@@ -20,6 +20,25 @@ class ProjectService {
 	def stateEngineService
 	def userPreferenceService
 
+	/**
+	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
+	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
+	 * is false then the list will be restricted to those that the user has been assigned to via a relation in the
+	 * PartyRelationship table.
+	 *
+	 * @param userLogin - the user to lookup projects for
+	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
+	 * @param projectStatus - the status of the project, options [any | active | completed] (default any)
+	 * @param sortOn - field used to sort, could be name or projectCode
+	 * @param sortOrder - sort order, could be asc or desc
+	 * @return list of projects
+	 */
+	List<Project> getUserProjectsOrderBy(UserLogin userLogin, Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY, ProjectSortProperty sortOn = ProjectSortProperty.NAME, SortOrder sortOrder = SortOrder.ASC) {
+		def searchParams = [:]
+		searchParams.sortOn = sortOn
+		searchParams.sortOrder = sortOrder
+		return getUserProjects(userLogin, showAllProjPerm, projectStatus, searchParams)
+	}
 
 	/** 
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all 
@@ -29,7 +48,7 @@ class ProjectService {
 	 *
 	 * @param userLogin - the user to lookup projects for
 	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
-	 * @param projectState - the state of the project, options [any | active | completed] (default any)
+	 * @param projectStatus - the status of the project, options [any | active | completed] (default any)
 	 * @param params - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @return list of projects
 	 */
@@ -73,110 +92,6 @@ class ProjectService {
 		return projects
 	}
 
-	/*
-	 * Returns list of completed Project means projects whose completion time is less than today's date
-	 */
-	def getCompletedProject( timeNow, projectHasPermission, String sortOn='name',String orderBy='desc', def params = [:]) {
-		def loginUser = UserLogin.findByUsername(SecurityUtils.subject.principal)
-		def projects
-		def parties
-		def companyId
-		
-		if(!projectHasPermission){
-			def userCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' \
-				and partyIdTo = ${loginUser.person.id} and roleTypeCodeFrom = 'COMPANY' and roleTypeCodeTo = 'STAFF' ")
-			companyId = userCompany?.partyIdFrom
-			parties = PartyRelationship.executeQuery("SELECT pr.partyIdFrom FROM PartyRelationship pr WHERE \
-						pr.partyIdTo = ${companyId?.id} AND pr.roleTypeCodeFrom = 'PROJECT' ")
-		}
-		
-		projects = projectFilter( parties, projectHasPermission, companyId, timeNow, params, "completed")
-		return projects
-	}
-
-	
-	/**
-	 * Returns list of Active Projects whose completion time is greater than today's date.
-	 * @param Time - timeNow - the time in GMT to filter projects on
-	 * @param Boolean viewAllPerm - flag indicating if user has permission to view all projects
-	 * @param String sortOn - column to sort on ('name')
-	 * @param String orderBy - order to which the sort is done (default 'desc')
-	 * @return Project[] - an array of Project objects
-	 */
-	def getActiveProject( def timeNow, def viewAllPerm, String sortOn='name', String orderBy='desc', def params = [:]) {
-		Person nullPerson = null
-		return getActiveProject(timeNow, viewAllPerm, nullPerson, sortOn, orderBy, params)
-	}
-	
-	/**
-	 * Returns list of Active Projects whose completion time is greater than today's date limited to parties for the specified person
-	 * @param Time - timeNow - the time in GMT to filter projects on
-	 * @param Boolean viewAllPerm - flag indicating if user has permission to view all projects
-	 * @param Party party - the Party to filter projects on which is usually the company that a person is associated with
-	 * @param String sortOn - column to sort on ('name')
-	 * @param String orderBy - order to which the sort is done (default 'desc')
-	 * @return Project[] - an array of Project objects
-	 */
-	def getActiveProject( def timeNow, def viewAllPerm, Person person, String sortOn='name', String orderBy='desc', def params = [:] ) {
-		def projects 
-		def company
-		def parties
-		if(!viewAllPerm){
-			person = person ?: securityService.getUserLoginPerson()
-			company = partyRelationshipService.getStaffCompany( person )
-			parties = PartyRelationship.executeQuery("SELECT pr.partyIdFrom FROM PartyRelationship pr WHERE \
-							pr.partyIdTo = ${company?.id} AND pr.roleTypeCodeFrom = 'PROJECT' ")
-		}
-// TODO : we shouldn't be looking up parties. It should only be looking up the projects that the person is related to.		
-		projects = projectFilter( parties, viewAllPerm, company, timeNow, params, "active")
-		
-		return projects
-	}
-	
-	/**
-	 * Returns list of Active Projects based on the filters selected by the user in projectList
-	 * @param parties - list of Party to filter project if user do not have viewAll perm
-	 * @param viewAllPerm - perm to view all projects
-	 * @param company - company instance associated with user
-	 * @param timeNow - current time
-	 * @return Project[] - an array list of Project objects
-	 */
-	def projectFilter( def parties, def viewAllPerm,def company ,def timeNow, def params = [:], def active="active"){
-		def maxRows = params.rows ? Integer.valueOf(params.rows) : 25
-		def currentPage = params.page ? Integer.valueOf(params.page) : 1
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		
-		def startDates = params.startDate ? Project.findAll("from Project where startDate like '%${params.startDate}%'")?.startDate : []
-		def completionDates = params.completionDate ? Project.findAll("from Project where completionDate like '%${params.completionDate}%'")?.completionDate : []
-		
-		def projects = Project.createCriteria().list(max: maxRows, offset: rowOffset) {
-			if (!viewAllPerm){
-				or {
-					if(parties)
-						'in'("id",parties.id)
-					eq('client', company)
-				}
-			}
-			if(active == "active"){
-				ge("completionDate", timeNow)
-			}else{
-				lt('completionDate', timeNow)
-			}
-			if (params.projectCode)
-				ilike('projectCode', "%${params.projectCode}%")
-			if (params.name)
-				ilike('name', "%${params.name}%")
-			if (params.comment)
-				ilike('comment', "%${params.comment}%")
-			if (startDates)
-				'in'('startDate' , startDates)
-			if (completionDates)
-				'in'('completionDate' , completionDates)
-				
-			order(params.sidx ?: 'projectCode', params.sord ?: 'asc')
-		}
-		return projects
-	}
 	/**
 	 * This method is used to get partyRelationShip instance to fetch project manager for requested project.
 	 * @param projectId

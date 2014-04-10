@@ -3,6 +3,9 @@ import org.apache.shiro.SecurityUtils;
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
 import java.text.SimpleDateFormat
 import grails.converters.JSON
 
@@ -283,14 +286,14 @@ class UserLoginController {
 		
 		def userLoginInstance = new UserLogin()
 		userLoginInstance.properties = params
-		def expiryDate = new Date(now.getTime() + 7776000000)
+		def expiryDate = new Date(now.getTime() + 7776000000) // 3 Months
 		userLoginInstance.expiryDate = expiryDate
 		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 		def project = securityService.getUserCurrentProject()
-		
-		//def projectList = Project.list(sort:'name', order:'asc')
-		def projectList = projectService.getActiveProject( now, false, person, 'name', 'asc' )
-		
+
+		def currentUser = securityService.getUserLogin()
+		def projectList = projectService.getUserProjectsOrderBy(currentUser, false, ProjectStatus.ACTIVE)
+
 		return ['userLoginInstance':userLoginInstance, personInstance:person, companyId:companyId, roleList:roleList, projectList:projectList,
 			 	project:project]
 	}

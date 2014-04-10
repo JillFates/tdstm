@@ -1,3 +1,10 @@
+import java.util.List;
+import java.util.Map;
+
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
+
 import com.tds.asset.FieldImportance;
 
 import grails.converters.JSON
@@ -44,12 +51,17 @@ class ProjectController {
 		
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		def now = TimeUtil.nowGMT()
-		
-		def projectList 
-		if( params.isActive == "active" )
-			projectList =  projectService.getActiveProject( now, projectHasPermission, sortIndex, sortOrder, params)
-		else	
-			projectList =  projectService.getCompletedProject ( now, projectHasPermission, sortIndex, sortOrder, params)
+
+		def searchParams = [:]
+		searchParams.maxRows = maxRows
+		searchParams.currentPage = currentPage
+		searchParams.sortOn = ProjectSortProperty.valueOfParam(sortIndex)
+		searchParams.sortOrder = SortOrder.valueOfParam(sortOrder)
+
+		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive)
+		projectStatus = (projectStatus!=null)?projectStatus:ProjectStatus.COMPLETED
+
+		def projectList = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, projectStatus, searchParams)
 		
 		def totalRows = projectList.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)

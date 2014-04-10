@@ -14,9 +14,9 @@ import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.tm.enums.domain.ContextType
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-
 
 /**
  * The cookbook services handles the logic for creating recipes and running the cookbook
@@ -654,14 +654,14 @@ class CookbookService {
 					break
 					
 				case 'active':
-					def projects = projectService.getActiveProject(new Date(), true, loginUser.person)
+				    def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.ACTIVE)
 					projects.each { project ->
 						projectIds << project.id
 					}
 					break
 					
 				case 'completed':
-					def projects = projectService.getCompletedProject(new Date(), true);
+				    def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.COMPLETED)
 					projects.each { project ->
 						projectIds << project.id
 					}
@@ -672,8 +672,7 @@ class CookbookService {
 					log.debug('PROJECT ' + project)
 					if (project != null) {
 						def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-						def now = TimeUtil.nowGMT()
-						def projects = projectService.getActiveProject( now, projectHasPermission)*.id
+						def projects = projectService.getUserProjects(loginUser, projectHasPermission, ProjectStatus.ACTIVE)*.id
 
 						log.debug('PROJECTS of USER ' + projects)
 						

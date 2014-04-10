@@ -13,6 +13,9 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.WebUtil;
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
 
 class PersonController {
 	
@@ -668,8 +671,9 @@ class PersonController {
 		def moveEvents
 		def projectId = Project.findById( project.id) ? project.id : 0
 		def loginPerson = securityService.getUserLoginPerson()
-		def reqProjects = projectService.getActiveProject( now, hasShowAllProjectsPerm, 'name', 'asc' )
-		
+		def loginUser = securityService.getUserLogin()
+		def reqProjects = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectsPerm, ProjectStatus.ACTIVE)
+
 		if (projectId == 0) {
 			projects = reqProjects
 		}else{
@@ -807,8 +811,8 @@ class PersonController {
 		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
 		userPreferenceService.setPreference("StaffingScale",scale)
 		
-		userPreferenceService.setPreference("ShowClientStaff",onlyClientStaff)
-		userPreferenceService.setPreference("ShowAssignedStaff",assigned)
+		userPreferenceService.setPreference("ShowClientStaff",onlyClientStaff.toString())
+		userPreferenceService.setPreference("ShowAssignedStaff",assigned.toString())
 
 		def now = TimeUtil.nowGMT()
 		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")
@@ -824,7 +828,8 @@ class PersonController {
 		 * Otherwise, use the project specified by projectId. */
 		if (projectId == 0) {
 			// Just get a list of the active projects
-			projectList = projectService.getActiveProject( now, hasShowAllProjectPerm, 'name', 'asc' )
+			def loginUser = securityService.getUserLogin()
+			projectList = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectPerm, ProjectStatus.ACTIVE)
 		} else {
 			// Add only the indicated project if exists and based on user's associate to the project
 			project = Project.read( projectId )
@@ -914,7 +919,7 @@ class PersonController {
 					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
 		
 	}
-	
+
 	/*
 	 * An internal function used to retrieve staffing for specified project, roles, etc.
 	 *@param projectList - array of Projects to get staffing for

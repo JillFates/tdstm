@@ -12,6 +12,9 @@ import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.ProjectSortProperty
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.tm.enums.domain.SortOrder
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 
@@ -1240,9 +1243,10 @@ function goBack() { window.history.back() }
 			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 			def company = partyRelationshipService.getStaffCompany( person )
 			def personTeams =  partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
-			def projects =  projectService.getActiveProject( now, projectHasPermission,'name','asc')
+			def userLogin = securityService.getUserLogin()
+			def projects = projectService.getUserProjectsOrderBy(userLogin, projectHasPermission, ProjectStatus.ACTIVE)
 			def project = securityService.getUserCurrentProject()
-			
+
 			render( template:"mobilePref", model:[person:person, personTeams:personTeams, projects:projects, project:project,
 					timeToUpdate:timeToRefresh])
 		} else {
