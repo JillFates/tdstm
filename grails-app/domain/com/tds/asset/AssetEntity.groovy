@@ -264,7 +264,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		externalRefId( blank:true, nullable:true )
         
         size( nullable:true )
-        scale( blank:true, nullable:true, inList:SizeScale.getKeys() )
+        scale( nullable:true, inList:SizeScale.getKeys() )
         rateOfChange( nullable:true )
 		modifiedBy( nullable:true )
 	}
