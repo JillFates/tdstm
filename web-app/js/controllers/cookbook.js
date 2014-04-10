@@ -1989,12 +1989,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	// This should to be fired whenever the usr click on "Versions" tab. 
 	// It selects the first row if there isn't any selected  
 	$scope.versions.updateGrid = function(){
-		$log.info('group grid select');
+		$log.info('versions grid select');
 		$log.info($scope.versions.versionsGrid);
-		if($scope.versions.versionsGrid.selectedItems.length == 0){
-    		layoutPluginTasks.updateGridLayout();
-    		$scope.versions.versionsGrid.selectRow(0, true)
-    	}
+		$scope.versions.getVersions({recipeId: $scope.selectedRecipe.recipeId});
     };
 
     $scope.versions.getRecipeVersionData = function(versionNumber){
