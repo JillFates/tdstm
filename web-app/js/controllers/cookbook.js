@@ -411,18 +411,17 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	$scope.$on('ngGridEventData', function(){
 		$log.info('nggrid event data');
-		$log.info(typeof(rowToShow) == 'number');
-		$log.info(typeof($scope.currentSelectedRow.rowIndex) == 'number');
+		var row = 0;
 		if(typeof(rowToShow) == 'number'){
-			$scope.gridOptions.selectRow(rowToShow, true);
+			row = rowToShow;
 			rowToShow = null;
 		}else if(typeof($scope.currentSelectedRow.rowIndex) == 'number'){
-			$scope.gridOptions.selectRow($scope.currentSelectedRow.rowIndex, true);
-		}else{
-			$timeout(function(){
-				$scope.gridOptions.selectRow(0, true);
-			}, 300)
+			row = $scope.currentSelectedRow.rowIndex;
 		}
+
+		$timeout(function(){
+			$scope.gridOptions.selectRow(row, true);
+		}, 200);
 	});
 
 	$scope.$on('ngGridEventEndCellEdit', function(evt){
