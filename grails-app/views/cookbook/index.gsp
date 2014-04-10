@@ -23,9 +23,9 @@
 	<g:javascript src="mergely/mergely.js" />	
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular/plugins/angular-resource.js" />
-	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
+	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<g:javascript src="controllers/cookbook.js" />
-	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.debug.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 </head>
 <body>
