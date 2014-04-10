@@ -339,8 +339,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.colDefNoData = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
 	$scope.colDefinition = $scope.colDef;
 
-
-	$scope.mySelection = [];
 	$scope.currentSelectedRow = {};
 	
 	$scope.editingRecipe = false;
@@ -350,7 +348,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.gridOptions = {
 		data: 'gridData',
 		multiSelect: false,
-		selectedItems: $scope.mySelection,
+		selectedItems: [],
 		columnDefs: 'colDefinition',
 		enableCellEditOnFocus: false,
 		enableCellEdit: true,
@@ -412,6 +410,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	};
 
 	$scope.$on('ngGridEventData', function(){
+		$log.info('nggrid event data');
+		$log.info(typeof(rowToShow) == 'number');
+		$log.info(typeof($scope.currentSelectedRow.rowIndex) == 'number');
 		if(typeof(rowToShow) == 'number'){
 			$scope.gridOptions.selectRow(rowToShow, true);
 			rowToShow = null;
@@ -420,7 +421,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}else{
 			$timeout(function(){
 				$scope.gridOptions.selectRow(0, true);
-			}, 100)
+			}, 300)
 		}
 	});
 
