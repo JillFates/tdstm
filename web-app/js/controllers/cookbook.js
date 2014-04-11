@@ -795,7 +795,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		validateSyntax : function(){
 			var dataToSend = $.param({'sourceCode': $scope.selectedRWip.sourceCode});
 			restCalls.validate({}, dataToSend, function(data){
-				$scope.currentSyntaxValidation = data.errors || [{"error":0,"reason":"No errors found"}];
+				$scope.currentSyntaxValidation = data.warnings || [{"error":0,"reason":"No errors found"}];
 				$scope.activeSubTabs.editor.syntaxErrors = true;
 			}, function(data){
 				$log.warn('Error on validation');

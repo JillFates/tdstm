@@ -377,7 +377,7 @@ class WsCookbookController {
 			if (results == null) {
 				render(ServiceResults.success() as JSON)
 			} else {
-				render(ServiceResults.errors(results) as JSON)
+				render(ServiceResults.warnings(results) as JSON)
 			}
 
 		} catch (UnauthorizedException e) {

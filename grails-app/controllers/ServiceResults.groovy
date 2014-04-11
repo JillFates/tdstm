@@ -49,6 +49,21 @@ class ServiceResults {
 	}
 	
 	/**
+	 * Returns a warning response to be serialized as json
+	 * @param object an array or map to be set as warnings
+	 * @return the response map
+	 */
+	static def warnings(object) {
+		def renderMap = [:]
+		renderMap.status = 'warning'
+		renderMap.warnings = object ?: []
+		
+		return renderMap
+	}
+	
+	
+	
+	/**
 	 * Sends an unauthorized error
 	 * @param response the response object
 	 */
