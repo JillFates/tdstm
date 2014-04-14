@@ -219,8 +219,8 @@
 											</div>
 											<div class="btn-group pull-left">
 												<button type="button" class="btn btn-default" ng-disabled="!((selectedRWip != null) && (selectedRVersion != null && (selectedRVersion.versionNumber > 0)))" ng-click="editorActions.diff()">Diff</button>
+												<button type="submit" class="btn btn-default pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()">Validate Syntax</button>
 											</div>
-											<button type="submit" class="btn btn-default pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()">Validate Syntax</button>
 										</div>
 									</div>
 									<div class="col-xs-6">
