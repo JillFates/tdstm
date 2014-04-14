@@ -1793,7 +1793,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		restCalls.getGroups({recipeVersionId: $scope.selectedRecipe.recipeVersionId, contextId: $scope.groups.contextId}, function(data){
 			$log.info('Success on getting Groups');
 			$log.info(data.data.groups);
-			$scope.groups.groupsArray = data.data.groups
+			$scope.groups.groupsArray = data.data.groups;
+			loadAssets([]);
 			$timeout(function(){
 				$scope.enabledGridSelection = true;
 			}, 200)
