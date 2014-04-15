@@ -24,33 +24,7 @@ function showCablingDetails( e, assetId ){
 	},500);
 }
 
-function changeCableStatus(cableId){
-	$('#status_'+cableId+' option[value="Cabled"]').attr('selected','selected');
-}
-function changeCableDetails(value, cableId){
-	var scope = angular.element($('#app')).scope();
-	if(value=='Empty'){
-		$("#assetFromId_"+cableId).val('');
-		$("#modelConnectorId_"+cableId).val('');
-		 scope.modelConnectors={}
-	}else if(value=='Unknown') {
-		$("#assetFromId_"+cableId).val('');
-		$("#color_"+cableId).val('');
-		$("#cableComment_"+cableId).val('');
-		$("#cableLength_"+cableId).val('');
-		$("#modelConnectorId_"+cableId).val('');
-		 scope.modelConnectors={}
-	}else{
-		$("#color_"+cableId).val(scope.cables[cableId]['color']);
-		$("#cableComment_"+cableId).val(scope.cables[cableId]['comment']);
-		$("#cableLength_"+cableId).val(scope.cables[cableId]['length']);
-		$("#assetFromId_"+cableId).val(scope.cables[cableId]['fromAssetId']);
-		scope.modelConnectors = scope.connectors[scope.cables[cableId]['fromAssetId']]
-		$("#modelConnectorId_"+cableId).val(scope.cables[cableId]['connectorId'])
-	}
-	if(!isIE7OrLesser)
-    	$("#assetFromId_"+cableId).select2();
-}
+
 function assetModelConnectors(value){
 	var connectId=$("#cabledTypeId").val();
 	if(value!='null'){

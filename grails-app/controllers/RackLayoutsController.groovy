@@ -669,13 +669,16 @@ class RackLayoutsController {
 		def assetCablingMap =[:]
 		def modelConnectorMap =[:]
 		def assetRows =[:]
-		def powerHouse = [:]
 		assetCableMapList.each {
 			def connectorLabel = it.assetToPort ? it.assetToPort.label : ""
 			def toAssetId
 			def toTitle =  ""
+			def powerA = 'power'
+			def powerB = 'nonPower'
 			if(it.assetFromPort.type == "Power"){
 				connectorLabel = it.toPower ? it.toPower : ""
+				powerA = 'nonPower'
+				powerB = 'power'
 			} else if(it.assetTo){
 				toAssetId = it.assetTo.id
 				toTitle = it.assetTo.assetName+" ( "+it.assetTo.model?.manufacturer+" / "+it.assetTo.model+" )"
@@ -695,17 +698,15 @@ class RackLayoutsController {
 									fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
 			
 			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color :it.cableColor, type:it.assetFromPort.type, length:it.cableLength?:'',
-									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'',asset :it.assetTo? it.assetTo?.assetName :'',
+									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'null',asset :it.assetTo? it.assetTo?.assetName :'',
 									fromAsset:(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ,toTitle:toTitle, title:title, rackUposition : connectorLabel , 
-									connectorId: it.assetToPort ? it.assetToPort?.id : "",type:it.assetFromPort.type, cableId:it.id, 
-									locRoom: (it.assetLoc=='S') ? 'Current' : 'Target', roomType:it.assetLoc]]
+									connectorId: it.assetToPort ? it.assetToPort?.id : "null",type:it.assetFromPort.type, cableId:it.id, 
+									locRoom: (it.assetLoc=='S') ? 'Current' : 'Target', roomType:it.assetLoc, powerA:powerA, powerB:powerB]]
 			
 			assetRows << [(it.id):'h']
-			//Used to show and hide power links using angular.
-			powerHouse << [(it.id):(it.assetFromPort.type=='Power'? 'h': 's')]
 		}
 		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON),
-										  models:models,assetRows:(assetRows as JSON),cableTypes:(powerHouse as JSON),isTargetRoom:isTargetRoom, 
+										  models:models,assetRows:(assetRows as JSON),isTargetRoom:isTargetRoom, 
 										  assetId:assetId, roomType:roomType])
 	}
 	/*
@@ -799,7 +800,7 @@ class RackLayoutsController {
 			assetCableMap.assetToPort = toConnector
 			assetCableMap.toPower = toPower
 			assetCableMap.cableColor = jsonInput.color
-			assetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength,0).round() 
+			assetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(),0).round() 
 			assetCableMap.cableComment = jsonInput.cableComment
 			assetCableMap.assetLoc= jsonInput.roomType
 			if(assetCableMap.save(flush:true)){
@@ -810,7 +811,7 @@ class RackLayoutsController {
 					toAssetCableMap.assetTo = assetCableMap.assetFrom
 					toAssetCableMap.assetToPort = assetCableMap.assetFromPort
 					toAssetCableMap.cableColor = jsonInput.color
-					toAssetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength,0).round() 
+					toAssetCableMap.cableLength = NumberUtils.toDouble(jsonInput.cableLength.toString(),0).round() 
 					toAssetCableMap.cableComment = jsonInput.cableComment
 					toAssetCableMap.assetLoc= jsonInput.roomType
 					if(!toAssetCableMap.save(flush:true)){
@@ -826,14 +827,18 @@ class RackLayoutsController {
 			}
 		}
 		def connectorLabel = assetCableMap.assetToPort ? assetCableMap.assetToPort.label : ""
+		def powerA = 'power'
+		def powerB = 'nonPower'
 		if(assetCableMap.assetFromPort.type == "Power"){
 			connectorLabel = assetCableMap.toPower ? assetCableMap.toPower : ""
+			powerA = 'nonPower'
+			powerB = 'power'
 		}
-		def assetCable = [ color :assetCableMap.cableColor, length:assetCableMap.cableLength?:'', asset :assetCableMap.assetTo? assetCableMap.assetTo?.assetName :'',
+		def assetCable = [ label : assetCableMap.assetFromPort.label, type:assetCableMap.assetFromPort.type, color :assetCableMap.cableColor, length:assetCableMap.cableLength?:'', asset :assetCableMap.assetTo? assetCableMap.assetTo?.assetName :'',
 									status:assetCableMap.cableStatus,comment:assetCableMap.cableComment?:'', fromAssetId :assetCableMap.assetTo? assetCableMap.assetTo?.id :'',
 									fromAsset:(assetCableMap.assetTo? assetCableMap.assetTo?.assetName+"/"+connectorLabel:'') , rackUposition : connectorLabel , 
 									connectorId: assetCableMap.assetToPort ? assetCableMap.assetToPort.id : "" , toCableId:toCableId?.id, 
-									locRoom: (assetCableMap.assetLoc=='S') ? 'Current' : 'Target']
+									locRoom: (assetCableMap.assetLoc=='S') ? 'Current' : 'Target', powerA:powerA,powerB:powerB]
 		render assetCable as JSON
 	}
 	/*

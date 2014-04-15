@@ -3,33 +3,24 @@
 var app = angular.module("app", ['ui']);
 
 app.controller('Ctrl', function($scope, $filter, $http) {
-	 $scope.statues = [
-	                   {value: 1, text:'Cabled'},
-	   				   {value: 2, text:'Unknown'},
-	   				   {value: 3, text:'Empty'}
-	   				  ];
+	 $scope.statues = ['Cabled','Unknown','Empty'];
 
-	 $scope.colors = [
-	                  {value: 1, text:'White'},
-	   				  {value: 2, text:'Grey'},
-	   				  {value: 3, text:'Green'},
-	   				  {value: 4, text:'Yellow'},
-	   				  {value: 5, text:'Orange'},
-	   				  {value: 6, text:'Red'},
-	   				  {value: 7, text:'Blue'},
-	   				  {value: 8, text:'Purple'},
-	   				  {value: 9, text:'Black'}
-   				  	];
-
+	 $scope.colors = ['White','Grey','Green','Yellow','Orange','Red','Blue','Purple','Black'];
+	
 	 $scope.cables = ${assetCablingMap};
+	 // which is used to reassign the cable value if user cancel without updating
+	 $scope.backUpCables = ${assetCablingMap};
 	 $scope.assets = {}; 
+	 $scope.cableColor = {};
 	 $scope.connectors = {};
 	 $scope.row = ${assetRows};
-  	 $scope.power = ${cableTypes};
    	 $scope.modelConnectors = {};
-  	 $scope.demoChange = function(value,type){
-  	  	if(value)
+  	 $scope.demoChange = function(id,type){
+  	  	var value= $scope.cables[id]['fromAssetId']
+  	  	if(value){
         	$scope.modelConnectors = $scope.connectors[value];
+  	  	}
+  	 	$scope.cables[id]['connectorId'] = 'null';
     }
 	
 	$scope.showRow = function(id) {
@@ -41,10 +32,18 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 		var type = $("#connectType_"+id).val();
 		var roomType = $("#roomType").val();
 	    if(tempId!='' && id!=tempId){
+		    if($scope.cables[id]['color'])
+	    		$scope.cableColor[id] = $scope.cables[id]['color']
+		    else
+		    	$scope.cableColor[id] = "White"
     		$scope.cancelRow(tempId);
 		    $scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
 	    } else {
 	    	if($('.btn:visible').length== 0){
+	    		if($scope.cables[id]['color'])
+		    		$scope.cableColor[id] = $scope.cables[id]['color']
+			    else
+			    	$scope.cableColor[id] = "White"
 	    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
 	         }
 	    }
@@ -73,10 +72,12 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 				$scope.assets = resp['assets'];
 				$scope.connectors = resp['connectors'];
 				$scope.showAsset(id, asset, type);
-				if(asset)
+				if(asset){
 					$scope.modelConnectors = $scope.connectors[asset];
-				else
+				}else{
 					$scope.modelConnectors = {};
+					$scope.cables[id]['connectorId'] = 'null';
+				}
 			}).error(function(resp, status, headers, config) {
 				alert("An Unexpected error while showing the asset fields.")
 			});
@@ -93,19 +94,21 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 		},600);
 	}
     $scope.cancelRow = function(id){
+    	$scope.cables[id]=$scope.backUpCables[id]
     	return $scope.row[id] = 'h';
     };
 //moved code from room.rack.combined.js to update the json which is useful to update a particular row.
     $scope.submitAction = function(cableId){
     	var actionId = $("#actionTypeId").val()
     	var isValid = true
+    	var statusVal = $scope.cables[cableId]['status']
     	if(actionId == "assignId"){
     		
     		if($("#connectType_"+cableId).val() != 'Power'){
 
-    			var assetFrom = $("#assetFromId_"+cableId).val()
-    			var modelConnectorId = $("#modelConnectorId_"+cableId).val()
-    			if($("#status_"+cableId).val() == 'Cabled' || $("#status_"+cableId).val() == 'Empty'){
+    			var assetFrom = $("#assetFromId_"+cableId).val();
+    			var modelConnectorId = $scope.cables[cableId]['connectorId']
+    			if(statusVal == 'Cabled' || statusVal == 'Empty'){
     				if( assetFrom!='null' && modelConnectorId=='null' ){
     					isValid = false
     					alert("Please enter the target connector details")
@@ -114,18 +117,18 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     		} 
     	}
     	var actionType=''
-    	switch($("#status_"+cableId).val()){
+    	switch(statusVal){
     		case "Cabled" : actionType = 'assignId' ; break;
     		case "Empty" : actionType = 'assignId' ; break;
     	}
     	if(isValid){
     		$http({
     			url:contextPath+'/rackLayouts/updateCablingDetails',
-    			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$("#status_"+cableId).val(),'actionType':actionType,
-    				          'color':$("#color_"+cableId).val(), 'connectorType':$("#connectType_"+cableId).val(),'assetFromId':$("#assetFromId_"+cableId).val(),
-    				          'modelConnectorId':$("#modelConnectorId_"+cableId).val(),'staticConnector':$("input:radio[name=staticConnector]:checked").val(),
-    				          'cableComment':$("#cableComment_"+cableId).val(), 'cableLength':$("#cableLength_"+cableId).val(),
-    				          'roomType':$("#roomType").val()},
+    			data: {'assetCable':cableId ,'assetId':$("#assetEntityId").val(), 'status':$scope.cables[cableId]['status'],'actionType':actionType,
+    				          'color':$scope.cableColor[cableId], 'connectorType':$("#connectType_"+cableId).val(),
+    				          'assetFromId':$("#assetFromId_"+cableId).val(),'modelConnectorId':$scope.cables[cableId]['connectorId'],
+    				          'staticConnector':$("input:radio[name=staticConnector]:checked").val(),'cableComment':$scope.cables[cableId]['comment'],
+    				          'cableLength':$scope.cables[cableId]['length'],'roomType':$("#roomType").val()},
     			method: "POST"
     		}).success (function(resp) {
         		$scope.cancelRow(cableId)
@@ -139,16 +142,62 @@ app.controller('Ctrl', function($scope, $filter, $http) {
         		$scope.cables[cableId]['connectorId']= resp.connectorId
         		$scope.cables[cableId]['asset']= resp.asset
         		$scope.cables[cableId]['locRoom'] = resp.locRoom
+        		$scope.cables[cableId]['powerA'] = resp.powerA
+        		$scope.cables[cableId]['powerB'] = resp.powerB
+        		$scope.cables[cableId]['cableComment'] = resp.cableComment
         		if(resp.toCableId && resp.toCableId!=cableId){
         			$scope.cables[resp.toCableId]['fromAssetId']= ''
             		$scope.cables[resp.toCableId]['fromAsset']= ''
             		$scope.cables[resp.toCableId]['connectorId']= ''
             		$scope.cables[resp.toCableId]['asset']= ''
         		}
+        		 $scope.backUpCables[cableId] =  $scope.cables[cableId];
     		});
     	}
     }
-   
+    $scope.changeCableDetails = function(cableId){
+        var value = $scope.cables[cableId]['status']
+    	if(value=='Empty'){
+    		$scope.modelConnectors={}
+    		console.log("--"+$("#assetFromId_"+cableId).val())
+    		if($("#assetFromId_"+cableId).val()){
+    			$("#assetFromId_"+cableId).val('');
+    		}
+    		$scope.cables[cableId]['connectorId']= 'null';
+    	}else if(value=='Unknown') {
+    		$scope.modelConnectors={}
+    		if($("#assetFromId_"+cableId).val()){
+    			$("#assetFromId_"+cableId).val('');
+    		}
+    		$scope.cableColor[cableId] = "White";
+    		$scope.cables[cableId]['comment']= '';
+    		$scope.cables[cableId]['length']= '';
+    		$scope.cables[cableId]['connectorId']= 'null';
+    	}else{
+    		$scope.cables[cableId]=$scope.backUpCables[cableId]
+    		$scope.cableColor[cableId] = $scope.backUpCables[cableId]['color']
+    		$("#assetFromId_"+cableId).val($scope.backUpCables[cableId]['fromAssetId']);
+    		$scope.modelConnectors = $scope.connectors[$scope.backUpCables[cableId]['fromAssetId']]
+    	}
+    	if(!isIE7OrLesser)
+        	$("#assetFromId_"+cableId).select2();
+    }
+    $scope.changeCableStatus = function(cableId){
+        if($scope.cables[cableId]['status']!='Cabled'){
+        	$scope.cables[cableId]['status']= 'Cabled';
+        }
+    }
+    $scope.openCablingDiv= function( assetId , type){
+    	var defRoomType = $("#roomTypeForCabling").val();
+    	if(!type && defRoomType=='0'){
+    		type = 'T'
+    	}
+    	
+    	if(!type){
+    		type='S'
+    	}
+    	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
+    }
 });
 
 </script>
@@ -191,7 +240,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 </div>
 <div id="app" ng-app="app" ng-controller="Ctrl">
    <table id="cableTable" class="table table-bordered table-hover table-condensed" style="width:auto;display:none;">
-    <tr style="font-weight: bold">
+    <tr style="font-weight: bold;">
       <th>Type</th>
       <th>Connector</th>
       <th>Status</th>
@@ -206,39 +255,37 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       <td ng-click="showEditRow(cable.cableId)">
       	 <span ng-hide="showRow(cable.cableId)">{{cable.status}}</span>
       	 <span ng-show="showRow(cable.cableId)">
-      	 <select id="status_{{cable.cableId}}" name="status_{{cable.cableId}}" style="width:75px;" onchange="changeCableDetails(this.value,{{cable.cableId}})">
-	        <option ng-repeat="s in statues" value="{{s.text}}" title="{{s.text}}" ng-selected="s.text == cable.status">{{s.text}}</option>
-	     </select>
-      	 </span>
+	     <select style="width:75px;" ng-model="cables[cable.cableId]['status']" ng-options="s for s in statues" ng-change="changeCableDetails(cable.cableId)"></select><br>
+      	</span>
       </td>
       <td ng-click="showEditRow(cable.cableId)" class='{{cable.color}}' ng-hide="showRow(cable.cableId)" >
-      	 <span></span>
+      <span></span>
       </td>
       <td ng-click="showEditRow(cable.cableId)" ng-show="showRow(cable.cableId)">
       	 <span>
-	      	 <select id="color_{{cable.cableId}}" name="color_{{cable.cableId}}" style="width:75px;" onchange="changeCableStatus({{cable.cableId}})">
-	      	 		<option value="">Please Select</option>
-			        <option ng-repeat="c in colors" value="{{c.text}}" title="{{c.text}}" ng-selected="c.text == cable.color">{{c.text}}</option>
-		     </select>
+			<select ng-model="cableColor[cable.cableId]" ng-options="c for c in colors" ng-change="changeCableStatus(cable.cableId)"></select><br>
       	 </span>
       </td>
       <td ng-click="showEditRow(cable.cableId)">
       	 <span ng-hide="showRow(cable.cableId)">{{ cable.length }}</span>
       	 <span ng-show="showRow(cable.cableId)">
-      	 	<input type="text" id="cableLength_{{cable.cableId}}" name="cableLength_{{cable.cableId}}" value="{{ cable.length }}" size="2" onkeypress="changeCableStatus({{cable.cableId}})"/>
+      	 	<input type="text" ng-model="cables[cable.cableId]['length']"
+      	 		value="{{ cable.length }}" size="2" ng-keypress="changeCableStatus(cable.cableId)"/>
       	 </span>
       </td>
       <td ng-click="showEditRow(cable.cableId)" >
       	 <div ng-hide="showRow(cable.cableId)" class='commentEllip'>{{ cable.comment }}</div>
       	 <span ng-show="showRow(cable.cableId)">
-      	 	<input type="text" name="cableComment_{{cable.cableId}}" id="cableComment_{{cable.cableId}}" value="{{ cable.comment }}" size="8" onkeypress="changeCableStatus({{cable.cableId}})"/>
+      	 	<input type="text" ng-model="cables[cable.cableId]['comment']"
+      	 		value="{{ cable.comment }}" size="8" ng-keypress="changeCableStatus(cable.cableId)"/>
       	 </span>
       </td>
       <td>
-      	<span ng-hide="showRow(cable.cableId);" class="power_{{power[cable.cableId]}}" style="display:none;" onclick="javascript:openCablingDiv({{cable.fromAssetId}},'${roomType}')">
+      	<span ng-hide="showRow(cable.cableId)" class='{{cable.powerA}}' ng-click="openCablingDiv(cable.fromAssetId,'${roomType}')"
+      		style="text-decoration: underline;color:blue;cursor: pointer;">
       		{{ cable.fromAsset }}
       	</span>
-      	<span ng-hide="showRow(cable.cableId);" style="display:none;" class="type_{{power[cable.cableId]}}">
+      	<span ng-hide="showRow(cable.cableId)" class='{{cable.powerB}}'>
       		{{ cable.rackUposition }}
       	</span>
 	      	<span ng-show="showRow(cable.cableId)">
@@ -246,21 +293,21 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 					<input type="radio" name="staticConnector" id="staticConnector_A_{{cable.cableId}}" value="A">A</input>&nbsp;
 					<input type="radio" name="staticConnector" id="staticConnector_B_{{cable.cableId}}" value="B">B</input>&nbsp;
 					<input type="radio" name="staticConnector" id="staticConnector_C_{{cable.cableId}}" value="C">C</input>
-					<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value="{{cable.rackUposition}}"/>
+					<input type="hidden" name="power_{{cable.cableId}}" id="power_{{cable.cableId}}" value='{{cable.rackUposition}}'/>
 				</span>
-				<%--TODO: Used onchange and onkeypress since ng-model usage in selects adding an empty option which is a drawback 
-				     you can look over here  https://github.com/angular/angular.js/issues/1019 --%>
+				
 				<span class="nonPowerDiv" style="display:none;">
-				     <select ui-select2 ng-model="params.value" ng-change="demoChange(params.value, cable.type)" id="assetFromId_{{cable.cableId}}" style="width:100px;" onchange="changeCableStatus({{cable.cableId}})">
+				     <select ui-select2  id="assetFromId_{{cable.cableId}}" ng-model="cables[cable.cableId]['fromAssetId']"
+				     	ng-change="demoChange(cable.cableId,cable.type);changeCableStatus(cable.cableId);" style="width:100px;">
 			        	<option value="{{cable.fromAssetId}}">{{ cable.asset }}</option>
 				     </select>
 				     <select id="assetHiddenId" style="display:none;width:75px;">
 				        <option value="null">Please Select</option>
 				        <option ng-repeat="v in assets" value="{{v.id}}" title="{{v.assetName}}" >{{v.assetName}}</option>
 				     </select>
-				     <select id="modelConnectorId_{{cable.cableId}}" style="width:75px;" onchange="changeCableStatus({{cable.cableId}})">
+				     <select ng-model="cables[cable.cableId]['connectorId']" style="width:75px;" ng-change="changeCableStatus(cable.cableId)">
 				        <option value="null">Please Select</option>
-				        <option ng-repeat="c in modelConnectors" value="{{c.value}}" title="{{c.text}}" ng-selected="c.value == cable.connectorId">{{c.text}}</option>
+				        <option ng-repeat="c in modelConnectors" value='{{c.value}}' title='{{c.text}}' ng-selected='c.value == cable.connectorId'>{{c.text}}</option>
 				     </select>
 			    </span>
 			    <input type="hidden" name="fromAsset_{{cable.cableId}}" id="fromAsset_{{cable.cableId}}" value="{{cable.fromAssetId}}"/>
