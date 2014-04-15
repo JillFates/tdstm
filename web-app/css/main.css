@@ -763,20 +763,12 @@ th.desc{
 	text-align: center;
 }
 
-.power_s{
-	text-decoration: underline;
-	color:blue;
-	cursor: pointer;
+.power {
 	display: block;
 }
-.power_h{
-	display: none !important;
-}
-.type_s{
+
+.nonPower {
 	display: none;
-}
-.type_h{
-	display: block;
 }
 br.page-break-after {
 	page-break-after: always;
