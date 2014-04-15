@@ -120,13 +120,12 @@ class WsTaskController {
 			return
 		}
 		
-		def contextType = params.contextType
+		def recipeVersionId = params.recipeVersionId
 		def contextId = params.contextId
-		def recipeVersion = params.recipeVersion
 		def publishTasks = params.publishTasks
 
 		try {
-			def result = taskService.initiateCreateTasksWithRecipe(loginUser, contextType, contextId, recipeVersion, publishTasks);
+			def result = taskService.initiateCreateTasksWithRecipe(loginUser, recipeVersionId, contextId, publishTasks);
 
 			render(ServiceResults.success('jobId' : result.jobId) as JSON)
 		} catch (UnauthorizedException e) {

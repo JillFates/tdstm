@@ -1268,9 +1268,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Used to initiate an async task creation process 
 	 * This is the service method called by the controller to initiate task generation
+	 * @param recipeVersionId - the id of the recipe version
 	 * @param publish - used to indicate if the tasks should be published at the time that they are generate, default=false
 	 */
-	Map initiateCreateTasksWithRecipe(UserLogin user, contextType, contextId, recipe, publish=false) {
+	Map initiateCreateTasksWithRecipe(UserLogin user, recipeVersionId, contextId, publish=false) {
 		if (!RolePermissions.hasPermission('GenerateTasks')) {
 			throw new UnauthorizedException('User doesn\'t have a GenerateTasks permission')
 		}
@@ -1279,25 +1280,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new UnauthorizedException('User doesn\'t have a PublishTasks permission')
 		}
 		
-		try {
-			contextType = ContextType.valueOf(contextType)
-		} catch (e) {
-			throw new IllegalArgumentException('Invalid context type', e)
-		}
-		
-		if (contextId == null || !contextId.isNumber()) {
-			throw new IllegalArgumentException('Invalid context id', e)
-		}
-		contextId = contextId.toInteger()
-		
-		if (recipe == null || !recipe.isNumber()) {
+		if (recipeVersionId == null || !recipeVersionId.isInteger()) {
 			throw new IllegalArgumentException('Invalid recipe id', e)
 		}
-		recipe = RecipeVersion.get(recipe.toInteger())
+		
+		def recipe = RecipeVersion.get(recipeVersionId.toInteger())
+		
 		if (recipe == null) {
 			new EmptyResultException('Recipe doesn\'t exists');
 		}
 
+		def contextType = recipe.recipe.asContextType()
 		publish = publish == null ? false : publish.toBoolean()
 		
 		def assets = this.getAssocAssets(contextType)

@@ -1363,8 +1363,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 
 		$scope.tasks.generateOpts.contextId = idSelected;
-		$scope.tasks.generateOpts.recipeId = $scope.selectedRecipe.recipeId;
-		$scope.tasks.generateOpts.recipeVersionId = '';
+		$scope.tasks.generateOpts.recipeVersionId = $scope.selectedRecipe.recipeId;
 
 		dataToSend = $.param($scope.tasks.generateOpts);
 
@@ -1423,7 +1422,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 						groupName: event.name
 					});
 				}else{
-					$scope.groups.bundlesArrayAssigned = $scope.tasks.generateOptions({
+					$scope.tasks.bundlesArrayAssigned = $scope.tasks.generateOptions({
 						isUnassigned: false, 
 						unassignedArray: angular.copy($scope.tasks.bundlesArrayUnassigned), 
 						assignedArray: data.data.list, 

@@ -1,4 +1,5 @@
 
+import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
 
 /**
@@ -63,5 +64,22 @@ class Recipe {
 	String toString() {
 		name
 	}	
+	
+	ContextType asContextType() {
+		switch (this.context) {
+			case 'Application' :
+				return ContextType.A
+				break;
+			case 'Bundle' :
+				return ContextType.B
+				break;
+			case 'Event' :
+				return ContextType.E
+				break;
+			default :
+				throw new IllegalArgumentException('Invalid context')
+				break;
+		}
+	}
 	
 }
