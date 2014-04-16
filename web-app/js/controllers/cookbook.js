@@ -982,7 +982,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 						$log.info('Row changed');
 						$scope.clone.selectedRecipe = rowItem.entity;
 						$scope.clone.newRecipe.context = $scope.clone.selectedRecipe.context;
-						$scope.clone.newRecipe.cloneFrom = $scope.clone.selectedRecipe.recipeId;
+						$scope.clone.newRecipe.clonedFrom = $scope.clone.selectedRecipe.recipeId;
 					}
 				}, 50)
 				
@@ -1015,7 +1015,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		if($scope.clone.selectedContext && $scope.clone.selectedProject/* && $scope.clone.selectedProjectState*/){
 			$log.info('fill the grid');
 			restCalls.getListOfRecipes(
-				{context: $scope.clone.selectedContext.name, projectId: $scope.clone.selectedProject.id}, 
+				{context: $scope.clone.selectedContext.name, projectType: $scope.clone.selectedProject.id}, 
 				function(data){
 					$log.info('Success on getting Recipes to Clone');
 					$log.info(data.data.list);
@@ -1128,7 +1128,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$scope.activeTabs.editor  = true;
 		}, function(){
 			$log.warn('Error when creating recipe');
-			$scope.alerts.addAlert({type: 'danger', msg: 'Saved'});
+			$scope.alerts.addAlert({type: 'danger', msg: 'Sorry but an unexpected error has occurred. Please contact support for assistance'});
 		});
 
 		clearFields();
