@@ -63,6 +63,7 @@ class ProjectService {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def sortOn = searchParams.sortOn?:ProjectSortProperty.PROJECT_CODE
 		def sortOrder = searchParams.sortOrder?:SortOrder.ASC
+		def projParams=searchParams.params?: [:]
 
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
@@ -72,6 +73,8 @@ class ProjectService {
 			if (!projectIds) return projects;
 		}
 
+		def startDates = projParams.startDate ? Project.findAll("from Project where startDate like '%${projParams.startDate}%'")?.startDate : []
+		def completionDates = projParams.completionDate ? Project.findAll("from Project where completionDate like '%${projParams.completionDate}%'")?.completionDate : []
 		// if !showAllProjPerm then filter in('id', userProjectIds)
 		// If projectState = active, filter ge("completionDate", timeNow)
 		// If projectState = completed then filter lt('completionDate', timeNow)
@@ -80,6 +83,17 @@ class ProjectService {
 			if (projectIds){
 				'in'("id", projectIds)
 			}
+			if(projParams.projectCode)
+				ilike('projectCode', "%${projParams.projectCode}%")
+			if(projParams.name)
+				ilike('name', "%${projParams.name}%")
+			if(projParams.comment)
+				ilike('comment', "%${projParams.comment}%")
+			if (startDates)
+				'in'('startDate' , startDates)
+			if (completionDates)
+				'in'('completionDate' , completionDates)
+				
 			if (projectStatus != ProjectStatus.ANY) { 
 				if(projectStatus == ProjectStatus.ACTIVE){
 					ge("completionDate", timeNow)

@@ -17,7 +17,7 @@ class EnumUtil {
 	 * @param param the value to search
 	 */
 	static searchfParam(values, String param ) {
-		return param?values.find { it.value == param.toLowerCase() }:null
+		return param?values.find { it.value == param }:null
 	}
 
 }

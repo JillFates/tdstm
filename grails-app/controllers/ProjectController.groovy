@@ -57,6 +57,7 @@ class ProjectController {
 		searchParams.currentPage = currentPage
 		searchParams.sortOn = ProjectSortProperty.valueOfParam(sortIndex)
 		searchParams.sortOrder = SortOrder.valueOfParam(sortOrder)
+		searchParams.params = params
 
 		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive)
 		projectStatus = (projectStatus!=null)?projectStatus:ProjectStatus.COMPLETED

@@ -9,7 +9,7 @@ import com.tdssrc.grails.EnumUtil
  *
  */
 enum ProjectSortProperty {
-	PROJECT_CODE("projectCode"), NAME("name");
+	PROJECT_CODE("projectCode"), NAME("name"), COMMENT("comment"), START_DATE("startDate"), COMPLETION_DATE("completionDate");
 
 	final String value
 
