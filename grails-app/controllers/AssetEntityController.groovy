@@ -1706,6 +1706,10 @@ class AssetEntityController {
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
+		def fixedFilter = false
+		if(params.filter)
+			fixedFilter = true
+		
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : entities.servers, 
 			applications : entities.applications, dbs : entities.dbs, files : entities.files,  networks :entities.networks, assetName:filters?.assetNameFilter ?:'', 
@@ -1715,7 +1719,7 @@ class AssetEntityController {
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
 			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
 			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType, 
-			 justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm]) 
+			 justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm, fixedFilter:fixedFilter]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList

@@ -64,13 +64,18 @@ class FilesController {
 		}
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
+		def fixedFilter = false
+		if(params.filter)
+			fixedFilter = true
+		
 		return [assetDependency: new AssetDependency(), servers : entities.servers, applications : entities.applications, dbs : entities.dbs, networks : entities.networks ,
 			files : entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
 			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
 			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,toValidate:params.toValidate,
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
-			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm]
+			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', 
+			hasPerm:hasPerm,fixedFilter:fixedFilter]
 		
 	}
 	/**

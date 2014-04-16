@@ -66,6 +66,10 @@ class ApplicationController {
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
+		def fixedFilter = false
+		if(params.filter)
+			fixedFilter = true
+		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
 			servers: entities.servers, 
 			applications: entities.applications, 
@@ -78,7 +82,8 @@ class ApplicationController {
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref,toValidate:params.toValidate, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
 			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent, moveBundleList:moveBundleList,
-			attributesList:attributesList, appPref:appPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm]
+			attributesList:attributesList, appPref:appPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true',
+			hasPerm:hasPerm, fixedFilter:fixedFilter]
 	}
 	/**
 	 * This method is used by JQgrid to load appList 

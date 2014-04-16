@@ -68,6 +68,10 @@ class DatabaseController {
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
+		def fixedFilter = false
+		if(params.filter)
+			fixedFilter = true
+		
 		return [assetDependency: new AssetDependency(),
 			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, 
 			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,

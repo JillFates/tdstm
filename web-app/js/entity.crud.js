@@ -986,6 +986,10 @@ $(document).ready(function() {
 			}
 		
 		}
+		$("[id^=gs_]").keydown(function(event){
+			$(".clearFilterId").removeAttr("disabled");
+		});
+		
 	});
 });
 
@@ -1130,3 +1134,14 @@ function toggleJustPlanning($me){
 		}
     });
 }
+function clearFilter(gridId){
+	$("[id^=gs_]").val('');
+	var data = new Object();
+	$("[id^=gs_]").each(function(){
+		 data[$(this).attr("name")] = '';//{assetName='',appOwner:'',environment:'',....}
+	});
+	$("#"+gridId+"Grid").setGridParam({postData: data});
+	$('.ui-icon-refresh').click();
+	$(".clearFilterId").attr("disabled","disabled");
+}
+
