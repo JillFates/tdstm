@@ -78,7 +78,8 @@ class DatabaseController {
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,toValidate:params.toValidate,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
-			dbPref:dbPref , modelPref:modelPref, attributesList:attributesList, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm]
+			dbPref:dbPref , modelPref:modelPref, attributesList:attributesList, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', 
+			hasPerm:hasPerm, fixedFilter:fixedFilter]
 	}
 	
 	/**

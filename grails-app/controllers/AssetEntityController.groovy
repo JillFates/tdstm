@@ -1894,7 +1894,7 @@ class AssetEntityController {
 			}
 		}
 		
-		if ( params.filter ) {
+		if ( params.filter && params.filter!='assetSummary') {
 			if (params.filter !='other'){  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
 				if(!params.event)
 					query.append("WHERE assets.assetType  IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
