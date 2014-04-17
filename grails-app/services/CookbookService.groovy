@@ -80,13 +80,13 @@ class CookbookService {
 		def defaultChangelog = ''
 		
 		if (cloneFrom != null) {
-			if (clonedFrom.isNumber()) {
-				clonedVersion = RecipeVersion.get(clonedFrom)
+			if (cloneFrom.isNumber()) {
+				clonedVersion = Recipe.get(cloneFrom)
 				if (clonedVersion == null) {
 					log.warn('Empty cloned version')
 					throw new EmptyResultException()
 				}
-				checkAccess(loginUser.person, clonedVersion.recipe.project)
+				//checkAccess(loginUser.person, clonedVersion.recipe.project)
 			} else {
 				log.info("Cloned from is not a number. Found: ${cloneFrom}")
 				throw new EmptyResultException()
@@ -101,9 +101,9 @@ class CookbookService {
 
 		def result = null
 
-		if (clonedVersion != null) {
+		if (clonedVersion != null && clonedVersion.releasedVersion != null) {
 			result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
-				           currentProject, clonedVersion.sourceCode, clonedVersion.changelog, clonedVersion, loginUser.person)
+				           currentProject, clonedVersion.releasedVersion.sourceCode, clonedVersion.releasedVersion.changelog, clonedVersion.releasedVersion, loginUser.person)
 		} else {
 		    result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
 			               currentProject, defaultSourceCode, defaultChangelog, null, loginUser.person)

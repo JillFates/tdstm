@@ -28,7 +28,7 @@ class WsCookbookController {
 		def name = params.name
 		def description = params.description
 		def context = params.context
-		def cloneFrom = params.cloneFrom
+		def cloneFrom = params.clonedFrom
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
