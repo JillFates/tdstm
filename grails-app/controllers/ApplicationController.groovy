@@ -239,6 +239,7 @@ class ApplicationController {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 	
 		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
@@ -249,7 +250,8 @@ class ApplicationController {
 		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,moveEventList:moveEventList,
-			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, availabaleRoles:availabaleRoles]
+			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, 
+			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value]
 	}
 	def save = {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -347,6 +349,7 @@ class ApplicationController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 
@@ -383,7 +386,8 @@ class ApplicationController {
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs, availabaleRoles:availabaleRoles]
+						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs, 
+						availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value]
 		}
 
 	}

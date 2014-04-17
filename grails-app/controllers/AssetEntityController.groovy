@@ -3425,6 +3425,7 @@ class AssetEntityController {
 			
 			def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 			
+			def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 	
 			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
@@ -3438,7 +3439,7 @@ class AssetEntityController {
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
 								models:models, assetType:assetType, manufacuterer:manufacuterer, config:configMap.config ,customs:configMap.customs,
-								rooms:rooms]
+								rooms:rooms, environmentOptions:environmentOptions?.value]
 			 
 			 if(params.redirectTo == "assetAudit") {
 				 paramsMap << ['source':params.source, 'assetType':params.assetType]
@@ -3565,6 +3566,7 @@ class AssetEntityController {
 
 		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
 		
 		def sourceBladeChassis = assetEntityInstance.roomSource ? AssetEntity.findAllByRoomSource(assetEntityInstance.roomSource)?.findAll{it.assetType == 'Blade Chassis'} : []
@@ -3597,7 +3599,7 @@ class AssetEntityController {
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
 							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs,
-							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks]
+							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks, environmentOptions:environmentOptions?.value]
 		
 		if(params.redirectTo == "roomAudit") {
 			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
@@ -4197,7 +4199,10 @@ class AssetEntityController {
 		
 		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		
-		return [planStatusOptions:planStatusOptions, priorityOption:priorityOption,dependencyType:dependencyType, dependencyStatus:dependencyStatus]
+		def environment = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		
+		return [planStatusOptions:planStatusOptions, priorityOption:priorityOption,dependencyType:dependencyType, 
+				dependencyStatus:dependencyStatus, environment:environment]
 
 	}
 	
@@ -4232,6 +4237,14 @@ class AssetEntityController {
 			}
 			planStatus = AssetOptions.findByValue(params.dependencyType).id
 			
+		}else if(params.assetOptionType=="environment"){
+			assetOptionInstance.type = AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
+			assetOptionInstance.value = params.environment
+			if(!assetOptionInstance.save(flush:true)){
+				assetOptionInstance.errors.allErrors.each { log.error  it }
+			}
+			planStatus = AssetOptions.findByValue(params.environment).id
+			
 		}else {
 		    assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
 			assetOptionInstance.value = params.dependencyStatus
@@ -4263,6 +4276,11 @@ class AssetEntityController {
 			}
 		}else if(params.assetOptionType=="dependency"){
 		    assetOptionInstance = AssetOptions.get(params.dependecyId)
+			if(!assetOptionInstance.delete(flush:true)){
+				assetOptionInstance.errors.allErrors.each { log.error  it }
+			}
+		}else if(params.assetOptionType=="environment"){
+		    assetOptionInstance = AssetOptions.get(params.environmentId)
 			if(!assetOptionInstance.delete(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}

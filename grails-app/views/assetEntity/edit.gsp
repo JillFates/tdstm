@@ -87,7 +87,7 @@
 								<td class="label ${config.assetType}" nowrap="nowrap"><label for="assetType">Type</label></td>
 								<td ><g:select from="${assetTypeOptions}"  class="${config.assetType} assetSelect" id="assetTypeEditId" name="assetType"  value="${assetEntityInstance.assetType}" onChange="selectManufacturer(this.value, 'Edit')" tabindex="12"/></td>
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
-								<td><g:select id="environment" name="environment" class="${config.environment}" from="${assetEntityInstance.constraints.environment.inList}" value="${assetEntityInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32"></g:select></td>
+								<td><g:select id="environment" name="environment" class="${config.environment}" from="${environmentOptions}" value="${assetEntityInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32"></g:select></td>
 								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocationId">Room</label></td>
 									<td >
 										<span class="useRoomS">

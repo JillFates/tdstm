@@ -11,6 +11,9 @@
    <span>The following options are used for asset fields and are system-wide, not project specific.  Please take care when editing.</span>
 </div>
  <div>
+	<g:render template="assetEnvironment"/>
+ </div>
+ <div>
 	<g:render template="assetOptions"/>
  </div>
  <div>

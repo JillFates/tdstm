@@ -78,7 +78,7 @@
 								</td>
 								<td >
 									<g:select id="environment" class="${config.environment}" name="environment" 
-										from="${applicationInstance.constraints.environment.inList}" 
+										from="${environmentOptions}" 
 										value="${applicationInstance.environment}" 
 										noSelection="${['':' Please Select']}" tabindex="32">
 									</g:select>

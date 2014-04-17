@@ -224,6 +224,7 @@ class FilesController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
@@ -231,7 +232,8 @@ class FilesController {
 		
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,
-					planStatusOptions:planStatusOptions.value, config:configMap.config, customs:configMap.customs]
+					planStatusOptions:planStatusOptions.value, config:configMap.config, customs:configMap.customs,
+					environmentOptions:environmentOptions?.value]
 	}
 	def save = {
 				params.assetType = "Files"
@@ -296,6 +298,7 @@ class FilesController {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.read(projectId)
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
@@ -320,7 +323,8 @@ class FilesController {
 			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, 
-						dependencyStatus:dependencyStatus,servers:servers, config:configMap.config, customs:configMap.customs]
+						dependencyStatus:dependencyStatus,servers:servers, config:configMap.config, customs:configMap.customs,
+						environmentOptions:environmentOptions?.value]
 		}
 		
 	}

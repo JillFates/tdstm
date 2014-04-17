@@ -64,7 +64,7 @@
 								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment
 								</label>
 								</td>
-								<td><g:select id="environment" class="${config.environment}" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}" noSelection="${['':' Please Select']}"/>
+								<td><g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" noSelection="${['':' Please Select']}"/>
 								</td>
 								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${fileInstance.externalRefId}" tabindex="11" /></td>

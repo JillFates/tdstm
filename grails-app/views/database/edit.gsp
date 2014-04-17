@@ -36,7 +36,7 @@
 							<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label></td>
 							<td><input type="text" id="supportType" class="${config.supportType}" name="supportType" value="${databaseInstance.supportType}" tabindex="26" /></td>
 							<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
-							<td colspan="3"><g:select id="environment" class="${config.environment}" name="environment" from="${com.tds.asset.AssetEntity.constraints.environment.inList}" value="${databaseInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32" /></td>
+							<td colspan="3"><g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32" /></td>
 						</tr>
 						<tr>
 							<td class="label ${config.dbFormat}" nowrap="nowrap"><label for="dbFormat">Format<span style="color: red;">*</span></label></td>
