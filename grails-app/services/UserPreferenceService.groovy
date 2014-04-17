@@ -355,6 +355,7 @@ class UserPreferenceService  {
 			ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
 			
 			AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = ${projectInstance.id}")
+			TaskBatch.executeUpdate("delete from TaskBatch tb where tb.project = ${projectInstance.id}")
 			
 			// remove DataTransferBatch
 			def batchQuery = "select dtb.id from DataTransferBatch dtb where dtb.project = ${projectInstance.id}"

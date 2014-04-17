@@ -33,6 +33,7 @@ class TaskBatch {
 	String infoLog = ''
 	/** Whom created this version of the recipe */
 	Person createdBy
+	Project project
 
 	Date dateCreated
 	Date lastUpdated

@@ -84,5 +84,6 @@ databaseChangeLog = {
 	include file: '20140324-add-modified-by-column-in-asset-entity.groovy'
 	include file: '20140327-modify-owner-frontend-label-to-appOwner.groovy'
 	include file: '20140403-add-version-column-in-eav-entity-table.groovy'
+	include file: '20140417-add-task-batch-project.groovy'
 	include file: '20140417-insert-environment-options-in-asset-options-table.groovy'
 }
