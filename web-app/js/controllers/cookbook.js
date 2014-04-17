@@ -899,9 +899,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	};
 
 	// CLONE
-
 	$scope.clone = {
-		contextArray : [{name: 'all'}, {name: 'Event'}, {name: 'Bundle'}, {name: 'Application'}],
+		contextArray : [{name: 'All'}, {name: 'Event'}, {name: 'Bundle'}, {name: 'Application'}],
 		projectsArray : [],
 		projectsStateArray : [],
 		selectedContext : '',
@@ -955,6 +954,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		}
 	}
+
+	$scope.clone.selectedContext = $scope.clone.contextArray[0];
 
 		// Grid stuff
 	$scope.clone.colDef = [
@@ -1024,8 +1025,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 						$scope.clone.projectsGrid.selectRow(0, true)
 					}, 200)
 				}, function(data){
+					$scope.clone.gridData = [];
 					$log.warn('Error on getting Recipes to Clone');
-					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
+					//$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
 				}
 			);
 			//$scope.clone.gridData = angular.copy($scope.clone.projectsArray);

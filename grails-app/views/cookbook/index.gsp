@@ -383,7 +383,6 @@
 												<label class="col-sm-2 control-label" for="eventSelect">Context</label>
 												<div class="col-sm-10">
 													<select class="form-control" name="contextSelect" id="cloneContextSelect" ng-model="clone.selectedContext" ng-change="clone.optionsSelected('context')" ng-options="item as item.name for item in clone.contextArray">
-														<option value="">Please select</option>
 													</select>
 												</div>
 											</div>
