@@ -3710,7 +3710,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								asset = Application.get(asset.id)
 								break
 							case 'database':
-								asset = Databae.get(asset.id)
+								asset = Database.get(asset.id)
 								break
 							case ~/files|file|storage/:
 								asset = Files.get(asset.id)
@@ -3739,7 +3739,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							daList << asset
 					}
 				}
-				assets = daList
+				assets = daList.unique()
 			}			
 		}
 	
