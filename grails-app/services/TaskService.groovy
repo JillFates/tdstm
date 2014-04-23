@@ -3679,67 +3679,73 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// limited filtering
 			//
 			if (filter?.containsKey('dependency') && assets.size() ) {
-				// Now we need to find assets that are associated via the AssetDependency domain
-				def depMode = filter.dependency.mode[0].toLowerCase()
-				def daProp='asset'
-				if (depMode == 'r') {
-					sql = 'from AssetDependency ad where ad.dependent.id in (:assetIds)'
-				} else {
-					sql = 'from AssetDependency ad where ad.asset.id in (:assetIds)'
-					daProp = 'dependent'					
-				}
-				def depAssets = AssetDependency.findAll(sql, [assetIds:assets*.id])
-				def daList = []
-				queryOn = filter.dependency.containsKey('class') ? filter.dependency['class'].toLowerCase() : 'device'
-
-				def chkVirtual=false
-				def chkPhysical=false
-				if (filter.dependency.containsKey('asset')) {
-					chkVirtual = filter.dependency.asset.containsKey('virtual')
-					chkPhysical = filter.dependency.asset.containsKey('physical')
-				}
-
-				depAssets.each { da -> 
-					def asset = da[daProp]
-					// Verify that the asset is in the move bundle id list
-					if ( map.bIds.contains( asset.moveBundle.id ) ) {
-						// Now verify based on 
-						// Attempt to get the asset by it's class
-						switch (queryOn) {
-							case 'application':
-								asset = Application.get(asset.id)
-								break
-							case 'database':
-								asset = Database.get(asset.id)
-								break
-							case ~/files|file|storage/:
-								asset = Files.get(asset.id)
-								break
-							case 'device':
-								// Make sure that the assets that were found are of the right type
-								if (chkVirtual) {
-									if ( ! ['virtual', 'vm'].contains(asset.assetType.toLowerCase() )) 
-										asset = null
-								} else if (chkPhysical) {
-									if ( ['application', 'database', 'files', 'virtual', 'vm'].contains(asset.assetType.toLowerCase() ))
-										asset = null
-								} else {
-									if ( ['application', 'database', 'files'].contains(asset.assetType.toLowerCase() ))
-										asset = null
-								}
-
-								break
-							default:
-								log.error "findAllAssetsWithFilter() Unhandled switch/case for filter.dependency.class='$queryOn'"
-								throw new RuntimeException("Unsupported filter.dependency.class '$queryOn' specified in filter ($filter)")
-								break
-						}
-
-						if (asset)
-							daList << asset
+				try {
+					// Now we need to find assets that are associated via the AssetDependency domain
+					def depMode = filter.dependency.mode[0].toLowerCase()
+					def daProp='asset'
+					if (depMode == 'r') {
+						sql = 'from AssetDependency ad where ad.dependent.id in (:assetIds)'
+					} else {
+						sql = 'from AssetDependency ad where ad.asset.id in (:assetIds)'
+						daProp = 'dependent'					
 					}
+					def depAssets = AssetDependency.findAll(sql, [assetIds:assets*.id])
+					def daList = []
+					queryOn = filter.dependency.containsKey('class') ? filter.dependency['class'].toLowerCase() : 'device'
+
+					def chkVirtual=false
+					def chkPhysical=false
+					if (filter.dependency.containsKey('asset')) {
+						chkVirtual = filter.dependency.asset.containsKey('virtual')
+						chkPhysical = filter.dependency.asset.containsKey('physical')
+					}
+
+					depAssets.each { da -> 
+						def asset = da[daProp]
+						// Verify that the asset is in the move bundle id list
+						if ( map.bIds.contains( asset.moveBundle.id ) ) {
+							// Now verify based on 
+							// Attempt to get the asset by it's class
+							switch (queryOn) {
+								case 'application':
+									asset = Application.get(asset.id)
+									break
+								case 'database':
+									asset = Database.get(asset.id)
+									break
+								case ~/files|file|storage/:
+									asset = Files.get(asset.id)
+									break
+								case 'device':
+									// Make sure that the assets that were found are of the right type
+									if (chkVirtual) {
+										if ( ! ['virtual', 'vm'].contains(asset.assetType.toLowerCase() )) 
+											asset = null
+									} else if (chkPhysical) {
+										if ( ['application', 'database', 'files', 'virtual', 'vm'].contains(asset.assetType.toLowerCase() ))
+											asset = null
+									} else {
+										if ( ['application', 'database', 'files'].contains(asset.assetType.toLowerCase() ))
+											asset = null
+									}
+
+									break
+								default:
+									log.error "findAllAssetsWithFilter() Unhandled switch/case for filter.dependency.class='$queryOn'"
+									throw new RuntimeException("Unsupported filter.dependency.class '$queryOn' specified in filter ($filter)")
+									break
+							}
+
+							if (asset)
+								daList << asset
+						}
+					}
+					assets = daList.unique()
 				}
-				assets = daList.unique()
+			} catch (e) {
+				// We really shouldn't of gotten here so we're going to do a stackdump
+				e.printStackTrace()
+				log.error "An unexpected error occurred - ${e.getMessage()}"
 			}			
 		}
 	
