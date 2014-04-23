@@ -3741,11 +3741,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 					}
 					assets = daList.unique()
+				} catch (e) {
+					// We really shouldn't of gotten here so we're going to do a stackdump
+					e.printStackTrace()
+					log.error "An unexpected error occurred - ${e.getMessage()}"
 				}
-			} catch (e) {
-				// We really shouldn't of gotten here so we're going to do a stackdump
-				e.printStackTrace()
-				log.error "An unexpected error occurred - ${e.getMessage()}"
 			}			
 		}
 	
