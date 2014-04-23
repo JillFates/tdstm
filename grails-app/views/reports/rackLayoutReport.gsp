@@ -14,6 +14,26 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+<style type="text/css" media="print">
+@page {
+	size: auto;
+	margin: 0mm;
+}
+
+body {
+	position: relative;
+}
+
+table.rack_elevation {
+	page-break-inside: avoid;
+	-webkit-region-break-inside: avoid;
+	position: relative;
+}
+
+div.onepage {
+	page-break-after: always;
+}
+</style>
 <script type="text/javascript">
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })
@@ -133,36 +153,40 @@
 <div class="body">
 <g:if test="${rackLayout}">
 <g:each in="${rackLayout}" var="rackLayout">
+	
 	<g:if test="${frontView}">
-	<table cellpadding=2 class="rack_elevation">
-		<tr>
-			<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
-		</tr>
-		<tr>
-			<th>U</th>
-			<th>Device</th>
-			<th>Bundle</th>
-			<th>U</th>
-		</tr>
-		${rackLayout?.frontViewRows}
-	</table>
-	<br class="page-break-after"/>
+		<div class='onepage'>
+			<table cellpadding=2 class="rack_elevation">
+				<tr>
+					<td colspan="13" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
+				</tr>
+				<tr>
+					<th>U</th>
+					<th>Device</th>
+					<th>Bundle</th>
+					<th>U</th>
+				</tr>
+				${rackLayout?.frontViewRows}
+			</table>
+		<%--	<p class="page-break-after" style="page-break-before: always;" />--%>
+		</div>
 	</g:if>
 	<g:if test="${backView}">
-	<table cellpadding=2 class="rack_elevation">
-		<tr>
-			<td colspan="5" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
-		</tr>
-		<tr>
-			<th>U</th>
-			<th>Device</th>
-			<th>Bundle</th>
-			<th>Cabling</th>
-			<th>U</th>
-		</tr>
-		${rackLayout?.backViewRows}
-	</table>
-	<br class="page-break-after"/>
+		<div class='onepage'>
+			<table cellpadding=2 class="rack_elevation">
+				<tr>
+					<td colspan="5" style="border:0px;"><h2>Room: ${rackLayout?.room} - Rack: ${rackLayout?.rack}</h2></td>
+				</tr>
+				<tr>
+					<th>U</th>
+					<th>Device</th>
+					<th>Bundle</th>
+					<th>Cabling</th>
+					<th>U</th>
+				</tr>
+				${rackLayout?.backViewRows}
+			</table>
+		</div>
 	</g:if>
 </g:each>
 </g:if>
