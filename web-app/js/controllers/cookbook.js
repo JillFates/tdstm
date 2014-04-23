@@ -421,13 +421,14 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		$timeout.cancel(lastLoopData);
 		lastLoopData = $timeout(function(){
 			if(typeof(rowToShow) == 'number'){
-				row = ($scope.gridOptions.data.length == 1) ? 0 : rowToShow;
+				row = ($scope.gridData.length == 1) ? 0 : rowToShow;
 				rowToShow = null;
+				$scope.gridOptions.selectRow(row, true);
 			}else if(typeof($scope.currentSelectedRow.rowIndex) == 'number'){
 				row = $scope.currentSelectedRow.rowIndex;
+				$scope.gridOptions.selectRow(row, true);
 			}
 			
-			$scope.gridOptions.selectRow(row, true);
 		}, 100);
 	});
 
@@ -1126,8 +1127,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		var dataToSend = $.param(args);
 		restCalls.createRecipe(dataToSend, function(data){
 			$scope.alerts.addAlert({type: 'success', msg: 'Recipe Created', closeIn: 1500});
-			listRecipes($scope.gridData.length);
 			$scope.activeTabs.editor  = true;
+			listRecipes($scope.gridData.length);
 		}, function(){
 			$log.warn('Error when creating recipe');
 			$scope.alerts.addAlert({type: 'danger', msg: 'Sorry but an unexpected error has occurred. Please contact support for assistance'});
