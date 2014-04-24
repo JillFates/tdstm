@@ -15,6 +15,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
 <style type="text/css" media="print">
+<%--Had given these css property in css file but was not reflecting. so defined in page itself--%>
 @page {
 	size: auto;
 	margin: 0mm;
@@ -168,7 +169,6 @@ div.onepage {
 				</tr>
 				${rackLayout?.frontViewRows}
 			</table>
-		<%--	<p class="page-break-after" style="page-break-before: always;" />--%>
 		</div>
 	</g:if>
 	<g:if test="${backView}">

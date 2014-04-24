@@ -6,6 +6,27 @@
 <title>Application Profiles</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
+<style type="text/css" media="print">
+<%--Had given these css property in css file but was not reflecting. so defined in page itself--%>
+@page {
+	size: auto; /* auto is the current printer page size */
+	margin: 0mm; /* this affects the margin in the printer settings */
+}
+
+body {
+	position: relative;
+}
+
+table.tablePerPage {
+	page-break-inside: avoid;
+	-webkit-region-break-inside: avoid;
+	position: relative;
+}
+
+div.onepage {
+	page-break-after: always;
+}
+</style>
 <script>
 	$(document).ready(function() {
 		$("#showEntityView").dialog({ autoOpen: false })
@@ -23,7 +44,8 @@
 		</div>
 
 <g:each var="appList" in="${applicationList}" var="application" status="i">
-		<table style="margin-left:80px;">
+	<div class='onepage'>
+		<table style="margin-left:80px;" class="tablePerPage">
 			<tbody>
 				<tr>
 				<th><a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
@@ -39,7 +61,8 @@
 					<g:render template="../assetEntity/dependentShow" model="[assetEntity:application.app,supportAssets:application.supportAssets,dependentAssets:application.dependentAssets]" ></g:render>
 				</tr>
 			</tbody>
-		</table><br class="page-break-after">
+		</table>
+	</div>
 	</g:each>
 	<div id="showEntityView" style="display: none;"></div>
 	<div id="editEntityView" style="display: none;"></div>
