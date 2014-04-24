@@ -1,4 +1,4 @@
-import java.beans.StaticFieldsPersistenceDelegate;
+// import java.beans.StaticFieldsPersistenceDelegate;
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 

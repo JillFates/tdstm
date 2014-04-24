@@ -99,11 +99,12 @@ class TaskService implements InitializingBean {
 		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
 
 		// Initialize some class level variables used repeatedly by the application
+		// TODO : Need to get staffingRoles out of static as the list can change during runtime
 		staffingRoles = partyRelationshipService.getStaffingRoles()*.id
 
 		commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
-		(1..24).each() { commonFilterProperties.add("custom$it".toString()) }	// Add custom1..custom24
-
+		(1..48).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom48
+		log.debug "commonFilterProperties include $commonFilterProperties"
 	}
 
 	/**
@@ -3423,14 +3424,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				// log.info("assetsLatestTask has ${assetsLatestTask.size()} assets")
 				if (loadedGroups.containsKey(groupCode)) {
 					assets.addAll( loadedGroups[groupCode] )
-					log.info("findAllAssetsWithFilter: added ${loadedGroups[groupCode].size()} asset(s) for group $groupCode")
+					log.debug("findAllAssetsWithFilter: added ${loadedGroups[groupCode].size()} asset(s) for group $groupCode")
 				} else {
 					log.error("findAllAssetsWithFilter: 'filter.group' value ($filter.group) references undefined group ($groupCode).")
 					throw new RuntimeException("'filter.group' value ($filter.group) references undefined group ($groupCode).")
 				}
 			}
 			if (assets.size() == 0) {
-				log.info("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets.")
+				log.debug("findAllAssetsWithFilter: 'filter.taskSpec' group filter found no assets.")
 				// throw new RuntimeException("''filter.taskSpec' group filter ($groups) contains no assets.")
 			}
 
@@ -3447,7 +3448,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// HANDLE filter.taskSpec
 			//
 
-			log.info("findAllAssetsWithFilter: taskSpec ${filter.taskSpec}")
+			log.debug("findAllAssetsWithFilter: taskSpec ${filter.taskSpec}")
 
 			// Put the group property into an array if not already an array
 			def filterTaskSpecs = CU.asList(filter.taskSpec)
@@ -3466,17 +3467,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					if  (predecessorsTasks[0].assetEntity ) {
 						assets.addAll( predecessorsTasks*.assetEntity )
 					} else {
-						log.info("findAllAssetsWithFilter: 'filter.taskSpec' value ($filter.taskSpec) references taskSpec ($groupCode) that does not contain assets.")
+						log.debug("findAllAssetsWithFilter: 'filter.taskSpec' value ($filter.taskSpec) references taskSpec ($groupCode) that does not contain assets.")
 						throw new RuntimeException("'filter.group' value ($filter.taskSpec) references taskSpec ($taskSpec) that does not contain assets.")								
 					}
 				} else {
-					log.info("findAllAssetsWithFilter: 'filter.taskSpec' value ($filter.taskSpec) references undefined taskSpec.ID ($ts).")
+					log.debug("findAllAssetsWithFilter: 'filter.taskSpec' value ($filter.taskSpec) references undefined taskSpec.ID ($ts).")
 					throw new RuntimeException("'filter.taskSpec' value ($filter.taskSpec) references undefined taskSpec.ID ($ts).")
 				}	
 			}
 			
 			if (assets.size() == 0) {
-				log.info("findAllAssetsWithFilter: 'filter.taskSpec' taskSpecs filter found no assets .")
+				log.debug("findAllAssetsWithFilter: 'filter.taskSpec' taskSpecs filter found no assets .")
 				// throw new RuntimeException("''filter.taskSpec' taskSpecs filter ($filterTaskSpecs) contains no assets.")
 			}
 			addFilters = false
@@ -3523,7 +3524,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 				}
 				if (incIds.size() == 0) {
-					log.info("findAllAssetsWithFilter: 'filter.include' found no assets")
+					log.debug("findAllAssetsWithFilter: 'filter.include' found no assets")
 					// Just return an empty list of assets
 					return assets
 				} 
@@ -3572,10 +3573,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			 * @param String[] - list of the properties to examine
 			 */
 			def addWhereConditions = { list ->
-				log.info "addWhereConditions: Building WHERE - list:$list, filter=${filter}"
+				log.debug "addWhereConditions: Building WHERE - list:$list, filter=${filter}"
 				list.each() { code ->
 					if (filter?.asset?.containsKey(code)) {
-						log.info("addWhereConditions: code $code matched")						
+						log.debug("addWhereConditions: code $code matched")						
 						sm = SqlUtil.whereExpression("a.$code", filter.asset[code], code)
 						if (sm) {
 							where = SqlUtil.appendToWhere(where, sm.sql)
@@ -3610,7 +3611,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					where = SqlUtil.appendToWhere(where, 'a.id NOT in (:excludes)')
 					map.put('excludes', excludes*.id)
 				}
-				log.info "findAllAssetsWithFilter: excluding group(s) [${filter.exclude}] that has ${excludes.size()} assets"
+				log.debug "findAllAssetsWithFilter: excluding group(s) [${filter.exclude}] that has ${excludes.size()} assets"
 			}
 			
 			// Assemble the SQL and attempt to execute it
@@ -3632,7 +3633,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						addWhereConditions(['truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
 
 						sql = "from AssetEntity a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
-						log.info "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
+						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
 						assets = AssetEntity.findAll(sql, map)
 						break;
 					
@@ -3641,7 +3642,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						addWhereConditions( ['appVendor','sme','sme2','businessUnit','criticality', 'shutdownBy', 'startupBy', 'testingBy'] )
 						
 						sql = "from Application a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
-						log.info "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
+						log.debug "findAllAssetsWithFilter: APPLICATION sql=$sql, map=$map"
 						assets = Application.findAll(sql, map)
 						break;
 					
@@ -3649,7 +3650,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions( ['dbFormat','size'] )
 						sql = "from Database a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
-						log.info "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
+						log.debug "findAllAssetsWithFilter: DATABASE sql=$sql, map=$map"
 						assets = Database.findAll(sql, map)
 						break;
 
@@ -3657,7 +3658,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Add additional WHERE clauses based on the following properties being present in the filter (Database domain specific)
 						addWhereConditions( ['fileFormat','size', 'scale', 'LUN'] )
 						sql = "from Files a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
-						log.info "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
+						log.debug "findAllAssetsWithFilter: FILES sql=$sql, map=$map"
 						assets = Files.findAll(sql, map)
 						break;
 												
@@ -3675,10 +3676,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			//
 			// Handle filter.dependency if specified and there were assets found
 			//
-			// This will instead of returning the assets found above, it will return the assets found through dependencies and some
-			// limited filtering
+			// This will instead of returning the assets found above, it will return the assets found through dependencies. It also provides
+			// some limited filtering of the dependents.
 			//
 			if (filter?.containsKey('dependency') && assets.size() ) {
+				log.debug "findAllAssetsWithFilter: Processing filter.dependency: master list ${assets*.id}"
 				try {
 					// Now we need to find assets that are associated via the AssetDependency domain
 					def depMode = filter.dependency.mode[0].toLowerCase()
@@ -3702,42 +3704,46 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 					depAssets.each { da -> 
 						def asset = da[daProp]
+						def dependent = null
 						// Verify that the asset is in the move bundle id list
+						// log.debug "findAllAssetsWithFilter: examining asset $asset"
 						if ( map.bIds.contains( asset.moveBundle.id ) ) {
-							// Now verify based on 
-							// Attempt to get the asset by it's class
+							// Now verify the class and attempt to get the asset by it's class type
 							switch (queryOn) {
 								case 'application':
-									asset = Application.get(asset.id)
+									if (asset.assetType.toLowerCase() == 'application')
+										dependent = Application.get(asset.id)
 									break
 								case 'database':
-									asset = Database.get(asset.id)
+									if (asset.assetType.toLowerCase() == 'database')
+										dependent = Database.get(asset.id)
 									break
 								case ~/files|file|storage/:
-									asset = Files.get(asset.id)
+									if (asset.assetType.toLowerCase() == 'files')
+										dependent = Files.get(asset.id)
 									break
 								case 'device':
 									// Make sure that the assets that were found are of the right type
 									if (chkVirtual) {
-										if ( ! ['virtual', 'vm'].contains(asset.assetType.toLowerCase() )) 
-											asset = null
+										if ( ['virtual', 'vm'].contains(asset.assetType.toLowerCase() )) 
+											dependent = asset
 									} else if (chkPhysical) {
-										if ( ['application', 'database', 'files', 'virtual', 'vm'].contains(asset.assetType.toLowerCase() ))
-											asset = null
+										if ( ! ['application', 'database', 'files', 'virtual', 'vm'].contains(asset.assetType.toLowerCase() ))
+											dependent = asset
 									} else {
-										if ( ['application', 'database', 'files'].contains(asset.assetType.toLowerCase() ))
-											asset = null
+										if ( ! ['application', 'database', 'files'].contains(asset.assetType.toLowerCase() ))
+											dependent = asset
 									}
 
 									break
 								default:
-									log.error "findAllAssetsWithFilter() Unhandled switch/case for filter.dependency.class='$queryOn'"
+									log.error "findAllAssetsWithFilter: Unhandled switch/case for filter.dependency.class='$queryOn'"
 									throw new RuntimeException("Unsupported filter.dependency.class '$queryOn' specified in filter ($filter)")
 									break
 							}
 
-							if (asset)
-								daList << asset
+							if (dependent)
+								daList << dependent
 						}
 					}
 					assets = daList.unique()
@@ -3745,6 +3751,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					// We really shouldn't of gotten here so we're going to do a stackdump
 					e.printStackTrace()
 					log.error "An unexpected error occurred - ${e.getMessage()}"
+					throw e
 				}
 			}			
 		}
