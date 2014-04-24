@@ -1802,7 +1802,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}, 200)
 		}, function(){
 			$log.warn('Error on getting Groups');
-			$scope.groups.groupsArray = [{'message': 'No results found', 'context': 'none'}];
+			$scope.groups.groupsArray = [{'message': 'Unexpected error', 'context': 'none'}];
 			$scope.groups.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
 			$timeout(function(){
 				$scope.enabledGridSelection = true;
