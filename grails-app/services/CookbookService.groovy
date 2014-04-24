@@ -862,7 +862,7 @@ class CookbookService {
 	* 5) Duplicate reference
 	*/
 	List<Map> basicValidateSyntax( sourceCode ) {
-		def errorList = []
+		def errorList = [] as HashSet
 		def recipe
 
 		// Helper closure that compares the properties of a spec to a defined map
@@ -877,7 +877,7 @@ class CookbookService {
 
 					if ( CU.isaMap(map[n])) {
 						// Check the sub section of the spec against a sub section of the map
-						// errorList.addAll( validateAgainstMap(type, spec[n], map[n]) )
+						errorList.addAll( validateAgainstMap(type, spec[n], map[n]) )
 					} else if ( CU.isaList(map[n]) ) {
 						// Check if the value of a property exists in the map defined list
 						if ( ! map[n].contains( v ) ) {
@@ -891,7 +891,7 @@ class CookbookService {
 						detail: "$label in element $i contains unknown property '$n'" ]
 				}
 			}
-			return errorList
+			return errorList as List
 		}
 
 		// Definition of the properties supported by group
@@ -913,18 +913,14 @@ class CookbookService {
 			id:0,
 			title:0,
 			description:0,
-			filter: [
-				group: '',
-				include: [],
-				exclude: []
-			],
+			filter: groupProps.filter,
 			type:['asset','action','milestone','gateway','general'],
 			action: ['rollcall','location','room','rack','truck','set'],
 			disposition:0,
 			setOn:0,
 			action:0,
 			workflow:0,
-			duration:0,
+			duration:'',
 			team:0,
 			category:0,
 			estStart:0,
@@ -944,11 +940,12 @@ class CookbookService {
 				ignore:true,
 				require:true,
 				typeSpec:0,
+				taskSpec:0,
 				inverse:true,
 				classification: ['device','database','application','storage']
 			],
 			successor: [
-				defer: [],
+				defer: '',
 				gather: []
 			],
 			constraintTime:0,
@@ -1000,10 +997,11 @@ class CookbookService {
 						if ( CU.isaMap(group.filter)) {
 							if ( group.filter.containsKey('class') ) {
 								// Make sure that the filter has a class and proper value
-								if (! classNames.contains( group.filter.class.toLowerCase() ) ) {
-									errorList << [ error: 1, reason: 'Invalid syntax', 
-										detail: "Group '${group.name}' in element ${index} has invalid filter.class value. Allowed values [${classNames.join(',')}]" ]
-								}
+								//NO LONGER NECESSARY WITH NESTED EVALUATIONS
+								//if (! classNames.contains( group.filter.class.toLowerCase() ) ) {
+								//	errorList << [ error: 1, reason: 'Invalid syntax', 
+								//		detail: "Group '${group.name}' in element ${index} has invalid filter.class value. Allowed values [${classNames.join(',')}]" ]
+								//}
 							} else {
 								// We default class=device so no error if not found
 								//errorList << [ error: 3, reason: 'Missing property', 
@@ -1384,7 +1382,7 @@ class CookbookService {
 			} // Tasks section Tests
 		}
 
-		return (errorList ?: null)
+		return (errorList ? errorList as List : null)
     }
 	
 	void validateGroupReferences(taskRef, fieldName, field, existingGroups, errorList) {

@@ -265,6 +265,55 @@ tasks: [
 ]
 	"""
 		
+	def invalidFilters = """
+groups: [
+	[
+		name: 'GOOD-GROUP',
+		filter : [
+			class: 'device',
+		]
+	],
+	[
+		name: 'BAD-GROUP',
+		description: 'This has an asset attribute in the parent filter element',
+		filter : [
+			class: 'device',
+			custom8: '%hasLic%'
+		]
+	],
+],
+tasks: [
+	[
+		id: 4100,
+		description: 'custom8 attribute in the proper filter.asset element',
+		title: 'GOOD TASK',
+		team: 'SYS_ADMIN_LNX',
+		category: 'startup',
+		duration: 13,
+		filter : [
+			class: 'asset',
+			asset:[
+				custom8: '%hasLic%'
+			]
+		],
+	],
+	[
+		id: 4120,
+		description: 'Task has an asset attribute in the parent filter element',
+		title: 'BAD TASK',
+		team: 'SYS_ADMIN_LNX',
+		category: 'startup',
+		duration: 13,
+		filter : [
+			class: 'asset',
+			custom8: '%hasLic%'
+		],
+	],
+
+
+]
+"""
+	
 	/**
 	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
 	 * dynamic method injections for various object classes to be used by the application
@@ -302,21 +351,46 @@ tasks: [
 		assertNull errors
 	}
 	
-	void testValidateProblem1() {
-		def errors = cookbookService.validateSyntax( problemRecipe1 )
-		assertNull errors
+	void testInvalidFilters() {
+		def errors = cookbookService.validateSyntax(invalidFilters)
+		assertNotNull errors
+		
+		def expectedErrors = [
+			"Group UNDEF in element 2 contains unknown property 'custom8'",
+			"Task id UNDEF in element 1 property 'class' contains invalid value 'asset'",
+			"Task id UNDEF in element 2 contains unknown property 'custom8'"
+		].sort{ a, b -> a.compareTo(b) }
+		
+		def returnedErrors = errors.collect {
+			it.detail
+		}.sort{ a, b -> a.compareTo(b) }
+		
+		assertEquals (returnedErrors, expectedErrors)
 	}
 	
 	void testValidateProblem2() {
 		def errors = cookbookService.validateSyntax( problemRecipe2 )
 		assertNotNull errors
-		assertEquals 'Should have one error', 6, errors.size()
-		assertTrue 'Should have an error', errors[0].detail.contains("Task id 2144 'duration' has invalid reference (#startupDuration,10x)")
-		assertTrue 'Should have an error', errors[1].detail.contains("Task id 2160 'duration' has invalid value (abc)")
-		assertTrue 'Should have an error', errors[2].detail.contains("Task id 2210 'filter/group' references an invalid group BOGUS")
-		assertTrue 'Should have an error', errors[3].detail.contains("Task id 2301 'filter/include' references an invalid group BOGUS")
-		assertTrue 'Should have an error', errors[4].detail.contains("Task id 2310 'filter/exclude' references an invalid group BOGUS")
-		assertTrue 'Should have an error', errors[5].detail.contains("Task id 2330 'predecessor/group' references an invalid group BOGUS")
+		assertEquals 'Should have six error', 6, errors.size()
+		
+		def returnedErrors = errors.collect { 
+			it.detail 
+		}.sort{ a, b -> a.compareTo(b) }
+		def expectedErrors = [
+				"Task id 2144 'duration' has invalid reference (#startupDuration,10x)",
+				"Task id 2160 'duration' has invalid value (abc)",
+				"Task id 2210 'filter/group' references an invalid group BOGUS",
+				"Task id 2301 'filter/include' references an invalid group BOGUS",
+				"Task id 2310 'filter/exclude' references an invalid group BOGUS",
+				"Task id 2330 'predecessor/group' references an invalid group BOGUS"
+			].sort{ a, b -> a.compareTo(b) }
+		
+		assertEquals (returnedErrors, expectedErrors)
+	}
+	
+	void testValidateProblem1() {
+		def errors = cookbookService.validateSyntax( problemRecipe1 )
+		assertNull errors
 	}
 	
 	void testSimple() {
@@ -364,7 +438,7 @@ tasks: [
 		log.info errors
 		assertNotNull 'Should have errors', errors
 		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have the invalid class name', errors[0].detail.contains('has invalid filter.class value')
+		assertTrue 'Should have the invalid class name', errors[0].detail.contains('Group UNDEF in element 1 property \'class\' contains invalid value \'invalidClassName\'')
 	}
 
 	void testValidateSyntaxGroupIsMissingFilterDefinition() {
