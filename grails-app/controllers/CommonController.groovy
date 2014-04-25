@@ -25,7 +25,7 @@ class CommonController {
 		if( !keyMap ){
 			def attributes = projectService.getAttributes(entityType)?.attributeCode
 			attributes.each{f->
-				keyValueMap << [(f): keyMap[f]?:""]
+				keyValueMap << [(f): keyMap[f]?:(f.contains('custom')? f: '')]
 			}
 		}else{
 			keyValueMap = keyMap
@@ -42,10 +42,19 @@ class CommonController {
 	def tooltipsUpdate = {
 		def entityType = request.JSON.entityType
 		def helpText = request.JSON.jsonString
+		def fields = JSON.parse(request.JSON.fields);
 		def category = EntityType.getListAsCategory(entityType)
 		def project = securityService.getUserCurrentProject()
 		try{
 			def attributes = projectService.getAttributes(entityType)?.attributeCode
+			def assetTypes=EntityType.list
+			fields.each{
+				project[it.label]=it.id
+			}
+			if(!project.validate() || !project.save(flush:true)){
+				def etext = "Project customs unable to Update "+GormUtil.allErrorsString( project )
+				log.error( etext )
+			}
 			attributes.each{ k ->
 				def keyMap = KeyValue.findAllByCategoryAndKey(category, k).find{it.project==project}
 				if(!keyMap)

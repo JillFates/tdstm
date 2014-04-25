@@ -22,5 +22,10 @@
 			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">{{importance[type.name][field.label]['phase'][phase.id]}}</td>
 			<td>{{help[type.name][field.label]}}</td>
 		</tr>
+		<tr ng-repeat="field in fields['customs']">
+			<td>{{field.id}}</td>
+			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">{{importance[type.name][field.label]['phase'][phase.id]}}</td>
+			<td>{{help[type.name][field.label]}}</td>
+		</tr>
 	</table>
 </div>

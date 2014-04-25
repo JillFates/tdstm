@@ -199,7 +199,7 @@
 		function showMegaMenu(e){
 			$(".headerClass").removeClass("ui-icon");
 			if(megamenuitem!=e)
-				$(".active").removeClass('active').addClass('inActive')
+				$(".menu2 .active").removeClass('active').addClass('inActive')
 			if($(e).hasClass('inActive'))
 				$(e).addClass('active').removeClass('inActive')
 			else

@@ -68,24 +68,10 @@
 							<td class="name">Event Manager:</td>
 							<td class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
 						</tr>
-						<tr class="prop">
-							<td class="name"><g:message code="project.customFieldsShown.label" default="Custom Fields Shown" />:</td>
-							<td class="valueNW" colspan="3">${fieldValue(bean: projectInstance, field: "customFieldsShown")}</td>
-						</tr>
 					</tbody>
 				</table>
 				<table style="border-style:none solid none solid;">
 					<tbody>
-						<g:each in="${ (1..Project.CUSTOM_FIELD_COUNT) }" var="i">
-							<g:if test="${i % 4 == 1}">
-								<tr class="prop custom_table" id="custom_count_${i}">
-							</g:if>
-								<td class="name" nowrap="nowrap"><g:message code="project.(custom${i}).label" default="Custom${i} Label" />:</td>
-								<td class="valueNW" nowrap="nowrap">${projectInstance.('custom'+i)}</td>
-							<g:if test="${i % 4 == 0}">
-								</tr>
-							</g:if>
-						  </g:each>
 						<tr class="prop">
 							<td class="name">Workflow Code:</td>
 							<td class="valueNW" nowrap="nowrap">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;

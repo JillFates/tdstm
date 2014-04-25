@@ -432,26 +432,6 @@
 					</optgroup>
 				</select> <input type="hidden" id="companyManagersId" value="${managers.size()}"/></td>
 			</tr>
-			<tr>
-			<td class="name"><label for="customFieldCount" > Custom Fields Shown: </label>
-				</td>
-				<td class="valueNW"><g:select id="customcount" name="customFieldsShown" from="${projectInstance.constraints.customFieldsShown.inList}" 
-                         value="${prevParam?.customFieldsShown?:'0'}" onchange="showCustomFields(this.value, 2);" /></td>
-			</tr>
-			<g:each in="${ (1..Project.CUSTOM_FIELD_COUNT) }" var="i">
-				<g:if test="${i % 2 == 1}">
-					<tr class="prop custom_table" id="custom_count_${i}" style="display: none;">
-				</g:if>
-					<td class="name" nowrap="nowrap">
-						<label for="custom$i"><g:message code="project.(custom${i}).label" default="Custom${i} Label" /></label>:
-					</td>
-					<td class="valueNW ${hasErrors(bean: projectInstance, field: 'custom'+i, 'errors')}">
-						<g:textField name="custom${i}" value="${projectInstance?.('custom'+i)}" />
-					</td>
-				<g:if test="${i % 2 == 0}">
-					</tr>
-				</g:if>
-		    </g:each>
 			<tr class="prop">
 				<td class="name"><label for="workflowCode">Workflow Code:</label></td>
 				<td

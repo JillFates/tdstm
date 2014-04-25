@@ -20,6 +20,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import org.apache.commons.lang.math.NumberUtils
 
 class ProjectController {
 	def userPreferenceService
@@ -640,7 +641,8 @@ class ProjectController {
 	 * Action to render the Field Settings (aka Importance) Show/Edit maintenance form for field importance and field tooltips
 	 */
 	def fieldImportance = {
-		return []
+		def project = securityService.getUserCurrentProject()
+		return [project:project]
 	}
 	
 	/**
@@ -655,6 +657,7 @@ class ProjectController {
 		assetTypes.each{type->
 			fieldMap << [(type):projectService.getFields(type)]
 		}
+		fieldMap<< ['customs':projectService.getCustoms()]
 		render fieldMap as JSON
 	}
 	/**
@@ -735,5 +738,19 @@ class ProjectController {
 		def entityType = request.JSON.entityType
 		def parseData = projectService.generateDefaultConfig(entityType)
 		render parseData as JSON
+	}
+	/**
+	 *This action is used to project customFieldsShown
+	 *@param : custom count.
+	 *@render string 'success'.
+	 */
+	def updateProjectCustomShown = {
+		def project = securityService.getUserCurrentProject()
+		project.customFieldsShown = NumberUtils.toInt(request.JSON.customCount,48)
+		if(!project.validate() || !project.save(flush:true)){
+			def etext = "Project customs unable to Update "+GormUtil.allErrorsString( project )
+			log.error( etext )
+		}
+		render "success"
 	}
 }

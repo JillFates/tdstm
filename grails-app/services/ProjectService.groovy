@@ -129,19 +129,29 @@ class ProjectService {
 		return moveManager
 	}
 	/**
-	 * To action is used to get the fields
+	 * This action is used to get the fields, splitted fields in to two to handle common customs.
 	 *@param : entityType type of entity.
 	 *@return 
 	 */
 	def getFields(def entityType){
 		def project = securityService.getUserCurrentProject()
 		def attributes = getAttributes(entityType)
-		def returnMap = attributes.collect{ p->
-			return ['id':(p.attributeCode.contains('custom') && project[p.attributeCode])? project[p.attributeCode]:p.frontendLabel, 'label':p.attributeCode]
+		def returnMap = attributes.findAll{!(it.attributeCode.contains('custom'))}.collect{ p->
+			return ['id':p.frontendLabel, 'label':p.attributeCode]
 		}
 		return returnMap
 	}
-	
+	/**
+	 * This action is used to get the custom fields
+	 *@return 
+	 */
+	def getCustoms(){
+		def project = securityService.getUserCurrentProject()
+		def attributes = getAttributes('Application')
+		def returnMap = attributes.findAll{it.attributeCode.contains('custom')}.collect{ p->
+			return ['id':project[p.attributeCode] ?: p.frontendLabel, 'label':p.attributeCode]
+		}
+	}
 	/**
 	 * This action useed to get the config from field importance Table.
 	 * @param entity type

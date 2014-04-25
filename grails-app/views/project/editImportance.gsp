@@ -20,7 +20,14 @@
 			<th>Help Text</th>
 		</tr>
 		<tr ng-repeat="field in fields[type.name]">
-			<td>{{field.id}}</td>
+			<td><span>{{field.id}}</span></td>
+			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">
+			<div class="pickbox" ng-repeat='datum in data' ng-click="assignData(type.name,datum,field.label,phase.id);">{{datum}}</div>
+			</td>
+			<td><input type="text" value="{{help[type.name][field.label]}}" id="help_{{type.name}}_{{field.label}}"/></td>
+		</tr>
+		<tr ng-repeat="field in fields['customs']">
+			<td><span><input type="text" value="{{field.id}}" id="{{type.name}}_{{field.label}}"/></span></td>
 			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">
 			<div class="pickbox" ng-repeat='datum in data' ng-click="assignData(type.name,datum,field.label,phase.id);">{{datum}}</div>
 			</td>

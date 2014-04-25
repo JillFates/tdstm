@@ -462,9 +462,11 @@ span.cellWithoutBackground
 }
 
 .fieldTable{
-	border:0px;
-	width :auto;
-	margin-left: 10px;
+	border: 0 none;
+    margin-left: 27px;
+    margin-top: 21px;
+    position: absolute;
+    width: auto;
 }
 
 .assetFieldHeader1 {
@@ -481,9 +483,8 @@ span.cellWithoutBackground
 	background-color:#CCCCCC !important;
 }
 .legend{
-	display:none;
 	position:absolute;
-	margin-top:-19px;
+	margin-top:-5px;
 	width:350px;
 }
 .legendTable{
