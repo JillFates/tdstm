@@ -1412,7 +1412,7 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	width: 250px
 }
 
-#predeccessorShowTd {
+#predecessorShowTd {
 	vertical-align: top !important;
 }
 #successorShowTd {
