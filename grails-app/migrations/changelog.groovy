@@ -86,4 +86,5 @@ databaseChangeLog = {
 	include file: '20140403-add-version-column-in-eav-entity-table.groovy'
 	include file: '20140417-add-task-batch-project.groovy'
 	include file: '20140417-insert-environment-options-in-asset-options-table.groovy'
+	include file: '20140428-add-description-field-to-eav-attribute.groovy'
 }
