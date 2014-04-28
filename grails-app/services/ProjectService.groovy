@@ -200,7 +200,7 @@ class ProjectService {
 	 * @return
 	 */
 	def updateConfigForMissingFields(parseData, type){
-		def fields = getFields(type)
+		def fields = getFields(type) + getCustoms()
 		def phases = ValidationType.getListAsMap().keySet()
 		fields.each{f->
 		if(!parseData[f.label]){

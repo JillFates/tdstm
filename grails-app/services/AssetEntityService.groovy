@@ -338,7 +338,7 @@ class AssetEntityService {
 	def getConfig (def type, def validation) {
 		def project = securityService.getUserCurrentProject()
 		def allconfig = projectService.getConfigByEntity(type)
-		def fields = projectService.getFields(type)
+		def fields = projectService.getFields(type) + projectService.getCustoms()
 		def config = [:]
 		def validationType
 		def valList=ValidationType.getValuesAsMap()
