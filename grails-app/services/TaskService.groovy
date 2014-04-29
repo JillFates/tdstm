@@ -1435,7 +1435,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def taskList = [:]				// an Map list (key AssetComment.id) that will contain list of all tasks that are inserted as they are created
 		def taskSpecTasks = [:]			// A map list where the key is the task spec id and value is an array of the tasks created by the task spec
 		def collectionTaskSpecIds = []	// An array containing task spec ids that are determined to be collections (sets, trucks, cart, rack, gateway, milestones, etc) 
-		def lastMilestone = null		// Will reference the most recent milestone task
+		def latestMilestone = null		// Will reference the most recent milestone task
 		def assetsLatestTask = [:]		// This map array will contain reference of the assets' last assigned task
 		def taskSpecList = [:]			// Used to track the ID #s of all of the taskSpecs in the recipe and holds last task created for some special cases
 		def groups = [:]				// Used to hold groups of assets as defined in the groups section of the recipe that can then be reference in taskSpec filters
@@ -1478,10 +1478,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		 * @param AssetComment (aka Task)
 		 */
 		def linkTaskToMilestone = { taskToLink ->
-			if (lastMilestone) {
+			if (latestMilestone) {
 				log.info "linkTaskToMilestone - $taskToLink"
 				log.debug "Calling createTaskDependency from linkTaskToMile"
-				depCount += createTaskDependency( lastMilestone, taskToLink, taskList, assetsLatestTask, settings, out)
+				depCount += createTaskDependency( latestMilestone, taskToLink, taskList, assetsLatestTask, settings, out)
 			} else {
 				log.info "linkTaskToMilestone Task(${taskToLink}) has no predecessor tasks"
 				exceptions.append("Task(${taskToLink}) has no predecessor tasks<br/>")
@@ -1790,8 +1790,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						isGroupingSpec = true
 						
 						newTask = createTaskFromSpec(recipeId, whom, taskList, ++lastTaskNum, moveEvent, taskSpec, projectStaff, exceptions, workflow)
-						def prevMilestone = lastMilestone
-						lastMilestone = newTask 
+						def prevMilestone = latestMilestone
+						latestMilestone = newTask 
 
 						// Indicate that the task is funnelling so that predecessor tasks' assets are moved through the task 
 						newTask.metaClass.setProperty('tmpIsFunnellingTask', true)		
@@ -1801,16 +1801,22 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						
 						log.info "milestone isRequired = $isRequired"
 						
-						// Find all tasks that don't have have a successor (excluding the current milestone task) 
+						// Find all tasks that don't have have a successor that are not terminal (excluding the current milestone task) 
+						// As well, find asset associated tasks that are sitting at the previous milestone and pull it forward if so
 						def tasksNoSuccessors = []
 						taskList.each() { id, t ->
-							if 	( ! t.metaClass.hasProperty(t, 'hasSuccessorTaskFlag') && 
-								  ! terminalTasks.contains(t.id) &&
-								  t.id != newTask.id 
-								) {
-
-								tasksNoSuccessors << t
-								taskSpecTasks[taskSpec.id] << t
+							// Check to see if the task doesn't have a successor, that it isn't terminal and that it isn't the current Milestone task
+							if ( ! t.metaClass.hasProperty(t, 'hasSuccessorTaskFlag') && 
+								! terminalTasks.contains(t.id) &&
+								t.id != newTask.id ) {
+									tasksNoSuccessors << t
+									taskSpecTasks[taskSpec.id] << t
+							} else if ( t.assetEntity && 
+								assetsLatestTask.containsKey(t.assetEntity.id) && 
+								assetsLatestTask[t.assetEntity.id] == prevMilestone ) {
+							 		
+							 		// If this is a task with an asset that is current sitting back at a previous Milestone then we'll shuffle the task to this Milestone
+							 		assetsLatestTask[t.assetEntity.id] = latestMilestone
 							}
 						}
 
@@ -2360,7 +2366,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 												// Push the task onto the missing pred stack to be wired later if possible
 												// TODO - Need to validate that this is necessary as it might wire things wrong
-												saveMissingDep(missedDepList, "${tnp.assetEntity.id}_${tnp.category ?: 'BLANK'}", taskSpec, tnp, isRequired, lastMilestone)
+												saveMissingDep(missedDepList, "${tnp.assetEntity.id}_${tnp.category ?: 'BLANK'}", taskSpec, tnp, isRequired, latestMilestone)
 
 												//log.info(msg)
 												//exceptions.append("${msg}<br/>")
@@ -2557,7 +2563,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 													// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br/>")
 													
 													// Push this task onto the stack to be wired up later on
-													saveMissingDep(missedDepList, "${predAsset.id}_${tnp.category}", taskSpec, tnp, isRequired, lastMilestone, ad)
+													saveMissingDep(missedDepList, "${predAsset.id}_${tnp.category}", taskSpec, tnp, isRequired, latestMilestone, ad)
 												}
 											}
 										}
@@ -4231,11 +4237,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param Map Array - the TaskSpec used to create the task(s)
 	 * @param AssetComment task - the task that failed the dependency lookup
 	 * @param Boolean isRequired - the flag if the dependency was required in the taskspec
-	 * @param AssetComment lastMilestoneTask - the current last milestone at the time that the smdTask was created
+	 * @param AssetComment latestMilestoneTask - the current last milestone at the time that the smdTask was created
 	 * @param AssetDependency dependency - the dependency record that was used to link assets together (not always present)
 	 */
-	private def saveMissingDep = { missedDepList, key, taskSpec, task, isRequired, lastMilestoneTask, dependency=null ->
-		missedDepList[key].add( [ taskId:task.id, isRequired:isRequired, msTaskId:lastMilestoneTask?.id , dependency:dependency ] )
+	private def saveMissingDep = { missedDepList, key, taskSpec, task, isRequired, latestMilestoneTask, dependency=null ->
+		missedDepList[key].add( [ taskId:task.id, isRequired:isRequired, msTaskId:latestMilestoneTask?.id , dependency:dependency ] )
 		log.info "saveMissingDep() Added missing predecessor to stack ($key) for task $task. Now have ${missedDepList[key].size()} missed predecessors"
 	}
 
