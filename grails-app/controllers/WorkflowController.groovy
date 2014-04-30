@@ -17,6 +17,8 @@ class WorkflowController {
 	def jdbcTemplate
 	def userPreferenceService
     def partyRelationshipService
+	def projectService
+	def securityService
 	/*-----------------------------------------------
 	 * Index method for default action
 	 *---------------------------------------------*/
@@ -354,20 +356,23 @@ class WorkflowController {
 			def workflow = Workflow.get( workflowId )
 			def process = workflow.process
 			def workflowProjects = Project.findAllByWorkflowCode(workflow?.process)
-			workflowProjects.each{ project ->
-				userPreferenceService.removeProjectAssociates(project)
-				def party = Party.get(project.id)
-				party.delete()
+			try {
+				workflowProjects.each{ project ->
+					projectService.deleteProject(project, securityService.getUserLogin())
+					def party = Party.get(project.id)
+					party.delete()
+				}
+				WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflow])
+				WorkflowTransition.executeUpdate("delete from WorkflowTransition wt where wt.workflow = ?",[workflow])
+				Swimlane.executeUpdate("delete from Swimlane s where s.workflow = ?",[workflow])
+				workflow.delete()
+				//	load transitions details into application memory.
+				stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
+			} catch (Exception ex) {
+				flash.message = ex.getMessage()
 			}
-			WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflow])
-			WorkflowTransition.executeUpdate("delete from WorkflowTransition wt where wt.workflow = ?",[workflow])
-			Swimlane.executeUpdate("delete from Swimlane s where s.workflow = ?",[workflow])
-			workflow.delete()
-			
-			//	load transitions details into application memory.
-	    	stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
 		}
-		redirect(action:home)
+		redirect(action:home, params:[ message : flash.message ] )
 	}
 	/*-----------------------------------------------
 	 * @param : workfow

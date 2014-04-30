@@ -44,7 +44,7 @@ class ProjectController {
 	def listJson = {
 		def sortIndex = params.sidx ?: 'projectCode'
 		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows)
+		def maxRows = Integer.valueOf(params.rows)?:25
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -74,7 +74,7 @@ class ProjectController {
 			startDate = it.startDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.startDate, tzId)) : ''
 			completionDate = it.completionDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.completionDate, tzId)) : ''
 			[ cell: [it.projectCode, it.name, startDate, completionDate,it.comment], id: it.id,]
-			}
+		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
@@ -137,13 +137,18 @@ class ProjectController {
 	def delete = {
 		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		if(projectInstance) {
-			def message = userPreferenceService.removeProjectAssociates(projectInstance)
-			projectInstance.delete(flush:true)
-			PartyGroup.executeUpdate("delete from Party p where p.id = ${params.id}")
-			Party.executeUpdate("delete from Party p where p.id = ${params.id}")
-			
-			flash.message = "Project ${projectInstance} deleted"
-			redirect(controller:"projectUtil", params:['message':flash.message])
+			try {
+				def message = projectService.deleteProject(projectInstance, securityService.getUserLogin())
+				projectInstance.delete(flush:true)
+				PartyGroup.executeUpdate("delete from Party p where p.id = ${params.id}")
+				Party.executeUpdate("delete from Party p where p.id = ${params.id}")
+				
+				flash.message = "Project ${projectInstance} deleted"
+				redirect(controller:"projectUtil", params:['message':flash.message])
+			} catch (Exception ex) {
+				flash.message = ex.getMessage()
+				redirect(action:list)
+			}
 		} else {
 			flash.message = "Project not found with id ${params.id}"
 			redirect(action:list)
