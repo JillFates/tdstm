@@ -44,7 +44,7 @@ class ProjectController {
 	def listJson = {
 		def sortIndex = params.sidx ?: 'projectCode'
 		def sortOrder  = params.sord ?: 'asc'
-		def maxRows = Integer.valueOf(params.rows)?:25
+		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -65,8 +65,8 @@ class ProjectController {
 
 		def projectList = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, projectStatus, searchParams)
 		
-		def totalRows = projectList.totalCount
-		def numberOfPages = Math.ceil(totalRows / maxRows)
+		def totalRows = projectList?.totalCount
+		def numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1
 
 		def results = projectList?.collect { 
 			def startDate = ''
