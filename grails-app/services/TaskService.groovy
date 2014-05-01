@@ -1811,11 +1811,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								t.id != newTask.id ) {
 									tasksNoSuccessors << t
 									taskSpecTasks[taskSpec.id] << t
-							} else if ( t.assetEntity && 
-								assetsLatestTask.containsKey(t.assetEntity.id) && 
-								assetsLatestTask[t.assetEntity.id] == prevMilestone ) {
-							 		
-							 		// If this is a task with an asset that is current sitting back at a previous Milestone then we'll shuffle the task to this Milestone
+							} else if ( t.assetEntity && assetsLatestTask.containsKey(t.assetEntity.id) ) {
+							 		// If this is a task with an asset then we'll shuffle the task to the latest Milestone
 							 		assetsLatestTask[t.assetEntity.id] = latestMilestone
 							}
 						}
