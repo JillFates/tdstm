@@ -54,7 +54,7 @@ class DatabaseController {
 		def dbPref= assetEntityService.getExistingPref('Database_Columns')
 		def attributes = projectService.getAttributes('Database')
 		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
+		def nonCustomList = project.customFieldsShown!=64 ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
 		// Remove the non project specific attributes and sort them by attributeCode
 		def dbAttributes = attributes.findAll{it.attributeCode !='assetName' && !(it.attributeCode in nonCustomList)}
 
@@ -133,7 +133,7 @@ class DatabaseController {
 				temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
 				joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
 			break;
-			case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24|custom25|custom26|custom27|custom28|custom29|custom30|custom31|custom32|custom33|custom34|custom35|custom36|custom37|custom38|custom39|custom40|custom41|custom42|custom43|custom44|custom45|custom46|custom47|custom48/:
+			case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24|custom25|custom26|custom27|custom28|custom29|custom30|custom31|custom32|custom33|custom34|custom35|custom36|custom37|custom38|custom39|custom40|custom41|custom42|custom43|custom44|custom45|custom46|custom47|custom48|custom49|custom50|custom51|custom52|custom53|custom54|custom55|custom56|custom57|custom58|custom59|custom60|custom61|custom62|custom63|custom64/:
 				temp +="ae.${value} AS ${value},"
 			break;
 			case 'dbFormat':

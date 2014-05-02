@@ -8,7 +8,7 @@ import com.tds.asset.Files
 class Project extends PartyGroup {
 
 	def static final DEFAULT_PROJECT_ID = 2
-	def static final CUSTOM_FIELD_COUNT = 48
+	def static final CUSTOM_FIELD_COUNT = 64
 	
 	static isDefaultProject(aProjectRef) {
 		if (aProjectRef instanceof Project) {
@@ -80,6 +80,22 @@ class Project extends PartyGroup {
 		String custom46
 		String custom47
 		String custom48
+		String custom49
+		String custom50
+		String custom51
+		String custom52
+		String custom53
+		String custom54
+		String custom55
+		String custom56
+		String custom57
+		String custom58
+		String custom59
+		String custom60
+		String custom61
+		String custom62
+		String custom63
+		String custom64
 		
 	static hasMany = [ dataTransferBatch : DataTransferBatch ]
 	
@@ -144,7 +160,23 @@ class Project extends PartyGroup {
 		custom46( blank:true, nullable:true )
 		custom47( blank:true, nullable:true )
 		custom48( blank:true, nullable:true )
-		customFieldsShown( nullable:false, inList:[0,4,8,12,16,20,24,28,32,36,40,44,48] )
+		custom49( blank:true, nullable:true )
+		custom50( blank:true, nullable:true )
+		custom51( blank:true, nullable:true )
+		custom52( blank:true, nullable:true )
+		custom53( blank:true, nullable:true )
+		custom54( blank:true, nullable:true )
+		custom55( blank:true, nullable:true )
+		custom56( blank:true, nullable:true )
+		custom57( blank:true, nullable:true )
+		custom58( blank:true, nullable:true )
+		custom59( blank:true, nullable:true )
+		custom60( blank:true, nullable:true )
+		custom61( blank:true, nullable:true )
+		custom62( blank:true, nullable:true )
+		custom63( blank:true, nullable:true )
+		custom64( blank:true, nullable:true )
+		customFieldsShown( nullable:false, inList:[0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64] )
 		lastAssetId( nullable:true )
 		runbookOn(nullable:true)
 		depConsoleCriteria( blank:true, nullable:true )

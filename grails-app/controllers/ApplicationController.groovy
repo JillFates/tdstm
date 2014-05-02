@@ -51,7 +51,7 @@ class ApplicationController {
 		def appPref= assetEntityService.getExistingPref('App_Columns')
 		def attributes = projectService.getAttributes('Application')
 		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = (projectCustoms..48).collect{"custom"+it}
+		def nonCustomList = project.customFieldsShown!=64 ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
 		
 		// Remove the non project specific attributes and sort them by attributeCode
 		def appAttributes = attributes.findAll{it.attributeCode!="assetName" && !(it.attributeCode in nonCustomList)}

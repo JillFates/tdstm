@@ -75,6 +75,22 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String custom46
 	String custom47
 	String custom48
+	String custom49
+	String custom50
+	String custom51
+	String custom52
+	String custom53
+	String custom54
+	String custom55
+	String custom56
+	String custom57
+	String custom58
+	String custom59
+	String custom60
+	String custom61
+	String custom62
+	String custom63
+	String custom64
 	
 	MoveBundle moveBundle
 	Project project
@@ -207,6 +223,22 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		custom46( blank:true, nullable:true )
 		custom47( blank:true, nullable:true )
 		custom48( blank:true, nullable:true )
+		custom49( blank:true, nullable:true )
+		custom50( blank:true, nullable:true )
+		custom51( blank:true, nullable:true )
+		custom52( blank:true, nullable:true )
+		custom53( blank:true, nullable:true )
+		custom54( blank:true, nullable:true )
+		custom55( blank:true, nullable:true )
+		custom56( blank:true, nullable:true )
+		custom57( blank:true, nullable:true )
+		custom58( blank:true, nullable:true )
+		custom59( blank:true, nullable:true )
+		custom60( blank:true, nullable:true )
+		custom61( blank:true, nullable:true )
+		custom62( blank:true, nullable:true )
+		custom63( blank:true, nullable:true )
+		custom64( blank:true, nullable:true )
 		
 		moveBundle( nullable:true )
 		project( nullable:true )
