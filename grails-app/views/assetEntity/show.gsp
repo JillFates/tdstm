@@ -56,7 +56,7 @@ $(document).ready(function() {
 							<tr class="prop">
 								<td class="label ${config.assetType}" nowrap="nowrap"><label for="assetType">Type</label></td>
 								<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>
-								<td class="label ${config.environment}" nowrap="nowrap"><label for="assetName">Environment</label></td>
+								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
 								<td class="label ${config.sourceLocation}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
 								<td class="valueNW ${config.sourceLocation}">${assetEntity.sourceLocation}</td>
