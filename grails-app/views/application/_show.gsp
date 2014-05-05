@@ -3,11 +3,11 @@
 		<tr>
 			<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 			<td style="font-weight:bold;" class="${config.assetName}">${applicationInstance.assetName}</td>
-			<td class="label ${config.description}" nowrap="nowrap">Description</td>
+			<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
 			<td colspan="5" class="${config.description}">${applicationInstance.description}</td>
 		</tr>
 		<tr>
-			<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
+			<td class="label" nowrap="nowrap"><label for="appAccess">Type</label></td>
 			<td class="valueNW">${applicationInstance.assetType}</td>
 			<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label></td>
 			<td class="valueNW ${config.supportType}">${applicationInstance.supportType}</td>
@@ -59,11 +59,11 @@
 		<tr>
 			<td class="label ${config.license}" nowrap="nowrap"><label for="license">License</label></td>
 			<td class="valueNW ${config.license}">${applicationInstance.license}</td>
-			<td class="label ${config.retireDate}" nowrap="nowrap">Retire</td>
+			<td class="label ${config.retireDate}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
 			<td class="${config.retireDate}"><tds:convertDate
 					date="${applicationInstance?.retireDate}"
 					timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
-			<td class="label ${config.validation}" nowrap="nowrap">Validation</td>
+			<td class="label ${config.validation}" nowrap="nowrap"><label for="validation">Validation</label></td>
 			<td class="${config.validation}">${applicationInstance.validation}</td>
 			<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
 			<td class="${config.testProc}">${applicationInstance.testProc ? applicationInstance.testProc : '?'}</td>
@@ -71,7 +71,7 @@
 		<tr>
 			<td></td>
 			<td></td>
-			<td class="label ${config.maintExpDate}" nowrap="nowrap">Maint Exp.</td>
+			<td class="label ${config.maintExpDate}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
 			<td class="valueNW ${config.maintExpDate}"><tds:convertDate
 					date="${applicationInstance?.maintExpDate}" formate="12hrs"
 					timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
@@ -82,7 +82,7 @@
 			<td class="valueNW ${config.startupProc}">${applicationInstance.startupProc ? applicationInstance.startupProc : '?'}</td>
 		</tr>
 		<tr>
-			<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
+			<td class="label ${config.url}" nowrap="nowrap"><label for="url">URL</label></td>
 			<td class="valueNW ${config.url}" ><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
 
 			<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>

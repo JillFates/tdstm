@@ -59,6 +59,8 @@ function showEntityView(e, type){
 		 $("#editEntityView").dialog('close');
 		 $("#createEntityView").dialog('close');
 		 updateAssetTitle(type)
+		 if(!isIE7OrLesser)
+			 getHelpTextAsToolTip(type);
      }
 }
 var title = document.title;
@@ -404,6 +406,7 @@ function submitMoveForm(){
 }
 function updateToShow($me, forWhom){
 	var act = $me.data('action')
+	var type = 'Server'
 	var redirect = $me.data('redirect')
 	if(act=='close')
 		$('#updateView').val('closeView')
@@ -411,12 +414,15 @@ function updateToShow($me, forWhom){
 		$('#updateView').val('updateView')
 	var flag=true
 	if(forWhom=='app'){
+		type = 'Application'
 		flag = validateFields('Edit','editAssetsFormId')
 	}
 	if(forWhom=='files'){
+		type = 'Storage'
 		flag = validateFileFormat('editAssetsFormId')
 	}
 	if(forWhom=='database'){
+		type = 'Database'
 		flag = validateDbFormat('editAssetsFormId')
 	}
 	if(flag!=false)
@@ -446,6 +452,8 @@ function updateToShow($me, forWhom){
 						$("#showEntityView").dialog('open');
 					}
 					changeDocTitle(title)
+					if(!isIE7OrLesser) 
+						getHelpTextAsToolTip(type);
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -830,6 +838,9 @@ function getHelpTextAsToolTip(type){
 					$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
 					$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
 					$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
+					
+					$(".dialog label[for="+key+"]").closest('td').next('td').tooltip({ position: {my: "left top"} });
+					$(".dialog label[for="+key+"]").closest('td').next('td').attr("title",value);
 				}
 			},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -840,6 +851,7 @@ function getHelpTextAsToolTip(type){
 
 function saveToShow($me, forWhom){
 	var act = $me.data('action')
+	var type = 'Server'
 	if($me.data('redirect'))
 		var redirect = $me.data('redirect').split("_")[0]
 	if(act=='close'){
@@ -850,12 +862,15 @@ function saveToShow($me, forWhom){
 	var flag=true
 	if(forWhom=='Application'){
 		flag = validateFields('','createAssetsFormId')
+		type = 'Application'
 	}
 	if(forWhom=='Files'){
 		flag = validateFileFormat('createAssetsFormId')
+		type='Storage'
 	}
 	if(forWhom=='Database'){
 		flag = validateDbFormat('createAssetsFormId')
+		type = 'Database'
 	}
 	if(flag!=false)
 		flag = validateDependencies('createAssetsFormId')
@@ -886,6 +901,8 @@ function saveToShow($me, forWhom){
 						$("#showEntityView").dialog('option', 'position', ['center','top']);
 						$("#showEntityView").dialog('open');
 						updateAssetTitle(forWhom);
+						if(!isIE7OrLesser) 
+							getHelpTextAsToolTip(type);
 					}
 					changeDocTitle(title)
 				}

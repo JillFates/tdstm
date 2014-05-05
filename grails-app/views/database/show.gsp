@@ -12,7 +12,7 @@
 						<tr class="prop">
 							<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 							<td class="valueNW ${config.assetName}" style="font-weight:bold;">${databaseInstance?.assetName}</td>
-							<td class="label ${config.description}" nowrap="nowrap">Description</td>
+							<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
 							<td class="valueNW ${config.description}" colspan="5">${databaseInstance.description}</td>
 						</tr>
 						<tr class="prop">
@@ -26,7 +26,7 @@
 						<tr class="prop">
 							<td class="label ${config.dbFormat}" nowrap="nowrap"><label for="dbFormat">Format</label></td>
 							<td class="valueNW ${config.dbFormat}">${databaseInstance?.dbFormat}</td>
-							<td class="label ${config.retireDate}" nowrap="nowrap">Retire</td>
+							<td class="label ${config.retireDate}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
 							<td class="valueNW ${config.retireDate}"><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 							<td class="valueNW ${config.moveBundle}" colspan="3">${databaseInstance?.moveBundle} / ${dependencyBundleNumber}</td>
@@ -34,7 +34,7 @@
 						<tr class="prop">
 							<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
 							<td class="valueNW ${config.size}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</td>
-							<td class="label ${config.maintExpDate}" nowrap="nowrap">Maint Exp.</td>
+							<td class="label ${config.maintExpDate}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
 							<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
 							<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td class="valueNW ${config.planStatus}" colspan="3">${databaseInstance?.planStatus}</td>
@@ -44,7 +44,7 @@
 							<td class="valueNW ${config?.rateOfChange}">${databaseInstance?.rateOfChange}</td>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td class="${config.externalRefId}">${databaseInstance.externalRefId}</td>
-							<td class="label ${config.validation}">Validation</td>
+							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 							<td class="valueNW ${config.validation}" colspan="3">${databaseInstance.validation}</td>
 						</tr>
 						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>

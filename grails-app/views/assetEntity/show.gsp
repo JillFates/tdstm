@@ -39,9 +39,7 @@ $(document).ready(function() {
  	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
-			<tds:hasPermission permission='AssetEdit'>
-				<div class="dialog" ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})"></div>
-			</tds:hasPermission>
+			<div class="dialog" <tds:hasPermission permission='AssetEdit'>ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})" </tds:hasPermission> >
 			<g:if test="${errors}">
 				<div id="messageDivId" class="message">${errors}</div>
 			</g:if>
@@ -50,7 +48,7 @@ $(document).ready(function() {
 							<tr  class="prop">
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 								<td style="font-weight:bold" class="${config.assetName}">${assetEntity.assetName}</td>
-								<td class="label ${config.description}" nowrap="nowrap">Description</td>
+								<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
 								<td colspan="2" class="${config.description}">${assetEntity.description}</td>
 								<td class="label_sm">Current</td>
 								<td class="label_sm">Target</td>
@@ -135,7 +133,7 @@ $(document).ready(function() {
 								<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${assetEntity?.maintExpDate}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							    </td>
-								<td class="label ${config.validation}">Validation</td>
+								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 								<td class="valueNW ${config.validation}">${assetEntity.validation}</td>
 								<td>&nbsp;</td>
 							</tr>

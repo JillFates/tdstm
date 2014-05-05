@@ -32,7 +32,7 @@
 							<td class="valueNW ${config.environment}">${filesInstance.environment}</td>
 							<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 							<td class="${config.externalRefId}">${filesInstance.externalRefId}</td>
-							<td class="label ${config.validation}">Validation</td>
+							<td class="label ${config.validation}"><label for="validation">Validation</label></td>
 							<td class="valueNW ${config.validation}">${filesInstance.validation}</td>
 						</tr>
 						<tr>
