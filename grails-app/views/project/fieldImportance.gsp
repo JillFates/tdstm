@@ -1,13 +1,13 @@
 <!doctype html>
 <%@page import="com.tdsops.tm.enums.domain.EntityType"%>
-<html xmlns:ng="http://angularjs.org">
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="projectHeader" />
 <title>Project Field Settings</title>
 <g:javascript src="angular/angular.min.js" />
 <%--TODO:the following bootstrap contains few extra methods which is usefull for angular bootstrap,once testing entire application with this js I will replace it with bootstrap.js--%>
-<script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
+<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
 <g:javascript src="controllers/fieldImportance.js" />
 <link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap-tabs.css')}" type="text/css"/>
 </head>
