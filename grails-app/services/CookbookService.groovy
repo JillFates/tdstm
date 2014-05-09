@@ -942,7 +942,9 @@ class CookbookService {
 				typeSpec:0,
 				taskSpec:0,
 				inverse:true,
-				classification: ['device','database','application','storage']
+				classification: ['device','database','application','storage'],
+				type:'',
+				status:''
 			],
 			successor: [
 				defer: '',
