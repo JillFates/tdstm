@@ -1020,7 +1020,8 @@ class AssetEntityController {
 			database =Database.findAllByProject( project )
 			files =Files.findAllByProject( project )
 		} else {
-			asset = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.assetType not in('Application','Database','Files') and m.moveBundle in ( $bundleList ) " )
+			asset = AssetEntity.findAll("from AssetEntity m where m.project = project and ifnull(m.assetType,'') NOT IN " +
+				"(${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) and m.moveBundle in ( $bundleList ) " )
 			application = Application.findAll( "from Application m where m.project = project and m.moveBundle in ( $bundleList )" )
 			database = Database.findAll( "from Database m where m.project = project and m.moveBundle in ( $bundleList )")
 			files = Files.findAll( "from Files m where m.project = project and m.moveBundle in ( $bundleList )" )
@@ -1868,7 +1869,7 @@ class AssetEntityController {
 		if(listType=='server')
 			query.append(" AND ae.asset_Type IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())}) ")
 		else
-			query.append(" AND ae.asset_type NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
+			query.append(" AND ifnull(ae.asset_type,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
 		
 			
 		query.append(""" GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
@@ -1913,9 +1914,9 @@ class AssetEntityController {
 					query.append("AND assets.assetType  IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
 			}else{
 				if(!params.event)
-					query.append("WHERE assets.assetType NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+					query.append("WHERE ifnull(assets.assetType,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
 				else
-					query.append("AND assets.assetType NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+					query.append("AND ifnull(assets.assetType,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
 			}	
 				
 			if( params.type=='toValidate'){
@@ -4328,7 +4329,7 @@ class AssetEntityController {
 		}
 		
 		def unassignedPhysicalCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
-						AND project = $projectId AND assetType NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())})")[0]
+						AND project = $projectId AND ifnull(assetType,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())})")[0]
 		def unassignedAssetCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
 						AND project = $projectId AND assetType IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())})")[0]
 
