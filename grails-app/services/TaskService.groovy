@@ -103,7 +103,7 @@ class TaskService implements InitializingBean {
 		staffingRoles = partyRelationshipService.getStaffingRoles()*.id
 
 		commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
-		(1..48).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom48
+		(1..64).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom64
 		log.debug "commonFilterProperties include $commonFilterProperties"
 	}
 
@@ -3633,7 +3633,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 					
 						// Add any devices specific attribute filters
-						addWhereConditions(['truck', 'cart', 'shelf', 'sourceLocation', 'targetLocation', 'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
+						addWhereConditions(['supportType', 'environment', 'department', 'description', 'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
+							'truck', 'cart', 'shelf', 'sourceLocation', 'sourceRack', 'sourceRoom', 'targetLocation', 'targetRack', 'targetRoom',
+							'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
 
 						sql = "from AssetEntity a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
 						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
