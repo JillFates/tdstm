@@ -738,11 +738,10 @@ class AssetEntityController {
 					def skippedUpdated =0
 					def skippedAdded=0
 					for ( int r = 1; r < dependencySheetRow ; r++ ) {
-						int cols = 0 ;
-						def depId = NumberUtils.toDouble(dependencySheet.getCell( cols, r ).contents.replace("'","\\'"), 0).round()
+						def depId = NumberUtils.toDouble(dependencySheet.getCell( 0, r ).contents.replace("'","\\'"), 0).round()
 						def assetDep =  depId ? AssetDependency.get(depId) : null
-						def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
-						def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
+						def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'"), 0).round())
+						def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'"), 0).round())
 						def depExist = AssetDependency.findByAssetAndDependent(asset, dependent)
 						assetEntityService.validateAssetList([asset?.id ]+[dependent?.id]+[assetDep?.asset?.id]+[assetDep?.dependent?.id],  project)
 						def isNew = false
@@ -760,21 +759,21 @@ class AssetEntityController {
 						if (assetDep) {
 							assetDep.asset = asset
 							assetDep.dependent = dependent
-							assetDep.type = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.dataFlowFreq = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.dataFlowDirection = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.status = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							def depComment = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							assetDep.type = dependencySheet.getCell( 7, r ).contents.replace("'","\\'")
+							assetDep.dataFlowFreq = dependencySheet.getCell( 8, r ).contents.replace("'","\\'")
+							assetDep.dataFlowDirection = dependencySheet.getCell( 9, r ).contents.replace("'","\\'")
+							assetDep.status = dependencySheet.getCell(10, r ).contents.replace("'","\\'")
+							def depComment = dependencySheet.getCell( 11, r ).contents.replace("'","\\'")
 							def length = depComment.length()
 							if(length > 254){
 								depComment = StringUtil.ellipsis(depComment,254)
 								warnMsg += "<li> Comment With Dependency $dependent.assetName trimmed at 254"
 							}
 							assetDep.comment = depComment
-							assetDep.c1 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.c2 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.c3 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
-							assetDep.c4 = dependencySheet.getCell( ++cols, r ).contents.replace("'","\\'")
+							assetDep.c1 = dependencySheet.getCell( 12, r ).contents.replace("'","\\'")
+							assetDep.c2 = dependencySheet.getCell( 13, r ).contents.replace("'","\\'")
+							assetDep.c3 = dependencySheet.getCell(14, r ).contents.replace("'","\\'")
+							assetDep.c4 = dependencySheet.getCell( 15, r ).contents.replace("'","\\'")
 							assetDep.updatedBy = userLogins.person
 							if(isNew)
 								assetDep.createdBy = userLogin.person
@@ -1464,9 +1463,10 @@ class AssetEntityController {
 					if(params.dependency=='dependency'){
 						exportedEntity +="X"
 						def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
-						def dependencyMap = ['AssetId':1,'DependentId':2, 'Type':3, 'DataFlowFreq':4, 'DataFlowDirection':5, 'status':6, 'comment':7, 'c1':8, 'c2':9, 'c3':10, 'c4':11]
-						def dependencyColumnNameList = ['AssetId','DependentId', 'Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment', 'c1', 'c2', 'c3', 'c4']
-						def DTAMap = [0:'asset',1:'dependent', 2:'type', 3:'dataFlowFreq', 4:'dataFlowDirection', 5:'status', 6:'comment', 7:'c1', 8:'c2', 9:'c3', 10:'c4']
+						def dependencyMap = ['AssetId':1,'AssetName':2,'AssetType':3,'DependentId':4,'DependentName':5,'DependentType':6,'Type':7, 'DataFlowFreq':8, 'DataFlowDirection':9, 'status':10, 'comment':11, 'c1':12, 'c2':13, 'c3':14, 'c4':15]
+						def dependencyColumnNameList = ['AssetId','AssetName','AssetType','DependentId','DependentName','DependentType','Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment', 'c1', 'c2', 'c3', 'c4']
+						def DTAMap = [0:'asset',1:'assetName',2:'assetType',3:'dependent',4:'dependentName',5:'dependentType',6:'type', 7:'dataFlowFreq', 8:'dataFlowDirection', 9:'status', 10:'comment', 11:'c1', 12:'c2', 13:'c3', 14:'c4']
+						//def newDTA = ['assetName','assetType','dependentName','dependentType']
 						def dependentSize = assetDependent.size()
 						for ( int r = 1; r <= dependentSize; r++ ) {
 							//Add assetId for walkthrough template only.
@@ -1476,16 +1476,27 @@ class AssetEntityController {
 
 							for ( int coll = 0; coll < 11; coll++ ) {
 								def addContentToSheet
-								if ( assetDependent[r-1].(DTAMap[coll]) == null ) {
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, "" )
-								}else {
-									if(DTAMap[coll]=="dependent"){
-										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
-									}else if(DTAMap[coll]=="asset"){
-										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) )
-									}else{
-										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, String.valueOf(assetDependent[r-1].(DTAMap[coll])) )
-									}
+								switch(DTAMap[coll]){
+									case "assetName":
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetName) :"")
+									break;
+									case "assetType":
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetType) :"" )
+									break;
+									case "dependentName":
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetName) : "" )
+									break;
+									case "dependentType":
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetType) : "")
+									break;
+									case "dependent":
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : "")
+									break;
+									case "asset":
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : "")
+									break;
+									default:
+										addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll])) : "" )
 								}
 								dependencySheet.addCell( addContentToSheet )
 							}
