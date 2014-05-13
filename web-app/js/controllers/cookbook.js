@@ -27,7 +27,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	var restMethodDefinitions = {
 			archive: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "cookbook",
 					section: "recipe",
@@ -35,7 +35,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				}
 			},
 			unarchive: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "cookbook",
 					section: "recipe",
@@ -79,7 +79,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				}
 			},
 			release: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "cookbook",
 					section: "recipe",
@@ -87,7 +87,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				}
 			},
 			revert: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "cookbook",
 					section: "recipe",
@@ -95,7 +95,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				}
 			},
 			validate: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "cookbook",
 					section: "recipe",
@@ -166,14 +166,14 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				}
 			},
 			publishTaskBatch: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "task",
 					details: "publish"
 				}
 			},
 			unpublishTaskBatch: {
-				method: "PUT",
+				method: "POST",
 				params: {
 					domain: "task",
 					details: "unpublish"

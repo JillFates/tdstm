@@ -35,17 +35,17 @@ class UrlMappings {
 
 		"/ws/cookbook/recipe/revert/$id" {
 			controller = "wsCookbook"
-			action = [PUT:"revert"]
+			action = [POST:"revert"]
 		}
 		
 		"/ws/cookbook/recipe/archive/$id" {
 			controller = "wsCookbook"
-			action = [PUT:"archiveRecipe"]
+			action = [POST:"archiveRecipe"]
 		}
 
 		"/ws/cookbook/recipe/unarchive/$id" {
 			controller = "wsCookbook"
-			action = [PUT:"unarchiveRecipe"]
+			action = [POST:"unarchiveRecipe"]
 		}
 
 		"/ws/cookbook/recipe/$id/$version?" {
@@ -55,7 +55,7 @@ class UrlMappings {
 
 		"/ws/cookbook/recipe/release/$recipeId" {
 			controller = "wsCookbook"
-			action = [PUT:"releaseRecipe"]
+			action = [POST:"releaseRecipe"]
 		}
 
 		"/ws/cookbook/recipe/" {
@@ -65,7 +65,7 @@ class UrlMappings {
 
 		"/ws/cookbook/recipe/validateSyntax" {
 			controller = "wsCookbook"
-			action = [PUT:"validateSyntax"]
+			action = [POST:"validateSyntax"]
 		}
 
 		"/ws/cookbook/recipe/clone" {
@@ -110,12 +110,12 @@ class UrlMappings {
 
 		"/ws/task/$id/publish" {
 			controller = "wsTask"
-			action = [PUT:"publish"]
+			action = [POST:"publish"]
 		}
 
 		"/ws/task/$id/unpublish" {
 			controller = "wsTask"
-			action = [PUT:"unpublish"]
+			action = [POST:"unpublish"]
 		}
 		
 		"/ws/progress/$id" {
