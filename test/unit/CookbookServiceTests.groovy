@@ -356,9 +356,10 @@ tasks: [
 		assertNotNull errors
 		
 		def expectedErrors = [
-			"Group UNDEF in element 2 contains unknown property 'custom8'",
-			"Task id UNDEF in element 1 property 'class' contains invalid value 'asset'",
-			"Task id UNDEF in element 2 contains unknown property 'custom8'"
+			"Group BAD-GROUP in element 2 contains unknown property 'custom8'",
+			"Task id 4100 in element 1 property 'class' contains invalid value 'asset'",
+			"Task id 4120 in element 1 property 'class' contains invalid value 'asset'",
+			"Task id 4120 in element 2 contains unknown property 'custom8'"
 		].sort{ a, b -> a.compareTo(b) }
 		
 		def returnedErrors = errors.collect {
@@ -438,7 +439,7 @@ tasks: [
 		log.info errors
 		assertNotNull 'Should have errors', errors
 		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have the invalid class name', errors[0].detail.contains('Group UNDEF in element 1 property \'class\' contains invalid value \'invalidClassName\'')
+		assertTrue 'Should have the invalid class name', errors[0].detail.contains('Group APPS in element 1 property \'class\' contains invalid value \'invalidClassName\'')
 	}
 
 	void testValidateSyntaxGroupIsMissingFilterDefinition() {
