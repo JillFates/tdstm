@@ -867,9 +867,13 @@ class CookbookService {
 
 		// Helper closure that compares the properties of a spec to a defined map
 		def validateAgainstMap
-		validateAgainstMap = { type, spec, map ->
+		validateAgainstMap = { type, spec, map, key ->
 			def i=0
-			def label = ( type=='task' ? "Task id ${spec.id ?: 'UNDEF'}" : "Group ${spec.name ?: 'UNDEF'}" )
+			if (key == null) {
+				key = ( type=='task' ? "${spec.id ?: 'UNDEF'}" : "${spec.name ?: 'UNDEF'}")
+				log.warn(key)
+			}
+			def label = ( type=='task' ? "Task id ${key}" : "Group ${key}" )
 			spec.each { n, v -> 
 				i++
 				if (map.containsKey(n)) {
@@ -877,7 +881,7 @@ class CookbookService {
 
 					if ( CU.isaMap(map[n])) {
 						// Check the sub section of the spec against a sub section of the map
-						errorList.addAll( validateAgainstMap(type, spec[n], map[n]) )
+						errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )
 					} else if ( CU.isaList(map[n]) ) {
 						// Check if the value of a property exists in the map defined list
 						if ( ! map[n].contains( v ) ) {
@@ -1015,7 +1019,7 @@ class CookbookService {
 							}
 
 							// Check for any unsupported properties (misspellings, etc)
-							validateAgainstMap( 'group', group, groupProps )
+							validateAgainstMap( 'group', group, groupProps, null )
 
 							// Validate the filter.dependency map settings
 							if (group.filter.containsKey('dependency')) {
@@ -1139,7 +1143,7 @@ class CookbookService {
 					}
 
 					// Check for any unsupported properties (misspellings, etc)
-					validateAgainstMap( 'task', task, taskProps )
+					validateAgainstMap( 'task', task, taskProps, null )
 
 					if (task.containsKey('filter')) {
 						def taskFilter = task.filter
