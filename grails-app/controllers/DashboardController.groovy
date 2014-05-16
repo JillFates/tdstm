@@ -1,13 +1,20 @@
 import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
 
 class DashboardController {
 	
 	def userPreferenceService
     def taskService
+	def projectService
+	def securityService
+	def userService
+	
     
 	def index = {
 		
@@ -157,4 +164,32 @@ class DashboardController {
 					       'effortDonewidth':params.effortDoneWidthId, rolesPercentageMap:rolesPercentageMap])
         
     }
+	/**
+	 * user portal details for default project.
+	 * 
+	 */
+	def userPortal = {
+		def projectInstance = securityService.getUserCurrentProject()
+		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
+		
+		def details = userService.getuserPortalDetails(projectInstance)
+		
+		return [projects:userProjects, projectInstance:projectInstance, taskList:details.taskList, timeInMin:details.timeInMin,
+				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin,
+				newsList:details.newsList]
+	}
+	/**
+	 * ajax function for user portal details for user selected projects.
+	 *
+	 */
+	def userPortalDetails = {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if(projectInstance!='All'){
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+		def details = userService.getuserPortalDetails(projectInstance)
+		render(template :'portal', model:[ taskList:details.taskList, timeInMin:details.timeInMin, newsList:details.newsList,
+				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin])
+	}
 }

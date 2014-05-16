@@ -156,7 +156,9 @@ class TaskService implements InitializingBean {
 			a.asset_entity_id AS assetId,
 			a.asset_type AS assetType,
 			p.first_name AS firstName, p.last_name AS lastName,
-			t.hard_assigned AS hardAssigned, 
+			t.hard_assigned AS hardAssigned,
+			t.duration AS duration,
+			t.duration_scale AS durationScale,
 			t.category""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
@@ -285,11 +287,16 @@ class TaskService implements InitializingBean {
 			task.status == AssetCommentStatus.READY || ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id ) ||
 			(task.status == AssetCommentStatus.DONE && task.assignedTo == person.id && task.statusUpdated?.format(format) >= minAgoFormat )
 		}
-
+		
+		def assignedTasks = allTasks.findAll { task ->
+			if (task.taskNumber==374) { log.info "getUserTasks: minAgoFormat:${minAgoFormat} [${task.statusUpdated?.format(format)}]"}
+			(task.status == AssetCommentStatus.READY && task.assignedTo == person.id )|| ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id ) ||
+			(task.status == AssetCommentStatus.DONE && task.assignedTo == person.id && task.statusUpdated?.format(format) >= minAgoFormat )
+		}
 		if (countOnly) {
 			return ['all':allTasks.size(), 'todo':todoTasks.size()]
 		} else {
-			return ['all':allTasks, 'todo':todoTasks]
+			return ['all':allTasks, 'todo':todoTasks, 'user':assignedTasks]
 		}
 	}
 

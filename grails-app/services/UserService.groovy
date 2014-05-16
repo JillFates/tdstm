@@ -8,6 +8,12 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdssrc.grails.GormUtil
 import com.tdsops.common.exceptions.ConfigurationException
 import org.apache.shiro.authc.AccountException
+import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
+import org.apache.commons.lang.math.NumberUtils
+import com.tds.asset.AssetComment
+import com.tds.asset.Application
+import com.tdsops.tm.enums.domain.ProjectStatus
 
 class UserService {
 	
@@ -20,6 +26,9 @@ class UserService {
 	def personService
 	def partyRelationshipService
 	def userPreferenceService
+	def taskService
+	def projectService
+	def securityService
 
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
@@ -332,6 +341,92 @@ class UserService {
 			log.debug "findOrProvisionUser: FINISHED UserLogin(id:${userLogin.id}, $userLogin), Person(id:${person.id}, $person)"
 
 		return userLogin
+	}
+	/**
+	 * get the user portal Details for a project or list of projects.
+	 * @param projectInstance
+	 * @return
+	 */
+	def getuserPortalDetails(projectInstance){
+		def currentUser= securityService.getUserLoginPerson()
+		def dateNow = TimeUtil.nowGMT()
+		def timeNow = dateNow.getTime()
+		
+		def projects= []
+		if(projectInstance=='All'){
+			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+			def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
+			projects = userProjects
+		}else{
+			projects = [projectInstance]
+		}
+		//to get task Summary.
+		def issueList = []
+		def timeInMin =0
+		projects.each{project->
+			def tasks = taskService.getUserTasks(currentUser, project, false, 7 )
+			def taskList = tasks['user']
+			def durationScale = [d:1440, m:1, w:10080, h:60] // minutes per day,week,hour
+			taskList.each{ task ->
+				def css = taskService.getCssClassForStatus( task.status )
+				issueList << ['item':task,'css':css]
+			}
+			if(taskList){
+				timeInMin += taskList.sum{task->
+					task.duration ? task.duration*durationScale[task?.durationScale] : 0
+				}
+			}
+		}
+		//to get applications assigned to particular person & there relations.
+		def appList = Application.findAll("from Application where project in (:projects) and (sme=:person or sme2=:person or appOwner=:person)",
+											[projects:projects, person:currentUser])
+		def relationList = [:]
+		appList.each{
+			def relation = []
+			if(it.sme==currentUser){
+				relation << 'sme'
+			}
+			if(it.sme2==currentUser){
+				relation << 'sme2'
+			}
+			if(it.appOwner==currentUser){
+				relation << 'appOwner'
+			}
+			relationList << [(it.id) : WebUtil.listAsMultiValueString(relation)]
+		}
+		
+		//to get active people of that particular user selected project.
+		def loginPersons = UserLogin.findAll()
+		def recentLogin = [:]
+		(loginPersons-securityService.getUserLogin()).each{
+			if(it?.lastLogin && it?.lastLogin.getTime()>timeNow-1800000){
+				def loginProjId = UserPreference.executeQuery("SELECT value FROM UserPreference where userLogin.id=? and preferenceCode=?",[it.id,'CURR_PROJ'])[0]
+				if(NumberUtils.toLong(loginProjId) in projects?.id){
+					recentLogin << [(it.id) : ['name':it.person, 'project':Project.get(loginProjId)]]
+				}
+			}
+		}
+		
+		//to get all moveEvent list assigned to team.
+		def moveEventList = MoveEvent.findAllByProjectInList(projects)
+		def thirtyDaysInMS = 2592000000
+		def upcomingEvents=[:]
+		moveEventList.each{event->
+			def startTime = event.moveBundles.startTime.sort()[0]
+			if(startTime && startTime>dateNow && startTime < dateNow.plus(30)){
+				def teams = ProjectTeam.executeQuery("from ProjectTeam where moveBundle in (:bundles)",[bundles:event.moveBundles])
+				if(teams){
+					upcomingEvents << [(event.id) : ['moveEvent':event, 'teams':WebUtil.listAsMultiValueString(teams.teamCode),'daysToGo':startTime-dateNow]]
+				}
+			}
+		}
+		def newsList = []
+		def comingEvents =upcomingEvents.keySet().asList()
+		if(comingEvents){
+			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events)",[events:comingEvents])
+		}
+		return [taskList:issueList, timeInMin:timeInMin, appList:appList, relationList:relationList, upcomingEvents:upcomingEvents,
+				 recentLogin:recentLogin, newsList:newsList]
 	}
 	
 }

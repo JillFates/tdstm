@@ -412,6 +412,7 @@
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
 						<ul>
+							<li><g:link class="home mmlink" controller="dashboard" action="userPortal" onclick="hideMegaMenu('dashboardMegaMenu')">Home</g:link></li>
 							<tds:hasPermission permission='MoveBundleShowView'>
 							<li><g:link class="home mmlink" controller="moveBundle" action="planningStats" onclick="hideMegaMenu('dashboardMegaMenu')">Planning Dashboard</g:link></li>
 							</tds:hasPermission>
