@@ -414,9 +414,9 @@ class UserService {
 		moveEventList.each{event->
 			def startTime = event.moveBundles.startTime.sort()[0]
 			if(startTime && startTime>dateNow && startTime < dateNow.plus(30)){
-				def teams = ProjectTeam.executeQuery("from ProjectTeam where moveBundle in (:bundles)",[bundles:event.moveBundles])
+				def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, currentUser).role
 				if(teams){
-					upcomingEvents << [(event.id) : ['moveEvent':event, 'teams':WebUtil.listAsMultiValueString(teams.teamCode),'daysToGo':startTime-dateNow]]
+					upcomingEvents << [(event.id) : ['moveEvent':event, 'teams':WebUtil.listAsMultiValueString(teams),'daysToGo':startTime-dateNow]]
 				}
 			}
 		}
