@@ -1,0 +1,89 @@
+.eventOuterDiv{
+	width: 50%;
+	float: left;
+}
+
+.fullWidth{
+	width: 100%
+}
+
+.leftFloated {
+	float: left;
+}
+
+.rightFloated{
+	float: right;
+}
+
+.halfWidth {
+	width: 50%
+}
+
+.49PerWidth {
+	width: 50%
+}
+
+.eventScrolableTable{
+	max-height: 140px; 
+	overflow: auto;
+}
+
+.eventNewsDiv {
+	font-size: 18px; 
+	width: 49%; 
+	float: right;
+}
+
+.eventNewsHeader {
+	margin-left: -17%; 
+	width: 50%;
+}
+
+.eventNewsScrolableTable{
+	max-height: 140px;
+	overflow: auto; 
+	width: 100%;
+}
+
+.taskSummaryOuterDiv {
+	width: 50%; 
+	float: left; 
+	margin-top: 10px;
+}
+
+.taskSummaryScrolableTable {
+	float: left; 
+	width: 100%; 
+	max-height: 348px; 
+	overflow: auto;
+}
+
+#issueTable {
+	width: 100%; 
+	margin-left: -1px;
+}
+
+.appOuterDiv {
+	float: right; 
+	width:49%; 
+	margin-top: 10px;
+}
+
+.appScrolableTable {
+	float: left; 
+	width: 100%;
+	max-height: 140px; 
+	overflow: auto;
+}
+
+.activepplOuterDiv {
+	font-size: 18px;
+	float:right; 
+	width: 100%;
+}
+
+.activepplHeader {
+	margin-left: -15%; 
+	width: 50%;
+	margin-top: 20px
+}
