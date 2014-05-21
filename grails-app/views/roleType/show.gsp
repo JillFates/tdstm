@@ -35,11 +35,16 @@
               <td valign="top" class="value">${fieldValue(bean:roleTypeInstance, field:'description')}</td>
 
             </tr>
+              <tr class="prop">
+              <td valign="top" class="name">Help:</td>
+
+              <td valign="top" class="value">${fieldValue(bean:roleTypeInstance, field:'help')}</td>
+            </tr>
 
           </tbody>
         </table>
       </div>
-      <tds:hasPermission permission='EditRoleType'>
+      <tds:hasPermission permission='RoleTypeEditView'>
       <div class="buttons">
         <g:form>
           <input type="hidden" name="id" value="${roleTypeInstance?.id}" />

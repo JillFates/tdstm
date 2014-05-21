@@ -38,6 +38,18 @@
 						bean="${roleTypeInstance}" as="list" field="description" /></div>
 				</g:hasErrors></td>
 			</tr>
+			<tr class="prop">
+				<td valign="top" class="name"><label for="help">Help:</label>
+				</td>
+				<td valign="top"
+					class="value ${hasErrors(bean:roleTypeInstance,field:'help','errors')}">
+				<input type="text" id="help" name="help"
+					value="${fieldValue(bean:roleTypeInstance,field:'help')}" />
+				<g:hasErrors bean="${roleTypeInstance}" field="help">
+					<div class="errors"><g:renderErrors
+						bean="${roleTypeInstance}" as="list" field="help" /></div>
+				</g:hasErrors></td>
+			</tr>
 
 		</tbody>
 	</table>

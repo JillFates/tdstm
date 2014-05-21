@@ -19,6 +19,8 @@
                    	        <g:sortableColumn property="id" title="Code" />
                         
                    	        <g:sortableColumn property="description" title="Description" />
+                   	        
+                   	        <g:sortableColumn property="help" title="Help" />
                         
                         </tr>
                     </thead>
@@ -29,6 +31,8 @@
                             <td><g:link action="show" id="${roleTypeInstance.id}">${fieldValue(bean:roleTypeInstance, field:'id')}</g:link></td>
                         
                             <td>${fieldValue(bean:roleTypeInstance, field:'description')}</td>
+                            
+                            <td>${fieldValue(bean:roleTypeInstance, field:'help')}</td>
                         
                         </tr>
                     </g:each>

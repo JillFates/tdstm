@@ -221,6 +221,7 @@
                             	     ${role}:
                             	 </td>
                             	 <td valign="top" class="value" >
+                            	 	 &nbsp; ${role.help ? role.help + '&nbsp;:' : ''} &nbsp;
                             	     <input type="checkbox" name="assignedRole"  value="${role.id}" />
                             	 </td>
                             	</tr>
