@@ -189,6 +189,7 @@
                             	     ${role}:
                             	 </td>
                             	 <td valign="top" class="value" >
+                            	 	 &nbsp; ${role.help ? role.help + '&nbsp;:' : ''} &nbsp;
                             	     <input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''} />
                             	 </td>
                             	</tr>
