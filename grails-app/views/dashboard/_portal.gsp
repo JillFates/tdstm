@@ -6,7 +6,7 @@
 
 <div>
 	<div style="margin-top: 3%;">
-		<div style="width: 100%">
+		<div style="width: 100%; float: left;">
 
 			<div class="eventOuterDiv">
 				<h4 class="leftFloated">Upcoming Events</h4>
