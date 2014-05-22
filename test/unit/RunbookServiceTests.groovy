@@ -1,6 +1,4 @@
-
-<!-- saved from url=(0096)http://svn.tdsops.com/svn/tdstm/branches/grails_237_upgrade/test/unit/RunbookServiceTests.groovy -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">import groovy.mock.interceptor.*
+import groovy.mock.interceptor.*
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.log4j.* 
@@ -434,4 +432,4 @@ class RunbookServiceTests extends Specification {
 
 	}
 	
-}</pre></body></html>
+}
