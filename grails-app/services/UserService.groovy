@@ -369,7 +369,7 @@ class UserService {
 			def durationScale = [d:1440, m:1, w:10080, h:60] // minutes per day,week,hour
 			taskList.each{ task ->
 				def css = taskService.getCssClassForStatus( task.status )
-				issueList << ['item':task,'css':css]
+				issueList << ['item':task,'css':css, projectName : project.name]
 			}
 			if(taskList){
 				timeInMin += taskList.sum{task->
@@ -423,7 +423,7 @@ class UserService {
 		def newsList = []
 		def comingEvents =upcomingEvents.keySet().asList()
 		if(comingEvents){
-			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events)",[events:comingEvents])
+			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events) order by dateCreated",[events:comingEvents])
 		}
 		return [taskList:issueList, timeInMin:timeInMin, appList:appList, relationList:relationList, upcomingEvents:upcomingEvents,
 				 recentLogin:recentLogin, newsList:newsList]

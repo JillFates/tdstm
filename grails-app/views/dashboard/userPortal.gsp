@@ -34,31 +34,10 @@
 			<g:render template="../dashboard/portal"/>
 		</div>
 	</div>
-	<g:render template="../assetEntity/modelDialog"/>
-	<div id="showEntityView" style="display: none;"></div>
-	<div id="editEntityView" style="display: none;"></div>
-	<div id="editManufacturerView" style="display: none;"></div>
-	<div id="createEntityView" style="display: none;"></div>
-	<div id="cablingDialogId" style="display: none;"></div>
-	<g:render template="../assetEntity/commentCrud"/>
-	<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+	
+	
 </div>
 <script type="text/javascript">
-	<g:if test="${isOnIE && isCleaner}">
-    /*
-     * To load the installed printers into session by initializing TFORMer
-     */
-	$(function() {
-		window.TF.RefreshOSPrinters();
-		var def = "";
-		var dropdown = new Array();
-		for (i = 0; i < window.TF.GetOSPrintersCount(); i++){
-			dropdown.push(window.TF.GetOSPrinter(i))
-		}
-		${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
-		
-	});
-	</g:if>
 
     $(".actionBar").die().live('click',function(){
 		var id = $(this).attr('data-itemId');
@@ -166,17 +145,6 @@ function pageRefresh(){
 		<g:if test="${projects.size()>1}">
 			$("#userProjectId option:first").before(myOption);
 		</g:if>
-		
-		$("#showEntityView").dialog({ autoOpen: false })
-		$("#createEntityView").dialog({ autoOpen: false })
-		$("#editEntityView").dialog({ autoOpen: false })
-		$("#manufacturerShowDialog").dialog({ autoOpen: false })
-		$("#modelShowDialog").dialog({ autoOpen: false })
-		$("#showCommentDialog").dialog({ autoOpen: false })
-		$("#editCommentDialog").dialog({ autoOpen: false })
-		$("#editManufacturerView").dialog({ autoOpen: false})
-		$("#createCommentDialog").dialog({ autoOpen: false })
-		$("#cablingDialogId").dialog({ autoOpen:false })
 	});
 
 	function userPortalByProject(value){

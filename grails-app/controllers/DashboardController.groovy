@@ -1,6 +1,7 @@
 import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
+import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -14,6 +15,7 @@ class DashboardController {
 	def projectService
 	def securityService
 	def userService
+	def assetEntityService
 	
     
 	def index = {
@@ -174,10 +176,14 @@ class DashboardController {
 		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
 		
 		def details = userService.getuserPortalDetails(projectInstance)
+		def moveBundleList = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
+		def entities = assetEntityService.entityInfo( projectInstance )
 		
 		return [projects:userProjects, projectInstance:projectInstance, taskList:details.taskList, timeInMin:details.timeInMin,
 				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin,
-				newsList:details.newsList]
+				newsList:details.newsList,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+			files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
+			staffRoles:taskService.getTeamRolesForTasks(), moveBundleList:moveBundleList]
 	}
 	/**
 	 * ajax function for user portal details for user selected projects.
@@ -185,11 +191,21 @@ class DashboardController {
 	 */
 	def userPortalDetails = {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		def entities = [:]
+		def moveBundleList = []
 		if(projectInstance!='All'){
 			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+			entities = assetEntityService.entityInfo( projectInstance )
+			moveBundleList = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
 		}
+		
 		def details = userService.getuserPortalDetails(projectInstance)
+	
+		
 		render(template :'portal', model:[ taskList:details.taskList, timeInMin:details.timeInMin, newsList:details.newsList,
-				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin])
+				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin,
+				project:projectInstance,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+			files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
+			staffRoles:taskService.getTeamRolesForTasks(), moveBundleList:moveBundleList])
 	}
 }

@@ -15,8 +15,10 @@
 					<table class="fullWidth">
 						<thead>
 							<tr>
+								<g:if test="${project=='All' }">
+									<th>Project</th>
+								</g:if>
 								<th>Name</th>
-								<th>Project</th>
 								<th>Start Date</th>
 								<th>Days</th>
 								<th>Teams</th>
@@ -27,13 +29,15 @@
 								<g:set var="moveEvent"
 									value="${upcomingEvents[event].moveEvent}" />
 								<tr>
+									<g:if test="${project=='All'}">
+									<td>
+										${moveEvent.project.name}
+									</td>
+									</g:if>
 									<td><g:link action="index"
 											parmas="[moveEvent:'${moveEvent.id}']">
 											${moveEvent.name}
 										</g:link></td>
-									<td>
-										${moveEvent.project.name}
-									</td>
 									<td>
 										${moveEvent.eventTimes.start}
 									</td>
@@ -41,7 +45,8 @@
 										${upcomingEvents[event]?.daysToGo+' days'}
 									</td>
 									<td>
-										${upcomingEvents[event]?.teams}
+										<g:set var="team" value="${upcomingEvents[event]?.teams}"/>
+										${team ? team.substring(team.indexOf(':')+1, team.length()) : ''}
 									</td>
 								</tr>
 							</g:each>
@@ -56,21 +61,29 @@
 					<table class="fullWidth">
 						<thead>
 							<tr>
-								<th>Event</th>
+								<g:if test="${project=='All' }">
+									<th>Project</th>
+								</g:if>
 								<th>Date</th>
+								<th>Event</th>
 								<th>News</th>
 							</tr>
 						</thead>
 						<tbody>
 							<g:each in="${newsList}" var="news">
 								<tr>
+									<g:if test="${project=='All' }">
+									<td width="auto">
+										${news.moveEvent.project.name}
+									</td>
+									</g:if>
+								    <td width="150px">
+										${news.dateCreated}
+									</td>
 									<td><g:link action="index"
 											parmas="[moveEvent:'${moveEvent.id}']">
 											${news.moveEvent.name}
 										</g:link></td>
-									<td>
-										${news.dateCreated}
-									</td>
 									<td>
 										${news.message}
 									</td>
@@ -94,6 +107,9 @@
 						<table id="issueTable" cellspacing="0px">
 							<thead>
 								<tr>
+									<g:if test="${project=='All' }">
+										<th>Project</th>
+									</g:if>
 									<th>Task</th>
 									<th>Related</th>
 									<th>Due/Est Finish</th>
@@ -105,6 +121,14 @@
 									<g:set var="item" value="${issue?.item}" />
 									<tr id="issueTrId_${item?.id}" class="${issue.css}"
 										style="cursor: pointer;">
+										<g:if test="${project=='All' }">
+										<td id="comment_${item?.id}"
+											class="actionBar asset_details_block_task"
+											data-itemId="${item?.id}" data-status="${item?.status}"
+											style="width: 50% !important;">
+											${issue?.projectName}
+										</td>
+										</g:if>
 										<td id="comment_${item?.id}"
 											class="actionBar asset_details_block_task"
 											data-itemId="${item?.id}" data-status="${item?.status}"
@@ -144,7 +168,7 @@
 													onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')" />
 											</g:if> <tds:actionButton label="Details..." icon="ui-icon-zoomin"
 												id="${item?.id}"
-												onclick="issueDetails(${item?.id},'${item?.status}')" /> <g:if
+												onclick="showAssetComment(${item?.id}, 'show')" /> <g:if
 												test="${item.successors > 0 || item.predecessors > 0}">
 												<tds:actionButton label="View Graph" icon="ui-icon-zoomin"
 													id="${item?.id}"
@@ -180,11 +204,11 @@
 								</g:each>
 							</tbody>
 						</table>
-						<b class="leftFloated">
-							${taskList.size()} assigned tasks with ${timeInMin} minutes of
-							effort.
-						</b>
 					</div>
+					<span class="leftFloated effort">
+						${taskList.size()} assigned tasks with ${timeInMin} minutes of
+						effort.
+					</span>
 				</div>
 			</div>
 		</div>
@@ -197,6 +221,9 @@
 				<table class="fullWidth">
 					<thead>
 						<tr>
+							<g:if test="${project=='All' }">
+								<th>Project</th>
+							</g:if>
 							<th>Name</th>
 							<th>PlanStatus</th>
 							<th>Relation</th>
@@ -207,6 +234,12 @@
 						<g:each in="${appList}" var="app">
 							<tr
 								onclick="getEntityDetails('myIssues','${app.assetType}',${app.id})">
+								
+								<g:if test="${project=='All' }">
+									<td>
+										${app.project.name}
+									</td>
+								</g:if>
 								<td>
 									${app.assetName}
 								</td>
@@ -229,23 +262,23 @@
 			class="activepplOuterDiv">
 			<h4 class="activepplHeader">Active People</h4>
 			<br>
-			<br>
 			<div>
 				<table class="fullWidth">
 					<thead>
 						<tr>
-							<th>Name</th>
 							<th>Project</th>
+							<th>Name</th>
+							
 						</tr>
 					</thead>
 					<tbody>
 						<g:each in="${recentLogin.keySet()}" var="per">
 							<tr>
 								<td>
-									${recentLogin[per].name.lastNameFirst}
+									${recentLogin[per].project.name}
 								</td>
 								<td>
-									${recentLogin[per].project.name}
+									${recentLogin[per].name.lastNameFirst}
 								</td>
 							</tr>
 						</g:each>
@@ -255,3 +288,29 @@
 		</div>
 	</div>
 </div>
+	<g:render template="../assetEntity/commentCrud" model="['servers':servers, 'applications':applications, 'dbs':dbs, 'files':files]"/>
+	<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers, 'servers':servers,
+	 'applications':applications, 'dbs':dbs, 'files':files, 'dependencyType':dependencyType, dependencyStatus:dependencyStatus,
+	 'moveBundleList':moveBundleList]"></g:render>
+	<g:render template="../assetEntity/modelDialog"/>
+	<div id="showEntityView" style="display: none;"></div>
+	<div id="editEntityView" style="display: none;"></div>
+	<div id="editManufacturerView" style="display: none;"></div>
+	<div id="createEntityView" style="display: none;"></div>
+	<div id="cablingDialogId" style="display: none;"></div>
+	
+<script>
+$(document).ready(function() {
+		
+		$("#showEntityView").dialog({ autoOpen: false })
+		$("#createEntityView").dialog({ autoOpen: false })
+		$("#editEntityView").dialog({ autoOpen: false })
+		$("#manufacturerShowDialog").dialog({ autoOpen: false })
+		$("#modelShowDialog").dialog({ autoOpen: false })
+		$("#showCommentDialog").dialog({ autoOpen: false })
+		$("#editCommentDialog").dialog({ autoOpen: false })
+		$("#editManufacturerView").dialog({ autoOpen: false})
+		$("#createCommentDialog").dialog({ autoOpen: false })
+		$("#cablingDialogId").dialog({ autoOpen:false })
+	});
+</script>
