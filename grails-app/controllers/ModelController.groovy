@@ -208,137 +208,151 @@ class ModelController {
     }
 
     def save = {
-    	def modelId = params.modelId
-		def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
-		def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
-		def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
-		def powerType = params.powerType
-		def endOfLifeDate = params.endOfLifeDate
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def principal = SecurityUtils.subject?.principal
-		def user
-		
-		if( principal ){
-			user  = UserLogin.findByUsername( principal )
-			def person = user.person
-			def score = person?.modelScore? person?.modelScore:0
-			if(user && person){
-			     if(params?.modelStatus == "new"||params?.modelStatus=="full" ){
-					    person.modelScore = score+10
-				 }else{
-				        person.modelScore = score+20
-				 }
-				if(!person.save(flush:true)){
-					person.errors.allErrors.each{ println it }
-				}				
+		try {
+			def user = securityService.getUserLogin()
+			
+	    	def modelId = params.modelId
+			if (!RolePermissions.hasPermission('EditModel')) {
+				log.warn "Unauthorized user $user attempted to update modelId $modelId"
+				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError: 
+				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5 
+				//So using 'RuntimeException' for now.
+				throw new RuntimeException('User does not have permission to create model')
 			}
-		}
-		if(endOfLifeDate){
-			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
-		}
-		if( powerType == "Amps"){
-			powerNameplate =  powerNameplate * 120
-			powerDesign = powerDesign * 120
-			powerUsed = powerUsed * 120
-        }
-	    def modelTemplate 
-		if(modelId)
-			modelTemplate = Model.get(modelId)
-    	params.useImage = params.useImage == 'on' ? 1 : 0
-    	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
-    	params.powerUse = powerUsed
-        def  modelInstance = new Model(params)
-		modelInstance.powerUse = powerUsed
-		modelInstance.powerDesign = powerDesign
-		modelInstance.powerNameplate = powerNameplate
-		if(params?.modelStatus=='valid'){
-			modelInstance.validatedBy = user?.person
-		}
-		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-		def frontImage = request.getFile('frontImage')
-        if( frontImage?.bytes?.size() > 0 ) {
-			if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
-				if (! okcontents.contains(frontImage.getContentType())) {
-	        		flash.message = "Front Image must be one of: ${okcontents}"
-	        		render(view: "create", model: [modelInstance: modelInstance])
-	        		return;
-	        	}
-        	}
-        } else if(modelTemplate){
-        	modelInstance.frontImage = modelTemplate.frontImage
-        } else {
-        	modelInstance.frontImage = null
-        }
-        def rearImage = request.getFile('rearImage')
-        if( rearImage?.bytes?.size() > 0 ) {
-			if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
-				if (! okcontents.contains(rearImage.getContentType())) {
-	        		flash.message = "Rear Image must be one of: ${okcontents}"
-	        		render(view: "create", model: [modelInstance: modelInstance])
-	        		return;
-	        	}
-        	}
-        } else if(modelTemplate){
-        	modelInstance.rearImage = modelTemplate.rearImage
-        } else {
-        	modelInstance.rearImage = null
-        }
-        if (modelInstance.save(flush: true)) {
-        	def connectorCount = Integer.parseInt(params.connectorCount)
-			if(connectorCount > 0){
-	        	for(int i=1; i<=connectorCount; i++){
-	        		def modelConnector = new ModelConnector(model : modelInstance,
-						connector : params["connector"+i],
-						label : params["label"+i],
-						type :params["type"+i],
-						labelPosition : params["labelPosition"+i],
-						connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
-						connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
-						status:params["status"+i] )
-	        		
-	        		if (!modelConnector.hasErrors() )
-	        			modelConnector.save(flush: true)
-	        	}
-        	} else {
-				def powerConnector = new ModelConnector(model : modelInstance,
-					connector : 1,
-					label : "Pwr1",
-					type : "Power",
-					labelPosition : "Right",
-					connectorPosX : 0,
-					connectorPosY : 0,
-					status: "missing"
-					)
-
-				if (!powerConnector.save(flush: true)){
-					def etext = "Unable to create Power Connectors for ${modelInstance}" +
-					GormUtil.allErrorsString( powerConnector )
-					println etext
+			def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
+			def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
+			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
+			def powerType = params.powerType
+			def endOfLifeDate = params.endOfLifeDate
+			def formatter = new SimpleDateFormat("MM/dd/yyyy");
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			//def principal = SecurityUtils.subject?.principal
+			//def user
+			
+			if( user ){
+				//user  = UserLogin.findByUsername( principal )
+				def person = user.person
+				def score = person?.modelScore? person?.modelScore:0
+				if(user && person){
+				     if(params?.modelStatus == "new"||params?.modelStatus=="full" ){
+						    person.modelScore = score+10
+					 }else{
+					        person.modelScore = score+20
+					 }
+					if(!person.save(flush:true)){
+						person.errors.allErrors.each{ println it }
+					}				
 				}
 			}
-			
-        	modelInstance.sourceTDSVersion = 1
-        	modelInstance.save(flush: true)
-			def akaNames = params.list('aka')
-			akaNames.each{ aka ->
-				aka = aka.trim()
-				if (aka)  
-					modelInstance.findOrCreateAliasByName(aka, true)
+			if(endOfLifeDate){
+				params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
 			}
-            flash.message = "${modelInstance.modelName} created"
-            redirect(action:list , id: modelInstance.id)
-        } else {
-        	flash.message = modelInstance.errors.allErrors.each{  log.error it }
-			def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
-	    	def otherConnectors = []
-			def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
-			for(int i = existingConnectors ; i<51; i++ ){
-				otherConnectors << i
+			if( powerType == "Amps"){
+				powerNameplate =  powerNameplate * 120
+				powerDesign = powerDesign * 120
+				powerUsed = powerUsed * 120
+	        }
+		    def modelTemplate 
+			if(modelId)
+				modelTemplate = Model.get(modelId)
+	    	params.useImage = params.useImage == 'on' ? 1 : 0
+	    	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
+	    	params.powerUse = powerUsed
+	        def  modelInstance = new Model(params)
+			modelInstance.powerUse = powerUsed
+			modelInstance.powerDesign = powerDesign
+			modelInstance.powerNameplate = powerNameplate
+			if(params?.modelStatus=='valid'){
+				modelInstance.validatedBy = user?.person
 			}
-            render(view: "create", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
-										   otherConnectors:otherConnectors, modelTemplate:modelTemplate ] )
-        }
+			def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+			def frontImage = request.getFile('frontImage')
+	        if( frontImage?.bytes?.size() > 0 ) {
+				if( frontImage.getContentType() && frontImage.getContentType() != "application/octet-stream"){
+					if (! okcontents.contains(frontImage.getContentType())) {
+		        		flash.message = "Front Image must be one of: ${okcontents}"
+		        		render(view: "create", model: [modelInstance: modelInstance])
+		        		return;
+		        	}
+	        	}
+	        } else if(modelTemplate){
+	        	modelInstance.frontImage = modelTemplate.frontImage
+	        } else {
+	        	modelInstance.frontImage = null
+	        }
+	        def rearImage = request.getFile('rearImage')
+	        if( rearImage?.bytes?.size() > 0 ) {
+				if( rearImage.getContentType() && rearImage.getContentType() != "application/octet-stream"){
+					if (! okcontents.contains(rearImage.getContentType())) {
+		        		flash.message = "Rear Image must be one of: ${okcontents}"
+		        		render(view: "create", model: [modelInstance: modelInstance])
+		        		return;
+		        	}
+	        	}
+	        } else if(modelTemplate){
+	        	modelInstance.rearImage = modelTemplate.rearImage
+	        } else {
+	        	modelInstance.rearImage = null
+	        }
+	        if (modelInstance.save(flush: true)) {
+	        	def connectorCount = Integer.parseInt(params.connectorCount)
+				if(connectorCount > 0){
+		        	for(int i=1; i<=connectorCount; i++){
+		        		def modelConnector = new ModelConnector(model : modelInstance,
+							connector : params["connector"+i],
+							label : params["label"+i],
+							type :params["type"+i],
+							labelPosition : params["labelPosition"+i],
+							connectorPosX : Integer.parseInt(params["connectorPosX"+i]),
+							connectorPosY : Integer.parseInt(params["connectorPosY"+i]),
+							status:params["status"+i] )
+		        		
+		        		if (!modelConnector.hasErrors() )
+		        			modelConnector.save(flush: true)
+		        	}
+	        	} else {
+					def powerConnector = new ModelConnector(model : modelInstance,
+						connector : 1,
+						label : "Pwr1",
+						type : "Power",
+						labelPosition : "Right",
+						connectorPosX : 0,
+						connectorPosY : 0,
+						status: "missing"
+						)
+	
+					if (!powerConnector.save(flush: true)){
+						def etext = "Unable to create Power Connectors for ${modelInstance}" +
+						GormUtil.allErrorsString( powerConnector )
+						println etext
+					}
+				}
+				
+	        	modelInstance.sourceTDSVersion = 1
+	        	modelInstance.save(flush: true)
+				def akaNames = params.list('aka')
+				akaNames.each{ aka ->
+					aka = aka.trim()
+					if (aka)  
+						modelInstance.findOrCreateAliasByName(aka, true)
+				}
+	            flash.message = "${modelInstance.modelName} created"
+	            redirect(action:list , id: modelInstance.id)
+	        } else {
+	        	flash.message = modelInstance.errors.allErrors.each{  log.error it }
+				def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
+		    	def otherConnectors = []
+				def existingConnectors = modelConnectors ? modelConnectors.size()+1 : 1
+				for(int i = existingConnectors ; i<51; i++ ){
+					otherConnectors << i
+				}
+	            render(view: "create", model: [modelInstance: modelInstance, modelConnectors:modelConnectors,
+											   otherConnectors:otherConnectors, modelTemplate:modelTemplate ] )
+	        }
+		}catch(RuntimeException rte) {
+			flash.message = rte.getMessage()
+			redirect(controller:'project', action: 'list')
+		}
     }
 
     def show = {
@@ -406,255 +420,266 @@ class ModelController {
 
     def update = {
 		
-        def modelInstance = Model.get(params.id)
-		def modelStatus = modelInstance?.modelStatus 
-		def endOfLifeDate = params.endOfLifeDate
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def principal = SecurityUtils.subject?.principal
-		def user
-		def person
-		if( principal ){
-			user  = UserLogin.findByUsername( principal )
-		    person = user.person
-			if(user && person){
-				def score = person?.modelScore ?: 0
-				if(params?.modelStatus == "full" && modelStatus != params?.modelStatus){
-					person.modelScore = score+20
-				}else if(params?.modelStatus == "valid" && modelStatus != params?.modelStatus){
-					if(modelInstance?.validatedBy?.id == person?.id && modelInstance.updatedBy?.id != person?.id ){
-						person.modelScore = score+20
-					} else {
-						person.modelScore = score+50
-					}
-				}
-				if(!person.save(flush:true)){
-					person.errors.allErrors.each{println it}
-				}
-		     }
-		}
-		if(endOfLifeDate){
-			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
-		}
-		
-        if (modelInstance) {
-			def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
-			def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
-			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
-			def powerType = params.powerType
-			if( powerType == "Amps"){
-				powerNameplate = powerNameplate * 120
-				powerDesign = powerDesign * 120
-				powerUsed = powerUsed * 120
+		try{
+	        def modelInstance = Model.get(params.id)
+			def user = securityService.getUserLogin()
+			if (!RolePermissions.hasPermission('EditModel')) {
+				log.warn "Unauthorized user $user attempted to update modelId ${modelInstance.modelName}"
+				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError: 
+				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5 
+				//So using 'RuntimeException' for now.
+				throw new RuntimeException('User does not have permission to update model')
 			}
-        	params.useImage = params.useImage == 'on' ? 1 : 0
-        	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
-			params.powerNameplate = powerNameplate
-			params.powerDesign = powerDesign
-			params.powerUse = powerUsed
-            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-    		def frontImage 
-            if( request?.getFile('frontImage') ) {
-				frontImage = request?.getFile('frontImage')
-    			if( frontImage?.getContentType() && frontImage?.getContentType() != "application/octet-stream"){
-    				if (! okcontents.contains(frontImage.getContentType())) {
-    	        		flash.message = "Front Image must be one of: ${okcontents}"
-    	        		render(view: "create", model: [modelInstance: modelInstance])
-    	        		return;
-    	        	}
-    				frontImage = frontImage.bytes
-					
-            	} else {
-            		frontImage = modelInstance.frontImage
-				}
-            } else {
-            	frontImage = modelInstance.frontImage
-            }
-            def rearImage 
-            if( request?.getFile('rearImage') ) {
-				rearImage = request?.getFile('rearImage')
-    			if( rearImage?.getContentType() && rearImage?.getContentType() != "application/octet-stream"){
-    				if (! okcontents.contains(rearImage.getContentType())) {
-    	        		flash.message = "Rear Image must be one of: ${okcontents}"
-    	        		render(view: "create", model: [modelInstance: modelInstance])
-    	        		return;
-    	        	}
-    				rearImage = rearImage.bytes
-            	} else {
-					rearImage = modelInstance.rearImage
-				} 
-            } else {
-            	rearImage = modelInstance.rearImage
-            }
-			modelInstance.height = params.modelHeight != "" ? NumberUtils.toDouble(params.modelHeight,0).round():0 
-			modelInstance.weight = params.modelWeight != "" ? NumberUtils.toDouble(params.modelWeight,0).round():0 
-			modelInstance.depth  = params.modelDepth  != "" ? NumberUtils.toDouble(params.modelDepth,0).round():0 
-			modelInstance.width  = params.modelWidth  != "" ? NumberUtils.toDouble(params.modelWidth,0).round():0
-            if( params?.modelStatus == 'valid' && modelStatus == 'full'){
-			   modelInstance.validatedBy = user?.person
-			   modelInstance.updatedBy =  modelInstance.updatedBy
-			}else{
-			   modelInstance.updatedBy = person
-			}				
-            modelInstance.properties = params
-            modelInstance.rearImage = rearImage
-            modelInstance.frontImage = frontImage
-						
-			def oldModelManufacturer = modelInstance.manufacturer.id
-			def oldModelType = modelInstance.assetType          
-			
-			if (!modelInstance.hasErrors() && modelInstance.save(flush:true)) {
-				
-				def deletedAka = params.deletedAka
-				def akaToSave = params.list('aka')
-				if(deletedAka){
-					ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (:ids)",[ids:deletedAka.split(",").collect{return NumberUtils.toDouble(it,0).round()}])
-				}
-				def modelAliasList = ModelAlias.findAllByModel( modelInstance )
-				modelAliasList.each{ modelAlias->
-					modelAlias.name = params["aka_"+modelAlias.id]
-					if(!modelAlias.save()){
-						modelAlias.errors.allErrors.each {println it}
-					}
-				}
-				akaToSave.each{aka->
-					modelInstance.findOrCreateAliasByName(aka, true)
-				}
-				
-				def connectorCount = 0
-				if(params.connectorCount){
-            	    connectorCount = NumberUtils.toDouble(params.connectorCount,0).round()
-				}
-				if(connectorCount > 0){
-		        	for(int i=1; i<=connectorCount; i++){
-						def connector = params["connector"+i]
-		        		def modelConnector = connector ? ModelConnector.findByModelAndConnector(modelInstance,connector) : ModelConnector.findByModelAndConnector(modelInstance,i)
-						if( !connector && modelConnector ){
-							
-							modelConnector.delete(flush:true)
-							
+			def modelStatus = modelInstance?.modelStatus 
+			def endOfLifeDate = params.endOfLifeDate
+			def formatter = new SimpleDateFormat("MM/dd/yyyy");
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def principal = SecurityUtils.subject?.principal
+			def person
+			if( user ){
+			    person = user.person
+				if(user && person){
+					def score = person?.modelScore ?: 0
+					if(params?.modelStatus == "full" && modelStatus != params?.modelStatus){
+						person.modelScore = score+20
+					}else if(params?.modelStatus == "valid" && modelStatus != params?.modelStatus){
+						if(modelInstance?.validatedBy?.id == person?.id && modelInstance.updatedBy?.id != person?.id ){
+							person.modelScore = score+20
 						} else {
-							if(modelConnector){
-								modelConnector.connector = params["connector"+i]
-								modelConnector.label = params["label"+i]
-								modelConnector.type = params["type"+i]
-								modelConnector.labelPosition = params["labelPosition"+i]
-								modelConnector.connectorPosX = NumberUtils.toDouble(params["connectorPosX"+i],0).round()
-								modelConnector.connectorPosY = NumberUtils.toDouble(params["connectorPosY"+i],0).round()
-								modelConnector.status = params["status"+i]
-								
-							} else if(connector){
-								modelConnector = new ModelConnector(
-									model: modelInstance,
-									connector: params["connector"+i],
-									label: params["label"+i],
-									type: params["type"+i],
-									labelPosition: params["labelPosition"+i],
-									connectorPosX: NumberUtils.toDouble(params["connectorPosX"+i],0).round(),
-									connectorPosY: NumberUtils.toDouble(params["connectorPosY"+i],0).round(),
-									status: params["status"+i] )
-
-							}
-			        		if (modelConnector && !modelConnector.hasErrors() )
-			        			modelConnector.save(flush: true)
+							person.modelScore = score+50
 						}
-		        	}
-	        	} else {
+					}
+					if(!person.save(flush:true)){
+						person.errors.allErrors.each{println it}
+					}
+			     }
+			}
+			if(endOfLifeDate){
+				params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
+			}
+			
+	        if (modelInstance) {
+				def powerNameplate = params.powerNameplate ? Float.parseFloat(params.powerNameplate) : 0
+				def powerDesign = params.powerDesign ? Float.parseFloat(params.powerDesign) : 0
+				def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
+				def powerType = params.powerType
+				if( powerType == "Amps"){
+					powerNameplate = powerNameplate * 120
+					powerDesign = powerDesign * 120
+					powerUsed = powerUsed * 120
+				}
+	        	params.useImage = params.useImage == 'on' ? 1 : 0
+	        	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
+				params.powerNameplate = powerNameplate
+				params.powerDesign = powerDesign
+				params.powerUse = powerUsed
+	            def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+	    		def frontImage 
+	            if( request?.getFile('frontImage') ) {
+					frontImage = request?.getFile('frontImage')
+	    			if( frontImage?.getContentType() && frontImage?.getContentType() != "application/octet-stream"){
+	    				if (! okcontents.contains(frontImage.getContentType())) {
+	    	        		flash.message = "Front Image must be one of: ${okcontents}"
+	    	        		render(view: "create", model: [modelInstance: modelInstance])
+	    	        		return;
+	    	        	}
+	    				frontImage = frontImage.bytes
+						
+	            	} else {
+	            		frontImage = modelInstance.frontImage
+					}
+	            } else {
+	            	frontImage = modelInstance.frontImage
+	            }
+	            def rearImage 
+	            if( request?.getFile('rearImage') ) {
+					rearImage = request?.getFile('rearImage')
+	    			if( rearImage?.getContentType() && rearImage?.getContentType() != "application/octet-stream"){
+	    				if (! okcontents.contains(rearImage.getContentType())) {
+	    	        		flash.message = "Rear Image must be one of: ${okcontents}"
+	    	        		render(view: "create", model: [modelInstance: modelInstance])
+	    	        		return;
+	    	        	}
+	    				rearImage = rearImage.bytes
+	            	} else {
+						rearImage = modelInstance.rearImage
+					} 
+	            } else {
+	            	rearImage = modelInstance.rearImage
+	            }
+				modelInstance.height = params.modelHeight != "" ? NumberUtils.toDouble(params.modelHeight,0).round():0 
+				modelInstance.weight = params.modelWeight != "" ? NumberUtils.toDouble(params.modelWeight,0).round():0 
+				modelInstance.depth  = params.modelDepth  != "" ? NumberUtils.toDouble(params.modelDepth,0).round():0 
+				modelInstance.width  = params.modelWidth  != "" ? NumberUtils.toDouble(params.modelWidth,0).round():0
+	            if( params?.modelStatus == 'valid' && modelStatus == 'full'){
+				   modelInstance.validatedBy = user?.person
+				   modelInstance.updatedBy =  modelInstance.updatedBy
+				}else{
+				   modelInstance.updatedBy = person
+				}				
+	            modelInstance.properties = params
+	            modelInstance.rearImage = rearImage
+	            modelInstance.frontImage = frontImage
+							
+				def oldModelManufacturer = modelInstance.manufacturer.id
+				def oldModelType = modelInstance.assetType          
 				
-					def powerConnector = new ModelConnector(model : modelInstance,
-						connector: 1,
-						label: "Pwr1",
-						type: "Power",
-						labelPosition: "Right",
-						connectorPosX: 0,
-						connectorPosY: 0,
-						status: "${AssetCableStatus.UNKNOWN}"
-					)
+				if (!modelInstance.hasErrors() && modelInstance.save(flush:true)) {
 					
-					if (!powerConnector.save(flush: true)){
-						def etext = "Unable to create Power Connectors for ${modelInstance}" +
-						GormUtil.allErrorsString( powerConnector )
-						println etext
+					def deletedAka = params.deletedAka
+					def akaToSave = params.list('aka')
+					if(deletedAka){
+						ModelAlias.executeUpdate("delete from ModelAlias mo where mo.id in (:ids)",[ids:deletedAka.split(",").collect{return NumberUtils.toDouble(it,0).round()}])
 					}
-				
-				}
-            	def assetEntitysByModel = AssetEntity.findAllByModel( modelInstance )
-				def assetConnectors = ModelConnector.findAllByModel( modelInstance )
-				assetEntitysByModel.each{ assetEntity ->
-            		assetConnectors.each{connector->
-            			
-    					def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetEntity, connector )
-						if( !assetCableMap ){
-	    					assetCableMap = new AssetCableMap(
-								cable : "Cable"+connector.connector,
-								assetFrom: assetEntity,
-								assetFromPort : connector,
-								cableStatus : connector.status,
-								cableComment : "Cable"+connector.connector
-							)
+					def modelAliasList = ModelAlias.findAllByModel( modelInstance )
+					modelAliasList.each{ modelAlias->
+						modelAlias.name = params["aka_"+modelAlias.id]
+						if(!modelAlias.save()){
+							modelAlias.errors.allErrors.each {println it}
 						}
-						if(assetEntity?.rackTarget && connector.type == "Power" && 
-							connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower){
-							assetCableMap.assetToPort = null
-							assetCableMap.toPower = "A"
-							assetCableMap.cableStatus= connector.status
-							assetCableMap.cableComment= "Cable"
-						}
-						if ( !assetCableMap.validate() || !assetCableMap.save() ) {
-							def etext = "Unable to create assetCableMap for assetEntity ${assetEntity}" +
-							GormUtil.allErrorsString( assetCableMap )
+					}
+					akaToSave.each{aka->
+						modelInstance.findOrCreateAliasByName(aka, true)
+					}
+					
+					def connectorCount = 0
+					if(params.connectorCount){
+	            	    connectorCount = NumberUtils.toDouble(params.connectorCount,0).round()
+					}
+					if(connectorCount > 0){
+			        	for(int i=1; i<=connectorCount; i++){
+							def connector = params["connector"+i]
+			        		def modelConnector = connector ? ModelConnector.findByModelAndConnector(modelInstance,connector) : ModelConnector.findByModelAndConnector(modelInstance,i)
+							if( !connector && modelConnector ){
+								
+								modelConnector.delete(flush:true)
+								
+							} else {
+								if(modelConnector){
+									modelConnector.connector = params["connector"+i]
+									modelConnector.label = params["label"+i]
+									modelConnector.type = params["type"+i]
+									modelConnector.labelPosition = params["labelPosition"+i]
+									modelConnector.connectorPosX = NumberUtils.toDouble(params["connectorPosX"+i],0).round()
+									modelConnector.connectorPosY = NumberUtils.toDouble(params["connectorPosY"+i],0).round()
+									modelConnector.status = params["status"+i]
+									
+								} else if(connector){
+									modelConnector = new ModelConnector(
+										model: modelInstance,
+										connector: params["connector"+i],
+										label: params["label"+i],
+										type: params["type"+i],
+										labelPosition: params["labelPosition"+i],
+										connectorPosX: NumberUtils.toDouble(params["connectorPosX"+i],0).round(),
+										connectorPosY: NumberUtils.toDouble(params["connectorPosY"+i],0).round(),
+										status: params["status"+i] )
+	
+								}
+				        		if (modelConnector && !modelConnector.hasErrors() )
+				        			modelConnector.save(flush: true)
+							}
+			        	}
+		        	} else {
+					
+						def powerConnector = new ModelConnector(model : modelInstance,
+							connector: 1,
+							label: "Pwr1",
+							type: "Power",
+							labelPosition: "Right",
+							connectorPosX: 0,
+							connectorPosY: 0,
+							status: "${AssetCableStatus.UNKNOWN}"
+						)
+						
+						if (!powerConnector.save(flush: true)){
+							def etext = "Unable to create Power Connectors for ${modelInstance}" +
+							GormUtil.allErrorsString( powerConnector )
 							println etext
-							log.error( etext )
 						}
-    				}
-					def assetCableMaps = AssetCableMap.findAllByAssetFrom( assetEntity )
-					assetCableMaps.each{assetCableMap->
-						if(!assetConnectors.id?.contains(assetCableMap.assetFromPort?.id)){
-							AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
-								assetToPort=null where assetToPort = ${assetCableMap.assetFromPort?.id}""")
-							AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = ${assetCableMap.assetFromPort?.id}")
-						}
+					
 					}
-            	}
-            	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
-            	jdbcTemplate.update(updateAssetsQuery)
-                
-				if(modelInstance.sourceTDSVersion){
-	        		modelInstance.sourceTDSVersion ++
-	    		} else {
-	    			modelInstance.sourceTDSVersion = 1
-	    		}
-	        	modelInstance.save(flush: true)
-				def newManufacturer = Manufacturer.get(params.manufacturer.id)
-				if( oldModelManufacturer != params.manufacturer.id){
-					def updateModelQuery = "update asset_entity set manufacturer = '${newManufacturer.name}' where model_id='${modelInstance.id}'"
-					jdbcTemplate.update(updateModelQuery)
-				}
-				if(oldModelType!=params.assetType){
-					def updateModelTypeQuery = "update asset_entity set asset_type = '${params.assetType}' where model_id='${modelInstance.id}'"
-					jdbcTemplate.update(updateModelTypeQuery)
-				
-				}
-				
-				flash.message = "${modelInstance.modelName} Updated"
-				if(params.redirectTo == "assetAudit"){
-					render(template: "modelAuditView", model: [modelInstance:modelInstance] )
-				}
-				forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
-				
-            } else {
-				modelInstance.errors.allErrors.each {log.error it}
-            	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
-				def otherConnectors = []
-				for(int i = modelConnectors.size()+1 ; i<51; i++ ){
-					otherConnectors << i
-				}
-                render(view: "edit", model: [modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors])
-            }
-        } else {
-            flash.message = "Model not found with Id ${params.id}"
-            redirect(action: "list")
-        }
+	            	def assetEntitysByModel = AssetEntity.findAllByModel( modelInstance )
+					def assetConnectors = ModelConnector.findAllByModel( modelInstance )
+					assetEntitysByModel.each{ assetEntity ->
+	            		assetConnectors.each{connector->
+	            			
+	    					def assetCableMap = AssetCableMap.findByAssetFromAndAssetFromPort( assetEntity, connector )
+							if( !assetCableMap ){
+		    					assetCableMap = new AssetCableMap(
+									cable : "Cable"+connector.connector,
+									assetFrom: assetEntity,
+									assetFromPort : connector,
+									cableStatus : connector.status,
+									cableComment : "Cable"+connector.connector
+								)
+							}
+							if(assetEntity?.rackTarget && connector.type == "Power" && 
+								connector.label?.toLowerCase() == 'pwr1' && !assetCableMap.toPower){
+								assetCableMap.assetToPort = null
+								assetCableMap.toPower = "A"
+								assetCableMap.cableStatus= connector.status
+								assetCableMap.cableComment= "Cable"
+							}
+							if ( !assetCableMap.validate() || !assetCableMap.save() ) {
+								def etext = "Unable to create assetCableMap for assetEntity ${assetEntity}" +
+								GormUtil.allErrorsString( assetCableMap )
+								println etext
+								log.error( etext )
+							}
+	    				}
+						def assetCableMaps = AssetCableMap.findAllByAssetFrom( assetEntity )
+						assetCableMaps.each{assetCableMap->
+							if(!assetConnectors.id?.contains(assetCableMap.assetFromPort?.id)){
+								AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
+									assetToPort=null where assetToPort = ${assetCableMap.assetFromPort?.id}""")
+								AssetCableMap.executeUpdate("delete AssetCableMap where assetFromPort = ${assetCableMap.assetFromPort?.id}")
+							}
+						}
+	            	}
+	            	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
+	            	jdbcTemplate.update(updateAssetsQuery)
+	                
+					if(modelInstance.sourceTDSVersion){
+		        		modelInstance.sourceTDSVersion ++
+		    		} else {
+		    			modelInstance.sourceTDSVersion = 1
+		    		}
+		        	modelInstance.save(flush: true)
+					def newManufacturer = Manufacturer.get(params.manufacturer.id)
+					if( oldModelManufacturer != params.manufacturer.id){
+						def updateModelQuery = "update asset_entity set manufacturer = '${newManufacturer.name}' where model_id='${modelInstance.id}'"
+						jdbcTemplate.update(updateModelQuery)
+					}
+					if(oldModelType!=params.assetType){
+						def updateModelTypeQuery = "update asset_entity set asset_type = '${params.assetType}' where model_id='${modelInstance.id}'"
+						jdbcTemplate.update(updateModelTypeQuery)
+					
+					}
+					
+					flash.message = "${modelInstance.modelName} Updated"
+					if(params.redirectTo == "assetAudit"){
+						render(template: "modelAuditView", model: [modelInstance:modelInstance] )
+					}
+					forward(action: "show", params:[id: modelInstance.id, redirectTo:params.redirectTo])
+					
+	            } else {
+					modelInstance.errors.allErrors.each {log.error it}
+	            	def modelConnectors = ModelConnector.findAllByModel( modelInstance )
+					def otherConnectors = []
+					for(int i = modelConnectors.size()+1 ; i<51; i++ ){
+						otherConnectors << i
+					}
+	                render(view: "edit", model: [modelInstance: modelInstance, modelConnectors : modelConnectors, otherConnectors : otherConnectors])
+	            }
+	        } else {
+	            flash.message = "Model not found with Id ${params.id}"
+	            redirect(action: "list")
+	        }
+		} catch(RuntimeException rte) {
+			flash.message = rte.getMessage()
+			redirect(controller:'project', action: 'list')
+		}
     }
 
     def delete = {

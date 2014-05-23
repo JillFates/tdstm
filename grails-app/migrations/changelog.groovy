@@ -89,4 +89,5 @@ databaseChangeLog = {
 	include file: '20140428-add-description-field-to-eav-attribute.groovy'
 	include file: '20150205-add-49-64-custom-fields.groovy'
 	include file: '20140521-add-help-column-in-role-type-table.groovy'
+	include file: '20140523-add-model-edit-permission.groovy'
 }

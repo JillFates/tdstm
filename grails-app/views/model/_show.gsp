@@ -200,45 +200,47 @@
 	<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
-					<g:form action="update" >
-						<input name="id" value="${modelInstance.id}" type="hidden"/>
-						 <input type="hidden" name="redirectTo" value="${redirectTo}" />
-						<span class="button">
-						
-						   <g:if test="${redirectTo=='modelDialog'}">
-								<span class="button"><input type="button" class="edit" value="Edit"
-										onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
-								<g:if test="${modelRef}">
-									<g:actionSubmit class="delete disableButton" action="delete" value="Delete"  disabled="disabled" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
-								</g:if>
-								<g:else>
-									<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
-								</g:else>
-								<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
-								  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
-								</g:if>
-								<g:else>
-								  <input type="button" class="edit disableButton" value="Validate" disabled="disabled" />
-								</g:else>
-						   </g:if>
-						   <g:else>
-								<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
-								<g:if test="${modelRef}">
-									<g:actionSubmit class="disableButton delete" action="delete" value="Delete"  disabled="disabled" 
-									 onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
-								</g:if>
-								<g:else>
-									<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
-								</g:else>
-								<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
-								  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
-								</g:if>
-								<g:else>
-								  <input type="button" class="edit disableButton" value="Validate" disabled="disabled" />
-								</g:else>
-						   </g:else>
-						</span>
-					</g:form>
+					<tds:hasPermission permission="EditModel">
+						<g:form action="update" >
+							<input name="id" value="${modelInstance.id}" type="hidden"/>
+							 <input type="hidden" name="redirectTo" value="${redirectTo}" />
+							<span class="button">
+							
+							   <g:if test="${redirectTo=='modelDialog'}">
+									<span class="button"><input type="button" class="edit" value="Edit"
+											onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','edit','Edit')" /></span>
+									<g:if test="${modelRef}">
+										<g:actionSubmit class="delete disableButton" action="delete" value="Delete"  disabled="disabled" onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+									</g:if>
+									<g:else>
+										<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+									</g:else>
+									<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
+									  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
+									</g:if>
+									<g:else>
+									  <input type="button" class="edit disableButton" value="Validate" disabled="disabled" />
+									</g:else>
+							   </g:if>
+							   <g:else>
+									<g:actionSubmit class="edit" action="edit" value="Edit"></g:actionSubmit>
+									<g:if test="${modelRef}">
+										<g:actionSubmit class="disableButton delete" action="delete" value="Delete"  disabled="disabled" 
+										 onclick="return validateModelDependency(${modelInstance.id})"></g:actionSubmit>
+									</g:if>
+									<g:else>
+										<g:actionSubmit class="delete" action="delete" value="Delete"></g:actionSubmit>
+									</g:else>
+									<g:if test="${modelHasPermission && modelInstance?.modelStatus=='full'}">
+									  <input type="button" class="edit" value="Validate" onclick="validateModel(${modelInstance.id})"/>
+									</g:if>
+									<g:else>
+									  <input type="button" class="edit disableButton" value="Validate" disabled="disabled" />
+									</g:else>
+							   </g:else>
+							</span>
+						</g:form>
+					</tds:hasPermission>
 				</div>
 			</td>
 		</tr>

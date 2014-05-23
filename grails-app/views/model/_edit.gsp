@@ -308,16 +308,18 @@
 	<tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
-					<input name="id" value="${modelInstance.id}" type="hidden"/>
-					<input type="hidden" name="redirectTo" value="${redirectTo }" />
-					<span class="button">
-					 <g:if test="${redirectTo=='modelDialog'}">
-						<input type="button" class="save"  value="Update" onclick="updateModel('Model', 'modelForm')"/>
-					</g:if>
-					<g:else>
-						<input type="submit" class="save"  value="Update" />
-					</g:else>
-					</span>
+					<tds:hasPermission permission="EditModel">
+						<input name="id" value="${modelInstance.id}" type="hidden"/>
+						<input type="hidden" name="redirectTo" value="${redirectTo }" />
+						<span class="button">
+						 <g:if test="${redirectTo=='modelDialog'}">
+							<input type="button" class="save"  value="Update" onclick="updateModel('Model', 'modelForm')"/>
+						</g:if>
+						<g:else>
+							<input type="submit" class="save"  value="Update" />
+						</g:else>
+						</span>
+					</tds:hasPermission>
 				</div>
 			</td>
 		</tr>

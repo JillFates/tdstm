@@ -263,9 +263,11 @@
 	    <tr>
 			<td colspan="2">
 				<div class="buttons" style="margin-left: 10px;margin-right: 10px;"> 
+					<tds:hasPermission permission="EditModel">
 					<span class="button">
 						<g:actionSubmit class="save" action="save" value="Save" onclick="return validateForm()"></g:actionSubmit>
 					</span>
+					</tds:hasPermission>
 				</div>
 			</td>
 		</tr>

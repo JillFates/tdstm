@@ -17,10 +17,10 @@
 				$("#createModelView").dialog({ autoOpen: false })
 				$("#showModelView").dialog({ autoOpen: false })
 				$("#showOrMergeId").dialog({ autoOpen: false })
-				var listCaption ="Models: \
+				var listCaption ="Models: \ <tds:hasPermission permission='AssetEdit'> \
 					<span class='capBtn'><input type='button' value='Create Model' onclick='createModelManuDetails(\"model\",\"Model\")'/></span> \
 					<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>\
-					<span class='capBtn'><input type='button' id='deleteModelId' value='Bulk Delete' onclick='deleteModels()' disabled='disabled'/></span>"
+					<span class='capBtn'><input type='button' id='deleteModelId' value='Bulk Delete' onclick='deleteModels()' disabled='disabled'/></span> </tds:hasPermission>"
 				<jqgrid:grid id="modelId" url="'${createLink(action: 'listJson')}'"
 					colNames="'Model Name','Manufacturer', '${columnLabelpref['1']}','${columnLabelpref['2']}', '${columnLabelpref['3']}','${columnLabelpref['4']}','Assets ','Version','Source TDS','Model Status'"
 					colModel="{name:'modelName', index: 'modelName', width:'150',formatter: myLinkFormatter},
