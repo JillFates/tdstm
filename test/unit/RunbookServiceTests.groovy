@@ -64,7 +64,7 @@ class RunbookServiceTests extends Specification {
 		log = LogManager.getLogger("RunbookService")
 
 		// use groovy metaClass to put the log into your class
-		RunbookService.class.metaClass.getLog &lt;&lt; {-&gt; log }
+		RunbookService.class.metaClass.getLog << {-> log }
 
 		//loadConfig()
 		// Initialize various custom methods used by our application
@@ -79,38 +79,38 @@ class RunbookServiceTests extends Specification {
         
 		def tasks = []
 		def deps = []
-		tasks &lt;&lt; new AssetComment(id:0, taskNumber: 1000, duration:5, comment:'Start Move')	// Start vertex
-		tasks &lt;&lt; new AssetComment(id:1, taskNumber: 1001, duration:8, comment:'SD App Exchange')
-		tasks &lt;&lt; new AssetComment(id:2, taskNumber: 1002, duration:10, comment:'SD App Payroll')
-		tasks &lt;&lt; new AssetComment(id:3, taskNumber: 1003, duration:3, comment:'PD Srv xyzzy')
-		tasks &lt;&lt; new AssetComment(id:4, taskNumber: 1004, duration:20, comment:'PD VM vsmssql01')
-		tasks &lt;&lt; new AssetComment(id:5, taskNumber: 1005, duration:15, comment:'Unrack Srv xyzzy')
-		tasks &lt;&lt; new AssetComment(id:6, taskNumber: 1006, duration:9, comment:'Disable monitoring')	// Start vertex
-		tasks &lt;&lt; new AssetComment(id:7, taskNumber: 1007, duration:45, comment:'Post Move Testing') // Sink vertex
-		tasks &lt;&lt; new AssetComment(id:8, taskNumber: 1008, duration:2, comment:'Make Coffee') // Sink vertex
-		tasks &lt;&lt; new AssetComment(id:9, taskNumber: 1009, duration:1, comment:'Done Move') // Sink vertex
+		tasks << new AssetComment(id:0, taskNumber: 1000, duration:5, comment:'Start Move')	// Start vertex
+		tasks << new AssetComment(id:1, taskNumber: 1001, duration:8, comment:'SD App Exchange')
+		tasks << new AssetComment(id:2, taskNumber: 1002, duration:10, comment:'SD App Payroll')
+		tasks << new AssetComment(id:3, taskNumber: 1003, duration:3, comment:'PD Srv xyzzy')
+		tasks << new AssetComment(id:4, taskNumber: 1004, duration:20, comment:'PD VM vsmssql01')
+		tasks << new AssetComment(id:5, taskNumber: 1005, duration:15, comment:'Unrack Srv xyzzy')
+		tasks << new AssetComment(id:6, taskNumber: 1006, duration:9, comment:'Disable monitoring')	// Start vertex
+		tasks << new AssetComment(id:7, taskNumber: 1007, duration:45, comment:'Post Move Testing') // Sink vertex
+		tasks << new AssetComment(id:8, taskNumber: 1008, duration:2, comment:'Make Coffee') // Sink vertex
+		tasks << new AssetComment(id:9, taskNumber: 1009, duration:1, comment:'Done Move') // Sink vertex
 
-		deps &lt;&lt; new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'SS') 
-		// 1 &gt; [3,4], 3 &gt; 5, 5 &gt; [7,8,9], 4 &gt; 9
+		deps << new TaskDependency(id:100, predecessor:tasks[0], assetComment:tasks[1], type:'SS') 
+		// 1 > [3,4], 3 > 5, 5 > [7,8,9], 4 > 9
 		// 8    3,20  3  15, 15  45,2,1   20  1
-		// 1 &gt; 3 &gt; 5 &gt; [7,8,9] (72)
-		// 1 &gt; 4 &gt; 9 (29)
-		deps &lt;&lt; new TaskDependency(id:101, predecessor:tasks[0], assetComment:tasks[2], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:102, predecessor:tasks[1], assetComment:tasks[3], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:103, predecessor:tasks[1], assetComment:tasks[4], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:104, predecessor:tasks[2], assetComment:tasks[3], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:105, predecessor:tasks[3], assetComment:tasks[5], type:'SS') // 4 downstream tasks
-		deps &lt;&lt; new TaskDependency(id:106, predecessor:tasks[4], assetComment:tasks[9], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:107, predecessor:tasks[6], assetComment:tasks[1], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:108, predecessor:tasks[6], assetComment:tasks[2], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:109, predecessor:tasks[5], assetComment:tasks[7], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'SS')
-		deps &lt;&lt; new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'SS')
+		// 1 > 3 > 5 > [7,8,9] (72)
+		// 1 > 4 > 9 (29)
+		deps << new TaskDependency(id:101, predecessor:tasks[0], assetComment:tasks[2], type:'SS')
+		deps << new TaskDependency(id:102, predecessor:tasks[1], assetComment:tasks[3], type:'SS')
+		deps << new TaskDependency(id:103, predecessor:tasks[1], assetComment:tasks[4], type:'SS')
+		deps << new TaskDependency(id:104, predecessor:tasks[2], assetComment:tasks[3], type:'SS')
+		deps << new TaskDependency(id:105, predecessor:tasks[3], assetComment:tasks[5], type:'SS') // 4 downstream tasks
+		deps << new TaskDependency(id:106, predecessor:tasks[4], assetComment:tasks[9], type:'SS')
+		deps << new TaskDependency(id:107, predecessor:tasks[6], assetComment:tasks[1], type:'SS')
+		deps << new TaskDependency(id:108, predecessor:tasks[6], assetComment:tasks[2], type:'SS')
+		deps << new TaskDependency(id:109, predecessor:tasks[5], assetComment:tasks[7], type:'SS')
+		deps << new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'SS')
+		deps << new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'SS')
 
         def id = 0;
-        tasks.each { t -&gt; t.id = id++}
+        tasks.each { t -> t.id = id++}
         id = 100;
-        deps.each { d -&gt; d.id = id++}
+        deps.each { d -> d.id = id++}
 
 		return [tasks, deps]
 
@@ -208,7 +208,7 @@ class RunbookServiceTests extends Specification {
 
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 
-		dataMatrix.each { i, c, d -&gt; 
+		dataMatrix.each { i, c, d -> 
 			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
 			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
@@ -231,7 +231,7 @@ class RunbookServiceTests extends Specification {
 		(tasks, deps) = initTestData()
 
 		// Add a cyclical reference
-		deps &lt;&lt; new TaskDependency(id:666, predecessor:tasks[5], assetComment:tasks[2], type:'SS')
+		deps << new TaskDependency(id:666, predecessor:tasks[5], assetComment:tasks[2], type:'SS')
 
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
@@ -249,7 +249,7 @@ class RunbookServiceTests extends Specification {
 			['103', 2, 21],	// We added the earlier reference
 			['109', 1, 45] 	// Shouldn't of changed
 		]
-		m.each { i, c, d -&gt; 
+		m.each { i, c, d -> 
 			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
 			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
@@ -294,32 +294,32 @@ class RunbookServiceTests extends Specification {
         
         asset = new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
         asset.id = ltid+1
-		tasks &lt;&lt; asset
+		tasks << asset
         
         asset = new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
         asset.id = ltid+2
-		tasks &lt;&lt; asset
+		tasks << asset
 
         asset = new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
         asset.id = ltid+3
-		tasks &lt;&lt; asset
+		tasks << asset
 
         dep = new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
         dep.id = 200
-		deps &lt;&lt; dep
+		deps << dep
 
         dep = new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
         dep.id = 201
-		deps &lt;&lt; dep
+		deps << dep
 
 		// Add an additional starting vector that is shorter so we can see the counts
         asset = new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
         asset.id = ltid+4
-		tasks &lt;&lt; asset
+		tasks << asset
         
         dep = new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
         dep.id = 210
-		deps &lt;&lt; dep
+		deps << dep
 
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
@@ -402,7 +402,7 @@ class RunbookServiceTests extends Specification {
 		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 
 
-		tasks.each { t -&gt; println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
+		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
 
 		// id, estStart, earliest, latest, is Critical Path
 		def startTimes = [
@@ -422,7 +422,7 @@ class RunbookServiceTests extends Specification {
 		    82 == estFinish //estFinish should be zero
 
 		// Check the times and critical path of all tasks
-		startTimes.each { id, estStart, earliest, latest, criticalPath -&gt;
+		startTimes.each { id, estStart, earliest, latest, criticalPath ->
 			def task = tasks[id] 
 			assertEquals "Estimated Start ($id)", estStart, tmp['tasks'][tasks[id].id].tmpEstimatedStart
 			assertEquals "Earliest Start ($id)", earliest, tmp['tasks'][tasks[id].id].tmpEarliestStart
