@@ -20,12 +20,12 @@ class TaskController {
     def jdbcTemplate
     def reportsService
 
-    def index() { }
+    def index = { }
 	
 	/**
 	* Used by the myTasks and Task Manager to update tasks appropriately.
 	*/
-	def update() {
+	def update = {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
 
 		if (params.view == 'myTask') {		
@@ -619,15 +619,15 @@ digraph runbook {
 		}
 		def tasks = runbookService.getEventTasks(me)
 		def deps = runbookService.getTaskDependencies(tasks)
-		def tmp = runbookService.createTempObject(tasks, deps)
 		def startTime = 0
 		
 		// generate optimized schedule based on this data
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
-		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
 
+//		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def startDate = TimeUtil.convertInToUserTZ(dfsMap.starts[0].estStart, tzId) ?: TimeUtil.nowGMT()
 		
@@ -642,22 +642,24 @@ digraph runbook {
 			def role = t.role ?: 'NONE'
 			if ( ! (role in roles) )
 				roles.push(role)
-			items.push([ id:t.id, name:t.comment, startInitial:tmp['tasks'][t.id].tmpEarliestStart, endInitial:tmp['tasks'][t.id].tmpEarliestStart+t.duration,
-			predecessorIds:predecessorIds, criticalPath:tmp['tasks'][t.id].tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
+			items.push([ id:t.id, name:t.comment, startInitial:t.tmpEarliestStart, endInitial:t.tmpEarliestStart+t.duration,
+			predecessorIds:predecessorIds, criticalPath:t.tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
 			role:role])
 		}
-		
 		def sinks = []
 		dfsMap.sinks.each { s ->
 			sinks.push(s.id)
 		}
+		def data = [items:items, sinks:sinks, roles:roles, startDate:startDate] as JSON
 		
-		def starts = []
-		dfsMap.starts.each { s ->
-			starts.push(s.id)
+		// clear out the metaclass objects to prevent a memory leak
+		tasks.each { t ->
+			t.metaClass = null
+		}
+		deps.each { d ->
+			d.metaClass = null
 		}
 		
-		def data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate] as JSON
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
 		render data
 	}

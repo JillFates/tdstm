@@ -1,20 +1,18 @@
 import groovy.mock.interceptor.*
+import grails.test.GrailsUnitTestCase
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.log4j.* 
 
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
-import grails.test.mixin.TestFor
-import spock.lang.Specification
 
 /**
  * Unit test cases for the RunbookService class
  */
-@TestFor(RunbookService)
-class RunbookServiceTests extends Specification {
+class RunbookServiceTests extends GrailsUnitTestCase {
 	
-	def runbookService
+	def runbookService = new RunbookService()
 	def log
 
 	def mapData = [
@@ -52,12 +50,10 @@ class RunbookServiceTests extends Specification {
 		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config")) 
 	} 
 
-	void setup() {
+	void setUp() {
 		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		//super.setUp() 
+		super.setUp() 
 
-        runbookService = new RunbookService()
-        
 		// build a logger...
 		BasicConfigurator.configure() 
 		LogManager.rootLogger.level = Level.DEBUG
@@ -68,15 +64,13 @@ class RunbookServiceTests extends Specification {
 
 		//loadConfig()
 		// Initialize various custom methods used by our application
-		com.tdsops.metaclass.CustomMethods.getInitialize(false)
+		com.tdsops.metaclass.CustomMethods.initialize
 
 	}
 
-    def cleanup() {
-    }
 
 	def initTestData = {
-        
+
 		def tasks = []
 		def deps = []
 		tasks << new AssetComment(id:0, taskNumber: 1000, duration:5, comment:'Start Move')	// Start vertex
@@ -107,11 +101,6 @@ class RunbookServiceTests extends Specification {
 		deps << new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'SS')
 		deps << new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'SS')
 
-        def id = 0;
-        tasks.each { t -> t.id = id++}
-        id = 100;
-        deps.each { d -> d.id = id++}
-
 		return [tasks, deps]
 
 	}
@@ -119,14 +108,13 @@ class RunbookServiceTests extends Specification {
 	// Test that the List.asMap method actually works
 	void testAsMap() {
 		// def byColor = mapData.asGroup('color')
-		def staff = mapData.asMap('id')
+		def staff = mapData.asMap( 'id')
 
-        expect:
-		    'John' == staff['1'].name
-		    'Tom' == staff['2'].name
-		    'Sarah' == staff['5'].name
-		    'id 666 should not exist' != staff.containsKey(666)
-		    6 == staff.size()
+		assertEquals 'John', staff['1'].name
+		assertEquals 'Tom', staff['2'].name
+		assertEquals 'Sarah', staff['5'].name
+		assertFalse 'id 666 should not exist', staff.containsKey('666')
+		assertEquals 'Map should have 6 elements', 6, staff.size()
 	}
 	
 	// Test that the List.asMap method actually works
@@ -139,12 +127,12 @@ class RunbookServiceTests extends Specification {
 		println "byColor=$byColor"
 		println "find Harry? $harry"
 
-        expect:
-		    byColor.size() == 4 //Should have 4 colors
-		    byColor.containsKey('blue') //Should contain the key "blue"
-		    byColor['blue'].size() == 2 //Blue should have two objects
-		    ( byColor['blue'].find({ it.name == 'John' })?.name=='John' ) //Blue should contain "John"
-		    ( harry == null ) //Blue should not contain "Harry"
+		assertEquals 'Should have 4 colors', 4, byColor.size()
+		assertTrue 'Should contain the key "blue"', byColor.containsKey('blue')
+		assertEquals 'Blue should have two objects', 2, byColor['blue'].size()
+		assertTrue  'Blue should contain "John"', ( byColor['blue'].find({ it.name == 'John' })?.name=='John' )
+		assertTrue 'Blue should not contain "Harry"',  ( harry == null )
+
 	}
 
 
@@ -156,43 +144,37 @@ class RunbookServiceTests extends Specification {
 		def deps
 		(tasks, deps) = initTestData()
 
-		def by = deps.asGroup({ it.predecessor.id })
+		def by = deps.asGroup { it.predecessor.id }
 		// println "by=${by}"
 
-        expect:
-            by.size() == 7 //Should have 7 groups
-            by.containsKey('0') //id "0" should be one of the ids in the map
-            by['0'].size() == 2 //Group "0" should have 2 nodes
-            by['5'].size() == 3 //Group "5" should have 3 nodes
-            ( by['0'].find { it.predecessor.taskNumber == 1000}?.predecessor.taskNumber == 1000 ) //Group "0" should contain dependency "1000"
-            ( by['0'].find { it.predecessor.taskNumber == 1014 } == null ) //Group "0" should not contain dependency "1014"
+		assertEquals 'Should have 7 groups', 7, by.size()
+		assertTrue 'id "0" should be one of the ids in the map', by.containsKey('0')
+		assertEquals 'Group "0" should have 2 nodes', 2, by['0'].size()
+		assertEquals 'Group "5" should have 3 nodes', 3, by['5'].size()
+		assertTrue 'Group "0" should contain dependency "100"', ( by['0'].find { it.id == 100}?.id == 100 )
+		assertTrue 'Group "0" should not contain dependency "14"', ( by['0'].find { it.id == 14 } == null )
 	}
 
 	// @Test
 	// Test that the processDFS is returning the proper results
 	void testProcessDFS() {
-        
+
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def dfsMap = runbookService.processDFS( tasks, deps )
 
-        expect:
-		   'java.util.ArrayList' == dfsMap.starts.getClass().name //Starts type
-		   'java.util.ArrayList' == dfsMap.sinks.getClass().name //Sinks type
-		   'java.util.LinkedHashMap' == dfsMap.cyclicals.getClass().name //Cyclicals type
+		assertEquals 'Starts type', 'java.util.ArrayList', dfsMap.starts.getClass().name
+		assertEquals 'Sinks type', 'java.util.ArrayList', dfsMap.sinks.getClass().name
+		assertEquals 'Cyclicals type', 'java.util.LinkedHashMap', dfsMap.cyclicals.getClass().name
 
-		    dfsMap.starts.size() == 2 //Should have 2 Start vertices
-		    dfsMap.sinks.size() == 3 //Should have 3 Sink vertices
-		    dfsMap.cyclicals.size() == 0 //Should have 0 Cyclical vertices
+		assertEquals 'Should have 2 Start vertices', 2, dfsMap.starts.size()
+		assertEquals 'Should have 3 Sink vertices', 3, dfsMap.sinks.size()
+		assertEquals 'Should have 0 Cyclical vertices', 0, dfsMap.cyclicals.size()
 
-            dfsMap['starts'].find { it.id == 0 }?.id != null //Starts vertices should contain id 0
-            dfsMap['starts'].find { it.id == 6 }?.id != null //Starts vertices should contain id 6
-            dfsMap['sinks'].find { it.id == 7 }?.id != null //Sinks vertices should contain id 7
-            dfsMap['sinks'].find { it.id == 8 }?.id != null //Sinks vertices should contain id 8
-            dfsMap['sinks'].find { it.id == 9 }?.id != null //Sinks vertices should contain id 9
+		[0,6].each { n -> assertEquals "Starts vertices should contain id $n", n, dfsMap['starts'].find { it.id == n }?.id }
+		(7..9).each { n -> assertEquals "Sinks vertices should contain id $n", n, dfsMap['sinks'].find { it.id == n }?.id }
 	}
 
 	// @Test
@@ -202,24 +184,23 @@ class RunbookServiceTests extends Specification {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def dfsMap = runbookService.processDFS( tasks, deps )
 
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
 		dataMatrix.each { i, c, d -> 
-			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
+			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].tmpDownstreamTaskCount
+			assertEquals "pathDuration for edge $i", d, durMap.edges[i].tmpPathDuration
 		}
 
-		expect:
-			tmp['tasks'][durMap.tasks[9].id].tmpMapDepth == 1 //Finish tmpMapDepth
-			tmp['tasks'][durMap.tasks[5].id].tmpMapDepth == 2 //Task 1005 tmpMapDepth
-			tmp['tasks'][durMap.tasks[3].id].tmpMapDepth == 3 //Task 1003 tmpMapDepth
-			tmp['tasks'][durMap.tasks[2].id].tmpMapDepth == 4 //Task 1002 tmpMapDepth
-			tmp['tasks'][durMap.tasks[1].id].tmpMapDepth == 4 //Task 1001 tmpMapDepth
-			tmp['tasks'][durMap.tasks[0].id].tmpMapDepth == 5 //Task 1000 tmpMapDepth
+		assertEquals 'Finish tmpMapDepth', 1, durMap.tasks[9].tmpMapDepth 
+		assertEquals 'Task 1005 tmpMapDepth', 2, durMap.tasks[5].tmpMapDepth 
+		assertEquals 'Task 1003 tmpMapDepth', 3, durMap.tasks[3].tmpMapDepth 
+		assertEquals 'Task 1002 tmpMapDepth', 4, durMap.tasks[2].tmpMapDepth 
+		assertEquals 'Task 1001 tmpMapDepth', 4, durMap.tasks[1].tmpMapDepth 
+		assertEquals 'Task 1000 tmpMapDepth', 5, durMap.tasks[0].tmpMapDepth 
+
 	}
 	
 	// @Test
@@ -233,15 +214,13 @@ class RunbookServiceTests extends Specification {
 		// Add a cyclical reference
 		deps << new TaskDependency(id:666, predecessor:tasks[5], assetComment:tasks[2], type:'SS')
 
-		def tmp = runbookService.createTempObject(tasks, deps)
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def dfsMap = runbookService.processDFS( tasks, deps )
 
-        expect:
-            dfsMap.starts.size() == 2 //Should have 2 Start vertices
-            dfsMap.sinks.size() == 3 //Should have 3 Sink vertices
-            dfsMap.cyclicals.size() == 1 //Should have 1 Cyclical vertex
+		assertEquals 'Should have 2 Start vertices', 2, dfsMap.starts.size()
+		assertEquals 'Should have 3 Sink vertices', 3, dfsMap.sinks.size()
+		assertEquals 'Should have 1 Cyclical vertex', 1, dfsMap.cyclicals.size()
 
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
 		// println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
 		// Run the same process as before and we shouldn't see any differences
@@ -250,8 +229,8 @@ class RunbookServiceTests extends Specification {
 			['109', 1, 45] 	// Shouldn't of changed
 		]
 		m.each { i, c, d -> 
-			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
+			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].tmpDownstreamTaskCount
+			assertEquals "pathDuration for edge $i", d, durMap.edges[i].tmpPathDuration
 		}
 
 	}
@@ -263,20 +242,18 @@ class RunbookServiceTests extends Specification {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-		def tmp = runbookService.createTempObject(tasks, deps)
-		
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
 
-        expect:
-            graphs.size() == 1 //Returns a list with one group
-            graphs[0].starts == [0,6]
-            graphs[0].sinks == [7,8,9]
-            graphs[0].maxPathDuration == 82
-            graphs[0].maxDownstreamTaskCount == 8
+		assertEquals 'Returns a list with one group', 1, graphs.size()
+		assertEquals 'Starts', [0,6], graphs[0].starts
+		assertEquals 'Sinks', [7,8,9], graphs[0].sinks
+		assertEquals 'maxPathDuration', 82, graphs[0].maxPathDuration
+		assertEquals 'maxDownstreamTaskCount', 8, graphs[0].maxDownstreamTaskCount
 	}
 
 	// @Test
@@ -289,57 +266,35 @@ class RunbookServiceTests extends Specification {
 
 		// Add a second separate set of tasks
 		def ltid = tasks.size() - 1
-        def asset
-        def dep
-        
-        asset = new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
-        asset.id = ltid+1
-		tasks << asset
-        
-        asset = new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
-        asset.id = ltid+2
-		tasks << asset
-
-        asset = new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
-        asset.id = ltid+3
-		tasks << asset
-
-        dep = new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
-        dep.id = 200
-		deps << dep
-
-        dep = new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
-        dep.id = 201
-		deps << dep
+		tasks << new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
+		tasks << new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
+		tasks << new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
+		deps << new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
+		deps << new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
 
 		// Add an additional starting vector that is shorter so we can see the counts
-        asset = new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
-        asset.id = ltid+4
-		tasks << asset
-        
-        dep = new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
-        dep.id = 210
-		deps << dep
+		tasks << new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
+		deps << new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
 
-		def tmp = runbookService.createTempObject(tasks, deps)
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
 
-        expect:
-            graphs.size() == 2 //Returns a list with one group
-            [0, 6, ltid+4] == graphs[0].starts //1st Starts
-            [7,8,9] == graphs[0].sinks //1st Sinks
-            180 == graphs[0].maxPathDuration //
-            8 == graphs[0].maxDownstreamTaskCount //1st maxDownstreamTaskCount
+		assertEquals 'Returns a list with one group', 2, graphs.size()
+		assertEquals '1st Starts', [0, 6, ltid+4], graphs[0].starts
+		assertEquals '1st Sinks', [7,8,9], graphs[0].sinks
+		assertEquals '1st maxPathDuration', 180, graphs[0].maxPathDuration
+		assertEquals '1st maxDownstreamTaskCount', 8, graphs[0].maxDownstreamTaskCount
 
-		    [ltid+1] == graphs[1].starts //2nd Starts
-		    [ltid+3] == graphs[1].sinks //2nd Sinks
-		    109 == graphs[1].maxPathDuration //2nd maxPathDuration
-		    2 == graphs[1].maxDownstreamTaskCount //2nd maxDownstreamTaskCount
+		assertEquals '2nd Starts', [ltid+1], graphs[1].starts
+		assertEquals '2nd Sinks', [ltid+3], graphs[1].sinks
+		assertEquals '2nd maxPathDuration', 109, graphs[1].maxPathDuration
+		assertEquals '2nd maxDownstreamTaskCount', 2, graphs[1].maxDownstreamTaskCount
+
+
 	}
 
 	// @Test
@@ -349,18 +304,16 @@ class RunbookServiceTests extends Specification {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 
 		def tasksMap = tasks.asMap('id')
 
-		def task = runbookService.findCriticalStartTask(tasksMap, graphs[0], tmp)
+		def task = runbookService.findCriticalStartTask(tasksMap, graphs[0])
 
-        expect:
-		    6 == task.id
+		assertEquals "Critical start task should be", 6, task.id
 	}
 
 	// @Test
@@ -370,18 +323,16 @@ class RunbookServiceTests extends Specification {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 
 		def edgesByPred = deps.asGroup { it.predecessor.id }
-		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
+		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred)
 
-        expect:        
-		   edge != null //Edge should not be null
-		   108 == edge.id //Critical edge should be
+		assertTrue 'Edge should not be null', edge != null
+		assertEquals "Critical edge should be", 108, edge.id
 	}
 
 	// @Test
@@ -391,18 +342,17 @@ class RunbookServiceTests extends Specification {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def dfsMap = runbookService.processDFS( tasks, deps )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
 
 		def startTime = 0
-		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
+		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
 
 
-		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
+		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${t.tmpEstimatedStart}, earliest=${t.tmpEarliestStart}, latest=${t.tmpLatestStart}, CP=${t.tmpCriticalPath}"}
 
 		// id, estStart, earliest, latest, is Critical Path
 		def startTimes = [
@@ -418,16 +368,15 @@ class RunbookServiceTests extends Specification {
 			[9,  0, 37, 81, false],
 		]
 
-        expect:        
-		    82 == estFinish //estFinish should be zero
+		assertEquals 'estFinish should be zero', 82, estFinish
 
 		// Check the times and critical path of all tasks
 		startTimes.each { id, estStart, earliest, latest, criticalPath ->
 			def task = tasks[id] 
-			assertEquals "Estimated Start ($id)", estStart, tmp['tasks'][tasks[id].id].tmpEstimatedStart
-			assertEquals "Earliest Start ($id)", earliest, tmp['tasks'][tasks[id].id].tmpEarliestStart
-			assertEquals "Estimated Start ($id)", latest, tmp['tasks'][tasks[id].id].tmpLatestStart
-			assertEquals "Critical Path ($id)", criticalPath, tmp['tasks'][tasks[id].id].tmpCriticalPath
+			assertEquals "Estimated Start ($id)", estStart, tasks[id].tmpEstimatedStart
+			assertEquals "Earliest Start ($id)", earliest, tasks[id].tmpEarliestStart
+			assertEquals "Estimated Start ($id)", latest, tasks[id].tmpLatestStart
+			assertEquals "Critical Path ($id)", criticalPath, tasks[id].tmpCriticalPath
 		}
 
 	}
