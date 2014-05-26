@@ -9,10 +9,10 @@
 		<div style="width: 100%; float: left;">
 
 			<div class="eventOuterDiv">
-				<h4 class="leftFloated">Upcoming Events</h4>
+				<h4 class="leftFloated">Events</h4>
 				<br> <br>
 				<div class="eventScrolableTable">
-					<table class="fullWidth">
+					<table class="fullWidth" cellspacing="0px">
 						<thead>
 							<tr>
 								<g:if test="${project=='All' }">
@@ -45,8 +45,7 @@
 										${upcomingEvents[event]?.daysToGo+' days'}
 									</td>
 									<td>
-										<g:set var="team" value="${upcomingEvents[event]?.teams}"/>
-										${team ? team.substring(team.indexOf(':')+1, team.length()) : ''}
+										${upcomingEvents[event]?.teams}
 									</td>
 								</tr>
 							</g:each>
@@ -58,7 +57,7 @@
 				<h4 class="eventNewsHeader">Event News</h4>
 				<br>
 				<div class="eventNewsScrolableTable">
-					<table class="fullWidth">
+					<table class="fullWidth" cellspacing="0px">
 						<thead>
 							<tr>
 								<g:if test="${project=='All' }">
@@ -218,7 +217,7 @@
 			<h4 class="eventNewsHeader">Application</h4>
 			<br>
 			<div class="appScrolableTable">
-				<table class="fullWidth">
+				<table class="fullWidth" cellspacing="0px">
 					<thead>
 						<tr>
 							<g:if test="${project=='All' }">
@@ -263,7 +262,7 @@
 			<h4 class="activepplHeader">Active People</h4>
 			<br>
 			<div>
-				<table class="fullWidth">
+				<table class="fullWidth" cellspacing="0px">
 					<thead>
 						<tr>
 							<th>Project</th>

@@ -2,10 +2,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="layout" content="projectHeader" />
-<title>User Portal</title>
+<title>User Dashboard</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'userPortal.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
@@ -20,7 +21,7 @@
 <div id="doc">
 	<!-- Body Starts here-->
 	<div id="bodycontent"  style="font-size:18px;">
-	<h1 style="float:left;position:absolute;">My Dashboard</h1>
+	<h1 style="float:left;position:absolute;">User Dashboard</h1>
 		<!--Header Starts here-->
 		<div>
 			<div style="float: left;margin-top:3%;position:absolute;">

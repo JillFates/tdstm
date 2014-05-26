@@ -337,7 +337,7 @@ class UserLoginController {
 				def personInstance = Person.findById( person )
 				personInstance.active = userLoginInstance.active
 				userPreferenceService.setUserRoles(assignedRoles, person)
-				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "Current Dashboard")
+				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "User Dashboard")
 				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
 				def tZPreference = new UserPreference()
 				tZPreference.userLogin = userLoginInstance

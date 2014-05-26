@@ -412,11 +412,17 @@ class UserService {
 		def thirtyDaysInMS = 2592000000
 		def upcomingEvents=[:]
 		moveEventList.each{event->
-			def startTime = event.moveBundles.startTime.sort()[0]
-			if(startTime && startTime>dateNow && startTime < dateNow.plus(30)){
+			def eventCompTimes = event.moveBundles.completionTime.sort().reverse()
+			def startTimes = event.moveBundles.startTime.sort()
+			startTimes.removeAll([null])
+			def startTime = startTimes[0]
+			def completionTime = eventCompTimes[0]
+			if(completionTime && completionTime > dateNow.minus(30)){
 				def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, currentUser).role
 				if(teams){
-					upcomingEvents << [(event.id) : ['moveEvent':event, 'teams':WebUtil.listAsMultiValueString(teams),'daysToGo':startTime-dateNow]]
+					upcomingEvents << [(event.id) : ['moveEvent':event, 
+						'teams':WebUtil.listAsMultiValueString(teams.collect {team-> team.description.replaceFirst("Staff : ", "")}),
+						'daysToGo':startTime > dateNow ? (startTime-dateNow) : (" + " + (dateNow - startTime))]]
 				}
 			}
 		}

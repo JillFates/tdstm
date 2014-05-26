@@ -95,7 +95,7 @@ class AuthController {
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 					
 					Person.loggedInPerson = securityService.getUserLoginPerson();
-					
+					def startPage = userPreferenceService.getPreference('START_PAGE')
 					if(browserTest) {
 						if(browserTestiPad) {
 							redirect(controller:'projectUtil')
@@ -104,20 +104,24 @@ class AuthController {
 						}
 					} else {
 					   if(userPreferenceService.getPreference('CURR_PROJ')){
-							if(userPreferenceService.getPreference('START_PAGE')=='Project Settings'){
+							if(startPage =='Project Settings'){
 								redirect(controller:'projectUtil')
-							}else if(userPreferenceService.getPreference('START_PAGE')=='Current Dashboard'){
+							}else if(startPage=='Current Dashboard'){
 								 if(RolePermissions.hasPermission('MoveBundleShowView')){
 									  redirect(controller:'moveBundle',action:'planningStats')
 								 }else{
 									   redirect(controller:'projectUtil')
 								 }
-							}else if(userPreferenceService.getPreference('START_PAGE')=='Admin Portal'){
+							} else if(startPage=='Admin Portal'){
 								redirect(action:'home')
-							}else{
+							} else if(startPage=='User Dashboard' || startPage == null){
+					   			redirect(controller:'dashboard', action:'userPortal')
+							} else{
 								redirect(controller:'projectUtil')
 							}
-					   }else{
+					   } else if(startPage=='User Dashboard' || startPage == null){
+					   		redirect(controller:'dashboard', action:'userPortal')
+					   } else{
 							 redirect(controller:'projectUtil')
 					   }
 					}

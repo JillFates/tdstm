@@ -412,7 +412,7 @@
 					<table class="mmtable"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Live Dashboards</span><br />
 						<ul>
-							<li><g:link class="home mmlink" controller="dashboard" action="userPortal" onclick="hideMegaMenu('dashboardMegaMenu')">Home</g:link></li>
+							<li><g:link class="home mmlink" controller="dashboard" action="userPortal" onclick="hideMegaMenu('dashboardMegaMenu')">User Dashboards</g:link></li>
 							<tds:hasPermission permission='ShowPlanning'>
 							<li><g:link class="home mmlink" controller="moveBundle" action="planningStats" onclick="hideMegaMenu('dashboardMegaMenu')">Planning Dashboard</g:link></li>
 							</tds:hasPermission>
@@ -635,11 +635,11 @@
 						</td>
 						<td valign="top" class="value">
 						<g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
-							<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal']}" 
+							<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" 
 							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
 						</g:if>
 						<g:else>
-						<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard']}" 
+						<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard', 'User Dashboard']}" 
 							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
 						</g:else>
 						</td>
