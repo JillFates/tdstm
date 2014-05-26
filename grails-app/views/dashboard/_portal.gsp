@@ -9,7 +9,7 @@
 		<div style="width: 100%; float: left;">
 
 			<div class="eventOuterDiv">
-				<h4 class="leftFloated">Events</h4>
+				<h4 class="leftFloated dashboard_head">Events</h4>
 				<br> <br>
 				<div class="eventScrolableTable">
 					<table class="fullWidth" cellspacing="0px">
@@ -54,7 +54,7 @@
 				</div>
 			</div>
 			<div class="eventNewsDiv">
-				<h4 class="eventNewsHeader">Event News</h4>
+				<h4 class="eventNewsHeader dashboard_head">Event News</h4>
 				<br>
 				<div class="eventNewsScrolableTable">
 					<table class="fullWidth" cellspacing="0px">
@@ -97,7 +97,7 @@
 
 		<div class="fullWidth">
 			<div class="taskSummaryOuterDiv">
-				<h4 class="leftFloated">Task Summary</h4>
+				<h4 class="leftFloated dashboard_head">Task Summary</h4>
 				<br>
 				<br>
 				<div id="myTaskList">
@@ -214,7 +214,7 @@
 	</div>
 	<div class="appOuterDiv">
 		<div >
-			<h4 class="eventNewsHeader">Application</h4>
+			<h4 class="eventNewsHeader dashboard_head">Application</h4>
 			<br>
 			<div class="appScrolableTable">
 				<table class="fullWidth" cellspacing="0px">
@@ -259,7 +259,7 @@
 		</div>
 		<div
 			class="activepplOuterDiv">
-			<h4 class="activepplHeader">Active People</h4>
+			<h4 class="activepplHeader  dashboard_head">Active People</h4>
 			<br>
 			<div>
 				<table class="fullWidth" cellspacing="0px">
@@ -267,7 +267,6 @@
 						<tr>
 							<th>Project</th>
 							<th>Name</th>
-							
 						</tr>
 					</thead>
 					<tbody>

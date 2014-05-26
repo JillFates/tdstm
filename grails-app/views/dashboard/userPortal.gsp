@@ -26,7 +26,7 @@
 		<div>
 			<div style="float: left;margin-top:3%;position:absolute;">
 			<span> 
-				<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}"
+				Project:&nbsp;<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}"
 				onChange="userPortalByProject(this.value)"/>
 			</span>
 			</div><br><br>
