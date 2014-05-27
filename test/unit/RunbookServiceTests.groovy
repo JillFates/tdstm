@@ -162,8 +162,9 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
+		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
 
 		assertEquals 'Starts type', 'java.util.ArrayList', dfsMap.starts.getClass().name
 		assertEquals 'Sinks type', 'java.util.ArrayList', dfsMap.sinks.getClass().name
@@ -184,23 +185,23 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
+		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
 
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 
 		dataMatrix.each { i, c, d -> 
-			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].tmpDownstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, durMap.edges[i].tmpPathDuration
+			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
+			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
 
-		assertEquals 'Finish tmpMapDepth', 1, durMap.tasks[9].tmpMapDepth 
-		assertEquals 'Task 1005 tmpMapDepth', 2, durMap.tasks[5].tmpMapDepth 
-		assertEquals 'Task 1003 tmpMapDepth', 3, durMap.tasks[3].tmpMapDepth 
-		assertEquals 'Task 1002 tmpMapDepth', 4, durMap.tasks[2].tmpMapDepth 
-		assertEquals 'Task 1001 tmpMapDepth', 4, durMap.tasks[1].tmpMapDepth 
-		assertEquals 'Task 1000 tmpMapDepth', 5, durMap.tasks[0].tmpMapDepth 
-
+		assertEquals 'Finish tmpMapDepth', 1, tmp['tasks'][durMap.tasks[9].id].tmpMapDepth 
+		assertEquals 'Task 1005 tmpMapDepth', 2, tmp['tasks'][durMap.tasks[5].id].tmpMapDepth 
+		assertEquals 'Task 1003 tmpMapDepth', 3, tmp['tasks'][durMap.tasks[3].id].tmpMapDepth 
+		assertEquals 'Task 1002 tmpMapDepth', 4, tmp['tasks'][durMap.tasks[2].id].tmpMapDepth 
+		assertEquals 'Task 1001 tmpMapDepth', 4, tmp['tasks'][durMap.tasks[1].id].tmpMapDepth 
+		assertEquals 'Task 1000 tmpMapDepth', 5, tmp['tasks'][durMap.tasks[0].id].tmpMapDepth 
 	}
 	
 	// @Test
@@ -214,13 +215,14 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		// Add a cyclical reference
 		deps << new TaskDependency(id:666, predecessor:tasks[5], assetComment:tasks[2], type:'SS')
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
+		def tmp = runbookService.createTempObject(tasks, deps)
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
 
 		assertEquals 'Should have 2 Start vertices', 2, dfsMap.starts.size()
 		assertEquals 'Should have 3 Sink vertices', 3, dfsMap.sinks.size()
 		assertEquals 'Should have 1 Cyclical vertex', 1, dfsMap.cyclicals.size()
 
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 
 		// println "What tasks does edge 105 have? ${durMap.edges['105'].successor.tmpDownstreamTasks}"
 		// Run the same process as before and we shouldn't see any differences
@@ -229,8 +231,8 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 			['109', 1, 45] 	// Shouldn't of changed
 		]
 		m.each { i, c, d -> 
-			assertEquals "downstreamTaskCount for edge $i", c, durMap.edges[i].tmpDownstreamTaskCount
-			assertEquals "pathDuration for edge $i", d, durMap.edges[i].tmpPathDuration
+			assertEquals "downstreamTaskCount for edge $i", c, tmp['dependencies'][durMap.edges[i].id].tmpDownstreamTaskCount
+			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
 
 	}
@@ -242,10 +244,11 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
-
-		def dfsMap = runbookService.processDFS( tasks, deps )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def tmp = runbookService.createTempObject(tasks, deps)
+		
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
 
@@ -276,10 +279,11 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		tasks << new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
 		deps << new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def tmp = runbookService.createTempObject(tasks, deps)
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
 
@@ -304,14 +308,15 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
+		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		def tasksMap = tasks.asMap('id')
 
-		def task = runbookService.findCriticalStartTask(tasksMap, graphs[0])
+		def task = runbookService.findCriticalStartTask(tasksMap, graphs[0], tmp)
 
 		assertEquals "Critical start task should be", 6, task.id
 	}
@@ -323,13 +328,14 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
+		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		def edgesByPred = deps.asGroup { it.predecessor.id }
-		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred)
+		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
 
 		assertTrue 'Edge should not be null', edge != null
 		assertEquals "Critical edge should be", 108, edge.id
@@ -342,17 +348,18 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
+		def tmp = runbookService.createTempObject(tasks, deps)
 
-		def dfsMap = runbookService.processDFS( tasks, deps )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
+		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
+		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		def startTime = 0
-		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
+		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 
 
-		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${t.tmpEstimatedStart}, earliest=${t.tmpEarliestStart}, latest=${t.tmpLatestStart}, CP=${t.tmpCriticalPath}"}
+		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
 
 		// id, estStart, earliest, latest, is Critical Path
 		def startTimes = [
@@ -373,10 +380,10 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		// Check the times and critical path of all tasks
 		startTimes.each { id, estStart, earliest, latest, criticalPath ->
 			def task = tasks[id] 
-			assertEquals "Estimated Start ($id)", estStart, tasks[id].tmpEstimatedStart
-			assertEquals "Earliest Start ($id)", earliest, tasks[id].tmpEarliestStart
-			assertEquals "Estimated Start ($id)", latest, tasks[id].tmpLatestStart
-			assertEquals "Critical Path ($id)", criticalPath, tasks[id].tmpCriticalPath
+			assertEquals "Estimated Start ($id)", estStart, tmp['tasks'][tasks[id].id].tmpEstimatedStart
+			assertEquals "Earliest Start ($id)", earliest, tmp['tasks'][tasks[id].id].tmpEarliestStart
+			assertEquals "Estimated Start ($id)", latest, tmp['tasks'][tasks[id].id].tmpLatestStart
+			assertEquals "Critical Path ($id)", criticalPath, tmp['tasks'][tasks[id].id].tmpCriticalPath
 		}
 
 	}

@@ -176,11 +176,12 @@ class TestCaseController {
 		try {
 			tasks = runbookService.getEventTasks(me)
 			deps = runbookService.getTaskDependencies(tasks)
+			def tmp = runbookService.createTempObject(tasks, deps)
 
-			dfsMap = runbookService.processDFS( tasks, deps )
-			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks) 
-			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks)
-			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs)
+			dfsMap = runbookService.processDFS( tasks, deps, tmp )
+			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 
 			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -246,25 +247,17 @@ class TestCaseController {
 
 				// TODO : add in computation for time differences if both constraint time est and/or actual
 	 
-	 			def criticalPath = (t.duration > 0 && t.tmpEarliestStart == t.tmpLatestStart ? 'Yes' : '&nbsp;')
+	 			def criticalPath = (t.duration > 0 && tmp['tasks'][t.id].tmpEarliestStart == tmp['tasks'][t.id].tmpLatestStart ? 'Yes' : '&nbsp;')
 
-				results.append( "<tr><td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td><td>${t.tmpEarliestStart}</td>" + 
-					"<td>${t.tmpLatestStart}</td><td>$constraintTime</td><td>$actFinish</td><td>${t.priority}</td>" + 
+				results.append( "<tr><td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td><td>${tmp['tasks'][t.id].tmpEarliestStart}</td>" + 
+					"<td>${tmp['tasks'][t.id].tmpLatestStart}</td><td>$constraintTime</td><td>$actFinish</td><td>${t.priority}</td>" + 
 					"<td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</tr>")
 			}
 			results.append('</table>')
 		} catch (e) {
 			results.append("<h1>Unable to complete computation</h1>${e.getMessage()}")
 		}
-
-		// Cleanup work to free up memory which is otherwise a memory leak
-		tasks?.each { x -> x.metaClass = null }
-		deps?.each { x -> x.metaClass = null }
-		tasks?.each { x -> x.metaClass = null }
-		dfsMap?.each { x -> x.metaClass = null }
-		durMap?.each { x -> x.metaClass = null }
-		graphs?.each { x -> x.metaClass = null }
-
+		
 		render results.toString()
 
 	}
