@@ -173,39 +173,87 @@ class DashboardController {
 	def userPortal = {
 		def projectInstance = securityService.getUserCurrentProject()
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		 
 		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
 		
-		def details = userService.getuserPortalDetails(projectInstance)
-		def moveBundleList = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
-		def entities = assetEntityService.entityInfo( projectInstance )
-		
-		return [projects:userProjects, projectInstance:projectInstance, taskList:details.taskList, timeInMin:details.timeInMin,
-				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin,
-				newsList:details.newsList,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
-			files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
-			staffRoles:taskService.getTeamRolesForTasks(), moveBundleList:moveBundleList]
+		return [projects:userProjects, projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
 	}
+	
 	/**
-	 * ajax function for user portal details for user selected projects.
-	 *
+	 * This action will load the event template for User Dashboard.
+	 * @param : project id of selected project 
+	 * @render : events template
+	 * 
 	 */
-	def userPortalDetails = {
+	def getEvents = {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if(projectInstance!='All'){
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+		render (template :'events', model:[ upcomingEvents:userService.getEventDetails(projectInstance), project:projectInstance,
+			staffRoles:taskService.getTeamRolesForTasks()])
+	}
+	
+	/**
+	 * This action will load the event news for User Dashboard.
+	 * @param : project id of selected project 
+	 * @render : eventNews template
+	 * 
+	 */
+	def getEventsNewses = {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		render (template :'eventNews', model:[ newsList:userService.getEventNewses(projectInstance), project:projectInstance])
+	}
+	
+	/**
+	 * This action will load the tasks for User Dashboard.
+	 * @param : project id of selected project 
+	 * @render : tasks template
+	 * 
+	 */
+	def getTaskSummary  ={
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		def taskSummary = userService.getTaskSummary(projectInstance)
+		render (template :'tasks', model:[ taskList:taskSummary.taskList, timeInMin:taskSummary.timeInMin, project:projectInstance,
+			dueTaskCount:taskSummary.dueTaskCount])
+	}
+	
+	/**
+	 * This action will load the apps for User Dashboard.
+	 * @param : project id of selected project 
+	 * @render : application template 
+	 * 
+	 */
+	def getApplications  ={
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		def appSummary = userService.getApplications(projectInstance)
+		render (template :'application', model:[ appList:appSummary.appList, relationList:appSummary.relationList, project:projectInstance ])
+	
+	}
+	
+	/**
+	 * This action will load the active people for User Dashboard.
+	 * @param : project id of selected project 
+	 * @render : activePeople template 
+	 * 
+	 */
+	def getActivePeople  ={
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		render (template :'activePeople', model:[ recentLogin:userService.getActivePeople(projectInstance), project:projectInstance ])
+	}
+	
+	/**
+	 * This action will load the related Entities User Dashboard that would be hidden.
+	 * @param : project id of selected project 
+	 * @render : activePeople template 
+	 */
+	def getRelatedEntities={
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def entities = [:]
 		def moveBundleList = []
-		if(projectInstance!='All'){
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-			entities = assetEntityService.entityInfo( projectInstance )
-			moveBundleList = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
-		}
-		
-		def details = userService.getuserPortalDetails(projectInstance)
-	
-		
-		render(template :'portal', model:[ taskList:details.taskList, timeInMin:details.timeInMin, newsList:details.newsList,
-				appList:details.appList, relationList:details.relationList, upcomingEvents:details.upcomingEvents, recentLogin:details.recentLogin,
-				project:projectInstance,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+		render (template :'relatedEntities', model:[servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 			files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 			staffRoles:taskService.getTeamRolesForTasks(), moveBundleList:moveBundleList])
 	}
+	
 }

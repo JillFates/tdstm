@@ -798,3 +798,8 @@ input, select, textarea {
 	width: 120px;
 	border: 1px solid gray;
 }
+.descriptionText{
+	font-size: 12pt !important;
+	float : left;
+	padding-top: 5px;
+}

@@ -342,16 +342,38 @@ class UserService {
 
 		return userLogin
 	}
+	
+	
 	/**
-	 * get the user portal Details for a project or list of projects.
+	 * 
 	 * @param projectInstance
 	 * @return
 	 */
-	def getuserPortalDetails(projectInstance){
+	def getEventDetails(projectInstance){
 		def currentUser= securityService.getUserLoginPerson()
+		def projects = getSelectedProject(projectInstance)
+		def upcomingEvents=[:]
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
 		
+		getEvents(projects, dateNow).each{ event, startTime->
+			def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, currentUser).role
+			if(teams){
+				upcomingEvents << [(event.id) : ['moveEvent':event,
+					'teams':WebUtil.listAsMultiValueString(teams.collect {team-> team.description.replaceFirst("Staff : ", "")}),
+					'daysToGo':startTime > dateNow ? (startTime-dateNow) : (" + " + (dateNow - startTime))]]
+			}
+		}
+		
+		return upcomingEvents
+	}
+	
+	/**
+	 * 
+	 * @param projectInstance
+	 * @return
+	 */
+	def getSelectedProject(projectInstance){
 		def projects= []
 		if(projectInstance=='All'){
 			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
@@ -360,16 +382,67 @@ class UserService {
 		}else{
 			projects = [projectInstance]
 		}
-		//to get task Summary.
-		def issueList = []
+		return projects
+	}
+	
+	/**
+	 * 
+	 * @param projectInstance
+	 * @return
+	 */
+	def getEvents(projects, dateNow ){
+		def moveEventList = MoveEvent.findAllByProjectInList(projects).sort{it.eventTimes.start}
+		def thirtyDaysInMS = 2592000000
+		
+		def events = [:]
+		
+		moveEventList.each{event->
+			def eventCompTimes = event.moveBundles.completionTime.sort().reverse()
+			def startTimes = event.moveBundles.startTime.sort()
+			startTimes.removeAll([null])
+			def startTime = startTimes[0]
+			def completionTime = eventCompTimes[0]
+			if(completionTime && completionTime > dateNow.minus(30)){
+				events << [(event):startTime]
+			}
+		}
+		
+		return events
+	}
+	
+	/**
+	 * 
+	 * @param project
+	 * @return
+	 */
+	def getEventNewses( project ){
+		def newsList = []
+		def comingEvents = getEvents(getSelectedProject(project), TimeUtil.nowGMT()).keySet().asList()
+		if(comingEvents){
+			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events) order by dateCreated desc",[events:comingEvents.id])
+		}
+		
+		return newsList
+	}
+	
+	/**
+	 * 
+	 * @param project
+	 * @return
+	 */
+	def getTaskSummary ( project ){
+		
 		def timeInMin =0
-		projects.each{project->
-			def tasks = taskService.getUserTasks(currentUser, project, false, 7 )
+		def issueList = []
+		def currentUser= securityService.getUserLoginPerson()
+		
+		getSelectedProject(project).each{proj->
+			def tasks = taskService.getUserTasks(currentUser, proj, false, 7, 'score' )
 			def taskList = tasks['user']
 			def durationScale = [d:1440, m:1, w:10080, h:60] // minutes per day,week,hour
 			taskList.each{ task ->
 				def css = taskService.getCssClassForStatus( task.status )
-				issueList << ['item':task,'css':css, projectName : project.name]
+				issueList << ['item':task,'css':css, projectName : proj.name]
 			}
 			if(taskList){
 				timeInMin += taskList.sum{task->
@@ -377,9 +450,24 @@ class UserService {
 				}
 			}
 		}
+		if(project=="All"){
+			issueList:issueList.sort{it.item.project}
+		}
+		def dueTaskCount = issueList.item.findAll {it.duedate && it.duedate < TimeUtil.nowGMT()}.size()
+		return [taskList:issueList, timeInMin:timeInMin, dueTaskCount:dueTaskCount]
+	}
+	
+	/**
+	 * 
+	 * @param project
+	 * @return
+	 */
+	def getApplications( project ){
+		
 		//to get applications assigned to particular person & there relations.
-		def appList = Application.findAll("from Application where project in (:projects) and (sme=:person or sme2=:person or appOwner=:person)",
-											[projects:projects, person:currentUser])
+		def currentUser= securityService.getUserLoginPerson()
+		def appList = Application.findAll("from Application where project in (:projects) and (sme=:person or sme2=:person or appOwner=:person) \
+											order by assetName asc", [projects:getSelectedProject(project), person:currentUser])
 		def relationList = [:]
 		appList.each{
 			def relation = []
@@ -395,8 +483,19 @@ class UserService {
 			relationList << [(it.id) : WebUtil.listAsMultiValueString(relation)]
 		}
 		
+		return [appList:appList, relationList:relationList]
+	}
+	
+	/**
+	 * 
+	 * @param project
+	 * @return
+	 */
+	def getActivePeople( project ){ 
 		//to get active people of that particular user selected project.
 		def loginPersons = UserLogin.findAll()
+		def dateNow = TimeUtil.nowGMT()
+		def timeNow = dateNow.getTime()
 		def recentLogin = [:]
 		(loginPersons-securityService.getUserLogin()).each{
 			if(it?.lastLogin && it?.lastLogin.getTime()>timeNow-1800000){
@@ -407,32 +506,6 @@ class UserService {
 			}
 		}
 		
-		//to get all moveEvent list assigned to team.
-		def moveEventList = MoveEvent.findAllByProjectInList(projects)
-		def thirtyDaysInMS = 2592000000
-		def upcomingEvents=[:]
-		moveEventList.each{event->
-			def eventCompTimes = event.moveBundles.completionTime.sort().reverse()
-			def startTimes = event.moveBundles.startTime.sort()
-			startTimes.removeAll([null])
-			def startTime = startTimes[0]
-			def completionTime = eventCompTimes[0]
-			if(completionTime && completionTime > dateNow.minus(30)){
-				def teams = MoveEventStaff.findAllByMoveEventAndPerson(event, currentUser).role
-				if(teams){
-					upcomingEvents << [(event.id) : ['moveEvent':event, 
-						'teams':WebUtil.listAsMultiValueString(teams.collect {team-> team.description.replaceFirst("Staff : ", "")}),
-						'daysToGo':startTime > dateNow ? (startTime-dateNow) : (" + " + (dateNow - startTime))]]
-				}
-			}
-		}
-		def newsList = []
-		def comingEvents =upcomingEvents.keySet().asList()
-		if(comingEvents){
-			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events) order by dateCreated",[events:comingEvents])
-		}
-		return [taskList:issueList, timeInMin:timeInMin, appList:appList, relationList:relationList, upcomingEvents:upcomingEvents,
-				 recentLogin:recentLogin, newsList:newsList]
+		return recentLogin
 	}
-	
 }

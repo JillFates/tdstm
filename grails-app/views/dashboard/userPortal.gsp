@@ -2,7 +2,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="layout" content="projectHeader" />
-<title>User Dashboard</title>
+<title>User Dashboard For ${loggedInPerson}</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'userPortal.css')}" />
@@ -20,18 +20,18 @@
 <a name="page_up"></a>
 <div id="doc">
 	<!-- Body Starts here-->
-	<div id="bodycontent"  style="font-size:18px;">
+	<div id="bodycontent" >
 	<h1 style="float:left;position:absolute;">User Dashboard</h1>
-		<!--Header Starts here-->
 		<div>
 			<div style="float: left;margin-top:3%;position:absolute;">
+			Project : 
 			<span> 
 				Project:&nbsp;<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}"
-				onChange="userPortalByProject(this.value)"/>
+				onChange="loadAll(this.value)"/>
 			</span>
 			</div><br><br>
 		</div>
-		<div id="userPortalDiv">
+		<div id="userPortalDiv"  style="font-size:18px;">
 			<g:render template="../dashboard/portal"/>
 		</div>
 	</div>
@@ -137,6 +137,90 @@ function pageRefresh(){
 	document.issueAssetForm.action = 'listTasks'
 	document.issueAssetForm.submit()
 }
+var image = "<tr><td><div><img src='"+contextPath+"/images/processing.gif'></div></td></tr>"
+function loadRelatedEntities(id){
+	jQuery.ajax({
+		url: '../dashboard/getRelatedEntities',
+		data: {'project':id ? id :$("#userProjectId").val()},
+		type:'POST',
+		success: function(data) {
+			$("#relatedEntitiesId").html(data);
+		}
+	});
+}
+
+function loadEventTable(id){
+
+	jQuery.ajax({
+		url: '../dashboard/getEvents',
+		data: {'project':id ? id :$("#userProjectId").val()},
+		type:'POST',
+		beforeSend: function(xhr) {
+			$("#eventTableId").html(image);
+		},
+		success: function(data) {
+			$("#eventTableId").html(data);
+		}
+	});
+}
+
+function loadEventNewsTable(id){
+
+	jQuery.ajax({
+		url: '../dashboard/getEventsNewses',
+		data: {'project':id ? id :$("#userProjectId").val()},
+		type:'POST',
+		beforeSend: function(xhr) {
+			$("#eventNewsTableId").html(image);
+		},
+		success: function(data) {
+			$("#eventNewsTableId").html(data);
+		}
+	});
+}
+
+function loadTasksTable(id){
+
+	jQuery.ajax({
+		url: '../dashboard/getTaskSummary',
+		data: {'project':id ? id :$("#userProjectId").val()},
+		type:'POST',
+		beforeSend: function(xhr) {
+			$("#myTaskList").html(image);
+		},
+		success: function(data) {
+			$("#myTaskList").html(data);
+		}
+	});
+}
+
+function loadAppTable(id){
+	jQuery.ajax({
+		url: '../dashboard/getApplications',
+		data: {'project':id ? id :$("#userProjectId").val()},
+		type:'POST',
+		beforeSend: function(xhr) {
+			$("#appTableId").html(image);
+		},
+		success: function(data) {
+			$("#appTableId").html(data);
+		}
+	});
+}
+
+function loadActivepplTable(id){
+	jQuery.ajax({
+		url: '../dashboard/getActivePeople',
+		data: {'project':id ? id :$("#userProjectId").val()},
+		type:'POST',
+		beforeSend: function(xhr) {
+			$("#actpplTableId").html(image);
+		},
+		success: function(data) {
+			$("#actpplTableId").html(data);
+		}
+	});
+}
 </script>
 <script>
 	currentMenuId = "#teamMenuId";
@@ -146,8 +230,37 @@ function pageRefresh(){
 		<g:if test="${projects.size()>1}">
 			$("#userProjectId option:first").before(myOption);
 		</g:if>
+
+		var id = $("#userProjectId").val();
+		loadAll(id);
+		
 	});
 
+	function loadAll(id){
+		if(id==0){
+			if($("#eventTable th:first-child").html()!="Project"){
+				$("#eventThId").prepend("<th>Project</th>")
+				$("#eventNewsThId").prepend("<th>Project</th>")
+				$("#taskThId").prepend("<th>Project</th>")
+				$("#appThId").prepend("<th>Project</th>")
+			}
+		} else {
+			if($("#eventTable th:first-child").html()=="Project"){
+				$("#eventTable th:first-child").remove()
+				$("#eventNewsTable th:first-child").remove()
+				$("#issueTable th:first-child").remove()
+				$("#appTable th:first-child").remove()
+			}
+		}
+		loadRelatedEntities(id)
+		loadEventTable(id);
+		loadEventNewsTable(id);
+		loadTasksTable(id);
+		loadAppTable(id);
+		loadActivepplTable(id);
+	}
+
+	
 	function userPortalByProject(value){
 		jQuery.ajax({
 	        url:contextPath+'/dashboard/userPortalDetails',

@@ -73,6 +73,8 @@ class CustomTagLib {
 				out << dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 			} else if(formate == "hh:mm"){
 				out << dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+			} else if(formate == "yyyy/mm-dd hh:mm a"){
+				out << dtParam[0..3]+"/"+dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 			} else {
 				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
 			}

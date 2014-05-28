@@ -21,3 +21,4 @@
 <g:if test="${assetEntity && assetEntity?.assetType in AssetType.getPhysicalServerTypes() && assetEntity?.model && assetEntity.isCableExist()}">
  	<span class="button"><input type="button" id="cableId" name="cableId" class="edit" value="Cable" onclick="openCablingDiv(${assetEntity?.id},'S')" /> </span>
 </g:if>
+

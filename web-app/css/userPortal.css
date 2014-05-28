@@ -24,7 +24,7 @@
 }
 
 .eventScrolableTable{
-	max-height: 152px; 
+	max-height: 195px; 
 	overflow: auto;
 }
 
@@ -35,12 +35,14 @@
 }
 
 .eventNewsHeader {
-	margin-left: -17%; 
-	width: 50%;
+	float: left;
+    margin-left: -1%;
+    width: 18%;
+    padding-bottom: 13px;
 }
 
 .eventNewsScrolableTable{
-	max-height: 152px;
+	max-height: 195px;
 	overflow: auto; 
 	width: 100%;
 }
@@ -77,18 +79,24 @@
 }
 
 .activepplOuterDiv {
-	font-size: 18px;
-	float:right; 
-	width: 100%;
+	float: right;
+    font-size: 18px;
+    padding-top: 10px;
+    width: 100%;
 }
 
 .activepplHeader {
-	margin-left: -15%; 
-	width: 50%;
-	margin-top: 20px
+	float: left;
+    margin-left: -2%;
+    margin-top: -2px;
+    width: 22%;
 }
 
 .effort {
 	margin-top:10px; 
 	font-size: 14px
+}
+
+.cursor {
+	cursor:pointer;
 }
