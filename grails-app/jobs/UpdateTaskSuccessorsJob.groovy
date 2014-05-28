@@ -44,7 +44,7 @@ class UpdateTaskSuccessorsJob {
 			}
 
 			// Reschedule the job for 500ms
-			long nextFiring = System.currentTimeMillis() + 100    // in 100ms
+			long nextFiring = System.currentTimeMillis() + 2000    // in 100ms
 			Date nextFiringDate = new Date(nextFiring)
 			Trigger trigger = context.getTrigger()
 			trigger.setStartTime(nextFiringDate)

@@ -495,7 +495,7 @@ class TaskService implements InitializingBean {
 				whom = securityService.getUserLoginPerson()
 				isPM = securityService.hasRole("PROJ_MGR")
 			}
-			long startTime = System.currentTimeMillis() + (300L)
+			long startTime = System.currentTimeMillis() + (2000L)
 			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
 			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM, tries:0L ] )
 			trigger.setJobName('UpdateTaskSuccessorsJob')
