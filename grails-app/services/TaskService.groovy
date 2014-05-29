@@ -225,9 +225,10 @@ class TaskService implements InitializingBean {
 			LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id 
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND t.is_published = true """)
 
-			sql.append("AND( t.assigned_to_id=:assignedToId OR \
-				(${roles ? 't.role IN (:roles) AND ' : ''}	t.status IN (:statuses) \
-				AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) ")
+		// filter tasks to those directly assigned to the user and/or assigned to a team that they're assigne and the task is in one of the proper statuses
+		sql.append("AND( t.assigned_to_id=:assignedToId OR \
+			(${roles ? 't.role IN (:roles) AND ' : 'false AND '} t.status IN (:statuses) \
+			AND t.hard_assigned=0 OR (t.hard_assigned=1 AND t.assigned_to_id=:assignedToId) ) ) ")
 		
 		search = org.apache.commons.lang.StringUtils.trimToNull(search)
 		if (search) {
@@ -273,8 +274,8 @@ class TaskService implements InitializingBean {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		//log.info "getUserTasks: SQL: " + sql.toString()
-		//log.info "getUserTasks: SQL params: " + sqlParams
+		log.debug "getUserTasks: SQL: " + sql.toString()
+		log.debug "getUserTasks: SQL params: " + sqlParams
 		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )
@@ -283,13 +284,11 @@ class TaskService implements InitializingBean {
 		def format = "yyyy/MM/dd hh:mm:ss"
 		def minAgoFormat = minAgo.format(format)
 		def todoTasks = allTasks.findAll { task ->
-			if (task.taskNumber==374) { log.info "getUserTasks: minAgoFormat:${minAgoFormat} [${task.statusUpdated?.format(format)}]"}
 			task.status == AssetCommentStatus.READY || ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id ) ||
 			(task.status == AssetCommentStatus.DONE && task.assignedTo == person.id && task.statusUpdated?.format(format) >= minAgoFormat )
 		}
 		
 		def assignedTasks = allTasks.findAll { task ->
-			if (task.taskNumber==374) { log.info "getUserTasks: minAgoFormat:${minAgoFormat} [${task.statusUpdated?.format(format)}]"}
 			(task.status == AssetCommentStatus.READY && task.assignedTo == person.id )|| ( task.status == AssetCommentStatus.STARTED && task.assignedTo == person.id ) ||
 			(task.status == AssetCommentStatus.DONE && task.assignedTo == person.id && task.statusUpdated?.format(format) >= minAgoFormat )
 		}
