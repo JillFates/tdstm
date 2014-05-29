@@ -884,7 +884,8 @@ class CookbookService {
 						errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )
 					} else if ( CU.isaList(map[n]) ) {
 						// Check if the value of a property exists in the map defined list
-						if ( ! map[n].contains( v ) ) {
+						def cleanedExp = v.replaceAll( /[!=<>]/, '' )
+						if ( ! map[n].contains( cleanedExp ) ) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
 								detail: "$label in element $i property '$n' contains invalid value '$v'" ]
 						}
@@ -909,6 +910,14 @@ class CookbookService {
 				taskSpec:0,
 				class:['device','database','application','storage'],
 				asset:0,
+				dependency: [
+					mode:['supports', 'requires'],
+					class:['device','database','application','storage'],
+					asset: [
+						physical:true,
+						virtual:true
+					]
+				]
 			]
 		]
 
