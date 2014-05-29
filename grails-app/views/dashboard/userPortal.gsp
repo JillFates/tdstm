@@ -24,7 +24,6 @@
 	<h1 style="float:left;position:absolute;">User Dashboard</h1>
 		<div>
 			<div style="float: left;margin-top:3%;position:absolute;">
-			Project : 
 			<span> 
 				Project:&nbsp;<g:select id="userProjectId" name="projectId" from="${projects}" optionKey="id" optionValue="name" value="${projectInstance.id}"
 				onChange="loadAll(this.value)"/>

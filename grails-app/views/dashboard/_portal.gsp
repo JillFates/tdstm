@@ -9,10 +9,9 @@
 		<div style="width: 100%; float: left;">
 
 			<div class="eventOuterDiv">
-				<h4 class="leftFloated dashboard_head">Events </h4><span class="descriptionText"> : Your assigned events and your team 
-					<input type="button" value="Refresh" onclick="loadEventTable()"/>
-				</span>
-				<br> <br>
+				<h4 class="leftFloated dashboard_head">Events </h4>
+				<span class="descriptionText"> Your assigned events and your team <input type="button" value="Refresh" onclick="loadEventTable()"/></span>
+				<br>
 				<div class="eventScrolableTable">
 					<table class="fullWidth" cellspacing="0px" id="eventTable">
 						<thead>
@@ -26,15 +25,13 @@
 								<th>Teams</th>
 							</tr>
 						</thead>
-						<tbody id="eventTableId">
-						</tbody>
+						<tbody id="eventTableId"></tbody>
 					</table>
 				</div>
 			</div>
 			<div class="eventNewsDiv">
 				<h4 class="eventNewsHeader dashboard_head">Event News</h4>
-				<span class="descriptionText" > : Active news for your events 
-				<input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
+				<span class="descriptionText" > Active news for your events <input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
 				<br>
 				<div class="eventNewsScrolableTable">
 					<table class="fullWidth" cellspacing="0px" id="eventNewsTable">
@@ -45,8 +42,7 @@
 								<th>News</th>
 							</tr>
 						</thead>
-						<tbody id="eventNewsTableId">
-						</tbody>
+						<tbody id="eventNewsTableId"></tbody>
 					</table>
 				</div>
 			</div>
@@ -56,24 +52,19 @@
 		<div class="fullWidth">
 			<div class="taskSummaryOuterDiv">
 				<h4 class="leftFloated dashboard_head">Task Summary </h4>
-				<span class="descriptionText"> : Active tasks assigned to you
-				<input type="button" value="Refresh" onclick="loadTasksTable()"/></span>
-				<br>
+				<span class="descriptionText"> Active tasks assigned to you <input type="button" value="Refresh" onclick="loadTasksTable()"/></span>
 				<br>
 				<div id="myTaskList">
-					
-					</div>
-					<span class="leftFloated effort" id="taskNews">
-					</span>
+				</div>
+					<span class="leftFloated effort" id="taskNews"></span>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="appOuterDiv">
-		<div >
+		<div>
 			<h4 class="eventNewsHeader dashboard_head">Application </h4>
-			<span class="descriptionText"> : Your applications as a SME or Owner
-			<input type="button" value="Refresh" onclick="loadAppTable()"/></span>
+			<span class="descriptionText"> Your applications as a SME or Owner<input type="button" value="Refresh" onclick="loadAppTable()"/></span>
 			<br>
 			<div class="appScrolableTable">
 				<table class="fullWidth" cellspacing="0px" id="appTable">
@@ -85,17 +76,13 @@
 							<th>Relation</th>
 						</tr>
 					</thead>
-					<tbody id="appTableId">
-					</tbody>
+					<tbody id="appTableId"></tbody>
 				</table>
 			</div>
 		</div>
-		<div
-			class="activepplOuterDiv">
+		<div class="activepplOuterDiv">
 			<h4 class="activepplHeader  dashboard_head">Active People</h4>
-			<span class="descriptionText"> : Currently active people on this project
-			<input type="button" value="Refresh" onclick="loadActivepplTable()"/></span></span>	
-			<br>
+			<span class="descriptionText"> Currently active people on this project <input type="button" value="Refresh" onclick="loadActivepplTable()"/></span></span>	
 			<br>
 			<div class="appScrolableTable">
 				<table class="fullWidth" cellspacing="0px">
@@ -105,9 +92,7 @@
 							<th>Name</th>
 						</tr>
 					</thead>
-					<tbody id="actpplTableId">
-						
-					</tbody>
+					<tbody id="actpplTableId"></tbody>
 				</table>
 			</div>
 		</div>
