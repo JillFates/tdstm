@@ -41,7 +41,6 @@ databaseChangeLog = {
     //include file: '20130522-create-default-project.groovy' // TODO : enable after John's review
 	include file: '20130624-update-recent-users-expiry-dates.groovy'
 	include file: '20130626-update-person-staff_type.groovy'
-*/
 	include file: '20130709-add-new-fields-application-table.groovy'
 	include file: '20130710-add-new-app-field-import-export.groovy'
 	include file: '20130713-add-permission-view-permission.groovy'
@@ -64,6 +63,7 @@ databaseChangeLog = {
 	include file: '20131014-delete-orphan-records-room-rack.groovy'
 	include file: '20131018-fix-party-version-tempForUpdate.groovy'
 	include file: '20131211-asset-cable-map-rebuild.groovy'
+*/
 	include file: '20140128-add-cookbook.groovy'
 	include file: '20140130-remove-createdBy-recipe.groovy'
 	include file: '20140131-add-missing-version.groovy'
@@ -90,4 +90,5 @@ databaseChangeLog = {
 	include file: '20150205-add-49-64-custom-fields.groovy'
 	include file: '20140521-add-help-column-in-role-type-table.groovy'
 	include file: '20140523-add-model-edit-permission.groovy'
+	include file: '20140529-add-viewTaskTimeline-perms.groovy'
 }

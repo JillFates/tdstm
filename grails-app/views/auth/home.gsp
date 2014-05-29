@@ -135,8 +135,9 @@ a:hover {
 					<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
 				</tr>
 				<tr class="even">
-					<td><g:link controller="task" action="taskGraphViewer" style="color:black">View Task Timeline</g:link></td>
-					<td><g:link controller="testCase" action="testRBO" params="[eventId:0]" style="color:black">Task Critical Path Calculator</g:link></td>
+					<td>
+						<g:link controller="testCase" action="testRBO" params="[eventId:0]" style="color:black">Task Critical Path Calculator</g:link>
+					</td>
 				</tr>
 			</tbody>
 		</table>

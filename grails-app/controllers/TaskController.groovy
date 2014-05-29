@@ -562,31 +562,25 @@ digraph runbook {
 		render retMap as JSON
 	}
 	
-	def taskGraphViewer = {
-		if ( RolePermissions.hasPermission("AdminMenuView") ) {
-			// handle project
-			long projectId = securityService.getUserCurrentProject().id
-			if ( ! projectId ) {
-				flash.message = "You must select a project before using the task graph."
-				redirect(controller:"project", action:"list")
-				return
-			}
-
-			// if user used the event selector on the page, update their preferences with the new event
-			if (params.moveEventId && params.moveEventId.isLong())
-				userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
-
-			// handle move events
-			def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
-			def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
-			long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
-			
-			return [moveEvents:moveEvents, selectedEventId:selectedEventId]
-		} else {
-			flash.message = "You do not have permission to view the task graph."
-			redirect(controller:"project", action:"show")
+	def taskTimeline = {
+		// handle project
+		def project = securityService.getUserCurrentProject()
+		if ( ! project ) {
+			flash.message = "You must select a project in order to use the task timeline."
+			redirect(controller:"project", action:"list")
 			return
 		}
+
+		// if user used the event selector on the page, update their preferences with the new event
+		if (params.moveEventId && params.moveEventId.isLong())
+			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+
+		// handle move events
+		def moveEvents = MoveEvent.findAllByProject(project)
+		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
+		
+		return [moveEvents:moveEvents, selectedEventId:selectedEventId]
 	}
 	
 	// gets the JSON object used to populate the task graph timeline
