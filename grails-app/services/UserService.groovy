@@ -497,6 +497,7 @@ class UserService {
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
 		def recentLogin = [:]
+		def projects = getSelectedProject( project )
 		(loginPersons-securityService.getUserLogin()).each{
 			if(it?.lastLogin && it?.lastLogin.getTime()>timeNow-1800000){
 				def loginProjId = UserPreference.executeQuery("SELECT value FROM UserPreference where userLogin.id=? and preferenceCode=?",[it.id,'CURR_PROJ'])[0]
