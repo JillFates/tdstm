@@ -9,9 +9,9 @@
 		<div style="width: 100%; float: left;">
 
 			<div class="eventOuterDiv">
-				<h4 class="leftFloated dashboard_head">Events </h4>
-				<span class="descriptionText"> Your assigned events and your team <input type="button" value="Refresh" onclick="loadEventTable()"/></span>
-				<br>
+				<h4 class="leftFloated dashboard_head">Events&nbsp;</h4>&nbsp;
+				<span class="descriptionText">Your assigned events and your team <input type="button" value="Refresh" onclick="loadEventTable()"/></span>
+				<br style="font-size:28px;">
 				<div class="eventScrolableTable">
 					<table class="fullWidth" cellspacing="0px" id="eventTable">
 						<thead>
@@ -30,8 +30,8 @@
 				</div>
 			</div>
 			<div class="eventNewsDiv">
-				<h4 class="eventNewsHeader dashboard_head">Event News</h4>
-				<span class="descriptionText" > Active news for your events <input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
+				<h4 class="eventNewsHeader dashboard_head">Event News&nbsp;</h4>
+				<span class="descriptionText">&nbsp;Active news for your events <input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
 				<br>
 				<div class="eventNewsScrolableTable">
 					<table class="fullWidth" cellspacing="0px" id="eventNewsTable">
@@ -51,8 +51,8 @@
 
 		<div class="fullWidth">
 			<div class="taskSummaryOuterDiv">
-				<h4 class="leftFloated dashboard_head">Task Summary </h4>
-				<span class="descriptionText"> Active tasks assigned to you <input type="button" value="Refresh" onclick="loadTasksTable()"/></span>
+				<h4 class="leftFloated dashboard_head">Task Summary&nbsp;</h4>
+				<span class="descriptionText">Active tasks assigned to you <input type="button" value="Refresh" onclick="loadTasksTable()"/></span>
 				<br>
 				<div id="myTaskList">
 				</div>
@@ -63,8 +63,8 @@
 	</div>
 	<div class="appOuterDiv">
 		<div>
-			<h4 class="eventNewsHeader dashboard_head">Application </h4>
-			<span class="descriptionText"> Your applications as a SME or Owner<input type="button" value="Refresh" onclick="loadAppTable()"/></span>
+			<h4 class="eventNewsHeader dashboard_head">Application&nbsp;</h4>
+			<span class="descriptionText">Your applications as a SME or Owner<input type="button" value="Refresh" onclick="loadAppTable()"/></span>
 			<br>
 			<div class="appScrolableTable">
 				<table class="fullWidth" cellspacing="0px" id="appTable">
@@ -81,8 +81,8 @@
 			</div>
 		</div>
 		<div class="activepplOuterDiv">
-			<h4 class="activepplHeader  dashboard_head">Active People</h4>
-			<span class="descriptionText"> Currently active people on this project <input type="button" value="Refresh" onclick="loadActivepplTable()"/></span></span>	
+			<h4 class="activepplHeader  dashboard_head">Active People&nbsp;</h4>
+			<span class="descriptionText">Currently active people on this project <input type="button" value="Refresh" onclick="loadActivepplTable()"/></span></span>	
 			<br>
 			<div class="appScrolableTable">
 				<table class="fullWidth" cellspacing="0px">
