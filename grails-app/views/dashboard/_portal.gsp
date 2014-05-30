@@ -30,7 +30,7 @@
 				</div>
 			</div>
 			<div class="eventNewsDiv">
-				<h4 class="eventNewsHeader dashboard_head">Event News&nbsp;</h4>
+				<h4 class="eventNewsHeader dashboard_head">Event News</h4>
 				<span class="descriptionText">&nbsp;Active news for your events <input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
 				<br>
 				<div class="eventNewsScrolableTable">
