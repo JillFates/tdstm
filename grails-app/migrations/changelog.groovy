@@ -91,4 +91,5 @@ databaseChangeLog = {
 	include file: '20140521-add-help-column-in-role-type-table.groovy'
 	include file: '20140523-add-model-edit-permission.groovy'
 	include file: '20140529-add-viewTaskTimeline-perms.groovy'
+	include file: '20140530-remove-unused-keyvalues-rows.groovy'
 }
