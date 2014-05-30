@@ -11,7 +11,7 @@
 			<div class="eventOuterDiv">
 				<h4 class="leftFloated dashboard_head">Events&nbsp;</h4>&nbsp;
 				<span class="descriptionText">Your assigned events and your team <input type="button" value="Refresh" onclick="loadEventTable()"/></span>
-				<br style="font-size:28px;">
+				<br><br>
 				<div class="eventScrolableTable">
 					<table class="fullWidth" cellspacing="0px" id="eventTable">
 						<thead>
