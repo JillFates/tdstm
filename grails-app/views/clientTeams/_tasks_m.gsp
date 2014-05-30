@@ -33,6 +33,17 @@
 				onfocus="changeAction()" onblur="retainAction()" />
 			<input type="hidden" name="sort" value="${sort}">
 			<input type="hidden" name="order" value="${order}">
+  			<span style="color: white;">Event : 
+  				<g:select name='event' value="${moveEvent?.id}"
+						noSelection="${['null':'All Events']}"
+						from='${moveEventList}'
+						optionKey="id" 
+						optionValue="name"
+						onfocus="changeAction()" onblur="retainAction()"
+						onchange="submit()">
+					</g:select>
+  			</span>
+
 		</li>
 	</ul>
 </div>

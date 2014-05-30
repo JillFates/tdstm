@@ -117,9 +117,10 @@ class TaskService implements InitializingBean {
 	 * @param search	A String value when provided will provided will limit the results to just the AssetEntity.AssetTag	
 	 * @param sortOn	A String value when provided will sort the task lists by the specified column (limited to present list of columns), default sort on score
 	 * @param sortOrder A String value with valid options [asc|desc], default [desc]
+	 * @param moveEvent the MoveEvent that these tasks belong. If null it will include all.
 	 * @return Map	A map containing keys all and todo. Values will contain the task lists or counts based on countOnly flag
 	 */
-	def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null ) {
+	def getUserTasks(person, project, countOnly=false, limitHistory=7, sortOn=null, sortOrder=null, search=null, moveEvent = null ) {
 		// Need to initialize the NamedParameterJdbcTemplate to pass named params to a SQL statement
 		def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 
@@ -246,6 +247,14 @@ class TaskService implements InitializingBean {
 				log.warn "getUserTasks: invalid parameter value for limitHistory (${limitHistory})"
 			}
 		}		
+		
+		if (moveEvent) {
+			if (moveEvent.project.id == project.id) {
+				sql.append("AND t.move_event_id = ${moveEvent.id} ")
+			} else {
+				log.warn "getUserTasks: trying to use a move event not belonging to the project"
+			}
+		}
 		
 		if ( ! countOnly ) {
 			// If we are returning the lists, then let's deal with the sorting

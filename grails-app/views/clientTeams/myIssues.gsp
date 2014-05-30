@@ -67,6 +67,16 @@
 						<input type="hidden" name="order" value="${order}" />
 						<input type="hidden" name="tab" id="tabId" value="${tab}" />
 						<input type="hidden" id="myPage" value="mytask" />
+			   			<span style="color: white;">Event : 
+			   			<g:select name='event' value="${moveEvent?.id}"
+    						noSelection="${['null':'All Events']}"
+    						from='${moveEventList}'
+    						optionKey="id" 
+    						optionValue="name"
+    						onfocus="changeAction()" onblur="retainAction()"
+    						onchange="submit()">
+    					</g:select>
+			   			</span>
 					</g:form>
 				</div>
 				</div>

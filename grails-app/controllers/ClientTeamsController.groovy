@@ -1027,8 +1027,19 @@ class ClientTeamsController {
 		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
 		def isMoveTech = partyRelationshipService.staffHasFunction(project.id, person.id, 'MOVE_TECH')
 
+		if (params.event) {
+			def eventP = params.event.equals('null') ? "_null" : params.event;
+			userPreferenceService.setPreference("MYTASKS_MOVE_EVENT_ID", eventP)
+		}
+		
+		def moveEventId = userPreferenceService.getPreference("MYTASKS_MOVE_EVENT_ID")
+		if (moveEventId.equals("_null")) {
+			moveEventId = null
+		}
+		def moveEvent = MoveEvent.get(moveEventId)
+		
 		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
-		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search )
+		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search, moveEvent)
 		
 		// Get the size of the lists
 		def todoSize = tasks['todo'].size()
@@ -1052,6 +1063,8 @@ class ClientTeamsController {
 		}
 		def timeToRefresh =  userPreferenceService.getPreference("MYTASKS_REFRESH")
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+		
 		// Determine the model and view
 		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
 			search:search, sort:params.sort, order:params.order,
@@ -1061,7 +1074,7 @@ class ClientTeamsController {
 			applications : entities.applications, dbs : entities.dbs, 
 			files : entities.files,  networks :entities.networks,
 			assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,]
+			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,moveEventList:moveEventList, moveEvent: moveEvent]
 		
 		if(search && taskList.size() > 0){
 			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]
