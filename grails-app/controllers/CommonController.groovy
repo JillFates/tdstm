@@ -45,6 +45,7 @@ class CommonController {
 		def fields = JSON.parse(request.JSON.fields);
 		def category = EntityType.getListAsCategory(entityType)
 		def project = securityService.getUserCurrentProject()
+		def result = null;
 		try{
 			def attributes = projectService.getAttributes(entityType)?.attributeCode
 			def assetTypes=EntityType.list
@@ -54,23 +55,35 @@ class CommonController {
 			if(!project.validate() || !project.save(flush:true)){
 				def etext = "Project customs unable to Update "+GormUtil.allErrorsString( project )
 				log.error( etext )
-			}
-			attributes.each{ k ->
-				def keyMap = KeyValue.findAllByCategoryAndKey(category, k).find{it.project==project}
-				if(!keyMap)
-					keyMap = new KeyValue( project:project ,category:category, key:k, value:helpText.("$k"))
-				else{
-					keyMap.value = helpText.("$k")
+				result = ServiceResults.fail(etext) as JSON
+			} else {
+				def values = KeyValue.getAll(project, category, null)
+				def keysMap = [:]
+				if (values != null) {
+					values.each{ v -> keysMap[v.key] = v }
 				}
-				if(!keyMap.validate() || !keyMap.save(flush:true)){
-					def etext = "tooltipsUpdate Unable to create HelpText"+GormUtil.allErrorsString( keyMap )
-					log.error( etext )
+				attributes.each{ k ->
+					def keyMap = keysMap[k]
+					if (!keyMap) {
+						keyMap = new KeyValue( project:project ,category:category, key:k, value:helpText.("$k"))
+					}else{
+						keyMap.value = helpText.("$k")
+					}
+					if(!keyMap.validate() || !keyMap.save(flush:true)){
+						def etext = "tooltipsUpdate Unable to create HelpText"+GormUtil.allErrorsString( keyMap )
+						log.error( etext )
+						result = ServiceResults.fail(etext) as JSON
+					}
+				}
+				if (result == null) {
+					result = ServiceResults.success() as JSON	
 				}
 			}
 		} catch(Exception ex){
-			log.error "An error occurred : ${ex}"
+			log.error "An error occurred : ${ex}", ex
+			result = ServiceResults.fail() as JSON
 		}
-		render "success"
+		render result;
 	}
 	
 	/**

@@ -173,9 +173,11 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			method: "POST",
 			data:{'jsonString':$scope.help[type], 'entityType':type, 'fields':$scope.fields['customs']}
 		}).success (function(resp) {
-			console.log(resp);
+			if (resp.status != "success") {
+				alert("An Unexpected error while saving asset fields.")
+			}
 		}).error(function(resp, status, headers, config) {
-			alert("An Unexpected error while showing the asset fields.")
+			alert("An Unexpected error while saving asset fields.")
 		});
 	}
 	$scope.updateCustomFieldsShown = function(){
