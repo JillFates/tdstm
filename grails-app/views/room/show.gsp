@@ -10,37 +10,39 @@
 			<tr>
 				<td class="buttonR" style="vertical-align:top;width:220px;">
 					<div>
-					<h1 style="margin: 0px;">Data Center Room View</h1><br />
-					<input type="hidden" id="roomTypeForCabling" value="${roomInstance.source}"/>
-					<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
-					<input type="hidden" id="selectedRackId" value="">
-					<br />
-					<g:form action="list">
-					<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;
-					<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a><br />
-					<input type="hidden" name="viewType" value="list" />
-					<input type="submit" class="submit" value="List" />
-					<tds:hasPermission permission='RoomEditView'>
-						<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
-					</tds:hasPermission> 
-					<input type="checkbox" id="auditCheckId" ${auditPref=='1' ? 'checked="checked"  value="1"' : 'value="0"'}
-					onclick="if(this.checked){this.value = 1} else {this.value = 0 }; saveAuditPref(this.value, ${roomInstance.id})" />
-					<label for="auditCheckId"><b>Audit</b></label>
-					<br/>
-					</g:form>
+						<h1 style="margin: 0px;">Data Center Room View</h1><br />
+						<input type="hidden" id="roomTypeForCabling" value="${roomInstance.source}"/>
+						<g:select id="roomId" name="id" from="${roomInstanceList}" value="${roomInstance.id}" optionKey="id" optionValue="${{it.location +' / '+it.roomName}}" onchange="getRackDetails()"/>
+						<input type="hidden" id="selectedRackId" value="">
+						<br />
+						<g:form action="list">
+							<span>${roomInstance.getRoomAddress('span')}</span>&nbsp;
+							<a href="http://maps.google.com/maps?q=${roomInstance.getRoomAddress('link')}" target="_blank"> Map...</a><br />
+							<input type="hidden" name="viewType" value="list" />
+							<input type="submit" class="submit" value="List" />
+							<tds:hasPermission permission='RoomEditView'>
+								<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+							</tds:hasPermission>
+							<tds:hasPermission permission='AssetEdit'>
+								<input type="checkbox" id="auditCheckId" ${auditPref=='1' ? 'checked="checked"  value="1"' : 'value="0"'}
+								onclick="if(this.checked){this.value = 1} else {this.value = 0 }; saveAuditPref(this.value, ${roomInstance.id})" />
+								<label for="auditCheckId"><b>Audit</b></label>
+							</tds:hasPermission>
+							<br/>
+						</g:form>
 					</div>
 				</td>
 				<td style="vertical-align:top;width:150px;">
 					<div style="width: 150px"><label><b>Highlight : </b></label><br /><br />
-					  <g:if test="${browserTestiPad}">
-						<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey ="${-2}" optionValue ="${1}" noSelection="${['all':'All']}"
-							onChange="getRackDetails('ipad')"
-						/>
-					  </g:if>
-					  <g:else>
-					  	<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey ="${-2}" optionValue ="${1}" noSelection="${['all':'All']}"
-					     	multiple="multiple" size="3" onChange="getRackDetails()"/>
-					  </g:else>
+						<g:if test="${browserTestiPad}">
+							<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey ="${-2}" optionValue ="${1}" noSelection="${['all':'All']}"
+								onChange="getRackDetails('ipad')"
+							/>
+						</g:if>
+						<g:else>
+							<g:select id="bundleId" name="moveBundleId" from="${bundleList}" value="${moveBundleId=='taskReady'? 'taskReady' :moveBundleList.id}" optionKey ="${-2}" optionValue ="${1}" noSelection="${['all':'All']}"
+							multiple="multiple" size="3" onChange="getRackDetails()"/>
+						</g:else>
 					</div>
 				</td>
 				<td class="cap_tab" style="vertical-align:top;width:250px;">
@@ -112,75 +114,75 @@
 				</tr ><!-- ${numrows++} -->
 			</g:while>
 		</table>
-			<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
-				<g:if test="${rack.rackType == 'Rack'}">
-					<a href="#" onclick="getRackLayout(${rack.id })">
-					<g:if test="${rack?.model?.layoutStyle == null}">			
-					    <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : statusList[rack.id] ? 'rack_highlight_'+rack.front+' '+statusList[rack.id] : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front } adjustRack">
-					 </g:if>
-					 <g:else>
-					     <div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle}_${rack.front}">
-					 </g:else>
-					    <span id="cap_count_${rack.id}" class="capCount" >&nbsp;</span>
-						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(${rack.id})">${rack.tag}</div>
-					</div>
-					</a>
+		<g:each in="${Rack.findAllByRoom(roomInstance)}" var="rack" status='i'>
+			<g:if test="${rack.rackType == 'Rack'}">
+				<a href="#" onclick="getRackLayout(${rack.id })">
+				<g:if test="${rack?.model?.layoutStyle == null}">
+					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack?.roomX ? rack.roomX : 0}px;" class="${rack.hasBelongsToMoveBundle(moveBundleList.id) ? 'rack_highlight_'+rack.front : statusList[rack.id] ? 'rack_highlight_'+rack.front+' '+statusList[rack.id] : source=='true' && rack.source == 1 ? 'rack_highlight_'+rack.front : target == 'true' && rack.source == 0 ? 'rack_highlight_'+rack.front : rack.front ? 'rack_highlight_no_'+rack.front :'rack_highlight_no_'+rack.front } adjustRack">
 				</g:if>
 				<g:else>
-					<div id="rack_${rack.id}" style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">
-						<div class="racktop_label" >${rack.tag}</div>
-					</div>
+					<div id="rack_${rack.id}" style="top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="${rack.model?.layoutStyle}_${rack.front}">
 				</g:else>
-			</g:each>
+						<span id="cap_count_${rack.id}" class="capCount" >&nbsp;</span>
+						<div id="rack_div_${i}" class="racktop_label" onclick="$('#selectedRackId').val(${rack.id})">${rack.tag}</div>
+					</div>
+				</a>
+			</g:if>
+			<g:else>
+				<div id="rack_${rack.id}" style="position:absolute;top:${rack.roomY ? rack.roomY : 0}px;left:${rack.roomX ? rack.roomX : 0}px;" class="room_${rack.rackType}_${rack.front}">
+					<div class="racktop_label" >${rack.tag}</div>
+				</div>
+			</g:else>
+		</g:each>
 		<span>Floor ${roomInstance.roomWidth}ft x ${roomInstance.roomDepth}ft = ${roomInstance.roomWidth * roomInstance.roomDepth} sqft</span>
 	</div>
 	<div id="rackLayout">
-	<table style="display:none" cellpadding=2 class="rack_elevation back">
-	<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
-	<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>41</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>40</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>39</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>38</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>37</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>36</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>35</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>34</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>33</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>32</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>31</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>30</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>29</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>28</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>27</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>26</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>25</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>24</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>23</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>22</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>21</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>20</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>19</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>18</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>17</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>16</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>15</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>14</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>13</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>12</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>11</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>10</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>9</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>8</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>7</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>6</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>5</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>4</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>3</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>2</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	<tr><td class='rack_upos'>1</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
-	</table>
-	
+		<table style="display:none" cellpadding=2 class="rack_elevation back">
+			<tr><th>U</th><th>Device</th><th>Bundle</th></tr>
+			<tr><td class='rack_upos'>42</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>41</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>40</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>39</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>38</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>37</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>36</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>35</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>34</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>33</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>32</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>31</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>30</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>29</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>28</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>27</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>26</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>25</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>24</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>23</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>22</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>21</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>20</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>19</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>18</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>17</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>16</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>15</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>14</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>13</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>12</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>11</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>10</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>9</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>8</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>7</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>6</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>5</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>4</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>3</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>2</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+			<tr><td class='rack_upos'>1</td><td rowspan='1' class='empty'>&nbsp;</td><td>&nbsp;</td></tr>
+		</table>
+		
 	</div>
 	<div id="auditDetailViewId" class="table.rack_elevation.back" style="display: none;">
 	</div>
