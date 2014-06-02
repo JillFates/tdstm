@@ -421,23 +421,23 @@
 		
 		//set up mega menus to align with menu2 items
 		//admin and user mega menus are to the edges
-		$('#projectMegaMenu').css("left", $('#projectMenuId').offset().left+"px");
-		$('#racksMegaMenu').css("left", $('#roomMenuId').offset().left+"px");
-		$('#assetMegaMenu').css("left", $('#assetMenuId').offset().left+"px");
-		$('#bundleMegaMenu').css("left", $('#eventMenuId').offset().left+"px");
-		$('#teamMegaMenu').css("left", $('#teamMenuId').offset().left+"px");
-		$('#consoleMegaMenu').css("left", $('#consoleMenuId').offset().left+"px");
-		$('#dashboardMegaMenu').css("left", $('#dashboardMenuId').offset().left+"px");
-		$('#reportsMegaMenu').css("right", $('#reportsMenuId').offset().right+"px");
-
-		$('#projectMegaMenu').css("top", $('#projectMenuId').offset().bottom +1+"px");
-		$('#racksMegaMenu').css("top", $('#roomMenuId').offset().bottom +1+"px");
-		$('#assetMegaMenu').css("top", $('#assetMenuId').offset().bottom +1+"px");
-		$('#bundleMegaMenu').css("top", $('#eventMenuId').offset().bottom +1+"px");
-		$('#teamMegaMenu').css("top", $('#teamMenuId').offset().bottom +1+"px");
-		$('#consoleMegaMenu').css("top", $('#consoleMenuId').offset().bottom +1+"px");
-		$('#dashboardMegaMenu').css("top", $('#dashboardMenuId').offset().bottom +1+"px");
-		$('#reportsMegaMenu').css("top", $('#reportsMenuId').offset().bottom +1+"px");
+		var menus = [['project', 'project'], ['racks', 'room'], ['asset', 'asset'], ['bundle', 'event'], ['team', 'team'], ['console', 'console'], ['dashboard', 'dashboard'], ['reports', 'reports']];
+		
+		// iterate through each menu to position the megamenus
+		for (var i = 0; i < menus.size(); ++i) {
+			
+			// only perform calculations on menus that are shown for this user
+			if ($('#' + menus[i] + 'MegaMenu').size() > 0 && $('#' + menus[i][1] + 'MenuId').size() > 0) {
+			
+				// the reports menu uses the right offset instead of the left
+				if (menus[i] != 'reports')
+					$('#' + menus[i][0] + 'MegaMenu').css("left", $('#' + menus[i][1] + 'MenuId').offset().left + "px");
+				else
+					$('#' + menus[i][0] + 'MegaMenu').css("left", $('#' + menus[i][1] + 'MenuId').offset().right + "px");
+				
+				$('#' + menus[i][0] + 'MegaMenu').css("top", $('#' + menus[i][1] + 'MenuId').offset().bottom + 1 + "px");
+			}
+		}
 
 		var timeout = 500;
 		var megamenuitem = 0;
