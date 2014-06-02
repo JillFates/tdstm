@@ -28,7 +28,7 @@ class AssetComment {
 	Person assignedTo				// FKA owner
 	Integer hardAssigned = 0			// Flags a task that can ONLY be done by an individual TODO : constraint 1/0 default 0 type tinyint 
 	String commentCode 
-	String category = "general"
+	String category = AssetCommentCategory.GENERAL
 	String displayOption = "U"		// Used in dashboard to control display of user entered test (comment) or a generic message
 	String attribute = 'default'	// TODO : What is attribute used for?  See if we're using and remove if not
 	String commentKey				// TODO : What is commentKey used for?  See if we're using and remove if not
@@ -74,11 +74,11 @@ class AssetComment {
 	// TODO : Add custom validator for role that checks that the role is legit for "Staff : *" of RoleType
 	
 	// Grouping of the various categories
-	def static final preMoveCategories = ['general','discovery','verify','analysis','planning','design','buildout','walkthru','premove']
-	def static final moveDayCategories = ['moveday','shutdown','physical','transport', 'startup']
-	def static final postMoveCategories = ['postmove','closeout']
-	def static final discoveryCategories = ['discovery', 'verify']
-	def static final planningCategories = ['analysis','planning','design','buildout']
+	def static final preMoveCategories = AssetCommentCategory.getPreMoveCategories()
+	def static final moveDayCategories = AssetCommentCategory.getMoveDayCategories()
+	def static final postMoveCategories = AssetCommentCategory.getPostMoveCategories()
+	def static final discoveryCategories = AssetCommentCategory.getDiscoveryCategories()
+	def static final planningCategories = AssetCommentCategory.getPlanningCategories()
 	def static final AUTOMATIC_ROLE = 'AUTO'
 
 	static constraints = {	

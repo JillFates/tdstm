@@ -18,7 +18,35 @@ class AssetCommentCategory {
 	static final String PHYSICAL='physical'
 	static final String STARTUP='startup'
 	static final String POSTMOVE='postmove'
+	static final String VERIFY='verify'
+	static final String ANALYSIS='analysis'
+	static final String DESIGN='design'
+	static final String BUILDOUT='buildout'
+	static final String TRANSPORT='transport'
+	static final String CLOSEOUT='closeout'
+
 	static final getList() {
-		return [GENERAL, DISCOVERY, PLANNING, WALKTHRU, PREMOVE, MOVEDAY, SHUTDOWN, PHYSICAL, STARTUP, POSTMOVE]
+		return [GENERAL, DISCOVERY, PLANNING, WALKTHRU, PREMOVE, MOVEDAY, SHUTDOWN, PHYSICAL, STARTUP, POSTMOVE, VERIFY, ANALYSIS, DESIGN, BUILDOUT, TRANSPORT, CLOSEOUT]
 	}
-}	
+
+	static final getPreMoveCategories() {
+		return [GENERAL,DISCOVERY,VERIFY,ANALYSIS,PLANNING,DESIGN,BUILDOUT,WALKTHRU,PREMOVE]
+	}
+
+	static final getMoveDayCategories() {
+		return [MOVEDAY,SHUTDOWN,PHYSICAL,TRANSPORT, STARTUP]
+	}
+
+	static final getPostMoveCategories() {
+		return [POSTMOVE,CLOSEOUT]
+	}
+
+	static final getDiscoveryCategories() {
+		return [DISCOVERY,VERIFY]
+	}
+
+	static final getPlanningCategories() {
+		return [ANALYSIS,PLANNING,DESIGN,BUILDOUT]
+	}
+
+}
