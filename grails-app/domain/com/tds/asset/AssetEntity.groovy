@@ -163,6 +163,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
 		priority( nullable:true )
+		// planStatus( blank:true, nullable:true, inList:AssetEntityPlanStatus.list )
+		// TODO - Need to create a custom validator to lookup the values from the map table
 		planStatus( blank:true, nullable:true, inList:AssetEntityPlanStatus.list )
 		purchaseDate( nullable:true )
 		purchasePrice( nullable:true )

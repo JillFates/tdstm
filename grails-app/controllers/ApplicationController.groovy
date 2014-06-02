@@ -473,9 +473,9 @@ class ApplicationController {
 						redirect( action:list)
 				}
 			}
-		}
-		else {
-			flash.message = "Application not created"
+		} else {
+			log.warn "Unable to update application - " + GormUtil.allErrorsString(applicationInstance)
+			flash.message = "An unexpected error occurred therefore the Application not updated"
 			applicationInstance.errors.allErrors.each{ flash.message += it }
 			redirect(action:list)
 		}
