@@ -27,38 +27,40 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 		return $scope.row[id] == 's';
 	}
 	var tempId=''
-    $scope.showEditRow = function(id){
-		var asset = $("#fromAsset_"+id).val();
-		var type = $("#connectType_"+id).val();
-		var roomType = $("#roomType").val();
-	    if(tempId!='' && id!=tempId){
-		    if($scope.cables[id]['color'])
-	    		$scope.cableColor[id] = $scope.cables[id]['color']
-		    else
-		    	$scope.cableColor[id] = "White"
-    		$scope.cancelRow(tempId);
-		    $scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
-	    } else {
-	    	if($('.btn:visible').length== 0){
-	    		if($scope.cables[id]['color'])
-		    		$scope.cableColor[id] = $scope.cables[id]['color']
-			    else
-			    	$scope.cableColor[id] = "White"
-	    		$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
-	         }
-	    }
-	  //TODO: Used jquery syntax for now,should be replaced with angular.
-		if(type=='Power'){
-			$(".powerDiv").show();
-			$(".nonPowerDiv").hide();
-			$("#staticConnector_"+$('#power_'+id).val()+"_"+id).attr('checked', true);
-    	}else{
-			$(".nonPowerDiv").show();
-			$(".powerDiv").hide();
-			$scope.getAsset(id, asset, type, roomType)
-        }
-	    tempId=id
-    };
+	$scope.showEditRow = function(id) {
+		<tds:hasPermission permission="EditModel">
+			var asset = $("#fromAsset_"+id).val();
+			var type = $("#connectType_"+id).val();
+			var roomType = $("#roomType").val();
+			if (tempId!='' && id!=tempId) {
+				if($scope.cables[id]['color'])
+					$scope.cableColor[id] = $scope.cables[id]['color']
+				else
+					$scope.cableColor[id] = "White"
+				$scope.cancelRow(tempId);
+				$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
+			} else {
+				if ($('.btn:visible').length== 0) {
+					if ($scope.cables[id]['color'])
+						$scope.cableColor[id] = $scope.cables[id]['color']
+					else
+						$scope.cableColor[id] = "White"
+					$scope.row[id] = $scope.row[id] == 'h' ? 's' : 'h';
+				}
+			}
+			//TODO: Used jquery syntax for now,should be replaced with angular.
+			if (type=='Power') {
+				$(".powerDiv").show();
+				$(".nonPowerDiv").hide();
+				$("#staticConnector_"+$('#power_'+id).val()+"_"+id).attr('checked', true);
+			} else {
+				$(".nonPowerDiv").show();
+				$(".powerDiv").hide();
+				$scope.getAsset(id, asset, type, roomType)
+			}
+			tempId=id
+		</tds:hasPermission>
+	};
 	var assetTemp = ''
 	var roomTemp = ''
     $scope.getAsset = function(id, asset, type, room){
