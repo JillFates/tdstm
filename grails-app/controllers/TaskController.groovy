@@ -584,7 +584,7 @@ digraph runbook {
 	}
 	
 	// gets the JSON object used to populate the task graph timeline
-	def taskGraph = {
+	def taskTimelineData = {
 		
 		// handle project
 		long projectId = securityService.getUserCurrentProject().id
@@ -613,6 +613,17 @@ digraph runbook {
 		}
 		def tasks = runbookService.getEventTasks(me)
 		def deps = runbookService.getTaskDependencies(tasks)
+		
+		// add any tasks referenced by the dependencies that are not in the task list
+		deps.each {
+			if ( !(it.predecessor in tasks) )
+				tasks.push(it.predecessor)
+			if ( !(it.successor in tasks) )
+				tasks.push(it.successor)
+		}
+		tasks.sort { a, b ->
+			return a.id - b.id
+		}
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def startTime = 0
 		
@@ -651,7 +662,7 @@ digraph runbook {
 			starts.push(s.id)
 		}
 		
-		def data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate] as JSON
+		def data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate, cyclicals:dfsMap.cyclicals] as JSON
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
 		render data
 	}

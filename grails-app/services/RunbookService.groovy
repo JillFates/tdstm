@@ -20,7 +20,7 @@ class RunbookService {
 	List getEventTasks(MoveEvent moveEvent) {
 		def tasks = []
 		if (moveEvent) {
-			tasks = AssetComment.findAllByMoveEventAndCategoryInList(moveEvent, AssetComment.moveDayCategories)
+			tasks = AssetComment.findAllByMoveEvent(moveEvent)
 		}
 
 		return tasks
