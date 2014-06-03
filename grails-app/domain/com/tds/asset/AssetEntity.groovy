@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
+import com.tdsops.validators.CustomValidators;
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil;
 
@@ -163,9 +164,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
 		priority( nullable:true )
-		// planStatus( blank:true, nullable:true, inList:AssetEntityPlanStatus.list )
-		// TODO - Need to create a custom validator to lookup the values from the map table
-		planStatus( blank:true, nullable:true, inList:AssetEntityPlanStatus.list )
+		planStatus( blank:true, nullable:true, validator: 
+			CustomValidators.inList(
+				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.STATUS_OPTION), 
+				"planStatus")
+		)
 		purchaseDate( nullable:true )
 		purchasePrice( nullable:true )
 		department( blank:true, nullable:true )
