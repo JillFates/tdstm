@@ -95,6 +95,7 @@ var floatMode = false;
 			
 // Build the layout model
 function buildMap (charge, linkSize, friction, theta, width, height) {
+	$('#item1').css('width', 'auto');
 	$('#item1').css('height', '');
 
 	// Use the new parameters, or the defaults if not specified
@@ -449,6 +450,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	var firstTick = true;
 	function tick(e) {
+		
 		if ( gravity == 0 && ! floatMode ) {
 			var k =  e.alpha
 			nodes.forEach(function(o, i) {
