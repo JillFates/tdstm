@@ -175,8 +175,13 @@ class DashboardController {
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		 
 		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
-		
-		return [projects:userProjects, projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
+		if(!userProjects && !projectInstance){
+			flash.message = "Please select project to view User Dashboard"
+			redirect(controller:'project',action:'list')
+		}else{
+			def dispProjs = userProjects+projectInstance
+			return [projects:dispProjs.unique(), projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
+		}
 	}
 	
 	/**

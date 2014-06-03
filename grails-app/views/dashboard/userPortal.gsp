@@ -85,7 +85,7 @@
 	function showAssetCommentMyTasks(id){
 		$('#dependencyBox').css('display','table');
 		jQuery.ajax({
-			url: '../assetEntity/showComment',
+			url: contextPath+'/assetEntity/showComment',
 			data: {'id':id},
 			type:'POST',
 			success: function(data) {
@@ -111,6 +111,9 @@
 				$('#durationScale').html(ac.durationScale)
 				$('#priorityShowId').html(ac.priority)
 				$('#assetShowValueId').html(ac.assetEntity)
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred when showing comments.")
 			}
 		});
 	}
@@ -139,11 +142,14 @@ function pageRefresh(){
 var image = "<tr><td><div><img src='"+contextPath+"/images/processing.gif'></div></td></tr>"
 function loadRelatedEntities(id){
 	jQuery.ajax({
-		url: '../dashboard/getRelatedEntities',
+		url: contextPath+'/dashboard/getRelatedEntities',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		success: function(data) {
 			$("#relatedEntitiesId").html(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred when updating entities.")
 		}
 	});
 }
@@ -151,7 +157,7 @@ function loadRelatedEntities(id){
 function loadEventTable(id){
 
 	jQuery.ajax({
-		url: '../dashboard/getEvents',
+		url: contextPath+'/dashboard/getEvents',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -159,6 +165,9 @@ function loadEventTable(id){
 		},
 		success: function(data) {
 			$("#eventTableId").html(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$("#eventTableId").html("An unexpected error occurred when updating Event Table.");
 		}
 	});
 }
@@ -166,7 +175,7 @@ function loadEventTable(id){
 function loadEventNewsTable(id){
 
 	jQuery.ajax({
-		url: '../dashboard/getEventsNewses',
+		url: contextPath+'/dashboard/getEventsNewses',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -174,6 +183,9 @@ function loadEventNewsTable(id){
 		},
 		success: function(data) {
 			$("#eventNewsTableId").html(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$("#eventNewsTableId").html("An unexpected error occurred when updating Event News Table.")
 		}
 	});
 }
@@ -181,7 +193,7 @@ function loadEventNewsTable(id){
 function loadTasksTable(id){
 
 	jQuery.ajax({
-		url: '../dashboard/getTaskSummary',
+		url: contextPath+'/dashboard/getTaskSummary',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -189,13 +201,16 @@ function loadTasksTable(id){
 		},
 		success: function(data) {
 			$("#myTaskList").html(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$("#myTaskList").html("<br>An unexpected error occurred when updating Tasks Table")
 		}
 	});
 }
 
 function loadAppTable(id){
 	jQuery.ajax({
-		url: '../dashboard/getApplications',
+		url: contextPath+'/dashboard/getApplications',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -203,13 +218,16 @@ function loadAppTable(id){
 		},
 		success: function(data) {
 			$("#appTableId").html(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$("#appTableId").html("An unexpected error occurred when updating Application Table.")
 		}
 	});
 }
 
 function loadActivepplTable(id){
 	jQuery.ajax({
-		url: '../dashboard/getActivePeople',
+		url: contextPath+'/dashboard/getActivePeople',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -217,6 +235,9 @@ function loadActivepplTable(id){
 		},
 		success: function(data) {
 			$("#actpplTableId").html(data);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$("#actpplTableId").html("An unexpected error occurred when updating Active ppl Table.")
 		}
 	});
 }
@@ -268,6 +289,9 @@ function loadActivepplTable(id){
 			success: function(data) {
 				console.log("success");
 				$("#userPortalDiv").html(data);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred when getting userPortal by project.")
 			}
 	    });
 	}
