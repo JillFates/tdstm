@@ -27,7 +27,12 @@ class NewsEditorController {
 	def newsEditorList = {
 		
 		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
-		def projectInstance = Project.findById( projectId )
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view News"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveEventsList = MoveEvent.findAllByProject(projectInstance)
 		def moveBundlesList
 		def moveEventId = params.moveEvent

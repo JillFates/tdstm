@@ -58,8 +58,12 @@ def messageSource
 			flash.message = params.message
 		}
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		
-		def project = Project.findById( projectId )
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Manage Batches"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		if( !params.max ) params.max = 10
 		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", 
 			[sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )

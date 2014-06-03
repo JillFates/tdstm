@@ -608,7 +608,12 @@ class MoveEventController {
 	 */
 	def exportRunbook ={
 		def projectId =  session.CURR_PROJ.CURR_PROJ		
-		def project = Project.get(projectId)
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Export Runbook"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveEventList = MoveEvent.findAllByProject(project)
 		
 		return [moveEventList:moveEventList]

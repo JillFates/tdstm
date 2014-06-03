@@ -36,7 +36,12 @@ class FilesController {
 	def list={
 		def filters = session.FILES?.JQ_FILTERS
 		session.FILES?.JQ_FILTERS = []
-		def project = securityService.getUserCurrentProject()
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Files"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
 		

@@ -16,14 +16,16 @@ class DashboardController {
 	def securityService
 	def userService
 	def assetEntityService
-	
     
 	def index = {
 		
-		def projectId = session.CURR_PROJ.CURR_PROJ
 		def moveEvent
-		
-		def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view User Dashboard"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveEventId = params.moveEvent
 		
 		if(moveEventId){
@@ -173,13 +175,15 @@ class DashboardController {
 	def userPortal = {
 		def projectInstance = securityService.getUserCurrentProject()
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-		 
 		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
-		if(!userProjects && !projectInstance){
+		if(!projectInstance){
 			flash.message = "Please select project to view User Dashboard"
 			redirect(controller:'project',action:'list')
 		}else{
-			def dispProjs = userProjects+projectInstance
+			def dispProjs = projectInstance
+			if (userProjects) {
+				dispProjs = userProjects+projectInstance
+			}
 			return [projects:dispProjs.unique(), projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
 		}
 	}

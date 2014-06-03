@@ -228,12 +228,12 @@ class AssetEntityController {
 			//get project id from session
 			def currProj = getSession().getAttribute( "CURR_PROJ" )
 			projectId = currProj.CURR_PROJ
-			projectInstance = Project.findById( projectId )
-			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 			if( projectId == null ) {
 				flash.message = " No Projects are Associated, Please select Project. "
 				redirect( controller:"project",action:"list" )
 			}
+			projectInstance = Project.findById( projectId )
+			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		}
 		if ( projectId != null ) {
 			project = Project.findById(projectId)
@@ -1694,7 +1694,12 @@ class AssetEntityController {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
 		
-		def project = securityService.getUserCurrentProject()
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Assets"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def entities = assetEntityService.entityInfo( project )
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		def moveEvent = null
@@ -3778,7 +3783,12 @@ class AssetEntityController {
 		if(params.initSession)
 			session.TASK = [:]
 			
-		def project = securityService.getUserCurrentProject()
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Tasks"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveEvents = MoveEvent.findAllByProject(project)
 		def filters = session.TASK?.JQ_FILTERS
 		
@@ -3845,7 +3855,12 @@ class AssetEntityController {
 	 * Used to generate the List of Comments, which leverages a shared closeure with the above listTasks controller
 	 */
 	def listComment = {
-			def project = securityService.getUserCurrentProject()
+			def project = securityService.getUserCurrentProject();
+			if (!project) {
+				flash.message = "Please select project to view Comments"
+				redirect(controller:'project',action:'list')
+				return
+			}
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		    return [ rediectTo:'comment', servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
@@ -4315,7 +4330,12 @@ class AssetEntityController {
 	*/
 	def assetSummary ={
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.findById( projectId )
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Asset Summary"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		List moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		List assetSummaryList = []
 		int totalAsset = 0;
@@ -5070,17 +5090,22 @@ class AssetEntityController {
 	  * Action to return on list Dependency
 	  */
 	 def listDependencies ={
-		 def project = securityService.getUserCurrentProject()
-		 def entities = assetEntityService.entityInfo( project )
-		 def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		 def depPref= assetEntityService.getExistingPref('Dep_Columns')
-		 def attributes =[ 'c1':'C1','c2':'C2','c3':'C3','c4':'C4','frequency':'Frequency','comment':'Comment','direction':'Direction']
-		 def columnLabelpref = [:]
-		 depPref.each{key,value->
-			 columnLabelpref << [ (key):attributes[value] ]
-		 }
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Dependencies"
+			redirect(controller:'project',action:'list')
+			return
+		}
+		def entities = assetEntityService.entityInfo( project )
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		def depPref= assetEntityService.getExistingPref('Dep_Columns')
+		def attributes =[ 'c1':'C1','c2':'C2','c3':'C3','c4':'C4','frequency':'Frequency','comment':'Comment','direction':'Direction']
+		def columnLabelpref = [:]
+		depPref.each{key,value->
+			columnLabelpref << [ (key):attributes[value] ]
+		}
 		 
-	 	 return [projectId: project.id, assetDependency: new AssetDependency(),
+	 	return [projectId: project.id, assetDependency: new AssetDependency(),
 			 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
 				files: entities.files, networks: entities.networks, 
 				dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,

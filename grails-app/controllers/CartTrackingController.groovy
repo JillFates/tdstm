@@ -8,6 +8,7 @@ class CartTrackingController {
 	def userPreferenceService
 	def jdbcTemplate
 	def stateEngineService
+	def securityService
 	def workflowService
 	/*---------------------------------
 	 * default Index method
@@ -24,8 +25,13 @@ class CartTrackingController {
 		def cartAction = params.cartAction
     	def moveBundleInstance
     	def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Cart Tracking"
+			redirect(controller:'project',action:'list')
+			return
+		}
     	def bundleId = params.moveBundle
-    	def projectInstance = Project.findById( projectId )
     	def allCartTrackingDetails = []
     	def pendingCartTrackingDetails = []
 		def cartTrackingDetails = []

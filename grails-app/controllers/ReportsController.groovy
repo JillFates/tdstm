@@ -53,7 +53,12 @@ class ReportsController {
     	def reportId = params.reportId
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
         def projectId = currProj.CURR_PROJ
-        def projectInstance = Project.findById( projectId )
+        def projectInstance = securityService.getUserCurrentProject();
+        if (!projectInstance) {
+          flash.message = "Please select project to view Reports"
+          redirect(controller:'project',action:'list')
+          return
+        }
         def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		def browserTest = false
 		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
@@ -124,7 +129,12 @@ class ReportsController {
     def teamSheetReport = {
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
+      def projectInstance = securityService.getUserCurrentProject();
+      if (!projectInstance) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
     	def partyGroupInstance = PartyGroup.get(projectInstance.id)
     	//if no Bundle selected	
     	if(params.moveBundle == "null") {    		
@@ -322,7 +332,12 @@ class ReportsController {
     	def reportName = params.reportName
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
+      def projectInstance = securityService.getUserCurrentProject();
+      if (!projectInstance) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
     	def partyGroupInstance = PartyGroup.get(projectInstance.id)
     	def sortOrder = params.sortType
     	def teamPartyGroup
@@ -650,7 +665,12 @@ class ReportsController {
     	def personInstance = Person.findByFirstName( principal )
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
+      def projectInstance = securityService.getUserCurrentProject();
+      if (!projectInstance) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
     	def partyGroupInstance = PartyGroup.get(projectInstance.id)
     	def bundleNames = ""
     	def reportFields = []
@@ -809,7 +829,12 @@ class ReportsController {
 	def getLabelBadges = {
     	def moveBundle = params.bundle
     	def location = params.location
-    	def projectInstance = Project.findById(params.project)
+      def projectInstance = securityService.getUserCurrentProject();
+      if (!projectInstance) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
     	def projectId = params.project
     	def client = projectInstance.client.name
     	def startDate = projectInstance.startDate
@@ -981,7 +1006,12 @@ class ReportsController {
     	def reportName = params.reportName
     	def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
+      def projectInstance = securityService.getUserCurrentProject();
+      if (!projectInstance) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
     	def cableType = params.cableType
     	// if no moveBundle was selected
     	if(params.moveBundle == "null") {
@@ -1074,7 +1104,12 @@ class ReportsController {
 	def cablingDataReport = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
     	def projectId = currProj.CURR_PROJ
-    	def projectInstance = Project.findById( projectId )
+      def projectInstance = securityService.getUserCurrentProject();
+      if (!projectInstance) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
     	def cableType = params.cableType
     	// if no moveBundle was selected
     	if(params.moveBundle == "null") {
@@ -1132,7 +1167,12 @@ class ReportsController {
 	def powerReport = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-		def projectInstance = Project.findById( projectId )
+    def projectInstance = securityService.getUserCurrentProject();
+    if (!projectInstance) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
@@ -1166,7 +1206,12 @@ class ReportsController {
 			def targetRacks = new ArrayList()
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
-			def project = Project.findById(projectId)
+      def project = securityService.getUserCurrentProject();
+      if (!project) {
+        flash.message = "Please select project to view Reports"
+        redirect(controller:'project',action:'list')
+        return
+      }
 			def moveBundles = MoveBundle.findAllByProject( project )
 			def powerType = params.powerType ? params.powerType : session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 			if(!bundleId.contains("all")){
@@ -1300,8 +1345,12 @@ class ReportsController {
 		}
 	}
 	def preMoveCheckList={
-		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-    	def projectInstance = Project.findById( currProj ) 
+    def projectInstance = securityService.getUserCurrentProject();
+    if (!projectInstance) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveEventList = MoveEvent.findAllByProject(projectInstance)
 		def moveEventId = securityService.getUserCurrentMoveEventId()
 		return ['moveEvents':moveEventList,moveEventId:moveEventId]
@@ -1330,7 +1379,12 @@ class ReportsController {
 	}
 	def applicationConflicts = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = Project.findById( currProj ) 
+    def projectInstance = securityService.getUserCurrentProject();
+    if (!projectInstance) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
@@ -1340,7 +1394,12 @@ class ReportsController {
 	 * Used to display application selection criteria page.
 	 */
 	def applicationProfiles ={
-		def project = securityService.getUserCurrentProject()
+    def project = securityService.getUserCurrentProject();
+    if (!project) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
@@ -1606,7 +1665,12 @@ class ReportsController {
 	 */
 	def serverConflicts = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = Project.findById( currProj )
+    def projectInstance = securityService.getUserCurrentProject();
+    if (!projectInstance) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
@@ -1647,7 +1711,12 @@ class ReportsController {
 	 * used to render to application Migration Report selection criteria.
 	 */
 	def applicationMigrationReport = {
-		def project = securityService.getUserCurrentProject()
+    def project = securityService.getUserCurrentProject();
+    if (!project) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
@@ -1738,7 +1807,12 @@ class ReportsController {
 	 */
 	def databaseConflicts = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = Project.findById( currProj )
+    def projectInstance = securityService.getUserCurrentProject();
+    if (!projectInstance) {
+      flash.message = "Please select project to view Reports"
+      redirect(controller:'project',action:'list')
+      return
+    }
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]

@@ -32,7 +32,12 @@ class ApplicationController {
 	def list = {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
-		def project = securityService.getUserCurrentProject()
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Applications"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		
 		def entities = assetEntityService.entityInfo( project )
 		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'

@@ -990,7 +990,12 @@ class ClientTeamsController {
 	 */
 	def listTasks = {
 
-		def project = securityService.getUserCurrentProject()
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view Tasks"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		//log.error "PROJECT: ${project}"
 		def person = securityService.getUserLoginPerson()
 		//log.error "PERSON=${person}"
