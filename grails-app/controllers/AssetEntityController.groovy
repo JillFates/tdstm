@@ -271,6 +271,12 @@ class AssetEntityController {
 		def forwardAction = 'assetImport'
 		def flagToManageBatches = false
 		def dataTransferSet = params.dataTransferSet
+
+		if (!dataTransferSet) {
+			forward action:forwardAction, params: [error: 'Import submission was missing expected parameter(s).']
+			return
+		}
+
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
 		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Servers" )
 		def appDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Applications" )
