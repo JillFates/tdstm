@@ -4,6 +4,9 @@ import com.tdssrc.grails.TimeUtil
 class Manufacturer {
 	String name
 	String description
+	String corporateName
+	String corporateLocation
+	String website
 	Date dateCreated
 	Date lastModified
 
@@ -15,6 +18,9 @@ class Manufacturer {
 	static constraints = {
 		name( blank:false, nullable:false, unique:true )
 		description( blank:true, nullable:true )
+		corporateName( blank:true, nullable:true )
+		corporateLocation( blank:true, nullable:true )
+		website( blank:true, nullable:true )
 		lastModified( nullable:true )
 	}
 	

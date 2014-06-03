@@ -92,4 +92,5 @@ databaseChangeLog = {
 	include file: '20140523-add-model-edit-permission.groovy'
 	include file: '20140529-add-viewTaskTimeline-perms.groovy'
 	include file: '20140530-remove-unused-keyvalues-rows.groovy'
+	include file: '20140603-add-corporateName-corporateLocation-and-website-columns-to-manufacturer-table.groovy'
 }

@@ -1,6 +1,9 @@
 class ManufacturerSync {
 	String name
 	String description
+	String corporateName
+	String corporateLocation
+	String website
 	String aka
 	String importStatus
 	ModelSyncBatch batch
@@ -9,6 +12,9 @@ class ManufacturerSync {
 	static constraints = {
 		name( blank:false, nullable:false )
 		description( blank:true, nullable:true )
+		corporateName( blank:true, nullable:true )
+		corporateLocation( blank:true, nullable:true )
+		website( blank:true, nullable:true )
 		aka( blank:true, nullable:true)
 		importStatus(blank:true, nullable:true )
 	}

@@ -80,11 +80,11 @@ function avoidDuplicate(spanId){
  * @param value
  * @param name
  */
-function convertPowerType(value, whom){
+function convertPowerType (value, whom) {
 	if(value=="Watts"){
 		var powerUsed = ($('#powerUseIdH').val() && $('#powerUseIdH').val() != '0')? $('#powerUseIdH').val() : ($('#powerUse'+whom+'Id').val()*120)
-	    var powerNameplate =  ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0')  ? $('#powerNameplateIdH').val() : ($('#powerNameplate'+whom+'Id').val()*120)
-	    var powerDesign =  ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val() : ($('#powerDesign'+whom+'Id').val()*120)
+		var powerNameplate =  ($('#powerNameplateIdH').val() && $('#powerNameplateIdH').val() != '0')  ? $('#powerNameplateIdH').val() : ($('#powerNameplate'+whom+'Id').val()*120)
+		var powerDesign =  ($('#powerDesignIdH').val() && $('#powerDesignIdH').val() !='0') ? $('#powerDesignIdH').val() : ($('#powerDesign'+whom+'Id').val()*120)
 		$('#powerUse'+whom+'Id').val(powerUsed);
 		$('#powerNameplate'+whom+'Id').val(powerNameplate);
 		$('#powerDesign'+whom+'Id').val(powerDesign);
@@ -98,7 +98,7 @@ function convertPowerType(value, whom){
 	}
 }
 
-function createModelManuDetails(controllerName,forWhom){
+function createModelManuDetails (controllerName,forWhom) {
 	jQuery.ajax({
 		url : contextPath+'/'+controllerName+'/create',
 		data : {'forWhom':'modelDialog'},
@@ -115,7 +115,7 @@ function createModelManuDetails(controllerName,forWhom){
 	updateTitle(forWhom,"create","Create")
 	}
 
-function showOrEditModelManuDetails(controllerName,id,forWhom,view, name){
+function showOrEditModelManuDetails (controllerName,id,forWhom,view, name) {
 	jQuery.ajax({
 		url : contextPath+'/'+controllerName+'/'+view+'/',
 		data : {'id' : id,'redirectTo':'modelDialog'},
@@ -136,11 +136,11 @@ function showOrEditModelManuDetails(controllerName,id,forWhom,view, name){
 	updateTitle(forWhom,view, name)
 }
 
-function updateTitle( type, view, name){
+function updateTitle ( type, view, name) {
 	$("#"+view+""+type+"View").dialog( "option", "title", name+" "+type );
 }
 
-function updateModel(forWhom, formName){
+function updateModel (forWhom, formName) {
 	$("#"+formName).ajaxSubmit({
 		success: function(data) { 
 			$("#editModelView").dialog('close')

@@ -8,20 +8,20 @@ import com.tdssrc.grails.WebUtil
 class ManufacturerController {
 	
 	// Initialize services
-    def jdbcTemplate
+	def jdbcTemplate
 	def sessionFactory
 	def securityService
 	def userPreferenceService
 	
-    def index = { redirect(action:list,params:params) }
-
-    // the delete, save and update actions only accept POST requests
-    def allowedMethods = [delete:'POST', save:'POST', update:'POST']
-
-    def list = {
+	def index = { redirect(action:list,params:params) }
+	
+	// the delete, save and update actions only accept POST requests
+	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+	
+	def list = {
 		return 
-    }
-  
+	}
+	
 	/**
 	 * This method is used by JQgrid to load manufacturerList
 	 */
@@ -38,69 +38,74 @@ class ManufacturerController {
 				ilike('name', "%${params.name}%")
 			if (params.description)
 				ilike('description', "%${params.description}%")
+			if (params.corporateName)
+				ilike('corporateName', "%${params.corporateName}%")
+			if (params.corporateLocation)
+				ilike('corporateLocation', "%${params.corporateLocation}%")
+			if (params.website)
+				ilike('website', "%${params.website}%")
 			
 			order(sortIndex, sortOrder).ignoreCase()
 		}
-
+		
 		def totalRows = manufacturers.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
-
-		def results = manufacturers?.collect { [ cell: [ it.name, ManufacturerAlias.findAllByManufacturer( it )?.name,it.description, it.modelsCount,
+		
+		def results = manufacturers?.collect { [ cell: [ it.name, ManufacturerAlias.findAllByManufacturer( it )?.name, it.description, it.corporateName, it.corporateLocation, it.website, it.modelsCount,
 					AssetEntity.countByManufacturer(it)], id: it.id,
 			]}
-
+		
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-
+		
 		render jsonData as JSON
 		
 	}
-
-    def show = {
-        def manufacturerInstance = Manufacturer.get( params.id )
-
-        if(!manufacturerInstance) {
-            flash.message = "Manufacturer not found with id ${params.id}"
-            redirect(action:list)
-        }
+	
+	def show = {
+		def manufacturerInstance = Manufacturer.get( params.id )
+		
+		if(!manufacturerInstance) {
+			flash.message = "Manufacturer not found with id ${params.id}"
+			redirect(action:list)
+		}
 		else {
 			 def manuAlias = WebUtil.listAsMultiValueString(manufacturerInstance.getAliases()?.name)
-			 return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ] }
-    }
-
-    def delete = {
-        def manufacturerInstance = Manufacturer.get( params.id )
-        if(manufacturerInstance) {
+			 return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ]
+		}
+	}
+	
+	def delete = {
+		def manufacturerInstance = Manufacturer.get( params.id )
+		if (manufacturerInstance) {
 			manufacturerInstance.delete(flush:true)
-            flash.message = "Manufacturer ${params.id} deleted"
-            redirect(action:list)
-        }
-        else {
-            flash.message = "Manufacturer not found with id ${params.id}"
-            redirect(action:list)
-        }
-    }
-
-    def edit = {
-        def manufacturerInstance = Manufacturer.get( params.id )
-
-        if(!manufacturerInstance) {
-            flash.message = "Manufacturer not found with id ${params.id}"
-            redirect(action:list)
-        }
-        else {
-			def manuAlias = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
-            return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ]
-        }
-    }
-
-    def update = {
+			flash.message = "Manufacturer ${params.id} deleted"
+			redirect(action:list)
+		} else {
+			flash.message = "Manufacturer not found with id ${params.id}"
+			redirect(action:list)
+		}
+	}
+	
+	def edit = {
+		def manufacturerInstance = Manufacturer.get( params.id )
 		
-        def manufacturerInstance = Manufacturer.get( params.id )
-        if(manufacturerInstance) {
-            manufacturerInstance.properties = params
-            def deletedAka = params.deletedAka
-            def akaToSave = params.list('aka')
-			if(deletedAka){
+		if(!manufacturerInstance) {
+			flash.message = "Manufacturer not found with id ${params.id}"
+			redirect(action:list)
+		} else {
+			def manuAlias = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
+			return [ manufacturerInstance : manufacturerInstance, manuAlias:manuAlias ]
+		}
+	}
+	
+	def update = {
+		
+		def manufacturerInstance = Manufacturer.get( params.id )
+		if (manufacturerInstance) {
+			manufacturerInstance.properties = params
+			def deletedAka = params.deletedAka
+			def akaToSave = params.list('aka')
+			if (deletedAka) {
 				ManufacturerAlias.executeUpdate("delete from ManufacturerAlias ma where ma.id in (${deletedAka})")
 			}
 			def manufacturerAliasList = ManufacturerAlias.findAllByManufacturer( manufacturerInstance )
@@ -112,64 +117,62 @@ class ManufacturerController {
 				manufacturerInstance.findOrCreateAliasByName(aka, true)
 			}
 			
-            if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
-                flash.message = "Manufacturer ${params.id} updated"
-                redirect(action:show,id:manufacturerInstance.id)
-            }
-            else {
-                render(view:'edit',model:[manufacturerInstance:manufacturerInstance])
-            }
-        }
-        else {
-            flash.message = "Manufacturer not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
-        }
-    }
-
-    def create = {
-        def manufacturerInstance = new Manufacturer()
-        manufacturerInstance.properties = params
-        return ['manufacturerInstance':manufacturerInstance]
-    }
-
-    def save = {
+			if (!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
+				flash.message = "Manufacturer ${params.id} updated"
+				redirect(action:show,id:manufacturerInstance.id)
+			} else {
+				render(view:'edit',model:[manufacturerInstance:manufacturerInstance])
+			}
+		} else {
+			flash.message = "Manufacturer not found with id ${params.id}"
+			redirect(action:edit,id:params.id)
+		}
+	}
+	
+	def create = {
+		def manufacturerInstance = new Manufacturer()
+		manufacturerInstance.properties = params
+		return ['manufacturerInstance':manufacturerInstance]
+	}
+	
+	def save = {
 		def loggedUser = securityService.getUserLogin()
-        def manufacturerInstance = new Manufacturer(params)
-        if(!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
+		def manufacturerInstance = new Manufacturer(params)
+		if (!manufacturerInstance.hasErrors() && manufacturerInstance.save()) {
 			def akaNames = params.list('aka')
-			if(akaNames.size() > 0){
-				akaNames.each{aka->
+			if ( (akaNames.size() > 0) && ! (akaNames.size() == 1 && akaNames[0].equals('')) ) {
+				akaNames.each{ aka->
 					manufacturerInstance.findOrCreateAliasByName(aka, true)
 				}
 			}
-            flash.message = "Manufacturer ${manufacturerInstance.name} created"
-            redirect(action:list,id:manufacturerInstance.id)
-        }
-        else {
-            render(view:'create',model:[manufacturerInstance:manufacturerInstance])
-        }
-    }
-    /*
-     *  Send List of Manufacturer as JSON object
-     */
+			flash.message = "Manufacturer ${manufacturerInstance.name} created"
+			redirect(action:list,id:manufacturerInstance.id)
+		} else {
+			render(view:'create',model:[manufacturerInstance:manufacturerInstance])
+		}
+	}
+	
+	/*
+	 *  Send List of Manufacturer as JSON object
+	 */
 	def getManufacturersListAsJSON = {
-    	def assetType = params.assetType
-    	def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+		def assetType = params.assetType
+		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 		def manufacturersList = []
-    	manufacturers.each{
-    		manufacturersList << [id:it.id,name:it.name]
-    	}
-    	render manufacturersList as JSON
-    }
-    /*
-     * When the user clicks on an item do the following actions:
-     *	1. Add to the AKA field list in the target record
+		manufacturers.each{
+			manufacturersList << [id:it.id,name:it.name]
+		}
+		render manufacturersList as JSON
+	}
+	/*
+	 * When the user clicks on an item do the following actions:
+	 *	1. Add to the AKA field list in the target record
 	 *	2. Revise Model, Asset, and any other records that may point to this manufacturer
 	 *	3. Delete manufacturer record.
 	 *	4. Return to manufacturer list view with the flash message "Merge completed."
-     */
+	 */
 	def merge = {
-    	
+		
 		// Get the manufacturer instances for params ids
 		def toManufacturer = Manufacturer.get(params.id)
 		def fromManufacturer = Manufacturer.get(params.fromId)
@@ -201,36 +204,36 @@ class ManufacturerController {
 		}
 		
 		// Return to manufacturer list view with the flash message "Merge completed."
-    	flash.message = "Merge completed."
-    	redirect(action:list)
-    }
-    /*
-     *  Send Manufacturer details as JSON object
-     */
+		flash.message = "Merge completed."
+		redirect(action:list)
+	}
+	/*
+	 *  Send Manufacturer details as JSON object
+	 */
 	def getManufacturerAsJSON = {
-    	def id = params.id
-    	def manufacturer = Manufacturer.get(params.id)
+		def id = params.id
+		def manufacturer = Manufacturer.get(params.id)
 		def jsonMap = [:]
 		jsonMap.put("manufacturer", manufacturer)
 		jsonMap.put("aliases", WebUtil.listAsMultiValueString(manufacturer.getAliases()?.name))
 		
-    	render jsonMap as JSON
-    }
-    
+		render jsonMap as JSON
+	}
+	
 	/**
 	 *  Validate whether requested AKA already exist in DB or not
 	 *  @param: aka, name of aka
-     *  @param: id, id of model
-     *  @return : return aka if exists
+	 *  @param: id, id of model
+	 *  @return : return aka if exists
 	 */
 	def validateAKA = {
 		def duplicateAka = ""
 		def aka = params.name
 		def manuId = params.id
 		def akaExist = Manufacturer.findByName(aka)
-        
-		if( akaExist ){
-            duplicateAka = aka
+		
+		if ( akaExist ) {
+			duplicateAka = aka
 		} else if(manuId) {
 			def manufacturer = Manufacturer.get(manuId)
 			def akaInAlias = ManufacturerAlias.findByNameAndManufacturer(aka, manufacturer)
@@ -245,7 +248,7 @@ class ManufacturerController {
 	 * render a list of suggestions for manufacturer's initial.
 	 * @param : value is initial for which user wants suggestions .
 	 */
-	def autoCompleteManufacturer ={
+	def autoCompleteManufacturer = {
 		def initials = params.value
 		def manufacturers = initials ? Manufacturer.findAllByNameIlike(initials+"%") : []
 		[manufacturers:manufacturers]
