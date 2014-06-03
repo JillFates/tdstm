@@ -83,7 +83,7 @@ class ReportsService {
 		ArrayList appList = new ArrayList()
 		def appsInBundle
 		def currAppOwner
-		log.info "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
+		log.debug "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
 		
 		if(planning) {
 			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseForPlanning(projectInstance, true).toList())
@@ -96,7 +96,7 @@ class ReportsService {
 			appsInBundle = appsInBundle.findAll{it.appOwner==currAppOwner}
 		}
 		
-		log.info "${appsInBundle}"
+		log.debug "${appsInBundle}"
 		appsInBundle.each {
 			def showApp = false
 			def dependsOnList = AssetDependency.findAllByAsset(it)
@@ -661,7 +661,7 @@ class ReportsService {
 		def maxR = params.rows ? Integer.valueOf(params.rows) : 50
 		def ofst = params.offset ? Integer.valueOf(params.offset) : 0
 		def appCount = params.appCount ?:0
-		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
+		log.debug "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
 		def bundles = []
 		if(planning) {
 			bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
@@ -676,7 +676,7 @@ class ReportsService {
 				appCount = AssetEntity.findAll(" FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:types)",
 									[bundles:bundles, types:AssetType.getServerTypes()]).size()
 		}
-		log.info "${assetsInBundle}"
+		log.debug "${assetsInBundle}"
 		def titleString = new StringBuffer("");
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
@@ -753,7 +753,7 @@ class ReportsService {
 		def project = securityService.getUserCurrentProject()
 		ArrayList assetList = new ArrayList()
 		def assetsInBundle = []
-		log.info "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} noApps:${noApps}  dbSupport:${dbSupport} planning:${planning} "
+		log.debug "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} noApps:${noApps}  dbSupport:${dbSupport} planning:${planning} "
 		
 		def bundles = []
 		if(planning) {
@@ -766,7 +766,7 @@ class ReportsService {
 								[bundles:bundles, type:[(AssetType.DATABASE).toString()]])
 		}
 		
-		log.info "${assetsInBundle}"
+		log.debug "${assetsInBundle}"
 		def titleString = new StringBuffer("");
 		if(bundleConflicts){
 			titleString.append('Bundle Conflicts')
