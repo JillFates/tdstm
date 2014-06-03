@@ -379,19 +379,19 @@ class AssetEntityController {
 				filesColumnNames.put(filesCellContent, c)
 			}
 			// Statement to check Headers if header are not found it will return Error message
-			if ( !checkHeader( serverColumnslist, serverColumnNames ) ) {
+			if ( params.asset == 'asset' && !checkHeader( serverColumnslist, serverColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
 				forward action:forwardAction, params: [error: " Server Column Headers : ${missingHeader} not found, Please check it."]
 				return
-			} else if ( !checkHeader( appColumnslist, appColumnNames ) ) {
+			} else if ( params.application == 'application' && !checkHeader( appColumnslist, appColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
 				forward action:forwardAction, params: [error: " Applciations Column Headers : ${missingHeader} not found, Please check it."]
 				return
-			} else if ( !checkHeader( databaseColumnslist, databaseColumnNames ) ) {
+			} else if ( params.database == 'database' && !checkHeader( databaseColumnslist, databaseColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
 				forward action:forwardAction, params: [error: " Databases Column Headers : ${missingHeader} not found, Please check it."]
 				return
-			} else if ( !checkHeader( filesColumnslist, filesColumnNames ) ) {
+			} else if ( params.files == 'files' && !checkHeader( filesColumnslist, filesColumnNames ) ) {
 				def missingHeader = missingHeader.replaceFirst(",","")
 				forward action:forwardAction, params: [error: " Storage Column Headers : ${missingHeader} not found, Please check it."]
 				return
@@ -883,7 +883,7 @@ class AssetEntityController {
 						}
 						
 						
-						def createdByImported = commentsSheet.getCell( ++cols, r ).contents
+						def createdByImported = (commentsSheet.getCell( ++cols, r ).contents).trim()
 						def person = createdByImported ? personService.findPerson(createdByImported, project, staffList)?.person : securityService.getUserLoginPerson()
 						
 						if(person){
