@@ -97,6 +97,10 @@ class RunbookService {
 			tmp['tasks'][it.id].tmpBeenExplored = false // Flag to indicate that the task was previously explored
 			tmp['tasks'][it.id].tmpIsStartVertex = true // Flag that the task is a start vertex
 		}
+		
+		dependencies.each {
+			tmp['dependencies'][it.id].tmpIgnore = false;
+		}
 
 		// Convert the task list into map by their ids
 		def nodes = tasks.asMap('id')
@@ -141,7 +145,7 @@ class RunbookService {
 			if ( edgesBySucc.containsKey(vertex.id.toString()) ) {
 				tmp['tasks'][vertex.id].tmpIsStartVertex = false
 				//log.debug "cleared out tmpIsStartVertex for $n"	
-			}			
+			}
 
 			// Throw the current node onto the stack
 			stack.push(n)
@@ -167,6 +171,7 @@ class RunbookService {
 							if (stack.find { it == edge.assetComment.id }) {
 								//log.debug "dfsOfGraph() found cyclical reference(2) with ${nodes[edge.assetComment.id]}"
 								cyclicalMaps[n] = stack.clone()
+								tmp['dependencies'][edge.id].tmpIgnore = true;
 							}
 						}
 					}
@@ -313,30 +318,34 @@ class RunbookService {
 					edgesBySucc[task.id.toString()].each { ebs -> 
 
 						ebs.each { edge ->
+							
+							// check if this edge should be ignored
+							if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
 
-							// Set the time it will take to finish all the remaining tasks along this current path 
-							// This will be the max time of any forked path downstream
-							tmp['dependencies'][edge.id].tmpPathDuration = tmp['tasks'][task.id].tmpMaxPathDuration + ( task.duration ?: 0 )
+								// Set the time it will take to finish all the remaining tasks along this current path 
+								// This will be the max time of any forked path downstream
+								tmp['dependencies'][edge.id].tmpPathDuration = tmp['tasks'][task.id].tmpMaxPathDuration + ( task.duration ?: 0 )
 
-							// Set the predeccessor task's tmpMaxPathDuration to this edge if it is the longest route
-							if (tmp['dependencies'][edge.id].tmpPathDuration > tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration) {
-								tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration = tmp['dependencies'][edge.id].tmpPathDuration
+								// Set the predeccessor task's tmpMaxPathDuration to this edge if it is the longest route
+								if (tmp['dependencies'][edge.id].tmpPathDuration > tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration) {
+									tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration = tmp['dependencies'][edge.id].tmpPathDuration
+								}
+
+								// Set the predecessor's tmpMapDepth one higher than the successor. If there were multiple paths
+								// to a task, we'll use the shortest path
+								if (tmp['tasks'][edge.predecessor.id].tmpMapDepth < tmpMapDepth)
+									tmp['tasks'][edge.predecessor.id].tmpMapDepth = tmpMapDepth
+
+								// Merge the downstream tasks from the current task plus add the current task to the upstream task
+								if (tmp['tasks'][task.id].tmpDownstreamTasks) {
+									tmp['tasks'][edge.predecessor.id].tmpDownstreamTasks << tmp['tasks'][task.id].tmpDownstreamTasks
+								}
+								tmp['tasks'][edge.predecessor.id].tmpDownstreamTasks << [ (task.id):task]
+
+								// Put each predecessor into the queue if it hasn't already been processed
+								if (! queue.contains( edge.predecessor.id ))
+									queue.add(edge.predecessor.id)
 							}
-
-							// Set the predecessor's tmpMapDepth one higher than the successor. If there were multiple paths
-							// to a task, we'll use the shortest path
-							if (tmp['tasks'][edge.predecessor.id].tmpMapDepth < tmpMapDepth)
-								tmp['tasks'][edge.predecessor.id].tmpMapDepth = tmpMapDepth
-
-							// Merge the downstream tasks from the current task plus add the current task to the upstream task
-							if (tmp['tasks'][task.id].tmpDownstreamTasks) {
-								tmp['tasks'][edge.predecessor.id].tmpDownstreamTasks << tmp['tasks'][task.id].tmpDownstreamTasks
-							}
-							tmp['tasks'][edge.predecessor.id].tmpDownstreamTasks << [ (task.id):task]
-
-							// Put each predecessor into the queue if it hasn't already been processed
-							if (! queue.contains( edge.predecessor.id ))
-								queue.add(edge.predecessor.id)							
 						}
 
 					}
@@ -522,17 +531,22 @@ class RunbookService {
 			def maxDur=0
 			def maxTasks=0
 			edges[id].each { e ->
-				if (tmp['dependencies'][e.id].tmpPathDuration > maxDur) {
-					edge = e
-					maxDur = tmp['dependencies'][e.id].tmpPathDuration
-					maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
-				} else if ( tmp['dependencies'][e.id].tmpPathDuration > maxDur ) {
-					def taskCount = maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
-					if (taskCount > maxTasks) {
+				
+				// check if this edge should be ignored
+				if ( ! tmp['dependencies'][e.id].tmpIgnore ) {
+				
+					if (tmp['dependencies'][e.id].tmpPathDuration > maxDur) {
 						edge = e
 						maxDur = tmp['dependencies'][e.id].tmpPathDuration
-						maxTasks = taskCount
-					} 
+						maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
+					} else if ( tmp['dependencies'][e.id].tmpPathDuration > maxDur ) {
+						def taskCount = maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
+						if (taskCount > maxTasks) {
+							edge = e
+							maxDur = tmp['dependencies'][e.id].tmpPathDuration
+							maxTasks = taskCount
+						}
+					}
 				}
 			} 
 		}
@@ -584,7 +598,8 @@ class RunbookService {
 		// 
 		// Main Loop
 		// 
-
+		
+		
 		// Need to iterate over the list of graphs and choose the first graph to work on
 		for (int g=0; g < graphs.size(); g++) {
 
@@ -655,7 +670,7 @@ class RunbookService {
 
 				// Bail out of infinite loop
 				if ( --safety == 0 ) {
-					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')					
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')			
 				}
 
 				// Get task id out of the queue
@@ -669,15 +684,20 @@ class RunbookService {
 					// Iterate over the edges back to the predecessor tasks
 					edgesBySucc[taskId].each() { edge ->
 						def calcLatestStart = succLatestStart - edge.predecessor.duration 
-						if ( ! tmp['tasks'][tasksMap[edge.predecessor.id.toString()].id].tmpBeenExplored ) {
-							// Add the task to the queue
-							queue.push(edge.predecessor.id.toString())
-							tmp['tasks'][edge.predecessor.id].tmpLatestStart = calcLatestStart
-							tmp['tasks'][edge.predecessor.id].tmpBeenExplored = true
-						} else {
-							// Been here before so we need to compare the latest starts to set to the ealiest start of the two
-							if ( calcLatestStart < tmp['tasks'][edge.predecessor.id].tmpLatestStart ) 
+						
+						// check if this edge should be ignored
+						if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
+						
+							if ( ! tmp['tasks'][tasksMap[edge.predecessor.id.toString()].id].tmpBeenExplored ) {
+								// Add the task to the queue
+								queue.push(edge.predecessor.id.toString())
 								tmp['tasks'][edge.predecessor.id].tmpLatestStart = calcLatestStart
+								tmp['tasks'][edge.predecessor.id].tmpBeenExplored = true
+							} else {
+								// Been here before so we need to compare the latest starts to set to the ealiest start of the two
+								if ( calcLatestStart < tmp['tasks'][edge.predecessor.id].tmpLatestStart ) 
+									tmp['tasks'][edge.predecessor.id].tmpLatestStart = calcLatestStart
+							}
 						}
 					}
 				} else {
@@ -712,15 +732,20 @@ class RunbookService {
 				log.debug "computeStartTimes() Earliest task=$taskId, queue.size=${queue.size()}"
 				if (edgesByPred.containsKey(taskId)) {
 					edgesByPred[taskId].each() { edge ->
-						// Only need to calculate the earliest start of non-critical path tasks
-						if ( !tmp['tasks'][edge.successor.id].tmpCriticalPath ) {
-							def earliest = tmp['tasks'][edge.predecessor.id].tmpEarliestStart + edge.predecessor.duration
-							if (earliest > tmp['tasks'][edge.successor.id].tmpEarliestStart)
-								tmp['tasks'][edge.successor.id].tmpEarliestStart = earliest
-						}
-						if ( ! tmp['tasks'][edge.successor.id].tmpBeenExplored ) {
-							queue.push( edge.successor.id.toString() )
-							tmp['tasks'][edge.successor.id].tmpBeenExplored = true
+						
+						// check if this edge should be ignored
+						if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
+							
+							// Only need to calculate the earliest start of non-critical path tasks
+							if ( !tmp['tasks'][edge.successor.id].tmpCriticalPath ) {
+								def earliest = tmp['tasks'][edge.predecessor.id].tmpEarliestStart + edge.predecessor.duration
+								if (earliest > tmp['tasks'][edge.successor.id].tmpEarliestStart)
+									tmp['tasks'][edge.successor.id].tmpEarliestStart = earliest
+							}
+							if ( ! tmp['tasks'][edge.successor.id].tmpBeenExplored ) {
+								queue.push( edge.successor.id.toString() )
+								tmp['tasks'][edge.successor.id].tmpBeenExplored = true
+							}
 						}
 					}
 				} else {
