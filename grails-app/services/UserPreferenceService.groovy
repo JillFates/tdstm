@@ -118,7 +118,6 @@ class UserPreferenceService  {
 		def userPreference = UserPreference.findByUserLoginAndPreferenceCode( userLogin, preferenceCode)
 		if ( userPreference ) {
 			userPreference.delete(flush:true)
-			loadPreferences( preferenceCode )
 		}
 	}
 
