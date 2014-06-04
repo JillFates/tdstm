@@ -163,7 +163,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		assetName( blank:true, nullable:true )
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
-		priority( nullable:true )
+		priority( nullable:true, validator: 
+			CustomValidators.inList(
+				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.PRIORITY_OPTION), 
+				"priority")
+		)
 		planStatus( blank:true, nullable:true, validator: 
 			CustomValidators.inList(
 				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.STATUS_OPTION), 
@@ -178,7 +182,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		retireDate( nullable:true )
 		description( blank:true, nullable:true )
 		supportType( blank:true, nullable:true )
-		environment( blank:true, nullable:true )
+		environment( blank:true, nullable:true, validator: 
+			CustomValidators.inList(
+				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION), 
+				"environment")
+		)
 		
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )

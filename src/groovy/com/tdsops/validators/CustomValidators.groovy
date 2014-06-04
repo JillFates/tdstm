@@ -14,10 +14,10 @@ class CustomValidators {
 	public static inList(aListClosure, fieldName) { 
 		return { value, object, errors ->
 			def allValues = aListClosure.call()
-			if (allValues.contains(value)) {
+			if (value == null || allValues.contains(value)) {
 				return true;
 			} else {
-				errors.rejectValue(fieldName, "${aClass}.${fieldName}.notInList", "${fieldName} not in list")
+				errors.rejectValue(fieldName, "${fieldName}.notInList", "${value} of ${fieldName} not in list ${allValues}")
 				return false
 			}
 		}
