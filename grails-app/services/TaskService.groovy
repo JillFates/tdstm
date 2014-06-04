@@ -259,7 +259,7 @@ class TaskService implements InitializingBean {
 		if ( ! countOnly ) {
 			// If we are returning the lists, then let's deal with the sorting
 			sql.append('ORDER BY ')
-			def sortableProps = ['number_comment', 'comment', 'estFinish', 'lastUpdated', 'status', 'assetName', 'assignedTo']
+			def sortableProps = ['number_comment', 'comment', 'estFinish', 'lastUpdated', 'status', 'assetName', 'assignedTo', 'score']
 			def sortAndOrder = null
 			if (sortOn) {
 				if ( sortableProps.contains(sortOn) ) {
