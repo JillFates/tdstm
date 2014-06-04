@@ -42,15 +42,6 @@
 							<input type="checkbox" name="vmWithNoSupport" id="vmWithNoSupport" checked="checked" />&nbsp; VM with no support
 						</td>
 					</tr>
-					<tr>
-						<td>
-							<div style="width: 150px; float: left;">
-								<label><strong>Output:</strong></label>&nbsp;<br />
-								<label for="web"><input type="radio" name="output" id="web" checked="checked" value="web" />&nbsp;Web</label><br />
-								<label for="pdf"><input type="radio" name="output" id="pdf" value="pdf" />&nbsp;PDF</label><br />
-							</div>
-						</td>
-					</tr>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
 						<td><input type="submit" class="submit" value="Generate" id="serverConflictsButton"/></td>
