@@ -41,7 +41,7 @@ class PersonController {
 		def listJsonUrl
 		def company
 		def currentCompany = securityService.getUserCurrentProject()?.client
-		def companyId = params.companyId ?: currentCompany.id
+		def companyId = params.companyId ?: (currentCompany? currentCompany.id : 'All')
 		if(companyId && companyId != 'All'){
 			def map = [controller:'person', action:'listJson', id:"${companyId}"]
 			listJsonUrl = HtmlUtil.createLink(map)
