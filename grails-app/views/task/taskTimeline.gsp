@@ -151,6 +151,18 @@ THE SOFTWARE.
 			stroke-opacity: 1;
 		}
 
+		#arrowheadRedundant path {
+			fill: orange;
+			fill-opacity: 0.6;
+			stroke-opacity: 0.6;
+		}
+
+		#arrowheadCyclical path {
+			fill: #44AA00;
+			fill-opacity: 1;
+			stroke-opacity: 1;
+		}
+
 		.dependency.selected {
 			stroke: red;
 			stroke-width: 2;
@@ -160,11 +172,13 @@ THE SOFTWARE.
 		.dependency.redundant {
 			stroke: orange;
 			stroke-opacity: 0.5;
+			marker-end: url(#arrowheadRedundant);
 		}
 		.dependency.cyclical {
 			stroke: #44AA00;
 			stroke-opacity: 1;
 			stroke-width: 3;
+			marker-end: url(#arrowheadCyclical);
 		}
 		
 		.unfocussed {
@@ -452,28 +466,19 @@ THE SOFTWARE.
 				.attr('class', 'background')
 				
 			// define the arrowhead marker used for marking dependencies
-			chart.select("defs")
-				.append("marker")
-				.attr("id", "arrowhead")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 10)
-				.attr("refY", 0)
-				.attr("markerWidth", 6)
-				.attr("markerHeight", 6)
-				.attr("orient", "auto")
-				.append("path")
-				.attr("d", "M0,-5L10,0L0,5");
-			chart.select("defs")
-				.append("marker")
-				.attr("id", "arrowheadSelected")
-				.attr("viewBox", "0 -5 10 10")
-				.attr("refX", 10)
-				.attr("refY", 0)
-				.attr("markerWidth", 6)
-				.attr("markerHeight", 6)
-				.attr("orient", "auto")
-				.append("path")
-				.attr("d", "M0,-5L10,0L0,5");
+			var arrowheadNames = ["arrowhead", "arrowheadSelected", "arrowheadRedundant", "arrowheadCyclical"];
+			for (var i = 0; i < arrowheadNames.size(); ++i)
+				chart.select("defs")
+					.append("marker")
+					.attr("id", arrowheadNames[i])
+					.attr("viewBox", "0 -5 10 10")
+					.attr("refX", 10)
+					.attr("refY", 0)
+					.attr("markerWidth", 6)
+					.attr("markerHeight", 6)
+					.attr("orient", "auto")
+					.append("path")
+					.attr("d", "M0,-5L10,0L0,5");
 				
 			// construct the minutes axis for the main graph
 			var xMinuteAxis = d3.svg.axis()
@@ -774,8 +779,7 @@ THE SOFTWARE.
 					classString += ' ahead '
 				else
 					classString += ' ontime '
-				if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)
-					classString += ' unfocussed '
+				if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)/					classString += ' unfocussed '
 				
 				return classString;
 			}
@@ -1211,6 +1215,10 @@ THE SOFTWARE.
 					items[i].checked = false;
 					items[i].height = 0;
 					items[i].root = items[i].root != null;
+					items[i].successors = [];
+					items[i].predecessors = [];
+					items[i].redundantSuccessors = [];
+					items[i].redundantPredecessors = [];
 				}
 				
 				// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created 
@@ -1227,26 +1235,43 @@ THE SOFTWARE.
 							}
 						}
 				
-				// find and remove any redundant dependencies
+				// find and remove any redundant dependencies using a queue for a breadth first search
 				var queue = [];
 				queue.push(data.root);
-				var calls = 0;
 				while (queue.size() > 0)
-					searchForRedundency(queue.pop(), calls);
+					searchForRedundency(queue.pop());
 				
-				function searchForRedundency (node, n) {
+				function searchForRedundency (node) {
+					
+					/* 	Mark this node as checked.
+						Because nodes are only added to the queue when all their predecessors 
+						are checked, all future dependencies checked for redundency are 
+						guarenteed to not come from a predecessor to this node. */
 					node.checked = true;
+					
+					// iterate through the node's successors
 					for (var j = 0; j < node.successors.size(); ++j) {
+						
+						
+						// if this successor has a predecessor that hasn't been checked, don't add it to the queue
 						var child = node.successors[j].successor;
 						var canQueue = true;
 						for (var i = 0; i < getPredecessors(child).size(); i++)
 							if (!getPredecessors(child)[i].checked)
 								canQueue = false;
+						
+						// if this successor can be queued, add it to the queue if it isn't already there
 						if (queue.indexOf(child) == -1 && canQueue)
 							queue.unshift(child);
+						
+						// if this successor has other predecessors, check if one of them leads back to the original node
 						if (child.predecessors.size() > 1) {
+							
+							// check if this dependency is redundant
 							checked = [];
 							if (searchUp(node, child, node.successors[j], checked)) {
+							
+								// the dependency is redundant, so remove it from both nodes' dependency lists and mark it as redundant
 								node.successors[j].redundant = true;
 								var index = node.successors[j].successor.predecessors.indexOf(node.successors[j]);
 								node.successors[j].successor.redundantPredecessors.push(node.successors[j]);
@@ -1255,22 +1280,32 @@ THE SOFTWARE.
 								node.successors.splice(j, 1);
 								--j;
 							}
-							++calls;
 						}
 					}
 				}
 				
-				// searches for @param target from @param start by searching up the tree, ignoreing dependency @param ignore
+				/*	Searches for @param target from @param start by searching up the tree, ignoring dependency @param ignore.
+					Returns true if the dependency is redundant. */
 				function searchUp (target, start, ignore, checked) {
+					
+					// if we found a path that reaches the target, the dependency is redundent
 					if (target == start)
 						return true;
+					
+					// if this node has already been checked, we can't get to the target from here
 					if (start.checked)
 						return false;
+					
+					// if this node is in the checked list, we have already confirmed that it can't lead to the target
 					if (checked.indexOf(start) != -1)
 						return false;
+					
+					// search from each of this node's predecessors
 					for (var i = 0; i < start.predecessors.size(); ++i)
 						if ( start.predecessors[i] != ignore && searchUp(target, start.predecessors[i].predecessor, ignore, checked) )
 							return true;
+					
+					// we can't reach the target from this node, so add it to the checked list and return false
 					checked.push(start);
 					return false;
 				}
