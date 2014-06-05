@@ -157,10 +157,14 @@ THE SOFTWARE.
 			marker-end: url(#arrowheadSelected);
 			stroke-opacity: 1;
 		}
-
 		.dependency.redundant {
-			stroke: yellow;
+			stroke: orange;
 			stroke-opacity: 0.5;
+		}
+		.dependency.cyclical {
+			stroke: #44AA00;
+			stroke-opacity: 1;
+			stroke-width: 3;
 		}
 		
 		.unfocussed {
@@ -761,6 +765,7 @@ THE SOFTWARE.
 					+ (d.criticalPath ? 'critical ' : '')
 					+ (d.root ? 'root ' : '')
 					+ (d.redundant ? 'redundant ' : '')
+					+ (d.cyclical ? 'cyclical ' : '')
 					+ (d.end < now() ? 'past ' : 'future ')
 					+ (d.status);
 				if (d.status != 'Completed' && d.end < now())
@@ -1139,19 +1144,36 @@ THE SOFTWARE.
 				 - populates the dependencies list from data in the items list 
 				 - corrects any impossible start times for tasks */
 			function sanitizeData (tasks, dependencies) {
+			
+				for (var i = 0; i < items.length; ++i) {
+					items[i].successors = [];
+					items[i].predecessors = [];
+					items[i].redundantSuccessors = [];
+					items[i].redundantPredecessors = [];
+				}
 				
-				// if there are any cyclical structures, remove one of the dependencies				
+				// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical			
 				for (var i = 0; i < Object.keys(data.cyclicals).size(); i++) {
 					var key = parseInt(Object.keys(data.cyclicals)[i]);
-					var successor = items[binarySearch(items, key, 0, items.length-1)];
+					var predecessor = items[binarySearch(items, key, 0, items.length-1)];
 					var stack = data.cyclicals[Object.keys(data.cyclicals)[i]];
 					for (var j = 0; j < stack.size(); ++j) {
 						var node = items[binarySearch(items, stack[j], 0, items.length-1)];
 						if (node.predecessorIds.indexOf(key) != -1) {
+							// construct a dependency object and move the predecessorId to the redundant list
+							var depObject = { "predecessor":predecessor, "successor":node, "modifier":"hidden", "selected":false, "redundant":true, "cyclical":true };
+							depObject.root = predecessor.root;
+							predecessor.redundantSuccessors.push(depObject);
+							node.redundantPredecessors.push(depObject);
+							dependencies.push(depObject);
 							node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
 						}
 					}
 				}
+				
+				// if there are cyclical structures, tell the user that the data might be inaccurate
+				if (Object.keys(data.cyclicals).size() > 0)
+					alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
 				
 				// if there is more than 1 start task, create a fake root task
 				if (starts.size() > 1) {
@@ -1182,10 +1204,6 @@ THE SOFTWARE.
 					items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone)*60000);
 					items[i].start = null;
 					items[i].end = null;
-					items[i].successors = [];
-					items[i].predecessors = [];
-					items[i].redundantSuccessors = [];
-					items[i].redundantPredecessors = [];
 					items[i].exChild = null;
 					items[i].exParent = null;
 					items[i].endOfExclusive = null;
@@ -1200,7 +1218,7 @@ THE SOFTWARE.
 					if (items[i].predecessorIds)
 						for (var j = 0; j < items[i].predecessorIds.length; ++j) {
 							var predecessorIndex = binarySearch(items, items[i].predecessorIds[j], 0, items.length-1)
-							var depObject = { "predecessor":items[predecessorIndex], "successor":items[i], "modifier":"hidden", "selected":false, "redundant":false };
+							var depObject = { "predecessor":items[predecessorIndex], "successor":items[i], "modifier":"hidden", "selected":false, "redundant":false, "cyclical":false };
 							if (predecessorIndex != -1) {
 								depObject.root = items[predecessorIndex].root;
 								items[predecessorIndex].successors.push(depObject);
