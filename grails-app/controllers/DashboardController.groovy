@@ -180,11 +180,12 @@ class DashboardController {
 			flash.message = "Please select project to view User Dashboard"
 			redirect(controller:'project',action:'list')
 		}else{
-			def dispProjs = projectInstance
+			def dispProjs = [projectInstance]
 			if (userProjects) {
 				dispProjs = userProjects+projectInstance
+				dispProjs = dispProjs.unique()
 			}
-			return [projects:dispProjs.unique(), projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
+			return [projects:dispProjs, projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
 		}
 	}
 	
