@@ -200,6 +200,7 @@
 			$(".headerClass").removeClass("ui-icon");
 			if(megamenuitem!=e)
 				$(".menu2 .active").removeClass('active').addClass('inActive')
+				$("#userMegaMenu").removeClass('active').addClass('inActive')
 			if($(e).hasClass('inActive'))
 				$(e).addClass('active').removeClass('inActive')
 			else
