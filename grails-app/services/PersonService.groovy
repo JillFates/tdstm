@@ -1,4 +1,6 @@
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+
 import com.tdssrc.grails.GormUtil
 
 /**
@@ -281,6 +283,7 @@ class PersonService {
 	 * @return Map - the map of the parsed name that includes first, last, middle, suffix or null if it couldn't be parsed for some odd reason
 	 */
 	Map parseName(String name) {
+		name = StringUtils.strip(name)
 		Map map = [first:'', last:'', middle:'', suffix:'']
 		def firstLast = true
 		def split

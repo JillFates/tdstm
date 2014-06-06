@@ -316,6 +316,7 @@ class AssetEntityController {
 		def appColumnslist = []
 		def databaseColumnslist = []
 		def filesColumnslist = []
+		def currentUser = null
 		//get column name and sheets
 		getColumnNames(serverDTAMap, serverColumnslist, project)
 		getColumnNames(appDTAMap, appColumnslist, project)
@@ -889,8 +890,11 @@ class AssetEntityController {
 						}
 						
 						
-						def createdByImported = (commentsSheet.getCell( ++cols, r ).contents).trim()
-						def person = createdByImported ? personService.findPerson(createdByImported, project, staffList)?.person : securityService.getUserLoginPerson()
+						def createdByImported = StringUtils.strip(commentsSheet.getCell( ++cols, r ).contents)
+						if (currentUser == null) {
+							currentUser = securityService.getUserLoginPerson()
+						}
+						def person = createdByImported ? personService.findPerson(createdByImported, project, staffList)?.person : currentUser
 						
 						if(person){
 							assetComment.createdBy = person
