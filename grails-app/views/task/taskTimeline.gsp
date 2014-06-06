@@ -342,7 +342,7 @@ THE SOFTWARE.
 				.attr('width', width)
 				.attr('class', 'mini')
 				.attr('height', miniHeight)
-				.call(d3.behavior.zoom().on("zoom", zoom))
+//				.call(d3.behavior.zoom().on("zoom", zoom))
 				.on('mousedown', drawStart)
 				.on('mousemove', drawMove)
 				.on('mouseup', drawEnd)
@@ -779,7 +779,8 @@ THE SOFTWARE.
 					classString += ' ahead '
 				else
 					classString += ' ontime '
-				if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)/					classString += ' unfocussed '
+				if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)
+					classString += ' unfocussed '
 				
 				return classString;
 			}
