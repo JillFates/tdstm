@@ -13,6 +13,7 @@ class ReportsService {
 	def jdbcTemplate
     def grailsApplication
 	def securityService
+	def runbookService
 
 	static transactional = true
 
@@ -54,6 +55,10 @@ class ReportsService {
 		}else{
 		    eventErrorString +="""<span style="color:green;text-align: center;"><h3>No preparation issues for this event</h3></span>"""
 		}
+  //---------------------------------------For Task Analysis------------------------------------------------//
+		
+		def	taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList)
+		
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
 			   'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
 			   'list':eventsProjectInfo.list,'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),
@@ -65,8 +70,11 @@ class ReportsService {
 			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
 			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
 			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
-			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,
-			   'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue, 'dependenciesNotValid':assetsInfo.dependenciesNotValid]
+			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,
+			   'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue,
+			   'dependenciesNotValid':assetsInfo.dependenciesNotValid, 'cyclicalsError':taskAnalysisInfo.cyclicalsError, 'cyclicalsRef':taskAnalysisInfo.cyclicalsRef,
+			   'sinksError':taskAnalysisInfo.sinksError, 'sinksRef':taskAnalysisInfo.sinksRef, 'personAssignErr':taskAnalysisInfo.personAssignErr,
+			   'personTasks':taskAnalysisInfo.personTasks, 'taskerrMsg':taskAnalysisInfo.exceptionString]
 
 	}
 	
@@ -843,5 +851,79 @@ class ReportsService {
 		}
 		return['project':project, 'appList':assetList, 'moveBundle':(moveBundleId.isNumber()) ? (MoveBundle.findById(moveBundleId)) : "Planning Bundles",
 				'columns':9, title:StringUtils.stripStart(titleString.toString(), ",")]
+	}
+	/**
+	 * used to get cyclical references, multiple sink vertices and assignment data.
+	 * @param moveEventInstance
+	 * @param eventErrorList
+	 * @return
+	 */
+	def getTaskAnalysisInfo(moveEventInstance, eventErrorList){
+		def dfsMap
+		def cyclicalsError=''
+		def sinksError=''
+		def personAssignErr = ''
+		def personTasks =[]
+		def exceptionString =''
+		StringBuilder sinksRef = new StringBuilder()
+		StringBuilder cyclicalsRef = new StringBuilder()
+		
+		def tasks = runbookService.getEventTasks(moveEventInstance)
+		def deps = runbookService.getTaskDependencies(tasks)
+		def tmp = runbookService.createTempObject(tasks, deps)
+		
+		try{
+			dfsMap = runbookService.processDFS( tasks, deps, tmp )
+		}catch(e){
+			exceptionString += "No Tasks"
+		}
+		
+		if(dfsMap){
+			if(dfsMap.cyclicals?.size()==0){
+				cyclicalsError+="""<span style="color: green;"><b>Cyclical References: OK  </b><br></br></span>"""
+			}else{
+				eventErrorList << 'Tasks'
+				cyclicalsError += """<span style="color: red;"><b>Cyclical References:</b><br></br></span>"""
+				cyclicalsRef.append('<ol>')
+				dfsMap.cyclicals.each { root, list ->
+					def task = tasks.find { it.id == root }
+					cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
+					list.each { cycTaskId ->
+						task = tasks.find { it.id == cycTaskId }
+						cyclicalsRef.append("<li>$task.taskNumber $task.comment")
+					}
+					cyclicalsRef.append('</ul>')
+				}
+				cyclicalsRef.append('</ol>')
+			}
+			
+			if(dfsMap.sinks?.size()==1){
+				sinksError+="""<span style="color: green;"><b> Sink Vertices: OK  </b><br></br></span>"""
+			}else if(dfsMap.sinks?.size()==0){
+				eventErrorList << 'Tasks'
+				sinksError+="""<span style="color: red;"><b>Sink Vertices: No end task was found, which is typically the result of cyclical references </b><br></br></span>"""
+			}else{
+				eventErrorList << 'Tasks'
+				sinksError += """<span style="color: red;"><b>Sink Vertices: <br> Warning - More than one task has no successors. Typical events will have just one ending task (e.g. Move Event Complete)</b><br></br></span>"""
+				sinksRef.append('<ul>')
+				dfsMap.sinks.each {
+						sinksRef.append("<li>$it")
+					}
+				sinksRef.append('</ul>')
+			}
+			
+			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null or (role is null or role='')) and category in (:category)",
+													 [ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories] )
+			
+			
+			if(personTasks.size()==0){
+				personAssignErr+="""<span style="color: green;"><b> Person/Team Assignments : OK  </b><br></br></span>"""
+			}else{
+				eventErrorList << 'Tasks'
+				personAssignErr+="""<span style="color: red;"><b> Person/Team Assignments : </b><br></br></span>"""
+			}
+		}
+		return ['cyclicalsError':cyclicalsError, 'cyclicalsRef':cyclicalsRef,'sinksError':sinksError,
+			'sinksRef':sinksRef, 'personAssignErr':personAssignErr, 'personTasks':personTasks, 'exceptionString':exceptionString]
 	}
 }

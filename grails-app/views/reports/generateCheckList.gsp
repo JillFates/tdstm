@@ -415,8 +415,66 @@
 				</td>
 			</tr>
 			
-			
-			
+			<tr>
+				<td>
+					<g:if test="${allErrors.contains('Tasks')}">
+						<span style="color: green;"><b><h2>Tasks</h2></b></span>
+					</g:if> <g:else>
+						<span style="color: red;"><b><h2>Tasks</h2></b></span>
+					</g:else>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					<g:if test="${taskerrMsg}">
+						<span style="color: green;"><b><h2>${taskerrMsg}</h2></b></span>
+					</g:if>
+					${cyclicalsError}
+					<div style="margin-left: 50px">
+						${cyclicalsRef.toString()}
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${sinksError}
+					<div style="margin-left: 50px">
+						${sinksRef.toString()}
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
+					${personAssignErr}
+					<g:if test="${personTasks && personTasks.size()>0}">
+						<table style="width: auto; margin-left: 100px;">
+						<tr>
+							<th>Task number</th>
+							<th>Title</th>
+							<th>TaskSpec</th>
+						</tr>
+						<tbody>
+								<g:each in="${personTasks}" var="task" status="i">
+									<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+										<td>
+											${task.taskNumber}
+										</td>
+										<td>
+											${task.comment}
+										</td>
+										<td>
+											${task.taskSpec}
+										</td>
+									</tr>
+								</g:each>
+						</tbody>
+					</table>
+					</g:if>
+				</td>
+			</tr>
 			
 		</table>
 

@@ -84,7 +84,7 @@ class RunbookService {
 		def e = new Date()
 
 		if (tasks.size() == 0 || dependencies.size() == 0)
-			throw new RuntimeException('processDFS() invoked without necessary vertices or edges')
+			throw new Exception('processDFS() invoked without necessary vertices or edges')
 
 		//log.debug "processDFS() invoked for ${tasks.size()} tasks"
 
