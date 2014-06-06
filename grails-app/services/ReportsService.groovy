@@ -14,6 +14,7 @@ class ReportsService {
     def grailsApplication
 	def securityService
 	def runbookService
+	def taskService
 
 	static transactional = true
 
@@ -901,10 +902,15 @@ class ReportsService {
 				sinksError+="""<span style="color: green;"><b> Sink Vertices: OK  </b><br></br></span>"""
 			}else if(dfsMap.sinks?.size()==0){
 				eventErrorList << 'Tasks'
-				sinksError+="""<span style="color: red;"><b>Sink Vertices: No end task was found, which is typically the result of cyclical references </b><br></br></span>"""
+				sinksError+= """<span style="color: red;">
+					<b>Sink Vertices: <br> No end task was found, which is typically the result of cyclical references.</b>
+					<br></br></span>"""
 			}else{
 				eventErrorList << 'Tasks'
-				sinksError += """<span style="color: red;"><b>Sink Vertices: <br> Warning - More than one task has no successors. Typical events will have just one ending task (e.g. Move Event Complete)</b><br></br></span>"""
+				sinksError += """<span style="color: red;"><b>Sink Vertices: <br>
+					Warning - More than one task has no successors. Typical events will have just one ending task 
+					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.</b>
+					<br></br></span>"""
 				sinksRef.append('<ul>')
 				dfsMap.sinks.each {
 						sinksRef.append("<li>$it")
@@ -912,15 +918,16 @@ class ReportsService {
 				sinksRef.append('</ul>')
 			}
 			
-			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null or (role is null or role='')) and category in (:category)",
-													 [ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories] )
+			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null and (role is null or role='')) and category in (:category)",
+				[ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories] )
 			
 			
-			if(personTasks.size()==0){
+			def missedAssignments=personTasks.size()
+			if(missedAssignments==0){
 				personAssignErr+="""<span style="color: green;"><b> Person/Team Assignments : OK  </b><br></br></span>"""
 			}else{
 				eventErrorList << 'Tasks'
-				personAssignErr+="""<span style="color: red;"><b> Person/Team Assignments : </b><br></br></span>"""
+				personAssignErr+="""<span style="color: red;"><b> Person/Team Assignments : $missedAssignments task${missedAssignments>1?'s have':' has'} no person or team assigned</b><br></br></span>"""
 			}
 		}
 		return ['cyclicalsError':cyclicalsError, 'cyclicalsRef':cyclicalsRef,'sinksError':sinksError,
