@@ -828,7 +828,7 @@ class AssetEntityController {
 					def userLogins = securityService.getUserLogin()
 					def skippedUpdated =0
 					def skippedAdded=0
-					def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
+					def staffList = partyRelationshipService.getAllCompaniesStaffPersons([project.client, PartyGroup.get(18)])
 					
 					for ( int r = 1; r < commentCount ; r++ ) {
 						def recordForAddition = false
