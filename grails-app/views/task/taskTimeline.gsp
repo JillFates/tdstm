@@ -26,7 +26,7 @@ THE SOFTWARE.
 -->
 <html>
 	<head>
-		<title>Task Graph</title>
+		<title>Task Timeline</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
 		<g:javascript src="asset.tranman.js"/>
@@ -72,7 +72,6 @@ THE SOFTWARE.
 			stroke-width: 1;
 			stroke: black;
 			fill: green;
-			fill-opacity: 1;
 		}
 		polygon.miniItem.selected {
 			fill: #00B0C0 !important;
@@ -83,7 +82,6 @@ THE SOFTWARE.
 			stroke-width: 2;
 			fill: #FFFF00;
 			stroke: #FFFF00;
-			fill-opacity: 1;
 		}
 		polygon.mainItem.selected {
 			stroke: blue !important;
@@ -113,6 +111,10 @@ THE SOFTWARE.
 			stroke: green;
 		}
 		
+		polygon.mainItem:hover {
+			fill-opacity: 0.7 !important;
+		}
+		
 		polygon.mainItem.critical {
 			stroke-width: 4;
 		}
@@ -133,10 +135,15 @@ THE SOFTWARE.
 		}
 
 		.dependency {
+			pointer-events: none !important;
 			stroke: darkgrey;
 			stroke-width: 1.5;
 			marker-end: url(#arrowhead);
 			stroke-opacity: 0.8;
+		}
+
+		path {
+			pointer-events: none !important;
 		}
 
 		#arrowhead path {
@@ -190,13 +197,8 @@ THE SOFTWARE.
 		.background {
 			fill-opacity: 0;
 		}
-
 		.itemLabel {
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
 			background-color: transparent !important;
-			text-align: center;
 			cursor: default !important;
 			pointer-events: none !important;
 			font: 10px sans-serif !important;
@@ -210,23 +212,12 @@ THE SOFTWARE.
 			margin-left: auto !important;
 			margin-right: auto !important;
 			table-layout: fixed !important;
-			text-align: center;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
 		}
 		div.itemLabel {
 			display: table-cell;
 			text-align: center;
-			vertical-align: middle;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+			vertical-align: middle;	
 		}
-		span.itemLabel {
-			text-align: center;
-		}
-		
 		.root {
 			display: none !important;
 		}
@@ -258,7 +249,9 @@ THE SOFTWARE.
 					message.html('not enough task data to create a graph for this event');
 				return;
 			}
+
 			var data = $.parseJSON(response.responseText);
+			var ready = false;
 			
 			// populate the roles select
 			$("#rolesSelectId").children().remove();
@@ -267,17 +260,21 @@ THE SOFTWARE.
 				$("#rolesSelectId").append('<option value="' + role + '">' + role + '</option>');
 			});
 			$("#rolesSelectId").val('ALL');
-			$('#rolesSelectId').on('change', display);
+			$('#rolesSelectId').on('change', function () {
+				display(true, true);
+			});
+			
 			
 			// graph defaults
 			var miniRectHeight = 5;
 			var mainRectHeight = 30;
 			var initialExtent = 1000000;
-			var anchorOffset = 10;
+			var anchorOffset = 10; // the length of the "point" at the end of task polygons
 			var margin = {top: 20, right: 0, bottom: 15, left: 0};
 			var items = data.items;
 			var starts = data.starts;
 			var dependencies = [];
+			
 			sanitizeData(items, dependencies);
 			
 			// sort the tasks chronologically for the stacking algorithm
@@ -305,10 +302,8 @@ THE SOFTWARE.
 			});
 
 			var x = d3.time.scale()
-				.domain([items[0].start, items[items.length-1].end])
+				.domain([new Date(data.startDate), items[items.length-1].end])
 				.range([0, $('div.body').innerWidth() - 20 - $('div.body').offset().left]);
-			var domainOffset = (x.domain()[1] - x.domain()[0]) * 0.1;
-			x.domain([new Date(x.domain()[0].getTime() - domainOffset),  new Date(x.domain()[1].getTime() + domainOffset)]);
 			
 			var maxStack = calculateStacks();
 			var miniHeight = ((maxStack+1)*miniRectHeight);
@@ -316,7 +311,8 @@ THE SOFTWARE.
 
 			var width = x.range()[1];
 			var height = mainHeight + miniHeight + margin.top + margin.bottom;
-			var x1 = d3.time.scale().range([0, width]);
+			var zoomScale = 2;
+			var x1 = d3.time.scale().domain(x.domain()).range([0, width*zoomScale]);
 
 			var taskSelected = null;
 			var xPrev = 0;
@@ -342,7 +338,6 @@ THE SOFTWARE.
 				.attr('width', width)
 				.attr('class', 'mini')
 				.attr('height', miniHeight)
-//				.call(d3.behavior.zoom().on("zoom", zoom))
 				.on('mousedown', drawStart)
 				.on('mousemove', drawMove)
 				.on('mouseup', drawEnd)
@@ -374,22 +369,29 @@ THE SOFTWARE.
 					tempBrush
 						.attr( 'x', Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left) )
 						.attr( 'width', Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
-					display();
+					display(false, false);
+				} else {
+					if (tempBrush != null)
+						tempBrush.remove();
+					tempBrush = null;
+					tempBrushXInitial = 0;
 				}
 			}
 			
 			function drawEnd () {
 				if (drawing) {
-					var x1 = Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left);
-					var x2 = Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left));
-					brush.extent([x.invert(x1), x.invert(x1+x2)]);
+					var xa = Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left);
+					var xb = Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left));
+					brush.extent([x.invert(xa), x.invert(xa+xb)]);
 					
 					tempBrush.remove();
 					tempBrush = null;
 					tempBrushXInitial = 0;
 					drawing = false;
-					display();
+					display(true, true);
+					display(false, false);
 				}
+				display(false, false);
 			}
 			
 			// Sets the custom dragging behavior
@@ -411,6 +413,7 @@ THE SOFTWARE.
 			var mainSelection = null;
 			var mainSelectionXInitial = 0;
 			var selectingMain = false;
+			var mainTranslate = 0;
 			
 			// handle panning and time selection behavior on the main graph
 			function dragStart () {
@@ -429,36 +432,53 @@ THE SOFTWARE.
 			
 			// handle panning and time selection behavior on the main graph
 			function dragMove () {
-				dragging = true;
+				if (Math.abs(d3.event.dx) > 1)
+					dragging = true;
 				if (selectingMain) {
 					mainSelection
 						.attr( 'x', Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left) )
 						.attr( 'width', Math.abs(mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
-					display();
 				} else {
+					var offset = -1 * x(brush.extent()[0]) - offsetInitial;
 					var minExtent = brush.extent()[0];
 					var maxExtent = brush.extent()[1];
 					var timeShift = (maxExtent - minExtent) * (d3.event.dx / width);
-					brush.extent([new Date(minExtent-timeShift), new Date(maxExtent-timeShift)]);
-					display();
+//					if (minExtent-timeShift > x.domain()[0] && maxExtent-timeShift < x.domain()[1]) {
+						brush.extent([new Date(minExtent-timeShift), new Date(maxExtent-timeShift)]);
+						mainTranslate += d3.event.dx;
+						display(false, false);
+//					}
 				}
 			}
 			
 			// handle panning and time selection behavior on the main graph
 			function dragEnd () {
 				if (selectingMain) {
-					selectingMain = false;
 					var a = Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
-					var b = Math.abs(mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left));
-					brush.extent([x1.invert(a), x1.invert(a+b)]);
+					var b = Math.abs(mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) + Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left);
+					var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
+					var width = x.range()[1];
+					var xa = x(brush.extent()[0]) + (a/width)*extentWidth;
+					var xb = x(brush.extent()[0]) + (b/width)*extentWidth;
+					brush.extent([x.invert(xa), x.invert(xb)]);
+				
+					selectingMain = false;
 					
 					mainSelection.remove();
 					mainSelection = null;
 					mainSelectionXInitial = 0;
-					display();
+					display(true, true);
+					display(false, false);
+				} else {
+					display(false, false);
+					mainTranslate = 0;
 				}
 			}
-
+			
+			function getViewWidth () {
+				
+			}
+			
 			// construct the area behind the objects
 			var background = main.append('rect')
 				.attr('width', width)
@@ -537,7 +557,6 @@ THE SOFTWARE.
 				.attr('y1', 0)
 				.attr('y2', mainHeight)
 				.attr('class', 'main todayLine')
-				.attr('clip-path', 'url(#clip)');
 				
 			mini.append('line')
 				.attr('x1', x(now()) + 0.5)
@@ -548,15 +567,12 @@ THE SOFTWARE.
 
 			// construct the container for the task polygons
 			var itemPolys = main.append('g')
-				.attr('clip-path', 'url(#clip)');
 				
 			// construct the container for the dependency lines
 			var itemArrows = main.append('g')
-				.attr('clip-path', 'url(#clip)');
 
 			// construct the container for the task labels
 			var itemLabels = main.append('g')
-				.attr('clip-path', 'url(#clip)');
 				
 			// construct the polys in the mini graph
 			var miniPolys = mini.append('g')
@@ -580,8 +596,12 @@ THE SOFTWARE.
 			// draw the selection area
 			var brush = d3.svg.brush()
 				.x(x)
-				.on("brush", display)
-				.extent([new Date(data.startDate), new Date(new Date(data.startDate).getTime() + 30 * 60000)])
+				.on("brush", brushed)
+				.extent([new Date(data.startDate), new Date( Math.min( new Date(data.startDate).getTime() + 30 * 60000, x.domain()[1].getTime() ) )])
+			
+			var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
+			zoomScale = extentWidth / width;
+			x1.range([0, width / zoomScale]);
 
 			mini.append('g')
 				.attr('class', 'x brush')
@@ -604,37 +624,57 @@ THE SOFTWARE.
 					.attr('x2', x(now()) + 0.5);
 			}, 100);
 			
+			$('#spinnerId').css('display', 'none');
 			$('#mainHeightFieldId').keyup(fullRedraw);
-			display();
+			var offsetInitial =  -1 * x(brush.extent()[0]);
+			ready = true;
+			display(true, true);
 
+			function brushed () {
+				drawing = false;
+				if (d3.event.mode == "move")
+					display(false, false);
+				else
+					display(false, true);
+			}
+			
 			// updates the svg
-			function display () {
+			function display (resized, scaled) {
+				if (!ready)
+					return;
+				
 			
 				var startTime = performance.now();
 				
 				var polys, labels, lines;
 				var minExtent = brush.extent()[0];
 				var maxExtent = brush.extent()[1];
-				var visItems = items.filter(function (d) { return d.start < maxExtent && d.end > minExtent});
+				var visItems = items;
 				var visDeps = dependencies;
+				
 
-				mini.select('.brush').call(brush.extent([minExtent, maxExtent]));		
+				mini.select('.brush').call(brush.extent([minExtent, maxExtent]));
+				var offset = -1 * x1(brush.extent()[0]) - offsetInitial;
+				itemPolys.attr('transform', 'translate(' + offset + ', 0)');
+				itemArrows.attr('transform', 'translate(' + offset + ', 0)');
+				itemLabels.attr('transform', 'translate(' + offset + ', 0)');
+					
+				if ( ! scaled )
+					return;
 				
-				var newHeight = parseInt($('#mainHeightFieldId').val());
-				if (!isNaN(newHeight))
-					mainRectHeight = newHeight;
+				var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
+				zoomScale = extentWidth / width;
+				x1.range([0, width / zoomScale]);
 				
-				x1.domain([minExtent, maxExtent]);
-				
-				// update the axis
-				main.select('.main.axis.minute').call(x1MinuteAxis);
-				main.select('.main.axis.hour').call(x1HourAxis)
+				$.each(items, function (i, d) {
+					d.points = getPoints(d);
+				});
 
 				// update any existing item polys
 				polys = itemPolys.selectAll('polygon')
 					.data(visItems, function (d) { return d.id; })
 					.attr('points', function(d) {
-						var p = getPoints(d);
+						var p = d.points;
 						return p.x + ',' + p.y + ' '
 							 + p.x2 + ',' + p.y + ' '
 							 + (p.x+p.w) + ',' + p.y2 + ' '
@@ -647,7 +687,7 @@ THE SOFTWARE.
 				polys.enter()
 					.append('polygon')
 					.attr('points', function(d) {
-						var p = getPoints(d);
+						var p = d.points;
 						return p.x + ',' + p.y + ' '
 							 + p.x2 + ',' + p.y + ' '
 							 + (p.x+p.w) + ',' + p.y2 + ' '
@@ -658,13 +698,13 @@ THE SOFTWARE.
 					.attr('id', function(d) { return 'task-' + d.id; })
 					.on("click", function(d) {
 						toggleTaskSelection(d);
-						display();
+						display(false, false);
 					})
 					.on("dblclick", function(d) {
 						showAssetComment(d.id, 'show');
 					})
 					.append('title')
-					.html(function(d) { return d.name + ' - ' + d.assignedTo + ' - ' + d.status; });
+					.html(function(d) { return d.number + ': ' + d.name + ' - ' + d.assignedTo + ' - ' + d.status; });
 					
 				polys.exit().remove();
 				
@@ -683,9 +723,12 @@ THE SOFTWARE.
 						var highest = start + (end - start) * 0.25;
 						return Math.round(Math.min( highest, start+anchorOffset ));
 					})
-					.attr('y1', function(d) { return getPoints(d.predecessor).y2; })
-					.attr('y2', function(d) { return getPoints(d.successor).y2; })
 					.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
+				
+				if (resized)
+					lines
+						.attr('y1', function(d) { return d.predecessor.points.y2; })
+						.attr('y2', function(d) { return d.successor.points.y2; })
 				
 				// add any dependency lines in the new domain extents
 				lines.enter().insert('line')
@@ -701,8 +744,8 @@ THE SOFTWARE.
 						var highest = start + (end - start) * 0.25;
 						return Math.round(Math.min( highest, start+anchorOffset ));
 					})
-					.attr('y1', function(d) { return getPoints(d.predecessor).y2; })
-					.attr('y2', function(d) { return getPoints(d.successor).y2; })
+					.attr('y1', function(d) { return d.predecessor.points.y2; })
+					.attr('y2', function(d) { return d.successor.points.y2; })
 					.attr('id', function(d) { return 'dep-' + d.predecessor.id + '-' + d.successor.id; })
 					.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
 				
@@ -710,48 +753,54 @@ THE SOFTWARE.
 				// move any selected lines to the top of the DOM
 				lines.sort(function (a, b) { return a.selected - b.selected; });
 				lines.exit().remove();
+
 				
 				// update the item labels
 				labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
 					.data(visItems, function (d) { return d.id; })
-					.attr('x', function(d) { return getPoints(d).x; })
-					.attr('y', function(d) { return getPoints(d).y; })
-					.attr('width', function(d) { return getPoints(d).w; })
-					.attr('height', function(d) { return getPoints(d).h; })
+					.attr('x', function(d) { return d.points.x; })
+					.attr('width', function(d) { return (d.points.w - anchorOffset); })
 					.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
+					
+				if (resized)
+					labels
+						.attr('y', function(d) { return d.points.y; })
+						.attr('height', function(d) { return d.points.h; })
 				
 				// update the item labels' children
 				itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
 					.selectAll(':first-child')
-					.attr('style', function(d) { return 'height: ' + getPoints(d).h + 'px !important;max-width: ' + getPoints(d).w + 'px !important;'; })
+					.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
 					.selectAll(':first-child')
 					.selectAll(':first-child')
-					.attr('style', function(d) { return 'width: ' + getPoints(d).w + 'px !important;max-width: ' + getPoints(d).w + 'px !important;'; });
+					.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; });
 				
 				// add any labels in the new domain extents
 				labels.enter().append('foreignObject')
 					.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
 					.attr('id', function(d) { return 'label-' + d.id; })
-					.attr('x', function(d) { return getPoints(d).x; })
-					.attr('y', function(d) { return getPoints(d).y; })
-					.attr('width', function(d) { return getPoints(d).w; })
-					.attr('height', function(d) { return getPoints(d).h; })
+					.attr('x', function(d) { return d.points.x; })
+					.attr('y', function(d) { return d.points.y; })
+					.attr('width', function(d) { return (d.points.w - anchorOffset); })
+					.attr('height', function(d) { return d.points.h; })
 					.append('xhtml:body')
-					.attr('style', function(d) { return 'height: ' + getPoints(d).h + 'px !important;max-width: ' + getPoints(d).w + 'px !important;'; })
+					.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
 					.attr('class', 'itemLabel')
 					.append('div')
 					.attr('class', 'itemLabel')
 					.attr('align', 'center')
 					.append('p')
 					.attr('class', 'itemLabel')
-					.attr('style', function(d) { return 'width: ' + getPoints(d).w + 'px !important;max-width: ' + getPoints(d).w + 'px !important;'; })
-					.html(function (d) { return d.name; });
+					.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
+					.html(function (d) { return d.number + ': ' + d.name; });
 
 				labels.exit().remove();
-
+				
 				// updates the mini graph
 				miniPolys
 					.attr('class', function(d) { return 'miniItem ' + getClasses(d); });
+				
+				console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
 			}
 			
 			// clears all items from the main group then redraws them
@@ -759,7 +808,7 @@ THE SOFTWARE.
 				itemPolys.selectAll('polygon').remove();
 				itemArrows.selectAll('line').remove();
 				itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); }).remove();
-				display();
+				display(true, true);
 			}
 			
 			// gets the css classes that apply to task @param d
@@ -793,7 +842,7 @@ THE SOFTWARE.
 				var y = (d.stack-offset) * mainRectHeight + 0.4 * mainRectHeight + 0.5;
 				var w = x1(d.end) - x1(d.start);
 				var h = (mainRectHeight) * Math.max(1, d.height) - (mainRectHeight * 0.2);
-				var x2 = x + w - 10;
+				var x2 = x + w - anchorOffset;
 				var y2 = y + (h/2);
 				return {x:x, y:y, x2:x2, y2:y2, w:w, h:h};
 			}
@@ -865,6 +914,8 @@ THE SOFTWARE.
 				
 				if ( ! selecting )
 					taskSelected = null;
+					
+				display(true, true);
 			}
 			
 			// moves the brush to the selected location
@@ -883,7 +934,7 @@ THE SOFTWARE.
 				}
 
 				brush.extent([start,end]);
-				display();
+				display(true, false);
 			}
 			
 			// cuts off any labels that extend outside of their task's polygon
@@ -1138,7 +1189,7 @@ THE SOFTWARE.
 				var newStart = midpoint - (halfExtent*delta);
 				var newEnd = midpoint + (halfExtent*delta);
 				brush.extent([new Date(newStart),new Date(newEnd)]);
-				display();
+				display(true, true);
 			}
 			
 			/*	Reconstructs the data in @param tasks for d3 by:
@@ -1157,7 +1208,7 @@ THE SOFTWARE.
 					items[i].redundantPredecessors = [];
 				}
 				
-				// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical			
+				// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
 				for (var i = 0; i < Object.keys(data.cyclicals).size(); i++) {
 					var key = parseInt(Object.keys(data.cyclicals)[i]);
 					var predecessor = items[binarySearch(items, key, 0, items.length-1)];
@@ -1222,7 +1273,7 @@ THE SOFTWARE.
 					items[i].redundantPredecessors = [];
 				}
 				
-				// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created 
+				// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
 				for (var i = 0; i < items.length; ++i)
 					if (items[i].predecessorIds)
 						for (var j = 0; j < items[i].predecessorIds.length; ++j) {
@@ -1502,8 +1553,14 @@ THE SOFTWARE.
 						task.start = latest;
 					}
 				}
-				if ( ! task.end )
-					task.end = new Date(task.start.getTime() + (task.endInitial.getTime()-task.startInitial.getTime()))
+				if ( ! task.end ) {
+					if (task.root) {
+						task.start = new Date(task.start.getTime()-2);
+						task.end = new Date(task.start.getTime()-1);
+					} else {
+						task.end = new Date(task.start.getTime() + (task.endInitial.getTime()-task.startInitial.getTime()));
+					}
+				}
 				return task.end;
 			}
 			
@@ -1540,7 +1597,8 @@ THE SOFTWARE.
 			var params = {};
 			if (event != 0)
 				params = {'moveEventId':event};
-							
+			$('#spinnerId').css('display', 'block');
+			
 			jQuery.ajax({
 				dataType: 'json',
 				url: 'taskTimelineData',
@@ -1553,7 +1611,7 @@ THE SOFTWARE.
 	</head>
 	<body>
 		<div class="body">
-			<h1>Task Graph</h1>
+			<h1>Task Timeline</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
@@ -1561,6 +1619,7 @@ THE SOFTWARE.
 			&nbsp; Role: <select name="roleSelect" id="rolesSelectId"></select>
 	            &nbsp; Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30"/>
 			&nbsp; Use Heights: <input type="checkbox" id="useHeightCheckBoxId" checked="checked"/>
+			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<g:render template="../assetEntity/commentCrud"/>
 		</div>
 	</body>

@@ -643,9 +643,6 @@ digraph runbook {
 		
 		// generate optimized schedule based on this data
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
-		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
-		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def startDate = TimeUtil.convertInToUserTZ(dfsMap.starts[0].estStart, tzId) ?: TimeUtil.nowGMT()
@@ -661,9 +658,9 @@ digraph runbook {
 			def role = t.role ?: 'NONE'
 			if ( ! (role in roles) )
 				roles.push(role)
-			items.push([ id:t.id, name:t.comment, startInitial:tmp['tasks'][t.id].tmpEarliestStart, endInitial:tmp['tasks'][t.id].tmpEarliestStart+t.duration,
-			predecessorIds:predecessorIds, criticalPath:tmp['tasks'][t.id].tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
-			role:role])
+			items.push([ id:t.id, name:t.comment, startInitial:0, endInitial:0,
+			predecessorIds:predecessorIds, criticalPath:false, assignedTo:t.assignedTo.toString(), status:t.status,
+			role:role, number:t.taskNumber])
 		}
 		
 		def sinks = []
