@@ -69,7 +69,7 @@
 				}
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
-						"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject){

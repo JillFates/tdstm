@@ -123,7 +123,7 @@
                   </script><span><input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="startTime" name="startTime"
         					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
         					onchange="isValidDate(this.value, this.id,'startTimeImg')"/></span>
-        					<span id="startTimeImg" style="display: none;"><img src="${resource(dir:'images/skin',file:'exclamation.png')}"></span>
+        					<span id="startTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     		<div class="errors">
                       			<g:renderErrors bean="${moveBundleInstance}" as="list" field="startTime"/>
@@ -145,7 +145,7 @@
                   			id="completionTime" name="completionTime"
 				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
 				        onchange="isValidDate(this.value, this.id, 'completionTimeImg')"/></span>
-				        <span id="completionTimeImg" style="display: none;"><img src="${resource(dir:'images/skin',file:'exclamation.png')}"></span>
+				        <span id="completionTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
 				                    <div class="errors">
 				                      <g:renderErrors bean="${moveBundleInstance}" as="list" field="completionTime"/>
@@ -303,14 +303,14 @@
 														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
-													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'images/skin',file:'exclamation.png')}"></span>
+													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>
 												<div style="float: left;">
 													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
 														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 														</span>
-													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'images/skin',file:'exclamation.png')}"></span>
+													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>	
 											</td>
 										</tr>
@@ -355,7 +355,7 @@
 											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
 										</div>
 										<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
-											<img src="${resource(dir:'images/skin',file:'exclamation.png')}">
+											<img src="${resource(dir:'icons',file:'exclamation.png')}">
 										</div>
 									</g:if>
 									<g:else>
@@ -364,7 +364,7 @@
 											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
 										</div>
 										<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
-											<img src="${resource(dir:'images/skin',file:'exclamation.png')}">
+											<img src="${resource(dir:'icons',file:'exclamation.png')}">
 										</div>
 									</g:else>
 								</td>
@@ -402,14 +402,14 @@
 													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
-													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'images/skin',file:'exclamation.png')}"></span>
+													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>
 												<div style="float: left;">
 													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
 													value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 													</span>
-													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'images/skin',file:'exclamation.png')}"></span>
+													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>
 											</td>
 										</tr>
@@ -452,7 +452,7 @@
 											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" onchange="validateManulaValue(this.value, ${dashboardStep.step.id })" />%
 									</div>
 									<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
-										<img src="${resource(dir:'images/skin',file:'exclamation.png')}">
+										<img src="${resource(dir:'icons',file:'exclamation.png')}">
 									</div>
 								</td>
 								<td>

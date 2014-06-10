@@ -565,7 +565,7 @@ function showAssetDialog( e , action ) {
 			      
 			      
 			      var image = document.createElement('img');
-			      image.src = "../images/skin/database_edit.png"
+			      image.src = "../icons/database_edit.png"
 			      image.border = 0
 			      var link = document.createElement('a');
 			      //link.href = '#'
@@ -977,7 +977,7 @@ function showAssetDialog( e , action ) {
 				  verifyTd.name = assetComments.assetComment.id
 				  verifyTd.onclick = function(){new Ajax.Request(contextPath+'/assetEntity/showComment?id='+this.name,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog( e , 'show' );commentChangeShow();}})}
 				  var image = document.createElement('img');
-			      image.src = "../images/skin/database_edit.png"
+			      image.src = "../icons/database_edit.png"
 			      image.border = 0
 				  var link = document.createElement('a');
 				  link.href = '#'

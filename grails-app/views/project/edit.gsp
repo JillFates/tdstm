@@ -127,7 +127,7 @@
 							<td class="name"><label for="client">Partner Image:</label>
 							</td>
 							<g:if test="${projectLogoForProject}">
-							<td class="valueNW"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'images',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
+							<td class="valueNW"><g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link></td>
 							</g:if>
 							<g:else>				
 							<td class="valueNW">

@@ -17,7 +17,7 @@
 		<tbody id="listCommentsTbodyIds">
 		<g:each status="i" in="${assetCommentList}"  var="commentList">
 		<tr style="cursor: pointer;" class="${commentList.status == 'Completed' || commentList.status=='Pending' ? 'resolved' : 'ready' }">
-			<td><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${resource(dir:'images/skin',file:'database_edit.png')}" border="0px"/></a></td>
+			<td><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px"/></a></td>
 			<td onclick="javascript:showComment(${commentList.id},'show')" style="text-align: center;">${commentList.taskNumber ?:'c'}</td>
 			<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
 			<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.status}</td>

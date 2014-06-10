@@ -41,7 +41,7 @@
 							<td nowrap="nowrap">
 							<g:checkBox name="checkBox" id="checkId_${asset.id}" ></g:checkBox>
 							<a href="javascript:editEntity('dependencyConsole','Server', ${asset.id})"><img
-									src="/tdstm/images/skin/database_edit.png" border="0px" />
+									src="/tdstm/icons/database_edit.png" border="0px" />
 							</a> <span id="icon_15651">
 							 <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">

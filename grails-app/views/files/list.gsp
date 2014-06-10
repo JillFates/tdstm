@@ -94,7 +94,7 @@
 				
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var editButton = '<a href="javascript:editEntity(\'files\',\''+rowObject[7]+'\','+options.rowId+')">'+
-							"<img src='${resource(dir:'images/skin',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					if(rowObject[6]=='issue'){
 						var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
 							+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"

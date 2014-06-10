@@ -35,7 +35,7 @@
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${database.id}" ></g:checkBox>
 							<a href="javascript:editEntity('dependencyConsole','Database', ${database.id})"><img
-									src="/tdstm/images/skin/database_edit.png" border="0px" />
+									src="/tdstm/icons/database_edit.png" border="0px" />
 							</a> <span id="icon_15651"> <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+database.id+' and commentType = ? and isResolved = ?',['issue',0])}">
 							   <g:remoteLink controller="assetEntity" action="listComments" id="${database.id}" before="setAssetId('${database.id}');" onComplete="listCommentsDialog(e,'never');">
 							      <img id="comment_${database.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />

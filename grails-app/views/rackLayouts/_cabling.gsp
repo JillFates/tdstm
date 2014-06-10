@@ -318,7 +318,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
       </td>
       <td ng-show="showRow(cable.cableId)">
       	<tds:hasPermission permission="EditModel">
-	     	<img src="${resource(dir:'images',file:'delete.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
+	     	<img src="${resource(dir:'icons',file:'delete.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
 			<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;"/>
 		</tds:hasPermission>
       </td>
