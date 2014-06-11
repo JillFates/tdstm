@@ -26,7 +26,7 @@ THE SOFTWARE.
 		<title>Task Graph</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<g:javascript src="jquery-1.9.1.js"/>	
-		<script type="text/javascript" src="${resource(dir:'d3',file:'d3.js')} "></script>
+		<g:javascript src="d3/d3.min.js"/>
 		<script type="text/javascript">
 		
 		var container = null;
