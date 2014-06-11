@@ -266,19 +266,19 @@
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							</tbody>
 							
-							<tr>
-								<td class="label" nowrap="nowrap"><label for="events">Event</label>
-								</td>
-								<td colspan="7"><g:each in="${moveEventList}" var="moveEvent">
-										<div class="label"
-											style="float: left; width: auto; padding: 5px;">
-											<label for="moveEvent"><b>${moveEvent.name}</b>
-											</label> <label for="moveEvent"> <g:select id="okToMove_${moveEvent.id}" class="ynselect" name="okToMove_${moveEvent.id}" from="${['Y', 'N']}" 
-											value="?" noSelection="['':'?']" />
-											</label>
-										</div>
-									</g:each></td>
-							</tr>
+<%--							<tr>--%>
+<%--								<td class="label" nowrap="nowrap"><label for="events">Event</label>--%>
+<%--								</td>--%>
+<%--								<td colspan="7"><g:each in="${moveEventList}" var="moveEvent">--%>
+<%--										<div class="label"--%>
+<%--											style="float: left; width: auto; padding: 5px;">--%>
+<%--											<label for="moveEvent"><b>${moveEvent.name}</b>--%>
+<%--											</label> <label for="moveEvent"> <g:select id="okToMove_${moveEvent.id}" class="ynselect" name="okToMove_${moveEvent.id}" from="${['Y', 'N']}" --%>
+<%--											value="?" noSelection="['':'?']" />--%>
+<%--											</label>--%>
+<%--										</div>--%>
+<%--									</g:each></td>--%>
+<%--							</tr>--%>
 						</tbody>
 					</table>
 					

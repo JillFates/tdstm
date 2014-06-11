@@ -268,18 +268,18 @@
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							</tbody>
 							<tr>
-							<tr>
-								<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>
-								<td colspan="7">
-									<g:each in="${moveEvent}" var="moveEventList">
-										<div  class="label" style="float: left;width: auto;padding: 5px;" ><label for="moveEvent"><b>${moveEventList?.name}</b></label>
-	      								    <g:select id="okToMove__${moveEventList?.id}" class="ynselect" name="okToMove_${moveEventList?.id}" from="${['Y', 'N']}" value="${AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,moveEventList)?.value}" noSelection="['':'?']" />
-		                                  </label>
-		                                </div>
-									</g:each>
-								</td>
-								
-							</tr> 
+<%--							<tr>--%>
+<%--								<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>--%>
+<%--								<td colspan="7">--%>
+<%--									<g:each in="${moveEvent}" var="moveEventList">--%>
+<%--										<div  class="label" style="float: left;width: auto;padding: 5px;" ><label for="moveEvent"><b>${moveEventList?.name}</b></label>--%>
+<%--	      								    <g:select id="okToMove__${moveEventList?.id}" class="ynselect" name="okToMove_${moveEventList?.id}" from="${['Y', 'N']}" value="${AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,moveEventList)?.value}" noSelection="['':'?']" />--%>
+<%--		                                  </label>--%>
+<%--		                                </div>--%>
+<%--									</g:each>--%>
+<%--								</td>--%>
+<%--								--%>
+<%--							</tr> --%>
 						</tbody>
 					</table>
 				</div></td>
