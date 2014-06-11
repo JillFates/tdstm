@@ -132,10 +132,10 @@
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" 
 									value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
-								<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+								<td class="label ${config.appOwner}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.owner} suffleSelect personContact assetSelect" optionKey="id" 
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.appOwner} suffleSelect personContact assetSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="23" 

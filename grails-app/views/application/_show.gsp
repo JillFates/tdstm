@@ -39,8 +39,8 @@
 		<tr>
 			<td class="label ${config.appTech}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
 			<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
-			<td class="label ${config.owner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-			<td class="valueNW ${config.owner}">${applicationInstance.appOwner?.lastNameFirst}</td>
+			<td class="label ${config.appOwner}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
+			<td class="valueNW ${config.appOwner}">${applicationInstance.appOwner?.lastNameFirst}</td>
 			<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
 			<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
 			<td class="label ${config.drRpoDesc}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
