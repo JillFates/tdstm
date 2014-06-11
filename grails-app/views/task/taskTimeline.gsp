@@ -237,6 +237,9 @@ THE SOFTWARE.
 		});
 		
 		function buildGraph (response, status) {
+			
+			// show the loading spinner
+			$('#spinnerId').css('display', 'block');
 		
 			// check for errors in the ajax call
 			if (status == 'error') {
@@ -246,7 +249,8 @@ THE SOFTWARE.
 				if (response.responseText == 'cyclical')
 					message.html('This event\'s task data contains a cyclical dependency sturcture, so no graph can be generated');
 				else
-					message.html('not enough task data to create a graph for this event');
+					message.html('<br />not enough task data to create a graph for this event');
+				$('#spinnerId').css('display', 'none');
 				return;
 			}
 
