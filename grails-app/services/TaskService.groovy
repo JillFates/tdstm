@@ -1943,7 +1943,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 										// Set flag that this is a funnelling task so that the predecessor logic will move all assets through it
 										t.metaClass.setProperty('tmpIsFunnellingTask', true)		
 										taskList[t.id] = t
-										taskSpecTasks[taskSpec.id] << t
+										// taskSpecTasks[taskSpec.id] << t
 									}
 									taskSpecTasks[taskSpec.id] = actionTasks
 									tasksNeedingPredecessors.addAll(actionTasks)
@@ -2600,8 +2600,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// Iterate over the associated assets that were stuffed into the task.associatedAssets list
 								def foundPred=false
 								tnp.associatedAssets.each() { assocAsset ->
-									// Let's stuff the asset into the task and then wire up the predecessors 
+									// If an asset already has existing task, need to wire up the predecessor
 									if (assetsLatestTask.containsKey(assocAsset.id)) {
+										// Let's temporially stuff the asset into the task and then wire up the predecessors 
 										tnp.assetEntity = assocAsset
 										linkTaskToLastAssetOrMilestone(tnp)
 										foundPred = true
@@ -3054,35 +3055,37 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		log.info "createTaskDependency: ** START - Creating dependency count=$count predecessor=$predecessor, successor=$successor"
 
-		// Need to see if the dependency was previously created. In addition, in the case of a missed dependency where there is a reversed
-		// taskSpec dependency (e.g. Auto App Shutdowns) we can get into the situation where a dependency is improperly created so we'll
-		// only create the first, which is created by the missed dependency (e.g. db -> app and later app -> db)
-		// TODO : change to use local memory list
-		if ( TaskDependency.findByAssetCommentAndPredecessor(successor, predecessor) || 
-			 TaskDependency.findByAssetCommentAndPredecessor(predecessor, successor) ) {
-			log.info "createTaskDependency: dependency already exists"
-
-			// See if the current task is a funnelling type task and if so, then we probably want to update the asset of the successor task to this task ?? 
-			return count
-		}
-
 		if (predecessor.id == successor.id) {
 			throw new RuntimeException("Attempted to create dependency where predecessor and successor are the same task ($predecessor)")
 		}
 
-		/*
-		if (settings.deferPred) {
-			throw new RuntimeException("createTaskDependency: shouldn't be called with predecessor.defer:'${settings.deferPred}' ($predecessor), succ ($successor)")			
-		}
-		*/
+		def dependency
 
-		def dependency = new TaskDependency( predecessor:predecessor, assetComment:successor )
-		if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
-			throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error:${GormUtil.errorsAsUL(dependency)}, ")
-		}
-		out.append("Created dependency (${dependency.id}) between $predecessor and $successor<br/>")
-		count++
+		// Need to see if the dependency was previously created. In addition, in the case of a missed dependency where there is a reversed
+		// taskSpec dependency (e.g. Auto App Shutdowns) we can get into the situation where a dependency is improperly created so we'll
+		// only create the first, which is created by the missed dependency (e.g. db -> app and later app -> db)
+		// 
+		// In the case of containers (set, truck, rack, etc) this method will get called repeatedly for each of the assets so we only create the first dependency but
+		// then need to bump the latest task for each of the assets appropriately. Keep in mind that the calling logic stuffs each of the assets into the task before
+		// calling this method. It's a bit convoluted...
 
+		// TODO : change to use local memory list
+		dependency = TaskDependency.findByAssetCommentAndPredecessor(successor, predecessor)
+		if (!dependency)
+			dependency = TaskDependency.findByAssetCommentAndPredecessor(predecessor, successor)
+
+		if (dependency) {
+			log.info "createTaskDependency: dependency already exists"
+
+		} else {
+			dependency = new TaskDependency( predecessor:predecessor, assetComment:successor )
+			if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
+				throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br/>Error:${GormUtil.errorsAsUL(dependency)}, ")
+			}
+			out.append("Created dependency (${dependency.id}) between $predecessor and $successor<br/>")
+			count++
+		}
+		
 		// Mark the predecessor task that it has a successor so it doesn't mess up the milestones
 		if ( ! predecessor.metaClass.hasProperty(predecessor, 'hasSuccessorTaskFlag') )
 			predecessor.metaClass.setProperty('hasSuccessorTaskFlag', true)
@@ -3109,71 +3112,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			//assetsLatestTask[successor.assetEntity.id] = successor
 			log.info "createTaskDependency: Updated assetsLatestTask for asset ${successor.assetEntity} with successor $successor"			
 		}
-/*
-		if (settings.isRequired && ! settings.deferSucc) {
-			// Update the task in the task list that it has a successor which is used by Milestones
-			// TODO - Why wouldn't a task be in the list? if not there, then we might want to warn or add?
-			if ( taskList.containsKey(predecessor.id) ) {
-				log.info "createTaskDependency: Setting hasSuccessorTaskFlag=true on task ${taskList[predecessor.id]}"
-				taskList[predecessor.id].metaClass.setProperty('hasSuccessorTaskFlag', true)
-			} else {
-				throw new RuntimeException("Unable to find predecessor task $predecessor for successor task $successor in taskList")
-//				log.error "createTaskDependency: unable to find predecessor task $predecessor for successor task $successor in taskList"
-			}
-		}
-*/
 
 		// Handling deferring dependency relationships when taskSpec indicates to successor.defer:'key'
 		if (settings.deferSucc) {
 			setDeferment(successor, successor.assetEntity, 's', settings.deferSucc, settings) 
 
-			// Bump the last task up so that subsequent tasks are bound to this task
-//			if (successor.assetEntity)
-//				assetsLatestTask[successor.assetEntity.id] = successor
 		}
-
-		// Handle gathering all previously deferred tasks for an asset and setup predecessor relationships
-/*
-		if (settings.gatherSucc) {
-			count += gatherDeferment(taskList, assetsLatestTask, successor, 's', settings.gatherSucc, settings, out)
-		} 
-*/
-/*
-		// Handle gathering all previously deferred tasks for an asset and setup predecessor relationships
-		if (settings.gatherSucc) {
-			out.append("createTaskDependency: gatherSucc - successor $successor (${successor.assetEntity}0</br>")
-		
-			if (successor.assetEntity) {
-				def gatheredTasks = taskList.findAll { id, t -> t.metaClass?.hasProperty(t, 'tmpDeferredDep') && 
-					t.tmpDeferredDep?.id == successor.assetEntity.id
-				}
-				log.debug "createTaskDependency: checking for tasks to gather $successor, found ${gatheredTasks} deferred tasks"
-				gatheredTasks.each { k, defPredTask ->
-					// This is a possibility that the successor task will have been marked as deferred by a previous bump so we have to 
-					// double check that the tasks are different.
-					if ( defPredTask.id != successor.id ) {
-						log.debug "createTaskDependency: gathered predecessor task ($defPredTask) to successor task ($successor)"
-						count += createTaskDependency(defPredTask, successor, taskList, assetsLatestTask, settings, out)
-						// assetsLatestTask[]
-						// Mark the task as having been gathered
-						if (defPredTask.assetEntity) 
-							assetsLatestTask[defPredTask.assetEntity.id] = successor
-
-						taskList[defPredTask.id].tmpDeferredDep = null
-					}
-				}
-			} else {
-				throw new RuntimeException("Invalid use of 'gather' as the task spec (${successor.taskSpec}) must reference an asset")					
-			}
-		}
-*/
-
-		// If this successor is pointing back to a predecessor that has a deferral, then we need to bump the deferral onto the successor
-		//if (! deferSucc && ! gatherSucc && predecessor.metaClass.hasProperty(predecessor, 'tmpDeferredDep') && predecessor.tmpDeferredDep) {
-		//	log.debug "createTaskDependency: Bumped predecessor deferment to the successor (pred: $predecessor, succ: $successor"
-		//	successor.metaClass.setProperty('tmpDeferredDep', predecessor.tmpDeferredDep)
-		//	predecessor.tmpDeferredDep = null
-		//}
 
 		// Here is the recursive loop if the predecessor has a peer
 		if (predecessor.metaClass?.hasProperty(predecessor, 'chainPeerTask')) {
@@ -3816,6 +3760,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// The following two variables will be assigned closures in the switch statement below, which will be subsequently used
 		// in the loop it go through the array of assetsForAction.
+		//
 		def findAssets			// Finds all the assets in the assetsForAction list that match the action
 		def validateForTask		// Used in iterator over the assets to determine if it should be associated to the current task
 		
