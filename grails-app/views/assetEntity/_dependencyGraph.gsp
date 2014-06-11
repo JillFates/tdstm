@@ -8,19 +8,19 @@ $(document).ready(function() {
 	var isAppChecked = $('#appChecked').val()
 	var isServerChecked = $('#serverChecked').val()
 	var isFilesChecked = $('#filesChecked').val()
-	if(isAppChecked=='true'){
-		  $('#appLabel').attr('checked',true)
-	}else{
-	  	  $('#appLabel').attr('checked',false)
+	if (isAppChecked == 'true') {
+		$('#appLabel').attr('checked',true)
+	} else {
+		$('#appLabel').attr('checked',false)
 	}
-	if(isServerChecked=='true'){
-	  $('#serverLabel').attr('checked',true)
-	}else{
-	  $('#serverLabel').attr('checked',false)
+	if (isServerChecked=='true') {
+		$('#serverLabel').attr('checked',true)
+	} else {
+		$('#serverLabel').attr('checked',false)
 	}
-	if(isFilesChecked=='true'){
-      $('#filesLabel').attr('checked',true)
-	}else{
+	if (isFilesChecked == 'true') {
+		$('#filesLabel').attr('checked',true)
+	} else {
 	  $('#filesLabel').attr('checked',false)
 	}
 	
@@ -90,21 +90,21 @@ function listCheck(){
 }
 function depConsoleLabelUserpref($me,forWhom){
 	var isChecked = $me.is(":checked")
-    jQuery.ajax({
-        url:contextPath+'/assetEntity/setImportPerferences',
-        data:{'selected':isChecked, 'prefFor':forWhom}
-    });
+	jQuery.ajax({
+		url:contextPath+'/assetEntity/setImportPerferences',
+		data:{'selected':isChecked, 'prefFor':forWhom}
+	});
 }
 
-  $('#forceId').val($('#force').val())
-  $('#linksSizeId').val($('#distance').val())
-  $('#frictionId').val($('#friction').val())
-  $('#heightId').val($('#height').val())
-  $('#widthId').val($('#width').val())
-  $('#listCheckId').val(listCheck())
-  
+$('#forceId').val($('#force').val())
+$('#linksSizeId').val($('#distance').val())
+$('#frictionId').val($('#friction').val())
+$('#heightId').val($('#height').val())
+$('#widthId').val($('#width').val())
+$('#listCheckId').val(listCheck())
 
-  $('#tabTypeId').val('graph')
+
+$('#tabTypeId').val('graph')
   
 </script>
 <div class="tabs">

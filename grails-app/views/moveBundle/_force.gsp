@@ -12,7 +12,7 @@ line.link.selected {
 </style>
 <script type="text/javascript">
 // If there is already an instance of force running in memory, it should be stopped before creating this one
-if(force != null) {
+if (force != null) {
 	console.log("Force is not null, force="+force)
 	force.stop()
 }
@@ -71,6 +71,9 @@ var graph
 var defaults = ${defaultsJson}
 var links = ${links}
 var nodes = ${nodes}
+console.log(" ********************************* ");
+console.log(links);
+console.log(nodes);
 var graphstyle = "top:-120;z-index:-1;"
 var	r = 5
 var	fill = d3.scale.category20()
@@ -129,8 +132,8 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	vis = canvas
 		.append('svg:g')
 			.on("dblclick.zoom", null)
-			.style('width', '100%')
-			.style('height', '100%')
+			.style('width', 'auto')
+			.style('height', 'auto')
 		.append('svg:g')
 	
 	
@@ -347,7 +350,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	
 	// Toggles selection of a node
-	function toggleNodeSelection(id) {
+	function toggleNodeSelection (id) {
 		
 		if (nodeSelected == -1 && id == -1)
 			return // No node is selected, so there is nothing to deselect
@@ -400,7 +403,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		}
 		
 		// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-		if(selecting) {
+		if (selecting) {
 			var selection = d3.selectAll('svg g g g')
 			selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
 				.concat(d3.selectAll('svg g g path').filter(':not(.selected)')[0])

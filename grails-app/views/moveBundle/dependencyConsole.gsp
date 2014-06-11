@@ -12,8 +12,8 @@
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
-		<script type="text/javascript" src="${resource(dir:'d3',file:'d3.js')} "></script>
-		<link rel="stylesheet" href="${resource(dir:'d3/force',file:'force.css')}" type="text/css"/>
+		<g:javascript src="d3.min.js"/>
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		
 		<script type="text/javascript">

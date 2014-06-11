@@ -163,7 +163,7 @@
 	</table>
 </div>
 
-<g:render template="../d3/force/force" model="${pageScope.variables}"/>
+<g:render template="../moveBundle/force" model="${pageScope.variables}"/>
 
 <script type="text/javascript">
 	buildMap(null, null, null, null, $('#item1').innerWidth(), $('#item1').innerHeight()-50);
