@@ -57,10 +57,12 @@ $('#svgContainerId')
 		minHeight: 400,
 		minWidth: 1000,
 		helper: "ui-resizable-helper",
-		stop: function(e, ui) {	
+		stop: function(e, ui) {
 			$('#heightId').val($(this).height());
 			$('#widthId').val($(this).width());
 			rebuildMap($("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $(this).width(), $(this).height());
+			$(this).width('');
+			$(this).height('');
 		}
 	});
 var zoomBehavior;
@@ -75,8 +77,8 @@ console.log(" ********************************* ");
 console.log(links);
 console.log(nodes);
 var graphstyle = "top:-120;z-index:-1;"
-var	r = 5
-var	fill = d3.scale.category20()
+var r = 5
+var fill = d3.scale.category20()
 var gravity = ${multiple?0.05:0}
 var maxWeight
 
@@ -98,8 +100,11 @@ var floatMode = false;
 			
 // Build the layout model
 function buildMap (charge, linkSize, friction, theta, width, height) {
+	
+	console.log('building map with a height of ' + height + ' pixels');
+	
 	$('#item1').css('width', 'auto');
-	$('#item1').css('height', '');
+	$('#item1').css('height', 'auto');
 
 	// Use the new parameters, or the defaults if not specified
 	var charge 	 =	( charge	? charge 	: defaults['force'] 	);

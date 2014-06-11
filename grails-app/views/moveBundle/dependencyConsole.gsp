@@ -52,7 +52,7 @@
 	<body>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body">
-		<div style="min-width: 1000px;">
+		<div id="DependencyGroupsTableId" style="min-width: 1000px;">
 			<div id="dependencyTitle" style="float: left;">
 				<h1>Dependency Analyzer</h1>
 				<div style="position:absolute;margin: -25px 176px 0;">
@@ -269,6 +269,10 @@
 					$(".compactClass").hide();
 				else
 					$(".compactClass").show();
+				if ($('#item1 svg').size() > 0) {
+					updateHeight();
+					rebuildMap($("#force").val(), $("#linkSize").val(), $("#friction").val(), $("#theta").val(), $("#widthId").val(), $("#heightId").val());
+				}
 			}
 		</script>
 	</body>

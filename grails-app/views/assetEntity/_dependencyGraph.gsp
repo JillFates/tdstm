@@ -24,8 +24,7 @@ $(document).ready(function() {
 	  $('#filesLabel').attr('checked',false)
 	}
 	
-	$('#item1').css('height', $(window).height() - 380);
-	$('#height').val($('#item1').innerHeight());
+	updateHeight();
 	$('#width').val($('#item1').innerWidth());
 	
 	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
@@ -54,10 +53,17 @@ function modifyParameter(action, id ){
 		alert((type.charAt(0).toUpperCase() + type.slice(1)) + " must be between " + minValue + " and " + maxValue)
 	
 	$("#"+id).val( value )
-	rebuildMap($("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $("#widthId").val(), $("#heightId").val())
+	rebuildMap($("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $("#widthId").val(), $("#heightId").val());
 }
 
-
+function updateHeight () {
+	var bottomMargin = 40;
+	var topMargin = 43;
+	var containerPadding = 8;
+	var graphOffset = $('#item1').offset().top;
+	$('#height').val($(window).height() - graphOffset - bottomMargin - topMargin - containerPadding);
+	$('#heightId').val($(window).height() - graphOffset - bottomMargin - topMargin - containerPadding);
+}
 
 function hidePanel(){
 	$('#controlPanel').css('display','none')
