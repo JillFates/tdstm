@@ -972,6 +972,7 @@ class CookbookService {
 		def teamCodes = []
 		if (partyRelationshipService) {
 			teamCodes = partyRelationshipService.getStaffingRoles()*.id
+			log.error "**** teamCodes == $teamCodes ****"
 		}
 
 		try {
@@ -1279,9 +1280,9 @@ class CookbookService {
 									team = false
 								}
 							}
-							if (! msg && team != false && !teamCodes.contains(team) ) {
+							if (! msg && team != false && teamCodes && !teamCodes.contains(team) ) {
 								log.debug "validating team $team"
-								msg = "$taskRef 'team' element references an invalid team name ${task.team}"
+								msg = "$taskRef 'team' element references an invalid team name ${task.team} ${teamCodes.size()}"
 							}
 						}
 						if (msg) {
