@@ -5223,6 +5223,7 @@ class AssetEntityController {
 		params.roomTarget = sourceBladeChassis?.roomTarget
 		params.rackTarget = sourceBladeChassis?.rackTarget
 	}
+	
 	/**
 	 * This method is used to sort AssetList in dependencyConsole
 	 * @param Assetlist
@@ -5230,16 +5231,17 @@ class AssetEntityController {
 	 * @param orderParam
 	 * @return list
 	 */
-	def sortAssetByColumn(assetlist, sortOn, orderBy){
-		assetlist.sort{ a,b->
-			if(orderBy == 'asc'){
-				(a?."${sortOn}".toString() <=> b."${sortOn}".toString())
+	def sortAssetByColumn (assetlist, sortOn, orderBy) {
+		assetlist.sort { a, b ->
+			if (orderBy == 'asc') {
+				(a?."${sortOn}".toString() <=> b?."${sortOn}".toString())
 			} else {
-				(b."${sortOn}".toString() <=> a?."${sortOn}".toString())
+				(b?."${sortOn}".toString() <=> a?."${sortOn}".toString())
 			}
 		}
 		return assetlist
 	}
+	
 	def getRacksPerRoom = {
 		def roomInstance = Room.get(NumberUtils.toInt(params.roomId))
 		def roomType= params.sourceType
