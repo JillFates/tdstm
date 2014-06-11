@@ -864,6 +864,7 @@ class CookbookService {
 	List<Map> basicValidateSyntax( sourceCode ) {
 		def errorList = [] as HashSet
 		def recipe
+		def msg
 
 		// Helper closure that compares the properties of a spec to a defined map
 		def validateAgainstMap
@@ -968,9 +969,9 @@ class CookbookService {
 			class:['device','database','application','storage']
 		]
 		
-		def ids = []
+		def teamCodes = []
 		if (partyRelationshipService) {
-			ids = partyRelationshipService.getStaffingRoles()*.id
+			teamCodes = partyRelationshipService.getStaffingRoles()*.id
 		}
 
 		try {
@@ -1256,15 +1257,35 @@ class CookbookService {
 						def successor = task.successor
 						if (! CU.isaMap(successor)) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
-								detail: "$taskRef 'successor' attribute is not a valid map definition" ]
+								detail: "$taskRef 'successor' element is not a valid map definition which requires at least one sub-element defined" ]
 						} 
 					}
 
+					// Validate that the team supports a valid team or if using indirect ref with a default, that the default is valid
 					if (task.containsKey('team')) {
-						if (!ids.isEmpty() && !ids.contains(task.team)) {
-							errorList << [ error: 1, reason: 'Invalid syntax',
-								detail: "$taskRef 'team' references a not valid staffing role ${task.team}" ]
-
+						msg = ''
+						def team = task.team
+						if (team) {
+							if (team[0]== '#') {
+								if (team.contains(',')) {
+									def split = team.split(',')*.trim()
+									if (split.size() != 2) {
+										msg = "Invalid syntax '$team' for 'team' attribute"
+									} else {
+										team = split[1]
+									}
+								} else {
+									// It is strictly an indirect reference so don't error at all
+									team = false
+								}
+							}
+							if (! msg && team != false && !teamCodes.contains(team) ) {
+								log.debug "validating team $team"
+								msg = "$taskRef 'team' element references an invalid team name ${task.team}"
+							}
+						}
+						if (msg) {
+							errorList << [ error: 1, reason: 'Invalid syntax', detail: msg ]
 						}
 					}
 

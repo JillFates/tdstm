@@ -4089,14 +4089,48 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		while (true) {
 			// Set the Team independently of the direct person assignment
 			if (taskSpec.containsKey('team')) {
+				def team = taskSpec.team
+				if (team) {
+					// Team can have an indirect reference and optional default team (e.g. '#custom3, SYS_ADMIN')
+					if (team[0]=='#') {
+						team = team[1..-1]
+						def defTeam
+						if (team.contains(',')) {
+							def split = team.split(',')*.trim()
+							if (split.size() != 2) {
+								msg = "Invalid syntax '$team' for 'team' attribute"
+								break
+							}
+							team = split[0]
+							defTeam = split[1]
+						}
+						try {
+							def teamProp = team
+							team = getIndirectPropertyRef(task.assetEntity, team)
+							if (! team ) {
+								if (defTeam) {
+									team = defTeam
+								} else {
+									msg = "Team not defined in property $teamProp for task $task"
+									break
+								}
+							}
+						} catch (e) {
+							e.printStackTrace()
+							msg = "${e.getMessage()}, team ($team)"
+							break
+						}
+					}
+				}
 				// Validate that the string is correct
-				if (staffingRoles.contains(taskSpec.team)) {
-					task.role = taskSpec.team
+				if (staffingRoles.contains(team)) {
+					task.role = team
 				} else {
 					msg = "Invalid team specified (${taskSpec.team})"
 					break
 				}
 			} else if (workflow && workflow.role_id) {
+				// Assign the default role/team for the workflow specified in the taskSpec
 				task.role = workflow.role_id
 			}
 
