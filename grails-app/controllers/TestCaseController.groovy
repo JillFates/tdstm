@@ -190,14 +190,20 @@ class TestCaseController {
 			results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
 			results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
 			results.append("Cyclical Maps: ")
+			
+			def cyclicals = [:]
+			dfsMap.cyclicals.each {
+				cyclicals.put(it.key, it.value.stack)
+			}
+			
 			// results.append(dfsMap.cyclicals)
 			if (dfsMap.cyclicals?.size()) {
 				results.append('<ol>')
-				dfsMap.cyclicals.each { root, list ->
-					def task = tasks.find { it.id == root }
+				dfsMap.cyclicals.each { c ->
+					def task = c.value.loopback
 					results.append("<li> Circular Reference Stack: <ul>")
 					// def marker = ''
-					list.each { cycTaskId ->
+					c.value.stack.each { cycTaskId ->
 						// results.append('<li>')
 						// def looper = cycTaskId == root
 						//def cycTaskNum = tasks.find { it.id == cycTaskId }?.taskNumber
@@ -205,7 +211,8 @@ class TestCaseController {
 						results.append("<li>$task.taskNumber $task.comment")
 						// results.append("<li>${looper?'<b>':''}$task.taskNumber $task.comment ${looper?'</b>':''}")
 						// if (!marker) marker = ' &gt; '
-					}  
+					}
+					results.append(" >> $c.value.loopback.taskNumber $c.value.loopback.comment</li>")
 					results.append('</ul>')
 				}
 				results.append('</ol>')

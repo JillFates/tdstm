@@ -138,7 +138,7 @@ class RunbookService {
 			// Check to see if we have entered into a cyclical map reference
 			if (stack.size() > 0 && stack.find { it == n } ) {
 				//log.debug "dfsOfGraph() - found cyclical reference(1) with ${vertex}"
-				cyclicalMaps[n] = stack.clone()
+				cyclicalMaps[n] = [stack:stack.clone(), loopback:n]
 			}
 
 			// Mark vertices that are know not to be start vertices
@@ -170,7 +170,7 @@ class RunbookService {
 							// Check to see if this vertex is in the stack and if so, we are in a cyclical reference so save it
 							if (stack.find { it == edge.assetComment.id }) {
 								//log.debug "dfsOfGraph() found cyclical reference(2) with ${nodes[edge.assetComment.id]}"
-								cyclicalMaps[n] = stack.clone()
+								cyclicalMaps[n] = [stack:stack.clone(), loopback:edge.assetComment]
 								tmp['dependencies'][edge.id].tmpIgnore = true;
 							}
 						}

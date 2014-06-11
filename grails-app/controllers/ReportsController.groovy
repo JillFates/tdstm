@@ -1103,36 +1103,36 @@ class ReportsController {
 	 */
 	def cablingDataReport = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
-    	def projectId = currProj.CURR_PROJ
-      def projectInstance = securityService.getUserCurrentProject();
-      if (!projectInstance) {
-        flash.message = "Please select project to view Reports"
-        redirect(controller:'project',action:'list')
-        return
-      }
-    	def cableType = params.cableType
-    	// if no moveBundle was selected
-    	if(params.moveBundle == "null") {
-            flash.message = " Please Select Bundles. "
-			redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
-        } else {
-        	def moveBundleInstance = MoveBundle.findById(params.moveBundle)
-            def reportFields = []
-            def bundleName = "All Bundles"
-			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
-            //if moveBundleinstance is selected (single moveBundle)
-            if( moveBundleInstance ) {
-                bundleName = moveBundleInstance?.name
-                cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
-            }
-            //All Bundles Selected
-            else {
-            	cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
-       		}
-            if(cableType){
-            	cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
-            }
-            cablesQuery.append(" order By acm.assetFrom ")
+		def projectId = currProj.CURR_PROJ
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Reports"
+			redirect(controller:'project',action:'list')
+			return
+		}
+		def cableType = params.cableType
+		// if no moveBundle was selected
+		if(params.moveBundle == "null") {
+			flash.message = " Please Select Bundles. "
+				redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
+		} else {
+			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def reportFields = []
+			def bundleName = "All Bundles"
+				def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
+			//if moveBundleinstance is selected (single moveBundle)
+			if ( moveBundleInstance ) {
+			    bundleName = moveBundleInstance?.name
+			    cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
+			}
+			//All Bundles Selected
+			else {
+				cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
+			}
+			if (cableType) {
+				cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
+			}
+			cablesQuery.append(" order By acm.assetFrom ")
 			def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
 			try {
 				File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()
@@ -1159,7 +1159,7 @@ class ReportsController {
 				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
 				return;
 			}
-        }
+		}
 	}
 	/*
 	 * request page for power report
@@ -1167,12 +1167,12 @@ class ReportsController {
 	def powerReport = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-    def projectInstance = securityService.getUserCurrentProject();
-    if (!projectInstance) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Reports"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
 		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
@@ -1206,12 +1206,12 @@ class ReportsController {
 			def targetRacks = new ArrayList()
 			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
-      def project = securityService.getUserCurrentProject();
-      if (!project) {
-        flash.message = "Please select project to view Reports"
-        redirect(controller:'project',action:'list')
-        return
-      }
+			def project = securityService.getUserCurrentProject();
+			if (!project) {
+				flash.message = "Please select project to view Reports"
+				redirect(controller:'project',action:'list')
+				return
+			}
 			def moveBundles = MoveBundle.findAllByProject( project )
 			def powerType = params.powerType ? params.powerType : session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 			if(!bundleId.contains("all")){
@@ -1344,24 +1344,24 @@ class ReportsController {
 			return [reportDetails : reportDetails]
 		}
 	}
-	def preMoveCheckList={
-    def projectInstance = securityService.getUserCurrentProject();
-    if (!projectInstance) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+	def preMoveCheckList = {
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Reports"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveEventList = MoveEvent.findAllByProject(projectInstance)
 		def moveEventId = securityService.getUserCurrentMoveEventId()
 		return ['moveEvents':moveEventList,moveEventId:moveEventId]
 	}
-	def generateCheckList={
+	def generateCheckList = {
 		def project = securityService.getUserCurrentProject()
 		def moveEventId = params.moveEvent
 		def moveEventInstance
 		def errorMsg = "Please select a MoveEvent"
 		
-		if( moveEventId && moveEventId.isNumber() ){
+		if ( moveEventId && moveEventId.isNumber() ) {
 			def isProjMoveEvent  = MoveEvent.findByIdAndProject( moveEventId, project )
 			if ( !isProjMoveEvent ) {
 				errorMsg = " User tried to access moveEvent ${moveEventId} that was not found in project : ${project} "
@@ -1379,12 +1379,12 @@ class ReportsController {
 	}
 	def applicationConflicts = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-    def projectInstance = securityService.getUserCurrentProject();
-    if (!projectInstance) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Reports"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')

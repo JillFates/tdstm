@@ -673,7 +673,12 @@ digraph runbook {
 			starts.push(s.id)
 		}
 		
-		def data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate, cyclicals:dfsMap.cyclicals] as JSON
+		def cyclicals = [:]
+		dfsMap.cyclicals.each {
+			cyclicals.put(it.key, it.value.stack)
+		}
+		
+		def data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate, cyclicals:cyclicals] as JSON
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
 		render data
 	}

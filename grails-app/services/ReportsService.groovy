@@ -45,20 +45,20 @@ class ReportsService {
 
   //---------------------------------------For Transport------------------------------------------------//
   
-        def transportInfo = getTransportInfo(assetEntityList,eventErrorList)
+		def transportInfo = getTransportInfo(assetEntityList,eventErrorList)
 		
 		def modelInfo = getModelInfo(moveEventInstance,eventErrorList)
 		
 		Set allErrors = eventErrorList
 		def eventErrorString = ''
-		if(allErrors.size()>0){
+		if (allErrors.size() > 0) {
 			eventErrorString +="""<span style="color:red;text-align: center;"><h2>There were ${allErrors.size()} sections with Issues (see details below).</h2></span><br/>"""
-		}else{
+		} else {
 		    eventErrorString +="""<span style="color:green;text-align: center;"><h3>No preparation issues for this event</h3></span>"""
 		}
   //---------------------------------------For Task Analysis------------------------------------------------//
 		
-		def	taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList)
+		def taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList)
 		
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
 			   'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
@@ -859,13 +859,13 @@ class ReportsService {
 	 * @param eventErrorList
 	 * @return
 	 */
-	def getTaskAnalysisInfo(moveEventInstance, eventErrorList){
+	def getTaskAnalysisInfo (moveEventInstance, eventErrorList) {
 		def dfsMap
-		def cyclicalsError=''
-		def sinksError=''
+		def cyclicalsError = ''
+		def sinksError = ''
 		def personAssignErr = ''
-		def personTasks =[]
-		def exceptionString =''
+		def personTasks = []
+		def exceptionString = ''
 		StringBuilder sinksRef = new StringBuilder()
 		StringBuilder cyclicalsRef = new StringBuilder()
 		
@@ -873,39 +873,42 @@ class ReportsService {
 		def deps = runbookService.getTaskDependencies(tasks)
 		def tmp = runbookService.createTempObject(tasks, deps)
 		
-		try{
+		try {
 			dfsMap = runbookService.processDFS( tasks, deps, tmp )
-		}catch(e){
+		} catch (e) {
 			exceptionString += "No Tasks"
 		}
 		
-		if(dfsMap){
-			if(dfsMap.cyclicals?.size()==0){
-				cyclicalsError+="""<span style="color: green;"><b>Cyclical References: OK  </b><br></br></span>"""
-			}else{
+		if (dfsMap) {
+			if (dfsMap.cyclicals?.size() == 0) {
+				cyclicalsError += """<span style="color: green;"><b>Cyclical References: OK  </b><br></br></span>"""
+			} else {
 				eventErrorList << 'Tasks'
 				cyclicalsError += """<span style="color: red;"><b>Cyclical References:</b><br></br></span>"""
 				cyclicalsRef.append('<ol>')
-				dfsMap.cyclicals.each { root, list ->
-					def task = tasks.find { it.id == root }
+				
+				dfsMap.cyclicals.each { c ->
+					def task = c.value.loopback
 					cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
-					list.each { cycTaskId ->
+					c.value.stack.each { cycTaskId ->
 						task = tasks.find { it.id == cycTaskId }
 						cyclicalsRef.append("<li>$task.taskNumber $task.comment")
 					}
+					cyclicalsRef.append(" >> $c.value.loopback.taskNumber $c.value.loopback.comment</li>")
 					cyclicalsRef.append('</ul>')
 				}
+				
 				cyclicalsRef.append('</ol>')
 			}
 			
-			if(dfsMap.sinks?.size()==1){
-				sinksError+="""<span style="color: green;"><b> Sink Vertices: OK  </b><br></br></span>"""
-			}else if(dfsMap.sinks?.size()==0){
+			if (dfsMap.sinks?.size() == 1) {
+				sinksError += """<span style="color: green;"><b> Sink Vertices: OK  </b><br></br></span>"""
+			} else if(dfsMap.sinks?.size() == 0) {
 				eventErrorList << 'Tasks'
-				sinksError+= """<span style="color: red;">
+				sinksError += """<span style="color: red;">
 					<b>Sink Vertices: <br> No end task was found, which is typically the result of cyclical references.</b>
 					<br></br></span>"""
-			}else{
+			} else {
 				eventErrorList << 'Tasks'
 				sinksError += """<span style="color: red;"><b>Sink Vertices: <br>
 					Warning - More than one task has no successors. Typical events will have just one ending task 
@@ -922,10 +925,10 @@ class ReportsService {
 				[ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories] )
 			
 			
-			def missedAssignments=personTasks.size()
-			if(missedAssignments==0){
+			def missedAssignments = personTasks.size()
+			if (missedAssignments == 0) {
 				personAssignErr+="""<span style="color: green;"><b> Person/Team Assignments : OK  </b><br></br></span>"""
-			}else{
+			} else {
 				eventErrorList << 'Tasks'
 				personAssignErr+="""<span style="color: red;"><b> Person/Team Assignments : $missedAssignments task${missedAssignments>1?'s have':' has'} no person or team assigned</b><br></br></span>"""
 			}
