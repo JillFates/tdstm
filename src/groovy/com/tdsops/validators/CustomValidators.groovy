@@ -14,7 +14,7 @@ class CustomValidators {
 	public static inList(aListClosure, fieldName) { 
 		return { value, object, errors ->
 			def allValues = aListClosure.call()
-			if (value == null || allValues.contains(value)) {
+			if (value == null || allValues.contains(value.toString())) {
 				return true;
 			} else {
 				errors.rejectValue(fieldName, "${fieldName}.notInList", "${value} of ${fieldName} not in list ${allValues}")
