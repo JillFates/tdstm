@@ -763,7 +763,7 @@ THE SOFTWARE.
 				labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
 					.data(visItems, function (d) { return d.id; })
 					.attr('x', function(d) { return d.points.x; })
-					.attr('width', function(d) { return (d.points.w - anchorOffset); })
+					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
 					.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
 					
 				if (resized)
@@ -785,7 +785,7 @@ THE SOFTWARE.
 					.attr('id', function(d) { return 'label-' + d.id; })
 					.attr('x', function(d) { return d.points.x; })
 					.attr('y', function(d) { return d.points.y; })
-					.attr('width', function(d) { return (d.points.w - anchorOffset); })
+					.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
 					.attr('height', function(d) { return d.points.h; })
 					.append('xhtml:body')
 					.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
