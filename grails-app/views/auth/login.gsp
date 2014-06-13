@@ -88,7 +88,6 @@
 			 }
 			 window.frames[0].location = '../build.txt?'+randomstring;
 			</script>
-			&nbsp;/&nbsp; Version: 3.0.16
 		</div>
 	</div>
 </div>
