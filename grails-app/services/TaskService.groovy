@@ -2709,6 +2709,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info "A total of ${taskList.size()} Tasks and $depCount Dependencies created in $elapsed"
 		if (failure) failure = "Generation FAILED: $failure<br/>"
 					
+		// TM-2843 - Fix issue with memory leak due to the usage of metaClass.addProperty
+		taskList.each { id, taskToWipe -> taskToWipe.metaClass = null }
+		
 		return ["status":"${failure}${taskList.size()} Tasks and $depCount Dependencies created in $elapsed",
 				"exceptions":exceptions.toString(), "Log":out.toString()]
 		
