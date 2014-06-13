@@ -35,6 +35,7 @@ import com.tds.asset.TaskDependency
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -2483,7 +2484,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 										wasWired=true
 										break
 									} else {
-										log.debug "Postponing wasn't necessary so just created relation back to last asset task or milestone"
+										log.debug "Deferral wasn't necessary so just created relation back to last asset task or milestone"
 										linkTaskToLastAssetOrMilestone(tnp)
 										wasWired = true
 										break
@@ -2781,12 +2782,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					throw new RuntimeException("Unable to resolve filter param:[${prop}] expression:[${taskSpec.predecessor[prop]}] while processing asset ${asset}")
 				}
 			}
-			
 		}
 
 		// Add filter on the classification (asset.type presently) if it was declared (this is filtering on the apposing asset.assetType property)
 		if (taskSpec.predecessor?.containsKey('classification') && taskSpec.predecessor.classification) {
-			sqlMap = SqlUtil.whereExpression("ad.${assocAssetPropName}.assetType", taskSpec.predecessor.classification, 'classification')
+			sqlMap = SqlUtil.whereExpression("ad.${assocAssetPropName}.assetClass", AssetClass.safeValueOf(taskSpec.predecessor.classification.toUpperCase()), 'classification')
 			sql = SqlUtil.appendToWhere(sql, sqlMap.sql)
 			map['classification'] = sqlMap.param
 			log.info "getAssetDependencies: Added classification filter ${sqlMap.sql}, ${sqlMap.param}"
@@ -3085,7 +3085,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			out.append("Created dependency (${dependency.id}) between $predecessor and $successor<br/>")
 			count++
 		}
-		
+
 		// Mark the predecessor task that it has a successor so it doesn't mess up the milestones
 		if ( ! predecessor.metaClass.hasProperty(predecessor, 'hasSuccessorTaskFlag') )
 			predecessor.metaClass.setProperty('hasSuccessorTaskFlag', true)
