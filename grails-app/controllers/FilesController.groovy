@@ -294,9 +294,12 @@ class FilesController {
 			
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+			
+			def highlightMap = assetEntityService.getHighlightedInfo('Files', filesInstance, configMap)
+			
 			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project ,prefValue:prefValue,
-			   config:configMap.config, customs:configMap.customs, errors:params.errors]
+			   config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
 		}
 	}
 	def edit ={

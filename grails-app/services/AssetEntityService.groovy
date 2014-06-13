@@ -747,4 +747,22 @@ class AssetEntityService {
 		}
 		return cableExist
 	}
+	/**
+	 * used to add the css for the labels which fieldImportance is 'C','I'
+	 * @param forWhom
+	 * @param assetEntity
+	 * @param configMap
+	 * @return
+	 */
+	def getHighlightedInfo( forWhom, assetEntity, configMap){
+		def fields = projectService.getFields(forWhom) + projectService.getCustoms()
+		def highlightMap = [:]
+		fields.each{f->
+			def configMaps=configMap.config
+			if(configMaps.(f.label) in ['C','I'] && (assetEntity && !assetEntity.(f.label))){
+				highlightMap << [(f.label):'highField']
+			}
+		}
+		return highlightMap
+	}
 }

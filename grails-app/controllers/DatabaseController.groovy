@@ -256,10 +256,12 @@ class DatabaseController {
 			def validationType = assetEntity.validation
 			def configMap = assetEntityService.getConfig('Database',validationType)
 			
+			def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
+			
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
 			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
-			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors]
+			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
 		}
 	}
 	

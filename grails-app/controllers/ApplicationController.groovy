@@ -339,14 +339,14 @@ class ApplicationController {
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
 			
-			
+			def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
 			
 			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
 			  config:configMap.config, customs:configMap.customs, shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
-			  errors:params.errors]
+			  errors:params.errors, highlightMap:highlightMap]
 		}
 	}
     

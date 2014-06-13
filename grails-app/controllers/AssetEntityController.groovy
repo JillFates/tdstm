@@ -3535,12 +3535,14 @@ class AssetEntityController {
 			def configMap = assetEntityService.getConfig('AssetEntity',validationType)
 			
 			def assetCommentList = AssetComment.findAllByAssetEntityAndIsPublished(assetEntity, true)
+			
+			def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntity, configMap)
 			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
 				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors]
+				 prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
 		
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
