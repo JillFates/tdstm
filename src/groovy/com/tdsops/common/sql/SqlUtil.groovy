@@ -54,17 +54,17 @@ class SqlUtil {
 				map = [sql:"$property $expr :$paramName", param:param]
 			} else {
 				// default EQUALS condition
-				println "in string - default EQUALS"				
 				map = [sql:"$property = :$paramName", param:criteria]
 			}
 		} else if (criteria instanceof 	java.lang.Integer) {
 			def expr=isNot ? '<>' : '='
 			map = [sql:"$property $expr :$paramName", param:criteria]
 		} else if (criteria instanceof java.util.ArrayList) {
-			println "whereExpression-Array"
-			map = [sql:"${property}${not}IN (:$paramName)", param:criteria]		
+			map = [sql:"${property}${not}IN (:$paramName)", param:criteria]				
+		} else if (criteria instanceof java.lang.Enum) {
+			map = [sql:"$property = :$paramName", param:criteria]				
 		} else {
-			// log.error "whereExpression received criteria of unsupported class type (${criteria.class}) for property $property"
+			println "whereExpression received criteria of unsupported class type (${criteria.class}) for property $property"
 			map = null
 		}
 		return map

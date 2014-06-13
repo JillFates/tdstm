@@ -34,6 +34,7 @@ import com.tds.asset.Database
 import com.tds.asset.FieldImportance
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
@@ -1835,7 +1836,7 @@ class AssetEntityController {
 					temp +="pt7.team_code AS targetTeamDba,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt7 ON pt7.project_team_id=ae.target_team_dba_id \n"
 					break;
-				case ~/custom1|custom2|custom3|custom4|custom5|custom6|custom7|custom8|custom9|custom10|custom11|custom12|custom13|custom14|custom15|custom16|custom17|custom18|custom19|custom20|custom21|custom22|custom23|custom24|custom25|custom26|custom27|custom28|custom29|custom30|custom31|custom32|custom33|custom34|custom35|custom36|custom37|custom38|custom39|custom40|custom41|custom42|custom43|custom44|custom45|custom46|custom47|custom48|custom49|custom50|custom51|custom52|custom53|custom54|custom55|custom56|custom57|custom58|custom59|custom60|custom61|custom62|custom63|custom64/:
+				case ~/custom\d{1,}/:
 					temp +="ae.${value} AS ${value},"
 					break;
 				case 'lastUpdated':
@@ -1880,9 +1881,11 @@ class AssetEntityController {
 				WHERE ae.project_id = ${project.id} """)
 		}
 		
+		query.append("\n AND ae.asset_class = '${AssetClass.DEVICE}'")
+
 		//which will limit the query based on physical or server Assets.
 		if(listType=='server')
-			query.append(" AND ae.asset_Type IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())}) ")
+			query.append(" AND ae.asset_type IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())}) ")
 		else
 			query.append(" AND ifnull(ae.asset_type,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
 		
@@ -1891,13 +1894,6 @@ class AssetEntityController {
 			) AS assets
 		""")
 		
-		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
-				LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
-				LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
-				LEFT OUTER JOIN asset_dependency adc ON ae.asset_entity_id = adc.asset_id AND adc.status IN (${validUnkownQuestioned}) 
-					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
-				LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
-					AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 		
 		// Handle the filtering by each column's text field
 		def firstWhere = true
@@ -1942,7 +1938,7 @@ class AssetEntityController {
 			query.append(" AND assets.planStatus='${params.plannedStatus}'")
 		}
 		
-		log.info  "query = ${query}"
+		log.debug  "query = ${query}"
 		def assetList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid

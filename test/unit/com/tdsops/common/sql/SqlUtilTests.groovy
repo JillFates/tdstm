@@ -1,6 +1,7 @@
 package com.tdsops.common.sql
 
 import grails.test.*
+import com.tdsops.tm.enums.domain.AssetClass
 
 class SqlUtilTests extends GrailsUnitTestCase {
 	
@@ -50,6 +51,10 @@ class SqlUtilTests extends GrailsUnitTestCase {
 		assertTrue (map.param instanceof List)
 		assertEquals a[0], map.param[0]
 
+		// Test an Enum
+		map = SqlUtil.whereExpression('name', AssetClass.byId('device'), 'assetClass')
+		assertEquals 'Testing of Enum', 'name = :assetClass', map.sql
+		assertTrue 'Testing of Enum', (map.param instanceof java.lang.Enum)
 	}
 	
 }

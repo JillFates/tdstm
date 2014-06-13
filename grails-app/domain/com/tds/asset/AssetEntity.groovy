@@ -1,20 +1,24 @@
 package com.tds.asset
 
+//import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
+
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
-import com.tdsops.validators.CustomValidators;
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.validators.CustomValidators
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil;
 
 
 class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
+	AssetClass assetClass = AssetClass.DEVICE
 	String application = ""
 	String assetName
 	String shortName
-	String assetType = "Server"
+	String assetType = 'Server'
 	Integer priority
 	String planStatus = AssetEntityPlanStatus.UNASSIGNED
 	Date purchaseDate
@@ -346,14 +350,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-		modifiedBy = Person.loggedInPerson
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
+		// modifiedBy = Person.loggedInPerson
 
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-		modifiedBy = Person.loggedInPerson
+		lastUpdated = TimeUtil.nowGMT()
+		// modifiedBy = Person.loggedInPerson
 	}
 	
 	/*def afterInsert = {

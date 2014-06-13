@@ -1,8 +1,14 @@
 package com.tds.asset
 
-import com.tdssrc.grails.GormUtil
+//import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
 
-class Files extends AssetEntity{
+import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdssrc.grails.TimeUtil
+
+class Files extends AssetEntity {
+
+	AssetClass assetClass = AssetClass.STORAGE
 	String fileFormat
 	String LUN
 	
@@ -20,13 +26,13 @@ class Files extends AssetEntity{
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-		modifiedBy = Person.loggedInPerson
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
+		// modifiedBy = Person.loggedInPerson
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
-		modifiedBy = Person.loggedInPerson
+		lastUpdated = TimeUtil.nowGMT()
+		// modifiedBy = Person.loggedInPerson
 	}
 	String toString(){
 		"id:$id name:$assetName "

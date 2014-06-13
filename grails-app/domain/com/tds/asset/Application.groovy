@@ -3,15 +3,15 @@ package com.tds.asset
 import Person
 import Project
 
+//import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
+
 import com.tdsops.tm.enums.domain.ContextType
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.TimeUtil
 
 class Application extends AssetEntity {
-	
-	static ContextType getContextType() {
-		return ContextType.A
-	}
-	
+
+	AssetClass assetClass = AssetClass.APPLICATION
 	String appVendor
 	String appVersion
 	Person sme
@@ -96,17 +96,22 @@ class Application extends AssetEntity {
 			testingFixed sqltype: 'tinyint(1)'
 		}
 	}
+
+	static ContextType getContextType() {
+		return ContextType.A
+	}
+
 	/*
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
 		dateCreated = TimeUtil.nowGMT()
 		lastUpdated = TimeUtil.nowGMT()
-		modifiedBy = Person.loggedInPerson
+		// modifiedBy = Person.loggedInPerson
 	}
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
-		modifiedBy = Person.loggedInPerson
+		// modifiedBy = Person.loggedInPerson
 	}
 	String toString(){
 		"id:$id name:$assetName tag:$appVendor"
