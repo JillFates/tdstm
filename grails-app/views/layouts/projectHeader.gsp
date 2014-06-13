@@ -72,7 +72,7 @@
    </script>
   </head>
 	<% def currProj = session.getAttribute("CURR_PROJ");
-	   def setImage = session.getAttribute("setImage");
+	   
     def projectId = currProj?.CURR_PROJ ;
     def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
     def moveEventName = moveEventId ? MoveEvent.findById( moveEventId ) : ''
@@ -95,6 +95,7 @@
 	def isIE7 = request.getHeader("User-Agent").contains("MSIE 7");
 	def isMDev = request.getHeader("User-Agent").contains("Mobile");
 	
+	def setImage = session.getAttribute("setImage")?:(currProjObj ? ProjectLogo.findByProject(currProjObj)?.id:'');
 	def user = UserLogin.findByPerson( person )
 	def username = user.username
 	def userPrefs = UserPreference.findAllByUserLogin(user)
