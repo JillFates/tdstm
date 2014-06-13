@@ -52,7 +52,7 @@ class SqlUtilTests extends GrailsUnitTestCase {
 		assertEquals a[0], map.param[0]
 
 		// Test an Enum
-		map = SqlUtil.whereExpression('name', AssetClass.byId('device'), 'assetClass')
+		map = SqlUtil.whereExpression('name', AssetClass.safeValueOf('DEVICE'), 'assetClass')
 		assertEquals 'Testing of Enum', 'name = :assetClass', map.sql
 		assertTrue 'Testing of Enum', (map.param instanceof java.lang.Enum)
 	}
