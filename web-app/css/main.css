@@ -31,12 +31,14 @@ a:link, a:visited, a:hover {
 	text-decoration: underline;
 }
 h1 {
-    color: #214aa0;
-    font-weight: normal;
-    font-size: 16px;
-    margin: .8em 0 .3em 0;
+    color: #214aa0 !important;
+    font-weight: normal !important;
+    font-size: 16px !important;
+    margin: .8em 0 .3em 0 !important;
 }
-
+h4 {
+	 font: 12px helvetica,arial,sans-serif !important;
+}
 .heading {
     color: #63a242;
     font-weight: bold;

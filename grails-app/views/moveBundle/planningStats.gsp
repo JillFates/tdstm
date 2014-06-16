@@ -5,6 +5,7 @@
 <meta name="layout" content="projectHeader" />
 <g:javascript src="entity.crud.js" />
 <title>Transition Planning Dashboard</title>
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
 <script type="text/javascript">
 $(document).ready(function() { 
 	currentMenuId = "#dashboardMenu";
@@ -42,7 +43,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<div class="body">
-		<div>
+		<div class="container">
 		    <g:set var="percentageAppToValidate" value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}" />
 		    <g:set var="percentagePSToValidate" value="${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}" />
 		    <g:set var="percentageVMToValidate" value="${virtualCount ? Math.round((vsToValidate/virtualCount)*100) :100}" />
@@ -53,7 +54,7 @@ $(document).ready(function() {
 		    <g:set var="percentageBundleReady" value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}" />
 			<g:set var="percentageUnassignedAppCount" value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}" />
 			<h1>Planning Dashboard</h1>
-			<div class="dashboard_div" style="float:left; width:250px;">
+			<div class="dashboard_div col-md-3 col-xs-3" style="float:left;">
 					<span class="dashboard_head">Discovery Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -120,7 +121,7 @@ $(document).ready(function() {
 						</g:if>
 					</table>
 			</div>
-			<div class="dashboard_div" style="float:left; width:250px;">
+			<div class="dashboard_div col-md-3 col-xs-3" style="float:left;">
 					<span class="dashboard_head">Analysis Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -239,7 +240,7 @@ $(document).ready(function() {
 						</tr>
 					</table>
 			</div>
-			<div class="dashboard_div" style="float:left;">
+			<div class="dashboard_div col-md-5 col-xs-5" style="float:left;">
 					<span class="dashboard_head">Execution Phase</span>
 					<table style="margin-bottom: 10px;border-spacing:0px;">
 						<tr>
@@ -301,6 +302,7 @@ $(document).ready(function() {
 							</td>
 						</tr>
 					</table>
+				<div style="overflow-y: hidden;">
 				<table class="dashboard_stat_table">
 					<thead>
 						<tr>
@@ -611,6 +613,7 @@ $(document).ready(function() {
 						</tr>
 					</tbody>
 				</table>
+				</div>
 			</div>
 		</div>
 	</div>
