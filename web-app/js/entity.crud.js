@@ -238,13 +238,19 @@ function showModelView(e, forWhom){
     	$("select.assetSelect").select2()
     }
 }
-function showComment(id , action){
-	   var id = id
-	   if(action =='edit'){
-	   new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'edit');commentChangeShow();}})
-	   }else{
-		   new Ajax.Request(contextPath+'/assetEntity/showComment?id='+id,{asynchronous:true,evalScripts:true,onComplete:function(e){showAssetCommentDialog(e, 'show');commentChangeShow();}})
-	   }
+//DEPRECATED
+function showComment(commentId , action, commentType){
+	    console.log('DEPRECATED: showComment.');
+	   	var id = id
+    	var objDom = $('[ng-app]');
+       	var injector = angular.element(objDom).injector();
+		injector.invoke(function($rootScope, commentUtils){
+			if(action =='edit'){
+				$rootScope.$broadcast('editComment', commentUtils.commentTO(commentId, commentType));
+			} else {
+				$rootScope.$broadcast('viewComment', commentUtils.commentTO(commentId, commentType), 'show');
+			}
+		});
 }
 function validateFileFormat(form){
 	var fileFlag = false;
@@ -1005,6 +1011,9 @@ function changeMoveBundleColor(depId,assetId,assetBundleId, status){
 $(document).ready(function() {
 	$(window).keydown(function(event){
 		if(event.keyCode == 13) {
+            if (event.srcElement.type == "textarea") {
+                return;
+            }
 			event.preventDefault();
 			var activeSup = $('[id^=depComment_support_]:visible')
 			var activeDep = $('[id^=depComment_dependent_]:visible')

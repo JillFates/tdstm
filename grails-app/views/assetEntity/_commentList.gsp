@@ -17,12 +17,12 @@
 		<tbody id="listCommentsTbodyIds">
 		<g:each status="i" in="${assetCommentList}"  var="commentList">
 		<tr style="cursor: pointer;" class="${commentList.status == 'Completed' || commentList.status=='Pending' ? 'resolved' : 'ready' }">
-			<td><a href ="javascript:showComment(${commentList.id},'edit')" ><img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px"/></a></td>
-			<td onclick="javascript:showComment(${commentList.id},'show')" style="text-align: center;">${commentList.taskNumber ?:'c'}</td>
-			<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.comment}</td>
-			<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.status}</td>
-			<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.category}</td>
-			<td onclick="javascript:showComment(${commentList.id},'show')" >${commentList.assignedTo}/${commentList.role}</td>
+			<td><a href ="javascript:showComment(${commentList.id},'edit','${commentList.commentType}')" ><img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px"/></a></td>
+			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" style="text-align: center;">${commentList.taskNumber ?:'c'}</td>
+			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.comment}</td>
+			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.status}</td>
+			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.category}</td>
+			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.assignedTo}/${commentList.role}</td>
 		</tr>
 		</g:each>
 			</tbody>

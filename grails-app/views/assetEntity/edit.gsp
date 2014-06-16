@@ -74,7 +74,7 @@
 						<tbody>
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td><input type="text" id="assetName" name="assetName" class="${config.assetName} ${highlightMap.validation?:''}" title="gagdjgajgdjgs" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
+								<td><input type="text" id="assetName" name="assetName" class="${config.assetName} ${highlightMap.validation?:''}" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
 								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap">Description</td>
 								<td colspan="2">
 									<input type="text" id="description" class="${config.description}" name="description" 

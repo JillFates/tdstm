@@ -9,14 +9,24 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="scrollfollow.js" />
 <g:javascript src="angular/angular.min.js" />
 <g:javascript src="angular/plugins/angular-ui.js"/>	
+<g:javascript src="angular/plugins/angular-resource.js" />
+<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 <g:javascript src="cabling.js"/>
 <g:javascript src="asset.comment.js" />
+<g:javascript src="bootstrap.js" />
+<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+
 <style type="text/css">
 td .odd {
 	background: #DDDDDD;
@@ -35,10 +45,6 @@ function onInvokeAction(id) {
 	$(document).ready(function() {
 		$("#editEntityView").dialog({autoOpen: false})
 	    $("#showEntityView").dialog({autoOpen: false})
-	    $("#commentsListDialog").dialog({ autoOpen: false })
-	    $("#createCommentDialog").dialog({ autoOpen: false })
-	    $("#showCommentDialog").dialog({ autoOpen: false })
-	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 	    $('#filterDialog').dialog({ autoOpen: false })
 	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
@@ -396,14 +402,11 @@ function onInvokeAction(id) {
 	}
 	function showfilterDialog(){
 		timedUpdate('never')
-		$('#createCommentDialog').dialog('close');
-		$('#commentsListDialog').dialog('close');
-		$('#editCommentDialog').dialog('close');
-		$('#showCommentDialog').dialog('close');
 		$('#showDialog').dialog('close');
 		$('#editDialog').dialog('close');
 		$('#createDialog').dialog('close');
 		$('#filterDialog').dialog('open');
+		hideCommentDialogs();
 	}
 	<%--/* --------------------------------------------
 	*	Function to get assets by Team
@@ -488,7 +491,7 @@ function onInvokeAction(id) {
 </table>
 </form>
 </div>
-<div class="body" style="width: 98%;">
+<div class="body" style="width: 98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -920,7 +923,6 @@ function onInvokeAction(id) {
 	</tr>
 </table>
 </div>
-<<g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
 <div id="filterDialog" title="Filter" style="display: none;">
 	<g:form name="filterForm" action="dashboardView">
@@ -986,6 +988,7 @@ function onInvokeAction(id) {
 <div id ="editEntityView" style="display: none" title="Edit Asset"></div>
 <div id="cablingDialogId" style="display: none;"></div>
 <g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+<g:render template="initAssetEntityData"/>
 <script type="text/javascript">
 bundleChange();
 $("#midDiv").css('width',vpWidth() - 340)

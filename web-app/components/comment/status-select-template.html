@@ -1,0 +1,8 @@
+<select required ng-model="ngModel" ng-class="'task_' + ngModel.toLowerCase()" id="status" name="status">
+    <option value="">Please Select</option> 
+    <option class="task_{{status.toLowerCase()}}" ng-selected="{{status == ngModel}}"
+        ng-repeat="status in statusList"
+        value="{{status}}">
+        {{status}}
+    </option>
+ </select>

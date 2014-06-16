@@ -9,6 +9,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tds.asset.TaskDependency
 import org.apache.commons.lang.math.NumberUtils
 import java.text.SimpleDateFormat
+import groovy.time.TimeCategory;
 
 class TaskController {
 	
@@ -225,6 +226,45 @@ class TaskController {
 		actionBar.append(""" </span> """)
 		render actionBar.toString()
 	}
+    
+	/**
+	 * Used to generate action Bar for task details view  
+	 * @param asset comment id.
+	 * @render : Action Bar JSON code.
+	 */
+	def genActionBarForShowViewJson = {
+		def comment = AssetComment.get(params.id)
+		def userLogin = securityService.getUserLogin()
+        def actionBar = [];
+		def result
+
+		if (comment) {
+			if(comment.status ==  AssetCommentStatus.READY){
+                actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager']
+			}
+
+			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+                actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager']
+			}
+
+			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+                actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
+			}
+
+			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
+			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
+                actionBar << [label: '1 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '1']
+                actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
+                actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
+			}
+            result = ServiceResults.success(actionBar) as JSON
+		} else {
+			result = ServiceResults.fail([error:"invalid comment id (${params.id}) from user ${userLogin}"]) as JSON
+		}
+
+		render result
+	}
+
 	/**
 	* Used by the getActionBarHTML to wrap the button HTML into <td>...</td>
 	*/
@@ -550,8 +590,30 @@ digraph runbook {
 			if (comment) {
 				comment.estStart = TimeUtil.nowGMT().plus(estDay)
 				
-				if (!comment.estFinish || comment.estStart > comment.estFinish )
+				if (comment.duration && comment.durationScale && comment.duration > 0) {
+					use ( TimeCategory ) {
+						switch (comment.durationScale) {
+							case "m":
+								comment.estFinish = comment.estStart + comment.duration.minutes
+								break;
+							case "h":
+								comment.estFinish = comment.estStart + comment.duration.hours
+								break;
+							case "d":
+								comment.estFinish = comment.estStart.plus(comment.duration)
+								break;
+							case "w":
+								comment.estFinish = comment.estStart + comment.duration.weeks
+								break;
+							default:
+								comment.estFinish = comment.estStart.plus(comment.duration)
+						}
+					}
+				} else {
+					comment.duration = 1;
+					comment.durationScale = "d";
 					comment.estFinish = comment.estStart.plus(1)
+				}
 					
 				if (!comment.hasErrors() && !comment.save(flush:true)) {
 					etext = "unable to update estTime"+GormUtil.allErrorsString( comment )
@@ -677,4 +739,37 @@ digraph runbook {
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
 		render data
 	}
+
+    def editTask = {
+        render( view: "_editTask", model: [])
+    }
+
+    def showTask = {
+        render( view: "_showTask", model: [])
+    }
+
+	/**
+	 * Get task roles
+	 */
+	def getStaffRoles = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		try {
+			def result = taskService.getRolesForStaff()
+
+			render(ServiceResults.success(result) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 }

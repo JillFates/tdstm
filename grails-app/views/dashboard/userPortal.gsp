@@ -8,17 +8,25 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'userPortal.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<g:javascript src="bootstrap.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="angular/plugins/angular-ui.js"/>	
+	<g:javascript src="angular/plugins/angular-resource.js" />
 	<g:javascript src="cabling.js"/>
 	<g:javascript src="model.manufacturer.js"/>
+	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
 <a name="page_up"></a>
-<div id="doc">
+<div id="doc" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<!-- Body Starts here-->
 	<div id="bodycontent" >
 	<h1 style="float:left;position:absolute;">User Dashboard</h1>
@@ -34,8 +42,7 @@
 			<g:render template="../dashboard/portal"/>
 		</div>
 	</div>
-	
-	
+	<g:render template="../assetEntity/initAssetEntityData"/>
 </div>
 <script type="text/javascript">
 

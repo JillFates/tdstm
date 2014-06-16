@@ -7,6 +7,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="room.rack.combined.js"/>
@@ -16,6 +17,14 @@
 <g:javascript src="angular/angular.min.js" />
 <g:javascript src="select2.js" />
 <g:javascript src="angular/plugins/angular-ui.js"/>
+<g:javascript src="angular/plugins/angular-resource.js" />
+<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+<g:javascript src="bootstrap.js" />
+<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 <title>Rack View</title>
 <script type="text/javascript">
 	function updateRackDetails(e) {
@@ -120,10 +129,6 @@
 	   	$("#createEntityView").dialog({autoOpen: false})
 	   	$("#showEntityView").dialog({autoOpen: false})
 	    $("#editEntityView").dialog({autoOpen: false})
-	    $("#commentsListDialog").dialog({ autoOpen: false })
-		$("#createCommentDialog").dialog({ autoOpen: false })
-	    $("#showCommentDialog").dialog({ autoOpen: false })
-	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#editManufacturerView").dialog({ autoOpen: false})
 	})
 	// Script to get the combined rack list
@@ -138,7 +143,7 @@
     </script>
 </head>
 <body>
-<div class="body" style="width:98%;">
+<div class="body" style="width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
@@ -213,7 +218,6 @@
 		</div>
 </div>
 
-<g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
 <div id ="createEntityView" style="display: none"></div>
 <div id ="showEntityView" style="display: none" ></div>
@@ -274,5 +278,6 @@
 	currentMenuId = "#racksMenu";
 	$("#rackMenuId a").css('background-color','#003366')
 </script>
+<g:render template="../assetEntity/initAssetEntityData"/>
 </body>
 </html>

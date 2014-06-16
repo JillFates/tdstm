@@ -7,11 +7,18 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
+		<g:javascript src="angular/plugins/angular-resource.js" />
+        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+        <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-
+		<g:javascript src="bootstrap.js" />
+		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
@@ -19,7 +26,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		<script type="text/javascript">
 
 			$(document).ready(function() {
@@ -27,10 +34,6 @@
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
-				$("#commentsListDialog").dialog({ autoOpen: false })
-				$("#createCommentDialog").dialog({ autoOpen: false })
-				$("#showCommentDialog").dialog({ autoOpen: false })
-				$("#editCommentDialog").dialog({ autoOpen: false })
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
@@ -72,7 +75,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('databaseId')}"
+					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
 						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate}"
@@ -103,17 +106,11 @@
 				var editButton = '<a href="javascript:editEntity(\'database\',\''+rowObject[7]+'\','+options.rowId+')">'+
 						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				if(rowObject[6]=='issue'){
-					var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
-						+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
-					editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
-						+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
+					editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[7]+'\');">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
 				} else if (rowObject[6]=='comment') {
-					var ajaxString = "new Ajax.Request('/tdstm/assetEntity/listComments/"
-						+options.rowId+"',{asynchronous:true,evalScripts:true,onComplete:function(e){listCommentsDialog( e ,'never' )}})"
-					editButton+='<span id="icon_'+options.rowId+'"><a href="#" onclick="setAssetId('+options.rowId+');'
-						+ajaxString+'">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
+					editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[7]+'\');">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
 				} else {
-					editButton+='<span id="icon_'+options.rowId+'"><a href="javascript:createNewAssetComment('+options.rowId+',\''+rowObject[1]+'\',\''+rowObject[7]+'\')">'
+					editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.createCommentBy(\'issue\','+options.rowId+',\''+rowObject[7]+'\')">'
 						+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
 				}
 				return editButton
@@ -137,8 +134,12 @@
 		<title>DB list</title>
 	</head>
 	<body>
-		<div class="body fluid">
+		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 			<h1>DB List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
+            <div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
+                <button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
+                {{alert.msg}}
+            </div>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>
@@ -157,15 +158,17 @@
 					</div>
 				</div>
 			</g:each>
-			<jqgrid:wrapper id="databaseId" /> 
+            <div ng-controller="tds.comments.controller.MainController as comments">
+			    <jqgrid:wrapper id="databaseId" /> 
+            </div>
 			<div id="createEntityView" style="display: none;" ></div>
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
 			<div id="cablingDialogId" style="display: none;"></div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Database', entities:dbs]"></g:render>
 		</div>
-		<g:render template="../assetEntity/commentCrud"/>
 		<g:render template="../assetEntity/modelDialog"/>
+        <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
 			$("#assetMenuId a").css('background-color','#003366')

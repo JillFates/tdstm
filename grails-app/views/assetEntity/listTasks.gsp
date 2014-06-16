@@ -13,22 +13,27 @@
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="angular/angular.min.js" />
-	<g:javascript src="angular/plugins/angular-ui.js"/>	
+	<g:javascript src="angular/plugins/angular-ui.js"/>
+	<g:javascript src="angular/plugins/angular-resource.js" />
+    <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+    <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 	<g:javascript src="cabling.js"/>
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
+	<g:javascript src="bootstrap.js" />
+	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#issueTimebar').width("100%")
 			
 			$('#assetMenu').show();
-			$("#commentsListDialog").dialog({ autoOpen: false })
-			$("#createCommentDialog").dialog({ autoOpen: false })
-			$("#showCommentDialog").dialog({ autoOpen: false })
-			$("#editCommentDialog").dialog({ autoOpen: false })
 			$("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			$("#createEntityView").dialog({ autoOpen: false })
@@ -98,7 +103,7 @@
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){bindResize('taskListId')}"
+				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
 				showPager="true">
@@ -130,7 +135,7 @@
 		$.jgrid.formatter.integer.thousandsSeparator='';
 		
 		function myCustomFormatter (cellVal,options,rowObject) {
-			var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
+			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')">'+
 				"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 			return editButton
 		}
@@ -187,7 +192,7 @@
 </head>
 <body>
 	<input type="hidden" id="timeBarValueId" value="0"/>
-	<div id="outerBodyId" class="body">
+	<div id="outerBodyId" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div class="taskTimebar" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
@@ -198,7 +203,6 @@
 			</g:if>
 			<div id="taskMessageDiv" class="message" style="display: none;"></div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
-			<g:render template="commentCrud"/> 
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
@@ -257,6 +261,7 @@
 		<div id="cablingDialogId" style="display: none;"></div>
 		<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 	</div>
+ <g:render template="initAssetEntityData"/>
  <script type="text/javascript">
 function toggleCheckbox (chkbox, field) {
 	$('input[name='+field+']').val(chkbox.checked ? '1' : '0')

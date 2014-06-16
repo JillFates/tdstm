@@ -1,0 +1,13 @@
+{
+  "name": "TEST",
+  "description": "Webdriver E2E test",
+  "dependencies": {
+    "selenium-webdriver": "2.41.0",
+    "minijasminenode": "0.4.0"
+  },
+  "devDependencies": {
+    "jasmine-reporters": "~0.2.1",
+    "jshint": "2.5.0",
+    "protractor": "0.22.0"
+  }
+}

@@ -97,7 +97,6 @@
 				<div id="editManufacturerView" style="display: none;"></div>
 				<div id="createEntityView" style="display: none;"></div>
 				<div id="cablingDialogId" style="display: none;"></div>
-				<g:render template="../assetEntity/commentCrud"/>
 				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 	    <br />
 	    <input type="hidden" id="timeBarValueId" value="0"/>
@@ -377,8 +376,6 @@ function setTab(tab){
 		$("#editEntityView").dialog({ autoOpen: false })
 		$("#manufacturerShowDialog").dialog({ autoOpen: false })
 		$("#modelShowDialog").dialog({ autoOpen: false })
-		$("#showCommentDialog").dialog({ autoOpen: false })
-		$("#editCommentDialog").dialog({ autoOpen: false })
 		$("#editManufacturerView").dialog({ autoOpen: false})
 		$("#createCommentDialog").dialog({ autoOpen: false })
 		$("#cablingDialogId").dialog({ autoOpen:false })

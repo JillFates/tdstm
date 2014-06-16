@@ -3,6 +3,9 @@ import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
+import org.springframework.beans.SimpleTypeConverter
+import org.springframework.web.servlet.support.RequestContextUtils as RCU
+import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 
 class CustomTagLib {
 	static namespace = 'tds'
@@ -250,5 +253,111 @@ class CustomTagLib {
 		}
 
 	}
+    
+    
+	/**
+	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
+	 */
+	def select = { attrs ->
+		def id = attrs['id'];
+		def name = attrs['name']
+        def clazz = attrs['class']
+        def onchange = attrs['ng-change']
+        def ngModel = attrs['ng-model']
+        def ngShow = attrs['ng-show']
+        def ngDisabled = attrs['ng-disabled']
+        def datasource = attrs['datasource']
+        
+        def from = attrs['from']        
+		def optionKey = attrs['optionKey']
+        def optionValue = attrs['optionValue']
+        def noSelection = attrs['noSelection']
+        def required = attrs['required']
+
+        if (noSelection != null) {
+            noSelection = noSelection.entrySet().iterator().next()
+        }
+
+        out << "<select "
+        if (name) {
+            out << "name=\"$name\" "
+        }
+        if (id) {
+            out << "id=\"$id\" "
+        }
+        if (clazz) {
+            out << "class=\"$clazz\" "
+        }
+        if (onchange) {
+            out << "ng-change=\"$onchange\" "
+        }
+        if (ngModel) {
+            out << "ng-model=\"$ngModel\" "
+        }
+        if (ngShow) {
+            out << "ng-show=\"$ngShow\" "
+        }
+        if (ngDisabled) {
+            out << "ng-disabled=\"$ngDisabled\" "
+        }
+        if (required) {
+            out << "required "
+        }
+
+        if (from && datasource) {
+            def first=true;
+            def label;
+            out << "ng-options=\"item.v as item.l for item in $datasource  \" "
+            
+            out << "ng-init=\"$datasource=["
+            from.eachWithIndex {el, i ->
+                def keyValue = null
+
+                if (optionKey) {
+                    if (optionKey instanceof Closure) {
+                        keyValue = optionKey(el)
+                    } else if (el != null && optionKey == 'id' && grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, el.getClass().name)) {
+                        keyValue = el.ident()
+                    } else {
+                        keyValue = el[optionKey]
+                    }
+                }  else {
+                    keyValue = el
+                }
+                
+                label = ""
+                if (optionValue) {
+                    if (optionValue instanceof Closure) {
+                        label = optionValue(el).toString().encodeAsHTML()
+                    } else {
+                        label = el[optionValue].toString().encodeAsHTML()
+                    }
+                } else {
+                    def s = el.toString()
+                    if (s) label = s.encodeAsHTML()
+                }
+
+                if (!first) {
+                    out << "," 
+                }
+                out << "{v:\'$keyValue\',l:\'$label\'} "
+                first = false;
+            }
+             out << "]\""
+        }
+
+        out << ">"
+        out.println()
+
+        if (noSelection) {
+            out << '<option value="' << (noSelection.key == null ? "" : noSelection.key) << '"'
+            out << '>' << noSelection.value.encodeAsHTML() << '</option>'
+            out.println()
+        }
+
+        
+        out << "</select>"
+        
+    }
 
 }

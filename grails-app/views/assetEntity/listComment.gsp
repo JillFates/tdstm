@@ -7,14 +7,22 @@
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="angular/angular.min.js" />
-		<g:javascript src="angular/plugins/angular-ui.js"/>	
+		<g:javascript src="angular/plugins/angular-ui.js"/>
+        <g:javascript src="angular/plugins/angular-resource.js" />
 		<g:javascript src="cabling.js"/>
+        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
+		<g:javascript src="bootstrap.js" />
+		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-		
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+        
 		<script type="text/javascript">
 			function onInvokeAction(id) {
 				setExportToLimit(id, '');
@@ -26,10 +34,6 @@
 			}
 			$(document).ready(function() {
 				$('#assetMenu').show();
-				$("#commentsListDialog").dialog({ autoOpen: false })
-				$("#createCommentDialog").dialog({ autoOpen: false })
-				$("#showCommentDialog").dialog({ autoOpen: false })
-				$("#editCommentDialog").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
 				$("#createEntityView").dialog({ autoOpen: false })
@@ -56,7 +60,7 @@
 					sortname="'lastUpdated'"
 					sortorder="'desc'"
 					caption="'Asset Comment:'"
-					gridComplete="function(){bindResize('listCommentGridId')}"
+					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper');}"
 					showPager="true">
 					<jqgrid:filterToolbar id="listCommentGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="listCommentGridId" add="false" edit="false" del="false" search="false"/>
@@ -65,10 +69,10 @@
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
-						return '<span class="Arrowcursor" onclick="javascript:showAssetComment(\''+options.rowId+'\',\'show\')">'+value+'</span>'
+						return '<span class="Arrowcursor" ng-click="comments.showCommentById(\''+options.rowId+'\',\'comment\')">'+value+'</span>'
 				}
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = '<a href="javascript:showAssetComment(\''+options.rowId+'\',\'edit\')">'+
+					var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
 						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					return editButton
 				}
@@ -79,7 +83,7 @@
 		</script>
 	</head>
 	<body>
-		<div class="body fluid">
+		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 			<h1>Asset Comment</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -92,8 +96,7 @@
 				<div id="cablingDialogId" style="display: none;"></div>
 				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 			</div>
-			
-			<g:render template="commentCrud"/> 
 		</div>
+        <g:render template="../assetEntity/initAssetEntityData"/>
 	</body>
 </html>

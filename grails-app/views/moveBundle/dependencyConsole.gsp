@@ -30,10 +30,6 @@
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })
 				$("#editEntityView").dialog({ autoOpen: false })
-				$("#commentsListDialog").dialog({ autoOpen: false })
-				$("#createCommentDialog").dialog({ autoOpen: false })
-				$("#showCommentDialog").dialog({ autoOpen: false })
-				$("#editCommentDialog").dialog({ autoOpen: false })
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#moveBundleSelectId").dialog({ autoOpen: false })
@@ -147,7 +143,6 @@
 			<tds:hasPermission permission='MoveBundleEditView'>
 				<div id="items1" style="display: none"></div>
 			</tds:hasPermission>
-			<g:render template="../assetEntity/commentCrud" />
 			<g:render template="../assetEntity/modelDialog" />
 			<div id="createEntityView" style="display: none;"></div>
 			<div id="showEntityView" style="display: none;"></div>

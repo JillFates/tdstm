@@ -1,4 +1,3 @@
-<g:render template="../assetEntity/commentCrud" model="['servers':servers, 'applications':applications, 'dbs':dbs, 'files':files]"/>
 <g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers, 'servers':servers,
 	 'applications':applications, 'dbs':dbs, 'files':files, 'dependencyType':dependencyType, dependencyStatus:dependencyStatus,
 	 'moveBundleList':moveBundleList]"></g:render>
@@ -17,10 +16,7 @@ $(document).ready(function() {
 		$("#editEntityView").dialog({ autoOpen: false })
 		$("#manufacturerShowDialog").dialog({ autoOpen: false })
 		$("#modelShowDialog").dialog({ autoOpen: false })
-		$("#showCommentDialog").dialog({ autoOpen: false })
-		$("#editCommentDialog").dialog({ autoOpen: false })
 		$("#editManufacturerView").dialog({ autoOpen: false})
-		$("#createCommentDialog").dialog({ autoOpen: false })
 		$("#cablingDialogId").dialog({ autoOpen:false })
 	});
 </script>

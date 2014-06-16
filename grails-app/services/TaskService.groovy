@@ -572,17 +572,13 @@ class TaskService implements InitializingBean {
 	}
 	
 	/**
-	* Used to generate a SELECT control for a project and category with an optional task. When a task is presented the list will
-	* also be filtered on tasks from the moveEvent.
-	* If a taskId is included, the SELECT will have CSS ID taskDependencyEditId otherwise taskDependencyId and the SELECT name of 
-	* taskDependencyEdit or taskDependencySave accordingly since having an Id means that we're in edit mode vs create mode.
 	*
 	* @param project - the project object to filter tasks to include
 	* @param category - a task category to filter on (optional) 
 	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	* @return String the SELECT control
 	*/
-	def genSelectForPredecessors(project, category, task, forWhom) {	
+	def genSelectForPredecessors(project, category, task) {	
 		
 		StringBuffer query = new StringBuffer("FROM AssetComment a WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
 		if (category) {
@@ -610,14 +606,7 @@ class TaskService implements InitializingBean {
 		query.append('ORDER BY a.taskNumber ASC')
 		def taskList = AssetComment.findAll( query.toString() )
 		
-		// Build the SELECT HTML
-		def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
-		def selectName = forWhom
-		def firstOption = [value:'', display:'Please Select']
-		def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
-		def selectControl = HtmlUtil.generateSelect( paramsMap )
-		
-		return selectControl
+		return taskList
 	}
 	
 	/**

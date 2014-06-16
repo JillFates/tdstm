@@ -2119,46 +2119,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 });
 
-angular.module('modNgBlur', [])
-.directive('ngBlur', function () {
-	return function (scope, elem, attrs) {
-		elem.bind('blur', function () {
-			scope.$apply(attrs.ngBlur);
-		});
-	};
-});
-
-app.factory('servicesInterceptor', [function() {
-    var servicesInterceptor = {
-        response: function(response) {
-        	var loginRedirect = response.headers('x-login-url');
-            if(!loginRedirect) {
-            	try {
-            		var json = angular.fromJson(response.data);
-                	if (json.errors && json.errors.length > 0) {
-						var errorDiv = angular.element(document.querySelector('#errorModalText'));
-						var errorsHTML = "<ul>";
-						for (var j = 0; j < json.errors.length; j++) {
-							errorsHTML = errorsHTML + "<li>" + json.errors[j] + "</li>";
-						}
-						errorsHTML = errorsHTML + "</ul>";
-						errorDiv.html(errorsHTML);
-						$('#errorModal').modal('show');
-                	} else {
-                		return response;
-                	}
-            	} catch (e) {
-                	return response;
-            	}
-            }else{
-            	alert("Your session has expired and need to login again.");
-            	//location.reload();
-            	window.location.href = loginRedirect;
-            }
-        }
-    };
-    return servicesInterceptor;
-}]);
+app.factory('servicesInterceptor', [tds.core.interceptor.LoggedCheckerInterceptor]);
 
 /**
  * This controller implements the behaviour for the source code diff dialog

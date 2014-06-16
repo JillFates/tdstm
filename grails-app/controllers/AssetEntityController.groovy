@@ -2484,6 +2484,7 @@ class AssetEntityController {
 			}
 			
 			def predecessorTable = ""
+            def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
 				taskDependencies = taskDependencies.sort{ it.predecessor.taskNumber }
@@ -2492,6 +2493,7 @@ class AssetEntityController {
 					def task = taskDep.predecessor
 					def css = taskService.getCssClassForStatus(task.status)
 					def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
+                    predecessorList << [id: taskDep.id, taskId: task.id, category: task.category, desc: taskDesc, taskNumber: task.taskNumber, status: task.status]
 					predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
 			    }
 				predecessorTable.append('</tbody></table>')
@@ -2500,12 +2502,15 @@ class AssetEntityController {
 			def successorsCount= taskSuccessors.size()
 			def predecessorsCount = taskDependencies.size()
 			def successorTable = ""
+            def successorList = []
 			if (taskSuccessors.size() > 0) {
 				taskSuccessors = taskSuccessors.sort{ it.assetComment.taskNumber }
 				successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
 				taskSuccessors.each() { successor ->
 					def task = successor.assetComment
 					def css = taskService.getCssClassForStatus(task.status)
+                    def succDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
+                    successorList << [id: successor.id, taskId: task.id, category: task.category, desc: succDesc, taskNumber: task.taskNumber, status: task.status]
 					successorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
 				}
 				successorTable.append("""</tbody></table>""")
@@ -2520,7 +2525,7 @@ class AssetEntityController {
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
-				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,assetType:assetComment.assetEntity?.assetType ]
+				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,assetType:assetComment.assetEntity?.assetType, predecessorList: predecessorList, successorList: successorList]
 		}else{
 		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
 		 log.error "showComment: show comment view - "+errorMsg
@@ -3914,7 +3919,7 @@ class AssetEntityController {
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = assetCommentList?.collect {
-			[ cell: ['',it.comment, 
+			[ cell: ['',(it.comment?.length()>50 ? (it.comment.substring(0,50) + '...'): it.comment).replace("\n",""), 
 					it.lastUpdated ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.lastUpdated, tzId)):'',
 					it.commentType ,
 					it.assetEntity?.assetName ?:'',
@@ -4717,11 +4722,13 @@ class AssetEntityController {
 	/**
 	 * This action is used to get workflowTransition select for comment id
 	 * @param assetCommentId : id of assetComment
-	 * @return select 
+     * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @return select or a JSON array
 	 */
 	def getWorkflowTransition={
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
+        def format = params.format
 		def assetCommentId = params.assetCommentId
         def assetComment = AssetComment.read(assetCommentId)
 		def assetEntity = AssetEntity.get(params.assetId)
@@ -4734,20 +4741,30 @@ class AssetEntityController {
 			def existingWorkflows = assetCommentId ? AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId ).workflowTransition : AssetComment.findAllByAssetEntity(assetEntity ).workflowTransition
 			workFlowTransition.removeAll(existingWorkflows)
 		}
-		def selectControl = ''
-		if(workFlowTransition.size()){
-			def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
-                            optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
-			selectControl = HtmlUtil.generateSelect( paramsMap )
-		}
-		render selectControl
+		def result
+        if (format == 'json') {
+        	def items = []
+        	workFlowTransition.each {
+        		items << [ id:it.id, name: it.name]
+        	}
+            result = ServiceResults.success(items) as JSON
+        } else {
+            result = ''
+            if(workFlowTransition.size()){
+                def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
+                                optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
+                result = HtmlUtil.generateSelect( paramsMap )
+            }
+        }
+		render result
 	}
     
 	/**
 	 * Provides a SELECT control with Staff associated with a project and the assigned staff selected if task id included
 	 * @param forView - The CSS ID for the SELECT control
 	 * @param id - the id of the existing task (aka comment)
-	 * @return HTML select of staff belongs to company and TDS
+     * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @return HTML select of staff belongs to company and TDS or a JSON array
 	 * 
 	 */
 	def updateAssignedToSelect = {
@@ -4757,6 +4774,7 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView
+        def format = params.format
 		def selectedId = 0
 		def person
 
@@ -4783,36 +4801,49 @@ class AssetEntityController {
 		}
 		list.sort { it.sortOn }
 		
-		def firstOption = [value:'0', display:'Unassigned']
-		def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
-			optionKey:'id', optionValue:'nameRole', 
-			optionSelected:selectedId, firstOption:firstOption ]
-		def assignedToSelect = HtmlUtil.generateSelect( paramsMap )
-		render assignedToSelect
+        def result
+        if (format == 'json') {
+            result = ServiceResults.success(list) as JSON
+        } else {
+            def firstOption = [value:'0', display:'Unassigned']
+            def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
+                optionKey:'id', optionValue:'nameRole', 
+                optionSelected:selectedId, firstOption:firstOption ]
+            result = HtmlUtil.generateSelect( paramsMap )
+        }
+		render result
 	}
 	/**
 	 * Generates an HTML SELECT control for the AssetComment.status property according to user role and current status of AssetComment(id)
 	 * @param	params.id	The ID of the AssetComment to generate the SELECT for
-	 * @return render HTML
+     * @param   format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @return render HTML or a JSON array
 	 */
 	def updateStatusSelect = {
 	
 		//Changing code to populate all select options without checking security roles.
 		def mapKey = 'ALL'//securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
+        def format = params.format
 		def taskId = params.id
 		def status = taskId ? (AssetComment.read(taskId)?.status?: '*EMPTY*') : AssetCommentStatus.READY
 		def optionList = optionForRole.get(status)
 		def firstOption = [value:'', display:'Please Select']
 		def selectId = taskId ? "statusEditId" : "statusCreateId"
 		def optionSelected = taskId ? (status != '*EMPTY*' ? status : 'na' ): AssetCommentStatus.READY
-		def paramsMap = [selectId:selectId, selectName:'statusEditId', selectClass:"task_${optionSelected.toLowerCase()}",
-			javascript:"onChange='this.className=this.options[this.selectedIndex].className'", 
-			options:optionList, optionSelected:optionSelected, firstOption:firstOption,
-			optionClass:""]
-		def statusSelect = HtmlUtil.generateSelect( paramsMap )
-		
-		render statusSelect
+
+        def result
+        if (format == 'json') {
+            result = ServiceResults.success(optionList) as JSON
+        } else {
+            def paramsMap = [selectId:selectId, selectName:'statusEditId', selectClass:"task_${optionSelected.toLowerCase()}",
+                javascript:"onChange='this.className=this.options[this.selectedIndex].className'", 
+                options:optionList, optionSelected:optionSelected, firstOption:firstOption,
+                optionClass:""]
+            result = HtmlUtil.generateSelect( paramsMap )
+        }
+
+		render result
 	  }
 	
 	/**
@@ -4887,14 +4918,20 @@ class AssetEntityController {
     
     /**
 	 * Generates the HTML SELECT for a single Predecessor
+	 * Used to generate a SELECT control for a project and category with an optional task. When a task is presented the list will
+	 * also be filtered on tasks from the moveEvent.
+	 * If a taskId is included, the SELECT will have CSS ID taskDependencyEditId otherwise taskDependencyId and the SELECT name of 
+	 * taskDependencyEdit or taskDependencySave accordingly since having an Id means that we're in edit mode vs create mode.
 	 * @param commentId - the comment (aka task) that the predecessor will use
 	 * @param category - comment category to filter the list of tasks by
-	 * @return String - HTML Select of prdecessor list
+     * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @return String - HTML Select of prdecessor list or a JSON 
 	 */
 	def predecessorSelectHtml = {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def task
+        def format=params.format
 		
 		if (params.commentId) { 
 			task = AssetComment.findByIdAndProject(params.commentId, project)
@@ -4903,9 +4940,27 @@ class AssetEntityController {
 			}
 		}
 
-		def selectControl = taskService.genSelectForPredecessors(project, params.category, task, params.forWhom)
+		def taskList = taskService.genSelectForPredecessors(project, params.category, task)
+        def result
 	    
-		render selectControl
+        if (format=='json') {
+            def list = []
+            list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
+            taskList.each {
+                def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
+                list << [ id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
+            }
+            result = ServiceResults.success(list) as JSON
+        } else {
+            // Build the SELECT HTML
+            def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
+            def selectName = params.forWhom
+            def firstOption = [value:'', display:'Please Select']
+            def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
+            result = HtmlUtil.generateSelect( paramsMap )
+        }
+
+		render result
 	}
 	
 	/**
@@ -5292,4 +5347,56 @@ class AssetEntityController {
 		}
 		render(template:'rackView',	model:[racks:racks, rackId:rackId, rackName:rackName, roomType:roomType, clazz:clazz, assetEntity:assetEntityInstance,forWhom:params.forWhom])
 	}
+
+	def getAssetsByType = {
+		def project = securityService.getUserCurrentProject();
+		if (!project) {
+			flash.message = "Please select project to view assets"
+			redirect(controller:'project',action:'list')
+			return
+		}
+		def assetType= params.assetType
+
+		try {
+			if (assetType == 'Other') {
+				assetType = AssetType.NETWORK.toString();
+			}
+			def groups = [assetType]
+			def info = assetEntityService.entityInfo(project, groups)
+			def assets = []
+			switch (assetType) {
+				case AssetType.SERVER.toString():
+					assets = info.servers;
+					break;
+				case AssetType.APPLICATION.toString():
+					assets = info.applications;
+					break;
+				case AssetType.DATABASE.toString():
+					assets = info.dbs;
+					break;
+				case AssetType.STORAGE.toString():
+					assets = info.files;
+					break;
+				case AssetType.NETWORK.toString():
+					assets = info.networks;
+					break;
+			}
+			def result = [:]
+			result.list = []
+			result.type = assetType
+        	assets.each {
+        		result.list << [ id:it[0], name: it[1]]
+        	}
+			render(ServiceResults.success(result) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 }

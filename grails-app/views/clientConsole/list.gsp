@@ -13,10 +13,21 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tableTheme.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>	
+<g:javascript src="angular/angular.min.js" />
+<g:javascript src="angular/plugins/angular-ui.js"/>	
+<g:javascript src="angular/plugins/angular-resource.js" />
+<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+<g:javascript src="bootstrap.js" />
+<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 
 <style type="text/css" media="screen">
 	.tranCell {
@@ -26,7 +37,7 @@
 
 </head>
 <body >
-<div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;">
+<div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<form name="changeStatusForm">
 	<input type="hidden" name="asset" id="assetIds"  />
 	<input type="hidden" name="projectId" id="projectId" value="${projectId}" />
@@ -299,7 +310,6 @@
 	</tbody>
 </table></div>
 </g:form>
-<g:render template="../assetEntity/commentCrud"/>
 <g:render template="../assetEntity/modelDialog"/>
 <div id="editManufacturerView" style="display: none;"></div>
 <div class="contextMenu" id="myMenu"></div>
@@ -383,10 +393,6 @@
 		$("#changeStatusDialog").dialog({ autoOpen: false })
 		$("#editEntityView").dialog({autoOpen: false})
 	    $("#showEntityView").dialog({autoOpen: false})
-		$("#commentsListDialog").dialog({ autoOpen: false })
-		$("#createCommentDialog").dialog({ autoOpen: false })
-	    $("#showCommentDialog").dialog({ autoOpen: false })
-	    $("#editCommentDialog").dialog({ autoOpen: false })
 	    $("#showChangeStatusDialog").dialog({ autoOpen: false })
 	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
 	    $("#modelShowDialog").dialog({ autoOpen: false })
@@ -617,13 +623,10 @@
 			$("#changeStatusDialog").dialog('option', 'width', 400)
 			$("#changeStatusDialog").dialog('option', 'position', ['center','top']);
 			$('#changeStatusDialog').dialog('open');
-			$('#createCommentDialog').dialog('close');
-			$('#commentsListDialog').dialog('close');
-			$('#editCommentDialog').dialog('close');
-			$('#showCommentDialog').dialog('close');
 			$('#showDialog').dialog('close');
 			$('#editDialog').dialog('close');
 			$('#createDialog').dialog('close');
+			hideCommentDialogs();
 		}
 	}
 	
@@ -1044,5 +1047,6 @@
 	currentMenuId = "#dashboardMenu";
 	$("#dashboardMenuId a").css('background-color','#003366')
 </script>
+<g:render template="../assetEntity/initAssetEntityData"/>
 </body>
 </html>

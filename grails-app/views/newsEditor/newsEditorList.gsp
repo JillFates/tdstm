@@ -21,7 +21,6 @@ function onInvokeAction(id) {
 
 <script type="text/javascript">
 $(document).ready(function() {
-    $("#showEditCommentDialog").dialog({ autoOpen: false })
     $("#createNewsDialog").dialog({ autoOpen: false })
 	var moveEvent = '${moveEventId}'
 	var viewFilter = '${viewFilter}'

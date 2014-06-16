@@ -24,6 +24,7 @@
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular/plugins/angular-resource.js" />
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 	<g:javascript src="controllers/cookbook.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />

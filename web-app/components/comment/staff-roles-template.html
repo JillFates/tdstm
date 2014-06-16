@@ -1,0 +1,8 @@
+<select ng-model="ngModel" class="assetSelect" id="roleType" name="roleType">
+	<option value="">Unassigned</option> 
+	<option ng-selected="{{role.id == ngModel}}"
+		ng-repeat="role in roleTypes"
+		value="{{role.id}}">
+	{{role.description}}
+	</option>
+</select>

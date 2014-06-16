@@ -1,0 +1,13 @@
+<table style="border: 0px; width:100px"><tbody>
+<tr ng-repeat="dependency in ngModel">
+<td>
+   <select ng-init="initDependencyList(dependency)" ng-model="dependency.category" ng-change="updateDependencyList(dependency, true)" ng-options="c.id as c.name for c in categories"></select>
+</td>
+<td>
+   <select ng-model="dependency.taskId" ng-options="item.id as (item.taskNumber?item.taskNumber+':'+item.desc:item.desc) for item in dependency.list"></select>
+</td>
+<td>
+   <a ng-click="deleteRow($index)"><span class="clear_filter"><u>X</u></span></a>
+</td>
+</tr>
+</tbody></table>

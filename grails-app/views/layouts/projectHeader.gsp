@@ -28,12 +28,15 @@
     <g:javascript src="crawler.js" />
 	<g:javascript src="select2.js"/>
 	<g:javascript src="jquery.combox.js"/>	
+	<g:javascript src="moment.min.js" />
+	<g:javascript src="daterangepicker.js" />
     <%--
     <g:javascript src="bootstrap/bootstrap.min.js" /> 
     --%>
     <g:layoutHead />
    
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
+    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
 
    <script type="text/javascript">
    		$(document).ready(function() {

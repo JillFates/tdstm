@@ -3,8 +3,6 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 
 		<title>Data Center Room List</title>
 		<g:javascript src="asset.tranman.js" />
@@ -16,12 +14,23 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="select2.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>	
+		<g:javascript src="angular/plugins/angular-resource.js" />
+	    <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	    <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+	    <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<g:javascript src="bootstrap.js" />
+		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />		
 	</head>
 	<body>
 
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
-		<div class="body" style="margin-top: 10px;width:98%;">
+		<div class="body" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
@@ -268,7 +277,6 @@
 				</table>
 			</div>
 		</div>
-		<g:render template="../assetEntity/commentCrud"/>
 		<g:render template="../assetEntity/modelDialog"/>
 		<div id ="createEntityView" style="display: none" ></div>
 		<div id ="showEntityView" style="display: none"></div>
@@ -416,5 +424,6 @@
 		currentMenuId = "#roomsMenu";
 		$("#roomMenuId a").css('background-color','#003366')
 		</script>
+		<g:render template="../assetEntity/initAssetEntityData"/>
 	</body>
 </html>

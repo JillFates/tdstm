@@ -1,0 +1,8 @@
+<select ng-model="ngModel" id="workflow" name="workflow">
+    <option value="">Unassigned</option> 
+    <option ng-selected="{{workflow.id == ngModel}}" 
+            ng-repeat="workflow in workflows"
+            value="{{workflow.id}}"> 
+    {{workflow.name}} 
+    </option> 
+</select>

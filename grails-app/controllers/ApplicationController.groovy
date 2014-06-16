@@ -90,6 +90,7 @@ class ApplicationController {
 			attributesList:attributesList, appPref:appPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true',
 			hasPerm:hasPerm, fixedFilter:fixedFilter]
 	}
+	
 	/**
 	 * This method is used by JQgrid to load appList 
 	 */
@@ -543,4 +544,5 @@ class ApplicationController {
 		def existingCol= "'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
 		render existingCol as JSON
 	}
+
 }

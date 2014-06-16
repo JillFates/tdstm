@@ -34,9 +34,19 @@ THE SOFTWARE.
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="d3/d3.min.js"/>
+		<g:javascript src="angular/angular.min.js" />
+		<g:javascript src="angular/plugins/angular-ui.js"/>	
+		<g:javascript src="angular/plugins/angular-resource.js" />
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		<style>
 		.unselectable {
 			-webkit-touch-callout: none;
@@ -229,10 +239,6 @@ THE SOFTWARE.
 		<script type="text/javascript">
 		
 		$(document).ready(function () {
-			$("#commentsListDialog").dialog({ autoOpen: false })
-			$("#createCommentDialog").dialog({ autoOpen: false })
-			$("#showCommentDialog").dialog({ autoOpen: false })
-			$("#editCommentDialog").dialog({ autoOpen: false })
 			generateGraph()
 		});
 		
@@ -1614,7 +1620,7 @@ THE SOFTWARE.
 		</script>
 	</head>
 	<body>
-		<div class="body">
+		<div class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 			<h1>Task Timeline</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -1624,7 +1630,7 @@ THE SOFTWARE.
 	            &nbsp; Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30"/>
 			&nbsp; Use Heights: <input type="checkbox" id="useHeightCheckBoxId" checked="checked"/>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
-			<g:render template="../assetEntity/commentCrud"/>
+			<g:render template="../assetEntity/initAssetEntityData"/>
 		</div>
 	</body>
 </html>
