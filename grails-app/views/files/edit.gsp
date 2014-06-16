@@ -27,18 +27,18 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label>
+								<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="assetName" class="${config.assetName}" name="assetName"
 									value="${fileInstance.assetName}" />
 								</td>
-								<td class="label ${config.description}" nowrap="nowrap"><label for="description">Description</label></td>
+								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
 								<td colspan="2"><input type="text" id="description" class="${config.description}"
 									name="description"
 									value="${fileInstance.description}" size="50" />
 								</td>
 								<td></td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
 							</tr>
@@ -53,37 +53,37 @@
 								<td><input type="text" id="lun" name="LUN"
 									value="${fileInstance.LUN}" />
 								</td>
-								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label></td>
+								<td class="label ${config.supportType} ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support</label></td>
 								<td><input type="text" id="supportType" name="supportType" class="${config.supportType}"
 									value="${fileInstance.supportType}" /></td>
-								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
+								<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">PlanStatus</label></td>
 								<td><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${fileInstance.planStatus}" />
 								</td>
 							</tr>
 
 							<tr>
-								<td class="label ${config.fileFormat}" nowrap="nowrap"><label for="fileFormat">
+								<td class="label ${config.fileFormat} ${highlightMap.fileFormat?:''}" nowrap="nowrap"><label for="fileFormat">
 										Format<span style="color: red;">*</span></label>
 								</td>
 								<td><input type="text" id="fileFormat" class="${config.fileFormat}" name="fileFormat"
 									value="${fileInstance.fileFormat}" /></td>
-								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
+								<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
 								<td><g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${fileInstance.environment}" noSelection="${['':' Please Select']}" />
 								</td>
-								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td><input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" value="${fileInstance.externalRefId}" tabindex="11" /></td>
-								<td class="label ${config.validation}"><label for="validation">Validation</label></td>
-							<td><g:select from="${fileInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'Files')" value="${fileInstance.validation}"/>	
+								<td class="label ${config.validation} ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>
+							<td><g:select from="${fileInstance.constraints.validation.inList}" id="validation" class="${config.validation}" name="validation" onChange="assetFieldImportance(this.value,'Files');highlightCssByValidation(this.value,'Files','${fileInstance.id}');" value="${fileInstance.validation}"/>	
 							</tr>
 							<tr>
-								<td class="label ${config.size}" nowrap="nowrap"><label for="size">Size<span style="color: red;">*</span></label>
+								<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size<span style="color: red;">*</span></label>
 								</td>
 								<td nowrap="nowrap" class="sizeScale">
 									<input type="text" id="size" name="size" class="${config.size}" value="${fileInstance.size}" size="10"/>&nbsp;
 									<g:select from="${fileInstance.constraints.scale.inList}" class="${config.scale}" name="scale" id="scale" value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
 								</td>
-								<td class="label ${config.rateOfChange}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
+								<td class="label ${config.rateOfChange} ${highlightMap.rateOfChange?:''}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
 								<td><input type="text" class="${config.rateOfChange}" size="3" name="rateOfChange" id="rateOfChange" value="${fileInstance.rateOfChange}"></td>
 							</tr>
 							<tbody class="customTemplate">

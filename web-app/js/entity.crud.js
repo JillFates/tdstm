@@ -825,7 +825,26 @@ function assetFieldImportance(phase,type){
 	});
 	
 }
-
+ function highlightCssByValidation(phase,forWhom, id){
+	 jQuery.ajax({
+			url: contextPath+'/assetEntity/getHighlightCssMap',
+			data: {'validation':phase, 'type':forWhom,'id':id},
+			type:'POST',
+			success: function(resp) {
+				console.log(resp)
+				$("td,input,select").removeClass("highField")
+				for (var key in resp) {
+					var value = resp[key]
+					$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred while getting asset.")
+			}
+		});
+	 
+ }
+ 
 function getHelpTextAsToolTip(type){
 	jQuery.ajax({
 		url: contextPath+'/common/getTooltips',

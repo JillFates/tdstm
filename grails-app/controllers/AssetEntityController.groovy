@@ -3457,12 +3457,13 @@ class AssetEntityController {
 			def configMap = assetEntityService.getConfig('AssetEntity','Discovery')
 			
 			def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-				
+			def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntityInstance, configMap)
+			
 			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
 								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
 								models:models, assetType:assetType, manufacuterer:manufacuterer, config:configMap.config ,customs:configMap.customs,
-								rooms:rooms, environmentOptions:environmentOptions?.value]
+								rooms:rooms, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 			 
 			 if(params.redirectTo == "assetAudit") {
 				 paramsMap << ['source':params.source, 'assetType':params.assetType]
@@ -3618,13 +3619,14 @@ class AssetEntityController {
 		if(assetEntityInstance.roomSource)
 			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
 			
+		def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntityInstance, configMap)
 		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
 							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
 							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs,
-							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks, environmentOptions:environmentOptions?.value]
+							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 		
 		if(params.redirectTo == "roomAudit") {
 			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
@@ -5033,7 +5035,33 @@ class AssetEntityController {
 		def configMap = assetEntityService.getConfig(assetType,validation)
 		render configMap.config as JSON
 	}
-	 
+	/**
+	 * This method is used to get highlighting css for particular fields
+	 * @param type,validation
+	 * @return
+	 */
+	def getHighlightCssMap= {
+		def assetType = params.type
+		def validation = params.validation
+		def assetEntityInstance
+		def forWhom
+		switch(assetType){
+			case 'Application': 
+				assetEntityInstance = params.id? Application.get(params.id): new Application(appOwner:'')
+			break;
+			case 'Database':
+				assetEntityInstance = params.id? Database.get(params.id): new Database(appOwner:'')
+			break;
+			case 'Files':
+				assetEntityInstance = params.id? Files.get(params.id): new Files(appOwner:'')
+			break;
+			default:
+				assetEntityInstance = params.id? AssetEntity.get(params.id): new AssetEntity(appOwner:'')
+		}
+		def configMap = assetEntityService.getConfig(assetType,validation)
+		def highlightMap = assetEntityService.getHighlightedInfo(assetType, assetEntityInstance, configMap)
+		render highlightMap as JSON
+	}
 	 /**
 	  * This method is used to update sheet's column header with custom labels
 	  * @param sheet : sheet's instance 

@@ -252,11 +252,12 @@ class ApplicationController {
 		
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Application','Discovery')
+		def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
 		
 		[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,moveEventList:moveEventList,
 			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, 
-			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value]
+			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 	def save = {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy")
@@ -388,11 +389,12 @@ class ApplicationController {
 			def configMap = assetEntityService.getConfig('Application',validationType)
 			def availabaleRoles = partyRelationshipService.getStaffingRoles()
 			
+			def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
 			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
 						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs, 
-						availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value]
+						availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 		}
 
 	}

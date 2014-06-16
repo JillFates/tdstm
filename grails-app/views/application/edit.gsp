@@ -39,11 +39,11 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
+								<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
 								<td>
 									<input type="text" id="assetName" class="${config.assetName}" name="assetName" 
 										value="${applicationInstance.assetName}" tabindex="9" /></td>
-								<td class="label ${config.description}" nowrap="nowrap">Description</td>
+								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap">Description</td>
 								<td colspan="3">
 									<input type="text" id="description" class="${config.description}" name="description" 
 										value="${applicationInstance.description}" size="50" tabindex="10" />
@@ -52,27 +52,27 @@
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
 								<td ><input type="text" id="assetType" name="assetType" value="Application" readonly="readonly" /></td>
-								<td class="label ${config.supportType}" nowrap="nowrap"><label for="supportType">Support</label>
+								<td class="label ${config.supportType}  ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support</label>
 								</td>
 								<td ><input type="text" id="supportType" class="${config.supportType}"
 									name="supportType" value="${applicationInstance.supportType}"  tabindex="21" />
 								</td>
-								<td class="label ${config.appFunction}" nowrap="nowrap"><label for="appFunction">Function</label>
+								<td class="label ${config.appFunction} ${highlightMap.appFunction?:''}" nowrap="nowrap"><label for="appFunction">Function</label>
 								</td>
 								<td ><input type="text" id="appFunction" class="${config.appFunction}"
 									name="appFunction" value="${applicationInstance.appFunction}"  tabindex="31" />
 								</td>
-								<td class="label ${config.userCount}" nowrap="nowrap"><label for="userCount">Users</label>
+								<td class="label ${config.userCount} ${highlightMap.userCount?:''}" nowrap="nowrap"><label for="userCount">Users</label>
 								</td>
 								<td ><input type="text" id="userId" class="${config.userCount}" name="userCount" value="${applicationInstance.userCount}"  tabindex="41" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appVendor}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
+								<td class="label ${config.appVendor} ${highlightMap.appVendor?:''}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
 								<td ><input type="text" id="appVendor" class="${config.appVendor}"
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
-								<td class="label ${config.sme}" nowrap="nowrap"><label for="sme">SME1</label></td>
+								<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td>
 									<g:select from="${personList}" id="sme1Edit" name="sme.id" class="${config.sme} personContact assetSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}"
@@ -81,11 +81,11 @@
 										noSelection="${['null':' Please Select']}" 
 									/>
 								</td>
-								<td class="label ${config.environment}" nowrap="nowrap"><label for="environment">Environment</label>
+								<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label>
 								</td>
 								<td ><g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${applicationInstance.environment}"  noSelection="${['':' Please Select']}" tabindex="32"></g:select>
 								</td>
-								<td class="label ${config.userLocations}" nowrap="nowrap"><label for="userLocations">User Location</label>
+								<td class="label ${config.userLocations} ${highlightMap.userLocations?:''}" nowrap="nowrap"><label for="userLocations">User Location</label>
 								</td>
 								<td ><input type="text" id="userLocations" class="${config.userLocations}"
 									name="userLocations"
@@ -93,12 +93,12 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appVersion}" nowrap="nowrap"><label for="appVersion">Version</label>
+								<td class="label ${config.appVersion} ${highlightMap.appVersion?:''}" nowrap="nowrap"><label for="appVersion">Version</label>
 								</td>
 								<td ><input type="text" id="appVersion" class="${config.appVersion}"
 									name="appVersion" value="${applicationInstance.appVersion}"  tabindex="12" />
 								</td>
-								<td class="label ${config.sme2}" nowrap="nowrap"><label for="sme2">SME2</label></td>
+								<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1Edit','sme2Edit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2Edit" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="id" 
@@ -109,7 +109,7 @@
 										noSelection="${['null':' Please Select']}" 
 									/>
 								</td>
-								<td class="label ${config.criticality}" nowrap="nowrap"><label for="criticality">Criticality</label>
+								<td class="label ${config.criticality} ${highlightMap.criticality?:''}" nowrap="nowrap"><label for="criticality">Criticality</label>
 								</td>
 								<td >
 									<g:select id="criticality" class="${config.criticality}" name="criticality" 
@@ -118,16 +118,16 @@
 										tabindex="33">
 									</g:select>
 								</td>
-								<td class="label ${config.useFrequency}" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
+								<td class="label ${config.useFrequency} ${highlightMap.useFrequency?:''}" nowrap="nowrap"><label for="useFrequency">Use	Frequency</label>
 								</td>
 								<td ><input type="text" id="useFrequency" class="${config.useFrequency}" name="useFrequency" value="${applicationInstance.useFrequency}" tabindex="43" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appTech}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
+								<td class="label ${config.appTech} ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
-								<td class="label ${config.appOwner}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
+								<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2Edit','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwnerEdit" class="${config.appOwner} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="id" 
@@ -138,37 +138,37 @@
 										noSelection="${['null':' Please Select']}" 
 									/>
 								</td>
-								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${applicationInstance.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
-								<td class="label ${config.drRpoDesc}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
+								<td class="label ${config.drRpoDesc} ${highlightMap.drRpoDesc?:''}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
 								</td>
 								<td ><input type="text" id="drRpoDesc"	class="${config.drRpoDesc}" name="drRpoDesc" value="${applicationInstance.drRpoDesc}" tabindex="44" />
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appSource}" nowrap="nowrap"><label for="appSource">Source</label></td>
+								<td class="label ${config.appSource} ${highlightMap.appSource?:''}" nowrap="nowrap"><label for="appSource">Source</label></td>
 								<td ><input type="text" id="appSource"	class="${config.appSource}" name="appSource" value="${applicationInstance.appSource}" tabindex="14" />
 								</td>
-								<td class="label ${config.businessUnit}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
+								<td class="label ${config.businessUnit} ${highlightMap.businessUnit?:''}" nowrap="nowrap"><label for="businessUnit">Bus	Unit</label>
 								</td>
 								<td ><input type="text" id="businessUnit" class="${config.businessUnit}" name="businessUnit" value="${applicationInstance.businessUnit}" tabindex="25" />
 								</td>
-								<td class="label ${config.planStatus}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
+								<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">Plan Status</label>
 								</td>
 								<td ><g:select from="${planStatusOptions}" id="planStatus" class="${config.planStatus}" name="planStatus" value="${applicationInstance.planStatus}" tabindex="35" />
 								</td>
-								<td class="label ${config.drRtoDesc}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
+								<td class="label ${config.drRtoDesc} ${highlightMap.drRtoDesc?:''}" nowrap="nowrap"><label for="drRtoDesc">DR RTO</label>
 								</td>
 								<td ><input type="text" id="drRtoDesc"	class="${config.drRtoDesc}" name="drRtoDesc" value="${applicationInstance.drRtoDesc}" tabindex="45" />
 								</td>
 							</tr>
 							<tr>
 							<tr>
-								<td class="label ${config.license}" nowrap="nowrap"><label for="license">License</label></td>
+								<td class="label ${config.license} ${highlightMap.license?:''}" nowrap="nowrap"><label for="license">License</label></td>
 								<td ><input type="text" id="license" class="${config.license}" name="license" value="${applicationInstance.license}" tabindex="15" />
 								</td>
-								<td class="label ${config.retireDate}"><label for="retireDate">Retire Date:</label>
+								<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}"><label for="retireDate">Retire Date:</label>
 								</td>
 								<td valign="top"
 									class="value ${hasErrors(bean:applicationInstance,field:'retireDate','errors')}">
@@ -178,11 +178,11 @@
 									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
 									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
 								</td>
-								<td class="label ${config.validation}" nowrap="nowrap"><label for="validation">Validation</label>
+								<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
-								<td ><g:select  id="validation"	class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }"  onChange="assetFieldImportance(this.value,'Application')" value="${applicationInstance.validation}" tabindex="36" />
+								<td ><g:select  id="validation"	class="${config.validation}" name="validation" from="${applicationInstance.constraints.validation.inList }"  onChange="assetFieldImportance(this.value,'Application');highlightCssByValidation(this.value,'Application','${applicationInstance.id}');" value="${applicationInstance.validation}" tabindex="36" />
 								</td>
-								<td class="label ${config.testProc}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
+								<td class="label ${config.testProc} ${highlightMap.testProc?:''}" nowrap="nowrap"><label for="testProc">Test Proc OK</label>
 								</td>
 								<td ><g:select  id="testProc"	class="${config.testProc} ynselect" name="testProc"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.testProc}" tabindex="46"/>
@@ -191,7 +191,7 @@
 							<tr>
 							    <td></td>
 							    <td></td>
-							    <td  class="label ${config.maintExpDate}"><label for="maintExpDate">Maint Exp.</label></td>
+							    <td  class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
 								<td valign="top"
 										class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
@@ -200,12 +200,12 @@
 									<input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" name="maintExpDate" id="maintExpDate" tabindex="27"
 									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" > 
 								</td>
-								<td class="label ${config.latency}" nowrap="nowrap"><label for="latency">Latency OK</label>
+								<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>
 								<td ><g:select  id="latency" class="${config.latency} ynselect"	name="latency"  from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.latency}" tabindex="37" />
 								</td>
-								<td class="label ${config.startupProc}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
+								<td class="label ${config.startupProc} ${highlightMap.startupProc?:''}" nowrap="nowrap"><label for="startupProc">Startup Proc OK</label>
 								</td>
 								<td ><g:select  id="startupProc" class="${config.startupProc} ynselect" name="startupProc" from="${['Y', 'N']}" value="?"
 		                                 noSelection="['':'?']" tabindex="46" value="${applicationInstance.startupProc}" tabindex="47"/>
@@ -213,14 +213,14 @@
 								
 							</tr>
 							<tr>
-								<td class="label ${config.url}" nowrap="nowrap"><label for="license">URL</label></td>
+								<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="license">URL</label></td>
 								<td ><input type="text" id="url" name="url" value="${applicationInstance.url}" tabindex="18" />
 								</td>
-								<td class="label ${config.externalRefId}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
+								<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td>
 									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
 									value="${applicationInstance.externalRefId}" tabindex="28" /></td>
-								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
+								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td >
 								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:config.shutdownBy]"></g:render>
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
@@ -228,14 +228,14 @@
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
 										${applicationInstance.shutdownFixed==1? 'checked="checked"' : ''}/>Fixed
 								</td>
-								<td class="label ${config.shutdownDuration}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
+								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
 								<td ><input type="text" id="shutdownDurationEdit" name="shutdownDuration"
 											value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
 							<tr>
-							<td class="label ${config.startupBy}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
+							<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:config.startupBy]"></g:render>
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
@@ -243,14 +243,14 @@
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
 										${applicationInstance.startupFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
-								<td class="label ${config.startupDuration}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
+								<td class="label ${config.startupDuration} ${highlightMap.startupDuration?:''}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
 								</td>
 								<td ><input type="text" id="startupDurationEdit" class="${config.startupDuration}" name="startupDuration"
 											value="${applicationInstance.startupDuration}" tabindex="55" size="7" />m
 								</td>
 								
 								
-								<td class="label ${config.testingBy}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
+								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:config.testingBy]"></g:render>
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
@@ -258,7 +258,7 @@
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
 										${applicationInstance.testingFixed ==1? 'checked="checked"' : ''}/>Fixed
 								</td>
-								<td class="label ${config.testingDuration}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
+								<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
 								</td>
 								<td ><input type="text" id="testingDurationEdit" class="${config.testingDuration}" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="55"  size="7"/>m

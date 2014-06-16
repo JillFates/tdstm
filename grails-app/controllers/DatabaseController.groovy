@@ -276,10 +276,11 @@ class DatabaseController {
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Database','Discovery')
+		def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
 		
 		[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 				planStatusOptions:planStatusOptions?.value, projectId:projectId, project:project, 
-			  config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value]
+			  config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 	
 	def save = {
@@ -345,11 +346,12 @@ class DatabaseController {
 			//fieldImportance Styling for default validation.
 			def validationType = databaseInstance.validation
 			def configMap = assetEntityService.getConfig('Database',validationType) 
+			def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
 			
 			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project:project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers, 
-						config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value]
+						config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 		}
 		
 		}

@@ -234,11 +234,12 @@ class FilesController {
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		//fieldImportance for Discovery by default
 		def configMap = assetEntityService.getConfig('Files','Discovery')
+		def highlightMap = assetEntityService.getHighlightedInfo('Files', fileInstance, configMap)
 		
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
 					planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,
 					planStatusOptions:planStatusOptions.value, config:configMap.config, customs:configMap.customs,
-					environmentOptions:environmentOptions?.value]
+					environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 	def save = {
 				params.assetType = "Files"
@@ -327,12 +328,13 @@ class FilesController {
 			//fieldImportance Styling for default validation.
 			def validationType = fileInstance.validation
 			def configMap = assetEntityService.getConfig('Files',validationType)
+			def highlightMap = assetEntityService.getHighlightedInfo('Files', fileInstance, configMap)
 			
 			[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, 
 						dependencyStatus:dependencyStatus,servers:servers, config:configMap.config, customs:configMap.customs,
-						environmentOptions:environmentOptions?.value]
+						environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 		}
 		
 	}

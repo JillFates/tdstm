@@ -5,7 +5,7 @@
 		<g:if test="${j % 4 == 0}">
 			<tr class="prop">
 		</g:if>
-			<td class="label ${config?.('custom'+i)}" nowrap="nowrap"><label for="custom${i}">${project.('custom'+i) ?: 'Custom'+i }</label></td>
+			<td class="label ${config?.('custom'+i)} ${highlightMap.('custom'+i)?:''}" nowrap="nowrap"><label for="custom${i}">${project.('custom'+i) ?: 'Custom'+i }</label></td>
 			<td>
 				<input type="text" id="custom${i}" class="${config?.('custom'+i)}" name="custom${i}" value="${assetEntityInstance.('custom'+i)}" tabindex="${tabOffset + 1}"/>
 			</td>
