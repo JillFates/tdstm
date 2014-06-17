@@ -892,7 +892,11 @@ class ReportsService {
 					cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
 					c.value.stack.each { cycTaskId ->
 						task = tasks.find { it.id == cycTaskId }
-						cyclicalsRef.append("<li>$task.taskNumber $task.comment")
+						if (task) {
+							cyclicalsRef.append("<li>$task.taskNumber $task.comment [TaskSpec ${task.taskSpec}]")
+						} else {
+							cyclicalsRef.append("<li>Unexpected error trying to find task record id $cycTaskId")
+						}
 					}
 					cyclicalsRef.append(" >> $c.value.loopback.taskNumber $c.value.loopback.comment</li>")
 					cyclicalsRef.append('</ul>')
@@ -916,7 +920,7 @@ class ReportsService {
 					<br></br></span>"""
 				sinksRef.append('<ul>')
 				dfsMap.sinks.each {
-						sinksRef.append("<li>$it")
+						sinksRef.append("<li>$it [TaskSpec ${it.taskSpec}]")
 					}
 				sinksRef.append('</ul>')
 			}
