@@ -50,4 +50,23 @@ class CustomTagLibTests extends GrailsUnitTestCase {
 			}
 		}
 	}
+	
+	void testTextAsLink() {
+		assertTrue new CustomTagLib().textAsLink(['text':'http://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'https://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'ftp://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'ftps://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'smb://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'file://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'\\\\hola', 'target':'_blank']).toString().startsWith('<a href="file://\\\\hola')
+		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['text':'p:/', 'target':'_blank']).toString().startsWith('<a href="file://p:/')
+		out.getBuffer().setLength(0)
+	}
 }

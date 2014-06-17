@@ -1,5 +1,6 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import org.apache.commons.validator.UrlValidator
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
@@ -229,14 +230,23 @@ class CustomTagLib {
 		def url
 		def label
 
-		def isUrl=false
-		if (text?.size() > 11) {
-			isUrl = text ==~ /(?i)^https?:\/\/.*/ 
-			if (isUrl) {
+		String[] schemes = ["http","https","ftp","ftps","smb","file"].toArray();
+		UrlValidator urlValidator = new UrlValidator(schemes);
+		
+		def isUrl = urlValidator.isValid(text)
+		
+		if (isUrl) {
+			def tokens = text.tokenize('|')
+			url = tokens[0]
+			label = tokens.size() > 1 ? tokens[1] : url
+		} else {
+			if (text.startsWith("\\\\") || text =~ "[A-z]+:/") {
+				isUrl = true
+				text = "file://" + text
 				def tokens = text.tokenize('|')
 				url = tokens[0]
 				label = tokens.size() > 1 ? tokens[1] : url
-			}
+			} 
 		}
 
 		if (isUrl) {
