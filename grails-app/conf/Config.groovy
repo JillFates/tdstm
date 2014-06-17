@@ -57,7 +57,6 @@ grails.plugin.databasemigration.dbDocController.enabled = true
 //
 // For Shiro Security Plugin
 //
-// jsecurity.legacy.filter.enabled = true
 security.shiro.annotationdriven.enabled = true
 // fix the strategy in Config.groovy to point to (http://groovy-grails.blogspot.com/search?q=shiro)
 // security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy()

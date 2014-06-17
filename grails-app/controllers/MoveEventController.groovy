@@ -179,25 +179,6 @@ class MoveEventController {
 			if(estStartTime){
 				params.estStartTime =  GormUtil.convertInToGMT(formatter.parse( estStartTime ), tzId)
 			}
-			
-			// Validate that the runbook recipe syntax is okay
-			if (params.runbookRecipe && params.runbookRecipe.size() > 0) {
-				def recipeErrors = cookbookService.validateSyntax( params.runbookRecipe )
-				if (recipeErrors) {
-					def errMsg = 'The recipe has the following error(s):<ul>'
-					log.debug "recipeErrors = $recipeErrors"
-					recipeErrors.each { e -> errMsg += "<li>${e.reason}: ${e.detail}</li>"}
-					errMsg += '</ul>'
-					log.debug "Recipe had syntax errors : $errMsg"
-
-					flash.message = errMsg
-
-					// Populate the parameters back into the MoveEvent so that the user doesn't loose what they were working on
-					moveEventInstance.properties = params
-					render(view:'edit',model:[moveEventInstance:moveEventInstance, moveBundles:MoveBundle.findAllByProject( moveEventInstance.project )])
-					return
-				}
-			}
 				
             moveEventInstance.properties = params
 			
@@ -455,8 +436,6 @@ class MoveEventController {
 			try {
 				if(params.type == 'reset'){
 					msg = taskService.resetTaskData(moveEvent)
-				} else if(params.type == 'delete'){
-					msg = taskService.deleteTaskData(moveEvent)
 				}
 			} catch(e) {
 				msg = e.getMessage()
@@ -877,35 +856,6 @@ class MoveEventController {
 			}
 		}
 		render errorMsg ? errorMsg : assetAffected
-	}
-	
-	/** 
-	 * Generates a runbook for a specified event using a recipe 
-	 * @usage Ajax
-	 * @param moveEventId
-	 * @return Results or error message appropriately
-	 */	
-	def generateMovedayTasks = {
-					
-		def message
-				 
-		if (! securityService.hasRole(['ADMIN','CLIENT_ADMIN', 'CLIENT_MGR'])) {
-			message = 'Sorry but you do not have the permissions to perform this action'
-		} else {
-			def project = securityService.getUserCurrentProject()
-			def moveEvent 
-		
-			if (params.moveEventId?.isNumber()) {
-				moveEvent = MoveEvent.findByIdAndProject(params.moveEventId, project) 
-			}
-		
-			if (! moveEvent) {
-				message = "Invalid event id or you don't have access to this project/event"
-			} else {
-				message = taskService.generateRunbook( securityService.getUserLoginPerson() , moveEvent ) 
-			}
-		}
-		render (template:"resMessage", model:[message: message])
 	}
 	
 	/**

@@ -19,7 +19,6 @@ databaseChangeLog = {
 				) ENGINE=InnoDB;
 			""")
 	}
-	/*
 
 	// This caused an error when deploying to production (see TM-2548)
 	// We need to move this migration to a new migration script once we update production and resolve this issue
@@ -29,7 +28,14 @@ databaseChangeLog = {
 		comment('Add function')
 		
 		preConditions(onFail:'MARK_RAN') {
-			tableExists(schemaName:'tdstm', tableName:'sequence_number')
+			sqlCheck(expectedResult:'0', """SELECT count(*) 
+				FROM INFORMATION_SCHEMA.ROUTINES 
+				WHERE 
+				   ROUTINE_TYPE='FUNCTION' and 
+				   ROUTINE_SCHEMA='tdstm' and 
+				   ROUTINE_NAME='tdstm_sequencer'
+				"""
+			)
 		}
 		createProcedure """
 				CREATE FUNCTION `tdstm_sequencer`(context_id BIGINT, name VARCHAR(16)) RETURNS bigint(20)
@@ -44,5 +50,4 @@ databaseChangeLog = {
 				END;
 			"""
 	}
-	*/
 }

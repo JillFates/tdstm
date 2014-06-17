@@ -3,6 +3,7 @@ package com.tds.asset
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.TimeConstraintType
 
 class AssetComment {
@@ -36,8 +37,8 @@ class AssetComment {
 	String status
 	Date dueDate
 	
-	Integer duration = 0			// # of minutes to perform task
-	String durationScale = 'm'		// Scale that duration represents m)inute, h)our, d)ay, w)eek
+	Integer duration = 0			// # of minutes/hours/days/weeks to perform task
+	TimeScale durationScale = TimeScale.M	// Scale that duration represents m)inute, h)our, d)ay, w)eek
 	Integer priority=3				// An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
 	
 	Date estStart
@@ -110,7 +111,7 @@ class AssetComment {
 			// validator:{ if (commentType=='issue' && ! status) return ['issue.blank'] } )
 		// TODO: change duration to default to zero and min:1, need to coordinate with db update for existing data
 		duration( )
-		durationScale(blank:false, inList:['m','h','d','w'])
+		durationScale(nullable:false, inList:TimeScale.getKeys())
 		// TODO : add constraint to priority
 		// priority(range:1..5)
 		priority( nullable:true )
@@ -259,13 +260,9 @@ class AssetComment {
 
 	// Returns the duration of the task in minutes
 	def durationInMinutes() {
-		def d = duration
-		switch (durationScale) {
-			case DurationScale.MINUTE:	d = duration; break
-			case DurationScale.HOUR:	d = duration/60; break
-			case DurationScale.DAY: 	d = duration/1440; break
-			case DurationScale.WEEK:	d = duration/7200; break
-		}
+		def d
+		if (durationScale)
+			d = durationScale.toMinutes( duration )
 		return d
 	}
 	

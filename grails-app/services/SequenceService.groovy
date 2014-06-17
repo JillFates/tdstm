@@ -14,12 +14,19 @@ class SequenceService {
 		this.service = Executors.newFixedThreadPool(30)
 	}
 	
-	def Integer next(final Integer contextId, final String name, final Integer maxTries=10) {
+	/**
+	 * Used to determine the next sequence number for given context and key
+	 * @param contextId - the id number that is used to uniquely identify common keys amoungst clients (typically this is the client id)
+	 * @param key - the key or label used to reference a particular sequence value
+	 * @param maxTries - provides the ability to control the number of retry attempts if the service is having contention issues with accessing the sequence table record (default:10)
+	 * @return The next sequence number for the context id + key
+	 */
+	Integer next(final Long contextId, final String key, final Integer maxTries=10) {
 		for (def i = 0; i < maxTries; i++) {
 			try {
 				Future<Integer> number = this.service.submit(new Callable<Integer>() {
 					Integer call() {
-						return internalSequenceService.next(contextId, name)
+						return internalSequenceService.next(contextId.toInteger(), key)
 					}
 				});
 			
@@ -28,7 +35,7 @@ class SequenceService {
 					return value
 				}
 			} catch (Exception e) {
-				log.info("Problem obtaining next value for sequence ${name} - ${contextId}")
+				log.error("Problem obtaining next value for sequence ${key} - ${contextId}")
 			}
 		}
 		

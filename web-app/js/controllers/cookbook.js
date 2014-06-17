@@ -1,5 +1,7 @@
 var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 
-	 'ui.codemirror']);
+	 'ui.codemirror', 'ui.router']);
+
+var restCalls, rootLog, layoutPluginTasks;
 
 app.config(['$logProvider', function($logProvider) {  
    //$logProvider.debugEnabled(false);  
@@ -9,21 +11,88 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('servicesInterceptor');
 }]);
 
+app.config(function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise('/');
+    $stateProvider
+        .state('generatedTasks', {
+            url: '/generatedTasks/:id',
+            templateUrl: 'components/cookbook/taskGrid.html',
+            controller: function($scope, $stateParams) {
+                $scope.assetComments = {};
+            	$scope.assetComments.noGridData = [{'message': 'No results found', 'context': 'none'}];
+            	$scope.assetComments.gridData = $scope.assetComments.noGridData;
+
+            	$scope.assetComments.noColDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
+            	$scope.assetComments.withDataColDef = [
+            		{field:'id', displayName:'Task #', enableCellEdit: false},
+            		{field:'description', displayName:'Description', enableCellEdit: false},
+            		{field:'asset', displayName:'Asset', enableCellEdit: false},
+            		{field:'team', displayName:'Team', enableCellEdit: false},
+            		{field:'person', displayName:'Person', enableCellEdit: false},
+            		{field:'dueDate', displayName:'Due date', enableCellEdit: false},
+            		{field:'status', displayName:'Status', enableCellEdit: false}
+            	];
+            	$scope.assetComments.colDef = $scope.assetComments.noColDef;
+
+            	$scope.assetComments.tasksGrid = {
+            		data: 'assetComments.gridData',
+            		multiSelect: false,
+            		columnDefs: 'assetComments.colDef',
+            		selectedItems: [],
+            		plugins: [layoutPluginTasks],
+            		enableCellEditOnFocus: false,
+            		afterSelectionChange: function(rowItem) {
+            			rootLog.info(rowItem.id);
+            			showAssetComment(rowItem.entity.id, 'show');
+            			$('#showCommentDialog').dialog('open');
+            		}
+            	}; 
+            	
+            	var taskBatchId = $stateParams.id;
+            	
+        		if (taskBatchId != "") {
+        			restCalls.getTasksOfTaskBatch({section: taskBatchId}, function(data){
+        				rootLog.info('Success on reading tasks of task batch');
+        				rootLog.info(data);
+        				$scope.assetComments.colDef = $scope.assetComments.withDataColDef;
+        				$scope.assetComments.gridData = data.data.tasks;
+        			}, function(){
+        				$scope.alerts.addAlert({type: 'danger', msg: 'Error getting tasks of task batch ' + taskBatchId, closeIn: 3000});
+        				rootLog.info('Error on reading tasks of task batch');
+        				$scope.assetComments.colDef = $scope.assetComments.noColDef;
+        				$scope.assetComments.gridData = $scope.assetComments.noGridData;
+        			});
+        		} else {
+        			$scope.assetComments.colDef = $scope.assetComments.noColDef;
+        			$scope.assetComments.gridData = $scope.assetComments.noGridData;
+        		}
+            }
+        })
+        .state('/', {
+        });
+});
+
 app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $resource, $timeout, $modal, 
-	$log, $location, $anchorScroll, $sce) {
+	$log, $location, $anchorScroll, $sce, $state) {
 	
 	// All Vars used
-	var restCalls, listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, lastLoopData, confirmation, 
+	var listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, lastLoopData, confirmation, 
 	confirmation, rowToShow, ModalInstanceCtrl, checkLoginStatus;
 
 	var layoutPluginGroups = new ngGridLayoutPlugin();
-	var layoutPluginTasks = new ngGridLayoutPlugin();
+	layoutPluginTasks = new ngGridLayoutPlugin();
 	var layoutPluginVersions = new ngGridLayoutPlugin();
-
+	rootLog = $log;
+	
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 	// Resource Calls
 
-	var startingFolder = 'tdstm'
+	var uriPrefix = '/tdstm';
+
+	// Used to construct the URI to controller 
+	function thisURI(path) {
+		return uriPrefix + path;
+	}
 
 	var restMethodDefinitions = {
 			archive: {
@@ -130,7 +199,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					section: "listInBundle"
 				}
 			},
-			getUsrPreferences: {
+			getProgress: {
+				method: "GET",
+				params: {
+					domain: "progress"
+				}
+			},
+			getUserPreferences: {
 				method: "GET",
 				params: {
 					domain: "user",
@@ -161,8 +236,14 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			getTaskBatch: {
 				method: "GET",
 				params: {
+					domain: "task"
+				}
+			},
+			getTasksOfTaskBatch: {
+				method: "GET",
+				params: {
 					domain: "task",
-					section: "taskBatch"
+					details: "tasks"
 				}
 			},
 			publishTaskBatch: {
@@ -177,6 +258,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				params: {
 					domain: "task",
 					details: "unpublish"
+				}
+			},
+			resetTaskBatch: {
+				method: "POST",
+				params: {
+					domain: "task",
+					details: "taskReset"
 				}
 			},
 			deleteTaskBatch: {
@@ -210,7 +298,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	};
 	
 	restCalls = $resource(
-		'/'+startingFolder+'/ws/:domain/:section/:details/:moreDetails',
+		thisURI('/ws/:domain/:section/:details/:moreDetails'),
+//		uriPrefix + '/ws/:domain/:section/:details/:moreDetails',
 		{
 			domain: "@domain",
 			section: "@section",
@@ -275,7 +364,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		history: {
 			actions: true,
 			tasks: false,
-			logs: false
+			logs: false,
+			textValue : $sce.trustAsHtml('testt'),
+			logRadioModel : 'exceptionLog'
 		},
 		editor: {
 			logs: true,
@@ -361,27 +452,15 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		enableCellEdit: true,
 		beforeSelectionChange: function(rowItem){
 			if (rowItem.rowIndex == $scope.currentSelectedRow.rowIndex) {
-				if(!$scope.preventSelection){
-					return true;
-				}else{
-					return false;
-				}
+				return (!$scope.preventSelection);
 			}
-			if($scope.editingRecipe){                
+			if($scope.editingRecipe) {
 				confirmation = confirm("Recipe " + $scope.currentSelectedRow.entity.name + 
 					" has unsaved changes."+ 
 					"Press Okay to continue and loose those changes otherwise press Cancel");
-				if (confirmation == true){
-					return true;
-				}else{
-					return false;
-				}
-			}else{
-				if(!$scope.preventSelection){
-					return true;
-				}else{
-					return false;
-				}
+				return (confirmation == true);
+			} else {
+				return (!$scope.preventSelection);
 			}
 		},
 		afterSelectionChange: function(rowItem){
@@ -823,7 +902,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			"rightLabel":rightLabel
 		};
 	    var dialogInstance = $modal.open({
-	        templateUrl: 'cookbook/sourceCodeDiffDialog.gsp',
+	        templateUrl: thisURI('/components/cookbook/sourceCodeDiffDialog.html'),
 	        controller: SourceCodeDiffController,
 	        scope: $scope,
 	        resolve: {
@@ -1204,10 +1283,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$scope.alerts.closeAlert();
 		}, time);
 	}
-	//--------------
 
-
-	// TASKS STUFF ///////////////////////////////////
+	//--------------------
+	// Task variables
+	// -------------------
 	$scope.tasks = {
 		eventsArray : [],
 		boundlesArray : [],
@@ -1221,6 +1300,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		selectedApplication : '',
 		validCurrentSelection : false,
 		showDeletePreviouslyGenerated : false,
+		progressPercent:0,
+		progressRemaining:'',
+		currentTaskBeingGenerated : -1,
 		taskBatch : {},
 		generateOpts : {
 			contextId: null,// - the select value from the select that represents the context
@@ -1231,9 +1313,16 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			deletePrevious: false
 		},
 		show : {
-			generate: true,
-			generating: false,
-			completion: false
+			start: true,
+			progress: false,
+			completed: false
+		},
+		generation : {
+			status: "",
+			taskCreated : 0,
+			exceptions : 0,
+			exceptionLog : "",
+			infoLog : ""
 		}
 	}
 
@@ -1314,7 +1403,6 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 		$scope.tasks.checkValidSelection();
 	};
-	////////////////////////////////
 
 	// Reset selects
 	$scope.tasks.resetSelects = function(){
@@ -1347,37 +1435,109 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		return newArray
 	}
 
-	// Generate btn click.
+	$scope.tasks.viewGeneratedResults = function(e){
+		var id = $scope.tasks.currentTaskBeingGenerated;
+		$scope.activeTabs.history = true;
+		$scope.activeSubTabs.history.tasks = true;
+        	$state.go('generatedTasks', { 'id' : id});
+	}
+
+	$scope.tasks.viewTaskGraph = function(e){
+		var id = $scope.tasks.currentTaskBeingGenerated;
+        	window.location = "task/moveEventTaskGraph?moveEventId=" + id;
+	}
+
+	$scope.tasks.startOver = function(e){
+		$scope.tasks.show.completed = false;
+	}
+
+	//
+	// Generate Tasks button clicked
+	//
 	$scope.tasks.generateTask = function(e){
-		var idSelected = null,
-			dataToSend;
-		switch($scope.currentSelectedRecipe.context){
-		case 'Event':
-			idSelected = $scope.tasks.selectedEvent.id;
-			break;
-		case 'Bundle':
-			idSelected = $scope.tasks.selectedBundle.id;
-			break;
-		case 'Application':
-			idSelected = $scope.tasks.selectedApplication.id;
-			break;
-		default:
-			idSelected = null
+		var idSelected = null;
+		var	dataToSend;
+		switch($scope.currentSelectedRecipe.context) {
+			case 'Event':
+				idSelected = $scope.tasks.selectedEvent.id;
+				break;
+			case 'Bundle':
+				idSelected = $scope.tasks.selectedBundle.id;
+				break;
+			case 'Application':
+				idSelected = $scope.tasks.selectedApplication.id;
+				break;
+			default:
 		}
 
 		$scope.tasks.generateOpts.contextId = idSelected;
-		$scope.tasks.generateOpts.recipeVersionId = $scope.selectedRecipe.recipeId;
+		$scope.tasks.generateOpts.recipeVersionId = $scope.selectedRecipe.recipeVersionId;
 
 		dataToSend = $.param($scope.tasks.generateOpts);
 
 		restCalls.generateTask({}, dataToSend, function(data){
 			$log.info('Success on generating task');
 			$log.info(data);
-		}, function(){
+			// Flip the user to the progress screen
+			$scope.tasks.show.start=false;
+			$scope.tasks.show.completed = false;
+			$scope.tasks.show.progress=true;
+			$scope.tasks.progressPercent = 0;
+			$scope.tasks.progressRemaining = "";
+			
+			var jobId = data.data.jobId;
+			var taskId = jobId.split('-')[1];
+
+			$scope.tasks.currentTaskBeingGenerated = taskId;
+
+			$scope.tasks.show.promise = setInterval(function() {
+				restCalls.getProgress({section: jobId}, {"id" : jobId}, function(data) {
+					$scope.tasks.progressPercent = data.data.percentComp;
+					$scope.tasks.progressRemaining = data.data.remainingTime;
+					
+					$scope.tasks.show.start = $scope.tasks.progressPercent == 100;
+					$scope.tasks.show.progress = $scope.tasks.progressPercent != 100;
+					
+					if (!$scope.tasks.show.progress) {
+						clearInterval($scope.tasks.show.promise);
+						$scope.alerts.addAlert({type: 'success', msg: 'Finish generating tasks', closeIn: 3000});
+						$scope.tasks.refreshTaskBatches();
+						$scope.tasks.show.completed = true;
+						restCalls.getTaskBatch({section: taskId}, function(data){
+							$scope.tasks.generation.status = data.data.taskBatch.status;
+							$scope.tasks.generation.taskCreated = data.data.taskBatch.taskCount;
+							$scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
+							$scope.tasks.generation.exceptionLog = $sce.trustAsHtml(data.data.taskBatch.exceptionLog);
+							$scope.tasks.generation.infoLog = $sce.trustAsHtml(data.data.taskBatch.infoLog);
+						}, function(){
+							$log.info('Error on getting Task Batch');
+						});
+					}
+				});
+		    }, 1000);
+			
+		}, function(data, status, headers, config){
+			$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to generate tasks. ' + data.headers().errormessage});
 			$log.info('Error on generating task');
 		});
 	}
 	
+	$scope.getTaskGenerationProgress = function() {
+		return $scope.tasks.progressPercent;
+	}
+	
+	$scope.getTaskGenerationStatus = function() {
+		return $scope.tasks.generation.status;
+	}
+
+	$scope.getTaskGenerationTasksCreated = function() {
+		return $scope.tasks.generation.taskCreated;
+	}
+
+	$scope.getTaskGenerationExceptions = function() {
+		return $scope.tasks.generation.exceptions;
+	}
+
 	// Get Events and Bundles
 	$scope.tasks.getEventsAndBundles = function(isGroup){
 		restCalls.getEventsAndBundles({}, function(data){
@@ -1388,7 +1548,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}else{
 				$scope.tasks.eventsArray = data.data.list;
 			}
-			$scope.tasks.getUsrPreferences(isGroup);
+			$scope.tasks.getUserPreferences(isGroup);
 		}, function(){
 			$log.info('Error on getting Events and Bundles');
 		});
@@ -1503,8 +1663,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 
 	// Get User Preference
-	$scope.tasks.getUsrPreferences = function(isGroup){
-		restCalls.getUsrPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
+	$scope.tasks.getUserPreferences = function(isGroup){
+		restCalls.getUserPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
 			$log.info('Success on getting User Preferences');
 			$log.info(data.data.preferences);
 			if(data.data.preferences.MOVE_EVENT){
@@ -1566,14 +1726,14 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			
 			$scope.tasks.gridData = (data.data.list.length > 0) ? 
 				data.data.list : [{'message': 'No results found', 'context': 'none'}];
-
+			
 			$scope.tasks.colDef = (data.data.list.length > 0) ? [
-				{field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
-				{field:'contextName', displayName:'Context', enableCellEdit: false, width: '**'},
-				{field:'taskCount', displayName:'# of', cellClass: 'text-center', 
+				// {field:'id', displayName:'Target', enableCellEdit: false, width: '**'},
+				{field:'contextName', displayName:'Context Target', enableCellEdit: false, width: '***'},
+				{field:'taskCount', displayName:'Tasks', cellClass: 'text-center', 
 					enableCellEdit: false, width: '**'},
 				{field:'exceptionCount', displayName:'Exceptions', cellClass: 'text-center', 
-					enableCellEdit: false, width: '***'},
+					enableCellEdit: false, width: '**'},
 				{field:'createdBy', displayName:'Generated By', enableCellEdit: false, width: '****'},
 				{field:'dateCreated', displayName:'Generated At', enableCellEdit: false, width: '****'},
 				{field:'status', displayName:'Status', enableCellEdit: false, width: '**'},
@@ -1591,7 +1751,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			if(data.data.list.length == 0){
 				$scope.tasks.selectedTaskBatch = null;
 			}
-			
+
 			$timeout(function(){
 				$scope.enabledGridSelection = true;
 			}, 200)
@@ -1614,11 +1774,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.tasks.getEventsAndBundles();
 	$scope.tasks.getListBundles(0);
 	$scope.tasks.getListInBundle(0);
-	///////////////////////////////////////////////////////
 
-
-	//Tasks Grid///////////////
-	
+	// ---------------------------
+	// Tasks Grid
+	// ---------------------------
 	$scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
 
 	$scope.tasks.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
@@ -1639,15 +1798,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$timeout.cancel(lastLoop);
 				lastLoop = $timeout(function(){
 					if(rowItem.entity.id){
-						$log.info('Row changed');
+						$log.info('Task row changed');
 						$scope.tasks.selectedTaskBatch = rowItem.entity;
+						$scope.activeSubTabs.history.textValue = $scope.secureHTML(rowItem.entity.exceptionLog);
 					}
 				}, 50)
-				
 			}
+            $state.go('generatedTasks', { 'id' : rowItem.entity.id});
 		}
 	}; 
 
+	$scope.$watch('activeSubTabs.history.logRadioModel', function(value) {
+		if ($scope.tasks.currentSelectedTaskRow) {
+			$scope.activeSubTabs.history.textValue = $scope.secureHTML($scope.tasks.currentSelectedTaskRow.entity[value]);
+		}
+	 });
+	
 	// Tasks Grid Actions
 	$scope.tasks.tasksGridActions = function(item, action){
 		$log.info(action);
@@ -1663,30 +1829,73 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Delete tasks batch function
 	$scope.tasks.deleteTaskBatch = function(id){
-		restCalls.deleteTaskBatch({section: id}, function(data){
-			$log.info('Success on deleting task');
-			$log.info(data);
-		}, function(){
-			$log.info('Error on deleting task');
-		});
+		var confirmation = confirm("Are you sure you want to delete the generated tasks? "+ 
+			"Press Okay to continue and loose those changes otherwise press Cancel");
+
+		if (confirmation) {
+			restCalls.deleteTaskBatch({section: id}, function(data){
+				$scope.alerts.addAlert({type: 'success', msg: 'Finish deleting tasks', closeIn: 3000});
+				$log.info('Success on deleting task');
+				$log.info(data);
+				$scope.tasks.refreshTaskBatches();
+			}, function(){
+				$log.info('Error on deleting task');
+			});
+		}
+	}
+	
+	// Reset tasks batch function
+	$scope.tasks.resetTaskBatch = function(id){
+		var confirmation = confirm("Are you sure you want to reset the generated tasks? "+ 
+				"Press Okay to continue and loose those changes otherwise press Cancel");
+
+		if (confirmation) {
+			restCalls.resetTaskBatch({section: id}, function(data){
+				$scope.alerts.addAlert({type: 'success', msg: 'Finish resetting tasks', closeIn: 3000});
+				$log.info('Success on resetting task');
+				$log.info(data);
+			}, function(){
+				$log.info('Error on resetting task');
+			});
+		}
+	}
+	
+	$scope.tasks.refreshTaskBatches = function() {
+		$scope.tasks.getListTaskBatches({recipeId: $scope.selectedRecipe.recipeId, limitDays: 30});
 	}
 
 	// Publish && Unpublish tasks batch functions
 	$scope.tasks.publishUnpublishTaskBatch = function(obj){
-		if(obj.isPublished){
-			restCalls.publishTaskBatch({section: obj.id}, function(data){
-				$log.info('Success on publishing task');
-				$log.info(data);
-			}, function(){
-				$log.info('Error on publishing task');
-			});
-		}else{
-			restCalls.unpublishTaskBatch({section: obj.id}, function(data){
-				$log.info('Success on unpublishing task');
-				$log.info(data);
-			}, function(){
-				$log.info('Error on unpublishing task');
-			});
+		var message = "";
+		if (obj.isPublished) {
+			message = "unpublish";
+		} else {
+			message = "publish";
+		}
+		
+		var confirmation = confirm("Are you sure you want to " + message + " the generated tasks? "+ 
+		"Press Okay to continue and loose those changes otherwise press Cancel");
+
+		if (confirmation) {
+			if(obj.isPublished){
+				restCalls.unpublishTaskBatch({section: obj.id}, function(data){
+					$scope.alerts.addAlert({type: 'success', msg: 'Finish ' + message + 'ing tasks', closeIn: 3000});
+					$log.info('Success on publishing task');
+					$log.info(data);
+					$scope.tasks.refreshTaskBatches();
+				}, function(){
+					$log.info('Error on publishing task');
+				});
+			}else{
+				restCalls.publishTaskBatch({section: obj.id}, function(data){
+					$scope.alerts.addAlert({type: 'success', msg: 'Finish ' + message + 'ing tasks', closeIn: 3000});
+					$log.info('Success on unpublishing task');
+					$log.info(data);
+					$scope.tasks.refreshTaskBatches();
+				}, function(){
+					$log.info('Error on unpublishing task');
+				});
+			}
 		}
 	}
 
@@ -1700,9 +1909,10 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
     	}
     };
 
-	///////////////////////////
-
-	//GROUPS///////////////////
+    
+	// ---------------------------
+	//GROUPS
+	// ---------------------------
 
 	var isGroup = true;
 
@@ -1851,9 +2061,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.tasks.getListBundles(0, isGroup);
 	$scope.tasks.getListInBundle(0, isGroup);
 
-
-
-	// ASSETS //////////////
+	// ---------------------------
+	// ASSETS
+	// ---------------------------
 	$scope.assets = {
 		colDef : [],
 		gridData : [],
@@ -1900,11 +2110,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 	};
 
-
-    ///////////////////////
-
+	// ---------------------------
     // VERSIONS
-
+	// ---------------------------
     $scope.versions = {
     	versionsArray : [],
 		selectedVersion : '',
@@ -2054,6 +2262,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$timeout.cancel(lastLoop);
 				lastLoop = $timeout(function(){
 					if(rowItem.entity.id){
+						$state.go('generatedTasks', {'id' : ''});
 						$log.info('Version Row changed');
 						$log.info(rowItem.entity);
 						var versionNumber = (rowItem.entity.versionNumber) ? rowItem.entity.versionNumber : 0;

@@ -73,14 +73,15 @@ class MoveEvent {
 	}
 
 	/**
-	 * Retrieves the MIN/MAX Start and Completion times of the MoveBundleSteps associate with the MoveBundle.MoveEvent
+	 * Retrieves the PLAN MIN/MAX Start and Completion times of the MoveBundleSteps associate with the MoveBundle.MoveEvent
+	 * TODO : JPM 3/2014 - getPlanTimes () doesn't look like it can actually work as the columns don't exist in MoveBundle
 	 * @return Map[planStart, planCompletion] times for the MoveEvent
 	 */
 	def getPlanTimes() {
 		def planTimes = jdbcTemplate.queryForMap(
-						"""SELECT MIN(mbs.plan_start_time) as start,  MAX(mbs.plan_completion_time) as completion FROM move_bundle mb
-						LEFT JOIN move_bundle_step mbs on mb.move_bundle_id = mbs.move_bundle_id WHERE move_event_id = ${id} """
-						)
+			"""SELECT MIN(mbs.plan_start_time) as start,  MAX(mbs.plan_completion_time) as completion FROM move_bundle mb
+			LEFT JOIN move_bundle_step mbs on mb.move_bundle_id = mbs.move_bundle_id WHERE move_event_id = ${id} """
+			)
 		return planTimes
 	}
 	/**
@@ -88,9 +89,11 @@ class MoveEvent {
 	 * @return Map[start, completion] times for the MoveEvent
 	 */
 	def getEventTimes() {
-		def eventTimes = jdbcTemplate.queryForMap("SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
+		def eventTimes = jdbcTemplate.queryForMap(
+			"SELECT MIN(start_time) as start,  MAX(completion_time) as completion FROM move_bundle WHERE move_event_id = ${id} ")
 		return eventTimes
 	}
+	
 	/*
 	 *  Render moveBundles list as comma separated value string
 	 */

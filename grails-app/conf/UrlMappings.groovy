@@ -118,6 +118,16 @@ class UrlMappings {
 			action = [POST:"unpublish"]
 		}
 		
+		"/ws/task/$id/taskReset" {
+			controller = "wsTask"
+			action = [POST:"taskReset"]
+		}
+		
+		"/ws/task/$id/tasks" {
+			controller = "wsTask"
+			action = [GET:"getTasksOfTaskBatch"]
+		}
+		
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [GET:"get"]

@@ -64,7 +64,7 @@ class SqlUtil {
 		} else if (criteria instanceof java.lang.Enum) {
 			map = [sql:"$property = :$paramName", param:criteria]				
 		} else {
-			println "whereExpression received criteria of unsupported class type (${criteria.class}) for property $property"
+			println "whereExpression received criteria of unsupported class type (${criteria?.class}) for property $property"
 			map = null
 		}
 		return map

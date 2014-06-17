@@ -6,6 +6,7 @@ class ProgressInfo {
 	String key
 	Integer percentComp = 0
 	String status
+	String detail
 	TimeDuration remainingTime
 	long lastUpdated
 	

@@ -14,6 +14,12 @@ import com.tdssrc.grails.GormUtil
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import java.text.SimpleDateFormat
 
+import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.security.ConnectorActiveDirectory
+
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 class TestCaseController {
 
@@ -22,8 +28,71 @@ class TestCaseController {
 	def personService
 	def runbookService
 	def taskService	
+	def securityService
+	def userService
 
 	// def messageSource
+	
+	def checkADConfig = {
+		def out = "<h1>Testing AD Configuration</h1><pre>" 
+		out += securityService.getActiveDirectorySettings().toString() + "</pre>"
+
+		render out.toString()
+	}
+
+	def findPerson = {
+		def nameMap = [first:'John', last:'Martin']
+
+		def client = PartyGroup.read(18)
+		def fullname = personService.findByClientAndName(client, nameMap) 
+		def firstname = personService.findByClientAndName(client, [first:'John'])
+		def email = personService.findByClientAndEmail(client, 'jmartin@transitionaldata.com')
+		def login = UserLogin.findAllByPersonInList(firstname)
+
+		render "Found by:<br>fullname: $fullname<br>firstname: $firstname<br>email: $email<br>logins: $login".toString()
+	}
+
+	def finduser = {
+		def userLogin = UserLogin.findByUsername( 'jmtest@transitionaldata.com' )
+		render (userLogin ? userLogin.toString() : 'Not found')
+	}
+	
+	def provisioning = {
+		def conf = securityService.getActiveDirectoryConfig()
+		conf.defaultProject = 2468
+
+		def userInfo=[:]
+		userInfo.company = 2467
+		userInfo.username = 'jmtest'
+		userInfo.firstName = 'John'
+		userInfo.lastName = 'Martin'
+		userInfo.fullName = 'John Martin'
+		userInfo.email = 'jmtest@transitionaldata.com'
+		userInfo.telephone = '555-111-3333'
+		userInfo.mobile = '555-222-3333'
+		userInfo.guid = 'kjlj23l4kj2l3jl23423lkj'
+		userInfo.roles = ['editor']
+
+		def user = userService.findOrProvisionUser(userInfo, conf)
+		render (user ? user.toString() : 'Nothing') 
+	}
+
+	def adIntegration = {
+		def ctx = ApplicationContextHolder.getApplicationContext()
+		def conf = ApplicationContextHolder.getConfig()
+		def adConf = conf?.tdstm?.security?.ad
+
+		//render ctx.securityService.class
+		//return
+
+		def username='jmtest'
+		def pswd='tryT0Gu3ss1t'
+		def userInfo = ConnectorActiveDirectory.getUserInfo(username, pswd, adConf)
+
+		render userInfo.toString()
+
+	}
+
 
 	def testGormUtilGetDPWC = {
 		def sb = new StringBuilder()

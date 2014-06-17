@@ -498,6 +498,7 @@ function listCommentsDialog(e,action) {
         return;
 	}
 }
+
 // Invoked by Ajax call to populate the Create & Edit Asset Comment Dialog
 //DEPRECATED
 function showAssetCommentDialog( e , action){

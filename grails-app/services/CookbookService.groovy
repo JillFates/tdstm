@@ -238,12 +238,20 @@ class CookbookService {
 		if (!recipe.project.equals(currentProject)) {
 			throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}
-		
-		recipe.releasedVersion = null;
-		recipe.save(flush:true, failOnError: true)
-		
-		namedParameterJdbcTemplate.update('UPDATE task_batch SET recipe_version_used_id = NULL WHERE recipe_version_used_id IN (SELECT recipe_version_id FROM recipe_version WHERE recipe_id = :recipeId)', ['recipeId' : recipeId])
-		namedParameterJdbcTemplate.update('DELETE FROM recipe_version WHERE recipe_id = :recipeId', ['recipeId' : recipeId])
+
+		def rvList = RecipeVersion.findAllByRecipe(recipe)
+		log.debug "Found ${rvList.size()} recipe versions to be deleted"
+		if (rvList.size()) {
+			// Update all TaskBatch to null the reference to the recipeVersions
+			TaskBatch.executeUpdate('update TaskBatch tb set tb.recipeVersionUsed=null where tb.recipeVersionUsed in (:rvList)', [rvList:rvList] )
+			RecipeVersion.executeUpdate('update RecipeVersion rv set rv.clonedFrom=null where rv.clonedFrom in (:rvList)', [rvList:rvList] )
+		}
+
+		recipe.releasedVersion=null
+		recipe.save(flush:true, failOnError:true)
+
+		// Remove all versions of the recipes
+		RecipeVersion.executeUpdate('delete RecipeVersion rv where rv.recipe=:recipe', [recipe:recipe])
 		
 		recipe.delete(failOnError: true)
 		
@@ -866,6 +874,8 @@ class CookbookService {
 		def recipe
 		def msg
 
+		// TODO: ValidateSyntax - Add a check to make sure that any filters that specify a group, that the group is defined
+
 		// Helper closure that compares the properties of a spec to a defined map
 		def validateAgainstMap
 		validateAgainstMap = { type, spec, map, key ->
@@ -885,6 +895,7 @@ class CookbookService {
 						errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )
 					} else if ( CU.isaList(map[n]) ) {
 						// Check if the value of a property exists in the map defined list
+						// Need to strip out any boolean expressions
 						def cleanedExp = v.replaceAll( /[!=<>]/, '' )
 						if ( ! map[n].contains( cleanedExp ) ) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
@@ -932,6 +943,7 @@ class CookbookService {
 			action: ['rollcall','location','room','rack','truck','set'],
 			disposition:0,
 			setOn:0,
+			disabled:false,
 			action:0,
 			workflow:0,
 			duration:'',
@@ -952,7 +964,7 @@ class CookbookService {
 				gather:'',
 				parent:0,
 				ignore:true,
-				require:true,
+				required:true,
 				typeSpec:0,
 				taskSpec:0,
 				inverse:true,

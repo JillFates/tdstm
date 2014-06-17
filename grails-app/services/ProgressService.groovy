@@ -34,39 +34,48 @@ class ProgressService {
 	 * @param key the key of the progress
 	 * @param status the initial status
 	 */
-	void create(String key, String status='') {
+	void create(String key, String status='Pending') {
 		ProgressInfo info = new ProgressInfo(key, status)
 		this.progressInfo.put(key, info)
 		//REMOVE THIS. ONLY FOR DEMO
-		this.service.execute(new Runnable() {
-			void run() {
-				int p = 2
-				while (p < 100) {
-					ProgressService.this.update(key, p, 'In progress', null)
-					p = p + 2
-					Thread.sleep(1000)
+		def demo = false
+		if (demo) {
+			this.service.execute(new Runnable() {
+				void run() {
+					int p = 2
+					while (p < 100) {
+						ProgressService.this.update(key, p, 'In progress', null)
+						p = p + 2
+						Thread.sleep(1000)
+					}
+					ProgressService.this.update(key, 100, 'Completed', null)
 				}
-				ProgressService.this.update(key, 100, 'Completed', null)
-			}
-		});
+			});
+		}
 	}
 	
+	// TODO : the ProgressService class will need be updated for a Clustered Tomcat configuration
+
 	/**
 	 * Updates a progress info with the specific information
 	 * If the info doesn't exists it simply ignores it
 	 * 
-	 * @param key the key of the progress
-	 * @param percentComp the percentage completed
-	 * @param status the initial status
+	 * @param key - the key of the progress
+	 * @param percentComp - the percentage completed
+	 * @param status - the initial status
+	 * @param detail - any additional information that might be shown in the progress meter such as the sub-task being performed (optional)
+	 * @param remainingTime - an estimate of the remainingTime before the task completes (optional)
 	 */
-	void update(String key, Integer percentComp, String status, TimeDuration remainingTime=null) {
+	void update(String key, Integer percentComp, String status, String detail='', TimeDuration remainingTime=null) {
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
-			log.debug("Key FOUND ${key}")
+			log.debug("update() Key was found ${key}")
 			synchronized (info) {
 				info.percentComp = percentComp
 				info.status = status
 				info.remainingTime = remainingTime
+				info.detail = detail
+				// TODO - this should be maintained in GMT
 				info.lastUpdated = new Date().getTime()
 			}
 		} else {
@@ -113,6 +122,7 @@ class ProgressService {
 			return [
 				'percentComp' : info.percentComp,
 				'status' : info.status,
+				'detail' : info.detail,
 				'remainingTime' : info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
 				'lastUpdated' : info.lastUpdated
 			];

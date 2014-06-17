@@ -137,7 +137,7 @@ class RunbookService {
 
 			// Check to see if we have entered into a cyclical map reference
 			if (stack.size() > 0 && stack.find { it == n } ) {
-				//log.debug "dfsOfGraph() - found cyclical reference(1) with ${vertex}"
+				log.debug "dfsOfGraph() - found cyclical reference(1) with ${vertex}"
 				cyclicalMaps[n] = [stack:stack.clone(), loopback:n]
 			}
 
@@ -223,6 +223,9 @@ class RunbookService {
 			"sinkVertices=$sinkVertices \n looped $loops times; recursed $tick times; took ${elapsed} to process"
 
 */
+
+		// Clean up objects that are causing memory leaks
+		
 		return [ 'sinks': sinkVertices, 'starts': startVertices, 'cyclicals': cyclicalMaps, 'elapsed': elapsed ]
 	}
 
@@ -759,4 +762,250 @@ class RunbookService {
 		return estFinish
 	}
 
+	/**
+	 * Used to compute the earliest and latest starts of a set of tasks in a directed graph
+	 * @param startTime - The start time for the event in GMT
+	 * @param tasks - list of tasks
+	 * @param dependencies - list of task dependencies associated with the task list
+ 	 * @param starts - list of the start vertices
+	 * @param sinks - list of the sink vertices
+	 * @param graphs - The resulting graphs data from determineUniqueGraphs() method
+	 * @return ?
+	 */
+	def computeStartTimes2(Date startTime, List<AssetComment> tasks, List<TaskDependency> dependencies, List<AssetComment> starts, List<AssetComment> sinks, List<Map> graphs ) {	
+
+		// 
+		// Initialization
+		// 
+
+		def time = startTime
+		// TODO - we need to convert to some time offset? TimeUtil.nowGMT()
+
+		// Sort on the # of tasks and then max durations so we work on the most important graph(s) first
+		if (graphs.size() > 1)
+			graphs = graphs.sort{ [it.maxDownstreamTaskCount, it.maxPathDuration ] }
+
+		// Add the temporary starts variables and reset the beenExplored 
+		tasks.each { 
+			it.metaClass.setProperty('tmpEarliestStart', 0)
+			it.metaClass.setProperty('tmpEstimatedStart', 0)
+			it.metaClass.setProperty('tmpLatestStart', 0)
+			it.metaClass.setProperty('tmpCriticalPath', false)
+			it.tmpBeenExplored = false
+		}
+
+		// Convert the task list into map by their ids
+		def tasksMap = tasks.asMap('id')
+
+		// Get map by dependencies by their predecessor and by their successors
+		def edgesByPred = dependencies.asGroup { it.predecessor.id }
+		def edgesBySucc = dependencies.asGroup { it.successor.id }
+
+		def estFinish
+
+		def constraintViolations = []
+
+		// 
+		// Main Loop
+		// 
+
+		// Need to iterate over the list of graphs and choose the first graph to work on
+		for (int g=0; g < graphs.size(); g++) {
+
+			// Find the start vertex that we should traverse based on the longest duration and tasks downstream
+			def task = findCriticalStartTask(tasksMap, graphs[g])
+
+			if (task==null) {
+				log.error "computeStartTimes() - No Critical Start Task found for graph: ${graphs[g]}"
+				continue
+			}
+
+			//
+			// Determine Critical Path
+			// Perform a DFS process through the graph to determine the earliest starts on the initial critical path
+			//
+			def safety = 500
+			while (true) {
+				if (--safety == 0) {
+					throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task ${task.taskNumber})")
+				}
+				task.tmpEstimatedStart = time
+				task.tmpEarliestStart = time
+				task.tmpLatestStart = time
+				task.tmpCriticalPath = true
+				time += task.durationRemaining()
+				log.debug "computeStartTimes() DFS/CP task id=${task.id}, dur=${task.duration}. time=$time"
+
+				def edge = findCriticalPath(task, edgesByPred)
+				if (edge == null) {
+					// We presently on the sink vertex
+					break
+				} else {
+					task = edge.successor
+					if (task.tmpBeenExplored) {
+						throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task: ${task.taskNumber}, edge: $edge)")
+					}
+					task.tmpBeenExplored = true
+				}
+			}
+
+			estFinish = time
+
+			//
+			// Calculate Latest Starts for all tasks 
+			// Do a reverse BFS walk through the graph to update the tmpLatestStart values for all tasks that we haven't walked
+			// using each of the sink vertices in the graph
+			//
+
+			// Create a queue that we'll use to push and pull from using FIFO
+			java.util.LinkedList queue = new java.util.LinkedList()
+
+			// initialize the queue with all of the sink tasks
+			graphs[g].sinks.each { id ->
+				id = id.toString()
+
+				queue.add(id) 
+
+				tasksMap[id].tmpBeenExplored = true
+
+				// Update the non-critical path sink tasks with the latest start
+				if (id != task.id.toString())
+					tasksMap[id].tmpLatestStart = estFinish - tasksMap[id].duration
+			}
+
+			// We'll iterate until the queue is empty
+			safety = tasks.size() * 3
+			while( queue.size() > 0 ) {
+
+				// Bail out of infinite loop
+				if ( --safety == 0 ) {
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')					
+				}
+
+				// Get task id out of the queue
+				def taskId = queue.poll()
+				log.debug "computeStartTimes() RBFS task=$taskId"
+
+				if (edgesBySucc.containsKey(taskId)) {
+					// Get the latest start of the successor task 
+					def succLatestStart = tasksMap[taskId].tmpLatestStart
+
+					// Iterate over the edges back to the predecessor tasks
+					edgesBySucc[taskId].each() { edge ->
+						def calcLatestStart = succLatestStart - edge.predecessor.duration 
+						if ( ! tasksMap[edge.predecessor.id.toString()].tmpBeenExplored ) {
+							// Add the task to the queue
+							queue.push(edge.predecessor.id.toString())
+							edge.predecessor.tmpLatestStart = calcLatestStart
+							edge.predecessor.tmpBeenExplored = true
+						} else {
+							// Been here before so we need to compare the latest starts to set to the ealiest start of the two
+							if ( calcLatestStart < edge.predecessor.tmpLatestStart ) 
+								edge.predecessor.tmpLatestStart = calcLatestStart
+						}
+					}
+				} else {
+					log.debug "computeStartTimes() Hit a start vertices task=$taskId"
+				}
+
+			}
+
+			//
+			// Calculate Earliest Starts
+			// Do a forward BFS walk through the graph to update the tmpEarliestStart that have yet to be updated (non-critical path)
+			//
+
+			// load queue with the start vertices
+			graphs[g].starts.each { id -> queue.push( id.toString() ) }
+
+			tasks.each { 
+				it.tmpBeenExplored = false
+			}
+
+			// log.debug "computeStartTimes() edgesByPred Keys: ${edgesByPred.keySet()}"
+
+			safety = tasks.size() * 3
+			while( queue.size() ) {
+
+				// Bail out of infinite loop
+				if ( --safety == 0 ) {
+					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')					
+				}
+
+				def taskId = queue.poll()
+				log.debug "computeStartTimes() Earliest task=$taskId, queue.size=${queue.size()}"
+				if (edgesByPred.containsKey(taskId)) {
+					edgesByPred[taskId].each() { edge ->
+						// Only need to calculate the earliest start of non-critical path tasks
+						if ( !edge.successor.tmpCriticalPath ) {
+							def earliest = edge.predecessor.tmpEarliestStart + edge.predecessor.duration
+							if (earliest > edge.successor.tmpEarliestStart)
+								edge.successor.tmpEarliestStart = earliest
+						}
+						if ( ! edge.successor.tmpBeenExplored ) {
+							queue.push( edge.successor.id.toString() )
+							edge.successor.tmpBeenExplored = true
+						}
+					}
+				} else {
+					log.debug "computeStartTimes() hit sink vertex $taskId"
+				}
+			}
+
+		} // for (int g=0; g < graphs.size(); g++)
+
+
+		return estFinish
+	}
+
+//  eventStart, eventFinish, constraintTask
+	/** 
+	 * Used to find the task that would be used as the starting point for calculating a plan's scheduled based on the method
+	 * @param method - the way to look for the contraint
+	 */
+	def findInitialConstrainedTask(String method, List<AssetComment> tasksList, List<AssetComment> starts, List<AssetComment> sinks ) {
+		def task
+
+		assert starts.size() 
+		assert sinks.size()
+		int i
+
+		switch (method) {
+			case 'ES':
+				// Event Start - find the start vertice with the longest path duration 
+				task = starts.find { it.tmpCriticalPath }
+				break
+			case 'EF':
+				// Event Finish - find the sink vertice with the latest start (earliest=latest)
+				task = sink.find { it.tmpCriticalPath }
+				break
+			case 'IF':
+				// In Flight - loop through tasks to find the one with the longest duration ignoring completed. For those started, reduce by now-started.
+				break
+			case ~/EC|LC/:
+				// Earliest or Latest Constrained task - get list of constraints and return the earliest
+				def constraints = tasks.findAll { it.constraintType && it.constraintTime }
+				if (constraints) {
+					if (method=='ES')
+						constraints.sort { a,b -> a < b }
+					else
+						constraints.sort { a,b -> a > b }
+					task = constraints[0]
+				} else {
+					// Need to find like ES or EF
+					if (method=='ES')
+						task = starts.find { it.tmpCriticalPath }
+					else
+						task = sinks.find { it.tmpCriticalPath }
+				}
+				break
+			case 'MC':
+				// Most critical task - don't need to figure this out as it needs to be done in the UI
+				break
+			default:
+				throw new RuntimeException("findConstrainedTask: called with unsupported method $method")
+		}
+		log.debug ""
+
+	}
 }

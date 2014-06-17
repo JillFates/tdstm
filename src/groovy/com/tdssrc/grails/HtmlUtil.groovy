@@ -114,4 +114,17 @@ class HtmlUtil {
 	def public static createLink(map) {
 		g.createLink(map).toString()
 	}
+
+	/**
+	 * Used to create a UL list from an array list
+	 * @param List to be converted to HTML
+	 * @return The HTML of an UL list
+	 */
+	public static String asUL(List list) {
+		StringBuilder text = new StringBuilder('<ul>')
+		list.each { text.append( '<li>' + it)}
+		text.append('</ul>')
+		return text.toString()		
+	}
+
 }

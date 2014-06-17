@@ -1,5 +1,6 @@
 
 import com.tds.asset.Application
+import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.ContextType
 import com.tdssrc.grails.TimeUtil
 
@@ -49,7 +50,7 @@ class TaskBatch {
 		createdBy(nullable:false)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
-		status(blank:false, nullable:false ,inList:['Pending', 'Generating', 'Completed', 'Cancelled'] )
+		status(blank:false, nullable:false ,inList:['Pending', 'Generating', 'Completed', 'Failed', 'Cancelled'] )
 	}
 
 	static mapping  = {	
@@ -72,6 +73,11 @@ class TaskBatch {
 	
 	def beforeUpdate = {
 		lastUpdated = TimeUtil.nowGMT()
+	}
+
+	def beforeDelete = {
+		// Remove any tasks that were created by the batch
+		AssetComment.executeUpdate('delete AssetComment ac where ac.taskBatch=:taskBatch', [taskBatch:this])
 	}
 
 	/** 

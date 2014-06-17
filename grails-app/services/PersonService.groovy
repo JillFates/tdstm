@@ -131,6 +131,28 @@ class PersonService {
 	}
 
 	/**
+	 * Used to find a person by full name
+	 * @param A string representing a person's name (e.g. John Doe; Doe, John; John T. Doe)
+	 * @return Null if name unable to be parsed or a Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is 
+	 * found. If more than one match is found then isAmbiguous will be set to true.
+	 */
+	Map findPersonByFullName(String name) {
+		def map = parseName(name)
+		if (map) {
+			def people = Person.findAll("from Person as p where p.firstName=? and p.middleName=? and p.lastName=?", [ map.first, map.middle, map.last ] )
+			if (people.size() == 1) {
+				map.person = people.get(0)
+			} else {
+				map.isAmbiguous = true;
+			}
+		} else {
+			map.isAmbiguous = true;
+		}
+		
+		return map;
+	}
+	
+	/**
 	 * Used to find a person associated with a given project using a parsed name map
 	 * @param Map containing person name elements
 	 * @param Project the project/client that the person is associated with

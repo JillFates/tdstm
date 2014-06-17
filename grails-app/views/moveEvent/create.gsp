@@ -89,23 +89,7 @@
 	                                <ul id="moveBundleList">
 	                                </ul>
                             	</td>
-                            </tr> 
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="runbookStatus">Runbook Status:</label>
-                                </td>
-                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
-                                    <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
-                                </td>
-                            </tr> 
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="description">Runbook version:</label>
-                                </td>
-                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookVersion','errors')}">
-                                    <input type="text" id="runbookVersion" name="runbookVersion" value="${fieldValue(bean:moveEventInstance,field:'runbookVersion')}"/>
-                                </td>
-                            </tr> 
+                            </tr>
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Runbook bridge1 :</label>

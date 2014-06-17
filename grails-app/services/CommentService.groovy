@@ -13,6 +13,7 @@ import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.TimeScale
 
 import org.quartz.SimpleTrigger
 import org.quartz.Trigger
@@ -208,8 +209,11 @@ class CommentService {
 			if (params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
 			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
 			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
-			if (params.duration?.isNumber()) assetComment.duration = Integer.parseInt(params.duration)
-			if (params.durationScale) assetComment.durationScale = params.durationScale		
+			if (params.duration.isInteger()) assetComment.duration = Integer.parseInt(params.duration)
+			if (params.durationScale) {
+				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())		
+				log.debug "saveUpdateCommentAndNotes - TimeScale=${assetComment.durationScale}"
+			}
 		 
 			// Issues (aka tasks) have a number of additional properties to be managed 
 			if ( assetComment.commentType == AssetCommentType.TASK ) {
@@ -268,6 +272,7 @@ class CommentService {
 			// should be the last update to Task properties before saving.	
 			taskService.setTaskStatus( assetComment, params.status )		
         
+        	log.debug "saveUpdateCommentAndNotes() about to save task/comment $assetComment"
 			if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 			
 				// Deal with Notes if there are any

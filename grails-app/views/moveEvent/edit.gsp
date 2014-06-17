@@ -58,10 +58,6 @@
 	                            <td class="name">Project:</td>
 	                            
 	                            <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-								<td class="valueNW" rowspan="11">
-									<label for="runbookRecipe">Runbook Recipe:</label><br/>
-									<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" wrap="soft">${moveEventInstance.runbookRecipe}</textarea>
-								</td>
                         	</tr>
                             <tr class="prop">
                                 <td class="name">
@@ -99,22 +95,6 @@
 									</ul>
                                 </td>
                             </tr>
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="runbookStatus">Runbook Status:</label>
-                                </td>
-                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
-                                    <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
-                                </td>
-                            </tr> 
-                            <tr class="prop">
-                                <td class="name">
-                                    <label for="description">Runbook version:</label>
-                                </td>
-                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookVersion','errors')}">
-                                    <input type="text" id="runbookVersion" name="runbookVersion" value="${fieldValue(bean:moveEventInstance,field:'runbookVersion')}"/>
-                                </td>
-                            </tr> 
                             <tr class="prop">
                                 <td class="name">
                                     <label for="description">Runbook bridge1 :</label>

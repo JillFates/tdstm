@@ -85,6 +85,7 @@ class ServiceResults {
 	 */
 	static def internalError(response, log, Exception e) {
 		log.error(e.getMessage())
+		response.addHeader("errorMessage", e.getMessage())
 		response.sendError(500, 'Internal server error')
 	}
 	
@@ -103,7 +104,10 @@ class ServiceResults {
 	 * Sends a forbidden error
 	 * @param response the response object
 	 */
-	static def forbidden(response) {
+	static def forbidden(response, log = null, Exception e = null) {
+		if (e != null) {
+			response.addHeader("errorMessage", e.getMessage())
+		}
 		response.sendError(403, 'Forbidden')
 	}
 }

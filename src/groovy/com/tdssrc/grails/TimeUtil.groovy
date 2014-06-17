@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat
 class TimeUtil {
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
+	def static dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
+	def static dateFormat = new SimpleDateFormat("MM/dd/yyyy")
 	
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of DAYS from an existing date
@@ -210,12 +212,26 @@ class TimeUtil {
 	 * @return The date or null if it failed to parse it
 	 **/
 	def public static Date parseDateTime( String text) {
-		def format = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
-
 		def dt
 
 		try {
-			dt = format.parse(text)
+			dt = dateTimeFormat.parse(text)
+		} catch (java.text.ParseException e) {
+			// println "parseDateTime() invalid formated string $text"
+		}
+		return dt
+	}
+
+	/**
+	 * Used to convert a string into a date that includes the Timezone
+	 * @param the datetime as a string
+	 * @return The date or null if it failed to parse it
+	 **/
+	def public static Date parseDate( String text) {
+		def dt
+
+		try {
+			dt = dateFormat.parse(text)
 		} catch (java.text.ParseException e) {
 			// println "parseDateTime() invalid formated string $text"
 		}

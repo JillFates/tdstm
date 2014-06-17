@@ -2519,8 +2519,11 @@ class AssetEntityController {
 			def cssForCommentStatus = taskService.getCssClassForStatus(assetComment.status)
 		 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
+			assetComment.durationScale = assetComment.durationScale.toString()
 			commentList << [ 
-				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
+				assetComment:assetComment,
+				durationScale:assetComment.durationScale.value(),
+				personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
 				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
@@ -3987,13 +3990,15 @@ class AssetEntityController {
 		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
 			and duration like '%${params.duration}%'",[project:project])?.duration : []
 
+		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
 	    def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
-		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project =:project and estStart like '%${params.estStart}%' ",[project:project])?.estStart : []
-		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project =:project and actStart like '%${params.actStart}%' ",[project:project])?.actStart : []
-		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project =:project and dateCreated like '%${params.dateCreated}%' ",[project:project])?.dateCreated : []
-		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project =:project and dateResolved like '%${params.dateResolved}%' ",[project:project])?.dateResolved : []
-		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project =:project and estFinish like '%${params.estFinish}%' ",[project:project])?.estFinish : []
+		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project=:project and estStart like '%${params.estStart}%' ",[project:project])?.estStart : []
+		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project=:project and actStart like '%${params.actStart}%' ",[project:project])?.actStart : []
+		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%${params.dateCreated}%' ",[project:project])?.dateCreated : []
+		def dateResolveddates = params.dateResolved ? AssetComment.findAll("from AssetComment where project=:project and dateResolved like '%${params.dateResolved}%' ",[project:project])?.dateResolved : []
+		def estFinishdates = params.estFinish ? AssetComment.findAll("from AssetComment where project=:project and estFinish like '%${params.estFinish}%' ",[project:project])?.estFinish : []
 		
+		// TODO TM-2515 - ONLY do the lookups if params used by the queries are populated
 		def assigned = params.assignedTo ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.assignedTo}%","%${params.assignedTo}%" ) : []
 		def createdBy = params.createdBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.createdBy}%","%${params.createdBy}%" ) : [] 
 		def resolvedBy = params.resolvedBy ? Person.findAllByFirstNameIlikeOrLastNameIlike("%${params.resolvedBy}%","%${params.resolvedBy}%" ) : []
@@ -4164,19 +4169,24 @@ class AssetEntityController {
 				'" target="_blank",>' + depCount + '</a>'
 
 			def status = it.status
+			def userSelectedCols = []
+			(1..5).each { colId ->
+				def value = taskManagerValues(taskPref["$colId"],it)
+				userSelectedCols << ( value?.getClass()?.isEnum() ? value?.value() : value )
+			}
 			
 			[ cell: [
 				'',
 				it.taskNumber, 
 				it.comment, 
-				taskManagerValues(taskPref["1"],it), 
-				taskManagerValues(taskPref["2"],it),
+				userSelectedCols[0], // taskManagerValues(taskPref["1"],it), 
+				userSelectedCols[1], // taskManagerValues(taskPref["2"],it),
 				updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
 				dueDate,
 				status ?: '', 
-				taskManagerValues(taskPref["3"],it),
-				taskManagerValues(taskPref["4"],it), 
-				taskManagerValues(taskPref["5"],it), 
+				userSelectedCols[2], // taskManagerValues(taskPref["3"],it),
+				userSelectedCols[3], // taskManagerValues(taskPref["4"],it), 
+				userSelectedCols[4], // taskManagerValues(taskPref["5"],it), 
 				nGraphUrl, 
 				it.score ?: 0,
 				status ? "task_${it.status.toLowerCase()}" : 'task_na',

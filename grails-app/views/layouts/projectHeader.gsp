@@ -9,10 +9,6 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
-    <%-- 
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.min.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.responsive.min.css')}" />
-    --%>
     <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
    	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
 	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
@@ -362,6 +358,10 @@
 
 							<tds:hasPermission permission='ViewTaskTimeline'>
 							<li><g:link class="mmlink" controller="task" action="taskTimeline" onclick="hideMegaMenu('teamMegaMenu')">Timeline</g:link></li>
+							</tds:hasPermission>
+
+							<tds:hasPermission permission="ViewRecipe">
+							<li><g:link class="mmlink" controller="cookbook" action="index" onclick="hideMegaMenu('teamMegaMenu')">Cookbook</g:link></li>
 							</tds:hasPermission>
 
 							<tds:hasPermission permission='HelpMenuView'>

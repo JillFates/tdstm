@@ -23,10 +23,6 @@
                     	<tr class="prop">
                             <td class="name">Project:</td>
                             <td class="valueNW"><g:link controller="project" action="show" id="${moveEventInstance?.project?.id}">${moveEventInstance?.project?.encodeAsHTML()}</g:link></td>
-							<td class="valueNW" rowspan="11">
-								<label for="runbookRecipe">Runbook Recipe:</label><br/>
-								<textarea name="runbookRecipe" class="fontMonospaced" id="runbookRecipe" cols="80" rows="30" readonly="yes" wrap="hard">${moveEventInstance.runbookRecipe}</textarea>
-							</td>
                         </tr>
                         <tr class="prop">
                             <td class="name">Name:</td>
@@ -55,19 +51,13 @@
 							</td>
 						</tr>
                         <tr class="prop">
-				            <td class="name">Runbook Status:</td>
-				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookStatus')}</td>
-						</tr><tr class="prop">
-				            <td class="name">Runbook Version:</td>
-				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookVersion')}</td>
-						</tr><tr class="prop">
 				            <td class="name">Runbook bridge1 :</td>
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge1')}</td>
 						</tr><tr class="prop">
 				            <td class="name">Runbook bridge2 :</td>
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge2')}</td>
 						</tr><tr class="prop">
-				            <td class="name">Video Link::</td>
+				            <td class="name">Video Link:</td>
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
 						</tr>
                         <tr class="prop">
@@ -88,9 +78,6 @@
                     <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
                     <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any news and any related step data?');" value="Delete" /></span>
                     <span class="button"><input type="button" class="delete" value="Clear Dashboard History" onclick="clearHistoricData( $('#moveEventId').val())"/></span>
-                    <span class="button"><input type="button" class="delete" value="Reset Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'reset')"/></span>
-                    <span class="button"><input type="button" class="edit" value="Generate Tasks" onclick="generateTasks( $('#moveEventId').val())"/></span>
-                    <span class="button"><input type="button" class="delete" value="Delete Generated Tasks" onclick="clearTaskData( $('#moveEventId').val(), 'delete')"/></span>
                     <span class="button"><input type="button" class="edit" value="Mark Assets Moved" onclick="markAssetsMoved( $('#moveEventId').val())"/></span>
                  </tds:hasPermission>
                 </g:form>
@@ -152,32 +139,6 @@
     			error: function(jqXHR, textStatus, errorThrown) {
     				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.")
     			}
-    		});
-         }
-   	}
-   	function generateTasks( moveEventId ){
-   		 $("#messageDiv").hide();
-     	 $("#messageDiv").html("");
-     	 var confirmStatus = confirm("Generate move day runbook tasks from recipe. Are you sure?")
-     	 if(confirmStatus){
-			$("#messageDiv").show();
-			$("#messageDiv").html("Generating move day runbook, please wait...");
-     		$.ajax({
-    			url:'../generateMovedayTasks',type:'POST',
-    			data: {'moveEventId':moveEventId},
-    			success: function(data, status, xhr) {
-					var url = xhr.getResponseHeader('X-Login-URL');
-					if (url) {
-						alert("Your session has expired and need to login again.");
-						window.location.href = url;
-					} else {
-	   					$('#messageDiv').html(xhr.status==200 ? data  : "Unexpected error occurred");						
-					}
-    			},
-    			error: function(xhr, textStatus, errorThrown) {
-    				$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
-    			}
-
     		});
          }
    	}

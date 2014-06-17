@@ -25,13 +25,33 @@
 	<g:javascript src="angular/plugins/angular-resource.js" />
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<g:javascript src="angular/plugins/angular-ui-router.min.js" />
 	<g:javascript src="controllers/cookbook.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+	<g:javascript src="asset.tranman.js" />
+	<g:javascript src="asset.comment.js" />
+	<g:javascript src="entity.crud.js" />
+	<g:javascript src="model.manufacturer.js"/>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var opt = {
+			        autoOpen: false,
+			        modal: false,
+			        width: 'auto',
+			        height: 'auto',
+			        position: ['center','top']
+			};
+			
+			$('#createCommentDialog').dialog(opt);
+			$('#showCommentDialog').dialog(opt);
+		});
+	</script>
 </head>
 <body>
 
 <g:include view="/layouts/_error.gsp" />
+<g:include view="/assetEntity/_commentCrud.gsp" />
 
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
 		<div class="container">
@@ -66,9 +86,9 @@
 					<div class="col-md-12">
 						<tabset id="mainTabset" class="hidden" ng-class="{show : true}">
 							%{-- Task Generation --}%
-							<tab heading="Task Generation" active="activeTabs.taskGeneration">
+							<tab heading="Actions" active="activeTabs.taskGeneration">
 								<p>Select appropriate context to generate tasks using the {{selectedRecipe.name}} recipe:</p>
-								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.generate">
+								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.start">
 									<label class="inline" for="eventSelect">Event:
 										<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.validCurrentSelection = tasks.getGenerateBtnStatus()">
 											<option value="">Please select</option>
@@ -98,7 +118,7 @@
 										</label>
 									</div>	
 									<div>	
-										<label for="deletePreviouslyGenerated" ng-show="">
+										<label for="deletePreviouslyGenerated">
 											<input type="checkbox" name="deletePreviouslyGenerated" id="deletePreviouslyGenerated" ng-model="tasks.generateOpts.deletePrevious">
 											Delete previously generated tasks that were created using this context & recipe
 										</label>
@@ -111,39 +131,47 @@
 										</label>
 									</div>
 								</form>
-								<div class="completionWrapper ng-hide" ng-show="tasks.show.generating">
-									<tabset id="taskGenerationTabs">
-										<tab heading="Summary" active="activeSubTabs.tasks.summary">
-											
-											<ul class="summaryList">
-												<li>Status: Completed | Canceled</li>
-												<li>Tasks Created: 1462</li>
-												<li>Number of Exceptions: 25</li>
-											</ul>
 
-										</tab>
-										<tab heading="Exceptions" active="activeSubTabs.tasks.exceptions"></tab>
-										<tab heading="Info" active="activeSubTabs.tasks.info"></tab>
-									</tabset>
-
-									<div class="completionButtons">
-										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-tasks"></span> View Results</a>
-										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-stats"></span> View Task Graph</a>
-										<a class="btn btn-default" href="#"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</a>
-									</div>
-								</div>
-								<div class="progressWrapper row ng-hide" ng-show="tasks.show.completion">
+								<!-- Task Generation Progress View -->
+								<div class="progressWrapper row ng-hide" ng-show="tasks.show.progress">
 									<div class="col-md-3 col-xs-3">
 										<p class="text-right">Creating Tasks: </p>
 									</div>
 									<div class="col-md-6 col-xs-6">
 										<div class="progress">
-											<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-												60%
+											<div class="progress-bar" role="progressbar" aria-valuenow="{{getTaskGenerationProgress()}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : ( getTaskGenerationProgress() + '%' )}">
+												<span>{{getTaskGenerationProgress()}}%</span>
 											</div>
 										</div>
-										<p class="text-center">Estimated to finish in 3 min 40 sec </p>
+										<p class="text-center"><span ng-bind="tasks.progressRemaining"></span></p>
 										<div class="text-center"><button class="btn btn-default">Cancel Generation</button></div>
+									</div>
+								</div>
+
+								<!-- Task Generataion Completed View -->
+								<div class="completionWrapper ng-hide" ng-show="tasks.show.completed">
+									<tabset id="taskGenerationTabs">
+										<tab heading="Summary" active="activeSubTabs.tasks.summary">
+											
+											<ul class="summaryList">
+												<li>Status: {{getTaskGenerationStatus()}}</li>
+												<li>Tasks Created: {{getTaskGenerationTasksCreated()}}</li>
+												<li>Number of Exceptions: {{getTaskGenerationExceptions()}}</li>
+											</ul>
+
+										</tab>
+										<tab heading="Exceptions" active="activeSubTabs.tasks.exceptions">
+											<span ng-bind-html="tasks.generation.exceptionLog"></span>
+										</tab>
+										<tab heading="Info" active="activeSubTabs.tasks.info">
+											<span ng-bind-html="tasks.generation.infoLog"></span>
+										</tab>
+									</tabset>
+
+									<div class="completionButtons">
+										<a class="btn btn-default" ng-click="tasks.viewGeneratedResults(this)"><span class="glyphicon glyphicon-tasks"></span> View Results</a>
+										<a class="btn btn-default" ng-click="tasks.viewTaskGraph(this)"><span class="glyphicon glyphicon-stats"></span> View Task Graph</a>
+										<a class="btn btn-default" ng-click="tasks.startOver(this)"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</a>
 									</div>
 								</div>
 							</tab>
@@ -159,14 +187,15 @@
 										<tab heading="Task Generation" active="activeSubTabs.history.actions">
 											<div class="btn-group">
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-bind="tasks.selectedTaskBatch.isPublished && 'Unpublish' || 'Publish'" ng-click="tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)">Publish</button>
+												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-click="tasks.resetTaskBatch(tasks.selectedTaskBatch.id)">Reset</button>
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null">Refresh</button>
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-click="tasks.deleteTaskBatch(tasks.selectedTaskBatch.id)">Delete</button>
 											</div>
 										</tab>
 										
 										%{-- Tasks Content --}%
-										<tab heading="Task Content" active="activeSubTabs.history.tasks">
-											
+										<tab heading="Tasks" active="activeSubTabs.history.tasks">
+											<div ui-view></div>
 										</tab>
 
 										%{-- Generation Log Content --}%
@@ -174,17 +203,19 @@
 											<form action="#">
 												<div class="radio-inline">
 													<label>
-														<input type="radio" name="logRadio" id="exceptions" value="option1" checked>
+														<input type="radio" name="logRadio" id="exceptions" ng-model="activeSubTabs.history.logRadioModel" value="exceptionLog" checked>
 														Exceptions
 													</label>
 												</div>
 												<div class="radio-inline">
 													<label>
-														<input type="radio" name="logRadio" id="infoWarnings" value="option2">
+														<input type="radio" name="logRadio" id="infoWarnings" ng-model="activeSubTabs.history.logRadioModel" value="infoLog">
 														Info/Warning
 													</label>
 												</div>
-												<textarea name="logsArea" id="logsArea" rows="10"></textarea>
+												<div>
+													<pre ng-bind-html="activeSubTabs.history.textValue"></pre>
+												</div>
 											</form>
 										</tab>
 									</tabset>
