@@ -37,15 +37,14 @@ $(document).ready(function() {
 	var percentageStorToValidate=100-"${fileCount ? Math.round((fileToValidate/fileCount)*100) :100}";
 	$("#filebar").animate({width: percentageStorToValidate+"%" }, 1000);
 	
-	var percentageOtherToValidate=100-"${otherAssetCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}
-	";
-						$("#assetbar").animate({
-							width : percentageOtherToValidate + "%"
-						}, 1000);
+	var percentageOtherToValidate=100-"${otherAssetCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}";
+	$("#assetbar").animate({
+		width : percentageOtherToValidate + "%"
+	}, 1000);
 
-						$("#eventDataTableId").css('max-width',
-								$(window).width() * 5.8 / 100 + '%')
-					});
+	$("#eventDataTableId").css('max-width',
+			$(window).width() * 5.8 / 100 + '%')
+	});
 
 	$(window).resize(
 			function() {
