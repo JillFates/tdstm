@@ -240,7 +240,7 @@ class CustomTagLib {
 			url = tokens[0]
 			label = tokens.size() > 1 ? tokens[1] : url
 		} else {
-			if (text.startsWith("\\\\") || text =~ "[A-z]+:/") {
+			if (text != null && text.startsWith("\\\\") || text =~ "[A-z]+:/") {
 				isUrl = true
 				text = "file://" + text
 				def tokens = text.tokenize('|')

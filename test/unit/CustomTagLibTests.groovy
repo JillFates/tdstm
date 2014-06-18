@@ -68,5 +68,7 @@ class CustomTagLibTests extends GrailsUnitTestCase {
 		out.getBuffer().setLength(0)
 		assertTrue new CustomTagLib().textAsLink(['text':'p:/', 'target':'_blank']).toString().startsWith('<a href="file://p:/')
 		out.getBuffer().setLength(0)
+		assertTrue new CustomTagLib().textAsLink(['target':'_blank']).toString().equals('null')
+		out.getBuffer().setLength(0)
 	}
 }
