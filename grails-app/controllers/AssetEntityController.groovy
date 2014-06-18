@@ -532,7 +532,7 @@ class AssetEntityController {
 											return
 										}
 									}
-									def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("'","\\'").replace("\\", "\\\\")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -594,7 +594,7 @@ class AssetEntityController {
 											return
 										}
 									}
-									def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("'","\\'").replace("\\", "\\\\")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -656,7 +656,7 @@ class AssetEntityController {
 											forward action:forwardAction, params: [error: "DBId must be an Integer on the Database tab at row ${r+1}"]
 										}
 									}
-									def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("'","\\'").replace("\\", "\\\\")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -716,7 +716,7 @@ class AssetEntityController {
 											return
 										}
 									}
-									String dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									String dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("'","\\'").replace("\\", "\\\\")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -748,8 +748,8 @@ class AssetEntityController {
 					for ( int r = 1; r < dependencySheetRow ; r++ ) {
 						def depId = NumberUtils.toDouble(dependencySheet.getCell( 0, r ).contents.replace("'","\\'"), 0).round()
 						def assetDep =  depId ? AssetDependency.get(depId) : null
-						def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'"), 0).round())
-						def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'"), 0).round())
+						def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'").replace("\\", "\\\\"), 0).round())
+						def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'").replace("\\", "\\\\"), 0).round())
 						def depExist = AssetDependency.findByAssetAndDependent(asset, dependent)
 						assetEntityService.validateAssetList([asset?.id ]+[dependent?.id]+[assetDep?.asset?.id]+[assetDep?.dependent?.id],  project)
 						def isNew = false
