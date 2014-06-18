@@ -64,8 +64,8 @@ class PartyRelationshipService {
 		def query = "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = :company and " +
 			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT'"
 		def clients = PartyRelationship.findAll( query, [company:company] )
-		if (clients && sortOn) {  
-			clients?.sort{it.partyIdTo.("$sortOn")}
+		if (clients && sortOn) {
+			clients?.sort{it.partyIdTo?.("$sortOn")}
 		}
 
 		return clients
