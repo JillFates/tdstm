@@ -398,7 +398,7 @@
 					onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ document.getElementById(\'clientId\').value +\'&partner=\'+this.value', onComplete:'updateMastersList(e)' )}">
 					<option value="" selected="selected">None</option>
 					<g:each status="i" in="${partners}" var="partners">
-						<option value="${partners.partyIdTo.id}">${partners.partyIdTo}</option>
+						<option value="${partners.partyIdTo?.id}">${partners.partyIdTo}</option>
 					</g:each>
 				</select></td>
 				<td class="name"><label for="client">Partner Image:</label>
@@ -416,7 +416,7 @@
 					<option value="" selected="selected">Please Select</option>
 					<optgroup label="TDS" id="compPmGroup">
 						<g:each status="i" in="${managers}" var="managers">
-							<option value="${managers.partyIdTo.id}">${managers.partyIdTo?.lastNameFirstAndTitle}</option>
+							<option value="${managers.partyIdTo?.id}">${managers.partyIdTo?.lastNameFirstAndTitle}</option>
 						</g:each>
 					</optgroup>
 				</select></td>
@@ -427,7 +427,7 @@
 					<option value="" selected="selected">Please Select</option>
 					<optgroup label="TDS" id="compMmGroup">
 						<g:each status="i" in="${managers}" var="managers">
-							<option value="${managers.partyIdTo.id}">${managers.partyIdTo?.lastNameFirstAndTitle}</option>
+							<option value="${managers.partyIdTo?.id}">${managers.partyIdTo?.lastNameFirstAndTitle}</option>
 						</g:each>
 					</optgroup>
 				</select> <input type="hidden" id="companyManagersId" value="${managers.size()}"/></td>
