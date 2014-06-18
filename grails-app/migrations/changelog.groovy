@@ -97,4 +97,5 @@ databaseChangeLog = {
 	include file: '20140530-remove-unused-keyvalues-rows.groovy'
 	include file: '20140603-add-corporateName-corporateLocation-and-website-columns-to-manufacturer-table.groovy'
 	include file: '20140611-assetclass-property-to-assets.groovy'
+	include file: '20140618-fix-timescale.groovy'
 }
