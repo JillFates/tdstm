@@ -9,7 +9,8 @@ import com.tdssrc.grails.TimeUtil
 import com.tds.asset.TaskDependency
 import org.apache.commons.lang.math.NumberUtils
 import java.text.SimpleDateFormat
-import groovy.time.TimeCategory;
+import groovy.time.TimeCategory
+import com.tdsops.tm.enums.domain.TimeScale
 
 class TaskController {
 	
@@ -235,7 +236,8 @@ class TaskController {
 	def genActionBarForShowViewJson = {
 		def comment = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
-        def actionBar = [];
+        def actionBar = []
+        def includeDetails = params.includeDetails?params.includeDetails.toBoolean():false
 		def result
 
 		if (comment) {
@@ -247,12 +249,17 @@ class TaskController {
                 actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager']
 			}
 
+			if (includeDetails) {
+				actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
+			}
+
 			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
                 actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
 			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
 			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
+				actionBar << [label: 'Delay for:']
                 actionBar << [label: '1 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '1']
                 actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
                 actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
@@ -593,16 +600,16 @@ digraph runbook {
 				if (comment.duration && comment.durationScale && comment.duration > 0) {
 					use ( TimeCategory ) {
 						switch (comment.durationScale) {
-							case "m":
+							case TimeScale.M:
 								comment.estFinish = comment.estStart + comment.duration.minutes
 								break;
-							case "h":
+							case TimeScale.H:
 								comment.estFinish = comment.estStart + comment.duration.hours
 								break;
-							case "d":
+							case TimeScale.D:
 								comment.estFinish = comment.estStart.plus(comment.duration)
 								break;
-							case "w":
+							case TimeScale.W:
 								comment.estFinish = comment.estStart + comment.duration.weeks
 								break;
 							default:
@@ -611,7 +618,7 @@ digraph runbook {
 					}
 				} else {
 					comment.duration = 1;
-					comment.durationScale = "d";
+					comment.durationScale = "D";
 					comment.estFinish = comment.estStart.plus(1)
 				}
 					

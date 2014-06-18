@@ -157,7 +157,7 @@
                             <input class="delete" type="button" value="Delete" ng-click="deleteComment()" />
                             </span>
                             </span>
-                            <action-bar comment='ac'></action-bar>
+                            <action-bar comment='ac' show-details='false' update-table='false'></action-bar>
                         </div>
                     </div>
                 </tds:hasPermission>

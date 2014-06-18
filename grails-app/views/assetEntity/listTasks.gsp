@@ -80,7 +80,7 @@
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var listCaption ="Tasks: \
 				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue()'/></span> \
-				<span class='capBtn'><input type='button' id='bulkEditId' class='bulkEdit' value='Bulk Edit' data-method='bulkEditTasks' /></span>"
+				<span class='capBtn'><input type='button' id='bulkEditId' class='bulkEdit' value='Bulk Edit' data-method='bulkEditTasks' ng-click='comments.bulkEditTasks()' /></span>"
 					
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
@@ -119,17 +119,6 @@
 				$("#taskListIdGrid_"+taskPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+taskPref+'\',\'taskList\',\''+${key}+'\')">');
 			</g:each>
 			
-			$('.bulkEdit').on('click',function(){
-				var method = $(this).data('method');
-				if(method == "bulkEditTasks"){
-					$(this).attr('disabled', 'disabled');
-					$(this).data('method','hideActionBars');
-					bulkEditTasks();
-				}else{
-					$(this).data('method','bulkEditTasks');
-					hideActionBars();
-				}
-			});
 		})
 		
 		$.jgrid.formatter.integer.thousandsSeparator='';
@@ -143,20 +132,20 @@
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
 		}
 		function assignedFormatter(cellVal,options,rowObject) {
-		  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" onclick="getActionBarGrid('+options.rowId+')" >' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
+		  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" master="true" >' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
-			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
 		 }
 		
 		function updatedFormatter(cellVal,options,rowObject){
-			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
-			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" onclick="getActionBarGrid('+options.rowId+')">' + cellVal + '</span>';
+			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
 			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[17]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
@@ -178,16 +167,6 @@
 			// esc to stop timer
 			if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
 		});
-		
-		function bulkEditTasks(){
-			var ids = new Array();
-			$(".task_started, .task_ready").each(function(){
-				var taskId = $(this).attr('id').split("_")[1]
-				ids.push(taskId)
-			})
-			if (B2 != '') { B2.Pause() }
-			getBulkActionBarGrid( ids )
-		}
 	</script>
 </head>
 <body>
@@ -201,6 +180,10 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
+			<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
+				<button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
+				{{alert.msg}}
+			</div>
 			<div id="taskMessageDiv" class="message" style="display: none;"></div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">

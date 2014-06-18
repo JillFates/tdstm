@@ -20,6 +20,9 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 	var activePopups = {};
 
 	scope.controller = this;
+	scope.config = {};
+	scope.config.table = {};
+	scope.bulkEditing = false;
 
 	//commentsScope is used after "jqgrid:grid" creates dynamic dom elements to $compile the grid
 	rootScope.commentsScope = scope;
@@ -164,6 +167,15 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 				}
 			}
 		});
+	}
+
+	this.bulkEditTasks = function() {
+		if (scope.bulkEditing) {
+			scope.$broadcast('hideActionBars');
+		} else {
+			scope.$broadcast('showActionBars');
+		}
+		scope.bulkEditing = !scope.bulkEditing;
 	}
 
 	var updateRefreshTimer = function() {
@@ -754,9 +766,10 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		return deferred.promise;
 	};
 
-	var getActionBarButtons = function(commentId) {
+	var getActionBarButtons = function(commentId, includeDetails) {
 		var params = $.param({
-			'id': commentId
+			'id': commentId,
+			'includeDetails': includeDetails
 		});
 		var deferred = q.defer();
 		http.post(utils.url.applyRootPath('/task/genActionBarForShowViewJson'), params).
@@ -973,7 +986,7 @@ tds.comments.util.CommentUtils = function(q, interval) {
 			moveEvent: "",
 			assetType: assetData.assetType,
 			duration: "",
-			durationScale: "m",
+			durationScale: "M",
 			priority: "3",
 			predecessorCategory: "",
 
@@ -1013,7 +1026,7 @@ tds.comments.util.CommentUtils = function(q, interval) {
 		temp.role = ac.role ? ac.role.toString() : '';
 		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
 		temp.duration = ac.duration;
-		temp.durationScale = ac.durationScale;
+		temp.durationScale = ac.durationScale?ac.durationScale.name:'M';
 		temp.priority = ac.priority ? ac.priority.toString() : '3';
 		temp.mustVerify = ac.mustVerify;
 		temp.commentId = ac.id;
@@ -1368,18 +1381,19 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 /*****************************************
  * Directive action bar
  */
-tds.comments.directive.ActionBar = function(commentService, alerts, utils) {
+tds.comments.directive.ActionBar = function(commentService, alerts, utils, commentUtils) {
 
 	return {
 		restrict: 'E',
 		scope: {
-			comment: '=comment'
+			comment: '=comment',
+			showDetailsButton: '@showDetails',
+			updateTable: '@updateTable'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/action-bar-template.html'),
 		link: function(scope, element, attrs) {
-
 			var updateActionBar = function() {
-				commentService.getActionBarButtons(scope.comment.commentId).then(
+				commentService.getActionBarButtons(scope.comment.commentId, scope.showDetailsButton).then(
 					function(data) {
 						if (data.status == 'success') {
 							scope.buttons = data.data;
@@ -1405,6 +1419,9 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils) {
 					case "changeEstTime":
 						action = scope.changeEstTime;
 						break;
+					case "showDetails":
+						action = scope.showDetails;
+						break;
 				}
 				if (action != null) {
 					action(button);
@@ -1414,7 +1431,7 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils) {
 			scope.changeStatus = function(button) {
 				commentService.changeTaskStatus(scope.comment.commentId, button.newStatus, scope.comment.status).then(
 					function(data) {
-						postAction(button);
+						postAction(button, data);
 					},
 					function(data) {
 						alerts.showGenericMsg();
@@ -1425,7 +1442,7 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils) {
 			scope.assignTask = function(button) {
 				commentService.assignTaskToMe(scope.comment.commentId, scope.comment.status).then(
 					function(data) {
-						postAction(button);
+						postAction(button, data);
 					},
 					function(data) {
 						alerts.showGenericMsg();
@@ -1436,7 +1453,7 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils) {
 			scope.changeEstTime = function(button) {
 				commentService.changeTaskEstTime(scope.comment.commentId, button.delay).then(
 					function(data) {
-						postAction(button);
+						postAction(button, data);
 					},
 					function(data) {
 						alerts.showGenericMsg();
@@ -1445,18 +1462,126 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils) {
 
 			};
 
-			var postAction = function(button) {
+			scope.showDetails = function(button) {
+				scope.$emit("viewComment", commentUtils.commentTO(scope.comment.commentId, 'issue'), 'show');
+			};
+
+			var postAction = function(button, data) {
 				button.disabled = true;
 				updateActionBar();
 				scope.$emit("commentUpdated", scope.comment.commentId, scope.comment.assetEntity);
+				if (scope.updateTable) {
+					var id = scope.comment.commentId;
+					if (data.error) {
+						alerts.addAlertMsg(data.error);
+					} else {
+						switch (button.actionType) {
+							case "changeStatus":
+								angular.element('#status_'+id).html(data.assetComment.status)
+								angular.element('#status_'+id).parent().removeAttr('class').addClass(data.statusCss)
+								angular.element('#status_'+id).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
+								break;
+							case "assignTask":
+								angular.element('#assignedToName_'+id).html(data.assignedTo)
+								break;
+						}
+					}
+				}
 			};
-
 			updateActionBar();
 
 		}
 	};
 };
 
+/*****************************************
+ * Directive action bar cell
+ */
+tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, templateCache, http, compile, windowTimedUpdate) {
+
+	return {
+		restrict: 'A',
+		scope: {
+			configTable: '=configTable',
+			assetId: '@assetId',
+			commentId: '@commentId',
+			status: '@status',
+			master: '@master',
+		},
+		link: function(scope, element, attrs) {
+			var templateUrl = utils.url.applyRootPath('/components/comment/action-bar-row-template.html');
+			scope.comment = {};
+			scope.comment.assetEntity = scope.assetId;
+			scope.comment.commentId = scope.commentId;
+			scope.comment.status = scope.status;
+
+			element.bind('click', function() {
+				if (scope.configTable[scope.commentId]) {
+					hideContent();
+				} else {
+					loadContent();	
+				}
+			});
+			var isActiveActionBar = function() {
+				var active = false;
+				var rowsMap = scope.configTable;
+				for(var key in rowsMap) {
+					if (rowsMap[key] != null) {
+						active = true;
+						break;
+					}
+				}
+				return active;
+			}
+			var hideContent = function() {
+				if (scope.configTable[scope.commentId]) {
+					scope.configTable[scope.commentId].row.remove();
+					scope.configTable[scope.commentId] = null;
+				}
+				if (!isActiveActionBar()) {
+					windowTimedUpdate.resume();
+				}
+			}
+			var loadContent = function() {
+				scope.loading = true;
+				var content = templateCache.get(templateUrl);
+				if (content) {
+					showContent(content[1]);
+				} else {
+					http.get(templateUrl, {cache:templateCache}).then(
+						function(data) {
+							var content = templateCache.get(templateUrl);
+							showContent(content[1]);
+						},
+						function(data) {
+							scope.loading = false;
+							alerts.showGenericMsg();
+						}
+					);
+				}
+			}
+			var showContent = function(content) {
+				windowTimedUpdate.pause();
+				var row = angular.element('#'+scope.commentId);
+				var newRow = compile(content)(scope);
+				row.after(newRow);
+				scope.configTable[scope.commentId] = {
+					"id": scope.commentId,
+					"row": newRow
+				}
+				scope.loading = false;
+			}
+			if (scope.master) {
+				scope.$on('showActionBars', function(evt) {
+					loadContent();
+				});
+				scope.$on('hideActionBars', function(evt) {
+					hideContent();
+				});
+			}
+		}
+	};
+};
 
 /*****************************************
  * Comments module configuration
@@ -1470,7 +1595,8 @@ tds.comments.module.directive('assignedToSelect', ['commentService', 'alerts', '
 tds.comments.module.directive('workflowTransitionSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.WorkflowTransitionSelect]);
 tds.comments.module.directive('statusSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.StatusSelect]);
 tds.comments.module.directive('taskDependencies', ['commentService', 'alerts', 'utils', tds.comments.directive.TaskDependencies]);
-tds.comments.module.directive('actionBar', ['commentService', 'alerts', 'utils', tds.comments.directive.ActionBar]);
+tds.comments.module.directive('actionBar', ['commentService', 'alerts', 'utils','commentUtils', tds.comments.directive.ActionBar]);
+tds.comments.module.directive('actionBarCell', ['commentService', 'alerts', 'utils', '$templateCache','$http','$compile', 'windowTimedUpdate', tds.comments.directive.ActionBarCell]);
 tds.comments.module.directive('staffRoles', ['commentService', 'alerts', 'utils', tds.comments.directive.StaffRoles]);
 tds.comments.module.directive('assetsByType', ['appCommonData', 'commentService', 'alerts', 'utils', tds.comments.directive.AssetsByType]);
 
@@ -1499,3 +1625,9 @@ function hideCommentDialogs() {
 	});
 }
 
+/*
+function addLoadingIndicator(gridElementId) {
+	var gridElement = angular.element('.ui-row-ltr:first');
+	gridElement.attr('loading-indicator', true);
+}
+*/

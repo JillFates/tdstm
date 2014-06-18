@@ -439,7 +439,7 @@ class UserService {
 		getSelectedProject(project).each{proj->
 			def tasks = taskService.getUserTasks(currentUser, proj, false, 7, 'score' )
 			def taskList = tasks['user']
-			def durationScale = [d:1440, m:1, w:10080, h:60] // minutes per day,week,hour
+			def durationScale = [D:1440, M:1, W:10080, H:60] // minutes per day,week,hour
 			taskList.each{ task ->
 				def css = taskService.getCssClassForStatus( task.status )
 				issueList << ['item':task,'css':css, projectName : proj.name]

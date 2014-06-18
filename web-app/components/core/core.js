@@ -432,6 +432,36 @@ function timedUpdate(timeoutPeriod) {
 	}
 }
 
+/**
+ * Service used to administrate windows timed updates
+ */
+tds.core.service.TimedUpdateService = function(window) {
+
+	var pause = function() {
+		if(window.B2 != '') {
+			window.B2.Pause(0);
+		}
+		if(window.B1 != '') {
+			window.B1.Pause(0);
+		}
+	}
+
+	var resume = function() {
+		var taskManagerTimePref = window.taskManagerTimePref;
+		if (window.B2 != '' && taskManagerTimePref != 0) { 
+			B2.Restart(taskManagerTimePref);
+		}
+		if (window.B1 != '' && taskManagerTimePref != 0){ 
+			B1.Restart(taskManagerTimePref); 
+		}
+	}
+
+	return {
+		pause: pause,
+		resume: resume
+	};
+}
+
 /*****************************************
  * Directive used to make a component draggable
  */
@@ -474,10 +504,10 @@ tds.core.directive.Centered = function(window) {
  */
 tds.core.directive.LoadingIndicator = function(timeout, utils) {
 	return {
-		restrict: 'E',
+		restrict: 'EA',
 		templateUrl: utils.url.applyRootPath('/components/core/loading-indicator.html'),
 		link: function(scope, element, attrs) {
-			scope.isLoading = true;
+			scope.isLoading = false;
 			scope.$on("newServiceRequest", function () {
 				scope.isLoading = true;
 			});
@@ -660,14 +690,14 @@ tds.core.directive.DurationPicker = function(utils) {
 			var updateModel = function() {
 				var duration = parseInt(scope.duration, 10);
 				if (duration) {
-					var offset = moment(0).add(scope.scale, duration);
+					var offset = moment(0).add(scope.scale.toLowerCase(), duration);
 					ngModelCtrl.$setViewValue(offset.valueOf());
 				}
 			}
 
 			var updateView = function() {
 				for (var i=(scope.scales.length-1); i >= 0; i--) {
-					var offset = moment(0).add(scope.scales[i].id, 1);
+					var offset = moment(0).add(scope.scales[i].id.toLowerCase(), 1);
 					if ((scope.ngModel >= offset.valueOf()) &&
 						((scope.ngModel % offset.valueOf()) == 0)) {
 						scope.duration = parseInt((scope.ngModel / offset.valueOf()), 10)
@@ -712,6 +742,7 @@ tds.core.module.value('appCommonData', tds.core.service.commonDataService);
 tds.core.module.factory('utils', ['servRootPath', 'dateFormat', 'dateTimeFormat', tds.core.utils]);
 
 tds.core.module.factory('alerts', ['$rootScope', '$timeout', tds.core.service.AlertsService]);
+tds.core.module.factory('windowTimedUpdate', ['$window', tds.core.service.TimedUpdateService]);
 
 tds.core.module.factory('loggedCheckerInterceptor', [tds.core.interceptor.LoggedCheckerInterceptor]);
 tds.core.module.factory('pendingRequestInterceptor', ['$q', '$rootScope', tds.core.interceptor.PendingRequestInterceptor]);
