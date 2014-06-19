@@ -83,7 +83,7 @@ $(document).ready(function() {
 			<g:set var="percentageUnassignedAppCount"
 				value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}" />
 			<h1>Planning Dashboard</h1>
-			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:250px">
+			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:260px">
 				<span class="dashboard_head">Discovery Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 					<tr>
@@ -172,7 +172,7 @@ $(document).ready(function() {
 					</g:if>
 				</table>
 			</div>
-			<div class="dashboard_div col-md-2 col-xs-2" style="float: left;width:250px">
+			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:250px">
 				<span class="dashboard_head">Analysis Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 					<tr>
