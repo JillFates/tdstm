@@ -2,7 +2,5 @@
     <option value="">Please Select</option> 
     <option class="task_{{status.toLowerCase()}}" ng-selected="{{status == ngModel}}"
         ng-repeat="status in statusList"
-        value="{{status}}">
-        {{status}}
-    </option>
+        value="{{status}}">{{status}}</option>
  </select>
