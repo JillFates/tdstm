@@ -1554,7 +1554,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * ProgressService to update the job with the status. 
 	 * @param taskBatch - the TaskBatch that contains all of the necessary data needed to generate the tasks
 	 */
-	private void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey) {
+	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey) {
 
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks, progressKey:$progressKey) called"
 
@@ -4413,142 +4413,106 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff ) {
 		def msg
-		def person
 
-		while (true) {
-			// Set the Team independently of the direct person assignment
-			if (taskSpec.containsKey('team')) {
-				def team = taskSpec.team
-				if (team) {
-					// Team can have an indirect reference and optional default team (e.g. '#custom3, SYS_ADMIN')
-					if (team[0]=='#') {
-						team = team[1..-1]
-						def defTeam
-						if (team.contains(',')) {
-							def split = team.split(',')*.trim()
-							if (split.size() != 2) {
-								msg = "Invalid syntax '$team' for 'team' attribute"
-								break
-							}
-							team = split[0]
-							defTeam = split[1]
-						}
-						try {
-							def teamProp = team
-							team = getIndirectPropertyRef(task.assetEntity, team)
-							if (! team ) {
-								if (defTeam) {
-									team = defTeam
-								} else {
-									msg = "Team not defined in property $teamProp for task $task"
-									break
-								}
-							}
-						} catch (e) {
-							e.printStackTrace()
-							msg = "${e.getMessage()}, team ($team)"
-							break
-						}
-					}
-				}
-				// Validate that the string is correct
-				if (staffingRoles.contains(team)) {
-					task.role = team
-				} else {
-					msg = "Invalid team specified (${taskSpec.team})"
-					break
-				}
-			} else if (workflow && workflow.role_id) {
-				// Assign the default role/team for the workflow specified in the taskSpec
-				task.role = workflow.role_id
+		def msg1 = this.assignTeam(task, taskSpec, workflow, projectStaff)
+		def msg2 = this.assignWhom(task, taskSpec, workflow, projectStaff)
+		
+		if (msg1) {
+			if (msg2) {
+				msg = msg1 + " and " + msg2
+			} else {
+				msg = msg1
 			}
-
-			if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1 ) {
-				def whom = taskSpec.whom
-
-				log.debug "assignWhomToTask() whom=$whom, task $task"
-
-				// whom can have one of the three following values
-				//    Persons' name (e.g. Banks, Robin J. )
-				//    Persons' email (e.g. robin.banks@example.com )
-				//    Indirect reference to other asset property (e.g. #testingBy)
-
-				// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
-				if (whom[0] == '#') {
-					// log.debug "assignWhomToTask()  performing indirect lookup whom=$whom, task $task"
-					if ( ! task.assetEntity ) {
-						msg = "Illegally used whom property reference ($whom) on non-asset"
-						break
-					}
-
-					try {
-						whom = getIndirectPropertyRef(task.assetEntity, whom)
-						if (whom instanceof Person) {
-							// The indirect lookup returned a person so we don't need to go any further!
-							person = whom
-							break
-						} else if ( whom?.isNumber() ) {
-							person = projectStaff.find { it.id == whom.toInteger() }
-							if ( ! person ) 
-								msg = "Indirect references an invalid person id ($whom) for ${taskSpec.whom}"
-							break
-						} else if (! whom || whom.size() == 0 ) {
-							msg = "Unable to resolve indirect whom reference (${taskSpec.whom})"
-							break
-						}
-
-						// If we got here, then the indirect either referenced a @team or a 'name', which will be resolved below
-
-					} catch (e) {
-						e.printStackTrace()
-						msg = "${e.getMessage()}, whom (${taskSpec.whom})"
-						break
-					}
-				}
-
-				if (whom[0] == '@') {
-					// team reference
-					def teamAssign = whom[1..-1]
-					if (staffingRoles.contains(teamAssign)) {
-						task.role = teamAssign
-					} else {
-						msg = "Unknown team (${taskSpec.team}) indirectly referenced"
-					}
-				} else if (whom.contains('@') ) {
-
-					// See if we can locate the person by email address
-					person = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
-					if (! person)
-						msg = "Staff referenced by email ($whom) not associated with project"
-				} else {
-
-					// Assignment by name
-					def map = personService.findPerson(whom, task.project, projectStaff)
-					def personMap = personService.findPersonByFullName(whom)
-					
-					if (!map.person && personMap.person ) {
-						msg = "Person by name ($whom) found but it is NOT a staff"
-					} else if ( map.isAmbiguous ) {
-						msg = "Staff referenced by name ($whom) was ambiguous"
-					} else {
-						person = map.person
-					}
-					
-					if (personMap.person) {
-						person = personMap.person
-					} else {
-						msg = "Person by name ($whom) NOT found"
-					}
-				}
-			}
-			break
+		} else {
+			msg = msg2
 		}
-
+		
 		// See if the above code ran into any errors
 		if (msg != null) {
 			msg += " for task #${task.taskNumber} ${task.comment}, taskSpec (${taskSpec.id})"
 			log.warn "assignWhomToTask() $msg, project ${task.project.id}"
 		} 
+		
+		return msg
+	}
+
+
+	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff ) {
+		def person
+
+		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1 ) {
+			def whom = taskSpec.whom
+
+			log.debug "assignWhomToTask() whom=$whom, task $task"
+
+			// whom can have one of the three following values
+			//    Persons' name (e.g. Banks, Robin J. )
+			//    Persons' email (e.g. robin.banks@example.com )
+			//    Indirect reference to other asset property (e.g. #testingBy)
+
+			// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
+			if (whom[0] == '#') {
+				// log.debug "assignWhomToTask()  performing indirect lookup whom=$whom, task $task"
+				if ( ! task.assetEntity ) {
+					return "Illegally used whom property reference ($whom) on non-asset"
+				}
+
+				try {
+					whom = getIndirectPropertyRef(task.assetEntity, whom)
+					if (whom instanceof Person) {
+						// The indirect lookup returned a person so we don't need to go any further!
+						person = whom
+					} else if ( whom?.isNumber() ) {
+						person = projectStaff.find { it.id == whom.toInteger() }
+						if ( ! person )
+							return "Indirect references an invalid person id ($whom) for ${taskSpec.whom}"
+					} else if (! whom || whom.size() == 0 ) {
+						return "Unable to resolve indirect whom reference (${taskSpec.whom})"
+					}
+
+					// If we got here, then the indirect either referenced a @team or a 'name', which will be resolved below
+
+				} catch (e) {
+					e.printStackTrace()
+					return "${e.getMessage()}, whom (${taskSpec.whom})"
+				}
+			}
+
+			if (whom[0] == '@') {
+				// team reference
+				def teamAssign = whom[1..-1]
+				if (staffingRoles.contains(teamAssign)) {
+					task.role = teamAssign
+				} else {
+					return "Unknown team (${taskSpec.team}) indirectly referenced"
+				}
+			} else if (whom.contains('@') ) {
+
+				// See if we can locate the person by email address
+				person = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
+				if (! person)
+					return "Staff referenced by email ($whom) not associated with project"
+			} else {
+
+				// Assignment by name
+				def map = personService.findPerson(whom, task.project, projectStaff)
+				def personMap = personService.findPersonByFullName(whom)
+				
+				if (!map.person && personMap.person ) {
+					return "Person by name ($whom) found but it is NOT a staff"
+				} else if ( map.isAmbiguous ) {
+					return "Staff referenced by name ($whom) was ambiguous"
+				} else {
+					person = map.person
+				}
+				
+				if (personMap.person) {
+					person = personMap.person
+				} else {
+					return "Person by name ($whom) NOT found"
+				}
+			}
+		}
 		
 		if (person) {
 			task.assignedTo = person
@@ -4556,11 +4520,57 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			if (taskSpec.containsKey('whomFixed') && taskSpec.whomFixed == true)
 				task.hardAssigned = 1
 		}
-
-		return msg
+		
+		return null
 	}
-
-
+	
+	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff ) {
+		// Set the Team independently of the direct person assignment
+		if (taskSpec.containsKey('team')) {
+			def team = taskSpec.team
+			if (team) {
+				// Team can have an indirect reference and optional default team (e.g. '#custom3, SYS_ADMIN')
+				if (team[0]=='#') {
+					team = team[1..-1]
+					def defTeam
+					if (team.contains(',')) {
+						def split = team.split(',')*.trim()
+						if (split.size() != 2) {
+							return "Invalid syntax '$team' for 'team' attribute"
+						}
+						team = split[0]
+						defTeam = split[1]
+					}
+					try {
+						def teamProp = team
+						team = getIndirectPropertyRef(task.assetEntity, team)
+						if (! team ) {
+							if (defTeam) {
+								team = defTeam
+							} else {
+								return "Team not defined in property $teamProp for task $task"
+							}
+						}
+					} catch (e) {
+						e.printStackTrace()
+						return "${e.getMessage()}, team ($team)"
+					}
+				}
+			}
+			// Validate that the string is correct
+			if (staffingRoles.contains(team)) {
+				task.role = team
+			} else {
+				return "Invalid team specified (${taskSpec.team})"
+			}
+		} else if (workflow && workflow.role_id) {
+			// Assign the default role/team for the workflow specified in the taskSpec
+			task.role = workflow.role_id
+		}
+		
+		return null
+	}
+	
 	/**
 	 * Helper method lookup indirect property references that will recurse once if necessary
 	 * This supports two situations:
