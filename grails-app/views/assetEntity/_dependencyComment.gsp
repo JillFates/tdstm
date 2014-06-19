@@ -1,12 +1,22 @@
-<a title="${ dependency.comment }" 
- 	${forWhom == 'edit'? 'id="commLink_'+type+'_'+dependency.id+'" href="javascript:openCommentDialog(\'depComment_'+type+'_'+dependency.id+'\')" ': ''}>
+<g:if test="${ forWhom == 'edit' }" >
+	<a title="${ dependency.comment }" 
+	 	id="commLink_${type}_${dependency.id}" href="javascript:openCommentDialog('depComment_${type}_${dependency.id}')">
+	 	<g:if test="${ dependency.comment }" >
+	   		<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment_edit.png')}" border="0px" />
+	   	</g:if>
+	   	<g:else>
+	   		<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" />
+	   	</g:else>
+	</a>
+</g:if>
+<g:else>
  	<g:if test="${ dependency.comment }" >
-   		<img id="comment_${dependency.id}" src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px" />
+ 		<a title="${ dependency.comment }"> 
+   			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
+   		</a>
    	</g:if>
-   	<g:else>
-   		<img id="comment_${dependency.id}" src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" />
-   	</g:else>
-</a>
+</g:else>
+
 <g:if test="${forWhom == 'edit'}">
  	<input type="hidden" name="comment_${type}_${dependency.id}" id="comment_${type}_${dependency.id}" value="${dependency.comment}">
  	<div id="depComment_${type}_${dependency.id}" class="depComDiv" style="display:none" >

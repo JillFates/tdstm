@@ -1089,9 +1089,9 @@ function saveDepComment(textId, hiddenId, dialogId, commLink){
 	$("#"+hiddenId).val($("#"+textId).val())
 	$("#"+dialogId).dialog("close")
 	if($("#"+hiddenId).val()){
-		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/i/db_table_bold.png">')
+		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/icons/comment_edit.png">')
 	}else {
-		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/i/db_table_light.png">')
+		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/icons/comment_edit.png">')
 	}
 }
 function validateDependencies(formName){
