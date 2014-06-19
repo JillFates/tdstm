@@ -44,25 +44,27 @@ $(document).ready(function() {
 
 	$("#eventDataTableId").css('max-width',
 			$(window).width() * 5.8 / 100 + '%')
+
+	$("#containerId").css('width',
+				$(window).width() - 50  + 'px')
+				
 	});
 
+   
 	$(window).resize(
-			function() {
-				$("#eventDataTableId").css('max-width',
-						$(window).width() * 5.8 / 100 + '%')
+		function() {
+			$("#eventDataTableId").css('max-width',
+					$(window).width() * 5.8 / 100 + '%')
 
-				//$("#eventDataTableId").attr("max-width" )
-			});
+			$("#containerId").css('width',
+					$(window).width() - 50  + 'px')
+							
+	});
 </script>
-<style type="text/css">
-.container {
-	width: 100% !important;
-}
-</style>
 </head>
 <body>
 	<div class="body">
-		<div class="container">
+		<div id="containerId" class="container">
 			<g:set var="percentageAppToValidate"
 				value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}" />
 			<g:set var="percentagePSToValidate"
