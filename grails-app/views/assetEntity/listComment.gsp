@@ -73,7 +73,7 @@
 				}
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
-						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+						"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject){

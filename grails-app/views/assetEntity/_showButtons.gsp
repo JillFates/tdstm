@@ -12,7 +12,7 @@
 </tds:hasPermission>
 <tds:hasPermission permission="CommentCrudView">
 	<a href="javascript:createIssue('${assetEntity.assetName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
-		<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
+		<img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
 	</a>
 	<a href="javascript:createIssue('${assetEntity.assetName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
 		<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task 

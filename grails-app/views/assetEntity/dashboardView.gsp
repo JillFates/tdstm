@@ -809,7 +809,7 @@ function onInvokeAction(id) {
 										</g:if>
 										<g:elseif test="${assetEntityBean.commentType == 'comment'}">
 											<g:remoteLink controller="assetEntity" action="listComments" id="${assetEntityBean.id}" before="setAssetId(${assetEntityBean.id});" onComplete="listCommentsDialog( e ,'never' ); ">
-												<img src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px"/>
+												<img src="${resource(dir:'icons',file:'comment.png')}" border="0px"/>
 											</g:remoteLink>
 										</g:elseif>
 										<g:else>

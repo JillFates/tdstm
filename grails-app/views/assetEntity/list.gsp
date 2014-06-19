@@ -129,7 +129,7 @@
 					if(rowObject[12]=='issue'){
                         editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[2]+'\');">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
 					} else if (rowObject[12]=='comment') {
-					   editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[2]+'\');">'+"<img src='${resource(dir:'i',file:'db_table_bold.png')}' border='0px'/>"+"</a></span>"
+					   editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[2]+'\');">'+"<img src='${resource(dir:'icons',file:'comment.png')}' border='0px'/>"+"</a></span>"
 					} else {
 					   editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.createCommentBy(\'issue\','+options.rowId+',\''+rowObject[2]+'\')">'
 						+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"

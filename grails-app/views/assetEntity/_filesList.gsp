@@ -43,7 +43,7 @@
 				             </g:if>
 						     <g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+files.id)}">
 						     <g:remoteLink controller="assetEntity" action="listComments" id="${files.id}" before="setAssetId('${files.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${files.id}" src="${resource(dir:'i',file:'db_table_bold.png')}" border="0px" />
+							      <img id="comment_${files.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
 							 </g:remoteLink>
 						     </g:elseif>
 						     <g:else>

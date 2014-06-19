@@ -10,11 +10,20 @@
 		<g:javascript src="projectStaff.js" />
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
+		<g:javascript src="angular/plugins/angular-resource.js" />
+        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+        <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.min.js"/>
+		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		
 		<script type="text/javascript">
 			// This variable must remain outside the scope of the rendered dependency map
@@ -47,7 +56,7 @@
 	</head>
 	<body>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
-		<div class="body">
+		<div class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div id="DependencyGroupsTableId" style="min-width: 1000px;">
 			<div id="dependencyTitle" style="float: left;">
 				<h1>Dependency Analyzer</h1>
@@ -157,6 +166,7 @@
 			  <g:select id="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+			<g:render template="../assetEntity/initAssetEntityData"/>
 		</div>
 		</div>
 		<script type="text/javascript">
