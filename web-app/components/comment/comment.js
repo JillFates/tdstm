@@ -1514,6 +1514,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			scope.comment.assetEntity = scope.assetId;
 			scope.comment.commentId = scope.commentId;
 			scope.comment.status = scope.status;
+			scope.configTable[scope.commentId] = null;
 
 			element.bind('click', function() {
 				if (scope.configTable[scope.commentId]) {
@@ -1543,21 +1544,23 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				}
 			}
 			var loadContent = function() {
-				scope.loading = true;
-				var content = templateCache.get(templateUrl);
-				if (content) {
-					showContent(content[1]);
-				} else {
-					http.get(templateUrl, {cache:templateCache}).then(
-						function(data) {
-							var content = templateCache.get(templateUrl);
-							showContent(content[1]);
-						},
-						function(data) {
-							scope.loading = false;
-							alerts.showGenericMsg();
-						}
-					);
+				if (scope.configTable[scope.commentId] == null) {
+					scope.loading = true;
+					var content = templateCache.get(templateUrl);
+					if (content) {
+						showContent(content[1]);
+					} else {
+						http.get(templateUrl, {cache:templateCache}).then(
+							function(data) {
+								var content = templateCache.get(templateUrl);
+								showContent(content[1]);
+							},
+							function(data) {
+								scope.loading = false;
+								alerts.showGenericMsg();
+							}
+						);
+					}
 				}
 			}
 			var showContent = function(content) {
