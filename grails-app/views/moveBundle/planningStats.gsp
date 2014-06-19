@@ -43,7 +43,7 @@ $(document).ready(function() {
 	}, 1000);
 
 	$("#eventDataTableId").css('max-width',
-			$(window).width() * 5.8 / 100 + '%')
+			$(window).width() * 6.2/ 100 + '%')
 
 	$("#containerId").css('width',
 				$(window).width() - 50  + 'px')
@@ -54,7 +54,7 @@ $(document).ready(function() {
 	$(window).resize(
 		function() {
 			$("#eventDataTableId").css('max-width',
-					$(window).width() * 5.8 / 100 + '%')
+					$(window).width() *  6.2 / 100 + '%')
 
 			$("#containerId").css('width',
 					$(window).width() - 50  + 'px')
@@ -83,7 +83,7 @@ $(document).ready(function() {
 			<g:set var="percentageUnassignedAppCount"
 				value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}" />
 			<h1>Planning Dashboard</h1>
-			<div class="dashboard_div col-md-2 col-xs-2" style="float: left;">
+			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:250px">
 				<span class="dashboard_head">Discovery Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 					<tr>
@@ -172,7 +172,7 @@ $(document).ready(function() {
 					</g:if>
 				</table>
 			</div>
-			<div class="dashboard_div col-md-2 col-xs-2" style="float: left;">
+			<div class="dashboard_div col-md-2 col-xs-2" style="float: left;width:250px">
 				<span class="dashboard_head">Analysis Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 					<tr>
@@ -510,10 +510,9 @@ $(document).ready(function() {
 									<table class="dashboard_stat_table">
 										<thead>
 											<tr>
-												<th class="dashboard_stat_exec_td">&nbsp;</th>
-												<th class="dashboard_stat_exec_td">&nbsp;</th>
+												<th class="dashboard_stat_exec_td headerWidth" >&nbsp;</th>
 												<g:each in="${moveEventList}" var="event">
-													<th class="dashboard_stat_exec_tdmc"><g:link
+													<th class="dashboard_stat_exec_tdmc headerWidth" ><g:link
 															controller="application" action="list"
 															params="[moveEvent:event.id]">
 															${event}
@@ -524,27 +523,25 @@ $(document).ready(function() {
 											</tr>
 											<tr>
 
-												<td class="dashboard_stat_exec_td">&nbsp;</td>
-												<td class="dashboard_stat_exec_td"><g:link
+												<td class="dashboard_stat_exec_td "><g:link
 														controller="application" action="list"
 														params="[filter:'applicationCount', plannedStatus:'Unassigned']">To be</g:link>
 												</td>
 												<g:each in="${moveEventList}" var="event">
-													<td class="dashboard_stat_exec_tdmc"
-														style="font-size: 10px"><b>${eventStartDate[event.id]}
+													<td class="dashboard_stat_exec_tdmc "
+														style="font-size: 10px ;"><b>${eventStartDate[event.id]}
 													</b></td>
 												</g:each>
 												<td></td>
 											</tr>
 											<tr>
-												<td class="dashboard_stat_exec_td">&nbsp;</td>
 												<td class="dashboard_stat_exec_td"><g:link
 														controller="application" action="list"
 														params="[filter:'applicationCount', plannedStatus:'Unassigned']">Assigned</g:link>
 												</td>
 												<g:each in="${moveEventList}" var="event">
-													<td class="dashboard_stat_exec_tdmc"
-														style="font-size: 10px"><b> ${event.runbookStatus ?: ''}</b></td>
+													<td class="dashboard_stat_exec_tdmc "
+														style="font-size: 10px;"><b> ${event.runbookStatus ?: ''}</b></td>
 												</g:each>
 												<td>Done</td>
 											</tr>
@@ -555,7 +552,6 @@ $(document).ready(function() {
 														test="${unassignedAppCount == 0 }">
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
-
 														<g:link controller="application" action="list"
 															params="[filter:'applicationCount', plannedStatus:'Unassigned']"
 															class="links">
@@ -585,7 +581,6 @@ $(document).ready(function() {
 													</g:else></td>
 											</tr>
 											<tr>
-
 												<td>&nbsp;</td>
 												<g:each in="${assetList}" var="appCount">
 													<td class="dashboard_stat_exec_tdmx" class='colorGrey'>
@@ -595,8 +590,6 @@ $(document).ready(function() {
 												<td>&nbsp;</td>
 											</tr>
 											<tr>
-
-
 												<td>&nbsp;</td>
 												<g:each in="${assetList}" var="appCount">
 													<td class="dashboard_stat_exec_tdmx" class='colorGrey'>
@@ -606,9 +599,6 @@ $(document).ready(function() {
 												<td>&nbsp;</td>
 											</tr>
 											<tr>
-
-
-
 												<td nowrap="nowrap"><g:if
 														test="${unassignedAssetCount == 0 }">
 														<span class='colorGrey'>0</span>
@@ -634,9 +624,6 @@ $(document).ready(function() {
 												<td>&nbsp;</td>
 											</tr>
 											<tr>
-
-
-
 												<td nowrap="nowrap"><g:set
 														var="percentageUnassignedPhysicalAssetCount"
 														value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}" />
@@ -697,7 +684,7 @@ $(document).ready(function() {
 														</g:else></td>
 												</g:each>
 												<td style="text-align: right;"><g:if
-														test="${percentagevirtualAssetCount== 0 }">
+														test="${percentagevirtualAssetCount==0 }">
 														<span class='colorGrey'>0%</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"

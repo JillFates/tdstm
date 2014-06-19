@@ -1526,3 +1526,8 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	height:100%;
 	background:url(../images/processing.gif) center center no-repeat;
 }
+.headerWidth{
+	max-width: 40px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
