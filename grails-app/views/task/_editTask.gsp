@@ -14,7 +14,7 @@
 				<table id="updateCommentTable" class="inner">
 					<tr class="prop">
 						<td valign="top" class="name" id="commentEditTdId">
-							<label><b>Task <span id="taskNumberEditId">#:<b>{{ac.taskNumber == null ? '&nbsp;' : ac.taskNumber}}</b></span>:</b></label>&nbsp;<span class="error-msg" ng-show="form.comment.$error.required"><b>*</b></span>
+							<label ><b>Task <span ng-show="isEdit" id="taskNumberEditId">#<b>{{ac.taskNumber == null ? '&nbsp;' : ac.taskNumber}}</b></span>:</b></label>&nbsp;<span class="error-msg" ng-show="form.comment.$error.required"><b>*</b></span>
 						</td>
 						<td valign="top" class="value">
 								<textarea required cols="80" rows="2" id="commentEditId" name="comment" ng-model="ac.comment" ng-maxlength="4000"></textarea>

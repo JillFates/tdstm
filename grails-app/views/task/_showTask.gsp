@@ -13,7 +13,7 @@
             <div>
                 <table id="showCommentTable" style="border: 0px;">
                     <tr class="prop">
-                        <td valign="top" class="name"><label for="comment"><b><span id="taskNumberId">Task #:<b>{{ac.taskNumber}}</b></span>:</b></label></td>
+                        <td valign="top" class="name"><label for="comment"><b><span id="taskNumberId">Task #<b>{{ac.taskNumber}}</b></span>:</b></label></td>
                         <td valign="top" class="value" colspan="3">
                             <textarea cols="80" rows="2" id="commentTdId" readonly="readonly">{{ac.comment}}</textarea>
                         </td>

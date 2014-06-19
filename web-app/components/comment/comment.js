@@ -971,7 +971,7 @@ tds.comments.util.CommentUtils = function(q, interval) {
 		return {
 			comment: '',
 			forWhom: '',
-			assetEntity: assetData.assetId.toString(),
+			assetEntity: assetData.assetId?assetData.assetId.toString():'',
 			category: 'general',
 			predCount: '-1',
 			deletePredId: '',
