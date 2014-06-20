@@ -4704,7 +4704,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param MoveEvent moveEvent object
 	 * @param loadedGroups Map<List> - A mapped list of the taskCounts, tatalDuratin, tasks by status
 	 */
-	def getMoveEventTaskSummary(def moveEvent){
+	Map getMoveEventTaskSummary(MoveEvent moveEvent) {
 		
 		def taskStatusMap =[:]
 		def totalDuration=0
@@ -4712,20 +4712,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		if (moveEvent) {
 			taskCountByEvent = AssetComment.countByMoveEventAndIsPublished(moveEvent, true)
-			def durationScale = [d:1440, m:1, w:10080, h:60] // minutes per day,week,hour
-			AssetCommentStatus.topStatusList.each{ status->
-				def duration = AssetComment.findAllByMoveEventAndStatus(moveEvent, status)
-				def timeInMin=duration.sum{d->
-					d.isPublished ? d.duration*durationScale[d.durationScale] : 0
+			AssetCommentStatus.topStatusList.each{ status ->
+				def tasks = AssetComment.findAllByMoveEventAndStatus(moveEvent, status)
+				def timeInMin = tasks?.sum { task ->
+					task.isPublished ? task.durationInMinutes() : 0 
 				}
-				def countTasks = duration.sum { d ->
-					d.isPublished ? 1 : 0
+				def countTasks = tasks.sum { task ->
+					task.isPublished ? 1 : 0
 				}
 				countTasks = countTasks ?: 0
 				taskStatusMap << [ (status): [taskCount: countTasks, timeInMin: timeInMin] ]  
-				if(timeInMin)
-					totalDuration +=timeInMin
-			}
+				if (timeInMin)
+					totalDuration += timeInMin
+			} 
 		}
 		
 		return [ taskCountByEvent:taskCountByEvent, taskStatusMap:taskStatusMap, totalDuration:totalDuration]
