@@ -4463,7 +4463,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// The indirect lookup returned a person so we don't need to go any further!
 						person = whom
 					} else if ( whom?.isNumber() ) {
-						person = projectStaff.find { it.id == whom.toInteger() }
+						def whomId = whom.toLong()
+						person = projectStaff.find { it.id == whomId }
 						if ( ! person )
 							return "Indirect references an invalid person id ($whom) for ${taskSpec.whom}"
 					} else if (! whom || whom.size() == 0 ) {
@@ -4478,38 +4479,40 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 
-			if (whom[0] == '@') {
-				// team reference
-				def teamAssign = whom[1..-1]
-				if (staffingRoles.contains(teamAssign)) {
-					task.role = teamAssign
-				} else {
-					return "Unknown team (${taskSpec.team}) indirectly referenced"
-				}
-			} else if (whom.contains('@') ) {
+			if (whom instanceof String) {
+				if (whom[0] == '@') {
+					// team reference
+					def teamAssign = whom[1..-1]
+					if (staffingRoles.contains(teamAssign)) {
+						task.role = teamAssign
+					} else {
+						return "Unknown team (${taskSpec.team}) indirectly referenced"
+					}
+				} else if (whom.contains('@') ) {
 
-				// See if we can locate the person by email address
-				person = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
-				if (! person)
-					return "Staff referenced by email ($whom) not associated with project"
-			} else {
+					// See if we can locate the person by email address
+					person = projectStaff.find { it.email?.toLowerCase() == whom.toLowerCase() }
+					if (! person)
+						return "Staff referenced by email ($whom) not associated with project"
+				} else {
 
-				// Assignment by name
-				def map = personService.findPerson(whom, task.project, projectStaff)
-				def personMap = personService.findPersonByFullName(whom)
-				
-				if (!map.person && personMap.person ) {
-					return "Person by name ($whom) found but it is NOT a staff"
-				} else if ( map.isAmbiguous ) {
-					return "Staff referenced by name ($whom) was ambiguous"
-				} else {
-					person = map.person
-				}
-				
-				if (personMap.person) {
-					person = personMap.person
-				} else {
-					return "Person by name ($whom) NOT found"
+					// Assignment by name
+					def map = personService.findPerson(whom, task.project, projectStaff)
+					def personMap = personService.findPersonByFullName(whom)
+					
+					if (!map.person && personMap.person ) {
+						return "Person by name ($whom) found but it is NOT a staff"
+					} else if ( map.isAmbiguous ) {
+						return "Staff referenced by name ($whom) was ambiguous"
+					} else {
+						person = map.person
+					}
+					
+					if (personMap.person) {
+						person = personMap.person
+					} else {
+						return "Person by name ($whom) NOT found"
+					}
 				}
 			}
 		}
