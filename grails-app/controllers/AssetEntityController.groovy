@@ -746,10 +746,54 @@ class AssetEntityController {
 					def skippedUpdated =0
 					def skippedAdded=0
 					for ( int r = 1; r < dependencySheetRow ; r++ ) {
+						def assetId = NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'"), 0).round()
+						def assetName
+						def assetClass
+						if(!assetId){
+							assetName = dependencySheet.getCell( 2, r ).contents.replace("'","\\'")
+							assetClass = dependencySheet.getCell( 3, r ).contents.replace("'","\\'")
+							
+							if(!assetName){
+								warnMsg +="<li> no asset ID or asset name for row # "+r+"</li>"
+								continue;
+							}
+						}
 						def depId = NumberUtils.toDouble(dependencySheet.getCell( 0, r ).contents.replace("'","\\'"), 0).round()
 						def assetDep =  depId ? AssetDependency.get(depId) : null
-						def asset = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'").replace("\\", "\\\\"), 0).round())
-						def dependent = AssetEntity.get(NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'").replace("\\", "\\\\"), 0).round())
+						def asset
+						if(assetId){
+							asset = AssetEntity.get(assetId)
+						} else {
+							def assets = AssetEntity.findAllByAssetNameAndAssetType(assetName, assetClass)
+							if(assets.size() == 0){
+								warnMsg +="<li> no asset match found for asset name "+assetName +"</li>"
+								continue;
+							} else if(assets.size() > 1){
+								warnMsg +="<li>no unique asset match for "+assetName+"</li>"
+								continue;
+							} else {
+								asset = assets[0]
+							}
+						}
+						def dependencyId = NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'"), 0).round()
+						def dependent
+						if(dependencyId){
+							dependent = AssetEntity.get(dependencyId)
+						} else {
+							def depName = dependencySheet.getCell( 5, r ).contents.replace("'","\\'")
+							def depClass = dependencySheet.getCell( 6, r ).contents.replace("'","\\'")
+							def assets = AssetEntity.findAllByAssetNameAndAssetType(depName, depClass)
+							if(assets.size() == 0){
+								warnMsg +="<li> no asset match found for dependent name "+depName + "<li>"
+								continue;
+							} else if(assets.size() > 1){
+								warnMsg +="<li> no unique asset match for dependent name "+depName+"</li>"
+								continue;
+							} else {
+								dependent = assets[0]
+							}
+						}
+						
 						def depExist = AssetDependency.findByAssetAndDependent(asset, dependent)
 						assetEntityService.validateAssetList([asset?.id ]+[dependent?.id]+[assetDep?.asset?.id]+[assetDep?.dependent?.id],  project)
 						def isNew = false
