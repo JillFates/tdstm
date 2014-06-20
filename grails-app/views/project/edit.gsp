@@ -143,17 +143,17 @@
 			                    <option value="" selected="selected">Please Select </option>
 			                    <optgroup label="TDS" >
 			                      <g:each status="i" in="${companyStaff}" var="companyStaff">
-			                        <option value="${companyStaff.partyIdTo.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${companyStaff.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectInstance?.client}">
 			                      <g:each status="i" in="${clientStaff}" var="clientStaff">
-			                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
 			                      <g:each status="i" in="${partnerStaff}" var="partnerStaff">
-			                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                </select></td>
@@ -164,17 +164,17 @@
 			                    <option value="" selected="selected">Please Select</option>
 			                    <optgroup label="TDS">
 			                      <g:each status="i" in="${companyStaff}" var="companyStaff">
-			                        <option value="${companyStaff?.partyIdTo.id}">${companyStaff?.partyIdTo.lastNameFirstAndTitle}</option>
+			                        <option value="${companyStaff?.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectInstance?.client}">
 			                      <g:each status="i" in="${clientStaff}" var="clientStaff">
-			                        <option value="${clientStaff?.partyIdTo.id}">${clientStaff?.partyIdTo.lastNameFirstAndTitle}</option>
+			                        <option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                    <optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
 			                      <g:each status="i" in="${partnerStaff}" var="partnerStaff">
-			                        <option value="${partnerStaff?.partyIdTo.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+			                        <option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
 			                      </g:each>
 			                    </optgroup>
 			                  </select>
@@ -208,7 +208,7 @@
 									Transitions in Status bar:</label></td>
 							<td class="valueNW"><g:select id="trackChanges"
 									name="trackChanges"
-									from="${projectInstance.constraints.trackChanges.inList}"
+									from="${projectInstance.constraints?.trackChanges?.inList}"
 									value="${projectInstance.trackChanges}"
 									valueMessagePrefix="project.trackChanges"></g:select> <g:hasErrors
 									bean="${projectInstance}" field="trackChanges">

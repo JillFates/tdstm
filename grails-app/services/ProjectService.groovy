@@ -373,28 +373,28 @@ class ProjectService {
 		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
 		def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 		companyStaff.each {
-			if ( it.partyIdTo.lastName == null ) {
-				it.partyIdTo.lastName = ""
+			if ( it.partyIdTo?.lastName == null ) {
+				it.partyIdTo?.lastName = ""
 			}
 		}
-		companyStaff.sort{it.partyIdTo.lastName}
+		companyStaff.sort{it.partyIdTo?.lastName}
 		def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 			clientStaff.each {
-			if ( it.partyIdTo.lastName == null ) {
-				it.partyIdTo.lastName = ""
+			if ( it.partyIdTo?.lastName == null ) {
+				it.partyIdTo?.lastName = ""
 			}
 		}
-		clientStaff.sort{it.partyIdTo.lastName}
+		clientStaff.sort{it.partyIdTo?.lastName}
 		def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-		companyPartners.sort{it.partyIdTo.name}
+		companyPartners.sort{it.partyIdTo?.name}
 		if (projectPartner != null) {
 			partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartnerId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 			partnerStaff.each {
-				if ( it.partyIdTo.lastName == null ) {
-					it.partyIdTo.lastName = ""
+				if ( it.partyIdTo?.lastName == null ) {
+					it.partyIdTo?.lastName = ""
 				}
 			}
-			partnerStaff.sort{it.partyIdTo.lastName}
+			partnerStaff.sort{it.partyIdTo?.lastName}
 		}
 		clientStaff.each{staff->
 		}
