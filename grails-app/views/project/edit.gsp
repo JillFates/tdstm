@@ -69,7 +69,7 @@
                                     <label for="description">Description:</label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
-                                    <textarea cols="40"  rows="3" id="description" name="description" onkeydown="textCounter(document.editProjectForm.description,200);" onkeyup="textCounter(document.editProjectForm.description,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
+                                    <textarea cols="40"  rows="3" id="description" name="description" onkeydown="textCounter(this.id,200);" onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
                                 <g:hasErrors bean="${projectInstance}" field="description">
 					            <div class="errors">
 					                <g:renderErrors bean="${projectInstance}" as="list" field="description"/>
@@ -80,7 +80,7 @@
                                     <label for="comment">Comment:</label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-                                    <textarea cols="40"  rows="3" name="comment" onkeydown="textCounter(document.editProjectForm.comment,200);" onkeyup="textCounter(document.editProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
+                                    <textarea cols="40"  rows="3" name="comment" id="comment" onkeydown="textCounter(this.id,200);" onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
                                 <g:hasErrors bean="${projectInstance}" field="comment">
 					            <div class="errors">
 					                <g:renderErrors bean="${projectInstance}" as="list" field="comment"/>

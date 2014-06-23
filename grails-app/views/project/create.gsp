@@ -237,17 +237,6 @@
 	      var clientObj = document.getElementById('clientId').value
 	      ${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ clientObj +\'&partner=\'+partnerVal', onComplete:'updateMastersList(e)')}
       }
-      function textCounter(field, maxlimit) {
-	      if (field.value.length > maxlimit) // if too long...trim it!
-	      {
-	      field.value = field.value.substring(0, maxlimit);
-	      return false;
-	      }
-	      else
-	      {
-	      return true;
-	      }
-      }
       function setCompletionDate(startDate){
     	var completionDateObj = document.createProjectForm.completionDate;
     	if(completionDateObj.value == ""){
@@ -342,8 +331,8 @@
 				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 				<textarea rows="3" cols="40" id="description" name="description" 
-				onkeydown="textCounter(document.createProjectForm.description,200);" 
-				onkeyup="textCounter(document.createProjectForm.description,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
+				onkeydown="textCounter(this.id,200);" 
+				onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
 				<g:hasErrors bean="${projectInstance}" field="description">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="description" /></div>
@@ -352,9 +341,9 @@
 				</td>
 				<td
 					class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-				<textarea  rows="3" cols="40" name="comment"
-					onkeydown="textCounter(document.createProjectForm.comment,200);"
-					onkeyup="textCounter(document.createProjectForm.comment,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
+				<textarea  rows="3" cols="40" id="comment" name="comment"
+					onkeydown="textCounter(this.id,200);"
+					onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 				<g:hasErrors bean="${projectInstance}" field="comment">
 					<div class="errors"><g:renderErrors bean="${projectInstance}"
 						as="list" field="comment" /></div>
