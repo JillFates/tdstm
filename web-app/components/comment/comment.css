@@ -178,3 +178,11 @@ button.alert-close {
 .comment-dialog-content {
 	position: relative;
 }
+.buttons input.edit-comment {
+    background: transparent url(../../icons/comment_edit.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
+.buttons input.delete-comment {
+    background: transparent url(../../icons/comment_delete.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
