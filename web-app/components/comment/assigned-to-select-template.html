@@ -1,4 +1,4 @@
-<select ng-model="ngModel" id="assignedTo" name="assignedTo"> 
+<select ng-model="ngModel" id="assignedTo" name="assignedTo" style="width: 200px"> 
 	<option value="">Unassigned</option> 
 	<option ng-selected="{{role.id == ngModel}}" 
 	    ng-repeat="role in roles" value="{{role.id}}">{{role.nameRole}}</option> 

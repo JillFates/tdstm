@@ -933,7 +933,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 /**
  * Factory used to interact with the asset entity services
  */
-tds.comments.util.CommentUtils = function(q, interval) {
+tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 
 	var closePopup = function(scope, type) {
 		if (!scope.closed) {
@@ -1005,8 +1005,7 @@ tds.comments.util.CommentUtils = function(q, interval) {
 
 			manageDependency: 1,
 
-			//Review: this values are dynamic html load from a request
-			assignedTo: '',
+			assignedTo: appCommonData.getLoginPerson().id.toString(),
 			status: 'Ready'
 		};
 	};
@@ -1592,7 +1591,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 tds.comments.module = angular.module('tdsComments', ['tdsCore']);
 
 tds.comments.module.factory('commentService', ['utils', '$http', '$q', tds.comments.service.CommentService]);
-tds.comments.module.factory('commentUtils', ['$q', '$interval', tds.comments.util.CommentUtils]);
+tds.comments.module.factory('commentUtils', ['$q', '$interval', 'appCommonData', tds.comments.util.CommentUtils]);
 
 tds.comments.module.directive('assignedToSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.AssignedToSelect]);
 tds.comments.module.directive('workflowTransitionSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.WorkflowTransitionSelect]);

@@ -296,6 +296,7 @@ tds.core.service.commonDataService = function() {
 	var roles = [];
 	var categories = [];
 	var durationScales = [];
+	var loginPerson = {};
 
 	var loadServers = function(value) {
 		servers = value
@@ -326,6 +327,9 @@ tds.core.service.commonDataService = function() {
 			}
 		}
 	};
+	var loadLoginPerson = function(value) {
+		loginPerson = value;
+	}
 
 	var getAssetTypeList = function(assetType) {
 		var result = [];
@@ -378,6 +382,9 @@ tds.core.service.commonDataService = function() {
 	var getDurationScales = function() {
 		return durationScales;
 	};
+	var getLoginPerson = function() {
+		return loginPerson;
+	}
 
 	return {
 		getRoles: getRoles,
@@ -390,11 +397,13 @@ tds.core.service.commonDataService = function() {
 		loadRoles: loadRoles,
 		loadCategories: loadCategories,
 		loadDurationScales: loadDurationScales,
+		loadLoginPerson: loadLoginPerson,
 
 		getAssetTypeList: getAssetTypeList,
 		setAssetTypeList: setAssetTypeList,
 		getCategories: getCategories,
-		getDurationScales: getDurationScales
+		getDurationScales: getDurationScales,
+		getLoginPerson: getLoginPerson
 	};
 
 }();
