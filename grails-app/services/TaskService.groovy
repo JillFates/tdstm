@@ -1569,18 +1569,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	void generateTasks(TaskBatch taskBatch, Boolean publishTasks) {
 		String progressKey = taskBatchKey(taskBatch.id)	
 		Boolean errored = false
+		def detail = ''
 
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks) called"
 		try {
 			generateTasks(taskBatch, publishTasks, progressKey)
 		} catch (RuntimeException e) {
 			errored = true
+			detail = e.getMessage()
 			log.error e.getMessage()
 			e.printStackTrace()
 		} 
 
 		// Mark the job's progress Competed or Failed accordingly 
-		progressService.update(progressKey, 100I, (errored ? 'Failed' : 'Completed') )
+		progressService.update(progressKey, 100I, (errored ? 'Failed' : 'Completed'), detail)
 	}
 
 	/**

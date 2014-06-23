@@ -1500,18 +1500,22 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 					
 					if (!$scope.tasks.show.progress) {
 						clearInterval($scope.tasks.show.promise);
-						$scope.alerts.addAlert({type: 'success', msg: 'Finish generating tasks', closeIn: 3000});
-						$scope.tasks.refreshTaskBatches();
-						$scope.tasks.show.completed = true;
-						restCalls.getTaskBatch({section: taskId}, function(data){
-							$scope.tasks.generation.status = data.data.taskBatch.status;
-							$scope.tasks.generation.taskCreated = data.data.taskBatch.taskCount;
-							$scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
-							$scope.tasks.generation.exceptionLog = $sce.trustAsHtml(data.data.taskBatch.exceptionLog);
-							$scope.tasks.generation.infoLog = $sce.trustAsHtml(data.data.taskBatch.infoLog);
-						}, function(){
-							$log.info('Error on getting Task Batch');
-						});
+						if (data.data.status == "Failed" ) {
+							$scope.alerts.addAlert({type: 'danger', msg: data.data.detail});
+						} else {
+							$scope.alerts.addAlert({type: 'success', msg: 'Finish generating tasks', closeIn: 3000});
+							$scope.tasks.refreshTaskBatches();
+							$scope.tasks.show.completed = true;
+							restCalls.getTaskBatch({section: taskId}, function(data){
+								$scope.tasks.generation.status = data.data.taskBatch.status;
+								$scope.tasks.generation.taskCreated = data.data.taskBatch.taskCount;
+								$scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
+								$scope.tasks.generation.exceptionLog = $sce.trustAsHtml(data.data.taskBatch.exceptionLog);
+								$scope.tasks.generation.infoLog = $sce.trustAsHtml(data.data.taskBatch.infoLog);
+							}, function(){
+								$log.info('Error on getting Task Batch');
+							});
+						}
 					}
 				});
 		    }, 1000);
