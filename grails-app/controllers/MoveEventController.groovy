@@ -436,6 +436,8 @@ class MoveEventController {
 			try {
 				if(params.type == 'reset'){
 					msg = taskService.resetTaskData(moveEvent)
+				} else if(params.type == 'delete'){
+					msg = taskService.deleteTaskData(moveEvent)
 				}
 			} catch(e) {
 				msg = e.getMessage()
