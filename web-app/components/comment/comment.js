@@ -553,13 +553,17 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 			if ($scope.isEdit) {
 				commentService.updateComment($scope.ac, $scope.dependencies).then(
 					function(data) {
-						$scope.close();
-						$scope.$emit("commentUpdated", $scope.ac.id, $scope.ac.assetEntity);
-						if ($scope.ac.assetEntity != $scope.acBackup.assetEntity) {
-							$scope.$emit("commentUpdated", $scope.ac.id, $scope.acBackup.assetEntity);
-						}
-						if (viewAfterSave) {
-							$scope.$emit("viewComment", commentTO, 'show');
+						if (data.error) {
+							alerts.addAlertMsg(data.error);
+						} else {
+							$scope.close();
+							$scope.$emit("commentUpdated", $scope.ac.id, $scope.ac.assetEntity);
+							if ($scope.ac.assetEntity != $scope.acBackup.assetEntity) {
+								$scope.$emit("commentUpdated", $scope.ac.id, $scope.acBackup.assetEntity);
+							}
+							if (viewAfterSave) {
+								$scope.$emit("viewComment", commentTO, 'show');
+							}
 						}
 					},
 					function(data) {
@@ -569,11 +573,15 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 			} else {
 				commentService.saveComment($scope.ac, $scope.dependencies).then(
 					function(data) {
-						var comment = commentUtils.commentTemplateFromCreateResponse(data, $scope.ac.assetEntity, $scope.ac.assetType);
-						$scope.close();
-						$scope.$emit("commentCreated", comment.commentId, comment.assetEntity);
-						if (open == 'view') {
-							$scope.$emit("viewComment", commentUtils.commentTO(comment.commentId, comment.commentType), 'show');
+						if (data.error) {
+							alerts.addAlertMsg(data.error);
+						} else {
+							var comment = commentUtils.commentTemplateFromCreateResponse(data, $scope.ac.assetEntity, $scope.ac.assetType);
+							$scope.close();
+							$scope.$emit("commentCreated", comment.commentId, comment.assetEntity);
+							if (open == 'view') {
+								$scope.$emit("viewComment", commentUtils.commentTO(comment.commentId, comment.commentType), 'show');
+							}
 						}
 					},
 					function(data) {
