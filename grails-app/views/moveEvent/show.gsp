@@ -103,7 +103,9 @@
    	function clearTaskData(moveEventId, type){
         $("#messageDiv").hide();
         $("#messageDiv").html("");
-       	var confirmStatus=confirm("Are you sure you want to permanently "+type.toUpperCase()+" the task data for this move event?")
+       	var confirmStatus=confirm("This process ONLY deletes tasks that were generated prior to the Cookbook feature. Any tasks that were " +
+            "created in the Cookbook must be deleted in the Cookbook History tab.\n\nAre you sure you want to permanently " +
+            type.toUpperCase() + " the recipe generated tasks for this move event?")
  		if (confirmStatus) {
 		   	$("#messageDiv").show();
 	      	$("#messageDiv").html((type=='reset' ? 'Resetting':'Deleting')+' tasks for the move event');
