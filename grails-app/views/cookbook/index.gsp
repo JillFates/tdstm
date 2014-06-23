@@ -51,7 +51,6 @@
 <body>
 
 <g:include view="/layouts/_error.gsp" />
-<g:include view="/assetEntity/_commentCrud.gsp" />
 
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
 		<div class="container">
