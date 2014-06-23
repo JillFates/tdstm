@@ -89,7 +89,7 @@
 					<tr class="prop" id="estStartEditTrId">
 						<td valign="top" class="name"><label for="estStartTrId">Estimated Start/Finish:</label></td>
 						<td valign="top" class="value" nowrap="nowrap">
-							<input type="text" date-begin="ac.estStart" date-end="ac.estFinish" ng-model="acData.estRange" ng-change="updateDuration()" size="35" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker />
+							<input type="text" date-begin="ac.estStart" date-end="ac.estFinish" ng-model="acData.estRange" ng-change="updateDuration()" size="45" style="display:inline;" name="estRange" id="estRange"	value="" tdsrangepicker />
 							<span class="error-msg" ng-show="form.estRange.$error.dateRange">Invalid range.</span>
 						</td>
 					</tr>
