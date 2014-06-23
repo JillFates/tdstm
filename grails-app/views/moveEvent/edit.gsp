@@ -97,6 +97,14 @@
                             </tr>
                             <tr class="prop">
                                 <td class="name">
+                                    <label for="runbookStatus">Runbook Status:</label>
+                                </td>
+                                <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookStatus','errors')}">
+                                    <g:select id="runbookStatus" name="runbookStatus" from="${moveEventInstance.constraints.runbookStatus.inList}" value="${moveEventInstance.runbookStatus}" ></g:select>
+                                </td>
+                            </tr>
+                            <tr class="prop">
+                                <td class="name">
                                     <label for="description">Runbook bridge1 :</label>
                                 </td>
                                 <td class="valueNW ${hasErrors(bean:moveEventInstance,field:'runbookBridge1','errors')}">

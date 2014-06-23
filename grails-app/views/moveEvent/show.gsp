@@ -51,6 +51,9 @@
 							</td>
 						</tr>
                         <tr class="prop">
+				            <td class="name">Runbook Status:</td>
+				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookStatus')}</td>
+						</tr><tr class="prop">
 				            <td class="name">Runbook bridge1 :</td>
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'runbookBridge1')}</td>
 						</tr><tr class="prop">
