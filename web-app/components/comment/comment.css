@@ -186,3 +186,12 @@ button.alert-close {
     background: transparent url(../../icons/comment_delete.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
+.modal:focus {
+	outline: none;  
+}
+.modal-dialog:focus {
+	outline: none;  
+}
+.modal-content:focus {
+	outline: none;  
+}
