@@ -1140,9 +1140,26 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/assigned-to-select-template.html'),
 		link: function(scope, element, attrs) {
+			var validateModel = function() {
+				var exist = false;
+				var id = scope.ngModel;
+				var list = scope.roles;
+				if (list.length > 0) {
+					for (var i=0; i < list.length; i++) {
+						if (list[i].id.toString() == id) {
+							exist = true;
+							break;
+						}
+					}
+				}
+				if (!exist) {
+					scope.ngModel = '';
+				}
+			};
 			commentService.getAssignedToList('', scope.commentId).then(
 				function(data) {
 					scope.roles = data.data;
+					validateModel();
 				},
 				function(data) {
 					alerts.showGenericMsg();
