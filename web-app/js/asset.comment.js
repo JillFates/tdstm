@@ -88,10 +88,12 @@ function assignTask(id, user, status, from){
 					if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref);}
 				}else{
 					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
-					 if(B1 != '' && taskManagerTimePref != 0){ 
-					 	B1.Restart(taskManagerTimePref); 
-					 }else { 
-					  	B1.Pause(0);
+					 if (B1 != '') {
+						 if(taskManagerTimePref != 0){ 
+						 	B1.Restart(taskManagerTimePref); 
+						 }else { 
+						  	B1.Pause(0);
+						 }
 					 }
 				}
 				$("#showCommentDialog #assignedToTdId").html(data.assignedTo)
