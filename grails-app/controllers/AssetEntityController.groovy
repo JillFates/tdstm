@@ -812,9 +812,14 @@ class AssetEntityController {
 							assetDep.asset = asset
 							assetDep.dependent = dependent
 							assetDep.type = dependencySheet.getCell( 7, r ).contents.replace("'","\\'")
-							assetDep.dataFlowFreq = dependencySheet.getCell( 8, r ).contents.replace("'","\\'")
-							assetDep.dataFlowDirection = dependencySheet.getCell( 9, r ).contents.replace("'","\\'")
-							assetDep.status = dependencySheet.getCell(10, r ).contents.replace("'","\\'")
+							
+							assetDep.dataFlowFreq = dependencySheet.getCell( 8, r ).contents.replace("'","\\'") ?: 
+								(isNew ? "Unknown" : assetDep.dataFlowFreq)
+							assetDep.dataFlowDirection = dependencySheet.getCell( 9, r ).contents.replace("'","\\'") ?: 
+								(isNew ? "Unknown" : assetDep.dataFlowDirection)
+							assetDep.status = dependencySheet.getCell(10, r ).contents.replace("'","\\'") ?: 
+								(isNew ? "Unknown" : assetDep.status)
+							
 							def depComment = dependencySheet.getCell( 11, r ).contents.replace("'","\\'")
 							def length = depComment.length()
 							if(length > 254){
