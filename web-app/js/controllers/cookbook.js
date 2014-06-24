@@ -1,5 +1,5 @@
 var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 
-	 'ui.codemirror', 'ui.router']);
+	 'ui.codemirror', 'ui.router', 'tdsCore']);
 
 var restCalls, rootLog, layoutPluginTasks;
 
@@ -11,12 +11,12 @@ app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('servicesInterceptor');
 }]);
 
-app.config(function($stateProvider, $urlRouterProvider) {
+app.config(function($stateProvider, $urlRouterProvider, servRootPathProvider) {
     $urlRouterProvider.otherwise('/');
     $stateProvider
         .state('generatedTasks', {
             url: '/generatedTasks/:id',
-            templateUrl: 'components/cookbook/taskGrid.html',
+            templateUrl: servRootPathProvider.$get() + '/components/cookbook/taskGrid.html',
             controller: function($scope, $stateParams) {
                 $scope.assetComments = {};
             	$scope.assetComments.noGridData = [{'message': 'No results found', 'context': 'none'}];
