@@ -3,13 +3,7 @@ var baseUrl =  process.env.BASE_URL;
 exports.config = {
 
   allScriptsTimeout: 11000,
-  specs: [
-    '../components/clientProject/listProjects.spec.js',
-    '../components/clientProject/createProject.spec.js',
-    '../components/clientProject/deleteProject.spec.js',
-    '../components/userMenu/signOut.spec.js',
-    '../components/login/login.spec.js'
-  ],
+
 
   // Patterns to exclude.
   // exclude: [],
@@ -17,12 +11,17 @@ exports.config = {
   // Alternatively, suites may be used. When run without a commad line parameter,
   // all suites will run. If run with --suite=smoke, only the patterns matched
   // by that suite will run.
-  // suites: {
-  //   test: '../spec/*.js'
-        // login:[file 1, file 2],
-  //   // smoke: 'spec/smoketests/*.js',
-  //   // full: 'spec/*.js'
-  // },
+  suites: {
+    regression: [
+    '../components/clientProject/listProjects.spec.js',
+    '../components/clientProject/createProject.spec.js',
+    '../components/assets/createApp.spec.js',
+    '../components/assets/addTask.spec.js',
+    '../components/clientProject/deleteProject.spec.js',
+    '../components/userMenu/signOut.spec.js',
+    '../components/login/login.spec.js'
+    ]
+  },
 
   capabilities: {
     'browserName': 'chrome'
@@ -65,10 +64,10 @@ exports.config = {
   framework: 'jasmine',
   
   jasmineNodeOpts: {
-    isVerbose: false,
+    isVerbose: true,
     showColors: true,
     // If true, include stack traces in failures.
-    // includeStackTrace: true,
+    includeStackTrace: true,
     defaultTimeoutInterval: 30000
   },
 

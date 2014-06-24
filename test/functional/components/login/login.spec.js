@@ -9,7 +9,7 @@ describe('Login Test', function(){
     });
   });
 
-  it('should have "Password:" as label for username', function(){
+  it('should have "Password:" as label for password', function(){
     loginPage.getPasswordLabel().then(function(label){
       expect(label.getText()).toEqual('Password:');
     });
@@ -22,7 +22,7 @@ describe('Login Test', function(){
       // browser.navigate().refresh();
     });
 
-    it('should be displayed after clicking on login button with setting user/pass', function(){
+    it('should be displayed after clicking on login button without setting user/pass', function(){
       loginPage.clickSingInBtn();
       expect(loginPage.getValidationMessage().getText()).toEqual('Invalid username and/or password');  
     });

@@ -6,6 +6,6 @@
     "minijasminenode": "0.4.0"
   },
   "devDependencies": {
-    "protractor": "0.22.0"
+    "protractor": "0.24.2"  
   }
 }

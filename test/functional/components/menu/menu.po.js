@@ -92,49 +92,44 @@ var Menu = function(){
   };
 
   this.goToAssets = function(option){
+    var that = this;
     browser.driver.findElement(by.css(this.assetsCss)).click();
     var d = {
       'summary':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
+        browser.driver.findElement(by.css(that.summaryCss)).click();
       },
       'listApps':function(){
-        browser.driver.findElement(by.css(this.listAppsCss)).click();
+        browser.driver.findElement(by.css(that.listAppsCss)).click();
       },
       'listServers':function(){
-        browser.driver.findElement(by.css(this.listServersCss)).click();
+        browser.driver.findElement(by.css(that.listServersCss)).click();
       },
       'listPhysical':function(){
-        browser.driver.findElement(by.css(this.listPhysicalCss)).click();
+        browser.driver.findElement(by.css(that.listPhysicalCss)).click();
       },
       'listDBs':function(){
-        browser.driver.findElement(by.css(this.listDBsCss)).click();
+        browser.driver.findElement(by.css(that.listDBsCss)).click();
       },
       'listStorage':function(){
-        browser.driver.findElement(by.css(this.listStorageCss)).click();
+        browser.driver.findElement(by.css(that.listStorageCss)).click();
       },
       'listDependencies':function(){
-        browser.driver.findElement(by.css(this.listDependenciesCss)).click();
+        browser.driver.findElement(by.css(that.listDependenciesCss)).click();
       },
       'dependencyAnalizer':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
+        browser.driver.findElement(by.css(that.dependencyAnalizerCss)).click();
       },
       'assetsHelp':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
       },
       'import':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
       },
       'manageBatches':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
       },
       'export':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
       },
       'assetComments':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
       },
       'manageDataHelp':function(){
-        browser.driver.findElement(by.css(this.summaryCss)).click();
       },
     };
     d[option]();
