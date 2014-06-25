@@ -2573,9 +2573,9 @@ class AssetEntityController {
 				assetComment:assetComment,
 				durationScale:assetComment.durationScale.value(),
 				personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
-				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
+				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
-				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
+				workflow:workflow,roles:roles?:'Unassigned', predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
 				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,assetType:assetComment.assetEntity?.assetType, predecessorList: predecessorList, successorList: successorList]
 		}else{
