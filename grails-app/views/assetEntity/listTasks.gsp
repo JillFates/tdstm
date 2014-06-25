@@ -45,13 +45,6 @@
 			$("#teamMenuId a").css('background-color','#003366')
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
 			$("#selectTimedBarId").val(${timeToUpdate})			
-			$("#viewtaskgraph_button_graph").click(function(event){
-				 var moveEvent = $("#moveEventId").val()
-				 if(moveEvent == '0'){
-				 	alert("Please select an event first.")
-				 	event.preventDefault()
-				 }
-			});
 			taskManagerTimePref = ${timeToUpdate}
 			$(window).resize(function() {
 				B2.Restart(taskManagerTimePref)
@@ -123,6 +116,14 @@
 		
 		$.jgrid.formatter.integer.thousandsSeparator='';
 		
+		function checkSelectedEvent(event) {
+			 var moveEvent = $("#moveEventId").val()
+			 if(moveEvent == '0'){
+			 	alert("Please select an event first.")
+			 	event.preventDefault()
+			 }
+		};
+
 		function myCustomFormatter (cellVal,options,rowObject) {
 			var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'task\')">'+
 				"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
@@ -204,9 +205,10 @@
 					<b><label for="viewUnpublishedCB" > View unpublished</label></b>&nbsp;&nbsp;
 				</tds:hasPermission>
 
-					<span id="viewGraphSpanId">
-					${HtmlUtil.actionButton('View Task Graph', 'ui-icon-zoomin', 'graph', '','../task/moveEventTaskGraph?moveEventId='+filterEvent+'&mode=s')}&nbsp;
-				
+					<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
+
+					<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/moveEventTaskGraph?moveEventId=${filterEvent}&mode=s" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
+
 					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
 					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">

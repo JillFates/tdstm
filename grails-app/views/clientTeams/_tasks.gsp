@@ -91,7 +91,7 @@
 								onclick="issueDetails(${item?.id},'${item?.status}')"/>
 
 							<g:if test="${item.successors > 0 || item.predecessors > 0}">
-								<tds:actionButton label="View Graph" icon="ui-icon-zoomin" id="${item?.id}"  
+								<tds:actionButton label="View Graph" icon="tds-task-graph-icon" id="${item?.id}"  
 									onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');"  
 								/>
 							</g:if>

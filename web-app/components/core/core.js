@@ -739,6 +739,32 @@ tds.core.directive.DurationPicker = function(utils) {
 };
 
 /*****************************************
+ * Directive tdsActionButton
+ */
+tds.core.directive.ActionButton = function(utils, window) {
+	return {
+		restrict: 'E',
+		templateUrl: utils.url.applyRootPath('/components/core/action-button-template.html'),
+		scope: {
+			id: '@id',
+			label: '@label',
+			icon: '@icon',
+			link: '@link',
+			click: '@click',
+		},
+		link: function(scope, element, attrs, ngModelCtrl) {
+			scope.name = scope.label.toLowerCase().replace(/ /g, '').replace(/\./g,'')
+			scope.applyRootPath = utils.url.applyRootPath;
+			scope.doAction = function(event) {
+				if (scope.click) {
+					window[scope.click](event);
+				}
+			}
+		}
+	}
+};
+
+/*****************************************
  * Core module configuration
  */
 tds.core.module = angular.module('tdsCore', ['ngGrid', 'ngResource', 'ui.bootstrap']);
@@ -769,3 +795,4 @@ tds.core.module.directive('loadingIndicator', ['$timeout', 'utils', tds.core.dir
 tds.core.module.directive('tdsdatepicker', ['utils', 'dateFormat', tds.core.directive.DatePicker]);
 tds.core.module.directive('tdsrangepicker', ['utils', 'dateTimeFormat', tds.core.directive.RangePicker]);
 tds.core.module.directive('tdsdurationpicker', ['utils', tds.core.directive.DurationPicker]);
+tds.core.module.directive('tdsactionbutton', ['utils', '$window', tds.core.directive.ActionButton]);

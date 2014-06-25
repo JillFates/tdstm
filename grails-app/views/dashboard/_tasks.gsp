@@ -68,7 +68,7 @@
 						</g:if> <tds:actionButton label="Details..." icon="ui-icon-zoomin"
 							id="${item?.id}" onclick="showAssetComment(${item?.id}, 'show')" />
 						<g:if test="${item.successors > 0 || item.predecessors > 0}">
-							<tds:actionButton label="View Graph" icon="ui-icon-zoomin"
+							<tds:actionButton label="View Graph" icon="tds-task-graph-icon"
 								id="${item?.id}"
 								onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');" />
 						</g:if> <g:if
