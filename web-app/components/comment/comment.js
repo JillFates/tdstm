@@ -1405,7 +1405,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 /*****************************************
  * Directive action bar
  */
-tds.comments.directive.ActionBar = function(commentService, alerts, utils, commentUtils) {
+tds.comments.directive.ActionBar = function(commentService, alerts, utils, commentUtils, window) {
 
 	return {
 		restrict: 'E',
@@ -1445,6 +1445,9 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 						break;
 					case "showDetails":
 						action = scope.showDetails;
+						break;
+					case "showNeighborhood":
+						action = scope.showNeighborhood;
 						break;
 				}
 				if (action != null) {
@@ -1488,6 +1491,10 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 
 			scope.showDetails = function(button) {
 				scope.$emit("viewComment", commentUtils.commentTO(scope.comment.commentId, 'issue'), 'show');
+			};
+
+			scope.showNeighborhood = function(button) {
+				window.open(utils.url.applyRootPath('/task/neighborhoodGraph/' + scope.comment.commentId), '_blank');
 			};
 
 			var postAction = function(button, data) {
@@ -1622,7 +1629,7 @@ tds.comments.module.directive('assignedToSelect', ['commentService', 'alerts', '
 tds.comments.module.directive('workflowTransitionSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.WorkflowTransitionSelect]);
 tds.comments.module.directive('statusSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.StatusSelect]);
 tds.comments.module.directive('taskDependencies', ['commentService', 'alerts', 'utils', tds.comments.directive.TaskDependencies]);
-tds.comments.module.directive('actionBar', ['commentService', 'alerts', 'utils','commentUtils', tds.comments.directive.ActionBar]);
+tds.comments.module.directive('actionBar', ['commentService', 'alerts', 'utils','commentUtils', '$window', tds.comments.directive.ActionBar]);
 tds.comments.module.directive('actionBarCell', ['commentService', 'alerts', 'utils', '$templateCache','$http','$compile', 'windowTimedUpdate', tds.comments.directive.ActionBarCell]);
 tds.comments.module.directive('staffRoles', ['commentService', 'alerts', 'utils', tds.comments.directive.StaffRoles]);
 tds.comments.module.directive('assetsByType', ['appCommonData', 'commentService', 'alerts', 'utils', tds.comments.directive.AssetsByType]);

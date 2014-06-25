@@ -264,6 +264,12 @@ class TaskController {
                 actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
                 actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
 			}
+
+			def depCount = TaskDependency.countByPredecessor( comment )
+			if (depCount > 0) {
+				actionBar << [label: 'Neighborhood', icon: 'tds-task-graph-icon', actionType: 'showNeighborhood']	
+			}
+
             result = ServiceResults.success(actionBar) as JSON
 		} else {
 			result = ServiceResults.fail([error:"invalid comment id (${params.id}) from user ${userLogin}"]) as JSON
