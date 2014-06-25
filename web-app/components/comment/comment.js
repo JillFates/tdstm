@@ -1293,8 +1293,12 @@ tds.comments.directive.AssetsByType = function(appCommonData, commentService, al
 				if (scope.assetType) {
 					commentService.getAssetsByType(scope.assetType).then(
 						function(data) {
-							appCommonData.setAssetTypeList(data.data.type, data.data.list);
-							if (scope.assetType == data.data.type) {
+							var aType = data.data.type;
+							if (aType == 'Network') {
+								aType = 'Other';
+							}
+							appCommonData.setAssetTypeList(aType, data.data.list);
+							if (scope.assetType == aType) {
 								scope.assets = appCommonData.getAssetTypeList(scope.assetType);
 								checkExist();
 							}
