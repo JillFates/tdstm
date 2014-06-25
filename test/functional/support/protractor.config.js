@@ -3,8 +3,6 @@ var baseUrl =  process.env.BASE_URL;
 exports.config = {
 
   allScriptsTimeout: 11000,
-
-
   // Patterns to exclude.
   // exclude: [],
 
@@ -17,9 +15,14 @@ exports.config = {
     '../components/clientProject/createProject.spec.js',
     '../components/assets/createApp.spec.js',
     '../components/assets/addTask.spec.js',
+    '../components/assets/addComments.spec.js',
+    '../components/assets/serverList.spec.js',
     '../components/clientProject/deleteProject.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
+    ],
+    test: [
+    '../components/assets/serverList.spec.js'
     ]
   },
 
@@ -64,7 +67,7 @@ exports.config = {
   framework: 'jasmine',
   
   jasmineNodeOpts: {
-    isVerbose: true,
+    isVerbose: false,
     showColors: true,
     // If true, include stack traces in failures.
     includeStackTrace: true,

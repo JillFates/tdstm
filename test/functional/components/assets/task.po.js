@@ -30,10 +30,32 @@ var TaskModal = function(){
   this.statusLabelCss = '[for="status"]';
   this.statusModel = 'ac.status';
   this.saveTaskBtn = '[ng-click="saveComment(true)"]';
+  // comments
+  this.editCommentModalId = 'editCommentPopup';
+  this.editCommentTitleCss = '#editCommentPopup #ui-id-5';
+  this.commentLabelCss = '#commentEditTdId label';
+  this.commentLabelReq = '#commentEditTdId span';
+  this.commentlabReqId = '#commentEditTdId';
 
+  this.getEditCommentModal = function(){
+    return element(by.id(this.editCommentModalId));
+  };
+  this.getEditCommentTitle = function(){
+    return $(this.editCommentTitleCss);
+  };
+  this.getCommentLabel = function (){
+    return $(this.commentLabelCss);
+  };
+  this.getCommentSpanReq = function(){
+    return $(this.commentLabelReq);
+  };  
+  this.getCommentLabReq = function(){
+    return $(this.commentlabReqId);
+  };
   this.getEditTaskModal = function(){
     return element(by.id(this.EditTaskModalId));
   };
+
   this.getTitle = function(){
     return $(this.createTaskTitleCss);
   };
@@ -148,6 +170,52 @@ var TaskModal = function(){
   };
   this.saveTask= function(){
     $(this.saveTaskBtn).click();
+  };
+
+  this.addComment = function(comment,categoryPos,category,assetTypePos,assetType,assetPos,asset){
+    //add comment
+    //if pos is null, will leave default information
+    var comm = this.getTaskTextArea();
+    comm.sendKeys(comment);
+    //select Category
+    expect(this.getCommentSpanReq().getAttribute('class')).toEqual('error-msg ng-hide');
+    if(categoryPos!==''){
+      this.getCategoryDropdownOptions().then(function(list){
+        list[categoryPos].click();
+      });
+    }
+    expect(this.getCategorySelected().getText()).toEqual(category);
+    //select assetType
+    if(assetTypePos!==''){
+      this.getAssetTypeOptions().then(function(list){
+        list[assetTypePos].click();
+      });
+    }
+    expect(this.getAssetTypeSelected().getText()).toEqual(assetType);
+    //select asset
+    if(assetPos!==''){
+      this.getAssetEntityOptions().then(function(list){
+        list[assetPos].click();
+      });
+    }
+    expect(this.getAssetEntitySelected().getText()).toEqual(asset);
+  };
+  this.addTask = function(task){
+// Task Text Area
+    var field = this.getTaskTextArea();
+    field.sendKeys(task);
+// Person Team
+// Event Dropdown
+// Category
+// Base on Category Workflow      
+//Asset Dropdowns
+// Duration  
+//Priority
+// Due Date    
+//Estimated Start Finish
+// Status
+//Predecessor
+//Successor
   };
 };
 module.exports = TaskModal;

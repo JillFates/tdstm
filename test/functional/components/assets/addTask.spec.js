@@ -32,13 +32,12 @@ describe('Add Task', function(){
   }); // Search for an app
 
   it('should open create task modal', function(){
-    console.log(appId);
     browser.sleep(300);
     appsListPage.clickOnCommentTaskIcon(appId);
     expect(taskModal.getEditTaskModal().isPresent()).toBe(true);
   });
 
-  it('should have Edit task as title', function(){
+  it('should have Create task as title', function(){
     expect(taskModal.getTitle().getText()).toEqual('Create Task');
   });
 
@@ -217,7 +216,7 @@ describe('Add Task', function(){
         expect(options[14].getText()).toEqual('startup');
         expect(options[15].getText()).toEqual('postmove');
       });
-    });
+    }); // category dropdown
       
     xdescribe('workflow dropdown', function(){
 
