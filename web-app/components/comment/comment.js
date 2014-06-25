@@ -1268,7 +1268,8 @@ tds.comments.directive.AssetsByType = function(appCommonData, commentService, al
 		restrict: 'E',
 		scope: {
 			assetType: '=assetType',
-			ngModel: '=ngModel'
+			ngModel: '=ngModel',
+			isRequired: '=isRequired'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/assets-by-type-template.html'),
 		link: function(scope, element, attrs) {
@@ -1290,24 +1291,18 @@ tds.comments.directive.AssetsByType = function(appCommonData, commentService, al
 			}
 			var refresh = function() {
 				if (scope.assetType) {
-					if (appCommonData.getAssetTypeList(scope.assetType).length == 0) {
-						commentService.getAssetsByType(scope.assetType).then(
-							function(data) {
-								data.data.list.splice(0,0, {'id': '','name': 'please select'});
-								appCommonData.setAssetTypeList(data.data.type, data.data.list);
-								if (scope.assetType == data.data.type) {
-									scope.assets = appCommonData.getAssetTypeList(scope.assetType);
-									checkExist();
-								}
-							},
-							function(data) {
-								alerts.showGenericMsg();
+					commentService.getAssetsByType(scope.assetType).then(
+						function(data) {
+							appCommonData.setAssetTypeList(data.data.type, data.data.list);
+							if (scope.assetType == data.data.type) {
+								scope.assets = appCommonData.getAssetTypeList(scope.assetType);
+								checkExist();
 							}
-						);
-					} else {
-						scope.assets = appCommonData.getAssetTypeList(scope.assetType);
-						checkExist();
-					}
+						},
+						function(data) {
+							alerts.showGenericMsg();
+						}
+					);
 				}
 			};
 			scope.$watch('assetType', function(nVal, oVal) {

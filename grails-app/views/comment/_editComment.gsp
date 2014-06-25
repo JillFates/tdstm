@@ -22,7 +22,7 @@
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
-							<label for="category">Category:</label>
+							<label for="category">Category:</label>&nbsp;<span class="error-msg" ng-show="form.category.$error.required"><b>*</b></span>
 						</td>
 						<td colspan="4">
 							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tds.asset.AssetComment.constraints.category.inList}"
@@ -30,12 +30,12 @@
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" class="name"><label for="asset">Asset:</label></td>
+						<td valign="top" class="name"><label for="asset">Asset:</label>&nbsp;<span class="error-msg" ng-show="form.assetEntity.$error.required"><b>*</b></span></td>
 						<td valign="top">
 							<tds:select required="true" id="asset" name="asset" ng-model="ac.assetType" from="['Application','Server','Database','Storage','Other']" datasource="ds.assetTypes"
 ng-change="getAssetsList()">
 							</tds:select>
-							<assets-by-type asset-type="ac.assetType" ng-model="ac.assetEntity"></assets-by-type>
+							<assets-by-type asset-type="ac.assetType" ng-model="ac.assetEntity" is-required="true"></assets-by-type>
 						</td>
 					</tr>
 					<tr ng-show="isEdit">

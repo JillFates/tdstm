@@ -66,7 +66,7 @@
 						<td valign="top">
 							<tds:select id="asset" name="asset" ng-model="ac.assetType" from="['Application','Server','Database','Storage','Other']" datasource="ds.assetTypes">
 							</tds:select>
-							<assets-by-type asset-type="ac.assetType" ng-model="ac.assetEntity"></assets-by-type>
+							<assets-by-type asset-type="ac.assetType" ng-model="ac.assetEntity" is-required="false"></assets-by-type>
 						</td>
 					</tr>
 					<tr class="prop" id="durationEditId">

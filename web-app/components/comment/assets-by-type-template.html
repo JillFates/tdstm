@@ -1,1 +1,3 @@
-<select ng-model="ngModel" class="assetSelect" id="assetEntity" name="assetEntity" ng-options="c.id.toString() as c.name for c in assets"></select>
+<select ng-model="ngModel" class="assetSelect" id="assetEntity" name="assetEntity" ng-options="c.id.toString() as c.name for c in assets" ng-required="isRequired">
+<option value="">please select</option>
+</select>
