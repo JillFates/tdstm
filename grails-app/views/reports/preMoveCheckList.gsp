@@ -26,7 +26,7 @@
 							<div style="width: 150px; float: left;">
 								<label><strong>Output:</strong></label>&nbsp;<br />
 								<label for="web"><input type="radio" name="output" id="web" checked="checked" value="web" />&nbsp;Web</label><br />
-								<label for="pdf"><input type="radio" name="output" id="pdf" value="pdf" />&nbsp;PDF</label><br />
+								<%--<label for="pdf"><input type="radio" name="output" id="pdf" value="pdf" />&nbsp;PDF</label><br />--%>
 							</div>
 						</td>
 					</tr>
