@@ -3839,77 +3839,92 @@ class AssetEntityController {
 	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
 	 */
 	def listTasks = {
-		params.commentType=AssetCommentType.TASK
-		
-		if(params.initSession)
-			session.TASK = [:]
+		def user = securityService.getUserLogin()
+		try{
+			if (!RolePermissions.hasPermission('ViewTaskManager')) {
+				log.warn "Unauthorized user $user attempted to see Task Manager"
+				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError:
+				//the number of constructors during runtime and compile time for java.lang.RuntimeException do not match. Expected 4 but got 5
+				//So using 'RuntimeException' for now.
+				throw new RuntimeException('User does not have permission to see Task Manager')
+				
+			}
 			
-		def project = securityService.getUserCurrentProject();
-		if (!project) {
-			flash.message = "Please select project to view Tasks"
-			redirect(controller:'project',action:'list')
-			return
-		}
-		def moveEvents = MoveEvent.findAllByProject(project)
-		def filters = session.TASK?.JQ_FILTERS
-		
-		// Deal with the parameters
-		def isTask = AssetCommentType.TASK
-		def taskPref= assetEntityService.getExistingPref('Task_Columns')
-		def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
-		def modelPref = [:]
-		taskPref.each{key,value->
-			modelPref <<  [ (key): assetCommentFields[value] ]
-		}
-		def filterEvent = 0
-		if(params.moveEvent){
-			filterEvent=params.moveEvent
-		}
-		def moveEvent
-		
-		if(params.containsKey("justRemaining")){
-			userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
-		}
-		if ( params.moveEvent?.size() > 0) {
-			// zero (0) = All events
-			// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
-			if (params.moveEvent != '0') {
-				moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
-				if (! moveEvent) {
-					log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
+			params.commentType=AssetCommentType.TASK
+			
+			if(params.initSession)
+				session.TASK = [:]
+				
+			def project = securityService.getUserCurrentProject();
+			if (!project) {
+				flash.message = "Please select project to view Tasks"
+				redirect(controller:'project',action:'list')
+				return
+			}
+			def moveEvents = MoveEvent.findAllByProject(project)
+			def filters = session.TASK?.JQ_FILTERS
+			
+			// Deal with the parameters
+			def isTask = AssetCommentType.TASK
+			def taskPref= assetEntityService.getExistingPref('Task_Columns')
+			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
+			def modelPref = [:]
+			taskPref.each{key,value->
+				modelPref <<  [ (key): assetCommentFields[value] ]
+			}
+			def filterEvent = 0
+			if(params.moveEvent){
+				filterEvent=params.moveEvent
+			}
+			def moveEvent
+			
+			if(params.containsKey("justRemaining")){
+				userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
+			}
+			if ( params.moveEvent?.size() > 0) {
+				// zero (0) = All events
+				// log.info "listCommentsOrTasks: Handling MoveEvent based on params ${params.moveEvent}"
+				if (params.moveEvent != '0') {
+					moveEvent = MoveEvent.findByIdAndProject(params.moveEvent,project)
+					if (! moveEvent) {
+						log.warn "listCommentsOrTasks: ${person} tried to access moveEvent ${params.moveEvent} that was not found in project ${project.id}"
+					}
+				}
+			} else {
+				// Try getting the move Event from the user's session
+				def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
+				// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
+				if (moveEventId) {
+					moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
 				}
 			}
-		} else {
-			// Try getting the move Event from the user's session
-			def moveEventId = userPreferenceService.getPreference('MOVE_EVENT')
-			// log.info "listCommentsOrTasks: getting MOVE_EVENT preference ${moveEventId} for ${person}"
-			if (moveEventId) {
-				moveEvent = MoveEvent.findByIdAndProject(moveEventId,project)
-			}
+			if (moveEvent && params.section != 'dashBoard') {
+					// Add filter to SQL statement and update the user's preferences
+					userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
+					filterEvent = moveEvent.id
+			} else {
+	        	userPreferenceService.removePreference( 'MOVE_EVENT' );
+		    }
+			def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
+			// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
+			def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
+			def viewUnpublished = params.containsKey('viewUnpublished') ? params.viewUnpublished : "0"
+			def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
+			def entities = assetEntityService.entityInfo( project )
+			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+			return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+					files:entities.files,networks:entities.networks, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
+					moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
+					comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
+					dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
+					category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList, viewUnpublished : viewUnpublished,
+					staffRoles:taskService.getTeamRolesForTasks(), taskPref:taskPref, attributesList: assetCommentFields.keySet().sort{it}, modelPref:modelPref,
+					//staffRoles:taskService.getRolesForStaff(), 
+					sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
+		} catch (RuntimeException uex){
+			log.error uex.getMessage()
+			response.sendError( 401, "Unauthorized Error")
 		}
-		if (moveEvent && params.section != 'dashBoard') {
-				// Add filter to SQL statement and update the user's preferences
-				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
-				filterEvent = moveEvent.id
-		} else {
-        	userPreferenceService.removePreference( 'MOVE_EVENT' );
-	    }
-		def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
-		// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
-		def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-		def viewUnpublished = params.containsKey('viewUnpublished') ? params.viewUnpublished : "0"
-		def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
-		def entities = assetEntityService.entityInfo( project )
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
-				files:entities.files,networks:entities.networks, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
-				moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
-				comment:filters?.comment ?:'', taskNumber:filters?.taskNumber ?:'', assetName:filters?.assetEntity ?:'', assetType:filters?.assetType ?:'',
-				dueDate : filters?.dueDate ?:'', status : filters?.status ?:'', assignedTo : filters?.assignedTo ?:'', role: filters?.role ?:'',
-				category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList, viewUnpublished : viewUnpublished,
-				staffRoles:taskService.getTeamRolesForTasks(), taskPref:taskPref, attributesList: assetCommentFields.keySet().sort{it}, modelPref:modelPref,
-//				staffRoles:taskService.getRolesForStaff(), 
-				sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
 	}
 
 	/**

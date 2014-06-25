@@ -160,5 +160,6 @@ class UrlMappings {
     	   	
     	
     	"500"(view:'/error')
+		"401"(view:'/unauthorized')
 	}
 }

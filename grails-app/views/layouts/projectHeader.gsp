@@ -352,7 +352,7 @@
 						<ul>
 							<li><a class="mmlink" id="MyTasksMenuId" href="/tdstm/clientTeams/listTasks" onclick="hideMegaMenu('teamMegaMenu')">My Tasks 
 							(<span id="todoCountProjectId">&nbsp;</span>)</a></li>
-							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
+							<tds:hasPermission permission='ViewTaskManager'>
 							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[initSession:true]" onclick="hideMegaMenu('teamMegaMenu')">Task Manager</g:link></li>
 							</tds:hasPermission>
 
@@ -380,7 +380,7 @@
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
 						<ul>
-							<tds:hasPermission permission='ShowMoveTechsAndAdmins'>
+							<tds:hasPermission permission='ViewSupervisorConsoles'>
 							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[ 'showAll':'show','teamType':'MOVE']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Techs (old)</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="['showAll':'show','teamType':'ADMIN']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Admins (old)</g:link></li>
 							<li><a class="mmlink" href="/tdstm/clientTeams/list" onclick="hideMegaMenu('teamMegaMenu')">Team Tasks (old)</a></li>
