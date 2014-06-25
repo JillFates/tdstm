@@ -50,7 +50,7 @@ app.config(function($stateProvider, $urlRouterProvider, servRootPathProvider) {
             	
             	var taskBatchId = $stateParams.id;
             	
-        		if (taskBatchId != "") {
+        		if ((taskBatchId != null) && (taskBatchId != "")) {
         			restCalls.getTasksOfTaskBatch({section: taskBatchId}, function(data){
         				rootLog.info('Success on reading tasks of task batch');
         				rootLog.info(data);
@@ -1502,6 +1502,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 						clearInterval($scope.tasks.show.promise);
 						if (data.data.status == "Failed" ) {
 							$scope.alerts.addAlert({type: 'danger', msg: data.data.detail});
+							$scope.tasks.refreshTaskBatches();
 						} else {
 							$scope.alerts.addAlert({type: 'success', msg: 'Finish generating tasks', closeIn: 3000});
 							$scope.tasks.refreshTaskBatches();
