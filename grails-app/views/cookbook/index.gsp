@@ -45,6 +45,8 @@
 			
 			$('#createCommentDialog').dialog(opt);
 			$('#showCommentDialog').dialog(opt);
+
+			$('.hasTooltip').tooltip();
 		});
 	</script>
 </head>
@@ -69,18 +71,18 @@
 				</div>
 			</form>
 			<div class="row-fluid clearfix">
-				<div class="col-md-12">
-					<div class="gridStyle" ng-grid="gridOptions"></div>
-				</div>				
-			</div>
-			<div class="row-fluid clearfix">
 				<div class="col-md-4">
-					<button class="btn btn-default createRecipe" ng-click="showCreateRecipeDialog()">Create Recipe</button>
+					<button class="btn btn-default createRecipe" ng-click="showCreateRecipeDialog()">Create Recipe...</button>
 				</div>
 					%{-- <div class="col-md-4 paginationWrapper">
 						<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
 					</div> --}%
-				</div>
+			</div>
+			<div class="row-fluid clearfix">
+				<div class="col-md-12">
+					<div class="gridStyle" ng-grid="gridOptions"></div>
+				</div>				
+			</div>
 				<div class="row-fluid clearfix">
 					<div class="col-md-12">
 						<tabset id="mainTabset" class="hidden" ng-class="{show : true}">
@@ -125,7 +127,7 @@
 									<div class="generateWrapper">
 										<label for="generateTask">
 											<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!tasks.validCurrentSelection" ng-click="tasks.generateTask(this)">
-												<span class="spinner"><i class="icon-spin icon-refresh"></i></span>Generate
+												<span class="spinner"><i class="icon-spin icon-refresh"></i></span>Generate Tasks
 											</a>
 										</label>
 									</div>
@@ -226,7 +228,9 @@
 								<div class="row clearfix edition">
 									<div class="col-xs-6">
 										<div class="titleWrapper row">
-											<h5 class="headingTitle col-xs-6">{{currentSelectedRecipe.name}}</h5>
+											<span class="headingTitle col-xs-6">
+												<p>{{currentSelectedRecipe.name}}</p>
+											</span>
 											<div class="versionLinks col-xs-6" style="text-align: right;">
 												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
 													<input type="radio" ng-model="wipConfig[gridData[currentSelectedRow.rowIndex].recipeId].opt" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{gridOptions.selectedItems[0].versionNumber}}
@@ -239,20 +243,6 @@
 										<section class="codeMirrorWrapper"> 
 											<textarea readonly name="recipeCode" title="Double click to edit" id="recipeCode" rows="10" ng-model="selectedRecipe.sourceCode" ng-dblclick="syntaxModal.showModal = true" ng-disabled="!currentSelectedRecipe" value="{{selectedRecipe.sourceCode}}"></textarea>
 										</section>
-										<div class="clearfix btns">
-											<div class="btn-group pull-left" style="margin-right:6px;">
-												<button type="button" class="btn btn-default" ng-disabled="!currentSelectedRecipe || !editingRecipe" ng-click="editorActions.saveWIP()">Save WIP</button>
-												<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" class="btn btn-default" ng-click="editorActions.releaseVersion()">Release</button>
-											</div>
-											<div class="btn-group pull-left" style="margin-right:6px;">
-												<button type="button" class="btn btn-default" ng-disabled="!editingRecipe || !currentSelectedRecipe" ng-click="editorActions.cancelChanges()">Cancel</button>
-												<button type="button" class="btn btn-default" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" ng-click="editorActions.discardWIP()">Discard WIP</button>
-											</div>
-											<div class="btn-group pull-left">
-												<button type="button" class="btn btn-default" ng-disabled="!((selectedRWip != null) && (selectedRVersion != null && (selectedRVersion.versionNumber > 0)))" ng-click="editorActions.diff()">Diff</button>
-												<button type="submit" class="btn btn-default pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()">Validate Syntax</button>
-											</div>
-										</div>
 									</div>
 									<div class="col-xs-6">
 										<tabset>
@@ -316,6 +306,23 @@
 												</ul>
 											</tab>
 										</tabset>
+									</div>
+								</div>
+								<div class="row clearfix edition">
+									<div class="clearfix btns col-xs-12">
+										<div class="btn-group pull-left" style="margin-right:6px;">
+											<button type="button" title="Edit the recipe syntax" class="btn btn-default hasTooltip" ng-disabled="!currentSelectedRecipe" ng-click="syntaxModal.showModal = true">Edit</button>
+											<button type="button" class="btn btn-default hasTooltip" ng-disabled="!editingRecipe || !currentSelectedRecipe" ng-click="editorActions.cancelChanges()" title="Undo all edit changes to the recipe">Undo</button>
+											<button type="button" class="btn btn-default hasTooltip" ng-disabled="!currentSelectedRecipe || !editingRecipe" ng-click="editorActions.saveWIP()" title="Save the recipe changes as Work In Progress (WIP)">Save WIP</button>
+											<button type="button" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" class="btn btn-default hasTooltip" ng-click="editorActions.releaseVersion()" title="Create a release or version of the recipe that can not be altered">Release</button>
+											<button type="button" class="btn btn-default hasTooltip" ng-disabled="!selectedRecipe.hasWIP || !currentSelectedRecipe || selectedRecipe.versionNumber > 0" ng-click="editorActions.discardWIP()" title="Delete the Work In Progress of the recipe">Discard WIP</button>
+										</div>
+										<div class="btn-group pull-left" style="margin-right:6px;">
+											<button type="button" class="btn btn-default hasTooltip" ng-disabled="!((selectedRWip != null) && (selectedRVersion != null && (selectedRVersion.versionNumber > 0)))" ng-click="editorActions.diff()" title="Compare the differences between the current release and WIP">Diff</button>
+										</div>
+										<div class="btn-group pull-left">
+											<button type="submit" class="btn btn-default hasTooltip pull-right" ng-disabled="selectedRecipe.sourceCode == '' || !currentSelectedRecipe" ng-click="editorActions.validateSyntax()" title="Validates that the current syntax of the recipe. Any errors are reported in the Syntax Errors tab">Check Syntax</button>
+										</div>
 									</div>
 								</div>
 							</tab>
