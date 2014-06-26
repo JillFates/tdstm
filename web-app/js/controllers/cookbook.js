@@ -1493,7 +1493,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$scope.tasks.show.promise = setInterval(function() {
 				restCalls.getProgress({section: jobId}, {"id" : jobId}, function(data) {
 					$scope.tasks.progressPercent = data.data.percentComp;
-					$scope.tasks.progressRemaining = data.data.remainingTime;
+					$scope.tasks.progressRemaining = data.data.detail;
 					
 					$scope.tasks.show.start = $scope.tasks.progressPercent == 100;
 					$scope.tasks.show.progress = $scope.tasks.progressPercent != 100;

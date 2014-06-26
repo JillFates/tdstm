@@ -54,7 +54,7 @@ div.onepage {
 				</tr>
 				<tr>
 				<td colspan="2">
-					<g:render template="../application/show" model="[applicationInstance:application.app, config:application.config, customs:application.customs, project:project]" ></g:render>			
+					<g:render template="../application/show" model="[applicationInstance:application.app, config:application.config, customs:application.customs, project:project, highlightMap:application.highlightMap]" ></g:render>			
 				</td>
 				</tr>
 				<tr id="deps">

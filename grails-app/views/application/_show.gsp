@@ -118,7 +118,7 @@
 			<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration</label></td>
 			<td class="valueNW ${config.testingDuration}" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
 		</tr>
-		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
+		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs, highlightMap:highlightMap]"></g:render>
 <%--		<tr>--%>
 <%--			<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>--%>
 <%--			<td colspan="7">--%>
