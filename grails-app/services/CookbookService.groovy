@@ -78,6 +78,7 @@ class CookbookService {
 		def clonedVersion = null
 		def defaultSourceCode = ''
 		def defaultChangelog = ''
+		def clonedReleasedVersion = null
 		
 		if (cloneFrom != null) {
 			if (cloneFrom.isNumber()) {
@@ -101,13 +102,27 @@ class CookbookService {
 
 		def result = null
 
-		if (clonedVersion != null && clonedVersion.releasedVersion != null) {
-			result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
-				           currentProject, clonedVersion.releasedVersion.sourceCode, clonedVersion.releasedVersion.changelog, clonedVersion.releasedVersion, loginUser.person)
-		} else {
-		    result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
-			               currentProject, defaultSourceCode, defaultChangelog, null, loginUser.person)
+		if (clonedVersion != null) {
+
+			if (clonedVersion.releasedVersion != null) {
+				defaultSourceCode = clonedVersion.releasedVersion.sourceCode
+				defaultChangelog = clonedVersion.releasedVersion.changelog
+				clonedReleasedVersion = clonedVersion.releasedVersion
+			} else {
+				def recipeVersions = findRecipeVersionsWithSourceCode(cloneFrom);
+				if ((recipeVersions != null) && (recipeVersions.size() > 0))  {
+					def wip = recipeVersions[0]
+					defaultSourceCode = wip.sourceCode
+					defaultChangelog = wip.changelog
+					clonedReleasedVersion = clonedVersion.releasedVersion
+				}
+
+			}
+
 		}
+
+	    result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
+			               currentProject, defaultSourceCode, defaultChangelog, clonedReleasedVersion, loginUser.person)
 
 		return result.recipe
 	}
@@ -784,6 +799,37 @@ class CookbookService {
 			WHERE recipe.recipe_id = :recipeId
 			ORDER BY version_number DESC
 			""", arguments, new RecipeVersionMapper())
+
+		return recipeVersions
+	}
+
+	/**
+	 * Finds the recipes versions for a given recipe id. Without checking project and including source code and changelog
+	 *
+	 * @param recipeId recipe id to search
+	 *
+	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
+	 */
+	def findRecipeVersionsWithSourceCode(recipeId) {
+
+		if (recipeId == null || !recipeId.isNumber()) {
+			throw new EmptyResultException();
+		}
+
+		def arguments = [
+			"recipeId" : recipeId
+		]
+
+		def recipeVersions = namedParameterJdbcTemplate.query("""
+			SELECT DISTINCT recipe.recipe_id as recipeId, recipe_version.recipe_version_id as recipeVersionId,
+							recipe_version.source_code as sourceCode, recipe_version.changelog as changelog,
+							recipe_version.version_number as versionNumber, recipe_version.last_updated as lastUpdated,
+							if ((recipe.released_version_id = recipe_version.recipe_version_id), true, false) as isCurrentVersion
+			FROM recipe
+			INNER JOIN recipe_version ON recipe.recipe_id = recipe_version.recipe_id 
+			WHERE recipe.recipe_id = :recipeId
+			ORDER BY version_number ASC
+			""", arguments, new RecipeVersionCompleteMapper())
 
 		return recipeVersions
 	}
@@ -1483,3 +1529,16 @@ class RecipeVersionMapper implements RowMapper {
 	}
 }
 
+class RecipeVersionCompleteMapper implements RowMapper {
+	@Override
+	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		def rowMap = [:]
+		rowMap.id = rs.getInt('recipeVersionId')
+		rowMap.versionNumber = (rs.getInt('versionNumber').equals(0)) ? '' : rs.getInt('versionNumber')
+		rowMap.lastUpdated = rs.getTimestamp('lastUpdated')
+		rowMap.sourceCode = rs.getString('sourceCode')
+		rowMap.changelog = rs.getString('changelog')
+		rowMap.isCurrentVersion = (rs.getInt('isCurrentVersion').equals(1)) ? true : false
+		return rowMap
+	}
+}
