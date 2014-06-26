@@ -397,26 +397,26 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	$scope.executeUpdate = true;
 
 	columnSel = {index: 0},
-	actionsTemplate =   '<div class="gridIcon">'+
-	'<a href="" class="actions edit" title="Edit" ng-click="gridActions(row, 0)">'+
-	'<span class="glyphicon glyphicon-pencil"></span>'+
-	'</a>'+
-	'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }"'+
-		'title="Revert" ng-click="gridActions(row, 1)">'+
-	'<span class="glyphicon glyphicon-arrow-left"></span>'+
-	'</a>'+
-	'<a href="" class="actions archive" title="Archive" ng-click="gridActions(row, 2)"'+
-		'ng-hide="archived == \'y\'">'+
-	'<span class="glyphicon glyphicon-folder-close"></span>'+
-	'</a>'+
-	'<a href="" class="actions unarchive" title="UnArchive" ng-click="gridActions(row, 4)"'+
-		'ng-hide="archived == \'n\'">'+
-	'<span class="glyphicon glyphicon-folder-open"></span>'+
-	'</a>'+
-	'<a href="" class="actions remove" title="Remove" ng-click="gridActions(row, 3)">'+
-	'<span class="glyphicon glyphicon-trash"></span>'+
-	'</a>'+
-	'</div>';
+	actionsTemplate = '<div class="gridIcon">'+
+			'<a href="" class="actions edit" title="Edit Recipe" ng-click="gridActions(row, 0)">'+
+				'<img src="'+ thisURI('/icons/script_edit.png') + '" alt="Edit">' +
+			'</a>'+
+			'<a href="" class="actions revert" ng-class="{ disabled: gridData[row.rowIndex].versionNumber < 1 }"'+
+				'title="Revert to other version" ng-click="gridActions(row, 1)">'+
+				'<img src="'+ thisURI('/icons/arrow_undo.png') + '" alt="Revert">' +
+			'</a>'+
+			'<a href="" class="actions archive" title="Archive Recipe" ng-click="gridActions(row, 1)"'+
+				'ng-hide="archived == \'y\'">'+
+				'<img src="'+ thisURI('/icons/folder.png') + '" alt="Archive">' +
+			'</a>'+
+			'<a href="" class="actions unarchive" title="Unarchive Recipe" ng-click="gridActions(row, 4)"'+
+				'ng-hide="archived == \'n\'">'+
+				'<img src="'+ thisURI('/icons/folder_go.png') + '" alt="Archive">' +
+			'</a>'+
+			'<a href="" class="actions remove" title="Delete Recipe" ng-click="gridActions(row, 3)">'+
+			'<img src="'+ thisURI('/icons/delete.png') + '" alt="Delete">' +
+			'</a>'+
+		'</div>';
 	$scope.edittableField = '<input class="ngGridCellEdit" ng-class="colt' + columnSel.index + 
 		'" ng-input="COL_FIELD" ng-model="COL_FIELD" ng-keydown="keyPressed($event, row, col)" />';
 	$scope.colDef = [
@@ -705,7 +705,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 	}, true);
 
-	// Actions for the main Grid
+	// Actions for the Recipe Grid
 	$scope.gridActions = function(row, ind){
 
 		if(ind != 0){
@@ -728,7 +728,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			},
 			revert : function(){
 				$scope.preventSelection = false;
-				$scope.activeTabs.history = true;
+				$scope.activeTabs.versions = true;
 				$timeout(function(){
 					$location.hash('mainTabset');
 					$anchorScroll();
@@ -1712,13 +1712,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			$log.info(data);
 
 			var	tasksActionsTemplate = '<div class="gridIcon">'+
-				'<a href="" class="actions edit" title="Edit"'+
+				'<a href="" class="actions edit" title="Reset Tasks"'+
 					'ng-click="tasks.tasksGridActions(row, \'refresh\')">'+
-				'<span class="glyphicon glyphicon-refresh"></span>'+
+					'<img src="'+ thisURI('/icons/table_refresh.png') + '" alt="Reset">' +
 				'</a>'+
-				'<a href="" class="actions remove" title="Remove"'+
+				'<a href="" class="actions remove" title="Delete Task Batch"'+
 					'ng-click="tasks.tasksGridActions(row, \'remove\')">'+
-				'<span class="glyphicon glyphicon-trash"></span>'+
+					'<img src="'+ thisURI('/icons/delete.png') + '" alt="Delete">' +
 				'</a>'+
 				'</div>',
 				checkboxTemplate = '<div class="gridIcon">'+
@@ -2131,13 +2131,13 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
     var	versionsActionsTemplate = '<div class="gridIcon">'+
 		'<a href="" ng-hide="row.entity.isCurrentVersion || !row.entity.versionNumber"'+
-			'class="actions edit" title="Edit"'+ 
+			'class="actions edit" title="Revert Recipe Version"'+ 
 			'ng-click="versions.versionsGridActions(row, \'revert\')">'+
-			'<span class="glyphicon glyphicon-arrow-left"></span>'+
+			'<img src="'+ thisURI('/icons/arrow_undo.png') + '" alt="Revert">' +
 		'</a>'+
-		'<a href="" class="actions remove" title="Remove"'+
-		'ng-click="versions.versionsGridActions(row, \'remove\')">'+
-			'<span class="glyphicon glyphicon-trash"></span>'+
+		'<a href="" class="actions remove" title="Delete Version"'+
+			'ng-click="versions.versionsGridActions(row, \'remove\')">'+
+			'<img src="'+ thisURI('/icons/delete.png') + '" alt="Delete">' +
 		'</a>'+
 		'</div>',
 		currentVersionTemplate = '<div class="gridIcon">'+
@@ -2167,7 +2167,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		var version = (item.entity.versionNumber) ? 'version '+item.entity.versionNumber : 'WIP version';
 		if(action == 'revert'){
 			console.log(item.entity);
-			confirmation = confirm("Reverting \"" + $scope.currentSelectedRecipe.name + "\" to " +
+			confirmation = confirm("Revert current recipe \"" + $scope.currentSelectedRecipe.name + "\" to " +
 				version + "\n\nPress Okay to continue");
 			if (confirmation == true){
 				$log.info(item.entity);
@@ -2184,7 +2184,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		}else if(action == 'remove'){
 			console.log($scope.selectedRecipe);
-			confirmation = confirm("Deleting " + version + " for \"" + 
+			confirmation = confirm("Delete " + version + " of recipe \"" + 
 				$scope.currentSelectedRecipe.name + "\" \n\nPress Okay to continue");
 			if (confirmation == true){
 				$log.info(item.entity);

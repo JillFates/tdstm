@@ -57,27 +57,23 @@
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
 		<div class="container">
 			<form id="gridControls" class="row-fluid clearfix form-inline groups">
-				<div class="col-md-4 col-xs-4 form-group">
+				<div class="col-md-4 col-xs-4 form-group" style="position:relative; bottom:0;">
 					<label for="contextSelector">Context: 
 						<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()"></select>
 					</label>
 				</div>
-				<div class="col-md-6 col-xs-6 form-group pull-right archiveCheckWrapper">
-					<div class="checkbox pull-right">
+				<div class="col-md-4 col-xs-4 form-group text-center">
+					<a class="btn btn-default" id="generateTask" ng-click="showCreateRecipeDialog()">
+						<img src="${ resource(dir:'icons', file:'script_add.png') }" />
+						Create Recipe...
+					</a>
+				</div>
+				<div class="col-md-4 col-xs-4 form-group pull-right archiveCheckWrapper">
 						<label class="pull-right">
 							<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
 						</label>
-					</div>
 				</div>
 			</form>
-			<div class="row-fluid clearfix">
-				<div class="col-md-4">
-					<button class="btn btn-default createRecipe" ng-click="showCreateRecipeDialog()">Create Recipe...</button>
-				</div>
-					%{-- <div class="col-md-4 paginationWrapper">
-						<pagination boundary-links="true" total-items="totalItems" page="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
-					</div> --}%
-			</div>
 			<div class="row-fluid clearfix">
 				<div class="col-md-12">
 					<div class="gridStyle" ng-grid="gridOptions"></div>
@@ -87,7 +83,7 @@
 					<div class="col-md-12">
 						<tabset id="mainTabset" class="hidden" ng-class="{show : true}">
 							%{-- Task Generation --}%
-							<tab heading="Actions" active="activeTabs.taskGeneration">
+							<tab heading="Task Generation" active="activeTabs.taskGeneration">
 								<p>Select appropriate context to generate tasks using the {{selectedRecipe.name}} recipe:</p>
 								<form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.start">
 									<label class="inline" for="eventSelect">Event:
@@ -127,7 +123,9 @@
 									<div class="generateWrapper">
 										<label for="generateTask">
 											<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!tasks.validCurrentSelection" ng-click="tasks.generateTask(this)">
-												<span class="spinner"><i class="icon-spin icon-refresh"></i></span>Generate Tasks
+												<span class="spinner"><i class="icon-spin icon-refresh"></i></span>
+												<img src="${ resource(dir:'icons', file:'table_gear.png') }" />
+												Generate Tasks
 											</a>
 										</label>
 									</div>
@@ -185,7 +183,7 @@
 								<div class="innerTabWrapper">
 									<tabset>
 										%{-- Actions Content --}%
-										<tab heading="Task Generation" active="activeSubTabs.history.actions">
+										<tab heading="Actions" active="activeSubTabs.history.actions">
 											<div class="btn-group">
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-bind="tasks.selectedTaskBatch.isPublished && 'Unpublish' || 'Publish'" ng-click="tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)">Publish</button>
 												<button type="button" class="btn btn-default" ng-disabled="tasks.selectedTaskBatch == null" ng-click="tasks.resetTaskBatch(tasks.selectedTaskBatch.id)">Reset</button>
@@ -229,7 +227,7 @@
 									<div class="col-xs-6">
 										<div class="titleWrapper row">
 											<span class="headingTitle col-xs-6">
-												<p>{{currentSelectedRecipe.name}}</p>
+												<p><label ng-show="currentSelectedRecipe.name">Recipe:</label> {{currentSelectedRecipe.name}}</p>
 											</span>
 											<div class="versionLinks col-xs-6" style="text-align: right;">
 												<label for="releasedVersionRadio" ng-show="gridOptions.selectedItems[0].versionNumber > 0">
