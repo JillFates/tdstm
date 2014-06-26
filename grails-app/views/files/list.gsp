@@ -49,6 +49,7 @@
 				var size = '${size}'
 				var sizePref = '${sizePref}'
 				var toValidate = '${toValidate}'
+				var unassigned = '${unassigned}'
 				
 				var listCaption ='Storages: <tds:hasPermission permission="AssetEdit"><span class="capBtn"><input type="button" value="Create Storage" onclick="createAssetDetails(\'Files\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
@@ -77,7 +78,7 @@
 					gridComplete="function(){bindResize('storageId');recompileDOM('storageIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId, assetName:fileName, 
-						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size,toValidate:toValidate}"
+						planStatus:planStatus, moveBundle:moveBundle, fileFormat:fileFormat, size:size,toValidate:toValidate, unassigned:unassigned}"
 					showPager="true">
 					<jqgrid:filterToolbar id="storageId" searchOnEnter="false" />
 					<jqgrid:navigation id="storageId" add="false" edit="false" del="false" search="false" refresh="false"/>

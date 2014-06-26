@@ -8,11 +8,10 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
-import com.tds.asset.AssetType
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdssrc.grails.WebUtil
 
 class ApplicationController {
 	def partyRelationshipService
@@ -88,7 +87,7 @@ class ApplicationController {
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
 			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent, moveBundleList:moveBundleList,
 			attributesList:attributesList, appPref:appPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true',
-			hasPerm:hasPerm, fixedFilter:fixedFilter]
+			hasPerm:hasPerm, fixedFilter:fixedFilter, unassigned: params.unassigned]
 	}
 	
 	/**
@@ -152,6 +151,16 @@ class ApplicationController {
 
 		if (justPlanning=='true')
 			query.append(" AND mb.use_for_planning=${justPlanning} ")
+			
+		if(params.unassigned){
+			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
+				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
+			
+			if(unasgnMB){
+				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
+				query.append( " AND ae.move_bundle_id IN (${unasgnmbId})" )
+			}
+		}
 
 		query.append("GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder} ) AS apps")
 		
@@ -198,6 +207,7 @@ class ApplicationController {
 		if(params.runbook){
 			query.append( " Where apps.runbookStatus='Done' " )
 		}
+		
 		log.info "query = ${query}"
 		def appsList = jdbcTemplate.queryForList(query.toString())
 		

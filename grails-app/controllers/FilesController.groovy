@@ -80,7 +80,7 @@ class FilesController {
 			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,toValidate:params.toValidate,
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
 			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', 
-			hasPerm:hasPerm,fixedFilter:fixedFilter]
+			hasPerm:hasPerm,fixedFilter:fixedFilter, unassigned: params.unassigned]
 		
 	}
 	/**
@@ -167,6 +167,16 @@ class FilesController {
 		
 		if(justPlanning=='true')
 			query.append(" AND mb.use_for_planning=${justPlanning} ")
+			
+		if(params.unassigned){
+			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
+				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
+			
+			if(unasgnMB){
+				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
+				query.append( " AND ae.move_bundle_id IN (${unasgnmbId})" )
+			}
+		}
 			
 		query.append(" GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}) AS files ")
 		

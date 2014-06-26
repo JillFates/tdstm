@@ -51,6 +51,7 @@
 				var dbFormat = '${validationFilter}'
 				var sizePref = '${sizePref}'
 				var toValidate = '${toValidate}'
+				var unassigned = '${unassigned}'
 					
 				var listCaption ='DataBases: <tds:hasPermission permission="AssetEdit"><span class="capBtn"><input type="button" value="Create DB" onclick="createAssetDetails(\'Database\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
@@ -78,7 +79,7 @@
 					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
-						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate}"
+						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate, unassigned:unassigned}"
 					showPager="true">
 					<jqgrid:filterToolbar id="databaseId" searchOnEnter="false" />
 					<jqgrid:navigation id="databaseId" add="false" edit="false" del="false" search="false" refresh="false" afterSubmit="deleteMessage"/>

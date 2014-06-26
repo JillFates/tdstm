@@ -84,7 +84,7 @@ class DatabaseController {
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
 			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
 			dbPref:dbPref , modelPref:modelPref, attributesList:attributesList, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', 
-			hasPerm:hasPerm, fixedFilter:fixedFilter]
+			hasPerm:hasPerm, fixedFilter:fixedFilter, unassigned: params.unassigned]
 	}
 	
 	/**
@@ -173,7 +173,16 @@ class DatabaseController {
 
 		if (justPlanning=='true')
 			query.append(" AND mb.use_for_planning=${justPlanning} ")
-
+			
+		if(params.unassigned){
+			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
+				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
+			
+			if(unasgnMB){
+				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
+				query.append( " AND ae.move_bundle_id IN (${unasgnmbId})" )
+			}
+		}
 		query.append(" GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}) AS dbs ")
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 

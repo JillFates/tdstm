@@ -65,6 +65,7 @@
 				var moveBundleId = '${moveBundleId}'
 				var windowWidth = $(window).width() - $(window).width()*5/100 ;
 				var sizePref = '${sizePref}'
+				var unassigned = '${unassigned}'
 				var listCaption ='Assets: <tds:hasPermission permission="AssetEdit"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span>\
@@ -101,7 +102,8 @@
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
-						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId,listType:listType}">
+						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId,listType:listType,
+						unassigned:unassigned}">
 					<jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="assetListId" />

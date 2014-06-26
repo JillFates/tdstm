@@ -1796,7 +1796,8 @@ class AssetEntityController {
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
 			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
 			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType, 
-			 justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm, fixedFilter:fixedFilter]) 
+			 justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm, fixedFilter:fixedFilter,
+			 unassigned: params.unassigned]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -1938,6 +1939,15 @@ class AssetEntityController {
 		else
 			query.append(" AND ifnull(ae.asset_type,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
 		
+		if(params.unassigned){
+			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
+					AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
+			
+			if(unasgnMB){
+				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
+				query.append( " AND ae.move_bundle_id IN (${unasgnmbId})" )
+			}
+		}
 			
 		query.append(""" GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
 			) AS assets

@@ -596,13 +596,18 @@ class MoveBundleController {
 			
 		}
 		
-		def unAssignedCountQuery = countQuery+" AND (ae.planStatus IS NULL OR ae.planStatus IN ('$unassignedPlan',''))"
-		def unAssignedDBCountQuery = dbCountQuery+" AND (ae.planStatus IS NULL OR ae.planStatus IN ('$unassignedPlan',''))"
-		def unAssignedFilesCountQuery = filesCountQuery+" AND (ae.planStatus IS NULL OR ae.planStatus IN ('$unassignedPlan',''))"
+		def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
+				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
 		
-		def unassignedAppCount =  moveBundleList ? Application.executeQuery("SELECT COUNT(ae) FROM Application ae WHERE ae.project = :project \
-			AND ae.assetType =:type AND ae.moveBundle IN (:moveBundles) AND (ae.planStatus is null OR ae.planStatus IN ('$unassignedPlan',''))",
-			countArgs <<[type:app])[0] : 0
+		def unAssignedCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN (:unasgnMB)"
+		def unAssignedDBCountQuery = "SELECT COUNT(ae) FROM Database ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN (:unasgnMB)"
+		def unAssignedFilesCountQuery = "SELECT COUNT(ae) FROM Files ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN (:unasgnMB)"
+		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.assetType NOT IN (:type) AND ae.moveBundle IN (:unasgnMB)"
+		
+		def unasgndArgs = [unasgnMB:unasgnMB]
+		
+		def unassignedAppCount =  unasgnMB ? Application.executeQuery("SELECT COUNT(ae) FROM Application ae WHERE \
+				ae.assetType =:type AND ae.moveBundle IN (:unasgnMB)", unasgndArgs << [type:app]) [0] : 0 
 			
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		
@@ -624,18 +629,18 @@ class MoveBundleController {
 		def appDoneCount = moveBundleList ? apps.findAll{it.moveBundle?.moveEvent?.runbookStatus=='Done'}.size() : 0
 		def percAppDoneCount = countAppPercentage(applicationCount, appDoneCount)
 		
-		def unassignedAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:[server, vm, blade]])[0] : 0
+		def unassignedAssetCount = unasgnMB ? AssetEntity.executeQuery(unAssignedCountQuery, unasgndArgs <<[type:[server, vm, blade]])[0] : 0
 		
-		def unassignedPhysialAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:[server, blade]])[0] : 0
+		def unassignedPhysialAssetCount = unasgnMB ? AssetEntity.executeQuery(unAssignedCountQuery, unasgndArgs <<[type:[server, blade]])[0] : 0
 		
-		def unassignedVirtualAssetCount = moveBundleList ? AssetEntity.executeQuery(unAssignedCountQuery, countArgs <<[type:[vm]])[0] : 0
+		def unassignedVirtualAssetCount = unasgnMB ? AssetEntity.executeQuery(unAssignedCountQuery, unasgndArgs <<[type:[vm]])[0] : 0
 		
-		def unassignedDbCount = moveBundleList ? Database.executeQuery(unAssignedDBCountQuery, countArgs <<[type:db])[0] : 0
+		def unassignedDbCount = unasgnMB ? Database.executeQuery(unAssignedDBCountQuery, unasgndArgs <<[type:db])[0] : 0
 		
-		def unassignedFilesCount = moveBundleList ? Files.executeQuery(unAssignedFilesCountQuery, countArgs <<[type:files])[0] : 0
+		def unassignedFilesCount = unasgnMB ? Files.executeQuery(unAssignedFilesCountQuery, unasgndArgs <<[type:files])[0] : 0
 		
-		def unassignedOtherCount = moveBundleList ? AssetEntity.executeQuery(otherCountQuery+"and (ae.planStatus is null or ae.planStatus \
-			in ('$unassignedPlan',''))", countArgs <<[type:[server, vm, blade, app, files, db, appliance]])[0] : 0
+		def unassignedOtherCount = unasgnMB ? AssetEntity.executeQuery(unAssignedOtherCountQuery, 
+			unasgndArgs <<[type:[server, vm, blade, app, files, db, appliance]])[0] : 0
 
 		def assignedPhysicalAsset = moveBundleList ? AssetEntity.executeQuery(countQuery , countArgs <<[type:[server, blade]])[0] : 0
 		

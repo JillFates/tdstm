@@ -65,7 +65,7 @@
 								<td ><input type="text" id="appVendor" class="${config.appVendor}"
 									name="appVendor" value="${applicationInstance.appVendor}"  tabindex="11" />
 								</td>
-								<td class="label ${applicationInstance.sme}  ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
+								<td class="label ${config.sme}  ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td >
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 

@@ -475,20 +475,19 @@ $(document).ready(function() {
 														params="[filter:'virtual',listType:'server']"
 														action="list" class="links">Virtual</g:link></td>
 											</tr>
-
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconStorage.png')}"
-													height="12" /></td>
-												<td><g:link controller="files" action="list"
-														class="links">Storage</g:link></td>
-											</tr>
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconDB.png')}"
 													height="12" /></td>
 												<td><g:link controller="database" action="list"
 														class="links">Databases</g:link></td>
+											</tr>
+											<tr>
+												<td class="dashboard_stat_icon_td"><img
+													src="${resource(dir:'images',file:'iconStorage.png')}"
+													height="12" /></td>
+												<td><g:link controller="files" action="list"
+														class="links">Storage</g:link></td>
 											</tr>
 
 											<tr>
@@ -553,7 +552,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="application" action="list"
-															params="[filter:'applicationCount', plannedStatus:'Unassigned']"
+															params="[filter:'applicationCount', unassigned:'true']"
 															class="links">
 															${unassignedAppCount} (${(percentageUnassignedAppCount > 0 && percentageUnassignedAppCount < 1) ? 1 : Math.round(percentageUnassignedAppCount)}%)
 														</g:link>
@@ -604,7 +603,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
-															params="[filter:'All',listType:'server', plannedStatus:'Unassigned']"
+															params="[filter:'All',listType:'server', unassigned:'true']"
 															class="links">
 															${unassignedAssetCount}
 														</g:link>
@@ -631,7 +630,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
-															params="[filter:'physical', plannedStatus:'Unassigned',listType:'server']"
+															params="[filter:'physical', unassigned:'true',listType:'server']"
 															class="links">
 															${unassignedPhysialAssetCount} (${(percentageUnassignedPhysicalAssetCount > 0 && percentageUnassignedPhysicalAssetCount < 1) ? 1 : Math.round(percentageUnassignedPhysicalAssetCount)}%)
 														</g:link>
@@ -666,7 +665,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
-															params="[filter:'virtual', plannedStatus:'Unassigned',listType:'server']"
+															params="[filter:'virtual', unassigned:'true',listType:'server']"
 															class="links">
 															${unassignedVirtualAssetCount} (${(percentageUnassignedVirtualCount > 0 && percentageUnassignedVirtualCount < 1) ? 1 : Math.round(percentageUnassignedVirtualCount)}%)
 														</g:link>
@@ -701,7 +700,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="database" action="list"
-															params="[filter:'db', plannedStatus:'Unassigned']"
+															params="[filter:'db', unassigned:'true']"
 															class="links">
 															${unassignedDbCount} (${(percentageUnassignedDbCount > 0 && percentageUnassignedDbCount < 1) ? 1 : Math.round(percentageUnassignedDbCount)}%)
 														</g:link>
@@ -737,7 +736,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="files" action="list"
-															params="[filter:'storage', plannedStatus:'Unassigned']"
+															params="[filter:'storage', unassigned:'true']"
 															class="links">
 															${unassignedFilesCount} (${(percentageUnassignedFilesCount > 0 && percentageUnassignedFilesCount < 1) ? 1 : Math.round(percentageUnassignedFilesCount)}%)
 														</g:link>
@@ -773,7 +772,7 @@ $(document).ready(function() {
 														<span class='colorGrey'>0</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
-															params="[filter:'other', plannedStatus:'Unassigned',listType:'physical']"
+															params="[filter:'other', unassigned:'true',listType:'physical']"
 															class="links">
 															${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
 														</g:link>

@@ -55,6 +55,7 @@
 				var appSme = '${appSme}'
 				var toValidate = '${toValidate}'
 				var runbook = '${runbook}'
+				var unassigned = '${unassigned}'
 				
 				var sizePref = '${sizePref}'
 				var listCaption ='Applications: \
@@ -91,7 +92,8 @@
 						resizeGrid()
 					}
 					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
-						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, toValidate:toValidate,runbook:runbook}">
+						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
+						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">
 					<jqgrid:filterToolbar id="applicationId" searchOnEnter="false" />
 					<jqgrid:navigation id="applicationId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="applicationId" />
