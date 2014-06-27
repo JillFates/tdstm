@@ -1,0 +1,219 @@
+.unselectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.mini text {
+	font: 9px sans-serif;
+}
+
+.main text {
+	font: 12px sans-serif;
+}
+
+.month text {
+	text-anchor: start;
+}
+
+.todayLine {
+	stroke: blue;
+	stroke-width: 1.5;
+}
+
+.axis line, .axis path {
+	stroke: black;
+}
+
+polygon.miniItem {
+	stroke-width: 1;
+	stroke: black;
+	fill: green;
+}
+polygon.miniItem.selected {
+	fill: #00B0C0 !important;
+}
+
+
+polygon.miniItem.siblings.selected {
+	fill: red !important;
+}
+polygon.miniItem.egg {
+	fill: yellow !important;
+}
+
+polygon.miniItem.selectionParent {
+	fill: blue !important;
+}
+
+
+
+polygon.mainItem {
+	stroke-width: 2;
+	fill: #FFFF00;
+	stroke: #FFFF00;
+}
+polygon.mainItem.selected {
+	stroke: blue !important;
+	fill: lightblue !important;
+}
+
+polygon.mainItem.Completed {
+	fill: #5478BA;
+}
+polygon.mainItem.Started {
+	fill: darkturquoise;
+}
+polygon.mainItem.Ready {
+	fill: lightgreen;
+}
+polygon.mainItem.Pending {
+	fill: lightgrey;
+}
+
+polygon.mainItem.overdue {
+	stroke: red;
+}
+polygon.mainItem.ontime {
+	stroke: black;
+}
+polygon.mainItem.ahead {
+	stroke: green;
+}
+
+polygon.mainItem:hover {
+	fill-opacity: 0.7 !important;
+}
+
+polygon.mainItem.critical {
+	stroke-width: 4;
+}
+polygon.mainItem.milestone {
+	fill-opacity: 0.75;
+}
+
+polygon.mainItem.siblings {
+	fill: purple !important;
+}
+
+polygon.mainItem.siblings.selected {
+	fill: red !important;
+}
+polygon.mainItem.egg {
+	fill: yellow !important;
+}
+
+polygon.mainItem.selectionParent {
+	fill: blue !important;
+}
+
+
+.brush .extent {
+	stroke: gray;
+	fill: blue;
+	fill-opacity: .165;
+}
+.tempBrush {
+	fill: red;
+	fill-opacity: .2;
+	stroke: orange;
+	stroke-opacity: .6;
+}
+
+.dependency {
+	pointer-events: none !important;
+	stroke: darkgrey;
+	stroke-width: 1.5;
+	marker-end: url(#arrowhead);
+	stroke-opacity: 0.8;
+}
+
+path {
+	pointer-events: none !important;
+}
+
+#arrowhead path {
+	fill: darkgrey;
+	fill-opacity: 0.8;
+	stroke-opacity: 0.8;
+}
+
+#arrowheadSelected path {
+	fill: red;
+	fill-opacity: 1;
+	stroke-opacity: 1;
+}
+
+#arrowheadRedundant path {
+	fill: orange;
+	fill-opacity: 0.6;
+	stroke-opacity: 0.6;
+}
+
+#arrowheadCyclical path {
+	fill: #44AA00;
+	fill-opacity: 1;
+	stroke-opacity: 1;
+}
+
+.dependency.selected {
+	stroke: red;
+	stroke-width: 2;
+	marker-end: url(#arrowheadSelected);
+	stroke-opacity: 1;
+}
+.dependency.redundant {
+	stroke: orange;
+	stroke-opacity: 0.5;
+	marker-end: url(#arrowheadRedundant);
+}
+.dependency.redundant.hidden {
+	display: none !important;
+}
+.dependency.cyclical {
+	stroke: #44AA00;
+	stroke-opacity: 1;
+	stroke-width: 3;
+	marker-end: url(#arrowheadCyclical);
+}
+
+.unfocussed {
+	opacity: 0.4 !important;
+	fill-opacity: 0.4 !important;
+	stroke-opacity: 0.4 !important;
+}
+
+.background {
+	fill-opacity: 0;
+}
+.itemLabel {
+	background-color: transparent !important;
+	cursor: default !important;
+	pointer-events: none !important;
+	font: 10px sans-serif !important;
+}
+.itemLabel.selected {
+	fill: #AA33AA;
+	font-weight: bold !important;	
+}
+body.itemLabel {
+	display: table !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	table-layout: fixed !important;
+}
+div.itemLabel {
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;	
+}
+.root {
+	display: none !important;
+}
+
+div.body {
+	width: 100%;
+}
