@@ -88,6 +88,19 @@ THE SOFTWARE.
 		}
 		
 		
+		polygon.miniItem.siblings.selected {
+			fill: red !important;
+		}
+		polygon.miniItem.egg {
+			fill: yellow !important;
+		}
+		
+		polygon.miniItem.selectionParent {
+			fill: blue !important;
+		}
+		
+		
+		
 		polygon.mainItem {
 			stroke-width: 2;
 			fill: #FFFF00;
@@ -131,6 +144,22 @@ THE SOFTWARE.
 		polygon.mainItem.milestone {
 			fill-opacity: 0.75;
 		}
+		
+		polygon.mainItem.siblings {
+			fill: purple !important;
+		}
+		
+		polygon.mainItem.siblings.selected {
+			fill: red !important;
+		}
+		polygon.mainItem.egg {
+			fill: yellow !important;
+		}
+		
+		polygon.mainItem.selectionParent {
+			fill: blue !important;
+		}
+		
 
 		.brush .extent {
 			stroke: gray;
@@ -191,6 +220,9 @@ THE SOFTWARE.
 			stroke-opacity: 0.5;
 			marker-end: url(#arrowheadRedundant);
 		}
+		.dependency.redundant.hidden {
+			display: none !important;
+		}
 		.dependency.cyclical {
 			stroke: #44AA00;
 			stroke-opacity: 1;
@@ -239,7 +271,7 @@ THE SOFTWARE.
 		<script type="text/javascript">
 		
 		$(document).ready(function () {
-			generateGraph()
+			generateGraph();
 		});
 		
 		function buildGraph (response, status) {
@@ -274,6 +306,15 @@ THE SOFTWARE.
 				display(true, true);
 			});
 			
+			// handle the checkbox to toggle hiding of redundant dependencies
+			var hideRedundant = $('#hideRedundantCheckBoxId').is(':checked');
+			$('#hideRedundantCheckBoxId').on('change', function (a, b) {
+				hideRedundant = a.target.checked;
+				if (hideRedundant)
+					$('.redundant').addClass('hidden');
+				else
+					$('.redundant').removeClass('hidden');
+			});
 			
 			// graph defaults
 			var miniRectHeight = 5;
@@ -284,6 +325,8 @@ THE SOFTWARE.
 			var items = data.items;
 			var starts = data.starts;
 			var dependencies = [];
+			var siblingGroups = [];
+			var siblingGroupsReduced = [];
 			
 			sanitizeData(items, dependencies);
 			
@@ -831,16 +874,16 @@ THE SOFTWARE.
 					+ (d.redundant ? 'redundant ' : '')
 					+ (d.cyclical ? 'cyclical ' : '')
 					+ (d.end < now() ? 'past ' : 'future ')
+					+ (hideRedundant ? 'hidden ' : '')
 					+ (d.status);
 				if (d.status != 'Completed' && d.end < now())
-					classString += ' overdue '
+					classString += ' overdue ';
 				else if (d.status == 'Completed' && d.end > now())
-					classString += ' ahead '
+					classString += ' ahead ';
 				else
-					classString += ' ontime '
+					classString += ' ontime ';
 				if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)
-					classString += ' unfocussed '
-				
+					classString += ' unfocussed ';
 				return classString;
 			}
 			
@@ -902,9 +945,10 @@ THE SOFTWARE.
 					toggleTaskSelection(taskSelected) // if another task is selected, deselect that one first
 					taskSelected = taskObject;
 				}
+
 				
 				// recursively style all tasks and dependencies connected to this task
-				function styleDependencies (task, direction) {	
+				function styleDependencies (task, direction) {
 					if (selecting != task.selected) {
 						task.selected = selecting;
 						
@@ -920,6 +964,7 @@ THE SOFTWARE.
 							});
 					}
 				}
+				
 				styleDependencies(taskObject, 'both');
 				
 				if ( ! selecting )
@@ -996,8 +1041,8 @@ THE SOFTWARE.
 						
 					// if not, move outwards from that location, until an empty location or a location worth switching for
 					} else {
-						var offsetLow = Math.floor((Math.max(task.height, 1)-1)/2);
-						var offsetHigh = Math.ceil((Math.max(task.height, 1)-1)/2);
+						var offsetLow = Math.floor((Math.max(task.height, 1) - 1) / 2);
+						var offsetHigh = Math.ceil((Math.max(task.height, 1) - 1) / 2);
 						var high = ideal;
 						var low = ideal;
 						var highLocked = false;
@@ -1246,11 +1291,11 @@ THE SOFTWARE.
 					var earliest = starts[0].startInitial;
 					for (var i = 0; i < starts.size(); i++) {
 						var task = items[binarySearch(items, starts[i], 0, items.length-1)];
-						task.predecessorIds.push(10);
+						task.predecessorIds.push(-10);
 						earliest = Math.min(earliest, task.startInitial);
 					}
 					var root = {};
-					root.id = 10;
+					root.id = -10;
 					root.name = 'root';
 					root.root = true;
 					root.startInitial = 0;
@@ -1281,6 +1326,9 @@ THE SOFTWARE.
 					items[i].predecessors = [];
 					items[i].redundantSuccessors = [];
 					items[i].redundantPredecessors = [];
+					items[i].siblingGroups = [];
+					items[i].siblingGroupParents = [];
+					items[i].childGroups = [];
 				}
 				
 				// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
@@ -1382,6 +1430,7 @@ THE SOFTWARE.
 					items[i].exEnd = getExEnd(items[i]);
 					var exSet = [];
 					getExclusiveSet(items[i], exSet);
+					items[i].exSet = exSet;
 					var nonExclusiveSet = [];
 					for (var j = 0; j < exSet.size(); ++j)
 						for (var k = 0; k < getSuccessors(exSet[j]).size(); ++k)
@@ -1390,42 +1439,575 @@ THE SOFTWARE.
 					if (nonExclusiveSet.size() == 1)
 						items[i].endOfExclusive = nonExclusiveSet[0];
 				}
+				
+				
+				// gets and outputs all the sibling groups
+				var groupMatrices = {};
+				for (var i = 0; i < items.length; ++i) {
+					if (items[i].predecessors.size() > 1) {
 						
+						var parentTask = null;
+						
+						// get the base group
+						var group = getPredecessors(items[i]);
+						
+						// move each sibling up until it reaches a task with multiple successors
+						for (var j = 0; j < group.length; ++j) {
+							while (group[j].predecessors.size() == 1 && getSuccessors(getPredecessors(group[j])[0]).size() == 1)
+								group.splice(j, 1, getPredecessors(group[j])[0]);
+						}
+							
+						siblingGroups.push(group);
+						
+						// make a new group that will be reduced further
+						var group2 = [];
+						for (var j = 0; j < group.length; ++j)
+							group2.push(group[j]);
+						
+						// reduce group 2
+						for (var j = 0; j < group2.length; ++j) {
+							
+							var searching  = true;
+							while (group2[j].predecessors.size() > 0 && searching) {
+								
+								searching = false;
+								
+								var parent = getPredecessors(group2[j])[0];
+								parentTask = parent;
+								var set = parent.exSet;
+								for (var s = 0; s < group2.length; ++s) {
+									if (set.indexOf(group2[s]) == -1) {
+										searching = true;
+									}
+								}
+								
+								
+								if (searching) {
+									var predecessors = getPredecessors(group2[j]);
+									if (group2.indexOf(predecessors[0]) == -1) {
+										group2.splice(j, 1, predecessors[0]);
+									} else {
+										group2.splice(j, 1);
+										--j;
+									}
+										
+									for (var k = 1; k < predecessors.length; ++k) {
+										var adding = predecessors[k];
+										if (group2.indexOf(adding) == -1)
+											group2.push(adding);
+									}
+								}
+							}
+							group2[j].siblings = true;
+							group2[j].siblingGroupParents = (group2[j].siblingGroupParents != null ? group2[j].siblingGroupParents : []);
+							group2[j].siblingGroups = (group2[j].siblingGroups ? group2[j].siblingGroups : []);
+							
+						}
+						
+						// build the association matrix if it doesn't exist
+						var firstIndex = 0;
+						var groupMatrix = groupMatrices[parentTask.id - firstIndex];
+						if (groupMatrix == null) {
+							groupMatrix = {};
+							var allSiblings = getSuccessors(parentTask);
+							for (var j = 0; j < allSiblings.size(); ++j) {
+								groupMatrix[allSiblings[j].id - firstIndex] = {};
+								for (var k = 0; k < allSiblings.size(); ++k) {
+									groupMatrix[allSiblings[j].id - firstIndex][allSiblings[k].id - firstIndex] = 0;
+								}
+								allSiblings[j].allSiblings = allSiblings;
+							}
+							
+							groupMatrices[parentTask.id - firstIndex] = groupMatrix;
+						}
+						
+						parentTask.childGroups.push(group2);
+						
+						
+						// add this group to the matrix
+						for (var j = 0; j < group2.size(); ++j)
+							for (var k = 0; k < group2.size(); ++k)
+								++(groupMatrices[parentTask.id - firstIndex][group2[j].id - firstIndex][group2[k].id - firstIndex]);
+						
+						// give each task a reference to this group
+						for (var j = 0; j < group2.length; ++j) {
+							group2[j].siblingGroupParents.push(items[i]);
+							group2[j].siblingGroups.push(group2);
+						}
+						
+						siblingGroupsReduced.push(group2);
+						items[i].siblingGroupParents = [items[i]];
+						items[i].siblingGroups.push(group2);
+					}
+				}
+				
 				// group successors by their predecessors for each task
 				for (var i = 0; i < items.length; ++i) {
 					var grouped = false;
-					if (items[i].successors.size() > 0) {
+					if (items[i].successors.size() > 1) {
+					
 						var oldSuccessors = items[i].successors;
 						var newSuccessors = [];
 						for (var j = 0; j < oldSuccessors.size(); ++j) {
 							var inserted = false;
+							var location = 0;
+							if (newSuccessors.size() == 0) {
+								newSuccessors.push(oldSuccessors[j]);
+								inserted = true;
+							}
+							
 							for (var k = 0; k < newSuccessors.size(); ++k)
-								if (!inserted && haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor)) {
+								if ( (!inserted) && (haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor, true) == 1) ) {
 									newSuccessors.splice(k, 0, oldSuccessors[j]);
+									location = k;
 									inserted = true;
 									grouped = true;
 								}
+							
+							// keep trying, ignoring an increasing number of non-matches
+							var tolerance = 0;
+							while ( ! inserted ) {
+								++tolerance;
+								for (var k = 0; k < newSuccessors.size(); ++k) {
+									if ( (!inserted) && (haveSameSuccessors(newSuccessors[k].successor, oldSuccessors[j].successor, false) <= tolerance) ) {
+										newSuccessors.splice(k, 0, oldSuccessors[j]);
+										inserted = true;
+										grouped = true;
+										location = k;
+									}
+								}
+								if (tolerance > 100) {
+									newSuccessors.push(oldSuccessors[j]);
+									inserted = true;
+									location = newSuccessors.size();
+								}
+							}
 							if (!inserted) {
 								newSuccessors.push(oldSuccessors[j]);
 								if (!grouped)
 									newSuccessors = newSuccessors.sort(function (a, b) {return b.height-a.height});
 							}
 						}
+						
 						items[i].successors = newSuccessors;
 					}
 				}
 				
-				function haveSameSuccessors (task1, task2) {
-					if ( (task1.endOfExclusive != null && task2.endOfExclusive != null) && (task1.endOfExclusive == task2.endOfExclusive) )
-						return true;
-					return false;
-					var same = task1.successors.size() == task2.successors.size();
-					if (same)
-						for (var i = 0; i < getSuccessors(task1).size(); ++i)
-							same = same && (getSuccessors(task1)[i].id == getSuccessors(task2)[i].id)
-					return same;
+				
+				for (var i = 0; i < items.length; ++i) {
+					var grouped = false;
+					if (items[i].successors.size() > 1) {
+						
+						var initialList = [];
+						var groups = items[i].childGroups;
+						for (var j = 0; j < items[i].successors.size(); ++j) {
+							
+							getSuccessors(items[i])[j].groups = {};
+							var s = getSuccessors(items[i])[j];
+							for (var k = 0; k < s.siblingGroups.size(); ++k) {
+								s.groups[groups.indexOf(s.siblingGroups[k])] = true;
+							}
+							initialList.push(getSuccessors(items[i])[j]);
+						}
+						
+						var groupStatus = [];
+						var newList = [];
+						
+						// first remove all duplicates
+						var bufferList = initialList.slice(0);
+						bufferList = removeDuplicates(initialList.slice(0), groups);
+						
+						// sort the list by number of groups
+						bufferList.sort(function (a, b) {
+							return Object.keys(a.groups).size() - Object.keys(b.groups).size();
+						});
+						
+						
+						if (newList.length == 0)
+							newList.push(bufferList.pop());
+						
+						for (var j = 0; j < groups.length; ++j) {
+							groupStatus.push('|');
+						}
+						
+						if (groupStatus.size() != 0) {
+							var calls = 0;
+							while (bufferList.length > 0) {
+								
+								// prevent infinite loops from occuring
+								++calls;
+								if (calls > 100)
+									break;
+								
+								// calculate the status
+								for (var j = 0; j < groups.length; ++j) {
+									
+									var g = groups[j];
+										
+									groupStatus[j] = '|';
+									
+									// use newList
+									var found = false;
+									(function () {
+										var emptyTop = newList[0].groups[j] == null;
+										for (var k = 0; k < newList.length; ++k) {
+											var t = newList[k];
+											if (t.groups[j] != null) {
+												found = true;
+												if (emptyTop) {
+													groupStatus[j] = 'v';
+													return;
+												}
+											} else {
+												if (!emptyTop) {
+													groupStatus[j] = '^';
+													return;
+												}
+											}
+										}
+										
+										if (!found)
+											groupStatus[j] = '_';
+										
+										return;
+									}())
+									
+									
+									// find complete groups
+									found = false;
+									for (var k = 0; k < bufferList.length; ++k)
+										if (bufferList[k].groups[j])
+											found = true;
+									if (!found)
+										groupStatus[j] = '%';
+								}
+								
+								// get the constraints for the next task
+								var constraints = [];
+								for (var j = 0; j < groups.length; ++j) {
+									if (groupStatus[j] == '^') {
+										constraints.push(-1 - j);
+									}
+									if (groupStatus[j] == 'v') {
+										constraints.push(1 + j);
+									}
+								}
+						
+								// score the tasks
+								var bestScore = 0;
+								var bestTask = 0;
+								
+								var pushConstraintsSatisfied = 0;
+								var unshiftConstraintsSatisfied = 0;
+								var maxConstraintsSatisfied = 0;
+								var constraintTask = 0;
+								var pushing = true;
+								
+								var pushMatches = 0;
+								var unshiftMatches = 0;
+								var maxMatches = 0;
+								var pushingMatches = true;
+								var matchTask = 0;
+								
+								for (var j = 0; j < bufferList.length; ++j) {
+									
+									var usable = (constraints.length > 0) ? (0) : (-1);
+									var fitsConstraints = (constraints.length == 0);
+									pushConstraintsSatisfied = 0;
+									unshiftConstraintsSatisfied = 0;
+									
+									pushMatches = getMatchingGroups(bufferList[j].groups, newList[newList.length-1].groups);
+									unshiftMatches = getMatchingGroups(bufferList[j].groups, newList[newList.length-1].groups);
+									
+									for (var k = 0; k < constraints.length; ++k) {
+										
+										var constraint = constraints[k];
+										if (constraint > 0)
+											--constraint;
+										else
+											++constraint;
+										
+										
+										if (bufferList[j].groups[constraint] && constraints[k] > 0) {
+											++pushConstraintsSatisfied;
+											if (usable == 0) {
+												fitsConstraints = true;
+												usable = 1;
+											}
+										
+										} else if (bufferList[j].groups[constraint] && constraints[k] < 0) {
+											++unshiftConstraintsSatisfied;
+											if (usable == 0) {
+												fitsConstraints = true;
+												usable = -1;
+											}
+										} else {
+											if (constraint > 0 && usable != 2) {
+												usable = -2;
+											} else if (constraint < 0 && usable != -2) {
+												usable = 2;
+											} else {
+												fitsConstraints = false;
+												usable = 3;
+											}
+										}
+									}
+									
+									
+									var score = 0;
+									if (usable == -1 || usable == -2)
+										for (var k = 0; k < groups.length; ++k)
+											if ( (groups[k].indexOf(newList[0]) != -1) && (groups[k].indexOf(bufferList[j]) != -1) )
+												score += usable;
+									if (usable == 1 || usable == 2)
+										for (var k = 0; k < groups.length; ++k)
+											if ( (groups[k].indexOf(newList[0]) != -1) && (groups[k].indexOf(bufferList[j]) != -1) )
+												score += usable;
+									
+									
+									if (score < 0)
+										score = (fitsConstraints && unshiftConstraintsSatisfied > 0) ? --score : 0;
+									else
+										score = (fitsConstraints && pushConstraintsSatisfied > 0) ? ++score : 0;
+									
+									if ( Math.abs(score) > Math.abs(bestScore) ) {
+										bestScore = score;
+										bestTask = j;
+									}
+									if ( Math.abs(score) > Math.abs(bestScore) ) {
+										bestScore = score;
+										constraint = j;
+									}
+									
+									if (Math.max(pushConstraintsSatisfied, unshiftConstraintsSatisfied) > maxConstraintsSatisfied) {
+										maxConstraintsSatisfied = Math.max(pushConstraintsSatisfied, unshiftConstraintsSatisfied);
+										constraintTask = j;
+										pushing = pushConstraintsSatisfied > unshiftConstraintsSatisfied;
+										unshiftConstraintsSatisfied = 0;
+										pushConstraintsSatisfied = 0;
+									}
+									
+									if (Math.max(pushMatches, unshiftMatches) > maxMatches) {
+										maxMatches = Math.max(pushMatches, unshiftMatches);
+										matchTask = j;
+										pushingMatches = pushMatches > unshiftMatches;
+										unshiftMatches = 0;
+										pushMatches = 0;
+									}
+								}
+								
+								if (bestScore < 0) {
+									newList.unshift(bufferList[bestTask]);
+									bufferList.splice(bestTask, 1);
+								} else if (bestScore > 0) {
+									newList.push(bufferList[bestTask]);
+									bufferList.splice(bestTask, 1);
+								} else if (maxConstraintsSatisfied > 0) {
+									if (pushing)
+										newList.push(bufferList[constraintTask]);
+									else
+										newList.unshift(bufferList[constraintTask]);
+									bufferList.splice(constraintTask, 1);
+									
+								} else if (maxMatches > 0) {
+									if (pushingMatches)
+										newList.push(bufferList[matchTask]);
+									else
+										newList.unshift(bufferList[matchTask]);
+									bufferList.splice(matchTask, 1);
+									
+								} else {
+									
+									var maxScore = 100000;
+									var score = 0;
+									var bestPlacement = 0;
+									var pushing = true;
+									for (var j = 0; j < bufferList.length; ++j) {
+										
+										var row = bufferList[j];
+										var tempList = newList.slice(0);
+										
+										tempList.push(row);
+										score = evaluateStack(tempList, groups);
+										if (score < maxScore) {
+											maxScore = score;
+											bestPlacement = j;
+											pushing = true;
+										}
+										tempList.pop();
+										
+										tempList.unshift(row);
+										score = evaluateStack(tempList, groups);
+										if (score < maxScore) {
+											maxScore = score;
+											bestPlacement = j;
+											pushing = false;
+										}
+										tempList.shift();
+									}
+									
+									if (pushing)
+										newList.push(bufferList[bestPlacement]);
+									else
+										newList.unshift(bufferList[bestPlacement]);
+									bufferList.splice(bestPlacement, 1);
+								}
+							}
+							
+							
+							// put back all the duplicates
+							for (var j = 0; j < initialList.length; ++j) {
+								
+								var task = initialList[j];
+								
+								// check if this task is already in the list
+								if (newList.indexOf(task) == -1) {
+									
+									// this task is already in the list so add it next to its duplicate
+									for (var k = 0; k < newList.length; ++k) {
+										
+										var matching = true;
+										for (var l = 0; l < Object.keys(task.groups).length; ++l) {
+											if (newList[k].groups[Object.keys(task.groups)[l]] == null)
+												matching = false;
+										}
+										
+										if (matching && newList[k].id != task.id) {
+											newList.splice(k, 0, task);
+											k = newList.length;
+										}
+									}
+								}
+							}
+							
+							function display (list, groups) {
+								console.log('--------------------------------------------');
+								for (var j = 0; j < list.length; ++j) {
+									var output = list[j].id + ' : ';
+									for (var k = 0; k < groups.length; ++k) {
+										if (groups[k].indexOf(list[j]) != -1)
+											output += '\t@';
+										else
+											output += '\t.';
+									}
+									console.log('\t > ' + output);
+								}
+								console.log('--------------------------------------------');
+							}
+			
+							// match the actual successor order to the calculated order
+							var newSuccessors = [];
+							for (var j = 0; j < items[i].successors.size(); ++j) {
+								var s = items[i].successors[j];
+								var index = newList.indexOf(s.successor);
+								newSuccessors[index] = s;
+							}
+							
+							items[i].successors = newSuccessors;
+						}
+					}
+				}	
+				
+				function getMatchingGroups (list1, list2) {
+					var matches = 0;
+					for (var i = 0; i < Object.keys(list1).length; ++i) {
+						var key = Object.keys(list1)[i];
+						if (list2[key] != null)
+							++matches;
+					}
+					return matches;
 				}
 				
+				function evaluateStack (list, groups) {
+					var score = 0;
+					var tempScore = 0;
+					var foundFirst = false;
+					
+					for (var k = 0; k < groups.length; ++k) {
+						tempScore = 0;
+						foundFirst = false;
+						for (var j = 0; j < list.length; ++j) {
+							if (list[j].groups[k]) {
+								foundFirst = true;
+								score += tempScore;
+								tempScore = 0;
+							} else {
+								if (foundFirst)
+									++tempScore;
+							}
+						}
+					}
+					
+					return score;
+				}
+				
+				
+				function removeDuplicates (list, groups) {
+					
+					var uniqueRows = [];
+					var returnList = [];
+					
+					for (var j = 0; j < list.length; ++j) {
+						tempScore = 0;
+						foundFirst = false;
+						var task = list[j];
+						var output = '';
+						for (var k = 0; k < groups.length; ++k) {
+							if (task.groups[k] != null)
+								output += 'a';
+							else
+								output += 'b';
+							
+						}
+						if (uniqueRows.indexOf(output) == -1) {
+							uniqueRows.push(output);
+							returnList.push(task);
+						}
+					}
+					
+					return returnList;
+				}
+				
+				function outputChildMatrix (node) {
+					var successors = getSuccessors(node);
+					console.log('child matrix for node [' + node.id + '] ' + node.name);
+					console.log('----------------------');
+					for (var i = 0; i < successors.size(); ++i) {
+						var node = successors[i];
+						var output = node.id + ' : ';
+						for (var l = 0; l < siblingGroupsReduced.length; ++l) {
+							if (siblingGroupsReduced[l].indexOf(node) != -1)
+								output += '\t@';
+							else
+								output += '\t.';
+						}
+						console.log('\t > ' + output + ' "' + node.name + '"');
+					}
+					console.log('----------------------');
+				}
+				
+				/*	compares two tasks, returning true if they have the same siblingGroups.
+					assumes siblingGroupParents is sorted. */
+				function haveSameSuccessors (task1, task2, fullMatch) {
+				
+					var returnVal = true;
+					var parents1 = task1.siblingGroupParents;
+					var parents2 = task2.siblingGroupParents;
+					var matches = 0;
+					var possibleMatches = Math.max(parents1.size(), parents2.size());
+					
+					if ( (fullMatch) && (parents1.size() != parents2.size()) ) {
+						return 0;
+					}
+					
+					for (var i = 0; i < parents2.size(); ++i)
+						if (parents1.indexOf(parents2[i]) != -1)
+							++matches;
+					
+					if (fullMatch)
+						return (matches == possibleMatches) ? 1 : 0;
+					return possibleMatches - matches;
+				}
 				
 				/*	fills @param set with all nodes that can only be 
 					reached from @param node and its children.
@@ -1629,6 +2211,7 @@ THE SOFTWARE.
 			&nbsp; Role: <select name="roleSelect" id="rolesSelectId"></select>
 	            &nbsp; Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30"/>
 			&nbsp; Use Heights: <input type="checkbox" id="useHeightCheckBoxId" checked="checked"/>
+			&nbsp; Hide Redundant: <input type="checkbox" id="hideRedundantCheckBoxId" checked="checked"/>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<g:render template="../assetEntity/initAssetEntityData"/>
 		</div>
