@@ -1431,7 +1431,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 		
 		final TaskBatch tb = this.createTaskBatch(user.person, project, contextType, cid, recipeVersion, publishTasks);
-
+		final def tbId = tb.id
+		
 		String key = taskBatchKey(tb.id)
 		this.progressService.create(key, 'Pending')
 
@@ -1441,7 +1442,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		this.executors.submit(new Runnable() {
 			void run() {
 				TaskBatch.withTransaction( { status ->
-					this.generateTasks(tb, publishTasks)
+					def taskBatch = TaskBatch.get(tbId)
+					this.generateTasks(taskBatch, publishTasks)
 				} );
 			}
 		});
