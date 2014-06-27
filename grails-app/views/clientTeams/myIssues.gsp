@@ -13,6 +13,13 @@
 	<g:javascript src="angular/plugins/angular-ui.js"/>	
 	<g:javascript src="cabling.js"/>
 	<g:javascript src="model.manufacturer.js"/>
+	<g:javascript src="angular/plugins/angular-resource.js" />
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
 		<div class="menu4">
@@ -107,7 +114,7 @@
  **************************
  */
 --%>
-	<div id="dependencyBox" style="display: none;" align="right">
+	<div id="dependencyBox" style="display: none;" align="right" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<span class="ui-icon ui-icon-closethick" unselectable="on" onclick="closeBox()"></span>
 		<table id="showCommentTable" style="border: 0px;">
 			<tr class="prop">
@@ -381,5 +388,6 @@ function setTab(tab){
 		$("#cablingDialogId").dialog({ autoOpen:false })
 	});
  </script>
+ <g:render template="../assetEntity/initAssetEntityData"/>
 </body>
 </html>
