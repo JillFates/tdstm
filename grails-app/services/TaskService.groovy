@@ -845,7 +845,7 @@ class TaskService implements InitializingBean {
 		
 		return assetComments.collect({ assetComment ->
 			return [
-				'id': assetComment.id,
+				'id': assetComment.taskNumber,
 				'description': assetComment.comment,
 				'asset': assetComment.assetEntity?.assetName,
 				'team': assetComment.assetEntity?.sourceTeamMt == null ? "None" : assetComment.assetEntity?.sourceTeamMt.name,
