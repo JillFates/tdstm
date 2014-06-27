@@ -1939,13 +1939,17 @@ class AssetEntityController {
 		else
 			query.append(" AND ifnull(ae.asset_type,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
 		
+		
+		if(params.event && params.event.isNumber() && moveBundleList)
+			query.append( " AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})" )
+			
 		if(params.unassigned){
 			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
 					AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
 			
 			if(unasgnMB){
 				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
-				query.append( " AND ae.move_bundle_id IN (${unasgnmbId})" )
+				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
 			}
 		}
 			

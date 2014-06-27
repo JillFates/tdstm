@@ -509,14 +509,14 @@ class MoveBundleController {
 		moveEventList.unique()
 		
 		// Forming query for multi-uses
-		def countQuery = "SELECT count(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) AND (ae.moveBundle IN \
-			(:moveBundles) OR ae.moveBundle IS NULL) AND ae.project = :project "
-		def appCountQuery = "SELECT count(ae) FROM Application ae WHERE ae.assetType =:type AND (ae.moveBundle IN \
-			(:moveBundles) OR ae.moveBundle IS NULL) AND ae.project = :project "
-		def dbCountQuery = "SELECT count(ae) FROM Database ae WHERE ae.assetType =:type AND (ae.moveBundle IN \
-			(:moveBundles) OR ae.moveBundle IS NULL) AND ae.project = :project "
-		def filesCountQuery = "SELECT count(ae) FROM Files ae WHERE ae.assetType =:type AND (ae.moveBundle IN \
-			(:moveBundles) OR ae.moveBundle IS NULL) AND ae.project = :project "
+		def countQuery = "SELECT count(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN \
+			(:moveBundles) AND ae.project = :project "
+		def appCountQuery = "SELECT count(ae) FROM Application ae WHERE ae.assetType =:type AND ae.moveBundle IN \
+			(:moveBundles) AND ae.project = :project "
+		def dbCountQuery = "SELECT count(ae) FROM Database ae WHERE ae.assetType =:type AND ae.moveBundle IN \
+			(:moveBundles) AND ae.project = :project "
+		def filesCountQuery = "SELECT count(ae) FROM Files ae WHERE ae.assetType =:type AND ae.moveBundle IN \
+			(:moveBundles) AND ae.project = :project "
 			
 		def otherCountQuery =  StringUtils.replace(countQuery, 'IN', 'NOT IN', 1 )
 		def countArgs = [moveBundles:moveBundleList, project:project]
@@ -599,15 +599,19 @@ class MoveBundleController {
 		def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
 				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
 		
-		def unAssignedCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN (:unasgnMB)"
-		def unAssignedDBCountQuery = "SELECT COUNT(ae) FROM Database ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN (:unasgnMB)"
-		def unAssignedFilesCountQuery = "SELECT COUNT(ae) FROM Files ae WHERE ae.assetType IN (:type) AND ae.moveBundle IN (:unasgnMB)"
-		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.assetType NOT IN (:type) AND ae.moveBundle IN (:unasgnMB)"
+		def unAssignedCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.assetType IN (:type) \
+			AND (ae.moveBundle IN (:unasgnMB) OR ae.moveBundle IS NULL)"
+		def unAssignedDBCountQuery = "SELECT COUNT(ae) FROM Database ae WHERE ae.assetType IN (:type) \
+			AND (ae.moveBundle IN (:unasgnMB) OR ae.moveBundle IS NULL)"
+		def unAssignedFilesCountQuery = "SELECT COUNT(ae) FROM Files ae WHERE ae.assetType IN (:type) \
+			AND (ae.moveBundle IN (:unasgnMB) OR ae.moveBundle IS NULL)"
+		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.assetType NOT IN (:type) \
+			AND (ae.moveBundle IN (:unasgnMB) OR ae.moveBundle IS NULL)"
 		
 		def unasgndArgs = [unasgnMB:unasgnMB]
 		
 		def unassignedAppCount =  unasgnMB ? Application.executeQuery("SELECT COUNT(ae) FROM Application ae WHERE \
-				ae.assetType =:type AND ae.moveBundle IN (:unasgnMB)", unasgndArgs << [type:app]) [0] : 0 
+				ae.assetType =:type AND (ae.moveBundle IN (:unasgnMB) OR ae.moveBundle IS NULL)", unasgndArgs << [type:app]) [0] : 0 
 			
 		def totalAssignedApp = applicationCount - unassignedAppCount ;
 		

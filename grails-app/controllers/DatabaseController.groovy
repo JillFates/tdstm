@@ -174,13 +174,16 @@ class DatabaseController {
 		if (justPlanning=='true')
 			query.append(" AND mb.use_for_planning=${justPlanning} ")
 			
+		if(params.event && params.event.isNumber() && moveBundleList)
+			query.append( " AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})" )
+			
 		if(params.unassigned){
 			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
 				AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
 			
 			if(unasgnMB){
 				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
-				query.append( " AND ae.move_bundle_id IN (${unasgnmbId})" )
+				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
 			}
 		}
 		query.append(" GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}) AS dbs ")
