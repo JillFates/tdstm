@@ -496,24 +496,28 @@ class MoveBundleController {
 		def blade = AssetType.BLADE.toString()
 		def appliance = AssetType.APPLIANCE.toString()
 		
-		def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
-		def bundleSortedList = moveBundleList.sort{it.startTime}
-		def totalEventList = bundleSortedList.moveEvent
-		def moveEventList = []
-		//To add the moveEvents whose bundles has startTime.
-		bundleSortedList.each{me->
-			if(me.startTime)
-				moveEventList.add(me.moveEvent)
+		// Get list of all of the MoveBundles that are used for Planning
+		def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project, true, [sort:'startTime'])
+
+		// Nothing to report if there are no planning bundles so we'll just return with zeros for everything
+		if (moveBundleList.size()==0) {
+			render(model:[], view:'planningStats_NoBundles')
+			return
 		}
-		moveEventList = moveEventList+(totalEventList-moveEventList)
-		moveEventList.removeAll( [null] )
-		moveEventList.unique()
-		
+
+		def allEventsList = moveBundleList*.moveEvent
+		def moveEventList = []
+		allEventsList.each { me ->
+			if (me) {
+				def times = me.getEventTimes()
+				if (times.start)
+					moveEventList << me
+			}
+		}
+
 		// Forming query for multi-uses
-		// AND ae.assetType IN (:type)
-		// 
-		def selectCount = 'SELECT count(*)'
-		def projectWhere = 'WHERE ae.project=:project'
+		def projectWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
+		def selectCount = 'SELECT count(ae) '
 		def countQuery = "SELECT count(ae) FROM AssetEntity ae $projectWhere"
 		def appQuery = "FROM Application ae $projectWhere"
 		def appCountQuery = "$selectCount $appQuery"
@@ -524,7 +528,7 @@ class MoveBundleController {
 		def deviceQuery = "FROM AssetEntity ae $projectWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
 		def deviceCountQuery = "$selectCount $deviceQuery"	
 		def otherCountQuery =  StringUtils.replace(deviceCountQuery, ' IN ', ' NOT IN ', 1 )
-		def countArgs = [project:project]
+		def countArgs = [project:project, moveBundles:moveBundleList]
 
 		def apps = Application.findAll(appQuery, countArgs)
 		def applicationCount = apps.size()
@@ -535,18 +539,6 @@ class MoveBundleController {
 		def physicalCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes()] )[0]		
 		def virtualCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]		
 		def otherAssetCount= AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
-
-		// Tack on the MoveBundle requirement for the WHERE clause that will be used in the next section
-		def bundleWhere = ' AND ae.moveBundle IN (:moveBundles)'
-		countQuery += bundleWhere
-		appCountQuery += bundleWhere
-		appQuery += bundleWhere
-		dbCountQuery += bundleWhere
-		filesCountQuery += bundleWhere
-		deviceCountQuery += bundleWhere
-		deviceQuery += bundleWhere
-		otherCountQuery += bundleWhere
- 		countArgs.moveBundles = moveBundleList
 
  		// Get the list of apps and servers assigned to planning bundles
 		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs) 
@@ -795,7 +787,6 @@ class MoveBundleController {
 			bundleReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'BundleReady'])[0]
 			
 			countArgs << [validation:'Discovery']
-			log.error "+++++++++++++++++ validateCountQuery=$validateCountQuery\n$countArgs"
 			appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
 			dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
 			fileToValidate = Files.executeQuery(filesValidateCountQuery, countArgs)[0]
