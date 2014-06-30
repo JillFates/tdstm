@@ -434,10 +434,10 @@ class UserService {
 		
 		def timeInMin =0
 		def issueList = []
-		def currentUser= securityService.getUserLoginPerson()
+		def person = securityService.getUserLoginPerson()
 		
 		getSelectedProject(project).each{proj->
-			def tasks = taskService.getUserTasks(currentUser, proj, false, 7, 'score' )
+			def tasks = taskService.getUserTasks(person, proj, false, 7, 'score' )
 			def taskList = tasks['user']
 			def durationScale = [D:1440, M:1, W:10080, H:60] // minutes per day,week,hour
 			taskList.each{ task ->
@@ -454,7 +454,7 @@ class UserService {
 			issueList:issueList.sort{it.item.project}
 		}
 		def dueTaskCount = issueList.item.findAll {it.duedate && it.duedate < TimeUtil.nowGMT()}.size()
-		return [taskList:issueList, timeInMin:timeInMin, dueTaskCount:dueTaskCount]
+		return [taskList:issueList, timeInMin:timeInMin, dueTaskCount:dueTaskCount, personId:person.id]
 	}
 	
 	/**

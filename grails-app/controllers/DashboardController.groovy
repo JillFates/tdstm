@@ -225,7 +225,7 @@ class DashboardController {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def taskSummary = userService.getTaskSummary(projectInstance)
 		render (template :'tasks', model:[ taskList:taskSummary.taskList, timeInMin:taskSummary.timeInMin, project:projectInstance,
-			dueTaskCount:taskSummary.dueTaskCount])
+			dueTaskCount:taskSummary.dueTaskCount, personId:taskSummary.personId])
 	}
 	
 	/**
