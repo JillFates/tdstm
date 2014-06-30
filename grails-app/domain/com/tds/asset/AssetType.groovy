@@ -100,20 +100,29 @@ public enum AssetType {
 	static String getStorageTypesAsString() {
 		GormUtil.asQuoteCommaDelimitedString(getStorageTypes())
 	}
-	
+
+
+	/**
+	 * The list of types represent all non Server Types.
+	 * @return
+	 */
+	static List getNonOtherTypes() {
+		return ['Application','Database'] + getStorageTypes() + getAllServerTypes()
+	}
+
 	/**
 	 * The list of types represent all non Server Types.
 	 * @return
 	 */
 	static List getNonPhysicalTypes() {
-		return ['Application','Files','Database','VM']
+		return ['Application','Database'] + getVirtualServerTypes() + getStorageTypes()
 	}
 	/**
 	 * The list of types represent all Server Types which differs the physical list and ServerList.
 	 * @return
 	 */
 	static List getServerTypes() {
-		return ['Server', 'Appliance', 'Blade','VM']
+		return getPhysicalServerTypes() + getVirtualServerTypes()
 	}
 
 }

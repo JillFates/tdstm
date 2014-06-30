@@ -1935,9 +1935,9 @@ class AssetEntityController {
 
 		//which will limit the query based on physical or server Assets.
 		if(listType=='server')
-			query.append(" AND ae.asset_type IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())}) ")
+			query.append(" AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getServerTypes())}) ")
 		else
-			query.append(" AND ifnull(ae.asset_type,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) ")
+			query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 		
 		
 		if(params.event && params.event.isNumber() && moveBundleList)
@@ -1981,16 +1981,11 @@ class AssetEntityController {
 		}
 		
 		if ( params.filter && params.filter!='assetSummary') {
-			if (params.filter !='other'){  // filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
-				if(!params.event)
-					query.append("WHERE assets.assetType  IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
-				else
-					query.append("AND assets.assetType  IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
-			}else{
-				if(!params.event)
-					query.append("WHERE ifnull(assets.assetType,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
-				else
-					query.append("AND ifnull(assets.assetType,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(assetType)}) ")
+			if (params.filter == 'other'){  
+				// filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
+				query.append( (params.event ? 'AND' : 'WHERE') + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) ")
+			} else {
+				query.append( (params.event ? 'AND' : 'WHERE') + "assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
 			}	
 				
 			if( params.type=='toValidate'){

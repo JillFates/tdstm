@@ -1,5 +1,7 @@
 package com.tdssrc.grails
 
+import com.tds.asset.AssetType
+
 class ApplicationConstants {
 	
 	// these are default global map contains planning console map details e.g. height , width .
@@ -14,7 +16,11 @@ class ApplicationConstants {
 	static def graphDefaultLargeMap = ["force":-70, "linkdistance":40, "width":1800, "height":2200]
 	
 	// Map for planning dashboard filters to asset list.
-	static def assetFilters = [All:['Server','VM','Blade'], physical:['Server','Blade'], virtual:['VM'],
-								other:['Server','VM','Blade','Application','Database','Files']]
+	static def assetFilters = [
+		All:AssetType.getAllServerTypes(), 
+		physical:AssetType.getPhysicalServerTypes(), 
+		virtual:AssetType.getVirtualServerTypes(),
+		other:AssetType.getAllServerTypes()
+	]
 
 }

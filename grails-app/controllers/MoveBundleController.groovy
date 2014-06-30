@@ -527,12 +527,9 @@ class MoveBundleController {
 		def dbCountQuery = "$selectCount $dbQuery"
 		def filesQuery = "FROM Files ae $baseWhere"
 		def filesCountQuery = "$selectCount $filesQuery"
-		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') IN (:type)"
 		def deviceCountQuery = "$selectCount $deviceQuery"	
 		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType NOT IN (:type)"
-
-log.error "++++++++ deviceCountQuery=$deviceCountQuery"
-log.error "++++++++  otherCountQuery=$otherCountQuery"
 
 		def apps = Application.findAll(appQuery, countArgs)
 		def applicationCount = apps.size()
@@ -542,7 +539,7 @@ log.error "++++++++  otherCountQuery=$otherCountQuery"
 		def assetCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
 		def physicalCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes()] )[0]		
 		def virtualCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]		
-		def otherAssetCount= AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
+		def otherAssetCount= AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes()] )[0]
 
  		// Get the list of apps and servers assigned to planning bundles
 		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs) 
