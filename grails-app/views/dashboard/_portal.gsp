@@ -9,7 +9,7 @@
 		<div style="width: 100%; float: left;">
 
 			<div class="eventOuterDiv">
-				<h4 class="leftFloated dashboard_head">Events&nbsp;</h4>&nbsp;
+				<h4 class="leftFloated user_dashboard_head">Events&nbsp;</h4>&nbsp;
 				<span class="descriptionText">Your assigned events and your team <input type="button" value="Refresh" onclick="loadEventTable()"/></span>
 				<br><br>
 				<div class="eventScrolableTable">
@@ -30,7 +30,7 @@
 				</div>
 			</div>
 			<div class="eventNewsDiv">
-				<h4 class="eventNewsHeader dashboard_head">Event News</h4>
+				<h4 class="eventNewsHeader user_dashboard_head">Event News</h4>
 				<span class="descriptionText">&nbsp;Active news for your events <input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
 				<br>
 				<div class="eventNewsScrolableTable">
@@ -51,7 +51,7 @@
 
 		<div class="fullWidth">
 			<div class="taskSummaryOuterDiv">
-				<h4 class="leftFloated dashboard_head">Task Summary&nbsp;</h4>
+				<h4 class="leftFloated user_dashboard_head">Task Summary&nbsp;</h4>
 				<span class="descriptionText">Active tasks assigned to you <input type="button" value="Refresh" onclick="loadTasksTable()"/></span>
 				<br>
 				<div id="myTaskList">
@@ -63,7 +63,7 @@
 	</div>
 	<div class="appOuterDiv">
 		<div>
-			<h4 class="eventNewsHeader dashboard_head">Application&nbsp;</h4>
+			<h4 class="eventNewsHeader user_dashboard_head">Application&nbsp;</h4>
 			<span class="descriptionText">Your applications as a SME or Owner<input type="button" value="Refresh" onclick="loadAppTable()"/></span>
 			<br>
 			<div class="appScrolableTable">
@@ -81,7 +81,7 @@
 			</div>
 		</div>
 		<div class="activepplOuterDiv">
-			<h4 class="activepplHeader  dashboard_head">Active People&nbsp;</h4>
+			<h4 class="activepplHeader  user_dashboard_head">Active People&nbsp;</h4>
 			<span class="descriptionText">Currently active people on this project <input type="button" value="Refresh" onclick="loadActivepplTable()"/></span></span>	
 			<br>
 			<div class="appScrolableTable">

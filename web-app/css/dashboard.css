@@ -803,3 +803,10 @@ input, select, textarea {
 	float : left;
 	padding-top: 7px;
 }
+.user_dashboard_head{
+	color: green;
+	font-size: 18px !important;
+	font-weight: bold !important;
+	line-height: 31px !important;
+	margin-bottom: -15px !important;
+}
