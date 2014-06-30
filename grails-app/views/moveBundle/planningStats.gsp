@@ -138,7 +138,11 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Storage',validate:fileToValidate,barId:'filebar',iconName:'iconStorage.png']"></g:render>
+							model="[assetCount:phyStorageCount,filter:'storage',assetType:'assetEntity',title:'Physical Storage',validate:phyStorageToValidate,barId:'filebar',iconName:'iconStorage.png']"></g:render>
+					</tr>
+					<tr>
+						<g:render template="discoveryGraph"
+							model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logic Storage',validate:fileToValidate,barId:'filebar',iconName:'iconStorage.png']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"

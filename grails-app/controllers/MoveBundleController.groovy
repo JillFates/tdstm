@@ -527,7 +527,9 @@ class MoveBundleController {
 		def dbCountQuery = "$selectCount $dbQuery"
 		def filesQuery = "FROM Files ae $baseWhere"
 		def filesCountQuery = "$selectCount $filesQuery"
-		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') IN (:type)"
+		def phyStorageQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		def phyStorageCountQuery = "$selectCount $phyStorageQuery"
+		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
 		def deviceCountQuery = "$selectCount $deviceQuery"	
 		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType NOT IN (:type)"
 
@@ -536,6 +538,7 @@ class MoveBundleController {
 
 		def databaseCount = Database.executeQuery(dbCountQuery, countArgs)[0]
 		def fileCount = Files.executeQuery(filesCountQuery, countArgs)[0]
+		def phyStorageCount = AssetEntity.executeQuery(phyStorageCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes()])[0]
 		def assetCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
 		def physicalCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes()] )[0]		
 		def virtualCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]		
@@ -763,49 +766,56 @@ class MoveBundleController {
 		// Remove the param 'type' that was used for a while above
 		countArgs.remove('type')
 
-		def dependencyScan=0
-		def validated=0
-		def dependencyReview=0
-		def bundleReady=0 
-		def appToValidate=0
-		def psToValidate=0
-		def vsToValidate=0
-		def dbToValidate=0
-		def fileToValidate=0
-		def otherToValidate=0
-
-		if (moveBundleList) {
-			def validationQuery = ' AND ae.validation=:validation'
-			def validateCountQuery = countQuery + validationQuery + ' AND ae.assetType IN (:type) AND ae.assetClass=:assetClass'
-			def appValidateCountQuery = appCountQuery + validationQuery
-			def dbValidateCountQuery = dbCountQuery + validationQuery
-			def filesValidateCountQuery = filesCountQuery + validationQuery
-			
-			// TODO - This section could be couple of queries instead of 10
-			dependencyScan = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyScan'] )[0]
-			validated = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Validated'])[0]
-			dependencyReview = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyReview'])[0]
-			bundleReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'BundleReady'])[0]
-			
-			countArgs << [validation:'Discovery']
-			appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
-			dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
-			fileToValidate = Files.executeQuery(filesValidateCountQuery, countArgs)[0]
-			psToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ])[0]
-			vsToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0]
-			
-			def otherValidateQuery = StringUtils.replace(validateCountQuery, ' IN ', ' NOT IN ', 1 )
-			otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0]
-		}			
+		def validationQuery = ' AND ae.validation=:validation'
+		def validateCountQuery = countQuery + validationQuery + ' AND ae.assetType IN (:type) AND ae.assetClass=:assetClass'
+		def appValidateCountQuery = appCountQuery + validationQuery
+		def dbValidateCountQuery = dbCountQuery + validationQuery
+		def filesValidateCountQuery = filesCountQuery + validationQuery
 		
-		return [
-			
+		// TODO - This section could be couple of queries instead of 10
+		def dependencyScan = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyScan'] )[0]
+		def validated = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Validated'])[0]
+		def dependencyReview = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyReview'])[0]
+		def bundleReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'BundleReady'])[0]
+		
+		countArgs << [validation:'Discovery']
+		def appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
+		def dbToValidate = Database.executeQuery(dbValidateCountQuery, countArgs)[0]
+		def fileToValidate = Files.executeQuery(filesValidateCountQuery, countArgs)[0]
+		def phyStorageToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ])[0]
+		def psToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ])[0]
+		def vsToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0]
+		
+		def otherValidateQuery = StringUtils.replace(validateCountQuery, ' IN ', ' NOT IN ', 1 )
+		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0]
+		
+		return [			
 			appList:appList, applicationCount:applicationCount, unassignedAppCount:unassignedAppCount, appToValidate:appToValidate, 
-			physicalCount:physicalCount, unassignedPhysialAssetCount:unassignedPhysialAssetCount, percentagePhysicalAssetCount:percentagePhysicalAssetCount, psToValidate:psToValidate, 
-			virtualCount:virtualCount, unassignedVirtualAssetCount:unassignedVirtualAssetCount, percentagevirtualAssetCount:percentagevirtualAssetCount, vsToValidate:vsToValidate, 
-			dbList:dbList, dbCount:databaseCount, unassignedDbCount:unassignedDbCount, percentageDBCount:percentageDBCount, dbToValidate:dbToValidate, 
-			filesList:filesList, fileCount:fileCount, unassignedFilesCount:unassignedFilesCount, percentageFilesCount:percentageFilesCount, fileToValidate:fileToValidate, 
-			otherTypeList:otherTypeList, otherAssetCount:otherAssetCount, unassignedOtherCount:unassignedOtherCount, percentageOtherCount:percentageOtherCount, otherToValidate:otherToValidate, 
+			physicalCount:physicalCount, 
+			unassignedPhysialAssetCount:unassignedPhysialAssetCount, 
+			percentagePhysicalAssetCount:percentagePhysicalAssetCount, 
+			psToValidate:psToValidate, 
+			virtualCount:virtualCount, 
+			unassignedVirtualAssetCount:unassignedVirtualAssetCount, 
+			percentagevirtualAssetCount:percentagevirtualAssetCount, 
+			vsToValidate:vsToValidate, 
+			dbList:dbList, dbCount:databaseCount, 
+			unassignedDbCount:unassignedDbCount, 
+			percentageDBCount:percentageDBCount, 
+			dbToValidate:dbToValidate, 
+			// Files (aka Storage)
+			filesList:filesList, fileCount:fileCount, 
+			unassignedFilesCount:unassignedFilesCount, 
+			percentageFilesCount:percentageFilesCount, 
+			fileToValidate:fileToValidate, 
+			phyStorageCount:phyStorageCount,
+			phyStorageToValidate:phyStorageToValidate,
+			// Other
+			otherTypeList:otherTypeList, 
+			otherAssetCount:otherAssetCount, 
+			unassignedOtherCount:unassignedOtherCount, 
+			percentageOtherCount:percentageOtherCount, 
+			otherToValidate:otherToValidate, 
 			
 			assetList:assetList, assetCount:assetCount, unassignedAssetCount:unassignedAssetCount, 
 			

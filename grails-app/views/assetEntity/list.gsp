@@ -63,6 +63,7 @@
 				var sortIndex = '${sortIndex}'
 				var sortOrder = '${sortOrder}'
 				var moveBundleId = '${moveBundleId}'
+				var toValidate = '${toValidate}'
 				var windowWidth = $(window).width() - $(window).width()*5/100 ;
 				var sizePref = '${sizePref}'
 				var unassigned = '${unassigned}'
@@ -103,7 +104,7 @@
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
 						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId,listType:listType,
-						unassigned:unassigned}">
+						unassigned:unassigned, toValidate:toValidate }">
 					<jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
 					<jqgrid:refreshButton id="assetListId" />

@@ -1795,9 +1795,11 @@ class AssetEntityController {
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
 			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
-			 attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType, 
-			 justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm, fixedFilter:fixedFilter,
-			 unassigned: params.unassigned]) 
+			attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType, 
+			justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm, fixedFilter:fixedFilter,
+			unassigned: params.unassigned,
+			toValidate:params.toValidate
+			]) 
 	}
 	/**
 	 * This method is used by JQgrid to load assetList
@@ -1933,22 +1935,20 @@ class AssetEntityController {
 		
 		query.append("\n AND ae.asset_class = '${AssetClass.DEVICE}'")
 
-		//which will limit the query based on physical or server Assets.
-		if(listType=='server')
-			query.append(" AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getServerTypes())}) ")
+		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
+		if (listType=='server')
+			query.append(" AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 		else
 			query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 		
-		
 		if(params.event && params.event.isNumber() && moveBundleList)
-			query.append( " AND ae.move_bundle_id IN (${WebUtil.listAsMultiValueString(moveBundleList.id)})" )
+			query.append( " AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
 			
 		if(params.unassigned){
-			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL \
-					AND mb.useForPlanning = :useForPlanning AND mb.project = :project ", [useForPlanning:true, project:project])
+			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
 			
 			if(unasgnMB){
-				def unasgnmbId = WebUtil.listAsMultiValueString(unasgnMB?.id)
+				def unasgnmbId = GormUtil.asQuoteCommaDelimitedString(unasgnMB?.id)
 				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
 			}
 		}
@@ -1983,15 +1983,24 @@ class AssetEntityController {
 		if ( params.filter && params.filter!='assetSummary') {
 			if (params.filter == 'other'){  
 				// filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
-				query.append( (params.event ? 'AND' : 'WHERE') + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) ")
+				query.append( (params.event ? ' AND' : ' WHERE') + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) ")
 			} else {
-				query.append( (params.event ? 'AND' : 'WHERE') + "assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
+				query.append( (params.event ? ' AND' : ' WHERE') + " assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
 			}	
 				
 			if( params.type=='toValidate'){
 				query.append(" AND assets.validation='Discovery' ")//eq ('validation','Discovery')
 			}
 		}
+
+log.debug "*************** ValidationType.getList().contains(params.toValidate)? ${ValidationType.getList().contains(params.toValidate)}"
+log.debug "*************** ValidationType.getList().contains(params.toValidate)? ${ValidationType.getList()}"
+log.debug "*************** ValidationType.getList().contains(params.toValidate)? ${params.toValidate}"
+		// Allow filtering on the Validate
+		if (params.toValidate && params.toValidate && ValidationType.getList().contains(params.toValidate)) {
+			query.append(" AND assets.validation='${params.toValidate}' ")
+		}
+
 		if(params.plannedStatus){
 			query.append(" AND assets.planStatus='${params.plannedStatus}'")
 		}
