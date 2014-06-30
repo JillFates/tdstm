@@ -516,19 +516,23 @@ class MoveBundleController {
 		}
 
 		// Forming query for multi-uses
-		def projectWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
-		def selectCount = 'SELECT count(ae) '
-		def countQuery = "SELECT count(ae) FROM AssetEntity ae $projectWhere"
-		def appQuery = "FROM Application ae $projectWhere"
-		def appCountQuery = "$selectCount $appQuery"
-		def dbQuery = "FROM Database ae $projectWhere"
-		def dbCountQuery = "$selectCount $dbQuery"
-		def filesQuery = "FROM Files ae $projectWhere"
-		def filesCountQuery = "$selectCount $filesQuery"
-		def deviceQuery = "FROM AssetEntity ae $projectWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
-		def deviceCountQuery = "$selectCount $deviceQuery"	
-		def otherCountQuery =  StringUtils.replace(deviceCountQuery, ' IN ', ' NOT IN ', 1 )
+		def baseWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
+		def selectCount = 'SELECT count(ae)'
 		def countArgs = [project:project, moveBundles:moveBundleList]
+
+		def countQuery = "$selectCount FROM AssetEntity ae $baseWhere"
+		def appQuery = "FROM Application ae $baseWhere"
+		def appCountQuery = "$selectCount $appQuery"
+		def dbQuery = "FROM Database ae $baseWhere"
+		def dbCountQuery = "$selectCount $dbQuery"
+		def filesQuery = "FROM Files ae $baseWhere"
+		def filesCountQuery = "$selectCount $filesQuery"
+		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
+		def deviceCountQuery = "$selectCount $deviceQuery"	
+		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType NOT IN (:type)"
+
+log.error "++++++++ deviceCountQuery=$deviceCountQuery"
+log.error "++++++++  otherCountQuery=$otherCountQuery"
 
 		def apps = Application.findAll(appQuery, countArgs)
 		def applicationCount = apps.size()
