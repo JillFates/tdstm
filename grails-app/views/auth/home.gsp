@@ -138,6 +138,9 @@ a:hover {
 					<td>
 						<g:link controller="testCase" action="testRBO" params="[eventId:0]" style="color:black">Task Critical Path Calculator</g:link>
 					</td>
+					<td>
+						<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 
+					</td>
 				</tr>
 			</tbody>
 		</table>
