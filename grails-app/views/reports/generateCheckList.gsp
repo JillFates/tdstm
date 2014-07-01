@@ -439,6 +439,15 @@
 			<tr>
 				<td>&nbsp;</td>
 				<td>
+					${startsError}
+					<div style="margin-left: 50px">
+						${startsRef.toString()}
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>
 					${sinksError}
 					<div style="margin-left: 50px">
 						${sinksRef.toString()}

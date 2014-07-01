@@ -61,21 +61,21 @@ class ReportsService {
 		def taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList)
 		
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
-			   'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
-			   'list':eventsProjectInfo.list,'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),
-			   'moveBundles':moveBundles,'summaryOk':assetsInfo.summaryOk,'duplicatesAssetNames':assetsInfo.duplicatesAssetNames,'duplicates':assetsInfo.duplicates,
-			   'duplicatesTag':assetsInfo.duplicatesTag,'duplicatesAssetTagNames':assetsInfo.duplicatesAssetTagNames,'missedRacks':assetsInfo.missedRacks,
-			   'missingRacks':assetsInfo.missingRacks,'dependenciesOk':assetsInfo.dependenciesOk,'issue':assetsInfo.issue,'issueMap':assetsInfo.issues,
-			   'bundleMap':moveBundleTeamInfo.bundleMap,'notAssignedToTeam':moveBundleTeamInfo.notAssignedToTeam,'teamAssignment':moveBundleTeamInfo.teamAssignment,
-			   'inValidUsers':moveBundleTeamInfo.inValidUsers,'userLogin':moveBundleTeamInfo.userLogin,'truckError':transportInfo.truckError,'truck':transportInfo.truck,
-			   'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
-			   'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
-			   'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
-			   'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,
-			   'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue,
-			   'dependenciesNotValid':assetsInfo.dependenciesNotValid, 'cyclicalsError':taskAnalysisInfo.cyclicalsError, 'cyclicalsRef':taskAnalysisInfo.cyclicalsRef,
-			   'sinksError':taskAnalysisInfo.sinksError, 'sinksRef':taskAnalysisInfo.sinksRef, 'personAssignErr':taskAnalysisInfo.personAssignErr,
-			   'personTasks':taskAnalysisInfo.personTasks, 'taskerrMsg':taskAnalysisInfo.exceptionString]
+			'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
+			'list':eventsProjectInfo.list,'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),
+			'moveBundles':moveBundles,'summaryOk':assetsInfo.summaryOk,'duplicatesAssetNames':assetsInfo.duplicatesAssetNames,'duplicates':assetsInfo.duplicates,
+			'duplicatesTag':assetsInfo.duplicatesTag,'duplicatesAssetTagNames':assetsInfo.duplicatesAssetTagNames,'missedRacks':assetsInfo.missedRacks,
+			'missingRacks':assetsInfo.missingRacks,'dependenciesOk':assetsInfo.dependenciesOk,'issue':assetsInfo.issue,'issueMap':assetsInfo.issues,
+			'bundleMap':moveBundleTeamInfo.bundleMap,'notAssignedToTeam':moveBundleTeamInfo.notAssignedToTeam,'teamAssignment':moveBundleTeamInfo.teamAssignment,
+			'inValidUsers':moveBundleTeamInfo.inValidUsers,'userLogin':moveBundleTeamInfo.userLogin,'truckError':transportInfo.truckError,'truck':transportInfo.truck,
+			'cartError':transportInfo.cartError,'cart':transportInfo.cart,'shelf':transportInfo.shelf,'shelfError':transportInfo.shelfError,'nullAssetname':assetsInfo.nullAssetname,
+			'blankAssets':assetsInfo.blankAssets ,'questioned':assetsInfo.questioned,'questionedDependency':assetsInfo.questionedDependency,
+			'specialInstruction':assetsInfo.specialInstruction,'importantInstruction':assetsInfo.importantInstruction,'eventErrorString':eventErrorString,
+			'dashBoardOk':eventBundleInfo.dashBoardOk,'allErrors':allErrors,'nullAssetTag':assetsInfo.nullAssetTag,'blankAssetTag':assetsInfo.blankAssetTag,
+			'modelList':modelInfo.modelList,'modelError':modelInfo.modelError,'eventIssues':assetsInfo.eventIssues,'nonAssetIssue':assetsInfo.nonAssetIssue,
+			'dependenciesNotValid':assetsInfo.dependenciesNotValid, 'cyclicalsError':taskAnalysisInfo.cyclicalsError, 'cyclicalsRef':taskAnalysisInfo.cyclicalsRef,
+			'startsError':taskAnalysisInfo.startsError, 'startsRef':taskAnalysisInfo.startsRef, 'sinksError':taskAnalysisInfo.sinksError, 'sinksRef':taskAnalysisInfo.sinksRef, 
+			'personAssignErr':taskAnalysisInfo.personAssignErr, 'personTasks':taskAnalysisInfo.personTasks, 'taskerrMsg':taskAnalysisInfo.exceptionString]
 
 	}
 	
@@ -862,10 +862,12 @@ class ReportsService {
 	def getTaskAnalysisInfo (moveEventInstance, eventErrorList) {
 		def dfsMap
 		def cyclicalsError = ''
+		def startsError = ''
 		def sinksError = ''
 		def personAssignErr = ''
 		def personTasks = []
 		def exceptionString = ''
+		StringBuilder startsRef = new StringBuilder()
 		StringBuilder sinksRef = new StringBuilder()
 		StringBuilder cyclicalsRef = new StringBuilder()
 		
@@ -905,9 +907,31 @@ class ReportsService {
 				cyclicalsRef.append('</ol>')
 			}
 			
+			// check for multiple starts
+			if (dfsMap.starts?.size() == 1) {
+				startsError += """<span style="color: green;"><b> Start Vertices: OK  </b><br></br></span>"""
+			} else if (dfsMap.starts?.size() == 0) {
+				eventErrorList << 'Tasks'
+				startsError += """<span style="color: red;">
+					<b>Start Vertices: <br> No start task was found.</b>
+					<br></br></span>"""
+			} else {
+				eventErrorList << 'Tasks'
+				startsError += """<span style="color: red;"><b>Start Vertices: <br>
+					Warning - More than one task has no predecessors. Typical events will have just one starting task 
+					(e.g. Prep for Move Event). This is an indicator that some task wiring may be incorrect.</b>
+					<br></br></span>"""
+				startsRef.append('<ul>')
+				dfsMap.starts.each {
+						startsRef.append("<li>$it [TaskSpec ${it.taskSpec}]")
+					}
+				startsRef.append('</ul>')
+			}
+			
+			// check for multiple sinks
 			if (dfsMap.sinks?.size() == 1) {
 				sinksError += """<span style="color: green;"><b> Sink Vertices: OK  </b><br></br></span>"""
-			} else if(dfsMap.sinks?.size() == 0) {
+			} else if (dfsMap.sinks?.size() == 0) {
 				eventErrorList << 'Tasks'
 				sinksError += """<span style="color: red;">
 					<b>Sink Vertices: <br> No end task was found, which is typically the result of cyclical references.</b>
@@ -925,6 +949,7 @@ class ReportsService {
 				sinksRef.append('</ul>')
 			}
 			
+			
 			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null and (role is null or role='')) and category in (:category)",
 				[ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories] )
 			
@@ -937,7 +962,7 @@ class ReportsService {
 				personAssignErr+="""<span style="color: red;"><b> Person/Team Assignments : $missedAssignments task${missedAssignments>1?'s have':' has'} no person or team assigned</b><br></br></span>"""
 			}
 		}
-		return ['cyclicalsError':cyclicalsError, 'cyclicalsRef':cyclicalsRef,'sinksError':sinksError,
-			'sinksRef':sinksRef, 'personAssignErr':personAssignErr, 'personTasks':personTasks, 'exceptionString':exceptionString]
+		return ['cyclicalsError':cyclicalsError, 'cyclicalsRef':cyclicalsRef, 'sinksRef':sinksRef, 'startsRef':startsRef, 
+			'sinksError':sinksError, 'startsError':startsError, 'personAssignErr':personAssignErr, 'personTasks':personTasks, 'exceptionString':exceptionString]
 	}
 }
