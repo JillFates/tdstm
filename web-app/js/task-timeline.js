@@ -552,10 +552,10 @@ function buildGraph (response, status) {
 		// update the item labels' children
 		itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
 			.selectAll(':first-child')
-			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
+			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 			.selectAll(':first-child')
 			.selectAll(':first-child')
-			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; });
+			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
 		
 		// add any labels in the new domain extents
 		labels.enter().append('foreignObject')
@@ -566,14 +566,14 @@ function buildGraph (response, status) {
 			.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
 			.attr('height', function(d) { return d.points.h; })
 			.append('xhtml:body')
-			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
+			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 			.attr('class', 'itemLabel')
 			.append('div')
 			.attr('class', 'itemLabel')
 			.attr('align', 'center')
 			.append('p')
 			.attr('class', 'itemLabel')
-			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + (d.points.w - anchorOffset) + 'px !important;'; })
+			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 			.html(function (d) { return d.number + ': ' + d.name; });
 
 		labels.exit().remove();
