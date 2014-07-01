@@ -266,20 +266,23 @@ class MoveBundleService {
 			// remove preferences
 			def bundleQuery = "select mb.id from MoveBundle mb where mb.id = ${moveBundleInstance.id}"
 			UserPreference.executeUpdate("delete from UserPreference up where up.value = ${moveBundleInstance.id} ")
-			//remove the AssetEntity
-			def assetsQuery = "select a.id from AssetEntity a where a.moveBundle = ${moveBundleInstance.id}"
-			 
-			ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
-			AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
-			AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
-			AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in ($assetsQuery)")
-			ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset in ($assetsQuery)")
-			AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)")
-			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null, 
-											assetToPort=null where assetTo in ($assetsQuery)""")
-			ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
-			
-			AssetEntity.executeUpdate("delete from AssetEntity ae where a.moveBundle = ${moveBundleInstance.id}")
+			//remove the AssetEntity and associated
+			def assets = AssetEntity.findAllByMoveBundle(moveBundleInstance) 
+			if(assets){
+				ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in (:assets)", [assets:assets])
+				AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in (:assets)", [assets:assets])
+				AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in (:assets)", [assets:assets])
+				AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in (:assets)", [assets:assets])
+				ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.asset in (:assets)", [assets:assets])
+				AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in (:assets)", [assets:assets])
+				AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null, 
+												assetToPort=null where assetTo in (:assets)""", [assets:assets])
+				ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in (:assets)", [assets:assets])
+				AssetDependency.executeUpdate("delete AssetDependency where asset in (:assets) or dependent in (:deps)", 
+												[assets:assets, deps:assets] )
+			    AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset in (:assets)", [assets:assets])
+				AssetEntity.executeUpdate("delete from AssetEntity ae where a.moveBundle = ${moveBundleInstance.id}")
+			}
 			
 		} catch(Exception ex){
 			message = "Unable to remove the $moveBundleInstance Assets Error:"+ex
