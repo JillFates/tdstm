@@ -13,6 +13,7 @@ exports.config = {
     regression: [
     '../components/clientProject/listProjects.spec.js',
     '../components/clientProject/createProject.spec.js',
+    '../components/eventsBundles/bundles.spec.js',
     '../components/assets/createApp.spec.js',
     '../components/assets/addTask.spec.js',
     '../components/assets/addComments.spec.js',
@@ -67,7 +68,7 @@ exports.config = {
   framework: 'jasmine',
   
   jasmineNodeOpts: {
-    isVerbose: false,
+    isVerbose: true,
     showColors: true,
     // If true, include stack traces in failures.
     includeStackTrace: true,

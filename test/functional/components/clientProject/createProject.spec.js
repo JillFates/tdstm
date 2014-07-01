@@ -26,7 +26,9 @@ describe('Create Project', function(){
   });
 
   it('should select id 2444 as client', function(){
-    projectPage.selectAClient(68);
+    // need to update this to search by marketing demo, instead of selecting by position
+    // to avoid issues if the database change.
+    projectPage.selectAClient(79);
     expect(projectPage.getclientSelect().getAttribute('value')).toEqual('2444');
   });
 

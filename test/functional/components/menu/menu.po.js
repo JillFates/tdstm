@@ -21,6 +21,7 @@ var Menu = function(){
 
   //Events/Bundles
   this.eventsBundlesCss = '#eventMenuId a';
+  this.listBundlesCss = 'a[href="/tdstm/moveBundle/list"]';
   //Tasks
   this.tasksCss = '#teamMenuId a';
   //Console
@@ -136,9 +137,17 @@ var Menu = function(){
   };
 
   this.goToEventsBundles= function(option){
+    var that = this;
     browser.driver.findElement(by.css(this.eventsBundlesCss)).click();
     var d = {
+      'listEvents':function(){
 
+      },
+      'listBundles':function(){
+        browser.driver.findElement(by.css(that.listBundlesCss)).click();
+
+
+      }
     };
     d[option]();
   };

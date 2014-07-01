@@ -119,13 +119,13 @@ describe('Add Task', function(){
         expect(taskModal.getTeamSelected().getText()).toEqual('Unassigned');
       });
        
-      it('should have 18 options', function(){
-        expect(taskModal.getTeamDropdownoptions().count()).toEqual(18);
+      it('should have 20 options', function(){
+        expect(taskModal.getTeamDropdownoptions().count()).toEqual(20);
       });
       
       it('should have the following options' ,function(){
         var values = ['','ACCT_MGR','APP_COORD','DB_ADMIN','DB_ADMIN_MS','DB_ADMIN_ORA','CLEANER',
-        'MOVE_MGR','MOVE_TECH', 'MOVE_TECH_SR', 'NETWORK_ADMIN','PROJ_ADMIN','PROJ_MGR','STOR_ADMIN',
+        'MIG_ANALYST','MIG_LEAD','MOVE_MGR','MOVE_TECH', 'MOVE_TECH_SR', 'NETWORK_ADMIN','PROJ_ADMIN','PROJ_MGR','STOR_ADMIN',
         'SYS_ADMIN', 'SYS_ADMIN_LNX', 'SYS_ADMIN_WIN','TECH'];
         expect(taskModal.getTeamDropdownoptions().count()).toEqual(values.length);
         var i = 0;
@@ -159,8 +159,8 @@ describe('Add Task', function(){
       taskModal.getTeamDropdownoptions().then(function(options){
       options[12].click();
       });
-      var val = 'PROJ_MGR';
-      expect(taskModal.getTeamSelected().getAttribute('value')).toEqual(val);
+      // var val = 'NETWORK_ADMIN';
+      expect(taskModal.getTeamSelected().getAttribute('value')).toEqual('NETWORK_ADMIN');
     });
 
     it('should not enable fixed assignment check if team is assigned', function(){
@@ -182,7 +182,7 @@ describe('Add Task', function(){
       expect(taskModal.getEventSelected().getText()).toEqual('please select');
     });
 
-    it('should be empty since no event is created for this project yet',function(){
+    xit('should be empty since no event is created for this project yet',function(){
       expect(taskModal.getEventDropdownOptions().count()).toEqual(1); 
     });
   }); // Event Dropdown

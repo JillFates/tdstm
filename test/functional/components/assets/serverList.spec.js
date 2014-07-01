@@ -122,7 +122,16 @@ describe('validate comments/task on server list', function(){
       commTasklist.selectFromList(0);
       expect(commTasklist.getTitle().getText()).toEqual('jiji');
     });
+    describe('modify a comment', function(){
 
+    });
+    describe('add a comment', function(){
+
+    });
+
+    describe('add a task', function(){
+
+    });
     it('should close Task List modal', function(){
       commTasklist.clickClose();
       expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(false);

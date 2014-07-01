@@ -5,7 +5,7 @@ var ListApps = function(){
   this.createServerBtnCss = '[onclick="createAssetDetails(\'assetEntity\')"]';
   this.searchNamefieldId = 'gs_assetName';
   this.appsOnListCss =  '[role="grid"] tbody tr.ui-widget-content';
-  this.messageId = 'messageId';
+  this.messageCss = 'div#messageId';
 
   this.getTitle = function(){
     return $(this.titleh1Css);
@@ -20,7 +20,8 @@ var ListApps = function(){
     return $(this.createServerBtnCss);
   };
   this.getConfirmMsg = function(){
-    return element(by.id(this.messageId));
+    // return element(by.id(this.messageId));
+    return $(this.messageCss);
   };
   this.getSearchAppName = function(){
     return element(by.id(this.searchNamefieldId));
