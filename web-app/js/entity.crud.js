@@ -1,75 +1,78 @@
-function createEntityView(e, type,source,rack,roomName,location,position){
-	 if(!isIE7OrLesser) 
+function createEntityView (e, type,source,rack,roomName,location,position) {
+	if(!isIE7OrLesser)
 		getHelpTextAsToolTip(type);
-	 var resp = e.responseText;
-	 $("#createEntityView").html(resp);
-	 $("#createEntityView").dialog('option', 'width', 'auto')
-	 $("#createEntityView").dialog('option', 'position', ['center','top']);
-	 $("#createEntityView").dialog('open');
-	 $("#editEntityView").dialog('close');
-	 $("#showEntityView").dialog('close');
-	 updateAssetTitle(type);
-	 updateAssetInfo(source,rack,roomName,location,position,'create')
+	var resp = e.responseText;
+	$("#createEntityView").html(resp);
+	$("#createEntityView").dialog('option', 'width', 'auto')
+	$("#createEntityView").dialog('option', 'position', ['center','top']);
+	$("#createEntityView").dialog('open');
+	$("#editEntityView").dialog('close');
+	$("#showEntityView").dialog('close');
+	updateAssetTitle(type);
+	updateAssetInfo(source,rack,roomName,location,position,'create')
 }
 
-function createAssetDetails(type){
+function createAssetDetails (type) {
 	switch(type){
-	 case "Application":
+	case "Application":
 		new Ajax.Request(contextPath+'/application/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Application');}})
 		break;
-	 case "Database":
+	case "Database":
 		new Ajax.Request(contextPath+'/database/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Database');}})
 		break;
-	 case "Files":
+	case "Files":
 		new Ajax.Request(contextPath+'/files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Storage');}})
 		break;
-	 default :
+	default :
 		new Ajax.Request(contextPath+'/assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Server');}})
-	 }
+	}
 }
 
-function getEntityDetails(redirectTo, type, value){
-	 switch(type){
-	 case "Application":
+function getEntityDetails (redirectTo, type, value) {
+	switch (type) {
+	case "Application":
 		new Ajax.Request(contextPath+'/application/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Application');}})
 		break;
-	 case "Database":
+	case "Database":
 		new Ajax.Request(contextPath+'/database/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
 		break;
-	 case "Files":
-		new Ajax.Request(contextPath+'/files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Storage');}})
+	case "Files":
+		new Ajax.Request(contextPath+'/files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Files');}})
 		break;
-	 default :
+	default :
 		new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
-	 }
+	}
 }
-function showEntityView(e, type){
-	 if(B2 != ''){
+
+function showEntityView (e, type) {
+	
+	if (B2 != '') {
 		B2.Pause()
-	 }
-	 var resp = e.responseText;
-	 if(resp.substr(0,1) == '{'){
-    	var resp = eval('(' + e.responseText + ')');
-   	 	alert(resp.errMsg)
-     }else{
-		 $("#showEntityView").html(resp);
-		 $("#showEntityView").dialog('option', 'width', 'auto')
-		 $("#showEntityView").dialog('option', 'position', ['center','top']);
-		 $("#showEntityView").dialog('open');
-		 $("#editEntityView").dialog('close');
-		 $("#createEntityView").dialog('close');
-		 updateAssetTitle(type)
-		 if(!isIE7OrLesser)
-			 getHelpTextAsToolTip(type);
-     }
+	}
+	var resp = e.responseText;
+	if (resp.substr(0,1) == '{') {
+		var resp = eval('(' + e.responseText + ')');
+		alert(resp.errMsg)
+	} else {
+		$("#showEntityView").html(resp);
+		$("#showEntityView").dialog('option', 'width', 'auto')
+		$("#showEntityView").dialog('option', 'position', ['center','top']);
+		$("#showEntityView").dialog('open');
+		$("#editEntityView").dialog('close');
+		$("#createEntityView").dialog('close');
+		updateAssetTitle(type)
+		if (!isIE7OrLesser)
+			getHelpTextAsToolTip(type);
+	}
 }
+
 var title = document.title;
-function changeDocTitle( newTitle ){
+function changeDocTitle ( newTitle ) {
 	$(document).attr('title', newTitle);
-	$(document).keyup(function(e) {     
-	    if(e.keyCode== 27) {
-	    	$(document).attr('title', title);
-	    } 
+	$(document).keyup(function(e) {
+		if(e.keyCode== 27) {
+			$(document).attr('title', title);
+		}
 	});
 	$(".ui-dialog .ui-dialog-titlebar-close").click(function(){
 		$(document).attr('title', title);
@@ -90,7 +93,7 @@ function changeDocTitle( newTitle ){
 	});
 }
 
-function editEntity(redirectTo,type, value, source,rack,roomName,location,position){
+function editEntity (redirectTo,type, value, source,rack,roomName,location,position) {
 	if(redirectTo == "rack"){
 		redirectTo = $('#redirectTo').val() == 'rack' ? 'rack' : $('#redirectTo').val()
 	}
@@ -108,30 +111,33 @@ function editEntity(redirectTo,type, value, source,rack,roomName,location,positi
 			 new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
 	 }
 }
-function editEntityView(e, type,source,rack,roomName,location,position){
-     var resps = e.responseText;
-     $("#editEntityView").html(resps);
-	 $("#editEntityView").dialog('option', 'width', 'auto')
-	 $("#editEntityView").dialog('option', 'position', ['center','top']);
-	 $("#editEntityView").dialog('open');
-	 $("#showEntityView").dialog('close');
-	 $("#createEntityView").dialog('close');
-	 if(!isIE7OrLesser)
-		 getHelpTextAsToolTip(type);
-	 updateAssetTitle(type)
-	 if(rack)
-		 updateAssetInfo(source,rack,roomName,location,position,'edit')
+
+function editEntityView (e, type,source,rack,roomName,location,position) {
+	var resps = e.responseText;
+	$("#editEntityView").html(resps);
+	$("#editEntityView").dialog('option', 'width', 'auto')
+	$("#editEntityView").dialog('option', 'position', ['center','top']);
+	$("#editEntityView").dialog('open');
+	$("#showEntityView").dialog('close');
+	$("#createEntityView").dialog('close');
+	if(!isIE7OrLesser)
+		getHelpTextAsToolTip(type);
+	updateAssetTitle(type)
+	if(rack)
+		updateAssetInfo(source,rack,roomName,location,position,'edit')
 }
-function isValidDate( date ){
-    var returnVal = true;
-  	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
-  	if( date && !objRegExp.test(date) ){
-      	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
-      	returnVal  =  false;
-  	} 
-  	return returnVal;
+
+function isValidDate ( date ) {
+	var returnVal = true;
+	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
+	if( date && !objRegExp.test(date) ){
+		alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
+		returnVal  =  false;
+	}
+	return returnVal;
 }
-function addAssetDependency( type,forWhom ){
+
+function addAssetDependency ( type,forWhom ) {
 	
 	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val()
 	var rowData = $("#assetDependencyRow tr").html()
@@ -148,7 +154,7 @@ function addAssetDependency( type,forWhom ){
 		.replace(/commLink/g,"commLink_"+type+"_"+rowNo);
 	$("#comment_"+type+"_"+rowNo).val('')
 	$("#dep_comment_"+type+"_"+rowNo).val('')
-	if(type!="support"){
+	if (type!="support") {
 		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	} else {
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
@@ -156,13 +162,13 @@ function addAssetDependency( type,forWhom ){
 	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
 	
-	if(!isIE7OrLesser)
+	if (!isIE7OrLesser)
 		$("select.assetSelect").select2();
 	
 	$("#depComment_"+type+"_"+rowNo).dialog({ autoOpen: false})
 }
 
-function deleteRow( rowId, forWhomId ){
+function deleteRow ( rowId, forWhomId ) {
 	$("#"+rowId).remove()
 	var id = rowId.split('_')[3]
 	if(id)
@@ -171,7 +177,7 @@ function deleteRow( rowId, forWhomId ){
 		$("#"+forWhomId).val(parseInt($("#"+forWhomId).val())+1)
 }
 
-function updateAssetsList(name, assetType, assetId ) {
+function updateAssetsList (name, assetType, assetId ) {
 	var idValues = name.split("_")
 	var csc = $("select[name='entity_"+idValues[1]+"_"+idValues[2]+"']")
 	var claz = csc.val()
@@ -180,70 +186,76 @@ function updateAssetsList(name, assetType, assetId ) {
 	asc.html($("#"+claz+" select").html())
 	console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
 
-	if(assetId === undefined){
+	if (assetId === undefined) {
 		if(!isIE7OrLesser)
-	    	$("select.assetSelect").select2()
+			$("select.assetSelect").select2()
 	}
 	// Set the value if we were passing in the original value for a pre-existing asset
 	if ( 
-	  (claz == 'Application' && assetType == claz) ||
-	  (claz == 'Database' && assetType == claz) ||
-	  (claz == 'Other' && assetType == claz) ||
-	  (claz == 'Storage' && ( assetType == claz || assetType == 'Files')) || 
-	  (claz == 'Server' && assetType!='Application' && assetType!='Database' && assetType!='Other' && assetType!='Storage' && assetType!='Files') 
+		(claz == 'Application' && assetType == claz) ||
+		(claz == 'Database' && assetType == claz) ||
+		(claz == 'Other' && assetType == claz) ||
+		(claz == 'Storage' && ( assetType == claz || assetType == 'Files')) || 
+		(claz == 'Server' && assetType!='Application' && assetType!='Database' && assetType!='Other' && assetType!='Storage' && assetType!='Files') 
 	) {
 		// relookup the SELECT
-	    // $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"'] option=[value='"+assetId+"']").attr('selected','selected')
+		// $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"'] option=[value='"+assetId+"']").attr('selected','selected')
 		asc.val(assetId)
 		//jQuery("select#selectBox option[value='requiredValue']").attr("selected",selected");
 		//console.log("updateAssetsList() setting select to assetId " + assetId)
 		//console.log(asc.html())
 	}
 }
-function updateAssetTitle( type ){
+
+function updateAssetTitle ( type ) {
 	$("#createEntityView").dialog( "option", "title", 'Create '+type );
 	$("#showEntityView").dialog( "option", "title", type+' Detail' );
 	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
 }
-function selectManufacturer(value, forWhom){
+
+function selectManufacturer (value, forWhom) {
 	var val = value;
 	manipulateFields(val)
 	new Ajax.Request(contextPath+'/assetEntity/getManufacturersList?assetType='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
 }
-function showManufacView(e, forWhom){
-    var resp = e.responseText;
-    if(forWhom == 'Edit')
-    	$("#manufacturerEditId").html(resp);
-    else 
-    	$("#manufacturerCreateId").html(resp);
-   
-    $("#manufacturers").removeAttr("multiple")
-    if(!isIE7OrLesser)
-    	$("select.assetSelect").select2()
+
+function showManufacView (e, forWhom) {
+	var resp = e.responseText;
+	if(forWhom == 'Edit')
+		$("#manufacturerEditId").html(resp);
+	else
+		$("#manufacturerCreateId").html(resp);
+	
+	$("#manufacturers").removeAttr("multiple")
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2()
 }
-function selectModel(value, forWhom){
+
+function selectModel (value, forWhom) {
 	var val = value;
 	var assetType = $("#assetType"+forWhom+"Id").val() ;
 	new Ajax.Request(contextPath+'/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
 	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&=\'+ val', onComplete:'showModelView(e)' )}
 }
-function showModelView(e, forWhom){
-    var resp = e.responseText;
-    $("#model"+forWhom+"Id").html(resp);
-    $("#models").removeAttr("multiple")
-    if(forWhom == "assetAudit"){
-    	$("#models").attr("onChange","editModelAudit(this.value)")
-    }
-    if(!isIE7OrLesser){
-    	$("select.assetSelect").select2()
-    }
+
+function showModelView (e, forWhom) {
+	var resp = e.responseText;
+	$("#model"+forWhom+"Id").html(resp);
+	$("#models").removeAttr("multiple")
+	if (forWhom == "assetAudit") {
+		$("#models").attr("onChange","editModelAudit(this.value)")
+	}
+	if (!isIE7OrLesser) {
+		$("select.assetSelect").select2()
+	}
 }
+
 //DEPRECATED
-function showComment(commentId , action, commentType){
-	    console.log('DEPRECATED: showComment.');
-	   	var id = id
-    	var objDom = $('[ng-app]');
-       	var injector = angular.element(objDom).injector();
+function showComment (commentId , action, commentType) {
+	console.log('DEPRECATED: showComment.');
+	var id = id
+	var objDom = $('[ng-app]');
+	var injector = angular.element(objDom).injector();
 		injector.invoke(function($rootScope, commentUtils){
 			if(action =='edit'){
 				$rootScope.$broadcast('editComment', commentUtils.commentTO(commentId, commentType));
@@ -252,19 +264,20 @@ function showComment(commentId , action, commentType){
 			}
 		});
 }
-function validateFileFormat(form){
+
+function validateFileFormat (form) {
 	var fileFlag = false;
-    var size = $('#'+form+' #size').val();
-    if( size=='' || isNaN(size)){
-   	  alert("Please enter numeric value for Storage Size");
-    }else if($('#'+form+' #fileFormat').val()==''){
-   	  alert("Please enter value for Storage Format");
-    }else{
-   	  fileFlag = true;
-    }
-  return fileFlag
+	var size = $('#'+form+' #size').val();
+	if ( size=='' || isNaN(size)) {
+		alert("Please enter numeric value for Storage Size");
+	} else if ($('#'+form+' #fileFormat').val()=='') {
+		alert("Please enter value for Storage Format");
+	} else {
+		fileFlag = true;
+	}
+	return fileFlag
 }
-function validateDbFormat(form){
+function validateDbFormat (form) {
 	var dbFlag = false;
     var size = $('#'+form+' #size').val();
     if( size=='' || isNaN(size)){

@@ -337,7 +337,15 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.append("svg:path")
 			.attr("class", "node")
 			.call(dragBehavior)
-			.on("dblclick", function(d) { return getEntityDetails('planningConsole', d.type, d.id); })
+			.on("dblclick", function(d) {
+				if (d.assetClass == 'APPLICATION')
+					return getEntityDetails('planningConsole', 'Application', d.id);
+				else if (d.assetClass == 'STORAGE')
+					return getEntityDetails('planningConsole', 'Files', d.id);
+				else if (d.assetClass == 'DATABASE')
+					return getEntityDetails('planningConsole', 'Database', d.id);
+				return getEntityDetails('planningConsole', 'Server', d.id);
+			})
 			.on("mousedown", mousedown)
 			.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
 			.attr("fix", false)

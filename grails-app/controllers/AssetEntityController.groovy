@@ -1847,8 +1847,8 @@ class AssetEntityController {
 		//TODO:need to move the code to AssetEntityService.
 		def temp= ""
 		def joinQuery= ""
-		assetPref.each{key,value->
-			switch(value){
+		assetPref.each { key,value->
+			switch (value) {
 				case 'appOwner':
 					temp +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner,"
 					joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id \n"
@@ -1961,7 +1961,7 @@ class AssetEntityController {
 		// Handle the filtering by each column's text field
 		def firstWhere = true
 		filterParams.each {
-			if( it.getValue() )
+			if ( it.getValue() )
 				if (firstWhere) {
 					// single quotes are stripped from the filter to prevent SQL injection
 					query.append(" WHERE assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
@@ -1971,24 +1971,24 @@ class AssetEntityController {
 				}
 		}
 		
-		if(params.moveBundleId){
-			if(params.moveBundleId!='unAssigned'){
+		if (params.moveBundleId) {
+			if (params.moveBundleId!='unAssigned') {
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
 				query.append(" WHERE assets.moveBundle  = '${bundleName}' ")
-			}else{
+			} else {
 				query.append(" WHERE assets.moveBundle IS NULL ")
 			}
 		}
 		
 		if ( params.filter && params.filter!='assetSummary') {
-			if (params.filter == 'other'){  
+			if (params.filter == 'other') {
 				// filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
 				query.append( (params.event ? ' AND' : ' WHERE') + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) ")
 			} else {
 				query.append( (params.event ? ' AND' : ' WHERE') + " assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
-			}	
-				
-			if( params.type=='toValidate'){
+			}
+			
+			if (params.type=='toValidate') {
 				query.append(" AND assets.validation='Discovery' ")//eq ('validation','Discovery')
 			}
 		}
@@ -4533,7 +4533,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		}
 		def queryFordepsList = """
 			SELECT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
-			ae.asset_type AS type, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality 
+			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality
 			FROM ( 
 				SELECT * FROM tdstm.asset_dependency_bundle 
 				WHERE project_id=${projectId} ${nodesQuery} 
@@ -4611,31 +4611,49 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				break
 
 			case "files" :
-				def filesList = assetDependentlist.findAll{it.type == AssetType.FILES.toString() }
+				def filesList = assetDependentlist.findAll{it.type in [AssetType.FILES.toString(), AssetType.STORAGE.toString()] }
+				def assetList = []
 				def fileList = []
 				
 				filesList.each {
-					fileList << Files.read(it.assetId)
+					assetList << AssetEntity.read(it.assetId)
+				}
+				
+				assetList.each {
+					def item = [id:it.id, assetName:it.assetName, assetType:it.assetType, 
+						validation:it.validation, moveBundle:it.moveBundle, planStatus:it.planStatus, 
+						depToResolve:it.depToResolve, depToConflic:it.depToConflict]
+					
+					// check if the object is a logical or physical strage
+					if (it.assetClass.toString().equals('DEVICE')) {
+						item.fileFormat = ''
+						item.storageType = 'Server'
+					} else {
+						item.fileFormat = Files.read(it.id)?.fileFormat?:''
+						item.storageType = 'Files'
+					}
+					
+					fileList << item
 				}
 				fileList = sortAssetByColumn(fileList,sortOn,orderBy)
 				model.filesList = fileList
-				model.filesDependentListSize = filesList.size()
+				model.filesDependentListSize = fileList.size()
 				render(template:"filesList", model:model)
 				break
 
 			case "graph" :
 				def moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
 				Set uniqueMoveEventList = moveBundleList.moveEvent
-			    uniqueMoveEventList.remove(null)
-			    List moveEventList = []
-				
-			    moveEventList =  uniqueMoveEventList.toList()
-			    moveEventList.sort{it?.name}
+				uniqueMoveEventList.remove(null)
+				List moveEventList = []
+
+				moveEventList =  uniqueMoveEventList.toList()
+				moveEventList.sort{it?.name}
 				
 				def eventColorCode = [:]
 				int colorDiff
 				if (moveEventList.size()) {
-				   colorDiff = (232/moveEventList.size()).intValue()
+					colorDiff = (232/moveEventList.size()).intValue()
 				}
 				
 				def labelMap = ['Application':userPreferenceService.getPreference('dependencyConsoleApplicationLabel')?:'true',
@@ -4699,7 +4717,8 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 						type:type, group:it.bundle, 
 						shape:shape, size:size, title:it.assetName, 
 						color:eventColorCode[moveEventName]?:'red', 
-						dependsOn:[], supports:[]
+						dependsOn:[], supports:[],
+						assetClass:it.assetClass
 					]
 				}
 				
@@ -4797,7 +4816,6 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				break
 		} // switch
 		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
-		log.info "\n____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________"
 	}	
 
 	/**
@@ -5396,7 +5414,6 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		params.roomTarget = sourceBladeChassis?.roomTarget
 		params.rackTarget = sourceBladeChassis?.rackTarget
 	}
-	
 	/**
 	 * This method is used to sort AssetList in dependencyConsole
 	 * @param Assetlist
@@ -5414,7 +5431,6 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		}
 		return assetlist
 	}
-	
 	def getRacksPerRoom = {
 		def roomInstance = Room.get(NumberUtils.toInt(params.roomId))
 		def roomType= params.sourceType
@@ -5490,5 +5506,4 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-
 }
