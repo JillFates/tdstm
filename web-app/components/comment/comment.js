@@ -1512,12 +1512,23 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 								angular.element('#status_'+id).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 								break;
 							case "assignTask":
-								angular.element('#assignedToName_'+id).html(data.assignedTo)
+								updateColumn('assignedTo', id, data.assignedTo);
 								break;
+							case "changeEstTime":
+								updateColumn('estStart', id, data.estStart);
+								updateColumn('estFinish', id, data.estFinish);
+								break;
+
 						}
 					}
 				}
 			};
+			var updateColumn = function(colPrefixId, id, data) {
+				var element = angular.element('#' + colPrefixId + '_' + id);
+				if (element.length > 0) {
+					element.html(data)
+				}
+			}
 			updateActionBar();
 
 		}

@@ -86,7 +86,7 @@
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
 					{name:'dueDate', formatter: dueFormatter},
 					{name:'status', formatter: statusFormatter},
-					{name:'${taskPref['3']}', formatter:assignedFormatter, width:200},
+					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
@@ -111,7 +111,6 @@
 				var taskPref= '${taskPref[key]}';
 				$("#taskListIdGrid_"+taskPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+taskPref+'\',\'taskList\',\''+${key}+'\')">');
 			</g:each>
-			
 		})
 		
 		$.jgrid.formatter.integer.thousandsSeparator='';
@@ -133,10 +132,7 @@
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
-		}
-		function assignedFormatter(cellVal,options,rowObject) {
-		  return '<span class="cellWithoutBackground pointer" id="assignedToName_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" master="true" >' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
@@ -146,11 +142,11 @@
 			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
-			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
+			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
 			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "getEntityDetails(\'listTask\', \''+rowObject[17]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
-				(cellVal || cellVal == 0 ? cellVal : "<span class='cellWithoutBackground pointer'></span>")
+				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
 		}
 		
 		function populateFilter(){
