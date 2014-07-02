@@ -1376,7 +1376,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			};
 			scope.deleteRow = function(index) {
 				if (scope.ngModel[index].id) {
-					deleted[scope.ngModel[index].id] = scope.ngModel[index].id;
+					scope.deleted[scope.ngModel[index].id] = scope.ngModel[index].id;
 				}
 				scope.ngModel.splice(index, 1);
 			};

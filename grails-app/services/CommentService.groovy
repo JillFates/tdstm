@@ -356,7 +356,8 @@ class CommentService {
 				if ( assetComment.commentType == AssetCommentType.TASK && 
 					assetComment.assignedTo	&& 
 					assetComment.assignedTo.id != loginPerson.id && 
-					statusToSendEmailFor.contains(assetComment.category) ) 
+					statusToSendEmailFor.contains(assetComment.category) &&
+					assetComment.isPublished) 
 				{
 					 dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
 				}
