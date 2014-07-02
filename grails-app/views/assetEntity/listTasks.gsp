@@ -203,7 +203,7 @@
 
 					<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
 
-					<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/moveEventTaskGraph?moveEventId=${filterEvent}&mode=s" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
+					<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
 
 					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"

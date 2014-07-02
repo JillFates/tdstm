@@ -292,11 +292,11 @@ class TaskController {
 	 */
 	def neighborhoodGraph = {
 		
-		def taskId=params.id
+		def taskId = params.id
 		if (! taskId || ! taskId.isNumber()) {
 			render "An invalid task id was supplied. Please contact support if this problem persists."
 			return
-		}	
+		}
 		def project = securityService.getUserCurrentProject()
 		def rootTask = AssetComment.findByIdAndProject(taskId, project) {
 			render "Sorry but the task not found. Please contact support if this problem persists."
@@ -308,6 +308,10 @@ class TaskController {
 			render "The task has no interdependencies with other tasks so a map wasn't generated."
 			return
 		}
+		
+		def moveEventId = 0
+		if (params.moveEventId && params.moveEventId.isNumber())
+			moveEventId = params.moveEventId
 
 		def now = new Date().format('yyyy-MM-dd H:m:s')
 		def styleDef = "rounded, filled"
@@ -325,9 +329,9 @@ digraph runbook {
   
 """
 	
-		def style=''
-		def fontcolor=''
-		def fontsize=''
+		def style = ''
+		def fontcolor = ''
+		def fontsize = ''
 		def attribs
 		def color
 
@@ -339,11 +343,11 @@ digraph runbook {
 		def outputTaskNode = { task, rootId ->
 			if (! tasks.contains(task.id)) {
 				tasks << task.id
-
-			    def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
-			    label = (label.size() < 31) ? label : label[0..30]
-
-			    def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+				
+				def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+				label = (label.size() < 31) ? label : label[0..30]
+				
+				def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 				def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
 				def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false])
@@ -366,9 +370,9 @@ digraph runbook {
 					style = styleDef
 				}
 
-				attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+				attribs = "id=\"${task.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 
-				dotText << "\t${task.taskNumber} [label=\"${label}\" URL=\"$url\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+				dotText << "\t${task.taskNumber} [label=\"${label}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 
 			}
 
@@ -378,7 +382,7 @@ digraph runbook {
 		def outputOuterNodeCount = { taskNode, isPred, count ->
 			log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
 			def cntNode = "C${taskNode.taskNumber}"
-			dotText << "\t$cntNode [label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n" 
+			dotText << "\t$cntNode [id=\"placeholder\" label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n"
 			// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
 			if (isPred) {
 				dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
@@ -410,7 +414,9 @@ digraph runbook {
 			// convert the URI to a web safe format
 			uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
 			String fileContents = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]).text
-			render(view:"taskGraph", model:[svg:fileContents])
+			
+			def data = [svg:fileContents, moveEventId:moveEventId, neighborhoodTask:rootTask] as JSON
+			render data
 			
 		} catch(e) {
 			render "<pre>${e.getMessage()}</pre>"
@@ -426,7 +432,7 @@ digraph runbook {
 	def moveEventTaskGraph = {
 		
 		def project = securityService.getUserCurrentProject()
-		def moveEventId=params.moveEventId	
+		def moveEventId = params.moveEventId	
 		if (! moveEventId || ! moveEventId.isNumber()) {
 			render "Invalid move event id supplied"
 			return
@@ -488,9 +494,9 @@ digraph runbook {
   
 """
 	
-		def style=''
-		def fontcolor=''
-		def fontsize=''
+		def style = ''
+		def fontcolor = ''
+		def fontsize = ''
 		def fillcolor
 		def attribs
 		def color
@@ -498,12 +504,12 @@ digraph runbook {
 		style = styleDef
 
 		tasks.each {
-		    def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-		    def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+			def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+			def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
 			def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
-
+			
 			fillcolor = taskService.taskStatusColorMap[colorKey][1]
-
+			
 			// log.info "task ${it.task}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
 			// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
 			if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
@@ -515,14 +521,14 @@ digraph runbook {
 				fontsize = '10'
 				color = 'black'
 			}
-
+			
 			// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
-			attribs = "color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
-
+			attribs = "id=\"${it.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+			
 			def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
 
-		    task = (task.size() > 35) ? task[0..34] : task 
-			dotText << "\t${it.task_number} [label=\"${task}\"  URL=\"$url\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+			task = (task.size() > 35) ? task[0..34] : task 
+			dotText << "\t${it.task_number} [label=\"${task}\"  id=\"${it.id}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 			def successors = it.successors
 			if (successors) {
 				successors = (successors as Character[]).join('')
@@ -532,7 +538,7 @@ digraph runbook {
 						dotText << "\t${it.task_number} -> ${s};\n"
 					}
 				}
-			}	
+			}
 		}
 
 		dotText << "}\n"
@@ -543,11 +549,33 @@ digraph runbook {
 			// convert the URI into a web-safe format
 			uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
 			String fileContents = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]).text
-			render(view:"taskGraph", model:[svg:fileContents])
+			def data = [svg:fileContents, moveEventId:moveEventId, neighborhoodTask:null] as JSON
+			render data
 			
 		} catch (e) {
 			render(text:"<h1>Graph Generation Failed</h1>The error was:<p/><pre>${e.getMessage()}</pre>", status:"503")
 		}
+	}
+	
+	def taskGraph = {
+		// handle project
+		def project = securityService.getUserCurrentProject()
+		if ( ! project ) {
+			flash.message = "You must select a project in order to use the task timeline."
+			redirect(controller:"project", action:"list")
+			return
+		}
+
+		// if user used the event selector on the page, update their preferences with the new event
+		if (params.moveEventId && params.moveEventId.isLong())
+			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+
+		// handle move events
+		def moveEvents = MoveEvent.findAllByProject(project)
+		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
+		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
+		
+		return [moveEvents:moveEvents, selectedEventId:selectedEventId]
 	}
 	
 	/**

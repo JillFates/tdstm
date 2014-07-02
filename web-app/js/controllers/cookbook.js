@@ -1444,7 +1444,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	$scope.tasks.viewTaskGraph = function(e){
 		var id = $scope.tasks.currentTaskBeingGenerated;
-        	window.location = "task/moveEventTaskGraph?moveEventId=" + id;
+        	window.location = "task/taskGraph?moveEventId=" + id;
 	}
 
 	$scope.tasks.startOver = function(e){

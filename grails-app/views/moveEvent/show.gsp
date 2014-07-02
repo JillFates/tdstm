@@ -9,7 +9,7 @@
             <h1>Event Details</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>
-				<span class="menuButton"><g:link class="create" controller="task" action="moveEventTaskGraph"
+				<span class="menuButton"><g:link class="create" controller="task" action="taskGraph"
 					params="[moveEventId: moveEventInstance.id]">View Task Graph</g:link></span>
 		    </div>
 		    <br/>

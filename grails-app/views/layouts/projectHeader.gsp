@@ -354,6 +354,10 @@
 							<tds:hasPermission permission='ViewTaskManager'>
 							<li><g:link class="mmlink" controller="assetEntity" action="listTasks"  params="[initSession:true]" onclick="hideMegaMenu('teamMegaMenu')">Task Manager</g:link></li>
 							</tds:hasPermission>
+							
+							<tds:hasPermission permission='ViewTaskGraph'>
+							<li><g:link class="mmlink" controller="task" action="taskGraph"  params="[initSession:true]" onclick="hideMegaMenu('teamMegaMenu')">Task Graph</g:link></li>
+							</tds:hasPermission>
 
 							<tds:hasPermission permission='ViewTaskTimeline'>
 							<li><g:link class="mmlink" controller="task" action="taskTimeline" onclick="hideMegaMenu('teamMegaMenu')">Timeline</g:link></li>
