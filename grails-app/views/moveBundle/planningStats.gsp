@@ -437,8 +437,11 @@ $(document).ready(function() {
 						<tr>
 							<td>
 								<div>
-									<table style="margin-top: 38px; border: none;">
+									<table style="margin-top: -8px; border: none;">
 										<tbody>
+										    <tr><td>&nbsp;</td></tr>
+										    <tr><td>&nbsp;</td></tr>
+										    <tr><td>&nbsp;</td></tr>
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconApp.png')}"
