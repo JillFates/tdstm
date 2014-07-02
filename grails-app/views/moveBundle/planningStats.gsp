@@ -493,8 +493,15 @@ $(document).ready(function() {
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconStorage.png')}"
 													height="12" /></td>
+												<td><g:link controller="assetEntity" action="list"
+														class="links">Physical Storage</g:link></td>
+											</tr>
+											<tr>
+												<td class="dashboard_stat_icon_td"><img
+													src="${resource(dir:'images',file:'iconStorage.png')}"
+													height="12" /></td>
 												<td><g:link controller="files" action="list"
-														class="links">Storage</g:link></td>
+														class="links">Logical Storage</g:link></td>
 											</tr>
 
 											<tr>
@@ -733,6 +740,43 @@ $(document).ready(function() {
 															class="links">
 															${percentageDBCount}%</g:link>
 													</g:else></td>
+											</tr>
+											<tr>
+												<td nowrap="nowrap"><g:set
+														var="percentageUnassignedPhyStorageCount"
+														value="${phyStorageCount ? (unAssignedPhyStorgCount/phyStorageCount)*100 : 0}" />
+													<g:if test="${unAssignedPhyStorgCount == 0 }">
+														<span class='colorGrey'>0</span>
+													</g:if> <g:else>
+														<g:link controller="assetEntity" action="list"
+															params="[filter:'storage', unassigned:'true']"
+															class="links">
+															${unAssignedPhyStorgCount} (${(percentageUnassignedPhyStorageCount > 0 && percentageUnassignedPhyStorageCount < 1) ? 1 : Math.round(percentageUnassignedPhyStorageCount)}%)
+														</g:link>
+													</g:else></td>
+												<g:each in="${phyStorageList}" var="phyStorageCount">
+													<td style="text-align: right;"><g:if
+															test="${phyStorageCount.count == 0 }">
+															<span class='colorGrey'>0</span>
+														</g:if> <g:else>
+															<g:link controller="assetEntity" action="list"
+																params="[filter:'storage', moveEvent:phyStorageCount.moveEvent]"
+																class="links">
+																${phyStorageCount.count}
+															</g:link>
+														</g:else></td>
+												</g:each>
+												<td style="text-align: right;"><g:if
+														test="${percentagePhyStorageCount== 0 }">
+														<span class='colorGrey'>0%</span>
+													</g:if> <g:else>
+														<g:link controller="assetEntity" action="list"
+															params="[filter:'storage', plannedStatus:'Moved']"
+															class="links">
+															${percentagePhyStorageCount}%
+														</g:link>
+													</g:else>
+												</td>
 											</tr>
 											<tr>
 												

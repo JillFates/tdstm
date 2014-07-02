@@ -506,7 +506,7 @@ class MoveBundleController {
 		}
 
 		def allEventsList = moveBundleList*.moveEvent
-		def moveEventList = []
+		Set moveEventList = []
 		allEventsList.each { me ->
 			if (me) {
 				def times = me.getEventTimes()
@@ -553,6 +553,7 @@ class MoveBundleController {
 		def assignedAssetCount
 		def assignedApplicationCount
         def dbList = []
+		def phyStorageList = []
 		def filesList = []
 		def otherTypeList = []
 		def openTasks = []
@@ -594,6 +595,9 @@ class MoveBundleController {
 			
 			def dbCount = moveBundles ? Database.executeQuery(dbCountQuery, eventWiseArgs)[0] : 0
 			dbList << [moveEvent:moveEvent.id , count:dbCount]
+						
+			def phyStoragesCount = moveBundles ? AssetEntity.executeQuery(phyStorageCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ])[0] : 0
+			phyStorageList << ['moveEvent':moveEvent.id , 'count':phyStoragesCount]
 			
 			def filesCount = moveBundles ? Files.executeQuery(filesCountQuery, eventWiseArgs)[0] : 0
 			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
@@ -633,6 +637,9 @@ class MoveBundleController {
 		// Get Storage Counts
 		def unAssignedFilesCountQuery = "SELECT COUNT(ae) FROM Files ae WHERE ae.project=:project AND $unassignedMBQuery"
 		def unassignedFilesCount = Files.executeQuery(unAssignedFilesCountQuery, assetCountQueryArgs)[0]
+		
+		def unAssignedPhyStorgCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND $unassignedMBQuery $assetTypeQuery"
+		def unAssignedPhyStorgCount = AssetEntity.executeQuery(unAssignedPhyStorgCountQuery,  assetCountQueryArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ])[0]
 
 		// Get Application Counts
 		def unAssignedAppsCountQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND $unassignedMBQuery"
@@ -713,6 +720,11 @@ class MoveBundleController {
 		
 		int percentageDBCount = moveBundleList ? Database.executeQuery(dbCountQuery + planStatusMovedQuery, countArgs)[0] : 0
 		percentageDBCount = percOfCount(percentageDBCount, databaseCount)
+		
+		int percentagePhyStorageCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'",
+			countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ] )[0] : 0
+		
+		percentagePhyStorageCount = percOfCount(percentagePhyStorageCount, phyStorageCount)
 		
 		int percentageFilesCount = moveBundleList ? Files.executeQuery(filesCountQuery + planStatusMovedQuery, countArgs)[0] : 0
 		percentageFilesCount = percOfCount(percentageFilesCount, fileCount)
@@ -807,9 +819,12 @@ class MoveBundleController {
 			filesList:filesList, fileCount:fileCount, 
 			unassignedFilesCount:unassignedFilesCount, 
 			percentageFilesCount:percentageFilesCount, 
-			fileToValidate:fileToValidate, 
+			fileToValidate:fileToValidate,
+			unAssignedPhyStorgCount:unAssignedPhyStorgCount,
 			phyStorageCount:phyStorageCount,
+			phyStorageList:phyStorageList,
 			phyStorageToValidate:phyStorageToValidate,
+			percentagePhyStorageCount:percentagePhyStorageCount,
 			// Other
 			otherTypeList:otherTypeList, 
 			otherAssetCount:otherAssetCount, 
