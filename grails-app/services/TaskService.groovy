@@ -1418,6 +1418,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new UnauthorizedException('Referenced context is not associated with current project')
 		def assets = this.getAssocAssets(contextObj)
 
+		if (assets.size() == 0) {
+			throw new RuntimeException("The selected event doesn't have associated bundles")
+		}
+
 		// Delete previous task batches now if the user specified to delete them
 		def taskBatches = findTaskBatchesForRecipeContext(recipe, cid)
 		if (taskBatches.size()) {
