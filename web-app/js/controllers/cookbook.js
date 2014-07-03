@@ -1,5 +1,5 @@
 var app = angular.module('cookbookRecipes', ['ngGrid', 'ngResource', 'ui.bootstrap', 'modNgBlur', 
-	 'ui.codemirror', 'ui.router', 'tdsCore']);
+	 'ui.codemirror', 'ui.router', 'tdsComments']);
 
 var restCalls, rootLog, layoutPluginTasks;
 
@@ -42,12 +42,13 @@ app.config(function($stateProvider, $urlRouterProvider, servRootPathProvider) {
             		plugins: [layoutPluginTasks],
             		enableCellEditOnFocus: false,
             		afterSelectionChange: function(rowItem) {
-            			rootLog.info(rowItem.id);
-            			showAssetComment(rowItem.entity.id, 'show');
-            			$('#showCommentDialog').dialog('open');
+            			if(rowItem.selected){
+							rootLog.info(rowItem.commentId);
+							showAssetComment(rowItem.entity.commentId, 'show');
+            			}
             		}
-            	}; 
-            	
+            	};
+
             	var taskBatchId = $stateParams.id;
             	
         		if ((taskBatchId != null) && (taskBatchId != "")) {

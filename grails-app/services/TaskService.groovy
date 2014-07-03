@@ -846,6 +846,7 @@ class TaskService implements InitializingBean {
 		return assetComments.collect({ assetComment ->
 			return [
 				'id': assetComment.taskNumber,
+				'commentId': assetComment.id,
 				'description': assetComment.comment,
 				'asset': assetComment.assetEntity?.assetName,
 				'team': assetComment.assetEntity?.sourceTeamMt == null ? "None" : assetComment.assetEntity?.sourceTeamMt.name,
@@ -3473,12 +3474,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// TODO : change to use local memory list
 		dependency = TaskDependency.findByAssetCommentAndPredecessor(successor, predecessor)
-		if (!dependency)
+		if (!dependency) {
 			dependency = TaskDependency.findByAssetCommentAndPredecessor(predecessor, successor)
+		}
 
 		if (dependency) {
 			log.info "createTaskDependency: dependency already exists"
-
 		} else {
 			dependency = new TaskDependency( predecessor:predecessor, assetComment:successor )
 			if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
@@ -3497,13 +3498,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("createTaskDependency: shouldn't be called with predecessor.defer:'${settings.deferPred}' ($predecessor), succ ($successor)")			
 		}
 		*/
-
-		dependency = new TaskDependency( predecessor:predecessor, assetComment:successor )
-		if (! ( dependency.validate() && dependency.save(flush:true) ) ) {
-			throw new RuntimeException("Error while trying to create dependency between predecessor=$predecessor, successor=$successor<br>Error:${GormUtil.errorsAsUL(dependency)}, ")
-		}
-		out.append("Created dependency (${dependency.id}) between $predecessor and $successor<br>")
-		count++
 
 		// Mark the predecessor task that it has a successor so it doesn't mess up the milestones
 		if ( ! predecessor.metaClass.hasProperty(predecessor, 'hasSuccessorTaskFlag') )
@@ -3535,7 +3529,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Handling deferring dependency relationships when taskSpec indicates to successor.defer:'key'
 		if (settings.deferSucc) {
 			setDeferment(successor, successor.assetEntity, 's', settings.deferSucc, settings) 
-
 		}
 
 		// Here is the recursive loop if the predecessor has a peer

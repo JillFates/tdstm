@@ -12,6 +12,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="codemirror/codemirror.js" />
 	<g:javascript src="codemirror/ui-codemirror.js" />
@@ -22,9 +23,11 @@
 	<g:javascript src="codemirror/javascript.js" />
 	<g:javascript src="mergely/mergely.js" />	
 	<g:javascript src="bootstrap.js" />
+	<g:javascript src="angular/plugins/angular-ui.js"/>	
 	<g:javascript src="angular/plugins/angular-resource.js" />
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 	<g:javascript src="angular/plugins/angular-ui-router.min.js" />
 	<g:javascript src="controllers/cookbook.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
@@ -55,7 +58,7 @@
 <g:include view="/layouts/_error.gsp" />
 
 	<div class="body" id="cookbookRecipesEditor" ng-app="cookbookRecipes" ng-controller="CookbookRecipeEditor">
-		<div class="container">
+		<div class="container" ng-controller="tds.comments.controller.MainController as comments">
 			<form id="gridControls" class="row-fluid clearfix form-inline groups">
 				<div class="col-md-4 col-xs-4 form-group" style="position:relative; bottom:0;">
 					<label for="contextSelector">Context: 
@@ -484,6 +487,7 @@
 				</div>
 			</div>
 		</div>
+		<g:render template="../assetEntity/initAssetEntityData"/>
 		<script type="text/javascript">
 		$('#editSyntax').on('shown.bs.modal', function (e) {
 			$('.CodeMirror').each(function(i, el){
