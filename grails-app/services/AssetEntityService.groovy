@@ -31,7 +31,6 @@ class AssetEntityService {
 	def assetEntityAttributeLoaderService
 	def userPreferenceService
 	def securityService
-	def sequenceService
 	
 	/**
 	 * This method is used to update dependencies for all entity types
@@ -787,15 +786,5 @@ class AssetEntityService {
 			}
 		}
 		return highlightMap
-	}
-	
-	/**
-	 * Used to get next asset tag based on client id of project
-	 * Internally uses sequenceService to generate assetTag
-	 * @param project
-	 * @return newly formatted assetTag
-	 */
-	def getNextAssetTag( project ){
-		return "TDS-"+ String.format("%05d", sequenceService.next(project.clientId, 'AssetTag'))
 	}
 }

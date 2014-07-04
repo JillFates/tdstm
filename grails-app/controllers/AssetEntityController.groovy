@@ -2176,7 +2176,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			assetEntity.setRack( params.rackTargetId, false )
 		
 		if(!params.assetTag){
-			assetEntity.assetTag = assetEntityService.getNextAssetTag( project ) 
+			assetEntity.assetTag = projectService.getNextAssetTag(projectInstance) 
 			if(!projectInstance.save(flush:true)){
 				log.error "Error while updating project.lastAssetId : ${projectInstance}"
 				projectInstance.errors.each { log.error  it }

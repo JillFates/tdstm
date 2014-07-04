@@ -27,7 +27,8 @@ class ProjectService {
 	def jdbcTemplate
 	def stateEngineService
 	def userPreferenceService
-	def assetEntityService
+	def sequenceService
+
 
 	/**
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
@@ -238,6 +239,16 @@ class ProjectService {
 		}
 		return attributes
 	}
+	
+	/**
+	 * Used to get next asset tag based on client id of project
+	 * Internally uses sequenceService to generate assetTag
+	 * @param project
+	 * @return newly formatted assetTag
+	 */
+	def getNextAssetTag( project ){
+		return "TDS-"+ String.format("%05d", sequenceService.next(project.clientId, 'AssetTag'))
+	}
 
 	/**
 	 * Used to get the next asset tag for the project
@@ -250,7 +261,7 @@ class ProjectService {
 		if (asset.id) {
 			tag = "TDS-${asset.id}"
 		} else {
-			tag = assetEntityService.getNextAssetTag( project )
+			tag = 'TDS-' + getNextAssetTag(project) 
 		}
 		return tag
 	}	
