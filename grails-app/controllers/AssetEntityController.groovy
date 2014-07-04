@@ -76,6 +76,7 @@ class AssetEntityController {
 	def taskService
 	def projectService
 	def personService
+	def sequenceService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
 		'Custom11','Custom12','Custom13','Custom14','Custom15','Custom16','Custom17','Custom18','Custom19','Custom20','Custom21','Custom22','Custom23','Custom24']
@@ -2175,15 +2176,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			assetEntity.setRack( params.rackTargetId, false )
 		
 		if(!params.assetTag){
-			def lastAssetId = projectInstance.lastAssetId
-			if(!lastAssetId){
-				lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity WHERE project_id = ${projectInstance.id}")
-			}
-			while(AssetEntity.findByAssetTagAndProject("TDS-${lastAssetId}",projectInstance)){
-				lastAssetId = lastAssetId+1
-			}
-			assetEntity.assetTag = "TDS-${lastAssetId}"
-			projectInstance.lastAssetId = lastAssetId + 1
+			assetEntity.assetTag = assetEntityService.getNextAssetTag( project ) 
 			if(!projectInstance.save(flush:true)){
 				log.error "Error while updating project.lastAssetId : ${projectInstance}"
 				projectInstance.errors.each { log.error  it }

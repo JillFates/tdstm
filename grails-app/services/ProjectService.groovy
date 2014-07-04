@@ -27,6 +27,7 @@ class ProjectService {
 	def jdbcTemplate
 	def stateEngineService
 	def userPreferenceService
+	def assetEntityService
 
 	/**
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
@@ -249,15 +250,10 @@ class ProjectService {
 		if (asset.id) {
 			tag = "TDS-${asset.id}"
 		} else {
-			def lastAssetId = project.lastAssetId
-			if (! lastAssetId) {
-				lastAssetId = jdbcTemplate.queryForInt("select max(asset_entity_id) FROM asset_entity") + 1
-			}
-			tag = "TDS-${lastAssetId}"
-			project.lastAssetId = ++lastAssetId
+			tag = assetEntityService.getNextAssetTag( project )
 		}
 		return tag
-	}
+	}	
 	/**
 	 * NOTE : use this method where ever we are getting project partner.
 	 * This method is used to get project partner  for requested project.

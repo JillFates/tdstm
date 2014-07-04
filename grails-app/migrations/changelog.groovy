@@ -102,4 +102,5 @@ databaseChangeLog = {
 	include file: '20140627-remove-editor-role-from-cookbook-permission.groovy'
 	include file: '20140701-delete-asset-dependency-orphaned-record.groovy'
 	include file: '20140205-add-viewtaskgraph-permissions.groovy'
+	include file: '20140704-pre-seed-asset-tag-sequence-for-existing-clients.groovy'
 }
