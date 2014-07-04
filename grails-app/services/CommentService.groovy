@@ -190,6 +190,15 @@ class CommentService {
 			if (params.containsKey('role')) {
 				assetComment.role = params.role ?: null
 			}
+			if (assetComment.commentType == 'comment' && params.isResolved?.isNumber()) {
+				if (Integer.parseInt(params.isResolved) == 0) {
+					assetComment.setDateResolved(null)
+					assetComment.resolvedBy = null
+				} else {
+					assetComment.setDateResolved(TimeUtil.nowGMT())
+					assetComment.resolvedBy = userLogin.person
+				}
+			}
 			
 			// Actual Start/Finish are handled by the statusUpdate function
 			// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)

@@ -986,7 +986,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 			commentFromId: '',
 			prevAsset: '',
 
-			isResolved: 0,
+			isResolved: '0',
 			resolution: '',
 
 			commentType: 'comment',
@@ -1027,7 +1027,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		var ac = response.assetComment;
 		temp.comment = ac.comment;
 		temp.category = ac.category;
-		temp.isResolved = ac.isResolved;
+		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
 		temp.resolution = ac.resolution;
 		temp.commentType = ac.commentType;
 		temp.role = ac.role ? ac.role.toString() : '';

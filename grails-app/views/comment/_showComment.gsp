@@ -30,6 +30,10 @@
 						</td>
 					</tr>
 					<tr>
+						<td valign="top" class="name"><label for="isResolved"></label></td>
+						<td valign="top" class="value" id="isResolved" colspan="3"><input type="checkbox" id="isResolved" name="isResolved" value="1" ng-model="ac.isResolved" ng-true-value="1" ng-false-value="0" ng-disabled="true" />&nbsp;<label for="asset">Archived</label></td>
+					</tr>
+					<tr>
 						<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 						<td valign="top" class="value" id="createdById" colspan="3">{{acData.personCreateObj?(acData.personCreateObj+" at "+acData.dtCreated):""}}</td>
 					</tr>

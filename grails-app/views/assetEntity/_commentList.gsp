@@ -16,7 +16,7 @@
 		</thead>
 		<tbody id="listCommentsTbodyIds">
 		<g:each status="i" in="${assetCommentList}"  var="commentList">
-		<tr style="cursor: pointer;" class="${commentList.status == 'Completed' || commentList.status=='Pending' ? 'resolved' : 'ready' }">
+		<tr style="cursor: pointer;" class="${(commentList.commentType == 'issue')?((commentList.status == 'Completed' || commentList.status=='Pending')? 'resolved' : 'ready'):(commentList.isResolved?'resolved':'ready') }">
 			<td>
 				<g:if test="${commentList.commentType == 'comment'}">
 					<a href ="javascript:showComment(${commentList.id},'edit','${commentList.commentType}')" ><img src="${resource(dir:'icons',file:'comment_edit.png')}" border="0px"/></a>
@@ -27,7 +27,7 @@
 			</td>
 			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" style="text-align: center;">${commentList.taskNumber ?:'c'}</td>
 			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.comment}</td>
-			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.status}</td>
+			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${(commentList.commentType == 'issue')?commentList.status:((commentList.isResolved?'Archived':''))}</td>
 			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.category}</td>
 			<td onclick="javascript:showComment(${commentList.id},'show','${commentList.commentType}')" >${commentList.assignedTo}/${commentList.role}</td>
 		</tr>
