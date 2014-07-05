@@ -75,7 +75,7 @@
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
 								<td><input type="text" id="assetName" name="assetName" class="${config.assetName} ${highlightMap.validation?:''}" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
-								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap">Description</td>
+								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
 								<td colspan="2">
 									<input type="text" id="description" class="${config.description}" name="description" 
 										value="${assetEntityInstance.description}" size="35" />
@@ -137,9 +137,9 @@
 								</td>
 								<td ><g:select id="priority" name ="priority" class="${config.priority}" from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':' Please Select']}" tabindex="21"/>
 								</td>
-								<td class="label rackLabel ${config.sourceRack} ${highlightMap.validation?:''}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
-								<td class="label bladeLabel ${config.sourceBladeChassis}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
-								<td class="label vmLabel ${config.virtualHost}" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
+								<td class="label rackLabel ${config.sourceRack} ${highlightMap.sourceRack?:''}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
+								<td class="label bladeLabel ${config.sourceBladeChassis} ${highlightMap.sourceBladeChassis?:''}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
+								<td class="label vmLabel ${config.virtualHost} ${highlightMap.virtualHost?:''}" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label>
 								
 								<td class="rackLabel">
 									<span class="useRackS">
@@ -181,16 +181,16 @@
 									<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Edit']" />
 								 </div>
 								</td>
-								<td class="label ${config.ipAddress} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
+								<td class="label ${config.ipAddress} ${highlightMap.ipAddress?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 								<td ><input type="text" id="ipAddress" name="ipAddress" class="${config.ipAddress}"
 									value="${assetEntityInstance.ipAddress}" tabindex="22"/>
 								</td>
 								<td class="label ${config.sourceRackPosition} ${highlightMap.sourceRackPosition?:''}" nowrap="nowrap"><label for="sourceRackPositionIdedit">Position</label>
 								<td class="rackLabel"><input type="text" id="sourceRackPositionIdedit" class="${config.sourceRackPosition}"
 									name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}" size=10 tabindex="34" /></td>
-								<td class="rackLabel"> <input type="text" id="targetRackPositionIdedit" class="${config.targetRackPosition}"
+								<td class="rackLabel"> <input type="text" id="targetRackPositionIdedit" class="${config.targetRackPosition} "
 									name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}" size=10 tabindex="44" /></td>
-								<td class="bladeLabel ${config.sourceBladePosition}"><input type="text" id="sourceBladePositionId" class="${config.sourceBladePosition}"
+								<td class="bladeLabel ${config.sourceBladePosition} ${highlightMap.sourceBladePosition?:''}"><input type="text" id="sourceBladePositionId" class="${config.sourceBladePosition}"
 									name="sourceBladePosition" value="${assetEntityInstance.sourceBladePosition}" size=10 tabindex="36"/></td>
 								<td class="bladeLabel"><input type="text" id="targetBladePositionId" class="${config.targetBladePosition}"
 									name="targetBladePosition" value="${assetEntityInstance.targetBladePosition}" size=10 tabindex="46" /></td>	
