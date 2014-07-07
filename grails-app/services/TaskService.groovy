@@ -1378,6 +1378,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
 	Map initiateCreateTasksWithRecipe(UserLogin user, Project project, String contextId, String recipeVersionId, Boolean deletePrevious, Boolean useWIP, Boolean publishTasks) {
+		log.debug "initiateCreateTasksWithRecipe() user=$user, project=$project"
+		
 		// Validate the user permissions
 		if (!RolePermissions.hasPermission('GenerateTasks'))
 			throw new UnauthorizedException('User does not have required permission to generate tasks')
@@ -1441,6 +1443,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		String key = taskBatchKey(tb.id)
 		this.progressService.create(key, 'Pending')
 
+		log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks"
 		// Kickoff the background job to generate the tasks
 		// TODO : This should be a Quartz job going forward so that we can throttle the number of jobs that can run at a time 
 		// as well as segregate which server runs these jobs when we get to a cluster
@@ -2418,8 +2421,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						// Flip the predecessor tasks to a Map<List> of the tasks by the associated asset id
 						predecessorTasks.each { t -> 
-							if (t.assetEntity)
+							if (t.assetEntity) {
+								if (! predTasksByAssetId.containsKey(t.assetEntity.id)) {
+									predTasksByAssetId[t.assetEntity.id] = []
+								}
 								predTasksByAssetId[t.assetEntity.id] << t
+							}
 						}
 
 						// log.debug "***%%%*** predTasksByAssetId: $predTasksByAssetId"
