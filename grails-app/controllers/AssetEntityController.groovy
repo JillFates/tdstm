@@ -1040,52 +1040,52 @@ class AssetEntityController {
 	 *------------------------------------------------------------*/
 	def export = {
 		//get project Id
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def dataTransferSet = params.dataTransferSet
 		def bundle = request.getParameterValues( "bundle" )
-		def bundleList = new StringBuffer()
 		def bundleNameList = new StringBuffer()
+		def bundles = []
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def bundleSize = bundle.size()
 		def started
 		
 		bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')		
-		for ( int i=0; i< bundleSize ; i++ ) {
-			if( i != bundleSize - 1) {
-				bundleList.append( bundle[i] + "," )
-			} else {
-				bundleList.append( bundle[i] )
-			}
-		}
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
 		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
 		def appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
 		def dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 		def fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
 
-		def project = Project.findById( projectId )
-		if ( projectId == null || projectId == "" ) {
-			flash.message = " Project Name is required. "
-			redirect( action:assetImport, params:[message:flash.message] )
+		def project = securityService.getUserCurrentProject()
+		if ( project == null) {
+			flash.message = " Project is required. "
+			redirect( action:exportAssets, params:[message:flash.message] )
 			return;
 		}
+		def projectId = project.id
 		def asset
 		def application
 		def database
 		def files
 		def assetEntityInstance
 		if(bundle[0] == "" ) {
-			asset = AssetEntity.findAllByProjectAndAssetTypeNotInList( project,["Application","Database","Files"], params )
+			asset = AssetEntity.findAll("from AssetEntity m where m.project=:project and m.assetClass = :assetClass", 
+						[project:project, assetClass:AssetClass.DEVICE] )
 			application =Application.findAllByProject( project )
 			database =Database.findAllByProject( project )
 			files =Files.findAllByProject( project )
 		} else {
-			asset = AssetEntity.findAll("from AssetEntity m where m.project = project and ifnull(m.assetType,'') NOT IN " +
-				"(${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())}) and m.moveBundle in ( $bundleList ) " )
-			application = Application.findAll( "from Application m where m.project = project and m.moveBundle in ( $bundleList )" )
-			database = Database.findAll( "from Database m where m.project = project and m.moveBundle in ( $bundleList )")
-			files = Files.findAll( "from Files m where m.project = project and m.moveBundle in ( $bundleList )" )
+			for ( int i=0; i< bundleSize ; i++ ) {
+				bundles << bundle[i].toLong() 
+			}
+			asset = AssetEntity.findAll("from AssetEntity m where m.project=:project and m.assetClass = :assetClass and m.moveBundle.id in ( :bundles )", 
+						[project:project, assetClass:AssetClass.DEVICE, bundles: bundles] )
+			application = Application.findAll( "from Application m where m.project = :project and m.moveBundle.id in ( :bundles )",
+						[project:project, bundles: bundles] )
+			database = Database.findAll( "from Database m where m.project = :project and m.moveBundle.id in ( :bundles )",
+						[project:project, bundles: bundles] )
+			files = Files.findAll( "from Files m where m.project = :project and m.moveBundle.id in ( :bundles )",
+						[project:project, bundles: bundles] )
 		}
 		//get template Excel
 		def workbook
@@ -1659,7 +1659,8 @@ class AssetEntityController {
 						if(bundle[0] == "" ) {
 							allAssets = AssetEntity.findAllByProject( project, params )
 						}else{
-						    allAssets = AssetEntity.findAll( "from AssetEntity m where m.project = project and m.moveBundle in ( $bundleList ) " )
+						    allAssets = AssetEntity.findAll( "from AssetEntity m where m.project = :project and m.moveBundle.id in ( :bundles ) ",
+						    						[project:project, bundles: bundles])
 						}
 						
 						if(sheetNames[sl] == "Comments"){
