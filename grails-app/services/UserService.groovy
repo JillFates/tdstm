@@ -419,7 +419,7 @@ class UserService {
 		def newsList = []
 		def comingEvents = getEvents(getSelectedProject(project), TimeUtil.nowGMT()).keySet().asList()
 		if(comingEvents){
-			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events) order by dateCreated desc",[events:comingEvents.id])
+			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events) and isArchived =:isArchived  order by dateCreated desc",[events:comingEvents.id, isArchived:0])
 		}
 		
 		return newsList
@@ -451,7 +451,7 @@ class UserService {
 			}
 		}
 		if(project=="All"){
-			issueList:issueList.sort{it.item.project}
+			issueList:issueList.sort{it.item.score}
 		}
 		def dueTaskCount = issueList.item.findAll {it.duedate && it.duedate < TimeUtil.nowGMT()}.size()
 		return [taskList:issueList, timeInMin:timeInMin, dueTaskCount:dueTaskCount, personId:person.id]
@@ -499,7 +499,7 @@ class UserService {
 		def recentLogin = [:]
 		def projects = getSelectedProject( project )
 		(loginPersons-securityService.getUserLogin()).each{
-			if(it?.lastLogin && it?.lastLogin.getTime()>timeNow-1800000){
+			if(it?.lastPage && it?.lastPage.getTime()>timeNow-1800000){
 				def loginProjId = UserPreference.executeQuery("SELECT value FROM UserPreference where userLogin.id=? and preferenceCode=?",[it.id,'CURR_PROJ'])[0]
 				if(NumberUtils.toLong(loginProjId) in projects?.id){
 					recentLogin << [(it.id) : ['name':it.person, 'project':Project.get(loginProjId)]]

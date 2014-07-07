@@ -26,14 +26,14 @@
 						<td id="comment_${item?.id}"
 							class="actionBar asset_details_block_task"
 							data-itemId="${item?.id}" data-status="${item?.status}"
-							style="width: 50% !important;">
+							style="width: auto !important;">
 							${issue?.projectName}
 						</td>
 					</g:if>
 					<td id="comment_${item?.id}"
 						class="actionBar asset_details_block_task"
 						data-itemId="${item?.id}" data-status="${item?.status}"
-						style="width: 50% !important;">
+						style="width: auto !important;">
 						${item?.taskNumber?item?.taskNumber+' - ' : ''} ${item?.comment}
 					</td>
 					<td id="asset_${item?.id}" class="asset_details_block"

@@ -29,7 +29,7 @@
 <div id="doc" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<!-- Body Starts here-->
 	<div id="bodycontent" >
-	<h1 style="float:left;position:absolute;">User Dashboard</h1>
+	<h1 style="float:left;position:absolute;">User Dashboard for ${loggedInPerson}</h1>
 		<div>
 			<div style="float: left;margin-top:3%;position:absolute;">
 			<span> 
@@ -43,6 +43,7 @@
 		</div>
 	</div>
 	<g:render template="../assetEntity/initAssetEntityData"/>
+	<div id="personGeneralViewId" style="display: none;" title="User Details"></div>
 </div>
 <script type="text/javascript">
 
@@ -248,11 +249,40 @@ function loadActivepplTable(id){
 		}
 	});
 }
+
+function getUserDetails(personId, renderPage){
+		jQuery.ajax({
+			url : contextPath+'/person/loadGeneral',
+			data : {
+				'personId' : personId,'tab':renderPage
+			},
+			type : 'POST',
+			success : function(data) {
+				$("#personGeneralViewId").html(data)
+				$("#personGeneralViewId").dialog('option', 'width', '420px')
+				$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
+				$("#edtBId").parent().remove()
+				$("#personGeneralViewId").dialog('open');
+				
+			}
+		});
+		
+}
+
+function switchTab(id,divId,header){
+	$(".person").hide()
+	currentTabShow = divId
+	currentHeaderShow = header
+	$(".mobmenu").removeClass("mobselect")
+	$("#"+currentHeaderShow).addClass("mobselect")
+	$("#"+currentTabShow).show()
+}
 </script>
 <script>
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
 	$(document).ready(function() {
+		$("#personGeneralViewId").dialog({ autoOpen: false })
 		var myOption = "<option value='0'>All Active</option>"
 		<g:if test="${projects.size()>1}">
 			$("#userProjectId option:first").before(myOption);

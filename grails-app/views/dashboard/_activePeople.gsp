@@ -1,5 +1,5 @@
 <g:each in="${recentLogin.keySet()}" var="per">
-	<tr>
+	<tr class="cursor" onclick="getUserDetails(${recentLogin[per].name.id})">
 		<td>
 			${recentLogin[per].project.name}
 		</td>

@@ -33,6 +33,7 @@
 				<h4 class="eventNewsHeader user_dashboard_head">Event News</h4>
 				<span class="descriptionText">&nbsp;Active news for your events <input type="button" value="Refresh" onclick="loadEventNewsTable()"/></span>
 				<br>
+				<br>
 				<div class="eventNewsScrolableTable">
 					<table class="fullWidth" cellspacing="0px" id="eventNewsTable">
 						<thead>
