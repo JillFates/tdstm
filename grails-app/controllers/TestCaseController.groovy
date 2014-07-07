@@ -373,4 +373,9 @@ class TestCaseController {
 
 	}
 
+	def test401 = {
+		// render(view:'/error/401')
+		response.sendError(401, 'Unauthorized')
+	}
+
 }

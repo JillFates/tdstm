@@ -157,8 +157,14 @@ class UrlMappings {
 			controller = "auth"
 			action = [GET:"maintMode"]
 		}
-    	   	
-    	
+    	 
+    	"401" (controller:'error', action:'error401')
+    	/*
+    		controller = 'error'
+    		action = [ GET:'error401' ]
+    	}
+		*/
+
     	"500"(view:'/error')
 		"401"(view:'/unauthorized')
 	}

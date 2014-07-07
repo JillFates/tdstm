@@ -1379,7 +1379,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	Map initiateCreateTasksWithRecipe(UserLogin user, Project project, String contextId, String recipeVersionId, Boolean deletePrevious, Boolean useWIP, Boolean publishTasks) {
 		log.debug "initiateCreateTasksWithRecipe() user=$user, project=$project"
-		
+
 		// Validate the user permissions
 		if (!RolePermissions.hasPermission('GenerateTasks'))
 			throw new UnauthorizedException('User does not have required permission to generate tasks')
@@ -1437,25 +1437,27 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 		
-		final TaskBatch tb = this.createTaskBatch(user.person, project, contextType, cid, recipeVersion, publishTasks);
-		final def tbId = tb.id
+		TaskBatch tb = this.createTaskBatch(user.person, project, contextType, cid, recipeVersion, publishTasks)
 		
 		String key = taskBatchKey(tb.id)
 		this.progressService.create(key, 'Pending')
 
-		log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks"
 		// Kickoff the background job to generate the tasks
-		// TODO : This should be a Quartz job going forward so that we can throttle the number of jobs that can run at a time 
-		// as well as segregate which server runs these jobs when we get to a cluster
-		this.executors.submit(new Runnable() {
-			void run() {
-				TaskBatch.withTransaction( { status ->
-					def taskBatch = TaskBatch.get(tbId)
-					this.generateTasks(taskBatch, publishTasks)
-				} );
-			}
-		});
-		// generateTasks(tb, publishTasks)
+		def jobName = "TM-GenerateTasks-${project.id}-${contextType}-${cid}"
+		try {
+			log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks $jobName"
+			// Delay 2 seconds to allow this current transaction to commit before firing off the job
+			Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 2000) )
+	        trigger.jobDataMap.putAll( [ 'taskBatchId':tb.id, 'publishTasks':publishTasks], 'tries':0L )
+			trigger.setJobName('GenerateTasksJob')
+			trigger.setJobGroup('tdstm-generate-tasks')
+			quartzScheduler.scheduleJob(trigger)
+			log.debug "initiateCreateTasksWithRecipe : dispatched Quartz job"
+		} catch (ex) {
+			log.error "initiateCreateTasksWithRecipe failed to create Quartz job : ${ex.getMessage()}"
+			progressService.update(key, 100I, 'Failed')
+			throw new RuntimeException('It appears that someone else is currently generating tasks for this context and recipe.')
+		}
 
 		return ['jobId' : key, 'taskBatch' : tb]
 	}
@@ -1902,7 +1904,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// Now iterate over each of the task specs
 			recipeTasks.each { taskSpec ->
 				
-				progressService.update(progressKey, Math.round(percComplete).toInteger(), 'Processing', "Generating tasks for task spec ${taskSpec.id}" )
+				progressService.update(progressKey, Math.round(percComplete).toInteger(), 'Processing', "Generating tasks for spec ${taskSpec.id}" )
 
 				if (taskSpec.containsKey('disabled') && taskSpec.disabled) {
 					if (isDebugEnabled) log.debug "Skipping taskSpec ${taskSpec.id} that is disable"
