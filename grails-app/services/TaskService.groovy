@@ -1447,8 +1447,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		try {
 			log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks $jobName"
 			// Delay 2 seconds to allow this current transaction to commit before firing off the job
-			Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 2000) )
-	        trigger.jobDataMap.putAll( [ 'taskBatchId':tb.id, 'publishTasks':publishTasks], 'tries':0L )
+			Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 500) )
+	        trigger.jobDataMap.putAll( [ 'taskBatchId':tb.id, 'publishTasks':publishTasks, 'tries':0L] )
 			trigger.setJobName('GenerateTasksJob')
 			trigger.setJobGroup('tdstm-generate-tasks')
 			quartzScheduler.scheduleJob(trigger)

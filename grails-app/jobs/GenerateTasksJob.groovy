@@ -33,7 +33,28 @@ class GenerateTasksJob {
 		if (taskBatch) {
 			taskService.generateTasks(taskBatch, publishTasks)
 		} else {
-			log.error "GenerateTasksJob failed to find batch $taskBatchId"
+			def tries = dataMap.getLongValue('tries')
+			if (tries > 10) {
+				log.error "GenerateTasksJob - Gave up on waiting for taskBatchId $taskBatchId"
+				return
+			}
+
+			// Reschedule the job for 2000ms
+			long nextFiring = System.currentTimeMillis() + 2000 // 2 seconds
+			Date nextFiringDate = new Date(nextFiring)
+			Trigger trigger = context.getTrigger()
+			trigger.setStartTime(nextFiringDate)
+
+			// Update the retries count
+			def map = context.getJobDetail().getJobDataMap()
+			map.put("tries", tries)
+			trigger.jobDataMap.putAll(map)
+			log.info "JobDataMap = $map"
+
+			// reschedule the job
+			String triggerName = trigger.getName()
+			context.getScheduler().rescheduleJob(triggerName, trigger.getGroup(), trigger)
+			log.info("Rescheduled job ${triggerName} for ${nextFiringDate}, tries=$tries")
 		}
 	}
 }
