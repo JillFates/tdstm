@@ -1834,6 +1834,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.debug '*************************************************************************************'
 			log.debug "**************** generateRunbook() by $whom for MoveEvent $moveEvent ****************"
 			log.debug '*************************************************************************************'
+			// log.debug "projectStaff is $projectStaff"
 		}
 
 		def recipeVersion 	// Holds reference to the recipeVersion that the TaskBatch points to
@@ -2590,7 +2591,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							}		
 
 							if (! wasWired) {
-								msg = "No predecessor tasks found for predecessor.taskSpec in spec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
+								msg = "No predecessor tasks found for predecessor.taskSpec (spec ${taskSpec.id}) for task $tnp"
 								log.info(msg)
 								exceptions.append("${msg}<br>")
 								exceptCnt++
