@@ -664,7 +664,8 @@ class MoveBundleController {
 		def totalVirtualAssetCount = virtualCount
 
 		// Get the Others Count
-		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND $unassignedMBQuery AND COALESCE(ae.assetType,'') IN (:type)"
+		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND " +
+			"$unassignedMBQuery AND COALESCE(ae.assetType,'') NOT IN (:type)"
 		def unassignedOtherCount = AssetEntity.executeQuery(unAssignedOtherCountQuery, assetCountQueryArgs + [ type:AssetType.getAllServerTypes() ] )[0]
 
 		// ------------------------------------
