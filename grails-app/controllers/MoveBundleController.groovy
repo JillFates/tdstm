@@ -505,14 +505,12 @@ class MoveBundleController {
 			return
 		}
 
-		def allEventsList = moveBundleList*.moveEvent
-		Set moveEventList = []
-		allEventsList.each { me ->
-			if (me) {
-				def times = me.getEventTimes()
-				if (times.start)
-					moveEventList << me
-			}
+		// Get the list of Move Events and sort on the start date 
+		List moveEventList = moveBundleList*.moveEvent.unique()
+		moveEventList.remove(null)
+		moveEventList = moveEventList.sort { 
+			def start = it.getEventTimes().start
+			(start ? "$start-${it.name}" : it.name)
 		}
 
 		// Forming query for multi-uses
@@ -563,9 +561,8 @@ class MoveBundleController {
 			def moveBundles = moveEvent.moveBundles?.findAll {it.useForPlanning}
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 			
-			def startDate = moveBundles.startTime.sort()
-			startDate?.removeAll( [null] )
-			eventStartDate << [(moveEvent.id):(startDate && startDate[0] ? bundleTimeformatter.format(startDate[0]) : 'TBD')]
+			def eventDates = moveEvent.getEventTimes()
+			eventStartDate << [(moveEvent.id):(eventDates.start ? bundleTimeformatter.format(eventDates.start) : 'TBD')]
 			
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
@@ -609,8 +606,7 @@ class MoveBundleController {
 				and a.moveEvent = :event AND a.isPublished=true", [project:project, type:AssetCommentType.TASK, 
 				status: [AssetCommentStatus.READY,AssetCommentStatus.STARTED,AssetCommentStatus.PENDING], event:moveEvent] )
 			
-			openTasks << [moveEvent:moveEvent.id , count:openIssues.size()]
-			
+			openTasks << [moveEvent:moveEvent.id , count:openIssues.size()]			
 		}
 		
 		// ----------------------------------------------------------------------------
