@@ -1935,7 +1935,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				def findParent = false		// Flag if the taskspec requires linking predecessor to a parent predecessor for an asset related task
 				def assetsForTask = []		// This will contain the list of assets to which tasks are created for asset type taskspec
 				def predTaskSpecs = null 		// Will hold an array of predecessor.taskSpec references if defined
-				def predTasksByAssetId = [:].withDefault {[]}	// This will hold all of the tasks by asset.id when we're processing dependencies along with taskSpec(s)
+				def predTasksByAssetId = [:].withDefault {[]}	// This will hold all of the predecessor tasks by asset.id for precedecessor.taskSpec element
+				def predTasksWithNoAssets = []	// This will hold all of the predecessor tasks that are not associated with Assets for precedecessor.taskSpec element
 
 				// because it could cause adverse dependency linkings.
 				log.info "##### Processing taskSpec $taskSpec"
@@ -2406,9 +2407,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						assetIdsForTask = assetsForTask*.id
 					}	
 
+					// Populate predecessorTasks array with all tasks that were created by the referenced predecessor.taskSpec(s)
 					if (hasPredTaskSpec) {
-						// Populate predecessorTasks array with all tasks that were created by the referenced predecessor.taskSpec(s)
-
 						predTaskSpecs.each() { ts -> 
 							// Find all predecessor tasks that have the taskSpec ID #
 							if ( taskSpecTasks.containsKey( ts ) ) {
@@ -2430,6 +2430,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								predTasksByAssetId[t.assetEntity.id] << t
 							}
 						}
+						predTasksWithNoAssets = predecessorTasks.findAll { ! it.assetEntity }
 
 						// log.debug "***%%%*** predTasksByAssetId: $predTasksByAssetId"
 					}	
@@ -2551,6 +2552,54 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							}
 						}
 
+						// 
+						// Wire up based on predecessor.taskSpec setting if it was declared
+						//
+						if ( hasPredTaskSpec) {
+							//
+							// --- TASKSPEC used W/O mode ---
+							//
+						
+							if (isDebugEnabled) log.debug "Processing in hasPredTaskSpec of DIRECT_MODE"
+						
+							// Use the predecessorTasks array that was initialized earlier. If any of those tasks and the current task are associated with the
+							// same asset then wire up the predecessor tasks one-to-one for each asset otherwise wire the current task to all tasks in the 
+							// predecessorTasks. If both have assets and we are unable to find a predecessor task for the same asset, the current task will 
+							// be wired to the most recent milestone if it exists.
+
+							// First try to look for predecessor tasks by asset id
+							if (tnp.assetEntity && predTasksByAssetId.containsKey(tnp.assetEntity.id) ) {
+								predTasksByAssetId[tnp.assetEntity.id].each { pt ->
+									if (isDebugEnabled) log.debug "Calling createTaskDependency from TASKSPEC 1"
+									depCount += createTaskDependency(pt, tnp, taskList, assetsLatestTask, settings, out)
+									wasWired = true
+									if ( isRequired ) {
+										// Update the Asset's last task based on if the previous task is for an asset or the current one is for an asset
+										// TODO - NOT certain that we need this predecessor assignment and need to investigate
+										assignToAssetsLatestTask(tnp.assetEntity, tnp, assetsLatestTask)
+										log.info "Adding latest task $tnp to asset ${tnp.assetEntity} - 7"
+									}
+								}		
+							}
+
+							// Now try and find all non-asset predecessor tasks and wire to them
+							predTasksWithNoAssets.each { pt ->
+								if (isDebugEnabled) log.debug "Calling createTaskDependency from TASKSPEC 2"
+								depCount += createTaskDependency(pt, tnp, taskList, assetsLatestTask, settings, out)
+								wasWired = true
+							}		
+
+							if (! wasWired) {
+								msg = "No predecessor tasks found for predecessor.taskSpec in spec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
+								log.info(msg)
+								exceptions.append("${msg}<br>")
+								exceptCnt++
+							}																	
+						}
+
+						// 
+						// Wire up based on the Mapping Mode
+						//
 						switch(mapMode) {
 												
 							case 'DIRECT_MODE':
@@ -2642,80 +2691,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 										}
 									}					
 								
-								} else if ( hasPredTaskSpec && ! depMode) {
-									//
-									// --- TASKSPEC used W/O mode ---
-									//
-								
-									if (isDebugEnabled) log.debug "Processing in hasPredTaskSpec of DIRECT_MODE"
-								
-									// Use the predecessorTasks array that was initialized earlier. If any of those tasks and the current task are associated with the
-									// same asset then wire up the predecessor tasks one-to-one for each asset otherwise wire the current task to all tasks in the 
-									// predecessorTasks. If both have assets and we are unable to find a predecessor task for the same asset, the current task will 
-									// be wired to the most recent milestone if it exists.
-									if (predecessorTasks.size() > 0) {
-									
-										// See if we're linking task to task by asset 
-										if (predecessorTasks[0].assetEntity && tnp.assetEntity) {
-											// Wire asset-to-asset for tasks if there is a match
-											def predTask = predecessorTasks.find { it.assetEntity.id == tnp.assetEntity.id }
-											if (predTask) {										
-												if (isDebugEnabled) log.debug "Calling createTaskDependency from TASKSPEC"
-												depCount += createTaskDependency(predTask, tnp, taskList, assetsLatestTask, settings, out)
-												wasWired = true
-											} else {
-												msg = "No predecessor task for asset (${tnp.assetEntity}) found to link to task ($tnp) in taskSpec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
+								} 
 
-												// Push the task onto the missing pred stack to be wired later if possible
-												// TODO - Need to validate that this is necessary as it might wire things wrong
-												saveMissingDep(missedDepList, "${tnp.assetEntity.id}_${tnp.category ?: 'BLANK'}", taskSpec, tnp, isRequired, latestMilestone)
-											}
-										} else {
-											// Link all predecessorTasks to tnp
-											// Wire the current task as the successor to all tasks specified in the predecessor.taskSpec property
-											log.info "predecessorTasks=${predecessorTasks.class}"
-											predecessorTasks.each() { predTask -> 
-												if (isDebugEnabled) {
-													log.debug "predTask=${predTask.class}"
-													log.debug "Calling createTaskDependency from TASKSPEC 2"
-												}
-												depCount += createTaskDependency(predTask, tnp, taskList, assetsLatestTask, settings, out)
-
-												if ( isRequired ) {
-													// Update the Asset's last task based on if the previous task is for an asset or the current one is for an asset
-													// TODO - NOT certain that we need this predecessor assignment and need to investigate
-													if ( predTask.assetEntity ) {
-														// assetsLatestTask[predTask.assetEntity.id] = tnp
-														assignToAssetsLatestTask(predTask.assetEntity, tnp, assetsLatestTask)
-														log.info "Adding latest task $tnp to asset ${tnp.assetEntity} - 7"
-													
-													} //else if ( tnp.assetEntity )  {
-														// assetsLatestTask[tnp.assetEntity.id] = tnp
-														// log.info "Adding latest task $tnp to asset ${tnp.assetEntity} - 8"
-													
-													// }
-												}
-											}
-											wasWired = predecessorTasks.size() > 0										
-										} 
-									} else {
-										msg = "Predecessor task list was empty for taskSpec in taskSpec ${taskSpec.id} (DIRECT_MODE/taskSpec)"
-										log.info(msg)
-										exceptions.append("${msg}<br>")
-										exceptCnt++
-									}
-																	
-								} else {
-									//
-									// --- BASIC ASSET PREDECESSOR --
-									//
-								
-									log.info "Processing from Basic Asset Predecessor"
-								
+								if (! wasWired) {
+									if (isDebugEnabled) log.debug "MapMode $mapMode - Wiring task predecessor to default"
 									linkTaskToLastAssetOrMilestone(tnp)
-									wasWired = true
+									wasWired = true									
 								}
-							
 								break
 								
 							case 'ASSET_DEP_MODE':
@@ -2814,6 +2796,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 									assetDependencies.each { ad ->
 
 										def predAsset 
+										// TODO TM-2968 -- This variable should only be an r|s so 'b' seems to be a typo also I don't understand what is going on in this block
 										if (depMode=='b') {
 											predAsset = (ad.asset.id == tnp.assetEntity.id ? ad.dependent : ad.asset)
 										} else {
@@ -2821,55 +2804,40 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 											predAsset = (depMode == 's' ?  ad.dependent : ad.asset)
 										}
 
-										// We have two ways of handling wiring up predecessors:
-										//    a) With taskspec references, wire to all of the tasks created for the supporting assets that were created by the taskSpec(s)
-										//    b) Wire to the last tasks of the supporting assets
-										if (hasPredTaskSpec) {
-											// Wiring dependencies referencing tasks created in earlier taskSpecs. We will find all tasks for each asset associated 
-											// with the task needing predecessors
-											if (isDebugEnabled) log.debug "Wiring predecessors based on previous taskSpecs for Asset $predAsset"
-											if (predTasksByAssetId.containsKey(predAsset.id)) {
-												predTasksByAssetId[predAsset.id].each { pt ->
-													if (isDebugEnabled) log.debug "Calling createTaskDependency from ASSET_DEP_MODE.taskSpec"
-													depCount += createTaskDependency(pt, tnp, taskList, assetsLatestTask, settings, out)
-													wasWired=true
+										// Now Wire to the last tasks of the supporting assets
+
+										if (isDebugEnabled) log.debug "Working on dependency asset (${ad.asset}_ depends on (${ad.dependent}) - matching on asset $predAsset"
+
+										// Make sure that the other asset is in one of the bundles in the event
+										def predMoveBundle = predAsset.moveBundle
+										if (! predMoveBundle || ! bundleIds.contains(predMoveBundle.id)) {
+											exceptions.append("Asset dependency references asset not in event: task($tnp) between asset ${tnp.assetEntity} and ${predAsset}<br>")
+											exceptCnt++
+										} else {
+											// Find the last task for the predAsset to create associations between tasks. If the predecessor was created
+											// during the same taskStep, assetsLatestTask may not yet be populated so we can scan the tasks created list for
+											// one with the same taskSpec id #
+											def previousTask = null
+											previousTask = taskList.find { i, t -> t.assetEntity?.id == predAsset.id && t.taskSpec == tnp.taskSpec }?.value
+											if (previousTask) {
+												log.info "Found task in taskList array - task (${previousTask})"
+											} else {
+												// Try finding latest task for the asset
+												if (assetsLatestTask.containsKey(predAsset.id)) {
+													previousTask = assetsLatestTask[predAsset.id]
+													log.info "Found task from assetsLatestTask array - task (${previousTask})"
 												}
 											}
-										} else {
-
-											if (isDebugEnabled) log.debug "Working on dependency asset (${ad.asset}_ depends on (${ad.dependent}) - matching on asset $predAsset"
-
-											// Make sure that the other asset is in one of the bundles in the event
-											def predMoveBundle = predAsset.moveBundle
-											if (! predMoveBundle || ! bundleIds.contains(predMoveBundle.id)) {
-												exceptions.append("Asset dependency references asset not in event: task($tnp) between asset ${tnp.assetEntity} and ${predAsset}<br>")
-												exceptCnt++
+											if (previousTask) {
+												if (isDebugEnabled) log.debug "Calling createTaskDependency from ASSET_DEP_MODE"
+												depCount += createTaskDependency(previousTask, tnp, taskList, assetsLatestTask, settings, out)
+												wasWired=true
 											} else {
-												// Find the last task for the predAsset to create associations between tasks. If the predecessor was created
-												// during the same taskStep, assetsLatestTask may not yet be populated so we can scan the tasks created list for
-												// one with the same taskSpec id #
-												def previousTask = null
-												previousTask = taskList.find { i, t -> t.assetEntity?.id == predAsset.id && t.taskSpec == tnp.taskSpec }?.value
-												if (previousTask) {
-													log.info "Found task in taskList array - task (${previousTask})"
-												} else {
-													// Try finding latest task for the asset
-													if (assetsLatestTask.containsKey(predAsset.id)) {
-														previousTask = assetsLatestTask[predAsset.id]
-														log.info "Found task from assetsLatestTask array - task (${previousTask})"
-													}
-												}
-												if (previousTask) {
-													if (isDebugEnabled) log.debug "Calling createTaskDependency from ASSET_DEP_MODE"
-													depCount += createTaskDependency(previousTask, tnp, taskList, assetsLatestTask, settings, out)
-													wasWired=true
-												} else {
-													log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp) ASSET_DEP_MODE"
-													// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br>")
-													
-													// Push this task onto the stack to be wired up later on
-													saveMissingDep(missedDepList, "${predAsset.id}_${tnp.category}", taskSpec, tnp, isRequired, latestMilestone, ad)
-												}
+												log.info "No predecessor task found for asset ($predAsset) to link to task ($tnp) ASSET_DEP_MODE"
+												// exceptions.append("No predecessor task found for asset ($predAsset) to link to task ($tnp)<br>")
+												
+												// Push this task onto the stack to be wired up later on
+												saveMissingDep(missedDepList, "${predAsset.id}_${tnp.category}", taskSpec, tnp, isRequired, latestMilestone, ad)
 											}
 										}
 									} // assetDependencies.each
