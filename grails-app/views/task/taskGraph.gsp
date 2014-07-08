@@ -27,9 +27,6 @@ THE SOFTWARE.
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
 		
-		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		
 		<g:javascript src="jquery-1.9.1.js"/>	
@@ -38,6 +35,10 @@ THE SOFTWARE.
 		<g:javascript src="angular/plugins/angular-ui.js"/>	
 		<g:javascript src="angular/plugins/angular-resource.js" />
 		<g:javascript src="asset.comment.js" />
+		
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		
 		<style type="text/css">
 			g#graph0 {
@@ -62,7 +63,7 @@ THE SOFTWARE.
 		var container = null;
 		var graph = null;
 		var svg = null;
-		var neighborhoodTaskId = null;
+		var neighborhoodTaskId = ${neighborhoodTaskId};
 		var background = null;
 		var width = 0;
 		var height = 0;
@@ -172,7 +173,7 @@ THE SOFTWARE.
 		}
 		
 		function submitForm () {
-			neighborhoodTaskId = null;
+			neighborhoodTaskId = -1;
 			generateGraph($('#moveEventId').val());
 		}
 
@@ -187,7 +188,7 @@ THE SOFTWARE.
 			$('#spinnerId').css('display', 'block');
 			
 			
-			if (neighborhoodTaskId == null)
+			if (neighborhoodTaskId == -1)
 				jQuery.ajax({
 					dataType: 'json',
 					url: 'moveEventTaskGraph',

@@ -1493,7 +1493,7 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 			};
 
 			scope.showNeighborhood = function(button) {
-				window.open(utils.url.applyRootPath('/task/neighborhoodGraph/' + scope.comment.commentId), '_blank');
+				window.open(utils.url.applyRootPath('/task/taskGraph?neighborhoodTaskId=' + scope.comment.commentId), '_blank');
 			};
 
 			var postAction = function(button, data) {

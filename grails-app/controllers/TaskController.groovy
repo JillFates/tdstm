@@ -575,7 +575,10 @@ digraph runbook {
 		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
 		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
 		
-		return [moveEvents:moveEvents, selectedEventId:selectedEventId]
+		// handle neighborhood graph specification
+		def neighborhoodTaskId = params.neighborhoodTaskId ?: -1
+		
+		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId]
 	}
 	
 	/**
