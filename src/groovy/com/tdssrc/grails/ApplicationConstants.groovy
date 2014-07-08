@@ -20,7 +20,7 @@ class ApplicationConstants {
 		All:AssetType.getAllServerTypes(), 
 		physical:AssetType.getPhysicalServerTypes(), 
 		virtual:AssetType.getVirtualServerTypes(),
-		other:AssetType.getNonOtherTypes(),
+		other:AssetType.getAllServerTypes(),
 		storage:AssetType.getStorageTypes(),
 	]
 

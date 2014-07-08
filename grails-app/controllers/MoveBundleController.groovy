@@ -529,7 +529,7 @@ class MoveBundleController {
 		def phyStorageCountQuery = "$selectCount $phyStorageQuery"
 		def deviceQuery = "FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType IN (:type)"
 		def deviceCountQuery = "$selectCount $deviceQuery"	
-		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND ae.assetType NOT IN (:type)"
+		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') NOT IN (:type)"
 
 		def apps = Application.findAll(appQuery, countArgs)
 		def applicationCount = apps.size()
@@ -540,7 +540,7 @@ class MoveBundleController {
 		def assetCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
 		def physicalCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes()] )[0]		
 		def virtualCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]		
-		def otherAssetCount= AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes()] )[0]
+		def otherAssetCount= AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
 
  		// Get the list of apps and servers assigned to planning bundles
 		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs) 
@@ -602,7 +602,7 @@ class MoveBundleController {
 			def otherCount = moveBundles ? AssetEntity.executeQuery(otherCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0] : 0
 			otherTypeList << [ moveEvent:moveEvent.id , count:otherCount ]
 			
-			def openIssues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status in (:status) \
+			def openIssues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status IN (:status) \
 				and a.moveEvent = :event AND a.isPublished=true", [project:project, type:AssetCommentType.TASK, 
 				status: [AssetCommentStatus.READY,AssetCommentStatus.STARTED,AssetCommentStatus.PENDING], event:moveEvent] )
 			
@@ -651,7 +651,7 @@ class MoveBundleController {
 		assetCountQueryArgs.assetClass = AssetClass.DEVICE
 
 		// Get counts on devices/vms
-		def unAssignedCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND $unassignedMBQuery $assetTypeQuery"
+		def unAssignedCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass $assetTypeQuery AND $unassignedMBQuery"
 		def unassignedAssetCount = AssetEntity.executeQuery(unAssignedCountQuery, assetCountQueryArgs + [ type:AssetType.getAllServerTypes() ] )[0]	
 		def unassignedPhysialAssetCount = AssetEntity.executeQuery(unAssignedCountQuery, assetCountQueryArgs + [ type:AssetType.getPhysicalServerTypes() ] )[0]
 		def unassignedVirtualAssetCount = AssetEntity.executeQuery(unAssignedCountQuery, assetCountQueryArgs + [ type:AssetType.getVirtualServerTypes() ] )[0]
@@ -664,7 +664,7 @@ class MoveBundleController {
 		def totalVirtualAssetCount = virtualCount
 
 		// Get the Others Count
-		def unAssignedOtherCountQuery = StringUtils.replace(unAssignedCountQuery, ' IN ', ' NOT IN ', 1 )
+		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND $unassignedMBQuery AND COALESCE(ae.assetType,'') IN (:type)"
 		def unassignedOtherCount = AssetEntity.executeQuery(unAssignedOtherCountQuery, assetCountQueryArgs + [ type:AssetType.getAllServerTypes() ] )[0]
 
 		// ------------------------------------
@@ -794,7 +794,7 @@ class MoveBundleController {
 		def psToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ])[0]
 		def vsToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0]
 		
-		def otherValidateQuery = StringUtils.replace(validateCountQuery, ' IN ', ' NOT IN ', 1 )
+		def otherValidateQuery = countQuery + validationQuery + ' AND ae.assetType NOT IN (:type) AND ae.assetClass=:assetClass'
 		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0]
 		
 		return [			
