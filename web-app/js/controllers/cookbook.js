@@ -58,7 +58,7 @@ app.config(function($stateProvider, $urlRouterProvider, servRootPathProvider) {
         				$scope.assetComments.colDef = $scope.assetComments.withDataColDef;
         				$scope.assetComments.gridData = data.data.tasks;
         			}, function(){
-        				$scope.alerts.addAlert({type: 'danger', msg: 'Error getting tasks of task batch ' + taskBatchId, closeIn: 3000});
+        				$scope.alerts.addAlert({type: 'danger', msg: 'Encountered error while getting tasks for task batch ' + taskBatchId, closeIn: 3000});
         				rootLog.info('Error on reading tasks of task batch');
         				$scope.assetComments.colDef = $scope.assetComments.noColDef;
         				$scope.assetComments.gridData = $scope.assetComments.noGridData;
@@ -335,7 +335,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		}, function(data){
 			$log.warn('Error on getting Recipes');
-			$scope.alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Recipes'});
+			$scope.alerts.addAlert({type: 'danger', msg: 'Received unexpected error while retrieving the list of Recipes'});
 		});
 	}
 
@@ -456,9 +456,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				return (!$scope.preventSelection);
 			}
 			if($scope.editingRecipe) {
-				confirmation = confirm("Recipe " + $scope.currentSelectedRow.entity.name + 
-					" has unsaved changes."+ 
-					"Press Okay to continue and loose those changes otherwise press Cancel");
+				confirmation = confirm("You have unsaved changes to the recipe '" + $scope.currentSelectedRow.entity.name + "'." +
+					"\n\nPress OK to continue and loose those changes otherwise press Cancel.");
 				return (confirmation == true);
 			} else {
 				return (!$scope.preventSelection);
@@ -767,7 +766,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			},
 
 			delete : function(){
-				confirmation = confirm("Delete Recipe \""+row.entity.name+"\"?");
+				confirmation = confirm("You are about to delete the recipe '" + row.entity.name + "'.\n\nPress OK to delete the recipe otherwise press Cancel." );
 				if (confirmation == true){
 					var selectedId = row.entity.recipeId;
 					restCalls.discardWIP({details:selectedId}, function(){
@@ -817,8 +816,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		releaseVersion : function(){
 			var dataToSend = $.param($scope.selectedRecipe),
 			selectedId = $scope.selectedRecipe.recipeId,
-			confirmation = confirm("Only publish recipes if it is ready for use by all users."+
-				"Press Okay to publish otherwise press cancel");
+			confirmation = confirm("You are about to create a release of the recipe that will be a perminant version of the source.\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				restCalls.release({moreDetails:selectedId}, dataToSend, function(){
 					$log.info('Success on Releasing');
@@ -842,8 +840,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		},
 		// Cancel
 		cancelChanges : function(){
-			var confirmation = confirm("You are about to cancel the changes for recipe: " +
-				$scope.currentSelectedRow.entity.name + ". You want to proceed?");
+			var confirmation = confirm("You are about to undo local changes of the recipe.\n\nPress OK to undo changes otherwise press Cancel.");
 			if (confirmation == true){
 				$scope.selectedRWip = angular.copy($scope.originalDataRecipe);
 				$scope.selectedRecipe = angular.copy($scope.originalDataRecipe);
@@ -854,9 +851,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		},
 		// Discard WIP
 		discardWIP : function(){
-			var confirmation = confirm("You are about to discard WIP: " + 
-				$scope.currentSelectedRow.entity.name + "."+
-				" Do you want to proceed?");
+			var confirmation = confirm("You are about to permanently discard the WIP version of the recipe.\n\nPress OK discard WIP otherwise press Cancel.");
 			if (confirmation == true){
 				var dataToSend = $.param($scope.selectedRecipe),
 				selectedId = $scope.selectedRecipe.recipeId,
@@ -1129,9 +1124,9 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		]
 	}
 
-	/////////////////////////////////
-
-	// Modal general stuff ------------------------------
+	// 
+	// Modal data
+	// 
 	$scope.modalBtns = {};
 
 	//Hide or show the modal
@@ -1232,8 +1227,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	
 	$scope.showCreateRecipeDialog = function() {
 		if($scope.editingRecipe){                
-			confirmation=confirm("Recipe " + $scope.currentSelectedRow.entity.name + " has unsaved changes."+ 
-				"Press Okay to continue and loose those changes otherwise press Cancel");
+			confirmation=confirm("You have unsaved changes in recipe '" + $scope.currentSelectedRow.entity.name + "'.\n\n" + 
+				"Press OK to continue and loose those changes otherwise press Cancel.");
 			if (confirmation==true){
 				$scope.showDialog = true;
 			}
@@ -1835,8 +1830,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 
 	// Delete tasks batch function
 	$scope.tasks.deleteTaskBatch = function(id){
-		var confirmation = confirm("Are you sure you want to delete the generated tasks? "+ 
-			"Press Okay to continue and loose those changes otherwise press Cancel");
+		var confirmation = confirm("You are about to delete the tasks generated by this batch.\n\n"+
+			"Press OK to delete the tasks otherwise press Cancel.");
 
 		if (confirmation) {
 			restCalls.deleteTaskBatch({section: id}, function(data){
@@ -1852,8 +1847,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	
 	// Reset tasks batch function
 	$scope.tasks.resetTaskBatch = function(id){
-		var confirmation = confirm("Are you sure you want to reset the generated tasks? "+ 
-				"Press Okay to continue and loose those changes otherwise press Cancel");
+		var confirmation = confirm("You are about to reset the generated tasks that clears out the comments and resets the task statuses.\n\n"+ 
+				"Press OK to continue otherwise press Cancel.");
 
 		if (confirmation) {
 			restCalls.resetTaskBatch({section: id}, function(data){
@@ -1879,8 +1874,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			message = "publish";
 		}
 		
-		var confirmation = confirm("Are you sure you want to " + message + " the generated tasks? "+ 
-		"Press Okay to continue and loose those changes otherwise press Cancel");
+		var confirmation = confirm("You are about to " + message + " the generated tasks.\n\n"+ 
+		"Press OK to " + message + " the tasks otherwise press Cancel.");
 
 		if (confirmation) {
 			if(obj.isPublished){
@@ -2168,8 +2163,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		var version = (item.entity.versionNumber) ? 'version '+item.entity.versionNumber : 'WIP version';
 		if(action == 'revert'){
 			console.log(item.entity);
-			confirmation = confirm("Revert current recipe \"" + $scope.currentSelectedRecipe.name + "\" to " +
-				version + "\n\nPress Okay to continue");
+			confirmation = confirm("You are about to revert the current recipe '" + $scope.currentSelectedRecipe.name + "' to version " +
+				version + ".\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				$log.info(item.entity);
 				restCalls.revert({moreDetails:item.entity.id}, function(){
@@ -2185,8 +2180,8 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 			}
 		}else if(action == 'remove'){
 			console.log($scope.selectedRecipe);
-			confirmation = confirm("Delete " + version + " of recipe \"" + 
-				$scope.currentSelectedRecipe.name + "\" \n\nPress Okay to continue");
+			confirmation = confirm("You are about to delete version " + version + " of recipe '" + 
+				$scope.currentSelectedRecipe.name + "'.\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				$log.info(item.entity);
 				restCalls.discardWIP({details:$scope.selectedRecipe.recipeId, 
