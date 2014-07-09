@@ -214,7 +214,7 @@ THE SOFTWARE.
 				<div class="message">${flash.message}</div>
 			</g:if>
 			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
-			&nbsp; <input type="button" name="exit neighborhood" id="moveEventId" value="exit neighborhood" onclick="submitForm()" />
+			&nbsp; <input type="button" name="exit neighborhood" id="moveEventId" value="Exit Neighborhood Graph" onclick="submitForm()" />
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
 	</body>
