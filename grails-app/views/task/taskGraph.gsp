@@ -178,7 +178,16 @@ THE SOFTWARE.
 		}
 
 		function generateGraph (event) {
+			
 			$('#svgContainerDivId').remove();
+			if (neighborhoodTaskId == -1) {
+				$('#pageHeadingId').html('Task Graph');
+				$('#exitNeighborhoodId').css('display', 'none');
+			} else {
+				$('#pageHeadingId').html('Task Graph - Neighborhood');
+				$('#exitNeighborhoodId').css('display', 'inline-block');
+			}
+			
 			height = 0;
 			var params = {'id':neighborhoodTaskId};
 			if (event != 0)
@@ -209,12 +218,12 @@ THE SOFTWARE.
 	</head>
 	<body>
 		<div class="body">
-			<h1>Task Graph</h1>
+			<h1 id="pageHeadingId">Task Graph</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
 			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
-			&nbsp; <input type="button" name="exit neighborhood" id="moveEventId" value="Exit Neighborhood Graph" onclick="submitForm()" />
+			&nbsp; <input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
 	</body>

@@ -565,6 +565,9 @@ digraph runbook {
 			redirect(controller:"project", action:"list")
 			return
 		}
+		
+		// handle neighborhood graph specification
+		def neighborhoodTaskId = params.neighborhoodTaskId ?: -1
 
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
@@ -573,10 +576,13 @@ digraph runbook {
 		// handle move events
 		def moveEvents = MoveEvent.findAllByProject(project)
 		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
-		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
-		
-		// handle neighborhood graph specification
-		def neighborhoodTaskId = params.neighborhoodTaskId ?: -1
+		long selectedEventId = 0
+		if (eventPref.isLong() && eventPref.toLong() != 0) {
+			selectedEventId = eventPref.toLong()
+		} else if (neighborhoodTaskId != -1) {
+			selectedEventId = AssetComment.get(neighborhoodTaskId)?.moveEvent?.id
+			userPreferenceService.setPreference("MOVE_EVENT", selectedEventId.toString())
+		}
 		
 		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId]
 	}
