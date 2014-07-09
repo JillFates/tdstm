@@ -70,7 +70,7 @@
 						<g:if test="${item.successors > 0 || item.predecessors > 0}">
 							<tds:actionButton label="Neighborhood" icon="tds-task-graph-icon"
 								id="${item?.id}"
-								onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');" />
+								onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'taskGraph']) }?neighborhoodTaskId=${item.id}','_blank');" />
 						</g:if> <g:if
 							test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person"

@@ -86,13 +86,12 @@
 							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"  
 								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')"/>
 							</g:if>
-
+							
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"  
 								onclick="issueDetails(${item?.id},'${item?.status}')"/>
-
 							<g:if test="${item.successors > 0 || item.predecessors > 0}">
 								<tds:actionButton label="Neighborhood" icon="tds-task-graph-icon" id="${item?.id}"  
-									onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'neighborhoodGraph', id: item?.id]) }','_blank');"  
+									onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'taskGraph'])}?neighborhoodTaskId=${item.id}','_blank');"  
 								/>
 							</g:if>
 							<g:if test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
@@ -112,7 +111,7 @@
 							</tds:hasPermission>
 						</td>
 					</tr>
-
+					
 					<tr id="detailTdId_${item?.id}" style="display: none">
 						<td colspan="6">
 							<div id="detailId_${item?.id}" style="width: 100%"></div>

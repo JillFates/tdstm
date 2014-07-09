@@ -350,7 +350,7 @@ digraph runbook {
 				def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
 				def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
 				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
-				def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false])
+				//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false])
 
 				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
 				if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
@@ -525,7 +525,7 @@ digraph runbook {
 			// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
 			attribs = "id=\"${it.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
 			
-			def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
+			//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
 
 			task = (task.size() > 35) ? task[0..34] : task 
 			dotText << "\t${it.task_number} [label=\"${task}\"  id=\"${it.id}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
@@ -577,11 +577,11 @@ digraph runbook {
 		def moveEvents = MoveEvent.findAllByProject(project)
 		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
 		long selectedEventId = 0
-		if (eventPref.isLong() && eventPref.toLong() != 0) {
-			selectedEventId = eventPref.toLong()
-		} else if (neighborhoodTaskId != -1) {
+		if (neighborhoodTaskId != -1) {
 			selectedEventId = AssetComment.get(neighborhoodTaskId)?.moveEvent?.id
 			userPreferenceService.setPreference("MOVE_EVENT", selectedEventId.toString())
+		} else if (eventPref.isLong() && eventPref.toLong() != 0) {
+			selectedEventId = eventPref.toLong()
 		}
 		
 		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId]
