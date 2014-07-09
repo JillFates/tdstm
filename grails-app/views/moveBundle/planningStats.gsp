@@ -435,7 +435,7 @@ $(document).ready(function() {
 				<table class="dashboard_stat_table">
 					<tbody>
 						<tr>
-							<td>
+							<td style="width:138px;">
 								<div>
 									<table style="margin-top: -8px; border: none;">
 										<tbody>
@@ -493,7 +493,7 @@ $(document).ready(function() {
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconStorage.png')}"
 													height="12" /></td>
-												<td><g:link controller="assetEntity" action="list"
+												<td nowrap="nowrap"><g:link controller="assetEntity" action="list"
 														class="links">Physical Storage</g:link></td>
 											</tr>
 											<tr>
@@ -519,7 +519,7 @@ $(document).ready(function() {
 								</div>
 							</td>
 							<td>
-								<div id="eventDataTableId" style="overflow-y: hidden;">
+								<div id="eventDataTableId" style="overflow-y: hidden;float: left;">
 									<table class="dashboard_stat_table">
 										<thead>
 											<tr>
