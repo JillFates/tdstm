@@ -426,7 +426,7 @@ class AssetEntityAttributeLoaderService {
 		} else if(!dtv.importValue.isEmpty() && dtv.importValue.toUpperCase().trim() !="NULL") {
 			moveBundleInstance = createBundleIfNotExist(dtv.importValue, projectInstance)
 		} else if(dtv.importValue.isEmpty()) {
-			moveBundleInstance = createBundleIfNotExist("TBD", projectInstance)
+			moveBundleInstance = projectInstance.getProjectDefaultBundle()
 		}
 		return moveBundleInstance
 	}

@@ -78,20 +78,27 @@
 							</td>
 							<td>
 							<span class="name">Runbook Driven: </span>&nbsp;</td>
-							<td><span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
+							<td><span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
+								${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
 							</td>
-							<td class="name">Display Transitions in Status bar:</td>
-							<td class="valueNW" colspan="3"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
+							<td class="name">Default Bundle:</td>
+							<td class="valueNW">${fieldValue(bean:projectInstance, field:'defaultBundle')}</td>
+							
 						</tr>
 						<tr class="prop">
+							<td class="name">Display Transitions in Status bar:</td>
+							<td class="valueNW" colspan="3"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
 							<td class="name">
 								<label for="dateCreated">Date Created:</label>
 							</td>
 							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+						</tr>
+						<tr>
 							<td class="name">
 								<label for="lastUpdated">Last Updated:</label>
 							</td>
 							<td class="valueNW" colspan="5"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+						
 						</tr>
 					</tbody>
 				</table>

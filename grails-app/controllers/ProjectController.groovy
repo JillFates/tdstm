@@ -159,17 +159,19 @@ class ProjectController {
 	def edit = {
 		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def projectDetails
+		def moveBundles
 		if (!projectInstance) {
 			flash.message = "Project not found with id ${params.id}"
 			redirect(action:list)
 		}
 		else {
 			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
+			moveBundles = MoveBundle.findAllByProject(projectInstance)
 		}
 		return [ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
 				 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
 				 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners,
-				 projectLogoForProject: projectDetails.projectLogoForProject, workflowCodes: projectDetails.workflowCodes ]
+				 projectLogoForProject: projectDetails.projectLogoForProject, workflowCodes: projectDetails.workflowCodes, moveBundles:moveBundles ]
 	}
 
 	/*
@@ -378,11 +380,12 @@ class ProjectController {
 			else {
 				flash.message = "Project ${projectInstance} not updated"
 				def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
+				def moveBundles = MoveBundle.findAllByProject(projectInstance)
 				projectInstance.discard()
 				render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
 											 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
 											 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
-											 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
+											 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params, moveBundles:moveBundles] )
 			}
 		} else {
 			flash.message = "Project not found with id ${params.id}"
@@ -516,7 +519,9 @@ class ProjectController {
 					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
 			}
 			// set the projectInstance as CURR_PROJ
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	   	
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
+			//Will create a bundle name TBD and set it as default bundle for project   
+			projectInstance.getProjectDefaultBundle()
 			
 			flash.message = "Project ${projectInstance} created"
 			redirect( action:show,  imageId:image.id )

@@ -18,6 +18,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetTransition
 import com.tds.asset.AssetDependencyBundle
+import com.tdssrc.grails.GormUtil
 
 class ProjectService {
 
@@ -498,5 +499,35 @@ class ProjectService {
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = ${projectInstance.id}")
 		
 		return message
+	}
+	
+	/**
+	 * Method is used getDefaultBundle for supplied project and create if not
+	 * @param project
+	 * @return getDefaultBundle for supplied project and create if not
+	 */
+	def getDefaultBundle(Project project ){
+		return project.defaultBundle ?: createDefaultBundle( project )
+	}
+	
+	/**
+	 * Method is used to create createDefaultBundle  
+	 * @param project
+	 * @return project's default move bundle 
+	 */
+	def createDefaultBundle (Project project ){
+		if(!project.defaultBundle){
+			def moveBundle = MoveBundle.findByNameAndProject("TBD", project)
+			if( moveBundle )
+				return moveBundle
+			else
+				moveBundle = new MoveBundle(name:"TBD", project:project, useForPlanning:true, workflowCode:project.workflowCode)
+				
+			if(!moveBundle.save(flush:true)){
+				log.error "createDefaultBundle: failed to create DefaultBundle : ${GormUtil.allErrorsString(moveBundle)}"
+				return null
+			} 
+			return moveBundle
+		}
 	}
 }

@@ -103,4 +103,5 @@ databaseChangeLog = {
 	include file: '20140701-delete-asset-dependency-orphaned-record.groovy'
 	include file: '20140205-add-viewtaskgraph-permissions.groovy'
 	include file: '20140704-pre-seed-asset-tag-sequence-for-existing-clients.groovy'
+	include file: '20140709-add-defualt-bundle-to-project.groovy'
 }

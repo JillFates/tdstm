@@ -204,7 +204,18 @@
 									</div>
 								</g:hasErrors>
 							</td>
-							<td class="name"><label for="inProgress">Display
+							<td class="name">Default Move Bundle:</td>
+							<td
+								class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
+								<g:select id="defaultBundle" name="defaultBundle.id"
+									from="${moveBundles}" optionKey="id" optionValue="name"
+									value="${projectInstance?.defaultBundle.id}"></g:select>
+							</td>
+							
+					</tr>
+						<tr class="prop">
+						
+						<td class="name"><label for="inProgress">Display
 									Transitions in Status bar:</label></td>
 							<td class="valueNW"><g:select id="trackChanges"
 									name="trackChanges"
@@ -217,21 +228,26 @@
 											field="trackChanges" />
 									</div>
 								</g:hasErrors></td>
-						</tr>
-						<tr class="prop">
+								
+	
 							<td class="name"><label for="dateCreated">Date
 									Created:</label></td>
 							<td class="valueNW"><tds:convertDateTime
 									date="${projectInstance?.dateCreated}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
-							<td class="name"><label for="lastUpdated">Last
+							
+						</tr>
+						<tr>
+						<td class="name"><label for="lastUpdated">Last
 									Updated:</label></td>
 							<td class="valueNW"><tds:convertDateTime
 									date="${projectInstance?.lastUpdated}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 						</tr>
+						
+						
 
 					</tbody>
 				</table>

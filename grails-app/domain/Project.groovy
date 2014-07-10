@@ -9,6 +9,7 @@ class Project extends PartyGroup {
 
 	def static final DEFAULT_PROJECT_ID = 2
 	def static final CUSTOM_FIELD_COUNT = 64
+	def projectService
 	
 	static isDefaultProject(aProjectRef) {
 		if (aProjectRef instanceof Project) {
@@ -30,6 +31,7 @@ class Project extends PartyGroup {
 	Integer runbookOn=1		// Flag that indicates that the project should use the runbook mode for various screens
     Integer customFieldsShown = 8
 	String depConsoleCriteria 
+	MoveBundle defaultBundle
     
 	// Custom field labels
     	String custom1
@@ -111,6 +113,7 @@ class Project extends PartyGroup {
 		lastUpdated( ) // related to party
 		workflowCode( blank:false, nullable:false )
 		projectType( blank:false, nullable:false, inList:['Standard', 'Template', 'Demo'] )
+		defaultBundle( nullable:true )
 		// custom fields
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )
@@ -194,7 +197,7 @@ class Project extends PartyGroup {
 		}
 	}
 	
-	static transients = [ 'isDefaultProject', 'getDefaultProject', 'readDefaultProject', 'active', 'status' ]
+	static transients = [ 'isDefaultProject', 'getDefaultProject', 'readDefaultProject', 'active', 'status', 'getProjectDefaultBundle' ]
 
 	String toString() {
 		"$projectCode : $name"
@@ -232,7 +235,15 @@ class Project extends PartyGroup {
 		//TODO: check time GMT
 		completionDate.compareTo(new Date()) > 0
 	}
-
+	
+    /**
+     * 
+     * Method csn used to get default move bundle for for a current project.
+     * @return default moveBundle for current project
+     */
+	def getProjectDefaultBundle() {
+		return projectService.getDefaultBundle(this)
+	}
 	/**
 	 * Can be used to determine project status, valid values are active or completed
 	 * @return String - could be active or completed

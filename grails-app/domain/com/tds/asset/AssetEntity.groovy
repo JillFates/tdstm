@@ -257,7 +257,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		custom63( blank:true, nullable:true )
 		custom64( blank:true, nullable:true )
 		
-		moveBundle( nullable:true )
 		project( nullable:true )
 		
 		serialNumber( blank:true, nullable:true )

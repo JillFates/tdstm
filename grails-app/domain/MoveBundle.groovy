@@ -42,6 +42,7 @@ class MoveBundle extends Party {
 		targetRacks : Rack,
 		assets : AssetEntity
 	]
+	
 	static mapping  = {
 		version true
 		sort "name" // Sorting moveBundle list by name.
@@ -56,6 +57,13 @@ class MoveBundle extends Party {
 		targetRacks joinTable:[name: 'asset_entity', key:'move_bundle_id', column:'rack_target_id']
 	}
 
+	def beforeDelete(){
+		/* Discarding current move bundle object from delete if 
+		   trying to delete project's default move bundle */	
+		if(this.id == this.project.getProjectDefaultBundle().id)
+			this.discard()
+	}
+	
     String toString(){
 		name
 	}
