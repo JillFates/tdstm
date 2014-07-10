@@ -12,12 +12,22 @@ class CustomValidators {
 	 * @return the custom validator
 	 */
 	public static inList(aListClosure, fieldName) { 
+		// value = user input
+		// object = the domain object
+		// errors = Spring error object
 		return { value, object, errors ->
-			def allValues = aListClosure.call()
-			if (value == null || allValues.contains(value.toString())) {
+
+			// Get the list of values from the list Closure
+			def validValues = aListClosure.call()
+
+			// Determine if the field supports blank and nullable
+			def blank = object.constraints[fieldName].blank
+			def nullable = object.constraints[fieldName].nullable
+
+			if ( (value == null && nullable && blank) || (value == '' && blank)  || validValues.contains(value.toString()) ) {
 				return true;
 			} else {
-				errors.rejectValue(fieldName, "${fieldName}.notInList", "${value} of ${fieldName} not in list ${allValues}")
+				errors.rejectValue(fieldName, "${fieldName}.notInList", "${value} of ${fieldName} not in list ${join(validValues,', ')}")
 				return false
 			}
 		}
