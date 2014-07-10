@@ -668,7 +668,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		}
 		for (var j = 0; j < depData.successors.length; j++) {
 			if ((depData.successors[j].taskId) && depSet[depData.successors[j].taskId]) {
-				alert("Sorry, loops not allowed.");
+				alert("One or more tasks are assigned as both a Predecessor and Successor, which is not allowed.");
 				result = false;
 				break;
 			}
