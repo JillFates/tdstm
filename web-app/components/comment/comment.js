@@ -915,6 +915,18 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		return deferred.promise;
 	};
 
+	var setShowAllPreference = function(selected) {
+		var deferred = q.defer();
+		http.get(utils.url.applyRootPath('/assetEntity/setShowAllPreference?selected='+selected)).
+		success(function(data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function(data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -933,7 +945,8 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		assignTaskToMe: assignTaskToMe,
 		changeTaskEstTime: changeTaskEstTime,
 		getStaffRoles: getStaffRoles,
-		getAssetsByType: getAssetsByType
+		getAssetsByType: getAssetsByType,
+		setShowAllPreference: setShowAllPreference
 	};
 
 };
@@ -1628,6 +1641,66 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 };
 
 /*****************************************
+ * Directive comment inner list
+ */
+tds.comments.directive.CommentInnerList = function(commentService, alerts, utils, commentUtils) {
+
+	return {
+		restrict: 'E',
+		scope: {
+			assetId: '@assetId',
+			prefValue: '@prefValue'
+		},
+		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
+		link: function(scope, element, attrs) {
+			scope.showAll = (scope.prefValue == 'TRUE')?'1':'0';
+			scope.comments = [];
+			scope.applyRootPath = utils.url.applyRootPath;
+			var refreshView = function() {
+				commentService.searchComments(scope.assetId).then(
+					function(data) {
+						scope.comments = data;
+					},
+					function(data) {
+						alerts.showGenericMsg();
+					}
+				);
+			};
+			scope.updatePreference = function(comment) {
+				scope.comments = scope.comments;
+				commentService.setShowAllPreference(scope.showAll);
+			}
+			scope.onlyCompleted = function(comment) {
+				if (scope.showAll == '1') {
+					return true;
+				} else {
+					return (((comment.commentInstance.commentType == 'issue') && 
+						     (comment.commentInstance.status == 'Completed' || comment.commentInstance.status=='Pending')
+						     )
+							||
+							((comment.commentInstance.commentType == 'comment') && 
+							 (comment.commentInstance.isResolved)
+							)
+							);
+				}
+			}
+			scope.$on('commentChanged', function(evt, eventTO) {
+				if ((eventTO != null) && (eventTO.assetId == scope.assetId)) {
+					refreshView();
+				}
+			});
+			scope.editComment = function(commentId, commentType) {
+				scope.$emit("editComment", commentUtils.commentTO(commentId, commentType));
+			}
+			scope.showComment = function(commentId, commentType) {
+				scope.$emit("viewComment", commentUtils.commentTO(commentId, commentType), 'show');
+			}
+			refreshView();
+		}
+	};
+};
+
+/*****************************************
  * Comments module configuration
  */
 tds.comments.module = angular.module('tdsComments', ['tdsCore']);
@@ -1643,6 +1716,7 @@ tds.comments.module.directive('actionBar', ['commentService', 'alerts', 'utils',
 tds.comments.module.directive('actionBarCell', ['commentService', 'alerts', 'utils', '$templateCache','$http','$compile', 'windowTimedUpdate', tds.comments.directive.ActionBarCell]);
 tds.comments.module.directive('staffRoles', ['commentService', 'alerts', 'utils', tds.comments.directive.StaffRoles]);
 tds.comments.module.directive('assetsByType', ['appCommonData', 'commentService', 'alerts', 'utils', tds.comments.directive.AssetsByType]);
+tds.comments.module.directive('commentInnerList', ['commentService', 'alerts', 'utils', 'commentUtils', tds.comments.directive.CommentInnerList]);
 
 
 /***************************

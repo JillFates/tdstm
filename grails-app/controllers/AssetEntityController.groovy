@@ -2482,7 +2482,8 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		assetCommentsInstance.each {
 			css = it.dueDate < today ? 'Lightpink' : 'White'
 			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css, 
-									assetName: it.assetEntity.assetName,assetType:it.assetEntity.assetType]
+									assetName: it.assetEntity.assetName,assetType:it.assetEntity.assetType,
+									assignedTo: it.assignedTo?it.assignedTo.toString():'', role: it.role?it.role:'']
 		}
 		render assetCommentsList as JSON
 	}
@@ -2633,10 +2634,6 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			}
 			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
 		} else if( params.open != "view" ){
-			def assetEntity = AssetEntity.get(params.prevAsset)
-			def assetCommentList = assetEntity ? AssetComment.findAllByAssetEntity(assetEntity) : []
-			render(template:"commentList",model:[assetCommentList:assetCommentList])
-		} else {
 			render map as JSON
 		}
 	}

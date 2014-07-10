@@ -793,17 +793,6 @@ function populateDependency(assetId, whom, thisDialog){
 		});
 }
 
-function showTask(selected){
-	if(selected =='1'){
-		 $('.resolved').show();
-	     $('#showEntityView').dialog('option', 'height', 'auto')
-	} else {
-		 $('.resolved').hide();
-		 $('#showEntityView').dialog('option', 'height', 'auto')
-	}
-	new Ajax.Request(contextPath+'/assetEntity/setShowAllPreference?selected='+selected,{asynchronous:true,evalScripts:true})
-
-}
 /*function updateModel(rackId,value){
 	var val = value;
 	new Ajax.Request('contextPath+/assetEntity/getModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})

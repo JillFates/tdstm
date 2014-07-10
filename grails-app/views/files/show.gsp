@@ -51,7 +51,7 @@
 		<g:render template="../assetEntity/dependentShow" model="[assetEntity:filesInstance]" ></g:render>
 	</tr>
 		<tr id="commentListId">
-			<g:render template="../assetEntity/commentList" ></g:render>
+			<g:render template="../assetEntity/commentList" model="['asset':filesInstance, 'prefValue': prefValue]"></g:render>
 		</tr>
 	<tr>
 		<td colspan="2">
@@ -70,17 +70,6 @@
 	$("#assetMenuId a").css('background-color','#003366')
 	
 	$(document).ready(function() { 
-		var prefVal = '${prefValue}'
-		if(prefVal == 'FALSE'){
-			$(".resolved").hide()
-		} else{
-			$(".resolved").show()
-		}
-				
-		$(".showAllChecked").click(function(){
-			 var selected = $(this).is(":checked") ? '1' : '0'
-			 showTask(selected)
-		})
 		changeDocTitle('${filesInstance.assetName}');
 	})
 </script>

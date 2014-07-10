@@ -21,17 +21,6 @@ $(document).ready(function() {
 		$(".rackLabel").show()
 		$(".vmLabel").hide()
 	}
-	var prefVal = '${prefValue}'
-
-	if(prefVal == 'FALSE'){
-		$(".resolved").hide()
-	} else{
-		$(".resolved").show()
-	}
-	$(".showAllChecked").click(function(){
-		 var selected = $(this).is(":checked") ? '1' : '0'
-		 showTask(selected)
-	})
 	changeDocTitle('${assetEntity.assetName}');
 })
 </script>
@@ -152,7 +141,7 @@ $(document).ready(function() {
 			<g:render template="dependentShow" model= "[assetEntity:assetEntity]"></g:render>
 		</tr>
 	<tr id="commentListId">
-		<g:render template="commentList" ></g:render>
+		<g:render template="commentList" model="['asset':assetEntity, 'prefValue': prefValue]" ></g:render>
 	</tr>
 		<tr>
 			<td colspan="2">
