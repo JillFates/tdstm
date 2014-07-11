@@ -1,26 +1,3 @@
-<!--
-The MIT License (MIT)
-
-Copyright (c) 2013 bill@bunkat.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
--->
 <html>
 	<head>
 		<title>Task Graph</title>
@@ -76,21 +53,22 @@ THE SOFTWARE.
 			
 			// check for errors in the ajax call
 			$('#errorMessageDiv').remove();
-			if (status != 'success') {
+			//if (status != 'success') {
+			if (response.status != 200) {
 				var message = d3.select('div.body')
 					.append('div')
 					.attr('id','errorMessageDiv');
-				message.html('<br />not enough task data to create a graph for this event');
+				message.html('<br />' + response.responseText);
 				$('#spinnerId').css('display', 'none');
 				return;
 			}
 			
-			var data = $.parseJSON(response.responseText);
+			// var data = $.parseJSON(response.responseText);
 			var svgData = d3.select('div.body')
 				.append('div')
 				.attr('id', 'svgContainerDivId');
 			
-			svgData.html(data.svg);
+			svgData.html(response.responseText);
 			
 			if (height == 0)
 				calculateSize();
@@ -199,7 +177,7 @@ THE SOFTWARE.
 			
 			if (neighborhoodTaskId == -1)
 				jQuery.ajax({
-					dataType: 'json',
+					dataType: 'text',
 					url: 'moveEventTaskGraph',
 					data: params,
 					type:'GET',
@@ -207,7 +185,7 @@ THE SOFTWARE.
 				});
 			else
 				jQuery.ajax({
-					dataType: 'json',
+					dataType: 'text',
 					url: 'neighborhoodGraph',
 					data: params,
 					type:'GET',
@@ -222,8 +200,10 @@ THE SOFTWARE.
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
-			&nbsp; <input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
+			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
+			&nbsp; 
+			<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
+			<br>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
 	</body>

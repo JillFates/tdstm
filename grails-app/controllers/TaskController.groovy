@@ -19,10 +19,10 @@ class TaskController {
 	def commentService
 	def taskService
 	def userPreferenceService
-    def jdbcTemplate
-    def reportsService
+	def jdbcTemplate
+	def reportsService
 
-    def index = { }
+	def index = { }
 	
 	/**
 	* Used by the myTasks and Task Manager to update tasks appropriately.
@@ -227,7 +227,7 @@ class TaskController {
 		actionBar.append(""" </span> """)
 		render actionBar.toString()
 	}
-    
+	
 	/**
 	 * Used to generate action Bar for task details view  
 	 * @param asset comment id.
@@ -236,17 +236,17 @@ class TaskController {
 	def genActionBarForShowViewJson = {
 		def comment = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
-        def actionBar = []
-        def includeDetails = params.includeDetails?params.includeDetails.toBoolean():false
+		def actionBar = []
+		def includeDetails = params.includeDetails?params.includeDetails.toBoolean():false
 		def result
 
 		if (comment) {
 			if(comment.status ==  AssetCommentStatus.READY){
-                actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager']
+				actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager']
 			}
 
 			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-                actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager']
+				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager']
 			}
 
 			if (includeDetails) {
@@ -254,15 +254,15 @@ class TaskController {
 			}
 
 			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-                actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
+				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
 			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
 			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
 				actionBar << [label: 'Delay for:']
-                actionBar << [label: '1 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '1']
-                actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
-                actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
+				actionBar << [label: '1 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '1']
+				actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
+				actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
 			}
 
 			def depCount = TaskDependency.countByPredecessor( comment )
@@ -270,7 +270,7 @@ class TaskController {
 				actionBar << [label: 'Neighborhood', icon: 'tds-task-graph-icon', actionType: 'showNeighborhood']	
 			}
 
-            result = ServiceResults.success(actionBar) as JSON
+			result = ServiceResults.success(actionBar) as JSON
 		} else {
 			result = ServiceResults.fail([error:"invalid comment id (${params.id}) from user ${userLogin}"]) as JSON
 		}
@@ -291,34 +291,45 @@ class TaskController {
 	 * @return redirect to URI of image or HTML showing the error
 	 */
 	def neighborhoodGraph = {
-		
-		def taskId = params.id
-		if (! taskId || ! taskId.isNumber()) {
-			render "An invalid task id was supplied. Please contact support if this problem persists."
-			return
-		}
-		def project = securityService.getUserCurrentProject()
-		def rootTask = AssetComment.findByIdAndProject(taskId, project) {
-			render "Sorry but the task not found. Please contact support if this problem persists."
-			return
-		}
+		def errorMessage = ''
 
-		def depList = taskService.getNeighborhood(taskId, 2, 5)
-		if (depList.size() == 0) {
-			render "The task has no interdependencies with other tasks so a map wasn't generated."
-			return
-		}
-		
-		def moveEventId = 0
-		if (params.moveEventId && params.moveEventId.isNumber())
-			moveEventId = params.moveEventId
+		while (true) {	
+			def taskId = params.id
+			if (! taskId || ! taskId.isNumber()) {
+				errorMessage = "An invalid task id was supplied. Please contact support if this problem persists."
+				break
+			}
 
-		def now = new Date().format('yyyy-MM-dd H:m:s')
-		def styleDef = "rounded, filled"
+			def project = securityService.getUserCurrentProject()
+			if (! project) {
+				errorMessage = 'You must first select a project before view graphs'
+				break
+			}
 
-		def dotText = new StringBuffer()
+			def rootTask = AssetComment.read(taskId) 
+			if (!rootTask || rootTask.project.id != project.id) {
+				errorMessage = "Unable to find the specified task"
+				if (rootTask) 
+					log.warn "SECURITY : User ${securityService.getUserLogin()} attempted to access graph for task ($taskId) not associated to current project ($project)"
+				break
+			}
 
-		dotText << """#
+			def depList = taskService.getNeighborhood(taskId, 2, 5)
+			if (depList.size() == 0) {
+				errorMessage = "The task has no interdependencies with other tasks so a map wasn't generated."
+				break
+			}
+			
+			def moveEventId = 0
+			if (params.moveEventId && params.moveEventId.isNumber())
+				moveEventId = params.moveEventId
+
+			def now = new Date().format('yyyy-MM-dd H:m:s')
+			def styleDef = "rounded, filled"
+
+			def dotText = new StringBuffer()
+
+			dotText << """#
 # TDS Runbook for Project ${project}, Task ${rootTask}
 # Exported on ${now}
 # This is  .DOT file format of the project tasks
@@ -328,99 +339,117 @@ digraph runbook {
 	node [ fontsize=10, fontname="Helvetica", shape="rect" style="${styleDef}" ]
   
 """
-	
-		def style = ''
-		def fontcolor = ''
-		def fontsize = ''
-		def attribs
-		def color
-
-		style = styleDef
-
-		def tasks = []
-
-		// helper closure that outputs the task info in a dot node format
-		def outputTaskNode = { task, rootId ->
-			if (! tasks.contains(task.id)) {
-				tasks << task.id
-				
-				def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
-				label = (label.size() < 31) ? label : label[0..30]
-				
-				def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
-				def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
-				def fillcolor = taskService.taskStatusColorMap[colorKey][1]
-				//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false])
-
-				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
-				if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
-					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
-					color = taskService.taskStatusColorMap['AUTO_TASK'][1]
-					fontsize = '8'
-				} else {
-					fontcolor = taskService.taskStatusColorMap[colorKey][0]
-					color = 'black'	// edge color
-					fontsize = '10'
-				}
-
-				// Make the center root task stand out
-				if ("${task.id}" == rootId) {
-					style = "dashed, bold, filled"
-				} else {
-					style = styleDef
-				}
-
-				attribs = "id=\"${task.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
-
-				dotText << "\t${task.taskNumber} [label=\"${label}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
-
-			}
-
-		}
-
-		// helper closure to output the count node for the adjacent tasks
-		def outputOuterNodeCount = { taskNode, isPred, count ->
-			log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
-			def cntNode = "C${taskNode.taskNumber}"
-			dotText << "\t$cntNode [id=\"placeholder\" label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n"
-			// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
-			if (isPred) {
-				dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
-			} else {
-				dotText << "\t${taskNode.taskNumber} -> $cntNode;\n"
-			}
-		}
-
-		// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node 
-		depList.each() { d ->
-			outputTaskNode(d.successor, taskId)
-			outputTaskNode(d.predecessor, taskId)
-
-			dotText << "\t${d.predecessor.taskNumber} -> ${d.assetComment.taskNumber};\n"
-
-			// Check for properties predecessorDepCount | successorDepCount to create the outer dependency count nodes
-			if (d.metaClass.hasProperty(d, 'successorDepCount')) {
-				outputOuterNodeCount(d.successor, false, d.successorDepCount)
-			} else if (d.metaClass.hasProperty(d, 'predecessorDepCount')) {
-				outputOuterNodeCount(d.predecessor, true, d.predecessorDepCount)
-			}
-		}
-
-		dotText << "}\n"
 		
-		try {
-			def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString() )
+			def style = ''
+			def fontcolor = ''
+			def fontsize = ''
+			def attribs
+			def color
+
+			style = styleDef
+
+			def tasks = []
+
+			// helper closure that outputs the task info in a dot node format
+			def outputTaskNode = { task, rootId ->
+				if (! tasks.contains(task.id)) {
+					tasks << task.id
+					
+					def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+					label = (label.size() < 31) ? label : label[0..30]
+					
+					def tooltip  = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
+					def colorKey = taskService.taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
+					def fillcolor = taskService.taskStatusColorMap[colorKey][1]
+					//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false])
+
+					// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
+					if ( "${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
+						fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
+						color = taskService.taskStatusColorMap['AUTO_TASK'][1]
+						fontsize = '8'
+					} else {
+						fontcolor = taskService.taskStatusColorMap[colorKey][0]
+						color = 'black'	// edge color
+						fontsize = '10'
+					}
+
+					// Make the center root task stand out
+					if ("${task.id}" == rootId) {
+						style = "dashed, bold, filled"
+					} else {
+						style = styleDef
+					}
+
+					attribs = "id=\"${task.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+
+					dotText << "\t${task.taskNumber} [label=\"${label}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+
+				}
+
+			}
+
+			// helper closure to output the count node for the adjacent tasks
+			def outputOuterNodeCount = { taskNode, isPred, count ->
+				log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
+				def cntNode = "C${taskNode.taskNumber}"
+				dotText << "\t$cntNode [id=\"placeholder\" label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n"
+				// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
+				if (isPred) {
+					dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
+				} else {
+					dotText << "\t${taskNode.taskNumber} -> $cntNode;\n"
+				}
+			}
+
+			// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node 
+			depList.each() { d ->
+				outputTaskNode(d.successor, taskId)
+				outputTaskNode(d.predecessor, taskId)
+
+				dotText << "\t${d.predecessor.taskNumber} -> ${d.assetComment.taskNumber};\n"
+
+				// Check for properties predecessorDepCount | successorDepCount to create the outer dependency count nodes
+				if (d.metaClass.hasProperty(d, 'successorDepCount')) {
+					outputOuterNodeCount(d.successor, false, d.successorDepCount)
+				} else if (d.metaClass.hasProperty(d, 'predecessorDepCount')) {
+					outputOuterNodeCount(d.predecessor, true, d.predecessorDepCount)
+				}
+			}
+
+			dotText << "}\n"
 			
-			// convert the URI to a web safe format
-			uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-			String fileContents = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]).text
-			
-			def data = [svg:fileContents, moveEventId:moveEventId, neighborhoodTask:rootTask] as JSON
-			render data
-			
-		} catch(e) {
-			render "<pre>${e.getMessage()}</pre>"
-		}				
+			try {
+				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString() )
+				
+				// convert the URI to a web safe format
+				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
+				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
+				
+				svgFile.withInputStream { 
+					response.contentLength = it.available() 
+					response.contentType = 'text/plain'
+					response.outputStream << it 
+				} 
+				response.outputStream.flush() 
+				return false
+				
+			} catch(e) {
+				errorMessage = 'Encounted an unexpected error while generating the graph'
+				// TODO : Need to change out permission to ShowDebugInfo
+				if (RolePermissions.hasPermission("RoleTypeCreate"))
+					errorMessage += "<br><pre>${e.getMessage()}</pre>"
+			}
+
+			break
+		} // while	
+
+		if (errorMessage) {
+			response.status = 203	// Partial data
+			response.contentType = 'text/html'
+			render errorMessage
+		}
+		
 	}
 
 	/**
@@ -430,60 +459,78 @@ digraph runbook {
 	 * @return redirect to URI of image or HTML showing the error
 	 */
 	def moveEventTaskGraph = {
+		def errorMessage = ''
 		
-		def project = securityService.getUserCurrentProject()
-		def moveEventId = params.moveEventId	
-		if (! moveEventId || ! moveEventId.isNumber()) {
-			render "Invalid move event id supplied"
-			return
-		}
-		
-		def moveEvent = MoveEvent.findByIdAndProject(moveEventId, project)
-		if (! moveEvent) {
-			render "Move event not found"
-			return
-		}
-		
-		def mode = params.mode ?: ''
-		if (mode && ! "s".contains(mode)) {
-			mode = ''
-			log.warn "The wrong mode [$mode] was specified"
-		}
-		
-		def projectId = project.id
-		
-		def query = """
-			SELECT 
-			  t.asset_comment_id AS id,
-			  t.task_number, 
-			  CONVERT( GROUP_CONCAT(s.task_number SEPARATOR ',') USING 'utf8') AS successors,
-			  IFNULL(a.asset_name,'') as asset, 
-			  t.comment as task, 
-			  t.role,
-			  t.status,
-			  IFNULL(CONCAT(first_name,' ', last_name),'') as hard_assign,
-			  t.duration
-			FROM asset_comment t
-			LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
-			LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
-			LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
-			LEFT OUTER JOIN person ON t.owner_id=person.person_id
-			WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId}
-			GROUP BY t.task_number
-			"""
+		// Create a loop that we can break out of as we need to	
+		while (true) {
 
-			//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
-			//  -- IFNULL(t.est_start,'') AS est_start
+			def project = securityService.getUserCurrentProject()
+			if (! project) {
+				errorMessage = "You must select a project before continuing"
+				break
+			}
 
-		def tasks = jdbcTemplate.queryForList(query)
-		
-		def now = new Date().format('yyyy-MM-dd H:m:s')
+			def moveEventId = params.moveEventId	
+			if (! moveEventId || ! moveEventId.isNumber()) {
+				errorMessage = "Please select an event to view the graph"
+				break
+			}
 
-		def styleDef = "rounded, filled"
+			def moveEvent = MoveEvent.read(moveEventId)
+			if (! moveEvent || moveEvent.project.id != project.id) {
+				errorMessage = "The event specified was not found"
+				if (moveEvent) 
+					log.warn "SECURITY : User ${securityService.getUserLogin()} attempted to access graph of event ($moveEventId) not associated to current project ($project)"
+				break
+			}
+			
+			log.debug "**** ${project.id} / ${moveEvent.project.id} - $project / $moveEvent "
 
-		def dotText = new StringBuffer()
+			def mode = params.mode ?: ''
+			if (mode && ! "s".contains(mode)) {
+				mode = ''
+				log.warn "The wrong mode [$mode] was specified"
+			}
+			
+			def projectId = project.id
+			
+			def query = """
+				SELECT 
+				  t.asset_comment_id AS id,
+				  t.task_number, 
+				  CONVERT( GROUP_CONCAT(s.task_number SEPARATOR ',') USING 'utf8') AS successors,
+				  IFNULL(a.asset_name,'') as asset, 
+				  t.comment as task, 
+				  t.role,
+				  t.status,
+				  IFNULL(CONCAT(first_name,' ', last_name),'') as hard_assign,
+				  t.duration
+				FROM asset_comment t
+				LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
+				LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
+				LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
+				LEFT OUTER JOIN person ON t.owner_id=person.person_id
+				WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId}
+				GROUP BY t.task_number
+				"""
 
-		dotText << """#
+				//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
+				//  -- IFNULL(t.est_start,'') AS est_start
+
+			def tasks = jdbcTemplate.queryForList(query)
+
+			if (tasks.size()==0) {
+				errorMessage = 'No tasks were found for the selected move event'
+				break
+			}
+
+			def now = new Date().format('yyyy-MM-dd H:m:s')
+
+			def styleDef = "rounded, filled"
+
+			def dotText = new StringBuffer()
+
+			dotText << """#
 # TDS Runbook for Project ${project}, Event ${moveEvent.name}
 # Exported on ${now}
 # This is  .DOT file format of the project tasks
@@ -493,67 +540,88 @@ digraph runbook {
 	node [ fontsize=10, fontname="Helvetica", shape="rect" style="${styleDef}" ]
   
 """
-	
-		def style = ''
-		def fontcolor = ''
-		def fontsize = ''
-		def fillcolor
-		def attribs
-		def color
+		
+			def style = ''
+			def fontcolor = ''
+			def fontsize = ''
+			def fillcolor
+			def attribs
+			def color
 
-		style = styleDef
+			style = styleDef
 
-		tasks.each {
-			def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-			def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-			def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
-			
-			fillcolor = taskService.taskStatusColorMap[colorKey][1]
-			
-			// log.info "task ${it.task}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
-			// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
-			if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
-				fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
-				color = taskService.taskStatusColorMap['AUTO_TASK'][1]
-				fontsize = '8'
-			} else {
-				fontcolor = taskService.taskStatusColorMap[colorKey][0]
-				fontsize = '10'
-				color = 'black'
-			}
-			
-			// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
-			attribs = "id=\"${it.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
-			
-			//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
+			tasks.each {
+				def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+				def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+				def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
+				
+				fillcolor = taskService.taskStatusColorMap[colorKey][1]
+				
+				// log.info "task ${it.task}: role ${it.role}, ${AssetComment.AUTOMATIC_ROLE}, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
+				// if ("${it.roll}" == "${AssetComment.AUTOMATIC_ROLE}" ) {
+				if ( "${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes' ) {
+					fontcolor = taskService.taskStatusColorMap['AUTO_TASK'][0] 
+					color = taskService.taskStatusColorMap['AUTO_TASK'][1]
+					fontsize = '8'
+				} else {
+					fontcolor = taskService.taskStatusColorMap[colorKey][0]
+					fontsize = '10'
+					color = 'black'
+				}
+				
+				// style = mode == 's' ? "fillcolor=\"${taskService.taskStatusColorMap[colorKey][1]}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\", style=filled" : ''
+				attribs = "id=\"${it.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
+				
+				//def url = HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:"${it.id}", absolute:false])
 
-			task = (task.size() > 35) ? task[0..34] : task 
-			dotText << "\t${it.task_number} [label=\"${task}\"  id=\"${it.id}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
-			def successors = it.successors
-			if (successors) {
-				successors = (successors as Character[]).join('')
-				successors = successors.split(',')
-				successors.each { s -> 
-					if (s.size() > 0) {
-						dotText << "\t${it.task_number} -> ${s};\n"
+				task = (task.size() > 35) ? task[0..34] : task 
+				dotText << "\t${it.task_number} [label=\"${task}\"  id=\"${it.id}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
+				def successors = it.successors
+				if (successors) {
+					successors = (successors as Character[]).join('')
+					successors = successors.split(',')
+					successors.each { s -> 
+						if (s.size() > 0) {
+							dotText << "\t${it.task_number} -> ${s};\n"
+						}
 					}
 				}
 			}
-		}
 
-		dotText << "}\n"
-		
-		try {
-			def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString() )
+			dotText << "}\n"
 			
-			// convert the URI into a web-safe format
-			uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-			String fileContents = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]).text
-			def data = [svg:fileContents, moveEventId:moveEventId, neighborhoodTask:null] as JSON
-			render data
-			
-		} catch (e) {
-			render(text:"<h1>Graph Generation Failed</h1>The error was:<p/><pre>${e.getMessage()}</pre>", status:"503")
+			try {
+				// String svgType = grailsApplication.config.graph.graphViz.graphType ?: 'svg'
+
+				def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString() )
+				// convert the URI into a web-safe format
+				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
+				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
+				def svgFile = new File(filename)
+
+				svgFile.withInputStream { 
+					response.contentLength = it.available() 
+					response.contentType = 'text/plain'
+					response.outputStream << it 
+				} 
+				response.outputStream.flush() 
+				return false
+				
+			} catch (e) {
+				errorMessage = 'Encounted an unexpected error while generating the graph'
+				// TODO : Need to change out permission to ShowDebugInfo
+				if (RolePermissions.hasPermission("RoleTypeCreate"))
+					errorMessage += "<br><pre>${e.getMessage()}</pre>"
+			}
+
+			break
+
+		} // Outer while loop
+
+		if (errorMessage) {
+			response.status = 203	// Partial data
+			response.contentType = 'text/html'
+			render errorMessage
 		}
 	}
 	
@@ -790,13 +858,13 @@ digraph runbook {
 		render data
 	}
 
-    def editTask = {
-        render( view: "_editTask", model: [])
-    }
+	def editTask = {
+		render( view: "_editTask", model: [])
+	}
 
-    def showTask = {
-        render( view: "_showTask", model: [])
-    }
+	def showTask = {
+		render( view: "_showTask", model: [])
+	}
 
 	/**
 	 * Get task roles
