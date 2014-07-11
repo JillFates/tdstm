@@ -1386,7 +1386,7 @@ class ReportsController {
 			return
 		}
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
-		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
+		def moveBundleId =  securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId,appOwnerList:appOwnerList]
 	}
@@ -1394,6 +1394,7 @@ class ReportsController {
 	 * Used to display application selection criteria page.
 	 */
 	def applicationProfiles ={
+		
     def project = securityService.getUserCurrentProject();
     if (!project) {
       flash.message = "Please select project to view Reports"
@@ -1401,10 +1402,11 @@ class ReportsController {
       return
     }
 		def moveBundleList = MoveBundle.findAllByProject(project)
-		def moveBundleId = securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
+		def moveBundleId = params.containsKey("moveBundle") ? params.moveBundle : securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
 		def appOwnerList = reportsService.getSmeList(moveBundleId, 'owner')
-		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},appOwnerList:appOwnerList.sort{it.lastName}]
+		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},appOwnerList:appOwnerList.sort{it.lastName},
+				'selectedSme':params.smeByModel, 'selectedOwner':params.appOwner]
 	}
 	
 	/**
@@ -1465,6 +1467,12 @@ class ReportsController {
 		}
 		log.info "query = ${query}"
 		def applicationList = jdbcTemplate.queryForList(query.toString())
+		
+		if( applicationList.size() > 100 ) {
+			flash.message = """Your criteria results in more than the maximum 100 applications that the report allows.
+				Please adjust your criteria accordingly before resubmitting."""
+			redirect (action:'applicationProfiles', params:params)
+		}
 		
 		ArrayList appList = new ArrayList()
 		//TODO:need to write a service method since the code used below is almost similar to application show.

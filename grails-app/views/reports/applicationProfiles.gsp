@@ -23,7 +23,8 @@
 								optionKey="id" optionValue="name" value="${moveBundleId}"/></td>
 					</tr>
 					<tbody id="smeAndAppOwnerTbody">
-						<g:render template="smeSelectByBundle"  model="[smeList:smeList, appOwnerList:appOwnerList]" />
+						<g:render template="smeSelectByBundle"  model="[smeList:smeList, appOwnerList:appOwnerList, selectedSme:selectedSme,
+							selectedOwner:selectedOwner]" />
 					</tbody>
 					<tr class="buttonR">
 					<tds:hasPermission permission="ShowMovePrep">
