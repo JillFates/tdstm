@@ -11,12 +11,14 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>	
 		<g:javascript src="angular/plugins/angular-resource.js" />
-		<g:javascript src="asset.comment.js" />
 		
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+
+		<%-- 
 		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
-		
+		--%>
+
 		<style type="text/css">
 			g#graph0 {
 				pointer-events: none;
@@ -174,11 +176,10 @@
 			// show the loading spinner
 			$('#spinnerId').css('display', 'block');
 			
-			
 			if (neighborhoodTaskId == -1)
 				jQuery.ajax({
 					dataType: 'text',
-					url: 'moveEventTaskGraph',
+					url: tdsCommon.createAppURL('/task/moveEventTaskGraphSvg'),
 					data: params,
 					type:'GET',
 					complete: buildGraph
@@ -186,7 +187,7 @@
 			else
 				jQuery.ajax({
 					dataType: 'text',
-					url: 'neighborhoodGraph',
+					url: tdsCommon.createAppURL('/task/neighborhoodGraphSvg'),
 					data: params,
 					type:'GET',
 					complete: buildGraph

@@ -290,7 +290,7 @@ class TaskController {
 	 * @param taskId
 	 * @return redirect to URI of image or HTML showing the error
 	 */
-	def neighborhoodGraph = {
+	def neighborhoodGraphSvg = {
 		def errorMessage = ''
 
 		while (true) {	
@@ -458,7 +458,7 @@ digraph runbook {
 	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
 	 * @return redirect to URI of image or HTML showing the error
 	 */
-	def moveEventTaskGraph = {
+	def moveEventTaskGraphSvg = {
 		def errorMessage = ''
 		
 		// Create a loop that we can break out of as we need to	
@@ -624,7 +624,15 @@ digraph runbook {
 			render errorMessage
 		}
 	}
-	
+
+	/**
+	 * Used to render neighborhood task graphs by passing the id argument to the taskGraph
+	 */
+	def neighborhoodGraph = {
+		Long id = params.id?.isLong() ? params.id.toLong() : 0L
+		forward action:'taskGraph', params: ['neighborhoodTaskId':id]
+	}
+
 	def taskGraph = {
 		// handle project
 		def project = securityService.getUserCurrentProject()
