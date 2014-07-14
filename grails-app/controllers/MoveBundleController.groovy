@@ -477,6 +477,7 @@ class MoveBundleController {
 	 */
 	def planningStats = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def project = Project.get(projectId)
 		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
 		def appList = []
@@ -562,7 +563,7 @@ class MoveBundleController {
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 			
 			def eventDates = moveEvent.getEventTimes()
-			eventStartDate << [(moveEvent.id):(eventDates.start ? bundleTimeformatter.format(eventDates.start) : 'TBD')]
+			eventStartDate << [(moveEvent.id):(eventDates.start ? bundleTimeformatter.format( GormUtil.convertInToGMT( eventDates.start, tzId) ) : 'TBD')]
 			
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
