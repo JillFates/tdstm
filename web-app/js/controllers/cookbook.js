@@ -74,7 +74,7 @@ app.config(function($stateProvider, $urlRouterProvider, servRootPathProvider) {
 });
 
 app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $resource, $timeout, $modal, 
-	$log, $location, $anchorScroll, $sce, $state) {
+	$log, $location, $anchorScroll, $sce, $state, utils) {
 	
 	// All Vars used
 	var listRecipes, columnSel, actionsTemplate, updateBtns, lastLoop, lastLoopData, confirmation, 
@@ -1439,8 +1439,16 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 	}
 
 	$scope.tasks.viewTaskGraph = function(e){
-		var id = $scope.tasks.currentTaskBeingGenerated;
-        	window.location = "task/taskGraph?moveEventId=" + id;
+		var eventsArray = $scope.tasks.eventsArray;
+		var eventName = $scope.tasks.generation.contextName;
+		var eventId = null;
+		for (var i=0; i<eventsArray.length;i++) {
+			if (eventsArray[i].name == eventName) {
+				eventId = eventsArray[i].id;
+				break;
+			}
+		}
+       	window.location = utils.url.applyRootPath("/task/taskGraph?moveEventId=" + eventId);
 	}
 
 	$scope.tasks.startOver = function(e){
@@ -1509,6 +1517,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 								$scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
 								$scope.tasks.generation.exceptionLog = $sce.trustAsHtml(data.data.taskBatch.exceptionLog);
 								$scope.tasks.generation.infoLog = $sce.trustAsHtml(data.data.taskBatch.infoLog);
+								$scope.tasks.generation.contextName = data.data.taskBatch.contextName;
 							}, function(){
 								$log.info('Error on getting Task Batch');
 							});
