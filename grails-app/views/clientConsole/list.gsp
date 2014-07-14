@@ -37,7 +37,7 @@
 
 </head>
 <body >
-<div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
+<div title="Change Status" id="changeStatusDialog" style="background-color: #808080;display: none;" >
 	<form name="changeStatusForm">
 	<input type="hidden" name="asset" id="assetIds"  />
 	<input type="hidden" name="projectId" id="projectId" value="${projectId}" />
@@ -63,7 +63,7 @@
 </table>
 </form>
 </div>
-<div style="width:100%">
+<div style="width:100%" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 <g:form	name="listForm" action="list" method="post">
 <div id="consoleHeader" style="width: 100%;">
 	
@@ -247,21 +247,7 @@
 			</span>
 			</g:if>
 			<img id="asset_${assetEntity.id}" src="${resource(dir:'images',file:'asset_view.png')}" border="0px" />
-			<span id="icon_${assetEntity.id}">
-				<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-						<img id="comment_${assetEntity.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
-				</g:if>
-				<g:else>
-					<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+assetEntity.id)}">
-						<img id="comment_${assetEntity.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-					</g:if>
-					<g:else>
-					<g:if test="${clientConsoleCommentHasPermission}">
-						<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${assetEntity.id},'${assetEntity.asset.assetName}','${assetEntity.asset.assetType}');"/>
-					</g:if>
-					</g:else>
-			</g:else>
-			</span>
+			<grid-buttons asset-id="${assetEntity.id}" asset-type="${assetEntity.asset.assetType}" tasks="${assetEntity.tasksStatus}" comments="${assetEntity.commentsStatus}"></grid-buttons>
 			</td>
 			<td  id="${assetEntity.id}_column1">
 				<g:if test="${columns?.column1.field != 'currentStatus'}">

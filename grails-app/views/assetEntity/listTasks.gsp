@@ -72,9 +72,9 @@
 			var sizePref = '${sizePref}'
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var listCaption ="Tasks: \
-				<span class='capBtn'><input type='button' value='Create Task' onclick='createIssue()'/></span> \
-				<span class='capBtn'><input type='button' id='bulkEditId' class='bulkEdit' value='Bulk Edit' data-method='bulkEditTasks' ng-click='comments.bulkEditTasks()' /></span>"
-					
+				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"ssue\",\"\",\"\")'></tdsactionbutton>&nbsp; \
+				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>"
+
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
@@ -201,20 +201,21 @@
 					<b><label for="viewUnpublishedCB" > View unpublished</label></b>&nbsp;&nbsp;
 				</tds:hasPermission>
 
-					<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
+				<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
+				<select id="selectTimedBarId"
+				    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
+					<option value="0">Manual</option>
+					<option value="60" selected="selected">1 Min</option>
+					<option value="120">2 Min</option>
+					<option value="180">3 Min</option>
+					<option value="240">4 Min</option>
+					<option value="300">5 Min</option>
+				</select>
 
+				<span style="float: right">
 					<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
 
-					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
-					<select id="selectTimedBarId"
-					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
-						<option value="0">Manual</option>
-						<option value="60" selected="selected">1 Min</option>
-						<option value="120">2 Min</option>
-						<option value="180">3 Min</option>
-						<option value="240">4 Min</option>
-						<option value="300">5 Min</option>
-					</select>
+					<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
 				</span>
 			</span>
 			<br/></br>

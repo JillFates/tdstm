@@ -33,47 +33,33 @@
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
-							<g:checkBox name="checkBox" id="checkId_${database.id}" ></g:checkBox>
-							<a href="javascript:editEntity('dependencyConsole','Database', ${database.id})"><img
+							<g:checkBox name="checkBox" id="checkId_${database.asset.id}" ></g:checkBox>
+							<a href="javascript:editEntity('dependencyConsole','Database', ${database.asset.id})"><img
 									src="/tdstm/icons/database_edit.png" border="0px" />
-							</a> <span id="icon_15651"> <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+database.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-							   <g:remoteLink controller="assetEntity" action="listComments" id="${database.id}" before="setAssetId('${database.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${database.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
-							   </g:remoteLink>
-				             </g:if>
-						     <g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+database.id)}">
-						     <g:remoteLink controller="assetEntity" action="listComments" id="${database.id}" before="setAssetId('${database.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${database.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-							 </g:remoteLink>
-						     </g:elseif>
-						     <g:else>
-						     <a href="javascript:createNewAssetComment(${database.id},'${database.assetName}','${database.assetType}');">
-							    <img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${database.id},'${database.assetName}','${database.assetType}');"/>
-							 </a>
-							    
-						    </g:else> </span>
+							</a> 
+							<grid-buttons asset-id="${database.asset?.id}" asset-type="${database.asset?.assetType}" tasks="${database.tasksStatus}" comments="${database.commentsStatus}"></grid-buttons>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.assetName}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.dbFormat}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.dbFormat}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.validation}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.moveBundle}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database.planStatus}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.planStatus}</span>
 
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database?.depToResolve?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.id} )">${database?.depToConflict?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>
@@ -84,6 +70,7 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		$('#tabTypeId').val('database')
+		$('#tabTypeId').val('database');
+		recompileDOM('item1');
 	</script>
 </div>

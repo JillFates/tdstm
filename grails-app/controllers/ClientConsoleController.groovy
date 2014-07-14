@@ -213,7 +213,7 @@ class ClientConsoleController {
 					def html = buildHtml(asset.id)
 					// TODO : Runbook : Figure out how to determine the currentStatus
 					def status = 'TBD'
-					assetEntityList << [id:asset.id, asset:asset, transitions:html, currentStatus:status]
+					assetEntityList << [id:asset.id, asset:asset, transitions:html, currentStatus:status, tasksStatus: asset.tasksStatus, commentsStatus: asset.commentsStatus]
 				}
 					
 			} else {
@@ -278,7 +278,7 @@ class ClientConsoleController {
 	                    }
 	                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
 	                }
-	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, 
+	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus,
 										currentStatus : it.currentStatus ? stateEngineService.getState(workflowCode,it.currentStatus) : ""]
 				}
 			}

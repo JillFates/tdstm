@@ -34,51 +34,35 @@
 					<g:each in="${appList}" var="app" status="i">
 						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
-								<g:checkBox name="checkBox" id="checkId_${app?.id}"></g:checkBox>
-								<a href="javascript:editEntity('dependencyConsole','Application', ${app?.id})">
+								<g:checkBox name="checkBox" id="checkId_${app.asset?.id}"></g:checkBox>
+								<a href="javascript:editEntity('dependencyConsole','Application', ${app.asset?.id})">
 									<img src="/tdstm/icons/database_edit.png" border="0px" />
 								</a>
-								<span id="icon_15651">
-									<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+app?.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-										<g:remoteLink controller="assetEntity" action="listComments" id="${app?.id}" before="setAssetId('${app?.id}');" onComplete="listCommentsDialog(e,'never');">
-											<img id="comment_${app?.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
-										</g:remoteLink>
-									</g:if>
-									<g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+app?.id)}">
-										<g:remoteLink controller="assetEntity" action="listComments" id="${app?.id}" before="setAssetId('${app?.id}');" onComplete="listCommentsDialog(e,'never');">
-											<img id="comment_${app?.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-										</g:remoteLink>
-									</g:elseif>
-									<g:else>
-										<a href="javascript:createNewAssetComment(${app?.id},'${app?.assetName}','${app?.assetType}');">
-											<img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${app?.id},'${app?.assetName}','${app?.assetType}');"/>
-										</a>
-									</g:else>
-								</span>
+								<grid-buttons asset-id="${app.asset?.id}" asset-type="${app.asset?.assetType}" tasks="${app.tasksStatus}" comments="${app.commentsStatus}"></grid-buttons>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.assetName}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.assetName}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.sme}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.sme}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.sme2}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.sme2}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.validation}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.validation}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.moveBundle}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.moveBundle}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.planStatus}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.planStatus}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.depToResolve?:''}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.depToResolve?:''}</span>
 							</td>
 							<td>
-								<span onclick="getEntityDetails('dependencyConsole','Application', ${app?.id} )">${app?.depToConflict?:''}</span>
+								<span onclick="getEntityDetails('dependencyConsole','Application', ${app.asset?.id} )">${app.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>
@@ -89,6 +73,7 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		$('#tabTypeId').val('apps')
+		$('#tabTypeId').val('apps');
+		recompileDOM('item1');
 	</script>
 </div>

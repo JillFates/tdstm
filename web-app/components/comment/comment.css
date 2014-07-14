@@ -195,3 +195,6 @@ button.alert-close {
 .modal-content:focus {
 	outline: none;  
 }
+.comment-buttons {
+	white-space: normal;
+}

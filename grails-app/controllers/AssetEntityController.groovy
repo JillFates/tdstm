@@ -1911,7 +1911,7 @@ class AssetEntityController {
 		def query = new StringBuffer(""" 
 			SELECT * FROM ( 
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, ae.source_location AS sourceLocation, 
-				ae.source_rack AS sourceRack,ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
+				ae.source_rack AS sourceRack, IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
 		if(temp)
 			query.append(temp)
 			
@@ -1921,7 +1921,9 @@ class AssetEntityController {
 		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle,ae.validation AS validation
 				FROM asset_entity ae
 				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
+				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+				""")
 		if(joinQuery)
 			query.append(joinQuery)
 			
@@ -2023,7 +2025,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			[ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
 			it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
 			/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
-			(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),	it.assetType, it.event
+			it.tasksStatus, it.assetType, it.event, it.commentsStatus
 		], id: it.assetId]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
@@ -2475,7 +2477,16 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	 *-------------------------------------------------------------*/
 	def listComments = {
 		def assetEntityInstance = AssetEntity.get( params.id )
-		def assetCommentsInstance = AssetComment.findAllByAssetEntity( assetEntityInstance )
+		def commentType = params.commentType;
+		def assetCommentsInstance
+		if (commentType) {
+			if (commentType != 'comment') {
+				commentType = 'issue'
+			}
+			assetCommentsInstance = AssetComment.findAllByAssetEntityAndCommentType( assetEntityInstance, commentType )
+		} else {
+			assetCommentsInstance = AssetComment.findAllByAssetEntity( assetEntityInstance )
+		}
 		def assetCommentsList = []
 		def today = new Date()
 		def css //= 'white'
@@ -4523,8 +4534,9 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 		}
 		def queryFordepsList = """
-			SELECT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
-			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality
+			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
+			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
+			IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
 			FROM ( 
 				SELECT * FROM tdstm.asset_dependency_bundle 
 				WHERE project_id=${projectId} ${nodesQuery} 
@@ -4534,8 +4546,10 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id 
 			LEFT OUTER JOIN move_event me ON me.move_event_id = mb.move_event_id 
 			LEFT OUTER JOIN application app ON app.app_id = ae.asset_entity_id
+			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			"""
-			
+
 		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
 		depSql += selectionQuery
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
@@ -4558,6 +4572,8 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		model.sortBy = sortOn
 		
 		def serverTypes = AssetType.getAllServerTypes()
+		def asset
+
 		
 		// Switch on the desired entity type to be shown, and render the page for that type 
 		switch(params.entity) {
@@ -4566,7 +4582,9 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				def appList = []
 				
 				applicationList.each {
-					appList << Application.read(it.assetId)
+					asset = Application.read(it.assetId)
+
+					appList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
 				}
 				appList = sortAssetByColumn(appList,sortOn,orderBy)
 				model.appList = appList
@@ -4580,7 +4598,9 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				def assetList = []
 				
 				assetEntityList.each {
-					assetList << AssetEntity.read(it.assetId)
+					asset = AssetEntity.read(it.assetId)
+
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
 				}
 				assetList = sortAssetByColumn(assetList,sortOn,orderBy)
 				model.assetList = assetList
@@ -4593,7 +4613,9 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				def dbList = []
 				
 				databaseList.each {
-					dbList << Database.read(it.assetId)
+					asset = Database.read(it.assetId)
+
+					dbList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
 				}
 				dbList = sortAssetByColumn(dbList,sortOn,orderBy)
 				model.databaseList = dbList
@@ -4607,24 +4629,26 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				def fileList = []
 				
 				filesList.each {
-					assetList << AssetEntity.read(it.assetId)
+					asset = AssetEntity.read(it.assetId)
+
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
 				}
 				
 				assetList.each {
-					def item = [id:it.id, assetName:it.assetName, assetType:it.assetType, 
-						validation:it.validation, moveBundle:it.moveBundle, planStatus:it.planStatus, 
-						depToResolve:it.depToResolve, depToConflic:it.depToConflict]
+					def item = [id:it.asset.id, assetName:it.asset.assetName, assetType:it.asset.assetType, 
+						validation:it.asset.validation, moveBundle:it.asset.moveBundle, planStatus:it.asset.planStatus, 
+						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict]
 					
 					// check if the object is a logical or physical strage
-					if (it.assetClass.toString().equals('DEVICE')) {
+					if (it.asset.assetClass.toString().equals('DEVICE')) {
 						item.fileFormat = ''
 						item.storageType = 'Server'
 					} else {
-						item.fileFormat = Files.read(it.id)?.fileFormat?:''
+						item.fileFormat = Files.read(it.asset.id)?.fileFormat?:''
 						item.storageType = 'Files'
 					}
 					
-					fileList << item
+					fileList << [asset: item, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
 				}
 				fileList = sortAssetByColumn(fileList,sortOn,orderBy)
 				model.filesList = fileList
@@ -5415,9 +5439,9 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	def sortAssetByColumn (assetlist, sortOn, orderBy) {
 		assetlist.sort { a, b ->
 			if (orderBy == 'asc') {
-				(a?."${sortOn}".toString() <=> b?."${sortOn}".toString())
+				(a.asset?."${sortOn}".toString() <=> b.asset?."${sortOn}".toString())
 			} else {
-				(b?."${sortOn}".toString() <=> a?."${sortOn}".toString())
+				(b.asset?."${sortOn}".toString() <=> a.asset?."${sortOn}".toString())
 			}
 		}
 		return assetlist

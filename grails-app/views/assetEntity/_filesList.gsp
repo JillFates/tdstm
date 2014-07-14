@@ -30,48 +30,32 @@
 					<g:each in="${filesList}" var="files" status="i">
 						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
-								<g:checkBox name="checkBox" id="checkId_${files.id}" ></g:checkBox>
-								<a href="javascript:editEntity('dependencyConsole', '${files.storageType}', ${files.id})">
-									<img src="/tdstm/icons/database_edit.png" border="0px" />
-								</a> 
-								<span id="icon_15651">
-									<g:if test="${AssetComment.find('from AssetComment where assetEntity = '+files.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-										<g:remoteLink controller="assetEntity" action="listComments" id="${files.id}" before="setAssetId('${files.id}');" onComplete="listCommentsDialog(e,'never');">
-											<img id="comment_${files.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
-										</g:remoteLink>
-									</g:if>
-									<g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+files.id)}">
-										<g:remoteLink controller="assetEntity" action="listComments" id="${files.id}" before="setAssetId('${files.id}');" onComplete="listCommentsDialog(e,'never');">
-											<img id="comment_${files.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-										</g:remoteLink>
-									</g:elseif>
-									<g:else>
-										<a href="javascript:createNewAssetComment(${files.id},'${files.assetName}','${files.assetType}');">
-										    <img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${files.id},'${files.assetName}','${files.assetType}');"/>
-										</a>								    
-									</g:else>
-								</span>
+							<g:checkBox name="checkBox" id="checkId_${files.asset?.id}" ></g:checkBox>
+							<a href="javascript:editEntity('dependencyConsole','${files.asset.storageType}', ${files.asset.id})"><img
+									src="/tdstm/icons/database_edit.png" border="0px" />
+							</a>
+							<grid-buttons asset-id="${files.asset?.id}" asset-type="${files.asset?.assetType}" tasks="${files.tasksStatus}" comments="${files.commentsStatus}"></grid-buttons>
 							</td>
-							<td>
-								<span onclick="getEntityDetails('dependencyConsole', '${files.storageType}', ${files.id} )">'${files.assetName}'</span>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.assetName}</span>
 							</td>
-							<td>
-								<span onclick="getEntityDetails('dependencyConsole','${files.storageType}', ${files.id} )">${files.fileFormat}</span>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.fileFormat}</span>
 							</td>
-							<td>
-								<span onclick="getEntityDetails('dependencyConsole','${files.storageType}', ${files.id} )">${files.validation}</span>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.validation}</span>
 							</td>
-   							<td>
-								<span onclick="getEntityDetails('dependencyConsole','${files.storageType}', ${files.id} )">${files.moveBundle}</span>
+   							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.moveBundle}</span>
 							</td>
-							<td>
-								<span onclick="getEntityDetails('dependencyConsole','${files.storageType}', ${files.id} )">${files.planStatus}</span>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.planStatus}</span>
 							</td>
-							<td>
-								<span onclick="getEntityDetails('dependencyConsole','${files.storageType}', ${files.id} )">${files.depToResolve?:''}</span>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset?.depToResolve?:''}</span>
 							</td>
-							<td>
-								<span onclick="getEntityDetails('dependencyConsole','${files.storageType}', ${files.id} )">${files.depToConflict?:''}</span>
+							<td><span
+								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>
@@ -82,6 +66,7 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		$('#tabTypeId').val('files')
+		$('#tabTypeId').val('files');
+		recompileDOM('item1');
 	</script>
 </div>

@@ -1,0 +1,14 @@
+<span class="comment-buttons">
+<a ng-if="tasks=='tasks'" ng-click="listBy('issue')" id="icon_task_{{assetId}}">
+	<img ng-src="{{applyRootPath('/icons/table_multiple.png')}}" border="0px"/>
+</a>
+<a ng-if="tasks=='noTasks'" ng-click="createCommentBy('issue')" id="icon_task_{{assetId}}">
+	<img ng-src="{{applyRootPath('/icons/table_add.png')}}" border="0px"/>
+</a>
+<a ng-if="comments=='comments'" ng-click="listBy('comment')" id="icon_comment_{{assetId}}">
+	<img ng-src="{{applyRootPath('/icons/comments.png')}}" border="0px"/>
+</a>
+<a ng-if="comments=='noComments'" ng-click="createCommentBy('comment')" id="icon_comment_{{assetId}}">
+	<img ng-src="{{applyRootPath('/icons/comment_add.png')}}" border="0px"/>
+</a>
+</span>

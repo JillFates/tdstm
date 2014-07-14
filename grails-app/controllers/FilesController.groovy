@@ -147,17 +147,19 @@ class FilesController {
 			}
 		}
 		def query = new StringBuffer("""SELECT * FROM ( SELECT f.files_id AS fileId, ae.asset_name AS assetName,ae.asset_type AS assetType,
-										 me.move_event_id AS event,ac.status AS commentStatus, """)
+										 me.move_event_id AS event, 
+										 IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus, """)
 		
 		if(temp){
 			query.append(temp)
 		}
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
-		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
+		query.append(""" ae.validation AS validation,ae.plan_status AS planStatus
 				FROM files f 
 				LEFT OUTER JOIN asset_entity ae ON f.files_id=ae.asset_entity_id
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id """)
 		if(joinQuery)
 			query.append(joinQuery)
@@ -229,8 +231,7 @@ class FilesController {
 			def commentType = it.commentType
 			[ cell: ['',it.assetName, (it[filePref["1"]] ?: ''), it[filePref["2"]], it[filePref["3"]], it[filePref["4"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),
-					it.assetType], id: it.fileId,
+					it.tasksStatus,	it.assetType, it.commentsStatus], id: it.fileId,
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]

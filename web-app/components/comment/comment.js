@@ -37,8 +37,8 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 		updateRefreshTimer();
 	});
 
-	scope.$on('commentsList', function(evt, assetTO) {
-		scope.controller.list(assetTO);
+	scope.$on('commentsList', function(evt, assetTO, commentType) {
+		scope.controller.list(assetTO, commentType);
 	});
 
 	scope.$on('createComment', function(evt, commentType, assetTO) {
@@ -74,21 +74,28 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 		scope.$broadcast('commentChanged', commentUtils.commentEventTO(commentId, assetId, action));
 	}
 
-	this.listBy = function(assetId, assetType) {
-		this.list(commentUtils.assetTO(assetId, assetType))
+	this.listBy = function(assetId, assetType, commentType) {
+		this.list(commentUtils.assetTO(assetId, assetType), commentType)
 	}
 
-	this.list = function(assetTO) {
+	this.list = function(assetTO, commentType) {
+		if (!commentType) {
+			commentType = 'issue';
+		}
 		window.setAssetId(assetTO.assetId);
+		var view = (commentType == 'comment') ? '/comment/list' : '/task/list';
 		scope.$broadcast('forceDialogClose', ['crud', 'list']);
 		modal.open({
-			templateUrl: utils.url.applyRootPath('/comment/list'),
+			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.ListDialogController,
 			scope: scope,
 			windowClass: "modal-comment",
 			resolve: {
 				assetTO: function() {
 					return assetTO;
+				},
+				defaultCommentType: function() {
+					return commentType;
 				}
 			}
 		});
@@ -205,7 +212,7 @@ tds.comments.controller.MainController.$inject = ['$rootScope', '$scope', '$moda
 /*****************************************
  * Controller for comments & assets list dialog
  */
-tds.comments.controller.ListDialogController = function($scope, $modalInstance, $log, $timeout, alerts, assetTO, commentService, appCommonData, utils, commentUtils) {
+tds.comments.controller.ListDialogController = function($scope, $modalInstance, $log, $timeout, alerts, assetTO, commentService, appCommonData, utils, commentUtils, defaultCommentType) {
 
 	$scope.commentsData = [];
 	$scope.truncate = utils.string.truncate;
@@ -228,7 +235,7 @@ tds.comments.controller.ListDialogController = function($scope, $modalInstance, 
 	});
 
 	var refreshView = function() {
-		commentService.searchComments(assetTO.assetId).then(
+		commentService.searchComments(assetTO.assetId, defaultCommentType).then(
 			function(data) {
 				showComments(data)
 			},
@@ -750,9 +757,9 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		return deferred.promise;
 	};
 
-	var searchComments = function(assetId) {
+	var searchComments = function(assetId, commentType) {
 		var deferred = q.defer();
-		http.get(utils.url.applyRootPath('/assetEntity/listComments/' + assetId)).
+		http.get(utils.url.applyRootPath('/assetEntity/listComments/' + assetId + '?commentType=' + commentType)).
 		success(function(data, status, headers, config) {
 			deferred.resolve(data);
 		}).
@@ -1089,7 +1096,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		var tempAssetType = null;
 		if (assetType == 'Application' || assetType == 'Database') {
 			tempAssetType = assetType
-		} else if (assetType == 'Files' || assetType == 'Storage') {
+		} else if (assetType == 'Files') {
 			tempAssetType = 'Storage'
 		} else if (assetType == 'Server' || assetType == 'VM' || assetType == 'Blade') {
 			tempAssetType = 'Server'
@@ -1657,7 +1664,7 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 			scope.comments = [];
 			scope.applyRootPath = utils.url.applyRootPath;
 			var refreshView = function() {
-				commentService.searchComments(scope.assetId).then(
+				commentService.searchComments(scope.assetId, '').then(
 					function(data) {
 						scope.comments = data;
 					},
@@ -1701,6 +1708,35 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 };
 
 /*****************************************
+ * Directive gridButtons
+ */
+tds.comments.directive.GridButtons = function(utils, commentUtils) {
+
+	return {
+		restrict: 'E',
+		replace: true,
+		scope: {
+			assetId: '@assetId', //=rowId
+			assetType: '@assetType',
+			tasks: '@tasks',
+			comments: '@comments'
+		},
+		templateUrl: utils.url.applyRootPath('/components/comment/grid-buttons-template.html'),
+		link: function(scope, element, attrs) {
+			scope.applyRootPath = utils.url.applyRootPath;
+
+			scope.listBy = function(commentType) {
+				scope.$emit('commentsList', commentUtils.assetTO(scope.assetId, scope.assetType), commentType);
+			}
+
+			scope.createCommentBy = function(commentType) {
+				scope.$emit('createComment', commentType, commentUtils.assetTO(scope.assetId, scope.assetType));
+			}
+		}
+	};
+};
+
+/*****************************************
  * Comments module configuration
  */
 tds.comments.module = angular.module('tdsComments', ['tdsCore']);
@@ -1717,6 +1753,7 @@ tds.comments.module.directive('actionBarCell', ['commentService', 'alerts', 'uti
 tds.comments.module.directive('staffRoles', ['commentService', 'alerts', 'utils', tds.comments.directive.StaffRoles]);
 tds.comments.module.directive('assetsByType', ['appCommonData', 'commentService', 'alerts', 'utils', tds.comments.directive.AssetsByType]);
 tds.comments.module.directive('commentInnerList', ['commentService', 'alerts', 'utils', 'commentUtils', tds.comments.directive.CommentInnerList]);
+tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comments.directive.GridButtons]);
 
 
 /***************************

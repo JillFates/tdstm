@@ -151,7 +151,8 @@ class DatabaseController {
 			}
 		}
 		def query = new StringBuffer("""SELECT * FROM ( SELECT d.db_id AS dbId, ae.asset_name AS assetName,ae.asset_type AS assetType,
-										 me.move_event_id AS event,ac.status AS commentStatus, """)
+										 me.move_event_id AS event,
+										 IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,""")
 		
 		if(temp){
 			query.append(temp)
@@ -160,7 +161,7 @@ class DatabaseController {
 		/*COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depResolve, adb.dependency_bundle AS depNumber,
 			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts */
 		
-		query.append("""  ac.comment_type AS commentType,ae.validation AS validation,ae.plan_status AS planStatus
+		query.append("""  ae.validation AS validation,ae.plan_status AS planStatus
 			FROM data_base d 
 			LEFT OUTER JOIN asset_entity ae ON d.db_id=ae.asset_entity_id
 			LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id """)
@@ -168,7 +169,8 @@ class DatabaseController {
 			query.append(joinQuery)
 			
 		query.append(""" \n LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id
+			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			WHERE ae.project_id = ${project.id} """)
 
 		if (justPlanning=='true')
@@ -234,8 +236,7 @@ class DatabaseController {
 			def commentType = it.commentType
 			[ cell: ['',it.assetName, (it[dbPref["1"]] ?: ''), it[dbPref["2"]], it[dbPref["3"]], it[dbPref["4"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),
-					it.assetType], id: it.dbId,
+					it.tasksStatus,	it.assetType, it.commentsStatus], id: it.dbId,
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]

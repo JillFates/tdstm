@@ -599,7 +599,8 @@ class PmoAssetTrackingService {
 			sptDba.team_code AS sourceTeamDba, tptDba.team_code AS targetTeamDba,
 			MAX(CAST(at.state_to AS UNSIGNED INTEGER)) AS maxstate,  
 			ae.custom1, ae.custom2, ae.custom3,	ae.custom4, ae.custom5, ae.custom6, ae.custom7, ae.custom8,
-			ae.current_status AS currentStatus, """)
+			ae.current_status AS currentStatus,
+			IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,""")
 		
 		if (project.runbookOn==1) {
 			query.append( 'MAX(IFNULL(task.last_updated,eav.last_updated)) AS updated')	
@@ -621,6 +622,8 @@ class PmoAssetTrackingService {
 			LEFT JOIN model m ON ae.model_id = m.model_id
 			LEFT JOIN manufacturer mf ON ae.manufacturer_id = mf.manufacturer_id
             LEFT JOIN asset_transition at ON at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process'
+			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			""")
 		if (project.runbookOn==1) {
 			query.append( 'LEFT JOIN asset_comment task ON task.asset_entity_id = ae.asset_entity_id')

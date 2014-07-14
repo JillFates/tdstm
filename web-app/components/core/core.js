@@ -754,7 +754,13 @@ tds.core.directive.ActionButton = function(utils, window) {
 		},
 		link: function(scope, element, attrs, ngModelCtrl) {
 			scope.name = scope.label.toLowerCase().replace(/ /g, '').replace(/\./g,'')
-			scope.applyRootPath = utils.url.applyRootPath;
+			scope.applyRootPath = function(path) {
+				if (path == '') {
+					return '#';
+				} else {
+					return utils.url.applyRootPath(path);
+				}
+			}
 			scope.doAction = function(event) {
 				if (scope.click) {
 					window[scope.click](event);

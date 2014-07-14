@@ -78,7 +78,7 @@
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle',
 						 'id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false,width:'40', fixed:true},
+					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false,width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType'},
 						{name:'model'}, 
@@ -129,14 +129,9 @@
 				function myCustomFormatter (cellVal,options,rowObject) {
 					var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+
 							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-					if(rowObject[12]=='issue'){
-                        editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[2]+'\');">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-					} else if (rowObject[12]=='comment') {
-					   editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[2]+'\');">'+"<img src='${resource(dir:'icons',file:'comment.png')}' border='0px'/>"+"</a></span>"
-					} else {
-					   editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.createCommentBy(\'issue\','+options.rowId+',\''+rowObject[2]+'\')">'
-						+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
-					}
+
+					editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[12] + "' comments='" + rowObject[15] + "'></grid-buttons>"
+
 					return editButton
 				}
 

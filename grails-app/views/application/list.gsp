@@ -71,7 +71,7 @@
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType', 'Event'"
-					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'50', fixed:true},
+					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${appPref['1']}',width:'120'},
 						{name:'${appPref['2']}', width:'120'},
@@ -118,14 +118,7 @@
 			function myCustomFormatter (cellVal,options,rowObject) {
 				var editButton = '<a href="javascript:editEntity(\'application\',\'Application\','+options.rowId+')">'+
 						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-				if (rowObject[6]=='issue') {
-					editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[7]+'\');">'+"<img src='${resource(dir:'i',file:'db_table_red.png')}' border='0px'/>"+"</a></span>"
-				} else if (rowObject[6]=='comment') {
-					editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.listBy('+options.rowId+',\''+rowObject[7]+'\');">'+"<img src='${resource(dir:'icons',file:'comment.png')}' border='0px'/>"+"</a></span>"
-				} else {
-					editButton+='<span id="icon_'+options.rowId+'"><a ng-click="comments.createCommentBy(\'issue\','+options.rowId+',\''+rowObject[7]+'\')">'
-						+"<img src='${resource(dir:'i',file:'db_table_light.png')}' border='0px'/>"+"</a></span>"
-				}
+				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[7] + "' tasks='" + rowObject[6] + "' comments='" + rowObject[9] + "'></grid-buttons>"
 				return editButton
 			}
 			function deleteMessage(response, postdata) {

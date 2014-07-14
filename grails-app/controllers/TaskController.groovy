@@ -874,6 +874,10 @@ digraph runbook {
 		render( view: "_showTask", model: [])
 	}
 
+    def list = {
+        render( view: "_list", model: [])
+    }
+
 	/**
 	 * Get task roles
 	 */

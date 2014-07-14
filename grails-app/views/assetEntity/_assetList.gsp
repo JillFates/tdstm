@@ -39,66 +39,50 @@
 						<tr id="tag_row1" style="cursor: pointer;"
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td nowrap="nowrap">
-							<g:checkBox name="checkBox" id="checkId_${asset.id}" ></g:checkBox>
-							<a href="javascript:editEntity('dependencyConsole','Server', ${asset.id})"><img
+							<g:checkBox name="checkBox" id="checkId_${asset.asset.id}" ></g:checkBox>
+							<a href="javascript:editEntity('dependencyConsole','Server', ${asset.asset.id})"><img
 									src="/tdstm/icons/database_edit.png" border="0px" />
-							</a> <span id="icon_15651">
-							 <g:if test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id+' and commentType = ? and isResolved = ?',['issue',0])}">
-							   <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${asset.id}" src="${resource(dir:'i',file:'db_table_red.png')}" border="0px" />
-							   </g:remoteLink>
-				             </g:if>
-						     <g:elseif test="${AssetComment.find('from AssetComment where assetEntity = '+asset.id)}">
-						     <g:remoteLink controller="assetEntity" action="listComments" id="${asset.id}" before="setAssetId('${asset.id}');" onComplete="listCommentsDialog(e,'never');">
-							      <img id="comment_${asset.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-							 </g:remoteLink>
-						     </g:elseif>
-						     <g:else>
-						     <a href="javascript:createNewAssetComment(${asset.id},'${asset.assetName}','${asset.assetType}');">
-							    <img src="${resource(dir:'i',file:'db_table_light.png')}" border="0px" onclick="createNewAssetComment(${asset.id},'${asset.assetName}','${asset.assetType}');"/>
-							 </a>
-							    
-						    </g:else>
-			 				</span>
+							</a> 
+							<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}"></grid-buttons>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.assetName}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.model}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.model}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.sourceLocation}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.sourceLocation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.sourceRack}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.targetLocation}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.targetLocation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.targetRack}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.targetRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.assetType}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.assetType}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.assetTag}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.assetTag}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.validation}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.moveBundle}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset.planStatus}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset?.depToResolve?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.id} )">${asset?.depToConflict?:''}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>
@@ -110,7 +94,8 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		$('#tabTypeId').val('server')
+		$('#tabTypeId').val('server');
+		recompileDOM('item1');
 	</script>
 </div>
 

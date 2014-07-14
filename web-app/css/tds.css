@@ -1532,12 +1532,11 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	text-overflow: ellipsis;
 }
 .action-button {
+	float: none !important;
 	position: relative;
-	float: right !important;
 	margin: 5px !important;	
 }
 a.action-button span.task_button {
-	float: left;
 	height: 22px;
 	line-height: 22px;
 	padding: 0 5px 0 5px;

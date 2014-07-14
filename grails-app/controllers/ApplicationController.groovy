@@ -129,7 +129,7 @@ class ApplicationController {
 		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
 		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName,a.latency AS latency,
-										ac.status AS commentStatus, ac.comment_type AS commentType,me.move_event_id AS event,""")
+										IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
 		if(customizeQuery.query){
 			query.append(customizeQuery.query)
 		}	
@@ -137,7 +137,9 @@ class ApplicationController {
 		query.append(""" ae.asset_type AS assetType,ae.validation AS validation,ae.plan_status AS planStatus,me.runbook_status AS runbookStatus
 			FROM application a 
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
-			LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id""")
+			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+			""")
 		if(customizeQuery.joinQuery){
 			query.append(customizeQuery.joinQuery)
 		}
@@ -223,11 +225,10 @@ class ApplicationController {
 			appsList = []
 			
 		def results = appsList?.collect { 
-			def commentType = it.commentType
 			[ cell: [
 			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], 
 			/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-			(it.commentStatus!='Completed' && commentType=='issue')?('issue'):(commentType?:'blank'),	it.assetType, it.event
+			it.tasksStatus, it.assetType, it.event, it.commentsStatus
 		], id: it.appId]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		
