@@ -434,16 +434,6 @@ $(document).ready(function() {
 											</tr>
 
 											<tr>
-												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td style="color: grey">Optional</td>
-											</tr>
-
-											<tr>
-												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td style="color: grey">Unknown</td>
-											</tr>
-
-											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconServer.png')}"
 													height="12" /></td>
@@ -574,24 +564,6 @@ $(document).ready(function() {
 															class="links">
 															${percAppDoneCount}%</g:link>
 													</g:else></td>
-											</tr>
-											<tr>
-												<td>&nbsp;</td>
-												<g:each in="${assetList}" var="appCount">
-													<td class="dashboard_stat_exec_tdmx" class='colorGrey'>
-														${appCount.optional}
-													</td>
-												</g:each>
-												<td>&nbsp;</td>
-											</tr>
-											<tr>
-												<td>&nbsp;</td>
-												<g:each in="${assetList}" var="appCount">
-													<td class="dashboard_stat_exec_tdmx" class='colorGrey'>
-														${appCount.potential}
-													</td>
-												</g:each>
-												<td>&nbsp;</td>
 											</tr>
 											<tr>
 												<td nowrap="nowrap"><g:if

@@ -573,22 +573,7 @@ class MoveBundleController {
 			def virtualAssetCount = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0] : 0
 			def allServersCount = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0] : 0
 			
-			// TODO -  JM 6/2014 - I believe this block can be removed as we're not going to show optional going forward 
-			def potential = 0
-			def optional = 0
-			def otherMoveBundles = moveEventList.moveBundles.findAll{ !(it.id in moveBundles.id) }
-			if(otherMoveBundles.size()>0){
-				def potentialQuery = "from AppMoveEvent am right join am.application a where a.moveBundle.useForPlanning=true \
-						and a.project=:project and (a.moveBundle.moveEvent != :moveEvent or a.moveBundle.moveEvent is null) \
-						and (am.moveEvent = :moveEvent or am.moveEvent is null)\
-						and (a.planStatus is null or a.planStatus in ('$unassignedPlan',''))"
-				
-				def queryArgs = [project:project, moveEvent:moveEvent]
-				
-				potential = Application.findAll(potentialQuery+" and (am.value = '?' or am.value is null or am.value = '') ",queryArgs).size()
-				optional = Application.findAll(potentialQuery+" and am.value = 'Y' ",queryArgs).size()
-			}
-			assetList << [physicalCount:physicalAssetCount, virtualAssetCount:virtualAssetCount, count:allServersCount, potential:potential, optional:optional, moveEvent:moveEvent.id]
+			assetList << [physicalCount:physicalAssetCount, virtualAssetCount:virtualAssetCount, count:allServersCount, moveEvent:moveEvent.id]
 			
 			def dbCount = moveBundles ? Database.executeQuery(dbCountQuery, eventWiseArgs)[0] : 0
 			dbList << [moveEvent:moveEvent.id , count:dbCount]
