@@ -286,7 +286,7 @@ class CookbookService {
 		if (!RolePermissions.hasPermission('DeleteRecipe')) {
 			throw new UnauthorizedException('User doesn\'t have a DeleteRecipe permission')
 		}
-		
+
 		if (recipeId == null || !recipeId.isNumber() || currentProject == null || recipeVersion == null || !recipeVersion.isNumber()) {
 			throw new EmptyResultException();
 		}
@@ -303,23 +303,27 @@ class CookbookService {
 
 		if (!recipe.project.equals(currentProject)) {
 			log.warn('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
-			throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+			throw new InvalidParamException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}
-		
+
 		if (!rv.recipe.equals(recipe)) {
 			log.warn('Recipe and version does not have a common recipe')
-			throw new UnauthorizedException('Recipe and version does not have a common recipe')
+			throw new InvalidParamException('Recipe and version does not have a common recipe')
 		}
 
 		if (recipe.releasedVersion.equals(rv)) {
 			log.warn('Can not delete the currently published version')
-			throw new UnauthorizedException('Can not delete the currently published version')
+			throw new InvalidParamException('Can not delete the currently published version')
+		}
+
+		def dependencies = RecipeVersion.findByClonedFrom(rv)
+		if (dependencies) {
+			log.warn('Can not delete, it have dependencies')
+			throw new InvalidParamException('Can not delete, it have dependencies')
 		}
 
 		namedParameterJdbcTemplate.update('UPDATE task_batch SET recipe_version_used_id = NULL WHERE recipe_version_used_id = :recipeVersionId', ['recipeVersionId' : rv.id])
-		
 		rv.delete(failOnError: true)
-		
 		return rv
 	}
 	

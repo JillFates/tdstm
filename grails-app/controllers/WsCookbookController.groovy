@@ -112,6 +112,8 @@ class WsCookbookController {
 			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (ConstraintViolationException e) {
 			render(ServiceResults.errors(['Can\'t delete the recipe']) as JSON)
+		} catch (InvalidParamException e) {
+			render(ServiceResults.fail(e.getMessage()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}

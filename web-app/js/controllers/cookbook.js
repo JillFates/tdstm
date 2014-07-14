@@ -2193,12 +2193,17 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 				$scope.currentSelectedRecipe.name + "'.\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				$log.info(item.entity);
+				var versionToDelete = item.entity.versionNumber?item.entity.versionNumber:0;
 				restCalls.discardWIP({details:$scope.selectedRecipe.recipeId, 
-					moreDetails: item.entity.versionNumber}, function(){
-					$log.info('Success on removing Recipe Version');
-					$scope.alerts.addAlert({type: 'success', msg: 'Recipe Version Removed', closeIn: 1500});
-					listRecipes();
-					$scope.versions.getVersions({recipeId: $scope.selectedRecipe.recipeId});
+					moreDetails: versionToDelete}, function(data){
+					if (data.status == 'fail') {
+						$scope.alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data});
+					} else {
+						$log.info('Success on removing Recipe Version');
+						$scope.alerts.addAlert({type: 'success', msg: 'Recipe Version Removed', closeIn: 1500});
+						listRecipes();
+						$scope.versions.getVersions({recipeId: $scope.selectedRecipe.recipeId});
+					}
 				}, function(){
 					$log.warn('Error on removing Recipe Version');
 					$scope.alerts.addAlert({type: 'danger', msg: 'Error: Unable to remove version'});
