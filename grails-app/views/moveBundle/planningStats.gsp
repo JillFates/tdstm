@@ -12,11 +12,11 @@ $(document).ready(function() {
 	currentMenuId = "#dashboardMenu";
 	$("#dashboardMenuId a").css('background-color','#003366')
 	
-	var percentageAppToValidate=100-"${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}";
+	var percentageAppToValidate= 100 - ${percentageAppToValidate}
 	$("#discoverybar").animate({width: percentageAppToValidate+"%" }, 1000);
 	$("#applicationbar").animate({width: percentageAppToValidate+"%" }, 1000);
 	
-	var percentageBundleReady="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}";
+	var percentageBundleReady="${percentageBundleReady}";
 	$("#analysisbar").animate({width: percentageBundleReady+"%" }, 1000);
 	
 	$("#confirmedbar").animate({width: "${confirmedAppCount}%" }, 1000);
@@ -25,19 +25,19 @@ $(document).ready(function() {
 
 	$("#assignmentbar").animate({width: "${assignedAppCount}%"}, 1000);
 	
-	var percentagePSToValidate=100-"${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}";
+	var percentagePSToValidate=100-"${percentagePSToValidate}";
 	$("#physicalbar").animate({width: percentagePSToValidate+"%" }, 1000);
 	
-	var percentageVMToValidate=100-"${virtualCount ? Math.round((vsToValidate/virtualCount)*100) :100}";
+	var percentageVMToValidate=100-"${percentageVMToValidate}";
 	$("#virtualbar").animate({width: percentageVMToValidate+"%" }, 1000);
 	
-	var percentageDBToValidate=100-"${dbCount ? Math.round((dbToValidate/dbCount)*100) :100}";
+	var percentageDBToValidate=100-"${percentageDBToValidate}";
 	$("#dbbar").animate({width: percentageDBToValidate+"%" }, 1000);
 	
-	var percentageStorToValidate=100-"${fileCount ? Math.round((fileToValidate/fileCount)*100) :100}";
+	var percentageStorToValidate=100-"${percentageStorToValidate}";
 	$("#filebar").animate({width: percentageStorToValidate+"%" }, 1000);
 	
-	var percentageOtherToValidate=100-"${otherAssetCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}";
+	var percentageOtherToValidate=100-"${percentageOtherToValidate}";
 	$("#assetbar").animate({
 		width : percentageOtherToValidate + "%"
 	}, 1000);
@@ -65,23 +65,6 @@ $(document).ready(function() {
 <body>
 	<div class="body">
 		<div id="containerId" class="container">
-			<g:set var="percentageAppToValidate"
-				value="${applicationCount ? Math.round((appToValidate/applicationCount)*100) :100}" />
-			<g:set var="percentagePSToValidate"
-				value="${physicalCount ? Math.round((psToValidate/physicalCount)*100) :100}" />
-			<g:set var="percentageVMToValidate"
-				value="${virtualCount ? Math.round((vsToValidate/virtualCount)*100) :100}" />
-			<g:set var="percentageDBToValidate"
-				value="${dbCount ? Math.round((dbToValidate/dbCount)*100) :100}" />
-			<g:set var="percentageStorToValidate"
-				value="${fileCount ? Math.round((fileToValidate/fileCount)*100) :100}" />
-			<g:set var="percentageOtherToValidate"
-				value="${otherAssetCount ? Math.round((otherToValidate/otherAssetCount)*100) :100}" />
-
-			<g:set var="percentageBundleReady"
-				value="${applicationCount ? Math.round((bundleReady/applicationCount)*100) : 0}" />
-			<g:set var="percentageUnassignedAppCount"
-				value="${applicationCount ? Math.round((unassignedAppCount/applicationCount)*100) :100}" />
 			<h1>Planning Dashboard</h1>
 			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:260px">
 				<span class="dashboard_head">Discovery Phase</span>
@@ -531,8 +514,7 @@ $(document).ready(function() {
 															${event}
 														</g:link></th>
 												</g:each>
-												<th class="dashboard_stat_exec_tdmc"
-													style="background-color: white;"></th>
+												<th class="dashboard_stat_exec_tdmc"></th>
 											</tr>
 											<tr>
 
@@ -585,7 +567,7 @@ $(document).ready(function() {
 												</g:each>
 												<td class="dashboard_stat_exec_tdmx"><g:if
 														test="${percAppDoneCount == 0 }">
-														<span class='colorGrey'>0%</span>
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="application" action="list"
 															params="[filter:'applicationCount', runbook:'Done']"
@@ -663,7 +645,7 @@ $(document).ready(function() {
 												</g:each>
 												<td style="text-align: right;"><g:if
 														test="${percentagePhysicalAssetCount== 0 }">
-														<span class='colorGrey'>0%</span>
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
 															params="[filter:'physical', plannedStatus:'Moved',listType:'server']"
@@ -698,7 +680,7 @@ $(document).ready(function() {
 												</g:each>
 												<td style="text-align: right;"><g:if
 														test="${percentagevirtualAssetCount==0 }">
-														<span class='colorGrey'>0%</span>
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
 															params="[filter:'virtual', plannedStatus:'Moved',listType:'server']"
@@ -733,7 +715,7 @@ $(document).ready(function() {
 												</g:each>
 												<td style="text-align: right;"><g:if
 														test="${percentageDBCount== 0 }">
-														<span class='colorGrey'>0%</span>
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="database" action="list"
 															params="[filter:'db', plannedStatus:'Moved']"
@@ -768,7 +750,7 @@ $(document).ready(function() {
 												</g:each>
 												<td style="text-align: right;"><g:if
 														test="${percentagePhyStorageCount== 0 }">
-														<span class='colorGrey'>0%</span>
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
 															params="[filter:'storage', plannedStatus:'Moved']"
@@ -805,8 +787,8 @@ $(document).ready(function() {
 														</g:else></td>
 												</g:each>
 												<td style="text-align: right;"><g:if
-														test="${percentageFilesCount== 0 }">
-														<span class='colorGrey'>0%</span>
+														test="${percentageFilesCount==0}">
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="files" action="list"
 															params="[filter:'storage', plannedStatus:'Moved']"
@@ -842,7 +824,7 @@ $(document).ready(function() {
 												</g:each>
 												<td style="text-align: right;"><g:if
 														test="${percentageOtherCount== 0 }">
-														<span class='colorGrey'>0%</span>
+														<span class='colorGrey'>N/A</span>
 													</g:if> <g:else>
 														<g:link controller="assetEntity" action="list"
 															params="[filter:'other', plannedStatus:'Moved',listType:'physical']"
@@ -851,7 +833,6 @@ $(document).ready(function() {
 													</g:else></td>
 											</tr>
 											<tr>
-
 												<td></td>
 												<g:each in="${openTasks}" var="tasks">
 													<td style="text-align: right;"><g:if

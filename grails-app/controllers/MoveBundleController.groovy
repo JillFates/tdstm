@@ -696,7 +696,7 @@ class MoveBundleController {
 
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
-			( total > 0 ? Math.round(count/total*100) : 100 )
+			( total > 0 ? Math.round(count/total*100)  : 0 )
 		}
 		
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
@@ -716,6 +716,7 @@ class MoveBundleController {
 		}
 		
 		int percentageDBCount = moveBundleList ? Database.executeQuery(dbCountQuery + planStatusMovedQuery, countArgs)[0] : 0
+		
 		percentageDBCount = percOfCount(percentageDBCount, databaseCount)
 		
 		int percentagePhyStorageCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'",
@@ -798,6 +799,15 @@ class MoveBundleController {
 		def otherValidateQuery = countQuery + validationQuery + ' AND ae.assetType NOT IN (:type) AND ae.assetClass=:assetClass'
 		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0]
 		
+		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
+		def percentageBundleReady = applicationCount ? percOfCount(bundleReady, applicationCount) : 0
+		def percentagePSToValidate= physicalCount ? percOfCount(psToValidate, physicalCount) :100 
+		def percentageVMToValidate= virtualCount ? percOfCount(vsToValidate, virtualCount) : 100
+		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
+		def percentageStorToValidate=fileCount ? percOfCount(fileToValidate, fileCount) :100
+		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
+		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
+		
 		return [			
 			appList:appList, applicationCount:applicationCount, unassignedAppCount:unassignedAppCount, appToValidate:appToValidate, 
 			physicalCount:physicalCount, 
@@ -853,7 +863,17 @@ class MoveBundleController {
 			
 			dependencyScan:dependencyScan, dependencyReview:dependencyReview, validated:validated, bundleReady:bundleReady,
 			movedAppCount:movedAppCount, assignedAppCount:assignedAppCount, confirmedAppCount:confirmedAppCount, 
-			percAppDoneCount:percAppDoneCount]
+			percAppDoneCount:percAppDoneCount, percentageAppToValidate:percentageAppToValidate,
+			percentageBundleReady:percentageBundleReady,
+			
+			percentagePSToValidate:percentagePSToValidate, 
+			percentageVMToValidate:percentageVMToValidate, 
+			percentageDBToValidate:percentageDBToValidate, 
+			percentageDBToValidate:percentageDBToValidate,
+			percentageStorToValidate:percentageStorToValidate, 
+			percentageOtherToValidate:percentageOtherToValidate,
+			percentageUnassignedAppCount:percentageUnassignedAppCount
+		]
 	}
 	
 	/**
