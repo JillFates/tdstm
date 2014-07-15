@@ -50,6 +50,17 @@ $(document).ready(function() {
 				
 	});
 
+	$(function(){
+	   if ($('#eventDataTableId').hasScrollBar())
+	   		$("#eventHeaderTableId").css("margin-top", "-26px")
+	});
+
+	(function($) {
+	    $.fn.hasScrollBar = function() {
+	        return this.get(0).scrollWidth > this.width();
+	    }
+	})(jQuery);
+
    
 	$(window).resize(
 		function() {
@@ -420,11 +431,13 @@ $(document).ready(function() {
 						<tr>
 							<td style="width:138px;">
 								<div>
-									<table style="margin-top: -8px; border: none;">
+									<table id="eventHeaderTableId" style="border: none;">
+										<thead>
+											<tr><th class="dashboard_stat_exec_td headerWidth">&nbsp;</th></tr>
+										    <tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
+										    <tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
+										</thead>
 										<tbody>
-										    <tr><td>&nbsp;</td></tr>
-										    <tr><td>&nbsp;</td></tr>
-										    <tr><td>&nbsp;</td></tr>
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconApp.png')}"
