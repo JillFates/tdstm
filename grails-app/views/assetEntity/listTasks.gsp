@@ -179,7 +179,7 @@
 			</g:if>
 			<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
 				<button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
-				{{alert.msg}}
+				<span ng-bind="alert.msg"></span>
 			</div>
 			<div id="taskMessageDiv" class="message" style="display: none;"></div>
 			<input type="hidden" id="manageTaskId" value="manageTask"/>

@@ -375,7 +375,7 @@
 
 				<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
 					<button type="button" class="close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
-					{{alert.msg}}
+					<span ng-bind="alert.msg"></span>
 				</div>
 
 				%{-- <div ng-model="selectedRecipe.sourceCode" ui-codemirror="codeEditorOptions" class="codeMirrorWrapper"></div> --}%

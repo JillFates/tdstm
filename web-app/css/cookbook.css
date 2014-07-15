@@ -32,18 +32,6 @@ ul{
 	padding-left: 25px;
 }
 
-.alert{
-	position: fixed;
-	width:300px;
-	left:50%;
-	margin-left:-15%;
-	top:5%;
-	z-index:100;
-	padding:5px 15px;
-	text-align:center;
-	/*display: none;*/
-}
-
 .modal-dialog{
 	width:800px;
 }
@@ -180,16 +168,6 @@ form .error-msg{
 	font-weight: normal;
 }
 
-/*animations*/
-.alert{
-	-webkit-transition:all ease 0.5s;
-	transition:all ease 0.5s;
-	top:-200px;
-}
-
-.alert.animateShow {
-	top:35px;
-}
 /****/
 
 /* Code Mirror Stuff */
