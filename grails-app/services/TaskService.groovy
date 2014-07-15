@@ -849,8 +849,8 @@ class TaskService implements InitializingBean {
 				'commentId': assetComment.id,
 				'description': assetComment.comment,
 				'asset': assetComment.assetEntity?.assetName,
-				'team': assetComment.assetEntity?.sourceTeamMt == null ? "None" : assetComment.assetEntity?.sourceTeamMt.name,
-				'person': assetComment.assignedTo == null ? "None" : assetComment.assignedTo.getLastNameFirst(),
+				'team': assetComment.role?assetComment.role:'None',
+				'person': assetComment.assignedTo?assetComment.assignedTo.toString():'None',
 				'dueDate': assetComment.dueDate,
 				'status': assetComment.status,
 			]
