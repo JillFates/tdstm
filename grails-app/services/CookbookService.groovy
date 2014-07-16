@@ -17,6 +17,7 @@ import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 
 /**
  * The cookbook services handles the logic for creating recipes and running the cookbook
@@ -937,6 +938,10 @@ class CookbookService {
 			def label = ( type=='task' ? "Task id ${key}" : "Group ${key}" )
 			spec.each { n, v -> 
 				i++
+				if( n=="category" && ! (v in AssetCommentCategory.getList())){
+					errorList << [ error: 1, reason: 'Invalid Category',
+						detail: "$label in element $i contains unknown category '$v'" ]
+				}
 				if (map.containsKey(n)) {
 					// can do more here to check the nested definitions later on.
 
