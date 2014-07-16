@@ -8,7 +8,6 @@
         </button>
     </div>
     <div id="showCommentDialog" title="Comment/Issue detail" class="comment-dialog-content">
-        <loading-indicator></loading-indicator>
         <div class="dialog" style="border: 1px solid #5F9FCF">
             <div>
                 <table id="showCommentTable" style="border: 0px;">
@@ -163,5 +162,6 @@
                 </tds:hasPermission>
             </div>
         </div>
+        <loading-indicator></loading-indicator>
     </div>
 </div>

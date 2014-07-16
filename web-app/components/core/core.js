@@ -515,7 +515,16 @@ tds.core.directive.LoadingIndicator = function(timeout, utils) {
 	return {
 		restrict: 'EA',
 		templateUrl: utils.url.applyRootPath('/components/core/loading-indicator.html'),
+		scope: {
+			align: '@align'
+		},
 		link: function(scope, element, attrs) {
+			scope.animClass = "loading-indicator-anim-center";
+			switch (scope.align) {
+				case "left":
+					scope.animClass = "loading-indicator-anim-left";
+					break;
+			}
 			scope.isLoading = false;
 			scope.$on("newServiceRequest", function () {
 				scope.isLoading = true;

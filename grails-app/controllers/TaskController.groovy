@@ -241,12 +241,12 @@ class TaskController {
 		def result
 
 		if (comment) {
-			if(comment.status ==  AssetCommentStatus.READY){
-				actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager']
-			}
+			if (comment.status in [ AssetCommentStatus.READY, AssetCommentStatus.STARTED]) {
+				def enabled = (comment.status ==  AssetCommentStatus.READY)
+				actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager', disabled: !enabled]
 
-			if (comment.status in[ AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager']
+				enabled = (comment.status in [ AssetCommentStatus.READY, AssetCommentStatus.STARTED])
+				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager', disabled: !enabled]
 			}
 
 			if (includeDetails) {

@@ -1451,6 +1451,9 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 			};
 
 			scope.doAction = function(button) {
+				if (button.disabled) {
+					return;
+				}
 				var action = null;
 				switch (button.actionType) {
 					case "changeStatus":

@@ -4,7 +4,7 @@
 		<a ng-if="button.icon" ng-disabled="button.disabled" class="task_action ui-button ui-widget 
 		  ui-state-default ui-corner-all ui-button-text-icon-primary" ng-click="doAction(button)"> 
 		<span class="ui-button-icon-primary ui-icon task_icon" ng-class="button.icon"></span> 
-		<span id="start_text_205966" class="ui-button-text task_button">{{button.label}}</span> 
+		<span id="start_text_205966" ng-class="{task_button_disabled: (button.disabled), task_button: (!button.disabled)}">{{button.label}}</span> 
 		</a> 
 		<span ng-if="!button.icon" style="float:left;padding-left:40px;" class="task_action">{{button.label}}</span>
 	</span>
