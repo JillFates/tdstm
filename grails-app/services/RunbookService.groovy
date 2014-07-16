@@ -614,6 +614,7 @@ class RunbookService {
 				continue
 			}
 
+			log.debug "computeStartTimes() Start vertex for graph is task id $task.id on graph $g"
 			//
 			// Determine Critical Path
 			// Perform a DFS process through the graph to determine the earliest starts on the initial critical path
@@ -691,11 +692,17 @@ class RunbookService {
 						// check if this edge should be ignored
 						if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
 						
-							if ( ! tmp['tasks'][tasksMap[edge.predecessor.id.toString()].id].tmpBeenExplored ) {
+							def predTaskInfo = tmp['tasks'][edge.predecessor.id]
+							if ( ! predTaskInfo.tmpBeenExplored ) {
 								// Add the task to the queue
+
 								queue.push(edge.predecessor.id.toString())
-								tmp['tasks'][edge.predecessor.id].tmpLatestStart = calcLatestStart
-								tmp['tasks'][edge.predecessor.id].tmpBeenExplored = true
+
+								// Only set the LatestStart if the task is not along critical path since it is already calculated
+								if (! predTaskInfo.tmpCriticalPath)
+									predTaskInfo.tmpLatestStart = calcLatestStart
+
+								predTaskInfo.tmpBeenExplored = true
 							} else {
 								// Been here before so we need to compare the latest starts to set to the ealiest start of the two
 								if ( calcLatestStart < tmp['tasks'][edge.predecessor.id].tmpLatestStart ) 
@@ -714,7 +721,8 @@ class RunbookService {
 			// Do a forward BFS walk through the graph to update the tmpEarliestStart that have yet to be updated (non-critical path)
 			//
 
-			// load queue with the start vertices
+			// Load the queue with all of the start vertices
+			queue.clear()
 			graphs[g].starts.each { id -> queue.push( id.toString() ) }
 
 			tasks.each { 
@@ -735,20 +743,20 @@ class RunbookService {
 				log.debug "computeStartTimes() Earliest task=$taskId, queue.size=${queue.size()}"
 				if (edgesByPred.containsKey(taskId)) {
 					edgesByPred[taskId].each() { edge ->
-						
-						// check if this edge should be ignored
-						if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
-							
-							// Only need to calculate the earliest start of non-critical path tasks
-							if ( !tmp['tasks'][edge.successor.id].tmpCriticalPath ) {
-								def earliest = tmp['tasks'][edge.predecessor.id].tmpEarliestStart + edge.predecessor.duration
-								if (earliest > tmp['tasks'][edge.successor.id].tmpEarliestStart)
-									tmp['tasks'][edge.successor.id].tmpEarliestStart = earliest
+						def succTaskInfo = tmp['tasks'][edge.successor.id]
+						def startWasBumped = false
+						// Only need to calculate the earliest start of non-critical path tasks
+						if ( ! succTaskInfo.tmpCriticalPath ) {
+							def earliest = tmp['tasks'][edge.predecessor.id].tmpEarliestStart + edge.predecessor.duration
+							if (earliest > succTaskInfo.tmpEarliestStart) {
+								succTaskInfo.tmpEarliestStart = earliest
+								log.debug "Set task[${edge.successor.taskNumber}].tmpEarliestStart to $earliest"
+								startWasBumped = true
 							}
-							if ( ! tmp['tasks'][edge.successor.id].tmpBeenExplored ) {
-								queue.push( edge.successor.id.toString() )
-								tmp['tasks'][edge.successor.id].tmpBeenExplored = true
-							}
+						}
+						if ( startWasBumped || ! succTaskInfo.tmpBeenExplored) {
+							queue.push( edge.successor.id.toString() )
+							succTaskInfo.tmpBeenExplored = true
 						}
 					}
 				} else {
@@ -756,8 +764,8 @@ class RunbookService {
 				}
 			}
 
-		} // for (int g=0; g < graphs.size(); g++)
 
+		} // for (int g=0; g < graphs.size(); g++)
 
 		return estFinish
 	}
@@ -772,6 +780,7 @@ class RunbookService {
 	 * @param graphs - The resulting graphs data from determineUniqueGraphs() method
 	 * @return ?
 	 */
+	 /*
 	def computeStartTimes2(Date startTime, List<AssetComment> tasks, List<TaskDependency> dependencies, List<AssetComment> starts, List<AssetComment> sinks, List<Map> graphs ) {	
 
 		// 
@@ -957,6 +966,8 @@ class RunbookService {
 
 		return estFinish
 	}
+	*/
+
 
 //  eventStart, eventFinish, constraintTask
 	/** 

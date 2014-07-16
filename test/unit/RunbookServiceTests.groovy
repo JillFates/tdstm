@@ -337,8 +337,16 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def edgesByPred = deps.asGroup { it.predecessor.id }
 		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
 
-		assertTrue 'Edge should not be null', edge != null
+		assertTrue 'Monitor - Edge should not be null', edge != null
 		assertEquals "Critical edge should be", 108, edge.id
+
+		edge = runbookService.findCriticalPath(tasks[5], edgesByPred, tmp)
+		assertTrue 'Unrack - Edge should not be null', edge != null
+		assertEquals "Critical edge should be", 109, edge.id
+
+		edge = runbookService.findCriticalPath(tasks[8], edgesByPred, tmp)
+		assertTrue 'Coffee - Edge should not be null', edge == null
+
 	}
 
 	// @Test
@@ -355,13 +363,17 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
+		//println "Before computeStartTimes call"
+		//tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
+
 		def startTime = 0
 		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 
+		//println "After computeStartTimes call"
+		//tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
 
-		tasks.each { t -> println "Task ${t.taskNumber}/${t.id} duration=${t.duration}, estStart=${tmp['tasks'][t.id].tmpEstimatedStart}, earliest=${tmp['tasks'][t.id].tmpEarliestStart}, latest=${tmp['tasks'][t.id].tmpLatestStart}, CP=${tmp['tasks'][t.id].tmpCriticalPath}"}
-
-		// id, estStart, earliest, latest, is Critical Path
+		// Task id, estStart, earliest, latest, is Critical Path
+		// Estimated Start (6) expected:<0> but was:<44>
 		def startTimes = [
 			[0,  0,  0, 48, false],
 			[1,  0,  9, 53, false],
@@ -369,7 +381,7 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 			[3, 19, 19, 19, true],
 			[4,  0, 17, 61, false],
 			[5, 22, 22, 22, true],
-			[6,  0,  0, 44, true],	// Start of CP
+			[6,  0,  0, 0, true],	// Start vertice of the true Critical Path
 			[7, 37, 37, 37, true],
 			[8,  0, 37, 80, false],
 			[9,  0, 37, 81, false],
