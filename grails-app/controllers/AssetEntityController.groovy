@@ -1940,10 +1940,13 @@ class AssetEntityController {
 		query.append("\n AND ae.asset_class = '${AssetClass.DEVICE}'")
 
 		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
-		if (listType=='server')
+		if (listType=='server') {
 			query.append(" AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
-		else
+		} else if (listType=='physical') {
+			query.append(" AND ae.asset_class = '${AssetClass.DEVICE}' AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+		} else {
 			query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
+		}
 		
 		if(params.event && params.event.isNumber() && moveBundleList)
 			query.append( " AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
