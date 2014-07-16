@@ -317,12 +317,7 @@ class CookbookService {
 			throw new InvalidParamException('Can not delete the currently published version')
 		}
 
-		def dependencies = RecipeVersion.findByClonedFrom(rv)
-		if (dependencies) {
-			log.warn('Can not delete, it have dependencies')
-			throw new InvalidParamException('Can not delete, it have dependencies')
-		}
-
+		namedParameterJdbcTemplate.update('UPDATE recipe_version SET cloned_from_id = NULL WHERE cloned_from_id = :recipeVersionId', ['recipeVersionId' : rv.id])
 		namedParameterJdbcTemplate.update('UPDATE task_batch SET recipe_version_used_id = NULL WHERE recipe_version_used_id = :recipeVersionId', ['recipeVersionId' : rv.id])
 		rv.delete(failOnError: true)
 		return rv
