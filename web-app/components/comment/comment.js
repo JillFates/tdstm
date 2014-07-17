@@ -1571,6 +1571,8 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			commentId: '@commentId',
 			status: '@status',
 			master: '@master',
+			idPrefix: '@idPrefix',
+			tableColSpan: '@tableColSpan'
 		},
 		link: function(scope, element, attrs) {
 			var templateUrl = utils.url.applyRootPath('/components/comment/action-bar-row-template.html');
@@ -1579,6 +1581,16 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			scope.comment.commentId = scope.commentId;
 			scope.comment.status = scope.status;
 			scope.configTable[scope.commentId] = null;
+			if (scope.idPrefix == null || (typeof scope.idPrefix === 'undefined')) {
+				scope.rowPrefix = '';
+			} else {
+				scope.rowPrefix = scope.idPrefix;
+			}
+			if (scope.tableColSpan == null || (typeof scope.tableColSpan === 'undefined')) {
+				scope.rowColSpan = 13;
+			} else {
+				scope.rowColSpan = scope.tableColSpan;
+			}
 
 			element.bind('click', function() {
 				if (scope.configTable[scope.commentId]) {
@@ -1629,7 +1641,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			}
 			var showContent = function(content) {
 				windowTimedUpdate.pause();
-				var row = angular.element('#'+scope.commentId);
+				var row = angular.element('#' + scope.rowPrefix + scope.commentId);
 				var newRow = compile(content)(scope);
 				row.after(newRow);
 				scope.configTable[scope.commentId] = {

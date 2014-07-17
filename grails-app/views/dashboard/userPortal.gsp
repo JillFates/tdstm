@@ -47,24 +47,6 @@
 </div>
 <script type="text/javascript">
 
-    $(".actionBar").die().live('click',function(){
-		var id = $(this).attr('data-itemId');
-		var status = $(this).attr('data-status');
-		var showStatusTr = $('#showStatusId_'+id);
-		if(status=='Started'){
-			$('#started_'+id).hide();
-			$('#image_'+id).hide();
-		}
-		if(!$(this).data('state')){
-			showStatusTr.toggle();
-			$(this).data('state',true);
-		} else{
-			showStatusTr.toggle();
-			$(this).data('state',false);
-			$('#detailTdId_'+id).hide();
-		}
-	});
-	
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
 		jQuery.ajax({
@@ -209,6 +191,7 @@ function loadTasksTable(id){
 		},
 		success: function(data) {
 			$("#myTaskList").html(data);
+			recompileDOM("myTaskList");
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			$("#myTaskList").html("<br>An unexpected error occurred when updating Tasks Table")

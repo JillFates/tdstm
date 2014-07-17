@@ -3,6 +3,7 @@
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
 <g:set var="now" value="${TimeUtil.nowGMT()}" />
+<g:set var="tableColCount" value="${project=='All'?5:4}" />
 <div id="assetIssueDiv" class="taskSummaryScrolableTable">
 	<table id="issueTable" cellspacing="0px">
 		<thead>
@@ -26,14 +27,16 @@
 						<td id="comment_${item?.id}"
 							class="actionBar asset_details_block_task"
 							data-itemId="${item?.id}" data-status="${item?.status}"
-							style="width: auto !important;">
+							style="width: auto !important;"
+							action-bar-cell config-table="config.table" comment-id="${item?.id}" asset-id="${item?.assetId}" status="${item?.status}" id-prefix="issueTrId_" master="true" table-col-span="${tableColCount}">
 							${issue?.projectName}
 						</td>
 					</g:if>
 					<td id="comment_${item?.id}"
 						class="actionBar asset_details_block_task"
 						data-itemId="${item?.id}" data-status="${item?.status}"
-						style="width: auto !important;">
+						style="width: auto !important;"
+						action-bar-cell config-table="config.table" comment-id="${item?.id}" asset-id="${item?.assetId}" status="${item?.status}" id-prefix="issueTrId_" master="false" table-col-span="${tableColCount}">
 						${item?.taskNumber?item?.taskNumber+' - ' : ''} ${item?.comment}
 					</td>
 					<td id="asset_${item?.id}" class="asset_details_block"
@@ -42,55 +45,18 @@
 					</td>
 					<td id="estFinish_${item?.id}" data-itemId="${item?.id}"
 						data-status="${item?.status}"
-						class="actionBar asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
+						class="actionBar asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}"
+						action-bar-cell config-table="config.table" comment-id="${item?.id}" asset-id="${item?.assetId}" status="${item?.status}" id-prefix="issueTrId_" master="false" table-col-span="${tableColCount}">
 						<tds:convertDate date="${item?.estFinish}"
 							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
 							format="MM/dd kk:mm" />
 					</td>
 
 					<td id="statusTd_${item?.id}" class="actionBar asset_details_block"
-						data-itemId="${item?.id}" data-status="${item?.status}">
+						data-itemId="${item?.id}" data-status="${item?.status}"
+						action-bar-cell config-table="config.table" comment-id="${item?.id}" asset-id="${item?.assetId}" status="${item?.status}" id-prefix="issueTrId_" master="false" table-col-span="${tableColCount}">
 						${item?.status} <% // (${formatter.format(item?.score?: 0)}) %>
 					</td>
-				</tr>
-				<tr id="showStatusId_${item?.id}"
-					${(todoSize!=1||search==''||search==null) ? 'style="display: none"' :''}>
-					<td nowrap="nowrap" colspan="6" class="statusButtonBar"><g:if
-							test="${issue.item.status == AssetCommentStatus.READY}">
-							<tds:actionButton label="Start" icon="ui-icon-play"
-								id="${item?.id}"
-								onclick="changeStatus('${item?.id}','${AssetCommentStatus.STARTED}', '${item?.status}', 'taskManager')" />
-						</g:if> <g:if
-							test="${ [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(issue.item.status) }">
-							<tds:actionButton label="Done" icon="ui-icon-check"
-								id="${item?.id}"
-								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')" />
-						</g:if> <tds:actionButton label="Details..." icon="ui-icon-zoomin"
-							id="${item?.id}" onclick="showAssetComment(${item?.id}, 'show')" />
-						<g:if test="${item.successors > 0 || item.predecessors > 0}">
-							<tds:actionButton label="Neighborhood" icon="tds-task-graph-icon"
-								id="${item?.id}"
-								onclick="window.open('${ HtmlUtil.createLink([controller:'task',action:'taskGraph']) }?neighborhoodTaskId=${item.id}','_blank');" />
-						</g:if> <g:if
-							test="${ personId != issue.item.assignedTo && issue.item.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]}">
-							<tds:actionButton label="Assign To Me" icon="ui-icon-person"
-								id="${item?.id}"
-								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')" />
-						</g:if> <tds:hasPermission permission='CommentCrudView'>
-							<g:if
-								test="${issue.item.status == AssetCommentStatus.READY && !(item.category in AssetComment.moveDayCategories)}">
-								<span class="delay_myTasks">Delay for:</span>
-								<tds:actionButton label="1 day" icon="ui-icon-seek-next"
-									id="${item?.id}"
-									onclick="changeEstTime(1,'${item?.id}', this.id)" />
-								<tds:actionButton label="2 days" icon="ui-icon-seek-next"
-									id="${item?.id}"
-									onclick="changeEstTime(2,'${item?.id}', this.id)" />
-								<tds:actionButton label="7 days" icon="ui-icon-seek-next"
-									id="${item?.id}"
-									onclick="changeEstTime(7,'${item?.id}', this.id)" />
-							</g:if>
-						</tds:hasPermission></td>
 				</tr>
 
 				<tr id="detailTdId_${item?.id}" style="display: none">
