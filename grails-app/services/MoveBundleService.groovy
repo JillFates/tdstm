@@ -325,10 +325,11 @@ class MoveBundleService {
 	 * relationships are processed first.
 	 */
 	def generateDependencyGroups = { projectId, connectionTypes, statusTypes, isChecked ->
+		
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time = formatter.format(date);
-
+		
 		def projectInstance = Project.get(projectId)
 		
 		// Get array of the valid status and connection types to check against in the inner loop
@@ -337,7 +338,7 @@ class MoveBundleService {
 		
 		// User previous setting if exists else set to empty
 		def depCriteriaMap = projectInstance.depConsoleCriteria ? JSON.parse(projectInstance.depConsoleCriteria) : [:]
-		if(isChecked == "1"){
+		if (isChecked == "1") {
 			depCriteriaMap = ["statusTypes": statusList, "connectionTypes":connectionList]
 		}
 		depCriteriaMap << ["modifiedBy":securityService.getUserLoginPerson().toString(), "modifiedDate":TimeUtil.nowGMT().getTime()]
@@ -347,12 +348,13 @@ class MoveBundleService {
 		// Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
 		String moveBundleText = MoveBundle.findAllByUseForPlanningAndProject(true,projectInstance).id
 		moveBundleText = GormUtil.asCommaDelimitedString(moveBundleText)
-
+		
 		// Get array of moveBundle ids
 		def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
 		def errMsg
 		
 		def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
+		
 		if (moveBundleText) {
 			// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
 			def queryForAssets = """SELECT a.asset_entity_id as assetId FROM asset_entity a
@@ -362,8 +364,8 @@ class MoveBundleService {
 			queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
 			queryForAssets += statusTypes == 'null' ? "" : " AND ad.status in (${statusTypes}) "
 			queryForAssets += " GROUP BY a.asset_entity_id ORDER BY COUNT(ad.asset_id) DESC "
-	 
-			def results = jdbcTemplate.queryForList(queryForAssets )
+			
+			def results = jdbcTemplate.queryForList(queryForAssets)
 			def assetIds = results.assetId
 			def assetIdsSize = assetIds.size()
 			
@@ -383,7 +385,7 @@ class MoveBundleService {
 			// TODO: THIS SHOULD NOT BE NECESSARY GOING FORWARD - THIS COLUMN is being dropped.
 			jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
 			
-	 
+			
 			// Reset hibernate session since we just cleared out the data directly and we don't want to be looking up assets in stale cache
 			sessionFactory.getCurrentSession().flush();
 			sessionFactory.getCurrentSession().clear();
@@ -404,7 +406,7 @@ class MoveBundleService {
 				
 				log.debug "New dependency group started : id=$groupNum"
 				while (stack.size() > 0) {
-					asset = stack[0] 
+					asset = stack[0]
 					log.debug "Processing asset ${asset.id}:${asset.assetName}:${asset.assetType}:i=${i}:loops=${loops++}:stack=${stack.size()}"
 					// cycle through all dependencies that the asset is dependent on
 					AssetDependency.findAllByDependent(asset).each { ad ->
@@ -435,7 +437,7 @@ class MoveBundleService {
 				
 				// Add all grouped assets to AssetDependencyBundle with groupNum.
 				log.info "Saving ${groupAssets.size()} assets in bundle $groupNum"
-				def count=0
+				def count = 0
 				groupAssets.each {
 					def assetDependencyBundle = new AssetDependencyBundle()
 					assetDependencyBundle.asset = it
@@ -453,9 +455,6 @@ class MoveBundleService {
 			} // for i
 			
 			// Last step is to put all the straggler assets that were not grouped into group 0
-			def assetTypes = '"' + AssetType.SERVER.toString() + '","' + AssetType.VM.toString() + '","' + 
-				AssetType.APPLICATION.toString() + '","' + AssetType.DATABASE.toString() + '","' + AssetType.FILES.toString() + '"'
-				
 			def stragglerSQL = """INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
 				SELECT ae.asset_entity_id, 0, "Straggler", now(), ae.project_id
 				FROM asset_entity ae
@@ -463,12 +462,12 @@ class MoveBundleService {
 				WHERE ae.project_id = ${projectId} # AND ae.dependency_bundle IS NULL
 				AND adb.asset_id IS NULL
 				AND move_bundle_id in (${moveBundleText})
-				AND ae.asset_type in (${assetTypes})"""
+				AND ae.asset_type in ${assetTypeList}"""
+			
 			def x = jdbcTemplate.execute(stragglerSQL)
 		} else {
-			errMsg="Please associate appropriate assets to one or more 'Planning' bundles before continuing."
+			errMsg = "Please associate appropriate assets to one or more 'Planning' bundles before continuing."
 		}
-		
 	}
 
 	/*
