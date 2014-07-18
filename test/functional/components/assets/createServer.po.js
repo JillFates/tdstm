@@ -1,6 +1,7 @@
 'use strict';
 var CreateServerModal = function(){
-  this.modalTitleId = 'ui-id-1';
+  // this.modalTitleId = 'ui-id-1';
+  this.createServerTitle = element(by.id('ui-id-1'));
   this.nameLabelCss = '[class="label C highField"] [for="assetName"]';
   this.nameFieldId = 'assetName';
   this.saveCloseBtnCss = 'input[value="Save/Close"]';
@@ -12,9 +13,9 @@ var CreateServerModal = function(){
   this.closeViewModalCss = '[aria-labelledby="ui-id-2"] .ui-dialog-titlebar-close';
 
 
-  this.getTitle = function(){
-    return element(by.id(this.modalTitleId));
-  };
+  // this.getTitle = function(){
+  //   return element(by.id(this.modalTitleId));
+  // };
 
   this.getNameLabel = function(){
     return $(this.nameLabelCss);

@@ -33,7 +33,7 @@ describe('Add Task', function(){
 
   it('should open create task modal', function(){
     browser.sleep(300);
-    appsListPage.clickOnCommentTaskIcon(appId);
+    appsListPage.clickOnTaskIcon(appId);
     expect(taskModal.getEditTaskModal().isPresent()).toBe(true);
   });
 

@@ -6,6 +6,7 @@ var CommentModal = function(){
   this.getEditModal = function(){
     return element(by.id(this.editModalId));
   };
+  
   this.getTitle = function(){
     return $(this.editTaskTitleCss);
   };

@@ -2,6 +2,10 @@
 var TaskModal = function(){
 // // Tasks
   this.EditTaskModalId = 'editTaskPopup';
+  this.detailsTaskModalId = 'showCommentPopup';
+  this.closeDetailsTaskModalCss = '#showCommentPopup [ng-click="close()"]';
+  this.deleteCommentCss = '#showCommentPopup [ng-click="deleteComment()"]';
+  this.CommentDetailTitleCss =  '#showCommentPopup #ui-id-5';
   this.createTaskTitleCss= '#editTaskPopup #ui-id-5';
   this.taskLabelCss = '#commentEditTdId label';
   this.taskTextAreaModel = 'ac.comment';
@@ -43,6 +47,9 @@ var TaskModal = function(){
   this.getEditCommentTitle = function(){
     return $(this.editCommentTitleCss);
   };
+  this.getCommentDetailTitle = function (){
+    return $(this.CommentDetailTitleCss);
+  };
   this.getCommentLabel = function (){
     return $(this.commentLabelCss);
   };
@@ -54,6 +61,15 @@ var TaskModal = function(){
   };
   this.getEditTaskModal = function(){
     return element(by.id(this.EditTaskModalId));
+  };
+  this.getDetailsTaskModal = function(){
+    return element(by.id(this.detailsTaskModalId));
+  };
+  this.closeDetailsTaskModal = function(){
+    $(this.closeDetailsTaskModalCss).click();
+  };
+  this.deleteComment = function(){
+    $(this.deleteCommentCss).click();
   };
 
   this.getTitle = function(){
@@ -109,6 +125,11 @@ var TaskModal = function(){
   };
   this.getCategorySelected = function(){
     return element(by.model(this.categoryModel)).$('option:checked');
+  };
+  this.setCategoryByPos = function(pos){
+    this.getCategoryDropdownOptions().then(function(list){
+        list[pos].click();
+      });
   };
   this.getAssetsLabel = function(){
     return $(this.assetsLabelCss);

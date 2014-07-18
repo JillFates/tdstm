@@ -45,9 +45,17 @@ var ListApps = function(){
     });
     return d.promise;
   };
-  this.clickOnCommentTaskIcon = function(appId){
-    var addtaskCommentIcon =  $('#icon_'+appId+' a');
-    addtaskCommentIcon.click();
+
+  this.clickOnTaskIcon = function(appId){
+    var addtaskIcon =  $('#icon_task_'+appId);
+    addtaskIcon.click();
+  };
+  this.clickOnCommentIcon = function(appId){
+    var addCommentIcon =  $('#icon_comment_'+appId);
+    addCommentIcon.click();
+  };
+  this.getCommentIcon = function(appId){
+    return $('#icon_comment_'+appId +' img');
   };
 };
 module.exports = ListApps;

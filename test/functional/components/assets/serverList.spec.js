@@ -18,13 +18,12 @@ var CommentTaskList = require('./commentTask-list.po.js');
 describe('validate comments/task on server list', function(){
   var menu = new Menu();
   var appsListPage =  new ListApps();
-  var serverModal = new CreateServerModal();
   var appName= 'Server CTV';
   var taskCommenModal = new TaskModal();
   var commTasklist = new CommentTaskList();
   var appId;
 
-  describe('add a server',function(){
+  describe('Server',function(){
 
     it('should load server List page after select Assets List Servers', function(){
       menu.goToAssets('listServers');
@@ -32,17 +31,29 @@ describe('validate comments/task on server list', function(){
     });
 
     it('should open Create server modal after click on create button', function(){
+      var serverModal = new CreateServerModal();
       appsListPage.clickOnCreateTaskBtn();
       expect(serverModal.isCreateModalOpened()).toBe(true);
     });
+    describe('Create Server Modal', function(){
+      var serverModal = new CreateServerModal();
 
-    it('should create a server and save and view',function(){
-      serverModal.createServer(appName,'view');
-    });
+      it('should has as title create server', function(){
+        expect(serverModal.createServerTitle.getText()).toEqual('Create Server');
+      });
+
+      it('should create a server and save and view',function(){
+        var serverModal = new CreateServerModal();
+        serverModal.createServer(appName,'view');
+      });
+  
+    }); // Create Server Modal
+
   });//add a server
 
   describe('add a comment',function(){
     it('should open create comment popup after click on addComment', function(){
+      var serverModal = new CreateServerModal();
       serverModal.clickAddComment();
       expect(taskCommenModal.getEditCommentModal().isPresent()).toBe(true);
     });
@@ -58,8 +69,9 @@ describe('validate comments/task on server list', function(){
 
   });// add a comment
 
-  describe('add a task',function(){
+  xdescribe('add a task',function(){
     it('should open create task popup after click on add Task', function(){
+      var serverModal = new CreateServerModal();
       serverModal.clickAddTask();
       expect(taskCommenModal.getEditTaskModal().isPresent()).toBe(true);
     });
@@ -73,6 +85,7 @@ describe('validate comments/task on server list', function(){
   }); // add a Task
 
   it('should close server modal', function(){
+    var serverModal = new CreateServerModal();
     serverModal.closeViewModal();
     expect(serverModal.isViewModalClosed()).toBe(true);
   });
@@ -94,48 +107,38 @@ describe('validate comments/task on server list', function(){
     });
   }); // Search for an app
 
-  describe('open comments/task List Modal', function(){
+  it('should have comments as icon', function(){
+    browser.sleep(1000);
+    expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
+  });
 
-    it('should open comment Task List modal', function(){
-      console.log(appId);
-      browser.sleep(300);
-      appsListPage.clickOnCommentTaskIcon(appId);
-      expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
-    });
+  it('should open Comment List modal', function(){
+    appsListPage.clickOnCommentIcon(appId);
+    expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+  });
+
+  describe('Comments List Modal', function(){
 
     it('should have as title Show Comments and task + App Name', function(){
-      expect(commTasklist.getTitle().getText()).toEqual('Show Comments & Tasks: Server/'+appName);
+      expect(commTasklist.getTitle().getText()).toEqual('Show Comments: Server/'+appName);
     });
 
-    it('should have only 2 items', function(){
-      expect(commTasklist.getList().count()).toEqual(2);
+    it('should have only 1 items', function(){
+      expect(commTasklist.getList().count()).toEqual(1);
     });
+
     it('should get List',function(){
-      var elems = ['This is the comments comment verify', 'This is task bla bla issue Ready general'];
+      var elems = ['This is the comments verify'];
       commTasklist.getList().then(function(list){
         expect(list[0].getText()).toEqual(elems[0]);
-        expect(list[1].getText()).toEqual(elems[1]);
       });
     });
 
-    xit('should select a task', function(){
-      commTasklist.selectFromList(0);
-      expect(commTasklist.getTitle().getText()).toEqual('jiji');
-    });
-    describe('modify a comment', function(){
-
-    });
-    describe('add a comment', function(){
-
-    });
-
-    describe('add a task', function(){
-
-    });
-    it('should close Task List modal', function(){
+    it('should close Comments List modal', function(){
       commTasklist.clickClose();
       expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(false);
     });
+  
   }); //open comments/task List Modal
 
 }); //validate comments/task on server list

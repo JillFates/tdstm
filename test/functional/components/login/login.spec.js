@@ -49,6 +49,7 @@ describe('Login Test', function(){
   }); //"Invalid userName and/or password" validation message
   
   it('should login to tdstm with valid userName/Password', function(){
+    loginPage.clearUsername();
     loginPage.setUsername(process.env.USERNAME);
     loginPage.setPassword(process.env.PASSWORD);
     loginPage.clickSingInBtn();

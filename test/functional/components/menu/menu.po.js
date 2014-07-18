@@ -1,13 +1,26 @@
 'use strict';
 var Menu = function(){
+//Main Menu
   this.titleCss =  '.title';
   this.adminCss = '#adminMenuId a';
-  
   this.clientProjectCss = '#projectMenuId a';
-  this.listProjectsCss = 'a[href="/tdstm/project/list?active=active"]';
-  
   this.roomRackCss = '#roomMenuId a';
-
+  this.eventsBundlesCss = '#eventMenuId a';
+  
+  //Admin
+  this.adminProtalCss = 'a[href="/tdstm/auth/home"]';
+  this.rolePermissionCss = 'a[href="/tdstm/permissions/show"]';
+  this.assetOptionsCss = 'a[href="/tdstm/assetEntity/assetOptions"]';
+  this.listCompaniesCss = 'a[href="/tdstm/partyGroup/list?active=active&tag_s_2_name=asc"]';
+  this.listStaffCss='a[href="/tdstm/person/index"]'; //Check this values since this may change depends on the project
+  this.listUsersCss = 'a[href="/tdstm/userLogin/index/2444"]';// this need to be check in the holw flow
+  this.importAccountsCss = 'a[href="/tdstm/admin/importAccounts"]';
+  this.listWorkflowCss = 'a[href="/tdstm/workflow/home"]';
+  this.listManufacturerCss = 'a[href="/tdstm/manufacturer/index"]';
+  this.listModelCss= 'a[href="/tdstm/model/index"]';
+  this.synchLibrariesCss = 'a[href="/tdstm/model/importExport"]';
+//ClientProjects
+  this.listProjectsCss = 'a[href="/tdstm/project/list?active=active"]';
   this.assetsCss = '#assetMenuId a';
   this.summaryCss = 'a[href="/tdstm/assetEntity/assetSummary"]';
   this.listAppsCss='a[href="/tdstm/application/list"]';
@@ -20,7 +33,6 @@ var Menu = function(){
   this.assetCommentsCss='a[href="/tdstm/assetEntity/listComment"]';
 
   //Events/Bundles
-  this.eventsBundlesCss = '#eventMenuId a';
   this.listBundlesCss = 'a[href="/tdstm/moveBundle/list"]';
   //Tasks
   this.tasksCss = '#teamMenuId a';
@@ -43,19 +55,44 @@ var Menu = function(){
   };
 
   this.goToAdmin = function(option){
+    var that = this;
     browser.driver.findElement(by.css(this.adminCss)).click(); 
     var d ={
       'adminPortal':function(){
-
+        browser.driver.findElement(by.css(that.adminProtalCss)).click();
       },
       'rolePermissions':function(){
-
+        browser.driver.findElement(by.css(that.rolePermissionCss)).click();
       },
       'assetOptions':function(){
-
+        browser.driver.findElement(by.css(that.assetOptionsCss)).click();
       },
       'releaseNotes':function(){
 
+      },
+      'listCompanies':function(){
+        browser.driver.findElement(by.css(that.listCompaniesCss)).click();
+      },
+      'listStaff':function(){
+        browser.driver.findElement(by.css(that.listStaffCss)).click();
+      },
+      'listUsers':function(){
+        browser.driver.findElement(by.css(that.listUsersCss)).click();
+      },
+      'importAccounts':function(){
+        browser.driver.findElement(by.css(that.importAccountsCss)).click();
+      },
+      'listWorkflow':function(){
+        browser.driver.findElement(by.css(that.listWorkflowCss)).click();
+      },
+      'listManufacturer':function(){
+        browser.driver.findElement(by.css(that.listManufacturerCss)).click();
+      },
+      'listModel': function(){
+        browser.driver.findElement(by.css(that.listModelCss)).click();
+      },
+      'synchLibraries':function(){
+        browser.driver.findElement(by.css(that.synchLibrariesCss)).click();
       }
     };
     d[option]();

@@ -12,6 +12,7 @@ var Login = function() {
   this.get = function() {
     browser.driver.get(process.env.BASE_URL+'/tdstm/auth/login');
   };
+  
   this.getUserNameLabel = function(){
      return browser.driver.findElements(by.css(this.fieldLabelsCss)).then(function(labels){
       return labels[0];
