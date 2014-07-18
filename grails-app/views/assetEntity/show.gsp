@@ -21,7 +21,7 @@ $(document).ready(function() {
 		$(".rackLabel").show()
 		$(".vmLabel").hide()
 	}
-	changeDocTitle('${assetEntity.assetName}');
+	changeDocTitle('${escapedName}');
 })
 </script>
  	<g:form method="post">
@@ -150,8 +150,7 @@ $(document).ready(function() {
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input type="hidden" name="id" id="assetsId" value="${assetEntity?.id}" />
 					<input type ="hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<g:render template="showButtons" 
-						model="[assetEntity:assetEntity, redirectTo:redirectTo,type:'Server', forWhom:'server']" />
+					<g:render template="showButtons" model="[assetEntity:assetEntity, redirectTo:redirectTo, type:'Server', forWhom:'server', escapedName:escapedName]" />
 				</div>
 			</td>
 		</tr>

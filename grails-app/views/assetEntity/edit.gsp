@@ -48,7 +48,7 @@
 		populateDependency(assetId, 'asset', 'edit')
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
-		changeDocTitle('${assetEntityInstance.assetName}');
+		changeDocTitle('${escapedName}');
 	})
 </script>
 
@@ -74,7 +74,7 @@
 						<tbody>
 							<tr>
 								<td class="label ${config.assetName}" nowrap="nowrap"><label for="assetName">Name</label></td>
-								<td><input type="text" id="assetName" name="assetName" class="${config.assetName} ${highlightMap.validation?:''}" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
+								<td><input type="text" id="assetName" name="assetName" class="${config.assetName} ${highlightMap.validation?:''}" value="${quotelessName}" tabindex="11" /></td>
 								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
 								<td colspan="2">
 									<input type="text" id="description" class="${config.description}" name="description" 

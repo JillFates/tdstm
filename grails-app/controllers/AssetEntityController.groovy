@@ -106,7 +106,7 @@ class AssetEntityController {
 			(AssetCommentStatus.HOLD): [AssetCommentStatus.HOLD]
 		]
 	]
-		
+	
 	def index = {
 		redirect( action:list, params:params )
 	}
@@ -117,15 +117,15 @@ class AssetEntityController {
 	 * @return Will return filters data to AssetEntity  
 	 * ------------------------------------------------------ */
 	def filter = {
-		if(params.rowVal){
-			if(!params.max) params.max = params.rowVal
+		if (params.rowVal) {
+			if (!params.max) params.max = params.rowVal
 			userPreferenceService.setPreference( "MAX_ASSET_LIST", "${params.rowVal}" )
-		}else{
+		} else {
 			def userMax = getSession().getAttribute("MAX_ASSET_LIST")
-			if( userMax.MAX_ASSET_LIST ) {
-				if( !params.max ) params.max = userMax.MAX_ASSET_LIST
+			if ( userMax.MAX_ASSET_LIST ) {
+				if ( !params.max ) params.max = userMax.MAX_ASSET_LIST
 			} else {
-				if( !params.max ) params.max = 50
+				if ( !params.max ) params.max = 50
 			}
 		}
 		def project = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
@@ -134,16 +134,16 @@ class AssetEntityController {
 
 		def assetEntityList = filterService.filter( params, AssetEntity )
 		assetEntityList.each{
-			if( it.project.id == project.id ) {
+			if ( it.project.id == project.id ) {
 				assetEntityInstanceList<<it
 			}
 		}
-		try{
+		try {
 			render( view:'list', model:[ assetEntityInstanceList: assetEntityInstanceList,
 						assetEntityCount: filterService.count( params, AssetEntity ),
 						filterParams: com.zeddware.grails.plugins.filterpane.FilterUtils.extractFilterParams(params),
 						params:params, projectId:project.id,maxVal : params.max ] )
-		} catch(Exception ex){
+		} catch (Exception ex) {
 			redirect( controller:"assetEntity", action:"list" )
 		}
 	}
@@ -159,19 +159,19 @@ class AssetEntityController {
 		def projectInstance
 		def moveBundleInstanceList
 		def project
-		if( projectId != null ) {
+		if ( projectId != null ) {
 			projectInstance = Project.findById( projectId )
 			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		}
 		def dataTransferSetImport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','I') ")
 		def dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
-		if( projectId == null ) {
+		if ( projectId == null ) {
 			//get project id from session
 			def currProj = getSession().getAttribute( "CURR_PROJ" )
 			projectId = currProj.CURR_PROJ
 			projectInstance = Project.findById( projectId )
 			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-			if( projectId == null ) {
+			if ( projectId == null ) {
 				flash.message = " No Projects are Associated, Please select Project. "
 				redirect( controller:"project",action:"list" )
 			}
@@ -1739,6 +1739,7 @@ class AssetEntityController {
 			return false
 		}
 	}
+	
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	/*------------------------------------------
@@ -1803,6 +1804,7 @@ class AssetEntityController {
 			toValidate:params.toValidate
 			]) 
 	}
+	
 	/**
 	 * This method is used by JQgrid to load assetList
 	 */
@@ -1912,7 +1914,7 @@ class AssetEntityController {
 			SELECT * FROM ( 
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, ae.source_location AS sourceLocation, 
 				ae.source_rack AS sourceRack, IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
-		if(temp)
+		if (temp)
 			query.append(temp)
 			
 		/*adb.dependency_bundle AS depNumber,
@@ -1924,10 +1926,10 @@ class AssetEntityController {
 				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 				""")
-		if(joinQuery)
+		if (joinQuery)
 			query.append(joinQuery)
 			
-		if(justPlanning=='true'){
+		if (justPlanning=='true') {
 			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
 				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 				WHERE ae.project_id = ${project.id} AND mb.use_for_planning=${justPlanning}""")
@@ -1948,13 +1950,13 @@ class AssetEntityController {
 			query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 		}
 		
-		if(params.event && params.event.isNumber() && moveBundleList)
+		if (params.event && params.event.isNumber() && moveBundleList)
 			query.append( " AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
 			
-		if(params.unassigned){
+		if (params.unassigned) {
 			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
 			
-			if(unasgnMB){
+			if (unasgnMB) {
 				def unasgnmbId = GormUtil.asQuoteCommaDelimitedString(unasgnMB?.id)
 				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
 			}
@@ -2008,7 +2010,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			query.append(" AND assets.validation='${params.toValidate}' ")
 		}
 
-		if(params.plannedStatus){
+		if (params.plannedStatus) {
 			query.append(" AND assets.planStatus='${params.plannedStatus}'")
 		}
 		
@@ -2023,18 +2025,23 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		else
 			assetList = []
 			
-		def results = assetList?.collect { 
+		def results = assetList?.collect {
 			def commentType = it.commentType
-			[ cell: [ '',it.assetName, (it.assetType ?: ''), it.model, 
-			it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
-			/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
-			it.tasksStatus, it.assetType, it.event, it.commentsStatus
-		], id: it.assetId]}
+			def name = assetEntityService.getEscapedName(AssetEntity.get(it.assetId))
+			[ 	
+				cell: [ '', it.assetName, (it.assetType ?: ''), it.model, 
+					it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
+					/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
+					it.tasksStatus, it.assetType, it.event, it.commentsStatus
+				], id: it.assetId
+			]
+		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		
 		render jsonData as JSON
 	}
+	
 	/* ----------------------------------------
 	 * delete assetEntity
 	 * @param assetEntityId
@@ -3557,7 +3564,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	/**
 	* Renders the detail of an AssetEntity 
 	*/
-	def show ={
+	def show = {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def userLogin = securityService.getUserLogin()
@@ -3603,9 +3610,12 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			}
 			
 			dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			supportAssets 	= AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
+			supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
 		
-			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+			def prefValue = userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+			
+			
+			def name = assetEntityService.getEscapedName(assetEntity)
 			
 			//field importance styling for respective validation.
 			def validationType = assetEntity.validation
@@ -3614,13 +3624,13 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			def assetCommentList = AssetComment.findAllByAssetEntityAndIsPublished(assetEntity, true)
 			
 			def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntity, configMap)
-			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity,
+			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity, escapedName:name,
 				supportAssets:supportAssets, dependentAssets:dependentAssets, 
 				redirectTo:params.redirectTo, project:project,
 				assetCommentList:assetCommentList,
-				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
-				 prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
-		
+				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle,
+				prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
+			
 			if(params.redirectTo == "roomAudit") {
 				paramsMap << [source:params.source, assetType:params.assetType]
 				render(template:"auditDetails",model:paramsMap)
@@ -3631,7 +3641,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	/**
 	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
 	 */
-	def setShowAllPreference={
+	def setShowAllPreference = {
 		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
 		render true
 	}
@@ -3642,7 +3652,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
 	 * to auditEdit view
 	 */
-	def edit ={
+	def edit = {
 		def assetEntityInstance = AssetEntity.get(params.id)
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 
@@ -3689,6 +3699,8 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		
 		def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
 			AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
+			
+		
 		
 		def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
 		def targetRacks
@@ -3700,15 +3712,15 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
 			
 		def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntityInstance, configMap)
-		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-							planStatusOptions:planStatusOptions?.value, projectId:projectId, project: project, railTypeOption:railTypeOption?.value,
-							priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
+		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, escapedName:assetEntityService.getEscapedName(assetEntityInstance),
+							quotelessName:assetEntityInstance.assetName.replaceAll('\"', {''}), planStatusOptions:planStatusOptions?.value, projectId:projectId, 
+							project: project, railTypeOption:railTypeOption?.value, priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
 							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
 							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
 							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs,
 							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 		
-		if(params.redirectTo == "roomAudit") {
+		if (params.redirectTo == "roomAudit") {
 			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
 			render(template:"auditEdit",model:paramsMap)
 		}
@@ -3735,38 +3747,38 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
 		
-		if(params.("manufacturer.id") && params.("manufacturer.id").isNumber())
+		if (params.("manufacturer.id") && params.("manufacturer.id").isNumber())
 			userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
 			
 		userPreferenceService.setPreference("lastType", assetType)
 		
-		if(maintExpDate){
+		if (maintExpDate) {
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
 		def retireDate = params.retireDate
-		if(redirectTo.contains("room_")){
+		if (redirectTo.contains("room_")) {
 			def newRedirectTo = redirectTo.split("_")
 			redirectTo = newRedirectTo[0]
 			def rackId = newRedirectTo[1]
 			session.setAttribute("RACK_ID", rackId)
 		}
-		if(retireDate){
+		if (retireDate) {
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
-		if( manufacturerName ){
+		if ( manufacturerName ) {
 			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
 			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
 		}
-		if(!params.SourceRoom)
+		if (!params.SourceRoom)
 			params.roomSource=null
 			
-		if(!params.TargetRoom)
+		if (!params.TargetRoom)
 			params.roomTarget=null
 		
-		if(!params.sourceRack)
+		if (!params.sourceRack)
 			params.rackSource=null
 		
-		if(!params.TargetRack)
+		if (!params.TargetRack)
 			params.rackTarget=null
 		
 		def project = securityService.getUserCurrentProject()
@@ -3777,30 +3789,30 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		def assetEntityInstance = AssetEntity.get(params.id)
 		assetEntityInstance.properties = params
 		
-		if(params.roomSourceId && params.roomSourceId != '-1')
+		if (params.roomSourceId && params.roomSourceId != '-1')
 			assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
-		if(params.roomTargetId && params.roomTargetId != '-1')
+		if (params.roomTargetId && params.roomTargetId != '-1')
 			assetEntityInstance.setRoomAndLoc( params.roomTargetId, false )
 		
-		if(params.rackSourceId && params.rackSourceId != '-1')
+		if (params.rackSourceId && params.rackSourceId != '-1')
 			assetEntityInstance.setRack( params.rackSourceId, true )
-		if(params.rackTargetId && params.rackTargetId != '-1')
+		if (params.rackTargetId && params.rackTargetId != '-1')
 			assetEntityInstance.setRack( params.rackTargetId, false )
 			
-		if(!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
-			if( assetEntityInstance.sourceRoom || assetEntityInstance.targetRoom){
+		if (!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
+			if ( assetEntityInstance.sourceRoom || assetEntityInstance.targetRoom) {
 				assetEntityInstance.updateRacks()
 			}
 			def loginUser = securityService.getUserLogin()
 			flash.message = "Asset ${assetEntityInstance.assetName} Updated <br/>"
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)
 			flash.message += errors
-			if(params.updateView == 'updateView'){
+			if (params.updateView == 'updateView') {
 				forward(action:'show', params:[id: params.id, errors:errors])
 				
-			}else if(params.updateView == 'closeView'){
+			} else if(params.updateView == 'closeView') {
 				render flash.message
-			}else{
+			} else {
 				redirectToReq(params, assetEntityInstance, redirectTo, false )
 			}
 		}
@@ -3848,7 +3860,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	 * @param manufacturerInstance : instance of Manufacturer for which model list is requested
 	 * @return : model list 
 	 */
-	def getModelSortedByStatus(manufacturerInstance){
+	def getModelSortedByStatus (manufacturerInstance) {
 		def models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
 		def modelListFull = models.findAll{it.modelStatus == 'full'}
 		def modelListValid = models.findAll{it.modelStatus == 'valid'}
@@ -3971,7 +3983,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	 * Used to generate list of comments using jqgrid
 	 * @return : list of tasks as JSON
 	 */
-	def listCommentJson ={
+	def listCommentJson = {
 		def sortIndex = params.sidx ?: 'lastUpdated'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
@@ -4200,7 +4212,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			}
 		}
 
-	def createJsonTime = new Date()
+		def createJsonTime = new Date()
 
 		def totalRows = tasks.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -4252,8 +4264,8 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			
 			def depCount = TaskDependency.countByPredecessor( it )
 			// Have the dependency count be a link to the Task Neighborhood graph if there are dependencies
-			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + HtmlUtil.createLink([controller:'task', action:'neighborhoodGraph', id:it.id]) +
-				'" target="_blank",>' + depCount + '</a>'
+			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + HtmlUtil.createLink([controller:'task', action:'taskGraph']) +
+				'?neighborhoodTaskId=' + it.id + '" target="_blank",>' + depCount + '</a>'
 
 			def status = it.status
 			def userSelectedCols = []
@@ -4295,9 +4307,9 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	/**
 	 * This method is used to get assetColumn value based on field name. .
 	 */
-	def taskManagerValues(value, task){
+	def taskManagerValues (value, task) {
 		def result
-		switch(value){
+		switch (value) {
 			case 'assetName':
 				result = task.assetEntity?.assetName
 			break;
@@ -4401,7 +4413,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	/**
 	 * This action is used to delete  AssetOptions by type from admin's AssetOption page .
 	 */
-	def deleteAssetOptions ={
+	def deleteAssetOptions = {
 		def assetOptionInstance
 		if(params.assetOptionType=="planStatus"){
 			 assetOptionInstance = AssetOptions.get(params.assetStatusId)
@@ -4434,7 +4446,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	/**
 	* Render Summary of assigned and unassgined assets.
 	*/
-	def assetSummary ={
+	def assetSummary = {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
@@ -4834,7 +4846,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				break
 		} // switch
 		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
-	}	
+	}
 
 	/**
 	* Delete multiple  Assets, Apps, Databases and files .
@@ -4842,7 +4854,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 	* @return : appropriate message back to view
 	* 
 	*/
-	def deleteBulkAsset={
+	def deleteBulkAsset = {
 		def respMap = [resp : assetEntityService.deleteBulkAssets(params.type, params.list("assetLists[]"))]
 		render respMap as JSON
 	}
@@ -4853,14 +4865,14 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
      * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return select or a JSON array
 	 */
-	def getWorkflowTransition={
+	def getWorkflowTransition = {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-        def format = params.format
+		def format = params.format
 		def assetCommentId = params.assetCommentId
-        def assetComment = AssetComment.read(assetCommentId)
+		def assetComment = AssetComment.read(assetCommentId)
 		def assetEntity = AssetEntity.get(params.assetId)
-        def workflowCode = assetEntity?.moveBundle?.workflowCode ?: project.workflowCode
+		def workflowCode = assetEntity?.moveBundle?.workflowCode ?: project.workflowCode
 		def workFlowInstance = Workflow.findByProcess(workflowCode)
 		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
         

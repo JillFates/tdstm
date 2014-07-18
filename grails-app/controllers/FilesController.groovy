@@ -29,11 +29,11 @@ class FilesController {
 	def userPreferenceService
 	def projectService
 	def jdbcTemplate
-	def index ={
+	def index = {
 	     redirect(action : list)
 		 	
 	}
-	def list={
+	def list = {
 		def filters = session.FILES?.JQ_FILTERS
 		session.FILES?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject();
@@ -194,7 +194,7 @@ class FilesController {
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 		def firstWhere = true
 		filterParams.each {
-			if( it.getValue() )
+			if ( it.getValue() )
 				if (firstWhere) {
 					// single quotes are stripped from the filter to prevent SQL injection
 					query.append(" WHERE files.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
@@ -204,18 +204,18 @@ class FilesController {
 				}
 		}
 		
-		if(params.moveBundleId){
-			if(params.moveBundleId!='unAssigned'){
+		if (params.moveBundleId) {
+			if (params.moveBundleId!='unAssigned') {
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
 				query.append(" WHERE files.moveBundle  = '${bundleName}' ")
-			}else{
+			} else {
 				query.append(" WHERE files.moveBundle IS NULL ")
 			}
 		}
-		if( params.toValidate){
+		if ( params.toValidate) {
 			query.append(" WHERE files.validation='Discovery'")
 		}
-		if(params.plannedStatus){
+		if (params.plannedStatus) {
 			query.append(" WHERE files.planStatus='${params.plannedStatus}'")
 		}
 		def filesList = jdbcTemplate.queryForList(query.toString())
@@ -231,14 +231,14 @@ class FilesController {
 			def commentType = it.commentType
 			[ cell: ['',it.assetName, (it[filePref["1"]] ?: ''), it[filePref["2"]], it[filePref["3"]], it[filePref["4"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					it.tasksStatus,	it.assetType, it.commentsStatus], id: it.fileId,
+					it.tasksStatus, it.assetType, it.commentsStatus], id: it.fileId, escapedName:assetEntityService.getEscapedName(it)
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 		render jsonData as JSON
 	}
-	def create ={
+	def create = {
 		def fileInstance = new Files(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
@@ -311,7 +311,7 @@ class FilesController {
 			
 			[ filesInstance : filesInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo ,assetComment:assetComment, assetCommentList:assetCommentList,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(filesInstance)?.dependencyBundle, project:project ,prefValue:prefValue,
-			   config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
+			   config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
 		}
 	}
 	def edit = {
@@ -345,7 +345,7 @@ class FilesController {
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, 
 						dependencyStatus:dependencyStatus,servers:servers, config:configMap.config, customs:configMap.customs,
-						environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
+						environmentOptions:environmentOptions?.value, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
 		}
 		
 	}

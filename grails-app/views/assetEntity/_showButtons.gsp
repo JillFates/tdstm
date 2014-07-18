@@ -11,10 +11,10 @@
 	</g:else>
 </tds:hasPermission>
 <tds:hasPermission permission="CommentCrudView">
-	<a href="javascript:createIssue('${assetEntity.assetName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
+	<a href="javascript:createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
 		<img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task 
 	</a>
-	<a href="javascript:createIssue('${assetEntity.assetName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
+	<a href="javascript:createIssue('${escapedName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
 		<img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
 	</a>	
 </tds:hasPermission>

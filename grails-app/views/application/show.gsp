@@ -32,6 +32,6 @@
 	$("#assetMenuId a").css('background-color','#003366')
 	
 	$(document).ready(function() { 
-		changeDocTitle('${applicationInstance.assetName}');
+		changeDocTitle('${escapedName}');
 	})
 </script>

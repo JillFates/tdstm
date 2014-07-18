@@ -10,7 +10,7 @@
 		var assetId = '${fileInstance.id}'
 		populateDependency(assetId,'files','edit')
 		
-		changeDocTitle('${fileInstance.assetName}');
+		changeDocTitle('${escapedName}');
 	})
 </script>
 <g:form method="post" action="update" name="editAssetsFormId">

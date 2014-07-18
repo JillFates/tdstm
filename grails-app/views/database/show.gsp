@@ -75,6 +75,6 @@
 	$("#assetMenuId a").css('background-color','#003366')
 	
 	$(document).ready(function() { 
-		changeDocTitle('${databaseInstance.assetName}');
+		changeDocTitle('${escapedName}');
 	})
 </script>

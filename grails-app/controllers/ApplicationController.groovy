@@ -21,6 +21,7 @@ class ApplicationController {
 	def userPreferenceService
 	def jdbcTemplate
 	def projectService
+	
 	def index = {
 		redirect(action:list,params:params)
 	}
@@ -140,7 +141,7 @@ class ApplicationController {
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			""")
-		if(customizeQuery.joinQuery){
+		if (customizeQuery.joinQuery) {
 			query.append(customizeQuery.joinQuery)
 		}
 		//commented as per craig comments for performance issue
@@ -229,7 +230,7 @@ class ApplicationController {
 			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], 
 			/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
 			it.tasksStatus, it.assetType, it.event, it.commentsStatus
-		], id: it.appId]}
+		], id: it.appId, escapedName:assetEntityService.getEscapedName(it)]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		
 		render jsonData as JSON
@@ -320,10 +321,10 @@ class ApplicationController {
 			redirect( action:list)
 		}
 	}
-	def show ={
+	def show = {
 		def id = params.id
 		def applicationInstance = Application.get( id )
-		if(!applicationInstance) {
+		if (!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
 			redirect(action:list)
 		}
@@ -332,9 +333,9 @@ class ApplicationController {
 			def assetComment 
 			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
-			if(AssetComment.find("from AssetComment where assetEntity = ${applicationInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
+			if (AssetComment.find("from AssetComment where assetEntity = ${applicationInstance?.id} and commentType = ? and isResolved = ?",['issue',0])) {
 				assetComment = "issue"
-			} else if(AssetComment.find('from AssetComment where assetEntity = '+ applicationInstance?.id)){
+			} else if (AssetComment.find('from AssetComment where assetEntity = '+ applicationInstance?.id)) {
 				assetComment = "comment"
 			} else {
 				assetComment = "blank"
@@ -344,7 +345,7 @@ class ApplicationController {
 			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
 			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
 			def project = Project.read(projectId)
-		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
 			
 			//field importance styling for respective validation.
@@ -362,7 +363,7 @@ class ApplicationController {
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
 			  config:configMap.config, customs:configMap.customs, shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
-			  errors:params.errors, highlightMap:highlightMap]
+			  errors:params.errors, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity) ]
 		}
 	}
     
@@ -409,7 +410,7 @@ class ApplicationController {
 						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
 						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs, 
-						availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
+						availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
 		}
 
 	}

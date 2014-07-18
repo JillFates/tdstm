@@ -10,9 +10,9 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />
-        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
@@ -76,8 +76,7 @@
 					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'assetListId\')"/></g:else></span>'
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle',
-						 'id', 'commentType'"
+					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle', 'id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false,width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType'},
@@ -117,34 +116,33 @@
 
 				<g:each var="key" in="['1','2','3','4']">
 					var assetPref= '${assetPref[key]}';
-					$("#assetListIdGrid_"+assetPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
+					$("#assetListIdGrid_" + assetPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
 				</g:each>
 			
-				$.jgrid.formatter.integer.thousandsSeparator='';
-				function myLinkFormatter (cellvalue, options, rowObjcet) {
-					var value = cellvalue ? cellvalue : ''
-					return '<a href="javascript:getEntityDetails(\'assetEntity\',\''+rowObjcet[2]+'\','+options.rowId+')">'+value+'</a>'
+				$.jgrid.formatter.integer.thousandsSeparator = '';
+				function myLinkFormatter (cellvalue, options, rowObject) {
+					var value = cellvalue ? cellvalue : '';
+					return '<a href="javascript:getEntityDetails(\'assetEntity\',\'Server\',' + options.rowId + ')">' + value + '</a>';
 				}
 
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = '<a href="javascript:editEntity(\'assetEntity\',\''+rowObject[1]+'\','+options.rowId+')">'+
+					var editButton = '<a href="javascript:editEntity(\'assetEntity\',\'Server\',' + options.rowId + ')">' +
 							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-
 					editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[12] + "' comments='" + rowObject[15] + "'></grid-buttons>"
 
 					return editButton
 				}
 
-				function deleteMessage(response, postdata){
-					 $("#messageId").show()
-					 $("#messageDivId").hide()
-					 $("#messageId").html(response.responseText)
-					 $("#delmodassetListIdGrid").remove()
-					 $(".jqmOverlay").remove()
-					  return true
+				function deleteMessage (response, postdata) {
+					$("#messageId").show()
+					$("#messageDivId").hide()
+					$("#messageId").html(response.responseText)
+					$("#delmodassetListIdGrid").remove()
+					$(".jqmOverlay").remove()
+					return true
 				}
 
-				function populateFilter(){
+				function populateFilter () {
 					$("#gs_assetName").val('${assetName}')
 					$("#gs_assetType").val('${assetType}')
 					$("#gs_model").val('${model}')

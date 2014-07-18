@@ -27,17 +27,17 @@ import com.tdsops.tm.enums.domain.AssetDependencyStatus
 class DatabaseController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-    def assetEntityService  
+	def assetEntityService  
 	def taskService 
 	def securityService
 	def jdbcTemplate
 	def userPreferenceService
 	def projectService
-    def index = {
+	def index = {
 		redirect(action: "list", params: params)
-    }
+	}
 	
-	def list ={
+	def list = {
 		def filters = session.DB?.JQ_FILTERS
 		session.DB?.JQ_FILTERS = []
 		def project = securityService.getUserCurrentProject();
@@ -236,7 +236,7 @@ class DatabaseController {
 			def commentType = it.commentType
 			[ cell: ['',it.assetName, (it[dbPref["1"]] ?: ''), it[dbPref["2"]], it[dbPref["3"]], it[dbPref["4"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					it.tasksStatus,	it.assetType, it.commentsStatus], id: it.dbId,
+					it.tasksStatus,	it.assetType, it.commentsStatus], id: it.dbId, escapedName:assetEntityService.getEscapedName(it)
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
@@ -244,7 +244,7 @@ class DatabaseController {
 		render jsonData as JSON
 	}
 	
-	def show ={
+	def show = {
 		def id = params.id
 		def databaseInstance = Database.get( id )
 		def project = securityService.getUserCurrentProject()
@@ -274,11 +274,11 @@ class DatabaseController {
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
 			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
-			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
+			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
 		}
 	}
 	
-	def create ={
+	def create = {
 		def databaseInstance = new Database(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
@@ -333,7 +333,7 @@ class DatabaseController {
 		
 			
      }
-	def edit ={
+	def edit = {
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
@@ -364,12 +364,12 @@ class DatabaseController {
 			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project:project,
 						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
 						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers, 
-						config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
+						config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
 		}
 		
-		}
+	}
 	
-	def update ={
+	def update = {
 		def attribute = session.getAttribute('filterAttr')
 		def filterAttr = session.getAttribute('filterAttributes')
 		session.setAttribute("USE_FILTERS","true")
@@ -378,27 +378,27 @@ class DatabaseController {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def maintExpDate = params.maintExpDate
 		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		if(maintExpDate){
+		if (maintExpDate) {
 			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
 		}
 		def retireDate = params.retireDate
-		if(retireDate){
+		if (retireDate) {
 			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
 		}
 		def databaseInstance = Database.get(params.id)
 		databaseInstance.properties = params
-		if(!databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
+		if (!databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
 			flash.message = "DataBase ${databaseInstance.assetName} Updated"
 			def loginUser = securityService.getUserLogin()
 			def project = securityService.getUserCurrentProject()
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, databaseInstance, loginUser, project)
 			flash.message += "</br>"+errors
-			if(params.updateView == 'updateView'){
+			if (params.updateView == 'updateView') {
 				forward(action:'show', params:[id: params.id, errors:errors])
-			}else if(params.updateView == 'closeView'){
+			} else if(params.updateView == 'closeView') {
 				render flash.message
-			}else{
-				switch(params.redirectTo){
+			} else {
+				switch (params.redirectTo) {
 					case "room":
 						redirect( controller:'room',action:list )
 						break;
@@ -450,9 +450,9 @@ class DatabaseController {
 			database.delete()
 			
 			flash.message = "Database ${assetName} deleted"
-			if(params.dstPath =='dependencyConsole'){
+			if (params.dstPath == 'dependencyConsole') {
 				forward( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])
-			}else{
+			} else {
 				redirect( action:list )
 			}
 		}

@@ -70,6 +70,6 @@
 	$("#assetMenuId a").css('background-color','#003366')
 	
 	$(document).ready(function() { 
-		changeDocTitle('${filesInstance.assetName}');
+		changeDocTitle('${escapedName}');
 	})
 </script>

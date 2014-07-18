@@ -787,4 +787,16 @@ class AssetEntityService {
 		}
 		return highlightMap
 	}
+	
+	def getEscapedName (assetEntity, ignoreSingleQuotes = false) {
+		def name = ''
+		for (int i = 0; i < assetEntity.assetName.size(); ++i)
+			if (assetEntity.assetName[i] == "'")
+				name = name + "\\'"
+			else if (ignoreSingleQuotes && assetEntity.assetName[i] == '"')
+				name = name + '\\"'
+			else
+				name = name + assetEntity.assetName[i]
+		return name
+	}
 }
