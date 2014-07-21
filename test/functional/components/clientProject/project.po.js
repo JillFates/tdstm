@@ -32,10 +32,9 @@ var Project = function(){
   this.getClientFieldLabel = function(){
     return browser.driver.findElement(by.css(this.clientLabelCss));
   };
-  this.selectAClient = function(pos){
-    browser.driver.findElements(by.css(this.clientsOptionsCss)).then(function(options){
-      options[pos].click();
-    });
+  this.selectAClient = function(name){
+    var selector = this.clientsOptionsCss + "[value='" + name + "']";
+    browser.driver.findElement(by.css(selector)).click();
   };
   this.getclientSelect = function(){
     return browser.driver.findElement(by.id(this.clientsId));
@@ -56,10 +55,9 @@ var Project = function(){
   this.getWorkflowCodeLabel = function(){
     return browser.driver.findElement(by.css(this.workflowCodeLabelCss));
   };
-  this.selectWorkflowCode = function(pos){
-    browser.driver.findElements(by.css(this.workflowCodeListOptionCss)).then(function(options){
-      options[pos].click();
-    });
+  this.selectWorkflowCodeByName = function(name){
+    var selector = this.workflowCodeListOptionCss + '[value="' + name + '"]';
+    return browser.driver.findElement(by.css(selector));
   };
   this.getWorkflowSelected = function(){
     return browser.driver.findElement(by.id(this.workflowCodeListId));
