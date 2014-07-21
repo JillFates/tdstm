@@ -17,7 +17,7 @@ describe('Comments - Application', function(){
   var commTasklist = new CommentTaskList();
   var appModal = new CreateAppModal();
   var appId;
-  var appName= 'App Test 1 comments';
+  var appName= 'App Test 2 comments';
 
   describe('Preconditions', function(){
     

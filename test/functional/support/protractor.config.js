@@ -4,10 +4,21 @@ exports.config = {
 
   allScriptsTimeout: 11000,
   suites: {
-    regression: [
+    regression: [ //Do not change the order of these files since some test depends on others.
     '../components/clientProject/listProjects.spec.js',
     '../components/clientProject/createProject.spec.js',
     '../components/eventsBundles/bundles.spec.js',
+    '../components/admin/adminPortal.spec.js',
+    '../components/admin/rolePermission.spec.js',
+    '../components/admin/assetOptions.spec.js',
+    '../components/admin/listCompanies.spec.js',
+    '../components/admin/listStaff.spec.js',
+    '../components/admin/listUsers.spec.js',
+    '../components/admin/importAccounts.spec.js',
+    '../components/admin/listWorkflow.spec.js',
+    '../components/admin/listManufacturers.spec.js',
+    '../components/admin/listModel.spec.js',
+    '../components/admin/syncLibraries.spec.js',
     '../components/assets/createApp.spec.js',
     '../components/assets/addTask.spec.js',
     '../components/assets/addComments.spec.js', // replace for comments/listapplication

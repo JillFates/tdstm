@@ -11,14 +11,15 @@ var Menu = function(){
   this.adminProtalCss = 'a[href="/tdstm/auth/home"]';
   this.rolePermissionCss = 'a[href="/tdstm/permissions/show"]';
   this.assetOptionsCss = 'a[href="/tdstm/assetEntity/assetOptions"]';
-  this.listCompaniesCss = 'a[href="/tdstm/partyGroup/list?active=active&tag_s_2_name=asc"]';
-  this.listStaffCss='a[href="/tdstm/person/index"]'; //Check this values since this may change depends on the project
-  this.listUsersCss = 'a[href="/tdstm/userLogin/index/2444"]';// this need to be check in the holw flow
+  this.listCompaniesCss = 'a[href^="/tdstm/partyGroup/list/"]';
+  // this.listCompaniesCss = 'a[href="/tdstm/partyGroup/list?active=active&tag_s_2_name=asc"]';
+  this.listStaffCss='a[href^="/tdstm/person/index"]'; //Check this values since this may change depends on the project
+  this.listUsersCss = 'a[href^="/tdstm/userLogin/index/"]';// this need to be check in the holw flow
   this.importAccountsCss = 'a[href="/tdstm/admin/importAccounts"]';
   this.listWorkflowCss = 'a[href="/tdstm/workflow/home"]';
-  this.listManufacturerCss = 'a[href="/tdstm/manufacturer/index"]';
-  this.listModelCss= 'a[href="/tdstm/model/index"]';
-  this.synchLibrariesCss = 'a[href="/tdstm/model/importExport"]';
+  this.listManufacturerCss = 'a[href^="/tdstm/manufacturer/index/"]';
+  this.listModelCss= 'a[href^="/tdstm/model/index/"]';
+  this.syncLibrariesCss = 'a[href="/tdstm/model/importExport"]';
 //ClientProjects
   this.listProjectsCss = 'a[href="/tdstm/project/list?active=active"]';
   this.assetsCss = '#assetMenuId a';
@@ -91,8 +92,8 @@ var Menu = function(){
       'listModel': function(){
         browser.driver.findElement(by.css(that.listModelCss)).click();
       },
-      'synchLibraries':function(){
-        browser.driver.findElement(by.css(that.synchLibrariesCss)).click();
+      'syncLibraries':function(){
+        browser.driver.findElement(by.css(that.syncLibrariesCss)).click();
       }
     };
     d[option]();
