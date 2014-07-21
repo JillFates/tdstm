@@ -1475,7 +1475,7 @@ app.controller('CookbookRecipeEditor', function($scope, $rootScope, $http, $reso
 		}
 
 		$scope.tasks.generateOpts.contextId = idSelected;
-		$scope.tasks.generateOpts.recipeVersionId = $scope.selectedRecipe.recipeVersionId;
+		$scope.tasks.generateOpts.recipeId = $scope.selectedRecipe.recipeId;
 
 		dataToSend = $.param($scope.tasks.generateOpts);
 

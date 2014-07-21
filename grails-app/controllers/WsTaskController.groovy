@@ -121,7 +121,7 @@ class WsTaskController {
 		}
 		def currentProject = securityService.getUserCurrentProject()
 		
-		def recipeVersionId = params.recipeVersionId
+		def recipeId = params.recipeId
 		def contextId = params.contextId
 		def publishTasks = params.autoPublish == 'true'
 		def useWIP = params.useWIP == 'true'
@@ -129,7 +129,7 @@ class WsTaskController {
 
 
 		try {
-			def result = taskService.initiateCreateTasksWithRecipe(loginUser, currentProject, contextId, recipeVersionId, deletePrevious, useWIP, publishTasks);
+			def result = taskService.initiateCreateTasksWithRecipe(loginUser, currentProject, contextId, recipeId, deletePrevious, useWIP, publishTasks);
 
 			render(ServiceResults.success('jobId' : result.jobId) as JSON)
 		} catch (UnauthorizedException e) {

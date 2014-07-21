@@ -1354,9 +1354,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def taskBatches = TaskBatch.createCriteria().list {
 			eq('contextId', contextId)
 			eq('contextType', recipe.asContextType() )
-			recipeVersionUsed {
-				eq('recipe', recipe)
-			}
+			eq('recipe', recipe)
 		}
 
 		return taskBatches
@@ -1377,7 +1375,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    taskbatch - the id number of the task batch that was created as part of the process
 	 * @throws UnauthorizedException, IllegalArgumentException, EmptyResultException
 	 */
-	Map initiateCreateTasksWithRecipe(UserLogin user, Project project, String contextId, String recipeVersionId, Boolean deletePrevious, Boolean useWIP, Boolean publishTasks) {
+	Map initiateCreateTasksWithRecipe(UserLogin user, Project project, String contextId, String recipeId, Boolean deletePrevious, Boolean useWIP, Boolean publishTasks) {
 		log.debug "initiateCreateTasksWithRecipe() user=$user, project=$project"
 
 		// Validate the user permissions
@@ -1387,21 +1385,21 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new UnauthorizedException('User does not have required permission to publish tasks')
 		
 		// Validate that we have a valid recipeVersionId and is associated with the user's project
-		if ( !recipeVersionId?.isInteger())
-			throw new IllegalArgumentException('An invalid recipe version id was received')
+		if ( !recipeId?.isInteger())
+			throw new IllegalArgumentException('An invalid recipe id was received')
 		if ( !contextId)
 			throw new IllegalArgumentException('Please select a context before attempting to generate')
 		if ( !contextId.isInteger())
 			throw new IllegalArgumentException('An invalid context id was recieved')
 
 		// Find the Recipe Version that the user selected
-		def recipeVersion = RecipeVersion.get(recipeVersionId.toInteger())
-		if (! recipeVersion )
-			throw new EmptyResultException('The selected recipe version not found');
-		if (recipeVersion.recipe.project.id != project.id)
+		def recipe = Recipe.get(recipeId.toInteger())
+		if (! recipe )
+			throw new EmptyResultException('The selected recipe not found');
+		if (recipe.project.id != project.id)
 			throw new UnauthorizedException('The recipe version submitted is not associated with current project')
 
-		def recipe = recipeVersion.recipe
+		def recipeVersion
 
 		// Now check to see if the RecipeVersion that we have is the latest release or if not, are we using WIP?
 		if (! useWIP) {
@@ -1409,6 +1407,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				recipeVersion = recipe.releasedVersion
 			} else {
 				throw new UnauthorizedException('There is no released version of the recipe to generate tasks with')
+			}
+		} else {
+			recipeVersion = RecipeVersion.findByRecipeAndVersionNumber(recipe, 0)
+			if (!recipeVersion) {
+				throw new UnauthorizedException('There is no wip version of the recipe to generate tasks with')
 			}
 		}
 
@@ -1437,7 +1440,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 		
-		TaskBatch tb = this.createTaskBatch(user.person, project, contextType, cid, recipeVersion, publishTasks)
+		TaskBatch tb = this.createTaskBatch(user.person, project, contextType, cid, recipe, recipeVersion, publishTasks)
 		
 		String key = taskBatchKey(tb.id)
 		this.progressService.create(key, 'Pending')
@@ -1471,10 +1474,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param isPublished - a flag that indicates that the tasks generated for the batch have been published
 	 * @return the TaskBatch that was created
 	 */
-	TaskBatch createTaskBatch(Person whom, Project project, ContextType contextType, Integer contextId, RecipeVersion recipeVersion, Boolean isPublished=true) {
+	TaskBatch createTaskBatch(Person whom, Project project, ContextType contextType, Integer contextId, Recipe recipe, RecipeVersion recipeVersion, Boolean isPublished=true) {
 		TaskBatch tb = new TaskBatch()
 		tb.project = project
 		tb.createdBy = whom
+		tb.recipe = recipe
 		tb.recipeVersionUsed = recipeVersion
 		tb.contextType = contextType
 		tb.contextId = contextId
@@ -1483,7 +1487,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		tb.save(failOnError: true)
 		return tb
 	}
-
 
 	/**
 	 * Returns the formatted key used to reference a task batch in the ProgressService
@@ -4877,7 +4880,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new EmptyResultException();
 		}
 		
-		if (taskBatch.recipeVersionUsed != null && !taskBatch.recipeVersionUsed.recipe.project.equals(currentProject)) {
+		if (taskBatch.recipe != null && !taskBatch.recipe.project.equals(currentProject)) {
 			log.warn "User $loginUser attempted to delete a task batch ($taskBatchId) from a project not currently associated with"
 			throw new UnauthorizedException('The task batch is not associated to the current project')
 		}
@@ -4922,6 +4925,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				'id': taskBatch.task_batch_id,
 				'contextType': taskBatch.context_type,
 				'contextId': taskBatch.context_id,
+				'recipe': taskBatch.recipe_id,
 				'recipeVersionUsed': taskBatch.recipe_version_id,
 				'status': taskBatch.status,
 				'taskCount': taskBatch.task_count,
@@ -4976,10 +4980,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		def c = TaskBatch.createCriteria()
 		def queryResults = c.list {
-			createAlias('recipeVersionUsed', 'rv')
-			
 			ge("dateCreated", startCreationDate)
-			eq("rv.recipe", recipe)
+			eq("recipe", recipe)
 		}
 		
 		def result = []
@@ -4994,7 +4996,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			'status': taskBatch.status,
 			'exceptionLog': taskBatch.exceptionLog,
 			'infoLog': taskBatch.infoLog,
-			'versionNumber' : taskBatch.recipeVersionUsed.versionNumber,
+			'versionNumber' : taskBatch.recipe.releasedVersion?taskBatch.recipe.releasedVersion.versionNumber:'',
 			'isPublished' : taskBatch.isPublished])
 		}
 

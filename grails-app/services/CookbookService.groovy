@@ -255,6 +255,9 @@ class CookbookService {
 			throw new UnauthorizedException('User is trying to delete recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
 		}
 
+		// Update all TaskBatch to null the reference to the recipe
+		TaskBatch.executeUpdate('update TaskBatch tb set tb.recipe=null where tb.recipe = (:recipe)', [recipe:recipe] )
+
 		def rvList = RecipeVersion.findAllByRecipe(recipe)
 		log.debug "Found ${rvList.size()} recipe versions to be deleted"
 		if (rvList.size()) {

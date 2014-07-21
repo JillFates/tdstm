@@ -104,4 +104,5 @@ databaseChangeLog = {
 	include file: '20140205-add-viewtaskgraph-permissions.groovy'
 	include file: '20140704-pre-seed-asset-tag-sequence-for-existing-clients.groovy'
 	include file: '20140709-add-defualt-bundle-to-project.groovy'
+	include file: '20140717-task-batch-add-recipe-id-field.groovy'
 }
