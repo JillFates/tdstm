@@ -6,6 +6,7 @@ exports.config = {
   suites: {
     regression: [ //Do not change the order of these files since some test depends on others.
     '../components/clientProject/listProjects.spec.js',
+	'../components/clientProject/showProjects.spec.js',
     '../components/clientProject/createProject.spec.js',
     '../components/eventsBundles/bundles.spec.js',
     '../components/admin/adminPortal.spec.js',
