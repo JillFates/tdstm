@@ -54,7 +54,7 @@ describe('Create Project', function(){
   it('Should select "Demo" as workflow', function(){
       projectPage.selectWorkflowCodeByName('Demo').click();
       expect(projectPage.getWorkflowSelected()
-        .getAttribute('value')).toEqual('Demo');
+        .getAttribute('value')).toEqual('STD_PROCESS');
   });
 
   it('should have "Project Code: *" as label for project code', function(){
