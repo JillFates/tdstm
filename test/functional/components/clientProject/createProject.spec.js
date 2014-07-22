@@ -51,8 +51,8 @@ describe('Create Project', function(){
         .getText()).toEqual('Workflow Code:');
   });
 
-  it('Should select "Demo" as workflow', function(){
-      projectPage.selectWorkflowCodeByName('Demo').click();
+  it('Should select "STD_PROCESS" as workflow', function(){
+      projectPage.selectWorkflowCodeByName('STD_PROCESS').click();
       expect(projectPage.getWorkflowSelected()
         .getAttribute('value')).toEqual('STD_PROCESS');
   });
