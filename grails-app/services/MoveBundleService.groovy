@@ -673,14 +673,14 @@ class MoveBundleService {
 	 * @param sheet : sheet-name
 	 * @return void
 	 */
-	def issueExport(def exportList, def columnList, def sheet, def tzId, def startRow = 0 ){
+	def issueExport (def exportList, def columnList, def sheet, def tzId, def startRow = 0 ) {
 		
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		for ( int r=startRow; r < (exportList.size()+startRow); r++ ) {
-			for (int c =0; c < columnList.size(); c++){
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		for ( int r = startRow; r < (exportList.size() + startRow); r++ ) {
+			for (int c = 0; c < columnList.size(); ++c){
 				def cellValue
 				def attribName = columnList[c]
-				switch(attribName){
+				switch (attribName) {
 					case "taskDependencies":
 						cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
 						break;
@@ -688,8 +688,8 @@ class MoveBundleService {
 						cellValue = exportList[r-startRow]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"?.assetName) : ''
 						break;
 					case "duration":
-						def duration= exportList[r-startRow].duration ? (exportList[r-startRow].durationScale == "m" ? exportList[r-startRow]."${columnList[c]}" : exportList[r-startRow]."${columnList[c]}"+exportList[r-startRow].durationScale) : ''
-					    cellValue = exportList[r-startRow]."${columnList[c]}" ?  String.valueOf(duration) : ''
+						def duration = exportList[r-startRow].duration ? (exportList[r-startRow].durationScale == "m" ? exportList[r-startRow]."${columnList[c]}" : exportList[r-startRow]."${columnList[c]}" + '' + exportList[r-startRow].durationScale) : ''
+						cellValue = exportList[r-startRow]."${columnList[c]}" ?  String.valueOf(duration) : ''
 						break;
 					case "commentAssetEntity":
 						cellValue = exportList[r-startRow].assetEntity ?  String.valueOf(exportList[r-startRow].assetEntity?.assetName) : ''
@@ -703,7 +703,7 @@ class MoveBundleService {
 					case "estStart":
 						 cellValue = exportList[r-startRow].estStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].estStart, tzId))) : ''
 						 break;
-				    case "estFinish":
+					case "estFinish":
 						 cellValue = exportList[r-startRow].estFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].estFinish, tzId))) : ''
 						 break;
 					case "actStart":
@@ -712,7 +712,7 @@ class MoveBundleService {
 					case "actFinish":
 						 cellValue = exportList[r-startRow].actFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].dateResolved, tzId))) : ''
 						 break;
-				    case "":
+					case "":
 						cellValue = ""
 						break;
 					default:
