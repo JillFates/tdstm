@@ -36,7 +36,13 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
+	<g:javascript src="moment-timezone-with-data-2010-2020.js" />
+	
 	<script type="text/javascript">
+		var userPreferences = {
+			"CURR_TZ" : "${userPreferenceService.get('CURR_TZ')}"
+		};
+
 		$(document).ready(function() {
 			var opt = {
 			        autoOpen: false,
