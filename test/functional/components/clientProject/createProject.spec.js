@@ -10,7 +10,46 @@ describe('Create Project', function(){
     menu.goToClientProject('listProjects');
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
- 
+    
+  it('should attempt to create and submit a project with no workflow code',function(){
+  		browser.driver.findElement(by.css('input[class="create"]')).click();
+		browser.driver.findElement(by.id('name')).sendKeys('TEST_PROJECT');		
+		browser.driver.findElement(by.id('projectCode')).sendKeys('TESTY');
+		browser.driver.findElement(by.css('input[class="save"')).click();
+		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+		browser.sleep(500);	
+  });
+  
+  it('should attempt to submit a project with no project name',function(){
+		browser.driver.findElement(by.id('name')).clear();	
+		browser.driver.findElement(by.id('workflowCode')).click;
+		browser.driver.findElement(by.css('option[value="STD_PROCESS"')).click();
+		browser.driver.findElement(by.css('input[class="save"')).click();
+		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+		browser.sleep(500);
+  });
+  
+  it('should attempt to submit a project with no project code',function(){
+		browser.driver.findElement(by.id('name')).sendKeys('TEST_PROJECT');
+		browser.driver.findElement(by.id('projectCode')).clear();
+		browser.driver.findElement(by.css('input[class="save"')).click();
+		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+		browser.sleep(500);
+  });
+  
+  it('should attempt to submit a project with no creation date',function(){
+		browser.driver.findElement(by.id('completionDateId')).clear();
+		browser.driver.findElement(by.id('projectCode')).sendKeys('TESTY');
+		browser.driver.findElement(by.css('input[class="save"')).click();
+		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+		browser.sleep(500);	
+  });
+  
+  it('should press the cancel button',function(){
+	browser.driver.findElement(by.css('input[class="delete"')).click();
+    expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
+  });
+  
   it('should load create project page after hitting create project button',function(){
     listProjectPage.clickOnCreateProjectBtn();
     expect(projectPage.getTitle().getText()).toEqual('Create Project');
