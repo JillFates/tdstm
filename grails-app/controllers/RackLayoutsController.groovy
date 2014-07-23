@@ -402,9 +402,9 @@ class RackLayoutsController {
 					def bladeLayoutMap = ['asset':it, 'permission':rackLayoutsHasPermission, 'hideIcons':hideIcons, 'redirectTo':redirectTo ,
 											'rackId':rackId, 'commit':commit, 'forWhom':forWhom, "bundle": paramsMap.bundle]
 					if(location == 1)
-						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, sourceRack: assetEntity.sourceRack )
+						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, sourceRoom: assetEntity.sourceRoom, sourceRack: assetEntity.sourceRack ).findAll{it.assetType != 'Blade'}
 					else 
-						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, targetRack: assetEntity.targetRack )
+						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, targetRoom: assetEntity.targetRoom, targetRack: assetEntity.targetRack ).findAll{it.assetType != 'Blade'}
 					if(overlappedAssets.size() > 1) {
 						overlappedAssets.each{ overlapAsset ->
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
