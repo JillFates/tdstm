@@ -22,6 +22,8 @@ var Menu = function(){
   this.syncLibrariesCss = 'a[href="/tdstm/model/importExport"]';
 //ClientProjects
   this.listProjectsCss = 'a[href="/tdstm/project/list?active=active"]';
+  this.fieldSettingsCss = 'a[href="/tdstm/project/fieldImportance"]';
+
   this.assetsCss = '#assetMenuId a';
   this.summaryCss = 'a[href="/tdstm/assetEntity/assetSummary"]';
   this.listAppsCss='a[href="/tdstm/application/list"]';
@@ -110,10 +112,10 @@ var Menu = function(){
 
       },
       'projectStaff':function(){
-
+	  
       },
       'fieldSettings':function(){
-
+        browser.driver.findElement(by.css(that.fieldSettingsCss)).click();
       },
       'help':function(){
 
