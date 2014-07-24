@@ -7,9 +7,9 @@ import com.excilys.ebi.gatling.http.Headers.Names._
 import akka.util.duration._
 
 class GetAssetLists extends Simulation {
-
+  val baseURL = System.getenv("BASE_URL")
   val httpConf = httpConfig
-      .baseURL("http://localhost:8080")
+      .baseURL(baseURL)
       .acceptHeader("image/png,image/*;q=0.8,*/*;q=0.5")
       .acceptEncodingHeader("gzip, deflate")
       .acceptLanguageHeader("en-US,en;q=0.5")
