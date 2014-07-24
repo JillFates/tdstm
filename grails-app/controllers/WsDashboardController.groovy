@@ -18,7 +18,7 @@ class WsDashboardController {
 	 * @param moveEventId
 	 * @return JSON map 
 	 */
-    def bundleData = {
+	def bundleData = {
 		def error = ""
 		def project = securityService.getUserCurrentProject()
 		def moveEventId = params.moveEventId
@@ -60,8 +60,8 @@ class WsDashboardController {
 		def dataPointsForEachStep = []
 
 		// Get the step data either by runbook tasks or     	
-    	if (moveBundle) {
-	    	if (project.runbookOn) {
+		if (moveBundle) {
+			if (project.runbookOn) {
 
 	    		// TODO - remove references to mbs MoveBundleStep 
 
@@ -88,7 +88,7 @@ class WsDashboardController {
 					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
 					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
 					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wft.trans_id
-					WHERE a.move_bundle_id = ${moveBundleId}
+					WHERE a.move_bundle_id = ${moveBundleId} AND t.move_event_id = ${moveEventId}
 					GROUP BY t.workflow_transition_id;
 				"""
 				
@@ -96,7 +96,7 @@ class WsDashboardController {
 
 				// log.info "bundleData() SQL = $taskStatsSql"
 
-	    	} else {
+			} else {
 
 	    		// def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) * ( -1 )
 	    		/*def offsetTZ = ( new Date().getTimezoneOffset() / 60 ) 
@@ -119,7 +119,7 @@ class WsDashboardController {
 					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
 					INNER JOIN (SELECT move_bundle_step_id, MAX(date_created) as date_created FROM step_snapshot GROUP BY move_bundle_step_id) ss2
 					ON ss2.move_bundle_step_id = mbs.id AND ss.date_created = ss2.date_created
-					WHERE mb.move_bundle_id = ${moveBundle.id} 
+					WHERE mb.move_bundle_id = ${moveBundle.id} AND t.move_event_id = ${moveEventId}
 				""" 
 					
 				/*	Get the steps that have not started / don't have step_snapshot records	*/						
@@ -134,7 +134,7 @@ class WsDashboardController {
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
 					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id 
-					WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL
+					WHERE mb.move_bundle_id = ${moveBundle.id} AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL AND t.move_event_id = ${moveEventId}
 				"""
 					
 				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery )
@@ -146,17 +146,17 @@ class WsDashboardController {
 		def sysTimeInMs = sysTime.getTime() / 1000
 		def sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a");
 
-		dataPointsForEachStep.each{ data ->
+		dataPointsForEachStep.each { data ->
 			
 			def snapshot 
 			def planCompTime = new Date( data.planComp ).getTime() / 1000  
 			def planStartTime = new Date( data.planStart ).getTime() / 1000
 			
-			if( data.snapshotId ){
+			if ( data.snapshotId ) {
 				snapshot = StepSnapshot.findById( data.snapshotId )
 				data.put( "projComp", snapshot.getProjectedCompletionTime() )
 				data.put( "statColor", snapshot.getStatusColor() )
-				if(snapshot.moveBundleStep.showInGreen){
+				if (snapshot.moveBundleStep.showInGreen) {
 					data.put( "percentageStyle", "step_statusbar_good" )
 					return;
 				}
@@ -165,17 +165,17 @@ class WsDashboardController {
 				data.put( "statColor", "red" )
 			}
 			
-			if( !data.actComp ){
+			if ( !data.actComp ) {
 				// 59s is added to planCompletion to consider the minutes instead of seconds 
-				if( sysTimeInMs > planCompTime+59 && data.tskComp < data.tskTot) {  
+				if ( sysTimeInMs > planCompTime+59 && data.tskComp < data.tskTot) {
 					data.put( "percentageStyle", "step_statusbar_bad" )
-				} else{
+				} else {
 					def remainingStepTime = planCompTime - sysTimeInMs
 					// 20% of planned duration
 					def planDurationLeft = (planCompTime - planStartTime) * 0.2 
 					// 80% of remainin assets
 					def remainingTasks =  data.tskTot ? data.tskTot * 0.6 : 0
-					if(remainingStepTime <= planDurationLeft && remainingTasks > data.tskComp){
+					if (remainingStepTime <= planDurationLeft && remainingTasks > data.tskComp) {
 						data.put( "percentageStyle", "step_statusbar_yellow" )
 					} else {
 						data.put( "percentageStyle", "step_statusbar_good" )
@@ -201,7 +201,7 @@ class WsDashboardController {
 				}*/
 			} else {
 				def actCompTime = new Date( data.actComp ).getTime() / 1000
-				if( actCompTime > planCompTime+59 ){  // 59s added to planCompletion to consider the minutes instead of seconds 
+				if ( actCompTime > planCompTime+59 ) {  // 59s added to planCompletion to consider the minutes instead of seconds 
 					data.put( "percentageStyle", "step_statusbar_bad" )
 				} else {
 					data.put( "percentageStyle", "step_statusbar_good" )
@@ -219,7 +219,7 @@ class WsDashboardController {
 		def revisedComp 
 		def dayTime
 		def eventString=""
-		if( moveEvent ){
+		if ( moveEvent ) {
 			
 			def resultMap = jdbcTemplate.queryForMap( """
 				SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %r' ) as compTime,
@@ -228,12 +228,12 @@ class WsDashboardController {
 				""" )
 
 			planSumCompTime = resultMap?.compTime
-			if(resultMap?.startTime){
+			if (resultMap?.startTime) {
 				def eventStartTime = new Date( resultMap?.startTime ) 
-				if(eventStartTime>sysTime){
+				if (eventStartTime>sysTime) {
 					dayTime = TimeCategory.minus(eventStartTime, sysTime)
 					eventString = "<i>Time Remaining<i>"
-				}else{
+				} else {
 					dayTime = TimeCategory.minus(sysTime, eventStartTime)
 					eventString = "<i>Event Time<i>"
 				}
@@ -247,7 +247,7 @@ class WsDashboardController {
 			moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent , "P"] )[0]
 			moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "R"] )[0]
 			revisedComp = moveEvent.revisedCompletionTime
-			if(revisedComp){
+			if (revisedComp) {
 				def revisedCompTime = revisedComp.getTime()
 				revisedComp = new Date(revisedCompTime)
 			}
