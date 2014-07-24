@@ -133,6 +133,16 @@ class UrlMappings {
 			action = [GET:"get"]
 		}
 
+		"/ws/progress/demo" {
+			controller = "wsProgress"
+			action = [GET:"demo"]
+		}
+
+		"/ws/progress/demo/failed" {
+			controller = "wsProgress"
+			action = [GET:"demoFailed"]
+		}
+
 		"/ws/user/preferences/$id" {
 			controller = "wsUser"
 			action = [GET:"preferences"]

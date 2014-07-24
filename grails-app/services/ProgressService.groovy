@@ -37,21 +37,6 @@ class ProgressService {
 	void create(String key, String status='Pending') {
 		ProgressInfo info = new ProgressInfo(key, status)
 		this.progressInfo.put(key, info)
-		//REMOVE THIS. ONLY FOR DEMO
-		def demo = false
-		if (demo) {
-			this.service.execute(new Runnable() {
-				void run() {
-					int p = 2
-					while (p < 100) {
-						ProgressService.this.update(key, p, 'In progress', null)
-						p = p + 2
-						Thread.sleep(1000)
-					}
-					ProgressService.this.update(key, 100, 'Completed', null)
-				}
-			});
-		}
 	}
 	
 	// TODO : the ProgressService class will need be updated for a Clustered Tomcat configuration
@@ -127,5 +112,40 @@ class ProgressService {
 				'lastUpdated' : info.lastUpdated
 			];
 		}
+	}
+	
+	def demo() {
+		def key = 'Task-' + UUID.randomUUID().toString()
+		this.create(key)
+		this.service.execute(new Runnable() {
+			void run() {
+				int p = 2
+				while (p < 100) {
+					ProgressService.this.update(key, p, 'In progress', null)
+					p = p + 2
+					Thread.sleep(1200)
+				}
+				ProgressService.this.update(key, 100, 'Completed', null)
+			}
+		});
+		return ['key' : key]
+	}
+
+	def demoFailed() {
+		def key = 'Task-' + UUID.randomUUID().toString()
+		this.create(key)
+		this.service.execute(new Runnable() {
+			void run() {
+				int p = 2
+				while (p < 60) {
+					ProgressService.this.update(key, p, 'In progress', null)
+					p = p + 2
+					Thread.sleep(1200)
+				}
+				ProgressService.this.update(key, p, 'Failed', null)
+				Thread.sleep(1200)
+			}
+		});
+		return ['key' : key]
 	}
 }
