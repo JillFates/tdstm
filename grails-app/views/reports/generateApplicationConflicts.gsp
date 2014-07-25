@@ -1,22 +1,33 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
-<title>Application Conflicts</title>
-<g:javascript src="asset.tranman.js" />
-<g:javascript src="entity.crud.js" />
-<script>
-	$(document).ready(function() {
-		$("#showEntityView").dialog({ autoOpen: false })
-		$("#editEntityView").dialog({ autoOpen: false })
-		currentMenuId = "#reportsMenu";
-		$("#reportsMenuId a").css('background-color','#003366')
-	});
-</script>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="layout" content="projectHeader" />
+	<title>Application Conflicts</title>
+	<g:javascript src="asset.tranman.js" />
+	<g:javascript src="entity.crud.js" />
+	<g:javascript src="angular/angular.min.js" />
+	<g:javascript src="angular/plugins/angular-ui.js"/>	
+	<g:javascript src="angular/plugins/angular-resource.js" />
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<g:javascript src="asset.comment.js" />
+	<g:javascript src="cabling.js"/>	
+	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+	<script>
+		$(document).ready(function() {
+			$("#showEntityView").dialog({ autoOpen: false })
+			$("#editEntityView").dialog({ autoOpen: false })
+			currentMenuId = "#reportsMenu";
+			$("#reportsMenuId a").css('background-color','#003366')
+		});
+	</script>
 </head>
 <body>
-	<div class="body" style="width:1000px;">
+	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Application Conflicts - ${project.name} : ${moveBundle} and App Owner:${currAppOwner}</b><br/>
 			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
@@ -29,8 +40,7 @@
 		<table>
 			<tbody>
 				<tr>
-					<td >
-					</td>
+					<td></td>
 					<td>
 						<g:each var="appList" in="${appList}" var="application" status="i">
 							<table class="conflictApp">
@@ -129,7 +139,6 @@
 											</tr>
 										</g:each>
 									</g:if>
-									
 								</tbody>
 							</table>
 						</g:each>
@@ -137,8 +146,11 @@
 				</tr>
 			</tbody>
 		</table>
-	<div id="showEntityView" style="display: none;"></div>
-	<div id="editEntityView" style="display: none;"></div>
+		<div ng-controller="tds.comments.controller.MainController as comments">
+			<jqgrid:wrapper id="applicationId" />
+		</div>
+		<div id="showEntityView" style="display: none;"></div>
+		<div id="editEntityView" style="display: none;"></div>
 
 	</div>
 </body>

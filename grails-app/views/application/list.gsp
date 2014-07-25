@@ -156,10 +156,10 @@
 	<body>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 			<h1>Application List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
-            <div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
-                <button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
-                <span ng-bind="alert.msg"></span>
-            </div>
+			<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
+			    <button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
+			    <span ng-bind="alert.msg"></span>
+			</div>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>
@@ -171,26 +171,26 @@
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width:13.7% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
-							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 
+							<!--<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 
 								${appPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
-								onchange="setColumnAssetPref(this.value,'${key}','App_Columns')"/> ${attribute.frontendLabel}</label><br>
+								onchange="setColumnAssetPref(this.value,'${key}','App_Columns')"/> ${attribute.frontendLabel}</label><br>-->
 						</g:each>
 					</div>
 				</div>
 			</g:each>
-            <div ng-controller="tds.comments.controller.MainController as comments">
-                <jqgrid:wrapper id="applicationId" />
-            </div>
+			<div ng-controller="tds.comments.controller.MainController as comments">
+			    <jqgrid:wrapper id="applicationId" />
+			</div>
 			<g:render template="../assetEntity/modelDialog"/>
 			<div id="createEntityView" style="display: none;" ></div>
 			<div id="showEntityView" style="display: none;"></div>
 			<div id="editEntityView" style="display: none;"></div>
-			<div id="createStaffDialog" style="display:none;">
 			<div id="cablingDialogId" style="display: none;"></div>
+			<div id="createStaffDialog" style="display:none;">
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<g:render template="../assetEntity/newDependency" model="['forWhom':'Application', entities:applications]"></g:render>
-			</div>
+		</div>
             <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
