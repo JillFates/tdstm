@@ -810,3 +810,13 @@ input, select, textarea {
 	line-height: 31px !important;
 	margin-bottom: -15px !important;
 }
+div#bdltabs span {
+	max-width: 123px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.disabled {
+	opacity: 0.4;
+	cursor: default;
+}

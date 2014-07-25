@@ -11,7 +11,7 @@ import com.tdssrc.grails.WebUtil
 class DashboardController {
 	
 	def userPreferenceService
-    def taskService
+	def taskService
 	def projectService
 	def securityService
 	def userService
@@ -28,43 +28,43 @@ class DashboardController {
 		}
 		def moveEventId = params.moveEvent
 		
-		if(moveEventId){
+		if (moveEventId) {
 			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
-            moveEvent = MoveEvent.findById(moveEventId)
+			moveEvent = MoveEvent.findById(moveEventId)
 		} else {
-            userPreferenceService.loadPreferences("MOVE_EVENT")
-            def defaultEvent = getSession().getAttribute("MOVE_EVENT")
-            if(defaultEvent.MOVE_EVENT){
-            	moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
-            	if( moveEvent?.project?.id != project?.id ){
-            		moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
-            	}
-            } else {
-            	moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
-            }
-        }
-        if(!moveEvent){
-            flash.message = "Please select move event to view Event Dashboard"
-            redirect(controller:"moveEvent",action:"list")
-        } else {
-            def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
-            def projectLogo = ProjectLogo.findByProject(project)
-    		userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
-            def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
-    		def subject = SecurityUtils.subject
-            //code for task Summary and task progress bars
-        	userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
+			userPreferenceService.loadPreferences("MOVE_EVENT")
+			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
+			if (defaultEvent.MOVE_EVENT) {
+				moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
+				if ( moveEvent?.project?.id != project?.id ) {
+					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+				}
+			} else {
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+			}
+		}
+		if (!moveEvent) {
+			flash.message = "Please select move event to view Event Dashboard"
+			redirect(controller:"moveEvent",action:"list")
+		} else {
+			def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
+			def projectLogo = ProjectLogo.findByProject(project)
+			userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
+			def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
+			def subject = SecurityUtils.subject
+			//code for task Summary and task progress bars
+			userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
-            def results = taskService.getMoveEventTaskSummary(moveEvent)
-            def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
-            
-    		return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
-    				 moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
-    				 manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
-    				 taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration,
-					 teamTaskMap:teamTaskResults, roles:teamTaskResults.values().role]
-        }
-    }
+			def results = taskService.getMoveEventTaskSummary(moveEvent)
+			def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
+
+			return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
+				moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
+				manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
+				taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration,
+				teamTaskMap:teamTaskResults, roles:teamTaskResults.values().role]
+		}
+	}
 	
 	/*---------------------------------------------------------
 	 * Will set user preference for DASHBOARD_REFRESH time
