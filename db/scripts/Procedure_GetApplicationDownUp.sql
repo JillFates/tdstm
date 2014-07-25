@@ -1,5 +1,5 @@
 --
--- GetApplicationDownUp 
+-- Procedure GetApplicationDownUp 
 --
 -- This procedure is used to get a list of applications for a move event and return if and when the application was shutdown and restarted
 --
@@ -8,19 +8,32 @@
 -- 		eventName - the name of the event
 --		downMatch - the string match used to find the app shutdown task by title using a SQL LIKE statement (e.g. App % is shutdown)
 --		upMatch - the string match used to find the app started up task by title using a SQL LIKE statement (e.g. App % finished testing)
+--      tzOffset - used to adjust the GMT times appropriate (e.g. EDT would be '-04:00')
+--
+-- Returns:
+-- 		id INT - interal application id
+--		ref_id VARCHAR(64) - the client's reference id of the application
+-- 		name VARCHAR(255) - the name of the application
+--		down BOOL - flag indicating if the application has been shutdown
+--  	down_at DATETIME - the time that the app completed shutdown otherwise NULL
+--		up BOOL - flag indicating if the application has been started up
+-- 		up_at DATETIME - the time that the app finished the startup or testing indicating that the app is back online
 --
 -- Usage:
--- 		CALL GetApplicationDownUp(2468, 'MG01', 'Initiate shutdown of %', 'App % is tested');
+-- 		CALL GetApplicationDownUp(2468, 'MG01', 'Staff present and ready to start shutdown PROCESS of %', 'App % is tested', '-04:00');
 
 DROP PROCEDURE IF EXISTS GetApplicationDownUp;
 DELIMITER //
-CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255), IN downMatch VARCHAR(255), IN upMatch VARCHAR(255) )
+CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255), IN downMatch VARCHAR(255), IN upMatch VARCHAR(255), tzOffset VARCHAR(6) )
     BEGIN
+		DECLARE GMT_TZ VARCHAR(6);
+		DECLARE TIME_FORMAT VARCHAR(30);
 		DECLARE eventId INT;
 		SELECT move_event_id INTO eventId FROM move_event WHERE name = eventName; 
+		SET GMT_TZ = '-00:00';
+		SET TIME_FORMAT = '%a %b %D %H:%i%p';
 
 		DROP TEMPORARY TABLE IF EXISTS apps;
-
 		CREATE TEMPORARY TABLE apps AS (
 			SELECT a. asset_entity_id AS id, 
 				a.external_ref_id AS ref_id, 
@@ -45,7 +58,7 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 
 		UPDATE apps SET down_at = ( 
 			COALESCE(
-				( SELECT IF(status IN ('Started', 'Completed'), task.date_resolved, null)
+				( SELECT IF(status IN ('Started', 'Completed'), CONVERT_TZ(task.act_start, GMT_TZ, tzOffset), null)
 				FROM asset_comment task
 				WHERE task.move_event_id=eventId AND 
 					task.asset_entity_id=apps.id AND 
@@ -54,6 +67,7 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 			)
 		);
 
+		-- Set the up column if the status is Completed
 		UPDATE apps SET up = ( 
 			COALESCE(
 				( SELECT status='Completed' 
@@ -65,9 +79,10 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 			)
 		);
 
+		-- Set the up_at column with the time resolved
 		UPDATE apps SET up_at = ( 
 			COALESCE(
-				( SELECT IF(status='Completed', task.date_resolved, null) 
+				( SELECT IF(status='Completed', CONVERT_TZ(task.date_resolved, GMT_TZ, tzOffset), null) 
 				FROM asset_comment task
 				WHERE task.move_event_id=eventId AND 
 					task.asset_entity_id=apps.id AND 
@@ -76,7 +91,8 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 			)
 		);
 
-		SELECT * from apps;
+		SELECT id, ref_id, name, date_format(down_at, TIME_FORMAT) AS down_at, date_format(up_at, TIME_FORMAT) AS up_at
+		FROM apps;
 		DROP TEMPORARY TABLE apps;
     END //
 DELIMITER ;
