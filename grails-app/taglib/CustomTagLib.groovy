@@ -1,6 +1,7 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.apache.commons.validator.UrlValidator
+import org.apache.commons.codec.net.URLCodec
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
@@ -218,7 +219,7 @@ class CustomTagLib {
 
 	/**
 	 * Used to output text as URL if it matches or straight text otherwise
-	 * @param text - text or URL to be displayed, for URL if there is a pipe (|) character after the URL, then the follow text will be used as the link (required)
+	 * @param text - text or URL to be displayed, for URL if there is a pipe (|) character the pattern will be (label | url) (required)
 	 * @param target - set the A 'target' tag appropriately (optional)
 	 * @param class - when presented it will be added to the style if it is a link (optional)
 	 *
@@ -229,28 +230,36 @@ class CustomTagLib {
 		def css = attrs['class'] ?: ''
 		def url
 		def label
+		def isUrl = false
 
-		String[] schemes = ["http","https","ftp","ftps","smb","file"].toArray();
-		UrlValidator urlValidator = new UrlValidator(schemes);
-		
-		def isUrl = urlValidator.isValid(text)
-		
-		if (isUrl) {
+		if (text) { 
+
+			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray();
+			UrlValidator urlValidator = new UrlValidator(schemes);
+
+			// Attempt to split the URL from the label
 			def tokens = text.tokenize('|')
-			url = tokens[0]
-			label = tokens.size() > 1 ? tokens[1] : url
-		} else {
-			if (text != null && text.startsWith("\\\\") || text =~ "[A-z]+:/") {
-				isUrl = true
-				text = "file://" + text
-				def tokens = text.tokenize('|')
-				url = tokens[0]
-				label = tokens.size() > 1 ? tokens[1] : url
+			url = tokens.size() > 1 ? tokens[1] : tokens[0]
+			label = tokens[0]
+			isUrl = urlValidator.isValid(url)
+			if (! isUrl) {
+				if (url.startsWith('\\\\')) {
+					// Handle UNC (\\host\share\file) which needs to be converted to file
+					isUrl = true
+					url = 'file:' + url.replaceAll('\\\\', '/')
+				} else {
+					if (( url ==~ /^[A-z]:\\.*/ ) ) {
+						// Handle windows directory reference do a drive letter
+						isUrl = true
+						URLCodec uc = new URLCodec()
+						url = 'file://' + uc.encode( url.replace("\\", '/') )
+					}
+				}
 			} 
 		}
 
 		if (isUrl) {
-			out << "<a href=\"$url\""
+			out << /<a href="$url"/
 			if (target) {
 				out << " target=\"$target\""
 			}
@@ -259,11 +268,10 @@ class CustomTagLib {
 			}
 			out << ">$label</a>"
 		} else {
-			out << text
+			out << (text?.size()>0 ? text : '')
 		}
 
 	}
-    
     
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified

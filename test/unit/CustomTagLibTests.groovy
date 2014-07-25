@@ -52,23 +52,57 @@ class CustomTagLibTests extends GrailsUnitTestCase {
 	}
 	
 	void testTextAsLink() {
-		assertTrue new CustomTagLib().textAsLink(['text':'http://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+
+		def justText = 'p:some more data that is not a URL'
+		assertEquals 'Just Text', justText, new CustomTagLib().textAsLink([text:justText])?.toString()
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'https://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+
+		assertTrue 'Testing http', new CustomTagLib().textAsLink([text:'http://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'ftp://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+
+		assertTrue 'Testing HTTP', new CustomTagLib().textAsLink([text:'HTTP://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'ftps://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+
+		assertTrue 'Testing https', new CustomTagLib().textAsLink([text:'https://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'smb://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+
+		assertTrue 'Testing HTTPS', new CustomTagLib().textAsLink([text:'HTTPS://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'file://www.google.com', 'target':'_blank']).toString().startsWith("<a href")
+
+		assertTrue 'Testing ftp', new CustomTagLib().textAsLink([text:'ftp://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'\\\\hola', 'target':'_blank']).toString().startsWith('<a href="file://\\\\hola')
+
+		assertTrue 'Testing FTP', new CustomTagLib().textAsLink([text:'FTP://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['text':'p:/', 'target':'_blank']).toString().startsWith('<a href="file://p:/')
+
+		assertTrue 'Testing ftps', new CustomTagLib().textAsLink([text:'ftps://www.google.com', target:'_blank']).toString().startsWith("<a href")
 		out.getBuffer().setLength(0)
-		assertTrue new CustomTagLib().textAsLink(['target':'_blank']).toString().equals('null')
+
+		assertTrue 'Testing FTPS', new CustomTagLib().textAsLink([text:'FTPS://www.google.com', target:'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+
+		assertTrue 'Testing smb', new CustomTagLib().textAsLink([text:'smb://www.google.com', target:'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+
+		assertTrue 'Testing SMB', new CustomTagLib().textAsLink([text:'SMB://www.google.com', target:'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+
+		assertTrue 'Testing file', new CustomTagLib().textAsLink([text:'file://www.google.com', target:'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+
+		assertTrue 'Testing FILE', new CustomTagLib().textAsLink([text:'FILE://www.google.com', target:'_blank']).toString().startsWith("<a href")
+		out.getBuffer().setLength(0)
+
+		assertTrue 'Testing UNC', new CustomTagLib().textAsLink([text:'\\\\hola\\dir\\file']).toString().startsWith('<a href="file://hola/dir/file')
+		out.getBuffer().setLength(0)
+
+		assertTrue 'A Windows File', new CustomTagLib().textAsLink([text:'p:\\dir\\file name'])?.toString().startsWith('<a href="file://p%3A%2Fdir%2Ffile+name')
+		out.getBuffer().setLength(0)
+
+		assertEquals 'Testing Blank Text', '', new CustomTagLib().textAsLink([text:null]).toString()
+		out.getBuffer().setLength(0)
+
+		assertEquals 'Testing Null Text', '', new CustomTagLib().textAsLink([text:null]).toString()
 		out.getBuffer().setLength(0)
 	}
 }
