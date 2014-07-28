@@ -29,17 +29,22 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 		DECLARE GMT_TZ VARCHAR(6);
 		DECLARE TIME_FORMAT VARCHAR(30);
 		DECLARE eventId INT;
+		DECLARE defaultDT DATETIME;
+
 		SELECT move_event_id INTO eventId FROM move_event WHERE name = eventName; 
 		SET GMT_TZ = '-00:00';
 		SET TIME_FORMAT = '%a %b %D %H:%i%p';
+		SET defaultDT = null;
 
 		DROP TEMPORARY TABLE IF EXISTS apps;
 		CREATE TEMPORARY TABLE apps AS (
 			SELECT a. asset_entity_id AS id, 
 				a.external_ref_id AS ref_id, 
 				a.asset_name as name, 
-				false as down, time(null) as down_at,
-				false as up, time(null) as up_at
+				false as down, 
+				defaultDT as down_at,
+				false as up, 
+				defaultDT as up_at
 			FROM asset_entity a
 			JOIN move_bundle mb ON a.move_bundle_id = mb.move_bundle_id
 			WHERE mb.move_event_id=eventId AND a.asset_class='Application'
@@ -56,6 +61,7 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 			)
 		);
 
+		-- Set the down_at time if the app is down
 		UPDATE apps SET down_at = ( 
 			COALESCE(
 				( SELECT IF(status IN ('Started', 'Completed'), CONVERT_TZ(task.act_start, GMT_TZ, tzOffset), null)
@@ -91,7 +97,9 @@ CREATE PROCEDURE GetApplicationDownUp(IN projectId INT, IN eventName VARCHAR(255
 			)
 		);
 
-		SELECT id, ref_id, name, date_format(down_at, TIME_FORMAT) AS down_at, date_format(up_at, TIME_FORMAT) AS up_at
+		SELECT id, ref_id, name, 
+			down, date_format(down_at, TIME_FORMAT) AS down_at, 
+			up, date_format(up_at, TIME_FORMAT) AS up_at
 		FROM apps;
 		DROP TEMPORARY TABLE apps;
     END //
