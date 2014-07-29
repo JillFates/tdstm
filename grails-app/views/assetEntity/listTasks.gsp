@@ -2,6 +2,7 @@
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.StringUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
+<%@page import="com.tdsops.tm.enums.domain.AssetCommentType"%>
 <%@page import="com.tdsops.tm.enums.domain.AssetCommentStatus"%>
 <html>
 <head>
@@ -72,7 +73,7 @@
 			var sizePref = '${sizePref}'
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var listCaption ="Tasks: \
-				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"ssue\",\"\",\"\")'></tdsactionbutton>&nbsp; \
+				<tdsactionbutton id='createTask' label='Create Task' icon='/icons/table_add.png' link='' ng-click='comments.createCommentBy(\"${AssetCommentType.TASK}\",\"\",\"\")'></tdsactionbutton>&nbsp; \
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>"
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
