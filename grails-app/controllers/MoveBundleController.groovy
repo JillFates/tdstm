@@ -138,12 +138,13 @@ class MoveBundleController {
 
 	def delete = {
 		def moveBundleInstance = MoveBundle.get( params.id )
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		if(moveBundleInstance) {
+		def project = securityService.getUserCurrentProject()
+		if(moveBundleInstance && project) {
 			AssetEntity.withTransaction { status ->
 				try{
 					// Update asset associations
-					AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = null WHERE moveBundle = ?",[moveBundleInstance])
+					AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",  
+						[project.defaultBundle, moveBundleInstance])
 					// Delete Bundle and associations
 					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
 
@@ -154,7 +155,7 @@ class MoveBundleController {
 
 				}catch(Exception ex){
 					status.setRollbackOnly()
-					flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
+					flash.message = "Unable to delete bundle " + moveBundleInstance.name
 					redirect(action:list)
 				}
 			}
