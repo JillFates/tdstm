@@ -20,7 +20,7 @@
 
 		<a ng-if="comment.commentInstance.commentType != 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)"><img ng-src="{{applyRootPath('/icons/database_edit.png')}}" border="0px"/></a>
 	</td>
-	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)" style="text-align: center;">{{comment.commentInstance.taskNumber?comment.commentInstance.taskNumber:'c'}}</td>
+	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)" style="text-align: center;">{{comment.commentInstance.taskNumber?comment.commentInstance.taskNumber:''}}</td>
 	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.commentInstance.comment}}</td>
 	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{(comment.commentInstance.commentType == 'issue')?comment.commentInstance.status:((comment.commentInstance.isResolved?'Archived':''))}}</td>
 	<td ng-click="showComment(comment.commentInstance.id, comment.commentInstance.commentType)">{{comment.commentInstance.category}}</td>

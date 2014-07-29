@@ -114,8 +114,10 @@ class CommentService {
 				assetComment = new AssetComment()
 				assetComment.createdBy = userLogin.person
 				assetComment.project = project
-				def lastTask = jdbcTemplate.queryForInt("SELECT MAX(task_number) FROM asset_comment WHERE project_id = ${project.id}")
-				assetComment.taskNumber = lastTask + 1
+				if (params.commentType == AssetCommentType.TASK) {
+					def lastTask = jdbcTemplate.queryForInt("SELECT MAX(task_number) FROM asset_comment WHERE project_id = ${project.id}")
+					assetComment.taskNumber = lastTask + 1
+				}
 				if (assetEntity) {
 					assetComment.assetEntity = assetEntity
 					commentProject = assetEntity.project
