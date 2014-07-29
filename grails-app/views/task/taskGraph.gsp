@@ -6,10 +6,10 @@
 		
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		
-		<g:javascript src="jquery-1.9.1.js"/>	
+		<g:javascript src="jquery-1.9.1.js"/>
 		<g:javascript src="d3/d3.min.js"/>
 		<g:javascript src="angular/angular.min.js" />
-		<g:javascript src="angular/plugins/angular-ui.js"/>	
+		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />
 		
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
@@ -103,7 +103,6 @@
 			
 			$('g').children('a')
 				.removeAttr('xlink:href')
-				.removeAttr('xlink:title')
 				.on('click', function (a, b) {
 					var parent = $(this).parent().parent();
 					var id = parent.attr('id');
@@ -111,7 +110,7 @@
 						neighborhoodTaskId = id;
 						generateGraph($('#moveEventId').val());
 					}
-				})
+				});
 			
 				
 			
