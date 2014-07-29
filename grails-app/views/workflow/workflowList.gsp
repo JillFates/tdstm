@@ -37,9 +37,9 @@
 	<g:form action="workflowList">
 		<input type="hidden" name="workflow" value="${workflow?.id}" />
 		<span class="button"><input type="button" class="save" value="Update" onclick="validateAndSubmitUpdateForm()"/></span>
-	    <span class="button"><input type="submit" class="delete" onclick="return confirm('Are you sure?')" value="Cancel" /></span>
-	    <span class="button"><input type="button" class="create" onclick="addStep('edit');" value="Add Step" /></span>
-    </g:form>
+		<span class="button"><input type="button" class="create" onclick="addStep('edit');" value="Add Step" /></span>
+		<span class="button"><input type="submit" class="cancel" onclick="return confirm('Are you sure?')" value="Cancel" /></span>
+	</g:form>
     </div>
 </div>
 <div>
@@ -280,9 +280,9 @@
 	<g:form action="workflowList">
 		<input type="hidden" name="workflow" value="${workflow?.id}" />
 		<span class="button"><input type="button" class="save" value="Update" onclick="validateAndSubmitUpdateForm()"/></span>
-	    <span class="button"><input type="submit" class="delete" onclick="return confirm('Are you sure?')" value="Cancel" /></span>
-	    <span class="button"><input type="button" class="create" onclick="addStep('edit');" value="Add Step" /></span>
-    </g:form>
+		<span class="button"><input type="button" class="create" onclick="addStep('edit');" value="Add Step" /></span>
+		<span class="button"><input type="submit" class="cancel" onclick="return confirm('Are you sure?')" value="Cancel" /></span>
+	</g:form>
 </div>
 <div id="copyWorkflowDialog" title="Copy Workflow" style="display:none;">
 	<g:form action="createWorkflow" onsubmit="return checkInputData()">
@@ -304,10 +304,10 @@
               </tbody>
             </table>
           </div>
-          <div class="buttons">
-            <span class="button"><input type="submit" class="create" value="Copy" /></span>
-            <span class="button"><input type="button" class="delete" value="Cancel" onclick="$('#copyWorkflowDialog').dialog('close');"/></span>
-          </div>
+		<div class="buttons">
+			<span class="button"><input type="submit" class="create" value="Copy" /></span>
+			<span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#copyWorkflowDialog').dialog('close');"/></span>
+		</div>
     </g:form>
     <div style="display: none;" >
     		 <g:select id="createCategory" name="createCategory" from="${WorkflowTransition.constraints.category.inList}" 

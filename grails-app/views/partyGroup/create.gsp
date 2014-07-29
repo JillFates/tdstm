@@ -81,9 +81,14 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Save" /></span>
-                </div>
+			<div class="buttons">
+				<span class="button">
+					<input class="save" type="submit" value="Save" />
+				</span>
+				<span class="button">
+					<input type="button" class="cancel" value="Cancel" onclick="window.history.back()"/>
+				</span>
+			</div>
             </g:form>
         </div>
 <script>

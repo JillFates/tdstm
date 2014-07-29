@@ -320,6 +320,9 @@
 						</g:else>
 						</span>
 					</tds:hasPermission>
+					<span class="button">
+						<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="showOrEditModelManuDetails('model',${modelInstance?.id},'Model','show','Show')" />
+					</span>
 				</div>
 			</td>
 		</tr>

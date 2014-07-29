@@ -157,10 +157,14 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="buttons">
-                    <span class="button"><input class="save" type="submit" value="Save" /></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Cancel" action="list" /></span>
-                </div>
+			<div class="buttons">
+				<span class="button">
+					<input class="save" type="submit" value="Save" />
+				</span>
+				<span class="button">
+					<input type="button" class="cancel" value="Cancel" onclick="window.history.back()"/>
+				</span>
+			</div>
             </g:form>
         </div>
         <script type="text/javascript">

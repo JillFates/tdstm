@@ -339,6 +339,10 @@ td.buttonR .powerIcon {
     background: transparent url(../icons/database_delete.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
+.buttons input.cancel {
+    background: transparent;
+    padding-left: 10px;
+}
 .buttons input.show {
     background: transparent url(../icons/database_table.png) 5px 50% no-repeat;
     padding-left: 28px;

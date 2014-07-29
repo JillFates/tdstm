@@ -175,10 +175,17 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" value="Update" /></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" /></span>
-                </div>
+			<div class="buttons">
+				<span class="button">
+					<g:actionSubmit class="save" value="Update" />
+				</span>
+				<span class="button">
+					<g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this Event will remove any move news and any related step data?');" value="Delete" />
+				</span>
+				<span class="button">
+					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/moveEvent/show/${moveEventInstance?.id}'"/>
+				</span>
+			</div>
             </g:form>
         </div>
 <script>

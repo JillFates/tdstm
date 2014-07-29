@@ -1,45 +1,45 @@
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
-        <title>Edit UserLogin</title>
-			 <script type="text/javascript"> 
-			 	   var flag 
-				   $().ready(function() {  
-					var isLocal = ${userLoginInstance.isLocal}
-					if(isLocal){
-						$(".passwordsEditFields").show();
-					}else{
-						$(".passwordsEditFields").hide();
-					}
-					   
-				    $('#add').click(function() {
-				     updateRole( 'add',$('#availableRoleId').val() );
-				     flag = !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
-				     return flag;  
-				    });  
-				    $('#remove').click(function() {
-				     updateRole( 'remove',$('#assignedRoleId').val() );
-				     flag = !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
-				     return flag;  
-				    });  
-				   }); 
-				   function updateRole( action, values ) {
-				   	 var personId = $('#person').val();
-				   	 if(values){
-				     	${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + values +\'&person=\'+personId +\'&actionType=\'+action')}
-				     }
-				   }
-				   function togglePasswordEditFields($me){
-						var isChecked = $me.is(":checked")
-						if(!isChecked){
-							$(".passwordsEditFields").hide();
-						}else{
-							$(".passwordsEditFields").show();
-						}
-					}
-			  </script> 
-    </head>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<meta name="layout" content="projectHeader" />
+		<title>Edit UserLogin</title>
+		<script type="text/javascript"> 
+			var flag 
+			$().ready(function() {
+				var isLocal = ${userLoginInstance.isLocal}
+				if (isLocal) {
+					$(".passwordsEditFields").show();
+				} else {
+					$(".passwordsEditFields").hide();
+				}
+
+				$('#add').click(function() {
+					updateRole( 'add',$('#availableRoleId').val() );
+					flag = !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
+					return flag;  
+				});  
+				$('#remove').click(function() {
+					updateRole( 'remove',$('#assignedRoleId').val() );
+					flag = !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
+					return flag;  
+				});  
+			}); 
+			function updateRole( action, values ) {
+				var personId = $('#person').val();
+				if (values) {
+					${remoteFunction(controller:'userLogin', action:'addRoles', params:'\'assignedRoleId=\' + values +\'&person=\'+personId +\'&actionType=\'+action')}
+				}
+			}
+			function togglePasswordEditFields($me) {
+				var isChecked = $me.is(":checked")
+				if (!isChecked) {
+					$(".passwordsEditFields").hide();
+				} else {
+					$(".passwordsEditFields").show();
+				}
+			}
+		</script> 
+	</head>
     <body>
         <div class="body">
             <h1>Edit UserLogin</h1>
@@ -237,13 +237,21 @@
                         --%></tbody>
                     </table>
                 </div>
-                <div class="buttons">
-                    <span class="button"><g:actionSubmit class="save" value="Update" /></span>
-                    <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
-                </div>
+			<div class="buttons">
+				<span class="button">
+					<g:actionSubmit class="save" value="Update" />
+				</span>
+				<span class="button">
+					<g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" />
+				</span>
+				<span class="button">
+					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/userLogin/show/${userLoginInstance?.id}'"/>
+				</span>
+			</div>
             </g:form>
         </div>
 <script>
+//					<input class="cancel" onclick="return confirm('Are you sure?');" value="Delete" />
 	currentMenuId = "#adminMenu";
 	$("#adminMenuId a").css('background-color','#003366')
 	

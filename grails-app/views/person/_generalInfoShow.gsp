@@ -13,7 +13,7 @@
 <div id="generalInfoShowId" class="person" >
 	<g:form name="personDialogForm" action="updatePerson">
 		<div class="dialog">
-			<input type="hidden" name="id" value="${person.id}">
+			<input type="hidden" name="id" value="${person.id}" />
 			<div>
 				<table class="personTable">
 					<tbody>
@@ -217,9 +217,7 @@
 </div>
 <tds:hasPermission permission='PersonEditView'>
 <div class="buttons">
-	<input class="edit" type="button" id="edtBId" value="Edit"
-		onClick="loadPersonDiv(${person.id},'generalInfo','edit')" /> <input
-		class="delete" type="button" id="cancelBId" value="Cancel"
-		onClick="closePersonDiv('personGeneralViewId')"/>
+	<input class="edit" type="button" id="edtBId" value="Edit" onClick="loadPersonDiv(${person.id},'generalInfo','edit')" />
+	<input class="cancel" type="button" id="cancelBId" value="Cancel" onClick="closePersonDiv('personGeneralViewId')"/>
 </div>
  </tds:hasPermission>

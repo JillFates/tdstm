@@ -31,91 +31,89 @@
 
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 		<div class="body" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
-		</g:if>
-		<div id="messageDivId" class="message" style="display: none;"></div>
-		<div id="processDiv" style="display: none;">
-			<img src="../images/processing.gif" /> Merging In Progress...
-		</div>
-		<div id="roomListView" style="width:500px;">
-		<g:if test="${roomId && viewType != 'list'}">
-		<!-- do nothing -->
-		</g:if>
-		<g:else>
-		<fieldset><legend><b>Room List</b></legend>
-		<g:form action="create" >
+			<g:if test="${flash.message}">
+				<div class="message">${flash.message}</div>
+			</g:if>
+			<div id="messageDivId" class="message" style="display: none;"></div>
+			<div id="processDiv" style="display: none;">
+				<img src="../images/processing.gif" /> Merging In Progress...
+			</div>
+			<div id="roomListView" style="width:500px;">
+				<g:if test="${roomId && viewType != 'list'}">
+				<!-- do nothing -->
+				</g:if>
+				<g:else>
+					<fieldset><legend><b>Room List</b></legend>
+						<g:form action="create" >
 
-		<div style="float: left; width: auto;">
-		<table>
-			<thead>
-				<tr>
+							<div style="float: left; width: auto;">
+								<table>
+									<thead>
+										<tr>
 
-					 <tds:hasPermission permission='RoomListActionColumn'><th><a href="#">Action</a></th></tds:hasPermission>
+											 <tds:hasPermission permission='RoomListActionColumn'><th><a href="#">Action</a></th></tds:hasPermission>
 
-					<g:sortableColumn property="location" title="Data Center" />
+											<g:sortableColumn property="location" title="Data Center" />
 
-					<g:sortableColumn property="roomName" title="Room" />
-					
-					<th><a href="#">City</a></th>
+											<g:sortableColumn property="roomName" title="Room" />
+											
+											<th><a href="#">City</a></th>
 
-					<th><a href="#">state Prov</a></th>
+											<th><a href="#">state Prov</a></th>
 
-					<th><a href="#">Rack count</a></th>
+											<th><a href="#">Rack count</a></th>
 
-					<th><a href="#">Asset count</a></th>
+											<th><a href="#">Asset count</a></th>
 
-				</tr>
-			</thead>
-			<tbody>
-				<g:each in="${roomInstanceList}" status="i" var="roomInstance">
-					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
+										</tr>
+									</thead>
+									<tbody>
+										<g:each in="${roomInstanceList}" status="i" var="roomInstance">
+											<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-						 <tds:hasPermission permission='RoomListActionColumn'>
-							<td><input type="checkbox" class="listCheck" name="checkbox_${roomInstance.id}" id="roomCheckBoxId" onclick="enableActions()"></td>
-						</tds:hasPermission>
-						<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
-						
-						<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
+												 <tds:hasPermission permission='RoomListActionColumn'>
+													<td><input type="checkbox" class="listCheck" name="checkbox_${roomInstance.id}" id="roomCheckBoxId" onclick="enableActions()"></td>
+												</tds:hasPermission>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
+												
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
 
-						<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "city")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "city")}</td>
 
-						<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "stateProv")}</td>
-						
-						<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.getRackCountByType('Rack')}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "stateProv")}</td>
+												
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.getRackCountByType('Rack')}</td>
 
-						<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
 
-					</tr>
-				</g:each>
-			</tbody>
-		</table>
-		<div class="buttons"> 
-			<span class="button">
-			 <tds:hasPermission permission='DeleteRoom'>
-				<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
-			 </tds:hasPermission>
-				 <tds:hasPermission permission='MergeRoom'>
-					<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
-				 </tds:hasPermission>
-				 <tds:hasPermission permission='DeleteRoom'>
-					<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
-				</tds:hasPermission>
-			</span>
-		</div>
-		</div>
-		</g:form>
-		</fieldset>
-		</g:else>
-		</div>
-		<div id="roomShowView" name="roomShowView" style="display: none;">
-		</div>
+											</tr>
+										</g:each>
+									</tbody>
+								</table>
+								<div class="buttons"> 
+									<span class="button">
+									 <tds:hasPermission permission='DeleteRoom'>
+										<input type="button" class="edit" value="Create Room" onclick="$('#createRoomDialog').dialog('open');$('#mergeRoomDialog').dialog('close')"/>
+									 </tds:hasPermission>
+										 <tds:hasPermission permission='MergeRoom'>
+											<span class="button"><input class="create disableButton" id="mergeId" type="button" value="Merge" onclick="showMergeDialog()" disabled="disabled" /></span>
+										 </tds:hasPermission>
+										 <tds:hasPermission permission='DeleteRoom'>
+											<g:actionSubmit class="delete disableButton" action="delete" id="deleteId" value="Delete" disabled="disabled"/>
+										</tds:hasPermission>
+									</span>
+								</div>
+							</div>
+						</g:form>
+					</fieldset>
+				</g:else>
+			</div>
+			<div id="roomShowView" name="roomShowView" style="display: none;"></div>
 		</div>
 		<div id="listDialog" title="Asset List" style="display: none;">
-				<div class="dialog" >
-					<table id="listDiv">
-					</table>
-				</div>
+			<div class="dialog" >
+				<table id="listDiv"></table>
+			</div>
 		</div>
 		<div id="createRoomDialog" title="Create Room" style="display: none;">
 			<g:form method="post" name="createRoomForm" action="save" onsubmit="return validateForm()">
@@ -180,7 +178,6 @@
 						<tr>
 							<td class="buttons" colspan="4">
 								<input type="submit" class="save" value="Save" />
-								<input type="button" class="show" value="Cancel" onclick="$('#createRoomDialog').dialog('close');" />
 							</td>
 						</tr>
 					</tbody>
