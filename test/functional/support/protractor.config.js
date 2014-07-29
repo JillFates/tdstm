@@ -6,7 +6,7 @@ exports.config = {
   suites: {
     regression: [ //Do not change the order of these files since some test depends on others.
     '../components/clientProject/listProjects.spec.js',
-	'../components/clientProject/showProjects.spec.js',
+    '../components/clientProject/showProjects.spec.js',
     '../components/clientProject/createProject.spec.js',
     '../components/clientProject/fieldSettings.spec.js',
     '../components/eventsBundles/bundles.spec.js',
@@ -23,7 +23,7 @@ exports.config = {
     '../components/admin/syncLibraries.spec.js',
     '../components/assets/createApp.spec.js',
     '../components/assets/addTask.spec.js',
-    '../components/assets/addComments.spec.js', // replace for comments/listapplication
+    '../components/assets/addComments.spec.js',
     '../components/assets/serverList.spec.js',
     '../components/clientProject/deleteProject.spec.js',
     '../components/userMenu/signOut.spec.js',

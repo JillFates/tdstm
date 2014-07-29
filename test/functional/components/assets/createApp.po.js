@@ -1,39 +1,35 @@
 'use strict';
 var CreateAppModal = function(){
-  this.creatAppModalTitleId = 'ui-id-1';
-  this.nameLabelCss = '[class="label C  highField"] [for="assetName"]';
-  this.nameFieldId = 'assetName';
-  this.saveCloseBtnCss = 'input[value="Save/Close"]';
-  this.saveShowBtnCss = '[data-redirect][onclick="saveToShow($(this),\'AssetEntity\')"]';
-  this.createAppModalCss = '[aria-labelledby="ui-id-1"]';
-  this.viewModalCss = '[aria-labelledby="ui-id-2"]';
+  this.createAppTitle = element(by.id('ui-id-1'));
+  this.nameLabel = $('[class="label C  highField"] [for="assetName"]');
+  this.nameField = element(by.id('assetName'));
+  this.saveCloseBtn = $('input[value="Save/Close"]');
+  this.saveShowBtn = $('[data-redirect][onclick="saveToShow($(this),\'AssetEntity\')"]');
+  this.createAppModal = $('[aria-labelledby="ui-id-1"]');
+  this.viewModal = $('[aria-labelledby="ui-id-2"]');
+  this.typeLabel = $('[for="assetType"]');
+  this.typeField = element(by.id('assetType'));
+  this.boundlefield = element(by.id('moveBundle'));
+  this.boundleOptions = this.boundlefield.$$('option');
+  this.boundleSelected = this.boundlefield.$('option:checked');
 
-  this.getTitle = function(){
-      return element(by.id(this.creatAppModalTitleId));
-  };
-
-  this.getNameLabel = function(){
-    return $(this.nameLabelCss);
-  };
-
-  this.getNameField = function(){
-    return element(by.id(this.nameFieldId));
+  this.setName = function(name){
+    this.nameField.sendKeys(name);
   };
 
-  this.clickSaveCloseBtn = function(){
-    $(this.saveCloseBtnCss).click();
+  this.createApp = function(name,save){
+    this.nameField.sendKeys(name);
+    if(save === 'close'){
+      this.saveCloseBtn.click();
+    }else {
+      this.saveShowBtn.click();
+    }
   };
-  this.clickSaveShowBtn = function(){
-    $(this.saveShowBtnCss).click();
-  };
-  this.getSaveShowBtn = function(){
-    return $(this.saveShowBtnCss);
-  };
-
+  
   this.isCreateModalClosed = function(){
     var that = this;
     return browser.wait(function(){
-      return $(that.createAppModalCss).getAttribute('style').then(function(style){
+      return that.createAppModal.getAttribute('style').then(function(style){
         return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: none;';
       });
     }).then(function(){
@@ -44,7 +40,7 @@ var CreateAppModal = function(){
   this.isCreateModalOpened = function(){
     var that = this;
     return browser.wait(function(){
-      return $(that.createAppModalCss).getAttribute('style').then(function(style){
+      return that.createAppModal.getAttribute('style').then(function(style){
         return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: block;';
       });
     }).then(function(){
@@ -55,11 +51,11 @@ var CreateAppModal = function(){
   this.isViewModalOpened = function(){
     var that = this;
     return browser.wait(function(){
-      return $(that.viewModalCss).getAttribute('style').then(function(style){
+      return that.viewModal.getAttribute('style').then(function(style){
         return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 3px; display: block;';
       });
     }).then(function(){
-       return true;
+       return module;
     });
   };
 };

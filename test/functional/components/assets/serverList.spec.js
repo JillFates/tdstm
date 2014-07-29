@@ -15,24 +15,23 @@ var CreateServerModal = require('./createServer.po.js');
 var  TaskModal = require('./task.po.js');
 var CommentTaskList = require('./commentTask-list.po.js');
 
-describe('validate comments/task on server list', function(){
-  var menu = new Menu();
-  var appsListPage =  new ListApps();
+describe('Server list', function(){
   var appName= 'Server CTV';
-  var taskCommenModal = new TaskModal();
-  var commTasklist = new CommentTaskList();
   var appId;
 
   describe('Server',function(){
 
     it('should load server List page after select Assets List Servers', function(){
+      var menu = new Menu();
       menu.goToAssets('listServers');
-      expect(appsListPage.getTitle().getText()).toEqual('Server List');
+      var appsListPage =  new ListApps();
+      expect(appsListPage.titleh.getText()).toEqual('Server List');
     });
 
     it('should open Create server modal after click on create button', function(){
+      var appsListPage =  new ListApps();
+      appsListPage.createServerBtn.click();
       var serverModal = new CreateServerModal();
-      appsListPage.clickOnCreateTaskBtn();
       expect(serverModal.isCreateModalOpened()).toBe(true);
     });
     describe('Create Server Modal', function(){
@@ -54,17 +53,20 @@ describe('validate comments/task on server list', function(){
   describe('add a comment',function(){
     it('should open create comment popup after click on addComment', function(){
       var serverModal = new CreateServerModal();
-      serverModal.clickAddComment();
-      expect(taskCommenModal.getEditCommentModal().isPresent()).toBe(true);
+      serverModal.addCommentBtn.click();
+      var taskCommenModal = new TaskModal();
+      expect(taskCommenModal.editCommentModal.isPresent()).toBe(true);
     });
 
     it('should add a comment', function(){
+      var taskCommenModal = new TaskModal();
       taskCommenModal.addComment('This is the comments',3,'verify', '','Server','',appName);
     });
     
     it('should save created comment',function(){ 
-      taskCommenModal.saveTask();
-      expect(taskCommenModal.getEditCommentModal().isPresent()).toBe(false );
+      var taskCommenModal = new TaskModal();
+      taskCommenModal.saveTaskBtn.click();
+      expect(taskCommenModal.editCommentModal.isPresent()).toBe(false );
   });
 
   });// add a comment
@@ -72,33 +74,46 @@ describe('validate comments/task on server list', function(){
   xdescribe('add a task',function(){
     it('should open create task popup after click on add Task', function(){
       var serverModal = new CreateServerModal();
-      serverModal.clickAddTask();
-      expect(taskCommenModal.getEditTaskModal().isPresent()).toBe(true);
+      var taskCommenModal = new TaskModal();
+      serverModal.addTaskBtn.click();
+      expect(taskCommenModal.editTaskModal.isPresent()).toBe(true);
     });
     it('should add a task', function(){
+      var taskCommenModal = new TaskModal();
       taskCommenModal.addTask('This is task bla bla');
     });
     it('should save created task',function(){ 
-      taskCommenModal.saveTask();
-      expect(taskCommenModal.getEditTaskModal().isPresent()).toBe(false );
+      var taskCommenModal = new TaskModal();
+      taskCommenModal.saveTaskBtn.click();
+      expect(taskCommenModal.editTaskModal.isPresent()).toBe(false );
     });
   }); // add a Task
 
   it('should close server modal', function(){
     var serverModal = new CreateServerModal();
-    serverModal.closeViewModal();
+    serverModal.closeViewModalBtn.click();
     expect(serverModal.isViewModalClosed()).toBe(true);
   });
 
  describe('search for the server', function(){
 
+    xit('should load server List page after select Assets List Servers', function(){
+      var menu = new Menu();
+      menu.goToAssets('listServers');
+      var appsListPage =  new ListApps();
+      expect(appsListPage.titleh.getText()).toEqual('Server List');
+    });
+
     it('should set name to search', function(){
-      var field = appsListPage.getSearchAppName();
+      var appsListPage =  new ListApps();
+      var field = appsListPage.searchNamefield;
+      field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
     });
 
     it('should validate search results', function(){
+      var appsListPage =  new ListApps();
       appsListPage.verifySearchResults(1).then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
@@ -107,38 +122,47 @@ describe('validate comments/task on server list', function(){
     });
   }); // Search for an app
 
-  it('should have comments as icon', function(){
-    browser.sleep(1000);
-    expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
-  });
-
-  it('should open Comment List modal', function(){
-    appsListPage.clickOnCommentIcon(appId);
-    expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
-  });
 
   describe('Comments List Modal', function(){
+    
+    it('should have comments as icon', function(){
+      var appsListPage =  new ListApps();
+      browser.sleep(300);
+      expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
+    });
+
+    it('should open Comment List modal', function(){
+      var appsListPage =  new ListApps();
+      console.log('appId', appId);
+      appsListPage.clickOnCommentIcon(appId);
+    });
+
+
 
     it('should have as title Show Comments and task + App Name', function(){
-      expect(commTasklist.getTitle().getText()).toEqual('Show Comments: Server/'+appName);
+      var commTasklist = new CommentTaskList();
+      expect(commTasklist.titleh.getText()).toEqual('Show Comments: Server/'+appName);
     });
 
     it('should have only 1 items', function(){
-      expect(commTasklist.getList().count()).toEqual(1);
+      var commTasklist = new CommentTaskList();
+      expect(commTasklist.list.count()).toEqual(1);
     });
 
     it('should get List',function(){
       var elems = ['This is the comments verify'];
-      commTasklist.getList().then(function(list){
+      var commTasklist = new CommentTaskList();
+      commTasklist.list.then(function(list){
         expect(list[0].getText()).toEqual(elems[0]);
       });
     });
 
     it('should close Comments List modal', function(){
-      commTasklist.clickClose();
-      expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(false);
+      var commTasklist = new CommentTaskList();
+      commTasklist.closeModalBtn.click();
+      expect(commTasklist.commentTaskListModal.isPresent()).toBe(false);
     });
   
-  }); //open comments/task List Modal
+  }); //Comment List Modal
 
-}); //validate comments/task on server list
+}); //Server List

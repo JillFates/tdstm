@@ -11,43 +11,38 @@ var CommentTaskList = require('./commentTask-list.po.js');
 var  Menu = require('../menu/menu.po.js');
 var CreateAppModal = require('./createApp.po.js');
 describe('Comments - Application', function(){
-  var menu = new Menu();
-  var commentModal = new TaskModal();
-  var appsListPage =  new ListApps();
-  var commTasklist = new CommentTaskList();
-  var appModal = new CreateAppModal();
   var appId;
-  var appName= 'App Test 2 comments';
+  var appName= 'App Test 3 comments';
 
   describe('Preconditions', function(){
     
     it('should load Application List page after select Assets List Apps', function(){
+      var menu = new Menu();
       menu.goToAssets('listApps');
-      expect(appsListPage.getTitle().getText()).toEqual('Application List');
+      var appsListPage =  new ListApps();
+      expect(appsListPage.titleh.getText()).toEqual('Application List');
     });
     
     it('should open Create app modal after click on create app button', function(){
-      appsListPage.clickOnCreateAppBtn();
+      var appsListPage =  new ListApps();
+      appsListPage.createAppBtn.click();
+      var appModal = new CreateAppModal();
       expect(appModal.isCreateModalOpened()).toBe(true);
     });
 
-    it('should add a Name', function(){
-      var field = appModal.getNameField();
-      field.sendKeys(appName);
-      expect(field.getAttribute('value')).toEqual(appName);
-    });
-
-    it('should save and close', function(){
-      appModal.clickSaveCloseBtn();
+    it('should create an app and save and close', function(){
+      var appModal = new CreateAppModal();
+      appModal.createApp(appName,'close');
       expect(appModal.isCreateModalClosed()).toBe(true);
     });
 
   }); //preconditions
 
   describe('search for app', function(){
+    var appsListPage =  new ListApps();
 
     it('should set name to search an app', function(){
-      var field = appsListPage.getSearchAppName();
+      var field = appsListPage.searchNamefield;
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
@@ -64,37 +59,42 @@ describe('Comments - Application', function(){
   }); // Search for an app
 
   it('should have add comment as icon', function(){
+    var appsListPage =  new ListApps();
     expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
   });
 
   it('should open create comment modal', function(){
+    var appsListPage =  new ListApps();    
     appsListPage.clickOnCommentIcon(appId);
-    expect(commentModal.getEditCommentModal().isPresent()).toBe(true);
+    var commentModal = new TaskModal();
+    expect(commentModal.isEditCommentModalPresent()).toBe(true);
   });
 
   describe('Create Comment Modal', function(){
-  
+    var commentModal = new TaskModal();
+    
     it('should have Create Comment as title', function(){
-      expect(commentModal.getEditCommentTitle().getText()).toEqual('Create Comment');
+      expect(commentModal.editCommentTitle.getText()).toEqual('Create Comment');
     });
 
     describe('comment text area', function(){
 
       it('should have "Comment: " as label', function(){
-        expect(commentModal.getCommentLabel().getText()).toEqual('Comment:');
+        expect(commentModal.commentLabel.$('label').getText()).toEqual('Comment:');
       });
 
       it('should be empty by default', function(){
-        expect(commentModal.getTaskTextArea().getAttribute('value')).toEqual('');
+        expect(commentModal.taskTextArea.getAttribute('value')).toEqual('');
       });
 
       it('should have textArea as required',function(){
-        expect(commentModal.getTaskTextArea().getAttribute('required')).toBe('true');
+        expect(commentModal.taskTextArea.getAttribute('required')).toBe('true');
       });
 
       it('should be mark as required', function(){
-        expect(commentModal.getCommentSpanReq().getAttribute('class')).toEqual('error-msg');
-        expect(commentModal.getCommentLabReq().getText()).toEqual('Comment: *');
+        var commentModal = new TaskModal();
+        expect(commentModal.commentLabelReq.getAttribute('class')).toEqual('error-msg');
+        expect(commentModal.commentLabel.getText()).toEqual('Comment: *');
       });
 
       xit('should have save button disabled', function(){
@@ -103,14 +103,14 @@ describe('Comments - Application', function(){
 
       it('should add a value', function(){
         var message= 'This is comment 01  and I am adding some text';
-        var field = commentModal.getTaskTextArea();
+        var field = commentModal.taskTextArea;
         field.sendKeys(message);
         expect(field.getAttribute('value')).toEqual(message);
       });
         
       it('should not longer have Task marked as required',function(){
-        expect(commentModal.getCommentSpanReq().getAttribute('class')).toEqual('error-msg ng-hide');
-        expect(commentModal.getCommentLabReq().getText()).toEqual('Comment: ');
+        expect(commentModal.commentLabelReq.getAttribute('class')).toEqual('error-msg ng-hide');
+        expect(commentModal.commentLabel.getText()).toEqual('Comment: ');
       }); 
 
     }); // comment text area
@@ -118,15 +118,15 @@ describe('Comments - Application', function(){
     describe('Category dropdown',function(){
 
       it('should have Category as label', function(){
-        expect(commentModal.getCategoryLabel().getText()).toEqual('Category:');
+        expect(commentModal.categoryLabel.getText()).toEqual('Category:');
       });
 
       it('should be general by default', function(){
-        expect(commentModal.getCategorySelected().getText()).toEqual('general');
+        expect(commentModal.categorySelected.getText()).toEqual('general');
       });
 
       it('should have this options', function(){
-        commentModal.getCategoryDropdownOptions().then(function(options){
+        commentModal.categoryOptions.then(function(options){
           expect(options[0].getText()).toEqual('please select');
           expect(options[1].getText()).toEqual('general');
           expect(options[2].getText()).toEqual('discovery');
@@ -148,7 +148,7 @@ describe('Comments - Application', function(){
       
       it('should select moveday as category', function(){
         commentModal.setCategoryByPos(10);
-        expect(commentModal.getCategorySelected().getText()).toEqual('moveday');
+        expect(commentModal.categorySelected.getText()).toEqual('moveday');
       });
 
     }); // category dropdown
@@ -156,17 +156,17 @@ describe('Comments - Application', function(){
     describe('Assets dropdowns', function(){
       
       it('should have Assets as label', function(){
-        expect(commentModal.getAssetsLabel().getText()).toEqual('Asset:');
+        expect(commentModal.assetsLabel.getText()).toEqual('Asset:');
       });
 
       describe('Asset Type dropdown', function(){
         
         it('should have Application selected by default', function(){
-            expect(commentModal.getAssetTypeSelected().getText()).toEqual('Application');
+            expect(commentModal.assetTypeSelected.getText()).toEqual('Application');
         });
 
         it('should have this options', function(){
-          commentModal.getAssetTypeOptions().then(function(options){
+          commentModal.assetTypeOptions.then(function(options){
             expect(options.length).toEqual(5);
             expect(options[0].getText()).toEqual('Application');
             expect(options[1].getText()).toEqual('Server');
@@ -181,11 +181,11 @@ describe('Comments - Application', function(){
     describe('Asset Entity dropdown', function(){
       
       it('should have the current application selected',function(){
-        expect(commentModal.getAssetEntitySelected().getText()).toEqual(appName);
+        expect(commentModal.assetEntitySelected.getText()).toEqual(appName);
       });
 
       xit('should have the existing applications listed',function(){
-        commentModal.getAssetEntityOptions().then(function(options){
+        commentModal.assetEntityOptions.then(function(options){
           expect(options.length).toEqual(2);
           expect(options[0].getText()).toEqual('Please select');
           expect(options[1].getText()).toEqual(appName);
@@ -219,8 +219,8 @@ describe('Comments - Application', function(){
   }); //Assets dropdowns
   
     it('should save created comment',function(){ 
-      commentModal.saveTask();
-      expect(commentModal.getEditCommentModal().isPresent()).toBe(false);
+      commentModal.saveTaskBtn.click();
+      expect(commentModal.editCommentModal.isPresent()).toBe(false);
     });
   }); //Create Comment Modal
 
@@ -229,18 +229,22 @@ describe('Comments - Application', function(){
     describe('search for app - this is added due to TM-2996', function(){
 
       it('should load Application List page after select Assets List Apps', function(){
+        var menu = new Menu();
         menu.goToAssets('listApps');
-        expect(appsListPage.getTitle().getText()).toEqual('Application List');
+        var appsListPage =  new ListApps();
+        expect(appsListPage.titleh.getText()).toEqual('Application List');
       });
 
       it('should set name to search an app', function(){
-        var field = appsListPage.getSearchAppName();
+        var appsListPage =  new ListApps();
+        var field = appsListPage.searchNamefield;
         field.clear();
         field.sendKeys(appName);
         expect(field.getAttribute('value')).toEqual(appName);
       });
 
       it('should validate search results', function(){
+        var appsListPage =  new ListApps();
         appsListPage.verifySearchResults(1).then(function(list){
           list[0].getAttribute('id').then(function(pid){
             appId = pid;
@@ -250,25 +254,31 @@ describe('Comments - Application', function(){
     }); // Search for an app
     
     it('should have comments as icon', function(){
+      var appsListPage =  new ListApps();
       expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
     });
 
-    it('should open create comment modal', function(){
+    it('should open comment list modal', function(){
+      var appsListPage =  new ListApps();
       appsListPage.clickOnCommentIcon(appId);
-      expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+      var commTasklist = new CommentTaskList(); 
+      expect(commTasklist.isListModalPresent()).toBe(true);
     });
 
     it('should have as title Show Comments and task + App Name', function(){
-      expect(commTasklist.getTitle().getText()).toEqual('Show Comments: Application/'+appName);
+      var commTasklist = new CommentTaskList();
+      expect(commTasklist.titleh.getText()).toEqual('Show Comments: Application/'+appName);
     });
 
     it('should have only 1 item', function(){
-      expect(commTasklist.getList().count()).toEqual(1);
+      var commTasklist = new CommentTaskList();
+      expect(commTasklist.list.count()).toEqual(1);
     });
   
     it('should get List',function(){
       var elems = ['This is comment 01 and I am a... moveday'];
-      commTasklist.getList().then(function(list){
+      var commTasklist = new CommentTaskList();
+      commTasklist.list.then(function(list){
         expect(list[0].getText()).toEqual(elems[0]);
       });
     });
@@ -276,49 +286,63 @@ describe('Comments - Application', function(){
     describe('add new comment', function(){
 
       describe('add comment button', function(){
+        
+        var commTasklist = new CommentTaskList();
+
         it('should have add comment icon', function(){
-          expect(commTasklist.getAddCommentIcon().getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
+          expect(commTasklist.addCommentIcon.getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
         });
 
         it('should have "Add Comment" label', function(){
-          expect(commTasklist.getAddComment().getText()).toEqual('  Add Comment');
+          expect(commTasklist.addCommentBtn.getText()).toEqual('  Add Comment');
         });
 
       }); // add comment button
       
       it('should open create comment modal', function(){
-        commTasklist.clickAddComment();
-        expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
-        expect(commentModal.getEditCommentModal().isPresent()).toBe(true);
+        var commTasklist = new CommentTaskList();
+        commTasklist.addCommentBtn.click();
+        // commTasklist.clickAddComment();
+        expect(commTasklist.isListModalPresent()).toBe(true);
+        // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+        var commentModal = new TaskModal();
+        // expect(commentModal.editCommentModal.isPresent()).toBe(true);
+        expect(commentModal.isEditCommentModalPresent()).toBe(true);
       });
 
       it('should have Create comment as title', function(){
-        expect(commentModal.getEditCommentTitle().getText()).toEqual('Create Comment');
+        var commentModal = new TaskModal();
+        expect(commentModal.editCommentTitle.getText()).toEqual('Create Comment');
       });
 
       it('should add a comment', function(){
+        var commentModal = new TaskModal();
         commentModal.addComment('Comment 2 added from list comments',5,'planning','','Application','',appName);
       });
       
       it('should save created comment',function(){ 
-        commentModal.saveTask();
-        expect(commentModal.getEditCommentModal().isPresent()).toBe(false);
+        var commentModal = new TaskModal();
+        commentModal.saveTaskBtn.click();
+        expect(commentModal.editCommentModal.isPresent()).toBe(false);
       });
 
     });
     describe('validate list after adding comment', function(){
       
+      var commTasklist = new CommentTaskList();
+      
       it('should remain opened comment list',function(){
-        expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+        // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+        expect(commTasklist.isListModalPresent()).toBe(true);
       });
 
       it('should have only 2 item', function(){
-        expect(commTasklist.getList().count()).toEqual(2);
+        expect(commTasklist.list.count()).toEqual(2);
       });
   
       it('should get List',function(){
         var elems = ['This is comment 01 and I am a... moveday','Comment 2 added from list comm... planning'];
-        commTasklist.getList().then(function(list){
+        commTasklist.list.then(function(list){
           expect(list[0].getText()).toEqual(elems[0]);
           expect(list[1].getText()).toEqual(elems[1]);
         });
@@ -326,60 +350,73 @@ describe('Comments - Application', function(){
     }); //validate list after adding comment
 
     describe('edit comment from list', function(){
+    
+      var commTasklist = new CommentTaskList();
 
       describe('edit button', function(){
+    
         it('should have edit comment icon', function(){
-          commTasklist.getList().then(function(list){
+          commTasklist.list.then(function(list){
             expect(list[0].$('a img').getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_edit.png');
           });
         });
         
       }); // edit button
+    
       it('should open Edit Comment Modal after click on edit btn', function(){
         commTasklist.editFromList(0);
-        expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
-        expect(commentModal.getEditCommentModal().isPresent()).toBe(true);
+        expect(commTasklist.isListModalPresent()).toBe(true);
+        // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+        var commentModal = new TaskModal();
+        expect(commentModal.isEditCommentModalPresent()).toBe(true);
+        // expect(commentModal.editCommentModal.isPresent()).toBe(true);
       });
 
       it('should have edit comment as title', function(){
-        expect(commentModal.getEditCommentTitle().getText()).toEqual('Edit Comment');
+        var commentModal = new TaskModal();
+        expect(commentModal.editCommentTitle.getText()).toEqual('Edit Comment');
       });
 
       it('should change the category to general', function(){
+        var commentModal = new TaskModal();
         commentModal.setCategoryByPos(1);
-        expect(commentModal.getCategorySelected().getText()).toEqual('general');
+        expect(commentModal.categorySelected.getText()).toEqual('general');
       });
 
       it('should save the changes and display comment Details modal', function(){
-        commentModal.saveTask();
-        expect(commentModal.getEditCommentModal().isPresent()).toBe(false);
-        expect(commentModal.getDetailsTaskModal().isPresent()).toBe(true);
+        var commentModal = new TaskModal();
+        commentModal.saveTaskBtn.click();
+        expect(commentModal.editCommentModal.isPresent()).toBe(false);
+        expect(commentModal.detailsTaskModal.isPresent()).toBe(true);
       });
       
       describe('Comments Details Modal', function(){
 
+        var commentModal = new TaskModal();
+        
         it('should have Comments Details as title', function(){
-          expect(commentModal.getCommentDetailTitle().getText()).toEqual('Comment Details');
+          expect(commentModal.commentDetailTitle.getText()).toEqual('Comment Details');
         });
 
         it('should close comments details', function(){
-          commentModal.closeDetailsTaskModal();
-          expect(commentModal.getDetailsTaskModal().isPresent()).toBe(false);
+          commentModal.closeDetailsTaskModalBtn.click();
+          expect(commentModal.detailsTaskModal.isPresent()).toBe(false);
         });
 
         describe('validate edited comment on the list', function(){
         
           it('should remain opened comment list',function(){
-            expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+            expect(commTasklist.isListModalPresent()).toBe(true);
+            // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
           });
 
           it('should have only 2 item', function(){
-            expect(commTasklist.getList().count()).toEqual(2);
+            expect(commTasklist.list.count()).toEqual(2);
           });
   
           it('should get List',function(){
             var elems = ['This is comment 01 and I am a... general','Comment 2 added from list comm... planning'];
-            commTasklist.getList().then(function(list){
+            commTasklist.list.then(function(list){
               expect(list[0].getText()).toEqual(elems[0]);
               expect(list[1].getText()).toEqual(elems[1]);
             });
@@ -391,31 +428,35 @@ describe('Comments - Application', function(){
 
     describe('view and delete a comment created', function(){
       
+      var commTasklist = new CommentTaskList();
+      var commentModal = new TaskModal();
+      
       it('should open Details Comment modal after click on comment.comment',function(){
         commTasklist.viewCommentDetail(1);
-        expect(commentModal.getDetailsTaskModal().isPresent()).toBe(true);
+        expect(commentModal.detailsTaskModal.isPresent()).toBe(true);
       });
 
       it('should close Comment Detail after delete comment button is hit', function(){
-        commentModal.deleteComment();
+        commentModal.deleteCommentBtn.click();
         var alertDialog = browser.switchTo().alert();
         var message= 'Are you sure?';
         expect(alertDialog.getText()).toEqual(message);
         alertDialog.accept();
-        expect(commentModal.getDetailsTaskModal().isPresent()).toBe(false);
+        expect(commentModal.detailsTaskModal.isPresent()).toBe(false);
       });
       
       it('should remain opened comment list',function(){
-        expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
+        expect(commTasklist.isListModalPresent()).toBe(true);
+        // expect(commTasklist.commentTaskListModal.isPresent()).toBe(true);
       });
 
       it('should have only 2 item', function(){
-        expect(commTasklist.getList().count()).toEqual(1);
+        expect(commTasklist.list.count()).toEqual(1);
       });
 
       it('should get List',function(){
         var elems = ['This is comment 01 and I am a... general','Comment 2 added from list comm... planning'];
-        commTasklist.getList().then(function(list){
+        commTasklist.list.then(function(list){
           expect(list[0].getText()).toEqual(elems[0]);
         });
       });
@@ -423,8 +464,9 @@ describe('Comments - Application', function(){
   }); //Comment List from App List
 
   it('should close Task List modal', function(){
-    commTasklist.clickClose();
-    expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(false);
+    var commTasklist = new CommentTaskList();
+    commTasklist.closeModalBtn.click();
+    expect(commTasklist.commentTaskListModal.isPresent()).toBe(false);
   });
 
 });// Comments - Application

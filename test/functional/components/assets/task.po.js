@@ -1,229 +1,108 @@
 'use strict';
 var TaskModal = function(){
 // // Tasks
-  this.EditTaskModalId = 'editTaskPopup';
-  this.detailsTaskModalId = 'showCommentPopup';
-  this.closeDetailsTaskModalCss = '#showCommentPopup [ng-click="close()"]';
-  this.deleteCommentCss = '#showCommentPopup [ng-click="deleteComment()"]';
-  this.CommentDetailTitleCss =  '#showCommentPopup #ui-id-5';
-  this.createTaskTitleCss= '#editTaskPopup #ui-id-5';
-  this.taskLabelCss = '#commentEditTdId label';
-  this.taskTextAreaModel = 'ac.comment';
-  this.commentRequiredId = 'commentEditTdId';
-  this.personTeamLabelCss = '#assignedToTrEditId label[for="assignedTo"]';
-  this.personDropdownModel = 'ac.assignedTo';
-  this.fixedAssignedLabelCss = '[for="hardAssignedEdit"]';
-  this.fixedAssignModel = 'ac.hardAssigned';
-  this.teamDropdownModel = 'ac.role';
-  this.eventLabelCss = '[for="moveEvent"]';
-  this.eventModel = 'ac.moveEvent';
-  this.categoryLabelCss = '[for="category"]';
-  this.categoryModel =   'ac.category';
-  this.assetsLabelCss =  '[for="asset"]';
-  this.assetTypeModel = 'ac.assetType';
-  this.assetEntityModel = 'ac.assetEntity';
-  this.durationLabelCss = '[for="durationEdit "]';
-  this.durationFieldModel = 'duration';
-  this.durationScaleModel = 'scale';
-  this.priorityLabelCss = '[for="priority"]';
-  this.priorityModel = 'ac.priority';
-  this.dueDateLabelCss= '[for="dueDateEditId"]';
-  this.dueDateModel = 'ac.dueDate';
-  this.estimatedStFinLabel = '[for="estStartTrId"]';
-  this.estimatedStFinFieldModel = 'acData.estRange';
-  this.statusLabelCss = '[for="status"]';
-  this.statusModel = 'ac.status';
-  this.saveTaskBtn = '[ng-click="saveComment(true)"]';
+  this.editTaskModal = element(by.id('editTaskPopup'));
+  this.detailsTaskModal = element(by.id('showCommentPopup'));
+  this.closeDetailsTaskModalBtn = $('#showCommentPopup [ng-click="close()"]');
+  this.deleteCommentBtn = $('#showCommentPopup [ng-click="deleteComment()"]');
+  this.commentDetailTitle =  $('#showCommentPopup #ui-id-5');
+  this.createTaskTitle = $('#editTaskPopup #ui-id-5');
+  this.taskLabel = $('#commentEditTdId label');
+  this.taskTextArea = element(by.model('ac.comment'));
+  this.personTeamLabel = $('#assignedToTrEditId label[for="assignedTo"]');
+  this.personField = element(by.model('ac.assignedTo'));
+  this.personOptions = this.personField.$$('option');
+  this.personSelected = this.personField.$('option:checked');
+  this.fixedAssignedLabel = $('[for="hardAssignedEdit"]');
+  this.fixedAssigned = element(by.model('ac.hardAssigned'));
+  this.teamField = element(by.model('ac.role'));
+  this.teamOptions = this.teamField.element(by.model('ngModel')).$$('option');
+  this.teamSelected = this.teamField.element(by.model('ngModel')).$('option:checked');
+  this.eventLabel = $('[for="moveEvent"]');
+  this.eventField = element(by.model('ac.moveEvent'));
+  this.eventOptions = this.eventField.$$('option');
+  this.eventSelected = this.eventField.$('option:checked');
+  this.categoryLabel = $('[for="category"]');
+  this.categoryField =  element(by.model('ac.category'));
+  this.categoryOptions = this.categoryField.$$('option');
+  this.categorySelected = this.categoryField.$('option:checked');
+  this.assetsLabel =  $('[for="asset"]');
+  this.assetType = element(by.model('ac.assetType'));
+  this.assetTypeOptions = this.assetType.$$('option');
+  this.assetTypeSelected = this.assetType.$('option:checked');
+  this.assetEntity = element(by.model('ac.assetEntity'));
+  this.assetEntityOptions = this.assetEntity.$$('option');
+  this.assetEntitySelected = this.assetEntity.$('option:checked');
+  this.durationLabel = $('[for="durationEdit "]');
+  this.durationField = element(by.model('duration'));
+  this.durationScale = element(by.model('scale'));
+  this.durationScaleOptions = this.durationScale.$$('option');
+  this.durationScaleSelected = this.durationScale.$('option:checked');
+  this.priorityLabel = $('[for="priority"]');
+  this.priority = element(by.model('ac.priority'));
+  this.priorityOptions = this.priority.$$('option');
+  this.prioritySelected = this.priority.$('option:checked');
+  this.dueDateLabel= $('[for="dueDateEditId"]');
+  this.dueDate = element(by.model('ac.dueDate'));
+  this.estimatedStFinLabel = $('[for="estStartTrId"]');
+  this.estimatedStFinField = element(by.model('acData.estRange'));
+  this.statusLabel = $('[for="status"]');
+  this.statusField = element(by.model('ac.status'));
+  this.statusOptions = this.statusField.$$('option');
+  this.statusSelected = this.statusField.$('option:checked');
+  this.saveTaskBtn = $('[ng-click="saveComment(true)"]');
   // comments
-  this.editCommentModalId = 'editCommentPopup';
-  this.editCommentTitleCss = '#editCommentPopup #ui-id-5';
-  this.commentLabelCss = '#commentEditTdId label';
-  this.commentLabelReq = '#commentEditTdId span';
-  this.commentlabReqId = '#commentEditTdId';
+  this.editCommentModal = element(by.id('editCommentPopup'));
+  this.editCommentTitle = $('#editCommentPopup #ui-id-5');
+  this.commentLabelReq = $('#commentEditTdId span');
+  this.commentLabel = element(by.id('commentEditTdId'));
 
-  this.getEditCommentModal = function(){
-    return element(by.id(this.editCommentModalId));
-  };
-  this.getEditCommentTitle = function(){
-    return $(this.editCommentTitleCss);
-  };
-  this.getCommentDetailTitle = function (){
-    return $(this.CommentDetailTitleCss);
-  };
-  this.getCommentLabel = function (){
-    return $(this.commentLabelCss);
-  };
-  this.getCommentSpanReq = function(){
-    return $(this.commentLabelReq);
-  };  
-  this.getCommentLabReq = function(){
-    return $(this.commentlabReqId);
-  };
-  this.getEditTaskModal = function(){
-    return element(by.id(this.EditTaskModalId));
-  };
-  this.getDetailsTaskModal = function(){
-    return element(by.id(this.detailsTaskModalId));
-  };
-  this.closeDetailsTaskModal = function(){
-    $(this.closeDetailsTaskModalCss).click();
-  };
-  this.deleteComment = function(){
-    $(this.deleteCommentCss).click();
-  };
+  this.isEditCommentModalPresent = function(){
+    var that = this;
+    return browser.wait(function(){
+      return that.editCommentModal.isPresent();
 
-  this.getTitle = function(){
-    return $(this.createTaskTitleCss);
-  };
-  this.getTaskLabel = function(){
-    return $(this.taskLabelCss);
-  };
-  this.getTaskTextArea = function(){
-    return element(by.model(this.taskTextAreaModel));
-  };
-  this.getTaskLabelReq = function (){
-    return element(by.id(this.commentRequiredId));
-  };
-  this.getTeamPersonLabel = function(){
-    return $(this.personTeamLabelCss);
-  };
-  this.getPersonDropdown = function(){
-    return element(by.model(this.personDropdownModel)).element(by.model('ngModel')).$$('option');
-  };
-  this.getPersonSelected = function(){
-    return   element(by.model(this.personDropdownModel)).element(by.model('ngModel')).$('option:checked');
-  };
-  this.getFixedAssignedCheckboxLabel = function(){
-    return  $(this.fixedAssignedLabelCss);
-  };
-  this.getFixedAssignmentCheck = function(){
-    return element(by.model(this.fixedAssignModel));
-  };
-  this.getTeamDropdownoptions = function(){
-    return  element(by.model(this.teamDropdownModel)).element(by.model('ngModel')).$$('option');
-  };
-  this.getTeamsReapeat = function(){
-    return element.all(by.repeater('role in roleTypes').column('{role.description'));
-  };
-  this.getTeamSelected = function(){
-    return element(by.model(this.teamDropdownModel)).element(by.model('ngModel')).$('option:checked');
-  };
-  this.getEventLabel = function(){
-    return $(this.eventLabelCss);
-  };
-  this.getEventDropdownOptions = function(){
-    return element(by.model(this.eventModel)).$$('option');
-  };
-  this.getEventSelected = function(){
-    return element(by.model(this.eventModel)).$('option:checked');
-  };
-  this.getCategoryLabel = function(){
-    return $(this.categoryLabelCss);
-  };
-  this.getCategoryDropdownOptions = function(){
-    return element(by.model(this.categoryModel)).$$('option');
-  };
-  this.getCategorySelected = function(){
-    return element(by.model(this.categoryModel)).$('option:checked');
+    }).then(function(){
+      return true;
+    });
   };
   this.setCategoryByPos = function(pos){
-    this.getCategoryDropdownOptions().then(function(list){
+    this.categoryOptions.then(function(list){
         list[pos].click();
       });
-  };
-  this.getAssetsLabel = function(){
-    return $(this.assetsLabelCss);
-  };
-  this.getAssetTypeOptions = function(){
-    return element(by.model(this.assetTypeModel)).$$('option');
-  };
-  this.getAssetTypeSelected = function(){
-    return element(by.model(this.assetTypeModel)).$('option:checked');
-  };
-  this.getAssetEntityOptions = function(){
-    return element(by.model(this.assetEntityModel)).$$('option');
-  };
-  this.getAssetEntitySelected = function(){
-    return element(by.model(this.assetEntityModel)).$('option:checked');
-  };
-  this.getDurationLabel = function(){
-    return $(this.durationLabelCss);
-  };
-  this.getDurationfield= function(){
-    return element(by.model(this.durationFieldModel));
-  };
-  this.getDurationScaleOptions = function(){
-    return element(by.model(this.durationScaleModel)).$$('option');
-  };
-
-  this.getDurationScaleSelected = function(){
-    return element(by.model(this.durationScaleModel)).$('option:checked');
-  };
-  this.getPriorityLabel = function(){
-    return $(this.priorityLabelCss);
-  };
-  this.getPrioiryOptions = function(){
-    return element(by.model(this.priorityModel)).$$('option');
-  };
-  this.getPrioritySelected = function(){
-    return element(by.model(this.priorityModel)).$('option:checked');
-  };
-  this.getDueDateLabel = function(){
-    return $(this.dueDateLabelCss);
-  };
-  this.getDueDateField = function(){
-    return element(by.model(this.dueDateModel));
-  };
-  this.getEstimatedLabel=function(){
-    return $(this.estimatedStFinLabel);
-  };
-  this.getEstimatedField =function(){
-    return element(by.model(this.estimatedStFinFieldModel));
-  };
-  this.getStatusLabel = function(){
-    return $(this.statusLabelCss);
-  };
-  this.getStatusOptions = function(){
-    return element(by.model(this.statusModel)).$$('option');
-  };
-  this.getStatusSelected = function(){
-    return element(by.model(this.statusModel)).$('option:checked');
-  };
-  this.saveTask= function(){
-    $(this.saveTaskBtn).click();
   };
 
   this.addComment = function(comment,categoryPos,category,assetTypePos,assetType,assetPos,asset){
     //add comment
     //if pos is null, will leave default information
-    var comm = this.getTaskTextArea();
+    var comm = this.taskTextArea;
     comm.sendKeys(comment);
     //select Category
-    expect(this.getCommentSpanReq().getAttribute('class')).toEqual('error-msg ng-hide');
+    // expect(this.commentSpanReq.getAttribute('class')).toEqual('error-msg ng-hide');
     if(categoryPos!==''){
-      this.getCategoryDropdownOptions().then(function(list){
+      this.categoryOptions.then(function(list){
         list[categoryPos].click();
       });
     }
-    expect(this.getCategorySelected().getText()).toEqual(category);
+    expect(this.categorySelected.getText()).toEqual(category);
     //select assetType
     if(assetTypePos!==''){
-      this.getAssetTypeOptions().then(function(list){
+      this.assetTypeOptions.then(function(list){
         list[assetTypePos].click();
       });
     }
-    expect(this.getAssetTypeSelected().getText()).toEqual(assetType);
+    expect(this.assetTypeSelected.getText()).toEqual(assetType);
     //select asset
     if(assetPos!==''){
-      this.getAssetEntityOptions().then(function(list){
+      this.asetEntityOptions.then(function(list){
         list[assetPos].click();
       });
     }
-    expect(this.getAssetEntitySelected().getText()).toEqual(asset);
+    expect(this.assetEntitySelected.getText()).toEqual(asset);
   };
   this.addTask = function(task){
 // Task Text Area
-    var field = this.getTaskTextArea();
+    var field = this.taskTextArea;
     field.sendKeys(task);
 // Person Team
 // Event Dropdown
