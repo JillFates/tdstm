@@ -83,7 +83,7 @@
 		</tr>
 		<tr>
 			<td class="label ${config.url} ${highlightMap.url?:''}" nowrap="nowrap"><label for="url">URL</label></td>
-			<td class="valueNW ${config.url}" ><a href="${applicationInstance.url}" style="color:#00E">${applicationInstance.url}</a></td>
+			<td class="valueNW ${config.url}" ><tds:textAsLink text="${applicationInstance.url}" target="_new"/></td>
 
 			<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 			<td class="${config.externalRefId}">${applicationInstance.externalRefId}</td>
@@ -119,17 +119,5 @@
 			<td class="valueNW ${config.testingDuration}" nowrap="nowrap">${applicationInstance.testingDuration ? applicationInstance.testingDuration+'m' :''}</td>
 		</tr>
 		<g:render template="../assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs, highlightMap:highlightMap]"></g:render>
-<%--		<tr>--%>
-<%--			<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>--%>
-<%--			<td colspan="7">--%>
-<%--				<g:each in="${moveEventList}" var="moveEventList">--%>
-<%--				  <div  class="label" style="float: left;width: auto;padding: 5px;" nowrap="nowrap" ><label for="moveEvent"><b>${moveEventList.name} :</b> </label>--%>
-<%--				  <g:if test="${AppMoveEvent.findByMoveEventAndApplication(moveEventList,applicationInstance)?.value=='Y'}">Y</g:if>--%>
-<%--				  <g:elseif test="${AppMoveEvent.findByMoveEventAndApplication(moveEventList,applicationInstance)?.value=='N'}">N</g:elseif>--%>
-<%--				  <g:else>?</g:else>--%>
-<%--				  </div>--%>
-<%--			  </g:each>--%>
-<%--			</td>--%>
-<%--		</tr>						--%>
 	</tbody>
 </table>
