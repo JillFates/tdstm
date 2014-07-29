@@ -1696,14 +1696,10 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 				if (scope.showAll == '1') {
 					return true;
 				} else {
-					return (((comment.commentInstance.commentType == 'issue') && 
-						     (comment.commentInstance.status == 'Completed' || comment.commentInstance.status=='Pending')
-						     )
-							||
-							((comment.commentInstance.commentType == 'comment') && 
-							 (comment.commentInstance.isResolved)
-							)
-							);
+					return (
+						((comment.commentInstance.commentType == 'issue') && (comment.commentInstance.status != 'Completed'))
+						|| ((comment.commentInstance.commentType == 'comment') && (!comment.commentInstance.isResolved))
+					);
 				}
 			}
 			scope.$on('commentChanged', function(evt, eventTO) {
