@@ -14,7 +14,11 @@ function openCablingDiv( assetId , type){
 	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
 }
 function showCablingDetails( e, assetId ){
-	$("#cablingDialogId").html(e.responseText);
+	$("#cablingDialogId").empty();
+	$("#cablingDialogId").append("<div></div>");
+	
+	var currentDiv = $("#cablingDialogId").children().first();
+	currentDiv.html(e.responseText);
 	$("#cablingDialogId").dialog( "option", "width", "auto" )
 	$("#cablingDialogId").dialog("open")
 	$("#assetEntityId").val(assetId)

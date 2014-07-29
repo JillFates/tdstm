@@ -1,6 +1,6 @@
 <%@page import="com.tds.asset.AssetCableMap"%>
 <script type="text/javascript">
-var app = angular.module("app", ['ui']);
+var app = angular.module("cablingApp${assetId}", ['ui']);
 
 app.controller('Ctrl', function($scope, $filter, $http) {
 	 $scope.statues = ['Cabled','Unknown','Empty'];
@@ -201,6 +201,8 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
     }
 });
+
+angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"]);
 
 </script>
 <script type="text/javascript">
