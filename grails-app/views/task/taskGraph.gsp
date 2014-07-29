@@ -80,10 +80,10 @@
 			
 			
 			background = container.append('rect')
-				.attr('x', -5000)
-				.attr('y', -5000)
-				.attr('width', 10000)
-				.attr('height', 10000)
+				.attr('x', -500000)
+				.attr('y', -500000)
+				.attr('width', 1000000)
+				.attr('height', 1000000)
 				.attr('opacity', 0)
 				.attr('class', 'background-rect')
 				.on('dblclick', function () {
