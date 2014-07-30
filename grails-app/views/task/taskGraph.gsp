@@ -11,6 +11,7 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />
+		<g:javascript src="lodash/lodash.min.js" />
 		
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 
@@ -25,6 +26,28 @@
 			}
 			a {
 				pointer-events: auto !important;
+			}
+			g.node.unselected g a path {
+				stroke-width: 1px !important;
+				stroke: #000000 !important;
+			}
+			g.node.selected g a path {
+				stroke-width: 6px !important;
+				stroke: #ff0000 !important;
+			}
+			form#taskSearchFormId {
+				display: inline-block !important;
+			}
+			span#filterClearId {
+				position: absolute !important;
+				display: inline !important;
+				margin-top: 4px !important;
+				cursor: pointer !important;
+				opacity: 1 !important;
+			}
+			span#filterClearId.disabled {
+				opacity: 0.3 !important;
+				cursor: auto !important;
 			}
 		</style>
 		
@@ -112,9 +135,9 @@
 					}
 				});
 			
-				
-			
 			addBindings();
+			performSearch();
+			$('#exitNeighborhoodId').removeAttr('disabled');
 		}
 		
 		function calculateSize () {
@@ -163,6 +186,7 @@
 				$('#pageHeadingId').html('Task Graph');
 				$('#exitNeighborhoodId').css('display', 'none');
 			} else {
+				$('#exitNeighborhoodId').attr('disabled','disabled');
 				$('#pageHeadingId').html('Task Graph - Neighborhood');
 				$('#exitNeighborhoodId').css('display', 'inline-block');
 			}
@@ -174,6 +198,11 @@
 			
 			// show the loading spinner
 			$('#spinnerId').css('display', 'block');
+			
+			// calculate the position for the filter clear button
+			$('#filterClearId').css('left', function () {
+				return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
+			});
 			
 			if (neighborhoodTaskId == -1)
 				jQuery.ajax({
@@ -192,6 +221,34 @@
 					complete: buildGraph
 				});
 		}
+		
+		// highlight tasks matching the user's regex
+		function performSearch () {
+			if (graph != null) {
+				var searchString = $('#searchBoxId').val().toLowerCase();
+				var nodes = $('g.node');
+				
+				if (searchString != '')
+					$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
+				else
+					$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
+				
+				_(nodes).forEach(function (o, i) {
+					var name = $(o).children('g').children('a').attr('xlink:title').toLowerCase();
+					$(o).children('path').removeAttr('stroke');
+					if (name.match(searchString) != null && searchString != '')
+						$(o).attr('class', 'node selected');
+					else
+						$(o).attr('class', 'node unselected');
+				});
+			}
+			return false;
+		}
+		
+		function clearFilter () {
+			$('#searchBoxId').val('');
+			performSearch();
+		}
 		</script>
 	</head>
 	<body>
@@ -203,6 +260,12 @@
 			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
 			&nbsp; 
 			<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
+			<form onsubmit="return performSearch()" id="taskSearchFormId">
+				<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter regex here (case insensitive)" size="32"/>
+				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
+				&nbsp; 
+				<input type="submit" name="Submit Button" id="SubmitButtonId" value="Filter" />
+			</form>
 			<br>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
