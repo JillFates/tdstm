@@ -14,10 +14,14 @@ import net.tds.util.jmesa.AssetEntityBean
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.SecurityUtils
 import java.io.File;
+import org.apache.commons.lang.math.NumberUtils
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Row
+import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
-import org.jmesa.limit.Limit
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 
@@ -5535,5 +5539,94 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	def poiDemo ={
+		return 
+	}
+	
+	def exportPoiDemo ={
+		def filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
+		def formatter = new SimpleDateFormat("yyyyMMdd")
+		def today = formatter.format(new Date())
+		def filename = "Demo_POI_Export-${today}" // Export file name
+		def project = securityService.getUserCurrentProject()
+
+		def assetEntities = AssetEntity.findAllByProject(project, [max:50])
+		File file  = ApplicationHolder.application.parentContext.getResource(filePath).getFile()
+
+		//getting FileInputStream instance for template file
+		FileInputStream fileInputStream = new FileInputStream( file );
+
+		//creating HSSFWorkbook insatnce with using template fileInput stream 
+		HSSFWorkbook workbook = new HSSFWorkbook(fileInputStream);
+		// Get sheet with name 'Server'
+		HSSFSheet sheet = workbook.getSheet("Servers");
+		
+		org.apache.poi.ss.usermodel.Cell cell = null;
+		Row row = null;
+		
+		//Get all column count of first row or header
+		def colCount = sheet.getRow(0).physicalNumberOfCells
+		def dataTransferSetInstance = DataTransferSet.findById( 1 )
+		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
+		def serverMap = [:]
+		def serverColumnNameList =[]
+		def serverSheetColumnNames = [:]
+		serverDTAMap.eachWithIndex { item, pos ->
+			serverMap.put( item.columnName, null )
+			serverColumnNameList.add(item.columnName)
+		}
+		serverMap.put("DepGroup", null )
+		serverColumnNameList.add("DepGroup")
+
+		def serverCol = sheet.getRow(0).getPhysicalNumberOfCells()
+		for ( int c = 0; c < serverCol; c++ ) {
+			def serverCellContent = sheet.getRow(0).getCell(c).stringCellValue
+			serverSheetColumnNames.put(serverCellContent, c)
+			if( serverMap.containsKey( serverCellContent ) ) {
+				serverMap.put( serverCellContent, c )
+			}
+		}
+		for (int r=1; r<=assetEntities.size(); r++){
+			// creating row here 
+			row = sheet.createRow(r);
+			// creating cell for id 
+			cell = row.createCell(0);
+			cell.setCellValue(assetEntities[r-1].id);
+			for (int c=0; c<serverColumnNameList.size(); c++){
+				def colName = serverColumnNameList.get(c)
+				
+				// creating cell for specified column
+				cell = row.createCell(serverMap[colName]);
+				def attribute = serverDTAMap.eavAttribute.attributeCode[serverMap[colName]]
+				println "colName::::::::::"+colName+"::::::::::"+serverMap[colName]+"::::::::::"+attribute
+				if(attribute)
+					cell.setCellValue(String.valueOf(assetEntities[r-1]."$attribute" ?:"") );
+			}
+		}
+
+		response.setContentType( "application/vnd.ms-excel" )
+		filename = filename.replace(".xls",'')
+		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+
+		try {
+			def snagIT = new File(file.getAbsolutePath())
+			FileOutputStream out =  new FileOutputStream(file);
+			workbook.write(out);
+			out.close();
+			response.outputStream << snagIT.getBytes()
+			response.outputStream.flush()
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return;
 	}
 }
