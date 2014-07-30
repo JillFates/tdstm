@@ -502,11 +502,11 @@ class ProjectService {
 	}
 	
 	/**
-	 * Method is used getDefaultBundle for supplied project and create if not
+	 * Used retrieve the default Bundle configured for the project or create one if it does not exist
 	 * @param project
-	 * @return getDefaultBundle for supplied project and create if not
+	 * @return MoveBundle - the default bundle assigned to the project or will create it on the fly
 	 */
-	def getDefaultBundle(Project project ){
+	MoveBundle getDefaultBundle(Project project ) {
 		return project.defaultBundle ?: createDefaultBundle( project )
 	}
 	
@@ -515,16 +515,25 @@ class ProjectService {
 	 * @param project
 	 * @return project's default move bundle 
 	 */
-	def createDefaultBundle (Project project ){
+	MoveBundle createDefaultBundle (Project project ) {
+		def defaultCode = 'TBD'
+		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
 		if(!project.defaultBundle){
-			def moveBundle = MoveBundle.findByNameAndProject("TBD", project)
+			def moveBundle = MoveBundle.findByNameAndProject(defaultCode, project)
 			if( moveBundle )
 				return moveBundle
 			else
-				moveBundle = new MoveBundle(name:"TBD", project:project, useForPlanning:true, workflowCode:project.workflowCode)
+				moveBundle = new MoveBundle(
+					name:defaultCode, 
+					project:project, 
+					useForPlanning:true, 
+					workflowCode:project.workflowCode,
+					startTime: project.startDate,
+					completionTime:project.completionDate
+				)
 				
-			if(!moveBundle.save(flush:true)){
-				log.error "createDefaultBundle: failed to create DefaultBundle : ${GormUtil.allErrorsString(moveBundle)}"
+			if (!moveBundle.save(flush:true)){
+				log.error "createDefaultBundle: failed to create DefaultBundle for project $project: ${GormUtil.allErrorsString(moveBundle)}"
 				return null
 			} 
 			return moveBundle
