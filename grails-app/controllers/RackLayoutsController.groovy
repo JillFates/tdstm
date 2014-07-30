@@ -981,7 +981,7 @@ class RackLayoutsController {
 					assetCablePower.assetToPort = null
 					assetCablePower.toPower = toPowers[i]
 					assetCablePower.cableColor = 'Black'
-					assetCablePower.cableStatus = 'cabledDetails'
+					assetCablePower.cableStatus = 'Cabled'
 					
 					if(!assetCablePower.save(flush:true)){
 						assetCablePower.errors.allErrors.each { println it }

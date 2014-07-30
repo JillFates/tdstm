@@ -96,7 +96,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
 		},600);
 	}
     $scope.cancelRow = function(id){
-    	$scope.cables[id]=$scope.backUpCables[id]
+    	$scope.cables[id] = $.extend(true, {}, $scope.backUpCables[id]);
     	return $scope.row[id] = 'h';
     };
 //moved code from room.rack.combined.js to update the json which is useful to update a particular row.
