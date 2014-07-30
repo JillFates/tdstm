@@ -35,10 +35,11 @@ class SequenceService {
 					return value
 				}
 			} catch (Exception e) {
-				log.error("Problem obtaining next value for sequence ${key} - ${contextId}")
+				log.error "Problem obtaining next value for scontext=$contextId, key=$key, exception ${e.getMessage()}"
 			}
 		}
 		
-		return null
+		log.error "Unable to retrieve next sequence number context=$contextId, key=$key"
+		throw new RuntimeException("Unable to retrieve next sequence number")
 	}
 }
