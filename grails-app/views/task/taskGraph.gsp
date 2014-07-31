@@ -225,8 +225,24 @@
 		// highlight tasks matching the user's regex
 		function performSearch () {
 			if (graph != null) {
-				var searchString = $('#searchBoxId').val().toLowerCase();
+				var searchString = $('#searchBoxId').val();
 				var nodes = $('g.node');
+				var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length-1) == '/');
+				var isRegex = false;
+				var regex = /.*/;
+				
+					
+				// check if the user entered an invalid regex
+				if (hasSlashes) {
+					try {
+						regex = new RegExp(searchString.substring(1, searchString.length-1));
+						isRegex = _.isRegExp(regex);
+					} catch (e) {
+						alert(e);
+						$('#searchBoxId').val('');
+						searchString = '';
+					}
+				}
 				
 				if (searchString != '')
 					$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
@@ -234,12 +250,20 @@
 					$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
 				
 				_(nodes).forEach(function (o, i) {
-					var name = $(o).children('g').children('a').attr('xlink:title').toLowerCase();
+					
+					var name = $(o).children('g').children('a').attr('xlink:title');
 					$(o).children('path').removeAttr('stroke');
-					if (name.match(searchString) != null && searchString != '')
-						$(o).attr('class', 'node selected');
-					else
+					
+					$(o).attr('class', 'node unselected');
+					
+					if (searchString == '') {
 						$(o).attr('class', 'node unselected');
+					} else {
+						if (isRegex && name.match(regex) != null)
+							$(o).attr('class', 'node selected');
+						else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
+							$(o).attr('class', 'node selected');
+					}
 				});
 			}
 			return false;
@@ -261,7 +285,7 @@
 			&nbsp; 
 			<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
 			<form onsubmit="return performSearch()" id="taskSearchFormId">
-				<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter regex here (case insensitive)" size="32"/>
+				<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
 				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
 				&nbsp; 
 				<input type="submit" name="Submit Button" id="SubmitButtonId" value="Filter" />
