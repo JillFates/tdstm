@@ -809,3 +809,8 @@ br.page-break-after {
 	color:red;
 	font-weight: bold;
 }
+
+/* fix for the field selects on the asset list views for older versions of firefox */
+.ui-jqgrid-hdiv {
+	overflow: visible !important;
+}
