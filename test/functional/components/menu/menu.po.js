@@ -6,6 +6,8 @@ var Menu = function(){
   this.clientProjectCss = '#projectMenuId a';
   this.roomRackCss = '#roomMenuId a';
   this.eventsBundlesCss = '#eventMenuId a';
+  this.tasksCss = '#teamMenuId a';
+  this.reportsCss = '#reportsMenuId a.home';
   
   //Admin
   this.adminProtalCss = 'a[href="/tdstm/auth/home"]';
@@ -23,7 +25,7 @@ var Menu = function(){
 //ClientProjects
   this.listProjectsCss = 'a[href="/tdstm/project/list?active=active"]';
   this.fieldSettingsCss = 'a[href="/tdstm/project/fieldImportance"]';
-
+//Assets
   this.assetsCss = '#assetMenuId a';
   this.summaryCss = 'a[href="/tdstm/assetEntity/assetSummary"]';
   this.listAppsCss='a[href="/tdstm/application/list"]';
@@ -38,13 +40,33 @@ var Menu = function(){
   //Events/Bundles
   this.listBundlesCss = 'a[href="/tdstm/moveBundle/list"]';
   //Tasks
-  this.tasksCss = '#teamMenuId a';
+  this.mytasksCss = 'a[href="/tdstm/clientTeams/listTasks"]';
+  this.taskManagerCss = 'a[href="/tdstm/assetEntity/listTasks?initSession=true"]';
+  this.taskGraphCss = 'a[href="/tdstm/task/taskGraph?initSession=true"]';
+  this.timelineCss = 'a[href="/tdstm/task/taskTimeline"]';
+  this.cookbookCss = 'a[href="/tdstm/cookbook/index"]';
   //Console
   this.consoleCss = '#consoleMenuId a';
   //Dashboard
   this.dashboardsCss = '#dashboardMenuId a';
   //Reports
-  this.reportsCss = '#reportsMenuId a';
+  this.cablingConflictsCss = 'a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict"]';
+  this.cablingDataCss = 'a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData"]';
+  this.powerCss = 'a[href="/tdstm/reports/powerReport"]';
+  this.applicationProfilesCss ='a[href="/tdstm/reports/applicationProfiles"]';
+  this.applicationConflictsCss = 'a[href="/tdstm/reports/applicationConflicts"]';
+  this.serverConflictsCss = 'a[href="/tdstm/reports/serverConflicts"]';
+  this.databaseConflictsCss = 'a[href="/tdstm/reports/databaseConflicts"]';
+  this.taskReportsCss = 'a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report"]';
+  this.preEventCheckListCss = 'a[href="/tdstm/reports/preMoveCheckList"]';
+  this.loginBadgesCss = 'a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges"]';
+  this.assetTagsCss = 'a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag"]';
+  this.logisticsTeamWorksheetsCss = 'a[href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset"]';
+  this.transportWorksheetsCss ='a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List"]';
+  this.applicationMigrationResultsCss ='a[href="/tdstm/reports/applicationMigrationReport"]';
+  this.issueReportCss ='a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report"]';
+  this.eventResultsCss ='a[href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults"]';
+  this.cablingQACss ='a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA"]';
   //timezonee
   this.timezoneCss = '.tzmenu';
 
@@ -112,7 +134,7 @@ var Menu = function(){
 
       },
       'projectStaff':function(){
-	  
+    
       },
       'fieldSettings':function(){
         browser.driver.findElement(by.css(that.fieldSettingsCss)).click();
@@ -193,14 +215,30 @@ var Menu = function(){
   };
   
   this.goToTasks= function(option){
+    var that = this;
     browser.driver.findElement(by.css(this.tasksCss)).click();
     var d = {
-
+      'myTasks':function(){
+        browser.driver.findElement(by.css(that.mytasksCss)).click();
+      },
+      'taskManager':function(){
+        browser.driver.findElement(by.css(that.taskManagerCss)).click();
+      },
+      'taskGraph':function(){
+        browser.driver.findElement(by.css(that.taskGraphCss)).click();
+      },
+      'timeline':function(){
+        browser.driver.findElement(by.css(that.timelineCss)).click();
+      }, 
+      'cookbook':function(){
+        browser.driver.findElement(by.css(that.cookbookCss)).click();
+      }
     };
     d[option]();
   };
   
   this.goToConsole= function(option){
+      this.eventTeamWorksheetsCss = 'a[]';
     browser.driver.findElement(by.css(this.consoleCss)).click();
     var d = {
 
@@ -217,9 +255,64 @@ var Menu = function(){
   };
 
   this.goToReports= function(option){
+    var that = this;
     browser.driver.findElement(by.css(this.reportsCss)).click();
     var d = {
 
+      'cablingConflicts':function(){
+        browser.driver.findElement(by.css(that.cablingConflictsCss)).click();
+      },
+      'cablingData':function(){
+        browser.driver.findElement(by.css(that.cablingDataCss)).click();
+      },
+      'power': function(){
+        browser.driver.findElement(by.css(that.powerCss)).click();
+      }, 
+      'applicationProfiles': function(){
+        browser.driver.findElement(by.css(that.applicationProfilesCss)).click();
+      },
+      'applicationConflicts':function(){
+        browser.driver.findElement(by.css(that.applicationConflictsCss)).click();
+      },
+      'serverConflicts':function(){
+        browser.driver.findElement(by.css(that.serverConflictsCss)).click();
+      }, 
+      'databaseConflicts':function(){
+        browser.driver.findElement(by.css(that.databaseConflictsCss)).click();
+      }, 
+      'taskReports':function(){
+        browser.driver.findElement(by.css(that.taskReportsCss)).click();
+      },
+      'preEventCheckList':function(){
+        browser.driver.findElement(by.css(that.preEventCheckListCss)).click();
+      },
+      'loginBadges':function(){
+        browser.driver.findElement(by.css(that.loginBadgesCss)).click();
+      },
+      'assetTags':function(){
+        browser.driver.findElement(by.css(that.assetTagsCss)).click();
+      },
+      'eventTeamWorksheets':function(){
+        browser.driver.findElement(by.css(that.eventTeamWorksheetsCss)).click();
+      },
+      'logisticsTeamWorksheets':function(){
+        browser.driver.findElement(by.css(that.logisticsTeamWorksheetsCss)).click();
+      },
+      'transportWorksheets':function(){
+        browser.driver.findElement(by.css(that.transportWorksheetsCss)).click();
+      },
+      'applicationMigrationResults':function(){
+        browser.driver.findElement(by.css(that.applicationMigrationResultsCss)).click();
+      },
+      'issueReport':function(){
+        browser.driver.findElement(by.css(that.issueReportCss)).click();
+      },
+      'eventResults':function(){
+        browser.driver.findElement(by.css(that.eventResultsCss)).click();
+      },
+      'cablingQA':function(){
+        browser.driver.findElement(by.css(that.cablingQACss)).click();
+      }
     };
     d[option]();
   };

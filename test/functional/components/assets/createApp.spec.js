@@ -1,5 +1,15 @@
 //Text as link on url field and custom fields
-
+/*
+# Go to application list page
+# create an application
+edit an application from the icon and save it -> view app modal shoul d be displayed with the changes updated
+click on app name - view app modal is displayed
+bulk delete only on e application
+bulk delete all selecting from the grid using a filter
+# add task
+add commentt 
+  
+*/
 'use strict';
 var  Menu = require('../menu/menu.po.js');
 var  ListApps = require('./listApps.po.js');

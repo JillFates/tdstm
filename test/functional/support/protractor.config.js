@@ -9,6 +9,7 @@ exports.config = {
     '../components/clientProject/showProjects.spec.js',
     '../components/clientProject/createProject.spec.js',
     '../components/clientProject/fieldSettings.spec.js',
+    '../components/reports/applicationProfiles.spec.js',
     '../components/reports/planningReports.spec.js',
     '../components/eventsBundles/bundles.spec.js',
     '../components/admin/adminPortal.spec.js',
