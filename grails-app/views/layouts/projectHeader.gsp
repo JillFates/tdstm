@@ -159,6 +159,9 @@
 							<li><g:link class="mmlink" controller="permissions" action="show" onclick="hideMegaMenu('adminMegaMenu')">Role Permissions</g:link> </li>
 							</tds:hasPermission>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetOptions" onclick="hideMegaMenu('adminMegaMenu')">Asset Options</g:link> </li>
+							<tds:hasPermission permission='ViewSupervisorConsoles'>
+							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[ 'showAll':'show','teamType':'MOVE']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Techs (old)</g:link></li>
+							</tds:hasPermission>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMReleaseNotes?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">Release Notes</a></li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
@@ -312,6 +315,9 @@
 								<span class="megamenuSection"> </span><br />
 								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEventId}" onclick="hideMegaMenu('bundleMegaMenu')">${moveEventName} Event Details</g:link></li>
 							</g:if>
+							<tds:hasPermission permission='ShowListNews'>
+							<li><g:link class="mmlink" controller="newsEditor"  onclick="hideMegaMenu('consoleMegaMenu')">List Event News</g:link></li>
+							</tds:hasPermission>
 							<tds:hasPermission permission="ShowMovePrep">
 							<li style="white-space:nowrap;"><g:link class="mmlink" controller="reports" action="preMoveCheckList" onclick="hideMegaMenu('bundleMegaMenu')">Pre-event Checklist</g:link></li>
 							</tds:hasPermission>
@@ -375,48 +381,6 @@
 			</li>
             </tds:hasPermission>
 
-	        <tds:hasPermission permission='ConsoleMenuView'>
-			<li id="consoleMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#consoleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#consoleMegaMenu')">Console</a>
-			    <div class="megamenu rooms inActive" id="consoleMegaMenu">
-					<table class="mmtable room_rack"><tr>
-					<td style="vertical-align:top"  ><span class="megamenuSection">Supervisor Console</span><br />
-						<ul>
-							<tds:hasPermission permission='ViewSupervisorConsoles'>
-							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="[ 'showAll':'show','teamType':'MOVE']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Techs (old)</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="dashboardView" params="['showAll':'show','teamType':'ADMIN']" onclick="hideMegaMenu('consoleMegaMenu')">Supervise Admins (old)</g:link></li>
-							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">News</span><br />
-						<ul>
-							<tds:hasPermission permission='ShowListNews'>
-							<li><g:link class="mmlink" controller="newsEditor"  onclick="hideMegaMenu('consoleMegaMenu')">List News</g:link></li>
-							</tds:hasPermission>
-							<tds:hasPermission permission='CreateNews'>
-							<li><a class="mmlink" href="javascript:openCreateNewsDialog()" onclick="hideMegaMenu('consoleMegaMenu')">Create News</a></li>
-							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Cart Tracker</span><br />
-						<ul>
-							<tds:hasPermission permission='ShowCartTracker'>
-							<li><g:link class="mmlink" controller="cartTracking" action="cartTracking"  onclick="hideMegaMenu('consoleMegaMenu')">Cart Status</g:link></li>
-							</tds:hasPermission>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					</tr></table>
-				</div>
-			</li>
-	        </tds:hasPermission>
 			<tds:hasPermission permission='DashBoardMenuView'> 
 			<li id="dashboardMenuId" class="menuLiIndex" style="position:relative; float:left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#dashboardMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#dashboardMegaMenu')">Dashboards</a>
 				<div class="megamenu rooms inActive" id="dashboardMegaMenu">
@@ -430,6 +394,9 @@
 							<li><g:link class="home mmlink" controller="dashboard" onclick="hideMegaMenu('dashboardMegaMenu')">Event Dashboard</g:link></li>
 							<tds:hasPermission permission='AssetTrackerMenuView'>
 							<li><g:link class="home mmlink" controller="clientConsole" onclick="hideMegaMenu('dashboardMegaMenu')">Asset Tracker</g:link></li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='ShowCartTracker'>
+							<li><g:link class="mmlink" controller="cartTracking" action="cartTracking"  onclick="hideMegaMenu('consoleMegaMenu')">Cart Tracker</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print','help');" onclick="hideMegaMenu('dashboardMegaMenu')">help</a></li>
