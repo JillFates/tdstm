@@ -1,10 +1,5 @@
+<%-- This template is used at the bottom of all of the Asset Create forms --%>
 <div class="buttons">
-	<g:if test="${redirectTo}">
-		<span class="button"><g:actionSubmit class="save" value="Save/Close" action="save" /></span>
-	</g:if>
-	<g:else>
-		<span class="button"><input type="button" class="save" value="Save/Close" data-action='close' onclick="saveToShow($(this),'${whom}')"/> </span>
-	</g:else>
-	<span class="button"><input type="button" class="save" value="Save/Show" data-redirect='${redirectTo}' data-action='' onclick="saveToShow($(this),'${whom}')"/> </span>
-	<span class="button"><input type="button" class="delete" value="Cancel" onclick="$('#createEntityView').dialog('close');"/> </span>
+	<span class="button"><input type="button" class="save" value="Save" data-redirect='${redirectTo}' data-action='' onclick="saveToShow($(this),'${whom}')"/> </span>
+	<span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#createEntityView').dialog('close');"/></span>
 </div>
