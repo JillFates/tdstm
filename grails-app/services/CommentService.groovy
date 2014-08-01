@@ -141,6 +141,9 @@ class CommentService {
 						// TODO - assignedTo may be changing at the same time, which is assigned below. Need to review this as it is a potential edge case.
 						def whoDidIt = (assetComment.status == AssetCommentStatus.DONE) ? assetComment.resolvedBy : assetComment.assignedTo
 						switch (assetComment.status) {
+							case AssetCommentStatus.READY:
+								// No need to error in this situation
+								break
 							case AssetCommentStatus.STARTED:
 								// We'll allow the same user to click Start and Done 
 								if (whoDidIt != userLogin.person ) {
