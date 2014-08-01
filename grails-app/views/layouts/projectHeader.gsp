@@ -263,13 +263,13 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
 						<ul>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary</g:link></li>	
-							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')">List Applications</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')">List Servers</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')">List All Devices</g:link></li>
-							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')">List Databases</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')">List Storage (Physical)</g:link></li>
-							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')">List Storage (Logical)</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">List Dependencies</g:link></li>
+							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')"> Applications</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')"> Servers</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')"> All Devices</g:link></li>
+							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')"> Databases</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage Devices (Physical)</g:link></li>
+							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"> Storage items (Logical)</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')"> Dependencies</g:link></li>
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependency Analyzer</g:link></li>
 							</tds:hasPermission>
