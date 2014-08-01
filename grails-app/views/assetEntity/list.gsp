@@ -167,16 +167,7 @@
 	<body>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 			<h1>${listType=='server'? 'Server' : 'Device'  } List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
-            <div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
-                <button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
-                <span ng-bind="alert.msg"></span>
-            </div>
-			<g:if test="${flash.message}">
-				<div id="messageDivId" class="message">${flash.message}</div>
-			</g:if>
-			<div>
-				<div id="messageId" class="message" style="display:none"></div>
-			</div>
+			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv">
