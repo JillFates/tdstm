@@ -101,7 +101,8 @@ class MoveBundleController {
 
 			def moveBundleInstance = MoveBundle.get( moveBundleId )
 			//request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
-			def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+			def project = securityService.getUserCurrentProject()
+			def projectId = project.id
 
 			if(!moveBundleInstance) {
 				flash.message = "MoveBundle not found with id ${moveBundleId}"
@@ -127,9 +128,12 @@ class MoveBundleController {
 
 				if( bundleTransition.size() > 0 )
 					showHistoryButton = true
+					
+				def isDefaultBundle = moveBundleInstance.id == project.defaultBundle.id ? true : false
 
 				return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager,
-					moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton ]
+					moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton,
+					isDefaultBundle:isDefaultBundle ]
 			}
 		} else {
 			redirect(action:list)

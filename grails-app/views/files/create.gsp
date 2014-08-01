@@ -30,7 +30,7 @@
 								</td>
 								<td>&nbsp;</td>
 								<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${fileInstance?.moveBundle}" optionKey="id" optionValue="name" tabindex="34" />
+								<td><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
 							</tr>
 

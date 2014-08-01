@@ -64,6 +64,27 @@
 		return check
 	}
 
+	function warning(isDefaultBundle, deleteType){
+		var check = true
+		if(isDefaultBundle=='true'){
+			alert("WARNING: You can not delete a project's default bundle");
+			check = false;
+		} else {
+			switch(deleteType) {
+			    case 'delete':
+			    	return confirm('WARNING: Deleting this bundle will remove any teams and any related step data?');
+			        break;
+			    case 'deleteBundleAndAssets':
+			    	  return confirm('WARNING: Deleting this bundle will remove any teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');
+			        break;
+			    case 'history':
+			    	return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');
+			    	break;
+			} 
+		}
+		return check	
+	}
+
 
     </script>
   </head>
@@ -195,10 +216,10 @@
           <input type="hidden" name="projectId" value="${projectId}" />
           <tds:hasPermission permission='MoveBundleEditView '>
 	          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-	          <span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Deleting this bundle will remove any teams and any related step data?');" value="Delete" /></span>
-	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return confirm('WARNING: Deleting this bundle will remove any teams, any related step data, AND ASSIGNED ASSETS? (NO UNDO)?');" value="Delete bundle and assets" /></span>
+	          <span class="button"><g:actionSubmit class="delete" onclick="return warning('${isDefaultBundle}', 'delete')" value="Delete" /></span>
+	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return warning('${isDefaultBundle}', 'deleteBundleAndAssets')" value="Delete bundle and assets" /></span>
           <g:if test="${showHistoryButton}">
-          		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('WARNING: Are you sure you want to permanently clear transitions for assets in this bundle?');" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
+          		<span class="button"><g:actionSubmit class="delete" onclick="return warning('${isDefaultBundle}', 'history')" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
           </g:if>
           </tds:hasPermission>
         </g:form>

@@ -5603,7 +5603,6 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 				// creating cell for specified column
 				cell = row.createCell(serverMap[colName]);
 				def attribute = serverDTAMap.eavAttribute.attributeCode[serverMap[colName]]
-				println "colName::::::::::"+colName+"::::::::::"+serverMap[colName]+"::::::::::"+attribute
 				if(attribute)
 					cell.setCellValue(String.valueOf(assetEntities[r-1]."$attribute" ?:"") );
 			}

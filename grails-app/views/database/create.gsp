@@ -41,7 +41,7 @@
 								value="<tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);" tabindex="27" > 
 							</td>
 							<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
-							<td colspan="3"><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${databaseInstance?.moveBundle}" optionKey="id" optionValue="name" tabindex="34" /></td>
+							<td colspan="3"><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" /></td>
 						</tr>
 						<tr>
 							<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size/Scale<span style="color: red;">*</span></label></td>
