@@ -70,7 +70,7 @@
 									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
-										noSelection="${['null':'Please Select']}" 
+										noSelection="${['null':'Select...']}" 
 										tabIndex="21"
 									/>
 								</td>
@@ -80,7 +80,7 @@
 									<g:select id="environment" class="${config.environment}" name="environment" 
 										from="${environmentOptions}" 
 										value="${applicationInstance.environment}" 
-										noSelection="${['':' Please Select']}" tabindex="32">
+										noSelection="${['':'Select...']}" tabindex="32">
 									</g:select>
 								</td>
 								<td class="label ${config.userLocations}  ${highlightMap.userLocations?:''}" nowrap="nowrap"><label for="userLocations">User Location</label>
@@ -104,7 +104,7 @@
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="22" 
-										noSelection="${['null':'Please select']}"
+										noSelection="${['null':'Select...']}"
 									/>
 								</td>
 								<td class="label ${config.criticality}  ${highlightMap.criticality?:''}" nowrap="nowrap">
@@ -114,7 +114,7 @@
 									<g:select id="criticality" class="${config.criticality}" name="criticality" 
 										from="${applicationInstance.constraints.criticality.inList}" 
 										value="${applicationInstance.criticality}" 
-										noSelection="${['':'Please select']}"
+										noSelection="${['':'Select...']}"
 										tabindex="33">
 									</g:select>
 								</td>
@@ -139,7 +139,7 @@
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="23" 
-										noSelection="${['null':' Please Select']}" 
+										noSelection="${['null':' Select...']}" 
 									/>
 								</td>
 								<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
