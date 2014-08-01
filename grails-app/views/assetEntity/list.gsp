@@ -76,7 +76,7 @@
 					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'assetListId\')"/></g:else></span>'
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Asset Name', 'Asset Type','Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle', 'id', 'commentType'"
+					colNames="'Actions', listType=='server'? 'Name' : 'Name', listType=='server'? 'Server Type' : 'Device Type' ,'Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle', 'id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false,width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
 						{name:'assetType'},
@@ -166,7 +166,7 @@
 	</head>
 	<body>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<h1>${listType=='server'? 'Server' : 'Physical'  } List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
+			<h1>${listType=='server'? 'Server' : 'Device'  } List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
             <div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
                 <button type="button" class="alert-close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
                 <span ng-bind="alert.msg"></span>

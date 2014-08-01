@@ -34,7 +34,7 @@
 					</tds:hasPermission>"
 				<jqgrid:grid id="dependencyGridId" url="'${createLink(action: 'listDepJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Asset','AssetClass', 'Bundle','Type', 'Depends On', 'Dep Class', 'Dep Bundle', '${columnLabelpref['1']}', '${columnLabelpref['2']}', 'Status'"
+					colNames="'Asset','Asset Type', 'Bundle','Type', 'Depends On', 'Dep Asset Type', 'Dep Asset Bundle', '${columnLabelpref['1']}', '${columnLabelpref['2']}', 'Status'"
 					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
 								  {name:'assetType', editable: true},
 								  {name:'assetBundle', editable: true},
