@@ -21,10 +21,10 @@ function createAssetDetails (type) {
 		new Ajax.Request(contextPath+'/database/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Database');}})
 		break;
 	case "Files":
-		new Ajax.Request(contextPath+'/files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Storage');}})
+		new Ajax.Request(contextPath+'/files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Logical Storage');}})
 		break;
 	default :
-		new Ajax.Request(contextPath+'/assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Server');}})
+		new Ajax.Request(contextPath+'/assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Device');}})
 	}
 }
 
@@ -40,7 +40,7 @@ function getEntityDetails (redirectTo, type, value) {
 		new Ajax.Request(contextPath+'/files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Files');}})
 		break;
 	default :
-		new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Server');}})
+		new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Device');}})
 	}
 }
 
@@ -105,10 +105,10 @@ function editEntity (redirectTo,type, value, source,rack,roomName,location,posit
 			new Ajax.Request(contextPath+'/database/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database',source,rack,roomName,location,position);}})
 			break;
 		 case "Files":
-			new Ajax.Request(contextPath+'/files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Storage',source,rack,roomName,location,position);}})
+			new Ajax.Request(contextPath+'/files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Logical Storage',source,rack,roomName,location,position);}})
 			break;
 		 default :
-			 new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Server',source,rack,roomName,location,position);}})
+			 new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Device',source,rack,roomName,location,position);}})
 	 }
 }
 
@@ -208,9 +208,9 @@ function updateAssetsList (name, assetType, assetId ) {
 }
 
 function updateAssetTitle ( type ) {
-	$("#createEntityView").dialog( "option", "title", 'Create '+type );
+	$("#createEntityView").dialog( "option", "title", type+ ' Detail' );
 	$("#showEntityView").dialog( "option", "title", type+' Detail' );
-	$("#editEntityView").dialog( "option", "title", 'Edit '+type );
+	$("#editEntityView").dialog( "option", "title", type+' Detail' );
 }
 
 function selectManufacturer (value, forWhom) {

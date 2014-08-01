@@ -36,10 +36,10 @@
 
 							<tr>
 								<td class="label" nowrap="nowrap"><label for="assetType">
-										Type</label>
+										Class</label>
 								</td>
 								<td><input type="text" id="assetType" name="assetType" 
-									value="Storage" readonly="readonly" />
+									value="Logical Storage" readonly="readonly" />
 								</td>
 								<td class="label" nowrap="nowrap"><label for="lun">LUN</label>
 								</td>

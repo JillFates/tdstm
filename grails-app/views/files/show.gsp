@@ -16,8 +16,8 @@
 							<td class="valueNW ${config.moveBundle}">${filesInstance?.moveBundle} / ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
-							<td class="label" nowrap="nowrap"><label for="assetType">App Type</label></td>
-							<td class="valueNW">${filesInstance.assetType == 'Files' ? 'Storage' : filesInstance.assetType}</td>
+							<td class="label" nowrap="nowrap"><label for="assetType">Class</label></td>
+							<td class="valueNW">${filesInstance.assetType == 'Files' ? 'Logical Storage' : filesInstance.assetType}</td>
 							<td class="label" nowrap="nowrap"><label for="lun">LUN</label></td>
 							<td class="valueNW">${filesInstance.LUN}</td>
 							<td class="label ${config.supportType} ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support</label></td>
