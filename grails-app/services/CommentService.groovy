@@ -142,18 +142,23 @@ class CommentService {
 						def whoDidIt = (assetComment.status == AssetCommentStatus.DONE) ? assetComment.resolvedBy : assetComment.assignedTo
 						switch (assetComment.status) {
 							case AssetCommentStatus.STARTED:
-								errorMsg = "The task was previously STARTED by ${whoDidIt}"; break
+								// We'll allow the same user to click Start and Done 
+								if (whoDidIt != userLogin.person ) {
+									errorMsg = "The task was previously STARTED by ${whoDidIt}"
+								}
+								break
 							case AssetCommentStatus.DONE:
-								errorMsg = "The task was previously COMPLETED by ${whoDidIt}"; break
+								errorMsg = "The task was previously COMPLETED by ${whoDidIt}"
+								break
 							default:
 								errorMsg = "The task status was changed to '${assetComment.status}'"
+								break
 						}
-						break
 					}
 				}
 			
 				commentProject = assetComment.project
-				if(params.containsKey("assetEntity")){
+				if (params.containsKey("assetEntity")){
 					assetComment.assetEntity = assetEntity
 				}
 				// Make sure that the comment about to be updated is associated to the user's current project
