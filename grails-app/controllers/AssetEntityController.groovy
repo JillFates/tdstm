@@ -1860,53 +1860,57 @@ class AssetEntityController {
 				case 'appOwner':
 					temp +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner,"
 					joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id \n"
-					break;
+					break
 				case 'os':
 					temp +="ae.hinfo AS os,"
-					break;
+					break
 				case 'sourceTeamMt':
 					temp +="pt.team_code AS sourceTeamMt,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt ON pt.project_team_id=ae.source_team_id \n"
-					break;
+					break
 				case 'targetTeamMt':
 					temp +="pt1.team_code AS targetTeamMt,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt1 ON pt1.project_team_id=ae.target_team_id \n"
-					break;
+					break
 				case 'sourceTeamLog':
 					temp +="pt2.team_code AS sourceTeamLog,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt2 ON pt2.project_team_id=ae.source_team_log_id \n"
-					break;
+					break
 				case 'targetTeamLog':
 					temp +="pt3.team_code AS targetTeamLog,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt3 ON pt3.project_team_id=ae.target_team_log_id \n"
-					break;
+					break
 				case 'sourceTeamSa':
 					temp +="pt4.team_code AS sourceTeamSa,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt4 ON pt4.project_team_id=ae.source_team_sa_id \n"
-					break;
+					break
 				case 'targetTeamSa':
 					temp +="pt5.team_code AS targetTeamSa,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt5 ON pt5.project_team_id=ae.target_team_sa_id \n"
-					break;
+					break
 				case 'sourceTeamDba':
 					temp +="pt6.team_code AS sourceTeamDba,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt6 ON pt6.project_team_id=ae.source_team_dba_id \n"
-					break;
+					break
 				case 'targetTeamDba':
 					temp +="pt7.team_code AS targetTeamDba,"
 					joinQuery +="\n LEFT OUTER JOIN project_team pt7 ON pt7.project_team_id=ae.target_team_dba_id \n"
-					break;
+					break
 				case ~/custom\d{1,}/:
 					temp +="ae.${value} AS ${value},"
-					break;
+					break
 				case 'lastUpdated':
 					temp +="ee.last_updated AS ${value},"
 					joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
-					break;
+					break
+				case 'manufacturer':
+					temp +="manu.name AS manufacturer,"
+					joinQuery +="\n LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id \n"
+					break
 				case 'modifiedBy':
 					temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
 					joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
-					break;
+					break
 				case 'validation':
 					break;
 				default:
