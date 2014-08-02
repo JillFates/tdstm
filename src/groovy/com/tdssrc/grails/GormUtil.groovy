@@ -1,9 +1,8 @@
 package com.tdssrc.grails;
 
 import org.apache.shiro.SecurityUtils
-// import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdsops.common.grails.ApplicationContextHolder
 
 public class GormUtil {
 
@@ -14,10 +13,12 @@ public class GormUtil {
 	 * @param String locale (optional)
 	 * @return String the errors formatted in human readable format
 	 */
-	def static String allErrorsString(domain, separator=" : ", locale=null) {
-		def messageSource = ApplicationHolder.application.mainContext.messageSource
+	def static String allErrorsString(domain, separator=" : ", locale=java.util.Locale.US) {
+		def messageSource = ApplicationContextHolder.getApplicationContext().messageSource
 		StringBuilder text = new StringBuilder()
-		domain?.errors.allErrors.each() { text.append("$separator ${messageSource.getMessage(it, locale)}") }
+		domain?.errors?.allErrors?.each() { 
+			text.append("$separator ${messageSource.getMessage(it, locale)}") 
+		}
 		text.toString()
 	}
 
@@ -27,7 +28,7 @@ public class GormUtil {
 	 * @param String locale (optional)
 	 * @return String the errors formatted in human readable format
 	 */
-	def static String errorsAsUL(domain, locale=null) {
+	def static String errorsAsUL(domain, locale=java.util.Locale.US) {
 		StringBuilder text = new StringBuilder('<ul>')
 		text.append(allErrorsString(domain, '<li>', locale))
 		text.append('</ul>')

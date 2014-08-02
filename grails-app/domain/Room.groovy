@@ -1,5 +1,7 @@
 import com.tds.asset.AssetEntity;
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
+
 class Room {
 	String roomName
 	String location
@@ -16,7 +18,7 @@ class Room {
 	Date dateCreated
 	Date lastUpdated
 	
-	// for temp use
+	// Value of 1 indicates that the room is a source location otherwise it is a target room
 	Integer source = 1
 	
 	static hasMany = [racks:Rack, sourceAssets:AssetEntity, targetAssets:AssetEntity]
@@ -24,16 +26,16 @@ class Room {
 	
 	static constraints = {
 		project( nullable:false )
-		roomName( blank:false, nullable:false )
-		location( blank:false, nullable:false )
+		roomName( blank:false, nullable:false, size:1..255 )
+		location( blank:false, nullable:false, size:1..255 )
 		roomWidth( nullable:true )
 		roomDepth( nullable:true )
-		source( nullable:true )
-		address( blank:true, nullable:true )
-		city( blank:true, nullable:true )
-		stateProv( blank:true, nullable:true )
-		postalCode ( blank:true, nullable:true )
-		country( blank:true, nullable:true )
+		source( nullable:false, range:0..1 )
+		address( blank:true, nullable:true, size:0..255 )
+		city( blank:true, nullable:true, size:0..255 )
+		stateProv( blank:true, nullable:true, size:0..255 )
+		postalCode ( blank:true, nullable:true, size:0..12 )
+		country( blank:true, nullable:true, size:0..255 )
 	}
 
 	static mapping  = {	
@@ -75,15 +77,16 @@ class Room {
 		}
 		return room
 	}
+	
 	/*
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	
 	def getRackCount(){

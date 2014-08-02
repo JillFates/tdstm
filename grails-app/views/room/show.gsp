@@ -1,6 +1,13 @@
 <html>
 <body>
 <div class="body" style="width:98%;">
+<g:if test="${flash.message}">
+	<div class="message">${flash.message}</div>
+</g:if>
+<g:if test="${flash.error}">
+	<div class="errors">${flash.error}</div>
+</g:if>
+
 <div id="roomListView"></div>
 <input type="hidden" id="redirectTo" value="room"/>
 <input type="hidden" id="fromRoomOrRack" value="room"/>
