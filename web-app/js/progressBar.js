@@ -72,7 +72,7 @@ TaskProgressBar.prototype.updateProgress = function() {
 				self.finishProgressBar();
 			} else {
 				var status = $('#progressStatus');
-				status.html(data.status);
+				status.html(data.status + (data.detail ? ": " + data.detail : ""));
 				
 				$('#progressClose').show();
 				$('#progressClose').click(function() {

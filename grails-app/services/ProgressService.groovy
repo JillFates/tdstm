@@ -69,6 +69,37 @@ class ProgressService {
 	}
 	
 	/**
+	 * Adds the dataKey,dataValue to the data of the progressInfo under key
+	 * @param key the key of the progressInfo
+	 * @param dataKey the key of the data
+	 * @param dataValue the value of the data
+	 */
+	void updateData(String key, Object dataKey, Object dataValue) {
+		ProgressInfo info = this.progressInfo.getIfPresent(key)
+		if (info != null) {
+			info.data.put(dataKey, dataValue)
+		} else {
+			log.debug("Key not found ${key}")
+		}
+	}
+	
+	/**
+	 * Gets the data value of the progressInfo under key
+	 * @param key the key of the progressInfo
+	 * @param dataKey the key of the data
+	 * @return dataValue the value of the data
+	 */
+	Object getData(String key, Object dataKey) {
+		ProgressInfo info = this.progressInfo.getIfPresent(key)
+		if (info != null) {
+			return info.data.get(dataKey)
+		} else {
+			log.debug("Key not found ${key}")
+			return null
+		}
+	}
+	
+	/**
 	 * Manually removes a progress info under a specific key
 	 * @param key the key of the progress
 	 */

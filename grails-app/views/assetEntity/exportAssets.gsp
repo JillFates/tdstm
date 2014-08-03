@@ -5,6 +5,44 @@
     <title>Asset Export</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 	<g:javascript src="import.export.js"/>
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+
+	<g:javascript src="bootstrap.js" />
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<g:javascript src="progressBar.js" />
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$.fn.serializeForm = function() {
+			    data = {};
+			    url = this.attr("action");
+			    items = this.serializeArray();
+			    $.each(items,function(i,item) {
+			        data[item['name']]=item['value'];
+			    });
+			    return data;
+			}
+			
+			$('#exportForm').submit(function(e){
+				var form = $('#exportForm');
+		        items = {};
+		        items = form.serializeForm();
+		        url = form.attr("action");
+
+				$.post(url, items, function(data) {
+					var progressBar = new TaskProgressBar(data.data.key, 1000, 
+					function() {
+						window.location="downloadExport?key=" + data.data.key;
+					}, function() {
+					},
+					"Exporting assets...");
+				});
+				
+		        return false;
+		    });
+		});
+	</script>
   </head>
   <body>
  <div class="body">
@@ -12,7 +50,7 @@
 	  <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <g:form action="export" method="post" name="exportForm">
+      <g:form id="exportForm" action="export" method="post" name="exportForm">
         <input type="hidden" value="${projectId}" name="projectIdExport" />
         <div class="dialog">
           <table>
