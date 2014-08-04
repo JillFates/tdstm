@@ -89,7 +89,7 @@
                                     <td width="50%">Successors:</td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td valign = "top">
                                         <table cellspacing="0" style="border:0px;">
                                             <tbody>
                                                 <tr ng-repeat="predecessor in acData.predecessorList" style="cursor:pointer;" class="task_{{predecessor.status.toLowerCase()}}" ng-click="viewTask(predecessor.taskId)">
@@ -98,7 +98,7 @@
                                             </tbody>
                                         </table>
                                     </td>
-                                    <td>
+                                    <td valign="top">
                                         <table cellspacing="0" style="border:0px;">
                                             <tbody>
                                                 <tr ng-repeat="successor in acData.successorList" style="cursor:pointer;" class="task_{{successor.status.toLowerCase()}}" ng-click="viewTask(successor.taskId)">
