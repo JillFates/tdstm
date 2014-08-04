@@ -351,6 +351,10 @@ td.buttonR .powerIcon {
     background: transparent url(../icons/database_edit.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
+.buttons input.cableedit {
+    background: transparent url(../icons/disconnect.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
 .buttons input.create {
     background: transparent url(../icons/database_add.png) 5px 50% no-repeat;
     padding-left: 28px;
