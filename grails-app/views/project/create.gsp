@@ -272,15 +272,12 @@
 	%>
 </head>
 <body>
-
 	<div class="body">
 		<h1>Create Project</h1>
 		<br/>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
-
 		</g:if> 
-
 		<g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
 			<div class="dialog">
 				<table>
@@ -305,8 +302,9 @@
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
 								<input type="text" id="projectCode" name="projectCode" maxlength="20" value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
 								<g:hasErrors bean="${projectInstance}" field="projectCode">
-									<div class="errors"><g:renderErrors bean="${projectInstance}"
-										as="list" field="projectCode" /></div>
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list" field="projectCode" />
+									</div>
 								</g:hasErrors>
 							</td>
 						</tr>
@@ -339,9 +337,12 @@
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 								<textarea rows="3" cols="40" id="description" name="description" 
 									onkeydown="textCounter(this.id,200);" 
-									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
+									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}
+								</textarea>
 								<g:hasErrors bean="${projectInstance}" field="description">
-									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="description" /></div>
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list" field="description" />
+									</div>
 								</g:hasErrors>
 							</td>
 							<td class="name">
@@ -350,13 +351,15 @@
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
 								<textarea rows="3" cols="40" id="comment" name="comment"
 									onkeydown="textCounter(this.id,200);"
-									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
+									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}
+								</textarea>
 								<g:hasErrors bean="${projectInstance}" field="comment">
-									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="comment" /></div>
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list" field="comment" />
+									</div>
 								</g:hasErrors>
 							</td>
 						</tr>
-
 						<tr class="prop">
 							<td class="name">
 								<label for="startDate">Start Date:</label>
@@ -366,7 +369,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
-									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/> 
+									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);" /> 
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="startDate" />
@@ -382,8 +385,8 @@
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	name="completionDate"
-									value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);"/>
+								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	
+									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
 								</g:hasErrors>
@@ -411,9 +414,8 @@
 								<input type="file" name="partnerImage" id="partnerImage" />
 							</td>
 						</tr>
-
 						<tr class="prop">
-							<td class="name" colspan="1">
+							<td class="name">
 								<label for="projectManager">Project Manager:</label>
 							</td>
 							<td class="valueNW">
@@ -426,8 +428,8 @@
 									</optgroup>
 								</select>
 							</td>
-							<td class="name" colspan="1">
-								<label for="moveManager">Move Manager:</label>
+							<td class="name">
+								<label for="moveManager">Event Manager:</label>
 							</td>
 							<td class="valueNW">
 								<select id="moveManagerId" name="moveManager">
@@ -438,23 +440,24 @@
 										</g:each>
 									</optgroup>
 								</select>
-								<input type="hidden" id="companyManagersId" value="${managers.size()}"/>
+								<input type="hidden" id="companyManagersId" value="${managers.size()}" />
 							</td>
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="workflowCode">Workflow Code:</label>
+								<label for="workflowCode">Workflow:</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
-									value="${projectInstance?.workflowCode}" noSelection="['':'Please Select']">
+									value="${projectInstance?.workflowCode}"
+									noSelection="['':'Please Select']">
 								</g:select> &nbsp;&nbsp;
 								<span class="name">
 									<label for="runbookOn">Runbook Driven:&nbsp;</label>
 								</span>
-								<span class="value ${hasErrors(bean:projectInstance,field:'runbookOn','errors')}">&nbsp;
-									<input type="checkbox" name="runbookOn" id="runbookOn" ${projectInstance.runbookOn ? 'checked="checked"' : ''}>
+								<span class="value ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
+									<input type="checkbox" name="runbookOn" id="runbookOn" ${projectInstance.runbookOn ? 'checked="checked"' : ''} />
 									<g:hasErrors bean="${projectInstance}" field="runbookOn">
 										<div class="errors">
 											<g:renderErrors bean="${projectInstance}" as="list" field="runbookOn" />
@@ -470,23 +473,20 @@
 							<td class="name">
 								<label for="trackChanges">Display Transitions in Status bar:</label>
 							</td>
-							<td>
+							<td colspan="3">
 								<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 
 								value="${projectInstance.trackChanges}" valueMessagePrefix="project.trackChanges"></g:select>
 							</td>
-							
 						</tr>
-
-
 					</tbody>
 				</table>
 			</div>
 			<div class="buttons">
 				<span class="button">
-					<input class="save" type="submit" value="Save" onclick="return validateDates();"/>
+					<input class="save" type="submit" value="Save" onclick="return validateDates();" />
 				</span>
 				<span class="button">
-					<input type="button" class="cancel" value="Cancel" onclick="window.history.back()"/>
+					<input type="button" class="cancel" value="Cancel" onclick="window.history.back()" />
 				</span>
 			</div>
 		</g:form>

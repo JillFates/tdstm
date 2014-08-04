@@ -8,7 +8,7 @@
 	<% def currProj = session.getAttribute("CURR_PROJ");
 			    def projectId = currProj.CURR_PROJ ;
 			    def currProjObj;
-			    if( projectId != null){
+				if( projectId != null) {
 				currProjObj = Project.findById(projectId);
 			    }
 		%>
@@ -16,20 +16,19 @@
 <body>
 	<div class="body">
 		<h1>Edit Project</h1>
-
 		<br/>
             <g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
+				<div class="message">${flash.message}</div>
             </g:if>
-            <g:form method="post" action="update" name="editProjectForm" enctype="multipart/form-data">
+            <g:form action="update" method="post" name="editProjectForm" enctype="multipart/form-data">
 			<div class="dialog">
 				<table>
 					<tbody>
-		                        <tr>
+						<tr>
 							<td colspan="4"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Associated Client:</td>
+							<td class="name">Client:</td>
 					
 							<td class="valueNW">${projectInstance?.client}</td>
 					
@@ -46,13 +45,13 @@
 						</tr>           
 						<tr class="prop">
 							<td class="name">
-								<label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b>:</label>
+								<label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'name','errors')}">
-								<input type="text" id="name" name="name" value="${fieldValue(bean:projectInstance,field:'name')}"/>
+								<input type="text" id="name" name="name" maxlength="64" value="${fieldValue(bean:projectInstance,field:'name')}" />
 								<g:hasErrors bean="${projectInstance}" field="name">
 									<div class="errors">
-										<g:renderErrors bean="${projectInstance}" as="list" field="name"/>
+										<g:renderErrors bean="${projectInstance}" as="list" field="name" />
 									</div>
 								</g:hasErrors>
 							</td>
@@ -71,10 +70,13 @@
 								<label for="description">Description:</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
-								<textarea cols="40"  rows="3" id="description" name="description" onkeydown="textCounter(this.id,200);" onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
+								<textarea rows="3" cols="40" id="description" name="description"
+									onkeydown="textCounter(this.id,200);"
+									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}
+								</textarea>
 								<g:hasErrors bean="${projectInstance}" field="description">
 									<div class="errors">
-										<g:renderErrors bean="${projectInstance}" as="list" field="description"/>
+										<g:renderErrors bean="${projectInstance}" as="list" field="description" />
 									</div>
 								</g:hasErrors>
 							</td>
@@ -82,10 +84,13 @@
 								<label for="comment">Comment:</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
-								<textarea cols="40"  rows="3" name="comment" id="comment" onkeydown="textCounter(this.id,200);" onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
+								<textarea rows="3" cols="40" id="comment" name="comment"
+									onkeydown="textCounter(this.id,200);"
+									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}
+								</textarea>
 								<g:hasErrors bean="${projectInstance}" field="comment">
 									<div class="errors">
-										<g:renderErrors bean="${projectInstance}" as="list" field="comment"/>
+										<g:renderErrors bean="${projectInstance}" as="list" field="comment" />
 									</div>
 								</g:hasErrors>
 							</td>
@@ -98,22 +103,25 @@
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" name="startDate" id="startDateId"
-									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);"/>
+								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
+									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="startDate">
-									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="startDate" /></div>
+									<div class="errors">
+										<g:renderErrors bean="${projectInstance}" as="list" field="startDate" />
+									</div>
 								</g:hasErrors>
 							</td>
 							<td class="name">
-								<label for="completionDate"><b>Completion Date:&nbsp;<span style="color: red">*</span></b></label>
+								<label for="completionDate">
+									<b>Completion Date:&nbsp;<span style="color: red">*</span></b>
+								</label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'completionDate','errors')}">
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width:112px;height:14px;" id="completionDateId" 
-									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value)"/>
-
+								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId" 
+									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
 								</g:hasErrors>
@@ -125,7 +133,9 @@
 								<label for="projectPartner">Partner:</label>
 							</td>
 							<td class="valueNW">
-								<select id="projectPartnerId" name="projectPartner" onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
+								<select id="projectPartnerId" 
+								name="projectPartner" 
+								onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
 									<option value="" selected="selected">None</option>
 									<g:each status="i" in="${companyPartners}" var="companyPartners">
 										<option value="${companyPartners?.partyIdTo.id}">${companyPartners?.partyIdTo}</option>
@@ -142,7 +152,7 @@
 							</g:if>
 							<g:else>				
 								<td class="valueNW">
-									<input type="file" name="partnerImage" id="partnerImage"/>
+									<input type="file" name="partnerImage" id="partnerImage" />
 								</td>				
 							</g:else>
 						</tr>
@@ -171,7 +181,7 @@
 								</select>
 							</td>
 							<td class="name">
-								<label for="moveManager">Move Manager:</label>
+								<label for="moveManager">Event Manager:</label>
 							</td>
 							<td class="valueNW">
 								<select id="moveManagerId" name="moveManager">
@@ -196,20 +206,20 @@
 							</td>
 						</tr>
 						<tr class="prop">
-							
-							<td class="name">Workflow Code:</td>
-							
+							<td class="name">
+								<label for="workflowCode">Workflow:</label>
+							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
-									noSelection="['':'Please Select']" onChange="warnForWorkflow()"></g:select>
-								&nbsp;&nbsp;
+									noSelection="['':'Please Select']" onChange="warnForWorkflow()">
+								</g:select> &nbsp;&nbsp;
 								<span class="name">
-									<label for="runbookOn">Runbook Driven:</label>
-								</span>&nbsp;
+									<label for="runbookOn">Runbook Driven:&nbsp;</label>
+								</span>
 								<span class="valueNW ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
-									<input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn == 1 ? 'checked="checked"':'') } />
+									<input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn == 1 ? 'checked="checked"' : '') } />
 								</span>
 								<g:hasErrors bean="${projectInstance}" field="workflowCode">
 									<div class="errors">
@@ -217,18 +227,21 @@
 									</div>
 								</g:hasErrors>
 							</td>
-							<td class="name">Default Move Bundle:</td>
+							<td class="name">Default Bundle:</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
 								<g:select id="defaultBundle" name="defaultBundle.id"
 									from="${moveBundles}" optionKey="id" optionValue="name"
 									value="${projectInstance?.defaultBundle.id}"></g:select>
 							</td>
-						
 						</tr>
 						<tr class="prop">
-						
+							<td class="name"><label for="dateCreated">Date Created:</label></td>
+							<td class="valueNW">
+								<tds:convertDateTime date="${projectInstance?.dateCreated}"
+									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							</td>
 							<td class="name">
-								<label for="inProgress">Display Transitions in Status bar:</label>
+								<label for="trackChanges">Display Transitions in Status bar:</label>
 							</td>
 							<td class="valueNW">
 								<g:select id="trackChanges"
@@ -242,39 +255,26 @@
 									</div>
 								</g:hasErrors>
 							</td>
-								
-	
-							<td class="name">
-								<label for="dateCreated">Date Created:</label>
-							</td>
-							<td class="valueNW">
-								<tds:convertDateTime date="${projectInstance?.dateCreated}"
-									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-							</td>
-							
 						</tr>
 						<tr>
-							<td class="name">
-								<label for="lastUpdated">Last Updated:</label>
-							</td>
-							<td class="valueNW">
+							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
+							<td class="valueNW" colspan="3">
 								<tds:convertDateTime date="${projectInstance?.lastUpdated}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 						</tr>
-						
 					</tbody>
 				</table>
 			</div>
 			<div class="buttons">
 				<span class="button">
-					<g:actionSubmit class="save" value="Update" onclick="return validateDates()" />
+					<g:actionSubmit class="save" value="Update" onclick="return validateDates();" />
 				</span>
 				<span class="button">
 					<g:actionSubmit class="delete" onclick="if(confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?')){document.editProjectForm.action = 'delete'};" value="Delete" />
 				</span>
 				<span class="button">
-					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/project/show/${projectInstance?.id}'"/>
+					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/project/show/${projectInstance?.id}'" />
 				</span>
 			</div>
 		</g:form>

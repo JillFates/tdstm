@@ -55,7 +55,7 @@
 							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
 						<tr class="prop">
-										<td class="name">Associated Partner:</td>
+							<td class="name">Associated Partner:</td>
 							<td class="valueNW">${projectPartner?.partyIdTo}</td>
 							<td class="name">Partner Image:</td>
 							<td class="valueNW">
@@ -73,12 +73,10 @@
 				<table style="border-style:none solid none solid;">
 					<tbody>
 						<tr class="prop">
-							<td class="name">Workflow Code:</td>
+							<td class="name">Workflow:</td>
 							<td class="valueNW" nowrap="nowrap">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;
-							</td>
-							<td>
-							<span class="name">Runbook Driven: </span>&nbsp;</td>
-							<td><span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
+								<span class="name">Runbook Driven: </span>&nbsp;
+								<span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
 								${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
 							</td>
 							<td class="name">Default Bundle:</td>
@@ -86,18 +84,14 @@
 							
 						</tr>
 						<tr class="prop">
-							<td class="name">Display Transitions in Status bar:</td>
-							<td class="valueNW" colspan="3"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
-							<td class="name">
-								<label for="dateCreated">Date Created:</label>
-							</td>
+							<td class="name"><label for="dateCreated">Date Created:</label></td>
 							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							<td class="name">Display Transitions in Status bar:</td>
+							<td class="valueNW"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
 						</tr>
 						<tr>
-							<td class="name">
-								<label for="lastUpdated">Last Updated:</label>
-							</td>
-							<td class="valueNW" colspan="5"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
+							<td class="valueNW" colspan="3"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
 						
 						</tr>
 					</tbody>
