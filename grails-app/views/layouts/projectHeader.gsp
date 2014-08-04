@@ -203,7 +203,7 @@
 			</li>
 			</tds:hasPermission>
 
-			<li id="projectMenuId" class="menuLiIndex" style="position:relative; float: left;" ><a class="home headerClass" onmouseover="hoverMegaMenu('#projectMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#projectMegaMenu')">Client/Project</a>
+			<li id="projectMenuId" class="menuLiIndex" style="position:relative; float: left;" ><a class="home headerClass" onmouseover="hoverMegaMenu('#projectMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#projectMegaMenu')">Projects</a>
 				<div class="megamenu client inActive" id="projectMegaMenu">
 					<table class="mmtable"><tr>
 						<td style="vertical-align:top">
@@ -211,7 +211,7 @@
 								<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
 							</ul>
 					<g:if test="${currProjObj}">
-						<span class="megamenuSection"> </span><br />
+						<span class="megamenuSection"> </span>
 							<ul >
 								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
 								<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
@@ -231,25 +231,18 @@
 				
 			</li>
 
-			<li id="roomMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Rooms/Racks</a>
+			<li id="roomMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Data Centers</a>
 				<div class="megamenu rooms inActive" id="racksMegaMenu">
 					<table class="mmtable room_rack" ><tr>
-					<td style="vertical-align:top"><span class="megamenuSection">Rooms</span><br />
+					<td style="vertical-align:top"><span class="megamenuSection">Rooms and Racks</span><br />
 						<ul >
 							<li><g:link class="mmlink" params="[viewType:'list']" controller="room"  onclick="hideMegaMenu('racksMegaMenu')">List Rooms</g:link></li>
 							<g:if test="${roomId}">
 								<li><g:link class="mmlink" params="[roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
 							</g:if>
-							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Racks</span><br />
-						<ul >
 							<li><g:link class="mmlink" controller="rackLayouts" action="create" onclick="hideMegaMenu('racksMegaMenu')">Racks</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRacks?cover=print','help');" onclick="hideMegaMenu('racksMegaMenu')">help</a></li>
+							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
 							</tds:hasPermission>
 						</ul>
 					</td>
@@ -262,13 +255,14 @@
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
 						<ul>
-							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary</g:link></li>	
+							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary Table</g:link></li>	
 							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconApp.png" height="12" /> Applications</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconServer.png" height="12" /> Servers</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconServer.png" height="12" /> All Devices</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconDB.png" height="12" /> Databases</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconStorage.png" height="12" /> Storage Devices (Physical)</g:link></li>
-							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconStorage.png" height="12" /> Storage items (Logical)</g:link></li>
+							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconStorage.png" height="12" /> Logical Storage</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">Comments</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')"> Dependencies</g:link></li>
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependency Analyzer</g:link></li>
@@ -283,16 +277,13 @@
 					
 						<ul>
 							<tds:hasPermission permission='Import'>
-							<li><g:link class="mmlink" controller="assetEntity" action="assetImport"  onclick="hideMegaMenu('assetMegaMenu')">Import</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="assetImport"  onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetEdit'>
 							<li><g:link class="mmlink" controller="dataTransferBatch" action="index" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='Export'>
-							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export</g:link></li>
-							</tds:hasPermission>
-							<tds:hasPermission permission='AssetMenuView'>
-							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">Asset Comments</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="exportAssets"  onclick="hideMegaMenu('assetMegaMenu')">Export Assets</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
@@ -305,14 +296,14 @@
 			</li>
 			</tds:hasPermission>
 			<tds:hasPermission permission='EventMenuView'>
-			<li id="eventMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#bundleMegaMenu')">Events/Bundles </a>
+			<li id="eventMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#bundleMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#bundleMegaMenu')">Planning</a>
 				<div class="megamenu rooms inActive" id="bundleMegaMenu">
 					<table class="mmtable " ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 						<ul>
 							<li><g:link class="mmlink" controller="moveEvent" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
 							<g:if test="${currProjObj && moveEvent}">
-								<span class="megamenuSection"> </span><br />
+								<span class="megamenuSection"> </span>
 								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEventId}" onclick="hideMegaMenu('bundleMegaMenu')">${moveEventName} Event Details</g:link></li>
 							</g:if>
 							<tds:hasPermission permission='ShowListNews'>
@@ -331,7 +322,7 @@
 						<ul>
 							<li><g:link class="mmlink" controller="moveBundle" action="list">List Bundles</g:link> </li>
 					<g:if test="${currProjObj && moveBundleId}">
-							<span class="megamenuSection"> </span><br />
+							<span class="megamenuSection"> </span>
 							<li><g:link class="mmlink" controller="moveBundle" action="show"  onclick="hideMegaMenu('bundleMegaMenu')">${moveBundleName} Bundle Details</g:link></li>
 							<li><g:link class="mmlink" controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]" onclick="hideMegaMenu('bundleMegaMenu')">Bundled Assets</g:link> </li>
 					</g:if>
@@ -364,7 +355,7 @@
 							</tds:hasPermission>
 
 							<tds:hasPermission permission='ViewTaskTimeline'>
-							<li><g:link class="mmlink" controller="task" action="taskTimeline" onclick="hideMegaMenu('teamMegaMenu')">Timeline</g:link></li>
+							<li><g:link class="mmlink" controller="task" action="taskTimeline" onclick="hideMegaMenu('teamMegaMenu')">Task Timeline</g:link></li>
 							</tds:hasPermission>
 
 							<tds:hasPermission permission="ViewRecipe">
