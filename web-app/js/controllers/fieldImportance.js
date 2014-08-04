@@ -41,7 +41,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		$scope.toggleSection('Application');
 	});
 	$scope.phases=fieldFactory.getPhases();
-	$scope.data = ['C','I','N','H'];
+	$scope.data = ['C','I','N', 'U','H'];
 	//initializing section
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 	
@@ -59,6 +59,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		{'id':'C','field':'Name','type':'svoradb01','imp':'C)ritical'},
 	    {'id':'I','field':'Type','type':'Server','imp':'I)mportant'},
 	    {'id':'N','field':'Manufacturer','type':'HP','imp':'N)ormal'},
+	    {'id':'U','field':'*Standard ONLY*','type':'','imp':'U)nimportant'}
 	    {'id':'H','field':'*Custom ONLY*','type':'','imp':'H)idden'}
 	];
 	var tempSec = ''

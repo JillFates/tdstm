@@ -33,7 +33,7 @@
 				</tr>
 			</table>
 		</div>
-		<div data-ng-init="types=[{'id':'Application','name':'Application'},{'id':'AssetEntity','name':'AssetEntity'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
+		<div data-ng-init="types=[{'id':'Application','name':'Application'},{'id':'Device','name':'AssetEntity'},{'id':'Database','name':'Database'},{'id':'Storage','name':'Files'}]">
 		
 		<tabset>
    			 <tab ng-repeat="type in types" ng-click="toggleSection(type.name)" heading="{{type.id}}">
