@@ -342,6 +342,7 @@ td.buttonR .powerIcon {
 .buttons input.cancel {
     background: transparent;
     padding-left: 10px;
+    color: #214aa0 !important
 }
 .buttons input.show {
     background: transparent url(../icons/database_table.png) 5px 50% no-repeat;
@@ -492,6 +493,10 @@ span.cellWithoutBackground
 .H{
 	background-color:#CCCCCC !important;
 }
+.U{
+	color:darkgray !important;
+}
+
 .legend{
 	position:absolute;
 	margin-top:-5px;
