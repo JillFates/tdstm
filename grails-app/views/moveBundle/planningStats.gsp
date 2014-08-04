@@ -140,7 +140,7 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:otherAssetCount,filter:'other',assetType:'assetEntity',title:'Other Assets',validate:otherToValidate,barId:'assetbar',iconName:'iconNetwork.png']"></g:render>
+							model="[assetCount:otherAssetCount,filter:'other',assetType:'assetEntity',title:'Other Devices',validate:otherToValidate,barId:'assetbar',iconName:'iconNetwork.png']"></g:render>
 					</tr>
 				</table>
 				<br />

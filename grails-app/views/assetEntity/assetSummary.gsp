@@ -16,9 +16,9 @@
 	     <th>Bundle</th>
 	     <th style="text-align:center;"><g:link controller="application" action="list">Applications</g:link> </th>
 	     <th style="text-align:center;"><g:link controller="assetEntity" action="list" params="[listType:'server']">Servers</g:link></th>
-	     <th style="text-align:center;"><g:link controller="assetEntity" action="list" params="[listType:'physical']">Physical Assets</g:link></th>
+	     <th style="text-align:center;"><g:link controller="assetEntity" action="list" params="[listType:'physical']">Physical Devices</g:link></th>
 	     <th style="text-align:center;"><g:link controller="database" action="list">Database</g:link></th>
-	     <th style="text-align:center;"><g:link controller="files" action="list">Storage</g:link></th>
+	     <th style="text-align:center;"><g:link controller="files" action="list">Logical Storage</g:link></th>
 	   </tr>
     </thead>
    
