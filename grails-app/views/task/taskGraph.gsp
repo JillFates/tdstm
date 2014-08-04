@@ -239,7 +239,6 @@
 						isRegex = _.isRegExp(regex);
 					} catch (e) {
 						alert(e);
-						$('#searchBoxId').val('');
 						searchString = '';
 					}
 				}

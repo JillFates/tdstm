@@ -217,3 +217,27 @@ div.itemLabel {
 div.body {
 	width: 100%;
 }
+polygon.highlighted.mainItem {
+	stroke-width: 6px !important;
+	stroke: #ff0000 !important;
+}
+polygon.highlighted.miniItem {
+	stroke: #ff0000 !important;
+	fill: #448000 !important;
+}
+
+/* for the task search box */
+form#taskSearchFormId {
+	display: inline-block !important;
+}
+span#filterClearId {
+	position: absolute !important;
+	display: inline !important;
+	margin-top: 4px !important;
+	cursor: pointer !important;
+	opacity: 1 !important;
+}
+span#filterClearId.disabled {
+	opacity: 0.3 !important;
+	cursor: auto !important;
+}

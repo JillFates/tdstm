@@ -42,6 +42,7 @@ THE SOFTWARE.
 		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<g:javascript src="lodash/lodash.min.js" />
 
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
@@ -58,9 +59,14 @@ THE SOFTWARE.
 			</g:if>
 			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
 			&nbsp; Role: <select name="roleSelect" id="rolesSelectId"></select>
-	            &nbsp; Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30"/>
+	            &nbsp; Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30" size="3"/>
 			&nbsp; Use Heights: <input type="checkbox" id="useHeightCheckBoxId" checked="checked"/>
 			&nbsp; Hide Redundant: <input type="checkbox" id="hideRedundantCheckBoxId" checked="checked"/>
+			<form onsubmit="return performSearch()" id="taskSearchFormId">
+				&nbsp; Search: <input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
+				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
+				&nbsp; <input type="submit" name="Submit Button" id="SubmitButtonId" value="Filter" />
+			</form>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<g:render template="../assetEntity/initAssetEntityData"/>
 		</div>

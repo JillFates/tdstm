@@ -1,5 +1,14 @@
 
+// global functions for accessing the graph outside the scope of the main function
+var getData = function () {return null}
+var forceDisplay = function () {return null}
+
 $(document).ready(function () {
+	// check keyup on the search field for the enter key
+	$('#searchBoxId').keyup( function (e) {
+		if (e.keyCode == 13)
+			$('#SubmitButtonId').submit();
+	});
 	generateGraph();
 });
 
@@ -7,7 +16,12 @@ function buildGraph (response, status) {
 	
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
-
+	
+	// calculate the position for the filter clear button
+	$('#filterClearId').css('left', function () {
+		return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
+	});
+	
 	// check for errors in the ajax call
 	if (status == 'error') {
 		var message = d3.select('div.body')
@@ -104,6 +118,7 @@ function buildGraph (response, status) {
 	// construct the SVG
 	var chart = d3.select('div.body')
 		.append('svg:svg')
+		.attr('id', 'timelineSVGId')
 		.attr('width', width + margin.right + margin.left)
 		.attr('height', height + margin.top + margin.bottom + 20)
 		.attr('class', 'chart unselectable');
@@ -411,7 +426,23 @@ function buildGraph (response, status) {
 	var offsetInitial =  -1 * x(brush.extent()[0]);
 	ready = true;
 	display(true, true);
-
+			
+	// calculate the position for the filter clear button
+	$('#filterClearId').css('left', function () {
+		return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
+	});
+	
+	/* define the global accessor functions */
+	
+	getData = function () {
+		return data;
+	}
+	
+	forceDisplay = function () {
+		display(false, true);
+	}
+	
+	// called when the brush is dragged
 	function brushed () {
 		drawing = false;
 		if (d3.event.mode == "move")
@@ -603,6 +634,7 @@ function buildGraph (response, status) {
 			+ (d.redundant ? 'redundant ' : '')
 			+ (d.cyclical ? 'cyclical ' : '')
 			+ (d.end < now() ? 'past ' : 'future ')
+			+ (d.highlight ? 'highlighted ' : '')
 			+ (hideRedundant ? 'hidden ' : '')
 			+ (d.status);
 		if (d.status != 'Completed' && d.end < now())
@@ -633,7 +665,7 @@ function buildGraph (response, status) {
 	function getPointsMini (d) {
 		var offset = Math.floor((Math.max(1, d.height)-1)/2);
 		var xa = x(d.start);
-		var ya = (d.stack-offset) * (miniRectHeight);
+		var ya = (d.stack - offset) * (miniRectHeight);
 		var w = x(d.end) - x(d.start);
 		var h = (miniRectHeight) * Math.max(1, d.height);
 		return xa + ',' + ya + ' '
@@ -984,7 +1016,9 @@ function buildGraph (response, status) {
 		 - populates the dependencies list from data in the items list 
 		 - corrects any impossible start times for tasks */
 	function sanitizeData (tasks, dependencies) {
-	
+		
+		data.searchFilter = '';
+		
 		for (var i = 0; i < items.length; ++i) {
 			items[i].successors = [];
 			items[i].predecessors = [];
@@ -1927,4 +1961,59 @@ function generateGraph (event) {
 		type:'GET',
 		complete: buildGraph
 	});
+}
+
+// highlight tasks matching the user's regex
+function performSearch () {
+	console.log('search');
+	if ($('svg#timelineSVGId') != null) {
+		var searchString = $('#searchBoxId').val();
+		var data = getData();
+		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length-1) == '/');
+		var isRegex = false;
+		var regex = /.*/;
+		
+			
+		// check if the user entered an invalid regex
+		if (hasSlashes) {
+			try {
+				regex = new RegExp(searchString.substring(1, searchString.length-1));
+				isRegex = _.isRegExp(regex);
+			} catch (e) {
+				alert(e);
+				//$('#searchBoxId').val('');
+				searchString = '';
+			}
+		}
+		
+		data.searchFilter = searchString;
+		if (searchString != '') {
+			$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
+		} else {
+			$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
+		}
+		
+		_(data.items).forEach(function (task, i) {
+			
+			var name = task.name;
+			
+			if (searchString == '') {
+				task.highlight = false;
+			} else {
+				if (isRegex && name.match(regex) != null)
+					task.highlight = true;
+				else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
+					task.highlight = true;
+				else
+					task.highlight = false;
+			}
+		});
+		forceDisplay();
+	}
+	return false;
+}
+
+function clearFilter () {
+	$('#searchBoxId').val('');
+	performSearch();
 }
