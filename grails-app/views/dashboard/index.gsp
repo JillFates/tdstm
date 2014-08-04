@@ -63,7 +63,7 @@
 							<option value="never" selected="selected">Never</option>
 						</select>
 					</div>
-					/*<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>*/
+					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
 				</div>
 				<input type="hidden" id="typeId" value="${params.type}"> 
 				<input type="hidden" id="stateId" value="${params.state}"> 
@@ -474,7 +474,7 @@
 		var lastStep = $('div.show_bundle_step').children().last();
 		var rightArrow = $('div#rightarrow a img');
 		var leftArrow = $('div#leftarrow a img');
-		
+
 		// check left arrow
 		if (themes.css('left') == '0px' || themes.css('left') == 'auto')
 			leftArrow.addClass('disabled');
@@ -482,10 +482,12 @@
 			leftArrow.removeClass('disabled');
 		
 		// check right arrow
-		if (lastStep.offset().left + lastStep.outerWidth() - rightArrow.offset().left < 10)
-			rightArrow.addClass('disabled');
-		else
-			rightArrow.removeClass('disabled');
+		if(lastStep){
+			if (lastStep.offset().left + lastStep.outerWidth() - rightArrow.offset().left < 10)
+				rightArrow.addClass('disabled');
+			else
+				rightArrow.removeClass('disabled');
+		}
 	}
 	
 	if (tz) {
