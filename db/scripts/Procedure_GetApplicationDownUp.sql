@@ -65,7 +65,7 @@ SQL SECURITY DEFINER
 		-- Set the down_at time if the app is down
 		UPDATE apps SET down_at = ( 
 			COALESCE(
-				( SELECT IF(status IN ('Started', 'Completed'), CONVERT_TZ(task.act_start, GMT_TZ, tzOffset), null)
+				( SELECT IF(status IN ('Started', 'Completed'), CONVERT_TZ(task.date_resolved, GMT_TZ, tzOffset), null)
 				FROM asset_comment task
 				WHERE task.move_event_id=eventId AND 
 					task.asset_entity_id=apps.id AND 
