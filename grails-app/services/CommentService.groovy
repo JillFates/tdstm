@@ -37,6 +37,7 @@ class CommentService {
 	def taskService
 	def userPreferenceService
 	def assetEntityService
+	def sequenceService
 
 	// TODO : This should use an array defined in AssetCommentCategory instead as that is where people will add new statuses
 	private final List<String> statusToSendEmailFor = [
@@ -115,8 +116,7 @@ class CommentService {
 				assetComment.createdBy = userLogin.person
 				assetComment.project = project
 				if (params.commentType == AssetCommentType.TASK) {
-					def lastTask = jdbcTemplate.queryForInt("SELECT MAX(task_number) FROM asset_comment WHERE project_id = ${project.id}")
-					assetComment.taskNumber = lastTask + 1
+					assetComment.taskNumber = sequenceService.next(project.client.id, 'TaskNumber')
 				}
 				if (assetEntity) {
 					assetComment.assetEntity = assetEntity
