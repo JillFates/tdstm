@@ -565,6 +565,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		columnDefs: 'clone.colDef',
 		selectedItems: [],
 		enableCellEditOnFocus: false,
+		enableHighlighting: true,
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.clone.currentSelectedRecipeRow){
 				scope.clone.currentSelectedRecipeRow = rowItem;
@@ -1170,6 +1171,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 		selectedItems: [],
 		plugins: [layoutPluginTasks],
 		enableCellEditOnFocus: false,
+		enableHighlighting: true,
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.tasks.currentSelectedTaskRow){
 				scope.tasks.currentSelectedTaskRow = rowItem;
@@ -1464,6 +1466,7 @@ tds.cookbook.controller.TaskBatchHistoryTasksController = function(scope, state,
 		selectedItems: [],
 		plugins: [layoutPluginTasks],
 		enableCellEditOnFocus: false,
+		enableHighlighting: true,
 		afterSelectionChange: function(rowItem) {
 			if(rowItem.selected){
 				log.info(rowItem.commentId);
@@ -1946,6 +1949,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		multiSelect: false,
 		columnDefs: 'groups.colDef',
 		enableCellEditOnFocus: false,
+		enableHighlighting: true,
 		selectedItems: [],
 		plugins: [layoutPluginGroups],
 		afterSelectionChange: function(rowItem){
@@ -1990,6 +1994,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		multiSelect: false,
 		columnDefs: 'assets.colDef',
 		enableCellEditOnFocus: false,
+		enableHighlighting: true,
 		selectedItems: [],
 		afterSelectionChange: function(rowItem){
 			if(rowItem != scope.assets.selectedAsset){
@@ -2233,6 +2238,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 		multiSelect: false,
 		columnDefs: 'versions.colDef',
 		enableCellEditOnFocus: false,
+		enableHighlighting: true,
 		selectedItems: [],
 		plugins: [layoutPluginVersions],
 		afterSelectionChange: function(rowItem){
