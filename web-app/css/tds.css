@@ -176,6 +176,7 @@
 	color:#9acaee;
 	padding:2px 6px;
 	border-right:1px solid #1376C0;
+	box-sizing: content-box;
 }
 .menu2 .title1 {
 	width:auto;
