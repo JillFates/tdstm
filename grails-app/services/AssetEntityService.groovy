@@ -845,7 +845,7 @@ class AssetEntityService {
 		
 		bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Servers" )
+		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Devices" )
 		def appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
 		def dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 		def fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
@@ -860,7 +860,7 @@ class AssetEntityService {
 		def database
 		def files
 		def assetEntityInstance
-		if(bundle[0] == "" ) {
+		if (bundle[0] == "") {
 			asset = AssetEntity.findAll("from AssetEntity m where m.project=:project and m.assetClass = :assetClass",
 						[project:project, assetClass:AssetClass.DEVICE] )
 			application =Application.findAllByProject( project )

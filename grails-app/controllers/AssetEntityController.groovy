@@ -284,7 +284,7 @@ class AssetEntityController {
 		}
 
 		def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
-		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Servers" )
+		def serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Devices" )
 		def appDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Applications" )
 		def databaseDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Databases" )
 		def filesDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Files" )
@@ -301,7 +301,7 @@ class AssetEntityController {
 		// create workbook
 		def workbook
 		def titleSheet
-		def sheetNameMap = ['Title','Applications','Servers','Databases','Storage','Dependencies','Cabling']
+		def sheetNameMap = ['Title','Applications','Devices','Databases','Storage','Dependencies','Cabling']
 		def appNameMap = [:]
 		def databaseNameMap = [:]
 		def filesNameMap = [:]
@@ -359,7 +359,7 @@ class AssetEntityController {
 				return
 			}
 
-			def serverSheet = workbook.getSheet( "Servers" )
+			def serverSheet = workbook.getSheet( "Devices" )
 			def appSheet = workbook.getSheet( "Applications" )
 			def databaseSheet = workbook.getSheet( "Databases" )
 			def filesSheet = workbook.getSheet( "Storage" )
@@ -423,7 +423,7 @@ class AssetEntityController {
 				//Add Data to dataTransferBatch.
 				def serverColNo = 0
 				for (int index = 0; index < serverCol; index++) {
-					if(serverSheet.getCell( index, 0 ).contents == "Server"){
+					if(serverSheet.getCell( index, 0 ).contents == "Name"){
 						serverColNo = index
 					}
 				}

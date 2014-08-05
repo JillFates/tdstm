@@ -106,4 +106,5 @@ databaseChangeLog = {
 	include file: '20140709-add-defualt-bundle-to-project.groovy'
 	include file: '20140717-task-batch-add-recipe-id-field.groovy'
 	include file: '20140804-fix-asset-comment-task-number.groovy'
+	include file: '20140805-change-asset-import-export-fields.groovy'
 }
