@@ -1082,6 +1082,8 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 		cookbookService.getProgress({section: jobId}, {"id" : jobId}, function(data) {
 			scope.tasks.progressPercent = data.data.percentComp;
 			scope.tasks.progressRemaining = data.data.detail;
+			scope.tasks.show.progress = ((data.data.percentComp < 100) && 
+				                         ((data.data.status == "Pending") || (data.data.status == "Processing")));
 			
 			if (!scope.tasks.show.progress) {
 				clearInterval(scope.tasks.show.promise);
