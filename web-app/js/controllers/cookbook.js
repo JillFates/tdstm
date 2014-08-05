@@ -52,6 +52,11 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	// All Vars used
 	var listRecipes, columnSel, actionsTemplate, lastLoop, lastLoopData, rowToShow;
 
+	scope.editor = {
+		editingRecipe: false,
+		recipeType: 'wip'
+	};
+
 	// Default data to get recipes
 	scope.context = stateParams.context?stateParams.context:'All';
 	scope.archived = stateParams.archived?stateParams.archived:'n';
@@ -1522,8 +1527,8 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	scope.selectedRVersion = {}; // Recipe release version data
 	scope.selectedRWip = {}; // Recipe WIP data
 	scope.selectedRecipe = scope.selectedRVersion; // Active recipe, should be ref to selectedRVersion or selectedRWip
-	scope.recipeType = 'wip';
-	scope.editingRecipe= false;
+	scope.editor.editingRecipe = false;
+	scope.editor.recipeType = 'wip';
 	var justReleased = false;
 
 	var getRecipeData = function() {
@@ -1605,9 +1610,9 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			scope.selectedRWip.sourceCode = sourceCode;
 			scope.selectedRWip.changelog = scope.selectedRecipe.changelog;
 			recipeManager.setEditingRecipe(true);
-			scope.editingRecipe = true;
+			scope.editor.editingRecipe = true;
 			scope.selectedRecipe = scope.selectedRWip;
-			if (scope.recipeType != 'wip') {
+			if (scope.editor.recipeType != 'wip') {
 				scope.switchWipRelease('wip');
 			}
 		});
@@ -1633,23 +1638,27 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	scope.releaseVersion = function() {
 		var dataToSend = $.param(scope.selectedRecipe);
 		var selectedId = stateParams.recipeId;
-		var confirmation = confirm("You are about to create a release of the recipe that will be a perminant version of the source.\n\nPress OK to continue otherwise press Cancel.");
-		if (confirmation == true){
-			cookbookService.release({moreDetails:selectedId}, dataToSend, function(data) {
-				log.info('Success on Releasing');
-				alerts.addAlert({type: 'success', msg: 'Version Released', closeIn: 1500});
-				getRecipeData();
-				justReleased = true;
-				rootScope.$broadcast("refreshRecipes");
-			}, function(){
-				log.warn('Error on Saving WIP');
-				if(scope.selectedRecipe.hasWIP){
-					alerts.addAlert({type: 'danger', msg: 'Error: Unable to release version'});    
-				}else{
-					alerts.addAlert({type: 'danger', msg: 'Error: You can only release recipes'+
-						' saved as WIP'});
-				}
-			});
+		if (scope.editor.editingRecipe) {
+			alert("You have unsaved changes. Please click Save WIP or Undo before proceeding.");
+		} else {
+			var confirmation = confirm("You are about to create a release of the recipe that will be a perminant version of the source.\n\nPress OK to continue otherwise press Cancel.");
+			if (confirmation == true){
+				cookbookService.release({moreDetails:selectedId}, dataToSend, function(data) {
+					log.info('Success on Releasing');
+					alerts.addAlert({type: 'success', msg: 'Version Released', closeIn: 1500});
+					getRecipeData();
+					justReleased = true;
+					rootScope.$broadcast("refreshRecipes");
+				}, function(){
+					log.warn('Error on Saving WIP');
+					if(scope.selectedRecipe.hasWIP){
+						alerts.addAlert({type: 'danger', msg: 'Error: Unable to release version'});    
+					}else{
+						alerts.addAlert({type: 'danger', msg: 'Error: You can only release recipes'+
+							' saved as WIP'});
+					}
+				});
+			}
 		}
 	};
 	
@@ -1759,7 +1768,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	var updateVersionSelection = function() {
 		recipeManager.setActiveVersion(scope.selectedRVersion);
 		recipeManager.setWip(scope.selectedRWip);
-		scope.editingRecipe= false;
+		scope.editor.editingRecipe= false;
 		recipeManager.setEditingRecipe(false);
 		scope.switchWipRelease('wip');
 	}
@@ -1768,7 +1777,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 
 	// Switching RELEASE or WIP radio buttons functionality. 
 	scope.switchWipRelease = function(recipeTypeToShow){
-		scope.recipeType = recipeTypeToShow;
+		scope.editor.recipeType = recipeTypeToShow;
 
 		if (justReleased){
 			scope.selectedRWip.changelog = '';
@@ -1802,13 +1811,18 @@ tds.cookbook.controller.RecipeEditorController.$inject = ['$scope', '$rootScope'
 /********************************************************************************
  * Recipe Editor Logs controller
  */
-tds.cookbook.controller.RecipeEditorLogsController = function(scope, state, stateParams, utils, cookbookService) {
+tds.cookbook.controller.RecipeEditorLogsController = function(scope, state, stateParams, utils, cookbookService, recipeManager) {
 
 	scope.recipeId = stateParams.recipeId;
 
+	scope.onEditChangeLog = function() {
+		scope.editor.editingRecipe = true;
+		recipeManager.setEditingRecipe(true);
+	};
+
 }
 
-tds.cookbook.controller.RecipeEditorLogsController.$inject = ['$scope', '$state', '$stateParams', 'utils', 'cookbookService'];
+tds.cookbook.controller.RecipeEditorLogsController.$inject = ['$scope', '$state', '$stateParams', 'utils', 'cookbookService', 'recipeManager'];
 
 
 /********************************************************************************

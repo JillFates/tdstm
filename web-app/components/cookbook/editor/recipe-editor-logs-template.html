@@ -1,2 +1,2 @@
 <label for="logs" class="sr-only">Logs </label>
-<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="!currentSelectedRecipe || wipConfig[gridData[currentSelectedRow.rowIndex].recipeId].opt == 'release'" value="{{selectedRecipe.changelog}}"></textarea>
+<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="editor.recipeType == 'release'" ng-change="onEditChangeLog()" value="{{selectedRecipe.changelog}}"></textarea>

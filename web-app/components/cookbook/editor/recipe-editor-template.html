@@ -6,10 +6,10 @@
 			</span>
 			<div class="versionLinks col-xs-6" style="text-align: right;">
 				<label for="releasedVersionRadio" ng-show="selectedRVersion.versionNumber > 0">
-					<input type="radio" ng-model="recipeType" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{selectedRVersion.versionNumber}}
+					<input type="radio" ng-model="editor.recipeType" value="release" ng-change="switchWipRelease('release')" name="releasedWipVersion" id="releasedVersionRadio"> Version {{selectedRVersion.versionNumber}}
 				</label>
 				<label for="wipVersionRadio" style="margin-left: 15px;">
-					<input type="radio" ng-model="recipeType" value="wip" ng-change="switchWipRelease('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
+					<input type="radio" ng-model="editor.recipeType" value="wip" ng-change="switchWipRelease('wip')" name="releasedWipVersion" id="wipVersionRadio"> WIP
 				</label>
 			</div>
 		</div>
@@ -34,9 +34,9 @@
 		<div class="btn-group pull-left" style="margin-right:6px;">
 			<button type="button" title="Edit the recipe syntax" class="btn btn-default hasTooltip" ng-click="showEditPopup()">Edit</button>
 
-			<button type="button" class="btn btn-primary hasTooltip" ng-disabled="!selectedRecipe || !editingRecipe" ng-click="saveWIP()" title="Save the recipe changes as Work In Progress (WIP)">Save WIP</button>
+			<button type="button" class="btn btn-primary hasTooltip" ng-disabled="!selectedRecipe || !editor.editingRecipe" ng-click="saveWIP()" title="Save the recipe changes as Work In Progress (WIP)">Save WIP</button>
 
-			<button type="button" class="btn btn-default hasTooltip" ng-disabled="!editingRecipe" ng-click="cancelChanges()" title="Undo all edit changes to the recipe">Undo</button>
+			<button type="button" class="btn btn-default hasTooltip" ng-disabled="!editor.editingRecipe" ng-click="cancelChanges()" title="Undo all edit changes to the recipe">Undo</button>
 		</div>
 		<div class="btn-group pull-left" style="margin-right:6px;">
 			<button type="button" ng-disabled="!selectedRecipe.hasWIP || !selectedRecipe || selectedRecipe.versionNumber > 0" class="btn btn-default hasTooltip" ng-click="releaseVersion()" title="Create a release or version of the recipe that can not be altered">Release</button>

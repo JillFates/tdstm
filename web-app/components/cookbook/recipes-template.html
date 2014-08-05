@@ -1,7 +1,7 @@
 <form id="gridControls" class="row-fluid clearfix form-inline groups">
 	<div class="col-md-4 col-xs-4 form-group" style="position:relative; bottom:0;">
 		<label for="contextSelector">Context: 
-			<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editingRecipe" ng-change="changeRecipeList()"></select>
+			<select name="contextSelector" id="contextSelector" ng-model="context" ng-options="c for c in ['All', 'Event', 'Bundle', 'Application']" ng-disabled="editor.editingRecipe" ng-change="changeRecipeList()"></select>
 		</label>
 	</div>
 	<div class="col-md-4 col-xs-4 form-group text-center">
@@ -12,7 +12,7 @@
 	</div>
 	<div class="col-md-4 col-xs-4 form-group pull-right archiveCheckWrapper">
 			<label class="pull-right">
-				<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
+				<input type="checkbox" name="viewArchived" id="viewArchived" value="n" ng-model="archived" ng-true-value="y" ng-false-value="n" ng-disabled="editor.editingRecipe" ng-change="changeRecipeList()"> View Archived Recipes
 			</label>
 	</div>
 </form>
