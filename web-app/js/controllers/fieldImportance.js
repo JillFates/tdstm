@@ -2,9 +2,18 @@
 
 var app = angular.module("MyApp", ['ui.bootstrap']);
 
+/*
+app.service('customFieldNumber', function (field) {
+	console.log("field: " + field );
+	return '123';
+	//var regx = /.*_custom([\d]{1,2})$/;
+	//var match = regx.exec(str);
+	//return match ? match[1] : '';
+});
+*/
 //factory which return Fields,phases and importance
 app.factory('fieldFactory',function($http){
-	return{
+	return {
 		getFields : function() {
 			return $http({
 				url: contextPath+"/project/getAssetFields",
@@ -24,7 +33,7 @@ app.factory('fieldFactory',function($http){
 				url: contextPath+"/project/getImportance",
 				method: 'GET'
 			})
-		}
+		},
 	}
 });
 
@@ -41,7 +50,10 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		$scope.toggleSection('Application');
 	});
 	$scope.phases=fieldFactory.getPhases();
-	$scope.data = ['C','I','N', 'U','H'];
+
+	$scope.standardOptions = ['C','I','N','U'];
+	$scope.customOptions = ['C','I','N','U','H'];
+
 	//initializing section
 	$scope.section = {'AssetEntity':'h','Application':'h','Database':'h','Files':'h'};
 	
@@ -59,7 +71,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		{'id':'C','field':'Name','type':'svoradb01','imp':'C)ritical'},
 	    {'id':'I','field':'Type','type':'Server','imp':'I)mportant'},
 	    {'id':'N','field':'Manufacturer','type':'HP','imp':'N)ormal'},
-	    {'id':'U','field':'*Standard ONLY*','type':'','imp':'U)nimportant'}
+	    {'id':'U','field':'*Standard ONLY*','type':'','imp':'U)nimportant'},
 	    {'id':'H','field':'*Custom ONLY*','type':'','imp':'H)idden'}
 	];
 	var tempSec = ''
@@ -84,20 +96,39 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	$scope.toggleEditMode = function (s) {
 		$scope.section[s] = $scope.section[s] == 'e' ? 's' : 'e'
 	}
-	
+
+	// Used to parse the custom field number
+	var customFieldRegx =  /^custom([\d]{1,2})$/;
+	$scope.customFieldNumber = function (field) {
+		var match = customFieldRegx.exec(field);
+		return (match ? match[1] : '');
+	};
+	// Used to parse the custom field number
+	var customLabelRegx =  /^Custom([\d]{1,2})$/;
+	$scope.customLabelNumber = function (label, field) {
+		var match = customLabelRegx.exec(label);
+		if (! match) {
+			match = customFieldRegx.exec(field);
+			return (match ? ' (' + match[1] + ')' : '');
+		}
+		return '';
+	};
+
+
 	//Constant consists of all customs as list
 	var FIELD_LIST = [];
 	var customCount = $("#customfieldShown").val();
 	for(i=1;i<=customCount;i++){
 		FIELD_LIST.push("custom"+i);
 	}
+
 	$scope.assignData = function(type,value,field,phase) {
 		//checking condition that for customs1.. 24 FI='H' must be same for all validation types.
 			if(FIELD_LIST.indexOf(field) != -1 && value=='H'){
 				$scope.phases.each(function(p){
 				$scope.setImportance(type,field, p.id, value);
 				});
-			}else if(value!= 'H'){ //checking condition that hidden will only work for customs1.. 24
+			} else if(value!= 'H'){ //checking condition that hidden will only work for customs1.. 24
 				$scope.setImportance(type,field, phase, value);
 				//checking condition to remove FI i.e Hidden for custom fields when FI is selected as C or I or N.
 					$scope.phases.each(function(p){

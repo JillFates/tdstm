@@ -23,7 +23,7 @@
 			<td>{{help[type.name][field.label]}}</td>
 		</tr>
 		<tr ng-repeat="field in fields['customs']">
-			<td>{{field.id}}</td>
+			<td>{{field.id}}<span class="small_text">{{ customLabelNumber(field.id, field.label)}}</span></td>
 			<td ng-repeat="phase in phases" class="{{importance[type.name][field.label]['phase'][phase.id]}}">{{importance[type.name][field.label]['phase'][phase.id]}}</td>
 			<td>{{help[type.name][field.label]}}</td>
 		</tr>

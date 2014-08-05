@@ -432,7 +432,9 @@
 	text-align: center;
 	background-color: transparent;
 }
-
+.small_text {
+	font:8px;
+}
 .tds_header {
 	width:100%;
 	height:30px;
