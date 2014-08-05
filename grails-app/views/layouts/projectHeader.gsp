@@ -1,156 +1,158 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <title><g:layoutTitle default="Grails" /></title>
-    <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
-    <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-    <link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
-    <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
-   	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
-	<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
-		href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
-    <g:javascript library="prototype" />
-    <g:javascript src="jquery-1.9.1.js"/>	
-	<g:javascript src="jquery-1.9.1-ui.js"/>
-	<g:javascript src="datetimepicker.js"/>
-	<g:javascript src="jquery-migrate-1.0.0.js"/>
-    <g:javascript src="crawler.js" />
-	<g:javascript src="select2.js"/>
-	<g:javascript src="jquery.combox.js"/>	
-	<g:javascript src="moment.min.js" />
-	<g:javascript src="daterangepicker.js" />
-	<g:javascript src="tds-common.js" />
-    <g:layoutHead />
-   
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
-    <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title><g:layoutTitle default="Grails" /></title>
+		<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
+		<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
+		<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
+		<link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
+		<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
+			href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
+		<g:javascript library="prototype" />
+		<g:javascript src="jquery-1.9.1.js"/>	
+		<g:javascript src="jquery-1.9.1-ui.js"/>
+		<g:javascript src="datetimepicker.js"/>
+		<g:javascript src="jquery-migrate-1.0.0.js"/>
+		<g:javascript src="crawler.js" />
+		<g:javascript src="select2.js"/>
+		<g:javascript src="jquery.combox.js"/>	
+		<g:javascript src="moment.min.js" />
+		<g:javascript src="daterangepicker.js" />
+		<g:javascript src="tds-common.js" />
+		<g:layoutHead />
 
-   <script type="text/javascript">
-   		$(document).ready(function() {
-      		$("#personDialog").dialog({ autoOpen: false })
-      		$("#userPrefDivId").dialog({ autoOpen: false })
-      		var currentURL = window.location.pathname
-      		${remoteFunction(controller:'userLogin', action:'updateLastPageLoad', params:'\'url=\' + currentURL ')}
-      		// Due to some issue with textarea overriding the value at intial load
-      		$('textarea').each(function(){
-      			$(this).val($(this).text())
-      		});
-      		$('.tzmenu').click(function(){
-      			 $(".tzmenu ul").toggle();
-      		});
-      		$(".headerClass").mouseover(function(){
-      			$(this).parent().find('a').addClass('mouseover');
-      			$(this).parent().find('a').removeClass('mouseout');
-      		})
-      		$(".headerClass").mouseout(function(){
-      			if(!$(this).parent().find(".megamenu").is(":visible")){
-      				$(this).parent().find('a').removeClass('mouseover');
-      			} else {
-      				$('.headerClass').removeClass('mouseover');
-      			}
-      		})
-     	})
-     	var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
-     	var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-     	var currentMenuId = "";
-     	var B1 = []
-     	var B2 = []
-     	var taskManagerTimePref = "60"
-		var contextPath = "${request.contextPath}"
-		var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false  
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
+		
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#personDialog").dialog({ autoOpen: false });
+				$("#userPrefDivId").dialog({ autoOpen: false });
+				var currentURL = window.location.pathname;
+				${remoteFunction(controller:'userLogin', action:'updateLastPageLoad', params:'\'url=\' + currentURL ')};
+				// Due to some issue with textarea overriding the value at intial load
+				$('textarea').each(function(){
+					$(this).val($(this).text());
+				});
+				$('.tzmenu').click(function(){
+					$(".tzmenu ul").toggle();
+				});
+				$(".headerClass").mouseover(function(){
+					$(this).parent().find('a').addClass('mouseover');
+					$(this).parent().find('a').removeClass('mouseout');
+				});
+				$(".headerClass").mouseout(function(){
+					if (!$(this).parent().find(".megamenu").is(":visible")) {
+						$(this).parent().find('a').removeClass('mouseover');
+					} else {
+						$('.headerClass').removeClass('mouseover');
+					}
+				});
+			});
+			var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
+			var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
+			var currentMenuId = "";
+			var B1 = []
+			var B2 = []
+			var taskManagerTimePref = "60"
+			var contextPath = "${request.contextPath}"
+			var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false  
 
-   </script>
-  </head>
-	<% def currProj = session.getAttribute("CURR_PROJ");
-	   
-    def projectId = currProj?.CURR_PROJ ;
-    def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
-    def moveEventName = moveEventId ? MoveEvent.findById( moveEventId ) : ''
-    def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
-    def roomId = session.getAttribute( "CURR_ROOM" )?.CURR_ROOM
-    def room = Room.get(roomId)
-	def moveBundleName = moveBundleId ? MoveBundle.findById( moveBundleId ) : ''
-    def currProjObj;
-    def moveEvent;
-	def personId = session.getAttribute("LOGIN_PERSON").id
-	def person = Person.get(personId)
-    if( projectId != null){
-      currProjObj = Project.findById(projectId)
-    }
-    if( moveEventId != null){
-    	moveEvent = MoveEvent.findById(moveEventId)
-    }
-    def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
-    def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
-	def isIE7 = request.getHeader("User-Agent").contains("MSIE 7");
-	def isMDev = request.getHeader("User-Agent").contains("Mobile");
-	
-	def setImage = session.getAttribute("setImage")?:(currProjObj ? ProjectLogo.findByProject(currProjObj)?.id:'');
-	def user = UserLogin.findByPerson( person )
-	def username = user.username
-	def userPrefs = UserPreference.findAllByUserLogin(user)
-    %>
-  <body>
-    <div class="main_body">
-      <input id="contextPath" type="hidden" value="${request.contextPath}"/>
-      <div class="tds_header">
-      	<div class="header_left">
-      		<g:if test="${setImage}">
-    	  		<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
-    	  	</g:if>
-	      	<g:else>      	
-     			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
-    		</g:else>
-    	</div>
-      <div class="title">&nbsp;TransitionManager&trade; 
-      	<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
-      	<g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
-      	<g:if test="${moveBundleId}"> : ${moveBundleName}</g:if>
-      </div>
-        <div class="header_right" id="userMenuId"><br />
-          <div style="font-weight: bold;">
-          <shiro:isLoggedIn>
-			<strong>
-			<div style="float: left;">
-			<g:if test="${isIE6 || isIE7}">
-				<span><img title="Note: MS IE6 and MS IE7 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
-			</g:if>
-			<a class="headerClass" onmouseover="hoverMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
-			&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span></a>
+		</script>
+	</head>
+	<% 
+		def currProj = session.getAttribute("CURR_PROJ");
+
+		def projectId = currProj?.CURR_PROJ ;
+		def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
+		def moveEventName = moveEventId ? MoveEvent.findById( moveEventId ) : ''
+		def moveBundleId = session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE ;
+		def roomId = session.getAttribute("CURR_ROOM")?.CURR_ROOM;
+		def room = Room.get(roomId)
+		def moveBundleName = moveBundleId ? MoveBundle.findById( moveBundleId ) : ''
+		def currProjObj;
+		def moveEvent;
+		def personId = session.getAttribute("LOGIN_PERSON").id
+		def person = Person.get(personId)
+		if (projectId != null) {
+			currProjObj = Project.findById(projectId)
+		}
+		if (moveEventId != null) {
+			moveEvent = MoveEvent.findById(moveEventId)
+		}
+		def partyGroup = session.getAttribute("PARTYGROUP")?.PARTYGROUP ;
+		def isIE6 = request.getHeader("User-Agent").contains("MSIE 6");
+		def isIE7 = request.getHeader("User-Agent").contains("MSIE 7");
+		def isMDev = request.getHeader("User-Agent").contains("Mobile");
+
+		def setImage = session.getAttribute("setImage")?:(currProjObj ? ProjectLogo.findByProject(currProjObj)?.id:'');
+		def user = UserLogin.findByPerson( person )
+		def username = user.username
+		def userPrefs = UserPreference.findAllByUserLogin(user)
+	%>
+	<body>
+		<div class="main_body">
+			<input id="contextPath" type="hidden" value="${request.contextPath}"/>
+			<div class="tds_header">
+				<div class="header_left">
+					<g:if test="${setImage}">
+						<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
+					</g:if>
+					<g:else>      	
+						<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" style="float: left;border: 0px;height: 30px;"/></a>
+					</g:else>
+				</div>
+				<div class="title">&nbsp;TransitionManager&trade; 
+					<g:if test="${currProjObj}"> - ${currProjObj.name} </g:if>
+					<g:if test="${moveEvent}"> : ${moveEvent?.name}</g:if>
+					<g:if test="${moveBundleId}"> : ${moveBundleName}</g:if>
+				</div>
+				<div class="header_right" id="userMenuId"><br />
+					<div style="font-weight: bold;">
+						<shiro:isLoggedIn>
+							<strong>
+								<div style="float: left;">
+									<g:if test="${isIE6 || isIE7}">
+										<span><img title="Note: MS IE6 and MS IE7 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
+									</g:if>
+									<a class="headerClass" onmouseover="hoverMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
+										&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span>
+									</a>
+								</div>
+								<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
+									time<ul>
+										<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
+										<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
+										<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
+										<li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
+										<li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
+										<li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
+										<li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
+										<li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
+										<li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
+									</ul>
+								</div>
+							</strong>
+							&nbsp;&nbsp;<g:link controller="auth" action="signOut"></g:link>
+						</shiro:isLoggedIn>
+					</div>
+				</div>
 			</div>
-			<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
-				time<ul>
-				<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
-				<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
-				<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
-				<li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
-				<li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
-				<li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
-				<li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
-				<li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
-				<li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
-				</ul>
-			</div>
-			</strong>
-              &nbsp;&nbsp;<g:link controller="auth" action="signOut"></g:link>
-          </shiro:isLoggedIn>
-          </div>
-        </div>
-      </div>
 
       <g:if test="${currProj}">
 	      <div class="menu2">
 	      <ul>
 			<tds:hasPermission permission='AdminMenuView'>
 			<li id="adminMenuId" class="menuLiIndex"><a class="home menuhideright headerClass" onmouseover="hoverMegaMenu('#adminMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#adminMegaMenu')">Admin</a>
-    		    <div class="megamenu admin inActive" id="adminMegaMenu">
+				<div class="megamenu admin inActive" id="adminMegaMenu">
 					<table class="mmtable room_rack"><tr>
 					<td style="vertical-align:top" nowrap="nowrap"><span class="megamenuSection">Administration</span><br />
 						<ul >
@@ -234,7 +236,8 @@
 			<li id="roomMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#racksMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#racksMegaMenu')">Data Centers</a>
 				<div class="megamenu rooms inActive" id="racksMegaMenu">
 					<table class="mmtable room_rack" ><tr>
-					<td style="vertical-align:top"><span class="megamenuSection">Rooms and Racks</span><br />
+					<td style="vertical-align:top">
+						<span class="megamenuSection">Rooms and Racks</span><br />
 						<ul >
 							<li><g:link class="mmlink" params="[viewType:'list']" controller="room"  onclick="hideMegaMenu('racksMegaMenu')">List Rooms</g:link></li>
 							<g:if test="${roomId}">
@@ -242,7 +245,7 @@
 							</g:if>
 							<li><g:link class="mmlink" controller="rackLayouts" action="create" onclick="hideMegaMenu('racksMegaMenu')">Racks</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
+								<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
 							</tds:hasPermission>
 						</ul>
 					</td>
@@ -461,7 +464,7 @@
 	        </li>
 	        </tds:hasPermission>
 	      </ul>
-	    </div>
+		</div>
 		<div class="megamenu inActive" id="userMegaMenu" style="width:255px">
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
@@ -570,24 +573,24 @@
                   </td>
                 </tr>
                 
-                <tds:hasPermission permission='PersonExpiryDate'>
-	                <tr class="prop">
+				<tds:hasPermission permission='PersonExpiryDate'>
+					<tr class="prop">
 						<td valign="top" class="name">
 							<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
 						</td>
 						<td valign="top" class="value">
-						<script type="text/javascript">
-							$(document).ready(function(){
-					        	$("#expiryDateId").datetimepicker();
-					        });
-						</script>
-	        	        <input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-						<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
+							<script type="text/javascript">
+								$(document).ready(function(){
+								$("#expiryDateId").datetimepicker();
+							  });
+							</script>
+							<input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
+							<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
 						</td>
 					</tr>
-                </tds:hasPermission>
-                
-                <tr class="prop">
+				</tds:hasPermission>
+
+				<tr class="prop">
 					<td valign="top" class="name">
 						<label for="title">Time Zone:</label>
 					</td>
@@ -602,19 +605,19 @@
 							<label for="startPage">Start Page:</label>
 						</td>
 						<td valign="top" class="value">
-						<g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
-							<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" 
-							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-						</g:if>
-						<g:else>
-						<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard', 'User Dashboard']}" 
-							value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-						</g:else>
+							<g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
+								<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" 
+								value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
+							</g:if>
+							<g:else>
+								<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard', 'User Dashboard']}" 
+									value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
+							</g:else>
 						</td>
 					</tr>
 				<tr class="prop">
 					<td valign="top" class="name">
-                       <label for="title">Power In:</label>
+						<label for="title">Power In:</label>
 					</td>
 					<td valign="top" class="value">
 						<g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
@@ -623,10 +626,10 @@
 				</tr>
 				<tr class="prop">
 					<td valign="top" class="name">
-                       <label for="title">Model Score:</label>
+						<label for="title">Model Score:</label>
 					</td>
 					<td valign="top" class="value">
-                       <input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
+						<input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
 					</td>
 				</tr>
 				<tr>
@@ -637,20 +640,20 @@
 						<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordId"/>
 					</td>
 				</tr>
-              	<tr class="prop">
-                	<td valign="top" class="name">
-                    	<label for="password">Old Password:&nbsp;</label>
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label for="password">Old Password:&nbsp;</label>
 					</td>
-                    <td valign="top" class="value">
-                    	<input type="hidden" id="personId" name="personId" value=""/>
+					<td valign="top" class="value">
+						<input type="hidden" id="personId" name="personId" value=""/>
 						<input type="text" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
 					</td>
 				</tr>
-              	<tr class="prop">
-                	<td valign="top" class="name">
-                    	<label for="password">New Password:&nbsp;</label>
+				<tr class="prop">
+					<td valign="top" class="name">
+						<label for="password">New Password:&nbsp;</label>
 					</td>
-                    <td valign="top" class="value">
+					<td valign="top" class="value">
 						<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword(this)" id="newPasswordId" value=""/>
 					</td>
 				</tr>
@@ -680,8 +683,7 @@
           <g:render template="../newsEditor/newsEditor"></g:render>
       </div>
     </div>
-    <g:javascript src="tdsmenu.js" />
-    <div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences">
-    </div>
-  </body>
+		<g:javascript src="tdsmenu.js" />
+		<div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
+	</body>
 </html>
