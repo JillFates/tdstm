@@ -51,7 +51,7 @@
 				</div>
 				<div style="float: right; width: 150px; padding-top: 2px;">
 					<div style="float: right;">
-						<input type="button" value="Update:" id="update"
+						<input type="button" value="Refresh:" id="update"
 							onclick="getMoveEventNewsDetails($('#moveEvent').val());updateTaskSummary();" /> 
 						<select name="updateTime" id="updateTimeId" class="selecttext"
 							onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(e.responseText)') }">
