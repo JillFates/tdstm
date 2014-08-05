@@ -482,7 +482,7 @@
 			leftArrow.removeClass('disabled');
 		
 		// check right arrow
-		if(lastStep){
+		if(typeof lastStep.offset() != 'undefined' ){
 			if (lastStep.offset().left + lastStep.outerWidth() - rightArrow.offset().left < 10)
 				rightArrow.addClass('disabled');
 			else
