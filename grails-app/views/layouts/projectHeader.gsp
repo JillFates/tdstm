@@ -259,12 +259,12 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Assets</span><br />
 						<ul>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary Table</g:link></li>	
-							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconApp.png" height="12" /> Applications</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconServer.png" height="12" /> Servers</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconServer.png" height="12" /> All Devices</g:link></li>
-							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconDB.png" height="12" /> Databases</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconStorage.png" height="12" /> Storage Devices (Physical)</g:link></li>
-							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"><img src="/tdstm/images/iconStorage.png" height="12" /> Logical Storage</g:link></li>
+							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')"> Applications</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')"> Servers</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')"> All Devices</g:link></li>
+							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')"> Databases</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage Devices (Physical)</g:link></li>
+							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"> Logical Storage</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">Comments</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')"> Dependencies</g:link></li>
 							<tds:hasPermission permission='MoveBundleEditView'>
