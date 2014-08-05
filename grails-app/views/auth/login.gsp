@@ -23,10 +23,8 @@
 	<table style="border: 0; width: 292px;">
 		<tr>
 			<td style="text-align: center;">
-				<a href="http://www.transitionaldata.com/" target="new">
-				<img src="${resource(dir:'images',file:'tds3b.png')}" border="0" alt="Visit TDS" /></a>
-				<br />
-				<h1>TransitionManager&trade;</h1>
+				<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
+				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" /></a>
 			</td>
 			
 		</tr>
