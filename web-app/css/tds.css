@@ -214,10 +214,12 @@
 	box-shadow: 3px 3px 3px #888;
 }
 #projectMegaMenu {
-	width:auto;
+	min-width: 200px;
+	width: auto;
 }
 #racksMegaMenu {
-	width:auto;
+	min-width: 200px;
+	width: auto;
 }
 #assetMegaMenu {
 	width:340px;
