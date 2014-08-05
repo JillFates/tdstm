@@ -1,0 +1,26 @@
+<!-- Task Generataion Completed View -->
+<div class="completionWrapper">
+	<tabset id="taskGenerationTabs">
+		<tab heading="Summary" active="activeSubTabs.tasks.summary">
+			
+			<ul class="summaryList">
+				<li>Status: {{getTaskGenerationStatus()}}</li>
+				<li>Tasks Created: {{getTaskGenerationTasksCreated()}}</li>
+				<li>Number of Exceptions: {{getTaskGenerationExceptions()}}</li>
+			</ul>
+
+		</tab>
+		<tab heading="Exceptions" active="activeSubTabs.tasks.exceptions">
+			<span ng-bind-html="tasks.generation.exceptionLog"></span>
+		</tab>
+		<tab heading="Info" active="activeSubTabs.tasks.info">
+			<span ng-bind-html="tasks.generation.infoLog"></span>
+		</tab>
+	</tabset>
+
+	<div class="completionButtons">
+		<a class="btn btn-default" ng-click="tasks.viewGeneratedResults(this)"><span class="glyphicon glyphicon-tasks"></span> View Results</a>
+		<a class="btn btn-default" ng-click="tasks.viewTaskGraph(this)"><span class="glyphicon glyphicon-stats"></span> View Task Graph</a>
+		<a class="btn btn-default" ng-click="tasks.startOver(this)"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</a>
+	</div>
+</div>

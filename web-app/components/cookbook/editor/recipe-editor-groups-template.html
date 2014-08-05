@@ -1,0 +1,39 @@
+<div class="groups">
+	<div class="selectors in">
+		<div class="form-group">
+			<label class="inline text-right" for="eventSelect">Event:</label>
+				<select name="eventSelect" id="eventSelect" ng-model="groups.selectedEvent" ng-change="groups.eventSelected()" ng-options="item as item.name for item in groups.eventsArray">
+					<option value="">Please select</option>
+				</select>
+		</div>	
+		
+		<div class="form-group" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+			<label class="inline text-right" for="eventSelect">Bundle:</label>
+				<select name="bundleSelect" id="bundleSelect" ng-model="groups.selectedBundle" ng-change="groups.bundleSelected()" ng-options="item as item.name group by item.group for item in groups.bundlesArray">
+					<option value="">Please select</option>
+				</select>
+		</div>
+
+		<div class="form-group" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
+			<label class="inline text-right" for="eventSelect">Application:</label>
+				<select name="applicationSelect" id="applicationSelect" ng-model="groups.selectedApplication" ng-change="groups.applicationSelected()" ng-options="item as item.name group by item.group for item in groups.applicationsArray">
+					<option value="">Please select</option>
+				</select>
+		</div>
+
+		<div class="refreshWrapper">
+			<label for="refreshGroups">
+				<a class="btn btn-default" ng-disabled="groups.fetchBtnDisabled" id="refreshGroups" ng-click="groups.fetchGroups()">
+					Fetch
+				</a>
+			</label>
+		</div>
+	</div>
+
+	<a class="selectorsHideShow" data-toggle="collapse" data-target=".selectors">Show/Hide Selectors</a>
+	
+	<div class="gridStyleGroups" style="margin-top:15px;" ng-grid="groups.groupsGrid"></div>
+
+	<div class="gridStyleGroups" ng-show="groups.showAssetsGrid" style="margin-top:15px;" ng-grid="assets.assetsGrid"></div>
+
+</div>

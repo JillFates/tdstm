@@ -1,0 +1,77 @@
+
+<div class="modal-header">
+	<h3>Create a recipe</h3>
+</div>
+<div class="modal-body">
+	<form class="form-horizontal" id="createRecipeForm" name="createRecipeForm" role="form" novalidate >
+	<tabset class="create-recipe-tabs">
+		<tab heading="Brand New Recipe" active="clone.activeTabs.newRecipe">
+			<div class="form-group">
+				<label for="inputName" class="col-sm-2 control-label">Name*</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="inputName" placeholder="" name="inputName" ng-model="newRecipe.name" required>
+					<div ng-show="createRecipeForm.inputName.$dirty && createRecipeForm.inputName.$invalid">
+						<pre class="error-msg" ng-show="createRecipeForm.inputName.$error.required">Recipe Name is required.</pre>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="textareaDescription" class="col-sm-2 control-label">Description</label>
+				<div class="col-sm-10">
+					<textarea class="form-control" rows="3" id="textareaDescription" placeholder="" ng-model="newRecipe.description"></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="contextSelector2" class="col-sm-2 control-label selectLabel">Context*</label>
+				<div class="col-sm-10">
+					<select name="contextSelector2" id="contextSelector2" ng-model="newRecipe.context" ng-options="d for d in ['Event', 'Bundle', 'Application']" required>
+						<option value="">Select context</option>
+					</select>
+				</div>
+			</div>							
+		</tab>
+
+		<tab heading="Clone An Existing Recipe" active="clone.activeTabs.clone" ng-click="refreshGrid()">
+			<div class="cloneSelectors">
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="eventSelect">Context</label>
+					<div class="col-sm-10">
+						<select class="form-control" name="contextSelect" id="cloneContextSelect" ng-model="clone.selectedContext" ng-change="optionsSelected('context')" ng-options="item as item.name for item in clone.contextArray">
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="projectSelect">Project</label>
+					<div class="col-sm-10">
+						<select class="form-control" name="projectSelect" id="cloneprojectSelect" ng-model="clone.selectedProject" ng-change="optionsSelected('project')" ng-options="item as item.name for item in clone.projectsArray">
+							<option value="">Please select</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Recipe to clone</label>
+					<div class="col-sm-10">
+						<div class="gridStyle form-control" ng-grid="clone.projectsGrid" style="padding:0"></div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="recipeName" class="col-sm-2 control-label">Name</label>
+					<div class="col-sm-10">
+						<input type="text" name="recipeName" ng-model="clone.newRecipe.name" class="form-control">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="recipeDescription" class="col-sm-2 control-label">Description</label>
+					<div class="col-sm-10">
+						<input type="text" name="recipeDescription" ng-model="clone.newRecipe.description" class="form-control"> 
+					</div>
+				</div>
+			</div>
+		</tab>
+	</tabset>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-default" ng-disabled="(clone.activeTabs.newRecipe && (createRecipeForm.$invalid || isUnchanged(newRecipe))) || (!clone.activeTabs.newRecipe && (!clone.newRecipe.name || !clone.projectsGrid.selectedItems[0]))" ng-click="save()">Save</button>
+	<button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

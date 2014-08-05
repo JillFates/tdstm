@@ -1,0 +1,6 @@
+<ul class="syntaxErrors">
+	<li ng-repeat="error in currentSyntaxValidation">
+		<p style="font-weight: bold" ng-bind="error.reason"></p>
+		<p ng-bind-html="secureHTML(error.detail)"></p>
+	</li>
+</ul>

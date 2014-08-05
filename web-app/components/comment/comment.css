@@ -1,12 +1,13 @@
 .modal-comment .modal-dialog {
+	width: 700px;
+}
+.modal-task .modal-dialog {
 	width: 1000px;
 }
-.modal-comment-huge {
-	width: 1000px;
+.modal-comment-task-list .modal-dialog {
+	width: 700px;
 }
-.modal-comment-normal {
-	width: 600px;
-}
+
 .list .comments-table-row:hover {
 	background: #FFFFFF;
 }
@@ -197,4 +198,30 @@ button.alert-close {
 }
 .comment-buttons {
 	white-space: normal;
+}
+.modal {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1040;
+	display: none;
+	overflow: auto;
+	overflow-y: scroll;
+}
+.modal-content {
+	position: relative;
+	background-color: #ffffff;
+	border: none;
+	border-radius: 6px;
+	outline: none;
+	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+	background-clip: padding-box;
+}
+.modal-dialog {
+	margin: 30px auto;
+	position: relative;
+	z-index: 1050;
 }

@@ -1,0 +1,14 @@
+<div class="row-fluid clearfix">
+	<div class="col-md-12">
+		<tabset id="mainTabset">
+			<tab
+				ng-repeat="tab in recipeTabs"
+				heading="{{tab.heading}}"
+				select="go(tab.route)"
+				active="tab.active">
+			</tab>
+		</tabset>
+		<div class="tab-container" ui-view="recipeDetailContent"></div>
+	</div>
+</div>
+

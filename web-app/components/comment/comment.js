@@ -89,7 +89,8 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.ListDialogController,
 			scope: scope,
-			windowClass: "modal-comment",
+			windowClass: 'modal-comment-task-list',
+			backdrop : 'static',
 			resolve: {
 				assetTO: function() {
 					return assetTO;
@@ -112,7 +113,8 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.EditCommentDialogController,
 			scope: scope,
-			windowClass: "modal-comment",
+			windowClass: ((commentType == 'comment') ? 'modal-comment' : 'modal-task'),
+			backdrop : 'static',
 			resolve: {
 				assetTO: function() {
 					return assetTO;
@@ -138,7 +140,8 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.ShowCommentDialogController,
 			scope: scope,
-			windowClass: "modal-comment",
+			windowClass: ((commentTO.commentType == 'comment') ? 'modal-comment' : 'modal-task'),
+			backdrop : 'static',
 			resolve: {
 				commentTO: function() {
 					return commentTO;
@@ -161,7 +164,8 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.EditCommentDialogController,
 			scope: scope,
-			windowClass: "modal-comment",
+			windowClass: ((commentTO.commentType == 'comment') ? 'modal-comment' : 'modal-task'),
+			backdrop : 'static',
 			resolve: {
 				assetTO: function() {
 					return null;

@@ -1,0 +1,6 @@
+<div class="btn-group">
+	<button type="button" class="btn btn-default" ng-disabled="!isTaskBatchSelected" ng-bind="tasks.selectedTaskBatch.isPublished && 'Unpublish' || 'Publish'" ng-click="tasks.publishUnpublishTaskBatch(tasks.selectedTaskBatch)">Publish</button>
+	<button type="button" class="btn btn-default" ng-disabled="!isTaskBatchSelected" ng-click="tasks.resetTaskBatch(tasks.selectedTaskBatch.id)">Reset</button>
+	<button type="button" class="btn btn-default" ng-disabled="!isTaskBatchSelected" ng-click="tasks.refreshTaskBatches()">Refresh</button>
+	<button type="button" class="btn btn-default" ng-disabled="!isTaskBatchSelected" ng-click="tasks.deleteTaskBatch(tasks.selectedTaskBatch.id)">Delete</button>
+</div>

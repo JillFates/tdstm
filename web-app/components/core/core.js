@@ -480,7 +480,7 @@ tds.core.directive.Draggable = function() {
 		link: function(scope, element, attrs) {
 			var params = {
 				revert: false,
-				containment: "document"
+				containment: element.parent().parent().parent()
 			};
 			var titleBar = element.find('.ui-dialog-titlebar');
 			if (titleBar.length > 0) {
@@ -804,7 +804,7 @@ tds.core.module.config(['$httpProvider',
 	}
 ]);
 
-tds.core.module.directive('draggable', tds.core.directive.Draggable);
+tds.core.module.directive('draggable', [tds.core.directive.Draggable]);
 tds.core.module.directive('centered', ['$window', tds.core.directive.Centered]);
 tds.core.module.directive('loadingIndicator', ['$timeout', 'utils', tds.core.directive.LoadingIndicator]);
 tds.core.module.directive('tdsdatepicker', ['utils', 'dateFormat', tds.core.directive.DatePicker]);

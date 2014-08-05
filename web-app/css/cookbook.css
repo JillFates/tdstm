@@ -48,7 +48,14 @@ ul{
 
 #gridControls{margin-top:15px;}
 
-.tab-content{
+.create-recipe-tabs .tab-content {
+	padding: 15px;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+
+.tab-container {
 	padding: 15px;
 	border-left: 1px solid #ddd;
 	border-right: 1px solid #ddd;
@@ -172,7 +179,8 @@ form .error-msg{
 
 /* Code Mirror Stuff */
 .CodeMirror{
-	height: 400px;
+	height: 430px;
+	border: 1px solid #ddd;
 }
 
 .CodeMirror-lines pre{
@@ -188,12 +196,21 @@ form .error-msg{
 	border: none;
 	border-radius: 0;
 }
+
+.code-editor-modal .modal-dialog {
+  width: 1060px;
+}
+
 /******/
 
 /* Code Diff Stuff */
 
+.code-diff-modal .modal-dialog {
+  width: 1060px;
+}
+
 .codeDiff {
-	height: 420px;
+	height: 430px;
 }
 
 .codeDiffHeaderLeft {
@@ -235,6 +252,13 @@ form.taskGeneration label.inline select{
 
 form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generateWrapper, .progressWrapper, .completionButtons{
 	margin-top: 20px;
+}
+
+.completionWrapper .tab-content {
+	padding: 15px;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 .progressWrapper .progress{

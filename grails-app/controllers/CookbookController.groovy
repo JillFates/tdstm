@@ -4,7 +4,7 @@ class CookbookController {
 
 	def userPreferenceService
 	
-    def index = {
+	def index = {
 		render(view: 'index', model: ['userPreferenceService': userPreferenceService])
 	}
 	

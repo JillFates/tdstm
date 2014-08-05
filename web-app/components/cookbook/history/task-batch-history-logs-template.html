@@ -1,0 +1,17 @@
+<form action="#">
+	<div class="radio-inline">
+		<label>
+			<input type="radio" name="logRadio" id="exceptions" ng-model="logRadioModel" value="exceptionLog" checked ng-click="showLog('exceptionLog')">
+			Exceptions
+		</label>
+	</div>
+	<div class="radio-inline">
+		<label>
+			<input type="radio" name="logRadio" id="infoWarnings" ng-model="logRadioModel" value="infoLog" ng-click="showLog('infoLog')">
+			Info/Warning
+		</label>
+	</div>
+	<div>
+		<pre ng-bind-html="taskBatchLogs"></pre>
+	</div>
+</form>

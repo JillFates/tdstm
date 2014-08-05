@@ -1,0 +1,9 @@
+<tabset>
+	<tab
+		ng-repeat="tab in taskBatchTabs"
+		heading="{{tab.heading}}"
+		select="go(tab.route)"
+		active="tab.active">
+	</tab>
+</tabset>
+<div class="tab-container" ui-view="taskBatchTabsContent"></div>

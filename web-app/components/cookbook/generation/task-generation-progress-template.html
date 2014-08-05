@@ -1,0 +1,15 @@
+<!-- Task Generation Progress View -->
+<div class="progressWrapper row">
+	<div class="col-md-3 col-xs-3">
+		<p class="text-right">Creating Tasks: </p>
+	</div>
+	<div class="col-md-6 col-xs-6">
+		<div class="progress">
+			<div class="progress-bar" role="progressbar" aria-valuenow="{{getTaskGenerationProgress()}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : ( getTaskGenerationProgress() + '%' )}">
+				<span>{{getTaskGenerationProgress()}}%</span>
+			</div>
+		</div>
+		<p class="text-center"><span ng-bind="tasks.progressRemaining"></span></p>
+		<div class="text-center"><button class="btn btn-default" ng-click="cancelGeneration()">Cancel Generation</button></div>
+	</div>
+</div>
