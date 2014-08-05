@@ -90,7 +90,7 @@ public enum AssetType {
 	 * @return List<String>
 	 */
 	static List getStorageTypes() {
-		return ['Files', 'Storage']
+		return ['Array', 'Disk', 'NAS', 'SAN', 'SAN Switch', 'Storage', 'Tape', 'Tape Library']
 	}
 
 	/**
