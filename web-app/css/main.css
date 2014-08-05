@@ -339,6 +339,10 @@ td.buttonR .powerIcon {
     background: transparent url(../icons/database_delete.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
+.buttons input.tabledelete {
+    background: transparent url(../icons/table_delete.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
 .buttons input.cancel {
     background: transparent;
     padding-left: 10px;
@@ -350,6 +354,10 @@ td.buttonR .powerIcon {
 }
 .buttons input.edit {
     background: transparent url(../icons/database_edit.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
+.buttons input.tableedit {
+    background: transparent url(../icons/table_edit.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
 .buttons input.cableedit {
@@ -365,6 +373,10 @@ td.buttonR .powerIcon {
 }
 .buttons input.save {
     background: transparent url(../icons/database_save.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
+.buttons input.tablesave {
+    background: transparent url(../icons/table_save.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
 .onhold_button {

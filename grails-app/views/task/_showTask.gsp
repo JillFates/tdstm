@@ -150,10 +150,10 @@
                         <div class="buttons" style="white-space: nowrap;">
                             <span class="button" class="slide">
                             <span class="slide">
-                            <input class="edit" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" />
+                            <input class="tableedit" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" />
                             </span>
                             <span id="fromAssetId" class="slide">
-                            <input class="delete" type="button" value="Delete" ng-click="deleteComment()" />
+                            <input class="tabledelete" type="button" value="Delete" ng-click="deleteComment()" />
                             </span>
                             </span>
                             <action-bar comment='ac' show-details='false' update-table='false'></action-bar>
