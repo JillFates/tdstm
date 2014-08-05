@@ -1087,6 +1087,28 @@ class AssetEntityController {
 		IOUtils.closeQuietly(out);
 	}
 
+	/* -------------------------------------------------------
+	 * To check the sheet headers
+	 * @param attributeList, SheetColumnNames
+	 * @author Mallikarjun
+	 * @return bollenValue 
+	 *------------------------------------------------------- */  
+	def checkHeader( def list, def serverSheetColumnNames  ) {
+		def listSize = list.size()
+		for ( int coll = 0; coll < listSize; coll++ ) {
+			if( serverSheetColumnNames.containsKey( list[coll] ) || list[coll] == "DepGroup") {
+				//Nonthing to perform.
+			} else {
+				missingHeader = missingHeader + ", " + list[coll]
+			}
+		}
+		if( missingHeader == "" ) {
+			return true
+		} else {
+			return false
+		}
+	}
+
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	/*------------------------------------------
