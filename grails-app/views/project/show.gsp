@@ -68,10 +68,6 @@
 							<td class="name">Event Manager:</td>
 							<td class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
 						</tr>
-					</tbody>
-				</table>
-				<table style="border-style:none solid none solid;">
-					<tbody>
 						<tr class="prop">
 							<td class="name">Workflow:</td>
 							<td class="valueNW" nowrap="nowrap">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;
@@ -81,7 +77,6 @@
 							</td>
 							<td class="name">Default Bundle:</td>
 							<td class="valueNW">${fieldValue(bean:projectInstance, field:'defaultBundle')}</td>
-							
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
@@ -92,7 +87,6 @@
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
 							<td class="valueNW" colspan="3"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-						
 						</tr>
 					</tbody>
 				</table>
