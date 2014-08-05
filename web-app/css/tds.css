@@ -434,7 +434,7 @@
 	background-color: transparent;
 }
 .small_text {
-	font:8px;
+	font: 8px helvetica, arial, sans-serif;
 }
 .tds_header {
 	width:100%;
