@@ -20,7 +20,23 @@ var tdsCommon = {
 		}
 		url += this.config.appBaseUri + uri;
 		return url;
-	}
+	},
 
+	// Generate a random string 
+	// @param Integer the length of string to generate (default 5)
+	// @param String the characterset to build the random string from (default A-Za-z0-9)
+	// @return String the random string
+	randomString: function(strLength, charSet) {
+		var result = [];
+
+		strLength = strLength || 5;
+		charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+		while (--strLength) {
+			result.push(charSet.charAt(Math.floor(Math.random() * charSet.length)));
+		}
+
+		return result.join('');
+	}
 
 }
