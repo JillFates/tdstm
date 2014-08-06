@@ -45,4 +45,12 @@ describe('Bundles', function(){
     expect(menu.getHeaderTitle().getText()).toEqual(' TransitionManager™ - Test Project : '+bundleName);
   });
 
-}); // Create Bundles
+
+  xdescribe('delete bundle assigned to an asset', function(){
+    describe('preconditions', function(){
+      //bundle created
+      // 
+    }); //  preconditions
+  
+  }); // delete bundle assigned to an asset
+}); // Bundles

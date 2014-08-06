@@ -4,10 +4,45 @@ var ListProjects = require('./listProjects.po.js');
 describe('List Projects', function(){
   var menu = new Menu();
   var listProjectPage =  new ListProjects();
+  
+  describe('search by code and select it', function(){
+    var projId;
+    it('should load list projects page after select Client/Project ListProjects', function(){
+      menu.goToClientProject('listProjects');
+      expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
+    });
+
+    it('should find the project to select', function(){
+      listProjectPage.setSearchProjectCode('MarketingDemo');
+      expect(listProjectPage.getSearchProjectCode().getAttribute('value')).toEqual('MarketingDemo');
+    });
+
+    it('should only be found MarketingDemo project', function(){
+      var results= 1;
+      listProjectPage.verifySearchResults(results).then(function(list){
+        expect(list.length).toEqual(results);
+        list[0].getAttribute('id').then(function(text){
+          projId = text;
+        });
+      });
+    });
+
+    it('should select the project found', function(){
+      listProjectPage.selectProjectfromListByPos(1,'MarketingDemo');
+    });
+
+    it('should be redirect to project/show/project+id', function(){
+      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
+    });
+
+    }); // search by code and select it
+
+  
   it('should load list projects page after select Client/Project ListProjects', function(){
     menu.goToClientProject('listProjects');
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
+
   it('should sort the projects by project code in both orders', function(){
 	browser.sleep(1000);
 	browser.driver.findElement(by.id('jqgh_projectGridIdGrid_projectCode')).click();
@@ -15,7 +50,8 @@ describe('List Projects', function(){
 	browser.driver.findElement(by.id('jqgh_projectGridIdGrid_projectCode')).click();
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
-   it('should sort the projects by name in both orders', function(){
+
+  it('should sort the projects by name in both orders', function(){
 	browser.sleep(1000);
 	browser.driver.findElement(by.id('jqgh_projectGridIdGrid_name')).click();
 	browser.sleep(1000);

@@ -8,6 +8,10 @@ Scenario
 6. search for the server
 7. validate that on task/comment list are the comment/task created.
 */
+/*To automate
+CRUD 
+title Device Details
+*/
 'use strict';
 var  Menu = require('../menu/menu.po.js');
 var  ListApps = require('./listApps.po.js');
@@ -38,12 +42,13 @@ describe('Server list', function(){
       var serverModal = new CreateServerModal();
 
       it('should has as title create server', function(){
-        expect(serverModal.createServerTitle.getText()).toEqual('Create Server');
+        expect(serverModal.createServerTitle.getText()).toEqual('Device Detail');
       });
 
       it('should create a server and save and view',function(){
         var serverModal = new CreateServerModal();
-        serverModal.createServer(appName,'view');
+        serverModal.createServer(appName);
+        expect(serverModal.isViewModalOpened()).toBe(true);
       });
   
     }); // Create Server Modal
@@ -127,13 +132,17 @@ describe('Server list', function(){
     
     it('should have comments as icon', function(){
       var appsListPage =  new ListApps();
-      browser.sleep(300);
-      expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
+      // browser.sleep(300);
+      // browser.wait(function(){
+      //   return appsListPage.getCommentIcon(appId).getAttribute('src'))===process.env.BASE_URL+'/tdstm/icons/comments.png';
+      // }).then(function(){
+      //   expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
+      // });
+      expect(appsListPage.isCommentsIconDisplayed(appId)).toBe(true);
     });
 
     it('should open Comment List modal', function(){
       var appsListPage =  new ListApps();
-      console.log('appId', appId);
       appsListPage.clickOnCommentIcon(appId);
     });
 

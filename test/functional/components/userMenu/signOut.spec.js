@@ -9,8 +9,7 @@ describe('sign out', function(){
   it('should sign out successfully', function(){
     userMenu.open();
     userMenu.selectSignOut();
-    var loginPageTitle=loginPage.getTitle();
-    expect(loginPageTitle.getText()).toEqual('TransitionManager™');
+    expect(browser.driver.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/auth/login')
   });
 
 });//signOut

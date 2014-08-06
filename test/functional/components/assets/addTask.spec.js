@@ -25,18 +25,29 @@ describe('Add Task', function(){
       expect(appModal.isCreateModalOpened()).toBe(true);
     });
 
-    it('should create an app and save and close', function(){
+    it('should create an app and save', function(){
       var appModal = new CreateAppModal();
-      expect(appModal.createAppTitle.getText()).toEqual('Create Application');
-      appModal.createApp(appName,'close');
+      expect(appModal.createAppTitle.getText()).toEqual('Application Detail');
+      appModal.createApp(appName);
       expect(appModal.isCreateModalClosed()).toBe(true);
+    });
+
+    it('should displayed view Modal', function(){
+      var appModal = new CreateAppModal();
+      expect(appModal.isViewModalOpened()).toBe(true);
+    });
+    
+    it('should close view modal', function(){
+      var appModal = new CreateAppModal();
+      appModal.closeBtn.click();
+      expect(appModal.isViewModalClosed()).toBe(true);
     });
 
   }); //preconditions
 
   describe('search for app', function(){
 
-    it('should load Application List page after select Assets List Apps', function(){
+    xit('should load Application List page after select Assets List Apps', function(){
       menu.goToAssets('listApps');
       expect(appsListPage.titleh.getText()).toEqual('Application List');
     });
@@ -56,8 +67,11 @@ describe('Add Task', function(){
     });
   }); // Search for an app
 
+  it('should have add task icon', function(){
+    expect(appsListPage.isAddTaskIconDisplayed(appId)).toBe(true);
+  });
   it('should open create task modal', function(){
-    browser.sleep(300);
+    // expect(appsListPage.isTaskIconPresent(appId)).toBe(true);
     appsListPage.clickOnTaskIcon(appId);
     expect(taskModal.editTaskModal.isPresent()).toBe(true);
   });
@@ -65,7 +79,6 @@ describe('Add Task', function(){
   it('should have Create task as title', function(){
     expect(taskModal.createTaskTitle.getText()).toEqual('Create Task');
   });
-
 // // default info:  task category status
   describe('Task Text Area', function(){
 
@@ -509,7 +522,7 @@ describe('Add Task', function(){
 //       }); //successor
   it('should save created task',function(){ 
     taskModal.saveTaskBtn.click();
-    expect(taskModal.editTaskModal.isPresent()).toBe(false );
+    expect(taskModal.editTaskModal.isPresent()).toBe(false);
   });
 
 }); //Add Task

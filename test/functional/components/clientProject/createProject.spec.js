@@ -46,7 +46,7 @@ describe('Create Project', function(){
 		browser.sleep(500);	
   });
   
-  it('should press the cancel button',function(){
+  xit('should press the cancel button',function(){
 	browser.driver.findElement(by.css('input[class="delete"')).click();
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
@@ -95,7 +95,7 @@ describe('Create Project', function(){
 
     it('should have "Workflow Code: " as label for  workflow', function(){
         expect(projectPage.getWorkflowCodeLabel()
-          .getText()).toEqual('Workflow Code:');
+          .getText()).toEqual('Workflow:');
     });
 
     it('Should select "STD_PROCESS" as workflow', function(){

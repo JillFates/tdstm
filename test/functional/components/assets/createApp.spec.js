@@ -34,7 +34,7 @@ describe('List App', function(){
     
   it('should validate Create Application modal title', function(){
     var appModal = new CreateAppModal();
-    expect(appModal.createAppTitle.getText()).toEqual('Create Application');
+    expect(appModal.createAppTitle.getText()).toEqual('Application Detail');
   });
 
   describe('Create Application Modal', function(){
@@ -47,13 +47,15 @@ describe('List App', function(){
         expect(appModal.nameLabel.getText()).toEqual('Name*');
       });
 
+      xit('should be required', function(){
+        appModal.saveBtn.click();
+          // this is not requested as required. 
+          // the user should not be allow to save the task
+      });
+      
       it('should add a Name', function(){
         appModal.setName(appName);
         expect(appModal.nameField.getAttribute('value')).toEqual(appName);
-      });
-
-      xit('should be required', function(){
-          // this is not requested as required. 
       });
 
     }); // name field
@@ -70,19 +72,74 @@ describe('List App', function(){
 
     }); // type field
 
-    it('should save and close', function(){
-      appModal.saveCloseBtn.click();
+    it('should save and view', function(){
+      appModal.saveBtn.click();
       expect(appModal.isCreateModalClosed()).toBe(true);
+      expect(appModal.isViewModalOpened()).toBe(true);
     });
 
   }); // Create Application Modal
+
+  describe('view application modal', function(){
+    var appModal = new CreateAppModal();
+
+    it('should have as title Application Detail', function(){
+      expect(appModal.viewAppTitle.getText()).toEqual('Application Detail');
+    });
+
+    xdescribe('displayed data set on create', function(){
+      it('should have name as label', function(){
+
+      });
+      it('should have the name', function(){
+
+      });
+      it('should have type as label', function(){
+
+      });
+      it('should have application as type', function(){
+
+      });
+
+    }); // displayed data set on create
+
+    describe('buttons', function(){
+
+      it('should have Edit button', function(){
+        expect(appModal.editBtn.getAttribute('value')).toEqual('Edit');
+
+      });
+
+      it('should have Delete button', function(){
+        expect(appModal.deleteBtn.getAttribute('value')).toEqual('Delete');
+      });
+      it('should have add task button', function(){
+         appModal.addTaskCommentBtnList.then(function(list){
+          expect(list[0].getText()).toEqual('  Add Task');
+        });
+      });
+
+      it('should have add comment button', function(){
+         appModal.addTaskCommentBtnList.then(function(list){
+          expect(list[1].getText()).toEqual('  Add Comment');
+        });
+      });
+    }); // buttons
+
+    describe('close view modal', function(){
+      it('should close view modal after click on x', function(){
+        appModal.closeBtn.click();
+        expect(appModal.isViewModalClosed()).toBe(true);
+      });
+    }); // close view modal
+  }); //view application modal 
 
   xit('should displayed confirmation message', function(){
     var appsListPage =  new ListApps();
     expect(appsListPage.confirmMsg.getText()).toEqual('Application App Test 1 created');
   });
   
-  xdescribe('search for app', function(){
+  describe('search for app', function(){
 
     var appsListPage =  new ListApps();
 

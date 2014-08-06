@@ -30,12 +30,22 @@ describe('Comments - Application', function(){
       expect(appModal.isCreateModalOpened()).toBe(true);
     });
 
-    it('should create an app and save and close', function(){
+    it('should create an app and save', function(){
       var appModal = new CreateAppModal();
-      appModal.createApp(appName,'close');
+      appModal.createApp(appName);
       expect(appModal.isCreateModalClosed()).toBe(true);
     });
 
+    it('should displayed view Modal', function(){
+      var appModal = new CreateAppModal();
+      expect(appModal.isViewModalOpened()).toBe(true);
+    });
+    
+    it('should close view modal', function(){
+      var appModal = new CreateAppModal();
+      appModal.closeBtn.click();
+      expect(appModal.isViewModalClosed()).toBe(true);
+    });
   }); //preconditions
 
   describe('search for app', function(){
@@ -60,7 +70,8 @@ describe('Comments - Application', function(){
 
   it('should have add comment as icon', function(){
     var appsListPage =  new ListApps();
-    expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
+    expect(appsListPage.isAddCommentIconDisplayed(appId)).toBe(true);
+    // expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
   });
 
   it('should open create comment modal', function(){
@@ -255,11 +266,13 @@ describe('Comments - Application', function(){
     
     it('should have comments as icon', function(){
       var appsListPage =  new ListApps();
-      expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
+      expect(appsListPage.isCommentsIconDisplayed(appId)).toBe(true);
+      // expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
     });
 
     it('should open comment list modal', function(){
       var appsListPage =  new ListApps();
+      browser.waitForAngular();
       appsListPage.clickOnCommentIcon(appId);
       var commTasklist = new CommentTaskList(); 
       expect(commTasklist.isListModalPresent()).toBe(true);
