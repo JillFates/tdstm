@@ -799,7 +799,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	};
 
 	scope.tasks.bundleSelected = function(){
-		$scope.tasks.selectedApplication = '';
+		scope.tasks.selectedApplication = '';
 		if (scope.tasks.selectedBundle && scope.currentSelectedRecipe.context != 'Bundle'){
 			scope.tasks.getListInBundle(scope.tasks.selectedBundle);
 		} else {
