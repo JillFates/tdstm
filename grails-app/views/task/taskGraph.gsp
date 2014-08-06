@@ -27,11 +27,11 @@
 			a {
 				pointer-events: auto !important;
 			}
-			g.node.unselected g a path {
+			g.node.unselected g a path,g.node.unselected g a polygon {
 				stroke-width: 1px !important;
 				stroke: #000000 !important;
 			}
-			g.node.selected g a path {
+			g.node.selected g a path,g.node.selected g a polygon {
 				stroke-width: 6px !important;
 				stroke: #ff0000 !important;
 			}
