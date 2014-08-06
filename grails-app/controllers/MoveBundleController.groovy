@@ -694,17 +694,17 @@ class MoveBundleController {
 		int percentagevirtualAssetCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + planStatusMovedQuery, 
 			countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0] : 0
 		
-		if (unassignedPhysialAssetCount==assignedPhysicalAsset){
-			percentagePhysicalAssetCount = 0;
-		} else {
-			percentagePhysicalAssetCount = percOfCount(percentagePhysicalAssetCount, assignedPhysicalAsset)
-		}
+//		if (unassignedPhysialAssetCount==assignedPhysicalAsset){
+//			percentagePhysicalAssetCount = 0;
+//		} else {
+			percentagePhysicalAssetCount = percOfCount(percentagePhysicalAssetCount, physicalCount)
+//		}
 		
-		if (unassignedVirtualAssetCount==assignedVirtualAsset){
-			percentagevirtualAssetCount = 0;
-		} else {
-			percentagevirtualAssetCount = percOfCount(percentagevirtualAssetCount, assignedVirtualAsset)
-		}
+//		if (unassignedVirtualAssetCount==virtualCount){
+//			percentagevirtualAssetCount = 0;
+//		} else {
+			percentagevirtualAssetCount = percOfCount(percentagevirtualAssetCount, virtualCount)
+//		}
 		
 		int percentageDBCount = moveBundleList ? Database.executeQuery(dbCountQuery + planStatusMovedQuery, countArgs)[0] : 0
 		
