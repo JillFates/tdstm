@@ -42,52 +42,60 @@ TaskProgressBar.prototype.showProgressBar = function() {
 TaskProgressBar.prototype.updateProgress = function() {
 	var self = this;
 	
-	var jqxhr = $.get('/tdstm/ws/progress/' + self.taskId, function(data) {
-		if (data) {
-			data = data.data;
-	        $('#progressTitle').html(self.progressTitle);
+	var jqxhr = $.ajax( 
+		{ 	type:'GET',
+			cache: false,
+			//dataType: 'json',
+			// data: 
+			url: tdsCommon.createAppURL('/ws/progress/' + self.taskId + '?rand=' + tdsCommon.randomString(16)), 
+			success: function(data) {
+				if (data) {
+					data = data.data;
+			        $('#progressTitle').html(self.progressTitle);
 
-			if (data.status == "In progress") {
-				var inner = $('#innerGlobalProgressBar');
-				var status = $('#progressStatus');
-				var value = data.percentComp;
-				inner.attr('aria-valuenow', value);
-				inner.css('width', value + '%');
-				inner.html(value + '%');
-				self.showProgressBar();
-				status.html(data.status);
-				
-			} else if (data.status == "Completed")  {
-				var inner = $('#innerGlobalProgressBar');
-				var status = $('#progressStatus');
-				var value = 100;
-				inner.attr('aria-valuenow', value);
-				inner.css('width', value + '%');
-				inner.html(value + '%');
-				status.html(data.status);
+					if (data.status == "In progress") {
+						var inner = $('#innerGlobalProgressBar');
+						var status = $('#progressStatus');
+						var value = data.percentComp;
+						inner.attr('aria-valuenow', value);
+						inner.css('width', value + '%');
+						inner.html(value + '%');
+						self.showProgressBar();
+						status.html(data.status);
+						
+					} else if (data.status == "Completed")  {
+						var inner = $('#innerGlobalProgressBar');
+						var status = $('#progressStatus');
+						var value = 100;
+						inner.attr('aria-valuenow', value);
+						inner.css('width', value + '%');
+						inner.html(value + '%');
+						status.html(data.status);
 
-				if (self.onSuccess != undefined) {
-					self.onSuccess();
+						if (self.onSuccess != undefined) {
+							self.onSuccess();
+						}
+						self.finishProgressBar();
+					} else {
+						var status = $('#progressStatus');
+						status.html(data.status + (data.detail ? ": " + data.detail : ""));
+						
+						$('#progressClose').show();
+						$('#progressClose').click(function() {
+							if (self.onFailure != undefined) {
+								self.onFailure();
+							}
+							self.finishProgressBar();
+						});
+
+					}
+				}
+			},
+			error: function() {
+				if (self.onFailure != undefined) {
+					self.onFailure();
 				}
 				self.finishProgressBar();
-			} else {
-				var status = $('#progressStatus');
-				status.html(data.status + (data.detail ? ": " + data.detail : ""));
-				
-				$('#progressClose').show();
-				$('#progressClose').click(function() {
-					if (self.onFailure != undefined) {
-						self.onFailure();
-					}
-					self.finishProgressBar();
-				});
-
 			}
-		}
-	}).fail(function() {
-		if (self.onFailure != undefined) {
-			self.onFailure();
-		}
-		self.finishProgressBar();
-	});
+		});
 }
