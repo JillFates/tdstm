@@ -1,2 +1,2 @@
 <label for="logs" class="sr-only">Logs </label>
-<textarea name="logs" id="logs" rows="6" ng-model="selectedRecipe.changelog" ng-disabled="editor.recipeType == 'release'" ng-change="onEditChangeLog()" value="{{selectedRecipe.changelog}}"></textarea>
+<textarea name="logs" id="logs" rows="6" ng-model="editor.selectedRecipe.changelog" ng-disabled="editor.recipeType == 'release'" ng-change="onEditChangeLog()" value="{{editor.selectedRecipe.changelog}}"></textarea>

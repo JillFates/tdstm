@@ -1,4 +1,4 @@
-<p>Select appropriate context to generate tasks using the {{selectedRecipe.name}} recipe:</p>
+<p>Select appropriate context to generate tasks using the {{editor.selectedRecipe.name}} recipe:</p>
 <form action="#" class="form-inline taskGeneration clearfix" ng-show="tasks.show.start">
 	<label class="inline" for="eventSelect">Event:
 		<select name="eventSelect" id="eventSelect" ng-model="tasks.selectedEvent" ng-change="tasks.eventSelected()" ng-options="item as item.name for item in tasks.eventsArray" ng-change="tasks.validCurrentSelection = tasks.getGenerateBtnStatus()">

@@ -67,11 +67,6 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 	// All Vars used
 	var listRecipes, columnSel, actionsTemplate, lastLoop, lastLoopData, rowToShow;
 
-	scope.editor = {
-		editingRecipe: false,
-		recipeType: 'wip'
-	};
-
 	// Default data to get recipes
 	scope.context = stateParams.context?stateParams.context:'All';
 	scope.archived = stateParams.archived?stateParams.archived:'n';
@@ -223,18 +218,6 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 						//scope.changeRecipe();
 					}else{
 						scope.currentSelectedRecipe = null;
-						scope.selectedRecipe = {
-							"name": "",
-							"description": "",
-							"context": "",
-							"createdBy":"",
-							"lastUpdated":"",
-							"versionNumber": "",
-							"hasWIP": "",
-							"sourceCode":"",
-							"changelog":"",
-							"clonedFrom":""
-						}
 					}
 				}, 50)
 				
@@ -359,23 +342,6 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	//------------------------------------------
 
-	var fillDefault = function(){
-		el = {
-			"recipeId": scope.currentSelectedRecipe.recipeId,
-			"name": scope.currentSelectedRecipe.name,
-			"description": scope.currentSelectedRecipe.description,
-			"createdBy": null,
-			"lastUpdated": "",
-			"versionNumber": scope.currentSelectedRecipe.versionNumber,
-			"hasWIP": scope.currentSelectedRecipe.hasWIP,
-			"sourceCode": "",
-			"changelog": "",
-			"clonedFrom": ""
-		}
-
-		return el;
-	}
-
 	var selectRecipeAndGo = function(row, stateName, recipeId) {
 		scope.recipesGridOptions.selectRow(row.rowIndex, true);
 		state.go(stateName, {'recipeId': recipeId});
@@ -486,9 +452,26 @@ tds.cookbook.controller.RecipesController.$inject = ['$scope', '$rootScope', '$t
 /********************************************************************************
  * Recipe detail controller
  */
-tds.cookbook.controller.RecipeDetailController = function(scope, state, stateParams, utils, cookbookService) {
+tds.cookbook.controller.RecipeDetailController = function(scope, state, stateParams, log, utils, cookbookService, recipeManager) {
 
 	scope.recipeId = stateParams.recipeId;
+
+	var fillDefault = function(clone){
+		el = {
+			"recipeId": scope.recipeId,
+			"name": (clone!=null)?clone.name:'',
+			"description": (clone!=null)?clone.description:'',
+			"createdBy": null,
+			"lastUpdated": "",
+			"versionNumber": "",
+			"hasWIP": false,
+			"sourceCode": "",
+			"changelog": "",
+			"clonedFrom": ""
+		}
+
+		return el;
+	}	
 
 	scope.recipeTabs = [
 		{ heading: "Task Generation", route:"recipes.detail.gentasks", active:false },
@@ -496,6 +479,16 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		{ heading: "Editor", route:"recipes.detail.code", active:false },
 		{ heading: "Versions", route:"recipes.detail.versions", active:false }
 	];
+
+	scope.editor = {
+		editingRecipe: false,
+		recipeType: 'wip',
+		selectedRVersion: fillDefault(),
+		selectedRWip: fillDefault(),
+		selectedRecipe: {},
+		justReleased: false
+	};
+	scope.editor.selectedRecipe = scope.editor.selectedRVersion;
 
 	scope.active = function(route){
 		return state.includes("**." + route + ".**");
@@ -517,9 +510,65 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		}
 	};
 
+	// Switching RELEASE or WIP
+	scope.switchWipRelease = function(recipeTypeToShow) {
+		scope.editor.recipeType = recipeTypeToShow;
+
+		if (scope.editor.justReleased){
+			scope.editor.selectedRWip.changelog = '';
+			scope.editor.justReleased = false;
+		}
+
+		scope.editor.selectedRecipe = (recipeTypeToShow == 'release') ? scope.editor.selectedRVersion : scope.editor.selectedRWip;
+	}
+
+	scope.getRecipeData = function() {
+		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
+			scope.editor.selectedRVersion = (data.data) ? data.data : null;
+			if(scope.editor.selectedRVersion.hasWIP){
+				// Only call getWipRecipe if there is the recipe has WIP
+				getWipData();
+			}else{
+				scope.editor.selectedRWip = fillDefault(scope.editor.selectedRVersion);
+				updateVersionSelection();
+			}
+			
+			log.info('Success on getting selected released recipe');
+			log.info(data.data);
+		}, function(){
+			scope.editor.selectedRVersion = fillDefault();
+			scope.editor.selectedRWip = angular.copy(scope.editor.selectedRVersion);
+			updateVersionSelection();
+			log.info('No records found for selected released Recipe');
+		});
+	};
+
+	// Only call getWipRecipe if there is the recipe has WIP
+	var getWipData = function(){
+		cookbookService.getARecipeVersion({details:stateParams.recipeId, moreDetails: 0, rand: tdsCommon.randomString(16)}, function(data){
+			// This is the selected recipe data.
+			scope.editor.selectedRWip = (data.data) ? data.data : null;
+			log.info('Success on getting selected wip recipe');
+			updateVersionSelection();
+		}, function(){
+			scope.editor.selectedRWip = fillDefault(scope.editor.selectedRVersion);
+			updateVersionSelection();
+			log.info('No records found for selected wip Recipe');
+		});
+	}
+
+	var updateVersionSelection = function() {
+		recipeManager.setActiveVersion(scope.editor.selectedRVersion);
+		recipeManager.setWip(scope.editor.selectedRWip);
+		recipeManager.setEditingRecipe(false);
+		scope.editor.editingRecipe = false;
+		scope.switchWipRelease('wip');
+	}
+
+	scope.getRecipeData();
 }
 
-tds.cookbook.controller.RecipeDetailController.$inject = ['$scope', '$state', '$stateParams', 'utils', 'cookbookService'];
+tds.cookbook.controller.RecipeDetailController.$inject = ['$scope', '$state', '$stateParams', '$log', 'utils', 'cookbookService', 'recipeManager'];
 
 
 /********************************************************************************
@@ -1103,7 +1152,7 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 	};
 
 	scope.cookbook.progressPromise = setInterval(function() {
-		cookbookService.getProgress({section: jobId}, {"id" : jobId, rand: tdsCommon.randomString(16)}, function(data) {
+		cookbookService.getProgress({section: jobId, rand: tdsCommon.randomString(16)}, {"id" : jobId}, function(data) {
 			scope.tasks.progressPercent = data.data.percentComp;
 			scope.tasks.progressRemaining = data.data.detail;
 			scope.tasks.show.progress = ((data.data.percentComp < 100) && 
@@ -1547,47 +1596,6 @@ tds.cookbook.controller.TaskBatchHistoryLogsController.$inject = ['$scope', '$st
 tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, state, stateParams, log, modal, timeout, utils, cookbookService, recipeManager, alerts) {
 
 	scope.recipeId = stateParams.recipeId;
-	scope.selectedRVersion = {}; // Recipe release version data
-	scope.selectedRWip = {}; // Recipe WIP data
-	scope.selectedRecipe = scope.selectedRVersion; // Active recipe, should be ref to selectedRVersion or selectedRWip
-	scope.editor.editingRecipe = false;
-	scope.editor.recipeType = 'wip';
-	var justReleased = false;
-
-	var getRecipeData = function() {
-		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
-			scope.selectedRVersion = (data.data) ? data.data : null;
-			if(scope.selectedRVersion.hasWIP){
-				// Only call getWipRecipe if there is the recipe has WIP
-				getWipData();
-			}else{
-				scope.selectedRWip = angular.copy(scope.selectedRVersion);
-				updateVersionSelection();
-			}
-			
-			log.info('Success on getting selected released recipe');
-			log.info(data.data);
-		}, function(){
-			scope.selectedRVersion = fillDefault();
-			scope.selectedRWip = angular.copy(scope.selectedRVersion);
-			updateVersionSelection();
-			log.info('No records found for selected released Recipe');
-		});
-	};
-
-	// Only call getWipRecipe if there is the recipe has WIP
-	var getWipData = function(){
-		cookbookService.getARecipeVersion({details:stateParams.recipeId, moreDetails: 0, rand: tdsCommon.randomString(16)}, function(data){
-			// This is the selected recipe data.
-			scope.selectedRWip = (data.data) ? data.data : null;
-			log.info('Success on getting selected wip recipe');
-			updateVersionSelection();
-		}, function(){
-			scope.selectedRWip = fillDefault();
-			updateVersionSelection();
-			log.info('No records found for selected wip Recipe');
-		});
-	}
 
 	scope.editorTabs = [
 		{ heading: "Change Logs", route:"recipes.detail.code.logs", active:false },
@@ -1624,17 +1632,17 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			windowClass: 'code-editor-modal',
 			resolve: {
 				sourceCode: function () {
-					return scope.selectedRecipe.sourceCode;
+					return scope.editor.selectedRecipe.sourceCode;
 				}
 			}
 		});
 		modalInstance.result.then(function (sourceCode) {
 			log.log('storing locally edition');
-			scope.selectedRWip.sourceCode = sourceCode;
-			scope.selectedRWip.changelog = scope.selectedRecipe.changelog;
+			scope.editor.selectedRWip.sourceCode = sourceCode;
+			scope.editor.selectedRWip.changelog = scope.editor.selectedRecipe.changelog;
 			recipeManager.setEditingRecipe(true);
 			scope.editor.editingRecipe = true;
-			scope.selectedRecipe = scope.selectedRWip;
+			scope.editor.selectedRecipe = scope.editor.selectedRWip;
 			if (scope.editor.recipeType != 'wip') {
 				scope.switchWipRelease('wip');
 			}
@@ -1642,14 +1650,14 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	};
 
 	scope.saveWIP = function() {
-		var tmpObj = angular.copy(scope.selectedRWip);
+		var tmpObj = angular.copy(scope.editor.selectedRWip);
 		var selectedId = stateParams.recipeId;
-		var selectedVersion = scope.selectedRWip.versionNumber;
+		var selectedVersion = scope.editor.selectedRWip.versionNumber;
 		dataToSend = $.param(tmpObj)
 		cookbookService.saveWIP({details:selectedId}, dataToSend, function(){
 			log.info('Success on Saving WIP');
 			alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
-			getRecipeData();
+			scope.getRecipeData();
 			rootScope.$broadcast("refreshRecipes");
 		}, function(){
 			log.warn('Error on Saving WIP');
@@ -1659,7 +1667,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	
 	// Release
 	scope.releaseVersion = function() {
-		var dataToSend = $.param(scope.selectedRecipe);
+		var dataToSend = $.param(scope.editor.selectedRecipe);
 		var selectedId = stateParams.recipeId;
 		if (scope.editor.editingRecipe) {
 			alert("You have unsaved changes. Please click Save WIP or Undo before proceeding.");
@@ -1669,12 +1677,12 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 				cookbookService.release({moreDetails:selectedId}, dataToSend, function(data) {
 					log.info('Success on Releasing');
 					alerts.addAlert({type: 'success', msg: 'Version Released', closeIn: 1500});
-					getRecipeData();
-					justReleased = true;
+					scope.editor.justReleased = true;
+					scope.getRecipeData();
 					rootScope.$broadcast("refreshRecipes");
 				}, function(){
 					log.warn('Error on Saving WIP');
-					if(scope.selectedRecipe.hasWIP){
+					if(scope.editor.selectedRecipe.hasWIP){
 						alerts.addAlert({type: 'danger', msg: 'Error: Unable to release version'});    
 					}else{
 						alerts.addAlert({type: 'danger', msg: 'Error: You can only release recipes'+
@@ -1689,7 +1697,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	scope.cancelChanges = function() {
 		var confirmation = confirm("You are about to undo local changes of the recipe.\n\nPress OK to undo changes otherwise press Cancel.");
 		if (confirmation == true) {
-			getRecipeData();
+			scope.getRecipeData();
 			return true;
 		}else{
 			return false;
@@ -1700,14 +1708,14 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	scope.discardWIP = function() {
 		var confirmation = confirm("You are about to permanently discard the WIP version of the recipe.\n\nPress OK discard WIP otherwise press Cancel.");
 		if (confirmation == true){
-			var dataToSend = $.param(scope.selectedRecipe),
+			var dataToSend = $.param(scope.editor.selectedRecipe),
 			selectedId = stateParams.recipeId,
-			selectedVersion = scope.selectedRecipe.versionNumber;
+			selectedVersion = scope.editor.selectedRecipe.versionNumber;
 			cookbookService.discardWIP({details:selectedId, moreDetails:selectedVersion}, 
 				dataToSend, function(){
 				log.info('Success on Discarding WIP');
 				alerts.addAlert({type: 'success', msg: 'WIP Discarded', closeIn: 1500});
-				getRecipeData();
+				scope.getRecipeData();
 				rootScope.$broadcast("refreshRecipes");
 			}, function(){
 				log.warn('Error on Discarding WIP');
@@ -1718,7 +1726,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 
 	// Validate Syntax
 	scope.validateSyntax = function() {
-		var dataToSend = $.param({'sourceCode': scope.selectedRWip.sourceCode});
+		var dataToSend = $.param({'sourceCode': scope.editor.selectedRWip.sourceCode});
 		cookbookService.validate({}, dataToSend, function(data){
 			scope.currentSyntaxValidation = data.warnings || [{"error":0,"reason":"No errors found"}];
 			state.go('recipes.detail.code.errors')
@@ -1730,10 +1738,10 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	
 	scope.diff = function() {
 		scope.showCompareCodeDialog(
-		   scope.selectedRVersion.sourceCode,
-		   scope.selectedRWip.sourceCode,
-		   ("Version " + scope.selectedRVersion.versionNumber),
-		   "WIP"
+			scope.editor.selectedRVersion.sourceCode,
+			scope.editor.selectedRWip.sourceCode,
+			("Version " + scope.editor.selectedRVersion.versionNumber),
+			"WIP"
 		);
 	};
 
@@ -1771,44 +1779,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 		);
 	}
 
-	var fillDefault = function(){
-		el = {
-			"recipeId": scope.recipeId,
-			"name": "",
-			"description": "",
-			"createdBy": null,
-			"lastUpdated": "",
-			"versionNumber": "",
-			"hasWIP": true,
-			"sourceCode": "",
-			"changelog": "",
-			"clonedFrom": ""
-		}
-
-		return el;
-	}
-
-	var updateVersionSelection = function() {
-		recipeManager.setActiveVersion(scope.selectedRVersion);
-		recipeManager.setWip(scope.selectedRWip);
-		scope.editor.editingRecipe= false;
-		recipeManager.setEditingRecipe(false);
-		scope.switchWipRelease('wip');
-	}
-
 	scope.wipConfig = [];
-
-	// Switching RELEASE or WIP radio buttons functionality. 
-	scope.switchWipRelease = function(recipeTypeToShow){
-		scope.editor.recipeType = recipeTypeToShow;
-
-		if (justReleased){
-			scope.selectedRWip.changelog = '';
-			justReleased = false;
-		}
-
-		scope.selectedRecipe = (recipeTypeToShow == 'release') ? scope.selectedRVersion : scope.selectedRWip;
-	}	
 
 	var codeViewLoaded = function(codeView) {
 		codeView.setSize("100%", "250px");
@@ -1825,7 +1796,6 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 		extraKeys: {"Ctrl-Space": "autocomplete"}
 	};
 
-	getRecipeData();
 }
 
 tds.cookbook.controller.RecipeEditorController.$inject = ['$scope', '$rootScope', '$state', '$stateParams', '$log', '$modal', '$timeout', 'utils', 'cookbookService', 'recipeManager', 'alerts'];
@@ -1919,7 +1889,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 	};
 
 	scope.groups.getContextId = function(){
-		var context = scope.selectedRecipe.context;
+		var context = scope.editor.selectedRecipe.context;
 		log.log(context);
 		switch(context){
 			case 'Application':
@@ -1945,7 +1915,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 
 	scope.groups.fetchGroups = function(recipeId, contextId){
 		scope.enabledGridSelection = false;
-		cookbookService.getGroups({recipeVersionId: scope.selectedRecipe.recipeVersionId, contextId: scope.groups.contextId, rand: tdsCommon.randomString(16)}, 
+		cookbookService.getGroups({recipeVersionId: scope.editor.selectedRecipe.recipeVersionId, contextId: scope.groups.contextId, rand: tdsCommon.randomString(16)}, 
 			function(data){
 			log.info('Success on getting Groups');
 			log.info(data.data.groups);
@@ -2095,11 +2065,9 @@ tds.cookbook.controller.RecipeEditorErrorsController.$inject = ['$scope', '$stat
 /********************************************************************************
  * Recipe Versions controller
  */
-tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, state, stateParams, log, timeout, modal, utils, cookbookService, recipeManager, alerts, recipeData, recipeVersionsData) {
+tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, state, stateParams, log, timeout, modal, utils, cookbookService, recipeManager, alerts, recipeVersionsData) {
 
 	var layoutPluginVersions = new ngGridLayoutPlugin();
-
-	scope.selectedRecipe = recipeData;
 
 	scope.versions = {
 		versionsArray : recipeVersionsData,
@@ -2166,13 +2134,13 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 				});
 			}
 		}else if(action == 'remove'){
-			console.log(scope.selectedRecipe);
+			console.log(scope.editor.selectedRecipe);
 			var confirmation = confirm("You are about to delete version " + version + " of recipe '" + 
 				scope.currentSelectedRecipe.name + "'.\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				log.info(item.entity);
 				var versionToDelete = item.entity.versionNumber?item.entity.versionNumber:0;
-				cookbookService.discardWIP({details:scope.selectedRecipe.recipeId, 
+				cookbookService.discardWIP({details:scope.editor.selectedRecipe.recipeId, 
 					moreDetails: versionToDelete}, function(data){
 					if (data.status == 'fail') {
 						alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data});
@@ -2332,7 +2300,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 	updateSelectedVersion();
 }
 
-tds.cookbook.controller.RecipeVersionsController.$inject = ['$scope', '$rootScope', '$state', '$stateParams', '$log', '$timeout', '$modal', 'utils', 'cookbookService', 'recipeManager', 'alerts', 'recipeData', 'recipeVersionsData'];
+tds.cookbook.controller.RecipeVersionsController.$inject = ['$scope', '$rootScope', '$state', '$stateParams', '$log', '$timeout', '$modal', 'utils', 'cookbookService', 'recipeManager', 'alerts', 'recipeVersionsData'];
 
 
 /********************************************************************************
@@ -2412,7 +2380,7 @@ tds.cookbook.controller.RecipeVersionsDiffController = function(scope, state, st
 					}
 				}
 			);
-			if (recipeManager.isEditingRecipe() || scope.selectedRecipe.hasWIP) {
+			if (recipeManager.isEditingRecipe() || scope.editor.selectedRecipe.hasWIP) {
 				toCompareVersions.splice(0, 0, "WIP");				
 			}
 		}
@@ -2991,16 +2959,6 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 				}
 			},
 			resolve: {
-				"recipeData": function($q, $stateParams, $log, cookbookService) {
-					var deferred = $q.defer();
-					cookbookService.getARecipeVersion({details: $stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
-						deferred.resolve((data.data) ? data.data : null);
-					}, function(){		
-						$log.info('No records found for selected released Recipe');
-						deferred.reject(null);
-					});
-					return deferred.promise;
-				},
 				"recipeVersionsData": function($q, $stateParams, $log, cookbookService) {
 					var deferred = $q.defer();
 					cookbookService.getVersions({moreDetails: $stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
