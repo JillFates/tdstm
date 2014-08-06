@@ -891,7 +891,7 @@ function generateDepSel(taskId, taskDependencyId, category, selectedPred, select
 
 function enableCreateIcon(id){
 	$(".create_"+id).css("display","block")
-	$("#span_"+id).html("<img src='../images/minus.gif'/>")
+	$("#span_"+id).html("<img src='../images/plus_disabled.gif'/>")
 	$("#span_"+id).attr("onClick","disableCreateIcon("+id+")")
 	new Ajax.Request(contextPath+'/rackLayouts/savePreference?preference=ShowAddIcons&add=true',{asynchronous:true,evalScripts:true })
 }

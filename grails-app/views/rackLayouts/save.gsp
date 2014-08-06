@@ -61,7 +61,7 @@
 					 <tds:hasPermission permission="AssetEdit">
 						<g:if test="${showIconPref =='true'}">
 							<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
-								<img src='../images/minus.gif' /></span>
+								<img src='../images/plus_disabled.gif' /></span>
 						</g:if>
 						<g:else>
 							<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 

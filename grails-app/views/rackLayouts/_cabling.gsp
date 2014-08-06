@@ -320,8 +320,8 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
       </td>
       <td ng-show="showRow(cable.cableId)">
       	<tds:hasPermission permission="EditModel">
-	     	<img src="${resource(dir:'icons',file:'delete.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;"/>
-			<img src="${resource(dir:'images',file:'check12.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;"/>
+	     	<img src="${resource(dir:'icons',file:'cancel.png')}" id="cancelButton_{{cable.cableId}}" class="pointer btn" ng-click="cancelRow(cable.cableId)" style="width:18px;" title="Cancel Changes"/>
+			<img src="${resource(dir:'icons',file:'accept.png')}" class="pointer btn" ng-click="submitAction(cable.cableId)" style="width:18px;" title="Save Changes"/>
 		</tds:hasPermission>
       </td>
     </tr>
