@@ -565,6 +565,89 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 		scope.switchWipRelease('wip');
 	}
 
+	// generate an array to show the select element correctly
+	// Expect opts with the following data: isUnassigned (boolean), unassignedArray 
+	// (array with unassigned info)
+	// assignedArray (array with assigned info), and groupName which would be the group name if 
+	// isUnassigned is false.
+	scope.generateOptions = function(opts, scopeContext){
+		var newArray = (opts.isUnassigned) ? opts.unassignedArray : opts.assignedArray;
+		if(opts.isUnassigned){
+			angular.forEach(newArray, function(value, key){
+				value.group = 'unassigned';
+			})
+			scopeContext.bundlesArrayUnassigned = newArray;
+		}else{
+			angular.forEach(newArray, function(value, key){
+				value.group = opts.groupName;
+			})
+		}
+		return newArray
+	}	
+
+	// Get List of Bundles for a given Event
+	scope.getListBundles = function(event, scopeContext){
+		var event = (event == 0) ? {id: 0} : event;
+		cookbookService.getListBundles({details: event.id, rand: tdsCommon.randomString(16)}, function(data){
+			log.info('Success on getting Bundles');
+			log.info(data.data.list);
+			if(event.id == 0){
+				//generate an array to show the select element correctly
+				scopeContext.bundlesArrayUnassigned = scope.generateOptions({
+					isUnassigned: true, 
+					unassignedArray: data.data.list, 
+					assignedArray: []
+				}, scopeContext);
+			}else{
+				//generate an array to show the select element correctly
+				scopeContext.bundlesArrayAssigned = scope.generateOptions({
+					isUnassigned: false, 
+					unassignedArray: angular.copy(scopeContext.bundlesArrayUnassigned), 
+					assignedArray: data.data.list, 
+					groupName: event.name
+				}, scopeContext);
+			}
+			scopeContext.bundlesArray = angular.copy(scopeContext.bundlesArrayAssigned)
+			.concat(angular.copy(scopeContext.bundlesArrayUnassigned));
+		}, function(){
+			log.info('Error on getting Bundles');
+		});
+	}
+
+	// Get Applications in for a given Bundle
+	scope.getListInBundle = function(bundle, scopeContext, isGroup){
+		var bundle = (bundle == 0) ? {id: 0} : bundle;
+		if(bundle.group != 'unassigned'){
+			cookbookService.getListInBundle({details: bundle.id, rand: tdsCommon.randomString(16)}, function(data){
+				log.info('Success on getting Applications');
+				log.info(data.data.list);
+				if(bundle.id == 0){
+					//generate an array to show the select element correctly
+					scopeContext.applicationsArrayUnassigned = scope.generateOptions({
+						isUnassigned: true, 
+						unassignedArray: data.data.list, 
+						assignedArray: []
+					}, scopeContext);
+				}else{
+					//generate an array to show the select element correctly
+					scopeContext.applicationsArrayAssigned = scope.generateOptions({
+						isUnassigned: false, 
+						unassignedArray: angular.copy(scopeContext.applicationsArrayUnassigned), 
+						assignedArray: data.data.list, 
+						groupName: bundle.name,
+						isGroup: isGroup
+					}, scopeContext);
+				}
+				scopeContext.applicationsArray = angular.copy(scopeContext.applicationsArrayAssigned).
+				concat(angular.copy(scopeContext.applicationsArrayUnassigned));
+			}, function(){
+				log.info('Error on getting Applications');
+			});
+		}else{
+			scopeContext.applicationsArray = angular.copy(scopeContext.applicationsArrayUnassigned)
+		}
+	}
+
 	scope.getRecipeData();
 }
 
@@ -856,7 +939,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		scope.tasks.selectedBundle = '';
 		scope.tasks.selectedApplication = '';
 		if (scope.tasks.selectedEvent && scope.currentSelectedRecipe.context != 'Event'){
-			scope.tasks.getListBundles(scope.tasks.selectedEvent);
+			scope.getListBundles(scope.tasks.selectedEvent, scope.tasks);
 		}else{
 			scope.tasks.blankBundles();
 		}
@@ -866,7 +949,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	scope.tasks.bundleSelected = function(){
 		scope.tasks.selectedApplication = '';
 		if (scope.tasks.selectedBundle && scope.currentSelectedRecipe.context != 'Bundle'){
-			scope.tasks.getListInBundle(scope.tasks.selectedBundle);
+			scope.getListInBundle(scope.tasks.selectedBundle, scope.tasks, false);
 		} else {
 			scope.tasks.blankApplications();
 		}
@@ -879,30 +962,6 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		scope.tasks.selectedBundle = '';
 		scope.tasks.selectedApplication = '';
 	};
-
-	// generate an array to show the select element correctly
-	// Expect opts with the following data: isUnassigned (boolean), unassignedArray 
-	// (array with unassigned info)
-	// assignedArray (array with assigned info), and groupName which would be the group name if 
-	// isUnassigned is false.
-	scope.tasks.generateOptions = function(opts){
-		var newArray = (opts.isUnassigned) ? opts.unassignedArray : opts.assignedArray;
-		if(opts.isUnassigned){
-			angular.forEach(newArray, function(value, key){
-				value.group = 'unassigned';
-			})
-			if(opts.isGroup){
-				scope.groups.bundlesArrayUnassigned = newArray;
-			}else{
-				scope.tasks.bundlesArrayUnassigned = newArray;
-			}
-		}else{
-			angular.forEach(newArray, function(value, key){
-				value.group = opts.groupName;
-			})
-		}
-		return newArray
-	}
 
 	scope.tasks.viewGeneratedResults = function(e){
 		var id = scope.tasks.currentTaskBeingGenerated;
@@ -982,114 +1041,6 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	scope.getTaskGenerationExceptions = function() {
 		return scope.tasks.generation.exceptions;
 	}
-
-	// Get List of Bundles for a given Event
-	scope.tasks.getListBundles = function(event, isGroup){
-		var event = (event == 0) ? {id: 0} : event;
-		cookbookService.getListBundles({details: event.id, rand: tdsCommon.randomString(16)}, function(data){
-			log.info('Success on getting Bundles');
-			log.info(data.data.list);
-			if(event.id == 0){
-				//generate an array to show the select element correctly
-				if(isGroup){
-					scope.groups.bundlesArrayUnassigned = scope.tasks.generateOptions({
-						isUnassigned: true, 
-						unassignedArray: data.data.list, 
-						assignedArray: []
-					});
-				}else{
-					scope.tasks.bundlesArrayUnassigned = scope.tasks.generateOptions({
-						isUnassigned: true, 
-						unassignedArray: data.data.list, 
-						assignedArray: []
-					});
-				}
-			}else{
-				//generate an array to show the select element correctly
-				if(isGroup){
-					scope.groups.bundlesArrayAssigned = scope.tasks.generateOptions({
-						isUnassigned: false, 
-						unassignedArray: angular.copy(scope.groups.bundlesArrayUnassigned), 
-						assignedArray: data.data.list, 
-						groupName: event.name
-					});
-				}else{
-					scope.tasks.bundlesArrayAssigned = scope.tasks.generateOptions({
-						isUnassigned: false, 
-						unassignedArray: angular.copy(scope.tasks.bundlesArrayUnassigned), 
-						assignedArray: data.data.list, 
-						groupName: event.name
-					});
-				}
-			}
-			if(isGroup){
-				scope.groups.bundlesArray = angular.copy(scope.groups.bundlesArrayAssigned)
-				.concat(angular.copy(scope.groups.bundlesArrayUnassigned));
-			}else{
-				scope.tasks.bundlesArray = angular.copy(scope.tasks.bundlesArrayAssigned)
-				.concat(angular.copy(scope.tasks.bundlesArrayUnassigned));
-			}
-		}, function(){
-			log.info('Error on getting Bundles');
-		});
-	}
-
-	// Get Applications in for a given Bundle
-	scope.tasks.getListInBundle = function(bundle, isGroup){
-		var bundle = (bundle == 0) ? {id: 0} : bundle;
-		if(bundle.group != 'unassigned'){
-			cookbookService.getListInBundle({details: bundle.id, rand: tdsCommon.randomString(16)}, function(data){
-				log.info('Success on getting Applications');
-				log.info(data.data.list);
-				if(bundle.id == 0){
-					//generate an array to show the select element correctly
-					if(isGroup){
-						scope.groups.applicationsArrayUnassigned = scope.tasks.generateOptions({
-							isUnassigned: true, 
-							unassignedArray: data.data.list, 
-							assignedArray: []
-						});
-					}else{
-						scope.tasks.applicationsArrayUnassigned = scope.tasks.generateOptions({
-							isUnassigned: true, 
-							unassignedArray: data.data.list, 
-							assignedArray: []
-						});
-					}
-				}else{
-					//generate an array to show the select element correctly
-					if(isGroup){
-						scope.groups.applicationsArrayAssigned = scope.tasks.generateOptions({
-							isUnassigned: false, 
-							unassignedArray: angular.copy(scope.tasks.applicationsArrayUnassigned), 
-							assignedArray: data.data.list, 
-							groupName: bundle.name,
-							isGroup: true
-						});
-					}else{
-						scope.tasks.applicationsArrayAssigned = scope.tasks.generateOptions({
-							isUnassigned: false, 
-							unassignedArray: angular.copy(scope.tasks.applicationsArrayUnassigned), 
-							assignedArray: data.data.list, 
-							groupName: bundle.name,
-							isGroup: false
-						});
-					}
-				}
-				if(isGroup){
-					scope.groups.applicationsArray = angular.copy(scope.tasks.applicationsArrayAssigned).
-					concat(angular.copy(scope.tasks.applicationsArrayUnassigned));
-				}else{
-					scope.tasks.applicationsArray = angular.copy(scope.tasks.applicationsArrayAssigned).
-					concat(angular.copy(scope.tasks.applicationsArrayUnassigned));
-				}
-			}, function(){
-				log.info('Error on getting Applications');
-			});
-		}else{
-			scope.tasks.applicationsArray = angular.copy(scope.tasks.applicationsArrayUnassigned)
-		}
-	}	
 
 	var getEventsAndBundles = function() {
 		cookbookService.getEventsAndBundles({rand: tdsCommon.randomString(16)}, function(data){
@@ -1869,7 +1820,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		scope.groups.selectedBundle = '';
 		scope.groups.selectedApplication = '';
 		if(scope.groups.selectedEvent && scope.currentSelectedRecipe.context != 'Event'){
-			scope.tasks.getListBundles(scope.groups.selectedEvent, isGroup);
+			scope.getListBundles(scope.groups.selectedEvent, scope.groups);
 		}else{
 			scope.groups.blankBundles();
 		}
@@ -1878,7 +1829,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 	scope.groups.bundleSelected = function(){
 		scope.groups.selectedApplication = '';
 		if(scope.groups.selectedBundle && scope.currentSelectedRecipe.context != 'Bundle'){
-			scope.tasks.getListInBundle(scope.groups.selectedBundle, isGroup);
+			scope.getListInBundle(scope.groups.selectedBundle, scope.groups, true);
 		}else{
 			scope.groups.blankApplications();
 		}
