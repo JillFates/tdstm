@@ -86,7 +86,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	// Method to Get the list of Recipes.
 	listRecipes = function(){
-		scope.recipes = cookbookService.getListOfRecipes({archived: scope.archived, context: scope.context}, 
+		scope.recipes = cookbookService.getListOfRecipes({archived: scope.archived, context: scope.context, rand: tdsCommon.randomString(16) }, 
 			function(data){
 			log.info('Success on getting Recipes');
 			if(data.data){
@@ -325,7 +325,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 			scope.save.promise = timeout(function(){
 				cookbookService.putInRecipe({details:rid}, recipeToUpdate, function(data){
 					if(data.data){
-						log.info('Racipe Updated');
+						log.info('Recipe Updated');
 						scope.save.pending = false;
 
 						scope.currentSelectedRecipe.name = recipeToUpdate.name;
@@ -602,7 +602,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 	var getProjectsAndStatuses = function(){
 		log.log('getProjectsAndStatuses');
 		cookbookService.getUserProjects(
-			{currentPage: 0, maxRows: 1000}, 
+			{currentPage: 0, maxRows: 1000, rand: tdsCommon.randomString(16)}, 
 			function(data){
 				log.info('Success on getting Project list');
 				scope.clone.projectsArray = data.data.projects;
@@ -625,7 +625,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		if(scope.clone.selectedContext && scope.clone.selectedProject/* && $scope.clone.selectedProjectState*/){
 			log.info('fill the grid');
 			cookbookService.getListOfRecipes(
-				{context: scope.clone.selectedContext.name, projectType: scope.clone.selectedProject.id}, 
+				{context: scope.clone.selectedContext.name, projectType: scope.clone.selectedProject.id, rand: tdsCommon.randomString(16)}, 
 				function(data){
 					log.info('Success on getting Recipes to Clone');
 					log.info(data.data.list);
@@ -773,6 +773,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 	// Get Task Batch Info
 	scope.tasks.getTaskBatchInfo = function(params){
+		params.rand = tdsCommon.randomString(16);
 		cookbookService.getTaskBatchInfo(params, function(data){
 			log.info('Success on getting Task Batch Info');
 			log.info(data);
@@ -936,7 +937,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	// Get List of Bundles for a given Event
 	scope.tasks.getListBundles = function(event, isGroup){
 		var event = (event == 0) ? {id: 0} : event;
-		cookbookService.getListBundles({details: event.id}, function(data){
+		cookbookService.getListBundles({details: event.id, rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting Bundles');
 			log.info(data.data.list);
 			if(event.id == 0){
@@ -988,7 +989,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	scope.tasks.getListInBundle = function(bundle, isGroup){
 		var bundle = (bundle == 0) ? {id: 0} : bundle;
 		if(bundle.group != 'unassigned'){
-			cookbookService.getListInBundle({details: bundle.id}, function(data){
+			cookbookService.getListInBundle({details: bundle.id, rand: tdsCommon.randomString(16)}, function(data){
 				log.info('Success on getting Applications');
 				log.info(data.data.list);
 				if(bundle.id == 0){
@@ -1042,7 +1043,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	}	
 
 	var getEventsAndBundles = function() {
-		cookbookService.getEventsAndBundles({}, function(data){
+		cookbookService.getEventsAndBundles({rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting Events and Bundles');
 			log.info(data.data.list);
 			scope.tasks.eventsArray = data.data.list;
@@ -1054,7 +1055,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 	// Get User Preference
 	var getUserPreferences = function() {
-		cookbookService.getUserPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
+		cookbookService.getUserPreferences({details: 'MOVE_EVENT,CURR_BUNDLE', rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting User Preferences');
 			log.info(data.data.preferences);
 			if (data.data.preferences.MOVE_EVENT) {
@@ -1102,11 +1103,11 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 	};
 
 	scope.cookbook.progressPromise = setInterval(function() {
-		cookbookService.getProgress({section: jobId}, {"id" : jobId}, function(data) {
+		cookbookService.getProgress({section: jobId}, {"id" : jobId, rand: tdsCommon.randomString(16)}, function(data) {
 			scope.tasks.progressPercent = data.data.percentComp;
 			scope.tasks.progressRemaining = data.data.detail;
 			scope.tasks.show.progress = ((data.data.percentComp < 100) && 
-				                         ((data.data.status == "Pending") || (data.data.status == "Processing")));
+				((data.data.status == "Pending") || (data.data.status == "Processing")));
 			
 			if (!scope.tasks.show.progress) {
 				clearInterval(scope.cookbook.progressPromise);
@@ -1134,7 +1135,7 @@ tds.cookbook.controller.TaskGenerationCompletedController = function(scope, stat
 
 	var taskBatchId = stateParams.taskBatchId;
 
-	cookbookService.getTaskBatch({section: taskBatchId}, function(data){
+	cookbookService.getTaskBatch({section: taskBatchId, rand: tdsCommon.randomString(16)}, function(data){
 		scope.tasks.generation.status = data.data.taskBatch.status;
 		scope.tasks.generation.taskCreated = data.data.taskBatch.taskCount;
 		scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
@@ -1333,6 +1334,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	// Get List of Task batches for a given Recipe
 	scope.tasks.getListTaskBatches = function(params){
 		scope.enabledGridSelection = false;
+		params.rand = tdsCommon.randomString(16);
 		cookbookService.getListTaskBatches(params, function(data){
 			log.info('Success on getting Task Batches');
 			log.info(data);
@@ -1495,7 +1497,7 @@ tds.cookbook.controller.TaskBatchHistoryTasksController = function(scope, state,
 	};
 
 	if ((taskBatchId != null) && (taskBatchId != "")) {
-		cookbookService.getTasksOfTaskBatch({section: taskBatchId}, function(data){
+		cookbookService.getTasksOfTaskBatch({section: taskBatchId, rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on reading tasks of task batch');
 			log.info(data);
 			scope.assetComments.colDef = scope.assetComments.withDataColDef;
@@ -1553,7 +1555,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	var justReleased = false;
 
 	var getRecipeData = function() {
-		cookbookService.getARecipeVersion({details:stateParams.recipeId}, function(data){
+		cookbookService.getARecipeVersion({details:stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 			scope.selectedRVersion = (data.data) ? data.data : null;
 			if(scope.selectedRVersion.hasWIP){
 				// Only call getWipRecipe if there is the recipe has WIP
@@ -1575,7 +1577,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 
 	// Only call getWipRecipe if there is the recipe has WIP
 	var getWipData = function(){
-		cookbookService.getARecipeVersion({details:stateParams.recipeId, moreDetails: 0}, function(data){
+		cookbookService.getARecipeVersion({details:stateParams.recipeId, moreDetails: 0, rand: tdsCommon.randomString(16)}, function(data){
 			// This is the selected recipe data.
 			scope.selectedRWip = (data.data) ? data.data : null;
 			log.info('Success on getting selected wip recipe');
@@ -1943,7 +1945,8 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 
 	scope.groups.fetchGroups = function(recipeId, contextId){
 		scope.enabledGridSelection = false;
-		cookbookService.getGroups({recipeVersionId: scope.selectedRecipe.recipeVersionId, contextId: scope.groups.contextId}, function(data){
+		cookbookService.getGroups({recipeVersionId: scope.selectedRecipe.recipeVersionId, contextId: scope.groups.contextId, rand: tdsCommon.randomString(16)}, 
+			function(data){
 			log.info('Success on getting Groups');
 			log.info(data.data.groups);
 			scope.groups.groupsArray = data.data.groups;
@@ -2044,7 +2047,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 	};
 
 	scope.getEventsAndBundles = function(){
-		cookbookService.getEventsAndBundles({}, function(data){
+		cookbookService.getEventsAndBundles({rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting Events and Bundles');
 			log.info(data.data.list);
 			scope.groups.eventsArray = data.data.list;
@@ -2055,7 +2058,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 	};
 
 	scope.getUserPreferences = function(){
-		cookbookService.getUserPreferences({details: 'MOVE_EVENT,CURR_BUNDLE'}, function(data){
+		cookbookService.getUserPreferences({details: 'MOVE_EVENT,CURR_BUNDLE', rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting User Preferences');
 			log.info(data.data.preferences);
 			if(data.data.preferences.MOVE_EVENT){
@@ -2192,7 +2195,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 			if (versionNumber == "WIP") {
 				scope.versions.compareVersions(scope.versions.selectedVersion, recipeManager.wip());
 			} else {
-				cookbookService.getARecipeVersion({details:scope.currentSelectedRecipe.recipeId, moreDetails: versionNumber},
+				cookbookService.getARecipeVersion({details:scope.currentSelectedRecipe.recipeId, moreDetails: versionNumber, rand: tdsCommon.randomString(16)},
 					function(data){
 						scope.versions.compareVersions(scope.versions.selectedVersion, data.data);
 					}, function(){
@@ -2301,7 +2304,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 	scope.versions.getVersions = function(obj){
 		scope.versions.selectedVersionRow = {};
 		scope.versions.versionsGrid.selectedItems = [];
-		cookbookService.getVersions({moreDetails: obj.recipeId}, function(data){
+		cookbookService.getVersions({moreDetails: obj.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 			log.info('Success on getting versions');
 			log.info(data.data.recipeVersions);
 			scope.versions.versionsArray = data.data.recipeVersions;
@@ -2704,7 +2707,8 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 			domain: "@domain",
 			section: "@section",
 			details: "@details",
-			moreDetails: "@moreDetails"
+			moreDetails: "@moreDetails",
+			rand: '',
 		},
 		restMethodDefinitions
 	);
@@ -2989,7 +2993,7 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 			resolve: {
 				"recipeData": function($q, $stateParams, $log, cookbookService) {
 					var deferred = $q.defer();
-					cookbookService.getARecipeVersion({details: $stateParams.recipeId}, function(data){
+					cookbookService.getARecipeVersion({details: $stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 						deferred.resolve((data.data) ? data.data : null);
 					}, function(){		
 						$log.info('No records found for selected released Recipe');
@@ -2999,7 +3003,7 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 				},
 				"recipeVersionsData": function($q, $stateParams, $log, cookbookService) {
 					var deferred = $q.defer();
-					cookbookService.getVersions({moreDetails: $stateParams.recipeId}, function(data){
+					cookbookService.getVersions({moreDetails: $stateParams.recipeId, rand: tdsCommon.randomString(16)}, function(data){
 						$log.info('Success on getting versions');
 						deferred.resolve(data.data.recipeVersions);
 					}, function(){
@@ -3023,7 +3027,7 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 			resolve: {
 				"recipeVersionData": function($q, $stateParams, $log, cookbookService) {
 					var deferred = $q.defer();
-					cookbookService.getARecipeVersion({details: $stateParams.recipeId, moreDetails: $stateParams.recipeVersion},
+					cookbookService.getARecipeVersion({details: $stateParams.recipeId, moreDetails: $stateParams.recipeVersion, rand: tdsCommon.randomString(16)},
 					function(data){
 						$log.info('Success on getting version');
 						$log.info(data.data);
