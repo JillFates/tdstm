@@ -71,7 +71,7 @@
 
 		<div class="container" ng-controller="tds.comments.controller.MainController as comments" ui-view></div>
 
-		<loading-indicator></loading-indicator>
+		<loading-indicator enabled="cookbook.loadingIndicatorEnabled"></loading-indicator>
 
 	</div>
 

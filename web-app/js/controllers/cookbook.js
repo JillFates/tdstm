@@ -21,14 +21,29 @@ tds.cookbook.directive = tds.cookbook.directive || {};
  */
 tds.cookbook.controller.MainController = function(scope, rootScope, log, recipeManager) {
 
-	rootScope.previousState = ''; 
-	rootScope.currentState = ''; 
+	scope.cookbook = {
+		loadingIndicatorEnabled: true,
+		progressPromise: null
+	};
+
+	rootScope.previousState = '';
+	rootScope.currentState = '';
 	
 	rootScope.$on('$stateChangeSuccess', function(ev, to, toParams, from, fromParams) { 
 		rootScope.previousState = from.name; 
 		rootScope.currentState = to.name; 
 		log.log('Previous state:' + rootScope.previousState);
 		log.log('Current state:' + rootScope.currentState);
+
+		//Disable loading indicator when cookbook is in the state 
+		scope.cookbook.loadingIndicatorEnabled = (rootScope.currentState != "recipes.detail.gentasks.progress");
+
+		//Clear timer if the state is not recipes.detail.gentasks.progress
+		if ((scope.cookbook.progressPromise != null) &&
+			(rootScope.currentState != "recipes.detail.gentasks.progress")) {
+			clearInterval(scope.cookbook.progressPromise);
+			scope.cookbook.progressPromise = null;
+		}
 	});
 
 	$(window).on('beforeunload', function(){
@@ -1081,10 +1096,12 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 	scope.tasks.currentTaskBeingGenerated = taskId;
 
 	scope.cancelGeneration = function() {
-		state.go("recipes.detail.gentasks.start", {'taskBatchId': taskId});
+		clearInterval(scope.cookbook.progressPromise);
+		scope.cookbook.progressPromise = null;
+		state.go("recipes.detail.gentasks.start", {'recipeId': stateParams.recipeId, 'taskBatchId': taskId});
 	};
 
-	scope.tasks.show.promise = setInterval(function() {
+	scope.cookbook.progressPromise = setInterval(function() {
 		cookbookService.getProgress({section: jobId}, {"id" : jobId}, function(data) {
 			scope.tasks.progressPercent = data.data.percentComp;
 			scope.tasks.progressRemaining = data.data.detail;
@@ -1092,7 +1109,8 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 				                         ((data.data.status == "Pending") || (data.data.status == "Processing")));
 			
 			if (!scope.tasks.show.progress) {
-				clearInterval(scope.tasks.show.promise);
+				clearInterval(scope.cookbook.progressPromise);
+				scope.cookbook.progressPromise = null;
 				if (data.data.status == "Failed" ) {
 					alerts.addAlert({type: 'danger', msg: data.data.detail});
 				} else {

@@ -516,7 +516,8 @@ tds.core.directive.LoadingIndicator = function(timeout, utils) {
 		restrict: 'EA',
 		templateUrl: utils.url.applyRootPath('/components/core/loading-indicator.html'),
 		scope: {
-			align: '@align'
+			align: '@align',
+			enabled: '=enabled'
 		},
 		link: function(scope, element, attrs) {
 			scope.animClass = "loading-indicator-anim-center";
@@ -527,7 +528,9 @@ tds.core.directive.LoadingIndicator = function(timeout, utils) {
 			}
 			scope.isLoading = false;
 			scope.$on("newServiceRequest", function () {
-				scope.isLoading = true;
+				if (angular.isUndefined(scope.enabled) || scope.enabled) {
+					scope.isLoading = true;
+				}
 			});
 			scope.$on("noPendingRequests", function () {
 				timeout(hideElement, 500);
