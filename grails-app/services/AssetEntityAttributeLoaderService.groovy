@@ -440,7 +440,8 @@ class AssetEntityAttributeLoaderService {
 	def createBundleIfNotExist(String bundleName, Project project){
 		def moveBundle = MoveBundle.findByNameAndProject( bundleName, project );
 		if(!moveBundle){
-			moveBundle = new MoveBundle( name:bundleName, project:project, operationalOrder:1, workflowCode: project.workflowCode )
+			moveBundle = new MoveBundle( name:bundleName, operationalOrder:1, workflowCode: project.workflowCode )
+			moveBundle.project = project
 			if(!moveBundle.save()){
 				def etext = "Unable to create movebundle" + GormUtil.allErrorsString( moveBundle )
 				log.error(etext)
