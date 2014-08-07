@@ -56,13 +56,26 @@ class DashboardController {
 			userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
 			def results = taskService.getMoveEventTaskSummary(moveEvent)
-			def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
-
+			def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent) //use the matrix instead once _taskSummary
+			
+			ArrayList teamTaskResultsMatrix = [] //use this in _taskSummary.gsp
+			def i = 0
+			teamTaskResults.each() {
+				def iMod = i%6
+				if(teamTaskResultsMatrix[iMod] == null)
+					teamTaskResultsMatrix[iMod] = new ArrayList()
+				teamTaskResultsMatrix[iMod] << it.getValue()
+				++i
+			}
+			
+			log.debug "egg1 ${results.taskStatusMap}"
+			log.debug "egg ${teamTaskResultsMatrix}"
+			
 			return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
 				moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
 				manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
 				taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration,
-				teamTaskMap:teamTaskResults, roles:teamTaskResults.values().role]
+				teamTaskMap:teamTaskResults, roles:teamTaskResults.values().role, teamTaskMatrix:teamTaskResultsMatrix] // help
 		}
 	}
 	

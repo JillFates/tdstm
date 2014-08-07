@@ -1,4 +1,5 @@
 <script type="text/javascript">
+egg here ${taskStatusMap}
 $(document).ready(function() {
     var percentageTaskDone=${taskStatusMap['Completed'].taskCount ? ((taskStatusMap['Completed'].taskCount/taskCountByEvent)*100).intValue() :0};
     $("#tasksDoneBar").animate({width: percentageTaskDone+"%" }, 1000);
@@ -82,19 +83,23 @@ $(document).ready(function() {
     </table>
  </div>
  <div style="margin-left:52%;position:absolute;margin-top: 20px;">
-  	<table style="border:none;">
-	   	<g:each in="${roles}" var="role" status="i">
-	   		<input type="hidden" name="${role.id}" id="${role.id}" value="${teamTaskMap[role.id].teamTaskCount ? Math.round((teamTaskMap[role.id].teamDoneCount/teamTaskMap[role.id].teamTaskCount)*100) :0}"/>	
-	   		<g:if test="${i==0 || i%2==0 }">
-	    		<tr>
-	    	</g:if>
-	    		<td><b>${role.description}</b></td>
-	    		<td><b>${teamTaskMap[role.id].teamTaskCount}</b></td>
-	    		<td>
-	    			<g:set var="remainingTeamTask" value="${teamTaskMap[role.id].teamTaskCount-teamTaskMap[role.id].teamDoneCount}" />
-		    		<g:if test="${remainingTeamTask>0 }" >
-		    		<div class="team_bar_base_small">
-						<div class="team_bar_graph_small" id="team_${role.id}" style="width: ${rolesPercentageMap? rolesPercentageMap[role.id]:'0'}%;"></div>
+  	
+	<table style="border:none;">
+		<g:set var="i" value="${0}" />
+		<g:each var="r" in="${teamTaskMatrix}">
+			<tr>
+			<g:each var="c" in="${r}">
+				<g:set var="team" value="${c}" />
+				<input type="hidden" name="${roles[i].id}" id="${roles[i].id}"
+					value="${team.teamTaskCount ? Math.round((team.teamDoneCount / team.teamTaskCount)*100):0}" />
+				<td><b>${roles[i].id}</b></td>
+				<td><b>${team.teamTaskCount}</b></td>
+				<td>
+					<g:set var="remainingTeamTask" value="${team.teamTaskCount - team.teamDoneCount}" />
+					<g:if test="${remainingTeamTask>0}" >
+					<div class="team_bar_base_small">
+						<div class="team_bar_graph_small" id="team_${roles[i].id}"
+							style="width: ${rolesPercentageMap? rolesPercentageMap[roles[i].id]:'0'}%;"></div>
 					</div>
 					<b>${remainingTeamTask} to go</b>
 					</g:if>
@@ -102,10 +107,11 @@ $(document).ready(function() {
 						<img src="${resource(dir:'images',file:'checked-icon.png')}" />
 					</g:else>
 				</td>
-			<g:if test="${i!=0 && i%2==1 }">
-	    		</tr>
-	    	</g:if>
-	   	</g:each>
+				<g:set var="i" value="${++i}" />
+			</g:each>
+			</tr>
+		</g:each>
     </table>
+	
 </div>
 </g:form>
