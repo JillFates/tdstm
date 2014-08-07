@@ -28,12 +28,6 @@
 			Generate using WIP recipe
 		</label>
 	</div>	
-	<div ng-show="tasks.showDeletePreviouslyGenerated">	
-		<label for="deletePreviouslyGenerated">
-			<input type="checkbox" name="deletePreviouslyGenerated" id="deletePreviouslyGenerated" ng-model="tasks.generateOpts.deletePrevious">
-			Delete previously generated tasks that were created using this context & recipe
-		</label>
-	</div>
 	<div class="generateWrapper">
 		<label for="generateTask">
 			<a class="btn btn-default has-spinner" id="generateTask" ng-disabled="!tasks.validCurrentSelection" ng-click="tasks.generateTask(this)">

@@ -835,7 +835,6 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		selectedBundle : '',
 		selectedApplication : '',
 		validCurrentSelection : false,
-		showDeletePreviouslyGenerated : false,
 		progressPercent:0,
 		progressRemaining:'',
 		currentTaskBeingGenerated : -1,
@@ -846,7 +845,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 			recipeVersionId: null,// - the id of the RecipeVersion record to use to generate the tasks
 			useWIP: false,
 			autoPublish: false,
-			deletePrevious: false
+			deletePrevious: true
 		},
 		show : {
 			start: true,
@@ -864,7 +863,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 	// Returns true if the 'generate task' button should be enabled. Otherwise returns false
 	scope.tasks.validateCurrentSelection = function(){
-		if(scope.currentSelectedRecipe && scope.currentSelectedRecipe.context){
+		if (scope.currentSelectedRecipe && scope.currentSelectedRecipe && scope.currentSelectedRecipe.context) {
 			var context = scope.currentSelectedRecipe.context;
 			if((context == 'Event' && scope.tasks.selectedEvent) || (context == 'Bundle' && 
 					scope.tasks.selectedBundle) ||	(context == 'Application' && 
@@ -875,12 +874,12 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 				log.log('not Matching');
 				return false;
 			}
-			return false;
 		}
+		return false;
 	}
 
 	scope.tasks.checkValidSelection = function(){
-		var context = scope.currentSelectedRecipe.context,
+		var context = scope.currentSelectedRecipe?scope.currentSelectedRecipe.context:'',
 			contextId,
 			recipeId = stateParams.recipeId;
 
@@ -908,11 +907,10 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		params.rand = tdsCommon.randomString(16);
 		cookbookService.getTaskBatchInfo(params, function(data){
 			log.info('Success on getting Task Batch Info');
-			log.info(data);
-			scope.tasks.activeTaskBatch = data.data;
-			scope.tasks.showDeletePreviouslyGenerated = (data.data.taskBatch != null);
-			scope.tasks.show.completed = (data.data.taskBatch == "Completed");
+			scope.tasks.activeTaskBatch = data.data.taskBatch;
+			scope.tasks.show.completed = ((scope.tasks.activeTaskBatch != null) && (scope.tasks.activeTaskBatch.status == "Completed"));
 		}, function(){
+			scope.tasks.activeTaskBatch = null;
 			log.info('Error on getting Task Batch Info');
 		});
 	}
@@ -1009,21 +1007,29 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 
 		dataToSend = $.param(scope.tasks.generateOpts);
 
-		cookbookService.generateTask({}, dataToSend, function(data){
-			log.info('Success on generating task');
-			log.info(data);
-			// Flip the user to the progress screen
-			//scope.tasks.show.start=false;
-			scope.tasks.show.completed = false;
+		var callCenerateTask = true;
 
-			var jobId = data.data.jobId;
+		if (scope.tasks.activeTaskBatch != null) {
+			callCenerateTask = confirm("There are tasks previously created with this recipe for the selected context.\n\nPress Okay to delete or Cancel to abort.");
+		}
 
-			state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
-			
-		}, function(data, status, headers, config){
-			alerts.addAlert({type: 'danger', msg: 'Error: Unable to generate tasks. ' + data.headers().errormessage});
-			log.info('Error on generating task');
-		});
+		if (callCenerateTask) {
+			cookbookService.generateTask({}, dataToSend, function(data){
+				log.info('Success on generating task');
+				log.info(data);
+				// Flip the user to the progress screen
+				//scope.tasks.show.start=false;
+				scope.tasks.show.completed = false;
+
+				var jobId = data.data.jobId;
+
+				state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
+				
+			}, function(data, status, headers, config){
+				alerts.addAlert({type: 'danger', msg: 'Error: Unable to generate tasks. ' + data.headers().errormessage});
+				log.info('Error on generating task');
+			});
+		}
 	}
 	
 	scope.getTaskGenerationProgress = function() {
@@ -1084,6 +1090,18 @@ tds.cookbook.controller.TaskGenerationController.$inject = ['$scope', '$state', 
 
 
 /********************************************************************************
+ * Task Batch Generation Start controller
+ */
+tds.cookbook.controller.TaskGenerationStartController = function(scope, state, stateParams, log, utils, cookbookService, alerts) {
+
+	scope.tasks.checkValidSelection();
+
+}
+
+tds.cookbook.controller.TaskGenerationStartController.$inject = ['$scope', '$state', '$stateParams', '$log', 'utils', 'cookbookService', 'alerts'];
+
+
+/********************************************************************************
  * Task Batch Generation Progress controller
  */
 tds.cookbook.controller.TaskGenerationProgressController = function(scope, state, stateParams, log, utils, cookbookService, alerts) {
@@ -1136,6 +1154,7 @@ tds.cookbook.controller.TaskGenerationCompletedController = function(scope, stat
 	var taskBatchId = stateParams.taskBatchId;
 
 	cookbookService.getTaskBatch({section: taskBatchId, rand: tdsCommon.randomString(16)}, function(data){
+		scope.tasks.activeTaskBatch = data.data.taskBatch;
 		scope.tasks.generation.status = data.data.taskBatch.status;
 		scope.tasks.generation.taskCreated = data.data.taskBatch.taskCount;
 		scope.tasks.generation.exceptions = data.data.taskBatch.exceptionCount;
@@ -2756,7 +2775,8 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 			url: '/start',
 			views: {
 				"taskBatchStart": {
-					templateUrl: servRootPathProvider.$get() + '/components/cookbook/generation/task-generation-start-template.html'
+					templateUrl: servRootPathProvider.$get() + '/components/cookbook/generation/task-generation-start-template.html',
+					controller: tds.cookbook.controller.TaskGenerationStartController
 				},
 				"taskBatchProgress": {
 					template: ''
