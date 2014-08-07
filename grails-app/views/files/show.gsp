@@ -12,8 +12,8 @@
 							<td style="font-weight:bold;" class="${config.assetName}">${filesInstance.assetName}</td>
 							<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
 							<td class="value ${config.description}">${filesInstance.description}</td>
-							<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
-							<td class="valueNW ${config.moveBundle}">${filesInstance?.moveBundle} / ${dependencyBundleNumber}</td>
+							<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
+							<td class="valueNW ${config.moveBundle}">${filesInstance?.moveBundle} : ${dependencyBundleNumber}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">Class</label></td>

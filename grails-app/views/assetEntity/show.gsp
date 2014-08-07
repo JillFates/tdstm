@@ -96,8 +96,8 @@ $(document).ready(function() {
 								<td class="valueNW ${config.serialNumber}">${assetEntity.serialNumber}</td>
 								<td class="label ${config.supportType}  ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
 								<td class="valueNW ${config.supportType}">${assetEntity.supportType}</td>
-								<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
-								<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' / ' : ''}${dependencyBundleNumber}</td>
+								<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
+								<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}</td>
 								<td class="label ${config.size}  ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
                                 <td nowrap="nowrap" class="sizeScale ${config.size}">
                                     ${assetEntity.size} ${assetEntity.scale?.value()}

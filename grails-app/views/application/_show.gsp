@@ -41,8 +41,8 @@
 			<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
 			<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 			<td class="valueNW ${config.appOwner}">${applicationInstance.appOwner?.lastNameFirst}</td>
-			<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle / Dep. Group</label></td>
-			<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} / ${dependencyBundleNumber}</td>
+			<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
+			<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} : ${dependencyBundleNumber}</td>
 			<td class="label ${config.drRpoDesc} ${highlightMap.drRpoDesc?:''}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>
 			<td class="valueNW ${config.drRpoDesc}">${applicationInstance.drRpoDesc}</td>
 		</tr>
