@@ -117,7 +117,7 @@
 	                <span><input type="checkbox" id="assetId" name="asset" value="asset" 
 	                		onclick="importExportPreference($(this),'ImportServer')"
 	                		${prefMap['ImportServer'] =='true'? 'checked="checked"' :''}/>&nbsp;
-	                <label for="assetId">Server</label></span>&nbsp;
+	                <label for="assetId">Devices</label></span>&nbsp;
 	                <span><input type="checkbox" id="databaseId" name="database" value="database" 
 	                		onclick="importExportPreference($(this),'ImportDatabase')"
 	                		${prefMap['ImportDatabase'] =='true' ? 'checked="checked"' :''}/>&nbsp;
