@@ -330,7 +330,7 @@ class TaskController {
 			def dotText = new StringBuffer()
 
 			dotText << """#
-# TDS Runbook for Project ${project}, Task ${rootTask}
+# TDS Runbook for Project ${project}, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
 # Exported on ${now}
 # This is  .DOT file format of the project tasks
 #
