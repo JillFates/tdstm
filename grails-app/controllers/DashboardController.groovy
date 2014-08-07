@@ -68,14 +68,22 @@ class DashboardController {
 				++i
 			}
 			
-			log.debug "egg1 ${results.taskStatusMap}"
-			log.debug "egg ${teamTaskResultsMatrix}"
-			
+			def remainTaskCount = results.taskCountByEvent - results.taskStatusMap['Completed'].taskCount 
+			def remainTaskCountFormat = String.format("%,d", remainTaskCount)
+
 			return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
-				moveBundleList : moveBundleList, timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
+				moveBundleList : moveBundleList, 
+				timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
 				manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
-				taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, totalDuration:results.totalDuration,
-				teamTaskMap:teamTaskResults, roles:teamTaskResults.values().role, teamTaskMatrix:teamTaskResultsMatrix] // help
+				taskCountByEvent:results.taskCountByEvent, 
+				taskStatusMap:results.taskStatusMap, 
+				totalDuration:results.totalDuration,
+				teamTaskMap:teamTaskResults, 
+				roles:teamTaskResults.values().role, 
+				teamTaskMatrix:teamTaskResultsMatrix,
+				remainTaskCount:remainTaskCount,
+				remainTaskCountFormat:remainTaskCountFormat
+			]
 		}
 	}
 	
