@@ -40,7 +40,7 @@
 	<script type="text/javascript">
 		var userPreferences = {
 			"CURR_TZ" : "${userPreferenceService.get('CURR_TZ')}"
-		}
+		};
 
 		$(document).ready(function() {
 			var opt = {
