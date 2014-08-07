@@ -677,7 +677,7 @@ class MoveBundleController {
 		
 		// Calculating App count of which runbook status is done
 		// TODO : @John, can we have runbookStatus as enum 
-		def appDoneCount = moveBundleList ? apps.findAll{it.moveBundle?.moveEvent?.runbookStatus=='Done'}.size() : 0
+		def appDoneCount = moveBundleList ? apps.findAll{it.planStatus == movedPlan}.size() : 0
 		def percAppDoneCount = countAppPercentage(applicationCount, appDoneCount)
 		
 		
