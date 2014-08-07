@@ -1,29 +1,3 @@
-<!--
-The MIT License (MIT)
-
-Copyright (c) 2013 bill@bunkat.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
--->
-
-<!--
--->
 <html>
 	<head>
 		<title>Task Timeline</title>
@@ -58,15 +32,18 @@ THE SOFTWARE.
 				<div class="message">${flash.message}</div>
 			</g:if>
 			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Select a move event']}" value="${selectedEventId}" onchange="submitForm()" />
-			&nbsp; Role: <select name="roleSelect" id="rolesSelectId"></select>
-	            &nbsp; Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30" size="3"/>
-			&nbsp; Use Heights: <input type="checkbox" id="useHeightCheckBoxId" checked="checked"/>
-			&nbsp; Hide Redundant: <input type="checkbox" id="hideRedundantCheckBoxId" checked="checked"/>
+			&nbsp; Highlight: <select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
 			<form onsubmit="return performSearch()" id="taskSearchFormId">
-				&nbsp; Search: <input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
+				&nbsp; <input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="20">
 				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
-				&nbsp; <input type="submit" name="Submit Button" id="SubmitButtonId" value="Filter" />
+				&nbsp; <input type="submit" name="Submit Button" id="SubmitButtonId" value="Highlight">
 			</form>
+			<span style="float:right; margin-right:35px;">
+				Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30" size="3"/ style="width:20px;">
+				&nbsp; <input type="checkbox" id="useHeightCheckBoxId" checked="checked"> Use Heights 
+				&nbsp; <input type="checkbox" id="hideRedundantCheckBoxId" checked="checked"> Hide Redundant
+			</span>
+			<br>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<g:render template="../assetEntity/initAssetEntityData"/>
 		</div>

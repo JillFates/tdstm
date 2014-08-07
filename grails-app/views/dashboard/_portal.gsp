@@ -65,7 +65,7 @@
 	<div class="appOuterDiv">
 		<div>
 			<h4 class="eventNewsHeader user_dashboard_head">Application&nbsp;</h4>
-			<span class="descriptionText">Your applications as a SME or Owner<input type="button" value="Refresh" onclick="loadAppTable()"/></span>
+			<span class="descriptionText">Your applications as a SME or Owner <input type="button" value="Refresh" onclick="loadAppTable()"/></span>
 			<br>
 			<div class="appScrolableTable">
 				<table class="fullWidth" cellspacing="0px" id="appTable">

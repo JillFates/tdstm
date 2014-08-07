@@ -2,7 +2,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="layout" content="projectHeader" />
-	<title>Client Dashboard</title>
+	<title>Event Dashboard</title>
 	<link type="text/css" rel="stylesheet"
 		href="${resource(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet"
@@ -15,9 +15,7 @@
 <div class="body_bg">
 	<a name="page_up"></a>
 	<div id="doc">
-		<!-- Body Starts here-->
 		<div id="bodycontent">
-			<!--Header Starts here-->
 			<div id="header">
 				<div style="float: left; padding-top: 2px;">
 					<g:form action="index" controller="dashboard" name="dashboardForm">
@@ -33,6 +31,7 @@
 						</span>
 					</g:form>
 				</div>
+				<%-- TODO - This timezone select looks as though it should be removed JPM 8/2014 --%>
 				<div style="height: 35px; display: none;">
 					<label> 
 						<select name="timezone" id="timezone"

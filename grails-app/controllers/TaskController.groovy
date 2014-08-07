@@ -839,12 +839,15 @@ digraph runbook {
 				predecessorIds.push(dep.predecessor.id)
 			}
 			def role = t.role ?: 'NONE'
-			if ( ! (role in roles) )
+			if ( t.role && ! (role in roles) )
 				roles.push(role)
 			items.push([ id:t.id, name:t.comment, startInitial:tmp['tasks'][t.id].tmpEarliestStart, endInitial:tmp['tasks'][t.id].tmpEarliestStart+t.duration,
 			predecessorIds:predecessorIds, criticalPath:tmp['tasks'][t.id].tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
 			role:role, number:t.taskNumber])
 		}
+
+		// Sort the roles aka teams
+		roles.sort()
 		
 		def sinks = []
 		dfsMap.sinks.each { s ->

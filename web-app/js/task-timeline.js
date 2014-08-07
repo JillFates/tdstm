@@ -38,14 +38,17 @@ function buildGraph (response, status) {
 	var data = $.parseJSON(response.responseText);
 	var ready = false;
 	
-	// populate the roles select
-	$("#rolesSelectId").children().remove();
-	$("#rolesSelectId").append('<option value="ALL">Show all</option>');
-	$.each(data.roles, function (index, role) {
-		$("#rolesSelectId").append('<option value="' + role + '">' + role + '</option>');
+	// populate the Team select
+	var teamSelect = $("#teamSelectId")
+	teamSelect.children().remove();
+	teamSelect.append('<option value="ALL">All Teams</option>');
+	teamSelect.append('<option value="NONE">No Team Assignment</option>');
+	teamSelect.append('<option disabled>──────────</option>');
+	$.each(data.roles, function (index, team) {
+		teamSelect.append('<option value="' + team + '">' + team + '</option>');
 	});
-	$("#rolesSelectId").val('ALL');
-	$('#rolesSelectId').on('change', function () {
+	teamSelect.val('ALL');
+	teamSelect.on('change', function () {
 		display(true, true);
 	});
 	
@@ -643,7 +646,8 @@ function buildGraph (response, status) {
 			classString += ' ahead ';
 		else
 			classString += ' ontime ';
-		if ($('#rolesSelectId').val() != 'ALL' && $('#rolesSelectId').val() != d.role)
+		var teamSelect = $('#teamSelectId');
+		if (teamSelect.val() != 'ALL' && teamSelect.val() != d.role)
 			classString += ' unfocussed ';
 		return classString;
 	}

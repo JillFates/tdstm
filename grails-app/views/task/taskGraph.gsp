@@ -287,7 +287,7 @@
 				<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24"/>
 				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
 				&nbsp; 
-				<input type="submit" name="Submit Button" id="SubmitButtonId" value="Filter" />
+				<input type="submit" name="Submit Button" id="SubmitButtonId" value="Highlight" />
 			</form>
 			<br>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>

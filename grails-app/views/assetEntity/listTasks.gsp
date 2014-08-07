@@ -189,7 +189,7 @@
 			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
 			<input type="hidden" name="viewUnpublished"   id="viewUnpublished"   value="${viewUnpublished}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
-			<span>
+			<span >
 				<b>Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
@@ -202,22 +202,23 @@
 					<b><label for="viewUnpublishedCB" > View unpublished</label></b>&nbsp;&nbsp;
 				</tds:hasPermission>
 
-				<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
-				<select id="selectTimedBarId"
-				    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
-					<option value="0">Manual</option>
-					<option value="60" selected="selected">1 Min</option>
-					<option value="120">2 Min</option>
-					<option value="180">3 Min</option>
-					<option value="240">4 Min</option>
-					<option value="300">5 Min</option>
-				</select>
-
 				<span style="float: right">
-					<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
+					<span style="margin-right: 30px;">
+						<tdsactionbutton id="graph" label="View Task Graph" icon="/icons/tds_task_graph.png" link="/task/taskGraph?moveEventId=${filterEvent}" click="checkSelectedEvent"></tdsactionbutton>&nbsp;
 
-					<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
-				</span>
+						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
+					</span>
+					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
+					<select id="selectTimedBarId"
+					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
+						<option value="0">Manual</option>
+						<option value="60" selected="selected">1 Min</option>
+						<option value="120">2 Min</option>
+						<option value="180">3 Min</option>
+						<option value="240">4 Min</option>
+						<option value="300">5 Min</option>
+					</select>
+				</span>				
 			</span>
 			<br/></br>
 			<jqgrid:wrapper id="taskListId" />
