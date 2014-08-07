@@ -175,7 +175,7 @@
 		}
 		function updateTimeZone( e ){
 			var sURL = unescape(window.location);
-			window.location.href = sURL;
+			window.location.reload();
 		}
 		//Function to wait for .5 sec to show megamenu to avoid unintended hover.
 		var tipTimer = null;

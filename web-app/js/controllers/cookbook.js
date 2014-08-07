@@ -74,7 +74,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	scope.convertTZ = function(date) {
 		var m = moment(date);
-		return m.tz(userPreferences['CURR_TZ']).format("YYYY-MM-DD HH:mm");
+		return m.tz(userPreferences['CURR_TZ']).format("YYYY-MM-DD h:mm a");
 	}
 
 	rowToShow = null;
