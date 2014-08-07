@@ -127,8 +127,8 @@
 										&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span>
 									</a>
 								</div>
-								<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
-									time<ul>
+								<div class="tzmenu">:&nbsp; <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' } time zone</span>
+									<ul>
 										<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
 										<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
 										<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
@@ -263,7 +263,7 @@
 							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')"> Servers</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')"> All Devices</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')"> Databases</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage Devices (Physical)</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage Devices</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"> Logical Storage</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment"  onclick="hideMegaMenu('assetMegaMenu')">Comments</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')"> Dependencies</g:link></li>
