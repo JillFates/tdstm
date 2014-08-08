@@ -25,6 +25,7 @@ $(document).ready(function() {
 			<h5 style="margin-top:12px;">Tasks Remaining</h5>
 	</div>
 </div>
+
 <div class="statusTaskEffort toprightcontent">
 	<div class="taskDetailsDiv">
 		<table class="statusTaskEffort">
@@ -39,7 +40,7 @@ $(document).ready(function() {
 				<td>Ready</td><td>${countReady}</td><td>${effortRemainReady}</td>
 			</tr>
 			<tr class="taskSummaryCounts">
-				<td>Pending</td><td>${countPendingC}</td><td>${effortRemainPending}</td>
+				<td>Pending</td><td>${countPending}</td><td>${effortRemainPending}</td>
 			</tr>
 		</table>
 	</div>
