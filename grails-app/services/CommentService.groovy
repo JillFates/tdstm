@@ -145,8 +145,12 @@ class CommentService {
 								// No need to error in this situation
 								break
 							case AssetCommentStatus.STARTED:
+								// Check to see if this is an project admin because they can update a task for users
+								def isPM = partyRelationshipService.staffHasFunction(project.id, userLogin.person.id, 'PROJ_MGR')
+
+								log.debug "Task Already STARTED - isPM? $isPM, whoDidIt=$whoDidIt, person=${userLogin.person}"
 								// We'll allow the same user to click Start and Done 
-								if (whoDidIt != userLogin.person ) {
+								if (whoDidIt != userLogin.person && ! isPM) {
 									errorMsg = "The task was previously STARTED by ${whoDidIt}"
 								}
 								break
@@ -158,6 +162,10 @@ class CommentService {
 								break
 						}
 					}
+				}
+
+				if (errorMsg) {
+					break
 				}
 			
 				commentProject = assetComment.project
