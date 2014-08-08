@@ -7,83 +7,85 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdsops.common.lang.ExceptionUtil
 
 class DashboardController {
 	
-	def userPreferenceService
-	def taskService
+	def assetEntityService
+	def dashboardService
 	def projectService
 	def securityService
+	def taskService
 	def userService
-	def assetEntityService
-    
+	def userPreferenceService
+	
 	def index = {
 		
 		def moveEvent
+		def user = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject();
-		if (!project) {
+		if (! project) {
 			flash.message = "Please select project to view User Dashboard"
 			redirect(controller:'project',action:'list')
 			return
 		}
-		def moveEventId = params.moveEvent
 		
-		if (moveEventId) {
-			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
-			moveEvent = MoveEvent.findById(moveEventId)
-		} else {
+		if (params.moveEvent && params.moveEvent.isInteger()) {
+			moveEvent = MoveEvent.findById(params.moveEvent)
+			if (moveEvent && moveEvent.project != project) {
+				log.warn "SECURITY : User $user attempted to access event ($moveEvent) that was not associate to his current project ($project)"
+				flash.message = "Sorry but the event select was not found. Please select another event before retrying."
+				redirect(controller:"moveEvent",action:"list")
+			}
+		} 
+
+		if (! moveEvent) {
 			userPreferenceService.loadPreferences("MOVE_EVENT")
 			def defaultEvent = getSession().getAttribute("MOVE_EVENT")
 			if (defaultEvent.MOVE_EVENT) {
-				moveEvent = MoveEvent.findById(defaultEvent.MOVE_EVENT)
-				if ( moveEvent?.project?.id != project?.id ) {
-					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
-				}
-			} else {
-				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+				// Try finding the event in the user's preferences
+				moveEvent = MoveEvent.findByIdAndProject(defaultEvent.MOVE_EVENT, project)
+			}
+			if (!moveEvent) {
+				// Last resort, get the first moveEvent in the list ordered by name
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])				
 			}
 		}
-		if (!moveEvent) {
+
+		if (! moveEvent) {
 			flash.message = "Please select move event to view Event Dashboard"
 			redirect(controller:"moveEvent",action:"list")
 		} else {
+			// Save the user's preference for the current move event
+			userPreferenceService.setPreference( "MOVE_EVENT", "${moveEvent.id}" )
+
+			// Start getting the data to build the data model
 			def moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
 			def projectLogo = ProjectLogo.findByProject(project)
 			userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
 			def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
-			def subject = SecurityUtils.subject
-			//code for task Summary and task progress bars
-			userPreferenceService.setPreference("MOVE_EVENT","${moveEvent.id}")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
-			def results = taskService.getMoveEventTaskSummary(moveEvent)
-			def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent) //use the matrix instead once _taskSummary
-			
-			ArrayList teamTaskResultsMatrix = [] //use this in _taskSummary.gsp
-			def i = 0
-			teamTaskResults.each() {
-				def iMod = i%6
-				if(teamTaskResultsMatrix[iMod] == null)
-					teamTaskResultsMatrix[iMod] = new ArrayList()
-				teamTaskResultsMatrix[iMod] << it.getValue()
-				++i
-			}
-			
-			def remainTaskCount = results.taskCountByEvent - results.taskStatusMap['Completed'].taskCount 
-			def remainTaskCountFormat = String.format("%,d", remainTaskCount)
 
-			return [ moveEventsList : moveEventsList, moveEvent : moveEvent, project : project, projectLogo : projectLogo, 
-				moveBundleList : moveBundleList, 
-				timeToUpdate : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : "never",
-				manualOverrideViewPermission:RolePermissions.hasPermission("ManualOverride"),
-				taskCountByEvent:results.taskCountByEvent, 
-				taskStatusMap:results.taskStatusMap, 
-				totalDuration:results.totalDuration,
-				teamTaskMap:teamTaskResults, 
-				roles:teamTaskResults.values().role, 
-				teamTaskMatrix:teamTaskResultsMatrix,
-				remainTaskCount:remainTaskCount,
-				remainTaskCountFormat:remainTaskCountFormat
-			]
+
+			def model = [:]
+			model.project = project
+			model.projectLogo = projectLogo
+			model.moveEvent = moveEvent
+			model.moveEventsList = moveEventsList
+			model.moveBundleList = moveBundleList
+			model.timeToUpdate = timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : 'never'
+			model.manualOverrideViewPermission = RolePermissions.hasPermission('ManualOverride')
+
+			try {
+				def taskSummary = dashboardService.getTaskSummaryModel(moveEvent.id, user, project)
+				if (taskSummary)
+					model.putAll(taskSummary)
+			} catch (e) {
+				log.warn "Encountered error (${e.getMessage()}) calling getTaskSummaryModel for $moveEvent\n${ExceptionUtil.stackTraceToString(e,60)}"
+				flash.error = "Sorry but an unexpected error was encountered and not all data was able to be gathered for the dashboard."
+			}
+
+			return model
 		}
 	}
 	
@@ -94,18 +96,18 @@ class DashboardController {
 	 * @return : refresh time 
 	 *---------------------------------------------------------*/
 	def setTimePreference = {
-        def timer = params.timer
-        if(timer){
-            userPreferenceService.setPreference( "DASHBOARD_REFRESH", "${timer}" )
-        }
-        def timeToRefresh = getSession().getAttribute("DASHBOARD_REFRESH")
-        render timeToRefresh ? timeToRefresh.DASHBOARD_REFRESH : 'never'
+		def timer = params.timer
+		if(timer){
+			userPreferenceService.setPreference( "DASHBOARD_REFRESH", "${timer}" )
+		}
+		def timeToRefresh = getSession().getAttribute("DASHBOARD_REFRESH")
+		render timeToRefresh ? timeToRefresh.DASHBOARD_REFRESH : 'never'
 	}
 	/*---------------------------------------------------------
-     * @author : Lokanada Reddy
-     * @param  : project, bundle, and filters, moveEventNews data
-     * @return : will save the data and redirect to action : newsEditorList
-     *--------------------------------------------------------*/
+	 * @author : Lokanada Reddy
+	 * @param  : project, bundle, and filters, moveEventNews data
+	 * @return : will save the data and redirect to action : newsEditorList
+	 *--------------------------------------------------------*/
 	def saveNews = {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
@@ -122,10 +124,10 @@ class DashboardController {
 		redirect(action:index)
 	}
 	/*---------------------------------------------------------
-     * @author : Lokanada Reddy
-     * @param  : project, bundle, and filters, assetComment / moveEventNews updated data
-     * @return : will save the data and redirect to action : newsEditorList
-     *--------------------------------------------------------*/
+	 * @author : Lokanada Reddy
+	 * @param  : project, bundle, and filters, assetComment / moveEventNews updated data
+	 * @return : will save the data and redirect to action : newsEditorList
+	 *--------------------------------------------------------*/
 	def updateNewsOrComment = {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
@@ -161,34 +163,68 @@ class DashboardController {
 			moveEventNewsInstance.save(flush:true)
 		
 		}
-	    
+		
 		redirect(action:index)
 	}
 	
-    /**
-     * ajax call to find the given event task summary ( taskCounts, tatalDuratin, tasks by status)
-     * @param id moveEventId
-     * @param Render taskSummary template
-     */
-    def taskSummary = {
-        
-        def moveEvent = MoveEvent.read(params.id)
-        def results = taskService.getMoveEventTaskSummary(moveEvent)
-		def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
-        def taskRoles = teamTaskResults.values().role
-		def rolesPercentageMap = [:]
-		taskRoles.each{t->
-			rolesPercentageMap << [(t.id): params.(t.id)]
+	/**
+	 * ajax call to find the given event task summary ( taskCounts, totalDuration, tasks by status)
+	 * @param id moveEventId
+	 * @param Render taskSummary template
+	 */
+	def taskSummary = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
 		}
-		render(template:'taskSummary',
-					model:[taskCountByEvent:results.taskCountByEvent, taskStatusMap:results.taskStatusMap, 
-					   	   totalDuration:results.totalDuration,teamTaskMap:teamTaskResults,
-						   roles:taskRoles, 'taskStartedwidth':params.taskStartedWidthId,
-					       'taskReadywidth':params.taskReadyWidthId,'taskDonewidth':params.taskDoneWidthId, 
-					       'effortStartedwidth':params.effortStartedWidthId, 'effortReadywidth':params.effortReadyWidthId,
-					       'effortDonewidth':params.effortDoneWidthId, rolesPercentageMap:rolesPercentageMap])
-        
-    }
+		
+		def id = params.id
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def model = dashboardService.getTaskSummaryModel(id, loginUser, currentProject)
+			render(template: 'taskSummary', model:model)
+
+			/*		
+			def moveEvent = MoveEvent.read(params.id)
+			def results = taskService.getMoveEventTaskSummary(moveEvent)
+			def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
+			def taskRoles = teamTaskResults.values().role
+			def rolesPercentageMap = [:]
+			taskRoles.each { t ->
+				rolesPercentageMap << [(t.id): params.(t.id)]
+			}
+			
+			render(template:'taskSummary', 
+				model: [
+					taskCountByEvent: results.taskCountByEvent, 
+					taskStatusMap: results.taskStatusMap, 
+					totalDuration: results.totalDuration,
+					teamTaskMap: teamTaskResults,
+					roles: taskRoles, 
+					taskStartedwidth: params.taskStartedWidthId,
+					taskReadywidth: params.taskReadyWidthId,
+					taskDonewidth: params.taskDoneWidthId, 
+					effortStartedwidth: params.effortStartedWidthId, 
+					effortReadywidth: params.effortReadyWidthId,
+					effortDonewidth: params.effortDoneWidthId, 
+					rolesPercentageMap: rolesPercentageMap
+				]
+			)
+			render(ServiceResults.success(['tasksUpdated' : tasksUpdated]) as JSON)
+			*/
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 	/**
 	 * user portal details for default project.
 	 * 

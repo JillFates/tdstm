@@ -12,7 +12,11 @@ class TimeUtil {
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
 	def static dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
 	def static dateFormat = new SimpleDateFormat("MM/dd/yyyy")
-	
+
+	static final String SHORT='S'
+	static final String FULL='F'
+	static final String ABBREVIATED='A'
+
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of DAYS from an existing date
 	 * @param Date	a date to be adjusted
@@ -86,23 +90,53 @@ class TimeUtil {
 	 * <= 90 minutes - ##m ##s
 	 * >1 minute - ##s
 	 * @param TimeDuration	The elapsed duration
+	 * @param format - the format of the time units (SHORT- h/m/s, ABBREVIATED hr/min/sec, FULL hour/minute/second) default SHORT
+	 * @return The time formatted
+	 * @examples
+	 *     3d 4h 10m
+	 *     3-days 4-hrs 10-min
+	 *     3-days 4-hours 10-minutes 
 	 */ 
-	public static String ago(TimeDuration duration) {		
+	public static String ago(TimeDuration duration, String format=SHORT) {		
 		int days=duration.getDays()
 		int hours=duration.getHours()
 		int minutes=duration.getMinutes()
 		int seconds=duration.getSeconds()
-		String ago = ""
+		StringBuffer ago = new StringBuffer()
+		String space = ''
+
         if (days > 0) {
-                ago = "${days}d ${hours}h ${minutes}m"
-        } else if (hours > 0) {
-                ago = "${hours}h ${minutes}m ${seconds}s"
-        } else if (minutes > 0) {
-                ago = "${minutes}m ${seconds}s"
-        } else {
-                ago = "${seconds}s"
+        	ago.append("${days}${ ( format == SHORT ? 'd' : ( '-day' + (days == 1 ? '' : 's') ) ) }")
+        } 
+        if (hours > 0) {
+			space = (ago.length() > 0 ? ' ' : '')
+			ago.append("${space}${hours}${ ( format == SHORT ? 'h' : ( format==FULL ? '-hour' : '-hr' ) + ( hours == 1 ? '' : 's') ) }") 
         }
-		return ago
+        if ( (days > 0 && minutes > 0) || (days < 1 && hours > 0) || minutes > 0 ) {
+			space = (ago.length() > 0 ? ' ' : '')
+			ago.append("${space}${minutes}${ ( format == SHORT ? 'm' : ( format==FULL ? '-minute' : '-min' ) + (minutes == 1 ? '' : 's') ) }") 
+        } 
+        // Only show seconds if hr min sec where sec > 0 or min sec
+        if ( (days < 1 && seconds > 0) || (days < 1 && hours < 1) ) {
+			space = (ago.length() > 0 ? ' ' : '')
+			ago.append("${space}${seconds}${ ( format == SHORT ? 's' : ( format==FULL ? '-second' : '-sec' ) + (seconds == 1 ? '' : 's') ) }") 
+        }
+
+		return ago.toString()
+	}
+
+	/**
+	 * Overload variation of the ago method that accepts a integer in seconds
+	 * @param secs - the number of seconds
+	 * @return The time in shorthand
+	 **/
+	public static String ago(Integer secs, String format=SHORT) {
+		Date start = new Date()
+		Date end
+		use( TimeCategory ) {
+		    end = start + (secs).seconds
+		}
+		return ago( elapsed(start, end), format)
 	}
 
 	/**
@@ -111,8 +145,8 @@ class TimeUtil {
 	 * @param Date	an ending datetime
 	 * @return String	The elapsed time in shorthand
 	 */
-	public static String ago(def start, def end) {
-		return ago( elapsed(start, end) )
+	public static String ago(Date start, Date end, String format=SHORT) {
+		return ago( elapsed(start, end), format )
 	}
 
 	/**
