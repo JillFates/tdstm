@@ -467,7 +467,8 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 			"hasWIP": false,
 			"sourceCode": "",
 			"changelog": "",
-			"clonedFrom": ""
+			"clonedFrom": "",
+			"recipeVersionId": null
 		}
 
 		return el;
@@ -1810,7 +1811,6 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 		selectedEvent : '',
 		selectedBundle : '',
 		selectedApplication : '',
-		fetchBtnDisabled : true,
 		contextId: 0,
 		gridData: [],
 		colDef: [],
@@ -1859,7 +1859,7 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 	};
 
 	scope.groups.getContextId = function(){
-		var context = scope.editor.selectedRecipe.context;
+		var context = scope.currentSelectedRecipe.context;
 		log.log(context);
 		switch(context){
 			case 'Application':
@@ -1874,7 +1874,6 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 			default:
 				scope.groups.contextId = 0;
 		}
-		scope.groups.fetchBtnDisabled = (scope.groups.contextId) ? false : true;
 	}
 
 	var countTemplate = '<div class="gridIcon">'+

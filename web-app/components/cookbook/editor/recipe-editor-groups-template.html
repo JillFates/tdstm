@@ -23,7 +23,7 @@
 
 		<div class="refreshWrapper">
 			<label for="refreshGroups">
-				<a class="btn btn-default" ng-disabled="groups.fetchBtnDisabled" id="refreshGroups" ng-click="groups.fetchGroups()">
+				<a class="btn btn-default" ng-disabled="(groups.contextId == 0) || (editor.selectedRecipe.recipeVersionId == null)" id="refreshGroups" ng-click="groups.fetchGroups()">
 					Fetch
 				</a>
 			</label>
