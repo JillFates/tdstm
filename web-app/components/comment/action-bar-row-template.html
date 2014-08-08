@@ -1,6 +1,6 @@
 <tr>
 	<td colspan="{{rowColSpan}}" class="statusButtonBar" style="position:relative">
-		<action-bar comment='comment' show-details='true' update-table='true'></action-bar>
-		<loading-indicator align="left"></loading-indicator>
+		<action-bar comment='comment' show-details='true' update-table='true' status="actionBarStatus"></action-bar>
+		<loading-indicator align="left" visible="actionBarStatus.active"></loading-indicator>
 	</td>
 </tr>

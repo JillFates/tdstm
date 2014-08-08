@@ -1435,11 +1435,13 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 		scope: {
 			comment: '=comment',
 			showDetailsButton: '@showDetails',
-			updateTable: '@updateTable'
+			updateTable: '@updateTable',
+			status: '=status'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/action-bar-template.html'),
 		link: function(scope, element, attrs) {
 			var updateActionBar = function() {
+				updateStatus(true);
 				commentService.getActionBarButtons(scope.comment.commentId, scope.showDetailsButton).then(
 					function(data) {
 						if (data.status == 'success') {
@@ -1447,8 +1449,10 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 						} else {
 							alerts.showGenericMsg();
 						}
+						updateStatus(false);
 					},
 					function(data) {
+						updateStatus(false);
 						alerts.showGenericMsg();
 					}
 				);
@@ -1482,33 +1486,39 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 			};
 
 			scope.changeStatus = function(button) {
+				updateStatus(true);
 				commentService.changeTaskStatus(scope.comment.commentId, button.newStatus, scope.comment.status).then(
 					function(data) {
 						postAction(button, data);
 					},
 					function(data) {
+						updateStatus(false);
 						alerts.showGenericMsg();
 					}
 				);
 			};
 
 			scope.assignTask = function(button) {
+				updateStatus(true);
 				commentService.assignTaskToMe(scope.comment.commentId, scope.comment.status).then(
 					function(data) {
 						postAction(button, data);
 					},
 					function(data) {
+						updateStatus(false);
 						alerts.showGenericMsg();
 					}
 				);
 			};
 
 			scope.changeEstTime = function(button) {
+				updateStatus(true);
 				commentService.changeTaskEstTime(scope.comment.commentId, button.delay).then(
 					function(data) {
 						postAction(button, data);
 					},
 					function(data) {
+						updateStatus(false);
 						alerts.showGenericMsg();
 					}
 				);
@@ -1525,6 +1535,7 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 
 			var postAction = function(button, data) {
 				button.disabled = true;
+				updateStatus(false);
 				updateActionBar();
 				scope.$emit("commentUpdated", scope.comment.commentId, scope.comment.assetEntity);
 				if (scope.updateTable) {
@@ -1556,8 +1567,12 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 					element.html(data)
 				}
 			}
+			var updateStatus = function(isActive) {
+				if (!angular.isUndefined(scope.status)) {
+					scope.status.active = isActive;
+				}
+			}
 			updateActionBar();
-
 		}
 	};
 };
@@ -1585,6 +1600,9 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			scope.comment.commentId = scope.commentId;
 			scope.comment.status = scope.status;
 			scope.configTable[scope.commentId] = null;
+			scope.actionBarStatus = {
+				active: false
+			};
 			if (scope.idPrefix == null || (typeof scope.idPrefix === 'undefined')) {
 				scope.rowPrefix = '';
 			} else {
