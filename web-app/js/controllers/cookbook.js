@@ -1709,10 +1709,10 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	
 	scope.diff = function() {
 		scope.showCompareCodeDialog(
-			scope.editor.selectedRVersion.sourceCode,
+			(scope.editor.selectedRVersion.hasWIP?recipeManager.wipBackup().sourceCode:recipeManager.versionBackup().sourceCode),
 			scope.editor.selectedRWip.sourceCode,
-			("Version " + scope.editor.selectedRVersion.versionNumber),
-			"WIP"
+			(scope.editor.selectedRVersion.hasWIP?"WIP":("Version " + scope.editor.selectedRVersion.versionNumber)),
+			"Local WIP"
 		);
 	};
 
@@ -2660,6 +2660,8 @@ tds.cookbook.service.RecipeManager = function(utils) {
 
 	var selectedRVersion = {}; // Recipe release version data
 	var selectedRWip = {}; // Recipe WIP data
+	var wipBackup = {};
+	var versionBackup = {};
 	var editingRecipe = false;
 
 	var getActiveVersion = function() {
@@ -2670,12 +2672,22 @@ tds.cookbook.service.RecipeManager = function(utils) {
 		return selectedRWip;
 	}
 
+	var getWipBackup = function() {
+		return wipBackup;
+	}
+
+	var getVersionBackup = function() {
+		return versionBackup;
+	}
+
 	var setActiveVersion = function(data) {
 		selectedRVersion = data;
+		versionBackup = angular.copy(data);
 	}
 
 	var setWIP = function(data) {
 		selectedRWip = data;
+		wipBackup = angular.copy(data);
 	}
 
 	var isEditingRecipe = function() {
@@ -2689,6 +2701,8 @@ tds.cookbook.service.RecipeManager = function(utils) {
 	return {
 		wip: getWIP,
 		activeVersion: getActiveVersion,
+		wipBackup: getWipBackup,
+		versionBackup: getVersionBackup,
 		setWip: setWIP,
 		setActiveVersion: setActiveVersion,
 		setEditingRecipe: setEditingRecipe,

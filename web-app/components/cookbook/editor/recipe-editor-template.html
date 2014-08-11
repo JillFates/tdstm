@@ -44,7 +44,7 @@
 			<button type="button" class="btn btn-default hasTooltip" ng-disabled="!editor.selectedRecipe.hasWIP || !editor.selectedRecipe || editor.selectedRecipe.versionNumber > 0" ng-click="discardWIP()" title="Delete the Work In Progress of the recipe">Discard WIP</button>
 		</div>
 		<div class="btn-group pull-left" style="margin-right:6px;">
-			<button type="button" class="btn btn-default hasTooltip" ng-disabled="!((editor.selectedRWip != null) && (editor.selectedRVersion != null && (editor.selectedRVersion.versionNumber > 0)))" ng-click="diff()" title="Compare the differences between the current release and WIP">Diff</button>
+			<button type="button" class="btn btn-default hasTooltip" ng-disabled="!editor.editingRecipe" ng-click="diff()" title="Compare the differences between the current release and WIP">Diff</button>
 		</div>
 		<div class="btn-group pull-left">
 			<button type="submit" class="btn btn-default hasTooltip pull-right" ng-disabled="editor.selectedRecipe.sourceCode == '' || !editor.selectedRecipe" ng-click="validateSyntax()" title="Validates that the current syntax of the recipe. Any errors are reported in the Syntax Errors tab">Check Syntax</button>
