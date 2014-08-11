@@ -70,6 +70,7 @@
 		var width = 0;
 		var height = 0;
 		var zoom;
+		var tasks= [];
 		
 		function buildGraph (response, status) {
 			
@@ -88,12 +89,29 @@
 				return;
 			}
 			
-			// var data = $.parseJSON(response.responseText);
+			var data = $.parseJSON(response.responseText);
+			
+			tasks = data.tasks;
+			
+			// populate the Team select
+			var teamSelect = $("#teamSelectId")
+			teamSelect.children().remove();
+			teamSelect.append('<option value="ALL">All Teams</option>');
+			teamSelect.append('<option value="NONE">No Team Assignment</option>');
+			teamSelect.append('<option disabled>──────────</option>');
+			$.each(data.roles, function (index, team) {
+				teamSelect.append('<option value="' + team + '">' + team + '</option>');
+			});
+			teamSelect.val('ALL');
+			teamSelect.on('change', function () {
+				filterRoles();
+			});
+			
 			var svgData = d3.select('div.body')
 				.append('div')
 				.attr('id', 'svgContainerDivId');
 			
-			svgData.html(response.responseText);
+			svgData.html(data.svgText);
 			
 			if (height == 0)
 				calculateSize();
@@ -272,6 +290,19 @@
 			$('#searchBoxId').val('');
 			performSearch();
 		}
+		
+		function filterRoles () {
+			var val = $('#teamSelectId').val();
+			for (var i = 0; i < tasks.size(); ++i)
+				if (val != 'ALL') {
+					if ( (tasks[i].role ? tasks[i].role : 'NONE') == val )
+						$('#' + tasks[i].id).css('opacity', 1);
+					else
+						$('#' + tasks[i].id).css('opacity', 0.3);
+				} else {
+					$('#' + tasks[i].id).css('opacity', 1);
+				}
+		}
 		</script>
 	</head>
 	<body>
@@ -281,6 +312,7 @@
 				<div class="message">${flash.message}</div>
 			</g:if>
 			Event: <g:select from="${moveEvents}" name="moveEventId" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' Please select']}" value="${selectedEventId}" onchange="submitForm()" />
+			&nbsp; Highlight: <select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
 			&nbsp; 
 			<input type="button" name="Exit Neighborhood Graph" id="exitNeighborhoodId" value="View Entire Graph" onclick="submitForm()" />
 			<form onsubmit="return performSearch()" id="taskSearchFormId">

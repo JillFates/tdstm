@@ -349,6 +349,8 @@ digraph runbook {
 			style = styleDef
 
 			def tasks = []
+			def taskList = []
+			def roles = []
 
 			// helper closure that outputs the task info in a dot node format
 			def outputTaskNode = { task, rootId ->
@@ -380,15 +382,22 @@ digraph runbook {
 					} else {
 						style = styleDef
 					}
-
+					
+					// add the task's role to the roles list
+					def role = task.role ?: 'NONE'
+					if ( task.role && ! (role in roles) )
+						roles.push(role)
+					
+					taskList << task
+					
 					attribs = "id=\"${task.id}\", color=\"${color}\", fillcolor=\"${fillcolor}\", fontcolor=\"${fontcolor}\", fontsize=\"${fontsize}\""
-
+					
 					dotText << "\t${task.taskNumber} [label=\"${label}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
-
+					
 				}
 
 			}
-
+			
 			// helper closure to output the count node for the adjacent tasks
 			def outputOuterNodeCount = { taskNode, isPred, count ->
 				log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
@@ -426,12 +435,10 @@ digraph runbook {
 				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
 				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
 				
-				svgFile.withInputStream { 
-					response.contentLength = it.available() 
-					response.contentType = 'text/plain'
-					response.outputStream << it 
-				} 
-				response.outputStream.flush() 
+				def svgText = svgFile.text
+				def data = [svgText:svgText, roles:roles, tasks:taskList]
+				render data as JSON
+				
 				return false
 				
 			} catch(e) {
@@ -518,7 +525,14 @@ digraph runbook {
 				//  -- IFNULL(t.est_start,'') AS est_start
 
 			def tasks = jdbcTemplate.queryForList(query)
-
+			
+			def roles = []
+			tasks.each { t ->
+				def role = t.role ?: 'NONE'
+				if ( t.role && ! (role in roles) )
+					roles.push(role)
+			}
+			
 			if (tasks.size()==0) {
 				errorMessage = 'No tasks were found for the selected move event'
 				break
@@ -598,13 +612,10 @@ digraph runbook {
 				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
 				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
 				def svgFile = new File(filename)
-
-				svgFile.withInputStream { 
-					response.contentLength = it.available() 
-					response.contentType = 'text/plain'
-					response.outputStream << it 
-				} 
-				response.outputStream.flush() 
+				
+				def svgText = svgFile.text
+				def data = [svgText:svgText, roles:roles, tasks:tasks]
+				render data as JSON
 				return false
 				
 			} catch (e) {
