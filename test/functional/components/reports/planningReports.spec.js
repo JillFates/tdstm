@@ -32,7 +32,7 @@ describe('Application Profiles', function(){
 		expect(ptr.isElementPresent(element)).toBe(true);
 		//expect(browser.driver.findElement(by.css('input[class="inlineLink"'))).not.toBeNull();
 	 });
-	 it('should attempt to generate a database conflicts report and check that it reports something',function(){
+	 xit('should attempt to generate a database conflicts report and check that it reports something',function(){
 		browser.driver.findElement(by.css('a[href="javascript:showMegaMenu(\'#reportsMegaMenu\')"]')).click();
 		browser.driver.findElement(by.css('a[href="/tdstm/reports/databaseConflicts"]')).click();
 		browser.driver.findElement(by.id('databaseConflictsButton')).click();

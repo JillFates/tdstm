@@ -6,7 +6,7 @@ describe('Field Settings', function() {
 	var menu = new Menu();
 	var fieldSettingsPage = new FieldSettings();
 	it('should load field settings page after clicking Client/Project Field Settings', function() {
-		menu.goToClientProject('fieldSettings');
+		menu.goToProjects('fieldSettings');
 		expect(fieldSettingsPage.getTitle().getText()).toEqual('Project Field Settings');
 	});
 	
@@ -17,7 +17,7 @@ describe('Field Settings', function() {
 		expect(fieldSettingsPage.getLegend().getAttribute('class')).toEqual('legendTable');
 	});
 	
-	it('should click the asset tab', function() {
+	xit('should click the asset tab', function() {
 		var tab = fieldSettingsPage.getTab('AssetEntity');
 		var tabParent = fieldSettingsPage.getTabParent('AssetEntity');
 		tab.click();

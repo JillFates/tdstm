@@ -7,8 +7,8 @@ describe('Create Project', function(){
   var listProjectPage =  new ListProjects();
   var projectPage = new Project();
 
-  it('should load list projects page after select Client/Project ListProjects', function(){
-    menu.goToClientProject('listProjects');
+  it('should load list projects page after select Project > ListProjects', function(){
+    menu.goToProjects('listProjects');
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
     
@@ -54,7 +54,7 @@ describe('Create Project', function(){
   describe('Create Project', function(){
     
     it('should load list projects page after select Client/Project ListProjects', function(){
-      menu.goToClientProject('listProjects');
+      menu.goToProjects('listProjects');
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
 

@@ -9,7 +9,7 @@ describe('Edit a project', function(){
   var projId;
   
   it('loads the List Projects page', function(){
-    menu.goToClientProject('listProjects');
+    menu.goToProjects('listProjects');
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
   

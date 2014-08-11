@@ -8,7 +8,7 @@ describe('List Projects', function(){
   describe('search by code and select it', function(){
     var projId;
     it('should load list projects page after select Client/Project ListProjects', function(){
-      menu.goToClientProject('listProjects');
+      menu.goToProjects('listProjects');
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
 
@@ -39,7 +39,7 @@ describe('List Projects', function(){
 
   
   it('should load list projects page after select Client/Project ListProjects', function(){
-    menu.goToClientProject('listProjects');
+    menu.goToProjects('listProjects');
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
 

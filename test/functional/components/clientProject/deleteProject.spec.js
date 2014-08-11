@@ -9,7 +9,7 @@ describe('Delete a project', function(){
   var projId;
 
   it('should load list projects page after select Client/Project ListProjects', function(){
-    menu.goToClientProject('listProjects');
+    menu.goToProjects('listProjects');
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
 

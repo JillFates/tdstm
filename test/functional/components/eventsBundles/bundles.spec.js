@@ -7,7 +7,7 @@ describe('Bundles', function(){
   var bundleName = 'BundTest';
 
   it('should load list Bundles page after select Events/Bundles > List Bundles', function(){
-    menu.goToEventsBundles('listBundles');
+    menu.goToPlanning('listBundles');
     expect(bundlePage.getTitle().getText()).toEqual('Bundle List');
   });
  
