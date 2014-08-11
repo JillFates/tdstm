@@ -378,7 +378,8 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/cookbook/index"]'));
   };
   this.getTasksHelp = function(){
-    return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print\',\'help\');"]'))
+    return browser.driver.findElement(by.css
+      ('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print\',\'help\');"]'));
   };
   this.goToTasks= function(option){
     var that = this;

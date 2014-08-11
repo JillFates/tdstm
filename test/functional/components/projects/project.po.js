@@ -33,7 +33,7 @@ var Project = function(){
     return browser.driver.findElement(by.css(this.clientLabelCss));
   };
   this.selectAClient = function(name){
-    var selector = this.clientsOptionsCss + "[value='" + name + "']";
+    var selector = this.clientsOptionsCss + '[value="' + name + '"]';
     browser.driver.findElement(by.css(selector)).click();
   };
   this.getclientSelect = function(){

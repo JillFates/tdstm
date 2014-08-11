@@ -1,11 +1,11 @@
 'use strict';
 var  Menu = require('../menu/menu.po.js');
 var ListProjects = require('./listProjects.po.js');
-var Project = require('./project.po.js');
+// var Project = require('./project.po.js');
 describe('Edit a project', function(){
   var menu = new Menu();
   var listProjectPage =  new ListProjects();
-  var projectPage = new Project();
+  // var projectPage = new Project();
   var projId;
   
   it('loads the List Projects page', function(){
@@ -35,7 +35,6 @@ describe('Edit a project', function(){
   it('should be at project/show/project+id', function(){
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
   });
-
   
   it('opens the edit page for the project', function(){
     browser.driver.findElement(by.css('input[class="edit"]')).click();
@@ -91,7 +90,7 @@ describe('Edit a project', function(){
     browser.driver.findElement(by.css('#workflowCode option[value="Please Select"]')).click();
 	var alert = browser.driver.switchTo().alert().accept();
     browser.driver.findElement(by.css('#workflowCode option[value="STD_PROCESS"]')).click();
-	var alert = browser.driver.switchTo().alert().accept();
+	alert = browser.driver.switchTo().alert().accept();
   });
   
   it('clicks runbook driven checkbox', function(){
@@ -99,7 +98,7 @@ describe('Edit a project', function(){
   });
   
   it('verifies the project is updated', function(){
-	expect(browser.driver.findElement(by.css("div#updateShow table tbody tr td b")).getText()).toEqual("Test Project Edit")
+	expect(browser.driver.findElement(by.css('div#updateShow table tbody tr td b')).getText()).toEqual('Test Project Edit');
   });
   
   it('changes the name back (for deleteProject to succeed)', function(){
@@ -112,6 +111,6 @@ describe('Edit a project', function(){
   });
   
   it('verifies the name is the same', function(){
-    expect(browser.driver.findElement(by.css("div#updateShow table tbody tr td b")).getText()).toEqual("Test Project")
+    expect(browser.driver.findElement(by.css('div#updateShow table tbody tr td b')).getText()).toEqual('Test Project');
   });
 });

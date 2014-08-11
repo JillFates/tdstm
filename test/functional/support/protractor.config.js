@@ -5,18 +5,18 @@ exports.config = {
   allScriptsTimeout: 11000,
   suites: {
     test:[
-    '../components/clientProject/createProject.spec.js',
-    '../components/eventsBundles/bundles.spec.js',
+    '../components/projects/createProject.spec.js',
+    '../components/planning/bundles.spec.js',
     '../components/assets/createApp.spec.js',
     '../components/assets/addTask.spec.js',
     '../components/assets/addComments.spec.js',
     '../components/assets/serverList.spec.js',
-    '../components/clientProject/deleteProject.spec.js'
+    '../components/projects/deleteProject.spec.js'
     ],
     regression: [ //Do not change the order of these files since some test depends on others.
-    '../components/clientProject/showProjects.spec.js',
-    '../components/clientProject/listProjects.spec.js',
-    '../components/clientProject/fieldSettings.spec.js',
+    '../components/projects/showProjects.spec.js',
+    '../components/projects/listProjects.spec.js',
+    '../components/projects/fieldSettings.spec.js',
     '../components/reports/applicationProfiles.spec.js',
     '../components/reports/planningReports.spec.js',
     '../components/menu/adminMenu.spec.js',

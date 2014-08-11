@@ -1,7 +1,7 @@
 'use strict';
-var  Menu = require('../menu/menu.po.js');
+// var  Menu = require('../menu/menu.po.js');
 describe('Application Profiles', function(){
-  var menu = new Menu();
+  // var menu = new Menu();
 	 it('should attempt to generate an application profiles report and check that it reports something',function(){
 		browser.driver.findElement(by.css('a[href="javascript:showMegaMenu(\'#reportsMegaMenu\')"]')).click();
 		browser.driver.findElement(by.css('a[href="/tdstm/reports/applicationProfiles"]')).click();
