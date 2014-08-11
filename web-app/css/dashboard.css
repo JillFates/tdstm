@@ -743,8 +743,8 @@ input, select, textarea {
 .Arrowcursor{
 	cursor:pointer;
 }
-.task_bar_table {
- width:200px;
+.task_bar {
+ width:500px;
  border-width:0px;
 }
 .task_bar_label {
@@ -753,7 +753,7 @@ input, select, textarea {
  padding: 5px;
 }
 .task_bar_base {
- width: 240px;
+ width: 460px;
  height: 24px;
  background-color: white;
  box-shadow: 2px 3px 3px lightgray inset !important;
@@ -777,9 +777,6 @@ input, select, textarea {
  color: white;
  margin: 5px;
 }
-.statusTaskEffort.toprightcontent {
-	width: 250px;
-}
 table.statusTaskEffort th td {
 	border: 1px solid black;
 }
@@ -795,12 +792,6 @@ table.statusTaskEffort th td {
 }
 .statusTaskEffort td:nth-child(3) {
 	text-align: center;
-}
-.taskDetailsDiv {
-	width: 190px;
-	font-size: 11px;
-	text-align: left;
-	margin: 4px 34px 0px;
 }
 .taskSummaryDiv {
 	margin-top:-24px;
