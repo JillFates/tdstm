@@ -168,9 +168,9 @@ class DashboardController {
 	}
 	
 	/**
-	 * ajax call to find the given event task summary ( taskCounts, totalDuration, tasks by status)
+	 * Used to render the Task Summary HTML that appears in the Event dashboard
 	 * @param id moveEventId
-	 * @param Render taskSummary template
+	 * @return HTML
 	 */
 	def taskSummary = {
 		def loginUser = securityService.getUserLogin()
@@ -185,43 +185,8 @@ class DashboardController {
 		try {
 			def model = dashboardService.getTaskSummaryModel(id, loginUser, currentProject)
 			render(template: 'taskSummary', model:model)
-
-			/*		
-			def moveEvent = MoveEvent.read(params.id)
-			def results = taskService.getMoveEventTaskSummary(moveEvent)
-			def teamTaskResults = taskService.getMoveEventTeamTaskSummary(moveEvent)
-			def taskRoles = teamTaskResults.values().role
-			def rolesPercentageMap = [:]
-			taskRoles.each { t ->
-				rolesPercentageMap << [(t.id): params.(t.id)]
-			}
-			
-			render(template:'taskSummary', 
-				model: [
-					taskCountByEvent: results.taskCountByEvent, 
-					taskStatusMap: results.taskStatusMap, 
-					totalDuration: results.totalDuration,
-					teamTaskMap: teamTaskResults,
-					roles: taskRoles, 
-					taskStartedwidth: params.taskStartedWidthId,
-					taskReadywidth: params.taskReadyWidthId,
-					taskDonewidth: params.taskDoneWidthId, 
-					effortStartedwidth: params.effortStartedWidthId, 
-					effortReadywidth: params.effortReadyWidthId,
-					effortDonewidth: params.effortDoneWidthId, 
-					rolesPercentageMap: rolesPercentageMap
-				]
-			)
-			render(ServiceResults.success(['tasksUpdated' : tasksUpdated]) as JSON)
-			*/
-		} catch (UnauthorizedException e) {
-			ServiceResults.forbidden(response)
-		} catch (EmptyResultException e) {
-			ServiceResults.methodFailure(response)
-		} catch (IllegalArgumentException e) {
-			ServiceResults.forbidden(response)
-		} catch (Exception e) {
-			ServiceResults.internalError(response, log, e)
+		} catch (e) {
+			render e.getMessage()
 		}
 	}
 

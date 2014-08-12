@@ -744,7 +744,7 @@ input, select, textarea {
 	cursor:pointer;
 }
 .task_bar {
- width:500px;
+ // width:500px;
  border-width:0px;
 }
 .task_bar_label {
@@ -753,45 +753,47 @@ input, select, textarea {
  padding: 5px;
 }
 .task_bar_base {
- width: 460px;
- height: 24px;
- background-color: white;
- box-shadow: 2px 3px 3px lightgray inset !important;
- padding: 0px;
- font-weight: bold;
- font-size: 11px;
+	background-color: white;
+	box-shadow: 2px 3px 3px lightgray inset !important;
+	padding: 0px;
+	font-weight: bold;
+	font-size: 11px;
 }
 .task_bar_graph {
- z-index:-1;
- height:24px;
- float:left;
+	z-index:-1;
+	height:26px;
+	padding-top: 3px;
+	float:left;
 }
 .task_bar_graph_edge {
- height:24px;
- border-right-width: 3px;
- border-color: lightgray;
- border-right-style:inset;
+	height:24px;
+	border-right-width: 3px;
+	border-color: lightgray;
+	border-right-style:inset;
 }
 .prog_bar_text {
- position:absolute;;
- color: white;
- margin: 5px;
+	position:absolute;;
+	color: white;
+	margin: 5px;
 }
-table.statusTaskEffort th td {
-	border: 1px solid black;
+.statusTaskEffort {
+	margin-left: 30px; 
 }
-.statusTaskEffort table th {
-	text-align: center;
+.statusTaskEffort.toprightcontent {
+	width: 350px;
 }
 .statusTaskEffort td {
 	padding: 2px;
 	white-space: nowrap;
+	vertical-align: middle !important;
 }
-.statusTaskEffort td:nth-child(2) {
-	text-align: right;
+.teamBreakdown.toprightcontent {
+	width: 50%; 
 }
-.statusTaskEffort td:nth-child(3) {
-	text-align: center;
+.teamBreakdown {
+	margin-top:5px;
+	margin-left: 30px; 
+	overflow: auto;
 }
 .taskSummaryDiv {
 	margin-top:-24px;

@@ -1,6 +1,5 @@
 <script type="text/javascript">
 $(document).ready(function() {
-
 		<%-- 
 			This code will animate all of the bargraphs in the Task Summary Section on load and refresh of section 
 		--%>
@@ -26,69 +25,48 @@ $(document).ready(function() {
 	</div>
 </div>
 
-<!--<div class="statusTaskEffort toprightcontent">
-	<div class="taskDetailsDiv">
-		<table class="statusTaskEffort">
-			<tr><th>Status</th><th>Tasks</th><th>Effort</th></tr>
-			<tr class="task_done taskSummaryCounts">
-				<td>Done</td><td>${countDone}</td><td>${effortRemainDone}</td>
-			</tr>
-			<tr class="task_started taskSummaryCounts">
-				<td>Started</td><td>${countStarted}</td><td>${effortRemainStarted}</td>
-			</tr>
-			<tr class="task_ready taskSummaryCounts">
-				<td>Ready</td><td>${countReady}</td><td>${effortRemainReady}</td>
-			</tr>
-			<tr class="taskSummaryCounts">
-				<td>Pending</td><td>${countPending}</td><td>${effortRemainPending}</td>
-			</tr>
-		</table>
-	</div>
-</div>-->
+<div class="statusTaskEffort toprightcontent">
+	<table class="task_bar">
+		<tr>
+			<td class="task_bar_label" rowspan="2"># of<br>Tasks</td>
+			<td class="task_bar_base">
+				<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 0%;"></div>
+				<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 0%;"></div>
+				<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 0%;"></div>
+				<%-- Display the perc done once enough is done that the text will be in blue --%>
+				 <div class="prog_bar_text" id="taskDoneText">${(percTaskDone<5)? '' : percTaskDone+'%'}</div>
+			</td>
+		</tr>
+		<tr>
+		<td class="task_bar_base">
+			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 25%;" align="center">Done<br />${countDone}</div>
+			<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 25%;" align="center">Started<br />${countStarted}</div>
+			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 25%;" align="center">Ready<br />${countReady}</div>
+			<div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: 25%;" align="center">Pending<br />${countPending}</div>
+		</td>
+		</tr>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<td class="task_bar_label" rowspan="2">Level<br>of Effort</td>
+			<td class="task_bar_base">
+				<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 0%;"></div>
+				<div class="task_started task_bar_graph" id="effortStartBar" style="width: 0%;"></div>
+				<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 0%;"></div>
+				<div class="prog_bar_text" id="effortDoneText">${(percDurationDone<5)? '' : percDurationDone+'%'}</div>
+			</td>
+		</tr>
+		<tr>
+		<td class="task_bar_base">
+			<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 25%;" align="center">Done<br />${effortRemainDone}</div>
+			<div class="task_started task_bar_graph" id="effortStartBar" style="width: 25%;" align="center">Started<br />${effortRemainStarted}</div>
+			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 25%;" align="center">Ready<br />${effortRemainReady}</div>
+			<div class="task_pending task_bar_graph" id="effortPendingBar" style="width: 25%;" align="center">Pending<br />${effortRemainPending}</div>
+		</td>
+		</tr>
+	</table>
+</div>
 
-<div class="toprightcontent">
-		<table class="task_bar">
-				 <tr>
-					<td class="task_bar_label" rowspan="2">Tasks</td>
-					<td class="task_bar_base">
-					 <div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 0%;"></div>
-					 <div class="task_started task_bar_graph" id="tasksStartBar" style="width: 0%;"></div>
-					 <div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 0%;"></div>
-					 <%-- Display the perc done once enough is done that the text will be in blue --%>
-					 <div class="prog_bar_text" id="taskDoneText">${(percTaskDone<5)? '' : percTaskDone+'%'}</div>
-					</td>
-				 </tr>
-				 <tr>
-					
-					<td class="task_bar_base">
-					 <div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 25%;" align="center">Done<br />${countDone}</div>
-					 <div class="task_started task_bar_graph" id="tasksStartBar" style="width: 25%;" align="center">Started<br />${countStarted}</div>
-					 <div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 25%;" align="center">Ready<br />${countReady}</div>
-					 <div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: 25%;" align="center">Pending<br />${countPending}</div>
-					</td>
-				 </tr>
-				 <tr>
-					<td class="task_bar_label" rowspan="2">Effort</td>
-					<td class="task_bar_base">
-					 <div class="task_done task_bar_graph" id="effortDoneBar" style="width: 0%;"></div>
-					 <div class="task_started task_bar_graph" id="effortStartBar" style="width: 0%;"></div>
-					 <div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 0%;"></div>
-					 <div class="prog_bar_text" id="effortDoneText">${(percDurationDone<5)? '' : percDurationDone+'%'}</div>
-					</td>
-				 </tr>
-				 <tr>
-					
-					<td class="task_bar_base">
-					 <div class="task_done task_bar_graph" id="effortDoneBar" style="width: 25%;" align="center">Done<br />${effortRemainDone}</div>
-					 <div class="task_started task_bar_graph" id="effortStartBar" style="width: 25%;" align="center">Started<br />${effortRemainStarted}</div>
-					 <div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 25%;" align="center">Ready<br />${effortRemainReady}</div>
-					 <div class="task_pending task_bar_graph" id="effortPendingBar" style="width: 25%;" align="center">Pending<br />${effortRemainPending}</div>
-					</td>
-				 </tr>
-		</table>
- </div>
-
- <div style="margin-left:52%; position:absolute; margin-top:5px; width: 550px; overflow: auto;">  	
+<div class="teamBreakdown toprightcontent">  	
 	<table style="border:none;">
 		<%-- 	
 			This section is going to iterate over the Team Task matrix of data to create the table of the team 
@@ -115,5 +93,5 @@ $(document).ready(function() {
 			</g:each>
 			</tr>
 		</g:each>
-		</table>
- </div>
+	</table>
+</div>
