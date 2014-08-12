@@ -570,10 +570,20 @@ class CookbookService {
 		
 		log.debug('Context type ' + contextType)
 		log.debug('Context id ' + contextId)
-
-		def context = contextType.getObject(contextId);
-
-		if (context == null || !context.belongsToClient(recipe.project.client)) {
+		def context = contextType.getObject(contextId)
+		def haveAccess = false
+		if (context != null) {
+			switch (recipe.context) {
+				case 'Application' :
+					haveAccess = context.moveBundle.project.equals(currentProject)
+					break;
+				case 'Bundle' :
+				case 'Event' :
+					haveAccess = context.belongsToClient(recipe.project.client)
+					break;
+			}			
+		}
+		if (!haveAccess) {
 			throw new UnauthorizedException('The client doesn\'t own this context')
 		}
 		
