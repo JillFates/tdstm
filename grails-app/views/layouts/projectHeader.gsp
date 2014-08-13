@@ -5,7 +5,7 @@
 		<title><g:layoutTitle default="Grails" /></title>
 		<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
 		<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-		<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+		<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
