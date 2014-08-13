@@ -75,7 +75,7 @@ class UrlMappings {
 
 		"/ws/cookbook/groups" {
 			controller = "wsCookbook"
-			action = [GET:"groups"]
+			action = [POST:"groups"]
 		}
 
 		"/ws/event/listBundles/$id" {

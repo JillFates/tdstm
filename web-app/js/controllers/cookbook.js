@@ -1884,8 +1884,22 @@ tds.cookbook.controller.RecipeEditorGroupsController = function(scope, state, st
 
 	scope.groups.fetchGroups = function(recipeId, contextId){
 		scope.enabledGridSelection = false;
-		cookbookService.getGroups({recipeVersionId: scope.editor.selectedRecipe.recipeVersionId, contextId: scope.groups.contextId, rand: tdsCommon.randomString(16)}, 
-			function(data){
+		var recVerId = scope.editor.selectedRecipe.recipeVersionId;
+		var source = null
+		if (scope.editor.editingRecipe && (scope.editor.recipeType == 'wip')) {
+			recVerId = null;
+		}
+		if (recVerId == null) {
+			source = scope.editor.selectedRWip.sourceCode;
+		}
+		var data = {
+			recipeVersionId: recVerId,
+			contextId: scope.groups.contextId,
+			contextType: scope.currentSelectedRecipe.context,
+			sourceCode: source
+		};
+		dataToSend = $.param(data)
+		cookbookService.getGroups(dataToSend, function(data){
 			log.info('Success on getting Groups');
 			log.info(data.data.groups);
 			scope.groups.groupsArray = data.data.groups;
@@ -2615,7 +2629,7 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 				}
 			},
 			getGroups: {
-				method: "GET",
+				method: "POST",
 				params: {
 					domain: "cookbook",
 					section: "groups"

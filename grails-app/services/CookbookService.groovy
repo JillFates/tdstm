@@ -530,30 +530,41 @@ class CookbookService {
 	 * @param currentProject the current project
 	 * @return the list of groups
 	 */
-	def getGroups(recipeVersionId, contextId, loginUser, currentProject) {
-		if (recipeVersionId == null || !recipeVersionId.isNumber()) {
+	def getGroups(recipeVersionId, contextId, predContextType, predSourceCode, loginUser, currentProject) {
+		def validRecipeId = (recipeVersionId != null && recipeVersionId.isNumber())
+		RecipeVersion recipeVersion = null
+		def recipe = null
+		def sourceCode = null
+		def contextTypeKey = null
+		if (!validRecipeId && (predSourceCode==null)) {
 			throw new EmptyResultException('Invalid recipeVersionId');
 		}
-		
-		RecipeVersion recipeVersion = RecipeVersion.get(recipeVersionId.toInteger())
-		
-		if (recipeVersion == null) {
-			throw new EmptyResultException('Recipe version does not exists');
+		if (validRecipeId) {
+			recipeVersion = RecipeVersion.get(recipeVersionId.toInteger())
+
+			if (recipeVersion == null) {
+				throw new EmptyResultException('Recipe version does not exists');
+			}
+			if (!recipeVersion.recipe.project.equals(currentProject)) {
+				log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeVersionId, current project: $currentProject"
+				throw new UnauthorizedException('Sorry but you can only update a recipe within the current project')
+			}
+
+			recipe = recipeVersion.recipe
+			contextTypeKey = recipe.context
+			sourceCode = recipeVersion.sourceCode
+		} else {
+			contextTypeKey = predContextType
+			sourceCode = (predSourceCode==null)?'':predSourceCode
 		}
-		
-		if (!recipeVersion.recipe.project.equals(currentProject)) {
-			log.warn "SECURITY: User $loginUser illegally attempted to update a recipe of different project, recipe id: $recipeVersionId, current project: $currentProject"
-			throw new UnauthorizedException('Sorry but you can only update a recipe within the current project')
-		}
-		
 		if (contextId == null || !contextId.isNumber()) {
 			throw new EmptyResultException('Invalid contextId');
 		}
 		
 		contextId = contextId.toInteger()
-		def recipe = recipeVersion.recipe
+		
 		def contextType = null
-		switch (recipe.context) {
+		switch (contextTypeKey) {
 			case 'Application' :
 				contextType = ContextType.A
 				break;
@@ -573,13 +584,13 @@ class CookbookService {
 		def context = contextType.getObject(contextId)
 		def haveAccess = false
 		if (context != null) {
-			switch (recipe.context) {
+			switch (contextTypeKey) {
 				case 'Application' :
 					haveAccess = context.moveBundle.project.equals(currentProject)
 					break;
 				case 'Bundle' :
 				case 'Event' :
-					haveAccess = context.belongsToClient(recipe.project.client)
+					haveAccess = context.belongsToClient(currentProject.client)
 					break;
 			}			
 		}
@@ -588,7 +599,7 @@ class CookbookService {
 		}
 		
 		def taskService = AH.application.mainContext.getBean('taskService')
-		def recipeMap = this.parseRecipeSyntax(recipeVersion.sourceCode)
+		def recipeMap = this.parseRecipeSyntax(sourceCode)
 		def exceptions = new StringBuilder()
 		def fetchedGroups = taskService.fetchGroups(recipeMap, context, exceptions)
 		

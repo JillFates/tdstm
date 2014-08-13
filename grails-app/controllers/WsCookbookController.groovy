@@ -462,10 +462,12 @@ class WsCookbookController {
 
 		def recipeVersionId = params.recipeVersionId
 		def contextId = params.contextId
+		def contextType = params.contextType
+		def sourceCode = params.sourceCode
 		def currentProject = securityService.getUserCurrentProject()
 
 		try {
-			def groups = cookbookService.getGroups(recipeVersionId, contextId, loginUser, currentProject)
+			def groups = cookbookService.getGroups(recipeVersionId, contextId, contextType, sourceCode, loginUser, currentProject)
 			render(ServiceResults.success('groups' : groups) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
