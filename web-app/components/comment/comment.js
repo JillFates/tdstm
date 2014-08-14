@@ -23,6 +23,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 	scope.config = {};
 	scope.config.table = {};
 	scope.bulkEditing = false;
+	scope.bulkEdit = false;
 
 	//commentsScope is used after "jqgrid:grid" creates dynamic dom elements to $compile the grid
 	rootScope.commentsScope = scope;
@@ -181,12 +182,14 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 	}
 
 	this.bulkEditTasks = function() {
-		if (scope.bulkEditing) {
+		scope.bulkEdit = true;
+	if (scope.bulkEditing) {
 			scope.$broadcast('hideActionBars');
 		} else {
 			scope.$broadcast('showActionBars');
 		}
 		scope.bulkEditing = !scope.bulkEditing;
+		scope.bulkEdit = false;
 	}
 
 	var updateRefreshTimer = function() {
@@ -1644,20 +1647,22 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			var loadContent = function() {
 				if (scope.configTable[scope.commentId] == null) {
 					scope.loading = true;
-					var content = templateCache.get(templateUrl);
-					if (content) {
-						showContent(content[1]);
-					} else {
-						http.get(templateUrl, {cache:templateCache}).then(
-							function(data) {
-								var content = templateCache.get(templateUrl);
-								showContent(content[1]);
-							},
-							function(data) {
-								scope.loading = false;
-								alerts.showGenericMsg();
-							}
-						);
+					if(!((angular.element('#outerBodyId').scope().bulkEdit) && (scope.comment.status != 'Started' && scope.comment.status != 'Ready'))){
+						var content = templateCache.get(templateUrl);
+						if (content) {
+							showContent(content[1]);
+						} else {
+							http.get(templateUrl, {cache:templateCache}).then(
+								function(data) {
+									var content = templateCache.get(templateUrl);
+									showContent(content[1]);
+								},
+								function(data) {
+									scope.loading = false;
+									alerts.showGenericMsg();
+								}
+							);
+						}
 					}
 				}
 			}
