@@ -262,7 +262,7 @@ class ProjectService {
 		if (asset.id) {
 			tag = "TDS-${asset.id}"
 		} else {
-			tag = 'TDS-' + getNextAssetTag(project) 
+			tag = getNextAssetTag(project) 
 		}
 		return tag
 	}	
