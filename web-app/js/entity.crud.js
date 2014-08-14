@@ -891,7 +891,7 @@ function saveToShow($me, forWhom){
 		flag = validateFields('','createAssetsFormId')
 		type = 'Application'
 	}
-	if(forWhom=='Files'){
+	if(forWhom=='Logical Storage'){
 		flag = validateFileFormat('createAssetsFormId')
 		type='Storage'
 	}

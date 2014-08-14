@@ -104,7 +104,7 @@
 				<input name="attributeSet.id" type="hidden" value="1"> <input
 					name="project.id" type="hidden" value="${projectId}"> 
 				<input name="showView" id="showView" type="hidden" value=""/>
-				<g:render template="../assetEntity/createButtons" model="[whom:'Files']"></g:render>
+				<g:render template="../assetEntity/createButtons" model="[whom:'Logical Storage']"></g:render>
 			</td>
 		</tr>
 	</table>
