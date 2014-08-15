@@ -25,9 +25,9 @@ describe('Server list', function(){
 
   describe('Server',function(){
 
-    it('should load server List page after select Assets List Servers', function(){
+    it('should load server List page after select Assets > Servers', function(){
       var menu = new Menu();
-      menu.goToAssets('listServers');
+      menu.goToAssets('servers');
       var appsListPage =  new ListApps();
       expect(appsListPage.titleh.getText()).toEqual('Server List');
     });
@@ -104,7 +104,7 @@ describe('Server list', function(){
 
     xit('should load server List page after select Assets List Servers', function(){
       var menu = new Menu();
-      menu.goToAssets('listServers');
+      menu.goToAssets('server');
       var appsListPage =  new ListApps();
       expect(appsListPage.titleh.getText()).toEqual('Server List');
     });

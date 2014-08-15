@@ -7,50 +7,53 @@ describe('Create Project', function(){
   var listProjectPage =  new ListProjects();
   var projectPage = new Project();
 
-  it('should load list projects page after select Project > ListProjects', function(){
-    menu.goToProjects('listProjects');
-    expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
-  });
+  xdescribe('Require field validations', function(){
+
+    it('should load list projects page after select Project > ListProjects', function(){
+      menu.goToProjects('listProjects');
+      expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
+    });
+      
+    it('should attempt to create and submit a project with no workflow code',function(){
+    		browser.driver.findElement(by.css('input[class="create"]')).click();
+  		browser.driver.findElement(by.id('name')).sendKeys('TEST_PROJECT');		
+  		browser.driver.findElement(by.id('projectCode')).sendKeys('TESTY');
+  		browser.driver.findElement(by.css('input[class="save"')).click();
+  		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+  		browser.sleep(500);	
+    });
     
-  it('should attempt to create and submit a project with no workflow code',function(){
-  		browser.driver.findElement(by.css('input[class="create"]')).click();
-		browser.driver.findElement(by.id('name')).sendKeys('TEST_PROJECT');		
-		browser.driver.findElement(by.id('projectCode')).sendKeys('TESTY');
-		browser.driver.findElement(by.css('input[class="save"')).click();
-		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
-		browser.sleep(500);	
-  });
-  
-  it('should attempt to submit a project with no project name',function(){
-		browser.driver.findElement(by.id('name')).clear();	
-		browser.driver.findElement(by.id('workflowCode')).click;
-		browser.driver.findElement(by.css('option[value="STD_PROCESS"')).click();
-		browser.driver.findElement(by.css('input[class="save"')).click();
-		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
-		browser.sleep(500);
-  });
-  
-  it('should attempt to submit a project with no project code',function(){
-		browser.driver.findElement(by.id('name')).sendKeys('TEST_PROJECT');
-		browser.driver.findElement(by.id('projectCode')).clear();
-		browser.driver.findElement(by.css('input[class="save"')).click();
-		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
-		browser.sleep(500);
-  });
-  
-  it('should attempt to submit a project with no creation date',function(){
-		browser.driver.findElement(by.id('completionDateId')).clear();
-		browser.driver.findElement(by.id('projectCode')).sendKeys('TESTY');
-		browser.driver.findElement(by.css('input[class="save"')).click();
-		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
-		browser.sleep(500);	
-  });
-  
-  xit('should press the cancel button',function(){
-	browser.driver.findElement(by.css('input[class="delete"')).click();
-    expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
-  });
-  
+    it('should attempt to submit a project with no project name',function(){
+  		browser.driver.findElement(by.id('name')).clear();	
+  		browser.driver.findElement(by.id('workflowCode')).click;
+  		browser.driver.findElement(by.css('option[value="STD_PROCESS"')).click();
+  		browser.driver.findElement(by.css('input[class="save"')).click();
+  		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+  		browser.sleep(500);
+    });
+    
+    it('should attempt to submit a project with no project code',function(){
+  		browser.driver.findElement(by.id('name')).sendKeys('TEST_PROJECT');
+  		browser.driver.findElement(by.id('projectCode')).clear();
+  		browser.driver.findElement(by.css('input[class="save"')).click();
+  		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+  		browser.sleep(500);
+    });
+    
+    it('should attempt to submit a project with no creation date',function(){
+  		browser.driver.findElement(by.id('completionDateId')).clear();
+  		browser.driver.findElement(by.id('projectCode')).sendKeys('TESTY');
+  		browser.driver.findElement(by.css('input[class="save"')).click();
+  		expect(listProjectPage.getTitle().getText()).toEqual('Create Project');
+  		browser.sleep(500);	
+    });
+    
+    xit('should press the cancel button',function(){
+  	browser.driver.findElement(by.css('input[class="delete"')).click();
+      expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
+    });
+    
+  }); // require field validation
   describe('Create Project', function(){
     
     it('should load list projects page after select Client/Project ListProjects', function(){

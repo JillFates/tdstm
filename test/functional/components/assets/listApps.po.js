@@ -13,7 +13,6 @@ var ListApps = function(){
     var d = webdriver.promise.defer();
     browser.wait(function(){
       return  that.appsOnList.then(function(list){
-        // console.log('bla',list.length === count);
         return list.length === count;
       });
     }).then(function(){

@@ -14,7 +14,7 @@ describe('Add Task', function(){
   describe('Preconditions', function(){
     
     it('should load Application List page after select Assets List Apps', function(){
-      menu.goToAssets('listApps');
+      menu.goToAssets('applications');
       expect(appsListPage.titleh.getText()).toEqual('Application List');
     });
 
@@ -48,7 +48,7 @@ describe('Add Task', function(){
   describe('search for app', function(){
 
     xit('should load Application List page after select Assets List Apps', function(){
-      menu.goToAssets('listApps');
+      menu.goToAssets('applications');
       expect(appsListPage.titleh.getText()).toEqual('Application List');
     });
 

@@ -18,7 +18,7 @@ describe('Comments - Application', function(){
     
     it('should load Application List page after select Assets List Apps', function(){
       var menu = new Menu();
-      menu.goToAssets('listApps');
+      menu.goToAssets('applications');
       var appsListPage =  new ListApps();
       expect(appsListPage.titleh.getText()).toEqual('Application List');
     });
@@ -241,7 +241,7 @@ describe('Comments - Application', function(){
 
       it('should load Application List page after select Assets List Apps', function(){
         var menu = new Menu();
-        menu.goToAssets('listApps');
+        menu.goToAssets('applications');
         var appsListPage =  new ListApps();
         expect(appsListPage.titleh.getText()).toEqual('Application List');
       });

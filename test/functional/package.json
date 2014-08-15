@@ -3,7 +3,8 @@
   "description": "Webdriver E2E test",
   "dependencies": {
     "selenium-webdriver": "2.41.0",
-    "minijasminenode": "0.4.0"
+    "minijasminenode": "0.4.0",
+    "phantomjs": "1.9.7-15"
   },
   "devDependencies": {
     "protractor": "1.0.0"  

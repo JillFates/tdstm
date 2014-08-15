@@ -265,28 +265,33 @@ var Menu = function(){
 
   this.goToAssets = function(option){
     var that = this;
-    // browser.driver.findElement(by.css(this.assetsCss)).click();
     this.getAssets().click();
     var d = {
       'summary':function(){
         that.getSummaryTable().click();
       },
-      'listApps':function(){
+      'applications':function(){
         that.getApplications().click();
       },
-      'listServers':function(){
+      'servers':function(){
         that.getServers().click();
       },
-      'listPhysical':function(){
+      'allDevices':function(){
         that.getAllDevices().click();
       },
-      'listDBs':function(){
+      'databases':function(){
         that.getDatabases().click();
       },
-      'listStorage':function(){
-        // browser.driver.findElement(by.css(that.listStorageCss)).click();
+      'storageDevices':function(){
+        that.getStorageDevices().click();
       },
-      'listDependencies':function(){
+      'logicalStorage':function(){
+        that.getLogicalStorage().click();
+      },
+      'comments':function(){
+        that.getComments().click();
+      },
+      'dependencies':function(){
         that.getDependencies().click();
       },
       'dependencyAnalizer':function(){
@@ -301,11 +306,11 @@ var Menu = function(){
       'manageBatches':function(){
         that.getManageBatches().click();
       },
-      'export':function(){
-      },
-      'assetComments':function(){
+      'exportAssets':function(){
+        that.getExportAssets().click();
       },
       'manageDataHelp':function(){
+        that.getManageDataHelp().click();
       },
     };
     d[option]();

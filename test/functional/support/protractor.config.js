@@ -40,12 +40,29 @@ exports.config = {
     '../components/admin/syncLibraries.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
+    ], 
+    tasks:[
+    '../components/tasks/myTasks.spec.js',
+    '../components/tasks/taskManager.spec.js',
+    '../components/tasks/taskGraph.spec.js',
+    '../components/tasks/timeline.spec.js',
+    // '../components/tasks/cookbook.spec.js'
+    ],
+    assets:[
+    '../components/assets/databases/createDatabase.spec.js'
     ]
   },
 
   capabilities: {
     'browserName': 'chrome'
+    // 'browserName':'phantomjs',
+    // 'phantomjs.binary.path':'./node_modules/phantomjs/bin/phantomjs',
   },
+  // multiCapabilities: [{
+  //   browserName: 'firefox'
+  // }, {
+  //   browserName: 'chrome'
+  // }],
 
   rootElement: 'div[ng-app]',
 

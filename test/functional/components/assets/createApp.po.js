@@ -1,7 +1,8 @@
 'use strict';
-var CreateAppModal = function(){
+var ApplicationModal = function(){
   this.createAppTitle = element(by.id('ui-id-1'));
-  this.nameLabel = $('[class="label C  highField"] [for="assetName"]');
+  // this.nameLabel = $('[class="label C  highField"] [for="assetName"]');
+  this.nameLabel = $('[for="assetName"]');
   this.nameField = element(by.id('assetName'));
   this.saveBtn = $('[onclick="saveToShow($(this),\'Application\')"]');
   this.createAppModal = $('[aria-labelledby="ui-id-1"]');
@@ -32,7 +33,9 @@ var CreateAppModal = function(){
     var that = this;
     return browser.wait(function(){
       return that.createAppModal.getAttribute('style').then(function(style){
-        return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: none;';
+        // return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: none;';
+        return style.search('display: none;') !== -1;
+
       });
     }).then(function(){
        return true;
@@ -43,7 +46,9 @@ var CreateAppModal = function(){
     var that = this;
     return browser.wait(function(){
       return that.createAppModal.getAttribute('style').then(function(style){
-        return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: block;';
+        // return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: block;';
+        return style.search('display: block;') !== -1;
+
       });
     }).then(function(){
        return true;
@@ -74,4 +79,4 @@ var CreateAppModal = function(){
   };
 
 };
-module.exports = CreateAppModal;
+module.exports = ApplicationModal;

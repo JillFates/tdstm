@@ -14,13 +14,13 @@ add commentt
 var  Menu = require('../menu/menu.po.js');
 var  ListApps = require('./listApps.po.js');
 var CreateAppModal = require('./createApp.po.js');
-describe('List App', function(){
+describe('createApp', function(){
   var appName= 'App Test 1';
   var appId;
 
   it('should load Application List page after select Assets List Apps', function(){
     var menu = new Menu();
-    menu.goToAssets('listApps');
+    menu.goToAssets('applications');
     var appsListPage =  new ListApps();
     expect(appsListPage.titleh.getText()).toEqual('Application List');
   });
@@ -159,4 +159,4 @@ describe('List App', function(){
     });
   }); // Search for an app
 
-});// Create App
+});// createApp
