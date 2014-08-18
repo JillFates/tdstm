@@ -568,7 +568,7 @@ class MoveBundleController {
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 			
 			def eventDates = moveEvent.getEventTimes()
-			eventStartDate << [(moveEvent.id):(eventDates.start ? bundleTimeformatter.format( GormUtil.convertInToGMT( eventDates.start, tzId) ) : 'TBD')]
+			eventStartDate << [(moveEvent.id):(eventDates.start ? bundleTimeformatter.format( GormUtil.convertInToUserTZ( eventDates.start, tzId) ) : 'TBD')]
 			
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
