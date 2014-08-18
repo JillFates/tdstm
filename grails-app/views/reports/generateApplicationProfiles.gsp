@@ -4,8 +4,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>Application Profiles</title>
+	<g:javascript src="bootstrap.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
+	<g:javascript src="projectStaff.js" />
 	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="angular/plugins/angular-ui.js"/>	
 	<g:javascript src="angular/plugins/angular-resource.js" />
@@ -85,5 +87,6 @@
 		<div id="editEntityView" style="display: none;"></div>
 
 	</div>
+	<g:render template="../assetEntity/initAssetEntityData"/>
 </body>
 </html>

@@ -969,7 +969,8 @@ tds.comments.service.CommentService = function(utils, http, q) {
  * Factory used to interact with the asset entity services
  */
 tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
-
+	console.log("heyo buckaroo");
+	console.log(appCommonData);
 	var closePopup = function(scope, type) {
 		if (!scope.closed) {
 			scope.$close('close');
