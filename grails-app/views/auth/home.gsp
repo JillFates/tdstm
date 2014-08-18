@@ -104,46 +104,68 @@ a:hover {
 			</div>
 			<br />
 			<div>
-		<table>
-			<thead>
-				<tr>
-					<th colspan="2">Misc. Admin functions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="odd">
-					<td><g:link controller="partyGroup" style="color:black">Company</g:link></td>
-					<td><g:link controller="roleType" style="color:black">Role Type </g:link></td>
-				</tr>
-				<tr class="even">
-					<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
-					<td><g:link controller="partyRelationshipType"
-						style="color:black">Party RelationshipType</g:link></td>
-				</tr>
-				<tr class="odd">
-					<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
-					<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
-				</tr>
-				<tr class="even">
-					<td><g:link controller="admin" action="orphanSummary"
-						style="color:black">Manage Orphan Records</g:link></td>
-					<td><a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
-					</td>
-				</tr>
-				<tr class="odd">
-					<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
-					<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
-				</tr>
-				<tr class="even">
-					<td>
-						<g:link controller="testCase" action="testRBO" params="[eventId:0]" style="color:black">Task Critical Path Calculator</g:link>
-					</td>
-					<td>
-						<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 
-					</td>
-				</tr>
-			</tbody>
-		</table>
+				<table>
+					<thead>
+						<tr>
+							<th colspan="2">Misc. Admin functions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="odd">
+							<td><g:link controller="partyGroup" style="color:black">Company</g:link></td>
+							<td><g:link controller="roleType" style="color:black">Role Type </g:link></td>
+						</tr>
+						<tr class="even">
+							<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
+							<td><g:link controller="partyRelationshipType"
+								style="color:black">Party RelationshipType</g:link></td>
+						</tr>
+						<tr class="odd">
+							<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
+							<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
+						</tr>
+						<tr class="even">
+							<td><g:link controller="admin" action="orphanSummary"
+								style="color:black">Manage Orphan Records</g:link></td>
+							<td><a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
+							</td>
+						</tr>
+						<tr class="odd">
+							<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
+							<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
+						</tr>
+						<tr class="even">
+							<td>
+								<g:link controller="testCase" action="testRBO" params="[eventId:0]" style="color:black">Task Critical Path Calculator</g:link>
+							</td>
+							<td>
+								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 
+							</td>
+						</tr>
+						<tr class="odd">
+							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br />
+			<div id="reconcileAssetsFormId" style="display: none;">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="2">Reconcile AssetTypes</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="odd">
+							<td colspan="2"><span id="outOfSyncAssetCountId">Assets out of sync: ###</span></td>
+						</tr>
+						<tr class="even">
+							<td colspan="2"><a style="color:black" href="#" onclick="reconcileAssetTypes()"><button>Reconcile</button></a></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</td>
 	</tr>

@@ -1324,4 +1324,34 @@ class AdminController {
 		def results = projectService.getProjectReportSummary( params )
 		render (template :'projectSummaryReport', model:[results:results, person:person, time:now])
 	}
+	
+	// Gets the number of assets with a desync between the device's assetType and its model's assetType
+	def countAssetsOutOfSync = {
+		def query = """ -- Case sensitive - assets that assetType don't match
+			SELECT COUNT(*)
+			FROM asset_entity a
+			JOIN model m ON m.model_id = a.model_id
+			WHERE a.asset_class='DEVICE' AND BINARY a.asset_type <> BINARY m.asset_type; """
+		def assetCount = jdbcTemplate.queryForLong(query)
+		render assetCount
+	}
+	
+	/**
+	 * Used to reconcile assetTypes of devices with the assetType of their models
+	 */
+	def reconcileAssetTypes = {
+		def hasPerm = RolePermissions.hasPermission("AdminMenuView")
+		
+		if (hasPerm) {
+			def query = """ -- Update DEVICES with their propery asset_type from their respective model record
+				UPDATE asset_entity a
+				JOIN model m ON a.model_id = m.model_id
+				SET a.asset_type = m.asset_type, a.model = m.name
+				WHERE a.asset_class='DEVICE';"""
+			jdbcTemplate.execute(query)
+		} else {
+			response.sendError( 401, "Unauthorized Error")
+		}
+		render 0
+	}
 }
