@@ -219,12 +219,12 @@
 												 <span id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
 											</li>
 										</ul>
-										<div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
+										<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
 											<tds:hasPermission permission='ViewPacingMeters'>
 												<img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
 													src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
 											</tds:hasPermission>
-										</div>
+										</div> -->
 									</div>
 								</g:each>
 							</div>
@@ -931,7 +931,7 @@
 					<tds:hasPermission permission='ViewPacingMeters'>
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
 					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
-					//post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
+					// post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
 					</tds:hasPermission>
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
