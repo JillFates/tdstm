@@ -329,7 +329,7 @@ text-align: left;
 }
 .newscroll li{
 display: block;
-background-image:url(../images/news_bullet.png);
+background-image:url(../icons/bullet_black.png);
 background-position:left;
 background-repeat:no-repeat;
 margin-left: -20px;
