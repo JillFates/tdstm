@@ -158,6 +158,8 @@ class NewsEditorController {
 			moveEventNewsQuery.append("and mn.resolution like '%${params.resolution}%'")
 		}
 		
+		assetCommentsQuery.append(" and ac.comment_type = 'news' ")
+			
 		def queryForCommentsList = new StringBuffer(assetCommentsQuery.toString() +" union all "+ moveEventNewsQuery.toString())
 		
 		queryForCommentsList.append("order by $sortIndex $sortOrder ")
