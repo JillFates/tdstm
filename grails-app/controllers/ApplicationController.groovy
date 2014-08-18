@@ -254,7 +254,7 @@ class ApplicationController {
 		render true
 	}
 	def create = {
-		def applicationInstance = new Application(appOwner:'TDS')
+		def applicationInstance = new Application()
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
 		def project = securityService.getUserCurrentProject()

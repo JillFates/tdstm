@@ -142,7 +142,7 @@
 										noSelection="${['null':' Select...']}" 
 									/>
 								</td>
-								<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
+								<td class="label ${config.moveBundle}" nowrap="nowrap"><label for="moveBundle">Bundle</label></td>
 								<td ><g:select from="${moveBundleList}" id="moveBundle" class="${config.moveBundle}" name="moveBundle.id" value="${project.defaultBundle.id}" optionKey="id" optionValue="name" tabindex="34" />
 								</td>
 								<td class="label ${config.drRpoDesc}  ${highlightMap.drRpoDesc?:''}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label>
@@ -224,7 +224,7 @@
 								<td>
 									<input type="text" id="externalRefId" class="${config.externalRefId}" name="externalRefId" 
 										value="${applicationInstance.externalRefId}" tabindex="28" /></td>
-								<td class="label ${config.shutdownBy}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
+								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:config.shutdownBy]"></g:render>
 									<input type="checkbox" id="shutdownByIdFixed" name="shutdownFixed" value="0"
