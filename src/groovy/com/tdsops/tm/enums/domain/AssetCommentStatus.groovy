@@ -21,6 +21,6 @@ class AssetCommentStatus {
 		return list as List
 	}
 	static final getTopStatusList() {
-		return [PENDING, READY, STARTED, DONE] as List
+		return [PENDING, READY, STARTED, HOLD, DONE] as List
 	}
 }	

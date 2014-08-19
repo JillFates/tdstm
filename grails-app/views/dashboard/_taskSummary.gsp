@@ -33,16 +33,18 @@ $(document).ready(function() {
 				<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 0%;"></div>
 				<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 0%;"></div>
 				<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 0%;"></div>
+				<div class="task_Hold task_bar_graph" id="tasksHoldBar" style="width: 0%;"></div>
 				<%-- Display the perc done once enough is done that the text will be in blue --%>
 				 <div class="prog_bar_text" id="taskDoneText">${(percTaskDone<5)? '' : percTaskDone+'%'}</div>
 			</td>
 		</tr>
 		<tr>
-		<td class="task_bar_base">
-			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 25%;" align="center">Done<br />${countDone}</div>
-			<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 25%;" align="center">Started<br />${countStarted}</div>
-			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 25%;" align="center">Ready<br />${countReady}</div>
-			<div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: 25%;" align="center">Pending<br />${countPending}</div>
+		<td class="task_bar_legend">
+			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 20%;" align="center">Done<br />${countDone}</div>
+			<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 20%;" align="center">Started<br />${countStarted}</div>
+			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 20%;" align="center">Ready<br />${countReady}</div>
+			<div class="task_hold task_bar_graph" id="tasksReadyBar" style="width: 20%;" align="center">Hold<br />${countHold}</div>
+			<div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: 20%;" align="center">Pending<br />${countPending}</div>
 		</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
@@ -52,15 +54,18 @@ $(document).ready(function() {
 				<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 0%;"></div>
 				<div class="task_started task_bar_graph" id="effortStartBar" style="width: 0%;"></div>
 				<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 0%;"></div>
+				<div class="task_hold task_bar_graph" id="effortHoldBar" style="width: 0%;"></div>
 				<div class="prog_bar_text" id="effortDoneText">${(percDurationDone<5)? '' : percDurationDone+'%'}</div>
 			</td>
 		</tr>
 		<tr>
-		<td class="task_bar_base">
-			<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 25%;" align="center">Done<br />${effortRemainDone}</div>
-			<div class="task_started task_bar_graph" id="effortStartBar" style="width: 25%;" align="center">Started<br />${effortRemainStarted}</div>
-			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 25%;" align="center">Ready<br />${effortRemainReady}</div>
-			<div class="task_pending task_bar_graph" id="effortPendingBar" style="width: 25%;" align="center">Pending<br />${effortRemainPending}</div>
+		<td class="task_bar_legend">
+			<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 20%;" align="center">Done<br />${effortRemainDone}</div>
+			<div class="task_started task_bar_graph" id="effortStartBar" style="width: 20%;" align="center">Started<br />${effortRemainStarted}</div>
+			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 20%;" align="center">Ready<br />${effortRemainReady}</div>
+			<div class="task_hold task_bar_graph" id="effortHoldBar" style="width: 20%;" align="center">Hold<br />${effortRemainHold}</div>
+			<div class="task_pending task_bar_graph" id="effortPendingBar" style="width: 20%;" align="center">Pending<br />${effortRemainPending}</div>
+			
 		</td>
 		</tr>
 	</table>

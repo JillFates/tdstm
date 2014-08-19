@@ -14,6 +14,7 @@ class DashboardService {
 	 * @return Map the data model
 	 */
 	Map getTaskSummaryModel(eventId, UserLogin user, Project project, maxTeamRows=6) {
+	log.info "test"
 		Map model = [:]
 		def event
 
@@ -63,22 +64,26 @@ class DashboardService {
 		model.countReady = taskStatusMap['Ready'].taskCount
 		model.countStarted = taskStatusMap['Started'].taskCount
 		model.countPending = taskStatusMap['Pending'].taskCount
+		model.countHold = taskStatusMap['Hold'].taskCount
 		model.countDone = taskStatusMap['Completed'].taskCount
 
 		// Task Percentage
 		model.percTaskReady = percCalc(taskStatusMap['Ready'].taskCount, taskCountByEvent)
 		model.percTaskStarted = percCalc(taskStatusMap['Started'].taskCount, taskCountByEvent)
+		//model.percTaskHold = percCalc(taskStatusMap['Hold'].taskCount, taskCountByEvent)
 		model.percTaskDone = percCalc(taskStatusMap['Completed'].taskCount, taskCountByEvent)
 
 		// Duration Percentage
 		model.percDurationReady = percCalc(taskStatusMap['Ready'].timeInMin, totalDuration)
 		model.percDurationStarted = percCalc(taskStatusMap['Started'].timeInMin, totalDuration)
+		//model.percDurationHold = percCalc(taskStatusMap['Hold'].timeInMin, totalDuration)
 		model.percDurationDone = percCalc(taskStatusMap['Completed'].timeInMin, totalDuration)
 
 		// Duration Remaining
 		model.effortRemainPending = effortRemaining('Pending')
 		model.effortRemainReady = effortRemaining('Ready')
 		model.effortRemainStarted = effortRemaining('Started')
+		//model.effortRemainHold = effortRemaining('Hold')
 		model.effortRemainDone = effortRemaining('Completed')
 
 		// Process Team information

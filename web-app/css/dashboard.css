@@ -245,7 +245,7 @@ body{
 .toprightcontent{
 	float:left;
 	text-align:center;
-	width:200px;
+	width:180px;
 	margin-top:25px;
 	font-size:13px;
 	line-height:21px;
@@ -759,6 +759,12 @@ input, select, textarea {
 	font-weight: bold;
 	font-size: 11px;
 }
+.task_bar_legend {
+	background-color: white;
+	padding: 0px;
+	font-weight: bold;
+	font-size: 11px;
+}
 .task_bar_graph {
 	z-index:-1;
 	height:26px;
@@ -780,7 +786,7 @@ input, select, textarea {
 	margin-left: 30px; 
 }
 .statusTaskEffort.toprightcontent {
-	width: 350px;
+	width: 380px;
 }
 .statusTaskEffort td {
 	padding: 2px;
