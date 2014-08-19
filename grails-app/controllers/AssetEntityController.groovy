@@ -546,8 +546,10 @@ class AssetEntityController {
 								jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
 								serverAdded = r
 							} catch (Exception e) {
-								skipped << "Servers [${( r + 1 )}]"
+								skipped << "Devices [row ${( r + 1 )}]"
 							}
+						} else {
+								skipped << "Devices [row ${( r + 1 )}] - blank name"							
 						}
 						if (r%50 == 0){
 							sessionFactory.getCurrentSession().flush();
@@ -576,7 +578,7 @@ class AssetEntityController {
 					}
 					for ( int r = 1; r < appSheetrows ; r++ ) {
 						def name = appSheet.getCell( appColNo, r ).contents
-						if(name){
+						if (name){
 							def dataTransferValueList = new StringBuffer()
 							// TODO - change the string appends to stringbuffer
 							for( int cols = 0; cols < appCol; cols++ ) {
@@ -611,8 +613,10 @@ class AssetEntityController {
 								)
 								appAdded = r
 							} catch (Exception e) {
-								skipped << "Apps [${( r + 1 )}]"
+								skipped << "Applications [row ${( r + 1 )}]"
 							}
+						} else {
+							skipped << "Applications [row ${( r + 1 )}] - blank name"
 						}
 						if (r % 50 == 0){
 							sessionFactory.getCurrentSession().flush();
@@ -670,8 +674,10 @@ class AssetEntityController {
 								jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
 								dbAdded = r
 							} catch (Exception e) {
-								skipped << "Database [${( r + 1 )}]"
+								skipped << "Database [row ${( r + 1 )}]"
 							}
+						} else {
+							skipped << "Database [row ${( r + 1 )}] - blank name"
 						}
 						if (r%50 == 0){
 							sessionFactory.getCurrentSession().flush();
@@ -730,8 +736,10 @@ class AssetEntityController {
 								jdbcTemplate.update("insert into data_transfer_value( asset_entity_id, import_value,row_id, data_transfer_batch_id, eav_attribute_id ) values "+dataTransferValueList.toString().substring(0,dataTransferValueList.lastIndexOf(",")))
 								filesAdded = r
 							} catch (Exception e) {
-								skipped << "Storage [${( r + 1 )}]"
+								skipped << "Storage [row ${( r + 1 )}]"
 							}
+						} else {
+							skipped << "Storage [row ${( r + 1 )}] - blank name"
 						}
 						if (r%50 == 0){
 							sessionFactory.getCurrentSession().flush();
@@ -1024,7 +1032,7 @@ class AssetEntityController {
 				"<li>$cablingAdded cables loaded" +
 				"<li>${commentCount-1} Comments loaded" +
 				warnMsg +
-				( skipped.size() ? "${skipped.size()} spreadsheet rows were skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
+				( skipped.size() ? "<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'
 			
 			forward action:forwardAction, params: [message: message]
@@ -3094,13 +3102,33 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
 			
 		def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntityInstance, configMap)
-		def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, escapedName:assetEntityService.getEscapedName(assetEntityInstance),
-							quotelessName:assetEntityInstance.assetName.replaceAll('\"', {''}), planStatusOptions:planStatusOptions?.value, projectId:projectId, 
-							project: project, railTypeOption:railTypeOption?.value, priorityOption:priorityOption?.value,dependentAssets:dependentAssets,supportAssets:supportAssets,
-							manufacturers:manufacturers, models:models,redirectTo:params?.redirectTo, dependencyType:dependencyType,
-							dependencyStatus:dependencyStatus,servers:servers, sourceChassisSelect:sourceChassisSelect, 
-							targetChassisSelect:targetChassisSelect, nonNetworkTypes:nonNetworkTypes, config:configMap.config, customs:configMap.customs,
-							rooms:rooms, targetRacks:targetRacks, sourceRacks:sourceRacks, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
+		def paramsMap = [assetEntityInstance:assetEntityInstance, 
+			assetTypeOptions:assetTypeOptions?.value, 
+			moveBundleList:moveBundleList, 
+			escapedName:assetEntityService.getEscapedName(assetEntityInstance),
+			quotelessName:assetEntityInstance.assetName?.replaceAll('\"', {''}), 
+			planStatusOptions:planStatusOptions?.value, 
+			projectId:projectId, 
+			project: project, 
+			railTypeOption:railTypeOption?.value, 
+			priorityOption:priorityOption?.value,
+			dependentAssets:dependentAssets,
+			supportAssets:supportAssets,
+			manufacturers:manufacturers, 
+			models:models,
+			redirectTo:params?.redirectTo, 
+			dependencyType:dependencyType,
+			dependencyStatus:dependencyStatus,
+			servers:servers, 
+			sourceChassisSelect:sourceChassisSelect, 
+			targetChassisSelect:targetChassisSelect, 
+			nonNetworkTypes:nonNetworkTypes, 
+			config:configMap.config, 
+			customs:configMap.customs,
+			rooms:rooms, targetRacks:targetRacks, 
+			sourceRacks:sourceRacks, 
+			environmentOptions:environmentOptions?.value, 
+			highlightMap:highlightMap]
 		
 		if (params.redirectTo == "roomAudit") {
 			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]

@@ -62,7 +62,7 @@
 					<table>
 						<tbody>
 							<tr>
-								<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>
+								<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name*</label></td>
 								<td><input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${assetEntityInstance.assetName}" tabindex="11" /></td>
 								<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="assetName">Description</label></td>
 								<td colspan="2">

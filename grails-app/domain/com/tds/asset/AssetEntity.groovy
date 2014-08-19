@@ -164,7 +164,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
 	static constraints = {
 		application( blank:true, nullable:true )
-		assetName( blank:true, nullable:true )
+		assetName( blank:false, nullable:false )
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
 		priority( nullable:true, validator: 

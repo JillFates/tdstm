@@ -265,30 +265,6 @@ function showComment (commentId , action, commentType) {
 		});
 }
 
-function validateFileFormat (form) {
-	var fileFlag = false;
-	var size = $('#'+form+' #size').val();
-	if ( size=='' || isNaN(size)) {
-		alert("Please enter numeric value for Storage Size");
-	} else if ($('#'+form+' #fileFormat').val()=='') {
-		alert("Please enter value for Storage Format");
-	} else {
-		fileFlag = true;
-	}
-	return fileFlag
-}
-function validateDbFormat (form) {
-	var dbFlag = false;
-    var size = $('#'+form+' #size').val();
-    if( size=='' || isNaN(size)){
-   	  alert("Please enter numeric value for DB Size");
-    }else if($('#'+form+' #dbFormat').val()==''){
-   	  alert("Please enter value for DB Format");
-    }else{
-    	dbFlag = true;
-    }
-  return dbFlag
-}
 function submitRemoteForm(){
 		jQuery.ajax({
 			url: $('#editAssetsFormId').attr('action'),
@@ -423,30 +399,51 @@ function submitMoveForm(){
 		}
 	});
 }
+
+/**
+ * Used to call Ajax Update for given asset form and then load the show view of the asset
+ * @param me - the form
+ * @param forWhom - the asset class of the form (app, files, database)
+ **/
 function updateToShow($me, forWhom){
-	var act = $me.data('action')
-	var type = 'Server'
-	var redirect = $me.data('redirect')
+	var act = $me.data('action');
+	var type = 'Server';
+	var redirect = $me.data('redirect');
 	if(act=='close')
-		$('#updateView').val('closeView')
+		$('#updateView').val('closeView');
 	else
-		$('#updateView').val('updateView')
-	var flag=true
-	if(forWhom=='app'){
-		type = 'Application'
-		flag = validateFields('Edit','editAssetsFormId')
+		$('#updateView').val('updateView');
+
+	var validateOkay=true;
+	switch(forWhom) {
+		case 'app':
+			type = 'Application';
+			validateOkay = validateAppForm('Edit','editAssetsFormId');
+			break;
+
+		case 'files':
+			type = 'Storage';
+			validateOkay = validateStorageForm('editAssetsFormId');
+			break;
+
+		case 'database':
+			type = 'Database';
+			validateOkay = validateDBForm('editAssetsFormId');
+			break;
+
+		case 'server':
+			type = 'Server';
+			validateOkay = validateDeviceForm('editAssetsFormId');
+			break;
+
+		default:
+			alert('Unsupported case for ' + forWhom);
 	}
-	if(forWhom=='files'){
-		type = 'Storage'
-		flag = validateFileFormat('editAssetsFormId')
-	}
-	if(forWhom=='database'){
-		type = 'Database'
-		flag = validateDbFormat('editAssetsFormId')
-	}
-	if(flag!=false)
-		flag = validateDependencies('editAssetsFormId')
-	if(flag){
+
+	if (validateOkay)
+		validateOkay = validateDependencies('editAssetsFormId');
+
+	if (validateOkay) {
 		jQuery.ajax({
 			url: $('#editAssetsFormId').attr('action'),
 			data: $('#editAssetsFormId').serialize(),
@@ -876,9 +873,16 @@ function getHelpTextAsToolTip(type){
 	});
 }
 
+/**
+ * Used to save newly created assets from the Create forms. After validating that the fields are 
+ * okay it will make an Ajax call to create the asset.
+ *
+ * @param me - the form that is being processed
+ * @param forWhom - string indicating which form is being processed (note that this is inconsistent with the update metho)
+ */
 function saveToShow($me, forWhom){
 	var act = $me.data('action')
-	var type = 'Server'
+
 	if($me.data('redirect'))
 		var redirect = $me.data('redirect').split("_")[0]
 	if(act=='close'){
@@ -886,23 +890,35 @@ function saveToShow($me, forWhom){
 	}else{
 		$('#showView').val('showView')
 	}
-	var flag=true
-	if(forWhom=='Application'){
-		flag = validateFields('','createAssetsFormId')
-		type = 'Application'
+
+	var type = forWhom;
+	var validateOkay=true;
+
+	switch(forWhom) {
+		case 'Application':
+			validateOkay = validateAppForm('Edit','createAssetsFormId');
+			break;
+
+		case 'Files':
+		case 'Logical Storage':
+			type = 'Storage';
+			validateOkay = validateStorageForm('createAssetsFormId');
+			break;
+
+		case 'Database':
+			validateOkay = validateDBForm('createAssetsFormId');
+			break;
+
+		case 'AssetEntity':
+			type = "Server";
+			validateOkay = validateDeviceForm('createAssetsFormId');
+			break;
+
+		default:
+			alert('Unsupported case for ' + forWhom);
 	}
-	if(forWhom=='Logical Storage'){
-		flag = validateFileFormat('createAssetsFormId')
-		type='Storage'
-	}
-	if(forWhom=='Database'){
-		flag = validateDbFormat('createAssetsFormId')
-		type = 'Database'
-	}
-	if(flag!=false)
-		flag = validateDependencies('createAssetsFormId')
 		
-	if(flag){
+	if (validateOkay) {
 		jQuery.ajax({
 			url: $('#createAssetsFormId').attr('action'),
 			data: $('#createAssetsFormId').serialize(),
@@ -942,17 +958,100 @@ function saveToShow($me, forWhom){
 	}
 }
 
-function validateFields(forWhom,formName){
-    var flag = true
-	if($("#sme1"+forWhom).val()=='0' || $("#sme2"+forWhom).val()=='0' || $("#appOwner"+forWhom).val()=='0' ){
-		flag = false
-		alert("Please De-select 'Add-Person' Option from sme , sme2 or appOwner select")
-		return flag
-	} else if (isNaN($("#shutdownDuration"+forWhom).val()) || isNaN($("#startupDuration"+forWhom).val()) || isNaN($("#testingDuration"+forWhom).val())){
-		flag = false
-		alert("Please enter numeric value for Shutdown Duration, Startup Duration, Testing Duration ")
-		return flag
-	} 
+/**
+ * Used to validate common fields on any of the asset create/edit forms
+ * @return true if valid
+ **/
+function validateCommonFields(form) {
+	var ok = false;
+
+	// Validate that asset name is not blank
+	var fieldVal = $('#'+form+' #assetName').val();
+	if (fieldVal == '') {
+		alert('Please provide a name for the asset')
+	} else {
+		ok = true
+	}
+	return ok;
+}
+
+/**
+ * Used to validate the Storage asset create/edit forms
+ * @return true if valid
+ **/
+function validateStorageForm(form) {
+	var ok = validateCommonFields(form);
+	if (ok) {
+		ok = false;
+		var size = $('#'+form+' #size').val();
+		if ( size=='' || isNaN(size)) {
+			alert("Please enter numeric value for Storage Size");
+		} else if ($('#'+form+' #fileFormat').val()=='') {
+			alert("Please enter value for Storage Format");
+		} else {
+			ok = true;
+		}
+	}
+	return ok
+}
+
+/**
+ * Used to validate the Database asset create/edit forms
+ * @return true if valid
+ **/
+function validateDBForm(form) {
+	var ok = validateCommonFields(form);
+	if (ok) {
+		ok = false;
+	    var size = $('#'+form+' #size').val();
+	    if ( size=='' || isNaN(size)){
+	    	alert("Please enter numeric value for DB Size");
+	    }else if($('#'+form+' #dbFormat').val()==''){
+	    	alert("Please enter value for DB Format");
+	    }else{
+	    	ok = true;
+	    }
+	}
+	return ok
+}
+
+/**
+ * Used to validate the Server/Device asset create/edit forms
+ * @return true if valid
+ **/
+function validateDeviceForm(form) {
+	var ok = validateCommonFields(form);
+	return ok
+}
+
+function validateAppForm(forWhom, form){
+	var ok = validateCommonFields(form);
+	if (ok) {
+		ok = false;
+		if($('#'+form+' #sme1'+forWhom).val()=='0' || $('#'+form+' #sme2'+forWhom).val()=='0' || $('#'+form+' #appOwner'+forWhom).val()=='0' ){
+			alert("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
+		} else if (
+			isNaN($('#'+form+' #shutdownDuration'+forWhom).val()) || 
+			isNaN($('#'+form+' #startupDuration'+forWhom).val()) || 
+			isNaN($('#'+form+' #testingDuration'+forWhom).val()) )
+		{
+			alert("Please make sure that Shutdown Duration, Startup Duration and Testing Duration properties have numberic values")
+		} else {
+			ok = true;
+		}
+	}
+	return ok;
+}
+
+function validateDependencies(formName){
+	var flag = true
+	$('#'+formName+' select[name*="asset_"]').each( function() {
+		if( $(this).val() == 'null' )
+			flag = false
+			return flag
+	})
+	if(flag==false)
+		alert("Please select a valid asset for all dependencies ")
 	return flag
 }
 
@@ -1095,17 +1194,6 @@ function saveDepComment(textId, hiddenId, dialogId, commLink){
 	}else {
 		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/icons/comment_edit.png">')
 	}
-}
-function validateDependencies(formName){
-	var flag = true
-	$('#'+formName+' select[name*="asset_"]').each( function() {
-		if( $(this).val() == 'null' )
-			flag = false
-			return flag
-	})
-	if(flag==false)
-		alert("Please select a valid asset for all dependencies ")
-	return flag
 }
 function changeBundleSelect(){
 	if($("#plannedMoveBundleList").val()){

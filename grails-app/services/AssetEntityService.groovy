@@ -804,7 +804,8 @@ class AssetEntityService {
 	
 	def getEscapedName (assetEntity, ignoreSingleQuotes = false) {
 		def name = ''
-		for (int i = 0; i < assetEntity.assetName.size(); ++i)
+		def size = assetEntity.assetName?.size() ?: 0
+		for (int i = 0; i < size; ++i)
 			if (assetEntity.assetName[i] == "'")
 				name = name + "\\'"
 			else if (ignoreSingleQuotes && assetEntity.assetName[i] == '"')
