@@ -55,8 +55,6 @@ exports.config = {
 
   capabilities: {
     'browserName': 'chrome'
-    // 'browserName':'phantomjs',
-    // 'phantomjs.binary.path':'./node_modules/phantomjs/bin/phantomjs',
   },
   // multiCapabilities: [{
   //   browserName: 'firefox'
@@ -72,7 +70,7 @@ exports.config = {
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
     browser.driver.get(baseUrl+'/tdstm/auth/login');
-    browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USERNAME);
+    browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
     browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);
     browser.driver.findElement(by.css('.buttonR input')).click();
   },
