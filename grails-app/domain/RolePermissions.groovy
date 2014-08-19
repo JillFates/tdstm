@@ -70,5 +70,9 @@ class RolePermissions {
 		}
 		return returnVal
 	}
+
+	String toString() {
+		return role
+	}
 	
 }

@@ -13,5 +13,8 @@ class PartyRole implements Serializable {
 		}
 		
 	}
-	
+
+	String toString() {
+		"$party : $roleType"
+	}	
 }

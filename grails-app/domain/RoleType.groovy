@@ -15,6 +15,6 @@ class RoleType {
 	}
 
 	String toString(){
-		description
+		return "$id : $description"
 	}
 }

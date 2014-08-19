@@ -88,6 +88,45 @@ class SecurityService implements InitializingBean {
 	}
 	
 	/**
+	 * Used to get a list of the security roles that a user has
+	 * @param The UserLogin object of the user being queried
+	 * @return A list of roles if the user has any
+	 */
+	List<RoleType> getRoles(UserLogin user) {
+		def roles = []
+		if( user ) {
+			roles = PartyRole.findAllByParty(user.person)
+		}
+		return roles*.roleType
+	}
+	
+	/**
+	 * Used to determine if a UserLogin has a particular permission
+	 * @param A UserLogin object for the given user
+	 * @param A permission tag name
+	 * @return boolean true if the user does have permission
+	 */
+	boolean hasPermission(UserLogin user, String permission) {
+		def hasPerm = false
+		def roles = getRoles(user)
+
+		if (roles) {
+			def permObj = Permissions.findByPermissionItem(permission)
+			if (permObj) {
+				if (RolePermissions.findByPermissionAndRoleInList(permObj, roles*.id)) {
+					hasPerm=true
+				}
+			} else {
+				log.debug "Unable to find permission ($permission) for user ($user) with roles (${roles*.id})"
+			}
+		} else {
+			log.debug "Unable to find roles for user $user"
+		}
+
+		return hasPerm
+	}
+
+	/**
 	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
 	 * should be returned (e.g. Staff or System). When a project is presented the method will return roles associate to the project otherwise
 	 * it return the user's global role.

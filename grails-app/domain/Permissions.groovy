@@ -15,4 +15,8 @@ class Permissions {
 		permissionGroup( nullable:false )
 		description( blank:true , nullable:true)
 	}
+
+	String toString() {
+		return permissionItem
+	}
 }

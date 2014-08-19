@@ -33,6 +33,16 @@ class TestCaseController {
 
 	// def messageSource
 	
+	def testPerms = {
+		def user = securityService.getUserLogin()
+
+		def hasPermGood = securityService.hasPermission(user, 'ShowCartTracker')
+		def hasPermBad = securityService.hasPermission(user, 'xyzzy')
+
+		render "hasPermGood=$hasPermGood, hasPermBad=$hasPermBad"
+
+	}
+
 	def checkADConfig = {
 		def out = "<h1>Testing AD Configuration</h1><pre>" 
 		out += securityService.getActiveDirectorySettings().toString() + "</pre>"
