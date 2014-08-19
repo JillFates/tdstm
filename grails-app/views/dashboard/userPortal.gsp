@@ -7,7 +7,7 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'userPortal.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />

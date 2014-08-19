@@ -5,7 +5,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
-	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<g:javascript library="application" />
 	<meta name="viewport" content="height=device-height,width=320" />
 </head>

@@ -5,7 +5,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
-	<link rel="shortcut icon" href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<g:javascript src="tech_teams.js" />
 	<g:javascript src="asset.comment.js" />

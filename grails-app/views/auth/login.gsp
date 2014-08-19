@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
 <link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
 <link rel="shortcut icon"
-	href="${resource(dir:'images',file:'tds.ico')}" type="image/x-icon" />
+	href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 <meta name="viewport" content="height=device-height,width=device-width" />
 	
 <g:javascript library="application" />
