@@ -49,7 +49,7 @@
 								</g:else>
 							</g:each>
 							<td style="text-align: center;"> 
-							  <input type="text" name="description_${permission.id}" value="${permission.description}" style="width:250px"> 
+							  <input type="text" name="description_${permission.id}" value="${permission.description}" style="width:350px"> 
 							</td>
 						</tr>
 					</g:each>

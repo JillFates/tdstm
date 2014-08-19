@@ -11,6 +11,13 @@
     <tds:hasPermission permission='AdminMenuView'>
     <div class="body">
     <h1>Role Permissions</h1>
+	    <div class="buttons">
+      <g:form action="edit">
+          <span class="button">
+            <g:actionSubmit type="button" class="edit" value="Edit"/>
+          </span>
+  </g:form>
+    </div>
     <div class="list" id="updateShow">
 			<table>
 				<thead>
@@ -42,19 +49,13 @@
 									<td style="text-align: center;">-</td>
 								</g:else>
 							</g:each>
-							<td style="text-align: center;">${permission.description}</td>
+							<td style="text-align: left;">${permission.description}</td>
 						</tr>
 					</g:each>
 				</tbody>
 			</table>
 		</div>   
-    <div class="buttons">
-      <g:form action="edit">
-          <span class="button">
-            <g:actionSubmit type="button" class="edit" value="Edit"/>
-          </span>
-  </g:form>
-    </div></div>
+</div>
     </tds:hasPermission>
 <script>
 	currentMenuId = "#adminMenu";
