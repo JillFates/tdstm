@@ -70,6 +70,15 @@ class ApplicationController {
 		def attributesList= (appAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
+		// Sorts attributesList alphabetically		
+		attributesList.sort { a,b->
+			if (a.frontendLabel < b.frontendLabel)
+				return -1
+			if (a.frontendLabel > b.frontendLabel)
+				return 1
+			return 0
+		}
+		
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
 		def fixedFilter = false
 		if(params.filter)

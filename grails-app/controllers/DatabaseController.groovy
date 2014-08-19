@@ -68,9 +68,18 @@ class DatabaseController {
 		dbPref.each{key,value->
 			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
 		}
+		
 		/* Asset Entity attributes for Filters*/
 		def attributesList= (dbAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
+		}
+		// Sorts attributesList alphabetically
+		attributesList.sort { a,b->
+			if (a.frontendLabel < b.frontendLabel)
+				return -1
+			if (a.frontendLabel > b.frontendLabel)
+				return 1
+			return 0
 		}
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
 		def fixedFilter = false

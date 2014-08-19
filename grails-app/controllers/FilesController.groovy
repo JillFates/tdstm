@@ -67,6 +67,15 @@ class FilesController {
 		def attributesList= (filesAttributes).collect{ attribute ->
 			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
 		}
+		// Sorts attributesList alphabetically		
+		attributesList.sort { a,b->
+			if (a.frontendLabel < b.frontendLabel)
+				return -1
+			if (a.frontendLabel > b.frontendLabel)
+				return 1
+			return 0
+		}
+		
 		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 		def hasPerm = RolePermissions.hasPermission("AssetEdit")
 		def fixedFilter = false
