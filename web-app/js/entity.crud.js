@@ -917,6 +917,9 @@ function saveToShow($me, forWhom){
 		default:
 			alert('Unsupported case for ' + forWhom);
 	}
+
+	if (validateOkay)
+		validateOkay = validateDependencies('createAssetsFormId')
 		
 	if (validateOkay) {
 		jQuery.ajax({
