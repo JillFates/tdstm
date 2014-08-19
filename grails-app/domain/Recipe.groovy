@@ -28,6 +28,8 @@ class Recipe {
 	
 	Boolean archived = false
 
+	Integer defaultAssetId
+
 	static constraints = {	
 		name(blank:false, nullable:false, maxLength:40)
 		description(blank:true, nullable:true, maxLength:255)
@@ -36,6 +38,7 @@ class Recipe {
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
 		releasedVersion(nullable:true)
+		defaultAssetId(nullable:true)
 	}
 
 	static mapping  = {	

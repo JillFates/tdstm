@@ -73,6 +73,11 @@ class UrlMappings {
 			action = [POST:"cloneRecipe"]
 		}
 
+		"/ws/cookbook/recipe/context/$recipeId" {
+			controller = "wsCookbook"
+			action = [POST:"defineRecipeContext", DELETE: "deleteRecipeContext"]
+		}
+
 		"/ws/cookbook/groups" {
 			controller = "wsCookbook"
 			action = [POST:"groups"]

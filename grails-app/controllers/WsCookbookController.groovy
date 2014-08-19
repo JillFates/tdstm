@@ -274,7 +274,10 @@ class WsCookbookController {
 			dataMap.sourceCode = result.recipeVersion.sourceCode
 			dataMap.changelog = result.recipeVersion.changelog
 			dataMap.clonedFrom = (result.recipeVersion.clonedFrom == null) ? '' : result.recipeVersion.clonedFrom.toString()
-			
+			dataMap.eventId = result.eventId
+			dataMap.bundleId = result.bundleId
+			dataMap.applicationId = result.applicationId
+
 			render(ServiceResults.success(dataMap) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
@@ -479,4 +482,52 @@ class WsCookbookController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+
+	def defineRecipeContext = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		def recipeId = params.recipeId
+		def contextId = params.contextId
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.defineRecipeContext(recipeId, contextId, currentProject)
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
+	def deleteRecipeContext = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		def recipeId = params.recipeId
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			cookbookService.deleteRecipeContext(recipeId, currentProject)
+			render(ServiceResults.success() as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 }

@@ -108,4 +108,5 @@ databaseChangeLog = {
 	include file: '20140804-fix-asset-comment-task-number.groovy'
 	include file: '20140805-change-asset-import-export-fields.groovy'
 	include file: '20140814-clean-up-orphaned-commentNotes.groovy'
+	include file: '20140813-add-default-asset-entity-field-to-recipe.groovy'
 }

@@ -189,6 +189,7 @@ class CookbookService {
 		newRecipe.context = context
 		newRecipe.project = project
 		newRecipe.archived = false
+		newRecipe.defaultAssetId = null
 
 		newRecipe.save(flush:true, failOnError: true)
 
@@ -650,14 +651,47 @@ class CookbookService {
 		}
 		
 		//checkAccess(loginUser.person, recipe.project)
+		def eventId = null
+		def bundleId = null
+		def applicationId = null
 		
+		if (recipe.defaultAssetId != null) {
+			def context
+			switch (recipe.context) {
+				case 'Application' :
+					context = ContextType.A.getObject(recipe.defaultAssetId)
+					if (context != null) {
+						eventId = context.moveBundle.moveEvent.id;
+						bundleId = context.moveBundle.id;
+						applicationId = recipe.defaultAssetId;
+					}
+					break;
+				case 'Bundle' :
+					context = ContextType.B.getObject(recipe.defaultAssetId)
+					if (context != null) {
+						eventId = context.moveEvent.id;
+						bundleId = recipe.defaultAssetId;
+					}
+					break;
+				case 'Event' :
+					eventId = recipe.defaultAssetId;
+					break;
+				default :
+					throw new IllegalArgumentException('Invalid context')
+					break;
+			}
+		}
+
 		def person = recipeVersion.createdBy
 		
 		def result = [
 			'recipe' : recipe,
 			'recipeVersion' : recipeVersion,
 			'person' : person,
-			'wip' : wip
+			'wip' : wip,
+			'eventId' : eventId,
+			'bundleId' : bundleId,
+			'applicationId' : applicationId
 		]
 		
 		return result
@@ -1526,6 +1560,93 @@ class CookbookService {
 			}
 		}
 	}
+
+	void defineRecipeContext(recipeId, contextId, currentProject) {
+		if (!RolePermissions.hasPermission('EditRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
+		}
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+		
+		if (!recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+		}
+
+		if (contextId == null || !contextId.isNumber()) {
+			throw new EmptyResultException('Invalid contextId');
+		}
+		
+		contextId = contextId.toInteger()
+		
+		def contextType = null
+		switch (recipe.context) {
+			case 'Application' :
+				contextType = ContextType.A
+				break;
+			case 'Bundle' :
+				contextType = ContextType.B
+				break;
+			case 'Event' :
+				contextType = ContextType.E
+				break;
+			default :
+				throw new IllegalArgumentException('Invalid context')
+				break;
+		}
+		
+		def context = contextType.getObject(contextId)
+
+		def haveAccess = false
+		if (context != null) {
+			switch (recipe.context) {
+				case 'Application' :
+					haveAccess = context.moveBundle.project.equals(currentProject)
+					break;
+				case 'Bundle' :
+				case 'Event' :
+					haveAccess = context.belongsToClient(currentProject.client)
+					break;
+			}			
+		}
+		if (!haveAccess) {
+			throw new UnauthorizedException('The client doesn\'t own this context')
+		}
+
+		recipe.defaultAssetId = contextId
+		recipe.save(flush:true, failOnError: true)
+	}
+
+	void deleteRecipeContext(recipeId, currentProject) {
+		if (!RolePermissions.hasPermission('EditRecipe')) {
+			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
+		}
+		
+		if (recipeId == null || !recipeId.isNumber() || currentProject == null) {
+			throw new EmptyResultException();
+		}
+		
+		def recipe = Recipe.get(recipeId)
+		
+		if (recipe == null) {
+			throw new EmptyResultException();
+		}
+		
+		if (!recipe.project.equals(currentProject)) {
+			throw new UnauthorizedException('User is trying to archive/unarchived recipe whose project that is not the current ' + recipeId + ' currentProject ' + currentProject.id)
+		}
+
+		recipe.defaultAssetId = null
+		recipe.save(flush:true, failOnError: true)
+	}
+
 }
 
 class RecipeMapper implements RowMapper {

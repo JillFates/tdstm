@@ -2,28 +2,37 @@
 	<div class="selectors in">
 		<div class="form-group">
 			<label class="inline text-right" for="eventSelect">Event:</label>
-				<select name="eventSelect" id="eventSelect" ng-model="groups.selectedEvent" ng-change="groups.eventSelected()" ng-options="item as item.name for item in groups.eventsArray">
+				<select name="eventSelect" id="eventSelect" ng-model="contexts.selectedEvent" ng-change="contexts.eventSelected()" ng-options="item as item.name for item in contexts.eventsArray">
 					<option value="">Please select</option>
 				</select>
 		</div>	
 		
 		<div class="form-group" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
 			<label class="inline text-right" for="eventSelect">Bundle:</label>
-				<select name="bundleSelect" id="bundleSelect" ng-model="groups.selectedBundle" ng-change="groups.bundleSelected()" ng-options="item as item.name group by item.group for item in groups.bundlesArray">
+				<select name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
 					<option value="">Please select</option>
 				</select>
 		</div>
 
 		<div class="form-group" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
 			<label class="inline text-right" for="eventSelect">Application:</label>
-				<select name="applicationSelect" id="applicationSelect" ng-model="groups.selectedApplication" ng-change="groups.applicationSelected()" ng-options="item as item.name group by item.group for item in groups.applicationsArray">
+				<select name="applicationSelect" id="applicationSelect" ng-model="contexts.selectedApplication" ng-change="contexts.checkValidSelection()" ng-options="item as item.name group by item.group for item in contexts.applicationsArray">
 					<option value="">Please select</option>
 				</select>
 		</div>
 
+		<div class="form-group">
+			<a id="setDefaultContext" ng-show="!contexts.enableClearDefaultContext" ng-disabled="!contexts.validCurrentSelection" ng-click="contexts.setRecipeDefaultContext()">
+				Set as Default
+			</a>
+			<a id="clearDefaultContext" ng-show="contexts.enableClearDefaultContext" ng-click="contexts.clearRecipeDefaultContext()">
+				Clear Default
+			</a>
+		</div>
+
 		<div class="refreshWrapper">
 			<label for="refreshGroups">
-				<a class="btn btn-default" ng-disabled="(groups.contextId == 0)" id="refreshGroups" ng-click="groups.fetchGroups()">
+				<a class="btn btn-default" ng-disabled="(contexts.contextId == 0)" id="refreshGroups" ng-click="groups.fetchGroups()">
 					Fetch
 				</a>
 			</label>
