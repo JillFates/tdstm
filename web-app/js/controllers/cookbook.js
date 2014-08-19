@@ -1248,8 +1248,14 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	scope.tasks = {};
 
 	scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
-
 	scope.tasks.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
+	scope.tasks.singleRecipe = (stateParams.recipeId != null);
+	scope.tasks.statePrefix = "recipes.detail.history";
+	scope.tasks.limitDays = '30';
+
+	if (!scope.tasks.singleRecipe) {
+		scope.tasks.statePrefix = "generationHistory";
+	}
 	
 	var	tasksActionsTemplate = '<div class="gridIcon">'+
 		'<a href="" class="actions edit" title="Reset Tasks"'+
@@ -1260,14 +1266,15 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 			'ng-click="tasks.tasksGridActions(row, \'remove\')">'+
 			'<img src="'+ utils.url.applyRootPath('/icons/delete.png') + '" alt="Delete">' +
 		'</a>'+
-		'</div>',
-		checkboxTemplate = '<div class="gridIcon">'+
+		'</div>';
+	var checkboxTemplate = '<div class="gridIcon">'+
 		'<span class="actions" style="text-align: center;">'+
 		'<input type="checkbox" name="isPublished" ng-checked="row.entity.isPublished"'+
 			'id="isPublished" ng-model="row.entity.isPublishedValue" ng-readonly="true"'+
 			'ng-click="tasks.tasksGridActions(row, \'publishUnpublish\', $event)"/>'+
 		'</span>'+
 		'</div>';
+	var recipeTemplate = '<a href="#/recipes/{{row.entity.recipeId}}/code/logs">{{row.entity.recipeName}}</a>';
 
 	var lastLoop;
 	var layoutPluginTasks = new ngGridLayoutPlugin();
@@ -1301,9 +1308,9 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	}; 
 
 	var validNextStates = [
-		"**.recipes.detail.history.detail.logs.**",
-		"**.recipes.detail.history.detail.actions.**",
-		"**.recipes.detail.history.detail.tasks.**"
+		"**." + scope.tasks.statePrefix + ".detail.logs.**",
+		"**." + scope.tasks.statePrefix + ".detail.actions.**",
+		"**." + scope.tasks.statePrefix + ".detail.tasks.**"
 	];
 
 	var getNextState = function() {
@@ -1314,8 +1321,8 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 				break;
 			}
 		}
-		if (next == null && state.includes("**.recipes.detail.history.**")) {
-			next = "recipes.detail.history.detail"
+		if (next == null && state.includes("**." + scope.tasks.statePrefix + ".**")) {
+			next = scope.tasks.statePrefix + ".detail"
 		}
 		return next;
 	}
@@ -1350,7 +1357,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	}
 
 	scope.tasks.refreshTaskBatches = function() {
-		scope.tasks.getListTaskBatches({recipeId: stateParams.recipeId, limitDays: 30});
+		scope.tasks.getListTaskBatches({recipeId: stateParams.recipeId, limitDays: scope.tasks.limitDays});
 	}
 
 	// Publish && Unpublish tasks batch functions
@@ -1452,6 +1459,12 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 				{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}
 			];
 
+			if ((data.data.list.length > 0) && (!scope.tasks.singleRecipe)) {
+				scope.tasks.colDef.splice(0, 0,
+					{field:'recipeName', displayName:'Recipe', enableCellEdit: false, width: '***', cellTemplate: recipeTemplate}
+				);
+			}
+
 			if(data.data.list.length == 0){
 				scope.tasks.selectedTaskBatch = null;
 			}
@@ -1502,9 +1515,9 @@ tds.cookbook.controller.TaskBatchHistoryDetailController = function(scope, state
 	scope.isTaskBatchSelected = (stateParams.taskBatchId != null && stateParams.taskBatchId != "");
 
 	scope.taskBatchTabs = [
-		{ heading: "Actions", route:"recipes.detail.history.detail.actions", active:false },
-		{ heading: "Tasks", route:"recipes.detail.history.detail.tasks", active:false },
-		{ heading: "Generation Log", route:"recipes.detail.history.detail.logs", active:false }
+		{ heading: "Actions", route: scope.tasks.statePrefix + ".detail.actions", active:false },
+		{ heading: "Tasks", route: scope.tasks.statePrefix + ".detail.tasks", active:false },
+		{ heading: "Generation Log", route: scope.tasks.statePrefix + ".detail.logs", active:false }
 	];
 
 	scope.active = function(route){
@@ -2562,6 +2575,13 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 					section: "listTaskBatches"
 				}
 			},
+			getTaskBatches: {
+				method: "GET",
+				params: {
+					domain: "task",
+					section: "listTaskBatches"
+				}
+			},
 			getTaskBatch: {
 				method: "GET",
 				params: {
@@ -3016,6 +3036,57 @@ tds.cookbook.module.config(function($stateProvider, $urlRouterProvider, servRoot
 				"versionsInnerTabsContent": {
 					templateUrl: servRootPathProvider.$get() + '/components/cookbook/versions/recipe-versions-diff-template.html',
 					controller: tds.cookbook.controller.RecipeVersionsDiffController
+				}
+			}
+		})
+		// ----------------------------------------------------------------------
+		// STATE DESC: Show task batch history
+		.state('generationHistory', {
+			url: '/generationHistory',
+			templateUrl: servRootPathProvider.$get() + '/components/cookbook/generation-history/generation-history-template.html',
+			controller: tds.cookbook.controller.TaskBatchHistoryController
+		})
+		// ----------------------------------------------------------------------
+		// STATE DESC: Show task batch history details
+		.state('generationHistory.detail', {
+			url: '/{taskBatchId:[0-9]*}',
+			views: {
+				"taskBatchInnerContent": {
+					templateUrl: servRootPathProvider.$get() + '/components/cookbook/history/task-batch-history-detail-template.html',
+					controller: tds.cookbook.controller.TaskBatchHistoryDetailController
+				}
+			}
+		})
+		// ----------------------------------------------------------------------
+		// STATE DESC: Show task batch history actions
+		.state('generationHistory.detail.actions', {
+			url: '/actions',
+			views: {
+				"taskBatchTabsContent": {
+					templateUrl: servRootPathProvider.$get() + '/components/cookbook/history/task-batch-history-actions-template.html',
+					controller: tds.cookbook.controller.TaskBatchHistoryActionsController
+				}
+			}
+		})
+		// ----------------------------------------------------------------------
+		// STATE DESC: Show task batch history tasks
+		.state('generationHistory.detail.tasks', {
+			url: '/tasks',
+			views: {
+				"taskBatchTabsContent": {
+					templateUrl: servRootPathProvider.$get() + '/components/cookbook/history/task-batch-history-tasks-template.html',
+					controller: tds.cookbook.controller.TaskBatchHistoryTasksController
+				}
+			}
+		})
+		// ----------------------------------------------------------------------
+		// STATE DESC: Show task batch history logs
+		.state('generationHistory.detail.logs', {
+			url: '/logs',
+			views: {
+				"taskBatchTabsContent": {
+					templateUrl: servRootPathProvider.$get() + '/components/cookbook/history/task-batch-history-logs-template.html',
+					controller: tds.cookbook.controller.TaskBatchHistoryLogsController
 				}
 			}
 		})

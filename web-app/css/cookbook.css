@@ -134,6 +134,14 @@ form.groups{
 	overflow-y: auto;
 }
 
+.gridStyleTasksHistory, .gridStyleGroups{
+	border: 1px solid rgb(212,212,212);
+	height: 254px;
+	margin: 0 0 10px 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
 .gridIcon{
 	display: table;
 	height: 100%;

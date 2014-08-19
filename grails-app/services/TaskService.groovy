@@ -4964,15 +4964,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new EmptyResultException('No project selected');
 		}
 		
-		if (recipeId == null || !recipeId.isNumber()) {
-			throw new EmptyResultException('Invalid recipeId');
-		}
-		def recipe = Recipe.get(recipeId.toInteger())
-		if (recipe == null) {
-			throw new EmptyResultException('Recipe doesn\'t exists');
-		}
-		if (!recipe.project.equals(currentProject)) {
-			throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+		def recipe = null
+		if (recipeId != null && recipeId.isNumber()) {
+			recipe = Recipe.get(recipeId.toInteger())
+			if (recipe == null) {
+				throw new EmptyResultException('Recipe doesn\'t exists');
+			}
+			if (!recipe.project.equals(currentProject)) {
+				throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+			}			
 		}
 		
 		if (limitDays == null || !limitDays.isNumber()) {
@@ -4984,15 +4984,28 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info("Start date" + startCreationDate)
 		
 		def c = TaskBatch.createCriteria()
-		def queryResults = c.list {
-			ge("dateCreated", startCreationDate)
-			eq("recipe", recipe)
+		def queryResults = []
+
+		if (recipe == null) {
+			queryResults = c.list {
+				ge("dateCreated", startCreationDate)
+				eq("project", currentProject)
+				order("dateCreated", "desc")
+			}
+		} else {
+			queryResults = c.list {
+				ge("dateCreated", startCreationDate)
+				eq("recipe", recipe)
+				order("dateCreated", "desc")
+			}
 		}
-		
+
 		def result = []
 		for (TaskBatch taskBatch in queryResults) {
 			result.add([
 			'id': taskBatch.id,
+			'recipeId' : taskBatch.recipe?taskBatch.recipe.id:0,
+			'recipeName' : taskBatch.recipe?taskBatch.recipe.name:'',
 			'contextName' : taskBatch.contextName(),
 			'taskCount': taskBatch.taskCount,
 			'exceptionCount': taskBatch.exceptionCount,
@@ -5001,7 +5014,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			'status': taskBatch.status,
 			'exceptionLog': taskBatch.exceptionLog,
 			'infoLog': taskBatch.infoLog,
-			'versionNumber' : taskBatch.recipe.releasedVersion?taskBatch.recipe.releasedVersion.versionNumber:'',
+			'versionNumber' : taskBatch.recipe?(taskBatch.recipe.releasedVersion?taskBatch.recipe.releasedVersion.versionNumber:''):'',
 			'isPublished' : taskBatch.isPublished])
 		}
 

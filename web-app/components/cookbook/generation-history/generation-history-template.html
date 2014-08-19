@@ -1,0 +1,10 @@
+<form id="gridControls" class="row-fluid clearfix form-inline groups">
+	<div class="col-md-4 col-xs-4 form-group" style="position:relative; bottom:0;">
+		<label for="contextSelector">Limit Days: 
+			<select name="dayslimit" id="dayslimit" ng-model="tasks.limitDays" ng-options="c for c in ['1', '7', '30']" ng-change="tasks.refreshTaskBatches()"></select>
+		</label>
+	</div>
+</form>
+<div class="gridStyleTasksHistory" ng-grid="tasks.tasksGrid"></div>
+
+<div class="innerTabWrapper" ui-view="taskBatchInnerContent"></div>
