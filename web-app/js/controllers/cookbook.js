@@ -1193,7 +1193,6 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 	scope.cookbook.progressPromise = setInterval(function() {
 		cookbookService.getProgress({section: jobId, rand: tdsCommon.randomString(16)}, {"id" : jobId}, function(data) {
 			scope.tasks.progressPercent = data.data.percentComp;
-			scope.tasks.progressRemaining = data.data.detail;
 			scope.tasks.show.progress = ((data.data.percentComp < 100) && 
 				((data.data.status == "Pending") || (data.data.status == "Processing")));
 			
@@ -1201,12 +1200,16 @@ tds.cookbook.controller.TaskGenerationProgressController = function(scope, state
 				clearInterval(scope.cookbook.progressPromise);
 				scope.cookbook.progressPromise = null;
 				if (data.data.status == "Failed" ) {
-					alerts.addAlert({type: 'danger', msg: data.data.detail});
+					scope.tasks.progressRemaining = "Generation FAILED";
+					alerts.addAlert({type: 'danger', msg: utils.string.htmlToPlaintext(data.data.detail)});
 				} else {
+					scope.tasks.progressRemaining = data.data.detail;
 					alerts.addAlert({type: 'success', msg: 'Finish generating tasks', closeIn: 3000});
 
 					state.go("recipes.detail.gentasks.completed", {'taskBatchId': taskId});
 				}
+			} else {
+				scope.tasks.progressRemaining = utils.string.htmlToPlaintext(data.data.detail);
 			}
 		});
 	}, 1000);

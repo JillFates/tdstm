@@ -75,8 +75,12 @@ tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
 			return trunc;
 		}
 
+		function htmlToPlaintext(text) {
+			return String(text).replace(/<[^>]+>/gm, '');
+		}
 		return {
-			truncate: truncate
+			truncate: truncate,
+			htmlToPlaintext: htmlToPlaintext
 		};
 
 	}();
