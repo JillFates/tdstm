@@ -260,7 +260,7 @@
 		<table id="assetEntityTable">
 			<thead>
 				<tr>
-					<th>Key off Step</th>
+					<th>Step Name</th>
 					<th>Dashboard</th>
 					<th>Dashboard Label</th>
 					<!--<th>Start</th>
@@ -611,13 +611,17 @@
 	  	    		  $("#completionTime_"+stepId).val(bundleCompletion)
 	  	    	  }
 	  	    	  
-		    	  if( !$("#dashboardLabel_"+stepId).val() || !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val()){
+		    	  if( !$("#dashboardLabel_"+stepId).val()){
 				  	  checked =  false;
-				      message ="Dashboard Labels, Step times are mandatory for selected key off steps";
+				      message ="A Dashboard Label is required for each selected step.";
 					  return false;
-		    	  } else if( $(".field_error").length > 0 ){
+		    	  } else if( !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val() ) {
+					  checked =  false;
+					  message = "Start and Completion Times are required for each selected step.";
+					  return false;
+				  } else if( $(".field_error").length > 0){
 				      checked =  false;
-				      message = "Date/Time entry problem. Please correct highlighted fields before saving.";
+				      message = "The date time format is incorrect for the highlighted fields.";
 			    	  return false;
 		    	  }
 		    	  
