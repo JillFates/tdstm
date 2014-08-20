@@ -1680,7 +1680,10 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			}
 			if (scope.master) {
 				scope.$on('showActionBars', function(evt) {
-					loadContent();
+					var currentStatus = angular.element('#status_' + scope.commentId).html();
+					if ((currentStatus == 'Ready') || (currentStatus == 'Started')) {
+						loadContent();	
+					}
 				});
 				scope.$on('hideActionBars', function(evt) {
 					hideContent();
