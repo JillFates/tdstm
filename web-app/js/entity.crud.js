@@ -1036,14 +1036,25 @@ function validateAppForm(forWhom, form){
 		ok = false;
 		if($('#'+form+' #sme1'+forWhom).val()=='0' || $('#'+form+' #sme2'+forWhom).val()=='0' || $('#'+form+' #appOwner'+forWhom).val()=='0' ){
 			alert("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
-		} else if (
-			isNaN($('#'+form+' #shutdownDuration'+forWhom).val()) || 
-			isNaN($('#'+form+' #startupDuration'+forWhom).val()) || 
-			isNaN($('#'+form+' #testingDuration'+forWhom).val()) )
-		{
-			alert("Please make sure that Shutdown Duration, Startup Duration and Testing Duration properties have numberic values")
 		} else {
-			ok = true;
+			var msg = '';
+			// Check to see if the durations have legit numbers
+			var fname = ['Shutdown', 'Startup', 'Testing'];
+			// Hack because of inconsistency in the field ids
+			var suffix = (form == 'createAssetsFormId' ? '' : 'Edit');
+			var c=0;
+			fname.forEach( function(name) {
+				var field = $('#'+form+' #' + name.toLowerCase() + 'Duration'+suffix).val();
+				if ( field != '' && isNaN(field) ) {
+					msg = ( msg!='' ? msg + ', ' : '' ) + name;
+					c++;
+				}
+			});
+			if (msg != '') {
+				alert("Please make sure that the " + msg + ' Duration field' + (c>1 ? 's have' : ' has a') + ' numeric value' + (c>1 ? 's' : ''));
+			} else {
+				ok = true;
+			}	
 		}
 	}
 	return ok;
