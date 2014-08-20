@@ -15,6 +15,7 @@ grails.project.dependency.resolution = {
 
 	repositories {
 		mavenRepo("http://tmdev.tdsops.com/grails-maven")
+		mavenRepo("http://repo.grails.org/grails/plugins/")
 		grailsPlugins()
 		grailsHome()
 		grailsCentral()
@@ -27,6 +28,5 @@ grails.project.dependency.resolution = {
 	plugins {
 		runtime ':database-migration:1.0'
 		runtime ':shiro:1.1.4'
-		// compile ':mongodb:1.0.0.RC4'
 	}
 }
