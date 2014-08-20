@@ -85,13 +85,8 @@ class ApplicationController {
 			fixedFilter = true
 		
 		return [projectId: project.id, assetDependency: new AssetDependency(),
-			servers: entities.servers, 
-			applications: entities.applications, 
-			dbs: entities.dbs, 
-			files: entities.files, 
-			networks: entities.networks, 
-			dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus, event:params.moveEvent, filter:params.filter, latencys:params.latencys,
+			dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
+			event:params.moveEvent, filter:params.filter, latencys:params.latencys,
 		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',runbook:params.runbook,
 			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref,toValidate:params.toValidate, 
 			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',

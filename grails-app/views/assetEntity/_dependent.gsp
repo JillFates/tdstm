@@ -1,6 +1,31 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	$(".depComDiv").dialog({ autoOpen: false})
+	
+	$(".scrollSelect").select2({
+		 minimumInputLength: 1,
+		 initSelection : function (element, callback) {
+		        var data = {id: element.val(), text: element.data("asset-name")};
+		        callback(data);
+		 },
+		 ajax: {
+		 	url: contextPath+"/assetEntity/entityList",
+			dataType: 'json',
+		 	quietMillis: 100,
+		 	data: function (term, page) { // page is the one-based page number tracked by Select2
+				 return {
+					 q: term, //search term
+					 max: 10, // page size
+					 page: page, // page number
+					 assetType:$(this).data("asset-type"),
+	 			};
+		 	},
+	 		results: function (data, page) {
+ 			 	var more = (page * 10) < data.total;
+	 			return { results: data.results , more: more};
+            }
+		 }
+	});
 })
 </script>
 <td valign="top" >
@@ -31,10 +56,10 @@ $(document).ready(function() {
 								value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Other')}" />
 						</td>
 						<td id="assetListSupportTdId_${i}"  class='combo-td'>
-							<select name="asset_support_${support.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${support?.asset?.id}')" 
-								 onchange="changeMovebundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')">
-								<option value="${support?.asset?.id}" selected>${support?.asset.assetName}</option>
-							</select>
+							 <input type="hidden" name="asset_support_${support.id}" data-asset-name="${support?.asset?.assetName}" data-asset-type="${type}"
+								 data-asset-id="${support?.asset?.id}" data-slide="deps"  class="scrollSelect" style="width:100px" 
+								 value="${support?.asset?.id}" id="asset_support_${support.id}"
+								 onchange="changeMovebundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')" />
 						</td>
 						<td>
 							<g:set var="supportBundle" value="${support?.asset?.moveBundle}"></g:set>
@@ -89,15 +114,17 @@ $(document).ready(function() {
 				<tr id='row_d_${i}_${dependent.id}'>
 					<td><g:select name="dataFlowFreq_dependent_${dependent.id}" value="${dependent.dataFlowFreq}" from="${dependent.constraints.dataFlowFreq.inList}" /></td>
 					<td>
-						<g:select name="entity_dependent_${dependent.id}" id="entity_dependent_${i}" from="['Server','Application','Database','Storage','Other']"
+						<g:select name="entity_dependent_${dependent.id}" id="entity_dependent_${dependent.id}" from="['Server','Application','Database','Storage','Other']"
 							value="${type== 'Files' ? 'Storage' : (nonNetworkTypes.contains(type) ? type : 'Other')}"  
 							onchange="updateAssetsList(this.name)" />
 					</td>
 					<td id="assetListDependentTdId_${i}"  class='combo-td'>
-						<select name="asset_dependent_${dependent.id}" class="assetSelect" onmousedown="updateAssetsList(this.name, '${type}', '${dependent?.dependent?.id}')" 
-							onchange="changeMovebundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')">
-							<option value="${dependent?.dependent?.id}" selected>${dependent?.dependent.assetName}</option>
-						</select>
+						<input type="hidden" name="asset_dependent_${dependent.id}"
+								onchange="changeMovebundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')" 
+								data-asset-name="${dependent?.dependent?.assetName}" data-asset-type="${type}"
+								id="asset_dependent_${dependent.id}"
+								data-asset-id="${dependent?.dependent?.id}" data-slide="deps"  value="${dependent?.dependent?.id}"
+								class="scrollSelect" style="width:100px" />
 					</td>
 					<td>
 						<g:set var="depBundle" value="${dependent?.dependent?.moveBundle}"></g:set>

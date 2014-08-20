@@ -1177,9 +1177,9 @@ class AssetEntityController {
 			fixedFilter = true
 		
 		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus,  servers : entities.servers, 
-			applications : entities.applications, dbs : entities.dbs, files : entities.files,  networks :entities.networks, assetName:filters?.assetNameFilter ?:'', 
-			assetType:filters?.assetTypeFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
+			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus, 
+			assetName:filters?.assetNameFilter ?:'', assetType:filters?.assetTypeFilter ?:'', 
+			planStatus:filters?.planStatusFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
 			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', 
 			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
 			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
@@ -5014,5 +5014,73 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		}
 
 		return;
+	}
+	
+	/**
+	 * 
+	 */
+	def entityList = {
+		def project = securityService.getUserCurrentProject()
+		
+		def maxRows = Integer.valueOf(params.max)
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		
+		def clazz
+		def assetTypes = [] 
+		def c 
+		
+		switch(params.assetType){
+			
+			case ~/Server|VM|Blade/ :
+				c = AssetEntity.createCriteria()
+				assetTypes = [ AssetType.SERVER.toString(), AssetType.VM.toString(), AssetType.BLADE.toString() ]
+				break;
+			case 'Application' :
+				c = Application.createCriteria()
+				assetTypes = [ AssetType.APPLICATION.toString() ]
+				break;
+		    case 'Database' :
+				c = Database.createCriteria()
+				assetTypes = [ AssetType.DATABASE.toString()]
+				break;
+			case ~/Storage|Files/ :
+				c = Files.createCriteria()
+				assetTypes = [ AssetType.FILES.toString() ]
+				break;
+			case 'Other' :
+				c = AssetEntity.createCriteria()
+				assetTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
+								AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
+				break;
+				
+		}
+		
+		
+		
+		def entities = c.list (max: maxRows, offset: rowOffset) {
+			like("assetName", ""+params.q+"%")
+			and {
+				
+				if(params.assetType=="Other"){
+					not { 
+						'in'( 'assetType' , assetTypes ) 
+					}
+				} else {
+					'in'( 'assetType' , assetTypes )
+				}
+				
+				eq("project", project)
+			}
+			order("assetName", "asc")
+		}
+		
+		def total = entities.totalCount
+		def results = entities.collect{ k -> return [id:k.id, text:k.assetName]}
+		
+		
+		def map = [results:results, total: total]
+		
+		render map as JSON
 	}
 }

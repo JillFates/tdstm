@@ -159,11 +159,35 @@ function addAssetDependency ( type,forWhom ) {
 	} else {
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
-	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("assetSelect");
+	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("scrollSelect");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
 	
-	if (!isIE7OrLesser)
-		$("select.assetSelect").select2();
+	$("#dep_"+type+"_"+rowNo+"_"+forWhom).attr("data-asset-type", $("#entity_"+type+"_"+rowNo).val())
+	
+	
+	if (!isIE7OrLesser){
+		$("#dep_"+type+"_"+rowNo+"_"+forWhom).select2({
+			 minimumInputLength: 1,
+			 placeholder: "Please Select",
+			 ajax: {
+			 	url: contextPath+"/assetEntity/entityList",
+				dataType: 'json',
+			 	quietMillis: 100,
+			 	data: function (term, page) {
+					 return {
+						 q: term, 
+						 max: 10, 
+						 page: page, 
+						 assetType:$(this).data("asset-type"),
+		 			};
+			 	},
+		 		results: function (data, page) {
+	 			 	var more = (page * 10) < data.total;
+		 			return { results: data.results , more: more};
+	            }
+			 }
+		});
+	}
 	
 	$("#depComment_"+type+"_"+rowNo).dialog({ autoOpen: false})
 }
@@ -179,32 +203,11 @@ function deleteRow ( rowId, forWhomId ) {
 
 function updateAssetsList (name, assetType, assetId ) {
 	var idValues = name.split("_")
-	var csc = $("select[name='entity_"+idValues[1]+"_"+idValues[2]+"']")
-	var claz = csc.val()
-	var asc = $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
-	asc.removeAttr('onmousedown')
-	asc.html($("#"+claz+" select").html())
-	console.log("in updateAssetsList name="+name+", claz="+claz+", assetType="+assetType+", assetId="+assetId)
-
-	if (assetId === undefined) {
-		if(!isIE7OrLesser)
-			$("select.assetSelect").select2()
-	}
-	// Set the value if we were passing in the original value for a pre-existing asset
-	if ( 
-		(claz == 'Application' && assetType == claz) ||
-		(claz == 'Database' && assetType == claz) ||
-		(claz == 'Other' && assetType == claz) ||
-		(claz == 'Storage' && ( assetType == claz || assetType == 'Files')) || 
-		(claz == 'Server' && assetType!='Application' && assetType!='Database' && assetType!='Other' && assetType!='Storage' && assetType!='Files') 
-	) {
-		// relookup the SELECT
-		// $("select[name='asset_"+idValues[1]+"_"+idValues[2]+"'] option=[value='"+assetId+"']").attr('selected','selected')
-		asc.val(assetId)
-		//jQuery("select#selectBox option[value='requiredValue']").attr("selected",selected");
-		//console.log("updateAssetsList() setting select to assetId " + assetId)
-		//console.log(asc.html())
-	}
+	var clazz = $("select[name='entity_"+idValues[1]+"_"+idValues[2]+"']")
+	
+	var csc = $("input[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
+	csc.data("asset-type", clazz.val())
+	
 }
 
 function updateAssetTitle ( type ) {
@@ -1048,8 +1051,8 @@ function validateAppForm(forWhom, form){
 
 function validateDependencies(formName){
 	var flag = true
-	$('#'+formName+' select[name*="asset_"]').each( function() {
-		if( $(this).val() == 'null' )
+	$('#'+formName+'  input[name^="asset_"]').each( function() {
+		if( $(this).val() == 'null' ||  $(this).val() == '')
 			flag = false
 			return flag
 	})

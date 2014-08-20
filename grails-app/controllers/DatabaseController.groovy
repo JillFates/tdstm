@@ -87,7 +87,6 @@ class DatabaseController {
 			fixedFilter = true
 		
 		return [assetDependency: new AssetDependency(),
-			servers : entities.servers, applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, 
 			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
 			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,toValidate:params.toValidate,
 			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',

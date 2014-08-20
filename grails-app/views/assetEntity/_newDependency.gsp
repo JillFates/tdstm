@@ -4,14 +4,13 @@
 			<td><g:select name="dataFlowFreq" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 			<td>
 					<g:select name="entity" from="['Application','Server','Database','Storage','Other']" 
-							onchange='updateAssetsList(this.name, this.value)' 
-							value="${forWhom== 'Application' ? 'Application' : 'Server'}"></g:select>
+							onchange="updateAssetsList(this.name, this.value)" 
+							value="${ forWhom == 'Application' ? 'Application' : 'Server'}"></g:select>
 			</td>
-			<td class='combo-td'>
-				<span id="${forWhom}"><g:select name="asset" id="dependenciesId" 
-					from="${entities}" optionKey="${-2}" optionValue="${1}" 
-					noSelection="${['null':'Please select']}" class="depSelect" onchange="changeMovebundle(this.value,this.id,jQuery('#moveBundle').val())"></g:select>
-				</span>
+			<td>
+					<input type="hidden" name="asset" onchange="changeMovebundle(this.value,this.id,jQuery('#moveBundle').val())"
+							id="dependenciesId"  style="width:100px" />
+				
 			</td>
 			<td><g:select name="bundles" from="${moveBundleList}" class="depBundle" optionKey="id" optionValue="name" 
 				noSelection="${['':' Please Select']}" onchange="changeMoveBundleColor(this.name,this.value, jQuery('#moveBundle').val(),'')"></g:select></td>
@@ -31,16 +30,4 @@
 				onchange="changeMoveBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)"></g:select></td>
 		</tr>
 	</table>
-</div>
-<div style="display: none;">
-	<span id="Server"><g:select name="asset" from="${servers}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
-	<span id="Application"><g:select name="asset" from="${applications}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
-	<span id="Database"><g:select name="asset" from="${dbs}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
-	<span id="Storage"><g:select name="asset" from="${files}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
-	<span id="Other"><g:select name="asset" from="${networks}" optionKey="${-2}" optionValue="${1}" 
-			noSelection="${['null':'Please select']}" class="depSelect"></g:select></span>
 </div>
