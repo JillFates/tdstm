@@ -125,7 +125,7 @@
 	                <span><input type="checkbox" id="storageId" name="storage" value="storage"  
 	                		onclick="importExportPreference($(this),'ImportStorage')"
 	                		${prefMap['ImportStorage']=='true' ? 'checked="checked"' :''}/>&nbsp;
-	                <label for="filesId">Storage</label></span>&nbsp;
+	                <label for="storageId">Storage</label></span>&nbsp;
 	                <span><input type="checkbox" id="dependencyId" name="dependency" value="dependency" 
 	                		onclick="importExportPreference($(this),'ImportDependency')"
 	                		${prefMap['ImportDependency'] =='true' ? 'checked="checked"' :''}/>&nbsp;
@@ -137,7 +137,7 @@
 	                <span><input type="checkbox" id="commentId" name="comment" value="comment" 
 		               		onclick="importExportPreference($(this),'ImportComment')"
 		               		${prefMap['ImportComment']=='true' ? 'checked="checked"' :''}/>&nbsp;
-		               		<label for="cablingId">Comment</label></span>&nbsp;
+		               		<label for="commentId">Comment</label></span>&nbsp;
 	                </td>
                 </tr>
                 <tr>

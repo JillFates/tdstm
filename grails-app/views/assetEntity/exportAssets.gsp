@@ -112,7 +112,7 @@
 		              <span><input type="checkbox" id="commentId" name="comment" value="comment" 
 		               		onclick="importExportPreference($(this),'ImportComment')"
 		               		${prefMap['ImportComment']=='true' ? 'checked="checked"' :''}/>&nbsp;
-		               		<label for="cablingId">Comment</label></span>&nbsp;
+		               		<label for="commentId">Comment</label></span>&nbsp;
 	                </td>
                </tr>
                <tr>
