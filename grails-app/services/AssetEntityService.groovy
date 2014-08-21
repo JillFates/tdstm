@@ -323,6 +323,38 @@ class AssetEntityService {
 	 * @return
 	 */
 	def entityInfo(def project, groups = null){
+		def servers = []
+
+        if (groups == null || groups.contains(AssetType.SERVER.toString())) {
+			servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('${AssetType.SERVER.toString()}','${AssetType.VM.toString()}','Blade')\
+					AND project=:project ORDER BY assetName", [project:project])
+		}
+
+		def applications = []
+		if (groups == null || groups.contains(AssetType.APPLICATION.toString())) {
+			applications =  Application.executeQuery("SELECT a.id, a.assetName FROM Application a WHERE assetType =? and project =?\
+					ORDER BY assetName", [AssetType.APPLICATION.toString(), project])
+		}
+
+		def dbs = []
+		if (groups == null || groups.contains(AssetType.DATABASE.toString())) {
+			dbs = Database.executeQuery("SELECT d.id, d.assetName FROM Database d where assetType = ? and project =? \
+					order by assetName asc",[AssetType.DATABASE.toString(), project])
+		}
+		
+		def files = []
+		if (groups == null || groups.contains(AssetType.STORAGE.toString())) {
+			files = Files.executeQuery("SELECT f.id, f.assetName FROM Files f where assetType = ? and project =? \
+					order by assetName asc",[AssetType.FILES.toString(), project])
+		}
+
+		def networks = []
+		if (groups == null || groups.contains(AssetType.NETWORK.toString())) {
+			def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
+								AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
+			networks = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a where assetType not in (:type) and project =:project \
+			order by assetName asc",[type:nonNetworkTypes, project:project])
+		}
 
 		def dependencyType = []
 		def dependencyStatus = []
@@ -331,8 +363,10 @@ class AssetEntityService {
 			dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		}
 
-		return [dependencyStatus:dependencyStatus, dependencyType:dependencyType]
+		return [servers:servers, applications:applications, dbs:dbs, files:files,
+				 dependencyType:dependencyType, dependencyStatus:dependencyStatus, networks:networks]
 	}
+
 	/**
 	 * This method is used to get config by entityType and validation
 	 * @param type,validation
