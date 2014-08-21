@@ -7,10 +7,10 @@ exports.config = {
     test:[
     '../components/projects/createProject.spec.js',
     '../components/planning/bundles.spec.js',
-    '../components/assets/createApp.spec.js',
-    '../components/assets/addTask.spec.js',
-    '../components/assets/addComments.spec.js',
-    '../components/assets/serverList.spec.js',
+    // '../components/assets/createApp.spec.js',
+    // '../components/assets/addTask.spec.js',
+    // '../components/assets/addComments.spec.js',
+    // '../components/assets/serverList.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],
     regression: [ //Do not change the order of these files since some test depends on others.
