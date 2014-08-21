@@ -4482,6 +4482,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 		def projectId = project.id
 		def task
         def format=params.format
+        def moveEventId=params.moveEvent
 		
 		if (params.commentId) { 
 			task = AssetComment.findByIdAndProject(params.commentId, project)
@@ -4490,7 +4491,7 @@ log.debug "*************** ValidationType.getList().contains(params.toValidate)?
 			}
 		}
 
-		def taskList = taskService.genSelectForPredecessors(project, params.category, task)
+		def taskList = taskService.genSelectForPredecessors(project, params.category, task, moveEventId)
         def result
 	    
         if (format=='json') {

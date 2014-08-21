@@ -36,7 +36,7 @@
 					<tr class="prop" id="moveEventEditTrId">
 						<td valign="top" class="name"><label for="moveEvent">Event:</label></td>
 						<td valign="top">
-							<tds:select ng-model="ac.moveEvent" datasource="ds.moveEvents" id="moveEvent" name="moveEvent"  from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
+							<tds:select ng-model="ac.moveEvent" ng-disabled="!enableMoveEvent" datasource="ds.moveEvents" id="moveEvent" name="moveEvent"  from="${MoveEvent.findAllByProject(Project.get(session.getAttribute('CURR_PROJ').CURR_PROJ ))}"
 							optionKey='id' optionValue="name" noSelection="['':'please select']"></tds:select>
 						</td>
 					</tr>
@@ -124,10 +124,10 @@
 								</tr>
 								<tr>
 									<td style="vertical-align: top;">
-										<task-dependencies ng-model="dependencies.predecessors" deleted="dependencies.deletedPredecessors" comment-id='ac.commentId' event-name="predecessor"></task-dependencies>
+										<task-dependencies ng-model="dependencies.predecessors" deleted="dependencies.deletedPredecessors" comment-id='ac.commentId' event-name="predecessor" move-event='ac.moveEvent'></task-dependencies>
 									</td>
 									<td style="vertical-align: top;">
-										<task-dependencies ng-model="dependencies.successors" deleted="dependencies.deletedSuccessors" comment-id='ac.commentId' event-name="successor"></task-dependencies>
+										<task-dependencies ng-model="dependencies.successors" deleted="dependencies.deletedSuccessors" comment-id='ac.commentId' event-name="successor" move-event='ac.moveEvent'></task-dependencies>
 									</td>
 								</tr>
 						    </table>

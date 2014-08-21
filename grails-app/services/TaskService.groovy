@@ -596,7 +596,7 @@ class TaskService implements InitializingBean {
 	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	* @return String the SELECT control
 	*/
-	def genSelectForPredecessors(project, category, task) {	
+	def genSelectForPredecessors(project, category, task, moveEventId) {	
 		
 		StringBuffer query = new StringBuffer("FROM AssetComment a WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
 		if (category) {
@@ -606,6 +606,11 @@ class TaskService implements InitializingBean {
 				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
 				category=''
 			}
+		}
+		if (moveEventId) {
+			query.append("AND a.moveEvent='${moveEventId}' ")
+		} else {
+			query.append("AND a.moveEvent is null ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent

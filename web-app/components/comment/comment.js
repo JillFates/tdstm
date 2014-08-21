@@ -442,6 +442,8 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 	$scope.workFlowTransition = "";
 	$scope.assignedEditData = "";
 
+	$scope.enableMoveEvent = true;
+
 	$modalInstance.opened.then(function(modalReady) {
 		$scope.$broadcast("popupOpened");
 	});
@@ -536,6 +538,13 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 				$scope.dependencies.predecessors = $scope.acData.predecessorList;
 				$scope.dependencies.successors = $scope.acData.successorList;
+
+				$scope.enableMoveEvent = ((!$scope.isEdit) ||
+					                      ( ($scope.isEdit) &&
+					                      	($scope.dependencies.predecessors.length == 0) &&
+					                      	($scope.dependencies.successors.length == 0)
+					                      )
+					                     );
 
 				if ($scope.ac.commentType == 'issue') {
 					$scope.statuWarnId = $scope.acData.statusWarn;
@@ -1355,7 +1364,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			commentId: '=commentId',
 			ngModel: '=ngModel',
 			deleted: '=deleted',
-			//moveEvent: '=moveEvent',
+			moveEvent: '=moveEvent',
 			eventName: '@eventName'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/task-dependencies-template.html'),
@@ -1379,21 +1388,17 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 				scope.updateDependencyList(dependency);
 			};
 			scope.updateDependencyList = function(dependency) {
-				//if (!depByCategory[dependency.category]) {
-				//	depByCategory[dependency.category] = {};
-				//}
-				//if (depByCategory[dependency.category][scope.moveEvent]) {
-				if (depByCategory[dependency.category]) {
-					//dependency.list = depByCategory[dependency.category][scope.moveEvent];
-					dependency.list = depByCategory[dependency.category];
+				if (!depByCategory[dependency.category]) {
+					depByCategory[dependency.category] = {};
+				}
+				if (depByCategory[dependency.category][scope.moveEvent]) {
+					dependency.list = depByCategory[dependency.category][scope.moveEvent];
 					checkTaskIdExist(dependency);
 				} else {
-					commentService.getDependencies(dependency.category, '', '', '').then(
+					commentService.getDependencies(dependency.category, '', '', scope.moveEvent).then(
 						function(data) {
-							//depByCategory[dependency.category][scope.moveEvent] = data.data;
-							depByCategory[dependency.category] = data.data;
-							//dependency.list = depByCategory[dependency.category][scope.moveEvent];
-							dependency.list = depByCategory[dependency.category];
+							depByCategory[dependency.category][scope.moveEvent] = data.data;
+							dependency.list = depByCategory[dependency.category][scope.moveEvent];
 							checkTaskIdExist(dependency);
 						},
 						function(data) {
@@ -1408,11 +1413,11 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 				}
 				scope.ngModel.splice(index, 1);
 			};
-			//scope.$watch('moveEvent', function(a, b, c) {
-			//	angular.forEach(scope.ngModel, function(dependency) {
-			//		scope.updateDependencyList(dependency);
-			//	});
-			//});
+			scope.$watch('moveEvent', function(nValue, oValue) {
+				angular.forEach(scope.ngModel, function(dependency) {
+					scope.updateDependencyList(dependency);
+				});
+			});
 			scope.internalControl = scope.control || {};
 			scope.$on('addDependency', function(evt, evtName) {
 				if (evtName == scope.eventName) {
