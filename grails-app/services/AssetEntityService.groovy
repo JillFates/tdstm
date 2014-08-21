@@ -1422,8 +1422,7 @@ class AssetEntityService {
 					
 					if(params.cabling=='cable'){
 						exportedEntity +="c"
-						def projectInstance = securityService.getUserCurrentProject()
-						def assetCablesList = AssetCableMap.findAll( " from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id " )
+						def assetCablesList = AssetCableMap.findAll( " from AssetCableMap acm where acm.assetFrom.project.id = $project.id " )
 						this.cablingReportData(assetCablesList, cablingSheet)
 					}
 				}
