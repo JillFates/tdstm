@@ -365,6 +365,10 @@
 							<li><g:link class="mmlink" controller="cookbook" action="index" onclick="hideMegaMenu('teamMegaMenu')">Cookbook</g:link></li>
 							</tds:hasPermission>
 
+							<tds:hasPermission permission="GenerateTasks">
+							<li><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
+							</tds:hasPermission>
+
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');" onclick="hideMegaMenu('consoleMegaMenu')">help</a></li>
 							</tds:hasPermission>
