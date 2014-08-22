@@ -31,9 +31,13 @@ function changeStatus(id, status, currentStatus, from){
 			} else {
 				//alert(data.cssClass)
 				if(from=="taskManager"){
-					$('#status_'+id).html(data.assetComment.status)
-					$('#status_'+id).parent().removeAttr('class').addClass(data.statusCss)
-				    $('#status_'+id).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
+					var cellId = '#status_' + id;
+					if ($(cellId).length == 0) {
+						cellId = '#statusTd_' + id;
+					}
+					$(cellId).html(data.assetComment.status)
+					$(cellId).parent().removeAttr('class').addClass(data.statusCss)
+				    $(cellId).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 				    if(status=="Started"){ 
 					    // $('#startTdId_'+id).hide() 
 					}else if(status=="Completed"){
