@@ -44,6 +44,7 @@ class AssetEntityService {
 	def securityService
 	def progressService
 	def partyRelationshipService
+	def taskService
 	
 	
 	/**
@@ -318,53 +319,142 @@ class AssetEntityService {
 	}
 	
 	/**
-	 * 
+	 * Used to gather all of the assets for a project by asset class with option to return just individual classes
 	 * @param project
-	 * @return
+	 * @param groups - an array of Asset Types to only return those types (optional)
+	 * @return Map of the assets by type along with the AssetOptions dependencyType and dependencyStatus lists
 	 */
-	def entityInfo(def project, groups = null){
-		def servers = []
+	Map entityInfo(Project project, List groups = null){
+		def map = [ servers:[], applications:[], dbs:[], files:[], networks:[], dependencyType:[], dependencyStatus:[] ]
 
         if (groups == null || groups.contains(AssetType.SERVER.toString())) {
-			servers = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a WHERE assetType in ('${AssetType.SERVER.toString()}','${AssetType.VM.toString()}','Blade')\
-					AND project=:project ORDER BY assetName", [project:project])
+			map.servers = AssetEntity.executeQuery(
+				"SELECT a.id, a.assetName FROM AssetEntity a " + 
+				"WHERE assetClass=:ac AND assetType in (:types) AND project=:project ORDER BY assetName", 
+				[ac:AssetClass.DEVICE, types:AssetType.getAllServerTypes(), project:project] )
 		}
 
-		def applications = []
 		if (groups == null || groups.contains(AssetType.APPLICATION.toString())) {
-			applications =  Application.executeQuery("SELECT a.id, a.assetName FROM Application a WHERE assetType =? and project =?\
-					ORDER BY assetName", [AssetType.APPLICATION.toString(), project])
+			map.applications =  Application.executeQuery(
+				"SELECT a.id, a.assetName FROM Application a " +
+				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
+				[ac:AssetClass.APPLICATION, project:project] )
 		}
 
-		def dbs = []
 		if (groups == null || groups.contains(AssetType.DATABASE.toString())) {
-			dbs = Database.executeQuery("SELECT d.id, d.assetName FROM Database d where assetType = ? and project =? \
-					order by assetName asc",[AssetType.DATABASE.toString(), project])
+			map.dbs = Database.executeQuery(
+				"SELECT d.id, d.assetName FROM Database d " +
+				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
+				[ac:AssetClass.DATABASE, project:project] )
 		}
 		
-		def files = []
 		if (groups == null || groups.contains(AssetType.STORAGE.toString())) {
-			files = Files.executeQuery("SELECT f.id, f.assetName FROM Files f where assetType = ? and project =? \
-					order by assetName asc",[AssetType.FILES.toString(), project])
+			map.files = Files.executeQuery(
+				"SELECT f.id, f.assetName FROM Files f " + 
+				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
+				[ac:AssetClass.STORAGE, project:project] )
 		}
 
-		def networks = []
+		// NOTE - the networks is REALLY OTHER devices other than servers
 		if (groups == null || groups.contains(AssetType.NETWORK.toString())) {
-			def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
-								AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
-			networks = AssetEntity.executeQuery("SELECT a.id, a.assetName FROM AssetEntity a where assetType not in (:type) and project =:project \
-			order by assetName asc",[type:nonNetworkTypes, project:project])
+			map.networks = AssetEntity.executeQuery(
+				"SELECT a.id, a.assetName FROM AssetEntity a " + 
+				"WHERE assetClass=:ac AND project=:project AND COALESCE(a.assetType,'') NOT IN (:types) ORDER BY assetName",
+				[ ac:AssetClass.DEVICE, project:project, types:AssetType.getNonOtherTypes() ] )
 		}
 
-		def dependencyType = []
-		def dependencyStatus = []
 		if (groups == null) {
-			dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			map.dependencyType = getDependencyTypes()
+			map.dependencyStatus = getDependencyStatuses()
 		}
 
-		return [servers:servers, applications:applications, dbs:dbs, files:files,
-				 dependencyType:dependencyType, dependencyStatus:dependencyStatus, networks:networks]
+		return map
+	}
+
+	/**
+	 * Used to get the list of Type used to assign to AssetDependency.type
+	 * @return List of the types
+	 */
+	List getDependencyTypes() {
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+	}
+
+	/**
+	 * Used to get the list of Status used to assign to AssetDependency.status
+	 * @return List of the types
+	 */
+	List getDependencyStatuses() {
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+	}
+
+
+	/** 
+	 * Used to provide the default properties used for the Asset Dependency views
+	 * @param listType - indicates the type of list [Files|]
+	 * @param moveEvent
+	 * @param params - the params from the HTTP request
+	 * @param filters - the map of the filter settings
+	 * @return a Map that includes all of the common properties shared between all Asset List views
+	 */
+	Map getDefaultModelForLists(String listType, Project project, Object fieldPrefs, Object params, Object filters) {
+
+		Map model = [	
+			assetDependency: new AssetDependency(), 
+			attributesList: [],		// Set below
+			dependencyType: getDependencyTypes(), 
+			dependencyStatus: getDependencyStatuses(),
+			event:params.moveEvent, 
+			fixedFilter: (params.filter ? true : false),
+			filter:params.filter,
+			hasPerm: RolePermissions.hasPermission("AssetEdit"),
+			justPlanning: userPreferenceService.getPreference("assetJustPlanning") ?: 'true',
+			modelPref: null,		// Set below
+			moveBundleId:params.moveBundleId, 
+			moveBundle:filters?.moveBundleFilter ?: '', 
+			moveBundleList: MoveBundle.findAllByProject(project, [sort:"name"]),
+			moveEvent: null,		// Set below
+			planStatus:filters?.planStatusFilter ?:'', 
+			plannedStatus:params.plannedStatus, 
+			projectId: project.id,
+			sizePref: userPreferenceService.getPreference("assetListSize")?: '25', 
+			sortIndex:filters?.sortIndex, 
+			sortOrder:filters?.sortOrder, 
+			staffRoles:taskService.getRolesForStaff(),
+			toValidate:params.toValidate,
+			unassigned: params.unassigned,
+			validation:params.validation
+		]
+
+		def moveEvent = null
+		if (params.moveEvent && params.moveEvent.isNumber()) {
+			moveEvent = MoveEvent.findByProjectAndId(project, params.moveEvent )
+		}
+		model.moveEvent = moveEvent
+
+		// Get the list of attributes that the user can select for columns
+		def attributes = projectService.getAttributes(listType)
+		def projectCustoms = project.customFieldsShown+1
+		def nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
+		
+		// Remove the non project specific attributes and sort them by attributeCode
+		def appAttributes = attributes.findAll{it.attributeCode!="assetName" && !(it.attributeCode in nonCustomList)}
+
+		// Used to display column names in jqgrid dynamically
+		def modelPref = [:]
+		fieldPrefs.each { key, value ->
+			modelPref << [(key): getAttributeFrontendLabel(value, attributes.find{it.attributeCode==value}?.frontendLabel)]
+		}
+		model.modelPref = modelPref
+
+		// Compose the list of Asset properties that the user can select and use for filters
+		def attributesList= (appAttributes).collect{ attribute ->
+			[attributeCode: attribute.attributeCode, frontendLabel: getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
+		}
+		// Sorts attributesList alphabetically
+		attributesList.sort { it.frontendLabel }
+		model.attributesList = attributesList
+
+		return model
 	}
 
 	/**

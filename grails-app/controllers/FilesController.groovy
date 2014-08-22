@@ -19,6 +19,7 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdssrc.grails.ControllerUtil as CU
 
 class FilesController {
 	
@@ -29,66 +30,31 @@ class FilesController {
 	def userPreferenceService
 	def projectService
 	def jdbcTemplate
+
 	def index = {
-	     redirect(action : list)
-		 	
+		redirect action:'list', params:params
 	}
+
 	def list = {
 		def filters = session.FILES?.JQ_FILTERS
 		session.FILES?.JQ_FILTERS = []
-		def project = securityService.getUserCurrentProject();
-		if (!project) {
-			flash.message = "Please select project to view Files"
-			redirect(controller:'project',action:'list')
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
 			return
-		}
-		def entities = assetEntityService.entityInfo( project )
-		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
-		
-		def moveEvent = null
-		if (params.moveEvent && params.moveEvent.isNumber()) {
-			log.info "it's good - ${params.moveEvent}"
-			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
-		}
-		
-		def filesPref= assetEntityService.getExistingPref('Storage_Columns')
-		def attributes = projectService.getAttributes('Files')
-		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = project.customFieldsShown!=64 ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
-		// Remove the non project specific attributes and sort them by attributeCode
-		def filesAttributes = attributes.findAll{it.attributeCode !='assetName' && !(it.attributeCode in nonCustomList)}
-		
-		// Used to display column names in jqgrid dynamically
-		def modelPref = [:]
-		filesPref.each{key,value->
-			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
-		}
-		/* Asset Entity attributes for Filters*/
-		def attributesList= (filesAttributes).collect{ attribute ->
-			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
-		}
-		// Sorts attributesList alphabetically		
-		attributesList.sort { a,b->
-			if (a.frontendLabel < b.frontendLabel)
-				return -1
-			if (a.frontendLabel > b.frontendLabel)
-				return 1
-			return 0
-		}
-		
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
-		def hasPerm = RolePermissions.hasPermission("AssetEdit")
-		def fixedFilter = false
-		if(params.filter)
-			fixedFilter = true
-		
-		return [assetDependency: new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,
-			staffRoles:taskService.getRolesForStaff(), moveBundleId:params.moveBundleId, fileName:filters?.assetNameFilter ?:'', 
-			fileFormat:filters?.fileFormatFilter, size:filters?.sizeFilter,toValidate:params.toValidate,
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
-			attributesList:attributesList, filesPref:filesPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', 
-			hasPerm:hasPerm,fixedFilter:fixedFilter, unassigned: params.unassigned]
+
+		def fieldPrefs = assetEntityService.getExistingPref('Storage_Columns')
+						
+		Map model = [
+			fileFormat:filters?.fileFormatFilter, 
+			fileName:filters?.assetNameFilter ?:'', 
+			filesPref: fieldPrefs, 
+			size:filters?.sizeFilter
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForLists('Files', project, fieldPrefs, params, filters) )
+
+		return model
 		
 	}
 	/**

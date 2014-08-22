@@ -18,6 +18,7 @@ import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
+import com.tdssrc.grails.ControllerUtil as CU
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -33,66 +34,30 @@ class DatabaseController {
 	def jdbcTemplate
 	def userPreferenceService
 	def projectService
+
 	def index = {
-		redirect(action: "list", params: params)
+		redirect action:'list', params:params
 	}
 	
 	def list = {
 		def filters = session.DB?.JQ_FILTERS
 		session.DB?.JQ_FILTERS = []
-		def project = securityService.getUserCurrentProject();
-		if (!project) {
-			flash.message = "Please select project to view Databases"
-			redirect(controller:'project',action:'list')
-			return
-		}
-		def entities = assetEntityService.entityInfo( project )
-		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
-		
-		def moveEvent = null
-		if (params.moveEvent && params.moveEvent.isNumber()) {
-			log.info "it's good - ${params.moveEvent}"
-			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
-		}
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
-		
-		def dbPref= assetEntityService.getExistingPref('Database_Columns')
-		def attributes = projectService.getAttributes('Database')
-		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = project.customFieldsShown!=64 ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
-		// Remove the non project specific attributes and sort them by attributeCode
-		def dbAttributes = attributes.findAll{it.attributeCode !='assetName' && !(it.attributeCode in nonCustomList)}
 
-		// Used to display column names in jqgrid dynamically
-		def modelPref = [:]
-		dbPref.each{key,value->
-			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
-		}
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def fieldPrefs = assetEntityService.getExistingPref('Database_Columns')
 		
-		/* Asset Entity attributes for Filters*/
-		def attributesList= (dbAttributes).collect{ attribute ->
-			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
-		}
-		// Sorts attributesList alphabetically
-		attributesList.sort { a,b->
-			if (a.frontendLabel < b.frontendLabel)
-				return -1
-			if (a.frontendLabel > b.frontendLabel)
-				return 1
-			return 0
-		}
-		def hasPerm = RolePermissions.hasPermission("AssetEdit")
-		def fixedFilter = false
-		if(params.filter)
-			fixedFilter = true
-		
-		return [assetDependency: new AssetDependency(),
-			dependencyStatus:entities.dependencyStatus,staffRoles:taskService.getRolesForStaff(),dependencyType:entities.dependencyType,
-			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, plannedStatus:params.plannedStatus, validation:params.validation,toValidate:params.toValidate,
-			moveBundleId:params.moveBundleId, dbName:filters?.assetNameFilter ?:'', dbFormat:filters?.dbFormatFilter?:'',
-			moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'', sizePref:sizePref, moveBundleList:moveBundleList,
-			dbPref:dbPref , modelPref:modelPref, attributesList:attributesList, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', 
-			hasPerm:hasPerm, fixedFilter:fixedFilter, unassigned: params.unassigned]
+		Map model = [
+			dbFormat:filters?.dbFormatFilter?:'',
+			dbName:filters?.assetNameFilter ?:'',
+			dbPref: fieldPrefs
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForLists('Database', project, fieldPrefs, params, filters) )
+
+		return model
 	}
 	
 	/**

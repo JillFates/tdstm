@@ -12,6 +12,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.ControllerUtil as CU
 
 class ApplicationController {
 	def partyRelationshipService
@@ -22,77 +23,44 @@ class ApplicationController {
 	def jdbcTemplate
 	def projectService
 	
-	def index = {
-		redirect(action:list,params:params)
-	}
-
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+
+	def index = {
+		redirect action:'list', params:params
+	}
 
 	def list = {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
-		def project = securityService.getUserCurrentProject();
-		if (!project) {
-			flash.message = "Please select project to view Applications"
-			redirect(controller:'project',action:'list')
-			return
-		}
-		
-		def entities = assetEntityService.entityInfo( project )
-		def sizePref = userPreferenceService.getPreference("assetListSize")?: '25'
-		
-		
-		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
-		def availabaleRoles = partyRelationshipService.getStaffingRoles()
-		def company = project.client
-		
-		def moveEvent = null
-		if (params.moveEvent && params.moveEvent.isNumber()) {
-			log.info "it's good - ${params.moveEvent}"
-			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
-		}
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
-		def appPref= assetEntityService.getExistingPref('App_Columns')
-		def attributes = projectService.getAttributes('Application')
-		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = project.customFieldsShown!=64 ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
-		
-		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{it.attributeCode!="assetName" && !(it.attributeCode in nonCustomList)}
 
-		// Used to display column names in jqgrid dynamically
-		def modelPref = [:]
-		appPref.each{key,value->
-			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
-		}
-		/* Asset Entity attributes for Filters*/
-		def attributesList= (appAttributes).collect{ attribute ->
-			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
-		}
-		// Sorts attributesList alphabetically		
-		attributesList.sort { a,b->
-			if (a.frontendLabel < b.frontendLabel)
-				return -1
-			if (a.frontendLabel > b.frontendLabel)
-				return 1
-			return 0
-		}
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		// TODO - This should be replaced with the staffRoles which is in the defaultModel already
+		def availabaleRoles = partyRelationshipService.getStaffingRoles()
+
+		def companiesList = PartyGroup.findAll("from PartyGroup as p where partyType = 'COMPANY' order by p.name ")
+
+		def fieldPrefs = assetEntityService.getExistingPref('App_Columns')
 		
-		def hasPerm = RolePermissions.hasPermission("AssetEdit")
-		def fixedFilter = false
-		if(params.filter)
-			fixedFilter = true
-		
-		return [projectId: project.id, assetDependency: new AssetDependency(),
-			dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-			event:params.moveEvent, filter:params.filter, latencys:params.latencys,
-		    staffRoles:taskService.getRolesForStaff(), plannedStatus:params.plannedStatus, appSme : filters?.appSmeFilter ?:'',runbook:params.runbook,
-			validation:params.validation, moveBundleId:params.moveBundleId, appName:filters?.assetNameFilter ?:'', sizePref:sizePref,toValidate:params.toValidate, 
-			validationFilter:filters?.appValidationFilter ?:'', moveBundle:filters?.moveBundleFilter ?:'', planStatus:filters?.planStatusFilter ?:'',
-			partyGroupList:companiesList, availabaleRoles:availabaleRoles, company:company, moveEvent:moveEvent, moveBundleList:moveBundleList,
-			attributesList:attributesList, appPref:appPref, modelPref:modelPref, justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true',
-			hasPerm:hasPerm, fixedFilter:fixedFilter, unassigned: params.unassigned]
+		Map model = [
+			appName:filters?.assetNameFilter ?:'', 
+			appPref: fieldPrefs, 
+			appSme: filters?.appSmeFilter ?:'',
+			availabaleRoles: availabaleRoles, 
+			company: project.client, 
+			latencys:params.latencys,
+			partyGroupList:companiesList, 
+			runbook:params.runbook,
+			validationFilter:filters?.appValidationFilter ?:'' 
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForLists('Application', project, fieldPrefs, params, filters) )
+
+		return model
+
 	}
 	
 	/**

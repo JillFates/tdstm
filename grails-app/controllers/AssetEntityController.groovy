@@ -54,6 +54,7 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.ControllerUtil as CU
 
 class AssetEntityController {
 
@@ -112,8 +113,9 @@ class AssetEntityController {
 	]
 	
 	def index = {
-		redirect( action:list, params:params )
+		redirect action:'list', params:params
 	}
+
 	/* -----------------------------------------------------
 	 * To Filter the Data on AssetEntityList Page 
 	 * @author Bhuvana
@@ -1119,6 +1121,7 @@ class AssetEntityController {
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
+
 	/*------------------------------------------
 	 * To get the assetEntity List 
 	 * @param project
@@ -1128,67 +1131,33 @@ class AssetEntityController {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
 		
-		def project = securityService.getUserCurrentProject();
-		if (!project) {
-			flash.message = "Please select project to view Assets"
-			redirect(controller:'project',action:'list')
+		def project = CU.getProjectForPage( this )
+		if (! project) 
 			return
-		}
-		def entities = assetEntityService.entityInfo( project )
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		def moveEvent = null
-		if (params.moveEvent && params.moveEvent.isNumber()) {
-			log.info "it's good - ${params.moveEvent}"
-			moveEvent = MoveEvent.findByProjectAndId( project, params.moveEvent )
-		}
 		
 		def listType = params.listType
 		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
-		def assetPref= assetEntityService.getExistingPref(prefType)
-		def attributes = projectService.getAttributes('AssetEntity')
-		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = project.customFieldsShown!=64 ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
-		def assets = ['assetName', 'assetType', 'model', 'sourceLocation', 'sourceRack', 'planStatus', 'moveBundle']
-		def removableAttributes = assets+nonCustomList
-		// Remove the non project specific attributes and sort them by attributeCode
-		def assetAttributes = attributes.findAll{!(it.attributeCode in removableAttributes)}
+		def fieldPrefs = assetEntityService.getExistingPref(prefType)
 		
-		// Used to display column names in jqgrid dynamically
-		def modelPref = [:]
-		assetPref.each{key,value->
-			modelPref << [(key): assetEntityService.getAttributeFrontendLabel(value,attributes.find{it.attributeCode==value}?.frontendLabel)]
-		}
-		/* Asset Entity attributes for Filters*/
-		def attributesList= (assetAttributes).collect{ attribute ->
-			[attributeCode: attribute.attributeCode, frontendLabel:assetEntityService.getAttributeFrontendLabel(attribute.attributeCode, attribute.frontendLabel)]
-		}
-		// Sorts attributesList alphabetically		
-		attributesList.sort { a,b->
-			if (a.frontendLabel < b.frontendLabel)
-				return -1
-			if (a.frontendLabel > b.frontendLabel)
-				return 1
-			return 0
-		}
-		
-		def hasPerm = RolePermissions.hasPermission("AssetEdit")
-		def fixedFilter = false
-		if(params.filter)
-			fixedFilter = true
-		
-		render(view:'list', model:[assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-			event:params.moveEvent, moveEvent:moveEvent, filter:params.filter, type:params.type, plannedStatus:params.plannedStatus, 
-			assetName:filters?.assetNameFilter ?:'', assetType:filters?.assetTypeFilter ?:'', 
-			planStatus:filters?.planStatusFilter ?:'', sourceRack:filters?.sourceRackFilter ?:'',
-			moveBundle:filters?.moveBundleFilter ?:'', model:filters?.modelFilter ?:'', sourceLocation:filters?.sourceLocationFilter ?:'', 
-			targetLocation:filters?.targetLocationFilter ?:'', targetRack:filters?.targetRackFilter ?:'', assetTag:filters?.assetTagFilter ?:'', 
-			serialNumber:filters?.serialNumberFilter ?:'', sortIndex:filters?.sortIndex, sortOrder:filters?.sortOrder, moveBundleId:params.moveBundleId,
-			staffRoles:taskService.getRolesForStaff(), sizePref:userPreferenceService.getPreference("assetListSize")?: '25' , moveBundleList:moveBundleList,
-			attributesList:attributesList, assetPref:assetPref, modelPref:modelPref, listType:listType, prefType :prefType, 
-			justPlanning:userPreferenceService.getPreference("assetJustPlanning")?:'true', hasPerm:hasPerm, fixedFilter:fixedFilter,
-			unassigned: params.unassigned,
-			toValidate:params.toValidate
-			]) 
+		Map model = [
+			assetName:filters?.assetNameFilter ?:'', 
+			assetPref: fieldPrefs, 
+			assetTag:filters?.assetTagFilter ?:'', 
+			assetType:filters?.assetTypeFilter ?:'', 
+			listType:listType, 
+			model:filters?.modelFilter ?:'', 
+			prefType :prefType, 
+			serialNumber:filters?.serialNumberFilter ?:'', 
+			sourceLocation:filters?.sourceLocationFilter ?:'', 
+			sourceRack:filters?.sourceRackFilter ?:'',
+			targetLocation:filters?.targetLocationFilter ?:'', 
+			targetRack:filters?.targetRackFilter ?:'', 
+			type:params.type
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters) )
+
+		render(view:'list', model:model) 
 	}
 	
 	/**
@@ -1356,52 +1325,55 @@ class AssetEntityController {
 			) AS assets
 		""")
 		
-		
-		// Handle the filtering by each column's text field
+		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
 		def firstWhere = true
-		filterParams.each {
-			if ( it.getValue() )
-				if (firstWhere) {
-					// single quotes are stripped from the filter to prevent SQL injection
-					query.append(" WHERE assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
-					firstWhere = false
-				} else {
-					query.append(" AND assets.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
-				}
+		def whereAnd = { 
+			if (firstWhere) {
+				firstWhere = false
+				return ' WHERE'
+			} else {
+				return ' AND'
+			}
+		}
+
+		// Handle the filtering by each column's text field
+		filterParams.each { fkey, fvalue ->
+			if ( fvalue ) {
+				// single quotes are stripped from the filter to prevent SQL injection
+				query.append( whereAnd() + " assets.${fkey} LIKE '%${fvalue.replaceAll("'", "")}%'")
+				firstWhere = false
+			}
 		}
 		
 		if (params.moveBundleId) {
 			if (params.moveBundleId!='unAssigned') {
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append(" WHERE assets.moveBundle  = '${bundleName}' ")
+				query.append( whereAnd() + " assets.moveBundle  = '${bundleName}' ")
 			} else {
-				query.append(" WHERE assets.moveBundle IS NULL ")
+				query.append( whereAnd() + " assets.moveBundle IS NULL ")
 			}
 		}
 		
 		if ( params.filter && params.filter!='assetSummary') {
 			if (params.filter == 'other') {
 				// filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
-				query.append( (params.event ? ' AND' : ' WHERE') + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) ")
+				query.append( whereAnd() + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) ")
 			} else {
-				query.append( (params.event ? ' AND' : ' WHERE') + " assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
+				query.append( whereAnd() + " assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
 			}
 			
 			if (params.type=='toValidate') {
-				query.append(" AND assets.validation='Discovery' ")//eq ('validation','Discovery')
+				query.append( whereAnd() + " assets.validation='Discovery' ")//eq ('validation','Discovery')
 			}
 		}
 
-log.debug "*************** ValidationType.getList().contains(params.toValidate)? ${ValidationType.getList().contains(params.toValidate)}"
-log.debug "*************** ValidationType.getList().contains(params.toValidate)? ${ValidationType.getList()}"
-log.debug "*************** ValidationType.getList().contains(params.toValidate)? ${params.toValidate}"
 		// Allow filtering on the Validate
 		if (params.toValidate && params.toValidate && ValidationType.getList().contains(params.toValidate)) {
-			query.append(" AND assets.validation='${params.toValidate}' ")
+			query.append( whereAnd() + " assets.validation='${params.toValidate}' ")
 		}
 
 		if (params.plannedStatus) {
-			query.append(" AND assets.planStatus='${params.plannedStatus}'")
+			query.append(whereAnd() + " assets.planStatus='${params.plannedStatus}'")
 		}
 		
 		log.debug  "query = ${query}"
