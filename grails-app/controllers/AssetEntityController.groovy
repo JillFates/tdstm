@@ -1140,24 +1140,24 @@ class AssetEntityController {
 		def fieldPrefs = assetEntityService.getExistingPref(prefType)
 		
 		Map model = [
-			assetName:filters?.assetNameFilter ?:'', 
+			assetName: filters?.assetNameFilter ?:'', 
 			assetPref: fieldPrefs, 
-			assetTag:filters?.assetTagFilter ?:'', 
-			assetType:filters?.assetTypeFilter ?:'', 
-			listType:listType, 
-			model:filters?.modelFilter ?:'', 
-			prefType :prefType, 
-			serialNumber:filters?.serialNumberFilter ?:'', 
-			sourceLocation:filters?.sourceLocationFilter ?:'', 
-			sourceRack:filters?.sourceRackFilter ?:'',
-			targetLocation:filters?.targetLocationFilter ?:'', 
-			targetRack:filters?.targetRackFilter ?:'', 
-			type:params.type
+			assetTag: filters?.assetTagFilter ?:'', 
+			assetType: filters?.assetTypeFilter ?:'', 
+			listType: listType, 
+			model: filters?.modelFilter ?:'', 
+			prefType: prefType, 
+			serialNumber: filters?.serialNumberFilter ?:'', 
+			sourceLocation: filters?.sourceLocationFilter ?:'', 
+			sourceRack: filters?.sourceRackFilter ?:'',
+			targetLocation: filters?.targetLocationFilter ?:'', 
+			targetRack: filters?.targetRackFilter ?:'', 
+			type: params.type
 		]
 
 		model.putAll( assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters) )
 
-		render(view:'list', model:model) 
+		return model
 	}
 	
 	/**

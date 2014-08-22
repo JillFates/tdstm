@@ -50,8 +50,8 @@ class DatabaseController {
 		def fieldPrefs = assetEntityService.getExistingPref('Database_Columns')
 		
 		Map model = [
-			dbFormat:filters?.dbFormatFilter?:'',
-			dbName:filters?.assetNameFilter ?:'',
+			dbFormat: filters?.dbFormatFilter?:'',
+			dbName: filters?.assetNameFilter ?:'',
 			dbPref: fieldPrefs
 		]
 

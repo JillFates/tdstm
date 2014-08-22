@@ -46,10 +46,10 @@ class FilesController {
 		def fieldPrefs = assetEntityService.getExistingPref('Storage_Columns')
 						
 		Map model = [
-			fileFormat:filters?.fileFormatFilter, 
-			fileName:filters?.assetNameFilter ?:'', 
+			fileFormat: filters?.fileFormatFilter, 
+			fileName: filters?.assetNameFilter ?:'', 
 			filesPref: fieldPrefs, 
-			size:filters?.sizeFilter
+			size: filters?.sizeFilter
 		]
 
 		model.putAll( assetEntityService.getDefaultModelForLists('Files', project, fieldPrefs, params, filters) )

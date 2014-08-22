@@ -46,15 +46,15 @@ class ApplicationController {
 		def fieldPrefs = assetEntityService.getExistingPref('App_Columns')
 		
 		Map model = [
-			appName:filters?.assetNameFilter ?:'', 
+			appName: filters?.assetNameFilter ?:'', 
 			appPref: fieldPrefs, 
 			appSme: filters?.appSmeFilter ?:'',
 			availabaleRoles: availabaleRoles, 
 			company: project.client, 
-			latencys:params.latencys,
-			partyGroupList:companiesList, 
-			runbook:params.runbook,
-			validationFilter:filters?.appValidationFilter ?:'' 
+			latencys: params.latencys,
+			partyGroupList: companiesList, 
+			runbook: params.runbook,
+			validationFilter: filters?.appValidationFilter ?:'' 
 		]
 
 		model.putAll( assetEntityService.getDefaultModelForLists('Application', project, fieldPrefs, params, filters) )
