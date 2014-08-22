@@ -11,6 +11,7 @@ exports.config = {
     '../components/assets/addTask.spec.js',
     '../components/assets/addComments.spec.js',
     '../components/assets/serverList.spec.js',
+    '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],
     regression: [ //Do not change the order of these files since some test depends on others.
@@ -49,7 +50,6 @@ exports.config = {
     // '../components/tasks/cookbook.spec.js'
     ],
     assets:[
-    '../components/assets/databases/createDatabase.spec.js'
     ]
   },
 

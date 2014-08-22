@@ -87,7 +87,6 @@ describe('Database', function(){
       it('should not allow to save if name is empty', function(){
         var createDBModal = new DatabaseModal();
         if(process.env.BROWSER_NAME === 'phantomjs'){
-          // browser.executeScript("window.alert = function(){}");
           createDBModal.saveBtn.click();
         }else{
           createDBModal.saveBtn.click();
@@ -119,7 +118,6 @@ describe('Database', function(){
           var createDBModal = new DatabaseModal();
           expect(createDBModal.sizeField.getAttribute('value')).toEqual('');
           if(process.env.BROWSER_NAME === 'phantomjs'){
-            // browser.executeScript("window.alert = function(){}");
             createDBModal.saveBtn.click();
           }else{
           createDBModal.saveBtn.click();
@@ -135,7 +133,6 @@ describe('Database', function(){
           createDBModal.sizeField.sendKeys('hola');
           expect(createDBModal.sizeField.getAttribute('value')).toEqual('hola');
           if(process.env.BROWSER_NAME === 'phantomjs'){
-            // browser.executeScript("window.alert = function(){}");
             createDBModal.saveBtn.click();
           }else{
             createDBModal.saveBtn.click();
@@ -639,6 +636,11 @@ describe('Database', function(){
 
     }); // edit Database from view database
 
+    it('should close View modal',function(){
+      var createDBModal = new DatabaseModal();
+      createDBModal.closeViewModalBtn.click();
+      expect(createDBModal.isViewModalClosed()).toBe(true);
+    });
   }); // view created database
 
 });//Database

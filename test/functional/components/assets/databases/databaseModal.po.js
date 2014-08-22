@@ -5,6 +5,7 @@ var DatabaseModal = function(){
   this.createTitle = extendAppModal.createAppTitle;
   this.createModal  = extendAppModal.createAppModal;
   this.viewModal = extendAppModal.viewModal;
+  this.closeViewModalBtn = $('[aria-labelledby="ui-id-2"] .ui-dialog-titlebar-close');
   this.createModalButtons = this.createModal.$$('span.button input');
   this.saveBtn = this.createModal.$('input[value="Save"]');
   this.nameLabel = extendAppModal.nameLabel;

@@ -109,8 +109,8 @@ describe('Server list', function(){
       expect(appsListPage.titleh.getText()).toEqual('Server List');
     });
 
+    var appsListPage =  new ListApps();
     it('should set name to search', function(){
-      var appsListPage =  new ListApps();
       var field = appsListPage.searchNamefield;
       field.clear();
       field.sendKeys(appName);
@@ -118,9 +118,10 @@ describe('Server list', function(){
     });
 
     it('should validate search results', function(){
-      var appsListPage =  new ListApps();
+      // var appsListPage =  new ListApps();
       appsListPage.verifySearchResults(1).then(function(list){
         list[0].getAttribute('id').then(function(pid){
+          // console.log('s',pid);
           appId = pid;
         });
       });

@@ -5,7 +5,7 @@ var  TaskModal = require('./task.po.js');
 var CreateAppModal = require('./createApp.po.js');
 
 describe('Add Task', function(){
-  var menu = new Menu();
+  // var menu = new Menu();
   var taskModal = new TaskModal();
   var appsListPage =  new ListApps();
   var appId;
@@ -14,7 +14,13 @@ describe('Add Task', function(){
   describe('Preconditions', function(){
     
     it('should load Application List page after select Assets List Apps', function(){
+      var menu = new Menu();
       menu.goToAssets('applications');
+      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/application/list');
+    });
+
+    it('should have as title Application List', function(){
+      var appsListPage =  new ListApps();
       expect(appsListPage.titleh.getText()).toEqual('Application List');
     });
 
@@ -46,11 +52,6 @@ describe('Add Task', function(){
   }); //preconditions
 
   describe('search for app', function(){
-
-    xit('should load Application List page after select Assets List Apps', function(){
-      menu.goToAssets('applications');
-      expect(appsListPage.titleh.getText()).toEqual('Application List');
-    });
 
     it('should set name to search an app', function(){
       var field = appsListPage.searchNamefield;
@@ -111,17 +112,23 @@ describe('Add Task', function(){
 
   }); //Task Text Area
 
-  xdescribe('person/team', function(){
+  describe('person/team', function(){
     // This scenario is comment out until this jira is fixed. TM-2920
     it('should have Person/Team as label', function(){
       expect(taskModal.personTeamLabel.getText()).toEqual('Person/Team:');
     });
 
-    it('should have person unassigned by default', function(){
-      expect(taskModal.personSelected.getText()).toEqual('Unassigned');
+    xit('should have person unassigned by default', function(){
+      if (process.env.BROWSER_NAME === 'phantomjs'){
+        taskModal.getPersonSelected().then(function(op){
+          expect(op).toEqual('Unassigned'); 
+        });
+      }else{
+        expect(taskModal.personSelected.getText()).toEqual('Unassigned');
+      }
     });
 
-    it('should have person list empty since no person is assigned to this project', function(){
+    xit('should have person list empty since no person is assigned to this project', function(){
       taskModal.personOptions.then(function(options){
         expect(options.length).toEqual(1);
         expect(options[0].getText()).toEqual('Unassigned');
@@ -154,7 +161,13 @@ describe('Add Task', function(){
     describe('Team drowpdown',  function(){
 
       it('should have team Unassigned by default', function(){
-        expect(taskModal.teamSelected.getText()).toEqual('Unassigned');
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          taskModal.getTeamSelected().then(function(op){
+            expect(op).toEqual('Unassigned');
+          });
+        }else{
+          expect(taskModal.teamSelected.getText()).toEqual('Unassigned');
+        }
       });
        
       it('should have 20 options', function(){
@@ -176,29 +189,19 @@ describe('Add Task', function(){
             i++;
           }
         });
-
-      });
-      xit('k',function(){
-        var options = ['Unassigned','Account Manager​','App Coordinator​','Database Admin','Database Admin-MSSQL​',
-        'Database Admin-Oracle​','Logistics Technician','Move Manager​','Move Technician​','Move Technician',
-        'Network Admin​','Project Admin​','Project Manager​','Storage Admin​','System Admin​','System Admin-Linux​',
-        'System Admin-Win​','​Technician​'];
-        var j = 0;
-        taskModal.teamOptions.each(function(vi){
-          var k = options[j];
-          expect(vi.getText()).toEqual(k);
-          j++;
-        });
       });
 
     });//Team dropdown
 
     it('Should be selected Project Manager team',function(){
-      taskModal.teamOptions.then(function(options){
-      options[12].click();
-      });
-      // var val = 'NETWORK_ADMIN';
-      expect(taskModal.teamSelected.getAttribute('value')).toEqual('NETWORK_ADMIN');
+      taskModal.teamOptions.get(12).click();
+      if(process.env.BROWSER_NAME==='phantomjs'){
+        taskModal.getTeamSelected().then(function(op){
+          expect(op).toEqual('Network Admin');
+        });
+      }else{
+        expect(taskModal.teamSelected.getAttribute('value')).toEqual('NETWORK_ADMIN');
+      }
     });
 
     it('should not enable fixed assignment check if team is assigned', function(){
@@ -216,11 +219,17 @@ describe('Add Task', function(){
       expect(taskModal.eventLabel.getText()).toEqual('Event:');
     });
 
-    it('should be unassigned by default', function(){
-      expect(taskModal.eventSelected.getText()).toEqual('please select');
+    it('should have "please select" by default', function(){
+      if(process.env.BROWSER_NAME ==='phantomjs'){
+        taskModal.getEventSelected().then(function(op){
+          expect(op).toEqual('please select');
+        });
+      }else{
+        expect(taskModal.eventSelected.getText()).toEqual('please select');
+      }
     });
 
-    xit('should be empty since no event is created for this project yet',function(){
+    it('should be empty since no event is created for this project yet',function(){
       expect(taskModal.eventOptions.count()).toEqual(1); 
     });
   }); // Event Dropdown
@@ -232,7 +241,13 @@ describe('Add Task', function(){
     });
 
     it('should be general by default', function(){
-      expect(taskModal.categorySelected.getText()).toEqual('general');
+      if(process.env.BROWSER_NAME==='phantomjs'){
+        taskModal.getCategorySelected().then(function(op){
+          expect(op).toEqual('general');
+        });
+      }else{
+        expect(taskModal.categorySelected.getText()).toEqual('general');
+      }
     });
 
     it('should have this options', function(){
@@ -277,11 +292,19 @@ describe('Add Task', function(){
       });
     }); // workflow dropdown
 
-    it('should be selcted to planning', function(){
-      taskModal.categoryOptions.then(function(options){
-        options[5].click();
-      });
-      expect(taskModal.categorySelected.getText()).toEqual('planning');
+    it('should selcted planning as category', function(){
+      // taskModal.categoryOptions.then(function(options){
+        // options[5].click();
+      // });
+      taskModal.categoryOptions.get(5).click();
+      if(process.env.BROWSER_NAME==='phantomjs'){
+        taskModal.getCategorySelected().then(function(op){
+          expect(op).toEqual('planning');
+        });
+      }else{
+        expect(taskModal.categorySelected.getText()).toEqual('planning');
+      }
+
     });
 
   }); // Category Dropdown
@@ -293,7 +316,13 @@ describe('Add Task', function(){
 
     describe('Asset Type dropdown', function(){
       it('should have Application selected by default', function(){
-        expect(taskModal.assetTypeSelected.getText()).toEqual('Application');
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          taskModal.getAssetTypeSelected().then(function(op){
+            expect(op).toEqual('Application');
+          });
+        }else{
+          expect(taskModal.assetTypeSelected.getText()).toEqual('Application');
+        }
       });
 
       it('should have this options', function(){
@@ -311,7 +340,13 @@ describe('Add Task', function(){
       
     describe('Asset Entity dropdown', function(){
       it('should have the current application selected',function(){
-        expect(taskModal.assetEntitySelected.getText()).toEqual(appName);
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          taskModal.getAssetEntitySelected().then(function(op){
+            expect(op).toEqual(appName);
+          });
+        }else{
+          expect(taskModal.assetEntitySelected.getText()).toEqual(appName);
+        }
       });
 
       xit('should have the existing applications listed',function(){
@@ -365,7 +400,13 @@ describe('Add Task', function(){
     });
 
     it('should have M selected by default',function(){
-      expect(taskModal.durationScaleSelected.getText()).toEqual('M');
+      if(process.env.BROWSER_NAME==='phantomjs'){
+        taskModal.getDurationSelected().then(function(op){
+          expect(op).toEqual('M');
+        }); 
+      }else{
+        expect(taskModal.durationScaleSelected.getText()).toEqual('M');
+      }
     });
 
     it('should have scale with M,H,D,W options', function(){
@@ -394,7 +435,13 @@ describe('Add Task', function(){
     });
 
     it('should be 3 by default', function(){
-      expect(taskModal.prioritySelected.getText()).toEqual('3');
+      if(process.env.BROWSER_NAME ==='phantomjs'){
+        taskModal.getPrioritySelected().then(function(op){
+          expect(op).toEqual('3');
+        });
+      }else{
+        expect(taskModal.prioritySelected.getText()).toEqual('3');
+      }
     });
 
   }); //priority
@@ -439,7 +486,13 @@ describe('Add Task', function(){
     });
 
     it('should be Ready by default',function(){
-      expect(taskModal.statusSelected.getText()).toEqual('Ready');
+      if(process.env.BROWSER_NAME==='phantomjs'){
+        taskModal.getStatusSelected().then(function(op){
+          expect(op).toEqual('Ready');
+        });
+      }else{
+        expect(taskModal.statusSelected.getText()).toEqual('Ready');
+      }
     });
 
     it('should have these values',function(){

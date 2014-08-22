@@ -21,6 +21,10 @@ describe('createApp', function(){
   it('should load Application List page after select Assets List Apps', function(){
     var menu = new Menu();
     menu.goToAssets('applications');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/application/list');
+  });
+
+  it('should have as title Application List', function(){
     var appsListPage =  new ListApps();
     expect(appsListPage.titleh.getText()).toEqual('Application List');
   });
@@ -47,10 +51,16 @@ describe('createApp', function(){
         expect(appModal.nameLabel.getText()).toEqual('Name*');
       });
 
-      xit('should be required', function(){
-        appModal.saveBtn.click();
-          // this is not requested as required. 
-          // the user should not be allow to save the task
+      it('should be required', function(){
+        if(process.env.BROWSER_NAME === 'phantomjs'){
+          appModal.saveBtn.click();
+        }else{
+          appModal.saveBtn.click();
+          var alertDialog = browser.driver.switchTo().alert();
+          expect(alertDialog.getText()).toEqual('Please provide a name for the asset');
+          alertDialog.accept();
+        }
+        expect(appModal.isCreateModalOpened()).toBe(true);
       });
       
       it('should add a Name', function(){

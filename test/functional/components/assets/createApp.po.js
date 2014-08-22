@@ -2,10 +2,10 @@
 var ApplicationModal = function(){
   this.createAppTitle = element(by.id('ui-id-1'));
   // this.nameLabel = $('[class="label C  highField"] [for="assetName"]');
+  this.createAppModal = $('[aria-labelledby="ui-id-1"]');
   this.nameLabel = $('[for="assetName"]');
   this.nameField = element(by.id('assetName'));
   this.saveBtn = $('[onclick="saveToShow($(this),\'Application\')"]');
-  this.createAppModal = $('[aria-labelledby="ui-id-1"]');
   this.typeLabel = $('[for="assetType"]');
   this.typeField = element(by.id('assetType'));
   this.boundlefield = element(by.id('moveBundle'));
@@ -61,7 +61,7 @@ var ApplicationModal = function(){
        return true;
     });
   };
-  
+
   this.isViewModalClosed = function(){
     var that = this;
     return browser.wait(function(){

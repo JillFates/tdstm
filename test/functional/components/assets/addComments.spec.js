@@ -133,7 +133,14 @@ describe('Comments - Application', function(){
       });
 
       it('should be general by default', function(){
-        expect(commentModal.categorySelected.getText()).toEqual('general');
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          commentModal.getCategorySelected().then(function(op){
+            expect(op).toEqual('general');
+          });
+        }else{
+          expect(commentModal.categorySelected.getText()).toEqual('general');
+        }
+
       });
 
       it('should have this options', function(){
@@ -158,8 +165,15 @@ describe('Comments - Application', function(){
       });
       
       it('should select moveday as category', function(){
-        commentModal.setCategoryByPos(10);
-        expect(commentModal.categorySelected.getText()).toEqual('moveday');
+        // commentModal.setCategoryByPos(10);
+        commentModal.categoryOptions.get(10).click();
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          commentModal.getCategorySelected().then(function(op){
+            expect(op).toEqual('moveday');
+          });
+        }else{
+          expect(commentModal.categorySelected.getText()).toEqual('moveday');
+        }
       });
 
     }); // category dropdown
@@ -173,7 +187,13 @@ describe('Comments - Application', function(){
       describe('Asset Type dropdown', function(){
         
         it('should have Application selected by default', function(){
+          if(process.env.BROWSER_NAME==='phantomjs'){
+            commentModal.getAssetTypeSelected().then(function(op){
+              expect(op).toEqual('Application');
+            });
+          }else{
             expect(commentModal.assetTypeSelected.getText()).toEqual('Application');
+          }
         });
 
         it('should have this options', function(){
@@ -192,7 +212,13 @@ describe('Comments - Application', function(){
     describe('Asset Entity dropdown', function(){
       
       it('should have the current application selected',function(){
-        expect(commentModal.assetEntitySelected.getText()).toEqual(appName);
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          commentModal.getAssetEntitySelected().then(function(op){
+            expect(op).toEqual(appName);
+          });
+        }else{
+          expect(commentModal.assetEntitySelected.getText()).toEqual(appName);
+        }
       });
 
       xit('should have the existing applications listed',function(){
@@ -392,8 +418,16 @@ describe('Comments - Application', function(){
 
       it('should change the category to general', function(){
         var commentModal = new TaskModal();
-        commentModal.setCategoryByPos(1);
-        expect(commentModal.categorySelected.getText()).toEqual('general');
+        commentModal.categoryOptions.get(1).click();
+        if(process.env.BROWSER_NAME==='phantomjs'){
+          commentModal.getCategorySelected().then(function(op){
+            expect(op).toEqual('general');
+          });
+        }else{
+          expect(commentModal.categorySelected.getText()).toEqual('general');
+        }
+        // commentModal.setCategoryByPos(1);
+        // expect(commentModal.categorySelected.getText()).toEqual('general');
       });
 
       it('should save the changes and display comment Details modal', function(){
@@ -450,11 +484,16 @@ describe('Comments - Application', function(){
       });
 
       it('should close Comment Detail after delete comment button is hit', function(){
-        commentModal.deleteCommentBtn.click();
-        var alertDialog = browser.switchTo().alert();
-        var message= 'Are you sure?';
-        expect(alertDialog.getText()).toEqual(message);
-        alertDialog.accept();
+        if(process.env.BROWSER_NAME === 'phantomjs'){
+          browser.driver.executeScript('confirm = function(){return true}');
+          commentModal.deleteCommentBtn.click();
+        }else{
+          commentModal.deleteCommentBtn.click();
+          var alertDialog = browser.switchTo().alert();
+          var message= 'Are you sure?';
+          expect(alertDialog.getText()).toEqual(message);
+          alertDialog.accept();
+        }
         expect(commentModal.detailsTaskModal.isPresent()).toBe(false);
       });
       

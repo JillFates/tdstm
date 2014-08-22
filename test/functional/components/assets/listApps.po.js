@@ -9,22 +9,24 @@ var ListApps = function(){
   
   this.verifySearchResults = function(count){
     var that=this;
-    var webdriver = require('selenium-webdriver');
-    var d = webdriver.promise.defer();
-    browser.wait(function(){
+    // var webdriver = require('selenium-webdriver');
+    // var d = webdriver.promise.defer();
+    return browser.wait(function(){
       return  that.appsOnList.then(function(list){
         return list.length === count;
       });
     }).then(function(){
-        that.appsOnList.then(function(list){
+        return that.appsOnList.then(function(list){
         if(count>0){
-          d.fulfill(list);
+          return list;
+          // d.fulfill(list);
         }else{
-          d.fulfill('No results found');
+          return 'No results found';
+          // d.fulfill('No results found');
         }
       });
     });
-    return d.promise;
+    // return d.promise;
   };
 
   this.clickOnTaskIcon = function(appId){
