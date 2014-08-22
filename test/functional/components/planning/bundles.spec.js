@@ -32,7 +32,8 @@ describe('Bundles', function(){
     it('should save the bundle and go to moveBundle/show/', function(){
       bundlePage.clickSaveBundle();
       expect(menu.getCurrentUrl())
-        .toMatch(/http:\/\/localhost:8080\/tdstm\/moveBundle\/show\/\d\d\d\d/);
+        // .toMatch(/http:\/\/localhost:8080\/tdstm\/moveBundle\/show\/\d\d\d\d/);
+        .toMatch(process.env.BASE_URL+'/tdstm/moveBundle/show/\\d\\d\\d\\d');
     });
   }); // Create Page
 
