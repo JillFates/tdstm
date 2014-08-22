@@ -31,7 +31,7 @@ What to do tu run Functional test suite
 
 6. add the following process.env variables
     $ export BASE_URL=http://localhost:8080
-    $ export USERNAME= "username" <-- add your userName 
+    $ export USER_NAME= "username" <-- add your userName 
     $ export PASSWORD= "password" <-- add your password
-    
+    $ export BROWSER_NAME = <-- chrome, firefox, phantomjs
 7. run the test  with "protractor support/protractor.config.js"

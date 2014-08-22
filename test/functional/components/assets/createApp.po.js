@@ -33,9 +33,7 @@ var ApplicationModal = function(){
     var that = this;
     return browser.wait(function(){
       return that.createAppModal.getAttribute('style').then(function(style){
-        // return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: none;';
         return style.search('display: none;') !== -1;
-
       });
     }).then(function(){
        return true;
@@ -46,9 +44,7 @@ var ApplicationModal = function(){
     var that = this;
     return browser.wait(function(){
       return that.createAppModal.getAttribute('style').then(function(style){
-        // return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 0px; display: block;';
         return style.search('display: block;') !== -1;
-
       });
     }).then(function(){
        return true;
@@ -59,14 +55,13 @@ var ApplicationModal = function(){
     var that = this;
     return browser.wait(function(){
       return that.viewModal.getAttribute('style').then(function(style){
-        // return  style === 'position: absolute; height: auto; width: auto; top: 0px; left: 3px; display: block;';
         return style.search('display: block;') !== -1;
-
       });
     }).then(function(){
        return true;
     });
   };
+  
   this.isViewModalClosed = function(){
     var that = this;
     return browser.wait(function(){

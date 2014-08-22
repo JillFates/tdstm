@@ -50,7 +50,7 @@ describe('Login Test', function(){
   
   it('should login to tdstm with valid userName/Password', function(){
     loginPage.clearUsername();
-    loginPage.setUsername(process.env.USERNAME);
+    loginPage.setUsername(process.env.USER_NAME);
     loginPage.setPassword(process.env.PASSWORD);
     loginPage.clickSingInBtn();
     expect(loginPage.getAfterLoginTitle().getText()).toMatch(/TransitionManager™.*/);

@@ -9,5 +9,7 @@ describe('Task Manager page', function(){
     var taskManagerPage = new TaskManager();
     expect(taskManagerPage.titleh.getText()).toEqual('Task Manager');
   });
-
+  xdescribe('Bulk edit button',function(){
+  	//should only expand task with Ready and  Started
+  });
 });

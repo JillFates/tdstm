@@ -38,11 +38,17 @@ describe('Delete a project', function(){
   });
 
   it('should delete the project after clicking on delete button', function(){
-    projectPage.deleteCurrentProject();
-    var alertDialog = browser.driver.switchTo().alert();
-    var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
-    expect(alertDialog.getText()).toEqual(message);
-    alertDialog.accept();
+    if(process.env.BROWSER_NAME === 'phantomjs'){
+      browser.driver.executeScript('$(\'input[value="Delete"]\').attr("onclick","").click("true")');
+      projectPage.deleteCurrentProject();
+    }else{
+      projectPage.deleteCurrentProject();
+      var alertDialog = browser.driver.switchTo().alert();
+      var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
+      expect(alertDialog.getText()).toEqual(message);
+      alertDialog.accept();
+    }
+
   });
 
   it('should be redirect to project list', function(){
