@@ -26,7 +26,7 @@ TaskProgressBar.prototype.initUI = function() {
 	    newcontent.innerHTML = '<div class="modal fade" id="globalProgressBar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">  <div class="modal-dialog">    <div class="modal-content">      <div class="modal-header">        <h4 id="progressTitle" class="modal-title" id="myModalLabel">Modal title</h4>      </div>      <div class="modal-body">	<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>        <div id="innerGlobalProgressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; font-size: 11px; font-family: verdana;">0%</div>	<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>      </div>      <div class="modal-footer">	<button id="progressClose" type="button" class="btn btn-default" data-dismiss="modal" style="display:none;">Close</button>        <button id="progressCancel" type="button" class="btn btn-primary" style="display:none;">Cancel</button>      </div>    </div>  </div></div>';
 	    document.body.appendChild(newcontent.firstChild);
 
-        $('#progressTitle').html("Pending work");
+        $('#progressTitle').html("Initializing");
 		var inner = $('#innerGlobalProgressBar');
 		var status = $('#progressStatus');
 		var value = 0;
