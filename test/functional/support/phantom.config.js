@@ -61,10 +61,9 @@ exports.config = {
   rootElement: 'div[ng-app]',
 
   onPrepare: function() {
-    // At this point, global 'protractor' object will be set up, and jasmine
-    // will be available. For example, you can add a Jasmine reporter with:
-    //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
-    //         'outputdir/', true, true));
+    require('jasmine-reporters');
+    jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
+            'outputdir/', true, true));
     browser.driver.get(baseUrl+'/tdstm/auth/login');
     browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
     browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);
