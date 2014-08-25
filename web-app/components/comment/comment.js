@@ -1554,9 +1554,15 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 					} else {
 						switch (button.actionType) {
 							case "changeStatus":
-								angular.element('#status_'+id).html(data.assetComment.status)
-								angular.element('#status_'+id).parent().removeAttr('class').addClass(data.statusCss)
-								angular.element('#status_'+id).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
+								var cell = angular.element('#status_'+id);
+								if (cell.length == 0) {
+									cell = angular.element('#statusTd_'+id);
+								}
+								if (cell.length > 0) {
+									cell.html(data.assetComment.status)
+									cell.parent().removeAttr('class').addClass(data.statusCss)
+									cell.removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
+								}								
 								break;
 							case "assignTask":
 								updateColumn('assignedTo', id, data.assignedTo);
@@ -1653,7 +1659,12 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			var loadContent = function() {
 				if (scope.configTable[scope.commentId] == null) {
 					scope.loading = true;
-					if(!((angular.element('#outerBodyId').scope().bulkEdit) && (scope.comment.status != 'Started' && scope.comment.status != 'Ready'))){
+					var bulkEdit = false;
+					var outerBody = angular.element('#outerBodyId');
+					if (outerBody.length > 0) {
+						bulkEdit = outerBody.scope().bulkEdit;
+					}
+					if(!(bulkEdit && (scope.comment.status != 'Started' && scope.comment.status != 'Ready'))){
 						var content = templateCache.get(templateUrl);
 						if (content) {
 							showContent(content[1]);
