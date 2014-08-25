@@ -13,7 +13,7 @@ function TaskProgressBar(taskId, pingTime, onSuccess, onFailure, progressTitle) 
 		self.initUI();
 	}, 10);
 	
-	this.interval = setInterval(function() {
+	setTimeout(function() {
 		self.updateProgress();
 	}, self.pingTime);
 }
@@ -28,7 +28,6 @@ TaskProgressBar.prototype.initUI = function() {
 }
 
 TaskProgressBar.prototype.finishProgressBar = function() {
-	clearInterval(this.interval);
 	setTimeout(function() {
 		$('#globalProgressBar').modal('hide');
 	}, 2000);
@@ -90,6 +89,10 @@ TaskProgressBar.prototype.updateProgress = function() {
 
 					}
 				}
+				
+				setTimeout(function() {
+					self.updateProgress();
+				}, self.pingTime);
 			},
 			error: function() {
 				if (self.onFailure != undefined) {
