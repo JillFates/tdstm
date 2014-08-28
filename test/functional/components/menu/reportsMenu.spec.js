@@ -8,28 +8,43 @@ describe('Reports Menu', function(){
       expect(menu.getReports().getText()).toEqual('Reports');
     });
 
-
     describe('submenu',function(){
+      it('should open Reports Menu',function(){
+        menu.getReports().click();
+        expect(menu.getReportsMegaMenu().getAttribute('class')).toEqual('megamenu reports active');
+      });
       it('should displayed 22 links', function(){
         menu.getReportsSubmenu().then(function(list){
           expect(list.length).toEqual(22);
         });
       });
-
-      it('should open Reports Menu',function(){
-        menu.getReports().click();
-      });
       it('should have Cabling Conflict in the submenu', function(){
-        expect(menu.getCablingConflict().getText()).toEqual('Cabling Conflict');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getCablingConflictText()).toEqual('Cabling Conflict');
+        }else{
+          expect(menu.getCablingConflict().getText()).toEqual('Cabling Conflict');
+        }
       });
       it('should have Cabling Data in the submenu', function(){
-        expect(menu.getCablingData().getText()).toEqual('Cabling Data');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getCablingDataText()).toEqual('Cabling Data');
+        }else{
+          expect(menu.getCablingData().getText()).toEqual('Cabling Data');
+        }
       });
       it('should have Power in the submenu', function(){
-        expect(menu.getPower().getText()).toEqual('Power');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getPowerText()).toEqual('Power');
+        }else{
+          expect(menu.getPower().getText()).toEqual('Power');
+        }
       });
       it('should have Discovery Help in the submenu', function(){
-        expect(menu.getDiscoveryHelp().getText()).toEqual('help');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getDiscoveryHelpText()).toEqual('help');
+        }else{
+          expect(menu.getDiscoveryHelp().getText()).toEqual('help');
+        }
       });
       it('should have Application Profiles in the submenu', function(){
         expect(menu.getApplicationProfiles().getText()).toEqual('Application Profiles');
@@ -44,7 +59,11 @@ describe('Reports Menu', function(){
         expect(menu.getDatabaseConflicts().getText()).toEqual('Database Conflicts');
       });
       it('should have Task Report in the submenu', function(){
-        expect(menu.getTaskReport().getText()).toEqual('Task Report');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getTaskReportText()).toEqual('Task Report');
+        }else{
+          expect(menu.getTaskReport().getText()).toEqual('Task Report');
+        }
       });
       it('should have Report Summary in the submenu', function(){
         expect(menu.getReportSummary().getText()).toEqual('Report Summary');
@@ -68,7 +87,11 @@ describe('Reports Menu', function(){
         expect(menu.getTransportWorksheets().getText()).toEqual('Transport Worksheets');
       });
       it('should have EventPrep Help in the submenu', function(){
-        expect(menu.getEventPrepHelp().getText()).toEqual('help');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getEventPrepHelpText()).toEqual('help');
+        }else{
+          expect(menu.getEventPrepHelp().getText()).toEqual('help');
+        }
       });
       it('should have Application Migration Results in the submenu', function(){
         expect(menu.getApplicationMigrationResults().getText()).toEqual('Application Migration Results');
@@ -83,7 +106,11 @@ describe('Reports Menu', function(){
         expect(menu.getCablingQA().getText()).toEqual('Cabling QA');
       });
       it('should have Event Day Help in the submenu', function(){
-        expect(menu.getEventDayHelp().getText()).toEqual('help');
+        if(process.env.BROWSER_NAME ==='phantomjs'){
+          expect(menu.getEventDayHelpText()).toEqual('help');
+        }else{
+          expect(menu.getEventDayHelp().getText()).toEqual('help');
+        }
       });
 
       it('should close Reports Menu',function(){

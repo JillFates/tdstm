@@ -4,19 +4,21 @@ var ListApps = function(){
   this.createAppBtn = $('input[value="Create App"]');
   this.createServerBtn = $('[onclick="createAssetDetails(\'assetEntity\')"]');
   this.searchNamefield = element(by.id('gs_assetName'));
-  this.appsOnList =  $$('[role="grid"] tbody tr.ui-widget-content');
+  // this.appsOnList =  $$('[role="grid"] tbody tr.ui-widget-content');
   this.confirmMsg = $('div#messageId');
   
   this.verifySearchResults = function(count){
-    var that=this;
+    // var that=this;
     // var webdriver = require('selenium-webdriver');
     // var d = webdriver.promise.defer();
     return browser.wait(function(){
-      return  that.appsOnList.then(function(list){
+      // return  that.appsOnList.then(function(list){
+      return  $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
+        
         return list.length === count;
       });
     }).then(function(){
-        return that.appsOnList.then(function(list){
+        return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
         if(count>0){
           return list;
           // d.fulfill(list);

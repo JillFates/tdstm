@@ -11,10 +11,11 @@ exports.config = {
     '../components/assets/addTask.spec.js',
     '../components/assets/addComments.spec.js',
     '../components/assets/serverList.spec.js',
+    '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],
     regression: [ //Do not change the order of these files since some test depends on others.
-    '../components/projects/showProjects.spec.js',
+    // '../components/projects/showProjects.spec.js',
     '../components/projects/listProjects.spec.js',
     '../components/projects/fieldSettings.spec.js',
     '../components/reports/applicationProfiles.spec.js',
@@ -49,7 +50,6 @@ exports.config = {
     // '../components/tasks/cookbook.spec.js'
     ],
     assets:[
-    '../components/assets/databases/createDatabase.spec.js'
     ]
   },
 
@@ -64,6 +64,7 @@ exports.config = {
     require('jasmine-reporters');
     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
             'outputdir/', true, true));
+
     browser.driver.get(baseUrl+'/tdstm/auth/login');
     browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
     browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);
