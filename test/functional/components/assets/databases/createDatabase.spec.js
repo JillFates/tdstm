@@ -516,7 +516,7 @@ describe('Database', function(){
 
       it('should have 5 in the list', function(){
         var createDBModal = new DatabaseModal();
-        expect(createDBModal.planStatusOptions.count()).toEqual(5);
+        expect(createDBModal.planStatusOptions.count()).toEqual(6);
       });
 
       it('should have the following list',function(){
@@ -527,6 +527,7 @@ describe('Database', function(){
           expect(list[2].getText()).toEqual('Confirmed');
           expect(list[3].getText()).toEqual('Locked');
           expect(list[4].getText()).toEqual('Moved');
+          expect(list[5].getText()).toEqual('Future');
          }); 
       });
 
