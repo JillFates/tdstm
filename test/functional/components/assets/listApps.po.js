@@ -6,36 +6,51 @@ var ListApps = function(){
   this.searchNamefield = element(by.id('gs_assetName'));
   // this.appsOnList =  $$('[role="grid"] tbody tr.ui-widget-content');
   this.confirmMsg = $('div#messageId');
-  
-  this.verifySearchResults = function(count){
-    // var that=this;
-    // var webdriver = require('selenium-webdriver');
-    // var d = webdriver.promise.defer();
+  this.devicesLoadingId = 'load_assetListIdGrid';
+  this.applicationLoadingId = 'load_applicationIdGrid';
+  this.databaseLoadingId = 'load_databaseIdGrid';
+  this.storageLoadingId = 'load_storageIdGrid';
+  this.dependencyLoadingId ='load_dependencyGridIdGrid';
+
+  this.verifySearchResults = function(count,device){
+    var that  =this;
+    var asse = 'assetnotdefine';
     return browser.wait(function(){
-      // return  that.appsOnList.then(function(list){
-      return  $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
-        
-        return list.length === count;
-      });
+      var d = {
+        'device': function(){
+            asse = that.devicesLoadingId;
+        },
+        'application':function(){
+          asse = that.applicationLoadingId;
+        },
+        'database':function(){
+          asse = that.databaseLoadingId;
+        },
+        'storage':function(){
+          asse = that.storageLoadingId;
+        },
+        'dependency':function(){
+          asse =that.dependencyLoadingId;
+        }
+      };
+      d[device]();
+        return element(by.id(asse)).getAttribute('style').then(function(attClass){
+          return attClass === 'display: none; ';
+        });
     }).then(function(){
         return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
         if(count>0){
           return list;
-          // d.fulfill(list);
         }else{
           return 'No results found';
-          // d.fulfill('No results found');
         }
       });
     });
-    // return d.promise;
   };
-
   this.clickOnTaskIcon = function(appId){
     var addtaskIcon =  $('#icon_task_'+appId);
     addtaskIcon.click();
   };
-
   this.isTasksIconDisplayed = function(appId){
     var that = this;
     return browser.wait(function(){

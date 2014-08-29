@@ -118,10 +118,8 @@ describe('Server list', function(){
     });
 
     it('should validate search results', function(){
-      // var appsListPage =  new ListApps();
-      appsListPage.verifySearchResults(1).then(function(list){
+      appsListPage.verifySearchResults(1,'device').then(function(list){
         list[0].getAttribute('id').then(function(pid){
-          // console.log('s',pid);
           appId = pid;
         });
       });
@@ -133,12 +131,6 @@ describe('Server list', function(){
     
     it('should have comments as icon', function(){
       var appsListPage =  new ListApps();
-      // browser.sleep(300);
-      // browser.wait(function(){
-      //   return appsListPage.getCommentIcon(appId).getAttribute('src'))===process.env.BASE_URL+'/tdstm/icons/comments.png';
-      // }).then(function(){
-      //   expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
-      // });
       expect(appsListPage.isCommentsIconDisplayed(appId)).toBe(true);
     });
 
@@ -146,8 +138,6 @@ describe('Server list', function(){
       var appsListPage =  new ListApps();
       appsListPage.clickOnCommentIcon(appId);
     });
-
-
 
     it('should have as title Show Comments and task + App Name', function(){
       var commTasklist = new CommentTaskList();

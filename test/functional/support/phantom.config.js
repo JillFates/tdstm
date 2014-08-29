@@ -18,8 +18,6 @@ exports.config = {
     // '../components/projects/showProjects.spec.js',
     '../components/projects/listProjects.spec.js',
     '../components/projects/fieldSettings.spec.js',
-    '../components/reports/applicationProfiles.spec.js',
-    '../components/reports/planningReports.spec.js',
     '../components/menu/adminMenu.spec.js',
     '../components/menu/projectsMenu.spec.js',
     '../components/menu/dataCentersMenu.spec.js',
@@ -50,6 +48,11 @@ exports.config = {
     // '../components/tasks/cookbook.spec.js'
     ],
     assets:[
+    ],
+    reports:[
+    '../components/reports/applicationProfiles.spec.js',
+    '../components/reports/planningReports.spec.js',
+    '../components/reports/cablingConflict.spec.js'
     ]
   },
 
@@ -64,7 +67,7 @@ exports.config = {
     require('jasmine-reporters');
     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
             'outputdir/', true, true));
-
+    browser.driver.manage().window().setSize(1280, 1024);
     browser.driver.get(baseUrl+'/tdstm/auth/login');
     browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
     browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);

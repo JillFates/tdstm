@@ -18,8 +18,8 @@ exports.config = {
     '../components/projects/showProjects.spec.js',
     '../components/projects/listProjects.spec.js',
     '../components/projects/fieldSettings.spec.js',
-    '../components/reports/applicationProfiles.spec.js',
-    '../components/reports/planningReports.spec.js',
+    // '../components/reports/applicationProfiles.spec.js',
+    // '../components/reports/planningReports.spec.js',
     '../components/menu/adminMenu.spec.js',
     '../components/menu/projectsMenu.spec.js',
     '../components/menu/dataCentersMenu.spec.js',
@@ -50,6 +50,11 @@ exports.config = {
     // '../components/tasks/cookbook.spec.js'
     ],
     assets:[
+    ],
+    reports:[
+    // '../components/reports/applicationProfiles.spec.js',
+    // '../components/reports/planningReports.spec.js',
+    '../components/reports/cablingConflict.spec.js'
     ]
   },
 

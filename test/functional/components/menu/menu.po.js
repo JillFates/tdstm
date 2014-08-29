@@ -9,7 +9,6 @@ var Menu = function(){
   this.getHeaderTitle = function(){
     return browser.driver.findElement(by.css(this.titleCss));
   };
-
   
   //Admin
   this.getAdmin = function(){
@@ -228,7 +227,6 @@ var Menu = function(){
   this.getStorageDevices = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?filter=storage"]'));
   };
-
   this.getLogicalStorage = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/files/index"]'));
   };
@@ -255,12 +253,6 @@ var Menu = function(){
   };
   this.getManageDataHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print\',\'help\');"]'));
-  };
-  this.get = function(){
-    return browser.driver.findElement(by.css());
-  };
-  this.get = function(){
-    return browser.driver.findElement(by.css());
   };
 
   this.goToAssets = function(option){
@@ -453,28 +445,15 @@ var Menu = function(){
   this.getReportsSubmenu = function(){
     return browser.driver.findElements(by.css('#reportsMenuId a.mmlink'));
   };
-  this.getCablingConflictText = function(){
-    return browser.executeScript('return $("a[href=\'/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict\']").text()');
-  };
   this.getCablingConflict = function(){
       return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict"]'));
-  };
-  this.getCablingDataText = function(){
-    return browser.executeScript('return $("a[href=\'/tdstm/reports/getBundleListForReportDialog?reportId=CablingData\']").text()');
   };
   this.getCablingData = function(){
     return browser.driver.findElement
       (by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData"]'));
   };
-  this.getPowerText =  function(){
-    return browser.executeScript('return $("a[href=\'/tdstm/reports/powerReport\']").text()');
-  };
   this.getPower = function(){
       return browser.driver.findElement(by.css('a[href="/tdstm/reports/powerReport"]'));
-  };
-  this.getDiscoveryHelpText = function(){
-    return browser.executeScript('return $("a[href=\'javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');\']")[0].text');
-
   };
   this.getDiscoveryHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');"]'));
@@ -490,9 +469,6 @@ var Menu = function(){
   };
   this.getDatabaseConflicts = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/databaseConflicts"]'));
-  };
-  this.getTaskReportText = function(){
-    return browser.executeScript('return $("a[href=\'/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report\']").text()');
   };
   this.getTaskReport = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report"]'));
@@ -518,10 +494,6 @@ var Menu = function(){
   this.getTransportWorksheets =function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List"]'));
   };
-  this.getEventPrepHelpText = function(){
-    return browser.executeScript('return $("a[href=\'javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');\']")[1].text');
-
-  };
   this.getEventPrepHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');"]'));
   };
@@ -537,10 +509,6 @@ var Menu = function(){
   this.getCablingQA = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA"]'));
   };
-  this.getEventDayHelpText = function(){
-    return browser.executeScript('return $("a[href=\'javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');\']")[2].text');
-
-  };
   this.getEventDayHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');"]'));
   };
@@ -548,8 +516,8 @@ var Menu = function(){
     var that = this;
     this.getReports().click();
     var d = {
-      'cablingConflicts':function(){
-        that.getCablingConflict().click();
+      'cablingConflict':function(){
+          that.getCablingConflict().click();
       },
       'cablingData':function(){
         that.getCablingData().click();

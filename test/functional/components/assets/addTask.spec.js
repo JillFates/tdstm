@@ -5,7 +5,6 @@ var  TaskModal = require('./task.po.js');
 var CreateAppModal = require('./createApp.po.js');
 
 describe('Add Task', function(){
-  // var menu = new Menu();
   var taskModal = new TaskModal();
   var appsListPage =  new ListApps();
   var appId;
@@ -60,7 +59,7 @@ describe('Add Task', function(){
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1).then(function(list){
+      appsListPage.verifySearchResults(1,'application').then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });
@@ -293,9 +292,6 @@ describe('Add Task', function(){
     }); // workflow dropdown
 
     it('should selcted planning as category', function(){
-      // taskModal.categoryOptions.then(function(options){
-        // options[5].click();
-      // });
       taskModal.categoryOptions.get(5).click();
       if(process.env.BROWSER_NAME==='phantomjs'){
         taskModal.getCategorySelected().then(function(op){

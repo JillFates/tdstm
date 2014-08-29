@@ -161,7 +161,7 @@ describe('createApp', function(){
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1).then(function(list){
+      appsListPage.verifySearchResults(1,'application').then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });

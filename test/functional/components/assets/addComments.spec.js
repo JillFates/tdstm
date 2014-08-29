@@ -59,7 +59,7 @@ describe('Comments - Application', function(){
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1).then(function(list){
+      appsListPage.verifySearchResults(1,'application').then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });
@@ -71,7 +71,6 @@ describe('Comments - Application', function(){
   it('should have add comment as icon', function(){
     var appsListPage =  new ListApps();
     expect(appsListPage.isAddCommentIconDisplayed(appId)).toBe(true);
-    // expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
   });
 
   it('should open create comment modal', function(){
@@ -282,7 +281,7 @@ describe('Comments - Application', function(){
 
       it('should validate search results', function(){
         var appsListPage =  new ListApps();
-        appsListPage.verifySearchResults(1).then(function(list){
+        appsListPage.verifySearchResults(1,'application').then(function(list){
           list[0].getAttribute('id').then(function(pid){
             appId = pid;
           });
@@ -293,7 +292,6 @@ describe('Comments - Application', function(){
     it('should have comments as icon', function(){
       var appsListPage =  new ListApps();
       expect(appsListPage.isCommentsIconDisplayed(appId)).toBe(true);
-      // expect(appsListPage.getCommentIcon(appId).getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comments.png');
     });
 
     it('should open comment list modal', function(){
@@ -341,11 +339,8 @@ describe('Comments - Application', function(){
       it('should open create comment modal', function(){
         var commTasklist = new CommentTaskList();
         commTasklist.addCommentBtn.click();
-        // commTasklist.clickAddComment();
         expect(commTasklist.isListModalPresent()).toBe(true);
-        // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
         var commentModal = new TaskModal();
-        // expect(commentModal.editCommentModal.isPresent()).toBe(true);
         expect(commentModal.isEditCommentModalPresent()).toBe(true);
       });
 
@@ -371,7 +366,6 @@ describe('Comments - Application', function(){
       var commTasklist = new CommentTaskList();
       
       it('should remain opened comment list',function(){
-        // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
         expect(commTasklist.isListModalPresent()).toBe(true);
       });
 
@@ -405,10 +399,8 @@ describe('Comments - Application', function(){
       it('should open Edit Comment Modal after click on edit btn', function(){
         commTasklist.editFromList(0);
         expect(commTasklist.isListModalPresent()).toBe(true);
-        // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
         var commentModal = new TaskModal();
         expect(commentModal.isEditCommentModalPresent()).toBe(true);
-        // expect(commentModal.editCommentModal.isPresent()).toBe(true);
       });
 
       it('should have edit comment as title', function(){
@@ -426,8 +418,6 @@ describe('Comments - Application', function(){
         }else{
           expect(commentModal.categorySelected.getText()).toEqual('general');
         }
-        // commentModal.setCategoryByPos(1);
-        // expect(commentModal.categorySelected.getText()).toEqual('general');
       });
 
       it('should save the changes and display comment Details modal', function(){
@@ -454,7 +444,6 @@ describe('Comments - Application', function(){
         
           it('should remain opened comment list',function(){
             expect(commTasklist.isListModalPresent()).toBe(true);
-            // expect(commTasklist.getCommentTaskListModal().isPresent()).toBe(true);
           });
 
           it('should have only 2 item', function(){

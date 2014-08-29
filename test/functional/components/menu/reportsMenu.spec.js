@@ -19,32 +19,16 @@ describe('Reports Menu', function(){
         });
       });
       it('should have Cabling Conflict in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getCablingConflictText()).toEqual('Cabling Conflict');
-        }else{
-          expect(menu.getCablingConflict().getText()).toEqual('Cabling Conflict');
-        }
+        expect(menu.getCablingConflict().getText()).toEqual('Cabling Conflict');
       });
       it('should have Cabling Data in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getCablingDataText()).toEqual('Cabling Data');
-        }else{
-          expect(menu.getCablingData().getText()).toEqual('Cabling Data');
-        }
+        expect(menu.getCablingData().getText()).toEqual('Cabling Data');
       });
       it('should have Power in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getPowerText()).toEqual('Power');
-        }else{
-          expect(menu.getPower().getText()).toEqual('Power');
-        }
+        expect(menu.getPower().getText()).toEqual('Power');
       });
       it('should have Discovery Help in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getDiscoveryHelpText()).toEqual('help');
-        }else{
-          expect(menu.getDiscoveryHelp().getText()).toEqual('help');
-        }
+        expect(menu.getDiscoveryHelp().getText()).toEqual('help');
       });
       it('should have Application Profiles in the submenu', function(){
         expect(menu.getApplicationProfiles().getText()).toEqual('Application Profiles');
@@ -59,11 +43,7 @@ describe('Reports Menu', function(){
         expect(menu.getDatabaseConflicts().getText()).toEqual('Database Conflicts');
       });
       it('should have Task Report in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getTaskReportText()).toEqual('Task Report');
-        }else{
-          expect(menu.getTaskReport().getText()).toEqual('Task Report');
-        }
+        expect(menu.getTaskReport().getText()).toEqual('Task Report');
       });
       it('should have Report Summary in the submenu', function(){
         expect(menu.getReportSummary().getText()).toEqual('Report Summary');
@@ -87,11 +67,7 @@ describe('Reports Menu', function(){
         expect(menu.getTransportWorksheets().getText()).toEqual('Transport Worksheets');
       });
       it('should have EventPrep Help in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getEventPrepHelpText()).toEqual('help');
-        }else{
-          expect(menu.getEventPrepHelp().getText()).toEqual('help');
-        }
+        expect(menu.getEventPrepHelp().getText()).toEqual('help');
       });
       it('should have Application Migration Results in the submenu', function(){
         expect(menu.getApplicationMigrationResults().getText()).toEqual('Application Migration Results');
@@ -106,13 +82,8 @@ describe('Reports Menu', function(){
         expect(menu.getCablingQA().getText()).toEqual('Cabling QA');
       });
       it('should have Event Day Help in the submenu', function(){
-        if(process.env.BROWSER_NAME ==='phantomjs'){
-          expect(menu.getEventDayHelpText()).toEqual('help');
-        }else{
-          expect(menu.getEventDayHelp().getText()).toEqual('help');
-        }
+        expect(menu.getEventDayHelp().getText()).toEqual('help');
       });
-
       it('should close Reports Menu',function(){
         menu.getReports().click();
       });
