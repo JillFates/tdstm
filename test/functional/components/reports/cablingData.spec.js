@@ -6,15 +6,15 @@ describe('Cabling Conflict Report',function(){
   var menu = new Menu();
   
   it('should load Cabling Conflict Report page after click on Reports > Cabling Conflict', function(){
-    menu.goToReports('cablingConflict');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict');
+    menu.goToReports('cablingData');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=CablingData');
   });
 
   describe('set Report Criteria and generate it', function(){
 
     it('should have Cabling Conflict as title', function(){
       var cablingConflictPage = new CablingConflict();
-      expect(cablingConflictPage.getPageTitle()).toEqual('Cabling Conflict Report');
+      expect(cablingConflictPage.getPageTitle()).toEqual('Structured Cabling Report');
     });
 
     describe('bundle dropdown',function(){
@@ -78,8 +78,13 @@ describe('Cabling Conflict Report',function(){
 
     it('should generate the report after click on generate button', function(){
       var cablingConflictPage = new CablingConflict();
-      cablingConflictPage.getGenerateCablingConflictBtn().click();
+      cablingConflictPage.generateCablingDataBtn().click();
       // expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
+    });
+    it('should get message empty',function(){
+      // tm-3128 throws exception
+      var cablingConflictPage = new CablingConflict();
+      expect(cablingConflictPage.getMessage().getText()).toEqual('');
     });
 
   }); // set report Criteria and generate it

@@ -52,7 +52,9 @@ exports.config = {
     reports:[
     '../components/reports/applicationProfiles.spec.js',
     '../components/reports/planningReports.spec.js',
-    '../components/reports/cablingConflict.spec.js'
+    '../components/reports/cablingConflict.spec.js',
+    '../components/reports/cablingData.spec.js',
+    '../components/reports/applicationConflicts.spec.js'
     ]
   },
 

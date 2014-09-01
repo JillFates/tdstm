@@ -18,8 +18,6 @@ exports.config = {
     '../components/projects/showProjects.spec.js',
     '../components/projects/listProjects.spec.js',
     '../components/projects/fieldSettings.spec.js',
-    // '../components/reports/applicationProfiles.spec.js',
-    // '../components/reports/planningReports.spec.js',
     '../components/menu/adminMenu.spec.js',
     '../components/menu/projectsMenu.spec.js',
     '../components/menu/dataCentersMenu.spec.js',
@@ -52,9 +50,11 @@ exports.config = {
     assets:[
     ],
     reports:[
-    // '../components/reports/applicationProfiles.spec.js',
-    // '../components/reports/planningReports.spec.js',
-    '../components/reports/cablingConflict.spec.js'
+    '../components/reports/applicationProfiles.spec.js',
+    '../components/reports/planningReports.spec.js',
+    '../components/reports/cablingConflict.spec.js',
+    '../components/reports/cablingData.spec.js',
+    '../components/reports/applicationConflicts.spec.js'
     ]
   },
 
@@ -62,10 +62,15 @@ exports.config = {
     'browserName': 'chrome'
   },
   // multiCapabilities: [{
-  //   browserName: 'firefox'
+  //   'browserName': 'firefox'
   // }, {
-  //   browserName: 'chrome'
-  // }],
+  //   'browserName': 'chrome'
+  // }
+  // // ,{
+  // //   'browserName': "phantomjs",
+  // //   'phantomjs.binary.path':'./node_modules/phantomjs/bin/phantomjs'
+  // // }
+  // ],
 
   rootElement: 'div[ng-app]',
 
