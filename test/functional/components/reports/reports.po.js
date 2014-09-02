@@ -1,5 +1,5 @@
 'use strict';
-var CablingConflict = function(){
+var Reports = function(){
   this.getPageTitle = function(){
     return browser.driver.findElement(by.css('h1')).getText();
   };
@@ -15,9 +15,12 @@ var CablingConflict = function(){
   this.generateApplicationProfilesBtn = function(){
     return browser.driver.findElement(by.id('applicationProfilesButton'));
   };
+  this.getAppProfileGeneratedHeader = function(){
+    return browser.driver.findElement(by.css('[ng-app="tdsAssets"] div b'));
+  };
   this.getMessage = function(){
     return browser.driver.findElement(by.css('.main_bottom .body .message'));
-  }
+  };
   this.getBundleLabel = function(){
     return browser.driver.findElement(by.css('#bundleRow label')).getText();
   };
@@ -76,4 +79,4 @@ var CablingConflict = function(){
     }
   };
 };
-module.exports = CablingConflict;
+module.exports = Reports;

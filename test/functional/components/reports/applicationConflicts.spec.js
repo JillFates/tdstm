@@ -1,6 +1,6 @@
 'use strict';
 var  Menu = require('../menu/menu.po.js');
-var CablingConflict = require('./reports.po.js');
+var Reports = require('./reports.po.js');
 
 describe('Application Conflicts',function(){
   var menu = new Menu();
@@ -10,12 +10,12 @@ describe('Application Conflicts',function(){
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationConflicts');
   });
   it('should have Application Conflicts as title',function(){
-      var cablingConflictPage = new CablingConflict();
+      var cablingConflictPage = new Reports();
       expect(cablingConflictPage.getPageTitle()).toEqual('Application Conflicts');
     });
 
 	describe('bundle',function(){
-     var cablingConflictPage = new CablingConflict();
+     var cablingConflictPage = new Reports();
       xit('should have bundle label', function(){
         expect(cablingConflictPage.getBundleLabel()).toEqual('Bundles:*');
       });
@@ -73,9 +73,15 @@ describe('Application Conflicts',function(){
 
 	});//checkboxes
   it('should generate the report after click on generate button', function(){
-    var cablingConflictPage = new CablingConflict();
+    var cablingConflictPage = new Reports();
     cablingConflictPage.generateApplicationConflictsBtn().click();
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationConflicts');
   });
+  describe('generated report',function(){
+    it('should get title from generated report',function(){
+      var appProfilesPage = new Reports();
+      expect(appProfilesPage.getAppProfileGeneratedHeader().getText()).toContain('Application Conflicts - MarketingDemo');
+    });
+  }); //generated report
 
 });
