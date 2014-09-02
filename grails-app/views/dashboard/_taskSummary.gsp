@@ -81,9 +81,9 @@ $(document).ready(function() {
 			<tr>
 			<g:each var="c" in="${r}">
 				<g:set var="team" value="${c}" />
-				<td nowrap><b>${team.role.description}</b></td>
-				<td style="text-align:right;"><b>${team.teamTaskCount}</b></td>
-				<td nowrap style="width: 70px; text-align: center;">
+				<td class="teamcol" nowrap><b>${team.role.description}</b></td>
+				<td class="teamcountcolumn"><b>${team.teamTaskCount}</b></td>
+				<td class="teambarcolumn" nowrap>
 					<g:set var="remainingTeamTask" value="${team.teamTaskCount - team.teamDoneCount}" />
 					<g:if test="${team.percDone < 100}" >
 						<div class="team_bar_base_small">
