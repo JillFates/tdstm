@@ -15,6 +15,7 @@ var ListApps = function(){
   this.verifySearchResults = function(count,device){
     var that  =this;
     var asse = 'assetnotdefine';
+    var cont = 0;
     return browser.wait(function(){
       var d = {
         'device': function(){
@@ -35,7 +36,12 @@ var ListApps = function(){
       };
       d[device]();
         return element(by.id(asse)).getAttribute('style').then(function(attClass){
-          return attClass === 'display: none; ';
+          // console.log('"'+attClass+'"');
+          if(attClass.search('display: block;') !== -1){
+            cont =1;
+          }
+          // console.log('cont',cont);
+          return (attClass.search('display: none;') !== -1  && cont===1);
         });
     }).then(function(){
         return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
