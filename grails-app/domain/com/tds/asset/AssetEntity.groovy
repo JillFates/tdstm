@@ -527,12 +527,4 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		return AssetCableMap.findByAssetFrom(this)
 	}
 
-	def getSourceRack() {
-		return (rackSource ? rackSource.tag : '')
-	}
-
-	def getTargetRack() {
-		return (rackTarget ? rackTarget.tag : '')
-	}
-
 }
