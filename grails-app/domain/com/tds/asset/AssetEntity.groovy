@@ -332,6 +332,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 	
 	def updateRacks() {
+		/*
 		try{
 			// Make sure the asset points to source/target racks if there is enough information for it
 			if ( project != null ) {
@@ -348,6 +349,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		} catch( Exception ex ){
 			log.error "$ex"
 		}
+		*/
 	}
 	/*
 	 *  methods for JMESA filter/sort
@@ -358,6 +360,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def getMoveBundleName(){
 		return this.moveBundle?.name
 	}
+
+	def getSourceLocation() { return this.roomSource?.location }
+	def getSourceRack() { return this.rackSource?.tag }
+	def getSourceRoom() { return this.roomSource?.roomName }
+	def getTargetLocation() { return this.roomTarget?.location }
+	def getTargetRack() { return this.rackTarget?.tag }
+	def getTargetRoom() { return this.roomTarget?.roomName }
 
 	/**
 	 * Use to determine if the asset is a Server / VM
