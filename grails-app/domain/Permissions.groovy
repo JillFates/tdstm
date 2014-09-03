@@ -10,10 +10,13 @@ class Permissions {
 		version false 
 	}
 	
+	static hasMany = [ rolePermissions: RolePermissions ]
+
 	static constraints = {
 		permissionItem( blank:false, nullable:false,unique:true )
 		permissionGroup( nullable:false )
 		description( blank:true , nullable:true)
+		rolePermissions cascade: "all-delete-orphan"
 	}
 
 	String toString() {

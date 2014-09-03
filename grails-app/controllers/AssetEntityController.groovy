@@ -1441,12 +1441,6 @@ class AssetEntityController {
 				case "rack":
 					redirect( controller:'rackLayouts',action:'create' )
 					break;
-				case "console":
-					redirect( action:dashboardView, params:[ showAll:'show'])
-					break;
-				case "dashboardView":
-					redirect( action:dashboardView, params:[ showAll:'show'])
-					break;
 				case "clientConsole":
 					redirect( controller:'clientConsole', action:list)
 					break;
@@ -1496,8 +1490,6 @@ class AssetEntityController {
 		}
 		if ( params.clientList ){
 			redirect( controller:"clientConsole", action:"list", params:[moveBundle:params.moveBundleId] )
-		} else if ( params.moveBundleId ){
-			redirect( action:dashboardView, params:[ moveBundle : params.moveBundleId, showAll : params.showAll] )
 		}else{
 			redirect( action:list )
 		}
@@ -1610,9 +1602,6 @@ class AssetEntityController {
 						render(template:'auditDetails',	model:[assetEntity:entity, source:params.source, assetType:params.assetType])
 					else
 						forward(action:'create', params:params)
-				  break;
-		    case "console":
-				  redirect( action:dashboardView, params:[ showAll:'show',tag_f_assetName:params.tag_f_assetName,tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType])
 				  break;
 			case "clientConsole":
 				  redirect( controller:'clientConsole', action:list)
@@ -2054,366 +2043,7 @@ class AssetEntityController {
 		}
 		render assetCommentsList as JSON
 	}
-	/*---------------------------------------------------------------------------------------
-	 *	User to get the details for Supervisor Console
-	 * 	@author:	Lokanath Reddy
-	 * 	@param :	CURR_PROJ and movebundle
-	 * 	@return:	AssetEntity details and Transition details for all MoveBundle Teams
-	 *--------------------------------------------------------------------------------------*/
-	def dashboardView = {
-		
-		def userLogin = securityService.getUserLogin()
-		def projectInstance = securityService.getUserCurrentProject()
-		def projectId = projectInstance.id
-		params.projectId = projectId
 
-		//
-		// Deal with which moveBundle that the user should be viewing
-		//
-		def bundleId = params.moveBundle
-		def moveBundleInstance
-		if (bundleId) {
-			// Okay, so the user selected one from the view.  Let's make sure that they aren't hacking around and trying to 
-			// get to a bundle outside their current project
-			moveBundleInstance = MoveBundle.findByIdAndProject(bundleId, projectInstance)
-			if (moveBundleInstance) {
-				userPreferenceService.setPreference( "CURR_BUNDLE", "${bundleId}" )
-			} else {
-				log.error "dashboardView: Bundle(${bundleId}) not associated with user's(${loginUser}) current project(${project.id})"
-				flash.message = "The bundle specified was unrelated to your current project"
-				bundleId = null
-			}
-		}
-		if ( ! bundleId ) {
-			// No bundle was specified so let's see if they have a preference or get one from the user's project
-			userPreferenceService.loadPreferences("CURR_BUNDLE")
-			def defaultBundle = getSession().getAttribute("CURR_BUNDLE")
-			if(defaultBundle?.CURR_BUNDLE){
-				moveBundleInstance = MoveBundle.findById(defaultBundle.CURR_BUNDLE)
-				def mbProject = moveBundleInstance?.project
-				// log.info "dashboardView: mbProject=${mbProject?.id}, projectId=${projectId}"
-				if( mbProject?.id != projectId ){
-//				if( mbProject?.id != Integer.parseInt(projectId) ){
-					moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-				}
-			} else {
-				moveBundleInstance = MoveBundle.find("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-			}
-		}
-		
-		// Get list of all moveBundles
-		def moveBundleList = MoveBundle.findAll("from MoveBundle mb where mb.project = ${projectInstance.id} order by mb.name asc")
-		
-		def filterAttr = [tag_f_priority:params.tag_f_priority,tag_f_assetTag:params.tag_f_assetTag,tag_f_assetName:params.tag_f_assetName,tag_f_status:params.tag_f_status,tag_f_sourceTeamMt:params.tag_f_sourceTeamMt,tag_f_targetTeamMt:params.tag_f_targetTeamMt,tag_f_commentType:params.tag_f_commentType,tag_s_1_priority:params.tag_s_1_priority,tag_s_2_assetTag:params.tag_s_2_assetTag,tag_s_3_assetName:params.tag_s_3_assetName,tag_s_4_status:params.tag_s_4_status,tag_s_5_sourceTeamMt:params.tag_s_5_sourceTeamMt,tag_s_6_targetTeamMt:params.tag_s_6_targetTeamMt,tag_s_7_commentType:params.tag_s_7_commentType]
-		session.setAttribute('filterAttr', filterAttr)
-		def showAll = params.showAll
-		def currentState = params.currentState
-		def assetList
-		def bundleTeams = []
-		def assetsList = []
-		def totalAsset = []
-		def totalAssetsSize = 0
-		def supportTeam = new HashMap()
-		
-		// Set the teamType to params or user's preferences or default to 'MOVE'
-		def teamType = params.teamType ?: ( getSession().getAttribute( "CONSOLE_TEAM_TYPE" )?.CONSOLE_TEAM_TYPE ?: "MOVE")
-
-		userPreferenceService.setPreference( "CONSOLE_TEAM_TYPE", "${teamType}" )
-		def stateVal
-		def taskVal
-		/* user role check*/
-		def role = ""
-		def subject = SecurityUtils.subject
-		if(subject.hasRole("ADMIN") || subject.hasRole("SUPERVISOR")){
-			role = "SUPERVISOR"
-		} else if(subject.hasRole("EDITOR")){
-			role = "EDITOR"
-		}
-		// NOTE - I don't see role referenced in the remainder of this code so it might not be used JM 12/7/2012
-		
-		// get the list of assets order by Hold and recent asset Transition
-		if( moveBundleInstance != null ){
-			//  Get Id for respective States
-			stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
-			def holdId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "Hold" ) )
-			def releasedId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "Release" ) )
-
-			def unrackedId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "Unracked" ) )
-
-			def cleanedId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "Cleaned" ) )
-			def onCartId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "OnCart" ) )
-			def stagedId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "Staged" ) )
-
-			def rerackedId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "Reracked" ) )
-
-			def onTruckId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "OnTruck" ) )
-			def offTruckId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, "OffTruck" ) )
-
-			def queryHold = supervisorConsoleService.getQueryForConsole( moveBundleInstance, params, 'hold')
-			def queryNotHold = supervisorConsoleService.getQueryForConsole(moveBundleInstance,params, 'notHold')
-			def holdTotalAsset = jdbcTemplate.queryForList( queryHold )
-			def otherTotalAsset = jdbcTemplate.queryForList( queryNotHold )
-			def today = GormUtil.convertInToGMT("now", "EDT" )
-
-			if(!currentState && !params.assetStatus || params.assetStatus?.contains("pend")){
-				holdTotalAsset.each{
-					totalAsset<<it
-				}
-			}
-			if( showAll ){
-				otherTotalAsset.each{
-					totalAsset<<it
-				}
-			}
-
-			totalAssetsSize = moveBundleService.assetCount( moveBundleInstance.id )
-			def projectTeamList = ProjectTeam.findAll("from ProjectTeam pt where pt.moveBundle = ${moveBundleInstance.id} and pt.role in (${teamsByType.get(teamType)}) order by pt.role, pt.name asc")
-
-			def bundleAssetsList = AssetEntity.findAllWhere( moveBundle : moveBundleInstance )
-
-			projectTeamList.each{ projectTeam->
-				def swimlane = Swimlane.findByNameAndWorkflow(projectTeam.role ? projectTeam.role : "MOVE_TECH", Workflow.findByProcess(moveBundleInstance.workflowCode) )
-
-				def minSource = swimlane.minSource ? swimlane.minSource : "Release"
-				def minSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, minSource ) )
-
-				def minTarget = swimlane.minTarget ? swimlane.minTarget : "Staged"
-				def minTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, minTarget ) )
-
-
-				def maxSource = swimlane.maxSource ? swimlane.maxSource : "Unracked"
-				def maxSourceId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, maxSource ) )
-
-				def maxTarget = swimlane.maxTarget ? swimlane.maxTarget : "Reracked"
-				def maxTargetId = Integer.parseInt( stateEngineService.getStateId( moveBundleInstance.workflowCode, maxTarget ) )
-
-				def teamId = projectTeam.id
-				def teamRole = projectTeam.role
-				def teamMembers = partyRelationshipService.getBundleTeamMembersDashboard(projectTeam.id)
-				def member
-				if(teamMembers.length() > 0){
-					member = teamMembers.delete((teamMembers.length()-1), teamMembers.length())
-				}
-
-				def sourceAssetsList = bundleAssetsList.findAll{it[sourceTeamType.get(teamRole)]?.id == teamId }
-
-				def sourceAssets = sourceAssetsList.size()
-
-				def sourcePendAssets = sourceAssetsList.findAll{it.currentStatus < minSourceId || !it.currentStatus }.size()
-
-				def sourceProcessAssets = sourceAssetsList.findAll{it.currentStatus > minSourceId && it.currentStatus < maxSourceId }.size()
-
-				def maxSourceAssets = sourceAssetsList.findAll{it.currentStatus >= maxSourceId }.size()
-
-				def sourceAvailassets = sourceAssetsList.findAll{it.currentStatus >= minSourceId && it.currentStatus < maxSourceId }.size()
-
-				if(projectTeam?.role == "CLEANER"){
-
-					sourceAssets = bundleAssetsList.size()
-
-					sourcePendAssets = bundleAssetsList.findAll{ it.currentStatus < maxSourceId || !it.currentStatus }.size()
-
-					sourceProcessAssets = bundleAssetsList.findAll{ it.currentStatus == maxSourceId }.size()
-
-					maxSourceAssets = bundleAssetsList.findAll{ it.currentStatus >= cleanedId }.size()
-
-					sourceAvailassets = bundleAssetsList.findAll{ it.currentStatus == maxSourceId }.size()
-
-				}
-				def targetAssetsList = bundleAssetsList.findAll{it[targetTeamType.get(teamRole)]?.id == teamId }
-				def targetAssets = targetAssetsList.size()
-
-				def targetPendAssets = targetAssetsList.findAll{it.currentStatus < minTargetId || !it.currentStatus }.size()
-
-				def targetProcessAssets = targetAssetsList.findAll{it.currentStatus > minTargetId && it.currentStatus < maxTargetId }.size()
-
-				def maxTargetAssets = targetAssetsList.findAll{it.currentStatus >= maxTargetId }.size()
-
-				def targetAvailAssets = targetAssetsList.findAll{it.currentStatus >= minTargetId && it.currentStatus < maxTargetId }.size()
-
-				def latestAssetCreated = AssetTransition.findAll("FROM AssetTransition a where a.assetEntity = ? and a.projectTeam = ? Order By a.id desc",[projectTeam.latestAsset, projectTeam],[max:1])
-				def elapsedTime = "00:00m"
-				if(latestAssetCreated.size() > 0){
-					elapsedTime = convertIntegerIntoTime(today.getTime() - latestAssetCreated[0].dateCreated.getTime() )?.toString()
-					elapsedTime = elapsedTime?.substring(0,elapsedTime.lastIndexOf(":")) + "m"
-				}
-
-				def headColor = 'done'
-				if(projectTeam.currentLocation != "Target"){
-					if(sourceProcessAssets > 0 && sourceAssets > 0){
-						headColor = 'process'
-					} else if(sourceAvailassets > 0){
-						headColor = 'ready'
-					} else if(sourceAssets != maxSourceAssets && sourceAssets > 0){
-						headColor = 'pending'
-					}
-				} else {
-					if(targetProcessAssets > 0 && targetAssets > 0){
-						headColor = 'process'
-					} else if(targetAvailAssets > 0){
-						headColor = 'ready'
-					} else if(targetAssets != maxTargetAssets && targetAssets > 0){
-						headColor = 'pending'
-					}
-				}
-				bundleTeams <<[team:projectTeam,members:member, sourceAssets:sourceAssets,
-							maxSourceAssets:maxSourceAssets, sourceAvailassets:sourceAvailassets ,
-							targetAvailAssets:targetAvailAssets , targetAssets:targetAssets,
-							maxTargetAssets:maxTargetAssets, sourcePendAssets:sourcePendAssets, headColor:headColor,
-							targetPendAssets:targetPendAssets, elapsedTime:elapsedTime, eventActive : projectTeam.moveBundle.moveEvent?.inProgress  ]
-			}
-
-			/*
-			 * @@@@ Cleaning team included into other teams
-			 * 
-			 * 	def sourcePendCleaned = bundleAssetsList.findAll{ it.currentStatus < unrackedId || !it.currentStatus }.size()
-			 def sourceAvailCleaned = bundleAssetsList.findAll{ it.currentStatus == unrackedId }.size()
-			 def sourceCleaned = bundleAssetsList.findAll{ it.currentStatus >= cleanedId }.size()
-			 */
-			def sourceMover = bundleAssetsList.findAll{ it.currentStatus >= onCartId }.size()
-
-			def sourceTransportAvail = bundleAssetsList.findAll{ it.currentStatus == cleanedId }.size()
-
-			def sourceTransportPend = bundleAssetsList.findAll{ it.currentStatus < cleanedId || !it.currentStatus }.size()
-
-			def targetMover = bundleAssetsList.findAll{ it.currentStatus >= stagedId }.size()
-
-			def targetTransportAvail = bundleAssetsList.findAll{ it.currentStatus >= onTruckId && it.currentStatus < offTruckId }.size()
-
-			def targetTransportPend = bundleAssetsList.findAll{ it.currentStatus < onTruckId || !it.currentStatus }.size()
-
-			def cleaningTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Logistics", moveBundleInstance)
-			def transportTeam = ProjectTeam.findByTeamCodeAndMoveBundle("Transport", moveBundleInstance)
-			def cleaningMembers
-			if ( cleaningTeam ) {
-				cleaningMembers = partyRelationshipService.getBundleTeamMembersDashboard(cleaningTeam.id)
-			}
-			def transportMembers
-			if ( transportTeam ) {
-				transportMembers = partyRelationshipService.getBundleTeamMembersDashboard(transportTeam.id)
-			}
-			supportTeam.put("sourceTransportAvail", sourceTransportAvail )
-			supportTeam.put("sourceTransportPend", sourceTransportPend )
-			supportTeam.put("targetTransportAvail", targetTransportAvail )
-			supportTeam.put("targetTransportPend", targetTransportPend )
-			supportTeam.put("totalAssets", totalAssetsSize )
-			supportTeam.put("sourceMover", sourceMover )
-			supportTeam.put("targetMover", targetMover )
-			supportTeam.put("cleaning", cleaningTeam )
-			supportTeam.put("cleaningMembers", cleaningMembers ? cleaningMembers?.delete((cleaningMembers?.length()-1), cleaningMembers?.length()) : "" )
-			supportTeam.put("transport", transportTeam )
-			supportTeam.put("transportMembers", transportMembers ? transportMembers?.delete((transportMembers?.length()-1), transportMembers?.length()) : "" )
-			totalAsset.each{
-				// log.info "dashboardView: it=${it}"
-				def check = true
-				def curId = it.currentState
-
-				stateVal = curId ? stateEngineService.getState( moveBundleInstance.workflowCode, curId ) : null
-				if (stateVal){
-					taskVal = stateEngineService.getTasks( moveBundleInstance.workflowCode, "SUPERVISOR", stateVal )
-					if(taskVal.size() == 0){
-						check = false
-					}
-				}
-				def cssClass
-				if(it.minstate == holdId ){
-					def holdAssetTransition = AssetTransition.findAll("FROM AssetTransition t WHERE t.assetEntity = ${it.id} AND t.stateTo = '${holdId}' AND t.voided = 0")
-					cssClass = 'asset_hold'
-					if(holdAssetTransition.size() > 0){
-						def holdTimer = holdAssetTransition[0]?.holdTimer
-						cssClass = (holdTimer && holdTimer.getTime() < today.getTime()) ? 'asset_hold_overtime' : 'asset_hold'
-					}
-				} else if(curId < releasedId && curId != holdId ){
-					cssClass = 'asset_pending'
-				} else if(curId > rerackedId){
-					cssClass = 'asset_done'
-				}
-				def status = curId ? stateEngineService.getStateLabel( moveBundleInstance.workflowCode, curId ) : ''
-				assetsList<<[asset: it, status:status, cssClass : cssClass, checkVal:check]
-			}
-			def totalSourcePending = bundleAssetsList.findAll{ it.currentStatus < releasedId || !it.currentStatus }.size()
-
-			def totalUnracked = bundleAssetsList.findAll{ it.currentStatus >= unrackedId }.size()
-
-			def totalSourceAvail = bundleAssetsList.findAll{ it.currentStatus >= releasedId && it.currentStatus < unrackedId }.size()
-
-			def totalTargetPending = bundleAssetsList.findAll{ it.currentStatus < stagedId || !it.currentStatus }.size()
-
-			def totalReracked = bundleAssetsList.findAll{ it.currentStatus >= rerackedId }.size()
-
-			def totalTargetAvail = bundleAssetsList.findAll{ it.currentStatus >= stagedId && it.currentStatus < rerackedId}.size()
-
-			def totalAssetsOnHold = jdbcTemplate.queryForInt("SELECT count(a.asset_entity_id) FROM asset_entity a left join asset_transition t on "+
-					"(a.asset_entity_id = t.asset_entity_id and t.voided = 0)  where "+
-					"a.move_bundle_id = ${moveBundleInstance.id} and t.state_to = $holdId")
-			userPreferenceService.loadPreferences("SUPER_CONSOLE_REFRESH")
-			def timeToUpdate = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
-			/*Get data for filter dropdowns*/
-			def applicationList=AssetEntity.executeQuery("select distinct ae.application , count(ae.id) from AssetEntity "+
-					"ae where  ae.moveBundle=${moveBundleInstance.id} "+
-					"group by ae.application order by ae.application")
-			def appOwnerList=AssetEntity.executeQuery("select distinct ae.appOwner, count(ae.id) from AssetEntity ae where "+
-					"ae.moveBundle=${moveBundleInstance.id} group by ae.appOwner order by ae.appOwner")
-			def appSmeList=AssetEntity.executeQuery("select distinct ae.appSme, count(ae.id) from AssetEntity ae where "+
-					" ae.moveBundle=${moveBundleInstance.id} group by ae.appSme order by ae.appSme")
-			/* Get list of Transitions states*/
-			def transitionStates = []
-			def processTransitions = stateEngineService.getTasks(moveBundleInstance.workflowCode, "TASK_ID")
-			processTransitions.each{
-				def stateId = Integer.parseInt( it )
-				transitionStates << [state:stateEngineService.getState( moveBundleInstance.workflowCode, stateId ),
-							stateLabel:stateEngineService.getStateLabel( moveBundleInstance.workflowCode, stateId )]
-			}
-			List assetBeansList = new ArrayList()
-			assetsList.each{
-				AssetEntityBean assetEntityBean = new AssetEntityBean()
-				assetEntityBean.setId(it.asset.id)
-				assetEntityBean.setAssetTag(it.asset.assetTag)
-				assetEntityBean.setAssetName(it.asset.assetName)
-				assetEntityBean.setAssetType(it.asset.assetType)
-				if(AssetComment.find("from AssetComment where assetEntity = ${it?.asset?.id} and commentType = ? and isResolved = ?",['issue',0])){
-					assetEntityBean.setCommentType("issue")
-				} else if(AssetComment.find('from AssetComment where assetEntity = '+ it?.asset?.id)){
-					assetEntityBean.setCommentType("comment")
-				} else {
-					assetEntityBean.setCommentType("blank")
-				}
-				assetEntityBean.setPriority(it.asset.priority)
-				if(it?.asset.sourceTeamMt){
-					assetEntityBean.setSourceTeamMt(ProjectTeam.findById(it?.asset?.sourceTeamMt)?.name)
-				}
-				if(it?.asset.targetTeamMt){
-					assetEntityBean.setTargetTeamMt(ProjectTeam.findById(it?.asset?.targetTeamMt)?.name)
-				}
-				assetEntityBean.setStatus(it.status)
-				assetEntityBean.setCssClass(it.cssClass ? it.cssClass : "")
-				assetEntityBean.setCheckVal(it.checkVal)
-				assetBeansList.add( assetEntityBean )
-			}
-			//Statements for JMESA integration
-			TableFacade tableFacade = new TableFacadeImpl("tag",request)
-			tableFacade.items = assetBeansList
-			
-			def project = securityService.getUserCurrentProject()
-			def entities = assetEntityService.entityInfo( project )
-			
-			return[ moveBundleList: moveBundleList, projectId:projectId, bundleTeams:bundleTeams,
-				assetBeansList:assetBeansList, moveBundleInstance:moveBundleInstance, project : projectInstance,
-				supportTeam:supportTeam, totalUnracked:totalUnracked, totalSourceAvail:totalSourceAvail,
-				totalTargetAvail:totalTargetAvail, totalReracked:totalReracked, totalAsset:totalAssetsSize,
-				timeToUpdate : timeToUpdate ? timeToUpdate.SUPER_CONSOLE_REFRESH : "never", showAll : showAll,
-				applicationList : applicationList, appOwnerList : appOwnerList, appSmeList : appSmeList,
-				transitionStates : transitionStates, params:params, totalAssetsOnHold:totalAssetsOnHold,
-				totalSourcePending: totalSourcePending, totalTargetPending: totalTargetPending, role: role, 
-				teamType:teamType, assetDependency: new AssetDependency() , servers:entities.servers , 
-				applications:entities.applications , dbs:entities.dbs, files:entities.files,
-				networks:entities.networks, dependencyType:entities.dependencyType, 
-				dependencyStatus:entities.dependencyStatus, staffRoles:taskService.getRolesForStaff() ]
-		} else {
-			flash.message = "Please create bundle to view Console"
-			redirect(controller:'project',action:'show')
-		}
-	}
 	/*--------------------------------------------
 	 * 	Get asset details part in dashboard page
 	 * 	@author: 	Lokanath Reddy
@@ -2525,12 +2155,13 @@ class AssetEntityController {
 		}
 		render status as JSON
 	}
-	/*-------------------------------------------------------------------
-	 *  Used to create Transaction for Supervisor 
-	 * @author: Lokanath Reddy
-	 * @param : AssetEntity id, priority,assigned to value and from and to States
-	 * @return: AssetEntity details and AssetTransition details
-	 *------------------------------------------------------------------*/
+	/**
+	  * Used to create Transaction for Supervisor 
+	  * TODO : JPM 9/2014 - createTransition method should no longer be needed once the AssetTracker (clientConsole/index) is removed
+	  * @author: Lokanath Reddy
+	  * @param : AssetEntity id, priority,assigned to value and from and to States
+	  * @return: AssetEntity details and AssetTransition details
+	  */
 	def createTransition = {
 		def assetId = params.asset
 		def assetEntity = AssetEntity.get(assetId)
@@ -2672,6 +2303,7 @@ class AssetEntityController {
 		}
 		render assetList as JSON
 	}
+
 	/*-----------------------------------------
 	 *@param : state value
 	 *@return: List of valid stated for param state
@@ -2707,12 +2339,13 @@ class AssetEntityController {
 		updateTime <<[updateTime:timeToUpdate]
 		render updateTime as JSON
 	}
-	/*-------------------------------------------
+	/** 
+	 * To get unique list of task for list of assets through ajax
 	 * @author : Bhuvaneshwari
 	 * @param  : List of assets selected for transition
 	 * @return : Common tasks for selected assets
-	 *-------------------------------------------*/
-	//  To get unique list of task for list of assets through ajax
+	 */
+
 	def getList = {
 		def projectInstance = securityService.getUserCurrentProject()
 		def assetArray = params.assetArray
@@ -2756,43 +2389,6 @@ class AssetEntityController {
 		}
 		render totalList as JSON
 
-	}
-
-	/*-------------------------------------------
-	 *To change the status for an asset
-	 *	@author : Bhuvaneshwari
-	 * 	@param  : List of assets selected for transition and tostate to change the state
-	 * 	@return : Once transition is completed it will redirect to dashboardView method
-	 * -------------------------------------------*/
-	def changeStatus = {
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		def assetId = params.assetVal
-		def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
-		try{
-			assetEnt.each{
-				def bundle = it.moveBundle
-				def principal = SecurityUtils.subject.principal
-				def loginUser = UserLogin.findByUsername(principal)
-				def team = it.sourceTeamMt
-
-				def workflow = workflowService.createTransition(bundle.workflowCode,"SUPERVISOR",params.taskList,it,bundle,loginUser,team,params.enterNote)
-				if(workflow.success){
-					if(params.enterNote != ""){
-						def assetComment = new AssetComment()
-						assetComment.comment = params.enterNote
-						assetComment.commentType = 'issue'
-						assetComment.createdBy = loginUser.person
-						assetComment.assetEntity = it
-						assetComment.save()
-					}
-				}else{
-					flash.message = message(code :workflow.message)
-				}
-			}
-		} catch(Exception ex){
-			log.error "changeStatus: unexpected Exception occurred - ${ex.toString()}"
-		}
-		redirect(action:'dashboardView',params:[moveBundle:params.moveBundle, showAll:params.showAll] )
 	}
 
 	/* --------------------------------------
@@ -3203,8 +2799,6 @@ class AssetEntityController {
 			session.AE?.JQ_FILTERS = params
             render flash.message
 		}
-
-
 	}
 	
     /**

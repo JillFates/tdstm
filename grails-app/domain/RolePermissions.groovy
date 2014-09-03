@@ -8,6 +8,8 @@ class RolePermissions {
 		version false
 	}
 	
+	static belongsTo = Permissions
+
     static constraints = {
 		role( blank:false, nullable:false )
 		permission( nullable:false )
