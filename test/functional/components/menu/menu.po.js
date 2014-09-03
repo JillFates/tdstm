@@ -485,9 +485,9 @@ var Menu = function(){
   this.getAssetTags = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag"]'));
   };
-  this.getEventTeamWorksheets = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets"]'));
-  };
+  // this.getEventTeamWorksheets = function(){
+  //   return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets"]'));
+  // };
   this.getLogisticsTeamWorksheets = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset"]'));
   };
@@ -549,9 +549,9 @@ var Menu = function(){
       'assetTags':function(){
         that.getAssetTags().click();
       },
-      'eventTeamWorksheets':function(){
-        that.getEventTeamWorksheets().click();
-      },
+      // 'eventTeamWorksheets':function(){
+      //   that.getEventTeamWorksheets().click();
+      // },
       'logisticsTeamWorksheets':function(){
         that.getLogisticsTeamWorksheets().click();
       },

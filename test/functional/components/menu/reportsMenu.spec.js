@@ -13,9 +13,9 @@ describe('Reports Menu', function(){
         menu.getReports().click();
         expect(menu.getReportsMegaMenu().getAttribute('class')).toEqual('megamenu reports active');
       });
-      it('should displayed 22 links', function(){
+      it('should displayed 21 links', function(){
         menu.getReportsSubmenu().then(function(list){
-          expect(list.length).toEqual(22);
+          expect(list.length).toEqual(21);
         });
       });
       it('should have Cabling Conflict in the submenu', function(){
@@ -56,9 +56,6 @@ describe('Reports Menu', function(){
       });
       it('should have Asset Tags in the submenu', function(){
         expect(menu.getAssetTags().getText()).toEqual('Asset Tags');
-      });
-      it('should have Event Team Worksheets in the submenu', function(){
-        expect(menu.getEventTeamWorksheets().getText()).toEqual('Event Team Worksheets');
       });
       it('should have Logistics Team Worksheets in the submenu', function(){
         expect(menu.getLogisticsTeamWorksheets().getText()).toEqual('Logistics Team Worksheets');
