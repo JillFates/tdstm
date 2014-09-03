@@ -839,7 +839,11 @@ digraph runbook {
 		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 		
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def startDate = TimeUtil.convertInToUserTZ(dfsMap.starts[0].estStart, tzId) ?: TimeUtil.nowGMT()
+		def estStart = dfsMap.starts[0].estStart
+		if (!estStart) {
+			estStart = TimeUtil.nowGMT()
+		}
+		def startDate = TimeUtil.convertInToUserTZ(estStart, tzId)
 		
 		// generate the JSON data used by d3
 		def items = []
