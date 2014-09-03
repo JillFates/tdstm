@@ -26,7 +26,7 @@ class MoveEventNewsController {
 				def holdId = stateEngineService.getStateId( moveEvent.project.workflowCode, "Hold" )
 				def assetCommentsQuery = new StringBuffer( """SELECT ac.asset_comment_id as id,  'I' as type,
 									DATE_FORMAT( date_created,'%Y/%m/%d %r') as created,  
-									if(display_option = 'G' || ae.current_status = $holdId , CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text, 
+									if(display_option = 'G', CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text, 
 									if(is_resolved = 0, 'L','A') as state from asset_comment ac 
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id) 
 									left join move_bundle mb on (mb.move_bundle_id = ae.move_bundle_id)
