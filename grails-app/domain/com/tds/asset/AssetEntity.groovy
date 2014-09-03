@@ -108,16 +108,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String os
 	Integer usize
 	
-	String sourceLocation
 	String sourceRoom
-	String sourceRack
 	Integer sourceRackPosition
 	String sourceBladeChassis
 	Integer sourceBladePosition
 
-	String targetLocation
 	String targetRoom
-	String targetRack
 	Integer targetRackPosition
 	String targetBladeChassis
 	Integer targetBladePosition
@@ -137,16 +133,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String appSme = ""
 
 	// MoveBundleAsset fields
-	ProjectTeam sourceTeamMt
-	ProjectTeam targetTeamMt
-	ProjectTeam sourceTeamLog
-	ProjectTeam targetTeamLog
-	ProjectTeam sourceTeamSa
-	ProjectTeam targetTeamSa
-	ProjectTeam sourceTeamDba
-	ProjectTeam targetTeamDba
-	
-	Integer currentStatus
 	String validation
 	
 	String externalRefId
@@ -267,16 +253,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		os( blank:true, nullable:true )
 		usize( nullable:true )
 		
-		sourceLocation( blank:true, nullable:true )
 		sourceRoom( blank:true, nullable:true )
-		sourceRack( blank:true, nullable:true )
 		sourceRackPosition( nullable:true )
 		sourceBladeChassis( blank:true, nullable:true )
 		sourceBladePosition( nullable:true )
 	
-		targetLocation( blank:true, nullable:true )
 		targetRoom( blank:true, nullable:true )
-		targetRack( blank:true, nullable:true )
 		targetRackPosition( nullable:true )
 		targetBladeChassis( blank:true, nullable:true )
 		targetBladePosition( nullable:true )
@@ -297,17 +279,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		appSme( blank:true, nullable:true )
 	
 		// MoveBundleAsset fields
-		sourceTeamMt( nullable:true )
-		targetTeamMt( nullable:true )
-		sourceTeamLog( nullable:true )
-		targetTeamLog( nullable:true )
-		sourceTeamSa( nullable:true )
-		targetTeamSa( nullable:true )
-		sourceTeamDba( nullable:true )
-		targetTeamDba( nullable:true )
-
 		validation( blank:true, nullable:true, inList:ValidationType.getList() )		
-		currentStatus( nullable:true )
 		dependencyBundle( nullable:true )
 		externalRefId( blank:true, nullable:true )
         
@@ -320,19 +292,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	static mapping  = {	
 		version true
 		autoTimestamp false
-		sourceTeamMt ignoreNotFound: true
-	    targetTeamMt ignoreNotFound: true
-	    sourceTeamLog ignoreNotFound: true
-	    targetTeamLog ignoreNotFound: true
-	    sourceTeamSa ignoreNotFound: true
-	    targetTeamSa ignoreNotFound: true
-	    sourceTeamDba ignoreNotFound: true
-	    targetTeamDba ignoreNotFound: true
 		tablePerHierarchy false
 		id column:'asset_entity_id'
 		os column:'hinfo'
-		sourceTeamMt column:'source_team_id'
-		targetTeamMt column:'target_team_id'
 		appOwner column:'app_owner_id'
 		moveBundle ignoreNotFound:true
 		owner ignoreNotFound: true
@@ -374,19 +336,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			// Make sure the asset points to source/target racks if there is enough information for it
 			if ( project != null ) {
 				if( sourceLocation && sourceRoom ){
-					roomSource = Room.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, roomName:sourceRoom )
-					if( sourceRack && assetType != 'Blade') {
-						rackSource = Rack.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, 'room.id':roomSource?.id, tag:sourceRack)
-					}
-					save(flush:true)
+					//roomSource = Room.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, roomName:sourceRoom )
+					//save(flush:true)
 					
 				}
-				if (targetLocation && targetRoom){
-					roomTarget = Room.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, roomName:targetRoom )
-					if( targetRack && assetType != 'Blade') {
-						rackTarget = Rack.findOrCreateWhere(source:0, 'project.id':project.id, location:targetLocation, 'room.id':roomTarget?.id, tag:targetRack)
-					}
-					save(flush:true)
+				if (targetRoom){
+					//roomTarget = Room.findOrCreateWhere(source:0, 'project.id':project.id, roomName:targetRoom )
+					//save(flush:true)
 				}
 			}
 		} catch( Exception ex ){
@@ -528,13 +484,12 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		//If flag is source then setting all source to requested value and vice versa .
 		if( source ){
 			roomSource = room
-			sourceRoom = room ? room.roomName : null
-			sourceLocation = room ? room?.location : null
+		//	sourceRoom = room ? room.roomName : null
+		//	sourceLocation = room ? room?.location : null
 		}
 		if( !source ){
 			roomTarget = room
-			targetRoom = room ? room.roomName : null
-			targetLocation = room ? room?.location : null
+		//	targetRoom = room ? room.roomName : null
 		}
 	}
 	/**
@@ -551,11 +506,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		//If flag is source then setting all source to requested value and vice versa .
 		if( source ){
 			rackSource = rack
-			sourceRack = rack ? rack.tag : null
 		}
 		if( !source ){
 			rackTarget = rack
-			targetRack = rack ? rack.tag : null
 		}
 	}
 	/**
@@ -564,4 +517,13 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def isCableExist(){
 		return AssetCableMap.findByAssetFrom(this)
 	}
+
+	def getSourceRack() {
+		return (rackSource ? rackSource.tag : '')
+	}
+
+	def getTargetRack() {
+		return (rackTarget ? rackTarget.tag : '')
+	}
+
 }

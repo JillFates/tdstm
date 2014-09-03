@@ -369,8 +369,9 @@ class ClientTeamsController {
 	   }
 	   def commentsList = clientTeamsService.getCommentsFromRemainderList( session )
 	   if ( search != null ) {
-		   def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
-		   assetItem = AssetEntity.find( query.toString(), [ search : search ] )
+			def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
+			assetItem = AssetEntity.find( query.toString(), [ search : search ] )
+
 		   if ( assetItem == null ) {
 			   flash.message += message ( code : "<li>Asset Tag number '${search}' was not located</li>" )
 			   if ( checkHome ) {
@@ -503,9 +504,9 @@ class ClientTeamsController {
 					   def assetCableMapList = AssetCableMap.findAllByAssetFrom( assetItem )
 					   def currRoomRackAssets = []
 					   if(assetItem.roomSource){
-						   currRoomRackAssets = AssetEntity.findAllByRoomSourceAndSourceRack(assetItem.roomSource,assetItem.sourceRack)
-					   }else{
-						   currRoomRackAssets = AssetEntity.findAllByRoomTargetAndTargetRack(assetItem.roomTarget,assetItem.targetRack)
+							currRoomRackAssets = AssetEntity.findAll("from AssetEntity ae where ae.roomSource.id = ${assetItem.roomSource.id} AND ae.rackSource.tag = '${assetItem.sourceRack}'")
+						}else{
+							currRoomRackAssets = AssetEntity.findAll("from AssetEntity ae where ae.roomTarget.id = ${assetItem.roomTarget.id} AND ae.rackTarget.tag = '${assetItem.targetRack}'")
 					   }
 					   def dependencyStatus = AssetCableStatus.list
 					   def assetCablingDetails = []

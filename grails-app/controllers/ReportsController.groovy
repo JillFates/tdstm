@@ -177,22 +177,22 @@ class ReportsController {
     			}else {
     				//source Location selected
     				if(location == "source"){
-    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    											"asset.sourceTeamMt != null order By asset.sourceTeamMt,asset.moveBundle,"+
-                    											"asset.assetName,asset.assetTag")
+    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id "+
+                    											" order By asset.moveBundle,"+
+                    											" asset.assetName,asset.assetTag")
     				}
     				//target Location selected
     				else if(location == "target"){
-    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    												"asset.targetTeamMt != null order By asset.targetTeamMt,asset.moveBundle,"+
-                    												"asset.assetName,asset.assetTag")
+    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id "+
+                    												" order By asset.moveBundle,"+
+                    												" asset.assetName,asset.assetTag")
     				}
     				//Location Both selected
     				else {
-    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    										"asset.sourceTeamMt != null order By asset.sourceTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
-    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id and "+
-                    										"asset.targetTeamMt != null order By asset.targetTeamMt,asset.moveBundle,asset.assetName,asset.assetTag")
+    					assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id "+
+                    										" order By asset.moveBundle,asset.assetName,asset.assetTag")
+    					targetAssetEntitylist = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id "+
+                    										" order By asset.moveBundle,asset.assetName,asset.assetTag")
     				}
     			}
     		}
@@ -246,18 +246,12 @@ class ReportsController {
     			if(asset.moveBundle != null) {
     				bundleInstance = MoveBundle.findById(asset.moveBundle.id)
     			}
-    			def teamPartyGroup 
-    			def projectTeamLocationInstance
-    			if( asset.sourceTeamMt != null ) {
-    				teamPartyGroup = PartyGroup.findById(asset.sourceTeamMt.id)
-    				projectTeamLocationInstance = ProjectTeam.findById(asset.sourceTeamMt.id)
-    			}
+
     			def assetCommentList = AssetComment.findAllByAssetEntity(asset)
     			def assetCommentString =""
     			assetCommentList.each { assetComment ->
     				assetCommentString = assetCommentString + assetComment.comment +"\n"
    			 	}
-    			def teamMembers = partyRelationshipService.getTeamMemberNames(asset.sourceTeamMt?.id)
     			def rackPos = (asset.sourceRack ? asset.sourceRack : "")+"/"+ (asset.sourceRackPosition ? asset.sourceRackPosition : "")
    				if (rackPos == "/"){
    					rackPos = ""
@@ -265,12 +259,10 @@ class ReportsController {
    			 	reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, 
    			 	                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    			 	                "position":asset.sourceRackPosition, 
-   			 	                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(source/ unracking)", 
-   			 	                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.sourceTeamMt?.id, 
+   			 	                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,
    			 	                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    			 	                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
    			 	                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name,
-   			 	                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    			 	                'location':"Source Team", 'rack':"SourceRack",'rackPos':"SourceRackPosition",'truck':asset.truck, 
    			 	                'room':asset.sourceRoom,  'instructions':assetCommentString, 'sourcetargetLoc':"s",
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
@@ -281,14 +273,6 @@ class ReportsController {
                 if(asset.moveBundle != null) {
                     bundleInstance = MoveBundle.findById(asset.moveBundle.id)
                 }
-   				def teamPartyGroup 
-   				def projectTeamLocationInstance
-   				def teamMembers
-   				if(asset.targetTeamMt != null ) {
-   					teamPartyGroup = PartyGroup.findById(asset.targetTeamMt.id)
-   					projectTeamLocationInstance = ProjectTeam.findById(asset.targetTeamMt.id)
-   					teamMembers = partyRelationshipService.getTeamMemberNames(asset.targetTeamMt.id) 
-   				}
    				def assetCommentList = AssetComment.findAllByAssetEntity(asset)
    				def assetCommentString =""
    				assetCommentList.each { assetComment ->
@@ -305,12 +289,10 @@ class ReportsController {
    				reportFields <<['assetName':asset.assetName , 'assetTag':asset.assetTag, "assetType":asset.assetType, 
    				                "manufacturer":asset.manufacturer?.toString(), "model":asset.model?.toString(), "sourceTargetrack":rackPos, 
    				                "position":asset.targetRackPosition, 
-   				                "sourceTargetPos":(projectTeamLocationInstance?.currentLocation ? projectTeamLocationInstance?.currentLocation : "") +"(target/ reracking)", 
-   				                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,"source_team_id":asset?.targetTeamMt?.id, 
+   				                "usize":asset?.model?.usize, "cart":asset.cart, "shelf":asset.shelf,
    				                "move_bundle_id":asset?.moveBundle?.id, "clientName":projectInstance?.client?.name,
    				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
    				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
-   				                'teamName':teamPartyGroup?.name +"-"+teamMembers, 'teamMembers':teamMembers,
    				                'location':"Target Team", 'rack':"TargetRack",'rackPos':"TargetRackPosition",
    				                'truck':(asset.truck ? asset.truck : "")+"\n"+cartShelf,'room':asset.targetRoom,'instructions':assetCommentString,'sourcetargetLoc':"t",
 								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
@@ -399,8 +381,6 @@ class ReportsController {
        				}
        				
        				// sort options for reportFields
-       				def teamTagSort = (asset.sourceTeamMt ? asset.sourceTeamMt?.name : "") +" "+ (asset.assetTag ? asset.assetTag : "")
-       				
        				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset?.model?.usize ? asset?.model?.usize : "")
        				
        				def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
@@ -408,14 +388,14 @@ class ReportsController {
        				def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
        				reportFields <<['assetName':asset.assetName , "model":asset.model?.toString(), 
        				                "sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
-       				                "cart":cartShelf, "shelf":asset.shelf,"source_team_id":teamPartyGroup?.id, 
-       				                "move_bundle_id":asset?.moveBundle?.id,dlocation:asset.sourceLocation,
+       				                "cart":cartShelf, "shelf":asset.shelf, "source_team_id":teamPartyGroup?.id, 
+       				                "move_bundle_id":asset?.moveBundle?.id,dlocation:asset.rackSource?asset.rackSource.location:'',
        				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
        				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
        				                'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
-       				                'teamMembers':teamMembers,'location':"Source Team", 'truck':asset.truck, 
-       				                'room':asset.sourceRoom,'moveTeam':asset?.sourceTeamMt?.name, 'instructions':assetCommentString,
-       				                'teamTagSort':teamTagSort, 'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
+       				                'location':"Source Team", 'truck':asset.truck, 
+       				                'room':asset.sourceRoom, 'instructions':assetCommentString,
+       				                'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
        				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
 									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
        			}
@@ -1155,6 +1135,7 @@ class ReportsController {
 				book.write()
 				book.close()
 			} catch( Exception ex ) {
+        log.error "Exception occurred while exporting cabling data " + ex
 				flash.message = "Exception occurred while exporting data"
 				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
 				return;

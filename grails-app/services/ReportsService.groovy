@@ -184,11 +184,6 @@ class ReportsService {
 		def assetList = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(moveBundles,['Application','Database','Files'])
 		
 		def notAssignedToTeam = []
-		assetList.each{assetEntity->
-			if(assetEntity['sourceTeamMt']?.teamCode ==null || assetEntity['targetTeamMt']?.teamCode==null){
-				notAssignedToTeam << [assetEntity.assetName]
-			}
-		}
 		
 		def teamAssignment = ""
 		if(notAssignedToTeam.size()>0){
@@ -293,7 +288,7 @@ class ReportsService {
 		
 		def missingRacks = AssetEntity.findAll("from AssetEntity asset where  asset.project.id=${currProj} and asset.assetType not in (:type) \
                             and asset.moveBundle.moveEvent = :event and \
-                            (sourceRack='' or targetRack='' or sourceRackPosition = '' or targetRackPosition = '') \
+                            (rackSource is null or rackTarget is null or sourceRackPosition = '' or targetRackPosition = '') \
                             group by asset.assetName",[type:['Application','Files','Database','VM'], event:moveEventInstance]).assetName
 		
 		String missedRacks = ""

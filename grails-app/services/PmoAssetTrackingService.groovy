@@ -587,19 +587,14 @@ class PmoAssetTrackingService {
 		def offset = params.offset
 		def query = new StringBuffer(
 			"""SELECT * FROM( SELECT ae.asset_entity_id AS id, ae.asset_name AS assetName,ae.short_name AS shortName,ae.asset_tag AS assetTag,
-			ae.asset_type AS assetType,mf.name AS manufacturer, m.name AS model, ae.application, ae.app_owner AS appOwner, ae.app_sme AS appSme,
+			ae.asset_type AS assetType,mf.name AS manufacturer, m.name AS model, ae.application, CONCAT(CONCAT(person.first_name, ' '), IFNULL(person.last_name,'')) AS appOwner, ae.app_sme AS appSme,
 			ae.ip_address AS ipAddress, ae.hinfo AS os, ae.serial_number AS serialNumber,m.usize, ae.rail_type AS railType, ae.project_id AS projectId,
-			ae.source_location AS sourceLocation, ae.source_room AS sourceRoom, ae.source_rack AS sourceRack, ae.source_rack_position AS sourceRackPosition,
-		    ae.target_location AS targetLocation, ae.target_room AS targetRoom, ae.target_rack AS targetRack, ae.target_rack_position AS targetRackPosition,
+			rack_source.location AS sourceLocation, ae.source_room AS sourceRoom, rack_source.tag AS sourceRack, ae.source_rack_position AS sourceRackPosition,
+		    rack_target.location AS targetLocation, ae.target_room AS targetRoom, rack_target.tag AS targetRack, ae.target_rack_position AS targetRackPosition,
 			mb.name AS moveBundle, ae.truck,
 			ae.plan_status AS planStatus, ae.priority, ae.cart, ae.shelf, 
-			sptMt.team_code AS sourceTeamMt, tptMt.team_code AS targetTeamMt,
-			sptLog.team_code AS sourceTeamLog, tptLog.team_code AS targetTeamLog,
-			sptSa.team_code AS sourceTeamSa, tptSa.team_code AS targetTeamSa,
-			sptDba.team_code AS sourceTeamDba, tptDba.team_code AS targetTeamDba,
 			MAX(CAST(at.state_to AS UNSIGNED INTEGER)) AS maxstate,  
 			ae.custom1, ae.custom2, ae.custom3,	ae.custom4, ae.custom5, ae.custom6, ae.custom7, ae.custom8,
-			ae.current_status AS currentStatus,
 			IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,""")
 		
 		if (project.runbookOn==1) {
@@ -611,19 +606,14 @@ class PmoAssetTrackingService {
 		query.append(""" FROM asset_entity ae
 			JOIN eav_entity eav ON eav.entity_id=ae.asset_entity_id
 			LEFT JOIN move_bundle mb ON ae.move_bundle_id = mb.move_bundle_id
-			LEFT JOIN project_team sptMt ON ae.source_team_id = sptMt.project_team_id
-            LEFT JOIN project_team tptMt ON ae.target_team_id = tptMt.project_team_id
-            LEFT JOIN project_team sptLog ON ae.source_team_id = sptLog.project_team_id
-            LEFT JOIN project_team tptLog ON ae.target_team_id = tptLog.project_team_id
-            LEFT JOIN project_team sptSa ON ae.source_team_id = sptSa.project_team_id
-            LEFT JOIN project_team tptSa ON ae.target_team_id = tptSa.project_team_id
-            LEFT JOIN project_team sptDba ON ae.source_team_id = sptDba.project_team_id
-            LEFT JOIN project_team tptDba ON ae.target_team_id = tptDba.project_team_id
 			LEFT JOIN model m ON ae.model_id = m.model_id
 			LEFT JOIN manufacturer mf ON ae.manufacturer_id = mf.manufacturer_id
             LEFT JOIN asset_transition at ON at.asset_entity_id = ae.asset_entity_id and at.voided = 0 and at.type='process'
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+			LEFT OUTER JOIN person ON person.person_id=ae.app_owner_id
+			LEFT OUTER JOIN rack rack_source ON rack_source.rack_id=ae.rack_source_id
+			LEFT OUTER JOIN rack rack_target ON rack_target.rack_id=ae.rack_target_id
 			""")
 		if (project.runbookOn==1) {
 			query.append( 'LEFT JOIN asset_comment task ON task.asset_entity_id = ae.asset_entity_id')
@@ -717,20 +707,17 @@ class PmoAssetTrackingService {
 		def offset = params.offset
 		def sortby = params.sort
         def order = params.order
+
 		// The SQL has a nested SELECT in order to provide ability to tack on LIMIT and ORDER criteria after the fact
 		def query = new StringBuffer("""SELECT * FROM (SELECT * FROM( select ae.asset_entity_id as id, ae.asset_name as assetName,ae.short_name as shortName,ae.asset_tag as assetTag,
-				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, ae.app_owner as appOwner, ae.app_sme as appSme,
+				ae.asset_type as assetType,mf.name as manufacturer, m.name as model, ae.application, CONCAT(CONCAT(person.first_name, ' '), IFNULL(person.last_name,'')) as appOwner, ae.app_sme as appSme,
 				ae.ip_address as ipAddress, ae.hinfo as os, ae.serial_number as serialNumber,m.usize, ae.rail_type as railType, ae.project_id AS projectId,
-				ae.source_location as sourceLocation, ae.source_room as sourceRoom, ae.source_rack as sourceRack, ae.source_rack_position as sourceRackPosition,
-				ae.target_location as targetLocation, ae.target_room as targetRoom, ae.target_rack as targetRack, ae.target_rack_position as targetRackPosition,
+				rack_source.location as sourceLocation, ae.source_room as sourceRoom, rack_source.tag as sourceRack, ae.source_rack_position as sourceRackPosition,
+				rack_target.location as targetLocation, ae.target_room as targetRoom, rack_target.tag as targetRack, ae.target_rack_position as targetRackPosition,
 			    mb.name as moveBundle, ae.truck,
 				ae.plan_status as planStatus, ae.priority, ae.cart, ae.shelf, 
-				sptMt.team_code as sourceTeamMt, tptMt.team_code as targetTeamMt,
-				sptLog.team_code as sourceTeamLog, tptLog.team_code as targetTeamLog,
-				sptSa.team_code as sourceTeamSa, tptSa.team_code as targetTeamSa,
-				sptDba.team_code as sourceTeamDba, tptDba.team_code as targetTeamDba,
 				max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate, ae.custom1 as custom1, ae.custom2 as custom2,ae.custom3 as custom3,
-				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8, ae.current_status as currentStatus,
+				ae.custom3 as custom4,ae.custom5 as custom5,ae.custom6 as custom6,ae.custom7 as custom7,ae.custom8 as custom8,
 			""")
 			
 		if (project.runbookOn) {
@@ -742,17 +729,13 @@ class PmoAssetTrackingService {
 		query.append(""" FROM asset_entity ae
 				JOIN eav_entity eav ON eav.entity_id=ae.asset_entity_id
 				LEFT JOIN move_bundle mb ON (ae.move_bundle_id = mb.move_bundle_id )
-				LEFT JOIN project_team sptMt ON (ae.source_team_id = sptMt.project_team_id )
-				LEFT JOIN project_team tptMt ON ae.target_team_id = tptMt.project_team_id
-                LEFT JOIN project_team sptLog ON (ae.source_team_id = sptLog.project_team_id )
-                LEFT JOIN project_team tptLog ON (ae.target_team_id = tptLog.project_team_id )
-                LEFT JOIN project_team sptSa ON (ae.source_team_id = sptSa.project_team_id )
-                LEFT JOIN project_team tptSa ON (ae.target_team_id = tptSa.project_team_id )
-                LEFT JOIN project_team sptDba ON (ae.source_team_id = sptDba.project_team_id )
-                LEFT JOIN project_team tptDba ON (ae.target_team_id = tptDba.project_team_id )
 				LEFT JOIN model m ON (ae.model_id = m.model_id )
 				LEFT JOIN manufacturer mf ON (ae.manufacturer_id = mf.manufacturer_id )
-                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id AND at.voided = 0 AND at.type='process')""")
+                LEFT JOIN asset_transition at ON (at.asset_entity_id = ae.asset_entity_id AND at.voided = 0 AND at.type='process')
+                LEFT OUTER JOIN person ON person.person_id=ae.app_owner_id
+				LEFT OUTER JOIN rack rack_source ON rack_source.rack_id=ae.rack_source_id
+				LEFT OUTER JOIN rack rack_target ON rack_target.rack_id=ae.rack_target_id
+                """)
 
 		if (project.runbookOn==1) {
 			query.append( 'LEFT JOIN asset_comment task ON task.asset_entity_id = ae.asset_entity_id ')

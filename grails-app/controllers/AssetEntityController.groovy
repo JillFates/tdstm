@@ -1206,6 +1206,12 @@ class AssetEntityController {
 		//TODO:need to move the code to AssetEntityService.
 		def temp= ""
 		def joinQuery= ""
+
+		if (params.sourceRack != null) {
+			temp +="sourceRack.tag AS sourceRack,"
+			joinQuery +="\n LEFT OUTER JOIN rack sourceRack ON sourceRack.rack_id=ae.rack_source_id \n"
+		}
+
 		assetPref.each { key,value->
 			switch (value) {
 				case 'appOwner':
@@ -1262,17 +1268,22 @@ class AssetEntityController {
 					temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
 					joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
 					break
+				case 'targetRack':
+					temp +="targetRack.tag AS targetRack,"
+					joinQuery +="\n LEFT OUTER JOIN rack targetRack ON targetRack.rack_id=ae.rack_target_id \n"
+					break;
 				case 'validation':
 					break;
 				default:
-					temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
+					if (!['targetLocation', 'targetRack'].contains(value))
+						temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
 			}
 		}
 		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		def query = new StringBuffer(""" 
 			SELECT * FROM ( 
-				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model, ae.source_location AS sourceLocation, 
-				ae.source_rack AS sourceRack, IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
+				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model,  
+				IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
 		if (temp)
 			query.append(temp)
 			
@@ -1389,7 +1400,6 @@ class AssetEntityController {
 			
 		def results = assetList?.collect {
 			def commentType = it.commentType
-			def name = assetEntityService.getEscapedName(AssetEntity.get(it.assetId))
 			[ 	
 				cell: [ '', it.assetName, (it.assetType ?: ''), it.model, 
 					it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
@@ -3151,17 +3161,6 @@ class AssetEntityController {
 			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
 			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
 		}
-		if (!params.SourceRoom)
-			params.roomSource=null
-			
-		if (!params.TargetRoom)
-			params.roomTarget=null
-		
-		if (!params.sourceRack)
-			params.rackSource=null
-		
-		if (!params.TargetRack)
-			params.rackTarget=null
 		
 		def project = securityService.getUserCurrentProject()
 		
@@ -4797,16 +4796,16 @@ class AssetEntityController {
 		def sourceBladeChassis = params.sourceBladeChassis ? AssetEntity.findByAssetTagAndProject( params.sourceBladeChassis, project ) : null
 		def targetBladeChassis = params.targetBladeChassis ? AssetEntity.findByAssetTagAndProject( params.targetBladeChassis, project ) : null
 		params.sourceLocation = sourceBladeChassis?.sourceLocation
-		params.sourceRoom = sourceBladeChassis?.sourceRoom
-		params.sourceRack = sourceBladeChassis?.sourceRack
-		params.roomSource = sourceBladeChassis?.roomSource
-		params.rackSource = sourceBladeChassis?.rackSource
+		//params.sourceRoom = sourceBladeChassis?.sourceRoom
+		//params.sourceRack = sourceBladeChassis?.sourceRack
+		//params.roomSource = sourceBladeChassis?.roomSource
+		//params.rackSource = sourceBladeChassis?.rackSource
 		
 		params.targetLocation = targetBladeChassis?.targetLocation
-		params.targetRoom = targetBladeChassis?.targetRoom
-		params.targetRack = sourceBladeChassis?.targetRack
-		params.roomTarget = sourceBladeChassis?.roomTarget
-		params.rackTarget = sourceBladeChassis?.rackTarget
+		//params.targetRoom = targetBladeChassis?.targetRoom
+		//params.targetRack = sourceBladeChassis?.targetRack
+		//params.roomTarget = sourceBladeChassis?.roomTarget
+		//params.rackTarget = sourceBladeChassis?.rackTarget
 	}
 	/**
 	 * This method is used to sort AssetList in dependencyConsole

@@ -1005,31 +1005,6 @@ class ClientConsoleController {
         return changedClass
 	}
 	/*
-	*  Return the list of current status Transitions 
-	*/
-	def getCurrentStatusOptions = {
-		def moveEventId = params.moveEventId
-		def columnName = "currentStatus"
-		def moveEvent = MoveEvent.get( moveEventId )
-		def moveBundlesList = MoveBundle.findAllByMoveEvent( moveEvent )
-		def bundles = moveBundlesList.id.toString().replace("[","(").replace("]",")")
-		def moveBundleInstance
-		def workflowCode    
-		
-		if (params.bundle == "all"){
-		    workflowCode = moveEvent.project.workflowCode
-		} else {
-			moveBundleInstance = MoveBundle.get(params.bundle) 
-			workflowCode = moveBundleInstance.workflowCode
-		}
-		
-		def tempList = AssetEntity.executeQuery("""SELECT DISTINCT ae.${columnName} , count(ae.id) FROM AssetEntity ae
-			WHERE  ae.moveBundle.id IN ${bundles} GROUP BY ae.${columnName} ORDER BY ae.${columnName}""")
-		
-		def columnList = pmoAssetTrackingService.splitFilterExpansion( tempList, columnName, workflowCode )
-		render columnList as JSON
-	}
-	/*
 	 * Add a user preference "BULK_WARNING" with a time stamp+24hrs. If the user re-enters bulk edit mode, and BulkWarning time is > now, don't show the popup warning.
 	 */
 	def setBulkWarning = {

@@ -645,9 +645,9 @@ class AssetEntityService {
 				cablingSheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-2].cableComment?:"" )) )
 				cablingSheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-2].cableColor?:"" )) )
 				if(assetCablesList[r-2].assetFrom.sourceRoom){
-					cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.sourceLocation+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack )) )
+					cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.rackSource?.location+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack )) )
 				}else if(assetCablesList[r-2].assetFrom.targetRoom){
-					cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.targetLocation+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack )) )
+					cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.rackTarget?.location+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack )) )
 				}else{
 					cablingSheet.addCell( new Label( 9, r, '') )
 				}

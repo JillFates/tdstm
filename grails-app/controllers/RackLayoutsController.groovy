@@ -402,9 +402,9 @@ class RackLayoutsController {
 					def bladeLayoutMap = ['asset':it, 'permission':rackLayoutsHasPermission, 'hideIcons':hideIcons, 'redirectTo':redirectTo ,
 											'rackId':rackId, 'commit':commit, 'forWhom':forWhom, "bundle": paramsMap.bundle]
 					if(location == 1)
-						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, sourceRoom: assetEntity.sourceRoom, sourceRack: assetEntity.sourceRack ).findAll{it.assetType != 'Blade'}
+						overlappedAssets = AssetEntity.findAll("FROM AssetEntity WHERE project=${assetEntity.project.id} AND assetTag='${tagValue}' AND sourceRoom='${assetEntity.sourceRoom}' AND rackSource.tag = '${assetEntity.sourceRack}' AND assetType <> 'Blade'")
 					else 
-						overlappedAssets = AssetEntity.findAllWhere( project:assetEntity.project, assetTag : tagValue, targetRoom: assetEntity.targetRoom, targetRack: assetEntity.targetRack ).findAll{it.assetType != 'Blade'}
+						overlappedAssets = AssetEntity.findAll("FROM AssetEntity WHERE project=${assetEntity.project.id} AND assetTag='${tagValue}' AND targetRoom='${assetEntity.targetRoom}' AND rackTarget.tag = '${assetEntity.targetRack}' AND assetType <> 'Blade'")
 					if(overlappedAssets.size() > 1) {
 						overlappedAssets.each{ overlapAsset ->
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"

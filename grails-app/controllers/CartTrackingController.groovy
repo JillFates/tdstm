@@ -150,7 +150,7 @@ class CartTrackingController {
 		def allAssetsOnCart = []
 		def assetsOnCart = []
 		def query = """select ae.asset_entity_id as id,ae.asset_tag as assetTag, ae.asset_name as assetName,
-					mf.name as manufacturer, m.name as model, ae.source_team_id as source,
+					mf.name as manufacturer, m.name as model, 
 					max(cast(at.state_to as UNSIGNED INTEGER)) as maxstate 
 					from asset_entity ae left join model m on (ae.model_id = m.model_id )
 					left join manufacturer mf on (ae.manufacturer_id = mf.manufacturer_id )
@@ -169,10 +169,7 @@ class CartTrackingController {
 				currentState = stateEngineService.getStateLabel(projectInstance.workflowCode,projectAssetMap.currentStateId)
 			}
 			def team = ""
-			if(it.source){
-				team = ProjectTeam.findById( it.source ).teamCode
-			}
-			
+		
 			if(it.maxstate >= cleanedId && it.maxstate < stagedId){
 				checked = true
 			} else if(it.maxstate < cleanedId ){
@@ -208,9 +205,9 @@ class CartTrackingController {
 													"from asset_transition at where at.asset_entity_id = $assetEntity.id "+
 													"and at.voided = 0 and at.type = 'process' group by at.asset_entity_id")
 		def onTruckId = stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,"OnTruck")
-		assetDetails<<[assetEntity:assetEntity,team:assetEntity.sourceTeamMt? assetEntity.sourceTeamMt.teamCode : "", 
+		assetDetails<<[assetEntity:assetEntity,
 		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId, 
-		               model : assetEntity.model ? assetEntity.model.modelName: "", manufacturer : assetEntity.manufacturer ? it.manufacturer : ""  ]
+		               model : assetEntity.model ? assetEntity.model.modelName: "", manufacturer : assetEntity.manufacturer ? assetEntity.manufacturer : ""  ]
 		render assetDetails as JSON
 	}
 	/*---------------------------------------------------------

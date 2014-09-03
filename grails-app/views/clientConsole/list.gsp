@@ -509,7 +509,6 @@
 		if(length > 0){
 			var moveEventId = $("#moveEventId").val();
 			var moveBundleName = $("#moveBundleId").val();
-			${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEventId +\'&bundle=\'+ moveBundleName ', onComplete:'updateCurrentStatusOptions(e);' )}
 			if($("#column1Attribute").val() == 'currentStatus'){ 
 				$("#"+assetTransitions[0].id+"_column1").html(assetTransitions[0].cssClass);
 			}
@@ -533,33 +532,7 @@
 			doAjaxCall();
 		}
 	}
-	/*
-	*	Update the current Status options when transition done through the Bulk edit 
-	*/
-	function updateCurrentStatusOptions( e ){
-		var options = eval('(' + e.responseText + ')');
-		var optionsString = "<option value='' selected='selected'>All</option>"
-		if( options.length > 0 ){
-			for(i=0; i<options.length; i++ ){
-				var option = options[i] 
-				var value = option.id ? option.id : 'blank'
-				var text = option.key ? option.key : 'blank'
-				optionsString+= "<option value='"+value+"'>"+ text +"("+option.value+")</option>"	
-			}
-		}
-		if($("#column1Attribute").val() == 'currentStatus'){ 
-			$("#column1Id").html(optionsString)
-		}
-		if($("#column2Attribute").val() == 'currentStatus'){ 
-			$("#column2Id").html(optionsString)
-		}
-		if($("#column3Attribute").val() == 'currentStatus'){ 
-			$("#column3Id").html(optionsString)
-		}
-		if($("#column4Attribute").val() == 'currentStatus'){ 
-			$("#column4Id").html(optionsString)
-		}
-	}
+
 	function editAssetDialog() {
 		timedUpdate('never')
 		$("#showDialog").dialog("close")
@@ -679,7 +652,6 @@
 		var order = $("#orderById").val()
 		var lastPoolTime = $("#lastPoolTimeId").val();
 		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&lastPoolTime=\'+lastPoolTime+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
-		${remoteFunction(action:'getCurrentStatusOptions', params:'\'moveEventId=\' + moveEvent +\'&bundle=\'+ moveBundle ', onComplete:'updateCurrentStatusOptions(e);' )}
 		timedUpdate($("#selectTimedId").val())
 	}
 	var doUpdate = true

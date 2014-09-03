@@ -702,9 +702,9 @@ class MoveTechController {
 							def assetCableMapList = AssetCableMap.findAllByAssetFrom( assetItem )
 							def currRoomRackAssets = []
 							if(assetItem.roomSource){
-								currRoomRackAssets = AssetEntity.findAllByRoomSourceAndSourceRack(assetItem.roomSource,assetItem.sourceRack)
+								currRoomRackAssets = AssetEntity.findAll("from AssetEntity ae where ae.roomSource.id = ${assetItem.roomSource.id} AND ae.rackSource.tag = '${assetItem.sourceRack}'")
 							}else{
-								currRoomRackAssets = AssetEntity.findAllByRoomTargetAndTargetRack(assetItem.roomTarget,assetItem.targetRack)
+								currRoomRackAssets = AssetEntity.findAll("from AssetEntity ae where ae.roomTarget.id = ${assetItem.roomTarget.id} AND ae.rackTarget.tag = '${assetItem.targetRack}'")
 							}
 							def dependencyStatus = AssetCableStatus.list
 							def assetCablingDetails = []

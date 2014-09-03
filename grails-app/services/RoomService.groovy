@@ -136,7 +136,7 @@ class RoomService {
 				racks.each { rack -> 
 					rack.sourceAssets.each { assetEntity ->
 						if (! msg) {
-							assetEntity.sourceRack = rack.tag
+							//assetEntity.sourceRack = rack.tag
 							assetEntity.sourceRoom = roomInstance.roomName
 							assetEntity.sourceLocation =  roomInstance.location
 							if (! assetEntity.validate() || ! assetEntity.save() ) {
@@ -149,7 +149,7 @@ class RoomService {
 					if (! msg) {
 						rack.targetAssets.each{ assetEntity ->
 							if (! msg) {
-								assetEntity.targetRack = rack.tag
+								//assetEntity.targetRack = rack.tag
 								assetEntity.targetRoom = roomInstance.roomName
 								assetEntity.targetLocation =  roomInstance.location
 								if (! assetEntity.validate() || ! assetEntity.save() ) {

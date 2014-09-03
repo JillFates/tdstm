@@ -48,8 +48,6 @@ $(document).ready(function() {
 								<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
 								<td class="label ${config.sourceLocation}  ${highlightMap.sourceLocation?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
-								<td class="valueNW ${config.sourceLocation}">${assetEntity.sourceLocation}</td>
-								<td class="valueNW ${config.targetLocation}">${assetEntity.targetLocation}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.manufacturer}  ${highlightMap.manufacturer?:''}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>

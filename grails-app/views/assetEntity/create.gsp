@@ -4,9 +4,7 @@
 	$("#asset_assetName").val($('#gs_assetName').val())
 	$("#asset_assetType").val($('#gs_assetType').val())
 	$("#asset_model").val($('#gs_model').val())
-	$("#asset_sourceLocation").val($('#gs_sourceLocation').val())
 	$("#asset_sourceRack").val($('#gs_sourceRack').val())
-	$("#asset_targetLocation").val($('#gs_targetLocation').val())
 	$("#asset_targetRack").val($('#gs_targetRack').val())
 	$("#asset_serialNumber").val($('#gs_serialNumber').val())
 	$("#asset_planStatus").val($('#gs_planStatus').val())
@@ -46,9 +44,7 @@
 	<input type="hidden" id="asset_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="asset_assetType" name="assetTypeFilter" value="" />
 	<input type="hidden" id="asset_model" name="modelFilter" value="" />
-	<input type="hidden" id="asset_sourceLocation" name="sourceLocationFilter" value="" />
 	<input type="hidden" id="asset_sourceRack" name="sourceRackFilter" value="" />
-	<input type="hidden" id="asset_targetLocation" name="targetLocationFilter" value="" />
 	<input type="hidden" id="asset_targetRack" name="targetRackFilter" value="" />
 	<input type="hidden" id="asset_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" id="asset_serialNumber" name="serialNumberFilter" value="" />
@@ -77,30 +73,13 @@
 								<td><g:select from="${assetTypeOptions}" class="${config.assetType} assetSelect" id="assetTypeCreateId" name="assetType" value="${assetType}" onChange="selectManufacturer(this.value,'Create')" tabindex="12" /></td>
 								<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td><g:select id="environment" class="${config.environment}" name="environment" from="${environmentOptions}" value="${assetEntityInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32"></g:select></td>
-								<td class="label ${config.sourceLocation} ${highlightMap.sourceLocation?:''}" nowrap="nowrap"><label for="sourceLocationId">Room</label></td>
 								<td>
-									<span class="useRoomS">
-									    <g:select from="${rooms.findAll{it.source==1}}" name="roomSourceId" class="${config.sourceLocation} assetSelect roomSelectEditS"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
-									    	noSelection="${[0:' Please Select...']}" tabindex="31" onchange="toogleRoom(this.value, 'S');getRacksPerRoom(this.value, 'S', '${assetEntityInstance.id}', 'create');"/>
-									</span>
-									<span class="newRoomS">
-										<input type="text" id="sourceLocationId" class="${config.sourceLocation}"
-											name="sourceLocation" value="${assetEntityInstance.sourceLocation}" size=10 tabindex="31" />
-									</span>
 									<span class="newRoomS">
 										<input type="text" id="sourceRoomId" class="${config.sourceRoom}"
 											name="sourceRoom" value="${assetEntityInstance.sourceRoom}" size=10 tabindex="32" />
 									</span>
 								</td>
 								<td>
-									<span class="useRoomT">
-									    <g:select from="${rooms.findAll{it.source==0}}" name="roomTargetId" class="${config.targetLocation} assetSelect roomSelectEditT"  optionKey="id" optionValue="${{it.location+' / '+it.roomName}}"
-									    	noSelection="${[0:' Please Select...']}"  tabindex="31" onchange="toogleRoom(this.value, 'T');getRacksPerRoom(this.value, 'T', '${assetEntityInstance.id}', 'create');"/>
-									</span>
-									<span class="newRoomT">
-										<input type="text" id="targetLocationId" class="${config.targetLocation}"
-											name="targetLocation" value="${assetEntityInstance.targetLocation}" size=10 tabindex="41" />
-									</span>
 									<span class="newRoomT">
 										<input type="text" id="targetRoomId" class="${config.targetRoom}"
 											name="targetRoom" value="${assetEntityInstance.targetRoom}" size=10 tabindex="42" />
