@@ -3950,6 +3950,29 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				}
 			}
 		
+			/** 
+			 * A helper closure used below to manipulate the 'where' and 'map' variables to add additional
+			 * WHERE expressions based on the properties passed in the filter
+			 * @param String[] - list of the properties to examine
+			 */
+			def addJoinWhereConditions = { alias, fieldMap ->
+				log.debug "addJoinWhereConditions: Building WHERE - alias:$alias, fieldMap:$fieldMap, filter=${filter}"
+				fieldMap.each() { propertyName, columnName ->
+					if (filter?.asset?.containsKey(propertyName)) {
+						log.debug("addJoinWhereConditions: $propertyName/$columnName matched")						
+						sm = SqlUtil.whereExpression("$alias.$columnName", filter.asset[propertyName], propertyName)
+						if (sm) {
+							where = SqlUtil.appendToWhere(where, sm.sql)
+							if (sm.param) {
+								map[code] = sm.param
+							}								
+						} else {
+							log.error "SqlUtil.whereExpression unable to resolve '$propertyName' expression [${filter.asset[propertyName]}]"
+						}
+					}
+				}
+			}
+		
 			// Add WHERE clauses based on the following properties being present in the filter.asset (Common across all Asset Classes)
 			addWhereConditions( commonFilterProperties )
 		
@@ -3991,10 +4014,34 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					
 						// Add any devices specific attribute filters
 						addWhereConditions(['supportType', 'environment', 'department', 'description', 'costCenter', 'maintContract', 'maintExpDate', 'retireDate',
-							'truck', 'cart', 'shelf', 'sourceLocation', 'sourceRack', 'sourceRoom', 'targetLocation', 'targetRack', 'targetRoom',
+							'truck', 'cart', 'shelf', 
 							'os', 'serialNumber', 'assetTag', 'usize', 'ipAddress' ] )
 
-						sql = "from AssetEntity a where a.moveBundle.id in (:bIds)" + ( where ? " and $where" : '')
+						// Deal with 'sourceLocation', 'sourceRack', 'sourceRoom', 'targetLocation', 'targetRack', 'targetRoom', since these are joins
+
+						def sb = new StringBuffer('FROM AssetEntity a ')
+
+						// Do joins to the Room and Rack domains as necessary and add the appropriate WHERE
+						if (filter?.asset?.find {['sourceLocation', 'sourceRoom'].contains(it)} ) {
+							sb.append('LEFT OUTER JOIN a.roomSource as roomSrc ')
+							addJoinWhereConditions('roomSrc', ['sourceLocation':'location', 'sourceRoom':'roomName'])
+						}
+						if (filter?.asset?.find { it == 'sourceRack' } ) {
+							sb.append('LEFT OUTER JOIN a.rackSource as rackSrc ')
+							addJoinWhereConditions('rackSrc', ['sourceRack':'tag'])
+						}
+						if (filter?.asset?.find {['targetLocation', 'targetRoom'].contains(it)} ) {
+							sb.append('LEFT OUTER JOIN a.roomtarget as roomTgt ')
+							addJoinWhereConditions('roomTgt', ['targetLocation':'location', 'targetRoom':'roomName'])
+						}
+						if (filter?.asset?.find { it == 'targetRack' } ) {
+							sb.append('LEFT OUTER JOIN a.racktarget as rackTgt ')
+							addJoinWhereConditions('rackTgt', ['sourceRack':'tag'])
+						}
+
+						sb.append(" WHERE a.moveBundle.id IN (:bIds) ${ ( where ? ' and ' + where : '')}")
+						sql = sb.toString()
+
 						log.debug "findAllAssetsWithFilter: DEVICE sql=$sql, map=$map"
 						assets = AssetEntity.findAll(sql, map)
 						break;
