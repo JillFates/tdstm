@@ -108,12 +108,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String os
 	Integer usize
 	
-	String sourceRoom
 	Integer sourceRackPosition
 	String sourceBladeChassis
 	Integer sourceBladePosition
 
-	String targetRoom
 	Integer targetRackPosition
 	String targetBladeChassis
 	Integer targetBladePosition

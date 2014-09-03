@@ -48,5 +48,6 @@ databaseChangeLog = {
 	include file: '20140814-clean-up-orphaned-commentNotes.groovy'
 	include file: '20140819-change-assetentity_assetname-notnull.groovy'
 	include file: '20140903-drop-permission-ViewSupervisorConsoles.groovy'
-
+	include file: '20140903-drop-colums-AssetEntity-source-target-rooms.groovy'
+	
 }
