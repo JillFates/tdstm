@@ -870,7 +870,8 @@
 			var planSum = snapshot.planSum
 			var sumDialInd = planSum.dialInd != null ? planSum.dialInd : 50
 			if(AditionalFrames == 1 || defaultBundle != moveBundleId){
-				AditionalFrames = ( steps.length > modWidth ? steps.length - (modWidth-1) : 1 );
+				visibleSteps = modWidth;
+				AditionalFrames = ( totalSteps > visibleSteps ? ((totalSteps - visibleSteps) + 1) : 1 );
 				$("#themes").css("left","0px");
 			}
 			defaultBundle = moveBundleId;
