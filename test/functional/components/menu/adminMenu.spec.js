@@ -10,9 +10,9 @@ describe('Admin Menu', function(){
 
     describe('submenu',function(){
 
-      it('should displayed 17 links', function(){
+      it('should displayed 16 links', function(){
           menu.getAdminSubmenu().then(function(list){
-            expect(list.length).toEqual(17);
+            expect(list.length).toEqual(16);
           });
       });
       
@@ -30,10 +30,6 @@ describe('Admin Menu', function(){
       
       it('should have Asset Options in the submenu', function(){
         expect(menu.getAssetOptions().getText()).toEqual('Asset Options');
-      });
-      
-      it('should have Supervise Techs (old) in the submenu', function(){
-        expect(menu.getSuperviseTechs().getText()).toEqual('Supervise Techs (old)');
       });
       
       it('should have Release Notes in the submenu', function(){

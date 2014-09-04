@@ -31,10 +31,6 @@ var Menu = function(){
     return browser.driver.findElement
       (by.css('a[href="/tdstm/assetEntity/assetOptions"]'));
   };
-  this.getSuperviseTechs = function(){
-    return browser.driver.findElement
-      (by.css('a[href="/tdstm/assetEntity/dashboardView?showAll=show&teamType=MOVE"]'));
-  };
   this.getReleaseNotes = function(){
     return browser.driver.findElement
       (by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMReleaseNotes?cover=print\',\'help\');"]'));
