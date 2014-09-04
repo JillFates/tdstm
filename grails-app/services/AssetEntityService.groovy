@@ -1046,7 +1046,7 @@ class AssetEntityService {
 			serverDTAMap.eachWithIndex { item, pos ->
 				serverMap.put( item.columnName, null )
 				serverColumnNameList.add(item.columnName)
-				serverSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+				serverSheetNameMap.put( "sheetName", item.sheetName?.trim() )
 			}
 			serverMap.put("DepGroup", null )
 			serverColumnNameList.add("DepGroup")
@@ -1054,7 +1054,7 @@ class AssetEntityService {
 			appDTAMap.eachWithIndex { item, pos ->
 				appMap.put( item.columnName, null )
 				appColumnNameList.add(item.columnName)
-				appSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+				appSheetNameMap.put( "sheetName", item.sheetName?.trim() )
 			}
 			appMap.put("DepGroup", null )
 			appColumnNameList.add("DepGroup")
@@ -1062,7 +1062,7 @@ class AssetEntityService {
 			dbDTAMap.eachWithIndex { item, pos ->
 				dbMap.put( item.columnName, null )
 				dbColumnNameList.add(item.columnName)
-				dbSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+				dbSheetNameMap.put( "sheetName", item.sheetName?.trim() )
 			}
 			dbMap.put("DepGroup", null )
 			dbColumnNameList.add("DepGroup")
@@ -1070,7 +1070,7 @@ class AssetEntityService {
 			fileDTAMap.eachWithIndex { item, pos ->
 				fileMap.put( item.columnName, null )
 				fileColumnNameList.add(item.columnName)
-				fileSheetNameMap.put( "sheetName", (item.sheetName).trim() )
+				fileSheetNameMap.put( "sheetName", item.sheetName?.trim() )
 			}
 			fileMap.put("DepGroup", null )
 			fileColumnNameList.add("DepGroup")
