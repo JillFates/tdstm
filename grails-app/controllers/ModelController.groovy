@@ -637,6 +637,8 @@ class ModelController {
 							}
 						}
 	            	}
+
+					// TODO : JPM 9/2014 : assetType Legacy code that shoule be removed at some point when we normalize out the assetType from AssetEntity
 	            	def updateAssetsQuery = "update asset_entity set asset_type = '${modelInstance.assetType}' where model_id='${modelInstance.id}'"
 	            	jdbcTemplate.update(updateAssetsQuery)
 	                
@@ -646,16 +648,6 @@ class ModelController {
 		    			modelInstance.sourceTDSVersion = 1
 		    		}
 		        	modelInstance.save(flush: true)
-					def newManufacturer = Manufacturer.get(params.manufacturer.id)
-					if( oldModelManufacturer != params.manufacturer.id){
-						def updateModelQuery = "update asset_entity set manufacturer = '${newManufacturer.name}' where model_id='${modelInstance.id}'"
-						jdbcTemplate.update(updateModelQuery)
-					}
-					if(oldModelType!=params.assetType){
-						def updateModelTypeQuery = "update asset_entity set asset_type = '${params.assetType}' where model_id='${modelInstance.id}'"
-						jdbcTemplate.update(updateModelTypeQuery)
-					
-					}
 					
 					flash.message = "${modelInstance.modelName} Updated"
 					if(params.redirectTo == "assetAudit"){
