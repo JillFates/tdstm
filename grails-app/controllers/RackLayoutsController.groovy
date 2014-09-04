@@ -6,9 +6,11 @@ import org.apache.shiro.SecurityUtils
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.ControllerUtil as CU
 import org.apache.commons.lang.math.NumberUtils
 
 class RackLayoutsController {
@@ -79,10 +81,18 @@ class RackLayoutsController {
 	}
 	
 	def save = {
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def projectId = project.id
+
 		session.setAttribute( "RACK_FILTERS", params )
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
-		if(bundleId == "null") {
+
+		if (bundleId == "null") {
 			return [errorMessage: "Please Select a Bundle."]
 		} else {
 			def redirectTo = 'rack'
@@ -93,14 +103,12 @@ class RackLayoutsController {
 			def backView = params.backView
 			def sourceRacks = new ArrayList()
 			def targetRacks = new ArrayList()
-			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
 			def rackLayout = []
-			def project = Project.findById(projectId)
 			def moveBundles = MoveBundle.findAllByProject( project )
 			def rackId = params.rackId
 			def hideIcons = params.hideIcons
 			
-			if(bundleId && !bundleId.contains("all")){
+			if (bundleId && !bundleId.contains("all")){
 				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
 				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
 			}
@@ -109,13 +117,13 @@ class RackLayoutsController {
 				rackLayoutsHasPermission =RolePermissions.hasPermission("rackLayouts")
 			}*/
 			
-			if(request && request.getParameterValues("sourcerack") != ['none']) {
+			if (request && request.getParameterValues("sourcerack") != ['none']) {
 				List rack = request.getParameterValues("sourcerack")
-				if(rack){
-					if(rack.contains("none")){
+				if (rack){
+					if (rack.contains("none")){
 						rack.remove("none")
 					}
-					if(rack && rack[0] == "") {
+					if (rack && rack[0] == "") {
 						moveBundles.each{ bundle->
 							bundle.sourceRacks.each{ sourceRack->
 								if( !sourceRacks.contains( sourceRack ) )
@@ -164,7 +172,7 @@ class RackLayoutsController {
 				racks = Rack.findAllById(rackId)
 				//moveBundles = []
 				bundleId = request.getParameterValues("moveBundleId")
-				if(bundleId && !bundleId.contains("all") && !bundleId.contains("taskReady")){
+				if (bundleId && !bundleId.contains("all") && !bundleId.contains("taskReady")){
 					def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
 					moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
 				}
@@ -309,9 +317,9 @@ class RackLayoutsController {
 				def backViewRows
 				def frontViewRows
 				def paramsMap = [:]
-				paramsMap = [ "rackLayoutsHasPermission" : rackLayoutsHasPermission, "assetDetails":assetDetails, "includeBundleName": includeBundleName,
-								"backView":backView, "showCabling":params.showCabling, "hideIcons":hideIcons, "redirectTo":redirectTo, "rackId":rack.id,
-								"forWhom":params.forWhom, "commit":params.commit, "bundle":moveBundles]
+				paramsMap = [ rackLayoutsHasPermission: rackLayoutsHasPermission, assetDetails: assetDetails, includeBundleName: includeBundleName,
+					backView: backView, showCabling: params.showCabling, hideIcons: hideIcons, redirectTo: redirectTo, rackId: rack.id,
+					forWhom: params.forWhom, commit: params.commit, bundle: moveBundles]
 				
 				if(backView) {
 					backViewRows = getRackLayout(paramsMap)
@@ -320,11 +328,11 @@ class RackLayoutsController {
 					paramsMap["backView"] = null
 					frontViewRows = getRackLayout(paramsMap)
 				}
-				rackLayout << [ assetDetails : assetDetails, rack : rack.tag , room : rack.room,
-								frontViewRows : frontViewRows, backViewRows : backViewRows , rackId :rack.id]
+				rackLayout << [ assetDetails: assetDetails, rack: rack.tag , room: rack.room,
+					frontViewRows: frontViewRows, backViewRows: backViewRows , rackId: rack.id]
 			}
 			def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
-			return [rackLayout : rackLayout, frontView : frontView, backView : backView, showIconPref:showIconPref, commit:params.commit]
+			return [rackLayout: rackLayout, frontView: frontView, backView: backView, showIconPref: showIconPref, commit: params.commit]
 		}
 	}
 	
@@ -356,6 +364,9 @@ class RackLayoutsController {
 		render rackDetails as JSON
 	}
 
+	/**
+	 * Used to generate the HTML that represents a Rack
+	 */
 	private getRackLayout( paramsMap ){
 		def rows = new StringBuffer()
 		def rowspan = 1
@@ -376,7 +387,7 @@ class RackLayoutsController {
 		
 		asset.each {
 			def row = new StringBuffer("<tr>")
-			if(it.asset) {
+			if (it.asset) {
 				rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
 				rackStyle = it.rackStyle
 				def location = it.source
@@ -388,6 +399,22 @@ class RackLayoutsController {
 					assetTag += "Devices Overlap:<br />"
 				def hasBlades = false
 				def cabling = ""
+
+				def srcTrg = 'Source'
+				def queryParams = [project: assetEntity.project, assetClass: AssetClass.DEVICE]
+				if (location == 1) {
+					queryParams.putAll( [roomName: assetEntity.sourceRoom, rackName: assetEntity.sourceRack] )
+				} else {
+					srcTrg = 'Target'
+					queryParams.putAll( [roomName: assetEntity.targetRoom, rackName: assetEntity.targetRack] )
+				}
+				def query = "FROM AssetEntity AS a \
+						JOIN a.room$srcTrg AS room \
+						JOIN a.rack$srcTrg as rack \
+						WHERE a.project=:project AND a.assetClass=:assetClass AND a.assetType<>'Blade' \
+						AND room.roomName=:roomName AND rack.tag=:rackName \
+						AND a.assetTag=:tag"
+
 				assetTagsList.each{ assetTagValue ->
 					def index = assetTagValue.indexOf('~-')
 					def tagValue
@@ -400,40 +427,34 @@ class RackLayoutsController {
 					def overlappedAssets
 					def bladeTable = ""
 					def bladeLayoutMap = ['asset':it, 'permission':rackLayoutsHasPermission, 'hideIcons':hideIcons, 'redirectTo':redirectTo ,
-											'rackId':rackId, 'commit':commit, 'forWhom':forWhom, "bundle": paramsMap.bundle]
-					if(location == 1)
-						overlappedAssets = AssetEntity.findAll("FROM AssetEntity WHERE project=${assetEntity.project.id} AND assetTag='${tagValue}' AND sourceRoom='${assetEntity.sourceRoom}' AND rackSource.tag = '${assetEntity.sourceRack}' AND assetType <> 'Blade'")
-					else 
-						overlappedAssets = AssetEntity.findAll("FROM AssetEntity WHERE project=${assetEntity.project.id} AND assetTag='${tagValue}' AND targetRoom='${assetEntity.targetRoom}' AND rackTarget.tag = '${assetEntity.targetRack}' AND assetType <> 'Blade'")
-					if(overlappedAssets.size() > 1) {
-						overlappedAssets.each{ overlapAsset ->
+						'rackId':rackId, 'commit':commit, 'forWhom':forWhom, "bundle": paramsMap.bundle]
+
+					queryParams.tag = tagValue
+					overlappedAssets = AssetEntity.findAll(query, queryParams)
+					log.debug "**** overlappedAssets = ${overlappedAssets.getClass().name} --- $overlappedAssets"
+
+					// TODO : JPM 9/2014 : This block of code is 99% duplicate except for the cabling assignment
+					def overlappedAssetsSize = overlappedAssets.size()
+					if (overlappedAssetsSize) {
+						overlappedAssets.each { r ->
+							def overlapAsset = r[0]
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
-							if(overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
+							if (overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
 								bladeLayoutMap << ['overlappedAsset':overlapAsset]
 								bladeTable = generateBladeLayout(bladeLayoutMap)
+							}
+							if (overlappedAssetsSize > 1) {
+								cabling = ( !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
 							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('"+redirectTo+"'"},'${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
 						}
-					} else if(overlappedAssets.size() > 0){
-						overlappedAsset = overlappedAssets[0]
-						moveBundle += (overlappedAsset?.moveBundle ? overlappedAsset?.moveBundle.name : "") + "<br/>"
-						if(overlappedAsset.model && overlappedAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on') ){
-							hasBlades = true
-							bladeLayoutMap << ['overlappedAsset':overlappedAsset]
-							bladeTable = generateBladeLayout(bladeLayoutMap)
-						}
-						cabling = !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : ""
-						assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('"+redirectTo+"'"},'${overlappedAsset?.assetType}',${overlappedAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>&nbsp;"
-						
-						if(hasBlades){
-							assetTag += "<br/>"+bladeTable
-						}
-					}
+					} 
 				}
+
 				if(backView) {
 					def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])
 					def taskAnchors = ""
@@ -537,9 +558,10 @@ class RackLayoutsController {
 		}
 		return rows
 	}
-	/*************************************************
-	 * Construct Balde layout for RackLayouts report
-	 **************************************************/
+
+	/**
+	  * Used to generate the HTML widget for a single Blade Chassis's layout for RackLayouts report
+	  */
 	def generateBladeLayout(bladeLayoutMap){
 		
 		def assetDetails = bladeLayoutMap.asset

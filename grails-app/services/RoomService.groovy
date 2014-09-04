@@ -129,42 +129,6 @@ class RoomService {
 						}
 					}
 				}
-				if (msg) break
-
-				/*
-				// Update the Assests which are pointing to Room and Rack
-				racks = Rack.findAllByRoom( roomInstance )
-				racks.each { rack -> 
-					rack.sourceAssets.each { assetEntity ->
-						if (! msg) {
-							//assetEntity.sourceRack = rack.tag
-							//assetEntity.sourceRoom = roomInstance.roomName
-							//assetEntity.sourceLocation =  roomInstance.location
-							if (! assetEntity.validate() || ! assetEntity.save() ) {
-								log.info "Updating existing assets failed - ${GormUtil.allErrorsString(assetEntity)} - user $user"
-								msg = "Updating existing asset (${assetEntity}) failed due to ${GormUtil.allErrorsString(assetEntity)}"
-								return
-							}
-						}
-					}
-					if (! msg) {
-						rack.targetAssets.each{ assetEntity ->
-							if (! msg) {
-								//assetEntity.targetRack = rack.tag
-								//assetEntity.targetRoom = roomInstance.roomName
-								//assetEntity.targetLocation =  roomInstance.location
-								if (! assetEntity.validate() || ! assetEntity.save() ) {
-									log.info "Updating existing assets failed - ${GormUtil.allErrorsString(assetEntity)} - user $user"
-									msg = "Updating existing asset (${assetEntity}) failed due to ${GormUtil.allErrorsString(assetEntity)}"
-									return
-								}
-							}
-						}
-					}
-				}
-				*/
-
-				// flush()
 				break
 
 			}	// while (true)
