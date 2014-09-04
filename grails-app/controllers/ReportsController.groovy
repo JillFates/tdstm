@@ -47,19 +47,19 @@ class ReportsController {
 	def index = { 
 		render(view:'home')
 	}
-    
-    // Generate Report Dialog
-    def getBundleListForReportDialog = {
-    	def reportId = params.reportId
-    	def currProj = getSession().getAttribute( "CURR_PROJ" )
-        def projectId = currProj.CURR_PROJ
-        def projectInstance = securityService.getUserCurrentProject();
-        if (!projectInstance) {
-          flash.message = "Please select project to view Reports"
-          redirect(controller:'project',action:'list')
-          return
-        }
-        def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+	
+	// Generate Report Dialog
+	def getBundleListForReportDialog = {
+		def reportId = params.reportId
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def projectId = currProj.CURR_PROJ
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+		  flash.message = "Please select project to view Reports"
+		  redirect(controller:'project',action:'list')
+		  return
+		}
+		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
 		def browserTest = false
 		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
 			browserTest = true
@@ -123,426 +123,426 @@ class ReportsController {
 					render 'An invalid report was specified'
 						break;
 		}
-    }
+	}
 	
 	//  cart Asset report
 	def cartAssetReport = {
-    	def reportName = params.reportName
-    	def currProj = getSession().getAttribute( "CURR_PROJ" )
-    	def projectId = currProj.CURR_PROJ
-      def projectInstance = securityService.getUserCurrentProject();
-      if (!projectInstance) {
-        flash.message = "Please select project to view Reports"
-        redirect(controller:'project',action:'list')
-        return
-      }
-    	def partyGroupInstance = PartyGroup.get(projectInstance.id)
-    	def sortOrder = params.sortType
-    	def teamPartyGroup
-    	// if no moveBundle was selected
-    	if(params.moveBundle == "null") {
-            flash.message = " Please Select Bundles. "
-            if(reportName == 'cartAsset') {
-            	redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
-            }else {
-            	redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
-            }
-        } else {
-            def moveBundleInstance = MoveBundle.findById(params.moveBundle)
-            def reportFields = []
-            def bundleName = "All Bundles"
-            def teamName = "All Teams"
-            def assetEntityList
-            def targetAssetEntitylist
-            //if moveBundleinstance is selected (single moveBundle)
-            if( moveBundleInstance ) {
-                bundleName = moveBundleInstance?.name
-                assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id  "+
-                    									"order By asset.moveBundle,asset.cart,asset.shelf")
-            }
-            //All Bundles Selected
-            else {
-       			assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id and "+
-                    									"asset.moveBundle != null order By asset.moveBundle,asset.cart,asset.shelf")
-       		}
-            
-            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-            def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+		def reportName = params.reportName
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def projectId = currProj.CURR_PROJ
+	  def projectInstance = securityService.getUserCurrentProject();
+	  if (!projectInstance) {
+		flash.message = "Please select project to view Reports"
+		redirect(controller:'project',action:'list')
+		return
+	  }
+		def partyGroupInstance = PartyGroup.get(projectInstance.id)
+		def sortOrder = params.sortType
+		def teamPartyGroup
+		// if no moveBundle was selected
+		if(params.moveBundle == "null") {
+			flash.message = " Please Select Bundles. "
+			if(reportName == 'cartAsset') {
+				redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+			}else {
+				redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
+			}
+		} else {
+			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def reportFields = []
+			def bundleName = "All Bundles"
+			def teamName = "All Teams"
+			def assetEntityList
+			def targetAssetEntitylist
+			//if moveBundleinstance is selected (single moveBundle)
+			if( moveBundleInstance ) {
+				bundleName = moveBundleInstance?.name
+				assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.moveBundle = $moveBundleInstance.id  "+
+														"order By asset.moveBundle,asset.cart,asset.shelf")
+			}
+			//All Bundles Selected
+			else {
+				assetEntityList = AssetEntity.findAll("from AssetEntity asset  where asset.project.id = $projectInstance.id and "+
+														"asset.moveBundle != null order By asset.moveBundle,asset.cart,asset.shelf")
+			}
+			
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-       		//Source AssetList 
-       		if( assetEntityList != null) {
-       			assetEntityList.each { asset ->
-       				def bundleInstance
-       				if(asset.moveBundle != null) {
-       					bundleInstance = MoveBundle.findById(asset.moveBundle.id)
-       				}
-                    if(reportName == 'cartAsset') {
-                        teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Logistics')
-                    }else {
-       					teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Transport')
-                    }
-       				def assetCommentList = AssetComment.findAllByAssetEntity(asset)
-       				def moveTeamName
-       				if(teamPartyGroup != null ){
-       					def moveteamInstance = PartyGroup.findById(teamPartyGroup.id)
-       					moveTeamName = moveteamInstance?.name
-       				}
-       				def assetCommentString =""
-       				assetCommentList.each { assetComment ->
-       					assetCommentString = assetCommentString + assetComment.comment +"\n"
-       				}
-       				def cartShelf = (asset.cart ? asset.cart : "")+"/"+ (asset.shelf ? asset.shelf : "")
-       				if (cartShelf == "/"){
-       					cartShelf = ""
-       				}
-       				
-       				// sort options for reportFields
-       				def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset?.model?.usize ? asset?.model?.usize : "")
-       				
-       				def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
-       				
-       				def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
-       				reportFields <<['assetName':asset.assetName , "model":asset.model?.toString(), 
-       				                "sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
-       				                "cart":cartShelf, "shelf":asset.shelf, "source_team_id":teamPartyGroup?.id, 
-       				                "move_bundle_id":asset?.moveBundle?.id,dlocation:asset.rackSource?asset.rackSource.location:'',
-       				                'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
-       				                'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
-       				                'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
-       				                'location':"Source Team", 'truck':asset.truck, 
-       				                'room':asset.sourceRoom, 'instructions':assetCommentString,
-       				                'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
-       				                'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
+			//Source AssetList 
+			if( assetEntityList != null) {
+				assetEntityList.each { asset ->
+					def bundleInstance
+					if(asset.moveBundle != null) {
+						bundleInstance = MoveBundle.findById(asset.moveBundle.id)
+					}
+					if(reportName == 'cartAsset') {
+						teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Logistics')
+					}else {
+						teamPartyGroup =  ProjectTeam.findByMoveBundleAndTeamCode(bundleInstance, 'Transport')
+					}
+					def assetCommentList = AssetComment.findAllByAssetEntity(asset)
+					def moveTeamName
+					if(teamPartyGroup != null ){
+						def moveteamInstance = PartyGroup.findById(teamPartyGroup.id)
+						moveTeamName = moveteamInstance?.name
+					}
+					def assetCommentString =""
+					assetCommentList.each { assetComment ->
+						assetCommentString = assetCommentString + assetComment.comment +"\n"
+					}
+					def cartShelf = (asset.cart ? asset.cart : "")+"/"+ (asset.shelf ? asset.shelf : "")
+					if (cartShelf == "/"){
+						cartShelf = ""
+					}
+					
+					// sort options for reportFields
+					def roomTagSort = (asset.sourceRoom ? asset.sourceRoom : "") +" "+ (asset.sourceRack ? asset.sourceRack : "") +" "+ (asset?.model?.usize ? asset?.model?.usize : "")
+					
+					def truckTagSort = (asset.truck ? asset.truck : "") +" "+ (asset.cart ? asset.cart : "") +" "+ (asset.shelf ? asset.shelf : "")
+					
+					def teamMembers = partyRelationshipService.getTeamMemberNames(teamPartyGroup?.id) 
+					reportFields <<['assetName':asset.assetName , "model":asset.model?.toString(), 
+									"sourceTargetPos":(teamPartyGroup?.currentLocation ? teamPartyGroup?.currentLocation : "") +"(source/ unracking)", 
+									"cart":cartShelf, "shelf":asset.shelf, "source_team_id":teamPartyGroup?.id, 
+									"move_bundle_id":asset?.moveBundle?.id,dlocation:asset.rackSource?asset.rackSource.location:'',
+									'projectName':partyGroupInstance?.name,'startAt':GormUtil.convertInToUserTZ( projectInstance?.startDate, tzId ), 
+									'completedAt':GormUtil.convertInToUserTZ( projectInstance?.completionDate, tzId ), 'bundleName':bundleInstance?.name, 
+									'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
+									'location':"Source Team", 'truck':asset.truck, 
+									'room':asset.sourceRoom, 'instructions':assetCommentString,
+									'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
+									'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
 									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
-       			}
-       		}
-       		//No Assets were found for selected moveBundle,team and Location
-       		if(reportFields.size() <= 0) {    		
-       			flash.message = " No Assets Were found for  selected values  "
-       			if(reportName == 'cartAsset') {
-       				redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
-        		}else {
-        			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
-        		}
-        	}else {
-        		//sort reportFields by selected sort options
-                if ( sortOrder ) {
-                	if ( sortOrder == "TEAM_ASSET" ) {
-                		reportFields.sort{ it.teamTagSort }
-                	} else if ( sortOrder == "ROOM_RACK_USIZE" ) {
-                		reportFields.sort{ it.roomTagSort }
-                	} else if ( sortOrder == "TRUCK_CART_SHELF" ) {
-                		reportFields.sort{ it.truckTagSort }
-                	} else if ( sortOrder == "ASSET_TAG" ) {
-                		reportFields.sort{ it.assetTagSort }
-                	}
-                }
-        		
+				}
+			}
+			//No Assets were found for selected moveBundle,team and Location
+			if(reportFields.size() <= 0) {    		
+				flash.message = " No Assets Were found for  selected values  "
+				if(reportName == 'cartAsset') {
+					redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+				}else {
+					redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
+				}
+			}else {
+				//sort reportFields by selected sort options
+				if ( sortOrder ) {
+					if ( sortOrder == "TEAM_ASSET" ) {
+						reportFields.sort{ it.teamTagSort }
+					} else if ( sortOrder == "ROOM_RACK_USIZE" ) {
+						reportFields.sort{ it.roomTagSort }
+					} else if ( sortOrder == "TRUCK_CART_SHELF" ) {
+						reportFields.sort{ it.truckTagSort }
+					} else if ( sortOrder == "ASSET_TAG" ) {
+						reportFields.sort{ it.assetTagSort }
+					}
+				}
+				
 				def name = reportName == "cartAsset" ? "LogisticsTeam" : "TransportTeam"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
-        		
+				
 				chain(controller:'jasper',action:'index',model:[data:reportFields],
 						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
-        	}
-        }
-    }
-    /*----------------------------------------------------------
-     * @author : Lokanath Reddy
-     * @param  : move bundle and params from rack elevation form
-     * @return : Data for Rack Elevation report  
-     *---------------------------------------------------------*/
-    def rackLayoutReport = {
-    	def bundleId = params.moveBundle
-   		def maxUSize = 42
-        if(bundleId == "null") {
-            flash.message = " Please Select Bundles. "
-            redirect( action:'getBundleListForReportDialog', params:[reportId: 'Rack Layout'] )
-        } else {
-        	def includeOtherBundle = params.otherBundle
-        	def includeBundleName = params.bundleName
-        	def printQuantity = params.printQuantity
-        	def location = params.locationName
-        	def frontView = params.frontView
-        	def backView = params.backView
-        	def racks = []
-        	def rack
-        	def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
-        	def rackLayout = []
+			}
+		}
+	}
+	/*----------------------------------------------------------
+	 * @author : Lokanath Reddy
+	 * @param  : move bundle and params from rack elevation form
+	 * @return : Data for Rack Elevation report  
+	 *---------------------------------------------------------*/
+	def rackLayoutReport = {
+		def bundleId = params.moveBundle
+		def maxUSize = 42
+		if(bundleId == "null") {
+			flash.message = " Please Select Bundles. "
+			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Rack Layout'] )
+		} else {
+			def includeOtherBundle = params.otherBundle
+			def includeBundleName = params.bundleName
+			def printQuantity = params.printQuantity
+			def location = params.locationName
+			def frontView = params.frontView
+			def backView = params.backView
+			def racks = []
+			def rack
+			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
+			def rackLayout = []
 
 			def moveBundle = MoveBundle.findById(bundleId)
-     		def reportsHasPermission = RolePermissions.hasPermission("reports")
-        	if(location == "source"){
-        		rack = request.getParameterValues("sourcerack")
-        		rack.each{
-        			racks<<[rack:it]
-            	}
-        		if( rack[0] == "" ){
-        			def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,'blank'),IFNULL(source_room,'blank'),"+
-            								"IFNULL(source_rack,'blank')) as rack from asset_entity where"
-            		if( bundleId && !includeOtherBundle){
-            			sourceRackQuery += " move_bundle_id = $bundleId "
-            		} else {
-            			sourceRackQuery += " project_id = $projectId "
-            		}
-        			sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade') and source_rack != '' and source_rack is not null "
-        			racks = jdbcTemplate.queryForList(sourceRackQuery + "group by source_location, source_rack, source_room")
-            	}
-            } else {
-            	rack = request.getParameterValues("targetrack")
-            	rack.each{
-            		racks<<[rack:it]
-            	}
-            	if(rack[0] == ""){
-            		def targetRackQuery = "select CONCAT_WS('~',IFNULL(target_location ,'blank'),IFNULL(target_room,'blank'), "+
-            								"IFNULL(target_rack,'blank')) as rack from asset_entity where"
+			def reportsHasPermission = RolePermissions.hasPermission("reports")
+			if(location == "source"){
+				rack = request.getParameterValues("sourcerack")
+				rack.each{
+					racks<<[rack:it]
+				}
+				if( rack[0] == "" ){
+					def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,'blank'),IFNULL(source_room,'blank'),"+
+											"IFNULL(source_rack,'blank')) as rack from asset_entity where"
+					if( bundleId && !includeOtherBundle){
+						sourceRackQuery += " move_bundle_id = $bundleId "
+					} else {
+						sourceRackQuery += " project_id = $projectId "
+					}
+					sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade') and source_rack != '' and source_rack is not null "
+					racks = jdbcTemplate.queryForList(sourceRackQuery + "group by source_location, source_rack, source_room")
+				}
+			} else {
+				rack = request.getParameterValues("targetrack")
+				rack.each{
+					racks<<[rack:it]
+				}
+				if(rack[0] == ""){
+					def targetRackQuery = "select CONCAT_WS('~',IFNULL(target_location ,'blank'),IFNULL(target_room,'blank'), "+
+											"IFNULL(target_rack,'blank')) as rack from asset_entity where"
 					if( bundleId && !includeOtherBundle){
 						targetRackQuery += " move_bundle_id = $bundleId "
 					} else {
 						targetRackQuery += " project_id = $projectId "
 					}
-            		targetRackQuery += " and asset_type NOT IN ('VM', 'Blade') and target_rack != '' and target_rack is not null "
-            		racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
-            		
-            		}
-            	
-            	}
-        	def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
-        	racks.each{
-        		def rackRooms = it?.rack.split("~")
-        		if(rackRooms?.size() == 3){
-    	            def assetDetails = []
-                	def assetDetail = []
-                	def finalAssetList = []
-                	def assetsDetailsQuery = supervisorConsoleService.getQueryForRackElevation( bundleId, projectId, includeOtherBundle, rackRooms, location )
-    	            def assetEntityList = jdbcTemplate.queryForList( assetsDetailsQuery.toString() )
-    	            assetEntityList.each{assetEntity ->
-    	            	def overlapError = false
-    	            	def rackPosition = assetEntity.rackPosition != 0 ? assetEntity.rackPosition : 1
-    	            	def rackSize = assetEntity?.usize != 0 ? assetEntity?.usize : 1
-		            	def position = rackPosition + rackSize - 1
-		            	def newHigh = position
-            			def newLow = rackPosition
-		            	if(assetDetail.size() > 0){
-		            		def flag = true
-		            		assetDetail.each{asset->
-		            			flag = true
-		            			def currentHigh = asset.currentHigh
-				            	def currentLow = asset.currentLow
-		            			def ignoreLow = (currentLow <= newLow && currentHigh >= newHigh )
-		            			def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
-		            			def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
-		            			def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
-		            			if(position > maxUSize){
-		            				asset.position = maxUSize
-	    	            			asset.rowspan = 1 
-	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-	    	            			asset.overlapError = true
-	    	            			asset.cssClass = "rack_error"
-	    	            			flag = false
-		            			} else if(ignoreLow){
-		            				asset.position = currentHigh
-	    	            			asset.rowspan = currentHigh - currentLow + 1 
-	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-	    	            			asset.overlapError = true
-	    	            			asset.cssClass = "rack_error"
-	    	            			flag = false
-		            			} else if(changeBoth) {
-		            				asset.currentHigh = newHigh
-		            				asset.currentLow = newLow
-		            				asset.position = newHigh
-	    	            			asset.rowspan = newHigh - newLow + 1
-	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-	    	            			asset.overlapError = true
-	    	            			asset.cssClass = "rack_error"
-	    	            			flag = false
-		            			} else if(changeHigh){
-		            				asset.currentHigh = newHigh
-		            				asset.position = newHigh
-	    	            			asset.rowspan = newHigh - currentLow  + 1
-	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-	    	            			asset.overlapError = true
-	    	            			asset.cssClass = "rack_error"
-	    	            			flag = false
-		            			} else if(changeLow){
-			            			asset.currentLow = newLow
-		            				asset.position = currentHigh
-	    	            			asset.rowspan = currentHigh - newLow +1
-	    	            			asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-	    	            			asset.overlapError = true
-	    	            			asset.cssClass = "rack_error"
-	    	            			flag = false
-		            			}
-	    	            	}
-		            		
-		            		if(flag){
-		            			if(position > maxUSize) {
-			            			position = maxUSize
-			            			newLow = maxUSize
-			            			assetEntity?.usize = 1
-			            			overlapError = true
-			            		}
-		            			assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
-		            			              rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow]
-		            		}
-		            	}else{
-		            		if(position > maxUSize) {
-		            			position = maxUSize
-		            			newLow = maxUSize
-		            			assetEntity?.usize = 1
-		            			overlapError = true
-		            		}
-		            		assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
-		            		              rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow ]
-		            	}
-		            }
-		            for (int i = maxUSize; i > 0; i--) {
-    	            	def assetEnity
-    	            	def cssClass = "empty"
-        	            def rackStyle = "rack_past"
-        	            assetDetail.each {
-    	            		if(it.position == i ){
-    		            		assetEnity = it
-    		            	}
-    		            }
-    	            	if(assetEnity){
-    	            		if(assetEnity.assetEntity?.racksize > 1 ){
-    	            			cssClass = 'rack_error'
-    	            			rackStyle = 'rack_error'
-    	            		} else if(assetEnity.overlapError){
-    	            			cssClass = 'rack_error'
-    	            			rackStyle = 'rack_error'
-    	            		} else if(bundleId && assetEnity.assetEntity?.bundleId != Integer.parseInt(bundleId)){
-    	            			def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
-    	            			def startTime = moveBundle.startTime ? moveBundle.startTime.getTime() : 0
-    	            			if(startTime < currentTime){
-    	            				cssClass = 'rack_past'
-    	            			} else {
-    	            				cssClass = "rack_future"
-    	            			}
-    	            		} else{
-    	            			cssClass = 'rack_current'
-    	            			rackStyle = 'rack_current'
-    	            		}
-    	            		if(assetEnity.assetEntity?.rackPosition == 0 || assetEnity.assetEntity?.usize == 0 ){
-    	            			rackStyle = 'rack_error'
-    	            		}
-    	            		assetDetails<<[asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle]
-    	            	}else {
-    	            		assetDetails<<[asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle]
-    	            	}
-    	            }
-    	            def backViewRows
-    	            def frontViewRows
-    	            if(backView){
-    	            	backViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, backView )
-    	            }
-    	            if(frontView){
-    	            	frontViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, null )
-    	            }
-    	            if(rackRooms.size() == 3){
-    	            	rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
-    	            	                location : rackRooms[0] +"("+location+")" , frontViewRows : frontViewRows, backViewRows : backViewRows ]
-    	            } else {
-    	            	rackLayout << [ assetDetails : assetDetails, rack : "", room : "", location : "("+location+")" , 
-    	            	                frontViewRows : frontViewRows, backViewRows : backViewRows ]
-    	            }
-        	}
-        }
-        render(view:'rackLayoutReport',model:[rackLayout : rackLayout, frontView : frontView, backView : backView])
-        }
-    }
+					targetRackQuery += " and asset_type NOT IN ('VM', 'Blade') and target_rack != '' and target_rack is not null "
+					racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
+					
+					}
+				
+				}
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
+			racks.each{
+				def rackRooms = it?.rack.split("~")
+				if(rackRooms?.size() == 3){
+					def assetDetails = []
+					def assetDetail = []
+					def finalAssetList = []
+					def assetsDetailsQuery = supervisorConsoleService.getQueryForRackElevation( bundleId, projectId, includeOtherBundle, rackRooms, location )
+					def assetEntityList = jdbcTemplate.queryForList( assetsDetailsQuery.toString() )
+					assetEntityList.each{assetEntity ->
+						def overlapError = false
+						def rackPosition = assetEntity.rackPosition != 0 ? assetEntity.rackPosition : 1
+						def rackSize = assetEntity?.usize != 0 ? assetEntity?.usize : 1
+						def position = rackPosition + rackSize - 1
+						def newHigh = position
+						def newLow = rackPosition
+						if(assetDetail.size() > 0){
+							def flag = true
+							assetDetail.each{asset->
+								flag = true
+								def currentHigh = asset.currentHigh
+								def currentLow = asset.currentLow
+								def ignoreLow = (currentLow <= newLow && currentHigh >= newHigh )
+								def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
+								def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
+								def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
+								if(position > maxUSize){
+									asset.position = maxUSize
+									asset.rowspan = 1 
+									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+									asset.overlapError = true
+									asset.cssClass = "rack_error"
+									flag = false
+								} else if(ignoreLow){
+									asset.position = currentHigh
+									asset.rowspan = currentHigh - currentLow + 1 
+									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+									asset.overlapError = true
+									asset.cssClass = "rack_error"
+									flag = false
+								} else if(changeBoth) {
+									asset.currentHigh = newHigh
+									asset.currentLow = newLow
+									asset.position = newHigh
+									asset.rowspan = newHigh - newLow + 1
+									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+									asset.overlapError = true
+									asset.cssClass = "rack_error"
+									flag = false
+								} else if(changeHigh){
+									asset.currentHigh = newHigh
+									asset.position = newHigh
+									asset.rowspan = newHigh - currentLow  + 1
+									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+									asset.overlapError = true
+									asset.cssClass = "rack_error"
+									flag = false
+								} else if(changeLow){
+									asset.currentLow = newLow
+									asset.position = currentHigh
+									asset.rowspan = currentHigh - newLow +1
+									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
+									asset.overlapError = true
+									asset.cssClass = "rack_error"
+									flag = false
+								}
+							}
+							
+							if(flag){
+								if(position > maxUSize) {
+									position = maxUSize
+									newLow = maxUSize
+									assetEntity?.usize = 1
+									overlapError = true
+								}
+								assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
+											  rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow]
+							}
+						}else{
+							if(position > maxUSize) {
+								position = maxUSize
+								newLow = maxUSize
+								assetEntity?.usize = 1
+								overlapError = true
+							}
+							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
+										  rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow ]
+						}
+					}
+					for (int i = maxUSize; i > 0; i--) {
+						def assetEnity
+						def cssClass = "empty"
+						def rackStyle = "rack_past"
+						assetDetail.each {
+							if(it.position == i ){
+								assetEnity = it
+							}
+						}
+						if(assetEnity){
+							if(assetEnity.assetEntity?.racksize > 1 ){
+								cssClass = 'rack_error'
+								rackStyle = 'rack_error'
+							} else if(assetEnity.overlapError){
+								cssClass = 'rack_error'
+								rackStyle = 'rack_error'
+							} else if(bundleId && assetEnity.assetEntity?.bundleId != Integer.parseInt(bundleId)){
+								def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+								def startTime = moveBundle.startTime ? moveBundle.startTime.getTime() : 0
+								if(startTime < currentTime){
+									cssClass = 'rack_past'
+								} else {
+									cssClass = "rack_future"
+								}
+							} else{
+								cssClass = 'rack_current'
+								rackStyle = 'rack_current'
+							}
+							if(assetEnity.assetEntity?.rackPosition == 0 || assetEnity.assetEntity?.usize == 0 ){
+								rackStyle = 'rack_error'
+							}
+							assetDetails<<[asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle]
+						}else {
+							assetDetails<<[asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle]
+						}
+					}
+					def backViewRows
+					def frontViewRows
+					if(backView){
+						backViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, backView )
+					}
+					if(frontView){
+						frontViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, null )
+					}
+					if(rackRooms.size() == 3){
+						rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
+										location : rackRooms[0] +"("+location+")" , frontViewRows : frontViewRows, backViewRows : backViewRows ]
+					} else {
+						rackLayout << [ assetDetails : assetDetails, rack : "", room : "", location : "("+location+")" , 
+										frontViewRows : frontViewRows, backViewRows : backViewRows ]
+					}
+			}
+		}
+		render(view:'rackLayoutReport',model:[rackLayout : rackLayout, frontView : frontView, backView : backView])
+		}
+	}
 	/*
 	 * Generate Issue Report
 	 */
 	def issueReport = {
-    	def subject = SecurityUtils.subject
-        def principal = subject.principal
-    	def personInstance = Person.findByFirstName( principal )
-    	def currProj = getSession().getAttribute( "CURR_PROJ" )
-    	def projectId = currProj.CURR_PROJ
-      def projectInstance = securityService.getUserCurrentProject();
-      if (!projectInstance) {
-        flash.message = "Please select project to view Reports"
-        redirect(controller:'project',action:'list')
-        return
-      }
-    	def partyGroupInstance = PartyGroup.get(projectInstance.id)
-    	def bundleNames = ""
-    	def reportFields = []
-    	def resolvedInfoInclude
-    	def sortBy = params.reportSort
+		def subject = SecurityUtils.subject
+		def principal = subject.principal
+		def personInstance = Person.findByFirstName( principal )
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def projectId = currProj.CURR_PROJ
+	  def projectInstance = securityService.getUserCurrentProject();
+	  if (!projectInstance) {
+		flash.message = "Please select project to view Reports"
+		redirect(controller:'project',action:'list')
+		return
+	  }
+		def partyGroupInstance = PartyGroup.get(projectInstance.id)
+		def bundleNames = ""
+		def reportFields = []
+		def resolvedInfoInclude
+		def sortBy = params.reportSort
 		def comment = params.commentInfo
 		def reportFormat = params._format
-    	if( params.reportSort == "sourceLocation" ) {
-    		sortBy = params.reportSort+",source_room,source_rack,source_rack_position"
-    	}else if( params.reportSort == "targetLocation" ){
-    		sortBy = params.reportSort+",target_room,target_rack,target_rack_position"
-    	}
-    	if( params.reportResolveInfo == "false" ){
-    		resolvedInfoInclude = "Resolved issues were not included"
-    	}
+		if( params.reportSort == "sourceLocation" ) {
+			sortBy = params.reportSort+",source_room,source_rack,source_rack_position"
+		}else if( params.reportSort == "targetLocation" ){
+			sortBy = params.reportSort+",target_room,target_rack,target_rack_position"
+		}
+		if( params.reportResolveInfo == "false" ){
+			resolvedInfoInclude = "Resolved issues were not included"
+		}
 		String moveBundles = params.moveBundle
 		moveBundles = moveBundles.replace("[","('").replace(",]","')").replace(",","','")
-    	if(params.moveBundle == "null") {    		
-    		flash.message = " Please Select Bundles. "
-    		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
-        } else {
-    		String bundleName = "All Bundles"
-    		def targetAssetEntitylist
+		if(params.moveBundle == "null") {    		
+			flash.message = " Please Select Bundles. "
+			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
+		} else {
+			String bundleName = "All Bundles"
+			def targetAssetEntitylist
 			def commentType = "('issue','comment')"
-	    	if(comment == "false"){
-	    		commentType = "('issue')"
-	    	}
-    		def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in ${commentType} ")
+			if(comment == "false"){
+				commentType = "('issue')"
+			}
+			def commentsQuery = new StringBuffer("from AssetComment ac where ac.commentType in ${commentType} ")
 				
-    		if( moveBundles.size() > 4 ){
-    			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id in $moveBundles ) order by ac.assetEntity.${sortBy} ")
-    			bundleNames = MoveBundle.findAll("from MoveBundle where id in $moveBundles").name.toString()
-    		    bundleName = bundleNames
-    		}else {
-    			commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.project.id = $projectInstance.id ) order by ac.assetEntity.${sortBy} ")
-    			bundleNames = "All"
-        	}
-    		
-    		def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
+			if( moveBundles.size() > 4 ){
+				commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.moveBundle.id in $moveBundles ) order by ac.assetEntity.${sortBy} ")
+				bundleNames = MoveBundle.findAll("from MoveBundle where id in $moveBundles").name.toString()
+				bundleName = bundleNames
+			}else {
+				commentsQuery.append(" and ac.assetEntity.id in (select ae.id from AssetEntity ae where ae.project.id = $projectInstance.id ) order by ac.assetEntity.${sortBy} ")
+				bundleNames = "All"
+			}
 			
-    		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-    		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+			def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
+			
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-    		assetCommentList.each { assetComment ->
-    			def createdBy
-    			def sourceTargetRoom
-    			sourceTargetRoom = (assetComment?.assetEntity?.sourceRoom ? assetComment?.assetEntity?.sourceRoom : "--")+
-    								"/"+(assetComment?.assetEntity?.sourceRack ? assetComment?.assetEntity?.sourceRack : "--")+
-    								"/"+(assetComment?.assetEntity?.sourceRackPosition ? assetComment?.assetEntity?.sourceRackPosition : "--")+"\n"+
-    								(assetComment?.assetEntity?.targetRoom ? assetComment?.assetEntity?.targetRoom : "--")+"/"+
-    								(assetComment?.assetEntity?.targetRack ? assetComment?.assetEntity?.targetRack : "--")+"/"+
-    								(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
-    			if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
-    				reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag,'moveBundle' :assetComment?.assetEntity?.moveBundle?.name,
-    								'sourceTargetRoom':sourceTargetRoom,
-    								'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
-    								'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
-    								'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
+			assetCommentList.each { assetComment ->
+				def createdBy
+				def sourceTargetRoom
+				sourceTargetRoom = (assetComment?.assetEntity?.sourceRoom ? assetComment?.assetEntity?.sourceRoom : "--")+
+									"/"+(assetComment?.assetEntity?.sourceRack ? assetComment?.assetEntity?.sourceRack : "--")+
+									"/"+(assetComment?.assetEntity?.sourceRackPosition ? assetComment?.assetEntity?.sourceRackPosition : "--")+"\n"+
+									(assetComment?.assetEntity?.targetRoom ? assetComment?.assetEntity?.targetRoom : "--")+"/"+
+									(assetComment?.assetEntity?.targetRack ? assetComment?.assetEntity?.targetRack : "--")+"/"+
+									(assetComment?.assetEntity?.targetRackPosition ? assetComment?.assetEntity?.targetRackPosition : "--")
+				if( params.reportResolveInfo == "true" || assetComment.isResolved != 1 ) {
+					reportFields <<['assetName':assetComment?.assetEntity?.assetName, 'assetTag':assetComment?.assetEntity?.assetTag,'moveBundle' :assetComment?.assetEntity?.moveBundle?.name,
+									'sourceTargetRoom':sourceTargetRoom,
+									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
+									'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
+									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateCreated, tzId ), 'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
-    								'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
-    								'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
-    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
+									'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
+									'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
+									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
-    			}
-    			if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
-    				reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null, 
+				}
+				if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
+					reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null, 
 									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
 									'occuredAt':GormUtil.convertInToUserTZ( assetComment?.dateResolved, tzId ), 
-    								'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
+									'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
-    								'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
-    								'clientName':projectInstance?.client?.name,
-    								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
+									'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
+									'clientName':projectInstance?.client?.name,
+									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
-    			}
-    		}
+				}
+			}
 			if( params.newsInfo == "true" ) {
 				def moveEvent = MoveEvent.findByProject(projectInstance)
 				def moveEventNewsList=MoveEventNews.findAllByMoveEvent(moveEvent)
@@ -560,14 +560,14 @@ class ReportsController {
 				}
 
 			}
-    		if(reportFields.size() <= 0) {    		
-        		flash.message = " No Issues Were found for  selected values  "
-        		redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
-        	}else {
-        		def filename = 	"IssueReport-${projectInstance.name}-${bundleName}"
+			if(reportFields.size() <= 0) {    		
+				flash.message = " No Issues Were found for  selected values  "
+				redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
+			}else {
+				def filename = 	"IssueReport-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
 				if(reportFormat == "PDF"){
-	        		chain(controller:'jasper',action:'index',model:[data:reportFields],
+					chain(controller:'jasper',action:'index',model:[data:reportFields],
 							params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
 				} else { // Generate XLS report
 					try {
@@ -611,10 +611,10 @@ class ReportsController {
 						return;
 					}
 				}
-        	}
-    		
-        }
-    }
+			}
+			
+		}
+	}
 
 	/*-------------------------------------------------------------------
 	 * To Get the Team Login Badge labes Data
@@ -623,141 +623,141 @@ class ReportsController {
 	 * @return logn badge labels data
 	 *--------------------------------------------------------------------*/
 	def getLabelBadges = {
-    	def moveBundle = params.bundle
-    	def location = params.location
-      def projectInstance = securityService.getUserCurrentProject();
-      if (!projectInstance) {
-        flash.message = "Please select project to view Reports"
-        redirect(controller:'project',action:'list')
-        return
-      }
-    	def projectId = params.project
-    	def client = projectInstance.client.name
-    	def startDate = projectInstance.startDate
-    	def reportFields = []
-    	def teamMembers = []
-    	if(params.moveBundle == "null") {    		
-    		reportFields <<[ 'flashMessage': "Please Select Bundles."]
-    		render reportFields as JSON
-    	} else {
-    		def moveBundleInstance = MoveBundle.findById(params.moveBundle)
-    		def projectTeamInstance
-    		def loginBadges = []
-    		def bundleName = "All Bundles"
-    		def teamName = "All Teams"
-    		def assetEntityList
-    		def targetAssetEntitylist
-    		if(params.teamFilter != "null"){
-   	   			projectTeamInstance = ProjectTeam.findById( params.teamFilter )
-   	   		}
-    		//if moveBundleinstance is selected (single moveBundle)
-    		if( moveBundleInstance ) {
-    			bundleName = moveBundleInstance?.name
-    			if( projectTeamInstance ) {
-    				teamName = projectTeamInstance?.name
-    				def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
-    				teamMembers.add(members)
-    			}else {
-    				def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $moveBundleInstance.id " )
-    				teamInstanceList.each { team ->
-    					def members = partyRelationshipService.getTeamMembers(team.id)
-    					teamMembers.add(members)
-    				}
-    			}
-    		} else {
-    			if( projectTeamInstance ) {
-    				teamName = projectTeamInstance?.name
-    				def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
-    				teamMembers.add(members)
-    			} else {
-    					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m "+
-                    												"where m.project = $projectId ) " )
-    					teamInstanceList.each { team ->
-                            def members = partyRelationshipService.getTeamMembers(team.id)
-                            teamMembers.add(members)
-    				}
-    			}
-    		}
-    		teamMembers.each { members ->
-    			members.each { member ->
-    				def teamCode = "mt"
-    				if(member.partyIdFrom.teamCode == "Logistics") {
-    					teamCode = "ct"
-    				}
-    				if ( params.location == "source" || params.location == "both" ) {
-    					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-                                         'teamName': member.partyIdFrom.name+" - Source","sortField":member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
-                                         'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-                                         'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
-                                         ]
-    				}
-    				if ( member.partyIdFrom.teamCode != "Logistics" && (params.location == "target" || params.location == "both") ) {
-    					reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
-    					                 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName, 
-    					                 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
-    					                 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
-    					                 ]
-    				}
-    			}
-    		}
-        	if(reportFields.size <= 0) { 
-        		reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
-        		render reportFields as JSON
-        	}else {
-        		reportFields.sort{it.sortField }
-        		render reportFields as JSON
-        	}
-    	}
-    }
+		def moveBundle = params.bundle
+		def location = params.location
+	  def projectInstance = securityService.getUserCurrentProject();
+	  if (!projectInstance) {
+		flash.message = "Please select project to view Reports"
+		redirect(controller:'project',action:'list')
+		return
+	  }
+		def projectId = params.project
+		def client = projectInstance.client.name
+		def startDate = projectInstance.startDate
+		def reportFields = []
+		def teamMembers = []
+		if(params.moveBundle == "null") {    		
+			reportFields <<[ 'flashMessage': "Please Select Bundles."]
+			render reportFields as JSON
+		} else {
+			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def projectTeamInstance
+			def loginBadges = []
+			def bundleName = "All Bundles"
+			def teamName = "All Teams"
+			def assetEntityList
+			def targetAssetEntitylist
+			if(params.teamFilter != "null"){
+				projectTeamInstance = ProjectTeam.findById( params.teamFilter )
+			}
+			//if moveBundleinstance is selected (single moveBundle)
+			if( moveBundleInstance ) {
+				bundleName = moveBundleInstance?.name
+				if( projectTeamInstance ) {
+					teamName = projectTeamInstance?.name
+					def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
+					teamMembers.add(members)
+				}else {
+					def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle = $moveBundleInstance.id " )
+					teamInstanceList.each { team ->
+						def members = partyRelationshipService.getTeamMembers(team.id)
+						teamMembers.add(members)
+					}
+				}
+			} else {
+				if( projectTeamInstance ) {
+					teamName = projectTeamInstance?.name
+					def members = partyRelationshipService.getTeamMembers(projectTeamInstance.id)
+					teamMembers.add(members)
+				} else {
+						def teamInstanceList = ProjectTeam.findAll( "from ProjectTeam pt where pt.moveBundle in ( select m.id from MoveBundle m "+
+																	"where m.project = $projectId ) " )
+						teamInstanceList.each { team ->
+							def members = partyRelationshipService.getTeamMembers(team.id)
+							teamMembers.add(members)
+					}
+				}
+			}
+			teamMembers.each { members ->
+				members.each { member ->
+					def teamCode = "mt"
+					if(member.partyIdFrom.teamCode == "Logistics") {
+						teamCode = "ct"
+					}
+					if ( params.location == "source" || params.location == "both" ) {
+						reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+										 'teamName': member.partyIdFrom.name+" - Source","sortField":member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName,
+										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+										 'barCode': teamCode+'-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-s' 
+										 ]
+					}
+					if ( member.partyIdFrom.teamCode != "Logistics" && (params.location == "target" || params.location == "both") ) {
+						reportFields <<[ 'name': member.partyIdTo.firstName +" "+ member.partyIdTo.lastName,
+										 'teamName': member.partyIdFrom.name+" - Target","sortField": member.partyIdFrom.moveBundle.name+member.partyIdTo.firstName+member.partyIdTo.lastName, 
+										 'bundleName': client+" - "+member.partyIdFrom.moveBundle.name+" "+(member.partyIdFrom.moveBundle.startTime ? partyRelationshipService.convertDate(member.partyIdFrom.moveBundle.startTime) : " "),
+										 'barCode': 'mt-'+member.partyIdFrom.moveBundle.id+'-'+member.partyIdFrom.id+'-t' 
+										 ]
+					}
+				}
+			}
+			if(reportFields.size <= 0) { 
+				reportFields <<[ 'flashMessage': "Team Members not Found for selected Teams"]
+				render reportFields as JSON
+			}else {
+				reportFields.sort{it.sortField }
+				render reportFields as JSON
+			}
+		}
+	}
 	/*----------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : asset details
 	 * @return : rack rows
 	 *---------------------------------------*/
 	def getRackLayout( def reportsHasPermission, def asset, def includeBundleName, def backView){
-    	def rows= new StringBuffer()
-    	def rowspan = 1
-    	def cssClass = "empty"
-    	def rackStyle = ""
-    	asset.each{
-    		 def row = new StringBuffer("<tr>")
-    		 	if(it.asset){
-    		 		rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
-    		 		rackStyle = it.rackStyle
-    		 		def assetTagsList = (it.asset?.assetTag).split("<br/>")
-    		 		def moveBundle = "" 
-    		 		def assetTag = ""
-    		 		def assetEntityId = it.asset.assetEntity.assetEntityId
-    		 		if(it.cssClass == "rack_error")
-		 			    assetTag += "Devices Overlap:<br />"
-		 			
-    		 		assetTagsList.each{
-    		 			def index = it.indexOf('-')
-    		 			def tag
-    		 			if (index != -1) {
-    		 				tag = it?.substring(0,index)
-    		 			} else {
-    		 				tag = it
-    		 			}
-    		 			def assetInstance = AssetEntity.get( assetEntityId )
-    		 			moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br/>"
-    		 			assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br/>"
-    		 		}
-    		 		if( !reportsHasPermission ){
-    		 			assetTag = it.asset?.assetTag
-    		 		}
-    		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-    		 		if(includeBundleName){
-    		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
-    		 		}else{
-    		 			row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
-    		 		}
-    		 		if(backView){
-    		 			if(it.cssClass != "rack_error"){
-    		 				def cablingString = ""/*"${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
-    		 									"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
-    		 									"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
-    		 									"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
+		def rows= new StringBuffer()
+		def rowspan = 1
+		def cssClass = "empty"
+		def rackStyle = ""
+		asset.each{
+			 def row = new StringBuffer("<tr>")
+				if(it.asset){
+					rowspan = it.asset?.rowspan != 0 ? it.asset?.rowspan : 1
+					rackStyle = it.rackStyle
+					def assetTagsList = (it.asset?.assetTag).split("<br/>")
+					def moveBundle = "" 
+					def assetTag = ""
+					def assetEntityId = it.asset.assetEntity.assetEntityId
+					if(it.cssClass == "rack_error")
+						assetTag += "Devices Overlap:<br />"
+					
+					assetTagsList.each{
+						def index = it.indexOf('-')
+						def tag
+						if (index != -1) {
+							tag = it?.substring(0,index)
+						} else {
+							tag = it
+						}
+						def assetInstance = AssetEntity.get( assetEntityId )
+						moveBundle += (assetInstance?.moveBundle ? assetInstance?.moveBundle.name : "") + "<br/>"
+						assetTag += "<a href='javascript:openAssetEditDialig(${assetInstance?.id})' >$it</a> <br/>"
+					}
+					if( !reportsHasPermission ){
+						assetTag = it.asset?.assetTag
+					}
+					row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+					if(includeBundleName){
+						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
+					}else{
+						row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
+					}
+					if(backView){
+						if(it.cssClass != "rack_error"){
+							def cablingString = ""/*"${it.asset?.assetEntity?.pduPort ? 'PDU: '+ it.asset?.assetEntity?.pduPort +' | ' : '' }"+ 
+												"${it.asset?.assetEntity?.nicPort ? 'NIC: '+ it.asset?.assetEntity?.nicPort +' | ' : ''}"+
+												"${it.asset?.assetEntity?.kvmDevice && it.asset?.assetEntity?.kvmDevice != 'blank / blank'? 'KVM: '+ it.asset?.assetEntity?.kvmDevice +' | ' : ''}"+
+												"${it.asset?.assetEntity?.remoteMgmtPort ? 'RMgmt: '+ it.asset?.assetEntity?.remoteMgmtPort +' | ': ''}"+
 												"${it.asset?.assetEntity?.fiberCabinet && it.asset?.assetEntity?.fiberCabinet != 'blank / blank / blank' ? 'Fiber: '+ it.asset?.assetEntity?.fiberCabinet +' | ' : ''}"
 							
 							if ( cablingString ) {
@@ -768,70 +768,70 @@ class ReportsController {
 							} else {
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${cablingString}</td>")
 							}
-    		 			} else {
-    		 				row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
-    		 			}
-    		 		}
-    		 	} else if(rowspan <= 1) {
-    		 		rowspan = 1
-    		 		rackStyle = it.rackStyle
-    		 		row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
-    		 		if(backView){
-    		 			row.append("<td>&nbsp;</td>")
-    		 		}
-    		 	} else {
-    		 		row.append("<td class='${rackStyle}'>${it.rack}</td>")
-    		 		rowspan--
-    		 	}
-    		 row.append("<td class='${rackStyle}'>${it.rack}</td>")
-    		 /*if(rackStyle == "rack_current" && backView && rowspan == 1){
-    			 row.append("<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
-    			 			"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
-    			 			"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>")
-    		 }*/
-    		 
-    		 row.append("</tr>")
-    		 rows.append(row.toString())
-    	}
-    	return rows
-     }
+						} else {
+							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>Devices Overlap</td>")
+						}
+					}
+				} else if(rowspan <= 1) {
+					rowspan = 1
+					rackStyle = it.rackStyle
+					row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan=1 class=${it.cssClass}></td><td>&nbsp;</td>")
+					if(backView){
+						row.append("<td>&nbsp;</td>")
+					}
+				} else {
+					row.append("<td class='${rackStyle}'>${it.rack}</td>")
+					rowspan--
+				}
+			 row.append("<td class='${rackStyle}'>${it.rack}</td>")
+			 /*if(rackStyle == "rack_current" && backView && rowspan == 1){
+				 row.append("<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
+							"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>"+
+							"<td class='${rackStyle}'>&nbsp;</td><td class='${rackStyle}'>&nbsp;</td>")
+			 }*/
+			 
+			 row.append("</tr>")
+			 rows.append(row.toString())
+		}
+		return rows
+	 }
 	/*
 	 *  Generate PDF Cabling QA / Conflict report 
 	 */
 	def cablingQAReport = {
-    	def reportName = params.reportName
-    	def currProj = getSession().getAttribute( "CURR_PROJ" )
-    	def projectId = currProj.CURR_PROJ
-      def projectInstance = securityService.getUserCurrentProject();
-      if (!projectInstance) {
-        flash.message = "Please select project to view Reports"
-        redirect(controller:'project',action:'list')
-        return
-      }
-    	def cableType = params.cableType
-    	// if no moveBundle was selected
-    	if(params.moveBundle == "null") {
-            flash.message = " Please Select Bundles. "
+		def reportName = params.reportName
+		def currProj = getSession().getAttribute( "CURR_PROJ" )
+		def projectId = currProj.CURR_PROJ
+	  def projectInstance = securityService.getUserCurrentProject();
+	  if (!projectInstance) {
+		flash.message = "Please select project to view Reports"
+		redirect(controller:'project',action:'list')
+		return
+	  }
+		def cableType = params.cableType
+		// if no moveBundle was selected
+		if(params.moveBundle == "null") {
+			flash.message = " Please Select Bundles. "
 			redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
-        } else {
-            def moveBundleInstance = MoveBundle.findById(params.moveBundle)
-            def reportFields = []
-            def bundleName = "All Bundles"
+		} else {
+			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
+			def reportFields = []
+			def bundleName = "All Bundles"
 			def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
-            //if moveBundleinstance is selected (single moveBundle)
-            if( moveBundleInstance ) {
-                bundleName = moveBundleInstance?.name
-                cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
-            }
-            //All Bundles Selected
-            else {
-            	cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
-       		}
-            if(cableType){
-            	cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
-            }
-            
-            
+			//if moveBundleinstance is selected (single moveBundle)
+			if( moveBundleInstance ) {
+				bundleName = moveBundleInstance?.name
+				cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
+			}
+			//All Bundles Selected
+			else {
+				cablesQuery.append(" and acm.assetFrom.moveBundle != null ")
+			}
+			if(cableType){
+				cablesQuery.append(" and acm.assetFromPort.type = '${cableType}' ")
+			}
+			
+			
 			List assetCablesList = new ArrayList()
 			if(reportName == "cablingQA"){
 				cablesQuery.append(" order By acm.assetFrom ")
@@ -850,19 +850,19 @@ class ReportsController {
 				if(orphanedList.size() > 0) assetCablesList.addAll(orphanedList)
 			}
 			
-            def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-            def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-       		//Source AssetList 
-       		if( assetCablesList != null) {
-       			assetCablesList.each { cable ->
-       				def bundleInstance
-       				if(cable.assetFrom.moveBundle != null) {
-       					bundleInstance = MoveBundle.findById(cable.assetFrom.moveBundle.id)
-       				}
-       				
-       				reportFields <<['from_asset_name':cable.assetFrom.assetName,
-       								'from_asset_tag':cable.assetFrom.assetTag,
+			//Source AssetList 
+			if( assetCablesList != null) {
+				assetCablesList.each { cable ->
+					def bundleInstance
+					if(cable.assetFrom.moveBundle != null) {
+						bundleInstance = MoveBundle.findById(cable.assetFrom.moveBundle.id)
+					}
+					
+					reportFields <<['from_asset_name':cable.assetFrom.assetName,
+									'from_asset_tag':cable.assetFrom.assetTag,
 									'cable_type': cable.assetFromPort.type,
 									'from_rack':cable.assetFrom?.rackTarget?.tag,
 									'to_rack':cable.assetTo ? cable.assetTo?.rackTarget?.tag : "",
@@ -873,27 +873,27 @@ class ReportsController {
 									'to_connector_label':cable.assetToPort ? cable.assetToPort.label : "",
 									'to_asset_tag': cable.assetTo ? cable.assetTo?.assetTag :"",
 									'to_asset_name':cable.assetTo ? cable.assetTo?.assetName :"",
-       				                "asset_id":cable.assetFrom?.id,
-       				                'project_name':projectInstance?.name,
-       				                'bundle_name':bundleInstance?.name,
-       				                'report_type': reportName == 'cablingQA' ? "Cabling QA Report" : "Cabling Conflict Report",
+									"asset_id":cable.assetFrom?.id,
+									'project_name':projectInstance?.name,
+									'bundle_name':bundleInstance?.name,
+									'report_type': reportName == 'cablingQA' ? "Cabling QA Report" : "Cabling Conflict Report",
 									'timezone':tzId ? tzId : "EDT", "rpt_time":String.valueOf(formatter.format( currDate ) )]
-       			}
-       		}
-       		//No Assets were found for selected moveBundle,team and Location
-       		if(reportFields.size() <= 0) {    		
-       			flash.message = " No Cables were found for  selected values  "
+				}
+			}
+			//No Assets were found for selected moveBundle,team and Location
+			if(reportFields.size() <= 0) {    		
+				flash.message = " No Cables were found for  selected values  "
 				redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
-        	}else {
+			}else {
 				def name = reportName == 'cablingQA' ? "CablingQA" : "CablingConflict"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
-        		
+				
 				chain(controller:'jasper',action:'index',model:[data:reportFields],
 						params:["_format":"PDF","_name":"${filename}","_file":"${params._file}"])
-        	}
-        }
-    }
+			}
+		}
+	}
 	/*
 	 *  Generate XLS Structured Cabling data report 
 	 */
@@ -918,8 +918,8 @@ class ReportsController {
 				def cablesQuery = new StringBuffer("from AssetCableMap acm where acm.assetFrom.project.id = $projectInstance.id ")
 			//if moveBundleinstance is selected (single moveBundle)
 			if ( moveBundleInstance ) {
-			    bundleName = moveBundleInstance?.name
-			    cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
+				bundleName = moveBundleInstance?.name
+				cablesQuery.append(" and acm.assetFrom.moveBundle = $moveBundleInstance.id ")
 			}
 			//All Bundles Selected
 			else {
@@ -951,7 +951,7 @@ class ReportsController {
 				book.write()
 				book.close()
 			} catch( Exception ex ) {
-        log.error "Exception occurred while exporting cabling data " + ex
+		log.error "Exception occurred while exporting cabling data " + ex
 				flash.message = "Exception occurred while exporting data"
 				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
 				return;
@@ -1089,8 +1089,8 @@ class ReportsController {
 					}
 				}
 				powerA = powerType != "Watts" ?  powerA ? (powerA / 120).toFloat().round(1) : 0.0 : powerA ? Math.round(powerA):0 
-	            powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
-	            powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
+				powerB = powerType != "Watts" ?  powerB ? (powerB / 120).toFloat().round(1) : 0.0 : powerB ? Math.round(powerB):0
+				powerC = powerType != "Watts" ?  powerC ? (powerC / 120).toFloat().round(1) : 0.0 : powerC ? Math.round(powerC):0
 				powerTBD = powerType != "Watts" ?  powerTBD ? (powerTBD / 120).toFloat().round(1) : 0.0 : powerTBD ? Math.round(powerTBD):0
 				totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 120).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
 				
@@ -1134,7 +1134,7 @@ class ReportsController {
 			} else if(params.output == "pdf"){
 				def filename = 	"Power_Report-${project.name}"
 					filename = filename.replace(" ", "_")
-        		
+				
 				chain(controller:'jasper',action:'index',model:[data:reportDetails],
 						params:["_format":"PDF","_name":"${filename}","_file":"Power_Report"])
 			}
@@ -1164,7 +1164,7 @@ class ReportsController {
 				errorMsg = " User tried to access moveEvent ${moveEventId} that was not found in project : ${project} "
 				log.warn "generateCheckList: User tried to access moveEvent ${moveEventId} that was not found in project : ${project}"
 			} else {
-			    errorMsg = ""
+				errorMsg = ""
 				userPreferenceService.setPreference( "MOVE_EVENT", "${moveEventId}" )
 				moveEventInstance = MoveEvent.get(moveEventId)
 				return reportsService.generatePreMoveCheckList(project.id, moveEventInstance)
@@ -1192,12 +1192,12 @@ class ReportsController {
 	 */
 	def applicationProfiles ={
 		
-    def project = securityService.getUserCurrentProject();
-    if (!project) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+	def project = securityService.getUserCurrentProject();
+	if (!project) {
+	  flash.message = "Please select project to view Reports"
+	  redirect(controller:'project',action:'list')
+	  return
+	}
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = params.containsKey("moveBundle") ? params.moveBundle : securityService.getUserCurrentMoveBundleId()?: moveBundleList[0]?.id
 		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
@@ -1289,7 +1289,7 @@ class ReportsController {
 			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
 			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
-		    def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
 			
 			//field importance styling for respective validation.
@@ -1361,7 +1361,7 @@ class ReportsController {
 			//if found any bad id returning to the user
 			if( badReqEventIds ){
 				flash.message = "Event ids $badReqEventIds is not associated with current project.\
-							    Kindly request for project associated  Event ids ."
+								Kindly request for project associated  Event ids ."
 				return
 			}
 			
@@ -1397,7 +1397,7 @@ class ReportsController {
 					  exportTaskReportPdf(taskList, tzId, project)
 					  break;
 					  
-			    default :
+				default :
 					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId]) 
 					 break;
 			}
@@ -1472,12 +1472,12 @@ class ReportsController {
 	 */
 	def serverConflicts = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-    def projectInstance = securityService.getUserCurrentProject();
-    if (!projectInstance) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+	def projectInstance = securityService.getUserCurrentProject();
+	if (!projectInstance) {
+	  flash.message = "Please select project to view Reports"
+	  redirect(controller:'project',action:'list')
+	  return
+	}
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
@@ -1518,12 +1518,12 @@ class ReportsController {
 	 * used to render to application Migration Report selection criteria.
 	 */
 	def applicationMigrationReport = {
-    def project = securityService.getUserCurrentProject();
-    if (!project) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+	def project = securityService.getUserCurrentProject();
+	if (!project) {
+	  flash.message = "Please select project to view Reports"
+	  redirect(controller:'project',action:'list')
+	  return
+	}
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		def smeList = reportsService.getSmeList(moveBundleId, 'sme')
@@ -1614,12 +1614,12 @@ class ReportsController {
 	 */
 	def databaseConflicts = {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-    def projectInstance = securityService.getUserCurrentProject();
-    if (!projectInstance) {
-      flash.message = "Please select project to view Reports"
-      redirect(controller:'project',action:'list')
-      return
-    }
+	def projectInstance = securityService.getUserCurrentProject();
+	if (!projectInstance) {
+	  flash.message = "Please select project to view Reports"
+	  redirect(controller:'project',action:'list')
+	  return
+	}
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]
