@@ -104,7 +104,7 @@ class TaskController {
 			errorMsg = "Task Not Found : Was unable to find the Task for the specified id - ${params.id}"
 		}
 		
-		def map = [assignedTo:assignedTo, errorMsg:errorMsg]
+		def map = [assignedToName:assignedTo, errorMsg:errorMsg]
 		render map as JSON
 	}
 	

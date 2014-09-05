@@ -1562,10 +1562,11 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 									cell.html(data.assetComment.status)
 									cell.parent().removeAttr('class').addClass(data.statusCss)
 									cell.removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
-								}								
+								}
+								updateColumn('assignedTo', id, data.assignedToName);
 								break;
 							case "assignTask":
-								updateColumn('assignedTo', id, data.assignedTo);
+								updateColumn('assignedTo', id, data.assignedToName);
 								break;
 							case "changeEstTime":
 								updateColumn('estStart', id, data.estStart);

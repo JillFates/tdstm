@@ -375,7 +375,11 @@ class CommentService {
 			
 				def statusCss = taskService.getCssClassForStatus(assetComment.status )
 				def lastUpadatedFormatter  = new SimpleDateFormat("MM/dd kk:mm:ss");
-				map = [ assetComment : assetComment, status : status ? true : false , cssClass:css, statusCss:statusCss, 
+				map = [ assetComment : assetComment,
+				        status : status ? true : false,
+				        cssClass:css,
+				        statusCss:statusCss, 
+				        assignedToName: assetComment.assignedTo?(assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName):"",
 						lastUpdatedDate:lastUpadatedFormatter.format(GormUtil.convertInToUserTZ(assetComment.lastUpdated,tzId)) ]
 
 				// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
