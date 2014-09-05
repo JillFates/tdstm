@@ -118,7 +118,6 @@
 					</tr>
 				</thead>
 				<tbody>
-			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Rack+Layout" class="home">Racks (old)</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home">Cabling Conflict</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 			<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home">Cabling Data</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 			<tr><td><a href="/tdstm/reports/powerReport" class="home">Power</a> </td><td style="width:12px">W</td><td style="width:12px">E</td><td style="width:12px">P</td></tr>

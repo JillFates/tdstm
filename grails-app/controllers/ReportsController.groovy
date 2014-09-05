@@ -29,6 +29,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.ControllerUtil as CU
 import com.tds.util.workbook.*;
 
 class ReportsController {
@@ -44,84 +45,69 @@ class ReportsController {
 	def moveBundleService
 	def projectService
 	def assetEntityService
+
 	def index = { 
-		render(view:'home')
+		render(view:'index')
 	}
 	
 	// Generate Report Dialog
 	def getBundleListForReportDialog = {
-		def reportId = params.reportId
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
-		def projectId = currProj.CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject();
-		if (!projectInstance) {
-		  flash.message = "Please select project to view Reports"
-		  redirect(controller:'project',action:'list')
-		  return
-		}
+		def projectInstance = CU.getProjectForPage( this )
+		if (! projectInstance) 
+			return
+
 		def moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-		def browserTest = false
-		if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
-			browserTest = true
-		}
-		switch (reportId) {
-	case "Home" :
-					render( view:'home',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						break;
-	case "Rack Layout" :  
-					userPreferenceService.loadPreferences("CURR_BUNDLE")
-					def currentBundle = getSession().getAttribute("CURR_BUNDLE")
-					render( view:'rackLayout',
-						model:[moveBundleInstanceList: moveBundleInstanceList, 
-						projectInstance:projectInstance, currentBundle:currentBundle])
-						break;
-	case "cart Asset":  
-					render( view:'cartAssetReport',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						break;
-	case "Issue Report":  
-					render( view:'issueReport',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						break;
-	case "Task Report":
+		def browserTest = ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) )
+
+		switch (params.reportId) {
+			case "Home" :
+				render( view:'home',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+				break
+			case "cart Asset":  
+				render( view:'cartAssetReport',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+				break
+			case "Issue Report":  
+				render( view:'issueReport',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+				break
+			case "Task Report":
 					def moveEventInstanceList  = MoveEvent.findAllByProject(projectInstance,[sort:'name'])
-					render( view:'taskReport',
-						model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance])
-						break;
-	case "Transportation Asset List":  
-					render( view:'transportationAssetReport',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
-						break;
-	case "Asset Tag" :
-					render( view:'assetTagLabel',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,
-						browserTest: browserTest])
-						break;
-	case "Login Badges":  
-					render( view:'loginBadgeLabelReport',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, 
-						browserTest: browserTest])
-						break;
-	case "MoveResults" :
-					def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
-					render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
-						break;
-	case "CablingQA":  
-					render( view:'cablingQAReport',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])
-						break;
-	case "CablingConflict":
-					render( view:'cablingQAReport',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'conflict'])
-						break;
-	case "CablingData":  
-					render( view:'cablingData',
-						model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance ])
-						break;
-	default: 
-					render 'An invalid report was specified'
-						break;
+				render( view:'taskReport',
+					model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance])
+				break
+			case "Transportation Asset List":  
+				render( view:'transportationAssetReport',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance])
+				break
+			case "Asset Tag" :
+				render( view:'assetTagLabel',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance,	browserTest: browserTest])
+				break
+			case "Login Badges":  
+				render( view:'loginBadgeLabelReport',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, browserTest: browserTest])
+				break
+			case "MoveResults" :
+				def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
+				render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
+				break
+			case "CablingQA":  
+				render( view:'cablingQAReport',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])
+				break
+			case "CablingConflict":
+				render( view:'cablingQAReport',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'conflict'])
+				break
+			case "CablingData":  
+				render( view:'cablingData',
+					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance ])
+				break
+			default: 
+				render 'An invalid report was specified'
+				break
 		}
 	}
 	
@@ -130,12 +116,13 @@ class ReportsController {
 		def reportName = params.reportName
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
-	  def projectInstance = securityService.getUserCurrentProject();
-	  if (!projectInstance) {
-		flash.message = "Please select project to view Reports"
-		redirect(controller:'project',action:'list')
-		return
-	  }
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Reports"
+			redirect(controller:'project',action:'list')
+			return
+		}
+
 		def partyGroupInstance = PartyGroup.get(projectInstance.id)
 		def sortOrder = params.sortType
 		def teamPartyGroup
@@ -247,211 +234,7 @@ class ReportsController {
 			}
 		}
 	}
-	/*----------------------------------------------------------
-	 * @author : Lokanath Reddy
-	 * @param  : move bundle and params from rack elevation form
-	 * @return : Data for Rack Elevation report  
-	 *---------------------------------------------------------*/
-	def rackLayoutReport = {
-		def bundleId = params.moveBundle
-		def maxUSize = 42
-		if(bundleId == "null") {
-			flash.message = " Please Select Bundles. "
-			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Rack Layout'] )
-		} else {
-			def includeOtherBundle = params.otherBundle
-			def includeBundleName = params.bundleName
-			def printQuantity = params.printQuantity
-			def location = params.locationName
-			def frontView = params.frontView
-			def backView = params.backView
-			def racks = []
-			def rack
-			def projectId = getSession().getAttribute("CURR_PROJ").CURR_PROJ
-			def rackLayout = []
 
-			def moveBundle = MoveBundle.findById(bundleId)
-			def reportsHasPermission = RolePermissions.hasPermission("reports")
-			if(location == "source"){
-				rack = request.getParameterValues("sourcerack")
-				rack.each{
-					racks<<[rack:it]
-				}
-				if( rack[0] == "" ){
-					def sourceRackQuery = "select CONCAT_WS('~',IFNULL(source_location ,'blank'),IFNULL(source_room,'blank'),"+
-											"IFNULL(source_rack,'blank')) as rack from asset_entity where"
-					if( bundleId && !includeOtherBundle){
-						sourceRackQuery += " move_bundle_id = $bundleId "
-					} else {
-						sourceRackQuery += " project_id = $projectId "
-					}
-					sourceRackQuery += " and asset_type NOT IN ('VM', 'Blade') and source_rack != '' and source_rack is not null "
-					racks = jdbcTemplate.queryForList(sourceRackQuery + "group by source_location, source_rack, source_room")
-				}
-			} else {
-				rack = request.getParameterValues("targetrack")
-				rack.each{
-					racks<<[rack:it]
-				}
-				if(rack[0] == ""){
-					def targetRackQuery = "select CONCAT_WS('~',IFNULL(target_location ,'blank'),IFNULL(target_room,'blank'), "+
-											"IFNULL(target_rack,'blank')) as rack from asset_entity where"
-					if( bundleId && !includeOtherBundle){
-						targetRackQuery += " move_bundle_id = $bundleId "
-					} else {
-						targetRackQuery += " project_id = $projectId "
-					}
-					targetRackQuery += " and asset_type NOT IN ('VM', 'Blade') and target_rack != '' and target_rack is not null "
-					racks = jdbcTemplate.queryForList( targetRackQuery  + "group by target_location, target_rack, target_room")
-					
-					}
-				
-				}
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
-			racks.each{
-				def rackRooms = it?.rack.split("~")
-				if(rackRooms?.size() == 3){
-					def assetDetails = []
-					def assetDetail = []
-					def finalAssetList = []
-					def assetsDetailsQuery = supervisorConsoleService.getQueryForRackElevation( bundleId, projectId, includeOtherBundle, rackRooms, location )
-					def assetEntityList = jdbcTemplate.queryForList( assetsDetailsQuery.toString() )
-					assetEntityList.each{assetEntity ->
-						def overlapError = false
-						def rackPosition = assetEntity.rackPosition != 0 ? assetEntity.rackPosition : 1
-						def rackSize = assetEntity?.usize != 0 ? assetEntity?.usize : 1
-						def position = rackPosition + rackSize - 1
-						def newHigh = position
-						def newLow = rackPosition
-						if(assetDetail.size() > 0){
-							def flag = true
-							assetDetail.each{asset->
-								flag = true
-								def currentHigh = asset.currentHigh
-								def currentLow = asset.currentLow
-								def ignoreLow = (currentLow <= newLow && currentHigh >= newHigh )
-								def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
-								def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
-								def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
-								if(position > maxUSize){
-									asset.position = maxUSize
-									asset.rowspan = 1 
-									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-									asset.overlapError = true
-									asset.cssClass = "rack_error"
-									flag = false
-								} else if(ignoreLow){
-									asset.position = currentHigh
-									asset.rowspan = currentHigh - currentLow + 1 
-									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-									asset.overlapError = true
-									asset.cssClass = "rack_error"
-									flag = false
-								} else if(changeBoth) {
-									asset.currentHigh = newHigh
-									asset.currentLow = newLow
-									asset.position = newHigh
-									asset.rowspan = newHigh - newLow + 1
-									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-									asset.overlapError = true
-									asset.cssClass = "rack_error"
-									flag = false
-								} else if(changeHigh){
-									asset.currentHigh = newHigh
-									asset.position = newHigh
-									asset.rowspan = newHigh - currentLow  + 1
-									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-									asset.overlapError = true
-									asset.cssClass = "rack_error"
-									flag = false
-								} else if(changeLow){
-									asset.currentLow = newLow
-									asset.position = currentHigh
-									asset.rowspan = currentHigh - newLow +1
-									asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag
-									asset.overlapError = true
-									asset.cssClass = "rack_error"
-									flag = false
-								}
-							}
-							
-							if(flag){
-								if(position > maxUSize) {
-									position = maxUSize
-									newLow = maxUSize
-									assetEntity?.usize = 1
-									overlapError = true
-								}
-								assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
-											  rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow]
-							}
-						}else{
-							if(position > maxUSize) {
-								position = maxUSize
-								newLow = maxUSize
-								assetEntity?.usize = 1
-								overlapError = true
-							}
-							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag, position:position, overlapError:overlapError, 
-										  rowspan:assetEntity?.usize, currentHigh : position, currentLow : newLow ]
-						}
-					}
-					for (int i = maxUSize; i > 0; i--) {
-						def assetEnity
-						def cssClass = "empty"
-						def rackStyle = "rack_past"
-						assetDetail.each {
-							if(it.position == i ){
-								assetEnity = it
-							}
-						}
-						if(assetEnity){
-							if(assetEnity.assetEntity?.racksize > 1 ){
-								cssClass = 'rack_error'
-								rackStyle = 'rack_error'
-							} else if(assetEnity.overlapError){
-								cssClass = 'rack_error'
-								rackStyle = 'rack_error'
-							} else if(bundleId && assetEnity.assetEntity?.bundleId != Integer.parseInt(bundleId)){
-								def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
-								def startTime = moveBundle.startTime ? moveBundle.startTime.getTime() : 0
-								if(startTime < currentTime){
-									cssClass = 'rack_past'
-								} else {
-									cssClass = "rack_future"
-								}
-							} else{
-								cssClass = 'rack_current'
-								rackStyle = 'rack_current'
-							}
-							if(assetEnity.assetEntity?.rackPosition == 0 || assetEnity.assetEntity?.usize == 0 ){
-								rackStyle = 'rack_error'
-							}
-							assetDetails<<[asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle]
-						}else {
-							assetDetails<<[asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle]
-						}
-					}
-					def backViewRows
-					def frontViewRows
-					if(backView){
-						backViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, backView )
-					}
-					if(frontView){
-						frontViewRows = getRackLayout( reportsHasPermission, assetDetails, includeBundleName, null )
-					}
-					if(rackRooms.size() == 3){
-						rackLayout << [ assetDetails : assetDetails, rack : rackRooms[2] , room : rackRooms[1] , 
-										location : rackRooms[0] +"("+location+")" , frontViewRows : frontViewRows, backViewRows : backViewRows ]
-					} else {
-						rackLayout << [ assetDetails : assetDetails, rack : "", room : "", location : "("+location+")" , 
-										frontViewRows : frontViewRows, backViewRows : backViewRows ]
-					}
-			}
-		}
-		render(view:'rackLayoutReport',model:[rackLayout : rackLayout, frontView : frontView, backView : backView])
-		}
-	}
 	/*
 	 * Generate Issue Report
 	 */
