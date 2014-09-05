@@ -50,4 +50,5 @@ databaseChangeLog = {
 	include file: '20140903-drop-permission-ViewSupervisorConsoles.groovy'
 	include file: '20140903-drop-colums-AssetEntity-source-target-rooms.groovy'
 	include file: '20140904-remove-asset-entity-old-fields.groovy'
+	include file: '20140905-remove-asset-entity-old-fields-map.groovy'
 }
