@@ -2,7 +2,7 @@
   "name": "TEST",
   "description": "Webdriver E2E test",
   "dependencies": {
-    "selenium-webdriver": "2.42.2",
+    "selenium-webdriver": "2.42.1",
     "minijasminenode": "1.1.1",
     "jasminewd":"1.0.4",
     "jasmine-reporters": "~0.2.1",
