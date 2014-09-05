@@ -1064,7 +1064,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 	}
 
 	scope.tasks.viewTaskGraph = function(e){
-		var eventsArray = scope.tasks.eventsArray;
+		var eventsArray = scope.contexts.eventsArray;
 		var eventName = scope.tasks.generation.contextName;
 		var eventId = null;
 		for (var i=0; i<eventsArray.length;i++) {
