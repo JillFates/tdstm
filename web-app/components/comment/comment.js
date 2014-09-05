@@ -1388,17 +1388,18 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 				scope.updateDependencyList(dependency);
 			};
 			scope.updateDependencyList = function(dependency) {
+				moveEvent = (scope.moveEvent==null?'':scope.moveEvent);
 				if (!depByCategory[dependency.category]) {
 					depByCategory[dependency.category] = {};
 				}
-				if (depByCategory[dependency.category][scope.moveEvent]) {
-					dependency.list = depByCategory[dependency.category][scope.moveEvent];
+				if (depByCategory[dependency.category][moveEvent]) {
+					dependency.list = depByCategory[dependency.category][moveEvent];
 					checkTaskIdExist(dependency);
 				} else {
-					commentService.getDependencies(dependency.category, '', '', scope.moveEvent).then(
+					commentService.getDependencies(dependency.category, '', '', moveEvent).then(
 						function(data) {
-							depByCategory[dependency.category][scope.moveEvent] = data.data;
-							dependency.list = depByCategory[dependency.category][scope.moveEvent];
+							depByCategory[dependency.category][moveEvent] = data.data;
+							dependency.list = depByCategory[dependency.category][moveEvent];
 							checkTaskIdExist(dependency);
 						},
 						function(data) {
