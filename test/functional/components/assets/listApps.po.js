@@ -12,10 +12,20 @@ var ListApps = function(){
   this.storageLoadingId = 'load_storageIdGrid';
   this.dependencyLoadingId ='load_dependencyGridIdGrid';
 
+  this.getLoadingStyle = function(asse){
+    return element(by.id(asse)).getAttribute('style').then(function(attClass){
+      return (attClass.search('display: none;') !== -1);
+    });      
+  };
+  this.getListItems = function(){
+    return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
+      return list.length>0;
+    });
+  };
+
   this.verifySearchResults = function(count,device){
     var that  =this;
     var asse = 'assetnotdefine';
-    var cont = 0;
     return browser.wait(function(){
       var d = {
         'device': function(){
@@ -35,25 +45,16 @@ var ListApps = function(){
         }
       };
       d[device]();
-        return element(by.id(asse)).getAttribute('style').then(function(attClass){
-          console.log('"'+attClass+'"');
-          // if(attClass.search('display: block;') !== -1){
-            // cont =1;
-          // }
-          // console.log('cont',cont);
-          return (attClass.search('display: none;') !== -1);
-          // return (attClass.search('display: none;') !== -1  && cont===1);
-        });
+      return that.getLoadingStyle(asse)&&that.getListItems();
     }).then(function(){
         return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
-        if(count>0){
           return list;
-        }else{
-          return 'No results found';
-        }
       });
-    });
+    },function(){
+      return 'No results found';}
+    );
   };
+
   this.clickOnTaskIcon = function(appId){
     var addtaskIcon =  $('#icon_task_'+appId);
     addtaskIcon.click();

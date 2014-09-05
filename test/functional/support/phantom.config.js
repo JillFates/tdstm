@@ -2,7 +2,7 @@
 var baseUrl =  process.env.BASE_URL;
 exports.config = {
 
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 80000,
   suites: {
     test:[
     '../components/projects/createProject.spec.js',
@@ -57,6 +57,8 @@ exports.config = {
     '../components/reports/applicationConflicts.spec.js'
     ]
   },
+
+  seleniumAddress:'http://localhost:4444/wd/hub',
 
   capabilities: {
     'browserName': "phantomjs",

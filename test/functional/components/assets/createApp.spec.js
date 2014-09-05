@@ -165,6 +165,7 @@ describe('createApp', function(){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });
+        expect(list.length).toEqual(1);
       });
     });
   }); // Search for an app
