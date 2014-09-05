@@ -1380,7 +1380,10 @@ class ReportsController {
 
 			if( params.viewUnpublished ){
 				taskListHql += " AND isPublished = :isPublished "
-				argMap << ["isPublished": true]
+				argMap << ["isPublished": false]
+			} else {
+				taskListHql += " AND isPublished = :isPublished "
+				argMap << ["isPublished": true]				
 			}
 
 			taskList = AssetComment.findAll(taskListHql, argMap)
