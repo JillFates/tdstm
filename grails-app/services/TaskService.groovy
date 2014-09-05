@@ -1713,6 +1713,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Determine the start/completion times for the event
+		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
 		def eventTimes = moveEvent ? moveEvent.getEventTimes() : [start:null, completion:null]
 
 		// TODO : Need to change out the categories to support all ???
@@ -1721,18 +1722,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Get the various workflow steps that will be used to populate things like the workflows ids, durations, teams, etc when creating tasks
 		def workflowSteps = []
 		if (bundleIds.size()) {
-		def workflowStepSql = "select mb.move_bundle_id AS moveBundleId, wft.*, mbs.* \
-			from move_bundle mb \
-			left outer join workflow wf ON wf.process = mb.workflow_code \
-			left outer join workflow_transition wft ON wft.workflow_id=wf.workflow_id \
-			left outer join move_bundle_step mbs ON mbs.move_bundle_id=mb.move_bundle_id AND mbs.transition_id=wft.trans_id \
-			where mb.move_bundle_id IN (${GormUtil.asCommaDelimitedString(bundleIds)})"
+			// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
+			def workflowStepSql = "select mb.move_bundle_id AS moveBundleId, wft.*, mbs.* \
+				from move_bundle mb \
+				left outer join workflow wf ON wf.process = mb.workflow_code \
+				left outer join workflow_transition wft ON wft.workflow_id=wf.workflow_id \
+				left outer join move_bundle_step mbs ON mbs.move_bundle_id=mb.move_bundle_id AND mbs.transition_id=wft.trans_id \
+				where mb.move_bundle_id IN (${GormUtil.asCommaDelimitedString(bundleIds)})"
 			workflowSteps = jdbcTemplate.queryForList(workflowStepSql)
 		}
 			
 		// log.debug "Workflow steps SQL= ${workflowStepSql}"	
-		// log.debug "Found ${workflowSteps.size()} workflow steps for moveEvent ${moveEvent}"
-		
+		// log.debug "Found ${workflowSteps.size()} workflow steps for moveEvent ${moveEvent}"		
 
 		/**
 		 * A helper closure used by generateRunbook to link a task to its predecessors by asset or milestone
@@ -1855,10 +1856,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		TimeDuration elapsed
 		def failed=null
 
-		def noSuccessorsSql = "select t.asset_comment_id as id \
-			from asset_comment t \
-			left outer join task_dependency d ON d.predecessor_id=t.asset_comment_id \
-			where t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null \
+		// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
+		def noSuccessorsSql = "SELECT t.asset_comment_id AS id \
+			FROM asset_comment t \
+			LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id \
+			WHERE t.move_event_id=${moveEvent.id} AND d.asset_comment_id is null \
 			AND t.auto_generated=true \
 			AND t.category IN (${categories}) "
 		// log.debug("noSuccessorsSql: $noSuccessorsSql")
@@ -1889,7 +1891,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.info "taskSpecIdList=$taskSpecIdList"
 
 			// Load the groups with the corresponding assets from the recipe group/filters
-			groups = fetchGroups( recipe, moveEvent, exceptions )
+			groups = fetchGroups( recipe, contextObj, exceptions )
 
 			out.append('Assets in Groups:<ul>')
 			groups.each { n, l ->
@@ -2222,7 +2224,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// Track what tasks were created by the taskSpec
 								taskSpecTasks[taskSpec.id] = []
 
-								def actionTasks = createAssetActionTasks(action, moveEvent, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions)
+								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions)
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
 									actionTasks.each() { t ->
@@ -2259,7 +2261,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							exceptCnt++
 						}
 					
-						assetsForTask = findAllAssetsWithFilter(moveEvent, taskSpec, groups, exceptions)
+						assetsForTask = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions)
 						log.info "Found ${assetsForTask?.size()} assets for taskSpec ${taskSpec.id}-${taskSpec.description}"
 						if ( !assetsForTask || assetsForTask.size()==0) 
 							return // aka continue
@@ -3737,6 +3739,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 	/**
 	 * This special method is used to find all assets of a moveEvent that match the criteria as defined in the filter map
+	 * TODO : JPM 9/2014 : findAllAssetsWithFilter needs to be updated in order to support generating tasks for contexts other than event and bundle
 	 * @param contextObject - the object that the filter is applied to (either MoveEvent or MoveBundle) 
 	 * @param Map filter - contains various attributes that define the filtering
 	 * @param loadedGroups Map<List> - A mapped list of the groups and associated assets that have already been loaded
@@ -4176,7 +4179,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * property to later be used to create the predecessor dependencies.
 	 *
 	 * @param String action - options [rack, cart, truck]
-	 * @param moveEvent - MoveEvent object
+	 * @param contextObj - the context for which we are generating the tasks (e.g. MoveEvent, MoveBundle, Application)
 	 * @param Person whom - who is creating the tasks
 	 * @param List<Person> - references of all staff associated with the project
 	 * @param Integer recipeId
@@ -4185,13 +4188,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param StringBuffer exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createAssetActionTasks(action, moveEvent, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions ) {
+	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions ) {
 		def taskList = []
 		def loc 			// used for racks
 		def msg
 		
 		// Get all the assets 			
-		def assetsForAction = findAllAssetsWithFilter(moveEvent, taskSpec, groups, exceptions)
+		def assetsForAction = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions)
 
 		// If there were no assets we can bail out of this method
 		if (assetsForAction.size() == 0) {
@@ -4199,6 +4202,27 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		def tasksToCreate = []	// List of tasks to create
+
+		// Identify the MoveEvent if possible
+		def moveEvent
+		switch (contextObj) {
+			case MoveEvent:
+				moveEvent = contextObj
+				break
+			case MoveBundle:
+				moveEvent = contextObj.moveEvent
+				break
+			case Application:
+				moveEvent = contextObj.moveBundle?.moveEvent
+				break
+			default:
+				// log error for unhandled case with the context.class
+				msg = "createAssetActionTasks: called with unsupported context type ${contextObj.getClass().name} - $contextObj"
+				log.error msg
+				throw new RuntimeException(msg)
+				break
+		}
+	
 
 		// We will put all of the assets into the array. Below the unique method will be invoke to create a subset of entries
 		// for which we'll create tasks from.
@@ -4245,12 +4269,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					loc = taskSpec.disposition.toLowerCase()
 					if (! ['source','target'].contains(loc) ) {
 						msg = "$action action taskspec (${taskSpec.id}) has invalid value (${taskSpec.location}) for 'disposition' property" 
-						log.error "$msg - moveEvent ${moveEvent}"
+						log.error "$msg - context ${contextObj}"
 						throw new RuntimeException(msg)
 					}
 				} else {
 					msg = "$action taskspec (${taskSpec.id}) requires 'disposition' property" 
-					log.error "$msg - moveEvent ${moveEvent}"			
+					log.error "$msg - context ${contextObj}"			
 					throw new RuntimeException("$msg (options 'source', 'target')")			
 				}
 				
