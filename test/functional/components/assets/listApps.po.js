@@ -36,12 +36,13 @@ var ListApps = function(){
       };
       d[device]();
         return element(by.id(asse)).getAttribute('style').then(function(attClass){
-          // console.log('"'+attClass+'"');
-          if(attClass.search('display: block;') !== -1){
-            cont =1;
-          }
+          console.log('"'+attClass+'"');
+          // if(attClass.search('display: block;') !== -1){
+            // cont =1;
+          // }
           // console.log('cont',cont);
-          return (attClass.search('display: none;') !== -1  && cont===1);
+          return (attClass.search('display: none;') !== -1);
+          // return (attClass.search('display: none;') !== -1  && cont===1);
         });
     }).then(function(){
         return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){

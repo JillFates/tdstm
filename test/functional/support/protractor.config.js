@@ -2,7 +2,7 @@
 var baseUrl =  process.env.BASE_URL;
 exports.config = {
 
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 15000,
   suites: {
     test:[
     '../components/projects/createProject.spec.js',
@@ -61,24 +61,10 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome'
   },
-  // multiCapabilities: [{
-  //   'browserName': 'firefox'
-  // }, {
-  //   'browserName': 'chrome'
-  // }
-  // // ,{
-  // //   'browserName': "phantomjs",
-  // //   'phantomjs.binary.path':'./node_modules/phantomjs/bin/phantomjs'
-  // // }
-  // ],
 
   rootElement: 'div[ng-app]',
 
   onPrepare: function() {
-    // At this point, global 'protractor' object will be set up, and jasmine
-    // will be available. For example, you can add a Jasmine reporter with:
-    //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
-    //         'outputdir/', true, true));
     browser.driver.get(baseUrl+'/tdstm/auth/login');
     browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
     browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);

@@ -12,7 +12,7 @@ describe('Planning Menu', function(){
     describe('submenu',function(){
       it('should displayed 8 links', function(){
         menu.getPlanningSubmenu().then(function(list){
-          expect(list.length).toEqual(8);
+          expect(list.length).toEqual(7);
         });
       });
 
@@ -36,9 +36,6 @@ describe('Planning Menu', function(){
       });
       it('should have List Bundles in the submenu', function(){
         expect(menu.getListBundles().getText()).toEqual('List Bundles');
-      });
-      it('should have Assign Assets in the submenu', function(){
-        expect(menu.getAssignAssets().getText()).toEqual('Assign Assets... (old)');
       });
       it('should have Bundles Help in the submenu', function(){
         expect(menu.getBundlesHelp().getText()).toEqual('help');
