@@ -1341,12 +1341,11 @@ class AdminController {
 	 */
 	def reconcileAssetTypes = {
 		def hasPerm = RolePermissions.hasPermission("AdminMenuView")
-		
 		if (hasPerm) {
 			def query = """ -- Update DEVICES with their propery asset_type from their respective model record
 				UPDATE asset_entity a
 				JOIN model m ON a.model_id = m.model_id
-				SET a.asset_type = m.asset_type, a.model = m.name
+				SET a.asset_type = m.asset_type
 				WHERE a.asset_class='DEVICE';"""
 			jdbcTemplate.execute(query)
 		} else {
