@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
-		<title>${listType=='server'? 'Server' : 'Physical'} List</title>
+		<title>${title}</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
@@ -35,39 +35,40 @@
 			// TODO : move this code to JS once verified in tmdev
 
 			$(document).ready(function() {
-				$("#createEntityView").dialog({ autoOpen: false })
-				$("#showEntityView").dialog({ autoOpen: false })
-				$("#editEntityView").dialog({ autoOpen: false })
-				$("#manufacturerShowDialog").dialog({ autoOpen: false })
-				$("#modelShowDialog").dialog({ autoOpen: false })
-				$("#editManufacturerView").dialog({ autoOpen: false})
-				$("#cablingDialogId").dialog({ autoOpen:false })
-				$("#filterPane").draggable()
-				var filter = '${filter}'
-				var type = '${type}'
-				var event = '${event}'
-				var plannedStatus = '${plannedStatus}' 
-				var listType = '${listType}'
+				$("#createEntityView").dialog({ autoOpen: false });
+				$("#showEntityView").dialog({ autoOpen: false });
+				$("#editEntityView").dialog({ autoOpen: false });
+				$("#manufacturerShowDialog").dialog({ autoOpen: false });
+				$("#modelShowDialog").dialog({ autoOpen: false });
+				$("#editManufacturerView").dialog({ autoOpen: false});
+				$("#cablingDialogId").dialog({ autoOpen:false });
+				$("#filterPane").draggable();
+				var filter = '${filter}';
+				var type = '${type}';
+				var event = '${event}';
+				var plannedStatus = '${plannedStatus}' ;
+				var listType = '${listType}';
 
-				var assetName = '${assetName}'
-				var planStatus = '${planStatus}'
-				var moveBundle = '${moveBundle}'
-				var assetType = '${assetType}'
-				var model = '${model}'
-				var sourceLocation = '${sourceLocation}'
-				var sourceRack = '${sourceRack}'
-				var targetLocation = '${targetLocation}'
-				var targetRack = '${targetRack}'
-				var assetTag = '${assetTag}'
-				var serialNumber = '${serialNumber}'
-				var sortIndex = '${sortIndex}'
-				var sortOrder = '${sortOrder}'
-				var moveBundleId = '${moveBundleId}'
-				var toValidate = '${toValidate}'
+				var assetName = '${assetName}';
+				var planStatus = '${planStatus}';
+				var moveBundle = '${moveBundle}';
+				var assetType = '${assetType}';
+				var model = '${model}';
+				var sourceLocation = '${sourceLocation}';
+				var sourceRack = '${sourceRack}';
+				var targetLocation = '${targetLocation}';
+				var targetRack = '${targetRack}';
+				var assetTag = '${assetTag}';
+				var serialNumber = '${serialNumber}';
+				var sortIndex = '${sortIndex}';
+				var sortOrder = '${sortOrder}';
+				var moveBundleId = '${moveBundleId}';
+				var toValidate = '${toValidate}';
+				// var justPlanning = '${justPlanning}';
 				var windowWidth = $(window).width() - $(window).width()*5/100 ;
-				var sizePref = '${sizePref}'
-				var unassigned = '${unassigned}'
-				var listCaption ='Assets: <tds:hasPermission permission="AssetEdit"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
+				var sizePref = '${sizePref}';
+				var unassigned = '${unassigned}';
+				var listCaption = 'Assets: <tds:hasPermission permission="AssetEdit"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
@@ -83,7 +84,7 @@
 						{name:'model'}, 
 						{name:'sourceLocation'},
 						{name:'sourceRack'},
-						{name:'${assetPref['1']}',width:'130'},
+						{name:'${assetPref['1']}', width:'130'},
 						{name:'${assetPref['2']}', width:'130'},
 						{name:'${assetPref['3']}', width:'130'}, 
 						{name:'${assetPref['4']}', width:'130'},
@@ -166,7 +167,7 @@
 	</head>
 	<body>
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
-			<h1>${listType=='server'? 'Server' : 'Device'  } List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
+			<h1>${title} ${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<g:each var="key" in="['1','2','3','4']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">

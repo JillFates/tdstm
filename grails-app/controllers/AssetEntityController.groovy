@@ -1139,23 +1139,36 @@ class AssetEntityController {
 		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
 		def fieldPrefs = assetEntityService.getExistingPref(prefType)
 		
-		Map model = [
-			assetName: filters?.assetNameFilter ?:'', 
-			assetPref: fieldPrefs, 
-			assetTag: filters?.assetTagFilter ?:'', 
-			assetType: filters?.assetTypeFilter ?:'', 
-			listType: listType, 
-			model: filters?.modelFilter ?:'', 
-			prefType: prefType, 
-			serialNumber: filters?.serialNumberFilter ?:'', 
-			sourceLocation: filters?.sourceLocationFilter ?:'', 
-			sourceRack: filters?.sourceRackFilter ?:'',
-			targetLocation: filters?.targetLocationFilter ?:'', 
-			targetRack: filters?.targetRackFilter ?:'', 
-			type: params.type
-		]
+		if (['physical', 'virtual'].contains(params.filter))
+			listType=params.filter
 
-		model.putAll( assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters) )
+		Map model = assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters)
+
+		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
+		model.assetName = filters?.assetNameFilter ?:'' 
+		model.assetPref = fieldPrefs 
+		model.assetTag = filters?.assetTagFilter ?:'' 
+		model.assetType = filters?.assetTypeFilter ?:'' 
+		model.listType = listType 
+		model.model = filters?.modelFilter ?:'' 
+		model.prefType = prefType 
+		model.serialNumber = filters?.serialNumberFilter ?:'' 
+		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
+		model.sourceRack = filters?.sourceRackFilter ?:''
+		model.targetLocation = filters?.targetLocationFilter ?:'' 
+		model.targetRack = filters?.targetRackFilter ?:'' 
+
+		// The customized title of the list
+		def titleByType = [
+			'all': 'All Devices',
+			'server': 'Servers',
+			'physical': 'Physical Devices',
+			'virtual': 'Virtual Servers'
+		]
+		model.title = ( titleByType.containsKey(params.listType) ? titleByType[listType] : titleByType['all'] ) + ' List'
+
+		// JPM 9/2014 - NOT REALLY SURE IF THIS IS USED IN ANY WAY...
+		model.type = params.type
 
 		return model
 	}
@@ -1201,123 +1214,127 @@ class AssetEntityController {
 
 		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
 		
-		//def unknownQuestioned = "'${AssetDependencyStatus.UNKNOWN}','${AssetDependencyStatus.QUESTIONED}'"
-		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
-		//TODO:need to move the code to AssetEntityService.
-		def temp= ""
-		def joinQuery= ""
+		StringBuffer altColumns = new StringBuffer()
+		StringBuffer joinQuery = new StringBuffer()
 
-		if (params.sourceRack != null) {
-			temp +="sourceRack.tag AS sourceRack,"
-			joinQuery +="\n LEFT OUTER JOIN rack sourceRack ON sourceRack.rack_id=ae.rack_source_id \n"
-		}
+		// Until sourceRack is optional on the list we have to do this one
+		altColumns.append(", srcRack.tag AS sourceRack")
+		joinQuery.append("\n LEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 
+		// Tweak the columns selected and addition joins based on the user's selected columns
 		assetPref.each { key,value->
 			switch (value) {
 				case 'appOwner':
-					temp +="CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner,"
-					joinQuery +="\n LEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id \n"
+					altColumns.append(", CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner")
+					joinQuery.append("\n LEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id ")
 					break
 				case 'os':
-					temp +="ae.hinfo AS os,"
-					break
-				case 'sourceTeamMt':
-					temp +="pt.team_code AS sourceTeamMt,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt ON pt.project_team_id=ae.source_team_id \n"
-					break
-				case 'targetTeamMt':
-					temp +="pt1.team_code AS targetTeamMt,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt1 ON pt1.project_team_id=ae.target_team_id \n"
-					break
-				case 'sourceTeamLog':
-					temp +="pt2.team_code AS sourceTeamLog,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt2 ON pt2.project_team_id=ae.source_team_log_id \n"
-					break
-				case 'targetTeamLog':
-					temp +="pt3.team_code AS targetTeamLog,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt3 ON pt3.project_team_id=ae.target_team_log_id \n"
-					break
-				case 'sourceTeamSa':
-					temp +="pt4.team_code AS sourceTeamSa,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt4 ON pt4.project_team_id=ae.source_team_sa_id \n"
-					break
-				case 'targetTeamSa':
-					temp +="pt5.team_code AS targetTeamSa,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt5 ON pt5.project_team_id=ae.target_team_sa_id \n"
-					break
-				case 'sourceTeamDba':
-					temp +="pt6.team_code AS sourceTeamDba,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt6 ON pt6.project_team_id=ae.source_team_dba_id \n"
-					break
-				case 'targetTeamDba':
-					temp +="pt7.team_code AS targetTeamDba,"
-					joinQuery +="\n LEFT OUTER JOIN project_team pt7 ON pt7.project_team_id=ae.target_team_dba_id \n"
+					altColumns.append(", ae.hinfo AS os")
 					break
 				case ~/custom\d{1,}/:
-					temp +="ae.${value} AS ${value},"
+					altColumns.append(", ae.${value} AS ${value}")
 					break
 				case 'lastUpdated':
-					temp +="ee.last_updated AS ${value},"
-					joinQuery +="\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id \n"
+					altColumns.append(", ee.last_updated AS ${value}")
+					joinQuery.append("\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id ")
 					break
 				case 'manufacturer':
-					temp +="manu.name AS manufacturer,"
-					joinQuery +="\n LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id \n"
+					altColumns.append(", manu.name AS manufacturer")
+					joinQuery.append("\n LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
 					break
 				case 'modifiedBy':
-					temp +="CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy,"
-					joinQuery +="\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by \n"
+					altColumns.append(", CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy")
+					joinQuery.append("\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by ")
+					break
+
+				case 'sourceLocation':
+				case 'sourceRoom':
+					altColumns.append(", srcRoom.room_name AS sourceRoom, srcRoom.location AS sourceLocation")
+					joinQuery.append("\n LEFT OUTER JOIN room srcRoom ON srcRoom.room_id=ae.room_source_id ")
+					break
+				case 'sourceRack':
+						// Already handled above
+					break
+
+				case 'targetLocation':
+				case 'targetRoom':
+					altColumns.append(", tgtRoom.room_name AS targetRoom, tgtRoom.location AS targetLocation")
+					joinQuery.append("\n LEFT OUTER JOIN room tgtRoom ON tgtRoom.room_id=ae.room_target_id ")
 					break
 				case 'targetRack':
-					temp +="targetRack.tag AS targetRack,"
-					joinQuery +="\n LEFT OUTER JOIN rack targetRack ON targetRack.rack_id=ae.rack_target_id \n"
-					break;
+					altColumns.append(", tgtRack.tag AS targetRack")
+					joinQuery.append("\n LEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
+					break
 				case 'validation':
 					break;
 				default:
 					if (!['targetLocation', 'targetRack'].contains(value))
-						temp +="ae.${WebUtil.splitCamelCase(value)} AS ${value},"
+						altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS ${value} ")
 			}
 		}
-		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
+
 		def query = new StringBuffer(""" 
 			SELECT * FROM ( 
 				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model,  
-				IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
-		if (temp)
-			query.append(temp)
-			
-		/*adb.dependency_bundle AS depNumber,
-					COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
-					COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts*/
-		query.append("""ae.plan_status AS planStatus, mb.name AS moveBundle,ae.validation AS validation
+				IF(at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, 
+				IF(ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus, 
+				me.move_event_id AS event, ae.plan_status AS planStatus, 
+				mb.name AS moveBundle, ae.validation AS validation
+			""" )
+
+		if (altColumns.length())
+			query.append("\n${ altColumns.toString() }")
+		/*
+			// Count of dependencies, dep to resolve and conflicts
+			adb.dependency_bundle AS depNumber,
+			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
+			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts
+		*/
+
+		query.append("""
 				FROM asset_entity ae
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
 				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
-				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+				LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = '${AssetCommentType.TASK}'
+				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = '${AssetCommentType.COMMENT}'
 				""")
-		if (joinQuery)
+//				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
+//				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
+
+		if (joinQuery.length())
 			query.append(joinQuery)
 			
-		if (justPlanning=='true') {
-			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = ${project.id} AND mb.use_for_planning=${justPlanning}""")
-		} else {
-			query.append(""" \n LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				WHERE ae.project_id = ${project.id} """)
-		}
-		
-		query.append("\n AND ae.asset_class = '${AssetClass.DEVICE}'")
+		//
+		// Begin the WHERE section of the query	
+		//
+		query.append("\nWHERE ae.project_id = ${project.id}\nAND ae.asset_class = '${AssetClass.DEVICE}'")
 
+		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
+		/*
+		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
+		if (params.justPlanning)
+			justPlanning = params.justPlanning
+		*/
+		if (justPlanning=='true')
+			query.append(" AND mb.use_for_planning=${justPlanning}")
+		
 		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
-		if (listType=='server') {
-			query.append(" AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
-		} else if (listType=='physical') {
-			query.append(" AND ae.asset_class = '${AssetClass.DEVICE}' AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
-		} else {
-			query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
+		switch(listType) {
+			case 'server':
+				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
+				break
+			case 'physical':
+				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				break
+			case 'virtual':
+				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' AND ae.asset_type,'') IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				break
+			case 'device': 
+				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' " )
+				break
+			default:
+				query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 		}
 		
 		if (params.event && params.event.isNumber() && moveBundleList)

@@ -32,8 +32,11 @@ import com.tdssrc.grails.WebUtil
 
 class AssetEntityService {
 
+	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
 		'Custom11','Custom12','Custom13','Custom14','Custom15','Custom16','Custom17','Custom18','Custom19','Custom20','Custom21','Custom22','Custom23','Custom24']
+	
+	// TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 
 	static transactional = true
@@ -425,6 +428,13 @@ class AssetEntityService {
 			validation:params.validation
 		]
 
+		// Override the Use Just For Planning if a URL requests it (e.g. Planning Dashboard)
+		/*
+		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
+		if (params.justPlanning) 
+			model.justPlanning=true
+		*/
+		
 		def moveEvent = null
 		if (params.moveEvent && params.moveEvent.isNumber()) {
 			moveEvent = MoveEvent.findByProjectAndId(project, params.moveEvent )

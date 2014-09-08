@@ -256,7 +256,7 @@
 							<li><g:link class="mmlink" controller="assetEntity" action="assetSummary">Summary Table</g:link></li>	
 							<li><g:link class="mmlink" controller="application" action="list"  onclick="hideMegaMenu('assetMegaMenu')"> Applications</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'server']" onclick="hideMegaMenu('assetMegaMenu')"> Servers</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'physical']" onclick="hideMegaMenu('assetMegaMenu')"> All Devices</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" params="[listType:'all']" onclick="hideMegaMenu('assetMegaMenu')"> All Devices</g:link></li>
 							<li><g:link class="mmlink" controller="database"  onclick="hideMegaMenu('assetMegaMenu')"> Databases</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage Devices</g:link></li>
 							<li><g:link class="mmlink" controller="files"  onclick="hideMegaMenu('assetMegaMenu')"> Logical Storage</g:link></li>
