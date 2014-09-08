@@ -52,8 +52,6 @@
 				</tds:hasPermission>
 				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home">Login Badges</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px"> </td></tr>
 				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home">Asset Tags</a> </td><td style="width:12px">W</td><td style="width:12px"> </td><td style="width:12px"> </td></tr>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets" class="home">Move Team Worksheets</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
-				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset" class="home">Logistics Team Worksheets</a></td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 				<tr><td><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home">Transport Worksheets</a></td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 				</tbody>
 			</table>
