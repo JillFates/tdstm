@@ -19,11 +19,10 @@ describe('Delete a project', function(){
   });
 
   it('should only be found TP01 project', function(){
-    var results= 1;
+    var results= 2;
     listProjectPage.verifySearchResults(results).then(function(list){
       expect(list.length).toEqual(results);
-      list[0].getAttribute('id').then(function(text){
-        // expect(list[0].getText()).toEqual(details);
+      list[1].getAttribute('id').then(function(text){
         projId = text;
       });
     });
@@ -48,7 +47,6 @@ describe('Delete a project', function(){
       expect(alertDialog.getText()).toEqual(message);
       alertDialog.accept();
     }
-
   });
 
   it('should be redirect to project list', function(){
@@ -71,13 +69,10 @@ describe('Delete a project', function(){
   });
 
   it('should not return the deleted project', function(){
-    var results= 0;
-    listProjectPage.verifySearchResults(results).then(function(text){
-      expect(text).toEqual('No results found');
+    var results= 1;
+    listProjectPage.verifySearchResults(results).then(function(list){
+      expect(list.length).toEqual(1);
     });
   });
 
-  // it('project not found', function(){
-  //   project.verifySearchResults(false);
-  // });
 }); // Delete a project

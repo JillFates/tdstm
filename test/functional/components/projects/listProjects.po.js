@@ -3,7 +3,8 @@ var ListProjects = function(){
   this.titleh1Css = 'h1';
   this.createProjectbtnCss = 'input[value="Create Project"]';
   this.createProjecth1Css = 'h1';
-  this.projetsOnListCss = '#projectGridIdGrid tbody tr.ui-widget-content';
+  this.projetsOnListCss2 = '#projectGridIdGrid tbody tr.ui-widget-content';
+  this.projetsOnListCss = '#projectGridIdGrid tbody tr';
   this.searchProjectCodeId = 'gs_projectCode';
   this.refreshbtnCss = '#projectGridId span';
   this.projectsLinkListCss = this.projetsOnListCss+' a';
@@ -28,15 +29,11 @@ var ListProjects = function(){
     var d = webdriver.promise.defer();
     browser.driver.wait(function(){
       return  browser.driver.findElements(by.css(that.projectsLinkListCss)).then(function(list){
-        return list.length === count;
+        return list.length >=0 && list.length <=count;
       });
     }).then(function(){
       browser.driver.findElements(by.css(that.projetsOnListCss)).then(function(list){
-        if(count>0){
-          d.fulfill(list);
-        }else{
-          d.fulfill('No results found');
-        }
+        d.fulfill(list);
       });
     });
     return d.promise;

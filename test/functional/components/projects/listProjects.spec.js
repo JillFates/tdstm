@@ -18,10 +18,10 @@ describe('List Projects', function(){
     });
 
     it('should only be found MarketingDemo project', function(){
-      var results= 1;
+      var results= 2;
       listProjectPage.verifySearchResults(results).then(function(list){
         expect(list.length).toEqual(results);
-        list[0].getAttribute('id').then(function(text){
+        list[1].getAttribute('id').then(function(text){
           projId = text;
         });
       });

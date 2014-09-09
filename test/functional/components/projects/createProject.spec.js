@@ -6,6 +6,7 @@ describe('Create Project', function(){
   var menu = new Menu();
   var listProjectPage =  new ListProjects();
   var projectPage = new Project();
+  var projId;
 
   xdescribe('Require field validations', function(){
 
@@ -60,6 +61,51 @@ describe('Create Project', function(){
       menu.goToProjects('listProjects');
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
+    
+    describe('cleanup',function(){
+      var exist;
+      it('should find the project to delete', function(){
+        listProjectPage.setSearchProjectCode('TP01');
+        expect(listProjectPage.getSearchProjectCode().getAttribute('value')).toEqual('TP01');
+      });
+      
+      it('should verify if TP01 project is found', function(){
+        var results= 2;
+        listProjectPage.verifySearchResults(results).then(function(list){
+          if(list.length ===2){
+            list[1].getAttribute('id').then(function(text){
+              projId = text;
+            });
+            exist = true;
+          }else{
+            exist = false;
+          }
+        });
+      });
+      it('should delete the project if exists', function(){
+        if(exist){
+          listProjectPage.selectProjectfromListByPos(1,'TP01');
+          expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
+          if(process.env.BROWSER_NAME === 'phantomjs'){
+            browser.driver.executeScript('$(\'input[value="Delete"]\').attr("onclick","").click("true")');
+            projectPage.deleteCurrentProject();
+          }else{
+            projectPage.deleteCurrentProject();
+            var alertDialog = browser.driver.switchTo().alert();
+            var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
+            expect(alertDialog.getText()).toEqual(message);
+            alertDialog.accept();
+          }
+          browser.driver.wait(function() {
+            return menu.getCurrentUrl().then(function(url){
+              return url === process.env.BASE_URL+'/tdstm/project/list';
+            });
+          }).then(function(){
+            expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list');
+          });
+        }
+      });
+    });//cleanup
 
     it('should load create project page after hitting create project button',function(){
       listProjectPage.clickOnCreateProjectBtn();
@@ -174,7 +220,6 @@ describe('Create Project', function(){
         .toEqual(process.env.BASE_URL+'/tdstm/project/show');
     }); 
 
-
     it('should be displayed created project confirmation message', function(){
       expect(projectPage.getConfirmMsg()).toEqual('Project TP01 : Test Project created');
     });
@@ -183,13 +228,4 @@ describe('Create Project', function(){
       expect(menu.getHeaderTitle().getText()).toEqual(' TransitionManager™ - Test Project');
     });
   }); // Create Project
-//xdescribe('validate info from the created project', function(){
-
-//});
-
-
-
-
-
-
 }); // Create Project

@@ -215,7 +215,8 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=server"]'));
   };
   this.getAllDevices = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=physical"]'));
+    // return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=physical"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=all"]'));
   };
   this.getDatabases = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/database/index"]'));

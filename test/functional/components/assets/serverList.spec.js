@@ -29,7 +29,7 @@ describe('Server list', function(){
       var menu = new Menu();
       menu.goToAssets('servers');
       var appsListPage =  new ListApps();
-      expect(appsListPage.titleh.getText()).toEqual('Server List');
+      expect(appsListPage.titleh.getText()).toEqual('Servers List');
     });
 
     it('should open Create server modal after click on create button', function(){
