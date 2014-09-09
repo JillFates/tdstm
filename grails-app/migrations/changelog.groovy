@@ -52,4 +52,5 @@ databaseChangeLog = {
 	include file: '20140904-remove-asset-entity-old-fields.groovy'
 	include file: '20140905-remove-asset-entity-old-fields-map.groovy'
 	include file: '20140908-add-bulk-delete-permissions.groovy'
+	include file: '20140909-update-model-types.groovy'
 }
