@@ -16,6 +16,22 @@ function compareOrMerge(){
 	});
 }
 
+function bulkDelete(){
+	var includeAssociatedWithAssetEntity = $('#includeAssociatedWithAssetEntity').val();
+	var ids = new Array()
+	$('.cbox:checkbox:checked').each(function(){
+		ids.push(this.id.split("_")[2])
+	})
+	jQuery.ajax({
+		url: contextPath+'/person/bulkDelete',
+		data: {'ids':ids, 'includeAssociatedWithAssetEntity': includeAssociatedWithAssetEntity},
+		type:'POST',
+		success: function(data) {
+			location.reload(true);
+		}
+	});
+}
+
 function mergePerson(){
     var returnStatus =  confirm('This will merge the selected Person');
 	if(returnStatus ){

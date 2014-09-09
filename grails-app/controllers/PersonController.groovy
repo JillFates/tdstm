@@ -156,6 +156,13 @@ class PersonController {
 	
 	}
 
+	def bulkDelete = {
+		def ids = params.get("ids[]")
+		def includeAssociatedWithAssetEntity = params.includeAssociatedWithAssetEntity.toBoolean()
+		personService.bulkDelete(ids, includeAssociatedWithAssetEntity)
+		render(ServiceResults.success() as JSON)
+	}
+	
 	def show = {
 			
 		def personInstance = Person.get( params.id )

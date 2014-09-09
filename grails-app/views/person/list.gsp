@@ -11,6 +11,10 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+		<g:javascript src="bootstrap.js" />
+
 		<jqgrid:resources />
 		<g:javascript src="projectStaff.js" />
 		<g:javascript src="person.js" />
@@ -52,7 +56,10 @@
 				<tds:hasPermission permission='PersonCreateView'>\
 					<span class=\"button\"><input type=\"button\" value=\"Create Staff\" class=\"create\" onClick=\"createDialog()\"/></span> \
 				</tds:hasPermission>\
-				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>"
+				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>\
+				<tds:hasPermission permission='BulkDeletePerson'>\
+					<span class='capBtn'><input type='button' id='bulkDelete' value='Bulk delete' onclick='$(\"#bulkDeleteModal\").modal(\"show\")' /></span>\
+				</tds:hasPermission>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
 				
@@ -91,6 +98,26 @@
 		</script>
 	</head>
 	<body>
+	
+	<!-- BULK DELETE model -->
+	<div class="modal fade" id="bulkDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h4 class="modal-title" id="myModalLabel">Bulk delete</h4>
+	      </div>
+	      <div class="modal-body">
+	        <input type="checkbox" id="includeAssociatedWithAssetEntity"> Include persons associated as App Owner or SMEs?
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-danger" onclick='bulkDelete()'>Delete</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	
 	<div class="body fluid">
 		<h1>Staff List</h1>
 		<g:if test="${flash.message}">
