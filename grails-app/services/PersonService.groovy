@@ -16,6 +16,7 @@ class PersonService {
 	def namedParameterJdbcTemplate
 	def sessionFactory
 	def partyRelationshipService
+	def securityService
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -558,60 +559,84 @@ class PersonService {
 		}
 	}
 	
-	def bulkDelete(ids, includeAssociatedWithAssetEntity) {
+	def bulkDelete(loginUser, ids, includeAssociatedWithAssetEntity) {
+		if (!securityService.hasPermission(loginUser, 'BulkDeletePerson')) {
+			throw new UnauthorizedException('User doesn\'t have a BulkDeletePerson permission')
+		}
+
+		def deleted = 0
+		def skipped = 0
+		
 		if (ids) {
 			for (id in ids) {
-				def person = Person.get(id)
-				
-				if (person) {
-					def userLogin = UserLogin.findByPerson(person)
+				if (id.isLong()) {
+					def person = Person.get(id)
 					
-					//userLogin case
-					if (userLogin != null) {
-						log.warn("Ignoring bulk delete of ${id} as it contains userLogin")
-						continue;
-					}
-					
-					//tasks assigned
-					def tasks = AssetComment.findAllByAssignedTo(person)
-					if (!tasks.isEmpty()) {
-						log.warn("Ignoring bulk delete of ${id} as it contains tasks assigned")
-						continue;
-					}
-					
-					//asset entity
-					def assetEntities = AssetEntity.findAllByAppOwner(person)
-					if (!assetEntities.isEmpty()) {
-						if (includeAssociatedWithAssetEntity) {
-							AssetEntity.executeUpdate("update AssetEntity a set a.appOwner = null where a.appOwner.id = ?", [person.id])
-						} else {
-							log.warn("Ignoring bulk delete of ${id} as it contains asset entities assigned")
+					if (person) {
+						def userLogin = UserLogin.findByPerson(person)
+						
+						//userLogin case
+						if (userLogin != null) {
+							log.warn("Ignoring bulk delete of ${id} as it contains userLogin")
+							skipped++
 							continue;
 						}
-					}
-					
-					//applications
-					def apps1 = Application.findAllBySme(person)
-					def apps2 = Application.findAllBySme2(person)
-					if (!apps1.isEmpty() || !apps1.isEmpty()) {
-						if (includeAssociatedWithAssetEntity) {
-							Application.executeUpdate("update Application a set a.sme = null, a.sme2 = null where a.sme.id = ? or a.sme2.id = ?", [person.id, person.id])
-						} else {
-							log.warn("Ignoring bulk delete of ${id} as it contains applications assigned")
+						
+						//tasks assigned
+						def tasks = AssetComment.findAllByAssignedTo(person)
+						if (!tasks.isEmpty()) {
+							log.warn("Ignoring bulk delete of ${id} as it contains tasks assigned")
+							skipped++
 							continue;
 						}
+						
+						//asset entity
+						def apps = Application.findAllByAppOwner(person)
+						if (!apps.isEmpty()) {
+							if (includeAssociatedWithAssetEntity) {
+								AssetEntity.executeUpdate("update Application a set a.appOwner = null where a.appOwner.id = ?", [person.id])
+							} else {
+								log.warn("Ignoring bulk delete of ${id} as it contains application assigned")
+								skipped++
+								continue;
+							}
+						}
+						
+						//applications
+						def apps1 = Application.findAllBySme(person)
+						if (!apps1.isEmpty()) {
+							if (includeAssociatedWithAssetEntity) {
+								Application.executeUpdate("update Application a set a.sme = null where a.sme.id = ?", [person.id])
+							} else {
+								log.warn("Ignoring bulk delete of ${id} as it contains applications assigned")
+								skipped++
+								continue;
+							}
+						}
+						
+						def apps2 = Application.findAllBySme2(person)
+						if (!apps1.isEmpty()) {
+							if (includeAssociatedWithAssetEntity) {
+								Application.executeUpdate("update Application a set a.sme2 = null where a.sme2.id = ?", [person.id])
+							} else {
+								log.warn("Ignoring bulk delete of ${id} as it contains applications assigned")
+								skipped++
+								continue;
+							}
+						}
+	
+						//delete references
+						int deletedPartyRoles = Person.executeUpdate("delete PartyRole p where p.party.id = ?", [person.id])
+						int deletedPartyRelationships = Person.executeUpdate("delete PartyRelationship p where p.partyIdFrom.id = ? or p.partyIdTo.id = ?", [person.id, person.id])
+	
+						//delete object
+						person.delete()
+						deleted++
 					}
-
-					//delete references
-					int deletedPartyRoles = Person.executeUpdate("delete PartyRole p where p.party.id = ?", [person.id])
-					int deletedPartyRelationships = Person.executeUpdate("delete PartyRelationship p where p.partyIdFrom.id = ? or p.partyIdTo.id = ?", [person.id, person.id])
-
-					//delete object
-					person.delete()
 				}
-				
-				
 			}
 		}
+		
+		return ['deleted' : deleted, 'skipped' : skipped]
 	}
 }

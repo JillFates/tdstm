@@ -7,6 +7,7 @@ import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.apache.commons.lang3.StringUtils
+import grails.validation.ValidationException
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tdssrc.grails.GormUtil
@@ -157,10 +158,26 @@ class PersonController {
 	}
 
 	def bulkDelete = {
-		def ids = params.get("ids[]")
-		def includeAssociatedWithAssetEntity = params.includeAssociatedWithAssetEntity.toBoolean()
-		personService.bulkDelete(ids, includeAssociatedWithAssetEntity)
-		render(ServiceResults.success() as JSON)
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		try {
+			def ids = params.get("ids[]")
+			def includeAssociatedWithAssetEntity = params.includeAssociatedWithAssetEntity.toBoolean()
+			def data = personService.bulkDelete(loginUser, ids, includeAssociatedWithAssetEntity)
+			render(ServiceResults.success(data) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
 	}
 	
 	def show = {

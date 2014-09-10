@@ -27,8 +27,15 @@ function bulkDelete(){
 		data: {'ids':ids, 'includeAssociatedWithAssetEntity': includeAssociatedWithAssetEntity},
 		type:'POST',
 		success: function(data) {
-			location.reload(true);
+			if (data.status == 'success') {
+				alert('Number of people deleted: ' + data.data.deleted + ' number of people skipped: ' + data.data.skipped);
+				location.reload(true);
+			} else {
+				alert('Error deleting people');
+			}
 		}
+	}).fail(function() {
+		alert('Error deleting people');
 	});
 }
 
