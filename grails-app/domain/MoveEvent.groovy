@@ -64,6 +64,7 @@ class MoveEvent {
 	static mapping  = {
 		version true
 		id column:'move_event_id'
+		sort 'name'
         columns {
 	 		revisedCompletionTime sqlType: 'DateTime'
 			runbookRecipe sqlType: 'Text'
