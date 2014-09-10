@@ -1317,28 +1317,27 @@ class AssetEntityController {
 			justPlanning = params.justPlanning
 		*/
 		if (justPlanning=='true')
-			query.append(" AND mb.use_for_planning=${justPlanning}")
+			query.append("\n AND mb.use_for_planning=${justPlanning}")
 		
+		query.append("\n AND ae.asset_class='${AssetClass.DEVICE}'")
+
 		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
 		switch(listType) {
 			case 'server':
-				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
+				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 				break
 			case 'physical':
-				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				query.append("\n AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
 				break
 			case 'virtual':
-				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' AND ae.asset_type,'') IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				query.append("\n AND ae.asset_type,'') IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
 				break
-			case 'device': 
-				query.append(" AND ae.asset_class='${AssetClass.DEVICE}' " )
+			case 'all': 
 				break
-			default:
-				query.append(" AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
 		}
 		
 		if (params.event && params.event.isNumber() && moveBundleList)
-			query.append( " AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
+			query.append( "\n AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
 			
 		if (params.unassigned) {
 			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
