@@ -52,13 +52,13 @@
 								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.model}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.rackSource.location}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.rackSource?.location}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.rackTarget.location}</span>
+								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.rackTarget?.location}</span>
 							</td>
 							<td><span
 								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.targetRack}</span>
