@@ -10,7 +10,7 @@
 			<td>
 				<g:select name="entity" 
 					onChange="AssetCrudModule.updateDependentAssetNameSelect(this.name)" 
-					from="${assetClassOptions.entrySet()}" optionKey="key" optionValue="value"
+					from="${assetClassOptions?.entrySet()}" optionKey="key" optionValue="value"
 					<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
 					value="${ forWhom == 'Application' ? 'APPLICATION' : 'SERVER-DEVICE'}"
 				</g:select>
