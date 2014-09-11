@@ -225,6 +225,7 @@ class ApplicationController {
 		userPreferenceService.setPreference( params.type, (existingColsMap as JSON).toString() )
 		render true
 	}
+
 	def create = {
 		def applicationInstance = new Application()
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -247,22 +248,20 @@ class ApplicationController {
 			config:configMap.config, customs:configMap.customs, personList:personList, company:project.client, 
 			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
+
 	def save = {
-		def formatter = new SimpleDateFormat("MM/dd/yyyy")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def maintExpDate = params.maintExpDate
-		if(maintExpDate){
-			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-		}
-		def retireDate = params.retireDate
-		if(retireDate){
-			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-		}
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+
 		def applicationInstance = new Application(params)
+
 		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
 			flash.message = "Application ${applicationInstance.assetName} created"
 			def loginUser = securityService.getUserLogin()
-			def project = securityService.getUserCurrentProject()
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance, loginUser, project)
 			flash.message += "</br>"+errors
 			def moveEventList = MoveEvent.findAllByProject(project).id
@@ -293,116 +292,101 @@ class ApplicationController {
 			redirect( action:list)
 		}
 	}
+
 	def show = {
-		def id = params.id
-		def applicationInstance = Application.get( id )
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def applicationInstance = CU.getAssetForPage(this, project, Application, params.id, true)
+
 		if (!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
-			redirect(action:list)
-		}
-		else {
-			def assetEntity = AssetEntity.get(id)
-			def assetComment 
-			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
-			if (AssetComment.find("from AssetComment where assetEntity = ${applicationInstance?.id} and commentType = ? and isResolved = ?",['issue',0])) {
-				assetComment = "issue"
-			} else if (AssetComment.find('from AssetComment where assetEntity = '+ applicationInstance?.id)) {
-				assetComment = "comment"
-			} else {
-				assetComment = "blank"
-			}
-			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
-			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)	
+			def errorMap = [errMsg : flash.message]
+			render errorMap as JSON
+		} else {
+			def assetEntity = AssetEntity.read(params.id)
+
 			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
-			def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-			def project = Project.read(projectId)
-			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
-			
-			//field importance styling for respective validation.
-			def validationType = assetEntity.validation
-			def configMap = assetEntityService.getConfig('Application',validationType)
-			
+			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+
 			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
 			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
-			
-			def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
-			
-			[ applicationInstance : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
-			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
-			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
-			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
-			  config:configMap.config, customs:configMap.customs, shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
-			  errors:params.errors, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity) ]
+
+			def model = [
+				applicationInstance : applicationInstance,
+				appMoveEvent:appMoveEvent, 
+				appMoveEventlist:appMoveEventlist, 
+				moveEventList:moveEventList, 
+				shutdownBy:shutdownBy, 
+				startupBy:startupBy, 
+				testingBy:testingBy
+			]
+
+			model.putAll( assetEntityService.getDefaultModelForShows('AssetEntity', project, params, assetEntity) )
+
+			return model
 		}
 	}
-    
-	def edit = {
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		def project = securityService.getUserCurrentProject()
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 
-		def id = params.id
-		def applicationInstance = Application.get( id )
+	/**
+	 * This action is used to redirect to edit view .
+	 * @param : redirectTo
+	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
+	 * to auditEdit view
+	 */
+	def edit = {
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def applicationInstance = CU.getAssetForPage(this, project, Application, params.id, true)
+
 		if(!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
 			redirect(action:list)
-		}
-		else {
-			def assetEntity = AssetEntity.get(id)
-			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
-			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-			def moveEvent = MoveEvent.findAllByProject(project,[sort:'name'])
-			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =${project.id} order by assetName asc")
-			moveEvent.each{
-			   def appMoveList = AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,it)
-			   if(!appMoveList){
-				   def appMoveInstance = new AppMoveEvent()
-				   appMoveInstance.application = applicationInstance
-				   appMoveInstance.moveEvent = it
-				   appMoveInstance.save(flush:true)
-			   }
-			}
-			def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
-			
-			//fieldImportance Styling for default validation.
-			def validationType = applicationInstance.validation
-			def configMap = assetEntityService.getConfig('Application',validationType)
-			def availabaleRoles = partyRelationshipService.getStaffingRoles()
-			
-			def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
-			[applicationInstance:applicationInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project : project,
-						planStatusOptions:planStatusOptions?.value, projectId:project.id, supportAssets: supportAssets,
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo,dependencyType:dependencyType, dependencyStatus:dependencyStatus,
-						moveEvent:moveEvent,servers:servers, personList:personList, config:configMap.config, customs:configMap.customs, 
-						availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
+			return
 		}
 
+		def availabaleRoles = partyRelationshipService.getStaffingRoles()
+		def moveEvent = assetEntityService.getMoveEvents(project)
+
+		moveEvent.each{
+			def appMoveList = AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,it)
+			if(!appMoveList){
+				def appMoveInstance = new AppMoveEvent()
+				appMoveInstance.application = applicationInstance
+				appMoveInstance.moveEvent = it
+				appMoveInstance.save(flush:true)
+			}
+		}
+		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
+
+		def model = [
+			applicationInstance:applicationInstance, 
+			availabaleRoles:availabaleRoles, 
+			moveEvent:moveEvent,
+			personList:personList
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForEdits('Application', project, applicationInstance, params) )
+
+		return model		
 	}
 
 	def update = {
-		def attribute = session.getAttribute('filterAttr')
-		def filterAttr = session.getAttribute('filterAttributes')
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
 		session.setAttribute("USE_FILTERS","true")
-		def formatter = new SimpleDateFormat("MM/dd/yyyy")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def project = securityService.getUserCurrentProject()
-		def maintExpDate = params.maintExpDate
-		if(maintExpDate){
-			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-		}
-		def retireDate = params.retireDate
-		if(retireDate){
-			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-		}
+
+		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
 		def applicationInstance = Application.get(params.id)
+
 		applicationInstance.sme = null
 		applicationInstance.sme2 = null
 		applicationInstance.appOwner = null
@@ -475,6 +459,7 @@ class ApplicationController {
 			redirect(action:list)
 		}
 	}
+
 	def delete = {
 		def application = Application.get( params.id)
 		if(application) {

@@ -1130,7 +1130,7 @@ class AssetEntityController {
 	def list = {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
-		
+
 		def project = CU.getProjectForPage( this )
 		if (! project) 
 			return
@@ -1138,26 +1138,6 @@ class AssetEntityController {
 		def listType = params.listType
 		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
 		def fieldPrefs = assetEntityService.getExistingPref(prefType)
-		
-		if (['physical', 'virtual'].contains(params.filter))
-			listType=params.filter
-
-		Map model = assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters)
-
-		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
-		model.assetName = filters?.assetNameFilter ?:'' 
-		model.assetPref = fieldPrefs 
-		model.assetTag = filters?.assetTagFilter ?:'' 
-		model.assetType = filters?.assetTypeFilter ?:'' 
-		model.listType = listType 
-		model.model = filters?.modelFilter ?:'' 
-		model.prefType = prefType 
-		model.serialNumber = filters?.serialNumberFilter ?:'' 
-		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
-		model.sourceRack = filters?.sourceRackFilter ?:''
-		model.targetLocation = filters?.targetLocationFilter ?:'' 
-		model.targetRack = filters?.targetRackFilter ?:'' 
-
 		// The customized title of the list
 		def titleByType = [
 			'all': 'All Devices',
@@ -1165,10 +1145,26 @@ class AssetEntityController {
 			'physical': 'Physical Devices',
 			'virtual': 'Virtual Servers'
 		]
-		model.title = ( titleByType.containsKey(params.listType) ? titleByType[listType] : titleByType['all'] ) + ' List'
 
-		// JPM 9/2014 - NOT REALLY SURE IF THIS IS USED IN ANY WAY...
-		model.type = params.type
+		Map model = [
+			assetName: filters?.assetNameFilter ?:'', 
+			assetPref: fieldPrefs, 
+			assetTag: filters?.assetTagFilter ?:'', 
+			assetType: filters?.assetTypeFilter ?:'', 
+			listType: listType, 
+			model: filters?.modelFilter ?:'', 
+			prefType: prefType, 
+			serialNumber: filters?.serialNumberFilter ?:'', 
+			sourceLocation: filters?.sourceLocationFilter ?:'', 
+			sourceRack: filters?.sourceRackFilter ?:'',
+			targetLocation: filters?.targetLocationFilter ?:'', 
+			targetRack: filters?.targetRackFilter ?:'', 
+			// JPM 9/2014 - NOT REALLY SURE IF THIS IS USED IN ANY WAY...
+			type: params.type,
+			title: ( titleByType.containsKey(params.listType) ? titleByType[listType] : titleByType['all'] ) + ' List'
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters) )
 
 		return model
 	}
@@ -1510,6 +1506,7 @@ class AssetEntityController {
 			redirect( action:list )
 		}
 	}
+
 	/* -------------------------------------------
 	 * To create New assetEntity
 	 * @param assetEntity Attribute
@@ -1517,9 +1514,13 @@ class AssetEntityController {
 	 * @return assetList Page
 	 * ------------------------------------------ */
 	def save = {
-		def formatter = new SimpleDateFormat("MM/dd/yyyy")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def maintExpDate = params.maintExpDate
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+
 		def redirectTo = params?.redirectTo
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
@@ -1528,13 +1529,6 @@ class AssetEntityController {
 		   userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
 		} 
 		userPreferenceService.setPreference("lastType", assetType)
-		if(maintExpDate){
-			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-		}
-		def retireDate = params.retireDate
-		if(retireDate){
-			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-		}
 		if(redirectTo.contains("room_")){
 			def newRedirectTo = redirectTo.split("_")
 			redirectTo = newRedirectTo[0]
@@ -1547,15 +1541,13 @@ class AssetEntityController {
 		}
 		
 		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
-		def projectId =  getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def projectInstance = securityService.getUserCurrentProject()
 		
 		if(params.assetType == "Blade")
-			setBladeRoomAndLoc( params, projectInstance)
+			setBladeRoomAndLoc( params, project)
 		
 		def assetEntity = new AssetEntity(params)	
-		assetEntity.project = projectInstance
-		assetEntity.owner = projectInstance.client
+		assetEntity.project = project
+		assetEntity.owner = project.client
 		
 		if(params.roomSourceId && params.roomSourceId != '-1')
 			assetEntity.setRoomAndLoc( params.roomSourceId, true )
@@ -1569,10 +1561,10 @@ class AssetEntityController {
 			assetEntity.setRack( params.rackTargetId, false )
 		
 		if(!params.assetTag){
-			assetEntity.assetTag = projectService.getNextAssetTag(projectInstance) 
-			if(!projectInstance.save(flush:true)){
-				log.error "Error while updating project.lastAssetId : ${projectInstance}"
-				projectInstance.errors.each { log.error  it }
+			assetEntity.assetTag = projectService.getNextAssetTag(project) 
+			if(!project.save(flush:true)){
+				log.error "Error while updating project.lastAssetId : ${project}"
+				project.errors.each { log.error  it }
 			}
 		}
 			if(!assetEntity.hasErrors() && assetEntity.save()) {
@@ -1585,7 +1577,7 @@ class AssetEntityController {
 					assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
 				}
 				flash.message = "AssetEntity ${assetEntity.assetName} created "
-				def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntity, loginUser, projectInstance)
+				def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntity, loginUser, project)
 				flash.message += "</br>"+errors 
 				if(params.showView == 'showView'){
 					forward(action:'show', params:[id: assetEntity.id, errors:errors])
@@ -2511,8 +2503,8 @@ class AssetEntityController {
 			def sessionManu = userPreferenceService.getPreference("lastManufacturer")
 			def manufacuterer =  sessionManu ? Manufacturer.findByName(sessionManu) : manufacturers[0]
 			def models=[]
-			models=getModelSortedByStatus(manufacuterer)
-			
+			models=assetEntityService.getModelSortedByStatus(manufacuterer)
+				
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
 			
 			def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
@@ -2549,36 +2541,24 @@ class AssetEntityController {
 	* Renders the detail of an AssetEntity 
 	*/
 	def show = {
-		def project = securityService.getUserCurrentProject()
-		def projectId = project.id
-		def userLogin = securityService.getUserLogin()
-		def assetEntity
-		flash.message = null
-		
-		if (params.containsKey('id')) {
-			assetEntity = AssetEntity.findByIdAndProject( params.id, project )
-			if (!assetEntity) {
-				flash.message = "Unable to find asset within current project"
-				log.warn "show - asset id (${params.id}) not found for project (${project.id}) by user ${userLogin}"				
-			}
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def assetEntity = CU.getAssetForPage(this, project, AssetEntity, params.id, true)
+
+		if (!assetEntity) {
+			flash.message = "Unable to find asset within current project with id ${params.id}"
+			log.warn "show - asset id (${params.id}) not found for project (${project.id}) by user ${userLogin}"
+			def errorMap = [errMsg : flash.message]
+			render errorMap as JSON
 		} else {
-			flash.message = "Asset reference id was missing from request"
-			log.error "show - missing params.id in request by user ${userLogin}"
-		}
-		if (flash.message) {
-		   def errorMap = [errMsg : flash.message]
-		   render errorMap as JSON
-		} else {
-		
-			def items = []
 			def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
 			def attributeOptions
 			def options
 			def frontEndLabel
-			def dependentAssets
-			def supportAssets
-			// def assetComment
-				
+
 			entityAttributeInstance.each{
 				attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
 				options = []
@@ -2592,36 +2572,22 @@ class AssetEntityController {
 					}
 				}
 			}
-			
-			dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
-		
-			def prefValue = userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
-			
-			
-			def name = assetEntityService.getEscapedName(assetEntity)
-			
-			//field importance styling for respective validation.
-			def validationType = assetEntity.validation
-			def configMap = assetEntityService.getConfig('AssetEntity',validationType)
-			
-			def assetCommentList = AssetComment.findAllByAssetEntityAndIsPublished(assetEntity, true)
-			
-			def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntity, configMap)
-			def paramsMap = [label:frontEndLabel, assetEntity:assetEntity, escapedName:name,
-				supportAssets:supportAssets, dependentAssets:dependentAssets, 
-				redirectTo:params.redirectTo, project:project,
-				assetCommentList:assetCommentList,
-				dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle,
-				prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap]
-			
+
+			def model = [
+				assetEntity: assetEntity, 
+				label: frontEndLabel
+			]
+
+			model.putAll( assetEntityService.getDefaultModelForShows('AssetEntity', project, params, assetEntity) )
+
 			if(params.redirectTo == "roomAudit") {
-				paramsMap << [source:params.source, assetType:params.assetType]
-				render(template:"auditDetails",model:paramsMap)
+				model << [source:params.source, assetType:params.assetType]
+				render(template: "auditDetails", model: model)
 			}
-			return paramsMap
+			return model
 		}
 	}
+
 	/**
 	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
 	 */
@@ -2637,99 +2603,66 @@ class AssetEntityController {
 	 * to auditEdit view
 	 */
 	def edit = {
-		def assetEntityInstance = AssetEntity.get(params.id)
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
 
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute,[sort:"value"])
-		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetEntityInstance.assetType])?.manufacturer
-		def models=[]
-		models=getModelSortedByStatus(assetEntityInstance.manufacturer)
+		def assetEntityInstance = CU.getAssetForPage(this, project, AssetEntity, params.id, true)
+		if (!assetEntityInstance) {
+			render '<span class="error">Unable to find asset to edit</span>'
+			return
+		}
 
-
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
-
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 
 		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
 		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-		
-		//fieldImportance Styling for default validation.
-		def validationType = assetEntityInstance.validation ?: ValidationType.DIS
-		def configMap = assetEntityService.getConfig('AssetEntity',validationType)
-		
-		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntityInstance])
-		def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntityInstance])
-		
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
 
-		def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-		def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
-		
+		def rooms = assetEntityService.getRooms(project)
+
+		def targetRacks
+		def sourceRacks
+		if(assetEntityInstance.roomTarget)
+			targetRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomTarget.id))
+
+		if(assetEntityInstance.roomSource)
+			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
+
 		def sourceBladeChassis = assetEntityInstance.roomSource ? AssetEntity.findAllByRoomSource(assetEntityInstance.roomSource)?.findAll{it.assetType == 'Blade Chassis'} : []
 		def targetBladeChassis = assetEntityInstance.roomTarget ? AssetEntity.findAllByRoomTarget(assetEntityInstance.roomTarget)?.findAll{it.assetType == 'Blade Chassis'} : []
 		def sourceChassisSelect = []
 		def targetChassisSelect = []
-		
+
 		sourceBladeChassis.each{
 			sourceChassisSelect << [it.assetTag, "${it.assetTag+'-'+''+it.assetName}"]
 		}
 		targetBladeChassis.each{
 			targetChassisSelect << [it.assetTag, "${it.assetTag+'-'+''+it.assetName}"]
 		}
-		
-		def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
-			AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
-			
-		
-		
-		def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-		def targetRacks
-		def sourceRacks
-		if(assetEntityInstance.roomTarget)
-			targetRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomTarget.id))
-			
-		if(assetEntityInstance.roomSource)
-			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
-			
-		def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntityInstance, configMap)
-		def paramsMap = [assetEntityInstance:assetEntityInstance, 
-			assetTypeOptions:assetTypeOptions?.value, 
-			moveBundleList:moveBundleList, 
-			escapedName:assetEntityService.getEscapedName(assetEntityInstance),
-			quotelessName:assetEntityInstance.assetName?.replaceAll('\"', {''}), 
-			planStatusOptions:planStatusOptions?.value, 
-			projectId:projectId, 
-			project: project, 
-			railTypeOption:railTypeOption?.value, 
-			priorityOption:priorityOption?.value,
-			dependentAssets:dependentAssets,
-			supportAssets:supportAssets,
-			manufacturers:manufacturers, 
-			models:models,
-			redirectTo:params?.redirectTo, 
-			dependencyType:dependencyType,
-			dependencyStatus:dependencyStatus,
-			servers:servers, 
-			sourceChassisSelect:sourceChassisSelect, 
-			targetChassisSelect:targetChassisSelect, 
-			nonNetworkTypes:nonNetworkTypes, 
-			config:configMap.config, 
-			customs:configMap.customs,
-			rooms:rooms, targetRacks:targetRacks, 
-			sourceRacks:sourceRacks, 
-			environmentOptions:environmentOptions?.value, 
-			highlightMap:highlightMap]
-		
+
+		def model = [
+			assetEntityInstance: assetEntityInstance, 
+			manufacturers: assetEntityService.getManufacturers(assetEntityInstance.assetType), 
+			models: assetEntityService.getModelSortedByStatus(assetEntityInstance.manufacturer),
+			nonNetworkTypes: AssetType.getNonNetworkTypes(), 
+			priorityOption: priorityOption?.value,
+			quotelessName: assetEntityInstance.assetName?.replaceAll('\"', {''}), 
+			railTypeOption: railTypeOption?.value, 
+			rooms: rooms,
+			targetRacks: targetRacks, 
+			sourceChassisSelect: sourceChassisSelect, 
+			sourceRacks: sourceRacks, 
+			targetChassisSelect: targetChassisSelect
+		]
+
+		model.putAll( assetEntityService.getDefaultModelForEdits('AssetEntity', project, assetEntityInstance, params) )
+
 		if (params.redirectTo == "roomAudit") {
 			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
-			render(template:"auditEdit",model:paramsMap)
+			render(template:"auditEdit",model:model)
 		}
-		
-		return paramsMap
+
+		return model		
 	}
 
 	/**
@@ -2739,14 +2672,11 @@ class AssetEntityController {
 	 * @return : render to appropriate view
 	 */
 	def update = {
-		
-		def attribute = session.getAttribute('filterAttr')
-		def filterAttr = session.getAttribute('filterAttributes')
-		def redirectTo = params.redirectTo
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def formatter = new SimpleDateFormat("MM/dd/yyyy")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def maintExpDate = params.maintExpDate
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def redirectTo = params.redirectTo	
 		def modelName = params.models
 		def manufacturerName = params.manufacturers
 		def assetType = params.assetType ?: 'Server'
@@ -2755,32 +2685,24 @@ class AssetEntityController {
 			userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
 			
 		userPreferenceService.setPreference("lastType", assetType)
-		
-		if (maintExpDate) {
-			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-		}
-		def retireDate = params.retireDate
+
+		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+		def assetEntityInstance = AssetEntity.get(params.id)
+		assetEntityInstance.properties = assetEntityInstance
+
 		if (redirectTo.contains("room_")) {
 			def newRedirectTo = redirectTo.split("_")
 			redirectTo = newRedirectTo[0]
 			def rackId = newRedirectTo[1]
 			session.setAttribute("RACK_ID", rackId)
 		}
-		if (retireDate) {
-			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-		}
 		if ( manufacturerName ) {
 			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
 			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
 		}
 		
-		def project = securityService.getUserCurrentProject()
-		
 		if(params.assetType == "Blade")
 			setBladeRoomAndLoc( params, project) 
-		
-		def assetEntityInstance = AssetEntity.get(params.id)
-		assetEntityInstance.properties = params
 		
 		if (params.roomSourceId && params.roomSourceId != '-1')
 			assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
@@ -2801,8 +2723,7 @@ class AssetEntityController {
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)
 			flash.message += errors
 			if (params.updateView == 'updateView') {
-				forward(action:'show', params:[id: params.id, errors:errors])
-				
+				forward(action:'show', params:[id: params.id, errors:errors])		
 			} else if(params.updateView == 'closeView') {
 				render flash.message
 			} else {
@@ -2841,24 +2762,9 @@ class AssetEntityController {
 		def models=[]
 		if(manufacturer!="null"){
 			def manufacturerInstance = Manufacturer.read(manufacturer)
-			models=getModelSortedByStatus(manufacturerInstance)
+			models=assetEntityService.getModelSortedByStatus(manufacturerInstance)
 		}
 		render (view :'_modelView' , model:[models : models, forWhom:params.forWhom])
-	}
-	
-	/**
-	 * This method is used to sort model by status full, valid and new to display at Asset CRUD
-	 * @param manufacturerInstance : instance of Manufacturer for which model list is requested
-	 * @return : model list 
-	 */
-	def getModelSortedByStatus (manufacturerInstance) {
-		def models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
-		def modelListFull = models.findAll{it.modelStatus == 'full'}
-		def modelListValid = models.findAll{it.modelStatus == 'valid'}
-		def modelListNew = models.findAll{!['full','valid'].contains(it.modelStatus)}
-		models = ['Validated':modelListValid, 'Unvalidated':modelListFull+modelListNew ]
-		
-		return models
 	}
 	
 	/**
@@ -4159,10 +4065,11 @@ class AssetEntityController {
 			def assetEntity = AssetEntity.findByIdAndProject( params.id.toLong(), project )
 			if( assetEntity ) {
 
-				def dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by \
-					a.dependent.assetType, a.dependent.assetName",[assetEntity])
-				def supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by \
-					a.asset.assetType,a.asset.assetName", [assetEntity])
+				def dependentAssets = assetEntityService.getDependentAssets(assetEntity)
+				def supportAssets = assetEntityService.getSupportingAssets(assetEntity)
+				def dependencyType = assetEntityService.getDependencyTypes()
+				def dependencyStatus = assetEntityService.getDependencyStatuses()
+				def moveBundleList = assetEntityService.getMoveBundles(project)
 /*	
 	Removed 7/16/03 - can remove soon	
 				def assetsMap = [
@@ -4172,24 +4079,30 @@ class AssetEntityController {
 					(AssetType.SERVER.toString()): assetEntityService.getAssetsByType(AssetType.SERVER.toString()),
 					(AssetType.NETWORK.toString()): assetEntityService.getAssetsByType(AssetType.NETWORK.toString()) ]
 */				
+				// TODO - JPM 8/2014 - Why do we have this? Seems like we should NOT be passing that to the template...
 				def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
 					AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
 				
-				def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-				def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-				def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+
 				returnMap = [ 
-					dependentAssets:dependentAssets, 
-					supportAssets:supportAssets, 
-					assetEntity:assetEntity,
+					assetClassOptions: AssetClass.getClassOptions(),
 //					assetsMap:assetsMap,
-					moveBundleList:moveBundleList,
-					nonNetworkTypes:nonNetworkTypes,
-					dependencyType:dependencyType, 
-					dependencyStatus:dependencyStatus, whom:params.whom]
+					assetEntity: assetEntity,
+					dependencyStatus: dependencyStatus, 
+					dependencyType: dependencyType, 
+					dependentAssets: dependentAssets, 
+					moveBundleList: moveBundleList,
+					nonNetworkTypes: nonNetworkTypes,
+					supportAssets: supportAssets, 
+					whom: params.whom
+				]
 			} else {
-				render "Invalid asset id for the your current project was received."
+				render "Unable to find requested asset"
+				return
 			}
+		} else {
+			render "An invalid asset id was submitted"
+			return
 		}
 		render(template: 'dependent', model: returnMap)
 	}
@@ -4599,67 +4512,117 @@ class AssetEntityController {
 	}
 	
 	/**
-	 * 
+	 * Returns a JSON object containing the data used by Select2 javascript library
+	 * @param assetClassOption
+	 * @param max
+	 * @param page
+	 * @param q
 	 */
-	def entityList = {
+	def assetListForSelect2 = {
+		def results = []
+		def total = 0
+
 		def project = securityService.getUserCurrentProject()
-		
-		def maxRows = Integer.valueOf(params.max)
-		def currentPage = Integer.valueOf(params.page) ?: 1
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		
-		def clazz
-		def assetTypes = [] 
-		def c 
-		
-		switch(params.assetType){
-			
-			case ~/Server|VM|Blade/ :
-				c = AssetEntity.createCriteria()
-				assetTypes = [ AssetType.SERVER.toString(), AssetType.VM.toString(), AssetType.BLADE.toString() ]
-				break;
-			case 'Application' :
-				c = Application.createCriteria()
-				assetTypes = [ AssetType.APPLICATION.toString() ]
-				break;
-		    case 'Database' :
-				c = Database.createCriteria()
-				assetTypes = [ AssetType.DATABASE.toString()]
-				break;
-			case ~/Storage|Files/ :
-				c = Files.createCriteria()
-				assetTypes = [ AssetType.FILES.toString() ]
-				break;
-			case 'Other' :
-				c = AssetEntity.createCriteria()
-				assetTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
-								AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
-				break;
-				
-		}
-		
-		
-		
-		def entities = c.list (max: maxRows, offset: rowOffset) {
-			like("assetName", ""+params.q+"%")
-			and {
-				
-				if(params.assetType=="Other"){
-					not { 
-						'in'( 'assetType' , assetTypes ) 
-					}
-				} else {
-					'in'( 'assetType' , assetTypes )
-				}
-				
-				eq("project", project)
+		if (project) {
+
+			// The following will perform a count query and then a query for a subset of results based on the max and page
+			// params passed into the request. The query will be constructed with @COLS@ tag that can be substitued when performing 
+			// the actual queries.
+
+			// TODO - need to fix this so that the values are handled correctly (reusable too)
+			def max = 10
+			if (params.containsKey('max') && params.max.isInteger()) {
+				max = Integer.valueOf(params.max)
+				if (max > 25)
+					max = 25
 			}
-			order("assetName", "asc")
+			def currentPage = 1
+			if (params.containsKey('page') && params.page.isInteger()) {
+				currentPage = Integer.valueOf(params.page)
+				if (currentPage == 0)
+					currentPage = 1
+			}
+			def offset = currentPage == 1 ? 0 : (currentPage - 1) * max
+			
+
+			// This map will drive how the query is constructed for each of the various options
+			def qmap = [
+				'APPLICATION': 		[ assetClass: AssetClass.APPLICATION, domain: Application ],
+				'SERVER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
+				'DATABASE': 		[ assetClass: AssetClass.DATABASE, domain: Database ],
+				'NETWORK-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNetworkDeviceTypes() ],
+				// 'NETWORK-LOGICAL': 	[],
+				'STORAGE-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getStorageTypes() ],
+				'STORAGE-LOGICAL': 	[ assetClass: AssetClass.STORAGE, domain: Files ],
+				'OTHER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ]
+			]
+
+
+			String queryColumns = 'a.id as id, a.assetName as text'
+			String queryCount = 'COUNT(a)'
+
+			StringBuffer query = new StringBuffer("SELECT @COLS@ FROM ")
+
+			if (qmap.containsKey(params.assetClassOption)) {
+				def qm=qmap[params.assetClassOption]
+				def assetClass = qm.assetClass
+				def qparams = [ project:project, assetClass:qm.assetClass ]
+
+				query.append(qm.domain.name + ' AS a ')
+
+				def doJoin = qm.containsKey('assetType')
+				def notIn = qm.containsKey('notIn') && qm.notIn
+				if (doJoin) {
+					if (notIn) {
+						query.append('LEFT OUTER JOIN a.model AS m ')
+					} else {
+						query.append('JOIN a.model AS m ')
+					}
+				}
+
+				query.append('WHERE a.project=:project AND a.assetClass=:assetClass ')
+
+				if (params.containsKey('q') && params.q.size() > 0) {
+					query.append('AND a.assetName LIKE :q ')
+					qparams.q = "%${params.q}%"
+				}
+
+				if (doJoin) {
+					if (notIn) {
+						query.append("AND COALESCE(m.assetType,'') NOT ")
+					} else {
+						query.append("AND m.assetType ")
+					}
+					query.append('IN (:assetType)')
+					qparams.assetType = qm.assetType
+				}
+
+				if (log.isDebugEnabled())
+					log.debug "***** Query: ${query.toString()}\nParams: $qparams}"
+
+				// Perform query and move data into normal map
+				def cquery = query.toString().replace('@COLS@', queryCount)
+				if (log.isDebugEnabled())
+					log.debug "***** Count Query: $cquery"
+				
+				total = qm.domain.executeQuery(cquery, qparams)[0]
+
+				if (total > 0) {
+					def rquery = query.toString().replace('@COLS@', queryColumns) 
+					if (log.isDebugEnabled())
+						log.debug "***** Results Query: $rquery"
+
+					results = qm.domain.executeQuery(rquery, qparams, [max:max, offset:offset, sort:'assetName' ])
+
+					// Convert the columns into a map that Select2 requires
+					results = results.collect{ r -> [ id:r[0], text:r[1] ]}			
+				}
+	 		} else {
+				// TODO - Return an error perhaps by setting total to -1 and adding an extra property for a message
+				log.error "assetListForSelect2() doesn't support param assetClassOption ${params.assetClassOption}"
+			}
+
 		}
-		
-		def total = entities.totalCount
-		def results = entities.collect{ k -> return [id:k.id, text:k.assetName]}
-		
 		
 		def map = [results:results, total: total]
 		

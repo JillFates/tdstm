@@ -218,39 +218,28 @@ class DatabaseController {
 	}
 	
 	def show = {
-		def id = params.id
-		def databaseInstance = Database.get( id )
-		def project = securityService.getUserCurrentProject()
-		if(!databaseInstance) {
-			flash.message = "Application not found with id ${params.id}"
-			redirect(action:list)
-		}
-		else {
-			def assetEntity = AssetEntity.get(id)
-			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
-			def assetComment
-			if(AssetComment.find("from AssetComment where assetEntity = ${databaseInstance?.id} and commentType = ? and isResolved = ?",['issue',0])){
-				assetComment = "issue"
-			} else if(AssetComment.find('from AssetComment where assetEntity = '+ databaseInstance?.id)){
-				assetComment ="comment"
-			} else {
-				assetComment ="blank"
-			}
-			def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
-			//field importance styling for respective validation.
-			def validationType = assetEntity.validation
-			def configMap = assetEntityService.getConfig('Database',validationType)
-			
-			def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
-			
-			def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
-			[ databaseInstance : databaseInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, redirectTo : params.redirectTo, 
-			  assetComment:assetComment, assetCommentList:assetCommentList,dependencyBundleNumber:AssetDependencyBundle.findByAsset(databaseInstance)?.dependencyBundle,
-			  project:project ,prefValue:prefValue, config:configMap.config, customs:configMap.customs, errors:params.errors, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
+
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def databaseInstance = CU.getAssetForPage(this, project, Database, params.id, true)
+
+		if (!databaseInstance) {
+			flash.message = "Database not found with id ${params.id}"
+			def errorMap = [errMsg : flash.message]
+			render errorMap as JSON
+		} else {
+			def model = [
+				databaseInstance: databaseInstance
+			]
+
+			model.putAll( assetEntityService.getDefaultModelForShows('Database', project, params) )
+
+			return model
 		}
 	}
-	
+
 	def create = {
 		def databaseInstance = new Database(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -270,100 +259,68 @@ class DatabaseController {
 	}
 	
 	def save = {
-		
-				def formatter = new SimpleDateFormat("MM/dd/yyyy")
-				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-				def maintExpDate = params.maintExpDate
-				if(maintExpDate){
-					params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-				}
-				def retireDate = params.retireDate
-				if(retireDate){
-					params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-				}
-				def dbInstance = new Database(params)
-				if(!dbInstance.hasErrors() && dbInstance.save()) {
-					flash.message = "Database ${dbInstance.assetName} created"
-					def loginUser = securityService.getUserLogin()
-					def project = securityService.getUserCurrentProject()
-					def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, dbInstance, loginUser, project)
-					flash.message +="</br>"+errors 
-					if(params.showView == 'showView'){
-						forward(action:'show', params:[id: dbInstance.id, errors:errors])
-					}else if(params.showView == 'closeView'){
-						render flash.message
-					}else{
-				        session.DB?.JQ_FILTERS = params
-						redirect( action:list)
-					}
-		 	    }else {
-					flash.message = "Database not created"
-					dbInstance.errors.allErrors.each{ flash.message += it  }
-					session.DB?.JQ_FILTERS = params
-					redirect( action:list)
-				}
-				
-		
-			
-     }
-	def edit = {
-		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
-		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.read(projectId)
-		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-		
 
-		def id = params.id
-		def databaseInstance = Database.get( id )
-		if(!databaseInstance) {
-			flash.message = "DataBase not found with id ${params.id}"
-			redirect(action:list)
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+
+		def dbInstance = new Database(params)
+
+		if(!dbInstance.hasErrors() && dbInstance.save()) {
+			flash.message = "Database ${dbInstance.assetName} created"
+			def loginUser = securityService.getUserLogin()
+			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, dbInstance, loginUser, project)
+			flash.message +="</br>"+errors 
+			if(params.showView == 'showView'){
+				forward(action:'show', params:[id: dbInstance.id, errors:errors])
+			}else if(params.showView == 'closeView'){
+				render flash.message
+			}else{
+		        session.DB?.JQ_FILTERS = params
+				redirect( action:list)
+			}
+ 	    }else {
+			flash.message = "Database not created"
+			dbInstance.errors.allErrors.each{ flash.message += it  }
+			session.DB?.JQ_FILTERS = params
+			redirect( action:list)
 		}
-		else {
-			def assetEntity = AssetEntity.get(id)
-			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
-			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
-			def dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			def dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
-			def servers = AssetEntity.findAll("from AssetEntity where assetType in ('Server','VM','Blade') and project =$projectId order by assetName asc")
-			//fieldImportance Styling for default validation.
-			def validationType = databaseInstance.validation
-			def configMap = assetEntityService.getConfig('Database',validationType) 
-			def highlightMap = assetEntityService.getHighlightedInfo('Database', databaseInstance, configMap)
+     }
+
+	def edit = {
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
 			
-			[databaseInstance:databaseInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList, project:project,
-						planStatusOptions:planStatusOptions?.value, projectId:projectId, supportAssets: supportAssets, 
-						dependentAssets:dependentAssets, redirectTo : params.redirectTo, dependencyType:dependencyType, dependencyStatus:dependencyStatus,servers:servers, 
-						config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap, escapedName:assetEntityService.getEscapedName(assetEntity)]
+		def databaseInstance = CU.getAssetForPage(this, project, Database, params.id, true)
+		if (!databaseInstance) {
+			render '<span class="error">Unable to find Database asset to edit</span>'
+			return
 		}
-		
+
+		def model = assetEntityService.getDefaultModelForEdits('Database', project,databaseInstance, params)
+
+		model.databaseInstance = databaseInstance
+
+		return model		
 	}
 	
 	def update = {
-		def attribute = session.getAttribute('filterAttr')
-		def filterAttr = session.getAttribute('filterAttributes')
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
 		session.setAttribute("USE_FILTERS","true")
 		
-		def formatter = new SimpleDateFormat("MM/dd/yyyy")
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def maintExpDate = params.maintExpDate
-		def projectId = session.getAttribute( "CURR_PROJ" ).CURR_PROJ
-		if (maintExpDate) {
-			params.maintExpDate =  GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
-		}
-		def retireDate = params.retireDate
-		if (retireDate) {
-			params.retireDate =  GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
-		}
+		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
 		def databaseInstance = Database.get(params.id)
 		databaseInstance.properties = params
-		if (!databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
-			flash.message = "DataBase ${databaseInstance.assetName} Updated"
+
+		if (! databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
+			flash.message = "Database ${databaseInstance.assetName} was updated"
 			def loginUser = securityService.getUserLogin()
-			def project = securityService.getUserCurrentProject()
 			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, databaseInstance, loginUser, project)
 			flash.message += "</br>"+errors
 			if (params.updateView == 'updateView') {
@@ -374,42 +331,42 @@ class DatabaseController {
 				switch (params.redirectTo) {
 					case "room":
 						redirect( controller:'room',action:list )
-						break;
+						break
 					case "rack":
 						redirect( controller:'rackLayouts',action:'create' )
-						break;
+						break
 					case "console":
 						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
-						break;
+						break
 					case "clientConsole":
 						redirect( controller:'clientConsole', action:list)
-						break;
+						break
 					case "assetEntity":
 						redirect( controller:'assetEntity', action:list)
-						break;
+						break
 					case "application":
 						redirect( controller:'application', action:list)
-						break;
+						break
 					case "files":
 						redirect( controller:'files', action:list)
-						break;
+						break
 					case "listComment":
-						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: projectId])
-						break;
+						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
+						break
 					case "listTask":
 						render "Database ${databaseInstance.assetName} updated."
-						break;
+						break
 					case "dependencyConsole":
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
-						break;
+						break
 					default:
 						session.DB?.JQ_FILTERS = params
-						redirect( action:list)
+						redirect(action:list)
 				}
 			}
 		}
 		else {
-			flash.message = "DataBase not created"
+			flash.message = "Database was not updated"
 			databaseInstance.errors.allErrors.each{ flash.message += it }
 			redirect(action:list)
 		}

@@ -27,7 +27,7 @@ class CustomValidators {
 			if ( (value == null && nullable && blank) || (value == '' && blank)  || validValues.contains(value.toString()) ) {
 				return true;
 			} else {
-				errors.rejectValue(fieldName, "${fieldName}.notInList", "${value} of ${fieldName} not in list ${join(validValues,', ')}")
+				errors.rejectValue(fieldName, "${fieldName}.notInList", "${value} of ${fieldName} not in list ${validValues.join(', ')}")
 				return false
 			}
 		}

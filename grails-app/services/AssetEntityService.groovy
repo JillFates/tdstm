@@ -26,6 +26,8 @@ import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -327,7 +329,7 @@ class AssetEntityService {
 	 * @param groups - an array of Asset Types to only return those types (optional)
 	 * @return Map of the assets by type along with the AssetOptions dependencyType and dependencyStatus lists
 	 */
-	Map entityInfo(Project project, List groups = null){
+	Map entityInfo(Project project, List groups=null){
 		def map = [ servers:[], applications:[], dbs:[], files:[], networks:[], dependencyType:[], dependencyStatus:[] ]
 
         if (groups == null || groups.contains(AssetType.SERVER.toString())) {
@@ -338,7 +340,7 @@ class AssetEntityService {
 		}
 
 		if (groups == null || groups.contains(AssetType.APPLICATION.toString())) {
-			map.applications =  Application.executeQuery(
+			map.applications = Application.executeQuery(
 				"SELECT a.id, a.assetName FROM Application a " +
 				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
 				[ac:AssetClass.APPLICATION, project:project] )
@@ -390,6 +392,200 @@ class AssetEntityService {
 		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 	}
 
+	/**
+	 * Use to get the list of Asset Environment options
+	 * @return List of options
+	 */
+	List getAssetEnvironmentOptions() {
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+	}
+
+	/**
+	 * Use to get the list of Asset Environment options
+	 * @return List of options
+	 */
+	List getAssetPlanStatusOptions() {
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+	}
+
+	/**
+	 * Used to retrieve the assettype attribute object
+	 * @param the name of the attribute
+	 * @return the Attribute object 
+	 */
+	Object getPropertyAttribute(String property) {
+		EavAttribute.findByAttributeCode(property)
+	}
+
+	/**
+	 * Use to get the list of Asset Type options
+	 * @return List of options
+	 */
+	List getPropertyOptions(Object propertyAttrib) {
+		return EavAttributeOption.findAllByAttribute(propertyAttrib)?.value
+	}
+
+	/**
+	 * Get dependent assets of an asset
+	 * @param AssetEntity - the asset that we're finding the dependent assets
+	 * @return List of Assets
+	 */
+	List getDependentAssets(Object asset) {
+		List list
+		if (asset)
+			list = AssetDependency.findAll("FROM AssetDependency a WHERE asset=? ORDER BY a.dependent.assetType, a.dependent.assetName",[asset])
+
+		return list
+	}
+
+	/**
+	 * Get supporting assets of an asset
+	 * @param AssetEntity - the asset that we're finding the dependent assets
+	 * @return List of Assets
+	 */
+	List getSupportingAssets(Object asset) {
+		List list
+		if (asset)
+			list = AssetDependency.findAll("FROM AssetDependency a WHERE dependent=? ORDER BY a.asset.assetType,a.asset.assetName", [asset])
+
+		return list
+	}
+
+	/**
+	 * Returns a list of MoveBundles for a project
+	 * @param project - the Project object to look for
+	 * @return list of MoveBundles
+	 */
+	List getMoveBundles(Project project) {
+		List list
+		if (project)
+			list = MoveBundle.findAllByProject(project, [sort:'name'])
+
+		return list
+	}
+
+	/**
+	 * Returns a list of MoveEvents for a project
+	 * @param project - the Project object to look for
+	 * @return list of MoveEvents
+	 */
+	List getMoveEvents(Project project) {
+		List list
+		if (project)
+			list = MoveEvent.findAllByProject(project,[sort:'name'])
+
+		return list
+	}
+
+	/**
+	 * Used to get the user's preference for the asset list size/rows per page
+	 * @return the number of rows to display per page
+	 */
+	String getAssetListSizePref() {
+		// TODO - JPM 08/2014 - seems like we could convert the values to Integer
+		return ( userPreferenceService.getPreference("assetListSize") ?: '25' )
+	}
+
+	/**
+	 * Used to provide the default/common properties shared between all of the Asset Edit views
+	 * @param
+	 * @return a Map that includes the list of common properties
+	 */
+	Map getDefaultModelForEdits(String type, Project project, Object asset, Object params) {
+
+		//assert ['Database'].contains(type)
+
+		def assetTypeAttribute = getPropertyAttribute('assetType')
+		def validationType = asset.validation
+		def configMap = getConfig(type, validationType) 
+		def highlightMap = getHighlightedInfo(type, asset, configMap)
+
+		def dependentAssets = getDependentAssets(asset)
+		def supportAssets = getSupportingAssets(asset)
+
+		// TODO - JPM 8/2014 - Need to see if Edit even uses the servers list at all. If so, this needs to join the model to filter on assetType 
+		def servers = AssetEntity.findAll("FROM AssetEntity WHERE project=:project AND assetClass=:ac AND assetType IN (:types) ORDER BY assetName",
+			[project:project, ac: AssetClass.DEVICE, types:AssetType.getServerTypes()])
+
+		Map model = [
+			assetTypeAttribute: assetTypeAttribute,
+			assetTypeOptions: getPropertyOptions(assetTypeAttribute),
+			config: configMap.config,
+			customs: configMap.customs,
+			dependencyStatus: getDependencyStatuses(),
+			dependencyType: getDependencyTypes(),
+			dependentAssets: dependentAssets,
+			environmentOptions: getAssetEnvironmentOptions(),
+			// The name of the asset that is quote escaped to prevent lists from erroring with links
+			// TODO - this function should be replace with a generic HtmlUtil method
+			escapedName: getEscapedName(asset),
+			highlightMap: highlightMap,
+			moveBundleList: getMoveBundles(project),
+			planStatusOptions: getAssetPlanStatusOptions()?.value,
+			project: project,
+			projectId: project.id,
+			// The page to return to after submitting changes
+			redirectTo: params.redirectTo,
+			servers: servers,
+			supportAssets: supportAssets
+		]
+
+		return model
+	}
+
+	/**
+	 * Used to provide the default/common properties shared between all of the Asset Show views
+	 * @param
+	 * @return a Map that includes the list of common properties
+	 */
+	Map getDefaultModelForShows(String type, Project project, Object params, Object assetEntity=null) {
+
+		if (assetEntity == null) {
+			assetEntity = AssetEntity.read(params.id)
+		}
+
+		def assetComment
+		if (AssetComment.find("from AssetComment where assetEntity = ${assetEntity?.id} and commentType = ? and isResolved = ?",['issue',0])) {
+			assetComment = "issue"
+		} else if (AssetComment.find('from AssetComment where assetEntity = '+ assetEntity?.id)) {
+			assetComment = "comment"
+		} else {
+			assetComment = "blank"
+		}
+
+		def assetCommentList = AssetComment.findAllByAssetEntity(assetEntity)
+
+		def validationType = assetEntity.validation
+		
+		def configMap = getConfig(type, validationType)
+
+		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+		
+		def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
+
+		def highlightMap = getHighlightedInfo(type, assetEntity, configMap)
+
+		def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+
+		Map model = [
+			assetComment:assetComment, 
+			assetCommentList:assetCommentList,
+			config:configMap.config, 
+			customs:configMap.customs, 
+			dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
+			dependentAssets:dependentAssets, 
+			errors:params.errors, 
+			escapedName:getEscapedName(assetEntity) ,
+			highlightMap:highlightMap, 
+			errors:params.errors, 
+			prefValue:prefValue, 
+			project:project,
+			redirectTo:params.redirectTo, 
+			supportAssets:supportAssets
+		]
+
+		return model
+	}
 
 	/** 
 	 * Used to provide the default properties used for the Asset Dependency views
@@ -401,11 +597,12 @@ class AssetEntityService {
 	 */
 	Map getDefaultModelForLists(String listType, Project project, Object fieldPrefs, Object params, Object filters) {
 
-		Map model = [	
+		Map model = [
+			assetClassOptions: AssetClass.getClassOptions(),	
 			assetDependency: new AssetDependency(), 
 			attributesList: [],		// Set below
-			dependencyType: getDependencyTypes(), 
 			dependencyStatus: getDependencyStatuses(),
+			dependencyType: getDependencyTypes(), 
 			event:params.moveEvent, 
 			fixedFilter: (params.filter ? true : false),
 			filter:params.filter,
@@ -414,12 +611,12 @@ class AssetEntityService {
 			modelPref: null,		// Set below
 			moveBundleId:params.moveBundleId, 
 			moveBundle:filters?.moveBundleFilter ?: '', 
-			moveBundleList: MoveBundle.findAllByProject(project, [sort:"name"]),
+			moveBundleList: getMoveBundles(project),
 			moveEvent: null,		// Set below
 			planStatus:filters?.planStatusFilter ?:'', 
 			plannedStatus:params.plannedStatus, 
 			projectId: project.id,
-			sizePref: userPreferenceService.getPreference("assetListSize")?: '25', 
+			sizePref: getAssetListSizePref(), 
 			sortIndex:filters?.sortIndex, 
 			sortOrder:filters?.sortOrder, 
 			staffRoles:taskService.getRolesForStaff(),
@@ -468,6 +665,22 @@ class AssetEntityService {
 	}
 
 	/**
+	 * Common logic on updates
+	 * @param
+	 */
+	def applyExpDateAndRetireDate(Object params, Object tzId) {
+		def formatter = new SimpleDateFormat("MM/dd/yyyy")
+		def maintExpDate = params.maintExpDate
+		if (maintExpDate) {
+			params.maintExpDate = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
+		}
+		def retireDate = params.retireDate
+		if (retireDate) {
+			params.retireDate = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+		}
+	}
+
+	/**
 	 * This method is used to get config by entityType and validation
 	 * @param type,validation
 	 * @return
@@ -505,9 +718,9 @@ class AssetEntityService {
 	/**
 	 * Resolves the display string for the shutdownBy, startupBy, testingBy fields by either
 	 * getting the name of the person or stripping the prefix for SME/AppOwner or Role
-	 * @param byValue : application's shutdownBy, startupBy, or testingBy raw value
-	 * @param stripPrefix : if true or not specified, the function will remove the # or @ character from the string
-	 * @return : value to display
+	 * @param byValue - application's shutdownBy, startupBy, or testingBy raw value
+	 * @param stripPrefix - if true or not specified, the function will remove the # or @ character from the string
+	 * @return value to display
 	 */
 	def resolveByName(byValue, stripPrefix = true) {
 		def byObj = ''
@@ -568,7 +781,7 @@ class AssetEntityService {
 	/**
 	 * This method is used to delete assets by asset type
 	 * @param type
-	 * @param : assetList : list of ids for which assets are requested to deleted
+	 * @param assetList - list of ids for which assets are requested to deleted
 	 * @return
 	 */
 	def deleteBulkAssets(type, assetList){
@@ -903,7 +1116,7 @@ class AssetEntityService {
 		return highlightMap
 	}
 	
-	def getEscapedName (assetEntity, ignoreSingleQuotes = false) {
+	def getEscapedName(assetEntity, ignoreSingleQuotes = false) {
 		def name = ''
 		def size = assetEntity.assetName?.size() ?: 0
 		for (int i = 0; i < size; ++i)
@@ -915,7 +1128,30 @@ class AssetEntityService {
 				name = name + assetEntity.assetName[i]
 		return name
 	}
-	
+
+	def getManufacturers(assetType) {
+		return Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+	}
+
+	/**
+	 * This method is used to sort model by status full, valid and new to display at Asset CRUD
+	 * @param manufacturerInstance : instance of Manufacturer for which model list is requested
+	 * @return : model list 
+	 */
+	def getModelSortedByStatus (manufacturerInstance) {
+		def models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
+		def modelListFull = models.findAll{it.modelStatus == 'full'}
+		def modelListValid = models.findAll{it.modelStatus == 'valid'}
+		def modelListNew = models.findAll{!['full','valid'].contains(it.modelStatus)}
+		models = ['Validated':modelListValid, 'Unvalidated':modelListFull+modelListNew ]
+		
+		return models
+	}
+
+	def getRooms(project) {
+		return Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
+	}
+
 	/*------------------------------------------------------------
 	 * download data form Asset Entity table into Excel file
 	 * @author Mallikarjun

@@ -1,3 +1,128 @@
+/*
+ * Javascript functions used by the Asset CRUD forms and Lists
+ */
+
+var AssetCrudModule = {
+
+	// Creates a Select2 control for an Asset Name selector
+	assetNameSelect2: function(element) {
+		element.select2( {
+			minimumInputLength: 0,
+			initSelection: function (element, callback) {
+				var data = { id: element.val(), text: element.data("asset-name")};
+				callback(data);
+			},
+			placeholder: "Please select",
+			ajax: {
+				url: contextPath+"/assetEntity/assetListForSelect2",
+				dataType: 'json',
+				quietMillis: 600,
+				data: function (term, page) {
+					return {
+						q: term, 
+						max: 25, 
+						page: page,
+						assetClassOption:$(this).data("asset-type"),
+					};
+				},
+				results: function (data, page) {
+					var more = (page * 25) < data.total;
+					return { results: data.results , more: more};
+				}
+			}
+		} );
+	},
+
+	// Used to change the Select2 Asset Name SELECT when the Class SELECT is changed
+	updateDependentAssetNameSelect: function(name) {
+		var split = name.split("_");
+		var classSelect = $("select[name='entity_"+split[1]+"_"+split[2]+"']");
+		var nameSelect = $("input[name='asset_"+split[1]+"_"+split[2]+"']");
+		nameSelect.data("asset-type", classSelect.val());
+		nameSelect.select2("val", "");
+	}, 
+
+	/**
+	 * Used to call Ajax Update for given asset form and then load the show view of the asset
+	 * @param me - the form
+	 * @param forWhom - the asset class of the form (app, files, database)
+	 **/
+	 performAssetUpdate: function($me, forWhom) {
+		var act = $me.data('action');
+		var type = 'Server';
+		var redirect = $me.data('redirect');
+
+		$('#updateView').val('updateView');
+
+		var validateOkay=true;
+		switch(forWhom) {
+			case 'app':
+				type = 'Application';
+				validateOkay = validateAppForm('Edit','editAssetsFormId');
+				break;
+
+			case 'files':
+				type = 'Storage';
+				validateOkay = validateStorageForm('editAssetsFormId');
+				break;
+
+			case 'database':
+				type = 'Database';
+				validateOkay = validateDBForm('editAssetsFormId');
+				break;
+
+			case 'server':
+				type = 'Server';
+				validateOkay = validateDeviceForm('editAssetsFormId');
+				break;
+
+			default:
+				alert('Unsupported case for ' + forWhom);
+		}
+
+		if (validateOkay)
+			validateOkay = validateDependencies('editAssetsFormId');
+
+		if (validateOkay) {
+			jQuery.ajax({
+				url: $('#editAssetsFormId').attr('action'),
+				data: $('#editAssetsFormId').serialize(),
+				type:'POST',
+				success: function(data) {
+					if(data.errMsg){
+						alert(data.errMsg)
+					} else {
+						if(act=='close'){
+							$('#editEntityView').dialog('close')
+							$('#messageId').show();
+							$('#messageId').html(data);
+							if($('.ui-icon-refresh').length)
+								$('.ui-icon-refresh').click();
+						}else{
+							$('#editEntityView').dialog('close')
+							if(redirect == 'room')
+								getRackLayout( $('#selectedRackId').val() )
+							$('#showEntityView').html(data)
+							$("#showEntityView").dialog('option', 'width', 'auto')
+							$("#showEntityView").dialog('option', 'position', ['center','top']);
+							$("#showEntityView").dialog('open');
+						}
+						changeDocTitle(title)
+						if(!isIE7OrLesser) 
+							getHelpTextAsToolTip(type);
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var err = jqXHR.responseText
+					alert("An unexpected error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")))
+				}
+			});
+		}
+		
+	}
+
+}
+
 function createEntityView (e, type,source,rack,roomName,location,position) {
 	if(!isIE7OrLesser)
 		getHelpTextAsToolTip(type);
@@ -137,59 +262,42 @@ function isValidDate ( date ) {
 	return returnVal;
 }
 
-function addAssetDependency ( type,forWhom ) {
+// Used to dynamically add a new dependency row to the dependency form table
+// @param type - the dependency type [support|dependent]
+// @param forWhom - used to indicate edit or create? views
+function addAssetDependency (type, forWhom) {
 	
-	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val()
+	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val();
+	var typeRowNo = type+"_"+rowNo;
 	var rowData = $("#assetDependencyRow tr").html()
-		.replace(/dataFlowFreq/g,"dataFlowFreq_"+type+"_"+rowNo)
-		.replace(/asset/g,"asset_"+type+"_"+rowNo)
-		.replace(/dependenciesId/g,"dep_"+type+"_"+rowNo+"_"+forWhom)
-		.replace(/dtype/g,"dtype_"+type+"_"+rowNo)
-		.replace(/status/g,"status_"+type+"_"+rowNo)
-		.replace(/bundles/g,"moveBundle_"+type+"_"+rowNo)
-		.replace(/entity/g,"entity_"+type+"_"+rowNo)
-		.replace(/aDepComment/g,"comment_"+type+"_"+rowNo)
-		.replace(/dep_comment/g,"dep_comment_"+type+"_"+rowNo)
-		.replace(/depComment/g,"depComment_"+type+"_"+rowNo)
-		.replace(/commLink/g,"commLink_"+type+"_"+rowNo);
-	$("#comment_"+type+"_"+rowNo).val('')
-	$("#dep_comment_"+type+"_"+rowNo).val('')
-	if (type!="support") {
-		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
-	} else {
+		.replace(/dataFlowFreq/g,"dataFlowFreq_"+typeRowNo)
+		.replace(/asset/g,"asset_"+typeRowNo)
+		.replace(/dependenciesId/g,"dep_"+typeRowNo+"_"+forWhom)
+		.replace(/dtype/g,"dtype_"+typeRowNo)
+		.replace(/status/g,"status_"+typeRowNo)
+		.replace(/bundles/g,"moveBundle_"+typeRowNo)
+		.replace(/entity/g,"entity_"+typeRowNo)
+		.replace(/aDepComment/g,"comment_"+typeRowNo)
+		.replace(/dep_comment/g,"dep_comment_"+typeRowNo)
+		.replace(/depComment/g,"depComment_"+typeRowNo)
+		.replace(/commLink/g,"commLink_"+typeRowNo);
+	$("#comment_"+typeRowNo).val('')
+	$("#dep_comment_"+typeRowNo).val('')
+	if (type=="support") {
 		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
+	} else {
+		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
-	$("#dep_"+type+"_"+rowNo+"_"+forWhom).addClass("scrollSelect");
+	$("#dep_"+typeRowNo+"_"+forWhom).addClass("scrollSelect");
 	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
 	
-	$("#dep_"+type+"_"+rowNo+"_"+forWhom).attr("data-asset-type", $("#entity_"+type+"_"+rowNo).val())
+	$("#dep_"+typeRowNo+"_"+forWhom).attr("data-asset-type", $("#entity_"+typeRowNo).val())
 	
-	
-	if (!isIE7OrLesser){
-		$("#dep_"+type+"_"+rowNo+"_"+forWhom).select2({
-			 minimumInputLength: 1,
-			 placeholder: "Please Select",
-			 ajax: {
-			 	url: contextPath+"/assetEntity/entityList",
-				dataType: 'json',
-			 	quietMillis: 100,
-			 	data: function (term, page) {
-					 return {
-						 q: term, 
-						 max: 10, 
-						 page: page, 
-						 assetType:$(this).data("asset-type"),
-		 			};
-			 	},
-		 		results: function (data, page) {
-	 			 	var more = (page * 10) < data.total;
-		 			return { results: data.results , more: more};
-	            }
-			 }
-		});
+	if (!isIE7OrLesser) {
+		AssetCrudModule.assetNameSelect2( $("#dep_"+typeRowNo+"_"+forWhom) );
 	}
 	
-	$("#depComment_"+type+"_"+rowNo).dialog({ autoOpen: false})
+	$("#depComment_"+typeRowNo).dialog({ autoOpen: false})
 }
 
 function deleteRow ( rowId, forWhomId ) {
@@ -199,15 +307,6 @@ function deleteRow ( rowId, forWhomId ) {
 		$("#deletedDepId").val(( $("#deletedDepId").val() ? $("#deletedDepId").val()+"," : "") + id)
 	else
 		$("#"+forWhomId).val(parseInt($("#"+forWhomId).val())+1)
-}
-
-function updateAssetsList (name, assetType, assetId ) {
-	var idValues = name.split("_")
-	var clazz = $("select[name='entity_"+idValues[1]+"_"+idValues[2]+"']")
-	
-	var csc = $("input[name='asset_"+idValues[1]+"_"+idValues[2]+"']")
-	csc.data("asset-type", clazz.val())
-	
 }
 
 function updateAssetTitle ( type ) {
@@ -403,86 +502,6 @@ function submitMoveForm(){
 	});
 }
 
-/**
- * Used to call Ajax Update for given asset form and then load the show view of the asset
- * @param me - the form
- * @param forWhom - the asset class of the form (app, files, database)
- **/
-function updateToShow($me, forWhom){
-	var act = $me.data('action');
-	var type = 'Server';
-	var redirect = $me.data('redirect');
-	if(act=='close')
-		$('#updateView').val('closeView');
-	else
-		$('#updateView').val('updateView');
-
-	var validateOkay=true;
-	switch(forWhom) {
-		case 'app':
-			type = 'Application';
-			validateOkay = validateAppForm('Edit','editAssetsFormId');
-			break;
-
-		case 'files':
-			type = 'Storage';
-			validateOkay = validateStorageForm('editAssetsFormId');
-			break;
-
-		case 'database':
-			type = 'Database';
-			validateOkay = validateDBForm('editAssetsFormId');
-			break;
-
-		case 'server':
-			type = 'Server';
-			validateOkay = validateDeviceForm('editAssetsFormId');
-			break;
-
-		default:
-			alert('Unsupported case for ' + forWhom);
-	}
-
-	if (validateOkay)
-		validateOkay = validateDependencies('editAssetsFormId');
-
-	if (validateOkay) {
-		jQuery.ajax({
-			url: $('#editAssetsFormId').attr('action'),
-			data: $('#editAssetsFormId').serialize(),
-			type:'POST',
-			success: function(data) {
-				if(data.errMsg){
-					alert(data.errMsg)
-				}else{
-					if(act=='close'){
-						$('#editEntityView').dialog('close')
-						$('#messageId').show();
-						$('#messageId').html(data);
-						if($('.ui-icon-refresh').length)
-							$('.ui-icon-refresh').click();
-					}else{
-						$('#editEntityView').dialog('close')
-						if(redirect == 'room')
-							getRackLayout( $('#selectedRackId').val() )
-						$('#showEntityView').html(data)
-						$("#showEntityView").dialog('option', 'width', 'auto')
-						$("#showEntityView").dialog('option', 'position', ['center','top']);
-						$("#showEntityView").dialog('open');
-					}
-					changeDocTitle(title)
-					if(!isIE7OrLesser) 
-						getHelpTextAsToolTip(type);
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				var err = jqXHR.responseText
-				alert("An unexpected error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")))
-			}
-		});
-	}
-	
-}
 
 function updateToRefresh(){
 	jQuery.ajax({

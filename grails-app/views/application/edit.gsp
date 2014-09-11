@@ -235,7 +235,7 @@
 								</td>
 							</tr>
 							<tr>
-							<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
+								<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
 								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:config.startupBy]"></g:render>
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
@@ -264,45 +264,40 @@
 											value="${applicationInstance.testingDuration}" tabindex="55"  size="7"/>m
 								</td>
 							</tr>
+
+							<%-- Custom User Defined Fields Section --%>
 							<tbody class="customTemplate">
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							</tbody>
-							<tr>
-<%--							<tr>--%>
-<%--								<td class="label" nowrap="nowrap" ><label for="events">Event</label></td>--%>
-<%--								<td colspan="7">--%>
-<%--									<g:each in="${moveEvent}" var="moveEventList">--%>
-<%--										<div  class="label" style="float: left;width: auto;padding: 5px;" ><label for="moveEvent"><b>${moveEventList?.name}</b></label>--%>
-<%--	      								    <g:select id="okToMove__${moveEventList?.id}" class="ynselect" name="okToMove_${moveEventList?.id}" from="${['Y', 'N']}" value="${AppMoveEvent.findByApplicationAndMoveEvent(applicationInstance,moveEventList)?.value}" noSelection="['':'?']" />--%>
-<%--		                                  </label>--%>
-<%--		                                </div>--%>
-<%--									</g:each>--%>
-<%--								</td>--%>
-<%--								--%>
-<%--							</tr> --%>
+
 						</tbody>
 					</table>
 				</div></td>
 		</tr>
+		
+		<%-- Dependency Edit Block --%>
 		<tr id="applicationDependentId" class="assetDependent">
-			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/> </span></td>
+			<td class="depSpin"><span><img alt="" src="${resource(dir:'images',file:'processing.gif')}"/></span></td>
 		</tr>
+
+		<%-- Action Buttons --%>
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}" />
-					<input name="supportCount"  id="edit_supportCount" type="hidden" value="${supportAssets.size()}" />
-					<input name="redirectTo" id="redirectTo" type="hidden" value="${redirectTo}"/>
-					<input type = "hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<input type = "hidden" id = "appId"  value ="${applicationInstance.id}"/>
-					<input type = "hidden" id = "tabType" name="tabType" value =""/>
-					<input name="updateView" id="updateView" type="hidden" value=""/>
+					<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
 					<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
-					
-					<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
+					<input type="hidden" id="dstPath" name = "dstPath" value ="${redirectTo}"/>
 					<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo,value:applicationInstance.id,whom:'app']"></g:render>
-                </div></td>
+					<input type="hidden" id="edit_dependentCount" name="dependentCount" value="${dependentAssets.size()}" />
+					<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
+					<input type="hidden" id="edit_supportCount" name="supportCount" value="${supportAssets.size()}" />
+					<input type="hidden" id="redirectTo" name="redirectTo" value="${redirectTo}"/>
+					<input type="hidden" id="tabType" name="tabType" value =""/>
+					<input type="hidden" id="updateView" name="updateView" value=""/>
+
+					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo, value:applicationInstance.id, whom:'app']"></g:render>
+				</div>
+			</td>
 		</tr>
 	</table>
 </g:form>

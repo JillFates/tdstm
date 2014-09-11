@@ -58,7 +58,10 @@ public enum AssetType {
 	 * @return List<String>
 	 */
 	static List getBladeChassisTypes() {
-		return ['Blade Chassis', 'Chassis']
+		return [
+			'Blade Chassis', 
+			'Chassis'
+		]
 	}
 
 	/**
@@ -90,7 +93,17 @@ public enum AssetType {
 	 * @return List<String>
 	 */
 	static List getStorageTypes() {
-		return ['Array', 'Disk', 'NAS', 'SAN', 'SAN Switch', 'Storage', 'Tape', 'Tape Library']
+		return [
+			'Array',
+			'Disk',
+			'NAS',
+			'SAN',
+			'SAN Switch',
+			'Storage',
+			'Tape',
+			'Tape Library',
+			'Virtual Tape Library'
+		]
 	}
 
 	/**
@@ -101,13 +114,12 @@ public enum AssetType {
 		GormUtil.asQuoteCommaDelimitedString(getStorageTypes())
 	}
 
-
 	/**
 	 * The list of types represent all non Server Types.
 	 * @return
 	 */
 	static List getNonOtherTypes() {
-		return ['Application','Database'] + getStorageTypes() + getAllServerTypes()
+		return getStorageTypes() + getAllServerTypes() + getNetworkDeviceTypes()
 	}
 
 	/**
@@ -115,14 +127,52 @@ public enum AssetType {
 	 * @return
 	 */
 	static List getNonPhysicalTypes() {
-		return ['Application','Database'] + getVirtualServerTypes() + getStorageTypes()
+		return ['Application','Database'] + getVirtualServerTypes() + getStorageTypes() + getNetworkDeviceTypes()
 	}
+
 	/**
 	 * The list of types represent all Server Types which differs the physical list and ServerList.
 	 * @return
 	 */
 	static List getServerTypes() {
 		return getPhysicalServerTypes() + getVirtualServerTypes()
+	}
+
+	/**
+	 * A list of the assetTypes that are considered to be Network devices
+	 * @return list of asset types
+	 */
+	static List<String> getNetworkDeviceTypes() {
+		return [
+			'Encoder',
+			'Load Balancer',
+			'Modem',
+			'Module',
+			'Multiplexer',
+			'Network',
+			'Probe',
+			'Receiver',
+			'Router',
+			'Switch',
+			'Telecom',
+			'Terminal Server',
+			'VPN'
+		]
+	}
+
+	/**
+	 * The list of types represent all non network types
+	 * @return
+	 */
+	static List getNonNetworkTypes() {
+		return [
+			'Server',
+			'Application',
+			'VM',
+			'Files',
+			'Database',
+			'Blade'
+		]
 	}
 
 }

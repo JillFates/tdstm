@@ -284,6 +284,7 @@
 					
 				</div></td>
 		</tr>
+
 		<tr>
 			<g:render template="../assetEntity/dependent" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
 		</tr>
