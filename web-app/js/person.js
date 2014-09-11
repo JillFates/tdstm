@@ -1,3 +1,37 @@
+
+var Person = {
+
+	// Used to Call the Person bulkDelete service call from the Person List
+	bulkDelete: function() {
+		var deleteIfAssocWithAssets = $('#deleteIfAssocWithAssets').val();
+		var ids = new Array()
+		$('.cbox:checkbox:checked').each(function(){
+			ids.push(this.id.split("_")[2])
+		})
+		jQuery.ajax({
+			url: tdsCommon.createAppURL('/person/bulkDelete'),
+			data: {'ids':ids, 'deleteIfAssocWithAssets': deleteIfAssocWithAssets},
+			type:'POST',
+			success: function(data, stat, xhr) {
+				var url = xhr.getResponseHeader('X-Login-URL');
+                if (url) {
+                        alert("Your session has expired and need to login again.");
+                        window.location.href = url;
+                } else {
+					if (data.status == 'success') {
+						alert('People deleted: ' + data.data.deleted + '\nPeople skipped: ' + data.data.skipped + '\nAsset assocations cleared: ' + data.data.cleared);
+						location.reload(true);
+					} else {
+						alert('Error deleting people - ' + data.errors.join());
+					}
+				}
+			}
+		}).fail(function() {
+			alert('Error deleting people');
+		});
+	}
+}
+
 function compareOrMerge(){
 	var ids = new Array()
 	$('.cbox:checkbox:checked').each(function(){
@@ -13,29 +47,6 @@ function compareOrMerge(){
 			$("#showOrMergeId").dialog('option', 'position', ['center','top']);
 			$("#showOrMergeId").dialog('open')
 		}
-	});
-}
-
-function bulkDelete(){
-	var includeAssociatedWithAssetEntity = $('#includeAssociatedWithAssetEntity').val();
-	var ids = new Array()
-	$('.cbox:checkbox:checked').each(function(){
-		ids.push(this.id.split("_")[2])
-	})
-	jQuery.ajax({
-		url: contextPath+'/person/bulkDelete',
-		data: {'ids':ids, 'includeAssociatedWithAssetEntity': includeAssociatedWithAssetEntity},
-		type:'POST',
-		success: function(data) {
-			if (data.status == 'success') {
-				alert('Number of people deleted: ' + data.data.deleted + ' number of people skipped: ' + data.data.skipped);
-				location.reload(true);
-			} else {
-				alert('Error deleting people');
-			}
-		}
-	}).fail(function() {
-		alert('Error deleting people');
 	});
 }
 

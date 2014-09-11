@@ -6,6 +6,7 @@ import com.tds.asset.AssetEntity;
 import com.tds.asset.Application;
 import Person;
 import com.tdssrc.grails.GormUtil
+import grails.validation.ValidationException
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
@@ -509,16 +510,16 @@ class PersonService {
 	
 	
 	/**
-	 * This method is used to update userlogin reference from 'fromUserLogin' to  'toUserLogin'
+	 * This method is used to update all UserLogin reference in all domains from on account to another
 	 * @param fromUserLogin : instance of fromUserLogin
 	 * @param toUserLogin : instance of toUserLogin
 	 * @return
 	 */
 	def updateUserLoginRefrence(fromUserLogin, toUserLogin){
-		def domainRelatMap = ['asset_transition':['user_login_id'], 'data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
-		domainRelatMap.each{key, value->
-			value.each{prop->
-				jdbcTemplate.update("UPDATE ${key} SET ${prop} = ${toUserLogin.id} where ${prop}=${fromUserLogin.id}")
+		def map = ['asset_transition':['user_login_id'], 'data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
+		map.each { table, columns->
+			columns.each { column->
+				jdbcTemplate.update("UPDATE ${table} SET ${column} = ${toUserLogin.id} where ${column}=${fromUserLogin.id}")
 			}
 		}
 	}
@@ -531,27 +532,26 @@ class PersonService {
 	 */
 	def updateProjectRelationship(Party fromPerson, Party toPerson){
 		try{
-			//Written all sql as GORM blowing up this block of code.
+			// Find all of the relationships that the FROM person has
 			def allRelations = jdbcTemplate.queryForList("SELECT p.party_relationship_type_id AS prType, p.party_id_from_id AS pIdFrom, \
-						p.party_id_to_id AS pIdTo, p.role_type_code_from_id AS rTypeCodeFrom, p.role_type_code_to_id AS rTypeCodeTo \
-						FROM party_relationship p WHERE p.party_id_to_id = ${fromPerson.id}")
+				p.party_id_to_id AS pIdTo, p.role_type_code_from_id AS rTypeCodeFrom, p.role_type_code_to_id AS rTypeCodeTo \
+				FROM party_relationship p WHERE p.party_id_to_id = ${fromPerson.id}")
 
 			allRelations.each{ relation->
-				def res = jdbcTemplate.queryForList("SELECT 1 FROM party_relationship p WHERE \
-							p.party_relationship_type_id='${relation.prType}' AND p.party_id_from_id =${relation.pIdFrom} \
-							AND p.party_id_to_id =${toPerson.id} AND p.role_type_code_from_id='${relation.rTypeCodeFrom}'\
-							AND p.role_type_code_to_id ='${relation.rTypeCodeTo}'")
+				// Check to see if the TO person has the particular relationship already. If so we delete the FROM person relationship otherwise
+				def toAlreadyHasRelationship = jdbcTemplate.queryForList("SELECT 1 FROM party_relationship p WHERE \
+					p.party_relationship_type_id='${relation.prType}' AND p.party_id_from_id =${relation.pIdFrom} \
+					AND p.party_id_to_id =${toPerson.id} AND p.role_type_code_from_id='${relation.rTypeCodeFrom}'\
+					AND p.role_type_code_to_id ='${relation.rTypeCodeTo}'")
 				
-				if(res){
-					jdbcTemplate.update("DELETE FROM party_relationship   \
-					   WHERE party_relationship_type_id = '${relation.prType}'\
+				def where = " WHERE party_relationship_type_id = '${relation.prType}' \
 					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
-					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}"
+
+				if (toAlreadyHasRelationship) {
+					jdbcTemplate.update("DELETE FROM party_relationship $where")
 				} else {
-				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} \
-					   WHERE party_relationship_type_id = '${relation.prType}'\
-					   AND role_type_code_from_id = '${relation.rTypeCodeFrom}' AND role_type_code_to_id='${relation.rTypeCodeTo}' \
-					   AND party_id_to_id = ${fromPerson.id} AND party_id_from_id = ${relation.pIdFrom}")
+				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} WHERE $where")
 				}
 			}
 		} catch(Exception ex){
@@ -559,84 +559,91 @@ class PersonService {
 		}
 	}
 	
-	def bulkDelete(loginUser, ids, includeAssociatedWithAssetEntity) {
-		if (!securityService.hasPermission(loginUser, 'BulkDeletePerson')) {
+	/**
+	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
+	 * @param user - The user attempting to do the bulk delete
+	 * @param ids - the list of person ids to delete
+	 * @param deleteIfAssocWithAssets - a flag to indicate that it is okay to delete the person if they're associated to assets
+	 * @return A map containing the following
+	 *   deleted: number of persons deleted
+	 *   skipped: number of persons skipped
+	 *   cleared: number of assets references that were cleared/unassigned
+	 */
+	Map bulkDelete(UserLogin user, Object ids, Boolean deleteIfAssocWithAssets) {
+		if (!securityService.hasPermission(user, 'BulkDeletePerson')) {
+			log.warn "SECURITY : $user attempted to perform Bulk Delete of persons but doesn't have permission"
 			throw new UnauthorizedException('User doesn\'t have a BulkDeletePerson permission')
 		}
 
+		if (! ids || ids.size()==0) {
+			throw new InvalidParamException('Must select at least one person to delete')
+		}
+
+		log.info "$user is attempted to bulk delete ${ids?.size()} persons"
+
 		def deleted = 0
 		def skipped = 0
+		def cleared = 0
 		
 		if (ids) {
 			for (id in ids) {
 				if (id.isLong()) {
-					def person = Person.get(id)
+					Person person = Person.get(id)
 					
 					if (person) {
+						
+						// Don't delete if they have a UserLogin
 						def userLogin = UserLogin.findByPerson(person)
-						
-						//userLogin case
-						if (userLogin != null) {
-							log.warn("Ignoring bulk delete of ${id} as it contains userLogin")
+						if (userLogin) {
+							log.debug("Ignoring bulk delete of ${id} as it contains userLogin")
 							skipped++
-							continue;
+							continue
 						}
 						
-						//tasks assigned
+						// Don't delete if they have assigned tasks
 						def tasks = AssetComment.findAllByAssignedTo(person)
-						if (!tasks.isEmpty()) {
-							log.warn("Ignoring bulk delete of ${id} as it contains tasks assigned")
+						if (tasks) {
+							log.debug("Ignoring bulk delete of ${id} as it contains tasks assigned")
 							skipped++
-							continue;
+							continue
 						}
+
+						Map map = [person:person]
 						
-						//asset entity
-						def apps = Application.findAllByAppOwner(person)
-						if (!apps.isEmpty()) {
-							if (includeAssociatedWithAssetEntity) {
-								AssetEntity.executeUpdate("update Application a set a.appOwner = null where a.appOwner.id = ?", [person.id])
-							} else {
-								log.warn("Ignoring bulk delete of ${id} as it contains application assigned")
-								skipped++
-								continue;
+						// Optionally don't delete if they are associated with Assets by AppOwner, SME or SME2
+						def foundAssoc = false
+						['appOwner', 'sme', 'sme2'].each { column ->
+							if (Application.find("from Application a where a.$column=:person", map)) {
+								if (deleteIfAssocWithAssets) {
+									// Clear out the person's associate with all assets for the given column
+									cleared += AssetEntity.executeUpdate("update Application a set a.${column}=NULL where a.${column}=:person", map)
+									log.debug "Disassociated person as $column"
+								} else {
+									log.debug("Ignoring bulk delete of person ${id} $person as it contains $column association with asset(s)")
+									foundAssoc=true
+									return
+								}								
 							}
 						}
-						
-						//applications
-						def apps1 = Application.findAllBySme(person)
-						if (!apps1.isEmpty()) {
-							if (includeAssociatedWithAssetEntity) {
-								Application.executeUpdate("update Application a set a.sme = null where a.sme.id = ?", [person.id])
-							} else {
-								log.warn("Ignoring bulk delete of ${id} as it contains applications assigned")
-								skipped++
-								continue;
-							}
-						}
-						
-						def apps2 = Application.findAllBySme2(person)
-						if (!apps1.isEmpty()) {
-							if (includeAssociatedWithAssetEntity) {
-								Application.executeUpdate("update Application a set a.sme2 = null where a.sme2.id = ?", [person.id])
-							} else {
-								log.warn("Ignoring bulk delete of ${id} as it contains applications assigned")
-								skipped++
-								continue;
-							}
+						if (foundAssoc) {
+							skipped++
+							continue
 						}
 	
 						//delete references
-						int deletedPartyRoles = Person.executeUpdate("delete PartyRole p where p.party.id = ?", [person.id])
-						int deletedPartyRelationships = Person.executeUpdate("delete PartyRelationship p where p.partyIdFrom.id = ? or p.partyIdTo.id = ?", [person.id, person.id])
+						int deletedPartyRoles = Person.executeUpdate("delete PartyRole p where p.party=:person", map)
+						int deletedPartyRelationships = Person.executeUpdate("delete PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
 	
 						//delete object
+						log.info "Bulk deleting person $id $person"
 						person.delete()
 						deleted++
+
 					}
 				}
 			}
 		}
 		
-		return ['deleted' : deleted, 'skipped' : skipped]
+		return [deleted: deleted, skipped: skipped, cleared: cleared]
 	}
-}
+}	

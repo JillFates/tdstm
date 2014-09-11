@@ -99,6 +99,17 @@ class ServiceResults {
 		def allErrorsAsArray = errs.allErrors.collect { it -> "${messageSource.getMessage(it, locale)}" }
 		return errors(allErrorsAsArray)
 	}
+
+	/**
+	 * Sends a method failure error with the validation errors
+	 * @param response the response object
+	 */
+	static def invalidParams(errs) {
+		if (errs instanceof String)
+			errs = [errs]
+		return errors(errs)
+	}
+
 	
 	/**
 	 * Sends a forbidden error

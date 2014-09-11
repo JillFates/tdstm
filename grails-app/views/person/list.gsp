@@ -58,7 +58,7 @@
 				</tds:hasPermission>\
 				<span class='capBtn'><input type='button' id='compareMergeId' value='Compare/Merge' onclick='compareOrMerge()' disabled='disabled'/></span>\
 				<tds:hasPermission permission='BulkDeletePerson'>\
-					<span class='capBtn'><input type='button' id='bulkDelete' value='Bulk delete' onclick='$(\"#bulkDeleteModal\").modal(\"show\")' /></span>\
+					<span class='capBtn'><input type='button' id='bulkDelete' value='Bulk Delete' onclick='$(\"#bulkDeleteModal\").modal(\"show\")' /></span>\
 				</tds:hasPermission>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })
 				$("#createStaffDialog").dialog({ autoOpen: false })
@@ -104,13 +104,13 @@
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h4 class="modal-title" id="myModalLabel">Bulk delete</h4>
+	        <h4 class="modal-title" id="myModalLabel">Bulk Delete</h4>
 	      </div>
 	      <div class="modal-body">
-	        <input type="checkbox" id="includeAssociatedWithAssetEntity"> Include persons associated as App Owner or SMEs?
+	        <input type="checkbox" id="deleteIfAssocWithAssets">&nbsp;<label for="deleteIfAssocWithAssets">Delete persons associated as App Owner or SMEs?</label>
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-danger" onclick='bulkDelete()'>Delete</button>
+	        <button type="button" class="btn btn-danger" onclick='Person.bulkDelete()'>Delete</button>
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 	      </div>
 	    </div>

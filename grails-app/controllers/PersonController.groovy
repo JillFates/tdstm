@@ -157,25 +157,35 @@ class PersonController {
 	
 	}
 
+	/**
+	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
+	 */
 	def bulkDelete = {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
 			return
 		}
+		def ids = params.get("ids[]") as List
+		if (!ids) {
+			render(ServiceResults.invalidParams('Please select at least one person to be be bulk deleted.') as JSON)
+			return
+		}
 
 		try {
-			def ids = params.get("ids[]")
-			def includeAssociatedWithAssetEntity = params.includeAssociatedWithAssetEntity.toBoolean()
-			def data = personService.bulkDelete(loginUser, ids, includeAssociatedWithAssetEntity)
+			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'on'
+			def data = personService.bulkDelete(loginUser, ids, deleteIfAssocWithAssets)
 			render(ServiceResults.success(data) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (InvalidParamException e) {
+			render(ServiceResults.invalidParams(e.getMessage()) as JSON)
 		} catch (ValidationException e) {
 			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
 		} catch (Exception e) {
+			e.printStackTrace()
 			ServiceResults.internalError(response, log, e)
 		}
 	}
