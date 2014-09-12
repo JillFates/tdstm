@@ -31,7 +31,7 @@
 		        url = form.attr("action");
 
 				$.post(url, items, function(data) {
-					var progressBar = new TaskProgressBar(data.data.key, 1000, 
+					var progressBar = new TaskProgressBar(data.data.key, 5000, 
 					function() {
 						window.location="downloadExport?key=" + data.data.key;
 					}, function() {

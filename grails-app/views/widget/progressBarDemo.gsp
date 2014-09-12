@@ -15,7 +15,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$.get('/tdstm/ws/progress${url}', function(data) {
-				var progressBar = new TaskProgressBar(data.data.key, 1000, 
+				var progressBar = new TaskProgressBar(data.data.key, 5000, 
 				function() {
 					alert('Completed!');
 				}, function() {
