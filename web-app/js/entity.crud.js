@@ -289,8 +289,7 @@ function addAssetDependency (type, forWhom) {
 		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
 	}
 	$("#dep_"+typeRowNo+"_"+forWhom).addClass("scrollSelect");
-	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)
-	
+
 	$("#dep_"+typeRowNo+"_"+forWhom).attr("data-asset-type", $("#entity_"+typeRowNo).val())
 	
 	if (!isIE7OrLesser) {
@@ -298,11 +297,14 @@ function addAssetDependency (type, forWhom) {
 	}
 	
 	$("#depComment_"+typeRowNo).dialog({ autoOpen: false})
+
+	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)	
 }
 
 function deleteRow ( rowId, forWhomId ) {
 	$("#"+rowId).remove()
 	var id = rowId.split('_')[3]
+
 	if(id)
 		$("#deletedDepId").val(( $("#deletedDepId").val() ? $("#deletedDepId").val()+"," : "") + id)
 	else
