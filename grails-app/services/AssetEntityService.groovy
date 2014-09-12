@@ -144,18 +144,16 @@ class AssetEntityService {
 	def addOrUpdateDeps(def type, def idSuf, def assetEntity, def params, def loginUser, def depType, def createNew = false){
 		//looking in DB whether added dependency exist or not
 		def depEntity = AssetEntity.get(NumberUtils.toDouble(params["asset_${depType}_"+idSuf],0).round())
-		
-		updateBundle(depEntity, params["moveBundle_${depType}_"+idSuf])
-		
+
 		def errMsg = "" // Initializing var to return error message (if came)
 		if(depEntity){
+			updateBundle(depEntity, params["moveBundle_${depType}_"+idSuf])
+
 			def alreadyExist = false //Initializing var to save dependency if dependency already exist
-			
 			// if flag is true for creating record need to check whether that record is not there in DB
 			if(createNew) 
 				alreadyExist = depType=="dependent" ? AssetDependency.findByAssetAndDependent(assetEntity, depEntity) :
 					AssetDependency.findByAssetAndDependent(depEntity, assetEntity)
-			
 			//Going update or save record if asset and dependency is belonging to same project and if a
 			//new record came to update already there in DB or not 		
 			if(!alreadyExist){
@@ -598,7 +596,7 @@ class AssetEntityService {
 	Map getDefaultModelForLists(String listType, Project project, Object fieldPrefs, Object params, Object filters) {
 
 		Map model = [
-			assetClassOptions: AssetClass.getClassOptions(),	
+			assetClassOptions: AssetClass.getClassOptions(),
 			assetDependency: new AssetDependency(), 
 			attributesList: [],		// Set below
 			dependencyStatus: getDependencyStatuses(),
