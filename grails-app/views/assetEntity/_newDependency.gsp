@@ -1,6 +1,7 @@
 <%--
  --- Html that inserted into the Asset Dependency Edit when user clicks Add button
  --%>
+<%@page import="com.tdsops.tm.enums.domain.AssetClass"%>
 <div style="display: none;">
 	<table id="assetDependencyRow">
 		<tr>
@@ -10,9 +11,9 @@
 			<td>
 				<g:select name="entity" 
 					onChange="AssetCrudModule.updateDependentAssetNameSelect(this.name)" 
-					from="${assetClassOptions?.entrySet()}" optionKey="key" optionValue="value"
+					from="${AssetClass.getClassOptions().entrySet()}" optionKey="key" optionValue="value"
 					<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
-					value="${ forWhom == 'Application' ? 'APPLICATION' : 'SERVER-DEVICE'}"
+					>
 				</g:select>
 			</td>
 

@@ -119,11 +119,11 @@
 
 					<%-- Class option --%>
 					<td>
-						<g:select name="entity_dependent_${dependent.id}" id="entity_dependent_${dependent.id}" 
-							onchange="AssetCrudModule.updateDependentAssetNameSelect(this.name)"
+						<g:select name="entity_dependent_${dependent.id}" 
+							id="entity_dependent_${dependent.id}" 
+							onChange="AssetCrudModule.updateDependentAssetNameSelect(this.name)" 
 							from="${assetClassOptions.entrySet()}" optionKey="key" optionValue="value"
-							<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
-							value="${ forWhom == 'Application' ? 'APPLICATION' : 'SERVER-DEVICE'}"
+							value="${AssetClass.getClassOptionForAsset(dependent?.dependent)}"
 						></g:select>
 					</td>
 
