@@ -11,6 +11,7 @@ class EntityType {
 	static final String DB='Database'
 	static final String STORAGE='Files'
 	static final String DEVICE=AE
+	static final String LOGICAL_STORAGE=STORAGE
 	static final getList() {
 		return [ AE, APP, DB, STORAGE, DEVICE ]
 	}
@@ -22,7 +23,7 @@ class EntityType {
 		return ctgType.("$type")
 	}
 	static final getKeyByText( text ){
-		def ctgType=[ 'Server' : AE, 'Storage':STORAGE, 'Database':DB, Application:APP, 'Device' : DEVICE]
+		def ctgType=[ 'Server' : AE, 'Storage':STORAGE, 'Database':DB, Application:APP, 'Device' : DEVICE, 'Logical Storage' : LOGICAL_STORAGE]
 		return ctgType[text]
 	}
 }
