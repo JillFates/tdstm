@@ -1195,7 +1195,20 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 			};
 			commentService.getAssignedToList('', scope.commentId).then(
 				function(data) {
-					scope.roles = data.data;
+					var unassigned = {"id" : 0, "nameRole" : "Unassigned"};
+					var auto =  {"id" : "AUTO", "nameRole" : "Automatic"};
+					var roles = data.data;
+					
+					roles.push(auto);
+					roles.push(unassigned);
+					
+					roles.sort(function(a, b) {
+					    if (a.nameRole < b.nameRole) return -1;
+					    if (a.nameRole > b.nameRole) return 1;
+					    return 0;
+					});
+					
+					scope.roles = roles;
 					validateModel();
 				},
 				function(data) {
