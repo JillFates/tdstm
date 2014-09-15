@@ -12,7 +12,7 @@ describe('Dashboards Menu', function(){
     describe('submenu',function(){
       it('should displayed 6 links', function(){
         menu.getDashboardsSubmenu().then(function(list){
-          expect(list.length).toEqual(6);
+          expect(list.length).toEqual(5);
         });
       });
 
@@ -27,9 +27,6 @@ describe('Dashboards Menu', function(){
       });
       it('should have Event Dashboard in the submenu', function(){
         expect(menu.getEventDashboard().getText()).toEqual('Event Dashboard');
-      });
-      it('should have Asset Tracker in the submenu', function(){
-        expect(menu.getAssetTracker().getText()).toEqual('Asset Tracker');
       });
       it('should have Cart Tracker in the submenu', function(){
         expect(menu.getCartTraker().getText()).toEqual('Cart Tracker');

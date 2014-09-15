@@ -490,10 +490,9 @@ describe('Comments - Application', function(){
       
       it('should remain opened comment list',function(){
         expect(commTasklist.isListModalPresent()).toBe(true);
-        // expect(commTasklist.commentTaskListModal.isPresent()).toBe(true);
       });
 
-      it('should have only 2 item', function(){
+      it('should have only 1 item', function(){
         expect(commTasklist.list.count()).toEqual(1);
       });
 

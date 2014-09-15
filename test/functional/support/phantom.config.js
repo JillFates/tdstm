@@ -9,11 +9,11 @@ exports.config = {
     '../components/planning/bundles.spec.js',
     '../components/assets/createApp.spec.js',
     '../components/assets/addTask.spec.js',
-    '../components/assets/addComments.spec.js',
-    '../components/assets/serverList.spec.js',
-    '../components/assets/databases/createDatabase.spec.js'
+    '../components/assets/addComments.spec.js'
     ],
     test2:[
+    '../components/assets/serverList.spec.js',
+    '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],
     menu:[
@@ -85,7 +85,7 @@ exports.config = {
   framework: 'jasmine',
   
   jasmineNodeOpts: {
-    isVerbose: true,
+    isVerbose: false,
     showColors: true,
     includeStackTrace: true,
     defaultTimeoutInterval: 30000

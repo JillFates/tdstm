@@ -413,9 +413,6 @@ var Menu = function(){
   this.getEventDashboard = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/dashboard/index"]'));
   };
-  this.getAssetTracker = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/clientConsole/index"]'));
-  };
   this.getCartTraker = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/cartTracking/cartTracking"]'));
   };
@@ -482,9 +479,6 @@ var Menu = function(){
   this.getAssetTags = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag"]'));
   };
-  // this.getEventTeamWorksheets = function(){
-  //   return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Team+Worksheets"]'));
-  // };
   this.getLogisticsTeamWorksheets = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset"]'));
   };
