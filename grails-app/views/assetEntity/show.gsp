@@ -1,10 +1,4 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
-<g:if test="${flash.message}">
-<script type="text/javascript">
-alert("${flash.message}")
-</script>
-<% flash.message = null %>
-</g:if>
 <script type="text/javascript">
 $(document).ready(function() { 
 	var assetType = "${assetEntity.assetType}"
