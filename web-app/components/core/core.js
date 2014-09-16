@@ -729,13 +729,20 @@ tds.core.directive.DurationPicker = function(utils) {
 			}
 
 			var updateView = function() {
-				for (var i=(scope.scales.length-1); i >= 0; i--) {
-					var offset = moment(0).add(scope.scales[i].id.toLowerCase(), 1);
-					if ((scope.ngModel >= offset.valueOf()) &&
-						((scope.ngModel % offset.valueOf()) == 0)) {
-						scope.duration = parseInt((scope.ngModel / offset.valueOf()), 10)
-						scope.scale = scope.scales[i].id;
-						break;
+				//check with current scale, if not go with a lower one
+				var offset = moment(0).add(scope.scale.toLowerCase(), 1);
+				var tentativeDuration = parseInt((scope.ngModel / offset.valueOf()), 10)
+				if ((tentativeDuration * offset.valueOf()) ==  scope.ngModel) {
+					scope.duration = tentativeDuration
+				} else {
+					for (var i=(scope.scales.length-1); i >= 0; i--) {
+						var offset = moment(0).add(scope.scales[i].id.toLowerCase(), 1);
+						if ((scope.ngModel >= offset.valueOf()) &&
+							((scope.ngModel % offset.valueOf()) == 0)) {
+							scope.duration = parseInt((scope.ngModel / offset.valueOf()), 10)
+							scope.scale = scope.scales[i].id;
+							break;
+						}
 					}
 				}
 			}
