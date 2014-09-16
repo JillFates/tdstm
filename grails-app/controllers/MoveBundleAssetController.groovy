@@ -109,11 +109,10 @@ class MoveBundleAssetController {
 		} else {
 		   moveBundleInstance = MoveBundle.findByProject(project,[sort:'name',order:'asc']  )
         }
+		
     	def moveBundles = MoveBundle.findAll("from MoveBundle where project.id = $moveBundleInstance.project.id order by name")
-    	def currentBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle.id = $moveBundleInstance.id")
-    	def moveBundleAssets = AssetEntity.findAll("from AssetEntity where moveBundle = null and project = $moveBundleInstance.project.id ")
-    	render( view:'assignAssets', model:[moveBundles:moveBundles, currentBundleAssets: currentBundleAssets, 
-    	                                    moveBundleInstance:moveBundleInstance, moveBundleAssets:moveBundleAssets ] )
+		
+		redirect(action: "assignAssetsToBundleChange", params: ['bundleLeft': moveBundles.getAt(0).id, 'bundleRight' : moveBundleInstance.id])
     }
     def assignAssetsToBundleChange = {
         def bundleRight = params.bundleRight
