@@ -5,12 +5,12 @@
 			<option value="">Please select</option>
 		</select>
 	</label>
-	<label class="inline" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Bundle:
+	<label class="inline" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="bundleSelect">Bundle:
 		<select name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
 			<option value="">Please select</option>
 		</select>
 	</label>
-	<label class="inline" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="eventSelect">Application:
+	<label class="inline" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'" for="applicationSelect">Application:
 		<select name="applicationSelect" id="applicationSelect" ng-model="contexts.selectedApplication" ng-change="contexts.checkValidSelection()" ng-options="item as item.name group by item.group for item in contexts.applicationsArray">
 			<option value="">Please select</option>
 		</select>

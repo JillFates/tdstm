@@ -8,14 +8,14 @@
 		</div>	
 		
 		<div class="form-group" ng-show="currentSelectedRecipe.context == 'Bundle' || currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
-			<label class="inline text-right" for="eventSelect">Bundle:</label>
+			<label class="inline text-right" for="bundleSelect">Bundle:</label>
 				<select name="bundleSelect" id="bundleSelect" ng-model="contexts.selectedBundle" ng-change="contexts.bundleSelected()" ng-options="item as item.name group by item.group for item in contexts.bundlesArray">
 					<option value="">Please select</option>
 				</select>
 		</div>
 
 		<div class="form-group" ng-show="currentSelectedRecipe.context == 'Application' || currentSelectedRecipe.context == 'All'">
-			<label class="inline text-right" for="eventSelect">Application:</label>
+			<label class="inline text-right" for="applicationSelect">Application:</label>
 				<select name="applicationSelect" id="applicationSelect" ng-model="contexts.selectedApplication" ng-change="contexts.checkValidSelection()" ng-options="item as item.name group by item.group for item in contexts.applicationsArray">
 					<option value="">Please select</option>
 				</select>
