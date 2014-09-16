@@ -249,7 +249,6 @@
 					<tr>
 						<td valign="top" >Bundle:
 						<select name="bundleLeft" id="bundleLeftId" onchange="bundleChange();" >
-							<option value="">Unassigned</option>
 							<g:each in="${moveBundles}" var="moveBundle">
 			                	<option value="${moveBundle.id}">${moveBundle}</option>
 			                </g:each>

@@ -1195,9 +1195,11 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 			};
 			commentService.getAssignedToList('', scope.commentId).then(
 				function(data) {
+					var unassigned =  {"id" : "0", "description" : "Unassigned"};
 					var auto =  {"id" : "AUTO", "nameRole" : "Automatic"};
 					var roles = data.data;
 					
+					roles.push(unassigned);
 					roles.push(auto);
 					
 					roles.sort(function(a, b) {
