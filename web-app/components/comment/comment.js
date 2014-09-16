@@ -1199,7 +1199,6 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					var auto =  {"id" : "AUTO", "nameRole" : "Automatic"};
 					var roles = data.data;
 					
-					roles.push(unassigned);
 					roles.push(auto);
 					
 					roles.sort(function(a, b) {
@@ -1207,7 +1206,9 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					    if (a.nameRole > b.nameRole) return 1;
 					    return 0;
 					});
-					
+
+					roles.unshift(unassigned);
+
 					scope.roles = roles;
 					validateModel();
 				},
@@ -1304,13 +1305,14 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 					var roles = data.data;
 										
 					roles.push(auto);
-					roles.push(unassigned);
 										
 					roles.sort(function(a, b) {
 					    if (a.description < b.description) return -1;
 					    if (a.description > b.description) return 1;
 					    return 0;
-					});					
+					});		
+					
+					roles.unshift(unassigned);
 					scope.roleTypes = roles;
 				},
 				function(data) {
