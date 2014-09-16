@@ -3,7 +3,7 @@ var Person = {
 
 	// Used to Call the Person bulkDelete service call from the Person List
 	bulkDelete: function() {
-		var deleteIfAssocWithAssets = $('#deleteIfAssocWithAssets').val();
+		var deleteIfAssocWithAssets = $('#deleteIfAssocWithAssets').prop('checked');
 		var ids = new Array()
 		$('.cbox:checkbox:checked').each(function(){
 			ids.push(this.id.split("_")[2])

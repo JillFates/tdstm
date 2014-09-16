@@ -166,14 +166,21 @@ class PersonController {
 			ServiceResults.unauthorized(response)
 			return
 		}
-		def ids = params.get("ids[]") as List
+		def ids = params.get("ids[]") 
 		if (!ids) {
 			render(ServiceResults.invalidParams('Please select at least one person to be be bulk deleted.') as JSON)
 			return
 		}
+		
+		if (ids instanceof String) {
+			def arr = new String[1];
+			arr[0] = ids;
+			ids = arr;
+		}
+		
 
 		try {
-			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'on'
+			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'true'
 			def data = personService.bulkDelete(loginUser, ids, deleteIfAssocWithAssets)
 			render(ServiceResults.success(data) as JSON)
 		} catch (UnauthorizedException e) {
