@@ -3354,59 +3354,47 @@ class AssetEntityController {
 	* Render Summary of assigned and unassgined assets.
 	*/
 	def assetSummary = {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = securityService.getUserCurrentProject();
-		if (!project) {
-			flash.message = "Please select project to view Asset Summary"
-			redirect(controller:'project',action:'list')
+		def project = CU.getProjectForPage( this )
+		if (! project) 
 			return
-		}
+
 		List moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 		List assetSummaryList = []
-		int totalAsset = 0;
-		int totalPhysical = 0;
-		int totalApplication =0;
-		int totalDatabase = 0;
-		int totalFiles = 0;
+		int totalAsset = 0
+		int totalPhysical = 0
+		int totalApplication =0
+		int totalDatabase = 0
+		int totalFiles = 0
+
+		def phySQL = 'from AssetEntity a where a.moveBundle=:mb and a.assetClass=:ac and coalesce(a.assetType) not in (:at)'
 
 		moveBundleList.each{ moveBundle->
-			def physicalCount = AssetEntity.countByMoveBundleAndAssetTypeNotInList( moveBundle,AssetType.getNonPhysicalTypes(), params )
+			def physicalCount = AssetEntity.findAll(phySQL, [mb:moveBundle, ac:AssetClass.DEVICE, at:AssetType.getVirtualServerTypes()]).size()
 			def assetCount = AssetEntity.countByMoveBundleAndAssetTypeInList( moveBundle,AssetType.getServerTypes(), params )
 			def applicationCount = Application.countByMoveBundle(moveBundle)
 			def databaseCount = Database.countByMoveBundle(moveBundle)
 			def filesCount = Files.countByMoveBundle(moveBundle)
-			assetSummaryList << ["name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "physicalCount":physicalCount,
+			assetSummaryList << [ "name":moveBundle, "assetCount":assetCount, "applicationCount":applicationCount, "physicalCount":physicalCount,
 				"databaseCount":databaseCount, "filesCount":filesCount, id:moveBundle.id]
 		}
 		
-		def unassignedPhysicalCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
-						AND project = $projectId AND ifnull(assetType,'') NOT IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getNonPhysicalTypes())})")[0]
-		def unassignedAssetCount = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE moveBundle = null \
-						AND project = $projectId AND assetType IN (${WebUtil.listAsMultiValueQuotedString(AssetType.getServerTypes())})")[0]
-
-		def unassignedAppCount = Application.executeQuery("SELECT COUNT(*) FROM Application WHERE moveBundle = null AND project = $projectId ")[0]
-		def unassignedDBCount = Database.executeQuery("SELECT COUNT(*) FROM Database WHERE moveBundle = null AND project = $projectId ")[0]
-		def unassignedFilesCount = Files.executeQuery("SELECT COUNT(*) FROM Files WHERE moveBundle = null AND project = $projectId ")[0]
-
-		assetSummaryList.each{asset->
+		assetSummaryList.each{ asset->
 			totalAsset=totalAsset + asset.assetCount
 			totalPhysical=totalPhysical+ asset.physicalCount
 			totalApplication = totalApplication + asset.applicationCount
 			totalDatabase = totalDatabase + asset.databaseCount
 			totalFiles = totalFiles + asset.filesCount
 		}
-		totalAsset = totalAsset + unassignedAssetCount ;
-		totalPhysical = totalPhysical + unassignedPhysicalCount;
-		totalApplication = totalApplication + unassignedAppCount;
-		totalDatabase = totalDatabase + unassignedDBCount;
-		totalFiles =totalFiles + unassignedFilesCount;
 
-		return [assetSummaryList:assetSummaryList, totalAsset:totalAsset, totalApplication:totalApplication, totalDatabase:totalDatabase,totalPhysical:totalPhysical,
-			totalFiles:totalFiles,unassignedAssetCount:unassignedAssetCount, unassignedAppCount:unassignedAppCount, unassignedDBCount:unassignedDBCount,unassignedPhysicalCount:unassignedPhysicalCount,
-			unassignedFilesCount:unassignedFilesCount]
-
+		return [
+			assetSummaryList:assetSummaryList,
+			totalAsset:totalAsset,
+			totalApplication:totalApplication,
+			totalDatabase:totalDatabase,totalPhysical:totalPhysical,
+			totalFiles:totalFiles
+		]
 	}
-
+	
 	/**
 	 * Used by the dependency console to load up the individual tabs for a dependency bundle
 	 * @param String entity - the entity type to view (server,database,file,app)
