@@ -1135,36 +1135,38 @@ class AssetEntityController {
 		if (! project) 
 			return
 		
-		def listType = params.listType
-		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		def prefType = 'Asset_Columns'
 		def fieldPrefs = assetEntityService.getExistingPref(prefType)
+		
+		Map model = assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters)
+
+		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
+		model.assetName = filters?.assetNameFilter ?:'' 
+		model.assetPref = fieldPrefs 
+		model.assetTag = filters?.assetTagFilter ?:'' 
+		model.assetType = filters?.assetTypeFilter ?:'' 
+		model.model = filters?.modelFilter ?:'' 
+		model.prefType = prefType 
+		model.serialNumber = filters?.serialNumberFilter ?:'' 
+		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
+		model.sourceRack = filters?.sourceRackFilter ?:''
+		model.targetLocation = filters?.targetLocationFilter ?:'' 
+		model.targetRack = filters?.targetRackFilter ?:'' 
+		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
+		model.type = params.type
+
 		// The customized title of the list
-		def titleByType = [
-			'all': 'All Devices',
-			'server': 'Servers',
-			'physical': 'Physical Devices',
-			'virtual': 'Virtual Servers'
+		def titleByFilter = [
+			all: 'All Devices',
+			other: 'Other Devices',
+			physical: 'Physical Device',
+			physicalServer: 'Physical Server',
+			server: 'Server',
+			storage:  'Storage Device',
+			virtualServer: 'Virtual Server',
 		]
-
-		Map model = [
-			assetName: filters?.assetNameFilter ?:'', 
-			assetPref: fieldPrefs, 
-			assetTag: filters?.assetTagFilter ?:'', 
-			assetType: filters?.assetTypeFilter ?:'', 
-			listType: listType, 
-			model: filters?.modelFilter ?:'', 
-			prefType: prefType, 
-			serialNumber: filters?.serialNumberFilter ?:'', 
-			sourceLocation: filters?.sourceLocationFilter ?:'', 
-			sourceRack: filters?.sourceRackFilter ?:'',
-			targetLocation: filters?.targetLocationFilter ?:'', 
-			targetRack: filters?.targetRackFilter ?:'', 
-			// JPM 9/2014 - NOT REALLY SURE IF THIS IS USED IN ANY WAY...
-			type: params.type,
-			title: ( titleByType.containsKey(params.listType) ? titleByType[listType] : titleByType['all'] ) + ' List'
-		]
-
-		model.putAll( assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters) )
+		model.title = ( titleByFilter.containsKey(params.filter) ? titleByFilter[params.filter] : titleByFilter['all'] ) + ' List'
 
 		return model
 	}
@@ -1173,7 +1175,19 @@ class AssetEntityController {
 	 * This method is used by JQgrid to load assetList
 	 */
 	def listJson = {
-		def filterParams = ['assetName':params.assetName, 'assetType':params.assetType, 'model':params.model, 'sourceLocation':params.sourceLocation, 'sourceRack':params.sourceRack, 'planStatus':params.planStatus, 'moveBundle':params.moveBundle, 'depNumber':params.depNumber, 'depToResolve':params.depToResolve,'depConflicts':params.depConflicts, 'event':params.event]
+		def filterParams = [
+			assetName: params.assetName, 
+			assetType: params.assetType, 
+			depConflicts: params.depConflicts, 
+			depNumber: params.depNumber, 
+			depToResolve: params.depToResolve,
+			event: params.event,
+			model: params.model, 
+			moveBundle: params.moveBundle, 
+			planStatus: params.planStatus, 
+			sourceLocation: params.sourceLocation, 
+			sourceRack: params.sourceRack, 
+		]
 		def validSords = ['asc', 'desc']
 		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
 		def maxRows = Integer.valueOf(params.rows) 
@@ -1185,8 +1199,8 @@ class AssetEntityController {
 		
 		def attributes = projectService.getAttributes('AssetEntity')
 		
-		def listType = params.listType
-		def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		def prefType = 'Asset_Columns'
 		def assetPref= assetEntityService.getExistingPref(prefType)
 		
 		def assetPrefVal = assetPref.collect{it.value}
@@ -1280,12 +1294,6 @@ class AssetEntityController {
 
 		if (altColumns.length())
 			query.append("\n${ altColumns.toString() }")
-		/*
-			// Count of dependencies, dep to resolve and conflicts
-			adb.dependency_bundle AS depNumber,
-			COUNT(DISTINCT adr.asset_dependency_id)+COUNT(DISTINCT adr2.asset_dependency_id) AS depToResolve,
-			COUNT(DISTINCT adc.asset_dependency_id)+COUNT(DISTINCT adc2.asset_dependency_id) AS depConflicts
-		*/
 
 		query.append("""
 				FROM asset_entity ae
@@ -1295,8 +1303,6 @@ class AssetEntityController {
 				LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = '${AssetCommentType.TASK}'
 				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = '${AssetCommentType.COMMENT}'
 				""")
-//				LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
-//				LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 
 		if (joinQuery.length())
 			query.append(joinQuery)
@@ -1317,21 +1323,34 @@ class AssetEntityController {
 		
 		query.append("\n AND ae.asset_class='${AssetClass.DEVICE}'")
 
+		def filter = params.filter ?: 'all'
+
 		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
-		switch(listType) {
-			case 'server':
-				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
-				break
+		switch(filter) {
 			case 'physical':
 				query.append("\n AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
 				break
-			case 'virtual':
-				query.append("\n AND ae.asset_type,'') IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+			case 'physicalServer':
+				def phyServerTypes = AssetType.getAllServerTypes() - AssetType.getVirtualServerTypes()
+				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(phyServerTypes)}) " )
 				break
-			case 'all': 
+			case 'server':
+				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
+				break
+			case 'storage':
+				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getStorageTypes())}) " )
+				break
+			case 'virtualServer':
+				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				break
+			case 'other':
+				query.append("\n AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) " )
+				break
+
+ 			case 'all': 
 				break
 		}
-		
+
 		if (params.event && params.event.isNumber() && moveBundleList)
 			query.append( "\n AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
 			
@@ -1377,17 +1396,8 @@ class AssetEntityController {
 			}
 		}
 		
-		if ( params.filter && params.filter!='assetSummary') {
-			if (params.filter == 'other') {
-				// filter is not other means filter is in (Server, VM , Blade) and others is excepts (Server, VM , Blade).
-				query.append( whereAnd() + " COALESCE(assets.assetType,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) ")
-			} else {
-				query.append( whereAnd() + " assets.assetType IN (${GormUtil.asQuoteCommaDelimitedString(assetType)}) " )
-			}
-			
-			if (params.type=='toValidate') {
-				query.append( whereAnd() + " assets.validation='Discovery' ")//eq ('validation','Discovery')
-			}
+		if (params.type && params.type == 'toValidate') {
+			query.append( whereAnd() + " assets.validation='Discovery' ") //eq ('validation','Discovery')
 		}
 
 		// Allow filtering on the Validate

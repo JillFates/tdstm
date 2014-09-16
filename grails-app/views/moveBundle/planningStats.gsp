@@ -77,6 +77,9 @@ $(document).ready(function() {
 	<div class="body">
 		<div id="containerId" class="container">
 			<h1>Planning Dashboard</h1>
+
+<%-- Analysis Phase --%>
+
 			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:260px">
 				<span class="dashboard_head">Discovery Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
@@ -105,7 +108,7 @@ $(document).ready(function() {
 									<b> ${100 - percentageAppToValidate}%
 									</b>
 									<g:link controller="application" action="list"
-										params="[filter:'applicationCount', toValidate:'Discovery']">Applications Validated</g:link>
+										params="[filter:'application', toValidate:'Discovery']">Applications Validated</g:link>
 								</div>
 							</g:else></td>
 					</tr>
@@ -116,15 +119,16 @@ $(document).ready(function() {
 				<table class="dashboard_stat_table">
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:applicationCount,filter:'applicationCount',assetType:'application',title:'Applications',validate:appToValidate,barId:'applicationbar',iconName:'iconApp.png']"></g:render>
+							model="[assetCount:applicationCount,filter:'application',assetType:'application',title:'Applications',validate:appToValidate,barId:'applicationbar',iconName:'iconApp.png']">
+						</g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:physicalCount,filter:'physical',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar',iconName:'iconServer.png']"></g:render>
+							model="[assetCount:physicalCount,filter:'physicalServer',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar',iconName:'iconServer.png']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:virtualCount,filter:'virtual',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar',iconName:'iconServer.png']"></g:render>
+							model="[assetCount:virtualCount,filter:'virtualServer',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar',iconName:'iconServer.png']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
@@ -170,6 +174,9 @@ $(document).ready(function() {
 					</g:if>
 				</table>
 			</div>
+
+<%-- Analysis Phase --%>
+
 			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:250px">
 				<span class="dashboard_head">Analysis Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
@@ -198,7 +205,7 @@ $(document).ready(function() {
 									<b> ${percentageBundleReady}%
 									</b>
 									<g:link controller="application" action="list"
-										params="[filter:'applicationCount', toValidate:'BundleReady']">Applications Ready</g:link>
+										params="[filter:'application', toValidate:'BundleReady']">Applications Ready</g:link>
 								</div>
 							</g:else></td>
 					</tr>
@@ -210,45 +217,45 @@ $(document).ready(function() {
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'Validated']"
+								params="[filter:'application', toValidate:'Validated']"
 								class="links">
 								${validated}
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'Validated']"
+								params="[filter:'application', toValidate:'Validated']"
 								class="links">Validated</g:link></td>
 					</tr>
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'DependencyScan']"
+								params="[filter:'application', toValidate:'DependencyScan']"
 								class="links">
 								${dependencyScan}
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'DependencyScan']"
+								params="[filter:'application', toValidate:'DependencyScan']"
 								class="links">Dependency Scan</g:link></td>
 					</tr>
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'DependencyReview']"
+								params="[filter:'application', toValidate:'DependencyReview']"
 								class="links">
 								${dependencyReview}
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'DependencyReview']"
+								params="[filter:'application', toValidate:'DependencyReview']"
 								class="links">Dependency Review</g:link></td>
 					</tr>
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'BundleReady']"
+								params="[filter:'application', toValidate:'BundleReady']"
 								class="links">
 								${bundleReady}
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount', toValidate:'BundleReady']"
+								params="[filter:'application', toValidate:'BundleReady']"
 								class="links">Ready</g:link></td>
 					</tr>
 				</table>
@@ -308,34 +315,37 @@ $(document).ready(function() {
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount', latencys:'N']" class="links">
+								params="[filter:'application', latencys:'N']" class="links">
 								${likelyLatency}
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount', latencys:'N']" class="links">Likely</g:link></td>
+								params="[filter:'application', latencys:'N']" class="links">Likely</g:link></td>
 					</tr>
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount',latencys:'unknown']"
+								params="[filter:'application',latencys:'unknown']"
 								class="links">
 								${unknownLatency}
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount',latencys:'unknown']"
+								params="[filter:'application',latencys:'unknown']"
 								class="links">Unknown</g:link></td>
 					</tr>
 					<tr>
 						<td class="dashboard_stat_td"><g:link
 								controller="application" action="list"
-								params="[filter:'applicationCount',latencys:'Y']" class="links">
+								params="[filter:'application',latencys:'Y']" class="links">
 								${unlikelyLatency }
 							</g:link></td>
 						<td><g:link controller="application" action="list"
-								params="[filter:'applicationCount',latencys:'Y']" class="links">UnLikely</g:link></td>
+								params="[filter:'application',latencys:'Y']" class="links">UnLikely</g:link></td>
 					</tr>
 				</table>
 			</div>
+
+<%-- Execution Phase Section --%>
+
 			<div class="dashboard_div col-md-7 col-xs-7" style="float: left;">
 				<span class="dashboard_head">Execution Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
@@ -364,7 +374,7 @@ $(document).ready(function() {
 									<b> ${assignedAppCount}%
 									</b>
 									<g:link controller="application" action="list"
-										params="[filter:'applicationCount',plannedStatus:'Assigned']">Applications Assigned</g:link>
+										params="[filter:'application',plannedStatus:'Assigned']">Applications Assigned</g:link>
 								</div>
 							</g:else></td>
 					</tr>
@@ -393,7 +403,7 @@ $(document).ready(function() {
 									<b> ${confirmedAppCount}%
 									</b>
 									<g:link controller="application" action="list"
-										params="[filter:'applicationCount',plannedStatus:'Confirmed']">Applications Confirmed</g:link>
+										params="[filter:'application',plannedStatus:'Confirmed']">Applications Confirmed</g:link>
 								</div>
 							</g:else></td>
 					</tr>
@@ -421,11 +431,12 @@ $(document).ready(function() {
 								<div
 									style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
 									<b> ${movedAppCount}% </b>
-									<g:link controller="application" action="list" params="[filter:'applicationCount', plannedStatus:'Moved']">Applications Moved</g:link>
+									<g:link controller="application" action="list" params="[filter:'application', plannedStatus:'Moved']">Applications Moved</g:link>
 								</div>
 							</g:else></td>
 					</tr>
 				</table>
+
 				<table class="dashboard_stat_table">
 					<tbody>
 						<tr>
@@ -442,59 +453,72 @@ $(document).ready(function() {
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconApp.png')}"
 													height="12" /></td>
-												<td style="vertical-align: middle;"><g:link
-														controller="application" action="list" class="links">Applications</g:link></td>
+												<td style="vertical-align: middle;">
+													<g:link controller="application" action="list" class="links">Applications</g:link>
+												</td>
 											</tr>
 
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconServer.png')}"
 													height="12" /></td>
-												<td><g:link controller="assetEntity"
-														params="[filter:'All']" action="list" class="links">Servers</g:link>
+												<td>
+													<g:link controller="assetEntity" params="[filter:'server']" action="list" class="links">Servers</g:link>
 												</td>
 											</tr>
 
 											<tr>
 												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td><g:link controller="assetEntity"
-														params="[filter:'physical',listType:'server']"
-														action="list" class="links">Physical</g:link></td>
+												<td>
+													<g:link controller="assetEntity"
+														params="[filter:'physicalServer']"
+														action="list" class="links">Physical</g:link>
+												</td>
 											</tr>
 
 											<tr>
 												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td><g:link controller="assetEntity"
-														params="[filter:'virtual',listType:'server']"
-														action="list" class="links">Virtual</g:link></td>
+												<td>
+													<g:link controller="assetEntity"
+														params="[filter:'virtualServer']"
+														action="list" class="links">Virtual</g:link>
+												</td>
 											</tr>
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconDB.png')}"
-													height="12" /></td>
+													height="12" />
+												</td>
 												<td><g:link controller="database" action="list"
-														class="links">Databases</g:link></td>
+													class="links">Databases</g:link></td>
 											</tr>
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconStorage.png')}"
 													height="12" /></td>
-												<td nowrap="nowrap"><g:link controller="assetEntity" action="list"
-														class="links">Physical Storage</g:link></td>
+												<td nowrap="nowrap"><g:link controller="assetEntity" action="list" 
+													params="[filter:'storage']"
+													class="links">Physical Storage</g:link>
+												</td>
 											</tr>
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconStorage.png')}"
 													height="12" /></td>
 												<td><g:link controller="files" action="list"
-														class="links">Logical Storage</g:link></td>
+													class="links">Logical Storage</g:link>
+												</td>
 											</tr>
 
 											<tr>
 												<td class="dashboard_stat_icon_td"><img
 													src="${resource(dir:'images',file:'iconNetwork.png')}"
 													height="12" /></td>
-												<td><b>Other</b></td>
+												<td><g:link controller="assetEntity" 
+													params="[filter:'other']"
+													action="list"
+													class="links">Other</g:link>
+												</td>
 											</tr>
 											<tr>
 												<td class="dashboard_stat_icon_td">&nbsp;</td>
@@ -511,11 +535,13 @@ $(document).ready(function() {
 											<tr>
 												<th class="dashboard_stat_exec_td headerWidth" >&nbsp;</th>
 												<g:each in="${moveEventList}" var="event">
-													<th class="dashboard_stat_exec_tdmc headerWidth" ><g:link
+													<th class="dashboard_stat_exec_tdmc headerWidth" >
+														<g:link
 															controller="application" action="list"
 															params="[moveEvent:event.id]">
 															${event}
-														</g:link></th>
+														</g:link>
+													</th>
 												</g:each>
 												<th class="dashboard_stat_exec_tdmc"></th>
 											</tr>
@@ -523,7 +549,7 @@ $(document).ready(function() {
 
 												<td class="dashboard_stat_exec_td "><g:link
 														controller="application" action="list"
-														params="[filter:'applicationCount', plannedStatus:'Unassigned']">To be</g:link>
+														params="[plannedStatus:'Unassigned']">To be</g:link>
 												</td>
 												<g:each in="${moveEventList}" var="event">
 													<td class="dashboard_stat_exec_tdmc "
@@ -535,7 +561,7 @@ $(document).ready(function() {
 											<tr>
 												<td class="dashboard_stat_exec_td"><g:link
 														controller="application" action="list"
-														params="[filter:'applicationCount', plannedStatus:'Unassigned']">Assigned</g:link>
+														params="[plannedStatus:'Unassigned']">Assigned</g:link>
 												</td>
 												<g:each in="${moveEventList}" var="event">
 													<td class="dashboard_stat_exec_tdmc "
@@ -545,278 +571,48 @@ $(document).ready(function() {
 											</tr>
 										</thead>
 										<tbody>
-											<tr>
-												<td nowrap="nowrap"><g:if
-														test="${unassignedAppCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="application" action="list"
-															params="[filter:'applicationCount', unassigned:'true']"
-															class="links">
-															${unassignedAppCount} (${(percentageUnassignedAppCount > 0 && percentageUnassignedAppCount < 1) ? 1 : Math.round(percentageUnassignedAppCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${appList}" var="appCount">
-													<td class="dashboard_stat_exec_tdmx"><g:if
-															test="${appCount.count == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="application" action="list"
-																params="[filter:'applicationCount',moveEvent:appCount.moveEvent]"
-																class="links">
-																${appCount.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td class="dashboard_stat_exec_tdmx"><g:if
-														test="${percAppDoneCount == 0 }">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="application" action="list"
-															params="[filter:'applicationCount', runbook:'Done']"
-															class="links">
-															${percAppDoneCount}%</g:link>
-													</g:else></td>
-											</tr>
-											<tr>
-												<td nowrap="nowrap"><g:if
-														test="${unassignedAssetCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'All',listType:'server', unassigned:'true']"
-															class="links">
-															${unassignedAssetCount}
-														</g:link>
-													</g:else></td>
-												<g:each in="${assetList}" var="assetCount">
-													<td style="text-align: right;"><g:if
-															test="${assetCount.count == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="assetEntity" action="list"
-																params="[moveEvent:assetCount.moveEvent,filter:'All',listType:'server']"
-																class="links">
-																${assetCount.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td>&nbsp;</td>
-											</tr>
-											<tr>
-												<td nowrap="nowrap"><g:set
-														var="percentageUnassignedPhysicalAssetCount"
-														value="${physicalCount ? (unassignedPhysialAssetCount/physicalCount)*100 : 0}" />
-													<g:if test="${unassignedPhysialAssetCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'physical', unassigned:'true',listType:'server']"
-															class="links">
-															${unassignedPhysialAssetCount} (${(percentageUnassignedPhysicalAssetCount > 0 && percentageUnassignedPhysicalAssetCount < 1) ? 1 : Math.round(percentageUnassignedPhysicalAssetCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${assetList}" var="assetCount">
-													<td style="text-align: right;"><g:if
-															test="${assetCount.physicalCount == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="assetEntity" action="list"
-																params="[moveEvent:assetCount.moveEvent,filter:'physical',listType:'server']"
-																class="links">
-																${assetCount.physicalCount}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td style="text-align: right;"><g:if
-														test="${percentagePhysicalAssetCount== 0 }">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'physical', plannedStatus:'Moved',listType:'server']"
-															class="links">
-															${percentagePhysicalAssetCount}%</g:link>
-													</g:else></td>
-											</tr>
-											<tr>
-												<td nowrap="nowrap"><g:set
-														var="percentageUnassignedVirtualCount"
-														value="${virtualCount ? (unassignedVirtualAssetCount/virtualCount)*100 : 0}" />
-													<g:if test="${unassignedVirtualAssetCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'virtual', unassigned:'true',listType:'server']"
-															class="links">
-															${unassignedVirtualAssetCount} (${(percentageUnassignedVirtualCount > 0 && percentageUnassignedVirtualCount < 1) ? 1 : Math.round(percentageUnassignedVirtualCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${assetList}" var="assetCount">
-													<td style="text-align: right;"><g:if
-															test="${assetCount.virtualAssetCount == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="assetEntity" action="list"
-																params="[moveEvent:assetCount.moveEvent,filter:'virtual',listType:'server']"
-																class="links">
-																${assetCount.virtualAssetCount}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td style="text-align: right;"><g:if
-														test="${percentagevirtualAssetCount==0 }">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'virtual', plannedStatus:'Moved',listType:'server']"
-															class="links">
-															${percentagevirtualAssetCount}%</g:link>
-													</g:else></td>
-											</tr>
-											<tr>
-												<td nowrap="nowrap"><g:set
-														var="percentageUnassignedDbCount"
-														value="${dbCount ? (unassignedDbCount/dbCount)*100 : 0}" />
-													<g:if test="${unassignedDbCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="database" action="list"
-															params="[filter:'db', unassigned:'true']"
-															class="links">
-															${unassignedDbCount} (${(percentageUnassignedDbCount > 0 && percentageUnassignedDbCount < 1) ? 1 : Math.round(percentageUnassignedDbCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${dbList}" var="dbCount">
-													<td style="text-align: right;"><g:if
-															test="${dbCount.count == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="database" action="list"
-																params="[filter:'db',moveEvent:dbCount.moveEvent]"
-																class="links">
-																${dbCount.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td style="text-align: right;"><g:if
-														test="${percentageDBCount== 0 }">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="database" action="list"
-															params="[filter:'db', plannedStatus:'Moved']"
-															class="links">
-															${percentageDBCount}%</g:link>
-													</g:else></td>
-											</tr>
-											<tr>
-												<td nowrap="nowrap"><g:set
-														var="percentageUnassignedPhyStorageCount"
-														value="${phyStorageCount ? (unAssignedPhyStorgCount/phyStorageCount)*100 : 0}" />
-													<g:if test="${unAssignedPhyStorgCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'storage', unassigned:'true']"
-															class="links">
-															${unAssignedPhyStorgCount} (${(percentageUnassignedPhyStorageCount > 0 && percentageUnassignedPhyStorageCount < 1) ? 1 : Math.round(percentageUnassignedPhyStorageCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${phyStorageList}" var="phyStorageCount">
-													<td style="text-align: right;"><g:if
-															test="${phyStorageCount.count == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="assetEntity" action="list"
-																params="[filter:'storage', moveEvent:phyStorageCount.moveEvent]"
-																class="links">
-																${phyStorageCount.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td style="text-align: right;"><g:if
-														test="${percentagePhyStorageCount== 0 }">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'storage', plannedStatus:'Moved']"
-															class="links">
-															${percentagePhyStorageCount}%
-														</g:link>
-													</g:else>
-												</td>
-											</tr>
-											<tr>
-												
-												<td nowrap="nowrap"><g:set
-														var="percentageUnassignedFilesCount"
-														value="${fileCount ? (unassignedFilesCount/fileCount)*100 : 0}" />
-													<g:if test="${unassignedFilesCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="files" action="list"
-															params="[filter:'storage', unassigned:'true']"
-															class="links">
-															${unassignedFilesCount} (${(percentageUnassignedFilesCount > 0 && percentageUnassignedFilesCount < 1) ? 1 : Math.round(percentageUnassignedFilesCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${filesList}" var="filesCount">
-													<td style="text-align: right;"><g:if
-															test="${filesCount.count == 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="files" action="list"
-																params="[filter:'storage', moveEvent:filesCount.moveEvent]"
-																class="links">
-																${filesCount.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td style="text-align: right;"><g:if
-														test="${percentageFilesCount==0}">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="files" action="list"
-															params="[filter:'storage', plannedStatus:'Moved']"
-															class="links">
-															${percentageFilesCount}%</g:link>
-													</g:else></td>
-											</tr>
-											<tr>
 
-												<td nowrap="nowrap"><g:set
-														var="percentageUnassignedOtherCount"
-														value="${otherAssetCount ? (unassignedOtherCount/otherAssetCount)*100 : 0}" />
-													<g:if test="${unassignedOtherCount == 0 }">
-														<span class='colorGrey'>0</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'other', unassigned:'true',listType:'physical']"
-															class="links">
-															${unassignedOtherCount}	(${(percentageUnassignedOtherCount > 0 && percentageUnassignedOtherCount < 1) ? 1 : Math.round(percentageUnassignedOtherCount)}%)
-														</g:link>
-													</g:else></td>
-												<g:each in="${otherTypeList}" var="otherCount">
-													<td style="text-align: right;"><g:if
-															test="${otherCount.count== 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="assetEntity" action="list"
-																params="[moveEvent:otherCount.moveEvent,filter:'other',listType:'physical']"
-																class="links">
-																${otherCount.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td style="text-align: right;"><g:if
-														test="${percentageOtherCount== 0 }">
-														<span class='colorGrey'>N/A</span>
-													</g:if> <g:else>
-														<g:link controller="assetEntity" action="list"
-															params="[filter:'other', plannedStatus:'Moved',listType:'physical']"
-															class="links">
-															${percentageOtherCount}%</g:link>
-													</g:else></td>
-											</tr>
+											<%-- Applications --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:applicationCount, unassignedCount:unassignedAppCount, percDone:percAppDoneCount, controller:'application', filter:'application', list:appList]" 
+											/>
+			
+											<%-- Servers (Summary) --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:allServerCount, unassignedCount:unassignedAssetCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]" 
+											/>
+
+											<%-- Physical Servers --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalAssetCount, percDone:percentagePhysicalAssetCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]" 
+											/>
+										
+											<%-- Virtual Servers --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualAssetCount, percDone:percVirtualAssetCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]" 
+											/>
+
+											<%-- Databases --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:dbcount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]" 
+											/>
+		
+											<%-- Physical Storage --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorgCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]" 
+											/>
+		
+											<%-- Logical Storage --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:fileCount, unassignedCount:unassignedFilesCount, percDone:percentageFilesCount, controller:'files', filter:'storage', list:filesList]" 
+											/>
+		
+											<%-- Other Devices --%>
+											<g:render template="planningStatsExecRow"
+												model="[assetCount:otherAssetCount, unassignedCount:unassignedOtherCount, percDone:percentageOtherCount, controller:'assetEntity', filter:'other', list:otherTypeList]" 
+											/>
+
+											<%-- Open Tasks --%>
 											<tr>
 												<td></td>
 												<g:each in="${openTasks}" var="tasks">
