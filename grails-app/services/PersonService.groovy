@@ -579,7 +579,7 @@ class PersonService {
 			throw new InvalidParamException('Must select at least one person to delete')
 		}
 
-		log.info "$user is attempted to bulk delete ${ids?.size()} persons"
+		log.info "$user is attempted to bulk delete ${ids?.size()} persons ($ids), deleteIfAssocWithAssets=$deleteIfAssocWithAssets"
 
 		def deleted = 0
 		def skipped = 0

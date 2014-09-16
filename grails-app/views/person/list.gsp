@@ -104,10 +104,16 @@
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h4 class="modal-title" id="myModalLabel">Bulk Delete</h4>
+	        <h1 class="modal-title" id="myModalLabel">Bulk Delete</h1>
 	      </div>
 	      <div class="modal-body">
+	      	<p>
+	      	This process will delete the persons selected as long as they are no associated to a UserLogin or Tasks. By default it will 
+	      	also skip persons associated as the App Owner or SME for one or more applications.
+	      	</p>
+	      	<p> 
 	        <input type="checkbox" id="deleteIfAssocWithAssets">&nbsp;<label for="deleteIfAssocWithAssets">Delete persons associated as App Owner or SMEs?</label>
+	        </p>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-danger" onclick='Person.bulkDelete()'>Delete</button>
