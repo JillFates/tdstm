@@ -639,9 +639,9 @@ class MoveBundleController {
 		def unassignedAppCount =  Application.executeQuery(unAssignedAppsCountQuery, assetCountQueryArgs)[0] 
 		def totalAssignedApp = applicationCount - unassignedAppCount
 		
-		def latencyQuery = "$unAssignedAppsCountQuery AND ae.latency=:latency"
-		def likelyLatency = Application.executeQuery(latencyQuery, assetCountQueryArgs + [latency:'N'])[0]
-		def unlikelyLatency = Application.executeQuery(latencyQuery, assetCountQueryArgs + [latency:'Y'])[0]
+		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
+		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
+		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
 		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
 
 		// Add AssetClass param that will be used for the rest of the queries

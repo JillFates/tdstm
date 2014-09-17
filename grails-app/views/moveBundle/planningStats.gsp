@@ -594,7 +594,7 @@ $(document).ready(function() {
 
 											<%-- Databases --%>
 											<g:render template="planningStatsExecRow"
-												model="[assetCount:dbcount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]" 
+												model="[assetCount:dbCount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]" 
 											/>
 		
 											<%-- Physical Storage --%>
