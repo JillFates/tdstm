@@ -212,20 +212,19 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/application/list"]'));
   };
   this.getServers = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=server"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/list?filter=server"]'));
   };
   this.getAllDevices = function(){
-    // return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=physical"]'));
-    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?listType=all"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/list?filter=all"]'));
   };
   this.getDatabases = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/database/index"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/database/list"]'));
   };
   this.getStorageDevices = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/index?filter=storage"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/list?filter=storage"]'));
   };
   this.getLogicalStorage = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/files/index"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/files/list"]'));
   };
   this.getComments = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/listComment"]'));

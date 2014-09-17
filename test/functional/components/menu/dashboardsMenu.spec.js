@@ -8,7 +8,6 @@ describe('Dashboards Menu', function(){
       expect(menu.getDashboards().getText()).toEqual('Dashboards');
     });
 
-
     describe('submenu',function(){
       it('should displayed 6 links', function(){
         menu.getDashboardsSubmenu().then(function(list){

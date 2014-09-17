@@ -492,7 +492,7 @@ describe('Comments - Application', function(){
         expect(commTasklist.isListModalPresent()).toBe(true);
       });
 
-      it('should have only 1 item', function(){
+      xit('should have only 1 item', function(){
         expect(commTasklist.list.count()).toEqual(1);
       });
 

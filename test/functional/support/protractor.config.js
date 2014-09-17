@@ -14,8 +14,7 @@ exports.config = {
     '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],
-    regression: [ //Do not change the order of these files since some test depends on others.
-    '../components/projects/showProjects.spec.js',
+    menu:[
     '../components/projects/listProjects.spec.js',
     '../components/projects/fieldSettings.spec.js',
     '../components/menu/adminMenu.spec.js',
@@ -25,7 +24,10 @@ exports.config = {
     '../components/menu/planningMenu.spec.js',
     '../components/menu/tasksMenu.spec.js',
     '../components/menu/dashboardsMenu.spec.js',
-    '../components/menu/reportsMenu.spec.js',
+    '../components/menu/reportsMenu.spec.js'
+    ],
+    regression:[ //Do not change the order of these files since some test depends on others.
+    // '../components/projects/showProjects.spec.js',
     '../components/admin/adminPortal.spec.js',
     '../components/admin/rolePermission.spec.js',
     '../components/admin/assetOptions.spec.js',
@@ -44,7 +46,7 @@ exports.config = {
     '../components/tasks/myTasks.spec.js',
     '../components/tasks/taskManager.spec.js',
     '../components/tasks/taskGraph.spec.js',
-    '../components/tasks/timeline.spec.js',
+    '../components/tasks/timeline.spec.js'
     // '../components/tasks/cookbook.spec.js'
     ],
     assets:[
@@ -74,7 +76,7 @@ exports.config = {
   framework: 'jasmine',
   
   jasmineNodeOpts: {
-    isVerbose: true,
+    isVerbose: false,
     showColors: true,
     includeStackTrace: true,
     defaultTimeoutInterval: 30000

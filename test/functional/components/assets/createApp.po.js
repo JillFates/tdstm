@@ -1,7 +1,6 @@
 'use strict';
 var ApplicationModal = function(){
   this.createAppTitle = element(by.id('ui-id-1'));
-  // this.nameLabel = $('[class="label C  highField"] [for="assetName"]');
   this.createAppModal = $('[aria-labelledby="ui-id-1"]');
   this.nameLabel = $('[for="assetName"]');
   this.nameField = element(by.id('assetName'));
@@ -16,8 +15,6 @@ var ApplicationModal = function(){
   this.editBtn = $('[onclick^="editEntity"]');
   this.deleteBtn = $('[onclick="return confirm(\'Are you sure?\');"]');
   this.addTaskCommentBtnList = $$('a[href^="javascript:createIssue"]');
-  // this.addTaskBtn = $$('a[href^="javascript:createIssue"]')[0];
-  // this.addCommentBtn = $$('a[href^="javascript:createIssue"]')[1];
   this.closeBtn = $('[aria-labelledby="ui-id-2"] .ui-dialog-titlebar-close');
 
   this.setName = function(name){
