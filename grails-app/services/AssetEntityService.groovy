@@ -1167,6 +1167,9 @@ class AssetEntityService {
 		def key = params.key
 		def projectId = params.projectId
 
+		// Helper closure that returns the size of an object or zero (0) if it is null
+		def sizeOf = { obj -> (obj ? obj.size : 0)}
+
 		try {
 		
 			java.io.File temp = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
@@ -1285,7 +1288,6 @@ class AssetEntityService {
 			dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 			fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
 			
-			def sizeOf = { obj -> (obj ? obj.size : 0)}
 			// Compute the total assets to be exported, used for progress meter
 			progressTotal = sizeOf(asset) + sizeOf(application) + sizeOf(database) + sizeOf(files)
 			
@@ -1309,7 +1311,7 @@ class AssetEntityService {
 			def currDate = TimeUtil.convertInToUserTZ(TimeUtil.nowGMT(),tzId)
 			def exportDate = exportFileFormat.format(currDate)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
-			//response.setContentType( "application/vnd.ms-excel" )
+
 			log.info "export() - Loading appDepBundle took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
@@ -1321,16 +1323,13 @@ class AssetEntityService {
 			log.info "export() - Creating workbook took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
-			// TODO : Lok - what does this code do? It seems to be getting the names of the sheets from the spreadsheet and then trying to look them up
-			// If anything, shouldn't it be looking for known names instead of positional references to the sheet names?
 			def sheetNames = book.getSheetNames() as List
 
 			// Helper closure used to retrieve the s
 			def getWorksheet = { sheetName ->
 				if (sheetNames.contains(sheetName)) {
-//					def index = sheetNames.findIndexOf( it == sheetName)
 					def index = sheetNames.findIndexOf( { it == sheetName } )
-					return  book.getSheet( sheetNames[index] )
+					return book.getSheet( sheetNames[index] )
 				} else {
 					throw new RuntimeException("Unable to find sheet $sheetName in the uploaded spreadsheet")
 				}
@@ -1341,6 +1340,9 @@ class AssetEntityService {
 			//
 			def serverCol, appCol, dbCol, filesCol
 
+			// TODO : JPM : The following 4 blocks of code should be able to be reduced to a shared closure
+
+			// Device
 			serverDTAMap.eachWithIndex { item, pos ->
 				serverMap.put( item.columnName, null )
 				serverColumnNameList.add(item.columnName)
@@ -1358,6 +1360,7 @@ class AssetEntityService {
 				}
 			}
 
+			// Application
 			appDTAMap.eachWithIndex { item, pos ->
 				appMap.put( item.columnName, null )
 				appColumnNameList.add(item.columnName)
@@ -1376,6 +1379,7 @@ class AssetEntityService {
 				}
 			}
 
+			// Database
 			dbDTAMap.eachWithIndex { item, pos ->
 				dbMap.put( item.columnName, null )
 				dbColumnNameList.add(item.columnName)
@@ -1393,6 +1397,7 @@ class AssetEntityService {
 				}
 			}
 
+			// Storage
 			fileDTAMap.eachWithIndex { item, pos ->
 				fileMap.put( item.columnName, null )
 				fileColumnNameList.add(item.columnName)
@@ -1401,7 +1406,6 @@ class AssetEntityService {
 			fileMap.put("DepGroup", null )
 			fileColumnNameList.add("DepGroup")
 			storageSheet = getWorksheet('Storage')
-
 			filesCol = storageSheet.getColumns()
 			for ( int c = 0; c < filesCol; c++ ) {
 				def fileCellContent = storageSheet.getCell( c, 0 ).contents
@@ -1435,7 +1439,6 @@ class AssetEntityService {
 				return out
 			}
 
-
 			//calling method to check for Header
 			def serverCheckCol = checkHeader( serverColumnNameList, serverSheetColumnNames, missingHeader )
 			def appCheckCol = checkHeader( appColumnNameList, appSheetColumnNames, missingHeader )
@@ -1449,7 +1452,7 @@ class AssetEntityService {
 
 				progressService.update(key, 100, 'Cancelled', " Column Headers : ${missingHeader} not found, Please check it.")
 
-				return;
+				return
 			} else {
 				//Add Title Information to master SpreadSheet
 				titleSheet = book.getSheet("Title")
@@ -1509,7 +1512,7 @@ class AssetEntityService {
 							def colNum = serverMap[colName]
 							def a = asset[r-1]
 
-							log.debug "coll=$coll, colNum=$colNum, colName=$colName, attribute=$attribute"
+							// log.debug "coll=$coll, colNum=$colNum, colName=$colName, attribute=$attribute"
 
 							if (attribute && !attribute.contains('.') && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
 								// Skip populating the cell if the value is null
@@ -1646,7 +1649,7 @@ class AssetEntityService {
 				// Database
 				//
 				if ( doDB ) {
-					exportedEntity +="D"
+					exportedEntity += "D"
 					for ( int r = 1; r <= dbSize; r++ ) {
 						progressCount++
 						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
@@ -1686,7 +1689,7 @@ class AssetEntityService {
 				// Storage ( files )
 				//
 				if ( doStorage ) {
-					exportedEntity +="F"
+					exportedEntity += "F"
 					for ( int r = 1; r <= fileSize; r++ ) {
 						progressCount++
 						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
@@ -1724,7 +1727,7 @@ class AssetEntityService {
 				// Dependencies
 				//
 				if ( doDependency ) {
-					exportedEntity +="X"
+					exportedEntity += "X"
 					def dependencySheet = getWorksheet('Dependencies')
 
 					def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
@@ -1774,7 +1777,7 @@ class AssetEntityService {
 				// Room Export
 				//
 				if( doRoom ) {
-					exportedEntity +="R"
+					exportedEntity += "R"
 
 					def roomSheet = getWorksheet('Room')
 
@@ -1877,6 +1880,9 @@ class AssetEntityService {
 			// Comments Export
 			// 
 			if ( doComment ) {
+
+				exportedEntity += "M"
+
 				def commentSheet = getWorksheet("Comments")
 
 				def commentIt = new ArrayList()
