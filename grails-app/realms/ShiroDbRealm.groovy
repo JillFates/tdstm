@@ -60,7 +60,7 @@ class ShiroDbRealm {
 	        def roleType = RoleType.read(roleName)
 	        roles = PartyRole.findAllByPartyAndRoleType(person,roleType)
     	}
-		log.debug "hasRole: userLogin:${userLogin ?: principal}, role:${roleName}, found:{$roles.size()}"
+		// log.debug "hasRole: userLogin:${userLogin ?: principal}, role:${roleName}, found:{$roles.size()}"
         return roles.size() > 0
     }
 
@@ -77,7 +77,7 @@ class ShiroDbRealm {
 			def roleType = RoleType.read(roleName)
 			rolesFound = PartyRole.findAllByPartyAndRoleTypeInList(person,roles)
 		}
-		log.debug "hasRole: userLogin:${userLogin ?: principal}, roles:${roles}, found:{$rolesFound.size()}"
+		//log.debug "hasRole: userLogin:${userLogin ?: principal}, roles:${roles}, found:{$rolesFound.size()}"
 		return rolesFound.size() > 0
 	}
 
@@ -94,7 +94,7 @@ class ShiroDbRealm {
 			def roleType = RoleType.read(roleName)
 			rolesFound = PartyRole.findAllByPartyAndRoleTypeInList(person,roles)
 		}
-		log.debug "hasAllRoles: userLogin:${userLogin ?: principal}, role:${roles}, found:{$rolesFound.size()}"
+		//log.debug "hasAllRoles: userLogin:${userLogin ?: principal}, role:${roles}, found:{$rolesFound.size()}"
 		return rolesFound.size() == roles.size
     }
 	

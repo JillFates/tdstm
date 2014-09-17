@@ -3,7 +3,8 @@ import grails.converters.JSON
 import java.text.SimpleDateFormat
 
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.shiro.SecurityUtils
+import java.util.regex.Matcher
+// import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
@@ -108,6 +109,7 @@ def messageSource
 		def warnings = []
 		def ignoredAssets = []
 
+		def counts = [:]
 		log.debug "serverProcess() nullProps = $nullProps"
 		log.debug "serverProcess() blankProps = $blankProps"
 
@@ -125,6 +127,10 @@ def messageSource
 			def modelAssetsList = new ArrayList()
 			def existingAssetsList = new ArrayList()
 
+			// Get Room and Rack counts for stats at the end
+			counts.room = Room.countByProject(project)
+			counts.rack = Rack.countByProject(project)
+
 			try {
 				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
 				if (! dataTransferBatch) 
@@ -139,7 +145,10 @@ def messageSource
 					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
 					def eavAttributeSet = EavAttributeSet.findById(1)
 					
-					for( int dataTransferValueRow =0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+					// 
+					// Iterate over the rows
+					//
+					for( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
 						def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 						def rowNum = rowId+1
 						def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
@@ -158,6 +167,9 @@ def messageSource
 							existingAssetsList << assetEntity
 						}
 
+						// This will hold any of the source/target location, room and rack information
+						def locRoomRack = [source: [:], target: [:] ]
+
 						// Iterate over the attributes to update the asset with
 						dtvList.each {
 							def attribName = it.eavAttribute.attributeCode
@@ -175,19 +187,8 @@ def messageSource
 							}
 
 							switch (attribName) {
-								case "sourceTeamMt":
-								case "targetTeamMt":
-								case "sourceTeamLog":
-								case "targetTeamLog":
-								case "sourceTeamSa":
-								case "targetTeamSa":
-								case "sourceTeamDba":
-								case "targetTeamDba":
-									def bundleInstance = assetEntity.moveBundle 
-									def teamInstance = assetEntityAttributeLoaderService.getdtvTeam(it, bundleInstance, bundleTeamRoles.get(attribName) ) 
-									if( assetEntity[attribName] != teamInstance || isNewValidate ) {
-										assetEntity[attribName] = teamInstance
-									}
+								case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
+									// Legacy columns that are no longer used - see TM-3128
 									break
 								case "manufacturer":
 									def manufacturerName = it.correctedValue ? it.correctedValue : it.importValue
@@ -216,11 +217,40 @@ def messageSource
 								case "usize":
 									// Skip the insertion
 									break
+								case ~/^(source|target)(Location|Room|Rack)/:
+									def disposition = Matcher.lastMatcher[0][1]	// Get first match
+									def val = (it.correctedValue ?: it.importValue)?.trim()
+									if (val?.size())
+										locRoomRack[disposition][attribName] = val
+									break
+
 								default: 
 									// Try processing all common properties
 									assetEntityAttributeLoaderService.setCommonProperties(project, assetEntity, it, rowNum, warnings, errorConflictCount)
 							}
 
+						}
+
+						// Assign the Source/Target Location/Room/Rack properties for the asset
+						def errors
+						['source', 'target'].each { disposition ->
+							def d = locRoomRack[disposition]
+							if (d.size()) {
+								// Check to see if they are trying to clear the fields with the NULL setting
+								if (d.values().contain('NULL')) {
+									warnings << "NULL not supported for unsetting Loc/Room/Rack in $disposition (row $rowNum)"
+									return
+								}
+
+								errors = assetEntityAttributeLoaderService.assignAssetToLocationRoomRack(assetEntity, 
+									d["${disposition}Location"],
+									d["${disposition}Room"],
+									d["${disposition}Rack"],
+									(disposition == 'source') )
+								if (errors) {
+									warnings << "Unable to set Source Loc/Room/Rack (row $rowNum) + $errors"
+								}
+							}
 						}
 
 						// Save the asset if it was changed or is new
@@ -241,10 +271,17 @@ def messageSource
 					// update assets racks, cabling data once process done
 					assetEntityService.updateAssetsCabling( modelAssetsList, existingAssetsList )
 				}
+		
+				// Update Room and Rack counts for stats
+				counts.room -= Room.countByProject(project)
+				counts.rack -= Rack.countByProject(project)
+
 			} catch (Exception e) {
 				status.setRollbackOnly()
 				insertCount = 0
 				updateCount = 0
+				counts.room = 0
+				counts.rack = 0
 				log.error "serverProcess() Unexpected error - rolling back : " + e.getMessage()
 				e.printStackTrace()
 				warnings << "Encounted unexpected error: ${e.getMessage()}"
@@ -254,10 +291,13 @@ def messageSource
 
 			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-			def sb = new StringBuilder("<b>Process Results for Batch ${params.batchId}:</b><ul>" + 
+			def sb = new StringBuilder(
+				"<b>Process Results for Batch ${params.batchId}:</b><ul>" + 
 				"<li>Assets in Batch: ${batchRecords}</li>" + 
 				"<li>Records Inserted: ${insertCount}</li>"+
 				"<li>Records Updated: ${updateCount}</li>" + 
+				"<li>Rooms Created: ${count.room}</li>" + 
+				"<li>Racks Created: ${count.rack}</li>" + 
 				"<li>Asset Errors: ${errorCount} </li> "+
 				"<li>Attribute Errors: ${errorConflictCount}</li>" +
 				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" + 
@@ -790,9 +830,10 @@ def messageSource
 		return [ completeDataTransferErrorList : completeDataTransferErrorList ]
 	 }
 
-	/*=========================================================
+	/**
 	 * Update Asset Racks once import batch process done.
-	 *========================================================*/
+	 */
+/*	 
 	def updateAssetRacks = {
 		def assetsList = session.getAttribute("IMPORT_ASSETS")
 		assetsList.each { assetId ->
@@ -801,7 +842,7 @@ def messageSource
 		session.setAttribute("IMPORT_ASSETS",null)
 		render ""
 	}
-
+*/
 	/**
 	 *     Delete the Data Transfer Batch Instance
 	 */

@@ -36,6 +36,16 @@ class StringUtil {
 		}
 		return r
 	}
-	
+
+	/**
+	 * Used to set a string to a default if the subject is blank
+	 * @param subject - the string to check to see if it is blank
+	 * @param defStr - the value to set the string to if it is blank
+	 * @return The string value trimmed using default if blank
+	 */
+	static String defaultIfEmpty(String subject, String defStr) {
+		def result = subject == null ? '' : subject.trim()
+		return ( result.isEmpty()) ? defStr : result
+	}
 	
 }
