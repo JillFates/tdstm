@@ -642,7 +642,11 @@ class AssetEntityService {
 		def nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
 		
 		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{it.attributeCode!="assetName" && !(it.attributeCode in nonCustomList)}
+		def appAttributes = attributes.findAll{
+			it.attributeCode!="assetName" && 
+			!(it.attributeCode in nonCustomList) && 
+			(it.attributeCode != "assetType")
+		}
 
 		// Used to display column names in jqgrid dynamically
 		def modelPref = [:]
