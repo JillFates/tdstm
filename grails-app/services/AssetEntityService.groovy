@@ -516,7 +516,7 @@ class AssetEntityService {
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			dependentAssets: dependentAssets,
-			environmentOptions: getAssetEnvironmentOptions(),
+			environmentOptions: getAssetEnvironmentOptions()?.value,
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
 			// TODO - this function should be replace with a generic HtmlUtil method
 			escapedName: getEscapedName(asset),
