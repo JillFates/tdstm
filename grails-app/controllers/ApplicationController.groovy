@@ -326,7 +326,7 @@ class ApplicationController {
 				testingBy:testingBy
 			]
 
-			model.putAll( assetEntityService.getDefaultModelForShows('AssetEntity', project, params, assetEntity) )
+			model.putAll( assetEntityService.getDefaultModelForShows('Application', project, params, assetEntity) )
 
 			return model
 		}
