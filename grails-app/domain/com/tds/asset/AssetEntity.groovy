@@ -251,10 +251,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		os( blank:true, nullable:true )
 		usize( nullable:true )
 		
+		sourceRackPosition( nullable:true )
 		sourceBladeChassis( blank:true, nullable:true )
 		sourceBladePosition( nullable:true )
 	
-		targetRoom( blank:true, nullable:true )
 		targetRackPosition( nullable:true )
 		targetBladeChassis( blank:true, nullable:true )
 		targetBladePosition( nullable:true )
@@ -347,6 +347,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		}
 		*/
 	}
+	
 	/*
 	 *  methods for JMESA filter/sort
 	 */
