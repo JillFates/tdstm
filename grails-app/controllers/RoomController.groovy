@@ -8,6 +8,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.ControllerUtil as CU
 
 class RoomController {
 
@@ -25,25 +26,54 @@ class RoomController {
 	}
 
 	def list = {
-		def rackIds = session.getAttribute("RACK_ID")
-		params.max = Math.min(params.max ? params.int('max') : 100, 100)
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		if (projectId) {
-			log.info "projectId=${projectId} class=${projectId.class}"
-			def project = Project.findById( projectId )
-			def roomInstanceList = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-			def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
-			def roomInstance = new Room()
-			def entities = assetEntityService.entityInfo( project )
-			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
-			[roomInstanceList: roomInstanceList, roomInstanceTotal: roomInstanceList.size(), 
-			 projectId:projectId, roomId:roomId, viewType:params.viewType, roomInstance:roomInstance, servers : entities.servers, networks : entities.networks,
-					applications : entities.applications, dbs : entities.dbs, files : entities.files ,filterRackId:rackIds, staffRoles:taskService.getRolesForStaff(),
-					dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, moveBundleList:moveBundleList]
-		} else {
-			flash.message = 'You must have a project selected before using this feature'
-			redirect(controller: "project", action: "list",params:[viewType : "list"])
+		def viewName = 'Room List'
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
+
+		// Check user permissions
+		def userLogin = securityService.getUserLogin()
+		if ( ! securityService.hasPermission(userLogin, 'RackMenuView')) {
+			log.warn "SECURITY : User $userLogin attempted to access $viewName without proper permissions"
+			CU.redirectToDefaultPage(this, "Sorry but you do not have permission to access the $viewName")
+			return
 		}
+
+		def projectId = project.id
+
+		// Not sure what is being stored into the user session...
+		def rackIds = session.getAttribute("RACK_ID")
+
+		params.max = Math.min(params.max ? params.int('max') : 100, 100)
+		
+		def model = [:]
+
+		def roomInstanceList = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
+		def roomId = getSession().getAttribute( "CURR_ROOM" )?.CURR_ROOM
+		def roomInstance = new Room()
+		def entities = assetEntityService.entityInfo( project )
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+
+		model = [
+			applications: entities.applications,
+			dbs: entities.dbs,
+			dependencyStatus: entities.dependencyStatus,
+			dependencyType: entities.dependencyType,
+			files: entities.files,
+			filterRackId: rackIds,
+			moveBundleList: moveBundleList,
+			networks: entities.networks,
+			projectId: projectId,
+			roomId: roomId,
+			roomInstance: roomInstance,
+			roomInstanceList: roomInstanceList,
+			roomInstanceTotal: roomInstanceList.size(),
+			servers: entities.servers,
+			staffRoles: taskService.getRolesForStaff(),
+			viewType: params.viewType,
+		]
+
+		return model
 	}
 
 	def create = {

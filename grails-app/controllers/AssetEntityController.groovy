@@ -26,6 +26,8 @@ import org.quartz.Trigger
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
+import java.util.regex.Matcher
+
 
 import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
@@ -1122,318 +1124,36 @@ class AssetEntityController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	/*------------------------------------------
-	 * To get the assetEntity List 
-	 * @param project
-	 * @return assetList
-	 *-------------------------------------------*/
+	/**
+	 * Used for the assetEntity List to load the initial model. The list subsequently calls listJson to get the 
+	 * actual data which is rendered by JQ-Grid
+	 * @param project, filter, number of properties
+	 * @return model data to initate the asset list
+	 **/
 	def list = {
-		def filters = session.AE?.JQ_FILTERS
-		session.AE?.JQ_FILTERS = []
-
 		def project = CU.getProjectForPage( this )
 		if (! project) 
 			return
+
+		def userLogin = securityService.getUserLogin()
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		
-		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
-		def prefType = 'Asset_Columns'
-		def fieldPrefs = assetEntityService.getExistingPref(prefType)
-		
-		Map model = assetEntityService.getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters)
-
-		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
-		model.assetName = filters?.assetNameFilter ?:'' 
-		model.assetPref = fieldPrefs 
-		model.assetTag = filters?.assetTagFilter ?:'' 
-		model.assetType = filters?.assetTypeFilter ?:'' 
-		model.model = filters?.modelFilter ?:'' 
-		model.prefType = prefType 
-		model.serialNumber = filters?.serialNumberFilter ?:'' 
-		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
-		model.sourceRack = filters?.sourceRackFilter ?:''
-		model.targetLocation = filters?.targetLocationFilter ?:'' 
-		model.targetRack = filters?.targetRackFilter ?:'' 
-		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
-		model.type = params.type
-
-		// The customized title of the list
-		def titleByFilter = [
-			all: 'All Devices',
-			other: 'Other Devices',
-			physical: 'Physical Device',
-			physicalServer: 'Physical Server',
-			server: 'Server',
-			storage:  'Storage Device',
-			virtualServer: 'Virtual Server',
-		]
-		model.title = ( titleByFilter.containsKey(params.filter) ? titleByFilter[params.filter] : titleByFilter['all'] ) + ' List'
-
-		return model
+		return assetEntityService.getListModel(project, userLogin, session, params, tzId)
 	}
 	
 	/**
 	 * This method is used by JQgrid to load assetList
 	 */
 	def listJson = {
-		def filterParams = [
-			assetName: params.assetName, 
-			assetType: params.assetType, 
-			depConflicts: params.depConflicts, 
-			depNumber: params.depNumber, 
-			depToResolve: params.depToResolve,
-			event: params.event,
-			model: params.model, 
-			moveBundle: params.moveBundle, 
-			planStatus: params.planStatus, 
-			sourceLocation: params.sourceLocation, 
-			sourceRack: params.sourceRack, 
-		]
-		def validSords = ['asc', 'desc']
-		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
-		def maxRows = Integer.valueOf(params.rows) 
-		def currentPage = Integer.valueOf(params.page) ?: 1
-		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
 
-		def project = securityService.getUserCurrentProject()
-		def moveBundleList
-		
-		def attributes = projectService.getAttributes('AssetEntity')
-		
-		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
-		def prefType = 'Asset_Columns'
-		def assetPref= assetEntityService.getExistingPref(prefType)
-		
-		def assetPrefVal = assetPref.collect{it.value}
-		attributes.each{ attribute ->
-			if(attribute.attributeCode in assetPrefVal)
-				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
-		}
-		def sortIndex = (params.sidx in filterParams.keySet()) ? (params.sidx) : ('assetName')
-		
-		session.AE = [:]
-		userPreferenceService.setPreference("assetListSize", "${maxRows}")
-		
-		if (params.event && params.event.isNumber()) {
-			def moveEvent = MoveEvent.read( params.event )
-			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
-		} else {
-			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
-		}
-		
-		def assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
+		def userLogin = securityService.getUserLogin()
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
-		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
-		
-		StringBuffer altColumns = new StringBuffer()
-		StringBuffer joinQuery = new StringBuffer()
-
-		// Until sourceRack is optional on the list we have to do this one
-		altColumns.append(", srcRack.tag AS sourceRack")
-		joinQuery.append("\n LEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
-
-		// Tweak the columns selected and addition joins based on the user's selected columns
-		assetPref.each { key,value->
-			switch (value) {
-				case 'appOwner':
-					altColumns.append(", CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner")
-					joinQuery.append("\n LEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id ")
-					break
-				case 'os':
-					altColumns.append(", ae.hinfo AS os")
-					break
-				case ~/custom\d{1,}/:
-					altColumns.append(", ae.${value} AS ${value}")
-					break
-				case 'lastUpdated':
-					altColumns.append(", ee.last_updated AS ${value}")
-					joinQuery.append("\n LEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id ")
-					break
-				case 'manufacturer':
-					altColumns.append(", manu.name AS manufacturer")
-					joinQuery.append("\n LEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
-					break
-				case 'modifiedBy':
-					altColumns.append(", CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy")
-					joinQuery.append("\n LEFT OUTER JOIN person p ON p.person_id=ae.modified_by ")
-					break
-
-				case 'sourceLocation':
-				case 'sourceRoom':
-					altColumns.append(", srcRoom.room_name AS sourceRoom, srcRoom.location AS sourceLocation")
-					joinQuery.append("\n LEFT OUTER JOIN room srcRoom ON srcRoom.room_id=ae.room_source_id ")
-					break
-				case 'sourceRack':
-						// Already handled above
-					break
-
-				case 'targetLocation':
-				case 'targetRoom':
-					altColumns.append(", tgtRoom.room_name AS targetRoom, tgtRoom.location AS targetLocation")
-					joinQuery.append("\n LEFT OUTER JOIN room tgtRoom ON tgtRoom.room_id=ae.room_target_id ")
-					break
-				case 'targetRack':
-					altColumns.append(", tgtRack.tag AS targetRack")
-					joinQuery.append("\n LEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
-					break
-				case 'validation':
-					break;
-				default:
-					if (!['targetLocation', 'targetRack'].contains(value))
-						altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS ${value} ")
-			}
-		}
-
-		def query = new StringBuffer(""" 
-			SELECT * FROM ( 
-				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, ae.asset_type AS assetType, m.name AS model,  
-				IF(at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, 
-				IF(ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus, 
-				me.move_event_id AS event, ae.plan_status AS planStatus, 
-				mb.name AS moveBundle, ae.validation AS validation
-			""" )
-
-		if (altColumns.length())
-			query.append("\n${ altColumns.toString() }")
-
-		query.append("""
-				FROM asset_entity ae
-				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
-				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
-				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
-				LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = '${AssetCommentType.TASK}'
-				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = '${AssetCommentType.COMMENT}'
-				""")
-
-		if (joinQuery.length())
-			query.append(joinQuery)
-			
-		//
-		// Begin the WHERE section of the query	
-		//
-		query.append("\nWHERE ae.project_id = ${project.id}\nAND ae.asset_class = '${AssetClass.DEVICE}'")
-
-		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
-		/*
-		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
-		if (params.justPlanning)
-			justPlanning = params.justPlanning
-		*/
-		if (justPlanning=='true')
-			query.append("\n AND mb.use_for_planning=${justPlanning}")
-		
-		query.append("\n AND ae.asset_class='${AssetClass.DEVICE}'")
-
-		def filter = params.filter ?: 'all'
-
-		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
-		switch(filter) {
-			case 'physical':
-				query.append("\n AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
-				break
-			case 'physicalServer':
-				def phyServerTypes = AssetType.getAllServerTypes() - AssetType.getVirtualServerTypes()
-				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(phyServerTypes)}) " )
-				break
-			case 'server':
-				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
-				break
-			case 'storage':
-				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getStorageTypes())}) " )
-				break
-			case 'virtualServer':
-				query.append("\n AND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
-				break
-			case 'other':
-				query.append("\n AND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) " )
-				break
-
- 			case 'all': 
-				break
-		}
-
-		if (params.event && params.event.isNumber() && moveBundleList)
-			query.append( "\n AND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
-			
-		if (params.unassigned) {
-			def unasgnMB = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
-			
-			if (unasgnMB) {
-				def unasgnmbId = GormUtil.asQuoteCommaDelimitedString(unasgnMB?.id)
-				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
-			}
-		}
-			
-		query.append(""" GROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}
-			) AS assets
-		""")
-		
-		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
-		def firstWhere = true
-		def whereAnd = { 
-			if (firstWhere) {
-				firstWhere = false
-				return ' WHERE'
-			} else {
-				return ' AND'
-			}
-		}
-
-		// Handle the filtering by each column's text field
-		filterParams.each { fkey, fvalue ->
-			if ( fvalue ) {
-				// single quotes are stripped from the filter to prevent SQL injection
-				query.append( whereAnd() + " assets.${fkey} LIKE '%${fvalue.replaceAll("'", "")}%'")
-				firstWhere = false
-			}
-		}
-		
-		if (params.moveBundleId) {
-			if (params.moveBundleId!='unAssigned') {
-				def bundleName = MoveBundle.get(params.moveBundleId)?.name
-				query.append( whereAnd() + " assets.moveBundle  = '${bundleName}' ")
-			} else {
-				query.append( whereAnd() + " assets.moveBundle IS NULL ")
-			}
-		}
-		
-		if (params.type && params.type == 'toValidate') {
-			query.append( whereAnd() + " assets.validation='Discovery' ") //eq ('validation','Discovery')
-		}
-
-		// Allow filtering on the Validate
-		if (params.toValidate && params.toValidate && ValidationType.getList().contains(params.toValidate)) {
-			query.append( whereAnd() + " assets.validation='${params.toValidate}' ")
-		}
-
-		if (params.plannedStatus) {
-			query.append(whereAnd() + " assets.planStatus='${params.plannedStatus}'")
-		}
-		
-		log.debug  "query = ${query}"
-		def assetList = jdbcTemplate.queryForList(query.toString())
-		
-		// Cut the list of selected applications down to only the rows that will be shown in the grid
-		def totalRows = assetList.size()
-		def numberOfPages = Math.ceil(totalRows / maxRows)
-		if (totalRows > 0)
-			assetList = assetList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
-		else
-			assetList = []
-			
-		def results = assetList?.collect {
-			def commentType = it.commentType
-			[ 	
-				cell: [ '', it.assetName, (it.assetType ?: ''), it.model, 
-					it.sourceLocation, it.sourceRack, (it[assetPref["1"]] ?: ''), it[assetPref["2"]], it[assetPref["3"]], it[assetPref["4"]], it.planStatus, it.moveBundle, 
-					/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
-					it.tasksStatus, it.assetType, it.event, it.commentsStatus
-				], id: it.assetId
-			]
-		}
-
-		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
-		
-		render jsonData as JSON
+		def data = assetEntityService.getListData(project, userLogin, session, params, tzId)		
+		render data as JSON
 	}
 	
 	/* ----------------------------------------
@@ -2590,7 +2310,7 @@ class AssetEntityController {
 
 			model.putAll( assetEntityService.getDefaultModelForShows('AssetEntity', project, params, assetEntity) )
 
-			if(params.redirectTo == "roomAudit") {
+			if (params.redirectTo == "roomAudit") {
 				model << [source:params.source, assetType:params.assetType]
 				render(template: "auditDetails", model: model)
 			}

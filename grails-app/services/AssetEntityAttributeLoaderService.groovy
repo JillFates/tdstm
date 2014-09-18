@@ -23,9 +23,12 @@ class AssetEntityAttributeLoaderService {
 	boolean transactional = true
 	def eavAttribute
 	def projectService
+	def rackService
+	def roomService
 	def securityService
 	def partyRelationshipService
 
+	// TODO : JPM 9/2014 - remove these statics that should no longer be referenced
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
@@ -33,7 +36,7 @@ class AssetEntityAttributeLoaderService {
 	/*
 	 * upload records in to EavAttribute table from from AssetEntity.xls
 	 */
-	def uploadEavAttribute = {def stream ->
+	def uploadEavAttribute = { def stream ->
 		//get Entity TYpe
 		def entityType = EavEntityType.findByEntityTypeCode( "AssetEntity" )
 		// create workbook
@@ -350,9 +353,9 @@ class AssetEntityAttributeLoaderService {
 		//Export Date Validation
 		def errorConflictCount = 0
 
-		def flag = asset.lastUpdated >= dataTransferBatch.exportDatetime
+		def modifiedSinceExport = (asset.lastUpdated && asset.lastUpdated >= dataTransferBatch.exportDatetime)
 
-		if ( flag ) {
+		if ( modifiedSinceExport ) {
 			log.debug "importValidation() Asset $asset was modified since the export"
 			// If the asset has been modified, see how many of the fields are in conflict
 			dtvList.each { dtValue->
@@ -386,9 +389,13 @@ class AssetEntityAttributeLoaderService {
 						}
 					} catch ( Exception ex ) {
 						// TODO - JM 10/2013 - nothing? really? if the parseInt fails shouldn't it be an error?
+						log.error "importValidation() failed parseInt most likely"
 					}
 				} else {
-					if(asset."$attribName" != dtValue.correctedValue && asset."$attribName" != dtValue.importValue ){
+					if (attribName.contains('.')) {
+						// These are the dot notation properties for master/child relationships
+						// TODO : 9/2014 JPM : Need to figure out what to do as part of the validation of master.child properties
+					} else if (asset."$attribName" != dtValue.correctedValue && asset."$attribName" != dtValue.importValue ){
 						updateChangeConflicts( dataTransferBatch, dtValue )
 						errorConflictCount++
 					}
@@ -397,7 +404,7 @@ class AssetEntityAttributeLoaderService {
 			}
 		}
 		
-		return [flag : flag, errorConflictCount : errorConflictCount]
+		return [flag:modifiedSinceExport, errorConflictCount:errorConflictCount]
 	}
 	
 	/*
@@ -795,7 +802,7 @@ class AssetEntityAttributeLoaderService {
 			if ( asset.dirtyPropertyNames.size() ) {
 				// Check to see if dirty
 				log.info "saveAssetChanges() Updated asset ${asset.id} ${asset.assetName} - Dirty properties: ${asset.dirtyPropertyNames}"
-				saved = asset.validate() && asset.save()
+				saved = asset.validate() && asset.save(flush:true)
 				if (saved) {
 					updateCount++
 					assetList << asset.id
@@ -805,7 +812,7 @@ class AssetEntityAttributeLoaderService {
 			}
 		} else {
 			// Handle a new asset 
-			saved = asset.validate() && asset.save()
+			saved = asset.validate() && asset.save(flush:true)
 			if (saved) {
 				insertCount++
 				assetList << asset.id // Once asset saved to DB it will provide ID for that.
@@ -829,6 +836,7 @@ class AssetEntityAttributeLoaderService {
 	 */
 	def updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session, clearEvery=100) {
 		if (dataTransferValueRow % clearEvery == (clearEvery - 1)) {
+			log.debug 
 			sessionFactory.getCurrentSession().flush()
 			sessionFactory.getCurrentSession().clear()
 			 
@@ -838,7 +846,8 @@ class AssetEntityAttributeLoaderService {
 			project = project.merge()
 		}
 
-		session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
+		importService.updateProgress(session, dataTransferValueRow)
+		// session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
 	}
 
 	/**
@@ -875,7 +884,7 @@ class AssetEntityAttributeLoaderService {
 		def clazz = asset.getClass().getName().tokenize('.')[-1]
 
 		if (value || ['assetName','assetTag'].contains(property))
-			log.debug "setCommonProperties() attempting to update ${clazz}.${property} with [$value] on row $rowNum"
+			log.debug "setCommonProperties() updating ${clazz}.${property} with [$value] (row $rowNum)"
 
 		switch (property) {
 			case ~/assetTag|assetName/:
@@ -937,7 +946,7 @@ class AssetEntityAttributeLoaderService {
 			case "validation":
 				setValueOrDefault(asset, property, value, 'Discovery')
 				break
-			case ~/modifiedBy|lastUpdated/: 
+			case ~/version|modifiedBy|lastUpdated/: 
 				break
 			default:
 				if (value.size() ) {
@@ -956,7 +965,7 @@ class AssetEntityAttributeLoaderService {
 						} catch ( Exception ex ) {
 							log.error "setCommonProperties() exception 1 : ${ex.getMessage()}"
 							ex.printStackTrace()
-							warnings << "Unable to update $property with value [$value] of ${asset.assetName} from row $rowNum"
+							warnings << "Unable to update $property with value [$value] on ${asset.assetName} (row $rowNum)"
 							errorConflictCount++
 							dtv.hasError = 1
 							dtv.errorText = "format error"
@@ -968,7 +977,7 @@ class AssetEntityAttributeLoaderService {
 						} catch ( Exception ex ) {
 							log.error "setCommonProperties() exception 2 : ${ex.getMessage()}"
 							ex.printStackTrace()
-							warnings << "Unable to update $property with value [$value] of ${asset.assetName} from row $rowNum"
+							warnings << "Unable to update $property with value [$value] on ${asset.assetName} (row $rowNum)"
 							errorConflictCount++
 							dtv.hasError = 1
 							dtv.errorText = ex.getMessage()
@@ -979,4 +988,5 @@ class AssetEntityAttributeLoaderService {
 		}
 		
 	}
+
 }

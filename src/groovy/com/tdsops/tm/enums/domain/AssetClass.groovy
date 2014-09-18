@@ -20,6 +20,19 @@ enum AssetClass {
 		return obj
 	}
 
+	static String domainNameFor(AssetClass assetClass) {
+		Map map = [
+			(AssetClass.DEVICE) : 'AssetEntity',
+			(AssetClass.DATABASE) : 'Database',
+			(AssetClass.APPLICATION) : 'Application',
+			(AssetClass.STORAGE) : 'Files'
+		] 
+		if (! map.containsKey(assetClass))
+			throw RuntimeException("AssetClass $assetClass has unhandled case in domainNameFor()")	
+
+		return map[assetClass]
+	}
+
 	/**
 	 * A list of the Asset Class Options used for filtering
 	 * @return Map of names

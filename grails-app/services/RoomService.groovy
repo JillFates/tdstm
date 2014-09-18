@@ -1,6 +1,8 @@
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
 import org.apache.commons.lang.math.NumberUtils 
+import org.apache.commons.lang.StringUtils
 
 class RoomService {
 	
@@ -139,21 +141,46 @@ class RoomService {
 
 		return msg
 	}
-/*
-	static String GormUtil.allErrorsString(domain, separator=" : ", locale=null) {
-//		def messageSource = ApplicationHolder.application.mainContext.messageSource
-		//def request = RequestContextHolder.currentRequestAttributes().request
-		//def localeX = RequestContextUtils.getLocale(request)
 
-		def messageSource = ApplicationContextHolder.getApplicationContext().messageSource
-		println "messageSource = $messageSource"
-		StringBuilder text = new StringBuilder()
-		domain?.errors?.allErrors?.each() { 
-			println "Processing it = $it"
-			text.append("$separator ${messageSource.getMessage(it, java.util.Locale.US)}") 
-//			text.append("$separator ${messageSource.getMessage(it, locale.ENGLISH)}") 
+	/**
+	 * Used to retrieve an existing room or create it on demand. Here are a few rules:
+	 *    1. If the location, roomName and rackName are blank then nothing is done
+	 *    2. If the any of the parameters are not blank then a Room will be created
+	 *    3. If either location or roomName is blank then they will default to 'TBD'
+	 * @param project - the project that the room is associated with
+	 * @param location - the location name
+	 * @param roomName - the name of the room to lookup/create
+	 * @param rackName - the name of the rack which is used to help determine if a room is created
+	 * @param isSource - a flag to indicate if the room is a source (true) or target (false)
+	 * @return The room object that was found or created
+	 */
+	Room findOrCreateRoom(Project project, String location, String roomName, String rackName, boolean isSource) {
+		// log.debug "findOrCreateRoom() project: $project, $location/$roomName/$isSource"
+		def room
+
+		if (StringUtils.isNotBlank(location) || StringUtils.isNotBlank(roomName) || StringUtils.isNotBlank(rackName)) {
+
+			def query = 'from Room r where project=:project and location=:location and roomName=:roomName and source=:source'
+			def params = [ 
+				project: project,
+				location: StringUtil.defaultIfEmpty(location, 'TBD'),
+				roomName: StringUtil.defaultIfEmpty(roomName, 'TBD'),
+				source: (isSource ? 1 : 0)
+			]
+
+			room = Room.find(query, params)
+
+			// Attempt to create a new room if it doesn't exist
+			if( !room ) {
+				room = new Room( params )
+				if ( ! room.validate() || ! room.save(flush:true) ) {
+					log.error "findOrCreateRoom() Unable to create room $project, $location, $roomName, $isSource : ${GormUtil.allErrorsString(room)}"
+					room = null
+				}
+				log.debug "findOrCreateRoom() Created room $room for project $project"
+			}
 		}
-		text.toString()
+		return room
 	}
-*/
+
 }

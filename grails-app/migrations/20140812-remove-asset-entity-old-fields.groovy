@@ -28,23 +28,4 @@ databaseChangeLog = {
 			DROP INDEX FK6F1FC812D0A6F0F,
 			DROP INDEX FK6F1FC812FF6AA285""")
 	}
-
-	changeSet(author: "erobles", id: "20140812 TM-3128-2") {
-		comment('Rename the Source/Target columns for Location, Room and Rack')
-		grailsChange {
-			change {
-				def swaps = [
-					'sourceLocation': 'roomSource.location',
-					'sourceRoom': 'roomSource.roomName',
-					'sourceRack': 'rackSource.tag',
-					'targetLocation': 'roomTarget.location',
-					'targetRoom': 'roomTarget.roomName',
-					'targetRack': 'rackTarget.tag'
-				]
-				swaps.each { origCode, newCode ->
-					sql.execute("UPDATE eav_attribute SET attribute_code='$newCode' WHERE attribute_code='$origCode'")
-				}
-			}
-		}
-	}
 }

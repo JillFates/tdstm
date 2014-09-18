@@ -12,23 +12,27 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
-import com.tdsops.tm.enums.domain.SizeScale
+import com.tdssrc.grails.ControllerUtil as CU
 
 class DataTransferBatchController {
+
 	// Objects to be injected
 	def sessionFactory
 	def assetEntityService
 	def assetEntityAttributeLoaderService
+	def importService
 	def jdbcTemplate
 	def securityService
 	def partyRelationshipService
 	def personService
 
-def messageSource
+	def messageSource
 
 	// Data used within some of the controller methods
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
@@ -91,230 +95,32 @@ def messageSource
 	}
 
 	/**
-	 * Process DataTransfervalues corresponding to a DataTransferBatch for Servers
+	 * Process DataTransfervalues corresponding to a DataTransferBatch for DEVICES
 	 * @param dataTransferBach
 	 * @return process the dataTransferBatch and return to datatransferBatchList
 	 */
-	def serverProcess = {
-		session.setAttribute("TOTAL_BATCH_ASSETS",0)
-		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
+	def deviceProcess = {
+		def message
+		def project = CU.getProjectForPage( this )
+		if (! project) 
+			return
 
+		def userLogin = securityService.getUserLogin()
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def assetEntityErrorList = []
-		def assetsList = new ArrayList()
-		def project
-		def nullProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', true )
-		def blankProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', true )
-		def newVal
-		def warnings = []
-		def ignoredAssets = []
 
-		def counts = [:]
-		log.debug "serverProcess() nullProps = $nullProps"
-		log.debug "serverProcess() blankProps = $blankProps"
+		try {
+			message = importService.processServerImport(project, userLogin, params.batchId, session, tzId)
+			log.info "deviceProcess() for batchId ${params.batchId} by user $userLogin\n " + message
+		} catch (Exception e) {
+			message = "Unable to process import : ${e.getMessage()}"
+			if (log.isDebugEnabled())
+				log.error ExceptionUtil.stackTraceToString(e)
 
-		DataTransferBatch.withTransaction { status ->
-			project = securityService.getUserCurrentProject()
-			def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
-			def dataTransferBatch
-			def insertCount = 0
-			def errorConflictCount = 0
-			def updateCount = 0
-			def errorCount = 0
-			def batchRecords = 0
-			def unknowAssetIds = 0
-			def unknowAssets = ""
-			def modelAssetsList = new ArrayList()
-			def existingAssetsList = new ArrayList()
-
-			// Get Room and Rack counts for stats at the end
-			counts.room = Room.countByProject(project)
-			counts.rack = Rack.countByProject(project)
-
-			try {
-				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
-				if (! dataTransferBatch) 
-					throw new RuntimeException('Unable to find the batch number for your current project')
-
-				if (dataTransferBatch.eavEntityType?.domainName == "AssetEntity") {
-					batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = $dataTransferBatch.id ")[0]
-					def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-						"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
-					def assetsSize = dataTransferValueRowList.size()
-					session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
-					def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
-					def eavAttributeSet = EavAttributeSet.findById(1)
-					
-					// 
-					// Iterate over the rows
-					//
-					for( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
-						def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-						def rowNum = rowId+1
-						def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
-						def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-						def isNewValidate = false
-						def isFormatError = 0
-
-						def assetEntity = assetEntityAttributeLoaderService.findAndValidateAsset( AssetEntity, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
-						if (assetEntity == null)
-							continue
-
-						if ( ! assetEntity.id ) {
-							isNewValidate = true
-							// Initialize extra properties for new asset
-						} else {
-							existingAssetsList << assetEntity
-						}
-
-						// This will hold any of the source/target location, room and rack information
-						def locRoomRack = [source: [:], target: [:] ]
-
-						// Iterate over the attributes to update the asset with
-						dtvList.each {
-							def attribName = it.eavAttribute.attributeCode
-
-							// If trying to set to NULL - call the closure to update the property and move on
-							if (it.importValue == "NULL") {
-								// Set the property to NULL appropriately
-								newVal = assetEntityAttributeLoaderService.setToNullOrBlank(assetEntity, attribName, it.importValue, nullProps, blankProps)
-								if (newVal) {
-									// Error messages are returned otherwise it updated
-									warnings << "$newVal for row $rowNum, asset $assetEntity"
-									errorConflictCount++
-								}
-								return
-							}
-
-							switch (attribName) {
-								case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
-									// Legacy columns that are no longer used - see TM-3128
-									break
-								case "manufacturer":
-									def manufacturerName = it.correctedValue ? it.correctedValue : it.importValue
-									def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName ) 
-									if( assetEntity[attribName] != manufacturerInstance || isNewValidate ) {
-										assetEntity[attribName] = manufacturerInstance 
-									}
-									break
-								case "model":
-									def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList, assetEntity) 
-									if( assetEntity[attribName] != modelInstance || isNewValidate ) {
-										assetEntity[attribName] = modelInstance 
-										modelAssetsList.add(assetEntity)
-									}
-									break
-								case "assetType":
-									if(assetEntity.model){ 
-										//if model already exist considering model's asset type and ignoring imported asset type.
-										assetEntity[attribName] = assetEntity.model.assetType
-									} else {
-										assetEntity[attribName] = it.correctedValue ?: it.importValue
-									}
-									//Storing imported asset type in EavAttributeOptions table if not exist
-									assetEntityAttributeLoaderService.findOrCreateAssetType(it.importValue, true)
-									break
-								case "usize":
-									// Skip the insertion
-									break
-								case ~/^(source|target)(Location|Room|Rack)/:
-									def disposition = Matcher.lastMatcher[0][1]	// Get first match
-									def val = (it.correctedValue ?: it.importValue)?.trim()
-									if (val?.size())
-										locRoomRack[disposition][attribName] = val
-									break
-
-								default: 
-									// Try processing all common properties
-									assetEntityAttributeLoaderService.setCommonProperties(project, assetEntity, it, rowNum, warnings, errorConflictCount)
-							}
-
-						}
-
-						// Assign the Source/Target Location/Room/Rack properties for the asset
-						def errors
-						['source', 'target'].each { disposition ->
-							def d = locRoomRack[disposition]
-							if (d.size()) {
-								// Check to see if they are trying to clear the fields with the NULL setting
-								if (d.values().contain('NULL')) {
-									warnings << "NULL not supported for unsetting Loc/Room/Rack in $disposition (row $rowNum)"
-									return
-								}
-
-								errors = assetEntityAttributeLoaderService.assignAssetToLocationRoomRack(assetEntity, 
-									d["${disposition}Location"],
-									d["${disposition}Room"],
-									d["${disposition}Rack"],
-									(disposition == 'source') )
-								if (errors) {
-									warnings << "Unable to set Source Loc/Room/Rack (row $rowNum) + $errors"
-								}
-							}
-						}
-
-						// Save the asset if it was changed or is new
-						(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-							assetEntity, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
-
-						// Update status and clear hibernate session
-						assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
-
-					} // for loop
-  					
-					dataTransferBatch.statusCode = 'COMPLETED'
-					if (!dataTransferBatch.save(flush:true)) {
-						GormUtil.allErrorsString(dataTransferBatch)
-						throw new RuntimeException("Unable to update the transfer batch status to COMPLETED")
-					}
-					
-					// update assets racks, cabling data once process done
-					assetEntityService.updateAssetsCabling( modelAssetsList, existingAssetsList )
-				}
-		
-				// Update Room and Rack counts for stats
-				counts.room -= Room.countByProject(project)
-				counts.rack -= Rack.countByProject(project)
-
-			} catch (Exception e) {
-				status.setRollbackOnly()
-				insertCount = 0
-				updateCount = 0
-				counts.room = 0
-				counts.rack = 0
-				log.error "serverProcess() Unexpected error - rolling back : " + e.getMessage()
-				e.printStackTrace()
-				warnings << "Encounted unexpected error: ${e.getMessage()}"
-				warnings << "<b>The Import was NOT processed</b>"
-			}
-			// END OF TRY
-
-			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-
-			def sb = new StringBuilder(
-				"<b>Process Results for Batch ${params.batchId}:</b><ul>" + 
-				"<li>Assets in Batch: ${batchRecords}</li>" + 
-				"<li>Records Inserted: ${insertCount}</li>"+
-				"<li>Records Updated: ${updateCount}</li>" + 
-				"<li>Rooms Created: ${count.room}</li>" + 
-				"<li>Racks Created: ${count.rack}</li>" + 
-				"<li>Asset Errors: ${errorCount} </li> "+
-				"<li>Attribute Errors: ${errorConflictCount}</li>" +
-				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li>" + 
-				"</ul><b>Warnings:</b><ul>" + 
-				WebUtil.getListAsli(warnings)
-			)
-
-			appendIgnoredAssets(sb, ignoredAssets)
-			sb.append('</ul>')
-			sb = sb.toString()
-
-			log.info sb
-			flash.message = sb
+			log.error "deviceProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.batchId}"
 		}
 
-		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id ] )
+		flash.message = message
+		redirect ( action:list )
 	}
 	
 	/**
@@ -498,7 +304,7 @@ def messageSource
 				WebUtil.getListAsli(warnings)
 			)
 
-			appendIgnoredAssets(sb, ignoredAssets)
+			importService.appendIgnoredAssets(sb, ignoredAssets)
 			sb.append('</ul>')
 			sb = sb.toString() 
 
@@ -635,7 +441,7 @@ def messageSource
 				WebUtil.getListAsli(warnings)
 			)
 
-			appendIgnoredAssets(sb, ignoredAssets)
+			importService.appendIgnoredAssets(sb, ignoredAssets)
 
 			sb.append('</ul>')
 			sb = sb.toString() 
@@ -772,7 +578,7 @@ def messageSource
 				WebUtil.getListAsli(warnings)
 			)
 
-			appendIgnoredAssets(sb, ignoredAssets)
+			importService.appendIgnoredAssets(sb, ignoredAssets)
 			sb.append('</ul>')
 			sb = sb.toString() 
 			
@@ -951,18 +757,5 @@ def messageSource
 		return errorMsg
 	}
 	
-	/**
-	 * Used to append a list of ignored assets if any to a StringBuilder buffer
-	 * @param StringBuilder the message buffer
-	 * @param List<Asset> list of ignored assets
-	 */
-	private void appendIgnoredAssets(StringBuilder sb, List assets ) {
-		if (assets.size()) {
-			sb.append("<li>${assets.size()} assets where skipped due to being updated since export<ul>")
-			assets.each { sb.append("<li>${it.id} ${it.assetName}</li>") }
-			sb.append('</ul></li>')
-		}
-		sb.append('</ul></li>')
-	}	
 
 }

@@ -134,7 +134,7 @@
                     <g:each in="${dataTransferBatchList}" status="i" var="dataTransferBatch">
                     	  <span id="assetDisabledProcessId_${dataTransferBatch.id}" style="display: none;"><a href="javascript:" class="disableButton">Process</a></span>
               			  <span id="assetProcessId_${dataTransferBatch.id}" style="display: none;" >
-              			  	<g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>
+              			  	<g:link action="deviceProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>
               			  </span>
               			  
               			  <span id="appDisabledProcessId_${dataTransferBatch.id}" style="display: none;"><a href="javascript:" class="disableButton">Process</a></span>
@@ -174,7 +174,7 @@
                             <td>
 	                            <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
 	                                <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
-                           	   			<span id="assetReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','asset')">Review</a></span>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+                           	   			<span id="assetReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','asset')">Review</a></span> | <g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                </g:if> 
 	                                 <g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
 	                                   <span id="appReviewId_${dataTransferBatch.id}"><a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','app')">Review</a></span>
@@ -189,7 +189,7 @@
 	                            	  |<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if> 
 	                                  <g:if test="${dataTransferBatch?.eavEntityType?.domainName == null}">
-	                            	   <g:link action="serverProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
+	                            	   <g:link action="deviceProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>|<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 	                                 </g:if>                     
 	                            </g:if>
 	                             <g:else>
@@ -207,16 +207,19 @@
              <div class="paginateButtons">
                 <g:paginate total="${DataTransferBatch.findAll('from DataTransferBatch where project = '+projectId).size()}" params ="[projectId:projectId]"/>
             </div>
+        	<%--
            <!--  <div class="buttons">
 	            <g:form>
 		            <span class="button"><input type="button" value="New" class="create" onClick="#"/></span>
 	        	</g:form>
         	</div> -->
+        	// JPM - 9/2014 - deleting this as it is a BOGUS way of updating assets  
         	<script type="text/javascript">
         	$.post("${createLink(action:'updateAssetRacks')}", {
         		ajax: 'true'
         	});
         	</script>
+        	--%>
         </div>
         <script type="text/javascript">
     		currentMenuId = "#assetMenu";

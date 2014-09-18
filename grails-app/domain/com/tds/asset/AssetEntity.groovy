@@ -251,8 +251,6 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		os( blank:true, nullable:true )
 		usize( nullable:true )
 		
-		sourceRoom( blank:true, nullable:true )
-		sourceRackPosition( nullable:true )
 		sourceBladeChassis( blank:true, nullable:true )
 		sourceBladePosition( nullable:true )
 	
@@ -269,10 +267,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		
 		// TODO : owner should not be nullable - remove and test
 		owner( nullable:true )
-		rackSource( nullable:true )
 		roomSource( nullable:true )
-		rackTarget( nullable:true )
+		rackSource( nullable:true )
 		roomTarget( nullable:true )
+		rackTarget( nullable:true )
 		appOwner( nullable:true )
 		appSme( blank:true, nullable:true )
 	

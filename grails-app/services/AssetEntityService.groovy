@@ -26,7 +26,9 @@ import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
@@ -52,7 +54,6 @@ class AssetEntityService {
 	def progressService
 	def partyRelationshipService
 	def taskService
-	
 	
 	/**
 	 * This method is used to update dependencies for all entity types
@@ -945,45 +946,53 @@ class AssetEntityService {
 		return [ query:query, joinQuery:joinQuery ]
 	}
 	/**
-	 * Used to get the existing preference for customized columns
-	 * @forWhom 'App_columns' for now
+	 * Returns the default optional/customizable columns 
+	 * @param prefName - the preference name for the various asset lists
 	 * @return appPref
 	 */
-	def getExistingPref(forWhom){
-		def existingPref = userPreferenceService.getPreference(forWhom)
-		def appPref
-		if(!existingPref){
-			switch(forWhom){
-				case 'App_Columns':
-					appPref = ['1':'sme','2':'validation','3':'planStatus','4':'moveBundle']
-				break;
-				case 'Asset_Columns':
-					appPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
-				break;
-				case 'Physical_Columns':
-					appPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
-				break;
-				case 'Database_Columns':
-					appPref = ['1':'dbFormat','2':'size','3':'planStatus','4':'moveBundle']
-				break;
-				case 'Storage_Columns':
-					appPref = ['1':'fileFormat','2':'size','3':'planStatus','4':'moveBundle']
-				break;
-				case 'Task_Columns':
-					appPref = ['1':'assetName','2':'assetType','3':'assignedTo','4':'role', '5':'category']
-				break;
-				case 'Model_Columns':
-					appPref = ['1':'description','2':'assetType','3':'powerUse','4':'modelConnectors']
-				break;
-				case 'Dep_Columns':
-					appPref = ['1':'frequency','2':'comment']
-				break;
-			}
-		}else{
-			appPref = JSON.parse(existingPref)
+	 // TODO : JPM 9/2014 : Rename getExistingPref method to getColumnPreferences
+	Map getExistingPref(prefName){
+		def colPref
+		def existingPref = userPreferenceService.getPreference(prefName)
+		
+		if (existingPref) {	
+			// TODO : JPM 9/2014 : I'm assuming that the JSON.parse function could throw an error if the json is corrupt so there should be a try/catch
+			colPref = JSON.parse(existingPref)
 		}
-		return appPref
+
+		if (! colPref) {
+		
+			switch (prefName) {
+				case 'App_Columns':
+					colPref = ['1':'sme', '2':'validation', '3':'planStatus', '4':'moveBundle']
+					break
+				case 'Asset_Columns':
+					colPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
+					break
+				case 'Physical_Columns':
+					colPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
+					break
+				case 'Database_Columns':
+					colPref = ['1':'dbFormat','2':'size','3':'planStatus','4':'moveBundle']
+					break
+				case 'Storage_Columns':
+					colPref = ['1':'fileFormat','2':'size','3':'planStatus','4':'moveBundle']
+					break
+				case 'Task_Columns':
+					colPref = ['1':'assetName','2':'assetType','3':'assignedTo','4':'role', '5':'category']
+					break
+				case 'Model_Columns':
+					colPref = ['1':'description','2':'assetType','3':'powerUse','4':'modelConnectors']
+					break
+				case 'Dep_Columns':
+					colPref = ['1':'frequency','2':'comment']
+					break
+			}
+		}
+
+		return colPref
 	}
+
 	/**
 	 * Used to save cabling data to database while importing.
 	 * 
@@ -1078,6 +1087,7 @@ class AssetEntityService {
 		}
 		return [warnMsg:warnMsg, cablingSkipped:cablingSkipped, cablingUpdated:cablingUpdated]
 	}
+
 	/**
 	 * Used to create or fetch target asset cables.
 	 *
@@ -1103,6 +1113,7 @@ class AssetEntityService {
 		}
 		return cableExist
 	}
+
 	/**
 	 * used to add the css for the labels which fieldImportance is 'C','I'
 	 * @param forWhom
@@ -1122,6 +1133,10 @@ class AssetEntityService {
 		return highlightMap
 	}
 	
+	/** 
+	 * This is used to escape quotes in a string to be used in Javascript
+	 * TODO : JPM 9/2014 : getEscapeName should be refactored into a reusable function in String or HtmlUtil as it should not be SOOOOO tied to an asset
+	 */
 	def getEscapedName(assetEntity, ignoreSingleQuotes = false) {
 		def name = ''
 		def size = assetEntity.assetName?.size() ?: 0
@@ -1158,11 +1173,41 @@ class AssetEntityService {
 		return Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
 	}
 
-	/*------------------------------------------------------------
-	 * download data form Asset Entity table into Excel file
-	 * @author Mallikarjun
+
+	/**
+	 * Used to retrieve the values of DEVICE properties based on the attribute name
+	 * @param asset - the asset to retrieve the property from
+	 * @param attribute - the attribute name
+	 * @return The string value of the object property value
+	 */
+	Object getAssetAttributeValue(Object asset, String attribute) {
+		def value
+		def fieldMap = [Location:'location', Room:'roomName', Rack:'tag']
+		switch (attribute) {
+			case ~/XXX(source|target)(Location|Room|Rack)/:
+				def disp = Matcher.lastMatcher[0][1]	// Disposition
+				def prop = Matcher.lastMatcher[0][2]
+
+				def assetProperty = (prop == 'Rack' ? 'rack' : 'room') + disp.capitalize()
+				def refProperty = fieldMap[prop]
+				log.debug "getAssetAttributeValue() assetProperty=$assetProperty,  refProperty=$refProperty, disp=$disp, prop=$prop"
+				if (!assetProperty || !refProperty) {
+					throw new RuntimeException("getAssetAttributeValue() unable to map '$attribute'")
+				}
+
+				value = asset[assetProperty][refProperty]?.toString()
+				break
+			default:
+				value = String.valueOf(asset[attribute])
+				log.debug "getAssetAttributeValue() attribute $attribute, value $value"
+		}
+		return StringUtil.defaultIfEmpty(value, '')
+	}
+
+	/**
+	 * Download data form Asset Entity table into Excel file
 	 * @param Datatransferset,Project,Movebundle
-	 *------------------------------------------------------------*/
+	 **/
 	def export(params) {
 		def key = params.key
 		def projectId = params.projectId
@@ -1418,19 +1463,6 @@ class AssetEntityService {
 			log.info "export() - Valdating columns took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
-			// Helper closure that will get the value from an asset where the properity name uses dot notation
-			def masterChildValue = { assetObj, propName ->
-				def value = '' 
-				def (master, child) = propName.split(/\./, 2)
-
-				if (master && child) 
-					value = assetObj[master] ? assetObj[master][child] : null
-				else 
-					log.error "masterChildValue failed to parse $propName"
-
-				return value
-			}
-
 			// Helper closure to create a text list from an array for debugging
 			def xportList = { list ->
 				def out = ''
@@ -1514,7 +1546,7 @@ class AssetEntityService {
 
 							// log.debug "coll=$coll, colNum=$colNum, colName=$colName, attribute=$attribute"
 
-							if (attribute && !attribute.contains('.') && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
+							if (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
 								// Skip populating the cell if the value is null
 								continue
 							}
@@ -1539,15 +1571,9 @@ class AssetEntityService {
 								case ~/Retire|MaintExp|Modified Date/:
 									addContentToSheet = new Label(colNum, r, stdDateFormat.format(a[attribute]) )
 									break
+
 								default:
-									def value
-									if (attribute.contains('.')) {
-										// Handle attributes that use the dot notation to reference a master/child relationship
-										value = StringUtil.defaultIfEmpty( masterChildValue(a, attribute), '' )
-									} else {
-										// Assuming that it is just a string property
-										value = StringUtil.defaultIfEmpty(String.valueOf(a[attribute]), '')
-									}
+									def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
 									addContentToSheet = new Label(colNum, r, value)
 							}
 
@@ -1983,11 +2009,13 @@ class AssetEntityService {
 	 * @param project : project instance
 	 * @return
 	 */
-   def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
-	   for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
+	 // TODO : JPM 9/2014 : The updateColumnHeaders probable won't work beyond 24 custom columns how this is written - should use regex test instead
+	 // customLabels is defined as a static at the top
+   	def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
+	   	for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
 		   def cellData = sheet.getCell(head,0)?.getContents()
 		   def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
-		   if(attributeMap?.attributeCode && customLabels.contains( cellData )){
+		   if (attributeMap?.attributeCode && customLabels.contains( cellData )) {
 			   def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
 			   def customColumn = new Label(head,0, columnLabel )
 			   sheet.addCell(customColumn)
@@ -1995,4 +2023,360 @@ class AssetEntityService {
 	   }
 	   return sheet
    }
+
+
+   /**
+    * Used by the AssetEntity List to populate the initial List view
+    */
+   Map getListModel(Project project, UserLogin userLogin, session, params, tzId) {
+		def filters = session.AE?.JQ_FILTERS
+		session.AE?.JQ_FILTERS = []
+
+		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		def prefType = 'Asset_Columns'
+		def fieldPrefs = getExistingPref(prefType)
+		
+		// The hack for the dot notation
+		fieldPrefs.each {k,v -> fieldPrefs[k] = v }
+
+		Map model = getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters)
+
+		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
+		model.assetName = filters?.assetNameFilter ?:'' 
+		model.assetPref = fieldPrefs 
+		model.assetTag = filters?.assetTagFilter ?:'' 
+		model.assetType = filters?.assetTypeFilter ?:'' 
+		model.model = filters?.modelFilter ?:'' 
+		model.prefType = prefType 
+		model.serialNumber = filters?.serialNumberFilter ?:'' 
+		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
+		model.sourceRack = filters?.sourceRackFilter ?:''
+		model.targetLocation = filters?.targetLocationFilter ?:'' 
+		model.targetRack = filters?.targetRackFilter ?:'' 
+		// Used for filter toValidate from the Planning Dashboard - want a better parameter (JPM 9/2014)
+		model.type = params.type
+
+		// The customized title of the list
+		def titleByFilter = [
+			all: 'All Devices',
+			other: 'Other Devices',
+			physical: 'Physical Device',
+			physicalServer: 'Physical Server',
+			server: 'Server',
+			storage:  'Storage Device',
+			virtualServer: 'Virtual Server',
+		]
+		model.title = ( titleByFilter.containsKey(params.filter) ? titleByFilter[params.filter] : titleByFilter['all'] ) + ' List'
+
+		return model
+	}
+
+   /** 
+    * Used to retrieve the data used by the AssetEntity List
+    */
+   Map getListData(Project project, UserLogin userLogin, session, params, tzId) {
+		def filterParams = [
+			assetName: params.assetName, 
+			assetType: params.assetType, 
+			depConflicts: params.depConflicts, 
+			depNumber: params.depNumber, 
+			depToResolve: params.depToResolve,
+			event: params.event,
+			model: params.model, 
+			moveBundle: params.moveBundle, 
+			planStatus: params.planStatus, 
+			sourceLocation: params.sourceLocation, 
+			sourceRack: params.sourceRack, 
+		]
+		def validSords = ['asc', 'desc']
+		def sortOrder = (validSords.indexOf(params.sord) != -1) ? (params.sord) : ('asc')
+		def maxRows = Integer.valueOf(params.rows) 
+		def currentPage = Integer.valueOf(params.page) ?: 1
+		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
+
+		def moveBundleList
+		
+		def attributes = projectService.getAttributes('AssetEntity')
+		
+		// def prefType = (listType=='server') ? 'Asset_Columns' : 'Physical_Columns'
+		def prefType = 'Asset_Columns'
+		def assetPref= getExistingPref(prefType)
+		
+		def assetPrefVal = assetPref.collect{it.value}
+		attributes.each { attribute ->
+			if (attribute.attributeCode in assetPrefVal)
+				filterParams << [ (attribute.attributeCode): params[(attribute.attributeCode)]]
+		}
+
+		// Lookup the field name reference for the sort
+		def sortIndex = (params.sidx in filterParams.keySet() ? params.sidx : 'assetName')
+		
+		// This is used by the JQ-Grid some how
+		session.AE = [:]
+
+		userPreferenceService.setPreference("assetListSize", "${maxRows}")
+		
+		if (params.event && params.event.isNumber()) {
+			def moveEvent = MoveEvent.read( params.event )
+			moveBundleList = moveEvent?.moveBundles?.findAll {it.useForPlanning == true}
+		} else {
+			moveBundleList = MoveBundle.findAllByProjectAndUseForPlanning(project,true)
+		}
+		
+		def assetType = params.filter ? ApplicationConstants.assetFilters[ params.filter ] : []
+
+		def bundleList = params.moveBundle ? MoveBundle.findAllByNameIlikeAndProject("%${params.moveBundle}%", project) : []
+		
+		StringBuffer altColumns = new StringBuffer()
+		StringBuffer joinQuery = new StringBuffer()
+
+		// Until sourceRack is optional on the list we have to do this one
+		altColumns.append("\n, srcRack.tag AS sourceRack, srcRoom.location AS sourceLocation")
+		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
+		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
+
+		boolean srcRoomAdded = true 	// Can set to false if the above lines are removed
+		boolean tgtRoomAdded = false
+
+		// Tweak the columns selected and addition joins based on the user's selected columns
+		assetPref.each { key,value->
+			switch (value) {
+				case 'appOwner':
+					altColumns.append(", CONCAT(CONCAT(p1.first_name, ' '), IFNULL(p1.last_name,'')) AS appOwner")
+					joinQuery.append("\nLEFT OUTER JOIN person p1 ON p1.person_id=ae.app_owner_id ")
+					break
+				case 'os':
+					altColumns.append(", ae.hinfo AS os")
+					break
+				case ~/custom\d{1,}/:
+					altColumns.append(", ae.${value} AS ${value}")
+					break
+				case 'lastUpdated':
+					altColumns.append(", ee.last_updated AS ${value}")
+					joinQuery.append("\nLEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id ")
+					break
+				case 'manufacturer':
+					altColumns.append(", manu.name AS manufacturer")
+					joinQuery.append("\nLEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
+					break
+				case 'modifiedBy':
+					altColumns.append(", CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy")
+					joinQuery.append("\nLEFT OUTER JOIN person p ON p.person_id=ae.modified_by ")
+					break
+
+				case ~/source(Location|Room)/:
+					// This is a hack for the columns that were moved to the Room domain property map attributes
+					def locOrRoom = Matcher.lastMatcher[0][1]
+
+					if (!srcRoomAdded) {
+						joinQuery.append("\nLEFT OUTER JOIN room srcRoom ON srcRoom.room_id=ae.room_source_id ")
+						srcRoomAdded = true
+					}
+					if (locOrRoom == 'Location') {
+						// Note that this is added by default above 
+						// altColumns.append(', srcRoom.location AS sourceLocation')
+					} else if (locOrRoom == 'Room') {
+						altColumns.append(', srcRoom.room_name AS sourceRoom')
+					} else {
+						throw new RuntimeException("Unhandled condition for property ($value)")
+					}
+					break	
+				case 'sourceRack':
+						// Already handled above
+						// Moved to the Rack domain
+					break
+
+				case ~/target(Location|Room)/:
+					// This is a hack for the columns that were moved to the Room domain property map attributes
+					def locOrRoom = Matcher.lastMatcher[0][1]
+
+					if (!tgtRoomAdded) {
+						joinQuery.append("\nLEFT OUTER JOIN room tgtRoom ON tgtRoom.room_id=ae.room_target_id ")
+						tgtRoomAdded = true
+					}
+					if (locOrRoom == 'Location') {
+						altColumns.append(', tgtRoom.location AS targetLocation')
+					} else if (locOrRoom == 'Room') {
+						altColumns.append(', tgtRoom.room_name AS targetRoom')
+					} else {
+						throw new RuntimeException("Unhandled condition for property ($value)")
+					}
+					break	
+				case 'targetRack':
+					// Property was moved to the Rack domain
+					altColumns.append(", tgtRack.tag AS targetRack")
+					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
+					break
+
+				case 'validation':
+					break;
+				default:
+					altColumns.append(", ae.${WebUtil.splitCamelCase(value)} AS ${value} ")
+			}
+		}
+
+		def query = new StringBuffer(""" 
+			SELECT * FROM ( 
+				SELECT ae.asset_entity_id AS assetId, ae.asset_name AS assetName, 
+				ae.asset_type AS assetType, m.name AS model,  
+				IF(at.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, 
+				IF(ac.comment_type IS NULL, 'noComments','comments') AS commentsStatus, 
+				me.move_event_id AS event, ae.plan_status AS planStatus, 
+				mb.name AS moveBundle, ae.validation AS validation
+			""" )
+
+		if (altColumns.length())
+			query.append("\n${ altColumns.toString() }")
+
+		query.append("""
+				FROM asset_entity ae
+				LEFT OUTER JOIN move_bundle mb ON mb.move_bundle_id=ae.move_bundle_id
+				LEFT OUTER JOIN move_event me ON me.move_event_id=mb.move_event_id
+				LEFT OUTER JOIN model m ON m.model_id=ae.model_id
+				LEFT OUTER JOIN asset_comment at ON at.asset_entity_id=ae.asset_entity_id AND at.comment_type = '${AssetCommentType.TASK}'
+				LEFT OUTER JOIN asset_comment ac ON ac.asset_entity_id=ae.asset_entity_id AND ac.comment_type = '${AssetCommentType.COMMENT}'
+				""")
+
+		if (joinQuery.length())
+			query.append(joinQuery)
+			
+		//
+		// Begin the WHERE section of the query	
+		//
+		query.append("\nWHERE ae.project_id = ${project.id}\nAND ae.asset_class = '${AssetClass.DEVICE}'")
+
+		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
+		/*
+		// This was being added to correct the issue when coming from the Planning Dashboard but there are some ill-effects still
+		if (params.justPlanning)
+			justPlanning = params.justPlanning
+		*/
+		if (justPlanning=='true')
+			query.append("\nAND mb.use_for_planning=${justPlanning}")
+		
+		query.append("\nAND ae.asset_class='${AssetClass.DEVICE}'")
+
+		def filter = params.filter ?: 'all'
+
+		// Filter the list of assets based on if param listType == 'server' to all server types otherwise filter NOT server types
+		switch(filter) {
+			case 'physical':
+				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				break
+			case 'physicalServer':
+				def phyServerTypes = AssetType.getAllServerTypes() - AssetType.getVirtualServerTypes()
+				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(phyServerTypes)}) " )
+				break
+			case 'server':
+				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getAllServerTypes())}) ")
+				break
+			case 'storage':
+				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getStorageTypes())}) " )
+				break
+			case 'virtualServer':
+				query.append("\nAND ae.asset_type IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getVirtualServerTypes())}) " )
+				break
+			case 'other':
+				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) " )
+				break
+
+ 			case 'all': 
+				break
+		}
+
+		if (params.event && params.event.isNumber() && moveBundleList)
+			query.append( "\nAND ae.move_bundle_id IN (${GormUtil.asQuoteCommaDelimitedString(moveBundleList.id)})" )
+			
+		if (params.unassigned) {
+			def unasgnMB = MoveBundle.findAll("\nFROM MoveBundle mb WHERE mb.moveEvent IS NULL AND mb.useForPlanning=true AND mb.project=:project ", [project:project])
+			
+			if (unasgnMB) {
+				def unasgnmbId = GormUtil.asQuoteCommaDelimitedString(unasgnMB?.id)
+				query.append( "\nAND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
+			}
+		}
+			
+		query.append("\nGROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}\n) AS assets")
+		
+		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
+		def firstWhere = true
+		def whereAnd = { 
+			if (firstWhere) {
+				firstWhere = false
+				return ' WHERE'
+			} else {
+				return ' AND'
+			}
+		}
+
+		// Handle the filtering by each column's text field
+		filterParams.each { fkey, fvalue ->
+			if ( fvalue ) {
+				// single quotes are stripped from the filter to prevent SQL injection
+				query.append( whereAnd() + " assets.${fkey} LIKE '%${fvalue.replaceAll("'", "")}%'")
+				firstWhere = false
+			}
+		}
+		
+		if (params.moveBundleId) {
+			if (params.moveBundleId!='unAssigned') {
+				def bundleName = MoveBundle.get(params.moveBundleId)?.name
+				query.append( whereAnd() + " assets.moveBundle  = '${bundleName}' ")
+			} else {
+				query.append( whereAnd() + " assets.moveBundle IS NULL ")
+			}
+		}
+		
+		if (params.type && params.type == 'toValidate') {
+			query.append( whereAnd() + " assets.validation='Discovery' ") //eq ('validation','Discovery')
+		}
+
+		// Allow filtering on the Validate
+		if (params.toValidate && params.toValidate && ValidationType.getList().contains(params.toValidate)) {
+			query.append( whereAnd() + " assets.validation='${params.toValidate}' ")
+		}
+
+		if (params.plannedStatus) {
+			query.append(whereAnd() + " assets.planStatus='${params.plannedStatus}'")
+		}
+		
+		log.debug  "query = ${query}"
+		def assetList = jdbcTemplate.queryForList(query.toString())
+		
+		// Cut the list of selected applications down to only the rows that will be shown in the grid
+		def totalRows = assetList.size()
+		def numberOfPages = Math.ceil(totalRows / maxRows)
+		if (totalRows > 0)
+			assetList = assetList[rowOffset..Math.min(rowOffset+maxRows,totalRows-1)]
+		else
+			assetList = []
+			
+		def results = assetList?.collect {
+			def commentType = it.commentType
+			[ 	
+				cell: [ 
+					'', // The action checkbox
+					it.assetName, 
+					(it.assetType ?: ''), 
+					it.model, 
+					it.sourceLocation, 
+					it.sourceRack,
+					( it[ assetPref['1'] ] ?: ''), 
+					( it[ assetPref['2'] ] ?: ''), 
+					( it[ assetPref['3'] ] ?: ''), 
+					( it[ assetPref['4'] ] ?: ''), 
+					it.planStatus, 
+					it.moveBundle, 
+					/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/
+					it.tasksStatus, 
+					it.assetType, 
+					it.event, 
+					it.commentsStatus
+				], id: it.assetId
+			]
+		}
+
+		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
+
+	}
 }

@@ -1,5 +1,6 @@
-import com.tds.asset.AssetEntity;
+import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 
 class Room {
@@ -51,33 +52,7 @@ class Room {
 	String toString(){
 		"$location / $roomName"
 	}
-	
-	static Room findOrCreateWhere(params) {
-		def r = createCriteria()
-		def results
-		try{
-			results = r.list {
-				eq('source', params.source.toInteger() ? 1 : 0)
-				eq('project.id', params['project.id'])
-				eq('location', "${params.location}")
-				eq('roomName', "${params.roomName}")
-			}
-		} catch( Exception ex ){
-			println"$ex"
-		}
-		// Create a new room if it doesn't exist
-		def room = results[0]
-		if( !room ){
-			room = new Room(params)
-			if ( !room.validate() || !room.save() ) {
-				def etext = "Unable to create Room" +
-                GormUtil.allErrorsString( room )
-				println etext
-			}
-		}
-		return room
-	}
-	
+		
 	/*
 	 * Date to insert in GMT
 	 */

@@ -5,7 +5,7 @@ package com.tdsops.common.lang
  */
 class ExceptionUtil {
 	
-	static String stackTraceToString(Exception e, Integer lines=30) {
+	static String stackTraceToString(Exception e, Integer lines=40) {
 		StringWriter sw = new StringWriter()
 		PrintWriter pw = new PrintWriter(sw)
 		e.printStackTrace(pw)

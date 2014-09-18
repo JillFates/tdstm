@@ -77,4 +77,25 @@ class ControllerUtil {
 		return "${controller.controllerUri} ${controller.actionName}"
 	}
 
+	/**
+	 * Used to redirect the user to the default web page
+	 * @param controller - the controller object from where the method is being called
+	 * @param flashMessage - an optional message to add to flash
+	 */
+	static void redirectToDefaultPage(Object controller, flashMessage) {
+		def userLogin = securityService.getUserLogin()
+
+		if ( flashMessage?.size() ) {
+			controller.flash.message = flashMessage
+		}
+
+		if (userLogin) {
+			// Redirect to User Dashboard
+			controller.redirect(controller:'dashboard', action:'userPortal')
+		} else {
+			// Send them to the login page
+			controller.redirect(controller:'auth', action:'login')
+		}
+	}
+
 }

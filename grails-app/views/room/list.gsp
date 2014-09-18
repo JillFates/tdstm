@@ -62,12 +62,13 @@
 											
 											<th><a href="#">City</a></th>
 
-											<th><a href="#">state Prov</a></th>
+											<th><a href="#">State Prov</a></th>
 
 											<th><a href="#">Rack count</a></th>
 
 											<th><a href="#">Asset count</a></th>
 
+											<th><a href="#">Source / Target</a></th>
 										</tr>
 									</thead>
 									<tbody>
@@ -88,6 +89,7 @@
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.getRackCountByType('Rack')}</td>
 
 												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.source ? 'Source' : 'Target'}</td>
 
 											</tr>
 										</g:each>
@@ -160,7 +162,7 @@
 							</td>
 						</tr>	
 						<tr>
-							<td>stateProv<td/>
+							<td>State/Prov<td/>
 							<td>
 								<input type="text" name="stateProv" id="stateProvId" value="">
 							</td>

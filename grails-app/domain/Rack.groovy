@@ -1,4 +1,5 @@
-import com.tds.asset.AssetEntity;
+import com.tds.asset.AssetEntity
+import com.tdssrc.grails.StringUtil
 
 class Rack {
 	Project project
@@ -17,7 +18,7 @@ class Rack {
 	static hasMany = [sourceAssets:AssetEntity, targetAssets:AssetEntity]
 	static mappedBy = [sourceAssets:"rackSource", targetAssets:"rackTarget"]
 	
-	static belongsTo = [ manufacturer:Manufacturer, model:Model]
+	static belongsTo = [ manufacturer:Manufacturer, model:Model, room:Room ]
 	
 	static constraints = {
 		project( nullable:false )
