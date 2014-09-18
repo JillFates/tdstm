@@ -41,7 +41,10 @@ $(document).ready(function() {
 								<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>
 								<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
-								<td class="label ${config.sourceLocation}  ${highlightMap.sourceLocation?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>
+								<td class="label ${config.sourceLocation}  ${highlightMap.sourceLocation?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>																
+								<td class="valueNW ${config.sourceLocation}">${assetEntity.sourceLocation}</td>
+								<td class="valueNW ${config.targetLocation}">${assetEntity.targetLocation}</td>
+
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.manufacturer}  ${highlightMap.manufacturer?:''}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
@@ -59,7 +62,7 @@ $(document).ready(function() {
 								</td>
 								<td class="label ${config.ipAddress}  ${highlightMap.ipAddress?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 								<td class="valueNW ${config.ipAddress}">${assetEntity.ipAddress}</td>
-								<td class="label rackLabel ${config.sourceRack}  ${highlightMap.sourceRack?:''}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
+								<td class="label rackLabel ${config.sourceRack}  ${highlightMap.sourceRack ?: ''}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
 								<td class="label bladeLabel ${config.sourceBladeChassis}  ${highlightMap.sourceBladeChassis?:''}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
 								<td class="label vmLabel ${config.virtualHost}  ${highlightMap.virtualHost?:''}" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 
