@@ -124,11 +124,11 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:physicalCount,filter:'physicalServer',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar',iconName:'iconServer.png']"></g:render>
+							model="[assetCount: phyServerCount,filter:'physicalServer',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar',iconName:'iconServer.png']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:virtualCount,filter:'virtualServer',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar',iconName:'iconServer.png']"></g:render>
+							model="[assetCount: virtServerCount,filter:'virtualServer',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar',iconName:'iconServer.png']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
