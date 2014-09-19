@@ -202,7 +202,7 @@ class ImportService {
 						return
 					}
 
-log.debug "Processing attribName=$attribName"
+					// log.debug "Processing attribName=$attribName"
 
 					switch (attribName) {
 						case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
@@ -257,7 +257,6 @@ log.debug "Processing attribName=$attribName"
 
 				}
 
-				log.debug "locRoomRack=$locRoomRack"
 				// Assign the Source/Target Location/Room/Rack properties for the asset
 				def errors
 				['source', 'target'].each { disposition ->
@@ -304,8 +303,9 @@ log.debug "Processing attribName=$attribName"
 				throw new RuntimeException("Unable to update the transfer batch status to COMPLETED")
 			}
 			
-			// update assets racks, cabling data once process done
-			assetEntityService.updateAssetsCabling( modelAssetsList, existingAssetsList )
+			// Update assets racks, cabling data once process done
+			// TODO : JPM 9/2014 : updateCablingOfAssets was commented out until we figure out what to do with this function (see TM-3308)
+			// assetEntityService.updateCablingOfAssets( modelAssetsList )
 	
 			// Update Room and Rack counts for stats
 			counts.room = Room.countByProject(project) - counts.room
@@ -317,7 +317,7 @@ log.debug "Processing attribName=$attribName"
 			counts.room = 0
 			counts.rack = 0
 			log.error "serverProcess() Unexpected error - rolling back : " + e.getMessage()
-			log.error ExceptionUtil.stackTraceToString(e)
+			log.error ExceptionUtil.stackTraceToString(e,80)
 
 			warnings << "Encounted unexpected error: ${e.getMessage()}"
 			warnings << "<b>The Import was NOT processed</b>"

@@ -566,14 +566,14 @@ class AssetEntityAttributeLoaderService {
 		return teamInstance
 	}
 
-	// TODO: Move to AssetEntityService
+	// TODO: Move to AssetEntityService and change the code to check for existing connectors (see TM-3308)
 	/*
 	*  Create asset_cabled_Map for all asset model connectors 
 	*/
 	def createModelConnectors( assetEntity ){
 		if(assetEntity.model){
 			def assetConnectors = ModelConnector.findAllByModel( assetEntity.model )
-			assetConnectors.each{
+			assetConnectors.each {
 				def assetCableMap = new AssetCableMap(
 					cable : "Cable"+it.connector,
 					assetFrom: assetEntity,
@@ -585,9 +585,8 @@ class AssetEntityAttributeLoaderService {
 					assetCableMap.assetToPort = null
 					assetCableMap.toPower = "A"
 				}
-				if ( !assetCableMap.validate() || !assetCableMap.save() ) {
-					def etext = "Unable to create assetCableMap" +
-					GormUtil.allErrorsString( assetCableMap )
+				if ( !assetCableMap.validate() || !assetCableMap.save(flush: true) ) {
+					def etext = "Unable to create assetCableMap : " + GormUtil.allErrorsString( assetCableMap )
 					println etext
 					log.error( etext )
 				}

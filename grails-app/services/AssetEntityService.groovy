@@ -836,15 +836,14 @@ class AssetEntityService {
 		
 	/*
 	 * Update assets cabling data for selected list of assets 
-	 * @param list
-	 * @param list 
+	 * @param list of assets to be updated
 	 */
-	def updateAssetsCabling( modelAssetsList, existingAssetsList ){
+	def updateCablingOfAssets( modelAssetsList ) {
 		modelAssetsList.each{ assetEntity->
-			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
-				assetToPort=null where assetTo = ? """,[assetEntity])
+			AssetCableMap.executeUpdate("Update AssetCableMap set cableStatus=?, assetTo=null, assetToPort=null where assetTo=?",[AssetCableStatus.UNKNOWN, assetEntity])
 			
-			AssetCableMap.executeUpdate("delete from AssetCableMap where assetFrom = ?",[assetEntity])
+			AssetCableMap.executeUpdate("Delete from AssetCableMap where assetFrom=?",[assetEntity])
+
 			assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
 		}
 		/*existingAssetsList.each{ assetEntity->
