@@ -45,6 +45,16 @@ class AssetEntityService {
 	// TODO : JPM 9/2014 : determine if bundleMoveAndClientTeams is used as the team functionality has been RIPPED out of TM
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 
+	// This is a list of properties that should be excluded from the custom column select list
+	private static COLUMN_PROPS_TO_EXCLUDE = [
+		(AssetClass.APPLICATION): [],
+		(AssetClass.DATABASE): [],
+		(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'MoveBundle', 'sourceLocation', 'sourceRack',
+		// TODO : JPM 9/2014 : This list can be removed as part of TM-3309
+		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'],
+		(AssetClass.STORAGE): [] 
+	]
+
 	static transactional = true
 	def jdbcTemplate
 	def projectService
@@ -590,13 +600,13 @@ class AssetEntityService {
 
 	/** 
 	 * Used to provide the default properties used for the Asset Dependency views
-	 * @param listType - indicates the type of list [Files|]
+	 * @param listType - indicates the type of list [Application|AssetEntity|Files|Storage]
 	 * @param moveEvent
 	 * @param params - the params from the HTTP request
 	 * @param filters - the map of the filter settings
 	 * @return a Map that includes all of the common properties shared between all Asset List views
 	 */
-	Map getDefaultModelForLists(String listType, Project project, Object fieldPrefs, Object params, Object filters) {
+	Map getDefaultModelForLists(AssetClass ac, String listType, Project project, Object fieldPrefs, Object params, Object filters) {
 
 		Map model = [
 			assetClassOptions: AssetClass.getClassOptions(),
@@ -641,14 +651,16 @@ class AssetEntityService {
 
 		// Get the list of attributes that the user can select for columns
 		def attributes = projectService.getAttributes(listType)
+
+		// Create a list of the "custom##" fields that are currently selectable
 		def projectCustoms = project.customFieldsShown+1
 		def nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
 		
 		// Remove the non project specific attributes and sort them by attributeCode
-		def appAttributes = attributes.findAll{
+		def appAttributes = attributes.findAll{ 
 			it.attributeCode!="assetName" && 
-			!(it.attributeCode in nonCustomList) && 
-			(it.attributeCode != "assetType")
+			! (it.attributeCode in nonCustomList) && 
+			! COLUMN_PROPS_TO_EXCLUDE[ac].contains(it.attributeCode)
 		}
 
 		// Used to display column names in jqgrid dynamically
@@ -2038,7 +2050,7 @@ class AssetEntityService {
 		// The hack for the dot notation
 		fieldPrefs.each {k,v -> fieldPrefs[k] = v }
 
-		Map model = getDefaultModelForLists('AssetEntity', project, fieldPrefs, params, filters)
+		Map model = getDefaultModelForLists(AssetClass.DEVICE, 'AssetEntity', project, fieldPrefs, params, filters)
 
 		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
 		model.assetName = filters?.assetNameFilter ?:'' 

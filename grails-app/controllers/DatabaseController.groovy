@@ -22,8 +22,8 @@ import com.tdssrc.grails.ControllerUtil as CU
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-
 
 class DatabaseController {
 	
@@ -55,7 +55,7 @@ class DatabaseController {
 			dbPref: fieldPrefs
 		]
 
-		model.putAll( assetEntityService.getDefaultModelForLists('Database', project, fieldPrefs, params, filters) )
+		model.putAll( assetEntityService.getDefaultModelForLists(AssetClass.DATABASE, 'Database', project, fieldPrefs, params, filters) )
 
 		return model
 	}

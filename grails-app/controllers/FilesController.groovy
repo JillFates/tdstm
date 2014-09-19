@@ -13,6 +13,7 @@ import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
@@ -52,7 +53,7 @@ class FilesController {
 			size: filters?.sizeFilter
 		]
 
-		model.putAll( assetEntityService.getDefaultModelForLists('Files', project, fieldPrefs, params, filters) )
+		model.putAll( assetEntityService.getDefaultModelForLists(AssetClass.STORAGE, 'Files', project, fieldPrefs, params, filters) )
 
 		return model
 		

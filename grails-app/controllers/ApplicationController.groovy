@@ -8,6 +8,7 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
@@ -57,7 +58,7 @@ class ApplicationController {
 			validationFilter: filters?.appValidationFilter ?:'' 
 		]
 
-		model.putAll( assetEntityService.getDefaultModelForLists('Application', project, fieldPrefs, params, filters) )
+		model.putAll( assetEntityService.getDefaultModelForLists(AssetClass.APPLICATION, 'Application', project, fieldPrefs, params, filters) )
 
 		return model
 
