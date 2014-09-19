@@ -613,11 +613,13 @@ class PersonService {
 						// Optionally don't delete if they are associated with Assets by AppOwner, SME or SME2
 						def foundAssoc = false
 						['appOwner', 'sme', 'sme2'].each { column ->
-							if (Application.find("from Application a where a.$column=:person", map)) {
+							if (foundAssoc)
+								return
+							if (AssetEntity.find("from AssetEntity a where a.$column=:person", map)) {
 								if (deleteIfAssocWithAssets) {
 									// Clear out the person's associate with all assets for the given column
-									cleared += AssetEntity.executeUpdate("update Application a set a.${column}=NULL where a.${column}=:person", map)
 									log.debug "Disassociated person as $column"
+									cleared += AssetEntity.executeUpdate("update Application a set a.${column}=NULL where a.${column}=:person", map)
 								} else {
 									log.debug("Ignoring bulk delete of person ${id} $person as it contains $column association with asset(s)")
 									foundAssoc=true
@@ -631,12 +633,10 @@ class PersonService {
 						}
 	
 						//delete references
-						int deletedPartyRoles = Person.executeUpdate("delete PartyRole p where p.party=:person", map)
-						int deletedPartyRelationships = Person.executeUpdate("delete PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
-	
-						//delete object
 						log.info "Bulk deleting person $id $person"
-						person.delete()
+						Person.executeUpdate("Delete PartyRole p where p.party=:person", map)
+						Person.executeUpdate("Delete PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
+						person.delete(flush:true)
 						deleted++
 
 					}
