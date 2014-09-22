@@ -42,7 +42,7 @@
 				$("#showOrMergeId").dialog({ autoOpen: false })
 				$('.cbox').change(function() {
 					var checkedLen = $('.cbox:checkbox:checked').length
-					if(checkedLen > 1 && checkedLen < 3) {
+					if(checkedLen > 1 && checkedLen < 10) {
 						$("#compareMergeId").removeAttr("disabled")
 					} else {
 						$("#compareMergeId").attr("disabled","disabled")

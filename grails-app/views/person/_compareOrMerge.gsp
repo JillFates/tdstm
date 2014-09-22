@@ -6,7 +6,7 @@
 	<div class="body">
 		<table>
 			<tr class="odd">
-				<td colspan="3" style="text-align: center;">
+				<td colspan="10" style="text-align: center;">
 					<b>Person Information</b>
 				</td>
 			</tr>
@@ -75,7 +75,7 @@
 			</g:each>
 			
 			<tr class="odd">
-				<td colspan="3" style="text-align: center;">
+				<td colspan="10" style="text-align: center;">
 					<b>Login Information</b>
 				</td>
 			</tr>
