@@ -40,7 +40,7 @@
 	<td style="text-align: right;">
 		<g:if test="${percDone > 0}">
 			<g:link controller="${controller}" action="list"
-				params="[filter:'${filter}', plannedStatus:'Moved']"
+				params="[filter:filter, plannedStatus:'Moved']"
 				class="links">
 				${percDone}%
 			</g:link>
