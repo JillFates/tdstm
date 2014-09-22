@@ -49,9 +49,10 @@ class AssetEntityService {
 	private static COLUMN_PROPS_TO_EXCLUDE = [
 		(AssetClass.APPLICATION): [],
 		(AssetClass.DATABASE): [],
-		(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'MoveBundle', 'sourceLocation', 'sourceRack',
-		// TODO : JPM 9/2014 : This list can be removed as part of TM-3309
-		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'],
+		(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation', 'sourceRack',
+		// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
+		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt', 'currentStatus'
+		],
 		(AssetClass.STORAGE): [] 
 	]
 
@@ -2192,9 +2193,8 @@ class AssetEntityService {
 						throw new RuntimeException("Unhandled condition for property ($value)")
 					}
 					break	
-				case 'sourceRack':
-						// Already handled above
-						// Moved to the Rack domain
+				case ~/sourceRack|moveBundle/:
+						// Handled by the default columns
 					break
 
 				case ~/target(Location|Room)/:
@@ -2330,6 +2330,7 @@ class AssetEntityService {
 		}
 		
 		if (params.moveBundleId) {
+			// TODO : JPM 9/2014 : params.moveBundleId!='unAssigned' - is that even possible anymore? moveBundle can't be unassigned...
 			if (params.moveBundleId!='unAssigned') {
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
 				query.append( whereAnd() + " assets.moveBundle  = '${bundleName}' ")
