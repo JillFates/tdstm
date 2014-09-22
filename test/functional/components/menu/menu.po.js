@@ -527,7 +527,7 @@ var Menu = function(){
       'databaseConflicts':function(){
         that.getDatabaseConflicts().click();
       }, 
-      'taskReports':function(){
+      'taskReport':function(){
         that.getTaskReport().click();
       },
       'preEventCheckList':function(){

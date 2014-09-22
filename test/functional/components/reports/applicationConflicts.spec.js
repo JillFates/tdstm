@@ -5,31 +5,31 @@ var Reports = require('./reports.po.js');
 describe('Application Conflicts',function(){
   var menu = new Menu();
   
-  it('should load Cabling Conflict Report page after click on Reports > Cabling Conflict', function(){
+  it('should load Application Conflict Report page after click on Reports > Application Conflict', function(){
     menu.goToReports('applicationConflicts');
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationConflicts');
   });
   it('should have Application Conflicts as title',function(){
-      var cablingConflictPage = new Reports();
-      expect(cablingConflictPage.getPageTitle()).toEqual('Application Conflicts');
+      var applicationConflictsPage = new Reports();
+      expect(applicationConflictsPage.getPageTitle()).toEqual('Application Conflicts');
     });
 
 	describe('bundle',function(){
-     var cablingConflictPage = new Reports();
+     var applicationConflictsPage = new Reports();
       xit('should have bundle label', function(){
-        expect(cablingConflictPage.getBundleLabel()).toEqual('Bundles:*');
+        expect(applicationConflictsPage.getBundleLabel()).toEqual('Bundles:*');
       });
 
       it('should have  All bundles as default option',function(){
-        expect(cablingConflictPage.getBundleSelected()).toEqual('Buildout');
+        expect(applicationConflictsPage.getBundleSelected()).toEqual('Buildout');
 
       });
       it('should have x options',function(){
-        expect(cablingConflictPage.getBundlesOptionsLength()).toEqual(11);
+        expect(applicationConflictsPage.getBundlesOptionsLength()).toEqual(11);
 
       });
       it('should have the following options',function(){
-        cablingConflictPage.getBundlesOptions().then(function(list){
+        applicationConflictsPage.getBundlesOptions().then(function(list){
           expect(list[0].getText()).toEqual('Buildout');
           expect(list[1].getText()).toEqual('M1');
           expect(list[2].getText()).toEqual('M2');
@@ -47,41 +47,40 @@ describe('Application Conflicts',function(){
 	xdescribe('App Owner',function(){
 
 	});
-	xdescribe('checkboxes',function(){
-
-		it('should have missing as label',function(){
+	describe('checkboxes',function(){
+    var applicationConflictsPage = new Reports();
+		xit('should have "Missing" as label',function(){
 
 		});
 		it('should have Missing checked by default',function(){
-
+      expect(applicationConflictsPage.getMissingInput().getAttribute('checked')).toBe('true');
 		});
-		it('should have Unresolved as label',function(){
+    xit('should have "Unresolved" as label',function(){
 
 		});
 		it('should have Unresolved checked by default',function(){
-
+      expect(applicationConflictsPage.getUnresolvedInput().getAttribute('checked')).toBe('true');
 		});
-		it('should have Conflicts as label',function(){
+		xit('should have "Conflicts" as label',function(){
 
     });
     it('should have Conflicts checked by default',function(){
-
+      expect(applicationConflictsPage.getConflictsInput().getAttribute('checked')).toBe('true');
     });
-    it('should click on generate report',function(){
-
-    });
-
 	});//checkboxes
-  it('should generate the report after click on generate button', function(){
-    var cablingConflictPage = new Reports();
-    cablingConflictPage.generateApplicationConflictsBtn().click();
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationConflicts');
-  });
-  describe('generated report',function(){
+
+  describe('generated report Web',function(){
+
+    it('should generate the report after click on generate button', function(){
+      var cablingConflictPage = new Reports();
+      cablingConflictPage.generateApplicationConflictsBtn().click();
+      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationConflicts');
+    });
+    
     it('should get title from generated report',function(){
       var appProfilesPage = new Reports();
       expect(appProfilesPage.getAppProfileGeneratedHeader().getText()).toContain('Application Conflicts - MarketingDemo');
     });
-  }); //generated report
 
+  }); //generated report
 });

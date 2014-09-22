@@ -60,7 +60,7 @@ describe('Application Profiles Report', function(){
       appProfilesPage.generateApplicationProfilesBtn().click();
       expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
     });
-    describe('generated report',function(){
+    describe('generated report Web',function(){
       it('should get title from generated report',function(){
         var appProfilesPage = new Reports();
         expect(appProfilesPage.getAppProfileGeneratedHeader().getText()).toContain('Application Profiles - MarketingDemo');
