@@ -232,31 +232,40 @@ class RoomController {
 		hbSession.clear()
 	}
 	
+	/**
+	 * Used to delete one or more rooms that do not have associated assets assigned to the room
+	 * @param checkbox_{roomId}
+	 */
 	def delete = {
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def project = Project.get(projectId)
-		def roomInstanceList = Room.findAllByProject( project )
-		def skippingRooms = []
-		roomInstanceList.each {roomInstance->
-			def isSelected = params["checkbox_"+roomInstance.id]
-			if (isSelected == "on") {
-				try {
-					if(AssetEntity.findByRoomSource(roomInstance) || AssetEntity.findByRoomTarget(roomInstance) || Rack.findByRoom(roomInstance)){
-						skippingRooms << roomInstance.roomName
-					} else {
-						roomInstance.racks*.delete()
-						roomInstance.delete(flush: true)
-					}
-				}
-				catch (org.springframework.dao.DataIntegrityViolationException e) {
-					flash.message = "Error occured while deleting Rack : ${roomInstance.roomName}"
-				}
+
+		def project = securityService.getUserCurrentProject()
+		def user = securityService.getUserLogin()
+
+		def roomIds = []
+
+		// Iterate over the params looking for the checkboxes that have been selected
+		params.each { n, v ->
+			if (n.startsWith('checkbox_')) {
+				if (params[n] == 'on')
+					roomIds << n.split(/_/)[1]
 			}
 		}
-		if(skippingRooms.size() > 0){
-			flash.message = "Rooms : ${skippingRooms} are not deleted as they were associated with AssetEntity or Rack"
+
+		if (! roomIds.size()) {
+			flash.message "Please select at least one room to be deleted before clicking Delete"
+		} else {
+			def s = 0
+			try {
+				def results = roomService.deleteRoom(project, user, roomIds)
+				s = results.size()
+				if (s) {
+					flash.message = "$s room${s > 1 ? 's were' : ' was'} not deleted either because ${s > 1 ? 'they were' : 'it was'} associated with devices or not found"
+				}
+			} catch (e) {
+				flash.message = "The selected room${s > 1 ? 's were' : ' was'} not deleted due to: ${e.getMessage()}"
+			}
 		}
-		userPreferenceService.removePreference("CURR_ROOM")
+
 		redirect(action: "list", params:[viewType : "list"])
 	}
 	

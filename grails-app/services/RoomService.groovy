@@ -1,12 +1,16 @@
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
+import com.tds.asset.AssetEntity
+
 import org.apache.commons.lang.math.NumberUtils 
 import org.apache.commons.lang.StringUtils
 
 class RoomService {
 	
 	boolean transactional = true
+	def securityService
+	def userPreferenceService
 
 	/**
 	 * Used to update the information about Rooms, Racks and the devices within the racks
@@ -181,6 +185,83 @@ class RoomService {
 			}
 		}
 		return room
+	}
+
+	/**
+	 * Used to delete a room, which will also delete an empty racks or room objects at the same time
+	 * @param project - the project that the room belongs to
+	 * @param user - the user that is attempting to delete the room
+	 * @param roomIds - an id or a list of ids of the room to be deleted
+	 */
+	List deleteRoom(Project project, UserLogin user, roomIds) {
+
+		if (!securityService.hasPermission(user, 'DeleteRoom')) {
+			log.warn "SECURITY : $user attempted to delete rooms without permission"
+			throw new UnauthorizedException('You do not have the necessary permission to delete rooms')
+		}
+
+		def skippedRooms = []
+		def userPrefRoom = userPreferenceService.getPreference("CURR_ROOM")
+		if (! roomIds instanceof List)
+			roomIds = [ roomIds ]
+
+		log.info "User $user is deleting room(s) $roomIds"
+
+		roomIds.each { roomId ->  
+			if ( roomId instanceof String) {
+				if (! roomId.isLong()) {
+					log.warn "SECURITY : $user attempted to delete rooms with an invalid id ($roomId), project $project"
+					throw new InvalidParamException("An invalid room id was received ($roomId)")					
+				}
+			}
+
+			def room = Room.get(roomId)
+			if (! room) {
+				skippedRooms << [roomId: 'Missing']
+				return 
+			}
+
+			if (room.project != project) {
+				log.warn "SECURITY : $user attempted to delete rooms associated to another project, room $room, project $project"
+				skippedRooms << [roomId: 'Missing']
+				return 
+			}
+
+			// Check to see if the room has any associated devices
+			// if (AssetEntity.findByRoomSource(room) || AssetEntity.findByRoomTarget(room) ) {
+			if (room.sourceAssets || room.targetAssets) {
+				skippedRooms << [roomId: 'In use']
+				return
+			}
+
+			try {
+				log.info "Deleting room $room ($roomId)"
+
+				// Delete any room objects and racks
+				room.racks.each { rack -> rack.delete(flush: true)}
+
+				// Some odd reason I was getting the following error when attemting to directly delete the room but never solved
+				// org.hibernate.hql.ast.tree.IdentNode cannot be cast to org.hibernate.hql.ast.tree.DotNode
+				//room.delete(flush: true)
+				Room.executeUpdate("delete Room r where r.id=?", [roomId.toLong()])
+
+				// Clear out the user's room preference if it was deleted
+				// TODO : JPM 9/2014 : Should delete ALL users CURR_ROOM preference when deleting a room if they exist for the room. Add to Preference service.
+				if (roomId == userPrefRoom)
+					userPreferenceService.removePreference("CURR_ROOM")
+
+			} catch (org.springframework.dao.DataIntegrityViolationException e) {
+				log.info "Unable to delete room ($room) due to integrity violation : ${e.getMessage()}"
+				skippedRooms << [roomId: 'In use']
+			} catch (e) {
+				def msg = "Error occured while deleting room ($room)"
+				log.error "$msg : ${e.getMessage()}"
+				throw new RuntimeException(msg)
+			}
+		}
+
+		return skippedRooms
+		
 	}
 
 }
