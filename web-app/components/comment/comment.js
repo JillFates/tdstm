@@ -1195,7 +1195,7 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 			};
 			commentService.getAssignedToList('', scope.commentId).then(
 				function(data) {
-					var unassigned =  {"id" : "0", "description" : "Unassigned"};
+					var unassigned =  {"id" : "0", "nameRole" : "Unassigned"};
 					var auto =  {"id" : "AUTO", "nameRole" : "Automatic"};
 					var roles = data.data;
 					
@@ -1210,6 +1210,7 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					roles.unshift(unassigned);
 
 					scope.roles = roles;
+					scope.$parent.ac.assignedTo = "0";
 					validateModel();
 				},
 				function(data) {
@@ -1314,6 +1315,7 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 					
 					roles.unshift(unassigned);
 					scope.roleTypes = roles;
+					scope.$parent.ac.role = "0";
 				},
 				function(data) {
 					alerts.showGenericMsg();
