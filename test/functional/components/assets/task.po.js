@@ -12,17 +12,25 @@ var TaskModal = function(){
   this.personTeamLabel = $('#assignedToTrEditId label[for="assignedTo"]');
   this.personField = element(by.model('ac.assignedTo'));
   this.personOptions = this.personField.$$('option');
-  this.personSelected = this.personField.$('option:checked');
+  // this.personSelected = this.personField.$('option:checked');
   this.getPersonSelected = function(){
-    return browser.executeScript('return $("[ng-model="ac.assignedTo"] option:checked").text()');
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.executeScript('return $("[ng-model=\'ac.assignedTo\'] option:checked").text()');
+    }else{
+      return this.personField.$('option:checked').getText();
+    }
   };
   this.fixedAssignedLabel = $('[for="hardAssignedEdit"]');
   this.fixedAssigned = element(by.model('ac.hardAssigned'));
   this.teamField = element(by.model('ac.role'));
   this.teamOptions = this.teamField.element(by.model('ngModel')).$$('option');
-  this.teamSelected = this.teamField.element(by.model('ngModel')).$('option:checked');
+  // this.teamSelected = this.teamField.element(by.model('ngModel')).$('option:checked');
   this.getTeamSelected = function(){
-    return browser.executeScript('return $("[ng-model=\'ac.role\'] [ng-model=\'ngModel\'] option:checked").text()');
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.executeScript('return $("[ng-model=\'ac.role\'] [ng-model=\'ngModel\'] option:checked").text()');
+    }else{
+      return this.teamField.element(by.model('ngModel')).$('option:checked').getText();
+    }
   };
   this.eventLabel = $('[for="moveEvent"]');
   this.eventField = element(by.model('ac.moveEvent'));

@@ -117,24 +117,22 @@ describe('Add Task', function(){
       expect(taskModal.personTeamLabel.getText()).toEqual('Person/Team:');
     });
 
-    xit('should have person unassigned by default', function(){
-      if (process.env.BROWSER_NAME === 'phantomjs'){
-        taskModal.getPersonSelected().then(function(op){
-          expect(op).toEqual('Unassigned'); 
-        });
-      }else{
-        expect(taskModal.personSelected.getText()).toEqual('Unassigned');
-      }
+    it('should have person unassigned by default', function(){
+      expect(taskModal.getPersonSelected()).toEqual('Unassigned');
     });
-
-    xit('should have person list empty since no person is assigned to this project', function(){
+    it('should have 2 options listed',function(){
       taskModal.personOptions.then(function(options){
-        expect(options.length).toEqual(1);
+        expect(options.length).toEqual(2);
+      });
+    });
+    it('should have Unassigned and automatic listed for persons', function(){
+      taskModal.personOptions.then(function(options){
         expect(options[0].getText()).toEqual('Unassigned');
+        expect(options[1].getText()).toEqual('Automatic');
       });
     });
 
-    describe('Fixed Assignment checkbox', function(){
+    xdescribe('Fixed Assignment checkbox', function(){
 
       it('should have fixed assignment as label',function(){
         expect(taskModal.fixedAssignedLabel.getText()).toEqual('Fixed Assignment');
@@ -144,7 +142,7 @@ describe('Add Task', function(){
         expect(taskModal.fixedAssigned.getAttribute('disabled')).toEqual('true');
       });
 
-      xit('should be unchecked if person is unassigned', function(){
+      it('should be unchecked if person is unassigned', function(){
         // This test is skip since the application is not returning the value for checked property.
         expect(taskModal.fixedAssigned.getAttribute('checked')).toEqual('false');
       });
@@ -159,21 +157,21 @@ describe('Add Task', function(){
 //         });
     describe('Team drowpdown',  function(){
 
-      xit('should have team Unassigned by default', function(){
-        if(process.env.BROWSER_NAME==='phantomjs'){
-          taskModal.getTeamSelected().then(function(op){
-            expect(op).toEqual('Unassigned');
-          });
-        }else{
-          expect(taskModal.teamSelected.getText()).toEqual('Unassigned');
-        }
+      it('should have team Unassigned by default', function(){
+        // if(process.env.BROWSER_NAME==='phantomjs'){
+        //   taskModal.getTeamSelected().then(function(op){
+        //     expect(op).toEqual('Unassigned');
+        //   });
+        // }else{
+          expect(taskModal.getTeamSelected()).toEqual('Unassigned');
+        // }
       });
        
-      xit('should have 21 options', function(){
+      it('should have 21 options', function(){
         expect(taskModal.teamOptions.count()).toEqual(21);
       });
       
-      xit('should have the following options' ,function(){
+      it('should have the following options' ,function(){
         var values = ['0', 'ACCT_MGR','APP_COORD','AUTO','DB_ADMIN','DB_ADMIN_MS','DB_ADMIN_ORA','CLEANER',
         'MIG_ANALYST','MIG_LEAD','MOVE_MGR','MOVE_TECH', 'MOVE_TECH_SR', 'NETWORK_ADMIN','PROJ_ADMIN','PROJ_MGR','STOR_ADMIN',
         'SYS_ADMIN', 'SYS_ADMIN_LNX', 'SYS_ADMIN_WIN','TECH'];
@@ -192,18 +190,12 @@ describe('Add Task', function(){
 
     });//Team dropdown
 
-    xit('Should be selected Project Manager team',function(){
+    it('Should be selected Project Manager team',function(){
       taskModal.teamOptions.get(13).click();
-      if(process.env.BROWSER_NAME==='phantomjs'){
-        taskModal.getTeamSelected().then(function(op){
-          expect(op).toEqual('Network Admin');
-        });
-      }else{
-        expect(taskModal.teamSelected.getAttribute('value')).toEqual('NETWORK_ADMIN');
-      }
+      expect(taskModal.getTeamSelected()).toEqual('Network Admin');
     });
 
-    it('should not enable fixed assignment check if team is assigned', function(){
+    xit('should not enable fixed assignment check if team is assigned', function(){
       expect(taskModal.fixedAssigned.getAttribute('disabled')).toEqual('true');
     });
 
