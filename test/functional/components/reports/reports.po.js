@@ -3,6 +3,40 @@ var Reports = function(){
   this.getPageTitle = function(){
     return browser.driver.findElement(by.css('h1')).getText();
   };
+//Report summary Starts  
+  this.getPageTitlesLength = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("h1").length');
+    }else{
+      return browser.driver.findElements(by.css('h1')).then(function(list){
+        return list.length;
+      });
+    }
+  };
+  this.getPageTitlesList = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("h1")');
+    }else{
+      return browser.driver.findElements(by.css('h1'));
+    }
+  };
+  this.getReportsListLength = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("table[style=\'border: 0\'] table tbody td a").length');
+    }else{
+      return browser.driver.findElements(by.css('table[style="border: 0"] table tbody td a')).then(function(list){
+        return list.length;
+      });
+    }
+  };
+  this.getReportsList = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("table[style=\'border: 0\'] table tbody td a")');
+    }else{
+      return browser.driver.findElements(by.css('table[style="border: 0"] table tbody td a'));
+    }
+  };
+  //Report summary ends
 //Generate Reports  Buttons Starts
   this.getGenerateCablingConflictBtn = function(){
     return browser.driver.findElement(by.css('[onclick="return submit_CablingQAReport(this)"]'));
@@ -156,7 +190,7 @@ var Reports = function(){
     if(process.env.BROWSER_NAME==='phantomjs'){
       return browser.driver.executeScript('return $(".buttonR input")');
     }else{
-      return browser.driver.findElement(by.css('.buttonR input'));
+      return browser.driver.findElements(by.css('.buttonR input'));
     }
   };
   this.generateTaskReport = function(option){

@@ -530,6 +530,9 @@ var Menu = function(){
       'taskReport':function(){
         that.getTaskReport().click();
       },
+      'reportSummary':function(){
+        that.getReportSummary().click();
+      },
       'preEventCheckList':function(){
         that.getReportPreEventChecklist().click();
       },
@@ -539,9 +542,6 @@ var Menu = function(){
       'assetTags':function(){
         that.getAssetTags().click();
       },
-      // 'eventTeamWorksheets':function(){
-      //   that.getEventTeamWorksheets().click();
-      // },
       'logisticsTeamWorksheets':function(){
         that.getLogisticsTeamWorksheets().click();
       },

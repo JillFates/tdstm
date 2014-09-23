@@ -59,7 +59,8 @@ exports.config = {
     '../components/reports/applicationConflicts.spec.js',
     '../components/reports/serverConflicts.spec.js',
     '../components/reports/databaseConflicts.spec.js',
-    '../components/reports/taskReport.spec.js'
+    '../components/reports/taskReport.spec.js',
+    '../components/reports/reportSummary.spec.js'
     ]
   },
 
