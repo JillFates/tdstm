@@ -45,15 +45,21 @@ class TimeUtilTests extends GrailsUnitTestCase {
 
 	public void testAgoWithInvertedTimeDuration() {
 
-		TimeDuration start = new TimeDuration(0, 30, 0, 0)
-		TimeDuration end = new TimeDuration(0, 20, 0, 0)
-		TimeDuration diff = end - start
-		assertEquals '-10m', TimeUtil.ago(diff, TimeUtil.SHORT)
+		TimeDuration est = new TimeDuration(0, 30, 0, 0)
+		TimeDuration act = new TimeDuration(0, 20, 0, 0)
+		TimeDuration delta = act - est
+		assertEquals '-10m', TimeUtil.ago(delta, TimeUtil.SHORT)
 
-		start = new TimeDuration(0, 30, 35, 0)
-		end = new TimeDuration(0, 20, 20, 0)
-		diff = end - start
-		assertEquals '-9m 45s', TimeUtil.ago(diff)
+		est = new TimeDuration(0, 30, 35, 0)
+		act = new TimeDuration(0, 20, 20, 0)
+		delta = act - est
+		assertEquals '-9m 45s', TimeUtil.ago(delta)
+
+		est = new TimeDuration(0, 1, 0, 0)
+		act = new TimeDuration(0, 0, 12, 0)
+		delta = act - est
+		assertEquals '-48s', TimeUtil.ago(delta)
+
 
 	}
 		

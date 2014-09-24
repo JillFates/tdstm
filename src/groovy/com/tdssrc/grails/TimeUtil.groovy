@@ -122,6 +122,12 @@ class TimeUtil {
 					else
 						parent -= adj
 				}
+			} else {
+				// See if we should borrow from the parent to knock it down
+				if (parent < 0 && value > 0) {
+					parent++
+					value = factor - value
+				}
 			}
 			return [value, parent]
 		}
