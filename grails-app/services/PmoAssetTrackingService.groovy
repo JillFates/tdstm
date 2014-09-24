@@ -182,7 +182,6 @@ class PmoAssetTrackingService {
 		} else if( projectAssetMap ) {
 			projectAssetMap.delete()
 		}
-		assetEntity.currentStatus = currState 
 		assetEntity.save()
 	}
 

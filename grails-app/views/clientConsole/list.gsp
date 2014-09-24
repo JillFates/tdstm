@@ -250,36 +250,16 @@
 			<grid-buttons asset-id="${assetEntity.id}" asset-type="${assetEntity.asset.assetType}" tasks="${assetEntity.tasksStatus}" comments="${assetEntity.commentsStatus}"></grid-buttons>
 			</td>
 			<td  id="${assetEntity.id}_column1">
-				<g:if test="${columns?.column1.field != 'currentStatus'}">
-					${assetEntity.asset[columns?.column1.field]}&nbsp;
-				</g:if>
-				<g:else>
-					${assetEntity.currentStatus}&nbsp;
-				</g:else>
+				${assetEntity.asset[columns?.column1.field]}&nbsp;
 			</td>
 			<td id="${assetEntity.id}_column2">
-				<g:if test="${columns?.column2.field != 'currentStatus'}">
-					${assetEntity.asset[columns?.column2.field]}&nbsp;
-				</g:if>
-				<g:else>
-					${assetEntity.currentStatus}&nbsp;
-				</g:else>
+				${assetEntity.asset[columns?.column2.field]}&nbsp;
 			</td>
 			<td id="${assetEntity.id}_column3">
-				<g:if test="${columns?.column3.field != 'currentStatus'}">
-					${assetEntity.asset[columns?.column3.field]}&nbsp;
-				</g:if>
-				<g:else>
-					${assetEntity.currentStatus}&nbsp;
-				</g:else>
+				${assetEntity.asset[columns?.column3.field]}&nbsp;
 			</td>
 			<td id="${assetEntity.id}_column4">
-				<g:if test="${columns?.column4.field != 'currentStatus'}">
-					${assetEntity.asset[columns?.column4.field]}&nbsp;
-				</g:if>
-				<g:else>
-					${assetEntity.currentStatus}&nbsp;
-				</g:else>
+				${assetEntity.asset[columns?.column4.field]}&nbsp;
 			</td>
 			<td id="${assetEntity.id}_column5" nowrap="nowrap">
 			<tds:convertDateTime date="${assetEntity.asset.updated}" formate="hh:mm"
@@ -509,18 +489,6 @@
 		if(length > 0){
 			var moveEventId = $("#moveEventId").val();
 			var moveBundleName = $("#moveBundleId").val();
-			if($("#column1Attribute").val() == 'currentStatus'){ 
-				$("#"+assetTransitions[0].id+"_column1").html(assetTransitions[0].cssClass);
-			}
-			if($("#column2Attribute").val() == 'currentStatus'){ 
-				$("#"+assetTransitions[0].id+"_column2").html(assetTransitions[0].cssClass)
-			}
-			if($("#column3Attribute").val() == 'currentStatus'){ 
-				$("#"+assetTransitions[0].id+"_column3").html(assetTransitions[0].cssClass)
-			}
-			if($("#column4Attribute").val() == 'currentStatus'){ 
-				$("#"+assetTransitions[0].id+"_column4").html(assetTransitions[0].cssClass)
-			}
 			for( i=0; i<length; i++ ) {
 				var transition = assetTransitions[i];
 				$("#"+transition.id).attr("class",transition.cssClass );

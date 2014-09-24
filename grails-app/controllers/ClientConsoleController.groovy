@@ -279,7 +279,7 @@ class ClientConsoleController {
 	                    htmlTd << "<td id=\"${assetId+"_"+trans.transId}\" class=\"$cssClass tranCell\"  >&nbsp;</td>"
 	                }
 	                assetEntityList << [id: assetId, asset:it, transitions:htmlTd, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus,
-										currentStatus : it.currentStatus ? stateEngineService.getState(workflowCode,it.currentStatus) : ""]
+										currentStatus : ""]
 				}
 			}
 			

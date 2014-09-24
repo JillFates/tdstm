@@ -51,7 +51,7 @@ class AssetEntityService {
 		(AssetClass.DATABASE): [],
 		(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation', 'sourceRack',
 		// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
-		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt', 'currentStatus'
+		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
 		],
 		(AssetClass.STORAGE): [] 
 	]

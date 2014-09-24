@@ -128,7 +128,6 @@ class WorkflowService {
 									projectAssetMap.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 				    				projectAssetMap.save(flush:true)
 									
-									assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 									assetEntity.save(flush:true)
 			    				}
 								success = true
@@ -183,7 +182,6 @@ class WorkflowService {
 				    		projectAssetMapInstance.currentStateId = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 				    		projectAssetMapInstance.save(flush:true)
 							
-							assetEntity.currentStatus = Integer.parseInt(stateEngineService.getStateId( process, toState ))
 							assetEntity.save()
 	    				}
 			    		message = "Transaction created successfully"
