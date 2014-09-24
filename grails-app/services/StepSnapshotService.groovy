@@ -587,47 +587,5 @@ class StepSnapshotService {
 		def stepsList = jdbcTemplate.queryForList( stepsListQuery )
 		return stepsList
 	}
-	/*-------------------------------------------------------------------------
-	 * Background function to process the snapshots for all the move events and Bundles
-	 * This functions runs by quartz job periodically (every 120 seconds) and checks for inProgress flags on Move Events. 
-	 * If no flags, do nothing. If true, initiate the snapshot function for the bundles in that move event. 
-	 * If the current time is greater than the completion time for all bundles in that event, turn off the inProgress flag.
-	 * @author : Lokanada Reddy
-	 *------------------------------------------------------------------------*/
-	def backgroundSnapshotProcess(){
-		def workflowCodes = []
-		stateEngineService.getCurrentWorkflowCodes().each{
-			workflowCodes << it
-		}
-		def moveEventsList
-		if(workflowCodes.size() > 0)
-			moveEventsList = MoveEvent.findAll("from MoveEvent m where m.project.workflowCode in (:workflowCode)", [ workflowCode: workflowCodes] )
-		
-		def now = GormUtil.convertInToGMT( "now", "EDT" );
-		
-		moveEventsList.each{ event ->
-			def planTimes = event.getEventTimes()
-			if(!planTimes.completion)
-				return  // next event
-			
-			// stop the process if current time is greater than event completion time
-			if(now.getTime() > planTimes.completion?.getTime()){
-				event.inProgress = "false"
-				event.save(flush:true)
-				return;
-			}
-			//	start the process if current time in betweeen the event start and completion times.
-			if(event.inProgress == "auto" && now.getTime() >= planTimes.start?.getTime() && now.getTime() < planTimes.completion?.getTime() ){
-					event.inProgress = "true"
-					event.save(flush:true)
-			}
-			// Run the process if event is active
-			if(event.inProgress == "true"){
-				def moveBundlesList = MoveBundle.findAllByMoveEvent( event )
-				moveBundlesList.each{ bundle ->
-					process(bundle.id)
-				}
-			}
-		} // end of event loop
-	}// end of function
+
 }
