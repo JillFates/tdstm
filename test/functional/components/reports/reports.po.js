@@ -203,5 +203,26 @@ var Reports = function(){
       buttons[op[option]].click();
     });
   };
+  //pre-Event Checklist
+  this.getOutputWeb = function(){
+    return browser.driver.findElement(by.id('web'));
+  };
+  this.generatePreEventChecklistBtn = function(){
+    return browser.driver.findElement(by.css('[onclick="return verifyEvent();"]'));
+  };
+  this.getPreEventCheckGeneratedReportHeader = function(){
+    return browser.driver.findElement(by.css('.main_bottom div div b'));
+  };
+  // transport worksheet
+  this.generateTransportWorksheetBtn = function(){
+    return browser.driver.findElement(by.css('[onclick="return submit_transportationAssetReport(this)"]'));
+  };
+  // Application Migration Results
+  this.generateApplicationMigrationBtn = function(){
+    return browser.driver.findElement(by.id('applicationMigrationButton'));
+  };
+  this.getMoveBundleLabel = function(){
+    return browser.driver.findElement(by.css('[for="moveBundle"]'));
+  };
 };
 module.exports = Reports;

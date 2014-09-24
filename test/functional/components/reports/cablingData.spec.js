@@ -75,18 +75,14 @@ describe('Cabling Data Report',function(){
         });
       });
     }); // Cable type dropdown
-
+  
+  describe('generate Pdf',function(){
     it('should generate the report after click on generate button', function(){
       var cablingConflictPage = new Reports();
       cablingConflictPage.generateCablingDataBtn().click();
-      // expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
     });
-    xit('should get message empty',function(){
-      // tm-3128 throws exception
-      var cablingConflictPage = new Reports();
-      expect(cablingConflictPage.getMessage().getText()).toEqual('');
-    });
-
+  }); //generate pdf
+  
   }); // set report Criteria and generate it
 
 }); //Cabling Conflict Report

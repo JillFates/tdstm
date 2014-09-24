@@ -76,10 +76,9 @@ describe('Cabling Conflict Report',function(){
       });
     }); // Cable type dropdown
 
-    it('should generate the report after click on generate button', function(){
+    it('should click on generate button', function(){
       var cablingConflictPage = new Reports();
       cablingConflictPage.getGenerateCablingConflictBtn().click();
-      // expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
     });
 
   }); // set report Criteria and generate it
