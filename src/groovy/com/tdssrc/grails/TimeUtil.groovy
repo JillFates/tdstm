@@ -95,30 +95,61 @@ class TimeUtil {
 	 * @examples
 	 *     3d 4h 10m
 	 *     3-days 4-hrs 10-min
+	 *     10-min 5-sec
 	 *     3-days 4-hours 10-minutes 
 	 */ 
-	public static String ago(TimeDuration duration, String format=SHORT) {		
-		int days=duration.getDays()
-		int hours=duration.getHours()
-		int minutes=duration.getMinutes()
-		int seconds=duration.getSeconds()
+	public static String ago(TimeDuration duration, String format=SHORT) {	
 		StringBuffer ago = new StringBuffer()
 		String space = ''
 
-        if (days > 0) {
+		def days = duration.getDays()
+		def hours = duration.getHours()
+		def minutes = duration.getMinutes()
+		def seconds = duration.getSeconds()
+
+		// local closure to do the borrowing math on the d:h:m:s appropriately
+		def adjustForNegative = { ggrand, grand, parent, value, factor -> 
+			if (value < 0) {
+				if (ggrand == 0 && grand == 0 && parent == 0 ) {
+					// We stop borrowing and just flip the value from negative to positive
+					value *= -1
+				} else { 
+					// Borrow from the parent
+					int adj = value.intdiv(factor) + 1
+					value = factor + value
+					if (parent < 0)
+						parent += adj
+					else
+						parent -= adj
+				}
+			}
+			return [value, parent]
+		}
+
+		if (days < 0 || hours < 0 || minutes < 0 || seconds < 0) {
+			(seconds, minutes) = adjustForNegative(days, hours, minutes, seconds, 60)
+			(minutes, hours) = adjustForNegative(0, days, hours, minutes, 60)
+			(hours, days) = adjustForNegative(0, 0, days, hours, 60)
+
+			ago.append('-')
+		}
+
+        if (days != 0) {
         	ago.append("${days}${ ( format == SHORT ? 'd' : ( '-day' + (days == 1 ? '' : 's') ) ) }")
         } 
-        if (hours > 0) {
-			space = (ago.length() > 0 ? ' ' : '')
+        // Hours
+        if (hours != 0) {
+			space = (ago.length() > 1 ? ' ' : '')
 			ago.append("${space}${hours}${ ( format == SHORT ? 'h' : ( format==FULL ? '-hour' : '-hr' ) + ( hours == 1 ? '' : 's') ) }") 
         }
-        if ( (days > 0 && minutes > 0) || (days < 1 && hours > 0) || minutes > 0 ) {
-			space = (ago.length() > 0 ? ' ' : '')
+        // Minutes
+        if ( days == 0 && minutes > 0 ) {
+			space = (ago.length() > 1 ? ' ' : '')
 			ago.append("${space}${minutes}${ ( format == SHORT ? 'm' : ( format==FULL ? '-minute' : '-min' ) + (minutes == 1 ? '' : 's') ) }") 
         } 
-        // Only show seconds if hr min sec where sec > 0 or min sec
-        if ( (days < 1 && seconds > 0) || (days < 1 && hours < 1) ) {
-			space = (ago.length() > 0 ? ' ' : '')
+        // Only show seconds if day/hr are zero
+        if ( days == 0 && hours == 0 && seconds > 0 ) {
+			space = (ago.length() > 1 ? ' ' : '')
 			ago.append("${space}${seconds}${ ( format == SHORT ? 's' : ( format==FULL ? '-second' : '-sec' ) + (seconds == 1 ? '' : 's') ) }") 
         }
 
