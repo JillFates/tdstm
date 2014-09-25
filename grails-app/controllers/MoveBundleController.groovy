@@ -545,7 +545,7 @@ class MoveBundleController {
 		def allServerCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
 		def physicalCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes()] )[0]		
 		def virtualCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]	
-		def otherAssetCount= AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes()] )[0]
+		def otherAssetCount = AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes()] )[0]
 
  		// Get the list of apps and servers assigned to planning bundles
 		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs) 
@@ -662,7 +662,7 @@ class MoveBundleController {
 		// Get the Others Count
 		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND " +
 			"$unassignedMBQuery AND COALESCE(ae.assetType,'') NOT IN (:type)"
-		def unassignedOtherCount = AssetEntity.executeQuery(unAssignedOtherCountQuery, assetCountQueryArgs + [ type:AssetType.getAllServerTypes() ] )[0]
+		def unassignedOtherCount = AssetEntity.executeQuery(unAssignedOtherCountQuery, assetCountQueryArgs + [ type:AssetType.getNonOtherTypes() ] )[0]
 
 		// ------------------------------------
 		// Calculate the Plan Status values
