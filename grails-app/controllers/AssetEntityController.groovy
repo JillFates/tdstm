@@ -56,37 +56,42 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.ControllerUtil as CU
 
 class AssetEntityController {
 
-	def missingHeader = ""
-	int added = 0
-	def skipped = []
-	def partyRelationshipService
-	def stateEngineService
-	def workflowService
-	def userPreferenceService
-	def supervisorConsoleService
-	def assetEntityInstanceList = []
-	def jdbcTemplate
-	def filterService
-	def moveBundleService
-	def sessionFactory
 	def assetEntityAttributeLoaderService
 	def assetEntityService
 	def commentService
-	def securityService
-	def taskService
-	def projectService
+	def controllerService
+	def filterService
+	def moveBundleService
+	def partyRelationshipService
 	def personService
-	def sequenceService
 	def progressService
-	def quartzScheduler
+	def projectService
+	def securityService
+	def sequenceService
+	def sessionFactory
+	def stateEngineService
+	def supervisorConsoleService
+	def taskService
+	def userPreferenceService
 	def userService
+	def workflowService
+
+	def jdbcTemplate
+	def quartzScheduler
 	
+	def missingHeader = ""
+	int added = 0
+	def skipped = []
+	def assetEntityInstanceList = []
+
+	// TODO : JPM 9/2014 : Need to review use of customLabels as it doesn't have all of the Custom## names in its list
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
 		'Custom11','Custom12','Custom13','Custom14','Custom15','Custom16','Custom17','Custom18','Custom19','Custom20','Custom21','Custom22','Custom23','Custom24']
+	
+	// TODO : JPM 9/2014 : Need to remove the references to the team static vars bundleMoveAndClientTeams, targetTeamType, sourceTeamType, teamsByType
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
@@ -203,11 +208,11 @@ class AssetEntityController {
 			isMSIE = true
 		
 		render( view:"importExport", model : [ assetsByProject: assetsByProject,
-					projectId: projectId,
-					moveBundleInstanceList: moveBundleInstanceList,
-					dataTransferSetImport: dataTransferSetImport,
-					dataTransferSetExport: dataTransferSetExport, prefMap:prefMap,
-					dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE, message:params.message, error:params.error] )
+			projectId: projectId,
+			moveBundleInstanceList: moveBundleInstanceList,
+			dataTransferSetImport: dataTransferSetImport,
+			dataTransferSetExport: dataTransferSetExport, prefMap:prefMap,
+			dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE, message:params.message, error:params.error] )
 	}
 	/* -----------------------------------------------------
 	 * To Export the assets
@@ -1131,7 +1136,7 @@ class AssetEntityController {
 	 * @return model data to initate the asset list
 	 **/
 	def list = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -1145,7 +1150,7 @@ class AssetEntityController {
 	 * This method is used by JQgrid to load assetList
 	 */
 	def listJson = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -1245,7 +1250,7 @@ class AssetEntityController {
 	 * ------------------------------------------ */
 	def save = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -2272,11 +2277,11 @@ class AssetEntityController {
 	*/
 	def show = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def assetEntity = CU.getAssetForPage(this, project, AssetEntity, params.id, true)
+		def assetEntity = controllerService.getAssetForPage(this, project, AssetEntity, params.id)
 
 		if (!assetEntity) {
 			flash.message = "Unable to find asset within current project with id ${params.id}"
@@ -2333,11 +2338,11 @@ class AssetEntityController {
 	 * to auditEdit view
 	 */
 	def edit = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def assetEntityInstance = CU.getAssetForPage(this, project, AssetEntity, params.id, true)
+		def assetEntityInstance = controllerService.getAssetForPage(this, project, AssetEntity, params.id)
 		if (!assetEntityInstance) {
 			render '<span class="error">Unable to find asset to edit</span>'
 			return
@@ -2402,7 +2407,7 @@ class AssetEntityController {
 	 * @return : render to appropriate view
 	 */
 	def update = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -3074,7 +3079,7 @@ class AssetEntityController {
 	* Render Summary of assigned and unassgined assets.
 	*/
 	def assetSummary = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 

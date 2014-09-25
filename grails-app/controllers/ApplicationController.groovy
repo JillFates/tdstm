@@ -13,16 +13,18 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.ControllerUtil as CU
 
 class ApplicationController {
-	def partyRelationshipService
+
 	def assetEntityService
-	def taskService
-	def securityService
-	def userPreferenceService
-	def jdbcTemplate
+	def controllerService
+	def partyRelationshipService
 	def projectService
+	def securityService
+	def taskService
+	def userPreferenceService
+
+	def jdbcTemplate
 	
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
@@ -35,7 +37,7 @@ class ApplicationController {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -252,7 +254,7 @@ class ApplicationController {
 
 	def save = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -296,11 +298,11 @@ class ApplicationController {
 
 	def show = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def applicationInstance = CU.getAssetForPage(this, project, Application, params.id, true)
+		def applicationInstance = controllerService.getAssetForPage(this, project, Application, params.id)
 
 		if (!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
@@ -340,11 +342,11 @@ class ApplicationController {
 	 * to auditEdit view
 	 */
 	def edit = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def applicationInstance = CU.getAssetForPage(this, project, Application, params.id, true)
+		def applicationInstance = controllerService.getAssetForPage(this, project, Application, params.id)
 
 		if(!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
@@ -379,7 +381,7 @@ class ApplicationController {
 	}
 
 	def update = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 

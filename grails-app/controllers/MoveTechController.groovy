@@ -10,6 +10,8 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
+import grails.converters.JSON
+
 class MoveTechController {
     def shiroSecurityManager
     def userPreferenceService
@@ -1351,17 +1353,20 @@ class MoveTechController {
 		return asset 
 	}
     
-    /*----------------------------------------------------------
-	* To load the installed printers into session
-	* @author : Lokanath Reddy
-	*---------------------------------------------------------*/
+    /**
+	* An Ajax service method used to load the installed printers into session
+	* TODO : JPM 9/2014 : Determine if setPrintersIntoSession method is even necessary / remove when we get rid of ActiveX control
+	* @param params.dropdown - list of printers
+	*/
     def setPrintersIntoSession = {
 		def printers 
-		if(params.dropdown){
+		if (params.dropdown) {
 			printers = params.dropdown.split(",")
 		}
     	session.setAttribute( "PRINTERS", printers)
+    	render(ServiceResults.success() as JSON)
     }
+
     /*----------------------------------------------------------------------------------
      * @author Lokanath Reddy
      * @param  String assetTag, project,bundle

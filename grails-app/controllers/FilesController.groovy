@@ -20,12 +20,12 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
-import com.tdssrc.grails.ControllerUtil as CU
 
 class FilesController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	def assetEntityService
+	def controllerService
 	def taskService
 	def securityService
 	def userPreferenceService
@@ -40,7 +40,7 @@ class FilesController {
 		def filters = session.FILES?.JQ_FILTERS
 		session.FILES?.JQ_FILTERS = []
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -235,7 +235,7 @@ class FilesController {
 
 	def save = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -264,11 +264,11 @@ class FilesController {
 
 	def show = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def filesInstance = CU.getAssetForPage(this, project, Files, params.id, true)
+		def filesInstance = controllerService.getAssetForPage(this, project, Files, params.id)
 
 		if (!filesInstance) {
 			flash.message = "Storage not found with id ${params.id}"
@@ -286,11 +286,11 @@ class FilesController {
 	}
 
 	def edit = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def fileInstance = CU.getAssetForPage(this, project, Files, params.id, true)
+		def fileInstance = controllerService.getAssetForPage(this, project, Files, params.id)
 		if (!fileInstance) {
 			render '<span class="error">Unable to find file to edit</span>'
 			return
@@ -306,7 +306,7 @@ class FilesController {
 	}
 
 	def update = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 

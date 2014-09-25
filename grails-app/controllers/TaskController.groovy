@@ -16,7 +16,7 @@ import org.apache.commons.lang.math.NumberUtils
 class TaskController {
 	
 	def commentService
-	// def controllerService
+	def controllerService
 	def runbookService
 	def securityService
 
@@ -934,13 +934,7 @@ digraph runbook {
 		Boolean showAll = (params.showAll == 'true')
 		String meId = params.eventId	
 
-		MoveEvent me = MoveEvent.read(meId.toLong())
-		if (! me) {
-			render "Unable to find event $meId"
-			return
-		}
-		/*
-		def (user, project) = controllerService.getUserAndProjectForPage( this )
+		def (project, user) = controllerService.getProjectAndUserForPage( this )
 		if (! project) 
 			return
 
@@ -949,7 +943,6 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		*/
 
 		def startTime = 0
 		def tasks, deps, dfsMap, durMap, graphs,estFinish

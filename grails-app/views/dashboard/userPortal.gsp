@@ -25,6 +25,10 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
+<g:if test="${flash.message}">
+<div class="message">${flash.message}</div>
+</g:if>
+
 <a name="page_up"></a>
 <div id="doc" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<!-- Body Starts here-->

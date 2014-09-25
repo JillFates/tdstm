@@ -18,7 +18,6 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.ControllerUtil as CU
 
 class DataTransferBatchController {
 
@@ -26,6 +25,7 @@ class DataTransferBatchController {
 	def sessionFactory
 	def assetEntityService
 	def assetEntityAttributeLoaderService
+	def controllerService
 	def importService
 	def jdbcTemplate
 	def securityService
@@ -34,7 +34,8 @@ class DataTransferBatchController {
 
 	def messageSource
 
-	// Data used within some of the controller methods
+	// Data used within some of the controller methods static vars bundleMoveAndClientTeams and bundleTeamRoles
+	// TODO : JPM 9/2014 : Need to remove the 
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static bundleTeamRoles = ['sourceTeamMt':'MOVE_TECH','targetTeamMt':'MOVE_TECH',
 		'sourceTeamLog':'CLEANER','targetTeamLog':'CLEANER',
@@ -101,7 +102,7 @@ class DataTransferBatchController {
 	 */
 	def deviceProcess = {
 		def message
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 

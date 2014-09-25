@@ -107,7 +107,8 @@ select {
     border: 1px solid #C7E693;
     color: #006dba;
     margin: 10px 0 5px 0;
-    padding: 5px 5px 5px 30px
+    padding: 5px 5px 5px 30px;
+    text-align: left;
 }
 
 div.errors {

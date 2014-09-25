@@ -18,7 +18,6 @@ import com.tds.asset.Files
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
-import com.tdssrc.grails.ControllerUtil as CU
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -28,7 +27,8 @@ import com.tdsops.tm.enums.domain.AssetDependencyStatus
 class DatabaseController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-	def assetEntityService  
+	def assetEntityService
+	def controllerService  
 	def taskService 
 	def securityService
 	def jdbcTemplate
@@ -43,7 +43,7 @@ class DatabaseController {
 		def filters = session.DB?.JQ_FILTERS
 		session.DB?.JQ_FILTERS = []
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -219,11 +219,11 @@ class DatabaseController {
 	
 	def show = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def databaseInstance = CU.getAssetForPage(this, project, Database, params.id, true)
+		def databaseInstance = controllerService.getAssetForPage(this, project, Database, params.id)
 
 		if (!databaseInstance) {
 			flash.message = "Database not found with id ${params.id}"
@@ -260,7 +260,7 @@ class DatabaseController {
 	
 	def save = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
@@ -290,11 +290,11 @@ class DatabaseController {
      }
 
 	def edit = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 			
-		def databaseInstance = CU.getAssetForPage(this, project, Database, params.id, true)
+		def databaseInstance = controllerService.getAssetForPage(this, project, Database, params.id)
 		if (!databaseInstance) {
 			render '<span class="error">Unable to find Database asset to edit</span>'
 			return
@@ -308,7 +308,7 @@ class DatabaseController {
 	}
 	
 	def update = {
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 

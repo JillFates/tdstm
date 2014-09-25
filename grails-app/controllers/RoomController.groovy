@@ -8,11 +8,11 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.ControllerUtil as CU
 
 class RoomController {
 
 	def assetEntityService
+	def controllerService
 	def roomService
 	def securityService
 	def taskService
@@ -26,18 +26,9 @@ class RoomController {
 	}
 
 	def list = {
-		def viewName = 'Room List'
-		def project = CU.getProjectForPage( this )
+		def (project, user) = controllerService.getProjectAndUserForPage( this, 'RackMenuView' )
 		if (! project) 
 			return
-
-		// Check user permissions
-		def userLogin = securityService.getUserLogin()
-		if ( ! securityService.hasPermission(userLogin, 'RackMenuView')) {
-			log.warn "SECURITY : User $userLogin attempted to access $viewName without proper permissions"
-			CU.redirectToDefaultPage(this, "Sorry but you do not have permission to access the $viewName")
-			return
-		}
 
 		def projectId = project.id
 

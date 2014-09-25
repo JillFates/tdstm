@@ -10,17 +10,17 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.ControllerUtil as CU
 import org.apache.commons.lang.math.NumberUtils
 
 class RackLayoutsController {
-	def userPreferenceService
-	def jdbcTemplate
-	def supervisorConsoleService
-	def sessionFactory
-	def taskService
 	def assetEntityService
+	def controllerService
+	def jdbcTemplate
 	def securityService
+	def sessionFactory
+	def supervisorConsoleService
+	def taskService
+	def userPreferenceService
 	
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	
@@ -82,7 +82,7 @@ class RackLayoutsController {
 	
 	def save = {
 
-		def project = CU.getProjectForPage( this )
+		def project = controllerService.getProjectForPage( this, 'RoomEditView' )
 		if (! project) 
 			return
 

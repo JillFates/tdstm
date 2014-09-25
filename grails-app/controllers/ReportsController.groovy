@@ -29,22 +29,22 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.ControllerUtil as CU
-import com.tds.util.workbook.*;
+import com.tds.util.workbook.*
 
 class ReportsController {
 	
-	def partyRelationshipService
 	def assetEntityAttributeLoaderService
-	def userPreferenceService
+	def assetEntityService
+	def controllerService
 	def jdbcTemplate
-	def supervisorConsoleService 
+	def moveBundleService
+	def moveEventService
+	def partyRelationshipService
+	def projectService
 	def reportsService
 	def securityService
-	def moveEventService
-	def moveBundleService
-	def projectService
-	def assetEntityService
+	def supervisorConsoleService 
+	def userPreferenceService
 
 	def index = { 
 		render(view:'index')
@@ -52,7 +52,7 @@ class ReportsController {
 	
 	// Generate Report Dialog
 	def getBundleListForReportDialog = {
-		def projectInstance = CU.getProjectForPage( this )
+		def projectInstance = controllerService.getProjectForPage( this )
 		if (! projectInstance) 
 			return
 
