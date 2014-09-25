@@ -136,7 +136,7 @@ a:hover {
 						</tr>
 						<tr class="even">
 							<td>
-								<g:link controller="testCase" action="testRBO" params="[eventId:0]" style="color:black">Task Critical Path Calculator</g:link>
+								<g:link controller="task" action="eventTimelineResults" params="[eventId:0, showAll:'false']" style="color:black">Task Critical Path Calculator</g:link>
 							</td>
 							<td>
 								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 

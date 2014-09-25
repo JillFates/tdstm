@@ -1,22 +1,25 @@
-import grails.converters.JSON
-
 import com.tds.asset.AssetComment
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.GormUtil
-import org.apache.commons.lang.StringEscapeUtils
-import com.tdssrc.grails.TimeUtil
 import com.tds.asset.TaskDependency
-import org.apache.commons.lang.math.NumberUtils
-import java.text.SimpleDateFormat
-import groovy.time.TimeCategory
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.TimeUtil
+
+import grails.converters.JSON
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
+import java.text.SimpleDateFormat
+import org.apache.commons.lang.StringEscapeUtils
+import org.apache.commons.lang.math.NumberUtils
 
 class TaskController {
 	
-	def securityService
-	def runbookService
 	def commentService
+	// def controllerService
+	def runbookService
+	def securityService
+
 	def taskService
 	def userPreferenceService
 	def jdbcTemplate
@@ -918,6 +921,178 @@ digraph runbook {
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
+	}
+
+	/**
+	 * Simply a test page for the runbook optimization
+	 * @param params.eventId - the event id to generate the data for or default to the user's current event
+	 * @param params.showAll - flag to indicate including all columns of just the planning ones (true|false)
+	 */
+	def eventTimelineResults = {
+
+		// Get the form parameters
+		Boolean showAll = (params.showAll == 'true')
+		String meId = params.eventId	
+
+		MoveEvent me = MoveEvent.read(meId.toLong())
+		if (! me) {
+			render "Unable to find event $meId"
+			return
+		}
+		/*
+		def (user, project) = controllerService.getUserAndProjectForPage( this )
+		if (! project) 
+			return
+
+		MoveEvent me = controllerService.getEventForPage(this, project, user, meId) 
+		if (! me) {
+			render "Unable to find event $meId"
+			return
+		}
+		*/
+
+		def startTime = 0
+		def tasks, deps, dfsMap, durMap, graphs,estFinish
+
+		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $me</h1>")
+
+		try {
+			tasks = runbookService.getEventTasks(me)
+			deps = runbookService.getTaskDependencies(tasks)
+			def tmp = runbookService.createTempObject(tasks, deps)
+
+			dfsMap = runbookService.processDFS( tasks, deps, tmp )
+			durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
+			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
+			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
+
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+
+			results.append("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
+			results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
+			results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
+			results.append("Cyclical Maps: ")
+			
+			def cyclicals = [:]
+			dfsMap.cyclicals.each {
+				cyclicals.put(it.key, it.value.stack)
+			}
+			
+			// results.append(dfsMap.cyclicals)
+			if (dfsMap.cyclicals?.size()) {
+				results.append('<ol>')
+				dfsMap.cyclicals.each { c ->
+					def task = c.value.loopback
+					results.append("<li> Circular Reference Stack: <ul>")
+					// def marker = ''
+					c.value.stack.each { cycTaskId ->
+						task = tasks.find { it.id == cycTaskId }
+						results.append("<li>$task.taskNumber $task.comment")
+					}
+					results.append(" >> $c.value.loopback.taskNumber $c.value.loopback.comment</li>")
+					results.append('</ul>')
+				}
+				results.append('</ol>')
+			} else {
+				results.append('none')
+			}
+			results.append('<br/>')
+			results.append("Pass 1 Elapsed Time: ${dfsMap.elapsed}<br/>")
+			results.append("Pass 2 Elapsed Time: ${durMap.elapsed}<br/>")
+
+			results.append("<b>Estimated Runbook Duration: ${estFinish} for Move Event: $me</b><br/>")
+
+			/*
+			results.append("<h1>Edges data</h1><table><tr><th>Id</th><th>Predecessor Task</th><th>Successor Task</th><th>DS Task Count</th><th>Path Duration</th></tr>")
+			deps.each { dep ->
+				results.append("<tr><td>${dep.id}</td><td>${dep.predecessor}</td><td>${dep.successor}</td><td>${dep.downstreamTaskCount}</td><td>${dep.pathDuration}</td></tr>")
+			}
+			results.append('</table>')
+			*/
+
+			def durationExtra = ''
+			def timesExtra = ''
+			def tailExtra = ''
+
+			if (showAll) {
+				durationExtra = "<th>Act Duration</th><th>Deviation</th>"
+				timesExtra = "<th>Act Start</th>"
+				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th>"
+			}
+
+			results.append("""<h1>Tasks Details</h1>
+				<table>
+					<tr><th>Id</th><th>Task #</th><th>Action</th> 
+					<th>Est Duration</th>
+					$durationExtra
+					<th>Earliest Start</th><th>Latest Start</th><th>Constraint Time</th>
+					$timesExtra
+					<th>Act Finish</th><th>Priority</th><th>Critical Path</td><th>Team</th><th>Individual</th><th>Category</th>
+					$tailExtra
+					</tr>""")
+
+			tasks.each { t ->
+
+				def person = t.assignedTo ?: ''
+				def team = t.role ?: ''
+				def constraintTime = ''
+				def actStart = ''
+				def actFinish = ''
+				TimeDuration actDuration
+				def deviation = ''
+				def actual=''
+
+				if (t.constraintTime) {
+					constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) + " ${t.constraintType}"
+				}
+				if (t.actStart) {
+					actStart = formatter.format(TimeUtil.convertInToUserTZ(t.actStart, tzId))
+				}
+				if (t.actFinish) {
+					actFinish = formatter.format(TimeUtil.convertInToUserTZ(t.actFinish, tzId))
+				}
+
+				if (t.actStart && t.actFinish) {
+					actDuration = TimeUtil.elapsed(t.actStart, t.actFinish)
+					TimeDuration estDuration = new TimeDuration(0, t.durationInMinutes(), 0, 0)
+					TimeDuration delta = actDuration.minus(estDuration)
+					deviation = TimeUtil.ago(delta)
+					actual = TimeUtil.ago(actDuration)
+				} else {
+					actual = ''
+					deviation = ''
+				}
+
+				durationExtra = ''
+				timesExtra = ''
+				tailExtra = ''
+				if (showAll) {
+					durationExtra = "<td>$actual</td><td>$deviation</td>"
+					timesExtra = "<td>$actStart</td>"
+					tailExtra = "<td>${t.taskSpec}</td><td>${t.hardAssigned==1 ? 'Yes' : ''}</td><td>${t.resolvedBy ?: ''}</td>"
+				}
+
+				// TODO : add in computation for time differences if both constraint time est and/or actual
+	 
+	 			def criticalPath = (t.duration > 0 && tmp['tasks'][t.id].tmpEarliestStart == tmp['tasks'][t.id].tmpLatestStart ? 'Yes' : '&nbsp;')
+
+				results.append( """<tr>
+					<td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td>
+					${durationExtra}
+					<td>${tmp['tasks'][t.id].tmpEarliestStart}</td><td>${tmp['tasks'][t.id].tmpLatestStart}</td><td>$constraintTime</td>
+					${timesExtra}
+					<td>$actFinish</td><td>${t.priority}</td><td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</td>
+					$tailExtra
+					</tr>""")
+			}
+			results.append('</table>')
+		} catch (e) {
+			results.append("<h1>Unable to complete computation</h1>${e.getMessage()}")
+		}
+		
+		render results.toString()
+
 	}
 
 }
