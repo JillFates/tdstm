@@ -190,7 +190,7 @@
                             	 </td>
                             	 <td valign="top" class="value" >
                             	     <input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''} />
-                            	 	 &nbsp; ${role.help ? role.help + '&nbsp;:' : ''} &nbsp;
+                            	 	 &nbsp; ${role.help ? role.help : ''} &nbsp;
                             	 </td>
                             	</tr>
                             </g:each>

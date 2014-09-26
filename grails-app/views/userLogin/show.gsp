@@ -108,7 +108,7 @@
                             	 </td>
                             	 <td valign="top" class="value" >
                             	     <input type="checkbox" id="${role.id}" name="assignedRole"  value="${role.id}" disabled="disabled" ${assignedRoles.id.contains(role.id) ? 'checked="checked"' : ''} />
-                            	 	 &nbsp; ${role.help ? role.help + '&nbsp;:' : ''}
+                            	 	 &nbsp; ${role.help ? role.help : ''}
                             	 </td>
                             	</tr>
                          </g:each>

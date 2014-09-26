@@ -222,7 +222,7 @@
                             	 </td>
                             	 <td valign="top" class="value" >
                             	     <input type="checkbox" name="assignedRole"  value="${role.id}" />
-                            	 	 &nbsp; ${role.help ? role.help + '&nbsp;:' : ''} &nbsp;
+                            	 	 &nbsp; ${role.help ? role.help : ''} &nbsp;
                             	 </td>
                             	</tr>
                             </g:each>
