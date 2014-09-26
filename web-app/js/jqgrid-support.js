@@ -83,7 +83,7 @@ function resizeGrid (gridId) {
  */
 function validateMergeCount() {
 	var checkedLen = $('.cbox:checkbox:checked').length
-	if(checkedLen > 1 && checkedLen < 5) {
+	if(checkedLen > 1 && checkedLen < 11) {
 		$("#compareMergeId").removeAttr("disabled")
 	} else {
 		$("#compareMergeId").attr("disabled","disabled")
