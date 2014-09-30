@@ -199,6 +199,34 @@ tds.core.interceptor.LoggedCheckerInterceptor = function() {
 	return servicesInterceptor;
 };
 
+function _goToLogin(url) {
+	setTimeout(function() {
+		location.href = url;
+	}, 500);
+}
+
+$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+	var success = options.success;
+    options.success = function(data, textStatus, xhr) {
+    	var url = xhr.getResponseHeader('X-Login-URL');
+        if (url) {
+        	alert("Your session has expired and need to login again.");
+        	_goToLogin(url);
+            return;
+        } else {
+            $('#messageDiv').html(xhr.status == 200 ? data  : "Unexpected error occurred");                   
+        }
+        
+        if(typeof(success) === "function") return success(data, textStatus, jqXHR);
+    };
+    
+    var error = options.error;
+    options.error = function(jqXHR, textStatus, errorThrown) {
+    	$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
+        if(typeof(error) === "function") return error(jqXHR, textStatus, errorThrown);
+    };
+});
+
 /**
  * Intercepector used to check if there are a penging request, it works in conjuntions with the LoadingIndicator directive
  */
