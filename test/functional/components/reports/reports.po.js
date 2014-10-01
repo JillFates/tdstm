@@ -224,5 +224,48 @@ var Reports = function(){
   this.getMoveBundleLabel = function(){
     return browser.driver.findElement(by.css('[for="moveBundle"]'));
   };
+  //Issue report
+  this.getSortReportByLabel = function(){
+    return browser.driver.findElement(by.css('.name[nowrap="nowrap"] label'));
+  };
+  this.getSortReportBySelected = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+     return browser.driver.executeScript('return $("#sortOrder option:checked").text()');
+    }else{
+     return browser.driver.findElement(by.css('#sortOrder option:checked')).getText();
+    }
+  };
+  this.getSortReportByOptionsLength = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("#sortOrder option").length');
+    }else{
+      return browser.driver.findElements(by.css('#sortOrder option')).then(function(list){
+        return list.length;
+      });
+    }
+  };
+  this.getSortReportByOptions = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("#sortOrder option")');
+    }else{
+      return browser.driver.findElements(by.css('#sortOrder option'));
+    }
+  };
+  this.getIncludeCommentInReportCheck = function(){
+    return browser.driver.findElement(by.id('commentCheck'));
+  };
+  this.getIncludeResolvedIssuesCheck = function(){
+    return  browser.driver.findElement(by.id('resolvedCheck'));
+  };
+  this.getIncludeNewsInReportCheck = function(){
+  return browser.driver.findElement(by.id('newsCheck'));
+  };
+  this.getIssueReportButtons = function(){
+    return browser.driver.findElements(by.css('.jasperButton'));
+  };
+  this.getIssueReportBtnImg = function(){
+    return browser.driver.findElements(by.css('.jasperButton img'));
+  }
 };
+
 module.exports = Reports;

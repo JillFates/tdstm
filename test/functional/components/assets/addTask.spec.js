@@ -117,15 +117,15 @@ describe('Add Task', function(){
       expect(taskModal.personTeamLabel.getText()).toEqual('Person/Team:');
     });
 
-    it('should have person unassigned by default', function(){
+    xit('should have person unassigned by default', function(){
       expect(taskModal.getPersonSelected()).toEqual('Unassigned');
     });
-    it('should have 2 options listed',function(){
+    xit('should have 2 options listed',function(){
       taskModal.personOptions.then(function(options){
         expect(options.length).toEqual(2);
       });
     });
-    it('should have Unassigned and automatic listed for persons', function(){
+    xit('should have Unassigned and automatic listed for persons', function(){
       taskModal.personOptions.then(function(options){
         expect(options[0].getText()).toEqual('Unassigned');
         expect(options[1].getText()).toEqual('Automatic');

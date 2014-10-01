@@ -6,8 +6,7 @@ describe('My Tasks page', function(){
   it('should load My tasks page after select Tasks - My Tasks', function(){
     var menu = new Menu();
     menu.goToTasks('myTasks');
-    // var myTasksPage = new MyTasks();
-    // expect(myTasksPage.titleh.getText()).toEqual('My Tasks');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/clientTeams/listTasks');
   });
 
 });

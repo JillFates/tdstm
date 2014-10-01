@@ -55,7 +55,7 @@ exports.config = {
     ],
     reports:[
     '../components/reports/applicationProfiles.spec.js',
-    // // // '../components/reports/planningReports.spec.js',
+        // // '../components/reports/planningReports.spec.js',
     '../components/reports/cablingConflict.spec.js',
     '../components/reports/cablingData.spec.js',
     '../components/reports/applicationConflicts.spec.js',
@@ -67,7 +67,8 @@ exports.config = {
     '../components/reports/loginBadges.spec.js',
     '../components/reports/assetTags.spec.js',
     '../components/reports/transportWorksheets.spec.js',
-    '../components/reports/applicationMigration.spec.js'
+    '../components/reports/applicationMigration.spec.js',
+    '../components/reports/issueReport.spec.js'
     ]
   },
 

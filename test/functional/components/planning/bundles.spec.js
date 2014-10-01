@@ -10,6 +10,9 @@ describe('Bundles', function(){
     menu.goToPlanning('listBundles');
     expect(bundlePage.getTitle().getText()).toEqual('Bundle List');
   });
+  xit('should have TBD Boundle listed', function(){
+
+  });
  
   describe('Create Page', function(){
 

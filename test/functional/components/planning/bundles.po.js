@@ -1,7 +1,6 @@
 'use strict';
 var ListBundles = function(){
   this.createBundleBtn = '[onclick="window.location.href=\'/tdstm/moveBundle/create\'"]';
-  this.titleCss = 'h1';
   // Create Bundle
   this.nameId = 'name';
   this.nameLabel =  '';
@@ -10,7 +9,7 @@ var ListBundles = function(){
   this.messageCss = '.steps_table .message';
 
   this.getTitle = function(){
-    return browser.driver.findElement(by.css(this.titleCss));
+    return browser.driver.findElement(by.css('h1'));
   };
 
 // Create Bundle
