@@ -1210,7 +1210,9 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					roles.unshift(unassigned);
 
 					scope.roles = roles;
-					scope.$parent.ac.assignedTo = "0";
+					if (!scope.$parent.ac.assignedTo || scope.$parent.ac.assignedTo == "") {
+						scope.$parent.ac.assignedTo = "0";
+					}
 					validateModel();
 				},
 				function(data) {
@@ -1299,6 +1301,22 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/staff-roles-template.html'),
 		link: function(scope, element, attrs) {
+			var validateModel = function() {
+				var exist = false;
+				var id = scope.ngModel;
+				var list = scope.roleTypes;
+				if (list.length > 0) {
+					for (var i=0; i < list.length; i++) {
+						if (list[i].id.toString() == id) {
+							exist = true;
+							break;
+						}
+					}
+				}
+				if (!exist) {
+					scope.ngModel = '';
+				}
+			};
 			commentService.getStaffRoles().then(
 				function(data) {
 					var unassigned =  {"id" : "0", "description" : "Unassigned"};
@@ -1315,7 +1333,10 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 					
 					roles.unshift(unassigned);
 					scope.roleTypes = roles;
-					scope.$parent.ac.role = "0";
+					if (!scope.$parent.ac.role || scope.$parent.ac.role == "") {
+						scope.$parent.ac.role = "0";
+					}
+					validateModel();
 				},
 				function(data) {
 					alerts.showGenericMsg();
