@@ -22,6 +22,7 @@ class AssetEntityAttributeLoaderService {
 
 	boolean transactional = true
 	def eavAttribute
+	def importService
 	def projectService
 	def rackService
 	def roomService
@@ -835,7 +836,6 @@ class AssetEntityAttributeLoaderService {
 	 */
 	def updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session, clearEvery=100) {
 		if (dataTransferValueRow % clearEvery == (clearEvery - 1)) {
-			log.debug 
 			sessionFactory.getCurrentSession().flush()
 			sessionFactory.getCurrentSession().clear()
 			 
