@@ -24,23 +24,24 @@ exports.config = {
     '../components/menu/planningMenu.spec.js',
     '../components/menu/tasksMenu.spec.js',
     '../components/menu/dashboardsMenu.spec.js',
-    '../components/menu/reportsMenu.spec.js'
+    '../components/menu/reportsMenu.spec.js',
+    '../components/reports/eventResults.spec.js'
     ],
     regression:[ //Do not change the order of these files since some test depends on others.
     // '../components/projects/showProjects.spec.js',
     '../components/admin/adminPortal.spec.js',
-    // '../components/admin/rolePermission.spec.js',
-    // '../components/admin/assetOptions.spec.js',
-    // '../components/admin/listCompanies.spec.js',
-    // '../components/admin/listStaff.spec.js',
-    // '../components/admin/listUsers.spec.js',
-    // '../components/admin/importAccounts.spec.js',
-    // '../components/admin/listWorkflow.spec.js',
-    // '../components/admin/listManufacturers.spec.js',
-    // '../components/admin/listModel.spec.js',
-    // '../components/admin/syncLibraries.spec.js',
-    // '../components/userMenu/signOut.spec.js',
-    // '../components/login/login.spec.js'
+    '../components/admin/rolePermission.spec.js',
+    '../components/admin/assetOptions.spec.js',
+    '../components/admin/listCompanies.spec.js',
+    '../components/admin/listStaff.spec.js',
+    '../components/admin/listUsers.spec.js',
+    '../components/admin/importAccounts.spec.js',
+    '../components/admin/listWorkflow.spec.js',
+    '../components/admin/listManufacturers.spec.js',
+    '../components/admin/listModel.spec.js',
+    '../components/admin/syncLibraries.spec.js',
+    '../components/userMenu/signOut.spec.js',
+    '../components/login/login.spec.js'
     ], 
     tasks:[
     '../components/tasks/myTasks.spec.js',
@@ -66,7 +67,9 @@ exports.config = {
     '../components/reports/assetTags.spec.js',
     '../components/reports/transportWorksheets.spec.js',
     '../components/reports/applicationMigration.spec.js',
-    '../componex`xnts/reports/issueReport.spec.js'
+    '../componex`xnts/reports/issueReport.spec.js',
+    '../components/reports/eventResults.spec.js',
+    '../components/reports/cablingQA.spec.js'
     ]
   },
 

@@ -265,7 +265,63 @@ var Reports = function(){
   };
   this.getIssueReportBtnImg = function(){
     return browser.driver.findElements(by.css('.jasperButton img'));
-  }
+  };
+  //Event Results start
+  this.getMoveEventLabel = function(){
+    return browser.driver.findElements(by.css('form .name label b')).then(function(list){
+      return list[0].getText();
+    });
+  } ;
+  this.getReportTypeLabel = function(){
+    return browser.driver.findElements(by.css('form .name label b')).then(function(list){
+      return list[1].getText();
+    });
+  };
+  this.getMoveEventSelected = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+     return browser.driver.executeScript('return $("[name=\'moveEvent\'] option:checked").text()');
+    }else{
+     return browser.driver.findElement(by.css('[name=\'moveEvent\'] option:checked')).getText();
+    }
+  };
+  this.getMoveEventOptionsLength = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("[name=\'moveEvent\'] option").length');
+    }else{
+      return browser.driver.findElements(by.css('[name=\'moveEvent\'] option')).then(function(list){
+        return list.length;
+      });
+    }
+  };
+  this.getMoveEventOptions = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("[name=\'moveEvent\'] option")');
+    }else{
+      return browser.driver.findElements(by.css('[name=\'moveEvent\'] option'));
+    }
+  };
+  this.getReportTypeSelected = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+     return browser.driver.executeScript('return $("[name=\'reportType\'] option:checked").text()');
+    }else{
+     return browser.driver.findElement(by.css('[name=\'reportType\'] option:checked')).getText();
+    }
+  };
+  this.getReportTypeOptionsLength = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("[name=\'reportType\'] option").length');
+    }else{
+      return browser.driver.findElements(by.css('[name=\'reportType\'] option')).then(function(list){
+        return list.length;
+      });
+    }
+  };
+  this.getReportTypeOptions = function(){
+    if(process.env.BROWSER_NAME==='phantomjs'){
+      return browser.driver.executeScript('return $("[name=\'reportType\'] option")');
+    }else{
+      return browser.driver.findElements(by.css('[name=\'reportType\'] option'));
+    }
+  };
 };
-
 module.exports = Reports;

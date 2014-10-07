@@ -494,6 +494,7 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report"]'));
   };
   this.getEventResults = function(){
+    // return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults"]'));
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults"]'));
   };
   this.getCablingQA = function(){
