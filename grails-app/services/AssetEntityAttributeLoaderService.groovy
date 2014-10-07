@@ -22,7 +22,6 @@ class AssetEntityAttributeLoaderService {
 
 	boolean transactional = true
 	def eavAttribute
-	def importService
 	def projectService
 	def rackService
 	def roomService
@@ -845,8 +844,7 @@ class AssetEntityAttributeLoaderService {
 			project = project.merge()
 		}
 
-		importService.updateProgress(session, dataTransferValueRow)
-		// session.setAttribute("TOTAL_PROCESSES_ASSETS",dataTransferValueRow)
+		session.setAttribute("TOTAL_PROCESSES_ASSETS", dataTransferValueRow)
 	}
 
 	/**

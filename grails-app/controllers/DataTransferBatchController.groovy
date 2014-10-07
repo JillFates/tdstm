@@ -110,7 +110,7 @@ class DataTransferBatchController {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
 		try {
-			message = importService.processServerImport(project, userLogin, params.batchId, session, tzId)
+			message = importService.processDeviceImport(project, userLogin, params.batchId, session, tzId)
 			log.info "deviceProcess() for batchId ${params.batchId} by user $userLogin\n " + message
 		} catch (Exception e) {
 			message = "Unable to process import : ${e.getMessage()}"

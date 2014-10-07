@@ -1,21 +1,19 @@
-
 //import org.apache.commons.lang.math.NumberUtils
 //import org.apache.commons.lang.StringUtils
 //import org.codehaus.groovy.grails.commons.GrailsClassUtils
-
 //import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetEntity
 //import com.tdssrc.eav.EavAttribute
 //import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavAttributeSet
-
 //import com.tdssrc.eav.EavEntityAttribute
 //import com.tdssrc.eav.EavEntityType
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdsops.tm.enums.domain.AssetClass
 //import com.tdsops.tm.enums.domain.SizeScale
 //import com.tdsops.tm.enums.domain.AssetCableStatus
 //import com.tdssrc.grails.DateUtil
+
+import com.tds.asset.AssetEntity
+import com.tdssrc.eav.EavAttributeSet
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 
@@ -124,7 +122,7 @@ class ImportService {
 	 * @param batchId - the id number of the batch to be processed
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 */
-	String processServerImport(Project project, UserLogin userLogin, String batchId, Object session, tzId) {
+	String processDeviceImport(Project project, UserLogin userLogin, String batchId, Object session, tzId) {
 		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, AssetClass.DEVICE, batchId)
 
 		// Fetch all of the common data shared by all of the import processes
