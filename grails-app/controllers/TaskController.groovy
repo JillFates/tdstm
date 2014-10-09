@@ -504,6 +504,8 @@ digraph runbook {
 			
 			def projectId = project.id
 			
+			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
+
 			def query = """
 				SELECT 
 				  t.asset_comment_id AS id,
@@ -526,6 +528,7 @@ digraph runbook {
 
 				//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
 				//  -- IFNULL(t.est_start,'') AS est_start
+			//log.debug "moveEventTaskGraphSvg() SQL for tasks: $query"
 
 			def tasks = jdbcTemplate.queryForList(query)
 			
