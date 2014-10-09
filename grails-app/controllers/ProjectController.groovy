@@ -28,7 +28,8 @@ class ProjectController {
 	def stateEngineService
 	def projectService
 	def securityService
-	
+	def controllerService
+
 	def index = { redirect(action:list,params:params) }
 
 	// the delete, save and update actions only accept POST requests
@@ -719,8 +720,11 @@ class ProjectController {
 	 *@return success string 
 	 */
 	def updateFieldImportance ={
+		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
+		if (! project) 
+			return
+
 		def entityType = request.JSON.entityType
-		def project = securityService.getUserCurrentProject()
 		def allConfig = request.JSON.jsonString as JSON;
 		try{
 			def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType\
@@ -763,4 +767,13 @@ class ProjectController {
 		}
 		render "success"
 	}
+
+	def showImportanceFields = {
+		render( view: "showImportance", model: [])
+	}
+
+	def editImportanceFields = {
+		render( view: "editImportance", model: [])
+	}
+
 }

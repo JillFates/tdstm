@@ -41,8 +41,8 @@
 						<tr ng-show="showSection(type.name)" class="crudTable">
 							<td>
 								<div>
-								 	<div ng-include src="'showImportance.gsp'"></div>
-									<div ng-include src="'editImportance.gsp'"></div>
+								 	<div ng-include src="'showImportanceFields'"></div>
+									<div ng-include src="'editImportanceFields'"></div>
 								</div>
 							</td>
 						</tr>

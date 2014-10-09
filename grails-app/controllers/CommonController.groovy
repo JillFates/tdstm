@@ -5,7 +5,8 @@ import com.tdsops.tm.enums.domain.EntityType;
 class CommonController {
 	def securityService
 	def projectService
-	
+	def controllerService
+
 	def index = { }
 
 	/**
@@ -40,11 +41,14 @@ class CommonController {
 	 *@return success string.
 	 */
 	def tooltipsUpdate = {
+		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
+		if (! project) 
+			return
+
 		def entityType = request.JSON.entityType
 		def helpText = request.JSON.jsonString
 		def fields = JSON.parse(request.JSON.fields);
 		def category = EntityType.getListAsCategory(entityType)
-		def project = securityService.getUserCurrentProject()
 		def result = null;
 		try{
 			def attributes = projectService.getAttributes(entityType)?.attributeCode
