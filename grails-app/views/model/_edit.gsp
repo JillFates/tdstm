@@ -241,10 +241,12 @@
 			</g:if>
 			<g:else>
 				<script type="text/javascript">
-					var usize = "${modelInstance.usize}"
-					$("#cablingPanelEdit").css("height",usize*30+'px')
+					var usize = "${modelInstance.usize}";
+					usize = (usize=="")?1:usize;
+					$("#cablingPanelEdit").css("height", (usize*30) + 'px');
 				</script>
 			</g:else>
+
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
@@ -341,7 +343,8 @@
 	//$('#connectorCount').val(${modelConnectors.size()});
 	var image = "${modelInstance.rearImage}"
 	var usize = "${modelInstance.usize}"
-	var useImage = "${modelInstance.useImage}" 
+	usize = (usize=="")?1:usize;
+	var useImage = "${modelInstance.useImage}"
 	if(!image || useImage != '1'){
 		initializeConnectors( usize, null )
 	} else {
@@ -350,7 +353,6 @@
 	$('div.connector_Left').each(function(index) {
 		$(this).attr("style","margin-left:-"+$(this).children().width()+"px");
 	});
-
 	function createConnector( type ) {
 		$("#connectorCount").val(parseInt($("#connectorCount").val()) + 1)
 		var count = $("#connectorCount").val()
@@ -383,7 +385,10 @@
 		for(j=1; j<=count; j++){
 			var matchConnectors = 0
 			for(i=1; i<=count; i++){
-				if($("#labelId"+j).val().toLowerCase() == $("#labelId"+i).val().toLowerCase()){
+				var connectorJ = $("#labelId"+j)
+				var connectorI = $("#labelId"+i)
+				if((connectorJ.length > 0) && (connectorI.length > 0) &&
+					(connectorJ.val().toLowerCase() == connectorI.val().toLowerCase())) {
 					matchConnectors = matchConnectors + 1 
 				}
 			}

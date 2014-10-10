@@ -147,7 +147,7 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanel" style="height: auto; ">
+		<div id="cablingPanel">
 			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
 			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
 			<script type="text/javascript">
@@ -156,12 +156,13 @@
 			</g:if>
 			<g:else>
 				<script type="text/javascript">
-					var usize = "${modelInstance.usize}"
-					$("#cablingPanel").css("height",usize*30)
+					var usize = "${modelInstance.usize}";
+					usize = (usize=="")?1:usize;
+					$("#cablingPanel").css("height", (usize*30) + "px" )
 				</script>
 			</g:else>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
+				<div id="sConnector${i}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
 					<div>
 					<img src="${resource(dir:'i/cabling',file:modelConnector.status+'.png')}"/>
 					</div>
@@ -186,7 +187,7 @@
 			</thead>
 			<tbody id="connectorModelBody">
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<tr id="connectorTr${i}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
+				<tr id="sConnectorTr${i}"  class="${(i % 2) == 0 ? 'odd' : 'even'}">
 					<td>${modelConnector.type}</td>
 					<td>${modelConnector.label}</td>
 					<td>${modelConnector.labelPosition}</td>
