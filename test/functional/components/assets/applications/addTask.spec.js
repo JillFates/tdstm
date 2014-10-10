@@ -1,8 +1,10 @@
 'use strict';
-var  Menu = require('../menu/menu.po.js');
-var  ListApps = require('./listApps.po.js');
-var  TaskModal = require('./task.po.js');
-var CreateAppModal = require('./createApp.po.js');
+var  Menu = require('../../menu/menu.po.js');
+var  ListApps = require('../listApps.po.js');
+var  TaskModal = require('../task.po.js');
+// var CreateAppModal = require('./createApp.po.js');
+var CreateAppModal = require('./appCreateModal.po.js');
+var ViewAppModal = require('./appViewModal.po.js');
 
 describe('Add Task', function(){
   var taskModal = new TaskModal();
@@ -32,18 +34,18 @@ describe('Add Task', function(){
 
     it('should create an app and save', function(){
       var appModal = new CreateAppModal();
-      expect(appModal.createAppTitle.getText()).toEqual('Application Detail');
+      expect(appModal.createModalTitle.getText()).toEqual('Application Detail');
       appModal.createApp(appName);
       expect(appModal.isCreateModalClosed()).toBe(true);
     });
 
     it('should displayed view Modal', function(){
-      var appModal = new CreateAppModal();
+      var appModal = new ViewAppModal();
       expect(appModal.isViewModalOpened()).toBe(true);
     });
     
     it('should close view modal', function(){
-      var appModal = new CreateAppModal();
+      var appModal = new ViewAppModal();
       appModal.closeBtn.click();
       expect(appModal.isViewModalClosed()).toBe(true);
     });

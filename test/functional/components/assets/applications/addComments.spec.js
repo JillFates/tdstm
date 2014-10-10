@@ -5,11 +5,13 @@
 // validate edit comment comal
 // validate comment list
 // validate 
-var  ListApps = require('./listApps.po.js');
-var TaskModal = require('./task.po.js');
-var CommentTaskList = require('./commentTask-list.po.js');
-var  Menu = require('../menu/menu.po.js');
-var CreateAppModal = require('./createApp.po.js');
+var  ListApps = require('../listApps.po.js');
+var TaskModal = require('../task.po.js');
+var CommentTaskList = require('../commentTask-list.po.js');
+var  Menu = require('../../menu/menu.po.js');
+// var CreateAppModal = require('./createApp.po.js');
+var CreateAppModal = require('./appCreateModal.po.js');
+var ViewAppModal = require('./appViewModal.po.js');
 describe('Comments - Application', function(){
   var appId;
   var appName= 'App Test 3 comments';
@@ -37,12 +39,12 @@ describe('Comments - Application', function(){
     });
 
     it('should displayed view Modal', function(){
-      var appModal = new CreateAppModal();
+      var appModal = new ViewAppModal();
       expect(appModal.isViewModalOpened()).toBe(true);
     });
     
     it('should close view modal', function(){
-      var appModal = new CreateAppModal();
+      var appModal = new ViewAppModal();
       appModal.closeBtn.click();
       expect(appModal.isViewModalClosed()).toBe(true);
     });

@@ -23,14 +23,11 @@ describe('Cabling Conflict Report',function(){
       it('should have bundle label', function(){
         expect(cablingConflictPage.getBundleLabel()).toEqual('Bundles:*');
       });
-
       it('should have  All bundles as default option',function(){
         expect(cablingConflictPage.getBundleSelected()).toEqual('All Bundles');
-
       });
       it('should have x options',function(){
         expect(cablingConflictPage.getBundlesOptionsLength()).toEqual(11);
-
       });
       it('should have the following options',function(){
         cablingConflictPage.getBundlesOptions().then(function(list){

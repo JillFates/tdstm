@@ -13,11 +13,13 @@ CRUD
 title Device Details
 */
 'use strict';
-var  Menu = require('../menu/menu.po.js');
-var  ListApps = require('./listApps.po.js');
-var CreateServerModal = require('./createServer.po.js');
-var  TaskModal = require('./task.po.js');
-var CommentTaskList = require('./commentTask-list.po.js');
+var  Menu = require('../../menu/menu.po.js');
+var  ListApps = require('../listApps.po.js');
+// var CreateServerModal = require('./createServer.po.js');
+var CreateServerModal = require('./devicesCreateModal.po.js');
+var ViewServerModal = require('./devicesViewModal.po.js');
+var  TaskModal = require('../task.po.js');
+var CommentTaskList = require('../commentTask-list.po.js');
 
 describe('Server list', function(){
   var appName= 'Server CTV';
@@ -42,13 +44,14 @@ describe('Server list', function(){
       var serverModal = new CreateServerModal();
 
       it('should has as title create server', function(){
-        expect(serverModal.createServerTitle.getText()).toEqual('Device Detail');
+        expect(serverModal.createModalTitle.getText()).toEqual('Device Detail');
       });
 
       it('should create a server and save and view',function(){
         var serverModal = new CreateServerModal();
         serverModal.createServer(appName);
-        expect(serverModal.isViewModalOpened()).toBe(true);
+        var viewServerModal = new ViewServerModal();
+        expect(viewServerModal.isViewModalOpened()).toBe(true);
       });
   
     }); // Create Server Modal
@@ -57,8 +60,8 @@ describe('Server list', function(){
 
   describe('add a comment',function(){
     it('should open create comment popup after click on addComment', function(){
-      var serverModal = new CreateServerModal();
-      serverModal.addCommentBtn.click();
+      var viewServerModal = new ViewServerModal();
+      viewServerModal.addCommentBtn.click();
       var taskCommenModal = new TaskModal();
       expect(taskCommenModal.editCommentModal.isPresent()).toBe(true);
     });
@@ -95,7 +98,7 @@ describe('Server list', function(){
   }); // add a Task
 
   it('should close server modal', function(){
-    var serverModal = new CreateServerModal();
+    var serverModal = new ViewServerModal();
     serverModal.closeViewModalBtn.click();
     expect(serverModal.isViewModalClosed()).toBe(true);
   });

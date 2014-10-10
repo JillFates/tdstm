@@ -7,12 +7,12 @@ exports.config = {
     test1:[
     '../components/projects/createProject.spec.js',
     '../components/planning/bundles.spec.js',
-    '../components/assets/createApp.spec.js',
-    '../components/assets/addTask.spec.js',
-    '../components/assets/addComments.spec.js'
+    '../components/assets/applications/createApp.spec.js',
+    '../components/assets/applications/addTask.spec.js',
+    '../components/assets/applications/addComments.spec.js'
     ],
     test2:[
-    '../components/assets/serverList.spec.js',
+    '../components/assets/devices/serverList.spec.js',
     '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],

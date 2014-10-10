@@ -11,9 +11,10 @@ add commentt
   
 */
 'use strict';
-var  Menu = require('../menu/menu.po.js');
-var  ListApps = require('./listApps.po.js');
-var CreateAppModal = require('./createApp.po.js');
+var  Menu = require('../../menu/menu.po.js');
+var  ListApps = require('../listApps.po.js');
+var CreateAppModal = require('./appCreateModal.po.js');
+var ViewAppModal = require('./appViewModal.po.js');
 describe('createApp', function(){
   var appName= 'App Test 1';
   var appId;
@@ -38,7 +39,7 @@ describe('createApp', function(){
     
   it('should validate Create Application modal title', function(){
     var appModal = new CreateAppModal();
-    expect(appModal.createAppTitle.getText()).toEqual('Application Detail');
+    expect(appModal.createModalTitle.getText()).toEqual('Application Detail');
   });
 
   describe('Create Application Modal', function(){
@@ -83,9 +84,10 @@ describe('createApp', function(){
     }); // type field
 
     it('should save and view', function(){
+      var viewAppModal = new ViewAppModal();
       appModal.saveBtn.click();
       expect(appModal.isCreateModalClosed()).toBe(true);
-      expect(appModal.isViewModalOpened()).toBe(true);
+      expect(viewAppModal.isViewModalOpened()).toBe(true);
     });
 
   }); // Create Application Modal
@@ -94,7 +96,8 @@ describe('createApp', function(){
     var appModal = new CreateAppModal();
 
     it('should have as title Application Detail', function(){
-      expect(appModal.viewAppTitle.getText()).toEqual('Application Detail');
+      var viewAppModal = new ViewAppModal();
+      expect(viewAppModal.viewAppTitle.getText()).toEqual('Application Detail');
     });
 
     xdescribe('displayed data set on create', function(){
@@ -114,32 +117,33 @@ describe('createApp', function(){
     }); // displayed data set on create
 
     describe('buttons', function(){
-
+      var viewAppModal = new ViewAppModal();
       it('should have Edit button', function(){
-        expect(appModal.editBtn.getAttribute('value')).toEqual('Edit');
+        expect(viewAppModal.editBtn.getAttribute('value')).toEqual('Edit');
 
       });
 
       it('should have Delete button', function(){
-        expect(appModal.deleteBtn.getAttribute('value')).toEqual('Delete');
+        expect(viewAppModal.deleteBtn.getAttribute('value')).toEqual('Delete');
       });
       it('should have add task button', function(){
-         appModal.addTaskCommentBtnList.then(function(list){
+         viewAppModal.addTaskCommentBtnList.then(function(list){
           expect(list[0].getText()).toEqual('  Add Task');
         });
       });
 
       it('should have add comment button', function(){
-         appModal.addTaskCommentBtnList.then(function(list){
+         viewAppModal.addTaskCommentBtnList.then(function(list){
           expect(list[1].getText()).toEqual('  Add Comment');
         });
       });
     }); // buttons
 
     describe('close view modal', function(){
+      var viewAppModal = new ViewAppModal();
       it('should close view modal after click on x', function(){
-        appModal.closeBtn.click();
-        expect(appModal.isViewModalClosed()).toBe(true);
+        viewAppModal.closeBtn.click();
+        expect(viewAppModal.isViewModalClosed()).toBe(true);
       });
     }); // close view modal
   }); //view application modal 

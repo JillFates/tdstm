@@ -5,6 +5,5 @@ var DatabaseList = function(){
   this.titleh = extendListApp.titleh;
   this.createDBBtn = $('input[value="Create DB"]');
   
-
 };
 module.exports = DatabaseList;
