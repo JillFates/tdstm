@@ -197,20 +197,20 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-	$("#capacityViewId").val('${capacityView}')
-	$("#createEntityView").dialog({autoOpen: false})
-	$("#showEntityView").dialog({autoOpen: false})
-    $("#editEntityView").dialog({autoOpen: false})
-    $("#editDialog").dialog({ autoOpen: false })
-    $("#createRoomDialog").dialog({ autoOpen: false })
-    $("#mergeRoomDialog").dialog({ autoOpen: false })
-    $("#listDialog").dialog({ autoOpen: false })
-    $("#cablingDialogId").dialog({ autoOpen: false })
-    $("#manufacturerShowDialog").dialog({ autoOpen: false })
-	$("#modelShowDialog").dialog({ autoOpen: false })
+	$("#capacityViewId").val('${capacityView}');
+	$("#createEntityView").dialog({autoOpen: false});
+	$("#showEntityView").dialog({autoOpen: false});
+    $("#editEntityView").dialog({autoOpen: false});
+    $("#editDialog").dialog({ autoOpen: false });
+    $("#createRoomDialog").dialog({ autoOpen: false });
+    $("#mergeRoomDialog").dialog({ autoOpen: false });
+    $("#listDialog").dialog({ autoOpen: false });
+    $("#cablingDialogId").dialog({ autoOpen: false });
+    $("#manufacturerShowDialog").dialog({ autoOpen: false });
+	$("#modelShowDialog").dialog({ autoOpen: false });
 })
-initializeRacksInRoom( [] )
-capacityView()
+initializeRacksInRoom( [] );
+capacityView();
 
 
 function updateRackPower(rackId){

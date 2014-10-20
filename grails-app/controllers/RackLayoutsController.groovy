@@ -447,7 +447,7 @@ class RackLayoutsController {
 							if (overlappedAssetsSize > 1) {
 								cabling = ( !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
-							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('"+redirectTo+"'"},'${overlapAsset?.assetType}',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('"+redirectTo+"'"},'Device',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -621,7 +621,7 @@ class RackLayoutsController {
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					else
-						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:${forWhom ? "editAudit('roomAudit','${assetDetails.source}'" : "getEntityDetails('${redirectTo}'" },'Blade',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
+						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:${forWhom ? "editAudit('roomAudit','${assetDetails.source}'" : "getEntityDetails('${redirectTo}'" },'Device',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
 				} else {
 					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>"
 					if(commit !="Print View"){
