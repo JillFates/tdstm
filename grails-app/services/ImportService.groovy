@@ -16,6 +16,7 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
+import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher
 
@@ -234,6 +235,14 @@ class ImportService {
 							// Skip the insertion
 							break
 
+						case "sourceChassis":
+							appendBladeToChassis(project, assetEntity, it.importValue, true, warnings, rowNum)
+							break
+
+						case "targetChassis":
+							appendBladeToChassis(project, assetEntity, it.importValue, false, warnings, rowNum)
+							break
+
 						// case ~/^(location|room|rack)(Source|Target)\.(.+)/:
 						case ~/(source|target)(Location|Room|Rack)/:
 							// def field = Matcher.lastMatcher[0][1]
@@ -269,12 +278,30 @@ class ImportService {
 						// Need to capitalize the disposition to form the property names correctly
 						//disposition = disposition.capitalize()
 
-						errors = deviceService.assignDeviceToLocationRoomRack(
-							assetEntity, 
-							d["${disposition}Location"],
-							d["${disposition}Room"],
-							d["${disposition}Rack"],
-							(disposition == 'source') )
+						//Check that the chassis room is the same that the room defined in the spreadsheet
+						def validChassisRoom = true
+						if (assetEntity.isaBlade()) {
+							def chassis = assetEntity["${disposition}Chassis"]
+							if (chassis) {
+								def roomProp = ((disposition == 'source')? 'roomSource' : 'roomTarget')
+								if (chassis[roomProp]) {
+									def room = chassis[roomProp]
+									if (!room.roomName.equals(d["${disposition}Room"])) {
+										validChassisRoom = false
+										warnings << "Chassis room and device room don't match (row $rowNum)"
+									}
+								}
+							}
+						}
+
+						if (validChassisRoom) {
+							errors = deviceService.assignDeviceToLocationRoomRack(
+								assetEntity, 
+								d["${disposition}Location"],
+								d["${disposition}Room"],
+								d["${disposition}Rack"],
+								(disposition == 'source') )
+						}
 						if (errors) {
 							warnings << "Unable to set $disposition Loc/Room/Rack (row $rowNum) : $errors"
 						}
@@ -358,6 +385,53 @@ class ImportService {
 			sb.append('</ul></li>')
 		}
 		sb.append('</ul></li>')
-	}	
+	}
+
+	void appendBladeToChassis(project, assetEntity, importValue, isSource, warnings, rowNum) {
+		def result = false
+		if (!StringUtils.isBlank(importValue) && assetEntity.isaBlade()) {
+			def chassisType = isSource?'source':'target'
+			if (importValue.startsWith("id:")) {
+				// Proccess chassis id
+				def chassisKey = null
+				def chassisName = null
+				// Check if there is a chassis name in the cell too
+				if (importValue.indexOf(' ') > 0) {
+					chassisKey = importValue.substring(0, importValue.indexOf(' '))
+					chassisName = importValue.substring(importValue.indexOf(' ') + 1, importValue.size())
+				} else {
+					chassisKey = importValue
+				}
+				def chassisId = chassisKey.substring(3, chassisKey.size())
+				def chassis = AssetEntity.get(chassisId.toLong())
+				if (chassis) {
+					// Validates that the chassis name match with the chassis found
+					if (chassisName != null && (!chassisName.equals(chassis.assetName))) {
+						warnings << "Chassis $chassisType with id $chassisId don't have name $chassisName (row $rowNum)"
+					}
+					assetEntityService.assignBladeToChassis(project, assetEntity, chassis.id.toString(), isSource)
+					result = true
+				} else {
+					warnings << "No chassis $chassisType found with id $chassisId (row $rowNum)"
+				}
+
+			} else {
+				// Proccess chassis name
+				def chassis = AssetEntity.findAllByAssetName(importValue)
+				if (chassis.size() > 0) {
+					// Check if we found more than one chassis
+					if (chassis.size() > 1) {
+						warnings << "Non-unique blade chassis name ($importValue) was referenced"
+					} else  {
+						def sChassis = chassis[0]
+						assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource)	
+						result = true
+					}				
+				} else {
+					warnings << "No chassis $chassisType found with name $importValue (row $rowNum)"
+				}
+			}
+		}
+	}
 
 }

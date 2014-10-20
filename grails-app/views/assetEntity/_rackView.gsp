@@ -1,2 +1,0 @@
-<g:select id="${rackId+forWhom}" from="${racks}" name="${rackName}" class="${clazz} assetSelect"  optionKey="id" optionValue="tag"
-					value="${roomType=='S' ? assetEntity?.rackSource?.id : assetEntity?.rackTarget?.id}" noSelection="${[0:' Please Select...']}" onchange="toogleRack(this.value, '${roomType}')"/>

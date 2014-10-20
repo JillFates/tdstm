@@ -749,8 +749,8 @@ class MoveEventController {
 			
 			def othersColumnList = ['id','application','assetName', 'shortName', 'serialNumber', 'assetTag', 'manufacturer',
 									'model','assetType','ipAddress', 'os', 'sourceLocation', 'sourceLocation','sourceRack',
-									'sourceRackPosition','sourceBladeChassis','sourceBladePosition',
-									'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetBladeChassis',
+									'sourceRackPosition','sourceChassis','sourceBladePosition',
+									'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetChassis',
 									'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
 									'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
 			   						]

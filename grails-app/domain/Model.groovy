@@ -145,9 +145,11 @@ class Model {
 			bladeCount = null
 			bladeLabelCount = null
 		}
-		def principal = SecurityUtils.subject?.principal
-		if( principal ){
-			createdBy  = UserLogin.findByUsername( principal )?.person
+		if (! createdBy) {
+			def principal = SecurityUtils.subject?.principal
+			if( principal ){
+				createdBy  = UserLogin.findByUsername( principal )?.person
+			}
 		}
 		prependHttp()
 	}

@@ -10,7 +10,7 @@
 			<%-- Asset Class Options SELECT --%>
 			<td>
 				<g:select name="entity" 
-					onChange="AssetCrudModule.updateDependentAssetNameSelect(this.name)" 
+					onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
 					from="${AssetClass.getClassOptions().entrySet()}" optionKey="key" optionValue="value"
 					<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
 					>
@@ -33,7 +33,7 @@
 
 			<%-- Dependency Type SELECT --%>
 			<td nowrap="nowrap">
-				<g:select name="dtype" from="${dependencyType?.value}"  optionValue="value"></g:select>
+				<g:select name="dtype" from="${dependencyType}"  optionValue="value"></g:select>
 				<input type="hidden" name="aDepComment" id="aDepComment" value="">
 				<div id="depComment"  style="display:none" >
 					<textarea rows="5" cols="50" name="dep_comment" id="dep_comment"></textarea>
@@ -48,7 +48,7 @@
 
 			<%-- Status SELECT --%>
 			<td>
-				<g:select name="status" from="${dependencyStatus?.value}" optionValue="value"
+				<g:select name="status" from="${dependencyStatus}" optionValue="value"
 					onchange="changeMoveBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)">
 				</g:select>
 			</td>

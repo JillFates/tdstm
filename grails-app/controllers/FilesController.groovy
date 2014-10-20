@@ -13,13 +13,15 @@ import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.WebUtil
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
+
 
 class FilesController {
 	
@@ -268,18 +270,14 @@ class FilesController {
 		if (! project) 
 			return
 
-		def filesInstance = controllerService.getAssetForPage(this, project, Files, params.id)
+		def id = params.id
 
-		if (!filesInstance) {
-			flash.message = "Storage not found with id ${params.id}"
-			def errorMap = [errMsg : flash.message]
-			render errorMap as JSON
+		def storage = controllerService.getAssetForPage(this, project, AssetClass.STORAGE, id)
+
+		if (!storage) {
+			render "Storage asset was not found with id $id".toString()
 		} else {
-			def model = [
-				filesInstance: filesInstance
-			]
-
-			model.putAll( assetEntityService.getDefaultModelForShows('Files', project, params) )
+			def model = StorageService.getModelForShow(project, storage, params)
 
 			return model
 		}
@@ -290,7 +288,7 @@ class FilesController {
 		if (! project) 
 			return
 
-		def fileInstance = controllerService.getAssetForPage(this, project, Files, params.id)
+		def fileInstance = controllerService.getAssetForPage(this, project, AssetClass.STORAGE, params.id)
 		if (!fileInstance) {
 			render '<span class="error">Unable to find file to edit</span>'
 			return

@@ -13,7 +13,7 @@
 		changeDocTitle('${escapedName}');
 	})
 </script>
-<g:form method="post" action="update" name="editAssetsFormId">
+<g:form method="post" action="update" name="createEditAssetForm">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
 	<input type="hidden" id="file_size" name="sizeFilter" value="" />

@@ -2,30 +2,22 @@
 <script type="text/javascript">
 $(document).ready(function() { 
 	var assetType = "${assetEntity.assetType}"
-	if(assetType=='Blade'){
-		$(".bladeLabel").show()
-		$(".rackLabel").hide()
-		$(".vmLabel").hide()
-	} else if(assetType=='VM') {
-		$(".bladeLabel").hide()
-		$(".rackLabel").hide()
-		$(".vmLabel").show()
-	} else {
-		$(".bladeLabel").hide()
-		$(".rackLabel").show()
-		$(".vmLabel").hide()
-	}
+
+	EntityCrud.toggleAssetTypeFields( assetType );
+
 	changeDocTitle('${escapedName}');
-})
+});
 </script>
  	<g:form method="post">
  	<table style="border:0;width:1000px;">
 		<tr>
 			<td colspan="2">
-			<div class="dialog" <tds:hasPermission permission='AssetEdit'>ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})" </tds:hasPermission> >
-			<g:if test="${errors}">
-				<div id="messageDivId" class="message">${errors}</div>
-			</g:if>
+				<div class="dialog" 
+					<tds:hasPermission permission='AssetEdit'>ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})"</tds:hasPermission> 
+				>
+					<g:if test="${errors}">
+						<div id="messageDivId" class="message">${errors}</div>
+					</g:if>
 					<table>
 						<tbody>
 							<tr  class="prop">
@@ -51,9 +43,11 @@ $(document).ready(function() {
 								<td class="valueNW ${config.manufacturer}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
 								<td class="label ${config.priority}  ${highlightMap.priority?:''}" nowrap="nowrap"><label for="priority">Priority</label></td>
 								<td class="valueNW ${config.priority}">${assetEntity.priority}</td>
-								<td class="label ${config.sourceRoom}  ${highlightMap.sourceRoom?:''}" nowrap="nowrap"><label for="sourceRoom">Room</label></td>
-								<td class="valueNW ${config.sourceRoom}" >${assetEntity.roomSource?.roomName}</td>
-								<td class="valueNW ${config.targetRoom}">${assetEntity.roomTarget?.roomName}</td>
+								<td class="label ${config.sourceRoom}  ${highlightMap.sourceRoom?:''}" nowrap="nowrap">
+									<label for="sourceRoom">Room</label>
+								</td>
+								<td class="valueNW ${config.sourceRoom}" >${roomSource?.roomName}</td>
+								<td class="valueNW ${config.targetRoom}">${roomTarget?.roomName}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.model}  ${highlightMap.model?:''}" nowrap="nowrap"><label for="model">Model</label></td>
@@ -62,18 +56,25 @@ $(document).ready(function() {
 								</td>
 								<td class="label ${config.ipAddress}  ${highlightMap.ipAddress?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 								<td class="valueNW ${config.ipAddress}">${assetEntity.ipAddress}</td>
-								<td class="label rackLabel ${config.sourceRack}  ${highlightMap.sourceRack ?: ''}"  nowrap="nowrap" id="rackId"><label for="sourceRackId">Rack/Cab</label></td>
-								<td class="label bladeLabel ${config.sourceBladeChassis}  ${highlightMap.sourceBladeChassis?:''}" nowrap="nowrap" id="bladeId" style="display: none"><label for="sourceBladeChassisId">Blade</label></td>
-								<td class="label vmLabel ${config.virtualHost}  ${highlightMap.virtualHost?:''}" style="display: none" class="label" nowrap="nowrap"><label for="virtualHost">Virtual Host</label></td>
 
+								<%-- The following fields will be displayed based on the assetType --%>
+								<%-- rackable --%>
+								<td class="label rackLabel ${config.sourceRack} ${highlightMap.sourceRack ?: ''}"  nowrap="nowrap" id="rackId">
+									<label for="sourceRackId">Rack/Cab</label>
+								</td>
 								<td class="rackLabel ${config.sourceRack}  ${highlightMap.sourceRack?:''}">${assetEntity.rackSource?.tag}</td>
 								<td class="rackLabel ${config.targetRack}  ${highlightMap.targetRack?:''}">${assetEntity.rackTarget?.tag}</td>
+								<%-- blade --%>
+								<td class="label bladeLabel ${config.sourceChassis} ${highlightMap.sourceChassis?:''}" nowrap="nowrap" id="bladeId" style="display: none">
+									<label for="sourceChassisId">Blade Chassis</label>
+								</td>
+								<td class="bladeLabel ${config.sourceChassis} ${highlightMap.sourceChassis?:''}" style="display: none">
+									${sourceChassis}
+								</td>
+								<td class="bladeLabel ${config.targetChassis} ${highlightMap.targetChassis?:''}" style="display: none" >
+									${targetChassis}
+								</td>
 
-								<td class="bladeLabel ${config.sourceBladeChassis}  ${highlightMap.sourceBladeChassis?:''}" style="display: none">${assetEntity.sourceBladeChassis}</td>
-								<td class="bladeLabel ${config.targetBladeChassis}  ${highlightMap.targetBladeChassis?:''}" style="display: none" >${assetEntity.targetBladeChassis}</td>
-
-								<td class="vmLabel ${config.virtualHost}  ${highlightMap.virtualHost?:''}" style="display: none">${assetEntity.virtualHost}</td>
-								<td class="vmLabel" style="display: none"></td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.shortName}  ${highlightMap.shortName?:''}" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
@@ -87,28 +88,36 @@ $(document).ready(function() {
 								<td class="bladeLabel ${config.targetBladePosition}  ${highlightMap.targetBladePosition?:''}" style="display: none" >${assetEntity.targetBladePosition}</td>
 							</tr>
 							<tr class="prop">
-								<td class="label ${config.serialNumber}  ${highlightMap.serialNumber?:''}" nowrap="nowrap"><label for="serialNumber">S/N</label></td>
+								<td class="label ${config.serialNumber}  ${highlightMap.serialNumber?:''}" nowrap="nowrap"><label for="serialNumber">Serial #</label></td>
 								<td class="valueNW ${config.serialNumber}">${assetEntity.serialNumber}</td>
 								<td class="label ${config.supportType}  ${highlightMap.supportType?:''}" nowrap="nowrap"><label for="supportType">Support Type</label></td>
 								<td class="valueNW ${config.supportType}">${assetEntity.supportType}</td>
 								<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
 								<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}</td>
 								<td class="label ${config.size}  ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size/Scale </label></td>
-                                <td nowrap="nowrap" class="sizeScale ${config.size}">
-                                    ${assetEntity.size} ${assetEntity.scale?.value()}
-                                </td>
+	                            <td nowrap="nowrap" class="sizeScale ${config.size}">
+	                                ${assetEntity.size} ${assetEntity.scale?.value()}
+	                            </td>
 							</tr>
 							<tr class="prop">
-								<td class="label ${config.assetTag}  ${highlightMap.assetTag?:''}" nowrap="nowrap"><label for="assetTag">Tag</label></td>
-								<td class="valueNW ${config.assetTag}">${assetEntity.assetTag}</td>
-								<td class="label ${config.retireDate}  ${highlightMap.retireDate?:''}"><label for="retireDate">Retire Date:</label></td>
-								<td class="valueNW ${config.retireDate}"><tds:convertDate date="${assetEntity?.retireDate}"
-							  		timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+								<td class="label ${config.assetTag}  ${highlightMap.assetTag?:''}" nowrap="nowrap">
+									<label for="assetTag">Tag</label>
 								</td>
-								<td class="label ${config.planStatus}  ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
+								<td class="valueNW ${config.assetTag}">${assetEntity.assetTag}</td>
+								<td class="label ${config.retireDate}  ${highlightMap.retireDate?:''}">
+									<label for="retireDate">Retire Date:</label>
+								</td>
+								<td class="valueNW ${config.retireDate}">
+									<tds:convertDate date="${assetEntity?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+								</td>
+								<td class="label ${config.planStatus}  ${highlightMap.planStatus?:''}" nowrap="nowrap">
+									<label for="planStatus">Plan Status</label>
+								</td>
 								<td class="valueNW ${config.planStatus}">${assetEntity.planStatus}</td>
-								<td class="label ${config.rateOfChange}  ${highlightMap.rateOfChange?:''}" nowrap="nowrap"><label for="rateOfChange">Rate of Change (%)</label></td>
-                                <td class="valueNW ${config.rateOfChange}">${assetEntity.rateOfChange}</td>
+								<td class="label ${config.rateOfChange}  ${highlightMap.rateOfChange?:''}" nowrap="nowrap">
+									<label for="rateOfChange">Rate of Change (%)</label>
+								</td>
+	                            <td class="valueNW ${config.rateOfChange}">${assetEntity.rateOfChange}</td>
 							</tr>
 							<tr class="prop">
 								<td class="label ${config.railType}  ${highlightMap.railType?:''}" nowrap="nowrap"><label for="railType">Rail Type</label></td>
@@ -124,13 +133,20 @@ $(document).ready(function() {
 							<tr>
 								<td class="label ${config.externalRefId}  ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 								<td class="${config.externalRefId}">${assetEntity.externalRefId}</td>
-								<td class="label ${config.truck}  ${highlightMap.truck?:''}" nowrap="nowrap"><label for="truck">Truck/Cart/Shelf</label></td>
-								<td class="valueNW ${config.truck}">${assetEntity.truck}/${assetEntity.cart}${assetEntity.shelf? ' / '+assetEntity.shelf : ''}</td>
+								<g:if test="! assetEntity.isVM()">
+									<td class="label ${config.truck}  ${highlightMap.truck?:''}" nowrap="nowrap">
+										<label for="truck">Truck/Cart/Shelf</label>
+									</td>
+									<td class="valueNW ${config.truck}"> 
+										${assetEntity.truck} / ${assetEntity.cart} / ${assetEntity.shelf}
+									</td>
+								</g:if>
 							</tr>
 							<g:render template="customShow" ></g:render>
 						</tbody>
 					</table>
-				</div></td>
+				</div>
+			</td>
 		</tr>
 		<tr id="deps">
 			<g:render template="dependentShow" model= "[assetEntity:assetEntity]"></g:render>

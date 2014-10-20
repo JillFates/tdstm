@@ -11,8 +11,8 @@
 
 		var myOption = "<option value='0'>Add Person...</option>"
 		<tds:hasPermission permission='PersonCreateView'>
-			$("#sme1Edit option:first").after(myOption);
-			$("#sme2Edit option:first").after(myOption);
+			$("#sme1 option:first").after(myOption);
+			$("#sme2 option:first").after(myOption);
 			$("#appOwnerEdit option:first").after(myOption);
 		</tds:hasPermission>
 		$("#shutdownByEditId").val('${applicationInstance.shutdownBy}')
@@ -23,7 +23,7 @@
 		changeDocTitle('${escapedName}');
 	})
 </script>
-<g:form method="post" action="update" name="editAssetsFormId" onsubmit="return validateFields('Edit',this.name)">
+<g:form method="post" action="update" name="createEditAssetForm" onsubmit="return validateFields('Edit',this.name)">
 
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
@@ -74,7 +74,7 @@
 								</td>
 								<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td>
-									<g:select from="${personList}" id="sme1Edit" name="sme.id" class="${config.sme} personContact assetSelect" optionKey="id" 
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}"
 										onchange="openPersonDiv(this.value,this.id)" value="${applicationInstance.sme?.id}" 
 										tabindex="22" 
@@ -100,8 +100,8 @@
 								</td>
 								<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
-								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1Edit','sme2Edit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="sme2Edit" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="id" 
+								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1','sme2')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										value="${applicationInstance.sme2?.id}" 
@@ -124,12 +124,12 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="label ${config.appTech} ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
+								<td class="label ${config.appTech} ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Technology</label></td>
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
 								<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
 								<td class="suffleTd">
-								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2Edit','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwnerEdit')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwnerEdit" class="${config.appOwner} suffleSelect personContact assetSelect" name="appOwner.id"  optionKey="id" 
 										optionValue="${{it.lastNameFirst}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
@@ -230,7 +230,7 @@
 								</td>
 								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
-								<td ><input type="text" id="shutdownDurationEdit" name="shutdownDuration"
+								<td ><input type="text" id="shutdownDuration" name="shutdownDuration"
 											value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
@@ -245,7 +245,7 @@
 								</td>
 								<td class="label ${config.startupDuration} ${highlightMap.startupDuration?:''}" nowrap="nowrap"><label for="startupDuration">Startup Duration </label>
 								</td>
-								<td ><input type="text" id="startupDurationEdit" class="${config.startupDuration}" name="startupDuration"
+								<td ><input type="text" id="startupDuration" class="${config.startupDuration}" name="startupDuration"
 											value="${applicationInstance.startupDuration}" tabindex="55" size="7" />m
 								</td>
 								
@@ -260,7 +260,7 @@
 								</td>
 								<td class="label ${config.testingDuration} ${highlightMap.testingDuration?:''}" nowrap="nowrap"><label for="testingDuration">Testing Duration </label>
 								</td>
-								<td ><input type="text" id="testingDurationEdit" class="${config.testingDuration}" name="testingDuration"
+								<td ><input type="text" id="testingDuration" class="${config.testingDuration}" name="testingDuration"
 											value="${applicationInstance.testingDuration}" tabindex="55"  size="7"/>m
 								</td>
 							</tr>

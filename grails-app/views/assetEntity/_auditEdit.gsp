@@ -32,12 +32,12 @@ $(document).ready(function() {
 		<td class="label">Blade</td>
 		<td class="label">
 		<g:if test="${source=='1'}">
-		<g:select id='sourceBladeChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
-			  name="sourceBladeChassis" value="${assetEntityInstance.sourceBladeChassis }" noSelection="${['':' Please Select']}"/>
+		<g:select id='sourceChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
+			  name="sourceChassis" value="${assetEntityInstance.sourceChassis?.id }" noSelection="${['':' Please Select']}"/>
 		</g:if>
 		<g:else>
-		<g:select id='targetBladeChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
-				name="targetBladeChassis"  value="${assetEntityInstance.targetBladeChassis}" noSelection="${['':' Please Select']}"/>
+		<g:select id='targetChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
+				name="targetChassis"  value="${assetEntityInstance.targetChassis?.id}" noSelection="${['':' Please Select']}"/>
 		</g:else>
 		</td>
 	</tr>

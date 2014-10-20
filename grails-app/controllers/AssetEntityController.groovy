@@ -12,7 +12,9 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
+
 import java.io.File;
+
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -26,8 +28,8 @@ import org.quartz.Trigger
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
-import java.util.regex.Matcher
 
+import java.util.regex.Matcher
 
 import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
@@ -41,6 +43,8 @@ import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
@@ -63,6 +67,7 @@ class AssetEntityController {
 	def assetEntityService
 	def commentService
 	def controllerService
+	def deviceService
 	def filterService
 	def moveBundleService
 	def partyRelationshipService
@@ -86,6 +91,7 @@ class AssetEntityController {
 	int added = 0
 	def skipped = []
 	def assetEntityInstanceList = []
+	def rackService
 
 	// TODO : JPM 9/2014 : Need to review use of customLabels as it doesn't have all of the Custom## names in its list
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8','Custom9','Custom10',
@@ -1143,7 +1149,9 @@ class AssetEntityController {
 		def userLogin = securityService.getUserLogin()
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		
-		return assetEntityService.getListModel(project, userLogin, session, params, tzId)
+		def model = assetEntityService.getDeviceModelForList(project, userLogin, session, params, tzId)
+
+		return model
 	}
 	
 	/**
@@ -1157,7 +1165,7 @@ class AssetEntityController {
 		def userLogin = securityService.getUserLogin()
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
-		def data = assetEntityService.getListData(project, userLogin, session, params, tzId)		
+		def data = assetEntityService.getDeviceDataForList(project, userLogin, session, params, tzId)		
 		render data as JSON
 	}
 	
@@ -1183,22 +1191,22 @@ class AssetEntityController {
 			}
 			switch(redirectAsset){
 				case "room":
-					redirect( controller:'room',action:list )
+					redirect( controller:'room',action:'list' )
 					break;
 				case "rack":
 					redirect( controller:'rackLayouts',action:'create' )
 					break;
 				case "clientConsole":
-					redirect( controller:'clientConsole', action:list)
+					redirect( controller:'clientConsole', action:'list')
 					break;
 				case "application":
-					redirect( controller:'application', action:list)
+					redirect( controller:'application', action:'list')
 					break;
 				case "database":
-					redirect( controller:'database', action:list)
+					redirect( controller:'database', action:'list')
 					break;
 				case "files":
-					redirect( controller:'files', action:list)
+					redirect( controller:'files', action:'list')
 					break;
 				case "dependencyConsole":
 					forward( action:'getLists', params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
@@ -1207,7 +1215,7 @@ class AssetEntityController {
 					render "AssetEntity ${assetEntityInstance.assetName} deleted"
 					break;
 				default:
-					redirect( action:list)
+					redirect( action:'list')
 			}
 
 		}
@@ -1238,143 +1246,75 @@ class AssetEntityController {
 		if ( params.clientList ){
 			redirect( controller:"clientConsole", action:"list", params:[moveBundle:params.moveBundleId] )
 		}else{
-			redirect( action:list )
+			redirect( action:'list' )
 		}
 	}
 
-	/* -------------------------------------------
-	 * To create New assetEntity
-	 * @param assetEntity Attribute
-	 * @author Mallikarjun
-	 * @return assetList Page
-	 * ------------------------------------------ */
-	def save = {
+	/**
+	 * Used to handle the appropriate redirections
+	 * 
+	 */	
+	private void redirectToReq(model, entity, redirectTo, saved, errorMsg="" ) {
+		log.debug "**** redirectToReq to $redirectTo, $list"
+		def project = securityService.getUserCurrentProject()
 
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
-
-		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
-
-		def redirectTo = params?.redirectTo
-		def modelName = params.models
-		def manufacturerName = params.manufacturers
-		def assetType = params.assetType ?: 'Server'
-		if (params.("manufacturer.id") && params.("manufacturer.id").isNumber()){
-		   userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
-		} 
-		userPreferenceService.setPreference("lastType", assetType)
-		if(redirectTo.contains("room_")){
-			def newRedirectTo = redirectTo.split("_")
-			redirectTo = newRedirectTo[0]
-			def rackId = newRedirectTo[1]
-			session.setAttribute("RACK_ID", rackId)
-		}
-		if( manufacturerName ){
-			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
-			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
-		}
-		
-		def bundleId = getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
-		
-		if(params.assetType == "Blade")
-			setBladeRoomAndLoc( params, project)
-		
-		def assetEntity = new AssetEntity(params)	
-		assetEntity.project = project
-		assetEntity.owner = project.client
-		
-		if(params.roomSourceId && params.roomSourceId != '-1')
-			assetEntity.setRoomAndLoc( params.roomSourceId, true )
-		if(params.roomTargetId && params.roomTargetId != '-1')
-			assetEntity.setRoomAndLoc( params.roomTargetId, false )
-		
-		if(params.rackSourceId && params.rackSourceId != '-1')
-			assetEntity.setRack( params.rackSourceId, true )
-			
-		if(params.rackTargetId && params.rackTargetId != '-1')
-			assetEntity.setRack( params.rackTargetId, false )
-		
-		if(!params.assetTag){
-			assetEntity.assetTag = projectService.getNextAssetTag(project) 
-			if(!project.save(flush:true)){
-				log.error "Error while updating project.lastAssetId : ${project}"
-				project.errors.each { log.error  it }
-			}
-		}
-			if(!assetEntity.hasErrors() && assetEntity.save()) {
-				if( assetEntity.sourceRoom || assetEntity.targetRoom){
-					assetEntity.updateRacks()
-				}
-					
-				def loginUser = securityService.getUserLogin()
-				if(assetEntity.model){
-					assetEntityAttributeLoaderService.createModelConnectors( assetEntity )
-				}
-				flash.message = "AssetEntity ${assetEntity.assetName} created "
-				def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntity, loginUser, project)
-				flash.message += "</br>"+errors 
-				if(params.showView == 'showView'){
-					forward(action:'show', params:[id: assetEntity.id, errors:errors])
-					
-				} else if(params.showView == 'closeView'){
-					render flash.message
-				}else{
-					redirectToReq( params, assetEntity, redirectTo, true )
-				}
-			}else {
-				flash.message = "AssetEntity ${assetEntity.assetName} not created"
-				def etext = "Unable to Update Asset" +
-						GormUtil.allErrorsString( assetEntity )
-				log.error  etext
-				redirectToReq(params, assetEntity, redirectTo, false )
-		}
-	}
-	
-	def redirectToReq(params, entity, redirectTo, saved ){
-		switch (redirectTo){
+		switch (redirectTo) {
 			case "room":
-				  redirect( controller:'room',action:list )
+				  redirect( controller:'room', action:'list' )
 				  break;
 			case "rack":
 				  session.setAttribute("USE_FILTERS", "true")
 				  redirect( controller:'rackLayouts',action:'create' )
 				  break;
 			case "assetAudit":
-					if(saved)
-						render(template:'auditDetails',	model:[assetEntity:entity, source:params.source, assetType:params.assetType])
-					else
-						forward(action:'create', params:params)
+				if (saved)
+					render(template:'auditDetails',	model:[assetEntity:entity, source:model.source, assetType:model.assetType])
+				else
+					forward(action:'create', params:model)
 				  break;
 			case "clientConsole":
-				  redirect( controller:'clientConsole', action:list)
+				  redirect( controller:'clientConsole', action:'list')
 				  break;
 		    case "application":
-				  redirect( controller:'application', action:list)
+				  redirect( controller:'application', action:'list')
 				  break;
 			case "database":
-				  redirect( controller:'database', action:list)
+				  redirect( controller:'database', action:'list')
 				  break;
 			case "files":
-				  redirect( controller:'files', action:list)
+				  redirect( controller:'files', action:'list')
 				  break;
 			case "listComment":
 				  forward(action:'listComment')
 				  break;
 		    case "roomAudit":
-				  forward(action:'show', params:[redirectTo:redirectTo, source:params.source, assetType:params.assetType])
+				  forward(action:'show', params:[redirectTo:redirectTo, source:model.source, assetType:model.assetType])
 				  break;
 		    case "dependencyConsole":
-				  forward(action:'getLists', params:[entity:params.tabType,labelsList:params.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
+				  forward(action:'getLists', params:[entity:model.tabType,labelsList:model.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
 				  break;
 			case "listTask":
 				  render "Asset ${entity.assetName} updated."
 				  break;
 		    case "dependencies":
-				  redirect(action:listDependencies)
+				  redirect(action:'listDependencies')
 				  break;
+
+			case 'list':
 			default:
-			  	redirect( action:list)
+				// Handle results as standardized Ajax return value
+				if (errorMsg.size()) {
+					render ServiceResults.errors(errorMsg) as JSON
+				} else if (!entity) {
+					render ServiceResults.errors("Asset not returned") as JSON
+				} else {
+					model = deviceService.getModelForShow(project, entity, params)
+					if (!model) {
+						ServiceResults.errors("Asset model not loaded")
+						return 
+					}
+					render(ServiceResults.success(model) as JSON)
+				}
 		  }
 	}
 
@@ -2202,135 +2142,92 @@ class AssetEntityController {
 	}
 	
 	/**
-	 * This action is used to redirect to create view .
-	 * @param : redirectTo 
+	 * This action is for presenting the CRUD form for a new Device entry form
+	 * @param params.redirectTo - used to redirect the user back to the appropriate page afterward
 	 * @return : render to create page based on condition as if redirectTo is assetAudit then redirecting 
 	 * to auditCreate view
 	 */
 	def create = {
-		def project = securityService.getUserCurrentProject()
-		def errorMsg
-		def map = [:]
-		if(params.containsKey("assetEntityId")){
-			 if(params.assetEntityId.isNumber()){
-				 def assetEntity = AssetEntity.read(params.assetEntityId)
-				 if(assetEntity){
-					 if(assetEntity.project.id !=  project.id){
-						 log.error "create : assetEntity.project (${assetEntity.id}) does not match user's current project (${project.id})"
-						 errorMsg = "An unexpected condition with the move event occurred that is preventing an update"
-					 }
-				 }else{
-					 log.error "create: Specified moveEvent (${params.assetEntityId}) was not found})"
-					 errorMsg = "An unexpected condition with the move event occurred that is preventing an update."
-				 }
-			  }
-		}
-		if( errorMsg ) {
-		   def errorMap = [errMsg : errorMsg]
-		   render errorMap as JSON
-		} else {
-			def assetEntityInstance = new AssetEntity(appOwner:'')
-	
-			def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
-			def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"])
-			def assetType = userPreferenceService.getPreference("lastType") ?: "Server"
-			def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
-			def sessionManu = userPreferenceService.getPreference("lastManufacturer")
-			def manufacuterer =  sessionManu ? Manufacturer.findByName(sessionManu) : manufacturers[0]
-			def models=[]
-			models=assetEntityService.getModelSortedByStatus(manufacuterer)
-				
-			def moveBundleList = MoveBundle.findAllByProject(project,[sort:"name"])
-			
-			def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
-			
-			def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
-			
-			def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
-	
-			def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
-			def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-			
-			//fieldImportance for Discovery by default
-			def configMap = assetEntityService.getConfig('AssetEntity','Discovery')
-			
-			def rooms = Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
-			def highlightMap = assetEntityService.getHighlightedInfo('AssetEntity', assetEntityInstance, configMap)
-			
-			def paramsMap = [assetEntityInstance:assetEntityInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-								planStatusOptions:planStatusOptions?.value, projectId:project.id ,railTypeOption:railTypeOption?.value,
-								priorityOption:priorityOption?.value ,project:project, manufacturers:manufacturers,redirectTo:params?.redirectTo,
-								models:models, assetType:assetType, manufacuterer:manufacuterer, config:configMap.config ,customs:configMap.customs,
-								rooms:rooms, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
-			 
-			 if(params.redirectTo == "assetAudit") {
-				 paramsMap << ['source':params.source, 'assetType':params.assetType]
-				 render(template:"createAuditDetails",model:paramsMap)
-			 }
-			 
-			return paramsMap
-		}
-	}
-	
-	/**
-	* Renders the detail of an AssetEntity 
-	*/
-	def show = {
-
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def assetEntity = controllerService.getAssetForPage(this, project, AssetEntity, params.id)
+		def (device, model) = assetEntityService.getDeviceAndModelForCreate(project, params)
 
-		if (!assetEntity) {
-			flash.message = "Unable to find asset within current project with id ${params.id}"
-			log.warn "show - asset id (${params.id}) not found for project (${project.id}) by user ${userLogin}"
-			def errorMap = [errMsg : flash.message]
-			render errorMap as JSON
-		} else {
-			def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
-			def attributeOptions
-			def options
-			def frontEndLabel
-
-			entityAttributeInstance.each{
-				attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
-				options = []
-				attributeOptions.each{option ->
-					options<<[option:option.value]
-				}
-				if( !bundleMoveAndClientTeams.contains(it.attribute.attributeCode) && it.attribute.attributeCode != "currentStatus" && it.attribute.attributeCode != "usize" ){
-					frontEndLabel = it.attribute.frontendLabel
-					if( customLabels.contains( frontEndLabel ) ){
-						frontEndLabel = project[it.attribute.attributeCode] ? project[it.attribute.attributeCode] : frontEndLabel
-					}
-				}
-			}
-
-			def model = [
-				assetEntity: assetEntity, 
-				label: frontEndLabel
-			]
-
-			model.putAll( assetEntityService.getDefaultModelForShows('AssetEntity', project, params, assetEntity) )
-
-			if (params.redirectTo == "roomAudit") {
-				model << [source:params.source, assetType:params.assetType]
-				render(template: "auditDetails", model: model)
-			}
-			return model
+		if ( params.redirectTo == "assetAudit") {
+			model << [source:params.source, assetType:params.assetType]
+			render( template:"createAuditDetails", model:model)
 		}
+		
+		model.action = 'save'
+		model.whom = 'Device'
+
+		// TODO : JPM 10/2014 : I'm guessing this is needed to make the save action work correctly
+		model.redirectTo = params.redirectTo ?: 'list'
+		
+		// model.each { n,v -> println "$n:\t$v"}
+		render ('view': 'createEdit', 'model' : model)
 	}
 
 	/**
-	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
+	 * Used to create and save a new device and associated dependencies. Upon success or failure it will redirect the 
+	 * user to the place that they came from based on the params.redirectTo param. The return content varies based on that
+	 * param as well.
 	 */
-	def setShowAllPreference = {
-		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
-		render true
+	def save = {
+		controllerService.saveUpdateAssetHandler(this, session, assetEntityService, AssetClass.DEVICE, params)
+/*
+		def errorMsg=''
+		def project, user
+		def asset, model
+		try {
+			(project, user) = controllerService.getProjectAndUserForPage( this, 'AssetEdit' )
+			if (project) {
+				asset = assetEntityService.createDeviceFromForm(this, session, project.id, user.id, params) 
+				model = assetEntityService.getAssetSimpleModel(asset)
+			}
+			errorMsg = flash.message
+			flash.message = null
+		} catch (InvalidRequestException e) {
+			errorMsg = e.getMessage()
+		} catch (EmptyResultException e) {
+			errorMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			errorMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errorMsg = e.getMessage()
+		} catch (e) {
+			log.error "save() failed for unexpected cause\nParams were: $params\n" +  ExceptionUtil.stackTraceToString(e)
+			errorMsg = "An error occurred while attempting to create the asset"
+		}
+
+		assetEntityService.renderSaveAssetJsonResponse(this, model, errorMsg)
+
+*/
+/*
+		def redirectTo = params.redirectTo	
+
+		// Deal with coming from the room view I'm guessing (jpm 9/2014)
+		if (redirectTo.contains("room_")) {
+			def newRedirectTo = redirectTo.split("_")
+			redirectTo = newRedirectTo[0]
+			
+			def rackId = newRedirectTo[1]
+			session.setAttribute("RACK_ID", rackId)
+		}
+
+		// Here was how the controller was responding if there were no errors. If there were errors it didn't work at all so this might be better?
+		if (params.showView == 'showView'){
+			forward(action:'show', params:[id: assetEntity.id, errors:errorMsg])
+		} else if(params.updateView == 'closeView') {
+			render errorMsg
+		} else {
+			def model = deviceService.getModelForShow(project, device, params)
+			redirectToReq(model, device, redirectTo, false, errorMsg )
+		}
+*/
 	}
-	
+
 	/**
 	 * This action is used to redirect to edit view .
 	 * @param : redirectTo
@@ -2342,62 +2239,28 @@ class AssetEntityController {
 		if (! project) 
 			return
 
-		def assetEntityInstance = controllerService.getAssetForPage(this, project, AssetEntity, params.id)
-		if (!assetEntityInstance) {
+		def (device, model) = assetEntityService.getDeviceModelForEdit(project, params.id, params)
+
+		if (! device) {
 			render '<span class="error">Unable to find asset to edit</span>'
 			return
 		}
 
-		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
-
-		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
-		def railTypeOption = EavAttributeOption.findAllByAttribute(railTypeAttribute)
-
-		def rooms = assetEntityService.getRooms(project)
-
-		def targetRacks
-		def sourceRacks
-		if(assetEntityInstance.roomTarget)
-			targetRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomTarget.id))
-
-		if(assetEntityInstance.roomSource)
-			sourceRacks = Rack.findAllByRoom(Room.get(assetEntityInstance.roomSource.id))
-
-		def sourceBladeChassis = assetEntityInstance.roomSource ? AssetEntity.findAllByRoomSource(assetEntityInstance.roomSource)?.findAll{it.assetType == 'Blade Chassis'} : []
-		def targetBladeChassis = assetEntityInstance.roomTarget ? AssetEntity.findAllByRoomTarget(assetEntityInstance.roomTarget)?.findAll{it.assetType == 'Blade Chassis'} : []
-		def sourceChassisSelect = []
-		def targetChassisSelect = []
-
-		sourceBladeChassis.each{
-			sourceChassisSelect << [it.assetTag, "${it.assetTag+'-'+''+it.assetName}"]
-		}
-		targetBladeChassis.each{
-			targetChassisSelect << [it.assetTag, "${it.assetTag+'-'+''+it.assetName}"]
-		}
-
-		def model = [
-			assetEntityInstance: assetEntityInstance, 
-			manufacturers: assetEntityService.getManufacturers(assetEntityInstance.assetType), 
-			models: assetEntityService.getModelSortedByStatus(assetEntityInstance.manufacturer),
-			nonNetworkTypes: AssetType.getNonNetworkTypes(), 
-			priorityOption: priorityOption?.value,
-			quotelessName: assetEntityInstance.assetName?.replaceAll('\"', {''}), 
-			railTypeOption: railTypeOption?.value, 
-			rooms: rooms,
-			targetRacks: targetRacks, 
-			sourceChassisSelect: sourceChassisSelect, 
-			sourceRacks: sourceRacks, 
-			targetChassisSelect: targetChassisSelect
-		]
-
-		model.putAll( assetEntityService.getDefaultModelForEdits('AssetEntity', project, assetEntityInstance, params) )
-
 		if (params.redirectTo == "roomAudit") {
-			paramsMap << ['rooms':rooms, 'source':params.source,'assetType':params.assetType]
-			render(template:"auditEdit",model:model)
+			// TODO : JPM 9/2014 : Need to determine the assetType
+			model.putAll( [
+				assetType:params.assetType,
+				source:params.source, 
+			] )
+
+			render(template:"auditEdit", model: model)
+			return
 		}
 
-		return model		
+		model.action = 'update'
+
+		// model.each { n,v -> println "$n:\t$v"}
+		render ('view': 'createEdit', 'model' : model)
 	}
 
 	/**
@@ -2407,73 +2270,106 @@ class AssetEntityController {
 	 * @return : render to appropriate view
 	 */
 	def update = {
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
 
+		controllerService.saveUpdateAssetHandler(this, session, assetEntityService, AssetClass.DEVICE, params)
+	/*
+		def errorMsg=''
+		def project, user
+		def asset, model
+		def id = params.id
+		try {
+			(project, user) = controllerService.getProjectAndUserForPage( this, 'AssetEdit' )
+			if (project) {
+				asset = controllerService.getAssetForPage(this, project, AssetClass.DEVICE, id)
+				if (asset) {
+					assetEntityService.updateDeviceFromForm(this, session, project.id, user.id, asset.id, params)
+
+					// Reload the asset due to the hibernate session 
+					asset = AssetEntity.read(id)
+					model = assetEntityService.getAssetSimpleModel(asset)
+				}
+			} 
+			errorMsg = flash.message
+			flash.message = null
+		} catch (InvalidRequestException e) {
+			errorMsg = e.getMessage()
+		} catch (EmptyResultException e) {
+			errorMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			errorMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errorMsg = e.getMessage()
+		} catch (e) {
+			log.error "update() failed " +  ExceptionUtil.stackTraceToString(e)
+			errorMsg = "An error occurred during the update"
+		}
+
+		if ( errorMsg ) {
+			// JPM 9/2014 - Not sure why we're updating the filter for JQGrid here
+			session.AE?.JQ_FILTERS = params
+		}
+
+		assetEntityService.renderUpdateAssetJsonResponse(this, model, errorMsg)
+	*/
+	/*
 		def redirectTo = params.redirectTo	
-		def modelName = params.models
-		def manufacturerName = params.manufacturers
-		def assetType = params.assetType ?: 'Server'
-		
-		if (params.("manufacturer.id") && params.("manufacturer.id").isNumber())
-			userPreferenceService.setPreference("lastManufacturer", Manufacturer.read(params.manufacturer.id)?.name)
-			
-		userPreferenceService.setPreference("lastType", assetType)
 
-		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
-		def assetEntityInstance = AssetEntity.get(params.id)
-		assetEntityInstance.properties = assetEntityInstance
-
+		// Deal with coming from the room view I'm guessing (jpm 9/2014)
 		if (redirectTo.contains("room_")) {
 			def newRedirectTo = redirectTo.split("_")
 			redirectTo = newRedirectTo[0]
+			
 			def rackId = newRedirectTo[1]
 			session.setAttribute("RACK_ID", rackId)
 		}
-		if ( manufacturerName ) {
-			params.manufacturer = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName )
-			params.model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, assetType)
+
+		// Here was how the controller was responding if there were no errors. If there were errors it didn't work at all so this might be better?
+		if (params.updateView == 'updateView') {
+			forward(action:'show', params:[id: params.id, errors:errorMsg])		
+		} else if(params.updateView == 'closeView') {
+			render errorMsg
+		} else {
+			params = deviceService.getModelForShow(project, params.id, params)
+			redirectToReq(params, device, redirectTo, false, errorMsg )
 		}
-		
-		if(params.assetType == "Blade")
-			setBladeRoomAndLoc( params, project) 
-		
-		if (params.roomSourceId && params.roomSourceId != '-1')
-			assetEntityInstance.setRoomAndLoc( params.roomSourceId, true ) 
-		if (params.roomTargetId && params.roomTargetId != '-1')
-			assetEntityInstance.setRoomAndLoc( params.roomTargetId, false )
-		
-		if (params.rackSourceId && params.rackSourceId != '-1')
-			assetEntityInstance.setRack( params.rackSourceId, true )
-		if (params.rackTargetId && params.rackTargetId != '-1')
-			assetEntityInstance.setRack( params.rackTargetId, false )
-			
-		if (!assetEntityInstance.hasErrors() && assetEntityInstance.save(flush:true)) {
-			if ( assetEntityInstance.sourceRoom || assetEntityInstance.targetRoom) {
-				assetEntityInstance.updateRacks()
+	*/
+	}
+ 	
+	/**
+	* Renders the detail of an AssetEntity 
+	*/
+	def show = {
+
+		def (project, userLogin) = controllerService.getProjectAndUserForPage( this )
+		if (! project) 
+			return
+
+		def assetId = params.id
+		def assetEntity = controllerService.getAssetForPage(this, project, AssetClass.DEVICE, assetId)
+
+		if (!assetEntity) {
+			flash.message = "Unable to find asset within current project with id ${params.id}"
+			log.warn "show - asset id (${params.id}) not found for project (${project.id}) by user ${userLogin}"
+			def errorMap = [errMsg : flash.message]
+			render errorMap as JSON
+		} else {
+			def model = deviceService.getModelForShow(project, assetEntity, params)
+			if (!model) {
+				render "Unable to load specified asset"
+				return 
 			}
-			def loginUser = securityService.getUserLogin()
-			flash.message = "Asset ${assetEntityInstance.assetName} Updated <br/>"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, assetEntityInstance, loginUser, project)
-			flash.message += errors
-			if (params.updateView == 'updateView') {
-				forward(action:'show', params:[id: params.id, errors:errors])		
-			} else if(params.updateView == 'closeView') {
-				render flash.message
-			} else {
-				redirectToReq(params, assetEntityInstance, redirectTo, false )
+
+			if (params.redirectTo == "roomAudit") {
+				// model << [source:params.source, assetType:params.assetType]
+				render(template: "auditDetails", model: model)
 			}
-		}
-		else {
-			flash.message = "Asset not Updated"
-            assetEntityInstance.errors.allErrors.each{ flash.message += it }
-			session.AE?.JQ_FILTERS = params
-            render flash.message
+
+			//model.each { n,v -> println "$n:\t$v"}
+			return model
 		}
 	}
-	
-    /**
+
+	/**
      * This action is used to get list of all Manufacturerss ordered by manufacturer name display at
      * assetEntity CRUD and AssetAudit CRUD
      * @param assetType : requested assetType for which we need to get manufacturer list
@@ -2488,6 +2384,14 @@ class AssetEntityController {
 	}
 	
 	/**
+	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
+	 */
+	def setShowAllPreference = {
+		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
+		render true
+	}
+	
+	/**
 	 * This action is used to get list of all Models to display at assetEntity CRUD and AssetAudit CRUD
 	 * @param assetType : requested assetType for which we need to get manufacturer list
 	 * @return : render to manufacturerView
@@ -2499,7 +2403,7 @@ class AssetEntityController {
 			def manufacturerInstance = Manufacturer.read(manufacturer)
 			models=assetEntityService.getModelSortedByStatus(manufacturerInstance)
 		}
-		render (view :'_modelView' , model:[models : models, forWhom:params.forWhom])
+		render (view :'_deviceModelSelect' , model:[models : models, forWhom:params.forWhom])
 	}
 	
 	/**
@@ -3784,6 +3688,7 @@ class AssetEntityController {
 		def returnMap = [:]
 		def project = securityService.getUserCurrentProject()
 
+
 		if (params.id && params.id.isLong()) {
 			def assetEntity = AssetEntity.findByIdAndProject( params.id.toLong(), project )
 			if( assetEntity ) {
@@ -4033,27 +3938,6 @@ class AssetEntityController {
 	}
 	
 	/**
-	 * Setting Blades Location and room as respective to their chassis location and rooms
-	 * @param params : params map
-	 * @param project: project instance
-	 * @return void
-	 */
-	def setBladeRoomAndLoc( params, project ){
-		def sourceBladeChassis = params.sourceBladeChassis ? AssetEntity.findByAssetTagAndProject( params.sourceBladeChassis, project ) : null
-		def targetBladeChassis = params.targetBladeChassis ? AssetEntity.findByAssetTagAndProject( params.targetBladeChassis, project ) : null
-		params.sourceLocation = sourceBladeChassis?.sourceLocation
-		//params.sourceRoom = sourceBladeChassis?.sourceRoom
-		//params.sourceRack = sourceBladeChassis?.sourceRack
-		//params.roomSource = sourceBladeChassis?.roomSource
-		//params.rackSource = sourceBladeChassis?.rackSource
-		
-		params.targetLocation = targetBladeChassis?.targetLocation
-		//params.targetRoom = targetBladeChassis?.targetRoom
-		//params.targetRack = sourceBladeChassis?.targetRack
-		//params.roomTarget = sourceBladeChassis?.roomTarget
-		//params.rackTarget = sourceBladeChassis?.rackTarget
-	}
-	/**
 	 * This method is used to sort AssetList in dependencyConsole
 	 * @param Assetlist
 	 * @param sortParam
@@ -4070,29 +3954,70 @@ class AssetEntityController {
 		}
 		return assetlist
 	}
-	def getRacksPerRoom = {
-		def roomInstance = Room.get(NumberUtils.toInt(params.roomId))
-		def roomType= params.sourceType
-		def assetEntityInstance = AssetEntity.get(NumberUtils.toInt(params.assetId))
-		def racks = []
+
+	/**
+	 * Used to return a SELECT for a specified roomId and sourceType
+	 * @param params.roomId - room id
+	 * @param params.rackId - the rack id of the currently selected rack
+	 * @param params.sourceTarget - S)ource or T)arget
+	 * @param params.forWhom - indicates if it is Create or Edit
+	 */
+	def getRackSelectForRoom = {
+		def project = controllerService.getProjectForPage(this)
+		def roomId = params.roomId
+		def rackId = params.rackId
+		def options = assetEntityService.getRackSelectOptions(project, roomId, true)
+		def sourceTarget = params.sourceTarget
+		def forWhom = params.forWhom
+		def tabindex = params.tabindex
 		
-		if(roomInstance)
-			racks = Rack.findAllByRoom(roomInstance)
-			
-		def rackId
-		def rackName
+		def rackDomId
+		def rackDomName
 		def clazz
 		
-		if( roomType== 'S' ){
-			rackId = 'rackSId'
-			rackName = 'rackSourceId'
+		if ( sourceTarget== 'S' ) {
+			rackDomId = 'rackSId'
+			rackDomName = 'rackSourceId'
 			clazz = 'config.sourceRack'
-		}else{
-			rackId = 'rackTId'
-			rackName = 'rackTargetId'
+		} else {
+			rackDomId = 'rackTId'
+			rackDomName = 'rackTargetId'
 			clazz = 'config.targetRack'
 		}
-		render(template:'rackView',	model:[racks:racks, rackId:rackId, rackName:rackName, roomType:roomType, clazz:clazz, assetEntity:assetEntityInstance,forWhom:params.forWhom])
+		render(template:'deviceRackSelect',	model:[options:options, rackDomId:rackDomId, rackDomName:rackDomName, clazz:clazz, rackId:rackId, forWhom:forWhom, tabindex:tabindex?tabindex:0, sourceTarget: sourceTarget])
+	}
+
+	/**
+	 * Used to return a SELECT for a specified roomId and sourceType
+	 * @param params.roomId - room id
+	 * @param params.id - the chassis id of the currently selected chassis
+	 * @param params.sourceTarget - S)ource or T)arget
+	 * @param params.forWhom - indicates if it is Create or Edit
+	 */
+	def getChassisSelectForRoom = {
+		def project = controllerService.getProjectForPage(this)
+		def roomId = params.roomId
+		def id = params.id
+		def options = assetEntityService.getChassisSelectOptions(project, roomId)
+		def sourceTarget = params.sourceTarget
+		def forWhom = params.forWhom
+		def tabindex = params.tabindex
+		
+		def rackDomId
+		def rackDomName
+		def domClass=params.domClass
+		def clazz
+		
+		if ( sourceTarget== 'S' ) {
+			rackDomId = 'rackSId'
+			rackDomName = 'rackSourceId'
+			clazz = 'config.sourceRack'
+		} else {
+			rackDomId = 'rackTId'
+			rackDomName = 'rackTargetId'
+			clazz = 'config.targetRack'
+		}
+		render(template:'deviceChassisSelect', model:[options:options, domId:params.domId, domName:params.domName, domClass:domClass, id:id, forWhom:forWhom, sourceTarget:sourceTarget, tabindex:tabindex])
 	}
 
 	def getAssetsByType = {
@@ -4350,5 +4275,68 @@ class AssetEntityController {
 		def map = [results:results, total: total]
 		
 		render map as JSON
+	}
+	
+	/**
+	 * Returns the list of models for a specific manufacturer and asset type
+	 */
+	def modelsOf = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def manufacturerId = params.manufacturerId
+		def assetType = params.assetType
+		def term = params.term
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def models = assetEntityService.modelsOf(manufacturerId, assetType, term, currentProject)
+
+			render(ServiceResults.success(['models' : models]) as JSON)
+		} catch (UnauthorizedException e) {
+			ExceptionUtil.stackTraceToString(e)
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ExceptionUtil.stackTraceToString(e)
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ExceptionUtil.stackTraceToString(e)
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ExceptionUtil.stackTraceToString(e)
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+	
+	/**
+	 * Returns the list of models for a specific asset type
+	 */
+	def manufacturer = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def assetType = params.assetType
+		def term = params.term
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def manufacturers = assetEntityService.manufacturersOf(assetType, term, currentProject)
+
+			render(ServiceResults.success(['manufacturers' : manufacturers]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
 	}
 }

@@ -512,7 +512,10 @@ class RoomController {
 	   assetEntityList = AssetEntity.findAll(query,[projcet:project, excludeAssetType:excludeAssetType ])
 	   
 	   def stringToReturn = new StringBuffer()
-	   stringToReturn.append("""<thead>
+	   stringToReturn.append("""
+	   							<div class="dialog" >
+				          		<table id="listDiv">
+								<thead>
 									<tr>
 									<th class="sortable ${sort=='assetName' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetName','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Name</a></th>
 									<th class="sortable ${sort=='assetTag' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetTag','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Tag</a></th>
@@ -520,7 +523,7 @@ class RoomController {
 									</tr>
 								</thead>
 								<tbody class="tbody" >
-								</tbody>""")
+								""")
 	   if(assetEntityList.size() > 0){
 		   assetEntityList.eachWithIndex{ obj, i ->
 			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editEntity( 'rack','${obj.assetType}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
@@ -532,6 +535,7 @@ class RoomController {
 	   } else {
 			stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
 	   }
+	   stringToReturn.append("</tbody></table></div>")
 	   render stringToReturn
    }
    /**
@@ -543,9 +547,9 @@ class RoomController {
 	   def assetEntityList = null
 	   if(params.assign == 'assign'){
 		   if(source == '1'){
-				   assetEntityList = AssetEntity.findAll("from AssetEntity where sourceBladeChassis is null and project = ${projectId} and assetType = 'Blade'")
+				   assetEntityList = AssetEntity.findAll("from AssetEntity where sourceChassis is null and project = ${projectId} and assetType = 'Blade'")
 		   } else {
-				   assetEntityList = AssetEntity.findAll("from AssetEntity where targetBladeChassis is null and project = ${projectId} and assetType = 'Blade'")
+				   assetEntityList = AssetEntity.findAll("from AssetEntity where targetChassis is null and project = ${projectId} and assetType = 'Blade'")
 		   }
 	   } else {
 		   if(source == '1'){

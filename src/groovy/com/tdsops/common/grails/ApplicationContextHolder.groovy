@@ -42,7 +42,16 @@ class ApplicationContextHolder implements ApplicationContextAware {
 	static ConfigObject getConfig() {
 		getGrailsApplication().config
 	}
-  
+
+	/**
+	 * used to access classes by name
+	 * @param name - the name of the class to lookup 
+	 * @example getClassForName("library.Book"); to lookup a domain class
+	 */
+	static getClassForName(String name) {
+		getGrailsApplication().getClassForName(name)
+  	}
+
 	static GrailsPluginManager getPluginManager() {
 		getBean('pluginManager')
 	}

@@ -66,13 +66,16 @@
 				var windowWidth = $(window).width() - $(window).width()*5/100 ;
 				var sizePref = '${sizePref}';
 				var unassigned = '${unassigned}';
-				var listCaption = 'Assets: <tds:hasPermission permission="AssetEdit"><span class=\'button\'><input type=\'button\' value=\'Create Asset\' class=\'create\' onclick="createAssetDetails(\'assetEntity\')"/></span></tds:hasPermission>\
-					<tds:hasPermission permission="AssetDelete">\
-						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span>\
-						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
-					</tds:hasPermission>\
-					<g:if test="${fixedFilter}"><g:link class="mmlink" controller="assetEntity" params="[]" action="list"><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" /></span></g:link>\
-					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'assetListId\')"/></g:else></span>'
+				var listCaption = '<tds:hasPermission permission="AssetEdit"><span class="button"><input type="button" value="Create Device" class="create" onclick="createAssetDetails(\'Device\')"/></span></tds:hasPermission>\
+					<tds:hasPermission permission="AssetDelete"> \
+						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'AssetEntity\')" disabled="disabled"/></span> \
+					</tds:hasPermission> \
+					<span><input type="checkbox" id="justPlanning" ${ (justPlanning == "true" ? "checked" : "") } onclick="toggleJustPlanning($(this))"/><label for="justPlanning"> Just Planning</label></span> \
+					<g:if test="${fixedFilter}"> \
+						<g:link class="mmlink" controller="assetEntity" params="[]" action="list"><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" /></span></g:link> \
+					</g:if><g:else> \
+						<span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'assetListId\')"/></span> \
+					</g:else>';
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions', 'Name', 'Device Type' , 'Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle', 'id', 'commentType'"
@@ -189,7 +192,7 @@
 		<div id="editEntityView" style="display: none;"></div>
 		<div id="editManufacturerView" style="display: none;"></div>
 		<div id="cablingDialogId" style="display: none;"></div>
-		<g:render template="newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+		<g:render template="newDependency" model="['forWhom':'Server', entities:servers, moveBundleList:moveBundleList]"></g:render>
         <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";

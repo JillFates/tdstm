@@ -1,4 +1,5 @@
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
 import org.apache.commons.lang.math.NumberUtils 
@@ -6,6 +7,7 @@ import org.apache.commons.lang.math.NumberUtils
 class RackService {
 	
 	boolean transactional = true
+	def securityService
 
 	/**
 	 * Used to find or create a Rack automatically. If the rack name is blank then it will default to 'TBD' 
@@ -104,5 +106,40 @@ class RackService {
 		return model
 	}
 
+	/**
+	 * Returns the list of racks for a given room sorted by tag
+	 * @param project - the project that the room is associated with
+	 * @param room - the room object
+	 * @param isSource - flag indicating to return source racks (true) or target racks (false) default (true)
+	 * @return List of racks associated to the room specified
+	 */
+	List getRacksOfRoom(Project project, Room room, Boolean isSource=true) {
+		def racks = Rack.findAllByRoom(room, [sort : "tag"])
+		// filter out room objects
+		racks = racks.findAll { e -> !e.model?.roomObject }
+		return racks
+	}
 
+	/**
+	 * Overloaded version of the getRacksOfRoom that takes the id of the room object instead of the room object itself
+	 * @param project - the project that the room is associated with
+	 * @param roomId - the id of the room
+	 * @param isSource - flag indicating to return source racks (true) or target racks (false) default (true)
+	 * @return List of racks associated to the room specified
+	 */
+	List getRacksOfRoom(Project project, roomId, Boolean isSource=true) {
+		def racks = []
+		Long id = NumberUtil.toLong(roomId)
+		if (id) {
+			Room room = Room.findByIdAndSource(id, isSource)
+			if (room) {
+				if (room.project == project) {
+					racks = getRacksOfRoom(project, room)
+				} else {
+					securityService.reportViolation("Attempted to access Room/Rack ($roomId) of unassociated project (${project.id})")
+				}
+			}
+		}
+		return racks
+	}
 }

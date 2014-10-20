@@ -109,14 +109,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Integer usize
 	
 	Integer sourceRackPosition
-	String sourceBladeChassis
+	AssetEntity sourceChassis
 	Integer sourceBladePosition
 
 	Integer targetRackPosition
-	String targetBladeChassis
+	AssetEntity targetChassis
 	Integer targetBladePosition
 
-	String virtualHost
+	String virtualHost		// TODO : JPM 9/2014 - drop the column virtualHost as this is no longer legitimate with true dependencies
 	String truck
 	String cart
 	String shelf
@@ -142,7 +142,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	Person modifiedBy
     
 	static hasMany = [
-		assetEntityVarchars : AssetEntityVarchar,
+		// assetEntityVarchars : AssetEntityVarchar,
 		comments : AssetComment
 	]
 	
@@ -252,11 +252,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		usize( nullable:true )
 		
 		sourceRackPosition( nullable:true )
-		sourceBladeChassis( blank:true, nullable:true )
+		sourceChassis( nullable:true )
 		sourceBladePosition( nullable:true )
 	
 		targetRackPosition( nullable:true )
-		targetBladeChassis( blank:true, nullable:true )
+		targetChassis( nullable:true )
 		targetBladePosition( nullable:true )
 	
 		virtualHost( blank:true, nullable:true )
@@ -317,37 +317,10 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		// modifiedBy = Person.loggedInPerson
 	}
 	
-	/*def afterInsert = {
-		updateRacks()
-	}
-	def afterUpdate = {
-		updateRacks()
-	}*/
 	String toString(){
 		"id:$id name:$assetName tag:$assetTag serial#:$serialNumber"
 	}
-	
-	def updateRacks() {
-		/*
-		try{
-			// Make sure the asset points to source/target racks if there is enough information for it
-			if ( project != null ) {
-				if( sourceLocation && sourceRoom ){
-					//roomSource = Room.findOrCreateWhere(source:1, 'project.id':project.id, location:sourceLocation, roomName:sourceRoom )
-					//save(flush:true)
-					
-				}
-				if (targetRoom){
-					//roomTarget = Room.findOrCreateWhere(source:0, 'project.id':project.id, roomName:targetRoom )
-					//save(flush:true)
-				}
-			}
-		} catch( Exception ex ){
-			log.error "$ex"
-		}
-		*/
-	}
-	
+		
 	/*
 	 *  methods for JMESA filter/sort
 	 */
@@ -358,6 +331,28 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		return this.moveBundle?.name
 	}
 
+	/**
+	 * Used to access the manufacturer of the asset which will return either the model.manufacturer or this.manufacturer where the model takes precedence
+	 */
+	Manufacturer getManufacturer() {
+		return (this.model ? this.model.manufacturer : this.manufacturer) 
+	}
+
+	/**
+	 * Used to access the AssetType as we normalize to the model.assetType. This will use the model.assetType if there is a model or use
+	 * the legacy AssetEntity.assetType for assets that don't have an assigned model.
+	 */
+	String getAssetType() {
+		String at
+		if (this.assetClass == AssetClass.DEVICE) {
+			at = (this.model ? this.model.assetType : this.assetType)
+		} else {
+			at = this.assetType
+		}
+		return at
+	}
+
+	// Legacy accessor methods to support referencing the pre-normalized loc/room/rack information
 	def getSourceLocation() { return this.roomSource?.location }
 	def getSourceRack() { return this.rackSource?.tag }
 	def getSourceRoom() { return this.roomSource?.roomName }
@@ -418,6 +413,22 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 */
 	def isaLogicalType() {
 		return (! isaDevice() && ! isaApplication() )
+	}
+
+	/**
+	 * Used to determine if an asset is a VM
+	 * @return Boolean true if the device is a VM
+	 */
+	def isaVM() {
+		return ( assetClass==AssetClass.DEVICE && ( model?.assetType==AssetType.VM.toString() || assetType==AssetType.VM.toString() ) )
+	}
+
+	/**
+	 * Used to determine if an asset is a Blade
+	 * @return Boolean true if the device is a VM
+	 */
+	def isaBlade() {
+		return ( assetClass==AssetClass.DEVICE && (model?.assetType==AssetType.BLADE.toString() || assetType==AssetType.BLADE.toString() ) )
 	}
 
 	/*
@@ -482,7 +493,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * @param source : a Boolean flag to determine whether request is for source or target
 	 * @return : void
 	 */
-	def setRoomAndLoc(def roomId, Boolean source){
+	def setRoomAndLoc(def roomId, Boolean source) {
+		throw new RuntimeException("AssetEntity.setRoomAndLoc() has been eliminated - see AssetEntityService.assignAssetToRoom")
+		/*
 		def room = null
 		if(roomId && roomId !='0')
 			room = Room.read( roomId )
@@ -497,6 +510,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 			roomTarget = room
 		//	targetRoom = room ? room.roomName : null
 		}
+		*/
 	}
 	/**
 	 * This method is used to set source Rack  or target Rack when we get request from select box
@@ -504,7 +518,9 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	 * @param source : a Boolean flag to determine whether request is for source or target
 	 * @return : void
 	 */
-	def setRack(def rackId, Boolean source){
+	def setRack(def rackId, Boolean source) {
+		throw new RuntimeException("AssetEntity.setRack() has been eliminated - see")
+		/*
 		def rack = null
 		if(rackId && rackId !='0')
 			rack = Rack.read( rackId )
@@ -516,6 +532,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		if( !source ){
 			rackTarget = rack
 		}
+		*/
 	}
 	/**
 	 * This method is used to know whether a particular asset having cables or not.

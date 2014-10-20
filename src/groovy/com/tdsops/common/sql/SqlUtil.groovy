@@ -10,16 +10,62 @@ class SqlUtil {
 	
 	/**
 	 * Helper class that allows the concatenantion of sql with and/or which only adds the logic if the query already contains content
-	 * @param String existing query
-	 * @param String additional query
-	 * @param String logical and/or (default 'and')
+	 * @param query - the string buffer that contains the current WHERE clause
+	 * @param criteria - the additional criteria to append to the query (StringBuffer or String)
+	 * @param andOr - the boolean identifier (defaul 'and')
 	 * @return String concatenated string
 	 */
-	static String appendToWhere(query, additional, andOr='and') {
+	static String appendToWhere(String query, String additional, String andOr='and') {
 		return query + (query.size() > 0 ? " $andOr " : '') + additional
 	}
 	
+	/**
+	 * Used to append a clause to a SQL query string and account for the AND/OR prefix boolean 
+	 * @param query - the string buffer that contains the current WHERE clause
+	 * @param criteria - the additional criteria to append to the query (StringBuffer or String)
+	 * @param andOr - the boolean identifier (defaul 'and')
+	 */
+	static void appendToWhere(StringBuffer query, criteria, String andOr='and') {
+		query.append((query.size() > 0 ? " $andOr " : '') + criteria)
+	}
 	
+	/**
+	 * Used to do a multiple word match against a particular field
+	 * @param property - the property to query on
+	 * @param words - a list of words to search on
+	 * @param matchAll - a boolean flag when true will require that the match must be on all words (default false)
+	 * @param exact - a boolean flag when true uses equal match else uses like (default false)
+	 * @return The query criteria that was constructed
+	 * @example
+	 * <pre>
+	 * assert SqlUtil.matchWords('a', ['x','y','z'], true, false) == '(a like ? and a like ? and a like ?)'
+	 * assert SqlUtil.matchWords('a', ['x','y','z'], false, true) == '(a=? or a=? or a=?)'
+	 */
+	static String matchWords(String property, List words, boolean matchAll=false, boolean exact=false) {
+		String andOr = (matchAll ? 'and' : 'or')
+		StringBuffer query = new StringBuffer('')
+		String criteria = (exact ? "$property=?" : "$property like ?")
+		int size = words.size()
+		if (size) {
+			query.append(criteria)
+			if (size > 1) {
+				query.append(StringUtils.repeat(" ${andOr} ${criteria}".toString(), --size))
+			}
+		}
+
+		// Return the query or '(1=1)' if there were no words so that the query is still legitimate
+		return '(' + ( query.size() ? query.toString() : '1=1' ) + ')'
+	}
+
+	/**
+	 * Used to wrap a list of words with the like percent markers (e.g. %word%)
+	 * @param words - a list of wordds
+	 * @return the formated list of words
+	 */
+	static List formatForLike(List words) {
+		words.collect { "%$it%" }
+	}
+
 	/**
 	 * Used to generate the WHERE expression for a particular property in which based on the criteria will create an EQUALS, IN or LIKE based on 
 	 * the criteria value. The options are as such for when criteria is:
@@ -62,10 +108,12 @@ class SqlUtil {
 		} else if (criteria instanceof java.util.ArrayList) {
 			map = [sql:"${property}${not}IN (:$paramName)", param:criteria]				
 		} else if (criteria instanceof java.lang.Enum) {
-			map = [sql:"$property = :$paramName", param:criteria]				
+			map = [sql:"$property = :$paramName", param:criteria]	
+		} else if (org.codehaus.groovy.grails.commons.DomainClassArtefactHandler.isDomainClass(criteria.getClass())) {
+			map = [sql:"$property = :$paramName", param:criteria]	
 		} else {
-			println "whereExpression received criteria of unsupported class type (${criteria?.class}) for property $property"
-			map = null
+			println "whereExpression() received criteria of unsupported class type (${criteria?.class}) for property $property"
+			throw RuntimeException("whereExpression() received criteria of unsupported class type (${criteria?.class}) for property $property")
 		}
 		return map
 	}

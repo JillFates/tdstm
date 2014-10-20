@@ -6,10 +6,17 @@ import jxl.*
 import jxl.read.biff.*
 import jxl.write.*
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+
 import java.util.regex.Matcher
+
+// Used to wire up bindData
+//import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
+//import org.codehaus.groovy.grails.commons.metaclass.GroovyDynamicMethodsInterceptor
+//import org.springframework.validation.BindingResult
 
 import com.tds.asset.Application
 import com.tds.asset.ApplicationAssetMap
@@ -24,17 +31,25 @@ import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.SizeScale
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.eav.EavAttributeSet
+import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdsops.common.sql.SqlUtil
+import com.tdssrc.eav.EavEntityAttribute
+import com.tdsops.common.lang.ExceptionUtil
 
 class AssetEntityService {
 
@@ -56,16 +71,546 @@ class AssetEntityService {
 		(AssetClass.STORAGE): [] 
 	]
 
-	static transactional = true
-	def jdbcTemplate
-	def projectService
-	def assetEntityAttributeLoaderService
-	def userPreferenceService
-	def securityService
-	def progressService
-	def partyRelationshipService
-	def taskService
+	// The follow define the various properties that can be used with bindData to assign domain.properties
+	static CUSTOM_PROPERTIES = [ 
+		'custom1', 'custom2', 'custom3', 'custom4', 'custom5', 'custom6', 'custom7', 'custom8', 'custom9', 'custom10',
+		'custom11', 'custom12', 'custom13', 'custom14', 'custom15', 'custom16', 'custom17', 'custom18', 'custom19', 'custom20',
+		'custom21', 'custom22', 'custom23', 'custom24', 'custom25', 'custom26', 'custom27', 'custom28', 'custom29', 'custom30',
+		'custom31', 'custom32', 'custom33', 'custom34', 'custom35', 'custom36', 'custom37', 'custom38', 'custom39', 'custom40',
+		'custom41', 'custom42', 'custom43', 'custom44', 'custom45', 'custom46', 'custom47', 'custom48', 'custom49', 'custom50',
+		'custom51', 'custom52', 'custom53', 'custom54', 'custom55', 'custom56', 'custom57', 'custom58', 'custom59', 'custom60',
+		'custom61', 'custom62', 'custom63', 'custom64']
 	
+	// Common properties for all asset classes (Application, Database, Files/Storate, Device)
+	static ASSET_PROPERTIES = [ 'assetName',  'shortName', 'priority', 'planStatus',  'department', 'costCenter', 
+		'maintContract', 'maintExpDate', 'retireDate', 'description', 'supportType', 'environment', 'serialNumber', 'validation', 'externalRefId', 
+		'size', 'scale', 'rateOfChange'
+	]
+	// 'purchaseDate', 'purchasePrice', 
+
+	// Properties strictly for DEVICES (a.k.a. AssetEntity)
+	static DEVICE_PROPERTIES = [ 
+		'assetTag', 'assetType', 'ipAddress', 'os', 'usize', 'truck', 'cart', 'shelf', 'railType', 
+		'sourceBladePosition', 'targetRackPosition',
+		'sourceRackPosition', 'targetBladePosition'
+	]
+
+	// Properties strictly for APPLICATION
+	static APPLICATION_PROPERTIES = []
+	// Properties strictly for APPLICATION
+	static DATABASE_PROPERTIES = []
+
+	// List of all of the Integer properties for the potentially any of the asset classes
+	static ASSET_INTEGER_PROPERTIES = ['size', 'rateOfChange', 'priority', 'sourceBladePosition', 'targetBladePosition', 'sourceRackPosition', 'targetRackPosition']
+
+	static transactional = true
+
+	def assetEntityAttributeLoaderService
+	def partyRelationshipService
+	def progressService
+	def projectService
+	def rackService
+	def roomService
+	def securityService
+	def taskService
+	def userPreferenceService
+
+	def jdbcTemplate
+
+	/**
+	 * Constructor
+	 */
+	/*
+	AssetEntityService() {
+		// This will wire up the bindData method to the service
+		// See http://nerderg.com/Grails
+ 		GroovyDynamicMethodsInterceptor i = new GroovyDynamicMethodsInterceptor(this)
+        i.addDynamicMethodInvocation(new BindDynamicMethod())
+	}
+	*/
+
+	/**
+	 * Used to save a new device which is called from the controller
+	 * @param controller - the controller that called the method
+	 * @param session - the user's selected project
+	 * @param projectId - the id of the user's project
+	 * @param userId - the id of the current user
+	 * @param params - the request parameters
+	 * @return The device asset that was created
+	 * @throws various RuntimeExceptions if there are any errors
+	 */
+	AssetEntity saveAssetFromForm(controller, session, Long projectId, Long userId, params) {
+		def device = new AssetEntity( )
+
+		return updateSaveAssetFromForm(controller, session, projectId, userId, params, device)
+		
+		// saveUserPreferencesForDevice(device)
+		//applyParamsToDevice(controller, session, project, userLogin, device, params)
+		//persistDeviceAndDependencies(device, params, userLogin)
+		//assetEntityAttributeLoaderService.createModelConnectors( device )
+
+		//return device
+	}
+
+	/**
+	 * Used to save a new device which is called from the controller
+	 * @param controller - the controller that called the method
+	 * @param session - the user's selected project
+	 * @param projectId - the id of the user's project
+	 * @param userId - the id of the current user
+	 * @param params - the request parameters
+	 * @return The device asset that was created
+	 * @throws various RuntimeExceptions if there are any errors
+	 */
+	AssetEntity updateAssetFromForm(controller, session, Long projectId, Long userId, params, Long deviceId ) {
+		Project project = Project.read(projectId)
+		AssetEntity asset = AssetEntityHelper.getAssetById(project, AssetClass.DEVICE, deviceId)
+
+		if (!asset)
+			throw new RuntimeException("updateAssetFromForm() unable to locate device id $deviceId")
+
+		return updateSaveAssetFromForm(controller, session, projectId, userId, params, device)
+	}
+
+	/**
+	 * Used to update a device which is called from the controller
+	 * @param controller - the controller that called the method
+	 * @param session - the user's selected project
+	 * @param device - the device to update
+	 * @param params - the request parameters
+	 * @throws various RuntimeExceptions if there are any errors
+	 * TODO : JPM 10/2014 : refactor updateAssetFromForm into the DeviceService class
+	 */
+	private AssetEntity updateSaveAssetFromForm(controller, session, Long projectId, Long userId, params, AssetEntity asset ) {
+		Project project = Project.get(projectId)
+		UserLogin userLogin = UserLogin.get(userId)
+
+		// If it is a new asset then we need to do some things
+		if (! asset.id) {
+			asset.project = project
+			asset.owner = project.client
+			asset.attributeSet = EavAttributeSet.get(1)
+		} else if (asset.project != project) {
+			securityService.reportViolation("Attempted to access device $deviceId not belonging to current project $project", userLogin)
+			throw new RuntimeException("updateDeviceFromForm() user access violation")
+		}
+
+		applyParamsToDevice(controller, session, project, userLogin, asset, params)
+
+		persistDeviceAndDependencies(project, userLogin, asset, params)
+
+		saveUserPreferencesForDevice(asset)
+
+		return asset
+	}
+
+	/** 
+	 * Used by the various asset controllers to return the JSON response to the callers when creating new asset
+	 * @param model
+	 * @param errorMsg
+	 */
+	void renderSaveAssetJsonResponse(controller, Map model, errorMsg) {
+		renderSaveUpdateJsonResponse(controller, model, errorMsg, true)
+	}
+	/** 
+	 * Used by the various asset controllers to return the JSON response to the callers when updating existing asset
+	 * @param model
+	 * @param errorMsg
+	 */
+	void renderUpdateAssetJsonResponse(controller, Map model, errorMsg) {
+		renderSaveUpdateJsonResponse(controller, model, errorMsg, false)
+	}
+	/**
+	 * The private method used by renderSaveAssetJsonResponse and renderUpdateJsonResponse
+	 */
+	private void renderSaveUpdateJsonResponse(controller, Map model, errorMsg, boolean isSave) {
+		// Handle results as standardized Ajax return value
+		if (errorMsg) {
+			controller.render ServiceResults.errors(errorMsg) as JSON
+		} else if (!model) {
+			def msg = "An error occurred after ${isSave ? 'creating' : 'updating'} the asset only affects displaying it. Please refresh the list to view the asset."
+			controller.render ServiceResults.errors(msg) as JSON
+		} else {
+			controller.render(ServiceResults.success(model) as JSON)
+		}
+	}
+
+	/**
+	 * Used to set some user preferences for manufacturer and type after creating or editing devices
+	 * @param device - the device object that was created or saved
+	 */
+	private void saveUserPreferencesForDevice(AssetEntity device) {
+		// Set some preferences if we were successful
+		if (device.manufacturer)
+			userPreferenceService.setPreference("lastManufacturer", device.manufacturer.name)
+		if (device.model) 
+			userPreferenceService.setPreference("lastType", device.model.assetType)
+	}
+
+	/**
+	 * Used by the create and update device service methods to persist changes to a new or existing device asset and then update the Dependencies
+	 * @param device - the device object to be persisted which maybe a new or existing asset
+	 * @param params - the request parameters
+	 * @throws various RuntimeExceptions if there are any errors
+	 */ 
+	private void persistDeviceAndDependencies(Project project, UserLogin userLogin, AssetEntity device, params) {
+
+		//def dirtyProps = device.dirtyPropertyNames
+		//log.debug "******* persistDeviceAndDependencies() for device ${device.id} - dirty properties: $dirtyProps"
+
+		//if ( device.validate() && device.save(flush:true) ) {
+			def errors = createOrUpdateAssetEntityDependencies(params, device, userLogin, device.project)
+			if (errors) {
+				throw new DomainUpdateException("Unable to update dependencies : $errors".toString())
+			}
+		//} else {
+		//	log.debug "Unable to update device : ${GormUtil.allErrorsString(device)}"
+		//	throw new DomainUpdateException("Unable to update device : ${GormUtil.allErrorsString(device)}".toString())
+		//}
+	}
+
+	/**
+	 * used by the create and update device service methods to persist changes to a new or existing device asset
+	 * @param controller - the controller that called the method
+	 * @param session - the user's selected project
+	 * @param device - the device object to be persisted which maybe a new or existing asset
+	 * @param params - the request parameters
+	 * @throws various RuntimeExceptions if there are any errors
+	 */
+	private AssetEntity applyParamsToDevice(controller, session, Project project, UserLogin userLogin, AssetEntity device, params) {
+		boolean isNew = ! device.id
+
+		if (isNew) {
+			device.project = project
+			device.owner = project.client
+		} else {
+
+			// Validate the optimistic locking to prevent two people from editing the same EXISTING asset
+			GormUtil.optimisticLockCheck(device, params, 'Device')			
+		}
+
+		//
+		// Set some of the params that need to be massaged from their string state into something more appropriate
+		//
+		parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+
+		params.scale = SizeScale.asEnum(params.scale)
+
+		ASSET_INTEGER_PROPERTIES.each { p -> 
+			if (params.containsKey(p))
+				params[p] = NumberUtil.toInteger(params[p])
+		}
+
+		// Assign all of the standard properties to the device class
+		(ASSET_PROPERTIES + CUSTOM_PROPERTIES + DEVICE_PROPERTIES).each { p ->
+			if (params.containsKey(p))
+				device[p] = params[p]
+		}
+
+		// Would prefer using the bindData but have been having all sorts of issues with it
+		// device.properties = params
+
+		//
+		// The following are not handled by the bindData assignment and need to be handled directly
+		//
+		device.modifiedBy = userLogin.person
+
+		if (! device.assetTag?.size())
+			device.assetTag = projectService.getNextAssetTag(project) 
+
+		assignAssetToBundle(project, device, params['moveBundle.id'])
+
+		// Update the Manufacturer and/or Model for the asset based on what the user has selected. If the model was selected 
+		// then we'll use that for everything otherwise we will set the manufacturer from the form. 
+		def manuId = NumberUtil.toLong(params.manufacturerId)
+		def modelId = NumberUtil.toLong(params.modelId)
+
+		if (modelId) {
+			// Check to see if the user gave us a valid model and then assign to the asset
+			def model = Model.get(modelId)
+			if (model) {
+				device.model = model
+				device.manufacturer = model.manufacturer
+				device.assetType = model.assetType
+			} else {
+				throw new DomainUpdateException("The model specified was not found")
+			}
+		} else if (manuId) {
+			// Attempt to assign just the manufacturer and asset type to the device
+			def manu = Manufacturer.get(manuId)
+			if (manu) {
+				device.model = null
+				device.manufacturer = manu
+				// assetType was applied in the bind above
+			} else {
+				throw new DomainUpdateException("The manufacturer specified was not found")
+			}
+		}
+		
+		// Set the source/target location/room which creates the Room if necessary
+		assignAssetToRoom(project, device, params.roomSourceId, params.sourceLocation, params.sourceRoom, true) 
+		assignAssetToRoom(project, device, params.roomTargetId, params.targetLocation, params.targetRoom, false) 
+
+		assignDeviceToChassisOrRack(project, userLogin, device, params)
+
+		if ( ! device.validate() || ! device.save(flush:true) ) {
+			log.debug "Unable to update device ${GormUtil.allErrorsString(device)}"
+			throw new DomainUpdateException("Unable to update device ${GormUtil.allErrorsString(device)}".toString())
+		}
+
+	}
+
+	/**
+	 * Used to assign a device to a blade chassis or rack appropriately. In the case of a VM it will clear out 
+	 * all of the rack/chassis properties appropriately that shouldn't be set in the first place.
+	 * @param project - the project object that the device belongs to
+	 * @param userLogin - the user making the change
+	 * @param device - the device to be assigned
+	 * @param params - the input parameters passed in from the device create/edit form (TODO : JPM 10/2014 : Define what params are used)
+	 */
+	void assignDeviceToChassisOrRack(Project project, UserLogin userLogin, AssetEntity device, params) {
+		if (device.isaBlade()) {
+			if (NumberUtil.toLong(params.roomSourceId) > 0)
+				assignBladeToChassis(project, device, params.sourceChassis, true) 
+			if (NumberUtil.toLong(params.roomTargetId) > 0)
+				assignBladeToChassis(project, device, params.targetChassis, false)
+		} else if (device.isaVM()) {
+			// Clear out various physical assignments that shouldn't be there anyways
+			[	'rackSource', 'sourceRackPosition', 
+				'rackTarget', 'targetRackPosition', 
+				'sourceChassis', 'sourceBladePosition', 
+				'targetChassis', 'targetBladePosition'
+			].each { prop -> device[prop] = null }
+		} else {
+			// This should handle all rackable devices
+			// Set the source/target rack appropriate and create the rack appropriately
+			assignAssetToRack(project, device, params.rackSourceId, params.sourceRack, true) 
+			assignAssetToRack(project, device, params.rackTargetId, params.targetRack, false) 
+		}
+	}
+
+	/**
+	 * Used to an asset to a Bundle and validate that it can be assigned
+	 * @param project - the user's current project
+	 * @param asset - the asset object to be assigned
+	 * @param bundleId - the id of the bundle to assign to
+	 */
+	void assignAssetToBundle(Project project, AssetEntity asset, String bundleId) {
+		Long id = NumberUtil.toLong(bundleId) 
+
+		if (id.is(null)) {
+			throw new InvalidRequestException('Invalid Bundle id was specified')
+		}
+		MoveBundle mb = MoveBundle.get(id)
+		if (! mb) {
+			throw new InvalidRequestException('Unable to find the Bundle id that was specified')
+		}
+		if (mb.project != project) {
+			securityService.reportViolation("Attempted to assign asset to bundle ($id) not associated with project (${project.id})".toString())
+			throw new InvalidRequestException('Unable to find the Bundle id that was specified')
+		}
+
+		asset.moveBundle = mb
+	}
+
+	/**
+	 * Used to set the source and target rooms on a device that was passed in from the form
+	 * @param project - the current project of the user
+	 * @param asset - the asset being assigned
+	 * @param roomId - the id of the room to assign to (0=Unassign, -1=Create new room, >0 Assign)
+	 * @param location - the name of the location if creating a new location/room
+	 * @param roomName - the name of the room if it is being created
+	 * @param isSource - true indicates that the assignment will be assigned to the source otherwise at the target
+	 */
+	void assignAssetToRoom(Project project, AssetEntity asset, String roomId, String location, String roomName, boolean isSource) {
+		def srcOrTrgt = (isSource ? 'Source' : 'Target')
+		def roomProp = "room$srcOrTrgt"
+		def id = NumberUtil.toLong(roomId)
+		if (id.is(null)) {
+			log.warn "assignAssetToRoom() called with invalid room id ($roomId)"
+			throw new InvalidRequestException("Room id was invalid")
+		}
+
+		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
+
+		switch (id) {
+			case -1:
+				// Create a new room
+				if (location.trim().size()==0 || roomName.trim().size()==0) {
+					throw new InvalidRequestException("Creating a $srcOrTarget room requires both the location and room name".toString())
+				}
+
+				def room = roomService.findOrCreateRoom(project, location, roomName, '', isSource)
+				if (room) {
+					asset[roomProp] = room
+					if (asset.isaBlade()) {
+						// Need to clear out the chassis assignment since it can't be assigned to chassis since it is a new room
+						assignBladeToChassis(project, asset, '0', isSource)
+					}
+				} else {
+					throw new RuntimeException("Unable to create new room $location/$roomName ($srcOrTrgt)".toString())
+				}
+				break
+
+			case 0:
+				// Unassign the room
+				asset[roomProp] = null
+				break
+
+			default:
+				// Attempt to assign the Asset to the Room as long as it legitimate
+				def room = Room.get(id)
+				if (room) {
+					if (room.project == project) {
+						if ( (isSource && room.source == 1) || (!isSource && room.source == 0)) {
+							asset[roomProp] = room
+						} else {
+							throw new InvalidRequestException("Referenced room ($room) was not a $srcOrTrgt room".toString())
+						}
+					} else {
+						securityService.reportViolation("Attempted to access room ($id) not associated with project (${project.id})".toString())
+						throw new UnauthorizedException("Referenced room ($id) is missing")
+					}
+				} else {
+					throw new InvalidRequestException("Referenced room ($id) was not found".toString())
+				}
+		}
+	}
+
+	/**
+	 * Used to assign the asset to source and target rack with the params thatt were passed in from the form. If the rack is being 
+	 * created then it will use the Room associated to the asset in the source or target room appropriately.
+	 * @param project - the current project of the user
+	 * @param asset - the asset/device being assigned to a rack
+	 * @param rackId - the id of the rack to assign to (0=Unassign, -1=Create new rack, >0 Assign)
+	 * @param rackName - the name of the rack if it is being created
+	 * @param isSource - true indicates that the assignment will be done at the source otherwise at the target
+	 */
+	void assignAssetToRack(Project project, AssetEntity asset, String rackId, String rackName, boolean isSource) {
+		def srcOrTrgt = (isSource ? 'Source' : 'Target')
+		def rackProp = "rack$srcOrTrgt"
+
+		log.debug "assignAssetToRack(${project.id}, ${asset.id}, $rackId, $rackName, $isSource)"
+
+		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
+		def assetType = asset.model?.assetType
+		if ([AssetType.BLADE.toString(), AssetType.VM.toString()].contains(assetType)) {
+			// If asset model is VM or BLADE we should remove rack assignments period
+			asset[rackProp] = null
+			if (isSource) {
+				asset.sourceBladePosition = null
+				asset.sourceRackPosition = null
+			} else {
+				asset.targetBladePosition = null
+				asset.targetRackPosition = null
+			}
+			return 
+		}
+
+		def id = NumberUtil.toLong(rackId)
+		if (id.is(null)) {
+			log.warn "assignAssetToRack() called with invalid rack id ($rackId)"
+			throw new InvalidRequestException("Rack id was invalid")
+		}
+
+		Room room = asset["room$srcOrTrgt"]
+
+		switch (id) {
+			case -1:
+				// Create a new rack
+				rackName = rackName?.trim()
+				if (rackName?.size()==0) {
+					throw new InvalidRequestException("Creating a $srcOrTarget rack requires a name".toString())
+				}
+
+				def rack = rackService.findOrCreateRack(room, rackName) 
+				if (rack) {
+					asset[rackProp] = rack
+				} else {
+					throw new RuntimeException("Unable to create new rack $rackName ($srcOrTrgt)".toString())
+				}
+				break
+
+			case 0:
+				// Unassign the room
+				asset[rackProp] = null
+				break
+
+			default:
+				// Attempt to assign the Asset to the Room as long as it legitimate
+				def rack = Rack.get(id)
+				if (rack) {
+					if (rack.project == project) {
+						if ( (isSource && rack.source == 1) || (!isSource && rack.source == 0)) {
+							asset[rackProp] = rack
+						} else {
+							throw new InvalidRequestException("Referenced rack ($rack) was not a $srcOrTrgt rack".toString())
+						}
+					} else {
+						securityService.reportViolation("Attempted to access rack ($id) not associated with project (${project.id})".toString())
+						throw new UnauthorizedException("Referenced rack ($id) is missing")
+					}
+				} else {
+					throw new InvalidRequestException("Referenced rack ($id) was not found".toString())
+				}
+		}
+	}	
+
+	/**
+	 * Used to set a blade to a chassis in the source or target locations
+	 * @param project - the current project of the user
+	 * @param blade - the blade being assigned
+	 * @param chassisId - the id of the chassis to assign to
+	 * @param isSource - true indicates that the assignment will be done at the source otherwise at the target
+	 */
+	void assignBladeToChassis(Project project, AssetEntity blade, String chassisId, boolean isSource) {
+		def srcOrTrgt = (isSource ? 'Source' : 'Target')
+		def roomProp = "room$srcOrTrgt"
+		def chassisProp = (isSource ? 'sourceChassis' : 'targetChassis')
+
+		def assetType = blade.model?.assetType
+		if (assetType != AssetType.BLADE.toString()) {
+			throw new InvalidRequestException("Attempted to assign a non-blade type asset to a chassis (type $assetType)".toString())
+		}
+
+		log.debug "assignBladeToChassis(${project.id}, ${blade.id}, $chassisId, $isSource) - chassisProp=$chassisProp"
+		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
+
+		// Clear out some non-blade type fields that sometimes get set
+		if (isSource) {
+			blade.rackSource = null
+			blade.sourceRackPosition = null
+		} else {
+			blade.rackTarget = null
+			blade.targetRackPosition = null
+		}
+
+		if (chassisId == '0') {
+			blade[chassisProp] = null
+		} else {
+			// Look to see if we really have a chassis and assign it appropriately
+			def chassis = AssetEntityHelper.getAssetById(project, AssetClass.DEVICE, chassisId)
+			if (!chassis) {
+				throw new EmptyResultException("Unable to find chassis".toString())
+			}
+			assetType = chassis.model?.assetType
+			if (assetType != AssetType.BLADE_CHASSIS.toString()) {
+				throw new InvalidRequestException("Attempted to assign a blade to a non-chassis type device (type $assetType)".toString())
+			}
+
+			if (blade[chassisProp] != chassis) {
+				log.info "Assigned Blade $blade to chassis $chassis for project $project"
+				// We're good so assign the blade to the chassis and the room that the chassis is in
+				blade[chassisProp] = chassis
+				blade[roomProp] = chassis[roomProp]
+			} else {
+				log.debug "assignBladeToChassis() no changes to the chassis assignment"
+			}
+		}
+
+
+	}
+
 	/**
 	 * This method is used to update dependencies for all entity types
 	 * @param params : params map received from client side
@@ -73,8 +618,7 @@ class AssetEntityService {
 	 * @param loginUser : Instance of current logged in user
 	 * @param project : Instance of current project
 	 * @return errorMsg : String of error came while updating dependencies (if any)
-	 */
-	
+	 */	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntity, loginUser, project) {
 		def errorMsg = ""
 		AssetDependency.withTransaction(){status->
@@ -329,8 +873,10 @@ class AssetEntityService {
 		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar aev where aev.assetEntity = :asset",[asset:assetEntity])
 		ProjectTeam.executeUpdate("update ProjectTeam pt set pt.latestAsset = null where pt.latestAsset = :asset",[asset:assetEntity])
 		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom = :asset",[asset:assetEntity])
-		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
-											assetToPort=null where assetTo = :asset""",[asset:assetEntity])
+		AssetCableMap.executeUpdate("""Update AssetCableMap 
+			set cableStatus='${AssetCableStatus.UNKNOWN}', assetTo=null,
+			assetToPort=null 
+			where assetTo = :asset""", [asset:assetEntity])
 		AssetDependency.executeUpdate("delete AssetDependency where asset = :asset or dependent = :dependent ",[asset:assetEntity, dependent:assetEntity])
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = :asset",[asset:assetEntity])
 	}
@@ -393,7 +939,7 @@ class AssetEntityService {
 	 * @return List of the types
 	 */
 	List getDependencyTypes() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)?.value
 	}
 
 	/**
@@ -401,7 +947,7 @@ class AssetEntityService {
 	 * @return List of the types
 	 */
 	List getDependencyStatuses() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)?.value
 	}
 
 	/**
@@ -409,7 +955,7 @@ class AssetEntityService {
 	 * @return List of options
 	 */
 	List getAssetEnvironmentOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)?.value
 	}
 
 	/**
@@ -417,7 +963,24 @@ class AssetEntityService {
 	 * @return List of options
 	 */
 	List getAssetPlanStatusOptions() {
-		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)?.value
+	}
+
+	/**
+	 * Use to get the list of Priority Options
+	 * @return List of Priority values 
+	 */
+	List getAssetPriorityOptions() {	
+		return AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)?.value
+	}
+
+	/**
+	 * Use to get the list of the device RailType Options
+	 * @return List of RailTypes
+	 */
+	List getAssetRailTypeOptions() {
+		def railTypeAttribute = EavAttribute.findByAttributeCode('railType')
+		return EavAttributeOption.findAllByAttribute(railTypeAttribute)?.value
 	}
 
 	/**
@@ -444,7 +1007,7 @@ class AssetEntityService {
 	 */
 	List getDependentAssets(Object asset) {
 		List list
-		if (asset)
+		if (asset?.id)
 			list = AssetDependency.findAll("FROM AssetDependency a WHERE asset=? ORDER BY a.dependent.assetType, a.dependent.assetName",[asset])
 
 		return list
@@ -457,7 +1020,7 @@ class AssetEntityService {
 	 */
 	List getSupportingAssets(Object asset) {
 		List list
-		if (asset)
+		if (asset?.id)
 			list = AssetDependency.findAll("FROM AssetDependency a WHERE dependent=? ORDER BY a.asset.assetType,a.asset.assetName", [asset])
 
 		return list
@@ -469,10 +1032,9 @@ class AssetEntityService {
 	 * @return list of MoveBundles
 	 */
 	List getMoveBundles(Project project) {
-		List list
+		List list = []
 		if (project)
 			list = MoveBundle.findAllByProject(project, [sort:'name'])
-
 		return list
 	}
 
@@ -490,12 +1052,140 @@ class AssetEntityService {
 	}
 
 	/**
+	 * Used to retrieve a list of valid AssetTypes for devices
+	 * @param project - the project the user is assigned to
+	 * @return List of AssetType strings
+	 */
+	List<String> getDeviceAssetTypeOptions(Project project) {
+		def list = Model.executeQuery('select distinct assetType from Model where assetType is not null order by assetType')
+		return list
+	}
+
+	/**
 	 * Used to get the user's preference for the asset list size/rows per page
 	 * @return the number of rows to display per page
 	 */
 	String getAssetListSizePref() {
-		// TODO - JPM 08/2014 - seems like we could convert the values to Integer
+		// TODO - JPM 08/2014 - seems like we could convert the values to Integer (improvement)
 		return ( userPreferenceService.getPreference("assetListSize") ?: '25' )
+	}
+
+	/**
+	 * Used to retrieve the asset and model that will be used for the Device Create form
+	 */
+	List getDeviceAndModelForCreate(Project project, Object params) {	
+
+		def (device, model) = getCommonDeviceModelForCreateEdit(project, null, params)
+
+		// Attempt to set the default bundle for the device based on the user's preferences
+		def bundleId = userPreferenceService.get('MOVE_BUNDLE')
+		if (bundleId) {
+			def bundle = MoveBundle.read(bundleId)
+			if (bundle && bundle.project == project) {
+				device.moveBundle = bundle
+			}
+		}
+
+		return [device, model]
+	}
+
+	/**
+	 * Used to retrieve the asset and model that will be used for the Device Edit form
+	 */
+	// TODO : JPM 9/2014 : these methods should be renamed from getDeviceModel to getDeviceAndModel to avoid confusion (improvement)
+	List getDeviceModelForEdit(Project project, Object deviceId, Object params) {
+		def (device, model) = getCommonDeviceModelForCreateEdit(project, deviceId, params)
+		if (device) {
+			// TODO : JPM 9/2014 : refactor the quote strip into StringUtil.stripQuotes method or escape the name. This is done to fix issue with putting device name into javascript links
+			model.quotelessName = device.assetName?.replaceAll('\"', {''}) 
+		} 
+		return [device, model]
+	}
+
+	/**
+	 * Used to get the model properties that are common between the Create and Edit forms. It will also 
+	 * lookup the device if the id is presented. If the id is presented but is not found or references
+	 * another project's asset the function will return [null, null]. If successful it will return the 
+	 * device and model map.
+	 * For Create purpose, the Manufacturer and Model will default to the user's session variables
+	 *
+	 * @param project - the project that the user is assigned to
+	 * @param deviceId - the id number of the device to lookup. Use null for Create action
+	 * @param params - the http params
+	 * @return A list containing [device object, model map]
+	 */
+	private List getCommonDeviceModelForCreateEdit(Project project, Object deviceId, Object params) {
+		boolean isNew = deviceId == null
+		def (device, model) = getCommonDeviceAndModel(project, deviceId, params)
+
+		// Check to see if someone is screwing around with the deviceId
+		if (device == null && model == null) {
+			log.error "**** getCommonDeviceModelForCreateEdit() didn't get the device"
+			return [null, null]
+		}
+
+		if (isNew) {
+			device = new AssetEntity()
+			device.assetType = ''	// clear out the default
+		}
+		
+		def assetType = device.assetType
+
+		model.putAll( [
+			assetEntityInstance: device,
+			assetType: assetType,
+			manufacturer: device.manufacturer,
+			manufacturers: getManufacturers( assetType ), 
+			models: getModelSortedByStatus( device.manufacturer ),
+			// TODO : JPM 9/2014 : Determine what nonNetworkTypes is used for in the view (clean up if unnecessary)
+			nonNetworkTypes: AssetType.getNonNetworkTypes(), 	
+			railTypeOption: getAssetRailTypeOptions(),
+			// TODO : JPM 9/2014 : determine if the views use source/targetRacks - I believe these can be removed as they are replaced by source/targetRackSelect 
+			sourceRacks: [],
+			targetRacks: [],
+			sourceChassisSelect: [],
+			targetChassisSelect: [],
+			version: device.version,
+		] )
+
+		// List of the room and racks to be used in the SELECTs
+		model.sourceRoomSelect = getRoomSelectOptions(project, true, true)
+		model.targetRoomSelect = getRoomSelectOptions(project, false, true)
+		model.sourceRackSelect = getRackSelectOptions(project, device?.roomSource?.id, true) 
+		model.targetRackSelect = getRackSelectOptions(project, device?.roomTarget?.id, true) 
+
+		model.putAll( getDefaultModelForEdits('AssetEntity', project, device, params) )
+
+		if (device) {
+			// TODO : JPM 9/2014 : Need to make the value flip based on user pref to show name or tag (enhancement TM-3390)
+			// Populate the listings of the Chassis SELECT name/values
+			model.sourceChassisSelect = getChassisSelectOptions(project, device?.roomSource?.id)
+			model.targetChassisSelect = getChassisSelectOptions(project, device?.roomTarget?.id)
+		}
+
+		// This is used to track the current assetType in the crud form. If the asset is new, it will default to Server otherwise 
+		// it will use that of the model the asset is assigned to.
+		model.currentAssetType = device.assetType
+
+		model.rooms = getRooms(project)
+		
+		return [device, model]
+	}
+
+	/**
+	 * Used to lookup the asset and return the common model properties for any of the CRUD pages
+	 * @param project - the project the user is assigned to
+	 * @param deviceId - the device id of the device to lookup
+	 * @param params - the parameters passed from the browser
+	 * @return (device,model) the device if found and the map of model properties
+	 */
+	private List getCommonDeviceAndModel(Project project, Object deviceId, Object params) {
+		AssetEntity device = AssetEntityHelper.getAssetById(project, AssetClass.DEVICE, deviceId)
+		Map model = [:]
+		if (device) {
+			// Load up any default model properties
+		}
+		return [device, model]
 	}
 
 	/**
@@ -506,12 +1196,11 @@ class AssetEntityService {
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Object params) {
 
 		//assert ['Database'].contains(type)
+		def configMap = getConfig('AssetEntity', asset?.validation ?: 'Discovery')
 
 		def assetTypeAttribute = getPropertyAttribute('assetType')
-		def validationType = asset.validation
-		def configMap = getConfig(type, validationType) 
+		//def validationType = asset.validation 
 		def highlightMap = getHighlightedInfo(type, asset, configMap)
-
 		def dependentAssets = getDependentAssets(asset)
 		def supportAssets = getSupportingAssets(asset)
 
@@ -520,26 +1209,29 @@ class AssetEntityService {
 			[project:project, ac: AssetClass.DEVICE, types:AssetType.getServerTypes()])
 
 		Map model = [
+			assetId: asset.id,
 			assetTypeAttribute: assetTypeAttribute,
-			assetTypeOptions: getPropertyOptions(assetTypeAttribute),
+			assetTypeOptions: getDeviceAssetTypeOptions(project),
 			config: configMap.config,
 			customs: configMap.customs,
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(),
 			dependentAssets: dependentAssets,
-			environmentOptions: getAssetEnvironmentOptions()?.value,
+			environmentOptions: getAssetEnvironmentOptions(),
 			// The name of the asset that is quote escaped to prevent lists from erroring with links
-			// TODO - this function should be replace with a generic HtmlUtil method
+			// TODO - this function should be replace with a generic HtmlUtil method - this function is to single purposed...
 			escapedName: getEscapedName(asset),
 			highlightMap: highlightMap,
 			moveBundleList: getMoveBundles(project),
-			planStatusOptions: getAssetPlanStatusOptions()?.value,
+			planStatusOptions: getAssetPlanStatusOptions(),
 			project: project,
 			projectId: project.id,
+			priorityOption: getAssetPriorityOptions(),
 			// The page to return to after submitting changes
 			redirectTo: params.redirectTo,
 			servers: servers,
-			supportAssets: supportAssets
+			supportAssets: supportAssets,
+			version: asset.version
 		]
 
 		return model
@@ -550,8 +1242,9 @@ class AssetEntityService {
 	 * @param
 	 * @return a Map that includes the list of common properties
 	 */
-	Map getDefaultModelForShows(String type, Project project, Object params, Object assetEntity=null) {
+	Map getCommonModelForShows(String type, Project project, Object params, Object assetEntity=null) {
 
+		log.debug "### getCommonModelForShows() type=$type, project=${project.id}, asset=${assetEntity? assetEntity.id : 'null'}"
 		if (assetEntity == null) {
 			assetEntity = AssetEntity.read(params.id)
 		}
@@ -579,17 +1272,19 @@ class AssetEntityService {
 
 		def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 
+		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
+
 		Map model = [
+			assetId: assetEntity?.id,
 			assetComment:assetComment, 
 			assetCommentList:assetCommentList,
 			config:configMap.config, 
 			customs:configMap.customs, 
-			dependencyBundleNumber:AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle ,
+			dependencyBundleNumber: depBundle,
 			dependentAssets:dependentAssets, 
-			errors:params.errors, 
-			escapedName:getEscapedName(assetEntity) ,
+			errors:params?.errors, 
+			escapedName:getEscapedName(assetEntity),
 			highlightMap:highlightMap, 
-			errors:params.errors, 
 			prefValue:prefValue, 
 			project:project,
 			redirectTo:params.redirectTo, 
@@ -615,26 +1310,26 @@ class AssetEntityService {
 			attributesList: [],		// Set below
 			dependencyStatus: getDependencyStatuses(),
 			dependencyType: getDependencyTypes(), 
-			event:params.moveEvent, 
+			event: params.moveEvent, 
 			fixedFilter: (params.filter ? true : false),
-			filter:params.filter,
+			filter: params.filter,
 			hasPerm: RolePermissions.hasPermission("AssetEdit"),
 			justPlanning: userPreferenceService.getPreference("assetJustPlanning") ?: 'true',
 			modelPref: null,		// Set below
-			moveBundleId:params.moveBundleId, 
-			moveBundle:filters?.moveBundleFilter ?: '', 
+			moveBundleId: params.moveBundleId, 
+			moveBundle: filters?.moveBundleFilter ?: '', 
 			moveBundleList: getMoveBundles(project),
 			moveEvent: null,		// Set below
-			planStatus:filters?.planStatusFilter ?:'', 
-			plannedStatus:params.plannedStatus, 
+			planStatus: filters?.planStatusFilter ?:'', 
+			plannedStatus: params.plannedStatus, 
 			projectId: project.id,
 			sizePref: getAssetListSizePref(), 
-			sortIndex:filters?.sortIndex, 
-			sortOrder:filters?.sortOrder, 
-			staffRoles:taskService.getRolesForStaff(),
-			toValidate:params.toValidate,
+			sortIndex: filters?.sortIndex, 
+			sortOrder: filters?.sortOrder, 
+			staffRoles: taskService.getRolesForStaff(),
+			toValidate: params.toValidate,
 			unassigned: params.unassigned,
-			validation:params.validation
+			validation: params.validation
 		]
 
 		// Override the Use Just For Planning if a URL requests it (e.g. Planning Dashboard)
@@ -683,19 +1378,127 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Common logic on updates
-	 * @param
+	 * Used to get an Select Option list of the Rooms for the source or target of the specified Project
+	 * @param project
+	 * @param isSource - flag to indicate that it should return Source rooms if true 
+	 * @param allowAdd - flag if true will include a Add Room... option (-1) default true
+	 * @return List<Map<id,value>>
 	 */
-	def applyExpDateAndRetireDate(Object params, Object tzId) {
-		def formatter = new SimpleDateFormat("MM/dd/yyyy")
-		def maintExpDate = params.maintExpDate
-		if (maintExpDate) {
-			params.maintExpDate = GormUtil.convertInToGMT(formatter.parse( maintExpDate ), tzId)
+	 List getRoomSelectOptions(Project project, isSource, allowAdd=true) {
+		def rsl = [ ]
+		if (allowAdd)
+			rsl << [id:-1, value: 'Add Room...']
+
+		def rooms = Room.findAll('from Room r where r.project=:p and source=:s order by location, roomName', [p:project, s:(isSource ? 1 : 0)])
+		rooms.each { rsl << [id:it.id, value:it.location+' / '+it.roomName] }
+		return rsl
+	}
+
+	/**
+	 * Used to get a list of the options available for a Rack
+	 * @param project
+	 * @param room - the room  idto find associated racks for
+	 * @param allowAdd - flag if true will include a Add Room... option (-1) default true
+	 * @return List<Map<id,value>>
+	 */
+	 List getRackSelectOptions(Project project, roomId, allowAdd) {
+		def rsl = [ ]
+		if (allowAdd)
+			rsl << [id:-1, value: 'Add Rack...']
+
+		roomId = NumberUtil.toLong(roomId)
+		if (roomId) {
+			def rooms = Rack.findAll('from Rack r inner join r.model m where r.project=:p and r.room.id=:r and m.assetType=:t order by tag', [p:project, r:roomId, t:'Rack'])
+			rooms.each { rsl << [id:it[0].id, value:it[0].tag] }
 		}
-		def retireDate = params.retireDate
-		if (retireDate) {
-			params.retireDate = GormUtil.convertInToGMT(formatter.parse( retireDate ), tzId)
+
+		return rsl
+	}
+
+	/**
+	 * Used to get an Select Option list of the chassis located in the specified Room
+	 * @param project
+	 * @param roomId - the id of the room to find chassis in
+	 * @return List<Map<id, value>>
+	 */
+	List getChassisSelectOptions(Project project, roomId) {
+		def rsl = [ ]
+		roomId = NumberUtil.toLong(roomId)
+		if (roomId) {
+			def room = Room.get(roomId)
+			if (room.project != project) {
+				securityService.reportViolation("Attemped to assess room ($roomId') unassociated with project (${project.id})")
+
+			} else {
+				def roomProp = (room.source ? 'roomSource' : 'roomTarget')
+				def chassisTypes = AssetType.getBladeChassisTypes()
+				def chassisList = getAssetsWithCriteriaMap(project, AssetClass.DEVICE, [(roomProp): room, assetType: chassisTypes] )
+
+				chassisList.each { rsl << [ id:it.id, value: "${it.assetName}/${it.assetTag}" ] }
+			}
 		}
+
+		return rsl
+	}
+
+	/**
+	 * Used to retrieve a list of assets based on with a criteria map
+	 * @param project - the project object for the associated assets
+	 * @param ac - the AssetClass to retrieve
+	 * @param criteriaMap - the property names to be associated
+	 * @param includeJoinData - a flag that when true, if there is a join in the query (e.g. referencing assetType) will return a multi-dimensional array of the dataset
+	 * @return the list of assets found
+	 */
+	List getAssetsWithCriteriaMap(Project project, AssetClass ac, Map criteriaMap, boolean includeJoinData=false) {
+		def params = [project: project, ac: ac]
+		String domainName = AssetClass.domainNameFor(ac)
+		Object domainClass = AssetClass.domainClassFor(ac)
+		StringBuilder from = new StringBuilder("from $domainName a ")
+		StringBuilder where = new StringBuilder("where a.project=:project and a.assetClass=:ac ")
+		def map
+		boolean hasJoin = false
+
+		// Go through the params and construct the query appropriately
+		criteriaMap.each { propName, value ->
+
+			if (propName == 'assetType') {
+				from.append('inner join a.model m ')
+				map = SqlUtil.whereExpression('m.assetType', value, 'assetType')
+				hasJoin = true
+			} else {
+				map = SqlUtil.whereExpression("a.$propName", value, propName)
+			}
+
+			if (map) {
+				where.append(' and ' + map.sql)
+				params.putAll((propName): map.param)
+			} else {
+				log.error "getAssetsWithCriteriaMap() SqlUtil.whereExpression() returned no value property $propName, criteria $value"
+				return null
+			}
+		}
+
+		String hql = from.toString() + where.toString()
+		// log.debug "getAssetsWithCriteriaMap() HQL=$hql, params=$params"
+		def assets = domainClass.findAll(hql, params)
+		// log.debug "getAssetsWithCriteriaMap() found ${assets.size()} : $assets"
+
+		if (assets && hasJoin) {
+			if (! includeJoinData) {
+				// Just get the Asset objects and exclude the joined domains
+				assets = assets.collect { it[0] }
+			}
+		}
+		return assets
+	}
+
+	/**
+	 * Used to convert the Maint Expiration and Retire date parameters from strings to Dates
+	 * @param params - the map of the params
+	 */
+	public void parseMaintExpDateAndRetireDate(Object params, userTimeZone) {
+		params.maintExpDate = GormUtil.convertInToGMT( DateUtil.mdyToDate(params.maintExpDate), userTimeZone )
+		params.retireDate   = GormUtil.convertInToGMT( DateUtil.mdyToDate(params.retireDate ), userTimeZone )
 	}
 
 	/**
@@ -1171,12 +1974,16 @@ class AssetEntityService {
 	 * @param manufacturerInstance : instance of Manufacturer for which model list is requested
 	 * @return : model list 
 	 */
-	def getModelSortedByStatus (manufacturerInstance) {
-		def models = Model.findAllByManufacturer( manufacturerInstance,[sort:'modelName',order:'asc'] )
-		def modelListFull = models.findAll{it.modelStatus == 'full'}
-		def modelListValid = models.findAll{it.modelStatus == 'valid'}
-		def modelListNew = models.findAll{!['full','valid'].contains(it.modelStatus)}
-		models = ['Validated':modelListValid, 'Unvalidated':modelListFull+modelListNew ]
+	def getModelSortedByStatus (Manufacturer mfr) {
+		def models = [Validated:[], Unvalidated:[]]
+		if (mfr) {
+			def mfrList = Model.findAllByManufacturer( mfr, [sort:'modelName',order:'asc'] )
+			def modelListFull = mfrList.findAll{it.modelStatus == 'full'}
+			def modelListValid = mfrList.findAll{it.modelStatus == 'valid'}
+			def modelListNew = mfrList.findAll{!['full','valid'].contains(it.modelStatus)}
+			models.Validated = modelListValid
+			models.Unvalidated = modelListFull+modelListNew
+		}
 		
 		return models
 	}
@@ -1582,6 +2389,16 @@ class AssetEntityService {
 									break
 								case ~/Retire|MaintExp|Modified Date/:
 									addContentToSheet = new Label(colNum, r, stdDateFormat.format(a[attribute]) )
+									break
+
+								case "Source Blade":
+								case "Target Blade":
+									def chassis = a[attribute]
+									def value = ""
+									if (chassis) {
+										value = "id:" + chassis.id + " " + chassis.assetName
+									}
+									addContentToSheet = new Label(colNum, r, value)
 									break
 
 								default:
@@ -2040,7 +2857,7 @@ class AssetEntityService {
    /**
     * Used by the AssetEntity List to populate the initial List view
     */
-   Map getListModel(Project project, UserLogin userLogin, session, params, tzId) {
+   Map getDeviceModelForList(Project project, UserLogin userLogin, session, params, tzId) {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
 
@@ -2053,7 +2870,7 @@ class AssetEntityService {
 
 		Map model = getDefaultModelForLists(AssetClass.DEVICE, 'AssetEntity', project, fieldPrefs, params, filters)
 
-		// Check the assetEntityService.getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
+		// Check the getDefaultModelForLists before adding to this list. This should ONLY be AssetEntity specific properties
 		model.assetName = filters?.assetNameFilter ?:'' 
 		model.assetPref = fieldPrefs 
 		model.assetTag = filters?.assetTagFilter ?:'' 
@@ -2086,7 +2903,7 @@ class AssetEntityService {
    /** 
     * Used to retrieve the data used by the AssetEntity List
     */
-   Map getListData(Project project, UserLogin userLogin, session, params, tzId) {
+   Map getDeviceDataForList(Project project, UserLogin userLogin, session, params, tzId) {
 		def filterParams = [
 			assetName: params.assetName, 
 			assetType: params.assetType, 
@@ -2391,4 +3208,153 @@ class AssetEntityService {
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 	}
+   
+   /**
+    * Returns the list of models from a specific manufacturer and asset type
+    * 
+    * @param manufacturerId the id of the manufacturer
+    * @param assetType the type of asset
+    * @param term the term to be searched
+    * @param currentProject the current project
+    * @return the map of models
+    */
+   List modelsOf(String manufacturerId, String assetType, String term, currentProject) {
+		def manufacturer
+		def result = []
+		List words = []
+
+		def manuId = NumberUtil.toLong(manufacturerId)	   
+		if (manuId) {
+			manufacturer = Manufacturer.read(manuId)
+		}
+
+		def hql = new StringBuffer( 'SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName FROM Model m JOIN m.manufacturer as man')
+		def params = []
+
+		StringBuffer where = new StringBuffer('')
+
+		if (manufacturer) {
+			SqlUtil.appendToWhere(where, "m.manufacturer=?", 'AND')
+			params << manufacturer
+		}
+
+		if (StringUtils.isNotBlank(assetType)) {
+			SqlUtil.appendToWhere(where, "m.assetType=?", 'AND')
+			params << assetType
+		}
+
+		if (StringUtils.isNotBlank(term)) {
+			words = StringUtil.split(term)
+			List likeWords = SqlUtil.formatForLike( words )
+			StringBuffer search = new StringBuffer('')
+
+			if (! manufacturer) {
+				SqlUtil.appendToWhere(where, 'm.manufacturer.id = man.id', 'AND')
+				SqlUtil.appendToWhere(search, SqlUtil.matchWords('man.name', words, false, false), 'OR')
+				params.addAll(likeWords)
+			}
+
+			if (! assetType) {
+				SqlUtil.appendToWhere(search, SqlUtil.matchWords('m.assetType', words, false, false), 'OR')
+				params.addAll(likeWords)
+			}
+
+			SqlUtil.appendToWhere(search, SqlUtil.matchWords('m.modelName', words, false, false), 'OR')
+			params.addAll(likeWords)
+
+			SqlUtil.appendToWhere(where, '('+search.toString()+')', 'AND')
+		}
+
+		if (where.size())
+			hql.append(' WHERE ' + where.toString())
+
+		// Construct to the orderby
+		StringBuffer orderBy = new StringBuffer('')
+		if (!manufacturer)
+			orderBy.append('man.name')
+		orderBy.append( (orderBy.size() ? ', ' : '') + 'm.modelName')
+		hql.append(' ORDER BY ' + orderBy)
+
+		String query=hql.toString()
+		// log.debug "modelsOf() manufacturerId=$manufacturerId, term=($term) assetType=$assetType, query=$query, params=$params"
+		def models = Model.executeQuery(query, params)
+		// log.debug "modelsOf() found ${models.size()} rows"
+		int i=0
+		int added=0
+		int max=50
+		boolean hasMultiWordFilter = words.size() > 1
+		models.each { model ->
+			//if (added >= max)
+			//	return
+
+			def title = ''
+			// Construct the title based on what the user is filtering on to fill in what is unknown
+			if (!manufacturer)
+				title = model[4] + ' - '
+			title += model[2]
+			if (!assetType)
+				title += " (${model[1]})"
+
+			// If the user search is on multiple words then we need to match on all of them
+			if (hasMultiWordFilter && ! StringUtil.containsAll(title, words))
+				return
+
+			// TODO : JPM 10/2014 - reduce the variable name sizes
+			result << [
+				id : model[0],
+				assetType : model[1],
+				manufacturerId : model[3],
+				manufacturerName : model[4],
+				name: model[2],
+				text : title
+			] 
+			added++
+		}
+
+		return result
+	}
+   
+   /**
+    * Obtains the list of manufactures using the assetType and term
+    * 
+    * @param assetType the type of asset
+    * @param term the term to be searched
+    * @param currentProject the current project
+    * @return the map of manufacturers
+    */
+   def manufacturersOf(assetType, term, currentProject) {
+	   def hql = "SELECT distinct m.id, m.name FROM Manufacturer m";
+	   def joinTables = ""
+	   def condition = ""
+	   def hqlParams = []
+	   
+	   if (StringUtils.isNotBlank(term)) {
+		   if (hqlParams.isEmpty()) {
+			   condition = condition + " WHERE m.name LIKE ?"
+		   } else {
+			   condition = condition + " AND m.name LIKE ?"
+		   }
+		   hqlParams.add("%" + term + "%")
+	   }
+
+	   if (StringUtils.isNotBlank(assetType)) {
+		   joinTables = " LEFT OUTER JOIN m.models as model";
+		   if (hqlParams.isEmpty()) {
+			   condition = condition + " WHERE model.assetType = ?"
+		   } else {
+			   condition = condition + " AND model.assetType = ?"
+		   }
+		   hqlParams.add(assetType)
+	   }
+
+	   def manufacturers = Manufacturer.executeQuery(hql + joinTables + condition, hqlParams)
+	   def result = manufacturers.collect { manufacturer ->
+			return [
+			   "id" : manufacturer[0],
+			   "text" : manufacturer[1]
+		   ];
+	   }
+	   
+	   return result
+   }
 }

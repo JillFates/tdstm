@@ -11,6 +11,7 @@ class DateUtil {
 
 	protected static formatter = new SimpleDateFormat("M-d-yyyy")
 	protected static simpleDateformatter = new SimpleDateFormat("MM/dd/yyyy")
+	protected static mdySdf = new SimpleDateFormat("MM/dd/yyyy")
 
 	/**
 	 * used to convert a string to a date in the format mm/dd/yyyy or m/d/yy
@@ -54,7 +55,7 @@ class DateUtil {
 	 * @return Date or errormsg
 	 */
 	static def parseImportedCreatedDate(String val){
-		if(val){
+		if (val) {
 			try{
 				simpleDateformatter.setLenient(false);
 				return simpleDateformatter.parse(val)
@@ -65,4 +66,23 @@ class DateUtil {
 			return new Date();
 		}
 	}
+
+	/**
+	 * Used to parse a string into a date with the expected mm/dd/yyyy format
+	 * @param str - the date string
+	 * @return the parsed date or null if not valid
+	 */
+	static Date mdyToDate(String str) {
+		Date parsedDate		
+		if (str) {
+			try {
+				mdySdf.setLenient(false)
+				parsedDate = mdySdf.parse(str)
+				parsedDate.clearTime()
+			} catch(Exception e) {
+			}
+		}
+		return parsedDate
+	}
+
 }

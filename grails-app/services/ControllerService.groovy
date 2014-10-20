@@ -1,8 +1,16 @@
 import com.tdssrc.grails.NumberUtil
+import com.tdsops.tm.enums.domain.AssetClass
 
 import javax.servlet.http.HttpSession
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
+
+import com.tdsops.tm.domain.AssetEntityHelper
+import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.common.lang.ExceptionUtil
+
+
 
 /**
  * A set of methods used to support common functionality used in the Controllers
@@ -12,6 +20,7 @@ class ControllerService {
 	static transactional=false
 
 	def securityService
+	def assetEntityService
 
 	/**
 	 * Used to get the user default project for a page request or redirects user to the Project List view
@@ -82,21 +91,17 @@ class ControllerService {
 	 * @param id - the id of the asset to be retrieved
 	 * @return an asset object if it is found and associated with the given project
 	 */
-	Object getAssetForPage(Object controller, Project project, Object assetClass, String id) {
+	Object getAssetForPage(Object controller, Project project, AssetClass ac, String id) {
 		def asset
 
 		if (! id.isInteger()) {
 			log.warn "Invalid asset id ($id) requested for page ${urlInfo(controller)} by user ${securityService.getUserLogin()}"
 			controller.flash.message = "The requested asset id is invalid"
 		} else {
-			asset = assetClass.read(id)
+			asset = AssetEntityHelper.getAssetById(project, ac, id)
 			if (! asset) {
 				log.warn "Missing asset id ($id) requested for page ${urlInfo(controller)} by user ${securityService.getUserLogin()}"
 				controller.flash.message = "The requested asset was not found"
-			} else if ( ! asset.project.equals(project)) {
-				log.warn "SECURITY : referenced asset ($id) not associated to user project for page ${urlInfo(controller)} by user ${securityService.getUserLogin()}"
-				controller.flash.message = "The requested asset was not found"
-				asset = null				
 			}
 		}
 		return asset
@@ -174,6 +179,57 @@ class ControllerService {
 		}
 
 		return bundle
+	}
+
+	/**
+	 * Used by the various asset controller methods to perform save/update using a standardized method names on the domain service classes
+	 * @param assetServiceClass - a reference to the domain service class (e.g. databaseService)
+	 * @param assetClass - the type of class that the domain is
+	 * @param params - the controller parameters submitted in request
+	 */
+	protected void saveUpdateAssetHandler(controller, session, assetServiceClass, AssetClass assetClass, params) {
+		def errorMsg=''
+		def project, user
+		def asset, model
+		def isNew = ! params.assetId
+
+		try {
+			(project, user) = getProjectAndUserForPage(controller, 'AssetEdit')
+			if (project) {
+				if (isNew) {
+					log.debug "saveUpdateAssetHandler() calling saveAssetFromForm()"
+					asset = assetServiceClass.saveAssetFromForm(controller, session, project.id, user.id, params)
+					log.debug "saveUpdateAssetHandler() saveAssetFromForm() returned $asset"
+				} else {
+					asset = getAssetForPage(controller, project, AssetClass.DEVICE, params.id)
+					assetServiceClass.updateAssetFromForm(controller, session, project.id, user.id, asset.id, params)
+				}
+				// Reload the asset due to the hibernate session 
+				//asset = AssetEntity.read(asset.id)
+				asset.discard()
+				model = AssetEntityHelper.simpleModelOfAsset(asset)
+			} 
+			errorMsg = controller.flash.message
+			controller.flash.message = null
+		} catch (InvalidRequestException e) {
+			errorMsg = e.getMessage()
+		} catch (EmptyResultException e) {
+			errorMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			errorMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errorMsg = e.getMessage()
+		} catch (e) {
+			log.error "update() failed " +  ExceptionUtil.stackTraceToString(e)
+			errorMsg = "An error occurred during the update"
+		}
+
+		if ( errorMsg ) {
+			// JPM 9/2014 - Not sure why we're updating the filter for JQGrid here
+			session.AE?.JQ_FILTERS = params
+		}
+
+		assetEntityService.renderUpdateAssetJsonResponse(controller, model, errorMsg)
 	}
 
 	/**

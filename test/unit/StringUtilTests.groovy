@@ -29,4 +29,28 @@ class StringUtilTests extends GrailsUnitTestCase {
     	assertEquals 'Stripped', 'Smith', SU.stripOffPrefixChars('Mr. ', 'Mr. Smith')    	
     	assertEquals 'Skipped', 'Jones', SU.stripOffPrefixChars('xyz', 'Jones')
     }
+
+    void testSplit() {
+        assertTrue 'space', ['a','b','c'] == SU.split(' a b c ')
+        assertTrue 'spaces', ['a','b','c'] == SU.split('a    b    c')
+        assertTrue 'tabs', ['a','b','c'] == SU.split(" a\tb\tc ")
+        assertTrue 'comma', ['a','b','c'] == SU.split(' a,b,c', ',')
+        assertTrue 'commaWithSpace', ['a','b','c'] == SU.split(' a, b, c ', ',')
+        assertTrue 'regex', ['a','b','c'] == SU.split('a.b.c', /\./)
+        assertTrue 'Empty string', [] == SU.split('')
+        assertTrue 'Null string', [] == SU.split(null)
+
+    }
+
+    void testContainsAny() {
+        assertTrue 'case insensitive', SU.containsAny('abcdefg', ['a','c'])
+        assertTrue 'case sensitive', SU.containsAny('abCdeFg', ['C','Z'])
+        assertFalse 'no match', SU.containsAny('abcdefg', ['X','y'])
+    }
+
+    void testContainsAll() {
+        assertTrue 'case insensitive', SU.containsAll('abcdefg', ['a','c'])
+        assertTrue 'case sensitive', SU.containsAll('abCdeFg', ['C','F'])
+        assertFalse 'no match', SU.containsAll('abcdefg', ['a','Z'])
+    }
 }

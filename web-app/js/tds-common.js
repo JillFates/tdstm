@@ -37,6 +37,23 @@ var tdsCommon = {
 		}
 
 		return result.join('');
+	},
+
+	overrideCloseDialog: function() {
+		$.widget( "ui.dialog", $.ui.dialog, {
+			close: function(event) {
+				var result = this._super();
+				if (this.element.length > 0) {
+					var dialog = $("#" + this.element[0].id)
+					if (dialog.length > 0) {
+						dialog.html('');	
+					}
+				}
+				return result;
+			}
+		});
 	}
 
 }
+
+tdsCommon.overrideCloseDialog();

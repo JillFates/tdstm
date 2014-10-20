@@ -2,6 +2,10 @@ package com.tdsops.tm.enums.domain
 
 import com.tdssrc.grails.EnumUtil
 import com.tds.asset.AssetType
+import com.tds.asset.Application
+import com.tds.asset.AssetEntity
+import com.tds.asset.Database
+import com.tds.asset.Files
 
 /**
  * Define all the possible classes of assets that are supported by TransitionManager
@@ -20,17 +24,34 @@ enum AssetClass {
 		return obj
 	}
 
+	/**
+	 * Used to get the name of the name of the domain class associated with the AssetClass
+	 * @param assetClass - the enum of the asset class
+	 * @return the name of the GORM domain class
+	 */
 	static String domainNameFor(AssetClass assetClass) {
-		Map map = [
-			(AssetClass.DEVICE) : 'AssetEntity',
-			(AssetClass.DATABASE) : 'Database',
-			(AssetClass.APPLICATION) : 'Application',
-			(AssetClass.STORAGE) : 'Files'
-		] 
-		if (! map.containsKey(assetClass))
-			throw RuntimeException("AssetClass $assetClass has unhandled case in domainNameFor()")	
+		def domain = domainClassFor(assetClass).name
+		domain.split(/\./)[3]
+	}
 
-		return map[assetClass]
+	/**
+	 * Used to get the appropriate Domain Class for a specified asset class
+	 * @param assetClass - the enum of the asset class
+	 * @return the GORM domain class
+	 */
+	static Object domainClassFor(Object assetClass) {
+		def domain
+		def map = [
+			(AssetClass.DEVICE) : AssetEntity,
+			(AssetClass.DATABASE) : Database,
+			(AssetClass.APPLICATION) : Application,
+			(AssetClass.STORAGE) : Files
+		]
+		if (map.containsKey(assetClass)) {
+			return map[assetClass]
+		} else {
+			throw RuntimeException("domainClassFor() Unhandled case for $assetClass")
+		}
 	}
 
 	/**

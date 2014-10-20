@@ -579,10 +579,11 @@ class RackLayoutsController {
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
 		def tdHeight = rowspan * 6
 		def blades = []
+		def chassis = AssetEntity.findByAssetName(assetEntity.assetTag)
 		if(assetDetails.asset.source == 1)
-			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', sourceBladeChassis:assetEntity.assetTag).findAll{it?.moveBundle?.id in bundles?.id}
+			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', sourceChassis:chassis).findAll{it?.moveBundle?.id in bundles?.id}
 		else
-			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', targetBladeChassis:assetEntity.assetTag).findAll{it?.moveBundle?.id in bundles?.id}
+			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', targetChassis:chassis).findAll{it?.moveBundle?.id in bundles?.id}
 
 		def fullRows = []
 		def chassisRows = assetEntity.model.bladeRows

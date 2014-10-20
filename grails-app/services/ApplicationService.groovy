@@ -10,6 +10,8 @@ class ApplicationService {
 
 	boolean transactional = true
 	
+	def assetEntityService
+
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
 	 * applications for the user's current project
@@ -63,5 +65,38 @@ class ApplicationService {
 		}
 		
 		return result
+	}
+
+
+	/**
+	 * Used to get the model map used to render the show view of an Application domain asset
+	 * @param project - the project of the user
+	 * @param app - the instance of the application to pull attributes from
+	 * @param params - parameters from the controller
+	 * @return a map of the properties
+	 */
+	Map getApplicationModelForShow(Project, app, params) {
+			Project project = app.project
+
+			def appMoveEvent = AppMoveEvent.findAllByApplication(app)
+			def appMoveEventlist = AppMoveEvent.findAllByApplication(app)?.value
+			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+
+			def shutdownBy = app.shutdownBy  ? assetEntityService.resolveByName(app.shutdownBy) : ''
+			def startupBy = app.startupBy  ? assetEntityService.resolveByName(app.startupBy) : ''
+			def testingBy = app.testingBy  ? assetEntityService.resolveByName(app.testingBy) : ''
+
+			def model = [
+				applicationInstance : app,
+				appMoveEvent:appMoveEvent, 
+				appMoveEventlist:appMoveEventlist, 
+				moveEventList:moveEventList, 
+				shutdownBy:shutdownBy, 
+				startupBy:startupBy, 
+				testingBy:testingBy
+			]
+
+			model.putAll( assetEntityService.getCommonModelForShows('Application', project, params, app) )	
+			return model
 	}
 }

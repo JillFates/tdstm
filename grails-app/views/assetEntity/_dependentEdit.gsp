@@ -7,7 +7,7 @@
 			<td><g:select name="dataFlowFreq" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 			<td>
 				<g:select name="assetClassOption" 
-					onchange="AssetCrudModule.updateDependentAssetNameSelect(this.name, this.value)" 
+					onchange="EntityCrud.updateDependentAssetNameSelect(this.name, this.value)" 
 					from="${com.tdsops.tm.enums.domain.AssetClass.getClassOptions().entrySet()}" optionKey="key" optionValue="value"
 					<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
 					value="${ forWhom == 'Application' ? 'APPLICATION' : 'SERVER-DEVICE'}" 

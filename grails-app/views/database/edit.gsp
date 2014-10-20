@@ -11,12 +11,17 @@
 		changeDocTitle('${escapedName}');
 	})
 </script>
-<g:form method="post" action="update" name="editAssetsFormId">
-<input type="hidden" name="id" value="${databaseInstance?.id}" />
-<input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
-<input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
-<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
-<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
+<g:form method="post" action="update" name="createEditAssetForm">
+	<input type="hidden" name="id" value="${databaseInstance?.id}" />
+	<input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
+	<input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
+	<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
+	<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
+
+	<%-- Key field and optimistic locking var --%>
+	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
+	<input type="hidden" id="version" 	name="version" value="${version}"/>
+
 
 <table style="border: 0">
 	<tr>
@@ -94,8 +99,8 @@
 				<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}" />
 				<input name="supportCount" id="edit_supportCount" type="hidden" value="${supportAssets.size()}" />
 				<input name="redirectTo" type="hidden" value="${redirectTo}">
-				<input type = "hidden" id = "dbId"  value ="${databaseInstance.id}"/>
-				<input type = "hidden" id = "tabType" name="tabType" value =""/>
+				<input type="hidden" id = "dbId"  value ="${databaseInstance.id}"/>
+				<input type="hidden" id = "tabType" name="tabType" value =""/>
 				<input name="updateView" id="updateView" type="hidden" value=""/>
 				<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
 					

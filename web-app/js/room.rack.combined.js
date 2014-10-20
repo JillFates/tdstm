@@ -25,19 +25,16 @@ function updateAssetInfo(source,rack,roomName,location,position,forWhom){
 	var roomType = source != '1' ? 'Target' : 'Source'
 		
 	$("#"+target+"LocationId").val(location)
-	if(forWhom=='create'){
-		$("#room"+roomType+"Id").val(roomName)
-	}else{
-		$("#roomSelect"+type).val(roomName)
-	}
-	$("#"+target+"RackPositionId"+forWhom).val(position)
-	
-	getRacksPerRoom(roomName, type, '',forWhom,rack)
-	
+	$("#roomSelect"+type).val(roomName)
+	$("#"+target+"RackPositionId").val(position)
+	$('#deviceRackId'+type).val(rack);
+
+	EntityCrud.fetchRackSelectForRoom(roomName, type, forWhom);
+
 	if(!isIE7OrLesser)
 		$("select.assetSelect").select2();
-    
 }
+
 function validateAssetEntity(formname) {
 	var attributeSet = $("#attributeSetId").val();
 	if(attributeSet || formname == 'editForm'){
@@ -61,7 +58,7 @@ function listDialog(assign,sort,order,source,rack,roomName,location,position){
 		type:'POST',
 		success: function(data) {
 			if(data != null && data != ""){
-				$("#listDiv").html(data)
+				$("#listDialog").html(data)
 				$("#listDialog").dialog('option', 'width', 600)
 				$("#listDialog").dialog('option', 'height', 600)
 				$("#listDialog").dialog('option', 'position', ['center','top']);
@@ -77,6 +74,7 @@ function editDialog(assetId,source,rack,roomName,location,position){
 }
 function updateEditForm(source,rack,roomName,location,position){
 	var target = source != '1' ? 'target' : 'source'
+
 	$("#edit"+target+"RackId").val(rack)
 	$("#edit"+target+"LocationId").val(location)
 	$("#edit"+target+"RoomId").val(roomName)

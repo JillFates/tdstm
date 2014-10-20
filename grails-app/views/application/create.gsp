@@ -16,7 +16,7 @@
 		$("select.assetSelect").select2();
 	
 </script>
-<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFields('',this.name)">
+<g:form method="post" action="save" name="createEditAssetForm" onsubmit="return validateFields('',this.name)">
 	<input type="hidden" id="appl_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="appl_sme" name="appSmeFilter" value="" />
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
@@ -128,7 +128,7 @@
 
 							</tr>
 							<tr>
-								<td class="label ${config.appTech}  ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
+								<td class="label ${config.appTech}  ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Technology</label></td>
 								<td ><input type="text" id="appTech" class="${config.appTech}" name="appTech" 
 									value="${applicationInstance.appTech}" tabindex="13" />
 								</td>
@@ -232,8 +232,11 @@
 								</td>
 								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
-								<td ><input type="text" id="shutdownDuration" class="${config.shutdownDuration}" name="shutdownDuration"
-											value="${applicationInstance.shutdownDuration}" tabindex="55"  size="7"/>m
+								<td >
+									<input type="text" id="shutdownDuration" name="shutdownDuration"
+										value="${applicationInstance.shutdownDuration}" 
+										class="${config.shutdownDuration}"
+										tabindex="55"  size="7"/>m
 								</td>
 							</tr>
 							<tr>
@@ -265,20 +268,6 @@
 							<tbody class="customTemplate">
 								<g:render template="../assetEntity/customEdit" model="[assetEntityInstance:applicationInstance]"></g:render>
 							</tbody>
-							
-<%--							<tr>--%>
-<%--								<td class="label" nowrap="nowrap"><label for="events">Event</label>--%>
-<%--								</td>--%>
-<%--								<td colspan="7"><g:each in="${moveEventList}" var="moveEvent">--%>
-<%--										<div class="label"--%>
-<%--											style="float: left; width: auto; padding: 5px;">--%>
-<%--											<label for="moveEvent"><b>${moveEvent.name}</b>--%>
-<%--											</label> <label for="moveEvent"> <g:select id="okToMove_${moveEvent.id}" class="ynselect" name="okToMove_${moveEvent.id}" from="${['Y', 'N']}" --%>
-<%--											value="?" noSelection="['':'?']" />--%>
-<%--											</label>--%>
-<%--										</div>--%>
-<%--									</g:each></td>--%>
-<%--							</tr>--%>
 						</tbody>
 					</table>
 					

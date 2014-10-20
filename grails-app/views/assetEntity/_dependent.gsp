@@ -29,7 +29,7 @@
 					<td>
 						<g:select name="entity_support_${support.id}" 
 							id="entity_support_${support.id}" 
-							onChange="AssetCrudModule.updateDependentAssetNameSelect(this.name)" 
+							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
 							from="${assetClassOptions.entrySet()}" optionKey="key" optionValue="value"
 							value="${AssetClass.getClassOptionForAsset(support?.asset)}"
 						></g:select>
@@ -75,12 +75,12 @@
 					</td>
 
 					<%-- Dependency Type --%>
-					<td nowrap><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType.value}" optionValue="value" />
+					<td nowrap><g:select name="dtype_support_${support.id}" value="${support.type}" from="${dependencyType}" optionValue="value" />
 					  <g:render template="../assetEntity/dependencyComment" model= "[dependency:support,type:'support',forWhom:'edit']"></g:render>
 					</td>
 
 					<%-- Status --%>
-					<td><g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus.value}" 
+					<td><g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus}" 
 						optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/></td>
 					<td><a href="javascript:deleteRow('row_s_${i}_${support.id}', '${whom}_supportAddedId')"><span class='clear_filter'>X</span></a></td>
 				</tr>
@@ -121,7 +121,7 @@
 					<td>
 						<g:select name="entity_dependent_${dependent.id}" 
 							id="entity_dependent_${dependent.id}" 
-							onChange="AssetCrudModule.updateDependentAssetNameSelect(this.name)" 
+							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
 							from="${assetClassOptions.entrySet()}" optionKey="key" optionValue="value"
 							value="${AssetClass.getClassOptionForAsset(dependent?.dependent)}"
 						></g:select>
@@ -169,12 +169,12 @@
 
 					<%-- Dependency Type --%>
 					<td nowrap>
-						<g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType.value}" optionValue="value"/>
+						<g:select name="dtype_dependent_${dependent.id}" value="${dependent.type}" from="${dependencyType}" optionValue="value"/>
 						<g:render template="../assetEntity/dependencyComment" model= "[dependency:dependent,type:'dependent',forWhom:'edit']"></g:render>
 					</td>
 
 					<%-- Dependency Status --%>
-					<td><g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus.value}" 
+					<td><g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus}" 
 						optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
 						</td>
 					<td><a href="javascript:deleteRow('row_d_${i}_${dependent.id}', '${whom}_dependentAddedId')"><span class='clear_filter'>X</span></a></td>
@@ -190,7 +190,7 @@ $(document).ready(function() {
 	$(".depComDiv").dialog({ autoOpen: false})
 	
 	if (!isIE7OrLesser) {
-		AssetCrudModule.assetNameSelect2( $(".scrollSelect") );
+		EntityCrud.assetNameSelect2( $(".scrollSelect") );
 	}
 /*
 	$(".scrollSelect").select2({

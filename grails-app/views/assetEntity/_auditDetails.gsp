@@ -12,7 +12,7 @@
 	<tr class="prop">
 		<td class="label">Blade</td>
 		<td class="label">
-			${source=='1'? assetEntity.sourceBladeChassis : assetEntity.targetBladeChassis}
+			${source=='1'? assetEntity.sourceChassis : assetEntity.targetChassis}
 		</td>
 	</tr>
 	<tr class="prop">

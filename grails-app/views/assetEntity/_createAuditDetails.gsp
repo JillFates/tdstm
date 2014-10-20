@@ -32,7 +32,7 @@ $(document).ready(function() {
 	<tr class="prop bladeLabel">
 		<td class="label">Blade</td>
 		<td class="label">
-			<input type="text" id="BladeChassisId" ${source=='1' ? 'name="sourceBladeChassis"' : 'name="targetBladeChassis"'} />
+			<input type="text" id="BladeChassisId" ${source=='1' ? 'name="sourceChassis"' : 'name="targetChassis"'} />
 		</td>
 	</tr>
 	<tr class="prop bladeLabel">
@@ -51,7 +51,7 @@ $(document).ready(function() {
 		<td class="label">Manufacturer</td>
 		<td class="label">
 		  <div id="manufacturerCreateId">
-		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacuterer?.id}" 
+		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacturer?.id}" 
 		   		onChange="selectModel(this.value,'Create')" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
 		 </div>
 		</td>

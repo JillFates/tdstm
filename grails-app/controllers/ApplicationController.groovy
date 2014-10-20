@@ -8,14 +8,17 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 
+
 class ApplicationController {
 
+	def applicationService
 	def assetEntityService
 	def controllerService
 	def partyRelationshipService
@@ -258,7 +261,7 @@ class ApplicationController {
 		if (! project) 
 			return
 
-		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
 
 		def applicationInstance = new Application(params)
 
@@ -278,13 +281,23 @@ class ApplicationController {
 					appMoveInstance.errors.allErrors.each { println it }
 				}
 			}
-			if(params.showView == 'showView'){
+
+			if (params.showView == 'showView') {
+
 				forward(action:'show', params:[id: applicationInstance.id, errors:errors])
 				
-			}else if(params.showView == 'closeView'){
+			} else if(params.showView == 'closeView') {
 				render flash.message
-			}else{
+			} else {
 				session.APP?.JQ_FILTERS = params
+
+				def model = assetEntityService.getModelForShow(project, applicationInstance, params)
+				if (!model) {
+					ServiceResults.errors("Asset model not loaded")
+					return 
+				}
+				render(ServiceResults.success(model) as JSON)
+
 				redirect( action:list)
 			}
 		}
@@ -297,40 +310,21 @@ class ApplicationController {
 	}
 
 	def show = {
-
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def applicationInstance = controllerService.getAssetForPage(this, project, Application, params.id)
+		def assetId = params.id
+		def app = controllerService.getAssetForPage(this, project, AssetClass.APPLICATION, assetId)
 
-		if (!applicationInstance) {
-			flash.message = "Application not found with id ${params.id}"
+		if (!app) {
+			log.debug "show() Unable to find application instance $assetId"
+			flash.message = "Application not found with id $assetId"
 			def errorMap = [errMsg : flash.message]
 			render errorMap as JSON
 		} else {
-			def assetEntity = AssetEntity.read(params.id)
-
-			def appMoveEvent = AppMoveEvent.findAllByApplication(applicationInstance)
-			def appMoveEventlist = AppMoveEvent.findAllByApplication(applicationInstance).value
-			def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
-
-			def shutdownBy = assetEntity.shutdownBy  ? assetEntityService.resolveByName(assetEntity.shutdownBy) : ''
-			def startupBy = assetEntity.startupBy  ? assetEntityService.resolveByName(assetEntity.startupBy) : ''
-			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
-
-			def model = [
-				applicationInstance : applicationInstance,
-				appMoveEvent:appMoveEvent, 
-				appMoveEventlist:appMoveEventlist, 
-				moveEventList:moveEventList, 
-				shutdownBy:shutdownBy, 
-				startupBy:startupBy, 
-				testingBy:testingBy
-			]
-
-			model.putAll( assetEntityService.getDefaultModelForShows('Application', project, params, assetEntity) )
-
+			def model = applicationService.getModelForShow(project, app, params)
+			model.each { n,v -> println "$n:\t$v"}
 			return model
 		}
 	}
@@ -346,7 +340,7 @@ class ApplicationController {
 		if (! project) 
 			return
 
-		def applicationInstance = controllerService.getAssetForPage(this, project, Application, params.id)
+		def applicationInstance = controllerService.getAssetForPage(this, project, AssetClass.APPLICATION, params.id)
 
 		if(!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
@@ -387,7 +381,8 @@ class ApplicationController {
 
 		session.setAttribute("USE_FILTERS","true")
 
-		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+		
 		def applicationInstance = Application.get(params.id)
 
 		applicationInstance.sme = null

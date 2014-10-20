@@ -51,5 +51,7 @@ databaseChangeLog = {
 	include file: '20140903-drop-colums-AssetEntity-source-target-rooms.groovy'
 	include file: '20140908-add-bulk-delete-permissions.groovy'
 	include file: '20140909-update-model-types.groovy'
+	include file: '20140929-changeBladeChassisRefToUseIds.groovy'
+//	include file: '20141006-RenameGenericManuAndModel.groovy' // This is currently commented out until I can finish it (JPM 10/2014)
 	include file: '20141008-add-edit-project-field-settings-permissions.groovy'
 }

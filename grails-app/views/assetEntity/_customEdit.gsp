@@ -1,4 +1,4 @@
-<g:set var="tabOffset" value="50"/>
+<g:set var="tabOffset" value="700"/>
 
 <g:if test="${project.customFieldsShown != 0 && project.customFieldsShown <= Project.CUSTOM_FIELD_COUNT}">
 	<g:each in="${customs}" var="i" status="j">

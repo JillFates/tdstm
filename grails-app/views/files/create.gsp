@@ -5,7 +5,7 @@
 	$("#file_planStatus").val($('#gs_planStatus').val())
 	$("#file_moveBundle").val($('#gs_moveBundle').val())
 </script>
-<g:form method="post" action="save" name="createAssetsFormId" onsubmit="return validateFileFormat()">
+<g:form method="post" action="save" name="createEditAssetForm" onsubmit="return validateFileFormat()">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
 	<input type="hidden" id="file_size" name="sizeFilter" value="" />

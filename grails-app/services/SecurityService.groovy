@@ -284,4 +284,15 @@ class SecurityService implements InitializingBean {
 		return activeDirectoryConfigMap
 	}
 	
+	/**
+	 * Used to report security violations
+	 * @param message to be reported
+	 * @param user - optionally provide the user otherwise it will be looked up automatically
+	 */
+	void reportViolation(String message, UserLogin user=null) {
+		if (! user) {
+			user = getUserLogin()
+		}
+		log.warn "SECURITY_VIOLATION : $message by user $user"
+	}
 }

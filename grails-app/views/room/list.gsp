@@ -116,9 +116,6 @@
 			<div id="roomShowView" name="roomShowView" style="display: none;"></div>
 		</div>
 		<div id="listDialog" title="Asset List" style="display: none;">
-			<div class="dialog" >
-				<table id="listDiv"></table>
-			</div>
 		</div>
 		<div id="createRoomDialog" title="Create Room" style="display: none;">
 			<g:form method="post" name="createRoomForm" action="save" onsubmit="return validateForm()">
@@ -311,7 +308,17 @@
 			$("#manufacturerShowDialog,#modelShowDialog,#createEntityView,#showEntityView").dialog({autoOpen: false})
 			$("#editEntityView,#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({ autoOpen: false })
 			$("#editCommentDialog,#editManufacturerView").dialog({ autoOpen: false})
+			$(document).on('entityAssetCreated', function(e) { updateRackLayoutView(); });
+			$(document).on('entityAssetUpdated', function(e) { updateRackLayoutView(); });
 		})
+
+		function updateRackLayoutView(){
+			var currentRackId = $('#selectedRackId').val()
+			if ((currentRackId != null) && (currentRackId != "")) {
+				getRackLayout(currentRackId);
+			}
+		}
+
 		function openRoomView(e,browser){
 			
 			var resp = e.responseText
@@ -323,7 +330,6 @@
 			}
 			$("#room_layout").css("height","auto")
 		}
-
 
 		function enableActions(){
 			var inputCheckBox = $("input:checkbox")

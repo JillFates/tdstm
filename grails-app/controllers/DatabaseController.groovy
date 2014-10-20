@@ -15,20 +15,23 @@ import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetDependencyStatus
+
 
 class DatabaseController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	def assetEntityService
 	def controllerService  
+	def databaseService
 	def taskService 
 	def securityService
 	def jdbcTemplate
@@ -218,23 +221,18 @@ class DatabaseController {
 	}
 	
 	def show = {
-
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		def databaseInstance = controllerService.getAssetForPage(this, project, Database, params.id)
+		def dbId = params.id
 
-		if (!databaseInstance) {
-			flash.message = "Database not found with id ${params.id}"
-			def errorMap = [errMsg : flash.message]
-			render errorMap as JSON
+		def db = controllerService.getAssetForPage(this, project, AssetClass.DATABASE, dbId)
+
+		if (!db) {
+			render "Database was not found with id $dbId".toString()
 		} else {
-			def model = [
-				databaseInstance: databaseInstance
-			]
-
-			model.putAll( assetEntityService.getDefaultModelForShows('Database', project, params) )
+			def model = databaseService.getModelForShow(project, db, params)
 
 			return model
 		}
@@ -259,12 +257,45 @@ class DatabaseController {
 	}
 	
 	def save = {
+		controllerService.saveUpdateAssetHandler(this, session, databaseService, AssetClass.DATABASE, params)
 
+		/*
+		def errorMsg=''
+		def project, user
+		def asset, model
+		try {
+			(project, user) = controllerService.getProjectAndUserForPage( this, 'AssetEdit' )
+			if (project) {
+				asset = databaseService.saveAssetFromForm(this, session, project.id, user.id, params) 
+				model = assetEntityService.getAssetSimpleModel(asset)
+			}
+			errorMsg = flash.message
+			flash.message = null
+		} catch (InvalidRequestException e) {
+			errorMsg = e.getMessage()
+		} catch (EmptyResultException e) {
+			errorMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			errorMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errorMsg = e.getMessage()
+		} catch (e) {
+			log.error "save() failed for unexpected cause\nParams were: $params\n" +  ExceptionUtil.stackTraceToString(e)
+			errorMsg = "An error occurred while attempting to create the asset"
+		}
+
+		// Not sure what this is doing...
+		session.DB?.JQ_FILTERS = params
+
+		assetEntityService.renderSaveAssetJsonResponse(this, model, errorMsg)
+		*/
+		/*
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
-		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+
+		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
 
 		def dbInstance = new Database(params)
 
@@ -287,6 +318,7 @@ class DatabaseController {
 			session.DB?.JQ_FILTERS = params
 			redirect( action:list)
 		}
+		*/
      }
 
 	def edit = {
@@ -294,7 +326,7 @@ class DatabaseController {
 		if (! project) 
 			return
 			
-		def databaseInstance = controllerService.getAssetForPage(this, project, Database, params.id)
+		def databaseInstance = controllerService.getAssetForPage(this, project, AssetClass.DATABASE, params.id)
 		if (!databaseInstance) {
 			render '<span class="error">Unable to find Database asset to edit</span>'
 			return
@@ -308,70 +340,103 @@ class DatabaseController {
 	}
 	
 	def update = {
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
+		controllerService.saveUpdateAssetHandler(this, session, databaseService, AssetClass.DATABASE, params)
+		/*
+		def errorMsg=''
+		def project, user
+		def asset, model
+		def id = params.id
+		try {
+			(project, user) = controllerService.getProjectAndUserForPage( this, 'AssetEdit' )
+			if (project) {
+				asset = controllerService.getAssetForPage(this, project, AssetClass.DATABASE, id)
+				if (asset) {
+					databaseService.updateAssetFromForm(this, session, project.id, user.id, asset.id, params)
 
-		session.setAttribute("USE_FILTERS","true")
-		
-		assetEntityService.applyExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
-		def databaseInstance = Database.get(params.id)
-		databaseInstance.properties = params
-
-		if (! databaseInstance.hasErrors() && databaseInstance.save(flush:true)) {
-			flash.message = "Database ${databaseInstance.assetName} was updated"
-			def loginUser = securityService.getUserLogin()
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, databaseInstance, loginUser, project)
-			flash.message += "</br>"+errors
-			if (params.updateView == 'updateView') {
-				forward(action:'show', params:[id: params.id, errors:errors])
-			} else if(params.updateView == 'closeView') {
-				render flash.message
-			} else {
-				switch (params.redirectTo) {
-					case "room":
-						redirect( controller:'room',action:list )
-						break
-					case "rack":
-						redirect( controller:'rackLayouts',action:'create' )
-						break
-					case "console":
-						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
-						break
-					case "clientConsole":
-						redirect( controller:'clientConsole', action:list)
-						break
-					case "assetEntity":
-						redirect( controller:'assetEntity', action:list)
-						break
-					case "application":
-						redirect( controller:'application', action:list)
-						break
-					case "files":
-						redirect( controller:'files', action:list)
-						break
-					case "listComment":
-						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
-						break
-					case "listTask":
-						render "Database ${databaseInstance.assetName} updated."
-						break
-					case "dependencyConsole":
-						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
-						break
-					default:
-						session.DB?.JQ_FILTERS = params
-						redirect(action:list)
+					// Reload the asset due to the hibernate session 
+					asset = AssetEntity.read(id)
+					model = assetEntityService.getAssetSimpleModel(asset)
 				}
+			} 
+			errorMsg = flash.message
+			flash.message = null
+		} catch (InvalidRequestException e) {
+			errorMsg = e.getMessage()
+		} catch (EmptyResultException e) {
+			errorMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			errorMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errorMsg = e.getMessage()
+		} catch (e) {
+			log.error "update() failed " +  ExceptionUtil.stackTraceToString(e)
+			errorMsg = "An error occurred during the update"
+		}
+
+		if ( errorMsg ) {
+			// JPM 9/2014 - Not sure why we're updating the filter for JQGrid here
+			session.AE?.JQ_FILTERS = params
+		}
+
+		assetEntityService.renderUpdateAssetJsonResponse(this, model, errorMsg)
+		*/
+		/*
+		if (params.updateView == 'updateView') {
+			forward(action:'show', params:[id: params.id, errors:errorMsg])
+		} else {
+			switch (params.redirectTo) {
+				case "room":
+					redirect( controller:'room',action:list )
+					break
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create' )
+					break
+				case "console":
+					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+					break
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list)
+					break
+				case "assetEntity":
+					redirect( controller:'assetEntity', action:list)
+					break
+				case "application":
+					redirect( controller:'application', action:list)
+					break
+				case "files":
+					redirect( controller:'files', action:list)
+					break
+				case "listComment":
+					redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
+					break
+				case "listTask":
+					render "Database ${databaseInstance.assetName} updated."
+					break
+				case "dependencyConsole":
+					forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
+					break
+				default:
+					session.DB?.JQ_FILTERS = params
+					// Handle results as standardized Ajax return value
+					if (errors.size()) {
+						render ServiceResults.errors(errors) as JSON
+					} else if (!databaseInstance) {
+						render ServiceResults.errors("Asset not returned") as JSON
+					} else {
+						model = databaseService.getModelForShow(project, databaseInstance, params)
+						if (!model) {
+							ServiceResults.errors("Asset model not loaded")
+							return 
+						}
+						render(ServiceResults.success(model) as JSON)
+					}
 			}
 		}
-		else {
-			flash.message = "Database was not updated"
-			databaseInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list)
-		}
+
+		*/
 		
 	}
+
 	def delete = {
 		def database = Database.get( params.id )
 		if( database ) {

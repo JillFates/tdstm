@@ -1,11 +1,178 @@
 /*
- * Javascript functions used by the Asset CRUD forms and Lists
+ * Javascript functions used by the Entity CRUD forms and Lists
  */
 
-var AssetCrudModule = {
+var EntityCrud = ( function($) {
 
-	// Creates a Select2 control for an Asset Name selector
-	assetNameSelect2: function(element) {
+	var pub = {};	// public methods
+
+	var stArray = ['source','target'];
+
+	// The default quiet period for Select2 before issuing searches
+	var quietMillis = 600;
+
+	// ---
+	// The following are a few handy accessors for the form variables
+	// ---
+
+	var modelFilteringData = {
+	    'id'             : null,
+	    'manufacturerId' : null,
+	    'assetType'      : null,
+	    'term'           : null
+	};
+	
+	var selectedModel = null;
+	
+	var assetFormName = "createEditAssetForm";
+
+	// ------------------
+	// Private Methods
+	// ------------------
+
+	/**
+	 * Private method used to validate common fields on any of the asset create/edit forms
+	 * @return true if valid
+	 **/
+	var validateCommonFields = function(form) {
+		var ok = false;
+
+		// Validate that asset name is not blank
+		var fieldVal = $('#'+form+' #assetName').val();
+		if (fieldVal == '') {
+			alert('Please provide a name for the asset')
+		} else {
+			ok = true
+		}
+		return ok;
+	};
+
+	/**
+	 * Private method used to validate the Storage asset create/edit forms
+	 * @return true if valid
+	 **/
+	var validateStorageForm = function(form) {
+		var ok = validateCommonFields(form);
+		if (ok) {
+			var size = $('#'+form+' #size').val();
+			if ( size=='' || isNaN(size)) {
+				alert("Please enter numeric value for Storage Size");
+				ok = false;
+			} else if ($('#'+form+' #fileFormat').val()=='') {
+				alert("Please enter value for Storage Format");
+				ok = false;
+			}
+		}
+		return ok
+	};
+
+	/**
+	 * Private method used to validate the Database asset create/edit forms
+	 * @return true if valid
+	 **/
+	var validateDBForm = function(form) {
+		var ok = validateCommonFields(form);
+		if (ok) {
+		    var size = $('#'+form+' #size').val();
+		    if ( size=='' || isNaN(size)){
+		    	alert("Please enter numeric value for DB Size");
+				ok = false;
+		    } else if($('#'+form+' #dbFormat').val()==''){
+		    	alert("Please enter value for DB Format");
+				ok = false;
+		    }
+		}
+		return ok
+	};
+
+	/**
+	 * Used to validate the Server/Device asset create/edit forms
+	 * @return true if valid
+	 **/
+	var validateDeviceForm = function(form) {
+		var ok = validateCommonFields(form);
+		return ok
+	};
+
+	var validateAppForm = function(form){
+		var ok = validateCommonFields(form);
+		if (ok) {
+			ok = false;
+			if($('#'+form+' #sme1').val()=='0' || $('#'+form+' #sme2').val()=='0' || $('#'+form+' #appOwner').val()=='0' ){
+				alert("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
+			} else {
+				var msg = '';
+				// Check to see if the durations have legit numbers
+				var fname = ['Shutdown', 'Startup', 'Testing'];
+				// Hack because of inconsistency in the field ids
+				var c=0;
+				fname.forEach( function(name) {
+					var fs = '#'+form+' input[name='+ name.toLowerCase() + 'Duration]';
+					var field = $(fs);
+					if (field.length>0) {
+						if ( field.val() != '' && isNaN(field.val()) ) {
+							msg = ( msg!='' ? msg + ', ' : '' ) + name;
+							c++;
+						}
+					} else {
+						console.log('validateAppForm() Unable to locate property ' + fs);
+					}
+				});
+				if (msg != '') {
+					alert("Please make sure that the " + msg + ' Duration field' + (c>1 ? 's have' : ' has a') + ' numeric value' + (c>1 ? 's' : ''));
+				} else {
+					ok = true;
+				}	
+			}
+		}
+		return ok;
+	};
+
+	// ------------------
+	// Public Methods
+	// ------------------
+
+	// Used to access the assetType within the CRUD pages
+	pub.getAssetType = function() {
+		return $('#currentAssetType').val();
+	};
+
+	// Get the initial rack id for S)ource or T)arget 
+	pub.getRackId = function(sourceTarget) {
+		var id = $('#deviceRackId'+sourceTarget).val();
+		return id;
+	}
+
+	// Get the initial chassis id for S)ource or T)arget 
+	pub.getChassisId = function(sourceTarget) {
+		var id = $('#deviceChassisId'+sourceTarget).val();
+		return id;
+	}
+
+	// Common method used to return the selected option in a select control
+	// TODO : refactor this to shared lib
+	pub.selectOptionSelected = function(selectCtrl) {
+		var val='';
+		if (selectCtrl.jquery) {
+			// JQuery found object
+			val = selectCtrl.val();
+		} else {
+			// Select found by other means
+			var si=selectCtrl.selectedIndex;
+			if (si > -1)
+				val = selectCtrl.options[si].value;
+		}
+		return val;
+	};
+
+	// Common method to capitalize the first letter of a string
+	// TODO : refactor this to shared lib
+	pub.capitalize = function(str) {
+		return str.charAt(0).toUpperCase() + str.substring(1);
+	}
+
+	// Creates a Select2 control for an Asset Name selector used in Depenedencies
+	pub.assetNameSelect2 = function(element) {
 		element.select2( {
 			minimumInputLength: 0,
 			initSelection: function (element, callback) {
@@ -14,9 +181,9 @@ var AssetCrudModule = {
 			},
 			placeholder: "Please select",
 			ajax: {
-				url: contextPath+"/assetEntity/assetListForSelect2",
+				url: tdsCommon.createAppURL('/assetEntity/assetListForSelect2'),
 				dataType: 'json',
-				quietMillis: 600,
+				quietMillis: quietMillis,
 				data: function (term, page) {
 					return {
 						q: term, 
@@ -31,128 +198,716 @@ var AssetCrudModule = {
 				}
 			}
 		} );
-	},
+	};
 
-	// Used to change the Select2 Asset Name SELECT when the Class SELECT is changed
-	updateDependentAssetNameSelect: function(name) {
-		var split = name.split("_");
-		var classSelect = $("select[name='entity_"+split[1]+"_"+split[2]+"']");
-		var nameSelect = $("input[name='asset_"+split[1]+"_"+split[2]+"']");
-		nameSelect.data("asset-type", classSelect.val());
-		nameSelect.select2("val", "");
-	}, 
+	// Used on populate the Manufacturer SELECT to toggle various form fields
+	// TODO : JPM 9/2014 : This is subject to change with the change in behavior with AssetType selector
+	pub.selectManufacturer = function(assetType, forWhom) {
+		EntityCrud.toggleAssetTypeFields(assetType);
+
+		new Ajax.Request(
+			contextPath+'/assetEntity/getManufacturersList?assetType='+assetType+'&forWhom='+forWhom,
+			{ 	asynchronous:true,
+				evalScripts:true,
+				onComplete:function(e) { showManufacView(e, forWhom); }
+			}
+		);
+	};
+
+	// Update Model Selector based on manufacturer
+	pub.updateModelSelect = function(manuId, forWhom) {
+		var assetType = $("#assetType"+forWhom+"Id").val() ;
+		new Ajax.Request(
+			contextPath+'/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+manuId+'&forWhom='+forWhom,
+			{	asynchronous:true,
+				evalScripts:true,
+				onComplete:function(e) { showModelView(e, forWhom); }
+			}
+		);
+	};
+
+	pub.showRackOrBladeFields = function(rackBlade) {
+		stArray.forEach( function(n,i) {
+			// Show Rack select if room is selected; Rack name if New Room or New Rack; or nothing if Room or Rack are not selected
+			['S','T'].forEach( function(n, i) {
+				var rmCtrl = $('#roomSelect'+n);
+				var roomId = pub.selectOptionSelected(rmCtrl);
+				var sOrT = (n=='S' ? 'source' : 'target');
+				var elPrefix = '#'+sOrT;
+				var rbcName = rackBlade.toLowerCase()+pub.capitalize(sOrT)+'Id';
+				var newrbcName = "new" + pub.capitalize(rbcName);
+				var oldrbcName = "old" + pub.capitalize(rbcName);
+				var rackBladeCtrl = $('#'+rbcName);
+				var rackBladePosCtrl = $(elPrefix+rackBlade+'PositionId');
+				switch(roomId) {
+					case '0':
+						// Unselected
+						$('.use'+rackBlade+n).hide();
+						$(".newRoom"+n).hide();
+						$(".newRack"+n).hide();
+						rackBladePosCtrl.hide();
+
+						if (rackBlade=='Rack') {
+							$('#' + rbcName).attr('name', rbcName);
+							$('#' + newrbcName).attr('name', newrbcName);
+						}
+						break;
+					case '-1':
+						// Create room - room  and input fields
+						$(".newRoom"+n).show();
+						if (rackBlade=='Rack') {
+							$(".newRack"+n).show();
+							$('.use'+rackBlade+n).hide();
+							rackBladePosCtrl.hide();
+							rackBladePosCtrl.show();
+							
+							$('#' + rbcName).attr('name', oldrbcName);
+							$('#' + newrbcName).attr('name', rbcName);
+						}
+						break;
+					default:
+						$(".newRoom"+n).hide();
+						$(".newRack"+n).hide();
+						$('.use'+rackBlade+n).show();
+						// Now show the chassis position based on if a chassis is selected
+						var rbVal = pub.selectOptionSelected(rackBladeCtrl);
+						var optionId = parseInt( rbVal );
+						if (optionId > 0) {
+							rackBladePosCtrl.show();
+						} else {
+							rackBladePosCtrl.hide();
+						}
+						if (rackBlade=='Rack') {
+							$('#' + rbcName).attr('name', rbcName);
+							$('#' + newrbcName).attr('name', newrbcName);
+						}
+				}
+			});
+		});
+
+	}
+	// Used to display Chassis fields appropriately
+	pub.showChassisFields = function() {
+		$(".positionLabel").show();
+		$(".bladeLabel").show();
+		stArray.forEach( function(n,i) {
+			// Only show Chassis select if room is selected
+			['S','T'].forEach( function(n, i) {
+				var rmCtrl = $('#roomSelect'+n);
+				var roomId = pub.selectOptionSelected(rmCtrl);
+				var sOrT = (n=='S' ? 'source' : 'target');
+				var elPrefix = '#'+sOrT;
+				var chassisCtrl = $(elPrefix+'ChassisSelectId');
+				var bladePosCtrl = $(elPrefix+'BladePositionId');
+				switch(roomId) {
+					case '-1':
+						// Show room input fields
+						$(".newRoom"+n).show();
+						// then fall into '0'
+					case '0':
+						$(".useBlade"+n).hide();
+						bladePosCtrl.hide();
+						break;
+					default:
+						$(".useBlade"+n).show();
+						// Now show the chassis position based on if a chassis is selected
+						var optionId = parseInt( chassisCtrl.val() );
+						if (optionId > 0) {
+							bladePosCtrl.show();
+						} else {
+							bladePosCtrl.hide();
+						}
+				}
+			});
+		});
+	};
+
+	// Used to hide Chassis fields
+	pub.hideChassisFields = function() {
+		$(".bladeLabel").hide();
+		$(".useBladeS").hide();
+		$(".useBladeT").hide();
+	};
+
+	// Used to display the Rack fields
+	pub.showRackFields = function() {
+		$(".positionLabel").show();
+		$(".rackLabel").show();
+		pub.showRackOrBladeFields('Rack');
+	}
+
+	// Used to hide Rack fields
+	pub.hideRackFields = function() {
+		$(".newRackS").hide();
+		$(".newRackT").hide();		
+		$(".useRackS").hide();
+		$(".useRackT").hide();
+		$(".rackLabel").hide();	
+	};
+
+	// Used to display VM fields
+	pub.showVMFields = function() {
+		$(".vmLabel").show();
+		$(".positionLabel").hide();
+	};
+
+	// Used to hide VM fields
+	pub.hideVMFields = function() {
+		$(".vmLabel").hide();
+	};
+
+	// Used to hide and show the appropriate fields based on the asset type (Blade, VM or other types)
+	pub.toggleAssetTypeFields = function( assetType ) {
+		switch(assetType) {
+			case 'Blade':
+				pub.hideRackFields();
+				pub.hideVMFields();
+				pub.showChassisFields();
+				break;
+			case 'VM':
+				pub.hideRackFields();
+				pub.hideChassisFields();
+				pub.showVMFields();
+				break;
+			default:
+				// Rackable device
+				pub.hideChassisFields();
+				pub.hideVMFields();
+				pub.showRackFields();
+		}
+	};
+
+	// Used to retrieve a SELECT control populated with the appropriate Rack for the specified room and source/target and assign to the appropriate form control
+	pub.fetchRackSelectForRoom = function(roomId, sourceTarget, forWhom) {
+		var rackId = pub.getRackId(sourceTarget);
+		var rsName='#rack'+(sourceTarget=='S' ? 'Source' : 'Target') + 'Id';
+		var selectCtrl = $(rsName);
+		if (selectCtrl.length) {
+			jQuery.ajax({
+				url: tdsCommon.createAppURL('/assetEntity/getRackSelectForRoom'),
+				data: {'roomId':roomId, 'rackId':rackId, 'sourceTarget':sourceTarget, 'forWhom':forWhom},
+				type:'POST',
+				success: function(resp) {
+					selectCtrl.html(resp);
+
+					if (!isIE7OrLesser)
+						selectCtrl.select2();
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					alert(xhr.status + " " + thrownError);
+					selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>') ;
+					selectCtrl.val(0);
+				}
+			});
+		} else {
+			alert('ERROR: fetchRackSelectForRoom() unable to locate select id '+ rsName);
+		}
+	};
+
+	// Used to retrieve a SELECT control populated with the appropriate Blade Chassis for the specified room and source/target and assign to the appropriate form control
+	pub.fetchChassisSelectForRoom = function(roomId, sourceTarget, forWhom) {
+		var id = pub.getChassisId(sourceTarget);
+		var selectCtrl = $( '#' + (sourceTarget=='S' ? 'source' : 'target') + 'ChassisSelectId');
+
+		jQuery.ajax({
+			url: tdsCommon.createAppURL('/assetEntity/getChassisSelectForRoom'),
+			data: {'roomId':roomId, 'id':id, 'sourceTarget':sourceTarget, 'forWhom':forWhom},
+			type:'POST',
+			success: function(resp) {
+				selectCtrl.html(resp);
+
+				if (!isIE7OrLesser)
+					selectCtrl.select2();
+			}, 
+			error: function (xhr, ajaxOptions, thrownError) {
+				alert(xhr.status + " " + thrownError);
+				selectCtrl.children().remove().end().append('<option selected value="0">Unable to load</option>') ;
+				selectCtrl.val(0);
+			}
+		});
+	};
+
+	// Handle form changes when the user selects a room
+	pub.updateOnRoomSelection = function(selectCtrl, sourceTarget, forWhom) {
+		var selectId = pub.selectOptionSelected(selectCtrl);
+		var assetType = pub.getAssetType();
+		switch(assetType) {
+			case 'Blade':
+				if (parseInt(selectId) > 0)
+					pub.fetchChassisSelectForRoom(selectId, sourceTarget, forWhom);
+				pub.showChassisFields();
+				break;
+			case 'VM':
+				pub.showVMFields();
+				break;
+			default:
+				if (parseInt(selectId) > 0)
+					pub.fetchRackSelectForRoom(selectId, sourceTarget, forWhom);
+				pub.showRackFields();
+		}
+		if (selectId == -1) {
+			targetLocationId
+			var elPrefix = "#" + (sourceTarget=='S' ? 'source' : 'target');
+			$(elPrefix + 'LocationId').focus();
+		}
+	};
+
+	// Called after the user selects a chassis
+	pub.updateOnChassisSelection = function (selectCtrl, sourceTarget, forWhom) {
+		pub.showChassisFields();
+	};
+
+	// Updates the form after the user chooses a rack
+	pub.updateOnRackSelection = function(selectCtrl, sourceTarget, forWhom) {
+		var selectId = pub.selectOptionSelected(selectCtrl);
+		var elPrefix = "#" + (sourceTarget=='S' ? 'source' : 'target');
+		var rackName=$(elPrefix + 'RackId');
+		var newRack=$(".newRack"+sourceTarget);
+		var rackPosition=$(elPrefix + 'RackPositionId');
+
+		switch(selectId) {
+			case '0':
+				newRack.hide();
+				rackPosition.hide();
+				rackPosition.val('');	// clear out current position
+				break;
+			case '-1': 
+				newRack.show();
+				rackPosition.show();
+				rackName.focus();
+				break;
+			default:
+				newRack.hide();
+				rackPosition.show().focus();
+		}
+	};
+
+	/**
+	 * Used to save newly created assets from the Create forms. After validating that the fields are 
+	 * okay it will make an Ajax call to create the asset.
+	 *
+	 * @param me - the form that is being processed
+	 * @param forWhom - string indicating which form is being processed (note that this is inconsistent with the update metho)
+	 */
+	pub.saveToShow = function(button, forWhom) {
+		// var action = button.data('action');
+		var redirect = button.data('redirect');
+
+		if (redirect)
+			redirect = redirect.split("_")[0]
+		// TODO : JPM 10/2014 : Determine purpose - has to do with the close/show behavior
+		$('#showView').val('showView')
+
+		var type = forWhom;
+		var validateOkay=true;
+		var formName = assetFormName;
+		switch(forWhom) {
+			case 'Application':
+				validateOkay = validateAppForm(formName);
+				break;
+
+			case 'Files':
+			case 'Logical Storage':
+				type = 'Storage';
+				validateOkay = validateStorageForm(formName);
+				break;
+
+			case 'Database':
+				validateOkay = validateDBForm(formName);
+				break;
+
+			case 'Device':
+				// type = "Server";
+				validateOkay = validateDeviceForm(formName);
+				break;
+
+			default:
+				alert('ERROR: saveToShow() - unsupported case for ' + forWhom);
+		}
+
+		if (validateOkay)
+			validateOkay = pub.validateDependencies(formName)
+			
+		if (validateOkay) {
+			var url=$('#createEditAssetForm').attr('action');
+			jQuery.ajax({
+				url: url,
+				data: $('#createEditAssetForm').serialize(),
+				type:'POST',
+				success: function(resp) {
+					if (resp.status == 'error') {
+						alert(resp.errors);
+						return false;
+					} else {
+						$('#createEntityView').dialog('close');
+
+						/*
+						// Go to the show view
+						if($('.ui-icon-refresh').length);
+							$('.ui-icon-refresh').click();
+						if (redirect=='room')
+							getRackLayout( $('#selectedRackId').val() );
+						$('#showEntityView').html(data.html);
+						$("#showEntityView").dialog('option', 'width', 'auto');
+						$("#showEntityView").dialog('option', 'position', ['center','top']);
+						$("#showEntityView").dialog('open');
+
+						updateAssetTitle(forWhom);
+						if(!isIE7OrLesser) 
+							getHelpTextAsToolTip(type);
+						changeDocTitle(title);
+						*/
+
+						getEntityDetails(redirect, forWhom, resp.data.asset.id);
+					}
+					$(document).trigger('entityAssetCreated');
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var err = jqXHR.responseText;
+					alert("An error occurred while creating Asset : "+ err);
+					return false;
+				}
+			});
+		}
+		return true;
+	};
 
 	/**
 	 * Used to call Ajax Update for given asset form and then load the show view of the asset
 	 * @param me - the form
 	 * @param forWhom - the asset class of the form (app, files, database)
 	 **/
-	 performAssetUpdate: function($me, forWhom) {
+	 pub.performAssetUpdate = function($me, forWhom) {
 		var act = $me.data('action');
 		var type = 'Server';
 		var redirect = $me.data('redirect');
 
 		$('#updateView').val('updateView');
 
-		var validateOkay=true;
+		var validateOkay=false;
+		var formName=assetFormName;
 		switch(forWhom) {
 			case 'app':
 				type = 'Application';
-				validateOkay = validateAppForm('Edit','editAssetsFormId');
+				validateOkay = validateAppForm('Edit',formName);
 				break;
 
 			case 'files':
 				type = 'Storage';
-				validateOkay = validateStorageForm('editAssetsFormId');
+				validateOkay = validateStorageForm(formName);
 				break;
 
 			case 'database':
 				type = 'Database';
-				validateOkay = validateDBForm('editAssetsFormId');
+				validateOkay = validateDBForm(formName);
 				break;
 
-			case 'server':
-				type = 'Server';
-				validateOkay = validateDeviceForm('editAssetsFormId');
+			case 'Device':
+				validateOkay = validateDeviceForm(formName);
 				break;
 
 			default:
-				alert('Unsupported case for ' + forWhom);
+				alert("Unsupported case '" + forWhom + "' in performAssetUpdate()");
+
 		}
 
 		if (validateOkay)
-			validateOkay = validateDependencies('editAssetsFormId');
+			validateOkay = pub.validateDependencies(formName);
 
 		if (validateOkay) {
+			var formObj=$('#'+formName);
+			if (formObj.length==0) {
+				alert("Unable to locate form "+formName);
+				return false;
+			}
+			var assetId=$("#"+formName+" :input[name='id']").val();
+			var url=formObj.attr('action')+'/'+assetId;
 			jQuery.ajax({
-				url: $('#editAssetsFormId').attr('action'),
-				data: $('#editAssetsFormId').serialize(),
+				url: url,
+				data: formObj.serialize(),
 				type:'POST',
-				success: function(data) {
-					if(data.errMsg){
-						alert(data.errMsg)
+				success: function(resp) {
+					if (resp.status == 'error') {
+						alert(resp.errors);
+						return false;
 					} else {
-						if(act=='close'){
-							$('#editEntityView').dialog('close')
-							$('#messageId').show();
-							$('#messageId').html(data);
-							if($('.ui-icon-refresh').length)
-								$('.ui-icon-refresh').click();
-						}else{
-							$('#editEntityView').dialog('close')
-							if(redirect == 'room')
-								getRackLayout( $('#selectedRackId').val() )
-							$('#showEntityView').html(data)
-							$("#showEntityView").dialog('option', 'width', 'auto')
-							$("#showEntityView").dialog('option', 'position', ['center','top']);
-							$("#showEntityView").dialog('open');
-						}
+						$('#editEntityView').dialog('close')
+
+						getEntityDetails(redirect, forWhom, resp.data.asset.id);
+
+						/*
+						if(redirect == 'room')
+							getRackLayout( $('#selectedRackId').val() )
+
+						$('#showEntityView').html(data)
+						$("#showEntityView").dialog('option', 'width', 'auto')
+						$("#showEntityView").dialog('option', 'position', ['center','top']);
+						$("#showEntityView").dialog('open');
 						changeDocTitle(title)
 						if(!isIE7OrLesser) 
 							getHelpTextAsToolTip(type);
+						*/
 					}
+					$(document).trigger('entityAssetUpdated');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					var err = jqXHR.responseText
-					alert("An unexpected error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")))
+					var err = jqXHR.responseText;
+					alert("An error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+					return false;
 				}
 			});
 		}
+		return true;	
+	};	
+	// Initializes the various controls for the selection of manufacturer and model with the assetType filter
+	pub.initializeUI = function(modelId, modelName, manufacturerId, manufacturerName) {
+
+		// Initialize the model filtering parameters
+		modelFilteringData.id = $('#hiddenModel').val();
+		modelFilteringData.manufacturerId = $('#hiddenManufacturer').val();
+		modelFilteringData.assetType = $('#currentAssetType').val();
+		modelFilteringData.id = $('#currentAssetType').val();
+
+		$('#assetTypeFilterUnSet').click(function() {
+			$('#assetTypeLabel').toggle();
+			$('#assetTypeSelectContainer').toggle();
+		});
+
+		$('#assetTypeFilterSet').click(function() {
+			$('#assetTypeLabel').toggle();
+			$('#assetTypeSelectContainer').toggle();
+			$('#assetTypeFilterSet').toggle();
+			$('#assetTypeFilterSet2').toggle();
+		});
+
+		$('#assetTypeFilterSet2').click(function() {
+			$('#assetTypeLabel').toggle();
+			$('#assetTypeSelectContainer').toggle();
+			$('#assetTypeFilterSet').toggle();
+			$('#assetTypeFilterSet2').toggle();
+		});
+
+		$("#assetTypeSelect").select2({
+		    placeholder: "Model type filter",
+		    minimumInputLength: 0,
+		    allowClear: true,
+		    width: "80%"
+		});
 		
+		$("#assetTypeSelect").on("change", function(event) {
+			$('#assetTypeFilterSet').show();
+			$('#assetTypeFilterUnSet').hide();
+			modelFilteringData.assetType = event.val;
+			if (selectedModel != null && selectedModel.assetType != null && event.val != selectedModel.assetType.toString()) {
+				selectedModel = {
+					"id" : null,
+					"text" : null,
+					"assetType" : event.val,
+					"manufacturerId" : selectedModel.manufacturerId,
+					"manufacturerName" : selectedModel.manufacturerName
+				}
+				
+				$("#modelSelect").select2('val', '');
+			}
+		});
+		
+		$("#modelSelect").select2({
+		    placeholder: "Model",
+		    minimumInputLength: 0,
+   			dropdownAutoWidth: true,
+		    width: "80%",
+		    allowClear: true,
+		    ajax: {
+		        url: tdsCommon.createAppURL('/assetEntity/modelsOf'),
+				quietMillis: quietMillis,
+		        dataType: 'json',
+		        data: function (term, page) {
+		        	modelFilteringData.term = term;
+		            return modelFilteringData;
+		        },
+		        results: function (data, page) {
+		            return {results: data.data.models};
+		        }
+		    },
+		    initSelection: function(element, callback) {
+		    	if (modelId != "") {
+		    		callback({id: modelId, text : modelName});
+		    	}
+		    }
+		}).select2('val', []);
+		
+		$('#modelSelect').on("change", function(event) {
+			console.log("in the #modelSelect on change event");
+			var at = event.added.assetType;
+			selectedModel = event.added;
+
+			var modelId = selectedModel.id;
+			var manuId = selectedModel.manufacturerId;
+			var manuName = selectedModel.manufacturerName;
+
+			$('#currentAssetType').val(at);
+			$('#asset_model').val(modelId);
+			$('#hiddenModel').val(modelId);
+			$('#hiddenManufacturer').val();
+
+			pub.toggleAssetTypeFields(at);
+			
+			$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':selectedModel.name});
+			$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
+			$("#assetTypeSelect").select2('data', {"id":at, "text":at});
+		});
+		
+		$("#manufacturerSelect").select2({
+		    placeholder: "Manufacturer",
+		    minimumInputLength: 0,
+			dropdownAutoWidth: true,
+		    width: "80%",
+		    allowClear: true,
+		    ajax: {
+		    	url: tdsCommon.createAppURL('/assetEntity/manufacturer'),
+		    	quietMillis: quietMillis,
+		    	dataType: 'json',
+		    	data: function (term, page) {
+		    		return {
+		    			"term" : term,
+		    			"assetType" : modelFilteringData.assetType
+		    		};
+		    	},
+		    	results: function (data, page) {
+		    		return {results: data.data.manufacturers};
+		    	}
+		    },
+		    initSelection: function(element, callback) {
+		    	if (manufacturerId != "") {
+		    		callback({id: manufacturerId, text : manufacturerName});
+		    	}
+		    }
+		}).select2('val', []);
+
+		$('#manufacturerSelect').on("change", function(event) {
+			modelFilteringData.manufacturerId = event.val;
+			
+			if (selectedModel != null && selectedModel.manufacturerId != null && event.val != selectedModel.manufacturerId.toString()) {
+				selectedModel = {
+					"id" : null,
+					"text" : null,
+					"assetType" : null,
+					"manufacturerId" : event.val,
+					"manufacturerName" : null
+				}
+				
+				$("#modelSelect").select2('val', '');
+			}
+		});
+	};
+	
+	pub.setManufacturerValues = function(modelId, modelName, assetType, manufacturerId, manufacturerName) {
+		selectedModel = {
+			"id" : modelId,
+			"text" : modelName,
+			"assetType" : assetType,
+			"manufacturerId" : manufacturerId,
+			"manufacturerName": manufacturerName
+		}
+		$("#assetTypeSelect").val('');
+	};
+
+	// Validates the user input for the dependency section of the form
+	// TODO : JPM 10/2014 - It would be nice to include which asset dependency is in error for validateDependencies
+	pub.validateDependencies = function(formName) {
+		var valid = true;
+		$('#'+formName+' input[name^="asset_"]').each( function() {
+			if ($(this).val() == 'null' ||  $(this).val() == '')
+				valid = false;
+		});
+		if (! valid)
+			alert("Please select a valid asset for all dependencies");
+
+		return valid;
 	}
 
+
+	// Used to populate the hidden form fields with the values from the JQGrid form fields
+	// TODO : JPM 10/2014 - See if we can eliminate loadFormFromJQGridFilters
+	pub.loadFormFromJQGridFilters = function() {
+		$("#asset_assetName").val($('#gs_assetName').val())
+		$("#asset_assetType").val($('#gs_assetType').val())
+		$("#asset_model").val($('#gs_model').val())
+		$("#asset_sourceRack").val($('#gs_sourceRack').val())
+		$("#asset_targetRack").val($('#gs_targetRack').val())
+		$("#asset_serialNumber").val($('#gs_serialNumber').val())
+		$("#asset_planStatus").val($('#gs_planStatus').val())
+		$("#asset_moveBundle").val($('#gs_moveBundle').val())
+		$("#asset_assetTag").val($('#gs_assetTag').val())
+	};
+
+	// Used to change the Select2 Asset Name SELECT when the Class SELECT is changed
+	// TODO : JPM 9/2014 : Is this still being used?
+	pub.updateDependentAssetNameSelect = function(name) {
+		var split = name.split("_");
+		var classSelect = $("select[name='entity_"+split[1]+"_"+split[2]+"']");
+		var nameSelect = $("input[name='asset_"+split[1]+"_"+split[2]+"']");
+		nameSelect.data("asset-type", classSelect.val());
+		nameSelect.select2("val", "");
+	};
+
+	return pub;
+
+} )(jQuery); //passed 'jQuery' global variable into local parameter '$'
+
+
+//
+// Older global functions
+//
+
+// Submits the save form for all asset types
+function saveToShow(button, forWhom) {
+	EntityCrud.saveToShow(button, forWhom);
 }
 
-function createEntityView (e, type,source,rack,roomName,location,position) {
+function createAssetDetails (type) {
+	switch(type) {
+		case "Application":
+		case "Database":
+			invokeCreateEntityView(type.toLowerCase(), type);
+			break;
+		case "Device":
+			invokeCreateEntityView('assetEntity', type);
+			break;
+		case "Files":
+			invokeCreateEntityView(type.toLowerCase(), 'Logical Storage');
+			break;
+		default :
+			alert("Error: unhandled case '" + type + "' in createAssetDetails()");
+	}
+}
+
+// Used to make the ajax call to get the create form and load into dom
+function invokeCreateEntityView(ctrlName, label) {
+	// TODO : JPM 10/2014 : Fix ajax for errors, etc
+	new Ajax.Request(contextPath+'/'+ctrlName+'/create', {
+		asynchronous:true, 
+		evalScripts:true, 
+		onComplete:function(e) { loadCreateEntityView(e, label);}
+	});
+}
+
+// Load the create entity modal view upon completing the Ajax call
+function loadCreateEntityView (e, type,source,rack,roomName,location,position) {
 	if(!isIE7OrLesser)
 		getHelpTextAsToolTip(type);
 	var resp = e.responseText;
 	$("#createEntityView").html(resp);
-	$("#createEntityView").dialog('option', 'width', 'auto')
+	$("#createEntityView").dialog('option', 'width', 'auto');
 	$("#createEntityView").dialog('option', 'position', ['center','top']);
 	$("#createEntityView").dialog('open');
 	$("#editEntityView").dialog('close');
 	$("#showEntityView").dialog('close');
 	updateAssetTitle(type);
-	updateAssetInfo(source,rack,roomName,location,position,'create')
+	updateAssetInfo(source,rack,roomName,location,position,'create');
 }
 
-function createAssetDetails (type) {
-	switch(type){
-	case "Application":
-		new Ajax.Request(contextPath+'/application/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Application');}})
-		break;
-	case "Database":
-		new Ajax.Request(contextPath+'/database/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Database');}})
-		break;
-	case "Files":
-		new Ajax.Request(contextPath+'/files/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Logical Storage');}})
-		break;
-	default :
-		new Ajax.Request(contextPath+'/assetEntity/create',{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e, 'Device');}})
-	}
-}
-
+// Called from the page to popup the Asset Entity details dialog
 function getEntityDetails (redirectTo, type, value) {
 	switch (type) {
 	case "Application":
@@ -169,8 +924,20 @@ function getEntityDetails (redirectTo, type, value) {
 	}
 }
 
-function showEntityView (e, type) {
-	
+// private method used to perform the Ajax call to get the show HTML and then invoke the display method
+function invokeShowEntityView(ctrlName, redirectTo, label) {
+	new Ajax.Request(
+		contextPath+'/'+ctrlName + '/show/'+value+'?redirectTo='+redirectTo, {
+			asynchronous:true,
+			evalScripts:true,
+			onComplete:function(e) {loadShowEntityView(e, 'Application');}
+		}
+	);
+}
+
+// Displays the detail view of the asset from ajax call in model popup
+function showEntityView (e, type) {	
+	// Disable refresh bar if it exists
 	if (B2 != '') {
 		B2.Pause()
 	}
@@ -212,7 +979,7 @@ function changeDocTitle ( newTitle ) {
 				.addClass( "arrow" )
 				.addClass( feedback.vertical )
 				.addClass( feedback.horizontal )
-					 .appendTo( this );
+				.appendTo( this );
 			}
 		 }
 	});
@@ -293,7 +1060,7 @@ function addAssetDependency (type, forWhom) {
 	$("#dep_"+typeRowNo+"_"+forWhom).attr("data-asset-type", $("#entity_"+typeRowNo).val())
 	
 	if (!isIE7OrLesser) {
-		AssetCrudModule.assetNameSelect2( $("#dep_"+typeRowNo+"_"+forWhom) );
+		EntityCrud.assetNameSelect2( $("#dep_"+typeRowNo+"_"+forWhom) );
 	}
 	
 	$("#depComment_"+typeRowNo).dialog({ autoOpen: false})
@@ -317,12 +1084,6 @@ function updateAssetTitle ( type ) {
 	$("#editEntityView").dialog( "option", "title", type+' Detail' );
 }
 
-function selectManufacturer (value, forWhom) {
-	var val = value;
-	manipulateFields(val)
-	new Ajax.Request(contextPath+'/assetEntity/getManufacturersList?assetType='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showManufacView(e, forWhom);}})
-}
-
 function showManufacView (e, forWhom) {
 	var resp = e.responseText;
 	if(forWhom == 'Edit')
@@ -335,12 +1096,6 @@ function showManufacView (e, forWhom) {
 		$("select.assetSelect").select2()
 }
 
-function selectModel (value, forWhom) {
-	var val = value;
-	var assetType = $("#assetType"+forWhom+"Id").val() ;
-	new Ajax.Request(contextPath+'/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+val+'&forWhom='+forWhom,{asynchronous:true,evalScripts:true,onComplete:function(e){showModelView(e, forWhom);}})
-	//${remoteFunction(action:'getModelsList', params:'\'assetType=\' +assetType +\'&=\'+ val', onComplete:'showModelView(e)' )}
-}
 
 function showModelView (e, forWhom) {
 	var resp = e.responseText;
@@ -548,7 +1303,7 @@ function deleteAssets(action){
 	}else{
 		if(confirm("You are about to delete all of the selected assets for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
 			jQuery.ajax({
-			url:contextPath+'/assetEntity/deleteBulkAsset',
+			url: tdsCommon.createAppURL('/assetEntity/deleteBulkAsset'),
 			data: {'assetLists':assetArr,'type':action},
 			type:'POST',
 			success: function(data) {
@@ -719,31 +1474,31 @@ var manuLoadRequest
 var modelLoadRequest
 
 function getAlikeManu(val) {
- if(manuLoadRequest)manuLoadRequest.abort();
- manuLoadRequest = jQuery.ajax({
-						url: contextPath+'/manufacturer/autoCompleteManufacturer',
-						data: {'value':val},
-						type:'POST',
-						success: function(data) {
-							$("#autofillId").html(data)
-							$("#autofillId").show()
-						}
-					});
-	 
+	if(manuLoadRequest)manuLoadRequest.abort();
+	manuLoadRequest = jQuery.ajax({
+		url: tdsCommon.createAppURL('/manufacturer/autoCompleteManufacturer'),
+		data: {'value':val},
+		type:'POST',
+		success: function(data) {
+			$("#autofillId").html(data)
+			$("#autofillId").show()
+		}
+	});
+ 
 }
 
 function getAlikeModel(val){
 	if(modelLoadRequest)modelLoadRequest.abort()
 	var manufacturer= $("#manufacturersAuditId").val()
 	modelLoadRequest = jQuery.ajax({
-							url: contextPath+'/model/autoCompleteModel',
-							data: {'value':val,'manufacturer':manufacturer},
-							type:'POST',
-							success: function(data) {
-								$("#autofillIdModel").html(data)
-								$("#autofillIdModel").show()
-							}
-						});
+		url: tdsCommon.createAppURL('/model/autoCompleteModel'),
+		data: {'value':val,'manufacturer':manufacturer},
+		type:'POST',
+		success: function(data) {
+			$("#autofillIdModel").html(data)
+			$("#autofillIdModel").show()
+		}
+	});
 }
 function updateManu(name){
 	$("#manufacturersAuditId").val(name)
@@ -773,33 +1528,17 @@ function setType(id, forWhom){
 			$("#assetType"+forWhom+"Id").val(data.responseText)
 			if(!isIE7OrLesser)
 				$("select.assetSelect").select2()
-			manipulateFields(data.responseText)
+			EntityCrud.toggleAssetTypeFields(data.responseText)
 			
 		}}
 	)	
 	
 }
 
-function manipulateFields( val ){
-	if(val=='Blade'){
-		$(".bladeLabel").show()
-		$(".rackLabel").hide()
-		$(".vmLabel").hide()
-	 } else if(val=='VM') {
-		$(".bladeLabel").hide()
-		$(".rackLabel").hide()
-		$(".vmLabel").show()
-	} else {
-		$(".bladeLabel").hide()
-		$(".rackLabel").show()
-		$(".vmLabel").hide()
-	}
-} 
-
 function populateDependency(assetId, whom, thisDialog){
 	$(".updateDep").attr('disabled','disabled')
 		jQuery.ajax({
-			url: contextPath+'/assetEntity/populateDependency',
+			url: tdsCommon.createAppURL('/assetEntity/populateDependency'),
 			data: {'id':assetId,'whom':thisDialog},
 			type:'POST',
 			success: function(data) { 
@@ -834,7 +1573,7 @@ function showDependencyControlDiv(){
 // Sets the field importance style classes in the edit and create views for all asset classes
 function assetFieldImportance(phase,type){
 	jQuery.ajax({
-		url: contextPath+'/assetEntity/getassetImportance',
+		url: tdsCommon.createAppURL('/assetEntity/getassetImportance'),
 		data: {'validation':phase, 'type':type},
 		type:'POST',
 		success: function(resp) {
@@ -855,242 +1594,46 @@ function assetFieldImportance(phase,type){
 	
 }
  function highlightCssByValidation(phase,forWhom, id){
-	 jQuery.ajax({
-			url: contextPath+'/assetEntity/getHighlightCssMap',
-			data: {'validation':phase, 'type':forWhom,'id':id},
-			type:'POST',
-			success: function(resp) {
-				console.log(resp)
-				$("td,input,select").removeClass("highField")
-				for (var key in resp) {
-					var value = resp[key]
-					$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while getting asset.")
+	jQuery.ajax({
+		url: tdsCommon.createAppURL('/assetEntity/getHighlightCssMap'),
+		data: {'validation':phase, 'type':forWhom,'id':id},
+		type:'POST',
+		success: function(resp) {
+			console.log(resp)
+			$("td,input,select").removeClass("highField")
+			for (var key in resp) {
+				var value = resp[key]
+				$(".dialog label[for="+key+"],label[for="+key+"Id]").parent().addClass(value);
 			}
-		});
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while getting asset.")
+		}
+	});
 	 
  }
  
 function getHelpTextAsToolTip(type){
 	jQuery.ajax({
-		url: contextPath+'/common/getTooltips',
+		url: tdsCommon.createAppURL('/common/getTooltips'),
 		data: {'type':type},
 		type:'POST',
 		success: function(resp) {
 			for (var key in resp) {
-					var value = resp[key]
-					$(".dialog input[name="+key+"],input[name='"+key+".id']" ).tooltip({ position: {my: "left top"} });
-					$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
-					$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
-					$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
-					
-					$(".dialog label[for="+key+"]").closest('td').next('td').tooltip({ position: {my: "left top"} });
-					$(".dialog label[for="+key+"]").closest('td').next('td').attr("title",value);
-				}
-			},
+				var value = resp[key]
+				$(".dialog input[name="+key+"],input[name='"+key+".id']" ).tooltip({ position: {my: "left top"} });
+				$(".dialog label[for="+key+"],label[for="+key+"Id]").tooltip({ position: {my: "left top"} });
+				$(".dialog input[name="+key+"],input[name='"+key+".id']").attr("title",value);
+				$(".dialog label[for="+key+"],label[for="+key+"Id]").attr("title",value);
+				
+				$(".dialog label[for="+key+"]").closest('td').next('td').tooltip({ position: {my: "left top"} });
+				$(".dialog label[for="+key+"]").closest('td').next('td').attr("title",value);
+			}
+		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while getting asset.")
 		}
 	});
-}
-
-/**
- * Used to save newly created assets from the Create forms. After validating that the fields are 
- * okay it will make an Ajax call to create the asset.
- *
- * @param me - the form that is being processed
- * @param forWhom - string indicating which form is being processed (note that this is inconsistent with the update metho)
- */
-function saveToShow($me, forWhom){
-	var act = $me.data('action')
-
-	if($me.data('redirect'))
-		var redirect = $me.data('redirect').split("_")[0]
-	if(act=='close'){
-		$('#showView').val('closeView')
-	}else{
-		$('#showView').val('showView')
-	}
-
-	var type = forWhom;
-	var validateOkay=true;
-
-	switch(forWhom) {
-		case 'Application':
-			validateOkay = validateAppForm('Edit','createAssetsFormId');
-			break;
-
-		case 'Files':
-		case 'Logical Storage':
-			type = 'Storage';
-			validateOkay = validateStorageForm('createAssetsFormId');
-			break;
-
-		case 'Database':
-			validateOkay = validateDBForm('createAssetsFormId');
-			break;
-
-		case 'AssetEntity':
-			type = "Server";
-			validateOkay = validateDeviceForm('createAssetsFormId');
-			break;
-
-		default:
-			alert('Unsupported case for ' + forWhom);
-	}
-
-	if (validateOkay)
-		validateOkay = validateDependencies('createAssetsFormId')
-		
-	if (validateOkay) {
-		jQuery.ajax({
-			url: $('#createAssetsFormId').attr('action'),
-			data: $('#createAssetsFormId').serialize(),
-			type:'POST',
-			success: function(data) {
-				if(data.errMsg){
-					alert(data.errMsg)
-				}else{
-					if(act=='close'){
-						$('#createEntityView').dialog('close')
-						if($('.ui-icon-refresh').length)
-							$('.ui-icon-refresh').click();
-						$('#messageId').show();
-						$('#messageId').html(data);
-					}else{
-						$('#createEntityView').dialog('close')
-						if($('.ui-icon-refresh').length)
-							$('.ui-icon-refresh').click();
-						if(redirect=='room')
-							getRackLayout( $('#selectedRackId').val() )
-						$('#showEntityView').html(data)
-						$("#showEntityView").dialog('option', 'width', 'auto')
-						$("#showEntityView").dialog('option', 'position', ['center','top']);
-						$("#showEntityView").dialog('open');
-						updateAssetTitle(forWhom);
-						if(!isIE7OrLesser) 
-							getHelpTextAsToolTip(type);
-					}
-					changeDocTitle(title)
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				var err = jqXHR.responseText
-				alert("An unexpected error occurred while creating Asset.")
-			}
-		});
-	}
-}
-
-/**
- * Used to validate common fields on any of the asset create/edit forms
- * @return true if valid
- **/
-function validateCommonFields(form) {
-	var ok = false;
-
-	// Validate that asset name is not blank
-	var fieldVal = $('#'+form+' #assetName').val();
-	if (fieldVal == '') {
-		alert('Please provide a name for the asset')
-	} else {
-		ok = true
-	}
-	return ok;
-}
-
-/**
- * Used to validate the Storage asset create/edit forms
- * @return true if valid
- **/
-function validateStorageForm(form) {
-	var ok = validateCommonFields(form);
-	if (ok) {
-		ok = false;
-		var size = $('#'+form+' #size').val();
-		if ( size=='' || isNaN(size)) {
-			alert("Please enter numeric value for Storage Size");
-		} else if ($('#'+form+' #fileFormat').val()=='') {
-			alert("Please enter value for Storage Format");
-		} else {
-			ok = true;
-		}
-	}
-	return ok
-}
-
-/**
- * Used to validate the Database asset create/edit forms
- * @return true if valid
- **/
-function validateDBForm(form) {
-	var ok = validateCommonFields(form);
-	if (ok) {
-		ok = false;
-	    var size = $('#'+form+' #size').val();
-	    if ( size=='' || isNaN(size)){
-	    	alert("Please enter numeric value for DB Size");
-	    }else if($('#'+form+' #dbFormat').val()==''){
-	    	alert("Please enter value for DB Format");
-	    }else{
-	    	ok = true;
-	    }
-	}
-	return ok
-}
-
-/**
- * Used to validate the Server/Device asset create/edit forms
- * @return true if valid
- **/
-function validateDeviceForm(form) {
-	var ok = validateCommonFields(form);
-	return ok
-}
-
-function validateAppForm(forWhom, form){
-	var ok = validateCommonFields(form);
-	if (ok) {
-		ok = false;
-		if($('#'+form+' #sme1'+forWhom).val()=='0' || $('#'+form+' #sme2'+forWhom).val()=='0' || $('#'+form+' #appOwner'+forWhom).val()=='0' ){
-			alert("Please unselect the 'Add Person' option from SME, SME2 or Application Owner properties")
-		} else {
-			var msg = '';
-			// Check to see if the durations have legit numbers
-			var fname = ['Shutdown', 'Startup', 'Testing'];
-			// Hack because of inconsistency in the field ids
-			var suffix = (form == 'createAssetsFormId' ? '' : 'Edit');
-			var c=0;
-			fname.forEach( function(name) {
-				var field = $('#'+form+' #' + name.toLowerCase() + 'Duration'+suffix).val();
-				if ( field != '' && isNaN(field) ) {
-					msg = ( msg!='' ? msg + ', ' : '' ) + name;
-					c++;
-				}
-			});
-			if (msg != '') {
-				alert("Please make sure that the " + msg + ' Duration field' + (c>1 ? 's have' : ' has a') + ' numeric value' + (c>1 ? 's' : ''));
-			} else {
-				ok = true;
-			}	
-		}
-	}
-	return ok;
-}
-
-function validateDependencies(formName){
-	var flag = true
-	$('#'+formName+'  input[name^="asset_"]').each( function() {
-		if( $(this).val() == 'null' ||  $(this).val() == '')
-			flag = false
-			return flag
-	})
-	if(flag==false)
-		alert("Please select a valid asset for all dependencies ")
-	return flag
 }
 
 /**
@@ -1120,7 +1663,7 @@ function shufflePerson(sFrom,sTo){
 function changeMovebundle(assetId, depId, assetBundelId){
 	var splittedDep = depId.split("_")
 	jQuery.ajax({
-		url: contextPath+'/assetEntity/getChangedBundle',
+		url: tdsCommon.createAppURL('/assetEntity/getChangedBundle'),
 		data: {'assetId':assetId, 'dependentId':splittedDep[2], 'type':splittedDep[1]},
 		type:'POST',
 		success: function(resp) {
@@ -1177,31 +1720,6 @@ $(document).ready(function() {
 	});
 });
 
-function toogleRoom(value, source){
-	if( value == '-1' )
-		$(".newRoom"+source).show()
-	else
-		$(".newRoom"+source).hide()
-}
-
-function getRacksPerRoom(value, type, assetId, forWhom,rack){
-	jQuery.ajax({
-		url: contextPath+'/assetEntity/getRacksPerRoom',
-		data: {'roomId':value,'sourceType':type ,'assetId':assetId,'forWhom':forWhom},
-		type:'POST',
-		success: function(resp) {
-			console.log('success');
-			$("#rack"+type+"Id"+forWhom).html(resp);
-			var myOption = "<option value='-1'>Add Rack...</option>"
-			$("#rack"+type+"Id"+forWhom+" option:first").after(myOption);
-			if(rack){
-				$("#rack"+type+"Id"+forWhom).val(rack);
-			}
-			if(!isIE7OrLesser)
-				$("select.assetSelect").select2();
-		}
-	});
-}
 
 function toogleRack(value, source){
 	if( value == '-1' )
@@ -1242,7 +1760,7 @@ function changeBundleSelect(){
 }
 function setColumnAssetPref(value,key, type){
 	jQuery.ajax({
-		url: contextPath+'/application/columnAssetPref',
+		url: tdsCommon.createAppURL('/application/columnAssetPref'),
 		data: {'columnValue':value,'from':key,'previousValue':$("#previousValue_"+key).val(),'type':type},
 		type:'POST',
 		success: function(resp) {
@@ -1299,7 +1817,7 @@ $(window).scroll(function(event){
 function toggleJustPlanning($me){
 	var isChecked= $me.is(":checked")
 	jQuery.ajax({
-        url:contextPath+'/assetEntity/setImportPerferences',
+        url: tdsCommon.createAppURL('/assetEntity/setImportPerferences'),
         data:{'selected':isChecked, 'prefFor':'assetJustPlanning'},
         type:'POST',
 		success: function(data) {

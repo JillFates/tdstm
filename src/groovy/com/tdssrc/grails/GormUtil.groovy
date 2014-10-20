@@ -4,7 +4,27 @@ import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import com.tdsops.common.grails.ApplicationContextHolder
 
+import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod  
+ 
 public class GormUtil {
+
+    private static BindDynamicMethod bindDynamicMethod = new BindDynamicMethod()  
+
+    /** 
+     * make the controller bindData method statically available, e.g. for service layer use 
+     * implemented as closure to allow static import emulating controller layer bindData usage 1:1 
+	 *
+ 	 * Used to bind params to a domain object by using the Grails bindUtil method used in controllers
+ 	 * TODO : JPM 10/2014 : The bindData doesn't appear to work correctly in Grails 1.3.8 but hopefully will in 2.3
+	 * @param domainObj - the object to assign the parameters to
+	 * @param params - the list of parameters
+	 * @param options - a map of optional values for include, exclude and filter
+	 * @see http://grails.org/doc/2.4.3/ref/Controllers/bindData.html
+	 * @see http://codingwithpassion.blogspot.com/2014/06/grails-databind-in-service-layer.html
+	 */
+    static Closure bindData = { Object[] args ->  
+        bindDynamicMethod.invoke(args ? args[0] : null, BindDynamicMethod.METHOD_SIGNATURE, args)  
+    }  
 
 	/**
 	 * Used to output GORM Domain constraints and update errors in human readable format
@@ -117,6 +137,27 @@ public class GormUtil {
 
 		}
 		return fields
+	}
+
+
+	/**
+	 * Used to validate if the version id of a domain is valid and hasn't been ticked by someone else while the user was editing the domain
+	 * @param domainObj - the domain object to check the version on
+	 * @param versionFromForm - the original value of the domain version when it was originally read
+	 * @param label - the text to indicate the domain object in error message 
+	 * @throws RuntimeException if there no initialVersion value
+	 * @throws DomainUpdateException if the version number was ticked since the initialVersion
+	 */
+	public static void optimisticLockCheck(Object domainObj, Object params, String label) {
+		def version = NumberUtil.toLong(params.version)
+		if (version.is(null)) {
+			println "domainVersionCheck failed on domain $domainObj for no version id parameter"
+			throw new RuntimeException("The $label version was missing from request")
+		} else {
+			if (domainObj.version > version) {
+				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
+			}
+		}
 	}
 
 }
