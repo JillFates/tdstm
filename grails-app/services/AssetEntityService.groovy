@@ -727,8 +727,8 @@ class AssetEntityService {
 		}
 
 		if (groups == null) {
-			map.dependencyType = getDependencyTypes()
-			map.dependencyStatus = getDependencyStatuses()
+			map.dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
+			map.dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
 		}
 
 		return map
