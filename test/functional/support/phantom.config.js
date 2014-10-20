@@ -29,7 +29,6 @@ exports.config = {
     '../components/menu/reportsMenu.spec.js'
     ],
     regression:[ //Do not change the order of these files since some test depends on others.
-    // '../components/projects/showProjects.spec.js',
     '../components/admin/adminPortal.spec.js',
     '../components/admin/rolePermission.spec.js',
     '../components/admin/assetOptions.spec.js',
@@ -41,6 +40,7 @@ exports.config = {
     '../components/admin/listManufacturers.spec.js',
     '../components/admin/listModel.spec.js',
     '../components/admin/syncLibraries.spec.js',
+    '../components/assets/dependencyAnalyzer.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
     ], 

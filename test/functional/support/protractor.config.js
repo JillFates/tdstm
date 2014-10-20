@@ -5,14 +5,14 @@ exports.config = {
   allScriptsTimeout: 15000,
   suites: {
     test:[
-    '../components/projects/createProject.spec.js',
-    '../components/planning/bundles.spec.js',
-    '../components/assets/applications/createApp.spec.js',
-    '../components/assets/applications/addTask.spec.js',
-    '../components/assets/applications/addComments.spec.js',
+    // '../components/projects/createProject.spec.js',
+    // '../components/planning/bundles.spec.js',
+    // '../components/assets/applications/createApp.spec.js',
+    // '../components/assets/applications/addTask.spec.js',
+    // '../components/assets/applications/addComments.spec.js',
     '../components/assets/devices/serverList.spec.js',
-    '../components/assets/databases/createDatabase.spec.js',
-    '../components/projects/deleteProject.spec.js'
+    // '../components/assets/databases/createDatabase.spec.js',
+    // '../components/projects/deleteProject.spec.js'
     ],
     menu:[
     '../components/projects/listProjects.spec.js',
@@ -28,7 +28,6 @@ exports.config = {
     '../components/reports/eventResults.spec.js'
     ],
     regression:[ //Do not change the order of these files since some test depends on others.
-    // '../components/projects/showProjects.spec.js',
     '../components/admin/adminPortal.spec.js',
     '../components/admin/rolePermission.spec.js',
     '../components/admin/assetOptions.spec.js',
@@ -40,6 +39,7 @@ exports.config = {
     '../components/admin/listManufacturers.spec.js',
     '../components/admin/listModel.spec.js',
     '../components/admin/syncLibraries.spec.js',
+    '../components/assets/dependencyAnalyzer.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
     ], 
@@ -67,7 +67,7 @@ exports.config = {
     '../components/reports/assetTags.spec.js',
     '../components/reports/transportWorksheets.spec.js',
     '../components/reports/applicationMigration.spec.js',
-    '../componex`xnts/reports/issueReport.spec.js',
+    '../components/reports/issueReport.spec.js',
     '../components/reports/eventResults.spec.js',
     '../components/reports/cablingQA.spec.js'
     ]
