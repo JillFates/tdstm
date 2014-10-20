@@ -174,7 +174,7 @@
 							</tr>
 							<tr>
 								<td class="label ${config.model} ${highlightMap.model?:''}" nowrap="nowrap">
-									<label for="model"><div id="assetTypeLabel">Model Type</div></label>
+									<label for="model"><div id="assetTypeLabel">Device Type</div></label>
 								</td>
 								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 								<div id="modelEditId">

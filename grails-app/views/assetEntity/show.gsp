@@ -29,7 +29,7 @@ $(document).ready(function() {
 								<td class="label_sm">Target</td>
 							</tr>
 							<tr class="prop">
-								<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap"><label for="assetType">Type</label></td>
+								<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap"><label for="assetType">Device Type</label></td>
 								<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>
 								<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
