@@ -1,3 +1,7 @@
+<%@page import="com.tds.asset.Application"%>
+<%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
+<g:set var="assetClass" value="Application" />
+
 <script type="text/javascript">
 	$("#appl_assetName").val($('#gs_assetName').val())
 	$("#appl_sme").val($('#gs_sme').val())
@@ -30,6 +34,10 @@
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
 	<input type="hidden" id="appl_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />
+
+	<%-- Key field and optimistic locking var --%>
+	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
+	<input type="hidden" id="version" 	name="version" value="${version}"/>
 
 	<input type="hidden" name="id" value="${applicationInstance?.id}" />
 	<table style="border: 0">
@@ -295,7 +303,7 @@
 					<input type="hidden" id="tabType" name="tabType" value =""/>
 					<input type="hidden" id="updateView" name="updateView" value=""/>
 
-					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo, value:applicationInstance.id, whom:'app']"></g:render>
+					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo, value:applicationInstance.id, whom:assetClass]"></g:render>
 				</div>
 			</td>
 		</tr>

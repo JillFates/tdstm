@@ -2170,65 +2170,6 @@ class AssetEntityController {
 	}
 
 	/**
-	 * Used to create and save a new device and associated dependencies. Upon success or failure it will redirect the 
-	 * user to the place that they came from based on the params.redirectTo param. The return content varies based on that
-	 * param as well.
-	 */
-	def save = {
-		controllerService.saveUpdateAssetHandler(this, session, assetEntityService, AssetClass.DEVICE, params)
-/*
-		def errorMsg=''
-		def project, user
-		def asset, model
-		try {
-			(project, user) = controllerService.getProjectAndUserForPage( this, 'AssetEdit' )
-			if (project) {
-				asset = assetEntityService.createDeviceFromForm(this, session, project.id, user.id, params) 
-				model = assetEntityService.getAssetSimpleModel(asset)
-			}
-			errorMsg = flash.message
-			flash.message = null
-		} catch (InvalidRequestException e) {
-			errorMsg = e.getMessage()
-		} catch (EmptyResultException e) {
-			errorMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			errorMsg = e.getMessage()
-		} catch (DomainUpdateException e) {
-			errorMsg = e.getMessage()
-		} catch (e) {
-			log.error "save() failed for unexpected cause\nParams were: $params\n" +  ExceptionUtil.stackTraceToString(e)
-			errorMsg = "An error occurred while attempting to create the asset"
-		}
-
-		assetEntityService.renderSaveAssetJsonResponse(this, model, errorMsg)
-
-*/
-/*
-		def redirectTo = params.redirectTo	
-
-		// Deal with coming from the room view I'm guessing (jpm 9/2014)
-		if (redirectTo.contains("room_")) {
-			def newRedirectTo = redirectTo.split("_")
-			redirectTo = newRedirectTo[0]
-			
-			def rackId = newRedirectTo[1]
-			session.setAttribute("RACK_ID", rackId)
-		}
-
-		// Here was how the controller was responding if there were no errors. If there were errors it didn't work at all so this might be better?
-		if (params.showView == 'showView'){
-			forward(action:'show', params:[id: assetEntity.id, errors:errorMsg])
-		} else if(params.updateView == 'closeView') {
-			render errorMsg
-		} else {
-			def model = deviceService.getModelForShow(project, device, params)
-			redirectToReq(model, device, redirectTo, false, errorMsg )
-		}
-*/
-	}
-
-	/**
 	 * This action is used to redirect to edit view .
 	 * @param : redirectTo
 	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
@@ -2264,75 +2205,24 @@ class AssetEntityController {
 	}
 
 	/**
+	 * Used to create and save a new device and associated dependencies. Upon success or failure it will redirect the 
+	 * user to the place that they came from based on the params.redirectTo param. The return content varies based on that
+	 * param as well.
+	 */
+	def save = {
+		controllerService.saveUpdateAssetHandler(this, session, deviceService, AssetClass.DEVICE, params)
+		session.AE?.JQ_FILTERS = params
+	}
+
+	/**
 	 * This action is used to update assetEntity 
 	 * @param redirectTo : a flag to redirect view to page after update
 	 * @param id : id of assetEntity
 	 * @return : render to appropriate view
 	 */
 	def update = {
-
-		controllerService.saveUpdateAssetHandler(this, session, assetEntityService, AssetClass.DEVICE, params)
-	/*
-		def errorMsg=''
-		def project, user
-		def asset, model
-		def id = params.id
-		try {
-			(project, user) = controllerService.getProjectAndUserForPage( this, 'AssetEdit' )
-			if (project) {
-				asset = controllerService.getAssetForPage(this, project, AssetClass.DEVICE, id)
-				if (asset) {
-					assetEntityService.updateDeviceFromForm(this, session, project.id, user.id, asset.id, params)
-
-					// Reload the asset due to the hibernate session 
-					asset = AssetEntity.read(id)
-					model = assetEntityService.getAssetSimpleModel(asset)
-				}
-			} 
-			errorMsg = flash.message
-			flash.message = null
-		} catch (InvalidRequestException e) {
-			errorMsg = e.getMessage()
-		} catch (EmptyResultException e) {
-			errorMsg = e.getMessage()
-		} catch (UnauthorizedException e) {
-			errorMsg = e.getMessage()
-		} catch (DomainUpdateException e) {
-			errorMsg = e.getMessage()
-		} catch (e) {
-			log.error "update() failed " +  ExceptionUtil.stackTraceToString(e)
-			errorMsg = "An error occurred during the update"
-		}
-
-		if ( errorMsg ) {
-			// JPM 9/2014 - Not sure why we're updating the filter for JQGrid here
-			session.AE?.JQ_FILTERS = params
-		}
-
-		assetEntityService.renderUpdateAssetJsonResponse(this, model, errorMsg)
-	*/
-	/*
-		def redirectTo = params.redirectTo	
-
-		// Deal with coming from the room view I'm guessing (jpm 9/2014)
-		if (redirectTo.contains("room_")) {
-			def newRedirectTo = redirectTo.split("_")
-			redirectTo = newRedirectTo[0]
-			
-			def rackId = newRedirectTo[1]
-			session.setAttribute("RACK_ID", rackId)
-		}
-
-		// Here was how the controller was responding if there were no errors. If there were errors it didn't work at all so this might be better?
-		if (params.updateView == 'updateView') {
-			forward(action:'show', params:[id: params.id, errors:errorMsg])		
-		} else if(params.updateView == 'closeView') {
-			render errorMsg
-		} else {
-			params = deviceService.getModelForShow(project, params.id, params)
-			redirectToReq(params, device, redirectTo, false, errorMsg )
-		}
-	*/
+		controllerService.saveUpdateAssetHandler(this, session, deviceService, AssetClass.DEVICE, params)
+		session.AE?.JQ_FILTERS = params
 	}
  	
 	/**

@@ -1,3 +1,7 @@
+<%@page import="com.tds.asset.Application"%>
+<%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
+<g:set var="assetClass" value="Application" />
+
 <table style="border: 0">
 	<tr>
 	
@@ -13,7 +17,7 @@
 		<g:render template="../assetEntity/dependentShow" model="[assetEntity:applicationInstance]" ></g:render>
 	</tr>
 	<tr id="commentListId">
-		<g:render template="../assetEntity/commentList" model="['asset':applicationInstance, 'prefValue': prefValue]" ></g:render>
+		<g:render template="../assetEntity/commentList" model="[asset:applicationInstance, 'prefValue': prefValue]" ></g:render>
 	</tr>
 	<tr>
 		<td colspan="2">
@@ -21,7 +25,7 @@
 				<g:form>
 					<input type="hidden" name="id" id="applicationId" value="${applicationInstance?.id}" />
 					<g:render template="../assetEntity/showButtons" 
-						model="[assetEntity:applicationInstance, redirectTo:redirectTo,type:'Application', forWhom:'app']"/>
+						model="[assetEntity:applicationInstance, config:config, highlightMap:highlightMap, redirectTo:redirectTo, type:'Application', forWhom:assetClass]"/>
 				</g:form>
 			</div>
 		</td>

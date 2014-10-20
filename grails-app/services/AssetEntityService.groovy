@@ -129,81 +129,6 @@ class AssetEntityService {
 	}
 	*/
 
-	/**
-	 * Used to save a new device which is called from the controller
-	 * @param controller - the controller that called the method
-	 * @param session - the user's selected project
-	 * @param projectId - the id of the user's project
-	 * @param userId - the id of the current user
-	 * @param params - the request parameters
-	 * @return The device asset that was created
-	 * @throws various RuntimeExceptions if there are any errors
-	 */
-	AssetEntity saveAssetFromForm(controller, session, Long projectId, Long userId, params) {
-		def device = new AssetEntity( )
-
-		return updateSaveAssetFromForm(controller, session, projectId, userId, params, device)
-		
-		// saveUserPreferencesForDevice(device)
-		//applyParamsToDevice(controller, session, project, userLogin, device, params)
-		//persistDeviceAndDependencies(device, params, userLogin)
-		//assetEntityAttributeLoaderService.createModelConnectors( device )
-
-		//return device
-	}
-
-	/**
-	 * Used to save a new device which is called from the controller
-	 * @param controller - the controller that called the method
-	 * @param session - the user's selected project
-	 * @param projectId - the id of the user's project
-	 * @param userId - the id of the current user
-	 * @param params - the request parameters
-	 * @return The device asset that was created
-	 * @throws various RuntimeExceptions if there are any errors
-	 */
-	AssetEntity updateAssetFromForm(controller, session, Long projectId, Long userId, params, Long deviceId ) {
-		Project project = Project.read(projectId)
-		AssetEntity asset = AssetEntityHelper.getAssetById(project, AssetClass.DEVICE, deviceId)
-
-		if (!asset)
-			throw new RuntimeException("updateAssetFromForm() unable to locate device id $deviceId")
-
-		return updateSaveAssetFromForm(controller, session, projectId, userId, params, device)
-	}
-
-	/**
-	 * Used to update a device which is called from the controller
-	 * @param controller - the controller that called the method
-	 * @param session - the user's selected project
-	 * @param device - the device to update
-	 * @param params - the request parameters
-	 * @throws various RuntimeExceptions if there are any errors
-	 * TODO : JPM 10/2014 : refactor updateAssetFromForm into the DeviceService class
-	 */
-	private AssetEntity updateSaveAssetFromForm(controller, session, Long projectId, Long userId, params, AssetEntity asset ) {
-		Project project = Project.get(projectId)
-		UserLogin userLogin = UserLogin.get(userId)
-
-		// If it is a new asset then we need to do some things
-		if (! asset.id) {
-			asset.project = project
-			asset.owner = project.client
-			asset.attributeSet = EavAttributeSet.get(1)
-		} else if (asset.project != project) {
-			securityService.reportViolation("Attempted to access device $deviceId not belonging to current project $project", userLogin)
-			throw new RuntimeException("updateDeviceFromForm() user access violation")
-		}
-
-		applyParamsToDevice(controller, session, project, userLogin, asset, params)
-
-		persistDeviceAndDependencies(project, userLogin, asset, params)
-
-		saveUserPreferencesForDevice(asset)
-
-		return asset
-	}
-
 	/** 
 	 * Used by the various asset controllers to return the JSON response to the callers when creating new asset
 	 * @param model
@@ -233,131 +158,6 @@ class AssetEntityService {
 		} else {
 			controller.render(ServiceResults.success(model) as JSON)
 		}
-	}
-
-	/**
-	 * Used to set some user preferences for manufacturer and type after creating or editing devices
-	 * @param device - the device object that was created or saved
-	 */
-	private void saveUserPreferencesForDevice(AssetEntity device) {
-		// Set some preferences if we were successful
-		if (device.manufacturer)
-			userPreferenceService.setPreference("lastManufacturer", device.manufacturer.name)
-		if (device.model) 
-			userPreferenceService.setPreference("lastType", device.model.assetType)
-	}
-
-	/**
-	 * Used by the create and update device service methods to persist changes to a new or existing device asset and then update the Dependencies
-	 * @param device - the device object to be persisted which maybe a new or existing asset
-	 * @param params - the request parameters
-	 * @throws various RuntimeExceptions if there are any errors
-	 */ 
-	private void persistDeviceAndDependencies(Project project, UserLogin userLogin, AssetEntity device, params) {
-
-		//def dirtyProps = device.dirtyPropertyNames
-		//log.debug "******* persistDeviceAndDependencies() for device ${device.id} - dirty properties: $dirtyProps"
-
-		//if ( device.validate() && device.save(flush:true) ) {
-			def errors = createOrUpdateAssetEntityDependencies(params, device, userLogin, device.project)
-			if (errors) {
-				throw new DomainUpdateException("Unable to update dependencies : $errors".toString())
-			}
-		//} else {
-		//	log.debug "Unable to update device : ${GormUtil.allErrorsString(device)}"
-		//	throw new DomainUpdateException("Unable to update device : ${GormUtil.allErrorsString(device)}".toString())
-		//}
-	}
-
-	/**
-	 * used by the create and update device service methods to persist changes to a new or existing device asset
-	 * @param controller - the controller that called the method
-	 * @param session - the user's selected project
-	 * @param device - the device object to be persisted which maybe a new or existing asset
-	 * @param params - the request parameters
-	 * @throws various RuntimeExceptions if there are any errors
-	 */
-	private AssetEntity applyParamsToDevice(controller, session, Project project, UserLogin userLogin, AssetEntity device, params) {
-		boolean isNew = ! device.id
-
-		if (isNew) {
-			device.project = project
-			device.owner = project.client
-		} else {
-
-			// Validate the optimistic locking to prevent two people from editing the same EXISTING asset
-			GormUtil.optimisticLockCheck(device, params, 'Device')			
-		}
-
-		//
-		// Set some of the params that need to be massaged from their string state into something more appropriate
-		//
-		parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
-
-		params.scale = SizeScale.asEnum(params.scale)
-
-		ASSET_INTEGER_PROPERTIES.each { p -> 
-			if (params.containsKey(p))
-				params[p] = NumberUtil.toInteger(params[p])
-		}
-
-		// Assign all of the standard properties to the device class
-		(ASSET_PROPERTIES + CUSTOM_PROPERTIES + DEVICE_PROPERTIES).each { p ->
-			if (params.containsKey(p))
-				device[p] = params[p]
-		}
-
-		// Would prefer using the bindData but have been having all sorts of issues with it
-		// device.properties = params
-
-		//
-		// The following are not handled by the bindData assignment and need to be handled directly
-		//
-		device.modifiedBy = userLogin.person
-
-		if (! device.assetTag?.size())
-			device.assetTag = projectService.getNextAssetTag(project) 
-
-		assignAssetToBundle(project, device, params['moveBundle.id'])
-
-		// Update the Manufacturer and/or Model for the asset based on what the user has selected. If the model was selected 
-		// then we'll use that for everything otherwise we will set the manufacturer from the form. 
-		def manuId = NumberUtil.toLong(params.manufacturerId)
-		def modelId = NumberUtil.toLong(params.modelId)
-
-		if (modelId) {
-			// Check to see if the user gave us a valid model and then assign to the asset
-			def model = Model.get(modelId)
-			if (model) {
-				device.model = model
-				device.manufacturer = model.manufacturer
-				device.assetType = model.assetType
-			} else {
-				throw new DomainUpdateException("The model specified was not found")
-			}
-		} else if (manuId) {
-			// Attempt to assign just the manufacturer and asset type to the device
-			def manu = Manufacturer.get(manuId)
-			if (manu) {
-				device.model = null
-				device.manufacturer = manu
-				// assetType was applied in the bind above
-			} else {
-				throw new DomainUpdateException("The manufacturer specified was not found")
-			}
-		}
-		
-		// Set the source/target location/room which creates the Room if necessary
-		assignAssetToRoom(project, device, params.roomSourceId, params.sourceLocation, params.sourceRoom, true) 
-		assignAssetToRoom(project, device, params.roomTargetId, params.targetLocation, params.targetRoom, false) 
-
-		assignDeviceToChassisOrRack(project, userLogin, device, params)
-
-		if ( ! device.validate() || ! device.save(flush:true) ) {
-			log.debug "Unable to update device ${GormUtil.allErrorsString(device)}"
-			throw new DomainUpdateException("Unable to update device ${GormUtil.allErrorsString(device)}".toString())
-		}
-
 	}
 
 	/**
@@ -621,8 +421,8 @@ class AssetEntityService {
 	 */	
 	def createOrUpdateAssetEntityDependencies(def params, def assetEntity, loginUser, project) {
 		def errorMsg = ""
-		AssetDependency.withTransaction(){status->
-			try{
+		AssetDependency.withTransaction() { status->
+			try {
 				validateAssetList([assetEntity.id], project) // Verifying assetEntity Exist in same project or not
 				
 				//Collecting deleted deps ids and fetching there instances list
@@ -637,7 +437,7 @@ class AssetEntityService {
 				}
 				//Update supporting dependencies 
 				def supports = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.dependent = :asset AND ad.dependent.project = :project",
-								[asset:assetEntity, project:project])
+					[asset:assetEntity, project:project])
 				
 				def supportMsg = addOrUpdateMultipleDeps(assetEntity, supports,  params, errorMsg, [user:loginUser, type:"support", key:"addedSupport", project:project] )
 				//Update dependents dependencies 
@@ -647,7 +447,7 @@ class AssetEntityService {
 				def depMsg = addOrUpdateMultipleDeps(assetEntity, deps,  params, errorMsg, [user:loginUser, type:"dependent", key:"addedDep", project:project])
 				
 				errorMsg = supportMsg + depMsg
-			} catch (RuntimeException rte){
+			} catch (RuntimeException rte) {
 				status.setRollbackOnly()
 				return rte.getMessage()
 			}

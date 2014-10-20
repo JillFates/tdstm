@@ -1,3 +1,7 @@
+<%@page import="com.tds.asset.Files"%>
+<%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
+<g:set var="assetClass" value="Files" />
+
 <script type="text/javascript">
 	$("#file_assetName").val($('#gs_assetName').val())
 	$("#file_fileFormat").val($('#gs_fileFormat').val())
@@ -20,6 +24,22 @@
 	<input type="hidden" id="file_planStatus" name="planStatusFilter" value="" />
 	<input type="hidden" id="file_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" name="id" value="${fileInstance?.id}" />
+
+	<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}">
+	<input  name="supportCount"  id="edit_supportCount" type="hidden" value="${supportAssets.size()}">
+	<input name="redirectTo" type="hidden" value="${redirectTo}">
+	<input type="hidden" id ="filesId"  value ="${fileInstance.id}"/>
+	<input type="hidden" id = "tabType" name="tabType" value =""/>
+	<input name="updateView" id="updateView" type="hidden" value=""/>
+	<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
+	
+	<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
+	<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
+
+	<%-- Key field and optimistic locking var --%>
+	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
+	<input type="hidden" id="version" 	name="version" value="${version}"/>
+
 	<table style="border: 0;">
 		<tr>
 			<td colspan="2">
@@ -100,17 +120,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-				<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}">
-					<input  name="supportCount"  id="edit_supportCount" type="hidden" value="${supportAssets.size()}">
-					<input name="redirectTo" type="hidden" value="${redirectTo}">
-					<input type = "hidden" id ="filesId"  value ="${fileInstance.id}"/>
-					<input type = "hidden" id = "tabType" name="tabType" value =""/>
-					<input name="updateView" id="updateView" type="hidden" value=""/>
-					<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
-					
-					<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
-					<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo,value:fileInstance.id,whom:'files']"></g:render>
+					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo, value:fileInstance.id, whom:assetClass]"></g:render>
 				</div>
 			</td>
 		</tr>

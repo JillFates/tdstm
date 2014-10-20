@@ -1,4 +1,8 @@
 <%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
+<%@page import="com.tds.asset.Database"%>
+<%-- <g:set var="assetClass" value="${(new Database()).assetClass}" /> --%>
+<g:set var="assetClass" value="Database" />
+
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -100,13 +104,13 @@
 			$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObjcet) {
 				var value = cellvalue ? cellvalue : ''
-				return '<a href="javascript:getEntityDetails(\'database\',\''+rowObjcet[7]+'\','+options.rowId+')">'+value+'</a>'
+				return '<a href="javascript:getEntityDetails(\'na\',\'${assetClass}\','+options.rowId+')">'+value+'</a>'
 			}
 			
 			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '<a href="javascript:editEntity(\'database\',\''+rowObject[7]+'\','+options.rowId+')">'+
+				var editButton = '<a href="javascript:editEntity(\'na\',\'${assetClass}\','+options.rowId+')">'+
 						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[7] + "' tasks='" + rowObject[6] + "' comments='" + rowObject[8] + "'></grid-buttons>"
+				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[6] + "' comments='" + rowObject[8] + "'></grid-buttons>"
 				return editButton
 			}
 			function deleteMessage(response, postdata){

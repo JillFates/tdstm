@@ -1,4 +1,9 @@
 <%@page import="com.tds.asset.AssetComment;com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;com.tds.asset.AssetComment;"%>
+
+<%@page import="com.tds.asset.Application"%>
+<%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
+<g:set var="assetClass" value="Application" />
+
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -180,7 +185,7 @@
 			<div id="createStaffDialog" style="display:none;">
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
-			<g:render template="../assetEntity/newDependency" model="['forWhom':'Application', entities:applications]"></g:render>
+			<g:render template="../assetEntity/newDependency" model="[forWhom:assetClass, entities:applications]"></g:render>
 		</div>
             <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>

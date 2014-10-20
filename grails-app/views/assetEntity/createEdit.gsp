@@ -1,6 +1,10 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <%@page import="com.tds.asset.AssetType"%>
 
+<%@page import="com.tds.asset.AssetEntity"%>
+<%-- <g:set var="assetClass" value="${(new AssetEntity()).assetClass}" /> --%>
+<g:set var="assetClass" value="Device" />
+
 <%-- Set some vars based on the action being save or update --%>
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
@@ -479,7 +483,8 @@
 			<td colspan="2">
 				<div class="buttons">
 					 <span class="button">
-					 	<input type="button" class="save updateDep" data-redirect='${redirectTo}' data-action='show' value="${actionLabel}" onclick="EntityCrud.${jsAction}($(this), 'Device'); " /> 
+					 	<input type="button" class="save updateDep" data-redirect='${redirectTo}' data-action='show' 
+					 		value="${actionLabel}" onclick="EntityCrud.${jsAction}($(this), '${assetClass}'); " /> 
 					 </span>
 					 <tds:hasPermission permission='AssetDelete'>
 						 <span class="button"><g:actionSubmit class="delete" 

@@ -26,12 +26,15 @@ import com.tdssrc.grails.WebUtil
 class FilesController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
 	def assetEntityService
 	def controllerService
-	def taskService
-	def securityService
-	def userPreferenceService
 	def projectService
+	def securityService
+	def storageService
+	def taskService
+	def userPreferenceService
+
 	def jdbcTemplate
 
 	def index = {
@@ -218,6 +221,7 @@ class FilesController {
 	}
 
 	def create = {
+		// TODO : JPM 10/2014 : refactor create to get model from service layer
 		def fileInstance = new Files(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
@@ -230,38 +234,9 @@ class FilesController {
 		def highlightMap = assetEntityService.getHighlightedInfo('Files', fileInstance, configMap)
 		
 		[fileInstance:fileInstance, assetTypeOptions:assetTypeOptions?.value, moveBundleList:moveBundleList,
-					planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,
-					planStatusOptions:planStatusOptions.value, config:configMap.config, customs:configMap.customs,
-					environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
-	}
-
-	def save = {
-
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
-
-		params.assetType = "Files"
-		def filesInstance = new Files(params)
-		if (!filesInstance.hasErrors() && filesInstance.save()) {
-			flash.message = "Storage ${filesInstance.assetName} created"
-			def loginUser = securityService.getUserLogin()
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance, loginUser, project)
-			flash.message += "</br>"+errors 
-			if (params.showView == 'showView') {
-				forward(action:'show', params:[id: filesInstance.id, errors:errors])
-			} else if (params.showView == 'closeView') {
-				render flash.message
-			} else {
-			  session.FILES?.JQ_FILTERS = params
-				redirect( action:list)
-			}
-		} else {
-			flash.message = "Storage not created"
-			filesInstance.errors.allErrors.each{ flash.message += it}
-			session.FILES?.JQ_FILTERS = params
-			redirect( action:list)
-		}
+			planStatusOptions:planStatusOptions?.value, projectId:project.id, project:project,
+			planStatusOptions:planStatusOptions.value, config:configMap.config, customs:configMap.customs,
+			environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 
 	def show = {
@@ -277,7 +252,7 @@ class FilesController {
 		if (!storage) {
 			render "Storage asset was not found with id $id".toString()
 		} else {
-			def model = StorageService.getModelForShow(project, storage, params)
+			def model = storageService.getModelForShow(project, storage, params)
 
 			return model
 		}
@@ -299,72 +274,59 @@ class FilesController {
 		]
 
 		model.putAll( assetEntityService.getDefaultModelForEdits('Files', project, fileInstance, params) )
-
+		// model.each { k,v -> log.debug "edit() $k=$v"}
 		return model
 	}
 
+	def save = {
+		controllerService.saveUpdateAssetHandler(this, session, storageService, AssetClass.STORAGE, params)
+		session.FILES?.JQ_FILTERS = params
+	}
+
 	def update = {
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
+		controllerService.saveUpdateAssetHandler(this, session, storageService, AssetClass.STORAGE, params)
+		session.FILES?.JQ_FILTERS = params
 
-		session.setAttribute("USE_FILTERS","true")
+		/*
 
-		def filesInstance = Files.get(params.id)
-		params.assetType = "Files"
-		filesInstance.properties = params
+			session.setAttribute("USE_FILTERS","true")
 
-		if (!filesInstance.hasErrors() && filesInstance.save(flush:true)) {
-			def loginUser = securityService.getUserLogin()
-			flash.message = "Storage ${filesInstance.assetName} Updated"
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, filesInstance, loginUser, project)
-			flash.message +="</br>"+errors 
-			if (params.updateView == 'updateView') {
-				forward(action:'show', params:[id: params.id, errors:errors])
-			} else if (params.updateView == 'closeView') {
-				render flash.message
-			} else {
-				switch (params.redirectTo) {
-					case "room":
-						redirect( controller:'room',action:list )
-						break;
-					case "rack":
-						redirect( controller:'rackLayouts',action:'create' )
-						break;
-					case "console":
-						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
-						break;
-					case "clientConsole":
-						redirect( controller:'clientConsole', action:list)
-						break;
-					case "assetEntity":
-						redirect( controller:'assetEntity', action:list)
-						break;
-					case "database":
-						redirect( controller:'database', action:list)
-						break;
-					case "application":
-						redirect( controller:'application', action:list)
-						break;
-					case "listComment":
-						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
-						break;
-					case "listTask":
-						render "Storage ${filesInstance.assetName} updated."
-						break;
-					case "dependencyConsole":
-						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
-						break;
-					default:
-						session.FILES?.JQ_FILTERS = params
-						redirect( action:list)
-				}
+			switch (params.redirectTo) {
+				case "room":
+					redirect( controller:'room',action:list )
+					break;
+				case "rack":
+					redirect( controller:'rackLayouts',action:'create' )
+					break;
+				case "console":
+					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
+					break;
+				case "clientConsole":
+					redirect( controller:'clientConsole', action:list)
+					break;
+				case "assetEntity":
+					redirect( controller:'assetEntity', action:list)
+					break;
+				case "database":
+					redirect( controller:'database', action:list)
+					break;
+				case "application":
+					redirect( controller:'application', action:list)
+					break;
+				case "listComment":
+					redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
+					break;
+				case "listTask":
+					render "Storage ${filesInstance.assetName} updated."
+					break;
+				case "dependencyConsole":
+					forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
+					break;
+				default:
+					session.FILES?.JQ_FILTERS = params
+					redirect( action:list)
 			}
-		} else {
-			flash.message = "Storage not created"
-			filesInstance.errors.allErrors.each{ flash.message += it }
-			redirect(action:list)
-		}
+		*/
 
 	}
 	

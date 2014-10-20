@@ -255,60 +255,6 @@ class ApplicationController {
 			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 
-	def save = {
-
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
-
-		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
-
-		def applicationInstance = new Application(params)
-
-		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
-			flash.message = "Application ${applicationInstance.assetName} created"
-			def loginUser = securityService.getUserLogin()
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance, loginUser, project)
-			flash.message += "</br>"+errors
-			def moveEventList = MoveEvent.findAllByProject(project).id
-			for(int i : moveEventList){
-				def okToMove = params["okToMove_"+i]
-				def appMoveInstance = new AppMoveEvent()
-				appMoveInstance.application = applicationInstance
-				appMoveInstance.moveEvent = MoveEvent.get(i)
-				appMoveInstance.value = okToMove
-				if(!appMoveInstance.save(flush:true)){
-					appMoveInstance.errors.allErrors.each { println it }
-				}
-			}
-
-			if (params.showView == 'showView') {
-
-				forward(action:'show', params:[id: applicationInstance.id, errors:errors])
-				
-			} else if(params.showView == 'closeView') {
-				render flash.message
-			} else {
-				session.APP?.JQ_FILTERS = params
-
-				def model = assetEntityService.getModelForShow(project, applicationInstance, params)
-				if (!model) {
-					ServiceResults.errors("Asset model not loaded")
-					return 
-				}
-				render(ServiceResults.success(model) as JSON)
-
-				redirect( action:list)
-			}
-		}
-		else {
-			flash.message = "Application not created"
-			applicationInstance.errors.allErrors.each{ flash.message += it }
-			session.APP?.JQ_FILTERS = params
-			redirect( action:list)
-		}
-	}
-
 	def show = {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
@@ -374,39 +320,18 @@ class ApplicationController {
 		return model		
 	}
 
-	def update = {
-		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
+	def save = {
+		controllerService.saveUpdateAssetHandler(this, session, applicationService, AssetClass.APPLICATION, params)
+		session.APP?.JQ_FILTERS = params
+	}
 
+	def update = {
+		controllerService.saveUpdateAssetHandler(this, session, applicationService, AssetClass.APPLICATION, params)
+		session.APP?.JQ_FILTERS = params
 		session.setAttribute("USE_FILTERS","true")
 
-		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
-		
-		def applicationInstance = Application.get(params.id)
+		/*
 
-		applicationInstance.sme = null
-		applicationInstance.sme2 = null
-		applicationInstance.appOwner = null
-		applicationInstance.properties = params
-		applicationInstance.shutdownFixed = params.shutdownFixed ?  1 : 0
-		applicationInstance.startupFixed = params.startupFixed ?  1 : 0
-		applicationInstance.testingFixed = params.testingFixed ?  1 : 0
-		
-		if(!applicationInstance.hasErrors() && applicationInstance.save(flush:true)) {
-			flash.message = "Application ${applicationInstance.assetName} Updated"
-			def loginUser = securityService.getUserLogin()
-			def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, applicationInstance, loginUser, project)
-			flash.message += "</br>"+errors
-			def appMoveEventList = AppMoveEvent.findAllByApplication(applicationInstance)?.moveEvent?.id
-			if(appMoveEventList.size()>0){
-				for(int i : appMoveEventList){
-					def okToMove = params["okToMove_"+i]
-					def appMoveInstance = AppMoveEvent.findByMoveEventAndApplication(MoveEvent.get(i),applicationInstance)
-					    appMoveInstance.value = okToMove
-					    appMoveInstance.save(flush:true)
-				}
-			}
 			if(params.updateView == 'updateView'){
 				forward(action:'show', params:[id: params.id, errors:errors])
 				
@@ -445,17 +370,9 @@ class ApplicationController {
 						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					
-					default:
-						session.APP?.JQ_FILTERS = params
-						redirect( action:list)
 				}
 			}
-		} else {
-			log.warn "Unable to update application - " + GormUtil.allErrorsString(applicationInstance)
-			flash.message = "An unexpected error occurred therefore the Application not updated"
-			GormUtil.allErrorsString(applicationInstance)
-			redirect(action:list)
-		}
+		*/
 	}
 
 	def delete = {

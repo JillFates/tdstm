@@ -1,3 +1,7 @@
+<%@page import="com.tds.asset.Files"%>
+<%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
+<g:set var="assetClass" value="Files" />
+
 <script type="text/javascript">
 	$("#file_assetName").val($('#gs_assetName').val())
 	$("#file_fileFormat").val($('#gs_fileFormat').val())
@@ -5,6 +9,7 @@
 	$("#file_planStatus").val($('#gs_planStatus').val())
 	$("#file_moveBundle").val($('#gs_moveBundle').val())
 </script>
+
 <g:form method="post" action="save" name="createEditAssetForm" onsubmit="return validateFileFormat()">
 	<input type="hidden" id="file_assetName" name="assetNameFilter" value="" />
 	<input type="hidden" id="file_fileFormat" name="fileFormatFilter" value="" />
@@ -104,7 +109,7 @@
 				<input name="attributeSet.id" type="hidden" value="1"> <input
 					name="project.id" type="hidden" value="${projectId}"> 
 				<input name="showView" id="showView" type="hidden" value=""/>
-				<g:render template="../assetEntity/createButtons" model="[whom:'Logical Storage']"></g:render>
+				<g:render template="../assetEntity/createButtons" model="[whom:assetClass]"></g:render>
 			</td>
 		</tr>
 	</table>

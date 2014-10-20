@@ -5,12 +5,11 @@ import javax.servlet.http.HttpSession
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
-import com.tdsops.tm.domain.AssetEntityHelper
 import com.tds.asset.AssetEntity
-import com.tdsops.tm.enums.domain.AssetClass
+import com.tds.asset.AssetType
 import com.tdsops.common.lang.ExceptionUtil
-
-
+import com.tdsops.tm.domain.AssetEntityHelper
+import com.tdsops.tm.enums.domain.AssetClass
 
 /**
  * A set of methods used to support common functionality used in the Controllers
@@ -19,8 +18,8 @@ class ControllerService {
 
 	static transactional=false
 
-	def securityService
 	def assetEntityService
+	def securityService
 
 	/**
 	 * Used to get the user default project for a page request or redirects user to the Project List view
@@ -191,8 +190,11 @@ class ControllerService {
 		def errorMsg=''
 		def project, user
 		def asset, model
-		def isNew = ! params.assetId
+		Long id = NumberUtil.toLong(params.id)
+		def isNew = id == null
 
+		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+		
 		try {
 			(project, user) = getProjectAndUserForPage(controller, 'AssetEdit')
 			if (project) {
@@ -202,7 +204,7 @@ class ControllerService {
 					log.debug "saveUpdateAssetHandler() saveAssetFromForm() returned $asset"
 				} else {
 					asset = getAssetForPage(controller, project, AssetClass.DEVICE, params.id)
-					assetServiceClass.updateAssetFromForm(controller, session, project.id, user.id, asset.id, params)
+					assetServiceClass.updateAssetFromForm(controller, session, project.id, user.id, params, asset.id)
 				}
 				// Reload the asset due to the hibernate session 
 				//asset = AssetEntity.read(asset.id)

@@ -489,7 +489,7 @@ var EntityCrud = ( function($) {
 	 * @param me - the form that is being processed
 	 * @param forWhom - string indicating which form is being processed (note that this is inconsistent with the update metho)
 	 */
-	pub.saveToShow = function(button, forWhom) {
+	pub.saveToShow = function(button, assetClass) {
 		// var action = button.data('action');
 		var redirect = button.data('redirect');
 
@@ -498,31 +498,31 @@ var EntityCrud = ( function($) {
 		// TODO : JPM 10/2014 : Determine purpose - has to do with the close/show behavior
 		$('#showView').val('showView')
 
-		var type = forWhom;
+		//var type = assetClass;
 		var validateOkay=true;
 		var formName = assetFormName;
-		switch(forWhom) {
+		switch (assetClass) {
 			case 'Application':
 				validateOkay = validateAppForm(formName);
-				break;
-
-			case 'Files':
-			case 'Logical Storage':
-				type = 'Storage';
-				validateOkay = validateStorageForm(formName);
 				break;
 
 			case 'Database':
 				validateOkay = validateDBForm(formName);
 				break;
 
+			case 'Files':
+				//type = 'Storage';
+				validateOkay = validateStorageForm(formName);
+				break;
+
 			case 'Device':
+			case 'Server':
 				// type = "Server";
 				validateOkay = validateDeviceForm(formName);
 				break;
 
 			default:
-				alert('ERROR: saveToShow() - unsupported case for ' + forWhom);
+				alert('ERROR: saveToShow() - unsupported case for assetClass' + assetClass);
 		}
 
 		if (validateOkay)
@@ -539,6 +539,7 @@ var EntityCrud = ( function($) {
 						alert(resp.errors);
 						return false;
 					} else {
+						getEntityDetails(redirect, assetClass, resp.data.asset.id);
 						$('#createEntityView').dialog('close');
 
 						/*
@@ -557,8 +558,6 @@ var EntityCrud = ( function($) {
 							getHelpTextAsToolTip(type);
 						changeDocTitle(title);
 						*/
-
-						getEntityDetails(redirect, forWhom, resp.data.asset.id);
 					}
 					$(document).trigger('entityAssetCreated');
 				},
@@ -577,7 +576,7 @@ var EntityCrud = ( function($) {
 	 * @param me - the form
 	 * @param forWhom - the asset class of the form (app, files, database)
 	 **/
-	 pub.performAssetUpdate = function($me, forWhom) {
+	 pub.performAssetUpdate = function($me, assetClass) {
 		var act = $me.data('action');
 		var type = 'Server';
 		var redirect = $me.data('redirect');
@@ -586,28 +585,29 @@ var EntityCrud = ( function($) {
 
 		var validateOkay=false;
 		var formName=assetFormName;
-		switch(forWhom) {
-			case 'app':
+		switch (assetClass) {
+			case 'Application':
 				type = 'Application';
 				validateOkay = validateAppForm('Edit',formName);
 				break;
 
-			case 'files':
+			case 'Files':
 				type = 'Storage';
 				validateOkay = validateStorageForm(formName);
 				break;
 
-			case 'database':
+			case 'Database':
 				type = 'Database';
 				validateOkay = validateDBForm(formName);
 				break;
 
 			case 'Device':
+			case 'Server':
 				validateOkay = validateDeviceForm(formName);
 				break;
 
 			default:
-				alert("Unsupported case '" + forWhom + "' in performAssetUpdate()");
+				alert("Unsupported case for assetClass '" + assetClass + "' in performAssetUpdate()");
 
 		}
 
@@ -622,18 +622,19 @@ var EntityCrud = ( function($) {
 			}
 			var assetId=$("#"+formName+" :input[name='id']").val();
 			var url=formObj.attr('action')+'/'+assetId;
+			var data=formObj.serialize();
 			jQuery.ajax({
 				url: url,
-				data: formObj.serialize(),
+				data: data,
 				type:'POST',
 				success: function(resp) {
 					if (resp.status == 'error') {
 						alert(resp.errors);
 						return false;
 					} else {
-						$('#editEntityView').dialog('close')
 
-						getEntityDetails(redirect, forWhom, resp.data.asset.id);
+						getEntityDetails(redirect, assetClass, resp.data.asset.id);
+						$('#editEntityView').dialog('close');
 
 						/*
 						if(redirect == 'room')
@@ -872,6 +873,7 @@ function createAssetDetails (type) {
 			invokeCreateEntityView(type.toLowerCase(), type);
 			break;
 		case "Device":
+		case "Server":
 			invokeCreateEntityView('assetEntity', type);
 			break;
 		case "Files":
@@ -908,19 +910,41 @@ function loadCreateEntityView (e, type,source,rack,roomName,location,position) {
 }
 
 // Called from the page to popup the Asset Entity details dialog
-function getEntityDetails (redirectTo, type, value) {
-	switch (type) {
-	case "Application":
-		new Ajax.Request(contextPath+'/application/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Application');}})
-		break;
-	case "Database":
-		new Ajax.Request(contextPath+'/database/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Database');}})
-		break;
-	case "Files":
-		new Ajax.Request(contextPath+'/files/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Logical Storage');}})
-		break;
-	default :
-		new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){showEntityView(e, 'Device');}})
+function getEntityDetails (redirectTo, assetClass, value) {
+	switch (assetClass) {
+		case "Application":
+			new Ajax.Request(contextPath+'/application/show?id='+value+'&redirectTo='+redirectTo,
+				{	asynchronous:true,
+					evalScripts:true,
+					onComplete:function(e){
+						showEntityView(e, 'Application');
+					}
+				});
+			break;
+		case "Database":
+			new Ajax.Request(contextPath+'/database/show?id='+value+'&redirectTo='+redirectTo,
+				{	asynchronous:true,
+					evalScripts:true,
+					onComplete:function(e){showEntityView(e, 'Database'); }
+				});
+			break;
+		case "Files":
+			new Ajax.Request(contextPath+'/files/show?id='+value+'&redirectTo='+redirectTo,
+				{	asynchronous:true,
+					evalScripts:true,
+					onComplete:function(e) { showEntityView(e, 'Logical Storage');}
+				});
+			break;
+		case "Device":
+		case "Server":
+			new Ajax.Request(contextPath+'/assetEntity/show?id='+value+'&redirectTo='+redirectTo,
+				{	asynchronous: true,
+					evalScripts: true,
+					onComplete: function(e){ showEntityView(e, 'Device'); }
+				});
+			break;
+		default:
+			alert("Error in getEntityDetails() Unsupported case for assetClass '" + assetClass + "'");
 	}
 }
 
@@ -985,28 +1009,32 @@ function changeDocTitle ( newTitle ) {
 	});
 }
 
-function editEntity (redirectTo,type, value, source,rack,roomName,location,position) {
+function editEntity (redirectTo, assetClass, value, source,rack,roomName,location,position) {
 	if(redirectTo == "rack"){
 		redirectTo = $('#redirectTo').val() == 'rack' ? 'rack' : $('#redirectTo').val()
 	}
-	 switch(type){
-		 case "Application":
+	switch (assetClass) {
+		case "Application":
 			new Ajax.Request(contextPath+'/application/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Application',source,rack,roomName,location,position);}})
 			break;
-		 case "Database":
+		case "Database":
 			new Ajax.Request(contextPath+'/database/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Database',source,rack,roomName,location,position);}})
 			break;
-		 case "Files":
+		case "Files":
 			new Ajax.Request(contextPath+'/files/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Logical Storage',source,rack,roomName,location,position);}})
 			break;
-		 default :
+		case "Device":
+		case "Server":
 			 new Ajax.Request(contextPath+'/assetEntity/edit?id='+value+'&redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){editEntityView(e, 'Device',source,rack,roomName,location,position);}})
-	 }
+			 break;
+		default:
+			alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
+	}
 }
 
-function editEntityView (e, type,source,rack,roomName,location,position) {
-	var resps = e.responseText;
-	$("#editEntityView").html(resps);
+function editEntityView (e, type, source, rack, roomName,location,position) {
+	var resp = e.responseText;
+	$("#editEntityView").html(resp);
 	$("#editEntityView").dialog('option', 'width', 'auto')
 	$("#editEntityView").dialog('option', 'position', ['center','top']);
 	$("#editEntityView").dialog('open');
@@ -1719,7 +1747,6 @@ $(document).ready(function() {
 		
 	});
 });
-
 
 function toogleRack(value, source){
 	if( value == '-1' )
