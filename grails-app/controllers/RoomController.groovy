@@ -162,7 +162,7 @@ class RoomController {
 		def project = Project.findById( projectId )
 		def rackInstanceList = Rack.findAllByRoom(roomInstance , [sort:"tag"])
 		def prefVal = userPreferenceService.getPreference("roomTableShowAll")?: 'FALSE'
-		def modelList = Model.findAllByRoomObject(true);		
+		def modelList = Model.findAllByRoomObjectAndAssetType(true, 'Rack');		
 		def newRacks = []
 		for(int i = 50000 ; i<50051; i++ ){
 			newRacks << i
