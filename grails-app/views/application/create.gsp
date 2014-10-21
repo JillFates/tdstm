@@ -1,4 +1,4 @@
-script type="text/javascript">
+<script type="text/javascript">
 	$("#appl_assetName").val($('#gs_assetName').val());
 	$("#appl_sme").val($('#gs_sme').val());
 	$("#appl_validation").val($('#gs_validation').val())

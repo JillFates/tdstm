@@ -67,7 +67,7 @@
 				var sizePref = '${sizePref}'
 				var listCaption = 'Application: \
 					<tds:hasPermission permission="AssetEdit">\
-						<span class="capBtn"><input type="button" value="Create"  onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/></span>\
+						<span class="capBtn"><input type="button" value="Create App" onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/></span>\
 					</tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Application\')" disabled="disabled"/></span>\

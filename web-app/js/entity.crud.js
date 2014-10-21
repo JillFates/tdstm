@@ -862,7 +862,6 @@ var EntityCrud = ( function($) {
 			url: url,
 			type:'POST',
 			success: function(resp) {
-				//debugger;
 				// Load the edit entity view
 				return presentAssetEditView(resp, fieldType, source, rack, roomName, location, position);
 			},
@@ -928,7 +927,6 @@ var EntityCrud = ( function($) {
 			url: url,
 			type:'POST',
 			success: function(resp) {
-				//debugger;
 				if (typeof resp === 'object') {
 					if (resp.status=='error') {
 						alert("An error occurred: " + resp.errors);
@@ -999,7 +997,6 @@ var EntityCrud = ( function($) {
 			url: url,
 			type:'POST',
 			success: function(resp) {
-				//debugger;
 				if (typeof resp === 'object') {
 					if (resp.status=='error') {
 						alert("The following error occurred: " + resp.errors);
