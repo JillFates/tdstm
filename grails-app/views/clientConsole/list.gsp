@@ -760,7 +760,7 @@
 			if( idArray[0] == "comment"  ) {
 				${remoteFunction(controller:'assetEntity', action:'listComments', params:'\'id=\'+assetId', before:'setAssetId(assetId);',onComplete:'listCommentsDialog( e ,\"action\");')}
 			}else if( idArray[0] == "asset"  ) {
-				getEntityDetails('clientConsole','Server',assetId);
+				EntityCrud.showAssetDetailView('DEVICE',assetId);
 			}else if( idArray[0] == "task" ) {
 				${remoteFunction( action:"getTask", params:'\'assetEntity=\'+assetId', onComplete:'showChangeStatusDialog(e);')}
 			}

@@ -47,7 +47,7 @@
 								<thead>
 									<tr>
 										<th colspan="${columns}">
-											<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
+											<a href="javascript:EntityCrud.showAssetDetailView('${application.app.assetClass}',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
 											<g:if test="${application.app.moveBundle.useForPlanning}"> (${application.app.moveBundle})</g:if> - Supports ${application.supportsList.size()} , Depends on ${application.dependsOnList.size()}
 										</th>
 									</tr>

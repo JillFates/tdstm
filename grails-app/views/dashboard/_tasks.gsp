@@ -40,7 +40,7 @@
 						${item?.taskNumber?item?.taskNumber+' - ' : ''} ${item?.comment}
 					</td>
 					<td id="asset_${item?.id}" class="asset_details_block"
-						${item?.assetName ? 'onclick="getEntityDetails(\'myIssues\',\''+item?.assetType+'\',\''+item?.assetId+'\')"' : ''}>
+						${item?.assetName ? 'onclick="EntityCrud.showAssetDetailView(\''+item?.assetClass+'\',\''+item?.assetId+'\')"' : ''}>
 						${item?.assetName}
 					</td>
 					<td id="estFinish_${item?.id}" data-itemId="${item?.id}"

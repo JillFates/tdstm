@@ -2,6 +2,10 @@
     This is used by the dependency Console
 --%>
 <%@page import="com.tds.asset.AssetComment"%>
+
+<%@page import="com.tds.asset.Files" %>
+<g:set var="assetClass" value="${(new Files()).assetClass}" />
+
 <div class="tabs">
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
 	<div id ="selectionFilesId">
@@ -31,31 +35,31 @@
 						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${files.asset?.id}" ></g:checkBox>
-							<a href="javascript:editEntity('dependencyConsole','${files.asset.storageType}', ${files.asset.id})"><img
+							<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${files.asset.id})"><img
 									src="/tdstm/icons/database_edit.png" border="0px" />
 							</a>
 							<grid-buttons asset-id="${files.asset?.id}" asset-type="${files.asset?.assetType}" tasks="${files.tasksStatus}" comments="${files.commentsStatus}"></grid-buttons>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.assetName}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.fileFormat}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.fileFormat}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.validation}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.validation}</span>
 							</td>
    							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.moveBundle}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset.planStatus}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset?.depToResolve?:''}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','${files.asset.storageType}', ${files.asset?.id} )">${files.asset?.depToConflict?:''}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>

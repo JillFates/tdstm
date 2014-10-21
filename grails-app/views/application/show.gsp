@@ -1,11 +1,13 @@
 <%@page import="com.tds.asset.Application"%>
-<%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
-<g:set var="assetClass" value="Application" />
+<g:set var="assetClass" value="${(new Application()).assetClass}" />
 
 <table style="border: 0">
 	<tr>
 	
-		<td colspan="2"><div class="dialog" <tds:hasPermission permission='AssetEdit'> ondblclick="editEntity('${redirectTo}', 'Application', ${applicationInstance?.id})"</tds:hasPermission>>
+		<td colspan="2"><div class="dialog" 
+			<tds:hasPermission permission='AssetEdit'>
+				ondblclick="EntityCrud.showAssetEditView('${assetClass}', ${applicationInstance?.id});"
+			</tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
@@ -24,8 +26,7 @@
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" id="applicationId" value="${applicationInstance?.id}" />
-					<g:render template="../assetEntity/showButtons" 
-						model="[assetEntity:applicationInstance, config:config, highlightMap:highlightMap, redirectTo:redirectTo, type:'Application', forWhom:assetClass]"/>
+					<g:render template="../assetEntity/showButtons" model="[assetEntity:applicationInstance]"/>
 				</g:form>
 			</div>
 		</td>

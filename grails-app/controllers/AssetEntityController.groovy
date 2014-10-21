@@ -2447,15 +2447,21 @@ class AssetEntityController {
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 
 		def results = assetCommentList?.collect {
-			[ cell: ['',(it.comment?.length()>50 ? (it.comment.substring(0,50) + '...'): it.comment).replace("\n",""), 
+			[ cell: 
+				[
+					'',
+					(it.comment?.length()>50 ? (it.comment.substring(0,50) + '...') : it.comment).replace("\n",""), 
 					it.lastUpdated ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.lastUpdated, tzId)):'',
 					it.commentType ,
 					it.assetEntity?.assetName ?:'',
 					it.assetEntity?.assetType ?:'',
 					it.category,
-					 it.assetEntity?.id], 
-					id: it.id]
-			}
+					it.assetEntity?.id,
+					it.assetEntity?.assetClass.toString()
+				], 
+				id: it.id
+			]
+		}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
@@ -2715,7 +2721,11 @@ class AssetEntityController {
 				nGraphUrl, 
 				it.score ?: 0,
 				status ? "task_${it.status.toLowerCase()}" : 'task_na',
-				updatedClass, dueClass, it.assetEntity?.id, it.assetEntity?.assetType
+				updatedClass, 
+				dueClass, 
+				it.assetEntity?.id, // 16
+				it.assetEntity?.assetType, // 17
+				it.assetEntity?.assetClass.toString() // 18
 				], 
 				id:it.id
 			]
@@ -3759,10 +3769,20 @@ class AssetEntityController {
 		def depPref= assetEntityService.getExistingPref('Dep_Columns')
 		StringBuffer query = new StringBuffer(""" 
 			SELECT * FROM ( 
-				SELECT asset_dependency_id AS id, ae.asset_name AS assetName, ae.asset_type AS assetType, mb.name AS assetBundle, ad.type AS type, 
-					aed.asset_name AS dependentName, aed.asset_type AS dependentType, mbd.name AS dependentBundle, 
+				SELECT asset_dependency_id AS id, 
+					ae.asset_name AS assetName, 
+					ae.asset_class AS assetClass,
+					ae.asset_type AS assetType, 
+					mb.name AS assetBundle, 
+					ad.type AS type, 
+					aed.asset_name AS dependentName,
+					aed.asset_class AS dependentClass,
+					aed.asset_type AS dependentType, 
+					mbd.name AS dependentBundle, 
 					ad.status AS status,ad.comment AS comment, ad.data_flow_freq AS frequency, ae.asset_entity_id AS assetId,  
-					aed.asset_entity_id AS dependentId, ad.c1 AS c1, ad.c2 AS c2, ad.c3 AS c3,ad.c4 AS c4,ad.data_flow_direction AS direction
+					aed.asset_entity_id AS dependentId, 
+					ad.c1 AS c1, ad.c2 AS c2, ad.c3 AS c3,ad.c4 AS c4,
+					ad.data_flow_direction AS direction
 				FROM tdstm.asset_dependency ad 
 				LEFT OUTER JOIN asset_entity ae ON ae.asset_entity_id = asset_id 
 				LEFT OUTER JOIN asset_entity aed ON aed.asset_entity_id = dependent_id 
@@ -3799,12 +3819,20 @@ class AssetEntityController {
 		def results = dependencies?.collect {
 			[ cell:
 				[
-				it.assetName, it.assetType, it.assetBundle, it.type,
-				it.dependentName, it.dependentType, it.dependentBundle,
-				(depPref['1']!='comment') ? it[depPref['1']] : (it[depPref['1']]? "<div class='commentEllip'>${it.comment}</div>" : ''), 
-				(depPref['2']!='comment') ? it[depPref['2']] : (it[depPref['2']]? "<div class='commentEllip'>${it.comment}</div>" : ''),
-				it.status,
-				it.assetId, it.dependentId
+					it.assetName, 
+					it.assetType, 
+					it.assetBundle, 
+					it.type,
+					it.dependentName, 
+					it.dependentType, 
+					it.dependentBundle,
+					(depPref['1']!='comment') ? it[depPref['1']] : (it[depPref['1']]? "<div class='commentEllip'>${it.comment}</div>" : ''), 
+					(depPref['2']!='comment') ? it[depPref['2']] : (it[depPref['2']]? "<div class='commentEllip'>${it.comment}</div>" : ''),
+					it.status,
+					it.assetId, // 10
+					it.dependentId, // 11
+					it.assetClass,	// 12
+					it.dependentClass	// 13
 				], id: it.id
 			]}
 		

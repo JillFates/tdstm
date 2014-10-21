@@ -36,15 +36,15 @@
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Asset','Asset Type', 'Bundle','Type', 'Depends On', 'Dep Asset Type', 'Dep Asset Bundle', '${columnLabelpref['1']}', '${columnLabelpref['2']}', 'Status'"
 					colModel="{name:'assetName', index: 'assetName', width:'200',formatter: myLinkFormatter},
-								  {name:'assetType', editable: true},
-								  {name:'assetBundle', editable: true},
-								  {name:'type', editable: true}, 
-								  {name:'dependentName', editable: true,formatter: dependentFormatter,width:'200'},
-								  {name:'dependentType', editable: true},
-								  {name:'dependentBundle', editable: true},
-								  {name:'${depPref['1']}', editable: true,width:'100'},
-								  {name:'${depPref['2']}',editable:true, width:'100'},
-								  {name:'status', editable: true, width:'80'}"
+						{name:'assetType', editable: true},
+						{name:'assetBundle', editable: true},
+						{name:'type', editable: true}, 
+						{name:'dependentName', editable: true,formatter: dependentFormatter,width:'200'},
+						{name:'dependentType', editable: true},
+						{name:'dependentBundle', editable: true},
+						{name:'${depPref['1']}', editable: true,width:'100'},
+						{name:'${depPref['2']}',editable:true, width:'100'},
+  						{name:'status', editable: true, width:'80'}"
 					sortname="'assetName'"
 					caption="listCaption"
 					multiselect="true"
@@ -61,13 +61,13 @@
 					$("#dependencyGridIdGrid_"+depPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+depPref+'\',\'dependencyGrid\',\''+${key}+'\')">');
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
-				function myLinkFormatter (cellvalue, options, rowObjcet) {
+				function myLinkFormatter (cellvalue, options, rowObject) {
 					var value = cellvalue ? cellvalue : ''
-						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[1]+'\',\''+rowObjcet[10]+'\')">'+value+'</a>'
+					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[12]+'\',\''+rowObject[10]+'\')">'+value+'</a>'
 				}
-				function dependentFormatter(cellvalue, options, rowObjcet){
+				function dependentFormatter(cellvalue, options, rowObject){
 					var value = cellvalue ? cellvalue : ''
-						return '<a href="javascript:getEntityDetails(\'dependencies\',\''+rowObjcet[5]+'\',\''+rowObjcet[11]+'\')">'+value+'</a>'
+					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[13]+'\',\''+rowObject[11]+'\')">'+value+'</a>'
 				}
 				
 			})

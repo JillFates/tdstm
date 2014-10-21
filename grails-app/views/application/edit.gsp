@@ -303,7 +303,7 @@
 					<input type="hidden" id="tabType" name="tabType" value =""/>
 					<input type="hidden" id="updateView" name="updateView" value=""/>
 
-					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo, value:applicationInstance.id, whom:assetClass]"></g:render>
+					<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>
 				</div>
 			</td>
 		</tr>

@@ -1,7 +1,3 @@
-<%@page import="com.tds.asset.Database"%>
-<%-- <g:set var="assetClass" value="${(new Database()).assetClass}" /> --%>
-<g:set var="assetClass" value="Database" />
-
 <script type="text/javascript">
 	$("#db_assetName").val($('#gs_assetName').val())
 	$("#db_dbFormat").val($('#gs_dbFormat').val())
@@ -92,7 +88,7 @@
 			<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
 			<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
 			<input name="showView" id="showView" type="hidden" value=""/>
-			<g:render template="../assetEntity/createButtons" model="[whom:assetClass]"></g:render>
+			<g:render template="../assetEntity/createButtons" model="[assetClass: databaseInstance.assetClass]"></g:render>
 		</td>
 	</tr>
 </table>

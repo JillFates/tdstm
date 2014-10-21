@@ -56,7 +56,9 @@
 		</g:if>
 		<tr id="assetShowId" class="prop">
 			<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
-			<td valign="top" class="value" id="assetShowValueId" colspan="3"><a href="javascript:getEntityDetails('listTask','${assetType}', '${assetId}')">${assetName}</a></td>
+			<td valign="top" class="value" id="assetShowValueId" colspan="3">
+				<a href="javascript:EntityCrud.showAssetDetailView('${assetComment?.assetEntity?.assetClass}', '${assetId}')">${assetName}</a>
+			</td>
 		</tr>
 		<g:if test = "${workflow}">
 			<tr class="issue" id="workFlowShow">

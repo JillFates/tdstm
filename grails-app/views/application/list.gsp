@@ -1,8 +1,10 @@
-<%@page import="com.tds.asset.AssetComment;com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;com.tds.asset.AssetComment;"%>
+<%@page import="com.tds.asset.AssetEntity" %>
+<%@page import="com.tds.asset.Database" %>
+<%@page import="com.tds.asset.Files" %>
+<%@page import="com.tds.asset.AssetComment" %>
+<%@page import="com.tds.asset.Application" %>
 
-<%@page import="com.tds.asset.Application"%>
-<%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
-<g:set var="assetClass" value="Application" />
+<g:set var="assetClass" value="${(new Application()).assetClass}" />
 
 <html>
 	<head>
@@ -63,9 +65,9 @@
 				var unassigned = '${unassigned}'
 				
 				var sizePref = '${sizePref}'
-				var listCaption ='Applications: \
+				var listCaption = 'Application: \
 					<tds:hasPermission permission="AssetEdit">\
-						<span class="capBtn"><input type="button" value="Create App"  onclick="createAssetDetails(\'Application\')"/></span>\
+						<span class="capBtn"><input type="button" value="Create"  onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/></span>\
 					</tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Application\')" disabled="disabled"/></span>\
@@ -115,13 +117,14 @@
 					$("#applicationIdGrid_"+appPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+appPref+'\',\'application\',\''+${key}+'\')">');
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
+
 			function myLinkFormatter (cellvalue, options, rowObject) {
 				var value = cellvalue ? cellvalue : ''
-				return '<a href="javascript:getEntityDetails(\'application\',\'Application\','+options.rowId+')">'+value+'</a>'
+				return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+')">'+value+'</a>'
 			}
 
 			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '<a href="javascript:editEntity(\'application\',\'Application\','+options.rowId+')">'+
+				var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');">'+
 						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[7] + "' tasks='" + rowObject[6] + "' comments='" + rowObject[9] + "'></grid-buttons>"
 				return editButton

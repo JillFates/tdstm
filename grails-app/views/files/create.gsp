@@ -1,7 +1,3 @@
-<%@page import="com.tds.asset.Files"%>
-<%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
-<g:set var="assetClass" value="Files" />
-
 <script type="text/javascript">
 	$("#file_assetName").val($('#gs_assetName').val())
 	$("#file_fileFormat").val($('#gs_fileFormat').val())
@@ -109,7 +105,7 @@
 				<input name="attributeSet.id" type="hidden" value="1"> <input
 					name="project.id" type="hidden" value="${projectId}"> 
 				<input name="showView" id="showView" type="hidden" value=""/>
-				<g:render template="../assetEntity/createButtons" model="[whom:assetClass]"></g:render>
+				<g:render template="../assetEntity/createButtons" model="[assetClass: fileInstance.assetClass]"></g:render>
 			</td>
 		</tr>
 	</table>

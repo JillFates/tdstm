@@ -120,7 +120,7 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo, value:fileInstance.id, whom:assetClass]"></g:render>
+					<g:render template="../assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
 				</div>
 			</td>
 		</tr>

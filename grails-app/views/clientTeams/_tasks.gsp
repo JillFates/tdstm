@@ -49,7 +49,7 @@
 							${item?.comment}
 						</td>
 						<td id="asset_${item?.id}" class="asset_details_block"
-						${item?.assetName ? 'onclick="getEntityDetails(\'myIssues\',\''+item?.assetType+'\',\''+item?.assetId+'\')"' : ''}>
+						${item?.assetName ? 'onclick="EntityCrud.showAssetDetailView(\''+item?.assetClass+'\',\''+item?.assetId+'\')"' : ''}>
 							${item?.assetName} 
 						</td>
 						<td id="lastUpdated_${item?.id}" class="actionBar asset_details_block"

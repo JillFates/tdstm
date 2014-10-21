@@ -116,7 +116,7 @@
 			</tr>
 			<tr>
 				<g:if test="${assetComment.assetEntity}">
-		   			<td>Asset:</td><td><span class="assetLink" onclick="getEntityDetails('myIssues','${assetComment.assetEntity?.assetType}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span></td>
+		   			<td>Asset:</td><td><span class="assetLink" onclick="EntityCrud.showAssetDetailView('${assetComment.assetEntity?.assetClass}','${assetComment?.assetEntity.id}')">&nbsp;${assetComment?.assetEntity.assetName}</span></td>
 		   		</g:if>
 		   	</tr>
 		   	<tr class="prop">

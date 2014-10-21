@@ -88,7 +88,7 @@
 <div class="buttons">
 	<input type="button" class="edit" value="Edit" onclick="editAudit('roomAudit','${source}','${assetType}', ${assetEntity?.id})" /> 
 	<input type="button" class="edit" value="Delete" onclick="deleteAudit(${assetEntity.id},'server')" /> 
-	<input type="button" class="edit" value="More..." onclick="getEntityDetails('room','Server', ${assetEntity?.id})" /> 
+	<input type="button" class="edit" value="More..." onclick="EntityCrud.showAssetDetailsView('${assetEntity?.assetClass}', ${assetEntity?.id})" /> 
 </div>
 <br>
 <div >

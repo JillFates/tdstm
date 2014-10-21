@@ -199,36 +199,58 @@ tds.core.interceptor.LoggedCheckerInterceptor = function() {
 	return servicesInterceptor;
 };
 
+// Helper function used with the following ajaxPrefilter to redirect the user to the login page
 function _goToLogin(url) {
 	setTimeout(function() {
 		location.href = url;
 	}, 500);
 }
 
+/**
+ * An Ajax Prefilter that is be applied to all Jquery Ajax calls. It will add the following functionality:
+ *    1. Add checks for errors in the request and display them in the #messageDiv or as an alert
+ *    2. Check for session expiration and redirect the user to the login page accordingly
+ */
 $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+	//console.log("In the ajaxPrefilter");
 	var success = options.success;
     options.success = function(data, textStatus, xhr) {
     	var url = xhr.getResponseHeader('X-Login-URL');
         if (url) {
+        	// The session must of expired if the X-Login-URL header was received
         	alert("Your session has expired and need to login again.");
         	_goToLogin(url);
             return;
         } else {
-            $('#messageDiv').html(xhr.status == 200 ? data  : "Unexpected error occurred");                   
+        	// Check for error situations
+        	if (xhr.status == 200) {
+	        	//console.log("ajaxPrefilter was successful");
+        		return success(data, textStatus, jqXHR);
+        	} else {
+				var errmsg = "Unexpected error occurred";
+				var msgDiv = $('#messageDiv');
+				if (msgDiv.length) {
+					msgDiv.html(errmsg)
+				} else {
+					alert(errmsg);
+				}
+				console.log("ajaxPrefilter received an error - " + errmsg);
+				return false;
+        	}
         }
-        
-        if(typeof(success) === "function") return success(data, textStatus, jqXHR);
-    };
+	};
     
+    /*
     var error = options.error;
     options.error = function(jqXHR, textStatus, errorThrown) {
     	$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
         if(typeof(error) === "function") return error(jqXHR, textStatus, errorThrown);
     };
+    */
 });
 
 /**
- * Intercepector used to check if there are a penging request, it works in conjuntions with the LoadingIndicator directive
+ * Interceptor used to check if there are a penging request, it works in conjuntions with the LoadingIndicator directive
  */
 tds.core.interceptor.PendingRequestInterceptor = function(q, rootScope) {
 	var requestCount = 0;

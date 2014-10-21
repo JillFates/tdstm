@@ -1,17 +1,3 @@
-<script type="text/javascript">
-$(document).ready(function() { 
-	var assetType = $("#assetTypeEditId").val()
-	if(assetType =='Blade'){
-		$(".bladeLabel").show()
-		$(".rackLabel").hide()
-		$(".vmLabel").hide()
-	 } else {
-		$(".bladeLabel").hide()
-		$(".rackLabel").show()
-		$(".vmLabel").hide()
-	}
-})
-</script>
 <g:form method="post"  name="editAssetsAuditFormId" controller="assetEntity" action="update">
 <div>
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
@@ -120,7 +106,7 @@ $(document).ready(function() {
 <div class="buttons">
 	<input type="button" class="edit" value="Update" onclick="updateAudit()" /> 
 	<input type="button" class="edit" value="Delete" onclick="deleteAudit(${assetEntityInstance.id},'server')" /> 
-	<input type="button" class="edit" value="More..." onclick="editEntity('room','Server', ${assetEntityInstance?.id})" /> 
+	<input type="button" class="edit" value="More..." onclick="EntityCrud.showAssetEditView('${assetEntityInstance.assetClass}', ${assetEntityInstance?.id})" /> 
 </div><br>
 </g:form>
 <div id="modelAuditId">
@@ -160,3 +146,18 @@ $(document).ready(function() {
 		</g:form>
 	</div>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function() { 
+	var assetType = $("#assetTypeEditId").val()
+	if(assetType =='Blade'){
+		$(".bladeLabel").show()
+		$(".rackLabel").hide()
+		$(".vmLabel").hide()
+	 } else {
+		$(".bladeLabel").hide()
+		$(".rackLabel").show()
+		$(".vmLabel").hide()
+	}
+})
+</script>

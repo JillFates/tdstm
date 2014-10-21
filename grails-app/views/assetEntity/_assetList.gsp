@@ -2,6 +2,10 @@
     This is used by the dependency Console
 --%>
 <%@page import="com.tds.asset.AssetComment"%>
+
+<%@page import="com.tds.asset.AssetEntity" %>
+<g:set var="assetClass" value="${(new AssetEntity()).assetClass}" />
+
 <div class="tabs">
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
     <div id ="selectionId" >
@@ -40,49 +44,49 @@
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td nowrap="nowrap">
 							<g:checkBox name="checkBox" id="checkId_${asset.asset.id}" ></g:checkBox>
-							<a href="javascript:editEntity('dependencyConsole','Server', ${asset.asset.id})"><img
-									src="/tdstm/icons/database_edit.png" border="0px" />
+							<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${asset.asset.id})"><img
+								src="/tdstm/icons/database_edit.png" border="0px" />
 							</a> 
 							<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}"></grid-buttons>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.assetName}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.model}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.model}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.rackSource?.location}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.rackSource?.location}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.rackTarget?.location}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.rackTarget?.location}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.targetRack}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.targetRack}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.assetType}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetType}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.assetTag}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetTag}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.validation}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.moveBundle}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset.planStatus}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset?.depToResolve?:''}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Server', ${asset.asset.id} )">${asset.asset?.depToConflict?:''}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>

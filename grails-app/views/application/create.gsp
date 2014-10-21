@@ -1,4 +1,4 @@
-<script type="text/javascript">
+script type="text/javascript">
 	$("#appl_assetName").val($('#gs_assetName').val());
 	$("#appl_sme").val($('#gs_sme').val());
 	$("#appl_validation").val($('#gs_validation').val())
@@ -279,14 +279,14 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<input name="dependentCount" id="create_dependentCount" type="hidden" value="0" />
-				<input name="supportCount"  id="create_supportCount" type="hidden" value="0" />
-				<input name="attributeSet.id" type="hidden" value="1" />
-				<input name="project.id" type="hidden" value="${projectId}" />
-				<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
-				<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-				<input name="showView" id="showView" type="hidden" value=""/>
-				<g:render template="../assetEntity/createButtons" model="[whom:'Application']"></g:render>
+				<input type="hidden" name="project.id" value="${projectId}" />
+				<input type="hidden" name="attributeSet.id" value="1" />
+				<input type="hidden" name="dependentCount" id="create_dependentCount" value="0" />
+				<input type="hidden" name="supportCount"  id="create_supportCount" value="0" />
+				<input type="hidden" name="addedSupport" id="create_supportAddedId" value ="0"/>
+				<input type="hidden" name="addedDep" id="create_dependentAddedId" value ="0"/>
+				<input type="hidden" name="showView" id="showView" value=""/>
+				<g:render template="../assetEntity/createButtons" model="[assetClass: applicationInstance.assetClass]"></g:render>
 			</td>
 		</tr>
 	</table>

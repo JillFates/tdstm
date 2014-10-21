@@ -8,7 +8,7 @@
 				<thead>
 					<tr>
 						<th colspan="${columns}">
-							<a href="javascript:getEntityDetails('Server','server',${assetEntity.app.id})" class="inlineLink">${assetEntity.app.assetName}</a>
+							<a href="javascript:EntityCrud.showAssetDetailView('${assetEntity.app.assetClass}',${assetEntity.app.id})" class="inlineLink">${assetEntity.app.assetName}</a>
 							<g:if test="${assetEntity.app.moveBundle.useForPlanning}"> (${assetEntity.app.moveBundle})</g:if> 
 								- Supports ${assetEntity.supportsList.size()} , Depends on ${assetEntity.dependsOnList.size()} 
 								<span style="color: red;">${assetEntity.header?' - '+assetEntity.header:''}</span>

@@ -256,21 +256,24 @@ class ApplicationController {
 	}
 
 	def show = {
+		log.debug "******* show() id=${params.id}"
+		def app
 		def project = controllerService.getProjectForPage( this )
-		if (! project) 
-			return
+		if (project) {
+			def assetId = params.id
+			app = controllerService.getAssetForPage(this, project, AssetClass.APPLICATION, assetId)
 
-		def assetId = params.id
-		def app = controllerService.getAssetForPage(this, project, AssetClass.APPLICATION, assetId)
+		}
 
-		if (!app) {
-			log.debug "show() Unable to find application instance $assetId"
-			flash.message = "Application not found with id $assetId"
-			def errorMap = [errMsg : flash.message]
-			render errorMap as JSON
+		if (!project || !app) {
+			def errorMsg = flash.message
+			flash.message=null
+			errorMsg = errorMsg ?: "Application not found with id $assetId"
+			log.debug "show() $errorMsg"
+			render ServiceResults.errors(errorMsg) as JSON
 		} else {
 			def model = applicationService.getModelForShow(project, app, params)
-			model.each { n,v -> println "$n:\t$v"}
+			// model.each { n,v -> println "$n:\t$v"}
 			return model
 		}
 	}

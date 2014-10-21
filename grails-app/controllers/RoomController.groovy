@@ -513,24 +513,24 @@ class RoomController {
 	   
 	   def stringToReturn = new StringBuffer()
 	   stringToReturn.append("""
-	   							<div class="dialog" >
-				          		<table id="listDiv">
-								<thead>
-									<tr>
-									<th class="sortable ${sort=='assetName' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetName','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Name</a></th>
-									<th class="sortable ${sort=='assetTag' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetTag','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Tag</a></th>
-									<th class="sortable ${sort=='model' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'model','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Model</a></th>
-									</tr>
-								</thead>
-								<tbody class="tbody" >
-								""")
-	   if(assetEntityList.size() > 0){
+			<div class="dialog" >
+			<table id="listDiv">
+			<thead>
+				<tr>
+					<th class="sortable ${sort=='assetName' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetName','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Name</a></th>
+					<th class="sortable ${sort=='assetTag' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'assetTag','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Asset Tag</a></th>
+					<th class="sortable ${sort=='model' ? 'sorted '+order :''}"><a href="javascript:listDialog('${assign}', 'model','${order}','${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">Model</a></th>
+				</tr>
+			</thead>
+			<tbody class="tbody" >
+			""")
+	   if (assetEntityList.size() > 0) {
 		   assetEntityList.eachWithIndex{ obj, i ->
-			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editEntity( 'rack','${obj.assetType}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
-											<td>${obj.assetName}</td>
-											<td>${obj.assetTag}</td>
-											<td>${obj.model ? obj.model.modelName : ''}</td>
-										</tr>""")
+			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('${obj.assetClass}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
+					<td>${obj.assetName}</td>
+					<td>${obj.assetTag}</td>
+					<td>${obj.model ? obj.model.modelName : ''}</td>
+				</tr>""")
 		   }
 	   } else {
 			stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")

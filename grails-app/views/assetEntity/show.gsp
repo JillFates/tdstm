@@ -13,7 +13,7 @@ $(document).ready(function() {
 		<tr>
 			<td colspan="2">
 				<div class="dialog" 
-					<tds:hasPermission permission='AssetEdit'>ondblclick="editEntity('${redirectTo}','Server', ${assetEntity?.id})"</tds:hasPermission> 
+					<tds:hasPermission permission='AssetEdit'>ondblclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id})"</tds:hasPermission> 
 				>
 					<g:if test="${errors}">
 						<div id="messageDivId" class="message">${errors}</div>
@@ -161,7 +161,7 @@ $(document).ready(function() {
 					<input name="project.id" type="hidden" value="${projectId}">
 					<input type="hidden" name="id" id="assetsId" value="${assetEntity?.id}" />
 					<input type ="hidden" id = "dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<g:render template="showButtons" model="[assetEntity:assetEntity, redirectTo:redirectTo, type:'Server', forWhom:'server', escapedName:escapedName]" />
+					<g:render template="showButtons" model="[assetEntity:assetEntity, escapedName:escapedName]" />
 				</div>
 			</td>
 		</tr>

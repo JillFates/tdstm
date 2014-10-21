@@ -42,7 +42,7 @@
 			<g:each var="appList" in="${appList}" var="application" status="i">
 				<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" align="center">
 					<td>
-						<a href="javascript:getEntityDetails('Application','Application',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
+						<a href="javascript:EntityCrud.showAssetDetailView('${application.app.assetClass}',${application.app.id})" class="inlineLink">${application.app.assetName}</a>
 					</td>
 					<td>${application.app.sme}</td>
 					<td>${application.startTime}</td>

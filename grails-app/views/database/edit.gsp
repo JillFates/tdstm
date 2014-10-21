@@ -110,7 +110,7 @@
 					
 				<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
 				<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-				<g:render template="../assetEntity/editButtons" model="[redirectTo:redirectTo,value:databaseInstance.id,whom:assetClass]"></g:render>
+				<g:render template="../assetEntity/editButtons" model="[assetEntity:databaseInstance]"></g:render>
 			</div>
 		</td>
 	</tr>

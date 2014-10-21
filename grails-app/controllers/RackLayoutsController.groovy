@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.math.NumberUtils
 
 class RackLayoutsController {
@@ -69,11 +70,11 @@ class RackLayoutsController {
 			session.removeAttribute("USE_FILTERS")
 			session.removeAttribute("RACK_FILTERS")
 			return [moveBundleList: moveBundleList, projectInstance:project, projectId:projectId,
-					currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:entities.servers, 
-					applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, rackFilters:rackFilters, targetRackFilter:targetRack,
-					bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),
-					staffRoles:taskService.getRolesForStaff(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-					frontCheck:frontCheck, backCheck:backCheck, wBundleCheck:wBundleCheck, woBundleCheck:woBundleCheck, wDCheck:wDCheck]
+				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:entities.servers, 
+				applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, rackFilters:rackFilters, targetRackFilter:targetRack,
+				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),
+				staffRoles:taskService.getRolesForStaff(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
+				frontCheck:frontCheck, backCheck:backCheck, wBundleCheck:wBundleCheck, woBundleCheck:woBundleCheck, wDCheck:wDCheck]
 		} else {
 			flash.message = 'You must have a project selected before using this feature'
 			redirect(controller: "project", action: "list",params:[viewType : "list"])
@@ -447,7 +448,14 @@ class RackLayoutsController {
 							if (overlappedAssetsSize > 1) {
 								cabling = ( !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
-							assetTag += """<a href="javascript:${forWhom ? "editAudit('roomAudit','${it.source}'" : "getEntityDetails('"+redirectTo+"'"},'Device',${overlapAsset?.id})" >"""+trimString(assetTagValue.replace('~-','-'))+"</a>"
+							assetTag += '<a href="javascript:' 
+							if (forWhom) {
+								assetTag += "editAudit('roomAudit','${it.source}'"
+							} else { 
+								assetTag += "EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})"
+							}
+							assetTag += '">' + StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) + '</a>'
+
 							if(hasBlades){
 								assetTag += "<br/>"+bladeTable
 							}
@@ -468,8 +476,8 @@ class RackLayoutsController {
 							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
 							if ( assetCables ){
 								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
-										onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="../icons/disconn.png"/>
-										&nbsp${taskAnchors}</td>""")
+									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="../icons/disconn.png"/>
+									&nbsp${taskAnchors}</td>""")
 							}else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;${taskAnchors}</td>")
 						} else {
@@ -621,7 +629,13 @@ class RackLayoutsController {
 					if((bladeSpan == 2) &&  hasError )
 						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
 					else
-						bladeTable += """<td class='blade' rowspan='${bladeSpan}' style='height:${tdHeight}px'><a href="javascript:${forWhom ? "editAudit('roomAudit','${assetDetails.source}'" : "getEntityDetails('${redirectTo}'" },'Device',${blade.id})" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"""
+						bladeTable += "<td class=\"blade\" rowspan=\"${bladeSpan}\" style=\"height:${tdHeight}px\"><a href=\"javascript:"
+						if (forWhom) {
+							bladeTable += "editAudit('roomAudit','${assetDetails.source}'" 
+						} else {
+							bladeTable += "EntityCrud.showAssetDetailView('${blade.assetClass}',${blade.id})"
+						}
+						bladeTable +=  "\" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
 				} else {
 					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>"
 					if(commit !="Print View"){
@@ -641,20 +655,11 @@ class RackLayoutsController {
 		
 		bladeTable += '</table>'
 	}
-	/********************************************
-	 * Trim Name if over 22, trim to 20 characters and add "...".
-	 ********************************************/
-	def private trimString( name ){
-		def trimmedVal = name
-		def length = name.length()
-		if(length > 22){
-			trimmedVal = trimmedVal.substring(0,20)+"..."
-		}
-		return trimmedVal
-	}
+
 	def modelTemplate = {
-			return [params:params]
+		return [params:params]
 	}
+
 	/*
 	 * Return AssetCableMap record details to display at RackLayout cabling screen
 	 */

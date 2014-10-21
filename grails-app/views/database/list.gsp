@@ -1,7 +1,6 @@
 <%@page import="com.tds.asset.AssetEntity;com.tds.asset.Application;com.tds.asset.Database;com.tds.asset.Files;"%>
 <%@page import="com.tds.asset.Database"%>
-<%-- <g:set var="assetClass" value="${(new Database()).assetClass}" /> --%>
-<g:set var="assetClass" value="Database" />
+<g:set var="assetClass" value="${(new Database()).assetClass}" />
 
 <html>
 	<head>
@@ -57,7 +56,12 @@
 				var toValidate = '${toValidate}'
 				var unassigned = '${unassigned}'
 					
-				var listCaption ='DataBases: <tds:hasPermission permission="AssetEdit"><span class="capBtn"><input type="button" value="Create DB" onclick="createAssetDetails(\'Database\')"/></span></tds:hasPermission>\
+				var listCaption ='Database: \
+					<tds:hasPermission permission="AssetEdit">\
+						<span class="capBtn">\
+							<input type="button" value="Create DB" onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/>\
+						</span>\
+					</tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Database\')" disabled="disabled"/></span>\
 						<span><input type="checkbox" id="justPlanning" ${ (justPlanning == 'true' ? 'checked="checked"': '') } onclick="toggleJustPlanning($(this))"/> Just Planning</span>\
@@ -104,12 +108,12 @@
 			$.jgrid.formatter.integer.thousandsSeparator='';
 			function myLinkFormatter (cellvalue, options, rowObjcet) {
 				var value = cellvalue ? cellvalue : ''
-				return '<a href="javascript:getEntityDetails(\'na\',\'${assetClass}\','+options.rowId+')">'+value+'</a>'
+				return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+');">'+value+'</a>'
 			}
 			
 			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '<a href="javascript:editEntity(\'na\',\'${assetClass}\','+options.rowId+')">'+
-						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+				var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')">'+
+					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[6] + "' comments='" + rowObject[8] + "'></grid-buttons>"
 				return editButton
 			}

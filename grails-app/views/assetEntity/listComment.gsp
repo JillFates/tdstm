@@ -18,6 +18,7 @@
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
@@ -76,8 +77,8 @@
 						"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					return editButton
 				}
-				function assetFormatter(cellVal,options,rowObject){
-					return cellVal ? '<span class="Arrowcursor" onclick= "getEntityDetails(\'listComment\', \''+rowObject[5]+'\', '+rowObject[7]+')\" >' + (cellVal) + '</span>' : "" 
+				function assetFormatter(cellVal,options,rowObject) {
+					return cellVal ? '<span class="Arrowcursor" onclick="EntityCrud.showAssetDetailView(\''+rowObject[8]+'\', '+rowObject[7]+ ')">' + (cellVal) + '</span>' : "" 
 				} 
 			});
 		</script>

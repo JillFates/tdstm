@@ -2,6 +2,9 @@
     This is used by the dependency Console
 --%>
 <%@page import="com.tds.asset.AssetComment"%>
+<%@page import="com.tds.asset.Database" %>
+<g:set var="assetClass" value="${(new Database()).assetClass}" />
+
 <div class="tabs">
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
 	<div id ="selectionDBId">
@@ -34,32 +37,31 @@
 							class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${database.asset.id}" ></g:checkBox>
-							<a href="javascript:editEntity('dependencyConsole','Database', ${database.asset.id})"><img
+							<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${database.asset.id})"><img
 									src="/tdstm/icons/database_edit.png" border="0px" />
 							</a> 
 							<grid-buttons asset-id="${database.asset?.id}" asset-type="${database.asset?.assetType}" tasks="${database.tasksStatus}" comments="${database.commentsStatus}"></grid-buttons>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.assetName}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.assetName}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.dbFormat}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.dbFormat}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.validation}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.validation}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.moveBundle}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.moveBundle}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset.planStatus}</span>
-
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset.planStatus}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset?.depToResolve?:''}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset?.depToResolve?:''}</span>
 							</td>
 							<td><span
-								onclick="getEntityDetails('dependencyConsole','Database', ${database.asset.id} )">${database.asset?.depToConflict?:''}</span>
+								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${database.asset.id} )">${database.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>

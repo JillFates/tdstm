@@ -1,7 +1,8 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
 <table style="border: 0">
 	<tr>
-		<td colspan="2"><div class="dialog" <tds:hasPermission permission='AssetEdit'> ondblclick="editEntity('${redirectTo}','Storage', ${filesInstance?.id})"</tds:hasPermission>>
+		<td colspan="2">
+			<div class="dialog" <tds:hasPermission permission='AssetEdit'> ondblclick="EntityCrud.showAssetEditView('${filesInstance?.assetClass}',${filesInstance?.id})"</tds:hasPermission>>
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
@@ -58,8 +59,7 @@
 			<div class="buttons">
 				<g:form>
 					<input type="hidden" name="id" id="filedeleteId" value="${filesInstance?.id}" />
-					<g:render template="../assetEntity/showButtons" 
-						model="[assetEntity:filesInstance, redirectTo:redirectTo,type:'Files', forWhom:'files']" />
+					<g:render template="../assetEntity/showButtons" model="[assetEntity:filesInstance]" />
 				</g:form>
 			</div>
 		</td>

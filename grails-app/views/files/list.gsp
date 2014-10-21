@@ -3,8 +3,7 @@
 <%@page import="com.tds.asset.Database"%>
 <%@page import="com.tds.asset.Files"%>
 
-<%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
-<g:set var="assetClass" value="Files" />
+<g:set var="assetClass" value="${(new Files()).assetClass}" />
 
 <html>
 	<head>
@@ -60,7 +59,7 @@
 				
 				var listCaption ='Storages: <tds:hasPermission permission="AssetEdit"> \
 					<span class="capBtn">\
-						<input type="button" value="Create Storage" onclick="createAssetDetails(\'${assetClass}\')"/>\
+						<input type="button" value="Create Storage" onclick="EntityCrud.showAssetCreateView(\'${assetClass}\')"/>\
 					</span></tds:hasPermission>\
 					<tds:hasPermission permission="AssetDelete">\
 						<span class="capBtn"><input type="button" id="deleteAssetId" value="Bulk Delete" onclick="deleteAssets(\'Files\')" disabled="disabled"/></span>\
@@ -104,11 +103,11 @@
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
 					var value = cellvalue ? cellvalue : ''
-					return '<a href="javascript:getEntityDetails(\'${assetClass}\',\'${assetClass}\','+options.rowId+')">'+value+'</a>'
+					return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+')">'+value+'</a>'
 				}
 				
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = '<a href="javascript:editEntity(\'na\',\'${assetClass}\','+options.rowId+')">'+
+					var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')">'+
 							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[7] + "' tasks='" + rowObject[6] + "' comments='" + rowObject[8] + "'></grid-buttons>";
 					return editButton

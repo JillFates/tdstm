@@ -128,9 +128,17 @@ var EntityCrud = ( function($) {
 		return ok;
 	};
 
+	var getCreateModal = function() { return $('#createEntityView'); };
+	var getEditModal = function() { return $('#editEntityView'); };
+	var getShowModal = function() { return $('#showEntityView'); };
+
 	// ------------------
 	// Public Methods
 	// ------------------
+
+	pub.closeCreateModal = function() { getCreateModal.dialog('close'); };
+	pub.closeEditModal = function() { getEditModal.dialog('close'); };
+	pub.closeShowModal = function() { getShowModal.dialog('close'); };
 
 	// Used to access the assetType within the CRUD pages
 	pub.getAssetType = function() {
@@ -502,27 +510,24 @@ var EntityCrud = ( function($) {
 		var validateOkay=true;
 		var formName = assetFormName;
 		switch (assetClass) {
-			case 'Application':
+			case 'APPLICATION':
 				validateOkay = validateAppForm(formName);
 				break;
 
-			case 'Database':
+			case 'DATABASE':
 				validateOkay = validateDBForm(formName);
 				break;
 
-			case 'Files':
-				//type = 'Storage';
+			case 'STORAGE':
 				validateOkay = validateStorageForm(formName);
 				break;
 
-			case 'Device':
-			case 'Server':
-				// type = "Server";
+			case 'DEVICE':
 				validateOkay = validateDeviceForm(formName);
 				break;
 
 			default:
-				alert('ERROR: saveToShow() - unsupported case for assetClass' + assetClass);
+				alert('ERROR: saveToShow() - unsupported case for ' + assetClass);
 		}
 
 		if (validateOkay)
@@ -539,8 +544,7 @@ var EntityCrud = ( function($) {
 						alert(resp.errors);
 						return false;
 					} else {
-						getEntityDetails(redirect, assetClass, resp.data.asset.id);
-						$('#createEntityView').dialog('close');
+						pub.showAssetDetailView(assetClass, resp.data.asset.id);
 
 						/*
 						// Go to the show view
@@ -548,22 +552,13 @@ var EntityCrud = ( function($) {
 							$('.ui-icon-refresh').click();
 						if (redirect=='room')
 							getRackLayout( $('#selectedRackId').val() );
-						$('#showEntityView').html(data.html);
-						$("#showEntityView").dialog('option', 'width', 'auto');
-						$("#showEntityView").dialog('option', 'position', ['center','top']);
-						$("#showEntityView").dialog('open');
-
-						updateAssetTitle(forWhom);
-						if(!isIE7OrLesser) 
-							getHelpTextAsToolTip(type);
-						changeDocTitle(title);
 						*/
 					}
 					$(document).trigger('entityAssetCreated');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
-					alert("An error occurred while creating Asset : "+ err);
+					alert("The following error occurred while attempting to create asset : "+ err);
 					return false;
 				}
 			});
@@ -586,23 +581,22 @@ var EntityCrud = ( function($) {
 		var validateOkay=false;
 		var formName=assetFormName;
 		switch (assetClass) {
-			case 'Application':
+			case 'APPLICATION':
 				type = 'Application';
 				validateOkay = validateAppForm('Edit',formName);
 				break;
 
-			case 'Files':
+			case 'STORAGE':
 				type = 'Storage';
 				validateOkay = validateStorageForm(formName);
 				break;
 
-			case 'Database':
+			case 'DATABASE':
 				type = 'Database';
 				validateOkay = validateDBForm(formName);
 				break;
 
-			case 'Device':
-			case 'Server':
+			case 'DEVICE':
 				validateOkay = validateDeviceForm(formName);
 				break;
 
@@ -632,22 +626,7 @@ var EntityCrud = ( function($) {
 						alert(resp.errors);
 						return false;
 					} else {
-
-						getEntityDetails(redirect, assetClass, resp.data.asset.id);
-						$('#editEntityView').dialog('close');
-
-						/*
-						if(redirect == 'room')
-							getRackLayout( $('#selectedRackId').val() )
-
-						$('#showEntityView').html(data)
-						$("#showEntityView").dialog('option', 'width', 'auto')
-						$("#showEntityView").dialog('option', 'position', ['center','top']);
-						$("#showEntityView").dialog('open');
-						changeDocTitle(title)
-						if(!isIE7OrLesser) 
-							getHelpTextAsToolTip(type);
-						*/
+						pub.showAssetDetailView(assetClass, resp.data.asset.id);
 					}
 					$(document).trigger('entityAssetUpdated');
 				},
@@ -852,6 +831,221 @@ var EntityCrud = ( function($) {
 		nameSelect.select2("val", "");
 	};
 
+	// Private method called by fetchAssetEditView to actually display the form once it is retrieved
+	var presentAssetEditView = function(html, fieldHelpType, source, rack, roomName,location,position) {
+		var createModal = $("#showEntityView");
+		var editModal = $("#editEntityView");
+		var showModal = $("#showEntityView");
+
+		if (editModal.length) {
+			editModal.html(html);
+			editModal.dialog('option', 'width', 'auto');
+			editModal.dialog('option', 'position', ['center','top']);
+			editModal.dialog('open');
+			showModal.dialog('close');
+			createModal.dialog('close');
+
+			if(!isIE7OrLesser)
+				getHelpTextAsToolTip(fieldHelpType);
+			updateAssetTitle(fieldHelpType);
+			if (rack)
+				updateAssetInfo(source,rack,roomName,location,position, 'edit');
+			return true;
+		} else {
+			console.log("EntityCrud.presentAssetEditView() Error: Unable to access editEntityView DIV");
+			return false;
+		}
+	}
+	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
+	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
+	var fetchAssetEditView = function(controller, fieldType, assetId, source, rack, roomName, location, position) {
+		var url = contextPath+'/'+controller+'/edit/' + assetId;
+		jQuery.ajax({
+			url: url,
+			type:'POST',
+			success: function(resp) {
+				//debugger;
+				// Load the edit entity view
+				return presentAssetEditView(resp, fieldType, source, rack, roomName, location, position);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var err = jqXHR.responseText;
+				alert("An error occurred while loading the asset edit form."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				return false;
+			}
+		});
+	};
+	// Used to display the various asset class edit modal views
+	// This replaces editEntity()
+	pub.showAssetEditView = function(assetClass, assetId, source, rack, roomName, location, position) {
+		switch (assetClass) {
+			case "APPLICATION":
+				return fetchAssetEditView('application', 'Application', assetId, source, rack, roomName, location, position);
+				break;
+			case "DATABASE":
+				return fetchAssetEditView('database', 'Database', assetId, source, rack, roomName, location, position);
+				break;
+			case "STORAGE":
+				return fetchAssetEditView('files', 'Logical Storage', assetId, source, rack, roomName, location, position);
+				break;
+			case "DEVICE":
+				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rack, roomName, location, position);
+				 break;
+			default:
+				alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
+				return false;
+		}
+	};
+
+	// Displays the detail view of the asset from ajax call in model popup
+	var presentAssetShowView = function(html, fieldHelpType) {
+		var createModal = $("#createEntityView");
+		var editModal = $("#editEntityView");
+		var showModal = $("#showEntityView");
+
+		// Disable refresh bar if it exists
+		if (B2 != '') {
+			B2.Pause()
+		}
+
+		if (editModal.length) {
+			showModal.html(html);
+			showModal.dialog('option', 'width', 'auto')
+			showModal.dialog('option', 'position', ['center','top']);
+			showModal.dialog('open');
+			createModal.dialog('close');
+			editModal.dialog('close');
+			updateAssetTitle(fieldHelpType)
+			if (!isIE7OrLesser)
+				getHelpTextAsToolTip(fieldHelpType);
+
+			return true;
+		}
+		return false;
+	};
+
+	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
+	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
+	var fetchAssetShowView = function(controller, fieldHelpType, assetId) {
+		var url = contextPath+'/'+controller+'/show/' + assetId;
+		jQuery.ajax({
+			url: url,
+			type:'POST',
+			success: function(resp) {
+				//debugger;
+				if (typeof resp === 'object') {
+					if (resp.status=='error') {
+						alert("An error occurred: " + resp.errors);
+						return false;
+					}
+					console.log("fetchAssetShowView() had unexpected response");
+					return false;
+				}
+				// Load the edit entity view
+				return presentAssetShowView(resp, fieldHelpType);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var err = jqXHR.responseText;
+				alert("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				return false;
+			}
+		});
+	};
+
+	// Called from the page to popup the Asset Entity details dialog
+	// getEntityDetails
+	pub.showAssetDetailView = function(assetClass, assetId) {
+		switch (assetClass) {
+			case "APPLICATION":
+				return fetchAssetShowView('application', 'Application', assetId);
+				break;
+			case "DATABASE":
+				return fetchAssetShowView('database', 'Database', assetId);
+				break;
+			case "STORAGE":
+				return fetchAssetShowView('files', 'Files', assetId);
+				break;
+			case "DEVICE":
+				return fetchAssetShowView('assetEntity', 'Device', assetId);
+				break;
+			default:
+				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
+				return false;
+		}
+	};
+
+	// Private method called by fetchAssetCreateView to present the various asset create modal window
+	var presentAssetCreateView = function(html, fieldHelpType, source, rack, roomName, location, position) {
+		var createModal = getCreateModal();
+		if (createModal.length) {
+			createModal.html(html);
+			createModal.dialog('option', 'width', 'auto');
+			createModal.dialog('option', 'position', ['center','top']);
+			createModal.dialog('open');
+			closeEditModal();
+			closeShowModal();
+			updateAssetTitle(fieldHelpType);
+			updateAssetInfo(source,rack,roomName,location,position,'create');
+
+			if(!isIE7OrLesser)
+				getHelpTextAsToolTip(fieldHelpType);
+
+			return true;
+		} else {
+			console.log("presentAssetCreateView() error - unable to access the create modal DIV");
+			return false;
+		}
+	};
+	// Private method used by showAssetCreateView
+	function fetchAssetCreateView(controller, fieldHelpType) {
+		var url = contextPath+'/'+controller+'/create';
+		jQuery.ajax({
+			url: url,
+			type:'POST',
+			success: function(resp) {
+				//debugger;
+				if (typeof resp === 'object') {
+					if (resp.status=='error') {
+						alert("The following error occurred: " + resp.errors);
+						return false;
+					}
+					console.log("fetchAssetCreateView() had unexpected response");
+					return false;
+				}
+				// Load the edit entity view
+				return presentAssetShowView(resp, fieldHelpType);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var err = jqXHR.responseText;
+				alert("An error occurred while loading the asset show view."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+				return false;
+			}
+		});
+	};
+	// Called from the page to popup the Asset Entity Create dialog
+	pub.showAssetCreateView = function(assetClass, assetId) {
+		switch (assetClass) {
+			case "APPLICATION":
+				return fetchAssetCreateView('application', 'Application', assetId);
+				break;
+			case "DATABASE":
+				return fetchAssetCreateView('database', 'Database', assetId);
+				break;
+			case "STORAGE":
+				return fetchAssetCreateView('files', 'Files', assetId);
+				break;
+			case "DEVICE":
+				return fetchAssetCreateView('assetEntity', 'Device', assetId);
+				break;
+			default:
+				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
+				return false;
+		}
+	};
+
+	//
+	// Return the pub object to make available to the public
+	//
 	return pub;
 
 } )(jQuery); //passed 'jQuery' global variable into local parameter '$'
@@ -863,10 +1057,12 @@ var EntityCrud = ( function($) {
 
 // Submits the save form for all asset types
 function saveToShow(button, forWhom) {
+	console.log("saveToShow() has been deprecated - please use EntityCrud.saveToShow()");
 	EntityCrud.saveToShow(button, forWhom);
 }
 
 function createAssetDetails (type) {
+	console.log("createAssetDetails("+type+") call is deprecated - please use showAssetCreateView()");
 	switch(type) {
 		case "Application":
 		case "Database":
@@ -884,33 +1080,9 @@ function createAssetDetails (type) {
 	}
 }
 
-// Used to make the ajax call to get the create form and load into dom
-function invokeCreateEntityView(ctrlName, label) {
-	// TODO : JPM 10/2014 : Fix ajax for errors, etc
-	new Ajax.Request(contextPath+'/'+ctrlName+'/create', {
-		asynchronous:true, 
-		evalScripts:true, 
-		onComplete:function(e) { loadCreateEntityView(e, label);}
-	});
-}
-
-// Load the create entity modal view upon completing the Ajax call
-function loadCreateEntityView (e, type,source,rack,roomName,location,position) {
-	if(!isIE7OrLesser)
-		getHelpTextAsToolTip(type);
-	var resp = e.responseText;
-	$("#createEntityView").html(resp);
-	$("#createEntityView").dialog('option', 'width', 'auto');
-	$("#createEntityView").dialog('option', 'position', ['center','top']);
-	$("#createEntityView").dialog('open');
-	$("#editEntityView").dialog('close');
-	$("#showEntityView").dialog('close');
-	updateAssetTitle(type);
-	updateAssetInfo(source,rack,roomName,location,position,'create');
-}
-
 // Called from the page to popup the Asset Entity details dialog
-function getEntityDetails (redirectTo, assetClass, value) {
+function getEntityDetails(redirectTo, assetClass, value) {
+	console.log("getEntityDetails("+redirectTo+","+assetClass+","+value+") is deprecated - please use EntityCrud.showAssetDetailView()")
 	switch (assetClass) {
 		case "Application":
 			new Ajax.Request(contextPath+'/application/show?id='+value+'&redirectTo='+redirectTo,
@@ -948,6 +1120,34 @@ function getEntityDetails (redirectTo, assetClass, value) {
 	}
 }
 
+// Used to make the ajax call to get the create form and load into dom
+function invokeCreateEntityView(ctrlName, label) {
+	console.log("invokeCreateEntityView() has been deprecated - see showAssetCreateView()");
+	// TODO : JPM 10/2014 : Fix ajax for errors, etc
+	new Ajax.Request(contextPath+'/'+ctrlName+'/create', {
+		asynchronous:true, 
+		evalScripts:true, 
+		onComplete:function(e) { loadCreateEntityView(e, label);}
+	});
+}
+
+// Load the create entity modal view upon completing the Ajax call
+function loadCreateEntityView (e, type,source,rack,roomName,location,position) {
+	console.log("loadCreateEntityView() has been deprecated - see showAssetCreateView()");	
+	if(!isIE7OrLesser)
+		getHelpTextAsToolTip(type);
+	var resp = e.responseText;
+	$("#createEntityView").html(resp);
+	$("#createEntityView").dialog('option', 'width', 'auto');
+	$("#createEntityView").dialog('option', 'position', ['center','top']);
+	$("#createEntityView").dialog('open');
+	$("#editEntityView").dialog('close');
+	$("#showEntityView").dialog('close');
+	updateAssetTitle(type);
+	updateAssetInfo(source,rack,roomName,location,position,'create');
+}
+
+
 // private method used to perform the Ajax call to get the show HTML and then invoke the display method
 function invokeShowEntityView(ctrlName, redirectTo, label) {
 	new Ajax.Request(
@@ -961,6 +1161,7 @@ function invokeShowEntityView(ctrlName, redirectTo, label) {
 
 // Displays the detail view of the asset from ajax call in model popup
 function showEntityView (e, type) {	
+	console.log("showEntityView() is deprecated - see showAssetDetailView()")
 	// Disable refresh bar if it exists
 	if (B2 != '') {
 		B2.Pause()
@@ -1009,7 +1210,8 @@ function changeDocTitle ( newTitle ) {
 	});
 }
 
-function editEntity (redirectTo, assetClass, value, source,rack,roomName,location,position) {
+function editEntity(redirectTo, assetClass, value, source,rack,roomName,location,position) {
+	console.log("editEntity("+redirectTo+","+assetClass+","+value+",...) has been depreicated - please use showAssetEditView(...)");
 	if(redirectTo == "rack"){
 		redirectTo = $('#redirectTo').val() == 'rack' ? 'rack' : $('#redirectTo').val()
 	}
@@ -1033,6 +1235,7 @@ function editEntity (redirectTo, assetClass, value, source,rack,roomName,locatio
 }
 
 function editEntityView (e, type, source, rack, roomName,location,position) {
+	console.log("editEntityView() - has been deprecated - see showAssetEditView")
 	var resp = e.responseText;
 	$("#editEntityView").html(resp);
 	$("#editEntityView").dialog('option', 'width', 'auto')
@@ -1061,7 +1264,7 @@ function isValidDate ( date ) {
 // @param type - the dependency type [support|dependent]
 // @param forWhom - used to indicate edit or create? views
 function addAssetDependency (type, forWhom) {
-	
+	debugger;
 	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val();
 	var typeRowNo = type+"_"+rowNo;
 	var rowData = $("#assetDependencyRow tr").html()
