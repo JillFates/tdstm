@@ -726,7 +726,7 @@ var EntityCrud = ( function($) {
 			var manuName = selectedModel.manufacturerName;
 
 			$('#currentAssetType').val(at);
-			$('#asset_model').val(modelId);
+			//$('#asset_model').val(modelId);
 			$('#hiddenModel').val(modelId);
 			$('#hiddenManufacturer').val();
 
