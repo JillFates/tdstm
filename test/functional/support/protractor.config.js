@@ -5,14 +5,14 @@ exports.config = {
   allScriptsTimeout: 15000,
   suites: {
     test:[
-    // '../components/projects/createProject.spec.js',
-    // '../components/planning/bundles.spec.js',
-    // '../components/assets/applications/createApp.spec.js',
-    // '../components/assets/applications/addTask.spec.js',
-    // '../components/assets/applications/addComments.spec.js',
+    '../components/projects/createProject.spec.js',
+    '../components/planning/bundles.spec.js',
+    '../components/assets/applications/createApp.spec.js',
+    '../components/assets/applications/addTask.spec.js',
+    '../components/assets/applications/addComments.spec.js',
     '../components/assets/devices/serverList.spec.js',
-    // '../components/assets/databases/createDatabase.spec.js',
-    // '../components/projects/deleteProject.spec.js'
+    '../components/assets/databases/createDatabase.spec.js',
+    '../components/projects/deleteProject.spec.js'
     ],
     menu:[
     '../components/projects/listProjects.spec.js',
@@ -39,6 +39,8 @@ exports.config = {
     '../components/admin/listManufacturers.spec.js',
     '../components/admin/listModel.spec.js',
     '../components/admin/syncLibraries.spec.js',
+    '../components/dataCenters/rooms.spec.js',
+    '../components/dataCenters/racks.spec.js',
     '../components/assets/dependencyAnalyzer.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'

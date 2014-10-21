@@ -40,6 +40,8 @@ exports.config = {
     '../components/admin/listManufacturers.spec.js',
     '../components/admin/listModel.spec.js',
     '../components/admin/syncLibraries.spec.js',
+    '../components/dataCenters/rooms.spec.js',
+    '../components/dataCenters/racks.spec.js',
     '../components/assets/dependencyAnalyzer.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
