@@ -75,7 +75,7 @@ describe('Database', function(){
       });
     });//Buttons
 
-    xdescribe('Canceling',function(){
+    describe('Canceling',function(){
       it('should close create modal after hit on cancel button',function(){
         var createDBModal = new DBCreateModal();
         createDBModal.createModalButtons.get(1).click();
@@ -83,7 +83,7 @@ describe('Database', function(){
       });
     });//Canceling
     
-    xit('should open create Database modal after click on create DB button', function(){
+    it('should open create Database modal after click on create DB button', function(){
       var databaseList = new DatabaseList();
       databaseList.createDBBtn.click();
       var createDBModal = new DBCreateModal();
