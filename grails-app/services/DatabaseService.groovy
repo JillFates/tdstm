@@ -91,7 +91,6 @@ class DatabaseService {
 		asset.modifiedBy = userLogin.person
 
 		// Update the date fields to proper dates
-		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
 
 		asset.properties = params
 
