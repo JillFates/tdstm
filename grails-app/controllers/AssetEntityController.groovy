@@ -2191,7 +2191,7 @@ class AssetEntityController {
 			// TODO : JPM 9/2014 : Need to determine the assetType
 			model.putAll( [
 				assetType:params.assetType,
-				source:params.source, 
+				source:params.source 
 			] )
 
 			render(template:"auditEdit", model: model)

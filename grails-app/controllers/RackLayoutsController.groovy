@@ -450,7 +450,7 @@ class RackLayoutsController {
 							}
 							assetTag += '<a href="javascript:' 
 							if (forWhom) {
-								assetTag += "editAudit('roomAudit','${it.source}'"
+								assetTag += "editAudit('roomAudit','${it.source}','${overlapAsset.assetClass}',${overlapAsset?.id})"
 							} else { 
 								assetTag += "EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})"
 							}
@@ -631,7 +631,7 @@ class RackLayoutsController {
 					else
 						bladeTable += "<td class=\"blade\" rowspan=\"${bladeSpan}\" style=\"height:${tdHeight}px\"><a href=\"javascript:"
 						if (forWhom) {
-							bladeTable += "editAudit('roomAudit','${assetDetails.source}'" 
+							bladeTable += "editAudit('roomAudit','${assetDetails.source}','${blade.assetClass}',${blade.id})" 
 						} else {
 							bladeTable += "EntityCrud.showAssetDetailView('${blade.assetClass}',${blade.id})"
 						}

@@ -1,7 +1,25 @@
 <g:form method="post"  name="editAssetsAuditFormId" controller="assetEntity" action="update">
 <div>
+<%-- Holds original values of the various SELECTS --%>
+<input type="hidden" id="hiddenModel"        name="modelId" value="${assetEntityInstance?.model?.id}">
+<input type="hidden" id="hiddenManufacturer" name="manufacturerId" value="${manufacturer?.id}">
+<input type="hidden" id="deviceChassisIdS" value="${assetEntityInstance?.sourceChassis?.id}"/>
+<input type="hidden" id="deviceChassisIdT" value="${assetEntityInstance?.targetChassis?.id}"/>
+<input type="hidden" id="deviceRackIdS" value="${assetEntityInstance?.rackSource?.id}"/>
+<input type="hidden" id="deviceRackIdT" value="${assetEntityInstance?.rackTarget?.id}"/>
+<input type="hidden" id="deviceRoomIdS" value="${assetEntityInstance?.roomSource?.id}"/>
+<input type="hidden" id="deviceRoomIdT" value="${assetEntityInstance?.roomTarget?.id}"/>
+<input type="hidden" id="roomSourceId" name="roomSourceId" value="${assetEntityInstance.roomSource?.id}"/>
+<input type="hidden" id="roomTargetId" name="roomTargetId" value="${assetEntityInstance.roomTarget?.id}"/>
+
+<%-- Used to maintain the selected AssetType --%>
+<input type="hidden" id="currentAssetType" 		name="currentAssetType" value="${currentAssetType}"/>
+
+<%-- Key field and optimistic locking var --%>
+<input type="hidden" id="assetId" name="id" value="${assetEntityInstance?.id}"/>
+<input type="hidden" id="version" name="version" value="${version}"/>
+
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
-<input type="hidden" name="id" value="${assetEntityInstance.id}"/>
 <input name="dependentCount" id="dependentCount" type="hidden" value="0"/>
 <input  name="supportCount"  id="supportCount" type="hidden" value="0"/>
 <input  name="source"  id="sourceId" type="hidden" value="${source ?: 1}"/>
@@ -10,20 +28,28 @@
 	<tr class="prop rackLabel" >
 		<td class="label ">Location</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" ${source=='1' ? 'name="sourceLocation" value="'+assetEntityInstance.sourceLocation+'"' : 'name="targetLocation" value="'+assetEntityInstance.targetLocation+'"'} size="6" /> / 
-			<input type="text" ${source=='1' ? 'name="sourceRoom" value="'+assetEntityInstance.sourceRoom+'"' : 'name="targetRoom" value="'+assetEntityInstance.targetRoom+'"'} size="6" />
+			<input readonly="true" type="text" ${source=='1' ? 'name="sourceLocation11" value="'+assetEntityInstance.sourceLocation+'"' : 'name="targetLocation11" value="'+assetEntityInstance.targetLocation+'"'} size="8" /> / 
+			<input readonly="true" type="text" ${source=='1' ? 'name="sourceRoom11" value="'+assetEntityInstance.sourceRoom+'"' : 'name="targetRoom11" value="'+assetEntityInstance.targetRoom+'"'} size="8" />
 		</td>
 	</tr>
 	<tr class="prop bladeLabel">
 		<td class="label">Blade</td>
 		<td class="label">
 		<g:if test="${source=='1'}">
-		<g:select id='sourceChassis' from='${sourceChassisSelect}' optionKey='${-2}' optionValue='${1}'
-			  name="sourceChassis" value="${assetEntityInstance.sourceChassis?.id }" noSelection="${['':' Please Select']}"/>
+			<g:render template="deviceChassisSelect"
+				model="[ domId:'sourceChassisSelectId', domName:'sourceChassis', 
+					options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
+					domClass: config.sourceChassis, 
+					sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"
+			/>
 		</g:if>
 		<g:else>
-		<g:select id='targetChassis' from='${targetChassisSelect}' optionKey='${-2}' optionValue='${1}'
-				name="targetChassis"  value="${assetEntityInstance.targetChassis?.id}" noSelection="${['':' Please Select']}"/>
+			<g:render template="deviceChassisSelect"
+				model="[ domId:'targetChassisSelectId', domName:'targetChassis',
+					options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id, 
+					domClass: config.targetChassis, 
+					sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"
+			/>
 		</g:else>
 		</td>
 	</tr>
@@ -42,26 +68,27 @@
 	<tr class="prop">
 		<td class="label">Manufacturer</td>
 		<td class="label">
-		 <div id="manufacturerEditId">
-		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${assetEntityInstance.manufacturer?.id}" 
-		   	onChange="selectModel(this.value,'Edit')" 
-		   optionKey="id" optionValue="name" noSelection="${[null:'Unassigned']}" tabindex="13"/>
-		 </div>
+			<div id="manufacturerSelect" tabindex="102">
+			</div>
+		</td>
+	</tr>
+	<tr class="prop">
+		<td class="label">Device Type</td>
+		<td class="label">
+			<div id="assetTypeSelectContainer" style="display:inline">
+				<select id="assetTypeSelect" name="assetType" onchange="setType(this.value, '${forWhom}')" style="width:120px" tabindex="103">
+					<option></option>
+					<g:each in="${assetTypeOptions}" var="assetType">
+						<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
+					</g:each>
+				</select>
+			</div>
 		</td>
 	</tr>
 	<tr class="prop" >
 		<td class="label">Model</td>
 		<td class="label">
-		<div id="modelEditId">
-			<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Edit']" />
-		</div>
-		</td>
-	</tr>
-	<tr class="prop">
-		<td class="label">Type</td>
-		<td class="label">
-			<g:select from="${assetTypeOptions}" id="assetTypeEditId" name="assetType" value="${assetEntityInstance.assetType}" 
-			onChange="selectManufacturer(this.value, 'Edit')" tabindex="12" />
+			<div id="modelSelect" tabindex="104"></div>
 		</td>
 	</tr>
 	<tr class="prop">
@@ -70,13 +97,50 @@
 			<input type="text" id="serialNumber" name="serialNumber" value="${assetEntityInstance.serialNumber}">
 		</td>
 	</tr>
-	<tr class="prop rackLabel">
-		<td class="label">Rack</td>
-		<td class="label" nowrap="nowrap">
-			<input type="text" ${source=='1' ? 'name="sourceRack" value="'+assetEntityInstance.sourceRack+'"' : 'name="targetRack" value="'+assetEntityInstance.targetRack+'"'} size="6" > 
-			Pos :<input type="text" ${source=='1' ? 'name="sourceRackPosition" value="'+(assetEntityInstance.sourceRackPosition ?:'')+'"' : 'name="targetRackPosition" value="'+(assetEntityInstance.targetRackPosition ?:'')+'"'} size="6">
-		</td>
-	</tr>
+	<g:if test="${source=='1'}">
+		<tr class="prop rackLabel">
+			<td class="label">Rack</td>
+			<td class="label" nowrap="nowrap">
+				<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id, 
+					rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
+				<input type="hidden" id="rackTargetId" name="rackTargetId" value="${assetEntityInstance.rackTarget?.id}"/>
+			</td>
+		</tr>
+		<tr class="prop rackLabel">
+			<td class="label">Pos</td>
+			<td class="label" nowrap="nowrap">
+				<input type="text" id="sourceRackPositionId" name="sourceRackPosition" 
+					value="${assetEntityInstance.sourceRackPosition}" 
+					placeholder="U position"
+					class="${config.sourceRackPosition} useRackS"
+					size=10 tabindex="320" 
+				/>
+				<input type="hidden" id="targetRackPositionId" name="targetRackPositionId" value="${assetEntityInstance.targetRackPosition}"/>
+			</td>
+		</tr>
+	</g:if>
+	<g:else>
+		<tr class="prop rackLabel">
+			<td class="label">Rack Target</td>
+			<td class="label" nowrap="nowrap">
+				<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+												rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
+				<input type="hidden" id="rackSourceId" name="rackSourceId" value="${assetEntityInstance.rackSource?.id}"/>
+			</td>
+		</tr>
+		<tr class="prop rackLabel">
+			<td class="label">Pos</td>
+			<td class="label" nowrap="nowrap">
+				<input type="text" id="targetRackPositionId" name="targetRackPosition"
+					value="${assetEntityInstance.targetRackPosition}" 
+					placeholder="U position"
+					class="${config.targetRackPosition} useRackT"
+					size=10 tabindex="350" />
+				<input type="hidden" id="sourceRackPositionId" name="sourceRackPositionId" value="${assetEntityInstance.sourceRackPosition}"/>
+			</td>
+		</tr>
+	</g:else>
+
 	<tr class="prop">
 		<td class="label">Tag</td>
 		<td class="label">
@@ -149,15 +213,13 @@
 
 <script type="text/javascript">
 $(document).ready(function() { 
-	var assetType = $("#assetTypeEditId").val()
-	if(assetType =='Blade'){
-		$(".bladeLabel").show()
-		$(".rackLabel").hide()
-		$(".vmLabel").hide()
-	 } else {
-		$(".bladeLabel").hide()
-		$(".rackLabel").show()
-		$(".vmLabel").hide()
-	}
+	var assetType = EntityCrud.getAssetType();
+
+	EntityCrud.toggleAssetTypeFields( assetType );
+	EntityCrud.loadFormFromJQGridFilters();
+
+	EntityCrud.initializeUI("${assetEntityInstance?.model?.id}", "${assetEntityInstance?.model?.modelName}", "${assetEntityInstance?.model?.manufacturer?.id}", "${assetEntityInstance?.model?.manufacturer?.name}");
+
+	EntityCrud.setManufacturerValues("${assetEntityInstance.model?.id}", "${assetEntityInstance.model?.modelName}", "${assetEntityInstance.model?.assetType}", "${assetEntityInstance.model?.manufacturer?.id}", "${assetEntityInstance.model?.manufacturer?.name}");
 })
 </script>
