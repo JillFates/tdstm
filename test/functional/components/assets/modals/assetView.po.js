@@ -5,7 +5,7 @@ var ViewAsset = function(){
   this.nameLabel = this.viewModal.$('[for="assetName"]');
   this.typeLabel = this.viewModal.$('[for="assetType"]');
   this.viewAppTitle = this.viewModal.element(by.id('ui-id-2'));
-  this.editBtn = this.viewModal.$('[onclick^="editEntity"]');
+  this.editBtn = this.viewModal.$('[onclick^="EntityCrud.showAssetEditView"]');
   this.deleteBtn = this.viewModal.$('[onclick="return confirm(\'Are you sure?\');"]');
   this.addCommentBtn = this.viewModal.$('[src="/tdstm/icons/comment_add.png"]');
   this.addTaskBtn = this.viewModal.$('[src="/tdstm/i/db_table_light.png"]');
@@ -27,8 +27,8 @@ ViewAsset.prototype.isViewModalClosed = function(){
 ViewAsset.prototype.isViewModalOpened = function(){
   var that = this;
   return browser.wait(function(){
-    return that.viewModal.getAttribute('style').then(function(style){
-      return style.search('display: block;') !== -1;
+    return that.viewModal.$('div.dialog').getAttribute('ondblclick').then(function(val){
+      return val !== null;
     });
   }).then(function(){
      return true;

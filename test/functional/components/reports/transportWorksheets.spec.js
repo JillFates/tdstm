@@ -40,7 +40,7 @@ describe('Transport Worksheets Reports', function(){
       });
     });
   });//bundle dropdown
-  describe('generate pdf',function(){
+  xdescribe('generate pdf',function(){
     it('should click on generate report button',function(){
       var transportWorksheetsPage = new Reports();
       transportWorksheetsPage.generateTransportWorksheetBtn().click();

@@ -93,8 +93,6 @@ describe('createApp', function(){
   }); // Create Application Modal
 
   describe('view application modal', function(){
-    var appModal = new CreateAppModal();
-
     it('should have as title Application Detail', function(){
       var viewAppModal = new ViewAppModal();
       expect(viewAppModal.viewAppTitle.getText()).toEqual('Application Detail');

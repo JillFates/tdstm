@@ -76,7 +76,7 @@ describe('Cabling Data Report',function(){
       });
     }); // Cable type dropdown
   
-  describe('generate Pdf',function(){
+  xdescribe('generate Pdf',function(){
     it('should generate the report after click on generate button', function(){
       var cablingConflictPage = new Reports();
       cablingConflictPage.generateCablingDataBtn().click();

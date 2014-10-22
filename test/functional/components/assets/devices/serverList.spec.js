@@ -15,7 +15,6 @@ title Device Details
 'use strict';
 var  Menu = require('../../menu/menu.po.js');
 var  ListApps = require('../listApps.po.js');
-// var CreateServerModal = require('./createServer.po.js');
 var CreateServerModal = require('./devicesCreateModal.po.js');
 var ViewServerModal = require('./devicesViewModal.po.js');
 var  TaskModal = require('../task.po.js');
@@ -40,16 +39,17 @@ describe('Server list', function(){
       var serverModal = new CreateServerModal();
       expect(serverModal.isCreateModalOpened()).toBe(true);
     });
+
     describe('Create Server Modal', function(){
-      var serverModal = new CreateServerModal();
 
       it('should has as title create server', function(){
+        var serverModal = new CreateServerModal();
         expect(serverModal.createModalTitle.getText()).toEqual('Device Detail');
       });
 
       it('should create a server and save and view',function(){
         var serverModal = new CreateServerModal();
-        serverModal.createServer(appName);
+        serverModal.createServer(appName,'Server');
         var viewServerModal = new ViewServerModal();
         expect(viewServerModal.isViewModalOpened()).toBe(true);
       });

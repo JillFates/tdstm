@@ -193,8 +193,15 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print\',\'help\');"]'));
   };
   this.goToDataCentars= function(option){
+    var that = this;
     this.getDataCenters().click();
     var d = {
+      'listRooms':function(){
+        that.getListRooms().click();
+      },
+      'racks':function(){
+        that.getRacks().click();
+      }
     };
     d[option]();
   };

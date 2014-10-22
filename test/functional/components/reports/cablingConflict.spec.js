@@ -73,7 +73,7 @@ describe('Cabling Conflict Report',function(){
       });
     }); // Cable type dropdown
 
-    it('should click on generate button', function(){
+    xit('should click on generate button', function(){
       var cablingConflictPage = new Reports();
       cablingConflictPage.getGenerateCablingConflictBtn().click();
     });

@@ -75,7 +75,7 @@ describe('Database', function(){
       });
     });//Buttons
 
-    describe('Canceling',function(){
+    xdescribe('Canceling',function(){
       it('should close create modal after hit on cancel button',function(){
         var createDBModal = new DBCreateModal();
         createDBModal.createModalButtons.get(1).click();
@@ -83,7 +83,7 @@ describe('Database', function(){
       });
     });//Canceling
     
-    it('should open create Database modal after click on create DB button', function(){
+    xit('should open create Database modal after click on create DB button', function(){
       var databaseList = new DatabaseList();
       databaseList.createDBBtn.click();
       var createDBModal = new DBCreateModal();
@@ -173,7 +173,7 @@ describe('Database', function(){
 
         it('should have Please Select as default value',function(){
           var createDBModal = new DBCreateModal();
-          expect(createDBModal.getScaleSelected()).toEqual(' Please Select')
+          expect(createDBModal.getScaleSelected()).toEqual(' Please Select');
         });
 
         it('should have the following 6 options',function(){
@@ -321,7 +321,8 @@ describe('Database', function(){
       });
 
     }); // Support
-    describe('Retire Date - Datepicker',function(){
+    //https://jira5.tdsops.com/browse/TM-3439
+    xdescribe('Retire Date - Datepicker',function(){
       
       it('should have Retire Date as value',function(){
         var createDBModal = new DBCreateModal();
@@ -351,8 +352,8 @@ describe('Database', function(){
       });
 
     });//Retire Date
-    
-    describe('Maint Exp. - Datepicker',function(){
+    //https://jira5.tdsops.com/browse/TM-3439
+    xdescribe('Maint Exp. - Datepicker',function(){
       it('should have Maint Exp. as label',function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.maintExpLabel.getText()).toEqual('Maint Exp.');

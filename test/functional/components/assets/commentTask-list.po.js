@@ -27,7 +27,6 @@ var CommentTaskList = function(){
       }).then(function(){
         return true;
       });
-
   };
 
 };

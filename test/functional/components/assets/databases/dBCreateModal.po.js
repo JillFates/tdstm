@@ -2,7 +2,8 @@
 var CreateAsset = require('../modals/assetCreate.po.js');
 
 var DBCreateModal = function(){
-  this.saveBtn = this.createModal.$('[onclick="saveToShow($(this),\'Database\')"]');
+  // this.saveBtn = this.createModal.$('[onclick="saveToShow($(this),\'Database\')"]');
+  this.saveBtn = this.createModal.$('[onclick="EntityCrud.saveToShow($(this),\'DATABASE\')"]');
   this.formatLabel = $('[for="dbFormat"]');
   this.formatField = $('#dbFormat');
   this.sizeScaleLabel = this.createModal.$('[for="size"]');

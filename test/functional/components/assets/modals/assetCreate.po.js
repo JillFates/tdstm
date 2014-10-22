@@ -1,7 +1,8 @@
 'use strict';
 var CreateAsset = function(){
-  this.createModal = $('[aria-labelledby="ui-id-1"]');
-  this.createModalTitle = this.createModal.element(by.id('ui-id-1'));
+  this.createModal = $('[aria-labelledby="ui-id-2"]');
+  this.createModalForm = this.createModal.element(by.id('createEditAssetForm'));
+  this.createModalTitle = this.createModal.element(by.id('ui-id-2'));
   this.closeCreateModalBtn = this.createModal.$('.ui-dialog-titlebar-close');
   this.createModalButtons = this.createModal.$$('span.button input');
   this.saveLogStgBtn = this.createModal.$('[onclick="saveToShow($(this),\'Logical Storage\')"]');
@@ -70,8 +71,8 @@ CreateAsset.prototype.getPlanStatusSelected = function(){
 CreateAsset.prototype.isCreateModalOpened = function(){
   var that = this;
   return browser.wait(function(){
-    return that.createModal.getAttribute('style').then(function(style){
-      return style.search('display: block;') !== -1;
+    return that.createModalForm.isPresent().then(function(valor){
+      return valor;
     });
   }).then(function(){
      return true;
@@ -80,8 +81,8 @@ CreateAsset.prototype.isCreateModalOpened = function(){
 CreateAsset.prototype.isCreateModalClosed = function(){
   var that = this;
   return browser.wait(function(){
-    return that.createModal.getAttribute('style').then(function(style){
-      return style.search('display: none;') !== -1;
+    return that.createModalForm.isPresent().then(function(valor){
+      return !valor;
     });
   }).then(function(){
      return true;

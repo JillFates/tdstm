@@ -2,7 +2,8 @@
 var ListApps = function(){
   this.titleh =  $('h1');
   this.createAppBtn = $('input[value="Create App"]');
-  this.createServerBtn = $('[onclick="createAssetDetails(\'assetEntity\')"]');
+  // this.createServerBtn = $('[onclick="createAssetDetails(\'Device\')"]');
+  this.createServerBtn = $('[onclick="EntityCrud.showAssetCreateView(\'DEVICE\');"]');
   this.searchNamefield = element(by.id('gs_assetName'));
   // this.appsOnList =  $$('[role="grid"] tbody tr.ui-widget-content');
   this.confirmMsg = $('div#messageId');

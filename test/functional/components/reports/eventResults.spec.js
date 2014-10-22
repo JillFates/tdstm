@@ -90,7 +90,7 @@ describe('Event Results Report', function(){
     });
 
   }); // Generate Buttons
-  describe('generate WEB',function(){
+  xdescribe('generate WEB',function(){
     it('should generate the report after click on generate button', function(){
       var eventResultsPage = new Reports();
       eventResultsPage.generateTaskReport('web');
