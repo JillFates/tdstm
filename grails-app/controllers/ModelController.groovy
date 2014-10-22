@@ -257,6 +257,7 @@ class ModelController {
 				modelTemplate = Model.get(modelId)
 	    	params.useImage = params.useImage == 'on' ? 1 : 0
 	    	params.sourceTDS = params.sourceTDS == 'on' ? 1 : 0
+	    	params.roomObject = params.roomObject == 'on' ? true : false
 	    	params.powerUse = powerUsed
 	        def  modelInstance = new Model(params)
 			modelInstance.powerUse = powerUsed
