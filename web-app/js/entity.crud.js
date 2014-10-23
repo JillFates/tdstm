@@ -397,6 +397,7 @@ var EntityCrud = ( function($) {
 				type:'POST',
 				success: function(resp) {
 					selectCtrl.html(resp);
+					EntityCrud.showRackFields();
 
 					if (!isIE7OrLesser)
 						selectCtrl.select2();
@@ -991,7 +992,7 @@ var EntityCrud = ( function($) {
 		}
 	};
 	// Private method used by showAssetCreateView
-	function fetchAssetCreateView(controller, fieldHelpType) {
+	function fetchAssetCreateView(controller, fieldHelpType, source, rack, roomName, location, position) {
 		var url = contextPath+'/'+controller+'/create';
 		jQuery.ajax({
 			url: url,
@@ -1006,7 +1007,7 @@ var EntityCrud = ( function($) {
 					return false;
 				}
 				// Load the edit entity view
-				return presentAssetShowView(resp, fieldHelpType);
+				return presentAssetCreateView(resp, fieldHelpType, source, rack, roomName, location, position);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
@@ -1016,19 +1017,20 @@ var EntityCrud = ( function($) {
 		});
 	};
 	// Called from the page to popup the Asset Entity Create dialog
-	pub.showAssetCreateView = function(assetClass, assetId) {
+	pub.showAssetCreateView = function(assetClass, source, rack, roomName, location, position) {
+		source, rack, roomName,location,position
 		switch (assetClass) {
 			case "APPLICATION":
-				return fetchAssetCreateView('application', 'Application', assetId);
+				return fetchAssetCreateView('application', 'Application', source, rack, roomName, location, position);
 				break;
 			case "DATABASE":
-				return fetchAssetCreateView('database', 'Database', assetId);
+				return fetchAssetCreateView('database', 'Database', source, rack, roomName, location, position);
 				break;
 			case "STORAGE":
-				return fetchAssetCreateView('files', 'Files', assetId);
+				return fetchAssetCreateView('files', 'Files', source, rack, roomName, location, position);
 				break;
 			case "DEVICE":
-				return fetchAssetCreateView('assetEntity', 'Device', assetId);
+				return fetchAssetCreateView('assetEntity', 'Device', source, rack, roomName, location, position);
 				break;
 			default:
 				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
