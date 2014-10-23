@@ -1881,4 +1881,18 @@ function clearFilter(gridId){
 	$('.ui-icon-refresh').click();
 	$(".clearFilterId").attr("disabled","disabled");
 }
+function updateAssetInfo(source,rack,roomId,location,position,forWhom){
+	var target = source != '1' ? 'target' : 'source'
+	var type = source != '1' ? 'T' : 'S'
+	var roomType = source != '1' ? 'Target' : 'Source'
+		
+	$("#"+target+"LocationId").val(location)
+	$("#roomSelect"+type).val(roomId)
+	$("#"+target+"RackPositionId").val(position)
+	$('#deviceRackId'+type).val(rack);
 
+	EntityCrud.fetchRackSelectForRoom(roomId, type, forWhom);
+
+	if(!isIE7OrLesser)
+		$("select.assetSelect").select2();
+}

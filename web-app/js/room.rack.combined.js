@@ -18,23 +18,7 @@ function showEditAsset(e) {
 function createDialog(source,rack,roomName,location,position){
     var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
     new Ajax.Request(contextPath+'/assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetInfo(source,rack,roomName,location,position);}})
-  }
-function updateAssetInfo(source,rack,roomId,location,position,forWhom){
-	var target = source != '1' ? 'target' : 'source'
-	var type = source != '1' ? 'T' : 'S'
-	var roomType = source != '1' ? 'Target' : 'Source'
-		
-	$("#"+target+"LocationId").val(location)
-	$("#roomSelect"+type).val(roomId)
-	$("#"+target+"RackPositionId").val(position)
-	$('#deviceRackId'+type).val(rack);
-
-	EntityCrud.fetchRackSelectForRoom(roomId, type, forWhom);
-
-	if(!isIE7OrLesser)
-		$("select.assetSelect").select2();
 }
-
 function validateAssetEntity(formname) {
 	var attributeSet = $("#attributeSetId").val();
 	if(attributeSet || formname == 'editForm'){
