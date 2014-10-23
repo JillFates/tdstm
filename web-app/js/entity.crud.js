@@ -1778,6 +1778,7 @@ function openCommentDialog(id){
 	 $("#"+id).dialog('option', 'width', 'auto')
 	 $("#"+id).dialog('option', 'position', 'absolute');
 	 $("#"+id).dialog('option', 'title', type+" Comment");
+	 $("#"+id).addClass('static-dialog');
 	 $("#"+id).dialog('open');
 	 if(!$("#comment_"+type+"_"+rowNo).val()){
 		 $("#comment_"+type+"_"+rowNo).val('')

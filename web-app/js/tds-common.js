@@ -45,7 +45,7 @@ var tdsCommon = {
 				var result = this._super();
 				if (this.element.length > 0) {
 					var dialog = $("#" + this.element[0].id)
-					if (dialog.length > 0) {
+					if (dialog.length > 0 && !dialog.hasClass('static-dialog')) {
 						dialog.html('');	
 					}
 				}
