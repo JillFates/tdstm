@@ -2154,19 +2154,20 @@ class AssetEntityController {
 
 		def (device, model) = assetEntityService.getDeviceAndModelForCreate(project, params)
 
-		if ( params.redirectTo == "assetAudit") {
-			model << [source:params.source, assetType:params.assetType]
-			render( template:"createAuditDetails", model:model)
-		}
-		
 		model.action = 'save'
 		model.whom = 'Device'
 
 		// TODO : JPM 10/2014 : I'm guessing this is needed to make the save action work correctly
 		model.redirectTo = params.redirectTo ?: 'list'
+
+		if ( params.redirectTo == "assetAudit") {
+			model << [source:params.source, assetType:params.assetType]
+			render( template:"createAuditDetails", model:model)
+		} else {
+			// model.each { n,v -> println "$n:\t$v"}
+			render ('view': 'createEdit', 'model' : model)
+		}
 		
-		// model.each { n,v -> println "$n:\t$v"}
-		render ('view': 'createEdit', 'model' : model)
 	}
 
 	/**

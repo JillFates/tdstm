@@ -13,6 +13,26 @@ $(document).ready(function() {
 })
 </script>
 <g:form method="post"  name="editAssetsAuditFormId" controller="assetEntity" action="save">
+<%-- Holds original values of the various SELECTS --%>
+<input type="hidden" id="hiddenModel"        name="modelId" value="">
+<input type="hidden" id="hiddenManufacturer" name="manufacturerId" value="${manufacturer?.id}">
+<input type="hidden" id="deviceChassisIdS" value=""/>
+<input type="hidden" id="deviceChassisIdT" value=""/>
+<input type="hidden" id="deviceRackIdS" value=""/>
+<input type="hidden" id="deviceRackIdT" value=""/>
+<input type="hidden" id="deviceRoomIdS" value=""/>
+<input type="hidden" id="deviceRoomIdT" value=""/>
+
+<%-- Used to maintain the selected AssetType --%>
+<input type="hidden" id="currentAssetType" 		name="currentAssetType" value="${currentAssetType}"/>
+
+<%-- Key field and optimistic locking var --%>
+<input type="hidden" id="assetId" name="id" value=""/>
+<input type="hidden" id="version" name="version" value="${version}"/>
+
+<input type="hidden" id="roomSelectS" name="roomSourceId" value="0"/>
+<input type="hidden" id="roomSelectT" name="roomTargetId" value="0"/>
+
 <div>
 <input type="hidden" name="redirectTo" value="${redirectTo}"/>
 <input name="attributeSet.id" type="hidden" value="1">
@@ -25,8 +45,8 @@ $(document).ready(function() {
 	<tr class="prop" >
 		<td class="label">Location</td>
 		<td class="label" nowrap="nowrap">
-			<input type="text" id="auditLocationId" name="sourceLocation"  size="6" /> / 
-			<input type="text" id="auditRoomId" name="sourceRoom"  size="6" />
+			<input readonly="true" type="text" id="auditLocationName" name="locationName"  size="8" />
+			<input readonly="true" type="text" id="auditRoomName" name="roomName"  size="8" />
 		</td>
 	</tr>
 	<tr class="prop bladeLabel">
@@ -50,25 +70,27 @@ $(document).ready(function() {
 	<tr class="prop">
 		<td class="label">Manufacturer</td>
 		<td class="label">
-		  <div id="manufacturerCreateId">
-		   <g:select id="manufacturer" name="manufacturer.id" from="${manufacturers}" value="${manufacturer?.id}" 
-		   		onChange="selectModel(this.value,'Create')" optionKey="id" optionValue="name" noSelection="${[null:' Unassigned']}" tabindex="13" />
-		 </div>
+			<div id="manufacturerSelect" tabindex="102">
+			</div>
 		</td>
 	</tr>
-	<tr class="prop trAnchor" >
-		<td class="label"><b>Model</b></td>
-		<td class="label">
-			<div id="modelCreateId">
-			  		<g:render template="modelView"  model="[clazz:config.model, models:models, assetEntity:assetEntityInstance, forWhom:'Create']" />
-			 </div>
-		</td>
-		</tr>
 	<tr class="prop">
-		<td class="label">Type</td>
+		<td class="label">Device Type</td>
 		<td class="label">
-			<g:select from="${assetTypeOptions}" id="assetTypeCreateId" name="assetType" value="${assetEntityInstance.assetType}" 
-			onChange="selectManufacturer(this.value, 'Create')" tabindex="12" />
+			<div id="assetTypeSelectContainer" style="display:inline">
+				<select id="assetTypeSelect" name="assetType" onchange="setType(this.value, '${forWhom}')" style="width:120px" tabindex="103">
+					<option></option>
+					<g:each in="${assetTypeOptions}" var="assetType">
+						<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
+					</g:each>
+				</select>
+			</div>
+		</td>
+	</tr>
+	<tr class="prop" >
+		<td class="label">Model</td>
+		<td class="label">
+			<div id="modelSelect" tabindex="104"></div>
 		</td>
 	</tr>
 	<tr class="prop">
@@ -77,13 +99,49 @@ $(document).ready(function() {
 			<input type="text" id="serialNumber" name="serialNumber" />
 		</td>
 	</tr>
-	<tr class="prop rackLabel">
-		<td class="label">Rack</td>
-		<td class="label" nowrap="nowrap">
-			<input  type="text" ${source=='1' ? 'id="sourceRack" name="sourceRack" ' : 'id="targetRack" name="targetRack"'} size="6" > 
-			Pos :<input type="text" ${source=='1' ? 'id="sourceRackPosition" name="sourceRackPosition" ' : 'id="targetRackPosition" name="targetRackPosition" '} size="6">
-		</td>
-	</tr>
+	<g:if test="${source=='1'}">
+		<tr class="prop rackLabel">
+			<td class="label">Rack</td>
+			<td class="label" nowrap="nowrap">
+				<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id, 
+					rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
+				<input type="hidden" id="rackTargetId" name="rackTargetId" value="0"/>
+			</td>
+		</tr>
+		<tr class="prop rackLabel">
+			<td class="label">Pos</td>
+			<td class="label" nowrap="nowrap">
+				<input type="text" id="sourceRackPositionId" name="sourceRackPosition" 
+					value="${assetEntityInstance.sourceRackPosition}" 
+					placeholder="U position"
+					class="${config.sourceRackPosition} useRackS"
+					size=10 tabindex="320" 
+				/>
+				<input type="hidden" id="targetRackPositionId" name="targetRackPosition" value="${assetEntityInstance.targetRackPosition}"/>
+			</td>
+		</tr>
+	</g:if>
+	<g:else>
+		<tr class="prop rackLabel">
+			<td class="label">Rack Target</td>
+			<td class="label" nowrap="nowrap">
+				<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+												rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
+				<input type="hidden" id="rackSourceId" name="rackSourceId" value="0"/>
+			</td>
+		</tr>
+		<tr class="prop rackLabel">
+			<td class="label">Pos</td>
+			<td class="label" nowrap="nowrap">
+				<input type="text" id="targetRackPositionId" name="targetRackPosition"
+					value="${assetEntityInstance.targetRackPosition}" 
+					placeholder="U position"
+					class="${config.targetRackPosition} useRackT"
+					size=10 tabindex="350" />
+				<input type="hidden" id="sourceRackPositionId" name="sourceRackPosition" value="${assetEntityInstance.sourceRackPosition}"/>
+			</td>
+		</tr>
+	</g:else>
 	<tr class="prop">
 		<td class="label">Tag</td>
 		<td class="label">
@@ -117,3 +175,16 @@ $(document).ready(function() {
 <br/>
 </g:form>
 <div id="modelAuditId" style="display: none"></div>
+
+<script type="text/javascript">
+$(document).ready(function() { 
+	var assetType = EntityCrud.getAssetType();
+
+	EntityCrud.toggleAssetTypeFields( assetType );
+	EntityCrud.loadFormFromJQGridFilters();
+
+	EntityCrud.initializeUI("${assetEntityInstance?.model?.id}", "${assetEntityInstance?.model?.modelName}", "${assetEntityInstance?.model?.manufacturer?.id}", "${assetEntityInstance?.model?.manufacturer?.name}");
+
+	EntityCrud.setManufacturerValues("${assetEntityInstance.model?.id}", "${assetEntityInstance.model?.modelName}", "${assetEntityInstance.model?.assetType}", "${assetEntityInstance.model?.manufacturer?.id}", "${assetEntityInstance.model?.manufacturer?.name}");
+})
+</script>

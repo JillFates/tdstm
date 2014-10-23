@@ -979,18 +979,20 @@ var EntityCrud = ( function($) {
 			createModal.dialog('open');
 			pub.closeEditModal();
 			pub.closeShowModal();
-			updateAssetTitle(fieldHelpType);
-			updateAssetInfo(source,rack,roomName,location,position,'create');
-
-			if(!isIE7OrLesser)
-				getHelpTextAsToolTip(fieldHelpType);
-
+			pub.populateAssetEditView(fieldHelpType, source, rack, roomName, location, position, 'create');
 			return true;
 		} else {
 			console.log("presentAssetCreateView() error - unable to access the create modal DIV");
 			return false;
 		}
 	};
+	pub.populateAssetEditView = function(fieldHelpType, source, rack, roomId, location, position, forWhom) {
+		updateAssetTitle(fieldHelpType);
+		updateAssetInfo(source, rack, roomId, location, position, forWhom);
+
+		if(!isIE7OrLesser)
+			getHelpTextAsToolTip(fieldHelpType);
+	}
 	// Private method used by showAssetCreateView
 	function fetchAssetCreateView(controller, fieldHelpType, source, rack, roomName, location, position) {
 		var url = contextPath+'/'+controller+'/create';
@@ -1478,28 +1480,14 @@ function updateModelAudit(){
 	});
 }
 
-function createAuditPage(type,source,rack,roomName,location,position){
+function createAuditPage(type, source, rack, roomId, location, position, locationName, roomName){
 	new Ajax.Request(contextPath+'/assetEntity/create?redirectTo=assetAudit'+'&assetType='+type+'&source='+source,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
-				$("#auditDetailViewId").html(data.responseText)
-				$("#auditLocationId").val(location)
-				$("#auditRoomId").val(roomName)
-				$("#assetTypeCreateId").val(type)
-				$(".bladeLabel").hide()
-				$(".rackLabel").show()
-				if(source==0 && type!='Blade'){
-					$("#auditLocationId").attr("name","targetLocation")
-					$("#auditRoomId").attr("name","targetRoom")
-					$("#auditRackId").attr("name","targetRack")
-					$("#auditPosId").attr("name","targetRackPosition")
-					$("#sourceId").val("0")
-					$("#targetRack").val(rack)
-					$("#targetRackPosition").val(position)
-				} else if (source=="1" && type!='Blade'){
-					$("#sourceRack").val(rack)
-					$("#sourceRackPosition").val(position)
-				}				
-				$("#auditDetailViewId").show()
+			$("#auditDetailViewId").html(data.responseText)
+			$("#auditDetailViewId").show()
+			$("#auditLocationName").val(locationName)
+			$("#auditRoomName").val(roomName)
+			EntityCrud.populateAssetEditView('Device', source, rack, roomId, location, position, 'create');
 		}}
 	)
 }
