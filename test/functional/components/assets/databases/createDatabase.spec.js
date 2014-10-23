@@ -322,7 +322,7 @@ describe('Database', function(){
 
     }); // Support
     //https://jira5.tdsops.com/browse/TM-3439
-    xdescribe('Retire Date - Datepicker',function(){
+    describe('Retire Date - Datepicker',function(){
       
       it('should have Retire Date as value',function(){
         var createDBModal = new DBCreateModal();
@@ -353,7 +353,7 @@ describe('Database', function(){
 
     });//Retire Date
     //https://jira5.tdsops.com/browse/TM-3439
-    xdescribe('Maint Exp. - Datepicker',function(){
+    describe('Maint Exp. - Datepicker',function(){
       it('should have Maint Exp. as label',function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.maintExpLabel.getText()).toEqual('Maint Exp.');
