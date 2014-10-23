@@ -3848,7 +3848,8 @@ class AssetEntityController {
 	*/
 	 
 	def getChangedBundle = {
-		def dependent = AssetDependency.read(params.dependentId)
+		def dependentId = params.dependentId
+		def dependent = AssetDependency.read(dependentId.isInteger() ? dependentId.toInteger() : -1)
 		def depBundle = params.dependentId == "support" ? dependent?.asset?.moveBundle?.id : dependent?.dependent?.moveBundle?.id
 		def resultMap = ["id": AssetEntity.read(params.assetId)?.moveBundle?.id ,"status":dependent?.status, 
 			"depBundle":depBundle]
