@@ -678,6 +678,7 @@ var EntityCrud = ( function($) {
 		$("#assetTypeSelect").on("change", function(event) {
 			$('#assetTypeFilterSet').show();
 			$('#assetTypeFilterUnSet').hide();
+			$('#currentAssetType').val(event.val);
 			modelFilteringData.assetType = event.val;
 			if (selectedModel != null && selectedModel.assetType != null && event.val != selectedModel.assetType.toString()) {
 				selectedModel = {
@@ -719,23 +720,28 @@ var EntityCrud = ( function($) {
 		
 		$('#modelSelect').on("change", function(event) {
 			console.log("in the #modelSelect on change event");
-			var at = event.added.assetType;
-			selectedModel = event.added;
+			if (event.added) {
+				var at = event.added.assetType;
+				selectedModel = event.added;
 
-			var modelId = selectedModel.id;
-			var manuId = selectedModel.manufacturerId;
-			var manuName = selectedModel.manufacturerName;
+				var modelId = selectedModel.id;
+				var manuId = selectedModel.manufacturerId;
+				var manuName = selectedModel.manufacturerName;
 
-			$('#currentAssetType').val(at);
-			//$('#asset_model').val(modelId);
-			$('#hiddenModel').val(modelId);
-			$('#hiddenManufacturer').val();
+				$('#currentAssetType').val(at);
+				//$('#asset_model').val(modelId);
+				$('#hiddenModel').val(modelId);
+				$('#hiddenManufacturer').val();
 
-			pub.toggleAssetTypeFields(at);
-			
-			$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':selectedModel.name});
-			$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
-			$("#assetTypeSelect").select2('data', {"id":at, "text":at});
+				pub.toggleAssetTypeFields(at);
+				
+				$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':selectedModel.name});
+				$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
+				$("#assetTypeSelect").select2('data', {"id":at, "text":at});
+			} else {
+				clearSelectedModel(selectedModel.manufacturerId);
+				$('#hiddenModel').val('');
+			}
 		});
 		
 		$("#manufacturerSelect").select2({
@@ -767,20 +773,25 @@ var EntityCrud = ( function($) {
 
 		$('#manufacturerSelect').on("change", function(event) {
 			modelFilteringData.manufacturerId = event.val;
+			$('#hiddenManufacturer').val(event.val);
 			
 			if (selectedModel != null && selectedModel.manufacturerId != null && event.val != selectedModel.manufacturerId.toString()) {
-				selectedModel = {
-					"id" : null,
-					"text" : null,
-					"assetType" : null,
-					"manufacturerId" : event.val,
-					"manufacturerName" : null
-				}
-				
-				$("#modelSelect").select2('val', '');
+				clearSelectedModel(event.val);
 			}
 		});
 	};
+
+	var clearSelectedModel = function(manufacturerId) {
+		selectedModel = {
+			"id" : null,
+			"text" : null,
+			"assetType" : null,
+			"manufacturerId" : event.val,
+			"manufacturerName" : null
+		}
+		
+		$("#modelSelect").select2('val', '');	
+	}
 	
 	pub.setManufacturerValues = function(modelId, modelName, assetType, manufacturerId, manufacturerName) {
 		selectedModel = {

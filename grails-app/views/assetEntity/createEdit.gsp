@@ -46,7 +46,7 @@
 
 	<%-- Holds original values of the various SELECTS --%>
 	<input type="hidden" id="hiddenModel"        name="modelId" value="${assetEntityInstance?.model?.id}">
-	<input type="hidden" id="hiddenManufacturer" name="manufacturerId" value="${manufacturer?.id}">
+	<input type="hidden" id="hiddenManufacturer" name="manufacturerId" value="${assetEntityInstance.manufacturer?.id}">
 	<input type="hidden" id="deviceChassisIdS" value="${assetEntityInstance?.sourceChassis?.id}"/>
 	<input type="hidden" id="deviceChassisIdT" value="${assetEntityInstance?.targetChassis?.id}"/>
 	<input type="hidden" id="deviceRackIdS" value="${assetEntityInstance?.rackSource?.id}"/>
@@ -516,10 +516,10 @@
 		EntityCrud.toggleAssetTypeFields( assetType );
 		EntityCrud.loadFormFromJQGridFilters();
 
-		EntityCrud.initializeUI("${assetEntityInstance?.model?.id}", "${assetEntityInstance?.model?.modelName}", "${assetEntityInstance?.model?.manufacturer?.id}", "${assetEntityInstance?.model?.manufacturer?.name}");
+		EntityCrud.initializeUI("${assetEntityInstance?.model?.id}", "${assetEntityInstance?.model?.modelName}", "${assetEntityInstance.manufacturer?.id}", "${assetEntityInstance.manufacturer?.name}");
 
 		<g:if test="${action == 'update'}">
-			EntityCrud.setManufacturerValues("${assetEntityInstance.model?.id}", "${assetEntityInstance.model?.modelName}", "${assetEntityInstance.model?.assetType}", "${assetEntityInstance.model?.manufacturer?.id}", "${assetEntityInstance.model?.manufacturer?.name}");
+			EntityCrud.setManufacturerValues("${assetEntityInstance.model?.id}", "${assetEntityInstance.model?.modelName}", "${assetEntityInstance.assetType}", "${assetEntityInstance.manufacturer?.id}", "${assetEntityInstance.manufacturer?.name}");
 		</g:if>
 		
 

@@ -279,15 +279,24 @@ class DeviceService {
 			} else {
 				throw new DomainUpdateException("The model specified was not found")
 			}
-		} else if (manuId) {
-			// Attempt to assign just the manufacturer and asset type to the device
-			def manu = Manufacturer.get(manuId)
-			if (manu) {
-				device.model = null
-				device.manufacturer = manu
-				// assetType was applied in the bind above
+		} else {
+			if (manuId) {
+				// Attempt to assign just the manufacturer and asset type to the device
+				def manu = Manufacturer.get(manuId)
+				if (manu) {
+					device.model = null
+					device.manufacturer = manu
+					// assetType was applied in the bind above
+				} else {
+					throw new DomainUpdateException("The manufacturer specified was not found")
+				}
 			} else {
-				throw new DomainUpdateException("The manufacturer specified was not found")
+				device.manufacturer = null
+			}
+			if (params.currentAssetType) {
+				device.assetType = params.currentAssetType
+			} else {
+				device.assetType = null
 			}
 		}
 		
