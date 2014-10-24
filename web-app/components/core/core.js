@@ -225,7 +225,9 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
         	// Check for error situations
         	if (xhr.status == 200) {
 	        	//console.log("ajaxPrefilter was successful");
-        		return success(data, textStatus, jqXHR);
+        		if (success) {
+            		return success(data, textStatus, jqXHR);
+        		}
         	} else {
 				var errmsg = "Unexpected error occurred";
 				var msgDiv = $('#messageDiv');
@@ -239,7 +241,35 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
         	}
         }
 	};
-    
+
+	var complete = options.complete;
+    options.complete = function(data, textStatus, xhr) {
+    	var url = xhr.getResponseHeader('X-Login-URL');
+        if (url) {
+        	// The session must of expired if the X-Login-URL header was received
+        	alert("Your session has expired and need to login again.");
+        	_goToLogin(url);
+            return;
+        } else {
+        	// Check for error situations
+        	if (xhr.status == 200) {
+	        	//console.log("ajaxPrefilter was successful");
+        		if (complete) {
+            		return complete(textStatus, jqXHR);
+        		}
+        	} else {
+				var errmsg = "Unexpected error occurred";
+				var msgDiv = $('#messageDiv');
+				if (msgDiv.length) {
+					msgDiv.html(errmsg)
+				} else {
+					alert(errmsg);
+				}
+				console.log("ajaxPrefilter received an error - " + errmsg);
+				return false;
+        	}
+        }
+	};
     /*
     var error = options.error;
     options.error = function(jqXHR, textStatus, errorThrown) {
