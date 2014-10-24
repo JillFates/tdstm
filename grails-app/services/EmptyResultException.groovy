@@ -5,7 +5,12 @@ class EmptyResultException extends RuntimeException {
 		super()
 	}
 		
-	public EmptyResultException(message) {
+	public EmptyResultException(String message) {
 		super(message)
 	}
+
+	public EmptyResultException(groovy.lang.GString message) {
+		super(message.toString())
+	}
+
 }
