@@ -243,7 +243,7 @@ $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
 	};
 
 	var complete = options.complete;
-    options.complete = function(data, textStatus, xhr) {
+    options.complete = function(textStatus, xhr) {
     	var url = xhr.getResponseHeader('X-Login-URL');
         if (url) {
         	// The session must of expired if the X-Login-URL header was received
