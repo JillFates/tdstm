@@ -1,3 +1,6 @@
+<%-- Placeholder for the manufacturing edit if so needed --%>
+<div id="editManufacturerView" style="display: none;"></div>
+
 <div id="manufacturerShowDialog" title="Show Manufacturer" style="display: none;">
 	<div class="dialog">
 		<table>
@@ -19,8 +22,8 @@
 	</div>
 	<tds:hasPermission permission='ModelDialogView'>
 	<div class="buttons">
-	        <input type="hidden" name="id" id="show_manufacturerId" />
-	        <span class="button"><input type="button" class="edit" value="Edit" onclick="showOrEditModelManuDetails('manufacturer',$('#show_manufacturerId').val(),'Manufacturer','edit','Edit');$('#manufacturerShowDialog').dialog('close');"/></span>
+		<input type="hidden" name="id" id="show_manufacturerId" />
+		<span class="button"><input type="button" class="edit" value="Edit" onclick="showOrEditModelManuDetails('manufacturer',$('#show_manufacturerId').val(),'Manufacturer','edit','Edit');$('#manufacturerShowDialog').dialog('close');"/></span>
 	</div>
 	</tds:hasPermission>
 </div>
@@ -109,3 +112,13 @@
 </div>
 </tds:hasPermission>
 </div>
+
+<script>
+// Set the dialogs when DocumentReady and JQuery is available
+( function($) {
+	$("#editManufacturerView").dialog({ autoOpen: false})
+	$("#manufacturerShowDialog").dialog({ autoOpen: false })
+	$("#modelShowDialog").dialog({ autoOpen: false })
+})(jQuery);
+</script>
+

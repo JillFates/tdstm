@@ -22,9 +22,19 @@
 	<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
 	<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
 
+	<input type="hidden" id="dbId" value ="${databaseInstance.id}"/>
+	<input type="hidden" id="tabType" name="tabType" value =""/>
+	<input type="hidden" name="updateView" id="updateView" value=""/>
+		
+	<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
+	<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
+
 	<%-- Key field and optimistic locking var --%>
 	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
 	<input type="hidden" id="version" 	name="version" value="${version}"/>
+
+	<%-- Used to track dependencies added and deleted --%>
+	<g:render template="../assetEntity/dependentHidden" />
 
 
 <table style="border: 0">
@@ -100,16 +110,6 @@
 	<tr>
 		<td colspan="2">
 			<div class="buttons">
-				<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}" />
-				<input name="supportCount" id="edit_supportCount" type="hidden" value="${supportAssets.size()}" />
-				<input name="redirectTo" type="hidden" value="${redirectTo}">
-				<input type="hidden" id = "dbId"  value ="${databaseInstance.id}"/>
-				<input type="hidden" id = "tabType" name="tabType" value =""/>
-				<input name="updateView" id="updateView" type="hidden" value=""/>
-				<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
-					
-				<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
-				<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
 				<g:render template="../assetEntity/editButtons" model="[assetEntity:databaseInstance]"></g:render>
 			</div>
 		</td>

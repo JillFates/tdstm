@@ -5,10 +5,17 @@
 	$("#db_moveBundle").val($('#gs_moveBundle').val())
 </script>
 <g:form method="post" action="save" name="createEditAssetForm">
-<input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
-<input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
-<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
-<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
+	<input type="hidden" id="db_assetName" name="assetNameFilter" value="" />
+	<input type="hidden" id="db_dbFormat" name="dbFormatFilter" value="" />
+	<input type="hidden" id="db_planStatus" name="planStatusFilter" value="" />
+	<input type="hidden" id="db_moveBundle" name="moveBundleFilter" value="" />
+
+	<input name="showView" id="showView" type="hidden" value=""/>
+
+	<%-- Used to track dependencies added and deleted --%>
+	<g:render template="../assetEntity/dependentHidden" />
+
+
 <table style="border: 0">
 	<tr>
 		<td colspan="2">
@@ -81,13 +88,6 @@
 	</tr>
 	<tr>
 		<td colspan="2">
-			<input name="dependentCount" id="create_dependentCount" type="hidden" value="0" />
-			<input name="supportCount" id="create_supportCount" type="hidden" value="0" />
-			<input name="attributeSet.id" type="hidden" value="1" />
-			<input name="project.id" type="hidden" value="${projectId}" />
-			<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
-			<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-			<input name="showView" id="showView" type="hidden" value=""/>
 			<g:render template="../assetEntity/createButtons" model="[assetClass: databaseInstance.assetClass]"></g:render>
 		</td>
 	</tr>

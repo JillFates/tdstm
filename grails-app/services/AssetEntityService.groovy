@@ -42,6 +42,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.DateUtil
+import com.tdssrc.grails.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.NumberUtil
@@ -413,149 +414,243 @@ class AssetEntityService {
 
 	/**
 	 * This method is used to update dependencies for all entity types
-	 * @param params : params map received from client side
-	 * @param assetEntity : instance of entity including Server, Application, Database, Files
-	 * @param loginUser : Instance of current logged in user
 	 * @param project : Instance of current project
-	 * @return errorMsg : String of error came while updating dependencies (if any)
+	 * @param loginUser : Instance of current logged in user
+	 * @param assetEntity : instance of entity including Server, Application, Database, Files
+	 * @param params : params map received from client side
+	 * @return List of error came while updating dependencies (if any)
 	 */	
-	def createOrUpdateAssetEntityDependencies(def params, def assetEntity, loginUser, project) {
-		def errorMsg = ""
+	List<String> createOrUpdateAssetEntityDependencies(Project project, UserLogin userLogin, AssetEntity assetEntity, def params) {
+		List errors = []
+
 		AssetDependency.withTransaction() { status->
 			try {
-				validateAssetList([assetEntity.id], project) // Verifying assetEntity Exist in same project or not
+				// Verifying assetEntity assigned to the project
+				validateAssetsAssocToProject([assetEntity.id], project) 
+
+				//
+				// Handle deleting first
+				// 
+
+				// Collecting deleted deps ids and fetching there instances list
+				List toDelDepIds = params.deletedDep ? params.deletedDep.split(",").collect { NumberUtil.toLong(it, 0L)} : []
+				List toDelDepObjs = ( toDelDepIds.size() ? AssetDependency.findAllByIdInList(toDelDepIds) : [] )
 				
-				//Collecting deleted deps ids and fetching there instances list
-				def deletedDepIds = params.deletedDep ? params.deletedDep.split(",").collect{NumberUtils.toDouble(it, 0).round()} : []
-				def deletedDeps = params.deletedDep ? AssetDependency.findAllByIdInList(deletedDepIds) : []
-				
-				if(deletedDeps){
-					//Sending deleted dep list from browser to ensure all ids are of current project
-					validateAssetList(deletedDeps?.asset?.id+deletedDeps?.dependent?.id, project)
-					//After ensuring deleting deleted dependencies from dialog
-					AssetDependency.executeUpdate("delete AssetDependency where id in ( :deletedDeps ) ", [deletedDeps:deletedDeps.id])
+				// Delete any dependencies that were listed in the params.deletedDep parameter
+				if (toDelDepObjs) {
+					// Gather all of the assets referenced in the dependendencies and make sure that they are associated to the project
+					List allReferencedAssetIds = ( toDelDepObjs?.asset?.id + toDelDepObjs?.dependent?.id ).unique()
+					validateAssetsAssocToProject(allReferencedAssetIds, project)
+
+					// Delete the dependencies
+					AssetDependency.executeUpdate('delete AssetDependency where id in ( :dependencyIds ) ', [dependencyIds:toDelDepObjs.id])
 				}
-				//Update supporting dependencies 
-				def supports = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.dependent = :asset AND ad.dependent.project = :project",
-					[asset:assetEntity, project:project])
-				
-				def supportMsg = addOrUpdateMultipleDeps(assetEntity, supports,  params, errorMsg, [user:loginUser, type:"support", key:"addedSupport", project:project] )
-				//Update dependents dependencies 
-				
-				def deps = AssetDependency.findAll("FROM AssetDependency ad WHERE ad.asset = :asset AND ad.dependent.project = :project",
-					[asset:assetEntity, project:project])
-				def depMsg = addOrUpdateMultipleDeps(assetEntity, deps,  params, errorMsg, [user:loginUser, type:"dependent", key:"addedDep", project:project])
-				
-				errorMsg = supportMsg + depMsg
+
+				// Add/Update Support dependencies 
+				addOrUpdateDependencies(project, userLogin, 'support', assetEntity,  params)
+
+				// Add/Update Dependent dependencies 
+				addOrUpdateDependencies(project, userLogin, 'dependent', assetEntity,  params)
+
+			} catch (DomainUpdateException e) {		
+				errors << e.getMessage()
+			} catch (InvalidRequestException e) {
+				errors << e.getMessage()
 			} catch (RuntimeException rte) {
-				status.setRollbackOnly()
-				return rte.getMessage()
+				//rte.printStackTrace()
+				log.error ExceptionUtil.stackTraceToString(rte, 60)
+				errors << 'An error occurred that prevented the update'
 			}
+
+			if (errors.size())
+				status.setRollbackOnly()			
 		}
-		return errorMsg
+
+		return errors
 	}
+
+	/**
+	 * A helper method for createOrUpdateAssetEntityDependencies which does the actual adds and updates of dependencies from the web request
+	 * @param project - instance of the user's currently assigned project
+	 * @param userLogin - the user object that made the request
+	 * @param depType - what dependency type is being updated (options support|dependent)
+	 * @param asset - the AssetEntity instance being referenced
+	 * @param params - map of params received from browser
+	 * @throws InvalidRequestException for various unexpected conditions
+	 * @throws DomainUpdateException for errors in data validation
+	 */
+	private void addOrUpdateDependencies(Project project, UserLogin userLogin, String depType, AssetEntity asset, params) {
 	
-	/**
-	 * A common method to forward dependency update or create request to next step based on conditions. 
-	 * @param entity : instance of Entities including AssetEntity, Application, Database, Files .
-	 * @param deps : list of dependents or supporters for entities as they need to updated .
-	 * @param params : map of params received from client side .
-	 * @param errorMsg : Reference of errorMsg String .
-	 * @param paramsMap : A map in argument contains additional params like loggedUser, type, key and project .
-	 * @return errorMsg : String of error came while updating dependencies (if any)
-	 */
-	def addOrUpdateMultipleDeps(def entity, def deps, def params, errorMsg, def paramsMap ){
-		//Collecting all received supports and dependent entities and sending to validate for current project
-		def assetIds = deps.collect{dep-> return NumberUtils.toDouble(params["asset_${paramsMap.type}_"+dep.id], 0).round()}
-		validateAssetList(assetIds, paramsMap.project)
-		//If everything is all right then processing it further for transaction
-		deps.each{dep->
-			errorMsg += addOrUpdateDeps(dep, dep.id, entity, params, paramsMap.user, paramsMap.type, false)
-			updateBundle((paramsMap.type== "support" ? dep.asset : dep.dependent), params["moveBundle_${paramsMap.type}_"+dep.id])
-			
-		}  
-		if(params.containsKey(paramsMap.key) && params[paramsMap.key] != "0"){
-			//Collecting all received supports and dependent added entities and sending to validate for current project
-			def newdepAssetIds = (0..(NumberUtils.toDouble(params[paramsMap.key], 0).round()+1)).collect{dep-> 
-				return NumberUtils.toDouble(params["asset_${paramsMap.type}_"+dep], 0).round()
+		def (existingDeps, newDeps) = parseParamsForDependencyAssetIds(depType, params)
+
+		// Check that all of the referenced assets are associated with the project
+		List allAssetIds = (existingDeps.values() + newDeps.values()).unique()
+		validateAssetsAssocToProject(allAssetIds, project)
+
+		List propNames = ['dataFlowFreq', 'type', 'status', 'comment']
+
+		// Closure used to perform the actual update that is called below in loops for existing and new dependencies
+		def updateDependency = { depId, assetDependency, depAssetId ->
+			boolean isNew = depId < 1
+
+			AssetEntity depAsset = AssetEntity.get(depAssetId)
+			if (!depAsset) {
+				throw new InvalidRequestException("Unable to find $depType asset ($depAssetId)")
 			}
-			validateAssetList(newdepAssetIds, paramsMap.project)
-			
-			(0..(NumberUtils.toDouble(params[paramsMap.key], 0).round()+1)).each{addedDep->
-				errorMsg += addOrUpdateDeps(new AssetDependency(), addedDep, entity, params, paramsMap.user, paramsMap.type, true)
+
+			// Check to see if there is already a duplicate reference to the dependent
+			// note that we are using withNewSession so that it doesn't cause the notorious 'Not Processed by Flush()' hibernate error
+			// TODO : JPM 10/2014 : Change query to readOnly:true or load entire list into memory so we don't do individual queries
+			AssetDependency.withNewSession() { status ->
+				AssetDependency dupAd 
+				if (depType == 'support') {
+					dupAd = AssetDependency.findByAssetAndDependent(depAsset, asset)
+				} else {
+					dupAd = AssetDependency.findByAssetAndDependent(asset, depAsset)
+				}
+				if (dupAd && (depId < 1 || (depId >0 && depId != dupAd.id))) {
+					throw new InvalidRequestException("Duplicate dependencies not allow for $depType ${depAsset.assetName}")
+				}
 			}
-		}
-		return errorMsg
-	}
 
-	/**
-	 * This common method is used to updating dependencies or create dependencies for given asset(entity)
-	 * @param type : instance of AssetDependency 
-	 * @param idSuf : idSuf could be id of dependency in case of updating and -1,-2 decrement-ed integer in case of saving 
-	 * @param assetEntity : instance of AssetEntity for which dependencies are storing
-	 * @param params : params received from client side
-	 * @param loginUser: Instance of currently logged in user .
-	 * @param depType : a flag to determine it is "support" or "dependent" 
-	 * @param createNew : a flag to determine whether the record is new or not
-	 * @return  errMsg String of error came while updating dependencies (if any)
-	 */
-	def addOrUpdateDeps(def type, def idSuf, def assetEntity, def params, def loginUser, def depType, def createNew = false){
-		//looking in DB whether added dependency exist or not
-		def depEntity = AssetEntity.get(NumberUtils.toDouble(params["asset_${depType}_"+idSuf],0).round())
-
-		def errMsg = "" // Initializing var to return error message (if came)
-		if(depEntity){
-			updateBundle(depEntity, params["moveBundle_${depType}_"+idSuf])
-
-			def alreadyExist = false //Initializing var to save dependency if dependency already exist
-			// if flag is true for creating record need to check whether that record is not there in DB
-			if(createNew) 
-				alreadyExist = depType=="dependent" ? AssetDependency.findByAssetAndDependent(assetEntity, depEntity) :
-					AssetDependency.findByAssetAndDependent(depEntity, assetEntity)
-			//Going update or save record if asset and dependency is belonging to same project and if a
-			//new record came to update already there in DB or not 		
-			if(!alreadyExist){
-				type.dataFlowFreq = params["dataFlowFreq_${depType}_"+idSuf]
-				type.type = params["dtype_${depType}_"+idSuf]
-				type.status = params["status_${depType}_"+idSuf]
-				type.asset = depType=="dependent" ? assetEntity : depEntity
-				type.dependent = depType=="dependent" ? depEntity : assetEntity
-				type.updatedBy = loginUser?.person
-				type.comment = params["comment_${depType}_"+idSuf]
-				if(createNew){
-					type.createdBy = loginUser?.person
+			// Update the fields
+			propNames.each { name ->
+				String paramName = "${name}_${depType}_${depId}"
+				if (params.containsKey(paramName)) {
+					assetDependency[name] = params[paramName]
+				} else {
+					log.warn "addOrUpdateDependencies() request was missing property $paramName, user=$userLogin, asset=$asset"
 				}
-				if(!type.save(flush:true)){
-					log.error GormUtil.allErrorsString( type )
-					errMsg += "<li>Unable to ${createNew ? 'add' : 'update'} dependency between ${assetEntity.assetName} and ${depEntity.assetName}"
-				}
+			}
+
+			if (isNew)
+				assetDependency.createdBy = userLogin.person
+
+			assetDependency.updatedBy = userLogin.person
+
+			if (depType == 'support') {
+				assetDependency.asset = depAsset
+				assetDependency.dependent = asset
 			} else {
-				errMsg += "<li>The dependency between ${assetEntity.assetName} and ${depEntity.assetName} already exists and therefore ignored"
+				assetDependency.asset = asset
+				assetDependency.dependent = depAsset
+			}
+
+			// Deal with the move bundle assignment for the dependent asset
+			String mbStrId = params["moveBundle_${depType}_${depId}"]
+			Long mbId = NumberUtil.toLong(mbStrId)
+			if (mbId == null) {
+				throw new DomainUpdateException("A move bundle must be specified for the $depType dependency for ${depAsset}")
+			}
+			if (mbId != depAsset.moveBundle.id) {
+				assignAssetToBundle(project, depAsset, mbStrId)
+			}
+
+			log.debug "addOrUpdateDependencies() Attempting to ${isNew ? 'CREATE' : 'UPDATE'} dependency (${assetDependency.id}) ${assetDependency.asset.id}/${assetDependency.dependent.id} : changed fields=${assetDependency.dirtyPropertyNames}"
+			if (! assetDependency.validate() || ! assetDependency.save(force:true)) {
+				throw new DomainUpdateException("Unable to save $depType dependency for ${assetDependency.asset} / ${assetDependency.dependent}", assetDependency)
 			}
 		}
-	  return errMsg
+
+		// Update existing dependencies
+		existingDeps.each { depId, depAssetId ->
+			// Check to see if they are trying assign the asset to itself
+			if (asset.id == depId) {
+				throw new InvalidRequestException("Associating asset ($asset.name) to itself is not allowed")
+			}
+
+			AssetDependency ad = AssetDependency.get(depId) 
+			if (!ad) {
+				throw new InvalidRequestException("Unable to find referenced dependency ($depId)")
+			}
+
+			updateDependency(depId, ad, depAssetId)
+		}
+
+		// Update new dependencies
+		newDeps.each { depId, depAssetId ->
+			// Check to see if they are trying assign the asset to itself
+			if (asset.id == depId) {
+				throw new InvalidRequestException("Associating asset ($asset.name) to itself is not allowed")
+			}
+
+			// Create a new dependency that will be saved
+			AssetDependency ad = new AssetDependency() 
+
+			updateDependency(depId, ad, depAssetId)
+		}
 	}
-	
+
 	/**
-	 * this method is used to verify asset belongs to current project or not, if Bad id found will throw a run time exception
-	 * @param assetIdList : list of assetIds
-	 * @param project : instance of project
-	 * @return : Void
+	 * Helper method used to parse the dependency id and reference asset from the paramaters of a request
+	 * 
+	 * Get list of all the AssetDependency ids referenced by stripping off the suffix of the asset_$type_ID param. For each 
+	 * form table row there will be variable representing each property of the domain followed by the type (support|dependent)
+	 * and the id of the domain. Values greater (>) than zero (0) reference existing records and <=0 are for new records.
+	 * @param depType - what dependency type is being updated (options support|dependent)
+	 * @param params - map of params received from browser
+	 * @return Existing Dependency List and New Dependency List, each containing maps of the dependency id : asset reference id
+	*/
+	private List parseParamsForDependencyAssetIds(String depType, params) {
+		// Get list of all the AssetDependency ids referenced by stripping off the suffix of the asset_$type_ID param. For each 
+		// form table row there will be variable representing each property of the domain followed by the type (support|dependent)
+		// and the id of the domain. Values greater (>) than zero (0) reference existing records and <=0 are for new records.
+		//
+		// This first loop will find all the referenced dependencies and new dependencies constructing a map of the id and the referenced asset and dependent
+		// asset.
+		def regex = "asset_${depType}_(.+)"
+		Map existingDeps = [:]
+		Map newDeps = [:]
+		params.each { n,v ->
+			n.find(regex, { match, id ->
+				id = NumberUtil.toLong(id)
+				if (id == null) {
+					throw new InvalidRequestException("An invalid asset reference id was received ($n:$v)")	
+				}
+
+				// Fetch the asset id
+				Long assetId = NumberUtil.toLong(v)
+				if (assetId == null || assetId < 1) {
+					throw new InvalidRequestException("A referenced asset id was invalid ($id)")
+				}
+
+				if (id > 0) {
+					existingDeps.put(id, assetId)
+				} else {
+					newDeps.put(id, assetId)
+				}
+			} )
+		}
+		return [existingDeps, newDeps]
+	}
+
+	/**
+	 * Helper function used to verify that referenced asset id(s) are associated to the specified project. If any are not then an exception is thrown.
+	 * @param assetIds - a list of asset ids to check
+	 * @param project - instance of project
 	 */
-	def validateAssetList(def assetIdList, def project){
-		def assetList = AssetEntity.findAllByIdInList( assetIdList )
-		def wrongId = assetList.find{it.project.id != project.id}
-		if(wrongId){
-			log.error "Updated ${wrongId.assetName} dependency  does not exist in current Project ${project.name}"
-			throw new RuntimeException("Updated ${wrongId.assetName} dependency  does not exist in current Project ${project.name}")
+	private void validateAssetsAssocToProject(List assetIds, Project project) {
+		def invalidAssetId
+		// Use withNewSession so that it doesn't cause the notorious 'Not Processed by Flush()' hibernate error
+		AssetEntity.withNewSession() { status ->
+			def assetList = AssetEntity.findAllByIdInList( assetIds, [readOnly:true] )
+			def invalidAsset = assetList.find { it.project.id != project.id}
+			invalidAssetId = invalidAsset?.id
+		}
+		if (invalidAssetId) {
+			securityService.reportViolation("In validateAssetsAssocToProject() an attempt to access asset ${invalidAsset.id} not associated with project ${project.id}")
+			throw new InvalidRequestException("Invalid asset id ${invalidAsset.id} referenced for project ${project.name}")
 		}
 	}
 	
 	/**
-	 * @patams, files path, file name startsWith
 	 * Delete all files that are match with params criteria
+	 * @param files path, file name startsWith
 	 */
-	def deleteTempGraphFiles(path, startsWith){
+	def deleteTempGraphFiles(path, startsWith) {
+		// TODO : JPM 10/2014 : deleteTempGraphFiles function should NOT be allowed the way this looks so it was disabled and should be deleted
+		log.error "deleteTempGraphFiles() should NEVER be called but obviously it is..."
+		/*
 		def filePath = ApplicationHolder.application.parentContext.getResource(path).file
 		// Get file path
 		def dir = new File( "${filePath.absolutePath}" )
@@ -570,7 +665,9 @@ class AssetEntityService {
 				}
 			}
 		}
+		*/
 	}
+
 	/**
 	 * @param project
 	 * @return list of entities 
@@ -1064,9 +1161,9 @@ class AssetEntityService {
 		
 		def configMap = getConfig(type, validationType)
 
-		def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
+		def dependentAssets = AssetDependency.findAll("from AssetDependency as a where asset = ? order by a.dependent.assetType, a.dependent.assetName asc",[assetEntity])
 		
-		def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
+		def supportAssets = AssetDependency.findAll("from AssetDependency as a where dependent = ? order by a.asset.assetType, a.asset.assetName asc",[assetEntity])
 
 		def highlightMap = getHighlightedInfo(type, assetEntity, configMap)
 
@@ -1434,22 +1531,40 @@ class AssetEntityService {
 		return resp
 	}
 	/**
-	 * This method is used to update assets bundle in dependencies.
-	 * @param entity
-	 * @param moveBundleId 
+	 * This method is used to update assets bundle in dependencies
+	 * @param project - the project that the user presently assigned to
+	 * @param userLogin - the user making the change request
+	 * @param entity - the AssetEntity (or other asset classes) to be reassigned
+	 * @param moveBundleId - the id of the bundle to assign to
+	 * @return Null if successful otherwise the error that occurred
 	 */
-	def updateBundle(def entity, def moveBundleId){
-		
-		if(entity.moveBundle?.id != moveBundleId){
-			entity.moveBundle = MoveBundle.read(moveBundleId)
-			if(!entity.save()){
-				entity.errors.allErrors.each{
-					println it
+	 // replaced with assignAssetToBundle
+	/*
+	private String updateBundle(Project project, UserLogin userLogin, AssetEntity entity, moveBundleId){
+		String error
+		Long id = NumberUtil.toLong(moveBundleId)
+		if (! id) {
+			error = "Invalid move bundle id was received"
+		} else {
+			MoveBundle mb = MoveBundle.get(id)
+			if (!mb) {
+				error = "Specified move bundle ($id) was not found"
+			} else {
+				if (mb.project.id !== project.id) {
+					securityService.reportViolation("Attempted to assign asset (${entity.id}) to bundle ($id) not associated with project (${project.id})".toString())
+					error = "Specified move bundle id ($id) was not found"
+				} else {
+					entity.moveBundle = mb
+					if (! entity.validate() || ! entity.save(flush:true)) {
+						error = GormUtil.allErrorsString(entity)
+					}
 				}
 			}
 		}
+		return error
 	}
-		
+	*/
+
 	/*
 	 * Update assets cabling data for selected list of assets 
 	 * @param list of assets to be updated

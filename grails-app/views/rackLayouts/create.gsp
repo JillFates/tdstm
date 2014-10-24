@@ -120,16 +120,9 @@
      }
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })
-	    $("#cablingDialogId").dialog({ autoOpen: false })
 	    $("#createDialog").dialog({ autoOpen: false })
 	    $("#listDialog").dialog({ autoOpen: false })
-	    $("#manufacturerShowDialog").dialog({ autoOpen: false })
-	    $("#modelShowDialog").dialog({ autoOpen: false })
 	    $("#showAssetList").dialog({autoOpen: false})
-	   	$("#createEntityView").dialog({autoOpen: false})
-	   	$("#showEntityView").dialog({autoOpen: false})
-	    $("#editEntityView").dialog({autoOpen: false})
-	    $("#editManufacturerView").dialog({ autoOpen: false})
 	})
 	// Script to get the combined rack list
 	function getRackDetails( objId ){
@@ -218,14 +211,12 @@
 		</div>
 </div>
 
-<g:render template="../assetEntity/modelDialog"/>
-<div id ="createEntityView" style="display: none"></div>
-<div id ="showEntityView" style="display: none" ></div>
-<div id ="editEntityView" style="display: none" ></div>
-<div id="editManufacturerView" style="display: none;"></div>
+	<g:render template="../assetEntity/modelDialog"/>
+	<g:render template="../assetEntity/entityCrudDivs" />
+	<g:render template="../assetEntity/dependentAdd" />
+
 <input type="hidden" id="role" value="role"/>
 
-<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 </div>
 <script type="text/javascript">
 
@@ -260,17 +251,17 @@
 	function createBladeDialog(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
 		var redirectTo = 'rack'
 		new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo+'&assetType='+assetType+'&manufacturer='+manufacturer,{asynchronous:true,evalScripts:true,
-				onSuccess:function(e){
-	      		    if(e.responseText.substr(0,1) == '{'){
-			        	var resp = eval('(' + e.responseText + ')');
-			       	 	alert(resp.errMsg)
-			        }else{
-		           	 	createEntityView(e,'Server');updateAssetBladeInfo(source,blade,position,manufacturer,moveBundleId);
-		            }
-		        },
-				onFailure:function(jqXHR, textStatus, errorThrown){
-					alert( "An unexpected error occurred. Please close and reload form to see if the problem persists" )
-				}
+			onSuccess:function(e){
+      		    if(e.responseText.substr(0,1) == '{'){
+		        	var resp = eval('(' + e.responseText + ')');
+		       	 	alert(resp.errMsg)
+		        }else{
+	           	 	createEntityView(e,'Server');updateAssetBladeInfo(source,blade,position,manufacturer,moveBundleId);
+	            }
+	        },
+			onFailure:function(jqXHR, textStatus, errorThrown){
+				alert( "An unexpected error occurred. Please close and reload form to see if the problem persists" )
+			}
 	    })
 	}
 </script>

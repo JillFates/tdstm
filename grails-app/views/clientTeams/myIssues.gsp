@@ -99,12 +99,8 @@
 				     </div>
 				</div>
 				<g:render template="../assetEntity/modelDialog"/>
-				<div id="showEntityView" style="display: none;"></div>
-				<div id="editEntityView" style="display: none;"></div>
-				<div id="editManufacturerView" style="display: none;"></div>
-				<div id="createEntityView" style="display: none;"></div>
-				<div id="cablingDialogId" style="display: none;"></div>
-				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+				<g:render template="../assetEntity/entityCrudDivs" />
+				<g:render template="../assetEntity/dependentAdd" />
 	    <br />
 	    <input type="hidden" id="timeBarValueId" value="0"/>
 <%--

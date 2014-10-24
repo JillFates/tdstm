@@ -22,6 +22,10 @@
 	<input type="hidden" id="appl_validation" name="appValidationFilter" value="" />
 	<input type="hidden" id="appl_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" id="appl_planStatus" name="planStatusFilter" value="" />
+	<input type="hidden" name="showView" id="showView" value=""/>
+
+	<%-- Used to track dependencies added and deleted --%>
+	<g:render template="../assetEntity/dependentHidden" />
 
 	<table style="border: 0">
 		<tr>
@@ -274,18 +278,13 @@
 				</div></td>
 		</tr>
 
+		<%-- Dependency Edit Block --%>
 		<tr>
 			<g:render template="../assetEntity/dependent" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
 		</tr>
+		
 		<tr>
 			<td colspan="2">
-				<input type="hidden" name="project.id" value="${projectId}" />
-				<input type="hidden" name="attributeSet.id" value="1" />
-				<input type="hidden" name="dependentCount" id="create_dependentCount" value="0" />
-				<input type="hidden" name="supportCount"  id="create_supportCount" value="0" />
-				<input type="hidden" name="addedSupport" id="create_supportAddedId" value ="0"/>
-				<input type="hidden" name="addedDep" id="create_dependentAddedId" value ="0"/>
-				<input type="hidden" name="showView" id="showView" value=""/>
 				<g:render template="../assetEntity/createButtons" model="[assetClass: applicationInstance.assetClass]"></g:render>
 			</td>
 		</tr>
@@ -295,5 +294,4 @@
 <script>
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
-	
 </script>

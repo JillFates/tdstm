@@ -39,7 +39,19 @@ var tdsCommon = {
 		return result.join('');
 	},
 
-	overrideCloseDialog: function() {
+	// Common method to capitalize the first letter of a string
+	capitalize: function(str) {
+		return str.charAt(0).toUpperCase() + str.substring(1);
+	},
+
+	/**
+	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
+	 * done to correct a problem with DIVs being populated with content that would not be cleared out and duplicate
+	 * DOM IDs would be created causing DOM lookup issues.
+	 *
+	 * To disable this behavior add the class 'static-dialog' to the DIV (style="static-dialog" or modal.addClass('static-dialog'))
+	 */
+	autoClearDialogOnClose: function() {
 		$.widget( "ui.dialog", $.ui.dialog, {
 			close: function(event) {
 				var result = this._super();
@@ -56,4 +68,4 @@ var tdsCommon = {
 
 }
 
-tdsCommon.overrideCloseDialog();
+tdsCommon.autoClearDialogOnClose();

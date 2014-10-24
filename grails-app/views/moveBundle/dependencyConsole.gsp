@@ -25,34 +25,6 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		
-		<script type="text/javascript">
-			// This variable must remain outside the scope of the rendered dependency map
-			// to ensure that only one d3 force layout can be running at a time
-			var force
-			
-			$(document).ready(function() {
-				var compactPref= '${compactPref}'
-				compactDivToggle(compactPref);
-				
-				// ${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
-				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
-				$("#createEntityView").dialog({ autoOpen: false })
-				$("#showEntityView").dialog({ autoOpen: false })
-				$("#editEntityView").dialog({ autoOpen: false })
-				$("#manufacturerShowDialog").dialog({ autoOpen: false })
-				$("#modelShowDialog").dialog({ autoOpen: false })
-				$("#moveBundleSelectId").dialog({ autoOpen: false })
-				$("#editManufacturerView").dialog({ autoOpen: false})
-				$("#createStaffDialog").dialog({ autoOpen: false })
-				$("#cablingDialogId").dialog({ autoOpen:false })
-				currentMenuId = "#assetMenu";
-				$("#assetMenuId a").css('background-color','#003366')	
-				$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
-				$(window).resize(function() {
-					$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
-				});
-			});
-		</script>
 	</head>
 	<body>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
@@ -153,19 +125,15 @@
 				<div id="items1" style="display: none"></div>
 			</tds:hasPermission>
 			<g:render template="../assetEntity/modelDialog" />
-			<div id="createEntityView" style="display: none;"></div>
-			<div id="showEntityView" style="display: none;"></div>
-			<div id="editEntityView" style="display: none;"></div>
-			<div id="editManufacturerView" style="display: none;"></div>
-			<div id="createStaffDialog" style="display:none;">'
-			<div id="cablingDialogId" style="display: none;"></div>
+			<g:render template="../assetEntity/entityCrudDivs" />
+			<div id="createStaffDialog" style="display:none;">
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
 			  <g:select id="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
 			  <g:select id="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
-			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+			<g:render template="../assetEntity/dependentAdd" />
 			<g:render template="../assetEntity/initAssetEntityData"/>
 		</div>
 		</div>
@@ -280,5 +248,32 @@
 				}
 			}
 		</script>
+
+		<script type="text/javascript">
+		// This variable must remain outside the scope of the rendered dependency map
+		// to ensure that only one d3 force layout can be running at a time
+		var force;
+
+			( function($) {
+			
+				var compactPref= '${compactPref}'
+				compactDivToggle(compactPref);
+				
+				// ${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
+				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
+
+				$("#moveBundleSelectId").dialog({ autoOpen: false })
+				$("#createStaffDialog").dialog({ autoOpen: false })
+
+				currentMenuId = "#assetMenu";
+				$("#assetMenuId a").css('background-color','#003366')	
+				$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
+				$(window).resize(function() {
+					$("#dependencyDivId").css('max-width', ($(window).width()-185)+'px');
+				});
+			})(jQuery);		
+
+		</script>
+
 	</body>
 </html>

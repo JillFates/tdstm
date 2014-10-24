@@ -143,11 +143,8 @@
 					</div>
 				</div>
 			</g:each>
-			<div id="createEntityView" style="display: none;"></div>
-			<div id="showEntityView" style="display: none;"></div>
-			<div id="editEntityView" style="display: none;"></div>	
-			<div id="cablingDialogId" style="display: none;"></div>
-			<g:render template="../assetEntity/newDependency" model="['forWhom':'Storage', entities:files]"></g:render>
+			<g:render template="../assetEntity/entityCrudDivs" />
+			<g:render template="../assetEntity/dependentAdd" />
 		</div>
 		<g:render template="../assetEntity/modelDialog"/>
         <g:render template="../assetEntity/initAssetEntityData"/>

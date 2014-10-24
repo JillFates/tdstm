@@ -41,7 +41,7 @@
 								</g:else>
 								<td class="dep-${support.status}" nowrap="nowrap">
 									${support.type} &nbsp;
-									<g:render template="../assetEntity/dependencyComment" model= "[dependency:support,type:'support',forWhom:'show']"></g:render>
+									<g:render template="../assetEntity/dependencyComment" model= "[dependency:support, type:'support', forWhom:'show']"></g:render>
 								</td>
 								<td class="dep-${support.status}">
 									${support.status}
@@ -95,7 +95,7 @@
 								 </g:else>
 								<td class="dep-${dependent.status}" nowrap="nowrap">
 									${dependent.type}&nbsp;
-									<g:render template="../assetEntity/dependencyComment" model= "[dependency:dependent,type:'dependent',forWhom:'show']"></g:render>
+									<g:render template="../assetEntity/dependencyComment" model= "[dependency:dependent, type:'dependent', forWhom:'show']"></g:render>
 								</td>
 								<td class="dep-${dependent.status}">
 									${dependent.status}

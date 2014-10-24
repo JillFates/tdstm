@@ -82,9 +82,6 @@
 			<div>
 				<div id="messageId" class="message" style="display:none"></div>
 			</div>
-			<div id="showEntityView" style="display: none;"></div>
-			<div id="editEntityView" style="display: none;"></div>
-			<div id="cablingDialogId" style="display: none;"></div>
 			<jqgrid:wrapper id="dependencyGridId" />
 			<g:each var="key" in="['1','2']">
 				<div id="columnCustomDiv_${depPref[key]}" style="display:none;">
@@ -98,7 +95,8 @@
 					</div>
 				</div>
 			</g:each>
-			<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+			<g:render template="../assetEntity/entityCrudDivs" />
+			<g:render template="../assetEntity/dependentAdd" />
 			<g:render template="initAssetEntityData"/>
 		</div>
 	</body>

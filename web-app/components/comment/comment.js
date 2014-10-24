@@ -56,7 +56,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 
 	scope.$on('showAssetDetails', function(evt, redirectTo, type, value) {
 		scope.$broadcast('forceDialogClose', ['crud', 'list']);
-		window.getEntityDetails(redirectTo, type, value);
+		EntityCrud.showAssetDetailView(type, value);
 	});
 
 	scope.$on('commentCreated', function(evt, commentId, assetId) {
@@ -216,7 +216,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 tds.comments.controller.MainController.$inject = ['$rootScope', '$scope', '$modal', '$window', 'utils', 'commentUtils'];
 
 
-/*****************************************
+/**
  * Controller for comments & assets list dialog
  */
 tds.comments.controller.ListDialogController = function($scope, $modalInstance, $log, $timeout, alerts, assetTO, commentService, appCommonData, utils, commentUtils, defaultCommentType) {
@@ -312,8 +312,8 @@ tds.comments.controller.ListDialogController = function($scope, $modalInstance, 
 
 };
 
-/*****************************************
- * Controller that shows a commet
+/**
+ * Controller that shows a comment
  */
 tds.comments.controller.ShowCommentDialogController = function($window, $scope, $modalInstance, $log, $timeout, commentService, alerts, commentTO, action, appCommonData, utils, commentUtils) {
 
@@ -378,7 +378,7 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 	}
 
 	$scope.getEntityDetails = function() {
-		$scope.$emit("showAssetDetails", 'listTask', $scope.ac.assetType, $scope.ac.assetEntity);
+		$scope.$emit("showAssetDetails", 'listTask', $scope.ac.assetClass, $scope.ac.assetEntity);
 	}
 
 	$scope.viewTask = function(taskId) {
@@ -1007,49 +1007,44 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		return deferred.promise;
 	}
 
+	// create a model object of all of the comment properties
 	var commentTemplate = function(assetData) {
 		if (assetData == null) {
 			assetData = assetTO('', 'Server');
 		}
 		return {
-			comment: '',
-			forWhom: '',
+			assetClass: assetData.assetClass,
 			assetEntity: assetData.assetId?assetData.assetId.toString():'',
-			category: 'general',
-			predCount: '-1',
-			deletePredId: '',
-			commentFromId: '',
-			prevAsset: '',
-
-			isResolved: '0',
-			resolution: '',
-
-			commentType: 'comment',
-			role: "",
-			moveEvent: "",
 			assetType: assetData.assetType,
+			assignedTo: appCommonData.getLoginPerson().id.toString(),
+			category: 'general',
+			comment: '',
+			commentFromId: '',
+			commentId: "",
+			commentType: 'comment',
+			deletePredId: '',
+			dueDate: '',
 			duration: "",
 			durationScale: "M",
-			priority: "3",
-			predecessorCategory: "",
-
-			mustVerify: 0,
-			commentId: "",
-			workflowTransition: '',
-
-			dueDate: '',
-			estStart: '',
 			estFinish: '',
+			estStart: '',
+			forWhom: '',
 			hardAssigned: '0',
+			isResolved: '0',
+			manageDependency: 1,
+			moveEvent: "",
+			mustVerify: 0,
 			override: '0',
-
+			predCount: '-1',
+			predecessorCategory: "",
+			prevAsset: '',
+			priority: "3",
+			resolution: '',
+			role: "",
+			status: 'Ready',
 			taskDependency: "",
 			taskSuccessor: "",
-
-			manageDependency: 1,
-
-			assignedTo: appCommonData.getLoginPerson().id.toString(),
-			status: 'Ready'
+			workflowTransition: ''
 		};
 	};
 
@@ -1060,27 +1055,28 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 	var commentTemplateFromCreateResponse = function(response, assetId, assetType) {
 		var temp = commentTemplate(assetTO(assetId, assetType));
 		var ac = response.assetComment;
-		temp.comment = ac.comment;
+		temp.assignedTo = ac.assignedTo ? ac.assignedTo.id.toString() : '';
+		temp.assetClass = response.assetClass;
 		temp.category = ac.category;
-		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
-		temp.resolution = ac.resolution;
+		temp.comment = ac.comment;
+		temp.commentId = ac.id;
 		temp.commentType = ac.commentType;
-		temp.role = ac.role ? ac.role.toString() : '';
-		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
+		temp.dueDate = response.dueDate;
 		temp.duration = ac.duration;
 		temp.durationScale = ac.durationScale?ac.durationScale.name:'M';
-		temp.priority = ac.priority ? ac.priority.toString() : '3';
-		temp.mustVerify = ac.mustVerify;
-		temp.commentId = ac.id;
-		temp.workflowTransition = ac.workflowTransition ? ac.workflowTransition.id.toString() : '';
-		temp.dueDate = response.dueDate;
-		temp.estStart = response.etStart;
 		temp.estFinish = response.etFinish;
+		temp.estStart = response.etStart;
 		temp.hardAssigned = ac.hardAssigned ? ac.hardAssigned.toString() : '0';
+		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
+		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
+		temp.mustVerify = ac.mustVerify;
 		temp.override = ac.workflowOverride ? ac.workflowOverride.toString() : '0';
-		temp.assignedTo = ac.assignedTo ? ac.assignedTo.id.toString() : '';
+		temp.priority = ac.priority ? ac.priority.toString() : '3';
+		temp.resolution = ac.resolution;
+		temp.role = ac.role ? ac.role.toString() : '';
 		temp.status = ac.status;
 		temp.taskNumber = ac.taskNumber;
+		temp.workflowTransition = ac.workflowTransition ? ac.workflowTransition.id.toString() : '';
 
 		return temp;
 	};

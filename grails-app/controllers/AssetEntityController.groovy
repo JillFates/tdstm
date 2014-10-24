@@ -1574,7 +1574,7 @@ class AssetEntityController {
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
 				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
 			}
-			if(assetComment.dateResolved){
+			if (assetComment.dateResolved) {
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
 				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
 			}
@@ -1650,13 +1650,34 @@ class AssetEntityController {
 			commentList << [ 
 				assetComment:assetComment,
 				durationScale:assetComment.durationScale.value(),
-				personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
-				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned', assetName:assetComment.assetEntity?.assetName ?: "",
-				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
-				workflow:workflow,roles:roles?:'Unassigned', predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
-				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
-				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,assetType:assetComment.assetEntity?.assetType, predecessorList: predecessorList, successorList: successorList]
-		}else{
+				personCreateObj:personCreateObj, 
+				personResolvedObj:personResolvedObj, 
+				dtCreated:dtCreated ?: "",
+				dtResolved:dtResolved ?: "", 
+				assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned', 
+				assetName:assetComment.assetEntity?.assetName ?: "",
+				eventName:assetComment.moveEvent?.name ?: "", 
+				dueDate:dueDate, 
+				etStart:etStart, 
+				etFinish:etFinish,
+				atStart:atStart,
+				notes:notes,
+				workflow:workflow,
+				roles:roles?:'Unassigned', 
+				predecessorTable:predecessorTable, 
+				successorTable:successorTable,
+				maxVal:maxVal,
+				cssForCommentStatus: cssForCommentStatus, 
+				statusWarn: taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
+				successorsCount: successorsCount, 
+				predecessorsCount: predecessorsCount, 
+				assetId: assetComment.assetEntity?.id ?: "" ,
+				assetType: assetComment.assetEntity?.assetType,
+				assetClass: assetComment.assetEntity?.assetClass.toString(),
+				predecessorList: predecessorList, 
+				successorList: successorList 
+			]
+		} else {
 		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
 		 log.error "showComment: show comment view - "+errorMsg
 		 commentList << [error:errorMsg]

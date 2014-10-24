@@ -104,7 +104,7 @@ class StorageService {
 			throw new DomainUpdateException("Unable to update asset ${GormUtil.allErrorsString(asset)}".toString())
 		}
 
-		def errors = assetEntityService.createOrUpdateAssetEntityDependencies(params, asset, userLogin, asset.project)
+		def errors = assetEntityService.createOrUpdateAssetEntityDependencies(asset.project, userLogin, asset, params)
 		if (errors) {
 			throw new DomainUpdateException("Unable to update dependencies : $errors".toString())
 		}

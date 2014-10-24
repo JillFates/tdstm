@@ -290,10 +290,8 @@
         <li id="noOptions">No Options</li>
     </ul>
 </div>
-<div id ="showEntityView" style="display: none" title="Show Asset"></div>
-<div id ="editEntityView" style="display: none" title="Edit Asset"></div>
-<div id="editManufacturerView" style="display: none;"></div>
-<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+<g:render template="../assetEntity/entityCrudDivs" />
+<g:render template="../assetEntity/dependentAdd" />
 
 <script type="text/javascript" src="/tdstm/js/jquery.fixedheadertable.1.1.2.js"></script>
 

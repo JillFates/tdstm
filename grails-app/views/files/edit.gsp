@@ -25,20 +25,16 @@
 	<input type="hidden" id="file_moveBundle" name="moveBundleFilter" value="" />
 	<input type="hidden" name="id" value="${fileInstance?.id}" />
 
-	<input name="dependentCount" id="edit_dependentCount" type="hidden" value="${dependentAssets.size()}">
-	<input  name="supportCount"  id="edit_supportCount" type="hidden" value="${supportAssets.size()}">
-	<input name="redirectTo" type="hidden" value="${redirectTo}">
 	<input type="hidden" id ="filesId"  value ="${fileInstance.id}"/>
 	<input type="hidden" id = "tabType" name="tabType" value =""/>
 	<input name="updateView" id="updateView" type="hidden" value=""/>
-	<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
 	
-	<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
-	<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-
 	<%-- Key field and optimistic locking var --%>
 	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
 	<input type="hidden" id="version" 	name="version" value="${version}"/>
+
+	<%-- Used to track dependencies added and deleted --%>
+	<g:render template="../assetEntity/dependentHidden" />
 
 	<table style="border: 0;">
 		<tr>

@@ -1,31 +1,37 @@
+<%-- 
+ 	Used to display the Asset Dependency Comment Icon(s) in the Dependency table and provides the comment dialog for edit
+ 	@param type - indicates type of dependency options (support|dependent)
+	@param forWhom - when set to 'edit' it provides the edit/add icon plus the comment dialog
+	@param dependency - the AssetDependency object
+	@comment the _dependentAdd.gsp creates a dependency map instead of using real dependency object so if you add other property reference.
+ --%>
+
+<g:set var="iconMode" value="${ (dependency.comment?.size() ? 'edit' : 'add')}" />
+
+<%-- Note that for the ADD action, there is a hidden TR which the id/name properties will have name_TAG so that the javascript can replace. Therefore
+if type is blank, the extra underscore(_) will be avoided --%>
+<g:set var="suffix" value="${ (type ? type+'_' : '') + dependency.id.toString()}"/>
+
 <g:if test="${ forWhom == 'edit' }" >
-	<a title="${ dependency.comment }" 
-	 	id="commLink_${type}_${dependency.id}" href="javascript:openCommentDialog('depComment_${type}_${dependency.id}')">
-	 	<g:if test="${ dependency.comment }" >
-	   		<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment_edit.png')}" border="0px" />
-	   	</g:if>
-	   	<g:else>
-	   		<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" />
-	   	</g:else>
+	<a title="${ dependency.comment?.toString() }" 
+	 	id="commLink_${suffix}" href="#" onclick="javascript:EntityCrud.openDepCommentDialog('${suffix}')">
+   		<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment_' + iconMode + '.png')}" border="0px" />
 	</a>
+
+ 	<input type="hidden" name="comment_${suffix}" id="comment_${suffix}" value="${dependency.comment}">
+
 </g:if>
 <g:else>
  	<g:if test="${ dependency.comment }" >
+ 		<%-- TODO : JPM 10/2014 : Change the show mode for comments to use some sort of bubble to support large text --%>
  		<a title="${ dependency.comment }"> 
    			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
    		</a>
+   		<%-- Trying to get bootstrap popover to work...
+ 		<a class="popover" data-toggle="popover" data-content="${dependency.comment}" data-placement="top" onclick="event.stopPropagation(); this.popover('toggle');"> 
+   			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
+   		</a>
+   		--%>
    	</g:if>
 </g:else>
 
-<g:if test="${forWhom == 'edit'}">
- 	<input type="hidden" name="comment_${type}_${dependency.id}" id="comment_${type}_${dependency.id}" value="${dependency.comment}">
- 	<div id="depComment_${type}_${dependency.id}" class="depComDiv" style="display:none" >
-		<textarea rows="5" cols="50" name="dep_comment_${type}_${dependency.id}" id="dep_comment_${type}_${dependency.id}"> ${dependency.comment} </textarea>
-		<div class="buttons">
-		<span class="button"><input type="button" class="save" value="Save" 
-			onclick="saveDepComment('dep_comment_${type}_${dependency.id}', 'comment_${type}_${dependency.id}', 
-				'depComment_${type}_${dependency.id}', 'commLink_${type}_${dependency.id}')"/> 
-		</span>
-		</div>
-  	</div>
-</g:if>

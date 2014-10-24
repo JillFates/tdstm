@@ -39,7 +39,16 @@
 	<input type="hidden" id="assetId" 	name="id" value="${assetId}"/>
 	<input type="hidden" id="version" 	name="version" value="${version}"/>
 
+	<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
+	<input type="hidden" id="dstPath" name = "dstPath" value ="${redirectTo}"/>
+	<input type="hidden" id="tabType" name="tabType" value =""/>
+	<input type="hidden" id="updateView" name="updateView" value=""/>
+
 	<input type="hidden" name="id" value="${applicationInstance?.id}" />
+
+	<%-- Used to track dependencies added and deleted --%>
+	<g:render template="../assetEntity/dependentHidden" />
+
 	<table style="border: 0">
 		<tr>
 			<td colspan="2">
@@ -292,17 +301,6 @@
 		<tr>
 			<td colspan="2">
 				<div class="buttons">
-					<input type="hidden" id="appId" value ="${applicationInstance.id}"/>
-					<input type="hidden" id="deletedDepId" name="deletedDep" value =""/>
-					<input type="hidden" id="dstPath" name = "dstPath" value ="${redirectTo}"/>
-					<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-					<input type="hidden" id="edit_dependentCount" name="dependentCount" value="${dependentAssets.size()}" />
-					<input type="hidden" id="edit_supportAddedId" name="addedSupport" value ="0"/>
-					<input type="hidden" id="edit_supportCount" name="supportCount" value="${supportAssets.size()}" />
-					<input type="hidden" id="redirectTo" name="redirectTo" value="${redirectTo}"/>
-					<input type="hidden" id="tabType" name="tabType" value =""/>
-					<input type="hidden" id="updateView" name="updateView" value=""/>
-
 					<g:render template="../assetEntity/editButtons" model="[assetEntity:applicationInstance]"></g:render>
 				</div>
 			</td>

@@ -91,11 +91,8 @@
 			</g:if>
 			<div>
 				<jqgrid:wrapper id="listCommentGridId" />
-				<div id="showEntityView" style="display: none;"></div>
-				<div id="editEntityView" style="display: none;"></div>
-				<div id="createEntityView" style="display: none;"></div>
-				<div id="cablingDialogId" style="display: none;"></div>
-				<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
+				<g:render template="../assetEntity/entityCrudDivs" />
+				<g:render template="../assetEntity/dependentAdd" />
 			</div>
 		</div>
         <g:render template="../assetEntity/initAssetEntityData"/>

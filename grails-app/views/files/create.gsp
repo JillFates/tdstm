@@ -12,6 +12,12 @@
 	<input type="hidden" id="file_size" name="sizeFilter" value="" />
 	<input type="hidden" id="file_planStatus" name="planStatusFilter" value="" />
 	<input type="hidden" id="file_moveBundle" name="moveBundleFilter" value="" />
+
+	<input name="showView" id="showView" type="hidden" value=""/>
+
+	<%-- Used to track dependencies added and deleted --%>
+	<g:render template="../assetEntity/dependentHidden" />
+
 	<table style="border: 0;">
 		<tr>
 			<td colspan="2">
@@ -98,13 +104,6 @@
 		</tr>
 		<tr>
 			<td colspan="2">
-				<input name="dependentCount" id="create_dependentCount" type="hidden" value="0">
-				<input  name="supportCount"  id="create_supportCount" type="hidden" value="0">
-				<input type="hidden" id="create_supportAddedId" name="addedSupport" value ="0"/>
-				<input type="hidden" id="create_dependentAddedId" name="addedDep" value ="0"/>
-				<input name="attributeSet.id" type="hidden" value="1"> <input
-					name="project.id" type="hidden" value="${projectId}"> 
-				<input name="showView" id="showView" type="hidden" value=""/>
 				<g:render template="../assetEntity/createButtons" model="[assetClass: fileInstance.assetClass]"></g:render>
 			</td>
 		</tr>

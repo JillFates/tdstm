@@ -276,14 +276,13 @@
 				</table>
 			</div>
 		</div>
+
 		<g:render template="../assetEntity/modelDialog"/>
-		<div id ="createEntityView" style="display: none" ></div>
-		<div id ="showEntityView" style="display: none"></div>
-		<div id ="editEntityView" style="display: none"></div>
-		<div id="editManufacturerView" style="display: none;"></div>
+		<g:render template="../assetEntity/entityCrudDivs" />
+		<g:render template="../assetEntity/dependentAdd" />
+
 		<input type="hidden" id="role" value="role"/>
 
-		<g:render template="../assetEntity/newDependency" model="['forWhom':'Server', entities:servers]"></g:render>
 	<script type="text/javascript">   
 		
 		var roomId = "${roomId}"
@@ -304,9 +303,9 @@
 			});
 		}
 		$(document).ready(function() {
-			$("#editDialog,#createRoomDialog,#mergeRoomDialog,#listDialog,#cablingDialogId").dialog({ autoOpen: false })
-			$("#manufacturerShowDialog,#modelShowDialog,#createEntityView,#showEntityView").dialog({autoOpen: false})
-			$("#editEntityView,#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({ autoOpen: false })
+			$("#editDialog,#createRoomDialog,#mergeRoomDialog,#listDialog").dialog({ autoOpen: false })
+			$("#manufacturerShowDialog,#modelShowDialog").dialog({autoOpen: false})
+			$("#commentsListDialog,#createCommentDialog,#showCommentDialog").dialog({ autoOpen: false })
 			$("#editCommentDialog,#editManufacturerView").dialog({ autoOpen: false})
 			$(document).on('entityAssetCreated', function(e) { updateRackLayoutView(); });
 			$(document).on('entityAssetUpdated', function(e) { updateRackLayoutView(); });

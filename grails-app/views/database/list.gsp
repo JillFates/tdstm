@@ -154,11 +154,8 @@
             <div ng-controller="tds.comments.controller.MainController as comments">
 			    <jqgrid:wrapper id="databaseId" /> 
             </div>
-			<div id="createEntityView" style="display: none;" ></div>
-			<div id="showEntityView" style="display: none;"></div>
-			<div id="editEntityView" style="display: none;"></div>
-			<div id="cablingDialogId" style="display: none;"></div>
-			<g:render template="../assetEntity/newDependency" model="['forWhom':'Database', entities:dbs]"></g:render>
+			<g:render template="../assetEntity/entityCrudDivs" />
+			<g:render template="../assetEntity/dependentAdd" />
 		</div>
 		<g:render template="../assetEntity/modelDialog"/>
         <g:render template="../assetEntity/initAssetEntityData"/>

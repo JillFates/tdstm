@@ -125,7 +125,7 @@
 
 			function myCustomFormatter (cellVal,options,rowObject) {
 				var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');">'+
-						"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[7] + "' tasks='" + rowObject[6] + "' comments='" + rowObject[9] + "'></grid-buttons>"
 				return editButton
 			}
@@ -181,14 +181,11 @@
 			    <jqgrid:wrapper id="applicationId" />
 			</div>
 			<g:render template="../assetEntity/modelDialog"/>
-			<div id="createEntityView" style="display: none;" ></div>
-			<div id="showEntityView" style="display: none;"></div>
-			<div id="editEntityView" style="display: none;"></div>
-			<div id="cablingDialogId" style="display: none;"></div>
+			<g:render template="../assetEntity/entityCrudDivs" />
+			<g:render template="../assetEntity/dependentAdd" />
 			<div id="createStaffDialog" style="display:none;">
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
-			<g:render template="../assetEntity/newDependency" model="[forWhom:assetClass, entities:applications]"></g:render>
 		</div>
             <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>

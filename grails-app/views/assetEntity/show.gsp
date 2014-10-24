@@ -1,13 +1,4 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
-<script type="text/javascript">
-$(document).ready(function() { 
-	var assetType = "${assetEntity.assetType}"
-
-	EntityCrud.toggleAssetTypeFields( assetType );
-
-	changeDocTitle('${escapedName}');
-});
-</script>
  	<g:form method="post">
  	<table style="border:0;width:1000px;">
 		<tr>
@@ -149,7 +140,7 @@ $(document).ready(function() {
 			</td>
 		</tr>
 		<tr id="deps">
-			<g:render template="dependentShow" model= "[assetEntity:assetEntity]"></g:render>
+			<g:render template="dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
 		</tr>
 	<tr id="commentListId">
 		<g:render template="commentList" model="['asset':assetEntity, 'prefValue': prefValue]" ></g:render>
@@ -167,3 +158,13 @@ $(document).ready(function() {
 		</tr>
 	</table>
 </g:form>
+
+<script type="text/javascript">
+$(document).ready(function() { 
+	var assetType = "${assetEntity.assetType}"
+
+	EntityCrud.toggleAssetTypeFields( assetType );
+
+	changeDocTitle('${escapedName}');
+});
+</script>

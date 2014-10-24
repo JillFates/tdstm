@@ -38,11 +38,7 @@
 	<input type="hidden" id="currentAssetType" 		name="currentAssetType" value="${currentAssetType}"/>
 
 	<%-- Used to track dependencies added and deleted --%>
-	<input type="hidden" id="deletedDepId" 			name="deletedDep" value =""/>
-	<input type="hidden" id="edit_dependentAddedId" name="addedDep" value ="0"/>
-	<input type="hidden" id="edit_dependentCount" 	name="dependentCount" value="${dependentAssets?.size()}"/>
-	<input type="hidden" id="edit_supportAddedId" 	name="addedSupport" value ="0"/>
-	<input type="hidden" id="edit_supportCount" 	name="supportCount" value="${supportAssets?.size()}"/>
+	<g:render template="../assetEntity/dependentHidden" />
 
 	<%-- Holds original values of the various SELECTS --%>
 	<input type="hidden" id="hiddenModel"        name="modelId" value="${assetEntityInstance?.model?.id}">
@@ -494,7 +490,7 @@
 </g:form>
 
 <script type="text/javascript">
-// Run when Document Ready
+// Run when Document Ready and JQuery available
 ( function($) {
 	//$(document).ready( function() {
 		currentMenuId = "#assetMenu";

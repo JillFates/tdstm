@@ -173,12 +173,6 @@ var EntityCrud = ( function($) {
 		return val;
 	};
 
-	// Common method to capitalize the first letter of a string
-	// TODO : refactor this to shared lib
-	pub.capitalize = function(str) {
-		return str.charAt(0).toUpperCase() + str.substring(1);
-	}
-
 	// Creates a Select2 control for an Asset Name selector used in Depenedencies
 	pub.assetNameSelect2 = function(element) {
 		element.select2( {
@@ -242,9 +236,9 @@ var EntityCrud = ( function($) {
 				var roomId = pub.selectOptionSelected(rmCtrl);
 				var sOrT = (n=='S' ? 'source' : 'target');
 				var elPrefix = '#'+sOrT;
-				var rbcName = rackBlade.toLowerCase()+pub.capitalize(sOrT)+'Id';
-				var newrbcName = "new" + pub.capitalize(rbcName);
-				var oldrbcName = "old" + pub.capitalize(rbcName);
+				var rbcName = rackBlade.toLowerCase()+tdsCommon.capitalize(sOrT)+'Id';
+				var newrbcName = "new" + tdsCommon.capitalize(rbcName);
+				var oldrbcName = "old" + tdsCommon.capitalize(rbcName);
 				var rackBladeCtrl = $('#'+rbcName);
 				var rackBladePosCtrl = $(elPrefix+rackBlade+'PositionId');
 				switch(roomId) {
@@ -978,6 +972,7 @@ var EntityCrud = ( function($) {
 				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
 				return false;
 		}
+
 	};
 
 	// Private method called by fetchAssetCreateView to present the various asset create modal window
@@ -1052,6 +1047,179 @@ var EntityCrud = ( function($) {
 		}
 	};
 
+	// Used to dynamically add a new dependency row to the dependency formin either support or dependent tables (see _dependent.gsp)
+	// @param supportDepend - the dependency type [support|dependent]
+	// @param forWhom - used to indicate edit or create? views
+	pub.addAssetDependencyRow = function(supportDepend) {
+		var addedCounter = $("#"+supportDepend+"Added");
+		if (addedCounter.length==0)
+			console.log('EntityCrud.addAssetDependencyRow() unable to locate #'+supportDepend+'Added');
+
+		var rowNum = addedCounter.val();
+
+		// We tick negatively so that new dependencies have negative id suffix vs actual (positive) ids for existing dependencies
+		addedCounter.val(parseInt(rowNum)-1);	
+
+		var fieldSuffix = supportDepend+"_"+rowNum;
+		var rowId='row_'+supportDepend.substring(0,1)+'_'+rowNum;
+
+		// Update all of the properties names that are from _dependentAdd.gsp to include the new row information
+		var rowData = $("#assetDependencyRow tr").html()
+			.replace(/FIELD_SUFFIX/g, fieldSuffix)
+			.replace(/ROW_ID/g, rowId);
+
+		// Stuff the new row html into the table
+		var dependencyList = $('#'+supportDepend+'List');
+		if (dependencyList.length)
+			dependencyList.append("<tr id='"+rowId+"'>"+rowData+'</tr>');
+		else
+			console.log('EntityCrud.addAssetDependencyRow() unable to locate #'+supportDepend+'List');
+
+		// Initialize some of the newly created form fields
+		$("#comment_"+fieldSuffix).val('');
+		$("#dep_comment_"+fieldSuffix).val('');
+		$("#depComment_"+fieldSuffix).dialog({ autoOpen: false});
+		
+		// Update the asset select control
+		var assetSelect = $("#dep_"+fieldSuffix);
+		if (assetSelect.length) {
+			assetSelect.addClass("scrollSelect");
+			assetSelect.attr("data-asset-type", $("#entity_"+fieldSuffix).val());
+			if (!isIE7OrLesser) {
+				pub.assetNameSelect2( assetSelect );
+			}
+		} else {
+			console.log('EntityCrud.addAssetDependencyRow() unable to locate #dep_'+fieldSuffix);
+		}		
+
+	};
+
+	// Used to delete a row from the support or dependent row in the edit/create dependency lists
+	// @param rowDomId - the DOM id for the row in the table
+	// @param forWhomId - the supportAdded|dependAdded form variable that contains the counter?
+	//pub.deleteAssetDependencyRow = function( rowDomId, forWhomId ) {
+	pub.deleteAssetDependencyRow = function( rowDomId ) {
+		$("#"+rowDomId).remove();
+
+		// If row being deleted is a previousl persisted dependency (suffix > 0) then need to add the id to the delete list
+		var id = rowDomId.split('_')[3];
+		if (id && parseInt(id)>0) {
+			var deletedDepList = $("#deletedDep");
+			var ddVal = deletedDepList.val();
+			deletedDepList.val(( ddVal ? ddVal+',' : '') + id);
+		}
+		// Note that we never tick the addedCounter because if there were a combination of rows added, deleted, added we don't want to duplicate any
+	};
+
+	/**
+	 * Used to update the selection of the move bundle when the user selects a new asset
+	 * @param assetId - the id of the asset the user selected 
+	 * @param depId
+	 */
+	pub.updateDependentBundle = function(assetId, assetDomId, assetBundleId){
+		var splittedDep = assetDomId.split("_");
+		jQuery.ajax({
+			url: tdsCommon.createAppURL('/assetEntity/getChangedBundle'),
+			data: {'assetId':assetId, 'dependentId':splittedDep[2], 'type':splittedDep[1]},
+			type:'POST',
+			success: function(resp) {
+				$("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]).val(resp.id);
+				pub.changeDependentBundleColor(assetDomId, assetBundleId, resp.id, '');
+			}
+		});
+	};
+
+	pub.changeDependentBundleColor = function(depId, assetId, assetBundleId, status) {
+		var splittedDep = depId.split("_");
+		var bundleObj = $("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]);
+		var status = status != '' ? status : $("#status_"+splittedDep[1]+"_"+splittedDep[2]).val();
+		var assetId = assetId != '' ? assetId : bundleObj.val();
+		bundleObj.removeAttr("class").removeAttr("style");
+		
+		if (assetId != assetBundleId && status == 'Validated') {
+			bundleObj.css('background-color','red');
+		} else {
+			if(status != 'Questioned' && status != 'Validated')
+				bundleObj.addClass('dep-Unknown');
+			else
+				bundleObj.addClass('dep-'+status);
+		}
+	};
+
+	/**
+	 * Used to open the Comment dialog for a specific Asset Dependency
+	 * @param dialogId
+	 */
+	pub.openDepCommentDialog = function(typeAndId) {
+		// The typeAndId id is formatted as Type_DependencyID
+		var type = typeAndId.split('_')[0];
+		var rowNo = typeAndId.split('_')[1];
+		var modal = $('#depCommentDialog');
+
+		var suffix = type+'_'+rowNo;
+		var hiddenInput = $('#comment_'+suffix);
+		var textarea = $('#depCommentTextarea');
+		// Populate the textarea from the hidden field
+		if (! hiddenInput.val())
+			hiddenInput.val('');
+		textarea.val(hiddenInput.val());
+
+		// Save the type/id back so the window know which dependency to update on close
+		$('#depCommentType').val(type);
+		$('#depCommentRowNo').val(rowNo);
+		
+		var depAssetSelect = $('#asset_'+suffix);
+		var depAssetText;
+		if (!isIE7OrLesser) {
+			depAssetText = depAssetSelect.select2('data').text;
+		} else {
+			depAssetText = depAssetSelect.find('option:selected').text();
+		}
+		var title = 'Comment for ' + depAssetText + ' (' + tdsCommon.capitalize(type) + ')';
+
+		modal.dialog('option', 'width', 'auto');
+		modal.dialog('option', 'position', 'absolute');
+		modal.dialog('option', 'title', title);
+		modal.dialog('open'); 
+		textarea.focus();
+	};
+
+	/**
+	 * Used to update a particular Asset Dependency after the user closes the Dependency Comment modal dialog
+	 * @param dialogId - the DOM id of the modal dialog
+	 * @param textareaId - the DOM id of the textarea
+	 * @param hiddenInputId - the DOM id of the hidden input that is used to pass the comment value as part of the post
+	 * @param iconLinkId - the DOM id of the A tag that contains the icon that is changed accordingly
+	 */
+	pub.onDepCommentDialogClose = function() {
+		var modal = $('#depCommentDialog');
+		var type = $('#depCommentType').val();
+		var rowNo = $('#depCommentRowNo').val();
+		var textarea = $('#depCommentTextarea');
+
+		var hiddenInput = $('#comment_'+type+'_'+rowNo);
+
+		hiddenInput.val(textarea.val());
+		modal.dialog('close');
+
+		// Update the icon based on if there is content
+		var iconMode = hiddenInput.val() ? 'edit' : 'add';
+		$('#commLink_'+type+'_'+rowNo).html('<img border="0px" src="'+contextPath+'/icons/comment_' + iconMode + '.png">');
+	};
+
+	/**
+	 * Used to close the Asset Dependency comment without updating the input hidden field
+	 * @param dialogId - the DOM id of the modal dialog
+	 * @param textareaId - the DOM id of the textarea
+	 */
+	pub.onDepCommentDialogCancel = function() {
+		var modal = $('#depCommentDialog');
+		var textarea = $('#depCommentTextarea');
+		modal.dialog('close');
+		textarea.val('');
+	};
+
+
 	//
 	// Return the pub object to make available to the public
 	//
@@ -1100,54 +1268,6 @@ function isValidDate ( date ) {
 		returnVal  =  false;
 	}
 	return returnVal;
-}
-
-// Used to dynamically add a new dependency row to the dependency form table
-// @param type - the dependency type [support|dependent]
-// @param forWhom - used to indicate edit or create? views
-function addAssetDependency (type, forWhom) {
-	var rowNo = $("#"+forWhom+"_"+type+"AddedId").val();
-	var typeRowNo = type+"_"+rowNo;
-	var rowData = $("#assetDependencyRow tr").html()
-		.replace(/dataFlowFreq/g,"dataFlowFreq_"+typeRowNo)
-		.replace(/asset/g,"asset_"+typeRowNo)
-		.replace(/dependenciesId/g,"dep_"+typeRowNo+"_"+forWhom)
-		.replace(/dtype/g,"dtype_"+typeRowNo)
-		.replace(/status/g,"status_"+typeRowNo)
-		.replace(/bundles/g,"moveBundle_"+typeRowNo)
-		.replace(/entity/g,"entity_"+typeRowNo)
-		.replace(/aDepComment/g,"comment_"+typeRowNo)
-		.replace(/dep_comment/g,"dep_comment_"+typeRowNo)
-		.replace(/depComment/g,"depComment_"+typeRowNo)
-		.replace(/commLink/g,"commLink_"+typeRowNo);
-	$("#comment_"+typeRowNo).val('')
-	$("#dep_comment_"+typeRowNo).val('')
-	if (type=="support") {
-		$("#"+forWhom+"SupportsList").append("<tr id='row_s_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow('row_s_"+rowNo+"', 'edit_supportAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
-	} else {
-		$("#"+forWhom+"DependentsList").append("<tr id='row_d_"+rowNo+"'>"+rowData+"<td><a href=\"javascript:deleteRow(\'row_d_"+rowNo+"', 'edit_dependentAddedId')\"><span class='clear_filter'>X</span></a></td></tr>")
-	}
-	$("#dep_"+typeRowNo+"_"+forWhom).addClass("scrollSelect");
-
-	$("#dep_"+typeRowNo+"_"+forWhom).attr("data-asset-type", $("#entity_"+typeRowNo).val())
-	
-	if (!isIE7OrLesser) {
-		EntityCrud.assetNameSelect2( $("#dep_"+typeRowNo+"_"+forWhom) );
-	}
-	
-	$("#depComment_"+typeRowNo).dialog({ autoOpen: false})
-
-	$("#"+forWhom+"_"+type+"AddedId").val(parseInt(rowNo)-1)	
-}
-
-function deleteRow ( rowId, forWhomId ) {
-	$("#"+rowId).remove()
-	var id = rowId.split('_')[3]
-
-	if(id)
-		$("#deletedDepId").val(( $("#deletedDepId").val() ? $("#deletedDepId").val()+"," : "") + id)
-	else
-		$("#"+forWhomId).val(parseInt($("#"+forWhomId).val())+1)
 }
 
 function updateAssetTitle ( type ) {
@@ -1292,7 +1412,7 @@ function selectAll(){
 		isFirst = true;
 	}
 }
-function changeMoveBundle(assetType,totalAsset,assignBundle){
+function changeMoveBundle(assetType, totalAsset, assignBundle) {
 	if(!assignBundle){
 		$("#saveBundleId").attr("disabled", "disabled");
 	}
@@ -1330,7 +1450,6 @@ function submitMoveForm(){
 		}
 	});
 }
-
 
 function updateToRefresh(){
 	jQuery.ajax({
@@ -1370,9 +1489,9 @@ function deleteAssets(action){
 		if(assetId)  
 			assetArr.push(assetId)
   })
-  	if(!assetArr){
+  	if(!assetArr) {
 		alert('Please select the Asset');
-	}else{
+	} else {
 		if(confirm("You are about to delete all of the selected assets for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel.")){
 			jQuery.ajax({
 			url: tdsCommon.createAppURL('/assetEntity/deleteBulkAsset'),
@@ -1718,36 +1837,6 @@ function shufflePerson(sFrom,sTo){
 	}
 }
 
-function changeMovebundle(assetId, depId, assetBundelId){
-	var splittedDep = depId.split("_")
-	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/getChangedBundle'),
-		data: {'assetId':assetId, 'dependentId':splittedDep[2], 'type':splittedDep[1]},
-		type:'POST',
-		success: function(resp) {
-			$("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2]).val(resp.id)
-			changeMoveBundleColor(depId,assetBundelId,resp.id,'')
-		}
-	});
-}
-
-function changeMoveBundleColor(depId,assetId,assetBundleId, status){
-	var splittedDep = depId.split("_")
-	var bundleObj = $("#moveBundle_"+splittedDep[1]+"_"+splittedDep[2])
-	var status = status != '' ? status : $("#status_"+splittedDep[1]+"_"+splittedDep[2]).val()
-	var assetId = assetId != '' ? assetId : bundleObj.val()
-	bundleObj.removeAttr("class").removeAttr("style")
-	
-	if(assetId != assetBundleId && status == 'Validated'){
-		bundleObj.css('background-color','red')
-	} else {
-		if(status != 'Questioned' && status != 'Validated')
-			bundleObj.addClass('dep-Unknown')
-		else
-			bundleObj.addClass('dep-'+status)
-	}
-}
-
 $(document).ready(function() {
 	$(window).keydown(function(event){
 		if(event.keyCode == 13) {
@@ -1784,31 +1873,7 @@ function toogleRack(value, source){
 	else
 		$(".newRack"+source).hide()
 }
-function openCommentDialog(id){
-	 var type = id.split("_")[1]
-	 var rowNo = id.split("_")[2]
-	 $("#"+id).dialog('option', 'width', 'auto')
-	 $("#"+id).dialog('option', 'position', 'absolute');
-	 $("#"+id).dialog('option', 'title', type+" Comment");
-	 $("#"+id).addClass('static-dialog');
-	 $("#"+id).dialog('open');
-	 if(!$("#comment_"+type+"_"+rowNo).val()){
-		 $("#comment_"+type+"_"+rowNo).val('')
-		 $("#dep_comment_"+type+"_"+rowNo).val('')
-	 } else {
-		 $("#dep_comment_"+type+"_"+rowNo).val($("#comment_"+type+"_"+rowNo).val())
-	 }
-}
 
-function saveDepComment(textId, hiddenId, dialogId, commLink){
-	$("#"+hiddenId).val($("#"+textId).val())
-	$("#"+dialogId).dialog("close")
-	if($("#"+hiddenId).val()){
-		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/icons/comment_edit.png">')
-	}else {
-		$("#"+commLink).html('<img border="0px" src="'+contextPath+'/icons/comment_edit.png">')
-	}
-}
 function changeBundleSelect(){
 	if($("#plannedMoveBundleList").val()){
 		$("#saveBundleId").removeAttr("disabled");
@@ -1841,6 +1906,7 @@ function showSelect(column, type, key){
 	columnPref=column
 }
 
+// TODO : JPM 10/2014 : This click function should ONLY be applied to certain pages. What is it for?
 $(document).click(function(e){
 	var customizeCount = $("#customizeFieldCount").val()
 	if(!customizeCount)

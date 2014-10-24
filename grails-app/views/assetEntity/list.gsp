@@ -198,12 +198,8 @@
 			</div>
 		</div> <%-- End of Body --%>
 		<g:render template="modelDialog"/>
-		<div id="createEntityView" style="display: none;"></div>
-		<div id="showEntityView" style="display: none;"></div>
-		<div id="editEntityView" style="display: none;"></div>
-		<div id="editManufacturerView" style="display: none;"></div>
-		<div id="cablingDialogId" style="display: none;"></div>
-		<g:render template="newDependency" model="['forWhom':'Server', entities:servers, moveBundleList:moveBundleList]"></g:render>
+		<g:render template="../assetEntity/entityCrudDivs" />
+		<g:render template="../assetEntity/dependentAdd" />
         <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
