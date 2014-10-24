@@ -988,7 +988,8 @@ var EntityCrud = ( function($) {
 	};
 	pub.populateAssetEditView = function(fieldHelpType, source, rack, roomId, location, position, forWhom) {
 		updateAssetTitle(fieldHelpType);
-		updateAssetInfo(source, rack, roomId, location, position, forWhom);
+		if (fieldHelpType=='Device')
+			updateAssetInfo(source, rack, roomId, location, position, forWhom);
 
 		if(!isIE7OrLesser)
 			getHelpTextAsToolTip(fieldHelpType);
