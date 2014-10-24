@@ -57,7 +57,7 @@ describe('Database', function(){
 
     it('should have Database Detail as title', function(){
       var createDBModal = new DBCreateModal();
-      expect(createDBModal.createModalTitle.getText()).toEqual('Database Detail');
+      expect(createDBModal.createModalTitle.getText()).toEqual('Database Create');
     });
     
     describe('Buttons',function(){

@@ -27,8 +27,8 @@ ViewAsset.prototype.isViewModalClosed = function(){
 ViewAsset.prototype.isViewModalOpened = function(){
   var that = this;
   return browser.wait(function(){
-    return that.viewModal.$('div.dialog').getAttribute('ondblclick').then(function(val){
-      return val !== null;
+    return that.viewModal.$('div.dialog').isPresent().then(function(valor){
+      return valor;
     });
   }).then(function(){
      return true;

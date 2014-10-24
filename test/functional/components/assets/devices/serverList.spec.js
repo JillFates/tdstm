@@ -44,7 +44,7 @@ describe('Server list', function(){
 
       it('should has as title create server', function(){
         var serverModal = new CreateServerModal();
-        expect(serverModal.createModalTitle.getText()).toEqual('Device Detail');
+        expect(serverModal.createModalTitle.getText()).toEqual('Device Create');
       });
 
       it('should create a server and save and view',function(){

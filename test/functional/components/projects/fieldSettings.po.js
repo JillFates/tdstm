@@ -35,7 +35,7 @@ var FieldSettings = function () {
 		return browser.driver.findElement(by.css(selector));
 	};
 	this.clickEdit = function () {
-		var buttons = browser.driver.findElements(by.css(this.editButtonCss));
+		browser.driver.findElements(by.css(this.editButtonCss));
 	};
 	this.getUpdateButtons = function () {
 		return browser.driver.findElement(by.css(this.updateButtonsDivCss));

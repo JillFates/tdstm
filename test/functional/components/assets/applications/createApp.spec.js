@@ -39,7 +39,7 @@ describe('createApp', function(){
     
   it('should validate Create Application modal title', function(){
     var appModal = new CreateAppModal();
-    expect(appModal.createModalTitle.getText()).toEqual('Application Detail');
+    expect(appModal.createModalTitle.getText()).toEqual('Application Create');
   });
 
   describe('Create Application Modal', function(){

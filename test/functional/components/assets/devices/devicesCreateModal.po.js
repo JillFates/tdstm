@@ -4,7 +4,7 @@ var DeviceCreateModal = function(){
   this.altNameLabel = this.createModal.$('[for="shortName"]');
   this.altNameField = this.createModal.element(by.id('shortName'));
   this.modelTypeField = this.createModal.element(by.id('assetTypeSelect'));
-  this.modelTypeFieldInput = this.createModal.$('#modelEditId input');
+  this.modelTypeFieldInput = this.createModal.$('#modelEditId input[id^="s2id_autogen"]');
   this.modelTypeOptions = this.modelTypeField.$$('option');
   this.modelTypeOptionSelected = this.modelTypeField.$('option:checked');
   this.saveBtn = this.createModal.$('[onclick="EntityCrud.saveToShow($(this), \'DEVICE\'); "]');

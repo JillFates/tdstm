@@ -32,7 +32,7 @@ describe('Event List',function(){
         it('should have "Project:*" as label',function(){
 
         });
-        xIt('should be required',function(){
+        xit('should be required',function(){
 
         });
         xit('should have existing projects listed',function(){

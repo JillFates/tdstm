@@ -1,8 +1,8 @@
 'use strict';
 var CreateAsset = function(){
-  this.createModal = $('[aria-labelledby="ui-id-2"]');
+  this.createModal = $('[aria-labelledby="ui-id-1"]');
   this.createModalForm = this.createModal.element(by.id('createEditAssetForm'));
-  this.createModalTitle = this.createModal.element(by.id('ui-id-2'));
+  this.createModalTitle = this.createModal.element(by.id('ui-id-1'));
   this.closeCreateModalBtn = this.createModal.$('.ui-dialog-titlebar-close');
   this.createModalButtons = this.createModal.$$('span.button input');
   this.saveLogStgBtn = this.createModal.$('[onclick="saveToShow($(this),\'Logical Storage\')"]');
