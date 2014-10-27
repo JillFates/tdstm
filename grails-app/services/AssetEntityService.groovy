@@ -2081,7 +2081,10 @@ class AssetEntityService {
 
 			//set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
-			exportType = exportType.substring(0,exportType.indexOf("Master_template.xls"))
+			def masterIndex = exportType.indexOf("Master_template.xls")
+			if (masterIndex != -1) {
+				exportType = exportType.substring(0, masterIndex)
+			}
 
 			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd")
 			SimpleDateFormat stdDateFormat = new SimpleDateFormat("MM-dd-yyyy")
