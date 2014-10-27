@@ -1301,6 +1301,11 @@ function showModelView (e, forWhom) {
 	}
 }
 
+function showEditDeviceViewFromAudit(assetClass, entityId) {
+	closeEditAuditView();
+	EntityCrud.showAssetEditView(assetClass, entityId);
+}
+
 //DEPRECATED
 function showComment (commentId , action, commentType) {
 	console.log('DEPRECATED: showComment.');
@@ -1533,6 +1538,11 @@ function getAuditDetails(redirectTo, assetType, value){
 			$("#auditDetailViewId").show()
 		}}
 	)
+}
+
+function closeEditAuditView() {
+	$("#auditDetailViewId").html('')
+	$("#auditDetailViewId").hide()
 }
 
 function editAudit(redirectTo, source, assetType, value){

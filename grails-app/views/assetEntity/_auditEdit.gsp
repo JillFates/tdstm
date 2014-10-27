@@ -170,7 +170,7 @@
 <div class="buttons">
 	<input type="button" class="edit" value="Update" onclick="updateAudit()" /> 
 	<input type="button" class="edit" value="Delete" onclick="deleteAudit(${assetEntityInstance.id},'server')" /> 
-	<input type="button" class="edit" value="More..." onclick="EntityCrud.showAssetEditView('${assetEntityInstance.assetClass}', ${assetEntityInstance?.id})" /> 
+	<input type="button" class="edit" value="More..." onclick="showEditDeviceViewFromAudit('${assetEntityInstance.assetClass}', ${assetEntityInstance?.id})" /> 
 </div><br>
 </g:form>
 <div id="modelAuditId">
