@@ -63,7 +63,7 @@
 			<%-- Status SELECT --%>
 			<td>
 				<g:select name="status_FIELD_SUFFIX" from="${dependencyStatus}" optionValue="value"
-					onchange="changeMoveBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)">
+					onchange="EntityCrud.changeDependentBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)">
 				</g:select>
 			</td>
 

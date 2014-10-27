@@ -21,7 +21,7 @@
 			</td>
 			<td>
 				<g:select name="bundles" from="${moveBundleList}" class="depBundle" optionKey="id" optionValue="name" 
-					noSelection="${['':'Please select']}" onchange="changeMoveBundleColor(this.name,this.value, jQuery('#moveBundle').val(),'')"
+					noSelection="${['':'Please select']}" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value, jQuery('#moveBundle').val(),'')"
 				></g:select>
 			</td>
 			<td nowrap="nowrap">
@@ -39,7 +39,7 @@
 			</td>
 			<td>
 				<g:select name="status" from="${dependencyStatus?.value}" optionValue="value"
-					onchange="changeMoveBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)"
+					onchange="EntityCrud.changeDependentBundleColor(this.name,'', jQuery('#moveBundle').val(),this.value)"
 				></g:select>
 			</td>
 		</tr>

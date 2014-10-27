@@ -58,17 +58,17 @@
 						<%-- Used to show bundle colors based on bundleConflicts --%>
 						<g:if test="${supportBundle!=assetEntity.moveBundle && support.status == 'Validated' }" >
 							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
-									optionKey="id" optionValue="name" style="background-color: red" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"/>
+									optionKey="id" optionValue="name" style="background-color: red" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"/>
 						</g:if>
 						<g:elseif test="${supportBundle!=assetEntity.moveBundle }" >
 							<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
-								optionKey="id" optionValue="name" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')" 
+								optionKey="id" optionValue="name" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')" 
 								class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle"
 							></g:select>
 						</g:elseif>
 						<g:else>
 							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
-								optionKey="id" optionValue="name" onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"
+								optionKey="id" optionValue="name" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"
 								class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle">
 							</g:select>	
 						</g:else>
@@ -83,7 +83,7 @@
 					<%-- Status --%>
 					<td>
 						<g:select name="status_support_${support.id}" value="${support.status}" from="${dependencyStatus}" 
-							optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
+							optionValue="value" onchange="EntityCrud.changeDependentBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
 					</td>
 
 					<%-- Delete Row Icon --%>
@@ -162,14 +162,14 @@
 							<g:select from="${moveBundleList}" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
 								optionKey="id" optionValue="name" 
 								class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status } depBundle"
-								onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"
+								onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"
 							></g:select>
 						</g:elseif>
 						<g:else>
 							<g:select from="${moveBundleList}" class="depBundle" name="moveBundle_dependent_${dependent.id}" value="${depBundle?.id}" 
 								optionKey="id" optionValue="name" 
 								class="dep-${(dependent.status != 'Questioned' && dependent.status != 'Validated') ? 'Unknown' : dependent.status } depBundle"
-								onchange="changeMoveBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"
+								onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity.moveBundle?.id}','')"
 							></g:select>
 						</g:else>
 					</td>
@@ -183,7 +183,7 @@
 					<%-- Dependency Status --%>
 					<td>
 						<g:select name="status_dependent_${dependent.id}" value="${dependent.status}" from="${dependencyStatus}" 
-							optionValue="value" onchange="changeMoveBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
+							optionValue="value" onchange="EntityCrud.changeDependentBundleColor(this.name,'','${assetEntity.moveBundle?.id}',this.value)"/>
 					</td>
 
 					<%-- Delete Row Icon --%>
