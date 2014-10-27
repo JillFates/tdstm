@@ -280,11 +280,11 @@ class DeviceService {
 				throw new DomainUpdateException("The model specified was not found")
 			}
 		} else {
+			device.model = null
 			if (manuId) {
 				// Attempt to assign just the manufacturer and asset type to the device
 				def manu = Manufacturer.get(manuId)
 				if (manu) {
-					device.model = null
 					device.manufacturer = manu
 					// assetType was applied in the bind above
 				} else {

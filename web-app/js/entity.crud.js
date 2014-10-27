@@ -674,16 +674,12 @@ var EntityCrud = ( function($) {
 			$('#assetTypeFilterUnSet').hide();
 			$('#currentAssetType').val(event.val);
 			modelFilteringData.assetType = event.val;
-			if (selectedModel != null && selectedModel.assetType != null && event.val != selectedModel.assetType.toString()) {
-				selectedModel = {
-					"id" : null,
-					"text" : null,
-					"assetType" : event.val,
-					"manufacturerId" : selectedModel.manufacturerId,
-					"manufacturerName" : selectedModel.manufacturerName
+			if ((selectedModel != null && selectedModel.assetType != null && event.val != selectedModel.assetType.toString()) || (event.val == null)) {
+				if (selectedModel != null) {
+					clearSelectedModel(selectedModel.manufacturerId, selectedModel.manufacturerName, event.val);
+				} else {
+					clearSelectedModel(null, null, event.val);
 				}
-				
-				$("#modelSelect").select2('val', '');
 			}
 		});
 		
@@ -734,7 +730,6 @@ var EntityCrud = ( function($) {
 				$("#assetTypeSelect").select2('data', {"id":at, "text":at});
 			} else {
 				clearSelectedModel(selectedModel.manufacturerId);
-				$('#hiddenModel').val('');
 			}
 		});
 		
@@ -769,22 +764,23 @@ var EntityCrud = ( function($) {
 			modelFilteringData.manufacturerId = event.val;
 			$('#hiddenManufacturer').val(event.val);
 			
-			if (selectedModel != null && selectedModel.manufacturerId != null && event.val != selectedModel.manufacturerId.toString()) {
-				clearSelectedModel(event.val);
+			if ((selectedModel != null && selectedModel.manufacturerId != null && event.val != selectedModel.manufacturerId.toString()) || (event.val == null)) {
+				clearSelectedModel(event.val, '', null);
 			}
 		});
 	};
 
-	var clearSelectedModel = function(manufacturerId) {
+	var clearSelectedModel = function(manufacturerId, manufacturerName, assetType) {
 		selectedModel = {
 			"id" : null,
 			"text" : null,
-			"assetType" : null,
-			"manufacturerId" : event.val,
-			"manufacturerName" : null
+			"assetType" : assetType,
+			"manufacturerId" : manufacturerId,
+			"manufacturerName" : manufacturerName
 		}
 		
-		$("#modelSelect").select2('val', '');	
+		$("#modelSelect").select2('val', '');
+		$('#hiddenModel').val('');
 	}
 	
 	pub.setManufacturerValues = function(modelId, modelName, assetType, manufacturerId, manufacturerName) {
