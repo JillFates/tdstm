@@ -1111,7 +1111,7 @@ var EntityCrud = ( function($) {
 		$("#depComment_"+fieldSuffix).dialog({ autoOpen: false});
 		
 		// Update the asset select control
-		var assetSelect = $("#dep_"+fieldSuffix);
+		var assetSelect = $("#asset_"+fieldSuffix);
 		if (assetSelect.length) {
 			assetSelect.addClass("scrollSelect");
 			assetSelect.attr("data-asset-type", $("#entity_"+fieldSuffix).val());
@@ -1198,12 +1198,14 @@ var EntityCrud = ( function($) {
 		$('#depCommentType').val(type);
 		$('#depCommentRowNo').val(rowNo);
 		
+		var depAssetText='Unselected';
 		var depAssetSelect = $('#asset_'+suffix);
-		var depAssetText;
-		if (!isIE7OrLesser) {
-			depAssetText = depAssetSelect.select2('data').text;
-		} else {
-			depAssetText = depAssetSelect.find('option:selected').text();
+		if (depAssetSelect.length && depAssetSelect.select2('data') != null) {
+			if (!isIE7OrLesser) {
+				depAssetText = depAssetSelect.select2('data').text;
+			} else {
+				depAssetText = depAssetSelect.find('option:selected').text();
+			}
 		}
 		var title = 'Comment for ' + depAssetText + ' (' + tdsCommon.capitalize(type) + ')';
 
