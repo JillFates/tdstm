@@ -634,6 +634,32 @@ var EntityCrud = ( function($) {
 		}
 		return true;	
 	};	
+
+	// Used to format the results of the model shown in the Model select (below) so that validated models are emphasized with BOLD and the other italics
+	var modelSelectFormatResult = function(item) {
+		if (item.text) {
+			if (item.isValid) {
+				return '<b>'+item.text+'</b>';
+			} else {
+				return '<i>'+item.text+'</i>';
+			}
+		} else {
+			return '';
+		}
+	};
+	// Used to format the item selected of the model in the Model select (below) so that validated models are emphasized with BOLD and the other italics
+	var modelSelectFormatSelection = function(item) {
+		if (item.text) {
+			if ( (('isValid' in item) && item.isValid) || item.text.indexOf('?') == -1 ) {
+				return '<b>'+item.text+'</b>';
+			} else {
+				return '<i>'+item.text+'</i>';
+			}
+		} else {
+			return '';
+		}
+	}; 
+
 	// Initializes the various controls for the selection of manufacturer and model with the assetType filter
 	pub.initializeUI = function(modelId, modelName, manufacturerId, manufacturerName) {
 
@@ -689,6 +715,11 @@ var EntityCrud = ( function($) {
    			dropdownAutoWidth: true,
 		    width: "80%",
 		    allowClear: true,
+			// Specify format function for dropdown item
+			formatResult: modelSelectFormatResult,
+			// Specify format function for selected item
+			formatSelection: modelSelectFormatSelection,
+			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
 		    ajax: {
 		        url: tdsCommon.createAppURL('/assetEntity/modelsOf'),
 				quietMillis: quietMillis,
@@ -699,13 +730,13 @@ var EntityCrud = ( function($) {
 		        },
 		        results: function (data, page) {
 		            return {results: data.data.models};
-		        }
+		        },
 		    },
 		    initSelection: function(element, callback) {
 		    	if (modelId != "") {
 		    		callback({id: modelId, text : modelName});
 		    	}
-		    }
+		    },
 		}).select2('val', []);
 		
 		$('#modelSelect').on("change", function(event) {
@@ -725,7 +756,9 @@ var EntityCrud = ( function($) {
 
 				pub.toggleAssetTypeFields(at);
 				
-				$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':selectedModel.name});
+				// Put trailing questionmark for non-validated models
+				var modelText = selectedModel.name + (selectedModel.isValid ? '' : ' ?');
+				$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':modelText});
 				$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
 				$("#assetTypeSelect").select2('data', {"id":at, "text":at});
 			} else {
@@ -739,6 +772,7 @@ var EntityCrud = ( function($) {
 			dropdownAutoWidth: true,
 		    width: "80%",
 		    allowClear: true,
+			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
 		    ajax: {
 		    	url: tdsCommon.createAppURL('/assetEntity/manufacturer'),
 		    	quietMillis: quietMillis,

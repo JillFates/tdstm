@@ -44,6 +44,7 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.ExceptionUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
@@ -1025,9 +1026,13 @@ class AssetEntityService {
 			device = new AssetEntity()
 			device.assetType = ''	// clear out the default
 		}
-		
-		def assetType = device.assetType
 
+		// Stick questionmark on the end of the model name if it is unvalidated
+		String modelName = device.model?.modelName ?: 'Undetermined'
+		if (! device.model?.isValid())
+			modelName += ' ?'
+
+		def assetType = device.assetType
 		model.putAll( [
 			assetEntityInstance: device,
 			assetType: assetType,
@@ -1035,6 +1040,7 @@ class AssetEntityService {
 			manufacturers: getManufacturers( assetType ), 
 			models: getModelSortedByStatus( device.manufacturer ),
 			// TODO : JPM 9/2014 : Determine what nonNetworkTypes is used for in the view (clean up if unnecessary)
+			modelName: modelName,
 			nonNetworkTypes: AssetType.getNonNetworkTypes(), 	
 			railTypeOption: getAssetRailTypeOptions(),
 			// TODO : JPM 9/2014 : determine if the views use source/targetRacks - I believe these can be removed as they are replaced by source/targetRackSelect 
@@ -3146,7 +3152,7 @@ class AssetEntityService {
 			manufacturer = Manufacturer.read(manuId)
 		}
 
-		def hql = new StringBuffer( 'SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName FROM Model m JOIN m.manufacturer as man')
+		def hql = new StringBuffer( 'SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName, m.modelStatus FROM Model m JOIN m.manufacturer as man')
 		def params = []
 
 		StringBuffer where = new StringBuffer('')
@@ -3197,14 +3203,16 @@ class AssetEntityService {
 		// log.debug "modelsOf() manufacturerId=$manufacturerId, term=($term) assetType=$assetType, query=$query, params=$params"
 		def models = Model.executeQuery(query, params)
 		// log.debug "modelsOf() found ${models.size()} rows"
-		int i=0
 		int added=0
-		int max=50
+		int max=100
 		boolean hasMultiWordFilter = words.size() > 1
-		models.each { model ->
-			//if (added >= max)
-			//	return
+		for (int i=0; i < models.size(); i++) {
+			def model = models[i]
 
+			if (added >= max)
+				break
+
+			boolean isValid = (model[5] == 'valid')
 			def title = ''
 			// Construct the title based on what the user is filtering on to fill in what is unknown
 			if (!manufacturer)
@@ -3212,19 +3220,22 @@ class AssetEntityService {
 			title += model[2]
 			if (!assetType)
 				title += " (${model[1]})"
+			if (! isValid)
+				title += ' ?'
 
 			// If the user search is on multiple words then we need to match on all of them
 			if (hasMultiWordFilter && ! StringUtil.containsAll(title, words))
-				return
+				continue
 
 			// TODO : JPM 10/2014 - reduce the variable name sizes
 			result << [
-				id : model[0],
-				assetType : model[1],
-				manufacturerId : model[3],
-				manufacturerName : model[4],
+				id: model[0],
+				assetType: model[1],
+				manufacturerId: model[3],
+				manufacturerName: model[4],
 				name: model[2],
-				text : title
+				text: title, 
+				isValid: isValid
 			] 
 			added++
 		}

@@ -126,6 +126,14 @@ class DeviceService {
 			}
 		}
 
+		/*
+		// Stick questionmark on the end of the model name if it is unvalidated
+		String modelName = device.model?.modelName ?: 'Undetermined'
+		if (! device.model?.isValid())
+			modelName += ' ?'
+		model.modelName = modelName
+		*/
+		
 		if (params.redirectTo == "roomAudit") {
 			model << [source:params.source, assetType:params.assetType]
 		}

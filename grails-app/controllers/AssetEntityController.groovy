@@ -4227,6 +4227,7 @@ class AssetEntityController {
 			ServiceResults.unauthorized(response)
 			return
 		}
+		def x = 1/0
 		
 		def manufacturerId = params.manufacturerId
 		def assetType = params.assetType

@@ -115,6 +115,15 @@ class HtmlUtil {
 		g.createLink(map).toString()
 	}
 
+	/** 
+	 * Used to create a Grails resource
+	 * @param map of the parameters
+	 * @return A string representing the resource as HTML resource
+	 */
+	public static String resource(Map map) {
+		g.resource(map).toString()
+	}
+
 	/**
 	 * Used to create a UL list from an array list
 	 * @param List to be converted to HTML

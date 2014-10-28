@@ -43,7 +43,7 @@
 							<tr class="prop">
 								<td class="label ${config.model}  ${highlightMap.model?:''}" nowrap="nowrap"><label for="model">Model</label></td>
 								<td class="valueNW ${config.model}"><a href='javascript:showModel(${assetEntity.model?.id})' style='color:#00E'>${assetEntity.model}</a>
-								  <g:if test="${assetEntity.model?.modelStatus!='valid'}"> <span style="color: red;"><b>?</b></span></g:if>
+								  <g:if test="${! assetEntity.model?.isValid()}"> <span style="color: red;"><b>?</b></span></g:if>
 								</td>
 								<td class="label ${config.ipAddress}  ${highlightMap.ipAddress?:''}" nowrap="nowrap"><label for="ipAddress">IP1</label></td>
 								<td class="valueNW ${config.ipAddress}">${assetEntity.ipAddress}</td>

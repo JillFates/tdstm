@@ -169,17 +169,17 @@
 									<label for="model"><div id="assetTypeLabel">Device Type</div></label>
 								</td>
 								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-								<div id="modelEditId">
-									<div id="assetTypeSelectContainer" style="display:inline">
-										<select id="assetTypeSelect" name="assetType" onchange="setType(this.value, '${forWhom}')" style="width:120px" tabindex="103">
-    										<option></option>
-											<g:each in="${assetTypeOptions}" var="assetType">
-												<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
-											</g:each>
-										</select>
+									<div id="modelEditId">
+										<div id="assetTypeSelectContainer" style="display:inline">
+											<select id="assetTypeSelect" name="assetType" onchange="setType(this.value, '${forWhom}')" style="width:120px" tabindex="103">
+	    										<option></option>
+												<g:each in="${assetTypeOptions}" var="assetType">
+													<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
+												</g:each>
+											</select>
+										</div>
+										<img src="/tdstm/i/filter-unset.png" />
 									</div>
-									<img src="/tdstm/i/filter-unset.png" />
-								 </div>
 								</td>
 								<td class="label ${config.priority} ${highlightMap.priority?:''}" nowrap="nowrap">
 									<label for="priority">Priority</label>
@@ -512,7 +512,7 @@
 		EntityCrud.toggleAssetTypeFields( assetType );
 		EntityCrud.loadFormFromJQGridFilters();
 
-		EntityCrud.initializeUI("${assetEntityInstance?.model?.id}", "${assetEntityInstance?.model?.modelName}", "${assetEntityInstance.manufacturer?.id}", "${assetEntityInstance.manufacturer?.name}");
+		EntityCrud.initializeUI("${assetEntityInstance?.model?.id}", "${modelName}", "${assetEntityInstance.manufacturer?.id}", "${assetEntityInstance.manufacturer?.name}");
 
 		<g:if test="${action == 'update'}">
 			EntityCrud.setManufacturerValues("${assetEntityInstance.model?.id}", "${assetEntityInstance.model?.modelName}", "${assetEntityInstance.assetType}", "${assetEntityInstance.manufacturer?.id}", "${assetEntityInstance.manufacturer?.name}");

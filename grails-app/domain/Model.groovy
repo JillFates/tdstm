@@ -105,7 +105,8 @@ class Model {
 		'assetsCount',
 		'source',
 		'manufacturerName',
-		'aliases'
+		'aliases',
+		'isValid'
 	]
 	
 	static mapping  = {	
@@ -203,6 +204,14 @@ class Model {
 		ModelAlias.findAllByModel(this, [sort:'name'])
 	}
     
+	/**
+	 * Used to determine if the current model has been validated
+	 * @return true if is validated else false
+	 */
+   	def isValid() {
+   		return this.modelStatus == 'valid'
+   	}
+
 	/**
 	 * Used to get a ModelAlias object by name and create one (optionally) if it doesn't exist 
 	 * @param String name - name of the model alias
