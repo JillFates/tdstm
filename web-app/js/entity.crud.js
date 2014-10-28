@@ -136,9 +136,18 @@ var EntityCrud = ( function($) {
 	pub.getEditModal = function() { return $('#editEntityView'); };
 	pub.getShowModal = function() { return $('#showEntityView'); };
 
-	pub.closeCreateModal = function() { pub.getCreateModal().dialog('close'); };
-	pub.closeEditModal = function() { pub.getEditModal().dialog('close'); };
-	pub.closeShowModal = function() { pub.getShowModal().dialog('close'); };
+	pub.closeCreateModal = function() { 
+		pub.getCreateModal().dialog('close'); 
+		$('#select2-drop-mask').click();
+	};
+	pub.closeEditModal = function() { 
+		pub.getEditModal().dialog('close');
+		$('#select2-drop-mask').click();
+	};
+	pub.closeShowModal = function() { 
+		pub.getShowModal().dialog('close'); 
+		$('#select2-drop-mask').click();
+	};
 
 	// Used to access the assetType within the CRUD pages
 	pub.getAssetType = function() {
