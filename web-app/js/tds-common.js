@@ -64,7 +64,7 @@ var tdsCommon = {
 				return result;
 			}
 		});
-	}
+	},
 
 	/**
 	 * A common error response handler for the Select2 controller when using Ajax and an error occurs
@@ -76,7 +76,7 @@ var tdsCommon = {
 			window.location.href = tdsCommon.createAppURL('/auth/login');
 		}
 		return 'An error occurred during search';
-	};
+	}
 
 }
 
