@@ -280,7 +280,7 @@
 
 		<%-- Dependency Edit Block --%>
 		<tr>
-			<g:render template="../assetEntity/dependent" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
+			<g:render template="../assetEntity/dependentCreateEdit" model="[whom:'create',supportAssets:[],dependentAssets:[]]"></g:render>
 		</tr>
 		
 		<tr>

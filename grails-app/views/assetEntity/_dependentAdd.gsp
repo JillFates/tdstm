@@ -23,7 +23,7 @@
 
 			<%-- Asset Name SELECT --%>
 			<td>
-				<input type="hidden" name="asset_FIELD_SUFFIX" id="dep_FIELD_SUFFIX"  
+				<input type="hidden" name="asset_FIELD_SUFFIX" id="asset_FIELD_SUFFIX"  
 					style="width:150px"
 					onchange="EntityCrud.updateDependentBundle(this.value, this.id, 'bundles_FIELD_SUFFIX');" />
 			</td>
@@ -39,7 +39,7 @@
 			<td nowrap="nowrap">
 				<g:select name="type_FIELD_SUFFIX" from="${dependencyType}" optionValue="value"></g:select>
 
-				<g:render template="../assetEntity/dependencyComment" model="[dependency:[id:'FIELD_SUFFIX', comment:''], type:'', forWhom:'edit']"></g:render>
+				<g:render template="../assetEntity/dependentComment" model="[dependency:[id:'FIELD_SUFFIX', comment:''], type:'', forWhom:'edit']"></g:render>
 
 				<%--				
 				<input type="hidden" name="comment_FIELD_SUFFIX" id="comment_FIELD_SUFFIX" value="">

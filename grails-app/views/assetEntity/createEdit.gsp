@@ -463,7 +463,7 @@
 
 		<g:if test="${action == 'save'}">
 		<tr>
-			<g:render template="dependent" model="[whom:'create', supportAssets:[], dependentAssets:[]]"></g:render>
+			<g:render template="dependentCreateEdit" model="[whom:'create', supportAssets:[], dependentAssets:[]]"></g:render>
 		</tr>
 		</g:if><g:else>
 		<tr id="assetDependentId" class="assetDependent">

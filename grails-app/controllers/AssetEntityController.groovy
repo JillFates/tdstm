@@ -3610,6 +3610,7 @@ class AssetEntityController {
 		def returnMap = [:]
 		def project = securityService.getUserCurrentProject()
 
+		// TODO : JPM 10/2014 : Move populateDependency method to a service to avoid muliple transations just to populate a model
 
 		if (params.id && params.id.isLong()) {
 			def assetEntity = AssetEntity.findByIdAndProject( params.id.toLong(), project )
@@ -3620,23 +3621,13 @@ class AssetEntityController {
 				def dependencyType = assetEntityService.getDependencyTypes()
 				def dependencyStatus = assetEntityService.getDependencyStatuses()
 				def moveBundleList = assetEntityService.getMoveBundles(project)
-/*	
-	Removed 7/16/03 - can remove soon	
-				def assetsMap = [
-					(AssetType.APPLICATION.toString()): assetEntityService.getAssetsByType(AssetType.APPLICATION.toString()), 
-					(AssetType.DATABASE.toString()): assetEntityService.getAssetsByType(AssetType.DATABASE.toString()),
-					(AssetType.FILES.toString()): assetEntityService.getAssetsByType(AssetType.FILES.toString()), 
-					(AssetType.SERVER.toString()): assetEntityService.getAssetsByType(AssetType.SERVER.toString()),
-					(AssetType.NETWORK.toString()): assetEntityService.getAssetsByType(AssetType.NETWORK.toString()) ]
-*/				
+
 				// TODO - JPM 8/2014 - Why do we have this? Seems like we should NOT be passing that to the template...
 				def nonNetworkTypes = [AssetType.SERVER.toString(),AssetType.APPLICATION.toString(),AssetType.VM.toString(),
 					AssetType.FILES.toString(),AssetType.DATABASE.toString(),AssetType.BLADE.toString()]
 				
-
 				returnMap = [ 
 					assetClassOptions: AssetClass.getClassOptions(),
-//					assetsMap:assetsMap,
 					assetEntity: assetEntity,
 					dependencyStatus: dependencyStatus, 
 					dependencyType: dependencyType, 
@@ -3654,7 +3645,7 @@ class AssetEntityController {
 			render "An invalid asset id was submitted"
 			return
 		}
-		render(template: 'dependent', model: returnMap)
+		render(template: 'dependentCreateEdit', model: returnMap)
 	}
 
 	/**
@@ -4228,7 +4219,7 @@ class AssetEntityController {
 			return
 		}
 		def x = 1/0
-		
+
 		def manufacturerId = params.manufacturerId
 		def assetType = params.assetType
 		def term = params.term
