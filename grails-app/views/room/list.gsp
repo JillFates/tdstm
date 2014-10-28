@@ -28,16 +28,15 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />		
 	</head>
 	<body>
-
 		<input type = "hidden" id = "dstPath" name = "dstPath" value ="room"/>
 		<div class="body" style="margin-top: 10px;width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-			<g:if test="${flash.message}">
-				<div class="message">${flash.message}</div>
-			</g:if>
+
+			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
+
 			<g:if test="${flash.error}">
 				<div class="errors">${flash.error}</div>
 			</g:if>
-			<div id="messageDivId" class="message" style="display: none;"></div>
+
 			<div id="processDiv" style="display: none;">
 				<img src="../images/processing.gif" /> Merging In Progress...
 			</div>

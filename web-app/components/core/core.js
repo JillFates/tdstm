@@ -338,6 +338,32 @@ tds.core.service.AlertsService = function(rootScope, timeout) {
 
 };
 
+// Singleton used to access alerts service from non-angular code
+tds.Alerts = function() {
+
+	var addAlertMsg = function(message) {
+		var injector = angular.element('[ng-app]').injector();
+		injector.invoke(function($rootScope, alerts) {
+			alerts.addAlertMsg(message);
+			$rootScope.$apply();
+		});
+	}
+
+	var addAlert = function(obj) {
+		var injector = angular.element('[ng-app]').injector();
+		injector.invoke(function($rootScope, alerts) {
+			alerts.addAlert(obj);
+			$rootScope.$apply();
+		});
+	}
+
+	return {
+		addAlertMsg: addAlertMsg,
+		addAlert: addAlert
+	}
+
+}();
+
 
 /**
  * Application Common Data

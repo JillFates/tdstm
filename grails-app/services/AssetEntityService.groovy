@@ -3152,7 +3152,8 @@ class AssetEntityService {
 			manufacturer = Manufacturer.read(manuId)
 		}
 
-		def hql = new StringBuffer( 'SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName, m.modelStatus FROM Model m JOIN m.manufacturer as man')
+		def hql = new StringBuffer( 'SELECT m.id, m.assetType, m.modelName, man.id as manId, man.name as manName, m.modelStatus, m.usize as usize FROM Model m JOIN m.manufacturer as man')
+
 		def params = []
 
 		StringBuffer where = new StringBuffer('')
@@ -3234,8 +3235,9 @@ class AssetEntityService {
 				manufacturerId: model[3],
 				manufacturerName: model[4],
 				name: model[2],
-				text: title, 
-				isValid: isValid
+				text: title,
+				isValid: isValid,
+				usize: model[6]
 			] 
 			added++
 		}

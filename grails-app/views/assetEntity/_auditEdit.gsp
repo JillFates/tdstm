@@ -173,28 +173,28 @@
 	<input type="button" class="edit" value="More..." onclick="showEditDeviceViewFromAudit('${assetEntityInstance.assetClass}', ${assetEntityInstance?.id})" /> 
 </div><br>
 </g:form>
-<div id="modelAuditId">
+<div id="modelAuditPanel">
 <g:form name="modelAuditEdit" controller="model" action="updateModel" method="post" >
 	<div>
-	<input type="hidden" name="id" value="${assetEntityInstance.model?.id}"> 
+	<input type="hidden" id="modelAuditPanel_updateModelId" name="id" value="">
 	<input type="hidden" name="redirectTo" value="assetAudit"> 
 		<table>
 			<tr><td colspan="2"><b>Model Audit Edit</b></td></tr>
 			<tr>
 				<td>Model Name:</td>
-				<td>${assetEntityInstance.model?.modelName}</td>
+				<td><span id="modelAuditPanel_modelName"></span></td>
 			</tr>
 
 			<tr>
 				<td>Usize:</td>
-				<td><g:select id="usizeId" name="usize"
+				<td><g:select id="modelAuditPanel_usize" name="usize"
 						from="${assetEntityInstance.model?.constraints?.usize?.inList ?: (1..42)}"
-						value="${assetEntityInstance.model?.usize}"></g:select></td>
+						value=""></g:select></td>
 			</tr>
 			<tr>
 				<td>Manufacturer</td>
 				<td>
-					${assetEntityInstance.model?.manufacturer}
+					<span id="modelAuditPanel_manufacturerName"></span>
 				</td>
 			</tr>
 		</table>
@@ -203,7 +203,7 @@
 	<div class="buttons">
 		<input type="button" class="edit" value="Update" onclick="updateModelAudit()" /> 
 		<g:form action="edit" controller="model" target="new">
-			<input name="id" type="hidden" id="show_modelId" value="${assetEntityInstance.model?.id}"/>
+			<input name="id" type="hidden" id="modelAuditPanel_editModelId" value=""/>
 			<span class="button">
 				<input type="submit" class="edit" value="More..."></input>
 			</span>
@@ -214,6 +214,10 @@
 <script type="text/javascript">
 $(document).ready(function() { 
 	var assetType = EntityCrud.getAssetType();
+
+	$(document).on('selectedAssetModelChanged', function(evt, evtSelectedModel) {
+		updateAuditModelPanel(evtSelectedModel);
+	});
 
 	EntityCrud.toggleAssetTypeFields( assetType );
 	EntityCrud.loadFormFromJQGridFilters();

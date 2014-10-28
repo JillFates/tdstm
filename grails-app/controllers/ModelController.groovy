@@ -1372,6 +1372,8 @@ class ModelController {
 				}
 			}
 			render(template: "modelAuditView", model: [modelInstance:model] )
+		} else {
+			render "<b> No Model found for id: ${params.id}</b>"
 		}
 	}
 	

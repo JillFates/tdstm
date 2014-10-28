@@ -761,6 +761,7 @@ var EntityCrud = ( function($) {
 				$('#modelSelect').select2('data', {'id':selectedModel.id, 'text':modelText});
 				$("#manufacturerSelect").select2('data', {"id":manuId, "text":manuName});
 				$("#assetTypeSelect").select2('data', {"id":at, "text":at});
+				$(document).trigger('selectedAssetModelChanged', selectedModel);
 			} else {
 				clearSelectedModel(selectedModel.manufacturerId);
 			}
@@ -810,11 +811,13 @@ var EntityCrud = ( function($) {
 			"text" : null,
 			"assetType" : assetType,
 			"manufacturerId" : manufacturerId,
-			"manufacturerName" : manufacturerName
+			"manufacturerName" : manufacturerName,
+			"usize" : null
 		}
 		
 		$("#modelSelect").select2('val', '');
 		$('#hiddenModel').val('');
+		$(document).trigger('selectedAssetModelChanged', selectedModel);
 	}
 	
 	pub.setManufacturerValues = function(modelId, modelName, assetType, manufacturerId, manufacturerName) {
@@ -823,9 +826,11 @@ var EntityCrud = ( function($) {
 			"text" : modelName,
 			"assetType" : assetType,
 			"manufacturerId" : manufacturerId,
-			"manufacturerName": manufacturerName
+			"manufacturerName": manufacturerName,
+			"usize" : null
 		}
 		$("#assetTypeSelect").val('');
+		$(document).trigger('selectedAssetModelChanged', selectedModel);
 	};
 
 	// Validates the user input for the dependency section of the form
@@ -1648,7 +1653,7 @@ function updateModelAudit(){
 		data: $('#modelAuditEdit').serialize(),
 		type:'POST',
 		success: function(data) {
-			$("#modelAuditId").html(data)
+			tds.Alerts.addAlert({type: 'success', msg: 'Model Updated', closeIn: 1500});
 		}
 	});
 }
@@ -2015,4 +2020,26 @@ function updateAssetInfo(source,rack,roomId,location,position,forWhom){
 
 	if(!isIE7OrLesser)
 		$("select.assetSelect").select2();
+}
+
+function updateAuditModelPanel(selectedModel) {
+	var valid = ((selectedModel != null) && (selectedModel.id != null) && (selectedModel.id != ''));
+	if (selectedModel != null) {
+		$('#modelAuditPanel_usize').val(selectedModel.usize);
+		$('#modelAuditPanel_modelName').html(selectedModel.text);
+		$('#modelAuditPanel_manufacturerName').html(selectedModel.manufacturerName);
+		$('#modelAuditPanel_updateModelId').val(selectedModel.id);
+		$('#modelAuditPanel_editModelId').val(selectedModel.id);
+	} else {
+		$('#modelAuditPanel_usize').val('');
+		$('#modelAuditPanel_modelName').html('');
+		$('#modelAuditPanel_manufacturerName').html('');
+		$('#modelAuditPanel_updateModelId').val('');
+		$('#modelAuditPanel_editModelId').val('');
+	}
+	if (valid) {
+		$('#modelAuditPanel').show();
+	} else {
+		$('#modelAuditPanel').hide();
+	}
 }
