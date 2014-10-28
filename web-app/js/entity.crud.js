@@ -767,31 +767,31 @@ var EntityCrud = ( function($) {
 		});
 		
 		$("#manufacturerSelect").select2({
-		    placeholder: "Manufacturer",
-		    minimumInputLength: 0,
+			placeholder: "Manufacturer",
+			minimumInputLength: 0,
 			dropdownAutoWidth: true,
-		    width: "80%",
-		    allowClear: true,
+			width: "80%",
+			allowClear: true,
 			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
-		    ajax: {
-		    	url: tdsCommon.createAppURL('/assetEntity/manufacturer'),
-		    	quietMillis: quietMillis,
-		    	dataType: 'json',
-		    	data: function (term, page) {
-		    		return {
-		    			"term" : term,
-		    			"assetType" : modelFilteringData.assetType
-		    		};
-		    	},
-		    	results: function (data, page) {
-		    		return {results: data.data.manufacturers};
-		    	}
-		    },
-		    initSelection: function(element, callback) {
-		    	if (manufacturerId != "") {
-		    		callback({id: manufacturerId, text : manufacturerName});
-		    	}
-		    }
+			ajax: {
+				url: tdsCommon.createAppURL('/assetEntity/manufacturer'),
+				quietMillis: quietMillis,
+				dataType: 'json',
+				data: function (term, page) {
+					return {
+						"term" : term,
+						"assetType" : modelFilteringData.assetType
+					};
+				},
+				results: function (data, page) {
+					return {results: data.data.manufacturers};
+				}
+			},
+			initSelection: function(element, callback) {
+				if (manufacturerId != "") {
+					callback({id: manufacturerId, text : manufacturerName});
+				}
+			}
 		}).select2('val', []);
 
 		$('#manufacturerSelect').on("change", function(event) {
