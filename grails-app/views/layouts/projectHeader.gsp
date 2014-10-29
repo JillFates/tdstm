@@ -3,30 +3,9 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title><g:layoutTitle default="Grails" /></title>
-		<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
-		<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-		<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.core.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
-		<link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui-smoothness.css')}" />
-		<link id="jquery-ui-theme" media="screen, projection" rel="stylesheet" type="text/css" 
-			href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'combox.css')}" />
-		<g:javascript library="prototype" />
-		<g:javascript src="jquery-1.9.1.js"/>	
-		<g:javascript src="jquery-1.9.1-ui.js"/>
-		<g:javascript src="datetimepicker.js"/>
-		<g:javascript src="jquery-migrate-1.0.0.js"/>
-		<g:javascript src="crawler.js" />
-		<g:javascript src="select2.js"/>
-		<g:javascript src="jquery.combox.js"/>	
-		<g:javascript src="moment.min.js" />
-		<g:javascript src="daterangepicker.js" />
-		<g:javascript src="tds-common.js" />
+
+		<g:render template="../layouts/standardResources" />
+
 		<g:layoutHead />
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
@@ -36,7 +15,7 @@
 			$(document).ready(function() {
 				$("#personDialog").dialog({ autoOpen: false });
 				$("#userPrefDivId").dialog({ autoOpen: false });
-				var currentURL = window.location.pathname;
+
 				${remoteFunction(controller:'userLogin', action:'updateLastPageLoad', params:'\'url=\' + currentURL ')};
 				// Due to some issue with textarea overriding the value at intial load
 				$('textarea').each(function(){
@@ -57,14 +36,6 @@
 					}
 				});
 			});
-			var emailRegExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/
-			var dateRegExpForExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-			var currentMenuId = "";
-			var B1 = []
-			var B2 = []
-			var taskManagerTimePref = "60"
-			var contextPath = "${request.contextPath}"
-			var isIE7OrLesser  = jQuery.browser.msie && parseInt(jQuery.browser.version) < 8 ? true : false  
 
 		</script>
 	</head>
@@ -97,6 +68,7 @@
 		def user = UserLogin.findByPerson( person )
 		def username = user.username
 		def userPrefs = UserPreference.findAllByUserLogin(user)
+
 	%>
 	<body>
 		<div class="main_body">
@@ -396,6 +368,7 @@
 				</div>
 			</li>
 			</tds:hasPermission>
+
 			<tds:hasPermission permission='ReportMenuView'>
 			<li id="reportsMenuId" class="menuLiIndex" style="position:relative; float: left;"><a class="home headerClass" onmouseover="hoverMegaMenu('#reportsMegaMenu')" onmouseout="clearTipTimer()" href="javascript:showMegaMenu('#reportsMegaMenu')">Reports</a>
 				<div class="megamenu reports inActive" id="reportsMegaMenu">
@@ -456,6 +429,7 @@
 				</div>
 	        </li>
 	        </tds:hasPermission>
+
 	      </ul>
 		</div>
 		<div class="megamenu inActive" id="userMegaMenu" style="width:255px">
@@ -477,7 +451,9 @@
 			</td>
 			</tr></table>
 		</div>
-				<g:if test="${currProjObj?.runbookOn && moveEvent && moveEvent?.inProgress == 'true'}">
+
+		<%-- Include the News crawler if there is an event in progress --%>
+		<g:if test="${currProjObj?.runbookOn && moveEvent && moveEvent?.inProgress == 'true'}">
 			<div class="menu3" id="head_crawler" >
 				<div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
 				<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
@@ -492,191 +468,20 @@
 			${remoteFunction(controller:'moveEvent', action:'getMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(e)')}
 			</script>
 		</g:if>
+
+
 	</g:if>
 	<div class="main_bottom"><div id="messageDiv" class="message" style="display:none"></div><g:layoutBody /></div>
 	
 	</div>
-    <div id="personDialog" title="Edit Person" style="display:none;">
-      <div class="dialog">
-          <div class="dialog">
-            <table>
-              <tbody>
-				<tr>
-					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-				</tr>
 
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
-					</td>
-					<td valign="top" class="value">
-						<input type="text" maxlength="64" id="firstNameId" name="firstName"/>
-					</td>
-				</tr>
-				
-				<tr class="prop" style="display:none;">
-					<td valign="top" class="name">
-						<label for="username"><b>User Name:&nbsp;<span style="color: red">*</span></b></label>
-					</td>
-					<td valign="top" class="value">
-						<input type="text" maxlength="64" id="prefUsernameId" name="username" value="${user.username}"/>
-					</td>
-				</tr>
-
-				<tr class="prop">
-				  <td valign="top" class="name">
-					<label for="middleName">Middle Name:</label>
-				  </td>
-				  <td valign="top" class="value">
-					<input type="text" maxlength="64" id="middleNameId" name="middleName"/>
-	              </td>
-                </tr>
-
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="lastName">Last Name:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="64" id="lastNameId" name="lastName"/>
-                  </td>
-                </tr>
-
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="nickName">Nick Name:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="64" id="nickNameId" name="nickName"/>
-                  </td>
-                </tr>
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="title">Title:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="34" id="titleId" name="title"/>
-                  </td>
-                </tr>
-                <tr class="prop">
-                  <td valign="top" class="name">
-                    <label for="nickName">Email:</label>
-                  </td>
-                  <td valign="top" class="value">
-                    <input type="text" maxlength="64" id="emailId" name="email"/>
-                  </td>
-                </tr>
-                
-				<tds:hasPermission permission='PersonExpiryDate'>
-					<tr class="prop">
-						<td valign="top" class="name">
-							<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
-						</td>
-						<td valign="top" class="value">
-							<script type="text/javascript">
-								$(document).ready(function(){
-								$("#expiryDateId").datetimepicker();
-							  });
-							</script>
-							<input type="text" maxlength="64" id="expiryDateId" name="expiryDate"/>
-							<input type="text" maxlength="64" id="expiryDateId" name="expiryDate" readonly="readonly" style="background: none;border: 0"/>
-						</td>
-					</tr>
-				</tds:hasPermission>
-
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="title">Time Zone:</label>
-					</td>
-					<td valign="top" class="value">
-						<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-						value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-					</td>
-				</tr>
-				
-					<tr class="prop">
-						<td valign="top" class="name">
-							<label for="startPage">Start Page:</label>
-						</td>
-						<td valign="top" class="value">
-							<g:if test="${RolePermissions.hasPermission('AdminMenuView')}">
-								<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard','Admin Portal', 'User Dashboard']}" 
-								value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-							</g:if>
-							<g:else>
-								<g:select name="startPage" id="startPage" from="${['Project Settings','Current Dashboard', 'User Dashboard']}" 
-									value="${session.getAttribute('START_PAGE')?.START_PAGE}"/>
-							</g:else>
-						</td>
-					</tr>
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="title">Power In:</label>
-					</td>
-					<td valign="top" class="value">
-						<g:select name="powerType" id="powerTypeId" from="${['Watts','Amps']}" 
-						value="${session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE}"/>
-					</td>
-				</tr>
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="title">Model Score:</label>
-					</td>
-					<td valign="top" class="value">
-						<input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Hide password:
-					</td>
-					<td>
-						<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordId"/>
-					</td>
-				</tr>
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="password">Old Password:&nbsp;</label>
-					</td>
-					<td valign="top" class="value">
-						<input type="hidden" id="personId" name="personId" value=""/>
-						<input type="text" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
-					</td>
-				</tr>
-				<tr class="prop">
-					<td valign="top" class="name">
-						<label for="password">New Password:&nbsp;</label>
-					</td>
-					<td valign="top" class="value">
-						<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword(this)" id="newPasswordId" value=""/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Requirements:
-					</td>
-					<td>
-						<em id="usernameRequirementId">Password must not contain the username</em><br/>
-						<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
-						<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
-						<ul>
-							<li><em id="uppercaseRequirementId">Uppercase characters</em></li>
-							<li><em id="lowercaseRequirementId">Lowercase characters</em></li>
-							<li><em id="numericRequirementId">Numeric characters</em></li>
-							<li><em id="symbolRequirementId">Nonalphanumeric characters</em></li>
-						</ul>
-					</td>
-				</tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="buttons">
-            <span class="button"><input type="button" class="edit" value="Update" onclick="changePersonDetails()"/></span>
-            <span class="button"><input type="button" class="delete" onclick="jQuery('#personDialog').dialog('close')" value="Cancel" /></span>
-          </div>
-          <g:render template="../newsEditor/newsEditor"></g:render>
-      </div>
     </div>
 		<g:javascript src="tdsmenu.js" />
+
+		<%-- DIV for editing User Profile --%> 
+		<g:render template="../person/personEdit" model="[user:user]" />
+ 
+		<%-- DIV for editing User Preferences --%>
 		<div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>
 	</body>
 </html>
