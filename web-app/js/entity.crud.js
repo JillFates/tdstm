@@ -137,16 +137,16 @@ var EntityCrud = ( function($) {
 	pub.getShowModal = function() { return $('#showEntityView'); };
 
 	pub.closeCreateModal = function() { 
+		$('.select2-container').select2('close'); 
 		pub.getCreateModal().dialog('close'); 
-		$('#select2-drop-mask').click();
 	};
 	pub.closeEditModal = function() { 
+		$('.select2-container').select2('close'); 
 		pub.getEditModal().dialog('close');
-		$('#select2-drop-mask').click();
 	};
 	pub.closeShowModal = function() { 
+		$('.select2-container').select2('close'); 
 		pub.getShowModal().dialog('close'); 
-		$('#select2-drop-mask').click();
 	};
 
 	// Used to access the assetType within the CRUD pages
