@@ -1,8 +1,10 @@
 'use strict';
 var CreateAsset = function(){
-  this.createModal = $('[aria-labelledby="ui-id-1"]');
+  this.createModal = $('[aria-describedby="createEntityView"]');
+  // this.createModal = element(by.id('createEditAssetForm'));
   this.createModalForm = this.createModal.element(by.id('createEditAssetForm'));
-  this.createModalTitle = this.createModal.element(by.id('ui-id-1'));
+  // this.createModalTitle = this.createModal.element(by.id('ui-id-1'));
+  this.createModalTitle = this.createModal.element(by.css('.ui-dialog-title'));
   this.closeCreateModalBtn = this.createModal.$('.ui-dialog-titlebar-close');
   this.createModalButtons = this.createModal.$$('span.button input');
   this.saveLogStgBtn = this.createModal.$('[onclick="saveToShow($(this),\'Logical Storage\')"]');
@@ -74,6 +76,7 @@ CreateAsset.prototype.isCreateModalOpened = function(){
     return that.createModalForm.isPresent().then(function(valor){
       return valor;
     });
+    // return browser.executeScript('return $("#createEntityView").dialog("isOpen")');
   }).then(function(){
      return true;
   });

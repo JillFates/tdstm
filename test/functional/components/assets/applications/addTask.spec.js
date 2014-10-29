@@ -2,7 +2,6 @@
 var  Menu = require('../../menu/menu.po.js');
 var  ListApps = require('../listApps.po.js');
 var  TaskModal = require('../task.po.js');
-// var CreateAppModal = require('./createApp.po.js');
 var CreateAppModal = require('./appCreateModal.po.js');
 var ViewAppModal = require('./appViewModal.po.js');
 

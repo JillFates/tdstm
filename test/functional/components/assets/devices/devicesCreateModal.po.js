@@ -5,16 +5,17 @@ var DeviceCreateModal = function(){
   this.altNameField = this.createModal.element(by.id('shortName'));
   this.modelTypeField = this.createModal.element(by.id('assetTypeSelect'));
   this.modelTypeFieldInput = this.createModal.$('#modelEditId input[id^="s2id_autogen"]');
+  this.currentAssetType = this.createModal.$('#currentAssetType');
   this.modelTypeOptions = this.modelTypeField.$$('option');
   this.modelTypeOptionSelected = this.modelTypeField.$('option:checked');
   this.saveBtn = this.createModal.$('[onclick="EntityCrud.saveToShow($(this), \'DEVICE\'); "]');
 };
 DeviceCreateModal.prototype = new CreateAsset();
-DeviceCreateModal.prototype.createServer = function(appName,deciveType){
-  var field = this.nameField;
-  field.sendKeys(appName);
-  this.modelTypeFieldInput.sendKeys(deciveType);
-  this.modelTypeField.$('[value='+deciveType+']').click();
+DeviceCreateModal.prototype.createServer = function(appName,deviceType){
+  this.nameField.sendKeys(appName);
+  this.modelTypeFieldInput.sendKeys(deviceType);
+  this.modelTypeField.$('[value='+deviceType+']').click();
+  browser.executeScript('return $("#currentAssetType").val("'+deviceType+'")');
   this.saveBtn.click();
 };
 DeviceCreateModal.prototype.getModelTypeSelected = function(){
