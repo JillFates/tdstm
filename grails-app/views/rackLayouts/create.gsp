@@ -27,6 +27,7 @@
 <g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 <title>Rack View</title>
 <script type="text/javascript">
+
 	function updateRackDetails(e) {
      	var rackDetails = eval('(' + e.responseText + ')')   	
       	var sourceSelectObj = $('#sourceRackIdSelect');
@@ -36,17 +37,17 @@
       	generateOptions(sourceSelectObj,sourceRacks,'none');
       	generateOptions(targetSelectObj,targetRacks,'all');
 	        
-      	var targetList = "${targetRackFilter}"
-      	var targetArray =	targetList.split(",")
+      	var targetList = "${targetRackFilter}";
+      	var targetArray =	targetList.split(",");
       	if(sourceList=='none'){
     		$("#sourceRackIdSelect option[value='none']").attr('selected', true);
-        }else if(targetArray.length>1 || targetList!=""){
+        } else if(targetArray.length>1 || targetList!="") {
 	        for(i=0; i<targetArray.length;i++){
 	            var optvalue = targetArray[i].trim();
 	            $("#targetRackIdSelect option[value="+optvalue+"]").attr('selected', 'selected');
 	            $("#targetRackIdSelect option[value='']").attr('selected', false);
 	 	    }
-	    }else{
+	    } else {
 		  $("#targetRackIdSelect option[value='']").attr('selected', 'selected');
 		}
 		
@@ -67,7 +68,7 @@
         		$("#sourceRackIdSelect option[value='none']").attr('selected', false);
           }
       	/* Start with generated default */
-      	$('input[value=Generate]').click();
+      	// $('input[value=Generate]').click();
      }
      function generateOptions(selectObj,racks,sel){
      	if (racks) {
@@ -94,30 +95,35 @@
 			});
       	}
      }
-     var reqLoadRack
-     function submitForm(form){
-     	if($("#bundleId").val() == 'null') {
-     		alert("Please select bundle")
-     		return false;
-     	} else if( !$("#frontView").is(":checked") && !$("#backViewId").is(":checked") ) {
-     		alert("Please select print view")
-     		return false;
-     	} else if($('#commit').val() == 'Generate') {
-			$("#cablingDialogId").dialog("close")
+
+	var reqLoadRack;
+	function submitForm(form){
+		if ($("#bundleId").val() == 'null') {
+			alert("Please select bundle");
+			return false;
+		} else if( !$("#frontView").is(":checked") && !$("#backViewId").is(":checked") ) {
+			alert("Please select print view");
+			return false;
+		} else if($('#commit').val() == 'Generate') {
+			<%-- calling this dialog close for some odd reason causes a popup window to appear with rack elevation --%>
+			// $("#cablingDialogId").dialog("close")
 			$('#racksLayout').html('Loading...');
-		if(reqLoadRack) reqLoadRack.abort();
-		reqLoadRack = jQuery.ajax({
+			if (reqLoadRack) 
+				reqLoadRack.abort();
+			reqLoadRack = jQuery.ajax({
 				url: $(form).attr('action'),
 				data: $(form).serialize(),
 				type:'POST',
 				success: function(data) {
 					getAssignedDetails('rack','');
-					$('#racksLayout').html(data);					
+					$('#racksLayout').html(data);
 				}
 			});
-	 		return false;
-     	}
-     }
+			return false;
+		}
+		return false;
+	}
+
 	$(document).ready(function() {
 	    $("#editDialog").dialog({ autoOpen: false })
 	    $("#createDialog").dialog({ autoOpen: false })
@@ -141,7 +147,7 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
-<g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this)" style="border: 1px solid black; width: 100%">
+<g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%">
 <input type="hidden" id="redirectTo" value="rack"/>
 <input type="hidden" id="fromRoomOrRack" value="rack"/>
 <table style="width:auto; border: none">
@@ -205,25 +211,28 @@
 
 </div>
 <div id="listDialog" title="Asset List" style="display: none;">
-		<div class="dialog" >
-			<table id="listDiv">
-			</table>
-		</div>
+	<div class="dialog" >
+		<table id="listDiv">
+		</table>
+	</div>
 </div>
 
-	<g:render template="../assetEntity/modelDialog"/>
-	<g:render template="../assetEntity/entityCrudDivs" />
-	<g:render template="../assetEntity/dependentAdd" />
+<g:render template="../assetEntity/modelDialog"/>
+<g:render template="../assetEntity/entityCrudDivs" />
+<g:render template="../assetEntity/dependentAdd" />
+<g:render template="../assetEntity/initAssetEntityData"/>
 
 <input type="hidden" id="role" value="role"/>
 
 </div>
 <script type="text/javascript">
 
-	$(document).ready(function() {
+	// Load the Source and Target Racks with possible options based on the currently selected Bundle
+	( function($) {
 		var bundleObj = $("#bundleId");
 		var bundle = "${bundle}"
 	    var bundleArray = bundle.split(",")
+	    <%-- TODO : JPM 10/2014 : watched this in debugger and saw that this will never work. Do not understand the purpose of this either --%>
       	if(bundleArray != null && bundleArray != '' && bundleArray != 'all' && bundleArray.size()>0){
 	        for(i=0; i < bundleArray.size();i++){
 	            var optvalue = bundleArray[i].trim();
@@ -233,7 +242,7 @@
 	    } else {
 		    var isCurrentBundle = '${isCurrentBundle}'
 		    $("#bundleId option[value='all']").attr('selected', true);	    
-			if(isCurrentBundle == "true"){
+			if (isCurrentBundle == "true") {
 				bundleObj.val('${currentBundle}');
 			}
 		}
@@ -243,11 +252,12 @@
 		$('input.submit').click(function() {
 			$('#commit').val($(this).val());
 		});
-	});
+	})(jQuery);
 	
 	function createAssetPage(type,source,rack,roomName,location,position){
 		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
 	}
+
 	function createBladeDialog(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){
 		var redirectTo = 'rack'
 		new Ajax.Request('../assetEntity/create?redirectTo='+redirectTo+'&assetType='+assetType+'&manufacturer='+manufacturer,{asynchronous:true,evalScripts:true,
@@ -269,6 +279,5 @@
 	currentMenuId = "#racksMenu";
 	$("#rackMenuId a").css('background-color','#003366')
 </script>
-<g:render template="../assetEntity/initAssetEntityData"/>
 </body>
 </html>

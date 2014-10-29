@@ -81,8 +81,12 @@ class RackLayoutsController {
 		}
 	}
 	
-	def save = {
 
+	/**
+	 * Used to generate multiple rack elevation diagrams
+	 * TODO : JPM 10/2014 : change method save to generateElevations in order to be intuitive to what it is doing since it is NOT saving anything...
+	 */
+	def save = {
 		def project = controllerService.getProjectForPage( this, 'RoomEditView' )
 		if (! project) 
 			return
@@ -96,6 +100,11 @@ class RackLayoutsController {
 		if (bundleId == "null") {
 			return [errorMessage: "Please Select a Bundle."]
 		} else {
+
+			def userLogin = securityService.getUserLogin()
+			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+			def model = assetEntityService.getDeviceModelForList(project, userLogin, session, params, tzId)
+
 			def redirectTo = 'rack'
 			def includeOtherBundle = params.otherBundle
 			def includeBundleName = params.bundleName
@@ -178,7 +187,6 @@ class RackLayoutsController {
 					moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
 				}
 			}
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
 			racks.each { rack ->
 				maxUSize = rack?.model?.usize ?: 42
 				def assetDetails = []
@@ -333,7 +341,10 @@ class RackLayoutsController {
 					frontViewRows: frontViewRows, backViewRows: backViewRows , rackId: rack.id]
 			}
 			def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
-			return [rackLayout: rackLayout, frontView: frontView, backView: backView, showIconPref: showIconPref, commit: params.commit]
+
+			model.putAll( [rackLayout: rackLayout, frontView: frontView, backView: backView, showIconPref: showIconPref, commit: params.commit] )
+			
+			return model
 		}
 	}
 	
@@ -666,19 +677,19 @@ class RackLayoutsController {
 	 * Return AssetCableMap record details to display at RackLayout cabling screen
 	 */
 	def getCablingDetails = {
-			def project = securityService.getUserCurrentProject()
-			def moveBundleList = MoveBundle.findAllByProject( project )
-			userPreferenceService.loadPreferences("CURR_BUNDLE")
-			def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
-			/* set first bundle as default if user pref not exist */
-			def isCurrentBundle = true
-			def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ project ])?.model
-			
-			if(!currentBundle){
-				currentBundle = moveBundleList[0]?.id?.toString()
-				isCurrentBundle = false
-			}
-			def roomType = params.roomType 
+		def project = securityService.getUserCurrentProject()
+		def moveBundleList = MoveBundle.findAllByProject( project )
+		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		/* set first bundle as default if user pref not exist */
+		def isCurrentBundle = true
+		def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ project ])?.model
+		
+		if(!currentBundle){
+			currentBundle = moveBundleList[0]?.id?.toString()
+			isCurrentBundle = false
+		}
+		def roomType = params.roomType 
 			
 		def assetId = params.assetId
 		def assetEntity = assetId ? AssetEntity.get(assetId) : null
@@ -719,25 +730,63 @@ class RackLayoutsController {
 			}else{
 				title += " ( "+it.assetFrom?.targetRack+" / "+it.assetFrom?.targetRackPosition+" )"
 			}
-			assetCablingDetails << [model:assetEntity.model?.id, id:it.id, connector : it.assetFromPort.connector, 
-									type:it.assetFromPort.type, connectorPosX:it.assetFromPort.connectorPosX,
-									labelPosition:it.assetFromPort.labelPosition, color : it.cableColor ? it.cableColor : "",
-									connectorPosY:it.assetFromPort.connectorPosY, status:it.cableStatus,displayStatus:it.cableStatus, comment:it.cableComment?:'',
-									label:it.assetFromPort.label, hasImageExist:assetEntity.model?.rearImage && assetEntity.model?.useImage ? true : false,
-									usize:assetEntity?.model?.usize, rackUposition : connectorLabel, toAssetId : toAssetId, toAssetPortId: it.assetToPort?.id,
-									fromAssetId :(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''), toTitle:toTitle, title:title]
+			assetCablingDetails << [
+				color: it.cableColor ? it.cableColor : "",
+				comment: it.cableComment?:'',
+				connector: it.assetFromPort.connector,
+				connectorPosX: it.assetFromPort.connectorPosX,
+				connectorPosY: it.assetFromPort.connectorPosY,
+				fromAssetId: (it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:''),
+				hasImageExist:assetEntity.model?.rearImage && assetEntity.model?.useImage ? true : false,
+				id: it.id,
+				label: it.assetFromPort.label,
+				labelPosition: it.assetFromPort.labelPosition,
+				model: assetEntity.model?.id,
+				rackUposition: connectorLabel,
+				status: it.cableStatus,displayStatus:it.cableStatus,
+				title: title,
+				toAssetId: toAssetId,
+				toAssetPortId: it.assetToPort?.id,
+				toTitle: toTitle,
+				type: it.assetFromPort.type,
+				usize: assetEntity?.model?.usize
+			]
 			
-			assetCablingMap <<[(it.id):[label : it.assetFromPort.label, color :it.cableColor, type:it.assetFromPort.type, length:it.cableLength?:'',
-									status:it.cableStatus,comment:it.cableComment?:'', fromAssetId :it.assetTo? it.assetTo?.id :'null',asset :it.assetTo? it.assetTo?.assetName :'',
-									fromAsset:(it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ,toTitle:toTitle, title:title, rackUposition : connectorLabel , 
-									connectorId: it.assetToPort ? it.assetToPort?.id : "null",type:it.assetFromPort.type, cableId:it.id, 
-									locRoom: (it.assetLoc=='S') ? 'Current' : 'Target', roomType:it.assetLoc, powerA:powerA, powerB:powerB]]
+			assetCablingMap << [ (it.id): 
+				[
+					cableId: it.id,
+					color: it.cableColor,
+					connectorId: it.assetToPort ? it.assetToPort?.id : "null",type:it.assetFromPort.type,
+					fromAsset: (it.assetTo? it.assetTo?.assetName+"/"+connectorLabel:'') ,toTitle:toTitle,
+					fromAssetId: it.assetTo? it.assetTo?.id :'null',asset :it.assetTo? it.assetTo?.assetName :'',
+					label: it.assetFromPort.label,
+					length: it.cableLength?:'',
+					locRoom: (it.assetLoc=='S') ? 'Current' : 'Target',
+					powerA: powerA,
+					powerB: powerB,
+					rackUposition: connectorLabel ,
+					roomType: it.assetLoc,
+					status: it.cableStatus,comment:it.cableComment?:'',
+					title: title,
+					type: it.assetFromPort.type,
+				]
+			]
 			
 			assetRows << [(it.id):'h']
 		}
-		render(template:"cabling", model:[assetCablingDetails:assetCablingDetails, currentBundle:currentBundle, assetCablingMap:(assetCablingMap as JSON),
-										  models:models,assetRows:(assetRows as JSON),isTargetRoom:isTargetRoom, 
-										  assetId:assetId, roomType:roomType])
+		render( 
+			template: 'cabling', 
+			model: [
+				assetCablingDetails: assetCablingDetails,
+				assetCablingMap: (assetCablingMap as JSON),
+				assetId: assetId,
+				assetRows: (assetRows as JSON),
+				currentBundle: currentBundle,
+				isTargetRoom: isTargetRoom,	
+				models: models,
+				roomType: roomType
+			]
+		)
 	}
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen

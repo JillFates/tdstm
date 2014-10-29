@@ -328,4 +328,3 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
   </table>
   <input type="hidden" name="assetEntityId" id="assetEntityId"/>
   <input type="hidden" name="actionType" id="actionTypeId" value='assignId'/>
-</div>

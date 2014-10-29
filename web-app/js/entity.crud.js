@@ -217,7 +217,7 @@ var EntityCrud = ( function($) {
 		EntityCrud.toggleAssetTypeFields(assetType);
 
 		new Ajax.Request(
-			contextPath+'/assetEntity/getManufacturersList?assetType='+assetType+'&forWhom='+forWhom,
+			tdsCommon.createAppURL('/assetEntity/getManufacturersList?assetType='+assetType+'&forWhom='+forWhom),
 			{ 	asynchronous:true,
 				evalScripts:true,
 				onComplete:function(e) { showManufacView(e, forWhom); }
@@ -229,7 +229,7 @@ var EntityCrud = ( function($) {
 	pub.updateModelSelect = function(manuId, forWhom) {
 		var assetType = $("#assetType"+forWhom+"Id").val() ;
 		new Ajax.Request(
-			contextPath+'/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+manuId+'&forWhom='+forWhom,
+			tdsCommon.createAppURL('/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+manuId+'&forWhom='+forWhom),
 			{	asynchronous:true,
 				evalScripts:true,
 				onComplete:function(e) { showModelView(e, forWhom); }
@@ -907,7 +907,7 @@ var EntityCrud = ( function($) {
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
 	var fetchAssetEditView = function(controller, fieldType, assetId, source, rack, roomName, location, position) {
-		var url = contextPath+'/'+controller+'/edit/' + assetId;
+		var url = tdsCommon.createAppURL('/'+controller+'/edit/' + assetId);
 		jQuery.ajax({
 			url: url,
 			type:'POST',
@@ -972,7 +972,7 @@ var EntityCrud = ( function($) {
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
 	var fetchAssetShowView = function(controller, fieldHelpType, assetId) {
-		var url = contextPath+'/'+controller+'/show/' + assetId;
+		var url = tdsCommon.createAppURL('/'+controller+'/show/' + assetId);
 		jQuery.ajax({
 			url: url,
 			type:'POST',
@@ -1046,7 +1046,7 @@ var EntityCrud = ( function($) {
 	}
 	// Private method used by showAssetCreateView
 	function fetchAssetCreateView(controller, fieldHelpType, source, rack, roomName, location, position) {
-		var url = contextPath+'/'+controller+'/create';
+		var url = tdsCommon.createAppURL('/'+controller+'/create');
 		jQuery.ajax({
 			url: url,
 			type:'POST',
@@ -1250,7 +1250,7 @@ var EntityCrud = ( function($) {
 
 		// Update the icon based on if there is content
 		var iconMode = hiddenInput.val() ? 'edit' : 'add';
-		$('#commLink_'+type+'_'+rowNo).html('<img border="0px" src="'+contextPath+'/icons/comment_' + iconMode + '.png">');
+		$('#commLink_'+type+'_'+rowNo).html('<img border="0px" src="'+tdsCommon.createAppURL('/icons/comment_' + iconMode + '.png">') );
 	};
 
 	/**
