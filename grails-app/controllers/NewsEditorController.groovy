@@ -9,16 +9,21 @@ import org.apache.shiro.SecurityUtils
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+
 class NewsEditorController {
 	
-	def userPreferenceService
 	def jdbcTemplate
+
+	def controllerService
 	def securityService
+	def userPreferenceService
 	
     def index = {
     	redirect( action:newsEditorList, params:params )
 	}
+
     /*---------------------------------------------------------
      * @author : Lokanada Reddy
      * @param  : project, bundle, and filters
@@ -265,38 +270,198 @@ class NewsEditorController {
 		redirect(action:newsEditorList, params:[moveBundle : params.moveBundle, viewFilter:params.viewFilter])
 	}
 	
-	/*---------------------------------------------------------
-     * @author : Lokanada Reddy
-     * @param  : project, bundle, and filters, moveEventNews data
-     * @return : will save the data and redirect to action : newsEditorList
-     *--------------------------------------------------------*/
+	/**
+	 * Used to create new MoveEventNews records that returns AJax Response for error or redirects if successful to newsEditorList
+	 * @param mode - indicates the mode to respond to the request, if 'ajax' then it uses the ServiceResponse format otherwise does the redirect
+	 * @param moveEvent.id
+	 * @param message
+	 * @param resolution
+	 * @param isArchived
+	 * @param resolution
+	 */
 	def saveNews = {
-			
-		def principal = SecurityUtils.subject.principal
-		def loginUser = UserLogin.findByUsername(principal)
-		def moveEventNewsInstance = new MoveEventNews(params)
-		moveEventNewsInstance.createdBy = loginUser.person
-		
-		if(params.isArchived == '1'){
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			moveEventNewsInstance.isArchived = 1
-			moveEventNewsInstance.archivedBy = loginUser.person
-			moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
+
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		if (!project) {
+			flash.message = null
+			return
 		}
-		moveEventNewsInstance.save(flush:true)
-		redirect(action:newsEditorList, params:[ moveBundle : params.moveBundle, 
-												viewFilter:params.viewFilter, moveEvent:params.moveEvent.id])
-	}
-	def truncate( value ){
-		def returnVal = ""
-		if(value){
-			def length = value.size()
-			if(length > 50){
-				returnVal = '"'+value.substring(0,50)+'.."'
+
+		// Check for permission
+		if (! securityService.hasPermission(userLogin, 'CreateNews') ) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		String error
+		MoveEvent me
+
+		// Check to make sure that the moveEvent id exists and is associated to the project
+		Long meId = NumberUtil.toLong(params['moveEvent.id'])
+		if (meId == null || meId < 1) {
+			error = 'Invalid move event id specified'
+		} else {
+			// Check that the move event exists and is assoicated to the user's project
+			me = MoveEvent.get(meId)
+			if (!me) {
+				error = 'Move event was not found'
 			} else {
-				returnVal = '"'+value+'"'
+				if (me.project.id != project.id) {
+					securityService.reportViolation("Accessing move event ($meId) not associated with project (${project.id})", userLogin)
+					error = 'Invalid move event id specified'
+				}
 			}
 		}
-		return returnVal
+		if (error) {
+			render ServiceResults.errors(error) as JSON
+			return
+		}
+
+		// Create the new news domain
+		def men = new MoveEventNews()
+		men.moveEvent = me
+		men.createdBy = userLogin.person
+
+		saveUpdateNewsHandler(project, userLogin, men, params, this)
+	}
+
+
+	/**
+	 * Used to update an exiting MoveEventNews record that returns AJax Response 
+	 * @param message
+	 * @param resolution
+	 * @param isArchived
+	 * @param resolution
+	 */
+	def updateNews = {
+
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		if (!project) {
+			flash.message = null
+			return
+		}
+
+		// Check for permission
+		if (! securityService.hasPermission(userLogin, 'CreateNews') ) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		String error
+		MoveEventNews men
+
+		// Check to make sure that the MoveEventNews id exists and is associated to the project
+		Long id = NumberUtil.toLong(params['id'])
+		if (id == null || id < 1) {
+			error = 'Invalid news id specified'
+		} else {
+			// Check that the move event news id exists and is assoicated to the user's project
+			men = MoveEventNews.get(id)
+			if (!id) {
+				error = 'News id was not found'
+			} else {
+				if (men.moveEvent.project.id != project.id) {
+					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project (${project.id})", userLogin)
+					error = 'Invalid news id specified'
+				}
+			}
+		}
+		if (error) {
+			render ServiceResults.errors(error) as JSON
+			return
+		}
+
+		saveUpdateNewsHandler(project, userLogin, men, params, this)
+	}
+
+	/**
+	 * Used by the saveNews and updateNews controller methods to perform the actual update of the new or existing MoveEventNews domain record
+	 */
+	private void saveUpdateNewsHandler(Project project, UserLogin userLogin, MoveEventNews men, params, controller) {
+
+		men.message = params.message
+		
+		if (params.isArchived == '1') {
+			men.isArchived = 1
+			men.archivedBy = userLogin.person
+			men.resolution = params.resolution
+			men.dateArchived = TimeUtil.nowGMT()
+		} else {
+			men.isArchived = 0
+		}
+
+		if (! men.validate() || !men.save(flush:true) ) {
+			error = "Error saving news : ${GormUtil.allErrorsString(men)}"
+			log.info "saveNews() user:$userLogin, project:${project.id} - $error"
+			render ServiceResults.errors(error) as JSON
+			return
+		}
+
+		String mode = params.mode ?: 'redirect'
+
+		if (mode == 'ajax') {
+			Map menModel = [id:men.id, message:men.message, resolution:men.resolution, isArchived:men.isArchived, moveEventId: men.moveEvent.id]
+			render ServiceResults.success([moveEventNews: menModel]) as JSON
+		} else {
+			controller.redirect( 
+				action: newsEditorList, 
+				params: [ moveBundle: params.moveBundle, viewFilter:params.viewFilter, moveEvent:params.moveEvent.id]
+			)
+		}
+
+	}
+
+	/**
+	 * Used to update an exiting MoveEventNews record that returns AJax Response 
+	 * @param id
+	 */
+	def deleteNews = {
+
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		if (!project) {
+			flash.message = null
+			return
+		}
+
+		// Check for permission
+		if (! securityService.hasPermission(userLogin, 'CreateNews') ) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
+		String error
+		MoveEventNews men
+
+		// Check to make sure that the MoveEventNews id exists and is associated to the project
+		Long id = NumberUtil.toLong(params['id'])
+		if (id == null || id < 1) {
+			error = 'Invalid news id specified'
+		} else {
+			// Check that the move event news id exists and is assoicated to the user's project
+			men = MoveEventNews.get(id)
+			if (!id) {
+				error = 'News id was not found'
+			} else {
+				if (men.moveEvent.project.id != project.id) {
+					securityService.reportViolation("Accessing MoveEventNews ($id) not associated with project (${project.id})", userLogin)
+					error = 'Invalid news id specified'
+				}
+			}
+		}
+
+		if (! error) {
+			try {
+				men.delete(flush:true)
+			} catch (e) {
+				error = "Delete failed :  ${GormUtil.allErrorsString(men)}"
+			}
+		}
+
+		if (error) {
+			render ServiceResults.errors(error) as JSON
+			return
+		}
+
+		render ServiceResults.success() as JSON
 	}
 }

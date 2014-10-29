@@ -133,27 +133,28 @@ class DashboardController {
 		def loginUser = UserLogin.findByUsername(principal)
 		def commentType = params.commentType
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		if(commentType == "issue"){
+
+		if (commentType == "issue") {
 			def assetCommentInstance = AssetComment.get(params.id)
 			if(params.isResolved == '1' && assetCommentInstance.isResolved == 0 ){
 				assetCommentInstance.resolvedBy = loginUser.person
 				assetCommentInstance.dateResolved = GormUtil.convertInToGMT( "now", tzId )
-			}else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
-			}else{
+			} else if(params.isResolved == '1' && assetCommentInstance.isResolved == 1){
+			} else {
 				assetCommentInstance.resolvedBy = null
 				assetCommentInstance.dateResolved = null
 			}
 			assetCommentInstance.properties = params
 			assetCommentInstance.save(flush:true)
-		} else if(commentType == "news"){
+		} else if (commentType == "news") {
 
 			def moveEventNewsInstance = MoveEventNews.get(params.id)
-			if(params.isResolved == '1' && moveEventNewsInstance.isArchived == 0 ){
+			if (params.isResolved == '1' && moveEventNewsInstance.isArchived == 0 ) {
 				moveEventNewsInstance.isArchived = 1
 				moveEventNewsInstance.archivedBy = loginUser.person
 				moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
-			}else if(params.isResolved == '1' && moveEventNewsInstance.isArchived == 1){
-			}else{
+			} else if (params.isResolved == '1' && moveEventNewsInstance.isArchived == 1) {
+			} else {
 				moveEventNewsInstance.isArchived = 0
 				moveEventNewsInstance.archivedBy = null
 				moveEventNewsInstance.dateArchived = null

@@ -254,8 +254,10 @@
 		<a name="page_down"></a>
 	</div>
 	
-	<div id="createNews" title="Create News Comment" style="display: none;">
-		<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" id="moveEventId" />
+	<div id="createNews" title="Create News" style="display: none;" class="static-dialog">
+		<form id="createNewsForm">
+			<input type="hidden" name="mode" value="ajax">
+			<input type="hidden" name="moveEvent.id" value="${moveEvent?.id}" id="moveEventId">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
 			<table id="createCommentTable" style="border: 0px">
 				<tr>
@@ -263,7 +265,7 @@
 				</tr>
 				<tr>
 					<td valign="top" class="name">
-						<label>Comment Type:</label>
+						<label>Type:</label>
 					</td>
 					<td valign="top" class="value">
 						<select disabled="disabled">
@@ -274,7 +276,7 @@
 				<tr class="prop">
 					<td valign="top" class="name">
 						<label for="messageId">
-							<b>Comment:&nbsp;
+							<b>Message:&nbsp;
 								<span style="color: red">*</span>
 							</b>
 						</label>
@@ -306,27 +308,27 @@
 							onkeyup="textCounter(this.id,255)"></textarea>
 					</td>
 				</tr>
-				
 			</table>
+			</form>
 		</div>
 		<div class="buttons">
 			<span class="button">
 				<input class="save" type="button" value="Create" onclick="return submitCreateNewsForm()" />
 			</span>
 			<span class="button">
-				<input class="delete" type="button" value="Cancel" onclick="resetCreateNewsForm();" />
+				<input class="cancel" type="button" value="Cancel" onclick="resetCreateNewsForm();" />
 			</span>
 		</div>
 	</div>
 	
-	<div id="showEditCommentDialog" title="Edit Issue Comment" style="display: none;">
+	<div id="showEditCommentDialog" title="Edit News" style="display: none;" class="static-dialog">
+		<form id="editNewsForm">
+			<input type="hidden" name="id" value="" id="commentId">
+			<input type="hidden" name="mode" value="ajax">
+
 		<div class="dialog" style="border: 1px solid #5F9FCF">
-			<input name="id" value="" id="commentId" type="hidden" />
-			<input name="commentType" value="" id="commentTypeId" type="hidden" />
-			<input name="moveEvent.id" value="${moveEvent?.id}" type="hidden" />
 			<div>
 				<table id="showCommentTable" style="border: 0px">
-					
 					<tr>
 						<td valign="top" class="name">
 							<label for="dateCreated">Created At:</label>
@@ -371,11 +373,11 @@
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name">
-							<label for="comment">Comment:</label>
+							<label for="comment">Message:</label>
 						</td>
 						<td valign="top" class="value">
 							<textarea cols="80" rows="5"
-								id="commentTdId" name="comment"
+								id="commentTdId" name="message"
 								onkeydown="textCounter(this.id,255)"
 								onkeyup="textCounter(this.id,255)"></textarea>
 						</td>
@@ -386,7 +388,7 @@
 						</td>
 						<td valign="top" class="value" id="resolveTdId">
 							<input type="checkbox" id="isResolvedId" value="0" onclick="updateHidden('isResolvedId','isResolvedHiddenId')" />
-							<input type="hidden" name="isResolved" value="0" id="isResolvedHiddenId" />
+							<input type="hidden" name="isArchived" value="0" id="isResolvedHiddenId" />
 						</td>
 					</tr>
 					<tr class="prop">
@@ -420,9 +422,13 @@
 					<input class="save" type="button" value="Update" onclick="return submitUpdateNewsForm()" /> 
 				</span>
 				<span class="button">
-					<input class="delete" type="button" value="Cancel" onclick="timedUpdate( $('#updateTimeId').val() );$('#showEditCommentDialog').dialog('close');" />
+					<input class="delete" type="button" value="Delete" onclick="return submitDeleteNewsForm()" /> 
+				</span>
+				<span>
+					<input type="button" class="cancel" value="Cancel" onclick="timedUpdate( $('#updateTimeId').val() );$('#showEditCommentDialog').dialog('close');">
 				</span>
 			</div>
+			</form>
 		</div>
 	</div>
 	</div>
@@ -595,10 +601,11 @@
 	if (moveEvent) {
 		$("#moveEvent").val(moveEvent)
 	}
-	timedUpdate( $("#updateTimeId").val() );
 	
+	timedUpdate( $("#updateTimeId").val() );	
+	var doUpdate = true;
+
 	/* Function to load the data for a particular MoveEvent */
-	var doUpdate = true
 	function getMoveEventNewsDetails (moveEvent) {
 		$("#createNews").dialog("close");
 		$("#messageNews").val("");
@@ -607,7 +614,7 @@
 		$('#isResolvedId').attr("checked",false)
 		$("#showEditCommentDialog").dialog("close");
 		updateDash( $("#defaultBundleId").val() );
-	<%--	if(dialReload && doUpdate){
+		<%--	if(dialReload && doUpdate){
 			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
 		}--%>
 		if (moveEvent) {
@@ -988,33 +995,63 @@
 			$("#"+hiddenId).val(0);
 		}
 	}
+
 	/*
-	* this function is used to validate the crete news form before sending to server
+	* Used to validate the create news form and submit to
 	*/
-	function submitCreateNewsForm(){
+	function submitCreateNewsForm() {
 		var moveEvent = $("#moveEventId").val();
 		var resolveBoo = $("#isResolvedId").is(':checked');
 		var resolveVal = $("#resolutionNews").val();
 		var news = $("#messageNews").val()
+		
 		var validate = false;
-		if(moveEvent){
-			if(resolveBoo && resolveVal == ""){
+		if (moveEvent) {
+			if(resolveBoo && resolveVal == "") {
 				alert('Please enter Resolution');
 			} else if( !news ){
 				alert('Please enter Comment');
 			} else {
 				validate = true;
 			}
-		} else{
-			alert("Please Assign Event to Current Bundle")
+		} else {
+			alert("Please select an event before creating a news message");
 		}
-		if(validate){
+
+		if (validate) {
 			timedUpdate( $("#updateTimeId").val() );
+			var form=$('#createNewsForm');
+			if (form.length) {
+				jQuery.ajax({
+					url: tdsCommon.createAppURL('/newsEditor/saveNews'),
+					data: form.serialize(),
+					type:'POST',
+					success: function(response) {
+						if (response.status == 'success') {
+							$('#createNews').dialog('close');
+							getMoveEventNewsDetails(moveEvent);
+						} else {
+							alert("Save failed - " + response.errors );
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown ) {
+						alert('Save errored - ' + errorThrown);
+					}
+				});
+			} else {
+				console.log('Error: Unable to locate createNewsForm in submitCreateNewsForm');
+			}
+/*
 			${remoteFunction(controller:'newsEditor',action:'saveNews', 
 					params:'\'moveEvent.id=\' + moveEvent +\'&message=\'+ news +\'&isArchived=\'+$(\'#isArchivedHiddenId\').val()+\'&resolution=\'+$(\'#resolutionNews\').val()+\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()', 
 					onComplete:'getMoveEventNewsDetails(moveEvent)')}
+*/
 		}
 	}
+
+	/*
+	 * Called when the user clicks cancel from the Create New Form
+	 */
 	function resetCreateNewsForm(){
 		$("#messageNews").val("");
 		$('#isArchivedHiddenId').val("0");
@@ -1023,6 +1060,7 @@
 		$('#createNews').dialog('close');
 		timedUpdate( $("#updateTimeId").val() );
 	}
+
 	/* will popup the dialog to edit news */
 	function openEditNewsDialog( newsId ){
 		var idArray = newsId.split("_")
@@ -1030,14 +1068,11 @@
 		var id = idArray [1] 
 		${remoteFunction(controller:'newsEditor', action:'getCommetOrNewsData',params:'\'id=\' + id +\'&commentType=\'+type', onComplete:'showEditNewsForm( e )')}
 	}
-	function showEditNewsForm(){
 
-	}
-	/*-------------------------------------------
-	 * @author : Lokanada Reddy
-	 * @param  : assetComment / moveEventNews object based on comment Type as JSON object
-	 * @return : Edit form
-	 *-------------------------------------------*/
+	/**
+	 * Used to populate the News Edit Form
+	 * @param  Ajax/JSON response object
+	 */
 	function showEditNewsForm( e ){
 		timedUpdate('never');
 		var assetComments = eval('(' + e.responseText + ')');
@@ -1071,7 +1106,7 @@
 				$("#displayOptionTr").hide();
 				$("#commentTypeOption").html("<option>News</option>");
 				$("#assetTrId").hide();
-				$("#showEditCommentDialog").dialog('option','title','Edit News Comment');
+				$("#showEditCommentDialog").dialog('option','title','Edit News');
 
 			} else {
 
@@ -1104,25 +1139,72 @@
 			$("#createNews").dialog("close");
 			}
 	}
-	/* will submit news edit form*/
-	function submitUpdateNewsForm(){
-		var moveEvent = $("#moveEventId").val();
+
+	/*
+	 * used to validate and submit the Edit News Form to the server for updating
+	 */
+	function submitUpdateNewsForm() {
 		var id = $("#commentId").val();
-		var resolveBoo = $("#isResolvedId").is(':checked');
-		var resolveVal = $("#resolutionId").val();
-		var validate = false
-		if(resolveBoo && resolveVal == ""){
-			alert('Please enter Resolution');
+		var moveEvent = $("#moveEventId").val();	// Note that this comes from separate field
+
+		timedUpdate( $("#updateTimeId").val() );
+
+		var form=$('#editNewsForm');
+		if (form.length) {
+			jQuery.ajax({
+				url: tdsCommon.createAppURL('/newsEditor/updateNews'),
+				data: form.serialize(),
+				type:'POST',
+				success: function(response) {
+					if (response.status == 'success') {
+						$('#showEditCommentDialog').dialog('close');
+						getMoveEventNewsDetails(moveEvent);
+					} else {
+						alert("Update failed - " + response.errors );
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown ) {
+					alert('Update errored - ' + errorThrown);
+				}
+			});
 		} else {
-			validate = true;
-		}
-		if(validate){
-			timedUpdate( $("#updateTimeId").val() );
-			${remoteFunction(action:'updateNewsOrComment', 
-					params:'\'moveEvent.id=\' + moveEvent +\'&id=\'+ id +\'&isResolved=\'+$(\'#isResolvedHiddenId\').val()+\'&comment=\'+$(\'#commentTdId\').val()+\'&resolution=\'+resolveVal+\'&commentType=\'+$(\'#commentTypeId\').val()+\'&displayOption=\'+$(\'input[name=displayOption]:checked\').val()', 
-					onComplete:'getMoveEventNewsDetails(moveEvent)')}
+			console.log('Error: Unable to locate updateNewsForm in submitUpdateNewsForm');
 		}
 	}
+
+	/*
+	 * used to validate and submit the Edit News Form to the server for updating
+	 */
+	function submitDeleteNewsForm() {
+		var id = $("#commentId").val();
+		var moveEvent = $("#moveEventId").val();	// Note that this comes from separate field
+
+		timedUpdate( $("#updateTimeId").val() );
+
+		var form=$('#editNewsForm');
+		if (form.length) {
+			jQuery.ajax({
+				url: tdsCommon.createAppURL('/newsEditor/deleteNews'),
+				data: form.serialize(),
+				type:'POST',
+				success: function(response) {
+					if (response.status == 'success') {
+						$('#showEditCommentDialog').dialog('close');
+						getMoveEventNewsDetails(moveEvent);
+					} else {
+						alert("Delete failed - " + response.errors );
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown ) {
+					alert('Delete errored - ' + errorThrown);
+				}
+			});
+		} else {
+			console.log('Error: Unable to locate updateNewsForm in submitDeleteNewsForm');
+		}
+	}
+
+
 	// validate the manual summary input value
 	function validateManulaSummary(value){
 		var check = true
