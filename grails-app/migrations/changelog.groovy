@@ -43,7 +43,7 @@ databaseChangeLog = {
 	include file: '20140717-task-batch-add-recipe-id-field.groovy'
 	include file: '20140804-fix-asset-comment-task-number.groovy'
 	include file: '20140805-change-asset-import-export-fields.groovy'
-	include file: '20140812-remove-asset-entity-old-fields.groovy'
+	//include file: '20140812-remove-asset-entity-old-fields.groovy'
 	include file: '20140813-add-default-asset-entity-field-to-recipe.groovy'
 	include file: '20140814-clean-up-orphaned-commentNotes.groovy'
 	include file: '20140819-change-assetentity_assetname-notnull.groovy'

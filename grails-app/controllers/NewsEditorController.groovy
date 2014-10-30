@@ -380,11 +380,11 @@ class NewsEditorController {
 	private void saveUpdateNewsHandler(Project project, UserLogin userLogin, MoveEventNews men, params, controller) {
 
 		men.message = params.message
+		men.resolution = params.resolution
 		
 		if (params.isArchived == '1') {
 			men.isArchived = 1
 			men.archivedBy = userLogin.person
-			men.resolution = params.resolution
 			men.dateArchived = TimeUtil.nowGMT()
 		} else {
 			men.isArchived = 0
