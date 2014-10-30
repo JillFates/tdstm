@@ -25,19 +25,28 @@ class RackLayoutsController {
 	
 	def static final statusDetails = ["missing":"Unknown", "cabledDetails":"Assigned","empty":"Empty","cabled":"Cabled"]
 	
+	/**
+	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
+	 */
 	def create = {
+
+		def project = controllerService.getProjectForPage( this, 'RoomEditView' )
+		if (! project) 
+			return
+
 		def targetRack= ""
 		def sourceRack= ""
 		def bundle= ""
 		def rackFilters
-		def frontCheck = false
-		def backCheck = true
-		def wBundleCheck = true
-		def woBundleCheck = true
-		def wDCheck = false
-		if(session.getAttribute("USE_FILTERS")=="true"){
+		def frontCheck = false 		// Render front view checkbox
+		def backCheck = true		// Render back view checkbox
+		def wBundleCheck = true		// with Bundle Names checkbox
+		def woBundleCheck = true	// with "other" Bundle names checkbox - include assets from other bundles not in the filter
+		def wDCheck = false 		// Render with diagrams / cabling (THIS IS NOT BEING USED CURRENTLY)
+
+		if (session.getAttribute("USE_FILTERS")=="true") {
 			rackFilters = session.getAttribute( "RACK_FILTERS")
-			if(rackFilters){
+			if (rackFilters) {
 				targetRack = rackFilters?.targetrack ? rackFilters?.targetrack?.toString().replace("[","").replace("]","") : ""
 				sourceRack = rackFilters?.sourcerack ? rackFilters?.sourcerack?.toString().replace("[","").replace("]","") : ""
 				bundle = rackFilters?.moveBundle ? rackFilters?.moveBundle?.toString().replace("[","").replace("]","") : ""
@@ -46,39 +55,38 @@ class RackLayoutsController {
 				wBundleCheck = rackFilters?.bundleName ? true : false
 				woBundleCheck = rackFilters?.otherBundle ? true : false
 				wDCheck = rackFilters?.showCabling ? true : false
-				
 			}
 		}
 		
-		def currProj = getSession().getAttribute( "CURR_PROJ" )
-		def projectId = currProj.CURR_PROJ
-		if ( projectId && projectId.isNumber() ) {
-			def project = Project.findById( projectId )
-			def moveBundleList = MoveBundle.findAllByProject( project )
-			userPreferenceService.loadPreferences("CURR_BUNDLE")
-			def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
-			/* set first bundle as default if user pref not exist */
-			def isCurrentBundle = true
-			def subject = SecurityUtils.subject
-			def models = AssetEntity.findAll('FROM AssetEntity WHERE project = ? GROUP BY model',[ project ])?.model
-			def entities = assetEntityService.entityInfo( project )
-			
-			if(!currentBundle){
-				currentBundle = moveBundleList[0]?.id?.toString()
-				isCurrentBundle = false
-			}
-			session.removeAttribute("USE_FILTERS")
-			session.removeAttribute("RACK_FILTERS")
-			return [moveBundleList: moveBundleList, projectInstance:project, projectId:projectId,
-				currentBundle:currentBundle, isCurrentBundle : isCurrentBundle, models:models ,servers:entities.servers, 
-				applications : entities.applications, dbs : entities.dbs, files : entities.files,networks : entities.networks, rackFilters:rackFilters, targetRackFilter:targetRack,
-				bundle:bundle,sourceRackFilter:sourceRack,rackLayoutsHasPermission:RolePermissions.hasPermission("rackLayouts"),
-				staffRoles:taskService.getRolesForStaff(), dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-				frontCheck:frontCheck, backCheck:backCheck, wBundleCheck:wBundleCheck, woBundleCheck:woBundleCheck, wDCheck:wDCheck]
-		} else {
-			flash.message = 'You must have a project selected before using this feature'
-			redirect(controller: "project", action: "list",params:[viewType : "list"])
+		List moveBundleList = MoveBundle.findAllByProject( project )
+		userPreferenceService.loadPreferences("CURR_BUNDLE")
+		def currentBundle = getSession().getAttribute("CURR_BUNDLE")?.CURR_BUNDLE
+		boolean isCurrentBundle=true
+		if (!currentBundle){
+			currentBundle = moveBundleList[0]?.id?.toString()
+			isCurrentBundle = false
 		}
+
+		// Map entities = assetEntityService.entityInfo( project )
+		
+		session.removeAttribute("USE_FILTERS")
+		session.removeAttribute("RACK_FILTERS")
+
+		return [
+			backCheck: backCheck,
+			bundle: bundle,
+			currentBundle: currentBundle,
+			frontCheck: frontCheck,
+			isCurrentBundle: isCurrentBundle,
+			moveBundleList: moveBundleList,
+			rackFilters: rackFilters,
+			rackLayoutsHasPermission: RolePermissions.hasPermission("rackLayouts"),
+			sourceRackFilter: sourceRack,
+			targetRackFilter: targetRack,
+			wBundleCheck: wBundleCheck,
+			wDCheck: wDCheck,
+			woBundleCheck: woBundleCheck
+		]
 	}
 	
 

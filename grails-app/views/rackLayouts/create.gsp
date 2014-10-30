@@ -181,13 +181,12 @@
 			</td>
 			
 			<td>
-				<div style="width:150px">
-					<label for="frontView" ><input type="checkbox" name="frontView" id="frontView" ${frontCheck ? 'checked="checked"' : '' }/>&nbsp;Front</label>&nbsp
-				    <label for="backView" ><input type="checkbox" name="backView" id="backViewId" ${backCheck ? 'checked="checked"' : '' }/>&nbsp;Back</label><br />
-				    <label for="bundleName" ><input type="checkbox" name="bundleName" id="bundleNameId" ${wBundleCheck ? 'checked="checked"': '' }/>&nbsp;w/ bundle names</label><br />
-				    <label for="otherBundle" ><input type="checkbox" name="otherBundle" id="otherBundleId" ${woBundleCheck ? 'checked="checked"' :'' }/>&nbsp;w/ other bundles</label><br />
-					
-					<label for="showCabling" ><input type="checkbox" name="showCabling" id="showCabling" ${wDCheck ? 'checked="checked"' :'' }/>&nbsp;w/ diagrams</label><br />
+				<div style="width:200px">
+					<label for="frontView"><input type="checkbox" name="frontView" id="frontView" ${frontCheck ? 'checked="checked"' : '' }/>&nbsp;Front View</label><br />
+				    <label for="backViewId"><input type="checkbox" name="backView" id="backViewId" ${backCheck ? 'checked="checked"' : '' }/>&nbsp;Back View (power/cabling)</label><br />
+				    <label for="bundleNameId"><input type="checkbox" name="bundleName" id="bundleNameId" ${wBundleCheck ? 'checked="checked"': '' }/>&nbsp;Render bundle names</label><br />
+					<%-- <label for="showCabling"><input type="checkbox" name="showCabling" id="showCabling" ${wDCheck ? 'checked="checked"' :'' }/>&nbsp;Render diagrams</label><br /> --%>
+				    <label for="otherBundleId"><input type="checkbox" name="otherBundle" id="otherBundleId" ${woBundleCheck ? 'checked="checked"' :'' }/>&nbsp;Include assets from other bundles</label><br />
 				</div>
 			</td>
 			
