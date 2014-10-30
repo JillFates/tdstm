@@ -701,7 +701,7 @@ var EntityCrud = ( function($) {
 		    placeholder: "Model type filter",
 		    minimumInputLength: 0,
 		    allowClear: true,
-		    width: "80%"
+		    width: "100%"
 		});
 		
 		$("#assetTypeSelect").on("change", function(event) {
@@ -722,7 +722,7 @@ var EntityCrud = ( function($) {
 		    placeholder: "Model",
 		    minimumInputLength: 0,
    			dropdownAutoWidth: true,
-		    width: "80%",
+		    width: "100%",
 		    allowClear: true,
 			// Specify format function for dropdown item
 			formatResult: modelSelectFormatResult,
@@ -777,10 +777,10 @@ var EntityCrud = ( function($) {
 		});
 		
 		$("#manufacturerSelect").select2({
-			placeholder: "Manufacturer",
+			placeholder: "Manufacturer filter",
 			minimumInputLength: 0,
 			dropdownAutoWidth: true,
-			width: "80%",
+			width: "100%",
 			allowClear: true,
 			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
 			ajax: {

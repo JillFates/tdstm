@@ -95,7 +95,6 @@
 										<div id="manufacturerSelect" tabindex="102">
 										</div>
 									</div>
-									<img src="/tdstm/i/filter-unset.png" />
 								</td>
 								<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap">
 									<label for="environment">Environment</label>
@@ -178,7 +177,6 @@
 												</g:each>
 											</select>
 										</div>
-										<img src="/tdstm/i/filter-unset.png" />
 									</div>
 								</td>
 								<td class="label ${config.priority} ${highlightMap.priority?:''}" nowrap="nowrap">
