@@ -311,13 +311,17 @@ var EntityCrud = ( function($) {
 					case '-1':
 						// Show room input fields
 						$(".newRoom"+n).show();
-						// then fall into '0'
+						$(".useBlade"+n).hide();
+						bladePosCtrl.hide();
+						break;
 					case '0':
 						$(".useBlade"+n).hide();
+						$(".newRoom"+n).hide();
 						bladePosCtrl.hide();
 						break;
 					default:
 						$(".useBlade"+n).show();
+						$(".newRoom"+n).hide();
 						// Now show the chassis position based on if a chassis is selected
 						var optionId = parseInt( chassisCtrl.val() );
 						if (optionId > 0) {
@@ -371,6 +375,7 @@ var EntityCrud = ( function($) {
 				pub.hideRackFields();
 				pub.hideVMFields();
 				pub.showChassisFields();
+				populateRackOrChassisSelect(false);
 				break;
 			case 'VM':
 				pub.hideRackFields();
@@ -382,8 +387,31 @@ var EntityCrud = ( function($) {
 				pub.hideChassisFields();
 				pub.hideVMFields();
 				pub.showRackFields();
+				populateRackOrChassisSelect(true);
 		}
 	};
+
+	var populateRackOrChassisSelect = function(checkRask) {
+		['S','T'].forEach( function(n, i) {
+			var rmCtrl = $('#roomSelect'+n);
+			var roomId = pub.selectOptionSelected(rmCtrl);
+
+			if ((roomId != null) && (roomId != "") && (roomId != "0") && (roomId != "-1")) {
+				if (checkRask) {
+					var rackSelect = $(n=='S' ? '#rackSourceId' : '#rackTargetId');
+					if (rackSelect.children('option').length <= 2) {
+						pub.fetchRackSelectForRoom(roomId, n, 'Edit');
+					}
+				} else {
+					var chassisSelect = $(n=='S' ? '#sourceChassisSelectId' : '#targetChassisSelectId');
+					if (chassisSelect.children('option').length <= 1) {
+						pub.fetchChassisSelectForRoom(roomId, n, 'Edit');
+					}
+				}
+			}
+
+		} );
+	}
 
 	// Used to retrieve a SELECT control populated with the appropriate Rack for the specified room and source/target and assign to the appropriate form control
 	pub.fetchRackSelectForRoom = function(roomId, sourceTarget, forWhom) {
@@ -424,6 +452,7 @@ var EntityCrud = ( function($) {
 			type:'POST',
 			success: function(resp) {
 				selectCtrl.html(resp);
+				pub.showChassisFields();
 
 				if (!isIE7OrLesser)
 					selectCtrl.select2();
@@ -444,18 +473,15 @@ var EntityCrud = ( function($) {
 			case 'Blade':
 				if (parseInt(selectId) > 0)
 					pub.fetchChassisSelectForRoom(selectId, sourceTarget, forWhom);
-				pub.showChassisFields();
 				break;
 			case 'VM':
-				pub.showVMFields();
 				break;
 			default:
 				if (parseInt(selectId) > 0)
 					pub.fetchRackSelectForRoom(selectId, sourceTarget, forWhom);
-				pub.showRackFields();
 		}
+		pub.toggleAssetTypeFields(assetType);
 		if (selectId == -1) {
-			targetLocationId
 			var elPrefix = "#" + (sourceTarget=='S' ? 'source' : 'target');
 			$(elPrefix + 'LocationId').focus();
 		}
@@ -712,6 +738,8 @@ var EntityCrud = ( function($) {
 				} else {
 					clearSelectedModel(null, null, event.val);
 				}
+			} else {
+				pub.toggleAssetTypeFields(event.val);
 			}
 		});
 		
@@ -823,6 +851,9 @@ var EntityCrud = ( function($) {
 		
 		$("#modelSelect").select2('val', '');
 		$('#hiddenModel').val('');
+		if (assetType) {
+			pub.toggleAssetTypeFields(assetType);
+		}
 		$(document).trigger('selectedAssetModelChanged', selectedModel);
 	}
 	
@@ -879,7 +910,7 @@ var EntityCrud = ( function($) {
 	};
 
 	// Private method called by fetchAssetEditView to actually display the form once it is retrieved
-	var presentAssetEditView = function(html, fieldHelpType, source, rack, roomName,location,position) {
+	var presentAssetEditView = function(html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
 		var editModal = pub.getEditModal();
 
 		if (editModal.length) {
@@ -893,8 +924,8 @@ var EntityCrud = ( function($) {
 			if(!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
 			updateAssetTitle(fieldHelpType);
-			if (rack)
-				updateAssetInfo(source,rack,roomName,location,position, 'edit');
+			if (rackOrChassisId)
+				updateAssetInfo(source,rackOrChassisId,roomId,location,position,'edit',isBlade);
 			return true;
 		} else {
 			console.log("EntityCrud.presentAssetEditView() Error: Unable to access editEntityView DIV");
@@ -903,14 +934,14 @@ var EntityCrud = ( function($) {
 	}
 	// Private method used by showAssetEditView to fetch the edit view for the asset class appropriately by 
 	// calling the controller/edit/assetId controller method and then invoking presentAssetEditView to display.
-	var fetchAssetEditView = function(controller, fieldType, assetId, source, rack, roomName, location, position) {
+	var fetchAssetEditView = function(controller, fieldType, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
 		var url = tdsCommon.createAppURL('/'+controller+'/edit/' + assetId);
 		jQuery.ajax({
 			url: url,
 			type:'POST',
 			success: function(resp) {
 				// Load the edit entity view
-				return presentAssetEditView(resp, fieldType, source, rack, roomName, location, position);
+				return presentAssetEditView(resp, fieldType, source, rackOrBladeId, roomId, location, position, isBlade);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
@@ -921,19 +952,19 @@ var EntityCrud = ( function($) {
 	};
 	// Used to display the various asset class edit modal views
 	// This replaces editEntity()
-	pub.showAssetEditView = function(assetClass, assetId, source, rack, roomName, location, position) {
+	pub.showAssetEditView = function(assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
 		switch (assetClass) {
 			case "APPLICATION":
-				return fetchAssetEditView('application', 'Application', assetId, source, rack, roomName, location, position);
+				return fetchAssetEditView('application', 'Application', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
 				break;
 			case "DATABASE":
-				return fetchAssetEditView('database', 'Database', assetId, source, rack, roomName, location, position);
+				return fetchAssetEditView('database', 'Database', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
 				break;
 			case "STORAGE":
-				return fetchAssetEditView('files', 'Logical Storage', assetId, source, rack, roomName, location, position);
+				return fetchAssetEditView('files', 'Logical Storage', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
 				break;
 			case "DEVICE":
-				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rack, roomName, location, position);
+				return fetchAssetEditView('assetEntity', 'Device', assetId, source, rackOrBladeId, roomId, location, position, isBlade);
 				 break;
 			default:
 				alert("Error in editEntity() - unsupported case for assetClass '" + assetClass + "'");
@@ -1017,7 +1048,7 @@ var EntityCrud = ( function($) {
 	};
 
 	// Private method called by fetchAssetCreateView to present the various asset create modal window
-	var presentAssetCreateView = function(html, fieldHelpType, source, rack, roomName, location, position) {
+	var presentAssetCreateView = function(html, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
 		var createModal = pub.getCreateModal();
 		if (createModal.length) {
 			createModal.html(html);
@@ -1026,27 +1057,30 @@ var EntityCrud = ( function($) {
 			createModal.dialog('open');
 			pub.closeEditModal();
 			pub.closeShowModal();
-			pub.populateAssetEditView(fieldHelpType, source, rack, roomName, location, position, 'create');
+			pub.populateAssetEditView(fieldHelpType, source, rackOrChassisId, roomId, location, position, 'create', isBlade);
 			return true;
 		} else {
 			console.log("presentAssetCreateView() error - unable to access the create modal DIV");
 			return false;
 		}
 	};
-	pub.populateAssetEditView = function(fieldHelpType, source, rack, roomId, location, position, forWhom) {
+	pub.populateAssetEditView = function(fieldHelpType, source, rackOrChassisId, roomId, location, position, forWhom, isBlade) {
 		updateAssetTitle(fieldHelpType);
 		if (fieldHelpType=='Device')
-			updateAssetInfo(source, rack, roomId, location, position, forWhom);
+			updateAssetInfo(source, rackOrChassisId, roomId, location, position, forWhom, isBlade);
 
 		if(!isIE7OrLesser)
 			getHelpTextAsToolTip(fieldHelpType);
 	}
 	// Private method used by showAssetCreateView
-	function fetchAssetCreateView(controller, fieldHelpType, source, rack, roomName, location, position) {
+	function fetchAssetCreateView(controller, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade) {
 		var url = tdsCommon.createAppURL('/'+controller+'/create');
 		jQuery.ajax({
 			url: url,
 			type:'POST',
+			data: {
+				initialAssetType: (isBlade?'Blade':'')
+			},
 			success: function(resp) {
 				if (typeof resp === 'object') {
 					if (resp.status=='error') {
@@ -1057,7 +1091,7 @@ var EntityCrud = ( function($) {
 					return false;
 				}
 				// Load the edit entity view
-				return presentAssetCreateView(resp, fieldHelpType, source, rack, roomName, location, position);
+				return presentAssetCreateView(resp, fieldHelpType, source, rackOrChassisId, roomId, location, position, isBlade);
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				var err = jqXHR.responseText;
@@ -1067,20 +1101,19 @@ var EntityCrud = ( function($) {
 		});
 	};
 	// Called from the page to popup the Asset Entity Create dialog
-	pub.showAssetCreateView = function(assetClass, source, rack, roomName, location, position) {
-		source, rack, roomName,location,position
+	pub.showAssetCreateView = function(assetClass, source, rackOrChassisId, roomId, location, position, isBlade) {
 		switch (assetClass) {
 			case "APPLICATION":
-				return fetchAssetCreateView('application', 'Application', source, rack, roomName, location, position);
+				return fetchAssetCreateView('application', 'Application', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			case "DATABASE":
-				return fetchAssetCreateView('database', 'Database', source, rack, roomName, location, position);
+				return fetchAssetCreateView('database', 'Database', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			case "STORAGE":
-				return fetchAssetCreateView('files', 'Files', source, rack, roomName, location, position);
+				return fetchAssetCreateView('files', 'Files', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			case "DEVICE":
-				return fetchAssetCreateView('assetEntity', 'Device', source, rack, roomName, location, position);
+				return fetchAssetCreateView('assetEntity', 'Device', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			default:
 				alert("Error in EntityCrud.showAssetDetailView() - Unsupported case for assetClass '" + assetClass + "'");
@@ -1759,10 +1792,8 @@ function setType(id, forWhom){
 			if(!isIE7OrLesser)
 				$("select.assetSelect").select2()
 			EntityCrud.toggleAssetTypeFields(data.responseText)
-			
 		}}
 	)	
-	
 }
 
 function populateDependency(assetId, whom, thisDialog){
@@ -2012,17 +2043,23 @@ function clearFilter(gridId){
 	$('.ui-icon-refresh').click();
 	$(".clearFilterId").attr("disabled","disabled");
 }
-function updateAssetInfo(source,rack,roomId,location,position,forWhom){
+function updateAssetInfo(source,rackOrBladeId,roomId,location,position,forWhom,isBlade){
 	var target = source != '1' ? 'target' : 'source'
 	var type = source != '1' ? 'T' : 'S'
 	var roomType = source != '1' ? 'Target' : 'Source'
 		
 	$("#"+target+"LocationId").val(location)
 	$("#roomSelect"+type).val(roomId)
-	$("#"+target+"RackPositionId").val(position)
-	$('#deviceRackId'+type).val(rack);
-
-	EntityCrud.fetchRackSelectForRoom(roomId, type, forWhom);
+	if (isBlade) {
+		$('#deviceChassisId'+type).val(rackOrBladeId);
+		$('#' + target + 'BladePositionId').val(position);
+		EntityCrud.fetchChassisSelectForRoom(roomId, type, forWhom);
+		EntityCrud.toggleAssetTypeFields('Blade');
+	} else {
+		$("#"+target+"RackPositionId").val(position)
+		$('#deviceRackId'+type).val(rackOrBladeId);
+		EntityCrud.fetchRackSelectForRoom(roomId, type, forWhom);
+	}
 
 	if(!isIE7OrLesser)
 		$("select.assetSelect").select2();

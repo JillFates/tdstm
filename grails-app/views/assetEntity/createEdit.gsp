@@ -170,7 +170,7 @@
 								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 									<div id="modelEditId">
 										<div id="assetTypeSelectContainer" style="display:inline">
-											<select id="assetTypeSelect" name="assetType" onchange="setType(this.value, '${forWhom}')" style="width:120px" tabindex="103">
+											<select id="assetTypeSelect" name="assetType" style="width:120px" tabindex="103">
 	    										<option></option>
 												<g:each in="${assetTypeOptions}" var="assetType">
 													<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>

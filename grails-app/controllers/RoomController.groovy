@@ -559,10 +559,18 @@ class RoomController {
 		   }
 	   }
 	   def stringToReturn = new StringBuffer()
-	   def bundleId = AssetEntity.findByAssetTag(params.blade)?.moveBundle?.id
+
+	   def bladeAsset = AssetEntity.findById(params.blade)
+	   def bladeAssetId = bladeAsset?.id
+	   def bundleId = bladeAsset?.moveBundle?.id
+		stringToReturn.append("""
+			<div class="dialog" >
+			<table id="listDiv">
+			<tbody class="tbody" >
+			""")
 	   if(assetEntityList.size() > 0){
 		   assetEntityList.eachWithIndex{ obj, i ->
-			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editBladeDialog( ${obj.id},'${source}','${params.blade}','${params.position}',${bundleId})">
+			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="editBladeDialog('${obj.assetClass}',${obj.id},'${source}','${bladeAssetId}','${params.roomName}','${params.location}','${params.position}')">
 											<td>${obj.assetName}</td>
 											<td>${obj.assetTag}</td>
 											<td>${obj.model ? obj.model.modelName : ''}</td>
@@ -571,6 +579,7 @@ class RoomController {
 	   } else {
 			   stringToReturn.append("<tr><td colspan='3' class='no_records'>No records found</td></tr>")
 	   }
+	   stringToReturn.append("</tbody></table></div>")
 	   render stringToReturn
    }
 	/**

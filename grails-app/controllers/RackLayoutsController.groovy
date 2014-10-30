@@ -566,7 +566,7 @@ class RackLayoutsController {
 				def rackParameter = it.rackDetails.id
 				row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
 							<ul>
-								<li><a href="javascript:${forWhom ? "createAuditPage" : "EntityCrud.showAssetCreateView"}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}','${locationName}','${roomName}')">Create asset  </a></li>
+								<li><a href="javascript:${forWhom ? "createAuditPage" : "EntityCrud.showAssetCreateView"}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
 								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
 							</ul></img></div>&nbsp;""")
@@ -618,6 +618,8 @@ class RackLayoutsController {
 		def chassisRows = assetEntity.model.bladeRows
 		def bladesPerRow = (assetEntity.model.bladeCount / chassisRows ).intValue()
 		def bladeLabelCount = assetEntity.model.bladeLabelCount
+		def assetRoom
+		def assetLocation
 
 		for(int k = 1; k <= chassisRows; k++){
 			int initialColumn = (k-1)*bladesPerRow + 1
@@ -660,11 +662,19 @@ class RackLayoutsController {
 				} else {
 					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>"
 					if(commit !="Print View"){
+						if(assetDetails.asset.source == 1) {
+							assetRoom = assetEntity.roomSource?.id
+							assetLocation = assetEntity.sourceLocation
+						} else {
+							assetRoom = assetEntity.roomTarget?.id
+							assetLocation = assetEntity.targetLocation
+						}
+
 						bladeTable += """<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="../i/rack_add2.png"/>
 							<ul>
-								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'createBladeDialog'}('${assetDetails.source}','${assetEntity.assetTag}','${i}','${assetEntity.manufacturer?.id}','Blade','${assetEntity?.id}','${assetEntity.moveBundle?.id}')">Create asset  </a></li>
-								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','assign')">Assign asset </a></li>
-								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.assetTag}','${i}','reassign')">Reassign asset </a></li>
+								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'EntityCrud.showAssetCreateView'}('DEVICE','${assetDetails.source}','${assetEntity?.id}','${assetRoom}','${assetLocation}', '${i}', true, '${assetEntity.manufacturer?.id}','Blade','${assetEntity.moveBundle?.id}')">Create asset  </a></li>
+								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.id}','${i}','assign','${assetRoom}','${assetLocation}')">Assign asset </a></li>
+								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.id}','${i}','reassign','${assetRoom}','${assetLocation}')">Reassign asset </a></li>
 							</ul>
 						</div>"""
 					}

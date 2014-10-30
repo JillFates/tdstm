@@ -3941,15 +3941,16 @@ class AssetEntityController {
 		def clazz
 		
 		if ( sourceTarget== 'S' ) {
-			rackDomId = 'rackSId'
-			rackDomName = 'rackSourceId'
-			clazz = 'config.sourceRack'
+			rackDomId = 'chassisSelectSId'
+			rackDomName = 'chassisSelectSourceId'
+			clazz = ''
 		} else {
-			rackDomId = 'rackTId'
-			rackDomName = 'rackTargetId'
-			clazz = 'config.targetRack'
+			rackDomId = 'chassisSelectTId'
+			rackDomName = 'chassisSelectTargetId'
+			clazz = ''
 		}
-		render(template:'deviceChassisSelect', model:[options:options, domId:params.domId, domName:params.domName, domClass:domClass, id:id, forWhom:forWhom, sourceTarget:sourceTarget, tabindex:tabindex])
+		domClass=(domClass==null)?clazz:domClass
+		render(template:'deviceChassisSelect', model:[options:options, domId:rackDomId, domName:rackDomName, domClass:domClass, value:id, forWhom:forWhom, sourceTarget:sourceTarget, tabindex:tabindex])
 	}
 
 	def getAssetsByType = {

@@ -1024,7 +1024,7 @@ class AssetEntityService {
 
 		if (isNew) {
 			device = new AssetEntity()
-			device.assetType = ''	// clear out the default
+			device.assetType = params.initialAssetType?:''	// clear out the default
 		}
 
 		// Stick questionmark on the end of the model name if it is unvalidated

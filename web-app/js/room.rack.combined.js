@@ -15,10 +15,6 @@ function showEditAsset(e) {
 		alert("Asset is not updated, Please check the required fields")
 	}
 }
-function createDialog(source,rack,roomName,location,position){
-    var redirectTo = $('#redirectTo').val() == 'room' ? 'room' : 'rack'
-    new Ajax.Request(contextPath+'/assetEntity/create?redirectTo='+redirectTo,{asynchronous:true,evalScripts:true,onComplete:function(e){createEntityView(e);updateAssetInfo(source,rack,roomName,location,position);}})
-}
 function validateAssetEntity(formname) {
 	var attributeSet = $("#attributeSetId").val();
 	if(attributeSet || formname == 'editForm'){
@@ -36,6 +32,7 @@ function validateAssetEntity(formname) {
 	}
 }
 function listDialog(assign,sort,order,source,rack,roomName,location,position){
+	closeEditAuditView();
 	jQuery.ajax({
 		url: contextPath+"/room/getAssetsListToAddRack",
 		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position+"&sort="+sort+"&order="+order+"&assign="+assign,
@@ -95,14 +92,15 @@ function updateAssetBladeInfo(source,blade,position,manufacturer,moveBundle){
 		$(".vmLabel").hide()
 	}
 }
-function listBladeDialog(source,blade,position, assign){
+function listBladeDialog(source, blade, position, assign, roomName, location){
+	closeEditAuditView();
 	jQuery.ajax({
 		url: contextPath+"/room/getBladeAssetsListToAddRack",
-		data: "source="+source+"&blade="+blade+"&position="+position+"&assign="+assign,
+		data: "source="+source+"&blade="+blade+"&position="+position+"&assign="+assign+"&roomName="+roomName+"&location="+location,
 		type:'POST',
 		success: function(data) {
 			if(data != null && data != ""){
-				$("#listDiv").html(data)
+				$("#listDialog").html(data)
 				$("#listDialog").dialog('option', 'width', 600)
 				$("#listDialog").dialog('option', 'position', ['center','top']);
 				$("#createDialog").dialog("close")
@@ -110,10 +108,9 @@ function listBladeDialog(source,blade,position, assign){
 			}
 		}
 	});
-}
-function editBladeDialog(assetId,source,blade,position, bundleId ){
-	openAssetEditDialig(assetId)
-	setTimeout("updateBladeEditForm('"+source+"','"+blade+"','"+position+"',"+bundleId+")",1000);
+} 
+function editBladeDialog(assetClass, assetId, source, bladeId, roomId, location, position){
+	EntityCrud.showAssetEditView(assetClass, assetId, source, bladeId, roomId, location, position, true)
 }
 function updateBladeEditForm(source,blade,position, bundleId){
 	var target = source != '1' ? 'target' : 'source'
