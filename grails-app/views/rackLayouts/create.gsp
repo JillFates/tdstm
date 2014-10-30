@@ -146,6 +146,7 @@
 <g:if test="${flash.message}">
 	<div class="message">${flash.message}</div>
 </g:if>
+<h1 style="margin: 10px;">Rack Elevations</h1>		
 <div class="dialog">
 <g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%">
 <input type="hidden" id="redirectTo" value="rack"/>
@@ -154,7 +155,6 @@
 	<tbody>
 		<tr>
 			<td>
-				<h1 style="margin: 2px;">Rack View</h1>
 				<label><b>Bundle</b></label><br />
 				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
 					<option value="all" selected="selected">All</option>
@@ -208,7 +208,7 @@
 </div>
 <div style="display: none;" id="cablingDialogId"></div>
 <div id="racksLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
-
+<h3 style="margin: 10px;">Enter your selection criteria and options then press Generate or Print View to view the rack elevations</h3>
 </div>
 <div id="listDialog" title="Asset List" style="display: none;">
 	<div class="dialog" >
