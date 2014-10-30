@@ -1582,3 +1582,9 @@ a.task_action span.tds-task-graph-icon {
 .alert.animateShow {
 	top:35px;
 }
+
+/* Hide the span that Select2 creates */
+.select2-hidden-accessible {
+    display: none !important; 
+    visibility: hidden !important;
+}
