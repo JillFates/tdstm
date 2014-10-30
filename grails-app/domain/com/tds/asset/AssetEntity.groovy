@@ -361,6 +361,16 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	def getTargetRoom() { return this.roomTarget?.roomName }
 
 	/**
+	 * The usize is now coming from the model vs the asset directly
+	 */
+	Integer getUsize() {
+		Integer sz
+		if (this.assetClass == AssetClass.DEVICE && this.model)
+			sz = this.model.usize
+		return sz
+	}
+
+	/**
 	 * Use to determine if the asset is a Server / VM
 	 * @return boolean
 	 */

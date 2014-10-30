@@ -1948,7 +1948,7 @@ class AssetEntityService {
 	 * Download data form Asset Entity table into Excel file
 	 * @param Datatransferset,Project,Movebundle
 	 **/
-	def export(params) {
+	void export(params) {
 		def key = params.key
 		def projectId = params.projectId
 
@@ -2264,6 +2264,8 @@ class AssetEntityService {
 				log.info "export() - Updating spreadsheet headers took ${TimeUtil.elapsed(started)}"
 				started = new Date()
 				
+				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
+
 				//
 				// Device Export
 				//
@@ -2287,7 +2289,8 @@ class AssetEntityService {
 							def colNum = serverMap[colName]
 							def a = asset[r-1]
 
-							// log.debug "coll=$coll, colNum=$colNum, colName=$colName, attribute=$attribute"
+							if (r==1)
+								log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
 
 							if (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
 								// Skip populating the cell if the value is null
@@ -2300,11 +2303,7 @@ class AssetEntityService {
 									def depGroup = assetDepBundleList.find{it.asset.id==a.id}?.dependencyBundle?.toString()
 									addContentToSheet = new Label(colNum, r, StringUtil.defaultIfEmpty(depGroup, ''))
 									break
-								case 'usize':	
-									def usize = a.model?.usize ?: 0
-									addContentToSheet = new jxl.write.Number(colNum, r, (Double)usize )
-									break
-								case ~/SourcePos|TargetPos/:
+								case ~/usize|SourcePos|TargetPos/:
 									def pos = a[attribute] ?: 0
 									// Don't bother populating position if it is a zero
 									if (pos == 0) 
@@ -2315,8 +2314,7 @@ class AssetEntityService {
 									addContentToSheet = new Label(colNum, r, stdDateFormat.format(a[attribute]) )
 									break
 
-								case "Source Blade":
-								case "Target Blade":
+								case ~/Source Blade|Target Blade/:
 									def chassis = a[attribute]
 									def value = ""
 									if (chassis) {
