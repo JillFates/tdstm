@@ -749,7 +749,7 @@ var EntityCrud = ( function($) {
 		}).select2('val', []);
 		
 		$('#modelSelect').on("change", function(event) {
-			console.log("in the #modelSelect on change event");
+			//console.log("in the #modelSelect on change event");
 			if (event.added) {
 				var at = event.added.assetType;
 				selectedModel = event.added;
@@ -1354,7 +1354,7 @@ function showEditDeviceViewFromAudit(assetClass, entityId) {
 
 //DEPRECATED
 function showComment (commentId , action, commentType) {
-	console.log('DEPRECATED: showComment.');
+	console.log('DEPRECATED: showComment');
 	var id = id
 	var objDom = $('[ng-app]');
 	var injector = angular.element(objDom).injector();
@@ -1832,7 +1832,7 @@ function assetFieldImportance(phase,type){
 		data: {'validation':phase, 'type':forWhom,'id':id},
 		type:'POST',
 		success: function(resp) {
-			console.log(resp)
+			//console.log(resp)
 			$("td,input,select").removeClass("highField")
 			for (var key in resp) {
 				var value = resp[key]
@@ -1943,7 +1943,7 @@ function setColumnAssetPref(value,key, type){
 		data: {'columnValue':value,'from':key,'previousValue':$("#previousValue_"+key).val(),'type':type},
 		type:'POST',
 		success: function(resp) {
-			console.log('success');
+			// console.log('success');
 			if(resp){
 				if( type!='Task_Columns')
 					window.location.reload()
