@@ -186,7 +186,7 @@ var Menu = function(){
   this.getListRooms = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/room/index?viewType=list"]'));
   };
-  this.getRacks = function(){
+  this.getRackElevations = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/rackLayouts/create"]'));
   };
   this.getDataCentersHelp = function(){
@@ -199,8 +199,8 @@ var Menu = function(){
       'listRooms':function(){
         that.getListRooms().click();
       },
-      'racks':function(){
-        that.getRacks().click();
+      'rackElevations':function(){
+        that.getRackElevations().click();
       }
     };
     d[option]();

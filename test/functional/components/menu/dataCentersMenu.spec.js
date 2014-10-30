@@ -9,6 +9,7 @@ describe('Data Centers Menu', function(){
     });
   
     describe('submenu',function(){
+
       it('should displayed 3 links', function(){
         menu.getDataCentersSubmenu().then(function(list){
           expect(list.length).toEqual(3);
@@ -22,7 +23,7 @@ describe('Data Centers Menu', function(){
         expect(menu.getListRooms().getText()).toEqual('List Rooms');
       });
       it('should have Racks in the submenu', function(){
-        expect(menu.getRacks().getText()).toEqual('Racks');
+        expect(menu.getRackElevations().getText()).toEqual('Rack Elevations');
       });
       it('should have Data Centers Help in the submenu', function(){
         expect(menu.getDataCentersHelp().getText()).toEqual('help');

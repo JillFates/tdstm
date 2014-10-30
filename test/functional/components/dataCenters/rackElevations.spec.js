@@ -4,7 +4,7 @@ var Racks = require('./racks.po.js');
 describe('Racks page', function(){
   it('should go to Racks View after select Data Centers - Racks',function(){
     var menu = new Menu();
-    menu.goToDataCentars('racks');
+    menu.goToDataCentars('rackElevations');
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/rackLayouts/create');
   });
 
