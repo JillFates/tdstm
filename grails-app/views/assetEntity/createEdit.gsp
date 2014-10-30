@@ -480,7 +480,7 @@
 						 <span class="button"><g:actionSubmit class="delete" 
 						 	onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
 					 </tds:hasPermission>
-					 <span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('.select2-container').select2('close'); $('#createEntityView').dialog('close'); $('#showEntityView').dialog('close'); $('#editEntityView').dialog('close');"/> </span>
+					 <span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#createEntityView').dialog('close'); $('#showEntityView').dialog('close'); $('#editEntityView').dialog('close');"/> </span>
 				</div>
 			</td>
 		</tr>

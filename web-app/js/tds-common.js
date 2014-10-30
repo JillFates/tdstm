@@ -58,7 +58,8 @@ var tdsCommon = {
 				if (this.element.length > 0) {
 					var dialog = $("#" + this.element[0].id)
 					if (dialog.length > 0 && !dialog.hasClass('static-dialog')) {
-						dialog.html('');	
+						$('.select2-container').select2('close'); 
+						dialog.html('');
 					}
 				}
 				return result;

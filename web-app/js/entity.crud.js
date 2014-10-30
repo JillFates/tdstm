@@ -136,16 +136,13 @@ var EntityCrud = ( function($) {
 	pub.getEditModal = function() { return $('#editEntityView'); };
 	pub.getShowModal = function() { return $('#showEntityView'); };
 
-	pub.closeCreateModal = function() { 
-		$('.select2-container').select2('close'); 
+	pub.closeCreateModal = function() {
 		pub.getCreateModal().dialog('close'); 
 	};
 	pub.closeEditModal = function() { 
-		$('.select2-container').select2('close'); 
 		pub.getEditModal().dialog('close');
 	};
 	pub.closeShowModal = function() { 
-		$('.select2-container').select2('close'); 
 		pub.getShowModal().dialog('close'); 
 	};
 
