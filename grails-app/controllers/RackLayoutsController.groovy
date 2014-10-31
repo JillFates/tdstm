@@ -107,8 +107,7 @@ class RackLayoutsController {
 		def maxUSize = 42
 
 		if (bundleId == "null") {
-			render(view:'save', model:[errorMessage: "Please select a bundle"] )
-			return 
+			return [errorMessage: "Please select a bundle"]
 		}
 
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -222,7 +221,7 @@ class RackLayoutsController {
 				def position = rackPosition + rackSize - 1
 				def newHigh = position
 				def newLow = rackPosition
-				if(assetDetail.size() > 0) {
+				if (assetDetail.size() > 0) {
 					def flag = true
 					assetDetail.each { asset ->
 						flag = true
@@ -366,8 +365,7 @@ class RackLayoutsController {
 			printView: printView
 		] )
 		
-		render( view:'save', model:model)
-	
+		return model
 	}
 	
 	def getRackDetails = {
