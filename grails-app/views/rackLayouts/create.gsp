@@ -25,7 +25,100 @@
 <g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 <g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 <g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+
 <title>Rack View</title>
+
+</head>
+<body>
+<div class="body" style="width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
+
+	<g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+	</g:if>
+
+	<h1 style="margin: 10px;">Rack Elevations</h1>		
+
+	<div class="dialog">
+		<g:form action="generateElevations" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%">
+		<input type="hidden" id="redirectTo" value="rack"/>
+		<input type="hidden" id="fromRoomOrRack" value="rack"/>
+		<table style="width:auto; border: none">
+			<tbody>
+				<tr>
+					<td>
+						<label><b>Bundle</b></label><br />
+						<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
+							<option value="all" selected="selected">All</option>
+							<g:each in="${moveBundleList}" var="moveBundle">
+								<option value="${moveBundle?.id}">${moveBundle?.name}</option>
+							</g:each>
+						</select>
+					</td>
+					
+					<td>
+						<label><b>Source</b></label><br />
+						<select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px" size="4">
+							<option value="null" selected="selected">All</option>
+						</select>
+					</td>
+
+					<td>
+						<div style="width:250px">
+							<label><b>Target</b></label><br />
+							<select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:200px" size="4">
+								<option value="null" selected="selected">All</option>
+							</select>
+						</div>
+					</td>
+					
+					<td>
+						<div style="width:200px">
+							<label for="frontView"><input type="checkbox" name="frontView" id="frontView" ${frontCheck ? 'checked="checked"' : '' }/>&nbsp;Front View</label><br />
+						    <label for="backViewId"><input type="checkbox" name="backView" id="backViewId" ${backCheck ? 'checked="checked"' : '' }/>&nbsp;Back View (power/cabling)</label><br />
+						    <label for="bundleNameId"><input type="checkbox" name="bundleName" id="bundleNameId" ${wBundleCheck ? 'checked="checked"': '' }/>&nbsp;Render bundle names</label><br />
+							<%-- <label for="showCabling"><input type="checkbox" name="showCabling" id="showCabling" ${wDCheck ? 'checked="checked"' :'' }/>&nbsp;Render diagrams</label><br /> --%>
+						    <label for="otherBundleId"><input type="checkbox" name="otherBundle" id="otherBundleId" ${woBundleCheck ? 'checked="checked"' :'' }/>&nbsp;Include assets from other bundles</label><br />
+						</div>
+					</td>
+					
+					<td class="buttonR">
+						<br /><br />
+						<input type="hidden" id="viewMode" name="viewMode" value="" />
+						<input type="submit" class="submit" value="Generate" id="generateId"/>
+					</td>
+
+					<td class="buttonR">
+						<br/><br/>
+						<input type="submit" class="submit" value="Print View" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		</g:form>
+	</div>
+
+	<div style="display: none;" id="cablingDialogId"></div>
+	<div id="racksLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
+
+	<h3 style="margin: 10px;">Enter your selection criteria and options then press Generate or Print View to view the rack elevations</h3>
+
+</div>
+
+<div id="listDialog" title="Asset List" style="display: none;">
+	<div class="dialog" >
+		<table id="listDiv">
+		</table>
+	</div>
+</div>
+
+<g:render template="../assetEntity/modelDialog"/>
+<g:render template="../assetEntity/entityCrudDivs" />
+<g:render template="../assetEntity/dependentAdd" />
+<g:render template="../assetEntity/initAssetEntityData"/>
+
+<%-- TODO : JPM 10/2014 : This hidden role input field is NOT in a form so it is bogus --%>
+<input type="hidden" id="role" value="role"/>
+
 <script type="text/javascript">
 
 	function updateRackDetails(e) {
@@ -54,9 +147,9 @@
       	var sourceList = "${sourceRackFilter}"
           
         	var sourceArray =	sourceList.split(",")
-        	if(sourceList=='none'){
+        	if (sourceList=='none') {
         		$("#sourceRackIdSelect option[value='none']").attr('selected', true);
-            }else if(sourceArray.length>=1 && sourceList!=""){
+            } else if(sourceArray.length>=1 && sourceList!="") {
 	  	        for(i=0; i<sourceArray.length;i++){
 	  	            var optsourcevalue = sourceArray[i].trim();
 	  	            $("#sourceRackIdSelect option[value="+optsourcevalue+"]").attr('selected', 'selected');
@@ -94,22 +187,34 @@
 				selectObj.append(option);
 			});
       	}
-     }
+    }
 
+    // Global variable that is used to hold onto async requests so that if the user changes the criteria
+    // and resubmits before the request finishes, that it can be aborted.
 	var reqLoadRack;
-	function submitForm(form){
+
+	function submitForm(form) {
 		if ($("#bundleId").val() == 'null') {
 			alert("Please select bundle");
 			return false;
-		} else if( !$("#frontView").is(":checked") && !$("#backViewId").is(":checked") ) {
+		}
+
+		if( !$("#frontView").is(":checked") && !$("#backViewId").is(":checked") ) {
 			alert("Please select print view");
 			return false;
-		} else if($('#commit').val() == 'Generate') {
+		} 
+
+		var viewMode = $('#viewMode').val();
+
+		if (viewMode == 'Generate') {
 			<%-- calling this dialog close for some odd reason causes a popup window to appear with rack elevation --%>
 			// $("#cablingDialogId").dialog("close")
 			$('#racksLayout').html('Loading...');
-			if (reqLoadRack) 
+
+			if (reqLoadRack) {
 				reqLoadRack.abort();
+			}
+
 			reqLoadRack = jQuery.ajax({
 				url: $(form).attr('action'),
 				data: $(form).serialize(),
@@ -120,7 +225,10 @@
 				}
 			});
 			return false;
+		} else if (viewMode = "Print View") {
+			return true;
 		}
+		console.log("submitForm() didn't handle viewMode '" + viewMode + "'");
 		return false;
 	}
 
@@ -139,92 +247,6 @@
        	
 		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(e)')}
 	}
-    </script>
-</head>
-<body>
-<div class="body" style="width:98%;" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-<g:if test="${flash.message}">
-	<div class="message">${flash.message}</div>
-</g:if>
-<h1 style="margin: 10px;">Rack Elevations</h1>		
-<div class="dialog">
-<g:form action="save" name="rackLayoutCreate" method="post" target="_blank" onsubmit="return submitForm(this);" style="border: 1px solid black; width: 100%">
-<input type="hidden" id="redirectTo" value="rack"/>
-<input type="hidden" id="fromRoomOrRack" value="rack"/>
-<table style="width:auto; border: none">
-	<tbody>
-		<tr>
-			<td>
-				<label><b>Bundle</b></label><br />
-				<select id="bundleId" name="moveBundle" multiple="multiple" size="3" onchange="getRackDetails(this.id)" style="width:150px">
-					<option value="all" selected="selected">All</option>
-					<g:each in="${moveBundleList}" var="moveBundle">
-						<option value="${moveBundle?.id}">${moveBundle?.name}</option>
-					</g:each>
-				</select>
-			</td>
-			
-			<td>
-				<label><b>Source</b></label><br />
-				<select id="sourceRackIdSelect" multiple="multiple" name="sourcerack" style="width:200px" size="4">
-					<option value="null" selected="selected">All</option>
-				</select>
-			</td>
-
-			<td>
-				<div style="width:250px">
-					<label><b>Target</b></label><br />
-					<select id="targetRackIdSelect" multiple="multiple" name="targetrack" style="width:200px" size="4">
-						<option value="null" selected="selected">All</option>
-					</select>
-				</div>
-			</td>
-			
-			<td>
-				<div style="width:200px">
-					<label for="frontView"><input type="checkbox" name="frontView" id="frontView" ${frontCheck ? 'checked="checked"' : '' }/>&nbsp;Front View</label><br />
-				    <label for="backViewId"><input type="checkbox" name="backView" id="backViewId" ${backCheck ? 'checked="checked"' : '' }/>&nbsp;Back View (power/cabling)</label><br />
-				    <label for="bundleNameId"><input type="checkbox" name="bundleName" id="bundleNameId" ${wBundleCheck ? 'checked="checked"': '' }/>&nbsp;Render bundle names</label><br />
-					<%-- <label for="showCabling"><input type="checkbox" name="showCabling" id="showCabling" ${wDCheck ? 'checked="checked"' :'' }/>&nbsp;Render diagrams</label><br /> --%>
-				    <label for="otherBundleId"><input type="checkbox" name="otherBundle" id="otherBundleId" ${woBundleCheck ? 'checked="checked"' :'' }/>&nbsp;Include assets from other bundles</label><br />
-				</div>
-			</td>
-			
-			<td class="buttonR">
-				<br /><br />
-				<input type="hidden" id="commit" name="commit" value="" />
-				<input type="submit" class="submit" value="Generate" id="generateId"/>
-			</td>
-
-			<td class="buttonR">
-				<br/><br/>
-				<input type="submit" class="submit" value="Print View" />
-			</td>
-		</tr>
-	</tbody>
-</table>
-	</g:form>
-</div>
-<div style="display: none;" id="cablingDialogId"></div>
-<div id="racksLayout" style="width:100%; overflow-x:auto; border: 1px solid black">
-<h3 style="margin: 10px;">Enter your selection criteria and options then press Generate or Print View to view the rack elevations</h3>
-</div>
-<div id="listDialog" title="Asset List" style="display: none;">
-	<div class="dialog" >
-		<table id="listDiv">
-		</table>
-	</div>
-</div>
-
-<g:render template="../assetEntity/modelDialog"/>
-<g:render template="../assetEntity/entityCrudDivs" />
-<g:render template="../assetEntity/dependentAdd" />
-<g:render template="../assetEntity/initAssetEntityData"/>
-
-<input type="hidden" id="role" value="role"/>
-
-</div>
-<script type="text/javascript">
 
 	// Load the Source and Target Racks with possible options based on the currently selected Bundle
 	( function($) {
@@ -249,7 +271,7 @@
 		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(e)')};
 		
 		$('input.submit').click(function() {
-			$('#commit').val($(this).val());
+			$('#viewMode').val($(this).val());
 		});
 	})(jQuery);
 	
@@ -273,10 +295,10 @@
 			}
 	    })
 	}
-</script>
-<script>
+
 	currentMenuId = "#racksMenu";
 	$("#rackMenuId a").css('background-color','#003366')
 </script>
+
 </body>
 </html>

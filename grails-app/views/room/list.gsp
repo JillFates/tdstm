@@ -399,7 +399,7 @@
 			},600);
 		}
 		function getRackLayout( rackId ){
-			if(rackId){
+			if (rackId) {
 				var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 				var moveBundleId = ''
 				$("#bundleId option:selected").each(function () {
@@ -410,21 +410,21 @@
 				$("#rack_"+rackId).addClass("objectSelected")
 				
 				var forWhom = $("#auditCheckId").val() == 1 ? "room" : ""
-				new Ajax.Request('../rackLayouts/save',{asynchronous:true,evalScripts:true,
+				new Ajax.Request('../rackLayouts/generateElevations',{asynchronous:true,evalScripts:true,
 					onSuccess:function(e){updateRackPower( rackId )},
 					onComplete:function(e){
 							jQuery('#rackLayout').html(e.responseText);
-							if(forWhom=='room'){
+							if (forWhom=='room') {
 								$("#auditDetailViewId").show();
 								$('#rackLayout').addClass('audit');
 								$('#rackLayout').removeClass('notAudit'); 
-							}else{
+							} else {
 								$("#auditDetailViewId").hide();
 								$('#rackLayout').addClass('notAudit');
 								$('#rackLayout').removeClass('audit');
 							}
 							getAssignedDetails('room', rackId)
-						},parameters:moveBundleId+'rackId='+rackId+'&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
+						}, parameters:moveBundleId+'rackId='+rackId+'&viewMode=Generate&backView=off&showCabling=off&otherBundle='+otherBundle+'&bundleName=on&hideIcons=on&forWhom='+forWhom});return false;
 			}
 		}
 		currentMenuId = "#roomsMenu";

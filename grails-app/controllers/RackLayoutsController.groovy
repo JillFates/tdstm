@@ -92,10 +92,11 @@ class RackLayoutsController {
 
 	/**
 	 * Used to generate multiple rack elevation diagrams
-	 * TODO : JPM 10/2014 : change method save to generateElevations in order to be intuitive to what it is doing since it is NOT saving anything...
 	 */
-	def save = {
-		def project = controllerService.getProjectForPage( this, 'RoomEditView' )
+	def generateElevations = {
+
+		// TODO : JPM 10/2014 : generateElevations method is using incorrect permission (RoomEditView)
+		def (project,userLogin) = controllerService.getProjectAndUserForPage( this, 'RoomEditView' )
 		if (! project) 
 			return
 
@@ -106,254 +107,267 @@ class RackLayoutsController {
 		def maxUSize = 42
 
 		if (bundleId == "null") {
-			return [errorMessage: "Please Select a Bundle."]
-		} else {
+			render(view:'save', model:[errorMessage: "Please select a bundle"] )
+			return 
+		}
 
-			def userLogin = securityService.getUserLogin()
-			def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-			def model = assetEntityService.getDeviceModelForList(project, userLogin, session, params, tzId)
+		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
-			def redirectTo = 'rack'
-			def includeOtherBundle = params.otherBundle
-			def includeBundleName = params.bundleName
-			def printQuantity = params.printQuantity
-			def frontView = params.frontView
-			def backView = params.backView
-			def sourceRacks = new ArrayList()
-			def targetRacks = new ArrayList()
-			def rackLayout = []
-			def moveBundles = MoveBundle.findAllByProject( project )
-			def rackId = params.rackId
-			def hideIcons = params.hideIcons
-			
-			if (bundleId && !bundleId.contains("all")){
-				def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
-				moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
-			}
-			def rackLayoutsHasPermission = RolePermissions.hasPermission("EditAssetInRackLayout")
-			/*if( !rackLayoutsHasPermission ) {
-				rackLayoutsHasPermission =RolePermissions.hasPermission("rackLayouts")
-			}*/
-			
-			if (request && request.getParameterValues("sourcerack") != ['none']) {
-				List rack = request.getParameterValues("sourcerack")
-				if (rack){
-					if (rack.contains("none")){
-						rack.remove("none")
-					}
-					if (rack && rack[0] == "") {
-						moveBundles.each{ bundle->
-							bundle.sourceRacks.each{ sourceRack->
-								if( !sourceRacks.contains( sourceRack ) )
-									sourceRacks.add( sourceRack )		
-							}
-						}
-					} else {
-						rack.each {
-							def thisRack = Rack.get(new Long(it))
-							if( !sourceRacks.contains( thisRack ) )
-								sourceRacks.add( thisRack )
-						}
-					}
-				}
-				sourceRacks = sourceRacks.sort { it.tag }
-			}
+		def model = assetEntityService.getDeviceModelForList(project, userLogin, session, params, tzId)
 
-			if(request && request.getParameterValues("targetrack") != ['none']) {
-				List rack = request.getParameterValues("targetrack")
-				if(rack){
-					if(rack.contains("none")){
-						rack.remove("none")
-					}
-					if(rack && rack[0] == "") {
-						moveBundles.each{ bundle->
-							bundle.targetRacks.each{ targetRack->
-								if( !targetRacks.contains( targetRack ) )
-									targetRacks.add( targetRack	)
-							}
-						}
-					} else {
-						rack.each {
-							def thisRack = Rack.get(new Long(it))
-							if( !targetRacks.contains( thisRack ) )
-								targetRacks.add( thisRack )
-						}
-					}
+		def redirectTo = 'rack'
+		def includeOtherBundle = params.otherBundle
+		def includeBundleName = params.bundleName
+		def printQuantity = params.printQuantity
+		def frontView = params.frontView
+		def backView = params.backView
+		def sourceRacks = new ArrayList()
+		def targetRacks = new ArrayList()
+		def rackLayout = []
+		def moveBundles = MoveBundle.findAllByProject( project )
+		def rackId = params.rackId
+		def hideIcons = params.hideIcons
+		
+		boolean printView = params.viewMode == 'Print View'
+		boolean generateView = params.viewMode == 'Generate'
+
+		if (bundleId && !bundleId.contains("all")){
+			def bundlesString = bundleId.toString().replace("[","(").replace("]",")")
+			moveBundles = MoveBundle.findAll("from MoveBundle m where id in ${bundlesString} ")
+		}
+		def rackLayoutsHasPermission = RolePermissions.hasPermission("EditAssetInRackLayout")
+		
+		if (request && request.getParameterValues("sourcerack") != ['none']) {
+			List rack = request.getParameterValues("sourcerack")
+			if (rack){
+				if (rack.contains("none")){
+					rack.remove("none")
 				}
-				targetRacks = targetRacks.sort { it.tag }
-			}
-			
-			def racks = sourceRacks + targetRacks
-			if(racks.size() == 0 && rackId){
-				session.setAttribute('RACK_ID',rackId)
-				redirectTo = 'room'
-				racks = Rack.findAllById(rackId)
-				//moveBundles = []
-				bundleId = request.getParameterValues("moveBundleId")
-				if (bundleId && !bundleId.contains("all") && !bundleId.contains("taskReady")){
-					def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
-					moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
-				}
-			}
-			racks.each { rack ->
-				maxUSize = rack?.model?.usize ?: 42
-				def assetDetails = []
-				def assetDetail = []
-				def finalAssetList = []
-				def racksByFilter
-				if(includeOtherBundle){
-					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+				if (rack && rack[0] == "") {
+					moveBundles.each{ bundle->
+						bundle.sourceRacks.each{ sourceRack->
+							if( !sourceRacks.contains( sourceRack ) )
+								sourceRacks.add( sourceRack )		
+						}
+					}
 				} else {
-					racksByFilter = rack.assets.findAll { it.assetType !='Blade' && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+					rack.each {
+						def thisRack = Rack.get(new Long(it))
+						if( !sourceRacks.contains( thisRack ) )
+							sourceRacks.add( thisRack )
+					}
 				}
-				racksByFilter.each { assetEntity ->
+			}
+			sourceRacks = sourceRacks.sort { it.tag }
+		}
+
+		if (request && request.getParameterValues("targetrack") != ['none']) {
+			List rack = request.getParameterValues("targetrack")
+			if (rack) {
+				if(rack.contains("none")){
+					rack.remove("none")
+				}
+				if (rack && rack[0] == "") {
+					moveBundles.each{ bundle->
+						bundle.targetRacks.each{ targetRack->
+							if( !targetRacks.contains( targetRack ) )
+								targetRacks.add( targetRack	)
+						}
+					}
+				} else {
+					rack.each {
+						def thisRack = Rack.get(new Long(it))
+						if( !targetRacks.contains( thisRack ) )
+							targetRacks.add( thisRack )
+					}
+				}
+			}
+			targetRacks = targetRacks.sort { it.tag }
+		}
+		
+		def racks = sourceRacks + targetRacks
+		if(racks.size() == 0 && rackId){
+			session.setAttribute('RACK_ID',rackId)
+			redirectTo = 'room'
+			racks = Rack.findAllById(rackId)
+			//moveBundles = []
+			bundleId = request.getParameterValues("moveBundleId")
+			if (bundleId && !bundleId.contains("all") && !bundleId.contains("taskReady")){
+				def moveBundleId = bundleId.collect{id->Long.parseLong(id)}
+				moveBundles = MoveBundle.findAllByIdInList(moveBundleId)
+			}
+		}
+
+		racks.each { rack ->
+			maxUSize = rack?.model?.usize ?: 42
+			def assetDetails = []
+			def assetDetail = []
+			def finalAssetList = []
+			def racksByFilter
+			if(includeOtherBundle){
+				racksByFilter = rack.assets.findAll { ! it.isaBlade() && it.project == project }
+					.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+			} else {
+				racksByFilter = rack.assets.findAll { ! it.isaBlade() && moveBundles?.id?.contains(it.moveBundle?.id) && it.project == project }
+					.sort { rack?.source == 1 ? it.sourceRackPosition ? it.sourceRackPosition * -1 : 0 : it.targetRackPosition ? it.targetRackPosition * -1 : 0}
+			}
+			racksByFilter.each { assetEntity ->
+			
+				def overlapError = false
+				def rackPosition = rack.source == 1 ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
+				if(rackPosition == 0 || rackPosition == null)
+					rackPosition = 1
 				
-					def overlapError = false
-					def rackPosition = rack.source == 1 ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
-					if(rackPosition == 0 || rackPosition == null)
-						rackPosition = 1
-					
-					def rackSize = assetEntity?.model?.usize == 0 || assetEntity?.model?.usize == null ? 1 : assetEntity?.model?.usize?.toInteger()
-					def position = rackPosition + rackSize - 1
-					def newHigh = position
-					def newLow = rackPosition
-					if(assetDetail.size() > 0) {
-						def flag = true
-						assetDetail.each { asset ->
-							flag = true
-							def currentHigh = asset.currentHigh
-							def currentLow = asset.currentLow
-							def ignoreLow = (currentLow <= newLow && currentHigh >= newHigh )
-							def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
-							def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
-							def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
-							if(position > maxUSize) {
-								asset.position = maxUSize
-								asset.rowspan = 1 
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
-								asset.overlapError = true
-								asset.cssClass = "rack_error"
-								flag = false
-							} else if(ignoreLow) {
-								asset.position = currentHigh
-								asset.rowspan = currentHigh - currentLow + 1 
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
-								asset.overlapError = true
-								asset.cssClass = "rack_error"
-								flag = false
-							} else if(changeBoth) {
-								asset.currentHigh = newHigh
-								asset.currentLow = newLow
-								asset.position = newHigh
-								asset.rowspan = newHigh - newLow + 1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
-								asset.overlapError = true
-								asset.cssClass = "rack_error"
-								flag = false
-							} else if(changeHigh) {
-								asset.currentHigh = newHigh
-								asset.position = newHigh
-								asset.rowspan = newHigh - currentLow  + 1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
-								asset.overlapError = true
-								asset.cssClass = "rack_error"
-								flag = false
-							} else if(changeLow) {
-								asset.currentLow = newLow
-								asset.position = currentHigh
-								asset.rowspan = currentHigh - newLow +1
-								asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
-								asset.overlapError = true
-								asset.cssClass = "rack_error"
-								flag = false
-							}
-						}
-							
-						if(flag) {
-							if(position > maxUSize) {
-								position = maxUSize
-								newLow = maxUSize
-								//assetEntity?.model?.usize = 1
-								overlapError = true
-							}
-							assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
-											rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
-						}
-					} else {
+				def rackSize = assetEntity?.model?.usize == 0 || assetEntity?.model?.usize == null ? 1 : assetEntity?.model?.usize?.toInteger()
+				def position = rackPosition + rackSize - 1
+				def newHigh = position
+				def newLow = rackPosition
+				if(assetDetail.size() > 0) {
+					def flag = true
+					assetDetail.each { asset ->
+						flag = true
+						def currentHigh = asset.currentHigh
+						def currentLow = asset.currentLow
+						def ignoreLow = (currentLow <= newLow && currentHigh >= newHigh )
+						def changeBoth = (currentLow >= newLow && currentHigh <= newHigh )
+						def changeLow = (currentLow >= newLow && currentHigh >= newHigh && currentLow <= newHigh)
+						def changeHigh = (currentLow <= newLow && currentHigh <= newHigh && currentHigh <= newLow)
 						if(position > maxUSize) {
+							asset.position = maxUSize
+							asset.rowspan = 1 
+							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
+							asset.overlapError = true
+							asset.cssClass = "rack_error"
+							flag = false
+						} else if(ignoreLow) {
+							asset.position = currentHigh
+							asset.rowspan = currentHigh - currentLow + 1 
+							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
+							asset.overlapError = true
+							asset.cssClass = "rack_error"
+							flag = false
+						} else if(changeBoth) {
+							asset.currentHigh = newHigh
+							asset.currentLow = newLow
+							asset.position = newHigh
+							asset.rowspan = newHigh - newLow + 1
+							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
+							asset.overlapError = true
+							asset.cssClass = "rack_error"
+							flag = false
+						} else if(changeHigh) {
+							asset.currentHigh = newHigh
+							asset.position = newHigh
+							asset.rowspan = newHigh - currentLow  + 1
+							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
+							asset.overlapError = true
+							asset.cssClass = "rack_error"
+							flag = false
+						} else if(changeLow) {
+							asset.currentLow = newLow
+							asset.position = currentHigh
+							asset.rowspan = currentHigh - newLow +1
+							asset.assetTag = asset.assetTag +"<br/>"+assetEntity.assetTag+ ' ~- ' + assetEntity.assetName
+							asset.overlapError = true
+							asset.cssClass = "rack_error"
+							flag = false
+						}
+					}
+						
+					if (flag) {
+						if (position > maxUSize) {
 							position = maxUSize
 							newLow = maxUSize
 							//assetEntity?.model?.usize = 1
 							overlapError = true
 						}
 						assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
-										rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
+							rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
 					}
+				} else {
+					if (position > maxUSize) {
+						position = maxUSize
+						newLow = maxUSize
+						//assetEntity?.model?.usize = 1
+						overlapError = true
+					}
+					assetDetail << [assetEntity:assetEntity, assetTag:assetEntity.assetTag + ' ~- ' + assetEntity.assetName, position:position, overlapError:overlapError, 
+						rowspan:rackSize, currentHigh : position, currentLow : newLow, source:rack.source ]
 				}
-				for (int i = maxUSize; i > 0; i--) {
-					def cssClass = "empty"
-					def rackStyle = "rack_past"
-					def assetEnitiesAtPosition = assetDetail.findAll { it.position == i }
+			}
+			for (int i = maxUSize; i > 0; i--) {
+				def cssClass = "empty"
+				def rackStyle = "rack_past"
+				def assetEnitiesAtPosition = assetDetail.findAll { it.position == i }
 
-					if(assetEnitiesAtPosition.size() > 1) {
+				if(assetEnitiesAtPosition.size() > 1) {
+					cssClass = 'rack_error'
+					rackStyle = 'rack_error'
+            		assetDetails<<[asset:assetEnitiesAtPosition[0], rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
+				} else if(assetEnitiesAtPosition.size() == 1) {
+					def assetEnity = assetEnitiesAtPosition[0]
+					def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+					if(assetEnity.overlapError) {
 						cssClass = 'rack_error'
 						rackStyle = 'rack_error'
-	            		assetDetails<<[asset:assetEnitiesAtPosition[0], rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
-					} else if(assetEnitiesAtPosition.size() == 1) {
-						def assetEnity = assetEnitiesAtPosition[0]
-						def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
-						if(assetEnity.overlapError) {
-							cssClass = 'rack_error'
-							rackStyle = 'rack_error'
-						} else if(bundleId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
-							def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
-							if(startTime < currentTime){
-								cssClass = 'rack_past'
-							} else {
-								cssClass = "rack_future"
-							}
-						} else if(rackId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
-							def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
-							if(startTime < currentTime){
-								cssClass = 'rack_past'
-							} else {
-								cssClass = "rack_future"
-							}
-						} else  {
-							cssClass = 'rack_current'
-							rackStyle = 'rack_current'
+					} else if(bundleId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
+						def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
+						if(startTime < currentTime){
+							cssClass = 'rack_past'
+						} else {
+							cssClass = "rack_future"
 						}
-						if(assetEnity.position == 0 || assetEnity.assetEntity?.model?.usize == 0 || assetEnity.assetEntity?.model?.usize == null ) {
-							rackStyle = 'rack_error'
+					} else if(rackId && !moveBundles?.id?.contains(assetEnity.assetEntity?.moveBundle?.id) ) {
+						def startTime = assetEnity.assetEntity?.moveBundle?.startTime ? assetEnity.assetEntity?.moveBundle?.startTime.getTime() : 0
+						if(startTime < currentTime){
+							cssClass = 'rack_past'
+						} else {
+							cssClass = "rack_future"
 						}
-						assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
-					} else {
-						assetDetails << [asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
+					} else  {
+						cssClass = 'rack_current'
+						rackStyle = 'rack_current'
 					}
+					if(assetEnity.position == 0 || assetEnity.assetEntity?.model?.usize == 0 || assetEnity.assetEntity?.model?.usize == null ) {
+						rackStyle = 'rack_error'
+					}
+					assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
+				} else {
+					assetDetails << [asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
 				}
-				def backViewRows
-				def frontViewRows
-				def paramsMap = [:]
-				paramsMap = [ rackLayoutsHasPermission: rackLayoutsHasPermission, assetDetails: assetDetails, includeBundleName: includeBundleName,
-					backView: backView, showCabling: params.showCabling, hideIcons: hideIcons, redirectTo: redirectTo, rackId: rack.id,
-					forWhom: params.forWhom, commit: params.commit, bundle: moveBundles]
-				
-				if(backView) {
-					backViewRows = getRackLayout(paramsMap)
-				}
-				if(frontView) {
-					paramsMap["backView"] = null
-					frontViewRows = getRackLayout(paramsMap)
-				}
-				rackLayout << [ assetDetails: assetDetails, rack: rack.tag , room: rack.room,
-					frontViewRows: frontViewRows, backViewRows: backViewRows , rackId: rack.id]
 			}
-			def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
-
-			model.putAll( [rackLayout: rackLayout, frontView: frontView, backView: backView, showIconPref: showIconPref, commit: params.commit] )
+			def backViewRows
+			def frontViewRows
+			def paramsMap = [:]
+			paramsMap = [ rackLayoutsHasPermission: rackLayoutsHasPermission, assetDetails: assetDetails, includeBundleName: includeBundleName,
+				backView: backView, showCabling: params.showCabling, hideIcons: hideIcons, redirectTo: redirectTo, rackId: rack.id,
+				forWhom: params.forWhom, bundle: moveBundles,
+				printView: printView
+			]
 			
-			return model
+			if (backView) {
+				backViewRows = getRackLayout(paramsMap)
+			}
+			if (frontView) {
+				paramsMap["backView"] = null
+				frontViewRows = getRackLayout(paramsMap)
+			}
+			rackLayout << [ assetDetails: assetDetails, rack: rack.tag , room: rack.room,
+				frontViewRows: frontViewRows, backViewRows: backViewRows , rackId: rack.id]
 		}
+		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
+
+		model.putAll( [
+			rackLayout: rackLayout, 
+			frontView: frontView, 
+			backView: backView, 
+			showIconPref: showIconPref, 
+			generateView: generateView,
+			printView: printView
+		] )
+		
+		render( view:'save', model:model)
+	
 	}
 	
 	def getRackDetails = {
@@ -387,7 +401,7 @@ class RackLayoutsController {
 	/**
 	 * Used to generate the HTML that represents a Rack
 	 */
-	private getRackLayout( paramsMap ){
+	private getRackLayout( paramsMap){
 		def rows = new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
@@ -403,8 +417,8 @@ class RackLayoutsController {
 		def redirectTo = paramsMap.redirectTo
 		def rackId = paramsMap.rackId
 		def forWhom = paramsMap.forWhom
-		def commit = paramsMap.commit
-		
+		boolean printView = paramsMap.printView
+
 		asset.each {
 			def row = new StringBuffer("<tr>")
 			if (it.asset) {
@@ -414,9 +428,11 @@ class RackLayoutsController {
 				def assetEntity = it.asset?.assetEntity
 				def assetTagsList = (it.asset?.assetTag).split("<br/>")
 				def moveBundle = "" 
-				def assetTag = ""
-				if(it.cssClass == "rack_error")
-					assetTag += "Devices Overlap:<br />"
+				StringBuffer assetTag = new StringBuffer('')
+
+				if (it.cssClass == "rack_error")
+					assetTag.append("Devices Overlap:<br />")
+				
 				def hasBlades = false
 				def cabling = ""
 
@@ -429,11 +445,11 @@ class RackLayoutsController {
 					queryParams.putAll( [roomName: assetEntity.targetRoom, rackName: assetEntity.targetRack] )
 				}
 				def query = "FROM AssetEntity AS a \
-						JOIN a.room$srcTrg AS room \
-						JOIN a.rack$srcTrg as rack \
-						WHERE a.project=:project AND a.assetClass=:assetClass AND a.assetType<>'Blade' \
-						AND room.roomName=:roomName AND rack.tag=:rackName \
-						AND a.assetTag=:tag"
+					JOIN a.room$srcTrg AS room \
+					JOIN a.rack$srcTrg as rack \
+					WHERE a.project=:project AND a.assetClass=:assetClass AND a.assetType<>'Blade' \
+					AND room.roomName=:roomName AND rack.tag=:rackName \
+					AND a.assetTag=:tag"
 
 				assetTagsList.each{ assetTagValue ->
 					def index = assetTagValue.indexOf('~-')
@@ -446,8 +462,16 @@ class RackLayoutsController {
 					def overlappedAsset
 					def overlappedAssets
 					def bladeTable = ""
-					def bladeLayoutMap = ['asset':it, 'permission':rackLayoutsHasPermission, 'hideIcons':hideIcons, 'redirectTo':redirectTo ,
-						'rackId':rackId, 'commit':commit, 'forWhom':forWhom, "bundle": paramsMap.bundle]
+					def bladeLayoutMap = [
+						asset: it, 
+						bundle: paramsMap.bundle, 
+						forWhom: forWhom, 
+						hideIcons: hideIcons, 
+						permission: rackLayoutsHasPermission, 
+						printView: printView,
+						rackId: rackId, 
+						redirectTo: redirectTo
+					]
 
 					queryParams.tag = tagValue
 					overlappedAssets = AssetEntity.findAll(query, queryParams)
@@ -457,7 +481,13 @@ class RackLayoutsController {
 					def overlappedAssetsSize = overlappedAssets.size()
 					if (overlappedAssetsSize) {
 						overlappedAssets.each { r ->
+
 							def overlapAsset = r[0]
+
+							String title = "Tag: ${overlapAsset.assetTag}\nName: ${overlapAsset.assetName}"
+							if (overlapAsset.model)
+								title += "\nModel: ${overlapAsset.model.modelName}"
+
 							moveBundle += (overlapAsset?.moveBundle ? overlapAsset?.moveBundle.name : "") + "<br/>"
 							if (overlapAsset.model && overlapAsset.model.assetType == 'Blade Chassis' && (!backView || showCabling != 'on')){
 								hasBlades = true
@@ -467,47 +497,57 @@ class RackLayoutsController {
 							if (overlappedAssetsSize > 1) {
 								cabling = ( !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
-							assetTag += '<a href="javascript:' 
-							if (forWhom) {
-								assetTag += "editAudit('roomAudit','${it.source}','${overlapAsset.assetClass}',${overlapAsset?.id})"
-							} else { 
-								assetTag += "EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})"
+							if (printView) {
+								assetTag.append( StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) )
+							} else {
+								assetTag.append('<a title="' + title + '" href="javascript:')
+								if (forWhom) {
+									assetTag.append("editAudit('roomAudit','${it.source}','${overlapAsset.assetClass}',${overlapAsset?.id})")
+								} else { 
+									assetTag.append("EntityCrud.showAssetDetailView('${overlapAsset.assetClass}',${overlapAsset?.id})")
+								}
+								assetTag.append('">' + StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) + '</a>')
 							}
-							assetTag += '">' + StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) + '</a>'
 
-							if(hasBlades){
-								assetTag += "<br/>"+bladeTable
+							if (hasBlades) {
+								assetTag.append("<br/>" + bladeTable)
 							}
 						}
 					} 
 				}
 
-				if(backView) {
-					def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])
+				if (backView) {
+
 					def taskAnchors = ""
-					tasks.each{
-						taskAnchors+="""<a href='#' class='${taskService.getCssClassForRackStatus(it.status)}' title='${it.taskNumber+':'+it.comment}' 
-							onclick=\"javascript:showAssetComment(${it.id},'show')\" > &nbsp;&nbsp;&nbsp;&nbsp; </a> &nbsp;"""
+					if (!printView) {
+						def tasks = AssetComment.findAllByAssetEntityAndStatusInList(it.asset?.assetEntity, [AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD])					
+						tasks.each{
+							taskAnchors += """<a href='#' class='${taskService.getCssClassForRackStatus(it.status)}' title='${it.taskNumber+':'+it.comment}' 
+								onclick=\"javascript:showAssetComment(${it.id},'show')\" > &nbsp;&nbsp;&nbsp;&nbsp; </a> &nbsp;"""
+						}
 					}
-					if(cabling != "" && it.cssClass != "rack_error"){
+
+					if (cabling != "" && it.cssClass != "rack_error"){
 						def assetCables = AssetCableMap.findByAssetFrom(it.asset?.assetEntity)
-						if( hasBlades && showCabling != 'on'){
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-							if ( assetCables ){
+						if ( hasBlades && showCabling != 'on') {
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
+							if ( !printView && assetCables ) {
 								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
-									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="../icons/disconn.png"/>
+									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="../icons/disconnect.png"/>
 									&nbsp${taskAnchors}</td>""")
-							}else
+							} else {
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;${taskAnchors}</td>")
+							}
 						} else {
 							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
-							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
+							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag.toString()}</td>")
 							
-							if(includeBundleName)
+							if (includeBundleName)
 								row.append("<td style='border:0;'>${moveBundle}</td>")
 							else
 								row.append("<td style='border:0;'>&nbsp;</td>")
-							if ( assetCables )
+
+							if ( !printView && assetCables )
 								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='../icons/disconnect.png'/> &nbsp; ${taskAnchors}</a></td></tr>")
 							else
 								row.append("<td style='border:0;'>&nbsp;${taskAnchors}</td></tr>")
@@ -516,17 +556,17 @@ class RackLayoutsController {
 						}
 					} else {
 						if( hasBlades && showCabling != 'on'){
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 						} else {
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}${cabling}</td>")
+							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}${cabling}</td>")
 							if(includeBundleName)
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 							else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
 						}
-						if(it.cssClass != "rack_error") {
+						if (it.cssClass != "rack_error") {
 							def assetCables = AssetCableMap.findByAssetFrom(it.asset?.assetEntity)
-							if ( assetCables )
+							if ( !printView && assetCables )
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='../icons/disconnect.png' height='12' width='12' title='Cabling'/> ${taskAnchors}</a></td>")
 							else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp; ${taskAnchors}</td>")
@@ -537,39 +577,39 @@ class RackLayoutsController {
 					}
 				} else {
 					if( hasBlades ){
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 					} else if(cabling != ""){
 						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='2' class='${it.cssClass}'>")
-						row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag}</td>")
-						if(includeBundleName)
+						row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag.toString()}</td>")
+						if (includeBundleName)
 							row.append("<td style='border:0;'>${moveBundle}</td></tr>")
 						else
 							row.append("<td style='border:0;'>&nbsp;</td></tr>")
 						row.append("<tr><td colspan='2' style='border:0;'>${cabling}</td></tr></table></td>")
 						
 					} else {
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag}</td>")
-						if(includeBundleName)
+						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
+						if (includeBundleName)
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 						else
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'></td>")
 					}
 				}
-			} else if(rowspan <= 1) {
+			} else if (rowspan <= 1) {
 				rowspan = 1
 				rackStyle = it.rackStyle
 				row.append("<td class='empty' nowrap>${it.rack}</td><td rowspan=1 class=${it.cssClass}>")
-				if (commit!="Print View") {
-				def roomParameter = it.rackDetails.room?.id
-				def roomName = it.rackDetails.room?.roomName
-				def locationName = it.rackDetails.room?.location
-				def rackParameter = it.rackDetails.id
-				row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
-							<ul>
-								<li><a href="javascript:${forWhom ? "createAuditPage" : "EntityCrud.showAssetCreateView"}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
-								<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
-								<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
-							</ul></img></div>&nbsp;""")
+				if (! printView) {
+					def roomParameter = it.rackDetails.room?.id
+					def roomName = it.rackDetails.room?.roomName
+					def locationName = it.rackDetails.room?.location
+					def rackParameter = it.rackDetails.id
+					row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
+						<ul>
+							<li><a href="javascript:${forWhom ? "createAuditPage" : "EntityCrud.showAssetCreateView"}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
+							<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
+							<li><a href="javascript:listDialog('all','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Reassign asset </a></li>
+						</ul></img></div>&nbsp;""")
 				}
 				row.append("</td><td>&nbsp;</td>")
 				if(backView)
@@ -591,8 +631,9 @@ class RackLayoutsController {
 	/**
 	  * Used to generate the HTML widget for a single Blade Chassis's layout for RackLayouts report
 	  */
-	def generateBladeLayout(bladeLayoutMap){
-		
+	private String generateBladeLayout(Map bladeLayoutMap) {
+		//log.debug "generateBladeLayout() - bladeLayoutMap=$bladeLayoutMap"
+
 		def assetDetails = bladeLayoutMap.asset
 		def assetEntity = bladeLayoutMap.overlappedAsset
 		def rackLayoutsHasPermission = bladeLayoutMap.permission
@@ -602,67 +643,114 @@ class RackLayoutsController {
 		def commit = bladeLayoutMap.commit
 		def forWhom = bladeLayoutMap.forWhom
 		def bundles = bladeLayoutMap.bundle
+		boolean printView = bladeLayoutMap.printView
 		
 		def showIconPref = userPreferenceService.getPreference("ShowAddIcons")
-		def bladeTable = '<table class="bladeTable"><tr>'
+		StringBuffer bladeTable = new StringBuffer('<table class="bladeTable"><tr>')
 		def rowspan = assetDetails.asset?.rowspan != 0 ? assetDetails.asset?.rowspan : 1
 		def tdHeight = rowspan * 6
 		def blades = []
-		def chassis = AssetEntity.findByAssetName(assetEntity.assetTag)
-		if(assetDetails.asset.source == 1)
-			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', sourceChassis:chassis).findAll{it?.moveBundle?.id in bundles?.id}
+		def chassis = AssetEntity.read(assetEntity.id)
+
+		if (assetDetails.asset.source == 1)
+			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', sourceChassis:chassis)
 		else
-			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', targetChassis:chassis).findAll{it?.moveBundle?.id in bundles?.id}
+			blades = AssetEntity.findAllWhere(project:assetEntity.project, assetType:'Blade', targetChassis:chassis)
+
+		// Filter out the blades based on the bundles selected
+		blades = blades.findAll{it?.moveBundle?.id in bundles?.id}
 
 		def fullRows = []
-		def chassisRows = assetEntity.model.bladeRows
-		def bladesPerRow = (assetEntity.model.bladeCount / chassisRows ).intValue()
-		def bladeLabelCount = assetEntity.model.bladeLabelCount
 		def assetRoom
 		def assetLocation
+		
+		def chassisRows = 1
+		if (assetEntity.model?.bladeRows)
+			chassisRows = assetEntity.model.bladeRows
 
-		for(int k = 1; k <= chassisRows; k++){
+		def bladesPerRow = 8
+		if (assetEntity.model.bladeCount) 
+			bladesPerRow = (assetEntity.model.bladeCount / chassisRows ).intValue()
+
+		// # of chars to display of the blade label in chassis view 
+		def bladeLabelCharsToDisplay = assetEntity.model.bladeLabelCount		
+
+		for (int k = 1; k <= chassisRows; k++){
 			int initialColumn = (k-1)*bladesPerRow + 1
-			for(int i = initialColumn; i <= k*bladesPerRow; i++){
+			for (int i = initialColumn; i <= k*bladesPerRow; i++){
 				def matching = []
-				if(assetDetails.asset.source == 1)
+				if (assetDetails.asset.source == 1)
 					matching = blades.findAll { it.sourceBladePosition == i }
 				else
 					matching = blades.findAll { it.targetBladePosition == i }
 				
-				if(fullRows.contains(i))
-					bladeTable += ''
-				else if(matching.size() > 1)
-					bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>Conflict</td>"
-				else if(matching.size() == 1) {
-					def blade = matching[0]
-					def tag = blade.assetTag
-					if(tag.length() >= bladeLabelCount){
-						tag = tag.substring(0,bladeLabelCount)
+				int bladeCount = matching.size()
+				if (fullRows.contains(i)) {
+					// What is a full row???
+					bladeTable.append('')
+				} else if (bladeCount > 1) {
+					// Multiple blades are assigned to the same slot so set the the title to display all of the blades tag/name in the hover
+					String title = "Overlap Conflict"
+					matching.each { 
+						title += "\nTag: ${it.assetTag} Name: ${it.assetName}" 
 					}
-					tag = tag.split('')[1..-1].join('<br/>')
-					def taglabel = "<div>"+tag.substring(0,tag.length())+"</div>"
+					String label = 'Conflict'.split('')[1..-1].join('<br>')
+					bladeTable.append("<td class='errorBlade' style='height:${tdHeight}px'>")
+					//bladeTable.append("<a href=\"#\" title=\"$title\" style=\"text-decoration: none;\">$label</a></td>")
+					bladeTable.append("<label title=\"$title\" style=\"text-decoration: none;\">$label</label></td>")
+				} else if(bladeCount == 1) {
+					def blade = matching[0]
+
+					// Determine how many rows a blade spans
 					def bladeSpan = blade.model?.bladeHeight == 'Full' ? chassisRows : 1
-					if(bladeSpan == chassisRows){
+					if (bladeSpan == chassisRows){
 						for(int y = i; y <= chassisRows*bladesPerRow; y += bladesPerRow ){
 							fullRows << y + bladesPerRow
 						}
 					}
-					def hasError = assetDetails.asset.source == 1 ? blades.findAll { it.sourceBladePosition == i + bladeLabelCount }.size() > 0 : blades.findAll { it.targetBladePosition == i + bladeLabelCount }.size() > 0
-					if((bladeSpan == 2) &&  hasError )
-						bladeTable += "<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>"
+
+					String title = "Tag: ${blade.assetTag}\nName: ${blade.assetName}"
+					if (blade.model)
+						title += "\nModel: ${blade.model.modelName}"
+
+					int charsToDisplay = bladeLabelCharsToDisplay * bladeSpan
+
+					def tag = blade.assetTag
+					// def tag = "${blade.assetName}"
+					if (tag.length() >= charsToDisplay) {
+						tag = tag.substring(0, charsToDisplay)
+					}
+					tag = tag.split('')[1..-1].join('<br>')
+					def taglabel = "<div>$tag</div>"
+
+					def hasError 
+					// TODO : JPM 10/2014 : The has logic error issue might be because it is useing bladeLabelCount - need to investigate
+					if (assetDetails.asset.source == 1) {
+						hasError = blades.findAll { it.sourceBladePosition == i + bladeLabelCharsToDisplay }.size() > 0 
+					} else {
+						hasError = blades.findAll { it.targetBladePosition == i + bladeLabelCharsToDisplay }.size() > 0
+					}
+
+					if ((bladeSpan == 2) &&  hasError )
+						bladeTable.append("<td class='errorBlade' style='height:${tdHeight}px'>&nbsp;</td>")
 					else
-						bladeTable += "<td class=\"blade\" rowspan=\"${bladeSpan}\" style=\"height:${tdHeight}px\"><a href=\"javascript:"
-						if (forWhom) {
-							bladeTable += "editAudit('roomAudit','${assetDetails.source}','${blade.assetClass}',${blade.id})" 
+						bladeTable.append("<td class=\"blade\" rowspan=\"${bladeSpan}\" style=\"height:${tdHeight}px\">")
+						if (printView) {
+							bladeTable.append(taglabel)
 						} else {
-							bladeTable += "EntityCrud.showAssetDetailView('${blade.assetClass}',${blade.id})"
+							bladeTable.append( '<a style="text-decoration: none;"href="javascript:')
+							if (forWhom) {
+								bladeTable.append("editAudit('roomAudit','${assetDetails.source}','${blade.assetClass}',${blade.id})")
+							} else {
+								bladeTable.append("EntityCrud.showAssetDetailView('${blade.assetClass}',${blade.id})")
+							}
+							bladeTable.append("\" title=\"${title}\">${taglabel}</a>")
 						}
-						bladeTable +=  "\" title='${tag.replace('<br/>','')}'>${taglabel}</a></td>"
+						bladeTable.append("</td>")
 				} else {
-					bladeTable += "<td class='emptyBlade' style='height:${tdHeight}px'>"
-					if(commit !="Print View"){
-						if(assetDetails.asset.source == 1) {
+					bladeTable.append("<td class='emptyBlade' style='height:${tdHeight}px'>")
+					if (! printView) {
+						if (assetDetails.asset.source == 1) {
 							assetRoom = assetEntity.roomSource?.id
 							assetLocation = assetEntity.sourceLocation
 						} else {
@@ -670,21 +758,29 @@ class RackLayoutsController {
 							assetLocation = assetEntity.targetLocation
 						}
 
-						bladeTable += """<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="../i/rack_add2.png"/>
+						bladeTable.append("""<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="../i/rack_add2.png"/>
 							<ul>
-								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'EntityCrud.showAssetCreateView'}('DEVICE','${assetDetails.source}','${assetEntity?.id}','${assetRoom}','${assetLocation}', '${i}', true, '${assetEntity.manufacturer?.id}','Blade','${assetEntity.moveBundle?.id}')">Create asset  </a></li>
+								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'EntityCrud.showAssetCreateView'}('DEVICE','${assetDetails.source}','${assetEntity?.id}','${assetRoom}','${assetLocation}', '${i}', true, '${assetEntity.manufacturer?.id}','Blade','${assetEntity.moveBundle?.id}')">Create asset</a></li>
 								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.id}','${i}','assign','${assetRoom}','${assetLocation}')">Assign asset </a></li>
 								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.id}','${i}','reassign','${assetRoom}','${assetLocation}')">Reassign asset </a></li>
 							</ul>
-						</div>"""
+						</div>""")
 					}
-					bladeTable += "</td>"
+					bladeTable.append("</td>")
 				}
 			}
-			bladeTable += k == chassisRows ? "</tr>" : "</tr><tr>"
+
+			// Close off the row and start a new one if we're not on the last chassis row
+			bladeTable.append('</tr>')
+			if (k < chassisRows) {
+				bladeTable.append('<tr>')
+			}
+
 		}
 		
-		bladeTable += '</table>'
+		bladeTable.append('</table>')
+
+		return bladeTable.toString()
 	}
 
 	def modelTemplate = {
@@ -999,16 +1095,11 @@ class RackLayoutsController {
 					cableDiagram.append("<div class='cablingPanel' style='height: "+(assetEntity?.model?.usize ? assetEntity?.model?.usize*30 : 30)+"px'>")
 				}
 				def assetCableMapList = AssetCableMap.findAllByAssetFrom( assetEntity )
-				assetCableMapList.each {assetCable->
-					cableDiagram.append("""<div style="top:${assetCable.assetFromPort.connectorPosY / 2}px ;left:${assetCable.assetFromPort.connectorPosX}px ">
-												<div>
-													<img src="../i/cabling/${assetCable.cableStatus}.png"/>
-												</div>
-												<div class="connector_${assetCable.assetFromPort.labelPosition}">
-													<span>${assetCable.assetFromPort.label}</span>
-										 		</div>
-											</div>
-										""")
+				assetCableMapList.each { assetCable ->
+					cableDiagram.append("<div style=\"top:${assetCable.assetFromPort.connectorPosY / 2}px ;left:${assetCable.assetFromPort.connectorPosX}px\">")
+					cableDiagram.append("<div><img src=\"../i/cabling/${assetCable.cableStatus}.png\"/></div>")
+					cableDiagram.append("<div class=\"connector_${assetCable.assetFromPort.labelPosition}\"><span>${assetCable.assetFromPort.label}</span> </div>")
+					cableDiagram.append('</div>')
 				}
 				cableDiagram.append("</div></td></tr></table>")
 			} else {
