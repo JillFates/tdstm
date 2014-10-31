@@ -370,7 +370,7 @@ class AssetEntityService {
 		def roomProp = "room$srcOrTrgt"
 		def chassisProp = (isSource ? 'sourceChassis' : 'targetChassis')
 
-		def assetType = blade.model?.assetType
+		def assetType = blade.assetType
 		if (assetType != AssetType.BLADE.toString()) {
 			throw new InvalidRequestException("Attempted to assign a non-blade type asset to a chassis (type $assetType)".toString())
 		}
