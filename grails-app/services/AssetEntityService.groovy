@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.springframework.transaction.annotation.Transactional
 
 import java.util.regex.Matcher
 
@@ -971,6 +972,7 @@ class AssetEntityService {
 	/**
 	 * Used to retrieve the asset and model that will be used for the Device Create form
 	 */
+	@Transactional(readOnly = true) 
 	List getDeviceAndModelForCreate(Project project, Object params) {	
 
 		def (device, model) = getCommonDeviceModelForCreateEdit(project, null, params)
@@ -991,6 +993,7 @@ class AssetEntityService {
 	 * Used to retrieve the asset and model that will be used for the Device Edit form
 	 */
 	// TODO : JPM 9/2014 : these methods should be renamed from getDeviceModel to getDeviceAndModel to avoid confusion (improvement)
+	@Transactional(readOnly = true) 
 	List getDeviceModelForEdit(Project project, Object deviceId, Object params) {
 		def (device, model) = getCommonDeviceModelForCreateEdit(project, deviceId, params)
 		if (device) {
@@ -1012,6 +1015,7 @@ class AssetEntityService {
 	 * @param params - the http params
 	 * @return A list containing [device object, model map]
 	 */
+	@Transactional(readOnly = true) 
 	private List getCommonDeviceModelForCreateEdit(Project project, Object deviceId, Object params) {
 		boolean isNew = deviceId == null
 		def (device, model) = getCommonDeviceAndModel(project, deviceId, params)
@@ -1082,6 +1086,7 @@ class AssetEntityService {
 	 * @param params - the parameters passed from the browser
 	 * @return (device,model) the device if found and the map of model properties
 	 */
+	@Transactional(readOnly = true) 
 	private List getCommonDeviceAndModel(Project project, Object deviceId, Object params) {
 		AssetEntity device = AssetEntityHelper.getAssetById(project, AssetClass.DEVICE, deviceId)
 		Map model = [:]
@@ -1096,6 +1101,7 @@ class AssetEntityService {
 	 * @param
 	 * @return a Map that includes the list of common properties
 	 */
+	@Transactional(readOnly = true)
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Object params) {
 
 		//assert ['Database'].contains(type)
@@ -1145,6 +1151,7 @@ class AssetEntityService {
 	 * @param
 	 * @return a Map that includes the list of common properties
 	 */
+	@Transactional(readOnly = true) 
 	Map getCommonModelForShows(String type, Project project, Object params, Object assetEntity=null) {
 
 		log.debug "### getCommonModelForShows() type=$type, project=${project.id}, asset=${assetEntity? assetEntity.id : 'null'}"
@@ -1205,6 +1212,7 @@ class AssetEntityService {
 	 * @param filters - the map of the filter settings
 	 * @return a Map that includes all of the common properties shared between all Asset List views
 	 */
+	@Transactional(readOnly = true) 
 	Map getDefaultModelForLists(AssetClass ac, String listType, Project project, Object fieldPrefs, Object params, Object filters) {
 
 		Map model = [
