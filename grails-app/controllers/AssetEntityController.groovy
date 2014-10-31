@@ -3757,11 +3757,21 @@ class AssetEntityController {
 			columnLabelpref << [ (key):attributes[value] ]
 		}
 		 
-	 	return [projectId: project.id, assetDependency: new AssetDependency(),
-			 	servers: entities.servers,applications: entities.applications,dbs: entities.dbs, 
-				files: entities.files, networks: entities.networks, 
-				dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus,
-			    moveBundleList:moveBundleList, depPref:depPref,attributesList:attributes.keySet().sort{it}, columnLabelpref:columnLabelpref]
+	 	return [
+			applications: entities.applications,
+			assetDependency: new AssetDependency(),
+			attributesList: attributes.keySet().sort{it},
+			columnLabelpref:columnLabelpref,
+			dbs: entities.dbs, 
+			depPref: depPref,
+			dependencyStatus: entities.dependencyStatus,
+			dependencyType: entities.dependencyType,
+			files: entities.files,
+			moveBundleList: moveBundleList,
+			networks: entities.networks, 
+			// projectId: project.id,
+			servers: entities.servers
+		]
 	 }
 	/**
 	* This method is to show list of dependencies using jqgrid.

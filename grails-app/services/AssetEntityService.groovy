@@ -825,8 +825,8 @@ class AssetEntityService {
 		}
 
 		if (groups == null) {
-			map.dependencyType = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_TYPE)
-			map.dependencyStatus = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.DEPENDENCY_STATUS)
+			map.dependencyType = getDependencyTypes()
+			map.dependencyStatus = getDependencyStatuses()
 		}
 
 		return map
@@ -1092,7 +1092,7 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Used to provide the default/common properties shared between all of the Asset Edit views
+	 * Used to provide the default/common properties shared between all of the Asset Create/Edit views
 	 * @param
 	 * @return a Map that includes the list of common properties
 	 */
