@@ -721,7 +721,7 @@ var EntityCrud = ( function($) {
 		});
 
 		$("#assetTypeSelect").select2({
-		    placeholder: "Model type filter",
+		    placeholder: "Device type filter",
 		    minimumInputLength: 0,
 		    allowClear: true,
 		    width: "100%"
