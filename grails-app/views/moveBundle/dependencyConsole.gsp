@@ -38,16 +38,16 @@
 				</div>
 			</div>
 			<tds:hasPermission permission='MoveBundleEditView'>
-				<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none">
+				<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
 					<div id="checkBoxDivId">
 						<g:form name="checkBoxForm"> 
 							<div style="float: left; margin-left:18px;">
 							   <fieldset>
 								  <legend>Connection Type:</legend>
 									<g:each in="${dependencyType}" var="dependency">
-										<input type="checkbox" id="${dependency.value}"
-											name="connection" value="${dependency.value}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency.value) ? 'checked' : '') : ([ 'Batch' ].contains(dependency.value) ? "" : "checked")}/>&nbsp;&nbsp;
-											<span id="dependecy_${dependency.id}"> ${dependency.value}</span>
+										<input type="checkbox" id="${dependency}"
+											name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
+											<span id="dependecy_${dependency}"> ${dependency}</span>
 										<br />
 									</g:each>
 								</fieldset>
@@ -57,9 +57,9 @@
 								<fieldset>
 									<legend>Connection Status:</legend>
 									<g:each in="${dependencyStatus}" var="dependencyStatus">
-										<input type="checkbox" id="${dependencyStatus.value}"
-											name="status" value="${dependencyStatus.value}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatus.value) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus.value) ? '' : 'checked')}/>&nbsp;&nbsp;
-											<span id="dependecy_${dependencyStatus.id}"> ${dependencyStatus.value} </span>
+										<input type="checkbox" id="${dependencyStatus}"
+											name="status" value="${dependencyStatus}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatus) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus) ? '' : 'checked')}/>&nbsp;&nbsp;
+											<span id="dependecy_${dependencyStatus}"> ${dependencyStatus} </span>
 										<br />
 									</g:each>
 								</fieldset>
