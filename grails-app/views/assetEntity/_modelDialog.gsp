@@ -1,7 +1,7 @@
 <%-- Placeholder for the manufacturing edit if so needed --%>
 <div id="editManufacturerView" style="display: none;"></div>
 
-<div id="manufacturerShowDialog" title="Show Manufacturer" style="display: none;">
+<div id="manufacturerShowDialog" title="Show Manufacturer" style="display: none;" class="static-dialog">
 	<div class="dialog">
 		<table>
 	    	<tbody>
@@ -27,7 +27,7 @@
 	</div>
 	</tds:hasPermission>
 </div>
-<div id="modelShowDialog"  title="Show Model" style="display: none;">
+<div id="modelShowDialog"  title="Show Model" style="display: none;" class="static-dialog">
 <div class="dialog">
 	<table>
 		<tbody>
