@@ -47,9 +47,10 @@ var tdsCommon = {
 	/**
 	 * This will override the dialog close event to clear out the HTML content of the DIV automatically. This was 
 	 * done to correct a problem with DIVs being populated with content that would not be cleared out and duplicate
-	 * DOM IDs would be created causing DOM lookup issues.
+	 * DOM IDs would be created causing DOM lookup issues. It also closes any currently open select2 controls that might 
+	 * be expanded on the page.
 	 *
-	 * To disable this behavior add the class 'static-dialog' to the DIV (style="static-dialog" or modal.addClass('static-dialog'))
+	 * To disable this behavior add the class 'static-dialog' to the DIV (class="static-dialog" or modal.addClass('static-dialog'))
 	 */
 	autoClearDialogOnClose: function() {
 		$.widget( "ui.dialog", $.ui.dialog, {
@@ -57,9 +58,13 @@ var tdsCommon = {
 				var result = this._super();
 				if (this.element.length > 0) {
 					var dialog = $("#" + this.element[0].id)
-					if (dialog.length > 0 && !dialog.hasClass('static-dialog')) {
-						$('.select2-container').select2('close'); 
-						dialog.html('');
+					if (dialog.length > 0) {
+						// Need to close any Select2 controls that might still be open
+						dialog.find('.select2-container').select2('close'); 
+
+						if (! dialog.hasClass('static-dialog')) {
+							dialog.html('');
+						}
 					}
 				}
 				return result;
