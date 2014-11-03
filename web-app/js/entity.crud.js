@@ -91,8 +91,28 @@ var EntityCrud = ( function($) {
 	 **/
 	var validateDeviceForm = function(form) {
 		var ok = validateCommonFields(form);
+		ok = validateNewRoom(form, 'S') && validateNewRoom(form, 'T');
 		return ok
 	};
+
+	var validateNewRoom = function (form, sourceTarget) {
+		var ok = true;
+		var rmCtrl = $('#roomSelect'+sourceTarget);
+		var roomId = pub.selectOptionSelected(rmCtrl);
+		if (roomId == -1) {
+			var type = ((sourceTarget == 'S')?'#source':'#target');
+			var location = $(type + 'LocationId').val();
+			var room = $(type + 'RoomId').val();
+			var rack = $(type + 'RackId').val();
+			if (tds.utils.stringUtils.empty(location) ||
+				tds.utils.stringUtils.empty(room) ||
+				tds.utils.stringUtils.empty(rack) ) {
+				alert("Location name, room name and rack name must be defined for 'Add Room'")
+				ok = false;
+			}
+		}
+		return ok;
+	}
 
 	var validateAppForm = function(form){
 		var ok = validateCommonFields(form);

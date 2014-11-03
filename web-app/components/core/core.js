@@ -11,80 +11,86 @@ tds.core = tds.core || {};
 tds.core.interceptor = tds.core.interceptor || {};
 tds.core.service = tds.core.service || {};
 tds.core.directive = tds.core.directive || {};
+tds.utils = {}
+
+/**
+ * Functions used to manage arrays
+ */
+tds.utils.arrayUtils = function() {
+
+	/*
+	 * to remove duplicate elemment in a array .
+	 */
+	function removeDuplicateElement(arrayName) {
+		var newArray = new Array();
+		label: for (var i = 0; i < arrayName.length; i++) {
+			for (var j = 0; j < newArray.length; j++) {
+				if (newArray[j].split("_")[1] == arrayName[i].split("_")[1])
+					continue label;
+			}
+			newArray[newArray.length] = arrayName[i];
+		}
+		return newArray;
+	}
+
+	function chkDuplicates(list1, list2) { // finds any duplicate array elements using the fewest possible comparison
+		var i, j, n;
+		var concArray = list1.concat(list2);
+		n = concArray.length;
+		// to ensure the fewest possible comparisons
+		for (i = 0; i < n; i++) { // outer loop uses each item i at 0 through n
+			for (j = i + 1; j < n; j++) { // inner loop only compares items j at i+1 to n
+				if (concArray[i].split("_")[1] == concArray[j].split("_")[1]) return true;
+			}
+		}
+		return false;
+	}
+
+	return {
+		removeDuplicateElement: removeDuplicateElement,
+		chkDuplicates: chkDuplicates
+	};
+
+}();
+
+
+/**
+ * Functions used to manage strings
+ */
+tds.utils.stringUtils = function() {
+
+	// Truncate the text 
+	function truncate(text) {
+		var trunc = text
+		if (text) {
+			if (text.length > 30) {
+				trunc = trunc.substring(0, 30);
+				trunc += '...'
+			}
+		}
+		return trunc;
+	}
+
+	function htmlToPlaintext(text) {
+		return String(text).replace(/<[^>]+>/gm, '');
+	}
+
+	function empty(text) {
+		return ((text == null) || (text.trim().length == 0));
+	}
+
+	return {
+		truncate: truncate,
+		htmlToPlaintext: htmlToPlaintext,
+		empty: empty
+	};
+
+}();
 
 /**
  * Utilities functions
  */
 tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
-
-	/**
-	 * Functions used to manage arrays
-	 */
-	var arrayUtils = function() {
-
-		/*
-		 * to remove duplicate elemment in a array .
-		 */
-		function removeDuplicateElement(arrayName) {
-			var newArray = new Array();
-			label: for (var i = 0; i < arrayName.length; i++) {
-				for (var j = 0; j < newArray.length; j++) {
-					if (newArray[j].split("_")[1] == arrayName[i].split("_")[1])
-						continue label;
-				}
-				newArray[newArray.length] = arrayName[i];
-			}
-			return newArray;
-		}
-
-		function chkDuplicates(list1, list2) { // finds any duplicate array elements using the fewest possible comparison
-			var i, j, n;
-			var concArray = list1.concat(list2);
-			n = concArray.length;
-			// to ensure the fewest possible comparisons
-			for (i = 0; i < n; i++) { // outer loop uses each item i at 0 through n
-				for (j = i + 1; j < n; j++) { // inner loop only compares items j at i+1 to n
-					if (concArray[i].split("_")[1] == concArray[j].split("_")[1]) return true;
-				}
-			}
-			return false;
-		}
-
-		return {
-			removeDuplicateElement: removeDuplicateElement,
-			chkDuplicates: chkDuplicates
-		};
-
-	}();
-
-
-	/**
-	 * Functions used to manage strings
-	 */
-	var stringUtils = function() {
-
-		// Truncate the text 
-		function truncate(text) {
-			var trunc = text
-			if (text) {
-				if (text.length > 30) {
-					trunc = trunc.substring(0, 30);
-					trunc += '...'
-				}
-			}
-			return trunc;
-		}
-
-		function htmlToPlaintext(text) {
-			return String(text).replace(/<[^>]+>/gm, '');
-		}
-		return {
-			truncate: truncate,
-			htmlToPlaintext: htmlToPlaintext
-		};
-
-	}();
-
 
 	/**
 	 * Functions used to manage dates
@@ -155,14 +161,13 @@ tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
 	}();
 
 	return {
-		array: arrayUtils,
-		string: stringUtils,
+		array: tds.utils.arrayUtils,
+		string: tds.utils.stringUtils,
 		date: dateUtils,
 		url: urlUtils
 	}
 
 };
-
 
 /**
  * Intercepector used to check if the user is logged in
