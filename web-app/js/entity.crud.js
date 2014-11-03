@@ -537,6 +537,9 @@ var EntityCrud = ( function($) {
 		}
 	};
 
+	// private singleton variable to control the saveToShow function from being called repeatedly
+	var assetCreateInvoked=false;
+
 	/**
 	 * Used to save newly created assets from the Create forms. After validating that the fields are 
 	 * okay it will make an Ajax call to create the asset.
@@ -545,6 +548,13 @@ var EntityCrud = ( function($) {
 	 * @param forWhom - string indicating which form is being processed (note that this is inconsistent with the update metho)
 	 */
 	pub.saveToShow = function(button, assetClass) {
+		if (assetCreateInvoked) {
+			alert("Please only click the save button once. Your save request is being processed.");
+			return false;
+		} else {
+			assetCreateInvoked=true;
+		}
+
 		// var action = button.data('action');
 		var redirect = button.data('redirect');
 
@@ -589,6 +599,7 @@ var EntityCrud = ( function($) {
 				success: function(resp) {
 					if (resp.status == 'error') {
 						alert(resp.errors);
+						assetCreateInvoked=false;
 						return false;
 					} else {
 						pub.showAssetDetailView(assetClass, resp.data.asset.id);
@@ -606,6 +617,7 @@ var EntityCrud = ( function($) {
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
 					alert("The following error occurred while attempting to create asset : "+ err);
+					assetCreateInvoked=false;
 					return false;
 				}
 			});
@@ -624,7 +636,7 @@ var EntityCrud = ( function($) {
 	 pub.performAssetUpdate = function(buttonClicked, assetClass) {
 
 		if (assetUpdateInvoked) {
-			alert("Please only click the update button once.");
+			alert("Please only click the update button once. Your update request is being processed.");
 			return false;
 		} else {
 			assetUpdateInvoked = true;
@@ -1168,6 +1180,7 @@ var EntityCrud = ( function($) {
 	};
 	// Called from the page to popup the Asset Entity Create dialog
 	pub.showAssetCreateView = function(assetClass, source, rackOrChassisId, roomId, location, position, isBlade) {
+		assetCreateInvoked=false;
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetCreateView('application', 'Application', source, rackOrChassisId, roomId, location, position, isBlade);
