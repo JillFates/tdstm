@@ -613,15 +613,27 @@ var EntityCrud = ( function($) {
 		return true;
 	};
 
+	// Private variable used to prevent multiple clicks from invoking multiple updates
+	var assetUpdateInvoked=false;
+
 	/**
 	 * Used to call Ajax Update for given asset form and then load the show view of the asset
-	 * @param me - the form
+	 * @param me - the button that the user clicked to get here
 	 * @param forWhom - the asset class of the form (app, files, database)
 	 **/
-	 pub.performAssetUpdate = function($me, assetClass) {
-		var act = $me.data('action');
+	 pub.performAssetUpdate = function(buttonClicked, assetClass) {
+
+		if (assetUpdateInvoked) {
+			alert("Please only click the update button once.");
+			return false;
+		} else {
+			assetUpdateInvoked = true;
+			buttonClicked.disabled = true;
+		}
+
+		var act = buttonClicked.data('action');
 		var type = 'Server';
-		var redirect = $me.data('redirect');
+		var redirect = buttonClicked.data('redirect');
 
 		$('#updateView').val('updateView');
 
@@ -668,18 +680,29 @@ var EntityCrud = ( function($) {
 				url: url,
 				data: data,
 				type:'POST',
+				async: false,
 				success: function(resp) {
 					if (resp.status == 'error') {
 						alert(resp.errors);
+						buttonClicked.one(function() {
+							pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
+						});
+						assetUpdateInvoked = false;
+						buttonClicked.disabled = false;
 						return false;
 					} else {
 						pub.showAssetDetailView(assetClass, resp.data.asset.id);
+						$(document).trigger('entityAssetUpdated');
 					}
-					$(document).trigger('entityAssetUpdated');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
 					alert("An error occurred while updating Asset."+ err.substring(err.indexOf("<span>")+6, err.indexOf("</span>")));
+					buttonClicked.one(function() {
+						pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
+					});
+					assetUpdateInvoked = false;
+					buttonClicked.disabled = false;
 					return false;
 				}
 			});
@@ -995,6 +1018,7 @@ var EntityCrud = ( function($) {
 	// Used to display the various asset class edit modal views
 	// This replaces editEntity()
 	pub.showAssetEditView = function(assetClass, assetId, source, rackOrBladeId, roomId, location, position, isBlade) {
+		assetUpdateInvoked=false;	// Reset the update invoked flag
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetEditView('application', 'Application', assetId, source, rackOrBladeId, roomId, location, position, isBlade);

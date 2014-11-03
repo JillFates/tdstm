@@ -2,8 +2,7 @@
 
 <g:if test="${redirectTo!='dependencyConsole'}">
 	 <span class="button">
-	 	<input type="button" class="save updateDep" data-action='' value="Update" 
-	 		onclick="EntityCrud.performAssetUpdate($(this),'${assetEntity.assetClass}'); " /> 
+		<input type="button" class="save updateDep" data-action='' value="Update" id="assetUpdateButton">
 	 </span>
 	 <tds:hasPermission permission='AssetDelete'>
 		 <span class="button"><g:actionSubmit class="delete" 
@@ -13,7 +12,7 @@
 </g:if>
 <g:else>
 	 <span class="button">
-	 	<input type="button" class="save updateDep" data-action='' value="Update" onclick="EntityCrud.performAssetUpdate($(this),'${assetEntity.assetClass}')" />
+		<input type="button" class="save updateDep" data-action='' value="Update" id="assetUpdateButton">
 	 </span>
 	 <span class="button"><input type="button" id="deleteId" name="deleteId"  class="save" value="Delete" onclick=" deleteAsset('${assetEntity.id}','${assetEntity.assetClass}')" /> </span>
 	 <span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#editEntityView').dialog('close');"/> </span>
@@ -23,3 +22,16 @@
 <g:if test="${assetEntity && assetEntity.model?.assetType && assetEntity.model.assetType in AssetType.getPhysicalServerTypes() && assetEntity.isCableExist()}">
  	<span class="button"><input type="button" id="cableId" name="cableId" class="edit" value="Cable" onclick="openCablingDiv('${assetEntity.id}','S')" /> </span>
 </g:if>
+
+
+<script>
+
+<%--
+  -- Initialize the update button so that it can only be clicked once. Note that for some reason that the JQuery one method is not working as expected 
+  -- so the performAssetUpdate method has some extra logic in it with a singleton flag controlling access
+  --%>
+$('#assetUpdateButton').one('click', function() {
+	return EntityCrud.performAssetUpdate($(this),'${assetEntity.assetClass}');
+});
+
+</script>
