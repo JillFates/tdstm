@@ -1105,7 +1105,7 @@ class AssetEntityService {
 	Map getDefaultModelForEdits(String type, Project project, Object asset, Object params) {
 
 		//assert ['Database'].contains(type)
-		def configMap = getConfig('AssetEntity', asset?.validation ?: 'Discovery')
+		def configMap = getConfig(type, asset?.validation ?: 'Discovery')
 
 		def assetTypeAttribute = getPropertyAttribute('assetType')
 		//def validationType = asset.validation 
