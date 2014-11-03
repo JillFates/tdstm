@@ -493,7 +493,7 @@ class RackLayoutsController {
 								bladeTable = generateBladeLayout(bladeLayoutMap)
 							}
 							if (overlappedAssetsSize > 1) {
-								cabling = ( !assetTag.contains("Devices Overlap") && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
+								cabling = ( (assetTag.indexOf("Devices Overlap") == -1) && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
 							if (printView) {
 								assetTag.append( StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) )

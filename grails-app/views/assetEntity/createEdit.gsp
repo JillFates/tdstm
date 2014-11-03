@@ -169,14 +169,8 @@
 								</td>
 								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 									<div id="modelEditId">
-										<div id="assetTypeSelectContainer" style="display:inline">
-											<select id="assetTypeSelect" name="assetType" style="width:120px" tabindex="103">
-	    										<option></option>
-												<g:each in="${assetTypeOptions}" var="assetType">
-													<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
-												</g:each>
-											</select>
-										</div>
+										<div id="assetTypeSelect" tabindex="103">
+									    </div>
 									</div>
 								</td>
 								<td class="label ${config.priority} ${highlightMap.priority?:''}" nowrap="nowrap">

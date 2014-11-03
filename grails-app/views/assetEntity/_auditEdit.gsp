@@ -9,8 +9,8 @@
 <input type="hidden" id="deviceRackIdT" value="${assetEntityInstance?.rackTarget?.id}"/>
 <input type="hidden" id="deviceRoomIdS" value="${assetEntityInstance?.roomSource?.id}"/>
 <input type="hidden" id="deviceRoomIdT" value="${assetEntityInstance?.roomTarget?.id}"/>
-<input type="hidden" id="roomSourceId" name="roomSourceId" value="${assetEntityInstance.roomSource?.id}"/>
-<input type="hidden" id="roomTargetId" name="roomTargetId" value="${assetEntityInstance.roomTarget?.id}"/>
+<input type="hidden" id="roomSourceId" name="roomSourceId" value="${assetEntityInstance.roomSource?assetEntityInstance.roomSource.id:0}"/>
+<input type="hidden" id="roomTargetId" name="roomTargetId" value="${assetEntityInstance.roomTarget?assetEntityInstance.roomTarget.id:0}"/>
 
 <%-- Used to maintain the selected AssetType --%>
 <input type="hidden" id="currentAssetType" 		name="currentAssetType" value="${currentAssetType}"/>
@@ -75,13 +75,7 @@
 	<tr class="prop">
 		<td class="label">Device Type</td>
 		<td class="label">
-			<div id="assetTypeSelectContainer" style="display:inline">
-				<select id="assetTypeSelect" name="assetType" style="width:120px" tabindex="103">
-					<option></option>
-					<g:each in="${assetTypeOptions}" var="assetType">
-						<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
-					</g:each>
-				</select>
+			<div id="assetTypeSelect" tabindex="103">
 			</div>
 		</td>
 	</tr>
@@ -103,7 +97,7 @@
 			<td class="label" nowrap="nowrap">
 				<g:render template="deviceRackSelect" model="[clazz:config.sourceRack, options:sourceRackSelect, rackId:assetEntityInstance.rackSource?.id, 
 					rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
-				<input type="hidden" id="rackTargetId" name="rackTargetId" value="${assetEntityInstance.rackTarget?.id}"/>
+				<input type="hidden" id="rackTargetId" name="rackTargetId" value="${assetEntityInstance.rackTarget?assetEntityInstance.rackTarget.id:0}"/>
 			</td>
 		</tr>
 		<tr class="prop rackLabel">
@@ -125,7 +119,7 @@
 			<td class="label" nowrap="nowrap">
 				<g:render template="deviceRackSelect"  model="[clazz:config.targetRack, options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 												rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
-				<input type="hidden" id="rackSourceId" name="rackSourceId" value="${assetEntityInstance.rackSource?.id}"/>
+				<input type="hidden" id="rackSourceId" name="rackSourceId" value="${assetEntityInstance.rackSource?assetEntityInstance.rackSource.id:0}"/>
 			</td>
 		</tr>
 		<tr class="prop rackLabel">

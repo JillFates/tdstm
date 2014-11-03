@@ -77,14 +77,8 @@ $(document).ready(function() {
 	<tr class="prop">
 		<td class="label">Device Type</td>
 		<td class="label">
-			<div id="assetTypeSelectContainer" style="display:inline">
-				<select id="assetTypeSelect" name="assetType" style="width:120px" tabindex="103">
-					<option></option>
-					<g:each in="${assetTypeOptions}" var="assetType">
-						<option ${ (assetType == assetEntityInstance.assetType ? 'selected ' : '') } value="${assetType}" >${assetType}</option>
-					</g:each>
-				</select>
-			</div>
+			<div id="assetTypeSelect" tabindex="103">
+			</div>		
 		</td>
 	</tr>
 	<tr class="prop" >

@@ -4282,4 +4282,34 @@ class AssetEntityController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+
+	/**
+	 * Returns the list of asset types for a specific manufactures
+	 */
+	def assetTypesOf = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def manufacturerId = params.manufacturerId
+		def term = params.term
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def assetTypes = assetEntityService.assetTypesOf(manufacturerId, term, currentProject)
+
+			render(ServiceResults.success(['assetTypes' : assetTypes]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+
 }

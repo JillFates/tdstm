@@ -741,11 +741,33 @@ var EntityCrud = ( function($) {
 		});
 
 		$("#assetTypeSelect").select2({
-		    placeholder: "Device type filter",
-		    minimumInputLength: 0,
-		    allowClear: true,
-		    width: "100%"
-		});
+			placeholder: "Device type filter",
+			minimumInputLength: 0,
+			allowClear: true,
+			width: "100%",
+			allowClear: true,
+			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
+			ajax: {
+				url: tdsCommon.createAppURL('/assetEntity/assetTypesOf'),
+				quietMillis: quietMillis,
+				dataType: 'json',
+				data: function (term, page) {
+					return {
+						"term" : term,
+						"manufacturerId" : modelFilteringData.manufacturerId
+					};
+				},
+				results: function (data, page) {
+					return {results: data.data.assetTypes};
+				}
+			},
+			initSelection: function(element, callback) {
+				var at = EntityCrud.getAssetType();
+				if (at != "") {
+					callback({id: at, text: at});
+				}
+			}
+		}).select2('val', []);
 		
 		$("#assetTypeSelect").on("change", function(event) {
 			$('#assetTypeFilterSet').show();

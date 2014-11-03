@@ -3294,4 +3294,48 @@ class AssetEntityService {
 	   
 	   return result
    }
+
+   /**
+	* Obtains the list of asset types using the manufacturer and term
+	* 
+	* @param manufacturer the manufacturer 
+	* @param term the term to be searched
+	* @param currentProject the current project
+	* @return the map of asset types
+	*/
+	def assetTypesOf(manufacturerId, term, currentProject) {
+		def hql = "SELECT distinct m.assetType as assetType FROM Model m";
+		def joinTables = " ";
+		def condition = ""
+		def hqlParams = []
+
+		if (StringUtils.isNotBlank(term)) {
+			if (hqlParams.isEmpty()) {
+				condition = condition + " WHERE m.assetType LIKE ?"
+			} else {
+				condition = condition + " AND m.assetType LIKE ?"
+			}
+			hqlParams.add("%" + term + "%")
+		}
+
+		if (StringUtils.isNotBlank(manufacturerId) && manufacturerId.isLong()) {
+			if (hqlParams.isEmpty()) {
+				condition = condition + " WHERE m.manufacturer.id = ?"
+			} else {
+				condition = condition + " AND m.manufacturer.id = ?"
+			}
+			hqlParams.add(manufacturerId.toLong())
+		}
+
+		def models = Model.executeQuery(hql + joinTables + condition, hqlParams)
+		def result = models.collect { model ->
+			return [
+				"id" : model,
+				"text" : model
+			];
+		}
+
+		return result
+	}
+
 }
