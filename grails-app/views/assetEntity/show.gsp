@@ -20,8 +20,8 @@
 								<td class="label_sm">Target</td>
 							</tr>
 							<tr class="prop">
-								<td class="label ${config.manufacturer}  ${highlightMap.manufacturer?:''}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
-								<td class="valueNW ${config.manufacturer}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
+								<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap"><label for="assetType">Device Type</label></td>
+								<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>							
 								<td class="label ${config.environment}  ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 								<td class="valueNW ${config.environment}">${assetEntity.environment}</td>
 								<td class="label ${config.sourceLocation}  ${highlightMap.sourceLocation?:''}" nowrap="nowrap"><label for="sourceLocation">Location</label></td>																
@@ -30,8 +30,8 @@
 
 							</tr>
 							<tr class="prop">
-								<td class="label ${config.assetType} ${highlightMap.assetType?:''}" nowrap="nowrap"><label for="assetType">Device Type</label></td>
-								<td class="valueNW ${config.assetType}">${assetEntity.assetType}</td>
+								<td class="label ${config.manufacturer}  ${highlightMap.manufacturer?:''}" nowrap="nowrap"><label for="manufacturer">Manufacturer</label></td>
+								<td class="valueNW ${config.manufacturer}"><a href='javascript:showManufacturer(${assetEntity.manufacturer?.id})' style='color:#00E'>${assetEntity.manufacturer}</a></td>
 								<td class="label ${config.priority}  ${highlightMap.priority?:''}" nowrap="nowrap"><label for="priority">Priority</label></td>
 								<td class="valueNW ${config.priority}">${assetEntity.priority}</td>
 								<td class="label ${config.sourceRoom}  ${highlightMap.sourceRoom?:''}" nowrap="nowrap">

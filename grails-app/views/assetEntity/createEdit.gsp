@@ -82,18 +82,13 @@
 								<td class="label_sm">Target</td>
 							</tr>
 							<tr>
-								<td class="label ${config.manufacturer} ${highlightMap.manufacturer?:''}" nowrap="nowrap">
-									<g:if test="${assetEntityInstance.manufacturer?.id}">
-										<label for="manufacturer"><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a></label>
-									</g:if>
-									<g:else>
-										<label for="manufacturer">Manufacturer</label>
-									</g:else>	
+								<td class="label ${config.model} ${highlightMap.model?:''}" nowrap="nowrap">
+									<label for="model"><div id="assetTypeLabel">Device Type</div></label>
 								</td>
-								<td style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-									<div id="manufacturerEditId" style="display:inline">
-										<div id="manufacturerSelect" tabindex="102">
-										</div>
+								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+									<div id="modelEditId">
+										<div id="assetTypeSelect" tabindex="103">
+									    </div>
 									</div>
 								</td>
 								<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap">
@@ -164,13 +159,18 @@
 
 							</tr>
 							<tr>
-								<td class="label ${config.model} ${highlightMap.model?:''}" nowrap="nowrap">
-									<label for="model"><div id="assetTypeLabel">Device Type</div></label>
+								<td class="label ${config.manufacturer} ${highlightMap.manufacturer?:''}" nowrap="nowrap">
+									<g:if test="${assetEntityInstance.manufacturer?.id}">
+										<label for="manufacturer"><a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a></label>
+									</g:if>
+									<g:else>
+										<label for="manufacturer">Manufacturer</label>
+									</g:else>	
 								</td>
-								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-									<div id="modelEditId">
-										<div id="assetTypeSelect" tabindex="103">
-									    </div>
+								<td style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+									<div id="manufacturerEditId" style="display:inline">
+										<div id="manufacturerSelect" tabindex="102">
+										</div>
 									</div>
 								</td>
 								<td class="label ${config.priority} ${highlightMap.priority?:''}" nowrap="nowrap">

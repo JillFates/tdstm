@@ -66,16 +66,16 @@
 		</td>
 	</tr>
 	<tr class="prop">
-		<td class="label">Manufacturer</td>
+		<td class="label">Device Type</td>
 		<td class="label">
-			<div id="manufacturerSelect" tabindex="102">
+			<div id="assetTypeSelect" tabindex="103">
 			</div>
 		</td>
 	</tr>
 	<tr class="prop">
-		<td class="label">Device Type</td>
+		<td class="label">Manufacturer</td>
 		<td class="label">
-			<div id="assetTypeSelect" tabindex="103">
+			<div id="manufacturerSelect" tabindex="102">
 			</div>
 		</td>
 	</tr>
