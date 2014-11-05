@@ -63,6 +63,7 @@ class ConnectorActiveDirectory {
 	static Map getUserInfo(username, password, config) {
 		def emsg = ''
 		def userInfo = [:]
+
 		try {
 
 			// Validate that everything is available in the configuration
@@ -78,7 +79,6 @@ class ConnectorActiveDirectory {
 
 			def queryUser = "(&(sAMAccountName=$smauser)(objectClass=user))"
 
-
 			// Use the config username/password if it exists otherwise just use the credentials of the user
 			// def sam = "${config.username}@${config.domain}".toString()
 			def usr = config.username ?: smauser
@@ -90,13 +90,11 @@ class ConnectorActiveDirectory {
 			def ldap = LDAP.newInstance(config.url[0], usr, pswd)
 
 			// Lookup the user by their sAMAccountName
-			if (config.debug)
-				log.info "Peforming user lookup for $queryUser"
-
 			def results
 			def i
 			for (i=0; i<config.searchBase.size(); i++) {
 				try {
+					log.debug "Attempting search for user $queryUser with searchBase=${config.searchBase[i]}"
 					results = ldap.search(queryUser, config.searchBase[i], SearchScope.SUB )
 					if (results.size()) {
 						if (config.debug)
@@ -118,29 +116,38 @@ class ConnectorActiveDirectory {
 			def nestedGroups = []
 			def roles = []
 
-			// Grab the user's nested group memberships by iterating over one or more searchBase values
-			def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
-			if (config.debug)
-				log.info "About to search for nested groups with query $queryNestedGroups"
-			def g = ldap.search(queryNestedGroups, config.baseDN, SearchScope.SUB)
-			if (g)
-				nestedGroups.addAll(g*.dn)
-
-			config.roleMap.each { role, filter ->
-				def groupDN="$filter,${config.baseDN}".toLowerCase()
+			if (config.updateRoles) {
+				// Grab the user's nested group memberships by iterating over one or more searchBase values
+				def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
 				if (config.debug)
-					log.info "Trying to find role $role for DN $groupDN"
-				if (nestedGroups.find { it.toLowerCase() == groupDN })
-					roles << role
+					log.info "About to search for nested groups for (${config.baseDN}) with query $queryNestedGroups"
+				def g = ldap.search(queryNestedGroups, config.baseDN, SearchScope.SUB)
+				if (g)
+					nestedGroups.addAll(g*.dn)
+
+				config.roleMap.each { role, filter ->
+					def groupDN="$filter,${config.baseDN}".toLowerCase()
+					if (config.debug)
+						log.info "Trying to find role $role for DN $groupDN"
+					if (nestedGroups.find { it.toLowerCase() == groupDN })
+						roles << role
+				}
+			} else {
+				assert config.defaultRole
+				// Set their default role
+				roles << config.defaultRole
 			}
 
 			// Now attempt a connect using the user's own DN/password and then try to compare the samaccountname to 
 			// validate that the user has given us the correct credentials
 			if (config.debug)
-				log.info 'Initiating LDAP connection with user credentials'
+				log.info "Initiating LDAP connection with user credentials (${u.dn})"
+
 			ldap = LDAP.newInstance(config.url[0], u.dn, password)
+
 			if (config.debug)
-				log.info 'Confirming user credentials'
+				log.info 'About to confirm user credentials with ldap.compare'
+
 			assert ldap.compare(u.dn, [samaccountname: smauser] )
 
 			// Map all of the user information into TM userInfo map

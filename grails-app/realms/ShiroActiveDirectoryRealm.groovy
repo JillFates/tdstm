@@ -50,7 +50,7 @@ class ShiroActiveDirectoryRealm {
 			}
 
 			if (! config)
-				log.error "ShiroActiveDirectoryRealm: Unable to load security settings"					
+				log.error "ShiroActiveDirectoryRealm: Unable to load security configuration settings"					
 		}
 	}
 

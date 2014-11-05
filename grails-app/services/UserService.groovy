@@ -263,8 +263,9 @@ class UserService {
 					newUserRoles << roleMap[r]
 			}
 		} else {
-			if (config.defaultRole && roleMap.containsKey(config.defaultRole))
-				newUserRoles << roleMap[config.defaultRole]
+			String defaultRole = config.defaultRole?.toLowerCase()
+			if ( defaultRole && roleMap.containsKey(defaultRole))
+				newUserRoles << roleMap[defaultRole]
 		}
 		if ( (createUser || config.updateRoles) && newUserRoles.size()==0) {
 			log.warn "findOrProvisionUser: No roles were determined for $personIdentifier"
