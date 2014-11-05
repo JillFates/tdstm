@@ -381,7 +381,7 @@
 	</tbody>
 </table>
 </div>
-<div id="reassignAssetDiv" title="Reassign Asset" style="display: none;">
+<div id="reassignAssetDiv" title="Reassign Asset" style="display: none;" class="static-dialog">
 	<table style="border: 0px;">
 		<tbody id="reassignAssetTbodyId">
 		</tbody>

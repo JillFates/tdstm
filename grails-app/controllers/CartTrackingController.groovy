@@ -207,7 +207,7 @@ class CartTrackingController {
 		def onTruckId = stateEngineService.getStateIdAsInt(assetEntity.project.workflowCode,"OnTruck")
 		assetDetails<<[assetEntity:assetEntity,
 		               state: transition[0] ? transition[0].maxstate : "", onTruck :onTruckId, 
-		               model : assetEntity.model ? assetEntity.model.modelName: "", manufacturer : assetEntity.manufacturer ? assetEntity.manufacturer : ""  ]
+		               model : assetEntity.model ? assetEntity.model.modelName: "", manufacturer : assetEntity.manufacturer ? assetEntity.manufacturer.name : ""  ]
 		render assetDetails as JSON
 	}
 	/*---------------------------------------------------------
