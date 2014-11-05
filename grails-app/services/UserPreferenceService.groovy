@@ -263,8 +263,6 @@ class UserPreferenceService  {
 			log.debug "updateLastLogin: updating user=$username, ${username.class}"
 		if( username ) {
 			username = username.toString()
-			if (username.toString() != 'jmtest@transitionaldata.com')
-				log.error "USERNAME DOESN'T MATCH '$username' 'jmtest@transitionaldata.com'"
 			def userLogin = UserLogin.findByUsername( username )
 			if (log.isDebugEnabled()) 
 				log.debug "updateLastLogin: found userLogin=$userLogin"
