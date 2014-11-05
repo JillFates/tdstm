@@ -74,6 +74,7 @@
 				var sizePref = '${sizePref}';
 				var unassigned = '${unassigned}';
 				var listCaption = '<tds:hasPermission permission="AssetEdit">\
+					Device:&nbsp;&nbsp;\
 					<span class="button">\
 						<input type="button" value="Create Device" class="create" \
 							onclick="EntityCrud.showAssetCreateView(\'${assetClass}\');"/>\

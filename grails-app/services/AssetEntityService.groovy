@@ -3330,11 +3330,12 @@ class AssetEntityService {
 		def models = Model.executeQuery(hql + joinTables + condition, hqlParams)
 		def result = models.collect { model ->
 			return [
-				"id" : model,
-				"text" : model
+				id : model,
+				text : model
 			];
 		}
 
+		result = result.sort {it.text}
 		return result
 	}
 
