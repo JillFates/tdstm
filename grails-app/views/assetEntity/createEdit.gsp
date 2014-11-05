@@ -85,7 +85,7 @@
 								<td class="label ${config.model} ${highlightMap.model?:''}" nowrap="nowrap">
 									<label for="model"><div id="assetTypeLabel">Device Type</div></label>
 								</td>
-								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+								<td style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 									<div id="modelEditId">
 										<div id="assetTypeSelect" tabindex="103">
 									    </div>
@@ -167,7 +167,7 @@
 										<label for="manufacturer">Manufacturer</label>
 									</g:else>	
 								</td>
-								<td style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
+								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 									<div id="manufacturerEditId" style="display:inline">
 										<div id="manufacturerSelect" tabindex="102">
 										</div>
