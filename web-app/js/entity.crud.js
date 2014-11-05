@@ -110,6 +110,16 @@ var EntityCrud = ( function($) {
 				alert("Location name, room name and rack name must be defined for 'Add Room'")
 				ok = false;
 			}
+		} else {
+			var rackId = $('#' + ((sourceTarget == 'S')?'rackSourceId':'rackTargetId')).val();
+			if (rackId == -1) {
+				var type = ((sourceTarget == 'S')?'#source':'#target');
+				var rack = $(type + 'RackId').val();
+				if  (tds.utils.stringUtils.empty(rack)) {
+					alert("Rack name must be defined for 'Add Rack'")
+					ok = false;
+				}
+			}
 		}
 		return ok;
 	}
