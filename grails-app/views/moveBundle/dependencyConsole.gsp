@@ -84,7 +84,7 @@
 			</tds:hasPermission>
 			<div style="clear: both;"></div>
 			
-			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" >
+			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
 				<g:form name="changeBundle" action="saveAssetsToBundle" >
 						
 					<input type="hidden" name="assetVal" id="assetVal" />
