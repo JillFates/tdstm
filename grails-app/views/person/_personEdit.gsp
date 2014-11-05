@@ -3,7 +3,7 @@
   -- @params user - the user information
   --%>
 
-<div id="personDialog" title="Edit Person ABC" style="display:none;" class="static-dialog">
+<div id="personDialog" title="Edit Person" style="display:none;" class="static-dialog">
 	<div class="dialog">
 		<table>
 		  <tbody>
