@@ -91,7 +91,7 @@ var EntityCrud = ( function($) {
 	 **/
 	var validateDeviceForm = function(form) {
 		var ok = validateCommonFields(form);
-		ok = validateNewRoom(form, 'S') && validateNewRoom(form, 'T');
+		ok = ok && validateNewRoom(form, 'S') && validateNewRoom(form, 'T');
 		return ok
 	};
 
@@ -621,6 +621,8 @@ var EntityCrud = ( function($) {
 					return false;
 				}
 			});
+		} else {
+			assetCreateInvoked = false;
 		}
 		return true;
 	};
@@ -718,6 +720,8 @@ var EntityCrud = ( function($) {
 					return false;
 				}
 			});
+		} else {
+			assetUpdateInvoked = false;
 		}
 		return true;	
 	};	
