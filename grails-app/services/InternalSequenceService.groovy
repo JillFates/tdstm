@@ -1,13 +1,25 @@
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.jdbc.support.KeyHolder
+import org.springframework.jdbc.core.simple.SimpleJdbcCall
+import java.util.*
+import org.springframework.jdbc.core.namedparam.SqlParameterSource
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 
 
 class InternalSequenceService {
 
 	boolean transactional = true
-	def namedParameterJdbcTemplate
+	def jdbcTemplate
 	
 	def Integer next(Integer contextId, String name) {
-		return namedParameterJdbcTemplate.queryForInt('SELECT tdstm_sequencer(:contextId, :name) as val', ['contextId' : contextId, 'name' : name])
+		SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName("tdstm_sequencer");
+		
+		Map<String, Object> inParamMap = new HashMap<String, Object>();
+		inParamMap.put("context_id", contextId);
+		inParamMap.put("name", name);
+		SqlParameterSource sqlParam = new MapSqlParameterSource(inParamMap);
+		
+		Map<String, Object> simpleJdbcCallResult = simpleJdbcCall.execute(sqlParam);
+		return simpleJdbcCallResult.get('sequence_number');
 	}
 }
