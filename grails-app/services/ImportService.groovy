@@ -2,10 +2,10 @@
 //import org.apache.commons.lang.StringUtils
 //import org.codehaus.groovy.grails.commons.GrailsClassUtils
 //import com.tds.asset.AssetCableMap
-//import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttribute
 //import com.tdssrc.eav.EavAttributeOption
-//import com.tdssrc.eav.EavEntityAttribute
-//import com.tdssrc.eav.EavEntityType
+import com.tdssrc.eav.EavEntityAttribute
+import com.tdssrc.eav.EavEntityType
 //import com.tdsops.tm.enums.domain.SizeScale
 //import com.tdsops.tm.enums.domain.AssetCableStatus
 //import com.tdssrc.grails.DateUtil
@@ -15,6 +15,9 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import org.apache.commons.lang.StringUtils;
 
@@ -114,6 +117,191 @@ class ImportService {
 	 */
 	void updateProgress(session, currentCount) {
 		session.setAttribute("TOTAL_PROCESSES_ASSETS", currentCount)
+	}
+
+	/**
+	 * Used to review an import batch for any unexpected issues 
+	 * @param projectId - the id of the project
+	 * @param userLoginId - the id of the user that has invoked the process
+	 * @param batchId - the id of the batch to examine
+	 * @return An error message if any issues otherwise null
+	 */
+	String reviewImportBatch(Long projectId, Long userLoginId, Long batchId) {
+		def startedAt = new Date()
+		String errorMsg = ''
+		StringBuffer sb = new StringBuffer()
+		
+		Project project = Project.get(projectId)
+
+		boolean performance=true
+		def now = new Date()
+
+		DataTransferBatch dtBatch = DataTransferBatch.get(batchId)
+		if (!dtBatch) {
+			return 'Unable to find batch id'
+		}
+		if (dtBatch.project.id != projectId) {
+			securityService.reportViolation("reviewImportBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)")
+			return 'Unable to locate batch id'
+		}
+
+		boolean batchIsForDevices = dtBatch.eavEntityType?.domainName == "AssetEntity"
+		
+		if (performance) now = new Date()
+		def dataTransferValueRowList = DataTransferValue.findAll(
+			"From DataTransferValue d where d.dataTransferBatch=? " +
+			"and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtBatch])
+		if (performance) log.debug "Fetching DataTransferValue ROWS took ${TimeUtil.elapsed(now)}"
+
+		/*
+		if (performance) now = new Date()
+		def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dtBatch )
+		if (performance) log.debug "Fetching DataTransferValue VALUES took ${TimeUtil.elapsed(now)}"
+		*/
+
+		if (performance) now = new Date()
+		def assetIds = AssetEntity.findAllByProject(project)?.id
+		if (performance) log.debug "Fetching existing asset IDS took ${TimeUtil.elapsed(now)}"
+
+		def eavAttributeSet = EavAttributeSet.findById(1)
+
+		def assetIdList = []
+		def dupAssetIds = []
+		def notExistedIds = []
+		Map mfgModelMatches = [:]
+
+		EavEntityType deviceEavEntityType = EavEntityType.findByDomainName('AssetEntity')
+		EavAttribute mfgEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'manufacturer')
+		EavAttribute modelEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'model')
+
+		// log.debug "deviceEavEntityType=$deviceEavEntityType, mfgEavAttr=$mfgEavAttr, modelEavAttr=$modelEavAttr"
+
+		if (performance) now = new Date()
+		def assetsSize = dataTransferValueRowList.size()
+		def logCount = 50
+		for (int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+			if (--logCount == 0) {
+				log.info "Reviewed $dataTransferValueRow rows of ${assetsSize+1} for batch id $batchId"
+				logCount = 50
+			}
+
+			if (false && dataTransferValueRow > 20) {
+				sb.append("Aborted process early")
+				break
+			}
+
+			// log.debug("Processing $dataTransferValueRow of $assetsSize")
+			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+			
+			if (batchIsForDevices) {
+				def modelName 
+				def mfgName 
+
+				mfgName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
+				modelName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:modelEavAttr)?.importValue
+
+				mfgName = StringUtil.defaultIfEmpty(mfgName, '')
+				modelName = StringUtil.defaultIfEmpty(modelName, '')
+
+				if (mfgName.size() > 0 || modelName.size() > 0) {
+					// Check to see if it is in the list
+					String key = "$mfgName::::$modelName"
+					if (mfgModelMatches.containsKey(key)) {
+						mfgModelMatches[key].count++
+					} else {
+						boolean found = verifyModelAndManuPair(modelName, mfgName)
+						mfgModelMatches[key] = [ found: found, count: 1, mfg: mfgName, model: modelName]
+					}
+				}
+			}
+			
+			// log.debug "Checking for dups"
+			// Checking for duplicate asset ids
+			if (assetEntityId && assetIdList.contains(assetEntityId))
+				dupAssetIds << assetEntityId
+			
+			// log.debug "Checking for missing ids"
+			// Checking for asset ids which does not exist in database
+			if (assetEntityId && !assetIds.contains((Long)(assetEntityId)))
+				notExistedIds << assetEntityId
+				
+			assetIdList << assetEntityId
+
+
+		}
+		if (performance) log.debug "Reviewing $assetsSize batch records took ${TimeUtil.elapsed(now)}"
+
+		// Log missed Mfg/Model references
+		mfgModelMatches.each { k, d ->
+			if (! d.found )
+				sb.append("Mfg: ${d.mfg} / Model: ${d.model} not found - ${d.count} reference(s)<br>") 
+		}
+
+		// Log found Mfg/Model references
+		/*
+		mfgModelMatches.each { k, d ->
+			if (d.found)
+				sb.append("Mfg: ${d.mfg} Model: ${d.model} found - ${d.count} reference(s)<br>") 
+		}
+		*/
+
+		if( dupAssetIds.size() > 0)
+			sb.append("Duplicate assetIDs #$dupAssetIds  <br>")
+			
+		if (notExistedIds.size() > 0)
+			sb.append("No match found for assetIDs #$notExistedIds   <br>")
+	
+		if (performance) log.debug "Entire review process of $assetsSize batch records took ${TimeUtil.elapsed(startedAt)}"
+
+		return sb.toString()
+	}
+
+	/**
+	 * To Verify Manufacturer and Model pair from database
+	 * @param searchModelName  : Imported Model from excel
+	 * @param searchMfgName   : Imported Manufacturer from excel
+	 * @return false if not found
+	 */
+	private boolean verifyModelAndManuPair(searchModelName, searchMfgName) {
+		 
+		boolean found=false
+		boolean mfgBlank = StringUtil.isBlank(searchMfgName)
+		boolean modelBlank = StringUtil.isBlank(searchModelName)
+
+		// Don't need to search for a match if mfg/model are blank
+		if ( mfgBlank && modelBlank)
+			return true
+
+		def manu 
+		if (! mfgBlank ) {
+			manu = Manufacturer.findByName(searchMfgName)
+			if( !manu ){
+				manu = ManufacturerAlias.findByName( searchMfgName )?.manufacturer
+			}
+			if (!manu) {
+				log.debug "verifyModelAndManuPair failed on MFG for $searchModelName, $searchMfgName"
+				return false
+			}
+		}
+
+		if (! modelBlank) {
+			Model model = Model.findByModelName(searchModelName)
+			String modelName
+			if (! model){
+				modelName = ModelAlias.findByNameAndManufacturer(searchModelName,manu)?.model?.modelName
+				if (!modelName)
+					modelName = modelName
+			}
+			model = Model.findByModelNameAndManufacturer(modelName, manu)
+			if (! model) {
+				log.debug "verifyModelAndManuPair failed on MODEL for $searchModelName, $searchMfgName"
+				return false
+			}
+
+		}
+			
+		return true
 	}
 
 	/**	

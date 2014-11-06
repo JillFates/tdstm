@@ -221,28 +221,37 @@
         	</script>
         	--%>
         </div>
+
         <script type="text/javascript">
     		currentMenuId = "#assetMenu";
     		$("#assetMenuId a").css('background-color','#003366')
 			$('#assetMenu').show();
 			$('#reportsMenu').hide();
 
-			function reviewBatch(dataTransferBatchId, forWhom){
-				$("#messageId").html($("#spinnerId").html()).show()
+			function reviewBatch(dataTransferBatchId, forWhom) {
+				var messageDiv = $("#messageId");
+				messageDiv.html($("#spinnerId").html()).show()
 				jQuery.ajax({
 					url: '../dataTransferBatch/reviewBatch',
 					data: {'id':dataTransferBatchId},
 					type:'POST',
 					success: function(data) {
-						if(data.importPerm || !data.errorMsg)
-							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"ProcessId_"+dataTransferBatchId).html())
+
+						// Set the Process or Revew button appropriately
+						if (data.importPerm || !data.errorMsg)
+							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"ProcessId_"+dataTransferBatchId).html());
 						else
-							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"DisabledProcessId_"+dataTransferBatchId).html())
+							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"DisabledProcessId_"+dataTransferBatchId).html());
 							
-						data.errorMsg ? $("#messageId").html(data.errorMsg) : $("#messageId").html(" Reviewed , there were no errors in the review.")
+						// User message
+						if (data.errorMsg)
+							messageDiv.html(data.errorMsg);
+						else	
+							messageDiv.html("Batch was reviewed and no errors were found. You may now click the 'Process' button to complete the import.");
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
-						alert("An Unexpected error while populating dependent asset.")
+						messageDiv.html('').hide();
+						alert("An error occurred while attempting to review the batch.");
 					}
 				});
 			}
