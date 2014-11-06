@@ -49,6 +49,9 @@ function listDialog(assign,sort,order,source,rack,roomName,location,position){
 		}
 	});
 }
+function closeAssignAssetListDialog() {
+	$("#listDialog").dialog("close");
+}
 function editDialog(assetId,source,rack,roomName,location,position){
 	openAssetEditDialig(assetId)
 	setTimeout("updateEditForm('"+source+"','"+rack+"','"+roomName+"','"+location+"','"+position+"')",1000);

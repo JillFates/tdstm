@@ -527,7 +527,7 @@ class RoomController {
 			""")
 	   if (assetEntityList.size() > 0) {
 		   assetEntityList.eachWithIndex{ obj, i ->
-			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('${obj.assetClass}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}')">
+			   stringToReturn.append("""<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="EntityCrud.showAssetEditView('${obj.assetClass}',${obj.id},'${source}','${params.rack}','${params.roomName}','${params.location}','${params.position}');closeAssignAssetListDialog();">
 					<td>${obj.assetName}</td>
 					<td>${obj.assetTag}</td>
 					<td>${obj.model ? obj.model.modelName : ''}</td>
