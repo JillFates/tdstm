@@ -9,12 +9,18 @@ var DeviceCreateModal = function(){
   this.modelTypeOptions = this.modelTypeField.$$('option');
   this.modelTypeOptionSelected = this.modelTypeField.$('option:checked');
   this.saveBtn = this.createModal.$('[onclick="EntityCrud.saveToShow($(this), \'DEVICE\'); "]');
+  this.rackCabinetLabel = this.createModal.$('[for="sourceRackId"]');
+  this.chassisBladeLabel = this.createModal.$('[for="sourceChassisId"]');
 };
 DeviceCreateModal.prototype = new CreateAsset();
-DeviceCreateModal.prototype.createServer = function(appName,deviceType){
+// DeviceCreateModal.prototype.createModal = function(){
+
+// }; 
+DeviceCreateModal.prototype.createDevice = function(appName,deviceType){
   this.nameField.sendKeys(appName);
   this.modelTypeFieldInput.sendKeys(deviceType);
-  this.modelTypeField.$('[value='+deviceType+']').click();
+  // this.modelTypeField.$('[value='+deviceType+']').click();
+  browser.actions().sendKeys(protractor.Key.ENTER).perform();
   browser.executeScript('return $("#currentAssetType").val("'+deviceType+'")');
   this.saveBtn.click();
 };
@@ -25,4 +31,5 @@ DeviceCreateModal.prototype.getModelTypeSelected = function(){
     return this.MmdelTypeOptionSelected.getText();
   }
 };
+
 module.exports = DeviceCreateModal;

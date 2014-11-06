@@ -54,6 +54,7 @@ exports.config = {
     // '../components/tasks/cookbook.spec.js'
     ],
     assets:[
+    '../components/assets/devices/devices.spec.js'
     ],
     reports:[
     '../components/reports/applicationProfiles.spec.js',

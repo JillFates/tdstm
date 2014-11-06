@@ -1,10 +1,6 @@
 'use strict';
 var CreateAsset = function(){
-  this.createModal = $('[aria-describedby="createEntityView"]');
-  // this.createModal = element(by.id('createEditAssetForm'));
-  this.createModalForm = this.createModal.element(by.id('createEditAssetForm'));
-  // this.createModalTitle = this.createModal.element(by.id('ui-id-1'));
-  this.createModalTitle = this.createModal.element(by.css('.ui-dialog-title'));
+  this.createModal = element(by.id('createEditAssetForm'));
   this.closeCreateModalBtn = this.createModal.$('.ui-dialog-titlebar-close');
   this.createModalButtons = this.createModal.$$('span.button input');
   this.saveLogStgBtn = this.createModal.$('[onclick="saveToShow($(this),\'Logical Storage\')"]');
@@ -45,6 +41,13 @@ var CreateAsset = function(){
   this.custom2Field= element(by.id('custom2'));
 };
 CreateAsset.prototype ={};
+CreateAsset.prototype.getModalTitle = function(modal){
+  var modalCss = '[aria-describedby="createEntityView"]';
+  if(modal === 'view'){
+    modalCss = '[aria-describedby="editEntityView"]';
+  }
+  return $(modalCss+' .ui-dialog-title');
+};
 CreateAsset.prototype.setName = function(name){
   this.nameField.clear();
   this.nameField.sendKeys(name);
@@ -73,10 +76,9 @@ CreateAsset.prototype.getPlanStatusSelected = function(){
 CreateAsset.prototype.isCreateModalOpened = function(){
   var that = this;
   return browser.wait(function(){
-    return that.createModalForm.isPresent().then(function(valor){
+    return that.createModal.isPresent().then(function(valor){
       return valor;
     });
-    // return browser.executeScript('return $("#createEntityView").dialog("isOpen")');
   }).then(function(){
      return true;
   });
@@ -84,7 +86,7 @@ CreateAsset.prototype.isCreateModalOpened = function(){
 CreateAsset.prototype.isCreateModalClosed = function(){
   var that = this;
   return browser.wait(function(){
-    return that.createModalForm.isPresent().then(function(valor){
+    return that.createModal.isPresent().then(function(valor){
       return !valor;
     });
   }).then(function(){

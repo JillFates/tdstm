@@ -33,7 +33,7 @@ describe('Add Task', function(){
 
     it('should create an app and save', function(){
       var appModal = new CreateAppModal();
-      expect(appModal.createModalTitle.getText()).toEqual('Application Create');
+      expect(appModal.getModalTitle().getText()).toEqual('Application Create');
       appModal.createApp(appName);
       expect(appModal.isCreateModalClosed()).toBe(true);
     });
