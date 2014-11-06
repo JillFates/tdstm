@@ -38,6 +38,15 @@ class StringUtil {
 	}
 
 	/**
+	 * Used to determine if a string is null, empty of just whitespace
+	 * @param subject - the string to check
+	 * @return true if blank otherwise false
+	 */
+	static boolean isBlank(String subject) {
+		return (subject == null || subject.trim().size() == 0)
+	}
+
+	/**
 	 * Used to set a string to a default if the subject is blank
 	 * @param subject - the string to check to see if it is blank
 	 * @param defStr - the value to set the string to if it is blank
