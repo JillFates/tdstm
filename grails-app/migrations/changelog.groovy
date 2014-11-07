@@ -55,4 +55,6 @@ databaseChangeLog = {
 	include file: '20140929-changeBladeChassisRefToUseIds.groovy'
 //	include file: '20141006-RenameGenericManuAndModel.groovy' // This is currently commented out until I can finish it (JPM 10/2014)
 	include file: '20141008-add-edit-project-field-settings-permissions.groovy'
+	include file: '20141107-clean-up-preference-asset-columns.groovy'
+	include file: '20141107-remove-current-status-from-eav-attribute.groovy'
 }
