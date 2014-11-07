@@ -18,7 +18,7 @@
 				<tr>
 		</g:if>
 		<g:else>
-			<div class="body">
+			<div class="body" style="float:none !important;">
 		</g:else>
 
 		<g:if test="${rackLayout}">
@@ -42,7 +42,7 @@
 						</tr>
 						${rackLayout?.frontViewRows}
 					</table>
-					<hr style="page-break-after:always"/>
+					<div style="display: block; page-break-after: always;"></div>
 					<g:if test="${generateView}">
 					</td>
 					</g:if>
@@ -84,7 +84,7 @@
 						</tr>
 						${rackLayout?.backViewRows}
 					</table>
-					<br class="page-break-after"/>
+					<div style="display: block; page-break-after: always;"></div>
 					<g:if test="${generateView}">
 						</td>
 					</g:if>
