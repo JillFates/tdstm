@@ -9,6 +9,8 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 
+import org.springframework.transaction.annotation.Transactional
+
 class DeviceService {
 
 	boolean transactional = true
@@ -79,6 +81,7 @@ class DeviceService {
 	 * @param project 
 	 * @return a Map that includes the list of common properties
 	 */
+	@Transactional(readOnly = true) 
 	Map getModelForShow(Project project, assetEntity, Object params) {
 
 		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntity.attributeSet.id order by eav.sortOrder ")
