@@ -327,7 +327,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	// Calculate the maximum weight value, which is used during the tick function
 	var maxWeight = 1
-	nodes.forEach(function(o, i) {
+	_(nodes).forEach(function(o) {
 		maxWeight = Math.max( maxWeight, (o.weight?o.weight:0) )
 		o.fix = false;
 	})
@@ -463,7 +463,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		
 		if ( gravity == 0 && ! floatMode ) {
 			var k =  e.alpha
-			nodes.forEach(function(o, i) {
+			_(nodes).forEach(function(o) {
 				if(! o.fix) {
 					if( maxWeight > 1 && (o.weight?o.weight:0) == 1 )
 						k = 0

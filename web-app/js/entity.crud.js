@@ -136,7 +136,7 @@ var EntityCrud = ( function($) {
 				var fname = ['Shutdown', 'Startup', 'Testing'];
 				// Hack because of inconsistency in the field ids
 				var c=0;
-				fname.forEach( function(name) {
+				_(fname).forEach( function(name) {
 					var fs = '#'+form+' input[name='+ name.toLowerCase() + 'Duration]';
 					var field = $(fs);
 					if (field.length>0) {
@@ -265,12 +265,12 @@ var EntityCrud = ( function($) {
 	};
 
 	pub.showRackOrBladeFields = function(rackBlade) {
-		stArray.forEach( function(n,i) {
+		_(stArray).forEach( function(stValue) {
 			// Show Rack select if room is selected; Rack name if New Room or New Rack; or nothing if Room or Rack are not selected
-			['S','T'].forEach( function(n, i) {
-				var rmCtrl = $('#roomSelect'+n);
+			_(['S','T']).forEach( function(stValue) {
+				var rmCtrl = $('#roomSelect'+stValue);
 				var roomId = pub.selectOptionSelected(rmCtrl);
-				var sOrT = (n=='S' ? 'source' : 'target');
+				var sOrT = (stValue=='S' ? 'source' : 'target');
 				var elPrefix = '#'+sOrT;
 				var rbcName = rackBlade.toLowerCase()+tdsCommon.capitalize(sOrT)+'Id';
 				var newrbcName = "new" + tdsCommon.capitalize(rbcName);
@@ -280,9 +280,9 @@ var EntityCrud = ( function($) {
 				switch(roomId) {
 					case '0':
 						// Unselected
-						$('.use'+rackBlade+n).hide();
-						$(".newRoom"+n).hide();
-						$(".newRack"+n).hide();
+						$('.use'+rackBlade+stValue).hide();
+						$(".newRoom"+stValue).hide();
+						$(".newRack"+stValue).hide();
 						rackBladePosCtrl.hide();
 
 						if (rackBlade=='Rack') {
@@ -292,10 +292,10 @@ var EntityCrud = ( function($) {
 						break;
 					case '-1':
 						// Create room - room  and input fields
-						$(".newRoom"+n).show();
+						$(".newRoom"+stValue).show();
 						if (rackBlade=='Rack') {
-							$(".newRack"+n).show();
-							$('.use'+rackBlade+n).hide();
+							$(".newRack"+stValue).show();
+							$('.use'+rackBlade+stValue).hide();
 							rackBladePosCtrl.hide();
 							rackBladePosCtrl.show();
 							
@@ -304,9 +304,9 @@ var EntityCrud = ( function($) {
 						}
 						break;
 					default:
-						$(".newRoom"+n).hide();
-						$(".newRack"+n).hide();
-						$('.use'+rackBlade+n).show();
+						$(".newRoom"+stValue).hide();
+						$(".newRack"+stValue).hide();
+						$('.use'+rackBlade+stValue).show();
 						// Now show the chassis position based on if a chassis is selected
 						var rbVal = pub.selectOptionSelected(rackBladeCtrl);
 						var optionId = parseInt( rbVal );
@@ -328,30 +328,30 @@ var EntityCrud = ( function($) {
 	pub.showChassisFields = function() {
 		$(".positionLabel").show();
 		$(".bladeLabel").show();
-		stArray.forEach( function(n,i) {
+		_(stArray).forEach( function(stValue) {
 			// Only show Chassis select if room is selected
-			['S','T'].forEach( function(n, i) {
-				var rmCtrl = $('#roomSelect'+n);
+			_(['S','T']).forEach( function(stValue) {
+				var rmCtrl = $('#roomSelect'+stValue);
 				var roomId = pub.selectOptionSelected(rmCtrl);
-				var sOrT = (n=='S' ? 'source' : 'target');
+				var sOrT = (stValue=='S' ? 'source' : 'target');
 				var elPrefix = '#'+sOrT;
 				var chassisCtrl = $(elPrefix+'ChassisSelectId');
 				var bladePosCtrl = $(elPrefix+'BladePositionId');
 				switch(roomId) {
 					case '-1':
 						// Show room input fields
-						$(".newRoom"+n).show();
-						$(".useBlade"+n).hide();
+						$(".newRoom"+stValue).show();
+						$(".useBlade"+stValue).hide();
 						bladePosCtrl.hide();
 						break;
 					case '0':
-						$(".useBlade"+n).hide();
-						$(".newRoom"+n).hide();
+						$(".useBlade"+stValue).hide();
+						$(".newRoom"+stValue).hide();
 						bladePosCtrl.hide();
 						break;
 					default:
-						$(".useBlade"+n).show();
-						$(".newRoom"+n).hide();
+						$(".useBlade"+stValue).show();
+						$(".newRoom"+stValue).hide();
 						// Now show the chassis position based on if a chassis is selected
 						var optionId = parseInt( chassisCtrl.val() );
 						if (optionId > 0) {
@@ -422,20 +422,20 @@ var EntityCrud = ( function($) {
 	};
 
 	var populateRackOrChassisSelect = function(checkRask) {
-		['S','T'].forEach( function(n, i) {
-			var rmCtrl = $('#roomSelect'+n);
+		_(['S','T']).forEach( function(stValue) {
+			var rmCtrl = $('#roomSelect'+stValue);
 			var roomId = pub.selectOptionSelected(rmCtrl);
 
 			if ((roomId != null) && (roomId != "") && (roomId != "0") && (roomId != "-1")) {
 				if (checkRask) {
-					var rackSelect = $(n=='S' ? '#rackSourceId' : '#rackTargetId');
+					var rackSelect = $(stValue=='S' ? '#rackSourceId' : '#rackTargetId');
 					if (rackSelect.children('option').length <= 2) {
-						pub.fetchRackSelectForRoom(roomId, n, 'Edit');
+						pub.fetchRackSelectForRoom(roomId, stValue, 'Edit');
 					}
 				} else {
-					var chassisSelect = $(n=='S' ? '#sourceChassisSelectId' : '#targetChassisSelectId');
+					var chassisSelect = $(stValue=='S' ? '#sourceChassisSelectId' : '#targetChassisSelectId');
 					if (chassisSelect.children('option').length <= 1) {
-						pub.fetchChassisSelectForRoom(roomId, n, 'Edit');
+						pub.fetchChassisSelectForRoom(roomId, stValue, 'Edit');
 					}
 				}
 			}
