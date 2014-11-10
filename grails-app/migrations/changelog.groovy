@@ -57,4 +57,5 @@ databaseChangeLog = {
 	include file: '20141008-add-edit-project-field-settings-permissions.groovy'
 	include file: '20141107-clean-up-preference-asset-columns.groovy'
 	include file: '20141107-remove-current-status-from-eav-attribute.groovy'
+	include file: '20141110-comment-notes-change-column-note-to-text.groovy'
 }
