@@ -87,7 +87,7 @@
 								</td>
 								<td style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 									<div id="modelEditId">
-										<div id="assetTypeSelect" tabindex="103">
+										<div id="assetTypeSelect" tabindex="102">
 									    </div>
 									</div>
 								</td>
@@ -169,7 +169,7 @@
 								</td>
 								<td style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
 									<div id="manufacturerEditId" style="display:inline">
-										<div id="manufacturerSelect" tabindex="102">
+										<div id="manufacturerSelect" tabindex="103">
 										</div>
 									</div>
 								</td>
