@@ -3,6 +3,8 @@ import jxl.read.biff.*
 import jxl.write.*
 
 import org.apache.commons.lang.math.NumberUtils
+
+
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
@@ -17,6 +19,8 @@ import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 
 class AssetEntityAttributeLoaderService {
 
@@ -32,7 +36,10 @@ class AssetEntityAttributeLoaderService {
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
-	
+
+	String DEFAULT_DEVICE_TYPE = 'Server'
+	String UNKNOWN_MFG_MODEL = 'Unknown'
+
 	/*
 	 * upload records in to EavAttribute table from from AssetEntity.xls
 	 */
@@ -456,45 +463,368 @@ class AssetEntityAttributeLoaderService {
 		}
 		return moveBundle
 	}
+
+	/**
+	 * Used to find or create both the manufacturer and/or model based on the values from the DataTransferValue objects for the two properties. This
+	 * method will also update the model and manufacturer properties of the device
+	 * @param userLogin - the UserLogin object of the person invoking this method
+	 * @param device - the AssetEntity object that is being created or updated
+	 * @param mfgNameParam - name of the manufacturer
+	 * @param modelNameParam - name of the model 
+	 * @param deviceType - the Device Type of the device that is used to help resolve the model at times
+	 * @param usize - the Usize of the asset used when creating new models
+	 * @param canCreateMfgAndModel - a flag indicating that the user has the permission to create new mfg and models
+	 * @return A map containing the following values:
+	 * 		errorMsg - one or more error messages that also is used to signal that the assignment failed for some reason
+	 * 		warningMsg - one or more warning messages that might be usesful to the user
+	 * 		modelWasCreated - flag to indicate that a new Model was created as a result of this call
+	 * 		mfgWasCreated - flag to indicate that a new Manufacturer was created as a result of this call
+	 * TODO : JPM 11/2014 : Refactor function assignMfgAndModelToDevice into the ImportService class
+	 */
+	Map assignMfgAndModelToDevice(UserLogin userLogin, AssetEntity device, String mfgNameParam, String modelNameParam, String deviceTypeParam, Map deviceTypeMap, String usize, boolean canCreateMfgAndModel) {
+		
+		String errorMsg, warningMsg
+
+		boolean deviceExists = device.id > 0
+		boolean mfgWasCreated = false
+		boolean modelWasCreated = false
+
+		String mfgName = mfgNameParam
+		String modelName = modelNameParam
+		String deviceType = deviceTypeParam
+		boolean haveMfgName = mfgName?.size() > 0
+		boolean haveModelName = modelName?.size() > 0
+		boolean haveDeviceType = deviceType?.size() > 0
+
+		// Flag when deviceType is supplied and is invalid which in most cases will result in an error or warning
+		boolean invalidDeviceType = false 	
+
+		// Get the Unknown Mfg in case we're doing a partial Mfg/Model reference and will go with the Unknown Mfg and corresponding Model
+		Manufacturer unknownMfg = Manufacturer.findByName('Unknown')
+		
+		// Double check the device type and set the deviceType to the proper case if found so we can use it below correctly
+		if (haveDeviceType) {
+			String dtlc = deviceType.toLowerCase()
+			deviceType = deviceTypeMap.find( { k,v -> k == dtlc } )?.getKey()
+			haveDeviceType = deviceType?.size() > 0
+			invalidDeviceType = ! haveDeviceType
+		}	
+
+		// Some common error/warning messages used below
+		String DEVICE_TYPE_INVALID = "Device Type ($deviceTypeParam) is invalid"
+		String LACK_INFO_NO_CREATE = 'Incomplete Mfg/Model/Type therefore did not update device'
+		String UNEXPECTED_CONDITION = "assignMfgAndModelToDevice() got to an unexpected condition"
+
+		// Get the device's current mfg/model
+		Manufacturer mfg = device.model?.manufacturer ?: device.manufacturer
+		Model model = device.model
+
+		// Helper closure used that will assign an existing Mfg/Model to the the asset using the supplied model object
+		def performAssignment = { modelObj ->
+			device.model = modelObj
+			device.manufacturer = modelObj.manufacturer
+			device.assetType = modelObj.assetType
+
+			// Add a few possible warning messages
+			if (usize?.size() && usize != modelObj.usize) {
+				warningMsg = StringUtil.concat(warningMsg, "Specified u-size ($usize) differs from existing model (${modelObj.usize}")
+			}
+			if (haveDeviceType && deviceType != modelObj.assetType) {
+				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceType) differs from existing model (${modelObj.assetType}")
+			} else if (invalidDeviceType) {
+				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) was invalid, defaulted to existed model type (${modelObj.assetType}")
+			}
+		}
+
+		// Helper closure used to create a model and possibly a manufacturer 
+		// @param mfgObj - the name of the Mfg if creating a new Mfg or the existing Mfg record
+		// @param createModelName - the name of the model to create
+		// @note This will assume the usize and deviceType from the local scope variables
+		def performCreateMfgModel = { mfgObj, createModelName, createDeviceType, createUsize ->
+			if (mfgObj instanceof String) {
+				mfgName = mfgObj
+				if (canCreateMfgAndModel) {
+					mfg = new Manufacturer(name: mfgName)
+					if (! ( mfg.validate() && mfg.save(flush:true)) ) {
+						errorMsg = "An error occured while trying to create the new manufacturer ($mfgName)"
+						log.error "An error occured while trying to create the new manufacturer ($mfgName) - ${GormUtil.allErrorsString(mfg)}"
+						return
+					}
+					mfgWasCreated = true
+				} else {
+					errorMsg = "You do not have permission to create manufacturer ($mfgName)"
+					return
+				}
+			} else {
+				mfgName = mfgObj.name
+				mfg = mfgObj
+			}
+
+			if (canCreateMfgAndModel) {
+				modelName = createModelName
+				try {
+					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  createUsize, userLogin?.person)
+					modelWasCreated = true
+					performAssignment(model)
+				} catch (e) {
+					errorMsg = e.getMessage()
+				}
+			} else {
+				errorMsg = "You do not have permission to create model ($mfgName/$modelName)"
+			}
+		}
+
+		// Helper closure used to setup various variables for when we'll create/assign an Unknown Mfg/Model
+		def performUnknownAssignment = {
+			if (! unknownMfg) {
+				errorMsg = "Unable to find the 'Unknown' manufacturer"
+			} else {
+				modelName = "$UNKNOWN_MFG_MODEL - $deviceType"
+				model = Model.findByNameAndManufacturerAndType(modelName, unknownMfg, deviceType)
+				if (model) {
+					performAssignment(model)
+				} else {
+					performCreateMfgModel(unknownMfg, modelName, deviceType, '1')
+				}
+			}
+		}
+
+		// Handle the off-chance that the model.manufacturer doesn't match device.manufacturer. If so, set the device mfg to that of the model
+		if (model && mfg && device.manufacturer != mfg)
+			device.manufacturer = mfg
+
+		while (true) {
+
+			// If we don't have any of the information to lookup the Mfg/Model or just deviceType
+			if (! ( haveMfgName && haveModelName) ) {
+				if (! device.model) {
+					if (haveDeviceType) {
+						performUnknownAssignment()
+					} else {
+						// Error if it is a new asset or existing asset missing a model
+						errorMsg = 'A Model Name plus Mfg Name or Device Type are required'
+					}
+				}
+				break
+			} 
+
+			// Handle the NULLing situation which will set the mfg/model to Unknow/Unknown - DeviceType, which will be created as necessary
+			if (mfgName == ImportService.NULL_INDICATOR || modelName == ImportService.NULL_INDICATOR) {
+				if (! haveDeviceType)
+					deviceType = DEFAULT_DEVICE_TYPE
+
+				performUnknownAssignment()
+				break
+			}
+
+			List mfgList = []
+			if (haveMfgName)
+				mfgList = findManufacturersByName(mfgName)
+			if (mfgList.size() > 1) {
+				// Check to see if we found more than one manufacturer / model combination
+				log.error "Manufacturer name ($mfgName) is not unique and should be corrected : $mfgList"
+				errorMsg = "Manufacturer ($mfgNameParam) must be unique"
+				break
+			}
+
+			List modelList = []
+			if (haveModelName)
+				modelList = findModelsByName(modelName)		
+
+			if (modelList.size() == 0 && ! device.model) {
+				errorMsg = "Model name is required"
+				break
+			} 
+
+			List foundModels
+			int modelsCount
+
+			// 
+			// Case when user has supplied a valid/existing Mfg
+			//
+			if (mfgList) {
+				//
+				// Case when we don't have a model
+				//
+				if (! haveModelName) {
+					if (haveDeviceType) {
+						warningMsg = StringUtil.concat(warningMsg, "Incomplete Mfg/Model/Type therefore set to 'Unknown/Unknown - $deviceType'")
+						performUnknownAssignment()
+					} else {
+						if (invalidDeviceType)
+							warningMsg = StringUtil.concat(warningMsg, "Device Type ($deviceTypeParam) is invalid")
+
+						errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
+					}
+					break
+				}
+
+				// Look for the models by Mfg with/without the device type
+				foundModels = modelList.findAll { it.manufacturer.id == mfgList[0].id }
+				modelsCount = foundModels.size()
+
+				//
+				// Case when we have no mfg / model matches
+				// 
+				if (modelsCount == 0) {
+					if (modelList.size()==0) {
+						// No models found but we have a model name so we can create as long as we have a valid type
+						if (haveDeviceType) {
+							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
+						} else {
+							// Can't create so send out error and possible warning on bogus device type
+							if (invalidDeviceType)
+								warningMsg = StringUtil.concat(warningMsg, DEVICE_TYPE_INVALID)
+
+							errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
+						}
+					}
+				} else if (modelsCount==1) {
+					//
+					// Case when we found a unique match for existing mfg/model - our favorite case!
+					//
+					performAssignment(foundModels[0])
+				} else {
+					//
+					// Case when we found multiple mfg/models matches so we need to narrow down the deviceType to try and get unique
+					//
+					if (haveDeviceType) {
+						// Try refining the list to include the Type
+						foundModels = foundModels.findAll { it.assetType == deviceType }
+						modelsCount = foundModels.size()
+
+						if (modelsCount == 0) {
+							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
+						} else if (modelsCount == 1) {
+							performAssignment(foundModels[0])
+						} else {
+							// Non-unique match - bad
+							errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
+						}
+					} else {
+						errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
+					}
+				}
+
+				break
+			} 
+
+			// 
+			// Case when user has supplied a non-existing Mfg Name and a Model Name (typical New Mfg/Model)
+			//
+			// TODO : JPM 11/2014 : Should add logic to compare mfg name against model aliases to see if mfg name in the model name
+			if (haveMfgName && haveModelName) {
+				// First make sure we have a valid device type
+				if (invalidDeviceType || !haveDeviceType) {
+					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID)
+				} else {
+					// Check to see if we have a model and type match and if so assume the user got the mfg name wrong
+					if (modelsCount > 0) {
+						// Filter down the model list to just the device type
+						foundModels = foundModels.findAll { it.assetType == deviceType }
+						modelsCount = foundModels.size()
+						// for modelsCount == 0 we'll fall out and catch in the next if statement
+						if (modelsCount == 1) {
+							performAssignment(foundModels[0])
+						} else if (modelsCount > 1) {
+							errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
+						}
+					}
+					if (modelsCount == 0) { 
+						// Create a new Mfg AND new Model
+						performCreateMfgModel(mfgName, modelName, deviceType, usize)
+					} else {
+						errorMsg = UNEXPECTED_CONDITION + ' - if (haveMfgName && haveModelName)'
+					}
+				}
+
+				break
+			}
+
+			// 
+			// Case when user has supplied an existing Model name but no Mfg Name
+			//
+			if (modelsCount) {
+				if (modelsCount == 1) {
+					// We'll assign the model regardless of the deviceType but may warn 
+					performAssignment(foundModels[0])
+				} else {
+					// We have more than 1 model so see if we can narrow down by device type
+					if (haveDeviceType) {
+						foundModels = foundModels.findAll { it.assetType == deviceType }
+						modelsCount = foundModels.size()
+					}
+					if (modelsCount == 1) {
+						// Found a single model name with the specified device type. Will assign but warn
+						performAssignment(foundModels[0])
+					} else {
+						errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
+					}
+				}
+				break
+			}
+
+			errorMsg = UNEXPECTED_CONDITION + ' - while'
+			break
+		} // while (true)
+
+		return [errorMsg: errorMsg, warningMsg: warningMsg, mfgWasCreated: mfgWasCreated, modelWasCreated: modelWasCreated]
+	}
 	
 	/* To get DataTransferValue Asset Manufacturer
 	 * @param dataTransferValue
 	 * @author Lokanada Reddy
 	 */
-	def getdtvManufacturer( def manufacturerValue ) {
-		def manufacturer
-		if(manufacturerValue){
-			manufacturer = Manufacturer.findByName( manufacturerValue )
-			if( !manufacturer ){
-				manufacturer = ManufacturerAlias.findByName(manufacturerValue)?.manufacturer
-				if( !manufacturer ) {
-					manufacturer = new Manufacturer( name : manufacturerValue )
-					if ( !manufacturer.validate() || !manufacturer.save() ) {
-						def etext = "Unable to create manufacturer" + GormUtil.allErrorsString( manufacturer )
-						log.error(etext)
+	List findOrCreateManufacturer(UserLogin userLogin, String mfgName, boolean canCreateMfgAndModel) {
+		Manufacturer mfg
+		String errorMsg
+
+		if (mfgName) {
+			mfg = Manufacturer.findByName( mfgName )
+			if ( ! mfg ) {
+				mfg = ManufacturerAlias.findByName(mfgName)?.manufacturer
+				if ( ! mfg ) {
+					if (canCreateMfgAndModel) {
+						mfg = new Manufacturer( name: mfgName )
+						if ( !mfg.validate() || !mfg.save(flush:true) ) {
+							errorMsg = "Unable to create manufacturer ($mfgName)" + GormUtil.allErrorsString( mfg )
+							log.error(errorMsg)
+						} else {
+							log.info "Manufacturer ($mfgName) was created"
+						}
+					} else {
+						errorMsg = "Unable to find manufacturer $mfgName"
 					}
 				}
 			}
 		}
-		return manufacturer
+		return [ mfg, errorMsg ]
 	}
-	
-	/* To get DataTransferValue Asset Model
-	 * @param dataTransferValue, dataTransferValueList
-	 * @author Lokanada Reddy
+
+	/**
+	 * Used to retrieve a list of all manufacturers and their aliases that have the same name
+	 * @param name - the name to lookup
+	 * @param The list of models found
 	 */
-	def getdtvModel(def dtv, def dtvList, def assetEntity ) {
-		def model
-		def modelValue = dtv.correctedValue ? dtv.correctedValue : dtv.importValue
-		def dtvManufacturer = dtvList.find{ it.eavAttribute.attributeCode == "manufacturer" }
-		def dtvUsize = dtvList.find{it.eavAttribute.attributeCode == "usize"}?.importValue
-		if(dtvManufacturer){
-			def manufacturerName = dtvManufacturer?.correctedValue ? dtvManufacturer?.correctedValue : dtvManufacturer?.importValue
-			model = findOrCreateModel(manufacturerName, modelValue, '', true, dtvUsize, dtvList);
-		}
-		return model
+	List findManufacturersByName(String name) {
+		List list = Manufacturer.findAllByName(name)
+		list.addAll( ManufacturerAlias.findAllByName(name).manufacturer )
+		list = list.unique({ a, b -> a.id <=> b.id })
+		return list
 	}
 	
+	/**
+	 * Used to retrieve a list of all models and their aliases that have the same name
+	 * @param modelName - the name to lookup
+	 * @param The list of models found
+	 */
+	List findModelsByName(String name) {
+		List list = Model.findAllByModelName(name)
+		list.addAll( ModelAlias.findAllByName(name).model )
+		list = list.unique({ a, b -> a.id <=> b.id })
+		return list
+	}
+
 	// TODO: Move to AssetEntityService
 	/**
 	 * Method used to find model by manufacturrName as well as create model if modelnot exist and manufacturer exist. 
@@ -506,51 +836,43 @@ class AssetEntityAttributeLoaderService {
 	 * @params dtvList : dataTransferValueList 
 	 * @return model instance
 	 */
-	def findOrCreateModel(def manufacturerName, def modelName, def type, def doCreate=true, def usize=1, def dtvList = []){
-		def model
-		try{
-		if( manufacturerName ){
-			// first checking imported value in manufacturer table .
-			def manufacturer = manufacturerName ? Manufacturer.findByName(manufacturerName) : null
-			if( !manufacturer && manufacturerName){
-				// if not found in manufacturer table then searching in manufacturer_alias table as it should exist per previous manufacturer creation
-				// if found assign to manufacturerAlias.manufacturer.
-				manufacturer = ManufacturerAlias.findByName( manufacturerName )?.manufacturer
-			}
-			if(manufacturer){
+	List findOrCreateModel(UserLogin userLogin, Manufacturer mfg, String modelName, String deviceType, String usize, boolean canCreateMfgAndModel) {
+		Model model
+		String errorMsg
+
+		try {
+			if (mfg) {
 				// if modelValue exist using that else using 'unknown' as modelValue
-				modelName = modelName?:'unknown'
+				modelName = modelName ?: 'unknown'
 				// if manufacturer searching in model table if found assigning .
-				model = Model.findByModelNameAndManufacturer( modelName, manufacturer )
-				if( !model ){
+				model = Model.findByModelNameAndManufacturer( modelName, mfg )
+				if( !model ) {
 					// if imported value is not in model table then search in model alias table .
-					model = ModelAlias.findByNameAndManufacturer(modelName,manufacturer)?.model
-					if(!model && doCreate){
-						def assetType
-						if(type){
-							assetType = type
+					model = ModelAlias.findByNameAndManufacturer(modelName,mfg)?.model
+					if (! model) {
+						if (canCreateMfgAndModel) {
+							if (! deviceType)
+								deviceType = 'Server'
+
+							model = Model.createModelByModelName(modelName, mfg, deviceType, usize, userLogin)
 						} else {
-							def dtvAssetType = dtvList.find{it.eavAttribute.attributeCode == "assetType"}
-							assetType = dtvAssetType?.correctedValue ? dtvAssetType?.correctedValue : dtvAssetType?.importValue
-							assetType = assetType ? assetType : "Server"
+							errorMsg = "Unable to find model ($modelName) for mfg ($mfg)"
 						}
-						model = Model.createModelByModelName(modelName, manufacturer, assetType, usize)
 					}
 				}
 			}
+		} catch(Exception e) {
+			errorMsg = "Unable to create model $modelName - ${e.toString()}"
+			log.error errorMsg + ExceptionUtil.stackTraceToString(e)
 		}
-		} catch(Exception ex){
-			ex.printStackTrace()
-			log.error("Unexpected exception:" + ex.toString() )
-		}
-	  return model
+		return [model, errorMsg]
 	}
-	
+
 	/* To get DataTransferValue source/target Team
 	 * @param dataTransferValue,moveBundle
 	 * @author srinivas
 	 */
-	def getdtvTeam(def dtv, def bundleInstance, def role ){
+	def getdtvTeam(def dtv, def bundleInstance, def role ) {
 		def teamInstance
 		if( dtv.correctedValue && bundleInstance ) {
 			teamInstance = projectTeam.findByTeamCodeAndMoveBundle(dtv.correctedValue, bundleInstance )
@@ -598,8 +920,8 @@ class AssetEntityAttributeLoaderService {
 	/*
 	 *  Create asset_cabled_Map for all asset model connectors 
 	 */
-	 def updateModelConnectors( assetEntity ){
-		if(assetEntity.model){
+	def updateModelConnectors( assetEntity ) {
+		if (assetEntity.model) {
 			// Set to connectors to blank if associated 
 			AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
 				assetToPort=null where assetTo = ? """,[assetEntity])
@@ -627,7 +949,7 @@ class AssetEntityAttributeLoaderService {
 				}
 			}
 		}
-	 }
+	}
 	 
 	 /**
 	  * Storing imported asset type in EavAttributeOptions table if not exist .
@@ -635,7 +957,7 @@ class AssetEntityAttributeLoaderService {
 	  * @param create : create (Boolean) a flag to determine assetType will get created or not
 	  * @return
 	  */
-	 def findOrCreateAssetType(assetTypeName, def create = false){
+	def findOrCreateAssetType(assetTypeName, def create = false){
 		 def typeAttribute = EavAttribute.findByAttributeCode("assetType")
 		 def assetType = EavAttributeOption.findByValueAndAttribute(assetTypeName, typeAttribute)
 		 if(!assetType && create){
@@ -647,7 +969,7 @@ class AssetEntityAttributeLoaderService {
 			 }
 		 }
 		 return assetType
-	 }
+	}
 	 
 	// TODO: Move to AssetEntityService
 	/**
@@ -727,6 +1049,7 @@ class AssetEntityAttributeLoaderService {
 		}
 		return msg
 	}
+
 	/**
 	 * A helper method used to do the initial lookup of an asset and perform the EAV attribute validation. If the asset was not found then it will
 	 * create a new asset and initialize various properties. If the asset was modified since the export and import then it will return null
@@ -787,7 +1110,6 @@ class AssetEntityAttributeLoaderService {
 			return null
 
 		return asset
-		
 	} 
 
 	/**
@@ -856,11 +1178,13 @@ class AssetEntityAttributeLoaderService {
 	 * @return void
 	 */
 	def setValueOrDefault(asset, property, value, defValue = null) {
-		if ( (value?.size() && value != asset[property]) || ! asset[property])
-			if (value)
+		if ( (value?.size() && value != asset[property]) || ! asset[property]) {
+			if (value) {
 				asset[property] = value
-			else if (defValue)
+			} else if (defValue) {
 				asset[property] = defValue
+			}
+		}
 	}
 
 	/**
@@ -944,6 +1268,7 @@ class AssetEntityAttributeLoaderService {
 				setValueOrDefault(asset, property, value, 'Discovery')
 				break
 			case ~/version|modifiedBy|lastUpdated/: 
+				// Do not want to all user to modify these properties
 				break
 			default:
 				if (value.size() ) {

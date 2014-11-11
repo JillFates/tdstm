@@ -61,6 +61,11 @@ class TestCaseController {
 		render "Found by:<br>fullname: $fullname<br>firstname: $firstname<br>email: $email<br>logins: $login".toString()
 	}
 
+	// Used to test the JQuery one method
+	def testOne = {
+		render(view: '../dashboard/testOne', model:[a:1])
+	}
+
 	def finduser = {
 		def userLogin = UserLogin.findByUsername( 'jmtest@transitionaldata.com' )
 		render (userLogin ? userLogin.toString() : 'Not found')

@@ -240,11 +240,19 @@ class Model {
 	 * @param usize - (optional param )Integer usize , usize of model  (default : 'unknown')
 	 * @return object of Model if created else null.
 	 */
-	def static createModelByModelName(def modelName, def manufacturer, def assetType='Server',  def usize=1){
-		def model = new Model( modelName:modelName, manufacturer:manufacturer, assetType:assetType, sourceTDS : 0, usize :usize )
+	def static createModelByModelName(def modelName, def manufacturer, def assetType='Server',  def usize=1, createdBy=null) {
+		def model = new Model( 
+			modelName: modelName, 
+			manufacturer: manufacturer, 
+			assetType: assetType, 
+			sourceTDS: 0, 
+			usize: usize,
+			createdBy: createdBy )
+
 		if ( !model.validate() || !model.save(flush:true) ) {
-			def etext = "Unable to create model" + GormUtil.allErrorsString( model )
-			model = null
+			String error = 'Unable to create model' + GormUtil.allErrorsString( model )
+			println "Call to createModelByModelName('$modelName', '${manufacturer.name}',...) by $createdBy - $error"
+			throw new RuntimeException(error)
 		} else {
 			def powerConnector = new ModelConnector(model : model,
 				connector : 1,

@@ -102,7 +102,7 @@ class DataTransferBatchController {
 	 * @return process the dataTransferBatch and return to datatransferBatchList
 	 */
 	def deviceProcess = {
-		def message
+		String message
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -111,18 +111,18 @@ class DataTransferBatchController {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
 		try {
-			message = importService.processDeviceImport(project, userLogin, params.batchId, session, tzId)
-			log.info "deviceProcess() for batchId ${params.batchId} by user $userLogin\n " + message
+			message = importService.processDeviceImport(project, userLogin, params.id, session, tzId)
+			log.info "deviceProcess() for batchId ${params.id} by user $userLogin\n " + message
+			render ServiceResults.success([results:message]) as JSON
 		} catch (Exception e) {
-			message = "Unable to process import : ${e.getMessage()}"
-			if (log.isDebugEnabled())
-				log.error ExceptionUtil.stackTraceToString(e)
-
+			message = 'An error occurred while processing the import. Please contact support for assistance.'
+			if (log.isDebugEnabled()) {
+				message = "$message : ${e.getMessage()}"
+			}
 			log.error "deviceProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.batchId}"
+			log.error ExceptionUtil.stackTraceToString(e)
+			render ServiceResults.errors(message) as JSON
 		}
-
-		flash.message = message
-		redirect ( action:list )
 	}
 	
 	/**
@@ -687,7 +687,7 @@ class DataTransferBatchController {
 		} else {
 			Long batchId = NumberUtil.toLong(params.id)
 			if (batchId) {
-				errorMsg = importService.reviewImportBatch(project.id, userLogin.id, batchId)
+				errorMsg = importService.reviewImportBatch(project.id, userLogin.id, batchId, session)
 			} else {
 				log.error "reviewBatch() called with invalid batch id ($batchId) by user $userLogin while assigned to project $project"
 				errorMsg = "The batch id was missing or an invalid value"

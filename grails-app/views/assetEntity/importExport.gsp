@@ -13,12 +13,12 @@
 		 * ------------------------------- */
 		var handle=0;
 		var requestCount=0;
-		function showProcessBar(e){
+		function showProcessBar(e) {
 			var progress = eval('(' + e.responseText + ')');
 			if(progress){
 				$("#progressbar").reportprogress(progress[0].imported,progress[0].total);
 		        if(progress[0].imported==progress[0].total){
-		                clearInterval(handle);
+		            clearInterval(handle);
 		        }
 			}
 		}
@@ -26,12 +26,12 @@
 		 * 	Author : Lokanada Reddy
 		 *	JQuery function to set the interval to display Progress
 		 * ------------------------------- */
-		jQuery(function($){
+		jQuery(function($) {
 	        $("#run").click(function(){
 	        	$("#progressbar").css("display","block")
 	        	clearInterval(handle);
-	        	if(${isMSIE}){
-	        		handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}",500);
+	        	if (${isMSIE}) {
+	        		handle = setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", 500);
 		        } else {
 			        // Increased interval by 5 sec as server was hanging over chrome with quick server request. 
 					handle=setInterval(getProgress, 500);
@@ -107,7 +107,7 @@
                 
                 <tr>
                   <td >&nbsp;</td>
-                  <td ><div id="progressbar" style="display: none;" ></div></td>
+                  <td><div id="progressbar" style="display: none;" ></div></td>
                 </tr>
                 <tr><td colspan="2">
 	                <span><input type="checkbox" id="applicationId" name="application" value="application" 

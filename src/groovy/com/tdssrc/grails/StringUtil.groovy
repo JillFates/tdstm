@@ -128,4 +128,15 @@ class StringUtil {
 		return containsThese(str, words, caseInsensitive, false)
 	}
 
+	/**
+	 * Used to concat a string to a null, blank or existing string and using a separator appropriately
+	 * @param existingString - the existing string (maybe)
+	 * @param newString - the string to append to existingString
+	 * @param separator - the seperator if existingString is not blank (default ',')
+	 * @return the con
+	 */
+	static String concat(String existingString, String newString, String separator=',') {
+		return [existingString, newString].join(separator)
+	}
+
 }

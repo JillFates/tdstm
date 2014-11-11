@@ -1583,6 +1583,12 @@ a.task_action span.tds-task-graph-icon {
 	top:35px;
 }
 
+div.centered {
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, 0%);
+}
+
 /* Hide the span that Select2 creates */
 .select2-hidden-accessible {
     display: none !important; 

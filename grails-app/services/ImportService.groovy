@@ -40,6 +40,9 @@ class ImportService {
 	// The number of assets to process before clearing the hibernate session 
 	static final int CLEAR_SESSION_AFTER = 100
 
+	static final String indent = '&nbsp;&nbsp;&nbsp;'
+	static final String NULL_INDICATOR='NULL'
+
 	/** 
 	 * Used by the process methods to peform the common validation checks before processing
 	 * @param project - the project that the user is logged into and the batch is associated with
@@ -93,7 +96,7 @@ class ImportService {
 		Map data = [:]
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
-		data.dataTransferValues = DataTransferValue.findAllByDataTransferBatch(dtb)
+		// data.dataTransferValues = DataTransferValue.findAllByDataTransferBatch(dtb)
 		data.eavAttributeSet = EavAttributeSet.findById(1)
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
 
@@ -120,18 +123,32 @@ class ImportService {
 	}
 
 	/**
+	 * Used to retrieve the list of valid Device Type values as a Map that is used for faster validation. Note that the
+	 * type is force to lowercase.
+	 * @return Map of the Device Type names as the key and value boolean true that has no real meaning
+	 */
+	Map getDeviceTypeMap() {
+		// Get a Device Type Map used to verify that device type are valid
+		List deviceTypeList = assetEntityService.getDeviceAssetTypeOptions()
+		HashMap deviceTypeMap = new HashMap(deviceTypeList.size())
+		deviceTypeList.each { type -> deviceTypeMap[type.toLowerCase()] = true }
+		return deviceTypeMap
+	}
+
+	/**
 	 * Used to review an import batch for any unexpected issues 
 	 * @param projectId - the id of the project
 	 * @param userLoginId - the id of the user that has invoked the process
 	 * @param batchId - the id of the batch to examine
 	 * @return An error message if any issues otherwise null
 	 */
-	String reviewImportBatch(Long projectId, Long userLoginId, Long batchId) {
+	String reviewImportBatch(Long projectId, Long userLoginId, Long batchId, session) {
 		def startedAt = new Date()
 		String errorMsg = ''
 		StringBuffer sb = new StringBuffer()
 		
-		Project project = Project.get(projectId)
+		Project project = Project.read(projectId)
+		UserLogin userLogin = UserLogin.read(userLoginId)
 
 		boolean performance=true
 		def now = new Date()
@@ -147,6 +164,12 @@ class ImportService {
 
 		boolean batchIsForDevices = dtBatch.eavEntityType?.domainName == "AssetEntity"
 		
+		// Get a Device Type Map used to verify that device type are valid
+		Map deviceTypeMap = getDeviceTypeMap()
+
+		// A map that will be used to track the invalid referenced Device Types
+		HashMap invalidDeviceTypeMap = new HashMap()
+
 		if (performance) now = new Date()
 		def dataTransferValueRowList = DataTransferValue.findAll(
 			"From DataTransferValue d where d.dataTransferBatch=? " +
@@ -173,15 +196,18 @@ class ImportService {
 		EavEntityType deviceEavEntityType = EavEntityType.findByDomainName('AssetEntity')
 		EavAttribute mfgEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'manufacturer')
 		EavAttribute modelEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'model')
+		EavAttribute deviceTypeEavAttr = EavAttribute.findWhere(entityType: deviceEavEntityType, attributeCode: 'assetType')
 
-		// log.debug "deviceEavEntityType=$deviceEavEntityType, mfgEavAttr=$mfgEavAttr, modelEavAttr=$modelEavAttr"
+		log.debug "deviceEavEntityType=$deviceEavEntityType, mfgEavAttr=$mfgEavAttr, modelEavAttr=$modelEavAttr, deviceTypeEavAttr=$deviceTypeEavAttr"
 
 		if (performance) now = new Date()
-		def assetsSize = dataTransferValueRowList.size()
+		def assetCount = dataTransferValueRowList.size()
+		initProgress(session, assetCount)
+
 		def logCount = 50
-		for (int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
+		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			if (--logCount == 0) {
-				log.info "Reviewed $dataTransferValueRow rows of ${assetsSize+1} for batch id $batchId"
+				log.info "Reviewed $dataTransferValueRow rows of ${assetCount+1} for batch id $batchId"
 				logCount = 50
 			}
 
@@ -190,28 +216,40 @@ class ImportService {
 				break
 			}
 
-			// log.debug("Processing $dataTransferValueRow of $assetsSize")
+			// log.debug("Processing $dataTransferValueRow of $assetCount")
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+			int rowNum = rowId + 1
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			
 			if (batchIsForDevices) {
-				def modelName 
-				def mfgName 
-
-				mfgName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
-				modelName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:modelEavAttr)?.importValue
+				String mfgName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
+				String modelName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:modelEavAttr)?.importValue
 
 				mfgName = StringUtil.defaultIfEmpty(mfgName, '')
 				modelName = StringUtil.defaultIfEmpty(modelName, '')
 
+				boolean found = false
 				if (mfgName.size() > 0 || modelName.size() > 0) {
 					// Check to see if it is in the list
 					String key = "$mfgName::::$modelName"
 					if (mfgModelMatches.containsKey(key)) {
 						mfgModelMatches[key].count++
+						found = mfgModelMatches[key].found
 					} else {
-						boolean found = verifyModelAndManuPair(modelName, mfgName)
+						found = verifyMfgAndModelExist(mfgName, modelName)
 						mfgModelMatches[key] = [ found: found, count: 1, mfg: mfgName, model: modelName]
+					}
+				}
+
+				// Validate the device type only if the Mfg/Model were not found
+				if (! found) {
+					String deviceType = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:deviceTypeEavAttr)?.importValue
+					if (!deviceTypeMap.containsKey(deviceType.toLowerCase())) {
+						if (!invalidDeviceTypeMap.containsKey(deviceType)) {
+							invalidDeviceTypeMap[deviceType] = 1
+						} else {
+							invalidDeviceTypeMap[deviceType]++
+						}
 					}
 				}
 			}
@@ -228,14 +266,25 @@ class ImportService {
 				
 			assetIdList << assetEntityId
 
-
+			updateProgress(session, rowNum)
 		}
-		if (performance) log.debug "Reviewing $assetsSize batch records took ${TimeUtil.elapsed(now)}"
+
+		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
 
 		// Log missed Mfg/Model references
-		mfgModelMatches.each { k, d ->
-			if (! d.found )
-				sb.append("Mfg: ${d.mfg} / Model: ${d.model} not found - ${d.count} reference(s)<br>") 
+		def missingMfgModel = mfgModelMatches.findAll { k, v -> ! v.found} 
+		if (missingMfgModel) {
+			sb.append("<b>Missing Mfg / Model references:</b><ul>")
+			missingMfgModel.each { k, d ->
+				sb.append("<li>Mfg: ${d.mfg} | Model: ${d.model} | ${d.count} reference${d.count > 1 ? '(s)' : ''}</li>") 
+			}
+			sb.append('</ul>')
+			boolean canCreateMfgAndModel = securityService.hasPermission(userLogin, 'NewModelsFromImport')
+			if (!canCreateMfgAndModel) {
+				sb.append("$indent <b>Note: You do not have the permission necessary to create models during import</b><br>")
+			}
+
+			sb.append('<br>')
 		}
 
 		// Log found Mfg/Model references
@@ -246,61 +295,75 @@ class ImportService {
 		}
 		*/
 
-		if( dupAssetIds.size() > 0)
-			sb.append("Duplicate assetIDs #$dupAssetIds  <br>")
-			
-		if (notExistedIds.size() > 0)
-			sb.append("No match found for assetIDs #$notExistedIds   <br>")
+		if( dupAssetIds.size()) {
+			sb.append("<b>Duplicated asset IDs (col A) $dupAssetIds</b><br>")
+			sb.append('<br>')
+		}
+
+		if (notExistedIds.size()) {
+			sb.append("<b>No match found for asset IDs (col A) #$notExistedIds</b><br>")
+			sb.append('<br>')
+		}
+
+		if (invalidDeviceTypeMap.size()) {
+			sb.append("<b>Invalid device type${invalidDeviceTypeMap.size() > 1 ? 's' : ''} specified:</b><ul>")
+			invalidDeviceTypeMap.each { k, v -> 
+				sb.append("<li>$k ($v)" + '</li>')
+			}
+			sb.append('</ul><br>')
+		}
 	
-		if (performance) log.debug "Entire review process of $assetsSize batch records took ${TimeUtil.elapsed(startedAt)}"
+		if (performance) 
+			log.debug "Entire review process of $assetCount batch records took ${TimeUtil.elapsed(startedAt)}"
+
+		//if (log.isDebugEnabled()) {
+		//	mfgModelMatches.each {k,v -> sb.append("Mfg/Model Matches $k: $v <br>")} 
+		//}
 
 		return sb.toString()
 	}
 
 	/**
-	 * To Verify Manufacturer and Model pair from database
-	 * @param searchModelName  : Imported Model from excel
-	 * @param searchMfgName   : Imported Manufacturer from excel
+	 * Used to verify that the Manufacturer/Model exists in the model table
+	 * @param searchMfgName - the name of the manufacturer to lookup
+	 * @param searchModelName - the model name to lookup
 	 * @return false if not found
 	 */
-	private boolean verifyModelAndManuPair(searchModelName, searchMfgName) {
+	private boolean verifyMfgAndModelExist(searchMfgName, searchModelName) {
 		 
 		boolean found=false
 		boolean mfgBlank = StringUtil.isBlank(searchMfgName)
 		boolean modelBlank = StringUtil.isBlank(searchModelName)
 
 		// Don't need to search for a match if mfg/model are blank
-		if ( mfgBlank && modelBlank)
-			return true
+		if ( mfgBlank || modelBlank)
+			return false
 
-		def manu 
+		Manufacturer mfg 
 		if (! mfgBlank ) {
-			manu = Manufacturer.findByName(searchMfgName)
-			if( !manu ){
-				manu = ManufacturerAlias.findByName( searchMfgName )?.manufacturer
+			mfg = Manufacturer.findByName(searchMfgName)
+			if( !mfg ) {
+				mfg = ManufacturerAlias.findByName( searchMfgName )?.manfacturer
+				log.debug "verifyMfgAndModelExist() lookup Mfg by alias found: $mfg"
 			}
-			if (!manu) {
-				log.debug "verifyModelAndManuPair failed on MFG for $searchModelName, $searchMfgName"
+			if (!mfg) {
+				log.debug "verifyMfgAndModelExist() failed on MFG for $searchModelName, $searchMfgName"
 				return false
 			}
 		}
 
 		if (! modelBlank) {
 			Model model = Model.findByModelName(searchModelName)
-			String modelName
-			if (! model){
-				modelName = ModelAlias.findByNameAndManufacturer(searchModelName,manu)?.model?.modelName
-				if (!modelName)
-					modelName = modelName
-			}
-			model = Model.findByModelNameAndManufacturer(modelName, manu)
 			if (! model) {
-				log.debug "verifyModelAndManuPair failed on MODEL for $searchModelName, $searchMfgName"
+				model = ModelAlias.findByNameAndManufacturer(searchModelName, mfg)?.model
+				log.debug "verifyMfgAndModelExist() lookup Model by alias found: $model"
+			}
+			if (! model) {
+				log.debug "verifyMfgAndModelExist() failed to find MODEL for $searchModelName, $searchMfgName"
 				return false
 			}
-
 		}
-			
+
 		return true
 	}
 
@@ -312,14 +375,26 @@ class ImportService {
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 */
 	String processDeviceImport(Project project, UserLogin userLogin, String batchId, Object session, tzId) {
+		boolean performance=true
+		def startedAt = new Date()
+
 		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, AssetClass.DEVICE, batchId)
+		if (performance) log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
+
+		boolean canCreateMfgAndModel = securityService.hasPermission(userLogin, 'NewModelsFromImport')
 
 		// Fetch all of the common data shared by all of the import processes
+		def now = new Date()
 		Map data = loadBatchData(dataTransferBatch)
+		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
+
 		def dataTransferValueRowList = data.dataTransferValueRowList
 		def dataTransferValues = data.dataTransferValues
 		def eavAttributeSet = data.eavAttributeSet
 		def staffList = data.staffList
+
+		// Get a Device Type Map used to verify that device type are valid
+		Map deviceTypeMap = getDeviceTypeMap()
 
 		def assetCount = dataTransferValueRowList.size()
 		initProgress(session, assetCount)
@@ -329,8 +404,9 @@ class ImportService {
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( AssetEntity, 'blank', true )
 		def newVal
-		def warnings = []
-		def ignoredAssets = []
+		List warnings = []
+		List missingMfgModel = []
+		List ignoredAssets = []
 		def insertCount = 0
 		def errorConflictCount = 0
 		def updateCount = 0
@@ -344,17 +420,30 @@ class ImportService {
 		def counts = [:]
 		counts.room = Room.countByProject(project)
 		counts.rack = Rack.countByProject(project)
+		Map mfgModelMap = [:]
 
 		try {			
 
 			// 
 			// Iterate over the rows
 			//
+			def logCount = 50
+	
 			for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
+				now = new Date()
+				if (--logCount == 0) {
+					log.info "Processing DEVICE ($dataTransferValueRow rows of ${assetCount+1}) for batch id $batchId"
+					logCount = 50
+					if (dataTransferValueRow > 10)
+						throw new RuntimeException("Just wanted to bail")
+				}
+
 				def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 				def rowNum = rowId+1
 
-				def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+				// def dtvList = dataTransferValues.findAll{ it.rowId== rowId } //DataTransferValue.findAllByRowIdAndDataTransferBatch( rowId, dataTransferBatch )
+				def dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch,rowId)
+
 				def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 				def isNewValidate = false
 				def isFormatError = 0
@@ -372,6 +461,9 @@ class ImportService {
 
 				// This will hold any of the source/target location, room and rack information
 				def locRoomRack = [source: [:], target: [:] ]
+
+				// Vars caught in the each loop below to be used to create mfg/model appropriately
+				String mfgName, modelName, usize, deviceType
 
 				// Iterate over the attributes to update the asset with
 				dtvList.each {
@@ -395,22 +487,15 @@ class ImportService {
 						case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
 							// Legacy columns that are no longer used - see TM-3128
 							break
-						case "manufacturer":
-							def manufacturerName = it.correctedValue ? it.correctedValue : it.importValue
-							def manufacturerInstance = assetEntityAttributeLoaderService.getdtvManufacturer( manufacturerName ) 
-							if( assetEntity[attribName] != manufacturerInstance || isNewValidate ) {
-								assetEntity[attribName] = manufacturerInstance 
-							}
-							break
-						case "model":
-							def modelInstance = assetEntityAttributeLoaderService.getdtvModel(it, dtvList, assetEntity) 
-							if( assetEntity[attribName] != modelInstance || isNewValidate ) {
-								assetEntity[attribName] = modelInstance 
-								modelAssetsList.add(assetEntity)
-							}
-							break
+						case 'manufacturer':
+							mfgName = it.correctedValue ?: it.importValue
+							break;
+						case 'model':
+							modelName = it.correctedValue ?: it.importValue
+							break;
 						case "assetType":
-							if(assetEntity.model){ 
+							/*
+							if (assetEntity.model) { 
 								//if model already exist considering model's asset type and ignoring imported asset type.
 								assetEntity[attribName] = assetEntity.model.assetType
 							} else {
@@ -418,9 +503,11 @@ class ImportService {
 							}
 							//Storing imported asset type in EavAttributeOptions table if not exist
 							assetEntityAttributeLoaderService.findOrCreateAssetType(it.importValue, true)
+							*/
+							deviceType = it.correctedValue ?: it.importValue
 							break
 						case "usize":
-							// Skip the insertion
+							usize = it.correctedValue ?: it.importValue
 							break
 
 						case "sourceChassis":
@@ -452,13 +539,48 @@ class ImportService {
 
 				}
 
+				//
+				// Process the Mfg / Model assignment by utilizing a cache of the various mfg/model names
+				//
+				mfgName = StringUtil.defaultIfEmpty(mfgName, '')
+				modelName = StringUtil.defaultIfEmpty(modelName, '')
+				deviceType = StringUtil.defaultIfEmpty(deviceType, '')
+				String mmKey = "${mfgName}::${modelName}::${deviceType}::$usize::${isNewValidate ? 'new' : 'existing'}"
+				def mfg, model
+
+				if (mfgModelMap.containsKey(mmKey)) {
+					// We've already processed this mfg/model/type/usize/new|existing combination before so work from the cache
+					mfgModelMap[mmKey].refCount++
+					if (! mfgModelMap.errorMsg) {
+						assetEntity.manufacturer = mfgModelMap[mmKey].mfg
+						assetEntity.model = mfgModelMap[mmKey].model
+					}
+				} else {
+					// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
+					Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, assetEntity, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
+					mfgModelMap[mmKey] = [
+						errorMsg: results.errorMsg, 
+						warningMsg: results.warningMsg, 
+						mfg: assetEntity.manufacturer, 
+						model: assetEntity.model, 
+						refCount: 1
+					]
+				}
+
+				if (mfgModelMap.errorMsg) {
+					warnings << "ERROR: $assetName (row $rowNum) - ${mfgModelMap.errorMsg}"
+				}
+				if (mfgModelMap.warningMsg) {
+					warnings << "WARNING: $assetName (row $rowNum) - ${mfgModelMap.warningMsg}"
+				}
+
 				// Assign the Source/Target Location/Room/Rack properties for the asset
 				def errors
 				['source', 'target'].each { disposition ->
 					def d = locRoomRack[disposition]
 					if (d?.size()) {
 						// Check to see if they are trying to clear the fields with the NULL setting
-						if (d.values().contains('NULL')) {
+						if (d.values().contains(NULL_INDICATOR)) {
 							warnings << "NULL not supported for unsetting Loc/Room/Rack in $disposition (row $rowNum)"
 							return
 						}
@@ -508,6 +630,8 @@ class ImportService {
 				// TODO : JPM : Need to re-enable the clear Hibernate Session 
 				// assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, null)
 
+				if (performance) log.debug "Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
+
 			} // for loop
 				
 			dataTransferBatch.statusCode = STATUS_COMPLETE
@@ -554,22 +678,40 @@ class ImportService {
 			WebUtil.getListAsli(warnings)
 		)
 
-		appendIgnoredAssets(sb, ignoredAssets)
-		sb.append('</ul>')
-		sb = sb.toString()
+		appendIssueList(sb, 'Unable to assign Mfg/Model to device', missingMfgModel)
+		appendIgnoredAssets(sb, "${ignoredAssets.size()} asset${ignoredAssets.size() != 1 ? 's where' : ' was'} skipped due to having been updated since the export was done", ignoredAssets)
 
-		return sb
+		sb.append('</ul>')
+		// sb = sb.toString()
+
+		return sb.toString()
 	}
 
 	/**
 	 * Used to append a list of ignored assets if any to a StringBuilder buffer
 	 * @param StringBuilder the message buffer
-	 * @param List<Asset> list of ignored assets
+	 * @param title - the title of the UL
+	 * @param List<AssetEntity> list of ignored assets
 	 */
-	void appendIgnoredAssets(StringBuilder sb, List assets ) {
+	private void appendIgnoredAssets(StringBuilder sb, String title, List assets ) {
 		if (assets.size()) {
-			sb.append("<li>${assets.size()} assets where skipped due to being updated since export<ul>")
+			sb.append("<li>$title<ul>")
 			assets.each { sb.append("<li>${it.id} ${it.assetName}</li>") }
+			sb.append('</ul></li>')
+		}
+		sb.append('</ul></li>')
+	}
+
+	/**
+	 * Used to append a list of ignored assets if any to a StringBuilder buffer
+	 * @param StringBuilder the message buffer
+	 * @param title - the title of the UL
+	 * @param List<AssetEntity> list of ignored assets
+	 */
+	private void appendIssueList(StringBuilder sb, String title, List issues ) {
+		if (issues.size()) {
+			sb.append("<li>$title<ul>")
+			issues.each { sb.append("<li>${it}</li>") }
 			sb.append('</ul></li>')
 		}
 		sb.append('</ul></li>')
