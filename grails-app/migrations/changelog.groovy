@@ -59,4 +59,6 @@ databaseChangeLog = {
 	include file: '20141107-remove-current-status-from-eav-attribute.groovy'
 	include file: '20141110-comment-notes-change-column-note-to-text.groovy'
 	include file: '20141110-nullout-invalid-person-ref.groovy'
+	include file: '20141110-new-custom-columns-from-65-to-96.groovy'
+
 }

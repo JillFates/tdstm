@@ -118,7 +118,7 @@ class TaskService implements InitializingBean {
 		staffingRoles = partyRelationshipService.getStaffingRoles()*.id
 
 		commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
-		(1..64).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom64
+		(1..96).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom96
 		log.debug "commonFilterProperties include $commonFilterProperties"
 		ctx = AH.application.mainContext
 		sessionFactory = ctx.sessionFactory

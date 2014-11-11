@@ -96,6 +96,38 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String custom62
 	String custom63
 	String custom64
+	String custom65
+	String custom66
+	String custom67
+	String custom68
+	String custom69
+	String custom70
+	String custom71
+	String custom72
+	String custom73
+	String custom74
+	String custom75
+	String custom76
+	String custom77
+	String custom78
+	String custom79
+	String custom80
+	String custom81
+	String custom82
+	String custom83
+	String custom84
+	String custom85
+	String custom86
+	String custom87
+	String custom88
+	String custom89
+	String custom90
+	String custom91
+	String custom92
+	String custom93
+	String custom94
+	String custom95
+	String custom96
 	
 	MoveBundle moveBundle
 	Project project
@@ -240,6 +272,38 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		custom62( blank:true, nullable:true )
 		custom63( blank:true, nullable:true )
 		custom64( blank:true, nullable:true )
+		custom65( blank:true, nullable:true )
+		custom66( blank:true, nullable:true )
+		custom67( blank:true, nullable:true )
+		custom68( blank:true, nullable:true )
+		custom69( blank:true, nullable:true )
+		custom70( blank:true, nullable:true )
+		custom71( blank:true, nullable:true )
+		custom72( blank:true, nullable:true )
+		custom73( blank:true, nullable:true )
+		custom74( blank:true, nullable:true )
+		custom75( blank:true, nullable:true )
+		custom76( blank:true, nullable:true )
+		custom77( blank:true, nullable:true )
+		custom78( blank:true, nullable:true )
+		custom79( blank:true, nullable:true )
+		custom80( blank:true, nullable:true )
+		custom81( blank:true, nullable:true )
+		custom82( blank:true, nullable:true )
+		custom83( blank:true, nullable:true )
+		custom84( blank:true, nullable:true )
+		custom85( blank:true, nullable:true )
+		custom86( blank:true, nullable:true )
+		custom87( blank:true, nullable:true )
+		custom88( blank:true, nullable:true )
+		custom89( blank:true, nullable:true )
+		custom90( blank:true, nullable:true )
+		custom91( blank:true, nullable:true )
+		custom92( blank:true, nullable:true )
+		custom93( blank:true, nullable:true )
+		custom94( blank:true, nullable:true )
+		custom95( blank:true, nullable:true )
+		custom96( blank:true, nullable:true )
 		
 		project( nullable:true )
 		

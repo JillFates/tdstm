@@ -196,7 +196,7 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			var fieldLabel= $scope.fields[type][i].label
 			$scope.help[type][fieldLabel] =$("#help_"+type+"_"+fieldLabel).val()
 		}
-		for(k=0;k<64;k++){
+		for(k=0;k<96;k++){
 			$scope.fields['customs'][k].id = $("#"+type+"_"+$scope.fields['customs'][k].label).val();
 			$scope.help[type][$scope.fields['customs'][k].label] =$("#help_"+type+"_"+$scope.fields['customs'][k].label).val();
 		}
