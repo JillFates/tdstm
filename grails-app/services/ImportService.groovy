@@ -116,10 +116,17 @@ class ImportService {
 		Map data = [:]
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
-		data.eavAttributeSet = EavAttributeSet.findByAttributeSetName( dtb.eavEntityType?.domainName)
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
 
-		log.debug "loadBatchData(${dtb.id}) for ${dtb.eavEntityType?.domainName}, data.eavAttributeSet=${data.eavAttributeSet}"
+		def domainName = dtb.eavEntityType?.domainName
+		if (domainName.equals('AssetEntity')) {
+			domainName = 'Server'
+		}
+		// TODO : JPM 11/2014 : loadBatchData() has hard-code AssetEntity to Server switch for EavAttributeSet - someday it should just be Device...	
+		data.eavAttributeSet = EavAttributeSet.findByAttributeSetName(domainName)
+		assert data.eavAttributeSet != null
+		
+		// log.debug "loadBatchData(${dtb.id}) for dtb.eavEntityType?.domainName=${dtb.eavEntityType?.domainName}, domainName=[${domainName}], data.eavAttributeSet=${data.eavAttributeSet}"
 
 		return data
 	} 
@@ -138,10 +145,18 @@ class ImportService {
 	 * Used to update the session with the current counter
 	 * @param session - the browser session
 	 * @param currentCount - the number of assets currently completed
+	 * @param forceUpdate - boolean flag to update the session regardless of the modulus factor (default false)
 	 */
-	void updateProgress(session, currentCount, Project project, UserLogin userLogin, DataTransferBatch dtb) {
-		session.setAttribute("TOTAL_PROCESSES_ASSETS", currentCount)
+	// void updateProgress(session, currentCount, Project project, UserLogin userLogin, DataTransferBatch dtb) {
+	void updateProgress(session, currentCount, boolean forceUpdate=false) {
+
+		// Only need to update the session every n records since the browser polling is at 5 seconds
+		if (forceUpdate || currentCount.mod(50) == 0)
+			session.setAttribute("TOTAL_PROCESSES_ASSETS", currentCount)
+
 		/*
+		// Note that clearing the session was clobbering objects and giving us all sorts of issues. I ended up 
+		// implementing the setSessionFlushMode(COMMIT) which seems to work better (maybe)
 		if (currentCount.mod(HIBERNATE_BATCH_SIZE) == 0) {
 			log.info "Processed $currentCount ${dtb.eavEntityType?.domainName} records for batch (${dtb.id})"
 
@@ -164,7 +179,7 @@ class ImportService {
 	/**
 	 * This method is used to set the Hibernate Session FlushMode which might be helpful under certain condiitions
 	 */
-	private void setSessionFlushMode( flushMode = org.hibernate.FlushMode.COMMIT ) {
+	private void setSessionFlushMode( flushMode=FlushMode.COMMIT ) {
 		def session = sessionFactory.getCurrentSession()
 		session.setFlushMode(flushMode)
 	}
@@ -243,13 +258,18 @@ class ImportService {
 
 		log.debug "$methodName deviceEavEntityType=$deviceEavEntityType, mfgEavAttr=$mfgEavAttr, modelEavAttr=$modelEavAttr, deviceTypeEavAttr=$deviceTypeEavAttr"
 
-		if (performance) now = new Date()
 		def assetCount = dataTransferValueRowList.size()
 		initProgress(session, assetCount)
 
+		if (performance) {
+			log.info "$methodName Initialization took ${TimeUtil.elapsed(now)}"
+		}
+
+		now = new Date()
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			if (dataTransferValueRow.mod(50) == 0) {
-				log.info "$methodName reviewed ${dataTransferValueRow+1} rows of ${assetCount} for batch id $batchId"
+				log.info "$methodName reviewed ${dataTransferValueRow} rows of ${assetCount} for batch id $batchId - execution took ${TimeUtil.elapsed(now)}"
+				now = new Date()
 			}
 
 			if (false && dataTransferValueRow > 20) {
@@ -308,8 +328,11 @@ class ImportService {
 			assetIdList << assetEntityId
 
 			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow, project, userLogin, dtBatch)
+			updateProgress(session, dataTransferValueRow)
+
 		} // for
+
+		updateProgress(session, assetCount, true)
 
 		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
 
@@ -600,10 +623,12 @@ class ImportService {
 				application, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow, project, userLogin, dataTransferBatch)
+			updateProgress(session, dataTransferValueRow)
 
 		} // for
 		
+		updateProgress(session, assetCount, true)
+
 		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
 		batchStatusCode = dataTransferBatch.statusCode
 			
@@ -898,16 +923,16 @@ class ImportService {
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
-			updateProgress(session, dataTransferValueRow, project, userLogin, dataTransferBatch)
-
 			// Update status and clear hibernate session
-			// TODO : JPM : Need to re-enable the clear Hibernate Session 
-			// assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, null)
+			updateProgress(session, dataTransferValueRow)
 
 			if (performance) log.debug "$methodName Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
 
 		} // for loop
 			
+		// One final update of the session
+		updateProgress(session, assetCount, true)
+
 		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
 		
 		// Update assets racks, cabling data once process done
@@ -1196,9 +1221,11 @@ class ImportService {
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow, project, userLogin, dataTransferBatch)
+			updateProgress(session, dataTransferValueRow)
 
 		} // for
+
+		updateProgress(session, assetCount, true)
 
 		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
 
