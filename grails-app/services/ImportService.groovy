@@ -125,7 +125,7 @@ class ImportService {
 		// TODO : JPM 11/2014 : loadBatchData() has hard-code AssetEntity to Server switch for EavAttributeSet - someday it should just be Device...	
 		data.eavAttributeSet = EavAttributeSet.findByAttributeSetName(domainName)
 		assert data.eavAttributeSet != null
-		
+
 		// log.debug "loadBatchData(${dtb.id}) for dtb.eavEntityType?.domainName=${dtb.eavEntityType?.domainName}, domainName=[${domainName}], data.eavAttributeSet=${data.eavAttributeSet}"
 
 		return data
@@ -210,7 +210,9 @@ class ImportService {
 
 		String methodName = 'reviewImportBatch()'
 		StringBuffer sb = new StringBuffer()
-		
+
+		setSessionFlushMode( flushMode=FlushMode.COMMIT ) 
+				
 		Project project = Project.read(projectId)
 		UserLogin userLogin = UserLogin.read(userLoginId)
 
