@@ -97,6 +97,73 @@ class DataTransferBatchController {
 	}
 
 	/**
+	 * Process DataTransfervalues corresponding to a DataTransferBatch for a given batch
+	 * @param params.id - the id of the DataTransferBatch
+	 * @return JSON response containing the information and other attributes regarding the process
+	 */
+	def processImportBatch = {
+		String error
+		Map results
+		Project project
+		UserLogin userLogin
+
+		while (true) {
+			try {
+				(project, userLogin) = controllerService.getProjectAndUserForPage( this, 'Import' )
+				if (! project) { 
+					error = flash.message
+					flash.message = null
+					break
+				}
+
+				Long id = NumberUtil.toLong(params.id)
+				if (id == null || id < 1) {
+					error = 'Invalid batch id was submitted'
+					break
+				}
+
+				DataTransferBatch dtb = DataTransferBatch.read(id)
+				if (! dtb) {
+					error = 'Invalid batch id was not found'
+					break
+				}
+				if (dtb.project.id != project.id) {
+					securityService.reportViolation("attemped to post import batch ($id) that is not associated with current project (${project.id})")
+					error = 'Invalid batch id was not found'
+					break
+				}
+
+				// Figure out which service method to invoke based on the DataTransferBatch
+				String domainName = dtb.eavEntityType?.domainName
+				String methodName = "process${domainName}Import"
+
+				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+				results = importService."$methodName"(project.id, userLogin.id, params.id, session, tzId) 
+				error = results.error
+			} catch (UnauthorizedException e) {
+				error = e.getMessage()
+			} catch (InvalidParamException e) {
+				error = e.getMessage()
+			} catch (DomainUpdateException e) {
+				error = e.getMessage()
+			} catch (RuntimeException e) {
+				error = 'An error occurred while processing the import. Please contact support for assistance.'
+				if (log.isDebugEnabled()) {
+					error = "$error ${e.getMessage()}"
+				}
+				log.error "deviceProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.id}"
+				log.error ExceptionUtil.stackTraceToString(e)
+			}
+			break
+		}
+
+		if (error)
+			render ServiceResults.errors(error) as JSON
+		else
+			render ServiceResults.success([results:results]) as JSON
+	}
+
+	/**
 	 * Process DataTransfervalues corresponding to a DataTransferBatch for DEVICES
 	 * @param dataTransferBach
 	 * @return process the dataTransferBatch and return to datatransferBatchList
@@ -110,9 +177,9 @@ class DataTransferBatchController {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
 		try {
-			message = importService.processDeviceImport(project.id, userLogin.id, params.id, session, tzId)
-			log.info "deviceProcess() for batchId ${params.id} by user $userLogin\n " + message
-			render ServiceResults.success([results:message]) as JSON
+			Map results = importService.processDeviceImport(project.id, userLogin.id, params.id, session, tzId) 
+			log.info "deviceProcess() for batchId ${params.id} by user $userLogin\n " + results.info
+			render ServiceResults.success([results:results]) as JSON
 		} catch (Exception e) {
 			message = 'An error occurred while processing the import. Please contact support for assistance.'
 			if (log.isDebugEnabled()) {
@@ -137,9 +204,9 @@ class DataTransferBatchController {
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
 		try {
-			message = importService.processApplicationImport(project.id, userLogin.id, params.id, session, tzId)
-			log.info "appProcess() for batchId ${params.id} by user $userLogin\n " + message
-			render ServiceResults.success([results:message]) as JSON
+			Map results = importService.processApplicationImport(project.id, userLogin.id, params.id, session, tzId) 
+			log.info "appProcess() for batchId ${params.id} by user $userLogin\n " + results.info
+			render ServiceResults.success([results:results]) as JSON
 		} catch (Exception e) {
 			message = 'An error occurred while processing the import. Please contact support for assistance.'
 			if (log.isDebugEnabled()) {
@@ -284,7 +351,6 @@ class DataTransferBatchController {
 			flash.message = sb
 		}
 
-		session.setAttribute("IMPORT_ASSETS", assetsList)
 		redirect ( action:list, params:[ projectId:project.id ] )
 		
 	}
@@ -420,7 +486,6 @@ class DataTransferBatchController {
 			flash.message = sb
 		
 		}
-		session.setAttribute("IMPORT_ASSETS", assetsList)
 		redirect ( action:list, params:[projectId:project.id] )
 		
 	}
@@ -497,8 +562,8 @@ class DataTransferBatchController {
 				flash.message = "DataTransferBatch not found with id ${params.batchId}"
 				redirect(action:list)
 		   }
-		}catch(Exception e){
-			   e.printStackTrace()
+		} catch(Exception e) {
+			e.printStackTrace()
 		}
 	}
 	
@@ -508,26 +573,32 @@ class DataTransferBatchController {
 	 * @return map containing error message if any and import permission  (NewModelsFromImport)
 	 */
 	def reviewBatch = {
-		String errorMsg = ''
-		boolean importPerm = true
+		Map results = [info:'', hasPerm:false]
+		String error
 
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this, 'NewModelsFromImport')
-		if (!project) {
-			errorMsg = flash.message
+		if (! project) {
+			results.info = flash.message
 			flash.message = null
-			importPerm = false
 		} else {
 			Long batchId = NumberUtil.toLong(params.id)
 			if (batchId) {
-				errorMsg = importService.reviewImportBatch(project.id, userLogin.id, batchId, session)
+				results = importService.reviewImportBatch(project.id, userLogin.id, batchId, session)
+				if (results.error) {
+					error = results.error
+				} else {
+					results.hasPerm = true
+				}
 			} else {
 				log.error "reviewBatch() called with invalid batch id ($batchId) by user $userLogin while assigned to project $project"
-				errorMsg = "The batch id was missing or an invalid value"
+				error = "The batch id was missing or an invalid value"
 			}
 		}
 
-		def returnMap = [errorMsg : errorMsg, importPerm:importPerm]
-		render returnMap as JSON
+		if (error)
+			render ServicResults.errors(results.error) as JSON
+		else 
+			render ServiceResults.success([results:results]) as JSON
 	}
 
 }

@@ -6,12 +6,13 @@
 	
 		<script type="text/javascript">
 			var checkProgressBar;
-			var progressBarRefreshRate = 5000; //msec
-			var handle=0;
+			var progressBarRefreshRate=5000; // msec
+			var progressIntervalHandle=0;
 			var progressBar = $("#progressbar");
 			var messageDiv = $("#messageId");
 			var reloadPageWhenDone=false;
 
+			// This method is used to capture the contents of the Progress meter bar Ajax call
 			function onIFrameLoad() {
 				var serverResponse = $("#iFrame").contents().find("pre").html();
 				var jsonProgress;
@@ -23,7 +24,7 @@
 					progressBar.reportprogress(jsonProgress[0].processed, jsonProgress[0].total);
 					if (jsonProgress[0].processed >= jsonProgress[0].total) {
 						checkProgressBar = false;
-						clearInterval(handle);
+						clearInterval(progressIntervalHandle);
 
 						// The post assets needs to reload the list after finishing while the review does not
 						//if (reloadPageWhenDone)
@@ -75,28 +76,28 @@
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="assetProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('asset', 'deviceProcess', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('asset', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
 						<span id="appDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="appProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('app', 'appProcess', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('app', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
 						<span id="dbDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="dbProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('db', 'dbProcess', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('db', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
 						<span id="filesDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="filesProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('files', 'filesProcess', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('files', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -176,7 +177,7 @@
 		<g:javascript src="jquery/ui.progressbar.js"/>
 		<script type="text/javascript">
 			var checkProgressBar;
-			var handle=0;
+			var progressIntervalHandle=0;
 			var progressBar = $("#progressbar");
 			var messageDiv = $("#messageId");
 
@@ -189,26 +190,26 @@
 			}
 
 			// This method will kickoff the Process function
-			function kickoffProcess(forWhom, action, batchId) {
+			function kickoffProcess(forWhom, batchId) {
 				if ( ! confirm('Please confirm that you want to post the import to inventory?') ) {
 					return false;
 				}
 
 				messageDiv.html('Posting imported assets to inventory').show();
-				// debugger;
+
 				$.ajax({
 					type: "POST",
 					async: true,
-					url: tdsCommon.createAppURL('/dataTransferBatch/' + action + '/' + batchId),
+					url: tdsCommon.createAppURL('/dataTransferBatch/processImportBatch/'+batchId),
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
 						stopProgressBar();
 						if (response.status == 'error') {
-							alert('An error occurred during the Process update');
-							console.log('Error: kickoffProcess() errored : ' + response.data.errors);
+							alert(response.errors);
+							console.log('Error: kickoffProcess() : ' + response.errors);
 						} else {
-							debugger;
-							messageDiv.html(response.data.results).show();
+							var results = response.data.results;
+							messageDiv.html(results.info).show();
 							$("#"+forWhom+"ReviewId_"+batchId).hide();
 
 							// TODO : change the buttons appropriately
@@ -245,21 +246,21 @@
 
 			// Used to actual start the display of the progress bar and kick off the interval function to call back the getProgress web service
 			function startProgressBar() {
-				progressBar.reportprogress(0,100,true);
+				progressBar.reportprogress(0,0,'Initializing...');
 				progressBar.css("display","block");
-				clearInterval(handle);
+				clearInterval(progressIntervalHandle);
 				if (${isMSIE}) {
-					handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", progressBarRefreshRate);
+					progressIntervalHandle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", progressBarRefreshRate);
 				} else {
 					//Increased interval by 5 sec as server was hanging over chrome with quick server request.
-					handle=setInterval(getProcessedDataInfo, progressBarRefreshRate);
+					progressIntervalHandle=setInterval(getProcessedDataInfo, progressBarRefreshRate);
 				}
 			}
 
 			// Used to stop the interval calls to the progress web service and hide the visual
 			function stopProgressBar() {
 				progressBar.hide();
-				clearInterval();
+				clearInterval(progressIntervalHandle);
 			}
 
 			// This code is used to display progress bar at chrome as Chrome browser cancel all ajax request while uploading .
@@ -273,7 +274,7 @@
 			$('#reportsMenu').hide();
 
 			// Used to kick-off the reviewBatch web service
-			function reviewBatch(dataTransferBatchId, forWhom) {
+			function reviewBatch(batchId, forWhom) {
 				//messageDiv.html($("#spinnerId").html()).show()
 				messageDiv.html('Reviewing batch for duplicate references, unknown Mfg/Model information and other discrepencies in the imported data.').show();
 
@@ -282,23 +283,30 @@
 
 				jQuery.ajax({
 					url: '../dataTransferBatch/reviewBatch',
-					data: {'id':dataTransferBatchId},
+					data: {'id':batchId},
 					type:'POST',
-					success: function(data) {
+					async: true,
+					success: function(response, textStatus, jqXHR) {
 						// Set the Process or Revew button appropriately
-						// debugger;
-						if (data.importPerm || !data.errorMsg)
-							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"ProcessId_"+dataTransferBatchId).html());
-						else
-							$("#"+forWhom+"ReviewId_"+dataTransferBatchId).html($("#"+forWhom+"DisabledProcessId_"+dataTransferBatchId).html());
-							
-						// User message
-						if (data.errorMsg)
-							messageDiv.html(data.errorMsg);
-						else	
-							messageDiv.html("Batch was reviewed and no errors were found. You may now click the 'Process' button to complete the import.");
-
 						stopProgressBar();
+
+						if (response.status == 'error') {
+							log.console('reviewBatch() ERROR ' + response.errors);
+							alert(results.errors);
+						} else {
+							var results = response.data.results;
+
+							// Get the active or disabled Process button HTML and overwrite the Review button HTML
+							var buttonDomName = "#"+forWhom+(results.hasPerm ? '' : 'Disabled')+"ProcessId_"+batchId;
+							var buttonDom = $("#"+forWhom+"ReviewId_"+batchId);
+							buttonDom.html( $(buttonDomName).html() );
+							
+							if (results.info) {
+								messageDiv.html(results.info);
+							} else {
+								messageDiv.html("Batch was reviewed and no errors were found. You may now click the 'Process' button to complete the import.");
+							}
+						}
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
 						stopProgressBar();

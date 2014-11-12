@@ -3,7 +3,12 @@
  * Release: 06/03/2009
  */ 
 (function($) {	
-	//Main Method
+	/**
+	 * Used to display the progress of a process
+	 * @param val - the current increment of the progress
+	 * @param maxVal - the highest increment to process
+	 * @param initializeBar - used to initial what is in the bar, if true clears out the bar text or if String will display the text
+	 */
 	$.fn.reportprogress = function(val, maxVal, initializeBar) {			
 		var max;
 		if (maxVal)
@@ -22,11 +27,17 @@
 				}
 				var width=Math.round(val/max*100);
 				innerdiv.css("width",width+"%");
-				if (initializeBar===true) {
-					div.find(".text").html('');
-				} else if (val) {	
-					div.find(".text").html(val + " of " + max);
+
+				var text = '';				
+				if (typeof initializeBar == 'string') {
+					text = initializeBar;
+				} else if (initializeBar===true) {
+					//
+				} else if (val) {
+					text = val + " of " + max;
 				}
+				div.find(".text").html(text)
+
 			}
 		);
 	};

@@ -7,35 +7,37 @@
 	<g:javascript src="jquery/ui.progressbar.js"/>
 	<g:javascript src="import.export.js"/>
 	<script type="text/javascript">
-		/* ---------------------------------
-		 * 	Author : Lokanada Reddy		
-		 *	function to show the Progress bar
-		 * ------------------------------- */
+		/* 
+		 * used to show the Progress bar
+		 */
 		var handle=0;
 		var requestCount=0;
+
 		function showProcessBar(e) {
 			var progress = eval('(' + e.responseText + ')');
-			if(progress){
+			if (progress) {
 				$("#progressbar").reportprogress(progress[0].imported,progress[0].total);
-		        if(progress[0].imported==progress[0].total){
+		        if (progress[0].imported==progress[0].total){
 		            clearInterval(handle);
 		        }
 			}
 		}
-		/* ---------------------------------
-		 * 	Author : Lokanada Reddy
-		 *	JQuery function to set the interval to display Progress
-		 * ------------------------------- */
+
+		/*
+		 * Used to set the interval to display Progress
+		 */
 		jQuery(function($) {
-	        $("#run").click(function(){
-	        	$("#progressbar").css("display","block")
-	        	clearInterval(handle);
-	        	if (${isMSIE}) {
-	        		handle = setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", 500);
-		        } else {
-			        // Increased interval by 5 sec as server was hanging over chrome with quick server request. 
-					handle=setInterval(getProgress, 500);
-		        }
+	        $("#run").click(function() {
+	        	var progressBar = $("#progressbar");
+				progressBar.reportprogress(0, 0, 'Uploading &amp; verifying spreadsheet...');
+				progressBar.css("display","block");
+				clearInterval(handle);
+				if (${isMSIE}) {
+					handle = setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", 5000);
+				} else {
+					// Increased interval by 5 sec as server was hanging over chrome with quick server request. 
+					handle=setInterval(getProgress, 5000);
+				}
 	        });
 		});
 
@@ -48,20 +50,22 @@
 			}
 		}
 		
+		// Used to handle the AJax response for the progress update
 		function onIFrameLoad() {
-		   var serverResponse = $("#iFrame").contents().find("pre").html();
-		   var jsonProgress
-		   if(serverResponse){
-			   $("#requestCount").val(parseInt(requestCount)+1)
-		     	jsonProgress = JSON.parse( serverResponse )
-		   }
-		   if(jsonProgress){
-			   $("#progressbar").reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
-		       if(jsonProgress[0].imported==jsonProgress[0].total){
-	  	         clearInterval(handle);
-		       }
-		   }
-		 }
+			var serverResponse = $("#iFrame").contents().find("pre").html();
+			var jsonProgress
+			if(serverResponse){
+				$("#requestCount").val(parseInt(requestCount)+1)
+				jsonProgress = JSON.parse( serverResponse )
+			}
+			if (jsonProgress) {
+				var progressBar = $("#progressbar");
+				progressBar.reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
+				if(jsonProgress[0].imported==jsonProgress[0].total){
+					clearInterval(handle);
+				}
+			}
+		}
 	</script>
 	
   </head>
