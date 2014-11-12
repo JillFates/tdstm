@@ -26,6 +26,7 @@ import com.tdssrc.grails.WebUtil
 import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher
+import org.hibernate.FlushMode
 
 class ImportService {
 
@@ -49,6 +50,9 @@ class ImportService {
 
 	static final String indent = '&nbsp;&nbsp;&nbsp;'
 	static final String NULL_INDICATOR='NULL'
+
+	// Indicates the number of rows to process before performing a flush/clear of the Hibernate session queue
+	static final int HIBERNATE_BATCH_SIZE=20
 
 	/** 
 	 * Used by the process methods to peform the common validation checks before processing
@@ -112,8 +116,10 @@ class ImportService {
 		Map data = [:]
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
 		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
-		data.eavAttributeSet = EavAttributeSet.findById(1)
+		data.eavAttributeSet = EavAttributeSet.findByAttributeSetName( dtb.eavEntityType?.domainName)
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
+
+		log.debug "loadBatchData(${dtb.id}) for ${dtb.eavEntityType?.domainName}, data.eavAttributeSet=${data.eavAttributeSet}"
 
 		return data
 	} 
@@ -135,8 +141,8 @@ class ImportService {
 	 */
 	void updateProgress(session, currentCount, Project project, UserLogin userLogin, DataTransferBatch dtb) {
 		session.setAttribute("TOTAL_PROCESSES_ASSETS", currentCount)
-
-		if (currentCount.mod(25) == 0) {
+		/*
+		if (currentCount.mod(HIBERNATE_BATCH_SIZE) == 0) {
 			log.info "Processed $currentCount ${dtb.eavEntityType?.domainName} records for batch (${dtb.id})"
 
 			Long pid = project.id
@@ -151,19 +157,28 @@ class ImportService {
 			project = Project.get(pid)
 			userLogin = UserLogin.get(uid)
 			//dtb = DataTransferBatch.get(did)
-		}		
+		}
+		*/		
+	}
+
+	/**
+	 * This method is used to set the Hibernate Session FlushMode which might be helpful under certain condiitions
+	 */
+	private void setSessionFlushMode( flushMode = org.hibernate.FlushMode.COMMIT ) {
+		def session = sessionFactory.getCurrentSession()
+		session.setFlushMode(flushMode)
 	}
 
 	/**
 	 * Used to retrieve the list of valid Device Type values as a Map that is used for faster validation. Note that the
 	 * type is force to lowercase.
-	 * @return Map of the Device Type names as the key and value boolean true that has no real meaning
+	 * @return Map of the Device Type names (lowercase) as the key and value (propercase)
 	 */
 	Map getDeviceTypeMap() {
 		// Get a Device Type Map used to verify that device type are valid
 		List deviceTypeList = assetEntityService.getDeviceAssetTypeOptions()
 		HashMap deviceTypeMap = new HashMap(deviceTypeList.size())
-		deviceTypeList.each { type -> deviceTypeMap[type.toLowerCase()] = true }
+		deviceTypeList.each { type -> deviceTypeMap[type.toLowerCase()] = type }
 		return deviceTypeMap
 	}
 
@@ -638,6 +653,8 @@ class ImportService {
 		AssetClass assetClass = AssetClass.DEVICE
 		def domainClass = AssetClass.domainClassFor(assetClass)
 
+		setSessionFlushMode(org.hibernate.FlushMode.COMMIT)
+
 		boolean performance=true
 		def startedAt = new Date()
 
@@ -714,7 +731,7 @@ class ImportService {
 				// Initialize extra properties for new asset
 			}
 
-			def isNewValidate = (asset.id > 0)
+			def isNewValidate = (! asset.id)
 
 			// This will hold any of the source/target location, room and rack information
 			def locRoomRack = [source: [:], target: [:] ]
@@ -751,16 +768,6 @@ class ImportService {
 						modelName = it.correctedValue ?: it.importValue
 						break;
 					case "assetType":
-						/*
-						if (asset.model) { 
-							//if model already exist considering model's asset type and ignoring imported asset type.
-							asset[attribName] = asset.model.assetType
-						} else {
-							asset[attribName] = it.correctedValue ?: it.importValue
-						}
-						//Storing imported asset type in EavAttributeOptions table if not exist
-						assetAttributeLoaderService.findOrCreateAssetType(it.importValue, true)
-						*/
 						deviceType = it.correctedValue ?: it.importValue
 						break
 					case "usize":
@@ -806,11 +813,19 @@ class ImportService {
 			def mfg, model
 
 			if (mfgModelMap.containsKey(mmKey)) {
+				log.debug "$methodName Found cached mfgModelMap for key $mmKey, hasErrors=${mfgModelMap[mmKey].errorMsg?.size()}"
 				// We've already processed this mfg/model/type/usize/new|existing combination before so work from the cache
 				mfgModelMap[mmKey].refCount++
-				if (! mfgModelMap.errorMsg) {
-					asset.manufacturer = mfgModelMap[mmKey].mfg
-					asset.model = mfgModelMap[mmKey].model
+				if (! mfgModelMap.errorMsg?.size() ) {
+					Map mmm = mfgModelMap[mmKey]
+					log.debug "$methodName Setting MfgModelType to $mmKey for asset $asset, $mmm"
+					if (asset.manufacturer?.id != mmm.mfgId)
+						asset.manufacturer = Manufacturer.get(mmm.mfgId)
+					if (asset.model?.id != mmm.modelId)
+						asset.model = Model.get(mmm.modelId)
+					asset.assetType = mmm.deviceType
+
+					log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
 				}
 			} else {
 				// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
@@ -818,8 +833,9 @@ class ImportService {
 				mfgModelMap[mmKey] = [
 					errorMsg: results.errorMsg, 
 					warningMsg: results.warningMsg, 
-					mfg: asset.manufacturer, 
-					model: asset.model, 
+					mfgId: asset.manufacturer?.id, 
+					modelId: asset.model?.id,
+					deviceType: asset.assetType, 
 					refCount: 1
 				]
 			}
@@ -873,10 +889,11 @@ class ImportService {
 						warnings << "Unable to set $disposition Loc/Room/Rack (row $rowNum) : $errors"
 					}
 				}
-			}
+			} // ['source', 'target'].each
 
 			// log.debug "$methodName asset $asset ${asset.sourceLocation}/${asset.sourceRoom}/${asset.sourceRack}"
 
+			log.debug "$methodName About to try saving isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
@@ -1148,9 +1165,6 @@ class ImportService {
 				// Initialize extra properties for new asset
 				asset.scale = SizeScale.GB
 			}
-
-			// Release Hibernate objects when we can
-			dtvList?.clear()
 
 			dtvList.each {
 				def attribName = it.eavAttribute.attributeCode

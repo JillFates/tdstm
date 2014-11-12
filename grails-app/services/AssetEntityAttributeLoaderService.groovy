@@ -474,9 +474,8 @@ class AssetEntityAttributeLoaderService {
 	 * TODO : JPM 11/2014 : Refactor function assignMfgAndModelToDevice into the ImportService class
 	 */
 	Map assignMfgAndModelToDevice(UserLogin userLogin, AssetEntity device, String mfgNameParam, String modelNameParam, String deviceTypeParam, Map deviceTypeMap, String usize, boolean canCreateMfgAndModel) {
-		
+		String methodName = 'assignMfgAndModelToDevice()'
 		String errorMsg, warningMsg
-
 		boolean deviceExists = device.id > 0
 		boolean mfgWasCreated = false
 		boolean modelWasCreated = false
@@ -497,10 +496,14 @@ class AssetEntityAttributeLoaderService {
 		// Double check the device type and set the deviceType to the proper case if found so we can use it below correctly
 		if (haveDeviceType) {
 			String dtlc = deviceType.toLowerCase()
-			deviceType = deviceTypeMap.find( { k,v -> k == dtlc } )?.getKey()
+			if (deviceTypeMap.containsKey(dtlc)) {
+				deviceType = deviceTypeMap[dtlc]
+			}
 			haveDeviceType = deviceType?.size() > 0
 			invalidDeviceType = ! haveDeviceType
 		}	
+
+		log.debug "$methodName mfgNameParam=$mfgNameParam, modelNameParam=modelNameParam, deviceType=($deviceTypeParam/$deviceType), deviceExists=$deviceExists"
 
 		// Some common error/warning messages used below
 		String DEVICE_TYPE_INVALID = "Device Type ($deviceTypeParam) is invalid"
@@ -516,6 +519,8 @@ class AssetEntityAttributeLoaderService {
 			device.model = modelObj
 			device.manufacturer = modelObj.manufacturer
 			device.assetType = modelObj.assetType
+
+			log.debug "${methodName}.performAssignment() model=$modelObj"
 
 			// Add a few possible warning messages
 			if (usize?.size() && usize != modelObj.usize) {
@@ -539,9 +544,10 @@ class AssetEntityAttributeLoaderService {
 					mfg = new Manufacturer(name: mfgName)
 					if (! ( mfg.validate() && mfg.save(flush:true)) ) {
 						errorMsg = "An error occured while trying to create the new manufacturer ($mfgName)"
-						log.error "An error occured while trying to create the new manufacturer ($mfgName) - ${GormUtil.allErrorsString(mfg)}"
+						log.error "${methodName}.performCreateMfgModel() $errorMsg - ${GormUtil.allErrorsString(mfg)}"
 						return
 					}
+					log.info "${methodName}.performCreateMfgModel() Manufacturer $mfgName was just created (${mfg.id})"
 					mfgWasCreated = true
 				} else {
 					errorMsg = "You do not have permission to create manufacturer ($mfgName)"
@@ -558,6 +564,7 @@ class AssetEntityAttributeLoaderService {
 					model = Model.createModelByModelName(modelName, mfg, createDeviceType,  createUsize, userLogin?.person)
 					modelWasCreated = true
 					performAssignment(model)
+					log.info "${methodName}.performCreateMfgModel() Model $modelName was created (id ${model.id})"
 				} catch (e) {
 					errorMsg = e.getMessage()
 				}
@@ -568,6 +575,7 @@ class AssetEntityAttributeLoaderService {
 
 		// Helper closure used to setup various variables for when we'll create/assign an Unknown Mfg/Model
 		def performUnknownAssignment = {
+			log.debug "${methodName}.performUnknownAssignment() modelName=$modelName, deviceType=$deviceType"
 			if (! unknownMfg) {
 				errorMsg = "Unable to find the 'Unknown' manufacturer"
 			} else {
@@ -1066,7 +1074,7 @@ class AssetEntityAttributeLoaderService {
 		if (assetId) {
 			asset = clazz.get(assetId)
 			if (asset) {
-				log.debug "findAndValidateAsset() Found $clazzName id $assetId"
+				log.debug "findAndValidateAsset() Found $clazzName id (${asset.id}) ${asset.assetName}"
 				if ( asset.project.id == project.id ) {
 					if ( dataTransferBatch?.dataTransferSet.id == 1 ) {
 						// Validate that the AE fields are valid
@@ -1081,7 +1089,9 @@ class AssetEntityAttributeLoaderService {
 						}
 					}
 				} else {
-					log.warn "findAndValidateAsset() Attempted it import $clazzName (id ${asset.id}) into unassociated project"
+					// If id is not associated to the project then we'll just ignore it and handle as a new asset
+					securityServie.reportViolation("attempted import of $clazzName asset ($assetId) not associated with project (${project.id}")
+					asset.clear()
 					asset = null
 				}
 			}
@@ -1110,11 +1120,12 @@ class AssetEntityAttributeLoaderService {
 	 * @return
 	 */
 	def saveAssetChanges(asset, assetList, rowNum, insertCount, updateCount, errorCount, warnings) {
+		String methodName = 'saveAssetChanges()'
 		def saved = false
 		if ( asset.id ) {
-			if ( asset.dirtyPropertyNames.size() ) {
+			if ( true || asset.dirtyPropertyNames.size() ) {
 				// Check to see if dirty
-				log.info "saveAssetChanges() Updated asset ${asset.id} ${asset.assetName} - Dirty properties: ${asset.dirtyPropertyNames}"
+				log.info "$methodName Updated asset ${asset.id} ${asset.assetName} - Dirty properties: ${asset.dirtyPropertyNames}"
 				saved = asset.validate() && asset.save(flush:true)
 				if (saved) {
 					updateCount++
@@ -1129,15 +1140,17 @@ class AssetEntityAttributeLoaderService {
 			if (saved) {
 				insertCount++
 				assetList << asset.id // Once asset saved to DB it will provide ID for that.
-				log.debug "saveAssetChanges() saved new asset id:$asset.id, insertCount:$insertCount"
+				log.debug "$methodName saved new asset id:$asset.id, insertCount:$insertCount"
 			}
 		}
 		if (! saved) {
-			log.warn "appProcess() Performing discard for rowNum $rowNum. " + GormUtil.allErrorsString(asset)
+			log.warn "$methodName Performing discard for rowNum $rowNum. " + GormUtil.allErrorsString(asset)
 			warnings << "Asset ${asset.assetName}, row $rowNum had an error and was not updated. " + GormUtil.errorsAsUL(asset)
 			asset.discard()
 			errorCount++
 		}
+
+		log.debug "$methodName saved=$saved, asset=$asset"
 
 		return [insertCount, updateCount, errorCount]
 	}
