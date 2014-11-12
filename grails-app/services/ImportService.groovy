@@ -34,6 +34,8 @@ class ImportService {
 	def roomService
 	def securityService
 	def partyRelationshipService
+
+	def sessionFactory
 	
 	static final STATUS_COMPLETE = 'COMPLETED'
 	static final STATUS_PENDING = 'PENDING'
@@ -215,6 +217,7 @@ class ImportService {
 			if (--logCount == 0) {
 				log.info "Reviewed $dataTransferValueRow rows of ${assetCount+1} for batch id $batchId"
 				logCount = 50
+
 			}
 
 			if (false && dataTransferValueRow > 20) {
@@ -435,13 +438,21 @@ class ImportService {
 			// 
 			// Iterate over the rows
 			//
-			def logCount = 50
 			def dtvList
+
 			for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 				now = new Date()
-				if (--logCount == 0) {
+				if (dataTransferValueRow.mod(25) == 0) {
 					log.info "Processing DEVICE ($dataTransferValueRow rows of ${assetCount+1}) for batch id $batchId"
-					logCount = 50
+
+					def hibernateSession = sessionFactory.getCurrentSession()
+					hibernateSession.flush()
+					hibernateSession.clear()
+
+					// Re-fetch a few objects that we need around
+					project = Project.get(projectId)
+					userLogin = UserLogin.get(userLoginId)
+
 					//if (dataTransferValueRow > 10)
 					//	throw new RuntimeException("Just wanted to bail")
 				}
