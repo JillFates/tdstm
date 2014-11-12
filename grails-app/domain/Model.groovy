@@ -147,7 +147,13 @@ class Model {
 			bladeLabelCount = null
 		}
 		if (! createdBy) {
-			def principal = SecurityUtils.subject?.principal
+			def principal
+			try {
+				principal = SecurityUtils.subject?.principal	
+			} catch (Exception e) {
+				log.info("No user found to associate to the model. " + e)
+			}
+			
 			if( principal ){
 				createdBy  = UserLogin.findByUsername( principal )?.person
 			}
