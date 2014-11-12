@@ -116,7 +116,11 @@
                             
                             <td></td>
                             
-                            <td>${fieldValue(bean:dataTransferBatch, field:'statusCode')}</td>
+                            <td>
+                            	<span id="statusCode${dataTransferBatch.id}">
+                            		${fieldValue(bean:dataTransferBatch, field:'statusCode')}
+                            	</span>
+                            </td>
 
                             <td>
 								<g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
@@ -211,6 +215,7 @@
 							var results = response.data.results;
 							messageDiv.html(results.info).show();
 							$("#"+forWhom+"ReviewId_"+batchId).hide();
+							$("#statusCode"+batchId).html( results.batchStatusCode);
 
 							// TODO : change the buttons appropriately
 						}

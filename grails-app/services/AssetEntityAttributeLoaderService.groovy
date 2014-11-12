@@ -67,7 +67,7 @@ class AssetEntityAttributeLoaderService {
 			"Walkthru Sheet Name":null,
 			"Walkthru Column Name":null ]
 
-		try{
+		try {
 			workbook = Workbook.getWorkbook( stream )
 			sheet = workbook.getSheet( sheetNo )
 			// export should use the same map.
@@ -218,7 +218,7 @@ class AssetEntityAttributeLoaderService {
 				map.put( cellContent,c )
 			}
 		}
-		if( map.containsValue( null ) == true ) {
+		if (map.containsValue( null ) == true ) {
 			return false
 		} else {
 			return true
@@ -231,7 +231,7 @@ class AssetEntityAttributeLoaderService {
 	def saveAssetsToBundle( def bundleTo, def bundleFrom, def assets ){
 		def moveBundleAssets
 		
-		// remove asstes from source bundle 
+		// remove assets from source bundle 
 		if ( bundleTo ) {
 			def moveBundleTo = MoveBundle.findById( bundleTo )
 			// get Assets into list
@@ -367,16 +367,8 @@ class AssetEntityAttributeLoaderService {
 			// If the asset has been modified, see how many of the fields are in conflict
 			dtvList.each { dtValue->
 				def attribName = dtValue.eavAttribute.attributeCode
-				//validation for sourceTeamMt and targetTeamMt and MoveBundle and Backendtype int field
-				if( bundleMoveAndClientTeams.contains(attribName) ) {
-					def bundleInstance = asset.moveBundle 
-					def teamInstance
-					if (asset?."$attribName"?.teamCode != dtValue.correctedValue && asset?."$attribName"?.teamCode != dtValue.importValue ){
-						updateChangeConflicts( dataTransferBatch, dtValue )
-						errorConflictCount++
-					}
-				} else if ( attribName == "moveBundle" ) {
-					if(asset?.moveBundle?.name != dtValue.correctedValue && asset?.moveBundle?.name != dtValue.importValue ){
+				if ( attribName == "moveBundle" ) {
+					if (asset?.moveBundle?.name != dtValue.correctedValue && asset?.moveBundle?.name != dtValue.importValue ){
 						updateChangeConflicts( dataTransferBatch, dtValue )
 						errorConflictCount++
 					}
@@ -580,7 +572,7 @@ class AssetEntityAttributeLoaderService {
 				errorMsg = "Unable to find the 'Unknown' manufacturer"
 			} else {
 				modelName = "$UNKNOWN_MFG_MODEL - $deviceType"
-				model = Model.findByNameAndManufacturerAndType(modelName, unknownMfg, deviceType)
+				model = Model.findWhere(modelName:modelName, manufacturer:unknownMfg, assetType:deviceType)
 				if (model) {
 					performAssignment(model)
 				} else {
