@@ -6,6 +6,7 @@
 	
 		<script type="text/javascript">
 			var checkProgressBar;
+			var progressBarRefreshRate = 5000; //msec
 			var handle=0;
 			var progressBar = $("#progressbar");
 			var messageDiv = $("#messageId");
@@ -81,27 +82,21 @@
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="appProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<g:link action="appProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >
-								<span>Process</span>
-							</g:link> |
+							<a href="javascript:" onclick="return kickoffProcess('app', 'appProcess', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
 						<span id="dbDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="dbProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<g:link action="dbProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >
-								<span>Process</span>
-							</g:link> |
+							<a href="javascript:" onclick="return kickoffProcess('db', 'dbProcess', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
 						<span id="filesDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
 							<a href="javascript:" class="disableButton">Process</a> |
 						</span>
 						<span id="filesProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<g:link action="fileProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >
-								<span>Process</span>
-							</g:link> |
+							<a href="javascript:" onclick="return kickoffProcess('files', 'filesProcess', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -254,10 +249,10 @@
 				progressBar.css("display","block");
 				clearInterval(handle);
 				if (${isMSIE}) {
-					handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", 5000);
+					handle=setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", progressBarRefreshRate);
 				} else {
 					//Increased interval by 5 sec as server was hanging over chrome with quick server request.
-					handle=setInterval(getProcessedDataInfo, 1000);
+					handle=setInterval(getProcessedDataInfo, progressBarRefreshRate);
 				}
 			}
 

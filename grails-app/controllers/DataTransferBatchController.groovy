@@ -103,23 +103,22 @@ class DataTransferBatchController {
 	 */
 	def deviceProcess = {
 		String message
-		def project = controllerService.getProjectForPage( this )
+		def (project, userLogin) = controllerService.getProjectAndUserForPage( this )
 		if (! project) 
 			return
 
-		def userLogin = securityService.getUserLogin()
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 
 		try {
-			message = importService.processDeviceImport(project, userLogin, params.id, session, tzId)
+			message = importService.processDeviceImport(project.id, userLogin.id, params.id, session, tzId)
 			log.info "deviceProcess() for batchId ${params.id} by user $userLogin\n " + message
 			render ServiceResults.success([results:message]) as JSON
 		} catch (Exception e) {
 			message = 'An error occurred while processing the import. Please contact support for assistance.'
 			if (log.isDebugEnabled()) {
-				message = "$message : ${e.getMessage()}"
+				message = "$message ${e.getMessage()}"
 			}
-			log.error "deviceProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.batchId}"
+			log.error "deviceProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.id}"
 			log.error ExceptionUtil.stackTraceToString(e)
 			render ServiceResults.errors(message) as JSON
 		}
@@ -131,192 +130,25 @@ class DataTransferBatchController {
 	 * @return process the dataTransferBatch and return to datatransferBatchList
 	 */
 	def appProcess = {
-		session.setAttribute("TOTAL_BATCH_ASSETS",0)
-		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
-		// session.getAttribute(null)
-
+		String message
+		def (project, userLogin) = controllerService.getProjectAndUserForPage( this )
+		if (! project) 
+			retu
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-		def assetEntityErrorList = []
-		def assetsList = new ArrayList()
-		def project
-		def nullProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'nullable', true )
-		def blankProps = GormUtil.getDomainPropertiesWithConstraint( Application, 'blank', true )
-		def newVal
-		def warnings = []
-		def ignoredAssets = []
-		def personMap = []
-		
-		DataTransferBatch.withTransaction { status ->
-			project = securityService.getUserCurrentProject()			
-			def staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
-			def dataTransferBatch
-			def insertCount = 0
-			def personsAdded = 0
-			def errorConflictCount = 0
-			def updateCount = 0
-			def errorCount = 0
-			def batchRecords = 0
-			def unknowAssetIds = 0
-			def unknowAssets = ""
-			def modelAssetsList = new ArrayList()
-			def existingAssetsList = new ArrayList()
-			def application
-		
-			def fubar = new StringBuilder("Staff List\n")
-			staffList.each { fubar.append( "   $it.id $it\n") }
-			log.debug fubar.toString()
 
-			try {
-				dataTransferBatch = DataTransferBatch.findByIdAndProject(params.batchId, project)
-				if (! dataTransferBatch) 
-					throw new RuntimeException('Unable to find the batch number for your current project')
-
-				batchRecords = DataTransferValue.executeQuery("select count( distinct rowId  ) from DataTransferValue where dataTransferBatch = ${dataTransferBatch.id}")[0]
-				def dataTransferValueRowList = DataTransferValue.findAll(" From DataTransferValue d where d.dataTransferBatch = "+
-					"$dataTransferBatch.id and d.dataTransferBatch.statusCode = 'PENDING' group by rowId")
-				def assetsSize = dataTransferValueRowList.size()
-				session.setAttribute("TOTAL_BATCH_ASSETS",assetsSize)
-				def dataTransferValues = DataTransferValue.findAllByDataTransferBatch( dataTransferBatch )
-				def eavAttributeSet = EavAttributeSet.findById(2)
-				
-				for ( int dataTransferValueRow=0; dataTransferValueRow < assetsSize; dataTransferValueRow++ ) {
-					def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-					def rowNum = rowId+1
-					def dtvList = dataTransferValues.findAll{ it.rowId == rowId } 
-					def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-					def flag = 0
-					def isNewValidate = true
-					def isFormatError = 0
-
-					application = assetEntityAttributeLoaderService.findAndValidateAsset(Application, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
-
-					if (application == null)
-						continue
-
-					if ( ! application.id ) {
-						// Initialize extra properties for new asset
-					}
-
-					// Iterate over the properties and set them on the asset
-					dtvList.each {
-						def attribName = it.eavAttribute.attributeCode
-						it.importValue = it.importValue.trim()
-
-						// If trying to set to NULL - call the closure to update the property and move on
-						if (it.importValue == "NULL") {
-							// Set the property to NULL appropriately
-							assetEntityAttributeLoaderService.setToNullOrBlank(application, attribName, it.importValue, nullProps, blankProps)
-							if (newVal) {
-								// Error messages are returned otherwise it updated
-								warnings << "$newVal for row $rowNum, asset $assetEntity"
-								errorConflictCount++
-							}
-							return
-						}
-
-						switch (attribName) {
-							case ~/sme|sme2|appOwner/:
-								if( it.importValue ) {
-									// Substitute owner for appOwner
-									def propName = attribName 
-									def results = personService.findOrCreatePerson(it.importValue, project, staffList)
-									def warnMsg = ''
-									if (results?.person) {
-										application[propName] = results.person
-
-										// Now check for warnings
-										if (results.isAmbiguous) {
-											warnMsg = " $attribName (${it.importValue}) was ambiguous for App ${application.assetName} on row $rowNum. Name set to ${results.person}"
-											warnings << warnMsg
-											log.warn warnMsg
-											errorConflictCount++
-										}
-
-										if (results.isNew) 
-											personsAdded++
-
-									} else if ( results?.error ) {
-										warnMsg = "$attribName (${it.importValue}) had an error '${results.error}'' for App ${application.assetName} on row $rowNum"
-										warnings << warnMsg
-										log.info warnMsg
-										errorConflictCount++
-									}
-								}
-								break
-							case ~/shutdownBy|startupBy|testingBy/:
-								if (it.importValue.size()) {
-									if(it.importValue[0] in ['@', '#']){
-										application[attribName] = it.importValue
-									} else {
-										def resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
-										application[attribName] = resultMap?.person?.id
-										if(it.importValue && resultMap?.isAmbiguous){
-											def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
-											log.warn warnMsg
-											warnings << warnMsg
-										}
-									}
-								}
-								break
-							case ~/shutdownFixed|startupFixed|testingFixed/:
-								if (it.importValue) {
-									application[attribName] = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
-								}
-								break
-							default:
-								// Try processing all common properties
-								assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount)
-
-						} // switch(attribName)
-
-					}	// dtvList.each						
-
-					// Save the asset if it was changed or is new
-					(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-						application, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
-
-					// Update status and clear hibernate session
-					assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
-
-				} // for
-				
-				dataTransferBatch.statusCode = 'COMPLETED'
-				dataTransferBatch.save(flush:true)
-					
-			} catch (Exception e) {
-				status.setRollbackOnly()
-				insertCount = 0
-				updateCount = 0
-				log.error "appProcess() Unexpected error - rolling back : " + e.getMessage()
-				e.printStackTrace()
-				warnings << "Encounted unexpected error: ${e.getMessage()}"
-				warnings << "<b>The Import was NOT processed</b>"			}
-
-			def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
-
-			def sb = new StringBuilder(
-				"Process Results for Batch ${params.batchId}:<ul><li>Assets in Batch: ${batchRecords}</li>" + 
-				"<li>Records Inserted: ${insertCount}</li>"+
-				"<li>Records Updated: ${updateCount}</li>" + 
-				"<li>Asset Errors: ${errorCount}</li> "+
-				"<li>Persons Added: $personsAdded</li>" +
-				"<li>Attribute Errors: ${errorConflictCount}</li>" +
-				"<li>AssetId Errors: ${unknowAssetIds}${assetIdErrorMess}</li></ul> " +
-				"<b>Warning:</b><ul>" + 
-				WebUtil.getListAsli(warnings)
-			)
-
-			importService.appendIgnoredAssets(sb, ignoredAssets)
-			sb.append('</ul>')
-			sb = sb.toString() 
-
-			log.info sb
-			flash.message = sb
-		}
-
-		session.setAttribute("IMPORT_ASSETS", assetsList)
-		redirect ( action:list, params:[projectId:project.id] )	
-	
+		try {
+			message = importService.processApplicationImport(project.id, userLogin.id, params.id, session, tzId)
+			log.info "appProcess() for batchId ${params.id} by user $userLogin\n " + message
+			render ServiceResults.success([results:message]) as JSON
+		} catch (Exception e) {
+			message = 'An error occurred while processing the import. Please contact support for assistance.'
+			if (log.isDebugEnabled()) {
+				message = "$message ${e.getMessage()}"
+			}
+			log.error "appProcess() failed : ${e.getMessage()} : userLogin $userLogin : batchId ${params.id}"
+			log.error ExceptionUtil.stackTraceToString(e)
+			render ServiceResults.errors(message) as JSON
+		}	
 	}
 
 	/**
@@ -324,7 +156,7 @@ class DataTransferBatchController {
 	 * @param dataTransferBach
 	 * @return process the dataTransferBatch and return to datatransferBatchList
 	 */
-	def fileProcess ={
+	def filesProcess ={
 		session.setAttribute("TOTAL_BATCH_ASSETS",0)
 		session.setAttribute("TOTAL_PROCESSES_ASSETS",0)
 		// session.getAttribute(null)
