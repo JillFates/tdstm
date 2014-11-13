@@ -3,6 +3,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
         <title>Manage Asset Import Batches</title>
+
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
+		<g:javascript src="bootstrap.js" />
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<g:javascript src="progressBar.js" />
 	
 		<script type="text/javascript">
 			var checkProgressBar;
@@ -196,7 +203,9 @@
 				}
 			}
 
-			// This method will kickoff the Process function
+			//
+			// This method will use Ajax to kickoff the Process function and activate the progress modal
+			//
 			function kickoffProcess(forWhom, batchId) {
 				if (postingFlag) {
 					alert('You can only perform one posting at a time.');
@@ -223,10 +232,16 @@
 						} else {
 							var results = response.data.results;
 							progressKey = results.progressKey;	// Used to get the progress updates
-
 							//messageDiv.html(results.info).show();
 							$("#"+forWhom+"ReviewId_"+batchId).hide();
-							$("#statusCode"+batchId).html( results.batchStatusCode);
+
+							var taskProgressBar = new TaskProgressBar(
+								progressKey, 
+								5000, 
+								function() { showProcessResults(batchId); },
+								function() { alert('Opening progress modal failed'); },
+								'Processing import batch ' + batchId + '...'
+							);
 
 							// TODO : change the buttons appropriately
 						}
@@ -243,6 +258,35 @@
 				//startProgressBar();
 				//return true;
 				return false;
+			}
+
+			//
+			// This is called at the edit after a successful batch process that will make Ajax call to get the results of the review or posting results
+			//
+			function showProcessResults(batchId) {
+				$.ajax({
+					type: "POST",
+					async: true,
+					url: tdsCommon.createAppURL('/import/importResults/'+batchId),
+					dataType: "json",
+					success: function (response, textStatus, jqXHR) { 
+						// stopProgressBar();
+						if (response.status == 'error') {
+							alert('An error occurred while trying to lookup the results.');
+							console.log('Error: showProcessResults() : ' + response.errors);
+							$("#statusCode"+batchId).html( results.batchStatusCode);
+						} else {
+							var results = response.data;
+							messageDiv.html(results.results).show();
+							$("#statusCode"+batchId).html( results.batchStatusCode);
+						}
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						// stopProgressBar();
+						console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
+						alert('An error occurred while invoking the posting process.');
+					}
+				});
 			}
 
 			// used to set the interval to display progress meter bar

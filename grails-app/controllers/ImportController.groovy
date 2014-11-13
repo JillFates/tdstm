@@ -10,6 +10,7 @@ class ImportController {
 	def controllerService
 	def importService
 	def progressService
+	def securityService
 
 	def quartzScheduler
 
@@ -89,7 +90,10 @@ class ImportController {
 				quartzScheduler.scheduleJob(trigger)
 
 				log.info "invokeAssetImportProcess() $userLogin kicked of an asset import process for batch ($batchId), progressKey=$progressKey"
-				// progressService.update(progressKey, 1, 'In progress')
+
+				// Need to set the progress into the 'In progress' status so that the modal window will work correctly
+				progressService.update(progressKey, 1, progressService.STARTED)
+
 			} catch (e) {
 				log.error "invokeAssetImportProcess() Initiate asset import process $triggerName failed to create Quartz job : ${e.getMessage()}"
 				progressService.update(progressKey, 100I, progressService.FAILED)
@@ -111,6 +115,64 @@ class ImportController {
 
 			render ServiceResults.success( [results:results] ) as JSON
 		}
+	}
+
+	/**
+	 * Used to retrieve the current import results of a batch
+	 * @param params.id - the id number of the batch
+	 * @return The standard ServiceResults object with the value in var results (JSON)
+	 */
+	def importResults = {
+		String errorMsg
+		Project project
+		UserLogin userLogin
+		String results=''
+		String statusCode
+
+		while (true) {
+			try {
+				(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'import')
+				if (!project) {
+					errorMsg = flash.message
+					flash.message = null
+					break
+				}
+
+				Long id = NumberUtil.toLong( params.id )
+
+				if (id == null || id < 1) {
+					errorMsg = 'Invalid batch id submitted'
+				}
+
+				DataTransferBatch dtb = DataTransferBatch.read(id)
+				if (!dtb) {
+					errorMsg = 'Unable to find import batch specified'
+					break
+				}
+				if (dtb.project.id != project.id) {
+					securityService.reportViolation("attempted to access data import batch ($id) not associated to project (${project.id})", userLogin)
+					errorMsg = 'Unable to find import batch specified'
+					break
+				}
+				results = dtb.importResults
+				statusCode = dtb.statusCode
+
+			} catch (e) {
+				log.error "getImportResults() received error ${e.getMessage()}"
+				errorMsg = log.isDebugEnabled() ? e.getMessage() : 'An error occured while attempting to lookup the results'
+			}
+
+			break
+		}
+		
+		if (errorMsg) {
+			//if (progressKey)
+			//	progressService.remove(progressKey)
+			render ServiceResults.errors(errorMsg) as JSON
+		} else {
+			render(ServiceResults.success([results:results, batchStatusCode:statusCode]) as JSON)
+		}
+
 	}
 
 }

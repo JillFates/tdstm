@@ -140,6 +140,20 @@ class ImportService {
 	 */
 	void updateJobProgress(String progressKey, int current, int total) {
 
+		// Only increment on modulus of 2% so we're not overwhelming the system unless the values are the same
+		if (current == total) {
+			progressService.update(progressKey, 100I, ProgressService.STARTED)
+		} else {
+			if (total < 1 || current > total) {
+				log.error "updateJobProgress() called with invalid total ($progressKey, $current, $total)"
+			} else {
+				int diff = total-current
+				if (diff.mod(2)) {
+					int percComp = Math.round(current/total*100)
+					progressService.update(progressKey, percComp, ProgressService.STARTED)
+				}
+			}
+		}
 	}
 
 	/**
@@ -524,7 +538,7 @@ class ImportService {
 				errorMsg = 'It appears that someone is presently processing this batch'
 				break
 			}
-			
+
 			if (dtb.statusCode == 'COMPLETED') {
 				errorMsg = 'The batch has already been completed'
 				break

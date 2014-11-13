@@ -17,9 +17,9 @@ import com.tdssrc.grails.TimeUtil
 class ProgressService {
 
 	static final String FAILED='failed'
-	static final String DONE='done'
+	static final String DONE='Completed'
 	static final String PENDING='pending'
-	static final String STARTED='started'
+	static final String STARTED='In process'
 	static final String PAUSED='paused'
 
 	Cache<String, ProgressInfo> progressInfo 
@@ -86,6 +86,11 @@ class ProgressService {
 	 * @param dataValue the value of the data
 	 */
 	void updateData(String key, Object dataKey, Object dataValue) {
+		if (key == null) {
+			log.error "updateData() called with null key"
+			return
+		} 
+
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
 			info.data.put(dataKey, dataValue)
@@ -101,6 +106,11 @@ class ProgressService {
 	 * @return dataValue the value of the data
 	 */
 	Object getData(String key, Object dataKey) {
+		if (key == null) {
+			log.error "getData() called with null key"
+			return null
+		} 
+
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
 			return info.data.get(dataKey)
@@ -115,7 +125,11 @@ class ProgressService {
 	 * @param key the key of the progress
 	 */
 	void remove(String key) {
-		this.progressInfo.invalidate(key)
+		if (key == null) {
+			log.error "remove() called with null key"
+		} else {
+			this.progressInfo.invalidate(key)
+		}
 	}
 	
 	/**
@@ -138,7 +152,12 @@ class ProgressService {
 	 * @param key the key of the progress
 	 * @return the information about a specific key if exists and if not empty map
 	 */
-	def get(key) {
+	Map get(key) {
+		if (key == null) {
+			log.error "updateData() called with null key"
+			return [:]
+		} 
+
 		ProgressInfo info = this.progressInfo.getIfPresent(key);
 		
 		if (info == null) {

@@ -42,7 +42,39 @@ class WsProgressController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
+	/**
+	 * Gets the status of the progress of a async task
+	 */
+	def getData = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def id = params.id
+		def dataKey = params.dataKey
+
+		def currentProject = securityService.getUserCurrentProject()
+
+		try {
+			def data = progressService.getData(id, dataKey)
+
+			render(ServiceResults.success([data:data]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+		
 	/**
 	 * Returns the list of pending progresses
 	 */
