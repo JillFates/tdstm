@@ -115,7 +115,7 @@
 			function myCustomFormatter (cellVal,options,rowObject) {
 				var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')">'+
 					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[6] + "' comments='" + rowObject[8] + "'></grid-buttons>"
+				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='${assetClass}' tasks='" + rowObject[7] + "' comments='" + rowObject[9] + "'></grid-buttons>"
 				return editButton
 			}
 			function deleteMessage(response, postdata){
