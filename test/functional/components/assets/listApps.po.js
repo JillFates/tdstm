@@ -18,6 +18,14 @@ var ListApps = function(){
       return (attClass.search('display: none;') !== -1);
     });      
   };
+  this.getColumnsHeaders =function(){
+    return browser.executeScript('return $("[role=\'grid\'] [class=\'ui-jqgrid-labels ui-sortable\'] th:visible")');
+  };
+
+  this.getColumnsWithHeaderSelector =function(){
+    return browser.executeScript('return $("[role=\'grid\'] [class=\'ui-jqgrid-labels ui-sortable\'] th:visible img")');
+  };
+
   this.getListItems = function(){
     return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
       return list.length>0;

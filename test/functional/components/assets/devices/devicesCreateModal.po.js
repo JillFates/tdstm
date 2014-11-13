@@ -13,15 +13,11 @@ var DeviceCreateModal = function(){
   this.chassisBladeLabel = this.createModal.$('[for="sourceChassisId"]');
 };
 DeviceCreateModal.prototype = new CreateAsset();
-// DeviceCreateModal.prototype.createModal = function(){
-
-// }; 
 DeviceCreateModal.prototype.createDevice = function(appName,deviceType){
   this.nameField.sendKeys(appName);
   this.modelTypeFieldInput.sendKeys(deviceType);
-  // this.modelTypeField.$('[value='+deviceType+']').click();
-  browser.actions().sendKeys(protractor.Key.ENTER).perform();
   browser.executeScript('return $("#currentAssetType").val("'+deviceType+'")');
+  browser.actions().sendKeys(protractor.Key.TAB).perform();
   this.saveBtn.click();
 };
 DeviceCreateModal.prototype.getModelTypeSelected = function(){

@@ -12,7 +12,7 @@ exports.config = {
     '../components/assets/applications/addComments.spec.js'
     ],
     test2:[
-    '../components/assets/devices/serverList.spec.js',
+    '../components/assets/devices/createServer.spec.js',
     '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
     ],
@@ -53,8 +53,8 @@ exports.config = {
     '../components/tasks/timeline.spec.js',
     // '../components/tasks/cookbook.spec.js'
     ],
-    assets:[
-    '../components/assets/devices/devices.spec.js'
+    dashboards:[
+    '../components/dashboards/eventDashboard.spec.js'
     ],
     reports:[
     '../components/reports/applicationProfiles.spec.js',
@@ -73,6 +73,15 @@ exports.config = {
     '../components/reports/issueReport.spec.js',
     '../components/reports/eventResults.spec.js',
     '../components/reports/cablingQA.spec.js'
+    ],
+    assets:[
+    '../components/assets/applications/applicationList.spec.js',
+    '../components/assets/databases/dbList.spec.js',
+    '../components/assets/devices/serverList.spec.js',
+    '../components/assets/devices/allDevicesList.spec.js',
+    '../components/assets/storage/storageList.spec.js',
+    '../components/assets/devices/storageDevicesList.spec.js',
+    '../components/assets/devices/devices.spec.js'
     ]
   },
 

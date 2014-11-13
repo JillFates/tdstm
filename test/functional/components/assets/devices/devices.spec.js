@@ -28,25 +28,13 @@ describe('All Devices', function(){
 
       it('should has as title create server', function(){
         var deviceModal = new CreateDeviceModal();
-        // expect(deviceModal.createModalTitle.getText()).toEqual('Device Create');
         expect(deviceModal.getModalTitle().getText()).toEqual('Device Create');
       });
 
       it('should create a server and save and view',function(){
         var deviceModal = new CreateDeviceModal();
         var deviceType = 'Blade';
-        deviceModal.nameField.sendKeys(appName);
-        deviceModal.modelTypeFieldInput.sendKeys(deviceType);
-        browser.actions().sendKeys(protractor.Key.ENTER).perform();
-        browser.executeScript('return $("#currentAssetType").val("'+deviceType+'")');
-        // expect(deviceModal.chassisBladeLabel.isDisplayed()).toEqual('true');
-        // expect(deviceModal.rackCabinetLabel.isDisplayed()).toEqual('false');
-        deviceModal.descriptionField.sendKeys('this is a description');
-
-        deviceModal.saveBtn.click();
-
-
-
+        deviceModal.createDevice(appName,deviceType);
         var viewDeviceModal = new ViewDeviceModal();
         expect(viewDeviceModal.isViewModalOpened()).toBe(true);
       });
@@ -80,7 +68,6 @@ describe('All Devices', function(){
    
     it('should have Device Edit as title', function(){
       var deviceModal = new CreateDeviceModal();
-      // deviceModal.createModal = $('[aria-describedby="editEntityView"]');
       expect(deviceModal.getModalTitle('view').getText()).toEqual('Device Edit');
     });
 

@@ -2,17 +2,17 @@
 var  Menu = require('../../menu/menu.po.js');
 var  ListApps = require('../listApps.po.js');
 
-describe('Server', function(){
+describe('All Devices', function(){
 
-  it('should load server List page after select Assets > Servers', function(){
+  it('should load All Devices List page after select Assets > All Devicess', function(){
     var menu = new Menu();
-    menu.goToAssets('servers');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=server');
+    menu.goToAssets('allDevices');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=all');
   });
 
-  it('should have "Server List" as title', function(){
+  it('should have "All Devices List" as title', function(){
     var appsListPage =  new ListApps();
-    expect(appsListPage.titleh.getText()).toEqual('Server List');
+    expect(appsListPage.titleh.getText()).toEqual('All Devices List');
   });
 
   describe('List Headers',function(){
@@ -111,4 +111,4 @@ describe('Server', function(){
 
   }); // List Headers
 
-}); // Server
+}); // All Devices

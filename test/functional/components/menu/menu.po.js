@@ -426,10 +426,21 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print\',\'help\');"]'));
   };
   this.goToDashboards= function(option){
-    // var that = this;
+    var that = this;
     this.getDashboards().click();
     var d = {
-
+      'userDashboard': function(){
+        that.getUserDashboard().click();
+      },
+      'planningDashBoard': function(){
+        that.getPlanningDashboard().click();
+      },
+      'eventDashboard':function(){
+        that.getEventDashboard().click();
+      },
+      'Cart Tracker': function(){
+        that.getCartTraker().click();
+      }
     };
     d[option]();
   };
