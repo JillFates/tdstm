@@ -487,10 +487,17 @@ class ImportService {
 		log.debug "updateDataTransferBatchStatus() Updated the $dtb status to $statusCode"
 	}
 
-	String validateImportBatchCanBeProcessed(Long projectId, Long batchId) {
+	/**
+	 * Used to validate that it is okay to process the specified batch for given project id
+	 * @param projectId - the id of the project that the user is currently assigned to
+	 * @param batchId - the id of the batch to be processed
+	 * @param progressKey - the progressService key to be used to track the process if the statusCode is in POSTING mode
+	 * @return an error message if any or null if it is safe to proceed
+	 */
+	String validateImportBatchCanBeProcessed(Long projectId, Long batchId, String progressKey=null) {
 		String errorMsg
 		while (true) {
-			DataTransferBatch dtb = DataTransferBatch.read(batchId)
+			DataTransferBatch dtb = DataTransferBatch.get(batchId)
 			if (! dtb) {
 				errorMsg = "Unable to locate batch id ($batchId)"
 				break
@@ -503,19 +510,26 @@ class ImportService {
 				break
 			}
 
+			// The kickoff step will set the the status to POSTING so there are two cases:
+			// 1. The kickoff should have status = PENDING
+			// 2. The job should have POSTING and we have a valid progressKey
+
+			if (! progressKey && dtb.statusCode != DataTransferBatch.PENDING) {
+				errorMsg = "The batch must be in the ${DataTransferBatch.PENDING} status in order to process"
+				break
+			}
+
 			// Check the status of the batch and make sure it is still PENDING
-			if (dtb.statusCode == 'POSTING') {
+			if (progressKey && dtb.statusCode == DataTransferBatch.POSTING && progressKey != dtb.progressKey) {
 				errorMsg = 'It appears that someone is presently processing this batch'
 				break
 			}
+			
 			if (dtb.statusCode == 'COMPLETED') {
 				errorMsg = 'The batch has already been completed'
 				break
 			}
-			if (dtb.statusCode != 'PENDING') {
-				errorMsg = 'The batch must be in the PENDING status in order to process'
-				break
-			}
+
 			break
 		}
 		return errorMsg
@@ -542,13 +556,13 @@ class ImportService {
 				// Set the hibernate flush mode to be controlled by us for performance reasons
 				session.setFlushMode(FlushMode.COMMIT)				
 				
-				errorMsg = validateImportBatchCanBeProcessed(projectId, batchId)
+				errorMsg = validateImportBatchCanBeProcessed(projectId, batchId, progressKey)
 				if (errorMsg)
 					break
 
 				DataTransferBatch.withTransaction { tx -> 
 
-					DataTransferBatch dtb = DataTransferBatch.read(batchId)
+					DataTransferBatch dtb = DataTransferBatch.get(batchId)
 
 					// Figure out which service method to invoke based on the DataTransferBatch entity type domain name
 					String domainName = dtb.eavEntityType?.domainName
@@ -557,6 +571,15 @@ class ImportService {
 
 					results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId) 
 					errorMsg = results.error
+
+					if (errorMsg) {
+						dtb.statusCode = DataTransferBatch.PENDING
+						dtb.importResults = errorMsg
+					} else {
+						dtb.statusCode = DataTransferBatch.COMPLETED
+						dtb.importResults = results.info
+						results.batchStatusCode = DataTransferBatch.COMPLETED
+					}
 
 					session.flush()
 					session.clear()
@@ -582,8 +605,12 @@ class ImportService {
 		}
 
 		if (errorMsg) {
-			return [error:errorMsg]
+			progressService.update(progressKey, 100I, progressService.FAILED)
+			return [error:errorMsg, batchStatusCode: DataTransferBatch.PENDING]
 		} else {
+			progressService.update(progressKey, 100I, progressService.DONE)
+			// Store the results so the the client can grab it afterward
+			progressService.updateData(progressKey, 'results', results.info)			
 			return results
 		}
 	}
@@ -597,7 +624,7 @@ class ImportService {
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 * @return map of the various attributes returned from the service
 	 */
-	Map processApplicationImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processApplicationImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 
 		// Flag if we want performance information throughout the method
 		boolean performance=true
@@ -758,8 +785,6 @@ class ImportService {
 
 		} // for
 
-		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
-			
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 		def sb = new StringBuilder(
@@ -792,11 +817,9 @@ class ImportService {
 
 		String info = sb.toString()
 
-
 		updateJobProgress(progressKey, assetCount, assetCount, )
 
-
-		return [elapsedTime: elapsedTime, batchStatusCode: dataTransferBatch.statusCode, info: sb.toString()] 
+		return [elapsedTime: elapsedTime, assetCount: assetCount, info: sb.toString()] 
 	}	
 
 	/**	
@@ -808,7 +831,7 @@ class ImportService {
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 * @return map of the various attributes returned from the service
 	 */
-	Map processAssetEntityImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processAssetEntityImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 		String methodName='processAssetEntityImport()'
 		AssetClass assetClass = AssetClass.DEVICE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1064,10 +1087,6 @@ class ImportService {
 
 		} // for
 
-		updateJobProgress(progressKey, assetCount, assetCount)
-
-		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
-		
 		// Update assets racks, cabling data once process done
 		// TODO : JPM 9/2014 : updateCablingOfAssets was commented out until we figure out what to do with this function (see TM-3308)
 		// assetEntityService.updateCablingOfAssets( modelAssetsList )
@@ -1106,12 +1125,11 @@ class ImportService {
 			sb.append('</ul>')
 		}
 
-
 		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
-		return [elapsedTime: elapsedTime.toString(), batchStatusCode: dataTransferBatch.statusCode, info: sb.toString()] 
+		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()] 
 	}
 
 	/**	
@@ -1123,7 +1141,7 @@ class ImportService {
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 * @return map of the various attributes returned from the service
 	 */
-	Map processDatabaseImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processDatabaseImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 		String methodName='processDatabaseImport()'
 		AssetClass assetClass = AssetClass.DATABASE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1214,10 +1232,6 @@ class ImportService {
 
 		} // for
 
-		updateJobProgress(progressKey, assetCount, assetCount)
-
-		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
-
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 		def sb = new StringBuilder("<b>Process Results for Batch ${batchId}:</b><ul>" + 
@@ -1245,9 +1259,7 @@ class ImportService {
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
-		return [elapsedTime: elapsedTime.toString(), batchStatusCode: dataTransferBatch.statusCode, info: sb.toString()] 
-
-		dataTransferBatch.statusCode
+		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()] 
 	}
 	
 	/**	
@@ -1259,7 +1271,7 @@ class ImportService {
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
 	 * @return map of the various attributes returned from the service
 	 */
-	Map processFilesImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processFilesImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 		String methodName='processAssetEntityImport()'
 		AssetClass assetClass = AssetClass.STORAGE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1361,10 +1373,6 @@ class ImportService {
 
 		} // for
 
-		updateJobProgress(progressKey, assetCount, assetCount)
-
-		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
-
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 		def sb = new StringBuilder("<b>Process results for Batch ${batchId}:</b><ul>" + 
@@ -1393,7 +1401,7 @@ class ImportService {
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
-		return [elapsedTime: elapsedTime.toString(), batchStatusCode: dataTransferBatch.statusCode, info: sb.toString()] 	
+		return [elapsedTime: elapsedTime.toString(), assetCount: assetCount, info: sb.toString()] 	
 	}
 
 	/**

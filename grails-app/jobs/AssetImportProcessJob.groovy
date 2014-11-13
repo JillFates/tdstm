@@ -40,9 +40,11 @@ class AssetImportProcessJob {
 
 			log.debug "execute() batchId=$batchId, projectId=$projectId, userLoginId=$userLoginId, timeZoneId=$timeZoneId, progressKey=$progressKey"
 
-			log.info "AssetImportProcessJob is about to invoke invokeAssetImportProcess started for batchId $batchId"
+			log.info "execute() is about to invoke importService.invokeAssetImportProcess to start processing batch ($batchId)"
 
 			results = importService.invokeAssetImportProcess(projectId, userLoginId, batchId, progressKey, timeZoneId)
+
+			log.info "execute() return from importService.invokeAssetImportProcess() : results=$results"
 			
 		} catch (e) {
 			errorMsg = e.getMessage()
@@ -51,11 +53,9 @@ class AssetImportProcessJob {
 		// Need to persist the data back to the batch and stop the job
 		if (errorMsg) {
 			results = [status:'error', errors: errorMsg]
-			progressService.update(progressKey, 100I, progressService.FAILED)
 			log.info "execute() received an error $errorMsg"
 		} else {
 			results.status = 'success'
-			progressService.update(progressKey, 100I, progressService.DONE)
 			log.info "execute() call to service was successful"
 
 			// TODO : JPM 11/2014 : persist the info and other information

@@ -34,6 +34,8 @@ class ImportController {
 		Project project
 		UserLogin userLogin
 		Map results = [:]
+		String triggerName
+		String triggerGroup=null
 
 		while (true) {
 			try {
@@ -50,40 +52,30 @@ class ImportController {
 				if (errorMsg)
 					break
 
-				log.debug "invokeAssetImportProcess() about to fetch DataTransferBatch.get($batchId)"
-
 				DataTransferBatch dtb = DataTransferBatch.get(batchId)
 
-				log.debug "invokeAssetImportProcess() about to set $dtb, current status of ${dtb.statusCode}"
-
-				// Update the batch status to POSTING
+				// Update the batch status to POSTING and save the progress key 
+				progressKey = "AssetImportProcess-" + UUID.randomUUID().toString()
 				dtb.statusCode = DataTransferBatch.POSTING
-
-				log.debug "invokeAssetImportProcess() about to save $dtb, status of ${dtb.statusCode}"
-
+				dtb.progressKey = progressKey
 				if (!dtb.save(flush:true, failOnError:true)) {
 					errorMsg = "Unable to update batch status : ${GormUtil.allErrorsString(dtb)}"
 					break
 				}
-				log.debug "invokeAssetImportProcess() Updated the batch status to: ${dtb.statusCode} for: $dtb"
-
 
 				// Start the progress service with a new key
-				progressKey = "AssetImportProcess-" + UUID.randomUUID().toString()
 				progressService.create(progressKey)
 
-errorMsg = "We are intentionally stopping the process kickoff to test something"
-break
 				//
 				// Setup the Quartz job that will execute the actual posting process
 				//
 
 				// The triggerName/Group will allow us to controller on import
-				String triggerName = "TM-AssetImport-${project.id}"
-				String triggerGroup = null
 				Date startTime = new Date(System.currentTimeMillis() + 2000) // Delay 2 seconds to allow this current transaction to commit before firing off the job
 
+				triggerName = "TM-AssetImport-${project.id}"
 				Trigger trigger = new SimpleTrigger(triggerName, null, startTime)
+
 				//trigger.jobDataMap.putAll(results)
 				trigger.jobDataMap.put('batchId', batchId)
 				trigger.jobDataMap.put('progressKey', progressKey)
@@ -110,7 +102,8 @@ break
 		}
 		
 		if (errorMsg) {
-			progressService.remove(progressKey)
+			//if (progressKey)
+			//	progressService.remove(progressKey)
 			render ServiceResults.errors(errorMsg) as JSON
 		} else {
 			results.progressKey = progressKey
