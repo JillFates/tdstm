@@ -77,13 +77,14 @@
 					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'applicationId\')"/></g:else></span>'
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType', 'Event'"
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType', 'Event'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${appPref['1']}',width:'120'},
 						{name:'${appPref['2']}', width:'120'},
 						{name:'${appPref['3']}', width:'120'}, 
 						{name:'${appPref['4']}', width:'120'},
+						{name:'${appPref['5']}', width:'120'},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true},
 						{name:'event', hidden: true} "
@@ -112,7 +113,7 @@
 						{afterSubmit:deleteMessage}
 					);
 				});
-				<g:each var="key" in="['1','2','3','4']">
+				<g:each var="key" in="['1','2','3','4','5']">
 					var appPref= '${appPref[key]}';
 					$("#applicationIdGrid_"+appPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+appPref+'\',\'application\',\''+${key}+'\')">');
 				</g:each>
@@ -165,7 +166,7 @@
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 			<h1>Application List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
-			<g:each var="key" in="['1','2','3','4']">
+			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${appPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width:13.7% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />

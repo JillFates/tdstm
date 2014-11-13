@@ -205,7 +205,7 @@ class ApplicationController {
 			
 		def results = appsList?.collect { 
 			[ cell: [
-			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], 
+			'',it.assetName, (it[appPref["1"]] ?: ''), it[appPref["2"]], it[appPref["3"]], it[appPref["4"]], it[appPref["5"]],
 			/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
 			it.tasksStatus, it.assetType, it.event, it.commentsStatus
 		], id: it.appId, escapedName:assetEntityService.getEscapedName(it)]}

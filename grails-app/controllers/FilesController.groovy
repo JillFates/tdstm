@@ -210,7 +210,7 @@ class FilesController {
 
 		def results = filesList?.collect {
 			def commentType = it.commentType
-			[ cell: ['',it.assetName, (it[filePref["1"]] ?: ''), it[filePref["2"]], it[filePref["3"]], it[filePref["4"]], 
+			[ cell: ['',it.assetName, (it[filePref["1"]] ?: ''), it[filePref["2"]], it[filePref["3"]], it[filePref["4"]], it[filePref["5"]], 
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
 					it.tasksStatus, it.assetType, it.commentsStatus], id: it.fileId, escapedName:assetEntityService.getEscapedName(it)
 			]}

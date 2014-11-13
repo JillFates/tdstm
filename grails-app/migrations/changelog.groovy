@@ -61,5 +61,5 @@ databaseChangeLog = {
 	include file: '20141110-nullout-invalid-person-ref.groovy'
 	include file: '20141110-new-custom-columns-from-65-to-96.groovy'
 	include file: '20141111-set-default-model-on-racks.groovy'
-
+	include file: '20141112-clean-up-preference-columns.groovy'
 }

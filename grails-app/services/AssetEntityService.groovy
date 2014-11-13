@@ -1269,6 +1269,7 @@ class AssetEntityService {
 		// Remove the non project specific attributes and sort them by attributeCode
 		def appAttributes = attributes.findAll{ 
 			it.attributeCode!="assetName" && 
+			it.attributeCode!="manufacturer" && 
 			! (it.attributeCode in nonCustomList) && 
 			! COLUMN_PROPS_TO_EXCLUDE[ac].contains(it.attributeCode)
 		}
@@ -1711,19 +1712,19 @@ class AssetEntityService {
 		
 			switch (prefName) {
 				case 'App_Columns':
-					colPref = ['1':'sme', '2':'validation', '3':'planStatus', '4':'moveBundle']
+					colPref = ['1':'sme', '2':'environment', '3':'validation', '4':'planStatus', '5':'moveBundle']
 					break
 				case 'Asset_Columns':
-					colPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
+					colPref = ['1':'sourceRack','2':'environment','3':'assetTag','4':'serialNumber','5':'validation']
 					break
 				case 'Physical_Columns':
-					colPref = ['1':'targetLocation','2':'targetRack','3':'assetTag','4':'serialNumber']
+					colPref = ['1':'sourceRack','2':'environment','3':'assetTag','4':'serialNumber','5':'validation']
 					break
 				case 'Database_Columns':
-					colPref = ['1':'dbFormat','2':'size','3':'planStatus','4':'moveBundle']
+					colPref = ['1':'dbFormat','2':'size','3':'validation','4':'planStatus','5':'moveBundle']
 					break
 				case 'Storage_Columns':
-					colPref = ['1':'fileFormat','2':'size','3':'planStatus','4':'moveBundle']
+					colPref = ['1':'fileFormat','2':'size','3':'validation','4':'planStatus','5':'moveBundle']
 					break
 				case 'Task_Columns':
 					colPref = ['1':'assetName','2':'assetType','3':'assignedTo','4':'role', '5':'category']
@@ -2809,6 +2810,7 @@ class AssetEntityService {
 		model.assetTag = filters?.assetTagFilter ?:'' 
 		model.assetType = filters?.assetTypeFilter ?:'' 
 		model.model = filters?.modelFilter ?:'' 
+		model.manufacturer = filters?.manufacturer ?:'' 
 		model.prefType = prefType 
 		model.serialNumber = filters?.serialNumberFilter ?:'' 
 		model.sourceLocation = filters?.sourceLocationFilter ?:'' 
@@ -2845,6 +2847,7 @@ class AssetEntityService {
 			depToResolve: params.depToResolve,
 			event: params.event,
 			model: params.model, 
+			manufacturer: params.manufacturer, 
 			moveBundle: params.moveBundle, 
 			planStatus: params.planStatus, 
 			sourceLocation: params.sourceLocation, 
@@ -2897,6 +2900,9 @@ class AssetEntityService {
 		joinQuery.append("\nLEFT OUTER JOIN rack AS srcRack ON srcRack.rack_id=ae.rack_source_id ")
 		joinQuery.append("\nLEFT OUTER JOIN room AS srcRoom ON srcRoom.room_id=ae.room_source_id ")
 
+		altColumns.append(", manu.name AS manufacturer")
+		joinQuery.append("\nLEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
+
 		boolean srcRoomAdded = true 	// Can set to false if the above lines are removed
 		boolean tgtRoomAdded = false
 
@@ -2916,10 +2922,6 @@ class AssetEntityService {
 				case 'lastUpdated':
 					altColumns.append(", ee.last_updated AS ${value}")
 					joinQuery.append("\nLEFT OUTER JOIN eav_entity ee ON ee.entity_id=ae.asset_entity_id ")
-					break
-				case 'manufacturer':
-					altColumns.append(", manu.name AS manufacturer")
-					joinQuery.append("\nLEFT OUTER JOIN manufacturer manu ON manu.manufacturer_id=m.manufacturer_id ")
 					break
 				case 'modifiedBy':
 					altColumns.append(", CONCAT(CONCAT(p.first_name, ' '), IFNULL(p.last_name,'')) AS modifiedBy")
@@ -3120,13 +3122,14 @@ class AssetEntityService {
 					'', // The action checkbox
 					it.assetName, 
 					(it.assetType ?: ''), 
+					it.manufacturer,
 					it.model, 
-					it.sourceLocation, 
-					it.sourceRack,
+					it.sourceLocation, 					
 					( it[ assetPref['1'] ] ?: ''), 
 					( it[ assetPref['2'] ] ?: ''), 
 					( it[ assetPref['3'] ] ?: ''), 
 					( it[ assetPref['4'] ] ?: ''), 
+					( it[ assetPref['5'] ] ?: ''), 
 					it.planStatus, 
 					it.moveBundle, 
 					/*it.depNumber, (it.depToResolve==0)?(''):(it.depToResolve), (it.depConflicts==0)?(''):(it.depConflicts),*/

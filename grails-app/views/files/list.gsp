@@ -70,13 +70,14 @@
 				// JqGrid implementations 
 				<jqgrid:grid id="storageId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType'"
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'50'},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${filesPref['1']}',width:'120'},
 						{name:'${filesPref['2']}', width:'120'},
 						{name:'${filesPref['3']}', width:'120'}, 
 						{name:'${filesPref['4']}', width:'120'},
+						{name:'${filesPref['5']}', width:'120'},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"
@@ -95,7 +96,7 @@
 				</jqgrid:grid>
 				populateFilter();
 
-				<g:each var="key" in="['1','2','3','4']">
+				<g:each var="key" in="['1','2','3','4','5']">
 					var filePref= '${filesPref[key]}';
 					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
 				</g:each>
@@ -131,7 +132,7 @@
             <div ng-controller="tds.comments.controller.MainController as comments">
 			    <jqgrid:wrapper id="storageId" />
             </div>
-			<g:each var="key" in="['1','2','3','4']">
+			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${filesPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width: 13.3% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${filesPref[key]}" />

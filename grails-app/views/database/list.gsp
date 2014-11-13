@@ -70,13 +70,14 @@
 					</g:if><g:else><span class="capBtn"><input type="button" class="clearFilterId" value="Clear Filters" disabled="disabled" onclick="clearFilter(\'databaseId\')"/></g:else></span>'		
 				<jqgrid:grid id="databaseId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','id', 'commentType'"
-					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'40', fixed:false},
+					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
+					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'50', fixed:false},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${dbPref['1']}',width:'120'},
 						{name:'${dbPref['2']}', width:'120'},
 						{name:'${dbPref['3']}', width:'120'}, 
 						{name:'${dbPref['4']}', width:'120'},
+						{name:'${dbPref['5']}', width:'120'},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"
@@ -100,7 +101,7 @@
 				$("#databaseId").jqGrid("editGridRow","new",
 					{afterSubmit:deleteMessage});
 			 });
-			<g:each var="key" in="['1','2','3','4']">
+			<g:each var="key" in="['1','2','3','4','5']">
 				var dbPref= '${dbPref[key]}';
 				$("#databaseIdGrid_"+dbPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+dbPref+'\',\'database\',\''+${key}+'\')">');
 			</g:each>
@@ -139,7 +140,7 @@
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 			<h1>Database List${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
-			<g:each var="key" in="['1','2','3','4']">
+			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${dbPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv" style="width: 13.3% !important;">
 						<input type="hidden" id="previousValue_${key}" value="${dbPref[key]}" />

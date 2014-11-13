@@ -59,6 +59,7 @@
 				var moveBundle = '${moveBundle}';
 				var assetType = '${assetType}';
 				var model = '${model}';
+				var manufacturer = '${manufacturer}';
 				var sourceLocation = '${sourceLocation}';
 				var sourceRack = '${sourceRack}';
 				var targetLocation = '${targetLocation}';
@@ -90,17 +91,18 @@
 					</g:else>';
 				<jqgrid:grid id="assetListId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
-					colNames="'Actions', 'Name', 'Device Type' , 'Model', 'Location','Rack','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','Plan Status','Bundle', 'id', 'commentType'"
+					colNames="'Actions', 'Name', 'Device Type', 'Manufacturer', 'Model', 'Location','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','Plan Status','Bundle', 'id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false,width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
-						{name:'assetType'},
-						{name:'model'}, 
+						{name:'assetType', width:'110'},
+						{name:'manufacturer', width:'120'},
+						{name:'model', width:'150'}, 
 						{name:'sourceLocation'},
-						{name:'sourceRack'},
 						{name:'${assetPref['1']}', width:'130'},
 						{name:'${assetPref['2']}', width:'130'},
 						{name:'${assetPref['3']}', width:'130'}, 
 						{name:'${assetPref['4']}', width:'130'},
+						{name:'${assetPref['5']}', width:'130'},
 						{name:'planStatus'},
 						{name:'moveBundle'},
 						{name:'id', hidden: true},
@@ -116,7 +118,7 @@
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
 						moveBundle : moveBundle, assetType:assetType , model :model , sourceLocation: sourceLocation , sourceRack:sourceRack,
-						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId,
+						targetLocation:targetLocation, targetRack :targetRack,assetTag :assetTag,serialNumber:serialNumber, moveBundleId:moveBundleId, manufacturer: manufacturer,
 						unassigned:unassigned, toValidate:toValidate }">
 					<jqgrid:filterToolbar id="assetListId" searchOnEnter="false" />
 					<jqgrid:navigation id="assetListId" add="false" edit="false" del="false" search="false" refresh="false" />
@@ -128,7 +130,7 @@
 						{afterSubmit:deleteMessage});
 				});
 
-				<g:each var="key" in="['1','2','3','4']">
+				<g:each var="key" in="['1','2','3','4','5']">
 					var assetPref= '${assetPref[key]}';
 					$("#assetListIdGrid_" + assetPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
 				</g:each>
@@ -182,7 +184,7 @@
 		<div class="body fluid" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 			<h1>${title} ${(event)?(' for Move Event '+moveEvent.name):('')}</h1>
 			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
-			<g:each var="key" in="['1','2','3','4']">
+			<g:each var="key" in="['1','2','3','4','5']">
 				<div id="columnCustomDiv_${assetPref[key]}" style="display:none;">
 					<div class="columnDiv_${key} customScroll customizeDiv">
 						<input type="hidden" id="previousValue_${key}" value="${assetPref[key]}" />
