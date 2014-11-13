@@ -122,25 +122,12 @@ class DataTransferBatchController {
 					break
 				}
 
-				DataTransferBatch dtb = DataTransferBatch.read(id)
-				if (! dtb) {
-					error = 'Invalid batch id was not found'
-					break
-				}
-				if (dtb.project.id != project.id) {
-					securityService.reportViolation("attemped to post import batch ($id) that is not associated with current project (${project.id})")
-					error = 'Invalid batch id was not found'
-					break
-				}
-
-				// Figure out which service method to invoke based on the DataTransferBatch
-				String domainName = dtb.eavEntityType?.domainName
-				assert domainName
-				String methodName = "process${domainName}Import"
-
 				def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
-				results = importService."$methodName"(project.id, userLogin.id, params.id, session, tzId) 
+
+				// Call the service stub that knowns which actual service method to run
+				results = importService.invokeAssetImportProcess(project.id, userLogin.id, id, tzId, session)
 				error = results.error
+				
 			} catch (UnauthorizedException e) {
 				error = e.getMessage()
 			} catch (InvalidParamException e) {

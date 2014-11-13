@@ -2,13 +2,15 @@
 //import org.apache.commons.lang.StringUtils
 //import org.codehaus.groovy.grails.commons.GrailsClassUtils
 //import com.tds.asset.AssetCableMap
-import com.tdssrc.eav.EavAttribute
 //import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavEntityAttribute
-import com.tdssrc.eav.EavEntityType
 //import com.tdsops.tm.enums.domain.SizeScale
 //import com.tdsops.tm.enums.domain.AssetCableStatus
 //import com.tdssrc.grails.DateUtil
+
+
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavEntityAttribute
+import com.tdssrc.eav.EavEntityType
 
 import com.tds.asset.Application
 import com.tds.asset.AssetEntity
@@ -36,6 +38,7 @@ class ImportService {
 	def assetEntityService
 	def deviceService
 	def personService
+	def progressService
 	def rackService
 	def roomService
 	def securityService
@@ -43,8 +46,6 @@ class ImportService {
 
 	def sessionFactory
 	
-	static final STATUS_COMPLETE = 'COMPLETED'
-	static final STATUS_PENDING = 'PENDING'
 	// The number of assets to process before clearing the hibernate session 
 	static final int CLEAR_SESSION_AFTER = 100
 
@@ -61,7 +62,7 @@ class ImportService {
 	 * @param assetClass - the asset class type
 	 * @param batchId - the id number of the batch to be processed
 	 */
-	private DataTransferBatch processValidation(Project project, UserLogin userLogin, AssetClass assetClass, String batchId) {
+	private DataTransferBatch processValidation(Project project, UserLogin userLogin, AssetClass assetClass, Long batchId) {
 
 		log.info "processValidate(project:${project.id}, userLogin:$userLogin, assetClass:${assetClass.toString()}, batchId:$batchId) started invoked at (${new Date().toString()})"
 
@@ -93,7 +94,7 @@ class ImportService {
 			throw new InvalidParamException("Specified batch is not for the asset class $assetClass")
 		}
 
-		if ( dataTransferBatch.statusCode == STATUS_COMPLETE ) {
+		if ( dataTransferBatch.statusCode == DataTransferBatch.COMPLETED ) {
 			log.warm "$warn for previously processed batch $batchId, project:$project"
 			throw new InvalidParamException('Specified batch was previously processed')
 		}
@@ -131,14 +132,48 @@ class ImportService {
 		return data
 	} 
 
+	/**
+	 * Used to update the progressService with the current state of the import job
+	 * @param progressKey - the key used to access the 
+	 * @param current - index of the current record
+	 * @param total - the index of the total number of records to process
+	 */
+	void updateJobProgress(String progressKey, int current, int total) {
+
+	}
+
+	/**
+	 * Used to clear out the hibernate session of objects no longer needed to help performance
+	 * @param counter - a count of how many transactions have occurred (running tally)
+	 * @param project - the project object
+	 * @param userLogin - the User login object
+	 * @param dtb - the data transfer batch being processed
+	 */
+	void resetHibernateSession(int counter, Project project, UserLogin userLogin, DataTransferBatch dtb) {
+		if (currentCount.mod(HIBERNATE_BATCH_SIZE) == 0) {
+			log.info "Processed $currentCount ${dtb.eavEntityType?.domainName} records for batch (${dtb.id})"
+
+			def hibernateSession = sessionFactory.getCurrentSession()
+			hibernateSession.flush()
+			hibernateSession.clear()
+
+			// Re-fetch a few objects that we need around that otherwise cause missing session errors
+			project = project.merge()
+			userLogin = userLogin.merge()
+			dtb = dtb.merge()
+		}
+	}
+
 	/** 
 	 * Used to initialize the session in order to track the progress of the process
 	 * @param session - the browser Session object
 	 * @param  assetCount - the number of assets to be processed by the batch
 	 */
 	void initProgress(session, assetCount) {
-		session.setAttribute("TOTAL_BATCH_ASSETS", assetCount)
-		session.setAttribute("TOTAL_PROCESSES_ASSETS", 0)
+		if (session) {
+			session.setAttribute("TOTAL_BATCH_ASSETS", assetCount)
+			session.setAttribute("TOTAL_PROCESSES_ASSETS", 0)
+		}
 	}
 
 	/**
@@ -151,7 +186,7 @@ class ImportService {
 	void updateProgress(session, currentCount, boolean forceUpdate=false) {
 
 		// Only need to update the session every n records since the browser polling is at 5 seconds
-		if (forceUpdate || currentCount.mod(50) == 0)
+		if (session && ( forceUpdate || currentCount.mod(50) == 0))
 			session.setAttribute("TOTAL_PROCESSES_ASSETS", currentCount)
 
 		/*
@@ -160,18 +195,14 @@ class ImportService {
 		if (currentCount.mod(HIBERNATE_BATCH_SIZE) == 0) {
 			log.info "Processed $currentCount ${dtb.eavEntityType?.domainName} records for batch (${dtb.id})"
 
-			Long pid = project.id
-			Long uid = userLogin.id
-			Long did = dtb.id
-
 			def hibernateSession = sessionFactory.getCurrentSession()
 			hibernateSession.flush()
 			hibernateSession.clear()
 
 			// Re-fetch a few objects that we need around that otherwise cause missing session errors
-			project = Project.get(pid)
-			userLogin = UserLogin.get(uid)
-			//dtb = DataTransferBatch.get(did)
+			project = project.merge()
+			userLogin = userLogin.merge()
+			dtb = dtb.merge()
 		}
 		*/		
 	}
@@ -180,8 +211,8 @@ class ImportService {
 	 * This method is used to set the Hibernate Session FlushMode which might be helpful under certain condiitions
 	 */
 	private void setSessionFlushMode( flushMode=FlushMode.COMMIT ) {
-		def session = sessionFactory.getCurrentSession()
-		session.setFlushMode(flushMode)
+		//def session = sessionFactory.getCurrentSession()
+		//session.setFlushMode(flushMode)
 	}
 
 	/**
@@ -211,8 +242,8 @@ class ImportService {
 		String methodName = 'reviewImportBatch()'
 		StringBuffer sb = new StringBuffer()
 
-		setSessionFlushMode( flushMode=FlushMode.COMMIT ) 
-				
+		setSessionFlushMode( FlushMode.COMMIT ) 
+
 		Project project = Project.read(projectId)
 		UserLogin userLogin = UserLogin.read(userLoginId)
 
@@ -453,6 +484,108 @@ class ImportService {
 			log.error "updateDataTransferBatchStatus() unable to update DataTransferBatch ${GormUtil.allErrorsString(dtb)}"
 			throw new DomainUpdateException("Unable to update the transfer batch status to $statusCode")
 		}
+		log.debug "updateDataTransferBatchStatus() Updated the $dtb status to $statusCode"
+	}
+
+	String validateImportBatchCanBeProcessed(Long projectId, Long batchId) {
+		String errorMsg
+		while (true) {
+			DataTransferBatch dtb = DataTransferBatch.read(batchId)
+			if (! dtb) {
+				errorMsg = "Unable to locate batch id ($batchId)"
+				break
+			}
+
+			// Validate that the project matches the user's
+			if (dtb.project.id != projectId) {
+				securityService.reportViolation("attemped to post import batch ($batchId) that is not associated with current project ($projectId)")
+				errorMsg = 'Invalid batch id was submitted'
+				break
+			}
+
+			// Check the status of the batch and make sure it is still PENDING
+			if (dtb.statusCode == 'POSTING') {
+				errorMsg = 'It appears that someone is presently processing this batch'
+				break
+			}
+			if (dtb.statusCode == 'COMPLETED') {
+				errorMsg = 'The batch has already been completed'
+				break
+			}
+			if (dtb.statusCode != 'PENDING') {
+				errorMsg = 'The batch must be in the PENDING status in order to process'
+				break
+			}
+			break
+		}
+		return errorMsg
+	}
+
+	/**
+	 * This is a stub function that will invoke the various processAssetClassImport method and can be called from the controller or job
+	 * @param projectId - the id of the project that the user that invoked the task
+	 * @param userLoginId - the id of the UserLogin object for the user
+	 * @param batchId - the id number of the DataTransferBatch to be processed
+	 * @param progressKey - the key reference the progressService job to update users of the progress
+	 * @param timeZoneId - the timezone of the current user
+	 * @return map of the various attributes returned from the service
+	 */
+	Map invokeAssetImportProcess(Long projectId, Long userLoginId, Long batchId, String progressKey, timeZoneId) {
+		Map results = [:]
+		String errorMsg
+		String methodName = 'invokeAssetImportProcess()'
+		while (true) {
+			try {
+				def session = sessionFactory.currentSession
+
+				log.debug "$methodName Current flushMode=${session.flushMode}"
+				// Set the hibernate flush mode to be controlled by us for performance reasons
+				session.setFlushMode(FlushMode.COMMIT)				
+				
+				errorMsg = validateImportBatchCanBeProcessed(projectId, batchId)
+				if (errorMsg)
+					break
+
+				DataTransferBatch.withTransaction { tx -> 
+
+					DataTransferBatch dtb = DataTransferBatch.read(batchId)
+
+					// Figure out which service method to invoke based on the DataTransferBatch entity type domain name
+					String domainName = dtb.eavEntityType?.domainName
+					assert domainName
+					String servicMethodName = "process${domainName}Import"
+
+					results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId) 
+					errorMsg = results.error
+
+					session.flush()
+					session.clear()
+					//tx.commit()
+				}
+			} catch (UnauthorizedException e) {
+				errorMsg = e.getMessage()
+			} catch (InvalidParamException e) {
+				errorMsg = e.getMessage()
+			} catch (DomainUpdateException e) {
+				errorMsg = e.getMessage()
+			} catch (RuntimeException e) {
+
+				// For non-TM exceptions, we don't want to show everything to the user
+				errorMsg = 'An error occurred while processing the import. Please contact support for assistance.'
+				if (log.isDebugEnabled()) {
+					errorMsg = "$errorMsg ${e.getMessage()}"
+				}
+				log.error "deviceProcess() failed : ${e.getMessage()} : userLogin ($userLoginId) : batchId $batchId"
+				log.error ExceptionUtil.stackTraceToString(e)
+			}
+			break
+		}
+
+		if (errorMsg) {
+			return [error:errorMsg]
+		} else {
+			return results
+		}
 	}
 
 	/**	
@@ -460,10 +593,11 @@ class ImportService {
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginID - the id of user login object of whom invoked the process
 	 * @param batchId - the id number of the batch to be processed
-	 * @param session - the controller session that invoked this method (used to update session variables used for progress updates)
+	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @return map of the various attributes returned from the service
 	 */
-	Map processApplicationImport(Long projectId, Long userLoginId, String batchId, Object session, tzId) {
+	Map processApplicationImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 
 		// Flag if we want performance information throughout the method
 		boolean performance=true
@@ -488,8 +622,6 @@ class ImportService {
 		def assetsList = new ArrayList()
 		def application
 		int assetCount
-		String batchStatusCode
-		Long dtbId
 
 		//
 		// Load initial data for method
@@ -499,9 +631,6 @@ class ImportService {
 
 		DataTransferBatch dataTransferBatch = processValidation(project, userLogin, AssetClass.APPLICATION, batchId)
 		if (performance) log.debug "processValidation() took ${TimeUtil.elapsed(startedAt)}"
-
-		batchStatusCode = dataTransferBatch.statusCode
-		dtbId = dataTransferBatch.id
 
 		// Fetch all of the common data shared by all of the import processes
 		def now = new Date()
@@ -513,7 +642,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		assetCount = dataTransferValueRowList.size()
 
-		initProgress(session, assetCount)
+		updateJobProgress(progressKey, 1, assetCount)
 
 		if (log.isDebugEnabled()) {
 			def fubar = new StringBuilder("Staff List\n")
@@ -625,14 +754,11 @@ class ImportService {
 				application, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow)
+			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
 
 		} // for
-		
-		updateProgress(session, assetCount, true)
 
-		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
-		batchStatusCode = dataTransferBatch.statusCode
+		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
 			
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
@@ -664,7 +790,13 @@ class ImportService {
 
 		sb.append("<br>Process batch took $elapsedTime to complete")
 
-		return [elapsedTime: elapsedTime, batchStatusCode: batchStatusCode, info: sb.toString()] 
+		String info = sb.toString()
+
+
+		updateJobProgress(progressKey, assetCount, assetCount, )
+
+
+		return [elapsedTime: elapsedTime, batchStatusCode: dataTransferBatch.statusCode, info: sb.toString()] 
 	}	
 
 	/**	
@@ -672,10 +804,11 @@ class ImportService {
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginId - the id of the user login object of whom invoked the process
 	 * @param batchId - the id number of the batch to be processed
-	 * @param session - the controller session that invoked this method (used to update session variables used for progress updates)
+	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @return map of the various attributes returned from the service
 	 */
-	Map processAssetEntityImport(Long projectId, Long userLoginId, String batchId, Object session, tzId) {
+	Map processAssetEntityImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 		String methodName='processAssetEntityImport()'
 		AssetClass assetClass = AssetClass.DEVICE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -721,7 +854,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
-		initProgress(session, assetCount)
+		updateJobProgress(progressKey, 1, assetCount)
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
@@ -925,17 +1058,15 @@ class ImportService {
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
-			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow)
-
 			if (performance) log.debug "$methodName Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
 
-		} // for loop
-			
-		// One final update of the session
-		updateProgress(session, assetCount, true)
+			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
 
-		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
+		} // for
+
+		updateJobProgress(progressKey, assetCount, assetCount)
+
+		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
 		
 		// Update assets racks, cabling data once process done
 		// TODO : JPM 9/2014 : updateCablingOfAssets was commented out until we figure out what to do with this function (see TM-3308)
@@ -988,10 +1119,11 @@ class ImportService {
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginId - the id of the user login object of whom invoked the process
 	 * @param batchId - the id number of the batch to be processed
-	 * @param session - the controller session that invoked this method (used to update session variables used for progress updates)
+	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @return map of the various attributes returned from the service
 	 */
-	Map processDatabaseImport(Long projectId, Long userLoginId, String batchId, Object session, tzId) {
+	Map processDatabaseImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 		String methodName='processDatabaseImport()'
 		AssetClass assetClass = AssetClass.DATABASE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1030,7 +1162,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
-		initProgress(session, assetCount)
+		updateJobProgress(progressKey, 1, assetCount)
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
@@ -1078,12 +1210,13 @@ class ImportService {
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
-			// Update status and clear hibernate session
-			assetEntityAttributeLoaderService.updateStatusAndClear(project, dataTransferValueRow, sessionFactory, session)
+			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
 
 		} // for
 
-		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
+		updateJobProgress(progressKey, assetCount, assetCount)
+
+		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
 
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
@@ -1122,10 +1255,11 @@ class ImportService {
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
 	 * @param userLoginId - the id of the user login object of whom invoked the process
 	 * @param batchId - the id number of the batch to be processed
-	 * @param session - the controller session that invoked this method (used to update session variables used for progress updates)
+	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @return map of the various attributes returned from the service
 	 */
-	Map processFilesImport(Long projectId, Long userLoginId, String batchId, Object session, tzId) {
+	Map processFilesImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
 		String methodName='processAssetEntityImport()'
 		AssetClass assetClass = AssetClass.STORAGE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1165,7 +1299,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
-		initProgress(session, assetCount)
+		updateJobProgress(progressKey, 1, assetCount)
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
@@ -1223,13 +1357,13 @@ class ImportService {
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow)
+			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
 
 		} // for
 
-		updateProgress(session, assetCount, true)
+		updateJobProgress(progressKey, assetCount, assetCount)
 
-		updateDataTransferBatchStatus(dataTransferBatch, STATUS_COMPLETE)
+		updateDataTransferBatchStatus(dataTransferBatch, DataTransferBatch.COMPLETED)
 
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 

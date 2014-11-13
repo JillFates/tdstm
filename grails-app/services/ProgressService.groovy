@@ -16,6 +16,12 @@ import com.tdssrc.grails.TimeUtil
  */
 class ProgressService {
 
+	static final String FAILED='failed'
+	static final String DONE='done'
+	static final String PENDING='pending'
+	static final String STARTED='started'
+	static final String PAUSED='paused'
+
 	Cache<String, ProgressInfo> progressInfo 
 	//REMOVE THIS. ONLY FOR DEMO
 	ExecutorService service
@@ -26,7 +32,7 @@ class ProgressService {
 			.build();
 			
 		//REMOVE THIS. ONLY FOR DEMO
-		this.service = Executors.newFixedThreadPool(10)
+		//this.service = Executors.newFixedThreadPool(10)
 	}
 	
 	/**
@@ -52,6 +58,11 @@ class ProgressService {
 	 * @param remainingTime - an estimate of the remainingTime before the task completes (optional)
 	 */
 	void update(String key, Integer percentComp, String status, String detail='', TimeDuration remainingTime=null) {
+		log.debug "update() key=$key, percentComp=percentComp, status=$status"
+		if (key == null) {
+			log.error "update() called with null key"
+			return
+		} 
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
 			log.debug("update() Key was found ${key}")
@@ -116,7 +127,7 @@ class ProgressService {
 		
 		for (def entry : this.progressInfo.asMap().entrySet()) {
 			def info = this.get(entry.getKey())
-			results.add(info)
+			results << [ entry.getKey(), info ]
 		}
 		
 		return results

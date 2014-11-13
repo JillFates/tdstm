@@ -182,9 +182,11 @@
 		<g:javascript src="jquery/ui.progressbar.js"/>
 		<script type="text/javascript">
 			var checkProgressBar;
+			var progressKey='';
 			var progressIntervalHandle=0;
 			var progressBar = $("#progressbar");
 			var messageDiv = $("#messageId");
+			var postingFlag = false;	// used to limit one posting at a time
 
 			function showProcessBar(e){
 				var progress = eval('(' + e.responseText + ')');			
@@ -196,25 +198,33 @@
 
 			// This method will kickoff the Process function
 			function kickoffProcess(forWhom, batchId) {
+				if (postingFlag) {
+					alert('You can only perform one posting at a time.');
+					return;
+				}
 				if ( ! confirm('Please confirm that you want to post the import to inventory?') ) {
 					return false;
 				}
+				postingFlag = true;
 
 				messageDiv.html('Posting imported assets to inventory').show();
 
 				$.ajax({
 					type: "POST",
 					async: true,
-					url: tdsCommon.createAppURL('/dataTransferBatch/processImportBatch/'+batchId),
+					url: tdsCommon.createAppURL('/import/invokeAssetImportProcess/'+batchId),
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
-						stopProgressBar();
+						// stopProgressBar();
 						if (response.status == 'error') {
 							alert(response.errors);
 							console.log('Error: kickoffProcess() : ' + response.errors);
+							postingFlag=false;
 						} else {
 							var results = response.data.results;
-							messageDiv.html(results.info).show();
+							progressKey = results.progressKey;	// Used to get the progress updates
+
+							//messageDiv.html(results.info).show();
 							$("#"+forWhom+"ReviewId_"+batchId).hide();
 							$("#statusCode"+batchId).html( results.batchStatusCode);
 
@@ -222,15 +232,17 @@
 						}
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
-						stopProgressBar();
+						// stopProgressBar();
 						console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
-						alert('An error occurred during the Process update');
+						alert('An error occurred while invoking the posting process.');
+						postingFlag = false;
 					}
 				});
 
-				reloadPageWhenDone=true;
-				startProgressBar();
-				return true;
+				//reloadPageWhenDone=true;
+				//startProgressBar();
+				//return true;
+				return false;
 			}
 
 			// used to set the interval to display progress meter bar

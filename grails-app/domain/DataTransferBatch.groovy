@@ -1,14 +1,21 @@
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.eav.EavEntityType
+
 class DataTransferBatch {
 	Date dateCreated
-	String statusCode
+	String statusCode=LOADING
 	Date lastModified
 	Integer versionNumber
 	String  transferMode
 	Date exportDatetime
 	Integer hasErrors = 0
-	
+
+	static final String LOADING='LOADING'
+	static final String PENDING='PENDING'
+	static final String POSTING='POSTING'
+	static final String COMPLETED='COMPLETED'	
+	static final String ERROR='ERROR'
+
 	static hasMany = [ dataTransferValue:DataTransferValue ]
 	
 	static belongsTo = [ dataTransferSet : DataTransferSet, project : Project, userLogin : UserLogin, eavEntityType : EavEntityType ]
@@ -22,7 +29,7 @@ class DataTransferBatch {
 		}
 	}
 	static constraints = {
-		statusCode( blank:false, size:0..20 )
+		statusCode( blank:false, size:0..20, inList: [LOADING,PENDING,POSTING,COMPLETED,ERROR])
 		dateCreated( nullable:true )
 		exportDatetime( nullable:true )
 		lastModified( nullable:true )
@@ -34,9 +41,9 @@ class DataTransferBatch {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastModified = GormUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.nowGMT()
 	}
 }
