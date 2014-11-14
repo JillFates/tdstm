@@ -63,4 +63,5 @@ databaseChangeLog = {
 	include file: '20141111-set-default-model-on-racks.groovy'
 	include file: '20141112-clean-up-preference-columns.groovy'
 	include file: '20141113-addSomeColumnsTo-DataTransferBatch.groovy'
+	include file: '20141114-addIndexTo_DataTransferValue_table.groovy'
 }
