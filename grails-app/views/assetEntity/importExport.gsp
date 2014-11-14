@@ -12,6 +12,7 @@
 		 */
 		var handle=0;
 		var requestCount=0;
+		var buttonClicked=false;
 
 		function showProcessBar(e) {
 			var progress = eval('(' + e.responseText + ')');
@@ -28,6 +29,14 @@
 		 */
 		jQuery(function($) {
 	        $("#run").click(function() {
+	        	if (buttonClicked) {
+	        		alert('You already have already clicked the Import Batches button.');
+	        		return false;
+	        	} 
+	        	buttonClicked=true;
+	        	// Some reason if the button gets disabled it prevents the original click process to continue, we should switch to the JQuery Once function
+	        	//$('#run').prop('disabled',true);
+
 	        	var progressBar = $("#progressbar");
 				progressBar.reportprogress(0, 0, 'Uploading &amp; verifying spreadsheet...');
 				progressBar.css("display","block");
