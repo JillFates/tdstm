@@ -12,13 +12,13 @@
 		<g:javascript src="progressBar.js" />
 	
 		<script type="text/javascript">
-			var checkProgressBar;
-			var progressBarRefreshRate=5000; // msec
-			var progressIntervalHandle=0;
-			var progressBar = $("#progressbar");
-			var messageDiv = $("#messageId");
-			var reloadPageWhenDone=false;
+			// var checkProgressBar;
+			//var progressBarRefreshRate=5000; // msec
+			//var progressIntervalHandle=0;
+			//var progressBar = $("#progressbar");
+			// var reloadPageWhenDone=false;
 
+/*
 			// This method is used to capture the contents of the Progress meter bar Ajax call
 			function onIFrameLoad() {
 				var serverResponse = $("#iFrame").contents().find("pre").html();
@@ -39,6 +39,7 @@
 					}
 				}
 			}
+*/
 		</script>
 	</head>
     <body>
@@ -148,11 +149,6 @@
 										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 									</g:if> 
 
-									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == null}">
-										<g:link action="deviceProcess" params="[batchId:dataTransferBatch.id]" onclick = "return getProgress();" >Process</g:link>
-										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
-									</g:if>                     
-
 								</g:if>
 								<g:else>
 									<g:if test="${dataTransferBatch?.hasErrors == 1}">
@@ -176,12 +172,17 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 		<g:javascript src="jquery/ui.progressbar.js"/>
 		<script type="text/javascript">
-			//var checkProgressBar;
+
+			var messageDiv = $("#messageId");
+
 			var progressKey='';
-			//var progressIntervalHandle=0;
-			//var progressBar = $("#progressbar");
 			var messageDiv = $("#messageId");
 			var postingFlag = false;	// used to limit one posting at a time
+			var progressModal;
+
+			//var checkProgressBar;
+			//var progressIntervalHandle=0;
+			//var progressBar = $("#progressbar");
 /*
 			function showProcessBar(e){
 				var progress = eval('(' + e.responseText + ')');			
@@ -224,10 +225,10 @@
 							var results = response.data.results;
 							progressKey = results.progressKey;	// Used to get the progress updates
 
-							var taskProgressBar = new TaskProgressBar(
+							var progressModal = new TaskProgressBar(
 								progressKey, 
 								5000, 
-								null, 
+								function() { progressModal=null; }, 
 								function() { showProcessResults(assetClass, batchId, reviewOrProcess); },
 								title
 							);
@@ -251,6 +252,7 @@
 			// This is called at the edit after a successful batch process that will make Ajax call to get the results of the review or posting results
 			//
 			function showProcessResults(assetClass, batchId, reviewOrProcess) {
+				progressModal=null;
 				$.ajax({
 					type: "POST",
 					async: true,
@@ -258,6 +260,7 @@
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
 						// stopProgressBar();
+						debugger;
 						if (response.status == 'error') {
 							alert('An error occurred while trying to lookup the results.');
 							console.log('Error: showProcessResults() : ' + response.errors);

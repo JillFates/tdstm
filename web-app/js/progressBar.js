@@ -1,8 +1,10 @@
 function TaskProgressBar(taskId, pingTime, onSuccess, onFailure, progressTitle) {
 	this.taskId = taskId;
 	this.pingTime = pingTime;
+
 	this.onSuccess = onSuccess;
 	this.onFailure = onFailure;
+
 	this.lastUpdated = 0;
 	this.noProgressCount = 0; 	// Used to keep track of # of times called service and got same lastUpdated 
 	if (progressTitle == undefined) {
