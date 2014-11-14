@@ -21,6 +21,18 @@ class ControllerService {
 	def assetEntityService
 	def securityService
 
+	/** 
+	 * A utility service to just dump the parameters
+	 * @param controller - the controller object
+	 * @param params - the parameters
+	 */
+	void dumpParams(controller, params) {
+		StringBuffer sb = new StringBuffer('<h1>Dump of params</h1><ul>')
+		params.each {k,v -> sb.append("<li>$k=$v</li>")}
+		sb.append('</ul>')
+		controller.render sb.toString()
+	}
+
 	/**
 	 * Used to get the user default project for a page request or redirects user to the Project List view
 	 * @param controller - a reference to the controller

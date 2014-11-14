@@ -351,7 +351,7 @@ class AssetEntityController {
 		getColumnNames(appDTAMap, appColumnslist, project)
 		getColumnNames(databaseDTAMap, databaseColumnslist, project)
 		getColumnNames(filesDTAMap, filesColumnslist, project)
-		
+
 		/*	def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
 		 def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
 		 def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']*/
@@ -517,11 +517,10 @@ class AssetEntityController {
 					}
 				}
 				
-				commentCount = commentsSheet.rows
 				//
 				// Assets
 				//
-				if(params.asset == 'asset') {
+				if (params.asset == 'asset') {
 					flagToManageBatches = true
 					session.setAttribute("TOTAL_ASSETS",assetsCount)
 					def eavEntityType = EavEntityType.findByDomainName('AssetEntity')
@@ -893,7 +892,7 @@ class AssetEntityController {
 				/**
 				 * imports Cabling data
 				 */
-				if(params.cabling=='cable'){
+				if (params.cabling=='cable'){
 					session.setAttribute("TOTAL_ASSETS",cablingCount)
 					cablingAdded = cablingCount-1
 					warnMsg += '<ul>'
@@ -902,12 +901,14 @@ class AssetEntityController {
 						<li>$resultMap.cablingUpdated cables updated
 						<li>$resultMap.cablingSkipped new cables skipped
 						$resultMap.warnMsg</ul>"""
-				}
+				} // if (params.cabling=='cable')
 				
 				/**
 				 * Importing coment
 				 */
 				if (params.comment=='comment') {
+					commentCount = commentsSheet.rows
+
 					session.setAttribute("TOTAL_ASSETS",commentCount)
 					def errorMsg = new StringBuilder("<ul>");
 					def projectInstance = securityService.getUserCurrentProject()
@@ -937,7 +938,7 @@ class AssetEntityController {
 						assetComment.project = project
 						
 						def assetId = commentsSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-						if(assetId){
+						if (assetId) {
 							def formattedId = NumberUtils.toDouble(assetId, 0).round()
 							def assetEntity = AssetEntity.findByIdAndProject(formattedId, project)
 							if(assetEntity){
@@ -952,11 +953,9 @@ class AssetEntityController {
 							continue;
 						}
 						
-						
-						
 						def categoryInput = commentsSheet.getCell( ++cols, r ).contents?.replace("'","\\'")?.toLowerCase()?.trim()
 						
-						if(AssetCommentCategory.list.contains(categoryInput)){
+						if (AssetCommentCategory.list.contains(categoryInput)){
 							assetComment.category =  categoryInput ?: AssetCommentCategory.GENERAL
 						} else{
 							recordForAddition ? skippedAdded++ : skippedUpdated++
@@ -967,22 +966,21 @@ class AssetEntityController {
 						
 						def createdDateInput = commentsSheet.getCell( ++cols, r ).contents?.replace("'","\\'")
 						def dateCreated = DateUtil.parseImportedCreatedDate(createdDateInput)
-						if(dateCreated instanceof Date){
+						if (dateCreated instanceof Date){
 							assetComment.dateCreated = TimeUtil.convertInToGMT(dateCreated, tzId)
 						} else {
 							recordForAddition ? skippedAdded++ : skippedUpdated++
 							errorMsg.append("<li> $dateCreated .</li>")
-							continue;
+							continue
 						}
-						
-						
+												
 						def createdByImported = StringUtils.strip(commentsSheet.getCell( ++cols, r ).contents)
 						if (currentUser == null) {
 							currentUser = securityService.getUserLoginPerson()
 						}
 						def person = createdByImported ? personService.findPerson(createdByImported, project, staffList)?.person : currentUser
 						
-						if(person){
+						if (person){
 							assetComment.createdBy = person
 						} else {
 							recordForAddition ? skippedAdded++ : skippedUpdated++
@@ -1014,33 +1012,12 @@ class AssetEntityController {
 					
 					errorMsg.append("</ul>");
 					warnMsg += errorMsg.toString();
-				}
-				/*for( int i=0;  i < sheetNamesLength; i++ ) {
-					if(sheetNames[i] == "Comments"){
-						def commentSheet = workbook.getSheet(sheetNames[i])
-						for( int rowNo = 1; rowNo < commentSheet.rows; rowNo++ ) {
-							def dataTransferComment
-							def commentId = commentSheet.getCell(1,rowNo).contents
-							def assetCommentId
-							if( commentId != "" && commentId != null ) {
-								assetCommentId = Integer.parseInt(commentId)
-								dataTransferComment = DataTransferComment.findByCommentId(commentId)
-							}
-							if( dataTransferComment == null ) {
-								dataTransferComment = new DataTransferComment()
-							}
-							dataTransferComment.commentId = assetCommentId
-							dataTransferComment.assetId = Integer.parseInt(commentSheet.getCell(0,rowNo).contents)
-							dataTransferComment.commentType = commentSheet.getCell(3,rowNo).contents
-							dataTransferComment.comment = commentSheet.getCell(4,rowNo).contents
-							dataTransferComment.rowId = rowNo
-							dataTransferComment.dataTransferBatch = dataTransferBatch
-							dataTransferComment.save()
-						}
-					}
-				}*/
 
+					commentCount--		// Decrement to account for the header row
+
+				} // if (params.comment=='comment')
 			} // generate error message
+
 			workbook.close()
 			added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
 			
@@ -1053,7 +1030,7 @@ class AssetEntityController {
 				"<li>$filesAdded Storage loaded" + 
 				"<li>$dependencyAdded Dependency loaded" +
 				"<li>$cablingAdded cables loaded" +
-				"<li>${commentCount-1} Comments loaded" +
+				"<li>${commentCount} Comments loaded" +
 				warnMsg +
 				( skipped.size() ? "<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
 				'</ul></p>'
