@@ -256,7 +256,6 @@ class ApplicationController {
 	}
 
 	def show = {
-		log.debug "******* show() id=${params.id}"
 		def app
 		def project = controllerService.getProjectForPage( this )
 		if (project) {

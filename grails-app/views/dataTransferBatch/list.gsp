@@ -222,7 +222,7 @@
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
 						// stopProgressBar();
-						debugger;
+						// debugger;
 						if (response.status == 'error') {
 							alert('An error occurred while trying to lookup the results.');
 							console.log('Error: showProcessResults() : ' + response.errors);

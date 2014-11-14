@@ -1123,7 +1123,7 @@ class AssetEntityAttributeLoaderService {
 		String methodName = 'saveAssetChanges()'
 		def saved = false
 		if ( asset.id ) {
-			if ( true || asset.dirtyPropertyNames.size() ) {
+			if ( asset.dirtyPropertyNames.size() ) {
 				// Check to see if dirty
 				log.info "$methodName Updated asset ${asset.id} ${asset.assetName} - Dirty properties: ${asset.dirtyPropertyNames}"
 				saved = asset.validate() && asset.save(flush:true)

@@ -180,8 +180,9 @@ class ImportService {
 			if (total < 1 || current > total) {
 				log.error "jobProgressUpdate() called with invalid total ($progressKey, $current, $total)"
 			} else {
-				int diff = total-current
-				if (diff.mod(2)) {
+				int twoPerc = Math.round(total/100*2)
+				log.debug "twoPerc = $twoPerc"
+				if (current.mod(twoPerc)==0) {
 					int percComp = Math.round(current/total*100)
 					progressService.update(progressKey, (int)percComp, ProgressService.STARTED, "$current of $total")
 				}
@@ -931,6 +932,8 @@ class ImportService {
 		def now = new Date()
 		Map data = loadBatchData(dataTransferBatch)
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
+
+def x = 1/0
 
 		def eavAttributeSet = data.eavAttributeSet
 		List staffList = data.staffList
