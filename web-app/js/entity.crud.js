@@ -1005,12 +1005,12 @@ var EntityCrud = ( function($) {
 		var editModal = pub.getEditModal();
 
 		if (editModal.length) {
+			pub.closeShowModal();
+			pub.closeCreateModal();
 			editModal.html(html);
 			editModal.dialog('option', 'width', 'auto');
 			editModal.dialog('option', 'position', ['center','top']);
 			editModal.dialog('open');
-			pub.closeShowModal();
-			pub.closeCreateModal();
 
 			if(!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
@@ -1074,12 +1074,12 @@ var EntityCrud = ( function($) {
 		}
 
 		if (showModal.length) {
+			pub.closeCreateModal();
+			pub.closeEditModal();
 			showModal.html(html);
 			showModal.dialog('option', 'width', 'auto');
 			showModal.dialog('option', 'position', ['center','top']);
 			showModal.dialog('open');
-			pub.closeCreateModal();
-			pub.closeEditModal();
 			updateAssetTitle(fieldHelpType);
 			if (!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
