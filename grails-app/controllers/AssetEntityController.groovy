@@ -1024,12 +1024,12 @@ class AssetEntityController {
 			def message = "<b>Spreadsheet import was successful</b>" +
 				( flagToManageBatches ? '<p>Please click the Manage Batches below to review and post these changes</p>' : '' ) +
 				'<p>Results: <ul>' +
-				"<li>${serverAdded} Servers loaded" + 
+				"<li>${serverAdded} Devices loaded" + 
 				"<li>$appAdded Applications loaded" + 
 				"<li>$dbAdded Databases loaded" +
-				"<li>$filesAdded Storage loaded" + 
+				"<li>$filesAdded Logical Storage loaded" + 
 				"<li>$dependencyAdded Dependency loaded" +
-				"<li>$cablingAdded cables loaded" +
+				"<li>$cablingAdded Cables loaded" +
 				"<li>${commentCount} Comments loaded" +
 				warnMsg +
 				( skipped.size() ? "<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul><li>${skipped.join('<li>')}</ul>" : '' ) +
