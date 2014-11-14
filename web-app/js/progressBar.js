@@ -64,13 +64,19 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 
 	var finishProgressBar = function(onFinishCallback) {
 		setTimeout(function() {
-			$('#globalProgressBar').modal('hide');
+			hideModal();
 			$(refUiContainerId).html('');
 			if (onFinishCallback) {
 				onFinishCallback();
 			}
 		}, 1000);
 
+	}
+
+	var hideModal = function() {
+		$('#globalProgressBar').modal('hide');
+		$('body').removeClass('modal-open');
+		$('.modal-backdrop').remove();
 	}
 
 	var showProgressBar = function() {

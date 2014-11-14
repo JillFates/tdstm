@@ -184,8 +184,8 @@
 								onclick="importExportPreference($(this),'ImportCabling')"
 								${prefMap['ImportCabling']=='true' ? 'checked="checked"' :''}/>
 							&nbsp;
-							<label for="cablingId">Cabling</label><
-						/span>
+							<label for="cablingId">Cabling</label>
+						</span>
 						<br>
 
 						<span>
@@ -195,7 +195,7 @@
 							&nbsp;
 							<label for="commentId">Comment</label>
 						</span>
-						
+
 	                </td>
                 </tr>
 

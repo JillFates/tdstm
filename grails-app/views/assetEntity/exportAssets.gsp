@@ -44,15 +44,17 @@
 		    });
 		});
 	</script>
-  </head>
-  <body>
- <div class="body">
-   <h1>Asset Export</h1>
-	  <g:if test="${flash.message}">
-        <div class="message">${flash.message}</div>
-      </g:if>
+	</head>
+	<body>
+	<div class="body">
+		<h1>Asset Export</h1>
 
-      <g:form id="exportForm" action="export" method="post" name="exportForm">
+		<g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+		</g:if>
+
+		<g:form id="exportForm" action="export" method="post" name="exportForm">
+        
         <input type="hidden" value="${projectId}" name="projectIdExport" />
         <div class="dialog">
           <table style="width:500px; margin-left:10px;">
@@ -153,8 +155,11 @@
         </div>
     </g:form>
     </div>
-<script>
-	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
-</script>
-  </body>
+
+	<script>
+		currentMenuId = "#assetMenu";
+		$("#assetMenuId a").css('background-color','#003366')
+	</script>
+
+	</body>
+</html>
