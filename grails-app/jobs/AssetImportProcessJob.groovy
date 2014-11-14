@@ -2,6 +2,7 @@ import org.quartz.JobExecutionContext
 import org.quartz.SimpleTrigger
 import org.quartz.Trigger
 import org.quartz.JobExecutionException
+import com.tdsops.common.lang.ExceptionUtil
 
 class AssetImportProcessJob {
 
@@ -47,22 +48,7 @@ class AssetImportProcessJob {
 			log.info "execute() return from importService.invokeAssetImportProcess() : results=$results"
 			
 		} catch (e) {
-			errorMsg = e.getMessage()
+			ExceptionUtil.stackTraceToString(e)
 		}
- 
-		// Need to persist the data back to the batch and stop the job
-		if (errorMsg) {
-			results = [status:'error', errors: errorMsg]
-			log.info "execute() received an error $errorMsg"
-		} else {
-			results.status = 'success'
-			log.info "execute() call to service was successful"
-
-			// TODO : JPM 11/2014 : persist the info and other information
-		}
-
-		// Store the results so the the client can grab it afterward
-		progressService.updateData(progressKey, 'results', results)
-
-	}
+ 	}
 }

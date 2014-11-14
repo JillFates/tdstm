@@ -17,9 +17,9 @@ import com.tdssrc.grails.TimeUtil
 class ProgressService {
 
 	static final String FAILED='failed'
-	static final String DONE='Completed'
+	static final String COMPLETED='Completed'
 	static final String PENDING='pending'
-	static final String STARTED='In process'
+	static final String STARTED='In progress'
 	static final String PAUSED='paused'
 
 	Cache<String, ProgressInfo> progressInfo 
@@ -58,7 +58,7 @@ class ProgressService {
 	 * @param remainingTime - an estimate of the remainingTime before the task completes (optional)
 	 */
 	void update(String key, Integer percentComp, String status, String detail='', TimeDuration remainingTime=null) {
-		log.debug "update() key=$key, percentComp=percentComp, status=$status"
+		log.debug "update() key=$key, percentComp=$percentComp, status=$status"
 		if (key == null) {
 			log.error "update() called with null key"
 			return

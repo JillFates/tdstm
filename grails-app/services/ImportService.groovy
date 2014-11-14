@@ -55,6 +55,37 @@ class ImportService {
 	// Indicates the number of rows to process before performing a flush/clear of the Hibernate session queue
 	static final int HIBERNATE_BATCH_SIZE=20
 
+
+	/**
+	 * Used to lookup and validate a batch id exists and is associated to the current project
+	 * @param id - the batch id to lookup
+	 * @param projectId - the id of the project that the user is associated with
+	 * @return [DataTransferBatch object, String error message if any] - if error then the DTB object will be null
+	 */
+	List getAndValidateBatch(String id, Long projectId) {
+		String errorMsg
+		DataTransferBatch dtb
+		Long batchId = NumberUtil.toLong(id)
+		if (batchId == null || batchId < 1) {
+			errorMsg = 'An invalid batch id was submitted'
+		} else {
+			dtb = DataTransferBatch.get(batchId)
+			if (!dtb) {
+				errorMsg = 'Unable to find specified batch'
+			} else {
+				if (dtb.project.id != projectId) {
+					securityService.reportViolation("getAndValidateBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)")
+					errorMsg = 'Unable to locate specified batch'
+					dtb = null
+				}			
+			}
+		}
+
+		return [dtb, errorMsg]
+
+	}
+
+
 	/** 
 	 * Used by the process methods to peform the common validation checks before processing
 	 * @param project - the project that the user is logged into and the batch is associated with
@@ -115,8 +146,9 @@ class ImportService {
 		Project project = dtb.project
 
 		Map data = [:]
+
 		data.assetsInBatch = DataTransferValue.executeQuery("select count(distinct rowId) from DataTransferValue where dataTransferBatch=?", [dtb])[0]
-		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
+		data.dataTransferValueRowList = DataTransferValue.findAll("From DataTransferValue d where d.dataTransferBatch=? group by rowId", [dtb])
 		data.staffList = partyRelationshipService.getAllCompaniesStaffPersons(project.client)
 
 		def domainName = dtb.eavEntityType?.domainName
@@ -138,22 +170,34 @@ class ImportService {
 	 * @param current - index of the current record
 	 * @param total - the index of the total number of records to process
 	 */
-	void updateJobProgress(String progressKey, int current, int total) {
+	void jobProgressUpdate(String progressKey, int current, int total) {
+		log.debug "jobProgressUpdate called (current=$current, total=$total"
 
 		// Only increment on modulus of 2% so we're not overwhelming the system unless the values are the same
 		if (current == total) {
 			progressService.update(progressKey, 100I, ProgressService.STARTED)
 		} else {
 			if (total < 1 || current > total) {
-				log.error "updateJobProgress() called with invalid total ($progressKey, $current, $total)"
+				log.error "jobProgressUpdate() called with invalid total ($progressKey, $current, $total)"
 			} else {
 				int diff = total-current
 				if (diff.mod(2)) {
 					int percComp = Math.round(current/total*100)
-					progressService.update(progressKey, percComp, ProgressService.STARTED)
+					progressService.update(progressKey, (int)percComp, ProgressService.STARTED, "$current of $total")
 				}
 			}
 		}
+	}
+
+	/**
+	 * Used to update the progressService with the current state of the import job
+	 * @param progressKey - the key used to access the 
+	 * @param current - index of the current record
+	 * @param total - the index of the total number of records to process
+	 */
+	void jobProgressFinish(String progressKey, String info) {
+		log.debug "jobProgressFinish called"
+		progressService.update(progressKey, 100I, info)
 	}
 
 	/**
@@ -247,9 +291,10 @@ class ImportService {
 	 * @param projectId - the id of the project
 	 * @param userLoginId - the id of the user that has invoked the process
 	 * @param batchId - the id of the batch to examine
+	 * @param progressKey - the key used to update the progress bar service
 	 * @return An error message if any issues otherwise null
 	 */
-	Map reviewImportBatch(Long projectId, Long userLoginId, Long batchId, session) {
+	Map reviewImportBatch(Long projectId, Long userLoginId, Long batchId, String progressKey) {
 		def startedAt = new Date()
 		String errorMsg = ''
 
@@ -258,22 +303,22 @@ class ImportService {
 
 		setSessionFlushMode( FlushMode.COMMIT ) 
 
-		Project project = Project.read(projectId)
-		UserLogin userLogin = UserLogin.read(userLoginId)
+		Project project = Project.get(projectId)
+		UserLogin userLogin = UserLogin.get(userLoginId)
 
 		boolean performance=true
 		def now = new Date()
 
-		DataTransferBatch dtBatch = DataTransferBatch.get(batchId)
-		if (!dtBatch) {
+		DataTransferBatch dtb = DataTransferBatch.get(batchId)
+		if (!dtb) {
 			return [error:'Unable to find batch id']
 		}
-		if (dtBatch.project.id != projectId) {
+		if (dtb.project.id != projectId) {
 			securityService.reportViolation("reviewImportBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)")
 			return [error:'Unable to locate batch id']
 		}
 
-		boolean batchIsForDevices = dtBatch.eavEntityType?.domainName == "AssetEntity"
+		boolean batchIsForDevices = dtb.eavEntityType?.domainName == "AssetEntity"
 		
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
@@ -284,7 +329,7 @@ class ImportService {
 		if (performance) now = new Date()
 		def dataTransferValueRowList = DataTransferValue.findAll(
 			"From DataTransferValue d where d.dataTransferBatch=? " +
-			"and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtBatch])
+			"and d.dataTransferBatch.statusCode='PENDING' group by rowId", [dtb])
 		if (performance) log.debug "Fetching DataTransferValue ROWS took ${TimeUtil.elapsed(now)}"
 
 		if (performance) now = new Date()
@@ -306,7 +351,6 @@ class ImportService {
 		log.debug "$methodName deviceEavEntityType=$deviceEavEntityType, mfgEavAttr=$mfgEavAttr, modelEavAttr=$modelEavAttr, deviceTypeEavAttr=$deviceTypeEavAttr"
 
 		def assetCount = dataTransferValueRowList.size()
-		initProgress(session, assetCount)
 
 		if (performance) {
 			log.info "$methodName Initialization took ${TimeUtil.elapsed(now)}"
@@ -330,8 +374,8 @@ class ImportService {
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			
 			if (batchIsForDevices) {
-				String mfgName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
-				String modelName = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:modelEavAttr)?.importValue
+				String mfgName = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
+				String modelName = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:modelEavAttr)?.importValue
 
 				mfgName = StringUtil.defaultIfEmpty(mfgName, '')
 				modelName = StringUtil.defaultIfEmpty(modelName, '')
@@ -351,7 +395,7 @@ class ImportService {
 
 				// Validate the device type only if the Mfg/Model were not found
 				if (! found) {
-					String deviceType = DataTransferValue.findWhere(dataTransferBatch:dtBatch, rowId:rowId, eavAttribute:deviceTypeEavAttr)?.importValue
+					String deviceType = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:deviceTypeEavAttr)?.importValue
 					if (!deviceTypeMap.containsKey(deviceType.toLowerCase())) {
 						if (!invalidDeviceTypeMap.containsKey(deviceType)) {
 							invalidDeviceTypeMap[deviceType] = 1
@@ -375,15 +419,13 @@ class ImportService {
 			assetIdList << assetEntityId
 
 			// Update status and clear hibernate session
-			updateProgress(session, dataTransferValueRow)
+			jobProgressUpdate(progressKey, rowNum, assetCount)
 
 		} // for
 
-		updateProgress(session, assetCount, true)
-
 		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
 
-		sb.append("<b>Process results of review for batch ${batchId}:</b><ul>" + 
+		sb.append("<b>Results</b><ul>" + 
 			"<li>Assets in batch: $assetCount</li>" +
 			"</ul>"
 		) 
@@ -400,8 +442,6 @@ class ImportService {
 			if (!canCreateMfgAndModel) {
 				sb.append("$indent <b>Note: You do not have the permission necessary to create models during import</b><br>")
 			}
-
-			sb.append('<br>')
 		}
 
 		// Log found Mfg/Model references
@@ -427,7 +467,7 @@ class ImportService {
 			invalidDeviceTypeMap.each { k, v -> 
 				sb.append("<li>$k ($v)" + '</li>')
 			}
-			sb.append('</ul><br>')
+			sb.append('</ul>')
 		}
 	
 		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
@@ -440,7 +480,14 @@ class ImportService {
 
 		sb.append("<br>Review took $elapsedTime to complete")
 
-		return [elapsedTime: elapsedTime, info: sb.toString()]
+
+		String info=sb.toString()
+
+		jobProgressFinish(progressKey, info)
+
+		dtb.importResults = info
+
+		return [elapsedTime: elapsedTime, info:info]
 	}
 
 	/**
@@ -562,6 +609,7 @@ class ImportService {
 		Map results = [:]
 		String errorMsg
 		String methodName = 'invokeAssetImportProcess()'
+
 		while (true) {
 			try {
 				def session = sessionFactory.currentSession
@@ -594,7 +642,9 @@ class ImportService {
 						dtb.importResults = results.info
 						results.batchStatusCode = DataTransferBatch.COMPLETED
 					}
-
+					if (!dtb.save(flush:true)) {
+						errorMsg = "Unable to update batch"
+					}
 					session.flush()
 					session.clear()
 					//tx.commit()
@@ -619,12 +669,10 @@ class ImportService {
 		}
 
 		if (errorMsg) {
-			progressService.update(progressKey, 100I, progressService.FAILED)
+			jobProgressFinish(progressKey, errorMsg)
 			return [error:errorMsg, batchStatusCode: DataTransferBatch.PENDING]
 		} else {
-			progressService.update(progressKey, 100I, progressService.DONE)
-			// Store the results so the the client can grab it afterward
-			progressService.updateData(progressKey, 'results', results.info)			
+			jobProgressFinish(progressKey, results.info)
 			return results
 		}
 	}
@@ -683,7 +731,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		assetCount = dataTransferValueRowList.size()
 
-		updateJobProgress(progressKey, 1, assetCount)
+		jobProgressUpdate(progressKey, 1, assetCount)
 
 		if (log.isDebugEnabled()) {
 			def fubar = new StringBuilder("Staff List\n")
@@ -795,7 +843,7 @@ class ImportService {
 				application, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			// Update status and clear hibernate session
-			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
+			jobProgressUpdate(progressKey, rowNum, assetCount)
 
 		} // for
 
@@ -830,8 +878,6 @@ class ImportService {
 		sb.append("<br>Process batch took $elapsedTime to complete")
 
 		String info = sb.toString()
-
-		updateJobProgress(progressKey, assetCount, assetCount, )
 
 		return [elapsedTime: elapsedTime, assetCount: assetCount, info: sb.toString()] 
 	}	
@@ -891,7 +937,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
-		updateJobProgress(progressKey, 1, assetCount)
+		jobProgressUpdate(progressKey, 1, assetCount)
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
@@ -1097,7 +1143,7 @@ class ImportService {
 
 			if (performance) log.debug "$methodName Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
 
-			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
+			jobProgressUpdate(progressKey, rowNum, assetCount)
 
 		} // for
 
@@ -1194,7 +1240,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
-		updateJobProgress(progressKey, 1, assetCount)
+		jobProgressUpdate(progressKey, 1, assetCount)
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
@@ -1242,7 +1288,7 @@ class ImportService {
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
-			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
+			jobProgressUpdate(progressKey, rowNum, assetCount)
 
 		} // for
 
@@ -1325,7 +1371,7 @@ class ImportService {
 		List dataTransferValueRowList = data.dataTransferValueRowList
 		int assetCount = dataTransferValueRowList.size()
 
-		updateJobProgress(progressKey, 1, assetCount)
+		jobProgressUpdate(progressKey, 1, assetCount)
 
 		def nullProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'nullable', true )
 		def blankProps = GormUtil.getDomainPropertiesWithConstraint( domainClass, 'blank', true )
@@ -1383,7 +1429,7 @@ class ImportService {
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			// Update status and clear hibernate session
-			updateJobProgress(progressKey, dataTransferValueRow, assetCount)
+			jobProgressUpdate(progressKey, rowNum, assetCount)
 
 		} // for
 

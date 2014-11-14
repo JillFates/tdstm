@@ -79,32 +79,20 @@
                     	  -- Generate the Process buttons that will be used to replace the Review after the review function is called 
                     	  --%>
 
-						<span id="assetDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
-							<a href="javascript:" class="disableButton">Process</a> |
-						</span>
-						<span id="assetProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('asset', '${dataTransferBatch.id}');" >Process</a> |
+						<span id="deviceProcessId_${dataTransferBatch.id}" style="display: none;" >
+							<a href="javascript:" onclick="return kickoffProcess('device', 'p', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
-						<span id="appDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
-							<a href="javascript:" class="disableButton">Process</a> |
-						</span>
 						<span id="appProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('app', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('app', 'p', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
-						<span id="dbDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
-							<a href="javascript:" class="disableButton">Process</a> |
-						</span>
 						<span id="dbProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('db', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('db', 'p', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
-						<span id="filesDisabledProcessId_${dataTransferBatch.id}" style="display: none;">
-							<a href="javascript:" class="disableButton">Process</a> |
-						</span>
 						<span id="filesProcessId_${dataTransferBatch.id}" style="display: none;" >
-							<a href="javascript:" onclick="return kickoffProcess('files', '${dataTransferBatch.id}');" >Process</a> |
+							<a href="javascript:" onclick="return kickoffProcess('files', 'p', '${dataTransferBatch.id}');" >Process</a> |
 						</span>
 
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
@@ -133,29 +121,29 @@
                             <td>
 								<g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
 									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
-										<span id="assetReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','asset')">Review</a> |
+										<span id="deviceReviewId_${dataTransferBatch.id}">
+											<a href="javascript:" onclick="kickoffProcess('device', 'r', '${dataTransferBatch.id}')">Review</a> |
 										</span>
 										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 									</g:if> 
 
 									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
 										<span id="appReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','app')">Review</a> |
+											<a href="javascript:" onclick="kickoffProcess('app', 'r', '${dataTransferBatch.id}')">Review</a> |
 										</span>
 										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 									</g:if> 
 
 									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Database'}">
 										<span id="dbReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','db')">Review</a> | 
+											<a href="javascript:" onclick="kickoffProcess('db', 'r', '${dataTransferBatch.id}')">Review</a> | 
 										</span>
 										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 									</g:if>
 
 									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Files'}">
 										<span id="filesReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="reviewBatch('${dataTransferBatch.id}','files')">Review</a> |
+											<a href="javascript:" onclick="kickoffProcess('files', 'r', '${dataTransferBatch.id}')">Review</a> |
 										</span>
 										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
 									</g:if> 
@@ -188,13 +176,13 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 		<g:javascript src="jquery/ui.progressbar.js"/>
 		<script type="text/javascript">
-			var checkProgressBar;
+			//var checkProgressBar;
 			var progressKey='';
-			var progressIntervalHandle=0;
-			var progressBar = $("#progressbar");
+			//var progressIntervalHandle=0;
+			//var progressBar = $("#progressbar");
 			var messageDiv = $("#messageId");
 			var postingFlag = false;	// used to limit one posting at a time
-
+/*
 			function showProcessBar(e){
 				var progress = eval('(' + e.responseText + ')');			
 				if (progress) {
@@ -202,45 +190,46 @@
 					progressBar.reportprogress(progress[0].processed, progress[0].total);
 				}
 			}
-
+*/
 			//
 			// This method will use Ajax to kickoff the Process function and activate the progress modal
 			//
-			function kickoffProcess(forWhom, batchId) {
+			function kickoffProcess(assetClass, reviewOrProcess, batchId) {
 				if (postingFlag) {
-					alert('You can only perform one posting at a time.');
+					alert('You can only perform one action at a time.');
 					return;
 				}
-				if ( ! confirm('Please confirm that you want to post the import to inventory?') ) {
-					return false;
+				if ( reviewOrProcess == 'p') {
+					if (! confirm('Please confirm that you want to post the imported assets to inventory?') ) {
+						return false;
+					}
 				}
 				postingFlag = true;
 
-				messageDiv.html('Posting imported assets to inventory').show();
+				messageDiv.html('').hide();
 
+				var title = '<h1>'+(reviewOrProcess=='r' ? 'Reviewing assets in batch ' : 'Posting assets to inventory for batch ')+batchId;
+				var uri = '/import/invokeAssetImport' + (reviewOrProcess=='r'?'Review':'Process') + '/' + batchId;
 				$.ajax({
 					type: "POST",
 					async: true,
-					url: tdsCommon.createAppURL('/import/invokeAssetImportProcess/'+batchId),
+					url: tdsCommon.createAppURL(uri),
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
 						// stopProgressBar();
 						if (response.status == 'error') {
 							alert(response.errors);
 							console.log('Error: kickoffProcess() : ' + response.errors);
-							postingFlag=false;
 						} else {
 							var results = response.data.results;
 							progressKey = results.progressKey;	// Used to get the progress updates
-							//messageDiv.html(results.info).show();
-							$("#"+forWhom+"ReviewId_"+batchId).hide();
 
 							var taskProgressBar = new TaskProgressBar(
 								progressKey, 
 								5000, 
-								function() { showProcessResults(batchId); },
-								function() { alert('Opening progress modal failed'); },
-								'Processing import batch ' + batchId + '...'
+								null, 
+								function() { showProcessResults(assetClass, batchId, reviewOrProcess); },
+								title
 							);
 
 							// TODO : change the buttons appropriately
@@ -254,16 +243,14 @@
 					}
 				});
 
-				//reloadPageWhenDone=true;
-				//startProgressBar();
-				//return true;
+				postingFlag=false;
 				return false;
 			}
 
 			//
 			// This is called at the edit after a successful batch process that will make Ajax call to get the results of the review or posting results
 			//
-			function showProcessResults(batchId) {
+			function showProcessResults(assetClass, batchId, reviewOrProcess) {
 				$.ajax({
 					type: "POST",
 					async: true,
@@ -277,8 +264,23 @@
 							$("#statusCode"+batchId).html( results.batchStatusCode);
 						} else {
 							var results = response.data;
-							messageDiv.html(results.results).show();
+							// messageDiv.html(results.results).show();
 							$("#statusCode"+batchId).html( results.batchStatusCode);
+
+							var currentButton = $("#"+assetClass+"ReviewId_"+batchId);
+							if (reviewOrProcess=='r') {
+								if (results.hasErrors) {
+									alert("The batch has errors that will prevent you from posting it");
+								} else {
+									// Flip the review button over to the Process
+									var processButton = "#"+assetClass+'ProcessId_'+batchId;
+									currentButton.html( $(processButton).html() );
+								}
+							} else {
+								if (results.batchStatusCode == 'COMPLETED') {
+									currentButton.hide();
+								}
+							}
 						}
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
@@ -287,8 +289,12 @@
 						alert('An error occurred while invoking the posting process.');
 					}
 				});
-			}
+				
+				// allow another action to occur
+				postingFlag=false;
 
+			}
+/*
 			// used to set the interval to display progress meter bar
 			function getProgress() {		
 				if ( ! checkProgressBar ) {
@@ -329,12 +335,13 @@
 			function getProcessedDataInfo() {
 				$("#iFrame").attr('src', contextPath+'/dataTransferBatch/getProgress');
 			}
-
+*/
     		currentMenuId = "#assetMenu";
     		$("#assetMenuId a").css('background-color','#003366')
 			$('#assetMenu').show();
 			$('#reportsMenu').hide();
 
+/*
 			// Used to kick-off the reviewBatch web service
 			function reviewBatch(batchId, forWhom) {
 				//messageDiv.html($("#spinnerId").html()).show()
@@ -378,6 +385,7 @@
 					}
 				});
 			}
+*/
 		</script>
 		
     </body>

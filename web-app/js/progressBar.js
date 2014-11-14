@@ -3,8 +3,10 @@ function TaskProgressBar(taskId, pingTime, onSuccess, onFailure, progressTitle) 
 	this.pingTime = pingTime;
 	this.onSuccess = onSuccess;
 	this.onFailure = onFailure;
+	this.lastUpdated = 0;
+	this.noProgressCount = 0; 	// Used to keep track of # of times called service and got same lastUpdated 
 	if (progressTitle == undefined) {
-		progressTitle = "Working";
+		progressTitle = "";
 	}
 	this.progressTitle = progressTitle;
 	var self = this;
@@ -26,22 +28,22 @@ TaskProgressBar.prototype.initUI = function() {
 	    newcontent.innerHTML = '<div class="modal fade" id="globalProgressBar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">  <div class="modal-dialog">    <div class="modal-content">      <div class="modal-header">        <h4 id="progressTitle" class="modal-title" id="myModalLabel">Modal title</h4>      </div>      <div class="modal-body">	<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>        <div id="innerGlobalProgressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; font-size: 11px; font-family: verdana;">0%</div>	<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>      </div>      <div class="modal-footer">	<button id="progressClose" type="button" class="btn btn-default" data-dismiss="modal" style="display:none;">Close</button>        <button id="progressCancel" type="button" class="btn btn-primary" style="display:none;">Cancel</button>      </div>    </div>  </div></div>';
 	    document.body.appendChild(newcontent.firstChild);
 
-        $('#progressTitle').html("Initializing");
-		var inner = $('#innerGlobalProgressBar');
+        $('#progressTitle').html(self.progressTitle);
+		var bar = $('#innerGlobalProgressBar');
 		var status = $('#progressStatus');
 		var value = 0;
-		inner.attr('aria-valuenow', value);
-		inner.css('width', value + '%');
-		inner.html(value + '%');
+		bar.attr('aria-valuenow', value);
+		bar.css('width', value + '%');
+		bar.html(value + '%');
 		self.showProgressBar();
-		status.html("Pending");
+		status.html("Initializing...");
 	}
 }
 
 TaskProgressBar.prototype.finishProgressBar = function() {
 	setTimeout(function() {
 		$('#globalProgressBar').modal('hide');
-	}, 2000);
+	}, 1000);
 
 }
 
@@ -57,33 +59,52 @@ TaskProgressBar.prototype.updateProgress = function() {
 			cache: false,
 			//dataType: 'json',
 			// data: 
-			url: tdsCommon.createAppURL('/ws/progress/' + self.taskId + '?rand=' + tdsCommon.randomString(16)), 
+			//url: tdsCommon.createAppURL('/ws/progress/' + self.taskId + '?rand=' + tdsCommon.randomString(16)), 
+			url: tdsCommon.createAppURL('/ws/progress/' + self.taskId), 
 			success: function(data) {
 				if (data) {
 					data = data.data;
+
+					if (data.lastUpdated == self.lastUpdated) {
+						self.noProgressCount++;
+						if (self.noProgressCount > 2) {
+							if (! confirm('It appears that the process has stopped work. Press Okay to continue waiting otherwise press Cancel.')) {
+								self.onFailure();						
+								self.finishProgressBar();
+								return;
+							}
+							self.noProgressCount = 0;
+						}
+					} else {
+						self.lastUpdated = data.lastUpdated;
+						self.noProgressCount = 1;
+					}
+
 			        $('#progressTitle').html(self.progressTitle);
 
-					if (data.status == "In progress") {
-						var inner = $('#innerGlobalProgressBar');
-						var status = $('#progressStatus');
+					var bar = $('#innerGlobalProgressBar');
+					var status = $('#progressStatus');
+					var closeButton = $('#progressClose');
+
+					if (data.status == "In progress") {						
 						var value = data.percentComp;
-						inner.attr('aria-valuenow', value);
-						inner.css('width', value + '%');
-						inner.html(value + '%');
+						bar.show();
+						bar.attr('aria-valuenow', value);
+						bar.css('width', value + '%');
+						bar.html(value + '%');
 						self.showProgressBar();
 						status.html(data.status);
-						
+											
 						setTimeout(function() {
 							self.updateProgress();
 						}, self.pingTime);
 
 					} else if (data.status == "Completed")  {
-						var inner = $('#innerGlobalProgressBar');
-						var status = $('#progressStatus');
 						var value = 100;
-						inner.attr('aria-valuenow', value);
-						inner.css('width', value + '%');
-						inner.html(value + '%');
+						bar.show();
+						bar.attr('aria-valuenow', value);
+						bar.css('width', value + '%');
+						bar.html(value + '%');
 						status.html(data.status);
 
 						if (self.onSuccess != undefined) {
@@ -91,14 +112,14 @@ TaskProgressBar.prototype.updateProgress = function() {
 						}
 						self.finishProgressBar();
 					} else {
-						var status = $('#progressStatus');
 						status.html(data.status + (data.detail ? ": " + data.detail : ""));
-						
-						$('#progressClose').show();
-						$('#progressClose').click(function() {
+						bar.hide();						
+						closeButton.show();
+						closeButton.click(function() {
 							if (self.onFailure != undefined) {
 								self.onFailure();
 							}
+							closeButton.hide();
 							self.finishProgressBar();
 						});
 
