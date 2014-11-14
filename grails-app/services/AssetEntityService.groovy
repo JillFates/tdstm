@@ -1795,6 +1795,12 @@ class AssetEntityService {
 				if(fromAssetConnectorsLabels && fromAssetConnectorsLabels?.contains(fromConnectorLabel)){
 					def fromConnector = fromAsset.model?.modelConnectors.find{it.label == fromConnectorLabel}
 					def assetCable = AssetCableMap.findByAssetFromAndAssetFromPort(fromAsset,fromConnector)
+					if (!assetCable) {
+						log.info "Cable not found for $fromAsset and $fromConnector"
+						warnMsg += "<li>row "+(r+1)+" with connector $fromConnectorLabel and Asset Name $fromAssetName don't have a cable.</li>"
+						cablingSkipped+=1
+						continue
+					}
 					if(toAsset){
 						def toAssetconnectorLabels= toAsset.model?.modelConnectors?.label
 						if(toAssetconnectorLabels.contains(toConnectorTemp)){
