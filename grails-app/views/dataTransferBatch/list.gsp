@@ -8,10 +8,27 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
 		<g:javascript src="bootstrap.js" />
+		<g:javascript src="angular/angular.min.js" />
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 		<g:javascript src="progressBar.js" />
 	
 		<script type="text/javascript">
+			// Used to handle the AJax response for the progress update
+			function onIFrameLoad() {
+				var serverResponse = $("#iFrame").contents().find("pre").html();
+				var jsonProgress
+				if(serverResponse){
+					$("#requestCount").val(parseInt(requestCount)+1)
+					jsonProgress = JSON.parse( serverResponse )
+				}
+				if (jsonProgress) {
+					var progressBar = $("#progressbar");
+					progressBar.reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
+					if(jsonProgress[0].imported==jsonProgress[0].total){
+						clearInterval(handle);
+					}
+				}
+			}			
 		</script>
 	</head>
     <body>
@@ -183,7 +200,7 @@
 							var results = response.data.results;
 							progressKey = results.progressKey;	// Used to get the progress updates
 
-							var progressModal = new TaskProgressBar(
+							var progressModal = tds.ui.progressBar(
 								progressKey, 
 								5000, 
 								function() { progressModal.destroy(); }, 

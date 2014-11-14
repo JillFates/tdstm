@@ -12,6 +12,7 @@ tds.core.interceptor = tds.core.interceptor || {};
 tds.core.service = tds.core.service || {};
 tds.core.directive = tds.core.directive || {};
 tds.utils = {}
+tds.ui = {}
 
 /**
  * Functions used to manage arrays
