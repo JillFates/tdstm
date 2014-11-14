@@ -228,38 +228,5 @@ class DataTransferBatchController {
 		}
 	}
 	
-	/**
-	 * This action used to review batch and find error in excel import if any 
-	 * @param : id- data transfer batch id
-	 * @return map containing error message if any and import permission  (NewModelsFromImport)
-	 */
-	def reviewBatch = {
-		Map results = [info:'', hasPerm:false]
-		String error
-
-		def (project, userLogin) = controllerService.getProjectAndUserForPage(this, 'NewModelsFromImport')
-		if (! project) {
-			results.info = flash.message
-			flash.message = null
-		} else {
-			Long batchId = NumberUtil.toLong(params.id)
-			if (batchId) {
-				results = importService.reviewImportBatch(project.id, userLogin.id, batchId, session)
-				if (results.error) {
-					error = results.error
-				} else {
-					results.hasPerm = true
-				}
-			} else {
-				log.error "reviewBatch() called with invalid batch id ($batchId) by user $userLogin while assigned to project $project"
-				error = "The batch id was missing or an invalid value"
-			}
-		}
-
-		if (error)
-			render ServicResults.errors(results.error) as JSON
-		else 
-			render ServiceResults.success([results:results]) as JSON
-	}
-
+	
 }
