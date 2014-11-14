@@ -214,6 +214,7 @@
 			//
 			function showProcessResults(assetClass, batchId, reviewOrProcess) {
 				//progressModal=null;
+				console.log("showProcessResults() was called");
 				$.ajax({
 					type: "POST",
 					async: true,
@@ -228,18 +229,17 @@
 							$("#statusCode"+batchId).html( results.batchStatusCode);
 						} else {
 							var results = response.data;
-							// messageDiv.html(results.results).show();
 							$("#statusCode"+batchId).html( results.batchStatusCode);
 
 							var currentButton = $("#"+assetClass+"ReviewId_"+batchId);
 							if (reviewOrProcess=='r') {
-								if (results.hasErrors) {
-									alert("The batch has errors that will prevent you from posting it");
-								} else {
+								//if (results.hasErrors) {
+								//	alert("The batch has errors that will prevent you from posting it");
+								//} else {
 									// Flip the review button over to the Process
 									var processButton = "#"+assetClass+'ProcessId_'+batchId;
 									currentButton.html( $(processButton).html() );
-								}
+								//}
 							} else {
 								if (results.batchStatusCode == 'COMPLETED') {
 									currentButton.hide();
