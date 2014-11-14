@@ -22,6 +22,10 @@ function TaskProgressBar(taskId, pingTime, onSuccess, onFailure, progressTitle) 
 	}, self.pingTime);
 }
 
+TaskProgressBar.prototype.destroy = function() {
+	$('#progressBar').remove();
+}
+
 TaskProgressBar.prototype.initUI = function() {
 	var initialized = $('#progressBar').length != 0;
 	var self = this;
