@@ -287,8 +287,8 @@ class AssetEntityController {
 	 * --------------------------------------------------- */
 	def upload = {
 
-		sessionFactory.getCurrentSession().flush();
-		sessionFactory.getCurrentSession().clear();
+//		sessionFactory.getCurrentSession().flush();
+//		sessionFactory.getCurrentSession().clear();
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 
@@ -574,8 +574,9 @@ class AssetEntityController {
 								skipped << "Devices [row ${( r + 1 )}] - blank name"							
 						}
 						if (r%50 == 0){
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
+							sessionFactory.getCurrentSession().flush()
+							sessionFactory.getCurrentSession().clear()
+							project = project.merge()
 						}
 					}
 				}
@@ -641,8 +642,9 @@ class AssetEntityController {
 							skipped << "Applications [row ${( r + 1 )}] - blank name"
 						}
 						if (r % 50 == 0){
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
+							sessionFactory.getCurrentSession().flush()
+							sessionFactory.getCurrentSession().clear()
+							project = project.merge()
 						}
 					}
 				}
@@ -702,8 +704,9 @@ class AssetEntityController {
 							skipped << "Database [row ${( r + 1 )}] - blank name"
 						}
 						if (r%50 == 0){
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
+							sessionFactory.getCurrentSession().flush()
+							sessionFactory.getCurrentSession().clear()
+							project = project.merge()
 						}
 					}
 				}
@@ -764,8 +767,9 @@ class AssetEntityController {
 							skipped << "Storage [row ${( r + 1 )}] - blank name"
 						}
 						if (r%50 == 0){
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
+							sessionFactory.getCurrentSession().flush()
+							sessionFactory.getCurrentSession().clear()
+							project = project.merge()
 						}
 					}
 				}
@@ -878,8 +882,9 @@ class AssetEntityController {
 							}
 						}
 						if (r%50 == 0){
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
+							sessionFactory.getCurrentSession().flush()
+							sessionFactory.getCurrentSession().clear()
+							project = project.merge()
 						}
 
 					}
@@ -904,7 +909,7 @@ class AssetEntityController {
 				} // if (params.cabling=='cable')
 				
 				/**
-				 * Importing coment
+				 * Importing comments
 				 */
 				if (params.comment=='comment') {
 					commentCount = commentsSheet.rows
@@ -915,7 +920,9 @@ class AssetEntityController {
 					def userLogins = securityService.getUserLogin()
 					def skippedUpdated =0
 					def skippedAdded=0
-					def staffList = partyRelationshipService.getAllCompaniesStaffPersons([project.client, PartyGroup.get(18)])
+
+					// TODO : JPM 11/2014 : Refactor the lookup of PartyGroup.get(18) to be TDS lookup - see TM-3570
+					def staffList = partyRelationshipService.getAllCompaniesStaffPersons([ project.client, PartyGroup.get(18) ])
 					
 					for ( int r = 1; r < commentCount ; r++ ) {
 						def recordForAddition = false
@@ -999,8 +1006,9 @@ class AssetEntityController {
 						
 						
 						if (r%50 == 0){
-							sessionFactory.getCurrentSession().flush();
-							sessionFactory.getCurrentSession().clear();
+							sessionFactory.getCurrentSession().flush()
+							sessionFactory.getCurrentSession().clear()
+							project = project.merge()
 						}
 
 					}
