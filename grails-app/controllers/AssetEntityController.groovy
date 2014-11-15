@@ -286,18 +286,22 @@ class AssetEntityController {
 	 * @return currentPage( assetImport Page)
 	 * --------------------------------------------------- */
 	def upload = {
+		String forwardAction = 'assetImport'
+		String warnMsg = ''
 
-//		sessionFactory.getCurrentSession().flush();
-//		sessionFactory.getCurrentSession().clear();
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this, 'Import')
+		if (!project) {
+			warnMsg=flash.message
+			flash.message=null
+			forward (action:forwardAction, params:[error:warnMsg])
+			return
+		}
+
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		//get project Name
-		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def warnMsg = ''
-		def forwardAction = 'assetImport'
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def flagToManageBatches = false
 		def dataTransferSet = params.dataTransferSet
 
@@ -432,10 +436,6 @@ class AssetEntityController {
 				forward action:forwardAction, params: [error: " Storage Column Headers : ${missingHeader} not found, Please check it."]
 				return
 			} else {
-				//get user name.
-				def subject = SecurityUtils.subject
-				def principal = subject.principal
-				def userLogin = UserLogin.findByUsername( principal )
 				int assetsCount = 0
 				int appCount = 0
 				int databaseCount = 0
@@ -785,58 +785,83 @@ class AssetEntityController {
 					def skippedUpdated =0
 					def skippedAdded=0
 					for ( int r = 1; r < dependencySheetRow ; r++ ) {
+						int rowNum = r+1
 						def assetId = NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'"), 0).round()
 						def assetName
 						def assetClass
-						if(!assetId){
+						if (!assetId) {
 							assetName = dependencySheet.getCell( 2, r ).contents.replace("'","\\'")
 							assetClass = dependencySheet.getCell( 3, r ).contents.replace("'","\\'")
 							
-							if(!assetName){
-								warnMsg +="<li> no asset ID or asset name for row # "+r+"</li>"
-								continue;
+							if (!assetName) {
+								warnMsg +="<li> no asset ID or asset name for row $rowNum</li>\n"
+								continue
 							}
 						}
+
+						def assetDep
 						def depId = NumberUtils.toDouble(dependencySheet.getCell( 0, r ).contents.replace("'","\\'"), 0).round()
-						def assetDep =  depId ? AssetDependency.get(depId) : null
+						if (depId) {
+							assetDep =  depId ? AssetDependency.get(depId) : null
+							if (assetDep) {
+								if (assetDep.asset.project.id != project.id) {
+									securityService.reportViolation("attempted to access assetDependency ($depId) not assigned to project (${project.id}", userLogin)
+									warnMsg += "<li>Invaild dependency id ($depId) on row $rowNum</li>\n"
+									continue
+								}
+							} else {
+								warnMsg += "<li>Invaild dependency id ($depId) on row $rowNum</li>\n"
+								continue
+							}
+						}
+
 						def asset
-						if(assetId){
+						if (assetId) {
 							asset = AssetEntity.get(assetId)
 						} else {
 							def assets = AssetEntity.findAllByAssetNameAndAssetType(assetName, assetClass)
 							if(assets.size() == 0){
-								warnMsg +="<li> no asset match found for asset name "+assetName +"</li>"
+								warnMsg +="<li> no asset match found for asset name "+assetName +", row $rowNum</li>\n"
 								continue;
 							} else if(assets.size() > 1){
-								warnMsg +="<li>no unique asset match for "+assetName+"</li>"
+								warnMsg +="<li>no unique asset match for "+assetName+", row $rowNum</li>\n"
 								continue;
 							} else {
 								asset = assets[0]
 							}
 						}
+
 						def dependencyId = NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'"), 0).round()
 						def dependent
-						if(dependencyId){
+						if (dependencyId) {
 							dependent = AssetEntity.get(dependencyId)
 						} else {
 							def depName = dependencySheet.getCell( 5, r ).contents.replace("'","\\'")
 							def depClass = dependencySheet.getCell( 6, r ).contents.replace("'","\\'")
 							def assets = AssetEntity.findAllByAssetNameAndAssetType(depName, depClass)
 							if(assets.size() == 0){
-								warnMsg +="<li> no asset match found for dependent name "+depName + "<li>"
+								warnMsg +="<li> no asset match found for dependent name "+depName + ", row $rowNum<li>"
 								continue;
 							} else if(assets.size() > 1){
-								warnMsg +="<li> no unique asset match for dependent name "+depName+"</li>"
+								warnMsg +="<li> no unique asset match for dependent name "+depName+", row $rowNum</li>"
 								continue;
 							} else {
 								dependent = assets[0]
 							}
 						}
 						
+						// Validate that the IDs specified in the spreadsheet are valid and associate to the project
+						List assetRefIds = [asset?.id, dependent?.id]
+						List invalidIdList = assetEntityService.validateAssetList(assetRefIds, project)
+						if ( invalidIdList ) {
+							warnMsg += "<li>Row $rowNum has invalid asset references ${invalidIdList}"
+							continue
+						}
+
 						def depExist = AssetDependency.findByAssetAndDependent(asset, dependent)
-						assetEntityService.validateAssetList([asset?.id ]+[dependent?.id]+[assetDep?.asset?.id]+[assetDep?.dependent?.id],  project)
+
 						def isNew = false
-						if(!assetDep){
+						if (!assetDep) {
 							if(!depExist){
 								assetDep = new AssetDependency()
 								isNew = true

@@ -144,6 +144,34 @@ class AssetEntityService {
 	}
 	*/
 
+	/**
+	 * Used to validate a list of assets belong to the project supplied and will throw an error if otherwise
+	 * @param assetIdList - a list of asset ids
+	 * @param project - the currently selected project
+	 * @return A list of the invalid asset ids otherwise an empty list
+	 */
+	@Transactional(readOnly = true)
+	List validateAssetList(List assetIdList, Project project) {
+		assetIdList = assetIdList.unique()
+		List allAssets=AssetEntity.findAllByIdInList(assetIdList)
+		List invalidIds = allAssets.findAll({ it.project.id != project.id}).id
+		List missingIds=[]
+		assetIdList.each { x -> 
+			if (! allAssets.find({it.id == x})) {
+				missingIds << x
+			}
+		}
+		// log.debug "**** assetIdList=$assetIdList, allAssets=${allAssets?.id}, invalidIds=${invalidIds}, missingIds=${missingIds}"
+
+		if (invalidIds) {
+			securityService.reportViolation("validateAssetList() attempted to access asset(s) ($invalidIds) not assigned to current project (${project.id})")
+		}
+		if (missingIds)
+			invalidIds += missingIds
+
+		return invalidIds
+	}
+
 	/** 
 	 * Used by the various asset controllers to return the JSON response to the callers when creating new asset
 	 * @param model

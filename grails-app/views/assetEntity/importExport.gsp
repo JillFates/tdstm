@@ -168,8 +168,10 @@
 							<label for="storageId">Storage</label>
 						</span>
 
-					</td><td style="vertical-align:top;">
+					</td>
+					<td style="vertical-align:top;">
 
+						These post immediately:<br><br>
 						<span>
 							<input type="checkbox" id="dependencyId" name="dependency" value="dependency" 
 								onclick="importExportPreference($(this),'ImportDependency')"

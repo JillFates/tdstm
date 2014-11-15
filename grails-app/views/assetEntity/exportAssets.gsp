@@ -37,7 +37,7 @@
 						window.location="downloadExport?key=" + data.data.key;
 					}, function() {
 					},
-					"Exporting assets...");
+					"<h1>Exporting assets</h1>");
 				});
 				
 		        return false;
