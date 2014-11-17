@@ -622,25 +622,34 @@ class ImportService {
 
 					DataTransferBatch dtb = DataTransferBatch.get(batchId)
 
-					// Figure out which service method to invoke based on the DataTransferBatch entity type domain name
-					String domainName = dtb.eavEntityType?.domainName
-					assert domainName
-					String servicMethodName = "process${domainName}Import"
-
-					results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId) 
-					errorMsg = results.error
-
-					if (errorMsg) {
-						dtb.statusCode = DataTransferBatch.PENDING
-						dtb.importResults = errorMsg
-					} else {
-						dtb.statusCode = DataTransferBatch.COMPLETED
-						dtb.importResults = results.info
-						results.batchStatusCode = DataTransferBatch.COMPLETED
+					// Update the batch status to POSTING
+					dtb.statusCode = DataTransferBatch.POSTING
+					if (!dtb.save(flush:true, failOnError:true)) {
+						errorMsg = "Unable to update batch status : ${GormUtil.allErrorsString(dtb)}"
 					}
-					if (!dtb.save(flush:true)) {
-						errorMsg = "Unable to update batch"
+
+					if (!errorMsg) {
+						// Figure out which service method to invoke based on the DataTransferBatch entity type domain name
+						String domainName = dtb.eavEntityType?.domainName
+						assert domainName
+						String servicMethodName = "process${domainName}Import"
+
+						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId) 
+						errorMsg = results.error
+
+						if (errorMsg) {
+							dtb.statusCode = DataTransferBatch.PENDING
+							dtb.importResults = errorMsg
+						} else {
+							dtb.statusCode = DataTransferBatch.COMPLETED
+							dtb.importResults = results.info
+							results.batchStatusCode = DataTransferBatch.COMPLETED
+						}
+						if (!dtb.save(flush:true)) {
+							errorMsg = "Unable to update batch"
+						}
 					}
+	
 					session.flush()
 					session.clear()
 					//tx.commit()

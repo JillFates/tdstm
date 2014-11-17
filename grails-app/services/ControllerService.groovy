@@ -276,4 +276,8 @@ class ControllerService {
 		}
 	}
 
+	String getDefaultErrorMessage() {
+		return "An error occurred. Please contact support for further assistance."
+	}
+
 }

@@ -1,6 +1,7 @@
 import grails.converters.JSON
 import org.quartz.SimpleTrigger
 import org.quartz.Trigger
+import org.quartz.ObjectAlreadyExistsException
 
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
@@ -94,11 +95,16 @@ class ImportController {
 				// Need to set the progress into the 'In progress' status so that the modal window will work correctly
 				progressService.update(progressKey, 1, progressService.STARTED)
 
+			} catch (ObjectAlreadyExistsException e) {
+				errorMsg = 'It appears that someone else is currently reviewing this batch.'
+				log.error ExceptionUtil.stackTraceToString(e)
+				if (log.isDebugEnabled())
+					errorMsg = "$errorMsg ${e.getMessage()}"
+
 			} catch (e) {
-				log.error "$methodName Initiate asset REVIEW process $triggerName failed to create Quartz job or something else...\n${ExceptionUtil.stackTraceToString(e)}"
 				if (progressStarted)
 					progressService.update(progressKey, 100I, progressService.FAILED)
-				errorMsg = 'There was either an error or that someone else is currently importing assets for this project.'
+				errorMsg = controllerService.getDefaultErrorMessage()
 				if (log.isDebugEnabled())
 					errorMsg = "$errorMsg ${e.getMessage()}"
 			}
@@ -149,9 +155,8 @@ class ImportController {
 
 				DataTransferBatch dtb = DataTransferBatch.get(batchId)
 
-				// Update the batch status to POSTING and save the progress key 
+				// Update the batch and save the progress key 
 				progressKey = "AssetImportProcess-" + UUID.randomUUID().toString()
-				dtb.statusCode = DataTransferBatch.POSTING
 				dtb.progressKey = progressKey
 				if (!dtb.save(flush:true, failOnError:true)) {
 					errorMsg = "Unable to update batch status : ${GormUtil.allErrorsString(dtb)}"
@@ -189,12 +194,18 @@ class ImportController {
 				// Need to set the progress into the 'In progress' status so that the modal window will work correctly
 				progressService.update(progressKey, 1, progressService.STARTED)
 
+			} catch (ObjectAlreadyExistsException e) {
+				errorMsg = 'It appears that someone else is currently posting assets for this project.'
+				log.error ExceptionUtil.stackTraceToString(e)
+				if (log.isDebugEnabled())
+					errorMsg = "$errorMsg ${e.getMessage()}"
+
 			} catch (e) {
 				log.error ExceptionUtil.stackTraceToString(e)
 				if (progressStarted)
 					progressService.update(progressKey, 100I, progressService.FAILED)
 
-				errorMsg = 'There was either an error or that someone else is currently importing assets for this project.'
+				errorMsg = controllerService.getDefaultErrorMessage()
 				if (log.isDebugEnabled())
 					errorMsg = "$errorMsg ${e.getMessage()}"
 			}
