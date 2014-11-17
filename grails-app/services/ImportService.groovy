@@ -171,7 +171,9 @@ class ImportService {
 	 * @param total - the index of the total number of records to process
 	 */
 	void jobProgressUpdate(String progressKey, int current, int total) {
-		log.debug "jobProgressUpdate called (current=$current, total=$total"
+		log.debug "jobProgressUpdate called (current=$current, total=$total)"
+
+		current = (current == 0)?1:current
 
 		// Only increment on modulus of 2% so we're not overwhelming the system unless the values are the same
 		if (current == total) {
@@ -182,7 +184,7 @@ class ImportService {
 			} else {
 				int twoPerc = Math.round(total/100*2)
 				log.debug "twoPerc = $twoPerc"
-				if (current.mod(twoPerc)==0) {
+				if (twoPerc > 0 && current.mod(twoPerc)==0) {
 					int percComp = Math.round(current/total*100)
 					progressService.update(progressKey, (int)percComp, ProgressService.STARTED, "$current of $total")
 				}
@@ -932,8 +934,6 @@ class ImportService {
 		def now = new Date()
 		Map data = loadBatchData(dataTransferBatch)
 		if (performance) log.debug "loadBatchData() took ${TimeUtil.elapsed(now)}"
-
-def x = 1/0
 
 		def eavAttributeSet = data.eavAttributeSet
 		List staffList = data.staffList
