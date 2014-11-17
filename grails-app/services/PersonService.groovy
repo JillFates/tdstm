@@ -7,6 +7,7 @@ import com.tds.asset.Application;
 import Person;
 import com.tdssrc.grails.GormUtil
 import grails.validation.ValidationException
+import com.tdsops.common.lang.ExceptionUtil
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
@@ -274,35 +275,46 @@ class PersonService {
 	 * @return Map containing person, status or null if unable to parse the name
 	 */
 	Map findOrCreatePerson(Map nameMap , Project project, staffList=null) {
-		
-		if ( ! staffList )
-			staffList = partyRelationshipService.getAllCompaniesStaffPersons()
+		Person person
+		try {
+			if ( ! staffList )
+				staffList = partyRelationshipService.getAllCompaniesStaffPersons()
 
-		def results = findPerson(nameMap, project, staffList)
-		results.isNew = null
+			def results = findPerson(nameMap, project, staffList)
+			results.isNew = null
 
-		if ( ! results.person && nameMap.first ) {
-			log.debug "findOrCreatePerson() creating new person and associate to Company as staff ($nameMap)"
-			def person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
-			
-			if ( ! person.save(insert:true, flush:true)) {
-				log.error "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
-				results.error = "Unable to create person $nameMap"
-			} else {
-				if (! partyRelationshipService.addCompanyStaff(project.client, person) ) {
-					results.error = "Unable to assign person $results.person.toString() as staff"
-					// TODO - JPM (10/13) do we really want to proceed if we can't assign the person as staff otherwise they'll be in limbo.
+			if ( ! results.person && nameMap.first ) {
+				log.debug "findOrCreatePerson() creating new person and associate to Company as staff ($nameMap)"
+				person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
+				
+				if ( ! person.validate() || ! person.save(insert:true, flush:true)) {
+					log.error "findOrCreatePerson Unable to create Person"+GormUtil.allErrorsString( person )
+					results.error = "Unable to create person ${nameMap}${GormUtil.allErrorsString( person )}"
 				} else {
-					staffList.add(person)
+					if (! partyRelationshipService.addCompanyStaff(project.client, person) ) {
+						results.error = "Unable to assign person $results.person.toString() as staff"
+						// TODO - JPM (10/13) do we really want to proceed if we can't assign the person as staff otherwise they'll be in limbo.
+					} else {
+						staffList.add(person)
+					}
+					results.person = person
+					results.isNew = true
 				}
-				results.person = person
-				results.isNew = true
+			} else {
+				results.isNew = false
 			}
-		} else {
-			results.isNew = false
-		}
 
-		return results
+			return results
+		} catch (e) {
+			log.error "Exception is: ${e.class.getName()} : ${ person ? GormUtil.allErrorsString( person ) : 'NO PERSON'}"
+			String exMsg = e.getMessage()
+			log.error "findOrCreatePerson() received exception for nameMap=$nameMap : ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
+			if (person && !person.id) {
+				person.discard()
+				person = null
+			}
+			throw new RuntimeException("Unable to create person : $exMsg")
+		}
 	}
 
 	/**

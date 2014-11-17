@@ -48,7 +48,8 @@ class AssetImportReviewJob {
 			log.info "execute() return from importService.invokeAssetImportProcess() : results=$results"
 			
 		} catch (e) {
-			ExceptionUtil.stackTraceToString(e)
+			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
+			progressService.update(progressKey, 100I, FAILED, e.getMessage())
 		} 
 	}
 }

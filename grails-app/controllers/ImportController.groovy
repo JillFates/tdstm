@@ -107,7 +107,7 @@ class ImportController {
 		}
 
 		if (errorMsg) {
-			render ServiceResults.errors(results.error) as JSON
+			render ServiceResults.errors(errorMsg) as JSON
 		} else {
 			results.progressKey = progressKey
 			results.batchStatusCode = DataTransferBatch.PENDING

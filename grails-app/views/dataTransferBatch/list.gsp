@@ -12,29 +12,10 @@
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 		<g:javascript src="progressBar.js" />
 	
-		<script type="text/javascript">
-			// Used to handle the AJax response for the progress update
-			function onIFrameLoad() {
-				var serverResponse = $("#iFrame").contents().find("pre").html();
-				var jsonProgress
-				if(serverResponse){
-					$("#requestCount").val(parseInt(requestCount)+1)
-					jsonProgress = JSON.parse( serverResponse )
-				}
-				if (jsonProgress) {
-					var progressBar = $("#progressbar");
-					progressBar.reportprogress(jsonProgress[0].imported,jsonProgress[0].total);
-					if(jsonProgress[0].imported==jsonProgress[0].total){
-						clearInterval(handle);
-					}
-				}
-			}			
-		</script>
 	</head>
     <body>
     
 	    <br>
-        <iframe id='iFrame'  class='iFrame' onload='onIFrameLoad()'></iframe>
         <div class="body">
 			<h1>Manage Asset Import Batches</h1>
 			<g:if test="${flash.message}">
@@ -167,9 +148,7 @@
 			var postingFlag = false;	// used to limit one posting at a time
 			var progressModal;
 
-			//
 			// This method will use Ajax to kickoff the Process function and activate the progress modal
-			//
 			function kickoffProcess(assetClass, reviewOrProcess, batchId) {
 				if (postingFlag) {
 					alert('You can only perform one action at a time.');
@@ -192,7 +171,6 @@
 					url: tdsCommon.createAppURL(uri),
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
-						// stopProgressBar();
 						if (response.status == 'error') {
 							alert(response.errors);
 							console.log('Error: kickoffProcess() : ' + response.errors);
@@ -203,15 +181,14 @@
 							var progressModal = tds.ui.progressBar(
 								progressKey, 
 								5000, 
-								function() { progressModal.destroy(); }, 
+								function() {
+									processFinished(assetClass, batchId, reviewOrProcess); 
+								}, 
 								function() { 
-									progressModal.destroy();
-									showProcessResults(assetClass, batchId, reviewOrProcess); 
+									processFailed(assetClass, batchId, reviewOrProcess);
 								},
 								title
 							);
-
-							// TODO : change the buttons appropriately
 						}
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
@@ -226,46 +203,35 @@
 				return false;
 			}
 
-			//
-			// This is called at the edit after a successful batch process that will make Ajax call to get the results of the review or posting results
-			//
-			function showProcessResults(assetClass, batchId, reviewOrProcess) {
-				//progressModal=null;
+			// This is called after a successful batch process that will make Ajax call to get the results of the review or posting results
+			function processFinished(assetClass, batchId, reviewOrProcess) {
+				var hiddenProcessButton = "#"+assetClass+'ProcessId_'+batchId;
+				var currentButton = $("#"+assetClass+"ReviewId_"+batchId);
+				if (reviewOrProcess=='r') {
+					// Flip the review button over to the Process
+					currentButton.html( $(hiddenProcessButton).html() );
+				} else {
+					currentButton.hide();
+				}
+
 				console.log("showProcessResults() was called");
+
+				// Get the status of the batch and update the list accordingly
 				$.ajax({
 					type: "POST",
 					async: true,
 					url: tdsCommon.createAppURL('/import/importResults/'+batchId),
 					dataType: "json",
 					success: function (response, textStatus, jqXHR) { 
-						// stopProgressBar();
-						// debugger;
 						if (response.status == 'error') {
-							alert('An error occurred while trying to lookup the results.');
 							console.log('Error: showProcessResults() : ' + response.errors);
 							$("#statusCode"+batchId).html( results.batchStatusCode);
 						} else {
 							var results = response.data;
 							$("#statusCode"+batchId).html( results.batchStatusCode);
-
-							var currentButton = $("#"+assetClass+"ReviewId_"+batchId);
-							if (reviewOrProcess=='r') {
-								//if (results.hasErrors) {
-								//	alert("The batch has errors that will prevent you from posting it");
-								//} else {
-									// Flip the review button over to the Process
-									var processButton = "#"+assetClass+'ProcessId_'+batchId;
-									currentButton.html( $(processButton).html() );
-								//}
-							} else {
-								if (results.batchStatusCode == 'COMPLETED') {
-									currentButton.hide();
-								}
-							}
 						}
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
-						// stopProgressBar();
 						console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
 						alert('An error occurred while invoking the posting process.');
 					}
@@ -274,6 +240,11 @@
 				// allow another action to occur
 				postingFlag=false;
 
+			}
+
+			// This is called when the progress view receives a failure message
+			function processFailed(assetClass, batchId, reviewOrProcess) {
+				console.log("Progress failed for "+ assetClass+ " batch "+ batchId+ " for " + (reviewOrProcess=='r' ? 'Review' : 'Posting'));
 			}
 
     		currentMenuId = "#assetMenu";
