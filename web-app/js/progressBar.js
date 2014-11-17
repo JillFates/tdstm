@@ -36,6 +36,12 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 	}
 	var refUiContainerId = '#' + uiContainerId;
 
+	var FAILED='Failed'
+	var COMPLETED='Completed'
+	var PENDING='Pending'
+	var STARTED='In progress'
+	var PAUSED='Paused'
+
 	var destroy = function() {
 	};
 
@@ -88,66 +94,110 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 			{ 	type:'GET',
 				cache: false,
 				//dataType: 'json',
-				// data: 
-				//url: tdsCommon.createAppURL('/ws/progress/' + taskId + '?rand=' + tdsCommon.randomString(16)), 
 				url: tdsCommon.createAppURL('/ws/progress/' + taskId), 
-				success: function(data) {
-					if (data) {
-						data = data.data;
+				success: function(response) {
+					var bar = $('#innerGlobalProgressBar');
+					var status = $('#progressStatus');
+					var closeButton = $('#progressClose');
 
+					if (!response) {
+						status.html('Unable to determine the progress.');
+					} else {
+						var failed=false;
+						var showDetail=false;
+						var showClose=false;
+						var showBar=true;
+						var percentComp=100;
+
+						data = response.data;
+
+						// Double-check to makes sure that the progress has been moving forward
 						if (data.lastUpdated == lastUpdated) {
 							noProgressCount++;
 							if (noProgressCount > 2) {
-								if (! confirm('It appears that the process has stopped work. Press Okay to continue waiting otherwise press Cancel.')) {
-									finishProgressBar(onFailure);
+								if (! confirm('It appears that the process has stopped work. Press Okay to continue waiting otherwise press Cancel to abort.')) {
+									data.status=FAILED;
+									data.detail=null;
+								} else {
+									noProgressCount = 0;
 									return;
 								}
-								noProgressCount = 0;
 							}
 						} else {
 							lastUpdated = data.lastUpdated;
-							noProgressCount = 1;
+							noProgressCount=0;
 						}
 
 				        $('#progressTitle').html(progressTitle);
 
-						var bar = $('#innerGlobalProgressBar');
-						var status = $('#progressStatus');
-						var closeButton = $('#progressClose');
+						switch (data.status) {
+							case STARTED:
+								status.html(data.status);
+								percentComp=data.percentComp;
+								setTimeout(function() {
+									updateProgress();
+								}, pingTime);
+								break;
 
-						if (data.status == "In progress") {						
+							case COMPLETED:
+								if (data.detail) {
+									showDetail=true;
+									showClose=true;
+									showBar=false;
+								} else {
+									status.html(data.status);
+									finishProgressBar(onSuccess);
+								}
+								break;
+
+							case FAILED:
+								if (data.detail) {
+									showDetail=true;
+								} else {
+									status.html(data.status);
+								}
+								failed=true;
+								finishProgressBar(onFailure);
+
+							default:
+								// Paused/Pending
+								status.html(data.status + (data.detail ? "<br>" + data.detail : ""));
+								percentComp=data.percentComp;
+								showBar=true;
+						} // switch
+
+						if (showBar) {
 							var value = data.percentComp;
 							bar.show();
 							bar.attr('aria-valuenow', value);
 							bar.css('width', value + '%');
 							bar.html(value + '%');
-							showProgressBar();
-							status.html(data.status);
-												
-							setTimeout(function() {
-								updateProgress();
-							}, pingTime);
-
-						} else if (data.status == "Completed")  {
-							var value = 100;
-							bar.show();
-							bar.attr('aria-valuenow', value);
-							bar.css('width', value + '%');
-							bar.html(value + '%');
-							status.html(data.status);
-
-							finishProgressBar(onSuccess);
+							showProgressBar();							
 						} else {
-							status.html(data.status + (data.detail ? ": " + data.detail : ""));
-							bar.hide();						
+							bar.hide();
+						}
+
+						if (showDetail) {
+							status.html(data.detail);
+						}
+
+						if (showClose) {
 							closeButton.show();
 							closeButton.click(function() {
 								closeButton.hide();
-								finishProgressBar(onFailure);
-							});
-
+								if (failed) {
+									finishProgressBar(onFailure);
+								} else {
+									finishProgressBar(onSuccess);
+								}
+							});							
+						} else if (failed) {
+							finishProgressBar(onFailure);
 						}
-					}
+
+
+
+					} // if (data)
 				},
 				error: function() {
 					finishProgressBar(onFailure);

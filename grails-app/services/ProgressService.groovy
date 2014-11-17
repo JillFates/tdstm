@@ -16,11 +16,11 @@ import com.tdssrc.grails.TimeUtil
  */
 class ProgressService {
 
-	static final String FAILED='failed'
+	static final String FAILED='Failed'
 	static final String COMPLETED='Completed'
-	static final String PENDING='pending'
+	static final String PENDING='Pending'
 	static final String STARTED='In progress'
-	static final String PAUSED='paused'
+	static final String PAUSED='Paused'
 
 	Cache<String, ProgressInfo> progressInfo 
 	//REMOVE THIS. ONLY FOR DEMO
@@ -40,8 +40,9 @@ class ProgressService {
 	 * @param key the key of the progress
 	 * @param status the initial status
 	 */
-	void create(String key, String status='Pending') {
+	void create(String key, String status=PENDING) {
 		ProgressInfo info = new ProgressInfo(key, status)
+		info.lastUpdated = new Date().getTime()
 		this.progressInfo.put(key, info)
 	}
 	
@@ -71,7 +72,6 @@ class ProgressService {
 				info.status = status
 				info.remainingTime = remainingTime
 				info.detail = detail
-				// TODO - this should be maintained in GMT
 				info.lastUpdated = new Date().getTime()
 			}
 		} else {
@@ -79,6 +79,37 @@ class ProgressService {
 		}
 	}
 	
+	/**
+	 * Updates a progress info with the specific information
+	 * If the info doesn't exists it simply ignores it
+	 * 
+	 * @param key - the key of the progress
+	 * @param percentComp - the percentage completed
+	 * @param status - the initial status
+	 * @param detail - any additional information that might be shown in the progress meter such as the sub-task being performed (optional)
+	 * @param remainingTime - an estimate of the remainingTime before the task completes (optional)
+	 */
+	void fail(String key, String detail='') {
+		log.debug "fail() key=$key, detail=$detail"
+		if (key == null) {
+			log.error "update() called with null key"
+			return
+		} 
+		ProgressInfo info = this.progressInfo.getIfPresent(key)
+		if (info != null) {
+			log.debug("update() Key was found ${key}")
+			synchronized (info) {
+				info.percentComp = 100I
+				info.status = FAILED
+				info.remainingTime = 0
+				info.detail = detail
+				info.lastUpdated = new Date().getTime()
+			}
+		} else {
+			log.debug("Key not found ${key}")
+		}
+	}
+
 	/**
 	 * Adds the dataKey,dataValue to the data of the progressInfo under key
 	 * @param key the key of the progressInfo
@@ -166,12 +197,11 @@ class ProgressService {
 		} else {
 			log.debug("Key FOUND ${key}")
 			return [
-				'percentComp' : info.percentComp,
-				'status' : info.status,
-				'detail' : info.detail,
-				'remainingTime' : info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
-				'lastUpdated' : info.lastUpdated
-			];
+				percentComp : info.percentComp,
+				status : info.status,
+				detail : info.detail,
+				remainingTime : info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
+			]
 		}
 	}
 	
@@ -182,14 +212,14 @@ class ProgressService {
 			void run() {
 				int p = 2
 				while (p < 100) {
-					ProgressService.this.update(key, p, 'In progress', null)
+					ProgressService.this.update(key, p, STARTED, null)
 					p = p + 2
 					Thread.sleep(1200)
 				}
-				ProgressService.this.update(key, 100, 'Completed', null)
+				ProgressService.this.update(key, 100, COMPLETED, null)
 			}
 		});
-		return ['key' : key]
+		return [key: key]
 	}
 
 	def demoFailed() {
@@ -199,14 +229,14 @@ class ProgressService {
 			void run() {
 				int p = 2
 				while (p < 60) {
-					ProgressService.this.update(key, p, 'In progress', null)
+					ProgressService.this.update(key, p, STARTED, null)
 					p = p + 2
 					Thread.sleep(1200)
 				}
-				ProgressService.this.update(key, p, 'Failed', null)
+				ProgressService.this.update(key, p, FAILED, null)
 				Thread.sleep(1200)
 			}
 		});
-		return ['key' : key]
+		return [key: key]
 	}
 }
