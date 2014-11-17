@@ -8,8 +8,8 @@ class ContactMech {
 	 */
 	static constraints = {
     	party( nullable: true )
-    	mechType( blank: false, unique:true, maxLength: 10 )
-    	value( blank: false, nullable: false )
+    	mechType( blank: false, unique:true, size: 1..10 )
+    	value( blank: false, nullable: false, size: 0..128 )
     }
 
 	 /*

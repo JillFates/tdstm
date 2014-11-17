@@ -7,8 +7,8 @@ class PartyGroup extends Party {
 	 * Fields Validations
 	 */
 	static constraints = {
-		name( blank: false, nullable:false, maxLength:64)
-		comment( blank: true, nullable: true )
+		name( blank: false, nullable:false, size: 1..64)
+		comment( blank: true, nullable: true, size: 0..255 )
 	}
 
 	/*

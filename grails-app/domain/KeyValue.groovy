@@ -10,10 +10,10 @@ class KeyValue  implements Serializable {
 	String value
 
 	static constraints = {
-		project( nullable:false)
-		category(blank:false, nullable:false, maxLength:10)
-		key(blank:false, nullable:false, maxLength:30)
-		value(maxLength:255)
+		project (nullable:false)
+		category (blank:false, nullable:false, size: 1..30)
+		key (blank:false, nullable:false, size: 1..30)
+		value (size: 0..255)
 	}
 
 	static mapping  = {
@@ -21,7 +21,7 @@ class KeyValue  implements Serializable {
 		id composite:['project', 'category', 'key'], generator:'assigned'
 		columns {
 			key sqltype: 'varchar(30)'
-			category sqltype: 'varchar(10)'
+			category sqltype: 'varchar(30)'
 		}
 		key column:'fi_key' //Changing  'key' column name as 'fi_key' cause 'key' is a reserved keyword in MYSQL
 	}

@@ -31,9 +31,10 @@ class Recipe {
 	Integer defaultAssetId
 
 	static constraints = {	
-		name(blank:false, nullable:false, maxLength:40)
-		description(blank:true, nullable:true, maxLength:255)
-		context(blank:false, nullable:false, inList: ['Event', 'Bundle', 'Application'] )	// TODO : Switch to ENUM RecipeContext
+		name(blank:false, nullable:false, size: 1..40)
+		description(blank:true, nullable:true, size: 0..255)
+		// TODO : Switch the context property to ENUM RecipeContext
+		context(blank:false, nullable:false, inList: ['Event', 'Bundle', 'Application'], size: 1..45 )	
 		project(nullable:false)
 		dateCreated(nullable:true)
 		lastUpdated(nullable:true)
@@ -47,6 +48,7 @@ class Recipe {
 		id column: 'recipe_id'
 		columns {
 			name sqltype: 'varchar(40)'
+			context sqltype: 'varchar(45)'
 			description sqltype: 'varchar(255)'
 		}
 	}

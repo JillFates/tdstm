@@ -3,8 +3,8 @@ class PartyType {
 	String description
 
 	static constraints = {
-		id(blank:false, nullable:false, maxLength:20)
-		description(blank:true, nullable:true)
+		id (blank:false, nullable:false, size: 1..32)
+		description (blank:true, nullable:true, size: 0..255)
 	}
 
 	static mapping  = {

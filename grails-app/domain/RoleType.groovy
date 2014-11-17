@@ -4,9 +4,9 @@ class RoleType {
 	String help
 
 	static constraints = {
-		id(blank:false, nullable:false, maxLength:20)
-		description(blank:true, nullable:true)
-		help(blank:true, nullable:true)
+		id (blank:false, nullable:false, size: 1..32)
+		description (blank:true, nullable:true, size: 0..255)
+		help (blank:true, nullable:true, size: 0..255)
 	}
 
 	static mapping  = {
