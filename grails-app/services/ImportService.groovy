@@ -183,6 +183,8 @@ class ImportService {
 				log.error "jobProgressUpdate() called with invalid total ($progressKey, $current, $total)"
 			} else {
 				int twoPerc = Math.round(total/100*2)
+				if (twoPerc == 0)
+					twoPerc = 1
 				log.debug "twoPerc = $twoPerc"
 				if (twoPerc > 0 && current.mod(twoPerc)==0) {
 					int percComp = Math.round(current/total*100)
@@ -200,7 +202,7 @@ class ImportService {
 	 */
 	void jobProgressFinish(String progressKey, String info) {
 		log.debug "jobProgressFinish called"
-		progressService.update(progressKey, 100I, info)
+		progressService.update(progressKey, 100I, ProgressService.COMPLETED, info)
 	}
 
 	/**
@@ -361,20 +363,11 @@ class ImportService {
 
 		now = new Date()
 		for (int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
-			if (dataTransferValueRow.mod(50) == 0) {
-				log.info "$methodName reviewed ${dataTransferValueRow} rows of ${assetCount} for batch id $batchId - execution took ${TimeUtil.elapsed(now)}"
-				now = new Date()
-			}
-
-			if (false && dataTransferValueRow > 20) {
-				sb.append("Aborted process early")
-				break
-			}
-
-			// log.debug("Processing $dataTransferValueRow of $assetCount")
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-			int rowNum = rowId + 1
+			int rowNum = dataTransferValueRow + 1
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+
+			// log.debug "***$methodName $dataTransferValueRow of $assetCount"
 			
 			if (batchIsForDevices) {
 				String mfgName = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:mfgEavAttr)?.importValue
@@ -715,6 +708,8 @@ class ImportService {
 		def application
 		int assetCount
 
+		String warnMsg
+
 		//
 		// Load initial data for method
 		//
@@ -784,60 +779,70 @@ class ImportService {
 					return
 				}
 
+				warnMsg = ''
+
 				switch (attribName) {
 					case ~/sme|sme2|appOwner/:
-						if( it.importValue ) {
+						if (it.importValue) {
+
 							// Substitute owner for appOwner
 							def propName = attribName 
-							def results = personService.findOrCreatePerson(it.importValue, project, staffList)
-							def warnMsg = ''
-							if (results?.person) {
+							def results
+							try {
+								results = personService.findOrCreatePerson(it.importValue, project, staffList)
+							} catch (e) {
+								warnMsg = "Failed to find or create $attribName (${it.importValue}) on row $rowNum - ${e.getMessage()}"
+							}
+
+							if (!warnMsg && results?.person) {
 								application[propName] = results.person
 
 								// Now check for warnings
 								if (results.isAmbiguous) {
 									warnMsg = " $attribName (${it.importValue}) was ambiguous for App ${application.assetName} on row $rowNum. Name set to ${results.person}"
-									warnings << warnMsg
-									log.warn warnMsg
-									errorConflictCount++
 								}
 
 								if (results.isNew) 
 									personsAdded++
 
 							} else if ( results?.error ) {
-								warnMsg = "$attribName (${it.importValue}) had an error '${results.error}'' for App ${application.assetName} on row $rowNum"
-								warnings << warnMsg
-								log.info warnMsg
-								errorConflictCount++
+								warnMsg = "Person assignment to $attribName of App for App ${application.assetName} on row $rowNum failed. ${results.error}"
 							}
+
 						}
 						break
+
 					case ~/shutdownBy|startupBy|testingBy/:
 						if (it.importValue.size()) {
-							if(it.importValue[0] in ['@', '#']){
+							if (it.importValue[0] in ['@', '#']){
 								application[attribName] = it.importValue
 							} else {
 								def resultMap = personService.findOrCreatePerson(it.importValue, project, staffList)
 								application[attribName] = resultMap?.person?.id
 								if(it.importValue && resultMap?.isAmbiguous){
-									def warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
-									log.warn warnMsg
-									warnings << warnMsg
+									warnMsg = "Ambiguity in ${attribName} (${it.importValue}) for ${application.assetName}"
 								}
 							}
 						}
 						break
+
 					case ~/shutdownFixed|startupFixed|testingFixed/:
 						if (it.importValue) {
 							application[attribName] = it.importValue.equalsIgnoreCase("yes") ? 1 : 0
 						}
 						break
+
 					default:
 						// Try processing all common properties
 						assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount)
 
 				} // switch(attribName)
+
+				if (warnMsg) {
+					warnings << warnMsg
+					log.warn warnMsg
+					errorConflictCount++
+				}
 
 			}	// dtvList.each						
 
