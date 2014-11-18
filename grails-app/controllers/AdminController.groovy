@@ -1353,4 +1353,13 @@ class AdminController {
 		}
 		render 0
 	}
+
+	/**
+	 * Used to encrypt a value
+	 */
+	def encryptValue = {
+		def toEncryptString = params.toEncryptString
+		render DESCodec.encode(toEncryptString)
+	}
+
 }

@@ -144,7 +144,7 @@ a:hover {
 						</tr>
 						<tr class="odd">
 							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>
-							<td></td>
+							<td><a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a></td>
 						</tr>
 					</tbody>
 				</table>
@@ -163,6 +163,33 @@ a:hover {
 						</tr>
 						<tr class="even">
 							<td colspan="2"><a style="color:black" href="#" onclick="reconcileAssetTypes()"><button>Reconcile</button></a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<br />
+			<div id="encryptStringForm" style="display: none;">
+				<table>
+					<thead>
+						<tr>
+							<th colspan="2">Encrypt String</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="odd">
+							<td><span>To Encrypt Value</span></td>
+							<td><input name="toEncryptString" id="toEncryptString" value=""></td>
+						</tr>
+						<tr class="odd">
+							<td><span>Encrypted Value</span></td>
+							<td><input name="encryptedString" id="encryptedString" value=""></td>
+						</tr>
+
+						<tr class="even">
+							<td colspan="2">
+								<a style="color:black" href="#" onclick="sendValueToEncrypt()"><button>Encrypt</button></a>
+								<a style="color:black" href="#" onclick="closeEncryptStringForm()"><button>Close</button></a>
+							</td>
 						</tr>
 					</tbody>
 				</table>

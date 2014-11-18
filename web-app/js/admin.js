@@ -130,3 +130,38 @@ function reconcileAssetTypes () {
 		}
 	})
 }
+
+/*
+ * This function displays the encrypt string form
+ */
+function openEncryptStringForm() {
+	$("#encryptStringForm").css('display', 'block');
+	$("#toEncryptString").val('');
+	$("#encryptedString").val('');
+}
+
+/*
+ * This function hide the encrypt string form
+ */
+function closeEncryptStringForm() {
+	$("#encryptStringForm").css('display', 'none');
+}
+
+/*
+ * This function send the value to encrypt
+ */
+function sendValueToEncrypt () {
+	jQuery.ajax({
+		url: contextPath + '/admin/encryptValue?toEncryptString=' + $("#toEncryptString").val(),
+		type:'POST',
+		success: function(text, b, data) {
+			$("#encryptedString").val(text);
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("Can't encrypt value");
+		}
+	})
+}
+
+
+
