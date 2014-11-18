@@ -327,6 +327,7 @@ class ImportService {
 		
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
+deviceTypeMap.each {k,v -> log.debug "$k=$v"}
 
 		// A map that will be used to track the invalid referenced Device Types
 		HashMap invalidDeviceTypeMap = new HashMap()
@@ -1064,7 +1065,7 @@ class ImportService {
 			}
 
 			//
-			// Process the Mfg / Model assignment by utilizing a cache of the various mfg/model names
+			// Process the Mfg / Model / Device Type assignment by utilizing a cache of the various mfg/model names
 			//
 			mfgName = StringUtil.defaultIfEmpty(mfgName, '')
 			modelName = StringUtil.defaultIfEmpty(modelName, '')
@@ -1072,25 +1073,18 @@ class ImportService {
 			String mmKey = "${mfgName}::${modelName}::${deviceType}::$usize::${isNewValidate ? 'new' : 'existing'}"
 			def mfg, model
 
+			Map mmm
 			if (mfgModelMap.containsKey(mmKey)) {
 				log.debug "$methodName Found cached mfgModelMap for key $mmKey, hasErrors=${mfgModelMap[mmKey].errorMsg?.size()}"
 				// We've already processed this mfg/model/type/usize/new|existing combination before so work from the cache
 				mfgModelMap[mmKey].refCount++
-				if (! mfgModelMap.errorMsg?.size() ) {
-					Map mmm = mfgModelMap[mmKey]
-					log.debug "$methodName Setting MfgModelType to $mmKey for asset $asset, $mmm"
-					if (asset.manufacturer?.id != mmm.mfgId)
-						asset.manufacturer = Manufacturer.get(mmm.mfgId)
-					if (asset.model?.id != mmm.modelId)
-						asset.model = Model.get(mmm.modelId)
-					asset.assetType = mmm.deviceType
-
-					log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
-				}
+				mmm = mfgModelMap[mmKey]
 			} else {
+				log.debug "$methodName Did not find asset in cache so calling assetEntityAttributeLoaderService.assignMfgAndModelToDevice()"
 				// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
 				Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
-				mfgModelMap[mmKey] = [
+				log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
+				mmm = [
 					errorMsg: results.errorMsg, 
 					warningMsg: results.warningMsg, 
 					mfgId: asset.manufacturer?.id, 
@@ -1098,16 +1092,30 @@ class ImportService {
 					deviceType: asset.assetType, 
 					refCount: 1
 				]
+				if (results.cachable)
+					mfgModelMap[mmKey] = mmm
 			}
 
-			if (mfgModelMap.errorMsg) {
-				warnings << "ERROR: $assetName (row $rowNum) - ${mfgModelMap.errorMsg}"
-			}
-			if (mfgModelMap.warningMsg) {
-				warnings << "WARNING: $assetName (row $rowNum) - ${mfgModelMap.warningMsg}"
+			// Now check the values against the Mfg/Model Map
+			if (mmm.errorMsg?.size() ) {
+				warnings << "ERROR: $asset.assetName (row $rowNum) - ${mmm.errorMsg}"
+				continue
+			} else {
+				if (mmm.warningMsg?.size()) {
+					warnings << "WARNING: $asset.assetName (row $rowNum) - ${mmm.warningMsg}"
+				}
+				if (asset.manufacturer?.id != mmm.mfgId)
+					asset.manufacturer = Manufacturer.get(mmm.mfgId)
+				if (asset.model?.id != mmm.modelId)
+					asset.model = Model.get(mmm.modelId)
+				asset.assetType = mmm.deviceType
+
+				log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
 			}
 
+			//
 			// Assign the Source/Target Location/Room/Rack properties for the asset
+			//
 			def errors
 			['source', 'target'].each { disposition ->
 				def d = locRoomRack[disposition]
@@ -1149,6 +1157,8 @@ class ImportService {
 						warnings << "Unable to set $disposition Loc/Room/Rack (row $rowNum) : $errors"
 					}
 				}
+
+
 			} // ['source', 'target'].each
 
 			// log.debug "$methodName asset $asset ${asset.sourceLocation}/${asset.sourceRoom}/${asset.sourceRack}"

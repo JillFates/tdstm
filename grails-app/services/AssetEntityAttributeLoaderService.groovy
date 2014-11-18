@@ -463,7 +463,8 @@ class AssetEntityAttributeLoaderService {
 	 * @param device - the AssetEntity object that is being created or updated
 	 * @param mfgNameParam - name of the manufacturer
 	 * @param modelNameParam - name of the model 
-	 * @param deviceType - the Device Type of the device that is used to help resolve the model at times
+	 * @param deviceTypeParam - the Device Type of the device that is used to help resolve the model at times
+	 * @param deviceTypeMap - a map of all of the existing types that the user's import must match in order to insert/update devices' models
 	 * @param usize - the Usize of the asset used when creating new models
 	 * @param canCreateMfgAndModel - a flag indicating that the user has the permission to create new mfg and models
 	 * @return A map containing the following values:
@@ -479,6 +480,8 @@ class AssetEntityAttributeLoaderService {
 		boolean deviceExists = device.id > 0
 		boolean mfgWasCreated = false
 		boolean modelWasCreated = false
+		// Flag to control if a combination should be cachable (e.g. blank mfg/model/type should NOT be cached)
+		boolean cachable = true 	
 
 		String mfgName = mfgNameParam
 		String modelName = modelNameParam
@@ -488,7 +491,7 @@ class AssetEntityAttributeLoaderService {
 		boolean haveDeviceType = deviceType?.size() > 0
 
 		// Flag when deviceType is supplied and is invalid which in most cases will result in an error or warning
-		boolean invalidDeviceType = false 	
+		boolean invalidDeviceType = true 	
 
 		// Get the Unknown Mfg in case we're doing a partial Mfg/Model reference and will go with the Unknown Mfg and corresponding Model
 		Manufacturer unknownMfg = Manufacturer.findByName('Unknown')
@@ -498,12 +501,13 @@ class AssetEntityAttributeLoaderService {
 			String dtlc = deviceType.toLowerCase()
 			if (deviceTypeMap.containsKey(dtlc)) {
 				deviceType = deviceTypeMap[dtlc]
+				log.debug "$methodName Found $dtlc in deviceTypeMap"
+				invalidDeviceType = false
+				haveDeviceType = true
 			}
-			haveDeviceType = deviceType?.size() > 0
-			invalidDeviceType = ! haveDeviceType
 		}	
 
-		log.debug "$methodName mfgNameParam=$mfgNameParam, modelNameParam=modelNameParam, deviceType=($deviceTypeParam/$deviceType), deviceExists=$deviceExists"
+		log.debug "**** $methodName mfgNameParam=$mfgNameParam, modelNameParam=modelNameParam, deviceType=($deviceTypeParam/$deviceType), deviceExists=$deviceExists, haveDeviceType=$haveDeviceType, invalidDeviceType=$invalidDeviceType"
 
 		// Some common error/warning messages used below
 		String DEVICE_TYPE_INVALID = "Device Type ($deviceTypeParam) is invalid"
@@ -527,7 +531,7 @@ class AssetEntityAttributeLoaderService {
 				warningMsg = StringUtil.concat(warningMsg, "Specified u-size ($usize) differs from existing model (${modelObj.usize}")
 			}
 			if (haveDeviceType && deviceType != modelObj.assetType) {
-				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceType) differs from existing model (${modelObj.assetType}")
+				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) differs from existing model (${modelObj.assetType}")
 			} else if (invalidDeviceType) {
 				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) was invalid, defaulted to existed model type (${modelObj.assetType}")
 			}
@@ -538,6 +542,7 @@ class AssetEntityAttributeLoaderService {
 		// @param createModelName - the name of the model to create
 		// @note This will assume the usize and deviceType from the local scope variables
 		def performCreateMfgModel = { mfgObj, createModelName, createDeviceType, createUsize ->
+			log.debug "${methodName}.performCreateMfgModel() mfg=$mfgObj, createModelName=$createModelName, createDeviceType=$createDeviceType, createUsize=$createUsize"
 			if (mfgObj instanceof String) {
 				mfgName = mfgObj
 				if (canCreateMfgAndModel) {
@@ -597,12 +602,24 @@ class AssetEntityAttributeLoaderService {
 
 			// If we don't have any of the information to lookup the Mfg/Model or just deviceType
 			if (! ( haveMfgName && haveModelName) ) {
-				if (! device.model) {
-					if (haveDeviceType) {
+				if (device.model) {
+					if (haveDeviceType && deviceType != device.model.assetType) {
+						warningMsg = "Specific device type ($deviceTypeParam) does not match the asset's exiting model type ($device.model.assetType})"
+					}
+					// Case 112/114
+					cachable = false
+				} else {
+					if (haveDeviceType && !invalidDeviceType) {
+						// Case 112
 						performUnknownAssignment()
 					} else {
-						// Error if it is a new asset or existing asset missing a model
-						errorMsg = 'A Model Name plus Mfg Name or Device Type are required'
+						if (haveDeviceType && invalidDeviceType) {
+							// Case 114
+							errorMsg = "An invalid device type ($deviceTypeParam) was specified"
+						} else {
+							// Case 111
+							errorMsg = 'A Model Name plus Mfg Name or Device Type are required'
+						}
 					}
 				}
 				break
@@ -614,6 +631,7 @@ class AssetEntityAttributeLoaderService {
 					deviceType = DEFAULT_DEVICE_TYPE
 
 				performUnknownAssignment()
+				//cachable = false
 				break
 			}
 
@@ -643,18 +661,23 @@ class AssetEntityAttributeLoaderService {
 			// Case when user has supplied a valid/existing Mfg
 			//
 			if (mfgList) {
+				log.debug "$methodName We have manufacturer(s) ${mfgList.size()}"
 				//
 				// Case when we don't have a model
 				//
 				if (! haveModelName) {
-					if (haveDeviceType) {
-						warningMsg = StringUtil.concat(warningMsg, "Incomplete Mfg/Model/Type therefore set to 'Unknown/Unknown - $deviceType'")
+					if (haveDeviceType && !invalidDeviceType) {
+						warningMsg = StringUtil.concat(warningMsg, "Incomplete Mfg/Model/Type therefore it was set to 'Unknown/Unknown - $deviceType'")
+						// Case 212
 						performUnknownAssignment()
 					} else {
-						if (invalidDeviceType)
-							warningMsg = StringUtil.concat(warningMsg, "Device Type ($deviceTypeParam) is invalid")
-
-						errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
+						if (haveDeviceType && invalidDeviceType) {
+							// Case 214
+							errorMsg = StringUtil.concat(warningMsg, "Device Type ($deviceTypeParam) is invalid")
+						} else {
+							// Case 211
+							errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
+						}
 					}
 					break
 				}
@@ -667,9 +690,10 @@ class AssetEntityAttributeLoaderService {
 				// Case when we have no mfg / model matches
 				// 
 				if (modelsCount == 0) {
+					log.debug "$methodName we have ZERO models"
 					if (modelList.size()==0) {
 						// No models found but we have a model name so we can create as long as we have a valid type
-						if (haveDeviceType) {
+						if (haveDeviceType && ! invalidDeviceType) {
 							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
 						} else {
 							// Can't create so send out error and possible warning on bogus device type
@@ -681,7 +705,7 @@ class AssetEntityAttributeLoaderService {
 					}
 				} else if (modelsCount==1) {
 					//
-					// Case when we found a unique match for existing mfg/model - our favorite case!
+					// Case 232 when we found a unique match for existing mfg/model - our favorite case!
 					//
 					performAssignment(foundModels[0])
 				} else {
@@ -768,7 +792,7 @@ class AssetEntityAttributeLoaderService {
 			break
 		} // while (true)
 
-		return [errorMsg: errorMsg, warningMsg: warningMsg, mfgWasCreated: mfgWasCreated, modelWasCreated: modelWasCreated]
+		return [errorMsg: errorMsg, warningMsg: warningMsg, mfgWasCreated: mfgWasCreated, modelWasCreated: modelWasCreated, cachable: cachable]
 	}
 	
 	/* To get DataTransferValue Asset Manufacturer
