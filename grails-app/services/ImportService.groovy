@@ -983,8 +983,11 @@ deviceTypeMap.each {k,v -> log.debug "$k=$v"}
 
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
 			def asset = assetEntityAttributeLoaderService.findAndValidateAsset( domainClass, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
-			if (!asset)
+			if (!asset) {
+				warnings << "Unable to initial asset for row $rowNum"
+				errorCount++
 				continue
+			}
 
 			if ( asset.id ) {
 				existingAssetsList << asset
@@ -1097,13 +1100,14 @@ deviceTypeMap.each {k,v -> log.debug "$k=$v"}
 			}
 
 			// Now check the values against the Mfg/Model Map
+			if (mmm.warningMsg?.size()) {
+				warnings << "WARNING: $asset.assetName (row $rowNum) - ${mmm.warningMsg}"
+			}
 			if (mmm.errorMsg?.size() ) {
 				warnings << "ERROR: $asset.assetName (row $rowNum) - ${mmm.errorMsg}"
+				errorCount++
 				continue
 			} else {
-				if (mmm.warningMsg?.size()) {
-					warnings << "WARNING: $asset.assetName (row $rowNum) - ${mmm.warningMsg}"
-				}
 				if (asset.manufacturer?.id != mmm.mfgId)
 					asset.manufacturer = Manufacturer.get(mmm.mfgId)
 				if (asset.model?.id != mmm.modelId)

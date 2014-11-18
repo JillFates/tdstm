@@ -53,4 +53,11 @@ class StringUtilTests extends GrailsUnitTestCase {
         assertTrue 'case sensitive', SU.containsAll('abCdeFg', ['C','F'])
         assertFalse 'no match', SU.containsAll('abcdefg', ['a','Z'])
     }
+
+    void testConCat() {
+        assertEquals "one", SU.concat('', 'one')
+        assertEquals "one-NULL", SU.concat(null, 'one-NULL')
+        assertEquals "one,two", SU.concat('one', 'two')
+        assertEquals "one : two", SU.concat('one', 'two', ' : ')
+    }
 }

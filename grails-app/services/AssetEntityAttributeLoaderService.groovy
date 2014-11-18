@@ -507,11 +507,11 @@ class AssetEntityAttributeLoaderService {
 			}
 		}	
 
-		log.debug "**** $methodName mfgNameParam=$mfgNameParam, modelNameParam=modelNameParam, deviceType=($deviceTypeParam/$deviceType), deviceExists=$deviceExists, haveDeviceType=$haveDeviceType, invalidDeviceType=$invalidDeviceType"
+		log.debug "**** $methodName mfgNameParam=$mfgNameParam, modelNameParam=$modelNameParam, deviceType=($deviceTypeParam/$deviceType), deviceExists=$deviceExists, haveDeviceType=$haveDeviceType, invalidDeviceType=$invalidDeviceType"
 
 		// Some common error/warning messages used below
 		String DEVICE_TYPE_INVALID = "Device Type ($deviceTypeParam) is invalid"
-		String LACK_INFO_NO_CREATE = 'Incomplete Mfg/Model/Type therefore did not update device'
+		String LACK_INFO_NO_CREATE = 'Incomplete Mfg/Model/Type therefore did not create device'
 		String UNEXPECTED_CONDITION = "assignMfgAndModelToDevice() got to an unexpected condition"
 
 		// Get the device's current mfg/model
@@ -531,9 +531,9 @@ class AssetEntityAttributeLoaderService {
 				warningMsg = StringUtil.concat(warningMsg, "Specified u-size ($usize) differs from existing model (${modelObj.usize}")
 			}
 			if (haveDeviceType && deviceType != modelObj.assetType) {
-				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) differs from existing model (${modelObj.assetType}")
+				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) differs from existing model (${modelObj.assetType})")
 			} else if (invalidDeviceType) {
-				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) was invalid, defaulted to existed model type (${modelObj.assetType}")
+				warningMsg = StringUtil.concat(warningMsg, "Specified device type ($deviceTypeParam) was invalid, defaulted to existed model type (${modelObj.assetType})")
 			}
 		}
 
@@ -649,10 +649,12 @@ class AssetEntityAttributeLoaderService {
 			if (haveModelName)
 				modelList = findModelsByName(modelName)		
 
+			/*
 			if (modelList.size() == 0 && ! device.model) {
 				errorMsg = "Model name is required"
 				break
 			} 
+			*/
 
 			List foundModels
 			int modelsCount
@@ -668,14 +670,14 @@ class AssetEntityAttributeLoaderService {
 				if (! haveModelName) {
 					if (haveDeviceType && !invalidDeviceType) {
 						warningMsg = StringUtil.concat(warningMsg, "Incomplete Mfg/Model/Type therefore it was set to 'Unknown/Unknown - $deviceType'")
-						// Case 212
+						log.debug "$methodName CASE 212"
 						performUnknownAssignment()
 					} else {
 						if (haveDeviceType && invalidDeviceType) {
-							// Case 214
+							log.debug "$methodName CASE 214"
 							errorMsg = StringUtil.concat(warningMsg, "Device Type ($deviceTypeParam) is invalid")
 						} else {
-							// Case 211
+							log.debug "$methodName CASE 211"
 							errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
 						}
 					}
@@ -694,38 +696,48 @@ class AssetEntityAttributeLoaderService {
 					if (modelList.size()==0) {
 						// No models found but we have a model name so we can create as long as we have a valid type
 						if (haveDeviceType && ! invalidDeviceType) {
+							log.debug "$methodName CASE 232"
 							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
 						} else {
-							// Can't create so send out error and possible warning on bogus device type
-							if (invalidDeviceType)
+							log.debug "$methodName CASE 231 or 234"
+							if (invalidDeviceType) {
 								warningMsg = StringUtil.concat(warningMsg, DEVICE_TYPE_INVALID)
-
+							}
 							errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
 						}
 					}
 				} else if (modelsCount==1) {
-					//
-					// Case 232 when we found a unique match for existing mfg/model - our favorite case!
-					//
+					// We found a unique match for existing mfg/model - our favorite case!
+					log.debug "$methodName CASE 232"
 					performAssignment(foundModels[0])
 				} else {
+					log.debug "$methodName fell into the mfg/model else section"
 					//
 					// Case when we found multiple mfg/models matches so we need to narrow down the deviceType to try and get unique
 					//
 					if (haveDeviceType) {
+						if (invalidDeviceType) {
+							log.debug "$methodName CASE 234"
+							errorMsg = "Invalid device type ($deviceTypeParam) specified"
+							break
+						}
+
 						// Try refining the list to include the Type
 						foundModels = foundModels.findAll { it.assetType == deviceType }
 						modelsCount = foundModels.size()
 
 						if (modelsCount == 0) {
+							log.debug "$methodName CASE 232"
 							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
 						} else if (modelsCount == 1) {
+							log.debug "$methodName CASE 211"
 							performAssignment(foundModels[0])
 						} else {
 							// Non-unique match - bad
 							errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
 						}
 					} else {
+						log.debug "$methodName CASE 231"
 						errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
 					}
 				}

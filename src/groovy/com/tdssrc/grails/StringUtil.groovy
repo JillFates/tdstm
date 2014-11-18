@@ -136,7 +136,7 @@ class StringUtil {
 	 * @return the con
 	 */
 	static String concat(String existingString, String newString, String separator=',') {
-		return [existingString, newString].join(separator)
+		return (existingString?.size()>0) ? [existingString, newString].join(separator) : newString
 	}
 
 }
