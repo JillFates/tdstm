@@ -30,7 +30,7 @@
 		jQuery(function($) {
 	        $("#run").click(function() {
 	        	if (buttonClicked) {
-	        		alert('You already have already clicked the Import Batches button.');
+	        		alert('You already clicked the Import Spreadsheet button and the upload is being processed.');
 	        		return false;
 	        	} 
 	        	buttonClicked=true;
