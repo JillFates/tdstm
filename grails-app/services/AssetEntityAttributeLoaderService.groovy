@@ -511,8 +511,10 @@ class AssetEntityAttributeLoaderService {
 
 		// Some common error/warning messages used below
 		String DEVICE_TYPE_INVALID = "Device Type ($deviceTypeParam) is invalid"
+		String DEVICE_TYPE_BLANK = "Device Type is needed but is blank"
+		String MODEL_BLANK = "Model name is needed but is blank"
 		String LACK_INFO_NO_CREATE = 'Incomplete Mfg/Model/Type therefore did not create device'
-		String UNEXPECTED_CONDITION = "assignMfgAndModelToDevice() got to an unexpected condition"
+		String UNEXPECTED_CONDITION = "An unexpected condition occurred for the Mfg/Model/Type combination"
 
 		// Get the device's current mfg/model
 		Manufacturer mfg = device.model?.manufacturer ?: device.manufacturer
@@ -606,18 +608,18 @@ class AssetEntityAttributeLoaderService {
 					if (haveDeviceType && deviceType != device.model.assetType) {
 						warningMsg = "Specific device type ($deviceTypeParam) does not match the asset's exiting model type ($device.model.assetType})"
 					}
-					// Case 112/114
+					log.debug "$methodName CASE 112/114"
 					cachable = false
 				} else {
 					if (haveDeviceType && !invalidDeviceType) {
-						// Case 112
+						log.debug "$methodName CASE 112"
 						performUnknownAssignment()
 					} else {
 						if (haveDeviceType && invalidDeviceType) {
-							// Case 114
+							log.debug "$methodName CASE 114"
 							errorMsg = "An invalid device type ($deviceTypeParam) was specified"
 						} else {
-							// Case 111
+							log.debug "$methodName CASE 111"
 							errorMsg = 'A Model Name plus Mfg Name or Device Type are required'
 						}
 					}
@@ -640,6 +642,7 @@ class AssetEntityAttributeLoaderService {
 				mfgList = findManufacturersByName(mfgName)
 			if (mfgList.size() > 1) {
 				// Check to see if we found more than one manufacturer / model combination
+				// Note that this should be nearly impossible unless someone screws up with the aliases some how
 				log.error "Manufacturer name ($mfgName) is not unique and should be corrected : $mfgList"
 				errorMsg = "Manufacturer ($mfgNameParam) must be unique"
 				break
@@ -648,13 +651,7 @@ class AssetEntityAttributeLoaderService {
 			List modelList = []
 			if (haveModelName)
 				modelList = findModelsByName(modelName)		
-
-			/*
-			if (modelList.size() == 0 && ! device.model) {
-				errorMsg = "Model name is required"
-				break
-			} 
-			*/
+			int modelListCount = modelList.size()
 
 			List foundModels
 			int modelsCount
@@ -692,24 +689,57 @@ class AssetEntityAttributeLoaderService {
 				// Case when we have no mfg / model matches
 				// 
 				if (modelsCount == 0) {
-					log.debug "$methodName we have ZERO models"
-					if (modelList.size()==0) {
+					log.debug "$methodName we have ZERO models matching Mfg"
+					if (modelListCount==0) {
 						// No models found but we have a model name so we can create as long as we have a valid type
 						if (haveDeviceType && ! invalidDeviceType) {
 							log.debug "$methodName CASE 232"
 							performCreateMfgModel(mfgList[0], modelName, deviceType, usize)
+							break
 						} else {
 							log.debug "$methodName CASE 231 or 234"
 							if (invalidDeviceType) {
 								warningMsg = StringUtil.concat(warningMsg, DEVICE_TYPE_INVALID)
 							}
 							errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
+							break
 						}
+					} else {
+						// Cases 321,322,323,324 - We have a list of existing models by name
+						if (invalidDeviceType) {
+							log.debug "$methodName CASE 324"
+							errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID)
+							break
+						}
+						if (!haveDeviceType) {
+							log.debug "$methodName CASE 321"
+							errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK)
+							break
+						}
+						
+	
+						// Try filtering down the original model list (w/o Mfg filtering) to get a model for the specified device type						
+						foundModels = modelList.findAll { it.assetType == deviceType }
+						modelsCount = foundModels.size()
+
+						if (modelsCount == 0) {
+							log.debug "$methodName CASE 323"
+							errorMsg = StringUtil.concat(errorMsg, "Device type ($devTypeParam) doesn't match any existing model of same name")
+						} else if (modelsCount == 1) {
+							log.debug "$methodName CASE 322"
+							warningMsg = StringUtil.concat(warningMsg, "Mfg ($mfgNameParam) doesn't match existing model's Mfg (${foundModels.manufacturer.name})")
+						} else {
+							log.debug "$methodName CASE 322 alternate"
+							errorMsg = StringUtil.concat(errorMsg, "Multiple models have same name and device type but don't match specified Mfg ($mfgNameParam)")
+						}
+						break
 					}
 				} else if (modelsCount==1) {
 					// We found a unique match for existing mfg/model - our favorite case!
 					log.debug "$methodName CASE 232"
 					performAssignment(foundModels[0])
+					break
+
 				} else {
 					log.debug "$methodName fell into the mfg/model else section"
 					//
@@ -736,71 +766,130 @@ class AssetEntityAttributeLoaderService {
 							// Non-unique match - bad
 							errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
 						}
+						break
 					} else {
 						log.debug "$methodName CASE 231"
 						errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
+						break
 					}
 				}
 
+				log.error "$methodName Reached condition with existing Mfg that was unhandled"
+				errorMsg = UNEXPECTED_CONDITION + ' for known Mfg'
 				break
 			} 
 
 			// 
-			// Case when user has supplied a non-existing Mfg Name and a Model Name (typical New Mfg/Model)
+			// Case when user has supplied a non-existing Mfg Name
 			//
 			// TODO : JPM 11/2014 : Should add logic to compare mfg name against model aliases to see if mfg name in the model name
-			if (haveMfgName && haveModelName) {
-				// First make sure we have a valid device type
-				if (invalidDeviceType || !haveDeviceType) {
+			if (haveMfgName) {
+				if (! haveDeviceType) {
+					log.debug "$methodName CASE 411, 421, 431"
+					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK)
+					if (! haveModelName) {
+						errorMsg = StringUtil.concat(errorMsg, MODEL_BLANK)
+					}
+					break
+				} else if ( invalidDeviceType) {
+					log.debug "$methodName CASE 414, 424, 434"
 					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID)
-				} else {
-					// Check to see if we have a model and type match and if so assume the user got the mfg name wrong
-					if (modelsCount > 0) {
-						// Filter down the model list to just the device type
-						foundModels = foundModels.findAll { it.assetType == deviceType }
-						modelsCount = foundModels.size()
-						// for modelsCount == 0 we'll fall out and catch in the next if statement
-						if (modelsCount == 1) {
-							performAssignment(foundModels[0])
-						} else if (modelsCount > 1) {
-							errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
-						}
-					}
-					if (modelsCount == 0) { 
-						// Create a new Mfg AND new Model
-						performCreateMfgModel(mfgName, modelName, deviceType, usize)
+				} else if (!haveModelName) {
+					if (! invalidDeviceType) {
+						log.debug "$methodName CASE 412"
+						performUnknownAssignment()
 					} else {
-						errorMsg = UNEXPECTED_CONDITION + ' - if (haveMfgName && haveModelName)'
+						log.error "$methodName reached if/else that was unexpected mfgNameParam=$mfgNameParam, modelNameParam=$modelNameParam, deviceType=($deviceTypeParam/$deviceType)"
+						errorMsg = StringUtil.concat(errorMsg, UNEXPECTED_CONDITION + ' without Mfg name')
 					}
+					break
+				} 
+
+				// Okay so we have a model name and a legit device type
+
+				// Check to see if we have a model and type match and if so assume the user got the mfg name wrong
+				if (modelsCount > 1) {
+					// Filter down the model list to just the device type
+					foundModels = foundModels.findAll { it.assetType == deviceType }
+					modelsCount = foundModels.size()
+					// for modelsCount == 0 we'll fall out and catch in the next if statement
+					if (modelsCount > 1) {
+						errorMsg = StringUtil.concat(errorMsg, "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique")
+					} else if (modelsCount == 1) {
+						log.debug "$methodName CASE 422"
+						warningMsg = StringUtil.concat(warningMsg, "Specified Mfg ($mfgNameParam) does not match the existing Model Mfg (${foundModels[0].manufacturer.name})")
+						performAssignment(foundModels[0])
+					} else {
+						log.debug "$methodName CASE 423"
+						performCreateMfgModel(mfgName, modelName, deviceType, usize)
+					}
+				}
+				if (modelsCount == 0) { 
+					// Create a new Mfg AND new Model
+					log.debug "$methodName CASE 432"
+					performCreateMfgModel(mfgName, modelName, deviceType, usize)
+				} else {
+					errorMsg = UNEXPECTED_CONDITION + ' with multiple model matches'
 				}
 
 				break
 			}
 
 			// 
-			// Case when user has supplied an existing Model name but no Mfg Name
+			// Case when user has NOT supplied the Mfg Name
 			//
-			if (modelsCount) {
-				if (modelsCount == 1) {
-					// We'll assign the model regardless of the deviceType but may warn 
-					performAssignment(foundModels[0])
-				} else {
-					// We have more than 1 model so see if we can narrow down by device type
-					if (haveDeviceType) {
-						foundModels = foundModels.findAll { it.assetType == deviceType }
-						modelsCount = foundModels.size()
+			if (! haveMfgName) {
+				if (!haveDeviceType) {
+					if (modelListCount == 1) {
+						log.debug "$methodName CASE 121"
+						warningMsg = StringUtil.concat(warningMsg, "No Mfg/Type specified therefore assuming you meant Mfg (${modelList[0].manufacturer.name})/Type (${modelList[0].assetType})")
+						performAssignment(modelList[0])
+					} else if (modelListCount > 0) {
+						log.debug "$methodName CASE 121 multiple model matches"
+						errorMsg = StringUtil.concat(errorMsg, "Multiple models matched by name without a type specified")
+					} else {
+						log.debug "$methodName CASE 121, 131"
+						errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_BLANK)
 					}
-					if (modelsCount == 1) {
-						// Found a single model name with the specified device type. Will assign but warn
+					break
+				} else if (invalidDeviceType) {
+					log.debug "$methodName CASE 124, 134"
+					errorMsg = StringUtil.concat(errorMsg, DEVICE_TYPE_INVALID)
+					break
+				}
+
+				if (modelListCount==0) {
+					// No Models found
+					log.debug "$methodName CASE 132"
+					errorMsg = StringUtil.concat(errorMsg, LACK_INFO_NO_CREATE)
+					break
+				} else {
+					// Try to find a match of the models by the deviceType
+					foundModels = modelList.findAll { it.assetType == deviceType }
+					modelsCount = foundModels.size()
+					if (modelsCount == 0) {
+						// Didn't find any matched after filtering on the device type so go back to the master model list
+						if (modelListCount == 1) {
+							log.debug "$methodName CASE 123"
+							// We'll assign the model regardless of the deviceType but may warn 
+							performAssignment(modelList[0])
+						} else {
+							log.debug "$methodName CASE 123 multiple model matches"
+							errorMsg = StringUtil.concat(errorMsg, "Multiple models matched by name but none had the specified type")
+						}
+					} else if (modelsCount == 1) {
+						log.debug "$methodName CASE 122"
+						warningMsg = StringUtil.concat(warningMsg, "No Mfg specified therefore assuming you meant Mfg (${foundModels[0].manufacturer.name})")
 						performAssignment(foundModels[0])
 					} else {
-						errorMsg = "Mfg/Model/DeviceType combination found $modelsCount matches, which must be unique"
+						log.debug "$methodName CASE 122 multiple model/type matches"
 					}
-				}
-				break
+					break
+				} 
 			}
 
-			errorMsg = UNEXPECTED_CONDITION + ' - while'
+			errorMsg = UNEXPECTED_CONDITION + ' at the end of conditions'
+			log.error "$methodName $errorMsg"
 			break
 		} // while (true)
 

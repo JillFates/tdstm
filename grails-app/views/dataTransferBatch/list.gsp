@@ -233,7 +233,7 @@
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
 						console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
-						alert('An error occurred while invoking the posting process.');
+						alert('An error occurred while getting the posting results.');
 					}
 				});
 				
