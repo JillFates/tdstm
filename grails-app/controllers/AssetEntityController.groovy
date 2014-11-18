@@ -317,7 +317,7 @@ class AssetEntityController {
 		def filesDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance, "Files" )
 		
 		def projectCustomLabels = new HashMap()
-		for(int i = 1; i< 96; i++){
+		for(int i = 1; i<= 96; i++){
 			if (project["custom"+i]) projectCustomLabels.put(project["custom"+i], "Custom"+i)
 		}
 
