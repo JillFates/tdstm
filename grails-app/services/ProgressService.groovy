@@ -197,10 +197,11 @@ class ProgressService {
 		} else {
 			log.debug("Key FOUND ${key}")
 			return [
-				percentComp : info.percentComp,
-				status : info.status,
-				detail : info.detail,
-				remainingTime : info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
+				percentComp: info.percentComp,
+				status: info.status,
+				detail: info.detail,
+				remainingTime: info.remainingTime == null ? 'Unknown' : TimeUtil.ago(info.remainingTime),
+				lastUpdated: info.lastUpdated
 			]
 		}
 	}
