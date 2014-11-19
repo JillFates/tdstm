@@ -182,14 +182,13 @@ class ImportService {
 			if (total < 1 || current > total) {
 				log.error "jobProgressUpdate() called with invalid total ($progressKey, $current, $total)"
 			} else {
-				int twoPerc = Math.round(total/100*2)
-				if (twoPerc == 0)
-					twoPerc = 1
-				log.debug "twoPerc = $twoPerc"
-				if (twoPerc > 0 && current.mod(twoPerc)==0) {
+				//int twoPerc = Math.round(total/100*2)
+				//if (twoPerc == 0)
+				//	twoPerc = 1
+				//if (twoPerc > 0 && current.mod(twoPerc)==0) {
 					int percComp = Math.round(current/total*100)
 					progressService.update(progressKey, (int)percComp, ProgressService.STARTED, "$current of $total")
-				}
+				//}
 			}
 		}
 	}
@@ -327,7 +326,6 @@ class ImportService {
 		
 		// Get a Device Type Map used to verify that device type are valid
 		Map deviceTypeMap = getDeviceTypeMap()
-deviceTypeMap.each {k,v -> log.debug "$k=$v"}
 
 		// A map that will be used to track the invalid referenced Device Types
 		HashMap invalidDeviceTypeMap = new HashMap()
@@ -417,7 +415,6 @@ deviceTypeMap.each {k,v -> log.debug "$k=$v"}
 
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
-
 		} // for
 
 		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
