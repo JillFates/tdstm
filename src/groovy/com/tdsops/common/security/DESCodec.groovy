@@ -1,3 +1,5 @@
+package com.tdsops.common.security
+
 import java.security.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
@@ -8,7 +10,7 @@ class DESCodec {
 
 	static encode(target) {
 		def cipher = getCipher(Cipher.ENCRYPT_MODE)
-		return cipher.doFinal(target.bytes).encodeBase64()
+		return cipher.doFinal(target.bytes).encodeBase64().toString()
 	}
 
 	static decode(target) {
@@ -25,7 +27,7 @@ class DESCodec {
 	}
 
 	private static getPassword() {
-		password.getBytes("UTF-8")
+		password.bytes
 	}
 
 }
