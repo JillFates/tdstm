@@ -11,6 +11,8 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 
+import org.springframework.web.context.request.RequestContextHolder
+
 /**
  * A set of methods used to support common functionality used in the Controllers
  */
@@ -61,6 +63,9 @@ class ControllerService {
 				}
 			}
 			if (!hasPerm) {
+				def request = RequestContextHolder.currentRequestAttributes().request
+				String 
+				securityService.reportViolation("attempted to access ${request.forwardURI} without permission ($perm)", user)
 				redirectToDefaultPage(controller, "Sorry but you are unauthorized to perform that action")
 				project = null
 			}

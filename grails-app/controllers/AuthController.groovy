@@ -1,4 +1,4 @@
-import org.apache.shiro.authc.AuthenticationException
+	import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.apache.shiro.SecurityUtils
@@ -149,7 +149,9 @@ class AuthController {
 	}
 
 	def signOut = {
-		// Log the user out of the application.
+		// Log the user out of the application
+		UserLogin userLogin = securityService.getUserLogin()
+		log.info "User $userLogin just logged out of the application"
 		SecurityUtils.subject?.logout()
 
 		// For now, redirect back to the login page.

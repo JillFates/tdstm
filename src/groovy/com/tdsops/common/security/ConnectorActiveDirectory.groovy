@@ -107,8 +107,7 @@ class ConnectorActiveDirectory {
 			}
 
 			if (! results.size()) {
-				if (config.debug)
-					log.info "Unable to locate username $username"
+				log.info "Unable to locate username $username"
 				throw new javax.naming.NameNotFoundException('Unable to locate username')
 			} 
 			
@@ -149,6 +148,8 @@ class ConnectorActiveDirectory {
 				log.info 'About to confirm user credentials with ldap.compare'
 
 			assert ldap.compare(u.dn, [samaccountname: smauser] )
+
+			log.info "Validated user credentials for $username with AD/LDAP"
 
 			// Map all of the user information into TM userInfo map
 			userInfo.company = config.company	// Copy over the company id
