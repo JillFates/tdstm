@@ -174,40 +174,28 @@ class AssetEntityController {
 			redirect( controller:"assetEntity", action:"list" )
 		}
 	}
-	/* -------------------------------------------------------
+
+	/**
 	 * To import the asset form data
-	 * @param project
-	 * @ render import export form
-	 * --------------------------------------------------------*/
+	 */
 	def assetImport = {
+		Project projectInstance
+		UserLogin userLogin
+
+		(projectInstance, userLogin) = controllerService.getProjectAndUserForPage(this, 'import') 
+		if (!projectInstance)
+			return 
+	
 		//get id of selected project from project view
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def assetsByProject
-		def projectInstance
-		def moveBundleInstanceList
-		def project
-		if ( projectId != null ) {
-			projectInstance = Project.findById( projectId )
-			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-		}
+		def projectId = projectInstance.id
+
+		List assetsByProject	= AssetEntity.findAllByProject(projectInstance)
+		List moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
+
 		def dataTransferSetImport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','I') ")
 		def dataTransferSetExport = DataTransferSet.findAll(" from DataTransferSet dts where dts.transferMode IN ('B','E') ")
-		if ( projectId == null ) {
-			//get project id from session
-			def currProj = getSession().getAttribute( "CURR_PROJ" )
-			projectId = currProj.CURR_PROJ
-			projectInstance = Project.findById( projectId )
-			moveBundleInstanceList = MoveBundle.findAllByProject( projectInstance )
-			if ( projectId == null ) {
-				flash.message = " No Projects are Associated, Please select Project. "
-				redirect( controller:"project",action:"list" )
-			}
-		}
-		if ( projectId != null ) {
-			project = Project.findById(projectId)
-			assetsByProject = AssetEntity.findAllByProject(project)
-		}
-		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
+
+		def	dataTransferBatchs = DataTransferBatch.findAllByProject(projectInstance).size()
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 		
@@ -221,18 +209,23 @@ class AssetEntityController {
 		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
 			isMSIE = true
 		
-		render( view:"importExport", model : [ assetsByProject: assetsByProject,
+		render( view:"importExport", model: [ 
+			assetsByProject: assetsByProject,
 			projectId: projectId,
 			moveBundleInstanceList: moveBundleInstanceList,
 			dataTransferSetImport: dataTransferSetImport,
-			dataTransferSetExport: dataTransferSetExport, prefMap:prefMap,
-			dataTransferBatchs: dataTransferBatchs, args:params.list("args"), isMSIE:isMSIE, message:params.message, error:params.error] )
+			dataTransferSetExport: dataTransferSetExport, 
+			prefMap: prefMap,
+			dataTransferBatchs: dataTransferBatchs, 
+			args: params.list("args"), 
+			isMSIE: isMSIE, 
+			message: params.message, 
+			error: params.error] )
 	}
-	/* -----------------------------------------------------
-	 * To Export the assets
-	 * @author Mallikarjun 
-	 * render export form
-	 *------------------------------------------------------*/
+
+	/**
+	 * To render the Export form
+	 */
 	def assetExport = {
 		render( view:"assetExport" )
 	}
