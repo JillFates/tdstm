@@ -1085,6 +1085,7 @@ deviceTypeMap.each {k,v -> log.debug "$k=$v"}
 			} else {
 				log.debug "$methodName Did not find asset in cache so calling assetEntityAttributeLoaderService.assignMfgAndModelToDevice()"
 				// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
+				log.debug "**** ROW $rowNum"
 				Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
 				log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
 				mmm = [
