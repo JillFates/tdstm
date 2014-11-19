@@ -15,20 +15,9 @@
 	
 	<script type="text/javascript">
 		$(document).ready(function() {
-			$.fn.serializeForm = function() {
-			    data = {};
-			    url = this.attr("action");
-			    items = this.serializeArray();
-			    $.each(items,function(i,item) {
-			        data[item['name']]=item['value'];
-			    });
-			    return data;
-			}
-			
 			$('#exportForm').submit(function(e){
 				var form = $('#exportForm');
-		        items = {};
-		        items = form.serializeForm();
+		        var items = form.serialize();
 		        url = form.attr("action");
 
 				$.post(url, items, function(data) {
@@ -78,7 +67,7 @@
 				<tr>
 					<td valign="top" class="name">Select on or more bundle(s):</td>
 					<td valign="top" class="value">
-						<select MULTIPLE id="bundleId" name="bundle">
+						<select id="bundleId" name="bundle" multiple="multiple">
 							<option value="" selected="selected">All</option>
 							<g:each status="i" in="${moveBundleInstanceList}" var="moveBundle">
 								<option value="${moveBundle?.id}">${moveBundle?.name}</option>
