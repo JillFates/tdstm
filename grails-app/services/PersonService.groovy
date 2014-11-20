@@ -181,7 +181,8 @@ class PersonService {
 			return results
 		}
 
-		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.roleTypeCodeFrom='COMPANY' and PR.partyRelationshipType='STAFF' and PR.partyIdFrom IN (:companies)"
+		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType='STAFF' " +
+			"and PR.roleTypeCodeFrom='COMPANY' and PR.roleTypeCodeTo='STAFF' and PR.partyIdFrom IN (:companies)"
 		String where = " and P.firstName=:firstName and P.middleName=:middleName and P.lastName=:lastName"
 		String lastName = lastNameWithSuffix(nameMap)
 		List companies = [project.client]
@@ -197,10 +198,12 @@ class PersonService {
 		List persons = Person.findAll(hql+where, queryParams)
 		if (persons) 
 			persons = persons.collect( {it[1]} )
-		log.debug "$mn Initial search found ${persons.size()}"
+		log.debug "$mn Initial search found ${persons.size()} $nameMap"
 
 		int s = persons.size()
 		if (s > 1) {
+			persons.each { person -> log.debug "person ${person.id} $person"}
+			results.person = persons[0]
 			results.isAmbiguous=true
 		} else if (s == 1) {
 			results.person = persons[0]
