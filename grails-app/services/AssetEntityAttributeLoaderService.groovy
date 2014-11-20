@@ -732,6 +732,7 @@ class AssetEntityAttributeLoaderService {
 						} else if (filteredCount == 1) {
 							log.debug "$methodName CASE 322"
 							warningMsg = StringUtil.concat(warningMsg, "Mfg ($mfgNameParam) doesn't match existing model's Mfg (${filteredModels.manufacturer.name})", delim)
+							performAssignment(filteredModels[0])
 						} else {
 							log.debug "$methodName CASE 322 alternate"
 							errorMsg = StringUtil.concat(errorMsg, "Multiple models have same name and device type but don't match specified Mfg ($mfgNameParam)", delim)
@@ -811,7 +812,7 @@ class AssetEntityAttributeLoaderService {
 				} 
 
 				// Okay so we have a model name and a legit device type so try filtering the model list on the deviceType
-				filteredModels = filteredModels.findAll { it.assetType == deviceType }
+				filteredModels = modelList.findAll { it.assetType == deviceType }
 				filteredCount = filteredModels.size()
 
 				if (filteredCount == 0) {
