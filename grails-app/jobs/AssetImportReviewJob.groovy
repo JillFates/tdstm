@@ -41,15 +41,15 @@ class AssetImportReviewJob {
 
 			log.debug "execute() batchId=$batchId, projectId=$projectId, userLoginId=$userLoginId, timeZoneId=$timeZoneId, progressKey=$progressKey"
 
-			log.info "execute() is about to invoke importService.invokeAssetImportProcess to start processing batch ($batchId)"
+			log.info "execute() is about to invoke importService.invokeAssetImportProcess to start processing batch ($batchId) for project $projectId"
 
 			results = importService.reviewImportBatch(projectId, userLoginId, batchId, progressKey)
 
 			log.info "execute() return from importService.invokeAssetImportProcess() : results=$results"
-			
+		
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
-			progressService.update(progressKey, 100I, FAILED, e.getMessage())
-		} 
+			progressService.fail(progressKey, e.getMessage())
+		}
 	}
 }

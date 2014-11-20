@@ -55,14 +55,13 @@ class ImportService {
 	// Indicates the number of rows to process before performing a flush/clear of the Hibernate session queue
 	static final int HIBERNATE_BATCH_SIZE=20
 
-
 	/**
 	 * Used to lookup and validate a batch id exists and is associated to the current project
 	 * @param id - the batch id to lookup
 	 * @param projectId - the id of the project that the user is associated with
 	 * @return [DataTransferBatch object, String error message if any] - if error then the DTB object will be null
 	 */
-	List getAndValidateBatch(String id, Long projectId) {
+	List getAndValidateBatch(String id, Long projectId, Long userLoginId) {
 		String errorMsg
 		DataTransferBatch dtb
 		Long batchId = NumberUtil.toLong(id)
@@ -74,17 +73,15 @@ class ImportService {
 				errorMsg = 'Unable to find specified batch'
 			} else {
 				if (dtb.project.id != projectId) {
-					securityService.reportViolation("getAndValidateBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)")
+					UserLogin userLogin = UserLogin.get(userLoginId)
+					securityService.reportViolation("getAndValidateBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)", userLogin)
 					errorMsg = 'Unable to locate specified batch'
 					dtb = null
 				}			
 			}
 		}
-
 		return [dtb, errorMsg]
-
 	}
-
 
 	/** 
 	 * Used by the process methods to peform the common validation checks before processing
@@ -98,23 +95,23 @@ class ImportService {
 		log.info "processValidate(project:${project.id}, userLogin:$userLogin, assetClass:${assetClass.toString()}, batchId:$batchId) started invoked at (${new Date().toString()})"
 
 		if (! securityService.hasPermission(userLogin, 'Import')) {
-			securityService.reportViolation("Attempted to process asset imports without permission, project:$project, batchId:$batchId")
+			securityService.reportViolation("Attempted to process asset imports without permission, project:$project, batchId:$batchId", userLogin)
 			throw new UnauthorizedException('You do not have permission to process asset imports')
 		}
 
 		Long id = NumberUtil.toLong(batchId)
 		if (id == null || id < 1) {
-			securityService.reportViolation("Attempted to process asset imports invalid batch id ($batchId), project:$project")
+			securityService.reportViolation("Attempted to process asset imports invalid batch id ($batchId), project:$project", userLogin)
 			throw new InvalidParamException("Invalid batch id was requested")
 		}
 
 		def dataTransferBatch = DataTransferBatch.get(batchId)
 		if (! dataTransferBatch) {
-			securityService.reportViolation("Attempted to process asset imports with missing batchId $batchId, project:$project")
+			securityService.reportViolation("Attempted to process asset imports with missing batchId $batchId, project:$project", userLogin)
 			throw new InvalidParamException('Unable to find the specified batch')
 		}
 		if (dataTransferBatch.project.id != project.id) {
-			securityService.reportViolation("Attempted to process asset imports with batchId $batchId not assocated with their session (${project.id})")
+			securityService.reportViolation("Attempted to process asset imports with batchId $batchId not assocated with their session (${project.id})", userLogin)
 			throw new InvalidParamException('Unable to find the specified batch')
 		}
 
@@ -226,49 +223,6 @@ class ImportService {
 		}
 	}
 
-	/** 
-	 * Used to initialize the session in order to track the progress of the process
-	 * @param session - the browser Session object
-	 * @param  assetCount - the number of assets to be processed by the batch
-	 */
-	void initProgress(session, assetCount) {
-		if (session) {
-			session.setAttribute("TOTAL_BATCH_ASSETS", assetCount)
-			session.setAttribute("TOTAL_PROCESSES_ASSETS", 0)
-		}
-	}
-
-	/**
-	 * Used to update the session with the current counter
-	 * @param session - the browser session
-	 * @param currentCount - the number of assets currently completed
-	 * @param forceUpdate - boolean flag to update the session regardless of the modulus factor (default false)
-	 */
-	// void updateProgress(session, currentCount, Project project, UserLogin userLogin, DataTransferBatch dtb) {
-	void updateProgress(session, currentCount, boolean forceUpdate=false) {
-
-		// Only need to update the session every n records since the browser polling is at 5 seconds
-		if (session && ( forceUpdate || currentCount.mod(50) == 0))
-			session.setAttribute("TOTAL_PROCESSES_ASSETS", currentCount)
-
-		/*
-		// Note that clearing the session was clobbering objects and giving us all sorts of issues. I ended up 
-		// implementing the setSessionFlushMode(COMMIT) which seems to work better (maybe)
-		if (currentCount.mod(HIBERNATE_BATCH_SIZE) == 0) {
-			log.info "Processed $currentCount ${dtb.eavEntityType?.domainName} records for batch (${dtb.id})"
-
-			def hibernateSession = sessionFactory.getCurrentSession()
-			hibernateSession.flush()
-			hibernateSession.clear()
-
-			// Re-fetch a few objects that we need around that otherwise cause missing session errors
-			project = project.merge()
-			userLogin = userLogin.merge()
-			dtb = dtb.merge()
-		}
-		*/		
-	}
-
 	/**
 	 * This method is used to set the Hibernate Session FlushMode which might be helpful under certain condiitions
 	 */
@@ -318,7 +272,7 @@ class ImportService {
 			return [error:'Unable to find batch id']
 		}
 		if (dtb.project.id != projectId) {
-			securityService.reportViolation("reviewImportBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)")
+			securityService.reportViolation("reviewImportBatch() call attempted to access batch ($batchId) not associated to user's project ($projectId)", userLogin)
 			return [error:'Unable to locate batch id']
 		}
 
@@ -438,14 +392,6 @@ class ImportService {
 			}
 		}
 
-		// Log found Mfg/Model references
-		/*
-		mfgModelMatches.each { k, d ->
-			if (d.found)
-				sb.append("Mfg: ${d.mfg} Model: ${d.model} found - ${d.count} reference(s)<br>") 
-		}
-		*/
-
 		if( dupAssetIds ) {
 			sb.append("<b>Duplicated asset IDs (col A) $dupAssetIds</b><br>")
 			sb.append('<br>')
@@ -549,7 +495,7 @@ class ImportService {
 	 * @param progressKey - the progressService key to be used to track the process if the statusCode is in POSTING mode
 	 * @return an error message if any or null if it is safe to proceed
 	 */
-	String validateImportBatchCanBeProcessed(Long projectId, Long batchId, String progressKey=null) {
+	String validateImportBatchCanBeProcessed(Long projectId, Long userId, Long batchId, String progressKey=null) {
 		String errorMsg
 		while (true) {
 			DataTransferBatch dtb = DataTransferBatch.get(batchId)
@@ -560,7 +506,8 @@ class ImportService {
 
 			// Validate that the project matches the user's
 			if (dtb.project.id != projectId) {
-				securityService.reportViolation("attemped to post import batch ($batchId) that is not associated with current project ($projectId)")
+				UserLogin userLogin = UserLogin.get(userId)
+				securityService.reportViolation("attemped to post import batch ($batchId) that is not associated with current project ($projectId)", userLogin)
 				errorMsg = 'Invalid batch id was submitted'
 				break
 			}
@@ -612,7 +559,7 @@ class ImportService {
 				// Set the hibernate flush mode to be controlled by us for performance reasons
 				session.setFlushMode(FlushMode.COMMIT)				
 				
-				errorMsg = validateImportBatchCanBeProcessed(projectId, batchId, progressKey)
+				errorMsg = validateImportBatchCanBeProcessed(projectId, userLoginId, batchId, progressKey)
 				if (errorMsg)
 					break
 
@@ -973,16 +920,15 @@ class ImportService {
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
+			log.debug "**** ROW $rowNum"
 
 			// Get all of the property values imported for a given row
 			dtvList?.clear()
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset( domainClass, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 			if (!asset) {
-				warnings << "Unable to initial asset for row $rowNum"
-				errorCount++
 				continue
 			}
 
@@ -999,6 +945,9 @@ class ImportService {
 
 			// Vars caught in the each loop below to be used to create mfg/model appropriately
 			String mfgName, modelName, usize, deviceType
+
+			// Vars caught in the each loop for setting the chassis and position
+			String sourceChassis, targetChassis, sourceBladePosition, targetBladePosition
 
 			// Iterate over the attributes to update the asset with
 			dtvList.each {
@@ -1034,13 +983,19 @@ class ImportService {
 					case "usize":
 						usize = it.correctedValue ?: it.importValue
 						break
-
 					case "sourceChassis":
-						appendBladeToChassis(project, asset, it.importValue, true, warnings, rowNum)
+						sourceChassis = it.correctedValue ?: it.importValue
+						// appendBladeToChassis(project, asset, it.importValue, true, warnings, rowNum)
 						break
-
 					case "targetChassis":
-						appendBladeToChassis(project, asset, it.importValue, false, warnings, rowNum)
+						targetChassis = it.correctedValue ?: it.importValue
+						// appendBladeToChassis(project, asset, it.importValue, false, warnings, rowNum)
+						break
+					case 'sourceBladePosition':
+						sourceBladePosition = it.correctedValue ?: it.importValue
+						break
+					case 'targetBladePosition':
+						targetBladePosition = it.correctedValue ?: it.importValue
 						break
 
 					// case ~/^(location|room|rack)(Source|Target)\.(.+)/:
@@ -1061,7 +1016,6 @@ class ImportService {
 						// Try processing all common properties
 						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount)
 				}
-
 			}
 
 			//
@@ -1082,7 +1036,6 @@ class ImportService {
 			} else {
 				log.debug "$methodName Did not find asset in cache so calling assetEntityAttributeLoaderService.assignMfgAndModelToDevice()"
 				// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
-				log.debug "**** ROW $rowNum"
 				Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
 				log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
 				mmm = [
@@ -1113,6 +1066,18 @@ class ImportService {
 				asset.assetType = mmm.deviceType
 
 				log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
+			}
+
+			// 
+			// Deal with Chassis
+			//
+			if (asset.isaBlade()) {
+				if ( ! StringUtil.isBlank(sourceChassis)) {
+					appendBladeToChassis(project, asset, sourceChassis, sourceBladePosition, true, warnings, rowNum)
+				}
+				if ( ! StringUtil.isBlank(targetChassis)) {
+					appendBladeToChassis(project, asset, targetChassis, targetBladePosition, false, warnings, rowNum)
+				}
 			}
 
 			//
@@ -1504,7 +1469,7 @@ class ImportService {
 		if (count) {
 			String title = "${count} asset${count != 1 ? 's where' : ' was'} skipped due to having been updated since the export was done:"
 			sb.append("<li>$title<ul>")
-			assets.each { sb.append("<li>${it.id} ${it.assetName}</li>") }
+			assets.each { sb.append("<li>${it}</li>") }
 			sb.append('</ul></li>')
 		}
 		sb.append('</ul></li>')
@@ -1525,50 +1490,63 @@ class ImportService {
 		sb.append('</ul></li>')
 	}
 
-	void appendBladeToChassis(project, assetEntity, importValue, isSource, warnings, rowNum) {
-		def result = false
-		if (!StringUtils.isBlank(importValue) && assetEntity.isaBlade()) {
-			def chassisType = isSource?'source':'target'
-			if (importValue.startsWith("id:")) {
-				// Proccess chassis id
-				def chassisKey = null
-				def chassisName = null
-				// Check if there is a chassis name in the cell too
-				if (importValue.indexOf(' ') > 0) {
-					chassisKey = importValue.substring(0, importValue.indexOf(' '))
-					chassisName = importValue.substring(importValue.indexOf(' ') + 1, importValue.size())
-				} else {
-					chassisKey = importValue
-				}
-				def chassisId = chassisKey.substring(3, chassisKey.size())
-				def chassis = AssetEntity.get(chassisId.toLong())
-				if (chassis) {
-					// Validates that the chassis name match with the chassis found
-					if (chassisName != null && (!chassisName.equals(chassis.assetName))) {
-						warnings << "Chassis $chassisType with id $chassisId don't have name $chassisName (row $rowNum)"
+	void appendBladeToChassis(Project project, AssetEntity assetEntity, String chassisIdName, String bladePosition, boolean isSource, List warnings, int rowNum) {
+		try {
+			log.debug "appendBladeToChassis() chassisIdName=$chassisIdName, bladePosition=$bladePosition, isSource=$isSource"
+			if (!StringUtils.isBlank(chassisIdName) && assetEntity.isaBlade()) {
+				def chassisType = isSource?'source':'target'
+				if (chassisIdName.startsWith("id:")) {
+					// Parse out the  chassis id: Name
+					String chassisKey = null
+					String chassisName = null
+					// Check if there is a chassis name in the cell too
+					if (chassisIdName.indexOf(' ') > 0) {
+						chassisKey = chassisIdName.substring(0, chassisIdName.indexOf(' '))
+						chassisName = chassisIdName.substring(chassisIdName.indexOf(' ') + 1, chassisIdName.size())
+					} else {
+						chassisKey = chassisIdName
 					}
-					assetEntityService.assignBladeToChassis(project, assetEntity, chassis.id.toString(), isSource)
-					result = true
+					def chassisId = chassisKey.substring(3, chassisKey.size())
+					Long id = NumberUtil.toLong(chassisId)
+					if (id != null && id > 0) {
+						def chassis = AssetEntity.get(id)
+						if (chassis) {
+							if (chassis.project.id != project.id) {
+								securityService.reportViolation("in appendBladeToChassis - tried to access asset ($id) not associated with project (${project.id})")
+								warnings << "ERROR: No $chassisType chassis with id $chassisId found (row $rowNum)"
+							} else {
+								// Validates that the chassis name match with the chassis found
+								if (chassisName != null && (!chassisName.equals(chassis.assetName))) {
+									warnings << "WARNING: Chassis ($chassisIdName) for $chassisType does not match referenced name ($chassis.assetName) (row $rowNum)"
+								}
+								String bladeWarnings = assetEntityService.assignBladeToChassis(project, assetEntity, chassis.id.toString(), isSource, bladePosition)
+								if (bladeWarnings)
+									warnings << "WARNING: Blade $chassisName $bladeWarnings (row $rowNum)"
+							}
+						} else {
+							warnings << "ERROR: No $chassisType chassis with id $chassisId found (row $rowNum)"
+						}
+					} else {
+						warnings << "ERROR: Invalid $chassisType chassis id ($chassisId) specified (row $rowNum)"
+					}
 				} else {
-					warnings << "No chassis $chassisType found with id $chassisId (row $rowNum)"
-				}
-
-			} else {
-				// Proccess chassis name
-				def chassis = AssetEntity.findAllByAssetName(importValue)
-				if (chassis.size() > 0) {
-					// Check if we found more than one chassis
-					if (chassis.size() > 1) {
-						warnings << "Non-unique blade chassis name ($importValue) was referenced"
-					} else  {
-						def sChassis = chassis[0]
-						assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource)	
-						result = true
-					}				
-				} else {
-					warnings << "No chassis $chassisType found with name $importValue (row $rowNum)"
+					// Proccess chassis name
+					def chassis = AssetEntity.findAllByAssetNameAndProject(chassisIdName, project)
+					if (chassis.size() > 0) {
+						// Check if we found more than one chassis
+						if (chassis.size() > 1) {
+							warnings << "ERROR: A non-unique blade chassis name ($chassisIdName) for $chassisType was referenced (row $rowNum)"
+						} else  {
+							def sChassis = chassis[0]
+							assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource)	
+						}				
+					} else {
+						warnings << "ERROR: No $chassisType chassis found with name ($chassisIdName) (row $rowNum)"
+					}
 				}
 			}
+		} catch (e) {
+			warnings << "${e.toString()} (row $rowNum)"
 		}
 	}
 

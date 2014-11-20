@@ -405,18 +405,20 @@ class AssetEntityService {
 	 * @param blade - the blade being assigned
 	 * @param chassisId - the id of the chassis to assign to
 	 * @param isSource - true indicates that the assignment will be done at the source otherwise at the target
+	 * @param bladePosition - the position to assign the blade to (optional)
+	 * @return a string that represents any warnings
 	 */
-	void assignBladeToChassis(Project project, AssetEntity blade, String chassisId, boolean isSource) {
+	String assignBladeToChassis(Project project, AssetEntity blade, String chassisId, boolean isSource, String bladePosition=null) {
+		String warnings
 		def srcOrTrgt = (isSource ? 'Source' : 'Target')
 		def roomProp = "room$srcOrTrgt"
 		def chassisProp = (isSource ? 'sourceChassis' : 'targetChassis')
 
-		def assetType = blade.assetType
-		if (assetType != AssetType.BLADE.toString()) {
-			throw new InvalidRequestException("Attempted to assign a non-blade type asset to a chassis (type $assetType)".toString())
+		if ( ! blade.isaBlade() ) {
+			throw new InvalidRequestException("Attempted to assign a non-blade type asset to a chassis (type ${blade.assetType})".toString())
 		}
 
-		log.debug "assignBladeToChassis(${project.id}, ${blade.id}, $chassisId, $isSource) - chassisProp=$chassisProp"
+		log.debug "assignBladeToChassis(${project.id}, ${blade.id}, $chassisId, $isSource) - chassisProp=$chassisProp, bladePosition=$bladePosition"
 		// TODO : JPM 9/2014 : If moving to a different room then we need to disconnect cabling (enhancement)
 
 		// Clear out some non-blade type fields that sometimes get set
@@ -436,7 +438,7 @@ class AssetEntityService {
 			if (!chassis) {
 				throw new EmptyResultException("Unable to find chassis".toString())
 			}
-			assetType = chassis.model?.assetType
+			String assetType = chassis.model?.assetType
 			if (assetType != AssetType.BLADE_CHASSIS.toString()) {
 				throw new InvalidRequestException("Attempted to assign a blade to a non-chassis type device (type $assetType)".toString())
 			}
@@ -449,9 +451,20 @@ class AssetEntityService {
 			} else {
 				log.debug "assignBladeToChassis() no changes to the chassis assignment"
 			}
+
+			// Try to assign the blade position if supplied
+			if (! StringUtil.isBlank(bladePosition)) {
+				int bp = NumberUtil.toTinyInt(bladePosition) 
+				if (bp) {
+					if (bp > chassis.model?.bladeCount) {
+						warnings = "position ($bp) exceeds chassis capacity (${chassis.model.bladeCount})"
+					}
+				} else {
+					warnings = "position ($bladePosition) specified is invalid"
+				}
+			}
 		}
-
-
+		return warnings
 	}
 
 	/**

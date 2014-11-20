@@ -5,14 +5,14 @@
  */
 
 import javax.servlet.http.HttpSession
-import org.springframework.web.context.request.RequestContextHolder
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
-import com.tdsops.tm.enums.domain.RoleTypeGroup
- 
 import org.springframework.beans.factory.InitializingBean
-import com.tdsops.common.grails.ApplicationContextHolder
+import org.springframework.web.context.request.RequestContextHolder
+
 import com.tdsops.common.exceptions.ConfigurationException
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.RoleTypeGroup
 
 class SecurityService implements InitializingBean {
 	
@@ -290,9 +290,20 @@ class SecurityService implements InitializingBean {
 	 * @param user - optionally provide the user otherwise it will be looked up automatically
 	 */
 	void reportViolation(String message, UserLogin user=null) {
-		if (! user) {
-			user = getUserLogin()
+		String username
+		if (user) {
+			username = user.toString()
+		} else {
+			try {
+				username = getUserLogin()?.toString()
+				username = username ?: 'UnableToDetermine' 
+			} catch (org.apache.shiro.UnavailableSecurityManagerException e) {
+				username = 'ProcessRunningAsService'
+			} catch (e) {
+				log.error "An exception (${e.getMessage()}) while looking up user\n${ExceptionUtil.stackTraceToString(e)}"
+				username = 'UnknownUser'
+			}
 		}
-		log.warn "SECURITY_VIOLATION : $message by user $user"
+		log.warn "SECURITY_VIOLATION : $message by user $username"
 	}
 }

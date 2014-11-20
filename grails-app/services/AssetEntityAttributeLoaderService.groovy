@@ -531,8 +531,9 @@ class AssetEntityAttributeLoaderService {
 			log.debug "${methodName}.performAssignment() model=$modelObj"
 
 			// Add a few possible warning messages
-			if (usize?.size() && usize != modelObj.usize) {
-				warningMsg = StringUtil.concat(warningMsg, "Specified u-size ($usize) differs from existing model (${modelObj.usize}", delim)
+//			if (! device.isaBlade() && usize?.size() && usize != modelObj.usize) {
+			if (usize?.size() && ! usize.equals(modelObj.usize.toString()))  {
+				warningMsg = StringUtil.concat(warningMsg, "Specified u-size ($usize) differs from existing model (${modelObj.usize})", delim)
 			}
 			if (haveDeviceType && deviceType != modelObj.assetType) {
 				warningMsg = StringUtil.concat(warningMsg, 
@@ -1183,7 +1184,7 @@ class AssetEntityAttributeLoaderService {
 	 *   - dtvList
 	 *   - project
 	 */
-	def findAndValidateAsset(clazz, assetId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets) { 
+	def findAndValidateAsset(Project project, UserLogin userLogin, clazz, assetId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum) { 
 		
 		// Try loading the application and make sure it is associated to the current project
 		def asset 
@@ -1202,14 +1203,14 @@ class AssetEntityAttributeLoaderService {
 							// The asset has been updated since the last export so we don't want to overwrite any possible changes
 							errorCount++
 							errorConflictCount += validateResultList.errorConflictCount
-							ignoredAssets << asset
+							ignoredAssets << "${asset.id} ${asset.assetName} (row $rowNum)"
 							log.warn "findAndValidateAsset() Field validation error for $clazzName (id:${asset.id}, assetName:${asset.assetName})"
 							asset = false
 						}
 					}
 				} else {
 					// If id is not associated to the project then we'll just ignore it and handle as a new asset
-					securityServie.reportViolation("attempted import of $clazzName asset ($assetId) not associated with project (${project.id}")
+					securityService.reportViolation("import referenced $clazzName asset ($assetId) not associated with project (${project.id})", userLogin)
 					asset.clear()
 					asset = null
 				}

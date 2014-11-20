@@ -51,7 +51,7 @@ class ImportController {
 					break
 				}
 				DataTransferBatch dtb 
-				(dtb, errorMsg) = importService.getAndValidateBatch(params.id, project.id)
+				(dtb, errorMsg) = importService.getAndValidateBatch(params.id, project.id, userLogin.id)
 				if (errorMsg)
 					break
 				
@@ -149,7 +149,7 @@ class ImportController {
 
 				batchId = NumberUtil.toLong(params.id)
 
-				errorMsg = importService.validateImportBatchCanBeProcessed(project.id, batchId)
+				errorMsg = importService.validateImportBatchCanBeProcessed(project.id, userLogin.id, batchId)
 				if (errorMsg)
 					break
 

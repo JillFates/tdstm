@@ -36,12 +36,14 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 	}
 	var refUiContainerId = '#' + uiContainerId;
 
-	var FAILED='Failed'
-	var COMPLETED='Completed'
-	var PENDING='Pending'
-	var STARTED='In progress'
-	var PAUSED='Paused'
+	var FAILED='Failed';
+	var COMPLETED='Completed';
+	var PENDING='Pending';
+	var STARTED='In progress';
+	var PAUSED='Paused';
 
+	var STALLED_RETRIES=10;
+	
 	var destroy = function() {
 	};
 
@@ -114,12 +116,15 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 						// Double-check to makes sure that the progress has been moving forward
 						if (data.lastUpdated == lastUpdated) {
 							noProgressCount++;
-							if (noProgressCount > 2) {
+							if (noProgressCount > STALLED_RETRIES) {
 								if (! confirm('It appears that the process has stopped work. Press Okay to continue waiting otherwise press Cancel to abort.')) {
 									data.status=FAILED;
 									data.detail=null;
 								} else {
 									noProgressCount = 0;
+									setTimeout( function() {
+										updateProgress();
+									}, pingTime);
 									return;
 								}
 							}
@@ -153,11 +158,12 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 							case FAILED:
 								if (data.detail) {
 									showDetail=true;
+									showClose=true;
 								} else {
 									status.html(data.status);
+									finishProgressBar(onFailure);
 								}
 								failed=true;
-								finishProgressBar(onFailure);
 
 							default:
 								// Paused/Pending
