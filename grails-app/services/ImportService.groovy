@@ -202,25 +202,15 @@ class ImportService {
 	}
 
 	/**
-	 * Used to clear out the hibernate session of objects no longer needed to help performance
-	 * @param counter - a count of how many transactions have occurred (running tally)
+	 * Used to clear out the hibernate session of objects no longer needed to help performance. It will also merge the existing 
 	 * @param project - the project object
 	 * @param userLogin - the User login object
 	 * @param dtb - the data transfer batch being processed
 	 */
-	void resetHibernateSession(int counter, Project project, UserLogin userLogin, DataTransferBatch dtb) {
-		if (currentCount.mod(HIBERNATE_BATCH_SIZE) == 0) {
-			log.info "Processed $currentCount ${dtb.eavEntityType?.domainName} records for batch (${dtb.id})"
-
-			def hibernateSession = sessionFactory.getCurrentSession()
-			hibernateSession.flush()
-			hibernateSession.clear()
-
-			// Re-fetch a few objects that we need around that otherwise cause missing session errors
-			project = project.merge()
-			userLogin = userLogin.merge()
-			dtb = dtb.merge()
-		}
+	void resetHibernateSession() {
+		def hibernateSession = sessionFactory.getCurrentSession()
+		hibernateSession.flush()
+		hibernateSession.clear()
 	}
 
 	/**
@@ -581,7 +571,7 @@ class ImportService {
 
 						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId) 
 						errorMsg = results.error
-
+						dtb = dtb.merge()
 						if (errorMsg) {
 							dtb.statusCode = DataTransferBatch.PENDING
 							dtb.importResults = errorMsg
@@ -699,7 +689,7 @@ class ImportService {
 		// Main loop that will iterate over the row ids from the import batch
 		//
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
-
+			now = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
 
@@ -708,7 +698,7 @@ class ImportService {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			application = assetEntityAttributeLoaderService.findAndValidateAsset(Application, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+			application = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, Application, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 			if (application == null)
 				continue
 
@@ -806,6 +796,12 @@ class ImportService {
 
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
+
+			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
+				resetHibernateSession()
+			}
+
+			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
 		} // for
 
@@ -1139,6 +1135,12 @@ class ImportService {
 
 			jobProgressUpdate(progressKey, rowNum, assetCount)
 
+			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
+				resetHibernateSession()
+			}
+
+			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
+
 		} // for
 
 		// Update assets racks, cabling data once process done
@@ -1242,6 +1244,7 @@ class ImportService {
 		def dtvList
 
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
+			now = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
 
@@ -1250,7 +1253,7 @@ class ImportService {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch,rowId)
 
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(domainClass, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 			if (! asset) 
 				continue
 
@@ -1283,6 +1286,12 @@ class ImportService {
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
 
 			jobProgressUpdate(progressKey, rowNum, assetCount)
+
+			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
+				resetHibernateSession()
+			}
+
+			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
 		} // for
 
@@ -1383,7 +1392,7 @@ class ImportService {
 			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
 			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(domainClass, assetEntityId, project, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets)
+			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
 
 			if (asset == null)
 				continue
@@ -1424,6 +1433,12 @@ class ImportService {
 
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
+
+			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
+				resetHibernateSession()
+			}
+
+			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
 		} // for
 
