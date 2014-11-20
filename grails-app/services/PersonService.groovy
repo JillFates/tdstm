@@ -1,11 +1,12 @@
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 
-import com.tds.asset.AssetComment;
-import com.tds.asset.AssetEntity;
-import com.tds.asset.Application;
-import Person;
+import com.tds.asset.AssetComment
+import com.tds.asset.AssetEntity
+import com.tds.asset.Application
+import Person
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import grails.validation.ValidationException
 import com.tdsops.common.lang.ExceptionUtil
 
@@ -158,19 +159,18 @@ class PersonService {
 		
 		return map;
 	}
-	
+		
 	/**
 	 * Used to find a person associated with a given project using a parsed name map
-	 * @param Map containing person name elements
-	 * @param Project the project/client that the person is associated with
-	 * @param The staff for the project. This is optional but recommended if the function is used repeatedly 
-	 *        Use partyRelationshipService.getAvailableProjectStaffPersons(project) in order to get list or 
-	 *        partyRelationshipService.getCompanyStaff(companyId)
-	 * @param Flag used to indicate if the search should only look at staff of the client or all persons associated to the project
+	 * @param nameMap - a Map containing person name elements
+	 * @param project - the project object that the person is associated with
+	 * @param staffList - deprecated argument that is no longer used
+	 * @param clientStaffOnly - a flag used to indicate if the search should only look at staff of the client or all persons associated to the project
 	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is 
 	 * found then isAmbiguous will be set to true.
 	 */
-	Map findPerson(Map nameMap , Project project, def staffList = null, def clientStaffOnly=true) {
+	Map findPerson(Map nameMap , Project project, List staffList=null, boolean clientStaffOnly=true) {
+		String mn = 'findPerson()'
 		def results = [person:null, isAmbiguous:false]
 		
 		log.debug "findPersion() attempting to find nameMap=$nameMap in project $project"
@@ -181,110 +181,102 @@ class PersonService {
 			return results
 		}
 
-		// Get the staffList if not passed into us
-		if (! staffList) {
-			staffList = partyRelationshipService.getAvailableProjectStaffPersons( project, null, clientStaffOnly )
-		}
-	
-		// log.debug "staffList looks like: \n$staffList"
+		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.roleTypeCodeFrom='COMPANY' and PR.partyRelationshipType='STAFF' and PR.partyIdFrom IN (:companies)"
+		String where = " and P.firstName=:firstName and P.middleName=:middleName and P.lastName=:lastName"
+		String lastName = lastNameWithSuffix(nameMap)
+		List companies = [project.client]
 
-		/*
-		* Here are the steps that we'll go through to find the person
-		*
-		*    1. First step is to try and find the persons based on an exact match on first, middle and last names
-		*    2. Match person to the staffList and save first match as the person. If multiple matches found then set ambiguous true and we're done
-		*    3. If no person found or ambiguous is still false and any of the name values are blank, then perform a looser search. This may find additional matches 
-		*       (e.g. "George W. Bush" would be found in the case where "George Bush" was passed). 
-		*    4. If any persons are found compare to the staff list and previously found person accordingly.
-		*
-		* Note that the staffList could have multiple entries for staff based on their multiple roles
-		*/
+		Map queryParams = [ 
+			companies: companies,
+			firstName: nameMap.first,
+			middleName: nameMap.middle,
+			lastName: lastName 
+		]
 
-		// An inline closure that will validate if the person is in the staff
-		def findPersonInStaff = { personList ->
-			if (personList?.size()) {
-				for (int i=0; i < personList?.size(); i++) {
-					log.debug "findPerson() Looking at ${personList[i]} (${personList[i].id})"
-					def staffRef = staffList.find { it.id == personList[i].id }
-					if (staffRef) {
-						log.debug "findPerson() Found person in staff list: ${results.person}, $staffRef"
-						if (! results.person) {
-							// Found our person!
-							results.person = personList[i]
-						} else if ( staffRef.id != results.person.id ) {
-							// Shoot, we found a second person so we are done since we know that there is ambiguity
-							results.isAmbiguous = true
-							break
-						}
-					}
+		// Try finding the person with an exact match
+		List persons = Person.findAll(hql+where, queryParams)
+		if (persons) 
+			persons = persons.collect( {it[1]} )
+		log.debug "$mn Initial search found ${persons.size()}"
+
+		int s = persons.size()
+		if (s > 1) {
+			results.isAmbiguous=true
+		} else if (s == 1) {
+			results.person = persons[0]
+		} else {
+			
+			// Try to find match on partial
+
+			// Closure to construct the where and queryParams used below
+			def addQueryParam = { name, value -> 
+				if (! StringUtil.isBlank(value) ) {
+					where += " and P.$name=:$name"
+					queryParams.put(name, value)
 				}
 			}
-		}
-	
-		def lastName = lastNameWithSuffix(nameMap)
-		def persons = Person.findAll("from Person as p where p.firstName=? and p.middleName=? and p.lastName=?", [ nameMap.first, nameMap.middle, lastName ] )
-		findPersonInStaff(persons)
 
-		if (! results.isAmbiguous && ( nameMap.middle == '' || lastNameWithSuffix(nameMap) == '' ) ) {
-			// Only need to check 
-			def query = "from Person as p where p.firstName=? " 
-			def args = [nameMap.first]
-			if ( nameMap.middle != '' ) {
-				query += " and p.middleName=? "
-				args << nameMap.middle
-			} 		
-			if ( lastName != '' ) {
-				query +=" and p.lastName=? "
-				args << lastName
+			where = ''
+			queryParams = [companies:companies]
+			addQueryParam('firstName', nameMap.first)
+			addQueryParam('middleName', nameMap.middle)
+			addQueryParam('lastName', lastName)
+
+			log.debug "$mn partial search using $queryParams"
+			persons = Person.findAll(hql+where, queryParams)
+			if (persons) 
+				persons = persons.collect( {it[1]} )
+			log.debug "$mn partial search found ${persons.size()}"
+
+			s = persons.size()
+			if (s > 1) {
+				results.isAmbiguous=true
+			} else if (s == 1) {
+				results.person = persons[0]
+				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName) )
 			}
-
-			findPersonInStaff( Person.findAll( query, args ) )
 		}
 
-		// If the lookup found a fullname by just a first name, then we want to set the isAmbiguous flag as a warning
-		if (! results.isAmbiguous && lastName == '' && results.person?.lastName )
-			results.isAmbiguous = true
-
-		log.debug "findPerson() found $results"
-
+		log.debug "$mn results=$results"
 		return results
 	}
 
 	/**
 	 * Used to find a person object from their full name and if not found create it
-	 * @param String the person's full name
-	 * @param Project the project/client that the person is associated with
-	 * @param List of staff Person objects (optional). If not passed then the the partyRelationshipService.getAllCompaniesStaffPersons() will be used
+	 * @param name - a String containing the person's full name to lookup
+	 * @param project - The Project that the person is associated with
+	 * @param staffList - a List of staff Person objects (optional). If not passed then the the partyRelationshipService.getAllCompaniesStaffPersons() will be used to get the list
+	 * @param clientStaffOnly - a flag to indicate if it should only look for person that is staff of the company or allow anyone assigned to a project (default true)
 	 * @return Map containing person, status or null if unable to parse the name
 	 */
-	Map findOrCreatePerson(String name , Project project, staffList=null) {
+	Map findOrCreatePerson(String name , Project project, List staffList=null, boolean clientStaffOnly=true) {
 		def nameMap = parseName(name)
 		if (nameMap == null) {
 			log.error "findOrCreatePersonByName() unable to parse name ($name)"
 			return null
 		}
-		return findOrCreatePerson( nameMap, project, staffList)
+		return findOrCreatePerson( nameMap, project, staffList, clientStaffOnly)
 	}
 
 	/**
 	 * This method is used to find a person object after importing and if not found create it
 	 * Used to find a person object from their full name and if not found create it
-	 * @param Map the person's full name in map
-	 * @param Project the project/client that the person is associated with
-	 * @param List of staff Person objects (optional). If not passed then the the partyRelationshipService.getAllCompaniesStaffPersons() will be used
+	 * @param nameMap - a Map the person's full name in map
+	 * @param project - The Project that the person is associated with
+	 * @param staffList - NO LONGER NEEDED
+	 * @param clientStaffOnly - a flag to indicate if it should only look for person that is staff of the company or allow anyone assigned to a project (default true)
 	 * @return Map containing person, status or null if unable to parse the name
 	 */
-	Map findOrCreatePerson(Map nameMap , Project project, staffList=null) {
+	Map findOrCreatePerson(Map nameMap , Project project, List staffList=null, boolean clientStaffOnly=true) {
 		Person person
+		boolean staffListSupplied = (staffList != null)
 		try {
-			if ( ! staffList )
-				staffList = partyRelationshipService.getAllCompaniesStaffPersons()
 
-			def results = findPerson(nameMap, project, staffList)
+			def results = findPerson(nameMap, project, staffList, clientStaffOnly)
 			results.isNew = null
 
 			if ( ! results.person && nameMap.first ) {
-				log.debug "findOrCreatePerson() creating new person and associate to Company as staff ($nameMap)"
+				log.info "findOrCreatePerson() Creating new person ($nameMap) as Staff for ${project.client}"
 				person = new Person('firstName':nameMap.first, 'lastName':nameMap.last, 'middleName': nameMap.middle, staffType:'Salary')
 				
 				if ( ! person.validate() || ! person.save(insert:true, flush:true)) {
@@ -294,8 +286,6 @@ class PersonService {
 					if (! partyRelationshipService.addCompanyStaff(project.client, person) ) {
 						results.error = "Unable to assign person $results.person.toString() as staff"
 						// TODO - JPM (10/13) do we really want to proceed if we can't assign the person as staff otherwise they'll be in limbo.
-					} else {
-						staffList.add(person)
 					}
 					results.person = person
 					results.isNew = true
@@ -306,7 +296,6 @@ class PersonService {
 
 			return results
 		} catch (e) {
-			log.error "Exception is: ${e.class.getName()} : ${ person ? GormUtil.allErrorsString( person ) : 'NO PERSON'}"
 			String exMsg = e.getMessage()
 			log.error "findOrCreatePerson() received exception for nameMap=$nameMap : ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			if (person && !person.id) {
