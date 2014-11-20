@@ -359,6 +359,9 @@ class ImportService {
 
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
+
+			resetHibernateSession()
+			
 		} // for
 
 		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
