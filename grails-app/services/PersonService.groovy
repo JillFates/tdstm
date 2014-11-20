@@ -244,10 +244,11 @@ class PersonService {
 	/**
 	 * Used to find a person object from their full name and if not found create it
 	 * @param name - a String containing the person's full name to lookup
-	 * @param project - The Project that the person is associated with
-	 * @param staffList - a List of staff Person objects (optional). If not passed then the the partyRelationshipService.getAllCompaniesStaffPersons() will be used to get the list
-	 * @param clientStaffOnly - a flag to indicate if it should only look for person that is staff of the company or allow anyone assigned to a project (default true)
-	 * @return Map containing person, status or null if unable to parse the name
+	 * @param project - the project object that the person is associated with
+	 * @param staffList - deprecated argument that is no longer used
+	 * @param clientStaffOnly - a flag used to indicate if the search should only look at staff of the client or all persons associated to the project
+	 * @return A Map[person:Person,isAmbiguous:boolean] where the person object will be null if no match is found. If more than one match is 
+	 * found then isAmbiguous will be set to true.
 	 */
 	Map findOrCreatePerson(String name , Project project, List staffList=null, boolean clientStaffOnly=true) {
 		def nameMap = parseName(name)
