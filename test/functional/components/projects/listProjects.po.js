@@ -47,4 +47,24 @@ var ListProjects = function(){
     });
   };
 };
+
+ListProjects.prototype = {};
+ListProjects.prototype.selectProjectIfExists = function(projCode) {
+  var webdriver = require('selenium-webdriver');
+  var d = webdriver.promise.defer();
+
+  this.setSearchProjectCode(projCode);
+  this.verifySearchResults(2).then(function(list){
+    if(list.length ===2){
+      list[1].getAttribute('id').then(function(projId){
+        var selector = '#projectGridIdGrid a[href="/tdstm/project/addUserPreference/'+projId+'"]';
+        browser.driver.findElement(by.css(selector)).click();
+        d.fulfill(projId);
+      });
+    }else{
+      d.fulfill(-1);
+    }
+  });
+  return d.promise;
+};
 module.exports = ListProjects;

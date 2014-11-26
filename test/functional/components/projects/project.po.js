@@ -82,6 +82,10 @@ var Project = function(){
       options[pos].click();
     });
   };
+  this.selectProjectTypeByName = function(name){
+    var selector = this.projectTypesOptionCss + '[value="' + name + '"]';
+    return browser.driver.findElement(by.css(selector));
+  };
   this.getProjectCodeSelected = function(){
     return browser.driver.findElement(by.id(this.projectTypeSelectId));
   };
@@ -112,9 +116,33 @@ var Project = function(){
     return browser.driver.executeScript('return $("'+this.messageCss+'").text()');
   };
 
-  this.deleteCurrentProject = function(){
+  this.deleteCurrentProject = function () {
     browser.driver.findElement(by.css(this.deleteProjectbtnCss)).click();
   };
+  this.deleteProject = function(){
+    if(process.env.BROWSER_NAME === 'phantomjs'){
+      browser.driver.executeScript('$(\'input[value="Delete"]\').attr("onclick","").click("true")');
+      browser.driver.findElement(by.css(this.deleteProjectbtnCss)).click();
+    }else{
+      browser.driver.findElement(by.css(this.deleteProjectbtnCss)).click();
+      var alertDialog = browser.driver.switchTo().alert();
+      // var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
+      // expect(alertDialog.getText()).toEqual(message);
+      alertDialog.accept();
+    }
+  };
 
+  this.createProject = function (project) {
+    //Create the project with require data
+    //check if the project exists if it does, delete and create
+    this.selectAClient(project['clientCode']);
+    this.setProjectName(project['name']);
+    this.selectWorkflowCodeByName(project['workflow']).click();
+    this.setProjectCode(project['code']);
+    this.selectProjectTypeByName(project['type']);
+    // projectPage.selectProjectType(2);  sino cambiar por este
+    this.save();
+
+  };
 };
 module.exports = Project;

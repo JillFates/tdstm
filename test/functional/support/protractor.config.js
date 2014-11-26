@@ -81,6 +81,9 @@ exports.config = {
     '../components/assets/devices/storageDevicesList.spec.js',
     '../components/assets/storage/storageList.spec.js',
     '../components/assets/devices/devices.spec.js'
+    ],
+    importExport:[
+    '../components/assets/importExport/exportEmpty.spec.js'
     ]
   },
 

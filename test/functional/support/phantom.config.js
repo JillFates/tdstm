@@ -82,7 +82,11 @@ exports.config = {
     '../components/assets/storage/storageList.spec.js',
     '../components/assets/devices/storageDevicesList.spec.js',
     '../components/assets/devices/devices.spec.js'
-    ]
+    ] 
+    /*// Phantomjd does not support file download yet 
+    , importExport:[
+    '../components/assets/importExport/exportEmpty.spec.js'
+    ]*/
   },
 
   // seleniumAddress:'http://localhost:4444/wd/hub',
