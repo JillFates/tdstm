@@ -112,16 +112,16 @@ File.prototype.getExpectedColHeaders = function(page) {
 File.prototype.generatColName = function(top) {
   var list = [],
       j = 0,
-      lett = '',
+      prefix = [],
       k = 0;
 
   for (var i = 0; i < top; ++i) {
     if (i !== 0 && i % 26 === 0 ) {
       j=0;
-      lett = list[k];
+      prefix = list[k];
       ++k;
     }
-    list[i] = lett + String.fromCharCode(j + 65);
+    list[i] = prefix + String.fromCharCode(j + 65);
     ++j;
   }
   return list;
@@ -147,9 +147,27 @@ File.prototype.getColumnsHead = function(object,page) {
   return head;
 };
 
-// File.prototype.getColumn = function(object, page, col) {
-  
-// };
+
+File.prototype.getRows = function(object, page,listCols,startRow) {
+  var rowTop = object.Sheets[page]['!range']['e']['r'];
+  var results = {};
+  if(!startRow){
+    if(page !=='Cabling'){
+      startRow=1; 
+    }else{
+      startRow=2; 
+    }
+  }
+  for(startRow; startRow<=rowTop; startRow++){
+    var partResul =[];
+    listCols.forEach(function(colName){
+      partResul.push(object.Sheets[page][colName+startRow].v);
+    });    
+    results[startRow] = partResul;
+  }
+
+  return results;
+};
 
 File.prototype.delete = function(filePath) {
   fs.unlinkSync(filePath);

@@ -83,7 +83,8 @@ exports.config = {
     '../components/assets/devices/devices.spec.js'
     ],
     importExport:[
-    '../components/assets/importExport/exportEmpty.spec.js'
+    '../components/assets/importExport/exportEmpty.spec.js',
+    // '../components/assets/importExport/impExp-devices.spec.js'
     ]
   },
 

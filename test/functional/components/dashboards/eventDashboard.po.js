@@ -31,5 +31,7 @@ EventDashboard.prototype.getAddNewsBtn = function(){
 EventDashboard.prototype.getTaskSummaryTitle = function(){
   return browser.driver.findElement(by.css('#taskSummary h3'));
 };
-
+EventDashboard.prototype.getNewsLiveList = function() {
+  return browser.driver.findElements(by.css('#news_live li'));
+};
 module.exports = EventDashboard;

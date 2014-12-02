@@ -44,74 +44,74 @@ ExportPage.prototype.getCablingCheckbox = function() {
 ExportPage.prototype.getCommentCheckbox = function() {
   return browser.driver.findElement(by.id('commentId'));
 };
-ExportPage.prototype.setApplicationCheckValue = function(value) {
+ExportPage.prototype.setApplicationCheckValue = function(expected) {
   var that = this;
-  this.getApplicationCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getApplicationCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getApplicationCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setDevicesCheckValue = function(value) {
+ExportPage.prototype.setDevicesCheckValue = function(expected) {
   var that = this;
-  this.getDevicesCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getDevicesCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getDevicesCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setDatabaseCheckValue = function(value) {
+ExportPage.prototype.setDatabaseCheckValue = function(expected) {
   var that = this;
-  this.getDatabaseCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getDatabaseCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getDatabaseCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setStorageCheckValue = function(value) {
+ExportPage.prototype.setStorageCheckValue = function(expected) {
   var that = this;
-  this.getStorageCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getStorageCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getStorageCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setRoomCheckValue = function(value) {
+ExportPage.prototype.setRoomCheckValue = function(expected) {
   var that = this;
-  this.getRoomCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getRoomCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getRoomCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setRackCheckValue = function(value) {
+ExportPage.prototype.setRackCheckValue = function(expected) {
   var that = this;
-  this.getRackCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getRackCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getRackCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setDependencyCheckValue = function(value) {
+ExportPage.prototype.setDependencyCheckValue = function(expected) {
   var that = this;
-  this.getDependencyCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getDependencyCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getDependencyCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setCablingCheckValue = function(value) {
+ExportPage.prototype.setCablingCheckValue = function(expected) {
   var that = this;
-  this.getCablingCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getCablingCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getCablingCheckbox().click();
     }
   });
 };
-ExportPage.prototype.setCommentCheckValue = function(value) {
+ExportPage.prototype.setCommentCheckValue = function(expected) {
   var that = this;
-  this.getCommentCheckbox().getAttribute('checked').then(function(valor){
-    if(valor !==value){
+  this.getCommentCheckbox().getAttribute('checked').then(function(current){
+    if ((expected !== current) && !(expected==='false' && current===null)){
       that.getCommentCheckbox().click();
     }
   });
@@ -143,15 +143,14 @@ ExportPage.prototype.getExportBtn = function() {
 };
 
 ExportPage.prototype.isExportingModalOpened = function() {
-  // var message = '';
   return browser.wait(function(){
-    return browser.driver.findElement(by.id('progressBar')).getText().then(function(text){
-      // if(text !== message){
-      //   console.log('valor en open', text);
-      //   message = text;
-      // }
-      return text!=='';
-    });
+    return browser.wait(function(){
+      return browser.driver.findElement(by.id('progressBar')).isDisplayed();    
+     }).then(function(){
+      return browser.driver.findElement(by.id('progressBar')).getText().then(function(text){
+        return text!=='';
+      });
+     }); 
   }).then(function(){
      return true;
   });
@@ -159,13 +158,8 @@ ExportPage.prototype.isExportingModalOpened = function() {
 
 ExportPage.prototype.isExportingModalClosed = function(filePath) {
   var file = new File();
-  // var message = '';
   return browser.driver.wait(function(){
     return browser.driver.findElement(by.id('progressBar')).getText().then(function(text){
-      // if(text !== message){
-      //   console.log('valor en close', text);
-      //   message = text;
-      // }
       return text==='' && file.existsSync(filePath);
     });
   }).then(function(){

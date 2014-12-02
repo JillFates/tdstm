@@ -172,12 +172,58 @@ describe('Event Dashboard', function(){
         expect(newsModal.isCreateClosed()).toEqual(true);  
       });
     }); // add
-    describe('edit',function(){
-      it('should click on an existing news', function(){
+    xdescribe('edit',function(){
+      var newsId ;
+      it('should select first news and edit modal is opened', function(){
+        var eventDashboardPage =  new EventDashboard();
+        eventDashboardPage.getNewsLiveList().then(function(list){
+          list[0].click();
+        });
+        var newsModal = new News();
+        expect(newsModal.isEditOpened()).toEqual(true);
+      });
 
+      xit('should have "Edit News" as title',function () {
+        
+      });
+      describe('Fotter buttons',function () {
+        xit('should have 3 buttons',function () {
+          
+        });
+        xit('should have "Update" buttons',function () {
+          
+        });
+        xit('should have "Delete" buttons',function () {
+          
+        });
+        xit('should have "Cancel" buttons',function () {
+          
+        });
+      }); //Footer buttons
+      xdescribe('type',function(){
+        it('should have "Type" as label',function () {
+          
+        });
+        it('should have News as type and be disabled',function () {
+          
+        });
+      }); //type
+      xdescribe('Message',function () {
+        it('sould have "Message" as label',function () {
+          
+        });
+        it('should have text set on create',function () {
+          
+        });
+        xit('TM-3603 should not be able to save without a message',function () {
+          
+        });
+        it('should modify the message',function () {
+          
+        });
       });
     }); // edit
-    describe('delete',function(){
+    xdescribe('delete',function(){
 
     });//delete
   });//news
