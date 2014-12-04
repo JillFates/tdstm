@@ -64,4 +64,5 @@ databaseChangeLog = {
 	include file: '20141112-clean-up-preference-columns.groovy'
 	include file: '20141113-addSomeColumnsTo-DataTransferBatch.groovy'
 	include file: '20141114-addIndexTo_DataTransferValue_table.groovy'
+	include file: '20141204-delete-invalid-references-from-party-relationship.groovy'
 }
