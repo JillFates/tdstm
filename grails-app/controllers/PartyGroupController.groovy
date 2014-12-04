@@ -85,6 +85,16 @@ class PartyGroupController {
 		try{
 	        def partyGroupInstance = PartyGroup.get( params.id )
 	        if(partyGroupInstance) {
+				PartyGroup.withNewSession { s -> 
+					def parties
+					parties = PartyRelationship.findAllByPartyIdFrom(partyGroupInstance)
+					parties*.delete()
+					parties = PartyRelationship.findAllByPartyIdTo(partyGroupInstance)
+					parties*.delete()
+					s.flush()
+					s.clear()
+			 	}
+
 	            partyGroupInstance.delete(flush:true)
 	            flash.message = "PartyGroup ${partyGroupInstance} deleted"
 	            redirect(action:list)
