@@ -107,6 +107,7 @@ log4j = {
 	appenders {
 	   def appName = appName ?: "tdstm"	// If not defined (for local config)
 	   def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
+	   def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
 	   def logDirectory = 'target'
 	   if (System.properties.getProperty('catalina.base')) {
 		   logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
@@ -119,7 +120,7 @@ log4j = {
 	   rollingFile name:'applicationLog',
 			   file:"${logDirectory}/${appName}.log",
 			   maxFileSize:'500MB',
-			   maxBackupIndex:7
+			   maxBackupIndex:7,
 			   layout:pattern(conversionPattern: commonPattern)
  
 	   // Stacktrace log file
@@ -128,16 +129,29 @@ log4j = {
 	   rollingFile name:'stacktraceLog',
 			   file:"$logDirectory/${appName}-stacktrace.log",
 			   maxFileSize:'500MB',
-			   maxBackupIndex:7
+			   maxBackupIndex:7,
 			   layout:pattern(conversionPattern: commonPattern)
+
+		// Audit log file
+		rollingFile name:'auditLog',
+			file:"$logDirectory/${appName}-audit.log",
+			maxFileSize:'500MB',
+			maxBackupIndex:7,
+			layout:pattern(conversionPattern: auditPattern)
 	}
 	
 	// Set the logging level for the various log files:
 	info 'stdout', 'applicationLog'
-	
+	//     , auditLog:'grails.app.service.AuditService',
+
 	additivity.grails=false
 	additivity.StackTrace=false
  }
 
 //Maintenance file path
 tdsops.maintModeFile = "/tmp/tdstm-maint.txt"
+
+// Audit configuration, valid options are: access and activity (default is access)
+// access: logging will include login, logout and security violations
+// activity:  will also include all user interactions with the application.
+//tdstm.security.auditLogging = "access"

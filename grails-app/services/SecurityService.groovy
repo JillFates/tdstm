@@ -21,6 +21,7 @@ class SecurityService implements InitializingBean {
 	// IoC
 	def grailsApplication
 	def jdbcTemplate
+	def auditService
 
 	def activeDirectoryConfigMap = [:]
 
@@ -305,5 +306,6 @@ class SecurityService implements InitializingBean {
 			}
 		}
 		log.warn "SECURITY_VIOLATION : $message by user $username"
+		auditService.logSecurityViolation(username, message)
 	}
 }

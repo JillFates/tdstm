@@ -13,6 +13,11 @@
 // Set the DEFAULT URL to use for the site
 grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 
+// Audit configuration, valid options are: access and activity (default is access)
+// access: logging will include login, logout and security violations
+// activity:  will also include all user interactions with the application.
+tdstm.security.auditLogging = "activity"
+
 // Database Properties
 environments {
 	development {
@@ -125,6 +130,7 @@ log4j = {
 
 	 appenders {
 			def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
+			def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
 			def appName = appName ?: "tdstm"
 			def logDirectory = 'target'
 			if (System.properties.getProperty('catalina.base')) {
@@ -138,7 +144,7 @@ log4j = {
 			rollingFile name:'applicationLog',
 				file:"${logDirectory}/${appName}.log",
 				maxFileSize:'500MB',
-				maxBackupIndex:7
+				maxBackupIndex:7,
 				layout:pattern(conversionPattern: commonPattern)
 
 			// Stacktrace log file
@@ -147,8 +153,15 @@ log4j = {
 			rollingFile name:'stacktraceLog',
 				file:"$logDirectory/${appName}-stacktrace.log",
 				maxFileSize:'500MB',
-				maxBackupIndex:7
+				maxBackupIndex:7,
 				layout:pattern(conversionPattern: commonPattern)
+
+			// Audit log file
+			rollingFile name:'auditLog',
+				file:"$logDirectory/${appName}-audit.log",
+				maxFileSize:'500MB',
+				maxBackupIndex:7,
+				layout:pattern(conversionPattern: auditPattern)
 	 }
 
 	 root {
@@ -156,6 +169,9 @@ log4j = {
 			debug 'stdout', 'applicationLog'
 			// additivity = false
 	 }
+
+	info auditLog:'grails.app.service.AuditService',
+		additivity: false
 
 	 additivity.StackTrace=false
 	 additivity.grails="false"
