@@ -10,8 +10,6 @@ class SecurityFilters {
 
 		maintModeCheck(controller:'*', action:'*'){
 			before = {
-				auditService.auditRequest(request, params)
-
 				if( controllerName == "wsSequence") return
 				
 				def hasBackdoorAccess = maintService.hasBackdoorAccess(session)
