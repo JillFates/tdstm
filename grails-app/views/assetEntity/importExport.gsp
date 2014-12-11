@@ -29,6 +29,10 @@
 		 */
 		jQuery(function($) {
 	        $("#run").click(function() {
+	        	if ($("#file").val().length == 0) {
+	        		alert("Please select a file to import.")
+	        		return false;
+	        	}
 	        	if (buttonClicked) {
 	        		alert('You already clicked the Import Spreadsheet button and the upload is being processed.');
 	        		return false;
@@ -97,7 +101,7 @@
     	<g:hiddenField name="requestCount" id="requestCount" value="1"/>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
           <div class="dialog">
-            <table style="width:500px; margin-left:10px;">
+            <table style="width:700px; margin-left:10px;">
               <thead>
               	<tr><th colspan="3">Import</th></tr>
               </thead>
@@ -119,7 +123,7 @@
 					<td>
 						<label for="file">File:</label></td>
 					<td colspan="2">
-						<input size="40" type="file" name="file" id="file" />
+						<input style="width:500px" type="file" name="file" id="file" />
 					</td>
 				</tr>              
 
