@@ -17,7 +17,8 @@ class AuditService {
 	static ACCESS_URI = ["/auth/signIn": true, "/auth/signOut": true]
 	static AUDITED_PARAMS = ["username": true, "id": true, "_action_Delete": true, "moveBundleId": true, "assetEntityId": true, "moveEventId": true]
 
-	def AuditService() {
+	// Constructor - should be using the Spring post construction method...
+	AuditService() {
 		AUDIT_TYPE = ConfigurationHolder.config.tdstm.security.auditLogging
 		if (!AUDIT_TYPE) {
 			AUDIT_TYPE = AUDIT_TYPE_ACCESS
@@ -32,16 +33,15 @@ class AuditService {
 	 * @param request request made
 	 * @param params parameters associated with the request
 	 */
-	def auditRequest(request, params) {
+	void auditRequest(request, params) {
 		def auditUri = request.forwardURI - request.contextPath
 		if (auditedUri(auditUri)) {
 			def subject = SecurityUtils.subject
 			params = filterParams(params)
-			if (subject && subject.principal) {
-				log.info "USER_ACTIVITY: $subject.principal invoked $request.method $auditUri on $params. From $request.remoteAddr."
-			} else {
-				log.info "USER_ACTIVITY: User invoked without session $request.method $auditUri on $params. From $request.remoteAddr."
-			}
+			String paramsMsg = params.size() ? "$params " : ''
+			String user = (subject && subject.principal) ? subject.principal : 'ANONYMOUS_USER'
+
+			log.info "USER_ACTIVITY: $user invoked $request.method $auditUri ${paramsMsg}from ${request.remoteAddr}"
 		}
 	}
 
@@ -50,7 +50,7 @@ class AuditService {
 	 * 
 	 * @param request to validate
 	 */
-	def auditedUri(uri) {
+	boolean auditedUri(uri) {
 		return ((AUDIT_ACTIVITY) || (ACCESS_URI[uri] != null))
 	}
 
@@ -59,7 +59,7 @@ class AuditService {
 	 * 
 	 * @param request to validate
 	 */
-	def filterParams(params) {
+	Map filterParams(params) {
 		def result = [:]
 		params.each{ key, value ->
 			if (AUDITED_PARAMS[key]) {
@@ -75,13 +75,20 @@ class AuditService {
 	 * @param user user involved in the security violation
 	 * @param message message associated with the security violation
 	 */
-	def logSecurityViolation(user, message) {
-		if (user) {
-			log.info "USER_ACTIVITY: SECURITY_VIOLATION: $message by user $user"
-		} else {
-			log.info "USER_ACTIVITY: SECURITY_VIOLATION: $message"
-		}
+	void logSecurityViolation(user, message) {
+		user = user ?: 'ANONYMOUS_USER'
+		log.info "SECURITY_VIOLATION: $message by $user"
 	}
+
+	/**
+	 * Used to simply log a message 
+	 * 
+	 * @param message message associated with the security violation
+	 */
+	def logMessage(message) {
+		log.info "USER_ACTIVITY: $message"
+	}
+
 
 	/**
 	 * Check if the configuration property is set to activity

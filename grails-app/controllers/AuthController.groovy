@@ -9,6 +9,8 @@ import com.tdssrc.grails.TimeUtil
 class AuthController {
 	
 	def shiroSecurityManager
+
+	def auditService
 	def userPreferenceService
 	def securityService
 
@@ -103,7 +105,7 @@ class AuthController {
 							redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
 						}
 					} else {
-					   if(userPreferenceService.getPreference('CURR_PROJ')){
+					   if (userPreferenceService.getPreference('CURR_PROJ')){
 							if(startPage =='Project Settings'){
 								redirect(controller:'projectUtil')
 							}else if(startPage=='Current Dashboard'){
@@ -134,6 +136,8 @@ class AuthController {
 				def remoteIp = HtmlUtil.getRemoteIp()
 				log.warn "1 Authentication failure user '${params.username}', IP ${remoteIp} : ${ex.getMessage()}"
 				flash.message = message(code: "login.failed")
+
+				auditService.logMessage("${params.username} login attempt failed")
 				
 				// Now redirect back to the login page.
 				redirect(action: 'login', params: loginMap())
@@ -142,6 +146,8 @@ class AuthController {
 			def remoteIp = HtmlUtil.getRemoteIp()
 			log.warn "2 Authentication failure for user '${params.username}' : IP ${remoteIp} : ${e.printStackTrace()}"
 			flash.message = "Authentication failure for user '${params.username}'."
+
+			auditService.logMessage("${params.username} login attempt failed")
 			
 			// Now redirect back to the login page.
 			redirect(action: 'login', params: loginMap())

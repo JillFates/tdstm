@@ -32,6 +32,13 @@ class SecurityFilters {
 				}
 			}
 		}
+
+		userActivityLog(controller:'*', action:'*') {
+			before = {
+				auditService.auditRequest(request, params)
+			}
+		}
+
 		// Creating, modifying, or deleting a Party,person, project,partyGroup requires the ADMIN role.
 		partyCrud(controller: "(party|partyGroup)", action: "(create|edit|save|update|delete)") {
 			before = {
