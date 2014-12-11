@@ -68,6 +68,7 @@ var File = function () {
   'Cable Comment', 'Cable Color', 'Potentially Room', 'Cable Status', 'Location/Room' ];
   this.commentsColHeader = [ 'commentId', 'assetId', 'Category', ' Created date', 'Created by', 'Comment' ];
 };
+File.prototype={};
 File.prototype.getFileObject = function(filePath) {
   return XLSJS.readFile(filePath);
 };

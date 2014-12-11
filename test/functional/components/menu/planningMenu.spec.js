@@ -10,7 +10,7 @@ describe('Planning Menu', function(){
  
   
     describe('submenu',function(){
-      it('should displayed 8 links', function(){
+      it('should displayed 7 links', function(){
         menu.getPlanningSubmenu().then(function(list){
           expect(list.length).toEqual(7);
         });

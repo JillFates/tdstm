@@ -61,26 +61,32 @@ describe('Database', function(){
     });
     
     describe('Buttons',function(){
+      
       it('should have only 2 buttons', function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.createModalButtons.count()).toEqual(2);
       });
+      
       it('should have save button',function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.createModalButtons.get(0).getAttribute('value')).toEqual('Save');
       });
+      
       it('should have cancel button',function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.createModalButtons.get(1).getAttribute('value')).toEqual('Cancel');
       });
+    
     });//Buttons
 
     describe('Canceling',function(){
+    
       it('should close create modal after hit on cancel button',function(){
         var createDBModal = new DBCreateModal();
         createDBModal.createModalButtons.get(1).click();
         expect(createDBModal.isCreateModalClosed()).toBe(true);
       });
+    
     });//Canceling
     
     it('should open create Database modal after click on create DB button', function(){
@@ -89,6 +95,7 @@ describe('Database', function(){
       var createDBModal = new DBCreateModal();
       expect(createDBModal.isCreateModalOpened()).toBe(true);
     });
+    
     describe('Name',function(){
 
       it('should have name* label', function(){
@@ -208,6 +215,7 @@ describe('Database', function(){
     }); // size/scale
 
     describe('Format',function(){
+    
       it('should have Format* as label', function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.formatLabel.getText()).toEqual('Format*');
@@ -236,8 +244,8 @@ describe('Database', function(){
         createDBModal.formatField.sendKeys(dbInfo['format']);
         expect(createDBModal.formatField.getAttribute('value')).toEqual(dbInfo['format']);
       });
-    }); // Format
 
+    }); // Format
 
     describe('type',function(){
     
@@ -280,7 +288,6 @@ describe('Database', function(){
         expect(createDBModal.rateOfChangeField.getAttribute('value')).toEqual(dbInfo['rateOfChange']);
       });
     });//Rate of Change
-
 
     describe('Description',function(){
 
@@ -348,12 +355,13 @@ describe('Database', function(){
       
       xit('should add a value from daypicker',function(){
         // var createDBModal = new DBCreateModal();
-
       });
 
     });//Retire Date
     //https://jira5.tdsops.com/browse/TM-3439
+    
     describe('Maint Exp. - Datepicker',function(){
+      
       it('should have Maint Exp. as label',function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.maintExpLabel.getText()).toEqual('Maint Exp.');
@@ -458,6 +466,7 @@ describe('Database', function(){
         var createDBModal = new DBCreateModal();
         expect(createDBModal.bundleOptions.count()).toEqual(2);
       });
+      
       it('should have the following list',function(){
         var createDBModal = new DBCreateModal();
         createDBModal.bundleOptions.then(function(list){
@@ -473,6 +482,7 @@ describe('Database', function(){
       });
 
     });//Bundle
+    
     describe('Plan Status',function(){
 
       it('should have Plan Status as label',function(){
@@ -545,6 +555,7 @@ describe('Database', function(){
       });
 
     });//Validation
+    
     xdescribe('Custom fields',function(){
       
       describe('Network Interfaces - Custom 1',function(){
@@ -561,12 +572,15 @@ describe('Database', function(){
       });//Network Interface
       
       describe('CMDB ID',function(){
+    
         it('should have CMDB ID as label',function(){
 
         });
+    
         it('should be empty by default',function(){
 
         });
+    
         it('should add a value',function(){
 
         });
@@ -586,22 +600,29 @@ describe('Database', function(){
   }); // create database
 
   describe('view created database', function(){
+    
     describe('buttons',function(){
+    
       it('should have 4 buttons',function(){
 
       });
+    
       it('should have edit button',function(){
 
       });
+    
       it('should have cancel button',function(){
 
       });
+    
       it('should have Add Task button',function(){
 
       });
+    
       it('should have Add Comment Button',function(){
 
       });
+    
     });
     describe('Validate Database created Information',function(){
 

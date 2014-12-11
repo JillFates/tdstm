@@ -26,10 +26,30 @@ var ListApps = function(){
     return browser.executeScript('return $("[role=\'grid\'] [class=\'ui-jqgrid-labels ui-sortable\'] th:visible img")');
   };
 
-  this.getListItems = function(){
-    return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
-      return list.length>0;
+  this.isLoadingHidden = function (device) {
+    /* Values for device base on asset type
+    application
+    assetList
+    storage
+    database */
+    return browser.wait(function () {
+      return element(by.id('load_'+device+'IdGrid')).isDisplayed().then(function (valor) {
+        return !valor;
+      });
+    }).then(function () {
+      return true;
     });
+  };
+
+  this.getListItems = function(expListItems){
+    return browser.wait(function () {
+      return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
+        return list.length===expListItems;
+      });
+    }).then(function () {
+      return true;
+    });
+
   };
 
   this.verifySearchResults = function(count,device){
@@ -54,7 +74,7 @@ var ListApps = function(){
         }
       };
       d[device]();
-      return that.getLoadingStyle(asse)&&that.getListItems();
+      return that.getLoadingStyle(asse)&&that.getListItems(count);
     }).then(function(){
         return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
           return list;

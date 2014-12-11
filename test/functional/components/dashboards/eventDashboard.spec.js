@@ -173,7 +173,7 @@ describe('Event Dashboard', function(){
       });
     }); // add
     xdescribe('edit',function(){
-      var newsId ;
+      // var newsId ;
       it('should select first news and edit modal is opened', function(){
         var eventDashboardPage =  new EventDashboard();
         eventDashboardPage.getNewsLiveList().then(function(list){

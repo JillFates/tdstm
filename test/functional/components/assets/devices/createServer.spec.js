@@ -118,6 +118,7 @@ describe('Server list', function(){
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
+      expect(appsListPage.isLoadingHidden('assetList')).toEqual(true);
     });
 
     it('should validate search results', function(){

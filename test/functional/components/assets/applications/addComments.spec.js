@@ -58,6 +58,7 @@ describe('Comments - Application', function(){
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
+      expect(appsListPage.isLoadingHidden('application')).toEqual(true);
     });
 
     it('should validate search results', function(){
@@ -280,6 +281,7 @@ describe('Comments - Application', function(){
         field.clear();
         field.sendKeys(appName);
         expect(field.getAttribute('value')).toEqual(appName);
+        expect(appsListPage.isLoadingHidden('application')).toEqual(true);
       });
 
       it('should validate search results', function(){

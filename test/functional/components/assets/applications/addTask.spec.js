@@ -8,7 +8,7 @@ var ViewAppModal = require('./appViewModal.po.js');
 describe('Add Task', function(){
   var taskModal = new TaskModal();
   var appsListPage =  new ListApps();
-  var appId;
+  var appId2;
   var appName= 'App Test 2 Tasks';
 
   describe('Preconditions', function(){
@@ -57,12 +57,14 @@ describe('Add Task', function(){
       var field = appsListPage.searchNamefield;
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
+      expect(appsListPage.isLoadingHidden('application')).toEqual(true);
+
     });
 
     it('should validate search results', function(){
       appsListPage.verifySearchResults(1,'application').then(function(list){
         list[0].getAttribute('id').then(function(pid){
-          appId = pid;
+          appId2 = pid;
         });
         expect(list.length).toEqual(1);
       });
@@ -70,10 +72,10 @@ describe('Add Task', function(){
   }); // Search for an app
 
   it('should have add task icon', function(){
-    expect(appsListPage.isAddTaskIconDisplayed(appId)).toBe(true);
+    expect(appsListPage.isAddTaskIconDisplayed(appId2)).toBe(true);
   });
   it('should open create task modal', function(){
-    appsListPage.clickOnTaskIcon(appId);
+    appsListPage.clickOnTaskIcon(appId2);
     expect(taskModal.editTaskModal.isPresent()).toBe(true);
   });
 
@@ -159,13 +161,7 @@ describe('Add Task', function(){
     describe('Team drowpdown',  function(){
 
       it('should have team Unassigned by default', function(){
-        // if(process.env.BROWSER_NAME==='phantomjs'){
-        //   taskModal.getTeamSelected().then(function(op){
-        //     expect(op).toEqual('Unassigned');
-        //   });
-        // }else{
           expect(taskModal.getTeamSelected()).toEqual('Unassigned');
-        // }
       });
        
       it('should have 21 options', function(){

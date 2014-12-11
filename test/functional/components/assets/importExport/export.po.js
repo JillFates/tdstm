@@ -144,13 +144,10 @@ ExportPage.prototype.getExportBtn = function() {
 
 ExportPage.prototype.isExportingModalOpened = function() {
   return browser.wait(function(){
-    return browser.wait(function(){
-      return browser.driver.findElement(by.id('progressBar')).isDisplayed();    
-     }).then(function(){
-      return browser.driver.findElement(by.id('progressBar')).getText().then(function(text){
+      return browser.executeScript('return $("#progressBar").text()').then(function(text){
+        console.log(text);
         return text!=='';
       });
-     }); 
   }).then(function(){
      return true;
   });

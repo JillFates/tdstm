@@ -93,21 +93,26 @@ describe('createApp', function(){
   }); // Create Application Modal
 
   describe('view application modal', function(){
+
     it('should have as title Application Detail', function(){
       var viewAppModal = new ViewAppModal();
       expect(viewAppModal.viewAppTitle.getText()).toEqual('Application Detail');
     });
 
     xdescribe('displayed data set on create', function(){
+    
       it('should have name as label', function(){
 
       });
+    
       it('should have the name', function(){
 
       });
+    
       it('should have type as label', function(){
 
       });
+    
       it('should have application as type', function(){
 
       });
@@ -115,15 +120,17 @@ describe('createApp', function(){
     }); // displayed data set on create
 
     describe('buttons', function(){
+    
       var viewAppModal = new ViewAppModal();
+    
       it('should have Edit button', function(){
         expect(viewAppModal.editBtn.getAttribute('value')).toEqual('Edit');
-
       });
 
       it('should have Delete button', function(){
         expect(viewAppModal.deleteBtn.getAttribute('value')).toEqual('Delete');
       });
+      
       it('should have add task button', function(){
          viewAppModal.addTaskCommentBtnList.then(function(list){
           expect(list[0].getText()).toEqual('  Add Task');
@@ -135,6 +142,7 @@ describe('createApp', function(){
           expect(list[1].getText()).toEqual('  Add Comment');
         });
       });
+
     }); // buttons
 
     describe('close view modal', function(){
@@ -160,6 +168,7 @@ describe('createApp', function(){
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
+      expect(appsListPage.isLoadingHidden('application')).toEqual(true);
     });
 
     it('should validate search results', function(){
