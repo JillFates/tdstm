@@ -36,6 +36,11 @@
 					<input type="checkbox" id="compactControl" name="compactControl" ${compactPref == 'true' ? 'checked="checked"' :''} onclick="compactControlPref( $(this) )"/>
 					&nbsp;<span> Compact Control </span>
 				</div>
+				<div style="position: absolute; margin: -25px 300px 0;">
+					<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
+						<img src="${resource(dir:'icons',file:'arrow_refresh.png')}" title="Refresh Data">
+					</g:link>
+				</div>
 			</div>
 			<tds:hasPermission permission='MoveBundleEditView'>
 				<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
