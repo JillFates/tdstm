@@ -82,17 +82,22 @@ function resizeGrid (gridId) {
  * when click on particular row.
  */
 function validateMergeCount() {
-	var checkedLen = $('.cbox:checkbox:checked').length
-	if(checkedLen > 1 && checkedLen < 11) {
-		$("#compareMergeId").removeAttr("disabled")
-	} else {
-		$("#compareMergeId").attr("disabled","disabled")
-	}
-	if(checkedLen > 0) {
-		$("#deleteAssetId").removeAttr("disabled")
-	} else {
-		$("#deleteAssetId").attr("disabled","disabled")
-	}
+	setTimeout(function() {
+		var checkedLen = $('.cbox:checkbox:checked').length
+		if ($("#cb_personIdGrid").is(':checked')) {
+			checkedLen--;
+		}
+		if(checkedLen > 1 && checkedLen < 26) {
+			$("#compareMergeId").removeAttr("disabled")
+		} else {
+			$("#compareMergeId").attr("disabled","disabled")
+		}
+		if(checkedLen > 0) {
+			$("#deleteAssetId").removeAttr("disabled")
+		} else {
+			$("#deleteAssetId").attr("disabled","disabled")
+		}
+	}, 500);
 }
 /**
  * This function is used to enable and disable compare/merge button in modelList,personList and BulkDelete button in assetLists
