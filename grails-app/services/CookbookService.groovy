@@ -107,14 +107,14 @@ class CookbookService {
 
 			if (clonedVersion.releasedVersion != null) {
 				defaultSourceCode = clonedVersion.releasedVersion.sourceCode
-				defaultChangelog = clonedVersion.releasedVersion.changelog
+				//defaultChangelog = clonedVersion.releasedVersion.changelog
 				clonedReleasedVersion = clonedVersion.releasedVersion
 			} else {
 				def recipeVersions = findRecipeVersionsWithSourceCode(cloneFrom);
 				if ((recipeVersions != null) && (recipeVersions.size() > 0))  {
 					def wip = recipeVersions[0]
 					defaultSourceCode = wip.sourceCode
-					defaultChangelog = wip.changelog
+					//defaultChangelog = wip.changelog
 					clonedReleasedVersion = clonedVersion.releasedVersion
 				}
 
