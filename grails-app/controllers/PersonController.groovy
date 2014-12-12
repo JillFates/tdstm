@@ -1318,8 +1318,8 @@ class PersonController {
 		def personsMap = [:]
 		def userLogins= []
 		ids.each{
-			def id = Long.parseLong(it)
-			def person = Person.get(id)
+			def id = it.isLong()?Long.parseLong(it):null
+			def person = id?Person.get(id):null
 			if(person){
 				personsMap << [(person) : partyRelationshipService.getStaffCompany( person )?.id]
 				def userLogin = UserLogin.findByPerson(person)
