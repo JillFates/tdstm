@@ -5,7 +5,7 @@
 // validate edit comment comal
 // validate comment list
 // validate 
-var  ListApps = require('../listApps.po.js');
+var  ListApps = require('./listApps.po.js');
 var TaskModal = require('../task.po.js');
 var CommentTaskList = require('../commentTask-list.po.js');
 var  Menu = require('../../menu/menu.po.js');
@@ -58,11 +58,11 @@ describe('Comments - Application', function(){
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
-      expect(appsListPage.isLoadingHidden('application')).toEqual(true);
+      expect(appsListPage.isLoadingHidden()).toEqual(true);
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1,'application').then(function(list){
+      appsListPage.verifySearchResults(1,appName).then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });
@@ -281,12 +281,12 @@ describe('Comments - Application', function(){
         field.clear();
         field.sendKeys(appName);
         expect(field.getAttribute('value')).toEqual(appName);
-        expect(appsListPage.isLoadingHidden('application')).toEqual(true);
+        expect(appsListPage.isLoadingHidden()).toEqual(true);
       });
 
       it('should validate search results', function(){
         var appsListPage =  new ListApps();
-        appsListPage.verifySearchResults(1,'application').then(function(list){
+        appsListPage.verifySearchResults(1,appName).then(function(list){
           list[0].getAttribute('id').then(function(pid){
             appId = pid;
           });

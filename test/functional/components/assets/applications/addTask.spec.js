@@ -1,7 +1,7 @@
 'use strict';
-var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
-var  TaskModal = require('../task.po.js');
+var Menu = require('../../menu/menu.po.js');
+var ListApps = require('./listApps.po.js');
+var TaskModal = require('../task.po.js');
 var CreateAppModal = require('./appCreateModal.po.js');
 var ViewAppModal = require('./appViewModal.po.js');
 
@@ -57,13 +57,14 @@ describe('Add Task', function(){
       var field = appsListPage.searchNamefield;
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
-      expect(appsListPage.isLoadingHidden('application')).toEqual(true);
+      expect(appsListPage.isLoadingHidden()).toEqual(true);
 
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1,'application').then(function(list){
+      appsListPage.verifySearchResults(1,appName).then(function(list){
         list[0].getAttribute('id').then(function(pid){
+          console.log('cid',pid);
           appId2 = pid;
         });
         expect(list.length).toEqual(1);

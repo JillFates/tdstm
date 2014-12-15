@@ -12,7 +12,7 @@ add commentt
 */
 'use strict';
 var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
+var  ListApps = require('./listApps.po.js');
 var CreateAppModal = require('./appCreateModal.po.js');
 var ViewAppModal = require('./appViewModal.po.js');
 describe('createApp', function(){
@@ -168,11 +168,11 @@ describe('createApp', function(){
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
-      expect(appsListPage.isLoadingHidden('application')).toEqual(true);
+      expect(appsListPage.isLoadingHidden()).toEqual(true);
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1,'application').then(function(list){
+      appsListPage.verifySearchResults(1,appName).then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });

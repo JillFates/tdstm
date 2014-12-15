@@ -1,16 +1,17 @@
 'use strict';
 var ListAssets = require('../listAssets.po.js');
-var DatabaseList = function(){
-  this.databaseLoadingId = 'load_databaseIdGrid';
-  this.createDBBtn = $('input[onclick="EntityCrud.showAssetCreateView(\'DATABASE\');"]');
+
+var ListApps = function () {
+  this.createAppBtn = $('input[value="Create App"]');
+  this.applicationLoadingId = 'load_applicationIdGrid';
 };
 
-DatabaseList.prototype = new ListAssets();
+ListApps.prototype = new ListAssets();
 
-DatabaseList.prototype.isLoadingHidden = function () {
+ListApps.prototype.isLoadingHidden = function () {
   var that = this;
   return browser.wait(function () {
-    return element(by.id(that.databaseLoadingId)).isDisplayed().then(function (valor) {
+    return element(by.id(that.applicationLoadingId)).isDisplayed().then(function (valor) {
       return !valor;
     });
   }).then(function () {
@@ -18,13 +19,13 @@ DatabaseList.prototype.isLoadingHidden = function () {
   });
 };
 
-DatabaseList.prototype.getLoadingStyle = function() {
-  return element(by.id(this.databaseLoadingId)).getAttribute('style').then(function(attClass){
+ListApps.prototype.getLoadingStyle = function() {
+  return element(by.id(this.applicationLoadingId)).getAttribute('style').then(function(attClass){
     return (attClass.search('display: none;') !== -1);
   });      
 };
 
-DatabaseList.prototype.getListItems = function(expListItems,appName){
+ListApps.prototype.getListItems = function(expListItems,appName){
   return browser.wait(function () {
     return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
       if(list.length===expListItems){
@@ -44,7 +45,7 @@ DatabaseList.prototype.getListItems = function(expListItems,appName){
   });
 };
 
-DatabaseList.prototype.verifySearchResults = function(count,appName){
+ListApps.prototype.verifySearchResults = function(count,appName){
   var that = this;
   return browser.wait(function(){
     return that.getLoadingStyle()&&that.getListItems(count,appName);
@@ -57,4 +58,4 @@ DatabaseList.prototype.verifySearchResults = function(count,appName){
   );
 };
 
-module.exports = DatabaseList;
+module.exports = ListApps;

@@ -42,14 +42,14 @@ describe('Issue Report', function(){
       expect(issueReportPage.getSortReportByLabel().getText()).toEqual('Sort report by:');
     });
     it('should have "Asset id" as default option',function(){
-      expect(issueReportPage.getSortReportBySelected()).toEqual('Asset Id ');
+      expect(issueReportPage.getSortReportBySelected()).toEqual('Asset Id');
     });
     it('should have 4 option',function(){
       expect(issueReportPage.getSortReportByOptionsLength()).toEqual(4);
     });
     it('should have the following options',function(){
       issueReportPage.getSortReportByOptions().then(function(list){
-        expect(list[0].getText()).toEqual('Asset Id ');
+        expect(list[0].getText()).toEqual('Asset Id');
         expect(list[1].getText()).toEqual('Asset Name');
         expect(list[2].getText()).toEqual('Source Location');
         expect(list[3].getText()).toEqual('Target Location');

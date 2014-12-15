@@ -1,6 +1,6 @@
 'use strict';
 var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
+var  ListApps = require('./listApps.po.js');
 describe('Application List', function(){
 
   it('should load Application List page after select Assets List Apps', function(){

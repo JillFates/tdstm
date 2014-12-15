@@ -13,11 +13,11 @@ CRUD
 title Device Details
 */
 'use strict';
-var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
+var Menu = require('../../menu/menu.po.js');
+var ListApps = require('./listDevices.po.js');
 var CreateServerModal = require('./devicesCreateModal.po.js');
 var ViewServerModal = require('./devicesViewModal.po.js');
-var  TaskModal = require('../task.po.js');
+var TaskModal = require('../task.po.js');
 var CommentTaskList = require('../commentTask-list.po.js');
 
 describe('Server list', function(){
@@ -118,11 +118,11 @@ describe('Server list', function(){
       field.clear();
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
-      expect(appsListPage.isLoadingHidden('assetList')).toEqual(true);
+      expect(appsListPage.isLoadingHidden()).toEqual(true);
     });
 
     it('should validate search results', function(){
-      appsListPage.verifySearchResults(1,'device').then(function(list){
+      appsListPage.verifySearchResults(1,appName).then(function(list){
         list[0].getAttribute('id').then(function(pid){
           appId = pid;
         });
