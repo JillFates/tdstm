@@ -15,7 +15,8 @@ ManageBatches.prototype.getReviewLinkList = function() {
 ManageBatches.prototype.isReviewModalOpened = function() {
   return browser.wait(function(){
     return browser.wait(function(){
-      return browser.driver.findElement(by.id('globalProgressBar')).isDisplayed().then(function (valor) {
+      // return browser.driver.findElement(by.id('globalProgressBar')).isDisplayed().then(function (valor) {
+      return browser.executeScript('return $("#globalProgressBar").text()').then(function (valor) {
         return valor;
       });
      }).then(function(){

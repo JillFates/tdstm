@@ -1,15 +1,17 @@
 module.exports = {
-  test: [
+  test1: [
     '../components/projects/createProject.spec.js',
     '../components/planning/bundles.spec.js',
     '../components/assets/applications/createApp.spec.js',
     '../components/assets/applications/addTask.spec.js',
-    '../components/assets/applications/addComments.spec.js',
+    '../components/assets/applications/addComments.spec.js'
+    ],
+  test2:[
     '../components/assets/devices/createServer.spec.js',
     '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
   ],
-  menu:[
+  menu:[ //Do not change the order of these files since some test depends on others.
     '../components/projects/listProjects.spec.js',
     '../components/projects/fieldSettings.spec.js',
     '../components/menu/adminMenu.spec.js',
@@ -77,8 +79,8 @@ module.exports = {
     '../components/assets/storage/storageList.spec.js',
     '../components/assets/devices/devices.spec.js'
     ],
-    importExport:[
+    importExport:[     // Phantomjd does not support file download yet 
     '../components/assets/importExport/exportEmpty.spec.js',
-    // '../components/assets/importExport/impExp-devices.spec.js'
+    '../components/assets/importExport/impExp-devices.spec.js'
     ]
-}
+};

@@ -221,7 +221,7 @@ describe('Import Export Devices',function(){
   
   }); // Import
 
-  xdescribe('Export', function () {
+  describe('Export', function () {
     var file = new File();
     var date = new Date().toJSON().slice(0,10).replace(/-/g,'');
     var filePath = process.env.DOWNLOAD_PATH+'TDS-To_Export_and_Import-All-SADFXRrcM-'+date+'.xls';
