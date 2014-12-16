@@ -76,7 +76,7 @@ class AssetEntityService {
 	private static COLUMN_PROPS_TO_EXCLUDE = [
 		(AssetClass.APPLICATION): [],
 		(AssetClass.DATABASE): [],
-		(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation', 'sourceRack',
+		(AssetClass.DEVICE): ['assetType', 'model', 'planStatus', 'moveBundle', 'sourceLocation',
 		// TODO : JPM 9/2014 : This list can be removed as part of TM-3311
 		'sourceTeamDba', 'sourceTeamDba', 'sourceTeamLog', 'sourceTeamSa', 'sourceTeamMt', 'targetTeamDba', 'targetTeamDba', 'targetTeamLog', 'targetTeamSa', 'targetTeamMt'
 		],
@@ -3025,6 +3025,14 @@ class AssetEntityService {
 					// Property was moved to the Rack domain
 					altColumns.append(", tgtRack.tag AS targetRack")
 					joinQuery.append("\nLEFT OUTER JOIN rack tgtRack ON tgtRack.rack_id=ae.rack_target_id ")
+					break
+				case 'sourceChassis':
+					altColumns.append(", aeSourceChassis.asset_name AS sourceChassis")
+					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeSourceChassis ON aeSourceChassis.asset_entity_id=ae.source_chassis_id ")
+					break
+				case 'targerChassis':
+					altColumns.append(", aeTargetChassis.asset_name AS targetChassis")
+					joinQuery.append("\nLEFT OUTER JOIN asset_entity aeTargetChassis ON aeTargetChassis.asset_entity_id=ae.targer_chassis_id ")
 					break
 
 				case 'validation':
