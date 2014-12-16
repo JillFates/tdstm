@@ -16,7 +16,7 @@
     <body>
     
 	    <br>
-        <div class="body">
+        <div class="body fluid">
 			<h1>Manage Asset Import Batches</h1>
 			<g:if test="${flash.message}">
 			<div class="message" style="background: #f3f8fc">${flash.message}</div>
