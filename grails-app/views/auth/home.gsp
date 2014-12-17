@@ -178,11 +178,24 @@ a:hover {
 					<tbody>
 						<tr class="odd">
 							<td><span>To Encrypt Value</span></td>
-							<td><input name="toEncryptString" id="toEncryptString" value=""></td>
+							<td><input name="toEncryptString" id="toEncryptString" value="" style="width:250px;"></td>
+						</tr>
+						<tr class="odd">
+							<td><span>Encrypt Salt (Optional)</span></td>
+							<td><input name="encryptSalt" id="encryptSalt" value="" style="width:250px;"></td>
+						</tr>
+						<tr class="odd">
+							<td><span>Encrypt Alghoritm</span></td>
+							<td>
+								<select name="encryptAlghoritm" id="encryptAlghoritm">
+									<option value="DES" selected>DES</option>
+									<option value="AES">AES</option>
+								</select>
+							</td>
 						</tr>
 						<tr class="odd">
 							<td><span>Encrypted Value</span></td>
-							<td><input name="encryptedString" id="encryptedString" value=""></td>
+							<td><input name="encryptedString" id="encryptedString" value="" style="width:250px;"></td>
 						</tr>
 
 						<tr class="even">

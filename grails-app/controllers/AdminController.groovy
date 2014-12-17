@@ -1360,7 +1360,18 @@ class AdminController {
 	 */
 	def encryptValue = {
 		def toEncryptString = params.toEncryptString
-		render DESCodec.encode(toEncryptString)
+		def encryptAlghoritm = params.encryptAlghoritm
+		def encryptSalt = params.encryptSalt
+		def encodedValue = ""
+		switch (encryptAlghoritm) {
+			case "AES":
+				encodedValue = AESCodec.encode(toEncryptString, encryptSalt)
+				break;
+			case "DES":
+			default:
+				encodedValue = DESCodec.encode(toEncryptString, encryptSalt)
+		}
+		render encodedValue
 	}
 
 }

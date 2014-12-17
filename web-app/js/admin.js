@@ -152,7 +152,7 @@ function closeEncryptStringForm() {
  */
 function sendValueToEncrypt () {
 	jQuery.ajax({
-		url: contextPath + '/admin/encryptValue?toEncryptString=' + $("#toEncryptString").val(),
+		url: contextPath + '/admin/encryptValue?toEncryptString=' + $("#toEncryptString").val() + '&encryptSalt=' + $("#encryptSalt").val() + '&encryptAlghoritm=' + $("#encryptAlghoritm").val(),
 		type:'POST',
 		success: function(text, b, data) {
 			$("#encryptedString").val(text);
