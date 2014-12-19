@@ -24,7 +24,7 @@
 	<g:form action="deleteWorkflow" onsubmit="return confirm('WARNING: Deleting this Workflow will remove any associated Projects and projects related data?');">
     	<input type="hidden" name="id" value="${workflow?.id}" />
         <span class="button"><input type="button" class="edit" value="Edit" onclick="editWorkflowList()"/></span>
-        <span class="button"><input type="submit" class="delete" value="Delete" /></span>
+        <!--span class="button"><input type="submit" class="delete" value="Delete" /></span-->
 	</g:form>
 	</div>
 </div>
