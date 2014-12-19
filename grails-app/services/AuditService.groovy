@@ -61,6 +61,13 @@ class AuditService {
 	 */
 	Map filterParams(params) {
 		def result = [:]
+		if (params.size()) {
+			AUDITED_PARAMS.each { k, v ->
+				if (params.containskey(k) && params[k].trim().size() ) {
+					result[k] = v
+				}
+			}
+		}
 		params.each{ key, value ->
 			if (AUDITED_PARAMS[key]) {
 				result[key] = value
