@@ -56,7 +56,7 @@ class ImportController {
 					break
 				
 				// Update the batch status to POSTING and save the progress key 
-				progressKey = "AssetImportProcess-" + UUID.randomUUID().toString()
+				progressKey = "AssetImportReview-" + UUID.randomUUID().toString()
 				dtb.progressKey = progressKey
 				if (!dtb.save(flush:true, failOnError:true)) {
 					log.error "$methodName error occurred while trying to update the DataTransferBatch ${dtb.id} ${GormUtil.allErrorsString(dtb)}" 
