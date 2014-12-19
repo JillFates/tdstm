@@ -68,11 +68,6 @@ class AuditService {
 				}
 			}
 		}
-		params.each{ key, value ->
-			if (AUDITED_PARAMS[key]) {
-				result[key] = value
-			}
-		}
 		return result
 	}
 
