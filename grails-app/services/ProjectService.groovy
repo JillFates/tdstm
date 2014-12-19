@@ -30,7 +30,6 @@ class ProjectService {
 	def userPreferenceService
 	def sequenceService
 
-
 	/**
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
 	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
@@ -411,21 +410,18 @@ class ProjectService {
 			companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,
 			projectLogoForProject:projectLogoForProject, workflowCodes:workflowCodes ]
 	}
-	
+
 	/*
 	 *The UserPreferenceService.removeProjectAssociates is moved here and renamed as deleteProject
 	 *@param project
-	 *@param UserLogin
+	 *@param includeProject indicates if should be deleted the project too
 	 *@return message
 	 */
-	def deleteProject( Project projectInstance, UserLogin userLogin) throws UnauthorizedException {
+	def deleteProject(prokectId, includeProject=false) throws UnauthorizedException {
 		def message
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		def projects = getUserProjects(securityService.getUserLogin(), projectHasPermission)
-		
-		if (!RolePermissions.hasPermission('ProjectDelete')) {
-			throw new UnauthorizedException('You do not have permission to delete projects')
-		}
+		def projectInstance = Project.get(prokectId)
 		
 		if(!(projectInstance in projects)){
 			throw new UnauthorizedException('You do not have access to the specified project')
@@ -449,6 +445,7 @@ class ProjectService {
 		ProjectTeam.executeUpdate("Update ProjectTeam pt SET pt.latestAsset = null where pt.latestAsset in ($assetsQuery)")
 		
 		AssetEntity.executeUpdate("delete from AssetEntity ae where ae.project = ${projectInstance.id}")
+		AssetComment.executeUpdate("delete from AssetComment ac where ac.project = ${projectInstance.id}")
 		TaskBatch.executeUpdate("delete from TaskBatch tb where tb.project = ${projectInstance.id}")
 		
 		// remove DataTransferBatch
@@ -497,7 +494,20 @@ class ProjectService {
 		
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = ${projectInstance.id}")
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = ${projectInstance.id}")
-		
+
+		def recipesQuery = "select r.id from Recipe r where r.project = ${projectInstance.id}"
+		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project = ${projectInstance.id}")
+		RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.recipe in ($recipesQuery)")
+		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe in ($recipesQuery)")
+		Recipe.executeUpdate("delete from Recipe r where r.project  = ${projectInstance.id}")
+
+		PartyGroup.executeUpdate("delete from Party p where p.id = ${projectInstance.id}")
+		Party.executeUpdate("delete from Party p where p.id = ${projectInstance.id}")
+
+		if (includeProject) {
+			Project.executeUpdate("delete from Project p where p.id = ${projectInstance.id}")
+		}
+
 		return message
 	}
 	

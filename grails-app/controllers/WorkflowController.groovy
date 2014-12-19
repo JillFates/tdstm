@@ -358,9 +358,7 @@ class WorkflowController {
 			def workflowProjects = Project.findAllByWorkflowCode(workflow?.process)
 			try {
 				workflowProjects.each{ project ->
-					projectService.deleteProject(project, securityService.getUserLogin())
-					def party = Party.get(project.id)
-					party.delete()
+					projectService.deleteProject(project.id, false)
 				}
 				WorkflowTransitionMap.executeUpdate("delete from WorkflowTransitionMap wtm where wtm.workflow = ?",[workflow])
 				WorkflowTransition.executeUpdate("delete from WorkflowTransition wt where wt.workflow = ?",[workflow])

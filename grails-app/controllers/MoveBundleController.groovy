@@ -759,11 +759,18 @@ class MoveBundleController {
 		def dependencyConsoleList = []
 		assetDependencyList.each{ dependencyBundle ->
 			def assetDependentlist = AssetDependencyBundle.findAllByDependencyBundleAndProject(dependencyBundle.dependencyBundle,project)
-			def appCount = assetDependentlist.findAll{ it.asset.assetType == app }.size()
-			// TODO : JPM 9/2014 - serverCount should be using the AssetType method since it is not looking at all of the correct assetTypes
-			def serverCount = assetDependentlist.findAll{ it.asset.assetType in [server, blade] }.size()
-			def vmCount = assetDependentlist.findAll{ it.asset.assetType == vm }.size()
-			
+			def appCount = 0
+			def serverCount = 0
+			def vmCount = 0
+			try {
+				appCount = assetDependentlist.findAll{ it.asset.assetType == app }.size()
+				// TODO : JPM 9/2014 - serverCount should be using the AssetType method since it is not looking at all of the correct assetTypes
+				serverCount = assetDependentlist.findAll{ it.asset.assetType in [server, blade] }.size()
+				vmCount = assetDependentlist.findAll{ it.asset.assetType == vm }.size()
+			} catch (org.hibernate.ObjectNotFoundException onfe) {
+				log.error "Database inconsistency: $onfe"
+			}
+
 			dependencyConsoleList << ['dependencyBundle':dependencyBundle.dependencyBundle, 'appCount':appCount, 'serverCount':serverCount, 'vmCount':vmCount]
 		}
 		

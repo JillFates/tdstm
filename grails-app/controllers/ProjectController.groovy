@@ -136,25 +136,20 @@ class ProjectController {
 	}
 
 	def delete = {
-		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		if(projectInstance) {
+		def project = controllerService.getProjectForPage(this, "ProjectDelete")
+		if (project) {
+			def userLogin = securityService.getUserLogin()
+			log.info "Project $project.name($project.id) is going to be deleted by $userLogin"
 			try {
-				def message = projectService.deleteProject(projectInstance, securityService.getUserLogin())
-				projectInstance.delete(flush:true)
-				PartyGroup.executeUpdate("delete from Party p where p.id = ${params.id}")
-				Party.executeUpdate("delete from Party p where p.id = ${params.id}")
-				
-				flash.message = "Project ${projectInstance} deleted"
+				def message = projectService.deleteProject(project.id, true)
+
+				flash.message = "Project ${project.name} deleted"
 				redirect(controller:"projectUtil", params:['message':flash.message])
 			} catch (Exception ex) {
 				flash.message = ex.getMessage()
 				redirect(action:list)
 			}
-		} else {
-			flash.message = "Project not found with id ${params.id}"
-			redirect(action:list)
 		}
-		
 	}
 
 	def edit = {
