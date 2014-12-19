@@ -257,6 +257,8 @@ class ImportService {
 		boolean performance=true
 		def now = new Date()
 
+		boolean canCreateMfgAndModel = securityService.hasPermission(userLogin, 'NewModelsFromImport')
+
 		DataTransferBatch dtb = DataTransferBatch.get(batchId)
 		if (!dtb) {
 			return [error:'Unable to find batch id']
@@ -379,7 +381,6 @@ class ImportService {
 				sb.append("<li>Mfg: ${d.mfg} | Model: ${d.model} | ${d.count} reference${d.count > 1 ? '(s)' : ''}</li>") 
 			}
 			sb.append('</ul>')
-			boolean canCreateMfgAndModel = securityService.hasPermission(userLogin, 'NewModelsFromImport')
 			if (!canCreateMfgAndModel) {
 				sb.append("$indent <b>Note: You do not have the permission necessary to create models during import</b><br>")
 			}
@@ -443,7 +444,7 @@ class ImportService {
 		if (! mfgBlank ) {
 			mfg = Manufacturer.findByName(searchMfgName)
 			if( !mfg ) {
-				mfg = ManufacturerAlias.findByName( searchMfgName )?.manfacturer
+				mfg = ManufacturerAlias.findByName( searchMfgName )?.manufacturer
 				log.debug "verifyMfgAndModelExist() lookup Mfg by alias found: $mfg"
 			}
 			if (!mfg) {
