@@ -63,7 +63,7 @@ class AuditService {
 		def result = [:]
 		if (params.size()) {
 			AUDITED_PARAMS.each { k, v ->
-				if (params.containskey(k) && params[k].trim().size() ) {
+				if (params.containsKey(k) && params[k].trim().size() ) {
 					result[k] = v
 				}
 			}
