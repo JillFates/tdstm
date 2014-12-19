@@ -101,7 +101,7 @@ class ProgressService {
 			synchronized (info) {
 				info.percentComp = 100I
 				info.status = FAILED
-				info.remainingTime = 0
+				//info.remainingTime = null
 				info.detail = detail
 				info.lastUpdated = new Date().getTime()
 			}

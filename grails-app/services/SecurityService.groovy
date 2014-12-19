@@ -24,14 +24,34 @@ class SecurityService implements InitializingBean {
 	def auditService
 
 	def activeDirectoryConfigMap = [:]
+	def loginConfigMap = [ authorityPrompt:'na', authorityLabel:'', authorityList:[] ]
 
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
 	 */
 	public void afterPropertiesSet() throws Exception {
 
+		// Initialize the Login Settings Map used by the login form 
+		def conf = grailsApplication.config?.tdstm?.security
+		if (conf.containsKey('authorityPrompt')) {
+			def ap = conf.authorityPrompt
+			def promptType = ['select','prompt','na']
+			if (promptType.contains(ap)) {
+				loginConfigMap.authorityPrompt = ap
+
+				if (ap != 'na') {
+					loginConfigMap.authorityList = config.ad?.domains?.label
+				}
+
+			} else {
+				println "ERROR - Invalid security setting ($ap) for tdstm.security.authorityPrompt. Valid settings are $promptType."
+			}
+		}
+		if (conf.authorityLabel)
+			loginConfigMap.authorityLabel = conf.authorityLabel
+
 		// Initialize the ActiveDirectory Configuration Map 
-		def conf = grailsApplication.config?.tdstm?.security?.ad
+		conf = grailsApplication.config?.tdstm?.security?.ad
 		if (conf) {
 			activeDirectoryConfigMap.with {
 				// A way to enable/disable the account quickly
@@ -61,6 +81,17 @@ class SecurityService implements InitializingBean {
 		}
 
 	}
+
+	/** 
+	 * Returns the configuration map for the login form based on the tdstm-config.groovy defined settings
+	 * @return a map of all of the settings for the login
+	 *    String authorityPrompt - select:show select, prompt: prompt for autority, na: do nothing for authority
+	 *	  List selectOptions - list of authorities/domains labels
+	 */
+	public Map getLoginConfig() {
+		return this.loginConfigMap
+	}
+
 
 	/**
 	 * Used to determine if the current user has a specified role
