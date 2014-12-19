@@ -271,9 +271,6 @@
 					<g:actionSubmit class="save" value="Update" onclick="return validateDates();" />
 				</span>
 				<span class="button">
-					<g:actionSubmit class="delete" onclick="if(confirm('Warning: This will delete the ${projectInstance?.name} project and all of the assets, events, bundles, and any historic data?')){document.editProjectForm.action = 'delete'};" value="Delete" />
-				</span>
-				<span class="button">
 					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/project/show/${projectInstance?.id}'" />
 				</span>
 			</div>
