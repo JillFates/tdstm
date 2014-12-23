@@ -5,13 +5,61 @@ var ManageBatches = require('./manageBatches.po.js');
 var path = require('path');
 var ExportPage = require('./export.po.js');
 var File = require('./file.po.js');
+var ConnectDatabase = require('./connectDatabase.po.js');
 
 describe('Import Export Devices',function(){
 
-  xdescribe('Preconditions',function () {
+  describe('Preconditions',function () {
+    var connectDatabase = new ConnectDatabase();
+    connectDatabase.connection.connect();
 
-    //Run mysql  delete  from manufacturer where name in ('Dell-ToCreate2', 'Dell-TEST290', 'Dell-TOCREATE1');
-    // delete from model where name in ('PowerEdge TOCREATE2','Hola','TOCREATE3');
+    it('should delete some manufacturers',function () {
+      var before ;
+      var after=0;
+      var sql = 'select count(*) as results from manufacturer where name in ("Dell-ToCreate2", "Dell-TEST290", "Dell-TOCREATE1");';
+      var sqlDelete = 'delete  from manufacturer where name in ("Dell-ToCreate2", "Dell-TEST290", "Dell-TOCREATE1");';
+      
+      connectDatabase.connection.query(sql,function (err,rows) {
+        if(!err){
+          before = rows[0].results;
+        }
+      });
+      
+      connectDatabase.connection.query(sqlDelete,function (err,rows) {
+        if(!err){
+          if(rows.length > 0){
+            after = rows[0].affectedRows;
+            expect(after).toEqual(before);
+          }else{
+            expect(after).toEqual(0);
+          }
+        }
+      });
+    });
+    
+    it('should delete some models', function () {
+      var sql = 'select count(*) as results from model where name in ("PowerEdge TOCREATE2","Hola","TOCREATE3")' ;
+      var sqlDelete = 'delete from model where name in ("PowerEdge TOCREATE2","Hola","TOCREATE3");';
+      var before ;
+      var after=0;
+
+      connectDatabase.connection.query(sql,function (err,rows) {
+        if(!err){
+          before = rows[0].results;
+        }
+      });
+
+      connectDatabase.connection.query(sqlDelete,function (err,rows) {
+        if(!err){
+          if(rows.length > 0){
+            after = rows[0].affectedRows;
+            expect(after).toEqual(before);
+          }else{
+            expect(after).toEqual(0);
+          }
+        }
+      });
+    });
     
   }); // Preconditions
 
@@ -104,6 +152,7 @@ describe('Import Export Devices',function(){
     });
 
     describe('Manage Batches',function () {
+     
       var manageBatches =  new ManageBatches();
       
       it('should start review after click on review link',function () {
@@ -221,7 +270,7 @@ describe('Import Export Devices',function(){
   
   }); // Import
 
-  describe('Export', function () {
+  xdescribe('Export', function () {
     var file = new File();
     var date = new Date().toJSON().slice(0,10).replace(/-/g,'');
     var filePath = process.env.DOWNLOAD_PATH+'TDS-To_Export_and_Import-All-SADFXRrcM-'+date+'.xls';

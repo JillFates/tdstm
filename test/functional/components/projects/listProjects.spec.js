@@ -18,7 +18,8 @@ describe('List Projects', function(){
     });
 
     it('should only be found MarketingDemo project', function(){
-      var results= 2;
+      var results= 2
+      browser.sleep(1000);
       listProjectPage.verifySearchResults(results).then(function(list){
         expect(list.length).toEqual(results);
         list[1].getAttribute('id').then(function(text){

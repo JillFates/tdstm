@@ -60,7 +60,7 @@ describe('Delete a project', function(){
   });
 
   it('should be displayed delete confirmation message', function(){
-    expect(projectPage.getConfirmMsg()).toMatch(/Project TP01 : Test Project deleted/);
+    expect(projectPage.getConfirmMsg()).toMatch(/Project Test Project deleted/);
   });
 
   it('should find the project to delete', function(){
