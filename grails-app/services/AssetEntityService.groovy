@@ -2,15 +2,15 @@ import grails.converters.JSON
 
 import java.text.SimpleDateFormat
 
-import jxl.*
-import jxl.read.biff.*
-import jxl.write.*
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.springframework.transaction.annotation.Transactional
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Cell
 
 import java.util.regex.Matcher
 
@@ -1658,28 +1658,28 @@ class AssetEntityService {
 	 */
 	def cablingReportData( assetCablesList, cablingSheet ){
 		for ( int r = 2; r <= assetCablesList.size(); r++ ) {
-			cablingSheet.addCell( new Label( 0, r, String.valueOf(assetCablesList[r-2].assetFromPort.type )) )
-			cablingSheet.addCell( new Label( 1, r, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" )) )
-			cablingSheet.addCell( new Label( 2, r, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" )) )
-			cablingSheet.addCell( new Label( 3, r, String.valueOf(assetCablesList[r-2].assetFromPort.label )) )
-			cablingSheet.addCell( new Label( 4, r, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" )) )
-			cablingSheet.addCell( new Label( 5, r, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" )) )
+			addCell(cablingSheet, r, 0, String.valueOf(assetCablesList[r-2].assetFromPort.type ))
+			addCell(cablingSheet, r, 1, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" ))
+			addCell(cablingSheet, r, 2, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" ))
+			addCell(cablingSheet, r, 3, String.valueOf(assetCablesList[r-2].assetFromPort.label ))
+			addCell(cablingSheet, r, 4, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" ))
+			addCell(cablingSheet, r, 5, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" ))
 			if(assetCablesList[r-2].assetFromPort.type !='Power'){
-				cablingSheet.addCell( new Label( 6, r, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" )) )
+				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" ))
 			}else{
-				cablingSheet.addCell( new Label( 6, r, String.valueOf(assetCablesList[r-2].toPower?:"" )) )
+				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].toPower?:"" ))
 			}
-			cablingSheet.addCell( new Label( 7, r, String.valueOf(assetCablesList[r-2].cableComment?:"" )) )
-			cablingSheet.addCell( new Label( 8, r, String.valueOf(assetCablesList[r-2].cableColor?:"" )) )
+			addCell(cablingSheet, r, 7, String.valueOf(assetCablesList[r-2].cableComment?:"" ))
+			addCell(cablingSheet, r, 8, String.valueOf(assetCablesList[r-2].cableColor?:"" ))
 			if(assetCablesList[r-2].assetFrom.sourceRoom){
-				cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.rackSource?.location+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack )) )
+				addCell(cablingSheet, r, 9, String.valueOf(assetCablesList[r-2].assetFrom?.rackSource?.location+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack ))
 			}else if(assetCablesList[r-2].assetFrom.targetRoom){
-				cablingSheet.addCell( new Label( 9, r, String.valueOf(assetCablesList[r-2].assetFrom?.rackTarget?.location+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack )) )
+				addCell(cablingSheet, r, 9, String.valueOf(assetCablesList[r-2].assetFrom?.rackTarget?.location+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack ))
 			}else{
-				cablingSheet.addCell( new Label( 9, r, '') )
+				addCell(cablingSheet, r, 9, '')
 			}
-			cablingSheet.addCell( new Label( 10, r, String.valueOf(assetCablesList[r-2].cableStatus?:"" )) )
-			cablingSheet.addCell( new Label( 11, r, String.valueOf(assetCablesList[r-2].assetLoc?: "" )) )
+			addCell(cablingSheet, r, 10, String.valueOf(assetCablesList[r-2].cableStatus?:"" ))
+			addCell(cablingSheet, r, 11, String.valueOf(assetCablesList[r-2].assetLoc?: "" ))
 		}
 	}
 
@@ -2012,6 +2012,39 @@ class AssetEntityService {
 		return StringUtil.defaultIfEmpty(value, '')
 	}
 
+	 /*-------------------------------------------------------
+	  *  TO Add the Title Info to MasterSpreadSheet
+	  *  @author srinivas
+	  *  @param Title Information as a List and Workbook Sheet Object
+	  *-------------------------------------------------------*/
+	 private def exportTitleInfo(def titleFieldList,def titleSheet){
+		 def sheetContent
+		 def column = 2
+		 for (int titleField = 0; titleField < titleFieldList.size(); titleField++ ) {
+			 if( titleField == 2){
+				 addCell(titleSheet, (column-=1), 2, titleFieldList.get(titleField).toString())
+			 }else {
+				 addCell(titleSheet, column, 1, titleFieldList.get(titleField).toString())
+			 }
+			 column+=1
+		 }
+	 }
+
+	 private def addCell(sheet, rowIdx, columnIdx, value, type=null) {
+	 	def row = sheet.getRow(rowIdx)
+	 	if (!row) {
+	 		row = sheet.createRow(rowIdx)
+	 	}
+	 	def cell = row.getCell(columnIdx)
+	 	if (!cell) {
+			cell = row.createCell(columnIdx)
+	 	}
+	 	if (type) {
+	 		cell.setCellType(type)
+	 	}
+	 	cell.setCellValue(value)
+	 }
+
 	/**
 	 * Download data form Asset Entity table into Excel file
 	 * @param Datatransferset,Project,Movebundle
@@ -2046,6 +2079,7 @@ class AssetEntityService {
 			def bundle = params.bundle
 			def bundleSize = bundle.size()
 			bundleNameList.append(bundle[0] != "" ? (bundleSize==1 ? MoveBundle.read( bundle[0] ).name : bundleSize+'Bundles') : 'All')
+
 
 			def dataTransferSetInstance = DataTransferSet.findById( dataTransferSet )
 
@@ -2145,7 +2179,6 @@ class AssetEntityService {
 			progressTotal = sizeOf(asset) + sizeOf(application) + sizeOf(database) + sizeOf(files)
 			
 			//get template Excel
-			def workbook
 			def book
 			started = new Date()
 			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
@@ -2171,21 +2204,18 @@ class AssetEntityService {
 			log.info "export() - Loading appDepBundle took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
-			//create workbook and sheet
-			WorkbookSettings wbSetting = new WorkbookSettings()
-			wbSetting.setUseTemporaryFileDuringWrite(true)
-			workbook = Workbook.getWorkbook( file, wbSetting )
-			book = Workbook.createWorkbook( new FileOutputStream(temp), workbook )
-			log.info "export() - Creating workbook took ${TimeUtil.elapsed(started)}"
-			started = new Date()
+			//create book and sheet
+			FileInputStream fileInputStream = new FileInputStream( file );
+			book = new HSSFWorkbook(fileInputStream);
 
-			def sheetNames = book.getSheetNames() as List
+			log.info "export() - Creating book took ${TimeUtil.elapsed(started)}"
+			started = new Date()
 
 			// Helper closure used to retrieve the s
 			def getWorksheet = { sheetName ->
-				if (sheetNames.contains(sheetName)) {
-					def index = sheetNames.findIndexOf( { it == sheetName } )
-					return book.getSheet( sheetNames[index] )
+				def s = book.getSheet( sheetName )
+				if (s) {
+					return s
 				} else {
 					throw new RuntimeException("Unable to find sheet $sheetName in the uploaded spreadsheet")
 				}
@@ -2207,9 +2237,9 @@ class AssetEntityService {
 			serverMap.put("DepGroup", null )
 			serverColumnNameList.add("DepGroup")
 			serverSheet = getWorksheet('Devices')
-			serverCol = serverSheet.getColumns()
+			serverCol = serverSheet.getRow(0).getLastCellNum()
 			for ( int c = 0; c < serverCol; c++ ) {
-				def serverCellContent = serverSheet.getCell( c, 0 ).contents
+				def serverCellContent = serverSheet.getRow(0).getCell(c).getStringCellValue()
 				serverSheetColumnNames.put(serverCellContent, c)
 				if( serverMap.containsKey( serverCellContent ) ) {
 					serverMap.put( serverCellContent, c )
@@ -2225,13 +2255,12 @@ class AssetEntityService {
 			appMap.put("DepGroup", null )
 			appColumnNameList.add("DepGroup")
 			appSheet = getWorksheet('Applications')
-			appCol = appSheet.getColumns()
+			appCol = appSheet.getRow(0).getLastCellNum()
 			for ( int c = 0; c < appCol; c++ ) {
-				def appCellContent = appSheet.getCell( c, 0 ).contents
+				def appCellContent = appSheet.getRow(0).getCell(c).getStringCellValue()
 				appSheetColumnNames.put(appCellContent, c)
 				if( appMap.containsKey( appCellContent ) ) {
 					appMap.put( appCellContent, c )
-
 				}
 			}
 
@@ -2244,9 +2273,9 @@ class AssetEntityService {
 			dbMap.put("DepGroup", null )
 			dbColumnNameList.add("DepGroup")
 			dbSheet = getWorksheet('Databases')
-			dbCol = dbSheet.getColumns()
+			dbCol = dbSheet.getRow(0).getLastCellNum()
 			for ( int c = 0; c < dbCol; c++ ) {
-				def dbCellContent = dbSheet.getCell( c, 0 ).contents
+				def dbCellContent = dbSheet.getRow(0).getCell(c).getStringCellValue()
 				dbSheetColumnNames.put(dbCellContent, c)
 				if( dbMap.containsKey( dbCellContent ) ) {
 					dbMap.put( dbCellContent, c )
@@ -2262,9 +2291,9 @@ class AssetEntityService {
 			fileMap.put("DepGroup", null )
 			fileColumnNameList.add("DepGroup")
 			storageSheet = getWorksheet('Storage')
-			filesCol = storageSheet.getColumns()
+			filesCol = storageSheet.getRow(0).getLastCellNum()
 			for ( int c = 0; c < filesCol; c++ ) {
-				def fileCellContent = storageSheet.getCell( c, 0 ).contents
+				def fileCellContent = storageSheet.getRow(0).getCell(c).getStringCellValue()
 				storageSheetColumnNames.put(fileCellContent, c)
 				if( fileMap.containsKey( fileCellContent ) ) {
 					fileMap.put( fileCellContent, c )
@@ -2302,15 +2331,15 @@ class AssetEntityService {
 				SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
 				if(titleSheet != null) {
 					def titleInfoMap = new ArrayList();
-					titleInfoMap.add (project.client )
+					titleInfoMap.add( project.client )
 					titleInfoMap.add( projectId )
 					titleInfoMap.add( project.name )
 					titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
 					titleInfoMap.add( format.format( currDate ) )
 					titleInfoMap.add( loginUser.person )
 					titleInfoMap.add( bundleNameList )
-					partyRelationshipService.exportTitleInfo(titleInfoMap,titleSheet)
-					titleSheet.addCell(new Label(0,30,"Note: All times are in ${tzId ? tzId : 'EDT'} time zone"))
+					exportTitleInfo(titleInfoMap,titleSheet)
+					addCell(titleSheet, 0,30,"Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
 				}
 
 				//update data from Asset Entity table to EXCEL
@@ -2345,11 +2374,9 @@ class AssetEntityService {
 						
 						//Add assetId for walkthrough template only.
 						if( serverSheetColumnNames.containsKey("assetId") ) {
-							def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-							def addAssetId = new Number(0, r, (asset[r-1].id))
-							serverSheet.addCell( addAssetId )
+							addCell(serverSheet, r, 0, asset[r-1].id, Cell.CELL_TYPE_NUMERIC)
 						}
-						
+
 						for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
 							def addContentToSheet
 							def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
@@ -2369,17 +2396,17 @@ class AssetEntityService {
 								case 'DepGroup':
 									// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
 									def depGroup = assetDepBundleList.find{it.asset.id==a.id}?.dependencyBundle?.toString()
-									addContentToSheet = new Label(colNum, r, StringUtil.defaultIfEmpty(depGroup, ''))
+									addCell(serverSheet, r, colNum, StringUtil.defaultIfEmpty(depGroup, ''))
 									break
 								case ~/usize|SourcePos|TargetPos/:
 									def pos = a[attribute] ?: 0
 									// Don't bother populating position if it is a zero
 									if (pos == 0) 
 										continue
-									addContentToSheet = new jxl.write.Number(colNum, r, (Double)pos )
+									addCell(serverSheet, r, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 									break
 								case ~/Retire|MaintExp|Modified Date/:
-									addContentToSheet = new Label(colNum, r, stdDateFormat.format(a[attribute]) )
+									addCell(serverSheet, r, colNum, stdDateFormat.format(a[attribute]))
 									break
 
 								case ~/Source Blade|Target Blade/:
@@ -2388,15 +2415,13 @@ class AssetEntityService {
 									if (chassis) {
 										value = "id:" + chassis.id + " " + chassis.assetName
 									}
-									addContentToSheet = new Label(colNum, r, value)
+									addCell(serverSheet, r, colNum, value)
 									break
 
 								default:
 									def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
-									addContentToSheet = new Label(colNum, r, value)
+									addCell(serverSheet, r, colNum, value)
 							}
-
-							serverSheet.addCell( addContentToSheet )
 						}
 					}
 					log.info "export() - processing assets took ${TimeUtil.elapsed(started)}"
@@ -2424,7 +2449,7 @@ class AssetEntityService {
 
 						// Add the appId column to column 0 if it exists
 						if (hasIdCol) {
-							appSheet.addCell( new jxl.write.Number(appSheetColumnNames[idColName], rowNum, (Double)app.id) )
+							addCell(appSheet, rowNum, appSheetColumnNames[idColName], (Double)app.id, Cell.CELL_TYPE_NUMERIC)
 						}
 								
 						for (int i=0; i < appColumnNameList.size(); i++) {
@@ -2476,13 +2501,10 @@ class AssetEntityService {
 									colVal = colVal.toString()
 								}
 
-								def cell
 								if ( numericCols.contains(colName) )
-									cell = new Number(colNum, rowNum, (Double)colVal)
+									addCell(appSheet, rowNum, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC)
 								else
-									cell = new Label( colNum, rowNum, String.valueOf(colVal) )
-
-								appSheet.addCell( cell )
+									addCell(appSheet, rowNum, colNum, colVal.toString())
 							}
 						}
 					}
@@ -2500,9 +2522,7 @@ class AssetEntityService {
 						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
 						//Add assetId for walkthrough template only.
 						if( dbSheetColumnNames.containsKey("dbId") ) {
-							def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-							def addDBId = new Number(0, r, (database[r-1].id))
-							dbSheet.addCell( addDBId )
+							addCell(dbSheet, r, 0, (database[r-1].id), Cell.CELL_TYPE_NUMERIC)
 						}
 						for ( int coll = 0; coll < dbcolumnNameListSize; coll++ ) {
 							def addContentToSheet
@@ -2511,19 +2531,18 @@ class AssetEntityService {
 							def colName = dbColumnNameList.get(coll)
 							if(colName == "DepGroup"){
 								def depGroup = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
-								addContentToSheet = new Label(dbMap[colName], r, depGroup ?:"" )
+								addCell(dbSheet, r, dbMap[colName], depGroup ?:"")
 							} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
-								addContentToSheet = new Label(dbMap[colName], r, (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) :''))
+								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) :''))
 							} else if ( database[r-1][attribute] == null ) {
-								addContentToSheet = new Label(  dbMap[colName], r, "" )
+								addCell(dbSheet, r, dbMap[colName], "")
 							}else {
 								if( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
-									addContentToSheet = new Label( dbMap[colName], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode) )
+									addCell(dbSheet, r, dbMap[colName], String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode))
 								}else {
-									addContentToSheet = new Label( dbMap[colName], r, String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) )
+									addCell(dbSheet, r, dbMap[colName], String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])))
 								}
 							}
-							dbSheet.addCell( addContentToSheet )
 						}
 					}
 					log.info "export() - processing databases took ${TimeUtil.elapsed(started)}"
@@ -2541,9 +2560,7 @@ class AssetEntityService {
 						
 						// Add assetId for walkthrough template only.
 						if ( storageSheetColumnNames.containsKey("filesId") ) {
-							def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-							def addFileId = new Number(0, r, (files[r-1].id))
-							storageSheet.addCell( addFileId )
+							addCell(storageSheet, r, 0, (files[r-1].id), Cell.CELL_TYPE_NUMERIC)
 						}
 
 						for ( int coll = 0; coll < filecolumnNameListSize; coll++ ) {
@@ -2552,16 +2569,15 @@ class AssetEntityService {
 							def colName = fileColumnNameList.get(coll)
 							if (colName == "DepGroup") {
 								def depGroup = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
-								addContentToSheet = new Label(fileMap[colName], r, depGroup ?:"" )
+								addCell(storageSheet, r, fileMap[colName], depGroup ?:"" )
 							} else if(attribute == "retireDate" || attribute == "maintExpDate" || attribute == "lastUpdated"){
-								addContentToSheet = new Label(fileMap[colName], r, (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) :''))
+								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) :''))
 							} else if ( files[r-1][attribute] == null ) {
-								addContentToSheet = new Label( fileMap[colName], r, "" )
+								addCell(storageSheet, r, fileMap[colName], "")
 							} else {
-								addContentToSheet = new Label( fileMap[colName], r, String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) )
+								addCell(storageSheet, r, fileMap[colName], String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])))
 							}
 
-							storageSheet.addCell( addContentToSheet )
 						}
 					}
 					log.info "export() - processing storage took ${TimeUtil.elapsed(started)}"
@@ -2583,35 +2599,33 @@ class AssetEntityService {
 					def dependentSize = assetDependent.size()
 					for ( int r = 1; r <= dependentSize; r++ ) {
 						//Add assetId for walkthrough template only.
-						def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-						def addAssetDependentId = new Number(0, r, (assetDependent[r-1].id))
-						dependencySheet.addCell( addAssetDependentId )
+						addCell(dependencySheet, r, 0, (assetDependent[r-1].id), Cell.CELL_TYPE_NUMERIC)
 
 						for ( int coll = 0; coll < 11; coll++ ) {
 							def addContentToSheet
 							switch(DTAMap[coll]){
 								case "assetName":
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetName) :"")
+									addContentToSheet = assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetName) :""
 								break;
 								case "assetType":
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetType) :"" )
+									addContentToSheet = assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetType) :"" 
 								break;
 								case "dependentName":
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetName) : "" )
+									addContentToSheet = assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetName) : "" 
 								break;
 								case "dependentType":
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetType) : "")
+									addContentToSheet = assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetType) : ""
 								break;
 								case "dependent":
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : "")
+									addContentToSheet = assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : ""
 								break;
 								case "asset":
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : "")
+									addContentToSheet = assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : ""
 								break;
 								default:
-									addContentToSheet = new Label( dependencyMap[dependencyColumnNameList.get(coll)], r, assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll])) : "" )
+									addContentToSheet = assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll])) : ""
 							}
-							dependencySheet.addCell( addContentToSheet )
+							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
 						}
 					}
 					log.info "export() - processing dependencies took ${TimeUtil.elapsed(started)}"
@@ -2634,10 +2648,10 @@ class AssetEntityService {
 								   'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
 								  ]
 					
-					def roomCol = storageSheet.getColumns()
+					def roomCol = roomSheet.getRow(0).getLastCellNum()
 					def roomSheetColumns = []
 					for ( int c = 0; c < roomCol; c++ ) {
-						def roomCellContent = roomSheet.getCell( c, 0 ).contents
+						def roomCellContent = roomSheet.getRow(0).getCell(c).getStringCellValue()
 						roomSheetColumns << roomCellContent
 					}
 					roomSheetColumns.removeAll('')
@@ -2645,18 +2659,16 @@ class AssetEntityService {
 						roomSheetColumns.eachWithIndex{column, i->
 							def addContentToSheet
 							if(column == 'roomId'){
-								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-								addContentToSheet = new Number(0, r, (rooms[r-1].id))
+								addCell(roomSheet, r, 0, (rooms[r-1].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
-							   if(column=='Date Created' || column=='Last Updated')
-									   addContentToSheet = new Label( i, r, rooms[r-1]."${roomMap[column]}" ?
-										   String.valueOf( formatter.format(rooms[r-1]."${roomMap[column]}")): "" )
-							   else if(column =="Source")
-									 addContentToSheet = new Label( i, r, String.valueOf(rooms[r-1]."${roomMap[column]}" ==1 ? "Source" : "Target" ) )
-							   else
-									addContentToSheet = new Label( i, r, String.valueOf(rooms[r-1]."${roomMap[column]}"?: "" ) )
+								if(column=='Date Created' || column=='Last Updated') {
+									addCell(roomSheet, r, i, rooms[r-1]."${roomMap[column]}" ?String.valueOf( formatter.format(rooms[r-1]."${roomMap[column]}")): "")
+								} else if(column =="Source") {
+									addCell(roomSheet, r, i, String.valueOf(rooms[r-1]."${roomMap[column]}" ==1 ? "Source" : "Target" ))
+								} else {
+									addCell(roomSheet, r, i, String.valueOf(rooms[r-1]."${roomMap[column]}"?: "" ))
+								}
 							}
-							roomSheet.addCell( addContentToSheet )
 						}
 				  }
 				  log.info "export() - processing rooms took ${TimeUtil.elapsed(started)}"
@@ -2677,11 +2689,11 @@ class AssetEntityService {
 								   'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
 								   'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
 								  ]
-					
-					def rackCol = storageSheet.getColumns()
+
+					def rackCol = rackSheet.getRow(0).getLastCellNum()
 					def rackSheetColumns = []
 					for ( int c = 0; c < rackCol; c++ ) {
-						def rackCellContent = rackSheet.getCell( c, 0 ).contents
+						def rackCellContent = rackSheet.getRow(0).getCell(c).getStringCellValue()
 						rackSheetColumns << rackCellContent
 					}
 					rackSheetColumns.removeAll('')
@@ -2689,15 +2701,13 @@ class AssetEntityService {
 						rackSheetColumns.eachWithIndex{column, i->
 							def addContentToSheet
 							if(column == 'rackId'){
-								def integerFormat = new WritableCellFormat (NumberFormats.INTEGER)
-								addContentToSheet = new Number(0, r, (racks[r-1].id))
+								addCell(rackSheet, r, 0, (racks[r-1].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
 							   if(column =="Source")
-									 addContentToSheet = new Label( i, r, String.valueOf(racks[r-1]."${rackMap[column]}" ==1 ? "Source" : "Target" ) )
+									addCell(rackSheet, r, i, String.valueOf(racks[r-1]."${rackMap[column]}" ==1 ? "Source" : "Target" ))
 							   else
-									addContentToSheet = new Label( i, r, String.valueOf(racks[r-1]."${rackMap[column]}"?: "" ) )
+									addCell(rackSheet, r, i, String.valueOf(racks[r-1]."${rackMap[column]}"?: "" ))
 							}
-							rackSheet.addCell( addContentToSheet )
 						}
 				  }
 				  log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
@@ -2764,18 +2774,18 @@ class AssetEntityService {
 					def category
 					def comment
 					for(int cr=1 ; cr<=assetcomment.size() ; cr++){
-						commentId = new Label(0,cr,String.valueOf(assetcomment[cr-1].id))
-						commentSheet.addCell(commentId)
-						assetId = new Label(1,cr,String.valueOf(assetcomment[cr-1].assetEntity.id))
-						commentSheet.addCell(assetId)
-						category = new Label(2,cr,String.valueOf(assetcomment[cr-1].category))
-						commentSheet.addCell(category)
-						createdDate = new Label(3,cr,String.valueOf(assetcomment[cr-1].dateCreated? createDateFormat.format(assetcomment[cr-1].dateCreated) : ''))
-						commentSheet.addCell(createdDate)
-						createdBy = new Label(4,cr,String.valueOf(assetcomment[cr-1].createdBy))
-						commentSheet.addCell(createdBy)
-						comment = new Label(5,cr,String.valueOf(assetcomment[cr-1].comment))
-						commentSheet.addCell(comment)
+
+						addCell(commentSheet, cr, 0, String.valueOf(assetcomment[cr-1].id))
+
+						addCell(commentSheet, cr, 1, String.valueOf(assetcomment[cr-1].assetEntity.id))
+
+						addCell(commentSheet, cr, 2, String.valueOf(assetcomment[cr-1].category))
+
+						addCell(commentSheet, cr, 3, String.valueOf(assetcomment[cr-1].dateCreated? createDateFormat.format(assetcomment[cr-1].dateCreated) : ''))
+
+						addCell(commentSheet, cr, 4, String.valueOf(assetcomment[cr-1].createdBy))
+
+						addCell(commentSheet, cr, 5, String.valueOf(assetcomment[cr-1].comment))
 					}
 				}
 			}
@@ -2784,11 +2794,15 @@ class AssetEntityService {
 			// Wrap up the process
 			// 
 			filename += "-"+exportedEntity+"-"+exportDate
-			book.write()
-			book.close()
+
+			FileOutputStream out =  new FileOutputStream(temp);
+
+			book.write(out)
+			out.close()
+
 			progressService.updateData(key, 'header', "attachment; filename=\""+exportType+'-'+filename+".xls\"")
 			progressService.update(key, 100, 'Completed')
-		
+
 		} catch( Exception exportExp ) {
 
 			exportExp.printStackTrace()
@@ -2832,12 +2846,11 @@ class AssetEntityService {
 	 // customLabels is defined as a static at the top
    	def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
 	   	for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
-		   def cellData = sheet.getCell(head,0)?.getContents()
+		   def cellData = sheet.getRow(0).getCell(head)?.getStringCellValue()
 		   def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
 		   if (attributeMap?.attributeCode && customLabels.contains( cellData )) {
 			   def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
-			   def customColumn = new Label(head,0, columnLabel )
-			   sheet.addCell(customColumn)
+			   addCell(sheet, 0, head, columnLabel)
 		   }
 	   }
 	   return sheet

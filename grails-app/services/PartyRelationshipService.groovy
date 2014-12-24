@@ -698,24 +698,6 @@ class PartyRelationshipService {
 		 }   
 		 return managerNames
 	 }
-	 /*-------------------------------------------------------
-	  *  TO Add the Title Info to MasterSpreadSheet
-	  *  @author srinivas
-	  *  @param Title Information as a List and Workbook Sheet Object
-	  *-------------------------------------------------------*/
-	 def exportTitleInfo(def titleFieldList,def titleSheet){
-		 def sheetContent
-		 def column = 2
-		 for (int titleField = 0; titleField < titleFieldList.size(); titleField++ ) {
-			 if( titleField == 2){
-				 sheetContent = new Label(2,(column-=1),titleFieldList.get(titleField).toString())
-			 }else {
-				 sheetContent = new Label(1,column,titleFieldList.get(titleField).toString())
-			 }
-			 titleSheet.addCell(sheetContent)
-			 column+=1
-		 }
-	 }
 	 /**
 	  * To update party role by type 
 	  * @param type : type of role
