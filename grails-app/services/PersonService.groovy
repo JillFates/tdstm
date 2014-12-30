@@ -556,11 +556,11 @@ class PersonService {
 				if (toAlreadyHasRelationship) {
 					jdbcTemplate.update("DELETE FROM party_relationship $where")
 				} else {
-				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} WHERE $where")
+				   jdbcTemplate.update("UPDATE party_relationship SET party_id_to_id = ${toPerson.id} $where")
 				}
 			}
 		} catch(Exception ex){
-			ex.printStackTrace()
+			log.error("Can't update person project relationship: " + ex.getMessage(), ex)
 		}
 	}
 	
