@@ -445,6 +445,8 @@ class PersonService {
 		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
 		//Updating person reference from 'fromPerson' to 'toPerson'
 		updatePersonReference(fromPerson, toPerson)
+		//Update FKs related to this person to the new one
+		updatePersonFKs(fromPerson, toPerson)
 		//Updating ProjectRelationship relation from 'fromPerson' to 'toPerson'
 		updateProjectRelationship(fromPerson, toPerson)
 		
@@ -528,7 +530,17 @@ class PersonService {
 			}
 		}
 	}
-	
+
+	/**
+	 * This method is used to update person FKs to use the new person id.
+	 * @param toPerson : instance of Person
+	 * @param fromPerson : instance of Person
+	 * @return void
+	 */
+	def updatePersonFKs(fromPerson, toPerson) {
+		jdbcTemplate.update("UPDATE recipe_version SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
+	}
+
 	/**
 	 * This method is used to update person reference in PartyRelationship table.
 	 * @param toPerson : instance of Person
