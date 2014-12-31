@@ -25,6 +25,16 @@ $(document).ready(function() {
 	</div>
 </div>
 
+<%-- 
+	If there are no tasks that are on hold, the legend for Hold will not be displayed
+--%>
+<g:set var="legendWidth" value="20%"/>
+<g:set var="legendHoldWidth" value="20%"/>
+<g:if test="${countHold == 0}">
+	<g:set var="legendWidth" value="25%"/>
+	<g:set var="legendHoldWidth" value="0%"/>
+</g:if>
+
 <div class="statusTaskEffort toprightcontent">
 	<table class="task_bar">
 		<tr>
@@ -40,11 +50,11 @@ $(document).ready(function() {
 		</tr>
 		<tr>
 		<td class="task_bar_legend">
-			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: 20%;" align="center">Done<br />${countDone}</div>
-			<div class="task_started task_bar_graph" id="tasksStartBar" style="width: 20%;" align="center">Started<br />${countStarted}</div>
-			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: 20%;" align="center">Ready<br />${countReady}</div>
-			<div class="task_hold task_bar_graph" id="tasksReadyBar" style="width: 20%;" align="center">Hold<br />${countHold}</div>
-			<div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: 20%;" align="center">Pending<br />${countPending}</div>
+			<div class="task_done task_bar_graph" id="tasksDoneBar" style="width: ${legendWidth};" align="center">Done<br />${countDone}</div>
+			<div class="task_started task_bar_graph" id="tasksStartBar" style="width: ${legendWidth};" align="center">Started<br />${countStarted}</div>
+			<div class="task_ready task_bar_graph" id="tasksReadyBar" style="width: ${legendWidth};" align="center">Ready<br />${countReady}</div>
+			<div class="task_hold task_bar_graph" id="tasksHoldBar" style="width: ${legendHoldWidth};" align="center">Hold<br />${countHold}</div>
+			<div class="task_pending task_bar_graph" id="tasksPendingBar" style="width: ${legendWidth};" align="center">Pending<br />${countPending}</div>
 		</td>
 		</tr>
 		<tr><td>&nbsp;</td></tr>
@@ -60,11 +70,11 @@ $(document).ready(function() {
 		</tr>
 		<tr>
 		<td class="task_bar_legend">
-			<div class="task_done task_bar_graph" id="effortDoneBar" style="width: 20%;" align="center">Done<br />${effortRemainDone}</div>
-			<div class="task_started task_bar_graph" id="effortStartBar" style="width: 20%;" align="center">Started<br />${effortRemainStarted}</div>
-			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: 20%;" align="center">Ready<br />${effortRemainReady}</div>
-			<div class="task_hold task_bar_graph" id="effortHoldBar" style="width: 20%;" align="center">Hold<br />${effortRemainHold}</div>
-			<div class="task_pending task_bar_graph" id="effortPendingBar" style="width: 20%;" align="center">Pending<br />${effortRemainPending}</div>
+			<div class="task_done task_bar_graph" id="effortDoneBar" style="width: ${legendWidth};" align="center">Done<br />${effortRemainDone}</div>
+			<div class="task_started task_bar_graph" id="effortStartBar" style="width: ${legendWidth};" align="center">Started<br />${effortRemainStarted}</div>
+			<div class="task_ready task_bar_graph" id="effortReadyBar" style="width: ${legendWidth};" align="center">Ready<br />${effortRemainReady}</div>
+			<div class="task_hold task_bar_graph" id="effortHoldBar" style="width: ${legendHoldWidth};" align="center">Hold<br />${effortRemainHold}</div>
+			<div class="task_pending task_bar_graph" id="effortPendingBar" style="width: ${legendWidth};" align="center">Pending<br />${effortRemainPending}</div>
 			
 		</td>
 		</tr>
