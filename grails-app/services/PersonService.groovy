@@ -539,6 +539,24 @@ class PersonService {
 	 */
 	def updatePersonFKs(fromPerson, toPerson) {
 		jdbcTemplate.update("UPDATE recipe_version SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE task_batch SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE asset_comment SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE asset_dependency SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE comment_note SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE model SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE model_sync SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE model_sync_batch SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE move_event_news SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
+
+		jdbcTemplate.update("UPDATE move_event_news SET archived_by = ${toPerson.id} WHERE archived_by = ${fromPerson.id} ")
 	}
 
 	/**
