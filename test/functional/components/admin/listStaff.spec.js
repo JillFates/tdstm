@@ -13,4 +13,5 @@ describe('List Staff page', function(){
     var listStaffPage = new ListStaff();
     expect(listStaffPage.titleh.getText()).toEqual('Staff List');
   });
+  
 });

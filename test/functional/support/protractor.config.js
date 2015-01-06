@@ -11,7 +11,8 @@ exports.config = {
     dashboards : suites.dashboards,
     reports : suites.reports,
     assets : suites.assets,
-    importExport : suites.importExport
+    importExport : suites.importExport,
+    admin : suites.admin
   },
 
   // seleniumAddress: 'http://localhost:4444/wd/hub',

@@ -12,7 +12,8 @@ exports.config = {
     tasks : suites.tasks,
     dashboards : suites.tasks,
     reports : suites.reports,
-    assets : suites.assets
+    assets : suites.assets,
+    admin : suites.admin
     /*// Phantomjd does not support file download yet 
     , importExport:[
     '../components/assets/importExport/exportEmpty.spec.js'
@@ -43,7 +44,7 @@ exports.config = {
   
   jasmineNodeOpts: {
     isVerbose: false,
-    showColors: false,
+    showColors: true,
     includeStackTrace: true,
     defaultTimeoutInterval: 80000
   }
