@@ -2969,18 +2969,7 @@ class AssetEntityController {
 
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def depGroups = JSON.parse(session.getAttribute('Dep_Groups'))
-		
-		def depSql = """SELECT  
-		   sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
-		   sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,
-		   sum(if(a.asset_type in ( ${AssetType.getStorageTypesAsString()} ), 1, 0)) as storageCount,
-		   sum(if(a.asset_type = '${AssetType.DATABASE.toString()}', 1, 0)) as dbCount,
-		   sum(if(a.asset_type = '${AssetType.APPLICATION.toString()}', 1, 0)) as appCount
-		from asset_dependency_bundle adb
-		join asset_entity a ON a.asset_entity_id=adb.asset_id
-		where adb.project_id=${projectId}
-		"""
+		def depGroups = JSON.parse(session.getAttribute('Dep_Groups'))		
 
 		def assetDependentlist
 		def selectionQuery = ''
@@ -2989,19 +2978,16 @@ class AssetEntityController {
 		def multiple = false;
 		if (params.dependencyBundle && params.dependencyBundle.isNumber() ) {
 			// Get just the assets for a particular dependency group id
-			selectionQuery = " and adb.dependency_bundle = ${params.dependencyBundle}"
 			mapQuery = " AND deps.bundle = ${params.dependencyBundle}"
 			nodesQuery = " AND dependency_bundle = ${params.dependencyBundle} "
 		} else if (params.dependencyBundle == 'onePlus') {
 			// Get all the groups other than zero - these are the groups that have interdependencies
 			multiple = true;
-			selectionQuery = " and adb.dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
 			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
 			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
 		} else {
 			// Get 'all' assets that were bundled
 			multiple = true;
-			selectionQuery = " and adb.dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 		}
@@ -3021,9 +3007,9 @@ class AssetEntityController {
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
 			LEFT OUTER JOIN asset_comment ac_comment ON ac_comment.asset_entity_id=ae.asset_entity_id AND ac_comment.comment_type = 'comment'
 			"""
-
+			
+			
 		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
-		depSql += selectionQuery
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
 		
@@ -3032,9 +3018,10 @@ class AssetEntityController {
 		// TODO : This pig of a list should NOT be stored into the session and the logic needs to be reworked
 		//session.setAttribute('assetDependentlist', assetDependentlist)
 		
-		def stats = jdbcTemplate.queryForMap(depSql)
+		def depMap = moveBundleService.dependencyConsoleMap(projectId, null, null, (params.dependencyBundle!="null")?(params.dependencyBundle):("all") )
+		depMap = depMap.gridStats
 		
-		def model = [entity: (params.entity ?: 'apps'), stats:stats]
+		def model = [entity: (params.entity ?: 'apps'), stats:depMap]
 		
 		def sortOn = params.sort?:"assetName"
 		def orderBy = params.orderBy?:"asc"
@@ -3045,6 +3032,7 @@ class AssetEntityController {
 		
 		def serverTypes = AssetType.getAllServerTypes()
 		def asset
+		
 
 		
 		// Switch on the desired entity type to be shown, and render the page for that type 
@@ -3071,8 +3059,7 @@ class AssetEntityController {
 				
 				assetEntityList.each {
 					asset = AssetEntity.read(it.assetId)
-
-					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, locRoom:asset.roomSource]
 				}
 				assetList = sortAssetByColumn(assetList,sortOn,orderBy)
 				model.assetList = assetList
@@ -3096,7 +3083,7 @@ class AssetEntityController {
 				break
 
 			case "files" :
-				def filesList = assetDependentlist.findAll{it.type in [AssetType.FILES.toString(), AssetType.STORAGE.toString()] }
+				def filesList = assetDependentlist.findAll{(it.assetClass == AssetClass.STORAGE.toString()) || (it.assetClass == AssetClass.DEVICE.toString() && it.type in AssetType.getStorageTypes())}
 				def assetList = []
 				def fileList = []
 				
@@ -3115,9 +3102,11 @@ class AssetEntityController {
 					if (it.asset.assetClass.toString().equals('DEVICE')) {
 						item.fileFormat = ''
 						item.storageType = 'Server'
+						item.type = item.assetType
 					} else {
 						item.fileFormat = Files.read(it.asset.id)?.fileFormat?:''
 						item.storageType = 'Files'
+						item.type = 'Logical'
 					}
 					
 					fileList << [asset: item, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus]
@@ -3125,6 +3114,7 @@ class AssetEntityController {
 				fileList = sortAssetByColumn(fileList,sortOn,orderBy)
 				model.filesList = fileList
 				model.filesDependentListSize = fileList.size()
+				
 				render(template:"filesList", model:model)
 				break
 
@@ -3146,6 +3136,7 @@ class AssetEntityController {
 				def labelMap = ['Application':userPreferenceService.getPreference('dependencyConsoleApplicationLabel')?:'true',
 							    'Server':userPreferenceService.getPreference('dependencyConsoleServerLabel')?:'', 
 								'Database':userPreferenceService.getPreference('dependencyConsoleDatabaseLabel')?:'', 
+								'StoragePhysical':userPreferenceService.getPreference('dependencyConsoleStoragePhysicalLabel')?:'', 
 								'Files':userPreferenceService.getPreference('dependencyConsoleFilesLabel')?:'', 
 								'Network':userPreferenceService.getPreference('dependencyConsoleNetworkLabel')?:'']
 				def labelList = params.labelsList
@@ -3167,6 +3158,7 @@ class AssetEntityController {
 				def color = ''
 				def type = ''
 				def assetType = ''
+				def assetClass = ''
 				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				log.info "t1 = ${t1}"
@@ -3174,28 +3166,27 @@ class AssetEntityController {
 				
 				
 				assetDependentlist.each {
-					assetType = it.type
+					assetType = it.model?.assetType?:it.type
+					assetClass = it.assetClass
 					size = 150
 					
-					if (assetType == AssetType.APPLICATION.toString() ) {
+					if (it.assetClass == AssetClass.APPLICATION.toString()) {
 						type = AssetType.APPLICATION.toString()
-						shape = 'circle'
 						size = it.criticality ? criticalitySizes[it.criticality] : 200
-					} else if (serverTypes.contains(assetType)) {
-						type = AssetType.SERVER.toString()
-						shape = 'square'
-					} else if (assetType == AssetType.DATABASE.toString() ) {
+					} else if (it.assetClass == AssetClass.DATABASE.toString()) {
 						type = AssetType.DATABASE.toString()
-						shape = 'triangle-up'
-					} else if (assetType in [AssetType.FILES.toString(), AssetType.STORAGE.toString()] ) {
+					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getVirtualServerTypes()) {
+						type = AssetType.VM.toString()
+					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getPhysicalServerTypes()) {
+						type = AssetType.SERVER.toString()
+					} else if (it.assetClass == AssetClass.STORAGE.toString()) {
 						type = AssetType.FILES.toString()
-						shape = 'diamond'
-					} else if (assetType == AssetType.NETWORK.toString() ) {
+					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getStorageTypes()) {
+						type = AssetType.STORAGE.toString()
+					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getNetworkDeviceTypes()) {
 						type = AssetType.NETWORK.toString()
-						shape = 'cross'
 					} else {
-						type = ''
-						shape = 'circle'
+						type = 'other'
 					}
 					
 					def moveEventName = it.eventName ?: ''
@@ -3208,6 +3199,11 @@ class AssetEntityController {
 						assetClass:it.assetClass
 					]
 				}
+				
+				// Define a map of all the options for asset types
+				def assetTypes = [(AssetType.APPLICATION.toString()):"application", (AssetType.DATABASE.toString()):"database", (AssetType.VM.toString()):"serverVirtual", 
+					(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
+					(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "other":"other"]
 				
 				// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
 				def nodeIds = []
@@ -3284,6 +3280,7 @@ class AssetEntityController {
 					graphNodes[target].supports.add(it.id)
 				}
 				
+				
 				// Create the model that will be used while rendering the page
 				model.defaults = defaults
 				model.defaultsJson = defaults as JSON
@@ -3297,6 +3294,9 @@ class AssetEntityController {
 				model.nodes = graphNodes as JSON
 				model.links = graphLinks as JSON
 				model.multiple = multiple
+				model.assetTypes = assetTypes as JSON
+				
+				
 				
 				// Render dependency graph
 				render(template:'dependencyGraph',model:model)

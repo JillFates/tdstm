@@ -1,22 +1,22 @@
 circle.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
+	stroke: #fff;
+	stroke-width: 1.5px;
 }
 
 line.link {
-  stroke: #999;
-  stroke-opacity: .6;
-  marker-end: url(#arrowhead);
+	stroke: #999;
+	stroke-opacity: .6;
+	marker-end: url(#arrowhead);
 }
 line.link.selected {
-  stroke: #00dd00;
-  marker-end: url(#arrowheadSelected);
+	stroke: #00dd00;
+	marker-end: url(#arrowheadSelected);
 }
 
 text {
 	cursor: default;
 	fill: #ffffff;
-    pointer-events:none;
+	pointer-events:none;
 }
 .blackText text {
 	fill: #000000 !important;
@@ -24,15 +24,15 @@ text {
 
 .ui-resizable-helper {
 	border: 2px dotted #00F;
-    z-index: 1000 !important;
+	z-index: 1000 !important;
 }
 .ui-resizable-helper {
 	border: 2px dotted #00F;
-    z-index: 1000 !important;
+	z-index: 1000 !important;
 }
 .ui-resizable-helper {
 	border: 2px dotted #00F;
-    z-index: 1000 !important;
+	z-index: 1000 !important;
 }
 #legendDivId {
 	z-index: 1001 !important;
@@ -46,5 +46,34 @@ text {
 	margin: 0px !important;
 }
 .ui-resizable-se {
-    background: none !important;
+	background: none !important;
+}
+#databaseShapeBackgroundId {
+	/*fill: grey !important;*/
+	stroke: black !important;
+}
+#databaseShapeForegroundId {
+	fill: black !important;
+	stroke: black !important;
+}
+#databaseShapeId path {
+	stroke-width: 1px !important;
+}
+#databaseShapeId circle {
+	fill: black !important;
+	stroke: black !important;
+	stroke-width: 1px !important;
+	cx: 25px !important;
+	r: 1 !important;
+}
+#deviceShapeId path {
+	stroke: black !important;
+	stroke-width: 1px !important;
+}
+#deviceShapeId circle {
+	fill: black !important;
+	stroke: black !important;
+	stroke-width: 1px !important;
+	cx: 25px !important;
+	r: 1 !important;
 }

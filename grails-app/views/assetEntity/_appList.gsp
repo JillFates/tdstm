@@ -23,8 +23,8 @@
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox"  onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','assetName')">Name</th>
-						<th class="Arrowcursor ${sortBy == 'sme' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme')">App Sme</th>
-						<th class="Arrowcursor ${sortBy == 'sme2' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme2')">Sme2</th>
+						<th class="Arrowcursor ${sortBy == 'sme' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme')">SME</th>
+						<th class="Arrowcursor ${sortBy == 'sme2' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','sme2')">SME2</th>
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','moveBundle')">Bundle</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('apps','${dependencyBundle}','planStatus')">Plan Status</th>

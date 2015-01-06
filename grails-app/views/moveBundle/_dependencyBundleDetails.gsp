@@ -34,13 +34,13 @@
 								<td><b>Applications</b></td>
 							</tr>
 							<tr class="odd compactClass">
-								<td><b>Phys Servers</b></td>
+								<td><b>Servers Physical</b></td>
 							</tr>
 							<tr class="even compactClass">
-								<td><b>Virt. Servers</b></td>
+								<td><b>Servers Virtual</b></td>
 							</tr>
 							<tr class="odd compactClass">
-								<td><b>DB</b></td>
+								<td><b>Databases</b></td>
 							</tr>
 							<tr class="even compactClass">
 								<td><b>Storage</b></td>

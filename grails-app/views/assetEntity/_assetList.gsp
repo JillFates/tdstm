@@ -8,7 +8,7 @@
 
 <div class="tabs">
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
-    <div id ="selectionId" >
+	<div id ="selectionId" >
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="server" />
 		<tds:hasPermission permission='MoveBundleEditView'>
@@ -17,19 +17,17 @@
 	</div>
 	<div class="tabInner">
 		<div id="item1">
-			<table id="tag" border="0" cellpadding="0" cellspacing="0"
-				style="border-collapse: separate" class="table">
+			<table id="tag" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate" class="table">
 				<thead>
 					<tr class="header">
 						<th nowrap="nowrap"><input id="selectId" type="checkbox" onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
-						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetName')">Asset Name</th>
+						<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetName')">Name</th>
 						<th class="Arrowcursor ${sortBy == 'model' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','model')">Model</th>
-						<th class="Arrowcursor ${sortBy == 'sourceLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceLocation')">Source Location</th>
-						<th class="Arrowcursor ${sortBy == 'sourceRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceRack')">Source Rack</th>
+						<th class="Arrowcursor ${sortBy == 'sourceLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceLocation')">Loc/Room</th>
+						<th class="Arrowcursor ${sortBy == 'sourceRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','sourceRack')">Rack</th>
 						<th class="Arrowcursor ${sortBy == 'targetLocation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetLocation')">Target Location</th>
 						<th class="Arrowcursor ${sortBy == 'targetRack' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','targetRack')">Target rack</th>
-						<th class="Arrowcursor ${sortBy == 'assetType' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetType')">Asset Type</th>
-						<th class="Arrowcursor ${sortBy == 'assetTag' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetTag')">Asset Tag</th>
+						<th class="Arrowcursor ${sortBy == 'assetType' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','assetType')">Device Type</th>
 						<th class="Arrowcursor ${sortBy == 'validation' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','validation')">Validation</th>
 						<th class="Arrowcursor ${sortBy == 'moveBundle' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','moveBundle')">Bundle</th>
 						<th class="Arrowcursor ${sortBy == 'planStatus' ? orderBy :''}" onclick="javascript:getListBySort('server','${dependencyBundle}','planStatus')">Plan Status</th>
@@ -40,53 +38,49 @@
 				</thead>
 				<tbody class="tbody">
 					<g:each in="${assetList}" var="asset" status="i">
-						<tr id="tag_row1" style="cursor: pointer;"
-							class="${(i % 2) == 0 ? 'odd' : 'even'}">
+						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td nowrap="nowrap">
-							<g:checkBox name="checkBox" id="checkId_${asset.asset.id}" ></g:checkBox>
-							<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${asset.asset.id})"><img
-								src="/tdstm/icons/database_edit.png" border="0px" />
-							</a> 
-							<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}"></grid-buttons>
+								<g:checkBox name="checkBox" id="checkId_${asset.asset.id}" ></g:checkBox>
+								<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${asset.asset.id})">
+									<img src="/tdstm/icons/database_edit.png" border="0px" />
+								</a> 
+								<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}"></grid-buttons>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetName}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetName}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.model}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.model}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.rackSource?.location}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.locRoom}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.sourceRack}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.rackTarget?.location}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.rackTarget?.location}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.targetRack}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.targetRack}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetType}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetType}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetTag}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.validation}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.validation}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.moveBundle}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.moveBundle}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.planStatus}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.planStatus}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset?.depToResolve?:''}</span>
 							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset?.depToResolve?:''}</span>
-							</td>
-							<td><span
-								onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset?.depToConflict?:''}</span>
+							<td>
+								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>

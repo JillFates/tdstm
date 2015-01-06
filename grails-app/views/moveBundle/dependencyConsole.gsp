@@ -11,13 +11,14 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />
-        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.min.js"/>
+		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
@@ -47,8 +48,8 @@
 					<div id="checkBoxDivId">
 						<g:form name="checkBoxForm"> 
 							<div style="float: left; margin-left:18px;">
-							   <fieldset>
-								  <legend>Connection Type:</legend>
+								<fieldset>
+									<legend>Connection Type:</legend>
 									<g:each in="${dependencyType}" var="dependency">
 										<input type="checkbox" id="${dependency}"
 											name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
@@ -72,8 +73,7 @@
 										&nbsp;&nbsp; <span>Save as defaults</span>
 							</div>
 							<div class="buttonR">
-								<input type="button" class="submit"
-									style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
+								<input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
 							</div>
 							
 						</g:form>
@@ -124,8 +124,8 @@
 					</table>
 				</g:form>
 			</div>
-			</div>
-			<div style="float:left;">
+		</div>
+		<div style="float:left;">
 			<tds:hasPermission permission='MoveBundleEditView'>
 				<div id="items1" style="display: none"></div>
 			</tds:hasPermission>

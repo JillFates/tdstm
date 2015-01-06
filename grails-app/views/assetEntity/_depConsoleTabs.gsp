@@ -9,9 +9,9 @@
 <g:set var="bundle" value="${dependencyBundle=='onePlus' ? '\'onePlus\'': dependencyBundle}" />
 
 <ul>	
-	<li id="appli" class="${appTabClass}"><a href="javascript:getList('apps',${bundle})">Apps(${stats.appCount})</a></li>
-	<li id="serverli" class="${serverTabClass}"><a href="javascript:getList('server',${bundle})">Servers(${stats.serverCount + stats.vmCount})</a></li>
-	<li id="dbli" class="${dbTabClass}"><a href="javascript:getList('database',${bundle})">DB(${stats.dbCount})</a></li>
-	<li id="fileli" class="${fileTabClass}"><a href="javascript:getList('files',${bundle})">Storage(${stats.storageCount})</a></li>
+	<li id="appli" class="${appTabClass}"><a href="javascript:getList('apps',${bundle})">Apps(${stats.app[0]})</a></li>
+	<li id="serverli" class="${serverTabClass}"><a href="javascript:getList('server',${bundle})">Servers(${stats.server[0] + stats.vm[0]})</a></li>
+	<li id="dbli" class="${dbTabClass}"><a href="javascript:getList('database',${bundle})">Databases(${stats.db[0]})</a></li>
+	<li id="fileli" class="${fileTabClass}"><a href="javascript:getList('files',${bundle})">Storage(${stats.storage[0]})</a></li>
 	<li id="graphli" class="${graphTabClass}"><a href="javascript:getList('graph',${bundle})">Map</a></li>
 </ul>

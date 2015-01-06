@@ -897,7 +897,7 @@ class MoveBundleController {
 		if(!assignedGroup)
 			assignedGroup = "1"
 		userPreferenceService.setPreference( "AssignedGroup", assignedGroup)
-		def map = moveBundleService.dependencyConsoleMap(projectId, params.bundle, assignedGroup)
+		def map = moveBundleService.dependencyConsoleMap(projectId, params.bundle, assignedGroup, null)
 		
 		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		return map
@@ -926,7 +926,7 @@ class MoveBundleController {
 
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
-		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned) )
+		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned, null) )
 	}
 	
 	/**

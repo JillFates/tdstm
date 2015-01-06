@@ -21,7 +21,7 @@ $(document).ready(function() {
 	if (isFilesChecked == 'true') {
 		$('#filesLabel').attr('checked',true)
 	} else {
-	  $('#filesLabel').attr('checked',false)
+		$('#filesLabel').attr('checked',false)
 	}
 	
 	updateHeight();
@@ -32,7 +32,7 @@ $(document).ready(function() {
 })
 
 // Called when the user clicks the + or - buttons on the control panel
-function modifyParameter(action, id ){
+function modifyParameter (action, id) {
 	listCheck()
 	var value = parseFloat($("#"+id).val())
 	var type = id.substring(0, id.length-2)
@@ -65,14 +65,14 @@ function updateHeight () {
 	$('#heightId').val($(window).height() - graphOffset - bottomMargin - topMargin - containerPadding);
 }
 
-function hidePanel(){
+function hidePanel () {
 	$('#controlPanel').css('display','none')
 	$('#legendDivIdGraph').css('display','block')
 	$('#legendDivId').css('display','block')
 	$('#panelLink').attr('onClick','openPanel()')
 }
 
-function openPanel(source){
+function openPanel (source) {
 	if ( $('#'+source).css('display') == 'block' ) {
 		$('#'+source).css('display', 'none')
 	} else if (source == 'controlPanel') {
@@ -87,14 +87,23 @@ function openPanel(source){
 	}
 }
 
-function listCheck(){
+function listCheck () {
 	var labelsList = {}
 	$('#labelTree input[type="checkbox"]').each(function() {
 		labelsList[$(this).attr('id')] = $(this).is(':checked');
 	});
 	return labelsList
 }
-function depConsoleLabelUserpref($me,forWhom){
+function getExpanededLabels () {
+	var labelsList = [];
+	$('#labelTree input[type="checkbox"]').each(function(i, o) {
+		$(o.classList).each(function(i, c) {
+			labelsList[c] = $(o).is(':checked');
+		});
+	});
+	return labelsList;
+}
+function depConsoleLabelUserpref ($me,forWhom) {
 	var isChecked = $me.is(":checked")
 	jQuery.ajax({
 		url:contextPath+'/assetEntity/setImportPerferences',

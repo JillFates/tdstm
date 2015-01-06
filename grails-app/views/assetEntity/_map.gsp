@@ -26,35 +26,42 @@
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" id="Application" name="labels" value="apps" ${( labelMap.Application=='true' ) ? 'checked' : ''} class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
-				<label for="Application" style="vertical-align: text-top;">Apps &nbsp;&nbsp;&nbsp;</label>
+				<input type="checkbox" id="Application" name="labels" value="apps" ${( labelMap.Application=='true' ) ? 'checked' : ''} class="pointer application" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
+				<label for="Application" style="vertical-align: text-top;">Applications &nbsp;&nbsp;&nbsp;</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Server" ${(labelMap.Server=='true') ? 'checked' : ''} value="servers" class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleServerLabel');"/>
+				<input type="checkbox" name="labels" id="Server" ${(labelMap.Server=='true') ? 'checked' : ''} value="servers" class="pointer serverPhysical serverVirtual" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleServerLabel');"/>
 				<label for="Server" style="vertical-align: text-top;">Servers</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Database" ${(labelMap.Database=='true') ? 'checked' : ''} value="databases" class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleDatabaseLabel');"/>
-				<label for="Database" style="vertical-align: text-top;">DB</label>
+				<input type="checkbox" name="labels" id="Database" ${(labelMap.Database=='true') ? 'checked' : ''} value="databases" class="pointer database" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleDatabaseLabel');"/>
+				<label for="Database" style="vertical-align: text-top;">Databases</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Files" ${(labelMap.Files=='true') ? 'checked' : ''} value="files" class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleFilesLabel');"/>
-				<label for="Files" style="vertical-align: text-top;">Storage</label>
+				<input type="checkbox" name="labels" id="StoragePhysical" ${(labelMap.StoragePhysical=='true') ? 'checked' : ''} value="storagePhysical" class="pointer storagePhysical" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleStoragePhysicalLabel');"/>
+				<label for="StoragePhysical" style="vertical-align: text-top;">Storage Devices</label>
+			</td>
+		</tr>
+		<tr>
+			<td><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
+			<td colspan="2" style="padding: 0px;">
+				<input type="checkbox" name="labels" id="Files" ${(labelMap.Files=='true') ? 'checked' : ''} value="files" class="pointer storageLogical" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleFilesLabel');"/>
+				<label for="Files" style="vertical-align: text-top;">Logical Storage</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Network" ${(labelMap.Network=='true') ? 'checked' : ''} value="networks" class="pointer" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleNetworkLabel');"/>
+				<input type="checkbox" name="labels" id="Network" ${(labelMap.Network=='true') ? 'checked' : ''} value="networks" class="pointer networkPhysical networkLogical" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleNetworkLabel');"/>
 				<label for="Network" style="vertical-align: text-top;">Network</label>
 			</td>
 		</tr>
@@ -120,19 +127,23 @@
 			<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
 			<tr>
 				<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
-				<td><span style="vertical-align: text-top;">Apps</span></td>
+				<td><span style="vertical-align: text-top;">Applications</span></td>
 			</tr>
 			<tr>
-				<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconServer.png')}"	height="14" /></td>
+				<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 				<td><span style="vertical-align: text-top;">Servers</span></td>
 			</tr>
 			<tr>
 				<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
-				<td><span style="vertical-align: text-top;">DB</span></td>
+				<td><span style="vertical-align: text-top;">Databases</span></td>
 			</tr>
 			<tr>
 				<td nowrap="nowrap"><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
-				<td><span style="vertical-align: text-top;">Storage</span></td>
+				<td><span style="vertical-align: text-top;">Storage Devices</span></td>
+			</tr>
+			<tr>
+				<td nowrap="nowrap"><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
+				<td><span style="vertical-align: text-top;">Logical Storage</span></td>
 			</tr>
 			<tr>
 				<td nowrap="nowrap"><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
@@ -144,8 +155,8 @@
 			<tr><td nowrap="nowrap" colspan="2"><span style="color: Gray;"><h4>Events:</h4></span></td></tr>
 			<g:each in="${eventColorCode}" var="color">
 				<tr>
-				   <td><input type="text" size="1"
-						style="background-color: ${color.value};height:5px;width:5px;" />
+					<td>
+						<input type="text" size="1" style="background-color: ${color.value};height:5px;width:5px;" />
 					</td>
 					<td nowrap="nowrap">
 						${color.key}
@@ -153,8 +164,9 @@
 					
 				</tr>
 			</g:each>
-			<tr><td><input type="text" size="1"
-						style="border: 2px solid red;height:5px;width:5px;" />
+			<tr>
+				<td>
+					<input type="text" size="1" style="border: 2px solid red;height:5px;width:5px;" />
 				</td>
 				<td nowrap="nowrap">
 						No Event
@@ -166,5 +178,9 @@
 <g:render template="../moveBundle/force" model="${pageScope.variables}"/>
 
 <script type="text/javascript">
-	buildMap(null, null, null, null, $('#width').val(), $('#height').val());
+	var fullWidth = $('.main_bottom').width() - ($('#svgContainerId').offset().left * 2);
+	var finalWidth = Math.max(fullWidth, $('#width').val());
+	$('#width').val(finalWidth);
+	$('#widthId').val($('#width').val());
+	buildMap(null, null, null, null, finalWidth, $('#height').val());
 </script>

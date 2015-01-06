@@ -20,6 +20,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetClass
 import grails.converters.JSON
 
 
@@ -476,60 +477,72 @@ class MoveBundleService {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties 
 	 */
-	def dependencyConsoleMap(projectId, moveBundleId, isAssigned) {
+	def dependencyConsoleMap(projectId, moveBundleId, isAssigned, dependencyBundle) {
 		def startAll = new Date()
 		def projectInstance = Project.get(projectId)
 		def dependencyConsoleList = []
-
+		
 		// This will hold the totals of each, element 0 is all and element 1 will be All minus group 0
 		def stats = [
 			app: [0,0],
-			db:  [0,0],
+			db: [0,0],
 			server: [0,0],
 			vm: [0,0],
 			storage: [0,0]
 		]
 		
 		def depSql = new StringBuffer("""SELECT  
-			adb.dependency_bundle as dependencyBundle, 
-			count(distinct adb.asset_id) as assetCnt, 
-			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') as moveBundles,
-			sum(if(a.plan_status='${AssetEntityPlanStatus.ASSIGNED}',1,0)) as statusAssigned,
-			sum(if(a.plan_status='${AssetEntityPlanStatus.MOVED}',1,0)) as statusMoved,
-			sum(if(a.validation<>'BundleReady',1,0)) as notBundleReady,
-			sum(if(a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), 1, 0)) as serverCount,
-			sum(if(a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), 1, 0)) as vmCount,
-			sum(if(a.asset_type in ( ${AssetType.getStorageTypesAsString()} ), 1, 0)) as storageCount,
-			sum(if(a.asset_type = '${AssetType.DATABASE.toString()}', 1, 0)) as dbCount,
-			sum(if(a.asset_type = '${AssetType.APPLICATION.toString()}', 1, 0)) as appCount,
+			adb.dependency_bundle AS dependencyBundle, 
+			COUNT(distinct adb.asset_id) AS assetCnt, 
+			CONVERT( group_concat(distinct a.move_bundle_id) USING 'utf8') AS moveBundles,
+			SUM(if(a.plan_status='${AssetEntityPlanStatus.ASSIGNED}',1,0)) AS statusAssigned,
+			SUM(if(a.plan_status='${AssetEntityPlanStatus.MOVED}',1,0)) AS statusMoved,
+			SUM(if(a.validation<>'BundleReady',1,0)) AS notBundleReady,
+			SUM(if(a.asset_class = '${AssetClass.DEVICE.toString()}' 
+				AND if(m.model_id > -1, m.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} ), a.asset_type in ( ${AssetType.getPhysicalServerTypesAsString()} )), 1, 0)) AS serverCount,
+			SUM(if(a.asset_class = '${AssetClass.DEVICE.toString()}' 
+				AND if(m.model_id > -1, m.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} ), a.asset_type in ( ${AssetType.getVirtualServerTypesAsString()} )), 1, 0)) AS vmCount,
+			SUM(if((a.asset_class = '${AssetClass.STORAGE.toString()}') 
+				OR (a.asset_class = '${AssetClass.DEVICE.toString()}' 
+				AND if(m.model_id > -1, m.asset_type in ( ${AssetType.getStorageTypesAsString()} ), a.asset_type in ( ${AssetType.getStorageTypesAsString()} )) ), 1, 0)) AS storageCount,
+			SUM(if(a.asset_class = '${AssetClass.DATABASE.toString()}', 1, 0)) AS dbCount,
+			SUM(if(a.asset_class = '${AssetClass.APPLICATION.toString()}', 1, 0)) AS appCount,
 			( select 
-		   		sum(if(ad1.status in 
+		   		SUM(if(ad1.status in 
 		   			(${AssetDependencyStatus.getReviewCodesAsString()}) OR ad2.status in (${AssetDependencyStatus.getReviewCodesAsString()}), 1,0) 
 		   		)
 				from asset_entity sa join asset_dependency_bundle sadb ON sa.asset_entity_id=sadb.asset_id 
 				left join asset_dependency ad1 ON ad1.asset_id=sa.asset_entity_id 
 				left join asset_dependency ad2 ON ad2.asset_id=sa.asset_entity_id
 				where sadb.project_id=$projectId and sadb.dependency_bundle = adb.dependency_bundle
-			) as needsReview
+			) AS needsReview
 			
 			FROM asset_dependency_bundle adb
 			JOIN asset_entity a ON a.asset_entity_id=adb.asset_id
+			LEFT OUTER JOIN model m ON a.model_id=m.model_id
 			WHERE adb.project_id=${projectId}""")
-
+			
+			if (dependencyBundle) {
+				def depGroups = JSON.parse(userPreferenceService.getSession().getAttribute('Dep_Groups'))
+				if (dependencyBundle.isNumber() )
+					depSql.append(" AND adb.dependency_bundle = ${dependencyBundle}")
+				else if (dependencyBundle == 'onePlus')
+					depSql.append(" AND adb.dependency_bundle IN (${WebUtil.listAsMultiValueString(depGroups-[0])})")
+				else if (dependencyBundle == 'all')
+					depSql.append(" AND adb.dependency_bundle IN (${WebUtil.listAsMultiValueString(depGroups)})")
+			}
 			
 			depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
-
+			
 		def dependList = jdbcTemplate.queryForList(depSql.toString())
-
-		// log.info "dependencyConsoleMap() : dependList[0]"
- 		// log.info "dependencyConsoleMap() : stats=$stats}"
 
 		if( moveBundleId )
 		 	dependList = dependList.collect{ if( it.moveBundles.contains(moveBundleId)){ it } }
 	 
 		dependList.removeAll([null])
 		def groups = dependList.dependencyBundle
-		userPreferenceService.getSession().setAttribute( 'Dep_Groups', (groups as JSON).toString() )
+		if (dependencyBundle == null)
+			userPreferenceService.getSession().setAttribute( 'Dep_Groups', (groups as JSON).toString() )
 	
 		dependList.each { group ->
 	 		def depGroupsDone = group.statusAssigned + group.statusMoved

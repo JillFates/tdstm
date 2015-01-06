@@ -23,34 +23,9 @@ var canvas = d3.select("div#item1")
 	.attr('id','svgContainerId')
 	.append("svg:svg");
 
-// define the arrowhead markers used for marking dependencies
-canvas.append("defs")
-	.append("marker")
-	.attr("id", "arrowhead")
-	.attr("viewBox", "0 -5 10 10")
-	.attr("refX", 20)
-	.attr("refY", 0)
-	.attr("markerUnits", "userSpaceOnUse")
-	.attr("markerWidth", 10)
-	.attr("markerHeight", 10)
-	.attr("orient", "auto")
-	.append("path")
-	.attr("d", "M0,-4L10,0L0,4")
-	.attr('fill', '#808080');
-	
-d3.select("defs")
-	.append("marker")
-	.attr("id", "arrowheadSelected")
-	.attr("viewBox", "0 -5 10 10")
-	.attr("refX", 20)
-	.attr("refY", 0)
-	.attr("markerUnits", "userSpaceOnUse")
-	.attr("markerWidth", 10)
-	.attr("markerHeight", 10)
-	.attr("orient", "auto")
-	.append("path")
-	.attr("d", "M0,-5L10,0L0,5")
-	.attr("fill", "#00dd00");
+// define the shapes used for the svg
+canvas.append("defs");
+defineShapes(d3.select("defs"));
 
 $('#svgContainerId')
 	.resizable({
@@ -66,34 +41,35 @@ $('#svgContainerId')
 		}
 	});
 var zoomBehavior;
-var vis = canvas
-var background
-var overlay
-var graph
-var defaults = ${defaultsJson}
-var links = ${links}
-var nodes = ${nodes}
-console.log(" ********************************* ");
+var vis = canvas;
+var background;
+var overlay;
+var graph;
+var defaults = ${defaultsJson};
+var links = ${links};
+var nodes = ${nodes};
+var assetTypes = ${assetTypes};
+
 console.log(links);
 console.log(nodes);
-var graphstyle = "top:-120;z-index:-1;"
-var r = 5
-var fill = d3.scale.category20()
-var gravity = ${multiple?0.05:0}
-var maxWeight
+var graphstyle = "top:-120;z-index:-1;";
+var r = 5;
+var fill = d3.scale.category20();
+var gravity = ${multiple ? 0.05 : 0};
+var maxWeight;
 
-var nodeSelected = -1
-var defaultColor = '#0000ff'
-var selectedParentColor = '#00ff00'
-var selectedChildColor = '#00cc99'
-var selectedLinkColor = '#00dd00'
-var backgroundColor = defaults.blackBackground ? '#000000' : '#ffffff'
-if (defaults.blackBackground)
+var nodeSelected = -1;
+var defaultColor = '#0000ff';
+var selectedParentColor = '#00ff00';
+var selectedChildColor = '#00cc99';
+var selectedLinkColor = '#00dd00';
+var backgroundColor = defaults.blackBackground ? '#000000' : '#ffffff';
+if (defaults.blackBackground);
 	$('marker#arrowhead').attr('fill', '#ffffff');
 
-var widthCurrent
-var heightCurrent
-var nameList = listCheck();
+var widthCurrent;
+var heightCurrent;
+var nameList = getExpanededLabels();
 
 var floatMode = false;
 
@@ -322,7 +298,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	});
 	
 	// Add the nodes to the SVG
-	var node = vis.selectAll("path")
+	var node = vis.selectAll("use")
 		.data(nodes).enter()
 	
 	// Calculate the maximum weight value, which is used during the tick function
@@ -334,17 +310,28 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	// Create the nodes
 	node = node
-		.append("svg:path")
+		.append("use")
+			.attr("xlink:href", function (d) {
+				return '#' + assetTypes[d.type] + 'ShapeId';
+			})
 			.attr("class", "node")
 			.call(dragBehavior)
 			.on("dblclick", function(d) {
+				console.log(d);
 				return EntityCrud.showAssetDetailView(d.assetClass, d.id);
+				if (d.assetClass == 'APPLICATION')
+					return getEntityDetails('planningConsole', 'Application', d.id);
+				else if (d.assetClass == 'STORAGE')
+					return getEntityDetails('planningConsole', 'Files', d.id);
+				else if (d.assetClass == 'DATABASE')
+					return getEntityDetails('planningConsole', 'Database', d.id);
+				return getEntityDetails('planningConsole', 'Server', d.id);
 			})
 			.on("mousedown", mousedown)
-			.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
+//			.attr("d", d3.svg.symbol().size(function(d) { return d.size; }).type(function(d) { return d.shape; }))
 			.attr("fix", false)
 			.attr("id", function(d) { return 'node-'+d.index })
-			.style("fill", function(d) { return fill(d.group); })
+//			.style("fill", function(d) { return fill(d.group); })
 			.style('cursor', 'default !important')
 			.attr("fillColor", function(d) {
 				return fill(d.group) 
@@ -355,9 +342,10 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			})
 			.style("stroke-width", '2px')
 	
-	
 	// Toggles selection of a node
 	function toggleNodeSelection (id) {
+		
+		console.log('toggleNodeSelection(' + id + ')');
 		
 		if (nodeSelected == -1 && id == -1)
 			return // No node is selected, so there is nothing to deselect
@@ -389,7 +377,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		
 		// Style the selected node
 		node.fillColor = parentColor
-		d3.selectAll('svg g g path').filter('#node-'+node.index)[0][0].classList.add('selected')
+		d3.selectAll('svg g g use').filter('#node-'+node.index)[0][0].classList.add('selected')
 		
 		// Style the dependencies of the selected node
 		var useTarget = true;
@@ -405,7 +393,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			childNode.fillColor = childColor ? childColor : fill(childNode.group)
 			selectedLinks.push('link-'+link.source.index+'-'+link.target.index)
 			selectedNodes.push('node-'+childNode.index)
-			d3.selectAll('svg g g path').filter('#node-'+childNode.index)[0][0].classList.add('selected')
+			d3.selectAll('svg g g use').filter('#node-'+childNode.index)[0][0].classList.add('selected')
 			d3.selectAll('svg g g line').filter('#link-'+link.source.index+'-'+link.target.index)[0][0].classList.add('selected')
 		}
 		
@@ -413,9 +401,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		if (selecting) {
 			var selection = d3.selectAll('svg g g g')
 			selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g path').filter(':not(.selected)')[0])
+				.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
 				.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-				.concat(d3.selectAll('svg g g path').filter('.selected')[0])
+				.concat(d3.selectAll('svg g g use').filter('.selected')[0])
 			var alpha = Math.max(force.alpha(), 0.007);
 			$.each(force.nodes(), function(i, n) {
 				n.fixed = true;
@@ -430,7 +418,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			d3.selectAll('svg g g line').filter('.selected')[0].each(function(o){
 				o.classList.remove('selected')
 			})
-			d3.selectAll('svg g g path').filter('.selected')[0].each(function(o){
+			d3.selectAll('svg g g use').filter('.selected')[0].each(function(o){
 				o.classList.remove('selected')
 			})
 			force.alpha(Math.max(force.alpha(), 0.007));
@@ -453,32 +441,32 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("dx", 12)
 		.attr("dy",".35em")
 		.text(function(d) {
-			return (nameList[d.type+''])?(d.name):('');
+			return (nameList[assetTypes[d.type]])?(d.name):('');
 		});
 	
 	force.on("tick", tick)
 	
 	var firstTick = true;
 	function tick(e) {
-		
 		if ( gravity == 0 && ! floatMode ) {
-			var k =  e.alpha
+			var k = e.alpha;
 			_(nodes).forEach(function(o) {
+				k = e.alpha;
 				if(! o.fix) {
 					if( maxWeight > 1 && (o.weight?o.weight:0) == 1 )
-						k = 0
-					o.y += (heightCurrent/2 - o.y) * k * ((o.weight+1) / maxWeight)
-					o.x += (widthCurrent/2 - o.x) * k * ((o.weight+1) / maxWeight)
+						k = 0;
+					o.y += (heightCurrent/2 - o.y) * k * ((o.weight+1) / maxWeight);
+					o.x += (widthCurrent/2 - o.x) * k * ((o.weight+1) / maxWeight);
 				}
 			})
 		}
 		
 		node
 			.attr("cx", function(d) {
-				return d.x
+				return d.x;
 			})
 			.attr("cy", function(d) {
-				return d.y
+				return d.y;
 			})
 			.attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";})
 			.style("fill", function(d) {
@@ -548,7 +536,7 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 		.remove();
 	
 	// Reset the list of types to show names for
-	nameList = listCheck();
+	nameList = getExpanededLabels();
 	
 	// Add the new labels
 	graph
@@ -556,7 +544,7 @@ function rebuildMap (charge, linkSize, friction, theta, width, height, labels) {
 		.attr("dx", 8)
 		.attr("dy",".35em")
 		.text(function(d) {
-			return (nameList[d.type+''])?(d.name):('');
+			return (nameList[assetTypes[d.type]])?(d.name):('');
 		});
 		
 		if (backgroundColor == '#ffffff') {
