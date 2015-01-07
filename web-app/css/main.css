@@ -836,3 +836,7 @@ br.page-break-after {
 .ui-jqgrid-hdiv {
 	overflow: visible !important;
 }
+
+.tabs {
+	min-width: 600px;
+}

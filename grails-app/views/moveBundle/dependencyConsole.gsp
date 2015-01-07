@@ -162,12 +162,13 @@
 				$('#db_'+id).addClass('db_count')
 				$('#file_'+id).addClass('file_count')
 				
-				switch(value){
+				switch (value) {
 					case "server" :
 						$('#assetCheck').attr('checked','false')
 					case "apps" :
 					case "database" :
 					case "files" :
+					case "all" :
 						var bundle = $("#planningBundleSelectId").val()
 						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle', onComplete:'listUpdate(e)') }
 						break

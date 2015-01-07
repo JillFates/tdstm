@@ -3024,6 +3024,7 @@ class AssetEntityController {
 		def model = [entity: (params.entity ?: 'apps'), stats:depMap]
 		
 		def sortOn = params.sort?:"assetName"
+			
 		def orderBy = params.orderBy?:"asc"
 		model.dependencyBundle = params.dependencyBundle
 		model.asset = params.entity
@@ -3037,6 +3038,23 @@ class AssetEntityController {
 		
 		// Switch on the desired entity type to be shown, and render the page for that type 
 		switch(params.entity) {
+			case "all" :
+				def assetList = []
+				
+				assetDependentlist.each {
+					asset = AssetEntity.read(it.assetId)
+					def type = asset.assetType
+					if (it.assetClass == AssetClass.STORAGE.toString())
+						type = "Logical Storage"
+					assetList << [asset: asset, tasksStatus: it.tasksStatus, commentsStatus: it.commentsStatus, type:type]
+				}
+				assetList = sortAssetByColumn(assetList,(sortOn != "type") ? (sortOn) : "assetType",orderBy)
+				model.assetList = assetList
+				model.assetListSize = assetDependentlist.size()
+
+				render( template:"allList", model:model )
+				break
+				
 			case "apps" :
 				def applicationList = assetDependentlist.findAll { it.type ==  AssetType.APPLICATION.toString() }
 				def appList = []
