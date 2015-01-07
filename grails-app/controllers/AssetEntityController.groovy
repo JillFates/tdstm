@@ -811,14 +811,22 @@ class AssetEntityController {
 						def asset
 						if (assetId) {
 							asset = AssetEntity.get(assetId)
+							if (asset.project.id != project.id) {
+								securityService.reportViolation("attempted to access asset ($assetId) not assigned to project (${project.id}", userLogin)
+								warnMsg += "<li>Invaild asset id ($assetId) on row $rowNum</li>\n"
+								continue
+							}
 						} else {
-							def assets = AssetEntity.findAllByAssetNameAndAssetType(assetName, assetClass)
+							def assets = AssetEntity.findAllByAssetNameAndProject(assetName, project)
 							if(assets.size() == 0){
-								warnMsg +="<li> no asset match found for asset name "+assetName +", row $rowNum</li>\n"
+								warnMsg +="<li>no asset match found for asset name "+assetName +", row $rowNum</li>\n"
 								continue;
 							} else if(assets.size() > 1){
-								warnMsg +="<li>no unique asset match for "+assetName+", row $rowNum</li>\n"
-								continue;
+								asset = assets.find { it.assetType == assetClass }
+								if (asset == null) {
+									warnMsg +="<li>no unique asset match for "+assetName+", row $rowNum</li>\n"
+									continue;
+								}
 							} else {
 								asset = assets[0]
 							}
@@ -828,16 +836,24 @@ class AssetEntityController {
 						def dependent
 						if (dependencyId) {
 							dependent = AssetEntity.get(dependencyId)
+							if (dependent.project.id != project.id) {
+								securityService.reportViolation("attempted to access dependent ($dependencyId) not assigned to project (${project.id}", userLogin)
+								warnMsg += "<li>Invaild dependent id ($dependencyId) on row $rowNum</li>\n"
+								continue
+							}
 						} else {
 							def depName = dependencySheet.getCell( 5, r ).contents.replace("'","\\'")
 							def depClass = dependencySheet.getCell( 6, r ).contents.replace("'","\\'")
-							def assets = AssetEntity.findAllByAssetNameAndAssetType(depName, depClass)
+							def assets = AssetEntity.findAllByAssetNameAndProject(depName, project)
 							if(assets.size() == 0){
-								warnMsg +="<li> no asset match found for dependent name "+depName + ", row $rowNum<li>"
+								warnMsg +="<li>no asset match found for dependent name "+depName + ", row $rowNum</li>\n"
 								continue;
 							} else if(assets.size() > 1){
-								warnMsg +="<li> no unique asset match for dependent name "+depName+", row $rowNum</li>"
-								continue;
+								dependent = assets.find { it.assetType == depClass }
+								if (dependent == null) {
+									warnMsg +="<li>no unique asset match for dependent name "+depName+", row $rowNum</li>\n"
+									continue;
+								}
 							} else {
 								dependent = assets[0]
 							}
@@ -847,7 +863,7 @@ class AssetEntityController {
 						List assetRefIds = [asset?.id, dependent?.id]
 						List invalidIdList = assetEntityService.validateAssetList(assetRefIds, project)
 						if ( invalidIdList ) {
-							warnMsg += "<li>Row $rowNum has invalid asset references ${invalidIdList}"
+							warnMsg += "<li>Row $rowNum has invalid asset references ${invalidIdList}</li>"
 							continue
 						}
 
@@ -862,7 +878,7 @@ class AssetEntityController {
 							     def msg = message(code: "assetEntity.dependency.warning", args: [asset.assetName, dependent.assetName])
 								 skippedAdded +=1
 								 log.error msg
-								 warnMsg += "<li>$msg"
+								 warnMsg += "<li>$msg</li>"
 							}
 						}
 						if (assetDep) {
