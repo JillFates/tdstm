@@ -3,20 +3,12 @@ var  Menu = require('../../menu/menu.po.js');
 var ListStaff = require('../listStaff.po.js');
 var CompareMergeModal = require('./compareMergeModal.po.js');
 var ConnectDatabase = require('../../assets/importExport/connectDatabase.po.js');
-
+var Person = require('./person.js');
 describe('Merge Staff', function(){
-  var personTo = {
-    'id':'',
-    'loginId': 0,
-    'sme1': [],
-    'sme2': []
-  };
-  var person1 = {
-    'id':'',
-    'loginId':0,
-    'sme1': [],
-    'sme2': []
-  };
+  var personTo = new Person();
+  var person1 = new Person();
+  var assetComment = {'createdBy':'created_by','resolvedBy':'resolved_by','ownerId':'owner_id','assignedToId':'assigned_to_id'};
+
 
   it('should go to List Staff page after select Admin - List Staff', function(){
     var menu = new Menu();  
@@ -53,51 +45,68 @@ describe('Merge Staff', function(){
     var connectDatabase = new ConnectDatabase();
     connectDatabase.connection.connect();
     
-    it('should get login id rows', function () {
-      var sqlloginId = 'select count(*) as results from user_login where user_login.person_id='+personTo.id+';';
-      connectDatabase.connection.query(sqlloginId,function (err,rows) {
-        if(!err){
-          personTo.loginId = rows[0].results;
-        }
-      });
-      sqlloginId = 'select count(*) as results from user_login where user_login.person_id='+person1.id+';';
-      connectDatabase.connection.query(sqlloginId,function (err,rows) {
-        if(!err){
-          person1.loginId = rows[0].results;
-        }
-      });
-    });    
+    var persons = [personTo,person1];
+
+    persons.forEach(function (person) {
     
-    it('should get sme1, sme2',function () {
-      var persons = [personTo,person1];
-      persons.forEach(function (person) {
-        var sqlSME1 = 'select app_id as app from application where application.sme_id ='+person.id+';';  
-        connectDatabase.connection.query(sqlSME1,function (err,rows) {
+      it('should get login id rows USER_LOGIN table', function () {
+        var sqlloginId = 'select count(*) as results from user_login where user_login.person_id='+person.id+';';
+        connectDatabase.connection.query(sqlloginId,function (err,rows) {
+          if(!err){
+            person.loginId = rows[0].results;
+          }
+        });
+      });    
+    
+      it('should get applicationSme1, applicationSme2 APPLICATION table',function () {
+        var sqlapplicationSme1 = 'select app_id as app from application where application.sme_id ='+person.id+';';  
+        connectDatabase.connection.query(sqlapplicationSme1,function (err,rows) {
           if(!err){
             for (var i = 0; i < rows.length; i++) {
-              person.sme1.push(rows[i].app);
+              person.application.bySme1.push(rows[i].app);
             }
-            expect(rows.length).toEqual(person.sme1.length);
+            expect(rows.length).toEqual(person.application.bySme1.length);
           }else {
             console.log('error',err);
           }
         });
 
-        var sqlSME2 = 'select app_id as app from application where application.sme2_id ='+person.id+';';  
-         connectDatabase.connection.query(sqlSME2,function (err,rows) {
+        var sqlapplicationSme2 = 'select app_id as app from application where application.sme2_id ='+person.id+';';  
+         connectDatabase.connection.query(sqlapplicationSme2,function (err,rows) {
           if(!err){
             for (var i = 0; i < rows.length; i++) {
-              person.sme2.push(rows[i].app);
+              person.application.bySme2.push(rows[i].app);
             }
-            expect(rows.length).toEqual(person.sme2.length);
+            expect(rows.length).toEqual(person.application.bySme2.length);
           } else {
             console.log('error',err);
           }
         });
          // console.log('person end', person);
       });
-    
-    });
+      
+      for ( var outerKey in assetComment){
+
+        (function(key) {
+
+          it('should get data from ASSET_COMMENT Table by '+key, function () {
+            var sql = 'select asset_comment_id as '+key+' from asset_comment where '+assetComment[key]+'='+person.id+';';
+            connectDatabase.connection.query(sql,function (err,rows) {
+              if(!err){
+                for (var i = 0; i < rows.length; i++) {
+                  person.assetComment[key].push(rows[i][key]);
+                }
+                expect(rows.length).toEqual(person.assetComment[key].length);
+              } else {
+                console.log('error',err);
+              }
+            });
+          });
+
+        })(outerKey);
+      }
+
+    }); // foreach person
     
   }); // Before Merge Data
   
@@ -144,6 +153,16 @@ describe('Merge Staff', function(){
         }
       });
     });
+
+    it('should delete person1 from person table', function () {
+      var sql = 'select count(*) as results from person where person_id ='+person1.id+';';
+        connectDatabase.connection.query(sql,function (err,rows) {
+        if(!err){
+          expect(rows[0].results).toEqual(0);
+        }
+      });
+    });
+
     it('should delete person1 user login', function () {
       var sqlloginId = 'select count(*) as results from user_login where user_login.person_id='+person1.id+';';
       connectDatabase.connection.query(sqlloginId,function (err,rows) {
@@ -153,39 +172,74 @@ describe('Merge Staff', function(){
       });
     });    
 
-    it('should have sme1 from both persons', function() {
-      var sme1After =[];
-      var sqlSME1 = 'select app_id as app from application where application.sme_id ='+personTo.id+';';  
-      connectDatabase.connection.query(sqlSME1,function (err,rows) {
+    it('should have applicationSme1 from both persons', function() {
+      var applicationSme1After =[];
+      var sqlapplicationSme1 = 'select app_id as app from application where application.sme_id ='+personTo.id+';';  
+      connectDatabase.connection.query(sqlapplicationSme1,function (err,rows) {
         if(!err){
           for (var i = 0; i < rows.length; i++) {
-            sme1After.push(rows[i].app);
+            applicationSme1After.push(rows[i].app);
           }
-          var expSme1 = personTo.sme1.concat(person1.sme1);
-          expect(sme1After.length).toEqual(expSme1.length);
-          expect(sme1After.sort()).toEqual(expSme1.sort());
+          var expapplicationSme1 = personTo.application.bySme1.concat(person1.application.bySme1);
+          expect(applicationSme1After.length).toEqual(expapplicationSme1.length);
+          expect(applicationSme1After.sort()).toEqual(expapplicationSme1.sort());
         }else {
           console.log('error',err);
         }
       });
     });
 
-    it('should have sme2 from both persons', function() {
-      var sme2After =[];
-      var sqlSME2 = 'select app_id as app from application where application.sme2_id ='+personTo.id+';';  
-      connectDatabase.connection.query(sqlSME2,function (err,rows) {
+    it('should have applicationSme2 from both persons', function() {
+      var applicationSme2After =[];
+      var sqlapplicationSme2 = 'select app_id as app from application where application.sme2_id ='+personTo.id+';';  
+      connectDatabase.connection.query(sqlapplicationSme2,function (err,rows) {
         if(!err){
           for (var i = 0; i < rows.length; i++) {
-            sme2After.push(rows[i].app);
+            applicationSme2After.push(rows[i].app);
           }
-          var expSme2 = personTo.sme2.concat(person1.sme2);
-          expect(sme2After.length).toEqual(expSme2.length);
-          expect(sme2After.sort()).toEqual(expSme2.sort());
+          var expapplicationSme2 = personTo.application.bySme2.concat(person1.application.bySme2);
+          expect(applicationSme2After.length).toEqual(expapplicationSme2.length);
+          expect(applicationSme2After.sort()).toEqual(expapplicationSme2.sort());
         }else {
           console.log('error',err);
         }
       });
     });
+
+    for (var outerKey in assetComment){
+      (function(key){
+
+        it('should have assets_comment '+key+' from both person', function () {
+          var sql = 'select asset_comment_id as '+key+' from asset_comment where '+assetComment[key]+'='+personTo.id+';';
+          var results = [];
+          connectDatabase.connection.query(sql,function (err,rows) {
+            if(!err){
+              for (var i = 0; i < rows.length; i++) {
+                results.push(rows[i][key]);
+              }
+              console.log('assetComment '+key, results);
+              var expResults = personTo.assetComment[key].concat(person1.assetComment[key]);
+              expect(results.length).toEqual(expResults.length);
+              expect(results.sort()).toEqual(expResults.sort());
+            } else {
+              console.log('error',err);
+            }
+          });
+        });
+
+        it('should have no asset_comment '+key+' person1', function() {
+          var sql = 'select count(*) as results from asset_comment where '+assetComment[key]+'='+person1.id+';';
+          connectDatabase.connection.query(sql,function (err,rows) {
+            if(!err){
+              expect(rows[0].results).toEqual(0);
+            } else {
+              console.log('error',err);
+            }
+          });
+        });
+
+      })(outerKey);
+    }
 
   }); // After Merge Data Validation
 }); // Merge Staff

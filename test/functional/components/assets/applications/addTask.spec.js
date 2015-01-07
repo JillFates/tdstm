@@ -64,7 +64,6 @@ describe('Add Task', function(){
     it('should validate search results', function(){
       appsListPage.verifySearchResults(1,appName).then(function(list){
         list[0].getAttribute('id').then(function(pid){
-          console.log('cid',pid);
           appId2 = pid;
         });
         expect(list.length).toEqual(1);

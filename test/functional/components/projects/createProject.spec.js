@@ -195,11 +195,11 @@ describe('Create Project', function(){
     //     expect(selectop.getAttribute('value')).toEqual('08/24/2014');
     //   });
 
-    it('should set Completion Date ', function(){
+    xit('should set Completion Date ', function(){
       projectPage.setCompletionDate('12/30/2014');
       expect(projectPage.getCompletionDate().getAttribute('value')).toEqual('12/30/2014');
     });
-
+// can be added a validation to check that default completion date is > today
     xit('should select a Completion Date using DayPicker', function(){
 
     });

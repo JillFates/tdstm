@@ -10,7 +10,7 @@ exports.config = {
     menu : suites.menu,
     regression : suites.regression, 
     tasks : suites.tasks,
-    dashboards : suites.tasks,
+    dashboards : suites.dashboards,
     reports : suites.reports,
     assets : suites.assets,
     admin : suites.admin
