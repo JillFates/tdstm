@@ -113,7 +113,7 @@
 
               <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="startTime">Start Time:</label>
+                  <label for="startTime"><b>Start Time:&nbsp;<span style="color: red">*</span></b></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'startTime','errors')}">
                   <script type="text/javascript">
@@ -134,7 +134,7 @@
 	
     	        <tr class="prop">
                 <td valign="top" class="name">
-                  <label for="completionTime">Completion Time:</label>
+                  <label for="completionTime"><b>Completion Time:&nbsp;<span style="color: red">*</span></b></label>
                 </td>
                 <td valign="top" class="value ${hasErrors(bean:moveBundleInstance,field:'completionTime','errors')}">
                   <script type="text/javascript">
@@ -587,17 +587,29 @@
 	} 
 	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
     function validateStepsData(){
-        var checked = true
-        var keyOffStep = ""
-		var message = ""
-        var uncheckedSteps = new Array()
-        var bundleStart = $("#startTime").val()
-        var bundleStartTime = bundleStart ? new Date(bundleStart).getTime() : new Date().getTime()
-                	
-        var bundleCompletion = $("#completionTime").val()
-        var bundleCompletionTime = bundleCompletion ? new Date(bundleCompletion).getTime() : new Date().getTime()
-                	
-    	$("input[title='Dashboard']").each(function(){
+      var checked = true
+      var keyOffStep = ""
+      var message = ""
+      var uncheckedSteps = new Array()
+      var bundleStart = $("#startTime").val()
+      var bundleStartTime = null
+      if (bundleStart == "") {
+        checked = false;
+        message = "Start date is mandatory\n";
+      } else {
+        bundleStartTime = new Date(bundleStart).getTime();
+      }
+      var bundleCompletion = $("#completionTime").val()
+      var bundleCompletionTime = null
+      if (bundleCompletion == "") {
+        checked = false;
+        message += "Completion date is mandatory";
+      } else {
+        bundleCompletionTime = new Date(bundleCompletion).getTime();
+      }
+
+      if (checked) {
+    	  $("input[title='Dashboard']").each(function(){
     		  var id = $(this).attr("id")
 	    	  if($(this).is(':checked') ){
 		    	  var stepId = id.substring(9,id.length)
@@ -628,7 +640,8 @@
 	    	  } else {
 	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length));
 	    	  }
-    	});
+    	  });
+      }
     	if( !checked ){
     		alert(message);
 	    	return checked;

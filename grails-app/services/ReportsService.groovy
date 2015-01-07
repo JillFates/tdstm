@@ -454,13 +454,15 @@ class ReportsService {
 				def projectStartTime = 'Not Available'
 				def projectEndTime = 'Not Available'
 				
-					if(it.startTime){
-					  projectStartTime  = formatter.format(format.parse(it.startTime.toString()))
-					  projectEndTime  = formatter.format(format.parse(it.completionTime.toString()))
-					}
-					
-					errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name}: OK </b>${projectStartTime} - ${projectEndTime}</span><br></br>"""
+				if (it.startTime) {
+					projectStartTime  = formatter.format(format.parse(it.startTime.toString()))
 				}
+				if (it.completionTime) {
+					projectEndTime  = formatter.format(format.parse(it.completionTime.toString()))
+				}
+				
+				errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name}: OK </b>${projectStartTime} - ${projectEndTime}</span><br></br>"""
+			}
 		}
 		def lastMoveBundleDate = moveEventInstance.moveBundles.completionTime
 		lastMoveBundleDate.sort()
