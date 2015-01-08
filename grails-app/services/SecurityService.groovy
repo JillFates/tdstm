@@ -12,7 +12,10 @@ import org.springframework.web.context.request.RequestContextHolder
 
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.tm.enums.domain.RoleTypeGroup
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 
 class SecurityService implements InitializingBean {
 	
@@ -23,67 +26,57 @@ class SecurityService implements InitializingBean {
 	def jdbcTemplate
 	def auditService
 
-	def activeDirectoryConfigMap = [:]
-	def loginConfigMap = [ authorityPrompt:'na', authorityLabel:'', authorityList:[] ]
+	def ldapConfigMap = [:]
+//	def loginConfigMap = [:]
+	def loginConfigMap = [usernamePlaceholder:'enter your freaking username', authorityPrompt:'prompt', authorityLabel:'DOMAIN!', authorityName:'TDS']
 
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
 	 */
 	public void afterPropertiesSet() throws Exception {
 
-		// Initialize the Login Settings Map used by the login form 
-		def conf = grailsApplication.config?.tdstm?.security
-		if (conf.containsKey('authorityPrompt')) {
-			def ap = conf.authorityPrompt
-			def promptType = ['select','prompt','na']
-			if (promptType.contains(ap)) {
-				loginConfigMap.authorityPrompt = ap
+		def config = grailsApplication.config
 
-				if (ap != 'na') {
-					loginConfigMap.authorityList = config.ad?.domains?.label
-				}
+		println "Parsing Security Login setting options"
+		loginConfigMap = SecurityConfigParser.parseLoginSettings(config)
 
-			} else {
-				println "ERROR - Invalid security setting ($ap) for tdstm.security.authorityPrompt. Valid settings are $promptType."
-			}
-		}
-		if (conf.authorityLabel)
-			loginConfigMap.authorityLabel = conf.authorityLabel
+		println "Parsing Security LDAP setting options"
+		ldapConfigMap = SecurityConfigParser.parseLDAPSettings(config)
 
-		// Initialize the ActiveDirectory Configuration Map 
-		conf = grailsApplication.config?.tdstm?.security?.ad
-		if (conf) {
-			activeDirectoryConfigMap.with {
-				// A way to enable/disable the account quickly
-				enabled = conf.containsKey('enabled') ? conf.enabled : false
-				// Flag to indicate the connector type that these settings are used with (ActiveDirectory)
-				connector = 'AD'	
-				url = conf.url ?: []
-				domain = conf.domain ?: ''
-				searchBase = conf.searchBase ?: ''
-				// groupBase = conf.groupBase ?: ''
-				baseDN = conf.baseDN
-				roleMap = conf.roleMap ?: []
-				username = conf.username ?: ''
-				password = conf.password ?: ''
-				company = conf.company ?: ''
-				autoProvision = conf.containsKey('autoProvision') ? conf.autoProvision : false
-				updateUser = conf.containsKey('updateUser') ? conf.updateUser : false
-				updateRoles = conf.containsKey('updateRoles') ? conf.updateRoles : false 
-				defaultRole = conf.defaultRole ?: ''
-				defaultTimezone = conf.defaultTimezone ?: 'EST'
-				defaultProject = conf.defaultProject ?: ''
-				debug = conf.containsKey('debug') ? conf.debug : false
-			}
-		} else {
-			// log has not yet been injected into the object so we need to use println...
-			println 'ERROR - SecurityService: unable to locate Active Directory configuration settings tdstm.ad.*'
-		}
-
+		println "Validating Security LDAP company/party setting"
+		validateLDAPCompanyProjectSettings(ldapConfigMap)
 	}
 
+	/**
+	 * Used to validate that each of the domains reference a valid company and project
+	 * @throws com.tdsops.common.exceptions.ConfigurationException
+	 */
+	private void validateLDAPCompanyProjectSettings(map) {
+		// println "*****validateLDAPCompanyProjectSettings() map====$map"
+		if (map.enabled) {
+			if (! map.domains || ! (map.domains instanceof Map)) {
+				throw new ConfigurationException("Security setting 'domains' is undefined or invalid")
+			}
+
+			// TODO : JPM 12/2014 - need to correct validateLDAPCompanyProjectSettings since read has not yet been injected on Domain objects yet
+			/*
+			map.domains.each { k,d ->
+				Project project = Project.read(d.defaultProject)
+				if (! project)
+					throw new ConfigurationException("Security settings has invalid '${k}.defaultProject' id")
+
+				PartyGroup pg = PartyGroup.read(d.company)
+				if (project.client != d.company)
+					throw new ConfigurationException("Security settings has invalid '${k}.company' id")
+
+				// TODO : Add logic to validate that the company IS a compnany and that there's some relationship between the Project and Company
+			}
+			*/
+		}
+	}
+	
 	/** 
-	 * Returns the configuration map for the login form based on the tdstm-config.groovy defined settings
+	 * Returns the configuration map for the login form that is derived from the tdstm-config.groovy settings
 	 * @return a map of all of the settings for the login
 	 *    String authorityPrompt - select:show select, prompt: prompt for autority, na: do nothing for authority
 	 *	  List selectOptions - list of authorities/domains labels
@@ -92,6 +85,15 @@ class SecurityService implements InitializingBean {
 		return this.loginConfigMap
 	}
 
+	/** 
+	 * Returns the configuration map for the LDAP setting derived from the tdstm-config.groovy settings
+	 * @return a map of all of the settings for the login
+	 *    String authorityPrompt - select:show select, prompt: prompt for autority, na: do nothing for authority
+	 *	  List selectOptions - list of authorities/domains labels
+	 */
+	public Map getLDAPConfig() {
+		return this.ldapConfigMap
+	}
 
 	/**
 	 * Used to determine if the current user has a specified role
@@ -240,8 +242,8 @@ class SecurityService implements InitializingBean {
 		def userLogin
 		if (principal)
 			userLogin = UserLogin.findByUsername( principal )
-		if (log.isDebugEnabled())
-			log.debug "getUserLogin: principal=${principal} userLogin=${userLogin}"
+		//if (log.isDebugEnabled())
+		//	log.debug "getUserLogin: principal=${principal} userLogin=${userLogin}"
 		return userLogin
 	}
 
@@ -306,16 +308,6 @@ class SecurityService implements InitializingBean {
 		return etext.toString()
 	 }
 
-	/**
-	 * Used to retrieve the Active Directory integration configuration settings
-	 * @return A map consisting of all of the settings defined in the configuration or various defaults
-	 */
-	Map getActiveDirectoryConfig() {
-		// log.debug "Calling AfterPropertiesSet()"
-		// afterPropertiesSet()
-		return activeDirectoryConfigMap
-	}
-	
 	/**
 	 * Used to report security violations
 	 * @param message to be reported

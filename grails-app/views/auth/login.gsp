@@ -11,11 +11,24 @@
 	
 <g:javascript library="application" />
 </head>
-<body onload="document.loginForm.username.focus()">
+<body onload="setFieldFocus()">
 <script language="javascript" type="text/javascript">
+
+	function setFieldFocus() {
+		<g:if test="${loginConfig.authorityPrompt in ['select', 'prompt']}">
+		var field = document.loginForm.authority;
+		</g:if>
+		<g:else>
+		var field = document.loginForm.username;
+		</g:else>
+		field.focus();
+	} 
+
 	/* break us out of any containing div or iframes */
 	if (top != self) { top.location.replace(self.location.href); }
+
 </script>
+
 <div id="spinner" class="spinner" style="display: none;"><img
 	src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
 </div>
@@ -45,13 +58,33 @@
 					</g:if>
 					<table>
 						<tbody>
+							<g:if test="${loginConfig.authorityPrompt in ['prompt', 'select']}">
+								<tr>
+									<td>${loginConfig.authorityLabel}:</td>
+									<g:if test="${loginConfig.authorityPrompt == 'prompt'}">
+										<td><input type="text" name="authority" value="${authority}" autocorrect="off" autocapitalize="off"></td>
+									</g:if>
+									<g:if test="${loginConfig.authorityPrompt == 'select'}">
+										<td>
+											<g:select name="authority" from="${loginConfig.authorityList}" value="${authority}"
+												noSelection="['':'Please select']"/>
+										</td>
+									</g:if>
+								</tr>
+							</g:if>
+							<g:if test="${loginConfig.authorityPrompt == 'hidden'}">
+								<input type="hidden" name="authority" value="${loginConfig.authorityName}">
+							</g:if>
+
 							<tr>
 								<td>Username:</td>
-								<td><input type="text" name="username" id="usernameId" value="${username}" autocorrect="off" autocapitalize="off" /></td>
+								<td>
+									<input type="text" name="username" id="usernameId" value="${username}" size="25" autocorrect="off" autocapitalize="off" placeholder="${loginConfig.usernamePlaceholder}"/>
+								</td>
 							</tr>
 							<tr>
 								<td>Password:</td>
-								<td><input type="password" name="password" value="" /></td>
+								<td><input type="password" name="password" size="25" value="" autocorrect="off" autocapitalize="off" placeholder="Enter your password"/></td>
 							</tr>
 							<tr>
 								<td />

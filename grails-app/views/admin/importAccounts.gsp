@@ -45,6 +45,7 @@
 						<th>Role</th>
 						<th>Team(s)</th>
 						<th>Match</th>
+						<th>Errors</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -61,6 +62,7 @@
 								<td>${person.role}</td>
 								<td>${person.teams}</td>
 								<td>${person.match}</td>
+								<td>${person.error}</td>
 						</tr>
 					</g:each>
 				</tbody>

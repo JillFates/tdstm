@@ -9,7 +9,12 @@ class ConfigurationException extends RuntimeException {
 		super()
 	}
 		
-	public ConfigurationException(message) {
+	public ConfigurationException(String message) {
 		super(message)
 	}
+
+	public ConfigurationException(groovy.lang.GString message) {
+		super(message.toString())
+	}
+
 }

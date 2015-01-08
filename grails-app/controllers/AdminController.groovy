@@ -1126,6 +1126,9 @@ class AdminController {
  
 		def filename = '/tmp/tdstm-account-import.csv'
 
+		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
+		List teamCodes = partyRelationshipService.getStaffingRoles()*.id
+
 		// Inline closure to parse the CSV file and return array of mapped fields
 		def parseCsv = {file, header ->
 			def first = true
@@ -1140,24 +1143,47 @@ class AdminController {
 						middleName: fields[2],
 						lastName: fields[3],
 						email: fields[7],
-						phone: fields[4]
+						teams: fields[5],
+						phone: fields[4],
+						error: ''
 					)
 				}
 			}
 			return people
 		}
 
+
+		def validateTeams = { teams -> 
+			String errors = ''
+			teams.each { tc -> 
+				if (! teamCodes.contains(tc)) {
+					errors += (errors ? ', ' : 'Invalid team code(s): ') + tc
+				}
+			}
+			return errors
+		}
+
+		def findPerson = { personInfo ->
+			def person = staff.find {
+				it.firstName == personInfo.firstName &&
+				(it.lastName == personInfo.lastName || ( ! it.lastName && ! personInfo.lastName)) &&
+				(it.middleName == personInfo.middleName || ( ! it.middleName && ! personInfo.middleName))
+			} 
+			return person
+		}
+
 		def lookForMatches = { 
-			def staff = partyRelationshipService.getCompanyStaff( project.client.id )
 			def matches = []
 			// Look over the people and try to find them in the system and then mark them as existing if they are.
 			for (int i=0 ; i < people.size; i++) {
-
+				/*
 				def person = staff.find {
 					it.firstName == people[i].firstName &&
 					(it.lastName == people[i].lastName || ( ! it.lastName && ! people[i].lastName)) &&
 					(it.middleName == people[i].middleName || ( ! it.middleName && ! people[i].middleName))
 				} 
+				*/
+				def person = findPerson(people[i])
 
 				if (person) {
 					people[i].match = 'person'
@@ -1174,6 +1200,11 @@ class AdminController {
 				}
 			}
 			return matches
+		}
+
+		def splitTeams = { t ->
+			List teams = t.split(';')
+			teams = teams*.trim()
 		}
 
 		switch (params.step) {
@@ -1199,6 +1230,16 @@ class AdminController {
 
 				people = parseCsv(upload, header)
 				map.matches = lookForMatches()
+
+				// Validate the teams
+				for (int i=0; i < people.size(); i++) {
+					if (people[i].teams) {
+						List teams = splitTeams(people[i].teams)
+						log.debug "teams=(${people[i].teams} -- $teams"
+						people[i].error = validateTeams(teams)
+					}
+				}
+
 				map.people = people
 				map.step = 'review'
 				map.header = params.header
@@ -1236,9 +1277,19 @@ class AdminController {
 				def created = 0
 
 				people.each() { p -> 
-					if (! p.match ) {
-						def failed = false
-						def person = new Person(
+					def person
+					boolean failed = false
+
+					if (p.match ) {
+						// Find the person
+						person = findPerson(p)
+						if (! person) {
+							p.error = "Unable to find previous Person match"
+							failedPeople << p
+							failed = true
+						}
+					} else {
+						person = new Person(
 							firstName:p.firstName, 
 							middleName:p.middleName, 
 							lastName:p.lastName,
@@ -1250,43 +1301,57 @@ class AdminController {
 						if (person.validate() && person.save(flush:true)) {
 							log.info "importAccounts() : created person $person"
 							partyRelationshipService.addCompanyStaff(project.client, person)
-
-							if (createUserLogin && p.username) {
-								def u = new UserLogin(
-									username: p.username,
-									password: password,
-									active: (activateLogin ? 'Y' : 'N'),
-									expiryDate: expiryDate,
-									person: person
-									)
-
-								if (! u.validate() || !u.save(flush:true)) {
-									p.error = GormUtil.allErrorsString(u)
-									failedPeople << p
-									failed = true
-								} else {
-									if (role) {
-										log.info "importAccounts() : creating Role $role for $person"
-										userPreferenceService.setUserRoles([role], person.id)
-									}
-
-									log.info "importAccounts() : created UserLogin $u"
-									def up = new UserPreference(
-										userLogin: u,
-										preferenceCode: 'CURR_PROJ',
-										value: project.id.toString()
-									)
-									if (! up.validate() || ! up.save()) {
-										log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-										p.error = "Setting Default Project Errored"
-										failedPeople << p
-									}
-								}
-							}
 						} else {
 							p.error = GormUtil.allErrorsString(person)
 							failedPeople << p
 							failed = true
+						}
+					}
+
+					if (person && createUserLogin && p.username) {
+						def u = UserLogin.findByPerson(person)
+						if (!u) {
+							u = new UserLogin(
+								username: p.username,
+								password: password,
+								active: (activateLogin ? 'Y' : 'N'),
+								expiryDate: expiryDate,
+								person: person
+							)
+
+							if (! u.validate() || !u.save(flush:true)) {
+								p.error = GormUtil.allErrorsString(u)
+								log.debug "importAccounts() UserLogin.validate/save failed - ${p.error}"
+								failedPeople << p
+								failed = true
+							} else {
+								if (role) {
+									log.info "importAccounts() : creating Role $role for $person"
+									userPreferenceService.setUserRoles([role], person.id)
+								}
+
+								log.info "importAccounts() : created UserLogin $u"
+								def up = new UserPreference(
+									userLogin: u,
+									preferenceCode: 'CURR_PROJ',
+									value: project.id.toString()
+								)
+								if (! up.validate() || ! up.save()) {
+									log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
+									p.error = "Setting Default Project Errored"
+									failedPeople << p
+								}
+							}
+						}
+
+						// Assign the user to one or more teams appropriately
+						if (! failed && p.teams) {
+							List teams = splitTeams(p.teams)
+							teams.each {t ->
+								if (teamCodes.contains(t)) {
+									partyRelationshipService.addStaffFunction(person, t, project.client, project)
+								}
+							}
 						}
 
 						if (! failed) created++
@@ -1309,6 +1374,7 @@ class AdminController {
 		return map
 
 	}
+
 	/**
 	 * A action to show project Summary report filters.
 	 */

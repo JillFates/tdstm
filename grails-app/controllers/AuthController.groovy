@@ -1,35 +1,46 @@
-	import org.apache.shiro.authc.AuthenticationException
+import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.common.lang.ExceptionUtil
 
 class AuthController {
 	
 	def shiroSecurityManager
 
 	def auditService
-	def userPreferenceService
 	def securityService
+	def userPreferenceService
 
 	def index = { redirect(action: 'login', params: params) }
 
 	def login = {
+		// Get the various security setup settings
+
 		def redirectURL = session.REDIRECT_URL
-		if(!redirectURL){
-			def url = HtmlUtil.createLink([controller:'auth', action:'login', absolute:true])
+		if (!redirectURL) {
 			// Adding the X-Login-URL header so that we can catch it in Ajax calls
+			def url = HtmlUtil.createLink([controller:'auth', action:'login', absolute:true])
 			response.setHeader('X-Login-URL', url)
-			return [ username: params.username, rememberMe: (params.rememberMe != null)]
+
+			def s = securityService.getLoginConfig()
+			return [ 
+				username:params.username, 
+				authority:params.authority, 
+				rememberMe:(params.rememberMe != null), 
+				loginConfig:securityService.getLoginConfig()
+			]
 		} else {
-			redirect( url:redirectURL)
+			redirect( url:redirectURL )
 		}
 	}
 
 	def signIn = {
-		log.warn 'signIn start'
+
+		// helper closure used a few times 
 		def loginMap = {
 			// Keep the username and "remember me" setting so that the
 			// user doesn't have to enter them again.
@@ -42,20 +53,34 @@ class AuthController {
 			if (params.targetUri) {
 				m['targetUri'] = params.targetUri
 			}
+
+			// Remember the authority that the user selected
+			if (params.authority) {
+				m.authority = params.authority
+			}
+
+			// Remember the username that the user entered
+			if (params.username) {
+				m.username = params.username
+			}
+
 			return m
 		}
 		
+		String failureMsg = ''
 		try {
-			def authToken = new UsernamePasswordToken(params.username, params.password)
+			if (! params.username || ! params.password) {
+				throw new AuthenticationException("Missing user credentials")
+			}
+
+			def authToken = new UsernamePasswordToken(params.username, params.password, params.authority)
 			// Support for "remember me"
 			if (params.rememberMe) {
 				authToken.rememberMe = true
 			}
 	
 			try {
-				// Perform the actual login. An AuthenticationException
-				// will be thrown if the username is unrecognised or the
-				// password is incorrect.
+				// Perform the actual login. An AuthenticationException will be thrown if the username is unrecognised or the password is incorrect
 				if (log.isDebugEnabled())
 					log.debug "signIn: About to call SecurityUtils.subject.login(authToken) : $authToken"
 				SecurityUtils.subject.login(authToken)
@@ -74,6 +99,7 @@ class AuthController {
 					SecurityUtils.subject.logout()
 					flash.message = message(code: 'userLogin.accountDisabled.message')
 					redirect(action: 'login', params:loginMap())
+					return
 				} else {
 					// If a controller redirected to this page, redirect back
 					// to it. Otherwise redirect to the root URI.
@@ -98,8 +124,8 @@ class AuthController {
 					
 					Person.loggedInPerson = securityService.getUserLoginPerson();
 					def startPage = userPreferenceService.getPreference('START_PAGE')
-					if(browserTest) {
-						if(browserTestiPad) {
+					if (browserTest) {
+						if (browserTestiPad) {
 							redirect(controller:'projectUtil')
 						} else {
 							redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
@@ -128,30 +154,27 @@ class AuthController {
 					   }
 					}
 					log.info "User '${params.username}' has signed in"
+					return
 				}
+			} catch (AuthenticationException e){
+				failureMsg = e.getMessage()				
 			}
-			catch (AuthenticationException ex){
-				// Authentication failed, so display the appropriate message
-				// on the login page.
-				def remoteIp = HtmlUtil.getRemoteIp()
-				log.warn "1 Authentication failure user '${params.username}', IP ${remoteIp} : ${ex.getMessage()}"
-				flash.message = message(code: "login.failed")
 
-				auditService.logMessage("${params.username} login attempt failed")
-				
-				// Now redirect back to the login page.
-				redirect(action: 'login', params: loginMap())
-			}
-	 	} catch(Exception e) {
-			def remoteIp = HtmlUtil.getRemoteIp()
-			log.warn "2 Authentication failure for user '${params.username}' : IP ${remoteIp} : ${e.printStackTrace()}"
-			flash.message = "Authentication failure for user '${params.username}'."
-
-			auditService.logMessage("${params.username} login attempt failed")
-			
-			// Now redirect back to the login page.
-			redirect(action: 'login', params: loginMap())
+		} catch(org.apache.shiro.authc.UnknownAccountException e) {
+			failureMsg = e.getMessage()
+		} catch(Exception e) {
+			failureMsg = e.getMessage()
+			log.error "Unexpected Authentication Exception for user '${params.username}' \n${ExceptionUtil.stackTraceToString(e)}"
 		}
+		flash.message = message(code: 'login.failed')
+		auditService.logMessage("${params.username} login attempt failed - $failureMsg")
+	
+		def remoteIp = HtmlUtil.getRemoteIp()
+		auditService.logMessage("${params.username} ($remoteIp) login attempt failed")			
+	
+		// Now redirect back to the login page.
+		redirect(action: 'login', params: loginMap())
+
 	}
 
 	def signOut = {

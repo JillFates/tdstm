@@ -13,10 +13,128 @@
 // Set the DEFAULT URL to use for the site
 grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 
-// Audit configuration, valid options are: access and activity (default is access)
-// access: logging will include login, logout and security violations
-// activity:  will also include all user interactions with the application.
-tdstm.security.auditLogging = "activity"
+tdstm {
+	security {
+
+		// Audit configuration, valid options are: access and activity (default is access)
+		// access: logging will include login, logout and security violations
+		// activity:  will also include all user interactions with the application.
+		auditLogging = "activity"
+
+		// Label to for the authority input prompt
+		authorityLabel = "Domain"
+
+		// Control how login form prompts for an authority, options: 
+		//    select: select list
+		//    prompt: input field
+		//    hidden: references a defined domain
+		//    na: not applicable for when LDAP is not enabled
+		authorityPrompt = 'na'
+
+		// The domain key that should be used when authorityPrompt=='hidden'
+		authorityName = 'CORP'
+
+		// usernamePlaceholder - used to override the placeholder value in the username field
+		usernamePlaceholder = 'Enter your username'
+
+		ldap {
+			// Enables the LDAP authentication when true, options true|false
+			enabled = false
+
+			// Enables debugging in the LDAP/ActiveDirectory process when true, options true|false
+			debug = true
+
+			// A list of one or more domains that the client has
+			domains {
+
+				CORP {
+
+					// The type of authority, options ActiveDirectory|LDAP
+					type = 'ActiveDirectory'
+
+					// One or more URLs to perform searchs against, if first fails it will try the second
+					url = ['ldap://127.0.0.1:389'] 
+
+					// The credentials for the service account which can be in the format:
+					// 		DOMAIN\usernam
+					//		UPN (e.g. ldap_service@example.com)
+					//		DN (e.g. CN=LDAP Service,OU=Accounts,DC=example,DC=com)
+					serviceName = 'ldap_service@example.com'
+					servicePassword = 'Try2Gue$$1T'
+
+					// The domain used with SAM login if not prompted and not entered by the user
+					domain = 'CO_DOMAIN'
+
+					// The FQDN used to construct the username for UPN
+					fqdn = 'example.com'
+
+					// The format that usernames are for prompting and persisting in TM, options are username|UPN
+					// usernameFormat = 'username'
+					usernameFormat = 'UPN'
+
+					// Lookup user using User Principle Name (UPN) or SAM Account Name (SAM) (default UPN)
+					userSearchOn = 'SAM'
+
+					// A list of one or more groups that are searched for user permissions
+					userSearchBase = [ 'ou=Accounts,dc=example,dc=com' ]
+
+					// How to search for user groups, options direct|nested
+					// When using 'nested' the query will lookup parent groups but takes longer
+					roleSearchMode = 'direct'
+
+					// The base DN to use when attempting to find the group(s) that a user belongs to
+					roleBaseDN = 'OU=Accounts,DC=example,DC=com'
+
+					// When true, upon authenticating the user's AD roles that map to TM roles will be assigned to the user and existing roles will
+					// be removed if they are no longer exist in AD. Any role not defined in the map is not updated and can be manual added to users.
+					// Options true|false (default false)
+					updateRoles = true
+					roleMap = [
+						editor:'CN=Editor,OU=TransitionMananager,OU=Applications',
+						supervisor:'CN=Supervisor,OU=TransitionMananager,OU=Applications',
+						admin:'CN=Admin,OU=TransitionMananager,OU=Applications',
+						client_admin: 'CN=ClientAdmin,OU=TransitionMananager,OU=Applications',
+						client_mgr: 'CN=ClientMgr,OU=TransitionMananager,OU=Applications'
+					]
+
+					// The default group to assign users when updateRoles=true. When set to blank, it requires that the individuals be assigned to 
+					// security group(s). Use will receive this role along with any that are mapped.
+					defaultRole = ''	
+
+					// When true and the user does not previously exists in TM, it will create the user's account if they have a role or there is a default
+					autoProvision = true
+
+					// The company to associate users to when they are provisioned initially
+					company = 2444
+
+					// The project to assign the user to and make their default when first provisioned
+					defaultProject = 2445
+
+					// The default timezone to set for the user when first provisioned
+					defaultTimezone = 'EST'
+
+					// When true the system will refresh the user's personal information each time that the authenticate successfully
+					updateUserInfo = true
+				} 					
+
+				// Define a 2nd domain / authority
+				QA {
+					type = 'LDAP'
+					url = 'ldap://127.0.0.1:389'
+					usernameFormat = 'email'
+					userSearchBase = 'dc=com'
+					serviceName = 'qa_service_account@example.com'
+					servicePassword = 'Try2Gu3$$Th1s1T00'
+					roleBaseDN = 'dc=example,dc=com'
+					company = 2444
+					defaultProject = 2445
+					roleSearchMode = 'nested'
+				}
+			}
+
+		}
+	}
+}
 
 // Database Properties
 environments {
@@ -42,8 +160,23 @@ environments {
 			username = ""
 			password = ""
 			dbCreate = ""
+
+			pooled=true
+			properties {
+				maxActive=100
+				maxIdle=5
+				initialSize=5
+				minEvictableIdleTimeMillis=(1000*60*30)
+				timeBetweenEvictionRunsMillis=(1000*60*30)
+				// numTestsPerEvictionRun=3
+				testOnBorrow=true
+				testWhileIdle=true
+				testOnReturn=true
+				removeAbandoned=true
+				removeAbandonedTimeout=600
+				validationQuery='/* ping */'
+			}
 		}
-	}
 
 	// DB Configuation to be used with the LiquiBase tool but not fully implemented yet
 	dbdiff {
@@ -173,7 +306,7 @@ log4j = {
 	info auditLog:'grails.app.service.AuditService',
 		additivity: false
 
-	 additivity.StackTrace=false
-	 additivity.grails="false"
+	additivity.StackTrace=false
+	additivity.grails=false
 }
 

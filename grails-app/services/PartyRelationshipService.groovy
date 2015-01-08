@@ -713,6 +713,67 @@ class PartyRelationshipService {
 			PartyRole.executeUpdate("delete from PartyRole where party = '$person.id' and roleType in (:roles)",[roles:existingRoles])
 		}
 	 }
+
+	/**
+	 * Used to add a function/team to staff for a company / project
+	 * @param person - the individual to assign the team function to
+	 * @param functionName - the name/code for the function/team
+	 * @param company - the Company to assign the person to
+	 * @param project - the Project to optionally assign the person to
+	 */
+	void addStaffFunction(Person person, String functionName, Party company, Party project=null) {
+		def coStaffPRType = PartyRelationshipType.read('STAFF')
+		def projStaffPRType = PartyRelationshipType.read('PROJ_STAFF')
+		def companyPRType = PartyRelationshipType.read('COMPANY')
+		
+		RoleType coRoleType = RoleType.read('COMPANY')
+		RoleType projRoleType = RoleType.read('PROJECT')
+		RoleType functionRoleType = RoleType.read(functionName)
+
+		String msg 
+
+		if (! functionRoleType) {
+			msg =  "Invalid role type $functionName"
+			log.error "AddStaffFunction() $msg"
+			throw new RuntimeException(msg)
+		}
+
+		String query = 'from PartyRelationship where partyRelationshipType = :type and partyIdFrom=:from and roleTypeCodeFrom=:fromType and partyIdTo=:to and roleTypeCodeTo=:toType'
+		def pr = PartyRelationship.find(query, [type:coStaffPRType, from:company, fromType: coRoleType, to:person, toType:functionRoleType])
+		if (!pr) {
+			pr = new PartyRelationship(
+				partyRelationshipType : coStaffPRType, 
+				partyIdFrom : company,
+				roleTypeCodeFrom:coRoleType,
+				partyIdTo : person, 
+				roleTypeCodeTo : functionRoleType 
+			)
+			if (! pr.validate() || ! pr.save(flush:true)) {
+				msg = "Unable to create Company/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
+				log.error "AddStaffFunction() $msg"
+				throw new RuntimeException(msg)
+			}
+		}
+
+		if (project) {
+			pr = PartyRelationship.find(query, [type:projStaffPRType, from:project, fromType: projRoleType, to:person, toType:functionRoleType])
+			if (!pr) {
+				pr = new PartyRelationship(
+					partyRelationshipType : projStaffPRType, 
+					partyIdFrom : project,
+					roleTypeCodeFrom:projRoleType,
+					partyIdTo : person, 
+					roleTypeCodeTo : functionRoleType 
+				)
+				if (! pr.validate() || ! pr.save(flush:true)) {
+					msg = "Unable to create Project/Staff/$functionName Relationship - ${GormUtil.allErrorsString(pr)}"
+					log.error "AddStaffFunction() $msg"
+					throw new RuntimeException(msg)
+				}
+			}
+		}
+
+	}
 	 
 	/**
 	 * Update the user functions based on the functions list.
@@ -721,7 +782,7 @@ class PartyRelationshipService {
 	 * @param functionIds - functions list that assigned to staff
 	 * @return nothing
 	 */
-	def updateStaffFunctions(partyIdFrom, person, functionIds, def prTypeId="STAFF" ){
+	def updateStaffFunctions(partyIdFrom, person, functionIds, def prTypeId="STAFF" ) {
 		
 		def prType = PartyRelationshipType.read(prTypeId)
 		def roleType = RoleType.read(prType=="STAFF"?"PROJECT":"COMPANY")
@@ -765,12 +826,13 @@ class PartyRelationshipService {
 		
 		// Iterate through the functions and assign to staff if not exists
 		functions.each{ func ->
-			def partyRT = new PartyRelationship( partyRelationshipType : prType, 
-													partyIdFrom : partyIdFrom,
-													roleTypeCodeFrom:roleType,
-													partyIdTo : person, 
-													roleTypeCodeTo : func 
-											  )
+			def partyRT = new PartyRelationship( 
+				partyRelationshipType : prType, 
+				partyIdFrom : partyIdFrom,
+				roleTypeCodeFrom:roleType,
+				partyIdTo : person, 
+				roleTypeCodeTo : func 
+			)
 			if ( !partyRT.validate() || !partyRT.save() ) {
 				def etext = "Unable to create Staff function " + GormUtil.allErrorsString( partyRT )
 				log.error( etext )

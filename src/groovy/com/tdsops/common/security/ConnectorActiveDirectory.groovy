@@ -9,6 +9,10 @@ import java.util.regex.Matcher
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.tdsops.common.security.SecurityConfigParser
+import com.tdsops.common.security.SecurityUtil
+
+import com.tdsops.common.lang.ExceptionUtil
 /**
  * Class used to authenticate with Active Directory via LDAP protocol
  */
@@ -25,27 +29,8 @@ class ConnectorActiveDirectory {
 	}
 
 	/**
-	 * Helper method that converts a binary GUID to a string
-	 * @param guid a binary string value
-	 * @return The guid converted to a hex string
-	 */
-	static String guidToString( guid ) {
-		def addLeadingZero = { k -> 
-			return (k <= 0xF ? '0' + Integer.toHexString(k) : Integer.toHexString(k))
-		}
-
-		// Where GUID is a byte array returned by a previous LDAP search
-		// guid.each { b -> log.info "b is ${b.class}"; str += addLeadingZero( (int)b & 0xFF ) }
-		StringBuffer str = new StringBuffer()
-		for (int c=0; c < guid.size(); c++) {
-			Integer digit = guid.charAt(c)
-			str.append( addLeadingZero( digit & 0xFF ) )
-		}
-		return str
-	}
-
-	/**
 	 * Used to authenticate and get user information from an Active Directory server
+	 * @param authority - the domain authority to check up against
 	 * @param username - the user login name to lookup
 	 * @param password - the password for the account
 	 * @param config - A map of the necessary configuration values needed to connect to the AD server and navigate the tree
@@ -60,48 +45,75 @@ class ConnectorActiveDirectory {
 	 *		roles - a list of roles (e.g. User, Editor, Manager, Admin)
 	 * @throws ...
 	 */
-	static Map getUserInfo(username, password, config) {
-		def emsg = ''
-		def userInfo = [:]
+	static Map getUserInfo(String authority, String username, String password, Map ldapConfig) {
+		String emsg = ''
+		Map userInfo = [:]
+		boolean debug = ldapConfig.debug
+		boolean serviceAuthSuccessful = false
+		Map domain 
 
 		try {
 
-			// Validate that everything is available in the configuration
-			assert config.url
-			assert config.domain
-			assert config.searchBase
-			assert config.baseDN
+			// Get the Domain configuration by cross referencing the authority (aka host/domain) - was validated that it exists in Realm class
+			domain = ldapConfig.domains[authority]
 
-			// Get the user's username, stripping of the @domain if present
-			def smauser = username
-			if (smauser.contains('@'))
-				smauser = smauser.split('@')[0]
+			String queryForUser
+			String queryUsername=username
 
-			def queryUser = "(&(sAMAccountName=$smauser)(objectClass=user))"
-
-			// Use the config username/password if it exists otherwise just use the credentials of the user
-			// def sam = "${config.username}@${config.domain}".toString()
-			def usr = config.username ?: smauser
-			def pswd = config.username ? config.password : password
+			switch (domain.userSearchOn) {
+				case 'UPN':
+					if (domain.usernameFormat == 'username') {
+						// Need to add the selected domain to the username for the lookup
+						queryUsername += '@' + domain.fqdn
+					}
+					queryForUser = "(userPrincipalName=$queryUsername)"
+					break
+				case 'SAM':
+					// If the user is logging in with SAM check to see if the domain was part of the username and add it if not
+					if (domain.domain) {
+						if (! queryUsername.contains('\\')) {
+							queryUsername = domain.domain = '\\' + username
+						} else {
+							// validate that the domain is the same as what is defined
+							String userEnteredDomain = queryUsername.split(/\\+/)[0]
+							if (! userEnteredDomain || userEnteredDomain.toLowerCase() == domain.domain.toLowerCase()) {
+								queryUsername = domain.domain = '\\' + username
+							} else {
+								throw new javax.naming.AuthenticationException('Invalid domain specified')
+							}
+						}
+					}
+					queryForUser = "(sAMAccountName=$queryUsername)"
+					break
+				default:
+					throw new RuntimeException("Unhandle switch for domain.userSearchOn(${domain.userSearchOn})")
+			}
+			// This user type query is the equivalant of (&(objectCategory=person)(objectClass=user)) but more efficient
+			String queryUserType = '(samAccountType=805306368)'
+			queryForUser = "(&$queryUserType$queryForUser)"
+			if (debug)
+				log.info "LDAP query for user: $queryForUser"
 
 			// Connect using the service bind account
-			if (config.debug)
-				log.info 'Initiating LDAP connection with system account'
-			def ldap = LDAP.newInstance(config.url[0], usr, pswd)
+			if (debug)
+				log.info "Initiating LDAP connection to ${domain.url[0]} with system account (${domain.serviceName})"
+			def ldap = LDAP.newInstance(domain.url[0], domain.serviceName, domain.servicePassword)
 
 			// Lookup the user by their sAMAccountName
 			def results
 			def i
-			for (i=0; i<config.searchBase.size(); i++) {
+			for (i=0; i < domain.userSearchBase.size(); i++) {
 				try {
-					log.debug "Attempting search for user $queryUser with searchBase=${config.searchBase[i]}"
-					results = ldap.search(queryUser, config.searchBase[i], SearchScope.SUB )
+					String searchBase = domain.userSearchBase[i]
+					log.debug "Attempting ldap.search($queryUsername, ${searchBase}, SearchScope.SUB)"
+					results = ldap.search(queryForUser, searchBase, SearchScope.SUB )
 					if (results.size()) {
-						if (config.debug)
-							log.info "Found user ${results[0].dn} in ${config.searchBase[i]}"
+						if (debug)
+							log.info "Found user ${results[0].dn} in ${searchBase}"
 						break
 					}
 				} catch (javax.naming.NameNotFoundException userSearchEx) {
+					log.debug "UserSearch got javax.naming.NameNotFoundException exception"
 					// Don't need to do anything
 				}
 			}
@@ -112,47 +124,66 @@ class ConnectorActiveDirectory {
 			} 
 			
 			def u = results[0]
-			def nestedGroups = []
+			def memberof = []
 			def roles = []
 
-			if (config.updateRoles) {
-				// Grab the user's nested group memberships by iterating over one or more searchBase values
-				def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
-				if (config.debug)
-					log.info "About to search for nested groups for (${config.baseDN}) with query $queryNestedGroups"
-				def g = ldap.search(queryNestedGroups, config.baseDN, SearchScope.SUB)
-				if (g)
-					nestedGroups.addAll(g*.dn)
+			// Flag that the Service Account was successful in authenticating after a successful search
+			serviceAuthSuccessful = true
 
-				config.roleMap.each { role, filter ->
-					def groupDN="$filter,${config.baseDN}".toLowerCase()
-					if (config.debug)
-						log.info "Trying to find role $role for DN $groupDN"
-					if (nestedGroups.find { it.toLowerCase() == groupDN })
-						roles << role
-				}
-			} else {
-				assert config.defaultRole
-				// Set their default role
-				roles << config.defaultRole
-			}
+			// Switch the connection to the user's credentials for the rest of the queries so that the user authentication is validated
+			ldap = LDAP.newInstance(domain.url[0], u.dn, password)
 
-			// Now attempt a connect using the user's own DN/password and then try to compare the samaccountname to 
-			// validate that the user has given us the correct credentials
-			if (config.debug)
-				log.info "Initiating LDAP connection with user credentials (${u.dn})"
-
-			ldap = LDAP.newInstance(config.url[0], u.dn, password)
-
-			if (config.debug)
-				log.info 'About to confirm user credentials with ldap.compare'
-
-			assert ldap.compare(u.dn, [samaccountname: smauser] )
-
+			// This will validate that the user credentials are valid and will tick the BadPwdCount if it fails
+			assert ldap.exists(u.dn)
 			log.info "Validated user credentials for $username with AD/LDAP"
 
+			// So we'll search through the roles to see what the user has defined
+			if (domain.roleMap && domain.roleMap.size()) {
+				if (debug)
+					log.info "About to lookup roles ${domain.roleMap} for mode ${domain.roleSearchMode}"
+
+				switch (domain.roleSearchMode) {
+					case 'nested':
+						// Grab the user's nested group memberships by iterating over one or more searchBase values
+						def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
+						if (debug)
+							log.info "About to search for nested groups for (${domain.roleBaseDN}) with query $queryNestedGroups"
+						def g = ldap.search(queryNestedGroups, domain.roleBaseDN, SearchScope.SUB)
+						if (g)
+							memberof.addAll(g*.dn)
+						break
+
+					case 'direct':
+						memberof = ( u.memberof instanceof List ? u.memberof : [ u.memberof.toString() ] )
+						break
+					default:
+						throw new RuntimeException("domain.roleSearchMode ${domain.roleSearchMode} is not supported")
+				}
+
+				if (debug) {
+					StringBuffer sb = new StringBuffer()
+					memberof.each {sb.append("\n\t$it")}
+					log.info "USER MEMBEROF (${domain.roleSearchMode.toUpperCase()}): $sb"
+				}
+
+				// Search through roles and see if we can match up
+				memberof = memberof*.toLowerCase()
+				domain.roleMap.each { role, filter ->
+					def groupDN="$filter${domain.roleBaseDN ? ','+domain.roleBaseDN : ''}".toLowerCase()
+					if (memberof.find { it == groupDN })
+						roles << role
+				}
+
+			} else {
+				if (debug)
+					log.info "No roles defined and using defaultRole (${domain.defaultRole})"
+				assert domain.defaultRole
+				// Set their default role
+				roles << domain.defaultRole
+			}
+
 			// Map all of the user information into TM userInfo map
-			userInfo.company = config.company	// Copy over the company id
+			userInfo.company = domain.company	// Copy over the company id
 			userInfo.username = username
 			userInfo.firstName = u.givenname ?: ''
 			userInfo.lastName = u.sn ?: ''
@@ -160,38 +191,46 @@ class ConnectorActiveDirectory {
 			userInfo.email = u.mail ?: ''
 			userInfo.telephone = u.telephonenumber ?: ''
 			userInfo.mobile = u.mobile ?: ''
-			userInfo.guid = (u.objectguid ? guidToString( u.objectguid ) : u.dn)
+			userInfo.guid = (u.objectguid ? SecurityUtil.guidToString( u.objectguid ) : u.distinguishedname)
 			userInfo.roles = roles
 
-			if (config.debug) {
+			if (debug) {
 				def ui = new StringBuffer("User information:\n")
 				userInfo.each { k,v -> ui.append("   $k=$v\n") }
 				log.info ui.toString()
 			}
 
+			// Make sure that the user has at least one assigned role if we're updating roles via AD
+			if (domain.updateRoles && roles.size()==0) {
+				throw new javax.naming.AuthenticationException('User has no assigned roles')
+			}
+
+		} catch (javax.naming.directory.InvalidSearchFilterException e) {
+			emsg = "InvalidSearchFilterException occurred : ${e.getMessage()}" 
+			// log.error "$emsg : ${e.getMessage()}"
 		} catch (javax.naming.AuthenticationException ae) {
-			emsg = 'Invalid user password'
-			if (config.debug)
+			emsg = (ae.getMessage() ?: 'Invalid user password' )
+			if (debug)
 				log.info "$emsg : ${ae.getMessage()}"
 		} catch (javax.naming.NameNotFoundException nnfe) {
 			emsg = 'Username not found'
-			if (config.debug)
+			if (debug)
 				log.info "$emsg : ${nnfe.getMessage()}"
 		} catch (javax.naming.InvalidNameException ine) {
 			emsg = 'User DN was invalid'
-			if (config.debug)
+			if (debug)
 				log.info "$emsg : ${ine.getMessage()}"
-		} catch (java.lang.NullPointerException npe) {				
-			emsg = 'Possibly invalid service user credentials or LDAP URL'
-			if (config.debug)
-				log.info "$emsg : ${npe.getMessage()}"
+		} catch (java.lang.NullPointerException npe) {
+			emsg = serviceAuthSuccessful ? 'Invalid user credentials' : 'Possibly invalid service account credentials or LDAP URL'
+			if (debug) 
+				log.info "$emsg\n${ExceptionUtil.stackTraceToString(npe)}"
 		} catch (Exception e) {
 			emsg = 'Unexpected error'
-			log.error "$emsg : ${e.class} ${e.getMessage()}"			
+			log.error "$emsg : ${e.class} ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
 		}
 
 		if (emsg)
-			throw new RuntimeException(emsg)
+			throw new javax.naming.AuthenticationException(emsg)
 
 		return userInfo
 	}

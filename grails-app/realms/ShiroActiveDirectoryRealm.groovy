@@ -9,6 +9,7 @@ import com.tdsops.common.security.ConnectorActiveDirectory
 
 import com.tdssrc.grails.HtmlUtil
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.security.SecurityConfigParser
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,19 +22,25 @@ class ShiroActiveDirectoryRealm {
 	static final authTokenClass = org.apache.shiro.authc.UsernamePasswordToken
 	//private static final grailsApplication = ApplicationHolder.application
 
+	static boolean initialized = false
 	static config
 	static Log log
-	static isEnabled = true
+	static isEnabled = false
 	def ctx
 
 	def credentialMatcher
+
+	public ShiroActiveDirectoryRealm() {
+		//initialize()
+	}
 
 	/**
 	 * Used to load the configuration settings one-time
 	 */
 	private synchronized void initialize() {
 		// isEnabled will get flipped to false if there is no config or AD is disabled
-		if (isEnabled && ! config ) {
+		if (! initialized ) {
+			initialized = true
 			log = LogFactory.getLog(this.class)
 			if (log.isDebugEnabled()) 
 				log.debug "ShiroActiveDirectoryRealm: initializing"
@@ -41,10 +48,30 @@ class ShiroActiveDirectoryRealm {
 			ctx = ApplicationContextHolder.getApplicationContext()
 			def securityService = ctx.securityService
 			if (securityService) {
-				config = securityService.getActiveDirectoryConfig()
-				if (log.isDebugEnabled()) 
-					log.debug "ShiroActiveDirectoryRealm: loaded configuration $config"
-				isEnabled = ( config && config.enabled ) 
+				config = securityService.getLDAPConfig()
+
+				// Log the loaded configuration if debugging is enabled
+				if (config.debug) {
+					java.lang.StringBuffer sb = new java.lang.StringBuffer('ShiroActiveDirectoryRealm() Loaded Configuration:')
+					config.each {k,v ->
+						if (k=='domains') {
+							config.domains.each { dk, domain -> 
+								sb.append("\n\tdomains.$dk:")
+								domain.each { domainKey, domainValue ->
+									if (domainKey.toLowerCase().contains('password'))
+										domainValue = '************'
+									sb.append("\n\t\t$domainKey=$domainValue") 
+								}
+							}
+						} else {
+							sb.append("\n\t$k=$v")
+						}
+					}
+					log.info sb.toString()
+				}
+
+				isEnabled = ( config && config.enabled && SecurityConfigParser.hasActiveDirectoryDomain(config) ) 
+
 			} else {
 				log.error "ShiroActiveDirectoryRealm: Unable to access security service"			
 			}
@@ -63,20 +90,30 @@ class ShiroActiveDirectoryRealm {
 	 * UnknownAccountException - when not auto provisioning and got a non-found account
 	 */
 	def authenticate(authToken) {
-		if (isEnabled && ! config)
+		if (! initialized)
 			initialize()
 
 		if (! isEnabled) {
-			// todo : switch to more appropriate exception after upgrade of shiro
 			throw new AccountException('Active Directory Realm is disabled')
 		}
 
-		def userInfo
-		def username = authToken.username
-		def password = authToken.password
+		Map userInfo
+		String username = authToken.username
+		String authority = authToken.host?.toLowerCase()
 
-		// TODO : Some reason the password is screwy/encoded (perhaps it has something to do with authTokenClass)
+		// The password is a char[] in AuthToken so we convert to a string
+		// TODO : Security doc mentions that keeping the password as char[] is safer for in-memory 
+		def password = authToken.password
 		password=password.toString() 
+
+
+		// Try to validate the domain using authority which is passed around in the Host
+		if (! authToken.host) {
+			throw new AccountException('Authentication authority is missing')
+		}
+		if (! config.domains.containsKey(authToken.host.toLowerCase())) {
+			throw new AccountException("Invalid authority (${authToken.host}) was specified")
+		}
 
 		// Null username is invalid
 		if (! username || ! password) {
@@ -88,7 +125,7 @@ class ShiroActiveDirectoryRealm {
 
 		// Try calling ActiveDirectory to Authenticate the user and get their information
 		try {
-			userInfo = ConnectorActiveDirectory.getUserInfo(username, password, config)
+			userInfo = ConnectorActiveDirectory.getUserInfo(authority, username, password, config)
 		} catch (RuntimeException e) {
 			def remoteIp = HtmlUtil.getRemoteIp()
 			log.warn "Login attempt failed (ShiroActiveDirectoryRealm) : user $username : IP ${remoteIp}"
@@ -107,7 +144,7 @@ class ShiroActiveDirectoryRealm {
 		def userLogin
 
 		def userService = ctx.userService
-		userLogin = userService.findOrProvisionUser( userInfo, config )
+		userLogin = userService.findOrProvisionUser(userInfo, config, authority)
 
 		if (log.isDebugEnabled() || config.debug)
 			log.debug "ShiroActiveDirectoryRealm: Returned with user '${userLogin.username}'"

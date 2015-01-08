@@ -14,6 +14,15 @@ class RoleType {
 		id column: 'role_type_code', generator: 'assigned'
 	}
 
+	static transients = ['securityRole']
+
+	/** 
+	 * Used to determine if the given type is a security role type
+	 */
+	boolean isSecurityRole() {
+		return (description ==~ /^System.:.*/)
+	}
+
 	String toString(){
 		description
 	}
