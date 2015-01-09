@@ -26,8 +26,10 @@ exports.config = {
 
   onPrepare: function() {
     browser.driver.get(process.env.BASE_URL+'/tdstm/auth/login');
-    browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
-    browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);
+    var username= browser.driver.findElement(by.id('usernameId'));
+    username.sendKeys(process.env.USER_NAME);
+    
+    browser.driver.findElement(by.css('input[type="password"][name="password"]')).sendKeys(process.env.PASSWORD);
     browser.driver.findElement(by.css('.buttonR input')).click();
   },
 

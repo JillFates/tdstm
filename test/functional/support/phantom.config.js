@@ -25,6 +25,7 @@ exports.config = {
   capabilities: {
     'browserName': 'phantomjs',
     'phantomjs.binary.path':'./node_modules/phantomjs/bin/phantomjs',
+    'phantomjs.cli.args': ['--ignore-ssl-errors=true',  '--web-security=false']
   },
   
   rootElement: 'div[ng-app]',
@@ -36,7 +37,7 @@ exports.config = {
     browser.driver.manage().window().setSize(1280, 1024);
     browser.driver.get(process.env.BASE_URL+'/tdstm/auth/login');
     browser.driver.findElement(by.id('usernameId')).sendKeys(process.env.USER_NAME);
-    browser.driver.findElement(by.name('password')).sendKeys(process.env.PASSWORD);
+    browser.driver.findElement(by.css('input[type="password"][name="password"]')).sendKeys(process.env.PASSWORD);
     browser.driver.findElement(by.css('.buttonR input')).click();
   },
 
