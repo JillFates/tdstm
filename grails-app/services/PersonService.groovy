@@ -39,6 +39,32 @@ class PersonService {
 		"le", "mac", "di", "del", "vel", "van", "von", "e'", "san", "af", "el", "o'"
 	]
 
+	static PERSON_DOMAIN_RELATIONSHIP_MAP = [
+		'application':['sme_id', 'sme2_id', 'shutdown_by', 'startup_by', 'testing_by'],
+		'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 
+		'comment_note':['created_by_id'],
+		'asset_dependency':['created_by','updated_by'],
+		'asset_entity':['app_owner_id'],
+		'exception_dates':['person_id'], 
+		'model':['created_by', 'updated_by', 'validated_by'],
+		'model_sync':['created_by_id', 'updated_by_id', 'validated_by_id'],
+		'model_sync_batch':['created_by_id'],
+		'move_event_news':['archived_by', 'created_by'],
+		'move_event_staff':['person_id'],
+		'workflow':['updated_by'],
+		'recipe_version':['created_by_id'],
+		'task_batch':['created_by_id']
+	]
+
+	static PERSON_DELETE_EXCEPTIONS_MAP = [
+		'application': [
+			'sme_id': true,
+			'sme2_id': true
+		],
+		'asset_entity':[
+			'app_owner_id': true
+		]
+	]
 
 	/**
 	 * Returns a properly format person's last name with its suffix
@@ -445,8 +471,6 @@ class PersonService {
 		mergeUserLogin(toUserLogin, fromUserLogin, toPerson)
 		//Updating person reference from 'fromPerson' to 'toPerson'
 		updatePersonReference(fromPerson, toPerson)
-		//Update FKs related to this person to the new one
-		updatePersonFKs(fromPerson, toPerson)
 		//Updating ProjectRelationship relation from 'fromPerson' to 'toPerson'
 		updateProjectRelationship(fromPerson, toPerson)
 		
@@ -492,7 +516,7 @@ class PersonService {
 		if(fromUserLogin && toUserLogin)
 			updateUserLoginRefrence(fromUserLogin, toUserLogin);
 	}
-	
+
 	/**
 	 * This method is used to update Person reference from 'fromPerson' to  'toPerson'
 	 * @param fromPerson : instance of fromPerson
@@ -500,22 +524,13 @@ class PersonService {
 	 * @return
 	 */
 	def updatePersonReference(fromPerson, toPerson){
-		def domainRelatMap = ['application':['sme_id', 'sme2_id', 'shutdown_by', 'startup_by', 'testing_by'],
-			'asset_comment':['resolved_by', 'created_by', 'assigned_to_id'], 'comment_note':['created_by_id'],
-			'asset_dependency':['created_by','updated_by'], 'asset_entity':['app_owner_id'],
-			'exception_dates':['person_id'], 'model':['created_by', 'updated_by', 'validated_by'],
-			'model_sync':['created_by_id', 'updated_by_id', 'validated_by_id'], 'move_event_news':['archived_by', 'created_by'],
-			'move_event_staff':['person_id'], 'workflow':['updated_by']]
-		
-		domainRelatMap.each{key, value->
-			value.each{prop->
+		PERSON_DOMAIN_RELATIONSHIP_MAP.each{key, value ->
+			value.each{ prop ->
 				jdbcTemplate.update("UPDATE ${key} SET ${prop} = '${toPerson.id}' where ${prop}= '${fromPerson.id}'")
 			}
 		}
 	}
-	
-	
-	
+
 	/**
 	 * This method is used to update all UserLogin reference in all domains from on account to another
 	 * @param fromUserLogin : instance of fromUserLogin
@@ -529,34 +544,6 @@ class PersonService {
 				jdbcTemplate.update("UPDATE ${table} SET ${column} = ${toUserLogin.id} where ${column}=${fromUserLogin.id}")
 			}
 		}
-	}
-
-	/**
-	 * This method is used to update person FKs to use the new person id.
-	 * @param toPerson : instance of Person
-	 * @param fromPerson : instance of Person
-	 * @return void
-	 */
-	def updatePersonFKs(fromPerson, toPerson) {
-		jdbcTemplate.update("UPDATE recipe_version SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE task_batch SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE asset_comment SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE asset_dependency SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE comment_note SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE model SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE model_sync SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE model_sync_batch SET created_by_id = ${toPerson.id} WHERE created_by_id = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE move_event_news SET created_by = ${toPerson.id} WHERE created_by = ${fromPerson.id} ")
-
-		jdbcTemplate.update("UPDATE move_event_news SET archived_by = ${toPerson.id} WHERE archived_by = ${fromPerson.id} ")
 	}
 
 	/**
@@ -593,7 +580,46 @@ class PersonService {
 			log.error("Can't update person project relationship: " + ex.getMessage(), ex)
 		}
 	}
-	
+
+	/**
+	 * Check if the user have a relationship with some entity, for example, Recipes
+	 * @param person - Person to check
+	 * @return boolean value that indicates if a relationship exist
+	 */
+	boolean haveRelationship(Person person) {
+		def existRelationship = false
+		def result
+
+		PERSON_DOMAIN_RELATIONSHIP_MAP.each{ key, value ->
+			value.each{ prop ->
+				if (!checkRelationshipException(key, prop)) {
+					result = jdbcTemplate.queryForList("SELECT count(*) AS count FROM ${key} WHERE ${prop} = '${person.id}'")
+					if (result[0].count > 0) {
+						log.info "Found relationship for '${person.firstName}, ${person.lastName}' on table: '${key}' over field: '${prop}'"
+					}
+					existRelationship = existRelationship || (result[0].count > 0)
+				}
+			}
+		}
+
+		return existRelationship
+	}
+
+	/**
+	 * Check if the table and field should be checked in the haveRelationship funcion
+	 * @param table to check
+	 * @param field to check
+	 * @return boolean tru
+	 */
+	boolean checkRelationshipException(table, field) {
+		def result = false
+		def fields = PERSON_DELETE_EXCEPTIONS_MAP[table]
+		if (fields != null) {
+			result = (fields[field] != null)
+		}
+		return result
+	}
+
 	/**
 	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
 	 * @param user - The user attempting to do the bulk delete
@@ -619,12 +645,12 @@ class PersonService {
 		def deleted = 0
 		def skipped = 0
 		def cleared = 0
+		def messages = []
 		
 		if (ids) {
 			for (id in ids) {
 				if (id.isLong()) {
 					Person person = Person.get(id)
-					
 					if (person) {
 						
 						// Don't delete if they have a UserLogin
@@ -634,7 +660,7 @@ class PersonService {
 							skipped++
 							continue
 						}
-						
+
 						// Don't delete if they have assigned tasks
 						def tasks = AssetComment.findAllByAssignedTo(person)
 						if (tasks) {
@@ -644,23 +670,34 @@ class PersonService {
 						}
 
 						Map map = [person:person]
-						
+
+						if (haveRelationship(person)) {
+							messages << "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due to associations with existing elements in one or more Projects. Please use Person Merge functionality if applicable."
+							skipped++
+							continue
+						}
 						// Optionally don't delete if they are associated with Assets by AppOwner, SME or SME2
 						def foundAssoc = false
-						['appOwner', 'sme', 'sme2'].each { column ->
+						def result
+						PERSON_DELETE_EXCEPTIONS_MAP.each { table, fields ->
+							fields.each { column, status ->
+								if (foundAssoc)
+									return
+								result = jdbcTemplate.queryForList("SELECT count(*) AS count FROM ${table} WHERE ${column} = '${person.id}'")
+								if (result[0].count > 0) {
+									if (deleteIfAssocWithAssets) {
+										// Clear out the person's associate with all assets for the given column
+										log.debug "Disassociated person as $column"
+										cleared += jdbcTemplate.update("UPDATE ${table} SET ${column} = NULL WHERE ${column} = '${person.id}'")
+									} else {
+										log.debug("Ignoring bulk delete of person ${id} $person as it contains $column association with asset(s)")
+										foundAssoc=true
+										return
+									}								
+								}
+							}
 							if (foundAssoc)
 								return
-							if (AssetEntity.find("from AssetEntity a where a.$column=:person", map)) {
-								if (deleteIfAssocWithAssets) {
-									// Clear out the person's associate with all assets for the given column
-									log.debug "Disassociated person as $column"
-									cleared += AssetEntity.executeUpdate("update Application a set a.${column}=NULL where a.${column}=:person", map)
-								} else {
-									log.debug("Ignoring bulk delete of person ${id} $person as it contains $column association with asset(s)")
-									foundAssoc=true
-									return
-								}								
-							}
 						}
 						if (foundAssoc) {
 							skipped++
@@ -679,6 +716,6 @@ class PersonService {
 			}
 		}
 		
-		return [deleted: deleted, skipped: skipped, cleared: cleared]
+		return [deleted: deleted, skipped: skipped, cleared: cleared, messages: messages]
 	}
 }	

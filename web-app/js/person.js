@@ -1,6 +1,14 @@
 
 var Person = {
 
+	showBulkDeleteModal: function() {
+		$('#bulkDeleteMessages').html("");
+		$('#bulkModalDeleteBtn').show();
+		$('#bulkModalCancelBtn').show();
+		$('#bulkModalCloseBtn').hide();
+		$("#bulkDeleteModal").modal("show");
+	},
+
 	// Used to Call the Person bulkDelete service call from the Person List
 	bulkDelete: function() {
 		var deleteIfAssocWithAssets = $('#deleteIfAssocWithAssets').prop('checked');
@@ -19,8 +27,24 @@ var Person = {
                         window.location.href = url;
                 } else {
 					if (data.status == 'success') {
-						alert('People deleted: ' + data.data.deleted + '\nPeople skipped: ' + data.data.skipped + '\nAsset assocations cleared: ' + data.data.cleared);
-						location.reload(true);
+						$('#bulkModalDeleteBtn').hide();
+						$('#bulkModalCancelBtn').hide();
+						$('#bulkModalCloseBtn').show();
+
+						var responseMsg = '<b>Results:</b><br><lu>' +
+							'<li>People deleted: ' + data.data.deleted +
+							'</li><li>People skipped: ' + data.data.skipped +
+							'</li><li>Asset assocations cleared: ' + data.data.cleared;
+
+						for (var i=0; i<data.data.messages.length;i++) {
+							responseMsg += '<li>' + data.data.messages[i] + '</li>';
+						}
+
+						responseMsg += '</lu>';
+
+						$('#bulkDeleteMessages').html(responseMsg);
+
+						//location.reload(true);
 					} else {
 						alert('Error deleting people - ' + data.errors.join());
 					}
@@ -29,6 +53,10 @@ var Person = {
 		}).fail(function() {
 			alert('Error deleting people');
 		});
+	},
+
+	closePopup: function() {
+		location.reload(true);
 	}
 }
 
