@@ -56,7 +56,7 @@ tdstm {
 					url = ['ldap://127.0.0.1:389'] 
 
 					// The credentials for the service account which can be in the format:
-					// 		DOMAIN\usernam
+					// 		DOMAIN\\username
 					//		UPN (e.g. ldap_service@example.com)
 					//		DN (e.g. CN=LDAP Service,OU=Accounts,DC=example,DC=com)
 					serviceName = 'ldap_service@example.com'
