@@ -57,7 +57,8 @@
 	$("#reportsMenuId a").css('background-color','#003366')
 	
 	$(document).ready(function() {
-		$("#moveBundleId").append("<option value='useForPlanning'>Planning Bundles</option>");
+		$("#moveBundleId").prepend("<option value='' disabled >──────────</option>")
+				.prepend("<option value='useForPlanning' id='planningBundlesId'>Planning Bundles</option>");
 		$("#databaseConflictsButton").removeAttr('disabled');
 	});
 	</script>
