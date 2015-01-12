@@ -45,77 +45,17 @@ ImportPage.prototype.getCommentCheckbox = function() {
   return browser.driver.findElement(by.id('commentId'));
 };
 
-ImportPage.prototype.setApplicationCheckValue = function(expected) {
-  var that = this;
-  this.getApplicationCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getApplicationCheckbox().click();
-    }
-  });
-};
-
-ImportPage.prototype.setDevicesCheckValue = function(expected) {
-  var that = this;
-  this.getDevicesCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getDevicesCheckbox().click();
-    }
-  });
-};
-
-ImportPage.prototype.setDatabaseCheckValue = function(expected) {
-  var that = this;
-  this.getDatabaseCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getDatabaseCheckbox().click();
-    }
-  });
-};
-
-ImportPage.prototype.setStorageCheckValue = function(expected) {
-  var that = this;
-  this.getStorageCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getStorageCheckbox().click();
-    }
-  });
-};
-
-ImportPage.prototype.setDependencyCheckValue = function(expected) {
-  var that = this;
-  this.getDependencyCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getDependencyCheckbox().click();
-    }
-  });
-};
-
-ImportPage.prototype.setCablingCheckValue = function(expected) {
-  var that = this;
-  this.getCablingCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getCablingCheckbox().click();
-    }
-  });
-};
-
-ImportPage.prototype.setCommentCheckValue = function(expected) {
-  var that = this;
-  this.getCommentCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getCommentCheckbox().click();
-    }
-  });
-};
-
 ImportPage.prototype.selectCheckboxToImport = function(toImport) {
- this.setApplicationCheckValue(toImport['application']);
- this.setDevicesCheckValue(toImport['devices']);
- this.setDatabaseCheckValue(toImport['database']);
- this.setStorageCheckValue(toImport['storage']);
- this.setDependencyCheckValue(toImport['dependency']);
- this.setCablingCheckValue(toImport['cabling']);
- this.setCommentCheckValue(toImport['comment']);
+  var that = this;
+  for (var outerKey in toImport){
+    (function (key) {
+      that['get'+key+'Checkbox']().getAttribute('checked').then(function(current){
+        if ((toImport[key] !== current) && !(toImport[key]==='false' && current===null)){
+          that['get'+key+'Checkbox']().click();
+        }
+      });
+    })(outerKey);
+  }
 };
 
 ImportPage.prototype.getFileField = function() {

@@ -10,7 +10,7 @@ Create a new project - Export file - Should be empty
 Validate New Project Template (sheets - col headers)
 Note: Phantonjs does not support currently file downloads - 
 */
-describe('Import - Export', function(){
+describe('Export', function(){
 
   var project ={
     'code': 'TOEXPIMP',
@@ -107,8 +107,8 @@ describe('Import - Export', function(){
     describe('generate Export',function () {
 
       it('Should export all devices', function () {
-        var toExport = {'application':'true', 'devices':'true','database':'true','storage':'true','room':'true','rack':'true',
-        'dependency':'true','cabling':'true','comment':'true'};
+        var toExport = {'Application':'true', 'Devices':'true','Database':'true','Storage':'true','Room':'true','Rack':'true',
+        'Dependency':'true','Cabling':'true','Comment':'true'};
         var exportPage =  new ExportPage();
         exportPage.selectCheckboxToExport(toExport);
         expect(exportPage.getApplicationCheckbox().getAttribute('checked')).toEqual('true');
@@ -213,4 +213,4 @@ describe('Import - Export', function(){
 
   }); // Check Export All on empty project
  
-}); // Import - Export
+}); // Export

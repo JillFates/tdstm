@@ -44,92 +44,24 @@ ExportPage.prototype.getCablingCheckbox = function() {
 ExportPage.prototype.getCommentCheckbox = function() {
   return browser.driver.findElement(by.id('commentId'));
 };
-ExportPage.prototype.setApplicationCheckValue = function(expected) {
-  var that = this;
-  this.getApplicationCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getApplicationCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setDevicesCheckValue = function(expected) {
-  var that = this;
-  this.getDevicesCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getDevicesCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setDatabaseCheckValue = function(expected) {
-  var that = this;
-  this.getDatabaseCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getDatabaseCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setStorageCheckValue = function(expected) {
-  var that = this;
-  this.getStorageCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getStorageCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setRoomCheckValue = function(expected) {
-  var that = this;
-  this.getRoomCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getRoomCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setRackCheckValue = function(expected) {
-  var that = this;
-  this.getRackCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getRackCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setDependencyCheckValue = function(expected) {
-  var that = this;
-  this.getDependencyCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getDependencyCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setCablingCheckValue = function(expected) {
-  var that = this;
-  this.getCablingCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getCablingCheckbox().click();
-    }
-  });
-};
-ExportPage.prototype.setCommentCheckValue = function(expected) {
-  var that = this;
-  this.getCommentCheckbox().getAttribute('checked').then(function(current){
-    if ((expected !== current) && !(expected==='false' && current===null)){
-      that.getCommentCheckbox().click();
-    }
-  });
-};
+
 ExportPage.prototype.getProgressStatus = function() {
   return browser.driver.findElement(by.id('progressStatus'));
 };
+
 ExportPage.prototype.selectCheckboxToExport = function(toExport) {
- this.setApplicationCheckValue(toExport['application']);
- this.setDevicesCheckValue(toExport['devices']);
- this.setDatabaseCheckValue(toExport['database']);
- this.setStorageCheckValue(toExport['storage']);
- this.setRoomCheckValue(toExport['room']);
- this.setRackCheckValue(toExport['rack']);
- this.setDependencyCheckValue(toExport['dependency']);
- this.setCablingCheckValue(toExport['cabling']);
- this.setCommentCheckValue(toExport['comment']);
+  for (var outerKey in toExport) {
+    var that = this;
+    (function (key) {
+      that['get'+key+'Checkbox']().getAttribute('checked').then(function(current){
+    if ((toExport[key] !== current) && !(toExport[key]==='false' && current===null)){
+      that['get'+key+'Checkbox']().click();
+    }
+  });
+    })(outerKey);
+  }
 };
+
 ExportPage.prototype.enableDevices = function() {
   var that = this;
   this.getDevicesCheckbox().getAttribute('checked').then(function(valor){

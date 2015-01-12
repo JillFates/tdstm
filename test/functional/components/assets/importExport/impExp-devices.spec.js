@@ -82,8 +82,8 @@ describe('Import Export Devices',function(){
     });
 
     it('should select only devices',function () {
-      var toImport = {'application':'false', 'devices':'true','database':'false','storage':'false',
-        'dependency':'false','cabling':'false','comment':'false'};
+      var toImport = {'Application':'false', 'Devices':'true','Database':'false','Storage':'false',
+        'Dependency':'false','Cabling':'false','Comment':'false'};
       var importPage =  new ImportPage();
       importPage.selectCheckboxToImport(toImport);
     });
@@ -270,7 +270,7 @@ describe('Import Export Devices',function(){
   
   }); // Import
 
-  xdescribe('Export', function () {
+  describe('Export', function () {
     var file = new File();
     var date = new Date().toJSON().slice(0,10).replace(/-/g,'');
     var filePath = process.env.DOWNLOAD_PATH+'TDS-To_Export_and_Import-All-SADFXRrcM-'+date+'.xls';
@@ -284,8 +284,10 @@ describe('Import Export Devices',function(){
     describe('generate Export',function () {
 
       it('Should export all devices', function () {
-        var toExport = {'application':'true', 'devices':'true','database':'true','storage':'true','room':'true','rack':'true',
-        'dependency':'true','cabling':'true','comment':'true'};
+        // var toExport = {'application':'true', 'devices':'true','database':'true','storage':'true','room':'true','rack':'true',
+        // 'dependency':'true','cabling':'true','comment':'true'};
+        var toExport = {'Application':'true', 'Devices':'true','Database':'true','Storage':'true','Room':'true','Rack':'true',
+        'Dependency':'true','Cabling':'true','Comment':'true'};
         var exportPage =  new ExportPage();
         exportPage.selectCheckboxToExport(toExport);
         expect(exportPage.getApplicationCheckbox().getAttribute('checked')).toEqual('true');

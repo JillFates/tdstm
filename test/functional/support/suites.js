@@ -80,10 +80,11 @@ module.exports = {
     '../components/assets/devices/devices.spec.js'
     ],
     importExport:[     // Phantomjd does not support file download yet 
+    '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
     '../components/assets/importExport/exportEmpty.spec.js',
     '../components/assets/importExport/impExp-devices.spec.js'
     ],
-    admin:[
+    admin:[ 
     '../components/admin/staff/merge.spec.js'
     ]
 };

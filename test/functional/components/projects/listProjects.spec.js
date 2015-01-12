@@ -18,7 +18,7 @@ describe('List Projects', function(){
     });
 
     it('should only be found MarketingDemo project', function(){
-      var results= 2
+      var results= 2;
       browser.sleep(1000);
       listProjectPage.verifySearchResults(results).then(function(list){
         expect(list.length).toEqual(results);
@@ -36,7 +36,7 @@ describe('List Projects', function(){
       expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
     });
 
-    }); // search by code and select it
+  }); // search by code and select it
 
   
   it('should load list projects page after select Client/Project ListProjects', function(){
