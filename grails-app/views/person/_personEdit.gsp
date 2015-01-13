@@ -132,7 +132,7 @@
 					<input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
 				</td>
 			</tr>
-			<tr>
+			<tr class="js-password">
 				<td>
 					Hide password:
 				</td>
@@ -140,7 +140,7 @@
 					<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordId"/>
 				</td>
 			</tr>
-			<tr class="prop">
+			<tr class="prop js-password">
 				<td valign="top" class="name">
 					<label for="password">Old Password:</label>
 				</td>
@@ -149,7 +149,7 @@
 					<input type="text" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
 				</td>
 			</tr>
-			<tr class="prop">
+			<tr class="prop js-password">
 				<td valign="top" class="name">
 					<label for="password">New Password:</label>
 				</td>
@@ -157,7 +157,7 @@
 					<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword(this)" id="newPasswordId" value=""/>
 				</td>
 			</tr>
-			<tr>
+			<tr class="js-password">
 				<td>
 					Requirements:
 				</td>

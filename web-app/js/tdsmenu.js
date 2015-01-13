@@ -44,7 +44,16 @@
 
 		// Update person details 
 		function updatePersonDetails( e ){
+			console.log(e);
 			var personDetails = eval("(" + e.responseText + ")");
+			
+			// If the user account is not local, we should hide all password-related functionality.
+			if(!personDetails.isLocal){
+				$(".js-password").each(function(e){
+					$(this).css("display", "none");
+				});
+			}
+
 			$("#personId").val(personDetails.person.id)
 			$("#firstNameId").val(personDetails.person.firstName);
 			$("#middleNameId").val(personDetails.person.middleName);

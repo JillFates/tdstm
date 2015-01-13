@@ -553,7 +553,7 @@ class PersonController {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 		def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
 		
-		def personDetails = [person:person, expiryDate: expiryDate]
+		def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
 		render personDetails as JSON
 	}
 	/*-----------------------------------------------------------
