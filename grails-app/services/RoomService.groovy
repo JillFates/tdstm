@@ -11,6 +11,7 @@ class RoomService {
 	boolean transactional = true
 	def securityService
 	def userPreferenceService
+	def rackService
 
 	/**
 	 * Used to update the information about Rooms, Racks and the devices within the racks
@@ -116,6 +117,10 @@ class RoomService {
 								newRack.powerB = (params["powerB_"+id]) ? NumberUtils.toDouble(params["powerB_"+id],0).round() : 0
 								newRack.powerC = (params["powerC_"+id]) ? NumberUtils.toDouble(params["powerC_"+id],0).round() : 0
 								def model = params["model_"+id] != "null" ?  Model.get(params["model_"+id]) : null
+								// Find default model
+								if (model == null) {
+									model = rackService.getDefaultRackModel()
+								}
 								newRack.manufacturer = model?.manufacturer
 								newRack.model = model
 								if(powerType != "Watts"){
