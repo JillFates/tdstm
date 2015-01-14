@@ -1,6 +1,6 @@
 'use strict';
 var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
+var  ListApps = require('../listAssets.po.js');
 describe('Logical Storage', function(){
 
   it('should load  Logical Storage List page after select Assets > Logical Storage', function(){

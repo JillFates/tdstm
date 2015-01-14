@@ -1,6 +1,7 @@
 'use strict';
 var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
+var  ListApps = require('./databaseList.po.js');
+
 describe('Database List', function(){
 
   it('should load database List page after select Assets > Databases', function(){

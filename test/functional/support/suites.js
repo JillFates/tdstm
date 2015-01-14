@@ -81,7 +81,7 @@ module.exports = {
     ],
     importExport:[     // Phantomjd does not support file download yet 
     '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
-    '../components/assets/importExport/exportEmpty.spec.js',
+    '../components/assets/importExport/exportEmpty.spec.js',    
     '../components/assets/importExport/impExp-devices.spec.js'
     ],
     admin:[ 

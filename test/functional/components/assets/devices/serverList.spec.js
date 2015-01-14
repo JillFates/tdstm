@@ -1,6 +1,6 @@
 'use strict';
 var  Menu = require('../../menu/menu.po.js');
-var  ListApps = require('../listApps.po.js');
+var  ListApps =  require('./listDevices.po.js');
 
 describe('Server', function(){
 
