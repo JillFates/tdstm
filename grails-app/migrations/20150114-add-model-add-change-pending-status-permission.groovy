@@ -18,3 +18,4 @@ databaseChangeLog = {
 			((select id from permissions where permission_group = 'TASK' and permission_item= 'ChangePendingStatus'), '${role}')""")
 		}
 	}
+}
