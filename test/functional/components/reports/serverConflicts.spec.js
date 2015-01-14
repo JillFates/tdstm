@@ -26,22 +26,23 @@ describe('Servers Conflicts',function(){
 
       });
       it('should have 11 options',function(){
-        expect(serverConflictsPage.getBundlesOptionsLength()).toEqual(11);
+        expect(serverConflictsPage.getBundlesOptionsLength()).toEqual(12);
 
       });
       it('should have the following options',function(){
         serverConflictsPage.getBundlesOptions().then(function(list){
-          expect(list[0].getText()).toEqual('Buildout');
-          expect(list[1].getText()).toEqual('M1');
-          expect(list[2].getText()).toEqual('M2');
-          expect(list[3].getText()).toEqual('M3');
-          expect(list[4].getText()).toEqual('Master Bundle');
-          expect(list[5].getText()).toEqual('Not Moving');
-          expect(list[6].getText()).toEqual('Retired');
-          expect(list[7].getText()).toEqual('Retiring');
-          expect(list[8].getText()).toEqual('TBD');
-          expect(list[9].getText()).toEqual('Wave1- Bundle1');
-          expect(list[10].getText()).toEqual('Planning Bundles');
+          expect(list[0].getText()).toEqual('Planning Bundles');
+          expect(list[1].getText()).toEqual('──────────');
+          expect(list[2].getText()).toEqual('Buildout');
+          expect(list[3].getText()).toEqual('M1');
+          expect(list[4].getText()).toEqual('M2');
+          expect(list[5].getText()).toEqual('M3');
+          expect(list[6].getText()).toEqual('Master Bundle');
+          expect(list[7].getText()).toEqual('Not Moving');
+          expect(list[8].getText()).toEqual('Retired');
+          expect(list[9].getText()).toEqual('Retiring');
+          expect(list[10].getText()).toEqual('TBD');
+          expect(list[11].getText()).toEqual('Wave1- Bundle1');
         });
       });
   });

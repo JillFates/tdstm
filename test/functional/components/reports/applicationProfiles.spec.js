@@ -12,40 +12,47 @@ describe('Application Profiles Report', function(){
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationProfiles');
   });
 
-
   describe('set Report Criteria and generate it', function(){
 
     it('should have Application Profiles as title', function(){
       var appProfilesPage = new Reports();
       expect(appProfilesPage.getPageTitle()).toEqual('Application Profiles');
     });
+
     describe('Criteria',function(){
+
       describe('Bundles dropdown',function(){
         var appProfilesPage = new Reports();
+
         xit('should have bundle label', function(){
           expect(appProfilesPage.getBundleLabel()).toEqual('Bundles:*');
         });
+
         it('should have  All bundles as default option',function(){
           expect(appProfilesPage.getBundleSelected()).toEqual('Buildout');
         });
-        it('should have x options',function(){
-          expect(appProfilesPage.getBundlesOptionsLength()).toEqual(11);
+
+        it('should have 12 options',function(){
+          expect(appProfilesPage.getBundlesOptionsLength()).toEqual(12);
         });
+
         it('should have the following options',function(){
           appProfilesPage.getBundlesOptions().then(function(list){
-            expect(list[0].getText()).toEqual('Buildout');
-            expect(list[1].getText()).toEqual('M1');
-            expect(list[2].getText()).toEqual('M2');
-            expect(list[3].getText()).toEqual('M3');
-            expect(list[4].getText()).toEqual('Master Bundle');
-            expect(list[5].getText()).toEqual('Not Moving');
-            expect(list[6].getText()).toEqual('Retired');
-            expect(list[7].getText()).toEqual('Retiring');
-            expect(list[8].getText()).toEqual('TBD');
-            expect(list[9].getText()).toEqual('Wave1- Bundle1');
-            expect(list[10].getText()).toEqual('Planning Bundles');
+            expect(list[0].getText()).toEqual('Planning Bundles');
+            expect(list[1].getText()).toEqual('──────────');
+            expect(list[2].getText()).toEqual('Buildout');
+            expect(list[3].getText()).toEqual('M1');
+            expect(list[4].getText()).toEqual('M2');
+            expect(list[5].getText()).toEqual('M3');
+            expect(list[6].getText()).toEqual('Master Bundle');
+            expect(list[7].getText()).toEqual('Not Moving');
+            expect(list[8].getText()).toEqual('Retired');
+            expect(list[9].getText()).toEqual('Retiring');
+            expect(list[10].getText()).toEqual('TBD');
+            expect(list[11].getText()).toEqual('Wave1- Bundle1');
           });
         }); 
+
       }); // Bundles Dropdown
 
       describe('SME dropdown',function(){
@@ -55,18 +62,22 @@ describe('Application Profiles Report', function(){
 
       });// app Owner dropdown
     }); //Criteria
+
     it('should generate the report after click on generate button', function(){
       var appProfilesPage = new Reports();
       appProfilesPage.generateApplicationProfilesBtn().click();
       expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
     });
+
     describe('generated report Web',function(){
+
       it('should get title from generated report',function(){
         var appProfilesPage = new Reports();
         expect(appProfilesPage.getAppProfileGeneratedHeader().getText()).toContain('Application Profiles - MarketingDemo');
       });
+
     }); //generated report
 
   }); // set report Criteria and generate it
 
-});
+}); //Application Profiles Report

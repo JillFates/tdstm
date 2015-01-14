@@ -2,11 +2,14 @@
 var  Menu = require('../menu/menu.po.js');
 var ListProjects = require('./listProjects.po.js');
 describe('List Projects', function(){
+  
   var menu = new Menu();
   var listProjectPage =  new ListProjects();
   
   describe('search by code and select it', function(){
+    
     var projId;
+    
     it('should load list projects page after select Client/Project ListProjects', function(){
       menu.goToProjects('listProjects');
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
