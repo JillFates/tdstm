@@ -233,6 +233,14 @@ class SecurityService implements InitializingBean {
 	}
 	
 	/**
+     * Checks whether current user is allow to edit pending status for a task or not.
+	 */
+	 def isChangePendingStatusAllowed() {
+	 	return hasPermission(getUserLogin(), 'ChangePendingStatus')
+	 }
+
+
+	/**
 	 * Used to get the UserLogin object of the currently logged in user
 	 * @return UserLogin object or null if user is not logged in
 	 */
