@@ -656,6 +656,11 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		var deferred = q.defer();
 		http.post(utils.url.applyRootPath('/assetEntity/updateStatusSelect?format=json&id=' + commentId)).
 		success(function(data, status, headers, config) {
+			var statusArray = data.data;
+			if((statusArray.length == 0) || (statusArray.length == 1 && statusArray[0] == "Pending")){
+				console.log("OK");
+				$("#status").prop("disabled", "disabled");
+			}
 			deferred.resolve(data);
 		}).
 		error(function(data, status, headers, config) {
