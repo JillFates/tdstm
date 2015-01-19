@@ -6,7 +6,7 @@
 		</tr>
 	</table>
 </span>
-<div id="controlPanel" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 160px; background-color:white;position: absolute;display: ${(showControls=='controls')?('block'):('none')};">
+<div id="controlPanel" style="width: 160px;display: ${(showControls=='controls')?('block'):('none')};">
 	<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
 		<tr>
 			<td style="padding: 3px 3px;" colspan="2"><h3>Control Panel</h3></td>
@@ -121,7 +121,7 @@
 		
 	</table>
 </div>
-<div id="legendDivId" style="float: left;border: 1px solid #ccc;margin-left: 3px;margin-top: 3px;width: 150px; background-color:white;position: absolute;display: ${(showControls=='legend')?('block'):('none')};">
+<div id="legendDivId" style="display: ${(showControls=='legend')?('block'):('none')};">
 	<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 140px;" >
 		<tr><td style="padding: 3px 3px;" colspan="2"><h3>Legend</h3></td></tr>
 			<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>

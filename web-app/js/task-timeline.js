@@ -693,6 +693,9 @@ function buildGraph (response, status) {
 
 	// Toggles selection of a task
 	function toggleTaskSelection(taskObject) {
+		console.log("__________________________");
+		console.log(siblingGroups);
+		console.log(siblingGroupsReduced);
 		
 		if (dragging)
 			return;

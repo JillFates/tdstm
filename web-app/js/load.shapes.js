@@ -5,31 +5,22 @@
 function defineShapes (defs) {
 	
 	// define the arrowhead markers used for marking dependencies
-	defs.append("marker")
-		.attr("id", "arrowhead")
-		.attr("viewBox", "0 -5 10 10")
-		.attr("refX", 20)
-		.attr("refY", 0)
-		.attr("markerUnits", "userSpaceOnUse")
-		.attr("markerWidth", 10)
-		.attr("markerHeight", 10)
-		.attr("orient", "auto")
-		.append("path")
-		.attr("d", "M0,-4L10,0L0,4")
-		.attr('fill', '#808080');
-	
-	defs.append("marker")
-		.attr("id", "arrowheadSelected")
-		.attr("viewBox", "0 -5 10 10")
-		.attr("refX", 20)
-		.attr("refY", 0)
-		.attr("markerUnits", "userSpaceOnUse")
-		.attr("markerWidth", 10)
-		.attr("markerHeight", 10)
-		.attr("orient", "auto")
-		.append("path")
-		.attr("d", "M0,-5L10,0L0,5")
-		.attr("fill", "#00dd00");
+	var markers = {'arrowhead':'#808080', 'arrowheadSelected':'green', 'arrowheadCyclical':'blue', 'arrowheadRedundant':'orange'};
+	var keys = Object.keys(markers);
+	for (var i = 0; i < keys.length; ++i) {
+		defs.append("marker")
+			.attr("id", keys[i])
+			.attr("viewBox", "0 -5 10 10")
+			.attr("refX", 20)
+			.attr("refY", 0)
+			.attr("markerUnits", "userSpaceOnUse")
+			.attr("markerWidth", 10)
+			.attr("markerHeight", 10)
+			.attr("orient", "auto")
+			.append("path")
+			.attr("d", "M0,-4L10,0L0,4")
+			.attr('fill', markers[keys[i]]);
+	}
 	
 	// define the custom database object
 	var databaseShape = defs
@@ -73,7 +64,7 @@ function defineShapes (defs) {
 		.attr("cx", 25)
 		.attr("r", 1);
 
-	// define the shapes for the other objects
+	// define the shapes for the other objects that do not yet have custom svg shapes
 	defs
 		.append("path")
 		.attr("id", "applicationShapeId")
@@ -112,5 +103,4 @@ function defineShapes (defs) {
 		.attr("d", d3.svg.symbol().size(150).type('triangle-up'));
 		
 	return null;
-//	return {databaseShape:databaseShape, deviceShape:deviceShape};
 }

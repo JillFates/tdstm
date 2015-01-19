@@ -4185,13 +4185,14 @@ class AssetEntityController {
 			// This map will drive how the query is constructed for each of the various options
 			def qmap = [
 				'APPLICATION': 		[ assetClass: AssetClass.APPLICATION, domain: Application ],
-				'SERVER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
+				'SERVER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
 				'DATABASE': 		[ assetClass: AssetClass.DATABASE, domain: Database ],
 				'NETWORK-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNetworkDeviceTypes() ],
 				// 'NETWORK-LOGICAL': 	[],
 				'STORAGE-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getStorageTypes() ],
 				'STORAGE-LOGICAL': 	[ assetClass: AssetClass.STORAGE, domain: Files ],
-				'OTHER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ]
+				'OTHER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ],
+				'ALL': 			[ domain: AssetEntity ]
 			]
 
 
@@ -4201,9 +4202,11 @@ class AssetEntityController {
 			StringBuffer query = new StringBuffer("SELECT @COLS@ FROM ")
 
 			if (qmap.containsKey(params.assetClassOption)) {
-				def qm=qmap[params.assetClassOption]
+				def qm = qmap[params.assetClassOption]
 				def assetClass = qm.assetClass
-				def qparams = [ project:project, assetClass:qm.assetClass ]
+				def qparams = [ project:project ]
+				if (assetClass)
+					qparams = [ project:project, assetClass:qm.assetClass ]
 
 				query.append(qm.domain.name + ' AS a ')
 
@@ -4216,8 +4219,11 @@ class AssetEntityController {
 						query.append('JOIN a.model AS m ')
 					}
 				}
-
-				query.append('WHERE a.project=:project AND a.assetClass=:assetClass ')
+				
+				if (assetClass)
+					query.append('WHERE a.project=:project AND a.assetClass=:assetClass ')
+				else
+					query.append('WHERE a.project=:project ')
 
 				if (params.containsKey('q') && params.q.size() > 0) {
 					query.append('AND a.assetName LIKE :q ')
@@ -4347,6 +4353,272 @@ class AssetEntityController {
 			def assetTypes = assetEntityService.assetTypesOf(manufacturerId, term, currentProject)
 
 			render(ServiceResults.success(['assetTypes' : assetTypes]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (IllegalArgumentException e) {
+			ServiceResults.forbidden(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
+	}
+	
+	def applicationArchitectureViewer = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		
+		def project = securityService.getUserCurrentProject()
+		def level = NumberUtils.toInt(params.level)
+		if (level == 0)
+			level = 3
+		return [assetId:params.assetId, level:level]
+	}
+	
+	/**
+	 * Returns the data needed to generate the application architecture graph
+	 */
+	def applicationArchitectureGraph = {
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		try {
+			def project = securityService.getUserCurrentProject()
+			def asset = AssetEntity.get(NumberUtils.toInt(params.assetId))
+			def level = NumberUtils.toInt(params.level)
+			def deps = []
+			def sups = []
+			def assetsList = []
+			def dependencyList = []
+			def cyclicalDependencyList = []
+			def endPointStacks = [:]
+			
+			if (asset.project != project) {
+				throw new UnauthorizedException();
+			}
+			
+			// build the graph based on a specific asset
+			if (params.mode.equals("assetId")) {
+				
+				// Check if the parameters are null
+				if (params.assetId == null || params.level == null) {
+					return [nodes:[] as JSON, links:[] as JSON, assetId:params.assetId, level:params.level]
+				}
+				
+				// recursively get all the nodes and links that depend on the asset
+				def stack = []
+				def constructDeps
+				constructDeps = { a, l ->
+					def indent = ""
+					for (int i = 0; i < level-l; ++i)
+						indent += "  "
+					if (!stack.contains(a)) {
+						stack += a
+						deps.push(a)
+						if ( ! (a in assetsList) )
+							assetsList.push(a)
+						if (l > 0) {
+							def dependent = AssetDependency.findAllByAsset(a)
+							dependent.each {
+								def repeat = false
+								endPointStacks.get(a).each { endStack ->
+									endStack.each { parentAsset ->
+										if (it.dependent == parentAsset)
+											repeat = true
+									}
+								}
+								if (!repeat) {
+									if ( ! (it in dependencyList) )
+										dependencyList.push(it)
+									constructDeps(it.dependent, l-1)
+								} else {
+									cyclicalDependencyList.push(it)
+								}
+							}
+						} else {
+							if (endPointStacks.get(a) == null)
+								endPointStacks.put(a, [])
+							endPointStacks.get(a).push(stack)
+						}
+						stack -= a
+					} else {
+						cyclicalDependencyList.push(AssetDependency.findByAssetAndDependent(stack[stack.size()-1], a))
+					}
+					
+				}
+				constructDeps(asset, level)
+				
+				// recursively get all the nodes and links that support the asset
+				stack = []
+				def constructSups
+				constructSups = { a, l ->
+					def indent = ""
+					for (int i = 0; i < level-l; ++i)
+						indent += "  "
+					if (!stack.contains(a) && (!deps.contains(a) || a.assetName == asset.assetName)) {
+						stack += a
+						sups.push(a)
+						if ( ! (a in assetsList) )
+							assetsList.push(a)
+						if (l > 0) {
+							def supports = AssetDependency.findAllByDependent(a)
+							supports.each {
+								def repeat = deps.contains(it.asset)
+								endPointStacks.get(a).each { endStack ->
+									endStack.each { parentAsset ->
+										if (it.asset == parentAsset)
+											repeat = true
+									}
+								}
+								if (!repeat) {
+									if ( ! (it in dependencyList) )
+										dependencyList.push(it)
+									constructSups(it.asset, l-1)
+								} else {
+									cyclicalDependencyList.push(it)
+								}
+							}
+						} else {
+							if (endPointStacks.get(a) == null)
+								endPointStacks.put(a, [])
+							endPointStacks.get(a).push(stack)
+						}
+						stack -= a
+					} else {
+						cyclicalDependencyList.push(AssetDependency.findByAssetAndDependent(a, stack[stack.size()-1]))
+					}
+				}
+				constructSups(asset, level)
+			
+			// this mode hasn't been implemented yet
+			} else if (params.mode.equals("dependencyBundle")) {
+				def bundle = params.dependencyBundle
+				def assets = assetDependencyBundle.findAllWhere(project:project, dependencyBundle:bundle)
+			}
+			
+			// find any links between assets that weren't found with the DFS
+			def assetIds = assetsList.id
+			def extraDependencies = []
+			assetsList.each { a ->
+				def depsList = AssetDependency.findAllByAssetAndDependentInList(a, assetsList)
+				depsList.each { dep ->
+					if (! (dep in dependencyList)) {
+						extraDependencies.push(dep)
+					}
+				}
+			}
+			
+			// add in any extra dependencies that were found
+			extraDependencies.each {
+				dependencyList += it
+			}
+			
+			def serverTypes = AssetType.getAllServerTypes()
+			
+			// Create the Nodes
+			def graphNodes = []
+			def name = ''
+			def shape = 'circle'
+			def size = 150
+			def title = ''
+			def color = ''
+			def type = ''
+			def assetType = ''
+			def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
+			
+			// create a node for each asset
+			assetsList.each {
+				
+				// get the type used to determine the icon used for this asset's node 
+				assetType = it.model?.assetType?:it.assetType
+				size = 150
+				if (it.assetClass == AssetClass.APPLICATION) {
+					type = AssetType.APPLICATION.toString()
+					size = it.criticality ? criticalitySizes[it.criticality] : 200
+				} else if (it.assetClass == AssetClass.DATABASE) {
+					type = AssetType.DATABASE.toString()
+				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getVirtualServerTypes()) {
+					type = AssetType.VM.toString()
+				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getPhysicalServerTypes()) {
+					type = AssetType.SERVER.toString()
+				} else if (it.assetClass == AssetClass.STORAGE) {
+					type = AssetType.FILES.toString()
+				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getStorageTypes()) {
+					type = AssetType.STORAGE.toString()
+				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getNetworkDeviceTypes()) {
+					type = AssetType.NETWORK.toString()
+				} else {
+					type = 'other'
+				}
+				
+				graphNodes << [
+					id:it.id, name:it.assetName, 
+					type:type, assetClass:it.assetClass.toString(),
+					shape:shape, size:size, title:it.assetName, 
+					color: ((it == asset)?('red'):('grey')), 
+					parents:[], children:[], checked:false, siblings:[]
+				]
+			}
+			
+			// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
+			def nodeIds = []
+			graphNodes.each {
+				nodeIds << it.id
+			}
+			def defaults = moveBundleService.getMapDefaults(graphNodes.size())
+			
+			
+			// Create the links
+			def graphLinks = []
+			def i = 0
+			def opacity = 1
+			def statusColor = 'grey'
+			dependencyList.each {
+				if (it.status=='Questioned') {
+					opacity = 1
+					statusColor='red'
+				} else if ( ! ( it.status in ['Unknown','Validated'] ) ) {
+					opacity = 0.2
+					statusColor = 'grey'
+				} else {
+					opacity = 1
+					statusColor = 'grey'
+				}
+				def sourceIndex = nodeIds.indexOf(it.asset.id)
+				def targetIndex = nodeIds.indexOf(it.dependent.id)
+				if (sourceIndex != -1 && targetIndex != -1) {
+					def isCyclical = (sups.contains(it.asset) != sups.contains(it.dependent)) && (deps.contains(it.asset) != deps.contains(it.dependent))
+					isCyclical = isCyclical || (it in cyclicalDependencyList)
+					isCyclical = isCyclical || (it in extraDependencies)
+					
+					graphLinks << ["id":i, "parentId":it.asset.id, "childId":it.dependent.id, "child":targetIndex, "parent":sourceIndex, 
+						"value":2, "statusColor":statusColor, "opacity":opacity, "redundant":false, "mutual":null, "cyclical":isCyclical]
+					i++
+				}
+			}
+			
+			// Set the dependency properties of the nodes
+			graphLinks.each {
+				def child = it.child
+				def parent = it.parent
+				if ( ! it.cyclical ) {
+					graphNodes[child].parents.add(it.id)
+					graphNodes[parent].children.add(it.id)
+				}
+			}
+			
+			// maps asset type names to simpler versions
+			def assetTypes = [(AssetType.APPLICATION.toString()):"application", (AssetType.DATABASE.toString()):"database", (AssetType.VM.toString()):"serverVirtual", 
+						(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
+						(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "other":"other"]
+			
+			def model2 = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, level:params.level, assetTypes:assetTypes as JSON]
+			render(view:'_applicationArchitectureGraph', model:model2)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {

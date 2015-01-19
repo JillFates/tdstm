@@ -12,11 +12,42 @@ line.link.selected {
 	stroke: #00dd00;
 	marker-end: url(#arrowheadSelected);
 }
+line.link.redundant {
+	stroke: orange !important;
+	stroke-opacity: 0.8 !important;
+	marker-end: url(#arrowheadRedundant);
+	stroke-dasharray: 5,3;
+}
+line.link.redundant.hidden {
+	display: none !important;
+}
+line.link.cyclical {
+	stroke: blue !important;
+	stroke-opacity: 0.3 !important;
+	marker-end: url(#arrowheadCyclical);
+	stroke-dasharray: 8,3;
+}
+
+#arrowheadRedundant {
+	opacity: 0.5 !important;
+}
+#arrowheadCyclical {
+	opacity: 0.3 !important;
+}
+#arrowheadSelected {
+	opacity: 1 !important;
+}
 
 text {
 	cursor: default;
 	fill: #ffffff;
-	pointer-events:none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none !important;
 }
 .blackText text {
 	fill: #000000 !important;
@@ -24,21 +55,21 @@ text {
 
 .ui-resizable-helper {
 	border: 2px dotted #00F;
-	z-index: 1000 !important;
+	z-index: 90 !important;
 }
 .ui-resizable-helper {
 	border: 2px dotted #00F;
-	z-index: 1000 !important;
+	z-index: 90 !important;
 }
 .ui-resizable-helper {
 	border: 2px dotted #00F;
-	z-index: 1000 !important;
+	z-index: 90 !important;
 }
 #legendDivId {
-	z-index: 1001 !important;
+	z-index: 91 !important;
 }
 #controlPanel {
-	z-index: 1001 !important;
+	z-index: 91 !important;
 }
 #svgContainerId {
 	border-width:1px;
@@ -49,7 +80,6 @@ text {
 	background: none !important;
 }
 #databaseShapeBackgroundId {
-	/*fill: grey !important;*/
 	stroke: black !important;
 }
 #databaseShapeForegroundId {
@@ -76,4 +106,65 @@ text {
 	stroke-width: 1px !important;
 	cx: 25px !important;
 	r: 1 !important;
+}
+
+.customMenu {
+	display: none;
+	z-index: 1000;
+	position: absolute;
+	overflow: hidden;
+	border: 1px solid #CCC;
+	white-space: nowrap;
+	font-family: sans-serif;
+	background: #FFF;
+	color: #333;
+	border-radius: 1px;
+	padding: 0;
+}
+
+/* Each of the items in the list */
+.customMenu li {
+	padding: 4px 24px;
+	cursor: pointer;
+	list-style-type: none;
+	background-repeat: no-repeat !important;
+	background-position: 4px 2px !important;
+}
+.customMenu li.show {
+	background: url(../icons/database_table.png);
+}
+.customMenu li.edit {
+	background: url(../icons/database_edit.png);
+}
+.customMenu li.console {
+	background: url(../icons/script_add.png);
+}
+.customMenu li.graph {
+	background: url(../icons/chart_organisation.png);
+}
+.customMenu li.refresh {
+	background: url(../icons/arrow_refresh.png);
+}
+
+.customMenu li:hover {
+	background-color: #DEF;
+}
+
+#controlPanel {
+	float: left;
+	border: 1px solid #ccc;
+	margin-left: 3px;
+	margin-top: 3px;
+	background-color: white;
+	position: absolute;
+}
+
+#legendDivId {
+	float: left;
+	border: 1px solid #ccc;
+	margin-left: 3px;
+	margin-top: 3px;
+	width: 150px;
+	background-color: white;
+	position: absolute;
 }

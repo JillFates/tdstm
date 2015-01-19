@@ -380,6 +380,10 @@ td.buttonR .powerIcon {
     background: transparent url(../icons/table_save.png) 5px 50% no-repeat;
     padding-left: 28px;
 }
+.buttons input.architectureGraph {
+    background: transparent url(../icons/chart_organisation.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
 .onhold_button {
     background-color:#FFFF33;
 }
