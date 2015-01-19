@@ -20,6 +20,7 @@ class PersonService {
 	def sessionFactory
 	def partyRelationshipService
 	def securityService
+	def projectService
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -717,5 +718,62 @@ class PersonService {
 		}
 		
 		return [deleted: deleted, skipped: skipped, cleared: cleared, messages: messages]
+	}
+
+	String assignToProject(personId, eventId, roleType, val ){
+		String message = ""
+		// Check if the user has permission to edit the staff
+		if ( RolePermissions.hasPermission("EditProjectStaff") ) {
+			// Check if the person and events are not null
+			if ( personId && eventId ) {
+				// Check if the user is trying to edit a TDS employee without permission
+				if ( ! ( partyRelationshipService.isTdsEmployee(personId) && ! RolePermissions.hasPermission("EditTDSPerson") ) ) {
+					roleType = roleType ?: 'AUTO'
+					def roleTypeInstance = RoleType.findById( roleType )
+					def moveEvent = MoveEvent.get( eventId )
+					def person = Person.get( personId )
+					def project = moveEvent.project ?: securityService.getUserCurrentProject()
+					if(hasAccessToProject(person, project)){
+						def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
+						if(moveEventStaff && val == "0"){
+							moveEventStaff.delete(flush:true)
+						} else if( !moveEventStaff ) {
+							def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
+							moveEventStaff = new MoveEventStaff()
+							moveEventStaff.person = person
+							moveEventStaff.moveEvent = moveEvent
+							moveEventStaff.role = RoleType.findById( roleType )
+							if(!moveEventStaff.save(flush:true)){
+								moveEventStaff.errors.allErrors.each{ println it}
+								message = "An error occurred processing your request"
+							}
+						}	
+					}else{
+						message = "This person doesn't have access to the selected project"
+					}
+					
+				} else {
+					message = "You do not have permission to edit TDS employees"
+				}
+			} else {
+				message = "The selected person and move event are not both valid"
+			}
+		} else {
+			message = "You do not have permission to assign staff to events"
+		}
+		return message
+	}
+
+	Boolean hasAccessToProject(Person person, Project project){
+		def userLogin = UserLogin.findByPerson(person)
+		def projects =  projectService.getUserProjects(userLogin)
+		def found = false
+		projects.each{currentProject ->
+			if(currentProject.id == project.id){
+				found = true
+				return
+			}
+		}
+		return found
 	}
 }	

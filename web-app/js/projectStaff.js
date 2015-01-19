@@ -173,7 +173,6 @@ function saveEventStaff (source) {
 	var eventId = source.parent().attr('id')
 	var personId = source.attr('id')
 	var roleType = row.find('#roleColumnId').attr('title')
-	
 	toggleChangedStyle(source)
 	
 	var project = row.find('#projectColumnId').children('input')
@@ -189,8 +188,18 @@ function saveEventStaff (source) {
 		data: params,
 		type:'POST',
 		success: function(data) {
-			if(data.flag == "false"){
-			   alert(data.message)
+			console.log(data);
+			if(!data.data.flag){
+			   var errmsg = data.data.message;
+				var msgDiv = $('#messageDiv');
+				if (msgDiv.length) {
+					msgDiv.html(errmsg);
+					$("#messageDiv").css("display", "");
+				} else {
+					alert(errmsg);
+				}
+			}else{
+				$("#messageDiv").css("display", "none");
 			}
 			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
 		},

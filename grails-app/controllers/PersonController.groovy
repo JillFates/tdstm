@@ -1179,53 +1179,24 @@ class PersonController {
 	 * @return if updated successful return true else return false
 	 */
 	def saveEventStaff = {
-		
-		def flag = true
-		def message = ""
-		
-		// Check if the user has permission to edit the staff
-		if ( RolePermissions.hasPermission("EditProjectStaff") ) {
-			// Check if the person and events are not null
-			if ( params.personId && params.eventId ) {
-				// Check if the user is trying to edit a TDS employee without permission
-				if ( ! ( partyRelationshipService.isTdsEmployee(params.personId) && ! RolePermissions.hasPermission("EditTDSPerson") ) ) {
-					def personId = params.personId
-					def eventId = params.eventId
-					def roleType = params.roleType ?: 'AUTO'
-					def roleTypeInstance = RoleType.findById( roleType )
-					def moveEvent = MoveEvent.get( eventId )
-					def person = Person.get( personId )
-					def project = moveEvent.project ?: securityService.getUserCurrentProject()
-					
-					def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
-					if(moveEventStaff && params.val == "0"){
-						moveEventStaff.delete(flush:true)
-					} else if( !moveEventStaff ) {
-						def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )
-						moveEventStaff = new MoveEventStaff()
-						moveEventStaff.person = person
-						moveEventStaff.moveEvent = moveEvent
-						moveEventStaff.role = RoleType.findById( roleType )
-						if(!moveEventStaff.save(flush:true)){
-							moveEventStaff.errors.allErrors.each{ println it}
-							flag = false
-						}
-					}
-				} else {
-					message = "You do not have permission to edit TDS employees"
-					flag = false
-				}
-			} else {
-				message = "The selected person and move event are not both valid"
-				flag = false
-			}
-		} else {
-			message = "You do not have permission to assign staff to events"
-			flag = false
+		// Validates the user is logged in.
+		def loginUser = securityService.getUserLogin()
+		if (loginUser == null) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+		try{
+			String message = personService.assignToProject(params.personId, params.eventId, params.roleType, params.val)
+			def flag = message.size() == 0
+			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
 		}
 		
-		def data = ['flag':flag, 'message':message]
-		render data as JSON
 	}
 	
 	/**

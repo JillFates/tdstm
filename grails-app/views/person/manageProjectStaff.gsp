@@ -13,6 +13,7 @@
 	<body>
 		<div class="body">
 			<h1>Project Staff</h1>
+			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<div id="staffSelectId">
 			<table id="staffFilterId" style="border: 0px;width: 100%;" >
 				<tr>
