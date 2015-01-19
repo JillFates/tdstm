@@ -495,11 +495,16 @@ class ProjectService {
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = ${projectInstance.id}")
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = ${projectInstance.id}")
 
-		def recipesQuery = "select r.id from Recipe r where r.project = ${projectInstance.id}"
-		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project = ${projectInstance.id}")
-		RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.recipe in ($recipesQuery)")
-		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe in ($recipesQuery)")
-		Recipe.executeUpdate("delete from Recipe r where r.project  = ${projectInstance.id}")
+		def recipesQuery = "select r.id from Recipe r where r.project.id = ${projectInstance.id}"
+		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project.id = ${projectInstance.id}")
+		def recipeVersions = RecipeVersion.find("from RecipeVersion rv where rv.recipe.id in ($recipesQuery)")
+		if (recipeVersions) {
+			recipeVersions.each {
+				RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.clonedFrom.id = $it.id")
+			}
+		}
+		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)")
+		Recipe.executeUpdate("delete from Recipe r where r.project.id  = ${projectInstance.id}")
 
 		PartyGroup.executeUpdate("delete from Party p where p.id = ${projectInstance.id}")
 		Party.executeUpdate("delete from Party p where p.id = ${projectInstance.id}")
