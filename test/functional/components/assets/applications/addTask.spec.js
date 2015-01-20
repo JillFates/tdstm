@@ -5,7 +5,7 @@ var TaskModal = require('../task.po.js');
 var CreateAppModal = require('./appCreateModal.po.js');
 var ViewAppModal = require('./appViewModal.po.js');
 
-describe('Add Task', function(){
+describe('Add task to an application', function(){
   var taskModal = new TaskModal();
   var appsListPage =  new ListApps();
   var appId2;
@@ -58,7 +58,6 @@ describe('Add Task', function(){
       field.sendKeys(appName);
       expect(field.getAttribute('value')).toEqual(appName);
       expect(appsListPage.isLoadingHidden()).toEqual(true);
-
     });
 
     it('should validate search results', function(){
@@ -69,11 +68,13 @@ describe('Add Task', function(){
         expect(list.length).toEqual(1);
       });
     });
+  
   }); // Search for an app
 
   it('should have add task icon', function(){
     expect(appsListPage.isAddTaskIconDisplayed(appId2)).toBe(true);
   });
+  
   it('should open create task modal', function(){
     appsListPage.clickOnTaskIcon(appId2);
     expect(taskModal.editTaskModal.isPresent()).toBe(true);
@@ -90,6 +91,7 @@ describe('Add Task', function(){
     });
 
     var field = taskModal.taskTextArea;
+  
     it('should displayed empty by default task textarea', function(){
       expect(field.getAttribute('value')).toEqual('');
     });
@@ -123,11 +125,14 @@ describe('Add Task', function(){
     xit('should have person unassigned by default', function(){
       expect(taskModal.getPersonSelected()).toEqual('Unassigned');
     });
+  
     xit('should have 2 options listed',function(){
       taskModal.personOptions.then(function(options){
         expect(options.length).toEqual(2);
       });
+  
     });
+  
     xit('should have Unassigned and automatic listed for persons', function(){
       taskModal.personOptions.then(function(options){
         expect(options[0].getText()).toEqual('Unassigned');
@@ -203,6 +208,7 @@ describe('Add Task', function(){
   }); //person/team
 
   describe('Event Dropdown', function(){
+  
     it('should have event as Label', function(){
       expect(taskModal.eventLabel.getText()).toEqual('Event:');
     });
@@ -220,6 +226,7 @@ describe('Add Task', function(){
     it('should be empty since no event is created for this project yet',function(){
       expect(taskModal.eventOptions.count()).toEqual(1); 
     });
+  
   }); // Event Dropdown
 
   describe('Category dropdown',function(){
@@ -257,8 +264,9 @@ describe('Add Task', function(){
         expect(options[14].getText()).toEqual('startup');
         expect(options[15].getText()).toEqual('postmove');
       });
+  
     }); // category dropdown
-      
+
     xdescribe('workflow dropdown', function(){
 
       it('should be displayed if moveday is selected', function(){
@@ -278,6 +286,7 @@ describe('Add Task', function(){
           expect(options[5].getText()).toEqual('planning');
         });
       });
+    
     }); // workflow dropdown
 
     it('should selcted planning as category', function(){
@@ -289,17 +298,18 @@ describe('Add Task', function(){
       }else{
         expect(taskModal.categorySelected.getText()).toEqual('planning');
       }
-
     });
 
   }); // Category Dropdown
     
   describe('Assets dropdowns', function(){
+  
     it('should have Assets as label', function(){
       expect(taskModal.assetsLabel.getText()).toEqual('Asset:');
     });
 
     describe('Asset Type dropdown', function(){
+  
       it('should have Application selected by default', function(){
         if(process.env.BROWSER_NAME==='phantomjs'){
           taskModal.getAssetTypeSelected().then(function(op){
@@ -324,6 +334,7 @@ describe('Add Task', function(){
     });//Application dropdown
       
     describe('Asset Entity dropdown', function(){
+  
       it('should have the current application selected',function(){
         if(process.env.BROWSER_NAME==='phantomjs'){
           taskModal.getAssetEntitySelected().then(function(op){
@@ -345,8 +356,9 @@ describe('Add Task', function(){
       xdescribe('application Entity filter by application type', function(){
 
         xit('should displayed only applications', function(){
-
+        
         });
+        
         xit('should displayed only', function(){
 
         });
@@ -366,6 +378,7 @@ describe('Add Task', function(){
       }); //application Entity filter by application type
 
     });//Asset dropdown
+  
   }); //Assets dropdowns
     
   describe('Duration', function(){
@@ -406,6 +419,7 @@ describe('Add Task', function(){
   }); // Duration
 
   describe('priority',function(){
+  
     it('should have Priority: as label',function(){
       expect(taskModal.priorityLabel.getText()).toEqual('Priority:');
     });
@@ -432,6 +446,7 @@ describe('Add Task', function(){
   }); //priority
     
   describe('Due Date',function(){
+  
     it('should be label as Due Date:', function(){
       expect(taskModal.dueDateLabel.getText()).toEqual('Due Date:');
     });
@@ -487,77 +502,84 @@ describe('Add Task', function(){
         expect(status.getText()).toEqual(options[i]);
         i++;
       });
-
     });
 
   }); // status
 
-//       describe('add predecessor',function(){
+  xdescribe('add predecessor',function(){
 
-//         xit('click on add predecessor', function(){
-//           //dropdowns are displayed
-//         });
-//         xit('check the list of categories', function(){
-
-//         });
-//         xit('select category', function(){
-
-//         });
-//         xit('check list of task', function(){
-//           //if there are no task created, this will be empty.
-
-//         });
-//         xit('select task', function(){
-
-//         });
-//         xit('click on add  predecessor', function(){
-
-//         });
-//         xit('select category 2', function(){
-
-//         });
-//         xit('select task2',function(){
-//           //if there are no task created, this will be empty.
-
-//         });
-//         xit('remove first predecessor added', function(){
-
-//         });
-//       }); // predecessor
+    xit('click on add predecessor', function(){
+      //dropdowns are displayed
+    });
     
-//       describe('add successor',function(){
+    xit('check the list of categories', function(){
+
+    });
     
-//         xit('click on add successor', function(){
-//             //dropdowns are displayed
-//         });
-//         xit('check the list of categories', function(){
+    xit('select category', function(){
 
-//         });
-//         xit('select category', function(){
+    });
 
-//         });
-//         xit('check list of task', function(){
-//           //if there are no task created, this will be empty.
+    xit('check list of task', function(){
+      //if there are no task created, this will be empty.
+    });
 
-//         });
-//         xit('select task', function(){
+    xit('select task', function(){
 
-//         });
-//         xit('click on add  successor', function(){
+    });
 
-//         });
-//         xit('select category 2', function(){
+    xit('click on add  predecessor', function(){
 
-//         });
-//         xit('select task2',function(){
-//           //if there are no task created, this will be empty.
+    });
 
-//         });
-//         xit('remove 2nd successor added', function(){
+    xit('select category 2', function(){
 
-//         });
-      
-//       }); //successor
+    });
+
+    xit('select task2',function(){
+      //if there are no task created, this will be empty.
+    });
+
+    xit('remove first predecessor added', function(){
+
+    });
+
+  }); // predecessor
+
+  xdescribe('add successor',function(){
+
+    xit('click on add successor', function(){
+        //dropdowns are displayed
+    });
+    xit('check the list of categories', function(){
+
+    });
+    xit('select category', function(){
+
+    });
+    xit('check list of task', function(){
+      //if there are no task created, this will be empty.
+
+    });
+    xit('select task', function(){
+
+    });
+    xit('click on add  successor', function(){
+
+    });
+    xit('select category 2', function(){
+
+    });
+    xit('select task2',function(){
+      //if there are no task created, this will be empty.
+
+    });
+    xit('remove 2nd successor added', function(){
+
+    });
+  
+  }); //successor
+  
   it('should save created task',function(){ 
     taskModal.saveTaskBtn.click();
     expect(taskModal.editTaskModal.isPresent()).toBe(false);
