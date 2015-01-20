@@ -18,6 +18,7 @@
 	<g:javascript src="codemirror/ui-codemirror.js" />
 	<g:javascript src="codemirror/addon/dialog.js" />
 	<g:javascript src="codemirror/addon/search.js" />
+	<g:javascript src="codemirror/addon/searchcursor.js" />
 	<g:javascript src="codemirror/addon/show-hint.js" />
 	<g:javascript src="codemirror/addon/javascript-hint.js" />
 	<g:javascript src="codemirror/javascript.js" />
