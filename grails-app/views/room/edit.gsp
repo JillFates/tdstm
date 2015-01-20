@@ -248,7 +248,9 @@
 								style="width:100px;"></g:select></td>
 						<td><span id="modelSpan_${rack}"><g:select
 									class="rackModel" id="model_${rack}" name="model_${rack}"
-									from="" noSelection="[null:'Select Model']"></g:select></span></td>
+									from="${modelList}" noSelection="[null:'Select Model']"
+									value="${defaultRackModel?.id}" optionKey="id"
+									optionValue="${{it.manufacturer.name+' / '+it.modelName} }"></g:select></span></td>
 						<td>0&nbsp;&nbsp;&nbsp;<a
 							href="javascript:verifyAndDeleteRacks(${rack})"><span
 								class="clear_filter"><u>X</u></span></a></td>
@@ -413,7 +415,7 @@ $(".draggable").draggable({
  */
 $(document).bind('keydown',function(evt) {
 	var focusedClass = $("*:focus").parent().parent().attr('class')
-	if(!focusedClass.contains('objectRowSelected')){
+	if(focusedClass && focusedClass.indexOf('objectRowSelected') == -1){
 	 $(".objectSelected").each(function(i) {
 		 var x = $(this).css('top')
 		 var y = $(this).css('left')
@@ -616,8 +618,8 @@ function updateRackStyle(id, frontValue, rackTypeValue){
 function changeRackPosition(rackId, value, position){
 	if(!isNaN(value)){
 		$("#rack_"+rackId).css(position,value+"px")
-		$("#rackDetailDiv_"+rack.id).css(position,value+"px")
-		$("#rackDetailDiv_"+rack.id).css(position,value+"px")
+		$("#rackDetailDiv_"+rackId).css(position,value+"px")
+		$("#rackDetailDiv_"+rackId).css(position,value+"px")
 	} else {
 		alert("Please enter Numerics")
 	}

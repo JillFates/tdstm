@@ -18,6 +18,7 @@ class RoomController {
 	def securityService
 	def taskService
 	def userPreferenceService
+	def rackService
 	SessionFactory sessionFactory
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -62,7 +63,7 @@ class RoomController {
 			roomInstanceTotal: roomInstanceList.size(),
 			servers: entities.servers,
 			staffRoles: taskService.getRolesForStaff(),
-			viewType: params.viewType,
+			viewType: params.viewType
 		]
 
 		return model
@@ -174,8 +175,14 @@ class RoomController {
 		}
 		else {
 			def draggableRack = session.getAttribute( "DraggableRack" )?.DraggableRack
-			[roomInstance: roomInstance, rackInstanceList:rackInstanceList, newRacks : newRacks, 
-				modelList:modelList, draggableRack:draggableRack, prefVal:prefVal]
+			[roomInstance: roomInstance,
+			 rackInstanceList:rackInstanceList,
+			 newRacks : newRacks, 
+			 modelList:modelList,
+			 draggableRack:draggableRack,
+			 prefVal:prefVal,
+			 defaultRackModel: rackService.getDefaultRackModel()
+			]
 		}
 		
 	}
