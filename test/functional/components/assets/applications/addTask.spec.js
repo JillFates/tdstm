@@ -157,12 +157,14 @@ describe('Add task to an application', function(){
       
     }); // Fixed Assignment checkbox
       
-//          xit('select a person from the list', function(){
+    xit('select a person from the list', function(){
 
-//         });
-//         xit('Fixed Assignment checkbox should be enable', function(){
+    });
 
-//         });
+    xit('Fixed Assignment checkbox should be enable', function(){
+
+    });
+
     describe('Team drowpdown',  function(){
 
       it('should have team Unassigned by default', function(){

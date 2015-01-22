@@ -21,8 +21,7 @@ module.exports = {
     '../components/menu/planningMenu.spec.js',
     '../components/menu/tasksMenu.spec.js',
     '../components/menu/dashboardsMenu.spec.js',
-    '../components/menu/reportsMenu.spec.js',
-    '../components/reports/eventResults.spec.js'
+    '../components/menu/reportsMenu.spec.js'
   ],
   regression:[ //Do not change the order of these files since some test depends on others.
     '../components/admin/adminPortal.spec.js',

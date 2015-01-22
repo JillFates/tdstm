@@ -17,9 +17,7 @@ exports.config = {
 
   // seleniumAddress: 'http://localhost:4444/wd/hub',
   capabilities: {
-    // 'browserName': 'internet explorer'
-    'browserName':'chrome'
-    // 'browserName':'firefox'
+    'browserName': process.env.BROWSER_NAME
   },
 
   rootElement: 'div[ng-app]',

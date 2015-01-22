@@ -209,6 +209,9 @@ var Menu = function(){
   this.getAssets = function(){
     return browser.driver.findElement(by.css('#assetMenuId a.home'));
   };
+  this.getAssetsSubmenuContainer = function () {
+    return browser.driver.findElement(by.css('#assetMenuId #assetMegaMenu'));
+  };
   this.getAssetsSubmenu = function(){
     return browser.driver.findElements(by.css('#assetMenuId a.mmlink'));
   };
@@ -242,6 +245,9 @@ var Menu = function(){
   this.getDependencyAnalizer = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/dependencyConsole"]'));
   };
+  this.getArchitectureViewer = function () {
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/applicationArchitectureViewer"]'))
+  }
   this.getAssetsHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print\',\'help\');"]'));
   };
@@ -291,6 +297,9 @@ var Menu = function(){
       },
       'dependencyAnalizer':function(){
         that.getDependencyAnalizer().click();
+      },
+      'architectureViewer':function(){
+        that.getArchitectureViewer().click();
       },
       'assetsHelp':function(){
         that.getAssetsHelp().click();
