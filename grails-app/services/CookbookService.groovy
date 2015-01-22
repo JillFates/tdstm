@@ -989,8 +989,18 @@ class CookbookService {
 				log.warn(key)
 			}
 			def label = ( type=='task' ? "Task id ${key}" : "Group ${key}" )
+			
 			spec.each { n, v -> 
 				i++
+				if(n == "action" && type == "task"){
+					if(v in ['location', 'room', 'rack']){
+						if(!spec.containsKey("disposition")){
+							errorList << [error: 1, reason: 'Invalid syntax',
+								detail: "$label in element $i. $v taskspec requires 'disposition' property (options 'source', 'target')"]
+						}
+					}
+				}
+
 				if( n=="category" && ! (v in AssetCommentCategory.getList())){
 					errorList << [ error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'" ]
@@ -1049,7 +1059,7 @@ class CookbookService {
 			filter: groupProps.filter,
 			type:['asset','action','milestone','gateway','general'],
 			action: ['rollcall','location','room','rack','truck','set'],
-			disposition:0,
+			disposition: ['source', 'target'],
 			setOn:0,
 			disabled:false,
 			action:0,

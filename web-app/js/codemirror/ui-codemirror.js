@@ -27,6 +27,16 @@ angular.module('ui.codemirror', [])
 
           options = uiCodemirrorConfig.codemirror || {};
           opts = angular.extend({ value: initialTextValue }, options, scope.$eval(iAttrs.uiCodemirror), scope.$eval(iAttrs.uiCodemirrorOpts));
+          opts["extraKeys"] = {
+            "F11": function(cm) {
+              cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+            },
+            "Esc": function(cm) {
+              if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+            }
+
+          };
+
 
           if (iElement[0].tagName === 'TEXTAREA') {
             // Might bug but still ...

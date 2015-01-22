@@ -10,6 +10,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/dialog.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/show-hint.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/addon/fullscreen.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
@@ -19,6 +20,7 @@
 	<g:javascript src="codemirror/addon/dialog.js" />
 	<g:javascript src="codemirror/addon/search.js" />
 	<g:javascript src="codemirror/addon/searchcursor.js" />
+	<g:javascript src="codemirror/addon/fullscreen.js" />
 	<g:javascript src="codemirror/addon/show-hint.js" />
 	<g:javascript src="codemirror/addon/javascript-hint.js" />
 	<g:javascript src="codemirror/javascript.js" />
