@@ -19,7 +19,7 @@ describe('Pre-Event Checklist Reports', function(){
     });
     it('should have the following options',function(){
       preEventChecklistPage.getEventsOptions().then(function(list){
-        expect(list[0].getText()).toEqual('Buildout');
+        expect(list[0].getText()).toEqual('Buildout Event');
         expect(list[1].getText()).toEqual('M1');
         expect(list[2].getText()).toEqual('M2');
         expect(list[3].getText()).toEqual('M3');
