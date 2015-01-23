@@ -919,10 +919,35 @@ class MoveBundleController {
 		
 		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
 		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
+
+		def started = new Date()
 		
 		def isChecked = params.saveDefault
 		// Generate the Dependency Groups
 		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked)
+
+		// Now get the model and display results
+		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
+
+		log.info "Dependency groups generation - Time ${TimeUtil.elapsed(started)}"
+
+		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned, null) )
+	}
+
+	def generateDependencyNew = {
+
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		
+		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
+		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
+
+		def started = new Date()
+		
+		def isChecked = params.saveDefault
+		// Generate the Dependency Groups
+		flash.message = moveBundleService.generateDependencyGroupsNew(projectId, connectionTypes, statusTypes, isChecked)
+
+		log.info "Dependency groups generation new - Time ${TimeUtil.elapsed(started)}"
 
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
@@ -1121,5 +1146,5 @@ class MoveBundleController {
 		}
 		render selected
 	}
-}
 
+}

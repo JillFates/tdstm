@@ -73,7 +73,10 @@
 										&nbsp;&nbsp; <span>Save as defaults</span>
 							</div>
 							<div class="buttonR">
-								<input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
+								<!--input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" /-->
+								<input type="button" class="submit" value="Generate" onclick="submitCheckBox()" />
+								<input type="button" class="submit" value="GenerateNew" onclick="submitCheckBoxNew()" />
+
 							</div>
 							
 						</g:form>

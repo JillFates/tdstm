@@ -22,6 +22,7 @@ import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.converters.JSON
+import com.tdsops.tm.asset.graph.*
 
 
 class MoveBundleService {
@@ -736,4 +737,180 @@ class MoveBundleService {
 			}
 		}
 	}
+
+	/**
+	 * Performs an analysis of the interdependencies of assets for a project and creates assetDependencyBundle records appropriately. It will
+	 * find all assets assigned to bundles that which are set to be used for planning, sorting the assets so that those with the most dependency
+	 * relationships are processed first.
+	 * @param projectId : Related project
+	 * @param connectionTypes : filter for asset types
+	 * @param statusTypes : filter for status tyoes
+	 * @param isChecked : check if should use the new criteria
+	 * @return String message information
+	 */
+	def generateDependencyGroupsNew(projectId, connectionTypes, statusTypes, isChecked) {
+		
+		def date = new Date()
+		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
+		String time = formatter.format(date);
+		
+		def projectInstance = Project.get(projectId)
+		
+		// Get array of the valid status and connection types to check against in the inner loop
+		def statusList = statusTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
+		def connectionList = connectionTypes.replaceAll(', ',',').replaceAll("'",'').tokenize(',')
+		
+		// User previous setting if exists else set to empty
+		def depCriteriaMap = projectInstance.depConsoleCriteria ? JSON.parse(projectInstance.depConsoleCriteria) : [:]
+		if (isChecked == "1") {
+			depCriteriaMap = ["statusTypes": statusList, "connectionTypes":connectionList]
+		}
+		depCriteriaMap << ["modifiedBy":securityService.getUserLoginPerson().toString(), "modifiedDate":TimeUtil.nowGMT().getTime()]
+		projectInstance.depConsoleCriteria = depCriteriaMap as JSON
+		projectInstance.save(flush:true)
+		
+		// Find all move bundles that are flagged for Planning in the project and then get all assets in those bundles
+		String moveBundleText = MoveBundle.findAllByUseForPlanningAndProject(true,projectInstance).id
+		moveBundleText = GormUtil.asCommaDelimitedString(moveBundleText)
+		
+		// Get array of moveBundle ids
+		def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
+		def errMsg
+		
+		def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
+		
+		if (moveBundleText) {
+			def started = new Date()
+
+			def results = searchForAssetDependencies(assetTypeList, moveBundleText, connectionTypes, statusTypes);
+
+			log.info "Dependency groups generation - Search assets and dependencies time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			def graph = new AssetGraph();
+			graph.loadFromResults(results);
+
+			log.info "Dependency groups generation - Load results time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			cleanDependencyGroupsStatus(projectId);
+
+			log.info "Dependency groups generation - Clean dependencies time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			def groups = graph.groupByDependencies(statusList, connectionList, moveBundleList);
+			groups.sort { a, b -> b.size() <=> a.size() }
+
+			log.info "Dependency groups generation - Group dependencies time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			saveDependencyGroups(projectInstance, groups);
+
+			log.info "Dependency groups generation - Save dependencies time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			// Last step is to put all the straggler assets that were not grouped into group 0
+			addStragglerDepsToGroupZero(projectId, moveBundleText, assetTypeList);
+
+			log.info "Dependency groups generation - Add straggles time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			graph.destroy();
+
+			log.info "Dependency groups generation - Destroy graph time ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+		} else {
+			errMsg = "Please associate appropriate assets to one or more 'Planning' bundles before continuing."
+		}
+	}
+
+	/**
+	 * Performs a search for all the assets and dependencies that match the parameters.
+	 * @param assetTypeList : filter for asset types
+	 * @param connectionTypes : filter for asset types on connection
+	 * @param statusTypes : filter for status tyoes
+	 * @param moveBundleText : bundle ids to analyze
+	 * @return List of records
+	 */
+	private def searchForAssetDependencies(assetTypeList, moveBundleText, connectionTypes, statusTypes) {
+		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
+		def queryForAssets = """SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type FROM asset_entity a
+			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id
+			WHERE a.asset_type in ${assetTypeList}
+				AND a.move_bundle_id in (${moveBundleText}) """
+		queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
+		queryForAssets += statusTypes == 'null' ? "" : " AND ad.status in (${statusTypes}) "
+		queryForAssets += " ORDER BY a.asset_entity_id DESC  "
+
+		log.info "SQL used to find assets: ${queryForAssets}"
+		
+		return jdbcTemplate.queryForList(queryForAssets)
+	}
+
+	/**
+	 * Clean all dependency groups for the specified project
+	 * @param projectId : related project
+	 */
+	private def cleanDependencyGroupsStatus(projectId) {
+		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=0 WHERE project_id = $projectId ")
+	
+		// Deleting previously generated dependency bundle table .
+		jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId")
+		// TODO: THIS SHOULD NOT BE NECESSARY GOING FORWARD - THIS COLUMN is being dropped.
+		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
+
+		// Reset hibernate session since we just cleared out the data directly and we don't want to be looking up assets in stale cache
+		sessionFactory.getCurrentSession().flush();
+		sessionFactory.getCurrentSession().clear();
+	}
+
+	/**
+	 * Store all groups in the database
+	 * @param projectInstance : related project
+	 * @param groups : groups to be stored
+	 */
+	private def saveDependencyGroups(projectInstance, groups) {
+		def dependency_source
+		int groupNum = 0
+		groups.each { group ->
+			
+			def count = 0
+			groupNum++
+
+			def insertSQL = "INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id) VALUES "
+			def first = true
+
+			group.each { asset ->
+				dependency_source = (count++ == 0 ? "Initial" : "Dependency")
+				if (!first) {
+					insertSQL += ","
+				}
+				insertSQL += "($asset.id,$groupNum,'$dependency_source',now(),$projectInstance.id)"
+				first = false
+			}
+
+			jdbcTemplate.execute(insertSQL)
+		}
+	}
+
+	/**
+	 * put all the straggler assets that were not grouped into group 0
+	 * @param projectId : related project
+	 * @param moveBundleText : bundle ids to analyze	 
+	 * @param assetTypeList : filter for asset types
+	 */
+	private def addStragglerDepsToGroupZero(projectId, moveBundleText, assetTypeList) {
+		def stragglerSQL = """INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
+			SELECT ae.asset_entity_id, 0, "Straggler", now(), ae.project_id
+			FROM asset_entity ae
+			LEFT OUTER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
+			WHERE ae.project_id = ${projectId} # AND ae.dependency_bundle IS NULL
+			AND adb.asset_id IS NULL
+			AND move_bundle_id in (${moveBundleText})
+			AND ae.asset_type in ${assetTypeList}"""
+		
+		jdbcTemplate.execute(stragglerSQL)
+	}
+
 }
