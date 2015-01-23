@@ -653,14 +653,24 @@ tds.comments.service.CommentService = function(utils, http, q) {
 	};
 
 	var getStatusList = function(commentId) {
+
 		var deferred = q.defer();
+
+		http.get(utils.url.applyRootPath('/assetEntity/isAllowToChangeStatus?id=' + commentId)).
+		success(function(data, status, headers, config) {
+			var disabledStr = "";
+			if(!data.isAllowToChangeStatus){
+				disabledStr = "disabled"
+			}
+			$("#status").prop("disabled", disabledStr);
+		}).
+		error(function(data, status, headers, config) {
+			deferred.reject(data);
+		});
+
 		http.post(utils.url.applyRootPath('/assetEntity/updateStatusSelect?format=json&id=' + commentId)).
 		success(function(data, status, headers, config) {
-			var statusArray = data.data;
-			if((statusArray.length == 0) || (statusArray.length == 1 && statusArray[0] == "Pending")){
-				console.log("OK");
-				$("#status").prop("disabled", "disabled");
-			}
+			console.log(data);
 			deferred.resolve(data);
 		}).
 		error(function(data, status, headers, config) {

@@ -123,13 +123,13 @@ class AssetEntityController {
 			(AssetCommentStatus.DONE): AssetCommentStatus.getList()
 		],
 		"LIMITED":[
-		//	'*EMPTY*': [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
-		//	(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
+			'*EMPTY*': [AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.PLANNED): [AssetCommentStatus.PLANNED],
 			(AssetCommentStatus.PENDING): [AssetCommentStatus.PENDING],
-		//	(AssetCommentStatus.READY):   [AssetCommentStatus.READY,AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
-		//	(AssetCommentStatus.STARTED): [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
-		//	(AssetCommentStatus.DONE): [AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
-		//	(AssetCommentStatus.HOLD): [AssetCommentStatus.HOLD]
+			(AssetCommentStatus.READY):   [AssetCommentStatus.READY,AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.STARTED): [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.DONE): [AssetCommentStatus.DONE, AssetCommentStatus.HOLD],
+			(AssetCommentStatus.HOLD): [AssetCommentStatus.HOLD]
 		]
 	]
 	
@@ -3444,6 +3444,20 @@ class AssetEntityController {
         }
 		render result
 	}
+
+	def isAllowToChangeStatus = {
+		def taskId = params.id
+		def allowed = true
+		if(taskId){
+			def status = AssetComment.read(taskId)?.status
+			def isChangePendingStatusAllowed = securityService.isChangePendingStatusAllowed()
+			if(status == "Pending" && !isChangePendingStatusAllowed){
+				allowed = false
+			}
+		}
+		render([isAllowToChangeStatus : allowed] as JSON)
+	}
+
 	/**
 	 * Generates an HTML SELECT control for the AssetComment.status property according to user role and current status of AssetComment(id)
 	 * @param	params.id	The ID of the AssetComment to generate the SELECT for
@@ -3451,10 +3465,8 @@ class AssetEntityController {
 	 * @return render HTML or a JSON array
 	 */
 	def updateStatusSelect = {
-	
 		//Changing code to populate all select options without checking security roles.
-		//def mapKey = 'ALL'//securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
-		def mapKey = securityService.isChangePendingStatusAllowed() ? 'ALL' : 'LIMITED'
+		def mapKey = 'ALL'//securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
         def format = params.format
 		def taskId = params.id
