@@ -68,6 +68,7 @@ function buildGraph (response, status) {
 	var initialExtent = 1000000;
 	var anchorOffset = 10; // the length of the "point" at the end of task polygons
 	var margin = {top: 20, right: 0, bottom: 15, left: 0};
+	var minExtentRange = 10;
 	var items = data.items;
 	var starts = data.starts;
 	var dependencies = [];
@@ -181,7 +182,7 @@ function buildGraph (response, status) {
 	function drawEnd () {
 		if (drawing) {
 			var xa = Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left);
-			var xb = Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left));
+			var xb = Math.max(Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)), minExtentRange);
 			brush.extent([x.invert(xa), x.invert(xa+xb)]);
 			
 			tempBrush.remove();
