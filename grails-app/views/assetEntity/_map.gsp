@@ -28,12 +28,6 @@
 				<input type="button" value="Undo Cuts" class="pointer" onclick="undoCuts()">
 			</td>
 		</tr>
-		<tr title="If checked, depenencies that were cut will still be shown">
-			<td colspan="3" style="padding: 0px;">
-				<input type="checkbox" name="cutLinks" id="showCutLinksId" value="showCutLinks" class="pointer"/>
-				<label for="showCutLinksId" style="vertical-align: text-top;">Show cut dependencies</label>
-			</td>
-		</tr>
 		<tr title="Maximum number of edges that can be cut at once">
 			<td colspan="3" style="padding: 0px;">
 				<input type="text" name="maxEdgeCount" id="maxEdgeCountId" value="4" class="pointer" size="2" maxlength="2" style="width:20px;"/>

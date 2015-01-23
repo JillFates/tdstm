@@ -41,7 +41,7 @@ $('#svgContainerId')
 			$(this).height('');
 		}
 	});
-
+/*
 $('#showCutLinksId').on('change', function (e) {
 	if (e.target.checked)
 		$('line.cut').each(function (i, o) {
@@ -52,7 +52,7 @@ $('#showCutLinksId').on('change', function (e) {
 			o.classList.add('hidden');
 		});
 });
-
+*/
 var maxCutAttempts = $('#maxCutAttemptsId').val();
 if (isNaN(maxCutAttempts))
 	maxCutAttempts = 200;
@@ -75,7 +75,7 @@ var vis = canvas;
 var background;
 var label;
 var defaults = ${defaultsJson};
-var selectedBundle = ${dependencyBundle};
+var selectedBundle = '${dependencyBundle}';
 var assetTypes = ${assetTypes};
 var links = ${links};
 var nodes = ${nodes};
@@ -83,7 +83,7 @@ var nodes = ${nodes};
 var cutLinks = [];
 var cutNodes = [];
 var graphstyle = "top:-120;z-index:-1;";
-var fill = d3.scale.category20();
+var fill = d3.scale.category10();
 var gravity = ${multiple ? 0.05 : 0};
 var floatMode = false;
 var maxWeight;
@@ -475,8 +475,8 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			o.x2.baseVal.value = d.target.x;
 			o.y2.baseVal.value = d.target.y;
 			if (d.cut == 2) {
-				if ( ! $('#showCutLinksId').is(':checked') )
-					o.classList.add('hidden');
+				//if ( ! $('#showCutLinksId').is(':checked') )
+				//	o.classList.add('hidden');
 				d.cut = 3;
 				o.classList.add('cut');
 			} else if (d.cut != 3) {
