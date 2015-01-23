@@ -115,7 +115,7 @@ tdstm {
 
 					// When true the system will refresh the user's personal information each time that the authenticate successfully
 					updateUserInfo = true
-				} 					
+				}
 
 				// Define a 2nd domain / authority
 				QA {
@@ -131,7 +131,6 @@ tdstm {
 					roleSearchMode = 'nested'
 				}
 			}
-
 		}
 	}
 }
