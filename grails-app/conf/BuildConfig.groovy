@@ -28,7 +28,6 @@ grails.project.dependency.resolution = {
 	plugins {
 		runtime ':database-migration:1.0'
 		runtime ':shiro:1.1.4'
-		compile ':grails-melody:1.46.0'
 	}
 }
 
