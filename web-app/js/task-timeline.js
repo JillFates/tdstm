@@ -333,22 +333,22 @@ function buildGraph (response, status) {
 		.tickFormat(d3.time.format('%H:%M'))
 		.tickSize(6, 0, 0);
 
-	main.append('g')
+	var mainMinuteAxis = main.append('g')
 		.attr('transform', 'translate(0,' + mainHeight + ')')
 		.attr('class', 'main axis minute')
 		.call(x1MinuteAxis);
 
-	main.append('g')
+	var mainHourAxis = main.append('g')
 		.attr('transform', 'translate(0,0.5)')
 		.attr('class', 'main axis hour')
 		.call(x1HourAxis)
 
-	mini.append('g')
+	var miniMinuteAxis = mini.append('g')
 		.attr('transform', 'translate(0,' + miniHeight + ')')
 		.attr('class', 'axis minute')
 		.call(xMinuteAxis);
 
-	mini.append('g')
+	var miniHourAxis = mini.append('g')
 		.attr('transform', 'translate(0,0.5)')
 		.attr('class', 'axis hour')
 		.call(xHourAxis)
@@ -475,13 +475,24 @@ function buildGraph (response, status) {
 		itemPolys.attr('transform', 'translate(' + offset + ', 0)');
 		itemArrows.attr('transform', 'translate(' + offset + ', 0)');
 		itemLabels.attr('transform', 'translate(' + offset + ', 0)');
-			
+		
+		// offset the axis
+		var offsetY = mainMinuteAxis[0][0].transform.baseVal[0].matrix.f;
+		mainHourAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
+		mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + offsetY + ')');
+		
 		if ( ! scaled )
 			return;
 		
 		var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 		zoomScale = extentWidth / width;
 		x1.range([0, width / zoomScale]);
+		
+		// update the scales for the axis
+		x1MinuteAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
+		x1HourAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
+		mainMinuteAxis.call(x1MinuteAxis);
+		mainHourAxis.call(x1HourAxis);
 		
 		$.each(items, function (i, d) {
 			d.points = getPoints(d);
