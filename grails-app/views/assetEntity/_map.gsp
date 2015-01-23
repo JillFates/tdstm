@@ -21,53 +21,79 @@
 			</td>
 		</tr>
 		<tr>
+			<td style="padding: 0px;text-align: center;" title="Performs a min cut to split one or more applications off from the main group">
+				<input type="button" value="Min Cut" class="pointer" onclick="cutAndRemove()">
+			</td>
+			<td colspan="2" style="padding: 0px;text-align: center;" title="Undoes any previous cuts">
+				<input type="button" value="Undo Cuts" class="pointer" onclick="undoCuts()">
+			</td>
+		</tr>
+		<tr title="If checked, depenencies that were cut will still be shown">
+			<td colspan="3" style="padding: 0px;">
+				<input type="checkbox" name="cutLinks" id="showCutLinksId" value="showCutLinks" class="pointer"/>
+				<label for="showCutLinksId" style="vertical-align: text-top;">Show cut dependencies</label>
+			</td>
+		</tr>
+		<tr title="Maximum number of edges that can be cut at once">
+			<td colspan="3" style="padding: 0px;">
+				<input type="text" name="maxEdgeCount" id="maxEdgeCountId" value="4" class="pointer" size="2" maxlength="2" style="width:20px;"/>
+				<label for="maxEdgeCountId" style="vertical-align: text-top;">&nbsp;Maximum edges in cut</label>
+			</td>
+		</tr>
+		<tr title="Maximum number of attempts at finding the optimal cut. Higher values may produce better cuts but will take longer">
+			<td colspan="3" style="padding: 0px;">
+				<input type="text" name="maxCutAttempts" id="maxCutAttemptsId" value="200" class="pointer" size="5" maxlength="5" style="width:20px;"/>
+				<label for="maxCutAttemptsId" style="vertical-align: text-top;">&nbsp;Maximum cut attempts</label>
+			</td>
+		</tr>
+		<tr>
 			<td colspan="2" style="padding: 0px 0px 6px 0px ;text-align: left;"><h4>Show Labels</h4></td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" id="Application" name="labels" value="apps" ${( labelMap.Application=='true' ) ? 'checked' : ''} class="pointer application" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
+				<input type="checkbox" id="Application" name="labels" value="apps" ${( labelMap.Application=='true' ) ? 'checked' : ''} class="pointer application" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
 				<label for="Application" style="vertical-align: text-top;">Applications &nbsp;&nbsp;&nbsp;</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Server" ${(labelMap.Server=='true') ? 'checked' : ''} value="servers" class="pointer serverPhysical serverVirtual" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleServerLabel');"/>
+				<input type="checkbox" name="labels" id="Server" ${(labelMap.Server=='true') ? 'checked' : ''} value="servers" class="pointer serverPhysical serverVirtual" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleServerLabel');"/>
 				<label for="Server" style="vertical-align: text-top;">Servers</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Database" ${(labelMap.Database=='true') ? 'checked' : ''} value="databases" class="pointer database" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleDatabaseLabel');"/>
+				<input type="checkbox" name="labels" id="Database" ${(labelMap.Database=='true') ? 'checked' : ''} value="databases" class="pointer database" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleDatabaseLabel');"/>
 				<label for="Database" style="vertical-align: text-top;">Databases</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="StoragePhysical" ${(labelMap.StoragePhysical=='true') ? 'checked' : ''} value="storagePhysical" class="pointer storagePhysical" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleStoragePhysicalLabel');"/>
+				<input type="checkbox" name="labels" id="StoragePhysical" ${(labelMap.StoragePhysical=='true') ? 'checked' : ''} value="storagePhysical" class="pointer storagePhysical" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleStoragePhysicalLabel');"/>
 				<label for="StoragePhysical" style="vertical-align: text-top;">Storage Devices</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Files" ${(labelMap.Files=='true') ? 'checked' : ''} value="files" class="pointer storageLogical" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleFilesLabel');"/>
+				<input type="checkbox" name="labels" id="Files" ${(labelMap.Files=='true') ? 'checked' : ''} value="files" class="pointer storageLogical" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleFilesLabel');"/>
 				<label for="Files" style="vertical-align: text-top;">Logical Storage</label>
 			</td>
 		</tr>
 		<tr>
 			<td><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
 			<td colspan="2" style="padding: 0px;">
-				<input type="checkbox" name="labels" id="Network" ${(labelMap.Network=='true') ? 'checked' : ''} value="networks" class="pointer networkPhysical networkLogical" onchange="rebuildMap();depConsoleLabelUserpref($(this),'dependencyConsoleNetworkLabel');"/>
+				<input type="checkbox" name="labels" id="Network" ${(labelMap.Network=='true') ? 'checked' : ''} value="networks" class="pointer networkPhysical networkLogical" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleNetworkLabel');"/>
 				<label for="Network" style="vertical-align: text-top;">Network</label>
 			</td>
 		</tr>
 		<tr title="Sets the color of the background to black">
 			<td colspan="2" style="padding-left :0px">
-				Black Background&nbsp;&nbsp;&nbsp;<input type="checkbox" id="blackBackgroundId" name="blackBackground" ${(defaults.blackBackground)?('checked="checked"'):('')} style="border: 0px;background-color: #FFF;" onchange="rebuildMap($('#forceId').val(), $('#linkSizeId').val(), $('#frictionId').val(), $('#thetaId').val(), $(widthId).val(), $(heightId).val());">
+				Black Background&nbsp;&nbsp;&nbsp;<input type="checkbox" id="blackBackgroundId" name="blackBackground" ${(defaults.blackBackground)?('checked="checked"'):('')} style="border: 0px;background-color: #FFF;" onchange="rebuildMap(false, $('#forceId').val(), $('#linkSizeId').val(), $('#frictionId').val(), $('#thetaId').val(), $(widthId).val(), $(heightId).val());">
 			</td>
 		</tr>
 		<tr title="Sets the amount of force between each node">

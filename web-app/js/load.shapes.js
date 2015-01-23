@@ -5,7 +5,7 @@
 function defineShapes (defs) {
 	
 	// define the arrowhead markers used for marking dependencies
-	var markers = {'arrowhead':'#808080', 'arrowheadSelected':'green', 'arrowheadCyclical':'blue', 'arrowheadRedundant':'orange'};
+	var markers = {'arrowhead':'#808080', 'arrowheadSelected':'#00dd00', 'arrowheadCyclical':'blue', 'arrowheadRedundant':'orange', 'arrowheadCut':'yellow'};
 	var keys = Object.keys(markers);
 	for (var i = 0; i < keys.length; ++i) {
 		defs.append("marker")
@@ -21,6 +21,10 @@ function defineShapes (defs) {
 			.attr("d", "M0,-4L10,0L0,4")
 			.attr('fill', markers[keys[i]]);
 	}
+	
+	defs.select('#arrowheadSelected').attr("viewBox", "0 -6 10 12")
+		.attr("markerHeight", 12)
+	$('#arrowheadSelected path').attr("d", "M0,-6L10,0L0,6");
 	
 	// define the custom database object
 	var databaseShape = defs

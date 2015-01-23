@@ -30,10 +30,6 @@ line.link.unknown {
 	stroke-opacity: 0.75;
 }
 
-g.selected text {
-	fill: darkgreen !important;
-}
-
 circle {
 	pointer-events: none !important;
 }
@@ -770,6 +766,7 @@ function buildMap (width, height) {
 			.attr("id", function (d) {
 				return "label-" + d.id;
 			})
+			.attr("class", "ignoresMouse")
 			.attr("text-anchor", "middle")
 			.attr("dx", 0)
 			.attr("dy","-1.85em")
@@ -2692,6 +2689,7 @@ function rebuildMap (width, height, labels) {
 	// Add the new labels
 	graph
 		.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+		.attr("class", "ignoresMouse")
 		.attr("dx", 8)
 		.attr("dy",".35em")
 		.text(function(d) {

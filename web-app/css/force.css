@@ -1,15 +1,39 @@
+.ignoresMouse {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none !important;
+}
+
 circle.node {
 	stroke: #fff;
 	stroke-width: 1.5px;
 }
+use.node {
+	fill: #0000ff;
+}
+use.node.selectedParent {
+	fill: #00ff00 !important;
+}
+use.node.selectedChild {
+	fill: #00cc99 !important;
+}
+use.node.cut {
+	fill: #ff0000 !important;
+}
 
 line.link {
 	stroke: #999;
+	stroke-width: 1px;
 	stroke-opacity: .6;
 	marker-end: url(#arrowhead);
 }
 line.link.selected {
-	stroke: #00dd00;
+	stroke: #00dd00 !important;
+	stroke-width: 3px;
 	marker-end: url(#arrowheadSelected);
 }
 line.link.redundant {
@@ -18,7 +42,7 @@ line.link.redundant {
 	marker-end: url(#arrowheadRedundant);
 	stroke-dasharray: 5,3;
 }
-line.link.redundant.hidden {
+line.link.hidden {
 	display: none !important;
 }
 line.link.cyclical {
@@ -26,6 +50,11 @@ line.link.cyclical {
 	stroke-opacity: 0.3 !important;
 	marker-end: url(#arrowheadCyclical);
 	stroke-dasharray: 8,3;
+}
+line.link.cut {
+	stroke: yellow !important;
+	stroke-opacity: 0.8 !important;
+	marker-end: url(#arrowheadCut);
 }
 
 #arrowheadRedundant {
@@ -41,16 +70,15 @@ line.link.cyclical {
 text {
 	cursor: default;
 	fill: #ffffff;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	pointer-events: none !important;
 }
 .blackText text {
-	fill: #000000 !important;
+	fill: #000000;
+}
+g.selected text {
+	fill: #ccffcc;
+}
+g.blackText.selected text {
+	fill: #003300;
 }
 
 .ui-resizable-helper {
@@ -79,6 +107,8 @@ text {
 .ui-resizable-se {
 	background: none !important;
 }
+
+
 #databaseShapeBackgroundId {
 	stroke: black !important;
 }
