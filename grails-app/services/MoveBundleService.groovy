@@ -776,13 +776,11 @@ class MoveBundleService {
 		// Get array of moveBundle ids
 		def moveBundleList = moveBundleText.replaceAll(', ',',').tokenize(',')
 		def errMsg
-		
-		def assetTypeList =  MoveBundleController.dependecyBundlingAssetType
-		
+
 		if (moveBundleText) {
 			def started = new Date()
 
-			def results = searchForAssetDependencies(assetTypeList, moveBundleText, connectionTypes, statusTypes);
+			def results = searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes);
 
 			log.info "Dependency groups generation - Search assets and dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
@@ -798,7 +796,7 @@ class MoveBundleService {
 			log.info "Dependency groups generation - Clean dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
-			def groups = graph.groupByDependencies(statusList, connectionList, moveBundleList);
+			def groups = graph.groupByDependencies(statusList, connectionList, moveBundleList, MoveBundleController.dependecyBundlingAssetTypeMap);
 			groups.sort { a, b -> b.size() <=> a.size() }
 
 			log.info "Dependency groups generation - Group dependencies time ${TimeUtil.elapsed(started)}"
@@ -810,7 +808,7 @@ class MoveBundleService {
 			started = new Date()
 
 			// Last step is to put all the straggler assets that were not grouped into group 0
-			addStragglerDepsToGroupZero(projectId, moveBundleText, assetTypeList);
+			addStragglerDepsToGroupZero(projectId, moveBundleText, MoveBundleController.dependecyBundlingAssetType);
 
 			log.info "Dependency groups generation - Add straggles time ${TimeUtil.elapsed(started)}"
 			started = new Date()
@@ -827,18 +825,16 @@ class MoveBundleService {
 
 	/**
 	 * Performs a search for all the assets and dependencies that match the parameters.
-	 * @param assetTypeList : filter for asset types
 	 * @param connectionTypes : filter for asset types on connection
 	 * @param statusTypes : filter for status tyoes
 	 * @param moveBundleText : bundle ids to analyze
 	 * @return List of records
 	 */
-	private def searchForAssetDependencies(assetTypeList, moveBundleText, connectionTypes, statusTypes) {
+	private def searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes) {
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
-		def queryForAssets = """SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type FROM asset_entity a
+		def queryForAssets = """SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id
-			WHERE a.asset_type in ${assetTypeList}
-				AND a.move_bundle_id in (${moveBundleText}) """
+			WHERE a.move_bundle_id in (${moveBundleText}) """
 		queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
 		queryForAssets += statusTypes == 'null' ? "" : " AND ad.status in (${statusTypes}) "
 		queryForAssets += " ORDER BY a.asset_entity_id DESC  "

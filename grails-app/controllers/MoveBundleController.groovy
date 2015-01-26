@@ -32,6 +32,7 @@ class MoveBundleController {
 	def userPreferenceService
     
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"  
+	protected static Map dependecyBundlingAssetTypeMap = ['SERVER':true,'VM':true,'BLADE':true,'APPLICATION':true,'FILES':true,'DATABASE':true,'APPLIANCE':true,'STORAGE':true]
 	
 	def index = { redirect(action:list,params:params) }
 

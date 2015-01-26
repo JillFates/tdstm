@@ -8,7 +8,7 @@ public class AssetGraph {
 	def nodes = [:]
 
 	/**
-	 * Load graph from a sql result list with the following data in each record: assetId, assetDepFromId, assetDepToId, moveBundleId, status, type
+	 * Load graph from a sql result list with the following data in each record: assetId, assetDepFromId, assetDepToId, moveBundleId, status, type, assetType
 	 */
 	def loadFromResults(result) {
 		nodes = [:]
@@ -17,7 +17,7 @@ public class AssetGraph {
 		result.each { record ->
 			if (currentId != record["assetId"]) {
 				currentId = record["assetId"]
-				currentNode = new AssetNode(id: record["assetId"], moveBundleId: record["moveBundleId"])
+				currentNode = new AssetNode(id: record["assetId"], moveBundleId: record["moveBundleId"], assetType: record["assetType"].toUpperCase())
 				nodes[currentNode.id] = currentNode
 			}
 			addDependencyToNode(currentNode, record["assetDepFromId"], record["assetDepToId"], record["type"], record["status"])
@@ -37,13 +37,14 @@ public class AssetGraph {
 
 	/**
 	 * Group assets by dependencies
+	 * @param dependecyBundlingAssetTypeMap : filter for asset types
 	 */
-	def groupByDependencies(statusList, typeList, moveBundleList) {
+	def groupByDependencies(statusList, typeList, moveBundleList, dependecyBundlingAssetTypeMap) {
 		def groups = []
 		def group = []
 
 		nodes.each { assetId, node ->
-			if (!node.checked) {
+			if (!node.checked && dependecyBundlingAssetTypeMap[node.assetType]) {
 				//If the node is not checked, then creates a new group and search for all assets/nodes related to this one
 				group = []
 				groups << group
@@ -58,17 +59,23 @@ public class AssetGraph {
 	 * Analyze current node and if the first time that is viewed, the analyze all his dependencies and add it to the group
 	 */
 	private def addToGroupAndAnalize(node, group, statusList, typeList, moveBundleList) {
-		if (!node.checked) {
-			node.checked = true
-			group << node
-			node.deps.each { dep ->
-				def depNode = nodes[dep.depId]
-				if ( depNode &&
-					 statusList.contains(dep.status) && 
-					 typeList.contains(dep.type) && 
-					 moveBundleList.contains(depNode.moveBundleId?.toString())
-				) {
-					addToGroupAndAnalize(depNode, group, statusList, typeList, moveBundleList);
+		def nodesStack = []
+		def n
+		nodesStack << node
+		while(nodesStack.size() > 0) {
+			n = nodesStack.pop()
+			if (!n.checked) {
+				n.checked = true
+				group << n
+				n.deps.each { dep ->
+					def depNode = nodes[dep.depId]
+					if ( depNode &&
+						 statusList.contains(dep.status) && 
+						 typeList.contains(dep.type) && 
+						 moveBundleList.contains(depNode.moveBundleId?.toString())
+					) {
+						nodesStack << depNode
+					}
 				}
 			}
 		}

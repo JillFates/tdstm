@@ -8,6 +8,7 @@ class AssetNode {
 	def id
 	def moveBundleId
 	def deps = []
+	def assetType
 	boolean checked = false
 
 	/**
@@ -16,6 +17,7 @@ class AssetNode {
 	def destroy() {
 		id = null
 		moveBundleId = null
+		assetType = null
 		deps.each {
 			it.destroy()
 		}
