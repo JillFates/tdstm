@@ -957,6 +957,41 @@ class CookbookService {
 			return errorList
 		}
 	}
+
+	def genericConditionallyMandatoryValidator(spec, options, attribute, value, i, errorList, errorLabel){
+		if(value in options){
+			if(!spec.containsKey(attribute)){
+				errorList << [	error: 1, 
+								reason: "Invalid Syntax",
+								detail: "$errorLabel in element $i. $value taskspec requires '$attribute' property."
+							]
+			}
+		}
+	}
+
+	/**
+	 * Validate the presence of the disposition attribute
+	 * depending on the value given for 'action.' See TM-3244.
+	 */
+	def validateDisposition(spec, value, i, errorList, errorLabel){
+		def options = ['location', 'room', 'rack']
+		genericConditionallyMandatoryValidator(spec, options, 'disposition', value, i, errorList, errorLabel)
+	}
+
+	
+
+	def validateFilter(spec, value, i, errorList, errorLabel){
+		def options = ['set', 'truck', 'location', 'room', 'rack', 'cart']
+		genericConditionallyMandatoryValidator(spec, options, 'filter', value, i, errorList, errorLabel)
+	}
+
+	def validateSetOn(spec, value, i, errorList, errorLabel){
+		def options = ['set']
+		genericConditionallyMandatoryValidator(spec, options, 'setOn', value, i, errorList, errorLabel)
+	}
+
+
+	def validate
 		
 	/**
 	* Used to validate the syntax of a recipe and will return a list of syntax violations 
@@ -992,14 +1027,13 @@ class CookbookService {
 			
 			spec.each { n, v -> 
 				i++
+				
 				if(n == "action" && type == "task"){
-					if(v in ['location', 'room', 'rack']){
-						if(!spec.containsKey("disposition")){
-							errorList << [error: 1, reason: 'Invalid syntax',
-								detail: "$label in element $i. $v taskspec requires 'disposition' property (options 'source', 'target')"]
-						}
-					}
+					validateDisposition(spec, v, i, errorList, label)
+					validateFilter(spec, v, i, errorList, label)
+					validateSetOn(spec, v, i, errorList, label)
 				}
+				
 
 				if( n=="category" && ! (v in AssetCommentCategory.getList())){
 					errorList << [ error: 1, reason: 'Invalid Category',
@@ -1009,9 +1043,16 @@ class CookbookService {
 					// can do more here to check the nested definitions later on.
 
 					if ( CU.isaMap(map[n])) {
-						// Check the sub section of the spec against a sub section of the map
-						errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )
+						if(!CU.isaMap(spec[n])){
+							errorList << [ error: 1, reason: 'Invalid syntax', 
+								detail: "$label in element $i property '$n' should be a map. Invalid value '$v' was given" ]
+						}else{
+							// Check the sub section of the spec against a sub section of the map
+							errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )	
+						}
+						
 					} else if ( CU.isaList(map[n]) ) {
+
 						// Check if the value of a property exists in the map defined list
 						// Need to strip out any boolean expressions
 						def cleanedExp = v.replaceAll( /[!=<>]/, '' )
@@ -1062,7 +1103,6 @@ class CookbookService {
 			disposition: ['source', 'target'],
 			setOn:0,
 			disabled:false,
-			action:0,
 			workflow:0,
 			duration:'',
 			team:0,
@@ -1286,7 +1326,7 @@ class CookbookService {
 					// Check for any unsupported properties (misspellings, etc)
 					validateAgainstMap( 'task', task, taskProps, null )
 
-					if (task.containsKey('filter')) {
+					if (task.containsKey('filter') && CU.isaMap(task['filter'])) {
 						def taskFilter = task.filter
 						
 						if (taskFilter.containsKey('group')) {
