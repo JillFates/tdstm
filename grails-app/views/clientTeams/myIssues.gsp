@@ -256,9 +256,9 @@
 
 				new Ajax.Request('../assetEntity/isAllowToChangeStatus?id='+id,{asynchronous:false,evalScripts:true,
 					onComplete:function(e){
-						var resp = e.responseText;
+						var resp = JSON.parse(e.responseText);
 						var disabledStr = "";
-						if(!data.isAllowToChangeStatus){
+						if(!resp.isAllowToChangeStatus){
 							disabledStr = "disabled"
 						}
 						$("[id^=statusEditId_]").prop("disabled", disabledStr);
