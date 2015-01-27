@@ -220,6 +220,30 @@ button.alert-close {
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	background-clip: padding-box;
 }
+
+.modal-dialog-fullscreen{
+	width:100% !important;
+	height:100% !important;
+	margin:0px !important;
+}
+
+.modal-body-fullscreen{
+	height:85% !important;
+}
+
+.sourceCode-fullscreen{
+	height:100% !important;
+}
+
+.CodeMirror-wrap-fullscreen{
+	height:100% !important;
+}
+
+.modal-content-fullscreen{
+	height:100% !important;
+	margin:0px;
+}
+
 .modal-dialog {
 	margin: 30px auto;
 	position: relative;

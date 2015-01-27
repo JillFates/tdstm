@@ -2390,6 +2390,14 @@ tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $sta
 	$scope.cancel = function () {
 		$modalInstance.dismiss('close');
 	};
+
+	$scope.toggleFullScreenMode = function(){
+		$(".modal-dialog").toggleClass("modal-dialog-fullscreen");
+		$(".modal-content").toggleClass("modal-content-fullscreen");
+		$(".modal-body").toggleClass("modal-body-fullscreen");
+		$(".CodeMirror-wrap").toggleClass("CodeMirror-wrap-fullscreen");
+		$("[ui-codemirror='codeEditorOptions']").toggleClass("sourceCode-fullscreen");
+	};
 }
 
 
