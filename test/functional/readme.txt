@@ -96,3 +96,30 @@ For Windows the install will default to c:\Program Files\nodejs, for Mac/Linux? 
     $ export BROWSER_NAME = <-- chrome, firefox, phantomjs
     
 7. Run the test  with "protractor support/protractor.config.js"
+
+=====================================
+  Win 7 - Lab Machine - Cygwin
+=====================================
+
+1. Install cywing <version downloaded: http://cygwin.com/setup-x86_64.exe> and ran it 
+In select packages section search for subversion and choose the package under Devel Default -> subversion: A version Control system.
+leave the other settings as default and continue the installation.
+
+2. Install node <version downloaded: http://nodejs.org/dist/v0.10.36/x64/node.exe>
+  * If this folder was not created , add it: "c:\Users\USERNAME\AppData\Roaming\npm"
+
+3. Opened cygwin 
+    I created a project folder
+    $ cd  project
+    $ svn co http://svn.tdsops.com/svn/tdstm/trunk/
+    $ cd trunk/test/functional
+    $ npm install
+    $ node_modules/protractor/bin/webdriver-manager update
+
+4. Add the following process.env variables
+    $ export BASE_URL=http://localhost:8080
+    $ export USER_NAME= "username" <-- add your userName 
+    $ export PASSWORD= "password" <-- add your password
+    $ export BROWSER_NAME = <-- chrome, firefox, phantomjs
+    
+5. Run the test  with "node_modules/protractor/bin/protractor support/protractor.config.js"
