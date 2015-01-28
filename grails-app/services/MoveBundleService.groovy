@@ -753,6 +753,9 @@ class MoveBundleService {
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time = formatter.format(date);
+
+		def sqlFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+		String sqlTime = sqlFormatter.format(date);
 		
 		def projectInstance = Project.get(projectId)
 		
@@ -802,13 +805,13 @@ class MoveBundleService {
 			log.info "Dependency groups generation - Group dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
-			saveDependencyGroups(projectInstance, groups);
+			saveDependencyGroups(projectInstance, groups, sqlTime);
 
 			log.info "Dependency groups generation - Save dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
 			// Last step is to put all the straggler assets that were not grouped into group 0
-			addStragglerDepsToGroupZero(projectId, moveBundleText, MoveBundleController.dependecyBundlingAssetType);
+			addStragglerDepsToGroupZero(projectId, moveBundleText, MoveBundleController.dependecyBundlingAssetType, sqlTime);
 
 			log.info "Dependency groups generation - Add straggles time ${TimeUtil.elapsed(started)}"
 			started = new Date()
@@ -866,7 +869,7 @@ class MoveBundleService {
 	 * @param projectInstance : related project
 	 * @param groups : groups to be stored
 	 */
-	private def saveDependencyGroups(projectInstance, groups) {
+	private def saveDependencyGroups(projectInstance, groups, sqlTime) {
 		def dependency_source
 		int groupNum = 0
 		groups.each { group ->
@@ -882,7 +885,7 @@ class MoveBundleService {
 				if (!first) {
 					insertSQL += ","
 				}
-				insertSQL += "($asset.id,$groupNum,'$dependency_source',now(),$projectInstance.id)"
+				insertSQL += "($asset.id,$groupNum,'$dependency_source','$sqlTime',$projectInstance.id)"
 				first = false
 			}
 
@@ -896,9 +899,9 @@ class MoveBundleService {
 	 * @param moveBundleText : bundle ids to analyze	 
 	 * @param assetTypeList : filter for asset types
 	 */
-	private def addStragglerDepsToGroupZero(projectId, moveBundleText, assetTypeList) {
+	private def addStragglerDepsToGroupZero(projectId, moveBundleText, assetTypeList, sqlTime) {
 		def stragglerSQL = """INSERT INTO asset_dependency_bundle (asset_id, dependency_bundle, dependency_source, last_updated, project_id)
-			SELECT ae.asset_entity_id, 0, "Straggler", now(), ae.project_id
+			SELECT ae.asset_entity_id, 0, "Straggler", "$sqlTime", ae.project_id
 			FROM asset_entity ae
 			LEFT OUTER JOIN asset_dependency_bundle adb ON ae.asset_entity_id=adb.asset_id
 			WHERE ae.project_id = ${projectId} # AND ae.dependency_bundle IS NULL
