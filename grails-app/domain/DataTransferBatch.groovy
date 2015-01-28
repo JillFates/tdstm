@@ -43,7 +43,7 @@ class DataTransferBatch {
 		versionNumber( nullable:true )
 		hasErrors( nullable:false )
 		progressKey nullable:true
-		importResults nullable:true
+		importResults( nullable:true, size:0..16384000)
 		importFilename nullable:true	
 	}
 	

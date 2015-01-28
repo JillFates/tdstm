@@ -66,4 +66,5 @@ databaseChangeLog = {
 	include file: '20141114-addIndexTo_DataTransferValue_table.groovy'
 	include file: '20141204-delete-invalid-references-from-party-relationship.groovy'
 	include file: '20150114-add-model-add-change-pending-status-permission.groovy'
+	include file: '20150170-data-transfer-batch-import-results-change.groovy'
 }

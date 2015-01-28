@@ -584,8 +584,9 @@ class ImportService {
 							dtb.importResults = results.info
 							results.batchStatusCode = DataTransferBatch.COMPLETED
 						}
-						if (!dtb.save(flush:true)) {
-							errorMsg = "Unable to update batch"
+						if ( !dtb.validate() || !dtb.save(flush:true) ) {
+							errorMsg = "Unable to import assets: " + GormUtil.allErrorsString( dtb )
+							log.error(errorMsg)
 						}
 					}
 	
