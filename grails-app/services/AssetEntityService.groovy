@@ -2046,6 +2046,19 @@ class AssetEntityService {
 	 }
 
 	/**
+	 * Updates progress for the give key only when is around 5%
+	 * @param key to update
+	 * @param progressCount progress count
+	 * @param progressTotal total number of items
+	 * @param description description used on update
+	 **/
+	private void updateProgress(key, progressCount, progressTotal, description) {
+		if ((progressCount % Math.round(progressTotal * 0.05)) == 0) {
+			progressService.update(key, ((int)((progressCount / progressTotal) * 100)), description)
+		}
+	}
+
+	/**
 	 * Download data form Asset Entity table into Excel file
 	 * @param Datatransferset,Project,Movebundle
 	 **/
@@ -2057,12 +2070,13 @@ class AssetEntityService {
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
 
 		try {
+			def startedMain = new Date()
+			def started = new Date()
 		
 			java.io.File temp = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
 			temp.deleteOnExit();
 			
 			progressService.updateData(key, 'filename', temp.getAbsolutePath())
-			
 			
 			def progressCount = 0
 			def progressTotal = 0
@@ -2074,7 +2088,6 @@ class AssetEntityService {
 			def bundles = []
 			def principal = params.username
 			def loginUser = UserLogin.findByUsername(principal)
-			def started
 			
 			def bundle = params.bundle
 			def bundleSize = bundle.size()
@@ -2181,7 +2194,6 @@ class AssetEntityService {
 			//get template Excel
 			def book
 			started = new Date()
-			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
 			def filenametoSet = dataTransferSetInstance.templateFilename
 			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
@@ -2201,7 +2213,16 @@ class AssetEntityService {
 			def exportDate = exportFileFormat.format(currDate)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
-			log.info "export() - Loading appDepBundle took ${TimeUtil.elapsed(started)}"
+			log.info "export() - Initial loading took ${TimeUtil.elapsed(started)}"
+			started = new Date()
+
+			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
+			def assetDepBundleMap = [:]
+			assetDepBundleList.each { dep ->
+				assetDepBundleMap[dep.asset.id] = dep?.dependencyBundle?.toString()?:''
+			}
+
+			log.info "export() - Create asset dep bundles took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
 			//create book and sheet
@@ -2370,7 +2391,7 @@ class AssetEntityService {
 					exportedEntity += "S"
 					for ( int r = 1; r <= assetSize; r++ ) {
 						progressCount++
-						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress')
 						
 						//Add assetId for walkthrough template only.
 						if( serverSheetColumnNames.containsKey("assetId") ) {
@@ -2395,8 +2416,7 @@ class AssetEntityService {
 							switch(colName) {
 								case 'DepGroup':
 									// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
-									def depGroup = assetDepBundleList.find{it.asset.id==a.id}?.dependencyBundle?.toString()
-									addCell(serverSheet, r, colNum, StringUtil.defaultIfEmpty(depGroup, ''))
+									addCell(serverSheet, r, colNum, assetDepBundleMap[a.id])
 									break
 								case ~/usize|SourcePos|TargetPos/:
 									def pos = a[attribute] ?: 0
@@ -2443,15 +2463,16 @@ class AssetEntityService {
 
 					def rowNum = 0
 					application.each { app ->
+
 						progressCount++
-						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress')
 						rowNum++
 
 						// Add the appId column to column 0 if it exists
 						if (hasIdCol) {
 							addCell(appSheet, rowNum, appSheetColumnNames[idColName], (Double)app.id, Cell.CELL_TYPE_NUMERIC)
 						}
-								
+
 						for (int i=0; i < appColumnNameList.size(); i++) {
 							def colName = appColumnNameList[i]
 
@@ -2477,7 +2498,7 @@ class AssetEntityService {
 									break
 								case 'DepGroup':
 									// Find the Dependency Group that this app is bound to
-									colVal = assetDepBundleList.find {it.asset.id == app.id }?.dependencyBundle?.toString() ?: ''
+									colVal = assetDepBundleMap[app.id]
 									break
 								case ~/ShutdownBy|StartupBy|TestingBy/:
 									colVal = app[assetColName] ? this.resolveByName(app[assetColName], false)?.toString() : ''
@@ -2519,7 +2540,7 @@ class AssetEntityService {
 					exportedEntity += "D"
 					for ( int r = 1; r <= dbSize; r++ ) {
 						progressCount++
-						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress')
 						//Add assetId for walkthrough template only.
 						if( dbSheetColumnNames.containsKey("dbId") ) {
 							addCell(dbSheet, r, 0, (database[r-1].id), Cell.CELL_TYPE_NUMERIC)
@@ -2530,8 +2551,7 @@ class AssetEntityService {
 							//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 							def colName = dbColumnNameList.get(coll)
 							if(colName == "DepGroup"){
-								def depGroup = assetDepBundleList.find{it.asset.id==database[r-1].id}?.dependencyBundle?.toString()
-								addCell(dbSheet, r, dbMap[colName], depGroup ?:"")
+								addCell(dbSheet, r, dbMap[colName], assetDepBundleMap[database[r-1].id])
 							} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
 								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) :''))
 							} else if ( database[r-1][attribute] == null ) {
@@ -2556,7 +2576,7 @@ class AssetEntityService {
 					exportedEntity += "F"
 					for ( int r = 1; r <= fileSize; r++ ) {
 						progressCount++
-						progressService.update(key, ((int)((progressCount / progressTotal) * 100)), 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress')
 						
 						// Add assetId for walkthrough template only.
 						if ( storageSheetColumnNames.containsKey("filesId") ) {
@@ -2568,8 +2588,7 @@ class AssetEntityService {
 							def attribute = fileDTAMap.eavAttribute.attributeCode[coll]
 							def colName = fileColumnNameList.get(coll)
 							if (colName == "DepGroup") {
-								def depGroup = assetDepBundleList.find{it.asset.id==files[r-1].id}?.dependencyBundle?.toString()
-								addCell(storageSheet, r, fileMap[colName], depGroup ?:"" )
+								addCell(storageSheet, r, fileMap[colName], assetDepBundleMap[files[r-1].id] )
 							} else if(attribute == "retireDate" || attribute == "maintExpDate" || attribute == "lastUpdated"){
 								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) :''))
 							} else if ( files[r-1][attribute] == null ) {
@@ -2803,6 +2822,8 @@ class AssetEntityService {
 			progressService.updateData(key, 'header', "attachment; filename=\""+exportType+'-'+filename+".xls\"")
 			progressService.update(key, 100, 'Completed')
 
+			log.info "export() - Global time ${TimeUtil.elapsed(startedMain)}"
+
 		} catch( Exception exportExp ) {
 
 			exportExp.printStackTrace()
@@ -2811,7 +2832,7 @@ class AssetEntityService {
 			return
 		}
 	}
-	
+
 	/* -------------------------------------------------------
 	 * To check the sheet headers
 	 * @param attributeList, SheetColumnNames
