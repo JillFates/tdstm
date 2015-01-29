@@ -417,10 +417,8 @@ class GenerateTasks extends Simulation {
     .userAgentHeader("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:35.0) Gecko/20100101 Firefox/35.0")
 
   val genTasks = scenario("GenTasks").exec(Login.login,Cookbook.cookbook)
-  // val genTasks = scenario("GenTasks").exec(Login.login)
 
 	setUp(
-    // scn.inject(atOnceUsers(1))
-    genTasks.inject((rampUsers(1) over (1 seconds))
+    genTasks.inject((rampUsers(1) over (1 seconds)))
     ).protocols(httpProtocol)
 }
