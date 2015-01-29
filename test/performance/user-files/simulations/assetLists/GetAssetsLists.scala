@@ -1,14 +1,13 @@
 package assetLists
 
-import com.excilys.ebi.gatling.core.Predef._
-import com.excilys.ebi.gatling.http.Predef._
-import com.excilys.ebi.gatling.jdbc.Predef._
-import com.excilys.ebi.gatling.http.Headers.Names._
-import akka.util.duration._
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef._
+import scala.concurrent.duration._
 
 class GetAssetLists extends Simulation {
   val baseURL = System.getenv("BASE_URL")
-  val httpConf = httpConfig
+  val httpConf = http
       .baseURL(baseURL)
       .acceptHeader("image/png,image/*;q=0.8,*/*;q=0.5")
       .acceptEncodingHeader("gzip, deflate")
@@ -17,9 +16,9 @@ class GetAssetLists extends Simulation {
       .userAgentHeader("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0")
 
   setUp(
-    GetListApp.scn.users(1).ramp(15).protocolConfig(httpConf),
-    GetListServers.scn.users(2).ramp(20).protocolConfig(httpConf),
-    GetListDbs.scn.users(1).ramp(5).protocolConfig(httpConf),
-    GetListStorages.scn.users(1).protocolConfig(httpConf) //.delay(15)
-    )
+    GetListApp.scn.inject(rampUsers(1) over (1 seconds)),
+    GetListServers.scn.inject(rampUsers(1) over (20 seconds)),
+    GetListDbs.scn.inject(rampUsers(1) over (5 seconds)),
+    GetListStorages.scn.inject(rampUsers(1) over (15 seconds))
+    ).protocols(httpConf)
 }

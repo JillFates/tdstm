@@ -3,6 +3,8 @@ package assetLists
 object Headers {
 //login
 
+  val headers_0 = Map("Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+
   //SingIn
   val headers_3 = Map(
       "Content-Type" -> """application/x-www-form-urlencoded"""
