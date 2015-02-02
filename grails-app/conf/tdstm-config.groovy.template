@@ -309,3 +309,4 @@ log4j = {
 	additivity.grails=false
 }
 
+javamelody.disabled = true
