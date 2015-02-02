@@ -124,7 +124,7 @@
 	<tbody>
 		<g:if test="${workflowTransitionsList}">
 		<g:each in="${workflowTransitionsList}" status="i" var="transitions">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowRoles('${transitions.transition.id}')">
+			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
 				<td class="name">${transitions.transition?.code}</td>
 				
@@ -326,10 +326,10 @@ $(document).ready(function() {
 /*=========================================
  * redirect to steps roles form
  *========================================*/
-function showWorkflowRoles( workflowTransitionId ){
+/*function showWorkflowRoles( workflowTransitionId ){
 	$("#workflowTransitionId").val( workflowTransitionId );
 	$("form[name=workflowRolesForm]").submit();
-}
+}*/
 /*=========================================
  * show workflow steps edit form
  *========================================*/

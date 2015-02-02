@@ -73,7 +73,7 @@ class WorkflowController {
 	 * @param : workfow stepId
 	 * provide controlle to set the role to change the status.
 	 *---------------------------------------------*/
-	def workflowRoles = {
+	/*def workflowRoles = {
 			def transitionId = params.workflowTransition
 			def workflowTransitionsList
 			def workflowTransition
@@ -101,7 +101,7 @@ class WorkflowController {
 			return [workflowTransitionsList : workflowTransitionsList, workflowTransition:workflowTransition,
 					workflow : workflowTransition?.workflow, swimlanes : swimlanes,
 					headerCount : headerCount, roleWiseTransitions : roleWiseTransitions ]
-	}
+	}*/
 	/*====================================================
 	 *  Create  new workflow workflow
 	 *==================================================*/
@@ -259,71 +259,7 @@ class WorkflowController {
 		}
 		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ] )
 	}
-	/*====================================================
-	 *  Update the workflow roles
-	 *==================================================*/
-	def updateWorkflowRoles = {
-		def currentStatus = params.currentStatus
-		def workflowId = params.workflow
-		def workflow = Workflow.get( workflowId )
-		def swimlanes = Swimlane.findAllByWorkflow( workflow )
-		def onTruck = WorkflowTransition.findByWorkflowAndCode( workflow, "OnTruck" )?.transId
-		def hold =  WorkflowTransition.findByWorkflowAndCode( workflow, "hold" )?.transId
-		def currentTransition = WorkflowTransition.get( currentStatus )
-		def workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') ", [ workflow ] )
-		swimlanes.each{ role->
-			workflowTransitions.each{transition->
-				def input = params["${role.name}_${transition.id}"]
-				if(input && input.equalsIgnoreCase("on")){
-					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
-					def flag = params["flag_${role.name}_${transition.id}"]
-					if(!workflowransitionMap.size()){
-						workflowransitionMap = new WorkflowTransitionMap(workflow:workflow, workflowTransition:currentTransition,swimlane:role,transId:transition.transId, flag:flag ).save(flush:true)
-					}else{
-						workflowransitionMap.each{
-							it.flag = flag
-							it.save( flush:true )
-						}
-					}
-				} else {
-					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
-					if(workflowransitionMap.size()){
-						workflowransitionMap.each{
-							it.delete( flush:true )
-						}
-					}
-				}
-			}
-			def maxSourceId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck}")
-			def maxTargetId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
-            def minSourceId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck} and trans_id > ${hold}")
-			def minTargetId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
-			
-			if(minSourceId){
-				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minSourceId, [sort:"transId", order:"asc"])?.workflowTransition
-				def minProcessIds = workflowTransition?.findAll { it.transId < minSourceId }?.sort{it.transId}
-				minSourceId = minProcessIds.transId[0]
-				role.minSource = minSourceId ? stateEngineService.getState( workflow.process, minSourceId ) : null
-			}
-			if(minTargetId){
-				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minTargetId, [sort:"transId", order:"asc"])?.workflowTransition
-				def minProcessIds = workflowTransition?.findAll { it.transId < minTargetId }?.sort{it.transId}
-				minTargetId = minProcessIds.transId[0]
-				role.minTarget = minTargetId ? stateEngineService.getState( workflow.process, minTargetId ) : null
-			}
-			
-			role.maxTarget = maxTargetId ? stateEngineService.getState( workflow.process, maxTargetId ) : null
-			role.maxSource = maxSourceId ? stateEngineService.getState( workflow.process, maxSourceId ) : null
-			
-			if(!role.save( flush:true )){
-				role.errors.each {  println it}
-			}
-		}
-		//	load transitions details into application memory.
-    	stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
-		
-		redirect(action:workflowList, params:[workflow:workflowId])
-	 }
+
 		
 	/*-----------------------------------------------
 	 * @param : workfow, workflowTransition
