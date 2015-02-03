@@ -23,7 +23,7 @@ class EntityType {
 		return ctgType.("$type")
 	}
 	static final getKeyByText( text ){
-		def ctgType=[ 'Server' : AE, 'Storage':STORAGE, 'Database':DB, Application:APP, 'Device' : DEVICE, 'Logical Storage' : LOGICAL_STORAGE]
+		def ctgType=[ 'Server' : AE, 'Storage':STORAGE, 'Database':DB, Application:APP, 'Device' : DEVICE, 'Logical Storage' : LOGICAL_STORAGE, 'Files' : STORAGE]
 		return ctgType[text]
 	}
 }
