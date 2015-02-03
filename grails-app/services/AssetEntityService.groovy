@@ -3408,26 +3408,18 @@ class AssetEntityService {
 	* @return the map of asset types
 	*/
 	def assetTypesOf(manufacturerId, term, currentProject) {
-		def hql = "SELECT distinct m.assetType as assetType FROM Model m";
+		def hql = "SELECT distinct m.assetType as assetType FROM Model m WHERE m.assetType is not null ";
 		def joinTables = " ";
 		def condition = ""
 		def hqlParams = []
 
 		if (StringUtils.isNotBlank(term)) {
-			if (hqlParams.isEmpty()) {
-				condition = condition + " WHERE m.assetType LIKE ?"
-			} else {
-				condition = condition + " AND m.assetType LIKE ?"
-			}
+			condition = condition + "AND m.assetType LIKE ?"
 			hqlParams.add("%" + term + "%")
 		}
 
 		if (StringUtils.isNotBlank(manufacturerId) && manufacturerId.isLong()) {
-			if (hqlParams.isEmpty()) {
-				condition = condition + " WHERE m.manufacturer.id = ?"
-			} else {
-				condition = condition + " AND m.manufacturer.id = ?"
-			}
+			condition = condition + "AND m.manufacturer.id = ?"
 			hqlParams.add(manufacturerId.toLong())
 		}
 
