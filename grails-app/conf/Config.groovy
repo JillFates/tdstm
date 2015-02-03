@@ -48,6 +48,9 @@ grails.enable.native2ascii = true
 grails.pagination.default="20"
 grails.pagination.max="20"
 
+// Eliminates warning error - see TM-3681
+grails.stringchararrayaccessor.disabled=true
+
 //
 // Database Migrations Plugin Settings
 // 
