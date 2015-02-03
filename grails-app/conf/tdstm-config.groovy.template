@@ -308,5 +308,3 @@ log4j = {
 	additivity.StackTrace=false
 	additivity.grails=false
 }
-
-javamelody.disabled = true
