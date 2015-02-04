@@ -1475,37 +1475,52 @@ class AdminController {
 		long nonHeapMax = memNonHeap.getMax() / MegaBytes
 
 		long sysMemSize = osMxBean.getTotalPhysicalMemorySize() / MegaBytes
+		long sysMemFree = osMxBean.getFreePhysicalMemorySize() / MegaBytes
+		long swapSize = osMxBean.getTotalSwapSpaceSize() / MegaBytes
+		long swapFree = osMxBean.getFreeSwapSpaceSize() / MegaBytes
+		long virtMemCommit = osMxBean.getCommittedVirtualMemorySize() / MegaBytes
 
-		render """
-Memory Usage (Kb): <pre>
-	 Physical Memory: ${String.format("%,10d", sysMemSize)}
+		Map sysProps = rtMXBean.getSystemProperties()
+/*
 	Max Memory (Xmx): ${String.format("%,10d", maxMemory)}
 	    Total Memory: ${String.format("%,10d", totalMemory)}
 	     Used Memory: ${String.format("%,10d", usedMemory)}
 	     Free Memory: ${String.format("%,10d", freeMemory)}
+*/
+		render """
+Memory Usage (Kb): <pre>
+	 Physical Memory: ${String.format("%,10d", sysMemSize)}
+	     Used Memory: ${String.format("%,10d", sysMemSize - sysMemFree)}
+	     Free Memory: ${String.format("%,10d", sysMemFree)}
+	  Virtual Memory: ${String.format("%,10d", virtMemCommit)}
+	     Swap Memory: ${String.format("%,10d", swapSize)}
+	       Swap Used: ${String.format("%,10d", swapSize - swapFree)}
+	       Swap Free: ${String.format("%,10d", swapFree)}
 
 	     ---- Heap ----
 	             Max: ${String.format("%,10d", heapMax)}
-	            Used: ${String.format("%,10d", heapUsed)}
 	       Committed: ${String.format("%,10d", heapCommitted)}
+	            Used: ${String.format("%,10d", heapUsed)}
+	     	    Free: ${String.format("%,10d", freeMemory)}
 
 	     -- Non-Heap --
+	       Committed: ${String.format("%,10d", nonHeapCommitted)}
 	             Max: ${String.format("%,10d", nonHeapMax)}
 	            Used: ${String.format("%,10d", nonHeapUsed)}
-	       Committed: ${String.format("%,10d", nonHeapCommitted)}
+	            Free: ${String.format("%,10d", nonHeapMax - nonHeapUsed)}
 </pre>
 
 System Information:
 
 <table>
-<tr><td align=right>OS: </td><td>${osMxBean.getName()} (${osMxBean.getArch()}</td></tr>
+<tr><td align=right>OS: </td><td>${osMxBean.getName()} (${osMxBean.getArch()})</td></tr>
 <tr><td align=right># of CPUs: </td><td>${rt.availableProcessors()}</td></tr>
 <tr><td align=right>Load Avg: </td><td>${String.format("%3.2f", osMxBean.getSystemLoadAverage() )}</td></tr>
 <tr><td align=right>VM Vendor: </td><td>${rtMXBean.getVmVendor()}</td></tr>
 <tr><td align=right>VM Name: </td><td>${rtMXBean.getVmName()}</td></tr>
-<tr><td align=right>VM Version: </td><td>${rtMXBean.getVmVersion()}</td></tr>
+<tr><td align=right>VM Version: </td><td>${sysProps['java.runtime.version']}</td></tr>
 
-<tr><td align=right valign=top>System&nbsp;Properties: </td><td>${rtMXBean.getSystemProperties()}</td></tr>
+<tr><td align=right valign=top>System&nbsp;Properties: </td><td>${sysProps}</td></tr>
 
 <tr><td align=right valign=top>Input Args: </td><td>${rtMXBean.getInputArguments()}</td></tr>
 </table>
