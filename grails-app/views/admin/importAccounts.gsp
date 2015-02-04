@@ -40,10 +40,10 @@
 						<th>Middle Name</th>
 						<th>Last Name</th>
 						<th>Phone</th>
+						<th>Team(s)</th>
+						<th>Role</th>
 						<th>Email</th>
 						<th>Password</th>
-						<th>Role</th>
-						<th>Team(s)</th>
 						<th>Match</th>
 						<th>Errors</th>
 					</tr>
@@ -57,12 +57,14 @@
 								<td>${person.middleName}</td>
 								<td>${person.lastName}</td>
 								<td>${person.phone}</td>
+								<td>${person.teams}</td>
+								<td>${person.role}</td>
 								<td>${person.email}</td>
 								<td>${person.password}</td>
-								<td>${person.role}</td>
-								<td>${person.teams}</td>
 								<td>${person.match}</td>
-								<td>${person.error}</td>
+								<td>
+									<g:each in="${person.errors}" var="error">${error}<br></g:each>
+								</td>
 						</tr>
 					</g:each>
 				</tbody>
@@ -104,8 +106,7 @@
 			<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
 			<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
 			<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password at next login<br />
-			<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or  <br />
-			<g:select id="timezone" name="timezone" from="${timzones}" value="${timezone}"></g:select> Timezone <br />
+			<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or  <br /-->
 			<input type="text" name="password" size="10"> Default password to use (if blank in import)<br />
 			<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
 			<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />

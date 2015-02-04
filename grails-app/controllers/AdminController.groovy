@@ -3,6 +3,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.runtime.TimeCategory
 import org.apache.commons.lang.math.NumberUtils
+import org.apache.commons.lang.StringUtils
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
@@ -12,6 +13,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
+import java.util.UUID
 
 class AdminController {
 	def jdbcTemplate
@@ -22,6 +24,8 @@ class AdminController {
 	def projectService
 	def securityService
 	def userPreferenceService
+
+	private static Map VALID_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
 
 	def index = { }
 
@@ -1144,16 +1148,17 @@ class AdminController {
 						firstName: fields[1],
 						middleName: fields[2],
 						lastName: fields[3],
-						email: fields[7],
-						teams: fields[5],
 						phone: fields[4],
+						teams: fields[5],
+						role: fields[6],
+						email: fields[7],
+						password: fields[8],
 						error: ''
 					)
 				}
 			}
 			return people
 		}
-
 
 		def validateTeams = { teams -> 
 			String errors = ''
@@ -1233,12 +1238,16 @@ class AdminController {
 				people = parseCsv(upload, header)
 				map.matches = lookForMatches()
 
-				// Validate the teams
+				// Validate the teams && role
 				for (int i=0; i < people.size(); i++) {
+					people[i].errors = []
 					if (people[i].teams) {
 						List teams = splitTeams(people[i].teams)
 						log.debug "teams=(${people[i].teams} -- $teams"
-						people[i].error = validateTeams(teams)
+						people[i].errors << validateTeams(teams)
+					}
+					if (!StringUtils.isEmpty(people[i].role) && !VALID_ROLES[people[i].role]) {
+						people[i].errors << "Invalid role: ${people[i].role}"
 					}
 				}
 
@@ -1264,6 +1273,9 @@ class AdminController {
 				people = parseCsv(csv, header)
 				lookForMatches()
 
+				if (randomPassword) {
+					password = UUID.randomUUID().toString()
+				}
 				if (password) {
 					password = securityService.encrypt(password)
 				}
@@ -1273,10 +1285,16 @@ class AdminController {
 				use(TimeCategory) {
 					expiryDate = expiryDate + expireDays.days
 				}
+
 				log.info "expiryDate=$expiryDate"
 
 				def failedPeople = []
 				def created = 0
+
+				if (!StringUtils.isEmpty(role) && !VALID_ROLES[role]) {
+					failed = true
+					people = []
+				}
 
 				people.each() { p -> 
 					def person
@@ -1313,12 +1331,17 @@ class AdminController {
 					if (person && createUserLogin && p.username) {
 						def u = UserLogin.findByPerson(person)
 						if (!u) {
+							def userPass = password
+							if (!StringUtils.isEmpty(p.password)) {
+								userPass = securityService.encrypt(p.password)
+							}
 							u = new UserLogin(
 								username: p.username,
-								password: password,
+								password: userPass,
 								active: (activateLogin ? 'Y' : 'N'),
 								expiryDate: expiryDate,
-								person: person
+								person: person,
+								forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
 							)
 
 							if (! u.validate() || !u.save(flush:true)) {
@@ -1327,11 +1350,6 @@ class AdminController {
 								failedPeople << p
 								failed = true
 							} else {
-								if (role) {
-									log.info "importAccounts() : creating Role $role for $person"
-									userPreferenceService.setUserRoles([role], person.id)
-								}
-
 								log.info "importAccounts() : created UserLogin $u"
 								def up = new UserPreference(
 									userLogin: u,
@@ -1346,17 +1364,29 @@ class AdminController {
 							}
 						}
 
+						def userRole = role
+						if (!StringUtils.isEmpty(p.role)) {
+							userRole = p.role
+						}
+						if (!failed && !StringUtils.isEmpty(userRole)) {
+							if (VALID_ROLES[userRole]) {
+								log.debug "importAccounts() : creating Role $role for $person"
+								userPreferenceService.setUserRoles([role], person.id)
+							}
+						}
+
 						// Assign the user to one or more teams appropriately
-						if (! failed && p.teams) {
+						if (!failed && p.teams) {
 							List teams = splitTeams(p.teams)
-							teams.each {t ->
+
+							teams.each { t ->
 								if (teamCodes.contains(t)) {
 									partyRelationshipService.addStaffFunction(person, t, project.client, project)
 								}
 							}
 						}
 
-						if (! failed) created++
+						if (!failed) created++
 
 					}
 
