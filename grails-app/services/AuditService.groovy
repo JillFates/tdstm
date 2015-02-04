@@ -63,12 +63,21 @@ class AuditService {
 		def result = [:]
 		if (params.size()) {
 			AUDITED_PARAMS.each { k, v ->
-				if (params.containsKey(k) && params[k] instanceof String && params[k].trim().size() ) {
+				if (params.containsKey(k) && isValidParam(params[k])) {
+					println(params[k])
 					result[k] = v
 				}
 			}
 		}
 		return result
+	}
+
+	/**
+	 * This method checks whether the param is of
+	 * a valid type (Collection or String) as is not empty.
+	 */
+	boolean isValidParam(param){
+		return (param instanceof String && param.trim().size()) || (param instanceof Collection<?> && !param.isEmpty())
 	}
 
 	/**

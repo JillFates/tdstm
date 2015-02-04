@@ -1885,12 +1885,11 @@ tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comme
 function recompileDOM(gridElementId) {
 	var objDom = $('[ng-app]');
 	var injector = angular.element(objDom).injector();
-	if(injector){
-		injector.invoke(function($rootScope, $compile) {
-			var gridElement = $('#' + gridElementId);
-			$compile(gridElement)($rootScope.commentsScope);
-		});	
-	}
+
+	injector.invoke(function($rootScope, $compile) {
+		var gridElement = $('#' + gridElementId);
+		$compile(gridElement)($rootScope.commentsScope);
+	});	
 	
 }
 
