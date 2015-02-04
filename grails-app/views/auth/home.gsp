@@ -146,6 +146,11 @@ a:hover {
 							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>
 							<td><a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a></td>
 						</tr>
+						<tr class="even">
+							<td>
+								<g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link>
+							</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>

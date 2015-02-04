@@ -16,10 +16,12 @@ import com.tdsops.common.security.*
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory
-	def securityService
+
+	def controllerService
 	def partyRelationshipService
-	def userPreferenceService
 	def projectService
+	def securityService
+	def userPreferenceService
 
 	def index = { }
 
@@ -1440,4 +1442,74 @@ class AdminController {
 		render encodedValue
 	}
 
+	/**
+	 * Used to display the application memory consumption
+	 */
+	def systemInfo = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
+		int MegaBytes = 1024;
+
+		Runtime rt = Runtime.getRuntime()
+		long freeMemory = rt.freeMemory()/MegaBytes
+		long totalMemory = rt.totalMemory()/MegaBytes
+		long maxMemory = rt.maxMemory()/MegaBytes
+		long usedMemory = totalMemory - freeMemory
+
+		java.lang.management.MemoryMXBean memoryMXBean = java.lang.management.ManagementFactory.getMemoryMXBean()
+		java.lang.management.MemoryUsage memNonHeap=memoryMXBean.getNonHeapMemoryUsage()
+		java.lang.management.MemoryUsage memHeap=memoryMXBean.getHeapMemoryUsage()
+
+		java.lang.management.OperatingSystemMXBean osMxBean = java.lang.management.ManagementFactory.getOperatingSystemMXBean()
+		java.lang.management.RuntimeMXBean rtMXBean = java.lang.management.ManagementFactory.getRuntimeMXBean()
+
+		long heapUsed = memHeap.getUsed()/MegaBytes
+		long heapCommitted = memHeap.getCommitted()/MegaBytes
+		long heapMax = memHeap.getMax() / MegaBytes
+
+		long nonHeapUsed = memNonHeap.getUsed()/MegaBytes
+		long nonHeapCommitted = memNonHeap.getCommitted()/MegaBytes
+		long nonHeapMax = memNonHeap.getMax() / MegaBytes
+
+		long sysMemSize = osMxBean.getTotalPhysicalMemorySize() / MegaBytes
+
+		render """
+Memory Usage (Kb): <pre>
+	 Physical Memory: ${String.format("%,10d", sysMemSize)}
+	Max Memory (Xmx): ${String.format("%,10d", maxMemory)}
+	    Total Memory: ${String.format("%,10d", totalMemory)}
+	     Used Memory: ${String.format("%,10d", usedMemory)}
+	     Free Memory: ${String.format("%,10d", freeMemory)}
+
+	     ---- Heap ----
+	             Max: ${String.format("%,10d", heapMax)}
+	            Used: ${String.format("%,10d", heapUsed)}
+	       Committed: ${String.format("%,10d", heapCommitted)}
+
+	     -- Non-Heap --
+	             Max: ${String.format("%,10d", nonHeapMax)}
+	            Used: ${String.format("%,10d", nonHeapUsed)}
+	       Committed: ${String.format("%,10d", nonHeapCommitted)}
+</pre>
+
+System Information:
+
+<table>
+<tr><td align=right>OS: </td><td>${osMxBean.getName()} (${osMxBean.getArch()}</td></tr>
+<tr><td align=right># of CPUs: </td><td>${rt.availableProcessors()}</td></tr>
+<tr><td align=right>Load Avg: </td><td>${String.format("%3.2f", osMxBean.getSystemLoadAverage() )}</td></tr>
+<tr><td align=right>VM Vendor: </td><td>${rtMXBean.getVmVendor()}</td></tr>
+<tr><td align=right>VM Name: </td><td>${rtMXBean.getVmName()}</td></tr>
+<tr><td align=right>VM Version: </td><td>${rtMXBean.getVmVersion()}</td></tr>
+
+<tr><td align=right valign=top>System&nbsp;Properties: </td><td>${rtMXBean.getSystemProperties()}</td></tr>
+
+<tr><td align=right valign=top>Input Args: </td><td>${rtMXBean.getInputArguments()}</td></tr>
+</table>
+""".toString() 
+
+	}
 }
