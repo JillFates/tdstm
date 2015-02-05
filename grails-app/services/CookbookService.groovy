@@ -965,6 +965,15 @@ class CookbookService {
 								reason: "Invalid Syntax",
 								detail: "$errorLabel in element $i. $value taskspec requires '$attribute' property."
 							]
+			}else{
+				if(spec[attribute] instanceof String){
+					if(!spec[attribute].trim().size()){
+							errorList << [	error: 1, 
+								reason: "Invalid Syntax",
+								detail: "$errorLabel in element $i. Property '$attribute' for taskspec $value can't be empty."
+							]
+					}
+				}
 			}
 		}
 	}
