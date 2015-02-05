@@ -42,7 +42,7 @@
 	</pre>
 	
 	<h3>Memory Pools:</h3>
-	<table style="width: 75%">
+	<table>
 		<tr>
 			<th>Name</th>
 			<th>Type</th>
@@ -114,6 +114,33 @@
 	<br>
 	<br>
 
+	<h3>Garbage Collection:</h3>
+	<table style="width: 40%">
+		<tr>
+			<th>Name</th>
+			<th>Count</th>
+			<th>Time</th>
+			<th>Avg. (Time/Count)</th>
+		</tr>
+		<g:each in="${java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()}" var="gcitem">
+		<tr>
+			<td>${gcitem.name}</td>
+			<td style="text-align: right">
+				<g:if test="${gcitem.collectionCount}">${gcitem.collectionCount}</g:if>
+			</td>
+			<td style="text-align: right">
+				<g:if test="${gcitem.collectionTime}">${gcitem.collectionTime}</g:if>
+			</td>
+			<td style="text-align: right">
+				<g:if test="${gcitem.collectionCount && gcitem.collectionTime}">${String.format("%.2f",gcitem.collectionTime / gcitem.collectionCount)}</g:if>
+			</td>
+		</tr>
+		</g:each>
+	</table>
+	<b>Note:</b> <i>PS Scavenge is used on the young (eden, survivor) generation and PS MarkSweep is used on the old generation</i>
+	<br>
+	<br>
+
 	<h3>System Information:</h3>
 	<table>
 	<tr><td align=right>OS: </td><td>${osMxBean.getName()} (${osMxBean.getArch()})</td></tr>
@@ -147,33 +174,6 @@
 	</tr>
 
 	</table>
-	<br>
-	<br>
-
-	<h3>Garbage Collection:</h3>
-	<table style="width: 40%">
-		<tr>
-			<th>Name</th>
-			<th>Count</th>
-			<th>Time</th>
-			<th>Avg. (Time/Count)</th>
-		</tr>
-		<g:each in="${java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()}" var="gcitem">
-		<tr>
-			<td>${gcitem.name}</td>
-			<td style="text-align: right">
-				<g:if test="${gcitem.collectionCount}">${gcitem.collectionCount}</g:if>
-			</td>
-			<td style="text-align: right">
-				<g:if test="${gcitem.collectionTime}">${gcitem.collectionTime}</g:if>
-			</td>
-			<td style="text-align: right">
-				<g:if test="${gcitem.collectionCount && gcitem.collectionTime}">${String.format("%.2f",gcitem.collectionTime / gcitem.collectionCount)}</g:if>
-			</td>
-		</tr>
-		</g:each>
-	</table>
-	<b>Note:</b> <i>PS Scavenge is used on the young (eden, survivor) generation and PS MarkSweep is used on the old generation</i>
 	<br>
 	<br>
 
