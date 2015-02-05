@@ -2053,7 +2053,8 @@ class AssetEntityService {
 	 * @param description description used on update
 	 **/
 	private void updateProgress(key, progressCount, progressTotal, description) {
-		if ((progressCount % Math.round(progressTotal * 0.05)) == 0) {
+		def stepSize = Math.round(progressTotal * 0.05)
+		if ((progressTotal > 0) && (stepSize > 0) && ((progressCount % stepSize) == 0)) {
 			progressService.update(key, ((int)((progressCount / progressTotal) * 100)), description)
 		}
 	}
