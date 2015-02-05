@@ -19,8 +19,10 @@
 	<span class="button"><input type="button" id="cableId" name="cableId" class="cableedit" value="Cable" onclick="openCablingDiv(${assetEntity?.id},'S')" /> </span>
 </g:if>
 
+<tds:hasPermission permission='ArchitectureView'>
 <span class="button">
-	<g:link controller="assetEntity" action="applicationArchitectureViewer" params="[assetId:assetEntity?.id, level:2]">
-		<input type="button" class="architectureGraph" value="Graph" />
+	<g:link controller="assetEntity" action="architectureViewer" params="[assetId:assetEntity?.id, level:2]">
+		<input type="button" class="architectureGraph" value="Arch Graph" />
 	</g:link>
 </span>
+</tds:hasPermission>

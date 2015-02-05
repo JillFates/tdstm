@@ -246,7 +246,7 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/dependencyConsole"]'));
   };
   this.getArchitectureViewer = function () {
-    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/applicationArchitectureViewer"]'))
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/architectureViewer"]'))
   }
   this.getAssetsHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print\',\'help\');"]'));

@@ -237,7 +237,9 @@
 							<tds:hasPermission permission='MoveBundleEditView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependency Analyzer</g:link></li>
 							</tds:hasPermission>
-							  <li><g:link class="mmlink" controller="assetEntity" action="applicationArchitectureViewer" onclick="hideMegaMenu('assetMegaMenu')">Architecture Viewer</g:link></li>
+							<tds:hasPermission permission='ArchitectureView'>
+							  <li><g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">Architecture Graph</g:link></li>
+							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print','help');" onclick="hideMegaMenu('assetMegaMenu')">help</a></li>
 							</tds:hasPermission>

@@ -2,7 +2,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 		<meta name="layout" content="projectHeader" />
-		<title>Application Architecture Graph</title>
+		<title>Architecture Graph</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
@@ -27,7 +27,7 @@
 	</head>
 <body>
 <div id="body" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-	<h1 id="pageTitleId">Application Architecture Graph</h1>
+	<h1 id="pageTitleId">Architecture Graph</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>

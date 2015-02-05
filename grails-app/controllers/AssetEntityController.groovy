@@ -4376,7 +4376,7 @@ class AssetEntityController {
 		}
 	}
 	
-	def applicationArchitectureViewer = {
+	def architectureViewer = {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -4387,7 +4387,7 @@ class AssetEntityController {
 		def level = NumberUtils.toInt(params.level)
 		if (level == 0)
 			level = 3
-		return [assetId:params.assetId, level:level]
+		render([assetId:params.assetId, level:level, view:'architectureGraph'])
 	}
 	
 	/**
