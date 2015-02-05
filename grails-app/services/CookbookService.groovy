@@ -1108,7 +1108,7 @@ class CookbookService {
 			description:0,
 			filter: groupProps.filter,
 			type:['asset','action','milestone','gateway','general'],
-			action: ['rollcall','location','room','rack','truck','set'],
+			action: ['rollcall','location','room','rack','truck','set', 'cart'],
 			disposition: ['source', 'target'],
 			setOn:0,
 			disabled:false,
