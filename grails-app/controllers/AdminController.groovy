@@ -13,6 +13,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
+
 import java.util.UUID
 
 class AdminController {
@@ -1517,44 +1518,32 @@ class AdminController {
 	     Used Memory: ${String.format("%,10d", usedMemory)}
 	     Free Memory: ${String.format("%,10d", freeMemory)}
 */
-		render """
-Memory Usage (Kb): <pre>
-	 Physical Memory: ${String.format("%,10d", sysMemSize)}
-	     Used Memory: ${String.format("%,10d", sysMemSize - sysMemFree)}
-	     Free Memory: ${String.format("%,10d", sysMemFree)}
-	  Virtual Memory: ${String.format("%,10d", virtMemCommit)}
-	     Swap Memory: ${String.format("%,10d", swapSize)}
-	       Swap Used: ${String.format("%,10d", swapSize - swapFree)}
-	       Swap Free: ${String.format("%,10d", swapFree)}
 
-	     ---- Heap ----
-	             Max: ${String.format("%,10d", heapMax)}
-	       Committed: ${String.format("%,10d", heapCommitted)}
-	            Used: ${String.format("%,10d", heapUsed)}
-	     	    Free: ${String.format("%,10d", freeMemory)}
-
-	     -- Non-Heap --
-	       Committed: ${String.format("%,10d", nonHeapCommitted)}
-	             Max: ${String.format("%,10d", nonHeapMax)}
-	            Used: ${String.format("%,10d", nonHeapUsed)}
-	            Free: ${String.format("%,10d", nonHeapMax - nonHeapUsed)}
-</pre>
-
-System Information:
-
-<table>
-<tr><td align=right>OS: </td><td>${osMxBean.getName()} (${osMxBean.getArch()})</td></tr>
-<tr><td align=right># of CPUs: </td><td>${rt.availableProcessors()}</td></tr>
-<tr><td align=right>Load Avg: </td><td>${String.format("%3.2f", osMxBean.getSystemLoadAverage() )}</td></tr>
-<tr><td align=right>VM Vendor: </td><td>${rtMXBean.getVmVendor()}</td></tr>
-<tr><td align=right>VM Name: </td><td>${rtMXBean.getVmName()}</td></tr>
-<tr><td align=right>VM Version: </td><td>${sysProps['java.runtime.version']}</td></tr>
-
-<tr><td align=right valign=top>System&nbsp;Properties: </td><td>${sysProps}</td></tr>
-
-<tr><td align=right valign=top>Input Args: </td><td>${rtMXBean.getInputArguments()}</td></tr>
-</table>
-""".toString() 
-
+		render (template:'systemInfo', model:
+			['freeMemory':freeMemory,
+			 'totalMemory':totalMemory,
+			 'maxMemory':maxMemory,
+			 'usedMemory':usedMemory,
+			 'memoryMXBean':memoryMXBean,
+			 'memNonHeap':memNonHeap,
+			 'memHeap':memHeap,
+			 'osMxBean':osMxBean,
+			 'rtMXBean':rtMXBean,
+			 'heapUsed':heapUsed,
+			 'heapCommitted':heapCommitted,
+			 'heapMax':heapMax,
+			 'nonHeapUsed':nonHeapUsed,
+			 'nonHeapCommitted':nonHeapCommitted,
+			 'nonHeapMax':nonHeapMax,
+			 'sysMemSize':sysMemSize,
+			 'sysMemFree':sysMemFree,
+			 'swapSize':swapSize,
+			 'swapFree':swapFree,
+			 'virtMemCommit':virtMemCommit,
+			 'sysProps':sysProps,
+			 'osMxBean':osMxBean,
+			 'rt': rt
+			]
+		)
 	}
 }
