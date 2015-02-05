@@ -119,7 +119,7 @@
 		<tr>
 			<th>Name</th>
 			<th>Count</th>
-			<th>Time</th>
+			<th>Time (msec)</th>
 			<th>Avg. (Time/Count)</th>
 		</tr>
 		<g:each in="${java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()}" var="gcitem">
