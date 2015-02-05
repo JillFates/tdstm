@@ -11,7 +11,6 @@
 </head>
 <body>
 <div class="body">
-<shiro:hasRole name="ADMIN">
 <div>
 	<h1>System Info</h1>
 	<g:if test="${flash.message}">
@@ -179,7 +178,6 @@
 	<br>
 
 </div>
-</shiro:hasRole>
 </div>
 </body>
 
