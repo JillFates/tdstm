@@ -1885,11 +1885,15 @@ tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comme
 function recompileDOM(gridElementId) {
 	var objDom = $('[ng-app]');
 	var injector = angular.element(objDom).injector();
-
-	injector.invoke(function($rootScope, $compile) {
-		var gridElement = $('#' + gridElementId);
-		$compile(gridElement)($rootScope.commentsScope);
-	});	
+	if(injector){
+		injector.invoke(function($rootScope, $compile) {
+			var gridElement = $('#' + gridElementId);
+			$compile(gridElement)($rootScope.commentsScope);
+		});		
+	}else{
+		console.log("We were not able to recompile");
+	}
+	
 	
 }
 

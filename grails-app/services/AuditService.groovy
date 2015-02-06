@@ -64,7 +64,6 @@ class AuditService {
 		if (params.size()) {
 			AUDITED_PARAMS.each { k, v ->
 				if (params.containsKey(k) && isValidParam(params[k])) {
-					println(params[k])
 					result[k] = v
 				}
 			}
