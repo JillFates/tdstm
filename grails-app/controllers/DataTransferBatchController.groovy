@@ -216,6 +216,8 @@ class DataTransferBatchController {
 		try{
 			def dataTransferBatchInstance = DataTransferBatch.get(params.batchId)
 			if(dataTransferBatchInstance) {
+				DataTransferValue.executeUpdate("delete from DataTransferValue where dataTransferBatch = ?",[dataTransferBatchInstance])
+
 				dataTransferBatchInstance.delete(flush:true,failOnError:true)
 				flash.message = "DataTransferBatch ${params.batchId} deleted"
 				redirect(action:list)
@@ -224,9 +226,9 @@ class DataTransferBatchController {
 				redirect(action:list)
 		   }
 		} catch(Exception e) {
+			log.error "Can't delete batch instance: " + e.getMessage()
 			e.printStackTrace()
 		}
 	}
-	
 	
 }
