@@ -15,6 +15,8 @@ import org.apache.shiro.SecurityUtils
 
 import java.io.File;
 
+import grails.util.GrailsUtil
+
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -4629,7 +4631,8 @@ class AssetEntityController {
 						(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
 						(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "other":"other"]
 			
-			def model2 = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, level:params.level, assetTypes:assetTypes as JSON]
+			def model2 = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, level:params.level, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
+			
 			render(view:'_applicationArchitectureGraph', model:model2)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)

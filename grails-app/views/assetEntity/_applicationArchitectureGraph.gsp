@@ -93,6 +93,7 @@ var assetTypes = null;
 links = ${links};
 assets = ${nodes};
 assetTypes = ${assetTypes};
+environment = '${environment}';
 
 
 // set the asset select to display the correct asset
@@ -791,8 +792,11 @@ function buildMap (width, height) {
 				if (tag == 'use') {
 					var id = event.target.id.substr(5);
 					var data = target.__data__;
-					var consoleOutputItem = '<li class="tempItem console" id="consoleOutputItemId">Output to console</li>';
-					$(".customMenu").append(consoleOutputItem);
+					if(environment == 'development'){
+						var consoleOutputItem = '<li class="tempItem console" id="consoleOutputItemId">Output to console</li>';
+						$(".customMenu").append(consoleOutputItem);	
+					}
+					
 					$("#consoleOutputItemId").on('click', function (a, b) {
 						closeMenu();
 						console.log(data);
