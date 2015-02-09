@@ -32,7 +32,12 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		<script type="text/javascript">
 
+			injector = null;
+
 			$(document).ready(function() {
+
+				
+
 				//$('#assetMenu').show();
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })
@@ -40,7 +45,7 @@
 				$("#manufacturerShowDialog").dialog({ autoOpen: false })
 				$("#modelShowDialog").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
-
+				
 
 				// JqGrid implementations 
 				var filter = '${filter}'
@@ -84,7 +89,7 @@
 					caption="listCaption"
 					rowNum="sizePref"
 					multiselect="true"
-					loadComplete="initCheck"
+					loadComplete="customInitCheck"
 					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
@@ -95,11 +100,15 @@
 					<jqgrid:resize id="databaseId" resizeOffset="-2" />
 					<jqgrid:refreshButton id="databaseId" />
 				</jqgrid:grid>
+
+
 				jQuery("#databaseId").jqGrid('navButtonAdd','#pcolch',{ caption: "Columns", title: "Reorder Columns", onClickButton : function (){ jQuery("#colch").jqGrid('columnChooser'); } });
 				populateFilter();
 				$("#del_databaseIdGrid").click(function(){
 				$("#databaseId").jqGrid("editGridRow","new",
 					{afterSubmit:deleteMessage});
+
+				
 			 });
 			<g:each var="key" in="['1','2','3','4','5']">
 				var dbPref= '${dbPref[key]}';
