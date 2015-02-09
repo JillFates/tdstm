@@ -1879,13 +1879,13 @@ tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comme
 
 function customInitCheck(){
 	if(!injector){
-		findInjector("customInitCheck");
+		findInjector();
 		initCheck();	
 	}
 	
 }
 
-function findInjector(param){
+function findInjector(){
 	var objDom = $('[ng-app]');
 	injector = angular.element(objDom).injector();
 }
@@ -1900,7 +1900,7 @@ function recompileDOM(gridElementId) {
 	/*var objDom = $('[ng-app]');
 	var injector2 = angular.element(objDom).injector();*/
 	if(!injector){
-		findInjector("recompileDOM");
+		findInjector();
 	}
 	if(injector){
 		injector.invoke(function($rootScope, $compile) {
