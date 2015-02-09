@@ -1571,32 +1571,6 @@ function submitCheckBox(){
 			}
 		});
 }
-function submitCheckBoxNew(){
-	var moveBundleId = $("#planningBundleSelectId").val();
-	var data = $('#checkBoxForm').serialize() + "&bundle="+moveBundleId;
-	new Ajax.Request(contextPath+'/moveBundle/generateDependencyNew?'+data,{asynchronous:true,evalScripts:true,
-		    onLoading:function(){
-		    	var processTab = jQuery('#processDiv');
-			    processTab.attr("style", "display:block");
-			    processTab.attr("style", "margin-left: 180px");
-			    var assetTab = jQuery('#dependencyTableId');
-			    assetTab.attr("style", "display:none");
-			    assetTab.attr("style", "display:none");
-			    jQuery('#items1').css("display","none");
-			    $('#upArrow').css('display','none')
-		    }, onComplete:function(data){
-				$('#dependencyBundleDetailsId').html(data.responseText)
-				var processTab = jQuery('#processDiv');
-			    processTab.attr("style", "display:none");
-			    var assetTab = jQuery('#dependencyBundleDetailsId');
-			    assetTab.attr("style", "display:block");
-			    $('#upArrow').css('display','inline');
-			    $('#downArrow').css('display','none');
-			}, onFailure: function() { 
-				alert("Please associate appropriate assets to one or more 'Planning' bundles before continuing"); 
-			}
-		});
-}
 var isFirst = true;
 function selectAll(){
 	var totalCheck = $("input[name=checkBox]");
