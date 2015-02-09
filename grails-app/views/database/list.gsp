@@ -32,8 +32,6 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		<script type="text/javascript">
 
-			injector = null;
-
 			$(document).ready(function() {
 
 				

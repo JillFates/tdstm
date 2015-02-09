@@ -1875,6 +1875,20 @@ tds.comments.module.directive('assetsByType', ['appCommonData', 'commentService'
 tds.comments.module.directive('commentInnerList', ['commentService', 'alerts', 'utils', 'commentUtils', tds.comments.directive.CommentInnerList]);
 tds.comments.module.directive('gridButtons', ['utils', 'commentUtils', tds.comments.directive.GridButtons]);
 
+injector = null;
+
+function customInitCheck(){
+	if(!injector){
+		findInjector();
+		initCheck();	
+	}
+	
+}
+
+function findInjector(){
+	var objDom = $('[ng-app]');
+	injector = angular.element(objDom).injector();
+}
 
 /***************************
  * COMPATIBILITY FUNCTIONS
