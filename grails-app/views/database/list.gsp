@@ -89,7 +89,7 @@
 					caption="listCaption"
 					rowNum="sizePref"
 					multiselect="true"
-					loadComplete="customInitCheck"
+					loadComplete="initCheck"
 					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
