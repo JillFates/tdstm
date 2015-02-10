@@ -14,10 +14,12 @@ public class AssetGraph {
 		nodes = [:]
 		def currentId = -1
 		def currentNode = null
+		def aType 
 		result.each { record ->
 			if (currentId != record["assetId"]) {
 				currentId = record["assetId"]
-				currentNode = new AssetNode(id: record["assetId"], moveBundleId: record["moveBundleId"], assetType: record["assetType"].toUpperCase())
+				aType = record["assetType"]?.toUpperCase()
+				currentNode = new AssetNode(id: record["assetId"], moveBundleId: record["moveBundleId"], assetType: aType)
 				nodes[currentNode.id] = currentNode
 			}
 			addDependencyToNode(currentNode, record["assetDepFromId"], record["assetDepToId"], record["type"], record["status"])
@@ -44,7 +46,7 @@ public class AssetGraph {
 		def group = []
 
 		nodes.each { assetId, node ->
-			if (!node.checked && dependecyBundlingAssetTypeMap[node.assetType]) {
+			if (!node.checked && node.assetType && dependecyBundlingAssetTypeMap[node.assetType]) {
 				//If the node is not checked, then creates a new group and search for all assets/nodes related to this one
 				group = []
 				groups << group
