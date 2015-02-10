@@ -3132,7 +3132,7 @@ class AssetEntityController {
 				assetList.each {
 					def item = [id:it.asset.id, assetName:it.asset.assetName, assetType:it.asset.assetType, 
 						validation:it.asset.validation, moveBundle:it.asset.moveBundle, planStatus:it.asset.planStatus, 
-						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict]
+						depToResolve:it.asset.depToResolve, depToConflic:it.asset.depToConflict, assetClass:it.asset.assetClass]
 					
 					// check if the object is a logical or physical strage
 					if (it.asset.assetClass.toString().equals('DEVICE')) {

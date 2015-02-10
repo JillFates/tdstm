@@ -2,8 +2,8 @@
     This is used by the dependency Console
 --%>
 <%@page import="com.tds.asset.AssetComment"%>
-
 <%@page import="com.tds.asset.Files" %>
+
 <g:set var="assetClass" value="${(new Files()).assetClass}" />
 
 <div class="tabs">
@@ -36,34 +36,34 @@
 						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 								<g:checkBox name="checkBox" id="checkId_${files.asset?.id}" ></g:checkBox>
-								<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${files.asset.id})">
+								<a href="javascript:EntityCrud.showAssetEditView('${files.asset.assetClass}', ${files.asset.id})">
 									<img src="/tdstm/icons/database_edit.png" border="0px" />
 								</a>
 								<grid-buttons asset-id="${files.asset?.id}" asset-type="${files.asset?.assetType}" tasks="${files.tasksStatus}" comments="${files.commentsStatus}"></grid-buttons>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.assetName}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.assetName}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.fileFormat}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.fileFormat}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.type}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.type}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.validation}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.validation}</span>
 							</td>
    							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.moveBundle}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.moveBundle}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset.planStatus}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset.planStatus}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset?.depToResolve?:''}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset?.depToResolve?:''}</span>
 							</td>
 							<td>
-								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${files.asset?.id} )">${files.asset?.depToConflict?:''}</span>
+								<span onclick="EntityCrud.showAssetDetailView('${files.asset.assetClass}', ${files.asset?.id} )">${files.asset?.depToConflict?:''}</span>
 							</td>
 						</tr>
 					</g:each>
