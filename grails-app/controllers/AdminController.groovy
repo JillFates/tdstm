@@ -1316,27 +1316,27 @@ class AdminController {
 							failedPeople << p
 							failed = true
 						}
-					}
 
-					def userRole = role
-					if (!StringUtils.isEmpty(p.role)) {
-						userRole = p.role
-					}
-					if (!failed && !StringUtils.isEmpty(userRole)) {
-						if (!VALID_ROLES[userRole]) {
-							userRole = DEFAULT_ROLE
+						def userRole = role
+						if (!StringUtils.isEmpty(p.role)) {
+							userRole = p.role
 						}
-						log.debug "importAccounts() : creating Role $userRole for $person"
-						userPreferenceService.setUserRoles([userRole], person.id)
-					}
+						if (!failed && !StringUtils.isEmpty(userRole)) {
+							if (!VALID_ROLES[userRole]) {
+								userRole = DEFAULT_ROLE
+							}
+							log.debug "importAccounts() : creating Role $userRole for $person"
+							userPreferenceService.setUserRoles([userRole], person.id)
+						}
 
-					// Assign the user to one or more teams appropriately
-					if (!failed && p.teams) {
-						List teams = splitTeams(p.teams)
+						// Assign the user to one or more teams appropriately
+						if (!failed && p.teams) {
+							List teams = splitTeams(p.teams)
 
-						teams.each { t ->
-							if (teamCodes.contains(t)) {
-								partyRelationshipService.addStaffFunction(person, t, project.client, project)
+							teams.each { t ->
+								if (teamCodes.contains(t)) {
+									partyRelationshipService.addStaffFunction(person, t, project.client, project)
+								}
 							}
 						}
 					}
