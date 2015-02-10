@@ -27,6 +27,7 @@ class AdminController {
 	def userPreferenceService
 
 	private static Map VALID_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
+	private static String DEFAULT_ROLE = 'USER'
 
 	def index = { }
 
@@ -1323,9 +1324,32 @@ class AdminController {
 							log.info "importAccounts() : created person $person"
 							partyRelationshipService.addCompanyStaff(project.client, person)
 						} else {
-							p.error = GormUtil.allErrorsString(person)
+							p.error = "Error" + GormUtil.allErrorsString(person)
 							failedPeople << p
 							failed = true
+						}
+					}
+
+					def userRole = role
+					if (!StringUtils.isEmpty(p.role)) {
+						userRole = p.role
+					}
+					if (!failed && !StringUtils.isEmpty(userRole)) {
+						if (!VALID_ROLES[userRole]) {
+							userRole = DEFAULT_ROLE
+						}
+						log.debug "importAccounts() : creating Role $userRole for $person"
+						userPreferenceService.setUserRoles([userRole], person.id)
+					}
+
+					// Assign the user to one or more teams appropriately
+					if (!failed && p.teams) {
+						List teams = splitTeams(p.teams)
+
+						teams.each { t ->
+							if (teamCodes.contains(t)) {
+								partyRelationshipService.addStaffFunction(person, t, project.client, project)
+							}
 						}
 					}
 
@@ -1346,7 +1370,7 @@ class AdminController {
 							)
 
 							if (! u.validate() || !u.save(flush:true)) {
-								p.error = GormUtil.allErrorsString(u)
+								p.error = "Error" + GormUtil.allErrorsString(u)
 								log.debug "importAccounts() UserLogin.validate/save failed - ${p.error}"
 								failedPeople << p
 								failed = true
@@ -1363,28 +1387,10 @@ class AdminController {
 									failedPeople << p
 								}
 							}
-						}
-
-						def userRole = role
-						if (!StringUtils.isEmpty(p.role)) {
-							userRole = p.role
-						}
-						if (!failed && !StringUtils.isEmpty(userRole)) {
-							if (VALID_ROLES[userRole]) {
-								log.debug "importAccounts() : creating Role $role for $person"
-								userPreferenceService.setUserRoles([role], person.id)
-							}
-						}
-
-						// Assign the user to one or more teams appropriately
-						if (!failed && p.teams) {
-							List teams = splitTeams(p.teams)
-
-							teams.each { t ->
-								if (teamCodes.contains(t)) {
-									partyRelationshipService.addStaffFunction(person, t, project.client, project)
-								}
-							}
+						} else {
+							failed = true
+							p.error = "Person already have a userlogin: $u"
+							failedPeople << p
 						}
 
 						if (!failed) created++
