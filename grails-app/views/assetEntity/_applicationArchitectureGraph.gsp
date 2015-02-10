@@ -95,7 +95,6 @@ assets = ${nodes};
 assetTypes = ${assetTypes};
 environment = '${environment}';
 
-
 // set the asset select to display the correct asset
 if ($('#assetSelectId').select2('data')) {
 	$('#assetSelectId').select2('data').id = assets[0].id;

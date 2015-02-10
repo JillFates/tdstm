@@ -157,6 +157,7 @@
 	var initialAssetId = ${assetId ?: 'null'};
 	
 	$(document).ready(function(){
+
 		
 		// define the select2 for assets
 		if (!isIE7OrLesser) {
@@ -178,8 +179,13 @@
 		});
 		
 		// if the page was loaded with an assetId, show the graph for it
-		if (! isNaN(initialAssetId))
+		if (! isNaN(initialAssetId)){
 			generateGraph();
+			if(initialAssetId != null){
+				$('#s2id_assetSelectId').find("a").removeClass("select2-default");	
+			}
+			
+		}
 	});
 	
 	// makes an ajax call to get the graph data, then loads it into the DOM

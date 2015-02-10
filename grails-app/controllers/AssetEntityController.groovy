@@ -4389,7 +4389,18 @@ class AssetEntityController {
 		def level = NumberUtils.toInt(params.level)
 		if (level == 0)
 			level = 3
-		render([assetId:params.assetId, level:level, view:'architectureGraph'])
+		
+		def assetName = null 
+		if(params.assetId){
+			def asset = AssetEntityHelper.getAssetById(project, null, params.assetId)
+			assetName = asset.assetName
+		}
+		
+		def model = [
+						assetId : params.assetId,
+						assetName: assetName
+					]
+		render([assetId:params.assetId, model: model, level:level, view:'architectureGraph'])
 	}
 	
 	/**

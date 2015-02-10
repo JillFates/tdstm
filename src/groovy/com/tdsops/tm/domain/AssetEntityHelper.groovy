@@ -20,7 +20,12 @@ class AssetEntityHelper {
 	static AssetEntity getAssetById(project, AssetClass ac, Object assetId) {
 		AssetEntity asset
 		Long id = NumberUtil.toLong(assetId)
-		def domainClass = AssetClass.domainClassFor(ac)
+		def domainClass = null
+		if(ac == null){
+			domainClass = AssetEntity
+		}else{
+			domainClass = AssetClass.domainClassFor(ac)
+		}
 		println "AssetEntityHelper.getAssetById() called"
 		if (id) {
 			asset = domainClass.get(id)
