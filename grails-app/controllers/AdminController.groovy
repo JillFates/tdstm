@@ -84,10 +84,6 @@ class AdminController {
 				UNION
 				SELECT 'asset_entity' as mainTable,'move_bundle_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.move_bundle_id not in (select m.move_bundle_id from move_bundle m )
 				UNION
-				SELECT 'asset_entity' as mainTable,'source_team_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.source_team_id not in (select pt.project_team_id from project_team pt )
-				UNION
-				SELECT 'asset_entity' as mainTable,'target_team_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )
-				UNION
 				SELECT 'asset_entity' as mainTable,'model_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.model_id not in (select m.model_id from model m)
 				UNION
 				SELECT 'asset_entity' as mainTable,'manufacturer_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_entity a where a.manufacturer_id not in (select mn.manufacturer_id from manufacturer mn)) a
@@ -504,14 +500,6 @@ class AdminController {
 					break;
 					case "move_bundle_id" :
 						query = "SELECT * FROM asset_entity a where a.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
-					case "source_team_id" :
-						query = "SELECT * FROM asset_entity a where a.source_team_id not in (select pt.project_team_id from project_team pt )"
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
-					case "target_team_id" :
-						query = "SELECT * FROM asset_entity a where a.target_team_id not in (select pt.project_team_id from project_team pt )"
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 					case "model_id" :
