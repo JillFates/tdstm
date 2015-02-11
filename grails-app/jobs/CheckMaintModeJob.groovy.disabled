@@ -1,10 +1,12 @@
 /*
  * Quartz job to check maint mode periodically
+ *
+ * See TM-3709 regarding the disabling of this job
  */
 class CheckMaintModeJob {
 	def maintService
 	static triggers = {
-		cron name: 'CheckMaintModeTrigger', cronExpression: "0/30 * * * * ?" 
+		cron name: 'CheckMaintModeTrigger', cronExpression: "05 1 * * * ?" 
 	}
 	/*
 	 * Default method which will execute the trigger after every 30 second.
