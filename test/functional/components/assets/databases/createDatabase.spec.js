@@ -278,13 +278,27 @@ describe('Database', function(){
         expect(createDBModal.rateOfChangeField.getAttribute('value')).toEqual('');
 
       });
-      xit('TM-3180 - should not allow non numeric values', function(){
-        //currently getting white page
+      it('should not allow non numeric values', function(){
+        var createDBModal = new DBCreateModal();
+        createDBModal.rateOfChangeField.sendKeys('chau');
+        expect(createDBModal.rateOfChangeField.getAttribute('value')).toEqual('chau');
+        if(process.env.BROWSER_NAME === 'phantomjs'){
+          createDBModal.saveBtn.click();
+        }else{
+          createDBModal.saveBtn.click();
+          browser.driver.sleep(1000);
+          var alertDialog = browser.driver.switchTo().alert();
+          expect(alertDialog.getText()).toEqual('Unable to update asset  :  Property rateOfChange must be a valid number');
+          alertDialog.accept();        
+        }
+        expect(createDBModal.isCreateModalOpened()).toBe(true);
       });
 
       it('should allow numeric values',function(){
         var createDBModal = new DBCreateModal();
-        createDBModal.rateOfChangeField.sendKeys(dbInfo['rateOfChange']);      
+        var field = createDBModal.rateOfChangeField;
+        field.clear();
+        field.sendKeys(dbInfo['rateOfChange']);      
         expect(createDBModal.rateOfChangeField.getAttribute('value')).toEqual(dbInfo['rateOfChange']);
       });
     });//Rate of Change
