@@ -497,8 +497,10 @@ class PersonController {
 				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 				def moveEvents = MoveEvent.findAllByProject(projectParty)
 				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
-			} else {
+			} else if(personService.hasAccessToProject(personParty, projectParty)){
 				projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
+			}else{
+				message = "This person doesn't have access to the selected project"
 			}
 
 			flag = projectStaff ? true : false
