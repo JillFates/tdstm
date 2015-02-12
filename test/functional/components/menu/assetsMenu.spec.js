@@ -62,7 +62,7 @@ describe('Assets Menu', function(){
     });
 
     it('should have Architecture Viewer in the submenu', function() {
-      expect(menu.getArchitectureViewer().getText()).toEqual('Architecture Viewer');
+      expect(menu.getArchitectureViewer().getText()).toEqual('Architecture Graph');
     });
     it('should have Assets Help in the submenu', function(){
       expect(menu.getAssetsHelp().getText()).toEqual('help');
