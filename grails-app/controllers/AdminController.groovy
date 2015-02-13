@@ -33,6 +33,11 @@ class AdminController {
 
 
 	def orphanSummary = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def summaryRecords = []
 		def orphanParty = """SELECT party_id as party_id FROM party p where p.party_id not in
 								(select distinct pr.party_id from (select party_group_id as party_id from party_group
@@ -47,7 +52,7 @@ class AdminController {
 								union
 								select app_id as party_id from application ) pr)"""
 								
-	def AssetsummaryQuery = """
+		def AssetsummaryQuery = """
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR APPLICATION_ASSET_MAP---------------------------------*/
 			SELECT * FROM (SELECT 'application_asset_map' as mainTable,'application_id' as refId,'Orphan' as type,count(*) as totalCount FROM application_asset_map asm where asm.application_id not in (select app.app_id from application app )
 				UNION
@@ -407,6 +412,11 @@ class AdminController {
 	 * 
 	 */
 	def orphanDetails = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def orphanDeatils
 		def table = params.table
 		def column = params.column
@@ -1011,6 +1021,11 @@ class AdminController {
 	 */
 	
 	def processOldData = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def deleteHistory = params.deleteHistory
 		StringBuffer queryForData = new StringBuffer("FROM data_transfer_value")
 		StringBuffer queryForBatch = new StringBuffer("FROM data_transfer_batch")
@@ -1040,6 +1055,11 @@ class AdminController {
 	 * @return : String formatted to display processed and pending batches and records
 	 */
 	def getBatchRecords = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		String queryForRecords ="""SELECT COUNT(*) AS batchCount, IF(SUM(noOfRows),SUM(noOfRows),0) AS records
 									  FROM (SELECT data_transfer_batch_id, COUNT(*) as noOfRows FROM (SELECT data_transfer_batch_id, COUNT(*) AS noOfRows  FROM data_transfer_value dtv
 									  LEFT OUTER JOIN data_transfer_batch dtb ON dtv.data_transfer_batch_id = dtb.batch_id
@@ -1064,6 +1084,11 @@ class AdminController {
 	 * @param:N/A
 	 */
 	def getAssetTypes ={
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"]).value
 		def returnMap = []
@@ -1082,6 +1107,11 @@ class AdminController {
 	 * This method is used to clean the UnUsed Asset types
 	 */
 	def cleanAssetTypes = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute , [sort:"value"]).value
 		def deletedTypes = []
@@ -1114,9 +1144,11 @@ class AdminController {
 	 */
 	def importAccounts = {
 
-		def people
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
 
-		def project = securityService.getUserCurrentProject()
+		def people
 
 		def map = [step:'start', projectName:project.toString() ]
  
@@ -1406,6 +1438,11 @@ class AdminController {
 	 * A action to show project Summary report filters.
 	 */
 	def projectReport = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		return
 	}
 	
@@ -1413,6 +1450,11 @@ class AdminController {
 	 * To Generate project Summary Web report
 	 */
 	def projectSummaryReport = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def person  = securityService.getUserLoginPerson().toString()
 		def now = TimeUtil.nowGMT()
 		def results = projectService.getProjectReportSummary( params )
@@ -1421,6 +1463,11 @@ class AdminController {
 	
 	// Gets the number of assets with a desync between the device's assetType and its model's assetType
 	def countAssetsOutOfSync = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def query = """ -- Case sensitive - assets that assetType don't match
 			SELECT COUNT(*)
 			FROM asset_entity a
@@ -1434,8 +1481,10 @@ class AdminController {
 	 * Used to reconcile assetTypes of devices with the assetType of their models
 	 */
 	def reconcileAssetTypes = {
-		def hasPerm = RolePermissions.hasPermission("AdminMenuView")
-		if (hasPerm) {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+
+		if (project) {
 			def query = """ -- Update DEVICES with their propery asset_type from their respective model record
 				UPDATE asset_entity a
 				JOIN model m ON a.model_id = m.model_id
@@ -1452,6 +1501,11 @@ class AdminController {
 	 * Used to encrypt a value
 	 */
 	def encryptValue = {
+
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
 		def toEncryptString = params.toEncryptString
 		def encryptAlghoritm = params.encryptAlghoritm
 		def encryptSalt = params.encryptSalt
