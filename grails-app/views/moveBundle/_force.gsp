@@ -264,10 +264,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("y1", function(d) { return d.source.y;})
 			.attr("x2", function(d) { return d.target.x;})
 			.attr("y2", function(d) { return d.target.y;});
-	
-	link.style("stroke", function(d) {
-		return d3.select(this).attr('fillColor')
-	});
+
 	
 	// Add the nodes to the SVG
 	var node = vis.selectAll("use")
