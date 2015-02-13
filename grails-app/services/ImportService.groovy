@@ -697,7 +697,6 @@ class ImportService {
 			now = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
-			project = Project.get(projectId)
 
 			// Get all of the property values imported for a given row					
 			dtvList?.clear()
@@ -805,6 +804,7 @@ class ImportService {
 
 			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
 				resetHibernateSession()
+				project = Project.get(projectId)
 			}
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
@@ -922,7 +922,6 @@ class ImportService {
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
-			project = Project.get(projectId)
 			log.debug "**** ROW $rowNum"
 
 			// Get all of the property values imported for a given row
@@ -1144,6 +1143,7 @@ class ImportService {
 
 			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
 				resetHibernateSession()
+				project = Project.get(projectId)
 			}
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
@@ -1254,7 +1254,6 @@ class ImportService {
 			now = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
-			project = Project.get(projectId)
 
 			// Get all of the property values imported for a given row
 			dtvList?.clear()
@@ -1297,6 +1296,7 @@ class ImportService {
 
 			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
 				resetHibernateSession()
+				project = Project.get(projectId)
 			}
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
@@ -1394,7 +1394,6 @@ class ImportService {
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
-			project = Project.get(projectId) 
 
 			// Get all of the property values imported for a given row
 			dtvList?.clear()
@@ -1445,6 +1444,7 @@ class ImportService {
 
 			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
 				resetHibernateSession()
+				project = Project.get(projectId)
 			}
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
