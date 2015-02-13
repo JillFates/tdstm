@@ -238,9 +238,13 @@ function saveProjectStaff (source) {
 		data: params,
 		type:'POST',
 		success: function(data) {
-			if(data=="false"){
-				//alert("An unexpected error occurred while attempting to update Person's Project  ")
-				alert("An unexpected error occurred while attempting to update Person's Project  ")
+			if(data.flag == false){
+				if(data.message && data.message.length > 0){
+					alert(data.message);
+				}else{
+					alert("An unexpected error occurred while attempting to update Person's Project  ")	
+				}
+				
 			}
 			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
 		},
