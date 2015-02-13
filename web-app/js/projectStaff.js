@@ -208,6 +208,15 @@ function saveEventStaff (source) {
 		}
 	});
 }
+
+
+function toggleCheckbox(source) {
+  if (this.checked) {
+    $(source).removeAttr("disabled");
+  } else {
+    $(source).attr("disabled", true);
+  }
+}
 /*
  * Make a ajax call when user checks on checkbox for Project to save project staff
  */
@@ -219,7 +228,7 @@ function saveProjectStaff (source) {
 	var projectId = $('#project').find('[selected]').val()
 	
 	toggleChangedStyle(source)
-	
+	toggleCheckbox(source)
 	var events = row.find('input')
 	if( val == 0 ) {
 		events.each(function(){
@@ -231,12 +240,12 @@ function saveProjectStaff (source) {
 			}
 		})
 	}
-	
 	var params = {'personId':personId, 'val':val, 'projectId':projectId, 'roleType':roleType }
 	jQuery.ajax({
 		url: contextPath+'/person/saveProjectStaff',
 		data: params,
 		type:'POST',
+		sourceElement : source,
 		success: function(data) {
 			if(data.flag == false){
 				if(data.message && data.message.length > 0){
@@ -246,9 +255,11 @@ function saveProjectStaff (source) {
 				}
 				
 			}
+			toggleCheckbox($(this).attr("sourceElement"));
 			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
+			toggleCheckbox($(this).attr("sourceElement"));
 			alert("An unexpected error occurred while attempting to update Person's Project ")
 		}
 	});
