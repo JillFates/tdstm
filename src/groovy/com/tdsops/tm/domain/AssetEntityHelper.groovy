@@ -30,7 +30,7 @@ class AssetEntityHelper {
 		if (id) {
 			asset = domainClass.get(id)
 			if (asset) {
-				if (asset.project != project) {
+				if (asset.project.id != project.id) {
 					def securityService = ApplicationContextHolder.getBean('securityService')
 					securityService.reportViolation("Attempt to access ${AssetClass.domainNameFor(ac)} ($assetId) of unassociated project (${project.id})")
 				}

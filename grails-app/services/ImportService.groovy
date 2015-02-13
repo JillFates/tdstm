@@ -697,6 +697,7 @@ class ImportService {
 			now = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
+			project = Project.get(projectId)
 
 			// Get all of the property values imported for a given row					
 			dtvList?.clear()
@@ -793,7 +794,7 @@ class ImportService {
 					errorConflictCount++
 				}
 
-			}	// dtvList.each						
+			}	// dtvList.each				
 
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
@@ -921,6 +922,7 @@ class ImportService {
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
+			project = Project.get(projectId)
 			log.debug "**** ROW $rowNum"
 
 			// Get all of the property values imported for a given row
@@ -1252,6 +1254,7 @@ class ImportService {
 			now = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
+			project = Project.get(projectId)
 
 			// Get all of the property values imported for a given row
 			dtvList?.clear()
@@ -1391,6 +1394,7 @@ class ImportService {
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
+			project = Project.get(projectId) 
 
 			// Get all of the property values imported for a given row
 			dtvList?.clear()
