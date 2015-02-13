@@ -3,6 +3,8 @@ import grails.converters.JSON
 import java.text.SimpleDateFormat
 
 import org.apache.commons.lang.StringUtils
+import org.quartz.SimpleTrigger
+import org.quartz.Trigger
 
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
@@ -30,6 +32,8 @@ class MoveBundleController {
 	def stepSnapshotService
     def taskService
 	def userPreferenceService
+	def progressService
+	def quartzScheduler
     
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"  
 	protected static Map dependecyBundlingAssetTypeMap = ['SERVER':true,'VM':true,'BLADE':true,'APPLICATION':true,'FILES':true,'DATABASE':true,'APPLIANCE':true,'STORAGE':true]
@@ -908,27 +912,45 @@ class MoveBundleController {
 	 * Controller to render the Dependency Bundle Details
 	 */
 	def dependencyBundleDetails = { 
-		render(template:"dependencyBundleDetails") 
-	}
-
-	def generateDependency = {
-
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		
-		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
-		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
-
-		def started = new Date()
-		
-		def isChecked = params.saveDefault
-		// Generate the Dependency Groups
-		flash.message = moveBundleService.generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked)
-
-		log.info "Dependency groups generation new - Time ${TimeUtil.elapsed(started)}"
-
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
 		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned, null) )
+	}
+
+	def generateDependency = {
+		def key = "generateDependency-" + UUID.randomUUID().toString()
+		progressService.create(key)
+		
+		def username = securityService.getUserLogin().username
+		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		
+		def jobName = "TM-" + key
+		log.info "Initiate Generate Dependency"
+		
+		// Delay 2 seconds to allow this current transaction to commit before firing off the job
+		Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 2000) )
+		trigger.jobDataMap.putAll(params)
+		
+		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
+		String statusTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "status" ) )
+		def isChecked = params.saveDefault
+
+		trigger.jobDataMap.put('key', key)
+		trigger.jobDataMap.put('username', username)
+		trigger.jobDataMap.put('projectId', projectId)
+		trigger.jobDataMap.put('connectionTypes', connectionTypes)
+		trigger.jobDataMap.put('statusTypes', statusTypes)
+		trigger.jobDataMap.put('isChecked', isChecked)
+		trigger.jobDataMap.put('userLoginName', securityService.getUserLoginPerson().toString())
+
+		trigger.setJobName('GenerateDependencyGroupsJob')
+		trigger.setJobGroup('tdstm-dependency-groups')
+		quartzScheduler.scheduleJob(trigger)
+
+		progressService.update(key, 1, 'In progress')
+		
+		render(ServiceResults.success(['key' : key]) as JSON)
 	}
 
 	/**

@@ -1545,31 +1545,54 @@ function deleteAsset(id,value){
 	}
 	
 }
+function reloadDependencyGroupsSection() {
+	var moveBundleId = $("#planningBundleSelectId").val();
+	var processTab = jQuery('#processDiv');
+	processTab.attr("style", "display:block");
+	processTab.attr("style", "margin-left: 180px");
+	var assetTab = jQuery('#dependencyTableId');
+	assetTab.attr("style", "display:none");
+	assetTab.attr("style", "display:none");
+	jQuery('#items1').css("display","none");
+	$('#upArrow').css('display','none')
+	$.ajax({
+		type: "GET",
+		url: contextPath+'/moveBundle/dependencyBundleDetails?bundle='+moveBundleId,
+		success: function(data){
+			$('#dependencyBundleDetailsId').html(data)
+			var processTab = jQuery('#processDiv');
+			processTab.attr("style", "display:none");
+			var assetTab = jQuery('#dependencyBundleDetailsId');
+			assetTab.attr("style", "display:block");
+			$('#upArrow').css('display','inline');
+			$('#downArrow').css('display','none');
+		}
+	});
+}
 function submitCheckBox(){
 	var moveBundleId = $("#planningBundleSelectId").val();
-	var data = $('#checkBoxForm').serialize() + "&bundle="+moveBundleId;
-	new Ajax.Request(contextPath+'/moveBundle/generateDependency?'+data,{asynchronous:true,evalScripts:true,
-		    onLoading:function(){
-		    	var processTab = jQuery('#processDiv');
-			    processTab.attr("style", "display:block");
-			    processTab.attr("style", "margin-left: 180px");
-			    var assetTab = jQuery('#dependencyTableId');
-			    assetTab.attr("style", "display:none");
-			    assetTab.attr("style", "display:none");
-			    jQuery('#items1').css("display","none");
-			    $('#upArrow').css('display','none')
-		    }, onComplete:function(data){
-				$('#dependencyBundleDetailsId').html(data.responseText)
-				var processTab = jQuery('#processDiv');
-			    processTab.attr("style", "display:none");
-			    var assetTab = jQuery('#dependencyBundleDetailsId');
-			    assetTab.attr("style", "display:block");
-			    $('#upArrow').css('display','inline');
-			    $('#downArrow').css('display','none');
-			}, onFailure: function() { 
-				alert("Please associate appropriate assets to one or more 'Planning' bundles before continuing"); 
-			}
-		});
+	var items = $('#checkBoxForm').serialize() + "&bundle="+moveBundleId;
+
+	var assetTab = jQuery('#dependencyTableId');
+	assetTab.attr("style", "display:none");
+	jQuery('#items1').css("display","none");
+	$('#upArrow').css('display','none')
+	hideDependencyControlDiv();
+
+	$.post(contextPath+'/moveBundle/generateDependency', items, function(data) {
+		var progressBar = tds.ui.progressBar(data.data.key, 5000, 
+		function() {
+			var assetTab = jQuery('#dependencyBundleDetailsId');
+			assetTab.attr("style", "display:block");
+			$('#upArrow').css('display','inline');
+			$('#downArrow').css('display','none');
+			reloadDependencyGroupsSection()
+		}, function() {
+			alert("Please associate appropriate assets to one or more 'Planning' bundles before continuing"); 
+		},
+		"<h1>Generating Dependency Groups</h1>");
+	});
+
 }
 var isFirst = true;
 function selectAll(){
@@ -1922,6 +1945,10 @@ function showDependencyControlDiv(){
 	$("#checkBoxDiv").dialog('option', 'position', ['center','top']);
 	$("#checkBoxDiv").dialog('open')
 	$("#checkBoxDivId").show();
+}
+
+function hideDependencyControlDiv(){
+	$("#checkBoxDiv").dialog('close'); 
 }
 
 // Sets the field importance style classes in the edit and create views for all asset classes

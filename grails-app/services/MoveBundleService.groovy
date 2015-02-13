@@ -35,6 +35,8 @@ class MoveBundleService {
     def partyRelationshipService
 	def securityService
 	def taskService
+	def progressService
+
 	/*----------------------------------------------
 	 * @author : Lokanada Reddy
      * @param  : moveBundleId
@@ -595,9 +597,10 @@ class MoveBundleService {
 	 * @param connectionTypes : filter for asset types
 	 * @param statusTypes : filter for status tyoes
 	 * @param isChecked : check if should use the new criteria
+	 * @param progressKey : progress key
 	 * @return String message information
 	 */
-	def generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked) {
+	def generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked, userLoginName, progressKey) {
 		
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -617,7 +620,7 @@ class MoveBundleService {
 		if (isChecked == "1") {
 			depCriteriaMap = ["statusTypes": statusList, "connectionTypes":connectionList]
 		}
-		depCriteriaMap << ["modifiedBy":securityService.getUserLoginPerson().toString(), "modifiedDate":TimeUtil.nowGMT().getTime()]
+		depCriteriaMap << ["modifiedBy":userLoginName, "modifiedDate":TimeUtil.nowGMT().getTime()]
 		projectInstance.depConsoleCriteria = depCriteriaMap as JSON
 		projectInstance.save(flush:true)
 		
@@ -631,44 +634,52 @@ class MoveBundleService {
 
 		if (moveBundleText) {
 			def started = new Date()
+			progressService.update(progressKey, 10I, ProgressService.STARTED, "Search assets and dependencies")
 
 			def results = searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes);
 
 			log.info "Dependency groups generation - Search assets and dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 20I, ProgressService.STARTED, "Load asset results")
 
 			def graph = new AssetGraph();
 			graph.loadFromResults(results);
 
 			log.info "Dependency groups generation - Load results time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 30I, ProgressService.STARTED, "Clean dependencies")
 
 			cleanDependencyGroupsStatus(projectId);
 
 			log.info "Dependency groups generation - Clean dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 40I, ProgressService.STARTED, "Group dependencies")
 
 			def groups = graph.groupByDependencies(statusList, connectionList, moveBundleList, MoveBundleController.dependecyBundlingAssetTypeMap);
 			groups.sort { a, b -> b.size() <=> a.size() }
 
 			log.info "Dependency groups generation - Group dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 70I, ProgressService.STARTED, "Save dependencies")
 
 			saveDependencyGroups(projectInstance, groups, sqlTime);
 
 			log.info "Dependency groups generation - Save dependencies time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 80I, ProgressService.STARTED, "Add straggles assets")
 
 			// Last step is to put all the straggler assets that were not grouped into group 0
 			addStragglerDepsToGroupZero(projectId, moveBundleText, MoveBundleController.dependecyBundlingAssetType, sqlTime);
 
 			log.info "Dependency groups generation - Add straggles time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 90I, ProgressService.STARTED, "Finishing")
 
 			graph.destroy();
 
 			log.info "Dependency groups generation - Destroy graph time ${TimeUtil.elapsed(started)}"
 			started = new Date()
+			progressService.update(progressKey, 100I, ProgressService.COMPLETED, "Finished")
 
 		} else {
 			errMsg = "Please associate appropriate assets to one or more 'Planning' bundles before continuing."
