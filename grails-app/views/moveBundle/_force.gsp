@@ -248,12 +248,13 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.size([width, height])
 		.theta(theta)
 		.start();
-	
+
 	
 	// Add the links the the SVG
 	var link = vis.selectAll("line.link")
 		.data(links).enter()
 		.append("svg:line")
+			// TM-3722	
 			.style("stroke", function(d) {return d.statusColor;})
 			.style("stroke-opacity", function (d) { return d.opacity;})
 			.attr("fillColor", function(d) { return d.statusColor; })
@@ -477,7 +478,8 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 				d.cut = 3;
 				o.classList.add('cut');
 			} else if (d.cut != 3) {
-				o.style.stroke = d.fillColor;
+				// TM-3722 
+				o.style.stroke = d.statusColor;
 			}
 		});
 		
