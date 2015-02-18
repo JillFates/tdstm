@@ -23,7 +23,7 @@ class PartyRelationshipService {
 			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
 			def roleTypeTo = RoleType.findById( roleTypeIdTo )
 			
-			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
+			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true, flush:true )
 			partyRelationship = partyRelationship.save( insert:true)
 			return partyRelationship
 		} catch (Exception e) {
