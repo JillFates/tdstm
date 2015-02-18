@@ -18,12 +18,13 @@ class PartyRelationshipService {
 	 */
 	def savePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
 		try{
+
 			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
 			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
 			def roleTypeTo = RoleType.findById( roleTypeIdTo )
 			
-			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true, flush:true )
-	
+			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" )
+			partyRelationship = partyRelationship.save( insert:true)
 			return partyRelationship
 		} catch (Exception e) {
 			println"Exception-------------->"+e
@@ -40,7 +41,10 @@ class PartyRelationshipService {
 		def roleTypeTo = RoleType.findById( roleTypeIdTo )
 		
 		def partyRelationInstance = PartyRelationship.getRelationshipInstance(partyIdTo,partyIdFrom,roleTypeTo,roleTypeFrom,partyRelationshipType)
-		partyRelationInstance.delete(flush:true)
+		if(partyRelationInstance){
+			partyRelationInstance.delete(flush:true)	
+		}
+		
 		return true
 	}
 	
