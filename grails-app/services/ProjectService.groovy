@@ -74,12 +74,13 @@ class ProjectService {
 		def sortOn = searchParams.sortOn?:ProjectSortProperty.PROJECT_CODE
 		def sortOrder = searchParams.sortOrder?:SortOrder.ASC
 		def projParams=searchParams.params?: [:]
+		def  personId = searchParams.personId?:userLogin.person.id
 
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
 		if (!showAllProjPerm) {
 			projectIds = PartyRelationship.executeQuery("SELECT pr.partyIdFrom.id FROM PartyRelationship pr WHERE \
-				pr.partyIdTo = ${userLogin.person.id} AND pr.roleTypeCodeFrom = 'PROJECT' AND pr.partyRelationshipType = 'PROJ_STAFF' ")
+				pr.partyIdTo = ${personId} AND pr.roleTypeCodeFrom = 'PROJECT' AND pr.partyRelationshipType = 'PROJ_STAFF' ")
 			if (!projectIds) return projects;
 		}
 

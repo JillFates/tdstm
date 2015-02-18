@@ -9,6 +9,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.validation.ValidationException
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.tm.enums.domain.ProjectStatus
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
@@ -765,8 +766,7 @@ class PersonService {
 	}
 
 	Boolean hasAccessToProject(Person person, Project project){
-		def userLogin = UserLogin.findByPerson(person)
-		def projects =  projectService.getUserProjects(userLogin)
+		def projects =  projectService.getUserProjects(null, false, ProjectStatus.ANY, [personId:person.id])
 		def found = false
 		projects.each{currentProject ->
 			if(currentProject.id == project.id){
