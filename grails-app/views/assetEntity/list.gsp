@@ -142,7 +142,7 @@
 				}
 
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\',' + options.rowId + ');">' +
+					var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\',' + options.rowId + ');" title=\'Edit Asset\'>' +
 							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[2] + "' tasks='" + rowObject[13] + "' comments='" + rowObject[16] + "'></grid-buttons>"
 

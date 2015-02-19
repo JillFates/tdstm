@@ -36,7 +36,7 @@
 						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td>
 								<g:checkBox name="checkBox" id="checkId_${files.asset?.id}" ></g:checkBox>
-								<a href="javascript:EntityCrud.showAssetEditView('${files.asset.assetClass}', ${files.asset.id})">
+								<a href="javascript:EntityCrud.showAssetEditView('${files.asset.assetClass}', ${files.asset.id})" title="Edit Asset">
 									<img src="/tdstm/icons/database_edit.png" border="0px" />
 								</a>
 								<grid-buttons asset-id="${files.asset?.id}" asset-type="${files.asset?.assetType}" tasks="${files.tasksStatus}" comments="${files.commentsStatus}"></grid-buttons>
