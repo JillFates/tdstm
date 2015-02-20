@@ -654,7 +654,7 @@ svg {
 	max-width: 1000px;
 }
 .uncheckedStaff {
-	background: #ff0000 !important;
+	background: yellow !important;
 }
 .checkedStaff {
 	background: #99ff99;

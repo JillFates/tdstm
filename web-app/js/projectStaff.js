@@ -174,7 +174,7 @@ function saveEventStaff (source) {
 	var personId = source.attr('id')
 	var roleType = row.find('#roleColumnId').attr('title')
 	toggleChangedStyle(source)
-	
+	toggleCheckbox(source, val );
 	var project = row.find('#projectColumnId').children('input')
 	if( (project.size() > 0) && (project.val() == 0) && (val == 1) ) {
 		project.attr('checked','checked')
@@ -187,8 +187,9 @@ function saveEventStaff (source) {
 		url: contextPath+'/person/saveEventStaff',
 		data: params,
 		type:'POST',
+		sourceElement : source,
 		success: function(data) {
-			console.log(data);
+			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
 			if(!data.data.flag){
 			   var errmsg = data.data.message;
 				var msgDiv = $('#messageDiv');
@@ -201,20 +202,26 @@ function saveEventStaff (source) {
 			}else{
 				$("#messageDiv").css("display", "none");
 			}
-			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
+			//loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
+			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
 			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
 		}
 	});
 }
 
 
-function toggleCheckbox(source) {
-  if (this.checked) {
+function toggleCheckbox(source, val) {
+  if ($(source).attr('disabled')) {
     $(source).removeAttr("disabled");
   } else {
     $(source).attr("disabled", true);
+  }
+  if(val == 0){
+
+  	$(source).parent().removeClass("uncheckedStaff");
+  	$(source).parent().removeClass("checkedStaffTemp");
   }
 }
 /*
@@ -228,7 +235,7 @@ function saveProjectStaff (source) {
 	var projectId = $('#project').find('[selected]').val()
 	
 	toggleChangedStyle(source)
-	toggleCheckbox(source)
+	toggleCheckbox(source, val );
 	var events = row.find('input')
 	if( val == 0 ) {
 		events.each(function(){
@@ -255,11 +262,11 @@ function saveProjectStaff (source) {
 				}
 				
 			}
-			toggleCheckbox($(this).attr("sourceElement"));
-			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
+			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
+			//loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			toggleCheckbox($(this).attr("sourceElement"));
+			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
 			alert("An unexpected error occurred while attempting to update Person's Project ")
 		}
 	});
@@ -268,7 +275,6 @@ function saveProjectStaff (source) {
  * Whenever a property is changed on the manage project staff list, give it a style to confirm that it has been modified
  */
 function toggleChangedStyle (source) {
-	source.html('aaaaaaaa')
 	if(source.val() == 0)
 		source.parent().addClass('uncheckedStaff')
 	else
