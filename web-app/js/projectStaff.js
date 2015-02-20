@@ -189,7 +189,6 @@ function saveEventStaff (source) {
 		type:'POST',
 		sourceElement : source,
 		success: function(data) {
-			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
 			if(!data.data.flag){
 			   var errmsg = data.data.message;
 				var msgDiv = $('#messageDiv');
@@ -202,6 +201,7 @@ function saveEventStaff (source) {
 			}else{
 				$("#messageDiv").css("display", "none");
 			}
+			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
 			//loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -221,7 +221,9 @@ function toggleCheckbox(source, val) {
   if(val == 0){
 
   	$(source).parent().removeClass("uncheckedStaff");
+  	$(source).parent().removeClass("checkedStaff");
   	$(source).parent().removeClass("checkedStaffTemp");
+
   }
 }
 /*
