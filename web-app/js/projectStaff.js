@@ -256,11 +256,14 @@ function saveProjectStaff (source) {
 		type:'POST',
 		sourceElement : source,
 		success: function(data) {
-			if(data.flag == false){
-				if(data.message && data.message.length > 0){
-					alert(data.message);
-				}else{
-					alert("An unexpected error occurred while attempting to update Person's Project  ")	
+			if(!data.data.flag){
+				var errmsg = "error";//data.data.message;
+				var msgDiv = $('#messageDiv');
+				if (msgDiv.length) {
+					msgDiv.html(errmsg);
+					$("#messageDiv").css("display", "");
+				} else {
+					alert(errmsg);
 				}
 				
 			}

@@ -503,11 +503,23 @@ class PersonController {
 				message = "This person doesn't have access to the selected project"
 			}
 
-			flag = projectStaff ? true : false
+			flag = message.size() == 0
 		}
 		
 		def data = ['flag':flag, 'message':message]
-		render data as JSON
+		try{
+			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
+		} catch (UnauthorizedException e) {
+			ServiceResults.forbidden(response)
+		} catch (EmptyResultException e) {
+			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (InvalidParamException e) {
+			render(ServiceResults.fail(e.getMessage()) as JSON)
+		} catch (Exception e) {
+			ServiceResults.internalError(response, log, e)
+		}
 	}
 	/*
 	 * Method to save person details and create party relation with Project as well 
@@ -1195,6 +1207,10 @@ class PersonController {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
 			ServiceResults.methodFailure(response)
+		} catch (ValidationException e) {
+			render(ServiceResults.errorsInValidation(e.getErrors()) as JSON)
+		} catch (InvalidParamException e) {
+			render(ServiceResults.fail(e.getMessage()) as JSON)
 		} catch (Exception e) {
 			ServiceResults.internalError(response, log, e)
 		}
