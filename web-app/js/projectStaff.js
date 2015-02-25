@@ -6,7 +6,7 @@ tds.staffing.module = angular.module('tdsProjectStaff', ['tdsCore']);
 
 
 
-tds.staffing.controller.MainController = function(scope, http, alerts){
+tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 
 
 	scope.toggleCheckbox = function(source, val) {
@@ -125,11 +125,12 @@ tds.staffing.controller.MainController = function(scope, http, alerts){
 			};
 		http.post( contextPath+'/person/loadFilteredStaff', data).then(
 			function(response){
-				$("#projectStaffTableId").html(response.data);
-				
+				$("#projectStaffTableId").html(compile(response.data)(scope));
+				scope.staffingTablestaffingTable = response.data;
+
+
 			},
 			function(response){
-				$("#projectStaffTableId").html(response.data);
 				alerts.addAlert({type: 'danger', msg: 'Error: ' + "An error occurred loading persons."});
 			}
 		);
@@ -138,7 +139,7 @@ tds.staffing.controller.MainController = function(scope, http, alerts){
 
 }
 
-tds.staffing.controller.MainController.$inject = ['$scope', '$http', 'alerts'];
+tds.staffing.controller.MainController.$inject = ['$scope', '$http', '$compile', 'alerts'];
 /*
  * for making and Ajax call to load staff list using filters.  
  */
