@@ -126,6 +126,7 @@ tds.staffing.controller.MainController = function(scope, http, alerts){
 		http.post( contextPath+'/person/loadFilteredStaff', data).then(
 			function(response){
 				$("#projectStaffTableId").html(response.data);
+				
 			},
 			function(response){
 				$("#projectStaffTableId").html(response.data);

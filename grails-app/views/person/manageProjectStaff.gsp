@@ -136,7 +136,7 @@
 			</table>
 			<br/>
 			<input type="hidden" id="manageStaff" value="manageStaff">
-			<div id="projectStaffTableId">
+			<div id="projectStaffTableId" ng-bindHtmlUnsafe="{{staff_expression}}">
 				<g:render template="projectStaffTable"></g:render>
 			</div>
 			</div>

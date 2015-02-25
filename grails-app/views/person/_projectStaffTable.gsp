@@ -44,7 +44,9 @@
 					<g:if test="${projectStaff.role != 'STAFF'}">
 						<td id="projectColumnId" class="${(projectStaff.project==1)?('checkedStaff'):('')}" nowrap="nowrap" title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}">
 							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck"
-								ng-click="saveProjectStaff2($event)" ng-checked="${inProject}"
+								ng-click="saveProjectStaff2($event)" 
+								<g:if test="${inProject}"> checked </g:if>
+								
 								value="${(inProject)?(1):(0)}" />
 						</td>
 					</g:if>
