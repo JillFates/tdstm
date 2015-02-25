@@ -264,54 +264,6 @@ function addBlackOutDay(){
 
 	
 }
-/*
- * Make a ajax call when user checks on checkbox for moveEvent
- */
-function saveEventStaff (source) {
-	var row = source.parent().parent()
-	var val = source.val()
-	var eventId = source.parent().attr('id')
-	var personId = source.attr('id')
-	var roleType = row.find('#roleColumnId').attr('title')
-	toggleChangedStyle(source)
-	toggleCheckbox(source, val );
-	var project = row.find('#projectColumnId').children('input')
-	if( (project.size() > 0) && (project.val() == 0) && (val == 1) ) {
-		project.attr('checked','checked')
-		project.val(1)
-		toggleChangedStyle(project)
-	}
-	
-	var params = {'personId':personId, 'val':val, 'roleType':roleType, 'eventId':eventId }
-	jQuery.ajax({
-		url: contextPath+'/person/saveEventStaff',
-		data: params,
-		type:'POST',
-		sourceElement : source,
-		success: function(data) {
-			alerts.addAlert({type: 'danger', msg: 'Error: ' + "ALGO"});
-			if(!data.data.flag){
-			   var errmsg = data.data.message;
-				var msgDiv = $('#messageDiv');
-				if (msgDiv.length) {
-					alerts.addAlert({type: 'danger', msg: 'Error: ' + errmsg});
-					msgDiv.html(errmsg);
-					$("#messageDiv").css("display", "");
-				} else {
-					alert(errmsg);
-				}
-			}else{
-				$("#messageDiv").css("display", "none");
-			}
-			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
-			//loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
-			alert("An unexpected error occurred while attempting to update Person's MoveEvent ")
-		}
-	});
-}
 
 
 /* 

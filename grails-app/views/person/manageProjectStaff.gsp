@@ -51,20 +51,20 @@
 					<td>
 						<span><b>Team</b></span><br/>
 						<label for="role">
-							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" onChange="loadFilteredStaff('lastName','staff')"
+							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" ng-click="loadFilteredStaff('lastName','staff')"
 									noSelection="${['0':'All']}"></g:select>
 						</label>
 					</td>
 					<tds:hasPermission permission='EditTDSPerson'>
 						<td>
 							<span><b>Only Client Staff</b></span><br/>
-								<input type="checkbox" name="clientStaff" id="clientStaffId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"
+								<input type="checkbox" name="clientStaff" id="clientStaffId"  ng-click="loadFilteredStaff('lastName','staff')"
 								${onlyClientStaff=='1'? 'checked="checked" value="1"'  : 'value="0"'}/>
 						</td>
 					</tds:hasPermission>
 					<td>
 						<span><b>Only Assigned</b></span><br/>
-							<input type="checkbox" name="assigned" id="assignedId"  onChange="if(this.checked){this.value = 1} else {this.value = 0 };loadFilteredStaff('lastName','staff')"
+							<input type="checkbox" name="assigned" id="assignedId"  ng-click="loadFilteredStaff('lastName','staff')"
 							${assigned=='1'? 'checked="checked" value="1"' : 'value="0"'}/>
 					</td>
 					<%--<td>
@@ -77,7 +77,7 @@
 					<td>
 						<span><b>Project</b></span><br/>
 						<label for="project">
-							<select id="project" name="project" onChange="loadFilteredStaff('lastName','staff')">
+							<select id="project" name="project" ng-model="selectedProject" ng-init="selectedProject=2445" ng-change="loadFilteredStaff('lastName','staff')">
 								<tds:hasPermission permission='EditProjectStaff'>
 									<option value="0">All</option>
 								</tds:hasPermission>
