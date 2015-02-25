@@ -43,10 +43,9 @@
 				<g:else>
 					<g:if test="${projectStaff.role != 'STAFF'}">
 						<td id="projectColumnId" class="${(projectStaff.project==1)?('checkedStaff'):('')}" nowrap="nowrap" title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}">
-							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"'}
-								onClick="if(this.checked){this.value = 1} else {this.value = 0 };saveProjectStaff($(this))" 
-								value="${(inProject)?(1):(0)}" 
-								${(projectStaff.project==1)?('checked="checked"'):('')} />
+							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck"
+								ng-click="saveProjectStaff2($event)" ng-checked="${inProject}"
+								value="${(inProject)?(1):(0)}" />
 						</td>
 					</g:if>
 					<g:else>
@@ -64,7 +63,7 @@
 							<g:set var="inMoveEvent" value="${(projectStaff.moveEvents.tokenize(',').contains(moveEvent.id.toString()))}" />
 							<td id="${moveEvent.id}" class="${(inMoveEvent)?('checkedStaff'):('')}" nowrap="nowrap" title="${moveEvent.project} - ${moveEvent.name} - ${moveEvent.startTime}">
 								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"' }
-									onClick="if(this.checked){this.value = 1} else {this.value = 0 };saveEventStaff($(this));" 
+									ng-click="saveProjectStaff2($event)""  ng-checked="${inMoveEvent}"
 									value="${(inMoveEvent)?(1):(0)}" 
 									${(inMoveEvent)?('checked="checked"'):('')} />
 							</td>

@@ -486,14 +486,14 @@ class PersonController {
 		def flag = false
 		def message = ''
 		
-		if(params.personId){
-			def personId = params.personId
-			def roleType = params.roleType
-			def projectId = params.projectId
+		if(request.JSON.personId){
+			def personId = request.JSON.personId
+			def roleType = request.JSON.roleType
+			def projectId = request.JSON.projectId
 			def projectParty = Project.findById( projectId )
 			def personParty = Person.findById( personId )
 			def projectStaff
-			if(params.val == "0") {
+			if(request.JSON.val == "1") {
 				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 				def moveEvents = MoveEvent.findAllByProject(projectParty)
 				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
@@ -1200,7 +1200,7 @@ class PersonController {
 			return
 		}
 		try{
-			String message = personService.assignToProject(params.personId, params.eventId, params.roleType, params.val)
+			String message = personService.assignToProject(request.JSON.personId, request.JSON.eventId, request.JSON.roleType, request.JSON.val)
 			def flag = message.size() == 0
 			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
 		} catch (UnauthorizedException e) {

@@ -1,49 +1,149 @@
+tds.staffing = tds.staffing || {};
+tds.staffing.controller = tds.staffing.controller || {};
+
+
+tds.staffing.module = angular.module('tdsProjectStaff', ['tdsCore']);
+
+
+
+tds.staffing.controller.MainController = function(scope, http, alerts){
+
+
+	scope.toggleCheckbox = function(source, val) {
+	  if (source.attr('disabled')) {
+	    source.removeAttr("disabled");
+	  } else {
+	    source.attr("disabled", true);
+	  }
+	  
+	  if(val == 1){
+
+	  	source.parent().removeClass("uncheckedStaff");
+	  	source.parent().removeClass("checkedStaff");
+	  	source.parent().removeClass("checkedStaffTemp");
+
+	  }else{
+	  	source.parent().removeClass("uncheckedStaff");
+	  	source.parent().addClass("checkedStaff");
+	  }
+	};
+
+	scope.saveProjectStaff2 = function($event){
+		var source = $($event.target)
+		var row = source.parent().parent()
+		var val = source.val()
+		var personId = source.attr('id')
+		var roleType = source.parent().siblings('#roleColumnId').attr('title')
+		var projectId = $('#project').find('[selected]').val()
+
+		scope.toggleCheckbox(source, val );
+
+		var params = {'personId':personId, 'val':val, 'projectId':projectId, 'roleType':roleType }
+
+		http.post( contextPath+'/person/saveProjectStaff', params).then(
+			function(response){
+				if(!response.data.data.flag){
+				   alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data.message});
+				}else{
+					scope.toggleCheckbox(source, val);
+					source.val((source.val() + 1) % 2);	
+				}
+				
+			},
+			function(response){
+				alerts.addAlert({type: 'danger', msg: 'Error: ' + "An unexpected error occurred while attempting to update Person's MoveEvent "});
+			}
+		);
+	};
+
+
+	scope.saveEventStaff2 = function($event) {
+		var source = $($event.target)
+		var row = source.parent().parent()
+		var val = source.val()
+		var eventId = source.parent().attr('id')
+		var personId = source.attr('id')
+		var roleType = row.find('#roleColumnId').attr('title')
+
+		toggleCheckbox(source, val );
+		var project = row.find('#projectColumnId').children('input')
+		if( (project.size() > 0) && (project.val() == 0) && (val == 1) ) {
+			project.attr('checked','checked')
+			project.val(1)
+			toggleChangedStyle(project)
+		}
+		
+		var params = {'personId':personId, 'val':val, 'roleType':roleType, 'eventId':eventId }
+
+		http.post( contextPath+'/person/saveEventtStaff', params).then(
+			function(response){
+				if(!response.data.data.flag){
+				   alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data.message});
+				}else{
+					scope.toggleCheckbox(source, val);
+					source.val((source.val() + 1) % 2);	
+				}
+				
+			},
+			function(response){
+				alerts.addAlert({type: 'danger', msg: 'Error: ' + "An unexpected error occurred while attempting to update Person's MoveEvent "});
+			}
+		);
+	};
+
+	scope.loadFilteredStaff = function(sortOn , firstProp, orderBy, changed) {
+		var role = $("#role").val()
+		var location = $("#location").val()
+		var project = $("#project").val()
+		var scale = $("#scale").val()
+		var onlyClientStaff = $("#clientStaffId").val()
+		var assigned = $("#assignedId").val()
+		var orderBy = orderBy ? orderBy : $("#orderBy").val()
+		var phaseArr = new Array();
+		if ($("#allPhase").val() == '1') {
+			phaseArr.push("all")
+		} else {
+			var checked = $("input[name='PhaseCheck']:checked")
+			$(checked).each(function() {
+				var phaseId = $(this).attr('id')//do stuff here with this
+				phaseArr.push(phaseId)
+			})
+		}
+		jQuery.ajax({
+			url : contextPath+'/person/loadFilteredStaff',
+			data : {
+				'role' : role,
+				'location' : location,
+				'project' : project,
+				'scale' : scale,
+				'phaseArr' : phaseArr,
+				'assigned' : assigned,
+				'onlyClientStaff' : onlyClientStaff,
+				'sortOn':sortOn,
+				'firstProp':firstProp,
+				'orderBy':orderBy
+				
+			},
+			type : 'POST',
+			success : function(data) {
+				$("#projectStaffTableId").html(data)
+			}
+		});
+
+	}
+
+}
+
+tds.staffing.controller.MainController.$inject = ['$scope', '$http', 'alerts'];
 /*
  * for making and Ajax call to load staff list using filters.  
  */
 var currentTabShow = "generalInfoShowId"
 var currentHeaderShow = "generalShowHeadId"
 
-function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
-	var role = $("#role").val()
-	var location = $("#location").val()
-	var project = $("#project").val()
-	var scale = $("#scale").val()
-	var onlyClientStaff = $("#clientStaffId").val()
-	var assigned = $("#assignedId").val()
-	var orderBy = orderBy ? orderBy : $("#orderBy").val()
-	var phaseArr = new Array();
-	if ($("#allPhase").val() == '1') {
-		phaseArr.push("all")
-	} else {
-		var checked = $("input[name='PhaseCheck']:checked")
-		$(checked).each(function() {
-			var phaseId = $(this).attr('id')//do stuff here with this
-			phaseArr.push(phaseId)
-		})
-	}
-	jQuery.ajax({
-		url : contextPath+'/person/loadFilteredStaff',
-		data : {
-			'role' : role,
-			'location' : location,
-			'project' : project,
-			'scale' : scale,
-			'phaseArr' : phaseArr,
-			'assigned' : assigned,
-			'onlyClientStaff' : onlyClientStaff,
-			'sortOn':sortOn,
-			'firstProp':firstProp,
-			'orderBy':orderBy
-			
-		},
-		type : 'POST',
-		success : function(data) {
-			$("#projectStaffTableId").html(data)
-		}
-	});
 
-}
+
+
 /*
  * when check  phase's all check box check all other checkboxes .  
  */
@@ -189,10 +289,12 @@ function saveEventStaff (source) {
 		type:'POST',
 		sourceElement : source,
 		success: function(data) {
+			alerts.addAlert({type: 'danger', msg: 'Error: ' + "ALGO"});
 			if(!data.data.flag){
 			   var errmsg = data.data.message;
 				var msgDiv = $('#messageDiv');
 				if (msgDiv.length) {
+					alerts.addAlert({type: 'danger', msg: 'Error: ' + errmsg});
 					msgDiv.html(errmsg);
 					$("#messageDiv").css("display", "");
 				} else {
@@ -212,70 +314,6 @@ function saveEventStaff (source) {
 }
 
 
-function toggleCheckbox(source, val) {
-  if ($(source).attr('disabled')) {
-    $(source).removeAttr("disabled");
-  } else {
-    $(source).attr("disabled", true);
-  }
-  if(val == 0){
-
-  	$(source).parent().removeClass("uncheckedStaff");
-  	$(source).parent().removeClass("checkedStaff");
-  	$(source).parent().removeClass("checkedStaffTemp");
-
-  }
-}
-/*
- * Make a ajax call when user checks on checkbox for Project to save project staff
- */
-function saveProjectStaff (source) {
-	var row = source.parent().parent()
-	var val = source.val()
-	var personId = source.attr('id')
-	var roleType = source.parent().siblings('#roleColumnId').attr('title')
-	var projectId = $('#project').find('[selected]').val()
-	
-	toggleChangedStyle(source)
-	toggleCheckbox(source, val );
-	var events = row.find('input')
-	if( val == 0 ) {
-		events.each(function(){
-			if($(this).val() == 1) {
-				$(this).removeAttr('checked')
-				$(this).val(0)
-				toggleChangedStyle($(this))
-				$(this).val(1)
-			}
-		})
-	}
-	var params = {'personId':personId, 'val':val, 'projectId':projectId, 'roleType':roleType }
-	jQuery.ajax({
-		url: contextPath+'/person/saveProjectStaff',
-		data: params,
-		type:'POST',
-		sourceElement : source,
-		success: function(data) {
-			if(!data.data.flag){
-				var errmsg = "error";//data.data.message;
-				var msgDiv = $('#messageDiv');
-				if (msgDiv.length) {
-					msgDiv.html(errmsg);
-					$("#messageDiv").css("display", "");
-				} else {
-					alert(errmsg);
-				}
-				
-			}
-			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
-			//loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			toggleCheckbox($(this).attr("sourceElement"), $(this).attr("data")["val"]);
-			alert("An unexpected error occurred while attempting to update Person's Project ")
-		}
-	});
-}
 /* 
  * Whenever a property is changed on the manage project staff list, give it a style to confirm that it has been modified
  */
