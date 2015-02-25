@@ -109,9 +109,8 @@ tds.staffing.controller.MainController = function(scope, http, alerts){
 				phaseArr.push(phaseId)
 			})
 		}
-		jQuery.ajax({
-			url : contextPath+'/person/loadFilteredStaff',
-			data : {
+
+		var data = {
 				'role' : role,
 				'location' : location,
 				'project' : project,
@@ -123,12 +122,16 @@ tds.staffing.controller.MainController = function(scope, http, alerts){
 				'firstProp':firstProp,
 				'orderBy':orderBy
 				
+			};
+		http.post( contextPath+'/person/loadFilteredStaff', data).then(
+			function(response){
+				$("#projectStaffTableId").html(response.data);
 			},
-			type : 'POST',
-			success : function(data) {
-				$("#projectStaffTableId").html(data)
+			function(response){
+				$("#projectStaffTableId").html(response.data);
+				alerts.addAlert({type: 'danger', msg: 'Error: ' + "An error occurred loading persons."});
 			}
-		});
+		);
 
 	}
 

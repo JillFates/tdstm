@@ -828,13 +828,13 @@ class PersonController {
 	 * @return HTML 
 	 */
 	def loadFilteredStaff = {
-		def role = params.role ?: 'AUTO'
-		def projectId = (params.project.isNumber()) ? (params.project.toLong()) : (0)
-		def scale = params.scale
-		def location = params.location
-		def phase = params.list("phaseArr[]")
-		def assigned = params.assigned ?: 1
-		def onlyClientStaff = params.onlyClientStaff ?: 1
+		def role = request.JSON.role ?: 'AUTO'
+		def projectId = (request.JSON.project.isNumber()) ? (request.JSON.project.toLong()) : (0)
+		def scale = request.JSON.scale
+		def location = request.JSON.location
+		def phase = request.JSON["phaseArr[]"]
+		def assigned = request.JSON.assigned ?: 1
+		def onlyClientStaff = request.JSON.onlyClientStaff ?: 1
 		def loginPerson = securityService.getUserLoginPerson()
 		
 		def sortableProps = ['lastName', 'fullName', 'company', 'team']
@@ -842,17 +842,17 @@ class PersonController {
 		
 		//code which is used to resolve the bug in TM-2585: 
 		//alphasorting is reversed each time when the user checks or unchecks the two filtering checkboxes.
-		if(params.firstProp != 'staff'){
-			session.setAttribute("Staff_OrderBy",params.orderBy)
-			session.setAttribute("Staff_SortOn",params.sortOn)
+		if(request.JSON.firstProp != 'staff'){
+			session.setAttribute("Staff_OrderBy",request.JSON.orderBy)
+			session.setAttribute("Staff_SortOn",request.JSON.sortOn)
 		}else{
-			params.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
-			params.sortOn = session.getAttribute("Staff_SortOn")?:'lastName'
+			request.JSON.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
+			request.JSON.sortOn = session.getAttribute("Staff_SortOn")?:'lastName'
 		}
 		
-		def paramsMap = [sortOn : params.sortOn in sortableProps ? params.sortOn : 'fullName',
-		firstProp : params.firstProp, 
-		orderBy : params.orderBy in orders ? params.orderBy : 'asc']
+		def paramsMap = [sortOn : request.JSON.sortOn in sortableProps ? request.JSON.sortOn : 'fullName',
+		firstProp : request.JSON.firstProp, 
+		orderBy : request.JSON.orderBy in orders ? request.JSON.orderBy : 'asc']
 		def sortString = "${paramsMap.sortOn} ${paramsMap.orderBy}"
 		sortableProps.each {
 			sortString = sortString + ', ' + it + ' asc'
