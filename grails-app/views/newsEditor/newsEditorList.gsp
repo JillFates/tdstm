@@ -172,7 +172,7 @@ function updateHidden(checkBoxId,hiddenId){
 function openCreateNewsDialog(){
 	$("#createNewsDialog").dialog('option', 'width', 'auto');
 	$("#createNewsDialog").dialog('option', 'position', ['center','top']);
-	$('#showEditCommentDialog').dialog('close');
+	//$('#showEditCommentDialog').dialog('close');
 	$('#createNewsDialog').dialog('open');
 }
 function validateCreateNewsForm(){
