@@ -1,6 +1,0 @@
-DefaultPackage
-scripts
-src.groovy.grails.util
-src.groovy.org.grails.plugins.webtest
-src.runtime.org.grails.plugins.webtest
-src.templates.test.webtest

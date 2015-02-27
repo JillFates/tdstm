@@ -1,11 +1,11 @@
 
 class WidgetController {
 
-	def progressBar = {
+	def progressBar() {
 		render(view: 'progressBarDemo', model: ['url' : '/demo'])
 	}
 
-	def progressBarFailed = {
+	def progressBarFailed() {
 		render(view: 'progressBarDemo', model: ['url' : '/demo/failed'])
 	}
 }

@@ -3,14 +3,18 @@
 import org.springframework.jdbc.core.JdbcTemplate
 import org.junit.Ignore
 
-class MoveBundleServiceTests {
-	
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+
+@TestFor(MoveBundleService)
+class MoveBundleServiceTests extends Specification {
+
 	def moveBundleService = new MoveBundleService()
 	
 	def jdbcTemplate = new JdbcTemplate( getDatasource() )
 	
 	//test case for moveBundleService.assetCount( def moveBundleId )
-	@Ignore
+	@Ignore //if this test is enabled again expect should be added
     void testassetCount() {
     	moveBundleService.jdbcTemplate = jdbcTemplate
 		
@@ -18,7 +22,7 @@ class MoveBundleServiceTests {
     }
 	
 	// test case for moveBundleService.assetCompletionCount( def moveBundleId, def transitionId )
-	@Ignore
+	@Ignore //if this test is enabled again expect should be added
 	void testassetCompletionCount() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		
@@ -28,14 +32,14 @@ class MoveBundleServiceTests {
     }
 	
 	// test case for moveBundleService.getActualTimes( def moveBundleId, def transitionId )
-	@Ignore
+	@Ignore //if this test is enabled again expect should be added
 	void testgetActualTimes() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		assertEquals false, ! moveBundleService.getActualTimes("27","60").started
     }
 	
 	// test case for moveBundleService.getAllDashboardSteps( def moveBundleId )
-	@Ignore
+	@Ignore //if this test is enabled again expect should be added
 	void testgetAllDashboardSteps() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		
@@ -49,7 +53,7 @@ class MoveBundleServiceTests {
     }
 	
 	// method to test the MoveEvent Transition Times summary report details
-	@Ignore
+	@Ignore //if this test is enabled again expect should be added
 	void testgetMoveEventSummaryResults() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		def summaryResults = moveBundleService.getMoveEventSummaryResults( 1 )
@@ -57,7 +61,7 @@ class MoveBundleServiceTests {
 	}
 	
 	// method to test the MoveEvent Transition Times detailed report details
-	@Ignore
+	@Ignore //if this test is enabled again expect should be added
 	void testgetMoveEventDetailedResults() {
 		moveBundleService.jdbcTemplate = jdbcTemplate
 		def detailedResults = moveBundleService.getMoveEventDetailedResults( 1 )

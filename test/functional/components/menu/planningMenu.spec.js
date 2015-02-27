@@ -19,6 +19,7 @@ describe('Planning Menu', function(){
       it('should open Planning Menu',function(){
         menu.getPlanning().click();
       });
+
       it('should have List Events in the submenu', function(){
         expect(menu.getListEvents().getText()).toEqual('List Events');
       });

@@ -184,7 +184,7 @@ describe('Import Export Devices',function(){
           'Mfg: Dell | Model: TOCREATE3 | 1 reference',
           'Invalid device types specified:',
           '(8)',
-          'NoExiste (8)\n',
+          'NoExiste (8)\n\n\n',
           'Review took \\d.\\d* seconds to complete'
         ].join('\n').replace(/[(|)]/g,'.');
         expect(manageBatches.getReviewResults()).toMatch(results);
@@ -273,7 +273,8 @@ describe('Import Export Devices',function(){
   describe('Export', function () {
     var file = new File();
     var date = new Date().toJSON().slice(0,10).replace(/-/g,'');
-    var filePath = process.env.DOWNLOAD_PATH+'TDS-To_Export_and_Import-All-SADFXRrcM-'+date+'.xls';
+    //var filePath = process.env.DOWNLOAD_PATH+'TDS-To_Export_and_Import-All-SADFXRrcM-'+date+'.xls';
+    var filePath = process.env.DOWNLOAD_PATH+'TDS-MarketingDemo-All-SADFXRrcM-'+date+'.xls';
   
     it('should load Export Assets page after select Assets > Export Assets', function(){
       var menu = new Menu();

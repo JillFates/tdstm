@@ -53,7 +53,7 @@
 						<input type="button" value="Refresh:" id="update"
 							onclick="getMoveEventNewsDetails($('#moveEvent').val());updateTaskSummary();" /> 
 						<select name="updateTime" id="updateTimeId" class="selecttext"
-							onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(e.responseText)') }">
+							onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(XMLHttpRequest.responseText)') }">
 							<option value="30000">30s</option>
 							<option value="60000">1m</option>
 							<option value="120000">2m</option>
@@ -946,7 +946,7 @@
 				}
 			}
 			//Append recent changes to status bar
-			${remoteFunction(controller:'moveEvent', action:'getMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'updateEventHeader(e)')}
+			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id=\' + moveEvent',onComplete:'updateEventHeader(XMLHttpRequest)')}
 			setStepsWidth();
 			
 		} catch (ex) {
@@ -1066,7 +1066,7 @@
 		var idArray = newsId.split("_")
 		var type = idArray [0]
 		var id = idArray [1] 
-		${remoteFunction(controller:'newsEditor', action:'getCommetOrNewsData',params:'\'id=\' + id +\'&commentType=\'+type', onComplete:'showEditNewsForm( e )')}
+		${remoteFunction(controller:'newsEditor', action:'retrieveCommetOrNewsData',params:'\'id=\' + id +\'&commentType=\'+type', onComplete:'showEditNewsForm( XMLHttpRequest )')}
 	}
 
 	/**

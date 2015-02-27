@@ -79,13 +79,13 @@
             <td>Front image:</label></td>
         	<td>
 	        	<g:if test="${modelInstance?.frontImage}">
-    	    	<img id="mainImg" src="${createLink(controller:'model', action:'getFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/>
+    	    	<img id="mainImg" src="${createLink(controller:'model', action:'retrieveFrontImage', id:modelInstance.id)}" style="height: 50px;width: 100px;"/>
         		</g:if>
             </td>
         	<td>Rear image:</td>
         	<td>
         		<g:if test="${modelInstance?.rearImage}">
-        		<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
+        		<img src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}"  style="height: 50px;width: 100px;" id="rearImageId"/>
         		</g:if>
         	</td>
         </tr>	
@@ -149,7 +149,7 @@
 	<div>
 		<div id="cablingPanel">
 			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
-			<img src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" />
+			<img src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" />
 			<script type="text/javascript">
 					$("#cablingPanel").css("background-color","#FFF")
 				</script>

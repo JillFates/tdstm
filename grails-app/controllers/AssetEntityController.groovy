@@ -26,12 +26,14 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
 import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 
 import java.util.regex.Matcher
+import org.hibernate.criterion.Order
 
 import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
@@ -135,7 +137,7 @@ class AssetEntityController {
 		]
 	]
 	
-	def index = {
+	def index() {
 		redirect action:'list', params:params
 	}
 
@@ -145,7 +147,7 @@ class AssetEntityController {
 	 * @param  Selected Filter Values
 	 * @return Will return filters data to AssetEntity  
 	 * ------------------------------------------------------ */
-	def filter = {
+	def filter() {
 		if (params.rowVal) {
 			if (!params.max) params.max = params.rowVal
 			userPreferenceService.setPreference( "MAX_ASSET_LIST", "${params.rowVal}" )
@@ -180,7 +182,7 @@ class AssetEntityController {
 	/**
 	 * To import the asset form data
 	 */
-	def assetImport = {
+	def assetImport() {
 		Project projectInstance
 		UserLogin userLogin
 
@@ -228,7 +230,7 @@ class AssetEntityController {
 	/**
 	 * To render the Export form
 	 */
-	def assetExport = {
+	def assetExport() {
 		render( view:"assetExport" )
 	}
 	
@@ -236,7 +238,7 @@ class AssetEntityController {
 	 * This action is used to redirect control export view  
 	 * render export form
 	 */
-	def exportAssets = {
+	def exportAssets() {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project
 		def projectInstance
@@ -280,7 +282,7 @@ class AssetEntityController {
 	 * @param DataTransferSet,Project,Excel Sheet 
 	 * @return currentPage( assetImport Page)
 	 * --------------------------------------------------- */
-	def upload = {
+	def upload() {
 		String forwardAction = 'assetImport'
 		String warnMsg = ''
 
@@ -346,10 +348,10 @@ class AssetEntityController {
 		def filesColumnslist = []
 		def currentUser = null
 		//get column name and sheets
-		getColumnNames(serverDTAMap, serverColumnslist, project)
-		getColumnNames(appDTAMap, appColumnslist, project)
-		getColumnNames(databaseDTAMap, databaseColumnslist, project)
-		getColumnNames(filesDTAMap, filesColumnslist, project)
+		retrieveColumnNames(serverDTAMap, serverColumnslist, project)
+		retrieveColumnNames(appDTAMap, appColumnslist, project)
+		retrieveColumnNames(databaseDTAMap, databaseColumnslist, project)
+		retrieveColumnNames(filesDTAMap, filesColumnslist, project)
 
 		/*	def dependencyColumnList = ['DependentId','Type','DataFlowFreq','DataFlowDirection','status','comment']
 		 def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
@@ -1090,7 +1092,7 @@ class AssetEntityController {
 		}
 	}
 	
-	def export = {
+	def export() {
 		def key = "AssetExport-" + UUID.randomUUID().toString()
 		progressService.create(key)
 		
@@ -1102,7 +1104,7 @@ class AssetEntityController {
 		log.info "Initiate Export"
 		
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
-		Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 2000) )
+		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 		trigger.jobDataMap.putAll(params)
 		
 		def bundle = request.getParameterValues( "bundle" )
@@ -1121,7 +1123,7 @@ class AssetEntityController {
 		render(ServiceResults.success(['key' : key]) as JSON)
 	}
 	
-	def downloadExport = {
+	def downloadExport() {
 		def key = params.key
 		def filename = progressService.getData(key, 'filename')
 		def header = progressService.getData(key, 'header')
@@ -1170,7 +1172,7 @@ class AssetEntityController {
 	 * @param project, filter, number of properties
 	 * @return model data to initate the asset list
 	 **/
-	def list = {
+	def list() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -1186,7 +1188,7 @@ class AssetEntityController {
 	/**
 	 * This method is used by JQgrid to load assetList
 	 */
-	def listJson = {
+	def listJson() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -1203,7 +1205,7 @@ class AssetEntityController {
 	 * @param assetEntityId
 	 * @return assetEntityList
 	 * --------------------------------------- */
-	def delete = {
+	def delete() {
 		def redirectAsset = params.dstPath
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -1238,7 +1240,7 @@ class AssetEntityController {
 					redirect( controller:'files', action:'list')
 					break;
 				case "dependencyConsole":
-					forward( action:'getLists', params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
+					forward( action:'retrieveLists', params:[entity: 'server',dependencyBundle:session.getAttribute("dependencyBundle")])
 					break;
 				case "assetAudit":
 					render "AssetEntity ${assetEntityInstance.assetName} deleted"
@@ -1259,7 +1261,7 @@ class AssetEntityController {
 	 * @author Mallikarjun
 	 * @return assetList page
 	 *-------------------------------------------------*/
-	def remove = {
+	def remove() {
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(assetEntityInstance) {
@@ -1320,7 +1322,7 @@ class AssetEntityController {
 				  forward(action:'show', params:[redirectTo:redirectTo, source:model.source, assetType:model.assetType])
 				  break;
 		    case "dependencyConsole":
-				  forward(action:'getLists', params:[entity:model.tabType,labelsList:model.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
+				  forward(action:'retrieveLists', params:[entity:model.tabType,labelsList:model.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
 				  break;
 			case "listTask":
 				  render "Asset ${entity.assetName} updated."
@@ -1353,7 +1355,7 @@ class AssetEntityController {
 	 *@author Mallikarjun
 	 *@return retun to assetEntity to assetEntity Dialog
 	 *--------------------------------------------------------- */
-	def editShow = {
+	def editShow() {
 		def items = []
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def entityAttributeInstance =  EavEntityAttribute.findAll(" from com.tdssrc.eav.EavEntityAttribute eav where eav.eavAttributeSet = $assetEntityInstance.attributeSet.id order by eav.sortOrder ")
@@ -1386,7 +1388,7 @@ class AssetEntityController {
 	 * @author Mallikarjun
 	 * @return assetEnntiAttribute JSON oObject 
 	 * ----------------------------------------------------------*/
-	def updateAssetEntity = {
+	def updateAssetEntity() {
 		def assetItems = []
 		def assetEntityParams = params.assetEntityParams
 		if(assetEntityParams) {
@@ -1481,7 +1483,7 @@ class AssetEntityController {
 	 *@author Lokanath
 	 *@return attributes as a JSON Object 
 	 */
-	def getAttributes = {
+	def retrieveAttributes() {
 		def attributeSetId = params.attribSet
 		def items = []
 		def entityAttributeInstance = []
@@ -1515,7 +1517,7 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return attributes as a JSON Object
 	 * -----------------------------------------------------*/
-	def getAssetAttributes = {
+	def retrieveAssetAttributes() {
 		def assetId = params.assetId
 		def items = []
 		def entityAttributeInstance = []
@@ -1537,7 +1539,7 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return autoCompletefield data as JSON
 	 *-----------------------------------------------------------*/
-	def getAutoCompleteDate = {
+	def retrieveAutoCompleteDate() {
 		def autoCompAttribs = params.autoCompParams
 		def data = []
 		if(autoCompAttribs){
@@ -1558,7 +1560,7 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return commentList as JSON
 	 *-------------------------------------------------------------*/
-	def listComments = {
+	def listComments() {
 		def assetEntityInstance = AssetEntity.get( params.id )
 		def commentType = params.commentType;
 		def assetCommentsInstance
@@ -1587,7 +1589,7 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return assetCommentList
 	 * ---------------------------------------------------------------------- */
-	def showComment = {
+	def showComment() {
 		def commentList = []
 		def personResolvedObj
 		def personCreateObj
@@ -1719,8 +1721,8 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return assetComments
 	 * -----------------------------------------------------------------*/
-	// def saveComment = { com.tdsops.tm.command.AssetCommentCommand cmd ->
-	def saveComment = {
+	// def saveComment() { com.tdsops.tm.command.AssetCommentCommand cmd ->
+	def saveComment() {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, true, flash)
 		if( params.forWhom == "update" ){
 			def assetEntity = AssetEntity.get(params.prevAsset)
@@ -1736,7 +1738,7 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return assetComment
 	 * ------------------------------------------------------------ */
-	def updateComment = {
+	def updateComment() {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
 		if ( params.open == "view" ) {
 			if (map.error) {
@@ -1758,7 +1760,7 @@ class AssetEntityController {
 	 * @author Lokanath
 	 * @return assetCommentList 
 	 */
-	def deleteComment = {
+	def deleteComment() {
 		// TODO - SECURITY - deleteComment - verify that the asset is part of a project that the user has the rights to delete the note
 		def assetCommentInstance = AssetComment.get(params.id)
 		if(assetCommentInstance){
@@ -1783,7 +1785,7 @@ class AssetEntityController {
 	 * 	@param :	AssetEntity
 	 * 	@return:	AssetEntity Details , Recent Transitions and MoveBundle Teams
 	 *-------------------------------------------*/
-	def assetDetails = {
+	def assetDetails() {
 		def assetId = params.assetId
 		def assetStatusDetails = []
 		def statesList = []
@@ -1876,7 +1878,7 @@ class AssetEntityController {
 	 * @param : fromState and toState
 	 * @return: boolean value to validate comment field
 	 *---------------------------------*/
-	def getFlag = {
+	def retrieveFlag() {
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def moveBundleInstance = MoveBundle.get(params.moveBundle)
 		def toState = params.toState
@@ -1895,7 +1897,7 @@ class AssetEntityController {
 	  * @param : AssetEntity id, priority,assigned to value and from and to States
 	  * @return: AssetEntity details and AssetTransition details
 	  */
-	def createTransition = {
+	def createTransition() {
 		def assetId = params.asset
 		def assetEntity = AssetEntity.get(assetId)
 		def assetList = []
@@ -1930,7 +1932,7 @@ class AssetEntityController {
 			if(status != "" ){
 				def transactionStatus = workflowService.createTransition(assetEntity.moveBundle.workflowCode,"SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
 				if ( transactionStatus.success ) {
-					stateIdList = getStates(status,assetEntity)
+					stateIdList = retrieveStates(status,assetEntity)
 					stateIdList.sort().each{
 						statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
 					}
@@ -1939,7 +1941,7 @@ class AssetEntityController {
 				} else {
 					statusLabel = stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,currentStateId)
 					statusName = stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId)
-					stateIdList = getStates(stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId),assetEntity)
+					stateIdList = retrieveStates(stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId),assetEntity)
 					stateIdList.sort().each{
 						statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
 					}
@@ -1948,7 +1950,7 @@ class AssetEntityController {
 			} else {
 				statusLabel = stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,currentStateId)
 				statusName = stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId)
-				stateIdList = getStates(stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId),assetEntity)
+				stateIdList = retrieveStates(stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId),assetEntity)
 				stateIdList.sort().each{
 					statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
 				}
@@ -2041,7 +2043,7 @@ class AssetEntityController {
 	 *@param : state value
 	 *@return: List of valid stated for param state
 	 *----------------------------------------*/
-	def getStates(def state,def assetEntity){
+	def retrieveStates(def state,def assetEntity){
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def stateIdList = []
 		def validStates
@@ -2062,7 +2064,7 @@ class AssetEntityController {
 	 * @param : time interval
 	 * @return : time interval
 	 *-------------------------------------------*/
-	def setTimePreference = {
+	def setTimePreference() {
 		def timer = params.timer
 		def updateTime =[]
 		if(timer){
@@ -2079,7 +2081,7 @@ class AssetEntityController {
 	 * @return : Common tasks for selected assets
 	 */
 
-	def getList = {
+	def retrieveList() {
 		def projectInstance = securityService.getUserCurrentProject()
 		def assetArray = params.assetArray
 		Set common = new HashSet()
@@ -2129,7 +2131,7 @@ class AssetEntityController {
 	 * 	@param : batch id and total assts from session 
 	 *	@return imported data for progress bar
 	 * -------------------------------------- */
-	def getProgress = {
+	def retrieveProgress() {
 		def importedData
 		def progressData = []
 		def batchId = session.getAttribute("BATCH_ID")
@@ -2164,7 +2166,7 @@ class AssetEntityController {
 	 * @param : assetId,StatusId
 	 * @return : status message
 	 */
-	def showStatus = {
+	def showStatus() {
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def arrayId = params.id.split("_")
 		def statusMsg =""
@@ -2197,7 +2199,7 @@ class AssetEntityController {
 	 * @return : render to create page based on condition as if redirectTo is assetAudit then redirecting 
 	 * to auditCreate view
 	 */
-	def create = {
+	def create() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -2226,7 +2228,7 @@ class AssetEntityController {
 	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
 	 * to auditEdit view
 	 */
-	def edit = {
+	def edit() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -2260,7 +2262,7 @@ class AssetEntityController {
 	 * user to the place that they came from based on the params.redirectTo param. The return content varies based on that
 	 * param as well.
 	 */
-	def save = {
+	def save() {
 		controllerService.saveUpdateAssetHandler(this, session, deviceService, AssetClass.DEVICE, params)
 		session.AE?.JQ_FILTERS = params
 	}
@@ -2271,7 +2273,7 @@ class AssetEntityController {
 	 * @param id : id of assetEntity
 	 * @return : render to appropriate view
 	 */
-	def update = {
+	def update() {
 		controllerService.saveUpdateAssetHandler(this, session, deviceService, AssetClass.DEVICE, params)
 		session.AE?.JQ_FILTERS = params
 	}
@@ -2279,7 +2281,7 @@ class AssetEntityController {
 	/**
 	* Renders the detail of an AssetEntity 
 	*/
-	def show = {
+	def show() {
 
 		def (project, userLogin) = controllerService.getProjectAndUserForPage( this )
 		if (! project) 
@@ -2316,7 +2318,7 @@ class AssetEntityController {
      * @param assetType : requested assetType for which we need to get manufacturer list
      * @return : render to manufacturerView
      */
-	def getManufacturersList = {
+	def retrieveManufacturersList() {
 		def assetType = params.assetType
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 		def prefVal =  userPreferenceService.getPreference("lastManufacturer")
@@ -2327,7 +2329,7 @@ class AssetEntityController {
 	/**
 	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
 	 */
-	def setShowAllPreference = {
+	def setShowAllPreference() {
 		userPreferenceService.setPreference("showAllAssetTasks", params.selected=='1' ? 'TRUE' : 'FALSE')
 		render true
 	}
@@ -2337,7 +2339,7 @@ class AssetEntityController {
 	 * @param assetType : requested assetType for which we need to get manufacturer list
 	 * @return : render to manufacturerView
 	 */
-	def getModelsList = {
+	def retrieveModelsList() {
 		def manufacturer = params.manufacturer
 		def models=[]
 		if(manufacturer!="null"){
@@ -2350,7 +2352,7 @@ class AssetEntityController {
 	/**
 	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
 	 */
-	def listTasks = {
+	def listTasks() {
 		def user = securityService.getUserLogin()
 		try{
 			if (!RolePermissions.hasPermission('ViewTaskManager')) {
@@ -2442,7 +2444,7 @@ class AssetEntityController {
 	/**
 	 * Used to generate the List of Comments, which leverages a shared closeure with the above listTasks controller
 	 */
-	def listComment = {
+	def listComment() {
 			def project = securityService.getUserCurrentProject();
 			if (!project) {
 				flash.message = "Please select project to view Comments"
@@ -2460,7 +2462,7 @@ class AssetEntityController {
 	 * Used to generate list of comments using jqgrid
 	 * @return : list of tasks as JSON
 	 */
-	def listCommentJson = {
+	def listCommentJson() {
 		def sortIndex = params.sidx ?: 'lastUpdated'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
@@ -2492,7 +2494,7 @@ class AssetEntityController {
 				if (params.assetName)
 					ilike('ae.assetName',"%${params.assetName}%")
 				def sid = sortIndex  =='assetName' || sortIndex  =='assetType' ? "ae.${sortIndex}" : sortIndex
-				order(sid, sortOrder).ignoreCase()
+				order(new Order(sid, sortOrder=='asc').ignoreCase())
 			}
 		def totalRows = assetCommentList.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -2522,7 +2524,7 @@ class AssetEntityController {
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON
 	 */
-	def listTaskJSON = {
+	def listTaskJSON() {
 		def sortIndex =  params.sidx ? params.sidx : session.TASK?.JQ_FILTERS?.sidx
 		def sortOrder =  params.sidx ? params.sord : session.TASK?.JQ_FILTERS?.sord
 		
@@ -2654,10 +2656,10 @@ class AssetEntityController {
 			if(sortIndex && sortOrder){
 				if(sortIndex  =='assetName' || sortIndex  =='assetType'){
 					assetEntity {
-						order(sortIndex, sortOrder).ignoreCase()
+						order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 					}
 				}else{
-					order(sortIndex, sortOrder).ignoreCase()
+					order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 				}
 			} else {
 				and{
@@ -2828,7 +2830,7 @@ class AssetEntityController {
 	/**
 	 * This action is used to get AssetOptions by type to display at admin's AssetOption page .
 	 */
-	def assetOptions = {
+	def assetOptions() {
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		
 		def priorityOption = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.PRIORITY_OPTION)
@@ -2847,7 +2849,7 @@ class AssetEntityController {
 	/**
 	 * This action is used to save AssetOptions by type to display at admin's AssetOption page .
 	 */
-	def saveAssetoptions = {
+	def saveAssetoptions() {
 		def assetOptionInstance = new AssetOptions()
 		def planStatusList = []
 		def planStatus
@@ -2857,7 +2859,8 @@ class AssetEntityController {
 			if(!assetOptionInstance.save(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
-			planStatus = AssetOptions.findByValue(params.planStatus).id
+			planStatus = assetOptionInstance.id
+			
 			
 		}else if(params.assetOptionType=="Priority"){
 			assetOptionInstance.type = AssetOptions.AssetOptionsType.PRIORITY_OPTION
@@ -2865,7 +2868,7 @@ class AssetEntityController {
 			if(!assetOptionInstance.save(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
-			planStatus = AssetOptions.findByValue(params.priorityOption).id
+			planStatus = assetOptionInstance.id
 			
 		}else if(params.assetOptionType=="dependency"){
 			assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_TYPE
@@ -2873,7 +2876,7 @@ class AssetEntityController {
 			if(!assetOptionInstance.save(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
-			planStatus = AssetOptions.findByValue(params.dependencyType).id
+			planStatus = assetOptionInstance.id
 			
 		}else if(params.assetOptionType=="environment"){
 			assetOptionInstance.type = AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION
@@ -2881,7 +2884,7 @@ class AssetEntityController {
 			if(!assetOptionInstance.save(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
-			planStatus = AssetOptions.findByValue(params.environment).id
+			planStatus = assetOptionInstance.id
 			
 		}else {
 		    assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
@@ -2889,7 +2892,7 @@ class AssetEntityController {
 			if(!assetOptionInstance.save(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
-			planStatus = AssetOptions.findByValue(params.dependencyStatus).id
+			planStatus = assetOptionInstance.id
 			
 		}
 		planStatusList =['id':planStatus]
@@ -2900,7 +2903,7 @@ class AssetEntityController {
 	/**
 	 * This action is used to delete  AssetOptions by type from admin's AssetOption page .
 	 */
-	def deleteAssetOptions = {
+	def deleteAssetOptions() {
 		def assetOptionInstance
 		if(params.assetOptionType=="planStatus"){
 			 assetOptionInstance = AssetOptions.get(params.assetStatusId)
@@ -2933,7 +2936,7 @@ class AssetEntityController {
 	/**
 	* Render Summary of assigned and unassgined assets.
 	*/
-	def assetSummary = {
+	def assetSummary() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -2981,7 +2984,7 @@ class AssetEntityController {
 	 * @param Integer dependencyBundle - the dependency bundle ID 
 	 * @return String HTML representing the page
 	 */
-	def getLists = {
+	def retrieveLists() {
 		def start = new Date()
 		session.removeAttribute('assetDependentlist')
 
@@ -3347,7 +3350,7 @@ class AssetEntityController {
 	* @return : appropriate message back to view
 	* 
 	*/
-	def deleteBulkAsset = {
+	def deleteBulkAsset() {
 		def respMap = [resp : assetEntityService.deleteBulkAssets(params.type, params.list("assetLists[]"))]
 		render respMap as JSON
 	}
@@ -3358,7 +3361,7 @@ class AssetEntityController {
      * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return select or a JSON array
 	 */
-	def getWorkflowTransition = {
+	def retrieveWorkflowTransition() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def format = params.format
@@ -3400,7 +3403,7 @@ class AssetEntityController {
 	 * @return HTML select of staff belongs to company and TDS or a JSON array
 	 * 
 	 */
-	def updateAssignedToSelect = {
+	def updateAssignedToSelect() {
 		
 		// TODO : Need to refactor this function to use the new TaskService.assignToSelectHtml method
 		
@@ -3447,7 +3450,7 @@ class AssetEntityController {
 		render result
 	}
 
-	def isAllowToChangeStatus = {
+	def isAllowToChangeStatus() {
 		def taskId = params.id
 		def allowed = true
 		if(taskId){
@@ -3466,7 +3469,7 @@ class AssetEntityController {
      * @param   format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return render HTML or a JSON array
 	 */
-	def updateStatusSelect = {
+	def updateStatusSelect() {
 		//Changing code to populate all select options without checking security roles.
 		def mapKey = 'ALL'//securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
@@ -3498,7 +3501,7 @@ class AssetEntityController {
 	 * @param	params.id	The ID of the AssetComment to load  predecessor SELECT for
 	 * @return render HTML
 	 */
-	def predecessorTableHtml = {
+	def predecessorTableHtml() {
 		//def sw = new org.springframework.util.StopWatch("predecessorTableHtml Stopwatch") 
 		//sw.start("Get current project")
 		def project = securityService.getUserCurrentProject()
@@ -3518,7 +3521,7 @@ class AssetEntityController {
 	 * @param : category : category for options .
 	 * @return : options
 	 */
-	def generateDepSelect = {
+	def generateDepSelect() {
 		
 		def taskId=params.taskId
 		def project = securityService.getUserCurrentProject()
@@ -3550,7 +3553,7 @@ class AssetEntityController {
      * @param   params.id   The ID of the AssetComment to load  successor SELECT for
      * @return render HTML
      */
-    def successorTableHtml = {
+    def successorTableHtml() {
         def project = securityService.getUserCurrentProject()
         def task = AssetComment.findByIdAndProject(params.commentId, project)
         if ( ! task ) {
@@ -3573,7 +3576,7 @@ class AssetEntityController {
      * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return String - HTML Select of prdecessor list or a JSON 
 	 */
-	def predecessorSelectHtml = {
+	def predecessorSelectHtml() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def task
@@ -3616,7 +3619,7 @@ class AssetEntityController {
 	 * @return : Export data in WH project format
 	 * 
 	 */
-	def exportSpecialReport = {
+	def exportSpecialReport() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def formatter = new SimpleDateFormat("yyyyMMdd")
@@ -3641,9 +3644,9 @@ class AssetEntityController {
 		}catch( Exception ex ){
 			log.error "Exception occurred while exporting data"+ex.printStackTrace()
 			flash.message = ex.getMessage()
-			redirect( action:exportAssets)
+			redirect( action:"exportAssets")
 		}
-	 redirect( action:exportAssets)
+	 redirect( action:"exportAssets")
 	}
 	
 	/**
@@ -3651,7 +3654,7 @@ class AssetEntityController {
 	 * @param : id - Requested model's id
 	 * @return : assetType if exist for requested model else 0
 	 */
-    def getAssetModelType = {
+    def retrieveAssetModelType() {
 		def assetType = 0
 		if(params.id && params.id.isNumber()){
 			def model = Model.read( params.id )
@@ -3665,7 +3668,7 @@ class AssetEntityController {
      * @param id : asset id
      * @return : HTML code containing support and dependent edit form
      */
-	def populateDependency = {
+	def populateDependency() {
 
 		def returnMap = [:]
 		def project = securityService.getUserCurrentProject()
@@ -3713,7 +3716,7 @@ class AssetEntityController {
 	 * @param id - class of asset to filter on (e.g. Application, Database, Server)
 	 * @return JSON array of asset id, assetName
 	 */
-	def assetSelectDataByClass = {
+	def assetSelectDataByClass() {
 		def project = securityService.getUserCurrentProject()
 
 		def assetList = assetEntityService.getAssetsByType(params.id, project)
@@ -3730,7 +3733,7 @@ class AssetEntityController {
 	 * @param type,validation
 	 * @return
 	 */
-	def getassetImportance = {
+	def retrieveAssetImportance() {
 		def assetType = params.type
 		def validation = params.validation
 		def configMap = assetEntityService.getConfig(assetType,validation)
@@ -3741,7 +3744,7 @@ class AssetEntityController {
 	 * @param type,validation
 	 * @return
 	 */
-	def getHighlightCssMap= {
+	def retrieveHighlightCssMap() {
 		def assetType = params.type
 		def validation = params.validation
 		def assetEntityInstance
@@ -3772,7 +3775,7 @@ class AssetEntityController {
 	 * @param project :project instance
 	 * @return
 	 */
-	def getColumnNames(entityDTAMap, columnslist, project){
+	def retrieveColumnNames(entityDTAMap, columnslist, project) {
 		entityDTAMap.eachWithIndex { item, pos ->
 			if(customLabels.contains( item.columnName )){
 				def customLabel = project[item.eavAttribute?.attributeCode] ? project[item.eavAttribute?.attributeCode] : item.columnName
@@ -3789,7 +3792,7 @@ class AssetEntityController {
 	 * @param prefFor
 	 * @param selected
 	  */
-	 def setImportPerferences ={
+	 def setImportPerferences() {
 		 def key = params.prefFor
 		 def selected=params.selected
 		 if(selected){
@@ -3801,7 +3804,7 @@ class AssetEntityController {
 	 /**
 	  * Action to return on list Dependency
 	  */
-	 def listDependencies ={
+	 def listDependencies() {
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
 			flash.message = "Please select project to view Dependencies"
@@ -3836,7 +3839,7 @@ class AssetEntityController {
 	/**
 	* This method is to show list of dependencies using jqgrid.
 	*/
-	def listDepJson ={
+	def listDepJson() {
 		def sortIndex = params.sidx ?: 'asset'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
@@ -3930,7 +3933,7 @@ class AssetEntityController {
 	* @render resultMap
 	*/
 	 
-	def getChangedBundle = {
+	def retrieveChangedBundle() {
 		def dependentId = params.dependentId
 		def dependent = AssetDependency.read(dependentId.isInteger() ? dependentId.toInteger() : -1)
 		def depBundle = params.dependentId == "support" ? dependent?.asset?.moveBundle?.id : dependent?.dependent?.moveBundle?.id
@@ -3964,7 +3967,7 @@ class AssetEntityController {
 	 * @param params.sourceTarget - S)ource or T)arget
 	 * @param params.forWhom - indicates if it is Create or Edit
 	 */
-	def getRackSelectForRoom = {
+	def retrieveRackSelectForRoom() {
 		def project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
 		def rackId = params.rackId
@@ -3996,7 +3999,7 @@ class AssetEntityController {
 	 * @param params.sourceTarget - S)ource or T)arget
 	 * @param params.forWhom - indicates if it is Create or Edit
 	 */
-	def getChassisSelectForRoom = {
+	def retrieveChassisSelectForRoom() {
 		def project = controllerService.getProjectForPage(this)
 		def roomId = params.roomId
 		def id = params.id
@@ -4023,7 +4026,7 @@ class AssetEntityController {
 		render(template:'deviceChassisSelect', model:[options:options, domId:rackDomId, domName:rackDomName, domClass:domClass, value:id, forWhom:forWhom, sourceTarget:sourceTarget, tabindex:tabindex])
 	}
 
-	def getAssetsByType = {
+	def retrieveAssetsByType() {
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
 			flash.message = "Please select project to view assets"
@@ -4077,11 +4080,11 @@ class AssetEntityController {
 	/**
 	 * 
 	 */
-	def poiDemo ={
+	def poiDemo() {
 		return 
 	}
 	
-	def exportPoiDemo ={
+	def exportPoiDemo() {
 		def filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
 		def formatter = new SimpleDateFormat("yyyyMMdd")
 		def today = formatter.format(new Date())
@@ -4169,7 +4172,7 @@ class AssetEntityController {
 	 * @param page
 	 * @param q
 	 */
-	def assetListForSelect2 = {
+	def assetListForSelect2() {
 		def results = []
 		def total = 0
 
@@ -4289,7 +4292,7 @@ class AssetEntityController {
 	/**
 	 * Returns the list of models for a specific manufacturer and asset type
 	 */
-	def modelsOf = {
+	def modelsOf() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -4323,7 +4326,7 @@ class AssetEntityController {
 	/**
 	 * Returns the list of models for a specific asset type
 	 */
-	def manufacturer = {
+	def manufacturer() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -4352,7 +4355,7 @@ class AssetEntityController {
 	/**
 	 * Returns the list of asset types for a specific manufactures
 	 */
-	def assetTypesOf = {
+	def assetTypesOf() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -4378,7 +4381,7 @@ class AssetEntityController {
 		}
 	}
 	
-	def architectureViewer = {
+	def architectureViewer() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -4406,7 +4409,7 @@ class AssetEntityController {
 	/**
 	 * Returns the data needed to generate the application architecture graph
 	 */
-	def applicationArchitectureGraph = {
+	def applicationArchitectureGraph() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)

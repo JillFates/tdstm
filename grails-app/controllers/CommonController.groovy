@@ -7,14 +7,14 @@ class CommonController {
 	def projectService
 	def controllerService
 
-	def index = { }
+	def index() { }
 
 	/**
 	 * Initializing Help Text for a given entity type.
 	 *@param : entityType type of entity.
 	 *@return : Json data.
 	 */
-	def tooltips = {
+	def tooltips() {
 		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
 		def defProject= Project.getDefaultProject()
@@ -40,7 +40,7 @@ class CommonController {
 	 *@param : entityType type of entity.
 	 *@return success string.
 	 */
-	def tooltipsUpdate = {
+	def tooltipsUpdate() {
 		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
 		if (! project) 
 			return
@@ -70,9 +70,8 @@ class CommonController {
 					def keyMap = keysMap[k]
 					if (!keyMap) {
 						keyMap = new KeyValue( project:project ,category:category, key:k, value:helpText.("$k"))
-					}else{
-						keyMap.value = helpText.("$k")
 					}
+					keyMap.value = helpText.("$k")
 					if(!keyMap.validate() || !keyMap.save(flush:true)){
 						def etext = "tooltipsUpdate Unable to create HelpText"+GormUtil.allErrorsString( keyMap )
 						log.error( etext )
@@ -95,7 +94,7 @@ class CommonController {
 	 *@param : entityType type of entity.
 	 *@return : json data.
 	 */
-	def getTooltips ={
+	def retrieveTooltips() {
 		def returnMap =[:]
 		def entityType = EntityType.getKeyByText(params.type)
 		def category = EntityType.getListAsCategory( entityType )

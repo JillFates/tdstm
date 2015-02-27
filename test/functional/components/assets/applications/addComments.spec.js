@@ -333,7 +333,7 @@ describe('Comments - Application', function(){
         var commTasklist = new CommentTaskList();
 
         it('should have add comment icon', function(){
-          expect(commTasklist.addCommentIcon.getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_add.png');
+          expect(commTasklist.addCommentIcon.getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/static/icons/comment_add.png');
         });
 
         it('should have "Add Comment" label', function(){
@@ -396,7 +396,7 @@ describe('Comments - Application', function(){
     
         it('should have edit comment icon', function(){
           commTasklist.list.then(function(list){
-            expect(list[0].$('a img').getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/icons/comment_edit.png');
+            expect(list[0].$('a img').getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/static/icons/comment_edit.png');
           });
         });
         

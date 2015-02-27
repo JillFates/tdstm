@@ -94,6 +94,7 @@ For Windows the install will default to c:\Program Files\nodejs, for Mac/Linux? 
     $ export USER_NAME= "username" <-- add your userName 
     $ export PASSWORD= "password" <-- add your password
     $ export BROWSER_NAME = <-- chrome, firefox, phantomjs
+    $ export DOWNLOAD_PATH=/path to browser downloads/ <-- browser download path
     
 7. Run the test  with "protractor support/protractor.config.js"
 

@@ -379,8 +379,8 @@
 					<tds:hasPermission permission='ShowDiscovery'>
 					<td style="vertical-align:top"><span class="megamenuSection">Discovery</span><br />
 						<ul>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Conflict</a> </li>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Data</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Conflict</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling Data</a> </li>
 							<li><a href="/tdstm/reports/powerReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Power</a> </li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
@@ -395,7 +395,7 @@
 							<li><a href="/tdstm/reports/serverConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Server Conflicts</a> </li>
 							<li><a href="/tdstm/reports/databaseConflicts" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Database Conflicts</a> </li>
 							<tds:hasPermission permission='ShowPlanning'>
-								<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report"  class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Task Report</a> </li>
+								<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report"  class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Task Report</a> </li>
 							</tds:hasPermission>
 							<li><g:link class="home mmlink" controller="reports" params="[projectId:currProjObj?.id]" onclick="hideMegaMenu('reportsMegaMenu')">Report Summary</g:link></li>
 						</ul>
@@ -406,9 +406,9 @@
 							<tds:hasPermission permission="ShowMovePrep">
 							<li><a href="/tdstm/reports/preMoveCheckList" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Pre-event Checklist</a> </li>
 							</tds:hasPermission>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Login Badges</a> </li>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Transport Worksheets</a></li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Login Badges</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Asset Tags</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Transport Worksheets</a></li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
@@ -419,9 +419,9 @@
 					<td style="vertical-align:top"><span class="megamenuSection">Event Day</span><br />
 						<ul>
 							<li><a href="/tdstm/reports/applicationMigrationReport" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Event Results</a> </li>
-							<li><a href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling QA</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Issue Report</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Event Results</a> </li>
+							<li><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA" class="home mmlink" onclick="hideMegaMenu('reportsMegaMenu')">Cabling QA</a> </li>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');" onclick="hideMegaMenu('reportsMegaMenu')">help</a></li>
 							</tds:hasPermission>
@@ -439,7 +439,7 @@
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul>
-					<li><g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account Details...</g:remoteLink></li>
+					<li><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account Details...</g:remoteLink></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="clientTeams" action="listTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>
 					<g:if test="${person?.modelScore}">
@@ -468,7 +468,7 @@
 				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
 				$("#moveEventStatus").html(newsAndStatus[0].status)
 			}
-			${remoteFunction(controller:'moveEvent', action:'getMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(e)')}
+			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
 			</script>
 		</g:if>
 

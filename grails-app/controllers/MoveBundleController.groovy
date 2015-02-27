@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat
 
 import org.apache.commons.lang.StringUtils
 import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
+
+import org.hibernate.criterion.Order
 
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
@@ -38,19 +41,19 @@ class MoveBundleController {
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"  
 	protected static Map dependecyBundlingAssetTypeMap = ['SERVER':true,'VM':true,'BLADE':true,'APPLICATION':true,'FILES':true,'DATABASE':true,'APPLIANCE':true,'STORAGE':true]
 	
-	def index = { redirect(action:list,params:params) }
+	def index() { redirect(action:"list",params:params) }
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	def list = {
+	def list() {
 	}
 	
 	/**
 	 * Used to generate the List for Bundles using jqgrid.
 	 * @return : list of bundles as JSON
 	 */
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'name'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
@@ -77,7 +80,7 @@ class MoveBundleController {
 					'in'('completionTime' , completionDates)
 				
 				if(sortIndex!='assetQty')	
-					order(sortIndex, sortOrder).ignoreCase()
+					order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 		}
 		def totalRows = bundleList.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
@@ -97,7 +100,7 @@ class MoveBundleController {
 
 		render jsonData as JSON
 	}
-	def show = {
+	def show() {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveBundleId = params.id
 
@@ -111,7 +114,7 @@ class MoveBundleController {
 
 			if(!moveBundleInstance) {
 				flash.message = "MoveBundle not found with id ${moveBundleId}"
-				redirect(action:list)
+				redirect(action:"list")
 			} else {
 				userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
 				def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
@@ -141,11 +144,11 @@ class MoveBundleController {
 					isDefaultBundle:isDefaultBundle ]
 			}
 		} else {
-			redirect(action:list)
+			redirect(action:"list")
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		def project = securityService.getUserCurrentProject()
 		if(moveBundleInstance && project) {
@@ -160,20 +163,20 @@ class MoveBundleController {
 					moveBundleInstance.delete(flush:true)
 
 					flash.message = "MoveBundle ${moveBundleInstance} deleted"
-					redirect(action:list)
+					redirect(action:"list")
 
 				}catch(Exception ex){
 					status.setRollbackOnly()
 					flash.message = "Unable to delete bundle " + moveBundleInstance.name
-					redirect(action:list)
+					redirect(action:"list")
 				}
 			}
 		} else {
 			flash.message = "MoveBundle not found with id ${params.id}"
-			redirect(action:list)
+			redirect(action:"list")
 		}
 	}
-	def deleteBundleAndAssets = {
+	def deleteBundleAndAssets() {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		if(moveBundleInstance) {
@@ -186,26 +189,26 @@ class MoveBundleController {
 
 					moveBundleInstance.delete(flush:true)
 					flash.message = "MoveBundle ${moveBundleInstance} deleted"
-					redirect(action:list)
+					redirect(action:"list")
 
 				}catch(Exception ex){
 					status.setRollbackOnly()
 					flash.message = "Unable to Delete MoveBundle Assosiated with Teams "+ex
-					redirect(action:list)
+					redirect(action:"list")
 				}
 			}
 		} else {
 			flash.message = "MoveBundle not found with id ${params.id}"
-			redirect(action:list)
+			redirect(action:"list")
 		}
 	}
-	def edit = {
+	def edit() {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		stateEngineService.loadWorkflowTransitionsIntoMap(moveBundleInstance.workflowCode, 'project')
 		def project = securityService.getUserCurrentProject()
 		if(!moveBundleInstance) {
 			flash.message = "MoveBundle not found with id ${params.id}"
-			redirect(action:list)
+			redirect(action:"list")
 		} else {
 			def managers = partyRelationshipService.getProjectStaff( project.id )
 			def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
@@ -234,7 +237,7 @@ class MoveBundleController {
 		}
 	}
 
-	def update = {
+	def update() {
 
 		// TODO : Security : Get User's project and attempt to find the project before blindly updating it
 
@@ -296,8 +299,8 @@ class MoveBundleController {
 				def updateMoveBundlePMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR" )
 				def updateMoveBundleMMRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR" )
 				flash.message = "MoveBundle ${moveBundleInstance} updated"
-				//redirect(action:show,params:[id:moveBundleInstance.id, projectId:projectId])
-				redirect(action:show,id:moveBundleInstance.id)
+				//redirect(action:"show",params:[id:moveBundleInstance.id, projectId:projectId])
+				redirect(action:"show",id:moveBundleInstance.id)
 			} else {
 				//	get the all Dashboard Steps that are associated to moveBundle.project
 				def allDashboardSteps = moveBundleService.getAllDashboardSteps( moveBundleInstance )
@@ -316,11 +319,11 @@ class MoveBundleController {
 		}
 		else {
 			flash.message = "MoveBundle not found with id ${params.id}"
-			redirect(action:edit,id:params.id)
+			redirect(action:"edit",id:params.id)
 		}
 	}
 
-	def create = {
+	def create() {
 		def moveBundleInstance = new MoveBundle()
 		def project = securityService.getUserCurrentProject()
 		def workflowCodes = stateEngineService.getWorkflowCode()
@@ -331,7 +334,7 @@ class MoveBundleController {
 
 	}
 
-	def save = {
+	def save() {
 
 		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -369,7 +372,7 @@ class MoveBundleController {
 			}
 
 			flash.message = "MoveBundle ${moveBundleInstance} created"
-			redirect(action:show,params:[id:moveBundleInstance.id])
+			redirect(action:"show",params:[id:moveBundleInstance.id])
 		}
 		else {
 			def workflowCodes = stateEngineService.getWorkflowCode()
@@ -385,7 +388,7 @@ class MoveBundleController {
 	 * @param tasksCompleted value 0-100 representing % completed
 	 * @return Returns 200 okay or appropriate error message
 	 */
-	def createManualStep = {
+	def createManualStep() {
 
 		try {
 			def moveBundleId = Integer.parseInt(params.moveBundleId)
@@ -414,7 +417,7 @@ class MoveBundleController {
 	 * 	@param transitionId
 	 * 	@return  new moveBundleStep
 	 */
-	def createMoveBundleStep = {
+	def createMoveBundleStep() {
 		def moveBundle = MoveBundle.get( params.moveBundleId )
 		def transitionId = Integer.parseInt( params.transitionId )
 		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId)
@@ -437,7 +440,7 @@ class MoveBundleController {
 	 * @param  : moveBundleId, list of unchecked steps
 	 * @return : success / failure
 	 *---------------------------------------------------*/
-	def checkStepSnapshotRecord = {
+	def checkStepSnapshotRecord() {
 		def steps = params.steps
 		def moveBundle = MoveBundle.findById( params.moveBundleId )
 		def transitionIds
@@ -458,7 +461,7 @@ class MoveBundleController {
 		render message;
 	}
 
-	def projectMoveBundles = {
+	def projectMoveBundles() {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def moveBundlesList
 		if(projectId){
@@ -470,7 +473,7 @@ class MoveBundleController {
 	 * Clear any transitions for the assets in that bundle. 
 	 * @param : bundleId, ProjectId
 	 * */
-	def clearBundleAssetHistory = {
+	def clearBundleAssetHistory() {
 		def bundleId = params.id
 		if(bundleId){
 			def moveBundle = MoveBundle.get( bundleId )
@@ -479,12 +482,12 @@ class MoveBundleController {
 			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [moveBundle])
 			stepSnapshotService.process( bundleId )
 		}
-		redirect(action:show,params:[id:params.id])
+		redirect(action:"show",params:[id:params.id])
 	}
 	/**
 	 * 
 	 */
-	def planningStats = {
+	def planningStats() {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def project = Project.get(projectId)
@@ -894,7 +897,7 @@ class MoveBundleController {
 	/**
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
 	 */
-	def dependencyConsole = {
+	def dependencyConsole() {
 	
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		Date start = new Date()
@@ -911,14 +914,14 @@ class MoveBundleController {
 	/*
 	 * Controller to render the Dependency Bundle Details
 	 */
-	def dependencyBundleDetails = { 
+	def dependencyBundleDetails() { 
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
 		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned, null) )
 	}
 
-	def generateDependency = {
+	def generateDependency() {
 		def key = "generateDependency-" + UUID.randomUUID().toString()
 		progressService.create(key)
 		
@@ -929,7 +932,7 @@ class MoveBundleController {
 		log.info "Initiate Generate Dependency"
 		
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
-		Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 2000) )
+		Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
 		trigger.jobDataMap.putAll(params)
 		
 		String connectionTypes = WebUtil.checkboxParamAsString( request.getParameterValues( "connection" ) )
@@ -956,7 +959,7 @@ class MoveBundleController {
 	/**
 	 * Assigns one or more assets to a specified bundle
 	 */
-	def saveAssetsToBundle={
+	def saveAssetsToBundle() {
 		def assetArray = params.assetVal
 		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundle))
 		session.ASSIGN_BUNDLE = params.moveBundle
@@ -972,7 +975,7 @@ class MoveBundleController {
 			}
 			
 		}
-		forward(controller:"assetEntity",action:"getLists", params:[entity:params.assetType,dependencyBundle:session.getAttribute('dependencyBundle')])
+		forward(controller:"assetEntity",action:"retrieveLists", params:[entity:params.assetType,dependencyBundle:session.getAttribute('dependencyBundle')])
    }
 	
 	/**
@@ -981,7 +984,7 @@ class MoveBundleController {
 	 * @return - error Message - if any else success Message
 	 * TODO -- THIS METHOD CAN BE REMOVED AS IT IS NOT USED ANY MORE
 	 */
-	def createTask = {
+	def createTask() {
 		
 		def bundleId = params.bundleId
 		def bundle = MoveBundle.get(bundleId)
@@ -1105,7 +1108,7 @@ class MoveBundleController {
      * @Param : bundleId - Id of bundle for which generated task needs to be deleted
      * @return : void
      */
-    def deleteWorkflowTasks = {
+    def deleteWorkflowTasks() {
         def bundleId = params.bundleId
         def bundle = MoveBundle.get(bundleId)
         def errMsg = ""
@@ -1136,7 +1139,7 @@ class MoveBundleController {
 	 * @param selected
 	 * @return selected
 	 */
-	def setCompactControlPref ={
+	def setCompactControlPref() {
 		def key = params.prefFor
 		def selected=params.selected
 		if(selected){

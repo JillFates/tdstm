@@ -19,7 +19,7 @@ class DashboardController {
 	def userService
 	def userPreferenceService
 	
-	def index = {
+	def index() {
 		
 		def moveEvent
 		def user = securityService.getUserLogin()
@@ -95,7 +95,7 @@ class DashboardController {
 	 * @param  : refresh time 
 	 * @return : refresh time 
 	 *---------------------------------------------------------*/
-	def setTimePreference = {
+	def setTimePreference() {
 		def timer = params.timer
 		if(timer){
 			userPreferenceService.setPreference( "DASHBOARD_REFRESH", "${timer}" )
@@ -108,7 +108,7 @@ class DashboardController {
 	 * @param  : project, bundle, and filters, moveEventNews data
 	 * @return : will save the data and redirect to action : newsEditorList
 	 *--------------------------------------------------------*/
-	def saveNews = {
+	def saveNews() {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def moveEventNewsInstance = new MoveEventNews(params)
@@ -121,7 +121,7 @@ class DashboardController {
 			moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
 		}
 		moveEventNewsInstance.save(flush:true)
-		redirect(action:index)
+		redirect(action:"index")
 	}
 	
 	/**
@@ -129,7 +129,7 @@ class DashboardController {
 	 * @param id moveEventId
 	 * @return HTML
 	 */
-	def taskSummary = {
+	def taskSummary() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -151,7 +151,7 @@ class DashboardController {
 	 * user portal details for default project.
 	 * 
 	 */
-	def userPortal = {
+	def userPortal() {
 		def projectInstance = securityService.getUserCurrentProject()
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
@@ -174,7 +174,7 @@ class DashboardController {
 	 * @render : events template
 	 * 
 	 */
-	def getEvents = {
+	def retrieveEvents() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		if(projectInstance!='All'){
 			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
@@ -189,7 +189,7 @@ class DashboardController {
 	 * @render : eventNews template
 	 * 
 	 */
-	def getEventsNewses = {
+	def retrieveEventsNewses() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		render (template :'eventNews', model:[ newsList:userService.getEventNewses(projectInstance), project:projectInstance])
 	}
@@ -200,7 +200,7 @@ class DashboardController {
 	 * @render : tasks template
 	 * 
 	 */
-	def getTaskSummary  ={
+	def retrieveTaskSummary() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def taskSummary = userService.getTaskSummary(projectInstance)
 		render (template :'tasks', model:[ taskList:taskSummary.taskList, timeInMin:taskSummary.timeInMin, project:projectInstance,
@@ -213,7 +213,7 @@ class DashboardController {
 	 * @render : application template 
 	 * 
 	 */
-	def getApplications  ={
+	def retrieveApplications() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def appSummary = userService.getApplications(projectInstance)
 		render (template :'application', model:[ appList:appSummary.appList, relationList:appSummary.relationList, project:projectInstance ])
@@ -226,7 +226,7 @@ class DashboardController {
 	 * @render : activePeople template 
 	 * 
 	 */
-	def getActivePeople  ={
+	def retrieveActivePeople() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		render (template :'activePeople', model:[ recentLogin:userService.getActivePeople(projectInstance), project:projectInstance ])
 	}
@@ -236,7 +236,7 @@ class DashboardController {
 	 * @param : project id of selected project 
 	 * @render : activePeople template 
 	 */
-	def getRelatedEntities={
+	def retrieveRelatedEntities() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		def entities = [:]
 		def moveBundleList = []

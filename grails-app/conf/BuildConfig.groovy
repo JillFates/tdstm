@@ -1,33 +1,71 @@
 /*
  * Since 1.1, Grails no longer stores plugins inside your PROJECT_HOME/plugins  directory by default.
  */
+grails.servlet.version = "2.5"
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 grails.project.plugins.dir="./plugins"
+grails.project.dependency.resolver = "maven"
+grails.project.source.level = 1.6
+grails.project.target.level = 1.6
+grails.plugin.location.'eav-model' = "./pluginscustom/eav-model-0.1"
 
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
 	inherits("global") {
+		excludes "itext" 
 	}
 	
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 
 	repositories {
+		inherits true
 		mavenRepo("http://tmdev.tdsops.com/grails-maven")
 		mavenRepo("http://repo.grails.org/grails/plugins/")
 		grailsPlugins()
 		grailsHome()
 		grailsCentral()
+		mavenLocal()
+		mavenCentral()
 	}
-	
+
 	dependencies {
 		// specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
+		runtime 'mysql:mysql-connector-java:5.1.27' 		
+		compile 'com.google.guava:guava:16.0.1'
+		compile 'org.apache.commons:commons-lang3:3.1'
+		compile 'net.sourceforge.jexcelapi:jxl:2.6.12'
+		compile 'org.apache.poi:poi:3.7'
+		build 'com.lowagie:itext:2.1.7'
+		compile 'net.sf.jasperreports:jasperreports:4.5.1'
+		compile 'commons-collections:commons-collections:3.2.1'
+		compile 'com.canoo.webtest:webtest:3.0'
 	}
-  
+
 	plugins {
-		runtime ':database-migration:1.0'
-		runtime ':shiro:1.1.4'
+		runtime ':resources:1.2.8'
+		runtime ':hibernate:3.6.10.16'
+		build ':tomcat:7.0.54'
+		runtime ':database-migration:1.4.0'
+		compile (":shiro:1.2.1") {
+			excludes([name: 'quartz', group: 'org.opensymphony.quartz'])
+		}
+		//compile ':eav-model:0.1'
+		compile ':filterpane:2.3.3'
+		compile ':scaffolding:2.0.3'
+		compile ':functional-test:1.2.7'
+		compile ':jasper:1.5.3'
+		compile ':jmesa:2.0.4-SNAPSHOT-0.1'
+		compile ':mail:1.0.4'
+		compile ':quartz:1.0.2'
+		compile ':ref-code:0.3.0'
+		compile ':jdbc-pool:7.0.47'
+		runtime ':jquery:1.11.0.1'
+		//compile ':webtest:3.0.1'
+		compile ':jqgrid:3.8.0.1'
+		compile ':plugin-config:0.2.0'
+		compile ':jquery-ui:1.8.15'
 	}
 }
 

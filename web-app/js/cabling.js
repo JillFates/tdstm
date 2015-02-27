@@ -11,7 +11,7 @@ function openCablingDiv( assetId , type){
 	if(!type){
 		type='S'
 	}
-	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
+	new Ajax.Request(contextPath+'/rackLayouts/retrieveCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
 }
 function showCablingDetails( e, assetId ){
 	$("#cablingDialogId").empty();
@@ -35,7 +35,7 @@ function assetModelConnectors(value){
 	var connectId=$("#cabledTypeId").val();
 	if(value!='null'){
 		jQuery.ajax({
-			url:contextPath+'/rackLayouts/getAssetModelConnectors',
+			url:contextPath+'/rackLayouts/retrieveAssetModelConnectors',
 			data: {'value':value,'type':$("#connectorTypeId").val()},
 			type:'POST',
 			success: function(data) {

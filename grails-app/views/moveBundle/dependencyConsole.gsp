@@ -68,10 +68,10 @@
 							<div style="float: left;margin-left: 10px;">
 								<fieldset>
 									<legend>Connection Status:</legend>
-									<g:each in="${dependencyStatus}" var="dependencyStatus">
-										<input type="checkbox" id="${dependencyStatus}"
-											name="status" value="${dependencyStatus}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatus) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus) ? '' : 'checked')}/>&nbsp;&nbsp;
-											<span id="dependecy_${dependencyStatus}"> ${dependencyStatus} </span>
+									<g:each in="${dependencyStatus}" var="dependencyStatusValue">
+										<input type="checkbox" id="${dependencyStatusValue}"
+											name="status" value="${dependencyStatusValue}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusValue) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusValue) ? '' : 'checked')}/>&nbsp;&nbsp;
+											<span id="dependecy_${dependencyStatusValue}"> ${dependencyStatusValue} </span>
 										<br />
 									</g:each>
 								</fieldset>
@@ -141,8 +141,8 @@
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 			<div style="display: none;">
-			  <g:select id="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
-			  <g:select id="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
+			  <g:select id="moveBundleList_all" name="moveBundleList_all" from="${allMoveBundles}" optionKey="id"  noSelection="${['':'Please Select']}"></g:select><br></br>
+			  <g:select id="moveBundleList_planning" name="moveBundleList_planning" from="${moveBundle}" optionKey="id" noSelection="${['':'Please Select']}"></g:select><br></br>
 			</div>
 			<g:render template="../assetEntity/dependentAdd" />
 			<g:render template="../assetEntity/initAssetEntityData"/>
@@ -176,7 +176,7 @@
 					case "files" :
 					case "all" :
 						var bundle = $("#planningBundleSelectId").val()
-						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle', onComplete:'listUpdate(e)') }
+						${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle', onComplete:'listUpdate(XMLHttpRequest)') }
 						break
 					case "graph" :
 						var labelsList = "Application"
@@ -192,7 +192,7 @@
 						else if ($('#blackBackgroundId').is(':not(:checked)'))
 							blackBackground = false
 						compressList()
-						${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls + \'&blackBackground=\'+ blackBackground+\'&bundle=\'+ bundle', onComplete:'listUpdate(e)') }
+						${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls + \'&blackBackground=\'+ blackBackground+\'&bundle=\'+ bundle', onComplete:'listUpdate(XMLHttpRequest)') }
 						break
 				}
 			}
@@ -236,7 +236,7 @@
 				var sortBy = $("#sortBy").val()
 				var orderBy = $("#orderBy").val() != 'asc' ? 'asc' : 'desc'
 				orderBy = (sortBy == sort) ? orderBy : 'asc'
-				${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle+\'&sort=\'+ sort+\'&orderBy=\'+ orderBy', onComplete:'listUpdate(e)') }
+				${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle+\'&sort=\'+ sort+\'&orderBy=\'+ orderBy', onComplete:'listUpdate(XMLHttpRequest)') }
 			}
 			function compactControlPref($me){
 				var isChecked= $me.is(":checked")
@@ -271,7 +271,7 @@
 				var compactPref= '${compactPref}'
 				compactDivToggle(compactPref);
 				
-				// ${remoteFunction(controller:'assetEntity', action:'getLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(e)') }
+				// ${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(XMLHttpRequest)') }
 				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
 
 				$("#moveBundleSelectId").dialog({ autoOpen: false })

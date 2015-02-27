@@ -8,16 +8,16 @@ class PartyGroupController {
     def userPreferenceService
 	def jdbcTemplate
 	
-    def index = { redirect(action:list,params:params) }
+    def index() { redirect(action:"list",params:params) }
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	// Will Return PartyGroup list where PartyType = COMPANY
-	def list = {
+	def list() {
         return [ listJsonUrl:HtmlUtil.createLink([controller:'person', action:'listJson']) ]
     }
 	
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'companyName'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')
@@ -70,18 +70,18 @@ class PartyGroupController {
 		render jsonData as JSON
 	}
 
-    def show = {
+    def show() {
         def partyGroupInstance = PartyGroup.get( params.id )
 		userPreferenceService.setPreference( "PARTYGROUP", "${partyGroupInstance?.id}" )
 
         if(!partyGroupInstance) {
             flash.message = "PartyGroup not found with id ${params.id}"
-            redirect(action:list)
+            redirect(action:"list")
         }
         else { return [ partyGroupInstance : partyGroupInstance ] }
     }
 
-    def delete = {
+    def delete() {
 		try{
 	        def partyGroupInstance = PartyGroup.get( params.id )
 	        if(partyGroupInstance) {
@@ -97,31 +97,31 @@ class PartyGroupController {
 
 	            partyGroupInstance.delete(flush:true)
 	            flash.message = "PartyGroup ${partyGroupInstance} deleted"
-	            redirect(action:list)
+	            redirect(action:"list")
 	        }
 	        else {
 	            flash.message = "PartyGroup not found with id ${params.id}"
-	            redirect(action:list)
+	            redirect(action:"list")
 	        }
 		} catch(Exception ex){
     		flash.message = ex
-    		redirect(action:list)
+    		redirect(action:"list")
     	}
     }
 
-    def edit = {
+    def edit() {
         def partyGroupInstance = PartyGroup.get( params.id )
 		userPreferenceService.setPreference( "PARTYGROUP", "${partyGroupInstance?.id}" )
         if(!partyGroupInstance) {
             flash.message = "PartyGroup not found with id ${params.id}"
-            redirect(action:list)
+            redirect(action:"list")
         }
         else {
             return [ partyGroupInstance : partyGroupInstance ]
         }
     }
 
-    def update = {
+    def update() {
         def partyGroupInstance = PartyGroup.get( params.id )
         //partyGroupInstance.lastUpdated = new Date()
         if(partyGroupInstance) {
@@ -129,7 +129,7 @@ class PartyGroupController {
 			
             if( !partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
                 flash.message = "PartyGroup ${partyGroupInstance} updated"
-                redirect(action:show,id:partyGroupInstance.id)
+                redirect(action:"show",id:partyGroupInstance.id)
             }   else {
             	flash.message = "Unable to update due to: " + GormUtil.errorsToUL(partyGroupInstance)
                 render(view:'edit',model:[partyGroupInstance:partyGroupInstance])
@@ -137,17 +137,17 @@ class PartyGroupController {
         }
         else {
             flash.message = "PartyGroup not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
+            redirect(action:"edit",id:params.id)
         }
     }
 
-    def create = {
+    def create() {
         def partyGroupInstance = new PartyGroup()
         partyGroupInstance.properties = params
         return ['partyGroupInstance':partyGroupInstance]
     }
 
-    def save = {
+    def save() {
         def partyGroupInstance = new PartyGroup(params)
         //partyGroupInstance.dateCreated = new Date()
         if(!partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
@@ -160,7 +160,7 @@ class PartyGroupController {
 
         	}
             flash.message = "PartyGroup ${partyGroupInstance} created"
-            redirect(action:show,id:partyGroupInstance.id)
+            redirect(action:"show",id:partyGroupInstance.id)
         }
         else {
             render(view:'create',model:[partyGroupInstance:partyGroupInstance])

@@ -1,7 +1,7 @@
 import grails.converters.JSON
 
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.TimeCategory
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.StringUtils
 
@@ -29,10 +29,9 @@ class AdminController {
 	private static Map VALID_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
 	private static String DEFAULT_ROLE = 'USER'
 
-	def index = { }
+	def index() { }
 
-
-	def orphanSummary = {
+	def orphanSummary() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -411,7 +410,7 @@ class AdminController {
 	/*
 	 * 
 	 */
-	def orphanDetails = {
+	def orphanDetails() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1020,7 +1019,7 @@ class AdminController {
 	 * @return : count of record that is deleted.
 	 */
 	
-	def processOldData = {
+	def processOldData() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1054,7 +1053,7 @@ class AdminController {
 	 * @params N/A : 
 	 * @return : String formatted to display processed and pending batches and records
 	 */
-	def getBatchRecords = {
+	def retrieveBatchRecords() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1083,7 +1082,7 @@ class AdminController {
 	 * This method is used to get the Asset type and their respective Asset Count and Model Count
 	 * @param:N/A
 	 */
-	def getAssetTypes ={
+	def retrieveAssetTypes() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1106,7 +1105,7 @@ class AdminController {
 	/**
 	 * This method is used to clean the UnUsed Asset types
 	 */
-	def cleanAssetTypes = {
+	def cleanAssetTypes() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1133,7 +1132,7 @@ class AdminController {
 	/**
 	 * Just a sample of the Twitter Bootstrap implementation
 	 */
-	def bootstrap = {
+	def bootstrap() {
 		def contextPath = request.contextPath
 		return [contextPath:contextPath]
 	}
@@ -1142,7 +1141,7 @@ class AdminController {
 	/**
 	 * A controller process to import user accounts
 	 */
-	def importAccounts = {
+	def importAccounts() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1437,7 +1436,7 @@ class AdminController {
 	/**
 	 * A action to show project Summary report filters.
 	 */
-	def projectReport = {
+	def projectReport() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1449,7 +1448,7 @@ class AdminController {
 	/**
 	 * To Generate project Summary Web report
 	 */
-	def projectSummaryReport = {
+	def projectSummaryReport() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1462,7 +1461,7 @@ class AdminController {
 	}
 	
 	// Gets the number of assets with a desync between the device's assetType and its model's assetType
-	def countAssetsOutOfSync = {
+	def countAssetsOutOfSync() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1480,7 +1479,7 @@ class AdminController {
 	/**
 	 * Used to reconcile assetTypes of devices with the assetType of their models
 	 */
-	def reconcileAssetTypes = {
+	def reconcileAssetTypes() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 
@@ -1500,7 +1499,7 @@ class AdminController {
 	/**
 	 * Used to encrypt a value
 	 */
-	def encryptValue = {
+	def encryptValue() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
@@ -1524,7 +1523,7 @@ class AdminController {
 	/**
 	 * Used to display the application memory consumption
 	 */
-	def systemInfo = {
+	def systemInfo() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 

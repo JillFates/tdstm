@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Walkthru&gt; Select Asset</title>
-<g:javascript library="prototype" />
+<g:javascript src="prototype/prototype.js" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'walkThrough.css')}" />
 <g:javascript src="betterinnerhtml.js" />
@@ -9,7 +9,7 @@
 var timeInterval;
 function searchAssets(){
 	//var aserchKey = document.selectAssetForm.search.value
-	//${remoteFunction(action:'searchAssets', params:'\'room=\' + document.selectAssetForm.room.value +\'&rack=\'+document.selectAssetForm.rack.value +\'&searchKey=\'+ aserchKey +\'&viewType=\'+document.selectAssetForm.viewType.value', onComplete:'updateAssets(e)')}
+	//${remoteFunction(action:'searchAssets', params:'\'room=\' + document.selectAssetForm.room.value +\'&rack=\'+document.selectAssetForm.rack.value +\'&searchKey=\'+ aserchKey +\'&viewType=\'+document.selectAssetForm.viewType.value', onComplete:'updateAssets(XMLHttpRequest)')}
 	document.selectAssetForm.submit();
 }
 <%--function updateAssets( e ) {
@@ -23,7 +23,7 @@ function searchAssets(){
 	BetterInnerHTML(getObject('assetsListBody'), assetsList);
 } --%>
 function showAssetMenu( assetId , assetName, bundleId, bundleName ) {
-	//${remoteFunction(action:'confirmAssetBundle', params:'\'id=\' + id ', onComplete:'confirmAssetBundle(e,id)')}
+	//${remoteFunction(action:'confirmAssetBundle', params:'\'id=\' + id ', onComplete:'confirmAssetBundle(XMLHttpRequest,id)')}
 	var flag = true
 	var auditBundle = '${params.moveBundle}'
 	if(bundleId != auditBundle){

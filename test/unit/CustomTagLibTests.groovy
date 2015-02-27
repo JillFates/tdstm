@@ -5,25 +5,19 @@ import grails.test.*
 import java.text.SimpleDateFormat
 
 import com.tdssrc.grails.GormUtil
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
-class CustomTagLibTests extends GrailsUnitTestCase {
+@TestFor(CustomTagLib)
+class CustomTagLibTests extends Specification {
 
-	// mocked "out" for taglib
-    StringWriter out
+	/** Setup metaclass fixtures for mocking. */
+	protected void setup() {
+	}
 
-    /** Setup metaclass fixtures for mocking. */
-    protected void setUp() {
-    	super.setUp()
-        out = new StringWriter()
-        CustomTagLib.metaClass.out = out
-    }
-
-    /** Remove metaclass fixtures for mocking. */
-    protected void tearDown() {
-     	super.tearDown()
-        def remove = GroovySystem.metaClassRegistry.&removeMetaClass
-        remove CustomTagLib
-    }
+	/** Remove metaclass fixtures for mocking. */
+	def cleanup() {
+	}
 
 	void testConvertDate() {
 		def format = [
@@ -37,72 +31,61 @@ class CustomTagLibTests extends GrailsUnitTestCase {
 
 		def date = new Date("08/21/2012 20:00:00")
 
+		def correct = true
+		def convertedDate
+
 		format.each{ key, value ->
 
 			value.each{ formatValue  ->
 
 				formatValue.each{ timeZone, expectedDate ->
-
-					assertEquals "Test format ${key} for timezone ${timeZone}", expectedDate, new CustomTagLib().convertDate(date:date, format:key, timeZone:timeZone).toString()
-					// reset "out" buffer
-					out.getBuffer().setLength(0)
+					convertedDate = applyTemplate('<tds:convertDate date="${date}" timeZone="${timeZone}" format="${format}" />', [date:date, timeZone:timeZone, format:key])
+					correct = correct && expectedDate.equals(convertedDate)
 				}
 			}
 		}
+
+		expect:
+			correct
 	}
-	
+
 	void testTextAsLink() {
 
-		def justText = 'p:some more data that is not a URL'
-		assertEquals 'Just Text', justText, new CustomTagLib().textAsLink([text:justText])?.toString()
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing http', new CustomTagLib().textAsLink([text:'http://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing HTTP', new CustomTagLib().textAsLink([text:'HTTP://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing https', new CustomTagLib().textAsLink([text:'https://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing HTTPS', new CustomTagLib().textAsLink([text:'HTTPS://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing ftp', new CustomTagLib().textAsLink([text:'ftp://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing FTP', new CustomTagLib().textAsLink([text:'FTP://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing ftps', new CustomTagLib().textAsLink([text:'ftps://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing FTPS', new CustomTagLib().textAsLink([text:'FTPS://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing smb', new CustomTagLib().textAsLink([text:'smb://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing SMB', new CustomTagLib().textAsLink([text:'SMB://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing file', new CustomTagLib().textAsLink([text:'file://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing FILE', new CustomTagLib().textAsLink([text:'FILE://www.google.com', target:'_blank']).toString().startsWith("<a href")
-		out.getBuffer().setLength(0)
-
-		assertTrue 'Testing UNC', new CustomTagLib().textAsLink([text:'\\\\hola\\dir\\file']).toString().startsWith('<a href="file://hola/dir/file')
-		out.getBuffer().setLength(0)
-
-		assertTrue 'A Windows File', new CustomTagLib().textAsLink([text:'p:\\dir\\file name'])?.toString().startsWith('<a href="file://p%3A%2Fdir%2Ffile+name')
-		out.getBuffer().setLength(0)
-
-		assertEquals 'Testing Blank Text', '', new CustomTagLib().textAsLink([text:null]).toString()
-		out.getBuffer().setLength(0)
-
-		assertEquals 'Testing Null Text', '', new CustomTagLib().textAsLink([text:null]).toString()
-		out.getBuffer().setLength(0)
+		expect:
+			// Just Text
+			applyTemplate('<tds:textAsLink text="${text}" />', [text: "p:some more data that is not a URL"]).equals("p:some more data that is not a URL")
+			// Testing http
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "http://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing HTTP
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "HTTP://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing https
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "https://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing HTTPS
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "HTTPS://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing ftp
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "ftp://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing FTP
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "FTP://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing ftps
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "ftps://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing FTPS
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "FTPS://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing smb
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "smb://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing SMB
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "SMB://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing file
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "file://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing FILE
+			applyTemplate('<tds:textAsLink text="${text}" target="${target}" />', [text: "FILE://www.google.com", target:"_blank"]).startsWith("<a href")
+			// Testing UNC
+			applyTemplate('<tds:textAsLink text="${text}" />', [text: '\\\\hola\\dir\\file']).startsWith('<a href="file://hola/dir/file')
+			// A Windows File
+			applyTemplate('<tds:textAsLink text="${text}" />', [text: 'p:\\dir\\file name']).startsWith('<a href="file://p%3A%2Fdir%2Ffile+name')
+			// Testing Blank Text
+			applyTemplate('<tds:textAsLink text="${text}" />', [text: '']).equals('')
+			// Testing Null Text
+			applyTemplate('<tds:textAsLink text="${text}" />', [text: null]).equals('')
 	}
+
 }

@@ -235,7 +235,7 @@
 			  partnerVal = '${prevParam?.projectPartner}'
 			   }
 			var clientObj = document.getElementById('clientId').value
-			${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ clientObj +\'&partner=\'+partnerVal', onComplete:'updateMastersList(e)')}
+			${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ clientObj +\'&partner=\'+partnerVal', onComplete:'updateMastersList(XMLHttpRequest)')}
 		}
 		function setCompletionDate(startDate){
 		var completionDateObj = document.createProjectForm.completionDate;
@@ -290,9 +290,9 @@
 								<label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW">
-								<select id="clientId" name="client.id" onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(e)' )}">
-									<g:each status="i" in="${clients}" var="clients">
-										<option value="${clients.partyIdTo.id}">${clients.partyIdTo}</option>
+								<select id="clientId" name="client.id" onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(XMLHttpRequest)' )}">
+									<g:each in="${clients}" var="client" status="i">
+									    <option value="${client.partyIdTo.id}">${client.partyIdTo}</option>
 									</g:each>
 								</select>
 							</td>
@@ -400,7 +400,7 @@
 							<td class="valueNW">
 								<select id="projectPartnerId"
 								name="projectPartner"
-								onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'client=\'+ document.getElementById(\'clientId\').value +\'&partner=\'+this.value', onComplete:'updateMastersList(e)' )}">
+								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ document.getElementById(\'clientId\').value +\'&partner=\'+this.value', onComplete:'updateMastersList(XMLHttpRequest)' )}">
 									<option value="" selected="selected">None</option>
 									<g:each status="i" in="${partners}" var="partners">
 										<option value="${partners.partyIdTo?.id}">${partners.partyIdTo}</option>

@@ -57,14 +57,14 @@ function filterByCommentType(val) {
 	document.commentsViewForm.commentType.value = val;
 	document.commentsViewForm.sort.value = 'desc';
 	document.commentsViewForm.orderType.value = 'comment';
-	document.commentsViewForm.action = "getComments"
+	document.commentsViewForm.action = "retrieveComments"
 	document.commentsViewForm.submit()
 	var assetId = document.commentForm.assetId.value;
 	var commentType = document.commentsViewForm.commentType.value;
 	var sort = document.commentsViewForm.sort.value;
 	var orderType = document.commentsViewForm.orderType.value;
 	sendCommentRequest()
-	${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; 
+	${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( XMLHttpRequest )')}; 
 	return false;	
 } --%>
 function missingAsset( type, id, message ){
@@ -78,7 +78,7 @@ function missingAsset( type, id, message ){
 		xmlHttpReq.send(null);
 		var serverResponse = xmlHttpReq.responseText;
 		updateMissingAsset(xmlHttpReq,type,id)
-		${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(e,type,id)')} --%>
+		${remoteFunction(action:'missingAsset', params:'\'id=\' + id +\'&type=\'+type', onComplete:'updateMissingAsset(XMLHttpRequest,type,id)')} --%>
 		}
 	}
 }
@@ -205,13 +205,13 @@ function populateComments() {
 		var sort = document.commentsViewForm.sort.value;
 		var orderType = document.commentsViewForm.orderType.value;
 		sendCommentRequest()
-		document.commentsViewForm.action = "getComments"
+		document.commentsViewForm.action = "retrieveComments"
 		document.commentsViewForm.submit()
 		return true
 	} else {
 		return false
 	}
-	//${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; 
+	//${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value +\'&sort=\'+document.commentsViewForm.sort.value +\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( XMLHttpRequest )')}; 
 	
 }
 
@@ -236,17 +236,17 @@ function sortCommentList(orderType) {
 	var rack = document.commentsViewForm.rack.value
 	var location = document.commentsViewForm.location.value
 	var moveBundle = document.commentsViewForm.moveBundle.value
-	window.location.href="getComments?commentType=all&sort="+sort+"&orderType="+orderType+"&id="+assetId+"&room="+room+"&rack="+rack+"&location="+location+"&moveBundle="+moveBundle+"#view_comments"
-	//document.commentsViewForm.action = "getComments"
+	window.location.href="retrieveComments?commentType=all&sort="+sort+"&orderType="+orderType+"&id="+assetId+"&room="+room+"&rack="+rack+"&location="+location+"&moveBundle="+moveBundle+"#view_comments"
+	//document.commentsViewForm.action = "retrieveComments"
 	//document.commentsViewForm.submit()
 	//sendCommentRequest()
-	<%--${remoteFunction(action:'getComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
+	<%--${remoteFunction(action:'retrieveComments', params:'\'id=\' + document.commentForm.assetId.value +\'&commentType=\'+document.commentsViewForm.commentType.value+\'&sort=\'+document.commentsViewForm.sort.value+\'&orderType=\'+document.commentsViewForm.orderType.value', onComplete:'updateViewComment( e )')}; --%>
 }
 <%--
 function getModels(){
 	var manufacturer = document.auditForm.manufacturerId.value
 	var device = document.auditForm.kvmDeviceId.value
-	//${remoteFunction(action:'getModels', params:'\'manufacturer=\' + manufacturer +\'&device=\'+device ', onComplete:'updateModels( e )')};
+	//${remoteFunction(action:'retrieveModels', params:'\'manufacturer=\' + manufacturer +\'&device=\'+device ', onComplete:'updateModels( XMLHttpRequest )')};
 }
 function updateModels( e ){
 	var models = eval('(' + e.responseText + ')');
@@ -271,7 +271,7 @@ function sendCommentRequest(){
 	var sort = document.commentsViewForm.sort.value;
 	var orderType = document.commentsViewForm.orderType.value;
 	var xmlHttpReq = createXMLHttpRequest()
-	xmlHttpReq.open("post", "getComments?id="+assetId+"&commentType="+commentType+"&sort="+sort+"&orderType="+orderType, false);
+	xmlHttpReq.open("post", "retrieveComments?id="+assetId+"&commentType="+commentType+"&sort="+sort+"&orderType="+orderType, false);
 	xmlHttpReq.send(null);
 	var serverResponse = xmlHttpReq.responseText;
 	updateViewComment( xmlHttpReq )
@@ -284,7 +284,7 @@ function checkComments(type) {
 	xmlHttpReq.send(null);
 	var serverResponse = xmlHttpReq.responseText;
 	callUpdateComment( xmlHttpReq, type)
-	<%--${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.commentType.value', onComplete:'callUpdateComment( e, \'comment\' )')} --%>
+	<%--${remoteFunction(action:'validateComments', params:'\'id=\' + document.commentForm.assetId.value +\'&comment=\'+escape(document.commentForm.comments.value) +\'&commentType=\'+document.commentForm.commentType.value', onComplete:'callUpdateComment( XMLHttpRequest, \'comment\' )')} --%>
 }
 </script>
 </head>
@@ -327,7 +327,7 @@ function checkComments(type) {
 			<g:else>
 				<a class="button big" href="#asset_front1">Front Audit</a> <BR /><BR />
 				<a class="button big" href="#asset_rear1">Rear Audit</a> <BR /><BR />
-				<a class="button big" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" 
+				<a class="button big" href="retrieveComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments" 
 					onclick="return validChanges();">Issues/Comments</a> <BR /><BR />
 				<input name="type" value="create" type="hidden"/>
 				<a href="#" class="button big" onclick="missingAsset('create', '${assetEntity?.id}','Mark asset as missing. Are you sure?')">Mark Asset Missing </a>
@@ -753,7 +753,7 @@ function checkComments(type) {
 			
 			<br />
 			
-			<a class="button" href="getComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">View Issues &amp; Comments</a>
+			<a class="button" href="retrieveComments?commentType=all&sort=desc&orderType=commentType&id=${assetEntity?.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">View Issues &amp; Comments</a>
 		</g:form>
 		</div>
 		</div>
@@ -820,10 +820,10 @@ function checkComments(type) {
 		<div class="gap"></div>
 		
 			<ul id="myMenu" class="SimpleContextMenu">
-				<li><a href="getComments?commentType=all&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">All</a></li>
-				<li><a href="getComments?commentType=comment&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Comment</a></li>
-				<li><a href="getComments?commentType=instruction&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Instruction</a></li>
-				<li><a href="getComments?commentType=issue&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issue</a></li>
+				<li><a href="retrieveComments?commentType=all&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">All</a></li>
+				<li><a href="retrieveComments?commentType=comment&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Comment</a></li>
+				<li><a href="retrieveComments?commentType=instruction&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Instruction</a></li>
+				<li><a href="retrieveComments?commentType=issue&sort=desc&orderType=comment&id=${assetEntity.id}&room=${room}&rack=${rack}&location=${location}&moveBundle=${moveBundle}#view_comments">Issue</a></li>
 		   </ul>
 		   
 	<script type="text/javascript">
@@ -881,7 +881,7 @@ function checkComments(type) {
 				}	
 		    }
 		}
-		xmlhttp.open("POST","../model/getModelsListAsJSON?manufacturer="+manufacturerId,true);
+		xmlhttp.open("POST","../model/retrieveModelsListAsJSON?manufacturer="+manufacturerId,true);
 		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		xmlhttp.send();
 	} 

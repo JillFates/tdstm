@@ -30,19 +30,19 @@ class ProjectController {
 	def securityService
 	def controllerService
 
-	def index = { redirect(action:list,params:params) }
+	def index() { redirect(action:"list",params:params) }
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	def list = {
+	def list() {
 		return [active:params.active?:'active']
 	}
 	/**
 	 * Used to generate the List for projects using jqgrid.
 	 * @return : list of projects as JSON
 	 */
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'projectCode'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
@@ -84,13 +84,13 @@ class ProjectController {
 	/*
 	 *  return the details of Project
 	 */
-	def show = {
+	def show() {
 		def CURR_PROJ = session.CURR_PROJ?.CURR_PROJ
 		if(CURR_PROJ){
 			def projectInstance = Project.get( CURR_PROJ )
 			if(!projectInstance) {
 				flash.message = "Project not found with id ${params.id}"
-				redirect( action:list )
+				redirect( action:"list" )
 			} else { 
 				// load transitions details into application memory.
 				//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
@@ -131,11 +131,11 @@ class ProjectController {
 			}
 		} else {
 		flash.message = "Project not found with id ${params.id}"
-		redirect(action:list)
+		redirect(action:"list")
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def project = controllerService.getProjectForPage(this, "ProjectDelete")
 		if (project) {
 			def userLogin = securityService.getUserLogin()
@@ -147,18 +147,21 @@ class ProjectController {
 				redirect(controller:"projectUtil", params:['message':flash.message])
 			} catch (Exception ex) {
 				flash.message = ex.getMessage()
-				redirect(action:list)
+				redirect(action:"list")
 			}
+		} else {
+			flash.message = "Project not found with id ${params.id}"
+			redirect(action:"list")
 		}
 	}
 
-	def edit = {
+	def edit() {
 		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 		def projectDetails
 		def moveBundles
 		if (!projectInstance) {
 			flash.message = "Project not found with id ${params.id}"
-			redirect(action:list)
+			redirect(action:"list")
 		}
 		else {
 			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
@@ -173,7 +176,7 @@ class ProjectController {
 	/*
 	 * Update the Project details
 	 */
-	def update = {
+	def update() {
 
 		// TODO : Security : Need fix update() to check user's permissions
 
@@ -370,7 +373,7 @@ class ProjectController {
 				}
 				*/
 				flash.message = "Project ${projectInstance} updated"
-				redirect(action:show)
+				redirect(action:"show")
 				
 			}
 			else {
@@ -385,14 +388,14 @@ class ProjectController {
 			}
 		} else {
 			flash.message = "Project not found with id ${params.id}"
-			redirect( action:list, id:params.id )
+			redirect( action:"list", id:params.id )
 		}
 	}
 
 	/*
 	 * Populate and present the create view for a new project
 	 */
-	def create = {
+	def create() {
 		def projectInstance = new Project()
 		projectInstance.properties = params
 		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
@@ -404,7 +407,7 @@ class ProjectController {
 	/*
 	 * create the project and PartyRelationships for the fields prompted
 	 */
-	def save = {
+	def save() {
 		def workflowCodes = []
 		//projectInstance.dateCreated = new Date()
 		def startDate = params.startDate
@@ -520,7 +523,7 @@ class ProjectController {
 			projectInstance.getProjectDefaultBundle()
 			
 			flash.message = "Project ${projectInstance} created"
-			redirect( action:show,  imageId:image.id )
+			redirect( action:"show",  imageId:image.id )
 		} else {
 			def projectDetails = projectService.getProjectPatnerAndManagerDetails()
 			render( view:'create', model:[ projectInstance:projectInstance, clients:projectDetails.clients, partners:projectDetails.partners,
@@ -531,7 +534,7 @@ class ProjectController {
 	/*
 	 *  Action to render partner staff as JSON  
 	 */
-	def getPartnerStaffList = {
+	def retrievePartnerStaffList() {
 			
 		def client = params.client
 		def partner = params.partner
@@ -577,13 +580,13 @@ class ProjectController {
 		render json as JSON
 	}
 	
-	def cancel = {
+	def cancel() {
 		redirect(controller:'projectUtil')
 	}
 	/*
 	 * Action to setPreferences
 	 */
-	def addUserPreference = {
+	def addUserPreference() {
 		def selectProject = params.id
 		if(selectProject){
 			def projectInstance = Project.read(params.id)
@@ -602,7 +605,7 @@ class ProjectController {
 			
 	}
 	
-	def showImage = {
+	def showImage() {
 			if( params.id ) {
 				def projectLogo = ProjectLogo.findById( params.id )
 		 		def image = projectLogo?.partnerImage?.binaryStream
@@ -613,7 +616,7 @@ class ProjectController {
 			}
 	 }
 	
-	def deleteImage = {			 
+	def deleteImage() {			 
 		 	 def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
 			 def imageInstance = ProjectLogo.findByProject(projectInstance)
 			 if(imageInstance){
@@ -626,10 +629,11 @@ class ProjectController {
 			 }
 			 
 	}
+
 	/*
 	 * function to set the user preference time zone
 	 */
-	def setUserTimeZone = {
+	def setUserTimeZone() {
 		def timeZone = params.tz
 		userPreferenceService.setPreference( "CURR_TZ", timeZone )
 		render timeZone 
@@ -637,7 +641,7 @@ class ProjectController {
 	/*
 	* function to set the user preference powerType
 	*/
-	def setPower = {
+	def setPower() {
 		def power = params.p
 		userPreferenceService.setPreference( "CURR_POWER_TYPE", power )
 		render power
@@ -646,7 +650,7 @@ class ProjectController {
 	/**
 	 * Action to render the Field Settings (aka Importance) Show/Edit maintenance form for field importance and field tooltips
 	 */
-	def fieldImportance = {
+	def fieldImportance() {
 		def project = securityService.getUserCurrentProject()
 		return [project:project]
 	}
@@ -656,7 +660,7 @@ class ProjectController {
 	 *@param : entityType type of entity.
 	 *@return : json data
 	 */
-	def getAssetFields ={
+	def retrieveAssetFields ={
 		
 		def assetTypes=EntityType.list
 		def fieldMap= [:]
@@ -689,7 +693,7 @@ class ProjectController {
 			custom8:{phase:{D:N,V:N,R:N,S:N,B:N}}}
 		}
 	 */
-	def getImportance ={
+	def retrieveImportance() {
 		def assetTypes=EntityType.list
 		def impMap =[:]
 		assetTypes.each{type->
@@ -702,7 +706,7 @@ class ProjectController {
 	 * @param entity type
 	 * @return json data
 	 */
-	def cancelImportance = {
+	def cancelImportance() {
 		def entityType = request.JSON.entityType
 		def project = securityService.getUserCurrentProject()
 		def parseData = projectService.getConfigByEntity(entityType)
@@ -714,7 +718,7 @@ class ProjectController {
 	 *@param : entityType type of entity for which user is requested for importance .
 	 *@return success string 
 	 */
-	def updateFieldImportance ={
+	def updateFieldImportance() {
 		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
 		if (! project) 
 			return
@@ -743,7 +747,7 @@ class ProjectController {
 	 *@param : entityType type of entity for which user is requested for importance .
 	 *@return 
 	 */
-	def retriveDefaultImportance={
+	def retriveDefaultImportance() {
 		def entityType = request.JSON.entityType
 		def parseData = projectService.generateDefaultConfig(entityType)
 		render parseData as JSON
@@ -753,7 +757,7 @@ class ProjectController {
 	 *@param : custom count.
 	 *@render string 'success'.
 	 */
-	def updateProjectCustomShown = {
+	def updateProjectCustomShown() {
 		def project = securityService.getUserCurrentProject()
 		project.customFieldsShown = NumberUtils.toInt(request.JSON.customCount,48)
 		if(!project.validate() || !project.save(flush:true)){
@@ -763,11 +767,11 @@ class ProjectController {
 		render "success"
 	}
 
-	def showImportanceFields = {
+	def showImportanceFields() {
 		render( view: "showImportance", model: [])
 	}
 
-	def editImportanceFields = {
+	def editImportanceFields() {
 		render( view: "editImportance", model: [])
 	}
 

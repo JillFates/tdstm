@@ -65,7 +65,7 @@ $(document).ready(function() {
  function getCommentDetails(id,type){
 	 
 	 jQuery.ajax({
-			url: contextPath+"/newsEditor/getCommetOrNewsData",
+			url: contextPath+"/newsEditor/retrieveCommetOrNewsData",
 			data: {'id':id , 'commentType':type},
 			type:'POST',
 			success: function(data) {

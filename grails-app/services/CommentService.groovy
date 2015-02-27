@@ -16,6 +16,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 
 import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import org.quartz.JobDetail
 
@@ -416,7 +417,7 @@ class CommentService {
      *  @return : create Trigger
      */
     def dispatchTaskEmail(Map params) {
-		Trigger trigger = new SimpleTrigger("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
+		Trigger trigger = new SimpleTriggerImpl("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
         trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew,'tries':0L])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')

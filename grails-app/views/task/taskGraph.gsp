@@ -244,7 +244,7 @@
 			
 			if (neighborhoodTaskId == -1)
 				jQuery.ajax({
-					dataType: 'text',
+					dataType: 'json',
 					url: tdsCommon.createAppURL('/task/moveEventTaskGraphSvg'),
 					data: params,
 					type:'GET',
@@ -252,7 +252,7 @@
 				});
 			else
 				jQuery.ajax({
-					dataType: 'text',
+					dataType: 'json',
 					url: tdsCommon.createAppURL('/task/neighborhoodGraphSvg'),
 					data: params,
 					type:'GET',

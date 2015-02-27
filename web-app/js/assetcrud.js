@@ -94,7 +94,7 @@ Array.prototype.contains = function (element) {
 	      if(browser == 'Microsoft Internet Explorer') {
 	      createDiv.innerHTML += "";
 	      }
-	      new Ajax.Request(contextPath+'/assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
+	      new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
  }
  function filedRequiredMess( table ){
 	 
@@ -281,7 +281,7 @@ Array.prototype.contains = function (element) {
 			editDiv.innerHTML += "";
 		  } 
 	      
-	     new Ajax.Request(contextPath+'/assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
+	     new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
 	  $("#createDialog").dialog("close");
 	  if(action == 'edit'){
 	      $("#editDialog").dialog('option', 'width', 600);

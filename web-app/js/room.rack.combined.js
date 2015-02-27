@@ -34,7 +34,7 @@ function validateAssetEntity(formname) {
 function listDialog(assign,sort,order,source,rack,roomName,location,position){
 	closeEditAuditView();
 	jQuery.ajax({
-		url: contextPath+"/room/getAssetsListToAddRack",
+		url: contextPath+"/room/retrieveAssetsListToAddRack",
 		data: "source="+source+"&rack="+rack+"&roomName="+roomName+"&location="+location+"&position="+position+"&sort="+sort+"&order="+order+"&assign="+assign,
 		type:'POST',
 		success: function(data) {
@@ -98,7 +98,7 @@ function updateAssetBladeInfo(source,blade,position,manufacturer,moveBundle){
 function listBladeDialog(source, blade, position, assign, roomName, location){
 	closeEditAuditView();
 	jQuery.ajax({
-		url: contextPath+"/room/getBladeAssetsListToAddRack",
+		url: contextPath+"/room/retrieveBladeAssetsListToAddRack",
 		data: "source="+source+"&blade="+blade+"&position="+position+"&assign="+assign+"&roomName="+roomName+"&location="+location,
 		type:'POST',
 		success: function(data) {
@@ -264,7 +264,7 @@ function validateRackData(value, field){
 		click = 1
 		if(value){
 			jQuery.ajax({
-				url: contextPath+"/rackLayouts/getAutoCompleteDetails",
+				url: contextPath+"/rackLayouts/retrieveAutoCompleteDetails",
 				data: "field=isValidRack&value="+value,
 				type:'POST',
 				success: function(data) {
@@ -292,7 +292,7 @@ function validateRackData(value, field){
 function getUpositionData(){
 	var rack = $("#rackId").val()
 	if(rack){
-		new Ajax.Request(contextPath+'/rackLayouts/getAutoCompleteDetails?field=uposition&rack='+rack,{asynchronous:true,evalScripts:true,onComplete:function(e){updateUpositionData(e);}})
+		new Ajax.Request(contextPath+'/rackLayouts/retrieveAutoCompleteDetails?field=uposition&rack='+rack,{asynchronous:true,evalScripts:true,onComplete:function(e){updateUpositionData(e);}})
 	} else {
 		alert("Please enter rack data")
 	}
@@ -315,7 +315,7 @@ function validateUpositionData(value, field){
 		if(rack){
 			if(value){
 			jQuery.ajax({
-				url: contextPath+"/rackLayouts/getAutoCompleteDetails",
+				url: contextPath+"/rackLayouts/retrieveAutoCompleteDetails",
 				data: "field=isValidUposition&rack="+rack+"&value="+value,
 				type:'POST',
 				success: function(data) {
@@ -346,7 +346,7 @@ function getConnectorData(){
 		var rack = $("#rackId").val()
 		var uposition = $("#upositionId").val()
 		if(rack && uposition){
-			new Ajax.Request(contextPath+'/rackLayouts/getAutoCompleteDetails?field=connector&rack='+rack+'&uposition='+uposition,{asynchronous:true,evalScripts:true,onComplete:function(e){updateConnectorData(e);}})
+			new Ajax.Request(contextPath+'/rackLayouts/retrieveAutoCompleteDetails?field=connector&rack='+rack+'&uposition='+uposition,{asynchronous:true,evalScripts:true,onComplete:function(e){updateConnectorData(e);}})
 		} else {
 			alert("Please enter rack data")
 		}
@@ -370,7 +370,7 @@ function validateConnectorData(value, field){
 		if(rack && uposition){
 			if(value){
 				jQuery.ajax({
-					url: contextPath+"/rackLayouts/getAutoCompleteDetails",
+					url: contextPath+"/rackLayouts/retrieveAutoCompleteDetails",
 					data: "field=isValidConnector&rack="+rack+"&uposition="+uposition+"&value="+value,
 					type:'POST',
 					success: function(data) {
@@ -441,7 +441,7 @@ function getAssignedDetails(forWhom, rackId){
 	   	});
 	} 
 	jQuery.ajax({
-		url: contextPath+"/rackLayouts/getAssignedCables",
+		url: contextPath+"/rackLayouts/retrieveAssignedCables",
 		data: {'moveBundle':selectedBundles, 'sourcerack':selectedSourceRoom, 'targetrack':selectedTargetRoom, 'rackId':rackId},
 		type:'POST',
 		success: function(data) {

@@ -38,11 +38,11 @@ class DatabaseController {
 	def userPreferenceService
 	def projectService
 
-	def index = {
+	def index() {
 		redirect action:'list', params:params
 	}
 	
-	def list = {
+	def list() {
 		def filters = session.DB?.JQ_FILTERS
 		session.DB?.JQ_FILTERS = []
 
@@ -66,7 +66,7 @@ class DatabaseController {
 	/**
 	 * This method is used by JQgrid to load assetList
 	 */
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')?:25
@@ -220,7 +220,7 @@ class DatabaseController {
 		render jsonData as JSON
 	}
 	
-	def show = {
+	def show() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -238,7 +238,7 @@ class DatabaseController {
 		}
 	}
 
-	def create = {
+	def create() {
 		def databaseInstance = new Database(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
@@ -256,7 +256,7 @@ class DatabaseController {
 			config:configMap.config, customs:configMap.customs, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 	
-	def edit = {
+	def edit() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -274,17 +274,17 @@ class DatabaseController {
 		return model		
 	}
 	
-	def save = {
+	def save() {
 		controllerService.saveUpdateAssetHandler(this, session, databaseService, AssetClass.DATABASE, params)
 		session.DB?.JQ_FILTERS = params
      }
 
-	def update = {
+	def update() {
 		controllerService.saveUpdateAssetHandler(this, session, databaseService, AssetClass.DATABASE, params)
 		session.DB?.JQ_FILTERS = params		
 	}
 
-	def delete = {
+	def delete() {
 		def database = Database.get( params.id )
 		if( database ) {
 			def assetName = database.assetName
@@ -293,21 +293,21 @@ class DatabaseController {
 			
 			flash.message = "Database ${assetName} deleted"
 			if (params.dstPath == 'dependencyConsole') {
-				forward( controller:'assetEntity',action:'getLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])
+				forward( controller:'assetEntity',action:'retrieveLists', params:[entity: 'database',dependencyBundle:session.getAttribute("dependencyBundle")])
 			} else {
-				redirect( action:list )
+				redirect( action:"list" )
 			}
 		}
 		else {
 			flash.message = "Database not found with id ${params.id}"
-			redirect( action:list )
+			redirect( action:"list" )
 		}
 		
 	}
 	/**
 	 * Delete multiple database.
 	 */
-	def deleteBulkAsset={
+	def deleteBulkAsset() {
 		def assetList = params.id.split(",")
 		def assetNames = []
 		assetList.each{ assetId->

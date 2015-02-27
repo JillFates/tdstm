@@ -13,10 +13,10 @@
 
 			<%-- Asset Class Options SELECT --%>
 			<td>
+				<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
 				<g:select name="entity_FIELD_SUFFIX" 
 					onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
 					from="${AssetClass.getClassOptions().entrySet()}" optionKey="key" optionValue="value"
-					<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
 					>
 				</g:select>
 			</td>

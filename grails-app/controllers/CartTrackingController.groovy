@@ -13,15 +13,15 @@ class CartTrackingController {
 	/*---------------------------------
 	 * default Index method
 	 *---------------------------------*/
-    def index = { 
-    	redirect(action:cartTracking,params:params)
+    def index() { 
+    	redirect(action:"cartTracking",params:params)
     }
 	/*---------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @param  : bundle and projectId
 	 * @return : Asset Details  On Cart and Truck 
 	 *---------------------------------------------------------*/
-	def cartTracking = {
+	def cartTracking() {
 		def cartAction = params.cartAction
     	def moveBundleInstance
     	def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
@@ -112,7 +112,7 @@ class CartTrackingController {
 	 * @param  : refresh time 
 	 * @return : refresh time 
 	 *---------------------------------------------------------*/
-	def setTimePreference = {
+	def setTimePreference() {
         def timer = params.timer
         def refreshTime =[]
         if(timer){
@@ -128,7 +128,7 @@ class CartTrackingController {
 	 * @param  : cart, truck, bundle and projectId
 	 * @return : updated truck
 	 *---------------------------------------------------------*/
-	def changeTruck = {
+	def changeTruck() {
 		def updateQuery = "update asset_entity set truck = '$params.truck' where project_id = ${session.CURR_PROJ.CURR_PROJ} "+
 						"and move_bundle_id = $params.bundleId and cart = '$params.cart' "
 		jdbcTemplate.update(updateQuery)
@@ -139,7 +139,7 @@ class CartTrackingController {
 	 * @param  : cart, truck, bundle and projectId
 	 * @return : return all the assets which are on Cart
 	 *---------------------------------------------------------*/
-	def getAssetsOnCart = {
+	def retrieveAssetsOnCart() {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = Project.findById( projectId )
 		def bundleId = params.moveBundle
@@ -197,7 +197,7 @@ class CartTrackingController {
 	 * @param  : asset entity
 	 * @return : return asset Details
 	 *---------------------------------------------------------*/
-	def getAssetDetails ={
+	def retrieveAssetDetails() {
 		def assetDetails = []
 		def assetId = params.assetId
 		def assetEntity = AssetEntity.findById( assetId )
@@ -215,7 +215,7 @@ class CartTrackingController {
 	 * @param  : cart, truck, bundle and projectId
 	 * @return : update the asset details
 	 *---------------------------------------------------------*/
-	def reassignAssetOnCart = {
+	def reassignAssetOnCart() {
 		def assetEntity = AssetEntity.get( params.assetId )
 		assetEntity.properties = params
 		if ( ! assetEntity.validate() || ! assetEntity.save() ) {
@@ -231,7 +231,7 @@ class CartTrackingController {
 	 * @param  : cart, truck, bundle and projectId
 	 * @return : update the all the assets state to OnTruck
 	 *---------------------------------------------------------*/
-	def moveToOnTruck = {
+	def moveToOnTruck() {
 		def startTime = System.currentTimeMillis()
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = Project.findById( projectId )

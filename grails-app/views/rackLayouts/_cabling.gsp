@@ -66,7 +66,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     $scope.getAsset = function(id, asset, type, room){
 	    if(id != assetTemp || room!=roomTemp){
 	    	$http({
-				url : "../rackLayouts/getAssetModelConnectors",
+				url : "../rackLayouts/retrieveAssetModelConnectors",
 				method: "POST",
 				async: false,
 				data:{'asset': $("#assetEntityId").val(), 'type':type,'roomType':room}
@@ -198,7 +198,7 @@ app.controller('Ctrl', function($scope, $filter, $http) {
     	if(!type){
     		type='S'
     	}
-    	new Ajax.Request(contextPath+'/rackLayouts/getCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
+    	new Ajax.Request(contextPath+'/rackLayouts/retrieveCablingDetails?assetId='+assetId+'&roomType='+type,{asynchronous:true,evalScripts:true,onComplete:function(e){showCablingDetails(e,assetId);}})
     }
 });
 
@@ -237,7 +237,7 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
 	<g:if test="${currentBundle}">
 		<g:each in="${models}" var="model">
 			<g:if test="${model?.rearImage && model?.useImage == 1}">
-				<img id="rearImage_${model.id}" src="${createLink(controller:'model', action:'getRearImage', id:model.id)}" style="display: none;"/>
+				<img id="rearImage_${model.id}" src="${createLink(controller:'model', action:'retrieveRearImage', id:model.id)}" style="display: none;"/>
 			</g:if>
 		</g:each>
 	</g:if>

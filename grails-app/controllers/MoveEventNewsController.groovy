@@ -8,7 +8,7 @@ class MoveEventNewsController {
 	 * @param : moveEventId?type=[N|I}&state=[L|A]&maxLen= n &sort=[A|D]
 	 * @return : union (AssetComments , MoveEventNews) 
 	 */
-	def list = {
+	def list() {
 			def projectId = getSession().getAttribute("CURR_PROJ")?.CURR_PROJ
 			def moveEventId = params.id
 			def moveEvent

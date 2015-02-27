@@ -49,7 +49,7 @@ class DataTransferBatchController {
 	/**
 	 * The default index page loads the list page
 	 */
-	def index = { redirect(action:list, params:params) }
+	def index() { redirect(action:"list", params:params) }
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [save:'POST', update:'POST']
@@ -60,7 +60,7 @@ class DataTransferBatchController {
 	 * @param projectId
 	 * @return dataTransferBatchList
 	 */
-	def list = {
+	def list() {
 		if(params.message){
 			flash.message = params.message
 		}
@@ -101,7 +101,7 @@ class DataTransferBatchController {
 	 * @param params.id - the id of the DataTransferBatch
 	 * @return JSON response containing the information and other attributes regarding the process
 	 */
-	def processImportBatch = {
+	def processImportBatch() {
 		String error
 		Map results
 		Project project
@@ -156,7 +156,7 @@ class DataTransferBatchController {
 	 * 	@param  : processed and total assts from session 
 	 *	@return : processed data for Batch progress bar
 	 */
-	def getProgress = {
+	def retrieveProgress() {
 		def progressData = []
 		def total = session.getAttribute("TOTAL_BATCH_ASSETS") 
 		def processed = session.getAttribute("TOTAL_PROCESSES_ASSETS")
@@ -168,7 +168,7 @@ class DataTransferBatchController {
 	 * 	@author : Mallikarjun
 	 *	@return : data transfer batch error list
 	 * -------------------------------------- */
-	def errorsListView = {
+	def errorsListView() {
 		def dataTransferBatchInstance = DataTransferBatch.get( params.id )
 		def query = new StringBuffer(" select d.asset_entity_id,d.import_value,d.row_id,a.attribute_code,d.error_text FROM data_transfer_value d ")
 		query.append(" left join eav_attribute a on (d.eav_attribute_id = a.attribute_id) where d.data_transfer_batch_id = ${dataTransferBatchInstance.id} ")
@@ -200,7 +200,7 @@ class DataTransferBatchController {
 	 * Update Asset Racks once import batch process done.
 	 */
 /*	 
-	def updateAssetRacks = {
+	def updateAssetRacks() {
 		def assetsList = session.getAttribute("IMPORT_ASSETS")
 		assetsList.each { assetId ->
 			AssetEntity.get(assetId)?.updateRacks()
@@ -212,7 +212,7 @@ class DataTransferBatchController {
 	/**
 	 *     Delete the Data Transfer Batch Instance
 	 */
-	def delete = {
+	def delete() {
 		try{
 			def dataTransferBatchInstance = DataTransferBatch.get(params.batchId)
 			if(dataTransferBatchInstance) {
@@ -220,10 +220,10 @@ class DataTransferBatchController {
 
 				dataTransferBatchInstance.delete(flush:true,failOnError:true)
 				flash.message = "DataTransferBatch ${params.batchId} deleted"
-				redirect(action:list)
+				redirect(action:"list")
 			}else {
 				flash.message = "DataTransferBatch not found with id ${params.batchId}"
-				redirect(action:list)
+				redirect(action:"list")
 		   }
 		} catch(Exception e) {
 			log.error "Can't delete batch instance: " + e.getMessage()

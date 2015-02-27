@@ -1,13 +1,16 @@
 import groovy.mock.interceptor.*
-import grails.test.GrailsUnitTestCase
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.log4j.* 
 
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+
 /**
  * Unit test cases for the CookbookService class
  */
-class CookbookServiceTests extends GrailsUnitTestCase {
+@TestFor(CookbookService)
+class CookbookServiceTests extends Specification {
 	
 	def cookbookService = new CookbookService()
 	def log
@@ -324,9 +327,9 @@ tasks: [
 		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config")) 
 	} 
 
-	void setUp() {
+	void setup() {
 		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		super.setUp() 
+		//super.setUp() 
 
 		// build a logger...
 		BasicConfigurator.configure() 
@@ -339,8 +342,10 @@ tasks: [
 		//loadConfig()
 		// Initialize various custom methods used by our application
 		com.tdsops.metaclass.CustomMethods.initialize
-
 	}
+
+    def cleanup() {
+    }
 
 	//
 	// Series of tests for the validateSyntax method as there are numerous issues that could arise
@@ -348,12 +353,12 @@ tasks: [
 	void testValidateSyntaxGroupIsProperlyFormatted() {
 		def recipe = "groups: [$goodGroup], tasks:[$predTask, $goodGeneralTask]"
 		def errors = cookbookService.validateSyntax( recipe )
-		assertNull errors
+		expect:
+			errors == null
 	}
 	
 	void testInvalidFilters() {
 		def errors = cookbookService.validateSyntax(invalidFilters)
-		assertNotNull errors
 		
 		def expectedErrors = [
 			"Group BAD-GROUP in element 2 contains unknown property 'custom8'",
@@ -366,14 +371,14 @@ tasks: [
 			it.detail
 		}.sort{ a, b -> a.compareTo(b) }
 		
-		assertEquals (returnedErrors, expectedErrors)
+		expect:
+			errors != null
+			errors.size() == 4
+			returnedErrors == expectedErrors
 	}
 	
 	void testValidateProblem2() {
 		def errors = cookbookService.validateSyntax( problemRecipe2 )
-		assertNotNull errors
-		assertEquals 'Should have six error', 6, errors.size()
-		
 		def returnedErrors = errors.collect { 
 			it.detail 
 		}.sort{ a, b -> a.compareTo(b) }
@@ -385,19 +390,24 @@ tasks: [
 				"Task id 2310 'filter/exclude' references an invalid group BOGUS",
 				"Task id 2330 'predecessor/group' references an invalid group BOGUS"
 			].sort{ a, b -> a.compareTo(b) }
-		
-		assertEquals (returnedErrors, expectedErrors)
+
+		expect:
+			errors != null
+			errors.size() == 6
+			returnedErrors == expectedErrors
 	}
 	
 	void testValidateProblem1() {
 		def errors = cookbookService.validateSyntax( problemRecipe1 )
-		assertNull errors
+		expect:
+			errors == null
 	}
 	
 	void testSimple() {
 		def recipe = "tasks: {}"
 		def errors = cookbookService.validateSyntax( recipe )
-		assertNotNull errors
+		expect:
+			errors != null
 	}
 
 	// Testing the Groups Section
@@ -406,9 +416,10 @@ tasks: [
 			groups: [ [name:'', filter: [class:'application'] ] ], 
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have the is blank error message for the name element', errors[0].detail.contains('is blank')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('is blank')
 	}
 
 	void testValidateSyntaxGroupNameHasSpace() {
@@ -416,9 +427,10 @@ tasks: [
 			groups: [ [name:'a b c', filter: [class:'application'] ] ], 
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have the spaces not allowed error for the name element', errors[0].detail.contains('contains unsupported space character(s)')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('contains unsupported space character(s)')
 	}
 
 	void testValidateSyntaxGroupHasDuplicateNameDefined() {
@@ -426,9 +438,10 @@ tasks: [
 			groups: [ $goodGroup, $goodGroup ], 
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have the duplicate name error for the name element', errors[0].detail.contains('duplicated in group')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('duplicated in group')
 	}
 
 	void testValidateSyntaxGroupHasInvalidClassName() {
@@ -437,9 +450,10 @@ tasks: [
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have the invalid class name', errors[0].detail.contains('Group APPS in element 1 property \'class\' contains invalid value \'invalidClassName\'')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains("'class' contains invalid value")
 	}
 
 	void testValidateSyntaxGroupIsMissingFilterDefinition() {
@@ -448,9 +462,10 @@ tasks: [
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have missing filter error message', errors[0].detail.contains('is missing require section \'filter\'')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('is missing require section \'filter\'')
 	}
 
 	void testValidateSyntaxGroupFilterIsNotMap() {
@@ -459,9 +474,10 @@ tasks: [
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have filter not a map error message', errors[0].detail.contains('\'filter\' element not properly defined as a map')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('\'filter\' element not properly defined as a map')
 	}
 
 	void testValidateSyntaxGroupFilterExcludeBadReference() {
@@ -477,9 +493,10 @@ tasks: [
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have undefined group reference error message', errors[0].detail.contains('references undefined group')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('references undefined group')
 	}
 
 	void testValidateSyntaxGroupFilterIncludeBadReferenceInAnArray() {
@@ -495,18 +512,20 @@ tasks: [
 			tasks:[$predTask, $goodGeneralTask]"""
 		def errors = cookbookService.validateSyntax( recipe )
 		log.info errors
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertTrue 'Should have undefined group reference error message', errors[0].detail.contains('references undefined group')
+		expect:
+			errors != null
+			errors.size() == 1
+			errors[0].detail.contains('references undefined group')
 	}
 
 	// Testing the Tasks Section
 	void testValidateSyntaxGroupMissingTasksSection() {
 		def recipe = "groups: [$goodGroup]"
 		def errors = cookbookService.validateSyntax( recipe )
-		assertNotNull 'Should have errors', errors
-		assertEquals 'Should have one error', 1, errors.size()
-		assertEquals 'Should have tasks section error message', 'Recipe is missing required \'tasks\' section', errors[0].detail
+		expect:
+			errors != null
+			errors.size() == 1
+			'Recipe is missing required \'tasks\' section' == errors[0].detail
 	}
 
 }

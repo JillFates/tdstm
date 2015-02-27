@@ -630,7 +630,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 
 	var getWorkflowTransitions = function(assetId, category, id) {
 		var deferred = q.defer();
-		http.post(utils.url.applyRootPath('/assetEntity/getWorkflowTransition?format=json&assetId=' + assetId + '&category=' + category + '&assetCommentId=' + id)).
+		http.post(utils.url.applyRootPath('/assetEntity/retrieveWorkflowTransition?format=json&assetId=' + assetId + '&category=' + category + '&assetCommentId=' + id)).
 		success(function(data, status, headers, config) {
 			deferred.resolve(data);
 		}).
@@ -931,7 +931,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 
 	var getStaffRoles = function() {
 		var deferred = q.defer();
-		http.get(utils.url.applyRootPath('/task/getStaffRoles')).
+		http.get(utils.url.applyRootPath('/task/retrieveStaffRoles')).
 		success(function(data, status, headers, config) {
 			deferred.resolve(data);
 		}).
@@ -943,7 +943,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 
 	var getAssetsByType = function(assetType) {
 		var deferred = q.defer();
-		http.get(utils.url.applyRootPath('/assetEntity/getAssetsByType?assetType=' + assetType)).
+		http.get(utils.url.applyRootPath('/assetEntity/retrieveAssetsByType?assetType=' + assetType)).
 		success(function(data, status, headers, config) {
 			deferred.resolve(data);
 		}).

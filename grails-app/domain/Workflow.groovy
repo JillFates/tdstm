@@ -10,7 +10,7 @@ class Workflow {
 	
 	static constraints = {
 		process( blank:false, nullable:false, unique:true)
-		dateCreated( nullable:false  )
+		dateCreated( nullable:true  )
 		lastUpdated( nullable:true  )
 		updateBy( nullable:true  )
     }

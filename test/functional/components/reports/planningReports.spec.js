@@ -44,7 +44,7 @@ describe('Application Profiles', function(){
 	 });
 	 	 it('should attempt to generate a task report and check that it reports something',function(){
 		browser.driver.findElement(by.css('a[href="javascript:showMegaMenu(\'#reportsMegaMenu\')"]')).click();
-		browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report"]')).click();
+		browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report"]')).click();
 		browser.driver.findElement(by.css('input[value="Generate Web"]')).click();
 		var ptr = protractor.getInstance();
 		ptr.ignoreSynchronization = true;

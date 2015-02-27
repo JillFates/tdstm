@@ -135,7 +135,7 @@
 							<td class="valueNW">
 								<select id="projectPartnerId" 
 								name="projectPartner" 
-								onchange="${remoteFunction(action:'getPartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(e)' )}">
+								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(XMLHttpRequest)' )}">
 									<option value="" selected="selected">None</option>
 									<g:each status="i" in="${companyPartners}" var="companyPartners">
 										<option value="${companyPartners?.partyIdTo.id}">${companyPartners?.partyIdTo}</option>

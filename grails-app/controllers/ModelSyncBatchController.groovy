@@ -3,16 +3,16 @@ class ModelSyncBatchController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	def securityService
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
         //params.max = Math.min(params.max ? params.int('max') : 20, 100)
         [modelSyncBatchInstanceList: ModelSyncBatch.list([sort:'id',order:'desc']), modelSyncBatchInstanceTotal: ModelSyncBatch.count()]
     }
 
-    def process = {
+    def process() {
     	def modelBatch = params.batchId
 		def modelSyncBatch = ModelSyncBatch.get(modelBatch)
 		def loggedUser = securityService.getUserLogin()

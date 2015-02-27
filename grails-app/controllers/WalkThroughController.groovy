@@ -19,19 +19,19 @@ class WalkThroughController {
 	def workflowService
 	def assetEntityAttributeLoaderService
 	
-    def index = { redirect(action: 'mainMenu', params: params) }
+    def index() { redirect(action: 'mainMenu', params: params) }
 	/*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @return : will render Main Menu
 	 *----------------------------------------------------------*/
-    def	mainMenu = {
+    def	mainMenu() {
     	render( view : 'mainMenu')
     }
     /*------------------------------------------------------------
 	 * @author : Lokanath Reddy
 	 * @return : Will render Stat Menu
 	 *----------------------------------------------------------*/
-    def startMenu = {
+    def startMenu() {
 		def projectId = params.project
 		def currentProj = getSession().getAttribute("AUDIT_PROJ")
 		if(projectId){
@@ -78,7 +78,7 @@ class WalkThroughController {
 	 * @param  : project
 	 * @return : Move Bundles list as JSON via AJAX
 	 *----------------------------------------------------------*/
-    def getBundles = {
+    def retrieveBundles() {
     	def moveBundleList
     	def projectId = params.id
     	if(projectId){
@@ -93,7 +93,7 @@ class WalkThroughController {
 	 * @author : Lokanath Reddy
 	 * @return : Racks list for selected Move Bundle
 	 *----------------------------------------------------------*/
-    def selectRack = {
+    def selectRack() {
 		def moveBundleId = params.moveBundle
 		def auditType = params.auditType
 		def sortOrder = params.sort
@@ -170,7 +170,7 @@ class WalkThroughController {
 	 * @param  : location
 	 * @return : Will render Asset Menu for selected Asset
 	 *----------------------------------------------------------*/
-	/*def getRacksByLocation = {
+	/*def retrieveRacksByLocation() {
 		def auditLocation = params.location
 		def viewType = params.viewType
 		def searchKey = params.searchKey
@@ -203,7 +203,7 @@ class WalkThroughController {
 	 * @param  : Bundle, location, room, rack
 	 * @return : Assets list for selected Rack
 	 *----------------------------------------------------------*/
-	def selectAsset = {
+	def selectAsset() {
 		def currentProj = getSession().getAttribute("AUDIT_PROJ")
 		if(currentProj){
 			def project = Project.findById( currentProj )
@@ -292,7 +292,7 @@ class WalkThroughController {
 	 * @param  : searck Key, room , rack
 	 * @return : Will return list of assets for a search key
 	 *----------------------------------------------------------*/
-	/*def searchAssets = {
+	/*def searchAssets() {
 		def auditLocation = getSession().getAttribute("AUDIT_LOCATION")
 		def moveBundle = getSession().getAttribute("AUDIT_BUNDLE")
 		def auditRoom = params.room
@@ -348,7 +348,7 @@ class WalkThroughController {
 	 * @param  : Asset Id
 	 * @return : Will return boolean flag if asset bundle does not match with Audit bundle
 	 *----------------------------------------------------------*/
-	/*def confirmAssetBundle = {
+	/*def confirmAssetBundle() {
 		def assetEntity = AssetEntity.findById(params.id)
 		def assetBundle = assetEntity?.moveBundle?.id
 		def auditBundle = Integer.parseInt(getSession().getAttribute("AUDIT_BUNDLE"))
@@ -363,7 +363,7 @@ class WalkThroughController {
 	 * @param  : Asset Id, Audit bundle, location, room, rack
 	 * @return : Will render Asset Menu for selected Asset
 	 *----------------------------------------------------------*/
-	def assetMenu = {
+	def assetMenu() {
 		def assetEntity = AssetEntity.findById(params.id)
 		def walkthruComments = walkthruComments()
 		def commentCodes = walkThroughCodes( assetEntity )
@@ -375,7 +375,7 @@ class WalkThroughController {
 	 * @param  : Asset Id
 	 * @return : Mark asset as missing Asset
 	 *----------------------------------------------------------*/
-	def missingAsset = {
+	def missingAsset() {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername ( principal )
 		def type = params.type
@@ -405,7 +405,7 @@ class WalkThroughController {
 	 * @param  : Manufacturer and device type
 	 * @return : list of Models for selected Manufacturer and Device
 	 *----------------------------------------------------------*/
-    def getModels = {
+    def retrieveModels() {
 		def manufacturer = params.manufacturer
 		def deviceType = params.device
 		def modelQuery = "from Model m "
@@ -421,7 +421,7 @@ class WalkThroughController {
 	 * @param  : Asset properties
 	 * @return : Will do the Save and Complete for Front/Rear audit
 	 *----------------------------------------------------------*/
-    def saveAndCompleteAudit = {
+    def saveAndCompleteAudit() {
 		def assetEntity = AssetEntity.get( params.id )
 		def existingModelId = assetEntity.model?.id 
 		def walkthruComments = walkthruComments()
@@ -538,7 +538,7 @@ class WalkThroughController {
 	 * @author : Mallikarjun 
 	 * @return : comments validation 
 	 *----------------------------------------------------------*/
-    def validateComments = {
+    def validateComments() {
 		def asset = AssetEntity.findById( params.id )
         def comment = params.comment
         def commentType = params.commentType
@@ -558,7 +558,7 @@ class WalkThroughController {
 	 * @author : Mallikarjun 
 	 * @return : save new comment
 	 *----------------------------------------------------------*/
-    def saveComment = {
+    def saveComment() {
     	def principal = SecurityUtils.subject.principal
     	def loginUser = UserLogin.findByUsername ( principal )
 		def assetEntity = AssetEntity.findById( params.assetId )
@@ -582,7 +582,7 @@ class WalkThroughController {
   * @param  : commentsList
   * @return : Will return comment list view as string
   *----------------------------------------------------------*/
-	def getComments = {
+	def retrieveComments() {
 		def assetEntity = AssetEntity.findById( params.id )
 		def assetCommentsList
 		if ( params.commentType != 'all' ) {

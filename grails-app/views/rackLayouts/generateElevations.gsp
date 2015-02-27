@@ -15,7 +15,7 @@
 		</g:else>
 
 		<g:if test="${rackLayout}">
-			<g:each in="${rackLayout}" var="rackLayout">
+			<g:each in="${rackLayout}" var="rackLayoutIt">
 				<g:if test="${frontView}">
 					<g:if test="${generateView}">
 						<td class="rack_elevation_td">
@@ -25,7 +25,7 @@
 						<tr>
 							<td colspan="4" style="border:0px;text-align:center; white-space: nowrap;">
 								<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
-								<h2>${rackLayout?.rack} in ${rackLayout?.room}</h2>
+								<h2>${rackLayoutIt?.rack} in ${rackLayoutIt?.room}</h2>
 							</td>
 						</tr>
 						<tr>
@@ -33,7 +33,7 @@
 							<th>Device</th>
 							<th>Bundle</th>
 						</tr>
-						${rackLayout?.frontViewRows}
+						${rackLayoutIt?.frontViewRows}
 					</table>
 					<div style="display: block; page-break-after: always;"></div>
 					<g:if test="${generateView}">
@@ -49,20 +49,20 @@
 						<tr>
 							<td colspan="4" style="border:0px;text-align:center">
 								<div class="close-icon" onclick="$(this).parents('td.rack_elevation_td').remove(); $(this).parents('table.rack_elevation').remove();"></div>
-								<h2>${rackLayout?.rack} in ${rackLayout?.room} (Back)
+								<h2>${rackLayoutIt?.rack} in ${rackLayoutIt?.room} (Back)
 								<g:if test="${generateView}">
 									<tds:hasPermission permission="AssetEdit">
 										<g:if test="${showIconPref == 'true'}">
-											<span id="span_${rackLayout?.rackId}" onclick="disableCreateIcon(${rackLayout?.rackId})"> 
+											<span id="span_${rackLayoutIt?.rackId}" onclick="disableCreateIcon(${rackLayoutIt?.rackId})"> 
 												<img src='../images/plus_disabled.gif' />
 											</span>
 										</g:if>
 										<g:else>
-											<span id="span_${rackLayout?.rackId}" onclick="enableCreateIcon(${rackLayout?.rackId})"> 
+											<span id="span_${rackLayoutIt?.rackId}" onclick="enableCreateIcon(${rackLayoutIt?.rackId})"> 
 												<img src="../images/plus.gif" />
 											</span>
 										</g:else>
-										<span id="anchor_${rackLayout?.rackId}" onclick="assignPowers(${rackLayout?.rackId})"> 
+										<span id="anchor_${rackLayoutIt?.rackId}" onclick="assignPowers(${rackLayoutIt?.rackId})"> 
 										</span>
 									</tds:hasPermission>
 								</g:if>
@@ -75,7 +75,7 @@
 							<th>Bundle</th>
 							<th>Cabling</th>
 						</tr>
-						${rackLayout?.backViewRows}
+						${rackLayoutIt?.backViewRows}
 					</table>
 					<div style="display: block; page-break-after: always;"></div>
 					<g:if test="${generateView}">

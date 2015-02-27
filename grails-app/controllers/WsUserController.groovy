@@ -22,7 +22,7 @@ class WsUserController {
 	 * @example GET ./ws/user/preferences/EVENT,BUNDLE
 	 * @return a MAP of the parameters (e.g. preferences:[EVENT:5, BUNDLE:30])
 	 */
-	def preferences = {
+	def preferences() {
 		def data = [:]
 		def prefs = ( params.id ? params.id?.split(',') : [] )
 		prefs.each { p -> data[p] = userPreferenceService.getPreference(p) }

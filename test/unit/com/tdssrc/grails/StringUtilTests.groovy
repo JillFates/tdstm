@@ -1,30 +1,34 @@
 package com.tdssrc.grails
 
 import grails.test.*
+import spock.lang.Specification
 
-class StringUtilTests extends GrailsUnitTestCase {
+/**
+ * Unit test cases for the StringUtil class
+*/
+class StringUtilTests extends Specification {
 	
 	public void testStripOffPrefixChars() {
 		
 		def match='!<>='
 		def criteria = ">=500"
 
-		// Test to see that it strips off the leading chars from the string
-		assertEquals '500', StringUtil.stripOffPrefixChars(match, criteria)
+		expect:
+			// Test to see that it strips off the leading chars from the string
+			'500' == StringUtil.stripOffPrefixChars(match, criteria)
+			'5' == StringUtil.stripOffPrefixChars(match, '>=5')
 		
-		assertEquals '5', StringUtil.stripOffPrefixChars(match, '>=5')
-		
-		// Test to see that it doesn't modify a string where there are no matches
-		assertEquals 'abc', StringUtil.stripOffPrefixChars('X', 'abc')		
-		assertEquals 'a', StringUtil.stripOffPrefixChars('X', 'a')		
+			// Test to see that it doesn't modify a string where there are no matches
+			'abc' == StringUtil.stripOffPrefixChars('X', 'abc')		
+			'a' == StringUtil.stripOffPrefixChars('X', 'a')		
 		
 	}
 	
 	public void testEllipsis() {
 		def s='abcdefgh'
-		assertEquals "abc...", StringUtil.ellipsis(s, 6)
-		assertEquals s, StringUtil.ellipsis(s, 50)
+		expect:
+			"abc..." == StringUtil.ellipsis(s, 6)
+			s == StringUtil.ellipsis(s, 50)
 	}
 
-	
 }

@@ -6,11 +6,16 @@ import org.apache.log4j.*
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.security.SecurityConfigParser
 
+import spock.lang.Specification
+
 // TODO : JPM 01/2015 : Fixed the SecurityConfigParserTests test cases
 // There was a large change to the structure that broke most of the test cases and I haven't had time to 
 // correct the test cases.
 
-class SecurityConfigParserTests extends GrailsUnitTestCase {
+/**
+ * Unit test cases for the SecurityConfigParser class
+*/
+class SecurityConfigParserTests extends Specification {
 
 	/*
 	 * Tests that after encode and decode a value the result is the same
@@ -25,10 +30,15 @@ class SecurityConfigParserTests extends GrailsUnitTestCase {
 
 		map = SecurityConfigParser.parseLoginSettings(config)
 		
-		assertEquals 'authorityPrompt default', 'na', map.authorityPrompt
-		assertEquals 'authorityLabel default', 'Domain', map.authorityLabel
-		assertEquals 'usernamePlaceholder default', 'Enter your username', map.usernamePlaceholder
+		expect:
+			// authorityPrompt default
+			'na'.equals(map.authorityPrompt)
+			// authorityLabel default
+			'Domain'.equals(map.authorityLabel)
+			// usernamePlaceholder default
+			'Enter your username'.equals(map.usernamePlaceholder)
 
+	/*
 		config.tdstm.settings = [
 			authorityPrompt:'hidden', 
 			authorityLabel:'label', 
@@ -36,7 +46,6 @@ class SecurityConfigParserTests extends GrailsUnitTestCase {
 			usernamePlaceholder:'placeholder'
 		]
 
-	/*
 		map = SecurityConfigParser.parseLoginSettings(config)
 
 		assertEquals 'authorityPrompt custom', 'hidden', map.authorityPrompt

@@ -1,3 +1,20 @@
+def appName = appName?:"tdstm"
+
+grails.project.groupId = tdstm
+grails.resources.adhoc.patterns = ['/components/*', '/css/*', '/fonts/*', '/i/*', '/icons/*', '/images/*', '/js/*', '/reports/*', '/resource/*', '/static/*', '/swf/*', '/templates/*', '/plugins/*', '/d3/*']
+grails.resources.adhoc.patterns = []
+grails.resources.adhoc.includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**', '/js/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**', '/plugins/**', '/d3/**'] 
+grails.resources.adhoc.excludes = ["*"]
+grails.resources.rewrite.css = false
+
+grails.views.gsp.sitemesh.preprocess = true
+grails.views.javascript.library="jquery"
+grails.scaffolding.templates.domainSuffix = 'Instance'
+grails.json.legacy.builder = false
+grails.spring.bean.packages = []
+grails.web.disable.multipart=false
+grails.exceptionresolver.params.exclude = ['password']
+grails.hibernate.cache.queries = false
 
 // The base package name for our classes
 // grails.project.groupId = 'com.tdsops.tdstm'
@@ -63,6 +80,7 @@ grails.plugin.databasemigration.dbDocController.enabled = true
 //
 // For Shiro Security Plugin
 //
+// jsecurity.legacy.filter.enabled = true
 security.shiro.annotationdriven.enabled = true
 // fix the strategy in Config.groovy to point to (http://groovy-grails.blogspot.com/search?q=shiro)
 // security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy()
@@ -104,14 +122,16 @@ log4j = {
 		  'org.codehaus.groovy.grails.plugins', // plugins
 		  'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
 		  'org.springframework',
-		  'net.sf.ehcache.hibernate'
+		  'net.sf.ehcache.hibernate',
+		  'grails.app.services.org.grails.plugin.resource',
+		  'grails.app.taglib.org.grails.plugin.resource',
+		  'grails.app.resourceMappers.org.grails.plugin.resource'
 	// trace 'org.hibernate'
 	// debug 'org.hibernate'
 	// info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
 	// off 'org.hibernate'
  
 	appenders {
-	   def appName = appName ?: "tdstm"	// If not defined (for local config)
 	   def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
 	   def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
 	   def logDirectory = 'target'
@@ -150,8 +170,9 @@ log4j = {
 	info 'stdout', 'applicationLog'
 	//     , auditLog:'grails.app.service.AuditService',
 
-	additivity.grails=false
-	additivity.StackTrace=false
+	info additivity: false
+	//additivity.grails=false
+	//additivity.StackTrace=false
  }
 
 //Maintenance file path

@@ -245,7 +245,7 @@
 			bundles.push($(this).val())
        	});
        	
-		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(e)')}
+		${remoteFunction(action:'retrieveRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(XMLHttpRequest)')}
 	}
 
 	// Load the Source and Target Racks with possible options based on the currently selected Bundle
@@ -268,7 +268,7 @@
 			}
 		}
 		var bundleId = bundleObj.val();
-		${remoteFunction(action:'getRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(e)')};
+		${remoteFunction(action:'retrieveRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(XMLHttpRequest)')};
 		
 		$('input.submit').click(function() {
 			$('#viewMode').val($(this).val());
@@ -276,7 +276,7 @@
 	})(jQuery);
 	
 	function createAssetPage(type,source,rack,roomName,location,position){
-		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
+		${remoteFunction(action:'create',controller:'assetEntity',params:['redirectTo':'rack'], onComplete:'createEntityView(XMLHttpRequest,type,source,rack,roomName,location,position)')}
 	}
 
 	function createBladeDialog(source,blade,position,manufacturer,assetType,assetEntityId, moveBundleId){

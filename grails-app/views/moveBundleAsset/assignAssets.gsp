@@ -36,7 +36,7 @@
 		}
 		if(assets != ""){
 			$("#leftassetId").removeAttr("checked")
-			${remoteFunction(action:'saveAssetsToBundle', params:'\'assets=\'+ assets +\'&bundleFrom=\'+bundleLeft +\'&bundleTo=\'+bundleRight', onComplete:'showAssetsRight(e)')}
+			${remoteFunction(action:'saveAssetsToBundle', params:'\'assets=\'+ assets +\'&bundleFrom=\'+bundleLeft +\'&bundleTo=\'+bundleRight', onComplete:'showAssetsRight(XMLHttpRequest)')}
 		}
 	}
 	function assignAssetsToLeftBundle(){
@@ -61,7 +61,7 @@
 		}
 		if(assets != ""){
 			$("#rightassetId").removeAttr("checked")
-			${remoteFunction(action:'saveAssetsToBundle', params:'\'assets=\'+ assets +\'&bundleFrom=\'+bundleRight +\'&bundleTo=\'+bundleLeft', onComplete:'showAssetsLeft(e)')}
+			${remoteFunction(action:'saveAssetsToBundle', params:'\'assets=\'+ assets +\'&bundleFrom=\'+bundleRight +\'&bundleTo=\'+bundleLeft', onComplete:'showAssetsLeft(XMLHttpRequest)')}
 		}
 	}
 	function showAssetsLeft(e){

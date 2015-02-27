@@ -2,7 +2,12 @@ package com.tdsops.common.security
 
 import grails.test.*
 
-class AESCodecTests extends GrailsUnitTestCase {
+import spock.lang.Specification
+
+/**
+ * Unit test cases for the AESodec class
+*/
+class AESCodecTests extends Specification {
 
 	/*
 	 * Tests that after encode and decode a value the result is the same
@@ -17,7 +22,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		println "decodedValue: $decodedValue"
 
 		//Value encoded and decode should be equal
-		assertEquals "Keeps equal to original", value, decodedValue
+		expect:
+			// Keeps equal to original
+			value.equals(decodedValue)
 	}
 
 	/*
@@ -28,7 +35,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		def encodedValue = AESCodec.encode(value)
 
 		//Value encoded should not be empty
-		assertTrue "Encoded value not empty", (encodedValue.size() > 0)
+		expect:
+			// Encoded value not empty
+			(encodedValue.size() > 0)
 	}
 
 	/*
@@ -39,7 +48,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		def encodedValue = AESCodec.encode(value)
 
 		//Value encoded and value should not be equal
-		assertTrue "Encoded value not equals to original", (!value.equals(encodedValue))
+		expect:
+			// Encoded value not equals to original
+			(!value.equals(encodedValue))
 	}
 
 	/*
@@ -55,7 +66,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		println "decodedValue: $decodedValue"
 
 		//Value encoded and decode should be equal
-		assertEquals "Keeps equal to original", value, decodedValue
+		expect:
+			// Keeps equal to original
+			value.equals(decodedValue)
 	}
 
 	/*
@@ -66,7 +79,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		def encodedValue = AESCodec.encode(value, "1234")
 
 		//Value encoded should not be empty
-		assertTrue "Encoded value not empty", (encodedValue.size() > 0)
+		expect:
+			// Encoded value not empty
+			(encodedValue.size() > 0)
 	}
 
 	/*
@@ -77,7 +92,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		def encodedValue = AESCodec.encode(value, "1234")
 
 		//Value encoded and value should not be equal
-		assertTrue "Encoded value not equals to original", (!value.equals(encodedValue))
+		expect:
+			// Encoded value not equals to original
+			(!value.equals(encodedValue))
 	}
 
 	/*
@@ -98,7 +115,9 @@ class AESCodecTests extends GrailsUnitTestCase {
 		println "decodedValue: $decodedValue"
 
 		//Value encoded and decode should be equal
-		assertFalse "Not equals", (value == decodedValue)
+		expect:
+			// Not equals
+			(!value.equals(decodedValue))
 	}
 
 }

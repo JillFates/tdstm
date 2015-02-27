@@ -58,7 +58,7 @@ var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to
     	tb.html( tbody );
     	$('#createFormTbodyId').css('display','block');
 	      
-	    new Ajax.Request(contextPath+'/assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
+	    new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){createAutoComplete(e);}})
 	    $("#assetTypeId").val("Server")
 		updateManufacturerOptions("Server", null, 1)
  }
@@ -173,7 +173,7 @@ function showAssetDialog( e , action ) {
 		editDiv.html( etbody );
     }
 	      
-	  new Ajax.Request(contextPath+'/assetEntity/getAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
+	  new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
 	  $("#createDialog").dialog("close");
 	  if(action == 'edit'){
 	      $("#editDialog").dialog('option', 'width', '1000px');
@@ -195,7 +195,7 @@ function showAssetDialog( e , action ) {
 	  timedUpdate('never')
     }
     function updateManufacturerOptions(assetType, manufacturerId, type){
-    	new Ajax.Request(contextPath+'/manufacturer/getManufacturersListAsJSON?assetType='+assetType,{
+    	new Ajax.Request(contextPath+'/manufacturer/retrieveManufacturersListAsJSON?assetType='+assetType,{
 			asynchronous:false,
 			evalScripts:true,
 			onComplete:function(e){
@@ -227,7 +227,7 @@ function showAssetDialog( e , action ) {
 		if(type == 1){
 			assetType = $("#assetTypeId").val()
 		}
-		new Ajax.Request(contextPath+'/model/getModelsListAsJSON?manufacturer='+manufacturer+"&assetType="+assetType,{
+		new Ajax.Request(contextPath+'/model/retrieveModelsListAsJSON?manufacturer='+manufacturer+"&assetType="+assetType,{
 			asynchronous:false,
 			evalScripts:true,
 			onComplete:function(e){
@@ -361,7 +361,7 @@ function showAssetDialog( e , action ) {
   		modelId = attribute.modelId
   		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit 
   		inputField = '<select name=\''+name+'\' id=\''+ id +name+'Id'+'\' onchange=\'confirmModelChange('+ attribute.modelId +', this.value, '+type+');\'><option value=\'\'>Unassigned</option></select>'
-  		/*new Ajax.Request('../model/getModelsListAsJSON',{
+  		/*new Ajax.Request('../model/retrieveModelsListAsJSON',{
 				asynchronous:false,
 				evalScripts:true,
 				onComplete:function(e){
@@ -384,7 +384,7 @@ function showAssetDialog( e , action ) {
   		manufacturerId = attribute.manufacturerId
   		var type = id ? 2 : 1 // Assume that 1 : create and 2 : edit
   		inputField = "<select name='"+name+"' id='"+ id +name+"Id' onchange='confirmManufacturerChange("+ attribute.manufacturerId +", this.value, "+type+" )'><option value=''>Unassigned</option>"
-  		/*new Ajax.Request('../manufacturer/getManufacturersListAsJSON ',{
+  		/*new Ajax.Request('../manufacturer/retrieveManufacturersListAsJSON ',{
 				asynchronous:false,
 				evalScripts:true,
 				onComplete:function(e){
@@ -731,7 +731,7 @@ function textCounter(fieldId, maxlimit) {
  * 
  */
 function showManufacturer(id){
-	new Ajax.Request(contextPath+'/manufacturer/getManufacturerAsJSON?id='+id,{
+	new Ajax.Request(contextPath+'/manufacturer/retrieveManufacturerAsJSON?id='+id,{
 		asynchronous:false,
 		evalScripts:true,
 		onComplete:function(e){
@@ -746,7 +746,7 @@ function showManufacturer(id){
 	})
 }
 function showModel(id){
-	new Ajax.Request(contextPath+'/model/getModelAsJSON?id='+id,{
+	new Ajax.Request(contextPath+'/model/retrieveModelAsJSON?id='+id,{
 		asynchronous:false,
 		evalScripts:true,
 		onComplete:function(e){
@@ -763,12 +763,12 @@ function showModel(id){
 			$("#powerSpanId").html( model.powerUse )
 			
 			if(model.frontImage != ''){
-				$("#showModelFrontImage").html( "<img src='../model/getFrontImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
+				$("#showModelFrontImage").html( "<img src='../model/retrieveFrontImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
 			} else {
 				$("#showModelFrontImage").html("")
 			}
 			if(model.rearImage != ''){
-				$("#showModelRearImage").html( "<img src='../model/getRearImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
+				$("#showModelRearImage").html( "<img src='../model/retrieveRearImage/"+model.id+"' style='height: 50px; width: 100px;' id='rearImageId'>" )
 			} else {
 				$("#showModelRearImage").html("")
 			}

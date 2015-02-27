@@ -172,7 +172,7 @@
         loadMoveBundles();
         function loadMoveBundles(){
             var projectId = $("#projectId").val()
-            ${remoteFunction(action:'getMoveBundles', params:'\'projectId=\' +projectId', onComplete:'updateMoveBundles(e)' )}
+            ${remoteFunction(action:'retrieveMoveBundles', params:'\'projectId=\' +projectId', onComplete:'updateMoveBundles(XMLHttpRequest)' )}
         }
         function updateMoveBundles( e ){
         	var moveBundles = eval("(" + e.responseText + ")")

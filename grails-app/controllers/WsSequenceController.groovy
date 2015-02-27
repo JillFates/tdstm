@@ -5,7 +5,7 @@ class WsSequenceController {
 
 	def sequenceService
 	
-	def get = {
+	def retrieveNext() {
 		def contextId = params.contextId
 		def name = params.name
 

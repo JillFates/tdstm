@@ -30,8 +30,8 @@ class ClientConsoleController {
 	 def pmoAssetTrackingService
 	 def taskService
 	 def assetEntityService
-	 def index = { 
-		 redirect(action:list,params:params)
+	 def index() { 
+		 redirect(action:"list",params:params)
 	 }
 	/*-----------------------------------------------------
 	 *  List of asset for client console
@@ -109,7 +109,7 @@ class ClientConsoleController {
 			def showAllOption = uniqueWorkflowCodes.size() == 1 && moveBundleInstanceList.size() > 1
 			
 			stateEngineService.loadWorkflowTransitionsIntoMap(workflowCode, 'project')
-			def headerCount = getHeaderNames(bundleId, workflowCode)
+			def headerCount = retrieveHeaderNames(bundleId, workflowCode)
 			
 			//def projectMap
 			def moveEventsList = MoveEvent.findAll("from MoveEvent me where me.project = ? order by me.name asc",[project])
@@ -272,7 +272,7 @@ class ClientConsoleController {
 	                            }
 	                        }
 	                        if( assetTrans )
-	                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
+	                           cssClass = retrieveRecentChangeStyle( assetTrans, cssClass )
 	                    } else {
 	                        cssClass='task_term'
 	                    }
@@ -325,7 +325,7 @@ class ClientConsoleController {
 	 * @param  : AssetEntitys  
 	 * @return : Tasks list for params asset
 	 *---------------------------------------------------------*/
-	def getTask = {
+	def retrieveTask() {
         def stateVal
         def taskList = []
         def temp
@@ -372,7 +372,7 @@ class ClientConsoleController {
 	 * @param  : update time 
 	 * @return : update time 
 	 *---------------------------------------------------------*/
-	def setTimePreference = {
+	def setTimePreference() {
         def timer = params.timer
         def updateTime =[]
         def sessionKey = params.prefFor ? params.prefFor : "CLIENT_CONSOLE_REFRESH"
@@ -389,7 +389,7 @@ class ClientConsoleController {
 	 * @param  : AssetEntitys array 
 	 * @return : Tasks list for params asset array 
 	 *---------------------------------------------------------*/
-	def getList = {
+	def retrieveList() {
     	def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
         def assetArray = params.assetArray
         Set common = new HashSet()
@@ -446,7 +446,7 @@ class ClientConsoleController {
 	 * @return : Change the status for params asset array 
 	 *---------------------------------------------------------*/
     
-	def changeStatus = {
+	def changeStatus() {
         def assetId = params.asset
 		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )		 		 
         def assetEnt = AssetEntity.findAll("from AssetEntity ae where ae.id in ($assetId)")
@@ -490,7 +490,7 @@ class ClientConsoleController {
 	 * @param : MoveBundle, application,appSme,appOwner
 	 * @return: AssetEntity object with recent transactions
 	 **/
-	def getTransitions = {
+	def retrieveTransitions() {
 		def workFlowCode
 		def project = securityService.getUserCurrentProject()
 		
@@ -634,7 +634,7 @@ class ClientConsoleController {
 								}
 							}
 							if( assetTrans )
-		                           cssClass = getRecentChangeStyle( assetTrans, cssClass )
+		                           cssClass = retrieveRecentChangeStyle( assetTrans, cssClass )
 	                    } else {
 	                    	cssClass='task_term'
 	                    }
@@ -684,7 +684,7 @@ class ClientConsoleController {
 	 * @author: Mallikarjun
 	 * @return: count of tasks
 	 *----------------------------------------------------*/
-	def getHeaderNames(moveBundleId, workFlowCode){
+	def retrieveHeaderNames(moveBundleId, workFlowCode){
 		def tempTransitions = []
 		def processTransitions= stateEngineService.getTasks(workFlowCode, "TASK_ID")
 		processTransitions.each{
@@ -745,7 +745,7 @@ class ClientConsoleController {
 	 * @param  : Transition td id 
 	 * @return : return the list for menu
 	 *----------------------------------------------------*/
-	def getMenuList = {
+	def retrieveMenuList() {
 		def id = params.id
 		def ids = id.split("_")
 		def transId = ids[1]
@@ -763,7 +763,7 @@ class ClientConsoleController {
 				situation = "done"
 			}
 		}
-		log.info "getMenuList: assetTransition=${assetTransition?'yes':'no'}, situation=${situation}, state=${state}, stateType=$stateType} "
+		log.info "retrieveMenuList: assetTransition=${assetTransition?'yes':'no'}, situation=${situation}, state=${state}, stateType=$stateType} "
 		menuOptions = pmoAssetTrackingService.constructMenuOptions( state, assetEntity, situation, stateType )
 		
 		render menuOptions
@@ -773,7 +773,7 @@ class ClientConsoleController {
 	 * @param  : Asset Entity and to toState
 	 * @return : Create a transition as selected by User and will return the tannsition asset row details
 	 *----------------------------------------------------*/
-	def createTransitionForNA = {
+	def createTransitionForNA() {
 		def loginUser = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 
@@ -827,7 +827,7 @@ class ClientConsoleController {
 	/*
 	 * Validate and return the message to the user. 
 	 */
-	def getAssetsCountForBulkTransition = {
+	def retrieveAssetsCountForBulkTransition() {
 		def message = "" 
 		def transId = params.transId
 		def moveEvent = MoveEvent.findById( params.eventId )
@@ -919,7 +919,7 @@ class ClientConsoleController {
 	 * Bulk edit of transitions by letting the project manager click on column head to transition the displayed assets to that step.
 	 * @params : transition Id, transition type, moveBundle, moveEvent
 	 */
-	def doBulkTransitionsByHeader = {
+	def doBulkTransitionsByHeader() {
 				
 		def transId = params.transId
 		def moveEvent = MoveEvent.findById( params.eventId )
@@ -984,7 +984,7 @@ class ClientConsoleController {
 	 */
 	// TODO - getRecentChangeStyle: move to TaskService
 	// TODO - getRecentChangeStyle: Runbook - will need to revamp this to work without transitions
-	private getRecentChangeStyle(def entity, def cssClass) {
+	private retrieveRecentChangeStyle(def entity, def cssClass) {
         def changedClass = cssClass
         if(cssClass == "task_done") {
             def createdTime = entity?.dateCreated?.getTime()
@@ -1007,7 +1007,7 @@ class ClientConsoleController {
 	/*
 	 * Add a user preference "BULK_WARNING" with a time stamp+24hrs. If the user re-enters bulk edit mode, and BulkWarning time is > now, don't show the popup warning.
 	 */
-	def setBulkWarning = {
+	def setBulkWarning() {
 		def dateNow = GormUtil.convertInToGMT( "now", "EDT" )
 		userPreferenceService.loadPreferences("BULK_WARNING")
 		def bulkWarning = getSession().getAttribute("BULK_WARNING")?.BULK_WARNING
@@ -1025,7 +1025,7 @@ class ClientConsoleController {
 		render status
 	}
 	
-	def moveBundleList ={
+	def moveBundleList() {
 		def moveEventId = params.moveEvent
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def moveEventInstance = MoveEvent.findByIdAndProject(moveEventId ,(Project.get(projectId)))

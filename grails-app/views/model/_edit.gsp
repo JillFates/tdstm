@@ -234,7 +234,7 @@
 	<div>
 		<div id="cablingPanelEdit" style="height: auto; " class="cablingPanel">
 			<g:if test="${modelInstance.rearImage}">
-				<img id="rearImage" src="${createLink(controller:'model', action:'getRearImage', id:modelInstance.id)}" style="display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
+				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" style="display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>
 				<script type="text/javascript">
 					$("#cablingPanelEdit").css("background-color","#FFF")
 				</script>
@@ -454,7 +454,7 @@
 	function verifyAndDeleteConnector( connector ){
 		var modelId = "${modelInstance.id}"
 		jQuery.ajax({
-			url: "getAssetCablesForConnector",
+			url: "retrieveAssetCablesForConnector",
 			data: "connector="+connector+"&modelId="+modelId,
 			type:'POST',
 			success: function(data) {

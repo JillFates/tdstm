@@ -85,7 +85,7 @@ a:hover {
    		$("#orphanDetailsTableId").html("<tr><td><img src='../images/processing.gif'/></td></tr>")
 		$("#tableName").html(table);
 		$("#columnName").html(column);
-		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(e, table )')}
+		${remoteFunction(action:'orphanDetails', params:'\'table=\' + table +\'&column=\'+column +\'&type=\'+type', onComplete:'showOrphanDetails(XMLHttpRequest, table )')}
 	}
 	function showOrphanDetails(e, table){
 		var records = eval('(' + e.responseText + ')');

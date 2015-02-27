@@ -1,5 +1,6 @@
 import org.quartz.JobExecutionContext
 import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import org.quartz.JobExecutionException
 import com.tdsops.common.lang.ExceptionUtil

@@ -9,8 +9,8 @@ class CustomMethods {
  	// Setup a Singleton pattern so we only initialize the methods once
 	private static INSTANCE 
     
-	static getInitialize() {
-		if (INSTANCE == null) {
+	static getInitialize(force=false) {
+		if (INSTANCE == null || force) {
 			INSTANCE = new CustomMethods()
 		} 
 		return INSTANCE 

@@ -22,12 +22,12 @@ class WorkflowController {
 	/*-----------------------------------------------
 	 * Index method for default action
 	 *---------------------------------------------*/
-	def index = { redirect(action:home,params:params) }
+	def index() { redirect(action:"home",params:params) }
 	
 	/*-----------------------------------------------
 	 *  Will render Workflow data
 	 *---------------------------------------------*/
-	def home = {
+	def home() {
 		flash.message = params.message
 		[ workflowInstanceList: Workflow.list( params ) ]
 	}
@@ -36,7 +36,7 @@ class WorkflowController {
 	 * @param : workfow
 	 * Will render Workflow steps for selected workflow
 	 *---------------------------------------------*/
-	def workflowList = {
+	def workflowList() {
 		def workflowId = params.workflow
 		def workflowTransitionsList = []
 		def workflow
@@ -53,7 +53,7 @@ class WorkflowController {
 			
 			workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? order by w.transId", [workflow] )
 		} else {
-			redirect(action:home)
+			redirect(action:"home")
 		}
 		
 		workflowTransitions.each{ workflowTransition ->
@@ -73,7 +73,8 @@ class WorkflowController {
 	 * @param : workfow stepId
 	 * provide controlle to set the role to change the status.
 	 *---------------------------------------------*/
-	/*def workflowRoles = {
+
+	/*def workflowRoles() {
 			def transitionId = params.workflowTransition
 			def workflowTransitionsList
 			def workflowTransition
@@ -95,7 +96,7 @@ class WorkflowController {
 				}
 			
 			} else {
-				redirect(action:home)
+				redirect(action:"home")
 			}
 			
 			return [workflowTransitionsList : workflowTransitionsList, workflowTransition:workflowTransition,
@@ -105,7 +106,7 @@ class WorkflowController {
 	/*====================================================
 	 *  Create  new workflow workflow
 	 *==================================================*/
-	def createWorkflow = {
+	def createWorkflow() {
 		def process = params.process
 		def workflow = params.workflow
 		def principal = SecurityUtils.subject.principal
@@ -171,13 +172,13 @@ class WorkflowController {
 				message = "Workflow \"${workflowInstance}\" was created"
 			}
 		}
-		redirect( action:home, params:[ message : message ] )
+		redirect( action:"home", params:[ message : message ] )
 	}
 	/*====================================================
 	 *  Update the workflow steps for selected workflow
 	 *  @param : workflowId, steps 
 	 *==================================================*/
-	def updateWorkflowSteps = {
+	def updateWorkflowSteps() {
 		def workflowId = params.workflow
 		def workflowTransitions
 		def workflowTransitionsList = []
@@ -255,17 +256,82 @@ class WorkflowController {
 			stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
 			roles = partyRelationshipService.getStaffingRoles()
 		} else {
-			redirect(action:home)
+			redirect(action:"home")
 		}
 		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ] )
 	}
 
+	/*====================================================
+	 *  Update the workflow roles
+	 *==================================================*/
+	def updateWorkflowRoles() {
+		def currentStatus = params.currentStatus
+		def workflowId = params.workflow
+		def workflow = Workflow.get( workflowId )
+		def swimlanes = Swimlane.findAllByWorkflow( workflow )
+		def onTruck = WorkflowTransition.findByWorkflowAndCode( workflow, "OnTruck" )?.transId
+		def hold =  WorkflowTransition.findByWorkflowAndCode( workflow, "hold" )?.transId
+		def currentTransition = WorkflowTransition.get( currentStatus )
+		def workflowTransitions = WorkflowTransition.findAll("FROM WorkflowTransition w where w.workflow = ? AND w.code not in ('SourceWalkthru','TargetWalkthru') ", [ workflow ] )
+		swimlanes.each{ role->
+			workflowTransitions.each{transition->
+				def input = params["${role.name}_${transition.id}"]
+				if(input && input.equalsIgnoreCase("on")){
+					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
+					def flag = params["flag_${role.name}_${transition.id}"]
+					if(!workflowransitionMap.size()){
+						workflowransitionMap = new WorkflowTransitionMap(workflow:workflow, workflowTransition:currentTransition,swimlane:role,transId:transition.transId, flag:flag ).save(flush:true)
+					}else{
+						workflowransitionMap.each{
+							it.flag = flag
+							it.save( flush:true )
+						}
+					}
+				} else {
+					def workflowransitionMap = WorkflowTransitionMap.findAll("From WorkflowTransitionMap wtm where wtm.workflowTransition = ? and wtm.swimlane = ? and wtm.transId = ?", [ currentTransition, role, transition.transId ])
+					if(workflowransitionMap.size()){
+						workflowransitionMap.each{
+							it.delete( flush:true )
+						}
+					}
+				}
+			}
+			def maxSourceId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck}")
+			def maxTargetId = jdbcTemplate.queryForInt("SELECT Max(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
+            def minSourceId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id < ${onTruck} and trans_id > ${hold}")
+			def minTargetId = jdbcTemplate.queryForInt("SELECT Min(trans_id) FROM workflow_transition_map where swimlane_id = ${role.id} and trans_id >= ${onTruck}")
+			
+			if(minSourceId){
+				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minSourceId, [sort:"transId", order:"asc"])?.workflowTransition
+				def minProcessIds = workflowTransition?.findAll { it.transId < minSourceId }?.sort{it.transId}
+				minSourceId = minProcessIds.transId[0]
+				role.minSource = minSourceId ? stateEngineService.getState( workflow.process, minSourceId ) : null
+			}
+			if(minTargetId){
+				def workflowTransition = WorkflowTransitionMap.findAllBySwimlaneAndTransId(role,minTargetId, [sort:"transId", order:"asc"])?.workflowTransition
+				def minProcessIds = workflowTransition?.findAll { it.transId < minTargetId }?.sort{it.transId}
+				minTargetId = minProcessIds.transId[0]
+				role.minTarget = minTargetId ? stateEngineService.getState( workflow.process, minTargetId ) : null
+			}
+			
+			role.maxTarget = maxTargetId ? stateEngineService.getState( workflow.process, maxTargetId ) : null
+			role.maxSource = maxSourceId ? stateEngineService.getState( workflow.process, maxSourceId ) : null
+			
+			if(!role.save( flush:true )){
+				role.errors.each {  println it}
+			}
+		}
+		//	load transitions details into application memory.
+    	stateEngineService.loadWorkflowTransitionsIntoMap(workflow.process, 'workflow')
 		
+		redirect(action:"workflowList", params:[workflow:workflowId])
+	 }
+
 	/*-----------------------------------------------
 	 * @param : workfow, workflowTransition
 	 * Delete the workflowTransition and associated data.
 	 *---------------------------------------------*/
-	def deleteTransitionFromWorkflow = {
+	def deleteTransitionFromWorkflow() {
 		def workflowId = params.workflow
 		def transitionId = params.id
 		if(transitionId){
@@ -280,13 +346,13 @@ class WorkflowController {
 			//	load transitions details into application memory.
 	    	stateEngineService.loadWorkflowTransitionsIntoMap( process, 'workflow')
 		}
-		redirect(action:workflowList, params:[workflow:workflowId])
+		redirect(action:"workflowList", params:[workflow:workflowId])
 	}
 	/*-----------------------------------------------
 	 * @param : workfow
 	 * Delete the workflow and associated projects and project's data.
 	 *---------------------------------------------*/
-	def deleteWorkflow = {
+	def deleteWorkflow() {
 		def workflowId = params.id
 		if(workflowId){
 			def workflow = Workflow.get( workflowId )
@@ -306,7 +372,7 @@ class WorkflowController {
 				flash.message = ex.getMessage()
 			}
 		}
-		redirect(action:home, params:[ message : flash.message ] )
+		redirect(action:"home", params:[ message : flash.message ] )
 	}
 	/*-----------------------------------------------
 	 * @param : workfow
@@ -375,7 +441,7 @@ class WorkflowController {
 	 *  @param : workflow, swimlaneName, actorId
 	 *  @return : updated actorId
 	 */
-	def saveActorName={
+	def saveActorName() {
 		def actorId = params.actorId
 		def workFlowId = params.workflow
 		def swimLaneName = params.swimlaneName

@@ -3,11 +3,11 @@ class PermissionsController {
 
 	def jdbcTemplate
 	
-	def index = {
-		redirect(action:show,params:params)
+	def index() {
+		redirect(action:"show",params:params)
 	}
 	
-	def show = {
+	def show() {
 		if(RolePermissions.hasPermission("RolePermissionView")){
 			def permissions = Permissions.withCriteria {
 				and {
@@ -23,7 +23,7 @@ class PermissionsController {
 		}
 	} 
 	
-	def edit = {
+	def edit() {
 		if(RolePermissions.hasPermission("RolePermissionView")){
 			def permissions = Permissions.withCriteria {
 				and {
@@ -38,7 +38,7 @@ class PermissionsController {
 		}
 	}
 	
-	def update = {
+	def update() {
 		def paramList = params.column
 		jdbcTemplate.update("delete from role_permissions")
 		def permissions = Permissions.list()
@@ -58,10 +58,10 @@ class PermissionsController {
 				}
 			}
 		}
-		for(int i : paramList){
-			def permissionInstansce = Permissions.findById(i)
+		for(String id : paramList){
+			def permissionInstansce = Permissions.findById(id.toInteger())
 			if(permissionInstansce){
-				permissionInstansce.description = params["description_"+i]
+				permissionInstansce.description = params["description_"+id]
 				if(!permissionInstansce.save(flush:true)){
 					permissionInstansce.errors.allErrors.each {  
 						println it
@@ -69,6 +69,6 @@ class PermissionsController {
 			    }
 			}
 		}
-		redirect(action:show)
+		redirect(action:"show")
 	}
 }

@@ -16,7 +16,7 @@ app.factory('fieldFactory',function($http){
 	return {
 		getFields : function() {
 			return $http({
-				url: contextPath+"/project/getAssetFields",
+				url: contextPath+"/project/retrieveAssetFields",
 				method: 'GET'
 			})
 		},
@@ -30,7 +30,7 @@ app.factory('fieldFactory',function($http){
 		},
 		getImportance : function() {
 			return $http({
-				url: contextPath+"/project/getImportance",
+				url: contextPath+"/project/retrieveImportance",
 				method: 'GET'
 			})
 		},

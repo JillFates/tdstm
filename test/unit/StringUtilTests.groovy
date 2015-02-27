@@ -1,63 +1,93 @@
 import grails.test.*
 import com.tdssrc.grails.StringUtil as SU
 
-class StringUtilTests extends GrailsUnitTestCase {
-	
-    protected void setUp() {
-        super.setUp()
-    }
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
-    protected void tearDown() {
-        super.tearDown()
-    }
+/**
+ * Unit test cases for the StringUtil class
+ */
+class StringUtilTests extends Specification {
 
-    void testDefaultIfEmpty() {
-		assertEquals 'Has Value', 'abc123', SU.defaultIfEmpty('abc123', 'foo')
-		assertEquals 'Is Blank', 'abc123', SU.defaultIfEmpty('', 'abc123')
-		assertEquals 'Is NULL', 'abc123', SU.defaultIfEmpty(null, 'abc123')
-		assertEquals 'Is Zero(0)', '0', SU.defaultIfEmpty('0', 'abc123')		
-    }
+	protected void setup() {
+	}
 
-    void testEllipsis() {
-    	assertEquals 'No Ellipsis', 'abcdef', SU.ellipsis('abcdef', 10)
-    	assertEquals 'Has Ellipsis', 'abc...', SU.ellipsis('abcdefgh', 6)
-    	// assertEquals 'Less than 3', 'ab', SU.ellipsis('abcdef', 2)
-    }
+	protected void cleanup() {
+	}
 
-    void testStripOffPrefixChars() {
+	void testDefaultIfEmpty() {
+		expect:
+			// Has Value
+			'abc123'.equals(SU.defaultIfEmpty('abc123', 'foo'))
+			// Is Blank
+			'abc123'.equals(SU.defaultIfEmpty('', 'abc123'))
+			// Is NULL
+			'abc123'.equals(SU.defaultIfEmpty(null, 'abc123'))
+			// Is Zero(0)
+			'0'.equals(SU.defaultIfEmpty('0', 'abc123'))
+	}
 
-    	assertEquals 'Stripped', 'Smith', SU.stripOffPrefixChars('Mr. ', 'Mr. Smith')    	
-    	assertEquals 'Skipped', 'Jones', SU.stripOffPrefixChars('xyz', 'Jones')
-    }
+	void testEllipsis() {
+		expect:
+			// No Ellipsis
+			'abcdef'.equals(SU.ellipsis('abcdef', 10))
+			// Has Ellipsis
+			'abc...'.equals(SU.ellipsis('abcdefgh', 6))
+	}
 
-    void testSplit() {
-        assertTrue 'space', ['a','b','c'] == SU.split(' a b c ')
-        assertTrue 'spaces', ['a','b','c'] == SU.split('a    b    c')
-        assertTrue 'tabs', ['a','b','c'] == SU.split(" a\tb\tc ")
-        assertTrue 'comma', ['a','b','c'] == SU.split(' a,b,c', ',')
-        assertTrue 'commaWithSpace', ['a','b','c'] == SU.split(' a, b, c ', ',')
-        assertTrue 'regex', ['a','b','c'] == SU.split('a.b.c', /\./)
-        assertTrue 'Empty string', [] == SU.split('')
-        assertTrue 'Null string', [] == SU.split(null)
+	void testStripOffPrefixChars() {
+		expect:
+			// Stripped
+			'Smith'.equals(SU.stripOffPrefixChars('Mr. ', 'Mr. Smith'))
+			// Skipped
+			'Jones'.equals(SU.stripOffPrefixChars('xyz', 'Jones'))
+	}
 
-    }
+	void testSplit() {
+		expect:
+			// space
+			['a','b','c'] == SU.split(' a b c ')
+			// spaces
+			['a','b','c'] == SU.split('a    b    c')
+			// tabs
+			['a','b','c'] == SU.split(" a\tb\tc ")
+			// comma
+			['a','b','c'] == SU.split(' a,b,c', ',')
+			// commaWithSpace
+			['a','b','c'] == SU.split(' a, b, c ', ',')
+			// regex
+			['a','b','c'] == SU.split('a.b.c', /\./)
+			// Empty string
+			[] == SU.split('')
+			// Null string
+			[] == SU.split(null)
+	}
 
-    void testContainsAny() {
-        assertTrue 'case insensitive', SU.containsAny('abcdefg', ['a','c'])
-        assertTrue 'case sensitive', SU.containsAny('abCdeFg', ['C','Z'])
-        assertFalse 'no match', SU.containsAny('abcdefg', ['X','y'])
-    }
+	void testContainsAny() {
+		expect:
+			// case insensitive
+			SU.containsAny('abcdefg', ['a','c'])
+			// case sensitive
+			SU.containsAny('abCdeFg', ['C','Z'])
+			// no match
+			!SU.containsAny('abcdefg', ['X','y'])
+	}
 
-    void testContainsAll() {
-        assertTrue 'case insensitive', SU.containsAll('abcdefg', ['a','c'])
-        assertTrue 'case sensitive', SU.containsAll('abCdeFg', ['C','F'])
-        assertFalse 'no match', SU.containsAll('abcdefg', ['a','Z'])
-    }
+	void testContainsAll() {
+		expect:
+			// case insensitive
+			SU.containsAll('abcdefg', ['a','c'])
+			// case sensitive
+			SU.containsAll('abCdeFg', ['C','F'])
+			// no match
+			!SU.containsAll('abcdefg', ['a','Z'])
+	}
 
-    void testConCat() {
-        assertEquals "one", SU.concat('', 'one')
-        assertEquals "one-NULL", SU.concat(null, 'one-NULL')
-        assertEquals "one,two", SU.concat('one', 'two')
-        assertEquals "one : two", SU.concat('one', 'two', ' : ')
-    }
+	void testConCat() {
+		expect:
+			"one".equals(SU.concat('', 'one'))
+			"one-NULL".equals(SU.concat(null, 'one-NULL'))
+			"one,two".equals(SU.concat('one', 'two'))
+			"one : two".equals(SU.concat('one', 'two', ' : '))
+	}
 }

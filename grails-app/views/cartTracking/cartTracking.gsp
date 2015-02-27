@@ -95,7 +95,7 @@
 		var projectId = $("#projectId").val();
 		var moveBundle = $("#moveBundleId").val();
 		var assetAction = $("#assetActionId").val()
-		${remoteFunction(action:'getAssetsOnCart', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle +\'&assetAction=\'+assetAction', onComplete:'showAssetDiv(e)')}
+		${remoteFunction(action:'retrieveAssetsOnCart', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle +\'&assetAction=\'+assetAction', onComplete:'showAssetDiv(XMLHttpRequest)')}
 		timedRefresh('never')
 	}
 	/*-----------------------------------------
@@ -107,7 +107,7 @@
 		var truck = $("#assetsOnTruckId").val();
 		var projectId = $("#projectId").val();
 		var moveBundle = $("#moveBundleId").val();
-		${remoteFunction(action:'getAssetsOnCart', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId +\'&moveBundle=\'+moveBundle +\'&assetAction=\'+id', onComplete:'showAssetDiv(e)')}
+		${remoteFunction(action:'retrieveAssetsOnCart', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId +\'&moveBundle=\'+moveBundle +\'&assetAction=\'+id', onComplete:'showAssetDiv(XMLHttpRequest)')}
 		timedRefresh('never')
 	}
 	/*-----------------------------------------
@@ -173,7 +173,7 @@
      	});     
 	    $("#assetRow_"+asset).addClass('selectedRow');
 		$("#assetEntityId").val(asset);
-		${remoteFunction(action:'getAssetDetails', params:'\'assetId=\' + asset ', onComplete:'showReassignAssetDiv(e)')}
+		${remoteFunction(action:'retrieveAssetDetails', params:'\'assetId=\' + asset ', onComplete:'showReassignAssetDiv(XMLHttpRequest)')}
 	}
 	/*-----------------------------------------
 	* function to show Reassign div
@@ -226,7 +226,7 @@
 		if( confirmMove ){
 			var projectId = $("#projectId").val();
 			var moveBundle = $("#moveBundleId").val();
-			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'removeMoveToTruckLink(e,cart, truck,rowId)')}
+			${remoteFunction(action:'moveToOnTruck', params:'\'cart=\' + cart +\'&truck=\'+truck +\'&projectId=\'+projectId+\'&moveBundle=\'+moveBundle ', onComplete:'removeMoveToTruckLink(XMLHttpRequest, cart, truck,rowId)')}
 			return true;
 		} else {
 			return false
@@ -288,7 +288,7 @@
 				<td style="text-align: right;">
 					<input type="hidden" name="last_refresh_2342131123" value="${new Date()}"/>
 					<input type="button" value="Refresh" onclick="pageReload();"/>
-					<select id="selectTimedId" onchange="${remoteFunction( action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(e)') }">
+					<select id="selectTimedId" onchange="${remoteFunction( action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setRefreshTime(XMLHttpRequest)') }">
 						<option value="60000">1 min</option>
 						<option value="120000">2 min</option>
 						<option value="180000">3 min</option>
@@ -315,19 +315,19 @@
 	</thead>
 	<tbody id="cartTableHighlightId">
 		<g:if test="${cartTrackingDetails}">
-		<g:each in="${cartTrackingDetails}" status="i" var="cartTrackingDetails" >
+		<g:each in="${cartTrackingDetails}" status="i" var="cartTrackingDetailsInst" >
 			<tr class="${(i % 2) == 0 ? 'even' : 'odd'}" id="cartRow_${i}">
-			<td><a href="#" onclick="openChangeTruckDiv('${cartTrackingDetails?.cartDetails?.cart}')">${cartTrackingDetails?.cartDetails?.truck}</a></td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.cart}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.totalAssets}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.pendingAssets}</td>
-			<td onclick="getAssetsOnCart('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}',${i})">${cartTrackingDetails?.cartDetails?.usize ? (Integer)cartTrackingDetails?.cartDetails?.usize : ''}</td>
+			<td><a href="#" onclick="openChangeTruckDiv('${cartTrackingDetailsInst?.cartDetails?.cart}')">${cartTrackingDetailsInst?.cartDetails?.truck}</a></td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetailsInst?.cartDetails?.cart}','${cartTrackingDetailsInst?.cartDetails?.truck}',${i})">${cartTrackingDetailsInst?.cartDetails?.cart}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetailsInst?.cartDetails?.cart}','${cartTrackingDetailsInst?.cartDetails?.truck}',${i})">${cartTrackingDetailsInst?.cartDetails?.totalAssets}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetailsInst?.cartDetails?.cart}','${cartTrackingDetailsInst?.cartDetails?.truck}',${i})">${cartTrackingDetailsInst?.pendingAssets}</td>
+			<td onclick="getAssetsOnCart('${cartTrackingDetailsInst?.cartDetails?.cart}','${cartTrackingDetailsInst?.cartDetails?.truck}',${i})">${cartTrackingDetailsInst?.cartDetails?.usize ? (Integer)cartTrackingDetailsInst?.cartDetails?.usize : ''}</td>
 			<td id="completedTd_${i}">
-			<g:if test="${cartTrackingDetails?.completed}">
+			<g:if test="${cartTrackingDetailsInst?.completed}">
 				<input type="checkbox" checked="checked" disabled="disabled"/>
 			</g:if>
-			<g:elseif test="${cartTrackingDetails?.pendingAssets == 0 }" >
-				<a href="#" onclick="return moveToOnTruck('${cartTrackingDetails?.cartDetails?.cart}','${cartTrackingDetails?.cartDetails?.truck}','${i}')">Move to Truck</a>
+			<g:elseif test="${cartTrackingDetailsInst?.pendingAssets == 0 }" >
+				<a href="#" onclick="return moveToOnTruck('${cartTrackingDetailsInst?.cartDetails?.cart}','${cartTrackingDetailsInst?.cartDetails?.truck}','${i}')">Move to Truck</a>
 			</g:elseif>
 			</td>
 			</tr>
@@ -407,7 +407,7 @@
 	</table>
 </div></div>
 </div>
-<g:javascript>
+<script>
 initialize();
 timedRefresh($("#selectTimedId").val())
 
@@ -420,10 +420,8 @@ $("#reassignAssetDiv").bind('dialogclose', function(){
 		$(row).removeClass('selectedRow');       		
     });   		
 });	
-</g:javascript>
-<script>
-	currentMenuId = "#consoleMenu";
-	$("#consoleMenuId a").css('background-color','#003366')
+currentMenuId = "#consoleMenu";
+$("#consoleMenuId a").css('background-color','#003366')
 </script>
 </body>
 </html>

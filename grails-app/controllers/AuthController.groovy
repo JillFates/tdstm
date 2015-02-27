@@ -15,9 +15,9 @@ class AuthController {
 	def securityService
 	def userPreferenceService
 
-	def index = { redirect(action: 'login', params: params) }
+	def index() { redirect(action: 'login', params: params) }
 
-	def login = {
+	def login() {
 		// Get the various security setup settings
 
 		def redirectURL = session.REDIRECT_URL
@@ -38,7 +38,7 @@ class AuthController {
 		}
 	}
 
-	def signIn = {
+	def signIn() {
 
 		// helper closure used a few times 
 		def loginMap = {
@@ -177,7 +177,7 @@ class AuthController {
 
 	}
 
-	def signOut = {
+	def signOut() {
 		// Log the user out of the application
 		UserLogin userLogin = securityService.getUserLogin()
 		log.info "User $userLogin just logged out of the application"
@@ -187,14 +187,14 @@ class AuthController {
 		redirect(uri: '/')
 	}
 
-	def unauthorized = {
+	def unauthorized() {
 		flash.message = 'You do not have permission to access this page.'
 		render( view:'home' )
 	}
 	/*
 	 *  Action to navigate the admin control home page
 	 */
-	def home = {
+	def home() {
 
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
@@ -230,7 +230,7 @@ class AuthController {
 		render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, moveBundlesList:upcomingBundles ] )
 	}
 	
-	def maintMode = {
+	def maintMode() {
 		//Do nothing
 	}
 }

@@ -8,15 +8,15 @@ class CommentController {
     /*
      * This list returns comments and tasks
      */
-    def list = {
+    def list() {
         render( view: "_list", model: [])
     }
 
-    def editComment = {
+    def editComment() {
         render( view: "_editComment", model: [])
     }
     
-    def showComment = {
+    def showComment() {
         render( view: "_showComment", model: [])
     }
 

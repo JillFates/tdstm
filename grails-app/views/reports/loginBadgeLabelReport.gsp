@@ -160,7 +160,7 @@ var sHint = "C:\\temp\\output";
 
      	} else {
 
-     	 ${remoteFunction(controller:'moveBundleAsset',action:'getTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
+     	 ${remoteFunction(controller:'moveBundleAsset',action:'retrieveTeamsForBundles', params:'\'bundleId=\' + val +\'&projectId=\'+projectId', onComplete:'assignTeams(e)')}
 
      	}     	
      }
@@ -230,7 +230,7 @@ var sHint = "C:\\temp\\output";
 	 var moveBundle = document.getElementById( 'moveBundleId' ).value
 	 var team = document.getElementById( 'projectTeamId' ).value
 	 var location = document.getElementById( 'location' ).value
-	${remoteFunction(action:'getLabelBadges', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId +\'&teamFilter=\'+team+\'&location=\'+location', onComplete:'startprintjob(e)')}
+	${remoteFunction(action:'retrieveLabelBadges', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId +\'&teamFilter=\'+team+\'&location=\'+location', onComplete:'startprintjob(XMLHttpRequest)')}
 	 }
 		$(document).ready(function() {
 		    currentMenuId = "#reportsMenu";

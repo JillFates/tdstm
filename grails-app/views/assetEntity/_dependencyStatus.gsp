@@ -10,12 +10,12 @@
 				</tr>
 			</thead>
 			<tbody id="dependencyStatusTbodyId">
-				<g:each in="${dependencyStatus}" status="i" var="dependencyStatus">
-					<tr id="dependencyStatus_${dependencyStatus.id}">
-						<td>${dependencyStatus.value}</td>
+				<g:each in="${dependencyStatus}" status="i" var="dependencyStatusIt">
+					<tr id="dependencyStatus_${dependencyStatusIt.id}">
+						<td>${dependencyStatusIt.value}</td>
 						<td><span class=" deleteDependencyStatus clear_filter"
 							style="display: none; cursor: pointer;"
-							onClick="deleteAssetStatus(${dependencyStatus.id},$('#dependencyStatusHiddenId').val())"><b>X</b>
+							onClick="deleteAssetStatus(${dependencyStatusIt.id},$('#dependencyStatusHiddenId').val())"><b>X</b>
 						</span></td>
 					</tr>
 				</g:each>

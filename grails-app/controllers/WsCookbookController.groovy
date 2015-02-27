@@ -18,7 +18,7 @@ class WsCookbookController {
 	 * Creates a recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def createRecipe = {
+	def createRecipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -50,7 +50,7 @@ class WsCookbookController {
 	 * Clone a recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def cloneRecipe = {
+	def cloneRecipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -85,7 +85,7 @@ class WsCookbookController {
 	 * Deletes a recipe or a recipe version id version is passed
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def deleteRecipeOrVersion = {
+	def deleteRecipeOrVersion() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -123,7 +123,7 @@ class WsCookbookController {
 	 * Updates the name and description of an existing Recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def updateRecipe = {
+	def updateRecipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -155,7 +155,7 @@ class WsCookbookController {
 	 * Saves a version of the recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def saveRecipeVersion = {
+	def saveRecipeVersion() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -189,7 +189,7 @@ class WsCookbookController {
 	 * Releases a recipe that is WIP
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def releaseRecipe = {
+	def releaseRecipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -218,7 +218,7 @@ class WsCookbookController {
 	 * Reverts a recipe to the previous release version
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def revert = {
+	def revert() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -247,7 +247,7 @@ class WsCookbookController {
 	 * Obtains the information about a recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def recipe = {
+	def recipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -295,7 +295,7 @@ class WsCookbookController {
 	 * Lists the recipes of the current user
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def recipeList = {
+	def recipeList() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -332,7 +332,7 @@ class WsCookbookController {
 	 * 
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def recipeVersionList = {
+	def recipeVersionList() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -365,7 +365,7 @@ class WsCookbookController {
 	 * Validates the syntax of the source code of a recipe
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def validateSyntax = {
+	def validateSyntax() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -400,7 +400,7 @@ class WsCookbookController {
 	 * Archive recipes
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def archiveRecipe = {
+	def archiveRecipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -428,7 +428,7 @@ class WsCookbookController {
 	 * Unarchive recipes
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def unarchiveRecipe = {
+	def unarchiveRecipe() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -456,7 +456,7 @@ class WsCookbookController {
 	 * List the groups
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def groups = {
+	def groups() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -483,7 +483,7 @@ class WsCookbookController {
 		}
 	}
 
-	def defineRecipeContext = {
+	def defineRecipeContext() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -507,7 +507,7 @@ class WsCookbookController {
 		}
 	}
 
-	def deleteRecipeContext = {
+	def deleteRecipeContext() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)

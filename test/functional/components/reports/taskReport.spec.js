@@ -6,7 +6,7 @@ describe('Task Report',function(){
   
   it('should load Task Report page after click on Reports > Task Report', function(){
     menu.goToReports('taskReport');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report');
   });
 
   it('should have Task Report as title',function(){

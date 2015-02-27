@@ -70,7 +70,7 @@
 	})
 	function openAssetEditDialig( id ){
 		$("#editFormId").val(id)
-		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( e , 'edit')")}
+		${remoteFunction(controller:"assetEntity", action:"editShow", params:'\'id=\' + id ', onComplete:"showAssetDialog( XMLHttpRequest , 'edit')")}
 	}
 	function showEditAsset(e) {
 		var assetEntityAttributes = eval('(' + e.responseText + ')')
@@ -89,7 +89,7 @@
 			bundles.push($(this).val())
        	});
        	
-		${remoteFunction(controller:'rackLayouts', action:'getRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(e)')}
+		${remoteFunction(controller:'rackLayouts', action:'retrieveRackDetails', params:'\'bundles=\' +bundles', onComplete:'updateRackDetails(XMLHttpRequest)')}
 	}
     </script>
 </head>
@@ -167,7 +167,7 @@
 			bundleObj.val('${currentBundle}');
 			bundleId = bundleObj.val();
 		}
-		${remoteFunction(controller:'rackLayouts',action:'getRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(e)')};
+		${remoteFunction(controller:'rackLayouts',action:'retrieveRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(XMLHttpRequest)')};
 	});
 	
 </script>

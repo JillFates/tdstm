@@ -10,32 +10,43 @@ import com.tds.asset.Application
 import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
+import spock.lang.Specification
 
-class AssetClassTests extends GrailsUnitTestCase {
+/**
+ * Unit test cases for the AssetClass class
+*/
+class AssetClassTests extends Specification {
 
 	// Validate that domainNameFor returns the expected GORM domain class name for each AssetClass
 	void testDomainNameFor() {
-		assertEquals "Application", AssetClass.domainNameFor(AssetClass.APPLICATION)
-		assertEquals "AssetEntity", AssetClass.domainNameFor(AssetClass.DEVICE)
-		assertEquals "Database", AssetClass.domainNameFor(AssetClass.DATABASE)
-		assertEquals "Files", AssetClass.domainNameFor(AssetClass.STORAGE)
+		expect:
+			"Application" == AssetClass.domainNameFor(AssetClass.APPLICATION)
+			"AssetEntity" == AssetClass.domainNameFor(AssetClass.DEVICE)
+			"Database" == AssetClass.domainNameFor(AssetClass.DATABASE)
+			"Files" == AssetClass.domainNameFor(AssetClass.STORAGE)
 	}
 
 	// Validate that domainClassFor returns the appropriate GORM domain classes as expected for each AssetClass
 	void testDomainClassFor() {
-		assertEquals Application, AssetClass.domainClassFor(AssetClass.APPLICATION)
-		assertEquals AssetEntity, AssetClass.domainClassFor(AssetClass.DEVICE)
-		assertEquals Database, AssetClass.domainClassFor(AssetClass.DATABASE)
-		assertEquals Files, AssetClass.domainClassFor(AssetClass.STORAGE)
+		expect:
+			Application == AssetClass.domainClassFor(AssetClass.APPLICATION)
+			AssetEntity == AssetClass.domainClassFor(AssetClass.DEVICE)
+			Database == AssetClass.domainClassFor(AssetClass.DATABASE)
+			Files == AssetClass.domainClassFor(AssetClass.STORAGE)
 	}
 
 	// Test that getClassOptions returns a map with some of the expected keys
 	void testGetClassOptions() {
 		Map map = AssetClass.getClassOptions()
-		assertTrue 'Contains App', map.containsKey('APPLICATION')
-		assertTrue 'Contains SERVER-DEVICE', map.containsKey('SERVER-DEVICE')
-		assertTrue 'Contains STORAGE-DEVICE', map.containsKey('STORAGE-DEVICE')
-		assertTrue 'Contains OTHER-DEVICE', map.containsKey('OTHER-DEVICE')
+		expect:
+			// Contains App
+			map.containsKey('APPLICATION')
+			// Contains SERVER-DEVICE
+			map.containsKey('SERVER-DEVICE')
+			// Contains STORAGE-DEVICE
+			map.containsKey('STORAGE-DEVICE')
+			// Contains OTHER-DEVICE
+			map.containsKey('OTHER-DEVICE')
 	}
 
 }

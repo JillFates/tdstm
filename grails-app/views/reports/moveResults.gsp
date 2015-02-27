@@ -19,7 +19,7 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
-<g:form controller="moveEvent" action="getMoveResults">
+<g:form controller="moveEvent" action="retrieveMoveResults">
 <table>
 	<tbody>
 		<tr>
@@ -49,8 +49,8 @@
 		<tr>
 			<td class="buttonR" colspan="2">
 				<input class="button" type="submit" name="generate" value="Generate XLS"/>
-				<g:actionSubmit value="Generate PDF" action="getMoveEventResultsAsPDF"/>
-				<g:actionSubmit value="Generate WEB" action="getMoveEventResultsAsWEB"/>
+				<g:actionSubmit value="Generate PDF" action="retrieveMoveEventResultsAsPDF"/>
+				<g:actionSubmit value="Generate WEB" action="retrieveMoveEventResultsAsWEB"/>
 			</td>
 		</tr>
 	</tbody>

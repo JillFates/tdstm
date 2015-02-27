@@ -89,18 +89,18 @@
 												 <tds:hasPermission permission='RoomListActionColumn'>
 													<td><input type="checkbox" class="listCheck" name="checkbox_${roomInstance.id}" id="roomCheckBoxId" onclick="enableActions()"></td>
 												</tds:hasPermission>
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "location")}</td>
 												
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "roomName")}</td>
 
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "city")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "city")}</td>
 
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "stateProv")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "stateProv")}</td>
 												
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.getRackCountByType('Rack')}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${roomInstance.getRackCountByType('Rack')}</td>
 
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
-												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(e)')}">${roomInstance.source ? 'Source' : 'Target'}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${fieldValue(bean: roomInstance, field: "assetCount")}</td>
+												<td style="cursor: pointer;" onclick="${remoteFunction(action:'show', params:'\'id='+roomInstance.id+'\'', onComplete:'openRoomView(XMLHttpRequest)')}">${roomInstance.source ? 'Source' : 'Target'}</td>
 
 											</tr>
 										</g:each>
@@ -225,7 +225,7 @@
 				<g:if test="${currentBundle}">
 				<g:each in="${models}" var="model">
 					<g:if test="${model?.rearImage && model?.useImage == 1}">
-					<img id="rearImage${model.id}" src="${createLink(controller:'model', action:'getRearImage', id:model.id)}" style="display: none;"/>
+					<img id="rearImage${model.id}" src="${createLink(controller:'model', action:'retrieveRearImage', id:model.id)}" style="display: none;"/>
 					</g:if>
 				</g:each>
 				</g:if>

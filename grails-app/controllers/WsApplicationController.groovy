@@ -20,7 +20,7 @@ class WsApplicationController {
 	 * applications for the user's current project
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def listInBundle = {
+	def listInBundle() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)

@@ -12,6 +12,8 @@ import jxl.format.UnderlineStyle
 import jxl.read.biff.*
 import jxl.write.*
 
+import org.hibernate.criterion.Order
+
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -39,20 +41,20 @@ class MoveEventController {
 	def securityService
 	def projectService
 
-    def index = { redirect(action:list,params:params) }
+    def index() { redirect(action:"list",params:params) }
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 	/*
 	 * will return the list of MoveEvents
 	 */
-    def list = {
+    def list() {
     }
 	
 	/**
 	 * 
 	 */
-	def listJson ={
+	def listJson() {
 		
 		def sortIndex = params.sidx ?: 'name'
 		def sortOrder  = params.sord ?: 'asc'
@@ -61,7 +63,7 @@ class MoveEventController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
 		def project = securityService.getUserCurrentProject()
-		def inProg = params.inProgress ? getInprogList(params.inProgress) : null
+		def inProg = params.inProgress ? retrieveInprogList(params.inProgress) : null
 		
 		def events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
@@ -74,7 +76,7 @@ class MoveEventController {
 			if (inProg)
 				'in'('inProgress', inProg)
 				
-			order(sortIndex, sortOrder).ignoreCase()
+			order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 		}
 		
 		def totalRows = events.totalCount
@@ -94,7 +96,7 @@ class MoveEventController {
 	 * @param : MoveEvent Id
 	 * @return : MoveEvent details  
 	 */
-    def show = {
+    def show() {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveEventId = params.id
 		if(moveEventId){
@@ -115,12 +117,12 @@ class MoveEventController {
 	
 	        if(!moveEventInstance) {
 	            flash.message = "MoveEvent not found with id ${moveEventId}"
-	            redirect(action:list)
+	            redirect(action:"list")
 	        } else { 
 	        	return [ moveEventInstance : moveEventInstance ] 
 	        }
 		} else {
-		    redirect(action:list)
+		    redirect(action:"list")
 		}
     }
 	/*
@@ -128,7 +130,7 @@ class MoveEventController {
 	 * @param : MoveEvent Id
 	 * @return : list of remaining MoveEvents
 	 */
-    def delete = {
+    def delete() {
     	try{
         	def moveEventInstance = MoveEvent.get( params.id )
 	        if(moveEventInstance) {
@@ -146,19 +148,19 @@ class MoveEventController {
     	} catch(Exception ex){
     		flash.message = ex
     	}
-    	redirect(action:list)
+    	redirect(action:"list")
     }
     /*
 	 * return the MoveEvent details for selected MoveEvent to the edit form
 	 * @param : MoveEvent Id
 	 * @return : MoveEvent details  
 	 */
-    def edit = {
+    def edit() {
         def moveEventInstance = MoveEvent.get( params.id )
 
         if(!moveEventInstance) {
             flash.message = "MoveEvent not found with id ${params.id}"
-            redirect(action:list)
+            redirect(action:"list")
         } else {
         	def moveBundles = MoveBundle.findAllByProject( moveEventInstance.project )
         	return [ moveEventInstance : moveEventInstance, moveBundles : moveBundles ]
@@ -169,7 +171,7 @@ class MoveEventController {
 	 * @param : MoveEvent Id
 	 * @return : redirect to the show method
 	 */
-    def update = {
+    def update() {
         def moveEventInstance = MoveEvent.get( params.id )
         
 		if(moveEventInstance) {
@@ -189,20 +191,20 @@ class MoveEventController {
             	moveBundleService.assignMoveEvent( moveEventInstance, moveBundles )
 				
                 flash.message = "MoveEvent '${moveEventInstance.name}' updated"
-                redirect(action:show,id:moveEventInstance.id)
+                redirect(action:"show",id:moveEventInstance.id)
             }
             else {
                 render(view:'edit',model:[moveEventInstance:moveEventInstance])
             }
         } else {
             flash.message = "MoveEvent not found with id ${params.id}"
-            redirect(action:edit,id:params.id)
+            redirect(action:"edit",id:params.id)
         }
     }
     /*
 	 * return blank create page
 	 */
-    def create = {
+    def create() {
         def moveEventInstance = new MoveEvent()
         moveEventInstance.properties = params
         return ['moveEventInstance':moveEventInstance]
@@ -212,7 +214,7 @@ class MoveEventController {
 	 * @param : MoveEvent Id
 	 * @return : redirect to the show method
 	 */
-    def save = {
+    def save() {
 		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def estStartTime = params.estStartTime
@@ -230,7 +232,7 @@ class MoveEventController {
 			moveBundleService.assignMoveEvent( moveEventInstance, moveBundles )
             moveBundleService.createManualMoveEventSnapshot( moveEventInstance )
 			flash.message = "MoveEvent ${moveEventInstance.name} created"
-            redirect(action:show,id:moveEventInstance.id)
+            redirect(action:"show",id:moveEventInstance.id)
         } else {
             render(view:'create',model:[moveEventInstance:moveEventInstance])
         }
@@ -240,7 +242,7 @@ class MoveEventController {
 	 * @param : projectId
 	 * @return : return the list of MoveBundles as JSON object
 	 */
-    def getMoveBundles = {
+    def retrieveMoveBundles() {
     	def projectId = session.CURR_PROJ.CURR_PROJ
 		def moveBundles
 		def project
@@ -257,7 +259,7 @@ class MoveEventController {
      * @param  : moveEvent and reportType.
      * @return : redirect to same page once data exported to Excel.
      *-------------------------------------------------------*/
-	def getMoveResults = {
+	def retrieveMoveResults() {
     	def workbook
 		def book
 		def moveEvent = params.moveEvent
@@ -321,12 +323,12 @@ class MoveEventController {
 		        
 			} catch( Exception ex ) {
 				flash.message = "Exception occurred while exporting data"
-				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 				return;
 			}	
 		} else {
 			flash.message = "Please select MoveEvent and report type. "
-			redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+			redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 			return;
 		}
     }
@@ -336,7 +338,7 @@ class MoveEventController {
      * @param  : moveEvent and reportType.
      * @return : redirect to same page once data exported to PDF.
      *-------------------------------------------------------*/
-	def getMoveEventResultsAsPDF = {
+	def retrieveMoveEventResultsAsPDF() {
 			def moveEvent = params.moveEvent
 			def reportType = params.reportType
 			if(moveEvent && reportType){
@@ -377,12 +379,12 @@ class MoveEventController {
 			            
 				} catch( Exception ex ) {
 					flash.message = "Exception occurred while exporting data"+ex
-					redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+					redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 					return;
 				}	
 			} else {
 				flash.message = "Please select MoveEvent and report type. "
-				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 				return;
 			}
         }
@@ -391,7 +393,7 @@ class MoveEventController {
      * @author : Lokanada Reddy
      * @param  : moveEventId
      *----------------------------------------------------*/
-	def clearHistoricData = {
+	def clearHistoricData() {
 		def moveEventId = params.moveEventId
 		if(moveEventId ){
 			jdbcTemplate.update("DELETE FROM move_event_snapshot WHERE move_event_id = $moveEventId " )
@@ -414,7 +416,7 @@ class MoveEventController {
 	 * @return text
 	 * @usage ajax
 	 */
-	def clearTaskData = {		
+	def clearTaskData() {		
 		def project = securityService.getUserCurrentProject()
 		def moveEvent
 		def msg = ""
@@ -451,7 +453,7 @@ class MoveEventController {
      * @author : Lokanada Reddy
      * @param  : id (moveEvent)
      *----------------------------------------------*/
-    def getMoveEventNewsAndStatus = {
+    def retrieveMoveEventNewsAndStatus() {
     	
     	def moveEvent = MoveEvent.findById(params.id)
 		def statusAndNewsList = []
@@ -513,7 +515,7 @@ class MoveEventController {
      * @author : Lokanada Reddy
      * @param  : moveEventId and moveEvent dialIndicatorValue
      */
-    def updateEventSumamry = {
+    def updateEventSumamry() {
     	def moveEvent = MoveEvent.get( params.moveEventId )
     	def dialIndicator
     	def checkbox = params.checkbox;
@@ -537,7 +539,7 @@ class MoveEventController {
     	}
 		render "success"
      }
-	def getMoveEventResultsAsWEB = {
+	def retrieveMoveEventResultsAsWEB() {
 		def moveEvent = params.moveEvent
 		def reportType = params.reportType
 		if(moveEvent && reportType){
@@ -574,12 +576,12 @@ class MoveEventController {
 					
 			} catch( Exception ex ) {
 				flash.message = "Exception occurred while exporting data"+ex
-				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 				return;
 			}
 		} else {
 			flash.message = "Please select MoveEvent and report type. "
-			redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
+			redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
 			return;
 		}
 	}
@@ -603,7 +605,7 @@ class MoveEventController {
 	/**
 	 * This provides runbookStats that is rendered into a window of the runbook exporting
 	 */
-	def runbookStats = {
+	def runbookStats() {
 		def moveEventId = params.id
 		def projectId =  session.CURR_PROJ.CURR_PROJ
 		def project = Project.get(projectId)
@@ -764,7 +766,7 @@ class MoveEventController {
 			def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
 			def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
 			
-			summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), getCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
+			summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), retrieveCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
 			summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
 			summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager?.toString() )) )
 			summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager?.toString() )) )
@@ -815,7 +817,7 @@ class MoveEventController {
 	 * @return
 	 * @throws WriteException
 	 */
-	def getCellFormat(jxl.format.Colour colour, jxl.format.Pattern pattern) throws WriteException {
+	def retrieveCellFormat(jxl.format.Colour colour, jxl.format.Pattern pattern) throws WriteException {
 		WritableFont cellFont = new WritableFont(WritableFont.ARIAL, 14, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, jxl.format.Colour.WHITE);
 		WritableCellFormat cellFormat = new WritableCellFormat(cellFont);
 		cellFormat.setBackground(colour, pattern);
@@ -829,7 +831,7 @@ class MoveEventController {
 	 * @return  Count of record affected with this update or Error Message if any
 	 * 
 	 */
-	def markEventAssetAsMoved = {
+	def markEventAssetAsMoved() {
 		def assetAffected
 		def errorMsg
 		def project = securityService.getUserCurrentProject()
@@ -867,7 +869,7 @@ class MoveEventController {
 	 * @param inProgress with what character user filterd InProgress property
 	 * @return matched db property of inProgress
 	 */
-	def getInprogList(inProgress){
+	def retrieveInprogList(inProgress){
 		def progList = ['Auto Start':'auto', 'Started':'true', 'Stopped':'false']
 		def returnList = []
 		progList.each{key, value->

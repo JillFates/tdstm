@@ -30,6 +30,18 @@ environments {
 			password = "tdstm"
 			
 	        //logSql = true 
+
+			properties {
+				minEvictableIdleTimeMillis=1800000
+				timeBetweenEvictionRunsMillis=1800000
+				// numTestsPerEvictionRun=3
+				testOnBorrow=true
+				testWhileIdle=true
+				testOnReturn=true
+				removeAbandoned=true
+				removeAbandonedTimeout=600
+				validationQuery="SELECT 1"
+			}
 		}
 	}
 	dbdiff {
@@ -65,6 +77,18 @@ environments {
 
 			// loggingSql = true
 			// logSql = true 
+
+			properties {
+				minEvictableIdleTimeMillis=1800000
+				timeBetweenEvictionRunsMillis=1800000
+				// numTestsPerEvictionRun=3
+				testOnBorrow=true
+				testWhileIdle=true
+				testOnReturn=true
+				removeAbandoned=true
+				removeAbandonedTimeout=600
+				validationQuery="SELECT 1"
+			}
 		}
 	}
 }

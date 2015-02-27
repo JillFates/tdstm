@@ -33,7 +33,7 @@
         var moveBundle = $("#moveBundleId").val()
     	var keyID = e.keyCode
     	if(keyID == 13 && validateManualVal( value )){
-    		${remoteFunction(controller:'moveBundle', action:'createManualStep', params:'\'moveBundleId=\'+ moveBundle +\'&moveBundleStepId=\'+ stepId +\'&tasksCompleted=\'+value', onComplete:'updateStepValue(e , stepId, value)')}
+    		${remoteFunction(controller:'moveBundle', action:'createManualStep', params:'\'moveBundleId=\'+ moveBundle +\'&moveBundleStepId=\'+ stepId +\'&tasksCompleted=\'+value', onComplete:'updateStepValue(XMLHttpRequest , stepId, value)')}
     	}
     }
     /*

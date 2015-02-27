@@ -28,7 +28,7 @@ class PersonController {
 	def sessionFactory
 	def jdbcTemplate
 
-	def index = { redirect(action:list,params:params) }
+	def index() { redirect(action:"list",params:params) }
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
@@ -38,7 +38,7 @@ class PersonController {
 	 * @param id - company id
 	 * @param companyName - optional search by name or 'ALL'
 	 */
-	def list = {
+	def list() {
 		def listJsonUrl
 		def company
 		def currentCompany = securityService.getUserCurrentProject()?.client
@@ -68,7 +68,7 @@ class PersonController {
 					listJsonUrl:listJsonUrl, availabaleRoles:availabaleRoles]
 	}
 	
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'lastname'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')
@@ -160,7 +160,7 @@ class PersonController {
 	/**
 	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
 	 */
-	def bulkDelete = {
+	def bulkDelete() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -197,13 +197,13 @@ class PersonController {
 		}
 	}
 	
-	def show = {
+	def show() {
 			
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		if(!personInstance) {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		} else { 
 			def company = partyRelationshipService.getStaffCompany( personInstance )
 			
@@ -211,7 +211,7 @@ class PersonController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 			
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
@@ -239,20 +239,20 @@ class PersonController {
 				personInstance.lastName = ""
 			}
 			flash.message = "Person ${personInstance} deleted"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 		else {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 	}
 	// return person details to EDIT form
-	def edit = {
+	def edit() {
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		if(!personInstance) {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 		else {
 			
@@ -263,7 +263,7 @@ class PersonController {
 	/**
 	 * Used to update the Person domain objects
 	 */
-	def update = {
+	def update() {
 			
 		def person = Person.get( params.id )
 			
@@ -281,16 +281,16 @@ class PersonController {
 					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', person, "STAFF")
 				}
 				flash.message = "Person '$person' was updated"
-				redirect( action:list, params:[ id:companyId ])
+				redirect( action:"list", params:[ id:companyId ])
 			}
 			else {
 				flash.message = "Person '$person' not updated due to: " + GormUtil.errorsToUL(person)
-				redirect( action:list, params:[ id:companyId ])
+				redirect( action:"list", params:[ id:companyId ])
 			}
 		}
 		else {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ])
+			redirect( action:"list", params:[ id:companyId ])
 		}
 	}
 
@@ -298,7 +298,7 @@ class PersonController {
 	 * Used to save a new Person domain object
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
-	def save = {
+	def save() {
 		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're 
 		// going to use the company associated with the current project.
 		def isAjaxCall = params.forWhom != "person"
@@ -378,14 +378,14 @@ class PersonController {
 		} else {
 			if (errMsg) 
 				flash.message = errMsg
-			redirect( action:list, params:[ companyId:companyId ] )
+			redirect( action:"list", params:[ companyId:companyId ] )
 		}
 
 	}
 
 
 	//	Ajax Overlay for show
-	def editShow = {
+	def editShow() {
 		
 		def personInstance = Person.get( params.id )        
 		def companyId = params.companyId
@@ -396,7 +396,7 @@ class PersonController {
 		def lastUpdatedFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.lastUpdated, tzId ) )
 		if(!personInstance) {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 		else {       	
 
@@ -409,7 +409,7 @@ class PersonController {
 		}
 	}
 	//ajax overlay for Edit
-	def editStaff = {
+	def editStaff() {
 		def map = new HashMap()
 		// TODO - SECURITY - this should have some VALIDATION to who has access to which Staff...
 		def personInstance = Person.read( params.id )
@@ -434,7 +434,7 @@ class PersonController {
 	/*
 	 *  Remote method to update Staff Details
 	 */
-	def updateStaff = {
+	def updateStaff() {
 		def personInstance = Person.get( params.id )
 		def projectId = session.CURR_PROJ.CURR_PROJ
 		def roleType = params.roleType
@@ -454,20 +454,20 @@ class PersonController {
 				def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
 				 
 				flash.message = "Person ${personInstance} updated"
-				redirect( action:projectStaff, params:[ projectId:projectId ])
+				redirect( action:"projectStaff", params:[ projectId:projectId ])
 			} else {
 				flash.message = "Person ${personInstance} not updated"
-				redirect( action:projectStaff, params:[ projectId:projectId ])
+				redirect( action:"projectStaff", params:[ projectId:projectId ])
 			}
 		} else {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:projectStaff, params:[ projectId:projectId ])
+			redirect( action:"projectStaff", params:[ projectId:projectId ])
 		}
 	}
 	/*
 	 *  Return Project Staff 
 	 */
-	def projectStaff = {
+	def projectStaff() {
 		def projectId = session.CURR_PROJ.CURR_PROJ
 		def submit = params.submit
 		def role = ""
@@ -481,7 +481,7 @@ class PersonController {
 	/*
 	 * Method to add Staff to project through Ajax Overlay 
 	 */
-	def saveProjectStaff = {
+	def saveProjectStaff() {
 		
 		def flag = false
 		def message = ''
@@ -524,7 +524,7 @@ class PersonController {
 	/*
 	 * Method to save person details and create party relation with Project as well 
 	 */
-	def savePerson = {
+	def savePerson() {
 		def personInstance = new Person( params )
 		
 		//personInstance.dateCreated = new Date()
@@ -558,7 +558,7 @@ class PersonController {
 	 * @param  : person id
 	 * @return : person details as JSON
 	 *----------------------------------------------------------*/
-	def getPersonDetails = {
+	def retrievePersonDetails() {
 		def personId = params.id
 		def person = Person.findById( personId  )
 		def userLogin = UserLogin.findByPerson( person )
@@ -576,7 +576,7 @@ class PersonController {
 	 * @param  : person id and input password
 	 * @return : pass:"no" or the return of the update method
 	 *----------------------------------------------------------*/
-	def checkPassword = {
+	def checkPassword() {
 		if(params.oldPassword == "")
 			return updatePerson(params)
 		def password = "" + params.newPassword;
@@ -604,7 +604,7 @@ class PersonController {
 	 * @param  : person details and user password
 	 * @return : person firstname
 	 *----------------------------------------------------------*/
-	def updatePerson = {
+	def updatePerson() {
 		def personInstance = Person.get(params.id)
 		def ret = []
 		params.travelOK == "1" ? params : (params.travelOK = 0)
@@ -702,7 +702,7 @@ class PersonController {
 	 * @ returns - staff list.
 	 * 
 	 */
-	def manageProjectStaff = {
+	def manageProjectStaff() {
 		def start = new Date()
 		
 		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
@@ -812,7 +812,7 @@ class PersonController {
 		
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 		return [projects:reqProjects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
-			moveEventList:getBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
+			moveEventList:retrieveBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
 			currPhase:currPhase, currScale:currScale, project:project, editPermission:editPermission,
 			assigned:assigned, onlyClientStaff:onlyClientStaff]
 		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
@@ -827,7 +827,7 @@ class PersonController {
 	 * @param location - location to filter staff list
 	 * @return HTML 
 	 */
-	def loadFilteredStaff = {
+	def loadFilteredStaff() {
 		def role = request.JSON.role ?: 'AUTO'
 		def projectId = (request.JSON.project.isNumber()) ? (request.JSON.project.toLong()) : (0)
 		def scale = request.JSON.scale
@@ -969,7 +969,7 @@ class PersonController {
 			log.info "A ${it}"
 		}*/
 		
-		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:getBundleHeader(moveEvents),
+		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:retrieveBundleHeader(moveEvents),
 					projectId:projectId, project:project, editPermission:editPermission,
 					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
 		
@@ -982,7 +982,7 @@ class PersonController {
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
 	 */
-	def getStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
+	def retrieveStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
 	
 		def sortOn = paramsMap.sortOn ?:"lastName"
 		def orderBy = paramsMap.orderBy?:'asc'
@@ -1128,7 +1128,7 @@ class PersonController {
 	 *@param person Id is id of person
 	 *@return NA
 	 */
-	def loadGeneral = {
+	def loadGeneral() {
 		log.info "class: ${params.personId.class}    value: ${params.personId}"
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
@@ -1156,7 +1156,7 @@ class PersonController {
 	 *@param moveEvents list of moveEvent for selected project
 	 *@return MAP of bundle header containing projectName ,event name, start time and event id
 	 */
-	def getBundleHeader(moveEvents) {
+	def retrieveBundleHeader(moveEvents) {
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
 		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
@@ -1192,7 +1192,7 @@ class PersonController {
 	 * @param id as composite id contains personId , MoveEventId and roleType id with separated of '-'
 	 * @return if updated successful return true else return false
 	 */
-	def saveEventStaff = {
+	def saveEventStaff() {
 		// Validates the user is logged in.
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
@@ -1222,7 +1222,7 @@ class PersonController {
 	 * @param prefCode : Preference Code that is requested for being deleted
 	 * @return : boolean
 	 */
-	def removeUserPreference = {
+	def removeUserPreference() {
 		def prefCode = params.prefCode
 		if(prefCode != "Current Dashboard")
 			userPreferenceService.removePreference(prefCode)
@@ -1236,7 +1236,7 @@ class PersonController {
 	 * @param N/A : 
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
-	def editPreference = {
+	def editPreference() {
 		def loggedUser = securityService.getUserLogin()
 		def prefs = UserPreference.findAllByUserLogin( loggedUser ,[sort:"preferenceCode"])
 		def prefMap = [:]
@@ -1301,7 +1301,7 @@ class PersonController {
 	 * @param : ids[] is array of 2 id which user want to compare or merge
 	 * @return : all column list , person list and userlogin list which we are display at client side
 	 */
-	def compareOrMerge ={
+	def compareOrMerge() {
 		
 		def ids = params.list("ids[]")
 		def personsMap = [:]
@@ -1341,7 +1341,7 @@ class PersonController {
 	 * @return : Appropriate message after merging
 	 */
 	
-	def mergePerson ={
+	def mergePerson() {
 		
 		def toPerson = Person.get(params.toId)
 		def fromPersons = params.list("fromId[]")

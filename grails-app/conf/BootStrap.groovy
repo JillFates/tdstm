@@ -9,6 +9,7 @@ import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.shiro.crypto.hash.Sha256Hash
 
+import org.grails.refcode.RefCode
 
 class BootStrap {
 	def assetEntityAttributeLoaderService

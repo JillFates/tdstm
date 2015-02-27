@@ -1,10 +1,14 @@
-import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.TimeCategory
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
 /** 
  * Unit Test class to test the Domain class StepSnapshot
  */
-class StepSnapshotTests extends GroovyTestCase {
-	def ss 
+@TestFor(StepSnapshot)
+class StepSnapshotTests extends Specification {
+
+    def ss 
 	
 	void initTest() {
 		def now = new Date()
@@ -21,31 +25,42 @@ class StepSnapshotTests extends GroovyTestCase {
 		initTest()
 		assertEquals "Takes 1 minute per task (seconds)", 60, ss.planTaskPace
 
-		ss.tasksCount = 60
-		assertEquals "Takes 2 minutes per task", 120, ss.planTaskPace
+        when: "step 1"
+		   ss.tasksCount = 60
+        then:
+		   120 == ss.planTaskPace //Takes 2 minutes per task
 		
-		ss.tasksCount = 240
-		assertEquals "1/2 minute per task", 30, ss.planTaskPace
+        when: "step 2"
+		   ss.tasksCount = 240
+        then:
+		   30 == ss.planTaskPace //1/2 minute per task
     }
 
 	void testGetActualTaskPace () {
 		initTest()
 		
-		ss.duration = 3600	// 1 hr
+        when: "step 1"
+		   ss.duration = 3600	// 1 hr
+		then:
+		   60 == ss.actualTaskPace //Completed 60 in 1 hour so 1 min (sec)
 		
-		assertEquals "Completed 60 in 1 hour so 1 min (sec)", 60, ss.actualTaskPace
-		
-		ss.tasksCompleted = 0
-		assertEquals "Nothing has been completed", 0, ss.actualTaskPace
+        when: "step 2"
+		   ss.tasksCompleted = 0
+        then:
+		   0 == ss.actualTaskPace //Nothing has been completed
 	}
 	
 	void testGetProjectedTimeRemaining () {
 		initTest()
 		
-		assertEquals "Should complete in 1 hour", 3600, ss.projectedTimeRemaining
+        when: "step 1"
+        then:
+		   3600 == ss.projectedTimeRemaining //Should complete in 1 hour
 
-		ss.tasksCompleted = ss.tasksCount
-		assertEquals "Should be all done", 0, ss.projectedTimeRemaining
+        when: "step 1"
+		   ss.tasksCompleted = ss.tasksCount
+        then:
+		   0 == ss.projectedTimeRemaining //Should be all done
 			
 	}
 }

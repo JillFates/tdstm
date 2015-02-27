@@ -6,7 +6,7 @@ var ViewAsset = function(){
   this.typeLabel = this.viewModal.$('[for="assetType"]');
   this.editBtn = this.viewModal.$('[onclick^="EntityCrud.showAssetEditView"]');
   this.deleteBtn = this.viewModal.$('[onclick="return confirm(\'Are you sure?\');"]');
-  this.addCommentBtn = this.viewModal.$('[src="/tdstm/icons/comment_add.png"]');
+  this.addCommentBtn = this.viewModal.$('[src="/tdstm/static/icons/comment_add.png"]');
   this.addTaskBtn = this.viewModal.$('[src="/tdstm/i/db_table_light.png"]');
   this.addTaskCommentBtnList = this.viewModal.$$('a[href^="javascript:createIssue"]');
   this.closeBtn = this.viewModal.$('.ui-dialog-titlebar-close');

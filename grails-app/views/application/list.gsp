@@ -96,9 +96,7 @@
 					gridComplete="function(){bindResize('applicationId');recompileDOM('applicationIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					showPager="true"
-					loadComplete=function(){
-						resizeGrid()
-					}
+					loadComplete="function(){resizeGrid()}"
 					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
 						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
 						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">

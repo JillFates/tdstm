@@ -12,7 +12,7 @@
 <meta name="viewport" content="height=device-height,width=220" />
 	
 	<%--
-	<g:javascript library="prototype" />
+	<g:javascript src="prototype/prototype.js" />
 	<jq:plugin name="jquery.combined" />
 	--%>
 	

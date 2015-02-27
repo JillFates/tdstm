@@ -12,7 +12,7 @@
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.dialog.css')}" />
     <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.theme.css')}" />
     <link rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" type="text/css"/>
-    <g:javascript library="prototype" />
+    <g:javascript src="prototype/prototype.js" />
     <jq:plugin name="jquery.combined" />
     <g:layoutHead />
 	
@@ -61,7 +61,7 @@
           	<g:if test="${isIE6}">
 				<span><img title="Note: MS IE6 has limited capability so functions have been reduced." src="${resource(dir:'images/skin',file:'warning.png')}" style="width: 14px;height: 14px;float: left;padding-right: 3px;"/></span>
 			</g:if>
-              	<g:remoteLink controller="person" action="getPersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
+              	<g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">
 			<strong>
 		
 			<div style="float: left;">

@@ -25,12 +25,12 @@ class TaskController {
 	def jdbcTemplate
 	def reportsService
 
-	def index = { }
+	def index() { }
 	
 	/**
 	* Used by the myTasks and Task Manager to update tasks appropriately.
 	*/
-	def update = {
+	def update() {
 		def map = commentService.saveUpdateCommentAndNotes(session, params, false, flash)
 
 		if (params.view == 'myTask') {		
@@ -60,7 +60,7 @@ class TaskController {
 	 * @params : id, status
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
-	def assignToMe = {
+	def assignToMe() {
 		def task = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
@@ -116,9 +116,9 @@ class TaskController {
 	 *  @params id - the task (aka AssetComment) id number for the task bark
 	 *  @return : actions bar as HTML (Start, Done, Details, Assign To Me)
 	 */
-	def genActionBarHTML = {
+	def genActionBarHTML() {
 		def comment = AssetComment.get(params.id)
-		def actionBar = getActionBarData(comment); 
+		def actionBar = retrieveActionBarData(comment); 
 		render actionBar.toString()
 	}
 	
@@ -127,7 +127,7 @@ class TaskController {
 	 * @param comment : instance of asset comment
 	 * @return : Action Bar HTML code.
 	 */
-	def getActionBarData (comment){
+	def retrieveActionBarData(comment) {
 		// There are a total of 13 columns so we'll subtract for each conditional button
 		def cols=12
 		def userLogin = securityService.getUserLogin()
@@ -183,7 +183,7 @@ class TaskController {
 	 * @param asset comment id.
 	 * @render : Action Bar HTML code.
 	 */
-	def genActionBarForShowView = {
+	def genActionBarForShowView() {
 		def comment = AssetComment.get(params.id)
 		StringBuffer actionBar = new StringBuffer("""<span class="slide" style=" margin-top: 4px;">""")
 		def cols=12
@@ -236,7 +236,7 @@ class TaskController {
 	 * @param asset comment id.
 	 * @render : Action Bar JSON code.
 	 */
-	def genActionBarForShowViewJson = {
+	def genActionBarForShowViewJson() {
 		def comment = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
 		def actionBar = []
@@ -293,7 +293,7 @@ class TaskController {
 	 * @param taskId
 	 * @return redirect to URI of image or HTML showing the error
 	 */
-	def neighborhoodGraphSvg = {
+	def neighborhoodGraphSvg() {
 		def errorMessage = ''
 
 		while (true) {	
@@ -468,7 +468,7 @@ digraph runbook {
 	 * @param mode - flag as to what mode to display the graph as (s=status, ?=default)
 	 * @return redirect to URI of image or HTML showing the error
 	 */
-	def moveEventTaskGraphSvg = {
+	def moveEventTaskGraphSvg() {
 		def errorMessage = ''
 		
 		// Create a loop that we can break out of as we need to	
@@ -621,7 +621,7 @@ digraph runbook {
 				
 				def svgText = svgFile.text
 				def data = [svgText:svgText, roles:roles, tasks:tasks]
-				render data as JSON
+				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
 				return false
 				
 			} catch (e) {
@@ -645,12 +645,12 @@ digraph runbook {
 	/**
 	 * Used to render neighborhood task graphs by passing the id argument to the taskGraph
 	 */
-	def neighborhoodGraph = {
+	def neighborhoodGraph() {
 		Long id = params.id?.isLong() ? params.id.toLong() : 0L
 		forward action:'taskGraph', params: ['neighborhoodTaskId':id]
 	}
 
-	def taskGraph = {
+	def taskGraph() {
 		// handle project
 		def project = securityService.getUserCurrentProject()
 		if ( ! project ) {
@@ -685,7 +685,7 @@ digraph runbook {
 	 * @param prefFor - Key 
 	 * @param selected : value
 	 */
-	def setLabelQuantityPref = {
+	def setLabelQuantityPref() {
 		def key = params.prefFor
 		def selected=params.list('selected[]')[0] ?:params.selected
 		if(selected){
@@ -700,7 +700,7 @@ digraph runbook {
 	 * @param : id[] : list of id whose status is ready or started
 	 * @return : map consist of id of task and action bar 
 	 */
-	def genBulkActionBarHTML = {
+	def genBulkActionBarHTML() {
 		def taskIds =  params.list("id[]")
 		def resultMap = [:]
 		taskIds.each{
@@ -719,7 +719,7 @@ digraph runbook {
 	 * @param : commentId.
 	 * @return : retMap. 
 	 */
-	def changeEstTime = {
+	def changeEstTime() {
 		def etext = ""
 		def comment
 		def commentId = NumberUtils.toInt(params.commentId)
@@ -773,7 +773,7 @@ digraph runbook {
 		render retMap as JSON
 	}
 	
-	def taskTimeline = {
+	def taskTimeline() {
 		// handle project
 		def project = securityService.getUserCurrentProject()
 		if ( ! project ) {
@@ -795,7 +795,7 @@ digraph runbook {
 	}
 	
 	// gets the JSON object used to populate the task graph timeline
-	def taskTimelineData = {
+	def taskTimelineData() {
 		
 		// handle project
 		long projectId = securityService.getUserCurrentProject().id
@@ -890,22 +890,22 @@ digraph runbook {
 		render data
 	}
 
-	def editTask = {
+	def editTask() {
 		render( view: "_editTask", model: [])
 	}
 
-	def showTask = {
+	def showTask() {
 		render( view: "_showTask", model: [])
 	}
 
-    def list = {
+    def list() {
         render( view: "_list", model: [])
     }
 
 	/**
 	 * Get task roles
 	 */
-	def getStaffRoles = {
+	def retrieveStaffRoles() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -931,7 +931,7 @@ digraph runbook {
 	 * @param params.eventId - the event id to generate the data for or default to the user's current event
 	 * @param params.showAll - flag to indicate including all columns of just the planning ones (true|false)
 	 */
-	def eventTimelineResults = {
+	def eventTimelineResults() {
 
 		// Get the form parameters
 		Boolean showAll = (params.showAll == 'true')

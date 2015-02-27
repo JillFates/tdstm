@@ -28,7 +28,7 @@ class RackLayoutsController {
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations
 	 */
-	def create = {
+	def create() {
 
 		def project = controllerService.getProjectForPage( this, 'RoomEditView' )
 		if (! project) 
@@ -93,7 +93,7 @@ class RackLayoutsController {
 	/**
 	 * Used to generate multiple rack elevation diagrams
 	 */
-	def generateElevations = {
+	def generateElevations() {
 
 		// TODO : JPM 10/2014 : generateElevations method is using incorrect permission (RoomEditView)
 		def (project,userLogin) = controllerService.getProjectAndUserForPage( this, 'RoomEditView' )
@@ -345,11 +345,11 @@ class RackLayoutsController {
 			]
 			
 			if (backView) {
-				backViewRows = getRackLayout(paramsMap)
+				backViewRows = retrieveRackLayout(paramsMap)
 			}
 			if (frontView) {
 				paramsMap["backView"] = null
-				frontViewRows = getRackLayout(paramsMap)
+				frontViewRows = retrieveRackLayout(paramsMap)
 			}
 			rackLayout << [ assetDetails: assetDetails, rack: rack.tag , room: rack.room,
 				frontViewRows: frontViewRows, backViewRows: backViewRows , rackId: rack.id]
@@ -368,7 +368,7 @@ class RackLayoutsController {
 		return model
 	}
 	
-	def getRackDetails = {
+	def retrieveRackDetails() {
 		def bundleIds = params.bundles
 		def moveBundles = []
 		if(bundleIds.contains('all')){
@@ -399,7 +399,7 @@ class RackLayoutsController {
 	/**
 	 * Used to generate the HTML that represents a Rack
 	 */
-	private getRackLayout( paramsMap){
+	private retrieveRackLayout( paramsMap){
 		def rows = new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
@@ -781,14 +781,14 @@ class RackLayoutsController {
 		return bladeTable.toString()
 	}
 
-	def modelTemplate = {
+	def modelTemplate() {
 		return [params:params]
 	}
 
 	/*
 	 * Return AssetCableMap record details to display at RackLayout cabling screen
 	 */
-	def getCablingDetails = {
+	def retrieveCablingDetails() {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject( project )
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
@@ -903,7 +903,7 @@ class RackLayoutsController {
 	/*
 	 * Return modelConnectorList to display at connectors dropdown in  cabling screen
 	 */
-	def getAssetModelConnectors = {
+	def retrieveAssetModelConnectors() {
 		def jsonInput = request.JSON
 		def roomType = jsonInput.roomType
 		def assetId =jsonInput.asset
@@ -933,7 +933,7 @@ class RackLayoutsController {
 	/*
 	 * Update the AssetCablingMap with the date send from RackLayout cabling screen
 	 */
-	def updateCablingDetails = {
+	def updateCablingDetails() {
 		def jsonInput = request.JSON
 		def assetId = NumberUtils.toDouble(jsonInput.assetId,0).round() 
 		def assetCableId = jsonInput.assetCable
@@ -1035,7 +1035,7 @@ class RackLayoutsController {
 	/*
 	 *  Provide the Rack auto complete details and connector, uposition validation 
 	 */
-	def getAutoCompleteDetails = {
+	def retrieveAutoCompleteDetails() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def project = Project.get( projectId )
@@ -1088,7 +1088,7 @@ class RackLayoutsController {
 				cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
 				if(assetEntity.model.rearImage && assetEntity.model.useImage == 1){
 					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
-					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getRearImage', id:assetEntity?.model?.id)}\' />")
+					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'retrieveRearImage', id:assetEntity?.model?.id)}\' />")
 				} else {
 					cableDiagram.append("<div class='cablingPanel' style='height: "+(assetEntity?.model?.usize ? assetEntity?.model?.usize*30 : 30)+"px'>")
 				}
@@ -1104,7 +1104,7 @@ class RackLayoutsController {
 				if( assetEntity.model.frontImage ){
 					cableDiagram = new StringBuffer("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;padding:0;'>")
 					cableDiagram.append("<div class='cablingPanel' style='height:auto;background-color:#FFF'>")
-					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'getFrontImage', id:assetEntity?.model?.id)}\' />")
+					cableDiagram.append("<img src=\'${createLink(controller:'model', action:'retrieveFrontImage', id:assetEntity?.model?.id)}\' />")
 					cableDiagram.append("</div></td></tr></table>")
 				}
 			}
@@ -1114,7 +1114,7 @@ class RackLayoutsController {
 	/**
 	 * This action is used for saving 'ShowAddIcons' Preference 
 	 */
-	def savePreference = {
+	def savePreference() {
 		def preference = params.preference
 		if(params.add == "true"){
 			userPreferenceService.setPreference(preference, "true")
@@ -1136,7 +1136,7 @@ class RackLayoutsController {
 	 *  @param rackId - id of requested rack.
 	 *  @return -  flash message
 	*/
-	def assignPowers = {
+	def assignPowers() {
 		def rack
 		if (params.roomId){
 			def roomInstance = Room.read(params.roomId)
@@ -1185,7 +1185,7 @@ class RackLayoutsController {
 	 * @param : targetrack[] : list of target racks
 	 * @return : json list
 	 */
-	def getAssignedCables = {
+	def retrieveAssignedCables() {
 		List bundleId = request.getParameterValues("moveBundle[]")
 		def sourceRacks = new ArrayList()
 		def targetRacks = new ArrayList()

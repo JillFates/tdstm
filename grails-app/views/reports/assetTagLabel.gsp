@@ -138,7 +138,7 @@ function mySelect(x)
 	 function generateLabels() {
 	 	var projectId = ${projectInstance?.id}
 	 	var moveBundle = document.getElementById( 'moveBundleId' ).value
-		${remoteFunction(controller:'moveBundleAsset', action:'getAssetTagLabelData', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId ', onComplete:'startprintjob(e)')}
+		${remoteFunction(controller:'moveBundleAsset', action:'retrieveAssetTagLabelData', params:'\'moveBundle=\' + moveBundle +\'&project=\'+projectId ', onComplete:'startprintjob(XMLHttpRequest)')}
 	 }
      
     </script>

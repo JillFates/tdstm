@@ -34,11 +34,11 @@ class ModelController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index = {
+    def index() {
         redirect(action: "list", params: params)
     }
 
-    def list = {
+    def list() {
 		def modelPref= assetEntityService.getExistingPref('Model_Columns')
 		def attributes = Model.getModelFieldsAndlabels()
 		def columnLabelpref=[:]
@@ -51,7 +51,7 @@ class ModelController {
 	/**
 	 * This method is used by JQgrid to load modelList
 	 */
-	def listJson = {
+	def listJson() {
 		def sortOrder = (params.sord in ['asc','desc']) ? (params.sord) : ('asc')
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
@@ -188,7 +188,7 @@ class ModelController {
 		*/
 	
 
-    def create = {
+    def create() {
     	def modelId = params.modelId
         def modelInstance = new Model()
     	def modelConnectors
@@ -207,7 +207,7 @@ class ModelController {
 				otherConnectors:otherConnectors, modelTemplate:modelTemplate, powerType : powerType ]
     }
 
-    def save = {
+    def save() {
 		try {
 			def user = securityService.getUserLogin()
 			
@@ -338,7 +338,7 @@ class ModelController {
 						modelInstance.findOrCreateAliasByName(aka, true)
 				}
 	            flash.message = "${modelInstance.modelName} created"
-	            redirect(action:list , id: modelInstance.id)
+	            redirect(action:"list" , id: modelInstance.id)
 	        } else {
 	        	flash.message = modelInstance.errors.allErrors.each{  log.error it }
 				def	modelConnectors = modelTemplate ? ModelConnector.findAllByModel( modelTemplate ) : null
@@ -356,7 +356,7 @@ class ModelController {
 		}
     }
 
-    def show = {
+    def show() {
 		def modelId = params.id
 		if(modelId && modelId.isNumber()){
 	        def model = Model.get(params.id)
@@ -386,7 +386,7 @@ class ModelController {
 		}
     }
 
-    def edit = {
+    def edit() {
 		def modelId = params.id
 		if(modelId && modelId.isNumber()){
 	        def model = Model.get(params.id)
@@ -419,7 +419,7 @@ class ModelController {
 		}
     }
 
-    def update = {
+    def update() {
 		
 		try{
 	        def modelInstance = Model.get(params.id)
@@ -675,7 +675,7 @@ class ModelController {
 		}
     }
 
-    def delete = {
+    def delete() {
         def model = Model.get(params.id)
 		def modelRef = isModelReferenced( model )
 		if(!modelRef){
@@ -720,7 +720,7 @@ class ModelController {
     /*
      *  Send FrontImage as inputStream
      */
-    def getFrontImage = {
+    def retrieveFrontImage() {
 		if( params.id ) {
     		def model = Model.findById( params.id )
      		def image = model?.frontImage
@@ -733,7 +733,7 @@ class ModelController {
     /*
      *  Send RearImage as inputStream
      */
-    def getRearImage = {
+    def retrieveRearImage() {
 		if( params.id ) {
     		def model = Model.findById( params.id )
      		def image = model?.rearImage
@@ -746,7 +746,7 @@ class ModelController {
     /*
      *  Send List of model as JSON object
      */
-	def getModelsListAsJSON = {
+	def retrieveModelsListAsJSON() {
     	def manufacturer = params.manufacturer
 		def assetType = params.assetType
     	def models
@@ -765,7 +765,7 @@ class ModelController {
     /*
      *  check to see that if they were any Asset records exist for the selected model before deleting it
      */
-    def checkModelDependency = {
+    def checkModelDependency() {
     	def modelId = params.modelId
 		def modelInstance = Model.findById(Integer.parseInt(modelId))
 		def returnValue = false
@@ -778,7 +778,7 @@ class ModelController {
     /*
      *  Return AssetCables to alert the user while deleting the connectors
      */
-	def getAssetCablesForConnector = {
+	def retrieveAssetCablesForConnector() {
     	def modelId = params.modelId
 		def modelInstance = Model.get(modelId)
 		def assetCableMap = []
@@ -792,7 +792,7 @@ class ModelController {
     /*
      *  TEMP method to redirect to action : show
      */
-    def cancel = {
+    def cancel() {
     		 redirect(action: "show", id: params.id)
     }
     /*
@@ -802,7 +802,7 @@ class ModelController {
 	 *	3. Delete model record
 	 *	4. Return to model list view with the flash message "Merge completed."
      */
-	def merge = {
+	def merge() {
     	// Get the Model instances for params ids
 		def toModel = Model.get(params.id)
 		def fromModel = Model.get(params.fromId)
@@ -810,7 +810,7 @@ class ModelController {
 		def assetUpdated = modelService.mergeModel(fromModel, toModel)
 		
     	flash.message = "Merge Completed, $assetUpdated assets updated"
-    	redirect(action:list)
+    	redirect(action:"list")
     }
 	
 	
@@ -820,7 +820,7 @@ class ModelController {
 	 * @param : fromId[] id of model that is being merged
      * @return : message
 	 */
-	def mergeModels ={
+	def mergeModels() {
 		
 		def toModel = Model.get(params.toId)
 		def fromModelsId = params.list("fromId[]")
@@ -851,7 +851,7 @@ class ModelController {
     /*
      * 
      */
-	def importExport = {
+	def importExport() {
 		if( params.message ) {
 			flash.message = params.message
 		}
@@ -863,7 +863,7 @@ class ModelController {
      * Use excel format with the manufacturer,model and connector sheets. 
      * The file name should be of the format TDS-Sync-Data-2011-05-02.xls with the current date.
      */
-    def export = {
+    def export() {
         //get template Excel
         try {
         	File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
@@ -963,7 +963,7 @@ class ModelController {
 	 *2b If it is lower, skip it.
 	 *3. Report the number of Model records updated.
      */
-    def upload = {
+    def upload() {
 		DataTransferBatch.withTransaction { status ->
 			//get user name.
 			def subject = SecurityUtils.subject
@@ -997,7 +997,7 @@ class ModelController {
 				}
 	            if( flag == 0 ) {
 	                flash.message = "${missingSheets} sheets not found, Please check it."
-	                redirect( action:importExport, params:[message:flash.message] )
+	                redirect( action:"importExport", params:[message:flash.message] )
 	                return;
 	            } else {
 	            	def manuAdded = 0
@@ -1051,7 +1051,7 @@ class ModelController {
 					// Statement to check Headers if header are not found it will return Error message
 					if ( missingHeader != "" ) {
 						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-						redirect( action:importExport, params:[ message:flash.message] )
+						redirect( action:"importExport", params:[ message:flash.message] )
 						return;
 					} else {
 						def sheetrows = modelSheet.rows
@@ -1198,7 +1198,7 @@ class ModelController {
 					// Statement to check Headers if header are not found it will return Error message
 					if ( missingHeader != "" ) {
 						flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-						redirect( action:importExport, params:[message:flash.message] )
+						redirect( action:"importExport", params:[message:flash.message] )
 						return;
 					} else {
 						def sheetrows = connectorSheet.rows
@@ -1243,19 +1243,19 @@ class ModelController {
 	                } else {
 	                    flash.message = " File uploaded successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records.  Please click the Manage Batches to review and post these changes."
 	                }
-	                redirect( action:importExport, params:[message:flash.message] )
+	                redirect( action:"importExport", params:[message:flash.message] )
 		            return;  
 		        }
 	        } catch( NumberFormatException ex ) {
 	            flash.message = ex
 	            status.setRollbackOnly()
-	            redirect( action:importExport, params:[message:flash.message] )
+	            redirect( action:"importExport", params:[message:flash.message] )
 	            return;
 	        } catch( Exception ex ) {
 	        	ex.printStackTrace()
 				status.setRollbackOnly()
 	            flash.message = ex
-	            redirect( action:importExport, params:[message:flash.message] )
+	            redirect( action:"importExport", params:[message:flash.message] )
 	            return;
 	        } 
 		}
@@ -1270,13 +1270,13 @@ class ModelController {
         }
     	return missingHeader
     }
-    def manageImports = {
+    def manageImports() {
     	[modelSyncBatch:ModelSyncBatch.list()]
     }
     /*
      *  Send Model details as JSON object
      */
-	def getModelAsJSON = {
+	def retrieveModelAsJSON() {
     	def id = params.id
     	def model = Model.get(params.id)
 		def powerNameplate = model.powerNameplate
@@ -1337,7 +1337,7 @@ class ModelController {
 	 *  @param: id, id of model
 	 *  @return : return aka if exists
 	 */
-	def validateAKA = {
+	def validateAKA() {
 		def duplicateAka = ""
 		def aka = params.name
 		def modelId = params.id
@@ -1361,7 +1361,7 @@ class ModelController {
 	 * @param id : id of model for update
 	 * 
 	 */
-	def updateModel = {
+	def updateModel() {
 		def modelId = params.id
 		if(modelId && modelId.isNumber()){
 			def model = Model.get( params.id ) 
@@ -1399,7 +1399,7 @@ class ModelController {
 	 * @return model's assetType
 	 * 
 	 */
-	def getModelType ={
+	def retrieveModelType ={
 		def modelName = params.value
 		def model = Model.findByModelName( modelName )
 		def modelType = model?.assetType ?: 'Server'
@@ -1412,7 +1412,7 @@ class ModelController {
 	 * @param manufacturerName : name of manufacturer
 	 * @return : modelAuditEdit template
 	 */
-	def getModelDetailsByName ={
+	def retrieveModelDetailsByName ={
 		def modelName = params.modelName
 		def manufacturerName = params.manufacturerName
 		def model = assetEntityAttributeLoaderService.findOrCreateModel(manufacturerName, modelName, '', false)
@@ -1478,7 +1478,7 @@ class ModelController {
 	 * @param modelLists
 	 * @render resp message.
 	 */
-	def deleteBulkModels = {
+	def deleteBulkModels() {
 		def resp
 		def deletedModels = []
 		def skippedModels = []
@@ -1509,7 +1509,7 @@ class ModelController {
 	 * @param model
 	 * @return flag
 	 */
-	def isModelReferenced(model){
+	def isModelReferenced(model) {
 		return  AssetEntity.findByModel( model )
 	}
 }

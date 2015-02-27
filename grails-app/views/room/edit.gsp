@@ -48,7 +48,7 @@
 							<tr>
 								<td class="buttonR" colspan="3"><input type="button"
 									class="submit" value="Cancel"
-									onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+									onclick="${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}" />
 									<input type="submit" class="submit" value="Update" /></td>
 								<td class="buttonR"
 									style="padding-left: 115px; vertical-align: top;" colspan="6"

@@ -29,9 +29,9 @@
                         <tr>
 							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 						</tr>
-                        <g:hasErrors bean="${partyGroupInstance}" idCheck>
+                        <g:hasErrors bean="${partyGroupInstance}">
 							<div class="errors">
-								<g:renderErrors bean="${partyGroupInstance}" as="list" idCheck/>
+								<g:renderErrors bean="${partyGroupInstance}" as="list" />
 							</div>
 						</g:hasErrors>
 

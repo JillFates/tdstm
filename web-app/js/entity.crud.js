@@ -244,7 +244,7 @@ var EntityCrud = ( function($) {
 		EntityCrud.toggleAssetTypeFields(assetType);
 
 		new Ajax.Request(
-			tdsCommon.createAppURL('/assetEntity/getManufacturersList?assetType='+assetType+'&forWhom='+forWhom),
+			tdsCommon.createAppURL('/assetEntity/retrieveManufacturersList?assetType='+assetType+'&forWhom='+forWhom),
 			{ 	asynchronous:true,
 				evalScripts:true,
 				onComplete:function(e) { showManufacView(e, forWhom); }
@@ -256,7 +256,7 @@ var EntityCrud = ( function($) {
 	pub.updateModelSelect = function(manuId, forWhom) {
 		var assetType = $("#assetType"+forWhom+"Id").val() ;
 		new Ajax.Request(
-			tdsCommon.createAppURL('/assetEntity/getModelsList?assetType='+assetType+'&manufacturer='+manuId+'&forWhom='+forWhom),
+			tdsCommon.createAppURL('/assetEntity/retrieveModelsList?assetType='+assetType+'&manufacturer='+manuId+'&forWhom='+forWhom),
 			{	asynchronous:true,
 				evalScripts:true,
 				onComplete:function(e) { showModelView(e, forWhom); }
@@ -450,7 +450,7 @@ var EntityCrud = ( function($) {
 		var selectCtrl = $(rsName);
 		if (selectCtrl.length) {
 			jQuery.ajax({
-				url: tdsCommon.createAppURL('/assetEntity/getRackSelectForRoom'),
+				url: tdsCommon.createAppURL('/assetEntity/retrieveRackSelectForRoom'),
 				data: {'roomId':roomId, 'rackId':rackId, 'sourceTarget':sourceTarget, 'forWhom':forWhom},
 				type:'POST',
 				success: function(resp) {
@@ -477,7 +477,7 @@ var EntityCrud = ( function($) {
 		var selectCtrl = $( '#' + (sourceTarget=='S' ? 'source' : 'target') + 'ChassisSelectId');
 
 		jQuery.ajax({
-			url: tdsCommon.createAppURL('/assetEntity/getChassisSelectForRoom'),
+			url: tdsCommon.createAppURL('/assetEntity/retrieveChassisSelectForRoom'),
 			data: {'roomId':roomId, 'id':id, 'sourceTarget':sourceTarget, 'forWhom':forWhom},
 			type:'POST',
 			success: function(resp) {
@@ -1286,7 +1286,7 @@ var EntityCrud = ( function($) {
 	pub.updateDependentBundle = function(assetId, assetDomId, assetBundleId){
 		var splittedDep = assetDomId.split("_");
 		jQuery.ajax({
-			url: tdsCommon.createAppURL('/assetEntity/getChangedBundle'),
+			url: tdsCommon.createAppURL('/assetEntity/retrieveChangedBundle'),
 			data: {'assetId':assetId, 'dependentId':splittedDep[2], 'type':splittedDep[1]},
 			type:'POST',
 			success: function(resp) {
@@ -1791,7 +1791,7 @@ function showModelAudit(id){
 function editModelAudit(val){
 	if(val){
 		var manufacturer = $("#manufacturersAuditId").val()
-		new Ajax.Request(contextPath+'/model/getModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
+		new Ajax.Request(contextPath+'/model/retrieveModelDetailsByName?modelName='+val+'&manufacturerName='+manufacturer,{asynchronous:true,evalScripts:true,
 			onComplete:function(data){
 					$("#modelAuditId").html(data.responseText)
 					$("#modelAuditId").show()
@@ -1893,7 +1893,7 @@ function updateModelForAudit(name){
 }
 
 function getAssetType(val){
-	new Ajax.Request(contextPath+'/model/getModelType?value='+val,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/model/retrieveModelType?value='+val,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetTypeEditId").val(data.responseText)
 			editModelAudit(""+val+"")
@@ -1902,7 +1902,7 @@ function getAssetType(val){
 }
 
 function setType(id, forWhom){
-	new Ajax.Request(contextPath+'/assetEntity/getAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
+	new Ajax.Request(contextPath+'/assetEntity/retrieveAssetModelType?id='+id,{asynchronous:true,evalScripts:true,
 		onComplete:function(data){
 			$("#assetType"+forWhom+"Id").val(data.responseText)
 			if(!isIE7OrLesser)
@@ -1932,7 +1932,7 @@ function populateDependency(assetId, whom, thisDialog){
 
 /*function updateModel(rackId,value){
 	var val = value;
-	new Ajax.Request('contextPath+/assetEntity/getModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
+	new Ajax.Request('contextPath+/assetEntity/retrieveModelsList?='+val,{asynchronous:true,evalScripts:true,onComplete:function(e){populateModelSelect(e,rackId);}})
 }
 function populateModelSelect(e,rackId){
     var resp = e.responseText;
@@ -1954,7 +1954,7 @@ function hideDependencyControlDiv(){
 // Sets the field importance style classes in the edit and create views for all asset classes
 function assetFieldImportance(phase,type){
 	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/getassetImportance'),
+		url: tdsCommon.createAppURL('/assetEntity/retrieveAssetImportance'),
 		data: {'validation':phase, 'type':type},
 		type:'POST',
 		success: function(resp) {
@@ -1976,7 +1976,7 @@ function assetFieldImportance(phase,type){
 }
  function highlightCssByValidation(phase,forWhom, id){
 	jQuery.ajax({
-		url: tdsCommon.createAppURL('/assetEntity/getHighlightCssMap'),
+		url: tdsCommon.createAppURL('/assetEntity/retrieveHighlightCssMap'),
 		data: {'validation':phase, 'type':forWhom,'id':id},
 		type:'POST',
 		success: function(resp) {
@@ -1996,7 +1996,7 @@ function assetFieldImportance(phase,type){
  
 function getHelpTextAsToolTip(type){
 	jQuery.ajax({
-		url: tdsCommon.createAppURL('/common/getTooltips'),
+		url: tdsCommon.createAppURL('/common/retrieveTooltips'),
 		data: {'type':type},
 		type:'POST',
 		success: function(resp) {

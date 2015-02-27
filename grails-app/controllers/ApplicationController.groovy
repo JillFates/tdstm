@@ -32,11 +32,11 @@ class ApplicationController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	def index = {
+	def index() {
 		redirect action:'list', params:params
 	}
 
-	def list = {
+	def list() {
 		def filters = session.APP?.JQ_FILTERS
 		session.APP?.JQ_FILTERS = []
 
@@ -72,7 +72,7 @@ class ApplicationController {
 	/**
 	 * This method is used by JQgrid to load appList 
 	 */
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')?:25
@@ -219,7 +219,7 @@ class ApplicationController {
 	 * @param from
 	 * @render true
 	 */
-	def columnAssetPref={
+	def columnAssetPref() {
 		def column= params.columnValue
 		def fromKey= params.from
 		def existingColsMap = assetEntityService.getExistingPref(params.type)
@@ -232,7 +232,7 @@ class ApplicationController {
 		render true
 	}
 
-	def create = {
+	def create() {
 		def applicationInstance = new Application()
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
 		def assetTypeOptions = EavAttributeOption.findAllByAttribute(assetTypeAttribute)
@@ -255,7 +255,7 @@ class ApplicationController {
 			availabaleRoles:availabaleRoles, environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 
-	def show = {
+	def show() {
 		def app
 		def project = controllerService.getProjectForPage( this )
 		if (project) {
@@ -283,7 +283,7 @@ class ApplicationController {
 	 * @return : render to edit page based on condition as if 'redirectTo' is roomAudit then redirecting
 	 * to auditEdit view
 	 */
-	def edit = {
+	def edit() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -292,7 +292,7 @@ class ApplicationController {
 
 		if(!applicationInstance) {
 			flash.message = "Application not found with id ${params.id}"
-			redirect(action:list)
+			redirect(action:"list")
 			return
 		}
 
@@ -322,12 +322,12 @@ class ApplicationController {
 		return model		
 	}
 
-	def save = {
+	def save() {
 		controllerService.saveUpdateAssetHandler(this, session, applicationService, AssetClass.APPLICATION, params)
 		session.APP?.JQ_FILTERS = params
 	}
 
-	def update = {
+	def update() {
 		controllerService.saveUpdateAssetHandler(this, session, applicationService, AssetClass.APPLICATION, params)
 		session.APP?.JQ_FILTERS = params
 		session.setAttribute("USE_FILTERS","true")
@@ -342,7 +342,7 @@ class ApplicationController {
 			}else{
 				switch(params.redirectTo){
 					case "room":
-						redirect( controller:'room',action:list )
+						redirect( controller:'room',action:"list" )
 						break;
 					case "rack":
 						redirect( controller:'rackLayouts',action:'create' )
@@ -351,16 +351,16 @@ class ApplicationController {
 						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
 						break;
 					case "clientConsole":
-						redirect( controller:'clientConsole', action:list)
+						redirect( controller:'clientConsole', action:"list")
 						break;
 					case "assetEntity":
-						redirect( controller:'assetEntity', action:list)
+						redirect( controller:'assetEntity', action:"list")
 						break;
 					case "database":
-						redirect( controller:'database', action:list)
+						redirect( controller:'database', action:"list")
 						break;
 					case "files":
-						redirect( controller:'files', action:list)
+						redirect( controller:'files', action:"list")
 						break;
 					case "listComment":
 						redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
@@ -369,7 +369,7 @@ class ApplicationController {
 						render "Application ${applicationInstance.assetName} updated."
 						break;
 					case "dependencyConsole":
-						forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
+						forward( controller:'assetEntity',action:'retrieveLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 						break;
 					
 				}
@@ -377,31 +377,35 @@ class ApplicationController {
 		*/
 	}
 
-	def delete = {
+	def delete() {
 		def application = Application.get( params.id)
 		if(application) {
 				assetEntityService.deleteAsset( application )
 				// deleting all appmoveEvent associated records .
-				def appMove = AppMoveEvent.findAllByApplication( application );
-				AppMoveEvent.withNewSession{appMove*.delete()}
+				AppMoveEvent.withNewSession { s -> 
+					def appMove = AppMoveEvent.findAllByApplication( application );
+					appMove*.delete()
+					s.flush()
+					s.clear()
+			 	}
 				application.delete();
 			
 			flash.message = "Application ${application.assetName} deleted"
 			if(params.dstPath =='dependencyConsole'){
-				forward( controller:'assetEntity',action:'getLists', params:[entity: 'apps',dependencyBundle:session.getAttribute("dependencyBundle")])
+				forward( controller:'assetEntity',action:'retrieveLists', params:[entity: 'apps',dependencyBundle:session.getAttribute("dependencyBundle")])
 			}else{
-				redirect( action:list )
+				redirect( action:"list" )
 			}
 		}
 		else {
 			flash.message = "Application not found with id ${params.id}"	
-			redirect( action:list )
+			redirect( action:"list" )
 		}		
 	}
 	/*
 	 * Delete multiple Application 
 	 */
-	def deleteBulkAsset={
+	def deleteBulkAsset() {
 		def assetList = params.id.split(",")
 		def assetNames = []
 		assetList.each{ assetId->
@@ -411,9 +415,12 @@ class ApplicationController {
 				assetEntityService.deleteAsset( application )
 				
 				// deleting all appmoveEvent associated records .
-				def appMove = AppMoveEvent.findAllByApplication( application );
-				AppMoveEvent.withNewSession{appMove*.delete()}
-				
+				AppMoveEvent.withNewSession { s -> 
+					def appMove = AppMoveEvent.findAllByApplication( application );
+					appMove*.delete()
+					s.flush()
+					s.clear()
+			 	}				
 				application.delete();
 			}
 		}	
@@ -422,7 +429,7 @@ class ApplicationController {
 	  render "Aplication $names Deleted."
 	}
 	
-	def customColumns={
+	def customColumns() {
 		def columnName = params.column
 		def removeCol = params.fromName
 		if(columnName && removeCol){

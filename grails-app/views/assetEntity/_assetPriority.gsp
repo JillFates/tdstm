@@ -10,12 +10,12 @@
 				</tr>
 			</thead>
 			<tbody id="priorityStatusTbodyId">
-				<g:each in="${priorityOption}" status="i" var="priorityOption">
-					<tr id="priorityOption_${priorityOption.id}">
-						<td>${priorityOption.value}</td>
+				<g:each in="${priorityOption}" status="i" var="priorityOptionIt">
+					<tr id="priorityOption_${priorityOptionIt.id}">
+						<td>${priorityOptionIt.value}</td>
 						<td><span class=" deletePriority clear_filter"
 							style="display: none; cursor: pointer;"
-							onClick="deleteAssetStatus(${priorityOption.id},$('#priorityhiddenId').val())"><b>X</b>
+							onClick="deleteAssetStatus(${priorityOptionIt.id},$('#priorityhiddenId').val())"><b>X</b>
 						</span></td>
 					</tr>
 				</g:each>

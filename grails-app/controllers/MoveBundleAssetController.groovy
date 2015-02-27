@@ -15,58 +15,58 @@ class MoveBundleAssetController {
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	
-    def index = { redirect( action:list, params:params ) }
+    def index() { redirect( action:"list", params:params ) }
 
     // the delete, save and update actions only accept POST requests
     def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-    def list = {
+    def list() {
         if(!params.max) params.max = 10
         [ moveBundleAssetInstanceList: AssetEntity.list( params ) ]
     }
 
-    def show = {
+    def show() {
         def moveBundleAssetInstance = AssetEntity.get( params.id )
 
         if(!moveBundleAssetInstance) {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect(action:list)
+            redirect(action:"list")
         }
         else { return [ moveBundleAssetInstance : moveBundleAssetInstance ] }
     }
 
-    def delete = {
+    def delete() {
         def moveBundleAssetInstance = AssetEntity.get( params.id )
         if(moveBundleAssetInstance) {
             moveBundleAssetInstance.delete(flush:true)
             flash.message = "MoveBundleAsset ${params.id} deleted"
-            redirect( action:list )
+            redirect( action:"list" )
         }
         else {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect( action:list )
+            redirect( action:"list" )
         }
     }
 
-    def edit = {
+    def edit() {
         def moveBundleAssetInstance = AssetEntity.get( params.id )
 
         if(!moveBundleAssetInstance) {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect( action:list )
+            redirect( action:"list" )
         }
         else {
             return [ moveBundleAssetInstance : moveBundleAssetInstance ]
         }
     }
 
-    def update = {
+    def update() {
         def moveBundleAssetInstance = AssetEntity.get( params.id )
         if(moveBundleAssetInstance) {
             moveBundleAssetInstance.properties = params
             if(!moveBundleAssetInstance.hasErrors() && moveBundleAssetInstance.save()) {
                 flash.message = "MoveBundleAsset ${params.id} updated"
-                redirect( action:show, id:moveBundleAssetInstance.id )
+                redirect( action:"show", id:moveBundleAssetInstance.id )
             }
             else {
                 render( view:'edit', model:[ moveBundleAssetInstance:moveBundleAssetInstance ] )
@@ -74,21 +74,21 @@ class MoveBundleAssetController {
         }
         else {
             flash.message = "MoveBundleAsset not found with id ${params.id}"
-            redirect( action:edit, id:params.id )
+            redirect( action:"edit", id:params.id )
         }
     }
 
-    def create = {
+    def create() {
         def moveBundleAssetInstance = new AssetEntity()
         moveBundleAssetInstance.properties = params
         return ['moveBundleAssetInstance':moveBundleAssetInstance]
     }
 
-    def save = {
+    def save() {
         def moveBundleAssetInstance = new AssetEntity( params )
         if(!moveBundleAssetInstance.hasErrors() && moveBundleAssetInstance.save()) {
             flash.message = "MoveBundleAsset ${moveBundleAssetInstance.id} created"
-            redirect( action:show, id:moveBundleAssetInstance.id )
+            redirect( action:"show", id:moveBundleAssetInstance.id )
         } else {
             render( view:'create', model:[ moveBundleAssetInstance:moveBundleAssetInstance ] )
         }
@@ -96,7 +96,7 @@ class MoveBundleAssetController {
 	/*
 	 *  Return asset details to assignAssets page
 	 */
-    def assignAssetsToBundle = {
+    def assignAssetsToBundle() {
 		def moveBundleInstance
 		def project = securityService.getUserCurrentProject()
 		if(params.containsKey('bundleId') && params.bundleId){
@@ -114,7 +114,7 @@ class MoveBundleAssetController {
 		
 		redirect(action: "assignAssetsToBundleChange", params: ['bundleLeft': moveBundles.getAt(0).id, 'bundleRight' : moveBundleInstance.id])
     }
-    def assignAssetsToBundleChange = {
+    def assignAssetsToBundleChange() {
         def bundleRight = params.bundleRight
         def bundleLeft = params.bundleLeft
         def sortField
@@ -183,7 +183,7 @@ class MoveBundleAssetController {
 	/*
 	 *  Sort Assets By Selected Row Column 
 	 */
-	def sortAssetList = {
+	def sortAssetList() {
 		def rightBundleId = params.rightBundle
 		def leftBundleId = params.leftBundle
 		def sortField
@@ -289,7 +289,7 @@ class MoveBundleAssetController {
 	/*
 	 *  Save Assets for corresponding Bundle
 	 */
-    def saveAssetsToBundle = {
+    def saveAssetsToBundle() {
 		def items = []
     	def bundleFrom = params.bundleFrom
     	def bundleTo = params.bundleTo
@@ -313,7 +313,7 @@ class MoveBundleAssetController {
     }
     
     //get teams for selected bundles.
-    def getTeamsForBundles = {
+    def retrieveTeamsForBundles() {
     	def bundleId = params.bundleId
     	def projectId = session.CURR_PROJ.CURR_PROJ
     	def projectInstance = Project.findById( projectId )
@@ -332,7 +332,7 @@ class MoveBundleAssetController {
         render teams as JSON
     }
     //Get the List of Racks corresponding to Selected Bundle
-    def getRacksForBundles = {
+    def retrieveRacksForBundles() {
     	def bundleId = params.bundleId
         def projectId = session.CURR_PROJ.CURR_PROJ
         def projectInstance = Project.findById( projectId )
@@ -351,7 +351,7 @@ class MoveBundleAssetController {
 	 * @param  : move bundle id
 	 * @return : list of racks and rooms
 	 *---------------------------------------*/
-	 def getRackDetails = {
+	 def retrieveRackDetails() {
     	def bundleId = params.bundleId
     	def rackDetails = []
     	def sourceRackList
@@ -375,7 +375,7 @@ class MoveBundleAssetController {
 	/*----------------------------------------------
 	 * return the asset d
 	 *---------------------------------------------*/
-	def getAssetTagLabelData = {
+	def retrieveAssetTagLabelData() {
 		def moveBundleId = params.moveBundle
 		def location = params.location
 		def projectId = params.project
@@ -419,7 +419,7 @@ class MoveBundleAssetController {
      * @param : sort field, order, filters(rack, team), bundle, rackPlan
      * @return : assetEntity list as JSON
      ********************************************************************/
-    def sortAssets = {
+    def sortAssets() {
     	def rackList = []
     	rackList = (params.rack).tokenize(",")
     	def rackString = "("

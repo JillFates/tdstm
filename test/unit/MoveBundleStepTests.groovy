@@ -1,9 +1,13 @@
-import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.TimeCategory
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
 /** 
  * Unit Test class to test the Domain class MoveBundleStep
  */
-class MoveBundleStepTests extends GroovyTestCase {
+@TestFor(MoveBundleStep)
+class MoveBundleStepTests extends Specification {
+
 	def mbs 
 	def now
 	
@@ -18,31 +22,39 @@ class MoveBundleStepTests extends GroovyTestCase {
 	
     void testPlanDuration() {
 		initTest()
-		assertEquals "Should be 2 hours (seconds)", 7200, mbs.getPlanDuration()
+        expect:
+		  mbs.getPlanDuration() == 7200 //Should be 2 hours (seconds)
     }
 
     void testActualDuration() {
 		initTest()
-		
-		print mbs.toString() + "\n"
-		assertEquals "Completed in 2 hours", 7200, mbs.getActualDuration( now )
-				
-		mbs.actualCompletionTime = null
-		assertEquals "Started an hour ago and not done", 3600, mbs.getActualDuration( now )
-		
-		mbs.actualStartTime = null
-		assertEquals "Hasn't started", 0, mbs.getActualDuration( now )
-		
+		when: "step 1"
+		  print mbs.toString() + "\n"
+        then:
+		  mbs.getActualDuration( now ) == 7200 //Should be 2 hours (seconds)
+
+        when: "step 2"
+		  mbs.actualCompletionTime = null
+        then:
+		  mbs.getActualDuration( now ) == 3600 //Started an hour ago and not done
+
+        when: "step 3"
+		  mbs.actualStartTime = null
+        then:
+		  mbs.getActualDuration( now ) == 0 //Hasn't started
+
     }
 
 
 	void testIsCompleted () {
 		initTest()
+		when: "step 1"
+        then:
+		    mbs.isCompleted() //Step should be completed
 		
-		assertTrue "Step should be completed", mbs.isCompleted()
-		
-		mbs.actualCompletionTime = null
-		assertFalse "Step should be incompleted", mbs.isCompleted()
-		
+        when: "step 2"
+		    mbs.actualCompletionTime = null
+        then:
+		    !mbs.isCompleted() //Step should be incompleted
 	}
 }

@@ -18,7 +18,7 @@ class WsDashboardController {
 	 * @param moveEventId
 	 * @return JSON map 
 	 */
-	def bundleData = {
+	def bundleData() {
 		def error = ""
 		def project = securityService.getUserCurrentProject()
 		def moveEventId = params.moveEventId

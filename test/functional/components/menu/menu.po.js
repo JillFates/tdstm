@@ -466,11 +466,11 @@ var Menu = function(){
     return browser.driver.findElements(by.css('#reportsMenuId a.mmlink'));
   };
   this.getCablingConflict = function(){
-      return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingConflict"]'));
+      return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict"]'));
   };
   this.getCablingData = function(){
     return browser.driver.findElement
-      (by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingData"]'));
+      (by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData"]'));
   };
   this.getPower = function(){
       return browser.driver.findElement(by.css('a[href="/tdstm/reports/powerReport"]'));
@@ -491,7 +491,7 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/databaseConflicts"]'));
   };
   this.getTaskReport = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Task+Report"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report"]'));
   };
   this.getReportSummary = function(){
     return browser.driver.findElement(by.css('a[href^="/tdstm/reports/index?projectId="]'));
@@ -500,16 +500,16 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/preMoveCheckList"].home'));
   };
   this.getLoginBadges = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Login+Badges"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges"]'));
   };
   this.getAssetTags = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Asset+Tag"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag"]'));
   };
   this.getLogisticsTeamWorksheets = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=cart+Asset"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=cart+Asset"]'));
   };
   this.getTransportWorksheets =function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List"]'));
   };
   this.getEventPrepHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');"]'));
@@ -518,14 +518,14 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/reports/applicationMigrationReport"]'));
   };
   this.getIssueReport = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report"]'));
   };
   this.getEventResults = function(){
     // return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults"]'));
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults"]'));
   };
   this.getCablingQA = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA"]'));
   };
   this.getEventDayHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print\',\'help\');"]'));

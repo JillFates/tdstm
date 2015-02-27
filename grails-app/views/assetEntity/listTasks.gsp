@@ -210,7 +210,7 @@
 					</span>
 					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
 					<select id="selectTimedBarId"
-					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
+					    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(XMLHttpRequest)') }">
 						<option value="0">Manual</option>
 						<option value="60" selected="selected">1 Min</option>
 						<option value="120">2 Min</option>

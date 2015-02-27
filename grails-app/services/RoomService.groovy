@@ -108,7 +108,7 @@ class RoomService {
 					if ( id < params.rackCount && ! msg ) {
 						def rack = Rack.get( id )
 						if (! rack && ! msg) {
-							def newRack = Rack.findOrCreateWhere(source:source, 'project.id':roomInstance.project.id, location:roomInstance.location, 'room.id':roomInstance?.id, tag:params["tag_"+id])
+							def newRack = Rack.findOrCreateWhere(source:source, project:roomInstance.project, location:roomInstance.location, room:roomInstance, tag:params["tag_"+id])
 							if (newRack){
 								newRack.location = roomInstance.location
 								newRack.roomX = params["roomX_"+id] ? NumberUtils.toDouble(params["roomX_"+id],0).round() :0

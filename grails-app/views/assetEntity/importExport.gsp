@@ -46,7 +46,7 @@
 				progressBar.css("display","block");
 				clearInterval(handle);
 				if (${isMSIE}) {
-					handle = setInterval("${remoteFunction(action:'getProgress', onComplete:'showProcessBar(e)')}", 5000);
+					handle = setInterval("${remoteFunction(action:'retrieveProgress', onComplete:'showProcessBar(XMLHttpRequest)')}", 5000);
 				} else {
 					// Increased interval by 5 sec as server was hanging over chrome with quick server request. 
 					handle=setInterval(getProgress, 5000);
@@ -59,7 +59,7 @@
 			var hiddenVal=$("#requestCount").val()
 			if(hiddenVal != requestCount){
 				requestCount = hiddenVal
-			 	$("#iFrame").attr('src', contextPath+'/assetEntity/getProgress');
+			 	$("#iFrame").attr('src', contextPath+'/assetEntity/retrieveProgress');
 			}
 		}
 		

@@ -136,7 +136,7 @@
 			<input type="button" id="updateId"
 				value="Update:" onclick="pageReload();"/> <select
 				id="selectTimedId"
-				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(e)') }">
+				onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'setUpdateTime(XMLHttpRequest)') }">
 				<option value="30000">30s</option>
 				<option value="60000">1m</option>
 				<option value="120000">2m</option>
@@ -374,28 +374,28 @@
 					$(".cell-selected").removeClass('cell-selected');
 					$(e.target).addClass('cell-selected');
 					actionId = $(e.target).attr("id") 
-					${remoteFunction(action:'getMenuList', params:'\'id=\' + actionId ', onComplete:'updateMenu(e,menu)')};
+					${remoteFunction(action:'retrieveMenuList', params:'\'id=\' + actionId ', onComplete:'updateMenu(XMLHttpRequest,menu)')};
 					return menu;
 				},
 				bindings: {
 	        		'start': function(t) {
-			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=start\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=start\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 			        },
 			        'done': function(t) {
-			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			       		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 			        },
 			        'ready': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=ready\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=ready\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 			        },
 			        'NA': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=NA\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=NA\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 			        },
 			        'pending': function(t) {
-			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=pending\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			          ${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=pending\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 			        },
 			        'void': function(t) {
 			          	if(confirm("Undo this specific task and any dependent (workflow) transitions. Are you sure?")){
-			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=void\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+			          		${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + actionId +\'&type=void\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 						} else {
 			          		return false
 			         	}
@@ -413,20 +413,20 @@
 				    var action = $("#bulkActionId").val()
 				    switch (action){
 					    case "pending" :
-					    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+					    	${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=pending\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 						break;
 						case "done" :
-							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=done\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 						break;
 						case "NA" :
-							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=NA\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 						break;
 						case "void" :
-							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(e)' )};
+							${remoteFunction(action:'createTransitionForNA', params:'\'actionId=\' + tdId +\'&type=void\'+\'&bundle=\'+bundle', onComplete:'updateTransitionRow(XMLHttpRequest)' )};
 						break;	
 				    }
 		        } else {
-		        	${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+tdId', onComplete:'window.status = e.responseText')}
+		        	${remoteFunction(controller:'assetEntity', action:'showStatus', params:'\'id=\'+tdId', onComplete:'window.status = XMLHttpRequest.responseText')}
 		        }
 	    	}
 	    });
@@ -617,7 +617,7 @@
 		var sort = $("#sortById").val()
 		var order = $("#orderById").val()
 		var lastPoolTime = $("#lastPoolTimeId").val();
-		${remoteFunction(action:'getTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&lastPoolTime=\'+lastPoolTime+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', onFailure:"handleErrors()", onComplete:'updateTransitions(e);' )}
+		${remoteFunction(action:'retrieveTransitions', params:'\'moveBundle=\' + moveBundle +\'&moveEvent=\'+moveEvent +\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&lastPoolTime=\'+lastPoolTime+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', onFailure:"handleErrors()", onComplete:'updateTransitions(XMLHttpRequest);' )}
 		timedUpdate($("#selectTimedId").val())
 	}
 	var doUpdate = true
@@ -711,7 +711,7 @@
 		if(j == 0){
 			alert('Please select the Asset');
 		}else{
-			${remoteFunction(action:'getList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(e);' )}
+			${remoteFunction(action:'retrieveList', params:'\'assetArray=\' + assetArr', onComplete:'showChangeStatusDialog(XMLHttpRequest);' )}
 		}
 	}
 	
@@ -756,11 +756,11 @@
 		if( idArray.length = 2  ) {
 			var assetId = idArray[1]
 			if( idArray[0] == "comment"  ) {
-				${remoteFunction(controller:'assetEntity', action:'listComments', params:'\'id=\'+assetId', before:'setAssetId(assetId);',onComplete:'listCommentsDialog( e ,\"action\");')}
+				${remoteFunction(controller:'assetEntity', action:'listComments', params:'\'id=\'+assetId', before:'setAssetId(assetId);',onComplete:'listCommentsDialog( XMLHttpRequest ,\"action\");')}
 			}else if( idArray[0] == "asset"  ) {
 				EntityCrud.showAssetDetailView('DEVICE',assetId);
 			}else if( idArray[0] == "task" ) {
-				${remoteFunction( action:"getTask", params:'\'assetEntity=\'+assetId', onComplete:'showChangeStatusDialog(e);')}
+				${remoteFunction( action:"retrieveTask", params:'\'assetEntity=\'+assetId', onComplete:'showChangeStatusDialog(XMLHttpRequest);')}
 			}
 		}
 	}
@@ -768,7 +768,7 @@
 	function performBulkEdit(){
 		
 		if(bulkEdit){
-			${remoteFunction(action:'setBulkWarning', onComplete:'showBulkEdit(e);' )}
+			${remoteFunction(action:'setBulkWarning', onComplete:'showBulkEdit(XMLHttpRequest);' )}
 		} else {
 			var bulkEditButton = $("#bulkEditId");
 			bulkEditButton.removeClass("bulkedit_active")
@@ -913,9 +913,9 @@
 			var sort = $("#sortById").val()
 			var order = $("#orderById").val()
 			
-			${remoteFunction(action:'getAssetsCountForBulkTransition', 
+			${remoteFunction(action:'retrieveAssetsCountForBulkTransition', 
 								params:'\'transId=\' + transId +\'&bundleId=\'+bundleId+\'&eventId=\'+eventId+\'&type=\'+type+\'&c1f=\'+c1f+\'&c2f=\'+c2f+\'&c3f=\'+c3f+\'&c4f=\'+c4f+\'&c1v=\'+c1v+\'&c2v=\'+c2v+\'&c3v=\'+c3v+\'&c4v=\'+c4v+\'&offset=\'+offset+\'&max=\'+max+\'&sort=\'+sort+\'&order=\'+order', 
-								onComplete:'doBulkTransitionsByHeader(e,transId)' )};
+								onComplete:'doBulkTransitionsByHeader(XMLHttpRequest,transId)' )};
 		}
 	}
 	function doBulkTransitionsByHeader( e, transId){
@@ -945,11 +945,10 @@
 
 	function changeMoveBundle(moveEventValue){
 		var moveEventnName =  moveEventValue
-		${remoteFunction(action:'moveBundleList', params:'\'moveEvent=\' + moveEventnName', onSuccess:'fillMoveBundle(e)' )};
+		${remoteFunction(action:'moveBundleList', params:'\'moveEvent=\' + moveEventnName', onSuccess:'fillMoveBundle(data)' )};
 	}
 	
-	function fillMoveBundle(e){
-		var data = eval('(' + e.responseText + ')');
+	function fillMoveBundle(data){
 		var selectContent = "<select id='moveBundleId' name='moveBundle'>"
 
 		for (var i = 0; i < data.size(); i++){

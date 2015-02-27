@@ -32,7 +32,7 @@ class TestCaseController {
 
 	// def messageSource
 	
-	def testPerms = {
+	def testPerms() {
 		def user = securityService.getUserLogin()
 
 		def hasPermGood = securityService.hasPermission(user, 'ShowCartTracker')
@@ -42,14 +42,14 @@ class TestCaseController {
 
 	}
 
-	def checkADConfig = {
+	def checkADConfig() {
 		def out = "<h1>Testing AD Configuration</h1><pre>" 
 		out += securityService.getActiveDirectorySettings().toString() + "</pre>"
 
 		render out.toString()
 	}
 
-	def findPerson = {
+	def findPerson() {
 		def nameMap = [first:'John', last:'Martin']
 
 		def client = PartyGroup.read(18)
@@ -62,16 +62,16 @@ class TestCaseController {
 	}
 
 	// Used to test the JQuery one method
-	def testOne = {
+	def testOne() {
 		render(view: '../dashboard/testOne', model:[a:1])
 	}
 
-	def finduser = {
+	def finduser() {
 		def userLogin = UserLogin.findByUsername( 'jmtest@transitionaldata.com' )
 		render (userLogin ? userLogin.toString() : 'Not found')
 	}
 	
-	def provisioning = {
+	def provisioning() {
 		def conf = securityService.getActiveDirectoryConfig()
 		conf.defaultProject = 2468
 
@@ -91,7 +91,7 @@ class TestCaseController {
 		render (user ? user.toString() : 'Nothing') 
 	}
 
-	def adIntegration = {
+	def adIntegration() {
 		def ctx = ApplicationContextHolder.getApplicationContext()
 		def conf = ApplicationContextHolder.getConfig()
 		def adConf = conf?.tdstm?.security?.ad
@@ -108,7 +108,7 @@ class TestCaseController {
 	}
 
 
-	def testGormUtilGetDPWC = {
+	def testGormUtilGetDPWC() {
 		def sb = new StringBuilder()
 
 		def list = []
@@ -146,7 +146,7 @@ class TestCaseController {
 		render sb.toString()
 	}
 
-	def testStaffingRoles = {
+	def testStaffingRoles() {
 		def list = partyRelationshipService.getStaffingRoles(false)
 		def s = '<table>'
 		list.each {
@@ -156,7 +156,7 @@ class TestCaseController {
 		render s
 	}
 
-	def testPersonServiceFindPerson = {
+	def testPersonServiceFindPerson() {
 		def person
 		def isa
 		def project = Project.read(457)
@@ -196,7 +196,7 @@ class TestCaseController {
 
 	}
 
-	def testFindPerson = {
+	def testFindPerson() {
 
 		// The dataset consists of [searchString, clientStaffOnly, shouldFind, ambiguous]
 		def data = [
@@ -232,7 +232,7 @@ class TestCaseController {
 		render s
 	}
 
-	def indirectTest = {
+	def indirectTest() {
 
 		def p = new Person(firstName:'Robin', lastName:'Banks', id:123)
 
@@ -255,7 +255,7 @@ class TestCaseController {
 	/**
 	 * Testing the GORM error handler to see if we can get human readable messages
 	 */
-	def gormErrorsTest = {
+	def gormErrorsTest() {
 
 		def app = new AssetEntity(assetName:'Test app', validation:'Foo', )
 		if (app.validate())

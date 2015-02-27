@@ -25,7 +25,7 @@
 						</td>
 						<td rowspan="2">
 							<g:if test="${person.personImageURL==null}">
-								<img src="../images/blankPerson.jpg" alt="Smiley face" height="60" width="60">
+								<img src="${resource(dir:'images',file:'blankPerson.jpg')}" alt="Smiley face" height="60" width="60">
 							</g:if>
 							<g:else>
 								<img src="${person.personImageURL}" height="60" width="60">
@@ -224,17 +224,25 @@
 								<label for="tdsNote">TDS Note:</label>
 							</td>
 							<td valign="top" class="value" colspan="2" >
-								<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="40" />							</td>
+								<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="40" />
+							</td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name">								<label for="tdsLink">TDS Link</label>							</td>
-							<td valign="top" class="value" colspan="2">								<input type="text" id="tdsLinkId" name="tdsLink" size="40" value="${person.tdsLink}" />							</td>
+							<td valign="top" class="name">
+								<label for="tdsLink">TDS Link</label>
+							</td>
+							<td valign="top" class="value" colspan="2">
+								<input type="text" id="tdsLinkId" name="tdsLink" size="40" value="${person.tdsLink}" />
+							</td>
 						</tr>
 
 						<tr class="prop">
-							<td valign="top" class="name">								<label for="staffType">StaffType:</label>							</td>
-							<td valign="top" class="value" colspan="2">								<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
+							<td valign="top" class="name">
+								<label for="staffType">StaffType:</label>
+							</td>
+							<td valign="top" class="value" colspan="2">
+								<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
 							</td>
 						</tr>
 

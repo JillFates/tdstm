@@ -1,18 +1,20 @@
 import groovy.mock.interceptor.*
-import grails.test.GrailsUnitTestCase
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.log4j.* 
 
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
 /**
  * Unit test cases for the RunbookService class
  */
-class RunbookServiceTests extends GrailsUnitTestCase {
+@TestFor(RunbookService)
+class RunbookServiceTests extends Specification {
 	
-	def runbookService = new RunbookService()
+	def runbookService
 	def log
 
 	def mapData = [
@@ -50,10 +52,12 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		ConfigurationHolder.config = slurper.parse(classLoader.loadClass("Config")) 
 	} 
 
-	void setUp() {
+	void setup() {
 		// add the super call to avoid the "NullPointerException: Cannot invoke method containsKey() on null object" when calling mockDomain 
-		super.setUp() 
+		//super.setUp() 
 
+        runbookService = new RunbookService()
+        
 		// build a logger...
 		BasicConfigurator.configure() 
 		LogManager.rootLogger.level = Level.DEBUG
@@ -64,13 +68,14 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		//loadConfig()
 		// Initialize various custom methods used by our application
-		com.tdsops.metaclass.CustomMethods.initialize
+		com.tdsops.metaclass.CustomMethods.getInitialize(true)
 
 	}
 
+    def cleanup() {
+    }
 
 	def initTestData = {
-
 		def tasks = []
 		def deps = []
 		tasks << new AssetComment(id:0, taskNumber: 1000, duration:5, comment:'Start Move')	// Start vertex
@@ -101,6 +106,11 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		deps << new TaskDependency(id:110, predecessor:tasks[5], assetComment:tasks[8], type:'SS')
 		deps << new TaskDependency(id:111, predecessor:tasks[5], assetComment:tasks[9], type:'SS')
 
+        def id = 0;
+        tasks.each { t -> t.id = id++}
+        id = 100;
+        deps.each { d -> d.id = id++}
+
 		return [tasks, deps]
 
 	}
@@ -108,13 +118,14 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 	// Test that the List.asMap method actually works
 	void testAsMap() {
 		// def byColor = mapData.asGroup('color')
-		def staff = mapData.asMap( 'id')
+		def staff = mapData.asMap('id')
 
-		assertEquals 'John', staff['1'].name
-		assertEquals 'Tom', staff['2'].name
-		assertEquals 'Sarah', staff['5'].name
-		assertFalse 'id 666 should not exist', staff.containsKey('666')
-		assertEquals 'Map should have 6 elements', 6, staff.size()
+        expect:
+		    'John' == staff['1'].name
+		    'Tom' == staff['2'].name
+		    'Sarah' == staff['5'].name
+		    'id 666 should not exist' != staff.containsKey(666)
+		    6 == staff.size()
 	}
 	
 	// Test that the List.asMap method actually works
@@ -127,12 +138,12 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		println "byColor=$byColor"
 		println "find Harry? $harry"
 
-		assertEquals 'Should have 4 colors', 4, byColor.size()
-		assertTrue 'Should contain the key "blue"', byColor.containsKey('blue')
-		assertEquals 'Blue should have two objects', 2, byColor['blue'].size()
-		assertTrue  'Blue should contain "John"', ( byColor['blue'].find({ it.name == 'John' })?.name=='John' )
-		assertTrue 'Blue should not contain "Harry"',  ( harry == null )
-
+        expect:
+		    byColor.size() == 4 //Should have 4 colors
+		    byColor.containsKey('blue') //Should contain the key "blue"
+		    byColor['blue'].size() == 2 //Blue should have two objects
+		    ( byColor['blue'].find({ it.name == 'John' })?.name=='John' ) //Blue should contain "John"
+		    ( harry == null ) //Blue should not contain "Harry"
 	}
 
 
@@ -144,21 +155,22 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def deps
 		(tasks, deps) = initTestData()
 
-		def by = deps.asGroup { it.predecessor.id }
+		def by = deps.asGroup({ it.predecessor.id })
 		// println "by=${by}"
 
-		assertEquals 'Should have 7 groups', 7, by.size()
-		assertTrue 'id "0" should be one of the ids in the map', by.containsKey('0')
-		assertEquals 'Group "0" should have 2 nodes', 2, by['0'].size()
-		assertEquals 'Group "5" should have 3 nodes', 3, by['5'].size()
-		assertTrue 'Group "0" should contain dependency "100"', ( by['0'].find { it.id == 100}?.id == 100 )
-		assertTrue 'Group "0" should not contain dependency "14"', ( by['0'].find { it.id == 14 } == null )
+        expect:
+            by.size() == 7 //Should have 7 groups
+            by.containsKey('0') //id "0" should be one of the ids in the map
+            by['0'].size() == 2 //Group "0" should have 2 nodes
+            by['5'].size() == 3 //Group "5" should have 3 nodes
+            ( by['0'].find { it.predecessor.taskNumber == 1000}?.predecessor.taskNumber == 1000 ) //Group "0" should contain dependency "1000"
+            ( by['0'].find { it.predecessor.taskNumber == 1014 } == null ) //Group "0" should not contain dependency "1014"
 	}
 
 	// @Test
 	// Test that the processDFS is returning the proper results
 	void testProcessDFS() {
-
+        
 		def tasks
 		def deps
 		(tasks, deps) = initTestData()
@@ -166,16 +178,20 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
 
-		assertEquals 'Starts type', 'java.util.ArrayList', dfsMap.starts.getClass().name
-		assertEquals 'Sinks type', 'java.util.ArrayList', dfsMap.sinks.getClass().name
-		assertEquals 'Cyclicals type', 'java.util.LinkedHashMap', dfsMap.cyclicals.getClass().name
+        expect:
+		   'java.util.ArrayList' == dfsMap.starts.getClass().name //Starts type
+		   'java.util.ArrayList' == dfsMap.sinks.getClass().name //Sinks type
+		   'java.util.LinkedHashMap' == dfsMap.cyclicals.getClass().name //Cyclicals type
 
-		assertEquals 'Should have 2 Start vertices', 2, dfsMap.starts.size()
-		assertEquals 'Should have 3 Sink vertices', 3, dfsMap.sinks.size()
-		assertEquals 'Should have 0 Cyclical vertices', 0, dfsMap.cyclicals.size()
+		    dfsMap.starts.size() == 2 //Should have 2 Start vertices
+		    dfsMap.sinks.size() == 3 //Should have 3 Sink vertices
+		    dfsMap.cyclicals.size() == 0 //Should have 0 Cyclical vertices
 
-		[0,6].each { n -> assertEquals "Starts vertices should contain id $n", n, dfsMap['starts'].find { it.id == n }?.id }
-		(7..9).each { n -> assertEquals "Sinks vertices should contain id $n", n, dfsMap['sinks'].find { it.id == n }?.id }
+            dfsMap['starts'].find { it.id == 0 }?.id != null //Starts vertices should contain id 0
+            dfsMap['starts'].find { it.id == 6 }?.id != null //Starts vertices should contain id 6
+            dfsMap['sinks'].find { it.id == 7 }?.id != null //Sinks vertices should contain id 7
+            dfsMap['sinks'].find { it.id == 8 }?.id != null //Sinks vertices should contain id 8
+            dfsMap['sinks'].find { it.id == 9 }?.id != null //Sinks vertices should contain id 9
 	}
 
 	// @Test
@@ -196,12 +212,13 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 			assertEquals "pathDuration for edge $i", d, tmp['dependencies'][durMap.edges[i].id].tmpPathDuration
 		}
 
-		assertEquals 'Finish tmpMapDepth', 1, tmp['tasks'][durMap.tasks[9].id].tmpMapDepth 
-		assertEquals 'Task 1005 tmpMapDepth', 2, tmp['tasks'][durMap.tasks[5].id].tmpMapDepth 
-		assertEquals 'Task 1003 tmpMapDepth', 3, tmp['tasks'][durMap.tasks[3].id].tmpMapDepth 
-		assertEquals 'Task 1002 tmpMapDepth', 4, tmp['tasks'][durMap.tasks[2].id].tmpMapDepth 
-		assertEquals 'Task 1001 tmpMapDepth', 4, tmp['tasks'][durMap.tasks[1].id].tmpMapDepth 
-		assertEquals 'Task 1000 tmpMapDepth', 5, tmp['tasks'][durMap.tasks[0].id].tmpMapDepth 
+		expect:
+			tmp['tasks'][durMap.tasks[9].id].tmpMapDepth == 1 //Finish tmpMapDepth
+			tmp['tasks'][durMap.tasks[5].id].tmpMapDepth == 2 //Task 1005 tmpMapDepth
+			tmp['tasks'][durMap.tasks[3].id].tmpMapDepth == 3 //Task 1003 tmpMapDepth
+			tmp['tasks'][durMap.tasks[2].id].tmpMapDepth == 4 //Task 1002 tmpMapDepth
+			tmp['tasks'][durMap.tasks[1].id].tmpMapDepth == 4 //Task 1001 tmpMapDepth
+			tmp['tasks'][durMap.tasks[0].id].tmpMapDepth == 5 //Task 1000 tmpMapDepth
 	}
 	
 	// @Test
@@ -218,9 +235,10 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
 
-		assertEquals 'Should have 2 Start vertices', 2, dfsMap.starts.size()
-		assertEquals 'Should have 3 Sink vertices', 3, dfsMap.sinks.size()
-		assertEquals 'Should have 1 Cyclical vertex', 1, dfsMap.cyclicals.size()
+        expect:
+            dfsMap.starts.size() == 2 //Should have 2 Start vertices
+            dfsMap.sinks.size() == 3 //Should have 3 Sink vertices
+            dfsMap.cyclicals.size() == 1 //Should have 1 Cyclical vertex
 
 		def durMap = runbookService.processDurations( tasks, deps, dfsMap.sinks, tmp) 
 
@@ -252,11 +270,12 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
 
-		assertEquals 'Returns a list with one group', 1, graphs.size()
-		assertEquals 'Starts', [0,6], graphs[0].starts
-		assertEquals 'Sinks', [7,8,9], graphs[0].sinks
-		assertEquals 'maxPathDuration', 82, graphs[0].maxPathDuration
-		assertEquals 'maxDownstreamTaskCount', 8, graphs[0].maxDownstreamTaskCount
+        expect:
+            graphs.size() == 1 //Returns a list with one group
+            graphs[0].starts == [0,6]
+            graphs[0].sinks == [7,8,9]
+            graphs[0].maxPathDuration == 82
+            graphs[0].maxDownstreamTaskCount == 8
 	}
 
 	// @Test
@@ -269,15 +288,37 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		// Add a second separate set of tasks
 		def ltid = tasks.size() - 1
-		tasks << new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
-		tasks << new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
-		tasks << new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
-		deps << new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
-		deps << new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
+        def asset
+        def dep
+        
+        asset = new AssetComment(id:ltid+1, taskNumber: 1050, duration:90, comment:'Separate map Start task') // start vertex
+        asset.id = ltid+1
+		tasks << asset
+        
+        asset = new AssetComment(id:ltid+2, taskNumber: 1051, duration:7, comment:'Separate map Middle task')
+        asset.id = ltid+2
+		tasks << asset
+
+        asset = new AssetComment(id:ltid+3, taskNumber: 1052, duration:12, comment:'Separate map Sink task') // start vertex
+        asset.id = ltid+3
+		tasks << asset
+
+        dep = new TaskDependency(id:200, predecessor:tasks[ltid+1], assetComment:tasks[ltid+2], type:'SS') 
+        dep.id = 200
+		deps << dep
+
+        dep = new TaskDependency(id:201, predecessor:tasks[ltid+2], assetComment:tasks[ltid+3], type:'SS') 
+        dep.id = 201
+		deps << dep
 
 		// Add an additional starting vector that is shorter so we can see the counts
-		tasks << new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
-		deps << new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
+        asset = new AssetComment(id:ltid+4, taskNumber: 1060, duration:120, comment:'Change tire on truck')
+        asset.id = ltid+4
+		tasks << asset
+        
+        dep = new TaskDependency(id:210, predecessor:tasks[ltid+4], assetComment:tasks[5], type:'SS') 
+        dep.id = 210
+		deps << dep
 
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def dfsMap = runbookService.processDFS( tasks, deps, tmp )
@@ -287,18 +328,17 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		// {starts=[0, 6], sinks=[7, 8, 9], maxPathDuration=73, maxDownstreamTaskCount=8}
 
-		assertEquals 'Returns a list with one group', 2, graphs.size()
-		assertEquals '1st Starts', [0, 6, ltid+4], graphs[0].starts
-		assertEquals '1st Sinks', [7,8,9], graphs[0].sinks
-		assertEquals '1st maxPathDuration', 180, graphs[0].maxPathDuration
-		assertEquals '1st maxDownstreamTaskCount', 8, graphs[0].maxDownstreamTaskCount
+        expect:
+            graphs.size() == 2 //Returns a list with one group
+            [0, 6, ltid+4] == graphs[0].starts //1st Starts
+            [7,8,9] == graphs[0].sinks //1st Sinks
+            180 == graphs[0].maxPathDuration //
+            8 == graphs[0].maxDownstreamTaskCount //1st maxDownstreamTaskCount
 
-		assertEquals '2nd Starts', [ltid+1], graphs[1].starts
-		assertEquals '2nd Sinks', [ltid+3], graphs[1].sinks
-		assertEquals '2nd maxPathDuration', 109, graphs[1].maxPathDuration
-		assertEquals '2nd maxDownstreamTaskCount', 2, graphs[1].maxDownstreamTaskCount
-
-
+		    [ltid+1] == graphs[1].starts //2nd Starts
+		    [ltid+3] == graphs[1].sinks //2nd Sinks
+		    109 == graphs[1].maxPathDuration //2nd maxPathDuration
+		    2 == graphs[1].maxDownstreamTaskCount //2nd maxDownstreamTaskCount
 	}
 
 	// @Test
@@ -318,7 +358,8 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 
 		def task = runbookService.findCriticalStartTask(tasksMap, graphs[0], tmp)
 
-		assertEquals "Critical start task should be", 6, task.id
+        expect:
+		    6 == task.id
 	}
 
 	// @Test
@@ -335,18 +376,26 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 
 		def edgesByPred = deps.asGroup { it.predecessor.id }
-		def edge = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
 
-		assertTrue 'Monitor - Edge should not be null', edge != null
-		assertEquals "Critical edge should be", 108, edge.id
+		when:
+			def edge = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
 
-		edge = runbookService.findCriticalPath(tasks[5], edgesByPred, tmp)
-		assertTrue 'Unrack - Edge should not be null', edge != null
-		assertEquals "Critical edge should be", 109, edge.id
+		then:
+			edge != null //Edge should not be null
+			108 == edge.id //Critical edge should be
+			assertTrue 'Monitor - Edge should not be null', edge != null
+			assertEquals "Critical edge should be", 108, edge.id
 
-		edge = runbookService.findCriticalPath(tasks[8], edgesByPred, tmp)
-		assertTrue 'Coffee - Edge should not be null', edge == null
+		when:
+			edge = runbookService.findCriticalPath(tasks[5], edgesByPred, tmp)
+		then:
+			assertTrue 'Unrack - Edge should not be null', edge != null
+			assertEquals "Critical edge should be", 109, edge.id
 
+		when:
+			edge = runbookService.findCriticalPath(tasks[8], edgesByPred, tmp)
+		then:
+			assertTrue 'Coffee - Edge should not be null', edge == null
 	}
 
 	// @Test
@@ -387,7 +436,8 @@ class RunbookServiceTests extends GrailsUnitTestCase {
 			[9,  0, 37, 81, false],
 		]
 
-		assertEquals 'estFinish should be zero', 82, estFinish
+        expect:        
+		    82 == estFinish //estFinish should be zero
 
 		// Check the times and critical path of all tasks
 		startTimes.each { id, estStart, earliest, latest, criticalPath ->

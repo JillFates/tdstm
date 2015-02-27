@@ -16,7 +16,7 @@ class WsProgressController {
 	/**
 	 * Gets the status of the progress of a async task
 	 */
-	def get = {
+	def retrieveStatus() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -46,7 +46,7 @@ class WsProgressController {
 	/**
 	 * Gets the status of the progress of a async task
 	 */
-	def getData = {
+	def retrieveData() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -78,7 +78,7 @@ class WsProgressController {
 	/**
 	 * Returns the list of pending progresses
 	 */
-	def list = {
+	def list() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -105,7 +105,7 @@ class WsProgressController {
 	/**
 	 * Returns the list of pending progresses
 	 */
-	def demo = {
+	def demo() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -132,7 +132,7 @@ class WsProgressController {
 	/**
 	 * Returns the list of pending progresses
 	 */
-	def demoFailed = {
+	def demoFailed() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)

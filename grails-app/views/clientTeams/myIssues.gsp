@@ -54,7 +54,7 @@
 							<input type="button" value="Refresh" onclick="pageRefresh()" style="cursor: pointer;"/>&nbsp;
 							<select id="selectTimedBarId"
 							    onchange="${remoteFunction(controller:'clientConsole', action:'setTimePreference', 
-								params:'\'timer=\'+ this.value +\'&prefFor=MYTASKS_REFRESH\' ', onComplete:'changeTimebarPref(e)') }">
+								params:'\'timer=\'+ this.value +\'&prefFor=MYTASKS_REFRESH\' ', onComplete:'changeTimebarPref(XMLHttpRequest)') }">
 								<option value="0">Manual</option>
 								<option value="30">30 sec</option>
 								<option value="60">1 Min</option>

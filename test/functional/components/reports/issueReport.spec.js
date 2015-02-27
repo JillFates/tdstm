@@ -8,7 +8,7 @@ describe('Issue Report', function(){
 
   it('should load Application Migration Report page after click on Reports > Application Migration', function(){
     menu.goToReports('issueReport');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=Issue+Report');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report');
   });
 
   it('should have Issue Report as title',function(){
@@ -117,7 +117,7 @@ describe('Issue Report', function(){
 
     it('should have PDF icon img',function(){
       issueReportPage.getIssueReportBtnImg().then(function(list){
-        expect(list[0].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.0.0/images/icons/PDF.gif');
+        expect(list[0].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.5.3/images/icons/PDF.gif');
       });
     });
 
@@ -129,7 +129,7 @@ describe('Issue Report', function(){
 
     it('should have generate XLS iconimg',function(){
      issueReportPage.getIssueReportBtnImg().then(function(list){
-        expect(list[1].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.0.0/images/icons/XLS.gif');
+        expect(list[1].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.5.3/images/icons/XLS.gif');
       });
     });
 

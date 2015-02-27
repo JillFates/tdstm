@@ -46,12 +46,12 @@ class ReportsController {
 	def supervisorConsoleService 
 	def userPreferenceService
 
-	def index = { 
+	def index() { 
 		render(view:'index')
 	}
 	
 	// Generate Report Dialog
-	def getBundleListForReportDialog = {
+	def retrieveBundleListForReportDialog() {
 		def projectInstance = controllerService.getProjectForPage( this )
 		if (! projectInstance) 
 			return
@@ -112,7 +112,7 @@ class ReportsController {
 	}
 	
 	//  cart Asset report
-	def cartAssetReport = {
+	def cartAssetReport() {
 		def reportName = params.reportName
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
@@ -130,9 +130,9 @@ class ReportsController {
 		if(params.moveBundle == "null") {
 			flash.message = " Please Select Bundles. "
 			if(reportName == 'cartAsset') {
-				redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'cart Asset'] )
 			}else {
-				redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
+				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
 			}
 		} else {
 			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
@@ -207,9 +207,9 @@ class ReportsController {
 			if(reportFields.size() <= 0) {    		
 				flash.message = " No Assets Were found for  selected values  "
 				if(reportName == 'cartAsset') {
-					redirect( action:'getBundleListForReportDialog', params:[reportId: 'cart Asset'] )
+					redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'cart Asset'] )
 				}else {
-					redirect( action:'getBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
+					redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Transportation Asset List'] )
 				}
 			}else {
 				//sort reportFields by selected sort options
@@ -238,7 +238,7 @@ class ReportsController {
 	/*
 	 * Generate Issue Report
 	 */
-	def issueReport = {
+	def issueReport() {
 		def subject = SecurityUtils.subject
 		def principal = subject.principal
 		def personInstance = Person.findByFirstName( principal )
@@ -269,7 +269,7 @@ class ReportsController {
 		moveBundles = moveBundles.replace("[","('").replace(",]","')").replace(",","','")
 		if(params.moveBundle == "null") {    		
 			flash.message = " Please Select Bundles. "
-			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
+			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Issue Report'] )
 		} else {
 			String bundleName = "All Bundles"
 			def targetAssetEntitylist
@@ -345,7 +345,7 @@ class ReportsController {
 			}
 			if(reportFields.size() <= 0) {    		
 				flash.message = " No Issues Were found for  selected values  "
-				redirect( action:'getBundleListForReportDialog', params:[reportId: 'Issue Report'] )
+				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Issue Report'] )
 			}else {
 				def filename = 	"IssueReport-${projectInstance.name}-${bundleName}"
 					filename = filename.replace(" ", "_")
@@ -390,7 +390,7 @@ class ReportsController {
 						book.close()
 					} catch( Exception ex ) {
 						flash.message = "Exception occurred while exporting data"+ex
-						redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'Issue Report'] )
+						redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'Issue Report'] )
 						return;
 					}
 				}
@@ -405,7 +405,7 @@ class ReportsController {
 	 * @param Project,MoveBundle,Team,Location
 	 * @return logn badge labels data
 	 *--------------------------------------------------------------------*/
-	def getLabelBadges = {
+	def retrieveLabelBadges() {
 		def moveBundle = params.bundle
 		def location = params.location
 	  def projectInstance = securityService.getUserCurrentProject();
@@ -497,7 +497,7 @@ class ReportsController {
 	 * @param  : asset details
 	 * @return : rack rows
 	 *---------------------------------------*/
-	def getRackLayout( def reportsHasPermission, def asset, def includeBundleName, def backView){
+	def retrieveRackLayout( def reportsHasPermission, def asset, def includeBundleName, def backView){
 		def rows= new StringBuffer()
 		def rowspan = 1
 		def cssClass = "empty"
@@ -581,7 +581,7 @@ class ReportsController {
 	/*
 	 *  Generate PDF Cabling QA / Conflict report 
 	 */
-	def cablingQAReport = {
+	def cablingQAReport() {
 		def reportName = params.reportName
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
@@ -595,7 +595,7 @@ class ReportsController {
 		// if no moveBundle was selected
 		if(params.moveBundle == "null") {
 			flash.message = " Please Select Bundles. "
-			redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
+			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
 		} else {
 			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
 			def reportFields = []
@@ -666,7 +666,7 @@ class ReportsController {
 			//No Assets were found for selected moveBundle,team and Location
 			if(reportFields.size() <= 0) {    		
 				flash.message = " No Cables were found for  selected values  "
-				redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
+				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
 			}else {
 				def name = reportName == 'cablingQA' ? "CablingQA" : "CablingConflict"
 				def filename = 	"${name}-${projectInstance.name}-${bundleName}"
@@ -680,7 +680,7 @@ class ReportsController {
 	/*
 	 *  Generate XLS Structured Cabling data report 
 	 */
-	def cablingDataReport = {
+	def cablingDataReport() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject();
@@ -693,7 +693,7 @@ class ReportsController {
 		// if no moveBundle was selected
 		if(params.moveBundle == "null") {
 			flash.message = " Please Select Bundles. "
-				redirect( action:'getBundleListForReportDialog', params:[reportId: 'CablingQA'] )
+				redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'CablingQA'] )
 		} else {
 			def moveBundleInstance = MoveBundle.findById(params.moveBundle)
 			def reportFields = []
@@ -736,7 +736,7 @@ class ReportsController {
 			} catch( Exception ex ) {
 		log.error "Exception occurred while exporting cabling data " + ex
 				flash.message = "Exception occurred while exporting data"
-				redirect( controller:'reports', action:"getBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
+				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
 				return;
 			}
 		}
@@ -744,7 +744,7 @@ class ReportsController {
 	/*
 	 * request page for power report
 	 */
-	def powerReport = {
+	def powerReport() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject();
@@ -770,7 +770,7 @@ class ReportsController {
 	/*
 	 *  Generate Power report in WEb, PDF, Excel format based on user input
 	 */
-	def powerReportDetails = {
+	def powerReportDetails() {
 
 		List bundleId = request.getParameterValues("moveBundle")
 		def maxUSize = 42
@@ -924,7 +924,7 @@ class ReportsController {
 			return [reportDetails : reportDetails]
 		}
 	}
-	def preMoveCheckList = {
+	def preMoveCheckList() {
 		def projectInstance = securityService.getUserCurrentProject();
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
@@ -935,7 +935,7 @@ class ReportsController {
 		def moveEventId = securityService.getUserCurrentMoveEventId()
 		return ['moveEvents':moveEventList,moveEventId:moveEventId]
 	}
-	def generateCheckList = {
+	def generateCheckList() {
 		def project = securityService.getUserCurrentProject()
 		def moveEventId = params.moveEvent
 		def moveEventInstance
@@ -957,7 +957,7 @@ class ReportsController {
 		redirect( action:"preMoveCheckList")
 		
 	}
-	def applicationConflicts = {
+	def applicationConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject();
 		if (!projectInstance) {
@@ -994,7 +994,7 @@ class ReportsController {
 	 * @param bundle
 	 * @render template
 	 */
-	def generateSmeByBundle = {
+	def generateSmeByBundle() {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleId=params.bundle
 		def smeList = []
@@ -1013,7 +1013,7 @@ class ReportsController {
 	 * @param sme
 	 * @return list of applications
 	 */
-	def generateApplicationProfiles = {
+	def generateApplicationProfiles() {
 		def project = securityService.getUserCurrentProject()
 		def currentBundle 
 		def currentSme
@@ -1094,7 +1094,7 @@ class ReportsController {
 		
 		return [applicationList:appList, moveBundle:currentBundle?:'Planning Bundles' , sme:currentSme?:'All' ,appOwner:applicationOwner?:'All', project:project]
 	}
-	def generateApplicationConflicts = {
+	def generateApplicationConflicts() {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleId = params.moveBundle
 		def moveBundleInstance
@@ -1125,7 +1125,7 @@ class ReportsController {
 	/*
 	 * Generate Issue Report
 	 */
-	def tasksReport = {
+	def tasksReport() {
 		def taskList = []
 		def reqEvents = params.list("moveEvent").toList()
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -1189,7 +1189,7 @@ class ReportsController {
 			}
 		} else{
 			flash.message = "Please select move event to get the task report."
-			redirect( action:"getBundleListForReportDialog", params:[reportId:"Task Report"])
+			redirect( action:"retrieveBundleListForReportDialog", params:[reportId:"Task Report"])
 		}
 		
 	}
@@ -1245,7 +1245,7 @@ class ReportsController {
 		}
 		if(reportFields.size() <= 0) {
 			flash.message = " No Assets Were found for  selected values  "
-			redirect( action:'getBundleListForReportDialog', params:[reportId: 'Task Report'] )
+			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Task Report'] )
 		}else {
 			def filename = 	"${project.name}-TaskReport"
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
@@ -1256,7 +1256,7 @@ class ReportsController {
 	/**
 	 * used to render to server Conflicts selection criteria.
 	 */
-	def serverConflicts = {
+	def serverConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	def projectInstance = securityService.getUserCurrentProject();
 	if (!projectInstance) {
@@ -1272,7 +1272,7 @@ class ReportsController {
 	/**
 	 * Used to generate server Conflicts.
 	 */
-	def generateServerConflicts = {
+	def generateServerConflicts() {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleId = params.moveBundle
 		def moveBundleInstance
@@ -1303,7 +1303,7 @@ class ReportsController {
 	/**
 	 * used to render to application Migration Report selection criteria.
 	 */
-	def applicationMigrationReport = {
+	def applicationMigrationReport() {
 	def project = securityService.getUserCurrentProject();
 	if (!project) {
 	  flash.message = "Please select project to view Reports"
@@ -1324,7 +1324,7 @@ class ReportsController {
 	/**
 	 * Used to generate Application Migration Report.
 	 */
-	def generateApplicationMigration = {
+	def generateApplicationMigration() {
 		def project = securityService.getUserCurrentProject()
 		def applicationList
 		def currentSme
@@ -1398,7 +1398,7 @@ class ReportsController {
 	/**
 	 * used to render to database Report selection criteria.
 	 */
-	def databaseConflicts = {
+	def databaseConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	def projectInstance = securityService.getUserCurrentProject();
 	if (!projectInstance) {
@@ -1413,7 +1413,7 @@ class ReportsController {
 	/**
 	 * Used to generate database conflicts Report.
 	 */
-	def generateDatabaseConflicts = {
+	def generateDatabaseConflicts() {
 		def project = securityService.getUserCurrentProject()
 		def moveBundleId = params.moveBundle
 		def moveBundleInstance

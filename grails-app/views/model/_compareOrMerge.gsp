@@ -15,11 +15,11 @@
 	         </g:if>
 	         
 	         <g:elseif test="${column =='Front Image' && model.(columnList.get(column))}">
-	         	<td class="col_${model.id}"><img src="${createLink(controller:'model', action:'getFrontImage', id:model.id)}" style="height: 50px;width: 100px;"/></td>
+	         	<td class="col_${model.id}"><img src="${createLink(controller:'model', action:'retrieveFrontImage', id:model.id)}" style="height: 50px;width: 100px;"/></td>
 	         </g:elseif>
 	         
 	         <g:elseif test="${column =='Rear Image' && model.(columnList.get(column))}">
-	         	<td class="col_${model.id}"><img src="${createLink(controller:'model', action:'getRearImage', id:model.id)}" style="height: 50px;width: 100px;"/></td>
+	         	<td class="col_${model.id}"><img src="${createLink(controller:'model', action:'retrieveRearImage', id:model.id)}" style="height: 50px;width: 100px;"/></td>
 	         </g:elseif>
 	         
 	         <g:elseif test="${i==0}">

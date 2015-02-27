@@ -5,6 +5,7 @@ var FieldSettings = require('./fieldSettings.po.js');
 describe('Field Settings', function() {
 	var menu = new Menu();
 	var fieldSettingsPage = new FieldSettings();
+	
 	it('should load field settings page after clicking Client/Project Field Settings', function() {
 		menu.goToProjects('fieldSettings');
 		expect(fieldSettingsPage.getTitle().getText()).toEqual('Project Field Settings');

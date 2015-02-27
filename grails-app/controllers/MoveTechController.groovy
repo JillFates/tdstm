@@ -27,7 +27,7 @@ class MoveTechController {
      * @param  : String user, String team, String location
      * @return : Redirect to home page with Array of arguments
      *------------------------------------------------------------*/
-    def index = {
+    def index() {
     	def browserTest = false
     	if ( !request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
     		browserTest = true
@@ -112,7 +112,7 @@ class MoveTechController {
     }
     
     //moveTech login
-    def moveTechLogin = {    	
+    def moveTechLogin() {    	
         redirect( action:'login' )
     }
     
@@ -121,7 +121,7 @@ class MoveTechController {
      * @param  : String username
      * @return : Redirect to home page if session is not expired else redirect to signIn method 
      *----------------------------------------------------------------------------------------*/
-    def login = {
+    def login() {
     	def validate = true
 		def message = flash.message
 		if( message ) {
@@ -154,7 +154,7 @@ class MoveTechController {
      * @param  : String username
      * @return : Redirect to checkAuth function if user login successful
      *-----------------------------------------------------------------*/
-    def signIn = {
+    def signIn() {
         def moveBundleInstance
         def projectTeamInstance
         if( params.username ) {
@@ -372,7 +372,7 @@ class MoveTechController {
      * Log out action
      * @return Redirect to login page if user has logged out
      *------------------------------------------------------------------------------*/
-    def signOut = {
+    def signOut() {
         // Log the user out of the application.
         //SecurityUtils.subject.logout()
 		session.setAttribute( "PRINCIPAL", null)
@@ -384,7 +384,7 @@ class MoveTechController {
      * Home Page action
      * @return Home page if the user session is not expired
      *------------------------------------------------------------------------------*/
-    def home = {
+    def home() {
     	def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
     	if( principal ){
     		render ( view:'home' )
@@ -400,7 +400,7 @@ class MoveTechController {
      * @param  String bundle, String team, String location
      * @return Array of arguments  
      *------------------------------------------------------------------------------*/
-	def assetTask = {
+	def assetTask() {
 		if ( params.fMess ) {
 			flash.clear()
 		}
@@ -519,7 +519,7 @@ class MoveTechController {
      * @param  String search, String team, String location
      * @return Array of arguments   
      *------------------------------------------------------------------------------*/
-	def assetSearch = {
+	def assetSearch() {
     	if(flash.message?.contains("was not located")){
     		flash.clear()
     	}
@@ -748,7 +748,7 @@ class MoveTechController {
      * @param  String enterNote, String team, String location, String bundle
      * @return boolean for indication of transitions   
      *------------------------------------------------------------------------------*/
-	def placeHold = {
+	def placeHold() {
         def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if ( principal ) {
         	def enterNote = params.enterNote
@@ -757,7 +757,7 @@ class MoveTechController {
         		clientTeamsService.appendCommentsToRemainderList( params, session )
         	}
         	def loginTeam = ProjectTeam.findById(params.team)
-    		def asset = getAssetEntity ( params.search, params.user )
+    		def asset = retrieveAssetEntity ( params.search, params.user )
     		def redirectAction = "assetTask"
     		if(asset){
             def bundle = asset.moveBundle
@@ -870,10 +870,10 @@ class MoveTechController {
      * @param  String assetComment, String team, String location, String actionLabel, String search, String user
      * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page   
      *--------------------------------------------------------------------------------------------------------*/
-	def unRack = {
+	def unRack() {
         def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if( principal ) {
-        	def asset = getAssetEntity ( params.search, params.user )
+        	def asset = retrieveAssetEntity ( params.search, params.user )
         	if(asset){
 	            def bundle = asset.moveBundle
 	            def moveBundleInstance = MoveBundle.findById( params.bundle )
@@ -928,7 +928,7 @@ class MoveTechController {
      * @param  String bundle, String team, String location
      * @return Array of arguments  
      *--------------------------------------------------------------------------------------------*/
-	def logisticsMyTasks = {
+	def logisticsMyTasks() {
 		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if( principal ) {
             def bundleId = params.bundle
@@ -1022,7 +1022,7 @@ class MoveTechController {
      * @param  String search, String team, String location
      * @return Array of arguments   
      *-----------------------------------------------------------------------------*/ 
-	def logisticsAssetSearch = {
+	def logisticsAssetSearch() {
 		def browserTest = false
 		if ( !request.getHeader( "User-Agent" ).contains( "MSIE" ) ) {
 			browserTest = true
@@ -1225,10 +1225,10 @@ class MoveTechController {
      * @param  String assetComment, String team, String location, String actionLabel, String search, String user
      * @return Message with boolean for indication of transitions   
      *-------------------------------------------------------------------------------------------------------*/ 
-	def cleaning = {
+	def cleaning() {
         def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
         if ( principal ) {
-        	def asset = getAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
+        	def asset = retrieveAssetEntity ( params.search, params.user )//AssetEntity.findByAssetTag(params.search)
         	if(asset){
 	            def bundle = asset.moveBundle
 	            //def moveBundleInstance = MoveBundle.findById( params.bundle )
@@ -1269,10 +1269,10 @@ class MoveTechController {
      * @param  String actionLabel, String team, String location, String search, String user
      * @return render the logisticsAssetSearch with required params  
      *--------------------------------------------------------------------------------------*/
-	def cancelAssetSearch = {
+	def cancelAssetSearch() {
 		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if ( principal ) {
-			def asset = getAssetEntity ( params.search, params.user )
+			def asset = retrieveAssetEntity ( params.search, params.user )
 			if(asset){
 				def bundle = asset.moveBundle
 				def loginUser = UserLogin.findByUsername ( principal )
@@ -1297,7 +1297,7 @@ class MoveTechController {
      * @param  String team, String location
      * @return Redirect to assetTask with required params
      *----------------------------------------------------*/
-	def moveTechSuccessLogin = {
+	def moveTechSuccessLogin() {
     	def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
     	// Checking user existence
     	if ( principal ) {	        
@@ -1331,7 +1331,7 @@ class MoveTechController {
      * @param  String assetTag, String user
      * @return AssetEntity Object
      *----------------------------------------------------------------------------------*/
-	def getAssetEntity ( assetTag, user ) {
+	def retrieveAssetEntity ( assetTag, user ) {
 		def loginCode = session.getAttribute( "USERNAME" )
 		def loginDetails = loginCode.split("-")
 		def movebundle = loginDetails[1]
@@ -1358,7 +1358,7 @@ class MoveTechController {
 	* TODO : JPM 9/2014 : Determine if setPrintersIntoSession method is even necessary / remove when we get rid of ActiveX control
 	* @param params.dropdown - list of printers
 	*/
-    def setPrintersIntoSession = {
+    def setPrintersIntoSession() {
 		def printers 
 		if (params.dropdown) {
 			printers = params.dropdown.split(",")
@@ -1372,11 +1372,11 @@ class MoveTechController {
      * @param  String assetTag, project,bundle
      * @return Create a Comment for AssetEntity
      *----------------------------------------------------------------------------------*/
-	def addComment = {
+	def addComment() {
 		def principal = session.getAttribute ( "PRINCIPAL" )//SecurityUtils.subject.principal
 		if( principal ){
 			def loginUser = UserLogin.findByUsername ( principal )
-			def asset = getAssetEntity ( params.search, params.user )
+			def asset = retrieveAssetEntity ( params.search, params.user )
 			if(asset){
 				def assetComment = new AssetComment()
 					assetComment.comment = params.enterNote
@@ -1392,9 +1392,9 @@ class MoveTechController {
 				flash.message = "Asset not found"
 			}
 	        if( params.user != "ct" ) {
-	        	redirect( action:assetSearch, params:params )
+	        	redirect( action:"assetSearch", params:params )
 	        } else {
-	        	redirect( action:logisticsAssetSearch, params:params )
+	        	redirect( action:"logisticsAssetSearch", params:params )
 	        }
 		} else {
         	flash.message = "Your login has expired and must login again."

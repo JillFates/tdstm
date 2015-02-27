@@ -71,48 +71,43 @@
 	        var environment = $("#environment").val();
 	        
 	        if(option=='planStatus' && planStatus){
-		        ${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ planStatus+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(e,planStatus,option)')};
+		        ${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ planStatus+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(data,planStatus,option)')};
 	        }else if(option=='Priority' && priorityOption){
-	        	${remoteFunction(action:'saveAssetoptions', params:'\'priorityOption=\'+ priorityOption +\'&assetOptionType=\'+"Priority"', onSuccess:'addAssetOption(e,priorityOption,option)')};
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'priorityOption=\'+ priorityOption +\'&assetOptionType=\'+"Priority"', onSuccess:'addAssetOption(data,priorityOption,option)')};
 	        } else if(option=='dependency' && dependencyType){
-	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyType=\'+ dependencyType +\'&assetOptionType=\'+"dependency" ', onSuccess:'addAssetOption(e,dependencyType,option)')};
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyType=\'+ dependencyType +\'&assetOptionType=\'+"dependency" ', onSuccess:'addAssetOption(data,dependencyType,option)')};
 	        }else if(option=='dependencyStatus' && dependencyStatus){
-	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ dependencyStatus +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(e,dependencyStatus,option)')};
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ dependencyStatus +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(data,dependencyStatus,option)')};
 	        }else if(option=='environment' && environment){
-	        	${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ environment +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(e,environment,option)')};
+	        	${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ environment +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
 	        }else{
     			alert(option+" can't be blank.")
     		}
     }
     
-    function addAssetOption(e,value,option){
+    function addAssetOption(data,value,option){
         var option = option;
     	 if(option=='planStatus'){
-	    	var data = eval('(' + e.responseText + ')');
 	    	var id = data.id;
 	    	var planStatusValue = value;
 	    	$("#planStatusTbodyId").append("<tr id='planStatus_"+id+"' style='cursor: pointer;'><td>"+planStatusValue+"</td><td><span class=\'deleteStatus clear_filter'\  onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
 	    	$("#newplanStatus").val("");
     	 }else if(option=='Priority'){
-    		var data = eval('(' + e.responseText + ')');
  	    	var id = data.id;
  	    	var priorityOptionValue = value;
  	    	$("#priorityStatusTbodyId").append("<tr id='priorityOption_"+id+"' style='cursor: pointer;'><td>"+priorityOptionValue+"</td><td><span class=\'deletePriority clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
  	    	$("#priorityOption").val("");
          }else if(option=='dependency'){
-    		var data = eval('(' + e.responseText + ')');
  	    	var id = data.id;
  	    	var dependencyTypeValue = value;
  	    	$("#dependencyTypeTbodyId").append("<tr id='dependencyType_"+id+"' style='cursor: pointer;'><td>"+dependencyTypeValue+"</td><td><span class=\'deleteDependency clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
  	    	$("#dependencyType").val("");
          }else if(option=='dependencyStatus'){
-    		var data = eval('(' + e.responseText + ')');
  	    	var id = data.id;
  	    	var dependencyStatusValue = value;
  	    	$("#dependencyStatusTbodyId").append("<tr id='dependencyStatus_"+id+"' style='cursor: pointer;'><td>"+dependencyStatusValue+"</td><td><span class=\'deleteDependencyStatus clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")
  	    	$("#dependencyStatus").val("");
          }else if(option=='environment'){
-    		var data = eval('(' + e.responseText + ')');
  	    	var id = data.id;
  	    	var environmentValue = value;
  	    	$("#envOptionTbodyId").append("<tr id='environment_"+id+"' style='cursor: pointer;'><td>"+environmentValue+"</td><td><span class=\'deleteEnvironment clear_filter'\ onClick=\"deleteAssetStatus(\'"+id+"','"+option+"')\" ><b>X</b></span></td></tr>")

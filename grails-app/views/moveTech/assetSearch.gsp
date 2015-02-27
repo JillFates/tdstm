@@ -243,7 +243,7 @@
 	<div class="cabling_div">
 		<div id="cablingPanel" style="height: auto;">
 		<g:if test="${projMap?.asset?.model?.rearImage && projMap?.asset?.model?.useImage == 1}">
-			<img src="${createLink(controller:'model', action:'getRearImage', id:projMap?.asset?.model?.id)}" />
+			<img src="${createLink(controller:'model', action:'retrieveRearImage', id:projMap?.asset?.model?.id)}" />
 		</g:if>
 		<g:each in="${assetCablingDetails}" status="i" var="assetCable">
 			<div id="connector${i}" style="top:${assetCable.connectorPosY / 2}px ;left:${assetCable.connectorPosX}px ">

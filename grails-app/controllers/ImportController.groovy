@@ -1,5 +1,6 @@
 import grails.converters.JSON
 import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import org.quartz.ObjectAlreadyExistsException
 
@@ -16,7 +17,7 @@ class ImportController {
 
 	def quartzScheduler
 
-	def listJobs = {
+	def listJobs() {
 		List jobs = progressService.list()
 		if (jobs) {
 			render jobs.toString()
@@ -30,7 +31,7 @@ class ImportController {
 	 * @param : id- data transfer batch id
 	 * @return map containing error message if any and import permission  (NewModelsFromImport)
 	 */
-	def invokeAssetImportReview = {
+	def invokeAssetImportReview() {
 		String methodName = 'invokeAssetReviewProcess()'
 		Map results = [info:'', hasPerm:false]
 		String errorMsg
@@ -76,7 +77,7 @@ class ImportController {
 				Date startTime = new Date(System.currentTimeMillis() + 2000) // Delay 2 seconds to allow this current transaction to commit before firing off the job
 
 				triggerName = "TM-AssetImportReview-${dtb.id}"
-				Trigger trigger = new SimpleTrigger(triggerName, null, startTime)
+				Trigger trigger = new SimpleTriggerImpl(triggerName, null, startTime)
 
 				//trigger.jobDataMap.putAll(results)
 				trigger.jobDataMap.put('batchId', dtb.id)
@@ -127,7 +128,7 @@ class ImportController {
 	 * @param params.id - the DataTransferBatch id to be processed
 	 * @return A JSON object with various data attributes in it
 	 */
-	def invokeAssetImportProcess = {
+	def invokeAssetImportProcess() {
 		String errorMsg
 		String progressKey
 		Project project
@@ -175,7 +176,7 @@ class ImportController {
 				Date startTime = new Date(System.currentTimeMillis() + 2000) // Delay 2 seconds to allow this current transaction to commit before firing off the job
 
 				triggerName = "TM-AssetImportPosting-${project.id}"
-				Trigger trigger = new SimpleTrigger(triggerName, null, startTime)
+				Trigger trigger = new SimpleTriggerImpl(triggerName, null, startTime)
 
 				//trigger.jobDataMap.putAll(results)
 				trigger.jobDataMap.put('batchId', batchId)
@@ -228,7 +229,7 @@ class ImportController {
 	 * @param params.id - the id number of the batch
 	 * @return The standard ServiceResults object with the value in var results (JSON)
 	 */
-	def importResults = {
+	def importResults() {
 		String errorMsg
 		Project project
 		UserLogin userLogin

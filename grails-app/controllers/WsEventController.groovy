@@ -19,7 +19,7 @@ class WsEventController {
 	 * Provides a list all events and associate bundles for the user's current project
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def listEventsAndBundles = {
+	def listEventsAndBundles() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -48,7 +48,7 @@ class WsEventController {
 	 * for the user's current project
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def listBundles = {
+	def listBundles() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)

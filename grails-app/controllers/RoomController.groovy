@@ -9,6 +9,7 @@ import com.tds.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.GormUtil
 
 class RoomController {
 
@@ -23,11 +24,11 @@ class RoomController {
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-	def index = {
+	def index() {
 		redirect(action: "list", params: params)
 	}
 
-	def list = {
+	def list() {
 		def (project, user) = controllerService.getProjectAndUserForPage( this, 'RackMenuView' )
 		if (! project) 
 			return
@@ -69,25 +70,30 @@ class RoomController {
 		return model
 	}
 
-	def create = {
+	def create() {
 		def roomInstance = new Room()
 		roomInstance.properties = params
 		return [roomInstance: roomInstance]
 	}
 
-	def save = {
+	def save() {
 		def roomInstance = new Room(params)
 		if (roomInstance.save(flush: true)) {
 			flash.message = "Room : ${roomInstance.roomName} is created"
 			redirect(action: "list", params:[viewType : "list"])
 		}
 		else {
-			flash.message = "Room : ${roomInstance.roomName} is not created"
+			log.info GormUtil.allErrorsString(roomInstance)
+			if (roomInstance.roomName) {
+				flash.message = "Room : ${roomInstance.roomName} is not created"	
+			} else {
+				flash.message = "Room not created"	
+			}
 			redirect(action: "list",params:[viewType : "list"])
 		}
 	}
 
-	def show = {
+	def show() {
 
 		session.removeAttribute("RACK_ID")
 		def roomInstance = Room.get(params.id)
@@ -158,7 +164,7 @@ class RoomController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 		def roomInstance = Room.get(params.id)
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project = Project.findById( projectId )
@@ -192,7 +198,7 @@ class RoomController {
 	 * @param id:Rack id
 	 * @return room layout 
 	 */
-	def roomObject = {
+	def roomObject() {
 		def rack = Rack.get(params.id)
 		if(!rack) rack = new Rack()
 		render (template:"roomObject", model:[rack:rack, rackId:params.id])
@@ -201,9 +207,12 @@ class RoomController {
 	/**
 	 * Update Room and Rack information
 	 */
-	def update = {
+	def update() {
 		def user = securityService.getUserLogin()
-		def project = securityService.getUserCurrentProject()
+		def project = controllerService.getProjectForPage( this )
+		if (! project) 
+			return
+
 		def powerType = session.getAttribute('CURR_POWER_TYPE')?.CURR_POWER_TYPE
 		def roomId = params.id
 		List rackIds = request.getParameterValues("rackId")
@@ -235,7 +244,7 @@ class RoomController {
 	 * Used to delete one or more rooms that do not have associated assets assigned to the room
 	 * @param checkbox_{roomId}
 	 */
-	def delete = {
+	def delete() {
 
 		def project = securityService.getUserCurrentProject()
 		def user = securityService.getUserLogin()
@@ -271,7 +280,7 @@ class RoomController {
 	/**
 	 *  Verify if rack has associated with any assets before deleting it.
 	 */
-	def verifyRackAssociatedRecords = {
+	def verifyRackAssociatedRecords() {
 		def id = params.rackId
 		def rack = Rack.get(id)
 		def assetEntity
@@ -285,7 +294,7 @@ class RoomController {
 	/**
 	*  Verify if Room has associated with any assets before deleting it.
 	*/
-   def verifyRoomAssociatedRecords = {
+   def verifyRoomAssociatedRecords() {
 	   def id = params.roomId
 	   def room = Room.get(id)
 	   def associatedRecords
@@ -302,7 +311,7 @@ class RoomController {
 	/**
 	 *  Merge Racks and delete the selected Room and Racks
 	 */
-   def mergeRoom = {
+   def mergeRoom() {
 	   def sourceRoomId = params.sourceRoom
 	   def targetRoomId = params.targetRoom
 	   if(sourceRoomId && targetRoomId){
@@ -340,7 +349,7 @@ class RoomController {
    /**
 	*  Return Power details as string to show at room layout.
 	*/
-   def getRackPowerData = {
+   def retrieveRackPowerData() {
 	   def room = Room.read(params.roomId)
 	   def racks = Rack.findAllByRoom(room)
 	   def location = room.source == 1 ? "source" : "target"
@@ -411,7 +420,7 @@ class RoomController {
 		   def prevUsize = 0
 		   assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
 			   // Calculating current assets's position .
-			   def posResult = getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
+			   def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 			   thisRackUsedSpace += posResult.assetUsize
 			   
 			   // Assigning rack position to keep track on upcoming asset's position in loop .
@@ -502,7 +511,7 @@ class RoomController {
    /**
 	*  Return assets list as html row format to assign racks
 	*/
-   def getAssetsListToAddRack = {
+   def retrieveAssetsListToAddRack() {
 	   def order = params.order ? params.order : 'asc'
 	   def project = securityService.getUserCurrentProject()
 	   def projectId = project.id
@@ -549,7 +558,7 @@ class RoomController {
    /**
 	*  Return blades list as html row format to assign blade chassis
 	*/
-   def getBladeAssetsListToAddRack = {
+   def retrieveBladeAssetsListToAddRack() {
 	   def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 	   def source = params.source
 	   def assetEntityList = null
@@ -593,7 +602,7 @@ class RoomController {
 	/**
 	 * Room Capacity Scaling
 	 */
-	def getCapacityView = {
+	def retrieveCapacityView() {
 		def capacityData = [:]
 		def room = Room.read(params.roomId)
 		def racks = Rack.findAllByRoomAndRackType(room,"Rack")
@@ -619,7 +628,7 @@ class RoomController {
 			def prevUsize = 0 // a flag to determine the previous asset's  usize . 
 			assetsInRack.findAll{ it.assetType != 'Blade' }.each{ assetEntity ->
 
-			def posResult = getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
+			def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 				usedRacks += posResult.assetUsize
 				
 				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
@@ -778,7 +787,7 @@ class RoomController {
 		}
 	}
 	
-	def setDraggableRackPref = {
+	def setDraggableRackPref() {
 		def prefVal = params.prefVal
 		userPreferenceService.setPreference("DraggableRack",prefVal)
 		render 'success'
@@ -791,7 +800,7 @@ class RoomController {
 	 * @param rackPos - the position of rack where we are requesting this method to fetch the assets
 	 * @return - list of assets at requested position
 	 */ 
-	def getAssetsAtPosByRackAndLoc(rack, location, assetEntity) {
+	def retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity) {
 		def assetsAtThisPos = location == "source" ? AssetEntity.findAllBySourceRackPositionAndRackSource(assetEntity.sourceRackPosition, rack) :
 			AssetEntity.findAllByTargetRackPositionAndRackTarget(assetEntity.targetRackPosition , rack)
 	
@@ -807,19 +816,19 @@ class RoomController {
 	 * @param rack : instance of rack .
 	 * @return : a map contains info like current and previous asset's usize and like current and previous asset's rack position .
 	 */
-	def getRackPosDetails(assetEntity, assetPos, prevUsize, location, rack){
+	def retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack){
 		def currAssetPos = location == "source" ? assetEntity.sourceRackPosition : assetEntity.targetRackPosition
 		def assetUsize = 0  // Initialized  to 0 to take the count of usize 0 if assets are overlapping.
 		// if assets are not overLapping then it should go inside condition to calculate asset's max usize.
 		def thisUsize
 		if( assetPos != currAssetPos &&  currAssetPos > (assetPos+prevUsize-1) ){ // if assets are not overlapping
 			// fetching  all assets  of current rack position .
-			def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity)
+			def assetsAtPos = retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity)
 			// Assigning usize of that assets which has max usize .
 			thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
 			assetUsize = thisUsize
 		} else if (currAssetPos > assetPos && currAssetPos < (assetPos+prevUsize)){ // If assets are overlapping
-				def assetsAtPos = getAssetsAtPosByRackAndLoc(rack, location, assetEntity)
+				def assetsAtPos = retrieveAssetsAtPosByRackAndLoc(rack, location, assetEntity)
 				//Assigning usize of that assets which has max usize .
 				thisUsize = assetsAtPos.model?.usize.sort().reverse()[0]?:1
 				if((assetPos + prevUsize) < (currAssetPos + thisUsize)){

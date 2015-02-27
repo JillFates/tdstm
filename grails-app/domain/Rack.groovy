@@ -46,47 +46,10 @@ class Rack {
 		}
 	}
 	
-	static Rack findOrCreateWhere(params) {
-		def roomId = params['room.id']
-		def r = createCriteria()
-		def results
-		try{
-			results = r.list {
-				eq('source', params.source.toInteger() ? 1 : 0)
-				eq('project.id', params['project.id'])
-				if( !params.location )
-					isNull('location')
-				else
-					eq('location', params.location)
-				if( !params['room.id'])
-					isNull('room')
-				else
-					eq('room.id', params['room.id'] )
-				eq('tag', params.tag)
-			}
-		} catch( Exception ex ){
-			println"$ex"
-		}
-		// Create a new rack if it doesn't exist
-		def rack = results ? results[0] : null
-		if( !rack )
-			try{
-				rack = new Rack(params)
-				if(!rack.model){
-					rack.model = Model.findByModelNameAndAssetType("Unknown","Rack")
-				}
-				if(!rack.save()){
-					rack.errors.allErrors.each{println it}
-				}
-			} catch(Exception ex){
-				println"$ex"
-			}
-		return rack
-	}
-	
 	def getAssets() {
 		return(source == 1 ? sourceAssets : targetAssets)
 	}
+
 	def hasBelongsToMoveBundle( moveBundleId ){
 		boolean returnVal = false
 		def assets = this.source == 1 ? sourceAssets : targetAssets

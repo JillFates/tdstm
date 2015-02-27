@@ -7,7 +7,7 @@ describe('Cabling QA Report',function(){
   
   it('should load Cabling QA Report page after click on Reports > Cabling QA', function(){
     menu.goToReports('cablingQA');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=CablingQA');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA');
   });
 
   it('should have Cabling QA as title', function(){
@@ -80,7 +80,7 @@ describe('Cabling QA Report',function(){
     });
     it('should have pdf img',function(){
       cablingQAPage.getIssueReportBtnImg().then(function(list){
-        expect(list[0].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.0.0/images/icons/PDF.gif');
+        expect(list[0].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.5.3/images/icons/PDF.gif');
       });
     });    
   }); //Buttons

@@ -105,5 +105,13 @@ class Person extends Party {
 		firstName + ( middleName ? " $middleName" : '' ) + ( lastName ? " $lastName" : '' )
 	}
 	
-	
+	def beforeValidate() {
+		if (middleName == null) {
+			middleName = ""
+		}
+		if (lastName == null) {
+			lastName = ""
+		}
+	}
+
 }

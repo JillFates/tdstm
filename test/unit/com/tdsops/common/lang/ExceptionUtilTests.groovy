@@ -3,8 +3,14 @@ package com.tdsops.common.lang
 import grails.test.*
 import com.tdsops.common.lang.ExceptionUtil
 
-class ExceptionUtilTests  extends GrailsUnitTestCase {
-		
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+
+/**
+ * Unit test cases for the ExceptionUtil class
+ */
+class ExceptionUtilTests extends Specification {
+	
 	public void testOne() {
 		String st
 		try {
@@ -20,10 +26,13 @@ class ExceptionUtilTests  extends GrailsUnitTestCase {
 		def parsed = st?.split(/\n/)
 		def numLines = parsed?.size()
 
-		assertTrue 'Exception string contains data', st?.size() > 0
-		assertTrue "Contains $eType", st?.contains(eType)
-		assertEquals "Number Of Lines", 10, numLines
-
+		expect:
+			// Exception string contains data
+			st?.size() > 0
+			// Contains $eType
+		    st?.contains(eType)
+		    // Number Of Lines
+		    10 == numLines
 	}
 	
 }

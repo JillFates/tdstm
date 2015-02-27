@@ -2,13 +2,16 @@
  * Unit test cases for testing all of the Enum classes
  */
 
-import grails.test.GrailsUnitTestCase
-
 import com.tds.asset.AssetEntityType
 import com.tdsops.tm.enums.domain.*
+import grails.test.mixin.TestFor
+import spock.lang.Specification
 
-class EnumTests extends GrailsUnitTestCase {
-
+/**
+ * Unit test cases for the Enum class
+ */
+class EnumTests extends Specification {
+    
 	/** 
 	 * closure used to perform a number of standard tests against an enum
 	 * @param e 	the Enum under test
@@ -23,51 +26,60 @@ class EnumTests extends GrailsUnitTestCase {
 
 		def keys = e.getKeys()
 		def labels = e.getLabels()
+		def valid = true
 
-		assertEquals "$label name", name, obj.name()
-		assertEquals "$label toString", name, obj.toString()
-		assertEquals "$label value", value, obj.value
-		assertEquals "$label value()", value, obj.value()
-		assertTrue	'$label getKeys() is a List', (keys instanceof List)
-		assertTrue	'$label getLabels() is a List', (labels instanceof List)
-		assertEquals "$label getKeys()[0]", obj.asEnum(firstKey), keys[0]
-		assertEquals "$label getLabels()[0]", firstLabel, labels[0]
+		valid = valid && name.equals(obj.name())
+		valid = valid && name.equals(obj.toString())
+		valid = valid && value.equals(obj.value)
+		valid = valid && value.equals(obj.value())
+		valid = valid && (keys instanceof List)
+		valid = valid && (labels instanceof List)
+		valid = valid && obj.asEnum(firstKey).equals(keys[0])
+		valid = valid && firstLabel.equals(labels[0])
+		valid = valid && (e.asEnum(firstKey) != null)
+		valid = valid && (e.asEnum('XYZZy123') == null)
 
-		assertTrue "$label asEnum() positive", (e.asEnum(firstKey) != null)
-		assertTrue "$label asEnum() negative", (e.asEnum('XYZZy123') == null)
-
+		return valid
 	}
 
 	void testAssetEntityType() {
-		enumTest AssetEntityType, AssetEntityType.STORAGE, 'STORAGE', 'S', 'APPLICATION', 'A'
+		expect:
+			enumTest AssetEntityType, AssetEntityType.STORAGE, 'STORAGE', 'S', 'APPLICATION', 'A'
 	}
 
 	void testSizeScale() {
-		enumTest SizeScale, SizeScale.GB, 'GB', 'Gigabyte', 'KB', 'Kilobyte'
+		expect:		
+			enumTest SizeScale, SizeScale.GB, 'GB', 'Gigabyte', 'KB', 'Kilobyte'
 	}
 
 	void testSpeedScale() {
-		enumTest SpeedScale, SpeedScale.MBps, 'MBps', 'MegaByte/sec', 'Kbps', 'Kilobit/sec'
+		expect:		
+			enumTest SpeedScale, SpeedScale.MBps, 'MBps', 'MegaByte/sec', 'Kbps', 'Kilobit/sec'
 	}
 
 	void testTaskDependencyType() {
-		enumTest TaskDependencyType, TaskDependencyType.FS, 'FS', 'Finish-Start', 'FR', 'Finish-Ready'
+		expect:		
+			enumTest TaskDependencyType, TaskDependencyType.FS, 'FS', 'Finish-Start', 'FR', 'Finish-Ready'
 	}
 
 	void testTimeConstraintType() {
-		enumTest TimeConstraintType, TimeConstraintType.ASAP, 'ASAP', 'As Soon As Possible', 'ALAP', 'As Late As Possible'
+		expect:		
+			enumTest TimeConstraintType, TimeConstraintType.ASAP, 'ASAP', 'As Soon As Possible', 'ALAP', 'As Late As Possible'
 	}
 
 	void testTimeScale() {
-		enumTest TimeScale, TimeScale.W, 'W', 'Weeks', 'M', 'Minutes'
+		expect:
+			enumTest TimeScale, TimeScale.W, 'W', 'Weeks', 'M', 'Minutes'
 	}
 
 	void testSecurityRole() {
-		enumTest SecurityRole, SecurityRole.ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
+		expect:
+			enumTest SecurityRole, SecurityRole.ADMIN, 'ADMIN', 'Administrator', 'USER', 'User'
 	}
 
 	void testContextType() {
-		enumTest ContextType, ContextType.A, 'A', 'Application', 'E', 'Event'
+		expect:
+			enumTest ContextType, ContextType.A, 'A', 'Application', 'E', 'Event'
 	}
 
 }

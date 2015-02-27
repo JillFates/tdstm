@@ -6,7 +6,7 @@ describe('Event Results Report', function(){
   
   it('should load Event Reports page after click on Reports > Application Migration', function(){
     menu.goToReports('eventResults');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults');
   });
 
   it('should have Move Results Report as title',function(){
@@ -94,7 +94,7 @@ describe('Event Results Report', function(){
     it('should generate the report after click on generate button', function(){
       var eventResultsPage = new Reports();
       eventResultsPage.generateTaskReport('web');
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=MoveResults');
+      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults');
     });
 
     it('should get title from generated report',function(){

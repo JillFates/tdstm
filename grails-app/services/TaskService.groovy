@@ -19,6 +19,7 @@ import org.apache.commons.lang.math.NumberUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.dao.IncorrectResultSizeDataAccessException
@@ -525,7 +526,7 @@ class TaskService implements InitializingBean {
 				isPM = securityService.hasRole("PROJ_MGR")
 			}
 			long startTime = System.currentTimeMillis() + (2000L)
-			Trigger trigger = new SimpleTrigger("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
+			Trigger trigger = new SimpleTriggerImpl("tm-updateTaskSuccessors-${taskId}" + System.currentTimeMillis(), null, new Date(startTime) )
 			trigger.jobDataMap.putAll( [ taskId:taskId, whomId:whom.id, status:status, isPM:isPM, tries:0L ] )
 			trigger.setJobName('UpdateTaskSuccessorsJob')
 			trigger.setJobGroup('tdstm-task-update')
@@ -1457,7 +1458,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		try {
 			log.info "initiateCreateTasksWithRecipe : Created taskBatch $tb and about to kickoff job to generate tasks $jobName"
 			// Delay 2 seconds to allow this current transaction to commit before firing off the job
-			Trigger trigger = new SimpleTrigger(jobName, null, new Date(System.currentTimeMillis() + 500) )
+			Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 500) )
 	        trigger.jobDataMap.putAll( [ 'taskBatchId':tb.id, 'publishTasks':publishTasks, 'tries':0L] )
 			trigger.setJobName('GenerateTasksJob')
 			trigger.setJobGroup('tdstm-generate-tasks')
@@ -2123,7 +2124,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						//log.info "SQL for noSuccessorsSql: $noSuccessorsSqlFinal"
-						log.info "generateRunbook: Found ${tasksNoSuccessors.count()} tasks with no successors for milestone ${taskSpec.id}, $moveEvent"
+						log.info "generateRunbook: Found ${tasksNoSuccessors.size()} tasks with no successors for milestone ${taskSpec.id}, $moveEvent"
 					
 						if (tasksNoSuccessors.size()==0 && taskList.size() > 1 ) {
 							if (prevMilestone) {
@@ -4429,7 +4430,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		
 		def taskList = []
 		def staffList = MoveEventStaff.findAllByMoveEvent(moveEvent, [sort:'person'])
-		log.info("createRollcallTasks: Found ${staffList.count()} MoveEventStaff records")
+		log.info("createRollcallTasks: Found ${staffList.size()} MoveEventStaff records")
 
 		def lastPerson = (staffList && staffList[0]) ? staffList[0].person : null
 		def teams = []		

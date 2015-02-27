@@ -18,7 +18,7 @@ class WsProjectController {
 	/**
 	 * Gets the projects associated to a user
 	 */
-	def userProjects = {
+	def userProjects() {
 
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {

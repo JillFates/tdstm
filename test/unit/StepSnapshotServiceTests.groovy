@@ -1,9 +1,11 @@
 // import groovy.time.TimeCategory // 
-import org.codehaus.groovy.runtime.TimeCategory
-import org.junit.Ignore;
+import groovy.time.TimeCategory
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+import spock.lang.Ignore;
 
-
-class StepSnapshotServiceTests extends GroovyTestCase {
+@TestFor(StepSnapshotService)
+class StepSnapshotServiceTests extends Specification {
 
 	def stepSnapshotService =  new StepSnapshotService()
 	
@@ -11,7 +13,7 @@ class StepSnapshotServiceTests extends GroovyTestCase {
 	 * Validate the calcDialIndicator method which should return values between 0 and 100 for various
 	 * durations and adjustments to durations.
 	 */
-	@Ignore
+	@Ignore("do not need to test this right now")
     void testCalcDialIndicator() {
 		assertEquals stepSnapshotService.calcDialIndicator( 100, 0), 50
 		assertEquals stepSnapshotService.calcDialIndicator( 100, -40), 82
@@ -23,7 +25,7 @@ class StepSnapshotServiceTests extends GroovyTestCase {
 	 * Validates the calcPlanDelta method which determine the delta time period that a Step will
 	 * complete in.
 	 */
-	@Ignore
+	@Ignore("do not need to test this right now")
 	void testCalcPlanDelta() {
 		def mbs = new MoveBundleStep()
 		def ss = new StepSnapshot()

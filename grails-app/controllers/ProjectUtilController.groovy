@@ -19,7 +19,7 @@ class ProjectUtilController {
 	def workflowService
 	def stepSnapshotService
 
-	def index = {
+	def index() {
 
 		try {
 			def principal = SecurityUtils.subject.principal
@@ -47,7 +47,7 @@ class ProjectUtilController {
 	 * Action to return a list of projects , sorted desc by dateCreated 
 	 */
 
-	def searchList = {
+	def searchList() {
 		def projectList
 		def partyProjectList
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
@@ -77,7 +77,7 @@ class ProjectUtilController {
 	/*
 	 * Action to setPreferences
 	 */
-	def addUserPreference = {
+	def addUserPreference() {
 
 		def projectInstance = Project.findByProjectCode(params.selectProject)
 
@@ -88,11 +88,11 @@ class ProjectUtilController {
 	/*
 	 *  show the prject demo create project
 	 */
-	def createDemo = { return }
+	def createDemo() { return }
 	/*
 	 *  Copy all the temp project associates to demo project 
 	 */
-	def saveDemoProject = {
+	def saveDemoProject() {
 		def template = params.template
 		def name = params.name
 		def startDate = params.startDate

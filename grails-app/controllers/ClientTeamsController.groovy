@@ -39,13 +39,13 @@ class ClientTeamsController {
 	protected static targetTeamType = ['MOVE_TECH':'targetTeamMt', 'CLEANER':'targetTeamLog','SYS_ADMIN':'targetTeamSa',"DB_ADMIN":'targetTeamDba']
 	protected static sourceTeamType = ['MOVE_TECH':'sourceTeamMt', 'CLEANER':'sourceTeamLog','SYS_ADMIN':'sourceTeamSa',"DB_ADMIN":'sourceTeamDba']
 	
-    def index = { redirect(action: list ,params:params) }
+    def index() { redirect(action:"list" ,params:params) }
 	/**
 	 * @author : Lokanada Reddy
 	 * @param :
 	 * @return : List of teams that are belongs to current project, and if project user preference not exist list all teams
 	 */
-	def list = {
+	def list() {
 		def sourceTeams = []
 		def targetTeams = []
 		userPreferenceService.loadPreferences("CURR_PROJ")
@@ -177,7 +177,7 @@ class ClientTeamsController {
 	 * @params : userLogin in the form of role-bundleId-teamId-location.
 	 * @return : Project, teamName, bundleName, TeamMambers.
 	 */
-	def home = {
+	def home() {
 		def viewMode = session.getAttribute("TEAM_VIEW_MODE")
 		def bundleId = params.bundleId
 		def teamId = params.teamId
@@ -209,7 +209,7 @@ class ClientTeamsController {
 	 * @param  : bundleId,teamId,location,project,tab
 	 * @return : Assets list
 	 */
-	def myTasks = {
+	def myTasks() {
 		if ( params.fMess ) {
 			flash.clear()
 		}
@@ -343,7 +343,7 @@ class ClientTeamsController {
 	* @param  : String search, String team, String location
 	* @return : Searched asset details
 	**/
-   def assetSearch = {
+   def assetSearch() {
 	   if(flash.message?.contains("was not located")){
 		   flash.clear()
 	   }
@@ -544,7 +544,7 @@ class ClientTeamsController {
    * @param  assetComment, team, location, actionLabel, search, user
    * @return redirect to Asset details page if transition flag is busy otherwise redirect to asset task page
    *--------------------------------------------------------------------------------------------------------*/
-   def doTransition = {
+   def doTransition() {
 		def bundleId = params.bundleId
 		def moveBundleInstance = MoveBundle.findById( bundleId )
 		def query = new StringBuffer ("from AssetEntity ae where ae.moveBundle=${moveBundleInstance.id} and ae.assetTag = :search ")
@@ -596,7 +596,7 @@ class ClientTeamsController {
     * @param  String enterNote, String team, String location, String bundle
     * @return boolean for indication of transitions
     *------------------------------------------------------------------------------*/
-   def placeOnHold = {
+   def placeOnHold() {
 	  def enterNote = params.enterNote
 	  def moveBundleInstance = MoveBundle.findById( params.bundleId )
 	  if ( params.similarComment == 'nosimilar' ) {
@@ -652,7 +652,7 @@ class ClientTeamsController {
     * @param  String assetTag, project,bundle
     * @return Create a Comment for AssetEntity from client team station
     *----------------------------------------------------------------------------------*/
-   def addComment = {
+   def addComment() {
 	   def moveBundleInstance = MoveBundle.findById( params.bundleId )
 	   def loginTeam = ProjectTeam.findById(params.teamId)
 	   def role = loginTeam.role
@@ -681,7 +681,7 @@ class ClientTeamsController {
     * @params : logistics team Id, bundle id
     * @return : Team details
     *--------------------------------------------*/
-   def logisticsHome = {
+   def logisticsHome() {
 	   def bundleId = params.bundleId
 	   def teamId = params.teamId
 	   def location = params.location
@@ -703,7 +703,7 @@ class ClientTeamsController {
     * @param  String bundleId, String teamId, String location
     * @return Array of arguments  
     *--------------------------------------------------------------------------------------------*/
-   def logisticsMyTasks = {
+   def logisticsMyTasks() {
 	   def bundleId = params.bundleId
 	   def tab = params.tab
 	   def teamId = params.teamId
@@ -778,7 +778,7 @@ class ClientTeamsController {
     * @param  String search, String teamId, String location
     * @return Array of arguments   
     *-----------------------------------------------------------------------------*/
-	def logisticsAssetSearch = {
+	def logisticsAssetSearch() {
 		def browserTest = false
 		if ( !request.getHeader( "User-Agent" ).contains( "MSIE" ) ) {
 			browserTest = true
@@ -929,7 +929,7 @@ class ClientTeamsController {
 	 * @param  String assetComment, String teamId, String location, String actionLabel, String search, String user
 	 * @return Message with boolean for indication of transitions
 	 *-------------------------------------------------------------------------------------------------------*/
-	def cleaning = {
+	def cleaning() {
 		def query = "from AssetEntity where moveBundle=${params.bundleId} and assetTag = :search "
 		def asset = AssetEntity.find ( query.toString(), [ search : params.search ] )
 		if(asset){
@@ -968,7 +968,7 @@ class ClientTeamsController {
 	 * @param  String actionLabel, String teamId, String location, String search, String user
 	 * @return render the logisticsAssetSearch with required params
 	 *--------------------------------------------------------------------------------------*/
-	def cancelAssetSearch = {
+	def cancelAssetSearch() {
 		def query = "from AssetEntity where moveBundle=${params.bundleId} and assetTag = :search "
 		def asset = AssetEntity.find ( query.toString(), [ search : params.search ] )
 		if(asset){
@@ -989,7 +989,7 @@ class ClientTeamsController {
 	 * params:
 	 *		tab - all or todo 
 	 */
-	def listTasks = {
+	def listTasks() {
 
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
@@ -1107,11 +1107,11 @@ class ClientTeamsController {
 	 * @author Ross Macfarlane
 	 * @return JSON response containing the number of tasks assigned to the current user {count:#}
 	 */
-	def getToDoCount={
+	def retrieveToDoCount() {
 		def project = securityService.getUserCurrentProject()
 		def person = securityService.getUserLoginPerson()
 		def tasksStats = taskService.getUserTasks(person, project, true)
-		// log.info "getToDoCount: tasksStats=${tasksStats}"
+		// log.info "retrieveToDoCount: tasksStats=${tasksStats}"
 		def map = [ count:tasksStats['todo'] ]
 		render map as JSON
 	}
@@ -1121,7 +1121,7 @@ class ClientTeamsController {
 	 * @param issueId
 	 * @return HTML that is used by an AJax call
 	 */
-	def showIssue ={
+	def showIssue() {
 
 		def project = securityService.getUserCurrentProject()
 
@@ -1254,7 +1254,7 @@ function goBack() { window.history.back() }
 	 * Used in MyTask mobile view to show user preference e.g. project, timer , Teams
 	 * @param: personId : Requested person's id .
 	 */
-	def loadUserMobilePref = {
+	def loadUserMobilePref() {
 		def person = Person.read(params.personId)
 		if(person){
 			def now = TimeUtil.nowGMT()
@@ -1272,7 +1272,7 @@ function goBack() { window.history.back() }
 		  	render "Person id ${params.personId} is not existed. "
 		}
 	}
-	def showTaskforEmail = {
+	def showTaskforEmail() {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		def isValidUser= false
@@ -1290,10 +1290,10 @@ function goBack() { window.history.back() }
 			redirect(controller:"clientTeams", action:"listTasks", params:[message:"you dont have permissions to access this task ${task.taskNumber}"])
 		}
 	}
-	def editTaskForEmail = {
+	def editTaskForEmail() {
 		return commentService.showOrEditTask(params)
 	}
-	def updateEmailComment = {
+	def updateEmailComment() {
 		def pred = params.taskDependency
 		def succ = params.taskSuccessor
 		

@@ -110,7 +110,7 @@ class UrlMappings {
 
 		"/ws/task/$id" {
 			controller = "wsTask"
-			action = [GET: "getTaskBatch", DELETE:"deleteBatch"]
+			action = [GET: "retrieveTaskBatch", DELETE:"deleteBatch"]
 		}
 
 		"/ws/task/$id/publish" {
@@ -130,12 +130,12 @@ class UrlMappings {
 		
 		"/ws/task/$id/tasks" {
 			controller = "wsTask"
-			action = [GET:"getTasksOfTaskBatch"]
+			action = [GET:"retrieveTasksOfTaskBatch"]
 		}
 		
 		"/ws/progress/$id" {
 			controller = "wsProgress"
-			action = [GET:"get"]
+			action = [GET:"retrieveStatus"]
 		}
 
 		"/ws/progress/demo" {
@@ -160,7 +160,7 @@ class UrlMappings {
 		
 		"/ws/public/sequence/$contextId/$name" {
 			controller = "wsSequence"
-			action = [GET:"get"]
+			action = [GET:"retrieveNext"]
 		}
 
 		"/ws/project/userProjects" {

@@ -136,7 +136,7 @@ function pageRefresh(){
 var image = "<tr><td><div><img src='"+contextPath+"/images/processing.gif'></div></td></tr>"
 function loadRelatedEntities(id){
 	jQuery.ajax({
-		url: contextPath+'/dashboard/getRelatedEntities',
+		url: contextPath+'/dashboard/retrieveRelatedEntities',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		success: function(data) {
@@ -151,7 +151,7 @@ function loadRelatedEntities(id){
 function loadEventTable(id){
 
 	jQuery.ajax({
-		url: contextPath+'/dashboard/getEvents',
+		url: contextPath+'/dashboard/retrieveEvents',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -169,7 +169,7 @@ function loadEventTable(id){
 function loadEventNewsTable(id){
 
 	jQuery.ajax({
-		url: contextPath+'/dashboard/getEventsNewses',
+		url: contextPath+'/dashboard/retrieveEventsNewses',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -187,7 +187,7 @@ function loadEventNewsTable(id){
 function loadTasksTable(id){
 
 	jQuery.ajax({
-		url: contextPath+'/dashboard/getTaskSummary',
+		url: contextPath+'/dashboard/retrieveTaskSummary',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -205,7 +205,7 @@ function loadTasksTable(id){
 
 function loadAppTable(id){
 	jQuery.ajax({
-		url: contextPath+'/dashboard/getApplications',
+		url: contextPath+'/dashboard/retrieveApplications',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
@@ -222,7 +222,7 @@ function loadAppTable(id){
 
 function loadActivepplTable(id){
 	jQuery.ajax({
-		url: contextPath+'/dashboard/getActivePeople',
+		url: contextPath+'/dashboard/retrieveActivePeople',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {

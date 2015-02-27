@@ -20,8 +20,8 @@ class NewsEditorController {
 	def securityService
 	def userPreferenceService
 	
-    def index = {
-    	redirect( action:newsEditorList, params:params )
+    def index() {
+    	redirect( action:"newsEditorList", params:params )
 	}
 
     /*---------------------------------------------------------
@@ -29,7 +29,7 @@ class NewsEditorController {
      * @param  : project, bundle, and filters
      * @return : Union of assets issues and move event news
      *--------------------------------------------------------*/
-	def newsEditorList = {
+	def newsEditorList() {
 		
 		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
 		def projectInstance = securityService.getUserCurrentProject();
@@ -71,7 +71,7 @@ class NewsEditorController {
 	 * 
 	 * 
 	 */
-	def listEventNewsJson = {
+	def listEventNewsJson() {
 		
 		def projectId =  getSession().getAttribute('CURR_PROJ').CURR_PROJ
 		def projectInstance = Project.findById( projectId )
@@ -189,7 +189,7 @@ class NewsEditorController {
 	 * @param  : id and comment type
 	 * @return : assetComment / moveEventNews object based on comment Type as JSON object
 	 *-------------------------------------------------------------------*/
-	def getCommetOrNewsData = {
+	def retrieveCommetOrNewsData() {
 		def commentList = []
 		def personResolvedObj
 		def personCreateObj
@@ -231,7 +231,7 @@ class NewsEditorController {
      * @param  : project, bundle, and filters, assetComment / moveEventNews updated data
      * @return : will save the data and redirect to action : newsEditorList
      *--------------------------------------------------------*/
-	def updateNewsOrComment = {
+	def updateNewsOrComment() {
 		def principal = SecurityUtils.subject.principal
 		def loginUser = UserLogin.findByUsername(principal)
 		def commentType = params.commentType
@@ -267,7 +267,7 @@ class NewsEditorController {
 		
 		}
 	    
-		redirect(action:newsEditorList, params:[moveBundle : params.moveBundle, viewFilter:params.viewFilter])
+		redirect(action:"newsEditorList", params:[moveBundle : params.moveBundle, viewFilter:params.viewFilter])
 	}
 	
 	/**
@@ -279,7 +279,7 @@ class NewsEditorController {
 	 * @param isArchived
 	 * @param resolution
 	 */
-	def saveNews = {
+	def saveNews() {
 
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
 		if (!project) {
@@ -333,7 +333,7 @@ class NewsEditorController {
 	 * @param isArchived
 	 * @param resolution
 	 */
-	def updateNews = {
+	def updateNews() {
 
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
 		if (!project) {
@@ -415,7 +415,7 @@ class NewsEditorController {
 	 * Used to update an exiting MoveEventNews record that returns AJax Response 
 	 * @param id
 	 */
-	def deleteNews = {
+	def deleteNews() {
 
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
 		if (!project) {

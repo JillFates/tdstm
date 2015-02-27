@@ -17,7 +17,7 @@ function updateRacks( e , type ) {
 }
 var timeInterval;
 function searchRacks(){
-	//${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+document.selectRackForm.viewType.value +\'&searchKey=\'+document.selectRackForm.search.value', onComplete:'updateRacks(e, \'search\')')}
+	//${remoteFunction(action:'getRacksByLocation', params:'\'location=\' + document.selectRackForm.location.value +\'&viewType=\'+document.selectRackForm.viewType.value +\'&searchKey=\'+document.selectRackForm.search.value', onComplete:'updateRacks(XMLHttpRequest, \'search\')')}
 	
 	var searchType = document.selectRackForm.searchType.value;
 	var search = document.selectRackForm.search.value;

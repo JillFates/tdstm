@@ -17,12 +17,12 @@ class UserLoginController {
 	def projectService
 	def jdbcTemplate
 
-	def index = { redirect(action:list,params:params) }
+	def index() { redirect(action:"list",params:params) }
 
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
-	def list = {
+	def list() {
 		def listJsonUrl
 		
 		def companyId = params.companyId ?: 'All'
@@ -48,7 +48,7 @@ class UserLoginController {
 		return [companyId:companyId ,partyGroupList:partyGroupList,listJsonUrl:listJsonUrl]
 	}
 	
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'username'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')
@@ -143,12 +143,12 @@ class UserLoginController {
 		render jsonData as JSON
 	}
 	
-	def show = {
+	def show() {
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(!userLoginInstance) {
 			flash.message = "UserLogin not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		} else { 
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 			def assignedRoles = userPreferenceService.getAssignedRoles( userLoginInstance.person )
@@ -156,28 +156,28 @@ class UserLoginController {
 		}
 	}
 
-	def delete = {
+	def delete() {
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(userLoginInstance) {
 			userLoginInstance.delete(flush:true)
 			flash.message = "UserLogin ${userLoginInstance} deleted"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 		else {
 			flash.message = "UserLogin not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 	}
 	/*
 	 *  Return userdetails and roles to Edit form
 	 */
-	def edit = {
+	def edit() {
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(!userLoginInstance) {
 			flash.message = "UserLogin not found with id ${params.id}"
-			redirect( action:list, params:[ id:companyId ] )
+			redirect( action:"list", params:[ id:companyId ] )
 		}
 		else {
 			def person = userLoginInstance.person
@@ -193,7 +193,7 @@ class UserLoginController {
 	/*
 	 * update user details and set the User Roles to the Person
 	 */
-	def update = {
+	def update() {
 		UserLogin.withTransaction { status ->
 			def userLoginInstance = UserLogin.get( params.id )
 			def companyId = params.companyId
@@ -212,7 +212,7 @@ class UserLoginController {
 				def oldPassword = userLoginInstance.password
 				if(!securityService.validPassword(params['username'], params['password']) && password != ""){
 					flash.message = "The password must meet all the requirements"
-					redirect( action:edit, id:userLoginInstance.id, params:[ companyId:companyId ] )
+					redirect( action:"edit", id:userLoginInstance.id, params:[ companyId:companyId ] )
 				} else{
 					userLoginInstance.properties = params
 					if(params.isLocal){
@@ -240,7 +240,7 @@ class UserLoginController {
 						userPreferenceService.setUserRoles(assignedRoles, person)
 						userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
 						flash.message = "UserLogin ${userLoginInstance} updated"
-						redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
+						redirect( action:"show", id:userLoginInstance.id, params:[ companyId:companyId ] )
 					} else {
 						def person = userLoginInstance.person
 						def availableRoles = userPreferenceService.getAvailableRoles( person )
@@ -252,13 +252,13 @@ class UserLoginController {
 			}
 			else {
 				flash.message = "UserLogin not found with id ${params.id}"
-				redirect( action:edit, id:params.id, params:[ companyId:companyId ])
+				redirect( action:"edit", id:params.id, params:[ companyId:companyId ])
 			}
 		}
 	}
 	
 	// set the User Roles to the Person
-	def addRoles = {
+	def addRoles() {
 			def assignedRoles = params.assignedRoleId.split(',')
 			def person = params.person
 			def actionType = params.actionType
@@ -271,7 +271,7 @@ class UserLoginController {
 	}
 	
 	// return userlogin details to create form
-	def create = {
+	def create() {
 		def personId = params.id
 		def companyId = params.companyId
 		def person
@@ -300,7 +300,7 @@ class UserLoginController {
 	/*
 	 *  Save the User details and set the user roles for Person
 	 */
-	def save = {
+	def save() {
 		try{
 			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -345,7 +345,7 @@ class UserLoginController {
 				tZPreference.value = "EDT"
 				tZPreference.save( insert: true)
 				flash.message = "UserLogin ${userLoginInstance} created"
-				redirect( action:show, id:userLoginInstance.id, params:[ companyId:companyId ] )
+				redirect( action:"show", id:userLoginInstance.id, params:[ companyId:companyId ] )
 				success = true
 			}
 		}
@@ -363,7 +363,7 @@ class UserLoginController {
 	/*======================================================
 	 *  Update recent page load time into userLogin
 	 *=====================================================*/
-	def updateLastPageLoad = {
+	def updateLastPageLoad() {
 		def principal = SecurityUtils.subject?.principal
 		if( principal ){
 			def userLogin = UserLogin.findByUsername( principal )
@@ -373,13 +373,13 @@ class UserLoginController {
 		}
 		render "SUCCESS"
 	}
-	def changePassword = {
+	def changePassword() {
 		def principal = SecurityUtils.subject?.principal
 		def userLoginInstance = UserLogin.findByUsername(principal)
 		render(view:'changePassword',model:[ userLoginInstance:userLoginInstance])
 		return [ userLoginInstance : userLoginInstance]
 	}
-	def updatePassword = {
+	def updatePassword() {
 		def subject = SecurityUtils.subject
 		def principal = subject.principal
 		def userLoginInstance = UserLogin.findByUsername(principal)

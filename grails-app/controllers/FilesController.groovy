@@ -37,11 +37,11 @@ class FilesController {
 
 	def jdbcTemplate
 
-	def index = {
+	def index() {
 		redirect action:'list', params:params
 	}
 
-	def list = {
+	def list() {
 		def filters = session.FILES?.JQ_FILTERS
 		session.FILES?.JQ_FILTERS = []
 
@@ -67,7 +67,7 @@ class FilesController {
 	/**
 	 * This method is used by JQgrid to load assetList
 	 */
-	def listJson = {
+	def listJson() {
 		def sortIndex = params.sidx ?: 'assetName'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
@@ -220,7 +220,7 @@ class FilesController {
 		render jsonData as JSON
 	}
 
-	def create = {
+	def create() {
 		// TODO : JPM 10/2014 : refactor create to get model from service layer
 		def fileInstance = new Files(appOwner:'TDS')
 		def assetTypeAttribute = EavAttribute.findByAttributeCode('assetType')
@@ -239,7 +239,7 @@ class FilesController {
 			environmentOptions:environmentOptions?.value, highlightMap:highlightMap]
 	}
 
-	def show = {
+	def show() {
 
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
@@ -258,7 +258,7 @@ class FilesController {
 		}
 	}
 
-	def edit = {
+	def edit() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
@@ -278,12 +278,12 @@ class FilesController {
 		return model
 	}
 
-	def save = {
+	def save() {
 		controllerService.saveUpdateAssetHandler(this, session, storageService, AssetClass.STORAGE, params)
 		session.FILES?.JQ_FILTERS = params
 	}
 
-	def update = {
+	def update() {
 		controllerService.saveUpdateAssetHandler(this, session, storageService, AssetClass.STORAGE, params)
 		session.FILES?.JQ_FILTERS = params
 
@@ -293,7 +293,7 @@ class FilesController {
 
 			switch (params.redirectTo) {
 				case "room":
-					redirect( controller:'room',action:list )
+					redirect( controller:'room',action:"list" )
 					break;
 				case "rack":
 					redirect( controller:'rackLayouts',action:'create' )
@@ -302,16 +302,16 @@ class FilesController {
 					redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
 					break;
 				case "clientConsole":
-					redirect( controller:'clientConsole', action:list)
+					redirect( controller:'clientConsole', action:"list")
 					break;
 				case "assetEntity":
-					redirect( controller:'assetEntity', action:list)
+					redirect( controller:'assetEntity', action:"list")
 					break;
 				case "database":
-					redirect( controller:'database', action:list)
+					redirect( controller:'database', action:"list")
 					break;
 				case "application":
-					redirect( controller:'application', action:list)
+					redirect( controller:'application', action:"list")
 					break;
 				case "listComment":
 					redirect( controller:'assetEntity', action:'listComment' , params:[projectId: project.id])
@@ -320,17 +320,17 @@ class FilesController {
 					render "Storage ${filesInstance.assetName} updated."
 					break;
 				case "dependencyConsole":
-					forward( controller:'assetEntity',action:'getLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
+					forward( controller:'assetEntity',action:'retrieveLists', params:[entity: params.tabType,dependencyBundle:session.getAttribute("dependencyBundle"),labelsList:'apps'])
 					break;
 				default:
 					session.FILES?.JQ_FILTERS = params
-					redirect( action:list)
+					redirect( action:"list")
 			}
 		*/
 
 	}
 	
-	def delete = {
+	def delete() {
 		def files = Files.get( params.id )
 		if ( files ) {
 			def assetName = files.assetName
@@ -339,19 +339,19 @@ class FilesController {
 			
 			flash.message = "Storage ${assetName} deleted"
 			if (params.dstPath =='dependencyConsole') {
-				forward( controller:'assetEntity',action:'getLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
+				forward( controller:'assetEntity',action:'retrieveLists', params:[entity: 'files',dependencyBundle:session.getAttribute("dependencyBundle")])
 			} else {
-				redirect( action:list )
+				redirect( action:"list" )
 			}
 		}
 		else {
 			flash.message = "Storage not found with id ${params.id}"
-			redirect( action:list )
+			redirect( action:"list" )
 		}
 		
 	}
 	
-	def deleteBulkAsset = {
+	def deleteBulkAsset() {
 		def assetList = params.id.split(",")
 		def assetNames = []
 	

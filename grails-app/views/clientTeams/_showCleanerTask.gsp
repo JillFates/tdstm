@@ -115,8 +115,14 @@
 					<input id="currentStatus_${assetComment.id}" name="currentStatus" type="hidden" value="${assetComment.status}" />
 				</td>
 				<td style="width: 20%;" id="statusEditTrId_${assetComment.id}" colspan="3">
-					<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
-					noSelection="['':'please select']"  onChange="showResolve()" ${statusWarn==1 ? 'disabled="true"' : ''}></g:select>
+					<g:if test="${statusWarn==1}">
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+						noSelection="['':'please select']"  onChange="showResolve()" disabled="true"></g:select>
+					</g:if>
+					<g:else>
+						<g:select id="statusEditId_${assetComment.id}" name="status" from="${com.tds.asset.AssetComment.constraints.status.inList}" value="${assetComment.status}"
+						noSelection="['':'please select']"  onChange="showResolve()"></g:select>
+					</g:else>
 				</td>	
 			</tr>				
 			 <tr class="prop">

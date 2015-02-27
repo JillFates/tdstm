@@ -5,7 +5,7 @@ describe('Transport Worksheets Reports', function(){
   var menu = new Menu();
   it('should load Transport Worksheets Report page after click on Reports > Transport Worksheets', function(){
     menu.goToReports('transportWorksheets');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/getBundleListForReportDialog?reportId=Transportation+Asset+List');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List');
   });
   it('should have Transport Worksheets as title',function(){
     var transportWorksheetsPage = new Reports();

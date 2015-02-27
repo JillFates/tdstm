@@ -198,7 +198,7 @@
 	<div>
 		<div id="cablingPanel">
 			<g:if test="${modelTemplate?.rearImage}">
-				<img id="rearImage" src="${createLink(controller:'model', action:'getRearImage', id:modelTemplate?.id)}" style="display: ${modelTemplate?.useImage != 1 ? 'none':'block' }"/>
+				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelTemplate?.id)}" style="display: ${modelTemplate?.useImage != 1 ? 'none':'block' }"/>
 			</g:if>
 			<g:each in="${modelConnectors}" status="i" var="modelConnector">
 				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">

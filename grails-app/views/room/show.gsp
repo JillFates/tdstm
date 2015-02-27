@@ -28,7 +28,7 @@
 							<input type="hidden" name="viewType" value="list" />
 							<input type="submit" class="submit" value="List" />
 							<tds:hasPermission permission='RoomEditView'>
-								<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(e)')}" />
+								<input type="Button" class="submit" value="Edit" onclick="${remoteFunction(action:'edit', params:'\'id=\'+$(\'#roomId\').val()', onComplete:'openRoomView(XMLHttpRequest)')}" />
 							</tds:hasPermission>
 							<tds:hasPermission permission='AssetEdit'>
 								<input type="checkbox" id="auditCheckId" ${auditPref=='1' ? 'checked="checked"  value="1"' : 'value="0"'}
@@ -221,7 +221,7 @@ function updateRackPower(rackId){
 	var moveBundleId = ''
 	var otherBundle = $("#otherBundle").is(":checked") ? 'on' : ''
 	jQuery.ajax({
-		url: "getRackPowerData",
+		url: "retrieveRackPowerData",
 		data: moveBundleId+"roomId="+$('#roomId').val()+"&rackId="+rackId+"&capacityView="+capacityView+"&capacityType="+capacityType+"&otherBundle="+otherBundle,
 		type:'POST',
 		success: function(data) {
@@ -239,7 +239,7 @@ function capacityView(){
 	var capacityType = $('input[name=capacityType]:checked').val()
 	var roomId = "${roomInstance.id}"
 	jQuery.ajax({
-		url: "getCapacityView",
+		url: "retrieveCapacityView",
 		data: "roomId="+roomId+"&capacityView="+capacityView+"&capacityType="+capacityType,
 		type:'POST',
 		success: function(data) {
@@ -309,12 +309,12 @@ function getRackDetails(browser){
 		bundles.push($(this).val())
    	});
    	var otherBundle = $("#otherBundle").val()
-	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle+\'&capView=\'+capacityView+\'&capType=\'+capacityType', onComplete:'openRoomView(e,browser)')}
+	${remoteFunction(action:'show', params:'\'id=\'+$(\'#roomId\').val()+\'&moveBundleId=\'+bundles+\'&source=\'+$(\'#sourceView\').is(\':checked\')+\'&target=\'+$(\'#targetView\').is(\':checked\')+\'&otherBundle=\'+otherBundle+\'&capView=\'+capacityView+\'&capType=\'+capacityType', onComplete:'openRoomView(XMLHttpRequest,browser)')}
 }
 
 function createAssetPage(type,source,rack,roomName,location,position){
 	var room = $("#redirectTo").val();
-	   ${remoteFunction(action:'create',controller:'assetEntity',params:'\'redirectTo=\'+room', onComplete:'createEntityView(e,type,source,rack,roomName,location,position)')}
+	   ${remoteFunction(action:'create',controller:'assetEntity',params:'\'redirectTo=\'+room', onComplete:'createEntityView(XMLHttpRequest,type,source,rack,roomName,location,position)')}
 }
 </script>
 </body>

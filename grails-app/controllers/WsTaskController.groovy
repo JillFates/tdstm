@@ -21,7 +21,7 @@ class WsTaskController {
 	 * Publishes a {@link TaskBatch} that has been generated before
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def publish = {
+	def publish() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -52,7 +52,7 @@ class WsTaskController {
 	 * Unpublishes a {@link TaskBatch} that has been generated before
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def unpublish = {
+	def unpublish() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -83,7 +83,7 @@ class WsTaskController {
 	 * Deletes a {@link TaskBatch}
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def deleteBatch = {
+	def deleteBatch() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -113,7 +113,7 @@ class WsTaskController {
 	/**
 	 * Generates a set of tasks based on a recipe
 	 */
-	def generateTasks = {
+	def generateTasks() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -151,7 +151,7 @@ class WsTaskController {
 	 * @param recipeId - the record id of the recipe used to generate the TaskBatch
 	 * @return A taskBatch object if found or null
 	 */
-	def findTaskBatchByRecipeAndContext = {
+	def findTaskBatchByRecipeAndContext() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -185,7 +185,7 @@ class WsTaskController {
 	 * List the {@link TaskBatch} using the parameters passed in the request
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def listTaskBatches = {
+	def listTaskBatches() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -217,7 +217,7 @@ class WsTaskController {
 	 * Gets a {@link TaskBatch} based on a id
 	 * Check {@link UrlMappings} for the right call
 	 */
-	def getTaskBatch = {
+	def retrieveTaskBatch() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -244,7 +244,7 @@ class WsTaskController {
 		}
 	}
 	
-	def taskReset = {
+	def taskReset() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)
@@ -272,7 +272,7 @@ class WsTaskController {
 	}
 	
 	
-	def getTasksOfTaskBatch = {
+	def retrieveTasksOfTaskBatch() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
 			ServiceResults.unauthorized(response)

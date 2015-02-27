@@ -1,4 +1,4 @@
-import org.hibernate.lob.BlobImpl
+import org.hibernate.Hibernate
 import java.sql.Blob
 class ProjectLogo {
 
@@ -16,7 +16,8 @@ class ProjectLogo {
 
    
     def setData(InputStream is, long length) {
-        partnerImage = new BlobImpl(is, (int)length)
+        partnerImage = Hibernate.createBlob(is, length)
+        //partnerImage = new BlobImpl(is, (int)length)
     }
    
     /*def getData() {

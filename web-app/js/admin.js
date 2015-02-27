@@ -26,7 +26,7 @@ function processBatch () {
 	
 function openFlushDiv () {
 	jQuery.ajax({
-		url: contextPath+'/admin/getBatchRecords',
+		url: contextPath+'/admin/retrieveBatchRecords',
 		type: 'POST',
 		beforeSend: function(jqXHR) {
 			$("#flushOldBatchId").dialog('option', 'width', '500px')
@@ -54,7 +54,7 @@ function openShowTypeDiv () {
 	$("#cleanProcessId").hide()
 	$("#cleanProcessDivId").hide()
 	jQuery.ajax({
-		url: contextPath+'/admin/getAssetTypes',
+		url: contextPath+'/admin/retrieveAssetTypes',
 		type: 'POST',
 		beforeSend: function(jqXHR) {
 			$("#showOrCleanTypeId").dialog('option', 'width', '500px')
