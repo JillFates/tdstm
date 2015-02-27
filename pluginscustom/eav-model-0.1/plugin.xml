@@ -1,0 +1,27 @@
+<plugin name='eav-model' version='0.1'>
+  <author>John Martin</author>
+  <authorEmail>jmartin@transitionaldata.com</authorEmail>
+  <title>EAV Model - Entity Attribute Model</title>
+  <description>The EAV plugin provide an extensible way to develop applications that utilize
+the Entity Attribute data model.
+</description>
+  <documentation>http://grails.org/EavModel+Plugin</documentation>
+  <resources>
+    <resource>BootStrap</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>AssetEntity</resource>
+    <resource>AssetEntityVarchar</resource>
+    <resource>com.tdssrc.eav.EavAttribute</resource>
+    <resource>com.tdssrc.eav.EavAttributeAuditLog</resource>
+    <resource>com.tdssrc.eav.EavAttributeOption</resource>
+    <resource>com.tdssrc.eav.EavAttributeSet</resource>
+    <resource>com.tdssrc.eav.EavEntity</resource>
+    <resource>com.tdssrc.eav.EavEntityAttribute</resource>
+    <resource>com.tdssrc.eav.EavEntityDatatype</resource>
+    <resource>com.tdssrc.eav.EavEntityDatatypeAuditable</resource>
+    <resource>com.tdssrc.eav.EavEntityType</resource>
+    <resource>com.tdssrc.eav.EavEntityVarchar</resource>
+    <resource>com.tdssrc.eav.EavEntityVarcharAuditable</resource>
+  </resources>
+</plugin>
