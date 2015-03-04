@@ -15,7 +15,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 	  } else {
 	    source.attr("disabled", true);
 	  }
-	  
+	  alert(val);
 	  if(val == 1){
 
 	  	source.parent().removeClass("uncheckedStaff");
@@ -31,7 +31,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 	scope.saveProjectStaff2 = function($event){
 		var source = $($event.target)
 		var row = source.parent().parent()
-		var val = source.val()
+		var val = parseInt(source.val())
 		var personId = source.attr('id')
 		var roleType = source.parent().siblings('#roleColumnId').attr('title')
 		var projectId = $('#project').find('[selected]').val()
@@ -46,7 +46,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 				   alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data.message});
 				}else{
 					scope.toggleCheckbox(source, val);
-					source.val((source.val() + 1) % 2);	
+					source.val((val + 1) % 2);	
 				}
 				
 			},
@@ -109,15 +109,14 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 				phaseArr.push(phaseId)
 			})
 		}
-
 		var data = {
 				'role' : role,
 				'location' : location,
 				'project' : project,
 				'scale' : scale,
 				'phaseArr' : phaseArr,
-				'assigned' : assigned,
-				'onlyClientStaff' : onlyClientStaff,
+				'assigned' :  scope.onlyAssigned,
+				'onlyClientStaff' : scope.onlyClientStaff,
 				'sortOn':sortOn,
 				'firstProp':firstProp,
 				'orderBy':orderBy

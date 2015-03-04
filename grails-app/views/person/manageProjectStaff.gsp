@@ -58,14 +58,14 @@
 					<tds:hasPermission permission='EditTDSPerson'>
 						<td>
 							<span><b>Only Client Staff</b></span><br/>
-								<input type="checkbox" name="clientStaff" id="clientStaffId"  ng-click="loadFilteredStaff('lastName','staff')"
-								${onlyClientStaff=='1'? 'checked="checked" value="1"'  : 'value="0"'}/>
+								<input type="checkbox" name="clientStaff" id="clientStaffId"  ng-change = "loadFilteredStaff('lastName','staff')"
+								ng-model="onlyClientStaff" ng-init="onlyClientStaff=${onlyClientStaff == 1}"/>
 						</td>
 					</tds:hasPermission>
 					<td>
 						<span><b>Only Assigned</b></span><br/>
-							<input type="checkbox" name="assigned" id="assignedId"  ng-click="loadFilteredStaff('lastName','staff')"
-							${assigned=='1'? 'checked="checked" value="1"' : 'value="0"'}/>
+							<input type="checkbox" name="assigned" id="assignedId"  ng-change = "loadFilteredStaff('lastName','staff')"
+								ng-model="onlyAssigned" ng-init="onlyAssigned=${assigned == 1}"/>
 					</td>
 					<%--<td>
 						<span><b>Location</b></span><br/>

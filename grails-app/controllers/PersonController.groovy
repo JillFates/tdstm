@@ -833,10 +833,9 @@ class PersonController {
 		def scale = request.JSON.scale
 		def location = request.JSON.location
 		def phase = request.JSON["phaseArr[]"]
-		def assigned = request.JSON.assigned ?: 1
-		def onlyClientStaff = request.JSON.onlyClientStaff ?: 1
+		def assigned = request.JSON.assigned ? '1' : '0'
+		def onlyClientStaff = request.JSON.onlyClientStaff ? '1' : '0'
 		def loginPerson = securityService.getUserLoginPerson()
-		
 		def sortableProps = ['lastName', 'fullName', 'company', 'team']
 		def orders = ['asc', 'desc']
 		
@@ -955,7 +954,6 @@ class PersonController {
 			) AS companyStaff 
 			WHERE 1=1 
 		""")
-		
 		if (assigned == '1')
 			query.append("AND companyStaff.project = 1 ")
 		if (role != '0')
