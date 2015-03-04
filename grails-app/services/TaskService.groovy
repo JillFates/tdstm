@@ -10,6 +10,7 @@
 import groovy.text.GStringTemplateEngine as Engine
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import groovy.transform.Synchronized
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -116,7 +117,7 @@ class TaskService implements InitializingBean {
 
 		// Initialize some class level variables used repeatedly by the application
 		// TODO : Need to get staffingRoles out of static as the list can change during runtime
-		staffingRoles = partyRelationshipService.getStaffingRoles()*.id
+		// staffingRoles = partyRelationshipService.getStaffingRoles()*.id
 
 		commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
 
@@ -1608,6 +1609,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		progressService.update(progressKey, 100I, (errored ? 'Failed' : 'Completed'), detail)
 	}
 
+
+	/**
+	 * Loads staffingRoles into static property
+	 */
+	@Synchronized
+	void loadStaffingRoles() {
+		if (! staffingRoles) {
+			staffingRoles = partyRelationshipService.getStaffingRoles()*.id
+		}
+	}
+
 	/**
 	 * Method used to generate tasks for a given TaskBatch object. This is designed to run asynch an as such will interact with the 
 	 * ProgressService to update the job with the status. 
@@ -1616,6 +1628,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	void generateTasks(TaskBatch taskBatch, Boolean publishTasks, String progressKey) {
 
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks, progressKey:$progressKey) called"
+
+		loadStaffingRoles()
 
 		// Mark the job's progress as started
 		progressService.update(progressKey, 0I, 'Processing', 'Initializing')

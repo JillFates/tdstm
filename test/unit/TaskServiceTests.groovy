@@ -28,11 +28,12 @@ class TaskServiceTests extends Specification {
 
 		taskService = new TaskService()
 		
-		// use groovy metaClass to put the log into your class
+		// use groovy metaClass to put the log into the class
 		TaskService.class.metaClass.getLog << {-> log}
 
-		// Perform some IOC on the service that is necessary
+		// Perform some IOC on the task service that is necessary
 		taskService.securityService = new SecurityService()
+		taskService.partyRelationshipService = new PartyRelationshipService()
 		
 		// The domains to mock
 	}
