@@ -23,7 +23,6 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'qvga.css')}" />
 		<title>Project Staff</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'calendarview.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
