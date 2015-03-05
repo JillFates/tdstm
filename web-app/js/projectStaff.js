@@ -15,7 +15,6 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 	  } else {
 	    source.attr("disabled", true);
 	  }
-	  alert(val);
 	  if(val == 1){
 
 	  	source.parent().removeClass("uncheckedStaff");
