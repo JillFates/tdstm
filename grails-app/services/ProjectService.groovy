@@ -50,6 +50,48 @@ class ProjectService {
 		return getUserProjects(userLogin, showAllProjPerm, projectStatus, searchParams)
 	}
 
+
+
+	List getStaffList(onlyAssigned, role, projects, companies, sorting){
+		
+		def query = new StringBuffer("""
+			SELECT * FROM (
+				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
+					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName, 
+					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
+				FROM tdstm.party_relationship pr 
+					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
+					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
+					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
+					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
+					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
+						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
+						AND pr2.party_id_from_id IN (${projects}) 
+						AND pr2.role_type_code_from_id = 'PROJECT'
+					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
+						AND mes.role_id = pr.role_type_code_to_id 
+				WHERE pr.role_type_code_from_id IN ('COMPANY') 
+					AND pr.party_relationship_type_id IN ('STAFF', 'PROJ_PARTNER') 
+					AND pr.party_id_from_id IN (${companies})
+                    AND p.active = 'Y' 
+				GROUP BY role, personId 
+				ORDER BY lastName ASC 
+			) AS companyStaff 
+			WHERE 1=1
+		""")
+
+		if (onlyAssigned == '1'){
+			query.append("AND companyStaff.project = 1 ")
+		}
+
+		if (role != '0')
+			query.append("AND companyStaff.role = '${role}'")
+			
+		query.append(" ORDER BY ${sorting}")
+		
+		return jdbcTemplate.queryForList(query.toString())
+	}
+
 	/** 
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all 
 	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
