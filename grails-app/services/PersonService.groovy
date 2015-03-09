@@ -725,6 +725,10 @@ class PersonService {
 		String message = ""
 		// Check if the user has permission to edit the staff
 		if ( RolePermissions.hasPermission("EditProjectStaff") ) {
+			println(">>>>>>>>>>>>>")
+			println(personId)
+			println(eventId)
+			println("<<<<<<<<<<<<<")
 			// Check if the person and events are not null
 			if ( personId && eventId ) {
 				// Check if the user is trying to edit a TDS employee without permission

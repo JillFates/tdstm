@@ -697,6 +697,7 @@ class PersonController {
 		userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
 		render person
 	}
+
 	/*
 	 * Redirect to project staff page with relevant data
 	 * @ returns - staff list.
@@ -771,40 +772,9 @@ class PersonController {
 			if(tdsIndex != -1)
 				companies.replace(tdsIndex, tdsIndex+1, "0")
 		}
-		def query = new StringBuffer("""
-			SELECT * FROM (
-				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
-					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName, 
-					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
-				FROM tdstm.party_relationship pr 
-					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
-					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
-					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
-					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
-					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
-						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
-						AND pr2.party_id_from_id IN (${projectList}) 
-						AND pr2.role_type_code_from_id = 'PROJECT'
-					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
-						AND mes.role_id = pr.role_type_code_to_id 
-				WHERE pr.role_type_code_from_id IN ('COMPANY') 
-					AND pr.party_relationship_type_id IN ('STAFF') 
-					AND pr.party_id_from_id IN (${companies})
-                    AND p.active = 'Y' 
-				GROUP BY role, personId 
-				ORDER BY lastName ASC 
-			) AS companyStaff 
-			WHERE 1=1
-		""")
 		
-		if (assigned == '1')
-			query.append("AND companyStaff.project = 1 ")
-		if (currRole != '0')
-			query.append("AND companyStaff.role = '${currRole}'")
-			
-		query.append(" ORDER BY lastName ASC, team ASC ")
-		
-		def staffList = jdbcTemplate.queryForList(query.toString())
+
+		def staffList = projectService.getStaffList(assigned, currRole, projectList, companies, 'lastName ASC, team ASC ')
 		
 		// Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
 		moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
@@ -928,40 +898,8 @@ class PersonController {
 			if(tdsIndex != -1)
 				companies.replace(tdsIndex, tdsIndex+1, "0")
 		}
-		
-		def query = new StringBuffer("""
-			SELECT * FROM (
-				SELECT pr.party_id_to_id AS personId, CONCAT(IFNULL(p.first_name, ''), ' ', IFNULL(CONCAT(p.middle_name, ' '), ''), IFNULL(p.last_name, '')) AS fullName, CONCAT('[',pg.name,']') AS company, 
-					pr.role_type_code_to_id AS role, SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, p.last_name AS lastName,
-					pr2.party_id_to_id IS NOT NULL AS project, IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
-				FROM tdstm.party_relationship pr 
-					LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id 
-					LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
-					LEFT OUTER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
-					LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
-					LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
-						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
-						AND pr2.party_id_from_id IN (${projects}) 
-						AND pr2.role_type_code_from_id = 'PROJECT'
-					LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
-						AND mes.role_id = pr.role_type_code_to_id 
-				WHERE pr.role_type_code_from_id in ('COMPANY') 
-					AND pr.party_relationship_type_id in ('STAFF') 
-					AND pr.party_id_from_id IN (${companies}) 
-					AND p.active = 'Y'
-				GROUP BY role, personId 
-				ORDER BY fullName ASC 
-			) AS companyStaff 
-			WHERE 1=1 
-		""")
-		if (assigned == '1')
-			query.append("AND companyStaff.project = 1 ")
-		if (role != '0')
-			query.append("AND companyStaff.role = '${role}' ")
-		
-		query.append("ORDER BY ${sortString}")
-		
-		def staffList = jdbcTemplate.queryForList(query.toString())
+
+		def staffList = projectService.getStaffList(assigned, role, projects, companies, sortString)
 		
 		/*staffList.each {
 			log.info "A ${it}"
