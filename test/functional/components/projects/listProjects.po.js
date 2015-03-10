@@ -17,7 +17,9 @@ var ListProjects = function(){
     browser.driver.findElement(by.css(this.createProjectbtnCss)).click();
   };
   this.setSearchProjectCode = function(projCode){
-    browser.driver.findElement(by.id(this.searchProjectCodeId)).sendKeys(projCode);
+    var field = browser.driver.findElement(by.id(this.searchProjectCodeId));
+    field.clear();
+    field.sendKeys(projCode);
   };
   this.getSearchProjectCode = function(){
     return browser.driver.findElement(by.id(this.searchProjectCodeId));

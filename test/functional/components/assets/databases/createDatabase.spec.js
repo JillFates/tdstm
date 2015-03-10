@@ -278,7 +278,8 @@ describe('Database', function(){
         expect(createDBModal.rateOfChangeField.getAttribute('value')).toEqual('');
 
       });
-      it('should not allow non numeric values', function(){
+
+      xit('should not allow non numeric values', function(){
         var createDBModal = new DBCreateModal();
         createDBModal.rateOfChangeField.sendKeys('chau');
         expect(createDBModal.rateOfChangeField.getAttribute('value')).toEqual('chau');

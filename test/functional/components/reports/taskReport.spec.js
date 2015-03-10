@@ -29,7 +29,7 @@ describe('Task Report',function(){
     it('should have the following options',function(){
       taskReportPage.getEventsOptions().then(function(list){
         expect(list[0].getText()).toEqual('All Events');
-        expect(list[1].getText()).toEqual('Buildout Event');
+        expect(list[1].getText()).toEqual('Buildout');
         expect(list[2].getText()).toEqual('M1');
         expect(list[3].getText()).toEqual('M2');
         expect(list[4].getText()).toEqual('M3');

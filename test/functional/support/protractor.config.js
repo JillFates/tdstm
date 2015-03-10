@@ -2,7 +2,7 @@
 var suites = require('./suites.js');
 exports.config = {
 
-  allScriptsTimeout: 15000,
+  allScriptsTimeout: 30000,
   suites: {
     test : suites.test1.concat(suites.test2),
     menu : suites.menu,

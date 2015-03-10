@@ -28,7 +28,7 @@ describe('Event Results Report', function(){
     it('should have the following options',function(){
       eventResultsPage.getMoveEventOptions().then(function(list){
         expect(list[0].getText()).toEqual('Please Select');
-        expect(list[1].getText()).toEqual('Buildout Event');
+        expect(list[1].getText()).toEqual('Buildout');
         expect(list[2].getText()).toEqual('M1');
         expect(list[3].getText()).toEqual('M2');
         expect(list[4].getText()).toEqual('M3');
@@ -38,7 +38,7 @@ describe('Event Results Report', function(){
       eventResultsPage.getMoveEventOptions().then(function(list){
         list[1].click();
       });
-      expect(eventResultsPage.getMoveEventSelected()).toEqual('Buildout Event');
+      expect(eventResultsPage.getMoveEventSelected()).toEqual('Buildout');
     });
   }); // Move event Dropdown
   describe('Report type dropdown',function(){
@@ -63,7 +63,7 @@ describe('Event Results Report', function(){
       eventResultsPage.getReportTypeOptions().then(function(list){
         list[1].click();
       });
-      expect(eventResultsPage.getMoveEventSelected()).toEqual('Buildout Event');
+      expect(eventResultsPage.getMoveEventSelected()).toEqual('Buildout');
     });
 
   });//Report type Dropdown
