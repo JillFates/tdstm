@@ -1,3 +1,4 @@
+if(typeof angular != 'undefined'){
 tds.staffing = tds.staffing || {};
 tds.staffing.controller = tds.staffing.controller || {};
 
@@ -137,7 +138,10 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 
 }
 
-tds.staffing.controller.MainController.$inject = ['$scope', '$http', '$compile', 'alerts'];
+tds.staffing.controller.MainController.$inject = ['$scope', '$http', '$compile', 'alerts'];	
+}
+
+
 /*
  * for making and Ajax call to load staff list using filters.  
  */
