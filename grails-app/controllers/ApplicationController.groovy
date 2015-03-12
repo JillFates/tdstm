@@ -68,6 +68,10 @@ class ApplicationController {
 		return model
 
 	}
+
+	def getListJsonPrefQueryParts(assetType, prefs){
+		return assetEntityService.getAppCustomQuery(prefs)
+	}
 	
 	/**
 	 * This method is used by JQgrid to load appList 
@@ -183,7 +187,12 @@ class ApplicationController {
 			}
 		}
 		if( params.toValidate){
-			query.append(" WHERE apps.validation='${params.toValidate}'")
+			if(firstWhere){
+				query.append(" WHERE ")
+			}else{
+				query.append(" AND ")
+			}
+			query.append("apps.validation='${params.toValidate}'")
 		}
 		if(params.plannedStatus){
 			query.append(" WHERE apps.planStatus='${params.plannedStatus}'")
@@ -193,6 +202,7 @@ class ApplicationController {
 		}
 		
 		log.info "query = ${query}"
+
 		def appsList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
