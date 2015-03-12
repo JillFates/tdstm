@@ -189,16 +189,29 @@ class ApplicationController {
 		if( params.toValidate){
 			if(firstWhere){
 				query.append(" WHERE ")
+				firstWhere = false
 			}else{
 				query.append(" AND ")
 			}
 			query.append("apps.validation='${params.toValidate}'")
 		}
 		if(params.plannedStatus){
-			query.append(" WHERE apps.planStatus='${params.plannedStatus}'")
+			if(firstWhere){
+				query.append(" WHERE ")
+				firstWhere = false
+			}else{
+				query.append(" AND ")
+			}
+			query.append(" apps.planStatus='${params.plannedStatus}'")
 		}
 		if(params.runbook){
-			query.append( " Where apps.runbookStatus='Done' " )
+			if(firstWhere){
+				query.append(" WHERE ")
+				firstWhere = false
+			}else{
+				query.append(" AND ")
+			}
+			query.append( " apps.runbookStatus='Done' " )
 		}
 		
 		log.info "query = ${query}"
