@@ -43,7 +43,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		http.post( contextPath+'/person/saveProjectStaff', params).then(
 			function(response){
 				if(!response.data.data.flag){
-				   alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data.message});
+				   alerts.addAlert({type: 'danger', msg: 'Error: ' + response.data.data.message});
 				}else{
 					scope.toggleCheckbox(source, val);
 					source.val((val + 1) % 2);	
@@ -65,23 +65,18 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		var personId = source.attr('id')
 		var roleType = row.find('#roleColumnId').attr('title')
 
-		toggleCheckbox(source, val );
+		scope.toggleCheckbox(source, val );
 		var project = row.find('#projectColumnId').children('input')
-		if( (project.size() > 0) && (project.val() == 0) && (val == 1) ) {
-			project.attr('checked','checked')
-			project.val(1)
-			toggleChangedStyle(project)
-		}
 		
 		var params = {'personId':personId, 'val':val, 'roleType':roleType, 'eventId':eventId }
 
-		http.post( contextPath+'/person/saveEventtStaff', params).then(
+		http.post( contextPath+'/person/saveEventStaff', params).then(
 			function(response){
 				if(!response.data.data.flag){
-				   alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data.message});
+				   alerts.addAlert({type: 'danger', msg: 'Error: ' + response.data.data.message});
 				}else{
 					scope.toggleCheckbox(source, val);
-					source.val((source.val() + 1) % 2);	
+					source.val((val + 1) % 2);		
 				}
 				
 			},

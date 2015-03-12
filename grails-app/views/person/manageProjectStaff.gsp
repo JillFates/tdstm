@@ -76,7 +76,7 @@
 					<td>
 						<span><b>Project</b></span><br/>
 						<label for="project">
-							<select id="project" name="project" ng-model="selectedProject" ng-init="selectedProject=2445" ng-change="loadFilteredStaff('lastName','staff')">
+							<select id="project" name="project" ng-model="selectedProject" ng-change="loadFilteredStaff('lastName','staff')">
 								<tds:hasPermission permission='EditProjectStaff'>
 									<option value="0">All</option>
 								</tds:hasPermission>

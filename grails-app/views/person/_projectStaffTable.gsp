@@ -65,7 +65,7 @@
 							<g:set var="inMoveEvent" value="${(projectStaff.moveEvents.tokenize(',').contains(moveEvent.id.toString()))}" />
 							<td id="${moveEvent.id}" class="${(inMoveEvent)?('checkedStaff'):('')}" nowrap="nowrap" title="${moveEvent.project} - ${moveEvent.name} - ${moveEvent.startTime}">
 								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"' }
-									ng-click="saveProjectStaff2($event)""  ng-checked="${inMoveEvent}"
+									ng-click="saveEventStaff2($event)""  ng-checked="${inMoveEvent}"
 									value="${(inMoveEvent)?(1):(0)}" 
 									${(inMoveEvent)?('checked="checked"'):('')} />
 							</td>
