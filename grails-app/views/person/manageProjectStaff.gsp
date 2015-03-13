@@ -76,12 +76,12 @@
 					<td>
 						<span><b>Project</b></span><br/>
 						<label for="project">
-							<select id="project" name="project" ng-model="selectedProject" ng-change="loadFilteredStaff('lastName','staff')">
+							<select id="project" name="project" ng-model="selectedProject" ng-change="loadFilteredStaff('lastName','staff')" ng-init="selectedProject=${projectId}">
 								<tds:hasPermission permission='EditProjectStaff'>
 									<option value="0">All</option>
 								</tds:hasPermission>
 								<g:each in="${projects}" var="project">
-									<option value="${project.id}" ${project.id == projectId ? 'selected="selected"' : ''}>
+									<option value="${project.id}">
 										${project.name}
 									</option>
 								</g:each>
