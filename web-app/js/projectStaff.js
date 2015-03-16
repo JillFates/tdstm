@@ -9,6 +9,17 @@ tds.staffing.module = angular.module('tdsProjectStaff', ['tdsCore']);
 
 tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 
+	scope.orderBy = "asc" 
+
+	scope.toggleSortOrder = function(sortOn , firstProp, orderBy, changed){
+		var newVal = "asc"
+		if(scope.orderBy == "asc"){
+			newVal = "desc"
+		}
+		scope.orderBy = newVal
+		scope.loadFilteredStaff(sortOn , firstProp, orderBy, changed)
+	}
+
 
 	scope.toggleCheckbox = function(source, val) {
 	  if (source.attr('disabled')) {
@@ -103,7 +114,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		var scale = $("#scale").val()
 		var onlyClientStaff = $("#clientStaffId").val()
 		var assigned = $("#assignedId").val()
-		var orderBy = orderBy ? orderBy : $("#orderBy").val()
+		var orderBy = orderBy ? orderBy : scope.orderBy
 		var phaseArr = new Array();
 		if ($("#allPhase").val() == '1') {
 			phaseArr.push("all")
@@ -167,14 +178,14 @@ function checkAllPhase() {
 			$("#" + phaseId).attr('checked', true);
 		})
 	}
-	loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
+	loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), scope.orderBy != 'asc' ? 'asc' :'desc');
 }
 /*
  * when uncheck any other check box uncheck phase's all check box
  */
 function unCheckAll() {
 	$("#allPhase").attr('checked', false);
-	loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
+	loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), scope.orderBy != 'asc' ? 'asc' :'desc');
 }
 /*
  * To open person's general info , Availabilty and TDS utility dialog
