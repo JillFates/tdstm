@@ -28,6 +28,14 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 	  }
 	};
 
+	scope.rollbackCheboxStatus = function(source, val){
+		if(val == 0){
+			source.parent().removeClass("checkedStaff");
+			source.removeAttr('checked');
+		}
+		source.removeAttr("disabled");
+	}
+
 	scope.saveProjectStaff2 = function($event){
 		var source = $($event.target)
 		var row = source.parent().parent()
@@ -43,6 +51,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		http.post( contextPath+'/person/saveProjectStaff', params).then(
 			function(response){
 				if(!response.data.data.flag){
+					scope.rollbackCheboxStatus(source,val);
 				   alerts.addAlert({type: 'danger', msg: 'Error: ' + response.data.data.message});
 				}else{
 					scope.toggleCheckbox(source, val);
@@ -60,7 +69,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 	scope.saveEventStaff2 = function($event) {
 		var source = $($event.target)
 		var row = source.parent().parent()
-		var val = source.val()
+		var val = parseInt(source.val())
 		var eventId = source.parent().attr('id')
 		var personId = source.attr('id')
 		var roleType = row.find('#roleColumnId').attr('title')
@@ -73,7 +82,8 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		http.post( contextPath+'/person/saveEventStaff', params).then(
 			function(response){
 				if(!response.data.data.flag){
-				   alerts.addAlert({type: 'danger', msg: 'Error: ' + response.data.data.message});
+					scope.rollbackCheboxStatus(source,val);
+					alerts.addAlert({type: 'danger', msg: 'Error: ' + response.data.data.message});
 				}else{
 					scope.toggleCheckbox(source, val);
 					source.val((val + 1) % 2);		
