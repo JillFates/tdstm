@@ -137,8 +137,8 @@
 								name="projectPartner" 
 								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(XMLHttpRequest)' )}">
 									<option value="" selected="selected">None</option>
-									<g:each status="i" in="${companyPartners}" var="companyPartners">
-										<option value="${companyPartners?.partyIdTo.id}">${companyPartners?.partyIdTo}</option>
+									<g:each status="i" in="${companyPartners}" var="partner">
+										<option value="${partner?.partyIdTo.id}">${partner?.partyIdTo}</option>
 									</g:each>
 								</select>
 							</td>
