@@ -48,21 +48,21 @@
 			<table id="staffFilterId" style="border: 0px;width: 100%;" >
 				<tr>
 					<td>
-						<span><b>Team</b></span><br/>
-						<label for="role" id="roleLabel">
+						<span><b id="teamLabel">Team</b></span><br/>
+						<label for="role">
 							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" ng-click="loadFilteredStaff('lastName','staff')"
 									noSelection="${['0':'All']}"></g:select>
 						</label>
 					</td>
 					<tds:hasPermission permission='EditTDSPerson'>
 						<td>
-							<span><b>Only Client Staff</b></span><br/>
+							<span><b id="onlyClientStaffLabel">Only Client Staff</b></span><br/>
 								<input type="checkbox" name="clientStaff" id="clientStaffId"  ng-change = "loadFilteredStaff('lastName','staff')"
 								ng-model="onlyClientStaff" ng-init="onlyClientStaff=${onlyClientStaff == 1}"/>
 						</td>
 					</tds:hasPermission>
 					<td>
-						<span><b>Only Assigned</b></span><br/>
+						<span><b id="onlyAssignedLabel">Only Assigned</b></span><br/>
 							<input type="checkbox" name="assigned" id="assignedId"  ng-change = "loadFilteredStaff('lastName','staff')"
 								ng-model="onlyAssigned" ng-init="onlyAssigned=${assigned == 1}"/>
 					</td>
@@ -74,8 +74,8 @@
 					</td>
 					--%>
 					<td>
-						<span><b>Project</b></span><br/>
-						<label for="project" id="projectLabel">
+						<span><b id="projectLabel">Project</b></span><br/>
+						<label for="project">
 							<select id="project" name="project" ng-model="selectedProject" ng-change="loadFilteredStaff('lastName','staff')" ng-init="selectedProject=${projectId}">
 								<tds:hasPermission permission='EditProjectStaff'>
 									<option value="0">All</option>
