@@ -49,7 +49,7 @@
 				<tr>
 					<td>
 						<span><b>Team</b></span><br/>
-						<label for="role">
+						<label for="role" id="roleLabel">
 							<g:select id="role" name="role" from="${roleTypes}" optionKey="id" optionValue="${{it.description}}"  value="${currRole}" ng-click="loadFilteredStaff('lastName','staff')"
 									noSelection="${['0':'All']}"></g:select>
 						</label>
@@ -75,7 +75,7 @@
 					--%>
 					<td>
 						<span><b>Project</b></span><br/>
-						<label for="project">
+						<label for="project" id="projectLabel">
 							<select id="project" name="project" ng-model="selectedProject" ng-change="loadFilteredStaff('lastName','staff')" ng-init="selectedProject=${projectId}">
 								<tds:hasPermission permission='EditProjectStaff'>
 									<option value="0">All</option>
