@@ -458,6 +458,12 @@ class AssetEntityService {
 				if (bp) {
 					if (bp > chassis.model?.bladeCount) {
 						warnings = "position ($bp) exceeds chassis capacity (${chassis.model.bladeCount})"
+					} else {
+						if (isSource) {
+							blade.sourceBladePosition = bp
+						} else {
+							blade.targetBladePosition = bp
+						}						
 					}
 				} else {
 					warnings = "position ($bladePosition) specified is invalid"
