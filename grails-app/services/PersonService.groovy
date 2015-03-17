@@ -725,10 +725,6 @@ class PersonService {
 		String message = ""
 		// Check if the user has permission to edit the staff
 		if ( RolePermissions.hasPermission("EditProjectStaff") ) {
-			println(">>>>>>>>>>>>>")
-			println(personId)
-			println(eventId)
-			println("<<<<<<<<<<<<<")
 			// Check if the person and events are not null
 			if ( personId && eventId ) {
 				// Check if the user is trying to edit a TDS employee without permission
@@ -754,7 +750,7 @@ class PersonService {
 							}
 						}	
 					}else{
-						message = "This person doesn't have access to the selected project"
+						message = "This person doesn't have access to the selected event."
 					}
 					
 				} else {
@@ -772,12 +768,15 @@ class PersonService {
 	Boolean hasAccessToProject(Person person, Project project){
 		def projects =  projectService.getUserProjects(null, false, ProjectStatus.ANY, [personId:person.id])
 		def found = false
-		projects.each{currentProject ->
-			if(currentProject.id == project.id){
-				found = true
-				return
-			}
+		if(projects){
+			projects.each{currentProject ->
+				if(currentProject.id == project.id){
+					found = true
+					return
+				}
+			}	
 		}
+		
 		return found
 	}
 }	

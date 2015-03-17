@@ -490,7 +490,8 @@ class PersonController {
 			def personId = request.JSON.personId
 			def roleType = request.JSON.roleType
 			def projectId = request.JSON.projectId
-			def projectParty = Project.findById( projectId )
+			//def projectParty = Project.findById( projectId )
+			def projectParty = securityService.getUserCurrentProject()
 			def personParty = Person.findById( personId )
 			def projectStaff
 			if(request.JSON.val == "1") {
