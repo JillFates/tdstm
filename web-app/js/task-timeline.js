@@ -12,6 +12,17 @@ $(document).ready(function () {
 	generateGraph();
 });
 
+function displayWarningOrErrorMsg(isCyclical) {
+	var message = d3.select('div.body')
+		.append('div')
+		.attr('class','chart');
+	if (isCyclical)
+		message.html('This event\'s task data contains a cyclical dependency sturcture, so no graph can be generated');
+	else
+		message.html('<br />not enough task data to create a graph for this event');
+	$('#spinnerId').css('display', 'none');
+}
+
 function buildGraph (response, status) {
 	
 	// show the loading spinner
@@ -24,20 +35,19 @@ function buildGraph (response, status) {
 	
 	// check for errors in the ajax call
 	if (status == 'error') {
-		var message = d3.select('div.body')
-			.append('div')
-			.attr('class','chart');
-		if (response.responseText == 'cyclical')
-			message.html('This event\'s task data contains a cyclical dependency sturcture, so no graph can be generated');
-		else
-			message.html('<br />not enough task data to create a graph for this event');
-		$('#spinnerId').css('display', 'none');
+		displayWarningOrErrorMsg(response.responseText == 'cyclical')
 		return;
 	}
 
 	var data = $.parseJSON(response.responseText);
+	data = data.data;
 	var ready = false;
-	
+
+	if (data.items.size() == 0) {
+		displayWarningOrErrorMsg(false)
+		return;
+	}
+
 	// populate the Team select
 	var teamSelect = $("#teamSelectId")
 	teamSelect.children().remove();
@@ -76,7 +86,7 @@ function buildGraph (response, status) {
 	var siblingGroupsReduced = [];
 	
 	sanitizeData(items, dependencies);
-	
+
 	// sort the tasks chronologically for the stacking algorithm
 	items.sort( function (a,b) {
 		var t1 = a.start ? (new Date(a.start)).getTime() : 0;
@@ -1069,6 +1079,7 @@ function buildGraph (response, status) {
 			alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
 		
 		// if there is more than 1 start task, create a fake root task
+		data.root = null;
 		if (starts.size() > 1) {
 			var earliest = starts[0].startInitial;
 			for (var i = 0; i < starts.size(); i++) {
@@ -1085,7 +1096,7 @@ function buildGraph (response, status) {
 			root.predecessorIds = [];
 			items = [root].concat(items);
 			data.root = root;
-		} else {
+		} else if (items.size() > 0) {
 			data.root = items[binarySearch(items, starts[0], 0, items.length-1)];
 		}
 		
@@ -1129,9 +1140,11 @@ function buildGraph (response, status) {
 		
 		// find and remove any redundant dependencies using a queue for a breadth first search
 		var queue = [];
-		queue.push(data.root);
-		while (queue.size() > 0)
-			searchForRedundency(queue.pop());
+		if (data.root != null) {
+			queue.push(data.root);
+			while (queue.size() > 0)
+				searchForRedundency(queue.pop());
+		}
 		
 		function searchForRedundency (node) {
 			
@@ -1840,7 +1853,7 @@ function buildGraph (response, status) {
 		}
 		
 		var set = [];
-		if ($('#useHeightCheckBoxId').is(':checked')) {
+		if ($('#useHeightCheckBoxId').is(':checked') && (items.size() > 0)) {
 			getExclusiveSet(items[0], set);
 			exclusiveHeight(items[0], set);
 		}

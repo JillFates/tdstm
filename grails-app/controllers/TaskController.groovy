@@ -805,6 +805,12 @@ digraph runbook {
 			return
 		}
 
+		// Define default data
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def	defaultEstStart = TimeUtil.nowGMT()
+		def defaultStartDate = TimeUtil.convertInToUserTZ(defaultEstStart, tzId)
+		def data = [items:[], sinks:[], starts:[], roles:[], startDate:defaultStartDate, cyclicals:[:]]
+
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
 			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
@@ -813,8 +819,10 @@ digraph runbook {
 		def moveEvents = MoveEvent.findAllByProject(Project.get(projectId))
 		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
 		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
-		if (selectedEventId == 0)
-			return [data:{}, moveEvents:moveEvents, selectedEventId:selectedEventId];
+		if (selectedEventId == 0) {
+			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
+			return
+		}
 		
 		// get basic task and dependency data
 		def me = MoveEvent.get(selectedEventId)
@@ -837,14 +845,18 @@ digraph runbook {
 		}
 		def tmp = runbookService.createTempObject(tasks, deps)
 		def startTime = 0
-		
+
+		if (tasks.size() == 0 || deps.size() == 0) {
+			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
+			return
+		}
+
 		// generate optimized schedule based on this data
 		def dfsMap = runbookService.processDFS(tasks, deps, tmp)
 		def durMap = runbookService.processDurations(tasks, deps, dfsMap.sinks, tmp)
 		def graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 		def estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 		
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def estStart = dfsMap.starts[0].estStart
 		if (!estStart) {
 			estStart = TimeUtil.nowGMT()
@@ -884,10 +896,9 @@ digraph runbook {
 		dfsMap.cyclicals.each {
 			cyclicals.put(it.key, it.value.stack)
 		}
-		
-		def data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate, cyclicals:cyclicals] as JSON
+		data = [items:items, sinks:sinks, starts:starts, roles:roles, startDate:startDate, cyclicals:cyclicals]
 		def returnMap = [data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON
-		render data
+		render returnMap
 	}
 
 	def editTask() {
