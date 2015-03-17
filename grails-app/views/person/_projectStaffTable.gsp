@@ -1,9 +1,9 @@
 <table>
 	<thead>
 		<tr>
-			<th style="cursor: pointer;" ng-click="loadFilteredStaff('lastName','lastName')">Name</th>
-			<th style="cursor: pointer;" ng-click="loadFilteredStaff('company','company')">Company</th>
-			<th style="cursor: pointer;" ng-click="loadFilteredStaff('team','team')">Team</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('lastName','lastName')">Name</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('company','company')">Company</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('team','team')">Team</th>
 			<g:if test="${projectId == 0}"> <th>Project</th></g:if>
 			<g:else><th>${project?.name}</th></g:else>
 			<g:each in ="${moveEventList}" var="moveEvent" >
@@ -20,17 +20,17 @@
 			<g:set var="inProject" value="${projectStaff.project == 1}" />
 			<g:set var="roleHasVowel" value="${projectStaff.team.getAt(0).find(/[aeiouAEIOU]/)}" />
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" >
-				<td nowrap="nowrap">
+				<td nowrap="nowrap" class="js-staffFullName">
 					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 						${projectStaff?.fullName}
 					</span>
 				</td>
-				<td>
+				<td class="js-staffCompany">
 					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 						${projectStaff?.company}
 					</span>
 				</td>
-				<td id="roleColumnId" nowrap="nowrap" title="${projectStaff.role}">
+				<td id="roleColumnId" class="js-staffRole" nowrap="nowrap" title="${projectStaff.role}">
 					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 						${projectStaff?.team}
 					</span>
@@ -42,7 +42,7 @@
 				</g:if>
 				<g:else>
 					<g:if test="${projectStaff.role != 'STAFF'}">
-						<td id="projectColumnId" class="${(projectStaff.project==1)?('checkedStaff'):('')}" nowrap="nowrap" title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}">
+						<td id="projectColumnId" class="js-staffProject ${(projectStaff.project==1)?('checkedStaff'):('')}" nowrap="nowrap" title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}">
 							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck"
 								ng-click="saveProjectStaff2($event)" 
 								<g:if test="${inProject}"> checked </g:if>
