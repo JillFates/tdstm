@@ -5,7 +5,9 @@
 var Menu = require('../menu/menu.po.js');
 var EventDashboard = require('./eventDashboard.po.js');
 var News = require('./news.po.js');
+
 describe('Event Dashboard', function(){
+
   var news1 ={
     'type':'News',
     'message': 'This is news 1 message',
@@ -171,10 +173,13 @@ describe('Event Dashboard', function(){
         newsModal.getCreateBtn().click();
         expect(newsModal.isCreateClosed()).toEqual(true);  
       });
+    
     }); // add
-    xdescribe('edit',function(){
+    
+    describe('edit',function(){
       // var newsId ;
-      it('should select first news and edit modal is opened', function(){
+      
+      xit('should select first news and edit modal is opened', function(){
         var eventDashboardPage =  new EventDashboard();
         eventDashboardPage.getNewsLiveList().then(function(list){
           list[0].click();
@@ -186,51 +191,74 @@ describe('Event Dashboard', function(){
       xit('should have "Edit News" as title',function () {
         
       });
+      
       describe('Fotter buttons',function () {
+      
         xit('should have 3 buttons',function () {
           
         });
+      
         xit('should have "Update" buttons',function () {
           
         });
+      
         xit('should have "Delete" buttons',function () {
           
         });
+      
         xit('should have "Cancel" buttons',function () {
           
         });
+      
       }); //Footer buttons
-      xdescribe('type',function(){
-        it('should have "Type" as label',function () {
+      
+      describe('type',function(){
+      
+        xit('should have "Type" as label',function () {
           
         });
-        it('should have News as type and be disabled',function () {
+      
+        xit('should have News as type and be disabled',function () {
           
         });
+      
       }); //type
-      xdescribe('Message',function () {
-        it('sould have "Message" as label',function () {
+      
+      describe('Message',function () {
+      
+        xit('sould have "Message" as label',function () {
           
         });
-        it('should have text set on create',function () {
+
+        xit('should have text set on create',function () {
           
         });
+
         xit('TM-3603 should not be able to save without a message',function () {
           
         });
-        it('should modify the message',function () {
+
+        xit('should modify the message',function () {
           
         });
+
       });
+
     }); // edit
-    xdescribe('delete',function(){
+
+    describe('delete',function(){
 
     });//delete
+
   });//news
+  
   describe('Task Summary section',function(){
+    
     it('should have "Task Summary" as title', function(){
       var eventDashboardPage =  new EventDashboard();
       expect(eventDashboardPage.getTaskSummaryTitle().getText()).toEqual('Task Summary');
     });
+  
   }); // Task Summary
+
 }); // Event Dashboard
