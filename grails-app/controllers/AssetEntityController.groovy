@@ -2990,7 +2990,10 @@ class AssetEntityController {
 
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def depGroups = JSON.parse(session.getAttribute('Dep_Groups'))		
+		def depGroups = JSON.parse(session.getAttribute('Dep_Groups'))
+		if (depGroups.size() == 0) {
+			depGroups = [-1]
+		}
 
 		def assetDependentlist
 		def selectionQuery = ''

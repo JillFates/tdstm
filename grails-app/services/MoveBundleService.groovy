@@ -376,6 +376,9 @@ class MoveBundleService {
 			
 			if (dependencyBundle) {
 				def depGroups = JSON.parse(userPreferenceService.getSession().getAttribute('Dep_Groups'))
+				if (depGroups.size() == 0) {
+					depGroups = [-1]
+				}
 				if (dependencyBundle.isNumber() )
 					depSql.append(" AND adb.dependency_bundle = ${dependencyBundle}")
 				else if (dependencyBundle == 'onePlus')
