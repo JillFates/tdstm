@@ -402,8 +402,8 @@
 								name="projectPartner"
 								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ document.getElementById(\'clientId\').value +\'&partner=\'+this.value', onComplete:'updateMastersList(XMLHttpRequest)' )}">
 									<option value="" selected="selected">None</option>
-									<g:each status="i" in="${partners}" var="partners">
-										<option value="${partners.partyIdTo?.id}">${partners.partyIdTo}</option>
+									<g:each status="i" in="${partners}" var="partner">
+										<option value="${partner.partyIdTo?.id}">${partner.partyIdTo}</option>
 									</g:each>
 								</select>
 							</td>
