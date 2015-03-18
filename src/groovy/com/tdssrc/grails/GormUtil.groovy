@@ -155,7 +155,8 @@ public class GormUtil {
 			throw new RuntimeException("The $label version was missing from request")
 		} else {
 			if (domainObj.version > version) {
-				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
+
+				throw new RuntimeException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 			}
 		}
 	}
