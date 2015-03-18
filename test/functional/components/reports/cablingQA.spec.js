@@ -24,12 +24,12 @@ describe('Cabling QA Report',function(){
 
     it('should have  All bundles as default option',function(){
       expect(cablingQAPage.getBundleSelected()).toEqual('All Bundles');
-
     });
+    
     it('should have x options',function(){
       expect(cablingQAPage.getBundlesOptionsLength()).toEqual(11);
-
     });
+    
     it('should have the following options',function(){
       cablingQAPage.getBundlesOptions().then(function(list){
         expect(list[0].getText()).toEqual('All Bundles');
@@ -45,18 +45,24 @@ describe('Cabling QA Report',function(){
         expect(list[10].getText()).toEqual('Wave1- Bundle1');
       });
     });
+  
   });//bundle dropdown
+  
   describe('Cable type dropdown',function(){
     var cablingQAPage = new Reports();
+  
     it('should have cable type as label',function(){
       expect(cablingQAPage.getCableTypeLabel()).toEqual('Cable Type');
     });
+  
     it('should have All Cables as default option',function(){
       expect(cablingQAPage.getCableTypeSelected()).toEqual('All Cables');
     });
+  
     it('should have x options',function(){
       expect(cablingQAPage.getCableTypeOptionsLength()).toEqual(9);
     });
+  
     it('should have the following options',function(){
       cablingQAPage.getCableTypeOptions().then(function(list){
         expect(list[0].getText()).toEqual('All Cables');
@@ -70,18 +76,24 @@ describe('Cabling QA Report',function(){
         expect(list[8].getText()).toEqual('Others');
       });
     });
+  
   }); // Cable type dropdown
+  
   describe('Buttons',function(){
     var cablingQAPage = new Reports();
+  
     it('should have 1 button',function(){
       cablingQAPage.getIssueReportButtons().then(function(list){
         expect(list.length).toEqual(1);
       });
     });
+  
     it('should have pdf img',function(){
       cablingQAPage.getIssueReportBtnImg().then(function(list){
         expect(list[0].getAttribute('src')).toEqual(process.env.BASE_URL+'/tdstm/plugins/jasper-1.5.3/images/icons/PDF.gif');
       });
     });    
+  
   }); //Buttons
+
 }); //Cabling QA Report

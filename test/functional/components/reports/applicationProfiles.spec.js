@@ -4,6 +4,7 @@
 // [14h'24:00] John Martin: So we can generate reports and distribute to the App Owner or SME so that they can review without needing to login and use TM.
 var  Menu = require('../menu/menu.po.js');
 var Reports = require('./reports.po.js');
+
 describe('Application Profiles Report', function(){
   var menu = new Menu();
   

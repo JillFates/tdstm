@@ -57,6 +57,7 @@ describe('Issue Report', function(){
     it('should have "Asset id" as default option',function(){
       expect(issueReportPage.getSortReportBySelected()).toContain('Asset Id');
     });
+    
     it('should have 4 option',function(){
       expect(issueReportPage.getSortReportByOptionsLength()).toEqual(4);
     });
@@ -135,11 +136,11 @@ describe('Issue Report', function(){
 
   });//Generate Buttons
 
-  xdescribe('Generate Report PDF',function(){
+  describe('Generate Report PDF',function(){
 
   });
 
-  xdescribe('Generate Report XLS',function(){
+  describe('Generate Report XLS',function(){
 
   });
 

@@ -3,14 +3,17 @@ var  Menu = require('../menu/menu.po.js');
 var Reports = require('./reports.po.js');
 describe('Report Summary', function(){
   var menu = new Menu();
+  
   it('should load Report Summary page after click on Reports >  Report Summary', function(){
     menu.goToReports('reportSummary');
     expect(menu.getCurrentUrl()).toMatch(process.env.BASE_URL+'/tdstm/reports/index.projectId=\\d{4,6}');
   });
+  
   it('should have 5 titles',function(){
     var reprotSummaryPage = new Reports();
     expect(reprotSummaryPage.getPageTitlesLength()).toEqual(5);
   });
+  
   it('should have the these titles',function(){
     var reprotSummaryPage = new Reports();
     reprotSummaryPage.getPageTitlesList().then(function(list){
@@ -21,12 +24,14 @@ describe('Report Summary', function(){
       expect(list[4].getText()).toEqual('Infrastructure');
     });
   });
+  
   describe('Report Links', function(){
     var reprotSummaryPage = new Reports();
+  
     it('should have 12 links', function(){
       expect(reprotSummaryPage.getReportsListLength()).toEqual(12);
-
     });
+
     it('should have expected label and href defined', function(){
       reprotSummaryPage.getReportsList().then(function(list){
         expect(list[0].getText()).toEqual('admin report1');
@@ -56,4 +61,5 @@ describe('Report Summary', function(){
       });
     });
   });
+
 });//Report Summary

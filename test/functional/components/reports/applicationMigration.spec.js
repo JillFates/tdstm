@@ -1,6 +1,7 @@
 'use strict';
 var  Menu = require('../menu/menu.po.js');
 var Reports = require('./reports.po.js');
+
 describe('Application Migration Reports', function(){
   
   var menu = new Menu();
@@ -47,25 +48,26 @@ describe('Application Migration Reports', function(){
         expect(list[11].getText()).toEqual('Wave1- Bundle1');
       });
     });
+
   });//bundle dropdown
   
-  xdescribe('SME dropdown',function(){
+  describe('SME dropdown',function(){
 
   }); //SME dropdown
   
-  xdescribe('start of with dropdown',function(){
+  describe('start of with dropdown',function(){
 
   }); //start of with dropdown
   
-  xdescribe('Testing dropdown',function(){
+  describe('Testing dropdown',function(){
 
   }); //Testing dropdown
   
-  xdescribe('end with dropdown',function(){
+  describe('end with dropdown',function(){
 
   }); //end with dropdown
   
-  xdescribe('Outage window dropdown',function(){
+  describe('Outage window dropdown',function(){
 
   }); //Outage window dropdown
   

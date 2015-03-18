@@ -93,9 +93,9 @@ describe('Database Conflicts Reports', function(){
     expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateDatabaseConflicts');
   });
   
-  xdescribe('generated report web',function(){
+  describe('generated report web',function(){
   
-    it('should get title from generated report',function(){
+    xit('should get title from generated report',function(){
       var databaseConflictsPage = new Reports();
       expect(databaseConflictsPage.getAppProfileGeneratedHeader().getText()).toContain('Database Conflicts - MarketingDemo');
     });

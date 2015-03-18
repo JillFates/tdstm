@@ -23,12 +23,15 @@ describe('Cabling Conflict Report',function(){
       it('should have bundle label', function(){
         expect(cablingConflictPage.getBundleLabel()).toEqual('Bundles:*');
       });
+      
       it('should have  All bundles as default option',function(){
         expect(cablingConflictPage.getBundleSelected()).toEqual('All Bundles');
       });
+      
       it('should have x options',function(){
         expect(cablingConflictPage.getBundlesOptionsLength()).toEqual(11);
       });
+      
       it('should have the following options',function(){
         cablingConflictPage.getBundlesOptions().then(function(list){
           expect(list[0].getText()).toEqual('All Bundles');
@@ -44,6 +47,7 @@ describe('Cabling Conflict Report',function(){
           expect(list[10].getText()).toEqual('Wave1- Bundle1');
         });
       });
+    
     });//bundle dropdown
     
     describe('Cable type dropdown',function(){
@@ -52,12 +56,15 @@ describe('Cabling Conflict Report',function(){
       it('should have cable type as label',function(){
         expect(cablingConflictPage.getCableTypeLabel()).toEqual('Cable Type');
       });
+    
       it('should have All Cables as default option',function(){
         expect(cablingConflictPage.getCableTypeSelected()).toEqual('All Cables');
       });
+    
       it('should have x options',function(){
         expect(cablingConflictPage.getCableTypeOptionsLength()).toEqual(9);
       });
+    
       it('should have the following options',function(){
         cablingConflictPage.getCableTypeOptions().then(function(list){
           expect(list[0].getText()).toEqual('All Cables');
@@ -71,6 +78,7 @@ describe('Cabling Conflict Report',function(){
           expect(list[8].getText()).toEqual('Others');
         });
       });
+    
     }); // Cable type dropdown
 
     xit('should click on generate button', function(){
