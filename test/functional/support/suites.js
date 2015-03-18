@@ -11,9 +11,13 @@ module.exports = {
     '../components/assets/databases/createDatabase.spec.js',
     '../components/projects/deleteProject.spec.js'
   ],
+  projects:[
+    // '../components/projects/listProjects.spec.js',
+    // '../components/projects/createProjectPage.spec.js',
+    '../components/projects/projectStaff.spec.js',
+    // '../components/projects/fieldSettings.spec.js'
+    ],
   menu:[ //Do not change the order of these files since some test depends on others.
-    '../components/projects/listProjects.spec.js',
-    '../components/projects/fieldSettings.spec.js',
     '../components/menu/adminMenu.spec.js',
     '../components/menu/projectsMenu.spec.js',
     '../components/menu/dataCentersMenu.spec.js',

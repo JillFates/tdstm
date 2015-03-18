@@ -5,15 +5,19 @@ describe('List Projects', function(){
   
   var menu = new Menu();
   var listProjectPage =  new ListProjects();
-  
+
+  it('should load Active list projects page after select Projects > List Projects', function(){
+    menu.goToProjects('listProjects');
+    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
+  });
+
+  it('should have Project List - Active Projects as title', function () {
+    expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
+  });
+ 
   describe('search by code and select it', function(){
     
     var projId;
-    
-    it('should load list projects page after select Client/Project ListProjects', function(){
-      menu.goToProjects('listProjects');
-      expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
-    });
 
     it('should find the project to select', function(){
       listProjectPage.setSearchProjectCode('MarketingDemo');
@@ -47,9 +51,9 @@ describe('List Projects', function(){
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
 
-  xdescribe('Order Columns',function () {
+  describe('Order Columns',function () {
     
-    it('should sort the projects by project code in both orders', function(){
+    xit('should sort the projects by project code in both orders', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('jqgh_projectGridIdGrid_projectCode')).click();
       browser.sleep(1000);
@@ -57,7 +61,7 @@ describe('List Projects', function(){
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
 
-    it('should sort the projects by name in both orders', function(){
+    xit('should sort the projects by name in both orders', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('jqgh_projectGridIdGrid_name')).click();
       browser.sleep(1000);
@@ -65,7 +69,7 @@ describe('List Projects', function(){
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
     
-    it('should sort the projects by start date in both orders', function(){
+    xit('should sort the projects by start date in both orders', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('jqgh_projectGridIdGrid_startDate')).click();
       browser.sleep(1000);
@@ -73,7 +77,7 @@ describe('List Projects', function(){
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
     
-    it('should sort the projects by completion date in both orders', function(){
+    xit('should sort the projects by completion date in both orders', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('jqgh_projectGridIdGrid_completionDate')).click();
       browser.sleep(1000);
@@ -81,7 +85,7 @@ describe('List Projects', function(){
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
     
-    it('should sort the projects by comments in both orders', function(){
+    xit('should sort the projects by comments in both orders', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('jqgh_projectGridIdGrid_comment')).click();
       browser.sleep(1000);
@@ -91,9 +95,9 @@ describe('List Projects', function(){
   
   }); // Order Columns
 
-  xdescribe('Filter on Columns',function () {
+  describe('Filter on Columns',function () {
     
-    it('should search for "no" under Project Code, then delete it.', function(){
+    xit('should search for "no" under Project Code, then delete it.', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('gs_projectCode')).sendKeys('no');
       browser.sleep(1000);
@@ -102,7 +106,7 @@ describe('List Projects', function(){
       browser.sleep(1000);
     });
     
-    it('should search for "Only Project" under Name, then delete it.', function(){
+    xit('should search for "Only Project" under Name, then delete it.', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('gs_name')).sendKeys('Only Project');
       browser.sleep(1000);
@@ -111,7 +115,7 @@ describe('List Projects', function(){
       browser.sleep(1000);
     });
     
-    it('should search for "06/17/2014" under Start Date, then delete it.', function(){
+    xit('should search for "06/17/2014" under Start Date, then delete it.', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('gs_startDate')).sendKeys('06/17/2014');
       browser.sleep(1000);
@@ -120,7 +124,7 @@ describe('List Projects', function(){
       browser.sleep(1000);
     });
     
-    it('should search for "09/15/2014" under Completion Date, then delete it.', function(){
+    xit('should search for "09/15/2014" under Completion Date, then delete it.', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('gs_completionDate')).sendKeys('09/15/2014');
       browser.sleep(1000);
@@ -129,7 +133,7 @@ describe('List Projects', function(){
       browser.sleep(1000);
     });
     
-    it('should search for "test comment" under Project Code, then delete it.', function(){
+    xit('should search for "test comment" under Project Code, then delete it.', function(){
       browser.sleep(1000);
       browser.driver.findElement(by.id('gs_comment')).sendKeys('test comment');
       browser.sleep(1000);

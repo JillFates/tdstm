@@ -6,6 +6,7 @@ exports.config = {
   suites: {
     test : suites.test1.concat(suites.test2),
     menu : suites.menu,
+    projects:suites.projects,
     regression : suites.regression, 
     tasks : suites.tasks,
     dashboards : suites.dashboards,
