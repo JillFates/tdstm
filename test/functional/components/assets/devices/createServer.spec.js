@@ -79,22 +79,26 @@ describe('Server list', function(){
 
   });// add a comment
 
-  xdescribe('add a task',function(){
-    it('should open create task popup after click on add Task', function(){
+  describe('add a task',function(){
+    
+    xit('should open create task popup after click on add Task', function(){
       var serverModal = new CreateServerModal();
       var taskCommenModal = new TaskModal();
       serverModal.addTaskBtn.click();
       expect(taskCommenModal.editTaskModal.isPresent()).toBe(true);
     });
-    it('should add a task', function(){
+    
+    xit('should add a task', function(){
       var taskCommenModal = new TaskModal();
       taskCommenModal.addTask('This is task bla bla');
     });
-    it('should save created task',function(){ 
+    
+    xit('should save created task',function(){ 
       var taskCommenModal = new TaskModal();
       taskCommenModal.saveTaskBtn.click();
       expect(taskCommenModal.editTaskModal.isPresent()).toBe(false );
     });
+  
   }); // add a Task
 
   it('should close server modal', function(){

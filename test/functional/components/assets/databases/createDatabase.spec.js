@@ -571,16 +571,16 @@ describe('Database', function(){
 
     });//Validation
     
-    xdescribe('Custom fields',function(){
+    describe('Custom fields',function(){
       
       describe('Network Interfaces - Custom 1',function(){
-        it('should have as label Network Interface',function(){
+        xit('should have as label Network Interface',function(){
 
         });
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
-        it('should add a value', function(){
+        xit('should add a value', function(){
 
         });
 
@@ -588,15 +588,15 @@ describe('Database', function(){
       
       describe('CMDB ID',function(){
     
-        it('should have CMDB ID as label',function(){
+        xit('should have CMDB ID as label',function(){
 
         });
     
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
     
-        it('should add a value',function(){
+        xit('should add a value',function(){
 
         });
 

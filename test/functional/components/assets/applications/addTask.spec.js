@@ -140,17 +140,17 @@ describe('Add task to an application', function(){
       });
     });
 
-    xdescribe('Fixed Assignment checkbox', function(){
+    describe('Fixed Assignment checkbox', function(){
 
-      it('should have fixed assignment as label',function(){
+      xit('should have fixed assignment as label',function(){
         expect(taskModal.fixedAssignedLabel.getText()).toEqual('Fixed Assignment');
       });
 
-      it('should be disabled if person is unassigned', function(){
+      xit('should be disabled if person is unassigned', function(){
         expect(taskModal.fixedAssigned.getAttribute('disabled')).toEqual('true');
       });
 
-      it('should be unchecked if person is unassigned', function(){
+      xit('should be unchecked if person is unassigned', function(){
         // This test is skip since the application is not returning the value for checked property.
         expect(taskModal.fixedAssigned.getAttribute('checked')).toEqual('false');
       });
@@ -269,21 +269,21 @@ describe('Add task to an application', function(){
   
     }); // category dropdown
 
-    xdescribe('workflow dropdown', function(){
+    describe('workflow dropdown', function(){
 
-      it('should be displayed if moveday is selected', function(){
+      xit('should be displayed if moveday is selected', function(){
         expect(true).toBe(false);
       });
 
-      it('should be displayed if shutdown is selected', function(){
+      xit('should be displayed if shutdown is selected', function(){
         expect(true).toBe(false);
       });
 
-      it('should be displayed if startup is selected', function(){
+      xit('should be displayed if startup is selected', function(){
         expect(true).toBe(false);
       });
 
-      it('should not be displayed if ..',function(){
+      xit('should not be displayed if ..',function(){
         taskModal.categoryOptions.then(function(options){
           expect(options[5].getText()).toEqual('planning');
         });
@@ -355,7 +355,7 @@ describe('Add task to an application', function(){
         });
       });
 
-      xdescribe('application Entity filter by application type', function(){
+      describe('application Entity filter by application type', function(){
 
         xit('should displayed only applications', function(){
         
@@ -508,7 +508,7 @@ describe('Add task to an application', function(){
 
   }); // status
 
-  xdescribe('add predecessor',function(){
+  describe('add predecessor',function(){
 
     xit('click on add predecessor', function(){
       //dropdowns are displayed
@@ -548,7 +548,7 @@ describe('Add task to an application', function(){
 
   }); // predecessor
 
-  xdescribe('add successor',function(){
+  describe('add successor',function(){
 
     xit('click on add successor', function(){
         //dropdowns are displayed

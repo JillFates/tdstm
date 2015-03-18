@@ -14,9 +14,11 @@ describe('Import Export Devices - Blade Chassis', function() {
     // check that project selected is marketing demo if not select it.
 
     describe('search by code and select it', function(){
+      
       var projId;
       var menu = new Menu();
       var listProjectPage =  new ListProjects();
+      
       it('should load list projects page after select Client/Project ListProjects', function(){
         menu.goToProjects('listProjects');
         expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
@@ -48,7 +50,6 @@ describe('Import Export Devices - Blade Chassis', function() {
 
     }); // search by code and select it
 
-    
   }); // Preconditions
 
   describe('Import', function() {
@@ -249,7 +250,7 @@ describe('Import Export Devices - Blade Chassis', function() {
 
   });// Import
 
-  xdescribe('Export', function() {
+  describe('Export', function() {
     
   });// Export
 

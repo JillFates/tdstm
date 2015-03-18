@@ -99,21 +99,21 @@ describe('createApp', function(){
       expect(viewAppModal.viewAppTitle.getText()).toEqual('Application Detail');
     });
 
-    xdescribe('displayed data set on create', function(){
+    describe('displayed data set on create', function(){
     
-      it('should have name as label', function(){
+      xit('should have name as label', function(){
 
       });
     
-      it('should have the name', function(){
+      xit('should have the name', function(){
 
       });
     
-      it('should have type as label', function(){
+      xit('should have type as label', function(){
 
       });
     
-      it('should have application as type', function(){
+      xit('should have application as type', function(){
 
       });
 

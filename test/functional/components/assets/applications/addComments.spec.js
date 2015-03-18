@@ -232,7 +232,7 @@ describe('Comments - Application', function(){
         });
       });
 
-      xdescribe('application Entity filter by application type', function(){
+      describe('application Entity filter by application type', function(){
 
         xit('should displayed only applications', function(){
 
