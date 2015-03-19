@@ -1348,18 +1348,6 @@ class AdminController {
 							failed = true
 						}
 
-						def userRole = role
-						if (!StringUtils.isEmpty(p.role)) {
-							userRole = p.role
-						}
-						if (!failed && !StringUtils.isEmpty(userRole)) {
-							if (!VALID_ROLES[userRole]) {
-								userRole = DEFAULT_ROLE
-							}
-							log.debug "importAccounts() : creating Role $userRole for $person"
-							userPreferenceService.setUserRoles([userRole], person.id)
-						}
-
 						// Assign the user to one or more teams appropriately
 						if (!failed && p.teams) {
 							List teams = splitTeams(p.teams)
@@ -1370,6 +1358,22 @@ class AdminController {
 								}
 							}
 						}
+					}
+
+					def userRole = role
+					if (!StringUtils.isEmpty(p.role)) {
+						userRole = p.role
+					}
+					if (!failed && !StringUtils.isEmpty(userRole)) {
+						log.debug "importAccounts() : creating Role $userRole for $person"
+						// Delete previous security roles if they exist
+						if (p.match) {
+							userPreferenceService.deleteSecurityRoles(person)
+						}
+						if (!VALID_ROLES[userRole]) {
+							userRole = DEFAULT_ROLE
+						}
+						userPreferenceService.setUserRoles([userRole], person.id)
 					}
 
 					if (person && createUserLogin && p.username) {

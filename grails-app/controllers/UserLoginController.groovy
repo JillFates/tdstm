@@ -160,6 +160,7 @@ class UserLoginController {
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(userLoginInstance) {
+			userPreferenceService.deleteSecurityRoles(userLoginInstance.person);
 			userLoginInstance.delete(flush:true)
 			flash.message = "UserLogin ${userLoginInstance} deleted"
 			redirect( action:"list", params:[ id:companyId ] )

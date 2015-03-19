@@ -96,8 +96,10 @@
 					</g:each>
 				</tbody>
 			</table>
+			<b>Note:</b> <i>Security roles are going to be overriden for matched users.</i>
 
-			<br />
+			<br/>
+			<br/>
 
 			<g:form action="importAccounts">
 			<input type="hidden" name="step" value="post" />

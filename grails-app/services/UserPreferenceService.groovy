@@ -26,7 +26,9 @@ class UserPreferenceService  {
 	// defaults holds global defaults for certain values 
 	// TODO - load these from application settings
 	protected static defaults = ['CURR_TZ':'EST']
-	
+
+	protected static Map SECURITY_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
+
 	/*
 	 * Return current session object
 	 */
@@ -209,8 +211,8 @@ class UserPreferenceService  {
 	 *	Set Roles to Persons in PartyRole  
 	 */
 	// TODO : setUserRoles - Move to SecurityService
-	def setUserRoles( def roleType, def person ){
-		def personInstance = Party.findById(person)
+	def setUserRoles( def roleType, def personId ){
+		def personInstance = Party.findById(personId)
 		roleType.each{role ->
 			def roleTypeInstance = RoleType.findById(role)
 			// Create Role Preferences to User
@@ -226,9 +228,9 @@ class UserPreferenceService  {
 	 * @return : Remove Roles to Persons in PartyRole  
 	 *----------------------------------------------------------*/
 	// TODO : setUserRoles - Move to SecurityService
-	def removeUserRoles( def roleType, def person ){
+	def removeUserRoles( def roleType, def personId ){
 		roleType.each{role ->
-			PartyRole.executeUpdate("delete from PartyRole where party = '$person' and roleType = '$role' ")
+			PartyRole.executeUpdate("delete from PartyRole where party = '$personId' and roleType = '$role' ")
 		}
 	}
 	
@@ -361,4 +363,18 @@ class UserPreferenceService  {
 		def userPreference = UserPreference.findByUserLoginAndPreferenceCode(userLogin, preference)
 		return userPreference?.value
 	}
+
+	def deleteSecurityRoles(person) {
+		def currentRoles = getAssignedRoles(person);
+		def toRemoveRoles = []
+		currentRoles.each { r -> 
+			if (SECURITY_ROLES[r.id]) {
+				toRemoveRoles << r.id
+			}
+		}
+		if (toRemoveRoles.size() > 0) {
+			removeUserRoles(toRemoveRoles, person.id);
+		}
+	}
+
 }

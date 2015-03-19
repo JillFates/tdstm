@@ -68,4 +68,5 @@ databaseChangeLog = {
 	include file: '20150114-add-model-add-change-pending-status-permission.groovy'
 	include file: '20150170-data-transfer-batch-import-results-change.groovy'
 	include file: '20150203-add-architecture-view-perm.groovy'
+	include file: '20150319-remove-invalid-security-entries-from-party-role.groovy'
 }
