@@ -1562,7 +1562,7 @@ class ImportService {
 							warnings << "ERROR: A non-unique blade chassis name ($chassisIdName) for $chassisType was referenced (row $rowNum)"
 						} else  {
 							def sChassis = chassis[0]
-							assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource)	
+							assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource, bladePosition)
 						}				
 					} else {
 						warnings << "ERROR: No $chassisType chassis found with name ($chassisIdName) (row $rowNum)"
