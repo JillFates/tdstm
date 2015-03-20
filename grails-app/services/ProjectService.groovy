@@ -88,7 +88,6 @@ class ProjectService {
 			query.append("AND companyStaff.role = '${role}'")
 			
 		query.append(" ORDER BY ${sorting}")
-		
 		return jdbcTemplate.queryForList(query.toString())
 	}
 

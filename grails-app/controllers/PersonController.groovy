@@ -807,7 +807,7 @@ class PersonController {
 		def assigned = request.JSON.assigned ? '1' : '0'
 		def onlyClientStaff = request.JSON.onlyClientStaff ? '1' : '0'
 		def loginPerson = securityService.getUserLoginPerson()
-		def sortableProps = ['lastName', 'fullName', 'company', 'team']
+		def sortableProps = [ 'fullName', 'company', 'team']
 		def orders = ['asc', 'desc']
 		
 		//code which is used to resolve the bug in TM-2585: 
@@ -899,6 +899,7 @@ class PersonController {
 			if(tdsIndex != -1)
 				companies.replace(tdsIndex, tdsIndex+1, "0")
 		}
+
 
 		def staffList = projectService.getStaffList(assigned, role, projects, companies, sortString)
 		
