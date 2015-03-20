@@ -775,11 +775,11 @@ class PersonController {
 		}
 		
 
-		def staffList = projectService.getStaffList(assigned, currRole, projectList, companies, 'lastName ASC, team ASC ')
+		def staffList = projectService.getStaffList(assigned, currRole, projectList, companies, 'fullName ASC, team ASC ')
 		
 		// Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
 		moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-		def paramsMap = [sortOn : 'lastName', firstProp : 'staff', orderBy : 'asc']
+		def paramsMap = [sortOn : 'fullName', firstProp : 'staff', orderBy : 'asc']
 		
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 		return [projects:reqProjects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
@@ -817,7 +817,7 @@ class PersonController {
 			session.setAttribute("Staff_SortOn",request.JSON.sortOn)
 		}else{
 			request.JSON.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
-			request.JSON.sortOn = session.getAttribute("Staff_SortOn")?:'lastName'
+			request.JSON.sortOn = session.getAttribute("Staff_SortOn")?:'fullName'
 		}
 		
 		def paramsMap = [sortOn : request.JSON.sortOn in sortableProps ? request.JSON.sortOn : 'fullName',
@@ -921,7 +921,7 @@ class PersonController {
 	 */
 	def retrieveStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
 	
-		def sortOn = paramsMap.sortOn ?:"lastName"
+		def sortOn = paramsMap.sortOn ?:"fullName"
 		def orderBy = paramsMap.orderBy?:'asc'
 		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
 		

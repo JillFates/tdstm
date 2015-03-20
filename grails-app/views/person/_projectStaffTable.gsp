@@ -1,7 +1,7 @@
 <table>
 	<thead>
 		<tr>
-			<th style="cursor: pointer;" ng-click="toggleSortOrder('lastName','lastName')">Name</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('fullName','fullName')">Name</th>
 			<th style="cursor: pointer;" ng-click="toggleSortOrder('company','company')">Company</th>
 			<th style="cursor: pointer;" ng-click="toggleSortOrder('team','team')">Team</th>
 			<g:if test="${projectId == 0}"> <th>Project</th></g:if>
@@ -82,5 +82,5 @@
 	</tbody>
 </table>
 <input type="hidden" id="orderBy" value="${orderBy?:'desc'}">
-<input type="hidden" id="sortOn" value="${sortOn?:'lastName'}">
+<input type="hidden" id="sortOn" value="${sortOn?:'fullName'}">
 <input type="hidden" id="firstProp" value="${firstProp?:'staff'}">

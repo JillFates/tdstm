@@ -75,7 +75,7 @@ class ProjectService {
 					AND pr.party_id_from_id IN (${companies})
                     AND p.active = 'Y' 
 				GROUP BY role, personId 
-				ORDER BY lastName ASC 
+				ORDER BY fullName ASC 
 			) AS companyStaff 
 			WHERE 1=1
 		""")
