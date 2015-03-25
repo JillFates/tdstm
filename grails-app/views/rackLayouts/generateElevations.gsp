@@ -4,6 +4,12 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 		<title>Rack Elevation Report</title>
+		<g:if test="${printView}">
+			<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
+			<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+			<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+			<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+		</g:if>
 	</head>
 	<body>
 		<g:if test="${generateView}">
