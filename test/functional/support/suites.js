@@ -12,10 +12,10 @@ module.exports = {
     '../components/projects/deleteProject.spec.js'
   ],
   projects:[
-    // '../components/projects/listProjects.spec.js',
-    // '../components/projects/createProjectPage.spec.js',
+    '../components/projects/listProjects.spec.js',
+    '../components/projects/createProjectPage.spec.js',
     '../components/projects/projectStaff.spec.js',
-    // '../components/projects/fieldSettings.spec.js'
+    '../components/projects/fieldSettings.spec.js'
     ],
   menu:[ //Do not change the order of these files since some test depends on others.
     '../components/menu/adminMenu.spec.js',
@@ -84,8 +84,8 @@ module.exports = {
     ],
     importExport:[     // Phantomjd does not support file download yet 
     '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
-    '../components/assets/importExport/exportEmpty.spec.js',    
-    '../components/assets/importExport/impExp-devices.spec.js'
+    // '../components/assets/importExport/exportEmpty.spec.js',    
+    // '../components/assets/importExport/impExp-devices.spec.js'
     ],
     admin:[ 
     '../components/admin/staff/merge.spec.js'
