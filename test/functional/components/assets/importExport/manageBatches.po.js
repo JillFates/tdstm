@@ -63,7 +63,7 @@ ManageBatches.prototype.isPostingEnded = function() {
 ManageBatches.prototype.getReviewResults = function() {
   return browser.driver.wait(function () {
     return browser.driver.findElement(by.css('#progressStatus')).getText().then(function (text) {
-      return text.indexOf('Initializing...', 'In Progress') === -1;
+      return text.indexOf('Initializing...', 'In Progress','In progress') === -1;
       // return text.indexOf('Initializing...') === -1;
       });
   }).then(function () {
