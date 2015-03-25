@@ -148,7 +148,9 @@
 									<td>${person.lastName}</td>
 									<td>${person.phone}</td>
 									<td>${person.email}</td>
-									<td>${person.error}</td>
+									<td>									
+										<g:each in="${person.errors}" var="error">${error}<br></g:each>
+									</td>
 							</tr>
 						</g:each>
 					</tbody>

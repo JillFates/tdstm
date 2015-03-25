@@ -25,6 +25,7 @@ class AdminController {
 	def projectService
 	def securityService
 	def userPreferenceService
+	def auditService
 
 	private static Map VALID_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
 	private static String DEFAULT_ROLE = 'USER'
@@ -1174,7 +1175,7 @@ class AdminController {
 						role: fields[6],
 						email: fields[7],
 						password: fields[8],
-						error: ''
+						errors: []
 					)
 				}
 			}
@@ -1325,9 +1326,22 @@ class AdminController {
 						// Find the person
 						person = findPerson(p)
 						if (! person) {
-							p.error = "Unable to find previous Person match"
+							p.errors << "Unable to find previous Person match"
 							failedPeople << p
 							failed = true
+						} else {
+							if ((person.email != p.email) ||
+							    (person.workPhone != p.phone) ) {
+								person.email = p.email
+								person.workPhone = p.phone
+								if (person.validate() && person.save(flush:true)) {
+									log.info "importAccounts() : updated person $person"
+								} else {
+									p.errors << "Error" + GormUtil.allErrorsString(person)
+									failedPeople << p
+									failed = true
+								}
+							}
 						}
 					} else {
 						person = new Person(
@@ -1343,7 +1357,7 @@ class AdminController {
 							log.info "importAccounts() : created person $person"
 							partyRelationshipService.addCompanyStaff(project.client, person)
 						} else {
-							p.error = "Error" + GormUtil.allErrorsString(person)
+							p.errors << "Error" + GormUtil.allErrorsString(person)
 							failedPeople << p
 							failed = true
 						}
@@ -1367,13 +1381,37 @@ class AdminController {
 					if (!failed && !StringUtils.isEmpty(userRole)) {
 						log.debug "importAccounts() : creating Role $userRole for $person"
 						// Delete previous security roles if they exist
-						if (p.match) {
-							userPreferenceService.deleteSecurityRoles(person)
-						}
+						def assignedRoles = []
+						def assignRole = false
 						if (!VALID_ROLES[userRole]) {
 							userRole = DEFAULT_ROLE
 						}
-						userPreferenceService.setUserRoles([userRole], person.id)
+						if (p.match) {
+							def personRoles = userPreferenceService.getAssignedRoles(person);
+							personRoles.each { r ->
+								assignedRoles << r.id
+								if (r.id != userRole) {
+									assignRole = true
+								}
+							}
+							if (assignRole) {
+								userPreferenceService.deleteSecurityRoles(person)
+							}
+						} else {
+							assignRole = true
+						}
+						if (assignRole) {
+							userPreferenceService.setUserRoles([userRole], person.id)
+
+							// Audit role changes
+							def currentUser = securityService.getUserLogin()
+							if (p.match) {
+								p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
+								auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
+							} else {
+								auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
+							}
+						}
 					}
 
 					if (person && createUserLogin && p.username) {
@@ -1393,8 +1431,8 @@ class AdminController {
 							)
 
 							if (! u.validate() || !u.save(flush:true)) {
-								p.error = "Error" + GormUtil.allErrorsString(u)
-								log.debug "importAccounts() UserLogin.validate/save failed - ${p.error}"
+								p.errors << "Error" + GormUtil.allErrorsString(u)
+								log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
 								failedPeople << p
 								failed = true
 							} else {
@@ -1406,13 +1444,13 @@ class AdminController {
 								)
 								if (! up.validate() || ! up.save()) {
 									log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-									p.error = "Setting Default Project Errored"
+									p.errors << "Setting Default Project Errored"
 									failedPeople << p
 								}
 							}
 						} else {
 							failed = true
-							p.error = "Person already have a userlogin: $u"
+							p.errors << "Person already have a userlogin: $u"
 							failedPeople << p
 						}
 
