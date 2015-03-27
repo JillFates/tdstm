@@ -415,7 +415,7 @@ line-height:28px;
 }
 
 #btitle li{
-	background-image:url(../images/bullet.png);
+/*	background-image:url(../images/news_bullet.png);*/
 	background-position:right;
 	background-repeat:no-repeat;
 	margin-right:5px;
