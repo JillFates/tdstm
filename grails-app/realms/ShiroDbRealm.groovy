@@ -35,7 +35,7 @@ class ShiroDbRealm {
         // in the database.
         // def account = new SimpleAccount(username, user.password, "jsecDbRealm")
         def account = new SimpleAccount(username, user.password, "shiroDbRealm")
-		log.error "credentialMatcher: $credentialMatcher"
+		log.debug "credentialMatcher: $credentialMatcher"
 		// def account = new SimpleAccount(username,user.passwordHash,new org.apache.shiro.util.SimpleByteSource(user.passwordSalt),"DbRealm")
         if (!credentialMatcher.doCredentialsMatch(authToken, account)) {
 			def remoteIp = HtmlUtil.getRemoteIp()
