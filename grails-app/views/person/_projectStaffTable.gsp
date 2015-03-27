@@ -1,9 +1,9 @@
 <table>
 	<thead>
 		<tr>
-			<th style="cursor: pointer;" ng-click="loadFilteredStaff('lastName','lastName')">Name</th>
-			<th style="cursor: pointer;" ng-click="loadFilteredStaff('company','company')">Company</th>
-			<th style="cursor: pointer;" ng-click="loadFilteredStaff('team','team')">Team</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('fullName','fullName')">Name</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('company','company')">Company</th>
+			<th style="cursor: pointer;" ng-click="toggleSortOrder('team','team')">Team</th>
 			<g:if test="${projectId == 0}"> <th>Project</th></g:if>
 			<g:else><th>${project?.name}</th></g:else>
 			<g:each in ="${moveEventList}" var="moveEvent" >
