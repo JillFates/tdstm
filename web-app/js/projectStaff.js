@@ -143,7 +143,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		http.post( contextPath+'/person/loadFilteredStaff', data).then(
 			function(response){
 				$("#projectStaffTableId").html(compile(response.data)(scope));
-				scope.staffingTablestaffingTable = response.data;
+				//scope.staffingTablestaffingTable = response.data;
 				$("#orderBy").val(orderBy)
 				$("#sortOn").val(sortOn)
 
