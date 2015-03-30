@@ -99,6 +99,8 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 					scope.toggleCheckbox(source, val);
 					source.val((val + 1) % 2);		
 				}
+
+
 				
 			},
 			function(response){
@@ -142,6 +144,8 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 			function(response){
 				$("#projectStaffTableId").html(compile(response.data)(scope));
 				scope.staffingTablestaffingTable = response.data;
+				$("#orderBy").val(orderBy)
+				$("#sortOn").val(sortOn)
 
 
 			},
@@ -158,12 +162,13 @@ tds.staffing.controller.MainController.$inject = ['$scope', '$http', '$compile',
 }
 
 
+
+
 /*
  * for making and Ajax call to load staff list using filters.  
  */
 var currentTabShow = "generalInfoShowId"
 var currentHeaderShow = "generalShowHeadId"
-
 
 
 
