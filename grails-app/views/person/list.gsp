@@ -108,7 +108,7 @@
 	      </div>
 	      <div class="modal-body">
 	      	<p>
-	      	This process will delete the persons selected as long as they are no associated to a UserLogin or Tasks. By default it will 
+	      	This process will delete the persons selected as long as they are not associated to a UserLogin or Tasks. By default it will 
 	      	also skip persons associated as the App Owner or SME for one or more applications.
 	      	</p>
 	      	<p> 
