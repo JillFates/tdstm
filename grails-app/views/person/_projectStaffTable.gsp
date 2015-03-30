@@ -1,4 +1,4 @@
-<table>
+<table id="staffingTable">
 	<thead>
 		<tr>
 			<th style="cursor: pointer;" ng-click="toggleSortOrder('fullName','fullName')">Name</th>
@@ -81,6 +81,6 @@
 		</g:each>
 	</tbody>
 </table>
-<input type="hidden" id="orderBy" value="${orderBy?:'desc'}">
+<input type="hidden" id="orderBy" value="${orderBy?:'asc'}">
 <input type="hidden" id="sortOn" value="${sortOn?:'fullName'}">
 <input type="hidden" id="firstProp" value="${firstProp?:'staff'}">
