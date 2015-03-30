@@ -37,6 +37,13 @@
 				});
 			});
 
+			function updateEventHeader( e ){
+				var newsAndStatus = eval("(" + e.responseText + ")")
+				$("#head_mycrawlerId").html(newsAndStatus[0].news);
+				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
+				$("#moveEventStatus").html(newsAndStatus[0].status)
+			}
+
 		</script>
 	</head>
 	<% 
@@ -462,12 +469,7 @@
 				<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
 			</div>
 			<script type="text/javascript">
-			function updateEventHeader( e ){
-				var newsAndStatus = eval("(" + e.responseText + ")")
-				$("#head_mycrawlerId").html(newsAndStatus[0].news);
-				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
-				$("#moveEventStatus").html(newsAndStatus[0].status)
-			}
+
 			${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
 			</script>
 		</g:if>
