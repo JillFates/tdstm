@@ -115,13 +115,18 @@ class ProjectService {
 		def sortOn = searchParams.sortOn?:ProjectSortProperty.PROJECT_CODE
 		def sortOrder = searchParams.sortOrder?:SortOrder.ASC
 		def projParams=searchParams.params?: [:]
-		def  personId = searchParams.personId?:userLogin.person.id
+		def person = searchParams.personId?:userLogin.person
+		def personId = person.id
+		def companyParty = partyRelationshipService.getStaffCompany( person )
 
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
 		if (!showAllProjPerm) {
-			projectIds = PartyRelationship.executeQuery("SELECT pr.partyIdFrom.id FROM PartyRelationship pr WHERE \
-				pr.partyIdTo = ${personId} AND pr.roleTypeCodeFrom = 'PROJECT' AND pr.partyRelationshipType = 'PROJ_STAFF' ")
+			def projQuery = "SELECT pr.partyIdFrom.id FROM PartyRelationship pr WHERE \
+				( (pr.partyIdTo = ${personId} AND pr.partyRelationshipType = 'PROJ_STAFF') OR \
+				  (pr.partyIdTo = ${companyParty.id} AND pr.partyRelationshipType = 'PROJ_COMPANY') ) \
+				  AND pr.roleTypeCodeFrom = 'PROJECT' "
+			projectIds = PartyRelationship.executeQuery(projQuery)
 			if (!projectIds) return projects;
 		}
 
@@ -596,4 +601,107 @@ class ProjectService {
 			return moveBundle
 		}
 	}
+
+	def saveProject(projectInstance, file, projectPartner, projectManager, moveManager) {
+
+		def workflowCodes = []
+		//projectInstance.dateCreated = new Date()
+		//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
+		//Get the Partner Image file from the multi-part request
+
+		// List of OK mime-types
+		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+		if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
+			if(projectPartner == ""){
+				return [message: " Please select Associated Partner to upload Image. ", success: false]
+			} else if (! okcontents.contains(file.getContentType())) {
+				return [message: "Image must be one of: ${okcontents}", success: false]
+			}		
+		}
+
+		//save image
+		def image
+		image = ProjectLogo.fromUpload(file)		   
+		image.project = projectInstance
+		def party
+		def partnerImage = projectPartner
+		if ( partnerImage != null && partnerImage != "" ) {
+			party = Party.findById(partnerImage)
+		}
+		image.party = party 
+		def imageSize = image.getSize()
+		if( imageSize > 50000 ) {
+			return [message: " Image size is too large. Please select proper Image", success: false]
+		}
+		
+		if ( !projectInstance.hasErrors() && projectInstance.save() ) {
+			if(file && file.getContentType() == "application/octet-stream"){
+				//Nonthing to perform.
+			} else if(params.projectPartner){
+				image.save()
+			}
+			//def client = params.projectClient
+		
+			def person = securityService.getUserLogin().person
+			def companyParty = partyRelationshipService.getStaffCompany( person )
+			if (!companyParty) {
+				companyParty = PartyGroup.findByName( "TDS" )
+			}
+
+			//def companyRelationshipType = PartyRelationshipType.findById( "PROJ_COMPANY" ) 
+			//def projectRoleType = RoleType.findById( "PROJECT" ) 
+			//def companyRoleType = RoleType.findById( "COMPANY" )
+			//def projectStaffRelationshipType = PartyRelationshipType.findById( "PROJ_STAFF" )
+			// For Project to Company PartyRelationship
+			def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", companyParty, "COMPANY" )
+
+			//new PartyRelationship( partyRelationshipType:companyRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:companyParty, roleTypeCodeTo:companyRoleType, statusCode:"ENABLED" ).save( insert:true )
+			/*
+			if ( client != null && client != "" ) {
+				
+				def clientParty = Party.findById(client)
+				def clientRelationshipType = PartyRelationshipType.findById( "PROJ_CLIENT" )
+				def clientRoleType = RoleType.findById( "CLIENT" )
+				//	For Project to Client PartyRelationship
+				def projectClientRel = new PartyRelationship( partyRelationshipType:clientRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:clientParty, roleTypeCodeTo:clientRoleType, statusCode:"ENABLED" ).save( insert:true )
+			}
+			*/
+			if ( projectPartner != null && projectPartner != "" ) {
+				
+				def partnerParty = Party.findById(projectPartner)
+				//def partnerRelationshipType = PartyRelationshipType.findById( "PROJ_PARTNER" )
+				//def partnerRoleType = RoleType.findById( "PARTNER" )
+				//	For Project to Partner PartyRelationship
+				def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
+					//new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
+			}
+			
+			if ( projectManager != null && projectManager != "" ) {
+				
+				def projectManagerParty = Party.findById(projectManager)
+				//def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
+				//	For Project to ProjectManager PartyRelationship
+				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
+					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+			}
+			
+			if ( moveManager != null && moveManager != "" ) {
+				
+				def moveManagerParty = Party.findById(moveManager)
+				//def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
+				//	For Project to MoveManager PartyRelationship
+				def moveManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveManagerParty, "MOVE_MGR" )
+					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+			}
+			// set the projectInstance as CURR_PROJ
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
+			//Will create a bundle name TBD and set it as default bundle for project   
+			projectInstance.getProjectDefaultBundle()
+			
+			return [message: "Project ${projectInstance} created", success: true, imageId: image.id]
+		} else {
+			return [message: "", success: false]
+		}
+	}
+
 }
