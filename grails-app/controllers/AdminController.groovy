@@ -1288,7 +1288,7 @@ class AdminController {
 				def password = params.password
 				def expireDays = NumberUtils.toInt(params.expireDays,90)
 				def header = params.header == 'Y'
-				def role = createUserLogin ? params.role : ''
+				def role = params.role
 
 				def csv = new File('/tmp/tdstm-account-import.csv')
 
@@ -1321,13 +1321,13 @@ class AdminController {
 				people.each() { p -> 
 					def person
 					boolean failed = false
+					boolean haveMessage = false
 
 					if (p.match ) {
 						// Find the person
 						person = findPerson(p)
 						if (! person) {
 							p.errors << "Unable to find previous Person match"
-							failedPeople << p
 							failed = true
 						} else {
 							if ((person.email != p.email) ||
@@ -1338,7 +1338,6 @@ class AdminController {
 									log.info "importAccounts() : updated person $person"
 								} else {
 									p.errors << "Error" + GormUtil.allErrorsString(person)
-									failedPeople << p
 									failed = true
 								}
 							}
@@ -1358,7 +1357,6 @@ class AdminController {
 							partyRelationshipService.addCompanyStaff(project.client, person)
 						} else {
 							p.errors << "Error" + GormUtil.allErrorsString(person)
-							failedPeople << p
 							failed = true
 						}
 
@@ -1375,17 +1373,17 @@ class AdminController {
 					}
 
 					def userRole = role
-					if (!StringUtils.isEmpty(p.role)) {
+					if (!StringUtils.isEmpty(p.role) && VALID_ROLES[p.role]) {
 						userRole = p.role
+					}
+					if (!VALID_ROLES[userRole]) {
+						userRole = DEFAULT_ROLE
 					}
 					if (!failed && !StringUtils.isEmpty(userRole)) {
 						log.debug "importAccounts() : creating Role $userRole for $person"
 						// Delete previous security roles if they exist
 						def assignedRoles = []
 						def assignRole = false
-						if (!VALID_ROLES[userRole]) {
-							userRole = DEFAULT_ROLE
-						}
 						if (p.match) {
 							def personRoles = userPreferenceService.getAssignedRoles(person);
 							personRoles.each { r ->
@@ -1397,6 +1395,9 @@ class AdminController {
 							if (assignRole) {
 								userPreferenceService.deleteSecurityRoles(person)
 							}
+							if (personRoles.size() == 0) {
+								assignRole = true
+							}
 						} else {
 							assignRole = true
 						}
@@ -1407,6 +1408,7 @@ class AdminController {
 							def currentUser = securityService.getUserLogin()
 							if (p.match) {
 								p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
+								haveMessage = true
 								auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
 							} else {
 								auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
@@ -1433,7 +1435,6 @@ class AdminController {
 							if (! u.validate() || !u.save(flush:true)) {
 								p.errors << "Error" + GormUtil.allErrorsString(u)
 								log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
-								failedPeople << p
 								failed = true
 							} else {
 								log.info "importAccounts() : created UserLogin $u"
@@ -1445,21 +1446,23 @@ class AdminController {
 								if (! up.validate() || ! up.save()) {
 									log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
 									p.errors << "Setting Default Project Errored"
-									failedPeople << p
+									failed = true
 								}
 							}
 						} else {
 							failed = true
 							p.errors << "Person already have a userlogin: $u"
-							failedPeople << p
 						}
 
 						if (!failed) created++
 
 					}
 
-				} // people.each
+					if (failed || haveMessage) {
+						failedPeople << p	
+					}
 
+				} // people.each
 
 				map.step = 'results'
 				map.failedPeople = failedPeople

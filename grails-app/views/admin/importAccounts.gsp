@@ -125,7 +125,7 @@
 			${created} accounts were created
 
 			<g:if test="${failedPeople.size() > 0}">
-				<h3>Accounts that failed:</h3>
+				<h3>Accounts status:</h3>
 				<table>
 					<thead>
 						<tr>
@@ -135,7 +135,7 @@
 							<th>Last Name</th>
 							<th>Phone</th>
 							<th>Email</th>
-							<th>Error</th>
+							<th>Error/Message</th>
 						</tr>
 					</thead>
 					<tbody>
