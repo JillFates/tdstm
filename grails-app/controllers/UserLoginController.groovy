@@ -70,7 +70,14 @@ class UserLoginController {
 		if(!active){
 			active = 'Y'
 		}
-		
+
+		// Search valid roles to display
+		def systemRoles = securityService.getSystemRoleTypes()
+		def systemRolesList = []
+		systemRoles.each{ sr ->
+			systemRolesList << "'${sr.id}'"
+		}
+
 		def query = new StringBuffer("""SELECT * FROM ( SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId, first_name AS firstName,
 			u.username as username, last_name as lastName, CONCAT(CONCAT(first_name, ' '), IFNULL(last_name,'')) as fullname, pg.name AS company, u.active, u.last_login AS lastLogin, u.expiry_date AS expiryDate, 
 			u.created_date AS dateCreated, u.user_login_id AS userLoginId 
@@ -80,7 +87,7 @@ class UserLoginController {
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
 				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pr.party_id 
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
-			WHERE u.active = '${active}'""")
+			WHERE role_type_id in (${systemRolesList.join(", ")}) AND u.active = '${active}'""")
 		if(active=='Y')
 			query.append(" AND u.expiry_date > '${presentDate}' ")
 		else
@@ -104,7 +111,7 @@ class UserLoginController {
 			}
 			//query.append(" GROUP BY pr.party_id ORDER BY pr.role_type_id, pg.name, first_name, last_name ) as users")
 			query.append(" GROUP BY pr.party_id ORDER BY " + sortIndex + " " + sortOrder + ") as users")
-			
+		
 			// Handle the filtering by each column's text field
 			def firstWhere = true
 			filterParams.each {

@@ -339,4 +339,14 @@ class SecurityService implements InitializingBean {
 		log.warn "SECURITY_VIOLATION : $message by user $username"
 		auditService.logSecurityViolation(username, message)
 	}
+
+	/**
+	 * Used to get a list of system roles.
+	 * 
+	 * @return List of roles
+	 */
+	def getSystemRoleTypes() {
+		return RoleType.findAll(" from RoleType rt WHERE rt.description like 'System%' ")
+	}
+
 }
