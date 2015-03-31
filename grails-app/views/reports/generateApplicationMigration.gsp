@@ -6,6 +6,31 @@
 <title>Application Migration Results</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
+<g:javascript src="model.manufacturer.js"/>
+<g:javascript src="angular/angular.min.js" />
+<g:javascript src="angular/plugins/angular-ui.js"/>
+<g:javascript src="angular/plugins/angular-resource.js" />
+<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+<g:javascript src="asset.comment.js" />
+<g:javascript src="cabling.js"/>
+<jqgrid:resources />
+<g:javascript src="jqgrid-support.js" />
+<g:javascript src="bootstrap.js" />
+<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 <script>
 	$(document).ready(function() {
 		$("#showEntityView").dialog({ autoOpen: false })
@@ -16,7 +41,7 @@
 </script>
 </head>
 <body>
-	<div class="body" style="width:1000px;">
+	<div class="body" style="width:1000px;" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Application Migration Results - ${project.name} : ${moveBundle}</b><br/>
 			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
@@ -26,7 +51,7 @@
 		</div>
 		${eventErrorString}
 		<br/>
-		<table style="margin-left:5%;">
+		<table style="margin-left:5%;" ng-controller="tds.comments.controller.MainController as comments">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -58,9 +83,10 @@
 			</g:each>
 			</tbody>
 		</table>
-	<div id="showEntityView" style="display: none;"></div>
-	<div id="editEntityView" style="display: none;"></div>
-
+		<g:render template="../assetEntity/modelDialog"/>
+		<g:render template="../assetEntity/entityCrudDivs" />
+		<g:render template="../assetEntity/dependentAdd" />
+        <g:render template="../assetEntity/initAssetEntityData"/>
 	</div>
 </body>
 </html>
