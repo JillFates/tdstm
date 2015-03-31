@@ -90,11 +90,11 @@ class PersonController {
 		def query = new StringBuffer("""SELECT * FROM ( SELECT p.person_id AS personId, p.first_name AS firstName, 
 			IFNULL(p.middle_name,'') as middlename, IFNULL(p.last_name,'') as lastName, IFNULL(u.username, 'CREATE') as userLogin, pg.name AS company, u.active, 
 			date_created AS dateCreated, last_updated AS lastUpdated, u.user_login_id AS userLoginId, IFNULL(p.model_score, 0) AS modelScore 
-			FROM party pa
-			LEFT OUTER JOIN person p on p.person_id=pa.party_id 
-			LEFT OUTER JOIN user_login u on p.person_id=u.person_id 
+			FROM person p
 			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
-				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=pa.party_id 
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id 
+			LEFT OUTER JOIN party pa on p.person_id=pa.party_id 
+			LEFT OUTER JOIN user_login u on p.person_id=u.person_id 
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
 			""")
 		
