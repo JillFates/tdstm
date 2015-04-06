@@ -404,7 +404,7 @@ class NewsEditorController {
 			render ServiceResults.success([moveEventNews: menModel]) as JSON
 		} else {
 			controller.redirect( 
-				action: newsEditorList, 
+				action: "newsEditorList", 
 				params: [ moveBundle: params.moveBundle, viewFilter:params.viewFilter, moveEvent:params.moveEvent.id]
 			)
 		}
