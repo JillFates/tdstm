@@ -123,7 +123,7 @@ describe('Import Export Devices - Blade Chassis', function() {
 
     it('should click on Import Spreadsheet and validate Result Message',function () {
       var importPage =  new ImportPage();
-      var resultMessage = importPage.getExpectedSucessMessage(6,0,0,0,0,0,0);
+      var resultMessage = importPage.getExpectedSucessMessage(7,0,0,0,0,0,0);
       importPage.getImportBtn().click(); 
       expect(importPage.getResultMessage()).toEqual(resultMessage);
     });
@@ -158,7 +158,7 @@ describe('Import Export Devices - Blade Chassis', function() {
       it('should have This Review Results',function () {
         var results = [
           'Results',
-          'Assets in batch: 6\n',
+          'Assets in batch: 7\n',
           'Review took \\d.\\d* seconds to complete'
         ].join('\n').replace(/[(|)]/g,'.');
         expect(manageBatches.getReviewResults()).toMatch(results);
@@ -193,14 +193,14 @@ describe('Import Export Devices - Blade Chassis', function() {
       });
       
       it('should have "Posting assets to inventory for batch ..." as title when posting process ends',function () {
-        expect(manageBatches.isPostingEnded()).toBe(true);
+        expect(manageBatches.getPostingTitle()).toContain('Posting assets to inventory for batch');
       });
 
       it('should have This Posting Results',function () {
         var results = [
           'Process Results for Batch \\d*:',
-          'Assets in Batch: 6',
-          'Records Inserted: 6',
+          'Assets in Batch: 7',
+          'Records Inserted: 7',
           'Records Updated: 0',
           'Rooms Created: 0',
           'Racks Created: 0',
@@ -213,6 +213,7 @@ describe('Import Export Devices - Blade Chassis', function() {
           'WARNING: Blade Desktops Side by Side position (lila) specified is invalid (row 4)',
           'ERROR: No source chassis found with name (Id:113922 Desktops Side by Side) (row 6)',
           'WARNING: Chassis (id:113921 Blade Chassis 2) for source does not match referenced name (Desktops Side by Side) (row 7)',
+          'WARNING: Blade Desktops Side by Side position (0) specified is invalid (row 8)',
           '\nElapsed time to process batch: \\d.\\d* seconds'
         ].join('\n').replace(/[(|)]/g,'.');
         expect(manageBatches.getReviewResults()).toMatch(results);

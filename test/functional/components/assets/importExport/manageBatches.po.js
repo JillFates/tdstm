@@ -1,5 +1,6 @@
 'use strict';
 var ManageBatches = function () {
+  this.get
   
 };
 ManageBatches.prototype = { };
@@ -44,7 +45,7 @@ ManageBatches.prototype.isReviewEnded = function() {
   });
 };
 
-ManageBatches.prototype.isPostingEnded = function() {
+ManageBatches.prototype.getPostingTitle = function() {
   var that = this;
   return browser.driver.wait(function(){
     return browser.driver.wait(function() {
@@ -54,17 +55,15 @@ ManageBatches.prototype.isPostingEnded = function() {
         return text.indexOf('Posting assets to inventory for batch') !== -1;
       });
     });
-
   }).then(function(){
-     return true;
+    return browser.driver.findElement(by.css('#globalProgressBar #progressTitle h1')).getText();
   });
 };
 
 ManageBatches.prototype.getReviewResults = function() {
   return browser.driver.wait(function () {
     return browser.driver.findElement(by.css('#progressStatus')).getText().then(function (text) {
-      return text.indexOf('Initializing...', 'In Progress','In progress') === -1;
-      // return text.indexOf('Initializing...') === -1;
+      return text.indexOf('Initializing...','In Progress','In progress') === -1;
       });
   }).then(function () {
     return browser.driver.findElement(by.id('progressStatus')).getText().then(function (text) {

@@ -9,11 +9,11 @@ var ConnectDatabase = require('./connectDatabase.po.js');
 
 describe('Import Export Devices',function(){
 
-  xdescribe('Preconditions',function () {
+  describe('Preconditions',function () {
     var connectDatabase = new ConnectDatabase();
     connectDatabase.connection.connect();
 
-    it('should delete some manufacturers',function () {
+    xit('should delete some manufacturers',function () {
       var before ;
       var after=0;
       var sql = 'select count(*) as results from manufacturer where name in ("Dell-ToCreate2", "Dell-TEST290", "Dell-TOCREATE1");';
@@ -37,7 +37,7 @@ describe('Import Export Devices',function(){
       });
     });
     
-    it('should delete some models', function () {
+    xit('should delete some models', function () {
       var sql = 'select count(*) as results from model where name in ("PowerEdge TOCREATE2","Hola","TOCREATE3")' ;
       var sqlDelete = 'delete from model where name in ("PowerEdge TOCREATE2","Hola","TOCREATE3");';
       var before ;
@@ -313,13 +313,13 @@ describe('Import Export Devices',function(){
   
   }); // Import
 
-  xdescribe('Export', function () {
+  describe('Export', function () {
     var file = new File();
     var date = new Date().toJSON().slice(0,10).replace(/-/g,'');
     //var filePath = process.env.DOWNLOAD_PATH+'TDS-To_Export_and_Import-All-SADFXRrcM-'+date+'.xls';
     var filePath = process.env.DOWNLOAD_PATH+'TDS-MarketingDemo-All-SADFXRrcM-'+date+'.xls';
   
-    it('should load Export Assets page after select Assets > Export Assets', function(){
+    xit('should load Export Assets page after select Assets > Export Assets', function(){
       var menu = new Menu();
       menu.goToAssets('exportAssets');
       expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/exportAssets');
@@ -327,7 +327,7 @@ describe('Import Export Devices',function(){
 
     describe('generate Export',function () {
 
-      it('Should export all devices', function () {
+      xit('Should export all devices', function () {
         // var toExport = {'application':'true', 'devices':'true','database':'true','storage':'true','room':'true','rack':'true',
         // 'dependency':'true','cabling':'true','comment':'true'};
         var toExport = {'Application':'true', 'Devices':'true','Database':'true','Storage':'true','Room':'true','Rack':'true',
@@ -345,22 +345,22 @@ describe('Import Export Devices',function(){
         expect(exportPage.getCommentCheckbox().getAttribute('checked')).toEqual('true');
       });
 
-      it('should click on Export Button',function(){
+      xit('should click on Export Button',function(){
         var exportPage =  new ExportPage();
         exportPage.getExportBtn().click();
       }); 
 
-      it('should be opened export progress modal', function  () {
+      xit('should be opened export progress modal', function  () {
         var exportPage =  new ExportPage();
         expect(exportPage.isExportingModalOpened()).toBe(true);
       });
 
-      it('should be closed export progress modal', function () {
+      xit('should be closed export progress modal', function () {
         var exportPage =  new ExportPage();
         expect(exportPage.isExportingModalClosed(filePath)).toBe(true);
       });
 
-      it('should check that file was generated', function () {
+      xit('should check that file was generated', function () {
         expect(file.existsSync(filePath)).toBe(true);
       });
 
@@ -368,17 +368,17 @@ describe('Import Export Devices',function(){
     
     describe('Validate Exported File',function () {
       var xlsFileObj;
-      it('should find downloaded file',function  () {
+      xit('should find downloaded file',function  () {
         xlsFileObj = file.getFileObject(filePath);        
         expect(xlsFileObj).not.toBe(null);
       });
 
-      it('should have x devices exported',function () {
+      xit('should have x devices exported',function () {
 
         expect(file.getPageSize(xlsFileObj,'Devices')).toEqual(2);
       });
 
-      it('should validate each row',function () {
+      xit('should validate each row',function () {
         var expResults = { 
           '1': [ 'Name', 'Manufacturer', 'Model', 'Type' ],
           '2': [ 'TC 112 BBM', 'unknown', 'Unknown - Server', 'Server' ],
@@ -408,7 +408,7 @@ describe('Import Export Devices',function(){
       
     }); // Validate Exported File
 
-    it('should delete exported file',function () {
+    xit('should delete exported file',function () {
       var file = new File();
       file.delete(filePath);
       expect(file.existsSync(filePath)).toBe(false);
