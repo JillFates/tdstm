@@ -658,6 +658,7 @@ class PersonService {
 						// Don't delete if they have a UserLogin
 						def userLogin = UserLogin.findByPerson(person)
 						if (userLogin) {
+							messages << "Staff '${person.firstName}, ${person.lastName}', ignoring bulk delete because it is associated to a user login."
 							log.debug("Ignoring bulk delete of ${id} as it contains userLogin")
 							skipped++
 							continue
@@ -666,6 +667,7 @@ class PersonService {
 						// Don't delete if they have assigned tasks
 						def tasks = AssetComment.findAllByAssignedTo(person)
 						if (tasks) {
+							messages << "Staff '${person.firstName}, ${person.lastName}', ignoring bulk delete because it contains tasks assigned."
 							log.debug("Ignoring bulk delete of ${id} as it contains tasks assigned")
 							skipped++
 							continue
@@ -693,6 +695,7 @@ class PersonService {
 										cleared += jdbcTemplate.update("UPDATE ${table} SET ${column} = NULL WHERE ${column} = '${person.id}'")
 									} else {
 										log.debug("Ignoring bulk delete of person ${id} $person as it contains $column association with asset(s)")
+										messages << "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due it contains $column association with asset(s)."
 										foundAssoc=true
 										return
 									}								
@@ -701,6 +704,7 @@ class PersonService {
 							if (foundAssoc)
 								return
 						}
+
 						if (foundAssoc) {
 							skipped++
 							continue
