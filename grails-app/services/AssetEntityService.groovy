@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.springframework.transaction.annotation.Transactional
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -454,8 +455,8 @@ class AssetEntityService {
 
 			// Try to assign the blade position if supplied
 			if (! StringUtil.isBlank(bladePosition)) {
-				int bp = NumberUtil.toTinyInt(bladePosition) 
-				if (bp) {
+				int bp = NumberUtil.toTinyInt(bladePosition, -1)
+				if (bp && (bp > -1)) {
 					if (bp > chassis.model?.bladeCount) {
 						warnings = "position ($bp) exceeds chassis capacity (${chassis.model.bladeCount})"
 					} else {
