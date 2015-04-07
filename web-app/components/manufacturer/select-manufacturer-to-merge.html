@@ -1,0 +1,32 @@
+<div draggable id="showMergeDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-front" style="width: 700px" tabindex="-1" >
+	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+		<span id="ui-id-5" class="ui-dialog-title">Select the item to merge INTO:</span>
+		<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" ng-click="close()">
+		<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
+		<span class="ui-button-text">close</span>
+		</button>
+	</div>
+	<div id="showMergeDialog" title="Select the item to merge INTO:" class="comment-dialog-content list">
+		<loading-indicator></loading-indicator>
+        <br/>
+        <div class="list" style="height: 500px;  overflow: auto;">
+			<table cellpadding="0" cellspacing="0">
+				<thead>
+					<tr><th>Name</th><th>AKA</th></tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="m in manufacturers | filter: listFilter" ng-class="{odd: $odd, even: $even}" ng-click="doManufacturerMerge(m)">
+						<td valign="top" class="name" ng-style="{'font-weight':(!m.alias?'bold':'normal')}">
+							{{m.name}}
+						</td>
+						<td valign="top" class="value">
+							{{m.alias}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="buttons">
+		</div>
+	</div>
+</div>

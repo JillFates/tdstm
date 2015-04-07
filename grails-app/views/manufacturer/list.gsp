@@ -3,10 +3,28 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<meta name="layout" content="projectHeader" />
 		<title>Manufacturer List</title>
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
-		<g:javascript src="model.manufacturer.js" />
+		<g:javascript src="angular/angular.min.js" />
+		<g:javascript src="angular/plugins/angular-ui.js"/>
+		<g:javascript src="angular/plugins/angular-resource.js" />
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/manufacturer',file:'manufacturer.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
+		<g:javascript src="bootstrap.js" />
+		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.tabs.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
+		<g:javascript src="model.manufacturer.js" />
 		<script type="text/javascript">
 		$(document).ready(function() {
 			$("#createManufacturerView").dialog({ autoOpen: false })
@@ -38,8 +56,9 @@
 		</script>
 	</head>
 	<body>
-		<div class="body fluid">
+		<div class="body fluid" ng-app="tdsManufacturers" ng-controller="tds.manufacturers.controller.MainController as manufacturers">
 			<h1>Manufacturer List</h1>
+			<g:render template="../assetEntity/listTitleAlerts" ></g:render>
 			<g:if test="${flash.message}">
 				<div id="messageDivId" class="message">${flash.message}</div>
 			</g:if>

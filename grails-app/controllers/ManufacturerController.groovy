@@ -160,10 +160,20 @@ class ManufacturerController {
 	 */
 	def retrieveManufacturersListAsJSON() {
 		def assetType = params.assetType
-		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+		def includeAlias = (params.includeAlias && (params.includeAlias == 'true'))
+		def manufacturers = []
+		if (assetType == 'all') {
+			manufacturers = Model.findAll("From Model group by manufacturer order by manufacturer.name")?.manufacturer
+		} else {
+			manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+		}
 		def manufacturersList = []
 		manufacturers.each{
-			manufacturersList << [id:it.id,name:it.name]
+			if (includeAlias) {
+				manufacturersList << [id:it.id,name:it.name, alias: WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(it).name)]
+			} else {
+				manufacturersList << [id:it.id,name:it.name]
+			}
 		}
 		render manufacturersList as JSON
 	}
@@ -186,6 +196,11 @@ class ManufacturerController {
 		
 		def updateModelsQuery = "update model set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
 		jdbcTemplate.update(updateModelsQuery)
+
+		def updateModelsAliasQuery = "update model_alias set manufacturer_id = ${toManufacturer.id} where manufacturer_id='${fromManufacturer.id}'"
+		jdbcTemplate.update(updateModelsAliasQuery)
+
+		// Add alias
 		def toManufacturerAlias = ManufacturerAlias.findAllByManufacturer(toManufacturer).name
 		
 		// Add to the AKA field list in the target record
@@ -207,9 +222,11 @@ class ManufacturerController {
 		}
 		
 		// Return to manufacturer list view with the flash message "Merge completed."
-		flash.message = "Merge completed."
-		redirect(action:"list")
+		def jsonMap = [:]
+		jsonMap.put("success", true)
+		render jsonMap as JSON
 	}
+
 	/*
 	 *  Send Manufacturer details as JSON object
 	 */
@@ -256,4 +273,9 @@ class ManufacturerController {
 		def manufacturers = initials ? Manufacturer.findAllByNameIlike(initials+"%") : []
 		[manufacturers:manufacturers]
 	}
+
+	def selectManufacturerToMerge() {
+
+	}
+
 }
