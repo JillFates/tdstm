@@ -26,6 +26,7 @@ var EntityCrud = ( function($) {
 	
 	var assetFormName = "createEditAssetForm";
 
+
 	// ------------------
 	// Private Methods
 	// ------------------
@@ -34,13 +35,16 @@ var EntityCrud = ( function($) {
 	 * Private method used to validate common fields on any of the asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateCommonFields = function(form) {
+	var validateCommonFields = function(form, alertErrors) {
 		var ok = false;
-
+		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true
 		// Validate that asset name is not blank
 		var fieldVal = $('#'+form+' #assetName').val();
 		if (fieldVal == '') {
-			alert('Please provide a name for the asset')
+			if(alertErrors){
+				alert('Please provide a name for the asset');
+			}
+			
 		} else {
 			ok = true
 		}
@@ -70,15 +74,21 @@ var EntityCrud = ( function($) {
 	 * Private method used to validate the Database asset create/edit forms
 	 * @return true if valid
 	 **/
-	var validateDBForm = function(form) {
-		var ok = validateCommonFields(form);
+	var validateDBForm = function(form, alertErrors) {
+		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true;
+		var ok = validateCommonFields(form, alertErrors);
 		if (ok) {
 		    var size = $('#'+form+' #size').val();
 		    if ( size=='' || isNaN(size)){
-		    	alert("Please enter numeric value for DB Size");
+		    	if(alertErrors){
+		    		alert("Please enter numeric value for DB Size");	
+		    	}
+		    	
 				ok = false;
 		    } else if($('#'+form+' #dbFormat').val()==''){
-		    	alert("Please enter value for DB Format");
+		    	if(alertErrors){
+		    		alert("Please enter value for DB Format");
+		    	}
 				ok = false;
 		    }
 		}
@@ -125,6 +135,7 @@ var EntityCrud = ( function($) {
 	}
 
 	var validateAppForm = function(form){
+
 		var ok = validateCommonFields(form);
 		if (ok) {
 			ok = false;
@@ -574,29 +585,8 @@ var EntityCrud = ( function($) {
 		$('#showView').val('showView')
 
 		//var type = assetClass;
-		var validateOkay=true;
 		var formName = assetFormName;
-		switch (assetClass) {
-			case 'APPLICATION':
-				validateOkay = validateAppForm(formName);
-				break;
-
-			case 'DATABASE':
-				validateOkay = validateDBForm(formName);
-				break;
-
-			case 'STORAGE':
-				validateOkay = validateStorageForm(formName);
-				break;
-
-			case 'DEVICE':
-				validateOkay = validateDeviceForm(formName);
-				break;
-
-			default:
-				alert('ERROR: saveToShow() - unsupported case for ' + assetClass);
-		}
-
+		var validateOkay = pub.validateForm(assetClass, formName, true);
 		if (validateOkay)
 			validateOkay = pub.validateDependencies(formName)
 			
@@ -637,6 +627,34 @@ var EntityCrud = ( function($) {
 		return true;
 	};
 
+
+	pub.validateForm = function(assetClass, formName, alertErrors){
+		var validateOkay = true;
+		alertErrors = typeof alertErrors !== 'undefined' ? alertErrors : true
+		switch (assetClass) {
+			case 'APPLICATION':
+				validateOkay = validateAppForm(formName);
+				break;
+
+			case 'DATABASE':
+				validateOkay = validateDBForm(formName);
+				break;
+
+			case 'STORAGE':
+				validateOkay = validateStorageForm(formName);
+				break;
+
+			case 'DEVICE':
+				validateOkay = validateDeviceForm(formName);
+				break;
+
+			default:
+				alert('ERROR: validateForm() - unsupported case for ' + assetClass);
+		}
+		return validateOkay;
+
+	}
+
 	// Private variable used to prevent multiple clicks from invoking multiple updates
 	var assetUpdateInvoked=false;
 
@@ -666,7 +684,8 @@ var EntityCrud = ( function($) {
 		switch (assetClass) {
 			case 'APPLICATION':
 				type = 'Application';
-				validateOkay = validateAppForm('Edit',formName);
+				alert("here");
+				validateOkay = validateAppForm(formName);
 				break;
 
 			case 'STORAGE':
