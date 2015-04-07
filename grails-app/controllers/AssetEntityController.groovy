@@ -3256,7 +3256,11 @@ class AssetEntityController {
 				// Report the time it took to create the nodes
 				def t2 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				def td = t2-t1
-				log.info "Iterating through list of ${assetDependentlist.size()} items took ${td} millis, with an average of ${(td)/(assetDependentlist.size())} millis per item"
+				def avg = 0
+				if(assetDependentlist.size() > 0){
+					avg = td / assetDependentlist.size()
+				}
+				log.info "Iterating through list of ${assetDependentlist.size()} items took ${td} millis, with an average of ${avg} millis per item"
 				
 				// Set the defaults map to be used in the dependeny graph
 				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
