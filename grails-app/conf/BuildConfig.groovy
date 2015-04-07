@@ -45,7 +45,7 @@ grails.project.dependency.resolution = {
 
 	plugins {
 		runtime ':resources:1.2.8'
-		runtime ':hibernate:3.6.10.16'
+		runtime ':hibernate:3.6.10.19'
 		build ':tomcat:7.0.54'
 		runtime ':database-migration:1.4.0'
 		compile (":shiro:1.2.1") {
