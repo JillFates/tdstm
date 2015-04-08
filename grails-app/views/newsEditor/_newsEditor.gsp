@@ -9,7 +9,7 @@
 	</head>
 	<body>
   		<div class="body">
-  		<div id="createNewsDialog" title="Create News Comment"  style="display: none;">
+  		<div id="createNewsDialog" title="Create News"  style="display: none;">
 			<input name="projectId" value="${session.getAttribute("CURR_PROJ").CURR_PROJ}" type="hidden"/>
 			<input name="moveBundle" value="${session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE}" type="hidden"/>
 			<input name="moveEvent.id" value="${session.getAttribute("MOVE_EVENT")?.MOVE_EVENT}" type="hidden" id="moveEventId"/>

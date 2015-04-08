@@ -22,6 +22,10 @@ function onInvokeAction(id) {
 <script type="text/javascript">
 $(document).ready(function() {
     $("#createNewsDialog").dialog({ autoOpen: false })
+    $("#showEditCommentDialog").dialog({ autoOpen: false })
+	$("#showEditCommentDialog").dialog('option', 'width', 'auto');
+	$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
+
 	var moveEvent = '${moveEventId}'
 	var viewFilter = '${viewFilter}'
 	var moveBundle = '${bundleId}'
@@ -140,8 +144,6 @@ function showEditCommentForm(e , rowId){
 			
 		}
      	
-			$("#showEditCommentDialog").dialog('option', 'width', 'auto');
-			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
 			$("#showEditCommentDialog").dialog("open");
 			$("#createNewsDialog").dialog("close");
 		}
@@ -245,7 +247,7 @@ function validateCreateNewsForm(){
 		</div>
 	</g:form>
 </div>
-<div id="showEditCommentDialog" title="Edit Issue Comment" style="display: none;">
+<div id="showEditCommentDialog" title="Edit Issue Comment" style="display: none;" class="static-dialog">
 <g:form action="updateNewsOrComment" method="post" name="editCommentForm">
 	<div class="dialog" style="border: 1px solid #5F9FCF">
 		<input name="id" value="" id="commentId" type="hidden"/>
@@ -333,8 +335,8 @@ function validateCreateNewsForm(){
 	</div>
 </g:form>
 </div>
-<div id="createNewsDialog" title="Create News Comment" style="display: none;">
-	<g:form action="saveNews" method="post" name="createNewsForm">
+<div id="createNewsDialog" title="Create News" style="display: none;" class="static-dialog">
+	<g:form action="saveNews" method="post" name="createNewsForm" id="createNewsForm">
 		<input name="projectId" value="${projectId}" type="hidden"/>
 		<input name="moveBundle" value="${params.moveBundle}" type="hidden"/>
 		<input name="viewFilter" value="${params.viewFilter}" type="hidden"/>
@@ -376,7 +378,7 @@ function validateCreateNewsForm(){
 				<input class="save" type="submit" value="Save" onclick="return validateCreateNewsForm()"/>
 			</span>
 			<span class="button"> 
-				<input class="delete" type="button" value="Cancel" onclick="this.form.reset();$('#createNewsDialog').dialog('close');"/>
+				<input class="delete" type="button" value="Cancel" onclick="$('#createNewsDialog').dialog('close');"/>
 			</span>
 		</div>
 	</g:form>
@@ -405,6 +407,9 @@ $("#showEditCommentDialog").bind('dialogclose', function(){
 	assetTable.each(function(n, row){
 		$(row).removeClass('selectedRow');       		
     });   		
+});
+$("#createNewsDialog").bind('dialogclose', function() {
+	$("#createNewsForm")[0].reset();
 });
 /*
  * validate the text area size
