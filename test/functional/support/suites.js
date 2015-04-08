@@ -55,6 +55,9 @@ module.exports = {
     dashboards:[
     '../components/dashboards/eventDashboard.spec.js'
     ],
+    planning:[
+    '../components/planning/listEventNews.spec.js'
+    ],
     reports:[
     '../components/reports/applicationProfiles.spec.js',
     '../components/reports/cablingConflict.spec.js',

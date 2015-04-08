@@ -28,8 +28,8 @@ describe('Event List',function(){
         expect(eventsPage.getTitle().getText()).toEqual('Create Event');
     });
     describe('Create Event Form',function(){
-      xdescribe('Project dropdown',function(){
-        it('should have "Project:*" as label',function(){
+      describe('Project dropdown',function(){
+        xit('should have "Project:*" as label',function(){
 
         });
         xit('should be required',function(){
@@ -38,109 +38,109 @@ describe('Event List',function(){
         xit('should have existing projects listed',function(){
 
         });
-        it('should have listed by default current project',function(){
+        xit('should have listed by default current project',function(){
 
         });
       }); // Project dropdown
-      xdescribe('Name',function(){
-        it('should have "Name:*" as label',function(){
+      describe('Name',function(){
+        xit('should have "Name:*" as label',function(){
 
         });
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
-        it('should not allow to save without a name',function(){
+        xit('should not allow to save without a name',function(){
 
         });
-        it('should add a name',function(){
+        xit('should add a name',function(){
 
         });
       });//Name
-      xdescribe('Description',function(){
-        it('should have "Description:" as label',function(){
+      describe('Description',function(){
+        xit('should have "Description:" as label',function(){
 
         });
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
-        it('should add a description',function(){
+        xit('should add a description',function(){
 
         });
       });// description
-      xdescribe('Bundles',function(){
-        it('should have "Bundles:" as label',function(){
+      describe('Bundles',function(){
+        xit('should have "Bundles:" as label',function(){
 
         });
-        it('should have existing bundles listed as checkbox',function(){
+        xit('should have existing bundles listed as checkbox',function(){
 
         });
-        it('should select a bundle',function(){
+        xit('should select a bundle',function(){
 
         });
       });//Bundles
-      xdescribe('Runbook Status',function(){
-        it('should have "Runbook Status:" as label',function(){
+      describe('Runbook Status',function(){
+        xit('should have "Runbook Status:" as label',function(){
 
         });
-        it('should have x options',function(){
+        xit('should have x options',function(){
 
         });
-        it('should have these options',function(){
+        xit('should have these options',function(){
 
         });
       }); //Runbook Status
-      xdescribe('Runbook bridge1 first', function(){
-        it('should have Runbook bridge1 as label',function(){
+      describe('Runbook bridge1 first', function(){
+        xit('should have Runbook bridge1 as label',function(){
 
         });
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
       }); //Runbook bridge1 first
-      xdescribe('Video Link',function(){
-        it('should have "Video Link" as label',function(){
+      describe('Video Link',function(){
+        xit('should have "Video Link" as label',function(){
 
         });
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
       }); // Video Link
-      xdescribe('Status',function(){
-        it('should have "Status:" as label',function(){
+      describe('Status',function(){
+        xit('should have "Status:" as label',function(){
 
         });
-        it('should have Auto Start selected by default',function(){
+        xit('should have Auto Start selected by default',function(){
 
         });
-        it('should have 3 options listed',function(){
+        xit('should have 3 options listed',function(){
 
         });
-        it('should have these options listed',function(){
+        xit('should have these options listed',function(){
 
         });
       }); // Status
-      xdescribe('Estimated Start',function(){
-        it('should have "Estimated Start:" as label',function(){
+      describe('Estimated Start',function(){
+        xit('should have "Estimated Start:" as label',function(){
 
         });
-        it('should be empty by default',function(){
+        xit('should be empty by default',function(){
 
         });
-        it('should add a date',function(){
+        xit('should add a date',function(){
 
         });
-        xdescribe('date picker',function(){
+        describe('date picker',function(){
 
         });
       });//Estimated Start
-      xdescribe('Buttons',function(){
-        it('should have 2 buttons',function(){
+      describe('Buttons',function(){
+        xit('should have 2 buttons',function(){
 
         });
-        it('should have "Save" as label',function(){
+        xit('should have "Save" as label',function(){
 
         });
-        it('should have "Cancel" as label',function(){
+        xit('should have "Cancel" as label',function(){
 
         });
       }); // Buttons

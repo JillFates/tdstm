@@ -10,6 +10,7 @@ exports.config = {
     regression : suites.regression, 
     tasks : suites.tasks,
     dashboards : suites.dashboards,
+    planning: suites.planning,
     reports : suites.reports,
     assets : suites.assets,
     importExport : suites.importExport,

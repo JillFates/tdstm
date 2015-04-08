@@ -49,7 +49,7 @@ describe('Bundles', function(){
   });
 
 
-  xdescribe('delete bundle assigned to an asset', function(){
+  describe('delete bundle assigned to an asset', function(){
     describe('preconditions', function(){
       //bundle created
       // 
