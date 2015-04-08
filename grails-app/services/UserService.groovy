@@ -220,7 +220,7 @@ class UserService {
 			}
 		} else {
 			// Update the person information if the configuration is set for it
-			if (domain.updateUser) {
+			if (domain.updateUserInfo) {
 				if (person.firstName != nameMap.first)
 					person.firstName = nameMap.first
 				if (person.middleName != nameMap.middle)
