@@ -348,6 +348,10 @@ class UserService {
 					if (! existingRoles.find { it.roleType.id == nr}) {
 						if (log.isDebugEnabled() || debug)
 							log.debug "findOrProvisionUser: Assigning new security role $nr for $personIdentifier"
+
+						// Force the Role Types to uppercase
+						nr = nr.toUpperCase()
+
 						def rt = RoleType.read(nr)
 						def pr = new PartyRole(party:person, roleType:rt)
 						if (! pr.save(flush:true)) {

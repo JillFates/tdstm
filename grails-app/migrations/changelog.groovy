@@ -70,4 +70,5 @@ databaseChangeLog = {
 	include file: '20150203-add-architecture-view-perm.groovy'
 	include file: '20150319-remove-invalid-security-entries-from-party-role.groovy'
 	include file: '20150407-cleanup-cabling-data.groovy'
+	include file: '20150408-set-all-PartyRoles-toUpperCase.groovy'
 }
