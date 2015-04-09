@@ -3348,7 +3348,7 @@ class AssetEntityController {
 				render(template:'dependencyGraph',model:model)
 				break
 		} // switch
-		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
+		log.debug "Loading dependency console took ${TimeUtil.elapsed(start)}"
 	}
 
 	/**
