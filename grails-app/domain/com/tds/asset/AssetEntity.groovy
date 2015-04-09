@@ -202,12 +202,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		retireDate( nullable:true )
 		description( blank:true, nullable:true )
 		supportType( blank:true, nullable:true )
-		environment( blank:true, nullable:true, validator: 
+		environment( blank:true, nullable:true, size:0..20, validator: 
 			CustomValidators.inList(
 				CustomValidators.optionsClosure(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION), 
 				"environment")
 		)
-		
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )
 		custom3( blank:true, nullable:true )
@@ -339,7 +338,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		appSme( blank:true, nullable:true )
 	
 		// MoveBundleAsset fields
-		validation( blank:true, nullable:true, inList:ValidationType.getList() )		
+		validation( blank:true, nullable:true, size:0..20, inList:ValidationType.getList() )		
 		dependencyBundle( nullable:true )
 		externalRefId( blank:true, nullable:true )
         

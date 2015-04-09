@@ -79,7 +79,11 @@
 	        }else if(option=='dependencyStatus' && dependencyStatus){
 	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ dependencyStatus +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(data,dependencyStatus,option)')};
 	        }else if(option=='environment' && environment){
-	        	${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ environment +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
+	        	if (environment.length <= 20) {
+	        		${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ environment +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
+	        	} else {
+					alert(option+" can't have more than 20 characters.")
+	        	}
 	        }else{
     			alert(option+" can't be blank.")
     		}
