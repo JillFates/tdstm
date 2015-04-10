@@ -72,4 +72,7 @@ databaseChangeLog = {
 	include file: '20150407-cleanup-cabling-data.groovy'
 	include file: '20150408-set-all-PartyRoles-toUpperCase.groovy'
 	include file: '20150408-modify-fields-environment-validation-criticaly.groovy'
+	include file: '20150409-new-user-login-permissions.groovy'
+	include file: '20150410-remove-user-login-permissions-from-client-admin-role.groovy'
+
 }

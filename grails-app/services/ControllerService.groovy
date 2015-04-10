@@ -75,6 +75,35 @@ class ControllerService {
 	}
 
 	/**
+	 * Validates is the user have the permission and if not redirect to default page
+	 * @param controller - a reference to the controller
+	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional)
+	 * @return true if the user have the permission
+	 */
+	boolean checkPermission(controller, perm, logError=true) {
+		def user = securityService.getUserLogin()
+
+		if (perm instanceof String)
+			perm = [perm]
+
+		boolean hasPerm=false
+		for(int i=0; i < perm.size(); i++) {
+			if (securityService.hasPermission(user, perm[i])) {
+				hasPerm = true
+				break
+			}
+		}
+
+		if (!hasPerm && logError) {
+			def request = RequestContextHolder.currentRequestAttributes().request
+			securityService.reportViolation("attempted to access ${request.forwardURI} without permission ($perm)", user)
+			redirectToDefaultPage(controller, "Sorry but you are unauthorized to perform that action")
+		}
+
+		return hasPerm
+	}
+
+	/**
 	 * Overloaded version of the getProjectForPage(controller, user)
 	 * @param controller - a reference to the controller
 	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional)

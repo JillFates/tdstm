@@ -27,6 +27,7 @@ class PersonController {
 	def projectService
 	def sessionFactory
 	def jdbcTemplate
+	def controllerService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -139,7 +140,9 @@ class PersonController {
 		else
 			personInstanceList = []
 		
-		
+		def haveCreateUserLoginPerm = controllerService.checkPermission(this, "CreateUserLogin", false)
+		def haveEditUserLoginPerm = controllerService.checkPermission(this, "EditUserLogin", false)
+
 		def map = [controller:'person', action:'listJson', id:"${params.companyId}"]
 		def listJsonUrl = HtmlUtil.createLink(map)
 		def createUrl = HtmlUtil.createLink([controller:'userLogin', action:'create'])
@@ -150,11 +153,29 @@ class PersonController {
 			[ cell: ['<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>', 
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>', 
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>', 
-			'<a href="'+((it.userLoginId)?("${editUrl+'/'+it.userLoginId}"):("${createUrl+'/'+it.personId}"))+'">'+it.userLogin+'</a>', 
+			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, it), 
 			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
 	
+	}
+
+	def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, person) {
+		def element = ""
+		if (person.userLoginId) {
+			if (haveEditUserLoginPerm) {
+				element = '<a href="' + editUrl + '/' + person.userLoginId + '">' + person.userLogin + '</a>'
+			} else {
+				element = person.userLogin
+			}
+		} else {
+			if (haveCreateUserLoginPerm) {
+				element = '<a href="' + createUrl + '/' + person.personId + '">' + person.userLogin + '</a>'
+			} else {
+				element = ''
+			}
+		}
+		return element
 	}
 
 	/**

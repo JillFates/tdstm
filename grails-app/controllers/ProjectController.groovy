@@ -85,53 +85,45 @@ class ProjectController {
 	 *  return the details of Project
 	 */
 	def show() {
-		def CURR_PROJ = session.CURR_PROJ?.CURR_PROJ
-		if(CURR_PROJ){
-			def projectInstance = Project.get( CURR_PROJ )
-			if(!projectInstance) {
-				flash.message = "Project not found with id ${params.id}"
-				redirect( action:"list" )
-			} else { 
-				// load transitions details into application memory.
-				//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
+		def currProjectInstance = controllerService.getProjectForPage(this)
+		if (currProjectInstance) {
+			// load transitions details into application memory.
+			//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
 
-				def currProj = session.getAttribute("CURR_PROJ");
-				def currProjectInstance = Project.get( currProj.CURR_PROJ )
-				def loginPerson = securityService.getUserLoginPerson()
-				def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
+			def loginPerson = securityService.getUserLoginPerson()
+			def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
 
-				// Save and load various user preferences
-				userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-				userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
-				userPreferenceService.loadPreferences("CURR_TZ")
-				userPreferenceService.loadPreferences("CURR_BUNDLE")
-				userPreferenceService.loadPreferences("MOVE_EVENT")
+			// Save and load various user preferences
+			userPreferenceService.setPreference( "CURR_PROJ", "${currProjectInstance.id}" )
+			userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
+			userPreferenceService.loadPreferences("CURR_TZ")
+			userPreferenceService.loadPreferences("CURR_BUNDLE")
+			userPreferenceService.loadPreferences("MOVE_EVENT")
 
-				def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
-				if(!currPowerType){
-					userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
-				}
-				def projectLogo
-				if(currProjectInstance){
-					projectLogo = ProjectLogo.findByProject(currProjectInstance)
-				}
-				def imageId
-				if(projectLogo){
-					imageId = projectLogo.id
-				}
-				session.setAttribute("setImage",imageId) 
-				def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
-				def projectPartner = projectService.getProjectPartner( projectInstance )
-				def projectManager = projectService.getProjectManagerByProject(projectInstance.id)
-				def moveManager = projectService.getMoveManagerByProject(projectInstance.id)
-	
-				return [ projectInstance : projectInstance, projectPartner:projectPartner, 
-						 projectManager:projectManager, moveManager:moveManager, 
-						 projectLogoForProject:projectLogoForProject ]
+			def currPowerType = session.getAttribute("CURR_POWER_TYPE")?.CURR_POWER_TYPE
+			if(!currPowerType){
+				userPreferenceService.setPreference( "CURR_POWER_TYPE", "Watts" )
 			}
+			def projectLogo
+			if(currProjectInstance){
+				projectLogo = ProjectLogo.findByProject(currProjectInstance)
+			}
+			def imageId
+			if(projectLogo){
+				imageId = projectLogo.id
+			}
+			session.setAttribute("setImage",imageId) 
+			def projectLogoForProject = ProjectLogo.findByProject(currProjectInstance)
+			def projectPartner = projectService.getProjectPartner( currProjectInstance )
+			def projectManager = projectService.getProjectManagerByProject(currProjectInstance.id)
+			def moveManager = projectService.getMoveManagerByProject(currProjectInstance.id)
+
+			return [ projectInstance : currProjectInstance, projectPartner:projectPartner, 
+					 projectManager:projectManager, moveManager:moveManager, 
+					 projectLogoForProject:projectLogoForProject ]
 		} else {
-		flash.message = "Project not found with id ${params.id}"
-		redirect(action:"list")
+			flash.message = "Project not found with id ${params.id}"
+			redirect(action:"list")
 		}
 	}
 
@@ -156,7 +148,7 @@ class ProjectController {
 	}
 
 	def edit() {
-		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = controllerService.getProjectForPage(this, "ProjectEditView")
 		def projectDetails
 		def moveBundles
 		if (!projectInstance) {
@@ -177,10 +169,7 @@ class ProjectController {
 	 * Update the Project details
 	 */
 	def update() {
-
-		// TODO : Security : Need fix update() to check user's permissions
-
-		def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
+		def projectInstance = controllerService.getProjectForPage(this, "ProjectEditView")
 		
 		if( projectInstance ) {
 			//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date

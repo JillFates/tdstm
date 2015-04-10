@@ -16,6 +16,7 @@ class UserLoginController {
 	def securityService
 	def projectService
 	def jdbcTemplate
+	def controllerService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -23,6 +24,9 @@ class UserLoginController {
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
 	def list() {
+		if (!controllerService.checkPermission(this, "UserLoginView"))
+			return
+
 		def listJsonUrl
 		
 		def companyId = params.companyId ?: 'All'
@@ -49,6 +53,9 @@ class UserLoginController {
 	}
 	
 	def listJson() {
+		if (!controllerService.checkPermission(this, "UserLoginView"))
+			return
+
 		def sortIndex = params.sidx ?: 'username'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')
@@ -151,6 +158,9 @@ class UserLoginController {
 	}
 	
 	def show() {
+		if (!controllerService.checkPermission(this, "UserLoginView"))
+			return
+
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(!userLoginInstance) {
@@ -164,6 +174,9 @@ class UserLoginController {
 	}
 
 	def delete() {
+		if (!controllerService.checkPermission(this, "UserLoginDelete"))
+			return
+
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(userLoginInstance) {
@@ -181,6 +194,9 @@ class UserLoginController {
 	 *  Return userdetails and roles to Edit form
 	 */
 	def edit() {
+		if (!controllerService.checkPermission(this, "EditUserLogin"))
+			return
+
 		def userLoginInstance = UserLogin.get( params.id )
 		def companyId = params.companyId
 		if(!userLoginInstance) {
@@ -202,6 +218,9 @@ class UserLoginController {
 	 * update user details and set the User Roles to the Person
 	 */
 	def update() {
+		if (!controllerService.checkPermission(this, "EditUserLogin"))
+			return
+
 		UserLogin.withTransaction { status ->
 			def userLoginInstance = UserLogin.get( params.id )
 			def companyId = params.companyId
@@ -280,6 +299,9 @@ class UserLoginController {
 	
 	// return userlogin details to create form
 	def create() {
+		if (!controllerService.checkPermission(this, "CreateUserLogin"))
+			return
+
 		def personId = params.id
 		def companyId = params.companyId
 		def person
@@ -309,6 +331,9 @@ class UserLoginController {
 	 *  Save the User details and set the user roles for Person
 	 */
 	def save() {
+		if (!controllerService.checkPermission(this, "CreateUserLogin"))
+			return
+
 		try{
 			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ

@@ -45,28 +45,13 @@ class SecurityFilters {
 				}
 			}
 		}
-		// Editing a project requires the ProjectEditView permission
-		projectCrud(controller: "project", action: "(edit|update)") {
-			before = {
-				def perm = RolePermissions.hasPermission("ProjectEditView")
-				if ( ! perm ) {
-					flash.message = "You do not have permission to edit projects."
-					redirect(controller:'project', action:'show')
-				}
-				return perm
-			}
-		}
-		// for modify and delete a userLogin require ADMIN role 
-		userCrud(controller: "userLogin", action: "(edit|update|delete)") {
-			before = {
-				accessControl {
-					role("ADMIN")
-				}
-			}
-		}
+
 		// for delete require ADMIN role 
 		crud(controller: "*", action: "delete") {
 			before = {
+				if (controllerName == "project" || controllerName == "userLogin") {
+					return true
+				}
 				accessControl {
 					role("ADMIN")
 				}
