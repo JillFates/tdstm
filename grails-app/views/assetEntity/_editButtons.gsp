@@ -30,7 +30,7 @@
   -- Initialize the update button so that it can only be clicked once. Note that for some reason that the JQuery one method is not working as expected 
   -- so the performAssetUpdate method has some extra logic in it with a singleton flag controlling access
   --%>
-$('#assetUpdateButton').one('click', function() {
+$('#assetUpdateButton').on('click', function() {
 	return EntityCrud.performAssetUpdate($(this),'${assetEntity.assetClass}');
 });
 
