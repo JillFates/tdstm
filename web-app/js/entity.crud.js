@@ -684,7 +684,6 @@ var EntityCrud = ( function($) {
 		switch (assetClass) {
 			case 'APPLICATION':
 				type = 'Application';
-				alert("here");
 				validateOkay = validateAppForm(formName);
 				break;
 
