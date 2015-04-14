@@ -178,7 +178,7 @@ class WorkflowController {
 	 *  Update the workflow steps for selected workflow
 	 *  @param : workflowId, steps 
 	 *==================================================*/
-	def updateWorkflowSteps() {
+def updateWorkflowSteps() {
 		def workflowId = params.workflow
 		def workflowTransitions
 		def workflowTransitionsList = []
@@ -199,12 +199,12 @@ class WorkflowController {
 				workflowTransition.code = params["code_"+workflowTransition.id]
 				workflowTransition.name = params["name_"+workflowTransition.id]
 				workflowTransition.transId = params["transId_"+workflowTransition.id] ? Integer.parseInt( params["transId_"+workflowTransition.id] ) : null
-				workflowTransition.type = params["type_"+workflowTransition.id]
+				// workflowTransition.type = params["type_"+workflowTransition.id]
 				workflowTransition.category = params["category_"+workflowTransition.id]
-				workflowTransition.color = params["color_"+workflowTransition.id]
+				// workflowTransition.color = params["color_"+workflowTransition.id]
 				workflowTransition.dashboardLabel = params["dashboardLabel_"+workflowTransition.id]
-				workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
-				workflowTransition.header = params["header_"+workflowTransition.id]
+				// workflowTransition.predecessor = params["predecessor_"+workflowTransition.id] ? Integer.parseInt( params["predecessor_"+workflowTransition.id] ) : null
+				// workflowTransition.header = params["header_"+workflowTransition.id]
 				//workflowTransition.effort = params["effort_"+workflowTransition.id] ? Integer.parseInt( params["effort_"+workflowTransition.id] ) : null
 				workflowTransition.duration = params["duration_"+workflowTransition.id] ? Integer.parseInt( params["duration_"+workflowTransition.id] ) : null
 				workflowTransition.role = RoleType.get(params["role_"+workflowTransition.id])
@@ -221,12 +221,13 @@ class WorkflowController {
 					code : params["code_$i"], 
 					name : params["name_$i"],
 					transId : params["transId_$i"] ? Integer.parseInt( params["transId_$i"] ) : null,
-					type : params["type_$i"],	
+					// type : params["type_$i"],	
+					type : 'boolean',
 					category : params["category_$i"],
-					color : params["color_$i"],
+					// color : params["color_$i"],
 					dashboardLabel : params["dashboardLabel_$i"],
-					predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
-					header : params["header_$i"],		
+					// predecessor : params["predecessor_$i"] ? Integer.parseInt( params["predecessor_$i"] ) : null,
+					// header : params["header_$i"],		
 					role : RoleType.get(params["role_$i"]),
 					//effort : params["effort_$i"] ? Integer.parseInt( params["effort_$i"] ) : null,
 					duration : params["duration_$i"] ? Integer.parseInt( params["duration_$i"] ) : null
@@ -260,6 +261,7 @@ class WorkflowController {
 		}
 		render( view : 'workflowList', model : [ workflowTransitionsList : workflowTransitionsList, workflow : workflow, roles:roles ] )
 	}
+
 
 	/*====================================================
 	 *  Update the workflow roles

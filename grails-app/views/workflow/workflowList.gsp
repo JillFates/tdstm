@@ -95,7 +95,7 @@
 	<thead>
 		<tr>
 			
-			<th class="sortable">Step<span style="color: red">*</span></th>
+			<th class="sortable">Step Code<span style="color: red">*</span></th>
 			
 			<th class="sortable">Label<span style="color: red">*</span></th>
 			
@@ -103,17 +103,9 @@
 			
 			<th class="sortable">Sequence<span style="color: red">*</span></th>
 			
-			<th class="sortable">Type<span style="color: red">*</span></th>
-			
 			<th class="sortable">Category</th>
 			
-			<th class="sortable">Start</th>
-			
-			<th class="sortable">Color</th>
-			
-			<th class="sortable">Header</th>
-			
-			<th class="sortable">Role</th>
+			<th class="sortable">Team</th>
 			
 			<th class="sortable">Duration</th>
 			
@@ -133,16 +125,8 @@
 				<td class="name">${transitions.transition?.dashboardLabel}</td>
 				
 				<td class="name">${transitions.transition?.transId}</td>
-				
-				<td class="name"><g:message code="workflow.type.${transitions.transition?.type}" /></td>
-
+			
 				<td class="name">${transitions.transition?.category}</td>
-				
-				<td class="name">${transitions.transition?.predecessor}</td>
-
-				<td class="name">${transitions.transition?.color}</td>
-				
-				<td class="name">${transitions.transition?.header}</td>
 				
 				<td class="name">${transitions.transition?.role?.description ? transitions.transition?.role?.description?.substring(transitions.transition?.role?.description.lastIndexOf(':') +1).trim() : ''}</td>
 
@@ -178,23 +162,15 @@
 	<thead>
 		<tr>
 			
-			<th class="sortable">Step<span style="color: red">*</span></th>
+			<th class="sortable">Step Code<span style="color: red">*</span></th>
 			
 			<th class="sortable">Label<span style="color: red">*</span></th>
 			
 			<th class="sortable">Dashboard Label</th>
 			
 			<th class="sortable">Sequence<span style="color: red">*</span></th>
-			
-			<th class="sortable">Type<span style="color: red">*</span></th>
-			
+
 			<th class="sortable">Category</th>
-			
-			<th class="sortable">Start</th>
-			
-			<th class="sortable">Color</th>
-			
-			<th class="sortable">Header</th>
 			
 			<th class="sortable">Role</th>
 			
@@ -226,24 +202,9 @@
 				</td>
 				
 				<td nowrap="nowrap">
-					<g:select id="typeId_${transitions.transition.id}" name="type_${transitions.transition.id}" from="${transitions.transition.constraints.type.inList}" value="${transitions.transition.type}" valueMessagePrefix="workflow.type"></g:select>
-				</td>
-				
-				<td nowrap="nowrap">
 					<g:select id="category_${transitions.transition.id}" name="category_${transitions.transition.id}" from="${com.tds.asset.AssetComment.constraints.category.inList}" optionValue="${{ e -> e.capitalize() }}" value="${transitions.transition.category}"  noSelection="['':'Please select']" ></g:select>
 				</td>
 
-				<td nowrap="nowrap">
-					<input type="text" name="predecessor_${transitions.transition.id}" id="predecessorId_${transitions.transition.id}" value="${transitions.transition?.predecessor}"  style="width: 50px;" maxlength="3"  onchange="validateField(this.value, this.id, 'predecessor')"/>
-				</td>
-
-				<td nowrap="nowrap">
-					<input type="text" name="color_${transitions.transition.id}" id="colorId_${transitions.transition.id}" value="${transitions.transition?.color}"  style="width: 60px;" maxlength="7"/>
-				</td>
-				
-				<td nowrap="nowrap">
-					<input type="text" name="header_${transitions.transition.id}" id="headerId_${transitions.transition.id}" value="${transitions.transition?.header}"  style="width: 50px;" maxlength="7"/>
-				</td>
 				<td nowrap="nowrap">
 				<g:select from="${roles}" id="role_${transitions.transition.id}" name="role_${transitions.transition.id}"
 					optionValue="${{it.description}}"
@@ -398,16 +359,9 @@ function addStep( type ){
 						"<td><input type='text' class='field_error' name='name_"+additionalSteps+"' id='nameId_"+additionalSteps+"' onchange=\"validateField(this.value, this.id, 'Name' )\" /></td>"+
 						"<td><input type='text' name='dashboardLabel_"+additionalSteps+"' id='dashboardLabelId_"+additionalSteps+"' /></td>"+
 						"<td><input type='text' class='field_error' name='transId_"+additionalSteps+"' id='transIdId_"+additionalSteps+"'  style='width: 60px;' maxlength='3'  onchange=\"validateField(this.value, this.id, 'transId')\"/></td>"+
-						"<td><select id='typeId_"+additionalSteps+"' name='type_"+additionalSteps+"'>"+
-								"<option value='process'>Process</option>"+
-								"<option value='boolean'>Boolean</option>"+
-							"</select></td>"+
 						"<td><select id='category_"+additionalSteps+"' name='category_"+additionalSteps+"'>"+
 								$('#createCategory').html()+
 							"</select></td>"+
-						"<td><input type='text' name='predecessor_"+additionalSteps+"' id='predecessorId_"+additionalSteps+"'  style='width: 60px;' maxlength='3'  onchange=\"validateField(this.value, this.id, 'predecessor')\"/></td>"+
-						"<td><input type='text' name='color_"+additionalSteps+"' id='colorId_"+additionalSteps+"' /></td>"+
-						"<td><input type='text' name='header_"+additionalSteps+"' id='headerId_"+additionalSteps+"'   style='width: 50px;' maxlength='7'/></td>"+
 						"<td><select id='role_"+additionalSteps+"' name='role_"+additionalSteps+"'>"+
 								$('#addRole').html()+
 							"</select></td>"+
