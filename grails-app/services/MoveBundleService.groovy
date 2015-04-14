@@ -1,7 +1,5 @@
 import java.text.SimpleDateFormat
 
-import jxl.write.Label
-
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 
 import com.tds.asset.ApplicationAssetMap
@@ -17,6 +15,7 @@ import com.tds.asset.AssetType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -613,7 +612,7 @@ class MoveBundleService {
 						cellValue = String.valueOf(exportList[r-startRow]?."${columnList[c]}" ?:'')
 						break;
 				}
-				sheet.addCell( new Label( c, r, cellValue) )
+				WorkbookUtil.addCell(sheet, c, r, cellValue)
 			}
 		}
 	}

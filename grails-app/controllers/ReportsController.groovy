@@ -8,9 +8,9 @@ import java.io.*
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jxl.*
-import jxl.read.biff.*
-import jxl.write.*
+import org.apache.poi.*
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
@@ -29,7 +29,9 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 import com.tds.util.workbook.*
+import com.tdsops.common.lang.ExceptionUtil
 
 class ReportsController {
 	
@@ -355,39 +357,37 @@ class ReportsController {
 				} else { // Generate XLS report
 					try {
 						File file =  ApplicationHolder.application.parentContext.getResource( "/templates/IssueReport.xls" ).getFile()
-						WorkbookSettings wbSetting = new WorkbookSettings()
-						wbSetting.setUseTemporaryFileDuringWrite(true)
-						def workbook = Workbook.getWorkbook( file, wbSetting )
+
 						//set MIME TYPE as Excel
 						response.setContentType( "application/vnd.ms-excel" )
 						response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 						response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
 						
-						def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+						def book = new HSSFWorkbook(new FileInputStream( file ));
 						
 						def sheet = book.getSheet("issues")
-						sheet.addCell( new Label( 1, 1, String.valueOf( projectInstance?.client?.name )) )
-						sheet.addCell( new Label( 1, 2, String.valueOf( partyGroupInstance?.name )) )
-						sheet.addCell( new Label( 1, 3, String.valueOf( bundleNames )) )
+						WorkbookUtil.addCell(sheet, 1, 1, String.valueOf( projectInstance?.client?.name ))
+						WorkbookUtil.addCell(sheet, 1, 2, String.valueOf( partyGroupInstance?.name ))
+						WorkbookUtil.addCell(sheet, 1, 3, String.valueOf( bundleNames ))
 						for ( int r = 0; r < reportFields.size(); r++ ) {
-							sheet.addCell( new Label( 0, r+6, String.valueOf(reportFields[r].assetName ?:'')) )
-							sheet.addCell( new Label( 1, r+6, String.valueOf(reportFields[r].assetTag ?:'')) )
-							sheet.addCell( new Label( 2, r+6, String.valueOf(reportFields[r].moveBundle ?:'')) )
-							sheet.addCell( new Label( 3, r+6, String.valueOf(reportFields[r].sourceTargetRoom ?:'')) )
-							sheet.addCell( new Label( 4, r+6, String.valueOf(reportFields[r].model ?:'')) )
-							sheet.addCell( new Label( 5, r+6, String.valueOf(reportFields[r].commentCode ?:'')) )
-							sheet.addCell( new Label( 6, r+6, String.valueOf(reportFields[r].commentType ?:'')) )
-							sheet.addCell( new Label( 7, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : "")) )
-							sheet.addCell( new Label( 8, r+6, String.valueOf(reportFields[r].createdBy ?:'')) )
-							sheet.addCell( new Label( 9, r+6, String.valueOf(reportFields[r].owner ?:'')) )
-							sheet.addCell( new Label( 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:'')) )
-							sheet.addCell( new Label( 11, r+6, String.valueOf(reportFields[r].issue ?:'')) )
+							WorkbookUtil.addCell(sheet, 0, r+6, String.valueOf(reportFields[r].assetName ?:''))
+							WorkbookUtil.addCell(sheet, 1, r+6, String.valueOf(reportFields[r].assetTag ?:''))
+							WorkbookUtil.addCell(sheet, 2, r+6, String.valueOf(reportFields[r].moveBundle ?:''))
+							WorkbookUtil.addCell(sheet, 3, r+6, String.valueOf(reportFields[r].sourceTargetRoom ?:''))
+							WorkbookUtil.addCell(sheet, 4, r+6, String.valueOf(reportFields[r].model ?:''))
+							WorkbookUtil.addCell(sheet, 5, r+6, String.valueOf(reportFields[r].commentCode ?:''))
+							WorkbookUtil.addCell(sheet, 6, r+6, String.valueOf(reportFields[r].commentType ?:''))
+							WorkbookUtil.addCell(sheet, 7, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : ""))
+							WorkbookUtil.addCell(sheet, 8, r+6, String.valueOf(reportFields[r].createdBy ?:''))
+							WorkbookUtil.addCell(sheet, 9, r+6, String.valueOf(reportFields[r].owner ?:''))
+							WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:''))
+							WorkbookUtil.addCell(sheet, 11, r+6, String.valueOf(reportFields[r].issue ?:''))
 							
 						}
-						sheet.addCell( new Label( 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") ))
+						WorkbookUtil.addCell(sheet, 0, reportFields.size()+7, String.valueOf("Note : All times are in "+reportFields[0].timezone+" time zone") )
 						
-						book.write()
-						book.close()
+						book.write(response.getOutputStream())
+
 					} catch( Exception ex ) {
 						flash.message = "Exception occurred while exporting data"+ex
 						redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'Issue Report'] )
@@ -715,26 +715,23 @@ class ReportsController {
 			def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
 			try {
 				File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()
-				WorkbookSettings wbSetting = new WorkbookSettings()
-				wbSetting.setUseTemporaryFileDuringWrite(true)
-				def workbook = Workbook.getWorkbook( file, wbSetting )
 				//set MIME TYPE as Excel
 				response.setContentType( "application/vnd.ms-excel" )
 				def filename = 	"CablingData-${projectInstance.name}-${bundleName}.xls"
 					filename = filename.replace(" ", "_")
 				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 				
-				def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+				def book = new HSSFWorkbook(new FileInputStream( file ));
 				
 				def sheet = book.getSheet("cabling_data")
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 				assetEntityService.cablingReportData(assetCablesList, sheet)
 				
-				book.write()
-				book.close()
+				book.write(response.getOutputStream())
+
 			} catch( Exception ex ) {
-		log.error "Exception occurred while exporting cabling data " + ex
+				log.error "Exception occurred while exporting cabling data: " + ExceptionUtil.stackTraceToString(ex)
 				flash.message = "Exception occurred while exporting data"
 				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
 				return;
@@ -883,33 +880,31 @@ class ReportsController {
 			if(params.output == "excel"){
 				try {
 					File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Power_Report.xls" ).getFile()
-					WorkbookSettings wbSetting = new WorkbookSettings()
-					wbSetting.setUseTemporaryFileDuringWrite(true)
-					def workbook = Workbook.getWorkbook( file, wbSetting )
+
 					//set MIME TYPE as Excel
 					response.setContentType( "application/vnd.ms-excel" )
 					def filename = 	"Power_Report-${project.name}.xls"
 						filename = filename.replace(" ", "_")
 					response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 					
-					def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+					def book = new HSSFWorkbook(new FileInputStream( file ));
 					
 					def sheet = book.getSheet("Power_Report")
 					
 					for ( int r = 1; r <= reportDetails.size(); r++ ) {
-						sheet.addCell( new Label( 0, r, String.valueOf(reportDetails[r-1].location )) )
-						sheet.addCell( new Label( 1, r, String.valueOf(reportDetails[r-1].room )) )
-						sheet.addCell( new Label( 2, r, String.valueOf(reportDetails[r-1].rack )) )
-						sheet.addCell( new Label( 3, r, String.valueOf(reportDetails[r-1].devices )) )
-						sheet.addCell( new Label( 4, r, String.valueOf(reportDetails[r-1].powerA )) )
-						sheet.addCell( new Label( 5, r, String.valueOf(reportDetails[r-1].powerB )) )
-						sheet.addCell( new Label( 6, r, String.valueOf(reportDetails[r-1].powerC )) )
-						sheet.addCell( new Label( 7, r, String.valueOf(reportDetails[r-1].powerTBD )) )
-						sheet.addCell( new Label( 8, r, String.valueOf(reportDetails[r-1].totalPower )) )
+						WorkbookUtil.addCell(sheet, 0, r, String.valueOf(reportDetails[r-1].location ))
+						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(reportDetails[r-1].room ))
+						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(reportDetails[r-1].rack ))
+						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(reportDetails[r-1].devices ))
+						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(reportDetails[r-1].powerA ))
+						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(reportDetails[r-1].powerB ))
+						WorkbookUtil.addCell(sheet, 6, r, String.valueOf(reportDetails[r-1].powerC ))
+						WorkbookUtil.addCell(sheet, 7, r, String.valueOf(reportDetails[r-1].powerTBD ))
+						WorkbookUtil.addCell(sheet, 8, r, String.valueOf(reportDetails[r-1].totalPower ))
 					}
 					
-					book.write()
-					book.close()
+					book.write(response.getOutputStream())
+
 				} catch( Exception ex ) {
 					println "Exception occurred while exporting data"+ex
 					return;
@@ -1203,15 +1198,22 @@ class ReportsController {
 	 * @return : will generate a XLS file having task task list
 	 */
 	def exportTaskReportExcel(taskList, tzId, project){
-		def book = WorkbookObject.getWritableWorkbook(response, "${project.name}-TaskReport", "/templates/TaskReport.xls" );
+		File file =  ApplicationHolder.application.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
+		def filename = "${project.name}-TaskReport"
+
+		//set MIME TYPE as Excel
+		response.setContentType( "application/vnd.ms-excel" )
+		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+		
+		def book = new HSSFWorkbook(new FileInputStream( file ));
+
 		def tasksSheet = book.getSheet("tasks")
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'role', 'status',
 					'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
 					'dateCreated', 'createdBy', 'moveEvent']
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7)
 		
-		book.write()
-		book.close()
+		book.write(response.getOutputStream())
 	}
 	
 	/**

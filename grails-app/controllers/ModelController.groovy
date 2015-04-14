@@ -4,9 +4,9 @@ import java.io.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-import jxl.*
-import jxl.read.biff.*
-import jxl.write.*
+import org.apache.poi.*
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
@@ -21,6 +21,8 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil 
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WorkbookUtil
+
 class ModelController {
 	
 	// Services and objects to be injected by IoC
@@ -867,9 +869,6 @@ class ModelController {
         //get template Excel
         try {
         	File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
-			WorkbookSettings wbSetting = new WorkbookSettings()
-			wbSetting.setUseTemporaryFileDuringWrite(true)
-			def workbook = Workbook.getWorkbook( file, wbSetting )
 			//set MIME TYPE as Excel
 			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			def filename = 	"TDS-Sync-Data-"+formatter.format(new Date())+".xls"
@@ -877,7 +876,7 @@ class ModelController {
 			response.setContentType( "application/vnd.ms-excel" )
 			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 			
-			def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+			def book = new HSSFWorkbook(new FileInputStream( file ));
 			
 			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = params.exportCheckbox ? Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer :
@@ -885,50 +884,50 @@ class ModelController {
 			def dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 			
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
-				manuSheet.addCell( new Label( 0, r+1, String.valueOf(manufacturers[r].id )) )
-				manuSheet.addCell( new Label( 1, r+1, String.valueOf(manufacturers[r].name )) )
-				manuSheet.addCell( new Label( 2, r+1, String.valueOf(WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(manufacturers[r]).name) )) )
-				manuSheet.addCell( new Label( 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" )) )
+				WorkbookUtil.addCell(manuSheet, 0, r+1, String.valueOf(manufacturers[r].id ))
+				WorkbookUtil.addCell(manuSheet, 1, r+1, String.valueOf(manufacturers[r].name ))
+				WorkbookUtil.addCell(manuSheet, 2, r+1, String.valueOf(WebUtil.listAsMultiValueString(ManufacturerAlias.findAllByManufacturer(manufacturers[r]).name) ))
+				WorkbookUtil.addCell(manuSheet, 3, r+1, String.valueOf(manufacturers[r].description ? manufacturers[r].description : "" ))
 			}
 			def modelSheet = book.getSheet("model")
 			def models = params.exportCheckbox == '1' ? Model.findAllBySourceTDS(1) : Model.findAll()
 
 			for ( int r = 0; r < models.size(); r++ ) {
-				modelSheet.addCell( new Label( 0, r+1, String.valueOf(models[r].id )) )
-				modelSheet.addCell( new Label( 1, r+1, String.valueOf(models[r].modelName )) )
-				modelSheet.addCell( new Label( 2, r+1, String.valueOf(WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(models[r]).name))) )
-				modelSheet.addCell( new Label( 3, r+1, String.valueOf(models[r].description ? models[r].description : "" )) )
-				modelSheet.addCell( new Label( 4, r+1, String.valueOf(models[r].manufacturer.id )) )
-				modelSheet.addCell( new Label( 5, r+1, String.valueOf(models[r].manufacturer.name )) )
-				modelSheet.addCell( new Label( 6, r+1, String.valueOf(models[r].assetType )) )
-				modelSheet.addCell( new Label( 7, r+1, String.valueOf(models[r].bladeCount ? models[r].bladeCount : "" )) )
-				modelSheet.addCell( new Label( 8, r+1, String.valueOf(models[r].bladeLabelCount ? models[r].bladeLabelCount : "" )) )
-				modelSheet.addCell( new Label( 9, r+1, String.valueOf(models[r].bladeRows ? models[r].bladeRows : "" )) )
-				modelSheet.addCell( new Label( 10, r+1, String.valueOf(models[r].sourceTDS == 1 ? "TDS" : "" )) )
-				modelSheet.addCell( new Label( 11, r+1, String.valueOf(models[r].powerNameplate ? models[r].powerNameplate : "" )) )
-				modelSheet.addCell( new Label( 12, r+1, String.valueOf(models[r].powerDesign ? models[r].powerDesign : "" )) )
-				modelSheet.addCell( new Label( 13, r+1, String.valueOf(models[r].powerUse ? models[r].powerUse : "" )) )
-				modelSheet.addCell( new Label( 14, r+1, String.valueOf(models[r].roomObject==1 ? 'True' : 'False' )) )
-				modelSheet.addCell( new Label( 15, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1 )) )
-				modelSheet.addCell( new Label( 16, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" )) )
-				modelSheet.addCell( new Label( 17, r+1, String.valueOf(models[r].usize ? models[r].usize : "")) )
-				modelSheet.addCell( new Label( 18, r+1, String.valueOf(models[r].height ? models[r].height : "")) )
-				modelSheet.addCell( new Label( 19, r+1, String.valueOf(models[r].weight ? models[r].weight : "")) )
-				modelSheet.addCell( new Label( 20, r+1, String.valueOf(models[r].depth ? models[r].depth : "")) )
-				modelSheet.addCell( new Label( 21, r+1, String.valueOf(models[r].width ? models[r].width : "")) )
-				modelSheet.addCell( new Label( 22, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: "")) )
-				modelSheet.addCell( new Label( 23, r+1, String.valueOf(models[r].productLine ? models[r].productLine :"")) )
-				modelSheet.addCell( new Label( 24, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :"")) )
-				modelSheet.addCell( new Label( 25, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :"")) )
-				modelSheet.addCell( new Label( 26, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :"")) )
-				modelSheet.addCell( new Label( 27, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :"")) )
-				modelSheet.addCell( new Label( 28, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :"")) )
-				modelSheet.addCell( new Label( 29, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : "")) )
-				modelSheet.addCell( new Label( 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :"")) )
-				modelSheet.addCell( new Label( 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:"")) )
-				modelSheet.addCell( new Label( 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :"")) )
-				modelSheet.addCell( new Label( 33, r+1, String.valueOf(models[r].dateCreated ? dateFormatter.format(models[r].dateCreated) : '')) )
-				modelSheet.addCell( new Label( 34, r+1, String.valueOf(models[r].lastModified ? dateFormatter.format(models[r].lastModified) : '')) )
+				WorkbookUtil.addCell(modelSheet, 0, r+1, String.valueOf(models[r].id ))
+				WorkbookUtil.addCell(modelSheet, 1, r+1, String.valueOf(models[r].modelName ))
+				WorkbookUtil.addCell(modelSheet, 2, r+1, String.valueOf(WebUtil.listAsMultiValueString(ModelAlias.findAllByModel(models[r]).name)))
+				WorkbookUtil.addCell(modelSheet, 3, r+1, String.valueOf(models[r].description ? models[r].description : "" ))
+				WorkbookUtil.addCell(modelSheet, 4, r+1, String.valueOf(models[r].manufacturer.id ))
+				WorkbookUtil.addCell(modelSheet, 5, r+1, String.valueOf(models[r].manufacturer.name ))
+				WorkbookUtil.addCell(modelSheet, 6, r+1, String.valueOf(models[r].assetType ))
+				WorkbookUtil.addCell(modelSheet, 7, r+1, String.valueOf(models[r].bladeCount ? models[r].bladeCount : "" ))
+				WorkbookUtil.addCell(modelSheet, 8, r+1, String.valueOf(models[r].bladeLabelCount ? models[r].bladeLabelCount : "" ))
+				WorkbookUtil.addCell(modelSheet, 9, r+1, String.valueOf(models[r].bladeRows ? models[r].bladeRows : "" ))
+				WorkbookUtil.addCell(modelSheet, 10, r+1, String.valueOf(models[r].sourceTDS == 1 ? "TDS" : "" ))
+				WorkbookUtil.addCell(modelSheet, 11, r+1, String.valueOf(models[r].powerNameplate ? models[r].powerNameplate : "" ))
+				WorkbookUtil.addCell(modelSheet, 12, r+1, String.valueOf(models[r].powerDesign ? models[r].powerDesign : "" ))
+				WorkbookUtil.addCell(modelSheet, 13, r+1, String.valueOf(models[r].powerUse ? models[r].powerUse : "" ))
+				WorkbookUtil.addCell(modelSheet, 14, r+1, String.valueOf(models[r].roomObject==1 ? 'True' : 'False' ))
+				WorkbookUtil.addCell(modelSheet, 15, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1 ))
+				WorkbookUtil.addCell(modelSheet, 16, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no" ))
+				WorkbookUtil.addCell(modelSheet, 17, r+1, String.valueOf(models[r].usize ? models[r].usize : ""))
+				WorkbookUtil.addCell(modelSheet, 18, r+1, String.valueOf(models[r].height ? models[r].height : ""))
+				WorkbookUtil.addCell(modelSheet, 19, r+1, String.valueOf(models[r].weight ? models[r].weight : ""))
+				WorkbookUtil.addCell(modelSheet, 20, r+1, String.valueOf(models[r].depth ? models[r].depth : ""))
+				WorkbookUtil.addCell(modelSheet, 21, r+1, String.valueOf(models[r].width ? models[r].width : ""))
+				WorkbookUtil.addCell(modelSheet, 22, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: ""))
+				WorkbookUtil.addCell(modelSheet, 23, r+1, String.valueOf(models[r].productLine ? models[r].productLine :""))
+				WorkbookUtil.addCell(modelSheet, 24, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :""))
+				WorkbookUtil.addCell(modelSheet, 25, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :""))
+				WorkbookUtil.addCell(modelSheet, 26, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :""))
+				WorkbookUtil.addCell(modelSheet, 27, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :""))
+				WorkbookUtil.addCell(modelSheet, 28, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :""))
+				WorkbookUtil.addCell(modelSheet, 29, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : ""))
+				WorkbookUtil.addCell(modelSheet, 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :""))
+				WorkbookUtil.addCell(modelSheet, 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:""))
+				WorkbookUtil.addCell(modelSheet, 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :""))
+				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? dateFormatter.format(models[r].dateCreated) : ''))
+				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? dateFormatter.format(models[r].lastModified) : ''))
 
 			}
 			def connectorSheet = book.getSheet("connector")
@@ -936,20 +935,19 @@ class ModelController {
 				ModelConnector.findAll()
 			
 			for ( int r = 0; r < connectors.size(); r++ ) {
-				connectorSheet.addCell( new Label( 0, r+1, String.valueOf(connectors[r].id )) )
-				connectorSheet.addCell( new Label( 1, r+1, String.valueOf(connectors[r].connector )) )
-				connectorSheet.addCell( new Label( 2, r+1, String.valueOf(connectors[r].connectorPosX )) )
-				connectorSheet.addCell( new Label( 3, r+1, String.valueOf(connectors[r].connectorPosY )) )
-				connectorSheet.addCell( new Label( 4, r+1, String.valueOf(connectors[r].label ? connectors[r].label : "" )) )
-				connectorSheet.addCell( new Label( 5, r+1, String.valueOf(connectors[r].labelPosition )) )
-				connectorSheet.addCell( new Label( 6, r+1, String.valueOf(connectors[r].model.id )) )
-				connectorSheet.addCell( new Label( 7, r+1, String.valueOf(connectors[r].model.modelName )) )
-				connectorSheet.addCell( new Label( 8, r+1, String.valueOf(connectors[r].option ? connectors[r].option : "" )) )
-				connectorSheet.addCell( new Label( 9, r+1, String.valueOf(connectors[r].status )) )
-				connectorSheet.addCell( new Label( 10, r+1, String.valueOf(connectors[r].type )) )
+				WorkbookUtil.addCell(connectorSheet, 0, r+1, String.valueOf(connectors[r].id ))
+				WorkbookUtil.addCell(connectorSheet, 1, r+1, String.valueOf(connectors[r].connector ))
+				WorkbookUtil.addCell(connectorSheet, 2, r+1, String.valueOf(connectors[r].connectorPosX ))
+				WorkbookUtil.addCell(connectorSheet, 3, r+1, String.valueOf(connectors[r].connectorPosY ))
+				WorkbookUtil.addCell(connectorSheet, 4, r+1, String.valueOf(connectors[r].label ? connectors[r].label : "" ))
+				WorkbookUtil.addCell(connectorSheet, 5, r+1, String.valueOf(connectors[r].labelPosition ))
+				WorkbookUtil.addCell(connectorSheet, 6, r+1, String.valueOf(connectors[r].model.id ))
+				WorkbookUtil.addCell(connectorSheet, 7, r+1, String.valueOf(connectors[r].model.modelName ))
+				WorkbookUtil.addCell(connectorSheet, 8, r+1, String.valueOf(connectors[r].option ? connectors[r].option : "" ))
+				WorkbookUtil.addCell(connectorSheet, 9, r+1, String.valueOf(connectors[r].status ))
+				WorkbookUtil.addCell(connectorSheet, 10, r+1, String.valueOf(connectors[r].type ))
 			}
-			book.write()
-			book.close()
+			book.write(response.getOutputStream())
 		} catch( Exception ex ) {
 			flash.message = "Exception occurred while exporting data"+ex
 			redirect( controller:'model', action:"importExport")
@@ -982,8 +980,8 @@ class ModelController {
 			sheetNameMap.put( "model", ["model_id", "name","aka","description","manufacturer_id","manufacturer_name","asset_type","blade_count","blade_label_count","blade_rows","sourcetds","power_nameplate","power_design","power_use","sourcetdsversion","use_image","usize","height","weight","depth","width", "layout_style","product_line","model_family","end_of_life_date","end_of_life_status","created_by","updated_by","validated_by","sourceurl","model_status","model_scope"] )
 			sheetNameMap.put( "connector", ["model_connector_id", "connector", "connector_posx", "connector_posy", "label", "label_position", "model_id", "model_name", "connector_option", "status", "type"] )
 	        try {
-	            workbook = Workbook.getWorkbook( file.inputStream )
-	            List sheetNames = workbook.getSheetNames()
+	            workbook = new HSSFWorkbook(file.inputStream);
+				def sheetNames = WorkbookUtil.getSheetNames(workbook)
 				def sheets = sheetNameMap.keySet()
 				def missingSheets = []
 	            def flag = 1
@@ -1005,9 +1003,9 @@ class ModelController {
 	            	def sheetColumnNames = [:]
 	                //check for column
 					def manuSheet = workbook.getSheet( "manufacturer" )
-	                def manuCol = manuSheet.getColumns()
+	                def manuCol = WorkbookUtil.getColumnsCount(manuSheet)
 	                for ( int c = 0; c < manuCol; c++ ) {
-	                    def cellContent = manuSheet.getCell( c, 0 ).contents
+	                    def cellContent = WorkbookUtil.getStringCellValue(manuSheet, c, 0 )
 	                    sheetColumnNames.put(cellContent, c)
 	                }
 	                def missingHeader = checkHeader( sheetNameMap.get("manufacturer"), sheetColumnNames )
@@ -1017,11 +1015,11 @@ class ModelController {
 	                    redirect( action:importExport, params:[message:flash.message] )
 	                    return;
 	                } else {
-	                    def sheetrows = manuSheet.rows
+	                    def sheetrows = manuSheet.getLastRowNum()
 	                    for ( int r = 1; r < sheetrows ; r++ ) {
 	                		def valueList = new StringBuffer("(")
 	                    	for( int cols = 0; cols < manuCol; cols++ ) {
-	                    		valueList.append("'"+manuSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+	                    		valueList.append("'"+WorkbookUtil.getStringCellValue(manuSheet, cols, r ).replace("'","\\'")+"',")
 	                        }
 	                		try{
 	                			jdbcTemplate.update("insert into manufacturer_sync( manufacturer_temp_id, name,aka, description, batch_id) values "+valueList.toString()+"${modelSyncBatch.id})")
@@ -1040,10 +1038,10 @@ class ModelController {
 					def modelSkipped = []
 	                 //check for column
 	 				def modelSheet = workbook.getSheet( "model" )
-					def modelCol = modelSheet.getColumns()
+					def modelCol = WorkbookUtil.getColumnsCount(modelSheet)
 					//def colContain = modelCol.
 					for ( int c = 0; c < modelCol; c++ ) {
-						def cellContent = modelSheet.getCell( c, 0 ).contents
+						def cellContent = WorkbookUtil.getStringCellValue(modelSheet, c, 0 )
 						modelSheetColumnNames.put(cellContent, c)
 					}
 	                missingHeader = checkHeader( sheetNameMap.get("model"), modelSheetColumnNames )
@@ -1054,7 +1052,7 @@ class ModelController {
 						redirect( action:"importExport", params:[ message:flash.message] )
 						return;
 					} else {
-						def sheetrows = modelSheet.rows
+						def sheetrows = modelSheet.getLastRowNum()
 						for ( int r = 1; r < sheetrows ; r++ ) {
 							onlyTds = false
 							def valueList = new StringBuffer("(")
@@ -1064,95 +1062,95 @@ class ModelController {
 							def validatedPersonId
 							def projectId
 		                 	for( int cols = 0; cols < modelCol; cols++ ) {
-								switch(modelSheet.getCell( cols, 0 ).contents){
+								switch(WorkbookUtil.getStringCellValue(modelSheet, cols, 0 )){
 								case "manufacturer_name" : 
-									def manuName = modelSheet.getCell( cols, r ).contents
+									def manuName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									manuId = ManufacturerSync.findByNameAndBatch(manuName,modelSyncBatch)?.id
-									valueList.append("'"+modelSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r ).replace("'","\\'")+"',")
 									break;
 								case "blade_count" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "blade_label_count" :
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "blade_rows" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "use_image" : 
 									int useImage = 0
-									if(modelSheet.getCell( cols, r ).contents.toLowerCase() != "no"){
+									if(WorkbookUtil.getStringCellValue(modelSheet, cols, r ).toLowerCase() != "no"){
 										useImage = 1
 									}
 									valueList.append(useImage+",")
 									break;
 								case "power_nameplate" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "power_design" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "power_use" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "usize" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "sourcetds" : 
 									int isTDS = 0
-									if(modelSheet.getCell( cols, r ).contents.toLowerCase() == "tds"){
+									if(WorkbookUtil.getStringCellValue(modelSheet, cols, r ).toLowerCase() == "tds"){
 										isTDS = 1
 										onlyTds = true
 									}
 									valueList.append(isTDS+",")
 									break;
 								case "sourcetdsversion" : 
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "height" :
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "weight" :
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "depth" :
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "width" :
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "model_scope" :
-								    def modelScope = modelSheet.getCell( cols, r ).contents
+								    def modelScope = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									projectId = Project.findByProjectCode(modelScope)?.id
-									//valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "end_of_life_date" :
-								    def endOfLifeDate = modelSheet.getCell( cols, r ).contents
+								    def endOfLifeDate = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									if(endOfLifeDate){
-									valueList.append("'"+(modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+"',")
+									valueList.append("'"+(WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+"',")
 									}else{
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									}
 									break;
 								/*case "end_of_life_status" :
-									valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;*/
 								case "created_by" :
-								    def createdByName = modelSheet.getCell( cols, r ).contents
+								    def createdByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									createdPersonId = Person.findByFirstName(createdByName)?.id
 									break;
 								case "updated_by" :
-									def updatedByName = modelSheet.getCell( cols, r ).contents
+									def updatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									updatedPersonId = Person.findByFirstName(updatedByName)?.id
-									//valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								case "validated_by" :
-									def validatedByName = modelSheet.getCell( cols, r ).contents
+									def validatedByName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									validatedPersonId = Person.findByFirstName(validatedByName)?.id
-									//valueList.append((modelSheet.getCell( cols, r ).contents ? modelSheet.getCell( cols, r ).contents : null)+",")
+									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
 								default : 
-									valueList.append("'"+modelSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r ).replace("'","\\'")+"',")
 									break;
 								}
 		                 									
@@ -1189,9 +1187,9 @@ class ModelController {
 					def connectorSkipped = []
 	                 //check for column
 	 				def connectorSheet = workbook.getSheet( "connector" )
-					def connectorCol = connectorSheet.getColumns()
+					def connectorCol = WorkbookUtil.getColumnsCount(connectorSheet)
 					for ( int c = 0; c < connectorCol; c++ ) {
-						def cellContent = connectorSheet.getCell( c, 0 ).contents
+						def cellContent = WorkbookUtil.getStringCellValue(connectorSheet, c, 0 )
 						connectorSheetColumnNames.put(cellContent, c)
 					}
 	                missingHeader = checkHeader( sheetNameMap.get("connector"), connectorSheetColumnNames )
@@ -1201,26 +1199,26 @@ class ModelController {
 						redirect( action:"importExport", params:[message:flash.message] )
 						return;
 					} else {
-						def sheetrows = connectorSheet.rows
+						def sheetrows = connectorSheet.getLastRowNum()
 						for ( int r = 1; r < sheetrows ; r++ ) {
 							def valueList = new StringBuffer("(")
 		             		def modelId
 		                 	for( int cols = 0; cols < connectorCol; cols++ ) {
 		                 		
-								switch(connectorSheet.getCell( cols, 0 ).contents){
+								switch(WorkbookUtil.getStringCellValue(connectorSheet, cols, 0 )){
 								case "model_name" : 
-									def modelName = connectorSheet.getCell( cols, r ).contents
+									def modelName = WorkbookUtil.getStringCellValue(connectorSheet, cols, r )
 									modelId = ModelSync.findByModelNameAndBatch(modelName,modelSyncBatch)?.id
-									valueList.append("'"+connectorSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r ).replace("'","\\'")+"',")
 									break;
 								case "connector_posx" : 
-									valueList.append((connectorSheet.getCell( cols, r ).contents ? connectorSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) : null)+",")
 									break;
 								case "connector_posy" :
-									valueList.append((connectorSheet.getCell( cols, r ).contents ? connectorSheet.getCell( cols, r ).contents : null)+",")
+									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) : null)+",")
 									break;
 								default : 
-									valueList.append("'"+connectorSheet.getCell( cols, r ).contents.replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r ).replace("'","\\'")+"',")
 									break;
 								}
 		                 									

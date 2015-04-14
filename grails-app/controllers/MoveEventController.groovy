@@ -7,10 +7,13 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.io.*
 
-import jxl.*
-import jxl.format.UnderlineStyle
-import jxl.read.biff.*
-import jxl.write.*
+import org.apache.poi.*
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.hssf.usermodel.HSSFCellStyle
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.IndexedColors
 
 import org.hibernate.criterion.Order
 
@@ -24,6 +27,7 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.WorkbookUtil
 
 class MoveEventController {
 	
@@ -275,9 +279,6 @@ class MoveEventController {
 					file =  ApplicationHolder.application.parentContext.getResource( "/templates/MoveResults_Summary.xls" ).getFile()	
 				}
 				
-				WorkbookSettings wbSetting = new WorkbookSettings()
-				wbSetting.setUseTemporaryFileDuringWrite(true)
-				workbook = Workbook.getWorkbook( file, wbSetting )
 				//set MIME TYPE as Excel
 				response.setContentType( "application/vnd.ms-excel" )
 				
@@ -286,41 +287,40 @@ class MoveEventController {
 					filename = filename.replace(" ", "_")
 				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 				
-				book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+				book = new HSSFWorkbook(new FileInputStream( file ));
 				def sheet = book.getSheet("moveEvent_results")
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
-						sheet.addCell( new Label( 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id )) )
-						sheet.addCell( new Label( 1, r, String.valueOf(moveEventResults[r-1].bundle_name )) )
-						sheet.addCell( new Label( 2, r, String.valueOf(moveEventResults[r-1].asset_id )) )
-						sheet.addCell( new Label( 3, r, String.valueOf(moveEventResults[r-1].asset_name )) )
-						sheet.addCell( new Label( 4, r, String.valueOf(moveEventResults[r-1].voided )) )
-						sheet.addCell( new Label( 5, r, String.valueOf(moveEventResults[r-1].from_name )) )
-						sheet.addCell( new Label( 6, r, String.valueOf(moveEventResults[r-1].to_name )) )
-						sheet.addCell( new Label( 7, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].transition_time, tzId ))) ))
-						sheet.addCell( new Label( 8, r, String.valueOf(moveEventResults[r-1].username )) )
-						sheet.addCell( new Label( 9, r, String.valueOf(moveEventResults[r-1].team_name )) )
+						WorkbookUtil.addCell(sheet, 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id ))
+						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(moveEventResults[r-1].bundle_name ))
+						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(moveEventResults[r-1].asset_id ))
+						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(moveEventResults[r-1].asset_name ))
+						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(moveEventResults[r-1].voided ))
+						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(moveEventResults[r-1].from_name ))
+						WorkbookUtil.addCell(sheet, 6, r, String.valueOf(moveEventResults[r-1].to_name ))
+						WorkbookUtil.addCell(sheet, 7, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].transition_time, tzId ))))
+						WorkbookUtil.addCell(sheet, 8, r, String.valueOf(moveEventResults[r-1].username ))
+						WorkbookUtil.addCell(sheet, 9, r, String.valueOf(moveEventResults[r-1].team_name ))
 					}
 				} else {
 					moveEventResults = moveBundleService.getMoveEventSummaryResults( moveEvent )
 					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
-						sheet.addCell( new Label( 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id )) )
-						sheet.addCell( new Label( 1, r, String.valueOf(moveEventResults[r-1].bundle_name )) )
-						sheet.addCell( new Label( 2, r, String.valueOf(moveEventResults[r-1].state_to )) )
-						sheet.addCell( new Label( 3, r, String.valueOf(moveEventResults[r-1].name )) )
-						sheet.addCell( new Label( 4, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].started, tzId )) )) )
-						sheet.addCell( new Label( 5, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].completed, tzId )) )) )
+						WorkbookUtil.addCell(sheet, 0, r, String.valueOf(moveEventResults[r-1].move_bundle_id ))
+						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(moveEventResults[r-1].bundle_name ))
+						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(moveEventResults[r-1].state_to ))
+						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(moveEventResults[r-1].name ))
+						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].started, tzId )) ))
+						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].completed, tzId )) ))
 					}	
 				}
 				tzId ? tzId : 'EDT'
-				sheet.addCell( new Label( 0, moveEventResults.size() + 2, "Note: All times are in $tzId time zone") )
+				WorkbookUtil.addCell(sheet, 0, moveEventResults.size() + 2, "Note: All times are in $tzId time zone")
 				
-				book.write()
-				book.close()
-		        
+				book.write(response.getOutputStream())
+
 			} catch( Exception ex ) {
 				flash.message = "Exception occurred while exporting data"
 				redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'MoveResults', message:flash.message] )
@@ -688,18 +688,17 @@ class MoveEventController {
 		postMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'postmove') 
 		//TODO - Move controller code into Service .
 		def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors.size()
+
 		try {
 			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
-			WorkbookSettings wbSetting = new WorkbookSettings()
-			wbSetting.setUseTemporaryFileDuringWrite(true)
-			def workbook = Workbook.getWorkbook( file, wbSetting )
 			//set MIME TYPE as Excel
 			response.setContentType( "application/vnd.ms-excel" )
 			def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} -${today}"
 			filename = filename.replace(".xls",'')
 			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 			response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
-			def book = Workbook.createWorkbook( response.getOutputStream(), workbook )
+
+			def book = new HSSFWorkbook(new FileInputStream( file ));
 			
 			def serverSheet = book.getSheet("Servers")
 			def personelSheet = book.getSheet("Staff")
@@ -719,7 +718,7 @@ class MoveEventController {
 					         				'duration', 'estStart','estFinish','actStart',
 					         				'actFinish', 'workflow']
 			
-				def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
+			def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
 					        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
 				        				]
 
@@ -765,13 +764,25 @@ class MoveEventController {
 			
 			def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
 			def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
-			
-			summarySheet.addCell( new Label( 1, 1, String.valueOf(project.name ), retrieveCellFormat(jxl.format.Colour.SEA_GREEN, jxl.format.Pattern.SOLID )) )
-			summarySheet.addCell( new Label( 2, 3, String.valueOf(project.name )) )
-			summarySheet.addCell( new Label( 2, 6, String.valueOf(projManager?.toString() )) )
-			summarySheet.addCell( new Label( 4, 6, String.valueOf(moveManager?.toString() )) )
-			summarySheet.addCell( new  Label( 2, 4, String.valueOf(moveEventInstance.name )) )
-			summarySheet.addCell( new Label( 2, 10, String.valueOf(moveEventInstance.name )) )
+
+			def projectNameFont = book.createFont()
+			projectNameFont.setFontHeightInPoints((short)14)
+			projectNameFont.setFontName("Arial")
+			projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+
+			def projectNameCellStyle
+			projectNameCellStyle = book.createCellStyle()
+			projectNameCellStyle.setFont(projectNameFont)
+			projectNameCellStyle.setFillBackgroundColor(IndexedColors.SEA_GREEN .getIndex())
+			projectNameCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND)
+
+			WorkbookUtil.addCell(summarySheet, 1, 1, String.valueOf(project.name ))
+			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)
+			WorkbookUtil.addCell(summarySheet, 2, 3, String.valueOf(project.name ))
+			WorkbookUtil.addCell(summarySheet, 2, 6, String.valueOf(projManager?.toString() ))
+			WorkbookUtil.addCell(summarySheet, 4, 6, String.valueOf(moveManager?.toString() ))
+			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEventInstance.name ))
+			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEventInstance.name ))
 			
 			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5)
 			
@@ -795,12 +806,11 @@ class MoveEventController {
 			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
 			for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
 				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-				personelSheet.addCell( new Label( 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.toString() )) )
-				personelSheet.addCell( new Label( 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo )) )
-				personelSheet.addCell( new Label( 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : '')) )
+				WorkbookUtil.addCell(personelSheet, 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.toString() ))
+				WorkbookUtil.addCell(personelSheet, 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo ))
+				WorkbookUtil.addCell(personelSheet, 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : ''))
 			}
-			book.write()
-			book.close()
+			book.write(response.getOutputStream())
 		} catch( Exception ex ) {
 			println "Exception occurred while exporting data"+ex.printStackTrace()
 		  
@@ -809,20 +819,6 @@ class MoveEventController {
 		return
 	
 	}
-	
-	/**
-	 * 
-	 * @param colour
-	 * @param pattern
-	 * @return
-	 * @throws WriteException
-	 */
-	def retrieveCellFormat(jxl.format.Colour colour, jxl.format.Pattern pattern) throws WriteException {
-		WritableFont cellFont = new WritableFont(WritableFont.ARIAL, 14, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, jxl.format.Colour.WHITE);
-		WritableCellFormat cellFormat = new WritableCellFormat(cellFont);
-		cellFormat.setBackground(colour, pattern);
-		return cellFormat;
-	 }
 	
 	/**
 	 * Used to set asset's plan-status to 'Moved' for the specified event

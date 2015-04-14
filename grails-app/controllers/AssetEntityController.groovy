@@ -3,9 +3,6 @@ import grails.converters.JSON
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 
-import jxl.*
-import jxl.read.biff.*
-import jxl.write.*
 import net.tds.util.jmesa.AssetEntityBean
 
 import org.apache.commons.io.IOUtils
@@ -64,6 +61,7 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.WorkbookUtil
 
 class AssetEntityController {
 
@@ -357,10 +355,10 @@ class AssetEntityController {
 		 def dependencyMap = ['DependentId':1, 'Type':2, 'DataFlowFreq':3, 'DataFlowDirection':4, 'status':5, 'comment':6]
 		 def DTAMap = [0:'dependent', 1:'type', 2:'dataFlowFreq', 3:'dataFlowDirection', 4:'status', 5:'comment']*/
 		try {
-			workbook = Workbook.getWorkbook( file.inputStream )
-			def sheetNames = workbook.getSheetNames()
+			workbook = new HSSFWorkbook( file.inputStream );
+			def sheetNames = WorkbookUtil.getSheetNames(workbook)
 			def flag = 0
-			def sheetNamesLength = sheetNames.length
+			def sheetNamesLength = sheetNames.size()
 			for( int i=0;  i < sheetNamesLength; i++ ) {
 				if ( sheetNameMap.contains(sheetNames[i].trim()) ) {
 					flag = 1
@@ -372,8 +370,9 @@ class AssetEntityController {
 			if( titleSheet != null) {
 				SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
 				try {
-					exportTime = format.parse( (titleSheet.getCell( 1,5 ).contents).toString() )
+					exportTime = format.parse(WorkbookUtil.getStringCellValue(titleSheet, 1, 5))
 				}catch ( Exception e) {
+					log.error "Error formating import time: " + e.message
 					forward action:forwardAction, params: [error: 'The Export date time was not found on the Title sheet.']
 					return
 				}
@@ -395,24 +394,24 @@ class AssetEntityController {
 			def databaseColumnNames = [:]
 			def filesColumnNames = [:]
 			//check for column
-			def serverCol = serverSheet.getColumns()
+			def serverCol = WorkbookUtil.getColumnsCount(serverSheet)
 			for ( int c = 0; c < serverCol; c++ ) {
-				def serverCellContent = serverSheet.getCell( c, 0 ).contents
+				def serverCellContent = WorkbookUtil.getStringCellValue(serverSheet, c, 0)
 				serverColumnNames.put(serverCellContent, c)
 			}
-			def appCol = appSheet.getColumns()
+			def appCol = WorkbookUtil.getColumnsCount(appSheet)
 			for ( int c = 0; c < appCol; c++ ) {
-				def appCellContent = appSheet.getCell( c, 0 ).contents
+				def appCellContent = WorkbookUtil.getStringCellValue(appSheet, c, 0 )
 				appColumnNames.put(appCellContent, c)
 			}
-			def databaseCol = databaseSheet.getColumns()
+			def databaseCol = WorkbookUtil.getColumnsCount(databaseSheet)
 			for ( int c = 0; c < databaseCol; c++ ) {
-				def databaseCellContent = databaseSheet.getCell( c, 0 ).contents
+				def databaseCellContent = WorkbookUtil.getStringCellValue(databaseSheet, c, 0 )
 				databaseColumnNames.put(databaseCellContent, c)
 			}
-			def filesCol = filesSheet.getColumns()
+			def filesCol = WorkbookUtil.getColumnsCount(filesSheet)
 			for ( int c = 0; c < filesCol; c++ ) {
-				def filesCellContent = filesSheet.getCell( c, 0 ).contents
+				def filesCellContent = WorkbookUtil.getStringCellValue(filesSheet, c, 0 )
 				filesColumnNames.put(filesCellContent, c)
 			}
 			// Statement to check Headers if header are not found it will return Error message
@@ -443,15 +442,15 @@ class AssetEntityController {
 				//Add Data to dataTransferBatch.
 				def serverColNo = 0
 				for (int index = 0; index < serverCol; index++) {
-					if(serverSheet.getCell( index, 0 ).contents == "Name"){
+					if(WorkbookUtil.getStringCellValue(serverSheet, index, 0 ) == "Name"){
 						serverColNo = index
 					}
 				}
-				def serverSheetrows = serverSheet.rows
+				def serverSheetrows = serverSheet.getLastRowNum()
 				if(params.asset=='asset'){
 					assetsCount
 					for (int row = 1; row < serverSheetrows; row++) {
-						def server = serverSheet.getCell( serverColNo, row ).contents
+						def server = WorkbookUtil.getStringCellValue(serverSheet, serverColNo, row )
 						if(server){
 							assetsCount = row
 						}
@@ -459,55 +458,55 @@ class AssetEntityController {
 				}
 				def appColNo = 0
 				for (int index = 0; index < appCol; index++) {
-					if(appSheet.getCell( index, 0 ).contents == "Name"){
+					if(WorkbookUtil.getStringCellValue(appSheet, index, 0 ) == "Name"){
 						appColNo = index
 					}
 				}
-				def appSheetrows = appSheet.rows
+				def appSheetrows = appSheet.getLastRowNum()
 				if(params.application == 'application'){
 					appCount
 					for (int row = 1; row < appSheetrows; row++) {
-						def name = appSheet.getCell( appColNo, row ).contents
+						def name = WorkbookUtil.getStringCellValue(appSheet, appColNo, row )
 						if(name){
 							appCount = row
 						}
 					}
 				}
-				def databaseSheetrows = databaseSheet.rows
+				def databaseSheetrows = databaseSheet.getLastRowNum()
 				if(params.database=='database'){
 					databaseCount
 					for (int row = 1; row < databaseSheetrows; row++) {
-						def name = databaseSheet.getCell( appColNo, row ).contents
+						def name = WorkbookUtil.getStringCellValue(databaseSheet, appColNo, row )
 						if(name){
 							databaseCount = row
 						}
 					}
 				}
-				def filesSheetrows = filesSheet.rows
+				def filesSheetrows = filesSheet.getLastRowNum()
 				if(params.files=='files'){
 					filesCount
 					for (int row = 1; row < filesSheetrows; row++) {
-						def name = filesSheet.getCell( appColNo, row ).contents
+						def name = WorkbookUtil.getStringCellValue(filesSheet, appColNo, row )
 						if(name){
 							filesCount = row
 						}
 					}
 				}
-				def dependencySheetRow = dependencySheet.rows
+				def dependencySheetRow = dependencySheet.getLastRowNum()
 				if(params.dependency=='dependency'){
 					dependencyCount
 					for (int row = 1; row < dependencySheetRow; row++) {
-						def name = dependencySheet.getCell( appColNo, row ).contents
+						def name = WorkbookUtil.getStringCellValue(dependencySheet, appColNo, row )
 						if(name){
 							dependencyCount = row
 						}
 					}
 				}
-				def cablingSheetRow = cablingSheet.rows
+				def cablingSheetRow = cablingSheet.getLastRowNum()
 				if(params.cabling=='cable'){
 					cablingCount
 					for (int row = 1; row < cablingSheetRow; row++) {
-						def name = cablingSheet.getCell( appColNo, row ).contents
+						def name = WorkbookUtil.getStringCellValue(cablingSheet, appColNo, row )
 						if(name){
 							cablingCount = row
 						}
@@ -533,30 +532,31 @@ class AssetEntityController {
 						session.setAttribute("BATCH_ID",serverDataTransferBatch.id)
 					}
 					for ( int r = 1; r < serverSheetrows ; r++ ) {
-						def server = serverSheet.getCell( serverColNo, r ).contents
+						def server = WorkbookUtil.getStringCellValue(serverSheet, serverColNo, r )
 						if(server){
 							def dataTransferValueList = new StringBuffer()
 							for( int cols = 0; cols < serverCol; cols++ ) {
 								def dataTransferAttributeMapInstance
-								def projectCustomLabel = projectCustomLabels[serverSheet.getCell( cols, 0 ).contents.toString()]
+								def projectCustomLabel = projectCustomLabels[WorkbookUtil.getStringCellValue(serverSheet, cols, 0 )]
 								if(projectCustomLabel){
 									dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == projectCustomLabel}
 								} else {
-									dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == serverSheet.getCell( cols, 0 ).contents}
+									dataTransferAttributeMapInstance = serverDTAMap.find{it.columnName == WorkbookUtil.getStringCellValue(serverSheet, cols, 0 )}
 								}
 
-								//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet.getCell( cols, 0 ).contents)
+								//dataTransferAttributeMapInstance = DataTransferAttributeMap.findByColumnName(serverSheet, cols, 0 ))
 								if( dataTransferAttributeMapInstance != null ) {
 									def assetId
-									if( serverColumnNames.containsKey("assetId") && (serverSheet.getCell( 0, r ).contents != "") ) {
+									if( serverColumnNames.containsKey("assetId") && (WorkbookUtil.getStringCellValue(serverSheet, 0, r ) != "") ) {
 										try{
-											assetId = Integer.parseInt(serverSheet.getCell( 0, r ).contents)
+											assetId = WorkbookUtil.getIntegerCellValue(serverSheet, 0, r )
 										} catch( NumberFormatException ex ) {
+											log.error "Error formating number: " + ex.message
 											forward action:forwardAction, params: [error: "AssetId must be an Integer on the Server tab at row ${r+1}"]
 											return
 										}
 									}
-									def dataTransferValues = "("+assetId+",'"+serverSheet.getCell( cols, r ).contents.replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									def dataTransferValues = "("+assetId+",'"+WorkbookUtil.getStringCellValue(serverSheet, cols, r, "").replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+serverDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -597,31 +597,31 @@ class AssetEntityController {
 						session.setAttribute("BATCH_ID",appDataTransferBatch.id)
 					}
 					for ( int r = 1; r < appSheetrows ; r++ ) {
-						def name = appSheet.getCell( appColNo, r ).contents
+						def name = WorkbookUtil.getStringCellValue(appSheet, appColNo, r )
 						if (name){
 							def dataTransferValueList = new StringBuffer()
 							// TODO - change the string appends to stringbuffer
 							for( int cols = 0; cols < appCol; cols++ ) {
 								
 								def dataTransferAttributeMapInstance
-								def projectCustomLabel = projectCustomLabels[appSheet.getCell( cols, 0 ).contents.toString()]
+								def projectCustomLabel = projectCustomLabels[WorkbookUtil.getStringCellValue(appSheet, cols, 0 ).toString()]
 								if(projectCustomLabel){
 									dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == projectCustomLabel}
 								} else {
-									dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == appSheet.getCell( cols, 0 ).contents}
+									dataTransferAttributeMapInstance = appDTAMap.find{it.columnName == WorkbookUtil.getStringCellValue(appSheet, cols, 0 )}
 								}
 
 								if( dataTransferAttributeMapInstance != null ) {
 									def assetId
-									if( appColumnNames.containsKey("appId") && (appSheet.getCell( 0, r ).contents != "") ) {
+									if( appColumnNames.containsKey("appId") && (WorkbookUtil.getStringCellValue(appSheet, 0, r ) != "") ) {
 										try{
-											assetId = Integer.parseInt(appSheet.getCell( 0, r ).contents)
+											assetId = WorkbookUtil.getIntegerCellValue(appSheet, 0, r )
 										} catch( NumberFormatException ex ) {
 											forward action:'assetImport', params: [error: "AppId must be an Integer on the Application tab at row ${r+1}"]
 											return
 										}
 									}
-									def dataTransferValues = "("+assetId+",'"+appSheet.getCell( cols, r ).contents.replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									def dataTransferValues = "("+assetId+",'"+WorkbookUtil.getStringCellValue(appSheet, cols, r, "").replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+appDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -665,28 +665,28 @@ class AssetEntityController {
 						session.setAttribute("BATCH_ID",dbDataTransferBatch.id)
 					}
 					for ( int r = 1; r < databaseSheetrows ; r++ ) {
-						def name = databaseSheet.getCell( appColNo, r ).contents
+						def name = WorkbookUtil.getStringCellValue(databaseSheet, appColNo, r )
 						if(name){
 							def dataTransferValueList = new StringBuffer()
 							for( int cols = 0; cols < databaseCol; cols++ ) {
 								def dataTransferAttributeMapInstance
-								def projectCustomLabel = projectCustomLabels[databaseSheet.getCell( cols, 0 ).contents.toString()]
+								def projectCustomLabel = projectCustomLabels[WorkbookUtil.getStringCellValue(databaseSheet, cols, 0 )]
 								if(projectCustomLabel){
 									dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == projectCustomLabel}
 								} else {
-									dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == databaseSheet.getCell( cols, 0 ).contents}
+									dataTransferAttributeMapInstance = databaseDTAMap.find{it.columnName == WorkbookUtil.getStringCellValue(databaseSheet, cols, 0 )}
 								}
 
 								if( dataTransferAttributeMapInstance != null ) {
 									def assetId
-									if( databaseColumnNames.containsKey("dbId") && (databaseSheet.getCell( 0, r ).contents != "") ) {
+									if( databaseColumnNames.containsKey("dbId") && (WorkbookUtil.getStringCellValue(databaseSheet, 0, r ) != "") ) {
 										try{
-											assetId = Integer.parseInt(databaseSheet.getCell( 0, r ).contents)
+											assetId = WorkbookUtil.getIntegerCellValue(databaseSheet, 0, r )
 										} catch( NumberFormatException ex ) {
 											forward action:forwardAction, params: [error: "DBId must be an Integer on the Database tab at row ${r+1}"]
 										}
 									}
-									def dataTransferValues = "("+assetId+",'"+databaseSheet.getCell( cols, r ).contents.replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									def dataTransferValues = "("+assetId+",'"+WorkbookUtil.getStringCellValue(databaseSheet, cols, r, "").replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+dbDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -727,29 +727,29 @@ class AssetEntityController {
 						session.setAttribute("BATCH_ID",fileDataTransferBatch.id)
 					}
 					for ( int r = 1; r < filesSheetrows ; r++ ) {
-						def name = filesSheet.getCell( appColNo, r ).contents
+						def name = WorkbookUtil.getStringCellValue(filesSheet, appColNo, r )
 						if(name){
 							def dataTransferValueList = new StringBuffer()
 							for( int cols = 0; cols < filesCol; cols++ ) {
 								def dataTransferAttributeMapInstance
-								def projectCustomLabel = projectCustomLabels[filesSheet.getCell( cols, 0 ).contents.toString()]
+								def projectCustomLabel = projectCustomLabels[WorkbookUtil.getStringCellValue(filesSheet, cols, 0 ).toString()]
 								if(projectCustomLabel){
 									dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == projectCustomLabel}
 								} else {
-									dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == filesSheet.getCell( cols, 0 ).contents}
+									dataTransferAttributeMapInstance = filesDTAMap.find{it.columnName == WorkbookUtil.getStringCellValue(filesSheet, cols, 0 )}
 								}
 
 								if( dataTransferAttributeMapInstance != null ) {
 									def assetId
-									if( filesColumnNames.containsKey("filesId") && (filesSheet.getCell( 0, r ).contents != "") ) {
+									if( filesColumnNames.containsKey("filesId") && (WorkbookUtil.getStringCellValue(filesSheet, 0, r ) != "") ) {
 										try{
-											assetId = Integer.parseInt(filesSheet.getCell( 0, r ).contents)
+											assetId = WorkbookUtil.getStringCellValue(filesSheet, 0, r )
 										} catch( NumberFormatException ex ) {
 											forward action:forwardAction, params: [error: "StorageId must be an Integer on the Storage tab at row ${r+1}"]
 											return
 										}
 									}
-									String dataTransferValues = "("+assetId+",'"+filesSheet.getCell( cols, r ).contents.replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
+									String dataTransferValues = "("+assetId+",'"+WorkbookUtil.getStringCellValue(filesSheet, cols, r, "").replace("\\", "\\\\").replace("'","\\'")+"',"+r+","+fileDataTransferBatch.id+","+dataTransferAttributeMapInstance.eavAttribute.id+")"
 									dataTransferValueList.append(dataTransferValues)
 									dataTransferValueList.append(",")
 								}
@@ -783,12 +783,12 @@ class AssetEntityController {
 					def skippedAdded=0
 					for ( int r = 1; r < dependencySheetRow ; r++ ) {
 						int rowNum = r+1
-						def assetId = NumberUtils.toDouble(dependencySheet.getCell( 1, r ).contents.replace("'","\\'"), 0).round()
+						def assetId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 1, r ).replace("'","\\'"), 0).round()
 						def assetName
 						def assetClass
 						if (!assetId) {
-							assetName = dependencySheet.getCell( 2, r ).contents.replace("'","\\'")
-							assetClass = dependencySheet.getCell( 3, r ).contents.replace("'","\\'")
+							assetName = WorkbookUtil.getStringCellValue(dependencySheet, 2, r ).replace("'","\\'")
+							assetClass = WorkbookUtil.getStringCellValue(dependencySheet, 3, r ).replace("'","\\'")
 							
 							if (!assetName) {
 								warnMsg +="<li> no asset ID or asset name for row $rowNum</li>\n"
@@ -797,7 +797,7 @@ class AssetEntityController {
 						}
 
 						def assetDep
-						def depId = NumberUtils.toDouble(dependencySheet.getCell( 0, r ).contents.replace("'","\\'"), 0).round()
+						def depId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 0, r ).replace("'","\\'"), 0).round()
 						if (depId) {
 							assetDep =  depId ? AssetDependency.get(depId) : null
 							if (assetDep) {
@@ -836,7 +836,7 @@ class AssetEntityController {
 							}
 						}
 
-						def dependencyId = NumberUtils.toDouble(dependencySheet.getCell( 4, r ).contents.replace("'","\\'"), 0).round()
+						def dependencyId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 4, r ).replace("'","\\'"), 0).round()
 						def dependent
 						if (dependencyId) {
 							dependent = AssetEntity.get(dependencyId)
@@ -846,8 +846,8 @@ class AssetEntityController {
 								continue
 							}
 						} else {
-							def depName = dependencySheet.getCell( 5, r ).contents.replace("'","\\'")
-							def depClass = dependencySheet.getCell( 6, r ).contents.replace("'","\\'")
+							def depName = WorkbookUtil.getStringCellValue(dependencySheet, 5, r ).replace("'","\\'")
+							def depClass = WorkbookUtil.getStringCellValue(dependencySheet, 6, r ).replace("'","\\'")
 							def assets = AssetEntity.findAllByAssetNameAndProject(depName, project)
 							if(assets.size() == 0){
 								warnMsg +="<li>no asset match found for dependent name "+depName + ", row $rowNum</li>\n"
@@ -888,26 +888,26 @@ class AssetEntityController {
 						if (assetDep) {
 							assetDep.asset = asset
 							assetDep.dependent = dependent
-							assetDep.type = dependencySheet.getCell( 7, r ).contents.replace("'","\\'")
+							assetDep.type = WorkbookUtil.getStringCellValue(dependencySheet, 7, r, "").replace("'","\\'")
 							
-							assetDep.dataFlowFreq = dependencySheet.getCell( 8, r ).contents.replace("'","\\'") ?: 
+							assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "").replace("'","\\'") ?: 
 								(isNew ? "Unknown" : assetDep.dataFlowFreq)
-							assetDep.dataFlowDirection = dependencySheet.getCell( 9, r ).contents.replace("'","\\'") ?: 
+							assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "").replace("'","\\'") ?: 
 								(isNew ? "Unknown" : assetDep.dataFlowDirection)
-							assetDep.status = dependencySheet.getCell(10, r ).contents.replace("'","\\'") ?: 
+							assetDep.status = WorkbookUtil.getStringCellValue(dependencySheet,10, r , "").replace("'","\\'") ?: 
 								(isNew ? "Unknown" : assetDep.status)
 							
-							def depComment = dependencySheet.getCell( 11, r ).contents.replace("'","\\'")
+							def depComment = WorkbookUtil.getStringCellValue(dependencySheet, 11, r , "").replace("'","\\'")
 							def length = depComment.length()
 							if(length > 254){
 								depComment = StringUtil.ellipsis(depComment,254)
 								warnMsg += "<li> Comment With Dependency $dependent.assetName trimmed at 254"
 							}
 							assetDep.comment = depComment
-							assetDep.c1 = dependencySheet.getCell( 12, r ).contents.replace("'","\\'")
-							assetDep.c2 = dependencySheet.getCell( 13, r ).contents.replace("'","\\'")
-							assetDep.c3 = dependencySheet.getCell(14, r ).contents.replace("'","\\'")
-							assetDep.c4 = dependencySheet.getCell( 15, r ).contents.replace("'","\\'")
+							assetDep.c1 = WorkbookUtil.getStringCellValue(dependencySheet, 12, r , "").replace("'","\\'")
+							assetDep.c2 = WorkbookUtil.getStringCellValue(dependencySheet, 13, r , "").replace("'","\\'")
+							assetDep.c3 = WorkbookUtil.getStringCellValue(dependencySheet,14, r , "").replace("'","\\'")
+							assetDep.c4 = WorkbookUtil.getStringCellValue(dependencySheet, 15, r , "").replace("'","\\'")
 							assetDep.updatedBy = userLogins.person
 							if(isNew)
 								assetDep.createdBy = userLogin.person
@@ -950,7 +950,7 @@ class AssetEntityController {
 				 * Importing comments
 				 */
 				if (params.comment=='comment') {
-					commentCount = commentsSheet.rows
+					commentCount = commentsSheet.getLastRowNum()
 
 					session.setAttribute("TOTAL_ASSETS",commentCount)
 					def errorMsg = new StringBuilder("<ul>");
@@ -965,7 +965,7 @@ class AssetEntityController {
 					for ( int r = 1; r < commentCount ; r++ ) {
 						def recordForAddition = false
 						int cols = 0 ;
-						def commentIdImported = commentsSheet.getCell( cols, r ).contents.replace("'","\\'")
+						def commentIdImported = WorkbookUtil.getStringCellValue(commentsSheet, cols, r ).replace("'","\\'")
 						def assetComment
 						if(commentIdImported){
 							def commentId = NumberUtils.toDouble(commentIdImported, 0).round()
@@ -982,7 +982,7 @@ class AssetEntityController {
 						assetComment.commentType = AssetCommentType.COMMENT
 						assetComment.project = project
 						
-						def assetId = commentsSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+						def assetId = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r ).replace("'","\\'")
 						if (assetId) {
 							def formattedId = NumberUtils.toDouble(assetId, 0).round()
 							def assetEntity = AssetEntity.findByIdAndProject(formattedId, project)
@@ -998,7 +998,7 @@ class AssetEntityController {
 							continue;
 						}
 						
-						def categoryInput = commentsSheet.getCell( ++cols, r ).contents?.replace("'","\\'")?.toLowerCase()?.trim()
+						def categoryInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r )?.replace("'","\\'")?.toLowerCase()?.trim()
 						
 						if (AssetCommentCategory.list.contains(categoryInput)){
 							assetComment.category =  categoryInput ?: AssetCommentCategory.GENERAL
@@ -1009,7 +1009,7 @@ class AssetEntityController {
 						}
 						
 						
-						def createdDateInput = commentsSheet.getCell( ++cols, r ).contents?.replace("'","\\'")
+						def createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r )?.replace("'","\\'")
 						def dateCreated = DateUtil.parseImportedCreatedDate(createdDateInput)
 						if (dateCreated instanceof Date){
 							assetComment.dateCreated = TimeUtil.convertInToGMT(dateCreated, tzId)
@@ -1019,7 +1019,7 @@ class AssetEntityController {
 							continue
 						}
 												
-						def createdByImported = StringUtils.strip(commentsSheet.getCell( ++cols, r ).contents)
+						def createdByImported = StringUtils.strip(WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r ))
 						if (currentUser == null) {
 							currentUser = securityService.getUserLoginPerson()
 						}
@@ -1033,7 +1033,7 @@ class AssetEntityController {
 							continue;
 						}
 						
-						assetComment.comment = commentsSheet.getCell( ++cols, r ).contents
+						assetComment.comment = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r )
 						
 						if(!assetComment.save()){
 							log.info GormUtil.allErrorsString(assetComment)
@@ -1064,7 +1064,6 @@ class AssetEntityController {
 				} // if (params.comment=='comment')
 			} // generate error message
 
-			workbook.close()
 			added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
 			
 			def message = "<b>Spreadsheet import was successful</b>" +
@@ -3643,17 +3642,16 @@ class AssetEntityController {
 			for ( int r = 0; r < storageInventoryList.size(); r++ ) {
 				 for( int c = 0; c < spcColumnList.size(); c++){
 					def valueForSheet = storageInventoryList[r][spcColumnList[c]] ? String.valueOf(storageInventoryList[r][spcColumnList[c]]) : ""
-					spcExpSheet.addCell( new Label( c, r+1, valueForSheet ) )
+					WorkbookUtil.addCell(spcExpSheet, c, r+1, valueForSheet )
 				 }
 			}
-			book.write()
-			book.close()
+			book.write(response.getOutputStream())
 		}catch( Exception ex ){
 			log.error "Exception occurred while exporting data"+ex.printStackTrace()
 			flash.message = ex.getMessage()
 			redirect( action:"exportAssets")
 		}
-	 redirect( action:"exportAssets")
+		redirect( action:"exportAssets")
 	}
 	
 	/**

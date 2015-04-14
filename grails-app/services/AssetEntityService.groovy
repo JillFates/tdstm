@@ -54,6 +54,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.eav.EavEntityAttribute
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.WorkbookUtil
 
 class AssetEntityService {
 
@@ -1807,20 +1808,20 @@ class AssetEntityService {
 		def cablingSkipped = 0
 		def cablingUpdated = 0
 		def project = securityService.getUserCurrentProject()
-		for ( int r = 2; r < cablingSheet.rows; r++ ) {
+		for ( int r = 2; r < cablingSheet.getLastRowNum(); r++ ) {
 			int cols = 0 ;
 			def isNew = false
-			def cableType=cablingSheet.getCell( cols, r ).contents.replace("'","\\'")
-			def fromAsset = AssetEntity.get(NumberUtils.toDouble(cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
-			def fromAssetName=cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-			def fromConnectorLabel =cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def cableType=WorkbookUtil.getStringCellValue(cablingSheet, cols, r ).replace("'","\\'")
+			def fromAsset = AssetEntity.get(NumberUtils.toDouble(WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'"), 0).round())
+			def fromAssetName=WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
+			def fromConnectorLabel =WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			//if assetId is not there then get asset from assetname and fromConnector
 			if(!fromAsset && fromAssetName){
 				fromAsset = AssetEntity.findByAssetNameAndProject( fromAssetName, project)?.find{it.model.modelConnectors?.label.contains(fromConnectorLabel)}
 			}
-			def toAsset = AssetEntity.get(NumberUtils.toDouble(cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'"), 0).round())
-			def toAssetName=cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-			def toConnectorLabel=cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def toAsset = AssetEntity.get(NumberUtils.toDouble(WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'"), 0).round())
+			def toAssetName=WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
+			def toConnectorLabel=WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			def toConnectorTemp
 			if(cableType=='Power')
 				toConnectorTemp = fromConnectorLabel
@@ -1833,11 +1834,11 @@ class AssetEntityService {
 				else
 					toAsset = fromAsset
 			}
-			def cableComment = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-			def cableColor = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-			def room = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-			def cableStatus = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
-			def roomType = cablingSheet.getCell( ++cols, r ).contents.replace("'","\\'")
+			def cableComment = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
+			def cableColor = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
+			def room = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
+			def cableStatus = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
+			def roomType = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			if(fromAsset){
 				def fromAssetConnectorsLabels= fromAsset.model?.modelConnectors?.label
 				if(fromAssetConnectorsLabels && fromAssetConnectorsLabels?.contains(fromConnectorLabel)){

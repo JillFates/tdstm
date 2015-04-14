@@ -1,8 +1,6 @@
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import jxl.*
-import jxl.write.*
-import jxl.read.biff.*
+import org.apache.poi.*
 
 import com.tdssrc.grails.GormUtil
 import com.tds.asset.AssetComment

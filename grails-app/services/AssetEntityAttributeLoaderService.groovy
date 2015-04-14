@@ -1,9 +1,8 @@
-import jxl.*
-import jxl.read.biff.*
-import jxl.write.*
-
 import org.apache.commons.lang.math.NumberUtils
 
+import org.apache.poi.*
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
@@ -68,11 +67,12 @@ class AssetEntityAttributeLoaderService {
 			"Walkthru Column Name":null ]
 
 		try {
-			workbook = Workbook.getWorkbook( stream )
+			//workbook = Workbook.getWorkbook( stream )
+			workbook = new HSSFWorkbook(file.inputStream);
 			sheet = workbook.getSheet( sheetNo )
 			// export should use the same map.
 			//check for column
-			def col = sheet.getColumns()
+			def col =  WorkbookUtil.getColumnsCount(sheet)
 			def checkCol = checkHeader( col, map, sheet )
 			// Statement to check Headers if header are not found it will return Error message
 			if ( checkCol == false ) {
@@ -80,23 +80,23 @@ class AssetEntityAttributeLoaderService {
 			} else {
 
 				// Iterate over the spreadsheet rows and populate the EavAttribute table appropriately
-				for ( int r = 1; r < sheet.rows; r++ ) {
+				for ( int r = 1; r < sheet.getLastRowNum(); r++ ) {
 					// get fields
-					def attributeCode = sheet.getCell( map["Attribute Code"], r ).contents
-					def backEndType = sheet.getCell( map["Type"], r ).contents
-					def frontEndInput = sheet.getCell( map["Input type"], r ).contents
-					def fronEndLabel = sheet.getCell( map["Label"], r ).contents
-					def isRequired = sheet.getCell( map["Required"], r ).contents
-					def isUnique = sheet.getCell( map["Unique"], r ).contents
-					def note = sheet.getCell( map["Note"], r ).contents
-					def mode = sheet.getCell( map["Mode"], r ).contents
-					def sortOrder = sheet.getCell( map["sortOrder"], r ).contents
-					def validation = sheet.getCell( map["Business Rules (hard/soft errors)"], r ).contents
-					def options = sheet.getCell( map["Options"], r ).contents
-					def spreadSheetName = sheet.getCell( map["Spreadsheet Sheet Name"], r ).contents
-					def spreadColumnName = sheet.getCell( map["Spreadsheet Column Name"], r ).contents
-					def walkthruSheetName = sheet.getCell( map["Walkthru Sheet Name"], r ).contents
-					def walkthruColumnName = sheet.getCell( map["Walkthru Column Name"], r ).contents
+					def attributeCode = WorkbookUtil.getStringCellValue(sheet, map["Attribute Code"], r )
+					def backEndType = WorkbookUtil.getStringCellValue(sheet, map["Type"], r )
+					def frontEndInput = WorkbookUtil.getStringCellValue(sheet, map["Input type"], r )
+					def fronEndLabel = WorkbookUtil.getStringCellValue(sheet, map["Label"], r )
+					def isRequired = WorkbookUtil.getStringCellValue(sheet, map["Required"], r )
+					def isUnique = WorkbookUtil.getStringCellValue(sheet, map["Unique"], r )
+					def note = WorkbookUtil.getStringCellValue(sheet, map["Note"], r )
+					def mode = WorkbookUtil.getStringCellValue(sheet, map["Mode"], r )
+					def sortOrder = WorkbookUtil.getStringCellValue(sheet, map["sortOrder"], r )
+					def validation = WorkbookUtil.getStringCellValue(sheet, map["Business Rules (hard/soft errors)"], r )
+					def options = WorkbookUtil.getStringCellValue(sheet, map["Options"], r )
+					def spreadSheetName = WorkbookUtil.getStringCellValue(sheet, map["Spreadsheet Sheet Name"], r )
+					def spreadColumnName = WorkbookUtil.getStringCellValue(sheet, map["Spreadsheet Column Name"], r )
+					def walkthruSheetName = WorkbookUtil.getStringCellValue(sheet, map["Walkthru Sheet Name"], r )
+					def walkthruColumnName = WorkbookUtil.getStringCellValue(sheet, map["Walkthru Column Name"], r )
 					// save data in to db(eavAttribute)
 
 					// Only save "Actual" or "Reference" attributes for the time being
@@ -213,7 +213,7 @@ class AssetEntityAttributeLoaderService {
 	 */
 	def checkHeader( def col, def map, def sheet ){
 		for ( int c = 0; c < col; c++ ) {
-			def cellContent = sheet.getCell( c, 0 ).contents
+			def cellContent = WorkbookUtil.getStringCellValue(sheet, c, 0 )
 			if( map.containsKey( cellContent ) ) {
 				map.put( cellContent,c )
 			}
