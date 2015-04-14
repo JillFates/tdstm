@@ -151,31 +151,13 @@ class MoveBundleController {
 	def delete() {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		def project = securityService.getUserCurrentProject()
-		if(moveBundleInstance && project) {
-			AssetEntity.withTransaction { status ->
-				try{
-					// Update asset associations
-					AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",  
-						[project.defaultBundle, moveBundleInstance])
-					// Delete Bundle and associations
-					moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
-
-					moveBundleInstance.delete(flush:true)
-
-					flash.message = "MoveBundle ${moveBundleInstance} deleted"
-					redirect(action:"list")
-
-				}catch(Exception ex){
-					status.setRollbackOnly()
-					flash.message = "Unable to delete bundle " + moveBundleInstance.name
-					redirect(action:"list")
-				}
-			}
-		} else {
-			flash.message = "MoveBundle not found with id ${params.id}"
-			redirect(action:"list")
-		}
+		def msg = moveBundleService.deleteBundle(moveBundleInstance, project)
+		flash.message = msg
+		redirect(action:"list")
+	
 	}
+
+
 	def deleteBundleAndAssets() {
 		def moveBundleInstance = MoveBundle.get( params.id )
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
