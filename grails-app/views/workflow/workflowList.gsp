@@ -172,7 +172,7 @@
 
 			<th class="sortable">Category</th>
 			
-			<th class="sortable">Role</th>
+			<th class="sortable">Team</th>
 			
 			<th class="sortable">Duration</th>
 			
