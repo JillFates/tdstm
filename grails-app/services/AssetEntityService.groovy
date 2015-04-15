@@ -546,6 +546,11 @@ class AssetEntityService {
 	
 		def (existingDeps, newDeps) = parseParamsForDependencyAssetIds(depType, params)
 
+		println(">>>> NEW DEPS")
+		println(newDeps)
+		println(">>>> EXISTING DEPS")
+		println(existingDeps)
+
 		// Check that all of the referenced assets are associated with the project
 		List allAssetIds = (existingDeps.values() + newDeps.values()).unique()
 		validateAssetsAssocToProject(allAssetIds, project)
@@ -3166,7 +3171,7 @@ class AssetEntityService {
 			}
 		}
 			
-		query.append("\nGROUP BY assetId ORDER BY ${sortIndex} ${sortOrder}\n) AS assets")
+		query.append("\nGROUP BY assetId \n) AS assets")
 		
 		// Setup a helper closure that is used to set WHERE or AND for the additional query specifications
 		def firstWhere = true
@@ -3210,7 +3215,7 @@ class AssetEntityService {
 		if (params.plannedStatus) {
 			query.append(whereAnd() + " assets.planStatus='${params.plannedStatus}'")
 		}
-		
+		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		log.debug  "query = ${query}"
 		def assetList = jdbcTemplate.queryForList(query.toString())
 		
