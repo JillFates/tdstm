@@ -150,7 +150,7 @@ class ApplicationController {
 			}
 		}
 
-		query.append("GROUP BY app_id ORDER BY ${sortIndex} ${sortOrder} ) AS apps")
+		query.append("GROUP BY app_id  ) AS apps")
 		
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 		LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned})
@@ -214,6 +214,7 @@ class ApplicationController {
 			query.append( " apps.runbookStatus='Done' " )
 		}
 		
+		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		log.info "query = ${query}"
 
 		def appsList = jdbcTemplate.queryForList(query.toString())

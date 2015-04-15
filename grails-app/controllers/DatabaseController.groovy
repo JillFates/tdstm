@@ -25,6 +25,9 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 
+import org.apache.commons.lang.StringEscapeUtils
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
 
 class DatabaseController {
 	
@@ -38,7 +41,9 @@ class DatabaseController {
 	def userPreferenceService
 	def projectService
 
-	def index() {
+	def dataSource
+
+	def index = {
 		redirect action:'list', params:params
 	}
 	
@@ -164,7 +169,7 @@ class DatabaseController {
 				query.append( " AND (ae.move_bundle_id IN (${unasgnmbId}) OR ae.move_bundle_id IS NULL)" )
 			}
 		}
-		query.append(" GROUP BY db_id ORDER BY ${sortIndex} ${sortOrder}) AS dbs ")
+		query.append(" GROUP BY db_id) AS dbs ")
 		/* LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
 			LEFT OUTER JOIN asset_dependency adr2 ON ae.asset_entity_id = adr2.dependent_id AND adr2.status IN (${unknownQuestioned}) 
@@ -174,15 +179,23 @@ class DatabaseController {
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
 		
 		def firstWhere = true
+		def queryParams = [:]
 		filterParams.each {
-			if( it.getValue() )
+			if( it.getValue()  && it.getValue().trim().size()){
+				
 				if (firstWhere) {
 					// single quotes are stripped from the filter to prevent SQL injection
-					query.append(" WHERE dbs.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+					query.append(" WHERE dbs.${it.getKey()} LIKE :${it.getKey()}")
 					firstWhere = false
 				} else {
-					query.append(" AND dbs.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
+					query.append(" AND dbs.${it.getKey()} LIKE :${it.getKey()}")
 				}
+				def paramValue = ""
+				if(it.getValue()){
+					paramValue = it.getValue().replaceAll("'", "")
+				}
+				queryParams << [ (it.getKey()) : "%"+StringEscapeUtils.escapeJava(paramValue)+"%"]
+			}
 		}
 		if(params.moveBundleId){
 			if(params.moveBundleId!='unAssigned'){
@@ -198,8 +211,16 @@ class DatabaseController {
 		if(params.plannedStatus){
 			query.append(" WHERE dbs.planStatus='${params.plannedStatus}'")
 		}
+
+		def dbsList = []
+		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
+		if(queryParams.size()){
+			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+			dbsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		}else{
+			dbsList = jdbcTemplate.queryForList(query.toString())
+		}
 		
-		def dbsList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = dbsList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)

@@ -164,7 +164,7 @@ class FilesController {
 			}
 		}
 			
-		query.append(" GROUP BY files_id ORDER BY ${sortIndex} ${sortOrder}) AS files ")
+		query.append(" GROUP BY files_id) AS files ")
 		
 		/*LEFT OUTER JOIN asset_dependency_bundle adb ON adb.asset_id=ae.asset_entity_id 
 			LEFT OUTER JOIN asset_dependency adr ON ae.asset_entity_id = adr.asset_id AND adr.status IN (${unknownQuestioned}) 
@@ -199,6 +199,7 @@ class FilesController {
 		if (params.plannedStatus) {
 			query.append(" WHERE files.planStatus='${params.plannedStatus}'")
 		}
+		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		def filesList = jdbcTemplate.queryForList(query.toString())
 		
 		def totalRows = filesList.size()
