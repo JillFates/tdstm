@@ -482,7 +482,6 @@ class MoveBundleController {
 		def assignedPlan = AssetEntityPlanStatus.ASSIGNED
 		def confirmedPlan = AssetEntityPlanStatus.CONFIRMED
 		def movedPlan = AssetEntityPlanStatus.MOVED
-		def planStatusLocked = AssetEntityPlanStatus.LOCKED
 		
 		def app = AssetType.APPLICATION.toString()
 		def db = AssetType.DATABASE.toString()
@@ -515,8 +514,8 @@ class MoveBundleController {
 		def countArgs = [project:project, moveBundles:moveBundleList]
 
 		def countQuery = "$selectCount FROM AssetEntity ae $baseWhere"
-		def appQuery = "FROM Application ae $baseWhere AND ae.planStatus <> '$planStatusLocked'"
-		def appCountQuery = "$selectCount $appQuery AND ae.planStatus <> '$planStatusLocked'"
+		def appQuery = "FROM Application ae $baseWhere"
+		def appCountQuery = "$selectCount $appQuery"
 		def dbQuery = "FROM Database ae $baseWhere"
 		def dbCountQuery = "$selectCount $dbQuery"
 		def filesQuery = "FROM Files ae $baseWhere"
