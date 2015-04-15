@@ -200,7 +200,7 @@ class AuthController {
 		def timeNow = dateNow.getTime()
 		
 		// retrive the list of 20 usernames with the most recent login times
-		def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastLogin DESC",[max:20])
+		def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastPage DESC",[max:20])
 
 		// retrive the list of events in progress
 		def currentLiveEvents = MoveEvent.findAll()
