@@ -10,7 +10,7 @@
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
-		<g:javascript src="tdsmenu.js" />
+		
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$("#personDialog").dialog({ autoOpen: false });
@@ -483,7 +483,7 @@
 	</div>
 
     </div>
-		
+		<g:javascript src="tdsmenu.js" />
 
 		<%-- DIV for editing User Profile --%> 
 		<g:render template="../person/personEdit" model="[user:user]" />
