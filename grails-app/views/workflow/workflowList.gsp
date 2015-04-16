@@ -271,8 +271,7 @@
 		</div>
     </g:form>
     <div style="display: none;" >
-    		 <g:select id="createCategory" name="createCategory" from="${WorkflowTransition.constraints.category.inList}" 
-                noSelection="['':'please select']"/>
+		<g:select id="createCategory" name="createCategory" from="${com.tds.asset.AssetComment.constraints.category.inList}" optionValue="${{ e -> e.capitalize() }}" noSelection="['':'Please select']" ></g:select>
     </div>
     <div style="display: none;" >
     		 <g:select id="addRole" name="addRole" from="${roles}"  optionValue="${{it.description}}"
