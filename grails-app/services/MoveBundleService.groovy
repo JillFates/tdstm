@@ -311,13 +311,14 @@ class MoveBundleService {
 						AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",  
 							[project.defaultBundle, moveBundleInstance])
 						// Delete Bundle and associations
-						moveBundleService.deleteMoveBundleAssociates(moveBundleInstance)
+						deleteMoveBundleAssociates(moveBundleInstance)
 
 						moveBundleInstance.delete(flush:true)
 
 						msg = "MoveBundle ${moveBundleInstance} deleted"
 
 					}catch(Exception ex){
+						ex.printStackTrace()
 						status.setRollbackOnly()
 						msg = "Unable to delete bundle " + moveBundleInstance.name
 					}
