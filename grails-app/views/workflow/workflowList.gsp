@@ -134,14 +134,14 @@
 				
 				<td class="name">
 				<g:if test="${transitions.donotDelete}">
-					<g:link controller="workflow" action="deleteTransitionFromWorkflow" id="${transitions.transition.id}" params="['workflow':workflow.id]">
+					<a href="javascript:deleteWorkflowStep(${workflow.id}, ${transitions.transition.id})">
 						<g:if test="${transitions.isExist}">
 							Delete Step and History
 						</g:if>
 						<g:else>
 							Delete
 						</g:else>
-					</g:link>
+					</a>
 				</g:if>
 				</td>
 			</tr>
@@ -215,14 +215,14 @@
 				</td>
 				<td nowrap="nowrap">
 				<g:if test="${transitions.donotDelete}">
-					<g:link controller="workflow" action="deleteTransitionFromWorkflow" id="${transitions.transition.id}" params="['workflow':workflow.id]">
+					<a href="javascript:deleteWorkflowStep(${workflow.id}, ${transitions.transition.id})">
 						<g:if test="${transitions.isExist}">
 							Delete Step and History
 						</g:if>
 						<g:else>
 							Delete
 						</g:else>
-					</g:link>
+					</a>
 				</g:if>
 				</td>
 			</tr>
@@ -386,6 +386,10 @@ function checkInputData(){
 		returnVal = false 
 	}
 	return returnVal
+}
+function deleteWorkflowStep(workflowId, transitionId) {
+	window.location.href = tdsCommon.createAppURL('/workflow/deleteTransitionFromWorkflow/' + transitionId + '?workflow=' + workflowId)
+	return false;
 }
 </script>
 <script>
