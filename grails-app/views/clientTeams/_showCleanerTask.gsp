@@ -171,7 +171,7 @@
 							</g:each>
 						</select> 
 						<b>Quantity: </b>
-						<g:select  name="labels" id="labelQuantity" from="${1..4}" value="${lblQty}" onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=printLabelQuantity\'')}"/>
+						<g:select  name="labels" id="labelQuantity" from="${1..9}" value="${lblQty}" onchange="${remoteFunction(controller:'task', action:'setLabelQuantityPref',params:'\'selected=\'+ this.value+\'&prefFor=printLabelQuantity\'')}"/>
 					</td>
 			</tr>
 			<tr>
@@ -317,9 +317,9 @@ function keyCheck( e ){
 	       startprintjob();
 	  }
 	  var labelQty = keyID - 48 
-	  if(labelQty < 5 && labelQty > 0){
-	       $('#labelQuantity').focus()
-		  if($("input:focus").length < 1){
+	  if (labelQty > 0 && labelQty < 10) {
+	      $('#labelQuantity').focus()
+		  if($("input:focus").length < 1) {
 		  	$('#labelQuantity').val(labelQty);
 		  }
 	  }
