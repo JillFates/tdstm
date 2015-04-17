@@ -20,11 +20,10 @@
 					</tr>
 				</g:each>
 		</table>
-		<input type="hidden" id="priorityhiddenId" name="hiddenId"
-			value="Priority" /> <span id="newPriorityOption"
-			style="display: none;"> <input type="text" id="priorityOption"
-			name="priorityOption" value=""> </span> <input type="button"
-			id="addPriorityButtonId" name="createPriorityOption" value="EDIT"
-			onclick="addAssetOptions($('#priorityhiddenId').val())"/>
+		<input type="hidden" id="priorityhiddenId" name="hiddenId" value="Priority" /> 
+		<span id="newPriorityOption" style="display: none;"> 
+			<input type="text" id="priorityOption" name="priorityOption" maxlength="20" value=""> 
+		</span>
+		<input type="button" id="addPriorityButtonId" name="createPriorityOption" value="EDIT" onclick="addAssetOptions($('#priorityhiddenId').val())"/>
 	</div>
 </div>

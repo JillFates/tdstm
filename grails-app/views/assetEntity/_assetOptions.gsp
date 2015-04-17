@@ -20,14 +20,14 @@
 					</tr>
 				</g:each>
 		</table>
-		<span id="newStatusOption" style="display: none;"> <input
-			type="text" id="newplanStatus" name="planStatus" value=""> </span> <input
-			type="hidden" id="planStatushiddenId" name="hiddenId"
-			value="planStatus" /> <input type="button" id="addButtonId"
-			name="createAssetPlan" value="EDIT"
-			onclick="addAssetOptions($('#planStatushiddenId').val())"/>
+		<span id="newStatusOption" style="display: none;"> 
+			<input type="text" id="newplanStatus" name="planStatus" maxlength="20" value=""> 
+		</span> 
+		<input type="hidden" id="planStatushiddenId" name="hiddenId" value="planStatus" />
+		<input type="button" id="addButtonId" name="createAssetPlan" value="EDIT" onclick="addAssetOptions($('#planStatushiddenId').val())"/>
 	</div>
 </div>
+
 	<script type="text/javascript">
 	currentMenuId = "#adminMenu";
 	$("#adminMenuId a").css('background-color','#003366')
@@ -70,21 +70,21 @@
 	        var dependencyStatus = $("#dependencyStatus").val();
 	        var environment = $("#environment").val();
 	        
-	        if(option=='planStatus' && planStatus){
+	        if (option=='planStatus' && planStatus){
 		        ${remoteFunction(action:'saveAssetoptions', params:'\'planStatus=\'+ planStatus+\'&assetOptionType=\'+"planStatus" ', onSuccess:'addAssetOption(data,planStatus,option)')};
-	        }else if(option=='Priority' && priorityOption){
+	        } else if(option=='Priority' && priorityOption){
 	        	${remoteFunction(action:'saveAssetoptions', params:'\'priorityOption=\'+ priorityOption +\'&assetOptionType=\'+"Priority"', onSuccess:'addAssetOption(data,priorityOption,option)')};
 	        } else if(option=='dependency' && dependencyType){
 	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyType=\'+ dependencyType +\'&assetOptionType=\'+"dependency" ', onSuccess:'addAssetOption(data,dependencyType,option)')};
-	        }else if(option=='dependencyStatus' && dependencyStatus){
+	        } else if(option=='dependencyStatus' && dependencyStatus){
 	        	${remoteFunction(action:'saveAssetoptions', params:'\'dependencyStatus=\'+ dependencyStatus +\'&assetOptionType=\'+"dependencyStatus"', onSuccess:'addAssetOption(data,dependencyStatus,option)')};
-	        }else if(option=='environment' && environment){
+	        } else if(option=='environment' && environment){
 	        	if (environment.length <= 20) {
 	        		${remoteFunction(action:'saveAssetoptions', params:'\'environment=\'+ environment +\'&assetOptionType=\'+"environment"', onSuccess:'addAssetOption(data,environment,option)')};
 	        	} else {
 					alert(option+" can't have more than 20 characters.")
 	        	}
-	        }else{
+	        } else {
     			alert(option+" can't be blank.")
     		}
     }

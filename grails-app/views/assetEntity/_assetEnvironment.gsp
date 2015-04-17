@@ -23,7 +23,7 @@
 		</table>
 		<input type="hidden" id="envOptionHiddenId" name="hiddenId" value="environment" /> 
 		<span id="newEnvironment" style="display: none;"> 
-			<input type="text" id="environment" name="environment" value=""> 
+			<input type="text" id="environment" name="environment" maxlength="20" value=""> 
 		</span> 
 		<input type="button" id="addEnvironmentButtonId" name="createEnvironment" value="EDIT" onclick="addAssetOptions($('#envOptionHiddenId').val())"/>
 	</div>

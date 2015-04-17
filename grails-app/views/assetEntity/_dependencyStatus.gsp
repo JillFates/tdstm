@@ -20,12 +20,10 @@
 					</tr>
 				</g:each>
 		</table>
-		<input type="hidden" id="dependencyStatusHiddenId" name="hiddenId"
-			value="dependencyStatus" /> <span id="newDependencyStatus"
-			style="display: none;"> <input type="text"
-			id="dependencyStatus" name="dependencyStatus" value=""> </span> <input
-			type="button" id="addDependencyStatusButtonId"
-			name="createDependencyStatusType" value="EDIT"
-			onclick="addAssetOptions($('#dependencyStatusHiddenId').val())"/>
+		<input type="hidden" id="dependencyStatusHiddenId" name="hiddenId" value="dependencyStatus" /> 
+		<span id="newDependencyStatus" style="display: none;">
+			<input type="text" id="dependencyStatus" name="dependencyStatus" maxlength="20" value="">
+		</span> 
+		<input type="button" id="addDependencyStatusButtonId" name="createDependencyStatusType" value="EDIT" onclick="addAssetOptions($('#dependencyStatusHiddenId').val())"/>
 	</div>
 </div>

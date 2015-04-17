@@ -22,7 +22,8 @@
 		</table>
 		<input type="hidden" id="dependencyHiddenId" name="hiddenId" value="dependency" /> 
 		<span id="newDependency" style="display: none;">
-		 <input type="text" id="dependencyType" name="dependencyType" value=""> </span> <input type="button" id="addDependencyButtonId" name="createDependencyType" value="EDIT"
-			onclick="addAssetOptions($('#dependencyHiddenId').val())"/>
+			<input type="text" id="dependencyType" name="dependencyType" maxlength="20" value=""> 
+		</span> 
+		<input type="button" id="addDependencyButtonId" name="createDependencyType" value="EDIT" onclick="addAssetOptions($('#dependencyHiddenId').val())"/>
 	</div>
 </div>
