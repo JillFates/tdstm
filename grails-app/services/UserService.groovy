@@ -461,7 +461,7 @@ class UserService {
 	 * @param project
 	 * @return
 	 */
-	def getEventNewses( project ){
+	def getEventNews( project ){
 		def newsList = []
 		def comingEvents = getEvents(getSelectedProject(project), TimeUtil.nowGMT()).keySet().asList()
 		if(comingEvents){

@@ -189,9 +189,9 @@ class DashboardController {
 	 * @render : eventNews template
 	 * 
 	 */
-	def retrieveEventsNewses() {
+	def retrieveEventsNews() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
-		render (template :'eventNews', model:[ newsList:userService.getEventNewses(projectInstance), project:projectInstance])
+		render (template :'eventNews', model:[ newsList:userService.getEventNews(projectInstance), project:projectInstance])
 	}
 	
 	/**

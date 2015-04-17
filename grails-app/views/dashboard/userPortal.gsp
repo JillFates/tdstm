@@ -169,7 +169,7 @@ function loadEventTable(id){
 function loadEventNewsTable(id){
 
 	jQuery.ajax({
-		url: contextPath+'/dashboard/retrieveEventsNewses',
+		url: contextPath+'/dashboard/retrieveEventsNews',
 		data: {'project':id ? id :$("#userProjectId").val()},
 		type:'POST',
 		beforeSend: function(xhr) {
