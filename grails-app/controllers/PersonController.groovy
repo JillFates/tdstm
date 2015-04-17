@@ -129,9 +129,7 @@ class PersonController {
 					query.append(" AND people.${it.getKey()} LIKE '%${it.getValue()}%'")
 				}
 		}
-		println(">>>>>>>>>>>>>>>>>>>>>>>>>")
-		println(query.toString())
-		println(">>>>>>>>>>>>>>>>>>>>>>>>>")
+
 		personInstanceList = jdbcTemplate.queryForList(query.toString())
 		
 		// Limit the returned results to the user's page size and number
