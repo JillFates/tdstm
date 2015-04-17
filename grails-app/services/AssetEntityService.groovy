@@ -546,11 +546,6 @@ class AssetEntityService {
 	
 		def (existingDeps, newDeps) = parseParamsForDependencyAssetIds(depType, params)
 
-		println(">>>> NEW DEPS")
-		println(newDeps)
-		println(">>>> EXISTING DEPS")
-		println(existingDeps)
-
 		// Check that all of the referenced assets are associated with the project
 		List allAssetIds = (existingDeps.values() + newDeps.values()).unique()
 		validateAssetsAssocToProject(allAssetIds, project)
