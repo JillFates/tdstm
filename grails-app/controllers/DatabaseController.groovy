@@ -43,7 +43,7 @@ class DatabaseController {
 
 	def dataSource
 
-	def index = {
+	def index() {
 		redirect action:'list', params:params
 	}
 	
