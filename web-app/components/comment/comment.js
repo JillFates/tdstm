@@ -564,53 +564,57 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 	//
 	// Invoked by createCommentForm and editCommentDialog to make Ajax call to persist changes of new and existing assetComment classes
 	//
-	$scope.saveComment = function(viewAfterSave) {
-		// Bump the list timer if it exists
-		if ($("#selectTimedId").length > 0) {
-			timedUpdate($("#selectTimedId").val())
-		}
+	$scope.saveComment = function(viewAfterSave, invalid) {
+		if(invalid){
+			alert("You must fill in all the required fields.")
+		}else{
+			// Bump the list timer if it exists
+			if ($("#selectTimedId").length > 0) {
+				timedUpdate($("#selectTimedId").val())
+			}
 
-		$scope.ac.id = $scope.ac.commentId;
+			$scope.ac.id = $scope.ac.commentId;
 
-		if (commentService.validDependencies($scope.dependencies)) {
-			if ($scope.isEdit) {
-				commentService.updateComment($scope.ac, $scope.dependencies).then(
-					function(data) {
-						if (data.error) {
-							alerts.addAlertMsg(data.error);
-						} else {
-							$scope.close();
-							$scope.$emit("commentUpdated", $scope.ac.id, $scope.ac.assetEntity);
-							if ($scope.ac.assetEntity != $scope.acBackup.assetEntity) {
-								$scope.$emit("commentUpdated", $scope.ac.id, $scope.acBackup.assetEntity);
+			if (commentService.validDependencies($scope.dependencies)) {
+				if ($scope.isEdit) {
+					commentService.updateComment($scope.ac, $scope.dependencies).then(
+						function(data) {
+							if (data.error) {
+								alerts.addAlertMsg(data.error);
+							} else {
+								$scope.close();
+								$scope.$emit("commentUpdated", $scope.ac.id, $scope.ac.assetEntity);
+								if ($scope.ac.assetEntity != $scope.acBackup.assetEntity) {
+									$scope.$emit("commentUpdated", $scope.ac.id, $scope.acBackup.assetEntity);
+								}
+								if (viewAfterSave) {
+									$scope.$emit("viewComment", commentTO, 'show');
+								}
 							}
-							if (viewAfterSave) {
-								$scope.$emit("viewComment", commentTO, 'show');
-							}
+						},
+						function(data) {
+							alerts.showGenericMsg();
 						}
-					},
-					function(data) {
-						alerts.showGenericMsg();
-					}
-				);
-			} else {
-				commentService.saveComment($scope.ac, $scope.dependencies).then(
-					function(data) {
-						if (data.error) {
-							alerts.addAlertMsg(data.error);
-						} else {
-							var comment = commentUtils.commentTemplateFromCreateResponse(data, $scope.ac.assetEntity, $scope.ac.assetType);
-							$scope.close();
-							$scope.$emit("commentCreated", comment.commentId, comment.assetEntity);
-							if (open == 'view') {
-								$scope.$emit("viewComment", commentUtils.commentTO(comment.commentId, comment.commentType), 'show');
+					);
+				} else {
+					commentService.saveComment($scope.ac, $scope.dependencies).then(
+						function(data) {
+							if (data.error) {
+								alerts.addAlertMsg(data.error);
+							} else {
+								var comment = commentUtils.commentTemplateFromCreateResponse(data, $scope.ac.assetEntity, $scope.ac.assetType);
+								$scope.close();
+								$scope.$emit("commentCreated", comment.commentId, comment.assetEntity);
+								if (open == 'view') {
+									$scope.$emit("viewComment", commentUtils.commentTO(comment.commentId, comment.commentType), 'show');
+								}
 							}
+						},
+						function(data) {
+							alerts.showGenericMsg();
 						}
-					},
-					function(data) {
-						alerts.showGenericMsg();
-					}
-				);
+					);
+				}
 			}
 		}
 	}

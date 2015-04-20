@@ -844,3 +844,7 @@ br.page-break-after {
 .tabs {
 	min-width: 600px;
 }
+
+.disabledButton input{
+    color:gray;
+}
