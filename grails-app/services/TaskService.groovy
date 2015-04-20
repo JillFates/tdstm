@@ -2989,9 +2989,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			// exceptions.append(failure)
 			if (! failure) {
 				// If the failed variable is empty then we have an unexpected error so dump the stack for debugging purposes
-				e.printStackTrace()
 				failure = e.getMessage()
 				exceptions.append(failure)
+				log.error "$failure\n${ExceptionUtil.stackTraceToString(e)}"
 			}
 		}
 		
@@ -3337,7 +3337,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 				} catch (e) {
 					msg = "Indirect duration '$duration' error ${e.getMessage()}"
-					log.error "$msg, asset=${task.assetEntity}"
+					log.error "$msg, asset=${task.assetEntity}\n${ExceptionUtil.stackTraceToString(e)}"
 					task.duration = defValue
 					task.durationScale = defScale
 					return msg
@@ -3941,7 +3941,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				map.bIds = bundleIds
 			} else if (contextObject instanceof MoveBundle) {
 				// Pretty simple, we're just searching the current bundle
-				map.bIds = contextObject.id
+				map.bIds = [ contextObject.id ]
 			} else {
 				throw new InvalidParamException("The context for findAllAssetsWithFilter must be a MoveBundle or MoveEvent ${contextObject.getClass().getName()}")
 			}
@@ -4098,7 +4098,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				} 
 			} catch (e) {
 				msg = "An unexpected error occurred while trying to locate assets for filter $filter" + e.toString()
-				log.error "$msg\n"
+				log.error "$msg\n${ExceptionUtil.stackTraceToString(e)}"
 				throw new RuntimeException("$msg<br>${e.getMessage()}")
 			}
 
@@ -4179,8 +4179,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					assets = daList.unique()
 				} catch (e) {
 					// We really shouldn't of gotten here so we're going to do a stackdump
-					e.printStackTrace()
-					log.error "An unexpected error occurred - ${e.getMessage()}"
+					log.error "An unexpected error occurred - ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 					throw e
 				}
 				// TODO : make this list distinct
@@ -4583,7 +4582,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					// If we got here, then the indirect either referenced a @team or a 'name', which will be resolved below
 
 				} catch (e) {
-					e.printStackTrace()
+					log.error "assignWhom: ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 					return "${e.getMessage()}, whom (${taskSpec.whom})"
 				}
 			}
@@ -4664,7 +4663,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							}
 						}
 					} catch (e) {
-						e.printStackTrace()
+						log.error "assignTeam: ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 						return "${e.getMessage()}, team ($team)"
 					}
 				}
