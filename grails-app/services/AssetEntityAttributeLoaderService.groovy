@@ -20,6 +20,7 @@ import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.WorkbookUtil
 
 class AssetEntityAttributeLoaderService {
 
@@ -68,8 +69,8 @@ class AssetEntityAttributeLoaderService {
 
 		try {
 			//workbook = Workbook.getWorkbook( stream )
-			workbook = new HSSFWorkbook(file.inputStream);
-			sheet = workbook.getSheet( sheetNo )
+			workbook = new HSSFWorkbook(stream);
+			sheet = workbook.getSheetAt( sheetNo )
 			// export should use the same map.
 			//check for column
 			def col =  WorkbookUtil.getColumnsCount(sheet)
@@ -200,7 +201,6 @@ class AssetEntityAttributeLoaderService {
 						}
 					}
 				}
-				workbook.close()
 			}
 		}
 		catch( Exception ex ) {

@@ -308,6 +308,7 @@ class ModelSyncBatchController {
 			modelSyncBatch.save()
 		} catch (Exception e) {
 			flash.message = "Import Batch process failed"
+			log.error "Can't import: " + e.message
 			e.printStackTrace();
 		}
     	redirect(action: "list", params: params)

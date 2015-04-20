@@ -971,7 +971,10 @@ class ModelController {
 	        MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 	        CommonsMultipartFile file = ( CommonsMultipartFile ) mpr.getFile("file")
 			def date = new Date();
-	        def modelSyncBatch = new ModelSyncBatch(userlogin:userLogin, changesSince:date,createdBy:userLogin,source:"TDS").save()
+			def modelSyncBatch = new ModelSyncBatch(changesSince:date,createdBy:userLogin,source:"TDS")
+			if ( modelSyncBatch.hasErrors() || !modelSyncBatch.save() ) {
+				log.error "Unable to create ModelSyncBatch for ${modelSyncBatch}" + GormUtil.allErrorsString( modelSyncBatch )
+			}
 	        // create workbook
 	        def workbook
 	        def sheetNameMap = new HashMap()
@@ -1012,19 +1015,20 @@ class ModelController {
 	                // Statement to check Headers if header are not found it will return Error message
 	                if ( missingHeader != "" ) {
 	                    flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-	                    redirect( action:importExport, params:[message:flash.message] )
+	                    redirect( action: "importExport", params:[message:flash.message] )
 	                    return;
 	                } else {
 	                    def sheetrows = manuSheet.getLastRowNum()
 	                    for ( int r = 1; r < sheetrows ; r++ ) {
 	                		def valueList = new StringBuffer("(")
 	                    	for( int cols = 0; cols < manuCol; cols++ ) {
-	                    		valueList.append("'"+WorkbookUtil.getStringCellValue(manuSheet, cols, r ).replace("'","\\'")+"',")
+	                    		valueList.append("'"+WorkbookUtil.getStringCellValue(manuSheet, cols, r, "").replace("'","\\'")+"',")
 	                        }
 	                		try{
 	                			jdbcTemplate.update("insert into manufacturer_sync( manufacturer_temp_id, name,aka, description, batch_id) values "+valueList.toString()+"${modelSyncBatch.id})")
 								manuAdded = r
 	                		} catch (Exception e) {
+	                			log.error "Can't insert into manufacturer_sync: ${e.getMessage()}"
 	                			manuSkipped += ( r +1 )
 	                		}
 	                    }
@@ -1066,7 +1070,7 @@ class ModelController {
 								case "manufacturer_name" : 
 									def manuName = WorkbookUtil.getStringCellValue(modelSheet, cols, r )
 									manuId = ManufacturerSync.findByNameAndBatch(manuName,modelSyncBatch)?.id
-									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r ).replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
 									break;
 								case "blade_count" : 
 									valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
@@ -1149,8 +1153,18 @@ class ModelController {
 									validatedPersonId = Person.findByFirstName(validatedByName)?.id
 									//valueList.append((WorkbookUtil.getStringCellValue(modelSheet, cols, r ) ? WorkbookUtil.getStringCellValue(modelSheet, cols, r ) : null)+",")
 									break;
+								case "room_object" : 
+									int roomObject = 0
+									if(WorkbookUtil.getStringCellValue(modelSheet, cols, r ).toLowerCase() != "False"){
+										roomObject = 1
+									}
+									valueList.append(roomObject+",")
+									break;
+								case "date_created":
+								case "last_modified":
+									break;
 								default : 
-									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r ).replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(modelSheet, cols, r, "").replace("'","\\'")+"',")
 									break;
 								}
 		                 									
@@ -1159,23 +1173,23 @@ class ModelController {
 		             			if(manuId){ 
 									 if(params.importCheckbox ){
 										 if(onlyTds == true) {
-											jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
+											jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId)")
 											modelAdded = r                                                                                                                                                                                                                    
 										 } else {
 										 // TODO : getting ArrayIndexOutOfbound exception, need to fix
 										 	//modelSkipped += ( r +1 )
 										 }	
 									 } else {
-									 	jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
+									 	jdbcTemplate.update("insert into model_sync( model_temp_id, name,aka, description,manufacturer_temp_id,manufacturer_name,asset_type,blade_count,blade_label_count,blade_rows,sourcetds,power_nameplate,power_design,power_use,room_object,sourcetdsversion,use_image,usize,height,weight,depth,width,layout_style,product_line,model_family,end_of_life_date,end_of_life_status,sourceurl,model_status,batch_id,manufacturer_id,created_by_id,updated_by_id,validated_by_id, model_scope_id ) values "+valueList.toString()+"${modelSyncBatch.id}, $manuId, $createdPersonId, $updatedPersonId, $validatedPersonId, $projectId) ")
 										 modelAdded = r
 									 }	  
 		             			} else {
 		             				//modelSkipped += ( r +1 )
 		             			}
 		             		} catch (Exception e) {
-								 e.printStackTrace()
-		             			//modelSkipped += ( r +1 )
-								 e.printStackTrace()
+		             			log.error "Can't insert into model_sync: ${e.getMessage()}"
+								e.printStackTrace()
+		             			modelSkipped += ( r +1 )
 		             		}
 		                }
 					}
@@ -1204,12 +1218,11 @@ class ModelController {
 							def valueList = new StringBuffer("(")
 		             		def modelId
 		                 	for( int cols = 0; cols < connectorCol; cols++ ) {
-		                 		
 								switch(WorkbookUtil.getStringCellValue(connectorSheet, cols, 0 )){
 								case "model_name" : 
 									def modelName = WorkbookUtil.getStringCellValue(connectorSheet, cols, r )
 									modelId = ModelSync.findByModelNameAndBatch(modelName,modelSyncBatch)?.id
-									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r ).replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
 									break;
 								case "connector_posx" : 
 									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) : null)+",")
@@ -1218,7 +1231,7 @@ class ModelController {
 									valueList.append((WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) ? WorkbookUtil.getStringCellValue(connectorSheet, cols, r ) : null)+",")
 									break;
 								default : 
-									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r ).replace("'","\\'")+"',")
+									valueList.append("'"+WorkbookUtil.getStringCellValue(connectorSheet, cols, r, "").replace("'","\\'")+"',")
 									break;
 								}
 		                 									
@@ -1231,11 +1244,11 @@ class ModelController {
 		             				connectorSkipped += ( r +1 )
 		             			}
 		             		} catch (Exception e) {
+		             			log.error "Can't insert into model_connector_sync: ${e.getMessage()}"
 		             			connectorSkipped += ( r +1 )
 		             		}
 		                }
 					} 
-	                workbook.close()
 	                if (manuSkipped.size() > 0 || modelSkipped.size() > 0 || connectorSkipped.size() > 0) {
 	                    flash.message = " File Uploaded Successfully with Manufactures:${manuAdded},Model:${modelAdded},Connectors:${connectorAdded} records. and  Manufactures:${manuSkipped},Model:${modelSkipped},Connectors:${connectorSkipped} Records skipped Please click the Manage Batches to review and post these changes."
 	                } else {

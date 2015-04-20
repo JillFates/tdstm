@@ -74,5 +74,6 @@ databaseChangeLog = {
 	include file: '20150408-modify-fields-environment-validation-criticaly.groovy'
 	include file: '20150409-new-user-login-permissions.groovy'
 	include file: '20150410-remove-user-login-permissions-from-client-admin-role.groovy'
-
+	include file: '20150417-remove-from-model-sync-batch-user-login-fields.groovy'
+	include file: '20150417-alter-foreign-key-on-model-sync.groovy'
 }

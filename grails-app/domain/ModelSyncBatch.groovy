@@ -11,9 +11,6 @@ class ModelSyncBatch {
 	
 	static hasMany = [ manufacturerSync:ManufacturerSync, modelSync:ModelSync ]	
 	
-	// TODO - delete these
-	UserLogin userlogin
-	
 	static mapping = {
 		version false
 		autoTimestamp false

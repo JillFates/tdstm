@@ -43,7 +43,7 @@
                         
                             <td><tds:convertDate date="${modelSyncBatchInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
                         
-                            <td>${modelSyncBatchInstance?.userlogin?.person?.lastNameFirst}</td>
+                            <td>${modelSyncBatchInstance?.createdBy?.person?.lastNameFirst}</td>
                         
                             <td>${ManufacturerSync.countByBatch(modelSyncBatchInstance)}</td>
                         

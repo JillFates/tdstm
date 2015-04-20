@@ -38,7 +38,16 @@ class WorkbookUtil {
 		def result = 0
 		def row = sheet.getRow(0)
 		if (row) {
-			result = row.getLastCellNum()
+			def value
+			def c = row.getLastCellNum()
+			while (c >= 0) { 
+				value = getStringCellValue(sheet, c, 0)
+				if (!StringUtil.isBlank(value)) {
+					result = c + 1;
+					break;
+				}
+				c--
+			}
 		}
 		return result
 	}
