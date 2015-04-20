@@ -1151,7 +1151,7 @@ class CookbookService {
 		def teamCodes = []
 		if (partyRelationshipService) {
 			teamCodes = partyRelationshipService.getStaffingRoles()*.id
-			log.error "**** teamCodes == $teamCodes ****"
+			log.debug "**** teamCodes == $teamCodes ****"
 		}
 
 		try {

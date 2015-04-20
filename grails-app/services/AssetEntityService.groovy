@@ -44,7 +44,6 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.DateUtil
-import com.tdssrc.grails.ExceptionUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil

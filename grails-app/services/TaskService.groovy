@@ -55,6 +55,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdsops.common.lang.ExceptionUtil
 
 class TaskService implements InitializingBean {
 
@@ -1601,8 +1602,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		} catch (RuntimeException e) {
 			errored = true
 			detail = e.getMessage()
-			log.error e.getMessage()
-			e.printStackTrace()
+			log.error "$e\n${ExceptionUtil.stackTraceToString(e)}"
 		} 
 
 		// Mark the job's progress Competed or Failed accordingly 
