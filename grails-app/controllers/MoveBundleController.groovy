@@ -103,16 +103,19 @@ class MoveBundleController {
 	def show() {
 		userPreferenceService.loadPreferences("MOVE_EVENT")
 		def moveBundleId = params.id
-
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
 		moveBundleId = moveBundleId ? moveBundleId : session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
-		if(moveBundleId){
+		if(moveBundleId?.isInteger()){
 
 			def moveBundleInstance = MoveBundle.get( moveBundleId )
 			//request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
-			def project = securityService.getUserCurrentProject()
-			def projectId = project.id
 
-			if(!moveBundleInstance) {
+			if(moveBundleInstance?.project?.id != projectId){
+				flash.message = "Unable to locate the specified bundle."
+				redirect(action:"list")
+			}else{
+				if(!moveBundleInstance) {
 				flash.message = "MoveBundle not found with id ${moveBundleId}"
 				redirect(action:"list")
 			} else {
@@ -142,8 +145,14 @@ class MoveBundleController {
 				return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager,
 					moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton,
 					isDefaultBundle:isDefaultBundle ]
+				}	
 			}
+
+			
 		} else {
+			if(moveBundleId){
+				flash.message = "Unable to perform the requested operation."
+			}
 			redirect(action:"list")
 		}
 	}
