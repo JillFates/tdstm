@@ -168,13 +168,17 @@ class UrlMappings {
 			action = [GET:"userProjects"]
 		}
 
+		"/ws/manufacturer/merge" {
+			controller = "wsManufacturer"
+			action = [POST:"merge"]
+		}
+
 		"/maint/backd00r" {
 			controller = "auth"
 			action = [GET:"maintMode"]
 		}
-    	   	
-    	
-    	"500"(view:'/error')
+
+		"500"(view:'/error')
 		"401"(view:'/unauthorized')
 	}
 }

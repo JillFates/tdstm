@@ -83,7 +83,8 @@ tds.manufacturers.controller.SelectManufacturerToMergeDialogController = functio
 					location.reload();
 				},
 				function(data) {
-					alerts.showGenericMsg();
+					alert("Fail: can't merge manufacturers." );
+					$scope.close();
 				}
 			);
 		}
@@ -120,7 +121,7 @@ tds.manufacturers.service.ManufacturerService = function(utils, http, q) {
 			'fromId': mFromId
 		});
 		var deferred = q.defer();
-		http.post(utils.url.applyRootPath('/manufacturer/merge'), params).
+		http.post(utils.url.applyRootPath('/ws/manufacturer/merge'), params).
 		success(function(data, status, headers, config) {
 			deferred.resolve(data);
 		}).

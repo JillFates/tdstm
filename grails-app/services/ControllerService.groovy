@@ -75,14 +75,11 @@ class ControllerService {
 	}
 
 	/**
-	 * Validates is the user have the permission and if not redirect to default page
-	 * @param controller - a reference to the controller
-	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional)
-	 * @return true if the user have the permission
+	 * Validates is the user have the permission
+	 *
+	 * @param perm - the permission (String) or permissions List<String> that the user requires
 	 */
-	boolean checkPermission(controller, perm, logError=true) {
-		def user = securityService.getUserLogin()
-
+	boolean hasPermission(user, perm) {
 		if (perm instanceof String)
 			perm = [perm]
 
@@ -93,6 +90,18 @@ class ControllerService {
 				break
 			}
 		}
+		return hasPerm
+	}
+
+	/**
+	 * Validates is the user have the permission and if not redirect to default page
+	 * @param controller - a reference to the controller
+	 * @param perm - the permission (String) or permissions List<String> that the user requires (optional)
+	 * @return true if the user have the permission
+	 */
+	boolean checkPermission(controller, perm, logError=true) {
+		def user = securityService.getUserLogin()
+		boolean hasPerm = hasPermission(user, perm)
 
 		if (!hasPerm && logError) {
 			def request = RequestContextHolder.currentRequestAttributes().request
@@ -101,6 +110,22 @@ class ControllerService {
 		}
 
 		return hasPerm
+	}
+
+	/**
+	 * Validates is the user have the permission
+	 *
+	 * @param perm - the permission (String) or permissions List<String> that the user requires
+	 */
+	boolean checkPermissionForWS(perm) {
+		def user = securityService.getUserLogin()
+		boolean hasPerm = hasPermission(user, perm)
+
+		if (!hasPerm) {
+			def request = RequestContextHolder.currentRequestAttributes().request
+			securityService.reportViolation("attempted to access ${request.forwardURI} without permission ($perm)", user)
+			throw new UnauthorizedException("Don't have the permission $perm")
+		}
 	}
 
 	/**
