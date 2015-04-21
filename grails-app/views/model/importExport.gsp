@@ -14,6 +14,10 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
+      <%--
+      TODO: Import code removed until import feature be fixed
+      --%>
+      <%--
         <h1>Import</h1>
         <h1 style="font-size: 12px;">Import or export TDS model data. This feature only synchronizes those with the Source TDS flag when checked.</h1>
         <g:form action="upload" method="post" name="importForm" enctype="multipart/form-data" >
@@ -41,7 +45,7 @@
             </table>
           </div>
         </g:form>
-      
+      --%>
       <h1>Export</h1>
 
       <g:form action="export" method="post" name="exportForm" >
