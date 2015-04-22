@@ -182,7 +182,7 @@
 			<g:render template="../assetEntity/modelDialog"/>
 			<g:render template="../assetEntity/entityCrudDivs" />
 			<g:render template="../assetEntity/dependentAdd" />
-			<div id="createStaffDialog" style="display:none;">
+			<div id="createStaffDialog" style="display:none;" class="static-dialog">
 				<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 			</div>
 		</div>

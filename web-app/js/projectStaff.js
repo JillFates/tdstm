@@ -399,9 +399,8 @@ function createPersonDetails(forWhom){
 function openPersonDiv(value, fieldName){
 	if(value=="0"){
 		$("#createStaffDialog").show()
-		$("#createStaffDialog").dialog('option', 'width', 500)
+		$("#createStaffDialog").dialog({ title:"Create Person", width: 500})
 		$("#createStaffDialog").dialog("open")
 		$("#fieldName").val( fieldName )
-		$("#createStaffDialog").dialog( "option", "title", "Create Person" );
 	}
 }
