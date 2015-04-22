@@ -143,7 +143,7 @@
 	
 	<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 	
-	<div id="createStaffDialog" title="Create Staff" style="display:none;">
+	<div id="createStaffDialog" title="Create Staff" style="display:none;" class="static-dialog">
 		<g:render template="createStaff" model="[forWhom:'person']"></g:render>
 	</div>
 	<div class="dialog">
