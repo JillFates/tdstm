@@ -85,6 +85,9 @@
 	color: #FFFFFF;
 	background-color:#5F9FCF;
 }
+.buttonDisabled {
+        color: #A6A2A2 !important;
+}
 
 /* CSS Document */
 .main_body

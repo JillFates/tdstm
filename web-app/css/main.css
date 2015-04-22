@@ -437,9 +437,6 @@ span.cellWithoutBackground
 .pointer {
 	cursor:pointer;
 }
-.disableButton{
-	color: #A6A2A2 !important;
-}
 .capBtn{
 	margin:15px;
 }
