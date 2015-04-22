@@ -89,12 +89,12 @@
     </script>
   </head>
   <body>   
-    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 250px; margin:9px 14px 0px">
-			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
-		    <tds:hasPermission permission='MoveBundleEditView '>
-		    	<span class="menuButton"><g:link class="create" action="create" >Create Bundle</g:link></span>
-			</tds:hasPermission>
-		</div>
+    <div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 300px; margin:9px 14px 0px">
+		<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
+		<tds:hasPermission permission='MoveBundleEditView '>
+			<span class="menuButton"><g:link class="create" action="create" >Create Bundle</g:link></span>
+		</tds:hasPermission>
+	</div>
     <div class="body" style="width: 330px;">
     	<div class="steps_table" style="float: none;">
       	<span class="span"><b> Bundle Details </b></span>
@@ -107,9 +107,12 @@
             <tr class="prop">
               <td valign="top" class="name">Name:</td>
 
-              <td valign="top" class="value">${fieldValue(bean:moveBundleInstance, field:'name')}</td>
+				<td valign="top" class="value">
+					${fieldValue(bean:moveBundleInstance, field:'name')}
+					<g:if test="${isDefaultBundle}"> (Default)</g:if>
+				</td>
 
-            </tr>
+	        </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Description:</td>
@@ -204,9 +207,6 @@
               </g:else></td>
 
             </tr>
-            
-            
-
           </tbody>
         </table>
       </div>
@@ -215,9 +215,11 @@
           <input type="hidden" name="id" value="${moveBundleInstance?.id}" />
           <input type="hidden" name="projectId" value="${projectId}" />
           <tds:hasPermission permission='MoveBundleEditView '>
-	          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
-	          <span class="button"><g:actionSubmit class="delete" onclick="return warning('${isDefaultBundle}', 'delete')" value="Delete" /></span>
-	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return warning('${isDefaultBundle}', 'deleteBundleAndAssets')" value="Delete bundle and assets" /></span>
+			<span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
+			<g:if test="${! isDefaultBundle}">
+				<span class="button"><g:actionSubmit class="delete" onclick="return warning('${isDefaultBundle}', 'delete')" value="Delete" /></span>
+				<span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return warning('${isDefaultBundle}', 'deleteBundleAndAssets')" value="Delete Bundle &amp; Assets" /></span>
+			</g:if>
           </tds:hasPermission>
         </g:form>
       </div>
