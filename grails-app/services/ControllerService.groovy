@@ -241,7 +241,7 @@ class ControllerService {
 
 		if (bundle && bundle.project != project) {
 			log.error "SECURITY : getBundleForPage() User $user attempted to access an event ($id) unrelated to project ${project?.id}"
-			event = null
+			bundle = null
 		}
 
 		if (! bundle) {

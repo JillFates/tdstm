@@ -218,9 +218,6 @@
 	          <span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
 	          <span class="button"><g:actionSubmit class="delete" onclick="return warning('${isDefaultBundle}', 'delete')" value="Delete" /></span>
 	          <span class="button"><g:actionSubmit class="delete" action="deleteBundleAndAssets" onclick="return warning('${isDefaultBundle}', 'deleteBundleAndAssets')" value="Delete bundle and assets" /></span>
-          <g:if test="${showHistoryButton}">
-          		<span class="button"><g:actionSubmit class="delete" onclick="return warning('${isDefaultBundle}', 'history')" value="Clear Asset History" action="clearBundleAssetHistory"/></span>
-          </g:if>
           </tds:hasPermission>
         </g:form>
       </div>

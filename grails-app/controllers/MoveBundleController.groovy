@@ -26,17 +26,19 @@ import com.tds.asset.AssetType
 
 class MoveBundleController {
 
-	def commentService
 	def jdbcTemplate
+
+	def commentService
+	def controllerService
 	def moveBundleService
 	def partyRelationshipService
+	def progressService
+	def quartzScheduler
 	def securityService
 	def stateEngineService
 	def stepSnapshotService
-    def taskService
+	def taskService
 	def userPreferenceService
-	def progressService
-	def quartzScheduler
     
 	protected static String dependecyBundlingAssetType = "('server','vm','blade','Application','Files','Database','Appliance','Storage')"  
 	protected static Map dependecyBundlingAssetTypeMap = ['SERVER':true,'VM':true,'BLADE':true,'APPLICATION':true,'FILES':true,'DATABASE':true,'APPLIANCE':true,'STORAGE':true]
@@ -100,61 +102,42 @@ class MoveBundleController {
 
 		render jsonData as JSON
 	}
+
 	def show() {
-		userPreferenceService.loadPreferences("MOVE_EVENT")
-		def moveBundleId = params.id
-		def project = securityService.getUserCurrentProject()
-		def projectId = project.id
-		moveBundleId = moveBundleId ? moveBundleId : session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
-		if(moveBundleId?.isInteger()){
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		if (! project) 
+			return
 
-			def moveBundleInstance = MoveBundle.get( moveBundleId )
-			//request.getSession(false).setAttribute("MOVEBUNDLE",moveBundleInstance)
-
-			if(moveBundleInstance?.project?.id != projectId){
-				flash.message = "Unable to locate the specified bundle."
-				redirect(action:"list")
-			}else{
-				if(!moveBundleInstance) {
-				flash.message = "MoveBundle not found with id ${moveBundleId}"
-				redirect(action:"list")
-			} else {
-				userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
-				def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
-				//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-				def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
-				//PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_BUNDLE_STAFF' and p.partyIdFrom = $moveBundleInstance.id and p.roleTypeCodeFrom = 'MOVE_BUNDLE' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-
-
-				// get the list of Manual Dashboard Steps that are associated to moveBundle.project
-				def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance])
-				def dashboardSteps = []
-
-				moveBundleSteps .each{
-					def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
-					dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
-				}
-				def showHistoryButton = false
-				def bundleTransition = AssetTransition.findAll("FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundleInstance.id})" )
-
-				if( bundleTransition.size() > 0 )
-					showHistoryButton = true
-					
-				def isDefaultBundle = moveBundleInstance.id == project.defaultBundle.id ? true : false
-
-				return [ moveBundleInstance : moveBundleInstance, projectId:projectId, projectManager: projectManager,
-					moveManager: moveManager, dashboardSteps:dashboardSteps, showHistoryButton : showHistoryButton,
-					isDefaultBundle:isDefaultBundle ]
-				}	
-			}
-
-			
-		} else {
-			if(moveBundleId){
-				flash.message = "Unable to perform the requested operation."
-			}
+		def moveBundleId = params.id ?: session.getAttribute("CURR_BUNDLE")?.CURR_BUNDLE;
+		def moveBundleInstance = controllerService.getBundleForPage(this, project, userLogin, moveBundleId)
+		if (! moveBundleInstance) {
 			redirect(action:"list")
+			return
 		}
+
+		userPreferenceService.setPreference( "CURR_BUNDLE", "${moveBundleInstance.id}" )
+		def projectManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "PROJ_MGR" )
+		def moveManager = partyRelationshipService.getPartyToRelationship( "PROJ_BUNDLE_STAFF", moveBundleInstance.id, "MOVE_BUNDLE", "MOVE_MGR" )
+
+		// get the list of Manual Dashboard Steps that are associated to moveBundle.project
+		def moveBundleSteps = MoveBundleStep.findAll('FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',[mb:moveBundleInstance])
+		def dashboardSteps = []
+
+		moveBundleSteps .each{
+			def stepSnapshot = StepSnapshot.findAll("FROM StepSnapshot ss WHERE ss.moveBundleStep = :msb ORDER BY ss.dateCreated DESC",[msb:it, max:1])
+			dashboardSteps << [moveBundleStep : it, stepSnapshot : stepSnapshot[0] ]
+		}
+			
+		def isDefaultBundle = (moveBundleInstance.id == project.defaultBundle.id)
+
+		return [ 
+			moveBundleInstance: moveBundleInstance, 
+			projectId: project.id, 
+			projectManager: projectManager,
+			moveManager: moveManager, 
+			dashboardSteps: dashboardSteps, 
+			isDefaultBundle: isDefaultBundle 
+		]
 	}
 
 	def delete() {
