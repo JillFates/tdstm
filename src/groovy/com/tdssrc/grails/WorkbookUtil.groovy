@@ -82,7 +82,7 @@ class WorkbookUtil {
 		return result
 	}
 
-	public static getStringCellValue(sheet, columnIdx, rowIdx, defaultValue=null) {
+	public static getStringCellValue(sheet, columnIdx, rowIdx, defaultValue="") {
 		def result = defaultValue
 		def cell = getCell(sheet, columnIdx, rowIdx)
 		if (cell) {

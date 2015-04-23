@@ -259,10 +259,11 @@ class ReportsController {
 		def sortBy = params.reportSort
 		def comment = params.commentInfo
 		def reportFormat = params._format
+
 		if( params.reportSort == "sourceLocation" ) {
-			sortBy = params.reportSort+",source_room,source_rack,source_rack_position"
+			sortBy = "roomSource.roomName,ac.assetEntity.rackSource.tag,ac.assetEntity.sourceRackPosition"
 		}else if( params.reportSort == "targetLocation" ){
-			sortBy = params.reportSort+",target_room,target_rack,target_rack_position"
+			sortBy = "roomTarget.roomName,ac.assetEntity.rackTarget.tag,ac.assetEntity.targetRackPosition"
 		}
 		if( params.reportResolveInfo == "false" ){
 			resolvedInfoInclude = "Resolved issues were not included"
@@ -719,8 +720,10 @@ class ReportsController {
 				response.setContentType( "application/vnd.ms-excel" )
 				def filename = 	"CablingData-${projectInstance.name}-${bundleName}.xls"
 					filename = filename.replace(" ", "_")
+					filename = filename.replace(".xls",'')
 				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-				
+				response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+
 				def book = new HSSFWorkbook(new FileInputStream( file ));
 				
 				def sheet = book.getSheet("cabling_data")
