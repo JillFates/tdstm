@@ -783,7 +783,11 @@ class AssetEntityController {
 					def skippedAdded=0
 					for ( int r = 1; r < dependencySheetRow ; r++ ) {
 						int rowNum = r+1
-						def assetId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 1, r ).replace("'","\\'"), 0).round()
+						def assetId = null
+						def assetIdCell = WorkbookUtil.getStringCellValue(dependencySheet, 1, r )
+						if(assetIdCell){
+							assetId = NumberUtils.toDouble(assetIdCell.replace("'","\\'"), 0).round()
+						}
 						def assetName
 						def assetClass
 						if (!assetId) {
@@ -797,7 +801,11 @@ class AssetEntityController {
 						}
 
 						def assetDep
-						def depId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 0, r ).replace("'","\\'"), 0).round()
+						def depIdCell = WorkbookUtil.getStringCellValue(dependencySheet, 0, r )
+						def depId = null
+						if(depIdCell){
+							depId = NumberUtils.toDouble(depIdCell.replace("'","\\'"), 0).round()
+						} 
 						if (depId) {
 							assetDep =  depId ? AssetDependency.get(depId) : null
 							if (assetDep) {
