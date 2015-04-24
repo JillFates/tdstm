@@ -65,6 +65,7 @@ grails.project.dependency.resolution = {
 		compile ':jqgrid:3.8.0.1'
 		compile ':plugin-config:0.2.0'
 		compile ':jquery-ui:1.8.15'
+		compile ":grails-melody:1.54.0"
 	}
 }
 
