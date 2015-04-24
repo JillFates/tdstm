@@ -715,24 +715,26 @@ class ReportsController {
 			cablesQuery.append(" order By acm.assetFrom ")
 			def assetCablesList = AssetCableMap.findAll( cablesQuery.toString() )
 			try {
-				File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()
 				//set MIME TYPE as Excel
-				response.setContentType( "application/vnd.ms-excel" )
-				def filename = 	"CablingData-${projectInstance.name}-${bundleName}.xls"
-					filename = filename.replace(" ", "_")
-					filename = filename.replace(".xls",'')
-				response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-				response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+				if (assetCablesList.size() == 0) {
+					flash.message = "No data found for the selected filter"
+					redirect( controller:'reports', action:"retrieveBundleListForReportDialog", params:[reportId:'CablingData', message:flash.message] )
+				} else {
+					File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Cabling_Details.xls" ).getFile()					
 
-				def book = new HSSFWorkbook(new FileInputStream( file ));
-				
-				def sheet = book.getSheet("cabling_data")
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-				assetEntityService.cablingReportData(assetCablesList, sheet)
-				
-				book.write(response.getOutputStream())
+					response.setContentType( "application/vnd.ms-excel" )
+					def filename = 	"CablingData-${projectInstance.name}-${bundleName}.xls"
+						filename = filename.replace(" ", "_")
+						filename = filename.replace(".xls",'')
+					response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
+					response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
 
+					def book = new HSSFWorkbook(new FileInputStream( file ));
+
+					def sheet = book.getSheet("cabling_data")
+					assetEntityService.cablingReportData(assetCablesList, sheet)
+					book.write(response.getOutputStream())
+				}
 			} catch( Exception ex ) {
 				log.error "Exception occurred while exporting cabling data: " + ExceptionUtil.stackTraceToString(ex)
 				flash.message = "Exception occurred while exporting data"

@@ -1665,22 +1665,22 @@ class AssetEntityService {
 	 */
 	def cablingReportData( assetCablesList, cablingSheet ){
 		for ( int r = 2; r <= assetCablesList.size(); r++ ) {
-			addCell(cablingSheet, r, 0, String.valueOf(assetCablesList[r-2].assetFromPort.type ))
+			addCell(cablingSheet, r, 0, String.valueOf(assetCablesList[r-2].assetFromPort?.type ))
 			addCell(cablingSheet, r, 1, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" ))
 			addCell(cablingSheet, r, 2, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" ))
-			addCell(cablingSheet, r, 3, String.valueOf(assetCablesList[r-2].assetFromPort.label ))
+			addCell(cablingSheet, r, 3, String.valueOf(assetCablesList[r-2].assetFromPort?.label ))
 			addCell(cablingSheet, r, 4, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" ))
 			addCell(cablingSheet, r, 5, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" ))
-			if(assetCablesList[r-2].assetFromPort.type !='Power'){
+			if(assetCablesList[r-2].assetFromPort && assetCablesList[r-2].assetFromPort.type && assetCablesList[r-2].assetFromPort.type !='Power'){
 				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" ))
 			}else{
 				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].toPower?:"" ))
 			}
 			addCell(cablingSheet, r, 7, String.valueOf(assetCablesList[r-2].cableComment?:"" ))
 			addCell(cablingSheet, r, 8, String.valueOf(assetCablesList[r-2].cableColor?:"" ))
-			if(assetCablesList[r-2].assetFrom.sourceRoom){
+			if(assetCablesList[r-2].assetFrom?.sourceRoom){
 				addCell(cablingSheet, r, 9, String.valueOf(assetCablesList[r-2].assetFrom?.rackSource?.location+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack ))
-			}else if(assetCablesList[r-2].assetFrom.targetRoom){
+			}else if(assetCablesList[r-2].assetFrom?.targetRoom){
 				addCell(cablingSheet, r, 9, String.valueOf(assetCablesList[r-2].assetFrom?.rackTarget?.location+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack ))
 			}else{
 				addCell(cablingSheet, r, 9, '')
