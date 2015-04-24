@@ -111,7 +111,7 @@ class WorkbookUtil {
 					break;
 			}
 		}
-		return result
+		return result?:defaultValue
 	}
 
 	public static applyStyleToCell(sheet, columnIdx, rowIdx, style) {
