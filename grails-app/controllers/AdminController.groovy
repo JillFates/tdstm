@@ -1566,7 +1566,7 @@ class AdminController {
 	}
 
 	/**
-	 * Used to display the application memory consumption
+	 * Used to display the application memory consumption along with runtime configuration and performance data
 	 */
 	def systemInfo() {
 
@@ -1604,12 +1604,6 @@ class AdminController {
 		long virtMemCommit = osMxBean.getCommittedVirtualMemorySize() / MegaBytes
 
 		Map sysProps = rtMXBean.getSystemProperties()
-/*
-	Max Memory (Xmx): ${String.format("%,10d", maxMemory)}
-	    Total Memory: ${String.format("%,10d", totalMemory)}
-	     Used Memory: ${String.format("%,10d", usedMemory)}
-	     Free Memory: ${String.format("%,10d", freeMemory)}
-*/
 
 		render (template:'systemInfo', model:
 			['freeMemory':freeMemory,

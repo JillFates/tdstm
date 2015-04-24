@@ -9,7 +9,7 @@
 		}
 	</style>
 </head>
-<body>
+<body style="font-family:'helvetica','arial';">
 <div class="body">
 <div>
 	<h1>System Info</h1>
@@ -20,6 +20,7 @@
 	<h3>Memory Usage (Kb):</h3>
 	<br>
 	<pre>
+       ---- System ----	
  Physical Memory: ${String.format("%,10d", sysMemSize)}
      Used Memory: ${String.format("%,10d", sysMemSize - sysMemFree)}
      Free Memory: ${String.format("%,10d", sysMemFree)}
@@ -28,21 +29,21 @@
        Swap Used: ${String.format("%,10d", swapSize - swapFree)}
        Swap Free: ${String.format("%,10d", swapFree)}
 
-     ---- Heap ----
+       ---- Heap ----
              Max: ${String.format("%,10d", heapMax)}
        Committed: ${String.format("%,10d", heapCommitted)}
             Used: ${String.format("%,10d", heapUsed)}
      	    Free: ${String.format("%,10d", freeMemory)}
 
-     -- Non-Heap --
-       Committed: ${String.format("%,10d", nonHeapCommitted)}
+       ---- Non-Heap ----
              Max: ${String.format("%,10d", nonHeapMax)}
+       Committed: ${String.format("%,10d", nonHeapCommitted)}
             Used: ${String.format("%,10d", nonHeapUsed)}
             Free: ${String.format("%,10d", nonHeapMax - nonHeapUsed)}
 	</pre>
 	
 	<h3>Memory Pools:</h3>
-	<table>
+	<table style="border-spacing: 5px; border-collapse: separate; border: 1px solid black;">
 		<tr>
 			<th>Name</th>
 			<th>Type</th>
@@ -71,42 +72,42 @@
 			<td>${item.name}</td>
 			<td>${item.type}</td>
 			<td style="text-align: right">
-				<g:if test="${item.usage}">${String.format("%.2f",item.usage?.init / 1048576)}</g:if>
+				<g:if test="${item.usage}">${String.format("%,.2f",item.usage?.init / 1048576)}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${item.usage}">${String.format("%.2f",item.usage?.used / 1048576)}</g:if>
+				<g:if test="${item.usage}">${String.format("%,.2f",item.usage?.used / 1048576)}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${item.usage}">${String.format("%.2f",item.usage?.committed / 1048576)}</g:if>
+				<g:if test="${item.usage}">${String.format("%,.2f",item.usage?.committed / 1048576)}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${item.usage}">${String.format("%.2f",item.usage?.max / 1048576)}</g:if>
-			</td>
-
-			<td style="text-align: right">
-				<g:if test="${item.peakUsage}">${String.format("%.2f",item.peakUsage?.init / 1048576)}</g:if>
-			</td>
-			<td style="text-align: right">
-				<g:if test="${item.peakUsage}">${String.format("%.2f",item.peakUsage?.used / 1048576)}</g:if>
-			</td>
-			<td style="text-align: right">
-				<g:if test="${item.peakUsage}">${String.format("%.2f",item.peakUsage?.committed / 1048576)}</g:if>
-			</td>
-			<td style="text-align: right">
-				<g:if test="${item.peakUsage}">${String.format("%.2f",item.peakUsage?.max / 1048576)}</g:if>
+				<g:if test="${item.usage}">${String.format("%,.2f",item.usage?.max / 1048576)}</g:if>
 			</td>
 
 			<td style="text-align: right">
-				<g:if test="${item.collectionUsage}">${String.format("%.2f",item.collectionUsage?.init / 1048576)}</g:if>
+				<g:if test="${item.peakUsage}">${String.format("%,.2f",item.peakUsage?.init / 1048576)}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${item.collectionUsage}">${String.format("%.2f",item.collectionUsage?.used / 1048576)}</g:if>
+				<g:if test="${item.peakUsage}">${String.format("%,.2f",item.peakUsage?.used / 1048576)}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${item.collectionUsage}">${String.format("%.2f",item.collectionUsage?.committed / 1048576)}</g:if>
+				<g:if test="${item.peakUsage}">${String.format("%,.2f",item.peakUsage?.committed / 1048576)}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${item.collectionUsage}">${String.format("%.2f",item.collectionUsage?.max / 1048576)}</g:if>
+				<g:if test="${item.peakUsage}">${String.format("%,.2f",item.peakUsage?.max / 1048576)}</g:if>
+			</td>
+
+			<td style="text-align: right">
+				<g:if test="${item.collectionUsage}">${String.format("%,.2f",item.collectionUsage?.init / 1048576)}</g:if>
+			</td>
+			<td style="text-align: right">
+				<g:if test="${item.collectionUsage}">${String.format("%,.2f",item.collectionUsage?.used / 1048576)}</g:if>
+			</td>
+			<td style="text-align: right">
+				<g:if test="${item.collectionUsage}">${String.format("%,.2f",item.collectionUsage?.committed / 1048576)}</g:if>
+			</td>
+			<td style="text-align: right">
+				<g:if test="${item.collectionUsage}">${String.format("%,.2f",item.collectionUsage?.max / 1048576)}</g:if>
 			</td>
 		</tr>
 		</g:each>
@@ -132,13 +133,14 @@
 				<g:if test="${gcitem.collectionTime}">${gcitem.collectionTime}</g:if>
 			</td>
 			<td style="text-align: right">
-				<g:if test="${gcitem.collectionCount && gcitem.collectionTime}">${String.format("%.2f",gcitem.collectionTime / gcitem.collectionCount)}</g:if>
+				<g:if test="${gcitem.collectionCount && gcitem.collectionTime}">${String.format("%,.2f",gcitem.collectionTime / gcitem.collectionCount)}</g:if>
 			</td>
 		</tr>
 		</g:each>
 	</table>
-	<b>Note:</b> <i>PS Scavenge is used on the young (eden, survivor) generation and PS MarkSweep is used on the old generation</i>
+
 	<br>
+	<b>Note:</b> <i>PS Scavenge is used on the young (eden, survivor) generation and PS MarkSweep is used on the old generation</i>
 	<br>
 
 	<h3>System Information:</h3>
