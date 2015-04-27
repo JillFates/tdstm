@@ -824,9 +824,14 @@ class AssetEntityController {
 						def asset
 						if (assetId) {
 							asset = AssetEntity.get(assetId)
+							def invalidAssetMsg = "<li>Invalid asset id ($assetId) on row $rowNum</li>\n"
+							if(!asset){
+								warnMsg += invalidAssetMsg
+								continue
+							}
 							if (asset.project.id != project.id) {
 								securityService.reportViolation("attempted to access asset ($assetId) not assigned to project (${project.id}", userLogin)
-								warnMsg += "<li>Invaild asset id ($assetId) on row $rowNum</li>\n"
+								warnMsg += invalidAssetMsg
 								continue
 							}
 						} else {
@@ -848,10 +853,15 @@ class AssetEntityController {
 						def dependencyId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 4, r ).replace("'","\\'"), 0).round()
 						def dependent
 						if (dependencyId) {
+							def invalidDependency = "<li>Invaild dependent id ($dependencyId) on row $rowNum</li>\n"
 							dependent = AssetEntity.get(dependencyId)
+							if(!dependent){
+								warnMsg += invalidDependency
+								continue
+							}
 							if (dependent.project.id != project.id) {
 								securityService.reportViolation("attempted to access dependent ($dependencyId) not assigned to project (${project.id}", userLogin)
-								warnMsg += "<li>Invaild dependent id ($dependencyId) on row $rowNum</li>\n"
+								warnMsg += invalidDependency
 								continue
 							}
 						} else {
