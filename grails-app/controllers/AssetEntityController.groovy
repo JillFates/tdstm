@@ -1075,6 +1075,8 @@ class AssetEntityController {
 
 			added = serverAdded + appAdded + dbAdded + filesAdded + dependencyAdded
 			
+			commentCount = Math.max(0,commentCount)
+			cablingAdded = Math.max(0,cablingAdded)
 			def message = "<b>Spreadsheet import was successful</b>" +
 				( flagToManageBatches ? '<p>Please click the Manage Batches below to review and post these changes</p>' : '' ) +
 				'<p>Results: <ul>' +
