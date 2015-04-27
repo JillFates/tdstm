@@ -399,6 +399,7 @@ function createPersonDetails(forWhom){
 function openPersonDiv(value, fieldName){
 	if(value=="0"){
 		$('#createDialogForm')[0].reset()
+		$("#funcsCreateTbodyId" ).empty();
 		$("#createStaffDialog").show()
 		$("#createStaffDialog").dialog({ title:"Create Person", width: 500})
 		$("#createStaffDialog").dialog("open")
