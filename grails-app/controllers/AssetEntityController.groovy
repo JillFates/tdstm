@@ -31,6 +31,7 @@ import org.springframework.web.multipart.commons.*
 
 import java.util.regex.Matcher
 import org.hibernate.criterion.Order
+import org.hibernate.criterion.CriteriaSpecification;
 
 import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
@@ -2599,7 +2600,7 @@ class AssetEntityController {
 			eq("commentType", AssetCommentType.TASK) 
 			if (params.viewUnpublished.equals("0"))
 				eq("isPublished", true)
-			assetEntity {
+			assetEntity(CriteriaSpecification.LEFT_JOIN) {
 				if (params.assetType)
 					ilike('assetType', "%${params.assetType}%")
 				if (params.assetName)
