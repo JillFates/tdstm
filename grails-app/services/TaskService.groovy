@@ -5067,26 +5067,29 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}			
 		}
 		
-		if (limitDays == null || !limitDays.isNumber()) {
+		boolean listAll=limitDays='All'
+		if (!listAll && (limitDays == null || !limitDays.isNumber() ) ) {
 			throw new IllegalArgumentException('Not a valid limitDays')
 		}
 		
 		def startCreationDate = new Date()
 		startCreationDate = startCreationDate - limitDays.toInteger()
-		log.info("Start date" + startCreationDate)
+		log.debug("Start date" + startCreationDate)
 		
 		def c = TaskBatch.createCriteria()
 		def queryResults = []
 
 		if (recipe == null) {
 			queryResults = c.list {
-				ge("dateCreated", startCreationDate)
+				if (!listAll)
+					ge("dateCreated", startCreationDate)
 				eq("project", currentProject)
 				order("dateCreated", "desc")
 			}
 		} else {
 			queryResults = c.list {
-				ge("dateCreated", startCreationDate)
+				if (!listAll)
+					ge("dateCreated", startCreationDate)
 				eq("recipe", recipe)
 				order("dateCreated", "desc")
 			}
