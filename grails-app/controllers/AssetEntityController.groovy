@@ -853,7 +853,7 @@ class AssetEntityController {
 						def dependencyId = NumberUtils.toDouble(WorkbookUtil.getStringCellValue(dependencySheet, 4, r ).replace("'","\\'"), 0).round()
 						def dependent
 						if (dependencyId) {
-							def invalidDependency = "<li>Invaild dependent id ($dependencyId) on row $rowNum</li>\n"
+							def invalidDependency = "<li>Invalid dependent id ($dependencyId) on row $rowNum</li>\n"
 							dependent = AssetEntity.get(dependencyId)
 							if(!dependent){
 								warnMsg += invalidDependency
