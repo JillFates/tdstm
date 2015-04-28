@@ -73,7 +73,7 @@ describe('Server list', function(){
     
     it('should save created comment',function(){ 
       var taskCommenModal = new TaskModal();
-      taskCommenModal.saveTaskBtn.click();
+      taskCommenModal.saveCommentBtn.click();
       expect(taskCommenModal.editCommentModal.isPresent()).toBe(false );
   });
 

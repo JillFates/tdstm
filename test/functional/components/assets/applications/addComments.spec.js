@@ -259,7 +259,7 @@ describe('Comments - Application', function(){
   }); //Assets dropdowns
   
     it('should save created comment',function(){ 
-      commentModal.saveTaskBtn.click();
+      commentModal.saveCommentBtn.click();
       expect(commentModal.editCommentModal.isPresent()).toBe(false);
     });
   }); //Create Comment Modal
@@ -362,7 +362,7 @@ describe('Comments - Application', function(){
       
       it('should save created comment',function(){ 
         var commentModal = new TaskModal();
-        commentModal.saveTaskBtn.click();
+        commentModal.saveCommentBtn.click();
         expect(commentModal.editCommentModal.isPresent()).toBe(false);
       });
 
@@ -428,7 +428,7 @@ describe('Comments - Application', function(){
 
       it('should save the changes and display comment Details modal', function(){
         var commentModal = new TaskModal();
-        commentModal.saveTaskBtn.click();
+        commentModal.saveCommentBtn.click();
         expect(commentModal.editCommentModal.isPresent()).toBe(false);
         expect(commentModal.detailsTaskModal.isPresent()).toBe(true);
       });

@@ -85,7 +85,9 @@ var TaskModal = function(){
   this.getStatusSelected = function(){
     return browser.executeScript('return $("[ng-model=\'ac.status\'] option:checked").text()');
   };
-  this.saveTaskBtn = $('[ng-click="saveComment(true)"]');
+  // this.saveTaskBtn = $('[ng-click="saveComment(true)"]');
+  this.saveTaskBtn = $('#saveAndCloseBId');
+  this.saveCommentBtn = $('#saveAndViewBId');
   // comments
   this.editCommentModal = element(by.id('editCommentPopup'));
   this.editCommentTitle = $('#editCommentPopup #ui-id-5');
