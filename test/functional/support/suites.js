@@ -1,15 +1,15 @@
 module.exports = {
   test1: [
-    '../components/projects/createProject.spec.js',
-    '../components/planning/bundles.spec.js',
-    '../components/assets/applications/createApp.spec.js',
-    '../components/assets/applications/addTask.spec.js',
-    '../components/assets/applications/addComments.spec.js'
+    // '../components/projects/createProject.spec.js',
+    // '../components/planning/bundles.spec.js',
+    // '../components/assets/applications/createApp.spec.js',
+    // '../components/assets/applications/addTask.spec.js',
+    // '../components/assets/applications/addComments.spec.js'
     ],
   test2:[
-    '../components/assets/devices/createServer.spec.js',
-    '../components/assets/databases/createDatabase.spec.js',
-    '../components/projects/deleteProject.spec.js'
+    // '../components/assets/devices/createServer.spec.js',
+    // '../components/assets/databases/createDatabase.spec.js',
+    // '../components/projects/deleteProject.spec.js'
   ],
   projects:[
     '../components/projects/listProjects.spec.js',
@@ -41,7 +41,7 @@ module.exports = {
     '../components/admin/syncLibraries.spec.js',
     '../components/dataCenters/rooms.spec.js',
     '../components/dataCenters/rackElevations.spec.js',
-    '../components/assets/dependencyAnalyzer.spec.js',
+    // '../components/assets/dependencyAnalyzer.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
     ], 

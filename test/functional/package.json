@@ -2,15 +2,23 @@
   "name": "TEST",
   "description": "Webdriver E2E test",
   "dependencies": {
-    "selenium-webdriver": "2.42.1",
+    "selenium-webdriver": "2.44.0",
     "minijasminenode": "1.1.1",
-    "jasminewd": "1.0.4",
-    "jasmine-reporters": "~0.2.1",
+    "jasminewd": "1.1.0",
+    "jasminewd2": "0.0.2",
+    "jasmine": "2.1.1",
     "phantomjs": "1.9.13"
   },
   "devDependencies": {
+    "protractor": "1.8.0",
     "mysql": "^2.5.4",
-    "protractor": "1.1.1",
+    "jasmine-reporters": "~2.0.0",
+    "jasmine-spec-reporter": "2.1.0",
+    "protractor-screenshot-reporter": "~0.0.5",
+    "jshint": "2.5.0",
     "xlsjs": "~0.7.2"
+  },
+  "repository": {
+    "type":"svn"
   }
 }
