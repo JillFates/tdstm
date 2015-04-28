@@ -62,7 +62,7 @@ class WsDashboardController {
 		// Get the step data either by runbook tasks or     	
 		if (moveBundle) {
 			if (project.runbookOn) {
-
+				
 	    		// TODO - remove references to mbs MoveBundleStep 
 
 				def taskStatsSql = """
@@ -88,10 +88,10 @@ class WsDashboardController {
 					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
 					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
 					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wft.trans_id
-					WHERE a.move_bundle_id = ${moveBundleId} AND t.move_event_id = ${moveEventId}
+					WHERE a.move_bundle_id = ${moveBundleId} AND t.move_event_id = ${moveEventId} AND t.is_published = 1
 					GROUP BY t.workflow_transition_id;
 				"""
-				
+
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 
 				// log.info "bundleData() SQL = $taskStatsSql"

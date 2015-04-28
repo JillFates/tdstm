@@ -5067,11 +5067,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}			
 		}
 		
-		boolean listAll=limitDays='All'
+		boolean listAll=(limitDays=='All')
 		if (!listAll && (limitDays == null || !limitDays.isNumber() ) ) {
 			throw new IllegalArgumentException('Not a valid limitDays')
 		}
-		
+
 		def startCreationDate = new Date()
 		startCreationDate = startCreationDate - limitDays.toInteger()
 		log.debug("Start date" + startCreationDate)
