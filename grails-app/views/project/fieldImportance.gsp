@@ -14,11 +14,13 @@
 <body>
 	<h1 class="assetFieldHeader1">Project Field Settings</h1><br>
 <div ng-app="MyApp" id="ng-app" ng-controller="assetFieldImportanceCtrl">
-	<div style="margin-left:20px;">
-		<h2>Custom Fields Shown:
-		<g:select ng-model="customShown" name="customFieldSelect" from="${Project.constraints.customFieldsShown.inList}" 
-                         value="customShown" ng-change="updateCustomFieldsShown();" /></h2>
-    </div>
+	<tds:hasPermission permission='EditProjectFieldSettings'>
+		<div style="margin-left:20px;">
+			<h2>Custom Fields Shown:
+			<g:select ng-model="customShown" name="customFieldSelect" from="${Project.constraints.customFieldsShown.inList}" 
+	                         value="customShown" ng-change="updateCustomFieldsShown();" /></h2>
+	    </div>
+	</tds:hasPermission>
     <div>
 		<div class="legend" >
 				<h1 class="assetImage" ng-click="toggleLegend()">Legend
