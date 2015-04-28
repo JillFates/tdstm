@@ -1,3 +1,4 @@
+'use strict';
 function ConnectDatabase () {
 	var mysql = require('../../../node_modules/mysql');
 	this.connection = mysql.createConnection({
@@ -6,5 +7,5 @@ function ConnectDatabase () {
 		password: '',
 		database:'tdstm'
 	});
-};
+}
 module.exports = ConnectDatabase;

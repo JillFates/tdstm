@@ -17,6 +17,7 @@ describe('Create Project', function(){
     
     describe('cleanup',function(){
       var exist;
+      
       it('should find the project to delete', function(){
         listProjectPage.setSearchProjectCode('TP01');
         expect(listProjectPage.getSearchProjectCode().getAttribute('value')).toEqual('TP01');
@@ -35,6 +36,7 @@ describe('Create Project', function(){
           }
         });
       });
+      
       it('should delete the project if exists', function(){
         if(exist){
           listProjectPage.selectProjectfromListByPos(1,'TP01');
@@ -58,6 +60,7 @@ describe('Create Project', function(){
           });
         }
       });
+    
     });//cleanup
 
     it('should load create project page after hitting create project button',function(){
@@ -71,8 +74,6 @@ describe('Create Project', function(){
     });
 
     it('should select id 2444 as client', function(){
-      // need to update this to search by marketing demo, instead of selecting by position
-      // to avoid issues if the database change.
       projectPage.selectAClient('2444');
       expect(projectPage.getclientSelect().getAttribute('value')).toEqual('2444');
     });

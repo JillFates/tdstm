@@ -6,6 +6,17 @@ var Menu = function(){
     return browser.driver.getCurrentUrl();
   };
   
+  this.waitForURL = function (expUrl) {
+    return browser.wait(function () {
+      return browser.driver.getCurrentUrl().then(function (url) {
+        console.log('expurl', expUrl);
+        console.log('url',url);
+        return expUrl === url;
+      });
+    }).then(function () {
+      return true;
+    });
+  };
   this.getHeaderTitle = function(){
     return browser.driver.findElement(by.css(this.titleCss));
   };
@@ -246,8 +257,8 @@ var Menu = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/dependencyConsole"]'));
   };
   this.getArchitectureViewer = function () {
-    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/architectureViewer"]'))
-  }
+    return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/architectureViewer"]'));
+  };
   this.getAssetsHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAssetOverview?cover=print\',\'help\');"]'));
   };
@@ -357,6 +368,9 @@ var Menu = function(){
     var d = {
       'listEvents':function(){
 
+      },
+      'listEventNews':function () {
+        that.getListEventNews().click();
       },
       'listBundles':function(){
         that.getListBundles().click();

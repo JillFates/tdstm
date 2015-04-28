@@ -283,6 +283,7 @@ describe('Project Staff Page', function() {
 
   });
 
-  
-
+  xit('should not allow to assigned a person for a different team',function () {
+    
+  });
 }); // Project Staff
