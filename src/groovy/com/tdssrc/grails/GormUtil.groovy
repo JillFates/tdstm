@@ -152,11 +152,11 @@ public class GormUtil {
 		def version = NumberUtil.toLong(params.version)
 		if (version.is(null)) {
 			println "domainVersionCheck failed on domain $domainObj for no version id parameter"
-			throw new RuntimeException("The $label version was missing from request")
+			throw new DomainUpdateException("The $label version was missing from request")
 		} else {
 			if (domainObj.version > version) {
 
-				throw new RuntimeException("The $label was updated by someone while you were editting therefore your changes were not saved.")
+				throw new DomainUpdateException("The $label was updated by someone while you were editting therefore your changes were not saved.")
 			}
 		}
 	}

@@ -189,12 +189,7 @@ class ApplicationService {
 
 		assetEntityService.assignAssetToBundle(project, asset, params['moveBundle.id'])
 
-		if (! asset.validate() || ! asset.save(flush:true)) {
-			log.debug "Unable to update device ${GormUtil.allErrorsString(asset)}"
-			throw new DomainUpdateException("Unable to update asset ${GormUtil.allErrorsString(asset)}".toString())
-		}
-
-		def errors = assetEntityService.createOrUpdateAssetEntityDependencies(asset.project, userLogin, asset, params)
+		def errors = assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
 		if (errors) {
 			throw new DomainUpdateException("Unable to update dependencies : $errors".toString())
 		}

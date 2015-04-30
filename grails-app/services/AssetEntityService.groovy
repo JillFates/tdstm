@@ -475,18 +475,23 @@ class AssetEntityService {
 	}
 
 	/**
-	 * This method is used to update dependencies for all entity types
+	 * This method is used for updating an asset and its dependencies for all entity types.
 	 * @param project : Instance of current project
 	 * @param loginUser : Instance of current logged in user
 	 * @param assetEntity : instance of entity including Server, Application, Database, Files
 	 * @param params : params map received from client side
 	 * @return List of error came while updating dependencies (if any)
 	 */	
-	List<String> createOrUpdateAssetEntityDependencies(Project project, UserLogin userLogin, AssetEntity assetEntity, def params) {
+	List<String> createOrUpdateAssetEntityAndDependencies(Project project, UserLogin userLogin, AssetEntity assetEntity, def params) {
 		List errors = []
 
 		AssetDependency.withTransaction() { status->
 			try {
+
+				if (! assetEntity.validate() || ! assetEntity.save(flush:true)) {
+					throw new DomainUpdateException("Unable to update asset ${GormUtil.allErrorsString(assetEntity)}".toString())
+				}
+
 				// Verifying assetEntity assigned to the project
 				validateAssetsAssocToProject([assetEntity.id], project) 
 
@@ -524,15 +529,17 @@ class AssetEntityService {
 				errors << 'An error occurred that prevented the update'
 			}
 
-			if (errors.size())
+			if (errors.size()){
+				assetEntity.discard()
 				status.setRollbackOnly()			
+			}
 		}
 
 		return errors
 	}
 
 	/**
-	 * A helper method for createOrUpdateAssetEntityDependencies which does the actual adds and updates of dependencies from the web request
+	 * A helper method for createOrUpdateAssetEntityAndDependencies which does the actual adds and updates of dependencies from the web request
 	 * @param project - instance of the user's currently assigned project
 	 * @param userLogin - the user object that made the request
 	 * @param depType - what dependency type is being updated (options support|dependent)
