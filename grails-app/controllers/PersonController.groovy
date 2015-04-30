@@ -13,7 +13,8 @@ import com.tds.asset.AssetComment
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.WebUtil;
+import com.tdssrc.grails.WebUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
@@ -40,6 +41,9 @@ class PersonController {
 	 * @param companyName - optional search by name or 'ALL'
 	 */
 	def list() {
+		if (!controllerService.checkPermission(this, 'PersonListView', true)) 
+			return
+
 		def listJsonUrl
 		def company
 		def currentCompany = securityService.getUserCurrentProject()?.client
@@ -70,6 +74,9 @@ class PersonController {
 	}
 	
 	def listJson() {
+		if (!controllerService.checkPermission(this, 'PersonListView', true)) 
+			return
+
 		def sortIndex = params.sidx ?: 'lastname'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows?:'25')
@@ -160,7 +167,16 @@ class PersonController {
 	
 	}
 
-	def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, person) {
+	/**
+	 * Creates an anchor for specific user based on user permission
+	 *
+	 * @param haveCreateUserLoginPerm boolean value that indicates if the user have CreateUserLoginPerm
+	 * @param haveEditUserLoginPerm boolean value that indicates if the user have EditUserLoginPerm
+	 * @param createUrl url used to create a new login for the current person
+	 * @param editUrl url used to edit login configuration for the current person
+	 * @param person person object to be displayed
+	 */
+	private def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, person) {
 		def element = ""
 		if (person.userLoginId) {
 			if (haveEditUserLoginPerm) {
@@ -182,11 +198,6 @@ class PersonController {
 	 * Used to bulk delete Person objects as long as they do not have user accounts or assigned tasks and optionally associated with assets
 	 */
 	def bulkDelete() {
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
-			ServiceResults.unauthorized(response)
-			return
-		}
 		def ids = params.get("ids[]") 
 		if (!ids) {
 			render(ServiceResults.invalidParams('Please select at least one person to be be bulk deleted.') as JSON)
@@ -201,6 +212,7 @@ class PersonController {
 		
 
 		try {
+			controllerService.checkPermissionForWS('BulkDeletePerson') 
 			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'true'
 			def data = personService.bulkDelete(loginUser, ids, deleteIfAssocWithAssets)
 			render(ServiceResults.success(data) as JSON)
@@ -217,9 +229,14 @@ class PersonController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
+	/**
+	 * Note: No reference found to this method
+	 */
 	def show() {
-			
+		if (!controllerService.checkPermission(this, 'PersonEditView')) 
+			return
+
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		if(!personInstance) {
@@ -232,8 +249,13 @@ class PersonController {
 		}
 	}
 
+	/**
+	 * Note: No reference found to this method
+	 */
 	def delete() {
-			
+		if (!controllerService.checkPermission(this, 'PersonDeleteView')) 
+			return
+
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		if ( personInstance ) {
@@ -267,8 +289,14 @@ class PersonController {
 			redirect( action:"list", params:[ id:companyId ] )
 		}
 	}
-	// return person details to EDIT form
+	/**
+	 * return person details to EDIT form
+	 * Note: No reference found to this method
+	 */
 	def edit() {
+		if (!controllerService.checkPermission(this, 'PersonEditView'))
+			return
+
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		if(!personInstance) {
@@ -283,8 +311,11 @@ class PersonController {
 
 	/**
 	 * Used to update the Person domain objects
+	 * Note: No reference found to this method
 	 */
 	def update() {
+		if (!controllerService.checkPermission(this, 'PersonEditView')) 
+			return
 			
 		def person = Person.get( params.id )
 			
@@ -320,6 +351,9 @@ class PersonController {
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
 	def save() {
+		if (!controllerService.checkPermission(this, 'PersonCreateView')) 
+			return
+
 		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're 
 		// going to use the company associated with the current project.
 		def isAjaxCall = params.forWhom != "person"
@@ -403,11 +437,14 @@ class PersonController {
 		}
 
 	}
-
-
-	//	Ajax Overlay for show
+	/*
+	 *  Remote method to edit Staff Details
+	 *  Note: No reference found to this method
+	 */
 	def editShow() {
-		
+		if (!controllerService.checkPermission(this, 'PersonEditView')) 
+			return
+
 		def personInstance = Person.get( params.id )        
 		def companyId = params.companyId
 		def companyParty = Party.findById(companyId)
@@ -429,10 +466,15 @@ class PersonController {
 			render items as JSON
 		}
 	}
-	//ajax overlay for Edit
+	/*
+	 *  Remote method to edit Staff Details
+	 *  Note: Used only in projectStaff.gsp
+	 */
 	def editStaff() {
+		if (!controllerService.checkPermission(this, 'EditProjectStaff')) 
+			return
+
 		def map = new HashMap()
-		// TODO - SECURITY - this should have some VALIDATION to who has access to which Staff...
 		def personInstance = Person.read( params.id )
 		def role = params.role
 		def company = partyRelationshipService.getStaffCompany( personInstance )
@@ -454,8 +496,12 @@ class PersonController {
 	}
 	/*
 	 *  Remote method to update Staff Details
+	 *  Note: Used only in projectStaff.gsp
 	 */
 	def updateStaff() {
+		if (!controllerService.checkPermission(this, 'EditProjectStaff')) 
+			return
+
 		def personInstance = Person.get( params.id )
 		def projectId = session.CURR_PROJ.CURR_PROJ
 		def roleType = params.roleType
@@ -487,8 +533,12 @@ class PersonController {
 	}
 	/*
 	 *  Return Project Staff 
+	 *  Note: there is no direct call to this method
 	 */
 	def projectStaff() {
+		if (!controllerService.checkPermission(this, 'ProjectStaffList')) 
+			return
+
 		def projectId = session.CURR_PROJ.CURR_PROJ
 		def submit = params.submit
 		def role = ""
@@ -503,7 +553,9 @@ class PersonController {
 	 * Method to add Staff to project through Ajax Overlay 
 	 */
 	def saveProjectStaff() {
-		
+		if (!controllerService.checkPermission(this, 'EditProjectStaff')) 
+			return
+
 		def flag = false
 		def message = ''
 		
@@ -515,7 +567,7 @@ class PersonController {
 			def projectParty = securityService.getUserCurrentProject()
 			def personParty = Person.findById( personId )
 			def projectStaff
-			if(request.JSON.val == "1") {
+			if(NumberUtil.toInteger(request.JSON.val) == 1) {
 				projectStaff = partyRelationshipService.deletePartyRelationship("PROJ_STAFF", projectParty, "PROJECT", personParty, roleType )
 				def moveEvents = MoveEvent.findAllByProject(projectParty)
 				def results = MoveEventStaff.executeUpdate("delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",[moveEvents:moveEvents, person:personParty,role:RoleType.read(roleType)])
@@ -545,8 +597,12 @@ class PersonController {
 	}
 	/*
 	 * Method to save person details and create party relation with Project as well 
+	 * Note: Used only in projectStaff.gsp
 	 */
 	def savePerson() {
+		if (!controllerService.checkPermission(this, 'PersonEditView'))
+			return
+
 		def personInstance = new Person( params )
 		
 		//personInstance.dateCreated = new Date()
@@ -581,6 +637,11 @@ class PersonController {
 	 * @return : person details as JSON
 	 *----------------------------------------------------------*/
 	def retrievePersonDetails() {
+		if (!controllerService.checkPermission(this, 'PersonEditView', false)) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		def personId = params.id
 		def person = Person.findById( personId  )
 		def userLogin = UserLogin.findByPerson( person )
@@ -599,10 +660,14 @@ class PersonController {
 	 * @return : pass:"no" or the return of the update method
 	 *----------------------------------------------------------*/
 	def checkPassword() {
+		if (!controllerService.checkPermission(this, 'PersonEditView')) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		if(params.oldPassword == "")
-			return updatePerson(params)
+			return updatePerson()
 		def password = "" + params.newPassword;
-		
 			
 		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
 		if(securityService.validPassword(userLogin.username, params.newPassword)){
@@ -610,7 +675,7 @@ class PersonController {
 			def passwordInput = new Sha1Hash(params.oldPassword).toHex()
 			
 			if(truePassword.equals(passwordInput))
-				return updatePerson(params)
+				return updatePerson()
 			def ret = []
 			ret << [pass:"no"]
 			render  ret as JSON
@@ -627,6 +692,11 @@ class PersonController {
 	 * @return : person firstname
 	 *----------------------------------------------------------*/
 	def updatePerson() {
+		if (!controllerService.checkPermission(this, 'PersonEditView', false)) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		def personInstance = Person.get(params.id)
 		def ret = []
 		params.travelOK == "1" ? params : (params.travelOK = 0)
@@ -709,6 +779,9 @@ class PersonController {
 	}
 	
 	def resetPreferences ={
+		if (!controllerService.checkPermission(this, 'PersonEditView'))
+			return
+
 		def person = Person.findById(params.user)
 		def personInstance = UserLogin.findByPerson(person)
 		def prePreference = UserPreference.findAllByUserLogin(personInstance).preferenceCode
@@ -726,6 +799,9 @@ class PersonController {
 	 * 
 	 */
 	def manageProjectStaff() {
+		if (!controllerService.checkPermission(this, 'EditProjectStaff'))
+			return
+
 		def start = new Date()
 		
 		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
@@ -820,6 +896,11 @@ class PersonController {
 	 * @return HTML 
 	 */
 	def loadFilteredStaff() {
+		if (!controllerService.checkPermission(this, 'ProjectStaffList', false)) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		def role = request.JSON.role ?: 'AUTO'
 		def projectId = (request.JSON.project.isNumber()) ? (request.JSON.project.toLong()) : (0)
 		def scale = request.JSON.scale
@@ -940,9 +1021,12 @@ class PersonController {
 	 *@param role - type of role to filter staff list
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
+	 * Note: There is no reference to this method
 	 */
 	def retrieveStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
-	
+		if (!controllerService.checkPermission(this, 'ProjectStaffList'))
+			return
+
 		def sortOn = paramsMap.sortOn ?:"fullName"
 		def orderBy = paramsMap.orderBy?:'asc'
 		def firstProp = paramsMap.firstProp ? (paramsMap.firstProp && paramsMap.firstProp == 'company' ? '' :paramsMap.firstProp) : 'staff'
@@ -1088,6 +1172,11 @@ class PersonController {
 	 *@return NA
 	 */
 	def loadGeneral() {
+		if (!controllerService.checkPermission(this, 'ProjectStaffShow', false)) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		log.info "class: ${params.personId.class}    value: ${params.personId}"
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
@@ -1115,7 +1204,7 @@ class PersonController {
 	 *@param moveEvents list of moveEvent for selected project
 	 *@return MAP of bundle header containing projectName ,event name, start time and event id
 	 */
-	def retrieveBundleHeader(moveEvents) {
+	private def retrieveBundleHeader(moveEvents) {
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
 		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
@@ -1153,13 +1242,12 @@ class PersonController {
 	 */
 	def saveEventStaff() {
 		// Validates the user is logged in.
-		def loginUser = securityService.getUserLogin()
-		if (loginUser == null) {
+		if (!controllerService.checkPermission(this, 'EditProjectStaff')) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 		try{
-			String message = personService.assignToProject(request.JSON.personId, request.JSON.eventId, request.JSON.roleType, request.JSON.val)
+			String message = personService.assignToProject(request.JSON.personId, request.JSON.eventId, request.JSON.roleType, NumberUtil.toInteger(request.JSON.val))
 			def flag = message.size() == 0
 			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
 		} catch (UnauthorizedException e) {
@@ -1261,6 +1349,10 @@ class PersonController {
 	 * @return : all column list , person list and userlogin list which we are display at client side
 	 */
 	def compareOrMerge() {
+		if (!controllerService.checkPermission(this, 'PersonEditView')) {
+			ServiceResults.unauthorized(response)
+			return
+		}
 		
 		def ids = params.list("ids[]")
 		def personsMap = [:]
@@ -1301,7 +1393,11 @@ class PersonController {
 	 */
 	
 	def mergePerson() {
-		
+		if (!controllerService.checkPermission(this, 'PersonEditView')) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+
 		def toPerson = Person.get(params.toId)
 		def fromPersons = params.list("fromId[]")
 		def personMerged = []

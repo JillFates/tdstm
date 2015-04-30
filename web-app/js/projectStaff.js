@@ -88,7 +88,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 		scope.toggleCheckbox(source, val );
 		var project = row.find('#projectColumnId').children('input')
 		
-		var params = {'personId':personId, 'val':val, 'roleType':roleType, 'eventId':eventId }
+		var params = {'personId':personId, 'val':((val + 1) % 2), 'roleType':roleType, 'eventId':eventId }
 
 		http.post( contextPath+'/person/saveEventStaff', params).then(
 			function(response){
@@ -99,12 +99,9 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 					scope.toggleCheckbox(source, val);
 					source.val((val + 1) % 2);		
 				}
-
-
-				
 			},
-			function(response){
-				alerts.addAlert({type: 'danger', msg: 'Error: ' + "An unexpected error occurred while attempting to update Person's MoveEvent "});
+			function(response) {
+				tdsCommon.displayWsError(response, "Error: An unexpected error occurred while attempting to update Person's MoveEvent", alerts);
 			}
 		);
 	};
@@ -150,7 +147,7 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 
 			},
 			function(response){
-				alerts.addAlert({type: 'danger', msg: 'Error: ' + "An error occurred loading persons."});
+				tdsCommon.displayWsError(response, 'Error: An error occurred loading persons.', alerts);
 			}
 		);
 
@@ -214,6 +211,9 @@ function loadPersonDiv(personId,renderPage,redirectTo){
 			$(".mobmenu").removeClass("mobselect")
 			$("#"+currentHeaderShow).addClass("mobselect")
 			$("#personGeneralViewId").dialog('open');
+		},
+		error : function (response) {
+			tdsCommon.displayWsError(response, "Error retriving person information.", false);
 		}
 	});
 	
@@ -249,7 +249,7 @@ function updatePerson(tab,form){
 				$("#"+currentHeaderShow).addClass("mobselect")
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				alert("An unexpected error occurred while attempting to update Person ")
+				tdsCommon.displayWsError(jqXHR, "An unexpected error occurred while attempting to update Person.", false);
 			}
 		});
 	}

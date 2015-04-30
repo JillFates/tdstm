@@ -44,26 +44,28 @@
 
 		// Update person details 
 		function updatePersonDetails( e ){
-			console.log(e);
-			var personDetails = eval("(" + e.responseText + ")");
-			
-			// If the user account is not local, we should hide all password-related functionality.
-			if(!personDetails.isLocal){
-				$(".js-password").each(function(e){
-					$(this).css("display", "none");
-				});
-			}
+			if (tdsCommon.isValidWsResponse(e, "Can't retrive person details", false)) {
+				console.log(e);
+				var personDetails = eval("(" + e.responseText + ")");
+				
+				// If the user account is not local, we should hide all password-related functionality.
+				if(!personDetails.isLocal){
+					$(".js-password").each(function(e){
+						$(this).css("display", "none");
+					});
+				}
 
-			$("#personId").val(personDetails.person.id)
-			$("#firstNameId").val(personDetails.person.firstName);
-			$("#middleNameId").val(personDetails.person.middleName);
-			$("#lastNameId").val(personDetails.person.lastName);
-			$("#nickNameId").val(personDetails.person.nickName);
-			$("#emailId").val(personDetails.person.email);
-			$("#titleId").val(personDetails.person.title);
-			$("#expiryDateId").val(personDetails.expiryDate);
-			$("#personDialog").dialog('option', 'width', 540)
-		    $("#personDialog").dialog("open")
+				$("#personId").val(personDetails.person.id)
+				$("#firstNameId").val(personDetails.person.firstName);
+				$("#middleNameId").val(personDetails.person.middleName);
+				$("#lastNameId").val(personDetails.person.lastName);
+				$("#nickNameId").val(personDetails.person.nickName);
+				$("#emailId").val(personDetails.person.email);
+				$("#titleId").val(personDetails.person.title);
+				$("#expiryDateId").val(personDetails.expiryDate);
+				$("#personDialog").dialog('option', 'width', 540);
+				$("#personDialog").dialog("open");
+			}
 		}
 		function changePersonDetails(){
 			var returnVal = true 
@@ -167,16 +169,18 @@
 			}
 		}
 		function updateWelcome( e ){
-			var ret = eval("(" + e.responseText + ")");
-			if(ret[0].pass == "no")
-				alert("Old Password is incorrect")
-			else if(ret[0].pass == "invalid")
-				alert("New Password does not meet the requirements")
-			else{
-				$("#loginUserId").html(ret[0].name)
-				$("#tzId").html(ret[0].tz)
-				$("#personDialog").dialog('close')
-				window.location.reload()
+			if (tdsCommon.isValidWsResponse(e, "Can't update person information", false)) {
+				var ret = eval("(" + e.responseText + ")");
+				if(ret[0].pass == "no")
+					alert("Old Password is incorrect")
+				else if(ret[0].pass == "invalid")
+					alert("New Password does not meet the requirements")
+				else{
+					$("#loginUserId").html(ret[0].name)
+					$("#tzId").html(ret[0].tz)
+					$("#personDialog").dialog('close')
+					window.location.reload()
+				}
 			}
 		}
 		function setUserTimeZone( tz ){

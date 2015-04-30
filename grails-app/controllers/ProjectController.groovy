@@ -121,9 +121,6 @@ class ProjectController {
 			return [ projectInstance : currProjectInstance, projectPartner:projectPartner, 
 					 projectManager:projectManager, moveManager:moveManager, 
 					 projectLogoForProject:projectLogoForProject ]
-		} else {
-			flash.message = "Project not found with id ${params.id}"
-			redirect(action:"list")
 		}
 	}
 
@@ -151,18 +148,14 @@ class ProjectController {
 		def projectInstance = controllerService.getProjectForPage(this, "ProjectEditView")
 		def projectDetails
 		def moveBundles
-		if (!projectInstance) {
-			flash.message = "Project not found with id ${params.id}"
-			redirect(action:"list")
-		}
-		else {
+		if (projectInstance) {
 			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
 			moveBundles = MoveBundle.findAllByProject(projectInstance)
-		}
-		return [ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
+			return [ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
 				 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
 				 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners,
 				 projectLogoForProject: projectDetails.projectLogoForProject, workflowCodes: projectDetails.workflowCodes, moveBundles:moveBundles ]
+		}				 
 	}
 
 	/*
@@ -375,9 +368,6 @@ class ProjectController {
 											 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
 											 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params, moveBundles:moveBundles] )
 			}
-		} else {
-			flash.message = "Project not found with id ${params.id}"
-			redirect( action:"list", id:params.id )
 		}
 	}
 
@@ -385,6 +375,9 @@ class ProjectController {
 	 * Populate and present the create view for a new project
 	 */
 	def create() {
+		if (!controllerService.checkPermission(this, 'CreateProject')) 
+			return
+
 		def projectInstance = new Project()
 		projectInstance.properties = params
 		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
@@ -397,9 +390,7 @@ class ProjectController {
 	 * create the project and PartyRelationships for the fields prompted
 	 */
 	def save() {
-
-		Project project = controllerService.getProjectForPage(this, 'CreateProject')
-		if (!project) 
+		if (!controllerService.checkPermission(this, 'CreateProject')) 
 			return
 
 		//projectInstance.dateCreated = new Date()

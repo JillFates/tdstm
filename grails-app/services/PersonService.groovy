@@ -740,7 +740,7 @@ class PersonService {
 					def project = moveEvent.project ?: securityService.getUserCurrentProject()
 					if(hasAccessToProject(person, project)){
 						def moveEventStaff = MoveEventStaff.findAllByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
-						if(moveEventStaff && val == "0"){
+						if(moveEventStaff && val == 0){
 							moveEventStaff.delete(flush:true)
 						} else if( !moveEventStaff ) {
 							def projectStaff = partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, roleType )

@@ -115,8 +115,8 @@ class ProjectService {
 		def sortOn = searchParams.sortOn?:ProjectSortProperty.PROJECT_CODE
 		def sortOrder = searchParams.sortOrder?:SortOrder.ASC
 		def projParams=searchParams.params?: [:]
-		def person = searchParams.personId?:userLogin.person
-		def personId = person.id
+		def personId = searchParams.personId?:userLogin.person.id
+		def person = Person.get(personId)
 		def companyParty = partyRelationshipService.getStaffCompany( person )
 
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id

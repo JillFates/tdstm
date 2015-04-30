@@ -448,7 +448,7 @@
 			<table class="mmtable"><tr>
 			<td style="vertical-align:top"><span class="megamenuSection">${session.getAttribute("LOGIN_PERSON").name }</span><br />
 				<ul>
-					<li><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(e)">Account Details...</g:remoteLink></li>
+					<li><g:remoteLink controller="person" action="retrievePersonDetails" id="${session.getAttribute('LOGIN_PERSON').id}" onComplete="updatePersonDetails(XMLHttpRequest)">Account Details...</g:remoteLink></li>
 					<li><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${user}" onclick="editPreference()">Edit preferences</a></li>
 					<li><g:link class="home mmlink" controller="clientTeams" action="listTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li>
 					<g:if test="${person?.modelScore}">

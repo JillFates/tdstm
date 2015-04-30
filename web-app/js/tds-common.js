@@ -82,6 +82,47 @@ var tdsCommon = {
 			window.location.href = tdsCommon.createAppURL('/auth/login');
 		}
 		return 'An error occurred during search';
+	},
+
+	/**
+	 * Check if the response is valid and if not show a message
+	 */
+	isValidWsResponse: function(response, errorMsg, alerts) {
+		var isValid = true;
+		if (response.status != 200) {
+			isValid = false;
+			this.displayWsError(response, errorMsg, alerts);
+		}
+		return isValid;
+	},
+
+	/**
+	 * A common error response handler that display different errors base on http status
+	 */
+	displayWsError: function(response, errorMsg, alerts) {
+		switch (response.status) {
+			case 401:
+			case 403:
+				this.displayError("You don't have permissions to do this operation.", alerts);
+				break;
+			default:
+				if (errorMsg != null) {
+					this.displayError(errorMsg, useAlerts);
+				} else {
+					this.displayError("An unexpected error occurred. Please try again.", alerts);
+				}
+		}
+	},
+
+	/**
+	 * Display a message error using the alerts server or the defauls javascript alert
+	 */
+	displayError: function(msg, alerts) {
+		if (alerts) {
+			alerts.addAlert({type: 'danger', msg: msg});
+		} else {
+			alert(msg);
+		}
 	}
 
 }

@@ -50,8 +50,8 @@ var Person = {
 					}
 				}
 			}
-		}).fail(function() {
-			alert('Error deleting people');
+		}).fail(function(response) {
+			tdsCommon.displayWsError(response, "Error deleting people.", false);
 		});
 	},
 
@@ -74,6 +74,9 @@ function compareOrMerge(){
 			$("#showOrMergeId").dialog('option', 'width', 'auto')
 			$("#showOrMergeId").dialog('option', 'position', ['center','top']);
 			$("#showOrMergeId").dialog('open')
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			tdsCommon.displayWsError(jqXHR, "Error retrieving users information.", false);
 		}
 	});
 }
@@ -117,7 +120,7 @@ function mergePerson(){
 			error: function(jqXHR, textStatus, errorThrown) {
 				$("#spinnerId").hide()
 				$("#messageId").hide()
-				alert("An unexpected error occurred while attempting to Merge Persons")
+				tdsCommon.displayWsError(jqXHR, "An unexpected error occurred while attempting to Merge Persons.", false);
 			}
 			
 		});
