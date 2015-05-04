@@ -218,7 +218,7 @@ class DeviceService {
 		*/
 		def errors = assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
 		if (errors) {
-			throw new DomainUpdateException("Unable to update dependencies : $errors".toString())
+			throw new DomainUpdateException("Unable to update asset : $errors".toString())
 		}
 
 		saveUserPreferencesForDevice(asset)
