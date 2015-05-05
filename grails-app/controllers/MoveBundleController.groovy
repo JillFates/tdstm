@@ -518,16 +518,11 @@ class MoveBundleController {
 		def deviceCountQuery = "$selectCount $deviceQuery"	
 		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') NOT IN (:type)"
 
-		def apps = Application.findAll(appQuery, countArgs)
-		def applicationCount = apps.size()
+		// def apps = Application.findAll(appQuery, countArgs)
+		//def applicationCount = apps.size()
 
 		def databaseCount = Database.executeQuery(dbCountQuery, countArgs)[0]
 		def fileCount = Files.executeQuery(filesCountQuery, countArgs)[0]
-		def phyStorageCount = AssetEntity.executeQuery(phyStorageCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes()])[0]
-		def allServerCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes()] )[0]
-		def physicalCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes()] )[0]		
-		def virtualCount = AssetEntity.executeQuery( deviceCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0]	
-		def otherAssetCount = AssetEntity.executeQuery( otherCountQuery, countArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes()] )[0]
 
  		// Get the list of apps and servers assigned to planning bundles
 		def applicationsOfPlanningBundle = Application.findAll(appQuery, countArgs) 
@@ -563,7 +558,6 @@ class MoveBundleController {
 			def virtualAssetCount = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes() ])[0] : 0
 			def serverCnt = moveBundles ? AssetEntity.executeQuery(deviceCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getAllServerTypes() ])[0] : 0
 			
-			// assetList << [physicalCount:physicalAssetCount, virtualAssetCount:virtualAssetCount, count:allServersCount, moveEvent:moveEvent.id]
 			allServerList << [moveEvent:moveEvent.id , count:serverCnt]
 			phyServerList << [moveEvent:moveEvent.id , count:physicalAssetCount]
 			virtServerList << [moveEvent:moveEvent.id , count:virtualAssetCount]
@@ -604,94 +598,124 @@ class MoveBundleController {
 			 assetCountQueryArgs.unassignedMoveBundles = unassignedMoveBundles
 		}
 
-		// Get DB Counts
-		def unAssignedDBCountQuery = "SELECT COUNT(ae) FROM Database ae WHERE ae.project=:project AND $unassignedMBQuery"
-		def unassignedDbCount = Database.executeQuery(unAssignedDBCountQuery, assetCountQueryArgs)[0]
-		
-		// Get Storage Counts
-		def unAssignedFilesCountQuery = "SELECT COUNT(ae) FROM Files ae WHERE ae.project=:project AND $unassignedMBQuery"
-		def unassignedFilesCount = Files.executeQuery(unAssignedFilesCountQuery, assetCountQueryArgs)[0]
-		
-		def unAssignedPhyStorgCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND $unassignedMBQuery $assetTypeQuery"
-		def unAssignedPhyStorgCount = AssetEntity.executeQuery(unAssignedPhyStorgCountQuery,  assetCountQueryArgs + [assetClass:AssetClass.DEVICE, type:AssetType.getStorageTypes() ])[0]
+		// Get majority of the unassigned counts
+		def unassignedDbCount = 0
+		def unassignedFilesCount = 0
+		def unassignedAppCount = 0
+		def unassignedDeviceCount = 0
+		def applicationCount = 0
+		int movedAppCount = 0
+		int confirmedAppCount = 0
+		int assignedAppCount = 0
 
-		// Get Application Counts
-		def unAssignedAppsCountQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND $unassignedMBQuery"
-		def unassignedAppCount =  Application.executeQuery(unAssignedAppsCountQuery, assetCountQueryArgs)[0] 
+		def basicCountsQuery = """SELECT 
+				assetClass, 
+				COUNT(ae) AS all1,
+				SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END )  AS allUnassigned2,
+				SUM( CASE WHEN ae.planStatus=:movedStatus THEN 1 ELSE 0 END )     AS allMoveded3,
+				SUM( CASE WHEN ae.planStatus=:confirmedStatus THEN 1 ELSE 0 END ) AS allConfirmed4
+			FROM AssetEntity ae
+			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles) 
+			GROUP BY ae.assetClass"""
+
+		def basicCountsParams = [ 
+			project: project, 
+			moveBundles: moveBundleList, 
+			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
+			movedStatus: AssetEntityPlanStatus.MOVED,
+			confirmedStatus: AssetEntityPlanStatus.CONFIRMED ]
+
+		def basicCountsResults = AssetEntity.executeQuery(basicCountsQuery, basicCountsParams)
+		basicCountsResults.each { ua ->
+			switch(ua[0]) {
+				case AssetClass.APPLICATION:
+					applicationCount = ua[1]
+					unassignedAppCount = ua[2]
+					assignedAppCount = applicationCount - unassignedAppCount
+					movedAppCount = ua[3]
+					confirmedAppCount = movedAppCount + ua[4]
+					break;
+				case AssetClass.DATABASE:
+					unassignedDbCount = ua[2]; break;
+				case AssetClass.DEVICE:
+					unassignedDeviceCount = ua[2]; break;
+				case AssetClass.STORAGE:
+					unassignedFilesCount = ua[2]; break;
+			}
+		}
+		// Calculate the Assigned Application Count
 		def totalAssignedApp = applicationCount - unassignedAppCount
+		def unassignedAssetCount = unassignedDbCount + unassignedFilesCount + unassignedAppCount + unassignedDeviceCount
 		
+		// Get the various DEVICE types broken out
+		def deviceMetricsQuery = """SELECT
+			COUNT(ae) AS allDevices, 
+			SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS allDevicesUnassigned, 			
+			SUM( CASE WHEN ae.assetType IN (:phyTypes) THEN 1 ELSE 0 END ) AS physicalAll, 
+			SUM( CASE WHEN ae.assetType IN (:phyTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS physicalUnassigned, 
+			SUM( CASE WHEN ae.assetType IN (:virtTypes) THEN 1 ELSE 0 END ) AS virtualAll, 
+			SUM( CASE WHEN ae.assetType IN (:virtTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS virtualUnassigned, 
+			SUM( CASE WHEN ae.assetType IN (:storageTypes) THEN 1 ELSE 0 END ) AS storageAll, 
+			SUM( CASE WHEN ae.assetType IN (:storageTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS storageUnassigned, 
+			SUM( CASE WHEN ae.assetType IN (:networkTypes) THEN 1 ELSE 0 END ) AS networkAll, 
+			SUM( CASE WHEN ae.assetType IN (:networkTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS networkUnassigned 
+			FROM AssetEntity ae 
+			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles) AND ae.assetClass=:assetClass"""
+
+		def deviceMetricsParams = [ 
+			project:project, 
+			moveBundles:moveBundleList, 
+			unassignStatus: AssetEntityPlanStatus.UNASSIGNED,
+			assetClass: AssetClass.DEVICE,
+			phyTypes: AssetType.getPhysicalServerTypes(),
+			virtTypes: AssetType.getVirtualServerTypes(),
+			storageTypes: AssetType.getStorageTypes(),
+			networkTypes: AssetType.getNetworkDeviceTypes()
+		]
+		def deviceMetrics = AssetEntity.executeQuery(deviceMetricsQuery, deviceMetricsParams)[0]
+
+		// Assign all the results into variables by ordinal position
+		def (totalDeviceCount, unassignedAllDeviceCount, totalPhysicalServerCount, unassignedPhysicalServerCount,
+			totalVirtualServerCount, unassignedVirtualServerCount, phyStorageCount, unAssignedPhyStorageCount,
+			phyNetworkCount, unAssignedPhyNetworkCount) = deviceMetrics
+
+		// Computed values from previous gathered data points
+		def unassignedServerCount = unassignedPhysicalServerCount + unassignedVirtualServerCount
+		def assignedPhysicalAsset = totalPhysicalServerCount - unassignedPhysicalServerCount
+		def assignedVirtualAsset = totalVirtualServerCount - unassignedVirtualServerCount
+		def totalServerCount = totalPhysicalServerCount + totalVirtualServerCount
+		def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount - phyNetworkCount
+		def unassignedOtherCount = unassignedAllDeviceCount - unassignedPhysicalServerCount - unassignedVirtualServerCount - unAssignedPhyStorageCount - unAssignedPhyNetworkCount
+
+		// TODO - this is unnecessary and could just load the map
 		def latencyQuery = "SELECT COUNT(ae) FROM Application ae WHERE ae.project=:project AND ae.latency=:latency"
 		def likelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'N'])[0]
 		def unlikelyLatency = Application.executeQuery(latencyQuery, [project:project, latency:'Y'])[0]
 		def unknownLatency = applicationCount - likelyLatency - unlikelyLatency
 
-		// Add AssetClass param that will be used for the rest of the queries
-		assetCountQueryArgs.assetClass = AssetClass.DEVICE
-
-		// Get counts on devices/vms
-		def unAssignedCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass $assetTypeQuery AND $unassignedMBQuery"
-		def unassignedAssetCount = AssetEntity.executeQuery(unAssignedCountQuery, assetCountQueryArgs + [ type:AssetType.getAllServerTypes() ] )[0]	
-		def unassignedPhysicalAssetCount = AssetEntity.executeQuery(unAssignedCountQuery, assetCountQueryArgs + [ type:AssetType.getPhysicalServerTypes() ] )[0]
-		def unassignedVirtualAssetCount = AssetEntity.executeQuery(unAssignedCountQuery, assetCountQueryArgs + [ type:AssetType.getVirtualServerTypes() ] )[0]
-
-		def assignedPhysicalAsset = physicalCount - unassignedPhysicalAssetCount
-		def assignedVirtualAsset = virtualCount - unassignedVirtualAssetCount
-
-		// TODO - this is unnecessary and could just load the map
-		def totalPhysicalAssetCount = physicalCount
-		def totalVirtualAssetCount = virtualCount
-
-		// Get the Others Count
-		def unAssignedOtherCountQuery = "SELECT COUNT(ae) FROM AssetEntity ae WHERE ae.project=:project AND ae.assetClass=:assetClass AND " +
-			"$unassignedMBQuery AND COALESCE(ae.assetType,'') NOT IN (:type)"
-		def unassignedOtherCount = AssetEntity.executeQuery(unAssignedOtherCountQuery, assetCountQueryArgs + [ type:AssetType.getNonOtherTypes() ] )[0]
-
 		// ------------------------------------
 		// Calculate the Plan Status values
 		// ------------------------------------
-		//Calculating Moved Applications which planStatus is Moved
-		//TODO-Lok : Need to take planStatus from ENUM but as it is dynamic now so left for John's Review
-		int movedAppCount = moveBundleList ? apps.findAll{it.planStatus == movedPlan}.size() : 0
+		def assignedAppPerc = countAppPercentage(applicationCount, assignedAppCount)
+		def confirmedAppPerc = countAppPercentage(applicationCount, confirmedAppCount)
 		movedAppCount = countAppPercentage(applicationCount, movedAppCount)
-		
-		// Assigned Apps  
-		int assignedAppCount = moveBundleList ? apps.findAll{it.planStatus in [movedPlan, assignedPlan, confirmedPlan]}.size() : 0
-		assignedAppCount = countAppPercentage(applicationCount, assignedAppCount)
-		
-		// Confirmed Apps
-		int confirmedAppCount = moveBundleList ? apps.findAll{it.planStatus in [movedPlan, confirmedPlan]}.size() : 0
-		confirmedAppCount = countAppPercentage(applicationCount, confirmedAppCount)
-		
-		// Calculating App count of which runbook status is done
-		// TODO : @John, can we have runbookStatus as enum 
-		def appDoneCount = moveBundleList ? apps.findAll{it.planStatus == movedPlan}.size() : 0
-		def percAppDoneCount = countAppPercentage(applicationCount, appDoneCount)
-		
-		
-		int percentagePhysicalAssetCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'", 
+		def percAppDoneCount = countAppPercentage(applicationCount, movedAppCount)
+				
+		int percentagePhysicalServerCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'", 
 			countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getPhysicalServerTypes() ] )[0] : 0
 		
-
 		// Quick closure for calculating the percentage below
 		def percOfCount = { count, total ->
 			( total > 0 ? Math.round(count/total*100)  : 0 )
 		}
 		
 		def planStatusMovedQuery = " AND ae.planStatus='$movedPlan'"
-		int percVirtualAssetCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + planStatusMovedQuery, 
-			countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0] : 0
+		int percVirtualServerCount = moveBundleList ? 
+			AssetEntity.executeQuery(deviceCountQuery + planStatusMovedQuery, countArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getVirtualServerTypes()] )[0] 
+			: 0
 		
-//		if (unassignedPhysicalAssetCount==assignedPhysicalAsset){
-//			percentagePhysicalAssetCount = 0;
-//		} else {
-			percentagePhysicalAssetCount = percOfCount(percentagePhysicalAssetCount, physicalCount)
-//		}
-		
-//		if (unassignedVirtualAssetCount==virtualCount){
-//			percVirtualAssetCount = 0;
-//		} else {
-			percVirtualAssetCount = percOfCount(percVirtualAssetCount, virtualCount)
-//		}
+		percentagePhysicalServerCount = percOfCount(percentagePhysicalServerCount, totalPhysicalServerCount)
+		percVirtualServerCount = percOfCount(percVirtualServerCount, totalVirtualServerCount)
 		
 		int percentageDBCount = moveBundleList ? Database.executeQuery(dbCountQuery + planStatusMovedQuery, countArgs)[0] : 0
 		
@@ -787,20 +811,26 @@ class MoveBundleController {
 		
 		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
 		def percentageBundleReady = applicationCount ? percOfCount(bundleReady, applicationCount) : 0
-		def percentagePSToValidate= physicalCount ? percOfCount(psToValidate, physicalCount) :100 
-		def percentageVMToValidate= virtualCount ? percOfCount(vsToValidate, virtualCount) : 100
+		def percentagePSToValidate= totalPhysicalServerCount ? percOfCount(psToValidate, totalPhysicalServerCount) :100 
+		def percentageVMToValidate= totalVirtualServerCount ? percOfCount(vsToValidate, totalVirtualServerCount) : 100
 		def percentageDBToValidate= databaseCount ? percOfCount(dbToValidate, databaseCount) :100
 		def percentageStorToValidate=fileCount ? percOfCount(fileToValidate, fileCount) :100
 		def percentageOtherToValidate= otherAssetCount ? percOfCount(otherToValidate, otherAssetCount) :100
 		def percentageUnassignedAppCount = applicationCount ? percOfCount(unassignedAppCount, applicationCount) :100
 		
 		return [			
-			appList:appList, applicationCount:applicationCount, unassignedAppCount:unassignedAppCount, appToValidate:appToValidate, 
-			unassignedPhysicalAssetCount:unassignedPhysicalAssetCount, 
-			percentagePhysicalAssetCount:percentagePhysicalAssetCount, 
+			appList:appList, 
+			applicationCount:applicationCount, 
+			unassignedAppCount:unassignedAppCount,
+			assignedAppPerc: assignedAppPerc,
+			confirmedAppPerc: confirmedAppPerc, 
+			appToValidate:appToValidate,
+			unassignedServerCount: unassignedServerCount,
+			unassignedPhysicalServerCount:unassignedPhysicalServerCount, 
+			percentagePhysicalServerCount:percentagePhysicalServerCount, 
 			psToValidate:psToValidate, 
-			unassignedVirtualAssetCount:unassignedVirtualAssetCount, 
-			percVirtualAssetCount:percVirtualAssetCount, 
+			unassignedVirtualServerCount:unassignedVirtualServerCount, 
+			percVirtualServerCount:percVirtualServerCount, 
 			vsToValidate:vsToValidate, 
 			dbList:dbList, dbCount:databaseCount, 
 			unassignedDbCount:unassignedDbCount, 
@@ -811,7 +841,7 @@ class MoveBundleController {
 			unassignedFilesCount:unassignedFilesCount, 
 			percentageFilesCount:percentageFilesCount, 
 			fileToValidate:fileToValidate,
-			unAssignedPhyStorgCount:unAssignedPhyStorgCount,
+			unAssignedPhyStorageCount:unAssignedPhyStorageCount,
 			phyStorageCount:phyStorageCount,
 			phyStorageList:phyStorageList,
 			phyStorageToValidate:phyStorageToValidate,
@@ -824,11 +854,11 @@ class MoveBundleController {
 			otherToValidate:otherToValidate, 
 			
 			// assetList:assetList, assetCount:assetCount, 
-			allServerCount: allServerCount,
+			totalServerCount: totalServerCount,
 			allServerList: allServerList,
-			phyServerCount:physicalCount, 
+			phyServerCount:totalPhysicalServerCount, 
 			phyServerList: phyServerList,
-			virtServerCount:virtualCount, 
+			virtServerCount:totalVirtualServerCount, 
 			virtServerList: virtServerList,
 			
 			unassignedAssetCount:unassignedAssetCount, 

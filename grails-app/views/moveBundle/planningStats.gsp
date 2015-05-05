@@ -1,12 +1,11 @@
 <%@page import="com.tds.asset.Application;"%>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta name="layout" content="projectHeader" />
-<g:javascript src="entity.crud.js" />
-<title>Transition Planning Dashboard</title>
-<link type="text/css" rel="stylesheet"
-	href="${resource(dir:'css',file:'bootstrap.css')}" />
+	<title>Transition Planning Dashboard</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<meta name="layout" content="projectHeader" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+
 <script type="text/javascript">
 $(document).ready(function() { 
 	currentMenuId = "#dashboardMenu";
@@ -19,11 +18,11 @@ $(document).ready(function() {
 	var percentageBundleReady="${percentageBundleReady}";
 	$("#analysisbar").animate({width: percentageBundleReady+"%" }, 1000);
 	
-	$("#confirmedbar").animate({width: "${confirmedAppCount}%" }, 1000);
+	$("#confirmedbar").animate({width: "${confirmedAppPerc}%" }, 1000);
 	
-	$("#appmovedbar").animate({width: "${movedAppCount}%" }, 1000);
+	$("#appmovedbar").animate({width: "${movedAppPerc}%" }, 1000);
 
-	$("#assignmentbar").animate({width: "${assignedAppCount}%"}, 1000);
+	$("#assignmentbar").animate({width: "${assignedAppPerc}%"}, 1000);
 	
 	var percentagePSToValidate=100-"${percentagePSToValidate}";
 	$("#physicalbar").animate({width: percentagePSToValidate+"%" }, 1000);
@@ -72,7 +71,7 @@ $(document).ready(function() {
 							
 	});
 </script>
-</head>
+<g:javascript src="entity.crud.js" /></head>
 <body>
 	<div class="body">
 		<div id="containerId" class="container">
@@ -349,92 +348,82 @@ $(document).ready(function() {
 			<div class="dashboard_div col-md-7 col-xs-7" style="float: left;">
 				<span class="dashboard_head">Execution Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
+
+					<%-- Applications Assigned Bar --%>
 					<tr>
-						<td class="dashboard_bar_base"><g:if
-								test="${assignedAppCount == 0}">
+						<td class="dashboard_bar_base">
+							<g:if test="${assignedAppPerc == 0}">
 								<div class="dashboard_bar_graph0">
 									<b>0% Applications Assigned</b>
 								</div>
-
-							</g:if> <g:elseif test="${assignedAppCount == 100}">
-
-								<div class="task_completed"
-									style="z-index: -1; height: 24px; width: 100%"></div>
-								<div class="task_completed"
-									style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
+							</g:if> 
+							<g:elseif test="${assignedAppPerc == 100}">
+								<div class="task_completed" style="z-index: -1; height: 24px; width: 100%"></div>
+								<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
 									<b>100% Applications Assigned</b>
 								</div>
-
-							</g:elseif> <g:else>
-
-								<div class="dashboard_bar_graph" id="assignmentbar"
-									style="width: 0%;"></div>
-								<div
-									style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-									<b> ${assignedAppCount}%
-									</b>
+							</g:elseif> 
+							<g:else>
+								<div class="dashboard_bar_graph" id="assignmentbar" style="width: 0%;"></div>
+								<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+									<b> ${assignedAppPerc}% </b>
 									<g:link controller="application" action="list"
 										params="[filter:'application',plannedStatus:'Assigned']">Applications Assigned</g:link>
 								</div>
-							</g:else></td>
+							</g:else>
+						</td>
 					</tr>
+
+					<%-- Applications Confirmed Bar --%>
 					<tr>
-						<td class="dashboard_bar_base"><g:if
-								test="${confirmedAppCount == 0}">
+						<td class="dashboard_bar_base">
+							<g:if test="${confirmedAppPerc == 0}">
 								<div class="dashboard_bar_graph0">
 									<b>0% Applications Confirmed</b>
 								</div>
-
-							</g:if> <g:elseif test="${confirmedAppCount == 100}">
-
-								<div class="task_completed"
-									style="z-index: -1; height: 24px; width: 100%"></div>
-								<div class="task_completed"
-									style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
-									<b>100% Applications Confirmed</b>
-								</div>
-
-							</g:elseif> <g:else>
-
-								<div class="dashboard_bar_graph" id="confirmedbar"
-									style="width: 0%;"></div>
-								<div
-									style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-									<b> ${confirmedAppCount}%
-									</b>
-									<g:link controller="application" action="list"
-										params="[filter:'application',plannedStatus:'Confirmed']">Applications Confirmed</g:link>
-								</div>
-							</g:else></td>
+							</g:if> 
+							<g:elseif test="${confirmedAppPerc == 100}">
+								<div class="task_completed" style="z-index: -1; height: 24px; width: 100%"></div>
+									<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
+										<b>100% Applications Confirmed</b>
+									</div>
+							</g:elseif> 
+							<g:else>
+								<div class="dashboard_bar_graph" id="confirmedbar" style="width: 0%;"></div>
+									<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+										<b> ${confirmedAppPerc}%
+										</b>
+										<g:link controller="application" action="list"
+											params="[filter:'application',plannedStatus:'Confirmed']">Applications Confirmed</g:link>
+									</div>
+							</g:else>
+						</td>
 					</tr>
 
+					<%-- Applications Moved Bar --%>
 					<tr>
-						<td class="dashboard_bar_base"><g:if
-								test="${movedAppCount == 0}">
+						<td class="dashboard_bar_base">
+							<g:if test="${movedAppPerc == 0}">
 								<div class="dashboard_bar_graph0">
 									<b>0% Applications Moved</b>
 								</div>
-
-							</g:if> <g:elseif test="${movedAppCount == 100}">
-
-								<div class="task_completed"
-									style="z-index: -1; height: 24px; width: 100%"></div>
-								<div class="task_completed"
-									style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
+							</g:if> 
+							<g:elseif test="${movedAppPerc == 100}">
+								<div class="task_completed" style="z-index: -1; height: 24px; width: 100%"></div>
+								<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
 									<b>100% Applications Moved</b>
 								</div>
-
-							</g:elseif> <g:else>
-
-								<div class="dashboard_bar_graph" id="appmovedbar"
-									style="width: 0%;"></div>
-								<div
-									style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-									<b> ${movedAppCount}% </b>
+							</g:elseif> 
+							<g:else>
+								<div class="dashboard_bar_graph" id="appmovedbar" style="width: 0%;"></div>
+								<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+									<b> ${movedAppPerc}% </b>
 									<g:link controller="application" action="list" params="[filter:'application', plannedStatus:'Moved']">Applications Moved</g:link>
 								</div>
-							</g:else></td>
+							</g:else>
+						</td>
 					</tr>
+
 				</table>
 
 				<table class="dashboard_stat_table">
@@ -472,7 +461,7 @@ $(document).ready(function() {
 												<td>
 													<g:link controller="assetEntity"
 														params="[filter:'physicalServer']"
-														action="list" class="links">Physical</g:link>
+														action="list" class="links">&nbsp;&nbsp;&nbsp;Physical</g:link>
 												</td>
 											</tr>
 
@@ -481,7 +470,7 @@ $(document).ready(function() {
 												<td>
 													<g:link controller="assetEntity"
 														params="[filter:'virtualServer']"
-														action="list" class="links">Virtual</g:link>
+														action="list" class="links">&nbsp;&nbsp;&nbsp;Virtual</g:link>
 												</td>
 											</tr>
 											<tr>
@@ -533,7 +522,11 @@ $(document).ready(function() {
 									<table class="dashboard_stat_table">
 										<thead>
 											<tr>
-												<th class="dashboard_stat_exec_td headerWidth" >&nbsp;</th>
+												<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
+													Unassigned
+												</th>
+
+
 												<g:each in="${moveEventList}" var="event">
 													<th class="dashboard_stat_exec_tdmc headerWidth" >
 														<g:link
@@ -546,26 +539,18 @@ $(document).ready(function() {
 												<th class="dashboard_stat_exec_tdmc"></th>
 											</tr>
 											<tr>
-
-												<td class="dashboard_stat_exec_td "><g:link
-														controller="application" action="list"
-														params="[plannedStatus:'Unassigned']">To be</g:link>
-												</td>
 												<g:each in="${moveEventList}" var="event">
-													<td class="dashboard_stat_exec_tdmc "
-														style="font-size: 10px ;"><b>${eventStartDate[event.id]}
-													</b></td>
+													<td class="dashboard_stat_exec_tdmc " style="font-size: 10px ;" nowrap>
+														<b>${eventStartDate[event.id]}</b>
+													</td>
 												</g:each>
 												<td></td>
 											</tr>
 											<tr>
-												<td class="dashboard_stat_exec_td"><g:link
-														controller="application" action="list"
-														params="[plannedStatus:'Unassigned']">Assigned</g:link>
-												</td>
 												<g:each in="${moveEventList}" var="event">
-													<td class="dashboard_stat_exec_tdmc "
-														style="font-size: 10px;"><b> ${event.runbookStatus ?: ''}</b></td>
+													<td class="dashboard_stat_exec_tdmc" style="font-size: 10px;">
+														<b> ${event.runbookStatus ?: ''}</b>
+												</td>
 												</g:each>
 												<td>Done</td>
 											</tr>
@@ -579,17 +564,17 @@ $(document).ready(function() {
 			
 											<%-- Servers (Summary) --%>
 											<g:render template="planningStatsExecRow"
-												model="[assetCount:allServerCount, unassignedCount:unassignedAssetCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]" 
+												model="[assetCount:totalServerCount, unassignedCount:unassignedServerCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]" 
 											/>
 
 											<%-- Physical Servers --%>
 											<g:render template="planningStatsExecRow"
-												model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalAssetCount, percDone:percentagePhysicalAssetCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]" 
+												model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalServerCount, percDone:percentagePhysicalServerCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]" 
 											/>
 										
 											<%-- Virtual Servers --%>
 											<g:render template="planningStatsExecRow"
-												model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualAssetCount, percDone:percVirtualAssetCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]" 
+												model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualServerCount, percDone:percVirtualServerCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]" 
 											/>
 
 											<%-- Databases --%>
@@ -599,7 +584,7 @@ $(document).ready(function() {
 		
 											<%-- Physical Storage --%>
 											<g:render template="planningStatsExecRow"
-												model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorgCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]" 
+												model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorageCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]" 
 											/>
 		
 											<%-- Logical Storage --%>

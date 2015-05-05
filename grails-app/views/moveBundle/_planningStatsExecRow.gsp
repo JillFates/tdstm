@@ -18,7 +18,7 @@
 			<img src="${resource(dir:'images',file:'checked-icon.png')}" />
 		</g:if><g:else>
 			<g:link controller="${controller}" action="list"
-				params="[filter:filter, unassigned:'true']"
+				params="[filter:filter, plannedStatus:'Unassigned']"
 				class="links">
 				${unassignedCount} (${percUnassigned}%)
 			</g:link>
