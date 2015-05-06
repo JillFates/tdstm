@@ -216,11 +216,8 @@ class DeviceService {
 			throw new DomainUpdateException("Unable to update asset ${GormUtil.allErrorsString(asset)}".toString())
 		}
 		*/
-		def errors = assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
-		if (errors) {
-			throw new DomainUpdateException("Unable to update asset : $errors".toString())
-		}
-
+		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
+		
 		saveUserPreferencesForDevice(asset)
 
 		return asset

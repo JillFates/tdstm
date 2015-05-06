@@ -96,10 +96,7 @@ class DatabaseService {
 
 		assetEntityService.assignAssetToBundle(project, asset, params['moveBundle.id'])
 
-		def errors = assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
-		if (errors) {
-			throw new DomainUpdateException("Unable to update asset : $errors".toString())
-		}
+		assetEntityService.createOrUpdateAssetEntityAndDependencies(asset.project, userLogin, asset, params)
 
 		return asset
 	}

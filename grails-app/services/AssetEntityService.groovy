@@ -480,15 +480,15 @@ class AssetEntityService {
 	 * @param loginUser : Instance of current logged in user
 	 * @param assetEntity : instance of entity including Server, Application, Database, Files
 	 * @param params : params map received from client side
-	 * @return List of error came while updating dependencies (if any)
 	 */	
-	List<String> createOrUpdateAssetEntityAndDependencies(Project project, UserLogin userLogin, AssetEntity assetEntity, def params) {
+	def createOrUpdateAssetEntityAndDependencies(Project project, UserLogin userLogin, AssetEntity assetEntity, def params) {
 		List errors = []
-
+		String errObject = 'dependencies'
 		AssetDependency.withTransaction() { status->
 			try {
 
 				if (! assetEntity.validate() || ! assetEntity.save(flush:true)) {
+					errObject = 'asset'
 					throw new DomainUpdateException("Unable to update asset ${GormUtil.allErrorsString(assetEntity)}".toString())
 				}
 
@@ -531,11 +531,10 @@ class AssetEntityService {
 
 			if (errors.size()){
 				assetEntity.discard()
-				status.setRollbackOnly()			
+				status.setRollbackOnly()
+				throw new DomainUpdateException("Unable to update $errObject : $errors".toString())		
 			}
 		}
-
-		return errors
 	}
 
 	/**
