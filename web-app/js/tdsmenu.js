@@ -34,7 +34,6 @@
 		* Script to load the marquee to scroll the live news
 		*--------------------------------------------------*/
 		if(typeof(marqueeInit) == "function"){
-			alert("OK")
 			marqueeInit({
 				uniqueid: 'head_mycrawler',
 				inc: 8, //speed - pixel increment for each iteration of this marquee's movement
