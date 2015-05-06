@@ -19,11 +19,27 @@
 	href="${resource(dir:'plugins/jquery-ui-1.8.15/jquery-ui/themes/ui-lightness',file:'jquery-ui-1.8.15.custom.css')}"/>
 
 <g:javascript src="prototype/prototype.js" />
-<g:javascript src="jquery-1.9.1.js"/>	
+<g:javascript src="jquery-1.9.1.js"/>
 <g:javascript src="jquery-1.9.1-ui.js"/>
 <g:javascript src="datetimepicker.js"/>
 <g:javascript src="jquery-migrate-1.0.0.js"/>
-<g:javascript src="crawler.js" />
+
+<%
+def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
+moveEvent = MoveEvent.findById(moveEventId)
+Date date = new Date()
+def showCrawler = false
+if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
+	if((moveEvent.inProgress != 'false') && (moveEvent.estStartTime <= date) && (moveEvent.estCompletionTime >= date)){
+		showCrawler = true
+	}	
+}
+
+%>
+
+<g:if test="${showCrawler}">
+	<g:javascript src="crawler.js" />
+</g:if>
 <g:javascript src="select2.js"/>
 <g:javascript src="jquery.combox.js"/>	
 <g:javascript src="moment.min.js" />

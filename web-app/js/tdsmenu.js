@@ -33,14 +33,18 @@
 	    /*---------------------------------------------------
 		* Script to load the marquee to scroll the live news
 		*--------------------------------------------------*/
-		marqueeInit({
-			uniqueid: 'head_mycrawler',
-			inc: 8, //speed - pixel increment for each iteration of this marquee's movement
-			mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
-			moveatleast: 4,
-			neutral: 150,
-			savedirection: false
-		});
+		if(typeof(marqueeInit) == "function"){
+			alert("OK")
+			marqueeInit({
+				uniqueid: 'head_mycrawler',
+				inc: 8, //speed - pixel increment for each iteration of this marquee's movement
+				mouse: 'cursor driven', //mouseover behavior ('pause' 'cursor driven' or false)
+				moveatleast: 4,
+				neutral: 150,
+				savedirection: false
+			});	
+		}
+		
 
 		// Update person details 
 		function updatePersonDetails( e ){
