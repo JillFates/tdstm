@@ -117,7 +117,7 @@ function showEditCommentForm(e , rowId){
 			$("#displayOptionTr").hide();
 			$("#commentTypeOption").html("<option>News</option>");
 			$("#assetTrId").hide();
-			$("#showEditCommentDialog").dialog('option','title','Edit News Comment');
+			$("#showEditCommentDialog").dialog('option','title','Edit News');
 
 		} else {
 			
