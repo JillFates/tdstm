@@ -518,9 +518,6 @@ class MoveBundleController {
 		def deviceCountQuery = "$selectCount $deviceQuery"	
 		def otherCountQuery = "$selectCount FROM AssetEntity ae $baseWhere AND ae.assetClass=:assetClass AND COALESCE(ae.assetType,'') NOT IN (:type)"
 
-		// def apps = Application.findAll(appQuery, countArgs)
-		//def applicationCount = apps.size()
-
 		def databaseCount = Database.executeQuery(dbCountQuery, countArgs)[0]
 		def fileCount = Files.executeQuery(filesCountQuery, countArgs)[0]
 
@@ -698,7 +695,7 @@ class MoveBundleController {
 		// ------------------------------------
 		def assignedAppPerc = countAppPercentage(applicationCount, assignedAppCount)
 		def confirmedAppPerc = countAppPercentage(applicationCount, confirmedAppCount)
-		movedAppCount = countAppPercentage(applicationCount, movedAppCount)
+		def movedAppPerc = countAppPercentage(applicationCount, movedAppCount)
 		def percAppDoneCount = countAppPercentage(applicationCount, movedAppCount)
 				
 		int percentagePhysicalServerCount = moveBundleList ? AssetEntity.executeQuery(deviceCountQuery + " AND ae.planStatus='$movedPlan'", 
@@ -792,7 +789,7 @@ class MoveBundleController {
 		def dbValidateCountQuery = dbCountQuery + validationQuery
 		def filesValidateCountQuery = filesCountQuery + validationQuery
 		
-		// TODO - This section could be couple of queries instead of 10
+		// This section could be consolidated to a simple query instead of a bunch
 		def dependencyScan = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyScan'] )[0]
 		def validated = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'Validated'])[0]
 		def dependencyReview = Application.executeQuery(appValidateCountQuery, countArgs+[validation:'DependencyReview'])[0]
@@ -823,7 +820,8 @@ class MoveBundleController {
 			applicationCount:applicationCount, 
 			unassignedAppCount:unassignedAppCount,
 			assignedAppPerc: assignedAppPerc,
-			confirmedAppPerc: confirmedAppPerc, 
+			confirmedAppPerc: confirmedAppPerc,
+			movedAppPerc: movedAppPerc, 
 			appToValidate:appToValidate,
 			unassignedServerCount: unassignedServerCount,
 			unassignedPhysicalServerCount:unassignedPhysicalServerCount, 

@@ -214,15 +214,18 @@ $(document).ready(function() {
 				</h4>
 				<table class="dashboard_stat_table">
 					<tr>
-						<td class="dashboard_stat_td"><g:link
+						<td class="dashboard_stat_td">
+							<g:link
 								controller="application" action="list"
 								params="[filter:'application', toValidate:'Validated']"
-								class="links">
-								${validated}
-							</g:link></td>
-						<td><g:link controller="application" action="list"
+								class="links">${validated}
+							</g:link>
+						</td>
+						<td>
+							<g:link controller="application" action="list"
 								params="[filter:'application', toValidate:'Validated']"
-								class="links">Validated</g:link></td>
+								class="links">Validated</g:link>
+						</td>
 					</tr>
 					<tr>
 						<td class="dashboard_stat_td"><g:link
