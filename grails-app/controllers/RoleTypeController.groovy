@@ -6,7 +6,7 @@ class RoleTypeController {
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
     // return list of Roles
     def list() {
-        if ( !params.max ) params.max = 10
+        if ( !params.max ) params.max = 25
         [ roleTypeInstanceList: RoleType.list( params ) ]
     }
     // return RoleType details to show form

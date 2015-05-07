@@ -6,7 +6,7 @@ class PartyRelationshipController {
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
     
     def list() {
-        if( !params.max ) params.max = 10
+        if( !params.max ) params.max = 25
         [ partyRelationshipInstanceList: PartyRelationship.list( params ) ]
     }
     //  return Party role details by using composite primary Key

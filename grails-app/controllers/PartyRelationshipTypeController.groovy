@@ -8,7 +8,7 @@ class PartyRelationshipTypeController {
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
     // return PartyRelationshipType List 
     def list() {
-        if( !params.max ) params.max = 10
+        if( !params.max ) params.max = 25
         [ partyRelationshipTypeInstanceList: PartyRelationshipType.list( params ) ]
     }
     // return PartyRelationshipType details

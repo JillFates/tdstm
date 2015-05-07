@@ -71,7 +71,7 @@ class DataTransferBatchController {
 			redirect(controller:'project',action:'list')
 			return
 		}
-		if( !params.max ) params.max = 10
+		if( !params.max ) params.max = 25
 		def dataTransferBatchList =  DataTransferBatch.findAllByProjectAndTransferMode( project, "I", 
 			[sort:"dateCreated", order:"desc", max:params.max,offset:params.offset ? params.offset : 0] )
 		
