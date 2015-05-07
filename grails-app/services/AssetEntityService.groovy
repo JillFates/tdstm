@@ -2232,8 +2232,10 @@ class AssetEntityService {
 
 			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
 			def assetDepBundleMap = [:]
-			assetDepBundleList.each { dep ->
-				assetDepBundleMap[dep.asset.id] = dep?.dependencyBundle?.toString()?:''
+			assetDepBundleList?.each { dep ->
+				if(dep.asset){
+					assetDepBundleMap[dep.asset.id] = dep?.dependencyBundle?.toString()?:''	
+				}
 			}
 
 			log.info "export() - Create asset dep bundles took ${TimeUtil.elapsed(started)}"
