@@ -254,14 +254,13 @@
 							</tds:hasPermission>
 						</ul>
 					</td>
-					<tds:hasPermission permission='AssetEdit'>
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Data</span><br />
 					
 						<ul>
 							<tds:hasPermission permission='Import'>
 							<li><g:link class="mmlink" controller="assetEntity" action="assetImport"  onclick="hideMegaMenu('assetMegaMenu')">Import Assets</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='AssetEdit'>
+							<tds:hasPermission permission='Import'>
 							<li><g:link class="mmlink" controller="dataTransferBatch" action="index" onclick="hideMegaMenu('assetMegaMenu')">Manage Batches</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='Export'>
@@ -272,7 +271,6 @@
 							</tds:hasPermission>
 						</ul>
 					</td>
-					</tds:hasPermission>
 					</tr></table>
 				</div>	
 			</li>
