@@ -647,15 +647,15 @@ class MoveBundleController {
 		// Get the various DEVICE types broken out
 		def deviceMetricsQuery = """SELECT
 			COUNT(ae) AS allDevices, 
-			SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS allDevicesUnassigned, 			
-			SUM( CASE WHEN ae.assetType IN (:phyTypes) THEN 1 ELSE 0 END ) AS physicalAll, 
-			SUM( CASE WHEN ae.assetType IN (:phyTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS physicalUnassigned, 
-			SUM( CASE WHEN ae.assetType IN (:virtTypes) THEN 1 ELSE 0 END ) AS virtualAll, 
-			SUM( CASE WHEN ae.assetType IN (:virtTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS virtualUnassigned, 
-			SUM( CASE WHEN ae.assetType IN (:storageTypes) THEN 1 ELSE 0 END ) AS storageAll, 
-			SUM( CASE WHEN ae.assetType IN (:storageTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS storageUnassigned, 
-			SUM( CASE WHEN ae.assetType IN (:networkTypes) THEN 1 ELSE 0 END ) AS networkAll, 
-			SUM( CASE WHEN ae.assetType IN (:networkTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ) AS networkUnassigned 
+			COALESCE(SUM( CASE WHEN ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS allDevicesUnassigned, 			
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:phyTypes) THEN 1 ELSE 0 END ), 0) AS physicalAll, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:phyTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS physicalUnassigned, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:virtTypes) THEN 1 ELSE 0 END ), 0) AS virtualAll, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:virtTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS virtualUnassigned, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:storageTypes) THEN 1 ELSE 0 END ), 0) AS storageAll, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:storageTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS storageUnassigned, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:networkTypes) THEN 1 ELSE 0 END ), 0) AS networkAll, 
+			COALESCE(SUM( CASE WHEN ae.assetType IN (:networkTypes) AND ae.planStatus=:unassignStatus THEN 1 ELSE 0 END ), 0) AS networkUnassigned 
 			FROM AssetEntity ae 
 			WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles) AND ae.assetClass=:assetClass"""
 
