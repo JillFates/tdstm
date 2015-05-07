@@ -193,6 +193,8 @@ function unCheckAll() {
  * To open person's general info , Availabilty and TDS utility dialog
  */
 function loadPersonDiv(personId,renderPage,redirectTo){
+	var currentFirstName;
+	var currentLastName;
 	jQuery.ajax({
 		url : contextPath+'/person/loadGeneral',
 		data : {
@@ -204,19 +206,28 @@ function loadPersonDiv(personId,renderPage,redirectTo){
 				currentTabShow = currentTabShow.replace('Show','Edit')
 				currentHeaderShow = currentHeaderShow.replace('Show','Edit')
 			}
-			$("#personGeneralViewId").html(data)
-			$("#personGeneralViewId").dialog('option', 'width', '420px')
-			$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
-			$("#"+currentTabShow).show()
-			$(".mobmenu").removeClass("mobselect")
-			$("#"+currentHeaderShow).addClass("mobselect")
-			$("#personGeneralViewId").dialog('open');
+				$("#personGeneralViewId").html(data)
+				$("#personGeneralViewId").dialog('option', 'width', '420px')
+				$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
+				if(currentTabShow == "generalInfoShowId")
+				{
+					$("#personGeneralViewId").dialog('option', 'title', 'Manage Staff - ' + $('span[id="firstNameId"]').text() + ' ' + $('span[id="middleNameId"]').text() + ' ' + $('span[id="lastNameId"]').text());
+				}
+				$("#"+currentTabShow).show()
+				
+				$(".mobmenu").removeClass("mobselect")
+				if(currentTabShow != "generalInfoEditId")
+				{
+					$('#generalInfoEditId').hide();
+				}
+				$("#"+currentHeaderShow).addClass("mobselect")
+				$("#personGeneralViewId").dialog('open');
+				
 		},
 		error : function (response) {
 			tdsCommon.displayWsError(response, "Error retriving person information.", false);
 		}
 	});
-	
 }
 function switchTab(id,divId,header){
 	$(".person").hide()
@@ -247,6 +258,7 @@ function updatePerson(tab,form){
 				$("#"+currentTabShow).show()
 				$(".mobmenu").removeClass("mobselect")
 				$("#"+currentHeaderShow).addClass("mobselect")
+				$("#personGeneralViewId").dialog('option', 'title', 'Manage Staff - ' + $('span[id="firstNameId"]').text() + ' ' + $('span[id="middleNameId"]').text() + ' ' + $('span[id="lastNameId"]').text());
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				tdsCommon.displayWsError(jqXHR, "An unexpected error occurred while attempting to update Person.", false);
