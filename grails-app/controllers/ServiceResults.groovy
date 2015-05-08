@@ -1,6 +1,6 @@
 // import java.beans.StaticFieldsPersistenceDelegate;
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-
+import grails.converters.JSON
 
 /**
  * Utility class for creating HTTP resposes
@@ -14,14 +14,26 @@ class ServiceResults {
 	 * @param map the Map data to be added to the response object
 	 * @return the response map
 	 */
-	static def success(map = [:]) {
+	static Map success(map = [:]) {
 		def renderMap = [:]
 		renderMap.status = 'success'
 		renderMap.data = map
 		
 		return renderMap
 	}  
-	
+
+	/**
+	 * Used to respond to a request with a success message
+	 * @param response - the HTTP response object
+	 * @param map - a Map of any returning data (optional)
+	 * @return void
+	 */
+	static void respondWithSuccess(response, map = [:]) {
+		response.outputStream << (success(map) as JSON)
+	}	
+
+// TODO - JPM 5/2015 - I think that the fail() and respondWithFailure should? return list instead of map?
+
 	/**
 	 * Returns a fail response to be serialized as json
 	 * @param map the Map data to be added to the response object
@@ -34,35 +46,79 @@ class ServiceResults {
 		
 		return renderMap
 	}
+
+	/**
+	 * Used to respond to a request with a Failure message
+	 * @param response - the HTTP response object
+	 * @param map - a Map of any returning data (optional)
+	 * @return void
+	 */
+	static void respondWithFailure(response, map = [:]) {
+		response.outputStream << (fail(map) as JSON)
+	}	
 	
 	/**
 	 * Returns a error response to be serialized as json
 	 * @param object an array or map to be set as errors
 	 * @return the response map
 	 */
-	static def errors(object) {
+	static def errors(errorStringOrList) {
 		def renderMap = [:]
+
 		renderMap.status = 'error'
-		renderMap.errors = object ?: []
+		if (errorStringOrList instanceof List) {
+			renderMap.errors = errorStringOrList
+		} else {
+			renderMap.errors = [ errorStringOrList ]
+		}
 		
 		return renderMap
 	}
 	
 	/**
+	 * Used to respond to a request with a Failure message
+	 * @param response - the HTTP response object
+	 * @param An error message string or list of error messages
+	 * @return void
+	 */
+	static void respondWithError(response, errorMsgs) {
+		respondAsJson(response, errors(errorMsgs))
+	}	
+
+	/**
 	 * Returns a warning response to be serialized as json
 	 * @param object an array or map to be set as warnings
 	 * @return the response map
 	 */
-	static def warnings(object) {
+	static def warnings(warnStringOrList) {
 		def renderMap = [:]
 		renderMap.status = 'warning'
-		renderMap.warnings = object ?: []
-		
+		if (warnStringOrList instanceof List) {
+			renderMap.errors = warnStringOrList
+		} else {
+			renderMap.warnings = [ warnStringOrList ]
+		}
+		println "warnings = $renderMap"
 		return renderMap
 	}
+
+	/**
+	 * Used to respond to a request with a Failure message
+	 * @param response - the HTTP response object
+	 * @param An error message string or list of error messages
+	 * @return void
+	 */
+	static void respondWithWarning(response, warningMsgs) {
+		respondAsJson(response, warnings(warningMsgs))
+	}	
 	
-	
-	
+	static respondAsJson(response, object) {
+		if (! object)
+			object = [:]
+		response.setHeader('content-type', 'application/json')
+		response.outputStream << ( object as JSON )
+	}
+
 	/**
 	 * Sends an unauthorized error
 	 * @param response the response object

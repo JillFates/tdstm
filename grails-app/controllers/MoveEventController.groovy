@@ -32,18 +32,20 @@ import com.tdssrc.grails.WorkbookUtil
 class MoveEventController {
 	
 	protected static Log log = LogFactory.getLog( StepSnapshotService.class )
-    // Service initialization
-	def moveBundleService
+
+    // Service initialization IOC
+	def controllerService
+	def cookbookService
 	def jdbcTemplate
-	def userPreferenceService
-	def stepSnapshotService
-	def stateEngineService
+	def moveBundleService
+	def projectService
 	def reportsService
 	def runbookService
-	def cookbookService
-	def taskService
 	def securityService
-	def projectService
+	def stateEngineService
+	def stepSnapshotService
+	def taskService
+	def userPreferenceService
 
     def index() { redirect(action:"list",params:params) }
 
@@ -448,22 +450,35 @@ class MoveEventController {
 		render msg
 	}
 	
-    /*------------------------------------------------
-     * Return the list of active news for a selected moveEvent and status of that evnt.
-     * @author : Lokanada Reddy
-     * @param  : id (moveEvent)
-     *----------------------------------------------*/
+    /**
+      * Return the list of active news for a selected moveEvent and status of that evnt.
+      * @param id - the moveEvent to get the news for
+      */
     def retrieveMoveEventNewsAndStatus() {
-    	
-    	def moveEvent = MoveEvent.findById(params.id)
+
+		// Make sure that the user is trying to access a valid event
+		def (project, user) = controllerService.getProjectAndUserForPage(this)
+		if (! project) {
+			// TODO - switch to getProjectAndUserForWS when available to avoid the flash.message
+			flash.message = ''
+			ServiceResults.respondWithWarning(response, "User presently has no selected project")
+			return
+    	}
+    	def moveEvent = controllerService.getEventForPage(this, project, user, params.id)
+    	if (!moveEvent) {
+			// TODO - switch to getEventForWS when available to avoid the flash.message
+			flash.message = ''
+			ServiceResults.respondWithWarning(response, "Event id was not found")
+			return
+		}
+
 		def statusAndNewsList = []
-		if(moveEvent){
-			def holdId = Integer.parseInt(stateEngineService.getStateId(moveEvent.project.workflowCode,"Hold"))
+		if (moveEvent) {
 			
 	    	def moveEventNewsQuery = """SELECT mn.date_created as created, mn.message as message from move_event_news mn 
-							left join move_event me on ( me.move_event_id = mn.move_event_id ) 
-							left join project p on (p.project_id = me.project_id) 
-	    					where mn.is_archived = 0 and mn.move_event_id = ${moveEvent.id} and p.project_id = ${moveEvent.project.id} order by created desc"""
+				left join move_event me on ( me.move_event_id = mn.move_event_id ) 
+				left join project p on (p.project_id = me.project_id) 
+				where mn.is_archived = 0 and mn.move_event_id = ${moveEvent.id} and p.project_id = ${moveEvent.project.id} order by created desc"""
 	    	
 			def moveEventNews = jdbcTemplate.queryForList( moveEventNewsQuery )
 			
@@ -481,8 +496,8 @@ class MoveEventController {
 				def today = GormUtil.convertInToGMT( "now", tzId );
 				def currentPoolTime = new java.sql.Timestamp(today.getTime())
 				def tasksCompQuery="""SELECT comment,date_resolved AS dateResolved FROM asset_comment WHERE project_id= ${moveEvent.project.id} AND 
-									  move_event_id=${moveEvent.id} AND status='Completed' AND
-									 (date_resolved BETWEEN SUBTIME('$currentPoolTime','00:15:00') AND '$currentPoolTime')"""
+					move_event_id=${moveEvent.id} AND status='Completed' AND
+					(date_resolved BETWEEN SUBTIME('$currentPoolTime','00:15:00') AND '$currentPoolTime')"""
 				def tasksCompList=jdbcTemplate.queryForList( tasksCompQuery )
 				tasksCompList.each{
 				 	def comment = it.comment
