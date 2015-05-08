@@ -42,11 +42,21 @@ $(document).ready(function() {
 	}, 1000);
 
 	$("#eventDataTableId").css('max-width',
-			$(window).width() * 6.2/ 100 + '%')
+			$(window).width() * 2.0 / 100 + '%')
 
 	$("#containerId").css('width',
 				$(window).width() - 50  + 'px')
-				
+		
+
+
+	if($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width())
+	{
+		$('#leftHeader').height($('#rightHeader').height() + 6 );
+	}
+	else
+	{
+		$('#leftHeader').height($('#rightHeader').height() - 6);
+	}		
 	});
 
 	$(function(){
@@ -58,17 +68,36 @@ $(document).ready(function() {
 	    $.fn.hasScrollBar = function() {
 	        return this.get(0).scrollWidth > this.width();
 	    }
+		
+		
 	})(jQuery);
 
    
 	$(window).resize(
 		function() {
+			
+			var scrollbarWasVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar was visible before the screen resize
 			$("#eventDataTableId").css('max-width',
-					$(window).width() *  6.2 / 100 + '%')
+					$(window).width() *  2.0 / 100 + '%')
 
 			$("#containerId").css('width',
-					$(window).width() - 50  + 'px')
-							
+			$(window).width() - 50  + 'px')
+			
+			
+			var scrollbarIsVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar is visible after the screen resize
+			
+			if((!scrollbarWasVisible) || (scrollbarWasVisible && !scrollbarIsVisible)) //realign the tables according to whether or not the scrollbar is present
+			{
+				if(scrollbarIsVisible)
+				{
+					$('#leftHeader').height($('#rightHeader').height() + $('#rightHeader').height()*.08 -20 );
+				}
+				else
+				{
+					$('#leftHeader').height($('#rightHeader').height() - 6);
+				}
+			}
+			
 	});
 </script>
 <g:javascript src="entity.crud.js" /></head>
@@ -436,9 +465,7 @@ $(document).ready(function() {
 								<div>
 									<table id="eventHeaderTableId" style="border: none;">
 										<thead>
-											<tr><th class="dashboard_stat_exec_td headerWidth">&nbsp;</th></tr>
-										    <tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
-										    <tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
+											<tr id="leftHeader"><th class="dashboard_stat_exec_td headerWidth"rowspan="3">&nbsp;</th> <td class="dashboard_stat_exec_td "></td></tr>
 										</thead>
 										<tbody>
 											<tr>
@@ -525,10 +552,10 @@ $(document).ready(function() {
 									<table class="dashboard_stat_table">
 										<thead>
 											<tr>
-												<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
+												<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom" id="rightHeader">
 													Unassigned
 												</th>
-
+								
 
 												<g:each in="${moveEventList}" var="event">
 													<th class="dashboard_stat_exec_tdmc headerWidth" >
