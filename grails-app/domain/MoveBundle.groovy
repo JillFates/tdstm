@@ -22,7 +22,7 @@ class MoveBundle extends Party {
 	Boolean tasksCreated = false
     
     static constraints = {        
-		name( blank:false, nullable:false )
+		name( blank:false, nullable:false, unique:['project'] )
 		project( nullable:false )
 		moveEvent( nullable:true )
 		description( blank:true, nullable:true )		
