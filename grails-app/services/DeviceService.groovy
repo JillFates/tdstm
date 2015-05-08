@@ -11,6 +11,7 @@ import com.tdssrc.grails.NumberUtil
 
 import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 class DeviceService {
 
 	boolean transactional = true

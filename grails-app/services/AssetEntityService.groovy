@@ -55,6 +55,7 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.WorkbookUtil
 
+@Transactional
 class AssetEntityService {
 
 	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should

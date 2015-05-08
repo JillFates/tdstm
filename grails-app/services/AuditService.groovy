@@ -1,11 +1,13 @@
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Service used to log audit information
  *
  * @author Diego Scarpa
  */
+@Transactional(readOnly = true)
 class AuditService {
 
 	static final String AUDIT_TYPE_ACCESS = "access"	
