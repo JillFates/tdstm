@@ -19,11 +19,6 @@ import com.tdsops.common.security.SecurityConfigParser
 
 class UserService {
 	
-	static transactional = true
-	//static final roleMap = [user:'USER', editor:'EDITOR', supervisor:'SUPERVISOR']
-	//static roleTypeList = []
-	//static initialized = false
-
 	// IoC
 	def personService
 	def partyRelationshipService
@@ -67,147 +62,81 @@ class UserService {
 		//    2. The UserLogin.username matches the person's AD UserLogin + '@' + company domain
 		//    3. The Person.firstName+lastName match the person's AD givenname + sn properties
 
-		def person
 		def persons
-		def userLogin
 		def project
 
-		boolean debug = config.debug
+		String mn = 'findOrProvisionUser:'
+
 		Map domain = config.domains[authority.toLowerCase()]
-		boolean autoProvision = domain.autoProvision
-		Long defaultProject = domain.defaultProject
-		String defaultRole = domain.defaultRole ?: ''
-		String defaultTimezone = domain.defaultTimezone ?: ''
+
+		boolean debug = log.isDebugEnabled() || config.debug
 
 		// If the user email was blank then set it based on the username + the company domain in the config
 		if (! userInfo.email) {
 			userInfo.email = userInfo.username.contains('@') ? userInfo.username : "${userInfo.username}@${domain.fqdn}"
 		}
 
-		// Set the username to the user's email as this is how they will be provisioned into TM
-		/*
-		switch (domain.usernameFormat) {
-			// User Principle Name (UPN)
-			case 'UPN':
-				userInfo.username = userInfo.email
-				break
-
-			//  SAM Account Name
-			case 'username':
-				// Previously set
-				break
-
-			default:
-				throw new RuntimeException("Unhandled case ${domain.usernameFormat}")
-		}
-		*/
-
 		def personIdentifier = "${userInfo.firstName} ${userInfo.lastName}${(userInfo.email ? ' <'+userInfo.email+'>' : '')}"
-		if (log.isDebugEnabled() || debug)
-			log.debug "findOrProvisionUser: Attempting to find or provision $personIdentifier"
+		if (debug)
+			log.debug "$mn Attempting to find or provision $personIdentifier"
 
-		def client = PartyGroup.get( userInfo.company )
+		boolean autoProvision = domain.autoProvision
+		Long defaultProject = domain.defaultProject
+		String defaultRole = domain.defaultRole ?: ''
+		String defaultTimezone = domain.defaultTimezone ?: ''
+
+		def client = PartyGroup.get( userInfo.companyId )
 		if (! client) {
-			log.error "findOrProvisionUser: Unable to find configured company for id ${userInfo.company}"
-			throw new ConfigurationException("Unable to find user's company by id ${userInfo.company}")
+			log.error "$mn Unable to find configured company for id ${userInfo.companyId}"
+			throw new ConfigurationException("Unable to find user's company by id ${userInfo.companyId}")
 		}
 
 		project = Project.get(defaultProject)
 		if (! project) {
-			log.error "findOrProvisionUser: Unable to find configured default project for id ${defaultProject}"
+			log.error "$mn Unable to find configured default project for id ${defaultProject}"
 			throw new ConfigurationException("Unable to find the default project for $client")
 		}
+
 		if (project.client.id != client.id) {
-			log.error "findOrProvisionUser: Project (${defaultProject}) not associated with client $client"
+			log.error "$mn Project (${defaultProject}) not associated with client $client"
 			throw new ConfigurationException("Project (${defaultProject}) not associated with client $client")
 		}
 
-		// Parse the person's name and populate a name map
-		def nameMap = [first:'', middle:'', last:userInfo.lastName]
-		def names = userInfo.firstName.split(' ')
-		if (names.size()) { 
-			nameMap.first = names[0]
-			if (names.size() > 1)
-				nameMap.middle = names[1..-1].join(' ')
-		}
-		if (log.isDebugEnabled())
-			log.debug "findOrProvisionUser: parsed [${userInfo.firstName} : ${userInfo.lastName}] into $nameMap"
+		// Attempt to lookup the Person and their UserLogin
+		def (person, userLogin) = findPersonAndUserLogin(client, userInfo, config, authority, personIdentifier)	
 
-		// Make the GUID unique to the companyId + the GUID from their authority system
-		def guid = "${userInfo.company}-${userInfo.guid}"	
-		userLogin = UserLogin.findByExternalGuid(guid)
-		if (userLogin) {
-			if (log.isDebugEnabled() || debug)
-				log.debug "findOrProvisionUser: Found user by GUID"
-		} else {
-
-			// Now try to get the Person
-			// Try to find the Person in case they were previously loaded or provisioned
-
-			// First try to find by their email 
-			if (userInfo.email) {
-				if (log.isDebugEnabled() || debug)
-					log.debug "findOrProvisionUser: Looking up person by email"
-				persons = personService.findByClientAndEmail(client, userInfo.email )
-			}
-
-			// Then try to find by their name
-			if (! persons) {
-				if (log.isDebugEnabled() || debug)
-					log.debug "findOrProvisionUser: Looking up person by name"
-				persons = personService.findByClientAndName(client, nameMap)
-			} 
-
-			// If we have any persons, try to find their respective user accounts
-			if (persons) {
-				def users = UserLogin.findAllByPersonInList(persons)
-				if (log.isDebugEnabled() || debug)
-					log.debug "findOrProvisionUser: Found these users: $users"				
-
-				// If we find more than one account we don't know which to use
-				if (users.size() > 1) {
-					log.error "findOrProvisionUser: found ${users.size} users that matched $personIdentifier"
-					throw new RuntimeException('Unable to resolve multiple UserLogin accounts')
-				}
-
-				if (users.size() == 1) 
-					userLogin = users[0]
-			}
-		}
-
+		// Check various requirements based on the Authentication Configuration and fall out if we don't 
+		// have an account and not allowed to create one.
 		if (! userLogin && ! userInfo.roles && ! domain.defaultRole) {
 			throw new AccountException('No roles defined for the user')
 		}
-
 		if (! userLogin && ! person && ! autoProvision) {
-			throw new AccountException('UserLogin or Person not found and autoProvision is disabled')
+			throw new AccountException('UserLogin and/or Person not found and autoProvision is disabled')
 		}
-
-		if (userLogin)
-			person = userLogin.person
-
 		if ( (! person || ! userLogin) && ! autoProvision ) {
 			log.warn "findOrProvisionUser: User attempted login but autoProvision is diabled ($personIdentifier)"
 			throw new RuntimeException('Auto provisioning is disabled')
 		}
 
-		// Create the person and associate to the client & project if one wasn't found
+		Map nameMap = this.userInfoToNameMap(userInfo)
+
 		if (! person) {
-			if (log.isDebugEnabled() || debug)
-				log.debug "findOrProvisionUser: Creating new person"
+
+			// Create the person and associate to the client & project if one wasn't found
+
+			if (debug)
+				log.debug "$mn Creating new person"
 
 			person = new Person( 
 				firstName:nameMap.first,
 				lastName:nameMap.last,
 				middleName: nameMap.middle,
 				email: userInfo.email,
-				staffType:'Salary',
-				active:'Y',
 				workPhone: userInfo.telephone,
 				mobilePhone: userInfo.mobile
 			)
 			if (! person.save(flush:true)) {
-				log.error "findOrProvisionUser: Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
+				log.error "$mn Creating user ($personIdentifier) failed due to ${GormUtil.allErrorsString(person)}"
 				throw new RuntimeException('Unexpected error while creating Person object')
 			}
 			// Create Staff relationship with the Company
@@ -219,7 +148,9 @@ class UserService {
 				throw new RuntimeException('Unable to associate new person to project')
 			}
 		} else {
+
 			// Update the person information if the configuration is set for it
+
 			if (domain.updateUserInfo) {
 				if (person.firstName != nameMap.first)
 					person.firstName = nameMap.first
@@ -235,11 +166,12 @@ class UserService {
 					person.workPhone = userInfo.telephone
 				if (person.mobilePhone != userInfo.mobile)
 					person.mobilePhone = userInfo.mobile
+
 				if (person.isDirty()) {
-					if (log.isDebugEnabled() || debug)
-						log.debug "findOrProvisionUser: Updating existing person record : ${person.dirtyPropertyNames}"
+					if (debug)
+						log.debug "$mn Updating existing person record : ${person.dirtyPropertyNames}"
 					if (! person.save(flush:true)) {
-						log.error "findOrProvisionUser: Failed updating Person due to ${GormUtil.allErrorsString(person)}"
+						log.error "$mn Failed updating Person due to ${GormUtil.allErrorsString(person)}"
 						throw new RuntimeException("Unexpected error while updating Person object")
 					}
 				}
@@ -248,10 +180,13 @@ class UserService {
 
 		def createUser = userLogin == null
 		if (createUser) {
-			if (log.isDebugEnabled() || debug)
-				log.debug "findOrProvisionUser: Creating new UserLogin"
+			if (debug)
+				log.debug "$mn Creating new UserLogin"
 			userLogin = new UserLogin( person:person )
+			// will set all the properties below
 		}
+
+		String guid = formatGuid(userInfo)
 
 		// Set any of the variables that need to be set regardless of configuration settings or if it is new/existing
 		if (! userLogin.externalGuid && userInfo.guid )
@@ -289,36 +224,18 @@ class UserService {
 			}
 		}
 
-		/*
-		if (config.roleMap) {
-			// iterate over the user's roles and cross ref to the roleMap
-			userInfo.roles.each { r -> 
-				if (roleMap.containsKey(r))
-					newUserRoles << roleMap[r]
-			}
-		} else {
-			String defaultRole = domain.defaultRole?.toLowerCase()
-			if ( defaultRole && roleMap.containsKey(defaultRole))
-				newUserRoles << roleMap[defaultRole]
-		}
-		if ( (createUser || domain.updateRoles) && newUserRoles.size()==0) {
-			log.warn "findOrProvisionUser: No roles were determined for $personIdentifier"
-			throw new RuntimeException("Unable to determine security roles")
-		}
-		*/
-
 		if (createUser) {
 			// Add their role(s)
 			newUserRoles.each { r -> 
-				if (log.isDebugEnabled() || debug)
-					log.info "findOrProvisionUser: Adding new security role '$r' to $personIdentifier"
+				if (debug)
+					log.info "$mn Adding new security role '$r' to $personIdentifier"
 				def rt = RoleType.read(r.toUpperCase())
 				if (! rt || ! rt.isSecurityRole()) {
 					throw new ConfigurationException("Configuration security property domains.${authority}.roleMap[$r] is an invalid code")
 				}
 				def pr = new PartyRole(party:person, roleType:rt)
 				if (! pr.save(flush:true)) {
-					log.error "findOrProvisionUser: Unable to add new role for person ${GormUtil.allErrorsString(userLogin)}"
+					log.error "$mn Unable to add new role for person ${GormUtil.allErrorsString(userLogin)}"
 					throw new RuntimeException("Unexpected error while assigning security role")
 				}
 			}
@@ -332,30 +249,30 @@ class UserService {
 				// Get the user roles from DB and compare
 				def existingRoles = PartyRole.findAllByPartyAndRoleTypeInList(person, roleTypes)
 
-				if (log.isDebugEnabled() || debug)
-					log.debug "findOrProvisionUser: User has existing roles $existingRoles"
+				if (debug)
+					log.debug "$mn User has existing roles $existingRoles"
 				// See if there are any existing that should be removed
 				existingRoles.each { er -> 
-					if (! newUserRoles.contains(er.roleType.id)) {
-						if (log.isDebugEnabled() || debug)
-							log.debug "findOrProvisionUser: Deleting security role ${er.roleType.id} for $personIdentifier"
+					if (! newUserRoles*.toUpperCase().contains(er.roleType.id)) {
+						if (debug)
+							log.debug "$mn Deleting security role ${er.roleType.id} for $personIdentifier"
 						er.delete(flush:true)
 					}
 				}
 
 				// Now go through and add any new roles that aren't in the user's existing list
 				newUserRoles.each { nr -> 
-					if (! existingRoles.find { it.roleType.id == nr}) {
-						if (log.isDebugEnabled() || debug)
-							log.debug "findOrProvisionUser: Assigning new security role $nr for $personIdentifier"
+					// Force the Role Types to uppercase
+					nr = nr.toUpperCase()
 
-						// Force the Role Types to uppercase
-						nr = nr.toUpperCase()
+					if (! existingRoles.find { it.roleType.id == nr }) {
+						if (debug)
+							log.debug "$mn Assigning new security role $nr for $personIdentifier"
 
 						def rt = RoleType.read(nr)
 						def pr = new PartyRole(party:person, roleType:rt)
 						if (! pr.save(flush:true)) {
-							log.error "findOrProvisionUser: Unable to update new role for person ${GormUtil.allErrorsString(userLogin)}"
+							log.error "$mn Unable to update new role for person ${GormUtil.allErrorsString(userLogin)}"
 							throw new RuntimeException("Unexpected error while assigning security role")
 						}
 					}
@@ -370,26 +287,141 @@ class UserService {
 		if (createUser || ! pref) {
 			// Set their default project preference
 			userPreferenceService.setPreference(userLogin, 'CURR_PROJ', project.id.toString() )
-			if (log.isDebugEnabled() || debug)
-				log.debug "findOrProvisionUser: set default project preference to ${project}"
+			if (debug)
+				log.debug "$mn set default project preference to ${project}"
 		}
 		if (defaultTimezone)
 			// Set their TZ preference
 			pref = userPreferenceService.getPreferenceByUserAndCode(userLogin, 'CURR_TZ')
 			if (createUser || ! pref) {
 				userPreferenceService.setPreference(userLogin, 'CURR_TZ', defaultTimezone )
-				if (log.isDebugEnabled() || debug)
-					log.debug "findOrProvisionUser: set timezone preference $defaultTimezone"
+				if (debug)
+					log.debug "$mn: set timezone preference $defaultTimezone"
 			}
 
 
-		if (log.isDebugEnabled() || debug)
-			log.debug "findOrProvisionUser: FINISHED UserLogin(id:${userLogin.id}, $userLogin), Person(id:${person.id}, $person)"
+		if (debug)
+			log.debug "$mn FINISHED UserLogin(id:${userLogin.id}, $userLogin), Person(id:${person.id}, $person)"
 
 		return userLogin
 	}
 	
-	
+	/**
+	 * Used by the login logic to parse the name from UserInfo  
+	 */
+	Map userInfoToNameMap(Map userInfo) {
+		// Parse the person's name and populate a name map
+		Map nameMap = [first:'', middle:'', last:userInfo.lastName]
+		List names = userInfo.firstName.split(' ')
+		if (names.size()) { 
+			nameMap.first = names[0]
+			if (names.size() > 1)
+				nameMap.middle = names[1..-1].join(' ')
+		}
+		return nameMap
+	}
+
+	String formatGuid(Map userInfo) {
+		return "${userInfo.companyId}-${userInfo.guid}"	
+	}
+
+	/**
+	 * Used to look for a Person and optionally their user login account using information supplied from Authentication Realm and
+	 * the authority configuration map.
+	 *
+	 * This assumes that a person account may previously exist but that the UserLogin may not
+	 * 
+	 * @param userInfo - the information provided by the login authentication session
+	 * @param config - a map of the authentication connector
+	 * @return a with [Person, UserLogin] account that was found or provisioned
+	 * @throws ConfigurationException, RuntimeException	 
+	 */
+	List findPersonAndUserLogin( PartyGroup client, Map userInfo, Map config, String authority, String personIdentifier ) {
+
+		// The first step is to attempt to find the user/person based on the following search patterns:
+		//    1. The UserLogin.externalGuid code matches the person's AD objectguid property
+		//    2. The UserLogin.username matches the person's AD UserLogin + '@' + company domain
+		//    3. The Person.firstName+lastName match the person's AD givenname + sn properties
+
+		def person
+		def persons
+		def userLogin
+
+		// method name
+		String mn = 'findUser:'
+
+		// Flag for debugging
+		boolean debug = log.isDebugEnabled() || config.debug
+		Map domain = config.domains[authority.toLowerCase()]
+
+		Map nameMap = this.userInfoToNameMap(userInfo)
+		if (debug)
+			log.debug "$mn Parsed [${userInfo.firstName} : ${userInfo.lastName}] into $nameMap"
+
+		// Make the GUID unique to the companyId + the GUID from their authority system
+		String guid = this.formatGuid(userInfo)
+		userLogin = UserLogin.findByExternalGuid(guid)
+		if (userLogin) {
+			if (debug)
+				log.debug "$mn Found user by GUID"
+
+			// Check to verify that the user found is assoicated to the company
+			// TODO - implement this validation
+			// if (userLogin.person...)
+
+		} else {
+
+			// User wasn't found so let's try by the Person information
+			// Try to find the Person in case they were previously loaded or provisioned other than by the login
+
+			// First try to find by their email 
+			if (userInfo.email) {
+				if (debug)
+					log.debug "$mn Looking up person by email"
+				persons = personService.findByClientAndEmail(client, userInfo.email )
+			}
+
+			// Then try to find by their name
+			if (! persons) {
+				if (debug)
+					log.debug "$mn Looking up person by name"
+				persons = personService.findByClientAndName(client, nameMap)
+				if (debug) 
+					log.debug "$mn personService.findByClientAndName found ${persons?.size()} people"
+			} 
+
+			// If we have any persons, try to find their respective user accounts
+			if (persons) {
+				def users = UserLogin.findAllByPersonInList(persons)
+				if (debug)
+					log.debug "$mn Found these users: $users"				
+
+				// If we find more than one account we don't know which to use
+				def size = users.size()
+				if (size == 1) {
+					userLogin = users[0]
+				} else if (size > 1) {
+					log.error "$mn found ${users.size} users that matched $personIdentifier"
+					throw new RuntimeException('Unable to resolve UserLogin account due to multiple matches')
+				} else {
+					size = persons.size()
+					if (size == 1) {
+						// Assign the person
+						person = persons[0]
+					} else if (size > 1) {
+						log.error "$mn found ${persons.size} Person accounts that matched $personIdentifier"
+						throw new RuntimeException('Unable to resolve Person account due to multiple matches')
+					}
+				}
+			}
+		}
+
+		if (userLogin)
+			person = userLogin.person
+
+		return [person, userLogin]
+	}
+
 	/**
 	 * 
 	 * @param projectInstance

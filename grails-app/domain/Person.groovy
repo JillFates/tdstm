@@ -21,7 +21,7 @@ class Person extends Party {
 	String keyWords
 	String tdsNote
 	String tdsLink
-	String staffType
+	String staffType = 'Salary'
 	Integer travelOK = 1
 	
 	static Person loggedInPerson

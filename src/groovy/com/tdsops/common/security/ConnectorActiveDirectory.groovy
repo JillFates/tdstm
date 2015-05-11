@@ -183,7 +183,7 @@ class ConnectorActiveDirectory {
 			}
 
 			// Map all of the user information into TM userInfo map
-			userInfo.company = domain.company	// Copy over the company id
+			userInfo.companyId = domain.company	// Copy over the company id
 			userInfo.username = username
 			userInfo.firstName = u.givenname ?: ''
 			userInfo.lastName = u.sn ?: ''

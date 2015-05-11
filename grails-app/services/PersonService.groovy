@@ -130,7 +130,6 @@ class PersonService {
 	 * @param nameMap - a map of the person's name (map [first, last, middle])
 	 * @return A list of the person(s) found that match the name or null if none found
 	 */
-
 	List findByClientAndEmail(PartyGroup client, String email) {
 		def map = [client:client.id, email:email]
 		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
@@ -139,8 +138,10 @@ class PersonService {
 		query.append(' AND pr.role_type_code_to_id="STAFF"')
 		query.append(' AND p.email=:email')
 
+		log.debug "findByClientAndEmail: query $query, map $map"
 		def persons
 		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), map)
+		log.debug "findByClientAndEmail: query $query, map $map, found ids $pIds"
 		if (pIds) {
 			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
 		}

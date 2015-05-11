@@ -76,7 +76,7 @@ class TestCaseController {
 		conf.defaultProject = 2468
 
 		def userInfo=[:]
-		userInfo.company = 2467
+		userInfo.companyId = 2467
 		userInfo.username = 'jmtest'
 		userInfo.firstName = 'John'
 		userInfo.lastName = 'Martin'
