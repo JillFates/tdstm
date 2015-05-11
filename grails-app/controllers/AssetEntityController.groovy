@@ -238,6 +238,9 @@ class AssetEntityController {
 	 * render export form
 	 */
 	def exportAssets() {
+		if (!controllerService.checkPermission(this, 'Export')){
+			return
+		}
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		def project
 		def projectInstance
@@ -1113,6 +1116,9 @@ class AssetEntityController {
 	}
 	
 	def export() {
+		if (!controllerService.checkPermission(this, 'Export')){
+			return
+		}
 		def key = "AssetExport-" + UUID.randomUUID().toString()
 		progressService.create(key)
 		
@@ -1144,6 +1150,9 @@ class AssetEntityController {
 	}
 	
 	def downloadExport() {
+		if (!controllerService.checkPermission(this, 'Export')){
+			return
+		}
 		def key = params.key
 		def filename = progressService.getData(key, 'filename')
 		def header = progressService.getData(key, 'header')
