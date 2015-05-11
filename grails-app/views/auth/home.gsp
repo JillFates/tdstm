@@ -60,7 +60,7 @@ a:hover {
 				</thead>
 				<tbody>
 					<g:if test="${moveEventsList}">
-						<g:each in="${moveEventsList}" status="i"  var="eventList">			
+						<g:each in="${moveEventsList}" status="i"  var="eventList">	
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td><g:link controller="project" action="show" id="${eventList?.moveEvent?.project?.id}">${eventList?.moveEvent?.project?.name} - ${eventList?.moveEvent?.name}</g:link></td>
 							<td>${eventList?.status }</td>
@@ -87,8 +87,8 @@ a:hover {
 						</tr>
 					</thead>
 					<tbody>
-						<g:if test="${moveBundlesList}">
-							<g:each in="${moveBundlesList}" status="i"  var="bundle">			
+						<g:if test="${upcomingBundles}">
+							<g:each in="${upcomingBundles}" status="i"  var="bundle">		
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 								<td><g:link controller="project" action="show" id="${bundle.project?.id}">${bundle.project?.name} - ${bundle.name}</g:link></td>
 								<td><tds:convertDateTime date="${bundle.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>

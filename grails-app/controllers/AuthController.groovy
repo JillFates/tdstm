@@ -198,6 +198,7 @@ class AuthController {
 
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
+		def dateNowSQL = TimeUtil.nowGMTSQLFormat()
 		
 		// retrive the list of 20 usernames with the most recent login times
 		def recentUsers = UserLogin.findAll("FROM UserLogin ul WHERE ul.lastLogin is not null ORDER BY ul.lastPage DESC",[max:20])
@@ -225,9 +226,9 @@ class AuthController {
 			}
 		}
 		// retrive the list of 10 upcoming bundles
-		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNow' ORDER BY mb.startTime",[max:10])
+		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle mb WHERE mb.startTime > '$dateNowSQL' ORDER BY mb.startTime",[max:10])
 		
-		render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, moveBundlesList:upcomingBundles ] )
+		render( view:'home', model:[ recentUsers:recentUsers, moveEventsList:moveEventsList, upcomingBundles:upcomingBundles] )
 	}
 	
 	def maintMode() {
