@@ -924,13 +924,14 @@ class MoveBundleController {
 	}
 
 	def generateDependency() {
-		def key = "generateDependency-" + UUID.randomUUID().toString()
+		def baseName = "generateDependency"
+		def key = baseName + "-" + UUID.randomUUID().toString()
 		progressService.create(key)
 		
 		def username = securityService.getUserLogin().username
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
 		
-		def jobName = "TM-" + key
+		def jobName = "TM-" + baseName + "-" + projectId
 		log.info "Initiate Generate Dependency"
 		
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
@@ -951,9 +952,13 @@ class MoveBundleController {
 
 		trigger.setJobName('GenerateDependencyGroupsJob')
 		trigger.setJobGroup('tdstm-dependency-groups')
-		quartzScheduler.scheduleJob(trigger)
-
-		progressService.update(key, 1, 'In progress')
+		try{
+			quartzScheduler.scheduleJob(trigger)	
+			progressService.update(key, 1, 'In progress')
+		}catch(ex){
+			log.error "generateDependency failed to create Quartz job : ${ex.getMessage()}"
+			progressService.update(key, 100I, ProgressService.COMPLETED, 'Failed: It appears that someone else is currently generating dependencies for this context and project.')
+		}
 		
 		render(ServiceResults.success(['key' : key]) as JSON)
 	}
