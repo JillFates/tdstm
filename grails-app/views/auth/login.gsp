@@ -90,13 +90,18 @@
 								<td />
 								<td class="buttonR"><input type="submit" value="Sign in" /></td>
 							</tr>
-							<g:if test="${ request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') }">
-							<tr>
-								<td colspan="2" >
-									<div class="message" >Warning: This site no longer supports Internet Explorer 6 or 7. We recommend that you use a newer browser for this site.</div>
-								</td>
-							</tr>
+							<g:if test="${ request.getHeader('User-Agent')}">
+								<g:if test="${ request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') }">
+								<tr>
+									<td colspan="2" >
+										<div class="message" >Warning: This site no longer supports Internet Explorer 6 or 7. We recommend that you use a newer browser for this site.</div>
+									</td>
+								</tr>
+								</g:if>
 							</g:if>
+							<g:else>
+								<div class="message" >Warning: Unable to determine your browser type and therefore unable to guarantee the site will work properly.</div>
+							</g:else>
 						</tbody>
 					</table>
 				</g:form></div>
