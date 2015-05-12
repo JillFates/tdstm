@@ -6,7 +6,9 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetComment
 import com.tds.asset.Application
 import com.tds.asset.AssetType
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 class ReportsService {
 
 	def partyRelationshipService
@@ -18,6 +20,7 @@ class ReportsService {
 
 	static transactional = true
 
+	@Transactional(readOnly = true) 
 	def generatePreMoveCheckList(def currProj , def moveEventInstance) {
 		
 		def projectInstance = Project.findById( currProj )
@@ -34,9 +37,11 @@ class ReportsService {
 		
 
   //---------------------------------------for Assets and Bundles --------------------------------------//
+  log.info "AAAAAAAAA " + moveBundles.id
 		
 		def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance,[sort:'assetName'])
 		
+
 		def assetsInfo = getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList)
 
   //---------------------------------------For Teams---------------------------------------------------//
