@@ -242,9 +242,6 @@
 					<g:actionSubmit class="save" value="Update" />
 				</span>
 				<span class="button">
-					<g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" />
-				</span>
-				<span class="button">
 					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/userLogin/show/${userLoginInstance?.id}'"/>
 				</span>
 			</div>

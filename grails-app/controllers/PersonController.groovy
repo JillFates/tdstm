@@ -549,6 +549,7 @@ class PersonController {
 		return [ projectStaff:projectStaff, companiesStaff:companiesStaff, projectCompanies:projectCompanies, 
 				projectId:projectId, submit:submit, personHasPermission:RolePermissions.hasPermission("AddPerson") ]
 	}
+
 	/*
 	 * Method to add Staff to project through Ajax Overlay 
 	 */
@@ -600,103 +601,52 @@ class PersonController {
 	 * Note: Used only in projectStaff.gsp
 	 */
 	def savePerson() {
-		if (!controllerService.checkPermission(this, 'PersonEditView'))
-			return
 
-		def personInstance = new Person( params )
+		if (! controllerService.checkPermission(this, 'PersonCreateView')) {
+			ServiceResults.unauthorized(response)
+			return
+		}
+	
+		def person = new Person( params )
 		
-		//personInstance.dateCreated = new Date()
+		if (person.lastName == null) {
+			person.lastName = ""	
+		}
+
 		def companyId = params.company
 		def projectId = session.CURR_PROJ.CURR_PROJ
 		def roleType = params.roleType
-		if ( !personInstance.hasErrors() && personInstance.save() ) {
+		if ( !person.hasErrors() && person.save() ) {
 			
 			if ( companyId != null && companyId != "" ) {
 				def companyParty = Party.findById( companyId )
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", personInstance, "STAFF" )
 			}
+
 			if ( projectId != null && projectId != "" && roleType != null) {
 				def projectParty = Party.findById( projectId )
 				def partyRelationship = partyRelationshipService.savePartyRelationship( "PROJ_STAFF", projectParty, "PROJECT", personInstance, roleType )
 			}
-			if(personInstance.lastName == null){
-				personInstance.lastName = ""	
-			}
-			flash.message = "Person ${personInstance} created"
+
+			flash.message = "Person ${person} created"
+			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
+		} else {
+			flash.message = "Unable to save person due to:" + GormUtil.errorsAsUL(person)
 			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
 		}
-		else {
-			flash.message = " Person FirstName cannot be blank. "
-			redirect( action:'projectStaff', params:[ projectId:projectId,submit:'Add' ] )
-		}
 	}
-	/*-----------------------------------------------------------
-	 * Will return person details for a given personId as JSON
-	 * @author : Lokanada Reddy 
-	 * @param  : person id
-	 * @return : person details as JSON
-	 *----------------------------------------------------------*/
-	def retrievePersonDetails() {
-		if (!controllerService.checkPermission(this, 'PersonEditView', false)) {
-			ServiceResults.unauthorized(response)
-			return
-		}
 
-		def personId = params.id
-		def person = Person.findById( personId  )
-		def userLogin = UserLogin.findByPerson( person )
-		
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-		def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
-		
-		def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
-		render personDetails as JSON
-	}
-	/*-----------------------------------------------------------
-	 * Check if the user inputed password is correct, and if so call the update method
-	 * @author : Ross Macfarlane 
-	 * @param  : person id and input password
-	 * @return : pass:"no" or the return of the update method
-	 *----------------------------------------------------------*/
-	def checkPassword() {
-		if (!controllerService.checkPermission(this, 'PersonEditView')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-
-		if(params.oldPassword == "")
-			return updatePerson()
-		def password = "" + params.newPassword;
-			
-		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
-		if(securityService.validPassword(userLogin.username, params.newPassword)){
-			def truePassword = userLogin.password
-			def passwordInput = new Sha1Hash(params.oldPassword).toHex()
-			
-			if(truePassword.equals(passwordInput))
-				return updatePerson()
-			def ret = []
-			ret << [pass:"no"]
-			render  ret as JSON
-		} else {
-			def ret = []
-			ret << [pass:"invalid"]
-			render  ret as JSON
-		}
-	}
-	/*-----------------------------------------------------------
+	/**
 	 * Update the person details and user password, Return person first name
-	 * @author : Lokanada Reddy 
 	 * @param  : person details and user password
 	 * @return : person firstname
-	 *----------------------------------------------------------*/
+	 */
 	def updatePerson() {
-		if (!controllerService.checkPermission(this, 'PersonEditView', false)) {
-			ServiceResults.unauthorized(response)
+		Person person = validatePersonAccess(params.id)
+		if (!person) {
 			return
 		}
-
+	
 		def personInstance = Person.get(params.id)
 		def ret = []
 		params.travelOK == "1" ? params : (params.travelOK = 0)
@@ -738,7 +688,7 @@ class PersonController {
 					partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
 			}
 
-			def personExpDates =params.list("availability")
+			def personExpDates = params.list("availability")
 			def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
 			personExpDates = personExpDates.collect{GormUtil.convertInToGMT(expFormatter.parse(it), tzId)}
 			def existingExp = ExceptionDates.findAllByPerson(personInstance)
@@ -777,18 +727,127 @@ class PersonController {
 			render  ret as JSON
 		}
 	}
-	
-	def resetPreferences ={
-		if (!controllerService.checkPermission(this, 'PersonEditView'))
-			return
 
-		def person = Person.findById(params.user)
-		def personInstance = UserLogin.findByPerson(person)
-		def prePreference = UserPreference.findAllByUserLogin(personInstance).preferenceCode
+	/**
+	 * Will return person details for a given personId as JSON
+	 * @param  params.id - the person id
+	 * @return person details as JSON
+	 */
+	def retrievePersonDetails() {
+		Person person = validatePersonAccess(params.id)
+		if (!person) {
+			return
+		}
+
+		def userLogin = UserLogin.findByPerson( person )
+		
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+
+		// TODO : JPM 5/2015 : Move the date formating into a reusable class
+		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
+		
+		def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
+
+		render personDetails as JSON
+	}
+
+	/**
+	 * Used by controller methods to validate that the user can access a person and will respond with appropriate 
+	 * HTTP responses based on access constraints (e.g. Unauthorized or Not Found)
+	 * @param personId - the id of the person to access
+	 * @return Person - the person if can access or null
+	 */
+	private Person validatePersonAccess(String personId) {
+		def currentPerson = securityService.getUserLoginPerson()
+		if (!currentPerson) {
+			ServiceResults.unauthorized(response)
+			return null
+		}
+
+		// Make sure we have a legit id
+		if (! personId || ! personId.isNumber() || ! personId.isLong() ) {
+			render Service.Results.invalidParams('Invalid or missing person id requested') as JSON
+			return
+		}
+		def editSelf = ( personId == currentPerson.id.toString() )
+
+		// If not edit own account, the user must have privilege to edit the account
+		if ( ! editSelf && ! controllerService.checkPermission(this, 'PersonEditView')) {
+			ServiceResults.unauthorized(response)
+			return null
+		}
+
+		if (! editSelf) {
+			// TODO : JPM 5/2015 : Need to make sure showing/editing someone that the user has access to
+		}
+
+		def person = Person.findById( personId  )
+		if (! person) {
+			ServiceResults.notFound()
+			return null
+		}
+
+		return person
+	}
+
+
+	/**
+	 * Check if the user inputed password is correct, and if so call the update method
+	 * @author : Ross Macfarlane 
+	 * @param  : person id and input password
+	 * @return : pass:"no" or the return of the update method
+	 */
+	def checkPassword() {
+		if (params.oldPassword == "")
+			return updatePerson()
+
+		def password = params.newPassword ?: ''
+			
+		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
+		if (securityService.validPassword(userLogin.username, params.newPassword)) {
+			def truePassword = userLogin.password
+			// TODO : JPM 5/2015 : Password encryption should be IN the securityService and NO WHERE ELSE. Should have passwordMatch method or something
+			def passwordInput = new Sha1Hash(params.oldPassword).toHex()
+			
+			if (truePassword.equals(passwordInput)) {
+				// TODO : JPM 5/2015 : The checkPassword and updatePerson functions are screwed up. The save button should be calling updatePerson directly
+				return updatePerson()
+			}
+		// TODO : JPM 5/2015 : Method should be returning standard ServiceResponse data	
+			def ret = []
+			ret << [pass:"no"]
+			render  ret as JSON
+		} else {
+			def ret = []
+			ret << [pass:"invalid"]
+			render ret as JSON
+		}
+	}
+
+	/** 
+	 * Used to clear out person's preferences. User can clear out own or requires permission
+	 */
+	def resetPreferences = {
+		Person person = validatePersonAccess(params.user)
+		if (!person) {
+			return
+		}
+
+		UserLogin userLogin = UserLogin.findByPerson(person)
+		if (! userLogin) {
+			log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
+			ServiceResults.notFound()
+			return 
+		}
+		
+		// TODO : JPM 5/2015 : Change the way that the delete is occurring
+		def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
 		prePreference.each{ preference->
-		  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,personInstance)
+		  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
 			 preferenceInstance.delete(flush:true)
 		}
+
 		userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
 		render person
 	}
@@ -799,8 +858,9 @@ class PersonController {
 	 * 
 	 */
 	def manageProjectStaff() {
-		if (!controllerService.checkPermission(this, 'EditProjectStaff'))
+		if (!controllerService.checkPermission(this, 'EditProjectStaff')) {
 			return
+		}
 
 		def start = new Date()
 		
@@ -896,7 +956,7 @@ class PersonController {
 	 * @return HTML 
 	 */
 	def loadFilteredStaff() {
-		if (!controllerService.checkPermission(this, 'ProjectStaffList', false)) {
+		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
 			ServiceResults.unauthorized(response)
 			return
 		}
@@ -1024,8 +1084,9 @@ class PersonController {
 	 * Note: There is no reference to this method
 	 */
 	def retrieveStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
-		if (!controllerService.checkPermission(this, 'ProjectStaffList'))
+		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
 			return
+		}
 
 		def sortOn = paramsMap.sortOn ?:"fullName"
 		def orderBy = paramsMap.orderBy?:'asc'
@@ -1067,93 +1128,6 @@ class PersonController {
 			}
 		}
 		
-		/*
-
-		StringBuffer queryForStaff = new StringBuffer("FROM PartyRole  p")
-		def sqlArgs = [:]
-		log.info("staffList: $staffList")
-		
-		StringBuffer queryForStaff = new StringBuffer("FROM PartyRole  p")
-		def sqlArgs = [:]
-		
-		if( role!="0" ){
-			def roleType =RoleType.findById(role)
-			sqlArgs << [roleArgs : [roleType]]
-		} else {
-			def roleTypes = partyRelationshipService.getStaffingRoles()
-			sqlArgs << [roleArgs : roleTypes]
-		}
-		queryForStaff.append(" WHERE p.roleType IN (:roleArgs) ")
-		
-		
-		if(project && projectId !=0 ){
-			def partyIds = partyRelationshipService.getProjectCompaniesStaff(projectId,'',true)
-			queryForStaff.append(" AND p.party IN (:partyIds) ")
-			sqlArgs << [partyIds : partyIds['staff']]
-		}
-		
-		queryForStaff.append("group by p.party, p.roleType order by p.party,p.roleType ")
-
-		log.info("queryForStaff: $queryForStaff")
-			
-		def partyRoles = PartyRole.findAll(queryForStaff,sqlArgs)
-		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-		def now = GormUtil.convertInToGMT( "now",session.getAttribute("CURR_TZ")?.CURR_TZ )
-		def activeProjects = projectService.getActiveProject( now, projectHasPermission, 'name', 'asc' )
-		def allProjRelations = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
-														and p.roleTypeCodeFrom = 'PROJECT' and p.partyIdFrom in (:partyIdFrom)",
-														[partyIdFrom:activeProjects])
-		partyRoles.each { relation->
-			Party party = relation.party
-			def person = Person.read(party.id)
-			def addComUsers = isProjMgr ?: false
-			if(person.active == "Y"){
-				def doAdd = true
-				if(assigned == "1"){
-					def hasProjReal
-					if (projectId != "0") {
-						hasProjReal = allProjRelations.find{ it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
-						   it.roleTypeCodeTo.id == relation.roleType?.id}
-					} else {
-						hasProjReal = allProjRelations.find{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}
-					}
-					if (!hasProjReal) {
-						doAdd = false
-					}
-				}
-				if(doAdd){
-					
-					def company = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = :party "+
-						"and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'",[party:party]).partyIdFrom
-					if(!isProjMgr){
-						if(company.id == userCompany.id){
-							addComUsers = true
-						} else if(projectId != "0" ){
-							def hasProjReal = allProjRelations.find{it.partyIdFrom?.id == project.id && it.partyIdTo?.id == party?.id && 
-								it.roleTypeCodeTo.id == relation.roleType?.id}
-							if(hasProjReal){
-								addComUsers = true
-							}
-						}
-					}
-					if( addComUsers ){
-						def projectStaff = allProjRelations.findAll{it.partyIdTo.id == party.id && it.roleTypeCodeTo.id == relation.roleType.id}?.partyIdFrom
-						def map = new HashMap()
-						map.put("company", company)
-						map.put("name", party.firstName+" "+ party.lastName)
-						map.put("role", relation.roleType)
-						map.put("staff", party)
-						map.put("project",projectId)
-						map.put("roleId", relation.roleType.id)
-						map.put("staffProject", projectStaff?.name)
-					
-						staffList << map
-					}
-				}
-			}
-		}
-		*/
-		
 		staffList.sort{ a,b->
 			if(orderBy == 'asc'){
 				firstProp ? (a."${firstProp}"?."${sortOn}" <=> b."${firstProp}"."${sortOn}") : ((a."${sortOn}").toString() <=> b."${sortOn}".toString())
@@ -1172,12 +1146,12 @@ class PersonController {
 	 *@return NA
 	 */
 	def loadGeneral() {
-		if (!controllerService.checkPermission(this, 'ProjectStaffShow', false)) {
+		if (!controllerService.checkPermission(this, 'ProjectStaffShow')) {
 			ServiceResults.unauthorized(response)
 			return
 		}
 
-		log.info "class: ${params.personId.class}    value: ${params.personId}"
+		log.debug "loadGeneral() class: ${params.personId.class} value: ${params.personId}"
 		def tab = params.tab ?: 'generalInfoShow'
 		def person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
@@ -1205,6 +1179,7 @@ class PersonController {
 	 *@return MAP of bundle header containing projectName ,event name, start time and event id
 	 */
 	private def retrieveBundleHeader(moveEvents) {
+		// TODO : JPM 5/2015 : Need to add security controls
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
 		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
@@ -1265,13 +1240,14 @@ class PersonController {
 	}
 	
 	/**
-	 * This action is used to handle ajax request and to delete preference except Preference Code : Current Dashboard
+	 * This action is used to handle ajax request and to delete current user's individual preferences except 'Current Dashboard'
 	 * @param prefCode : Preference Code that is requested for being deleted
 	 * @return : boolean
 	 */
 	def removeUserPreference() {
+		// TODO : JPM 5/2015 : Improve removeUserPreference - validate it was successful, return SecurityService.success
 		def prefCode = params.prefCode
-		if(prefCode != "Current Dashboard")
+		if (prefCode != "Current Dashboard")
 			userPreferenceService.removePreference(prefCode)
 			
 		render true

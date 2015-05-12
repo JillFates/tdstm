@@ -78,4 +78,5 @@ databaseChangeLog = {
 	include file: '20150417-alter-foreign-key-on-model-sync.groovy'
 	include file: '20150420-update-client-admin-and-client-mgr-permissions.groovy'
 	include file: '20150428-new-person-and-project-staff-permissions.groovy'
+	include file: '20150512-add-some-privileges.groovy'
 }

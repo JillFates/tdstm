@@ -62,7 +62,7 @@ class ServiceResults {
 	 * @param object an array or map to be set as errors
 	 * @return the response map
 	 */
-	static def errors(errorStringOrList) {
+	static Map errors(errorStringOrList) {
 		def renderMap = [:]
 
 		renderMap.status = 'error'
@@ -160,7 +160,7 @@ class ServiceResults {
 	 * Sends a method failure error with the validation errors
 	 * @param response the response object
 	 */
-	static def invalidParams(errs) {
+	static Map invalidParams(errs) {
 		if (errs instanceof String)
 			errs = [errs]
 		return errors(errs)
@@ -171,10 +171,19 @@ class ServiceResults {
 	 * Sends a forbidden error
 	 * @param response the response object
 	 */
-	static def forbidden(response, log = null, Exception e = null) {
+	static void forbidden(response, log = null, Exception e = null) {
 		if (e != null) {
 			response.addHeader("errorMessage", e.getMessage())
 		}
 		response.sendError(403, 'Forbidden')
 	}
+
+	/**
+	 * Sends a Not Found 404 error
+	 * @param response the response object
+	 */
+	static void notFound(response) {
+		response.sendError(404, 'Not Found')
+	}	
+
 }
