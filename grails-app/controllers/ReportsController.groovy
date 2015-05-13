@@ -879,7 +879,7 @@ class ReportsController {
 				powerTBD = powerType != "Watts" ?  powerTBD ? (powerTBD / 120).toFloat().round(1) : 0.0 : powerTBD ? Math.round(powerTBD):0
 				totalPower = powerType != "Watts" ?  totalPower ? (totalPower / 120).toFloat().round(1) : 0.0 : totalPower ? Math.round(totalPower):0
 				
-				reportDetails << [location:rack.location, room:rack.room, rack:rack.tag, devices:assets.size(),
+				reportDetails << [location:rack.location?.toString(), room:rack.room?.toString(), rack:rack.tag, devices:assets.size(),
 								  powerA:powerA,powerB:powerB,powerC:powerC,powerTBD:powerTBD,totalPower:totalPower]
 			}
 			if(params.output == "excel"){
