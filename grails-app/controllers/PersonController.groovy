@@ -203,18 +203,17 @@ class PersonController {
 			render(ServiceResults.invalidParams('Please select at least one person to be be bulk deleted.') as JSON)
 			return
 		}
-		
+
 		if (ids instanceof String) {
 			def arr = new String[1];
 			arr[0] = ids;
 			ids = arr;
 		}
-		
 
 		try {
 			controllerService.checkPermissionForWS('BulkDeletePerson') 
 			def deleteIfAssocWithAssets = params.deleteIfAssocWithAssets == 'true'
-			def data = personService.bulkDelete(loginUser, ids, deleteIfAssocWithAssets)
+			def data = personService.bulkDelete(ids, deleteIfAssocWithAssets)
 			render(ServiceResults.success(data) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)

@@ -107,7 +107,7 @@ var tdsCommon = {
 				break;
 			default:
 				if (errorMsg != null) {
-					this.displayError(errorMsg, useAlerts);
+					this.displayError(errorMsg, alerts);
 				} else {
 					this.displayError("An unexpected error occurred. Please try again.", alerts);
 				}

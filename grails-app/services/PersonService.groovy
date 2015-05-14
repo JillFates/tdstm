@@ -633,17 +633,12 @@ class PersonService {
 	 *   skipped: number of persons skipped
 	 *   cleared: number of assets references that were cleared/unassigned
 	 */
-	Map bulkDelete(UserLogin user, Object ids, Boolean deleteIfAssocWithAssets) {
-		if (!securityService.hasPermission(user, 'BulkDeletePerson')) {
-			log.warn "SECURITY : $user attempted to perform Bulk Delete of persons but doesn't have permission"
-			throw new UnauthorizedException('User doesn\'t have a BulkDeletePerson permission')
-		}
-
+	Map bulkDelete(Object ids, Boolean deleteIfAssocWithAssets) {
 		if (! ids || ids.size()==0) {
 			throw new InvalidParamException('Must select at least one person to delete')
 		}
 
-		log.info "$user is attempted to bulk delete ${ids?.size()} persons ($ids), deleteIfAssocWithAssets=$deleteIfAssocWithAssets"
+		log.info "Attempted to bulk delete ${ids?.size()} persons ($ids), deleteIfAssocWithAssets=$deleteIfAssocWithAssets"
 
 		def deleted = 0
 		def skipped = 0
