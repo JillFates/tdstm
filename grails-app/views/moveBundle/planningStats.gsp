@@ -41,13 +41,17 @@ $(document).ready(function() {
 		width : percentageOtherToValidate + "%"
 	}, 1000);
 
+	/*
 	$("#eventDataTableId").css('max-width',
 			$(window).width() * 2.0 / 100 + '%')
+	*/
+	
 
 	$("#containerId").css('width',
 				$(window).width() - 50  + 'px')
-		
-
+	
+	$("#eventDataTableId").css('max-width',
+				$(".dashboard_div.col-md-7.col-xs-7").width() - $("#eventHeaderTableId").width()-50)
 
 	if($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width())
 	{
@@ -68,20 +72,22 @@ $(document).ready(function() {
 	    $.fn.hasScrollBar = function() {
 	        return this.get(0).scrollWidth > this.width();
 	    }
-		
-		
+				
 	})(jQuery);
 
    
 	$(window).resize(
 		function() {
-			
 			var scrollbarWasVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar was visible before the screen resize
-			$("#eventDataTableId").css('max-width',
+			/*$("#eventDataTableId").css('max-width',
 					$(window).width() *  2.0 / 100 + '%')
+					*/
 
 			$("#containerId").css('width',
 			$(window).width() - 50  + 'px')
+			
+			$("#eventDataTableId").css('max-width',
+				$(".dashboard_div.col-md-7.col-xs-7").width() - $("#eventHeaderTableId").width()-50)
 			
 			
 			var scrollbarIsVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar is visible after the screen resize
@@ -653,6 +659,7 @@ $(document).ready(function() {
 					</tbody>
 				</table>
 				
+				<script type="text/javascript">$(window).resize()/*Prevents the div from jumping around the page when it loads*/</script> 
 			</div>
 		</div>
 	</div>
