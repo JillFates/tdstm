@@ -870,14 +870,14 @@ class PersonController {
 		
 		def project = securityService.getUserCurrentProject()
 		def roleTypes = partyRelationshipService.getStaffingRoles()
-		def role = params.role ? params.role : "MOVE_TECH"
+		def role = params.role ? params.role : "0"
 		def moveEventList = []
 		
 		// set the defaults for the checkboxes
-		def assigned = userPreferenceService.getPreference("ShowAssignedStaff") ?: '1'
-		def onlyClientStaff = userPreferenceService.getPreference("ShowClientStaff") ?: '1'
+		def assigned = userPreferenceService.getPreference("ShowAssignedStaff") ?: '0'
+		def onlyClientStaff = userPreferenceService.getPreference("ShowClientStaff") ?: '0'
 		
-		def currRole = userPreferenceService.getPreference("StaffingRole")?:"MOVE_TECH"
+		def currRole = userPreferenceService.getPreference("StaffingRole")?:"0"
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
 		def currPhase = userPreferenceService.getPreference("StaffingPhases")?:"All"
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
