@@ -4,7 +4,7 @@ var UserMenu = function() {
   this.signOutCss = 'a[href="/tdstm/auth/signOut"].mmlink';
   this.accountDetailsCss = 'a[href^="/tdstm/person/retrievePersonDetails/"]';
   this.editPreferencesCss = '#resetPreferenceId';
-  this.useMobileSiteCss = 'a[href="/tdstm/clientTeams/listTasks?viewMode=mobile&tab="]';
+  this.useMobileSiteCss = 'a[href="/tdstm/task/listUserTasks?viewMode=mobile&tab="]';
   this.userMegaMenuId = 'userMegaMenu';
   
 

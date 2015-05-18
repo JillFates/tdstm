@@ -246,10 +246,10 @@
           <span class="button"><g:actionSubmit class="save" value="Update" onclick="return validateStepsData()"/></span>
           <span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Cancel" action="show" /></span>
         </div>
-      <g:javascript>
+      <script type="text/javascript">
         initialize();
         var maxDuration = calculateMaxDuration()
-      </g:javascript>
+      </script>
     </div>
     <div class="body" style="margin: 0;">
    		<g:if test="${remainingSteps}">
@@ -267,8 +267,7 @@
 					<th>Completion</th>
 					<th>Duration</th> -->
 					<th>Start - Completion</th>
-					<th>Type</th>
-					<th>Value 
+					<th>Type
 					<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
 					</th>
 					<th>Be Green</th>
@@ -349,26 +348,6 @@
 									</div>
 								</td>
 								<td>
-									<g:if  test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">
-										<div id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
-											<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
-											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
-										</div>
-										<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
-											<img src="${resource(dir:'icons',file:'exclamation.png')}">
-										</div>
-									</g:if>
-									<g:else>
-										<div id="tasksCompletedInput_${dashboardStep.step.id }" title="input" style="display: none;">
-											<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="" 
-											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3"  onchange="validateManulaValue(this.value, ${dashboardStep.step.id })"/>%
-										</div>
-										<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
-											<img src="${resource(dir:'icons',file:'exclamation.png')}">
-										</div>
-									</g:else>
-								</td>
-								<td>
 									<div id="beGreenDiv_${dashboardStep.step.id }" style="text-align: center;" >
 										<g:if test="${dashboardStep.moveBundleStep?.showInGreen}">
 											<input type="checkbox" name="beGreen_${dashboardStep.step.id }" id="beGreen_${dashboardStep.step.id }" checked="checked"/>
@@ -445,15 +424,6 @@
 									<g:select from="${['L', 'M']}" valueMessagePrefix="step.calcMethod" name="calcMethod_${dashboardStep.step.id }"
 									value="${dashboardStep.moveBundleStep?.calcMethod}" onchange="showTaskCompleted(this.value, ${dashboardStep.step.id })"/>
 								</div>
-								</td>
-								<td>
-									<div style="display: none;" id="tasksCompletedInput_${dashboardStep.step.id }" title="input">
-										<input type="text" name="tasksCompleted_${dashboardStep.step.id }" style="width: 25px;" value="${dashboardStep.stepSnapshot?.tasksCompleted}" 
-											id="tasksCompleted_${dashboardStep.step.id }" maxlength="3" onchange="validateManulaValue(this.value, ${dashboardStep.step.id })" />%
-									</div>
-									<div id="stepValueImg_${dashboardStep.step.id }" style="display: none;" title="">
-										<img src="${resource(dir:'icons',file:'exclamation.png')}">
-									</div>
 								</td>
 								<td>
 									<div id="beGreenDiv_${dashboardStep.step.id }" style="display: none;text-align: center;">

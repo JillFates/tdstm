@@ -1,5 +1,6 @@
 import com.tds.asset.AssetComment
 import com.tds.asset.TaskDependency
+import com.tds.asset.AssetDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
@@ -24,6 +25,8 @@ class TaskController {
 	def userPreferenceService
 	def jdbcTemplate
 	def reportsService
+	def assetEntityService
+	def partyRelationshipService
 
 	def index() { }
 	
@@ -48,7 +51,7 @@ class TaskController {
 			if (params.status == AssetCommentStatus.DONE) {
 				redirParams << [sync:1]
 			}
-			forward(controller:'clientTeams', action:'listTasks', params:redirParams)			
+			forward(controller:'task', action:'listUserTasks', params:redirParams)			
 		} else {
 			// Coming from the Task Manager
 			render map as JSON
@@ -1100,6 +1103,278 @@ digraph runbook {
 		
 		render results.toString()
 
+	}
+
+	/**
+	 * Generates the user's list of tasks for the current project
+	 * params:
+	 *		tab - all or todo 
+	 */
+	def listUserTasks() {
+		def project = controllerService.getProjectForPage(this)
+		if (!project) {
+			return
+		}
+		//log.error "PROJECT: ${project}"
+		def person = securityService.getUserLoginPerson()
+		//log.error "PERSON=${person}"
+		def entities = assetEntityService.entityInfo( project )
+		// If the request is being made as a redirect for a previous task update that was being completed, we need to sleep a moment
+		// to allow the Quartz job that updates successors to finish so that when the user sees the new results that it may have successors
+		// there were updated by the previous update.
+		if (params.containsKey('sync')) {
+			log.info "listUserTasks - sync'n 500 ms for ${person} on project ${project.id}"
+			this.sleep(500)
+			log.info "listUserTasks - sunk for ${person} on project ${project.id}"
+		}
+		
+		log.debug "listUserTasks: params=$params, project=$project, person=$person, entities=${entities.size()}"
+
+		def allTasks = false
+
+		// Parameters 		
+		def tab
+		def taskList
+		def todo
+		def all
+		
+		// Deal with the user preferences
+		def viewMode = params.viewMode
+		def search = params.search
+		def sort = params.sort
+		
+		if (viewMode) { 
+			session.setAttribute('TASK_VIEW_MODE', viewMode)
+		}
+		// log.info "listComment() sort=${params.sort}, order=${params.order}"
+
+		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
+		def isMoveTech = partyRelationshipService.staffHasFunction(project.id, person.id, 'MOVE_TECH')
+
+		if (params.event) {
+			def eventP = params.event.equals('null') ? "_null" : params.event;
+			userPreferenceService.setPreference("MYTASKS_MOVE_EVENT_ID", eventP)
+		}
+		
+		def moveEventId = userPreferenceService.getPreference("MYTASKS_MOVE_EVENT_ID")
+		if (moveEventId.equals("_null")) {
+			moveEventId = null
+		}
+		def moveEvent = MoveEvent.get(moveEventId)
+		
+		// Use the taskService.getUserTasks service to get all of the tasks [all,todo]
+		def tasks = taskService.getUserTasks(person, project, false, 7, params.sort, params.order, search, moveEvent)
+		
+		// Get the size of the lists
+		def todoSize = tasks['todo'].size()
+		def allSize = tasks['all'].size()
+
+		// Based on which tab the user is viewing we'll set taskList to the appropriate list to be returned to the user
+		if (params.tab=='all') {
+			tab = 'all'
+			taskList = tasks['all']
+			allTasks = true
+		} else {
+			tab = 'todo'
+			taskList = tasks['todo']
+		}
+		
+		// Build the list and associate the proper CSS style
+		def issueList = []
+		taskList.each{ task ->
+			def css = taskService.getCssClassForStatus( task.status )
+			issueList << ['item':task,'css':css]
+		}
+		def timeToRefresh =  userPreferenceService.getPreference("MYTASKS_REFRESH")
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
+		
+		// Determine the model and view
+		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
+			search:search, sort:params.sort, order:params.order,
+	 		personId:person.id, isCleaner:isCleaner, isMoveTech:isMoveTech,
+			timeToUpdate:timeToRefresh ?: 60, 
+			isOnIE:false, person:person,servers : entities.servers, 
+			applications : entities.applications, dbs : entities.dbs, 
+			files : entities.files,  networks :entities.networks,
+			assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, 
+			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,moveEventList:moveEventList, moveEvent: moveEvent]
+		
+		if(search && taskList.size() > 0){
+			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]
+		}
+		def view = params.view == "myTask" ? "_tasks" : "myIssues"
+		model << [timers:session.MY_ISSUE_REFRESH?.MY_ISSUE_REFRESH]
+		if ( request.getHeader ( "User-Agent" ).contains ( "MSIE" ) ) {
+			model.isOnIE= true
+		}
+
+		log.debug "listUserTasks: View is $view"
+		
+		// Send the user on his merry way
+		render (view:view, model:model)
+		
+	}
+
+	/**
+	 * @author Ross Macfarlane
+	 * @return JSON response containing the number of tasks assigned to the current user {count:#}
+	 */
+	def retrieveUserToDoCount() {
+		def project = controllerService.getProjectForPage(this)
+		if (!project) {
+			return
+		}
+
+		def person = securityService.getUserLoginPerson()
+		def tasksStats = taskService.getUserTasks(person, project, true)
+		// log.info "retrieveToDoCount: tasksStats=${tasksStats}"
+		def map = [ count:tasksStats['todo'] ]
+		render map as JSON
+	}
+
+	/**
+	 * Used in the MyTasks view to display the details of a Task/Comment
+	 * @param issueId
+	 * @return HTML that is used by an AJax call
+	 */
+	def showIssue() {
+
+		def project = securityService.getUserCurrentProject()
+
+		// This is such a hack at the moment but if this errors, the mobile scanner doesn't have any way to get back to the previous screen 
+		// so it is a painful experience to close the app, kill the app, restart, login and then get back to the original screen.
+		def backButton = 'Please press the Back button to return to the previous screen.<p/><button onclick="goBack()">Back</button>'
+		def backScript = """
+<script>
+function goBack() { window.history.back() }
+</script>
+"""
+		
+		log.debug "showIssue: params=$params, project=$project"
+
+		def assetComment = AssetComment.findByIdAndProject(params.issueId, project)
+
+		if (! assetComment) {
+			render "${backScript}Unable to locate a task for asset [${params.search}/${params.issueId}]. $backButton"
+			return
+		}
+		
+
+		def cartQty = '	'
+		def moveEvent = assetComment.moveEvent
+		
+		// Determine the cart quantity
+		// The quantity only appears on the last label scanned/printed for a particular cart. This is used to notify
+		// the logistics and transport people that the cart is ready to wrap up.
+		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "CLEANER" && assetComment.status != AssetCommentStatus.DONE) {
+			def cart = taskService.getCartQuantities(moveEvent, assetComment.assetEntity.cart)
+			if (cart && ( cart.total - cart.done ) == 1) {
+				// Only set the cartQty if we're printing the LAST set of labels for a cart (done is 1 less than total)
+				cartQty = cart.total
+			}
+		}
+		// log.info "cartQty ($cartQty)"
+		
+		def selectCtrlId = "assignedToEditId_${assetComment.id}"
+		def assignToSelect = taskService.assignToSelectHtml(project.id, params.issueId, assetComment.assignedTo?.id, selectCtrlId)
+		def person = securityService.getUserLoginPerson()
+		
+		// Bounce back to the user if we didn't get a legit id, associated with the project
+		if (! assetComment ) {
+			log.error "${person} attempted an invalide access a task/comment with id ${params.issueId} on project $project"
+			render "${backScript}Unable to find specified record. ${backButton}"
+			return
+		}
+		
+		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy");
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			
+		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
+		def canPrint = request.getHeader ( "User-Agent" ).contains ( "MSIE" ) && isCleaner
+		
+		def noteList = assetComment.notes.sort{it.dateCreated}
+		def notes = []
+		noteList.each{
+			def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
+			notes << [dateCreated , it.createdBy.toString() ,it.note]
+		}
+		
+		def viewMode = session.getAttribute("TASK_VIEW_MODE")
+		
+		// Determine if the user should be able to edit the task. The rules are:
+		// 1. If ADMIN, CLIENT_ADMIN or CLIENT_MGR can always edit
+		// 2. Can ALWAYS add a NOTE.
+		// 3. Change person - when task is in the PENDING/READY status? 
+		 
+		def assignmentPerm = false
+		def categoryPerm = false
+		def permissionForUpdate = true
+
+		if (securityService.hasRole( ['ADMIN', 'CLIENT_ADMIN', 'CLIENT_MGR'])) {
+			assignmentPerm = categoryPerm = true
+		} else {
+			// AssignmentPerm can be changed if task is not completed/terminated
+			assignmentPerm = ! [AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(assetComment.status)
+		}
+		
+		def dueDate = assetComment.dueDate ? dueFormatter.format(GormUtil.convertInToUserTZ(assetComment.dueDate, tzId)) : ''
+		
+		def successor = TaskDependency.findAllByPredecessor( assetComment )
+		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
+		projectStaff.sort{it.firstName}
+	    
+		def model = [ assetComment:assetComment,
+			notes:notes, 
+			statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
+			permissionForUpdate:permissionForUpdate, 
+			assignmentPerm:assignmentPerm, 
+			categoryPerm:categoryPerm,
+			successor:successor, 
+			projectStaff:projectStaff,
+			canPrint:canPrint,
+			dueDate:dueDate,
+			assignToSelect:assignToSelect,
+            assetEntity:assetComment.assetEntity,
+            cartQty:cartQty,
+			project:project
+            ]
+	
+		def view = isCleaner ? '_showCleanerTask' : 'showIssue'
+		if(isCleaner){
+			def lblQty= session.getAttribute('printLabelQuantity') ?: userPreferenceService.getPreference( "printLabelQuantity" )
+			def printerName=session.getAttribute('PRINTER_NAME') ?: userPreferenceService.getPreference( "PRINTER_NAME" )
+			model << [lblQty:lblQty, prefPrinter:printerName]
+		}
+		render (view:view,model:model)
+	}
+
+	/**
+	 * Used in a email to display the details of a Task/Comment
+	 * @param task/comment id
+	 * @return HTML that is used to display a task form an email
+	 */
+	def showTaskforEmail() {
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		if (!project) {
+			return
+		}
+
+		def isValidUser= false
+		def task= AssetComment.get(params.id)
+		if(task?.assignedTo.id == userLogin.person.id){
+			def isPersonAssignedToProject = partyRelationshipService.isPersonAssignedToProject()
+			if(isPersonAssignedToProject)
+				isValidUser = true
+		}
+		
+		if(isValidUser){
+			// if we are here good to go
+			return commentService.showOrEditTask(params)
+		} else {
+			redirect(controller:"task", action:"listUserTasks", params:[message:"you dont have permissions to access this task ${task.taskNumber}"])
+		}
 	}
 
 }

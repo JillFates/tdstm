@@ -87,22 +87,6 @@ function getDeatiledReport( records, table ){
 							"<td>"+record.audit_action+"</td><td>"+record.value+"</td><td></tr>"
 				}
 			break;
-			/* for asset_transition */
-			case "asset_transition" :
-				var thead ="<tr><th>asset_transition_id</th><th>asset_entity_id</th><th>move_bundle_id</th><th>user_login_id</th><th>project_team_id</th>"+
-							"<th>comment</th><th>date_created</th><th>last_updated</th><th>state_from</th><th>state_to</th><th>type</th><th>voided</th><tr>"	
-				for( i = 0; i < dataLength; i++){
-					var cssClass = 'odd'
-					if(i % 2 == 0){
-						cssClass = 'even'
-					}
-					var record = records[i]
-					tbody +="<tr class='"+cssClass+"'><td>"+record.asset_transition_id+"</td><td>"+record.asset_entity_id+"</td><td>"+record.move_bundle_id+"</td>"+
-							"<td>"+record.user_login_id+"</td><td>"+record.project_team_id+"</td><td>"+record.comment+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.date_created, offset)+"</td><td nowrap>"+getConvertedTimeFormate(record.last_updated, offset) +"</td>"+
-							"<td>"+record.state_from +"</td><td>"+record.state_to+"</td><td>"+record.type +"</td><td>"+record.voided +"</td></tr>"
-				}
-			break;
 			/* for data_transfer_attribute_map */
 			case "data_transfer_attribute_map" :
 				var thead ="<tr><th>id</th><th>eav_attribute_id</th><th>data_transfer_set_id</th><th>column_name</th><th>is_required</th>"+

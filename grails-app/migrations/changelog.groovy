@@ -79,4 +79,5 @@ databaseChangeLog = {
 	include file: '20150420-update-client-admin-and-client-mgr-permissions.groovy'
 	include file: '20150428-new-person-and-project-staff-permissions.groovy'
 	include file: '20150512-add-some-privileges.groovy'
+	include file: '20150430-remove-asset-transition.groovy'
 }

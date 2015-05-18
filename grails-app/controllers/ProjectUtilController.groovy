@@ -7,7 +7,6 @@ import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 
 class ProjectUtilController {
@@ -16,8 +15,6 @@ class ProjectUtilController {
 	def partyRelationshipService
 	def jdbcTemplate
 	def stateEngineService
-	def workflowService
-	def stepSnapshotService
 
 	def index() {
 
@@ -200,7 +197,6 @@ class ProjectUtilController {
 						def newEventBundles = MoveBundle.findAll(" From MoveBundle mb where mb.project = ${projectInstance.id} and mb.name in ( select tmb.name from MoveBundle tmb where tmb.moveEvent = ${event.id})" )
 						newEventBundles.each{ newBundle ->
 							moveEvent.addToMoveBundles( MoveBundle.get( newBundle.id ) )
-							stepSnapshotService.process( newBundle.id )
 						}
 						// copy template event news
 						copyMoveEventNews(moveEvent, event)
@@ -291,33 +287,6 @@ class ProjectUtilController {
 					custom8: asset.custom8
 					)
 			if ( assetEntity.validate() && assetEntity.save(insert : true, flush:true) ) {
-				/*
-				 *  Copy assetTransitions
-				 */
-				def assetTransitions = AssetTransition.findAllByAssetEntity( asset )
-				assetTransitions.each{ trans ->
-					def assetTransition = new AssetTransition(
-							assetEntity : assetEntity,
-							moveBundle  : assetEntity.moveBundle,
-							projectTeam : null,
-							userLogin   : userLogin,
-							stateFrom: trans.stateFrom,
-							stateTo: trans.stateTo,
-							timeElapsed: trans.timeElapsed,
-							wasOverridden: trans.wasOverridden,
-							wasSkippedTo: trans.wasSkippedTo,
-							comment: trans.comment,
-							dateCreated: new Date(trans.dateCreated?.getTime() + timeDelta ),
-							voided: trans.voided,
-							type: trans.type,
-							isNonApplicable: trans.isNonApplicable
-							)
-					if ( ! assetTransition.validate() || ! assetTransition.save(insert : true, flush:true) ) {
-						def etext = "Unable to create asset ${assetTransition}" +
-								GormUtil.allErrorsString( assetTransition )
-						println etext
-					}
-				}
 				/*
 				 *  Copy project asset map
 				 */

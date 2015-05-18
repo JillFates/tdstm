@@ -470,13 +470,6 @@
 									</div>
 								</g:hasErrors> 
 							</td>
-							<td class="name">
-								<label for="trackChanges">Display Transitions in Status bar:</label>
-							</td>
-							<td colspan="3">
-								<g:select id="trackChanges" name="trackChanges"	from="${projectInstance.constraints.trackChanges.inList}" 
-								value="${projectInstance.trackChanges}" valueMessagePrefix="project.trackChanges"></g:select>
-							</td>
 						</tr>
 					</tbody>
 				</table>

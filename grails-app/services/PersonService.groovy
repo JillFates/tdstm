@@ -541,7 +541,7 @@ class PersonService {
 	 * @return
 	 */
 	def updateUserLoginRefrence(fromUserLogin, toUserLogin){
-		def map = ['asset_transition':['user_login_id'], 'data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
+		def map = ['data_transfer_batch':['user_login_id'],'model_sync':['created_by_id']]
 		map.each { table, columns->
 			columns.each { column->
 				jdbcTemplate.update("UPDATE ${table} SET ${column} = ${toUserLogin.id} where ${column}=${fromUserLogin.id}")

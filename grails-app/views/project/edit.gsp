@@ -240,20 +240,6 @@
 								<tds:convertDateTime date="${projectInstance?.dateCreated}"
 									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
-							<td class="name">
-								<label for="trackChanges">Display Transitions in Status bar:</label>
-							</td>
-							<td class="valueNW">
-								<g:select id="trackChanges"
-									name="trackChanges"
-									from="${projectInstance.constraints?.trackChanges?.inList}"
-									value="${projectInstance.trackChanges}"
-									valueMessagePrefix="project.trackChanges"></g:select>
-								<g:hasErrors bean="${projectInstance}" field="trackChanges">
-									<div class="errors">
-										<g:renderErrors bean="${projectInstance}" as="list" field="trackChanges" />
-									</div>
-								</g:hasErrors>
 							</td>
 						</tr>
 						<tr>

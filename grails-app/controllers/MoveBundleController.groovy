@@ -15,7 +15,6 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
-import com.tds.asset.AssetTransition
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tdsops.tm.enums.domain.*
@@ -36,7 +35,6 @@ class MoveBundleController {
 	def quartzScheduler
 	def securityService
 	def stateEngineService
-	def stepSnapshotService
 	def taskService
 	def userPreferenceService
     
@@ -253,14 +251,7 @@ class MoveBundleController {
 				stepsList.each{
 					def checkbox = params["checkbox_"+it.id]
 					if(checkbox  && checkbox == 'on'){
-						def moveBundleStep = moveBundleService.createMoveBundleStep(moveBundleInstance, it.id, params)
-						def tasksCompleted = params["tasksCompleted_"+it.id] ? Integer.parseInt(params["tasksCompleted_"+it.id]) : 0
-						def calcMethod = params["calcMethod_"+it.id]
-						if(calcMethod == "L"){
-							stepSnapshotService.createLinearSnapshot( moveBundleInstance.id, moveBundleStep.id )
-						} else {
-							stepSnapshotService.createManualSnapshot( moveBundleInstance.id, moveBundleStep.id, tasksCompleted )
-						}
+						moveBundleService.createMoveBundleStep(moveBundleInstance, it.id, params)
 					} else {
 						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundleInstance , it.id)
 						if( moveBundleStep ){
@@ -355,37 +346,6 @@ class MoveBundleController {
 		}
 	}
 
-	/**
-	 * Used to create StepSnapshot records for specified MoveBundle/MoveBundleStep.  
-	 * @param moveBundleId
-	 * @param moveBundleStepId 
-	 * @param tasksCompleted value 0-100 representing % completed
-	 * @return Returns 200 okay or appropriate error message
-	 */
-	def createManualStep() {
-
-		try {
-			def moveBundleId = Integer.parseInt(params.moveBundleId)
-			def moveBundleStepId = Integer.parseInt(params.moveBundleStepId)
-			def tasksCompleted = Integer.parseInt(params.tasksCompleted)
-			if ( tasksCompleted < 0 || tasksCompleted > 100 ) {
-				response.sendError( 400, "Bad Request P")
-				// render("400 Bad Request")
-				return false
-			}
-
-			def result = stepSnapshotService.createManualSnapshot( moveBundleId, moveBundleStepId, tasksCompleted)
-
-			if (result == 200)
-				render ("Record created")
-			else
-				response.sendError( result , "Error ${result}" )
-		} catch(NumberFormatException nfe) {
-			nfe.printStackTrace()
-			response.sendError( 400, "Bad Request NFE")
-		}
-
-	}
 	/* if the checkbox is subsequently checked and the form submitted, a new MoveBundleStep shall be created for that transition.
 	 *  @param moveBundleId
 	 * 	@param transitionId
@@ -443,21 +403,7 @@ class MoveBundleController {
 		}
 		render moveBundlesList as JSON
 	}
-	/*
-	 * Clear any transitions for the assets in that bundle. 
-	 * @param : bundleId, ProjectId
-	 * */
-	def clearBundleAssetHistory() {
-		def bundleId = params.id
-		if(bundleId){
-			def moveBundle = MoveBundle.get( bundleId )
-			AssetTransition.executeUpdate("DELETE FROM AssetTransition at WHERE at.assetEntity in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})" )
-			ProjectAssetMap.executeUpdate("DELETE FROM ProjectAssetMap WHERE asset in (SELECT ae.id FROM AssetEntity ae WHERE ae.moveBundle = ${moveBundle.id})")
-			MoveBundleStep.executeUpdate("UPDATE MoveBundleStep mbs SET mbs.actualStartTime = null , mbs.actualCompletionTime = null WHERE mbs.moveBundle = ?", [moveBundle])
-			stepSnapshotService.process( bundleId )
-		}
-		redirect(action:"show",params:[id:params.id])
-	}
+
 	/**
 	 * 
 	 */

@@ -1,5 +1,4 @@
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetTransition
 import com.tdsops.tm.enums.domain.ContextType;
 
 class MoveBundle extends Party {	
@@ -36,7 +35,6 @@ class MoveBundle extends Party {
 	}
 
 	static hasMany = [
-		assetTransitions : AssetTransition,
 		moveBundleSteps  : MoveBundleStep,
 		sourceRacks : Rack,
 		targetRacks : Rack,

@@ -22,7 +22,7 @@
 		/*
 		$("#MyTasksMenuId").ready(getTaskCount());
 		function getTaskCount(){
-			new Ajax.Request('/tdstm/clientTeams/retrieveToDoCount',{asynchronous:true,evalScripts:true,onComplete:function(e){setTaskCount(e)}});;
+			new Ajax.Request('/tdstm/task/retrieveUserToDoCount',{asynchronous:true,evalScripts:true,onComplete:function(e){setTaskCount(e)}});;
 		}
 		function setTaskCount( e ){
 			var count = eval("(" + e.responseText + ")")[0].count;
@@ -276,7 +276,7 @@
 				case "#teamMegaMenu":
 					if($("#teamMegaMenu:visible").length){
 						jQuery.ajax({
-							url: contextPath+'/clientTeams/retrieveToDoCount',
+							url: contextPath+'/task/retrieveUserToDoCount',
 							type:'POST',
 							success: function(resp) {
 								$("#todoCountProjectId").html(resp.count)

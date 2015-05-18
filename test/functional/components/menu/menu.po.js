@@ -386,7 +386,7 @@ var Menu = function(){
     return browser.driver.findElements(by.css('#teamMenuId a.mmlink'));
   };
   this.getMyTasks = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/clientTeams/listTasks"]'));
+    return browser.driver.findElement(by.css('a[href="/tdstm/task/listUserTasks"]'));
   };
   this.getTaskManager = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/assetEntity/listTasks?initSession=true"]'));

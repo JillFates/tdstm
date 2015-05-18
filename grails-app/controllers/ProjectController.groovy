@@ -485,7 +485,7 @@ class ProjectController {
 			
 			
 			if ( browserTest || params.mobileSelect )
-				redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
+				redirect(controller:'task', action:'listUserTasks', params:[viewMode:'mobile'])
 			else
 				redirect(controller:'project', action:"show", id: params.id )
 		} else {

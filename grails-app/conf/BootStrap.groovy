@@ -13,7 +13,6 @@ import org.grails.refcode.RefCode
 
 class BootStrap {
 	def assetEntityAttributeLoaderService
-	def workflowService
 	def stateEngineService
 	def init = { servletContext ->
 
@@ -317,10 +316,10 @@ class BootStrap {
 		// -------------------------------
 		println "PROJECTS "
 		def cedarsProject = new Project( name:"Cedars-Sinai Move 1", projectCode:'CS1', client:cedars,
-					description:'100 servers', trackChanges:'Y', partyType:groupPartyType,
+					description:'100 servers', partyType:groupPartyType,
 					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
 		def twProject = new Project( name:"Time Warner VA Move", projectCode:'TM-VA-1', client:timeWarner,
-					description:'500 servers', trackChanges:'N', partyType:groupPartyType,
+					description:'500 servers', partyType:groupPartyType,
 					startDate:new Date(), completionDate: new Date()+10, workflowCode: 'STD_PROCESS' ).save();
 
 
@@ -586,51 +585,6 @@ class BootStrap {
 			}
 		}
 
-		//--------------------------------
-		// Create AssetTransition
-		//--------------------------------
-		println "TRANSITIONS"
-		// Adding ‘Ready’ transition for all assets
-		def readyTarasitionList = [
-			[ "Ready", AssetEntity.get(1),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(2),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(3),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(4),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(5),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(6),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(7),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(8),cedarsProjectMoveBundle1],
-			[ "Ready", AssetEntity.get(9),cedarsProjectMoveBundle1]
-		]
-		//Insert the "Ready" list into Transitions
-		readyTarasitionList.each {
-			def readyTarasition = workflowService.createTransition("STD_PROCESS", "SUPERVISOR", it[0], it[1], it[2], userJohn, null, "" )
-		}
-		// Adding "PoweredDown" and "Release" to 4 of the assets
-		def powerTarasitionList = [
-			[ "PoweredDown", AssetEntity.get(1),cedarsProjectMoveBundle1],
-			[ "PoweredDown", AssetEntity.get(2),cedarsProjectMoveBundle1],
-			[ "PoweredDown", AssetEntity.get(3),cedarsProjectMoveBundle1],
-			[ "PoweredDown", AssetEntity.get(4),cedarsProjectMoveBundle1],
-			[ "Release", AssetEntity.get(1),cedarsProjectMoveBundle1],
-			[ "Release", AssetEntity.get(2),cedarsProjectMoveBundle1],
-			[ "Release", AssetEntity.get(3),cedarsProjectMoveBundle1],
-			[ "Release", AssetEntity.get(4),cedarsProjectMoveBundle1]
-		]
-		//	Insert the "PoweredDown" and "Release" list into Transitions
-		powerTarasitionList.each {
-			def powerTarasition = workflowService.createTransition("STD_PROCESS", "MANAGER", it[0], it[1], it[2], userJohn, null, "" )
-		}
-		//	Adding "Unracking" to 2 of the assets and "Unracked" to 1 of the asset
-		def unrackTarasitionList = [
-			[ "Unracking", AssetEntity.get(1),cedarsProjectMoveBundle1],
-			[ "Unracking", AssetEntity.get(2),cedarsProjectMoveBundle1],
-			[ "Unracked", AssetEntity.get(1),cedarsProjectMoveBundle1]
-		]
-		//	Insert the "Unracking" and "Unracked" list into Transitions
-		unrackTarasitionList.each {
-			def unrackTarasition = workflowService.createTransition("STD_PROCESS", "SUPERVISOR", it[0], it[1], it[2], userJohn, null, "" )
-		}
 
 		//--------------------------------
 		// Create DataTransferSet

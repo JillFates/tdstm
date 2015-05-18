@@ -63,6 +63,7 @@
 #issueTable {
 	width: 100%; 
 	margin-left: -1px;
+	position: relative;
 }
 
 .appOuterDiv {

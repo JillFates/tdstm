@@ -630,8 +630,8 @@ class PersonController {
 			flash.message = "Person ${person} created"
 			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
 		} else {
-			flash.message = "Unable to save person due to:" + GormUtil.errorsAsUL(person)
-			redirect( action:'projectStaff', params:[ projectId:projectId, submit:'Add' ] )
+			flash.message = " Person FirstName cannot be blank. "
+			redirect( action:'projectStaff', params:[ projectId:projectId,submit:'Add' ] )
 		}
 	}
 

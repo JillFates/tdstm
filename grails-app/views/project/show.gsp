@@ -81,8 +81,6 @@
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
 							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
-							<td class="name">Display Transitions in Status bar:</td>
-							<td class="valueNW"><g:message code="project.trackChanges.${bean:projectInstance?.trackChanges}" /></td>
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>

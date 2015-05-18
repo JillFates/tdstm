@@ -54,7 +54,7 @@
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
 		jQuery.ajax({
-			url: contextPath+'/clientTeams/showIssue',
+			url: contextPath+'/task/showIssue',
 			data: {'issueId':id},
 			type:'POST',
 			success: function(data) {

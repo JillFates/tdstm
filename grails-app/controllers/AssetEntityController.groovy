@@ -40,7 +40,6 @@ import com.tds.asset.AssetDependency
 import com.tds.asset.AssetDependencyBundle
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetOptions
-import com.tds.asset.AssetTransition
 import com.tds.asset.AssetType
 import com.tds.asset.Database
 import com.tds.asset.Files
@@ -85,7 +84,6 @@ class AssetEntityController {
 	def taskService
 	def userPreferenceService
 	def userService
-	def workflowService
 
 	def jdbcTemplate
 	def quartzScheduler
@@ -1257,9 +1255,6 @@ class AssetEntityController {
 				case "rack":
 					redirect( controller:'rackLayouts',action:'create' )
 					break;
-				case "clientConsole":
-					redirect( controller:'clientConsole', action:'list')
-					break;
 				case "application":
 					redirect( controller:'application', action:'list')
 					break;
@@ -1304,11 +1299,7 @@ class AssetEntityController {
 		else {
 			flash.message = "AssetEntity not found with id ${params.id}"
 		}
-		if ( params.clientList ){
-			redirect( controller:"clientConsole", action:"list", params:[moveBundle:params.moveBundleId] )
-		}else{
-			redirect( action:'list' )
-		}
+		redirect( action:'list' )
 	}
 
 	/**
@@ -1332,9 +1323,6 @@ class AssetEntityController {
 					render(template:'auditDetails',	model:[assetEntity:entity, source:model.source, assetType:model.assetType])
 				else
 					forward(action:'create', params:model)
-				  break;
-			case "clientConsole":
-				  redirect( controller:'clientConsole', action:'list')
 				  break;
 		    case "application":
 				  redirect( controller:'application', action:'list')
@@ -1779,7 +1767,7 @@ class AssetEntityController {
 			if (map.error) {
 				flash.message = map.error
 			}
-			forward(controller:"clientTeams", action:"listComment", params:[view:params.view, tab:params.tab])
+			forward(controller:"assetEntity", action:"listComment", params:[view:params.view, tab:params.tab])
 		} else if( params.open != "view" ){
 			render map as JSON
 		}
@@ -1809,100 +1797,6 @@ class AssetEntityController {
 		render assetCommentsList as JSON
 	}
 
-	/*--------------------------------------------
-	 * 	Get asset details part in dashboard page
-	 * 	@author: 	Lokanath Reddy
-	 * 	@param :	AssetEntity
-	 * 	@return:	AssetEntity Details , Recent Transitions and MoveBundle Teams
-	 *-------------------------------------------*/
-	def assetDetails() {
-		def assetId = params.assetId
-		def assetStatusDetails = []
-		def statesList = []
-		def recentChanges = []
-		def stateIdList = []
-		if(assetId){
-			def assetDetail = AssetEntity.findById(assetId)
-			def teamName = assetDetail.sourceTeamMt
-			def assetTransition = AssetTransition.findAllByAssetEntity( assetDetail, [ sort:"dateCreated", order:"desc"] )
-			def sinceTimeElapsed = "00:00:00"
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			if( assetTransition ){
-				sinceTimeElapsed = convertIntegerIntoTime( GormUtil.convertInToGMT("now", tzId ).getTime() - assetTransition[0]?.dateCreated?.getTime() )
-			}
-			assetTransition.each{
-				def cssClass
-				def taskLabel = stateEngineService.getStateLabel(assetDetail.moveBundle.workflowCode,Integer.parseInt(it.stateTo))
-				def time = GormUtil.convertInToUserTZ(it.dateCreated, tzId ).toString().substring(11,19)
-				def timeElapsed = convertIntegerIntoTime( it.timeElapsed )
-				if(it.voided == 1){
-					cssClass = "void_transition"
-				}
-				recentChanges<<[transition:time+"/"+timeElapsed+" "+taskLabel+' ('+ it.userLogin.person.lastName +')',cssClass:cssClass]
-			}
-			def holdId = stateEngineService.getStateId(assetDetail.moveBundle.workflowCode, "Hold" )
-			def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo, t.hold_timer as holdTimer from asset_transition t "+
-					"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-					"order by t.date_created desc, stateTo desc  limit 1 ")
-			def currentState = 0
-			def holdTimer = ""
-			if(transitionStates.size()){
-				def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-				currentState = transitionStates[0].stateTo
-				holdTimer = transitionStates[0].holdTimer ? formatter.format(GormUtil.convertInToUserTZ(transitionStates[0].holdTimer, tzId )) : ""
-			}
-			/*def projectAssetMap = ProjectAssetMap.findByAsset(assetDetail)
-			 if(projectAssetMap){
-			 currentState = projectAssetMap.currentStateId
-			 }*/
-
-			def state = currentState ? stateEngineService.getState( assetDetail.moveBundle.workflowCode, currentState ) : null
-			def validStates
-			if(state){
-				validStates= stateEngineService.getTasks( assetDetail.moveBundle.workflowCode, "SUPERVISOR", state )
-			} else {
-				validStates = ["Ready"]
-				//stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
-			}
-			validStates.each{
-				stateIdList<<stateEngineService.getStateIdAsInt( assetDetail.moveBundle.workflowCode, it )
-			}
-			stateIdList.sort().each{
-				statesList<<[id:stateEngineService.getState(assetDetail.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetDetail.moveBundle.workflowCode,it)]
-			}
-			def map = new HashMap()
-			map.put("assetDetail",assetDetail)
-			map.put("model",assetDetail.model?.modelName)
-			map.put("srcRack",(assetDetail.sourceRoom ? assetDetail.sourceRoom : '') +" / "+
-					(assetDetail.sourceRack ? assetDetail.sourceRack : '') +" / "+
-					(assetDetail.sourceRackPosition ? assetDetail.sourceRackPosition : ''))
-			map.put("tgtRack",(assetDetail.targetRoom ? assetDetail.targetRoom : '') +" / "+
-					(assetDetail.targetRack ? assetDetail.targetRack : '') +" / "+
-					(assetDetail.targetRackPosition ? assetDetail.targetRackPosition : ''))
-			if(teamName){
-				map.put("teamName",teamName.name)
-			}else{
-				map.put("teamName","")
-			}
-			map.put("currentState",stateEngineService.getStateLabel(assetDetail.moveBundle.workflowCode,currentState))
-			map.put("state",state)
-			def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and role = 'MOVE_TECH'")
-			def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetDetail.moveBundle.id and role = 'MOVE_TECH'")
-			if(assetDetail.sourceTeamMt){
-				sourceQuery.append(" and id != $assetDetail.sourceTeamMt.id ")
-			}
-			if(assetDetail.targetTeamMt){
-				targetQuery.append(" and id != $assetDetail.targetTeamMt.id ")
-			}
-			def sourceTeamMts = ProjectTeam.findAll(sourceQuery.toString())
-			def targetTeamMts = ProjectTeam.findAll(targetQuery.toString())
-			assetStatusDetails<<[ 'assetDetails':map, 'statesList':statesList, holdTimer:holdTimer,
-						'recentChanges':recentChanges, 'sourceTeamMts':sourceTeamMts,
-						'targetTeamMts':targetTeamMts, 'sinceTimeElapsed':sinceTimeElapsed ]
-		}
-		render assetStatusDetails as JSON
-
-	}
 	/*----------------------------------
 	 * @author: Lokanath Redy
 	 * @param : fromState and toState
@@ -1919,154 +1813,6 @@ class AssetEntityController {
 			status<< ['status':'true']
 		}
 		render status as JSON
-	}
-	/**
-	  * Used to create Transaction for Supervisor 
-	  * TODO : JPM 9/2014 - createTransition method should no longer be needed once the AssetTracker (clientConsole/index) is removed
-	  * @author: Lokanath Reddy
-	  * @param : AssetEntity id, priority,assigned to value and from and to States
-	  * @return: AssetEntity details and AssetTransition details
-	  */
-	def createTransition() {
-		def assetId = params.asset
-		def assetEntity = AssetEntity.get(assetId)
-		def assetList = []
-		def statesList = []
-		def stateIdList = []
-		def statusLabel
-		def statusName
-		def check
-		def assetComment
-		def message = ''
-		
-		if(assetEntity){
-			def status = params.state
-			def assignTo = params.assignTo
-			def priority = params.priority
-			def comment = params.comment
-			def holdTime = params.holdTime
-			def principal = SecurityUtils.subject.principal
-			def loginUser = UserLogin.findByUsername(principal)
-			def rerackedId = stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Reracked")
-			if(!rerackedId) {
-				rerackedId = stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Reracked")
-			}
-			def holdId = stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Hold")
-			def releasedId = stateEngineService.getStateId(assetEntity.moveBundle.workflowCode,"Release")
-			def projectAssetMap = ProjectAssetMap.findByAsset(assetEntity)
-			def currentStateId
-			if(projectAssetMap){
-				currentStateId = projectAssetMap.currentStateId
-			}
-
-			if(status != "" ){
-				def transactionStatus = workflowService.createTransition(assetEntity.moveBundle.workflowCode,"SUPERVISOR", status, assetEntity, assetEntity.moveBundle, loginUser, null, comment )
-				if ( transactionStatus.success ) {
-					stateIdList = retrieveStates(status,assetEntity)
-					stateIdList.sort().each{
-						statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
-					}
-					statusLabel = stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,stateEngineService.getStateIdAsInt(assetEntity.moveBundle.workflowCode,status))
-					statusName = stateEngineService.getState(assetEntity.moveBundle.workflowCode,stateEngineService.getStateIdAsInt(assetEntity.moveBundle.workflowCode,status))
-				} else {
-					statusLabel = stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,currentStateId)
-					statusName = stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId)
-					stateIdList = retrieveStates(stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId),assetEntity)
-					stateIdList.sort().each{
-						statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
-					}
-					message = transactionStatus.message
-				}
-			} else {
-				statusLabel = stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,currentStateId)
-				statusName = stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId)
-				stateIdList = retrieveStates(stateEngineService.getState(assetEntity.moveBundle.workflowCode,currentStateId),assetEntity)
-				stateIdList.sort().each{
-					statesList<<[id:stateEngineService.getState(assetEntity.moveBundle.workflowCode,it),label:stateEngineService.getStateLabel(assetEntity.moveBundle.workflowCode,it)]
-				}
-			}
-			if(priority){
-				assetEntity.priority = Integer.parseInt( priority )
-			}
-			if(assignTo){
-				def assignToList = assignTo.split('/')
-				def projectTeam = ProjectTeam.get(assignToList[1])
-				if(assignToList[0] == 's'){
-					assetEntity.sourceTeamMt = projectTeam
-				} else if(assignToList[0] == 't'){
-					assetEntity.targetTeamMt = projectTeam
-				}
-			}
-			if(comment){
-				assetComment = new AssetComment()
-				assetComment.comment = comment
-				assetComment.assetEntity = assetEntity
-				assetComment.commentType = 'issue'
-				assetComment.category = 'moveday'
-				assetComment.createdBy = loginUser.person
-				assetComment.save()
-			}
-			def transitionStates = jdbcTemplate.queryForList("select t.asset_transition_id as id, cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-					"where t.asset_entity_id = $assetId and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-					"order by t.date_created desc, stateTo desc limit 1 ")
-			def currentStatus = 0
-			if(transitionStates.size()){
-				currentStatus = transitionStates[0].stateTo
-				if(holdTime){
-					def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-					def assetTransition = AssetTransition.get(transitionStates[0].id)
-					if(assetTransition.stateTo == holdId){
-						assetTransition.holdTimer =  GormUtil.convertInToGMT(formatter.parse( holdTime ), tzId)
-						assetTransition.save(flush:true)
-					}
-				}
-			}
-			if(statesList.size() == 0){
-				check = false
-			}else{
-				check = true
-			}
-			def cssClass
-			if(currentStatus == Integer.parseInt(holdId) ){
-				cssClass = 'asset_hold'
-				def holdAssetTransition = AssetTransition.findAll("FROM AssetTransition t WHERE t.assetEntity = ${assetId} AND t.stateTo = '${holdId}' AND t.voided = 0")
-				cssClass = 'asset_hold'
-				if(holdAssetTransition.size() > 0){
-					def holdTimer = holdAssetTransition[0]?.holdTimer
-					cssClass = (holdTimer && holdTimer.getTime() < GormUtil.convertInToGMT("now", "EDT" ).getTime()) ? 'asset_hold_overtime' : 'asset_hold'
-				}
-			} else if(currentStatus < Integer.parseInt(releasedId) && currentStatus != Integer.parseInt(holdId) ){
-				cssClass = 'asset_pending'
-			} else if(currentStatus > Integer.parseInt(rerackedId)){
-				cssClass = 'asset_done'
-			}
-			assetEntity.save()
-			def sourceTeamMt
-			def targetTeamMt
-			if(assetEntity.sourceTeamMt){
-				sourceTeamMt = assetEntity.sourceTeamMt.name
-			}
-			if(assetEntity.targetTeamMt){
-				targetTeamMt = assetEntity.targetTeamMt.name
-			}
-			def sourceQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
-			def targetQuery = new StringBuffer("from ProjectTeam where moveBundle = $assetEntity.moveBundle.id and teamCode != 'Logistics' and teamCode != 'Transport'")
-			if(assetEntity.sourceTeamMt){
-				sourceQuery.append(" and id != $assetEntity.sourceTeamMt.id ")
-			}
-			if(assetEntity.targetTeamMt){
-				targetQuery.append(" and id != $assetEntity.targetTeamMt.id ")
-			}
-			def sourceTeamMts = ProjectTeam.findAll(sourceQuery.toString())
-			def targetTeamMts = ProjectTeam.findAll(targetQuery.toString())
-			assetList <<['assetEntity':assetEntity, 'sourceTeamMt':sourceTeamMt, 'targetTeamMt':targetTeamMt,
-						'sourceTeamMts':sourceTeamMts,'targetTeamMts':targetTeamMts, 'statesList':statesList,
-						'status':statusLabel,'cssClass':cssClass,'checkVal':check,
-						'statusName':statusName, 'assetComment':assetComment,
-						'message':message]
-		}
-		render assetList as JSON
 	}
 
 	/*-----------------------------------------
@@ -2104,57 +1850,6 @@ class AssetEntityController {
 		updateTime <<[updateTime:timeToUpdate]
 		render updateTime as JSON
 	}
-	/** 
-	 * To get unique list of task for list of assets through ajax
-	 * @author : Bhuvaneshwari
-	 * @param  : List of assets selected for transition
-	 * @return : Common tasks for selected assets
-	 */
-
-	def retrieveList() {
-		def projectInstance = securityService.getUserCurrentProject()
-		def assetArray = params.assetArray
-		Set common = new HashSet()
-		def taskList = []
-		def temp
-		def totalList = []
-		def tempTaskList = []
-		def sortList = []
-		def stateVal
-		def moveBundleInstance = MoveBundle.get(params.moveBundle)
-		if(assetArray){
-
-			def assetList = assetArray.split(",")
-			assetList.each{ asset->
-				def assetEntity = AssetEntity.findById(asset)
-				def holdId = stateEngineService.getStateId( assetEntity.moveBundle.workflowCode, "Hold" )
-				//def projectAssetMap = ProjectAssetMap.find("from ProjectAssetMap pam where pam.asset = $asset")
-				def transitionStates = jdbcTemplate.queryForList("select cast(t.state_to as UNSIGNED INTEGER) as stateTo from asset_transition t "+
-						"where t.asset_entity_id = $asset and t.voided = 0 and ( t.type = 'process' or t.state_To = $holdId ) "+
-						"order by t.date_created desc, stateTo desc limit 1 ")
-				if(transitionStates.size()){
-					stateVal = stateEngineService.getState(assetEntity.moveBundle.workflowCode,transitionStates[0].stateTo)
-					temp = stateEngineService.getTasks(assetEntity.moveBundle.workflowCode,"SUPERVISOR",stateVal)
-					taskList << [task:temp]
-				} else {
-					taskList << [task:["Ready"] ]
-				}
-			}
-			common = (HashSet)(taskList[0].task);
-			for(int i=1; i< taskList.size();i++){
-				common.retainAll((HashSet)(taskList[i].task))
-			}
-			common.each{
-				tempTaskList << stateEngineService.getStateIdAsInt(moveBundleInstance.workflowCode,it)
-			}
-			tempTaskList.sort().each{
-				sortList << [state:stateEngineService.getState(moveBundleInstance.workflowCode,it),label:stateEngineService.getStateLabel(moveBundleInstance.workflowCode,it)]
-			}
-			totalList << [item:sortList,asset:assetArray]
-		}
-		render totalList as JSON
-
-	}
 
 	/* --------------------------------------
 	 * 	@author : Lokanada Reddy
@@ -2191,38 +1886,7 @@ class AssetEntityController {
 		}
 		return timeFormate
 	}
-	/*
-	 * @author : Srinivas
-	 * @param : assetId,StatusId
-	 * @return : status message
-	 */
-	def showStatus() {
-		def projectInstance = Project.findById( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-		def arrayId = params.id.split("_")
-		def statusMsg =""
-		def assetId = arrayId[0]
-		def stateId = Integer.parseInt(arrayId[1])
-		def stateTo = arrayId[1]
-		def assetEntityInstance = AssetEntity.findById(assetId)
-		def state = stateEngineService.getStateLabel( assetEntityInstance.moveBundle.workflowCode.toString(),  stateId)
-		def assetTrasitionInstance = AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 0" )
-		if( assetTrasitionInstance ) {
-			DateFormat formatter ;
-			def formatterTime = new SimpleDateFormat("hh:mm a");
-			def formatterDate = new SimpleDateFormat("MM/dd/yyyy");
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def lastupdated = GormUtil.convertInToUserTZ(assetTrasitionInstance.lastUpdated, tzId)
-			def updatedTime = formatterTime.format(lastupdated)
-			def updatedDate = formatterDate.format(lastupdated)
-			statusMsg = "$assetEntityInstance.assetName : $state is done and was updated by $assetTrasitionInstance.userLogin.person.firstName $assetTrasitionInstance.userLogin.person.lastName at $updatedTime on $updatedDate "
-		}else if( AssetTransition.find( "from AssetTransition where assetEntity = $assetEntityInstance.id and voided=0 and stateTo= '$stateTo' and isNonApplicable = 1" ) ) {
-			statusMsg = "$assetEntityInstance.assetName : $state is not applicable "
-		}else {
-			statusMsg = "$assetEntityInstance.assetName : $state pending "
-		}
-		render statusMsg
-	}
-	
+
 	/**
 	 * This action is for presenting the CRUD form for a new Device entry form
 	 * @param params.redirectTo - used to redirect the user back to the appropriate page afterward

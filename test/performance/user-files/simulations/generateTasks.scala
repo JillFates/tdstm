@@ -108,7 +108,7 @@ class GenerateTasks extends Simulation {
   object Cookbook {
  
     val cookbook =  exec(http("getTaskCount -when open task menu")
-        .post("/tdstm/clientTeams/getToDoCount")
+        .post("/tdstm/task/retrieveUserToDoCount")
         .headers(headers_12))
         .pause(1)
         .exec(http("cookbook index")

@@ -104,23 +104,6 @@ class AdminController {
 				UNION
 				SELECT 'asset_entity_varchar' as mainTable,'attribute_id' as refId,'Null' as type,count(*) as totalCount FROM asset_entity_varchar aev where aev.attribute_id is null ) aev
 			WHERE aev.totalCount > 0
-			
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR ASSET_TRANSITION-------------------------------------------*/
-			SELECT * FROM (	SELECT 'asset_transition' as mainTable,'asset_entity_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_transition at where at.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )
-				UNION
-				SELECT 'asset_transition' as mainTable,'asset_entity_id' as refId,'Null' as type,count(*) as totalCount FROM asset_transition at where at.asset_entity_id is null
-				UNION
-				SELECT 'asset_transition' as mainTable,'move_bundle_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_transition at where at.move_bundle_id not in (select m.move_bundle_id from move_bundle m )
-				UNION
-				SELECT 'asset_transition' as mainTable,'move_bundle_id' as refId,'Null' as type,count(*) as totalCount FROM asset_transition at where at.move_bundle_id is null
-				UNION
-				SELECT 'asset_transition' as mainTable,'user_login_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_transition at where at.user_login_id not in (select ul.user_login_id from user_login ul )
-				UNION
-				SELECT 'asset_transition' as mainTable,'user_login_id' as refId,'Null' as type,count(*) as totalCount FROM asset_transition at where at.user_login_id is null
-				UNION
-				SELECT 'asset_transition' as mainTable,'project_team_id' as refId,'Orphan' as type,count(*) as totalCount FROM asset_transition at where at.project_team_id not in (select pt.project_team_id from project_team pt ) ) at
-			WHERE at.totalCount > 0 
 
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MODEL-------------------------------------------*/
@@ -539,39 +522,6 @@ class AdminController {
 						} else {
 							query = "SELECT * FROM asset_entity_varchar aev where aev.attribute_id is null"
 						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
-				}
-			break;
-			
-			case "asset_transition" :
-				switch (column) {
-					case "asset_entity_id" :
-						if(type != "Null"){
-							query = "SELECT * FROM asset_transition at where at.asset_entity_id not in (select ae.asset_entity_id from asset_entity ae )"
-						} else {
-							query = "SELECT * FROM asset_transition at where at.asset_entity_id is null"
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
-					case "move_bundle_id" :
-						if(type != "Null"){
-							query = "SELECT * FROM asset_transition at where at.move_bundle_id not in (select m.move_bundle_id from move_bundle m )"
-						} else {
-							query = "SELECT * FROM asset_transition at where at.move_bundle_id is null"
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
-					case "user_login_id" :
-						if(type != "Null"){
-							query = "SELECT * FROM asset_transition at where at.user_login_id not in (select ul.user_login_id from user_login ul )"
-						} else {
-							query = "SELECT * FROM asset_transition at where at.user_login_id is null"
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
-					case "project_team_id" :
-						query = "SELECT * FROM asset_transition at where at.project_team_id not in (select pt.project_team_id from project_team pt ) "
 						orphanDeatils = jdbcTemplate.queryForList(query)
 					break;
 				}

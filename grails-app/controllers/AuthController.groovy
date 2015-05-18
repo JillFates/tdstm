@@ -128,7 +128,7 @@ class AuthController {
 						if (browserTestiPad) {
 							redirect(controller:'projectUtil')
 						} else {
-							redirect(controller:'clientTeams', action:'listTasks', params:[viewMode:'mobile'])
+							redirect(controller:'task', action:'listUserTasks', params:[viewMode:'mobile'])
 						}
 					} else {
 					   if (userPreferenceService.getPreference('CURR_PROJ')){

@@ -374,9 +374,6 @@ class ApplicationController {
 					case "console":
 						redirect( controller:'assetEntity', action:"dashboardView", params:[showAll:'show'])
 						break;
-					case "clientConsole":
-						redirect( controller:'clientConsole', action:"list")
-						break;
 					case "assetEntity":
 						redirect( controller:'assetEntity', action:"list")
 						break;

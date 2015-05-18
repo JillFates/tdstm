@@ -1,5 +1,4 @@
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetTransition
 
 class ProjectTeam extends PartyGroup{
 	String teamCode
@@ -12,11 +11,7 @@ class ProjectTeam extends PartyGroup{
 	                    moveBundle : MoveBundle,
 	                    latestAsset : AssetEntity
 	                    ]
-	
-	static hasMany = [
-		assetTransitions : AssetTransition
-	]
-	
+
 	static constraints = {
 		name( ) // related party Group
 		teamCode( blank:false, nullable:false,unique:'moveBundle' )

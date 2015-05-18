@@ -25,17 +25,6 @@
 	  		});
 		}
 	}
-	/*
-	* will call the Ajax web service to invoke the moveBundle/createSnapshot method 
-	* when user hit the enter key
-	*/
-    function createSnapshot( stepId, value, e ) {
-        var moveBundle = $("#moveBundleId").val()
-    	var keyID = e.keyCode
-    	if(keyID == 13 && validateManualVal( value )){
-    		${remoteFunction(controller:'moveBundle', action:'createManualStep', params:'\'moveBundleId=\'+ moveBundle +\'&moveBundleStepId=\'+ stepId +\'&tasksCompleted=\'+value', onComplete:'updateStepValue(XMLHttpRequest , stepId, value)')}
-    	}
-    }
     /*
     * update the value once ajax request success
     */
@@ -234,8 +223,8 @@
 					<th>Start</th>
 					<th>Completion</th>
 					<th>Duration</th>
-					<th>Type</th>
-					<th>Value<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
+					<th>Type
+					<input type="hidden" name="moveBundleId" id="moveBundleId" value="${moveBundleInstance?.id}" />
 		        <input type="hidden" name="projectId" value="${projectId}"/></th>
 		        	<th>Be Green</th>
 				</tr>
@@ -255,18 +244,6 @@
 						</g:if>
 						<g:else>Linear</g:else>
 						</td>
-						<g:if test="${dashboardStep.moveBundleStep?.calcMethod == 'M'}">
-						<td onclick="$('#tasksCompletedText_${dashboardStep.moveBundleStep.id }').hide();$('#tasksCompletedInput_${dashboardStep.moveBundleStep.id }').show();">
-							<span style="display: none;" id="tasksCompletedInput_${dashboardStep.moveBundleStep.id }" title="input">
-								<input type="text" name="tasksCompleted" style="width: 25px;" id="tasksCompleted_${dashboardStep.moveBundleStep.id }" maxlength="3" 
-								onkeypress="createSnapshot(${dashboardStep.moveBundleStep.id }, this.value, event )"/>
-							</span>
-							<span id="tasksCompletedText_${dashboardStep.moveBundleStep.id }" title="text">${dashboardStep.stepSnapshot?.tasksCompleted}</span>
-							%
-						</td></g:if>
-						<g:else>
-						<td>&nbsp;</td>
-						</g:else>
 						<td>
 							<span id="beGreenDiv_${dashboardStep.moveBundleStep.id }" style="text-align: center;" >
 								<g:if test="${dashboardStep.moveBundleStep?.showInGreen}">

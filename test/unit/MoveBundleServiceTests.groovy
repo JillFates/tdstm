@@ -20,24 +20,7 @@ class MoveBundleServiceTests extends Specification {
 		
 		assertEquals 6, moveBundleService.assetCount("27")
     }
-	
-	// test case for moveBundleService.assetCompletionCount( def moveBundleId, def transitionId )
-	@Ignore //if this test is enabled again expect should be added
-	void testassetCompletionCount() {
-		moveBundleService.jdbcTemplate = jdbcTemplate
-		
-		assertEquals 1, moveBundleService.assetCompletionCount("27","60")
-		
-		assertEquals 1, moveBundleService.assetCompletionCount("27","50")
-    }
-	
-	// test case for moveBundleService.getActualTimes( def moveBundleId, def transitionId )
-	@Ignore //if this test is enabled again expect should be added
-	void testgetActualTimes() {
-		moveBundleService.jdbcTemplate = jdbcTemplate
-		assertEquals false, ! moveBundleService.getActualTimes("27","60").started
-    }
-	
+
 	// test case for moveBundleService.getAllDashboardSteps( def moveBundleId )
 	@Ignore //if this test is enabled again expect should be added
 	void testgetAllDashboardSteps() {

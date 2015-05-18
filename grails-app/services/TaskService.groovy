@@ -34,6 +34,7 @@ import com.tds.asset.CommentNote
 import com.tds.asset.Database
 import com.tds.asset.Files
 import com.tds.asset.TaskDependency
+import com.tdsops.common.exceptions.TaskCompletionException
 import com.tdsops.common.lang.CollectionUtils as CU
 import com.tdsops.common.lang.GStringEval
 import com.tdsops.common.sql.SqlUtil
@@ -67,7 +68,6 @@ class TaskService implements InitializingBean {
 	def progressService
 	def securityService
 	def sequenceService
-	def workflowService
 
 	def dataSource
 	def jdbcTemplate
@@ -978,33 +978,6 @@ class TaskService implements InitializingBean {
 		}
 	 } // def completeTask()
 	
-	/**
-	 * This method is used by the saveUpdateCommentAndNotes to create workflow transitions in order to support 
-	 * backwards compatiblity with legacy code while using runbook mode.
-	 * @param assetComment
-	 * @param tzId
-	 * @return void
-	 */
-	def createTransition(assetComment, userLogin, status ) {
-		def asset = assetComment.assetEntity
-
-		// Only need to do something if task is completed and the task is associated with a workflow
-		if (status == AssetCommentStatus.DONE && asset && assetComment.workflowTransition) {
-
-			def moveBundle = asset.moveBundle
-			def process = moveBundle.workflowCode
-			def role = 'SUPERVISOR'
-			def projectTeam = null
-			def comment = ''
-			def wft = assetComment.workflowTransition
-			def toState = wft.code
-			def updateTask=false		// we don't want createTransition to call back to TaskService
-
-			log.info "createTransition: task id($assetComment.id) by ${userLogin}, toState=$toState"
-
-			workflowService.createTransition( process, role, toState, asset, moveBundle, userLogin, projectTeam, comment, updateTask )
-		}
-	}
 	/**
 	 * This method is used by the several actions to get the roles that is starts with of 'staff'
 	 * @param blank

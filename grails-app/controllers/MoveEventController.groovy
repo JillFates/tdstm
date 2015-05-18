@@ -25,13 +25,12 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tds.asset.AssetTransition
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WorkbookUtil
 
 class MoveEventController {
 	
-	protected static Log log = LogFactory.getLog( StepSnapshotService.class )
+	protected static Log log = LogFactory.getLog( MoveEventController.class )
 
     // Service initialization IOC
 	def controllerService
@@ -42,8 +41,6 @@ class MoveEventController {
 	def reportsService
 	def runbookService
 	def securityService
-	def stateEngineService
-	def stepSnapshotService
 	def taskService
 	def userPreferenceService
 
@@ -490,9 +487,9 @@ class MoveEventController {
 	    		news.append(String.valueOf(formatter.format(GormUtil.convertInToUserTZ( it.created, tzId ))) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;")	
 	    	}
 			
-			// append recent tasks  whose status is completed, moveEvent is inProgress and project trackChanges is yes.
+			// append recent tasks  whose status is completed, moveEvent is inProgress
 			def transitionComment = new StringBuffer()
-			if(moveEvent.inProgress =="true" && moveEvent.project.trackChanges == "Y"){
+			if(moveEvent.inProgress =="true"){
 				def today = GormUtil.convertInToGMT( "now", tzId );
 				def currentPoolTime = new java.sql.Timestamp(today.getTime())
 				def tasksCompQuery="""SELECT comment,date_resolved AS dateResolved FROM asset_comment WHERE project_id= ${moveEvent.project.id} AND 
@@ -548,9 +545,6 @@ class MoveEventController {
 		}
     	if ( ! moveEvent.save( flush : true ) ) {
     		log.error("Unable to save changes to MoveEvent: ${moveEvent}")
-    	} else {
-    		def timeNow = GormUtil.convertInToGMT( "now", "EDT" ).getTime()
-			stepSnapshotService.processSummary( moveEvent.id , timeNow)
     	}
 		render "success"
      }

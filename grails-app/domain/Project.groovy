@@ -21,7 +21,6 @@ class Project extends PartyGroup {
 	
 	String projectCode
 	String description
-	String trackChanges = 'Y'
 	Date startDate	// Date that the project will start
 	Date completionDate	// Date that the project will finish
 	PartyGroup client
@@ -138,7 +137,6 @@ class Project extends PartyGroup {
 		projectCode( blank:false, nullable:false,unique:'client' )
 		client( nullable:false )
 		description( blank:true, nullable:true )
-		trackChanges( blank:false, nullable:false, inList:['Y', 'N'] )
 		startDate( nullable:true )
 		completionDate( nullable:false )
 		dateCreated( ) // related to party
@@ -255,7 +253,6 @@ class Project extends PartyGroup {
 		autoTimestamp false
 		id column: 'project_id'
 		columns {
-			trackChanges sqlType: 'char(1)'
 			projectCode sqlType: 'varchar(20)', index: 'project_projectcode_idx', unique: true
 			runbookOn sqlType: 'tinyint'
 			depConsoleCriteria sqlType : 'TEXT'

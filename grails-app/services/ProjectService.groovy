@@ -16,7 +16,6 @@ import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetTransition
 import com.tds.asset.AssetDependencyBundle
 import com.tdssrc.grails.GormUtil
 
@@ -484,7 +483,6 @@ class ProjectService {
 		ApplicationAssetMap.executeUpdate("delete from ApplicationAssetMap aam where aam.asset in ($assetsQuery)")
 		AssetComment.executeUpdate("delete from AssetComment ac where ac.assetEntity in ($assetsQuery)")
 		AssetEntityVarchar.executeUpdate("delete from AssetEntityVarchar av where av.assetEntity in ($assetsQuery)")
-		AssetTransition.executeUpdate("delete from AssetTransition at where at.assetEntity in ($assetsQuery)")
 		ProjectAssetMap.executeUpdate("delete from ProjectAssetMap pam where pam.project = ${projectInstance.id}")
 		AssetCableMap.executeUpdate("delete AssetCableMap where assetFrom in ($assetsQuery)")
 		AssetCableMap.executeUpdate("""Update AssetCableMap set cableStatus='${AssetCableStatus.UNKNOWN}',assetTo=null,
@@ -506,7 +504,6 @@ class ProjectService {
 		// remove Move Bundle
 		
 		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)")
-		AssetTransition.executeUpdate("delete from AssetTransition at where at.moveBundle in ($bundleQuery)")
 		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))")
 		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)")
 		

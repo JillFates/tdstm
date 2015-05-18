@@ -1,4 +1,3 @@
-import com.tds.asset.AssetTransition
 import com.tdssrc.grails.TimeUtil
 
 class UserLogin {
@@ -20,7 +19,6 @@ class UserLogin {
     
 	static belongsTo = [ person:Person ]
 	static hasMany = [
-		assetTransitions : AssetTransition,
 		dataTransferBatch : DataTransferBatch
 	]
 	

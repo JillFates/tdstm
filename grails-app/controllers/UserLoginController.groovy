@@ -434,4 +434,23 @@ class UserLoginController {
 		}
 		return
 	}
+
+	/*---------------------------------------------------------
+	* Will set user preference for CLIENT_CONSOLE_REFRESH time
+	* @author : Lokanath Reddy
+	* @param  : update time 
+	* @return : update time 
+	*---------------------------------------------------------*/
+	def setTimePreference() {
+		def timer = params.timer
+		def updateTime =[]
+		def sessionKey = params.prefFor ? params.prefFor : "CLIENT_CONSOLE_REFRESH"
+		if(timer){
+		    userPreferenceService.setPreference( sessionKey, "${timer}" )
+		}
+		def timeToUpdate = getSession().getAttribute(sessionKey)
+		updateTime <<[updateTime:timeToUpdate]
+		render updateTime as JSON
+	}
+
 }
