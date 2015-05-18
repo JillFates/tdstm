@@ -445,7 +445,7 @@ class AssetEntityController {
 				
 				//Add Data to dataTransferBatch.
 				def serverColNo = 0
-				for (int index = 0; index < serverCol; index++) {
+				for (int index = 0; index <= serverCol; index++) {
 					if(WorkbookUtil.getStringCellValue(serverSheet, index, 0 ) == "Name"){
 						serverColNo = index
 					}
@@ -453,7 +453,7 @@ class AssetEntityController {
 				def serverSheetrows = serverSheet.getLastRowNum()
 				if(params.asset=='asset'){
 					assetsCount
-					for (int row = 1; row < serverSheetrows; row++) {
+					for (int row = 1; row <= serverSheetrows; row++) {
 						def server = WorkbookUtil.getStringCellValue(serverSheet, serverColNo, row )
 						if(server){
 							assetsCount = row
@@ -461,7 +461,7 @@ class AssetEntityController {
 					}
 				}
 				def appColNo = 0
-				for (int index = 0; index < appCol; index++) {
+				for (int index = 0; index <= appCol; index++) {
 					if(WorkbookUtil.getStringCellValue(appSheet, index, 0 ) == "Name"){
 						appColNo = index
 					}
@@ -469,7 +469,7 @@ class AssetEntityController {
 				def appSheetrows = appSheet.getLastRowNum()
 				if(params.application == 'application'){
 					appCount
-					for (int row = 1; row < appSheetrows; row++) {
+					for (int row = 1; row <= appSheetrows; row++) {
 						def name = WorkbookUtil.getStringCellValue(appSheet, appColNo, row )
 						if(name){
 							appCount = row
@@ -479,7 +479,7 @@ class AssetEntityController {
 				def databaseSheetrows = databaseSheet.getLastRowNum()
 				if(params.database=='database'){
 					databaseCount
-					for (int row = 1; row < databaseSheetrows; row++) {
+					for (int row = 1; row <= databaseSheetrows; row++) {
 						def name = WorkbookUtil.getStringCellValue(databaseSheet, appColNo, row )
 						if(name){
 							databaseCount = row
@@ -489,7 +489,7 @@ class AssetEntityController {
 				def filesSheetrows = filesSheet.getLastRowNum()
 				if(params.files=='files'){
 					filesCount
-					for (int row = 1; row < filesSheetrows; row++) {
+					for (int row = 1; row <= filesSheetrows; row++) {
 						def name = WorkbookUtil.getStringCellValue(filesSheet, appColNo, row )
 						if(name){
 							filesCount = row
@@ -499,7 +499,7 @@ class AssetEntityController {
 				def dependencySheetRow = dependencySheet.getLastRowNum()
 				if(params.dependency=='dependency'){
 					dependencyCount
-					for (int row = 1; row < dependencySheetRow; row++) {
+					for (int row = 1; row <= dependencySheetRow; row++) {
 						def name = WorkbookUtil.getStringCellValue(dependencySheet, appColNo, row )
 						if(name){
 							dependencyCount = row
@@ -509,7 +509,7 @@ class AssetEntityController {
 				def cablingSheetRow = cablingSheet.getLastRowNum()
 				if(params.cabling=='cable'){
 					cablingCount
-					for (int row = 1; row < cablingSheetRow; row++) {
+					for (int row = 1; row <= cablingSheetRow; row++) {
 						def name = WorkbookUtil.getStringCellValue(cablingSheet, appColNo, row )
 						if(name){
 							cablingCount = row
@@ -535,7 +535,7 @@ class AssetEntityController {
 					if(serverDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",serverDataTransferBatch.id)
 					}
-					for ( int r = 1; r < serverSheetrows ; r++ ) {
+					for ( int r = 1; r <= serverSheetrows ; r++ ) {
 						def server = WorkbookUtil.getStringCellValue(serverSheet, serverColNo, r )
 						if(server){
 							def dataTransferValueList = new StringBuffer()
@@ -600,7 +600,7 @@ class AssetEntityController {
 					if(appDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",appDataTransferBatch.id)
 					}
-					for ( int r = 1; r < appSheetrows ; r++ ) {
+					for ( int r = 1; r <= appSheetrows ; r++ ) {
 						def name = WorkbookUtil.getStringCellValue(appSheet, appColNo, r )
 						if (name){
 							def dataTransferValueList = new StringBuffer()
@@ -668,7 +668,8 @@ class AssetEntityController {
 					if(dbDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",dbDataTransferBatch.id)
 					}
-					for ( int r = 1; r < databaseSheetrows ; r++ ) {
+					for ( int r = 1; r <= databaseSheetrows ; r++ ) {
+
 						def name = WorkbookUtil.getStringCellValue(databaseSheet, appColNo, r )
 						if(name){
 							def dataTransferValueList = new StringBuffer()
@@ -730,7 +731,7 @@ class AssetEntityController {
 					if(fileDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",fileDataTransferBatch.id)
 					}
-					for ( int r = 1; r < filesSheetrows ; r++ ) {
+					for ( int r = 1; r <= filesSheetrows ; r++ ) {
 						def name = WorkbookUtil.getStringCellValue(filesSheet, appColNo, r )
 						if(name){
 							def dataTransferValueList = new StringBuffer()
@@ -785,7 +786,7 @@ class AssetEntityController {
 					def userLogins = securityService.getUserLogin()
 					def skippedUpdated =0
 					def skippedAdded=0
-					for ( int r = 1; r < dependencySheetRow ; r++ ) {
+					for ( int r = 1; r <= dependencySheetRow ; r++ ) {
 						int rowNum = r+1
 						def assetId = null
 						def assetIdCell = WorkbookUtil.getStringCellValue(dependencySheet, 1, r )
@@ -984,7 +985,7 @@ class AssetEntityController {
 					// TODO : JPM 11/2014 : Refactor the lookup of PartyGroup.get(18) to be TDS lookup - see TM-3570
 					def staffList = partyRelationshipService.getAllCompaniesStaffPersons([ project.client, PartyGroup.get(18) ])
 					
-					for ( int r = 1; r < commentCount ; r++ ) {
+					for ( int r = 1; r <= commentCount ; r++ ) {
 						def recordForAddition = false
 						int cols = 0 ;
 						def commentIdImported = WorkbookUtil.getStringCellValue(commentsSheet, cols, r ).replace("'","\\'")
