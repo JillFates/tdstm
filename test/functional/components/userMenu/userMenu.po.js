@@ -6,7 +6,7 @@ var UserMenu = function() {
   this.editPreferencesCss = '#resetPreferenceId';
   this.useMobileSiteCss = 'a[href="/tdstm/clientTeams/listTasks?viewMode=mobile&tab="]';
   this.userMegaMenuId = 'userMegaMenu';
-  this.linkListCss = '#userMegaMenu li a';
+  
 
   this.open = function() {
     browser.driver.findElement(by.id(this.userMenuId)).click();
@@ -14,9 +14,9 @@ var UserMenu = function() {
   this.getUserMegaMenu = function () {
     return browser.driver.findElement(by.id(this.userMegaMenuId));
   };
-  this.getLinksList = function () {
-    return browser.driver.findElements(by.css(this.linkListCss));
-  }
+  // this.getLinksList = function () {
+    // return browser.driver.findElements(by.css(this.linkListCss));
+  // }
   this.selectSignOut = function(){
     browser.driver.findElement(by.css(this.signOutCss)).click();
   };
@@ -67,7 +67,7 @@ var UserMenu = function() {
     return browser.driver.findElement(by.css('[aria-describedby="userPrefDivId"] .ui-dialog-title'));
   };
 
-  this.CloseUserPreferencesModal = function () {
+  this.closeUserPreferencesModal = function () {
     browser.driver.findElement(by.css('[aria-describedby="userPrefDivId"] [title="close"]')).click();
   };
 
@@ -100,5 +100,10 @@ var UserMenu = function() {
   this.getUserMobileTitle = function () {
     return browser.driver.findElement(by.css('#mobtitle'));
   }
+};
+UserMenu.prototype = {};
+
+UserMenu.prototype.getLinksList = function() {
+  return browser.driver.findElements(by.css('#userMegaMenu li a'));
 };
 module.exports = UserMenu;

@@ -1,15 +1,15 @@
 module.exports = {
   test1: [
-    // '../components/projects/createProject.spec.js',
-    // '../components/planning/bundles.spec.js',
-    // '../components/assets/applications/createApp.spec.js',
-    // '../components/assets/applications/addTask.spec.js',
-    // '../components/assets/applications/addComments.spec.js'
+    '../components/projects/createProject.spec.js',
+    '../components/planning/bundles.spec.js',
+    '../components/assets/applications/createApp.spec.js',
+    '../components/assets/applications/addTask.spec.js',
+    '../components/assets/applications/addComments.spec.js'
     ],
   test2:[
-    // '../components/assets/devices/createServer.spec.js',
-    // '../components/assets/databases/createDatabase.spec.js',
-    // '../components/projects/deleteProject.spec.js'
+    '../components/assets/devices/createServer.spec.js',
+    '../components/assets/databases/createDatabase.spec.js',
+    '../components/projects/deleteProject.spec.js'
   ],
   projects:[
     '../components/projects/listProjects.spec.js',
@@ -25,10 +25,15 @@ module.exports = {
     '../components/menu/planningMenu.spec.js',
     '../components/menu/tasksMenu.spec.js',
     '../components/menu/dashboardsMenu.spec.js',
-    '../components/menu/reportsMenu.spec.js'
+    '../components/menu/reportsMenu.spec.js',
+    '../components/userMenu/userMenu.spec.js'
+  ],
+  admin:[
+    '../components/admin/adminPortal.spec.js',
+    // '../components/admin/adminPortal/roleType.spec.js',
+    // '../components/admin/staff/merge.spec.js'//need database configuration
   ],
   regression:[ //Do not change the order of these files since some test depends on others.
-    '../components/admin/adminPortal.spec.js',
     '../components/admin/rolePermission.spec.js',
     '../components/admin/assetOptions.spec.js',
     '../components/admin/listCompanies.spec.js',
@@ -89,8 +94,5 @@ module.exports = {
     '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
     // '../components/assets/importExport/exportEmpty.spec.js',    
     // '../components/assets/importExport/impExp-devices.spec.js'
-    ],
-    admin:[ 
-    '../components/admin/staff/merge.spec.js'
     ]
 };

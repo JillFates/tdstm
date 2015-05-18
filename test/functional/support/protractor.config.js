@@ -7,14 +7,14 @@ exports.config = {
     test : suites.test1.concat(suites.test2),
     projects:suites.projects,
     menu : suites.menu,
+    admin : suites.admin,
     regression : suites.regression, 
     tasks : suites.tasks,
     dashboards : suites.dashboards,
     planning: suites.planning,
     reports : suites.reports,
     assets : suites.assets,
-    importExport : suites.importExport,
-    admin : suites.admin
+    importExport : suites.importExport
   },
 
   // seleniumAddress: 'http://localhost:4444/wd/hub',
