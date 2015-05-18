@@ -116,35 +116,26 @@ a:hover {
 							<td><g:link controller="roleType" style="color:black">Role Type </g:link></td>
 						</tr>
 						<tr class="even">
-							<td><g:link controller="partyRelationship" style="color:black">Party Relationship</g:link></td>
-							<td><g:link controller="partyRelationshipType"
-								style="color:black">Party RelationshipType</g:link></td>
+							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>
+							<td><a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a></td>
 						</tr>
 						<tr class="odd">
-							<td><g:link controller="userLogin" style="color:black">Manage Users</g:link></td>
-							<td><g:link controller="refCode" style="color:black">Manage RefCode</g:link></td>
-						</tr>
-						<tr class="even">
 							<td><g:link controller="admin" action="orphanSummary"
 								style="color:black">Manage Orphan Records</g:link></td>
 							<td><a style="color:black" href="#" onclick="openFlushDiv()"> Flush import data </a>
 							</td>
 						</tr>
-						<tr class="odd">
+						<tr class="even">
 							<td><a style="color:black" href="#" onclick="openShowTypeDiv()"> Show/Clean Types </a></td>
 							<td><g:link controller="admin" action="projectReport" style="color:black">Projects Summary Report</g:link></td>
 						</tr>
-						<tr class="even">
+						<tr class="odd">
 							<td>
 								<g:link controller="task" action="eventTimelineResults" params="[eventId:0, showAll:'false']" style="color:black">Task Critical Path Calculator</g:link>
 							</td>
 							<td>
 								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 
 							</td>
-						</tr>
-						<tr class="odd">
-							<td><a style="color:black" href="#" onclick="openReconcileAssetsForm()">Reconcile AssetTypes</a></td>
-							<td><a style="color:black" href="#" onclick="openEncryptStringForm()">Encrypt String</a></td>
 						</tr>
 						<tr class="even">
 							<td>
