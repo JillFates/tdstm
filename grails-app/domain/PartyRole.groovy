@@ -1,6 +1,9 @@
+import groovy.transform.EqualsAndHashCode
+
 /**
  * PartyRole reflects the various roles that can be associated directly to a party.  Only disticted roles can be assigned.
  */
+@EqualsAndHashCode(includes=['party', 'roleType'])
 class PartyRole implements Serializable {
 	Party party
 	RoleType roleType

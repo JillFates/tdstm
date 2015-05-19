@@ -1,6 +1,9 @@
+import groovy.transform.EqualsAndHashCode
+
 /**
  * PartyRelationship is used to relate two parties into a relationship with roles.
  */
+@EqualsAndHashCode(includes=['partyRelationshipType', 'partyIdFrom', 'partyIdTo', 'roleTypeCodeFrom', 'roleTypeCodeTo'])
 class PartyRelationship implements Serializable {
 	PartyRelationshipType partyRelationshipType
 	Party partyIdFrom

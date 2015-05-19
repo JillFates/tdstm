@@ -1,7 +1,9 @@
 /** 
  * Used to represent categories of key/value pairs at a project level
  */
+import groovy.transform.EqualsAndHashCode
 
+@EqualsAndHashCode(includes=["project", "category", "key"])
 class KeyValue  implements Serializable {
 
 	Project project
@@ -94,4 +96,5 @@ class KeyValue  implements Serializable {
 		}
 		return kv
 	}
+
 }	

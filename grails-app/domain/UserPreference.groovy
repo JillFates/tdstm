@@ -1,3 +1,6 @@
+import groovy.transform.EqualsAndHashCode
+
+@EqualsAndHashCode(includes=["userLogin", "preferenceCode"])
 class UserPreference implements Serializable {
 	UserLogin userLogin
 	String preferenceCode
