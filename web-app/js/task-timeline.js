@@ -17,9 +17,9 @@ function displayWarningOrErrorMsg(isCyclical) {
 		.append('div')
 		.attr('class','chart');
 	if (isCyclical)
-		message.html('This event\'s task data contains a cyclical dependency sturcture, so no graph can be generated');
+		message.html('The task data for this event contains cyclical dependency mappings that thereby preventing graph generation');
 	else
-		message.html('<br />not enough task data to create a graph for this event');
+		message.html('<br />There is insufficient task data to create a graph for this event');
 	$('#spinnerId').css('display', 'none');
 }
 
