@@ -41,7 +41,7 @@
 			<tr>
 				<td></td>
 				<td>
-					${inProgressError}
+					${newsBarModeError}
 				</td>
 			</tr>
 			<tr>

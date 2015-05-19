@@ -66,7 +66,7 @@ class ReportsService {
 		def taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList)
 		
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
-			'inProgressError':eventsProjectInfo.inProgressError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
+			'newsBarModeError':eventsProjectInfo.newsBarModeError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
 			'list':eventsProjectInfo.list,'workFlowCodeSelected':eventBundleInfo.workFlowCodeSelected,'steps':eventBundleInfo.steps,'moveBundleSize':moveBundles.size(),
 			'moveBundles':moveBundles,'summaryOk':assetsInfo.summaryOk,'duplicatesAssetNames':assetsInfo.duplicatesAssetNames,'duplicates':assetsInfo.duplicates,
 			'duplicatesTag':assetsInfo.duplicatesTag,'duplicatesAssetTagNames':assetsInfo.duplicatesAssetTagNames,'missedRacks':assetsInfo.missedRacks,
@@ -438,7 +438,7 @@ class ReportsService {
 	/**
 	* @param moveEventInstance,projectInstance,currProj
 	* @param Events
-	* @return time,moveEventInstance,errorForEventTime,inProgressError,userLoginError,clientAccess,list
+	* @return time,moveEventInstance,errorForEventTime,newsBarModeError,userLoginError,clientAccess,list
 	*/
 	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList){
 		
@@ -447,7 +447,7 @@ class ReportsService {
 		def format = new SimpleDateFormat("yyyy-mm-dd hh:mm:sss");
 		String time = formatter.format(date);
 		def errorForEventTime = ""
-		def inProgressError = ""
+		def newsBarModeError = ""
 		def clientAccess = ""
 		def userLoginError = ""
 
@@ -477,14 +477,14 @@ class ReportsService {
 		   moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
 		}
 		def inPastError = ''
-		if(moveEventInstance.inProgress=='true'){
+		if(moveEventInstance.newsBarMode=='on'){
 			eventErrorList << 'Project'
-			inProgressError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Progress </b></span>"""
+			newsBarModeError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Progress </b></span>"""
 		}else if(moveEventCompletiondate < projectInstance.startDate) {
 		    eventErrorList << 'Project'
-		    inProgressError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Past </b></span>"""
+		    newsBarModeError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Past </b></span>"""
 		}else{
-		    inProgressError += """<span style="color:green" ><b>${moveEventInstance.name}: OK </b></span>"""
+		    newsBarModeError += """<span style="color:green" ><b>${moveEventInstance.name}: OK </b></span>"""
 		}
 		
 		
@@ -515,7 +515,7 @@ class ReportsService {
 			clientAccess += """<span style="color:Green"><b> Client Access:&nbsp;${personInstanceList}</b></span>"""
 		}
 		return[time:time,moveEvent:moveEventInstance,errorForEventTime:errorForEventTime,
-			   inProgressError:inProgressError,userLoginError:userLoginError,clientAccess:clientAccess,list:list,
+			   newsBarModeError:newsBarModeError,userLoginError:userLoginError,clientAccess:clientAccess,list:list,
 			   eventErrorList:eventErrorList]
 	}
 	

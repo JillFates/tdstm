@@ -64,8 +64,8 @@
 				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'videolink')}</td>
 						</tr>
                         <tr class="prop">
-				            <td  class="name">Status:</td>
-				            <td class="valueNW"><g:message code="event.inProgress.${moveEventInstance?.inProgress}" /></td>
+				            <td  class="name">News Bar Mode:</td>
+				            <td class="valueNW"><g:message code="event.newsBarMode.${moveEventInstance?.newsBarMode}" /></td>
 						</tr>
                         <tr class="prop">
 				            <td  class="name">Estimated Start:</td>

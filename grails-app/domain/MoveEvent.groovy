@@ -19,7 +19,7 @@ class MoveEvent {
     Project project
     String name
     String description
-	String inProgress = "auto" 
+	String newsBarMode = "off" 
 	String calcMethod = METHOD_LINEAR
 	String runbookStatus
 	Integer runbookVersion = 1
@@ -43,7 +43,7 @@ class MoveEvent {
 		actualStartTime(nullable:true )
 		actualCompletionTime(nullable:true )
 		revisedCompletionTime ( nullable:true )
-		inProgress( blank:false, nullable:false, inList:["auto", "true", "false"] )
+		newsBarMode( blank:false, nullable:false, inList:["auto", "on", "off"] )
 		calcMethod( blank:false, nullable:false, inList: [METHOD_LINEAR, METHOD_MANUAL] )
 		runbookStatus( blank:true, nullable:true , inList:["Pending", "Draft", "Final", "Done"])
 		runbookVersion ( nullable:true )

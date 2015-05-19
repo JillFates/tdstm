@@ -66,7 +66,7 @@ class MoveEventController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 
 		def project = securityService.getUserCurrentProject()
-		def inProg = params.inProgress ? retrieveInprogList(params.inProgress) : null
+		def newsBM = params.newsBarMode ? retrieveNewsBMList(params.newsBarMode) : null
 		
 		def events = MoveEvent.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
@@ -76,8 +76,8 @@ class MoveEventController {
 				ilike('description', "%${params.description}%")
 			if (params.runbookStatus)
 				ilike('runbookStatus', "%${params.runbookStatus}%")
-			if (inProg)
-				'in'('inProgress', inProg)
+			if (newsBM)
+				'in'('newsBarMode', newsBM)
 				
 			order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 		}
@@ -85,7 +85,7 @@ class MoveEventController {
 		def totalRows = events.totalCount
 		def numberOfPages = Math.ceil(totalRows / maxRows)
 			
-		def results = events?.collect { [ cell: [it.name, it.description, g.message(code: "event.inProgress.${it.inProgress}"), it.runbookStatus,
+		def results = events?.collect { [ cell: [it.name, it.description, g.message(code: "event.newsBarMode.${it.newsBarMode}"), it.runbookStatus,
 					it.moveBundlesString], id: it.id,
 			]}
 		
@@ -487,9 +487,9 @@ class MoveEventController {
 	    		news.append(String.valueOf(formatter.format(GormUtil.convertInToUserTZ( it.created, tzId ))) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;")	
 	    	}
 			
-			// append recent tasks  whose status is completed, moveEvent is inProgress
+			// append recent tasks  whose status is completed, moveEvent is newsBarMode
 			def transitionComment = new StringBuffer()
-			if(moveEvent.inProgress =="true"){
+			if(moveEvent.newsBarMode =="on"){
 				def today = GormUtil.convertInToGMT( "now", tzId );
 				def currentPoolTime = new java.sql.Timestamp(today.getTime())
 				def tasksCompQuery="""SELECT comment,date_resolved AS dateResolved FROM asset_comment WHERE project_id= ${moveEvent.project.id} AND 
@@ -868,17 +868,17 @@ class MoveEventController {
 	}
 	
 	/**
-	 * This method is used to filter inProgress property , As we are displaying different label in list so user may serch according to
+	 * This method is used to filter newsBarMode property , As we are displaying different label in list so user may serch according to
 	 * displayed label but in DB we have different values what we are displaying in label 
 	 * e.g. for auto - Auto Start, true - Started ..
-	 * @param inProgress with what character user filterd InProgress property
-	 * @return matched db property of inProgress
+	 * @param newsBarMode with what character user filterd newsBarMode property
+	 * @return matched db property of newsBarMode
 	 */
-	def retrieveInprogList(inProgress){
-		def progList = ['Auto Start':'auto', 'Started':'true', 'Stopped':'false']
+	def retrieveNewsBMList(newsBarMode){
+		def progList = ['Auto Start':'auto', 'Started':'on', 'Stopped':'off']
 		def returnList = []
 		progList.each{key, value->
-			if(StringUtils.containsIgnoreCase(key, inProgress))
+			if(StringUtils.containsIgnoreCase(key, newsBarMode))
 				returnList <<  value
 		}
 		return returnList

@@ -30,7 +30,7 @@ moveEvent = MoveEvent.findById(moveEventId)
 Date date = new Date()
 def showCrawler = false
 if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
-	if((moveEvent.inProgress != 'false') && (moveEvent.estStartTime <= date) && (moveEvent.estCompletionTime >= date)){
+	if((moveEvent.newsBarMode != 'off') && (moveEvent.estStartTime <= date) && (moveEvent.estCompletionTime >= date)){
 		showCrawler = true
 	}	
 }

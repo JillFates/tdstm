@@ -185,7 +185,7 @@ class ProjectUtilController {
 					def moveEvent = new MoveEvent( project:projectInstance,
 							name:event.name,
 							description:event.description,
-							inProgress:event.inProgress,
+							newsBarMode:event.newsBarMode,
 							calcMethod:event.calcMethod
 							)
 					if ( ! moveEvent.validate() || ! moveEvent.save(insert : true, flush:true) ) {

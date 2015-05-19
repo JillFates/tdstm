@@ -80,4 +80,5 @@ databaseChangeLog = {
 	include file: '20150428-new-person-and-project-staff-permissions.groovy'
 	include file: '20150512-add-some-privileges.groovy'
 	include file: '20150430-remove-asset-transition.groovy'
+	include file: '20150519-rename-in-progress-to-news-bar-mode.groovy'
 }

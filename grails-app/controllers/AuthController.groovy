@@ -210,7 +210,7 @@ class AuthController {
 		
 		currentLiveEvents.each{ moveEvent  ->
 			def completion = moveEvent.getEventTimes()?.completion?.getTime()
-			if(moveEvent.inProgress == "true" || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)){
+			if(moveEvent.newsBarMode == "on" || (completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)){
 				def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ?  ORDER BY mes.dateCreated DESC"
 				def moveEventSnapshot = MoveEventSnapshot.findAll( query , [moveEvent] )[0]
 				def status =""
