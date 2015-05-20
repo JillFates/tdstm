@@ -466,17 +466,14 @@
 		<g:if test="${currProjObj?.runbookOn && moveEvent && (moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime))}">
 			<g:if test="${moveEvent?.newsBarMode == 'auto'}">
 				<g:if test="${moveEvent?.estStartTime.getTime() < new Date().getTime()}">
-					<div class="menu3" id="head_crawler" >
-						<div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
-						<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
-					</div>
-					<script type="text/javascript">
-
-					${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
-					</script>
+					<g:set var="showNewsBar" value="true" />
 				</g:if>
 			</g:if>
 			<g:elseif test="moveEvent?.newsBarMode == 'on'">
+				<g:set var="showNewsBar" value="true" />
+			</g:elseif>
+				
+			<g:if test="${showNewsBar}">
 				<div class="menu3" id="head_crawler" >
 					<div id="crawlerHead">${moveEvent.name} Event Status <span id="moveEventStatus"></span>. News: </div>
 					<div id="head_mycrawler"><div id="head_mycrawlerId" style="width: 1200px; height:25px; vertical-align:bottom" > </div></div>
@@ -485,8 +482,7 @@
 
 				${remoteFunction(controller:'moveEvent', action:'retrieveMoveEventNewsAndStatus', params:'\'id='+moveEventId+'\'',onComplete:'updateEventHeader(XMLHttpRequest)')}
 				</script>
-			</g:elseif>
-				
+			</g:if>
 			
 		</g:if>
 

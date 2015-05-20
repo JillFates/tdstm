@@ -38,7 +38,7 @@ if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 */
 %>
 
-<g:if test="${moveEvent?.inProgress == 'true' || (moveEvent?.inProgress == 'auto' && moveEvent?.estStartTime)}">
+<g:if test="${moveEvent?.newsBarMode == 'on' || (moveEvent?.newsBarMode == 'auto' && moveEvent?.estStartTime)}">
 	<g:javascript src="crawler.js" />
 </g:if>
 <g:javascript src="select2.js"/>
