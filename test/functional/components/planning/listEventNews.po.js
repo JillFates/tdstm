@@ -21,7 +21,6 @@ ListEventNews.prototype.isCreateOpened = function() {
   var that = this;
   return browser.driver.wait(function () {
     return that.getCreateNewsModal().getAttribute('style').then(function (style) {
-      console.log('style',style);
       return style.indexOf('display: block;') !==-1;
     });
   }).then(function () {
@@ -33,7 +32,6 @@ ListEventNews.prototype.isCreateModalClosed = function() {
   var that = this;
   return browser.driver.wait(function () {
     return that.getCreateNewsModal().getAttribute('style').then(function (style) {
-      console.log('style',style);
       return style.indexOf('display: none;') !==-1;
     });
   }).then(function () {

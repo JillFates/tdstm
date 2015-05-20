@@ -1,6 +1,6 @@
 module.exports = {
   test1: [
-    '../components/projects/createProject.spec.js',
+    // '../components/projects/createProject.spec.js',
     '../components/planning/bundles.spec.js',
     '../components/assets/applications/createApp.spec.js',
     '../components/assets/applications/addTask.spec.js',
@@ -61,6 +61,7 @@ module.exports = {
     '../components/dashboards/eventDashboard.spec.js'
     ],
     planning:[
+    '../components/planning/listBundles.spec.js',
     '../components/planning/listEventNews.spec.js'
     ],
     reports:[

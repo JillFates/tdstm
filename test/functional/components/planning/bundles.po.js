@@ -1,4 +1,6 @@
 'use strict';
+var ListAssets = require ('../assets/listAssets.po.js');
+
 var ListBundles = function(){
   this.createBundleBtn = '[onclick="window.location.href=\'/tdstm/moveBundle/create\'"]';
   // Create Bundle
@@ -31,5 +33,63 @@ var ListBundles = function(){
   this.getConfirmMsg = function(){
     return browser.driver.findElement(by.css(this.messageCss));
   };
+
+};
+
+ListBundles.prototype = new ListAssets();
+
+ListBundles.prototype.getLoadingStyle = function() {
+  return browser.driver.findElement(by.id('load_bundleGridIdGrid')).getAttribute('style').then(function(attClass){
+    return (attClass.search('display: none;') !== -1);
+  });      
+};
+
+ListBundles.prototype.getListItems = function(expListItems,appName){
+  return browser.driver.wait(function () {
+    return browser.driver.findElements(by.css('[role="grid"] tbody tr.ui-widget-content')).then(function(list){
+      if(list.length===expListItems){
+        if(expListItems === 1){
+          return list[0].getText().then(function (text) {
+            return text.search(appName) !== -1;
+          });
+        }else {
+          return true;
+        }
+      }else{
+        return false;
+      }
+    });
+  }).then(function () {
+    return true;
+  });
+};
+
+ListBundles.prototype.verifySearchResults = function(count,appName){
+  var that = this;
+  return browser.driver.wait(function(){
+    return that.getLoadingStyle()&&that.getListItems(count,appName);
+  }).then(function(){
+      return browser.driver.findElements(by.css('[role="grid"] tbody tr.ui-widget-content')).then(function(list){
+        return list;
+    });
+  },function(){
+    return 'No results found';
+  });
+};
+
+ListBundles.prototype.getSearchNameField = function() {
+  return browser.driver.findElement(by.id('gs_name'));
+  
+};
+ListBundles.prototype.selectBundle = function(bundleId) {
+  browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/show/'+bundleId+'"]')).click();
+};
+
+ListBundles.prototype.clickBundleListBtn = function(first_argument) {
+  browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/list"].list')).click();
+};
+
+ListBundles.prototype.getErrors = function() {
+  return browser.driver.findElements(by.css('.errors li'));
 };
 module.exports = ListBundles;
