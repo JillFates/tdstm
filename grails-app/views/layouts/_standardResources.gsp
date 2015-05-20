@@ -3,6 +3,7 @@
 --%>
 
 <link rel="shortcut icon" type="image/x-icon" href="${resource(dir:'images',file:'favicon.ico')}" />
+
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'main.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'tds.css')}"/>
 <link rel="stylesheet" type="text/css" href="${resource(dir:'css',file:'ui.core.css')}" />
@@ -27,17 +28,17 @@
 <%
 def moveEventId = session.getAttribute("MOVE_EVENT")?.MOVE_EVENT ;
 moveEvent = MoveEvent.findById(moveEventId)
-Date date = new Date()
+/*Date date = new Date()
 def showCrawler = false
 if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 	if((moveEvent.newsBarMode != 'off') && (moveEvent.estStartTime <= date) && (moveEvent.estCompletionTime >= date)){
 		showCrawler = true
 	}	
 }
-
+*/
 %>
 
-<g:if test="${showCrawler}">
+<g:if test="${moveEvent?.inProgress == 'true' || (moveEvent?.inProgress == 'auto' && moveEvent?.estStartTime)}">
 	<g:javascript src="crawler.js" />
 </g:if>
 <g:javascript src="select2.js"/>
