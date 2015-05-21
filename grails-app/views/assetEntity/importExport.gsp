@@ -107,7 +107,7 @@
               </thead>
               <tbody>
               
-              	<tr>
+              	<tr hidden="true">
 					<td valign="top" class="name">Import Type:</td>
 					<td valign="top" class="value">
 						<select id="dataTransferSet" name="dataTransferSet">                    

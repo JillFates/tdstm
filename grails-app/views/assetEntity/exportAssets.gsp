@@ -52,7 +52,7 @@
               <tr><th colspan="3">Export</th></tr>
             </thead>
             <tbody>
-				<tr>
+				<tr hidden="true">
 					<td valign="top" class="name">Export Type:</td>
 					<td valign="top" class="value">
 						<select id="dataTransferSet" name="dataTransferSet">                    
