@@ -13,7 +13,7 @@ describe('Dashboards Menu', function(){
 
       it('should displayed 6 links', function(){
         menu.getDashboardsSubmenu().then(function(list){
-          expect(list.length).toEqual(5);
+          expect(list.length).toEqual(4);
         });
       });
 
