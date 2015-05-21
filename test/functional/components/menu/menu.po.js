@@ -367,13 +367,19 @@ var Menu = function(){
     this.getPlanning().click();
     var d = {
       'listEvents':function(){
-
+        that.getListEvents().click();
       },
       'listEventNews':function () {
         that.getListEventNews().click();
       },
       'listBundles':function(){
         that.getListBundles().click();
+      },
+      'preEventchecklist':function () {
+        that.getPreEventChecklist().click();
+      },
+      'exportRunbook':function () {
+        that.getExportRunbook().click();
       }
     };
     d[option]();
@@ -442,9 +448,6 @@ var Menu = function(){
   this.getEventDashboard = function(){
     return browser.driver.findElement(by.css('a[href="/tdstm/dashboard/index"]'));
   };
-  this.getCartTraker = function(){
-    return browser.driver.findElement(by.css('a[href="/tdstm/cartTracking/cartTracking"]'));
-  };
   this.getDashboardHelp = function(){
     return browser.driver.findElement(by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMDashboardOverview?cover=print\',\'help\');"]'));
   };
@@ -460,9 +463,6 @@ var Menu = function(){
       },
       'eventDashboard':function(){
         that.getEventDashboard().click();
-      },
-      'Cart Tracker': function(){
-        that.getCartTraker().click();
       }
     };
     d[option]();
