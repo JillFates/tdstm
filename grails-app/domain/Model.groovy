@@ -61,7 +61,7 @@ class Model {
 		modelName( blank:false, nullable:false, unique:['manufacturer'])
 		manufacturer( nullable:false )
 		description( blank:true, nullable:true )
-		assetType( blank:true, nullable:true )
+		assetType(nullable:false)
 		layoutStyle( blank:true, nullable:true )
 		modelStatus( blank:true, nullable:true, inList:['new','full','valid'])
 		bladeRows( nullable:true )

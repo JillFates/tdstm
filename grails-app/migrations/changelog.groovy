@@ -81,4 +81,5 @@ databaseChangeLog = {
 	include file: '20150512-add-some-privileges.groovy'
 	include file: '20150430-remove-asset-transition.groovy'
 	include file: '20150519-rename-in-progress-to-news-bar-mode.groovy'
+	include file: '20150526-assettype-defaulted-to-server-null-values.groovy'
 }
