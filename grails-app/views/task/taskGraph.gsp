@@ -406,7 +406,6 @@
 					}
 				},
 				Pause:function (sec) {
-					console.log("Pause:function");
 					clearTimeout(this.to);
 					if (sec == 0) {
 						this.oop.animate(sec,'',sec*1000);
