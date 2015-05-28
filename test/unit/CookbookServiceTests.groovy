@@ -469,13 +469,13 @@ tasks: [
 	void testValidateNotificationProblem1() {
 		def errors = cookbookService.validateSyntax( notificationRecipeProblem1 )
 		expect:
-			errors =! null
+			errors != null
 	}
 	
 	void testValidateNotificationProblem2() {
 		def errors = cookbookService.validateSyntax( notificationRecipeProblem2 )
 		expect:
-			errors =! null
+			errors != null
 	}
 	void testValidateNotificationGood1() {
 		def errors = cookbookService.validateSyntax( notificationRecipeGood1 )
