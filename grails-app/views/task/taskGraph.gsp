@@ -152,13 +152,13 @@
 			
 			graph = d3.select('#graph0');
 			var graph0 = graph[0][0];
-
+			
 			$('#containerId')[0].appendChild(graph0);
 			
 			var transform = graph0.transform.animVal;
 			for (var i = 0; i < transform.numberOfItems; ++i)
-				if (transform[i].type == 2)
-					container.attr('transform', 'translate(' + transform[i].matrix.e + ' ' + transform[i].matrix.f + ') scale(1)');
+				if (transform.getItem(i).type == 2)
+					container.attr('transform', 'translate(' + transform.getItem(i).matrix.e + ' ' + transform.getItem(i).matrix.f + ') scale(1)');
 					
 			graph.attr('transform', 'translate(0 0) scale(1)');
 			
