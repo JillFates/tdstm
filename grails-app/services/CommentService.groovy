@@ -235,6 +235,7 @@ class CommentService {
 				}
 			}
 			if (params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
+			if (params.sendNotification?.isNumber()) assetComment.sendNotification = Integer.parseInt(params.sendNotification)
 			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
 			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
 			if (params.duration?.isInteger()) assetComment.duration = Integer.parseInt(params.duration)
@@ -242,7 +243,7 @@ class CommentService {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())		
 				log.debug "saveUpdateCommentAndNotes - TimeScale=${assetComment.durationScale}"
 			}
-		 
+			if (params.sendNotification?.isInteger())assetComment.sendNotification=Integer.parseInt(params.sendNotification)
 			// Issues (aka tasks) have a number of additional properties to be managed 
 			if ( assetComment.commentType == AssetCommentType.TASK ) {
 				if ( params.containsKey('moveEvent') ) {
@@ -300,6 +301,7 @@ class CommentService {
 			// should be the last update to Task properties before saving.	
 			taskService.setTaskStatus( assetComment, params.status )		
         
+			def dirtyPropNames = assetComment.dirtyPropertyNames
         	log.debug "saveUpdateCommentAndNotes() about to save task/comment $assetComment"
 			if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 			
@@ -377,16 +379,64 @@ class CommentService {
 				        statusCss:statusCss, 
 				        assignedToName: assetComment.assignedTo?(assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName):"",
 						lastUpdatedDate:lastUpadatedFormatter.format(GormUtil.convertInToUserTZ(assetComment.lastUpdated,tzId)) ]
-
+				
 				// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 				def loginPerson = userLogin.person	// load so that we don't have a lazyInit issue
 				if ( assetComment.commentType == AssetCommentType.TASK && 
 					assetComment.assignedTo	&& 
 					assetComment.assignedTo.id != loginPerson.id && 
-					statusToSendEmailFor.contains(assetComment.category) &&
+					assetComment.sendNotification &&
+					(AssetCommentStatus.READY || AssetCommentStatus.STARTED) &&
 					assetComment.isPublished) 
 				{
-					 dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
+					for(int i = 0; i< dirtyPropNames.size(); i++ )
+					{	
+						def typeGood = false;
+						if(dirtyPropNames[i] != assetComment.dirtyPropertyNames[i])
+						{
+						switch(dirtyPropNames[i])
+							{
+								case "assignedTo":
+									typeGood = true;
+								break;
+								case "comment":
+									typeGood = true;
+								break;
+								case "assetEntity":
+									typeGood = true;
+								break;
+								case "moveEvent":
+									typeGood = true;
+								break;
+								case "status":
+									typeGood = true;
+								break;
+								case "dueDate":
+									typeGood = true;
+								break;
+								case "priority":
+									typeGood = true;
+								break;
+								case "estStart":
+									typeGood = true;
+								break;
+								case "actStart":
+									typeGood = true;
+								break;
+								case "estFinish":
+									typeGood = true;
+								break;
+								case "role":
+									typeGood = true;
+								break;
+							}
+						}
+						if(typeGood)
+						{
+							dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
+							break;
+						}
+					}
 				}
 			
 				break

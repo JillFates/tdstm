@@ -83,4 +83,5 @@ databaseChangeLog = {
 	include file: '20150519-rename-in-progress-to-news-bar-mode.groovy'
 	include file: '20150526-assettype-defaulted-to-server-null-values.groovy'
 	include file: '20150526-delete-orphaned-dependency-bundles.groovy'	
+	include file: '20150520-create-column-send-notification-in-asset-comment.groovy'
 }

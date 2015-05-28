@@ -1049,6 +1049,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 			estStart: '',
 			forWhom: '',
 			hardAssigned: '0',
+			sendNotification: '0',
 			isResolved: '0',
 			manageDependency: 1,
 			moveEvent: "",
@@ -1086,6 +1087,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		temp.estFinish = response.etFinish;
 		temp.estStart = response.etStart;
 		temp.hardAssigned = ac.hardAssigned ? ac.hardAssigned.toString() : '0';
+		temp.sendNotification = ac.sendNotification ? ac.sendNotification.toString() : '0';
 		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
 		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
 		temp.mustVerify = ac.mustVerify;

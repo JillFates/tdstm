@@ -316,7 +316,70 @@ tasks: [
 
 ]
 """
-	
+			def notificationRecipeProblem1 = """
+/**
+			 * Recipe to verify handling non-number input
+			 */
+tasks: [
+	[
+		id: 2000,
+		title: 'Test 1',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR',
+		whom: 'Jack	Wawrzynkiewicz',
+		sendNotification: a
+	]
+]
+	"""
+			def notificationRecipeProblem2 = """
+/**
+			 * Recipe to verify handling non 0/1 input
+			 */
+tasks: [
+	[
+		id: 2000,
+		title: 'Test 1',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR',
+		whom: 'Jack	Wawrzynkiewicz',
+		sendNotification: 2
+	]
+]
+	"""
+				def notificationRecipeGood1 = """
+/**
+			 * Recipe to verify notification set to true
+			 */
+tasks: [
+	[
+		id: 2000,
+		title: 'Test 1',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR',
+		whom: 'Jack	Wawrzynkiewicz',
+		sendNotification: 1
+	]
+]
+	"""
+			def notificationRecipeGood2 = """
+/**
+			 * Recipe to verify notification set to false
+			 */
+tasks: [
+	[
+		id: 2000,
+		title: 'Test 1',
+		type: 'milestone',
+		category: 'moveday',
+		team: 'PROJ_MGR',
+		whom: 'Jack	Wawrzynkiewicz',
+		sendNotification: 0
+	]
+]
+	"""
 	/**
 	 * This is used to load the grails-app/conf/Config.groovy which contains both configurations as well as 
 	 * dynamic method injections for various object classes to be used by the application
@@ -403,6 +466,27 @@ tasks: [
 			errors == null
 	}
 	
+	void testValidateNotificationProblem1() {
+		def errors = cookbookService.validateSyntax( notificationRecipeProblem1 )
+		expect:
+			errors =! null
+	}
+	
+	void testValidateNotificationProblem2() {
+		def errors = cookbookService.validateSyntax( notificationRecipeProblem2 )
+		expect:
+			errors =! null
+	}
+	void testValidateNotificationGood1() {
+		def errors = cookbookService.validateSyntax( notificationRecipeGood1 )
+		expect:
+			errors == null
+	}
+	void testValidateNotificationGood2() {
+		def errors = cookbookService.validateSyntax( notificationRecipeGood2 )
+		expect:
+			errors == null
+	}
 	void testSimple() {
 		def recipe = "tasks: {}"
 		def errors = cookbookService.validateSyntax( recipe )

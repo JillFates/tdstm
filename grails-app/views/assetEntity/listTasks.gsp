@@ -68,6 +68,7 @@
 			var dueDate = '${dueDate}'
 			var status = '${status}'
 			var assignedTo = '${assignedTo}'
+			var sendNotification = '${sendNotification}'
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'

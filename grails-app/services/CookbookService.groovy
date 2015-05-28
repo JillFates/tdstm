@@ -723,7 +723,7 @@ class CookbookService {
 				projectIds.add(currentProject.id)
 			}
 		} else {
-
+		
 			projectType = (projectType.class == String) ? projectType.toLowerCase() : projectType
 			if (projectType.isNumber()) {
 				projectType = projectType.toLong()
@@ -1121,6 +1121,7 @@ class CookbookService {
 			priority:0,
 			effort:0,
 			chain:0,
+			sendNotification:0,
 			terminal:0,
 			whom:0,
 			whomFixed:0,

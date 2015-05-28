@@ -22,6 +22,7 @@ var TaskModal = function(){
   };
   this.fixedAssignedLabel = $('[for="hardAssignedEdit"]');
   this.fixedAssigned = element(by.model('ac.hardAssigned'));
+  this.sendNotification = element(by.model('ac.sendNotification'));
   this.teamField = element(by.model('ac.role'));
   this.teamOptions = this.teamField.element(by.model('ngModel')).$$('option');
   // this.teamSelected = this.teamField.element(by.model('ngModel')).$('option:checked');
