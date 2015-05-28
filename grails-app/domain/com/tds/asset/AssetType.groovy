@@ -119,7 +119,7 @@ public enum AssetType {
 	 * @return
 	 */
 	static List getNonOtherTypes() {
-		return getStorageTypes() + getAllServerTypes() + getNetworkDeviceTypes()
+		return getStorageTypes() + getAllServerTypes() //+ getNetworkDeviceTypes()
 	}
 
 	/**
