@@ -880,6 +880,10 @@ class AssetEntityService {
 				"SELECT f.id, f.assetName FROM Files f " + 
 				"WHERE assetClass=:ac AND project=:project ORDER BY assetName", 
 				[ac:AssetClass.STORAGE, project:project] )
+			map.files += AssetEntity.executeQuery(
+				"SELECT a.id, a.assetName FROM AssetEntity a " + 
+				"WHERE assetClass=:ac AND project=:project AND COALESCE(a.assetType,'')='Storage' ORDER BY assetName",
+				[ ac:AssetClass.DEVICE, project:project] )
 		}
 
 		// NOTE - the networks is REALLY OTHER devices other than servers

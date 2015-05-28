@@ -1123,8 +1123,9 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 	};
 
 	var getRealAssetType = function(assetType) {
+		assetType = assetType.charAt(0).toUpperCase() + assetType.slice(1).toLowerCase()
 		var tempAssetType = null;
-		if (assetType == 'Application' || assetType == 'Database') {
+		if (assetType == 'Application' || assetType == 'Database' || assetType == 'Storage') {
 			tempAssetType = assetType
 		} else if (assetType == 'Files') {
 			tempAssetType = 'Storage'
