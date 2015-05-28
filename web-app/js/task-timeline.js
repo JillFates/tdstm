@@ -470,8 +470,10 @@ function buildGraph (response, status) {
 		if (!ready)
 			return;
 		
-	
-		var startTime = performance.now();
+		
+		var startTime = 0;
+		if (window.performance && window.performance.now)
+			startTime = performance.now();
 		
 		var polys, labels, lines;
 		var minExtent = brush.extent()[0];
@@ -487,7 +489,7 @@ function buildGraph (response, status) {
 		itemLabels.attr('transform', 'translate(' + offset + ', 0)');
 		
 		// offset the axis
-		var offsetY = mainMinuteAxis[0][0].transform.baseVal[0].matrix.f;
+		var offsetY = mainMinuteAxis[0][0].transform.baseVal.getItem(0).matrix.f;
 		mainHourAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
 		mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + offsetY + ')');
 		
@@ -638,7 +640,9 @@ function buildGraph (response, status) {
 		miniPolys
 			.attr('class', function(d) { return 'miniItem ' + getClasses(d); });
 		
-		console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
+		
+		if (window.performance && window.performance.now)
+			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
 	}
 	
 	// clears all items from the main group then redraws them
@@ -715,9 +719,6 @@ function buildGraph (response, status) {
 
 	// Toggles selection of a task
 	function toggleTaskSelection(taskObject) {
-		console.log("__________________________");
-		console.log(siblingGroups);
-		console.log(siblingGroupsReduced);
 		
 		if (dragging)
 			return;
@@ -1997,7 +1998,6 @@ function generateGraph (event) {
 
 // highlight tasks matching the user's regex
 function performSearch () {
-	console.log('search');
 	if ($('svg#timelineSVGId') != null) {
 		var searchString = $('#searchBoxId').val();
 		var data = getData();
