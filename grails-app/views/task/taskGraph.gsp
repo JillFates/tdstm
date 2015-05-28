@@ -293,7 +293,7 @@
 				for (var i = 0; i < tasks.size(); ++i) {
 					
 					// check this task against the regex
-					var name = tasks[i].task;
+					var name = (tasks[i].comment) ? (tasks[i].comment) : (tasks[i].task);
 					var matchRegex = false;
 					if (isRegex && name.match(regex) != null)
 						matchRegex = true;
