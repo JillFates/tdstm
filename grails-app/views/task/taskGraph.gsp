@@ -88,7 +88,7 @@
 		var width = 0;
 		var height = 0;
 		var zoom;
-		var tasks= [];
+		var tasks = [];
 		
 		function buildGraph (response, status) {
 			
@@ -122,7 +122,7 @@
 			});
 			teamSelect.val('ALL');
 			teamSelect.on('change', function () {
-				filterRoles();
+				performSearch();
 			});
 			
 			var svgData = d3.select('div.body')
@@ -269,7 +269,6 @@
 				var isRegex = false;
 				var regex = /.*/;
 				
-					
 				// check if the user entered an invalid regex
 				if (hasSlashes) {
 					try {
@@ -281,47 +280,52 @@
 					}
 				}
 				
+				// determine whether the "clear filter" icon should be usable
 				if (searchString != '')
 					$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
 				else
 					$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
 				
-				_(nodes).forEach(function (o, i) {
+				
+				var val = $('#teamSelectId').val();
+				var useRegex = (searchString != '');
+				var useRole = (val != 'ALL');				
+				for (var i = 0; i < tasks.size(); ++i) {
 					
-					var name = $(o).children('g').children('a').attr('xlink:title');
-					$(o).children('path').removeAttr('stroke');
+					// check this task against the regex
+					var name = tasks[i].task;
+					var matchRegex = false;
+					if (isRegex && name.match(regex) != null)
+						matchRegex = true;
+					else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
+						matchRegex = true;
+							
+					// check this task against the role filter
+					var matchRole = false;
+					if ((tasks[i].role ? tasks[i].role : 'NONE') == val)
+						matchRole = true;
 					
-					$(o).attr('class', 'node unselected');
+					// determine if this task should be highlighted
+					var highlight = true;
+					if ( (useRole && !matchRole) || (useRegex && !matchRegex) )
+						highlight = false;
+					if (!useRegex && !useRole)
+						highlight = false;
 					
-					if (searchString == '') {
-						$(o).attr('class', 'node unselected');
-					} else {
-						if (isRegex && name.match(regex) != null)
-							$(o).attr('class', 'node selected');
-						else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
-							$(o).attr('class', 'node selected');
-					}
-				});
+					// highlight the task
+					if (highlight)
+						$('#' + tasks[i].id).attr('class', 'node selected');
+					else
+						$('#' + tasks[i].id).attr('class', 'node unselected');
+				}
 			}
+			
 			return false;
 		}
 		
 		function clearFilter () {
 			$('#searchBoxId').val('');
 			performSearch();
-		}
-		
-		function filterRoles () {
-			var val = $('#teamSelectId').val();
-			for (var i = 0; i < tasks.size(); ++i)
-				if (val != 'ALL') {
-					if ( (tasks[i].role ? tasks[i].role : 'NONE') == val )
-						$('#' + tasks[i].id).css('opacity', 1);
-					else
-						$('#' + tasks[i].id).css('opacity', 0.3);
-				} else {
-					$('#' + tasks[i].id).css('opacity', 1);
-				}
 		}
 		</script>
 	</head>
