@@ -37,7 +37,6 @@ class ReportsService {
 		
 
   //---------------------------------------for Assets and Bundles --------------------------------------//
-  log.info "AAAAAAAAA " + moveBundles.id
 		
 		def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance,[sort:'assetName'])
 		
