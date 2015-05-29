@@ -329,7 +329,9 @@ class TaskController {
 			def moveEventId = 0
 			if (params.moveEventId && params.moveEventId.isNumber())
 				moveEventId = params.moveEventId
-
+			
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished?.equals("true"))
+			
 			def now = new Date().format('yyyy-MM-dd H:m:s')
 			def styleDef = "rounded, filled"
 
@@ -360,7 +362,7 @@ digraph runbook {
 
 			// helper closure that outputs the task info in a dot node format
 			def outputTaskNode = { task, rootId ->
-				if (! tasks.contains(task.id)) {
+				if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
 					tasks << task.id
 					
 					def label = "${task.taskNumber}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(task.comment).replaceAll(/\n/,'').replaceAll(/\r/,'')
@@ -507,27 +509,31 @@ digraph runbook {
 			
 			def projectId = project.id
 			
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished?.equals("true"))
+			
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
 
 			def query = """
 				SELECT 
-				  t.asset_comment_id AS id,
-				  t.task_number, 
-				  CONVERT( GROUP_CONCAT(s.task_number SEPARATOR ',') USING 'utf8') AS successors,
-				  IFNULL(a.asset_name,'') as asset, 
-				  t.comment as task, 
-				  t.role,
-				  t.status,
-				  IFNULL(CONCAT(first_name,' ', last_name),'') as hard_assign,
-				  t.duration
+					t.asset_comment_id AS id,
+					t.task_number, 
+					CONVERT( GROUP_CONCAT(s.task_number SEPARATOR ',') USING 'utf8') AS successors,
+					IFNULL(a.asset_name,'') AS asset, 
+					t.comment AS task, 
+					t.role,
+					t.status,
+					IFNULL(CONCAT(first_name,' ', last_name),'') AS hard_assign,
+					t.is_published AS isPublished,
+					t.duration
 				FROM asset_comment t
 				LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
 				LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
 				LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
 				LEFT OUTER JOIN person ON t.owner_id=person.person_id
-				WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId}
+				WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId} 
+				${viewUnpublished ? '' : ' AND t.is_published=1 '}
 				GROUP BY t.task_number
-				"""
+			"""
 
 				//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign, 
 				//  -- IFNULL(t.est_start,'') AS est_start
@@ -680,7 +686,19 @@ digraph runbook {
 			selectedEventId = eventPref.toLong()
 		}
 		
-		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId]
+		// handle the view unpublished tasks checkbox
+		def viewUnpublished = false;
+		if (params.viewUnpublished?.equals("true")) {
+			def hasPerm = RolePermissions.hasPermission("PublishTasks")
+			if (hasPerm) {
+				viewUnpublished = true;
+			} else {
+				def loginUser = securityService.getUserLogin()
+				log.warn "User ${loginUser} illegally attempted to access unpublished tasks on the task graph"
+			}
+		}
+		
+		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId, viewUnpublished:viewUnpublished]
 	}
 	
 	/**

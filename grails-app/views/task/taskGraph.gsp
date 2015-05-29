@@ -72,6 +72,12 @@
 				B2.Pause(0);
 			}
 			
+			// set the view unpublished checkbox to be checked if the parameter was passed as true
+			$('#viewUnpublishedId').attr('checked', ${viewUnpublished});
+			$('#viewUnpublishedId').on('change', function () {
+				generateGraph($('#moveEventId').val());
+			});
+			
 			generateGraph($('#moveEventId').val());
 			
 			$(window).resize(function () {
@@ -173,6 +179,7 @@
 					}
 				});
 			
+			
 			addBindings();
 			performSearch();
 			$('#exitNeighborhoodId').removeAttr('disabled');
@@ -206,7 +213,7 @@
 			background.call(zoom);
 
 			background.on("dblclick.zoom", null);
-
+			
 			function zooming () {
 				graph.attr('transform', 'translate(' + d3.event.translate + ') scale(' + d3.event.scale + ')');
 			}
@@ -233,6 +240,10 @@
 			var params = {'id':neighborhoodTaskId};
 			if (event != 0)
 				params = {'moveEventId':event, 'id':neighborhoodTaskId};
+			
+			// if the view unpublished checkbox exists, add this value to the parameters for the ajax calls
+			if ($('#viewUnpublishedId').size() > 0)
+				params.viewUnpublished = $('#viewUnpublishedId').is(':checked');
 			
 			// show the loading spinner
 			$('#spinnerId').css('display', 'block');
@@ -349,6 +360,10 @@
 				&nbsp; 
 				<input type="submit" name="Submit Button" id="SubmitButtonId" value="Highlight" />
 			</form>
+			<tds:hasPermission permission="PublishTasks">
+				&nbsp;<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" ${ (viewUnpublished=='1' ? 'checked="checked"':'') } />
+				View Unpublished
+			</tds:hasPermission>
 			<span style="float:right; margin-right:30px;">
 				<input type="button" value="Refresh" onclick="pageRefresh()" style="cursor: pointer;">&nbsp;
 				<select id="selectTimedBarId"

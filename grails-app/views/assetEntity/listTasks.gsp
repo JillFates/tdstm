@@ -117,12 +117,20 @@
 		
 		$.jgrid.formatter.integer.thousandsSeparator='';
 		
-		function checkSelectedEvent(event) {
-			 var moveEvent = $("#moveEventId").val()
-			 if(moveEvent == '0'){
-			 	alert("Please select an event first.")
-			 	event.preventDefault()
-			 }
+		function checkSelectedEvent (event) {
+			var moveEvent = $("#moveEventId").val();
+			if (moveEvent == '0') {
+				alert("Please select an event first.");
+				event.preventDefault();
+			}
+			if ($('#viewUnpublishedCB').size() > 0) {
+				var href = $('#viewtaskgraph_button_graph').attr('href');
+				if (href.indexOf('&viewUnpublished=') != -1) {
+					href = href.replace(/\&viewUnpublished\=[a-z]*/, '');
+					$('#viewtaskgraph_button_graph').attr('href', href);
+				}
+				$('#viewtaskgraph_button_graph').attr('href', href + '&viewUnpublished=' + $('#viewUnpublishedCB').is(':checked'));
+			}
 		};
 
 		function myCustomFormatter (cellVal,options,rowObject) {
