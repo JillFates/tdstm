@@ -2,12 +2,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
-        <title>RoleType List</title>
+        <title>Team (RoleType) List</title>
     </head>
     <body>
        
         <div class="body">
-            <h1>RoleType List</h1>
+            <h1>Team (RoleType) List</h1>
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
             </g:if>
