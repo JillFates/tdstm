@@ -53,9 +53,11 @@ ng-change="getAssetsList()">
 		</form>
 		<tds:hasPermission permission='CommentCrudView'>
 			<div class="buttons">
-<span class="button">
-				<input class="save" type="button" id="saveAndViewBId" value="Save" ng-click="saveComment(true)" ng-disabled="form.$invalid" />
-</span>
+				<span class="button">
+					<input class="save" type="button" id="saveAndViewBId" value="Save" ng-click="saveComment(true)" ng-disabled="form.$invalid" />
+				</span>
+				<span class="button"><input type="button" class="cancel" value="Cancel" ng-click="close()"/>
+				</span>
 			</div>
 		</tds:hasPermission>
 	</div>
