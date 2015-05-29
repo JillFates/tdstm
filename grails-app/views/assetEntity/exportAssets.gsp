@@ -65,7 +65,7 @@
 				</tr>
 
 				<tr>
-					<td valign="top" class="name">Select on or more bundle(s):</td>
+					<td valign="top" class="name">Select one or more bundle(s):</td>
 					<td valign="top" class="value">
 						<select id="bundleId" name="bundle" multiple="multiple">
 							<option value="" selected="selected">All</option>
