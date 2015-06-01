@@ -4183,6 +4183,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def loc 			// used for racks
 		def msg
 		
+		
 		// Get all the assets 			
 		def assetsForAction = findAllAssetsWithFilter(contextObj, taskSpec, groups, exceptions)
 
@@ -4205,6 +4206,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			case Application:
 				moveEvent = contextObj.moveBundle?.moveEvent
 				break
+				
 			default:
 				// log error for unhandled case with the context.class
 				msg = "createAssetActionTasks: called with unsupported context type ${contextObj.getClass().name} - $contextObj"
@@ -4322,7 +4324,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 					taskBatch: settings.taskBatch,
 					isPublished: settings.publishTasks,
-					sendNotification: taskSpec.sendNotification,
+					sendNotification: taskSpec.sendNotification ?: 0,
 					project: moveEvent.project, 
 					moveEvent: moveEvent, 
 					commentType: AssetCommentType.TASK,
@@ -4432,6 +4434,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 				taskBatch: settings.taskBatch,
 				isPublished: settings.publishTasks,
+				sendNotification: taskSpec.sendNotification ?: 0,
 				comment: title,
 				project: moveEvent.project, 
 				moveEvent: moveEvent, 
