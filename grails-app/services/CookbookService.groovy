@@ -1043,6 +1043,11 @@ class CookbookService {
 					validateSetOn(spec, v, i, errorList, label)
 				}
 				
+				if(n == "sendNotification" && type == "task" && (v != 1 && v!=0)){
+					errorList << [ error: 1, reason: 'Invalid Syntax',
+						detail: "$label in element $i must be either 0 or 1" ]
+				}
+				
 
 				if( n=="category" && ! (v in AssetCommentCategory.getList())){
 					errorList << [ error: 1, reason: 'Invalid Category',
