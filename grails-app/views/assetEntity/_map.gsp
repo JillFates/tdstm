@@ -22,7 +22,7 @@
 		</tr>
 		<tr>
 			<td style="padding: 0px;text-align: center;" title="Performs a min cut to split one or more applications off from the main group">
-				<input type="button" value="Min Cut" class="pointer" onclick="cutAndRemove()">
+				<input type="button" id="minCutButtonId" value="Min Cut" class="pointer" onclick="cutAndRemove()">
 			</td>
 			<td colspan="2" style="padding: 0px;text-align: center;" title="Undoes any previous cuts">
 				<input type="button" value="Undo Cuts" class="pointer" onclick="undoCuts()">

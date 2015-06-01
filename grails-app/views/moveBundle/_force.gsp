@@ -102,6 +102,9 @@ var widthCurrent;
 var heightCurrent;
 var nameList = getExpanededLabels();
 
+var progressBarCancelDisplayed = false;
+var cancelCut = false;
+
 			
 // Build the layout model
 function buildMap (charge, linkSize, friction, theta, width, height) {
@@ -657,6 +660,9 @@ function cutAndRemove () {
 	var linkList = [];
 	var appCount = 0;
 	var callCount = 0;
+	$('#minCutButtonId').attr('disabled', 'disable');
+	stopMap();
+	var progressBar = displayProgressBar();
 	
 	// find a neighborhood of nodes to use with a breadth first search
 	while (appCount < 2 && callCount < 1000) {
@@ -696,89 +702,116 @@ function cutAndRemove () {
 		return;
 	}
 	
-	// find the best cut
+	
 	var edges = [];
 	var bestDifference = 9999;
-	var intervals = Math.ceil(maxCutAttempts / 10);
-	for (var i = 0; i < maxCutAttempts; ++i) {
-		if (i % intervals == 0)
-			console.log(i + '/' + maxCutAttempts + ' cuts checked...');
-		var newEdges = getMinCut(nodeList, linkList);
-		if (newEdges.size() > 0) {
-			var parentSize = newEdges[0].parent.captured.size();
-			var childSize = newEdges[0].child.captured.size();
-			var difference = Math.abs(childSize - parentSize);
-			
-			if (difference < bestDifference && newEdges.size() <= maxEdgeCount) {
-				edges = newEdges;
-				bestDifference = difference;
-				newEdges[0].parent.capturedFinal = newEdges[0].parent.captured;
-				newEdges[0].child.capturedFinal = newEdges[0].child.captured;
+	var intervals = Math.ceil(maxCutAttempts / 100);
+	findBestCut(0);
+	
+	// called iteratively using setTimeout to prevent locking up the thread with long executions
+	function findBestCut (i) {
+		
+		// check if the job should be canceled
+		if (cancelCut) {
+			cancelCut = false;
+			removeProgressBar();
+			$('#minCutButtonId').removeAttr('disabled');
+			return;
+		}
+		
+		// update the progress bar
+		if (i % intervals == 0) {
+			setProgress(Math.round(100 * i / maxCutAttempts));
+		}
+		
+		// find the best cut
+		if (i < maxCutAttempts) {
+			var newEdges = getMinCut(nodeList, linkList);
+			if (newEdges.size() > 0) {
+				var parentSize = newEdges[0].parent.captured.size();
+				var childSize = newEdges[0].child.captured.size();
+				var difference = Math.abs(childSize - parentSize);
+				
+				if (difference < bestDifference && newEdges.size() <= maxEdgeCount) {
+					edges = newEdges;
+					bestDifference = difference;
+					newEdges[0].parent.capturedFinal = newEdges[0].parent.captured;
+					newEdges[0].child.capturedFinal = newEdges[0].child.captured;
+				}
 			}
+			setTimeout(function () {findBestCut(i+1)}, 0);
+		} else {
+			executeCut();
 		}
 	}
 	
-	// if we found a good set of edges, execute the cut
-	if (edges.size() > 0) {
-		
-		// another node group will be added, so this counter must be incremented
-		++groupCount;
-		
-		// reset any nodes that were cut previously
-		$(nodes).each(function (i, n) {
-			n.cut = 0;
-		});
-		
-		// find which nodes were cut and put them in a new group
-		$(edges[0].parent.capturedFinal).each(function (i, c) {
-			if (edges[0].child.capturedFinal.indexOf(c) == -1) {
-				c.cut = 2;
-				c.group = groupCount;
+	// executed by the last iteration of findBestCut
+	function executeCut () {
+		// if we found a good set of edges, execute the cut
+		if (edges.size() > 0) {
+			
+			// another node group will be added, so this counter must be incremented
+			++groupCount;
+			
+			// reset any nodes that were cut previously
+			$(nodes).each(function (i, n) {
+				n.cut = 0;
+			});
+			
+			// find which nodes were cut and put them in a new group
+			$(edges[0].parent.capturedFinal).each(function (i, c) {
+				if (edges[0].child.capturedFinal.indexOf(c) == -1) {
+					c.cut = 2;
+					c.group = groupCount;
+				}
+			});
+			edges[0].parent.cut = 2;
+			edges[0].parent.group = groupCount;
+			
+			// set which links were be cut
+			$(edges).each(function (i, e) {
+				links[e.id].cut = 1;
+			});
+			
+			// set cut to 0 for any links that won't be cut
+			for (var i = 0; i < links.size(); ++i) {
+				if (links[i].cut != 1)
+					links[i].cut = 0;
 			}
-		});
-		edges[0].parent.cut = 2;
-		edges[0].parent.group = groupCount;
-		
-		// set which links were be cut
-		$(edges).each(function (i, e) {
-			links[e.id].cut = 1;
-		});
-		
-		// set cut to 0 for any links that won't be cut
-		for (var i = 0; i < links.size(); ++i) {
-			if (links[i].cut != 1)
-				links[i].cut = 0;
-		}
-		
-		// remove the cut links from the graph
-		for (var i = 0; i < links.size(); ++i) {
-			for (var j = 0; j < links.size(); ++j) {
-				if (links[j].cut == 1) {
-					links[j].source.dependsOn.splice(links[j].source.dependsOn.indexOf(j), 1);
-					links[j].target.supports.splice(links[j].target.supports.indexOf(j), 1);
-					links[j].cut = 2;
-					cutLinks.push(links[j]);
-					links.splice(j, 1);
-					
-					for (var k = j; k < links.size(); ++k) {
-						links[k].id = k;
-						links[k].source.dependsOn[links[k].source.dependsOn.indexOf(k+1)] = k;
-						links[k].target.supports[links[k].target.supports.indexOf(k+1)] = k;
+			
+			// remove the cut links from the graph
+			for (var i = 0; i < links.size(); ++i) {
+				for (var j = 0; j < links.size(); ++j) {
+					if (links[j].cut == 1) {
+						links[j].source.dependsOn.splice(links[j].source.dependsOn.indexOf(j), 1);
+						links[j].target.supports.splice(links[j].target.supports.indexOf(j), 1);
+						links[j].cut = 2;
+						cutLinks.push(links[j]);
+						links.splice(j, 1);
+						
+						for (var k = j; k < links.size(); ++k) {
+							links[k].id = k;
+							links[k].source.dependsOn[links[k].source.dependsOn.indexOf(k+1)] = k;
+							links[k].target.supports[links[k].target.supports.indexOf(k+1)] = k;
+						}
+						
+						j = links.size();
 					}
-					
-					j = links.size();
 				}
 			}
+			
+			// update the graph for the modified link list
+			force.links(links)
+				.gravity(0.05)
+				.alpha(0.1);
+		
+		// no cuts could be found for the constraints, so update the user
+		} else {
+			alert('No dependency cuts could be found');
 		}
 		
-		// update the graph for the modified link list
-		force.links(links)
-			.gravity(0.05)
-			.alpha(0.1);
-	
-	// no cuts could be found for the constraints, so update the user
-	} else {
-		alert('No dependency cuts could be found');
+		$('#minCutButtonId').removeAttr('disabled');
+		removeProgressBar();
 	}
 }
 
@@ -808,5 +841,45 @@ function resetMap () {
 	getList('graph', selectedBundle);
 }
 
+// initializes the progress bar for min cuts
+function displayProgressBar () {
+	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "<h1>Calculating Group Cut Suggestion</h1>");
+	progressBarCancelDisplayed = false;
+	
+	return progressBar;
+}
+
+// sets the value of the progress bar to n %
+function setProgress (n) {
+	
+	/* the cancel button sometimes takes a few iterations before being accessable in the DOM,
+	so check it each time until it can be made visible */
+	if (!progressBarCancelDisplayed) {
+		var cancel = $('#progressCancel');
+		if (cancel.size() > 0) {
+			progressBarCancelDisplayed = true;
+			cancel.css('display', '');
+			cancel.on('click', function () {
+				cancelCut = true;
+			});
+			var status = $('#progressStatus');
+			status.html('');
+		}
+	}
+	
+	// update properties of the progress bar to reflect the new values
+	$('#globalProgressBar').css('display', 'block');
+	var bar = $('#innerGlobalProgressBar');
+	bar.css('transition-duration', '0.00s');
+	bar.show();
+	bar.attr('aria-valuenow', n);
+	bar.css('width', n + '%');
+	bar.html(n + '%');
+}
+
+// removes the progress bar from the DOM
+function removeProgressBar () {
+	$('#globalProgressBar').remove();
+}
 </script>
 </div>
