@@ -10,12 +10,14 @@
 				<th>Finish</th>
 				<th>Staff</th>
 				<th>Events</th>
-				<th>Servers</th>
+				<th>Devices</th>
 				<th>Applications</th>
 				<th>Databases</th>
 				<th>Storage</th>
 				<th nowrap>Total Assets Count</th>
 				<th>Project Description</th>
+				<th>Servers Total</th>
+				<th>Servers Active</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -39,6 +41,8 @@
 					<td>${project.filesCount?:''}</td>
 					<td>${project.totalAssetCount?:''}</td>
 					<td>${project.description?:''}</td>
+					<td>${project.totalServCount?:''}</td>
+					<td>${project.activeServCount?:''}</td>
 				</tr>
 			</g:each>
 		</tbody>

@@ -340,6 +340,8 @@ class ProjectService {
 					COUNT(IF(ae.asset_type = "${AssetType.FILES}",1,NULL)) AS filesCount, 
 					COUNT(IF(ae.asset_type = "${AssetType.DATABASE}",1,NULL)) AS dbCount, 
 					COUNT(IF(ae.asset_type = "${AssetType.APPLICATION}",1,NULL)) AS appCount,
+					COUNT(IF(ae.asset_type = "${AssetType.SERVER}",1,NULL)) AS totalServCount,
+					COUNT(IF(ae.asset_type = "${AssetType.SERVER}" and mb.use_for_planning ,1,NULL)) AS activeServCount,
 					COUNT(*) AS totalAssetCount,
 					DATE(p.start_date) AS startDate,
 					DATE(p.completion_date) AS completionDate,
