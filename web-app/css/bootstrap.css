@@ -209,7 +209,7 @@ textarea {
   vertical-align: top;
 }
 
-table {
+div.main_bottom table {
   border-collapse: collapse;
   border-spacing: 0;
 }
