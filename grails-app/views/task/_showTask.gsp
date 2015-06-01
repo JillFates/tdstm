@@ -25,7 +25,7 @@
                             ng-checked="ac.hardAssigned == 1" ng-disabled="true" ng-model="ac.hardAssigned" />&nbsp;&nbsp;
                             <label for="hardAssignedShow" >Fixed Assignment</label>&nbsp;&nbsp;
 							<input type="checkbox" id="sendNotificationShow" name="sendNotificationShow" value="0"
-                            ng-checked="ac.sendNotification == 1" ng-disabled="true" ng-model="ac.sendNotification" />&nbsp;&nbsp;
+                            ng-checked="ac.sendNotification == 'true'" ng-disabled="true" ng-model="ac.sendNotification" />&nbsp;&nbsp;
                             <label for="sendNotificationShow" >Send Notifications</label>&nbsp;&nbsp;
                         </td>
                     </tr>
