@@ -20,6 +20,7 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.math.NumberUtils
 
 class ProjectController {
@@ -114,12 +115,11 @@ class ProjectController {
 			}
 			session.setAttribute("setImage",imageId) 
 			def projectLogoForProject = ProjectLogo.findByProject(currProjectInstance)
-			def projectPartner = projectService.getProjectPartner( currProjectInstance )
-			def projectManager = projectService.getProjectManagerByProject(currProjectInstance.id)
-			def moveManager = projectService.getMoveManagerByProject(currProjectInstance.id)
+			def projectPartners = partyRelationshipService.getProjectPartners( currProjectInstance )
+			def projectManagers = projectService.getProjectManagersByProject(currProjectInstance.id)
 
-			return [ projectInstance : currProjectInstance, projectPartner:projectPartner, 
-					 projectManager:projectManager, moveManager:moveManager, 
+			return [ projectInstance : currProjectInstance, projectPartners:projectPartners, 
+					 projectManagers:projectManagers,
 					 projectLogoForProject:projectLogoForProject ]
 		}
 	}
@@ -151,9 +151,8 @@ class ProjectController {
 		if (projectInstance) {
 			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
 			moveBundles = MoveBundle.findAllByProject(projectInstance)
-			return [ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
-				 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
-				 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners,
+			return [ projectInstance : projectInstance, projectPartners: projectDetails.projectPartners, projectManagers: projectDetails.projectManagers, 
+				 companyPartners: projectDetails.companyPartners,
 				 projectLogoForProject: projectDetails.projectLogoForProject, workflowCodes: projectDetails.workflowCodes, moveBundles:moveBundles ]
 		}				 
 	}
@@ -191,17 +190,15 @@ class ProjectController {
 					if(params.projectPartner == ""){
 						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 						flash.message = " Please select Associated Partner to upload Image. "
-						render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
-													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
-													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+						render( view:'edit', model:[ projectInstance : projectInstance, projectPartners: projectDetails.projectPartners, projectManagers: projectDetails.projectManagers, 
+													 companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
 													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 						return;
 					} else if (! okcontents.contains(file.getContentType())) {
 						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 						flash.message = "Image must be one of: ${okcontents}"
-						render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
-													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
-													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+						render( view:'edit', model:[ projectInstance : projectInstance, projectPartners: projectDetails.projectPartners, projectManagers: projectDetails.projectManagers, 
+													 companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
 													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 						return;
 					}
@@ -216,20 +213,12 @@ class ProjectController {
 				
 				image = ProjectLogo.fromUpload(file)		   
 				image.project = projectInstance
-				def party
-				def partnerImage = params.projectPartner
-				if ( partnerImage != null && partnerImage != "" ) {
-					party = Party.findById(partnerImage)
-				}
-				image.party = party
-				
 				def imageSize = image.getSize()
 				if( imageSize > 50000 ) {
 					def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 					flash.message = " Image size is too large. Please select proper Image"
-					render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
-													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
-													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+					render( view:'edit', model:[ projectInstance : projectInstance, projectPartners: projectDetails.projectPartners, projectManagers: projectDetails.projectManagers, 
+													 companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
 													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 					return;
 				}
@@ -239,9 +228,8 @@ class ProjectController {
 					if(!image.save()){
 						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 						flash.message = " Image Upload Error."
-						render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
-													 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
-													 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+						render( view:'edit', model:[ projectInstance : projectInstance, projectPartners: projectDetails.projectPartners, projectManagers: projectDetails.projectManagers, 
+													 companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
 													 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params] )
 						return;
 					}
@@ -252,108 +240,22 @@ class ProjectController {
 					image.delete(flush:true)
 				}
 			}
-		
 			
 			if( !projectInstance.hasErrors() && projectInstance.save() ) {
 				
-				def partnerId = params.projectPartner
-				def projectManagerId = params.projectManager
-				def moveManagerId = params.moveManager
-				//def projectRoleType = RoleType.findById( "PROJECT" ) 
-				//def projectStaffRelationshipType = PartyRelationshipType.findById( "PROJ_STAFF" )
+				def partnersIds
 				
 				//-------------------------------
 				// Statements to re-insert Partner
 				//-------------------------------
-				
-				def updateProjectPartnerRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_PARTNER", projectInstance?.id, "PROJECT", partnerId, "PARTNER" )
-				/*
-				if ( partnerId != "" && partnerId != null ){
-					def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $partnerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-					def partnerParty = Party.findById( partnerId )
-					def partnerRelationshipType = PartyRelationshipType.findById( "PROJ_PARTNER" )
-					def partnerRoleType = RoleType.findById( "PARTNER" )
-					// condition to check whether partner has changed or not
-					if ( projectPartner == null ) {
-						def otherPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-						if ( otherPartner != null && otherPartner != "" ) {
-							//	Delete existing partner and reinsert new partner For Project, if partner changed
-							otherPartner.delete()
-							def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
-						} else {
-							// Create Partner if there is no partner for this project
-							def projectPartnerRel = new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
-						}
-					}
+				if (params.projectPartners instanceof String) {
+					partnersIds = [params.projectPartners]
 				} else {
-					//	if user select a blank then remove Partner
-					def otherPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ")
-					if ( otherPartner != null && otherPartner != "" ) {
-						otherPartner.delete()
-					}
+					partnersIds = params.projectPartners
 				}
-				*/
-				//---------------------------------------
-				// Statements to re-insert ProjectManager
-				//---------------------------------------
-				
-				def updateProjectManagerRel = partyRelationshipService.updatePartyRelationshipPartyIdTo( "PROJ_STAFF", projectInstance?.id, "PROJECT", projectManagerId, "PROJ_MGR" )
-				/*
-				if ( projectManagerId != "" && projectManagerId != null ) {
-					def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $projectManagerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-					def projectManagerParty = Party.findById( projectManagerId )
-					def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
-					//	condition to check whether Project Manager has changed or not
-					if ( projectManager == null ) {
-						def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-						if ( otherprojectManager != null && otherprojectManager != "" ) {
-							//	Delete existing partner and reinsert new partner For Project, if partner changed
-							otherprojectManager.delete()
-							def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-						} else {
-							//	Create Project Manager if there is no Project Managet for this project
-							def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-						}
-					}
-				} else {
-					//	if user select a blank then remove Project Manager
-					def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-					if ( otherprojectManager != null && otherprojectManager != "" ) {
-						otherprojectManager.delete()
-					}
-				}
-				*/
-				//---------------------------------------
-				// Statements to re-insert MoveManager
-				//---------------------------------------
-				
-				def updateMoveManagerRel = partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_STAFF", projectInstance?.id, "PROJECT", moveManagerId, "MOVE_MGR" )
-				/*
-				if ( moveManagerId != "" && moveManagerId != null ) {
-					def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $moveManagerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-					def moveManagerParty = Party.findById( moveManagerId )
-					def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
-					//	condition to check whether Move Manager has changed or not
-					
-					if ( moveManager == null ) {
-						def othermoveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-						if ( othermoveManager != null && othermoveManager != "" ) {
-							//	Delete existing partner and reinsert new partner For Move, if partner changed
-							othermoveManager.delete()
-							def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-						} else {
-							//	Create Move Manager if there is no Move Managet for this project
-							def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-						}
-					}
-				} else {
-					// if user select a blank then remove Move Manager 
-					def othermoveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-					if ( othermoveManager != null && othermoveManager != "" ) {
-						othermoveManager.delete()
-					}
-				}
-				*/
+
+				projectService.updateProjectPartners(projectInstance, partnersIds)
+
 				flash.message = "Project ${projectInstance} updated"
 				redirect(action:"show")
 				
@@ -363,9 +265,8 @@ class ProjectController {
 				def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
 				def moveBundles = MoveBundle.findAllByProject(projectInstance)
 				projectInstance.discard()
-				render( view:'edit', model:[ projectInstance : projectInstance, projectPartner: projectDetails.projectPartner, projectManager: projectDetails.projectManager, 
-											 moveManager: projectDetails.moveManager, companyStaff: projectDetails.companyStaff, clientStaff: projectDetails.clientStaff, 
-											 partnerStaff: projectDetails.partnerStaff, companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
+				render( view:'edit', model:[ projectInstance : projectInstance, projectPartners: projectDetails.projectPartners, projectManagers: projectDetails.projectManagers, 
+											 companyPartners: projectDetails.companyPartners, workflowCodes: projectDetails.workflowCodes,
 											 projectLogoForProject: projectDetails.projectLogoForProject, prevParam:params, moveBundles:moveBundles] )
 			}
 		}
@@ -383,7 +284,7 @@ class ProjectController {
 		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
 
 		return [ projectInstance:projectInstance, clients:projectDetails.clients , partners:projectDetails.partners , 
-					managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ]
+					workflowCodes: projectDetails.workflowCodes ]
 	}
 
 	/*
@@ -409,7 +310,7 @@ class ProjectController {
 
 		def file = request.getFile('partnerImage')
 
-		def result = projectService.saveProject(projectInstance, file, params.projectPartner, params.projectManager, params.moveManager)
+		def result = projectService.saveProject(projectInstance, file, params.projectPartners, params.projectManagerId)
 		
 		flash.message = result.message
 		if (result.success) {
@@ -417,7 +318,7 @@ class ProjectController {
 		} else {
 			def projectDetails = projectService.getProjectPatnerAndManagerDetails()
 			render( view:'create', model:[ projectInstance:projectInstance, clients:projectDetails.clients, partners:projectDetails.partners,
-						 managers:projectDetails.managers, workflowCodes: projectDetails.workflowCodes ,prevParam:params] )
+						 workflowCodes: projectDetails.workflowCodes ,prevParam:params] )
 		}
 	}
 
@@ -425,49 +326,86 @@ class ProjectController {
 	 *  Action to render partner staff as JSON  
 	 */
 	def retrievePartnerStaffList() {
-			
+
+		def q = params.q
+		def partners = params["partners[]"]
+		def filterByName = (q && (q != ""))
 		def client = params.client
 		def partner = params.partner
+		def role = params.role
 		def json = []
 		def pStaff = []
 		def cStaff = []
 		def compStaff = []
 		def tdsParty = PartyGroup.findByName( "TDS" ).id
+
+		if (filterByName) {
+			q = q.toUpperCase()
+		}
+
+		if (StringUtil.isBlank(role)) {
+			role = "STAFF"
+		}
+
 		// get list of all STAFF relationship to Client
-		def tdsStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+		def tdsStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = '$role' " )
 		tdsStaff.sort{it.partyIdTo.lastName}
 		tdsStaff.each{partyRelationship ->
-		def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
+			def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
 			def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
-			compStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
+			if (filterByName) {
+				if (fullName.toUpperCase().indexOf(q) != -1) {
+					compStaff <<[id:partyRelationship.partyIdTo.id, text:fullName+title]	
+				}
+			} else {
+				compStaff <<[id:partyRelationship.partyIdTo.id, text:fullName+title]
+			}
 		}
-		if ( client != "" && client != null ) {
-			def clientParty = PartyGroup.findById( client ).id
+		json << [text: "TDS", children: compStaff]
+
+		if ( client && client != "") {
+			def clientParty = PartyGroup.findById( client )
 			// get list of all STAFF relationship to Client
-			def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $clientParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+			def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $clientParty.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = '$role' " )
 			clientStaff.sort{it.partyIdTo.lastName}
 			clientStaff.each{partyRelationship ->
-			def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
+				def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
 				def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : "" 
-				cStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
-				 
+				if (filterByName) {
+					if (fullName.toUpperCase().indexOf(q) != -1) {
+						cStaff <<[id:partyRelationship.partyIdTo.id, text:fullName+title]
+					}
+				} else {
+					cStaff <<[id:partyRelationship.partyIdTo.id, text:fullName+title]
+				}
 			}
+			json << [text: clientParty.name, children: cStaff]
 		}
-		if ( partner != "" && partner != null ) {
-			def partnerParty = PartyGroup.findById( partner ).id
+		if ( partners && partners.size() > 0 ) {
+			def partnersIds
+			if (partners instanceof String) {
+				partnersIds = partners
+			} else {
+				partnersIds = partners.join(",")
+			}
 			// get list of all STAFF relationship to Client
-			def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $partnerParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+			def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom in ($partnersIds) and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = '$role' " )
 			partnerStaff.sort{it.partyIdTo.lastName}
 			partnerStaff.each{partyRelationship ->
-			def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
+				def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
 				def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
-				pStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
-				 
+				if (filterByName) {
+					if (fullName.toUpperCase().indexOf(q) != -1) {
+						pStaff <<[id:partyRelationship.partyIdTo.id, text:fullName+title]
+					}
+				} else {
+					pStaff <<[id:partyRelationship.partyIdTo.id, text:fullName+title]
+				}
 			}
+			json << [text: "Partners Staff", children: pStaff]
 		}
-		
-		json = [ identifier:"id", compStaff:compStaff, clientStaff:cStaff, partnerStaff:pStaff ]
-		render json as JSON
+
+		render ([results: json] as JSON)
 	}
 	
 	def cancel() {

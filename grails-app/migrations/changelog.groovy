@@ -84,4 +84,5 @@ databaseChangeLog = {
 	include file: '20150526-assettype-defaulted-to-server-null-values.groovy'
 	include file: '20150526-delete-orphaned-dependency-bundles.groovy'	
 	include file: '20150520-create-column-send-notification-in-asset-comment.groovy'
+	include file: '20150529-drop-party-column-from-project-logo.groovy'
 }

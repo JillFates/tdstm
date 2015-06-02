@@ -771,8 +771,7 @@ class MoveEventController {
 			              			]
 			
 			
-			def projManager = projectService.getProjectManagerByProject(project.id)?.partyIdTo
-			def moveManager = projectService.getMoveManagerByProject(project.id)?.partyIdTo
+			def projManagers = projectService.getProjectManagersByProject(project.id)?.partyIdTo
 
 			def projectNameFont = book.createFont()
 			projectNameFont.setFontHeightInPoints((short)14)
@@ -788,8 +787,8 @@ class MoveEventController {
 			WorkbookUtil.addCell(summarySheet, 1, 1, String.valueOf(project.name ))
 			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)
 			WorkbookUtil.addCell(summarySheet, 2, 3, String.valueOf(project.name ))
-			WorkbookUtil.addCell(summarySheet, 2, 6, String.valueOf(projManager?.toString() ))
-			WorkbookUtil.addCell(summarySheet, 4, 6, String.valueOf(moveManager?.toString() ))
+			WorkbookUtil.addCell(summarySheet, 2, 6, String.valueOf(projManagers.join(",")))
+			WorkbookUtil.addCell(summarySheet, 4, 6, String.valueOf(""))
 			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEventInstance.name ))
 			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEventInstance.name ))
 			

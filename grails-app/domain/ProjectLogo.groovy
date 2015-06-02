@@ -5,13 +5,11 @@ class ProjectLogo {
     String name
     Blob partnerImage    
     Project project
-    PartyGroup party
     
 	static constraints = {
         name()
         partnerImage(nullable: true)       
         project( nullable:false)
-        party( nullable:true)
     }
 
    

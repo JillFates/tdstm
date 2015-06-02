@@ -6,21 +6,22 @@
 		href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<title>Edit Project</title>
 	<% def currProj = session.getAttribute("CURR_PROJ");
-			    def projectId = currProj.CURR_PROJ ;
-			    def currProjObj;
+				def projectId = currProj.CURR_PROJ ;
+				def currProjObj;
 				if( projectId != null) {
 				currProjObj = Project.findById(projectId);
-			    }
+				}
 		%>
+	<script src="${resource(dir:'js',file:'project.js')}"></script>
 </head>
 <body>
 	<div class="body">
 		<h1>Edit Project</h1>
 		<br/>
-            <g:if test="${flash.message}">
+			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
-            </g:if>
-            <g:form action="update" method="post" name="editProjectForm" enctype="multipart/form-data">
+			</g:if>
+			<g:form action="update" method="post" name="editProjectForm" enctype="multipart/form-data">
 			<div class="dialog">
 				<table>
 					<tbody>
@@ -130,17 +131,11 @@
 		
 						<tr class="prop">
 							<td class="name">
-								<label for="projectPartner">Partner:</label>
+								<label for="projectPartners">Partners:</label>
 							</td>
 							<td class="valueNW">
-								<select id="projectPartnerId" 
-								name="projectPartner" 
-								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'partner=\' + this.value', onComplete:'appendPartnerStaff(XMLHttpRequest)' )}">
-									<option value="" selected="selected">None</option>
-									<g:each status="i" in="${companyPartners}" var="partner">
-										<option value="${partner?.partyIdTo.id}">${partner?.partyIdTo}</option>
-									</g:each>
-								</select>
+								<input type="button" value="Add Partner" onclick="Project.addPartnerSelect('#partnersContainer');">
+								<div id="partnersContainer"></div>
 							</td>
 							<td class="name">
 								<label for="client">Partner Image:</label>
@@ -158,63 +153,36 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="projectManager">Project Manager:</label>
+								<label for="projectManager">Project Managers:</label>
 							</td>
 							<td class="valueNW">
-								<select id="projectManagerId" name="projectManager">
-									<option value="" selected="selected">Please Select </option>
-									<optgroup label="TDS" >
-										<g:each status="i" in="${companyStaff}" var="companyStaff">
-											<option value="${companyStaff.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectInstance?.client}">
-										<g:each status="i" in="${clientStaff}" var="clientStaff">
-											<option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
-										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
-											<option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-								</select>
+								<ul>
+									<g:each status="i" in="${projectManagers}" var="manager">
+									<li>${manager?.partyIdTo?.lastNameFirstAndTitle}</li>
+									</g:each>
+								</ul>
+								<br>
+								<tds:hasPermission permission='EditProjectStaff'>
+								<g:link class="mmlink" controller="person" action="manageProjectStaff">Manage</g:link>
+								</tds:hasPermission>
 							</td>
-							<td class="name">
-								<label for="moveManager">Event Manager:</label>
-							</td>
-							<td class="valueNW">
-								<select id="moveManagerId" name="moveManager">
-									<option value="" selected="selected">Please Select</option>
-									<optgroup label="TDS">
-										<g:each status="i" in="${companyStaff}" var="companyStaff">
-											<option value="${companyStaff?.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectInstance?.client}">
-										<g:each status="i" in="${clientStaff}" var="clientStaff">
-											<option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
-										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
-											<option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-								</select>
-								<input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
+							<td class="name">Default Bundle:</td>
+							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
+								<g:select id="defaultBundle" name="defaultBundle.id"
+									from="${moveBundles}" optionKey="id" optionValue="name"
+									value="${projectInstance?.defaultBundle.id}"></g:select>
 							</td>
 						</tr>
 						<tr class="prop">
 							<td class="name">
-								<label for="workflowCode">Workflow:</label>
+								<label for="workflowCode"><b>Workflow:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
 									noSelection="['':'Please Select']" onChange="warnForWorkflow()">
-								</g:select> &nbsp;&nbsp;
+								</g:select><br><br>
 								<span class="name">
 									<label for="runbookOn">Runbook Driven:&nbsp;</label>
 								</span>
@@ -227,12 +195,8 @@
 									</div>
 								</g:hasErrors>
 							</td>
-							<td class="name">Default Bundle:</td>
-							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
-								<g:select id="defaultBundle" name="defaultBundle.id"
-									from="${moveBundles}" optionKey="id" optionValue="name"
-									value="${projectInstance?.defaultBundle.id}"></g:select>
-							</td>
+							<td><br></td>
+							<td><br></td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
@@ -254,7 +218,7 @@
 			</div>
 			<div class="buttons">
 				<span class="button">
-					<g:actionSubmit class="save" value="Update" onclick="return validateDates();" />
+					<g:actionSubmit class="save" value="Update" onclick="return validateForm();" />
 				</span>
 				<span class="button">
 					<input type="button" class="cancel" value="Cancel" id="cancelButtonId" onclick="window.location = contextPath + '/project/show/${projectInstance?.id}'" />
@@ -270,158 +234,84 @@
 		}
 		var customCol = (${prevParam?.customFieldsShown?: projectInstance.customFieldsShown})?(${prevParam?.customFieldsShown?: projectInstance.customFieldsShown}):'0'
 		showCustomFields(customCol, 2);
-		
+
+		$("#workflowCode").select2({
+			placeholder: "Please Select",
+			width: "75%"
+		});
+		$("#projectType").select2({
+			placeholder: "Please Select",
+			width: "75%"
+		});
+		$("#defaultBundle").select2({
+			placeholder: "Please Select",
+			width: "75%"
+		});
+
+		// Initialize company partners
+		var companyPartners = []
+		<g:each status="i" in="${companyPartners}" var="partner">
+		companyPartners.push({"id": ${partner.id}, "text": "${partner.name}" });
+		</g:each>
+
+		Project.loadCompanyPartners(companyPartners);
+
+		editProject();
 	});
-	 function updateManagers(){
-		 if('${prevParam?.projectManager}'){
-				$("#projectManagerId").val('${prevParam?.projectManager}');
-		 }
-		   	
-	  	 if('${prevParam?.moveManager}'){
-			$("#moveManagerId").val('${prevParam?.moveManager}');
-		 }
-	}
+
 	 function showCustomFields(value, columnCount) {
-   	  $(".custom_table").hide();
-   	  if(value=='0'){
-   		  $("#custom_table").hide();
-   	  } else {
-    		 for(i=1;i<=value;){
-   		    $("#custom_table").show();
-   	        $("#custom_count_"+i).show();
-   	        i=i+parseInt(columnCount)
-   		 }
-        }  
-     }
-        
-        function appendPartnerStaff(e) {
-  	      // The response comes back as a bunch-o-JSON
-  	      //alert("make sure that the project isn't saved with a staff member from the previous partner");
-  	      if(confirm(" Partner has been changed, Make sure that do you want to change the staff members ")){
-  	      
-  	      // evaluate JSON
-  	      var rselect = document.getElementById('projectManagerId')
-  	      var mselect = document.getElementById('moveManagerId')
-  	      var projectPartner = document.getElementById('projectPartnerId');
-  	      var projectPartnerVal = projectPartner[document.getElementById('projectPartnerId').selectedIndex].innerHTML;
-  	
-  	      var pmExeOptgroup = document.getElementById('pmGroup')
-  	      var mmExeOptgroup = document.getElementById('mmGroup')
-  	      var pmOptgroup
-  	      var mmOptgroup
-  	
-  	      if(pmExeOptgroup == null){
-  	      pmOptgroup = document.createElement('optgroup');
-  	      }else{
-  	      pmOptgroup = pmExeOptgroup
-  	      }
-  	      if(mmExeOptgroup == null){
-  	      mmOptgroup = document.createElement('optgroup');
-  	      }else{
-  	      mmOptgroup = mmExeOptgroup
-  	      }
-  	
-  	      if(projectPartnerVal != "None" ){
-  	      pmOptgroup.label = projectPartnerVal;
-  	      pmOptgroup.id = "pmGroup";
-  	      mmOptgroup.label = projectPartnerVal;
-  	      mmOptgroup.id = "mmGroup";
-  	      } else {
-  	      pmOptgroup.label = "";
-  	      mmOptgroup.label = "";
-  	      }
-  	      try {
-  	      rselect.appendChild(pmOptgroup, null) // standards compliant; doesn't work in IE
-  	      mselect.appendChild(mmOptgroup, null)
-  	      } catch(ex) {
-  	      rselect.appendChild(pmOptgroup) // IE only
-  	      mselect.appendChild(mmOptgroup)
-  	      }
-  	      // Clear all previous options
-  	      var l = rselect.length
-  	      var compSatff = document.getElementById('companyManagersId').value
-  	      while (l > compSatff) {
-  	      l--
-  	      rselect.remove(l)
-  	      mselect.remove(l)
-  	      }
-  	      
-  	      var managers = eval("(" + e.responseText + ")")
-  	      // Rebuild the select
-  	      if (managers) {
-  	
-  	      var length = managers.partnerStaff.length
-  	      for (var i=0; i < length; i++) {
-  	      var manager = managers.partnerStaff[i]
-  	      var popt = document.createElement('option');
-  	      popt.innerHTML = manager.name
-  	      popt.value = manager.id
-  	      var mopt = document.createElement('option');
-  	      mopt.innerHTML = manager.name
-  	      mopt.value = manager.id
-  	      try {
-  	      pmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
-  	      mmOptgroup.appendChild(mopt, null)
-  	      } catch(ex) {
-  	      pmOptgroup.appendChild(popt) // IE only
-  	      mmOptgroup.appendChild(mopt)
-  	      }
-  	      }
-  	      }
-  	      }else{
-  	      var partnerObj = document.getElementById("projectPartnerId")
-  	      <% if( projectPartner != null){ %>
-  	      partnerObj.value = "${projectPartner?.partyIdTo.id}"
-  	      <%} %>
-  	      }
-        }
-        
-        function editProject(){
-            var pmObj = document.getElementById("projectManagerId")
-            var mmObj = document.getElementById("moveManagerId")
-            var partnerObj = document.getElementById("projectPartnerId")
-            <% if( projectPartner != null){ %>
-            partnerObj.value = "${projectPartner?.partyIdTo.id}"
-            <%}
-            if ( projectManager != null ) {
-              %>
-            pmObj.value = "${projectManager?.partyIdTo.id}"
-            <% }
-              if ( moveManager != null ) { %>
-            mmObj.value = "${moveManager?.partyIdTo.id}"
-            <% } %>
-		updateManagers()
+	  $(".custom_table").hide();
+	  if(value=='0'){
+		  $("#custom_table").hide();
+	  } else {
+			 for(i=1;i<=value;){
+			$("#custom_table").show();
+			$("#custom_count_"+i).show();
+			i=i+parseInt(columnCount)
+		 }
+		}  
+	 }
+		
+		function editProject(){
+			var projectPartners = []
+			<g:each status="i" in="${projectPartners}" var="partner">
+			projectPartners.push("${partner.id}")
+			</g:each>
+			Project.initCompanyPartnersSelects("#partnersContainer", projectPartners);
+			Project.setActiveClientId(${projectInstance?.client.id});
 		}
-        editProject();
-        function setCompletionDate(startDate){
-  	      var completionDateObj = document.editProjectForm.completionDate;
-  	      if(completionDateObj.value == ""){
-  	      completionDateObj.value = startDate;
-  	      }
-        }
-        var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
-        function isValidDate( date ){
-            var returnVal = true;
-          	if( date && !dateRegExp.test(date) ){
-              	alert("Date should be in 'mm/dd/yyyy' format");
-              	returnVal  =  false;
-          	} 
-          	return returnVal;
+		function setCompletionDate(startDate){
+		  var completionDateObj = document.editProjectForm.completionDate;
+		  if(completionDateObj.value == ""){
+		  completionDateObj.value = startDate;
+		  }
 		}
-        function validateDates(){
-        	var returnval = false
-            var startDateId = $("#startDateId").val();
-            var completionDateId = $("#completionDateId").val();
-            if(isValidDate(startDateId) && isValidDate(completionDateId)){
-            	returnval = true;
+		var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
+		function isValidDate( date ){
+			var returnVal = true;
+			if( date && !dateRegExp.test(date) ){
+				alert("Date should be in 'mm/dd/yyyy' format");
+				returnVal  =  false;
 			} 
-            return returnval;
+			return returnVal;
 		}
-        function warnForWorkflow(){
-            alert("Warning: Changing the workflow for a project underway can create problems!")
-         return true
-       }
-       </script>
+		function validateDates(){
+			var returnval = false
+			var startDateId = $("#startDateId").val();
+			var completionDateId = $("#completionDateId").val();
+			if(isValidDate(startDateId) && isValidDate(completionDateId)){
+				returnval = true;
+			} 
+			return returnval;
+		}
+		function warnForWorkflow(){
+			alert("Warning: Changing the workflow for a project underway can create problems!")
+		 return true
+		}
+		function validateForm() {
+			return validateDates() && Project.validSelectedPartners();
+		}
+	   </script>
 <script>
 	currentMenuId = "#projectMenu";
 	$("#projectMenuId a").css('background-color','#003366')

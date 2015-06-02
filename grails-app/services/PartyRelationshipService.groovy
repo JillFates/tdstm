@@ -16,7 +16,6 @@ class PartyRelationshipService {
 	 */
 	def savePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
 		try{
-
 			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
 			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
 			def roleTypeTo = RoleType.findById( roleTypeIdTo )
@@ -25,7 +24,7 @@ class PartyRelationshipService {
 			partyRelationship = partyRelationship.save( insert:true)
 			return partyRelationship
 		} catch (Exception e) {
-			println"Exception-------------->"+e
+			log.error("Can't save party relationship: " + e.getMessage(), e)
 		}
 	}
 	
@@ -80,16 +79,40 @@ class PartyRelationshipService {
 	 * @return Array of PartyRelationship
 	 */
 	def getCompanyPartners( company, sortOn='name') {
+		return searchPartners(company, "PARTNERS", "COMPANY", sortOn)
+	}
 
-		def query = "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = :company and " +
-			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER'"
-		def partners = PartyRelationship.findAll( query, [company:company] )
-		if (partners && sortOn) {  
-			partners?.sort{it.partyIdTo.("$sortOn")}
+	/*
+	 * Used to get list of Partners for the specified project
+	 * @param Party - the project that has partners to be found
+	 * @param sortOn - property to sort on (default name)
+	 * @return Array of PartyRelationship
+	 */
+	def getProjectPartners( project, sortOn='name') {
+		return searchPartners(project, "PROJ_PARTNER", "PROJECT", sortOn)
+	}
+
+	/*
+	 * Generic function Used to get list of Partners
+	 * @param Party - the project that has partners to be found
+	 * @param type - relationship type
+	 * @param sortOn - property to sort on (default name)
+	 * @return Array of PartyRelationship
+	 */
+	private def searchPartners( party, rtype, roleTypeCodeFrom, sortOn='name') {
+		def result = []
+		def query = "from PartyRelationship p where p.partyRelationshipType = '$rtype' and p.partyIdFrom = :party and " +
+			"p.roleTypeCodeFrom = '$roleTypeCodeFrom' and p.roleTypeCodeTo = 'PARTNER'"
+		def partners = PartyRelationship.findAll( query, [party:party] )
+		if (partners && sortOn) {
+			partners.each{ p ->
+				result << p.partyIdTo
+			}
+			result.sort{it.("$sortOn")}
 		}
 
-		return partners
-	}   
+		return result
+	}
 
 	/**
 	 * Used to retrieve the a PartyGroup for a given Party and Type

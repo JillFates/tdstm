@@ -55,8 +55,14 @@
 							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Associated Partner:</td>
-							<td class="valueNW">${projectPartner?.partyIdTo}</td>
+							<td class="name">Associated Partners:</td>
+							<td class="valueNW">
+								<ul>
+								<g:each status="i" in="${projectPartners}" var="partner">
+									<li>${partner.name}</li>
+								</g:each>
+								</ul>
+							</td>
 							<td class="name">Partner Image:</td>
 							<td class="valueNW">
 								<g:if test="${projectLogoForProject}"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></g:if>
@@ -64,9 +70,19 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">Project Manager:</td>
-							<td class="valueNW">${projectManager?.partyIdTo?.lastNameFirstAndTitle}</td>
-							<td class="name">Event Manager:</td>
-							<td class="valueNW">${moveManager?.partyIdTo?.lastNameFirstAndTitle}</td>
+							<td class="valueNW">
+								<ul>
+									<g:each status="i" in="${projectManagers}" var="manager">
+									<li>${manager?.partyIdTo?.lastNameFirstAndTitle}</li>
+									</g:each>
+								</ul>
+								<br>
+								<tds:hasPermission permission='EditProjectStaff'>
+								<g:link class="mmlink" controller="person" action="manageProjectStaff">Manage</g:link>
+								</tds:hasPermission>
+							</td>
+							<td class="name">Default Bundle:</td>
+							<td class="valueNW">${fieldValue(bean:projectInstance, field:'defaultBundle')}</td>
 						</tr>
 						<tr class="prop">
 							<td class="name">Workflow:</td>
@@ -75,8 +91,8 @@
 								<span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
 								${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
 							</td>
-							<td class="name">Default Bundle:</td>
-							<td class="valueNW">${fieldValue(bean:projectInstance, field:'defaultBundle')}</td>
+							<td><br></td>
+							<td><br></td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>

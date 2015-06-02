@@ -1594,3 +1594,7 @@ div.centered {
     display: none !important; 
     visibility: hidden !important;
 }
+
+.partner_select_row {
+	margin-top: 3px;
+}

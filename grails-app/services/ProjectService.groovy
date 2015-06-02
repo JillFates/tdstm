@@ -18,6 +18,8 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.AssetEntityVarchar
 import com.tds.asset.AssetDependencyBundle
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 
 class ProjectService {
 
@@ -87,6 +89,7 @@ class ProjectService {
 			query.append("AND companyStaff.role = '${role}'")
 			
 		query.append(" ORDER BY ${sorting}")
+
 		return jdbcTemplate.queryForList(query.toString())
 	}
 
@@ -163,27 +166,17 @@ class ProjectService {
 	}
 
 	/**
-	 * This method is used to get partyRelationShip instance to fetch project manager for requested project.
+	 * This method is used to get partyRelationShip instance to fetch project managers for requested project.
 	 * @param projectId
 	 * @return partyRelationShip instance
 	 */
-	def getProjectManagerByProject(def projectId){
-		def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
+	def getProjectManagersByProject(def projectId){
+		def projectManagers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
 				and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-		
-		return projectManager
+
+		return projectManagers
 	}
 	
-	/**
-	 * This method is used to get partyRelationShip instance to fetch move manager for requested project.
-	 * @param projectId
-	 * @return partyRelationShip instance
-	 */
-	def getMoveManagerByProject (def projectId){
-		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
-			and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-		return moveManager
-	}
 	/**
 	 * This action is used to get the fields, splitted fields in to two to handle common customs.
 	 *@param : entityType type of entity.
@@ -311,18 +304,7 @@ class ProjectService {
 		}
 		return tag
 	}	
-	/**
-	 * NOTE : use this method where ever we are getting project partner.
-	 * This method is used to get project partner  for requested project.
-	 * @param projectId
-	 * @return projectPartner
-	 */
-	def getProjectPartner( project ) {
-		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
-			and p.partyIdFrom = :project and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",
-			[project:project])
-		return projectPartner
-	}
+
 	/**
 	 * This method gets the data used to populate the project summary report
 	 * @param params
@@ -380,18 +362,18 @@ class ProjectService {
 	 * This method used to get all clients,patners,managers and workflowcodes.
 	 */
 	def getProjectPatnerAndManagerDetails(){
-		def tdsParty = PartyGroup.findByName( 'TDS' )
-		
-		def clients = partyRelationshipService.getCompanyClients(tdsParty)//	Populate a SELECT listbox with default list as earlier.
-		def partners = partyRelationshipService.getCompanyPartners(tdsParty)
-		
-		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY (TDS)
-		def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${tdsParty.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-		managers?.sort{it.partyIdTo?.lastName}
-		
+		def person = securityService.getUserLogin().person
+		def companyParty = partyRelationshipService.getStaffCompany( person )
+
+		if (!companyParty) {
+			companyParty = PartyGroup.findByName( "TDS" )
+		}
+
+		def clients = partyRelationshipService.getCompanyClients(companyParty)//	Populate a SELECT listbox with default list as earlier.
+		def partners = partyRelationshipService.getCompanyPartners(companyParty)		
 		def workflowCodes = stateEngineService.getWorkflowCode()
 		
-		return [ clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ]
+		return [ clients:clients, partners:partners, workflowCodes: workflowCodes ]
 	}
 	/**
 	 * This method used to get all clients,patners,managers and workflowcodes for action edit.
@@ -417,45 +399,12 @@ class ProjectService {
 		def partnerStaff
 		def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
 		//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
-		def projectPartner = getProjectPartner( projectInstance )
-		def projectPartnerId
-		if (prevParam.projectPartner){
-			projectPartnerId = prevParam.projectPartner
-		} else {
-			projectPartnerId = projectPartner?.partyIdTo?.id
-		}
-		def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-		def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-		companyStaff.each {
-			if ( it.partyIdTo?.lastName == null ) {
-				it.partyIdTo?.lastName = ""
-			}
-		}
-		companyStaff.sort{it.partyIdTo?.lastName}
-		def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-			clientStaff.each {
-			if ( it.partyIdTo?.lastName == null ) {
-				it.partyIdTo?.lastName = ""
-			}
-		}
-		clientStaff.sort{it.partyIdTo?.lastName}
-		def companyPartners = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' order by p.partyIdTo" )
-		companyPartners.sort{it.partyIdTo?.name}
-		if (projectPartner != null) {
-			partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartnerId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
-			partnerStaff.each {
-				if ( it.partyIdTo?.lastName == null ) {
-					it.partyIdTo?.lastName = ""
-				}
-			}
-			partnerStaff.sort{it.partyIdTo?.lastName}
-		}
-		clientStaff.each{staff->
-		}
+		def projectPartners = partyRelationshipService.getProjectPartners( projectInstance )
+		def projectManagers = getProjectManagersByProject(projectInstance.id)
 		def workflowCodes = stateEngineService.getWorkflowCode()
-		return [projectPartner:projectPartner, projectManager:projectManager, moveManager:moveManager,
-			companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,
+		def companyPartners = partyRelationshipService.getCompanyPartners( projectCompany.partyIdTo )
+		return [projectPartners:projectPartners, projectManagers:projectManagers,
+			companyPartners:companyPartners,
 			projectLogoForProject:projectLogoForProject, workflowCodes:workflowCodes ]
 	}
 
@@ -601,7 +550,58 @@ class ProjectService {
 		}
 	}
 
-	def saveProject(projectInstance, file, projectPartner, projectManager, moveManager) {
+	def updateProjectPartners(projectInstance, partnersIds) {
+		// Get current partners in the database
+		def currentPartnersIds = []
+		def currentPartners = partyRelationshipService.getProjectPartners(projectInstance)
+		if (currentPartners) {
+			currentPartners.each{ p ->
+				currentPartnersIds << p.id
+			}
+		}
+		// Convert selected partners to long
+		def newPartnersIds = []
+		if (partnersIds) {
+			partnersIds.each{ p ->
+				if (!StringUtil.isBlank(p)) {
+					newPartnersIds << NumberUtil.toLong(p)	
+				}
+			}
+		}
+		// Define which partners should be deleted because are not in the new list
+		def toDeletePartners = currentPartnersIds - newPartnersIds
+		// Define which partners should be created because are new in the list
+		def toAddPartners = newPartnersIds - currentPartnersIds
+		def partnerParty = null
+
+		// Add partners to the relationship 
+		toAddPartners.each{ partnerId ->
+			partnerParty = Party.findById(partnerId)
+			partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
+		}
+		
+		// Delete partners from the relationship
+		def partnerStaff
+		toDeletePartners.each{ partnerId ->
+			partnerParty = Party.findById(partnerId)
+			def query = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = :partnerParty and " +
+				"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
+			partnerStaff = PartyRelationship.findAll( query, [partnerParty:partnerParty] )
+			if (partnerStaff.size() > 0) {
+				def idsToDelete = []
+				partnerStaff.each{ ps ->
+					idsToDelete << ps.partyIdTo.id
+				}
+				def idsToDeleteValue = idsToDelete.join(",")
+				jdbcTemplate.update("DELETE FROM party_relationship WHERE party_relationship_type_id = 'PROJ_STAFF' AND " +
+						"party_id_from_id = $projectInstance.id AND role_type_code_from_id = 'PROJECT' AND party_id_to_id IN ($idsToDeleteValue)")
+			}
+
+			partyRelationshipService.deletePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
+		}
+	}
+
+	def saveProject(projectInstance, file, projectPartners, projectManager) {
 
 		def workflowCodes = []
 		//projectInstance.dateCreated = new Date()
@@ -611,9 +611,7 @@ class ProjectService {
 		// List of OK mime-types
 		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
 		if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
-			if(projectPartner == ""){
-				return [message: " Please select Associated Partner to upload Image. ", success: false]
-			} else if (! okcontents.contains(file.getContentType())) {
+			if (! okcontents.contains(file.getContentType())) {
 				return [message: "Image must be one of: ${okcontents}", success: false]
 			}		
 		}
@@ -622,12 +620,6 @@ class ProjectService {
 		def image
 		image = ProjectLogo.fromUpload(file)		   
 		image.project = projectInstance
-		def party
-		def partnerImage = projectPartner
-		if ( partnerImage != null && partnerImage != "" ) {
-			party = Party.findById(partnerImage)
-		}
-		image.party = party 
 		def imageSize = image.getSize()
 		if( imageSize > 50000 ) {
 			return [message: " Image size is too large. Please select proper Image", success: false]
@@ -636,7 +628,7 @@ class ProjectService {
 		if ( !projectInstance.hasErrors() && projectInstance.save() ) {
 			if(file && file.getContentType() == "application/octet-stream"){
 				//Nonthing to perform.
-			} else if(params.projectPartner){
+			} else {
 				image.save()
 			}
 			//def client = params.projectClient
@@ -647,51 +639,25 @@ class ProjectService {
 				companyParty = PartyGroup.findByName( "TDS" )
 			}
 
-			//def companyRelationshipType = PartyRelationshipType.findById( "PROJ_COMPANY" ) 
-			//def projectRoleType = RoleType.findById( "PROJECT" ) 
-			//def companyRoleType = RoleType.findById( "COMPANY" )
-			//def projectStaffRelationshipType = PartyRelationshipType.findById( "PROJ_STAFF" )
 			// For Project to Company PartyRelationship
 			def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", companyParty, "COMPANY" )
 
-			//new PartyRelationship( partyRelationshipType:companyRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:companyParty, roleTypeCodeTo:companyRoleType, statusCode:"ENABLED" ).save( insert:true )
-			/*
-			if ( client != null && client != "" ) {
-				
-				def clientParty = Party.findById(client)
-				def clientRelationshipType = PartyRelationshipType.findById( "PROJ_CLIENT" )
-				def clientRoleType = RoleType.findById( "CLIENT" )
-				//	For Project to Client PartyRelationship
-				def projectClientRel = new PartyRelationship( partyRelationshipType:clientRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:clientParty, roleTypeCodeTo:clientRoleType, statusCode:"ENABLED" ).save( insert:true )
+			def partnersIds
+			if (projectPartners instanceof String) {
+				partnersIds = [projectPartners]
+			} else {
+				partnersIds = projectPartners
 			}
-			*/
-			if ( projectPartner != null && projectPartner != "" ) {
-				
-				def partnerParty = Party.findById(projectPartner)
-				//def partnerRelationshipType = PartyRelationshipType.findById( "PROJ_PARTNER" )
-				//def partnerRoleType = RoleType.findById( "PARTNER" )
-				//	For Project to Partner PartyRelationship
-				def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
-					//new PartyRelationship( partyRelationshipType:partnerRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:partnerParty, roleTypeCodeTo:partnerRoleType, statusCode:"ENABLED" ).save( insert:true )
-			}
+
+			updateProjectPartners(projectInstance, partnersIds)
 			
 			if ( projectManager != null && projectManager != "" ) {
 				
 				def projectManagerParty = Party.findById(projectManager)
-				//def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
 				//	For Project to ProjectManager PartyRelationship
 				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
-					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
 			}
 			
-			if ( moveManager != null && moveManager != "" ) {
-				
-				def moveManagerParty = Party.findById(moveManager)
-				//def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
-				//	For Project to MoveManager PartyRelationship
-				def moveManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveManagerParty, "MOVE_MGR" )
-					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-			}
 			// set the projectInstance as CURR_PROJ
 			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
 			//Will create a bundle name TBD and set it as default bundle for project   
