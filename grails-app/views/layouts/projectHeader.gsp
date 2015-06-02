@@ -238,8 +238,8 @@
 							<li><g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')"> Servers</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')"> All Devices</g:link></li>
 							<li><g:link class="mmlink" controller="database"    action="list" onclick="hideMegaMenu('assetMegaMenu')"> Databases</g:link></li>
-							<li><g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage Devices</g:link></li>
-							<li><g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')"> Logical Storage</g:link></li>
+							<li><g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')"> Storage-Devices</g:link></li>
+							<li><g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')"> Storage-Logical</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">Comments</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')"> Dependencies</g:link></li>
 							<tds:hasPermission permission='MoveBundleEditView'>

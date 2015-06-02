@@ -1145,7 +1145,7 @@ var EntityCrud = ( function($) {
 				return fetchAssetShowView('database', 'Database', assetId);
 				break;
 			case "STORAGE":
-				return fetchAssetShowView('files', 'Files', assetId);
+				return fetchAssetShowView('files', 'Logical Storage', assetId);
 				break;
 			case "DEVICE":
 				return fetchAssetShowView('assetEntity', 'Device', assetId);
@@ -1221,7 +1221,7 @@ var EntityCrud = ( function($) {
 				return fetchAssetCreateView('database', 'Database', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			case "STORAGE":
-				return fetchAssetCreateView('files', 'Files', source, rackOrChassisId, roomId, location, position, isBlade);
+				return fetchAssetCreateView('files', 'Logical Storage', source, rackOrChassisId, roomId, location, position, isBlade);
 				break;
 			case "DEVICE":
 				return fetchAssetCreateView('assetEntity', 'Device', source, rackOrChassisId, roomId, location, position, isBlade);
