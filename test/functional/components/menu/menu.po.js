@@ -42,10 +42,7 @@ var Menu = function(){
     return browser.driver.findElement
       (by.css('a[href="/tdstm/assetEntity/assetOptions"]'));
   };
-  this.getReleaseNotes = function(){
-    return browser.driver.findElement
-      (by.css('a[href="javascript:window.open(\'https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMReleaseNotes?cover=print\',\'help\');"]'));
-  };
+
   this.getListCompanies = function(){
     return browser.driver.findElement
       (by.css('a[href^="/tdstm/partyGroup/list"]'));
@@ -111,9 +108,6 @@ var Menu = function(){
       },
       'assetOptions':function(){
         that.getAssetOptions().click();
-      },
-      'releaseNotes':function(){
-         that.getReleaseNotes().click();
       },
       'listCompanies':function(){
         that.getListCompanies().click();
