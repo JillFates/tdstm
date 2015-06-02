@@ -3956,6 +3956,8 @@ class AssetEntityController {
 					query.append('IN (:assetType)')
 					qparams.assetType = qm.assetType
 				}
+				
+				query.append("ORDER BY a.assetName ASC")
 
 				if (log.isDebugEnabled())
 					log.debug "***** Query: ${query.toString()}\nParams: $qparams}"
