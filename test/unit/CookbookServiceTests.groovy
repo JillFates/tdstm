@@ -318,7 +318,7 @@ tasks: [
 """
 			def notificationRecipeProblem1 = """
 /**
-			 * Recipe to verify handling non-number input
+			 * Recipe to verify handling string (non-boolean) input
 			 */
 tasks: [
 	[
@@ -334,7 +334,7 @@ tasks: [
 	"""
 			def notificationRecipeProblem2 = """
 /**
-			 * Recipe to verify handling non 0/1 input
+			 * Recipe to verify handling integer (non-boolean) input
 			 */
 tasks: [
 	[
@@ -360,7 +360,7 @@ tasks: [
 		category: 'moveday',
 		team: 'PROJ_MGR',
 		whom: 'Jack	Wawrzynkiewicz',
-		sendNotification: 1
+		sendNotification: true
 	]
 ]
 	"""
@@ -376,7 +376,7 @@ tasks: [
 		category: 'moveday',
 		team: 'PROJ_MGR',
 		whom: 'Jack	Wawrzynkiewicz',
-		sendNotification: 0
+		sendNotification: false
 	]
 ]
 	"""
