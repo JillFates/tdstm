@@ -308,6 +308,8 @@
 					
 					// check this task against the regex
 					var name = (tasks[i].comment) ? (tasks[i].comment) : (tasks[i].task);
+					var taskNumber = (tasks[i].taskNumber) ? (tasks[i].taskNumber) : (tasks[i].task_number);
+					name = taskNumber + ':' + name;
 					var matchRegex = false;
 					if (isRegex && name.match(regex) != null)
 						matchRegex = true;
