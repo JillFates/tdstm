@@ -19,7 +19,7 @@ var Project = function(){
   this.completionDateId = 'completionDateId';
   this.commentLabelCss = '[for="comment"]';
   this.commentCss = 'textarea[name="comment"]';
-  this.saveBtnCss = 'input[type="submit"][onclick="return validateDates();"]';
+  this.saveBtnCss = 'input[type="submit"][onclick="return validateForm();"]';
   this.messageCss = '.message';
 
   //project/show

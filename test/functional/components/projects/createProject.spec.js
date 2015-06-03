@@ -92,14 +92,14 @@ describe('Create Project', function(){
         .getAttribute('value')).toEqual('Test Project');
     });
 
-    it('should have "Workflow Code: " as label for  workflow', function(){
-        expect(projectPage.getWorkflowCodeLabel()
-          .getText()).toEqual('Workflow:');
+    it('should have "Workflow: *" as label for  workflow', function(){
+      expect(projectPage.getWorkflowCodeLabel()
+        .getText()).toEqual('Workflow: *');
     });
 
     it('Should select "STD_PROCESS" as workflow', function(){
-        projectPage.selectWorkflowCodeByName('STD_PROCESS').click();
-        expect(projectPage.getWorkflowSelected()
+      projectPage.selectWorkflowCodeByName('STD_PROCESS').click();
+      expect(projectPage.getWorkflowSelected()
           .getAttribute('value')).toEqual('STD_PROCESS');
     });
 
