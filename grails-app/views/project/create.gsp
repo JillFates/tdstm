@@ -268,9 +268,9 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 								<textarea rows="3" cols="40" id="description" name="description" 
+									placeholder="Enter a short description of the project"
 									onkeydown="textCounter(this.id,200);" 
-									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}
-								</textarea>
+									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
 								<g:hasErrors bean="${projectInstance}" field="description">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="description" />
@@ -283,8 +283,7 @@
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
 								<textarea rows="3" cols="40" id="comment" name="comment"
 									onkeydown="textCounter(this.id,200);"
-									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}
-								</textarea>
+									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 								<g:hasErrors bean="${projectInstance}" field="comment">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="comment" />
