@@ -22,7 +22,7 @@ class RunbookService {
 		if (moveEvent) {
 			tasks = AssetComment.findAllByMoveEvent(moveEvent)
 		}
-
+		
 		return tasks
 	}
 
@@ -320,7 +320,7 @@ class RunbookService {
 						ebs.each { edge ->
 							
 							// check if this edge should be ignored
-							if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
+							if ( ! tmp['dependencies'][edge.id].tmpIgnore && tmp['tasks'][edge.predecessor.id]) {
 
 								// Set the time it will take to finish all the remaining tasks along this current path 
 								// This will be the max time of any forked path downstream
@@ -688,7 +688,7 @@ class RunbookService {
 						def calcLatestStart = succLatestStart - edge.predecessor.duration 
 						
 						// check if this edge should be ignored
-						if ( ! tmp['dependencies'][edge.id].tmpIgnore ) {
+						if ( ! tmp['dependencies'][edge.id].tmpIgnore && tmp['tasks'][edge.predecessor.id]) {
 						
 							def predTaskInfo = tmp['tasks'][edge.predecessor.id]
 							if ( ! predTaskInfo.tmpBeenExplored ) {
