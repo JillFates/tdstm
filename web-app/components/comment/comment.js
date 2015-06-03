@@ -969,6 +969,18 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		return deferred.promise;
 	};
 
+	var setViewUnpublishedPreference = function(viewUnpublished) {
+		var deferred = q.defer();
+		http.get(utils.url.applyRootPath('/assetEntity/setViewUnpublishedPreference?viewUnpublished='+viewUnpublished)).
+		success(function(data, status, headers, config) {
+			deferred.resolve(data);
+		}).
+		error(function(data, status, headers, config) {
+			deferred.reject(data);
+		});
+		return deferred.promise;
+	};
+
 	return {
 		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
@@ -988,7 +1000,8 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		changeTaskEstTime: changeTaskEstTime,
 		getStaffRoles: getStaffRoles,
 		getAssetsByType: getAssetsByType,
-		setShowAllPreference: setShowAllPreference
+		setShowAllPreference: setShowAllPreference,
+		setViewUnpublishedPreference: setViewUnpublishedPreference
 	};
 
 };
@@ -1787,11 +1800,13 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 		restrict: 'E',
 		scope: {
 			assetId: '@assetId',
-			prefValue: '@prefValue'
+			prefValue: '@prefValue',
+			viewUnpublishedValue: '@viewUnpublishedValue'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
 		link: function(scope, element, attrs) {
 			scope.showAll = (scope.prefValue == 'TRUE')?'1':'0';
+			scope.viewUnpublished = (scope.viewUnpublishedValue == 'true') ? '1' : '0';
 			scope.comments = [];
 			scope.applyRootPath = utils.url.applyRootPath;
 			var refreshView = function() {
@@ -1808,14 +1823,18 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 				scope.comments = scope.comments;
 				commentService.setShowAllPreference(scope.showAll);
 			}
-			scope.onlyCompleted = function(comment) {
+			scope.updateViewUnpublished = function(comment) {
+				scope.comments = scope.comments;
+				commentService.setViewUnpublishedPreference(scope.viewUnpublished);
+			}
+			scope.commentFilter = function(comment) {
 				if (scope.showAll == '1') {
-					return true;
+					return (scope.viewUnpublished == '1' || comment.commentInstance.isPublished);
 				} else {
 					return (
 						((comment.commentInstance.commentType == 'issue') && (comment.commentInstance.status != 'Completed'))
 						|| ((comment.commentInstance.commentType == 'comment') && (!comment.commentInstance.isResolved))
-					);
+					) && (scope.viewUnpublished == '1' || comment.commentInstance.isPublished);
 				}
 			}
 			scope.$on('commentChanged', function(evt, eventTO) {
@@ -1838,7 +1857,6 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
  * Directive gridButtons
  */
 tds.comments.directive.GridButtons = function(utils, commentUtils) {
-
 	return {
 		restrict: 'E',
 		replace: true,

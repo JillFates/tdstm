@@ -2031,6 +2031,14 @@ class AssetEntityController {
 	}
 	
 	/**
+	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
+	 */
+	def setViewUnpublishedPreference () {
+		userPreferenceService.setPreference("viewUnpublished", params.viewUnpublished == '1' ? 'true' : 'false')
+		render true
+	}
+	
+	/**
 	 * This action is used to get list of all Models to display at assetEntity CRUD and AssetAudit CRUD
 	 * @param assetType : requested assetType for which we need to get manufacturer list
 	 * @return : render to manufacturerView

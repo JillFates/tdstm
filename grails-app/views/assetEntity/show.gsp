@@ -143,7 +143,7 @@
 			<g:render template="dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
 		</tr>
 	<tr id="commentListId">
-		<g:render template="commentList" model="['asset':assetEntity, 'prefValue': prefValue]" ></g:render>
+		<g:render template="commentList" model="['asset':assetEntity, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
 	</tr>
 		<tr>
 			<td colspan="2">

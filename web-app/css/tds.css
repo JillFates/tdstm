@@ -1598,3 +1598,7 @@ div.centered {
 .partner_select_row {
 	margin-top: 3px;
 }
+
+#tasksAndCommentsLabelId {
+	display: inline;
+}

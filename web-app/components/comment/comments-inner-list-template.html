@@ -1,4 +1,6 @@
-<div class="list" style="position: relative">
+<input type="checkbox" id="showAll" name="showAll" value="1" ng-model="showAll" ng-true-value="1" ng-false-value="0" ng-change="updatePreference()" />View All Tasks&nbsp;
+<input type="checkbox" id="viewUnpublishedCheckboxId" name="viewUnpublished" value="{{viewUnpublishedValue}}" ng-model="viewUnpublished" ng-true-value="1" ng-false-value="0" ng-change="updateViewUnpublished()" />View Unpublished Tasks&nbsp;
+<div class="list" style="position: relative; margin-top: 4px;">
 <loading-indicator></loading-indicator>
 <table id="listCommentsTables">
 <thead>
@@ -6,15 +8,13 @@
 	<th nowrap class="headerwidth3">Edit</th>
 	<th nowrap class="headerwidth3">Task&nbsp;#</th>
 	<th nowrap>Task/Comment</th>
-	<th nowrap class="headerwidth12">Status&nbsp;(&nbsp;
-	<input type="checkbox" id="showAll" name="showAll" value="1" ng-model="showAll" ng-true-value="1" ng-false-value="0" ng-change="updatePreference()" />
-	&nbsp;<label for="showAll">All )</th>
+	<th nowrap class="headerwidth12">Status</th>
 	<th nowrap class="headerwidth6">Category</th>  
 	<th nowrap class="headerwidth20">Assigned To</th>
 </tr>
 </thead>
 <tbody id="listCommentsTbodyIds">
-<tr style="cursor: pointer;" ng-repeat="comment in comments | filter:onlyCompleted">
+<tr style="cursor: pointer;" ng-repeat="comment in comments | filter:commentFilter">
 	<td>
 		<a ng-if="comment.commentInstance.commentType == 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)"><img ng-src="{{applyRootPath('/icons/comment_edit.png')}}" border="0px"/></a>
 

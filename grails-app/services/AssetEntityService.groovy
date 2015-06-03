@@ -1249,7 +1249,9 @@ class AssetEntityService {
 
 		def highlightMap = getHighlightedInfo(type, assetEntity, configMap)
 
-		def prefValue= userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+		def prefValue = userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
+		
+		def viewUnpublishedValue = userPreferenceService.getPreference("viewUnpublished") ?: 'false'
 
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
 
@@ -1267,7 +1269,8 @@ class AssetEntityService {
 			prefValue:prefValue, 
 			project:project,
 			redirectTo:params.redirectTo, 
-			supportAssets:supportAssets
+			supportAssets:supportAssets,
+			viewUnpublishedValue:viewUnpublishedValue
 		]
 
 		return model
