@@ -42,11 +42,11 @@ describe('Assets Menu', function(){
     });
 
     it('should have Storage Devices in the submenu', function(){
-      expect(menu.getStorageDevices().getText()).toEqual('Storage Devices');
+      expect(menu.getStorageDevices().getText()).toEqual('Storage-Devices');
     });
 
     it('should have Logical Storage in the submenu', function(){
-      expect(menu.getLogicalStorage().getText()).toEqual('Logical Storage');
+      expect(menu.getLogicalStorage().getText()).toEqual('Storage-Logical');
     });
 
     it('should have Comments in the submenu', function(){
