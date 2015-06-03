@@ -1801,7 +1801,8 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 		scope: {
 			assetId: '@assetId',
 			prefValue: '@prefValue',
-			viewUnpublishedValue: '@viewUnpublishedValue'
+			viewUnpublishedValue: '@viewUnpublishedValue',
+			hasPublishPermission: '@hasPublishPermission'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
 		link: function(scope, element, attrs) {

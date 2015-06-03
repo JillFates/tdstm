@@ -1,5 +1,7 @@
 <input type="checkbox" id="showAll" name="showAll" value="1" ng-model="showAll" ng-true-value="1" ng-false-value="0" ng-change="updatePreference()" />View All Tasks&nbsp;
-<input type="checkbox" id="viewUnpublishedCheckboxId" name="viewUnpublished" value="{{viewUnpublishedValue}}" ng-model="viewUnpublished" ng-true-value="1" ng-false-value="0" ng-change="updateViewUnpublished()" />View Unpublished Tasks&nbsp;
+<span id="viewUnpublishedContainerId" style="display:{{hasPublishPermission == 'true' ? 'inline' : 'none'}};">
+	<input type="checkbox" id="viewUnpublishedCheckboxId" name="viewUnpublished" value="{{viewUnpublishedValue}}" ng-model="viewUnpublished" ng-true-value="1" ng-false-value="0" ng-change="updateViewUnpublished()" />View Unpublished Tasks&nbsp;
+</span>
 <div class="list" style="position: relative; margin-top: 4px;">
 <loading-indicator></loading-indicator>
 <table id="listCommentsTables">
@@ -9,7 +11,7 @@
 	<th nowrap class="headerwidth3">Task&nbsp;#</th>
 	<th nowrap>Task/Comment</th>
 	<th nowrap class="headerwidth12">Status</th>
-	<th nowrap class="headerwidth6">Category</th>  
+	<th nowrap class="headerwidth6">Category</th>
 	<th nowrap class="headerwidth20">Assigned To</th>
 </tr>
 </thead>

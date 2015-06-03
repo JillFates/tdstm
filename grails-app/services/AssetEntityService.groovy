@@ -1252,6 +1252,8 @@ class AssetEntityService {
 		def prefValue = userPreferenceService.getPreference("showAllAssetTasks") ?: 'FALSE'
 		
 		def viewUnpublishedValue = userPreferenceService.getPreference("viewUnpublished") ?: 'false'
+		
+		def hasPublishPermission = RolePermissions.hasPermission("PublishTasks")
 
 		def depBundle = AssetDependencyBundle.findByAsset(assetEntity)?.dependencyBundle // AKA dependency group
 
@@ -1270,7 +1272,8 @@ class AssetEntityService {
 			project:project,
 			redirectTo:params.redirectTo, 
 			supportAssets:supportAssets,
-			viewUnpublishedValue:viewUnpublishedValue
+			viewUnpublishedValue:viewUnpublishedValue,
+			hasPublishPermission:hasPublishPermission
 		]
 
 		return model
