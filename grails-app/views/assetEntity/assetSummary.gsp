@@ -3,12 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 <meta name="layout" content="projectHeader"/>
-<title>Asset Summary</title>
+<title>Asset Summary Table</title>
 </head>
 <body>
   <div class="body" style="width: 900px">
   <div>
-  <h1>ASSET SUMMARY</h1>
+  <h1>ASSET SUMMARY TABLE</h1>
   </div>
   <table style="width:700px;">
      <thead>
@@ -25,7 +25,11 @@
    <tbody>
    <g:each in="${assetSummaryList}" var="assetSummary" status="i">
          <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-	          <td>${assetSummary.name}</td>
+	          <td>
+				<tds:hasPermission permission="moveBundleShowView"><a href=../moveBundle/show/${assetSummary.id}></tds:hasPermission>
+				  ${assetSummary.name}
+				<tds:hasPermission permission="moveBundleShowView"></a></tds:hasPermission>
+			  </td>
 	          <g:if test="${assetSummary.applicationCount>0}">
 	            <td  style="text-align:right;"><g:link controller="application" action="list" params='[filter:"application", moveBundleId:"${assetSummary.id}"]'>${assetSummary.applicationCount}</g:link></td>
 	          </g:if>
