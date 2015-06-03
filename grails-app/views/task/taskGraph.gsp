@@ -73,7 +73,6 @@
 			}
 			
 			// set the view unpublished checkbox to be checked if the parameter was passed as true
-			$('#viewUnpublishedId').attr('checked', ${viewUnpublished});
 			$('#viewUnpublishedId').on('change', function () {
 				generateGraph($('#moveEventId').val());
 			});
@@ -242,8 +241,12 @@
 				params = {'moveEventId':event, 'id':neighborhoodTaskId};
 			
 			// if the view unpublished checkbox exists, add this value to the parameters for the ajax calls
-			if ($('#viewUnpublishedId').size() > 0)
-				params.viewUnpublished = $('#viewUnpublishedId').is(':checked');
+			if ($('#viewUnpublishedId').size() > 0) {
+				if ($('#viewUnpublishedId').is(':checked'))
+					params.viewUnpublished = 1;
+				else
+					params.viewUnpublished = 0;
+			}
 			
 			// show the loading spinner
 			$('#spinnerId').css('display', 'block');

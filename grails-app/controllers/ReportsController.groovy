@@ -76,8 +76,9 @@ class ReportsController {
 				break
 			case "Task Report":
 					def moveEventInstanceList  = MoveEvent.findAllByProject(projectInstance,[sort:'name'])
+					def viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
 				render( view:'taskReport',
-					model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance])
+					model:[moveEventInstanceList: moveEventInstanceList, projectInstance:projectInstance, viewUnpublished:viewUnpublished])
 				break
 			case "Transportation Asset List":  
 				render( view:'transportationAssetReport',
@@ -940,7 +941,6 @@ class ReportsController {
 		def moveEventId = params.moveEvent
 		def moveEventInstance
 		def errorMsg = "Please select a MoveEvent"
-		
 		if ( moveEventId && moveEventId.isNumber() ) {
 			def isProjMoveEvent  = MoveEvent.findByIdAndProject( moveEventId, project )
 			if ( !isProjMoveEvent ) {
@@ -1160,20 +1160,26 @@ class ReportsController {
 				taskListHql += "AND status != :status"
 				argMap << ["status":AssetCommentStatus.COMPLETED]
 			}
-
-			if( params.viewUnpublished ){
+			
+			// handle unpublished tasks
+			if (params.viewUnpublished)
+				userPreferenceService.setPreference("viewUnpublished", 'true')
+			else
+				userPreferenceService.setPreference("viewUnpublished", 'false')
+			
+			def viewUnpublished = RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished
+			if (!viewUnpublished) {
 				taskListHql += " AND isPublished = :isPublished "
-				argMap << ["isPublished": false]
-			} else {
-				taskListHql += " AND isPublished = :isPublished "
-				argMap << ["isPublished": true]				
+				argMap << ["isPublished": true]			
 			}
 
 			taskList = AssetComment.findAll(taskListHql, argMap)
-			taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProject(AssetCommentType.COMMENT, project): [])
+			if (viewUnpublished)
+				taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProject(AssetCommentType.COMMENT, project): [])
+			else
+				taskList.addAll( params.wComment ? AssetComment.findAllByCommentTypeAndProjectAndIsPublished(AssetCommentType.COMMENT, project, true): [])
 			
 			//Generating XLS Sheet
-			
 			switch(params._action_tasksReport){
 				case "Generate Xls" :
 					  exportTaskReportExcel(taskList, tzId, project)
@@ -1184,7 +1190,7 @@ class ReportsController {
 					  break;
 					  
 				default :
-					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId]) 
+					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId, viewUnpublished:viewUnpublished]) 
 					 break;
 			}
 		} else{
@@ -1216,7 +1222,9 @@ class ReportsController {
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'role', 'status',
 					'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
 					'dateCreated', 'createdBy', 'moveEvent']
-		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7)
+					
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7, viewUnpublished)
 		
 		book.write(response.getOutputStream())
 	}
@@ -1232,10 +1240,18 @@ class ReportsController {
 		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		def reportFields = []
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 		taskList.each{task ->
+			
+			def visibleDependencies = []
+			if (viewUnpublished)
+				visibleDependencies = task.taskDependencies
+			else
+				visibleDependencies = task.taskDependencies?.findAll{it?.predecessor?.isPublished}
+			
 			reportFields <<[
 				'taskNumber':task.taskNumber?.toString() , 
-				'taskDependencies': WebUtil.listAsMultiValueString(task.taskDependencies?.assetComment?.comment) ,
+				'taskDependencies': WebUtil.listAsMultiValueString(visibleDependencies.predecessor?.comment) ,
 				"assetEntity":task.assetEntity?.assetName,"comment":task.comment,
 				"assignedTo":task.assignedTo? task.assignedTo.toString():"", "status":task.status,
 				"datePlanned":"","outStanding":"","dateRequired":"", 'workflow':"",
@@ -1253,7 +1269,7 @@ class ReportsController {
 		if(reportFields.size() <= 0) {
 			flash.message = " No Assets Were found for  selected values  "
 			redirect( action:'retrieveBundleListForReportDialog', params:[reportId: 'Task Report'] )
-		}else {
+		} else {
 			def filename = 	"${project.name}-TaskReport"
 			chain(controller:'jasper',action:'index',model:[data:reportFields],
 					params:["_format":"PDF","_name":"${filename}","_file":"taskReport"])
@@ -1265,12 +1281,12 @@ class ReportsController {
 	 */
 	def serverConflicts() {
 		def currProj = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-	def projectInstance = securityService.getUserCurrentProject();
-	if (!projectInstance) {
-	  flash.message = "Please select project to view Reports"
-	  redirect(controller:'project',action:'list')
-	  return
-	}
+		def projectInstance = securityService.getUserCurrentProject();
+		if (!projectInstance) {
+			flash.message = "Please select project to view Reports"
+			redirect(controller:'project',action:'list')
+			return
+		}
 		def moveBundleList = MoveBundle.findAllByProject(projectInstance)
 		def moveBundleId = securityService.getUserCurrentMoveBundleId()
 		return ['moveBundles':moveBundleList,moveBundleId:moveBundleId]

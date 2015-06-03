@@ -47,7 +47,7 @@ function buildGraph (response, status) {
 		displayWarningOrErrorMsg(false)
 		return;
 	}
-
+	
 	// populate the Team select
 	var teamSelect = $("#teamSelectId")
 	teamSelect.children().remove();
@@ -1985,6 +1985,7 @@ function generateGraph (event) {
 	var params = {};
 	if (event != 0)
 		params = {'moveEventId':event};
+	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
 	$('#spinnerId').css('display', 'block');
 	
 	jQuery.ajax({

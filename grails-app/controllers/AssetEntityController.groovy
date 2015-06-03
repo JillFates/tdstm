@@ -1593,11 +1593,13 @@ class AssetEntityController {
 		def assetCommentsList = []
 		def today = new Date()
 		def css //= 'white'
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 		assetCommentsInstance.each {
 			css = it.dueDate < today ? 'Lightpink' : 'White'
-			assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css, 
-									assetName: it.assetEntity.assetName,assetType:it.assetEntity.assetType,
-									assignedTo: it.assignedTo?it.assignedTo.toString():'', role: it.role?it.role:'']
+			if (viewUnpublished || it.isPublished)
+				assetCommentsList <<[ commentInstance : it, assetEntityId : it.assetEntity.id,cssClass:css, 
+										assetName: it.assetEntity.assetName,assetType:it.assetEntity.assetType,
+										assignedTo: it.assignedTo?it.assignedTo.toString():'', role: it.role?it.role:'']
 		}
 		render assetCommentsList as JSON
 	}
@@ -2048,7 +2050,7 @@ class AssetEntityController {
 	 */
 	def listTasks() {
 		def user = securityService.getUserLogin()
-		try{
+		try {
 			if (!RolePermissions.hasPermission('ViewTaskManager')) {
 				log.warn "Unauthorized user $user attempted to see Task Manager"
 				//while using 'UnauthorizedException' getting  java.lang.IncompatibleClassChangeError:
@@ -2058,9 +2060,14 @@ class AssetEntityController {
 				
 			}
 			
-			params.commentType=AssetCommentType.TASK
+			if (params.containsKey('viewUnpublished') && params.viewUnpublished in ['0', '1']) {
+				def viewUnpublishedBoolean = (params.viewUnpublished == '1')
+				userPreferenceService.setPreference("viewUnpublished", viewUnpublishedBoolean.toString())
+			}
 			
-			if(params.initSession)
+			params.commentType = AssetCommentType.TASK
+			
+			if (params.initSession)
 				session.TASK = [:]
 				
 			def project = securityService.getUserCurrentProject();
@@ -2074,19 +2081,19 @@ class AssetEntityController {
 			
 			// Deal with the parameters
 			def isTask = AssetCommentType.TASK
-			def taskPref= assetEntityService.getExistingPref('Task_Columns')
+			def taskPref = assetEntityService.getExistingPref('Task_Columns')
 			def assetCommentFields = AssetComment.getTaskCustomizeFieldAndLabel()
 			def modelPref = [:]
-			taskPref.each{key,value->
+			taskPref.each {key,value->
 				modelPref <<  [ (key): assetCommentFields[value] ]
 			}
 			def filterEvent = 0
-			if(params.moveEvent){
-				filterEvent=params.moveEvent
+			if (params.moveEvent) {
+				filterEvent = params.moveEvent
 			}
 			def moveEvent
 			
-			if(params.containsKey("justRemaining")){
+			if (params.containsKey("justRemaining")) {
 				userPreferenceService.setPreference("JUST_REMAINING", params.justRemaining)
 			}
 			if ( params.moveEvent?.size() > 0) {
@@ -2107,16 +2114,16 @@ class AssetEntityController {
 				}
 			}
 			if (moveEvent && params.section != 'dashBoard') {
-					// Add filter to SQL statement and update the user's preferences
-					userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
-					filterEvent = moveEvent.id
+				// Add filter to SQL statement and update the user's preferences
+				userPreferenceService.setPreference( 'MOVE_EVENT', "${moveEvent.id}" )
+				filterEvent = moveEvent.id
 			} else {
-	        	userPreferenceService.removePreference( 'MOVE_EVENT' );
-		    }
+				userPreferenceService.removePreference( 'MOVE_EVENT' );
+			}
 			def justRemaining = userPreferenceService.getPreference("JUST_REMAINING") ?: "1"
 			// Set the Checkbox values to that which were submitted or default if we're coming into the list for the first time
 			def justMyTasks = params.containsKey('justMyTasks') ? params.justMyTasks : "0"
-			def viewUnpublished = params.containsKey('viewUnpublished') ? params.viewUnpublished : "0"
+			def viewUnpublished = (userPreferenceService.getPreference("viewUnpublished") == 'true') ? '1' : '0'
 			def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
@@ -2129,7 +2136,7 @@ class AssetEntityController {
 					staffRoles:taskService.getTeamRolesForTasks(), taskPref:taskPref, attributesList: assetCommentFields.keySet().sort{it}, modelPref:modelPref,
 					//staffRoles:taskService.getRolesForStaff(), 
 					sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
-		} catch (RuntimeException uex){
+		} catch (RuntimeException uex) {
 			log.error uex.getMessage()
 			response.sendError( 401, "Unauthorized Error")
 		}

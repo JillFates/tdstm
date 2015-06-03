@@ -598,7 +598,7 @@ class MoveEventController {
 	/**
 	 * The front-end UI to exporting a Runbook spreadsheet
 	 */
-	def exportRunbook ={
+	def exportRunbook = {
 		def projectId =  session.CURR_PROJ.CURR_PROJ		
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
@@ -608,7 +608,9 @@ class MoveEventController {
 		}
 		def moveEventList = MoveEvent.findAllByProject(project)
 		
-		return [moveEventList:moveEventList]
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		
+		return [moveEventList:moveEventList, viewUnpublished:(viewUnpublished ? '1' : '0')]
 	}
 	
 	/**
@@ -625,17 +627,29 @@ class MoveEventController {
 		def databaseCount = 0
 		def fileCount = 0
 		def otherAssetCount = 0
-		if(bundles?.size()>0){
-			 applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
-			 assetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'],params).size()
-			 databaseCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles).size()
-			 fileCount=AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles).size()
-			 otherAssetCount=AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles).size()
-			 
+		if (bundles?.size() > 0) {
+			applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
+			assetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'],params).size()
+			databaseCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles).size()
+			fileCount = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles).size()
+			otherAssetCount = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles).size() 
 		}
-		def  preMoveSize = AssetComment.countByMoveEventAndCategory(moveEventInstance, 'premove')
-		def  sheduleSize = AssetComment.countByMoveEventAndCategoryInList(moveEventInstance, ['shutdown','physical','moveday','startup'])
-		def  postMoveSize = AssetComment.countByMoveEventAndCategory(moveEventInstance, 'postmove')
+		
+		if (params.containsKey('viewUnpublished')) {
+			if (params.viewUnpublished == '1')
+				userPreferenceService.setPreference("viewUnpublished", 'true')
+			else
+				userPreferenceService.setPreference("viewUnpublished", 'false')
+		}
+		
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
+		
+		def preMoveSize = AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'premove', publishedValues)
+		def sheduleSize = AssetComment.countByMoveEventAndCategoryInListAndIsPublishedInList(moveEventInstance, ['shutdown','physical','moveday','startup'], publishedValues)
+		def postMoveSize = AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'postmove', publishedValues)
 		return [applcationAssigned:applcationAssigned, assetCount:assetCount, databaseCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount,
 			    preMoveSize: preMoveSize, sheduleSize:sheduleSize, postMoveSize:postMoveSize, bundles:bundles,moveEventInstance:moveEventInstance]
 	}
@@ -643,17 +657,17 @@ class MoveEventController {
 	/**
 	 * The controller that actually does the runbook export generation to an Excel spreadsheet
 	 */
-	def exportRunbookToExcel={
+	def exportRunbookToExcel = {
 		def projectId =  session.CURR_PROJ.CURR_PROJ
 		def project = Project.get(projectId)
 		def moveEventInstance = MoveEvent.get(params.eventId)
 		def currentVersion = moveEventInstance.runbookVersion
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		if(params.version=='on'){
-			if(moveEventInstance.runbookVersion){
+		if (params.version=='on') {
+			if (moveEventInstance.runbookVersion) {
 				moveEventInstance.runbookVersion = currentVersion + 1
 				currentVersion = currentVersion + 1
-			}else{
+			} else {
 				moveEventInstance.runbookVersion = 1
 				currentVersion = 1
 			}
@@ -677,26 +691,34 @@ class MoveEventController {
 		def unresolvedIssues = []
 		def preMoveIssue = []
 		def postMoveIssue = []
-		if(bundles?.size()>0){
-			 applications = Application.findAllByMoveBundleInListAndProject(bundles,project)
-			 applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
-			 assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'])
-			 assetCount = assets.size()
-			 databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles)
-			 databaseCount = databases.size()
-			 files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles)
-			 fileCount=files.size()
-			 others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles)
-			 otherAssetCount=others.size()
-			 def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
-			 String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')") 
-			 unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = ? and a.commentType = ? and a.category in ('general', 'discovery', 'planning','walkthru')",[0,'issue'])
+		
+		
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
+		
+		if (bundles?.size() > 0) {
+			applications = Application.findAllByMoveBundleInListAndProject(bundles,project)
+			applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
+			assets = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'])
+			assetCount = assets.size()
+			databases = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Database',bundles)
+			databaseCount = databases.size()
+			files = AssetEntity.findAllByAssetTypeAndMoveBundleInList('Files',bundles)
+			fileCount = files.size()
+			others = AssetEntity.findAllByAssetTypeNotInListAndMoveBundleInList(['Server','VM','Blade','Application','Files','Database'],bundles)
+			otherAssetCount = others.size()
+			def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
+			String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')")
+			unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = :isResolved and a.commentType = :commentType and a.category in ('general', 'discovery', 'planning','walkthru') AND a.isPublished IN :publishedValues",[isResolved:0, commentType:'issue', publishedValues:publishedValues])
 		}
-		preMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'premove') 
-		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInList(moveEventInstance, ['shutdown','physical','moveday','startup'])
-		postMoveIssue = AssetComment.findAllByMoveEventAndCategory(moveEventInstance, 'postmove') 
+		
+		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'premove', publishedValues) 
+		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInListAndIsPublishedInList(moveEventInstance, ['shutdown','physical','moveday','startup'], publishedValues)
+		postMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'postmove', publishedValues) 
 		//TODO - Move controller code into Service .
-		def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance).allErrors.size()
+		def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance, viewUnpublished).allErrors.size()
 
 		try {
 			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
@@ -716,7 +738,7 @@ class MoveEventController {
 			def filesSheet = book.getSheet("Storage")
 			def otherSheet = book.getSheet("Other")
 			def issueSheet = book.getSheet("Issues")
-			def appSheet = book.getSheet("Impacted Applications")
+			def appSheet = book.getSheet("Applications")
 			def postMoveSheet = book.getSheet("Post-move")
 			def summarySheet = book.getSheet("Index")
 			
@@ -792,25 +814,25 @@ class MoveEventController {
 			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEventInstance.name ))
 			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEventInstance.name ))
 			
-			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5)
+			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5, viewUnpublished)
 			
-			moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, 5)
+			moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, 5, viewUnpublished)
 			
-			moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, 4)
+			moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, 4, viewUnpublished)
 			
-			moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, 1)
+			moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, 1, viewUnpublished)
 			
-			moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, 1)
+			moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, 1, viewUnpublished)
 			
-			moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, 1)
+			moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, 1, viewUnpublished)
 			
-			moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, 7)
+			moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, 7, viewUnpublished)
 			
-			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7)
+			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7, viewUnpublished)
 			
-			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7)
+			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7, viewUnpublished)
 			  
-				  
+			
 			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
 			for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
 				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
@@ -818,9 +840,10 @@ class MoveEventController {
 				WorkbookUtil.addCell(personelSheet, 2, r, String.valueOf(projectStaff[r-8].roleTypeCodeTo ))
 				WorkbookUtil.addCell(personelSheet, 5, r, String.valueOf(projectStaff[r-8].partyIdTo?.email ? projectStaff[r-8].partyIdTo?.email : ''))
 			}
+			
 			book.write(response.getOutputStream())
 		} catch( Exception ex ) {
-			println "Exception occurred while exporting data"+ex.printStackTrace()
+			println "Exception occurred while exporting data: "+ex.printStackTrace()
 		  
 			return
 		}

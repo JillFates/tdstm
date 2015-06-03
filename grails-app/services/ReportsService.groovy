@@ -21,8 +21,7 @@ class ReportsService {
 	static transactional = true
 
 	@Transactional(readOnly = true) 
-	def generatePreMoveCheckList(def currProj , def moveEventInstance) {
-		
+	def generatePreMoveCheckList(def currProj , def moveEventInstance, def viewUnpublished = false) {
 		def projectInstance = Project.findById( currProj )
 		def moveBundles = moveEventInstance.moveBundles.sort{it.name}
 		def eventErrorList =[] 
@@ -39,9 +38,8 @@ class ReportsService {
   //---------------------------------------for Assets and Bundles --------------------------------------//
 		
 		def assetEntityList = AssetEntity.findAllByMoveBundleInListAndProject(moveBundles,projectInstance,[sort:'assetName'])
-		
 
-		def assetsInfo = getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList)
+		def assetsInfo = getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList, viewUnpublished)
 
   //---------------------------------------For Teams---------------------------------------------------//
 		
@@ -62,7 +60,7 @@ class ReportsService {
 		}
   //---------------------------------------For Task Analysis------------------------------------------------//
 		
-		def taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList)
+		def taskAnalysisInfo = getTaskAnalysisInfo(moveEventInstance, eventErrorList, viewUnpublished)
 		
 		return['project':projectInstance,'time':eventsProjectInfo.time,'moveEvent':moveEventInstance,'errorForEventTime':eventsProjectInfo.errorForEventTime,
 			'newsBarModeError':eventsProjectInfo.newsBarModeError,'userLoginError':eventsProjectInfo.userLoginError,'clientAccess':eventsProjectInfo.clientAccess,
@@ -157,7 +155,7 @@ class ReportsService {
 	 * @return bundleMap, inValidUsers, teamAssignment, notAssignedToTeam
 	 */
 	
-	def getMoveBundleTeamInfo( event, assetEntityList,eventErrorList){
+	def getMoveBundleTeamInfo( event, assetEntityList,eventErrorList) {
 		def moveBundles = event.moveBundles.sort{it.name}
 		def project = event.project
 		def bundleMap = []
@@ -227,7 +225,7 @@ class ReportsService {
 	*          duplicates,duplicatesAssetNames
 	*/
 	
-	def getAssetInfo(assetEntityList,moveBundles,projectInstance,currProj,moveEventInstance,eventErrorList){
+	def getAssetInfo(def assetEntityList,def moveBundles,def projectInstance,def currProj,def moveEventInstance,def eventErrorList, def viewUnpublished = false) {
 
 		def summaryOk = [:]
 		Set assetType
@@ -333,10 +331,14 @@ class ReportsService {
 		}
 		
 		
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
+		
 		def categories = ['shutdown','moveday','startup','physical','physical-source','physical-target']
 		def issues = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds) and commentType ='issue' \
-            and  isResolved =0 and comment.category not in (:categories) order by comment.assetEntity.assetName ",
-            [assetIds:assetId, categories:categories]) : []
+            and  isResolved =0 and comment.category not in (:categories) AND comment.isPublished IN (:publishedValues) order by comment.assetEntity.assetName ",
+            [assetIds:assetId, categories:categories, publishedValues:publishedValues]) : []
 		def issue = ""
 		if(issues.size()>0){
 			issue +="""<span style="color: red;"><b>Asset Tasks: Unresolved Tasks  </b><br></br></span>"""
@@ -345,8 +347,8 @@ class ReportsService {
 			issue +="""<span style="color: green;"><b>Asset Tasks: OK  </b><br></br></span>"""
 		}
 		
-		def specialInstruction = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 order by comment.assetEntity.assetName ",
-                                                        [assetIds : assetId]) : []
+		def specialInstruction = assetId ? AssetComment.findAll("from AssetComment comment where comment.assetEntity.id in (:assetIds)  and  mustVerify = 1 AND comment.isPublished IN (:publishedValues) order by comment.assetEntity.assetName ",
+                                                        [assetIds : assetId, publishedValues:publishedValues]) : []
 		def importantInstruction = ""
 		if(specialInstruction.size()>0){
 			importantInstruction +="""<span style="color: red;"><b>Special Instruction: </b><br></br></span>"""
@@ -368,8 +370,8 @@ class ReportsService {
 		}else{
 		    questioned +="""<span style="color: green;"><b>Dependencies Questioned: OK  </b><br></br></span>"""
 		}
-		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.moveEvent = :event and a.category in(:categories) and a.isResolved = :resolved",
-                                                [event: moveEventInstance, categories:['general','discovery','planning','walkthru'], resolved:0])
+		def nonAssetIssue = AssetComment.findAll("from AssetComment a where a.moveEvent = :event and a.category in(:categories) and a.isResolved = :resolved AND comment.isPublished IN (:publishedValues)",
+                                                [event: moveEventInstance, categories:['general','discovery','planning','walkthru'], resolved:0, publishedValues:publishedValues])
 		def eventIssues = ''
 		if(nonAssetIssue.size()>0){
 			eventIssues +="""<span style="color: red;"><b>Event Tasks: </b><br></br></span>"""
@@ -393,17 +395,17 @@ class ReportsService {
 	* @return workFlowCodeSelected,steps
 	*/
 	
-	def getEventsBundelsInfo(moveBundles,moveEventInstance,eventErrorList){
+	def getEventsBundelsInfo(moveBundles,moveEventInstance,eventErrorList) {
 		Set workFlowCode = moveBundles.workflowCode
 		def workFlow = moveBundles.workflowCode
 		def workFlowCodeSelected = [:]
 		def steps = [:]
 		def moveBundleStep
 		
-		if(workFlowCode.size()==1){
+		if (workFlowCode.size() == 1) {
 			workFlowCodeSelected << [(moveEventInstance.name+'  (Event)  '+'  All Bundles have same WorkFlow  '):workFlow[0]]
-		}else{
-			moveBundles.each{
+		} else {
+			moveBundles.each {
 				workFlowCodeSelected << [(it.name+'(Bundle)'+'  '+'  Uses WorkFlow ') : it.workflowCode]
 			}
 		}
@@ -412,15 +414,15 @@ class ReportsService {
 		
 		String labels
 		def dashBoardOk = []
-		moveBundles.each{moveBundle->
+		moveBundles.each { moveBundle->
 			def label = []
 			moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle,[sort:'transitionId'])
-			if(moveBundleStep.size()==0){
+			if (moveBundleStep.size() == 0) {
 				steps << [(moveBundle.name):"No steps created"]
 				eventErrorList << 'EventsBundle'
 				dashBoardOk <<['No steps created']
-			}else{
-				moveBundleStep.each{step->
+			} else {
+				moveBundleStep.each { step->
 					label << [
 						"${step.label}(${step.planDuration/60+'m'})"
 					]
@@ -432,14 +434,15 @@ class ReportsService {
 				dashBoardOk += """<span style="color:green" ><b>Dashboard OK: </b></span>"""
 			}
 		}
-	  return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList,dashBoardOk:dashBoardOk]
+		return[workFlowCodeSelected:workFlowCodeSelected,steps:steps,eventErrorList:eventErrorList,dashBoardOk:dashBoardOk]
 	}
+	
 	/**
 	* @param moveEventInstance,projectInstance,currProj
 	* @param Events
 	* @return time,moveEventInstance,errorForEventTime,newsBarModeError,userLoginError,clientAccess,list
 	*/
-	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList){
+	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList) {
 		
 		def date = new Date()
 		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
@@ -450,11 +453,11 @@ class ReportsService {
 		def clientAccess = ""
 		def userLoginError = ""
 
-		moveBundles.each{
-			if(it.startTime > projectInstance.startDate && it.completionTime > projectInstance.completionDate){
+		moveBundles.each {
+			if (it.startTime > projectInstance.startDate && it.completionTime > projectInstance.completionDate) {
 				eventErrorList << 'Project'
 				errorForEventTime += """<span style="color:red" ><b>Move bundle ${it.name} is completing after project completion</b>  </span><br></br>"""
-			}else{
+			} else {
 				def projectStartTime = 'Not Available'
 				def projectEndTime = 'Not Available'
 				
@@ -472,34 +475,34 @@ class ReportsService {
 		lastMoveBundleDate.sort()
 		def lastMoveBundleDateSize = lastMoveBundleDate.size()
 		def moveEventCompletiondate
-		if(lastMoveBundleDateSize>0){
-		   moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
+		if (lastMoveBundleDateSize > 0) {
+			moveEventCompletiondate = lastMoveBundleDate[lastMoveBundleDateSize-1]
 		}
 		def inPastError = ''
-		if(moveEventInstance.newsBarMode=='on'){
+		if (moveEventInstance.newsBarMode == 'on') {
 			eventErrorList << 'Project'
 			newsBarModeError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Progress </b></span>"""
-		}else if(moveEventCompletiondate < projectInstance.startDate) {
-		    eventErrorList << 'Project'
-		    newsBarModeError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Past </b></span>"""
-		}else{
-		    newsBarModeError += """<span style="color:green" ><b>${moveEventInstance.name}: OK </b></span>"""
+		} else if (moveEventCompletiondate < projectInstance.startDate) {
+			eventErrorList << 'Project'
+			newsBarModeError += """<span style="color:red" ><b>${moveEventInstance.name}: MoveEvent In Past </b></span>"""
+		} else {
+			newsBarModeError += """<span style="color:green" ><b>${moveEventInstance.name}: OK </b></span>"""
 		}
 		
 		
 		def list = partyRelationshipService.getProjectStaff(currProj)
-        list.sort{ a, b -> a.company[0]?.toString() <=> b.company[0]?.toString() ?: a.role?.toString() <=> b.role?.toString() }
+		list.sort{ a, b -> a.company[0]?.toString() <=> b.company[0]?.toString() ?: a.role?.toString() <=> b.role?.toString() }
 		
 		def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $currProj and p.roleTypeCodeFrom = 'PROJECT' ")
 		
-		projectStaff.each{staff ->
+		projectStaff.each { staff ->
 			def user = UserLogin.findByPerson(Person.get(staff.partyIdTo.id))
 			
-			if(!user){
+			if (!user) {
 				eventErrorList << 'Project'
 				userLoginError +="""<span style="color:red;margin-left:50px;"><b>${Person.get(staff.partyIdTo.id)} login disabled</b></span><br></br>"""
 			}
-			if(user?.active=='N'){
+			if (user?.active=='N') {
 				eventErrorList << 'Project'
 				userLoginError +="""<span style="color:red;margin-left:50px;"><b>${user} login inactive</b></span><br></br>"""
 			}
@@ -507,10 +510,10 @@ class ReportsService {
 		}
 		def query = "from Person s where s.id in (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${projectInstance.client.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) order by s.lastName "
 		def personInstanceList = Person.findAll( query )
-		if(personInstanceList.size()==0){
+		if (personInstanceList.size() == 0) {
 			clientAccess += """<span style="color:red"><b>No Client Access</b></span>"""
 			eventErrorList << 'Project'
-		}else{
+		} else {
 			clientAccess += """<span style="color:Green"><b> Client Access:&nbsp;${personInstanceList}</b></span>"""
 		}
 		return[time:time,moveEvent:moveEventInstance,errorForEventTime:errorForEventTime,
@@ -524,17 +527,17 @@ class ReportsService {
 	* @return truckError,truck
 	*/
 	
-	def getTransportInfo(assetEntityList,eventErrorList){
+	def getTransportInfo(assetEntityList,eventErrorList) {
 		
 		Set truck = assetEntityList.truck
 		truck.remove('')
 		truck.remove(null)
 		String truckError = ''
 		
-		if(truck.size()==0){
+		if (truck.size() == 0) {
 			eventErrorList << 'Transport'
 			truckError += """<span style="color: red;"><b>Trucks: No trucks defined</b><br></br></span>"""
-		}else{
+		} else {
 			truckError+="""<span style="color: green;"><b>Trucks: OK  </b><br></br></span>"""
 		}
 		
@@ -543,10 +546,10 @@ class ReportsService {
 		cart.remove(null)
 		String cartError = ''
 		
-		if(cart.size()==0){
+		if (cart.size() == 0) {
 			eventErrorList << 'Transport'
 			cartError += """<span style="color: red;"><b>Carts: No carts defined</b><br></br></span>"""
-		}else{
+		} else {
 			cartError+="""<span style="color: green;"><b>Carts: OK (${cart.size()}) </b><br></br></span>"""
 		}
 		
@@ -556,10 +559,10 @@ class ReportsService {
 		
 		def shelfError = ''
 		
-		if(shelf.size()==0){
+		if (shelf.size() == 0) {
 			eventErrorList << 'Transport'
 			shelfError += """<span style="color: red;"><b>Shelves: No Shelves defined</b><br></br></span>"""
-		}else{
+		} else {
 			shelfError+= """<span style="color: green;"><b>Shelves: OK (${shelf.size()}) </b><br></br></span>"""
 		}
 		
@@ -567,18 +570,18 @@ class ReportsService {
 			   eventErrorList:eventErrorList]
 	}
 	
-	def getModelInfo(moveEventInstance,eventErrorList){
+	def getModelInfo(moveEventInstance,eventErrorList) {
 		Set modelLists = AssetEntity.findAll('from AssetEntity a where a.model.modelStatus = ? and a.model.usize = ? and a.moveBundle.moveEvent =? order by a.model.modelName asc',['new',1,moveEventInstance]).modelName
 		def modelList = []
 		modelList = modelLists.toList()
 		//def modelList = Model.findAllByModelStatusAndUsize('new',1,[sort:'modelName']).modelName
 		def modelError = ''
 		
-		if(modelList.size()>0){
+		if (modelList.size() > 0) {
 			eventErrorList << 'Model'
 			modelError+="""<span style="color: red;margin-left:50px;"><b>${modelList.size()}: un-validated models used : </b><br></br></span>"""
-		}else{
-	    	modelError+="""<span style="color: green;margin-left:50px;"><b>Model: OK  </b><br></br></span>"""
+		} else {
+			modelError+="""<span style="color: green;margin-left:50px;"><b>Model: OK  </b><br></br></span>"""
 		}
 		return[modelList:modelList,modelError:modelError]
 		
@@ -860,7 +863,7 @@ class ReportsService {
 	 * @param eventErrorList
 	 * @return
 	 */
-	def getTaskAnalysisInfo (moveEventInstance, eventErrorList) {
+	def getTaskAnalysisInfo (def moveEventInstance, def eventErrorList, def viewUnpublished = false) {
 		def dfsMap
 		def cyclicalsError = ''
 		def startsError = ''
@@ -872,7 +875,11 @@ class ReportsService {
 		StringBuilder sinksRef = new StringBuilder()
 		StringBuilder cyclicalsRef = new StringBuilder()
 		
-		def tasks = runbookService.getEventTasks(moveEventInstance)
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
+		
+		def tasks = runbookService.getEventTasks(moveEventInstance).findAll{it.isPublished in publishedValues}
 		def deps = runbookService.getTaskDependencies(tasks)
 		def tmp = runbookService.createTempObject(tasks, deps)
 		
@@ -951,8 +958,8 @@ class ReportsService {
 			}
 			
 			
-			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null and (role is null or role='')) and category in (:category)",
-				[ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories] )
+			personTasks = AssetComment.findAll("from AssetComment where moveEvent=:moveEvent and (assignedTo is null and (role is null or role='')) and category in (:category) AND isPublished IN (:publishedValues)",
+				[ moveEvent:moveEventInstance, category:AssetComment.moveDayCategories, publishedValues:publishedValues] )
 			
 			
 			def missedAssignments = personTasks.size()

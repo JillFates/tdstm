@@ -49,7 +49,7 @@
 			<tr>
 				<td></td>
 				<td style="width:auto;">
-					<input type="checkbox" name="viewUnpublished" />
+					<input type="checkbox" name="viewUnpublished" ${viewUnpublished=='1' ? 'checked="checked"' : ''}/>
 					Include Unpublished Tasks
 				</td>
 			</tr>

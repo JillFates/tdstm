@@ -123,14 +123,6 @@
 				alert("Please select an event first.");
 				event.preventDefault();
 			}
-			if ($('#viewUnpublishedCB').size() > 0) {
-				var href = $('#viewtaskgraph_button_graph').attr('href');
-				if (href.indexOf('&viewUnpublished=') != -1) {
-					href = href.replace(/\&viewUnpublished\=[a-z]*/, '');
-					$('#viewtaskgraph_button_graph').attr('href', href);
-				}
-				$('#viewtaskgraph_button_graph').attr('href', href + '&viewUnpublished=' + $('#viewUnpublishedCB').is(':checked'));
-			}
 		};
 
 		function myCustomFormatter (cellVal,options,rowObject) {
@@ -207,7 +199,7 @@
 				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
 				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
 				<tds:hasPermission permission="PublishTasks">
-					<input type="checkbox" id="viewUnpublishedCB" ${ (viewUnpublished=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'viewUnpublished');"/>
+					<input type="checkbox" id="viewUnpublishedCB" ${ (viewUnpublished=='1' ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'viewUnpublished');"/>
 					<b><label for="viewUnpublishedCB" > View unpublished</label></b>&nbsp;&nbsp;
 				</tds:hasPermission>
 

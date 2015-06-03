@@ -330,7 +330,8 @@ class TaskController {
 			if (params.moveEventId && params.moveEventId.isNumber())
 				moveEventId = params.moveEventId
 			
-			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished?.equals("true"))
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
+			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
 			
 			def now = new Date().format('yyyy-MM-dd H:m:s')
 			def styleDef = "rounded, filled"
@@ -509,7 +510,9 @@ digraph runbook {
 			
 			def projectId = project.id
 			
-			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished?.equals("true"))
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
+			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
+			
 			
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
 
@@ -686,17 +689,7 @@ digraph runbook {
 			selectedEventId = eventPref.toLong()
 		}
 		
-		// handle the view unpublished tasks checkbox
-		def viewUnpublished = false;
-		if (params.viewUnpublished?.equals("true")) {
-			def hasPerm = RolePermissions.hasPermission("PublishTasks")
-			if (hasPerm) {
-				viewUnpublished = true;
-			} else {
-				def loginUser = securityService.getUserLogin()
-				log.warn "User ${loginUser} illegally attempted to access unpublished tasks on the task graph"
-			}
-		}
+		def viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
 		
 		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId, viewUnpublished:viewUnpublished]
 	}
@@ -812,7 +805,10 @@ digraph runbook {
 		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
 		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
 		
-		return [moveEvents:moveEvents, selectedEventId:selectedEventId]
+		// handle the view unpublished checkbox
+		def viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
+		
+		return [moveEvents:moveEvents, selectedEventId:selectedEventId, viewUnpublished:viewUnpublished]
 	}
 	
 	// gets the JSON object used to populate the task graph timeline
@@ -825,10 +821,21 @@ digraph runbook {
 			redirect(controller:"project", action:"list")
 			return
 		}
+		
+		// handle the view unpublished checkbox
+		if (params.viewUnpublished && params.viewUnpublished in ['0', '1']) {
+			def viewUnpublishedBoolean = (params.viewUnpublished == '1')
+			userPreferenceService.setPreference("viewUnpublished", viewUnpublishedBoolean.toString())
+		}
+		
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
 
 		// Define default data
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def	defaultEstStart = TimeUtil.nowGMT()
+		def defaultEstStart = TimeUtil.nowGMT()
 		def defaultStartDate = TimeUtil.convertInToUserTZ(defaultEstStart, tzId)
 		def data = [items:[], sinks:[], starts:[], roles:[], startDate:defaultStartDate, cyclicals:[:]]
 
@@ -851,14 +858,14 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		def tasks = runbookService.getEventTasks(me)
+		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
 		def deps = runbookService.getTaskDependencies(tasks)
 		
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
-			if ( !(it.predecessor in tasks) )
+			if ( !(it.predecessor in tasks) && it.predecessor.isPublished in publishedValues)
 				tasks.push(it.predecessor)
-			if ( !(it.successor in tasks) )
+			if ( !(it.successor in tasks) && it.successor.isPublished in publishedValues)
 				tasks.push(it.successor)
 		}
 		tasks.sort { a, b ->
@@ -883,6 +890,8 @@ digraph runbook {
 			estStart = TimeUtil.nowGMT()
 		}
 		def startDate = TimeUtil.convertInToUserTZ(estStart, tzId)
+		
+		
 		
 		// generate the JSON data used by d3
 		def items = []

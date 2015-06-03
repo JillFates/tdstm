@@ -55,9 +55,12 @@
 						<td>
 							${task.assetEntity?.assetName}
 						</td>
-						<td><g:each in="${task.taskDependencies}" var="dep">
-								${dep.predecessor == null ? '' : dep.predecessor.taskNumber + ' ' + dep.predecessor.comment.toString()}
-								<br />
+						<td>
+							<g:each in="${task.taskDependencies}" var="dep">
+								<g:if test="${viewUnpublished || dep.predecessor.isPublished}">
+									${dep.predecessor == null ? '' : dep.predecessor.taskNumber + ' ' + dep.predecessor.comment.toString()}
+									<br />
+								</g:if>
 							</g:each></td>
 						<td>
 							${task.assignedTo}

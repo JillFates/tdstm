@@ -500,8 +500,7 @@ class MoveBundleService {
 	 * @param sheet : sheet-name
 	 * @return void
 	 */
-	def issueExport (def exportList, def columnList, def sheet, def tzId, def startRow = 0 ) {
-		
+	def issueExport (def exportList, def columnList, def sheet, def tzId, def startRow = 0, def viewUnpublished = false) {
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 		for ( int r = startRow; r < (exportList.size() + startRow); r++ ) {
 			for (int c = 0; c < columnList.size(); ++c){
@@ -509,7 +508,10 @@ class MoveBundleService {
 				def attribName = columnList[c]
 				switch (attribName) {
 					case "taskDependencies":
-						cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
+						if (viewUnpublished)
+							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
+						else
+							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".findAll{it.predecessor?.isPublished}.collect({ e -> (e.predecessor == null ? '' : e.predecessor.taskNumber) + ' ' + e.predecessor.comment?.toString()}))
 						break;
 					case "assetEntity":
 						cellValue = exportList[r-startRow]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"?.assetName) : ''

@@ -58,6 +58,10 @@
 				<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
 				&nbsp; <input type="submit" name="Submit Button" id="SubmitButtonId" value="Highlight">
 			</form>
+			<tds:hasPermission permission="PublishTasks">
+				&nbsp;<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" ${ (viewUnpublished=='1' ? 'checked="checked"':'') } onchange="submitForm()" />
+				View Unpublished
+			</tds:hasPermission>
 			<span style="float:right; margin-right:30px;">
 				Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30" size="3"/ style="width:20px;">
 				&nbsp; <input type="checkbox" id="useHeightCheckBoxId" checked="checked"> Use Heights 
