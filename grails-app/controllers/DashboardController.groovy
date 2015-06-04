@@ -65,7 +65,16 @@ class DashboardController {
 			userPreferenceService.loadPreferences("DASHBOARD_REFRESH")
 			def timeToUpdate = getSession().getAttribute("DASHBOARD_REFRESH")
 			def moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = ${moveEvent.id} ORDER BY mb.startTime ")			
-
+		
+			// handle the view unpublished tasks checkbox
+			if (params.containsKey('viewUnpublished')) {
+				if (params.viewUnpublished == '1')
+					userPreferenceService.setPreference("viewUnpublished", 'true')
+				else
+					userPreferenceService.setPreference("viewUnpublished", 'false')
+			}
+			
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 
 			def model = [:]
 			model.project = project
@@ -75,9 +84,10 @@ class DashboardController {
 			model.moveBundleList = moveBundleList
 			model.timeToUpdate = timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : 'never'
 			model.manualOverrideViewPermission = RolePermissions.hasPermission('ManualOverride')
+			model.viewUnpublished = viewUnpublished ? '1' : '0'
 
 			try {
-				def taskSummary = dashboardService.getTaskSummaryModel(moveEvent.id, user, project)
+				def taskSummary = dashboardService.getTaskSummaryModel(moveEvent.id, user, project, 6, viewUnpublished)
 				if (taskSummary)
 					model.putAll(taskSummary)
 			} catch (e) {

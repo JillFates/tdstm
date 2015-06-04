@@ -13,8 +13,7 @@ class DashboardService {
 	 * @param eventId - the event id to retrieve data for
 	 * @return Map the data model
 	 */
-	Map getTaskSummaryModel(eventId, UserLogin user, Project project, maxTeamRows=6) {
-	log.info "test"
+	Map getTaskSummaryModel(eventId, UserLogin user, Project project, def maxTeamRows = 6, def viewUnpublished = false) {
 		Map model = [:]
 		def event
 
@@ -33,7 +32,7 @@ class DashboardService {
 		}
 
 		// Process task summary data
-		def results = taskService.getMoveEventTaskSummary(event)
+		def results = taskService.getMoveEventTaskSummary(event, viewUnpublished)
 		def taskStatusMap = results.taskStatusMap
 		def taskCountByEvent = results.taskCountByEvent
 		def totalDuration = results.totalDuration
@@ -87,7 +86,7 @@ class DashboardService {
 		model.effortRemainDone = effortRemaining('Completed')
 
 		// Process Team information
-		def teamTaskResults = taskService.getMoveEventTeamTaskSummary(event) //use the matrix instead once _taskSummary		
+		def teamTaskResults = taskService.getMoveEventTeamTaskSummary(event, viewUnpublished) //use the matrix instead once _taskSummary		
 		model.roles = teamTaskResults.values()*.role
 		// TODO : John 8/2014 : Shouldn't need the teamTaskMap but something in the view is still using it
 		model.teamTaskMap = teamTaskResults

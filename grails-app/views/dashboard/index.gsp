@@ -21,13 +21,17 @@
 					<g:form action="index" controller="dashboard" name="dashboardForm">
 						<span>
 							<label for="moveEvent"><b>Event:</b> </label>&nbsp;
-							<select id="moveEvent" name="moveEvent" onchange="document.dashboardForm.submit();">
+							<select id="moveEvent" name="moveEvent" onchange="submitForm();">
 								<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 									<option value="${moveEventInstance?.id}">
 										${moveEventInstance?.name}
 									</option>
 								</g:each>
-							</select> 
+							</select>
+							<tds:hasPermission permission="PublishTasks">
+								<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="submitForm();"/>
+								Include Unpublished Tasks
+							</tds:hasPermission>
 						</span>
 					</g:form>
 				</div>
@@ -456,10 +460,22 @@
 			}, 100);
 		});
 		// used to call the function once page loaded
-		getMoveEventNewsDetails($('#moveEvent').val())
-		moveDataSteps()
-		
+		getMoveEventNewsDetails($('#moveEvent').val());
+		moveDataSteps();
 	})
+	
+	function submitForm (event) {
+		if ($('#viewUnpublishedId').is(':checked')) {
+			$('#viewUnpublishedId').attr('value', '1');
+			$('#viewUnpublishedId').attr('checked', 'checked');
+			$('#dashboardForm').submit();
+		} else {
+			$('#viewUnpublishedId').attr('value', '0');
+			$('#viewUnpublishedId').attr('checked', 'checked');
+			$('#dashboardForm').submit();
+			$('#viewUnpublishedId').removeAttr('checked');
+		}
+	}
 	
 	// recalculates the width of the container holding the step columns
 	function setStepsWidth () {

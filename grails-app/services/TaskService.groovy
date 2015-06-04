@@ -4790,22 +4790,22 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param MoveEvent moveEvent object
 	 * @param loadedGroups Map<List> - A mapped list of the taskCounts, tatalDuratin, tasks by status
 	 */
-	Map getMoveEventTaskSummary(MoveEvent moveEvent) {
-		
+	Map getMoveEventTaskSummary(MoveEvent moveEvent, def viewUnpublished = false) {
 		def taskStatusMap =[:]
 		def totalDuration=0
 		def taskCountByEvent = 0
 		
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
 		if (moveEvent) {
-			taskCountByEvent = AssetComment.countByMoveEventAndIsPublished(moveEvent, true)
+			taskCountByEvent = AssetComment.countByMoveEventAndIsPublishedInList(moveEvent, publishedValues)
 			AssetCommentStatus.topStatusList.each{ status ->
-				def tasks = AssetComment.findAllByMoveEventAndStatus(moveEvent, status)
+				def tasks = AssetComment.findAllByMoveEventAndStatusAndIsPublishedInList(moveEvent, status, publishedValues)
 				def timeInMin = tasks?.sum { task ->
-					task.isPublished ? task.durationInMinutes() : 0 
+					task.durationInMinutes()
 				}
-				def countTasks = tasks.sum { task ->
-					task.isPublished ? 1 : 0
-				}
+				def countTasks = tasks.size()
 				countTasks = countTasks ?: 0
 				taskStatusMap << [ (status): [taskCount: countTasks, timeInMin: timeInMin] ]  
 				if (timeInMin)
@@ -4820,13 +4820,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param MoveEvent moveEvent object
 	 * @return loadedGroups Map<List> - A mapped list of the taskCounts, teamTaskDoneCount.
 	 */
-	def getMoveEventTeamTaskSummary(def moveEvent){
+	def getMoveEventTeamTaskSummary(def moveEvent, def viewUnpublished = false){
 		def teamTaskMap =[:]
+		def publishedValues = [true]
+		if (viewUnpublished)
+			publishedValues = [true, false]
 		if (moveEvent) {
 			def roles= getTeamRolesForTasks()
 			roles.each { role ->
-				def teamTask = AssetComment.findAllByMoveEventAndRole(moveEvent, role.id)
-				teamTask = teamTask.findAll{ t -> t.isPublished }
+				def teamTask = AssetComment.findAllByMoveEventAndRoleAndIsPublishedInList(moveEvent, role.id, publishedValues)
 				def teamDoneTask = teamTask.findAll { it.status == 'Completed' }
 				if(teamTask){
 					teamTaskMap << [(role.id): [teamTaskCount:teamTask.size(), teamDoneCount:teamDoneTask.size(), role:role ]]
