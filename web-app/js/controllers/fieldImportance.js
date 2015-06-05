@@ -167,16 +167,22 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 		});
 	}
 	
-	$scope.retriveDefaultImp = function (type){
-		$http({
-			url : contextPath+"/project/retriveDefaultImportance",
-			method: "POST",
-			data:{'entityType':type}
-		}).success (function(resp) {
-			$scope.importance[type]=resp;
-		}).error(function(resp, status, headers, config) {
-			alert("An Unexpected error while showing the asset fields.")
-		});
+	$scope.retriveDefaultImp = function (type) {
+		if (confirm('This action will reset the field highlighting to the defaults. You will still be required to click Update to save the changes. Press Okay to continue or Cancel to abort.'))
+			$http({
+				url : contextPath+"/project/retriveDefaultImportance",
+				method: "POST",
+				data:{'entityType':type}
+			}).success (function(resp) {
+				$(Object.keys(resp)).each(function (i, key) {
+					var label = $('#' + type + '_' + key);
+					var dontReplace = (label.size() > 0) && (label.val().toLowerCase() != key);
+					if (!dontReplace)
+						$scope.importance[type][key] = resp[key];
+				});
+			}).error(function(resp, status, headers, config) {
+				alert("An Unexpected error while showing the asset fields.")
+			});
 	}
 	
 	$scope.helpSection = function (type){

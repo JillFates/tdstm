@@ -22,6 +22,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.math.NumberUtils
+import com.tdsops.common.lang.ExceptionUtil
 
 class ProjectController {
 	def userPreferenceService
@@ -548,26 +549,25 @@ class ProjectController {
 	 */
 	def updateFieldImportance() {
 		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
-		if (! project) 
+		if (! project)
 			return
-
+		
 		def entityType = request.JSON.entityType
 		def allConfig = request.JSON.jsonString as JSON;
-		try{
-			def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType\
-											  ", [project:project, entityType:entityType])
-			if(!assetImp)
+		try {
+			def assetImp = FieldImportance.find("from FieldImportance where project=:project and entityType=:entityType", [project:project, entityType:entityType])
+			if (!assetImp)
 				assetImp = new FieldImportance(entityType:entityType, config: allConfig.toString(), project:project)
-			else{
+			else
 				assetImp.config = allConfig.toString()
-			}
-			if(!assetImp.validate() || !assetImp.save()){
+			if (!assetImp.validate() || !assetImp.save(flush: true)) {
 				def etext = "updateFieldImportance Unable to create FieldImportance"+GormUtil.allErrorsString( assetImp )
 				log.error( etext )
 			}
-		} catch(Exception ex){
-			log.error "An error occurred : ${ex}"
+		} catch(Exception ex) {
+			log.error ExceptionUtil.messageWithStacktrace("Updating FieldImportance", e)
 		}
+		
 		render "success"
 	}
 	/**
