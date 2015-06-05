@@ -72,6 +72,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 								<textarea rows="3" cols="40" id="description" name="description"
+									placeholder="Enter a short description of the project"
 									onkeydown="textCounter(this.id,200);"
 									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
 								<g:hasErrors bean="${projectInstance}" field="description">
