@@ -2299,14 +2299,13 @@ class AssetEntityController {
 		def tasks = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK) 
+			createAlias('assetEntity', 'assetEntity', CriteriaSpecification.LEFT_JOIN)
 			if (params.viewUnpublished.equals("0"))
 				eq("isPublished", true)
-			assetEntity(CriteriaSpecification.LEFT_JOIN) {
-				if (params.assetType)
-					ilike('assetType', "%${params.assetType}%")
-				if (params.assetName)
-					ilike('assetName', "%${params.assetName}%")
-			}
+			if (params.assetType)
+				ilike('assetEntity.assetType', "%${params.assetType}%")
+			if (params.assetName)
+				ilike('assetEntity.assetName', "%${params.assetName}%")
 			if (params.comment)
 				ilike('comment', "%${params.comment}%")
 			if (params.status)
@@ -2364,9 +2363,7 @@ class AssetEntityController {
 			
 			if(sortIndex && sortOrder){
 				if(sortIndex  =='assetName' || sortIndex  =='assetType'){
-					assetEntity {
-						order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
-					}
+					order(new Order('assetEntity.' + sortIndex, sortOrder=='asc').ignoreCase())
 				}else{
 					order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 				}
@@ -2415,6 +2412,8 @@ class AssetEntityController {
 		def dueClass
 		def nowGMT = TimeUtil.nowGMT()
 		def taskPref=assetEntityService.getExistingPref('Task_Columns')
+
+		log.info "EEEEE " + tasks
 
 		def results = tasks?.collect { 
 			def isRunbookTask = it.isRunbookTask()
