@@ -2282,6 +2282,8 @@ class AssetEntityController {
 		
 		def durations = params.duration ? AssetComment.findAll("from AssetComment where project =:project \
 			and duration like '%${params.duration}%'",[project:project])?.duration : []
+			
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 
 		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
 	    def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
@@ -2300,7 +2302,7 @@ class AssetEntityController {
 			eq("project", project)
 			eq("commentType", AssetCommentType.TASK) 
 			createAlias('assetEntity', 'assetEntity', CriteriaSpecification.LEFT_JOIN)
-			if (params.viewUnpublished.equals("0"))
+			if (!viewUnpublished)
 				eq("isPublished", true)
 			if (params.assetType)
 				ilike('assetEntity.assetType', "%${params.assetType}%")
@@ -2413,8 +2415,6 @@ class AssetEntityController {
 		def nowGMT = TimeUtil.nowGMT()
 		def taskPref=assetEntityService.getExistingPref('Task_Columns')
 
-		log.info "EEEEE " + tasks
-
 		def results = tasks?.collect { 
 			def isRunbookTask = it.isRunbookTask()
 			updatedTime =  isRunbookTask ? it.statusUpdated : it.lastUpdated
@@ -2455,7 +2455,13 @@ class AssetEntityController {
 				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
 			}
 			
-			def depCount = TaskDependency.countByPredecessor( it )
+			def deps = TaskDependency.findAllByPredecessor( it )
+			def depCount = 0
+			deps.each {
+				if (viewUnpublished || (it.assetComment?.isPublished && it.predecessor?.isPublished))
+					++depCount
+			}
+			
 			// Have the dependency count be a link to the Task Neighborhood graph if there are dependencies
 			def nGraphUrl = depCount == 0 ? depCount : '<a href="' + HtmlUtil.createLink([controller:'task', action:'taskGraph']) +
 				'?neighborhoodTaskId=' + it.id + '" target="_blank",>' + depCount + '</a>'
