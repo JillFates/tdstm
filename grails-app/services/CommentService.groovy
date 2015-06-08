@@ -209,6 +209,9 @@ class CommentService {
 			if (params.containsKey('role')) {
 				assetComment.role = params.role ?: null
 			}
+			if (params.containsKey('instructionsLink')){
+				assetComment.instructionsLink = params.instructionsLink ?: null
+			}
 			if (assetComment.commentType == 'comment' && params.isResolved?.isNumber()) {
 				if (Integer.parseInt(params.isResolved) == 0) {
 					assetComment.setDateResolved(null)

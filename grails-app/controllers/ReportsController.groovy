@@ -1219,7 +1219,7 @@ class ReportsController {
 		def book = new HSSFWorkbook(new FileInputStream( file ));
 
 		def tasksSheet = book.getSheet("tasks")
-		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'role', 'status',
+		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
 					'estStart','','', 'notes', 'duration', 'estStart','estFinish','actStart', 'actFinish', 'workflow',
 					'dateCreated', 'createdBy', 'moveEvent']
 					
@@ -1254,6 +1254,7 @@ class ReportsController {
 				'taskDependencies': WebUtil.listAsMultiValueString(visibleDependencies.predecessor?.comment) ,
 				"assetEntity":task.assetEntity?.assetName,"comment":task.comment,
 				"assignedTo":task.assignedTo? task.assignedTo.toString():"", "status":task.status,
+				"instructionsLink":task.instructionsLink? task.instructionsLink.toString():"", "instructionsLink":task.instructionsLink,
 				"datePlanned":"","outStanding":"","dateRequired":"", 'workflow':"",
 				"clientName":project?.client?.name,"team":task.role? task.role.toString():"",
 				'projectName':project?.name,'notes':task.notes? WebUtil.listAsMultiValueString(task.notes):"",

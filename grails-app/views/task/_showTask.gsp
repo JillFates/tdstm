@@ -1,5 +1,5 @@
 <div draggable id="showTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" role="dialog" style="width: 1000px" tabindex="-1">
-
+<%@page import="com.tdssrc.grails.HtmlUtil"%>
     <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
         <span id="ui-id-5" class="ui-dialog-title">Task Details</span>
         <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" ng-click="close()">
@@ -53,6 +53,13 @@
                             <a ng-click="getEntityDetails();">{{acData.assetName}}</a>
                         </td>
                     </tr>
+					<tr>
+						 <td class="name"><label for="comment">Instructions Link:</label></td>
+                        <td valign="top" class="value" id="instructionsLinkValueId" colspan="3">
+							<g:set var="instructionsLink" value="{{ac.instructionsLink}}"/>
+							<a ng-href="{{acData.instructionsLinkURL}}">{{acData.instructionsLinkLabel}}<a>
+                        </td>
+					</tr>
                     <tr id="workFlowShow">
                         <td valign="top" class="name"><label for="durationShowId">Duration:</label></td>
                         <td valign="top" class="value"colspan="3" nowrap="nowrap">

@@ -233,7 +233,6 @@ class CustomTagLib {
 		def isUrl = false
 
 		if (text) { 
-
 			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray();
 			UrlValidator urlValidator = new UrlValidator(schemes);
 

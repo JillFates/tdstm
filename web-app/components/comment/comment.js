@@ -138,7 +138,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentTO.commentType == 'comment') ? '/comment/showComment' : '/task/showTask';
 		modal.open({
-			templateUrl: utils.url.applyRootPath(view),
+			templateUrl: utils.url.applyRootPath(view) + '?taskId=' + commentTO.commentId,
 			controller: tds.comments.controller.ShowCommentDialogController,
 			scope: scope,
 			windowClass: ((commentTO.commentType == 'comment') ? 'modal-comment' : 'modal-task'),
@@ -1064,6 +1064,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 			hardAssigned: '0',
 			sendNotification: '0',
 			isResolved: '0',
+			instructionsLink: '',
 			manageDependency: 1,
 			moveEvent: "",
 			mustVerify: 0,
@@ -1101,6 +1102,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		temp.estStart = response.etStart;
 		temp.hardAssigned = ac.hardAssigned ? ac.hardAssigned.toString() : '0';
 		temp.sendNotification = ac.sendNotification ? ac.sendNotification.toString() : '0';
+		temp.instructionsLink = ac.instructionsLink ? ac.instructionsLink.toString() : '';
 		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
 		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
 		temp.mustVerify = ac.mustVerify;
@@ -1559,6 +1561,9 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 					case "assignTask":
 						action = scope.assignTask;
 						break;
+					case "viewInstructions":
+						action = scope.viewInstructions;
+						break;
 					case "changeEstTime":
 						action = scope.changeEstTime;
 						break;
@@ -1598,6 +1603,10 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 						alerts.showGenericMsg();
 					}
 				);
+			};
+			
+			scope.viewInstructions = function(button) {
+				window.open(scope.comment.instructionsLink,'_blank');
 			};
 
 			scope.changeEstTime = function(button) {
@@ -1685,6 +1694,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			assetId: '@assetId',
 			commentId: '@commentId',
 			status: '@status',
+			instructionsLink: '@instructionsLink',
 			master: '@master',
 			idPrefix: '@idPrefix',
 			tableColSpan: '@tableColSpan'
@@ -1694,6 +1704,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 			scope.comment = {};
 			scope.comment.assetEntity = scope.assetId;
 			scope.comment.commentId = scope.commentId;
+			scope.comment.instructionsLink = scope.instructionsLink;
 			scope.comment.status = scope.status;
 			scope.configTable[scope.commentId] = null;
 			scope.actionBarStatus = {
@@ -1807,7 +1818,6 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
 		link: function(scope, element, attrs) {
 			scope.showAll = (scope.prefValue == 'TRUE')?'1':'0';
-			scope.viewUnpublished = (scope.viewUnpublishedValue == 'true') ? '1' : '0';
 			scope.comments = [];
 			scope.applyRootPath = utils.url.applyRootPath;
 			var refreshView = function() {
@@ -1858,6 +1868,7 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
  * Directive gridButtons
  */
 tds.comments.directive.GridButtons = function(utils, commentUtils) {
+
 	return {
 		restrict: 'E',
 		replace: true,

@@ -744,12 +744,11 @@ class MoveEventController {
 			
 			def scheduleSheet = book.getSheet("Schedule")
 			
-			
 			def preMoveColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment','assignedTo', 'status','estStart','','', 'notes',
 					         				'duration', 'estStart','estFinish','actStart',
 					         				'actFinish', 'workflow']
 			
-			def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
+			def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 'instructionsURL' ,'',
 					        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
 				        				]
 

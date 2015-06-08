@@ -1661,6 +1661,9 @@ class AssetEntityController {
 				maxVal = 1
 			}
 			
+			def instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
+			def instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
+			
 			def predecessorTable = ""
             def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
@@ -1726,7 +1729,9 @@ class AssetEntityController {
 				assetType: assetComment.assetEntity?.assetType,
 				assetClass: assetComment.assetEntity?.assetClass.toString(),
 				predecessorList: predecessorList, 
-				successorList: successorList 
+				successorList: successorList,
+				instructionsLinkURL: instructionsLinkURL ?: "",
+				instructionsLinkLabel: instructionsLinkLabel ?: ""
 			]
 		} else {
 		 def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - ${params.id} "
@@ -2473,6 +2478,16 @@ class AssetEntityController {
 				userSelectedCols << ( value?.getClass()?.isEnum() ? value?.value() : value )
 			}
 			
+			def instructionsLinkURL;
+			
+			if(HtmlUtil.isMarkupURL(it.instructionsLink))
+			{
+				instructionsLinkURL = HtmlUtil.parseMarkupURL(it.instructionsLink)[1];
+			}
+			else
+			{
+				instructionsLinkURL = it.instructionsLink;
+			}
 			[ cell: [
 				'',
 				it.taskNumber, 
@@ -2492,7 +2507,8 @@ class AssetEntityController {
 				dueClass, 
 				it.assetEntity?.id, // 16
 				it.assetEntity?.assetType, // 17
-				it.assetEntity?.assetClass.toString() // 18
+				it.assetEntity?.assetClass.toString(), // 18
+				instructionsLinkURL // 19
 				], 
 				id:it.id
 			]

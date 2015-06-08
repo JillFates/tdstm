@@ -27,6 +27,7 @@
 					<th>Related to</th>
 					<th>Predecessor Task(s)</th>
 					<th>Responsible Resource</th>
+					<th>Instructions Link</th>
 					<th>Team</th>
 					<th>Status</th>
 					<th>Date Planned</th>
@@ -64,6 +65,9 @@
 							</g:each></td>
 						<td>
 							${task.assignedTo}
+						</td>
+						<td>
+							<tds:textAsLink text="${task.instructionsLink}" target="_blank"/>
 						</td>
 						<td>
 							${task.role}

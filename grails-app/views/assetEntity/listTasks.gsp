@@ -123,6 +123,14 @@
 				alert("Please select an event first.");
 				event.preventDefault();
 			}
+			if ($('#viewUnpublishedCB').size() > 0) {
+				var href = $('#viewtaskgraph_button_graph').attr('href');
+				if (href.indexOf('&viewUnpublished=') != -1) {
+					href = href.replace(/\&viewUnpublished\=[a-z]*/, '');
+					$('#viewtaskgraph_button_graph').attr('href', href);
+				}
+				$('#viewtaskgraph_button_graph').attr('href', href + '&viewUnpublished=' + $('#viewUnpublishedCB').is(':checked'));
+			}
 		};
 
 		function myCustomFormatter (cellVal,options,rowObject) {
@@ -134,22 +142,26 @@
 			return '<span class="cellWithoutBackground pointer" id="span_'+options.rowId+'" >' + (rowObject[17] ? rowObject[17] : "false") + '</span>';
 		}
 		function taskFormatter(cellVal,options,rowObject) {
-			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
+			return '<span class="cellWithoutBackground pointer" id="' + options.colModel.name + '_'+options.rowId+'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + (cellVal || cellVal == 0 ? cellVal :"") + '</span>';
 		}
 		function statusFormatter(cellVal,options,rowObject){
-			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		 }
 		
 		function updatedFormatter(cellVal,options,rowObject){
-			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
+			 return '<span id="span_'+options.rowId+'" class="cellWithoutBackground '+rowObject[14] +'" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function dueFormatter(cellVal,options,rowObject){
-			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'">' + cellVal + '</span>';
+			return '<span id="span_'+options.rowId+'" class=" '+rowObject[15] +'" master="true" action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[7]+'" instructions-link="'+rowObject[19]+'">' + cellVal + '</span>';
 		}
 		function assetFormatter(cellVal,options,rowObject){
 			return options.colModel.name == "assetName" && cellVal ? '<span class="cellWithoutBackground pointer" onclick= "EntityCrud.showAssetDetailView(\''+rowObject[18]+'\', '+rowObject[16]+')\" >' + (cellVal) + '</span>' :
 				(cellVal || cellVal == 0 ? taskFormatter(cellVal,options,rowObject) : "<span class='cellWithoutBackground pointer'></span>")
 		}
+		
+		function instructionsLinkFormatter(cellVal,options,rowObject){
+			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[19]+'" instructions-link="'+rowObject[7]+'">' + cellVal + '</span>';
+		 }
 		
 		function populateFilter(){
 			$("#gs_comment").val('${comment}')

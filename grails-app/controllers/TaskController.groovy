@@ -263,6 +263,18 @@ class TaskController {
 				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
 			}
 
+			if ( HtmlUtil.isMarkupURL(comment.instructionsLink)  )
+			{
+				actionBar << [label: HtmlUtil.parseMarkupURL(comment.instructionsLink)[0], icon: 'ui-icon-document', actionType: 'viewInstructions', redirect: 'taskManager']
+			}
+			else
+			{
+				if(HtmlUtil.isURL(comment.instructionsLink))
+				{
+				actionBar << [label: 'Instructions...', icon: 'ui-icon-document', actionType: 'viewInstructions', redirect: 'taskManager']
+				}
+			}
+			
 			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
 			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
 				actionBar << [label: 'Delay for:']
@@ -945,7 +957,10 @@ digraph runbook {
 		render( view: "_editTask", model: [])
 	}
 
+	
 	def showTask() {
+		//def instructionsLink = AssetComment.read(params.taskId)?.instructionsLink
+		//log.error instructionsLink
 		render( view: "_showTask", model: [])
 	}
 

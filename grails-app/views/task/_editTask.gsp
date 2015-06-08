@@ -71,6 +71,11 @@
 							<assets-by-type asset-type="ac.assetType" ng-model="ac.assetEntity" is-required="false"></assets-by-type>
 						</td>
 					</tr>
+					<tr class="prop">
+						<td> <label for="instructionsLink">Instructions Link:</td>
+						<td> <input id="instructionsLink" placeholder="Enter URL or Label|URL" value="{{ac.instructionsLink}}" ng-model="ac.instructionsLink" ng-maxlength="255"></input>
+						</td>
+					</tr>
 					<tr class="prop" id="durationEditId">
 						<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>
 						<td valign="top" class="value" colspan="4">
