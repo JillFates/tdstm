@@ -320,7 +320,16 @@ class TaskController {
 				break
 			}
 
-			def depList = taskService.getNeighborhood(taskId, 2, 5)
+			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
+			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
+			
+			// check if the specified task is unpubublished and the user shouldn't see it			
+			if (!viewUnpublished && !rootTask.isPublished) {
+				errorMessage = "Unable to find the specified task"
+				break
+			}
+			
+			def depList = taskService.getNeighborhood(taskId, 2, 5, viewUnpublished)
 			if (depList.size() == 0) {
 				errorMessage = "The task has no interdependencies with other tasks so a map wasn't generated."
 				break
@@ -330,8 +339,6 @@ class TaskController {
 			if (params.moveEventId && params.moveEventId.isNumber())
 				moveEventId = params.moveEventId
 			
-			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
-			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
 			
 			def now = new Date().format('yyyy-MM-dd H:m:s')
 			def styleDef = "rounded, filled"
@@ -409,14 +416,16 @@ digraph runbook {
 			
 			// helper closure to output the count node for the adjacent tasks
 			def outputOuterNodeCount = { taskNode, isPred, count ->
-				log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
-				def cntNode = "C${taskNode.taskNumber}"
-				dotText << "\t$cntNode [id=\"placeholder\" label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n"
-				// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
-				if (isPred) {
-					dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
-				} else {
-					dotText << "\t${taskNode.taskNumber} -> $cntNode;\n"
+				if (viewUnpublished || taskNode.isPublished) {
+					log.info "neighborhoodGraph() outputing edge node ${taskNode.taskNumber}, Predecessor? ${isPred?'yes':'no'}"
+					def cntNode = "C${taskNode.taskNumber}"
+					dotText << "\t$cntNode [id=\"placeholder\" label=\"$count\" tooltip=\"There are $count adjacent task(s)\"];\n"
+					// dotText << "\t$cntNode [label=\"$count\" style=\"invis\" tooltip=\"There are $count adjacent task(s)\"];\n" 
+					if (isPred) {
+						dotText << "\t$cntNode -> ${taskNode.taskNumber};\n"				
+					} else {
+						dotText << "\t${taskNode.taskNumber} -> $cntNode;\n"
+					}
 				}
 			}
 
@@ -531,6 +540,7 @@ digraph runbook {
 				FROM asset_comment t
 				LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
 				LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
+				${viewUnpublished ? '' : ' AND s.is_published=1 '}
 				LEFT OUTER JOIN asset_entity a ON t.asset_entity_id=a.asset_entity_id
 				LEFT OUTER JOIN person ON t.owner_id=person.person_id
 				WHERE t.project_id=${projectId} AND t.move_event_id=${moveEventId} 
@@ -543,7 +553,6 @@ digraph runbook {
 			//log.debug "moveEventTaskGraphSvg() SQL for tasks: $query"
 
 			def tasks = jdbcTemplate.queryForList(query)
-			
 			def roles = []
 			tasks.each { t ->
 				def role = t.role ?: 'NONE'
@@ -609,6 +618,7 @@ digraph runbook {
 				task = (task.size() > 35) ? task[0..34] : task 
 				dotText << "\t${it.task_number} [label=\"${task}\"  id=\"${it.id}\", style=\"$style\", $attribs, tooltip=\"${tooltip}\"];\n"
 				def successors = it.successors
+				
 				if (successors) {
 					successors = (successors as Character[]).join('')
 					successors = successors.split(',')

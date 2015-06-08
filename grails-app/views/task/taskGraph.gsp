@@ -59,6 +59,7 @@
 		
 		$(document).ready(function () {
 			
+			// refresh timer initialization
 			$('#issueTimebar').width("100%")
 			$("#selectTimedBarId").val(${timeToUpdate})			
 			taskManagerTimePref = ${timeToUpdate}
@@ -109,6 +110,7 @@
 					.attr('id','errorMessageDiv');
 				message.html('<br />' + response.responseText);
 				$('#spinnerId').css('display', 'none');
+				$('#exitNeighborhoodId').removeAttr('disabled');
 				return;
 			}
 			

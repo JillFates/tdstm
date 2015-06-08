@@ -1234,19 +1234,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param Integer blocks - the number blocks out that the list should retrieve (default 3)
 	 * @return List<TaskDependency> - the list of tasks dependencies surrounding the task
 	 */
-	def getNeighborhood( taskId, blocksLeft=2, blocksRight=2 ) {
+	def getNeighborhood(taskId, blocksLeft = 2, blocksRight = 2, viewUnpublished = false) {
 		def list = []
 		def findProp	// Is set to the TaskDependency property name used to find the current nodes (e.g. 'predecessor' when looking for successors)
 		def nextProp	// The opposite property name to findProp
 		def findCol		// The db column name that is used to find the adjacent task dep count on the outer edges of the neighborhood
 		//def nextCol		// The DB column name that represents the findCol property in the domain object
 		def depCountName	// The name of the property that will be injected into the edge nodes with the count (predecessorDepCount | successorDepCount)
-
 		// A recursive helper method that will traverse each of the neighbors out the # of blocks passed in
-		def neighbors 
+		def neighbors
 		neighbors = { tId, depth ->
 			// log.info "In the hood $depth for $tId"
-			if (depth > 0) {
+			if (depth > 0 && (viewUnpublished || AssetComment.read(tId)?.isPublished)) {
 				def td = TaskDependency.findAll("from TaskDependency td where td.${findProp}.id=?", [tId])
 				// log.info "Found ${td.size()} going to $predOrSucc"
 				if (td.size() > 0) {
@@ -1291,7 +1290,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 
 					// tnp.metaClass.setProperty('chainPeerTask', assetsLatestTask[tnp.assetEntity.id])
-					list.addAll(td)
+					td.each() { t ->
+						if (viewUnpublished || (t.predecessor?.isPublished && t.assetComment?.isPublished)) {
+							list.add(t)
+						}
+					}
 
 				}
 			}
