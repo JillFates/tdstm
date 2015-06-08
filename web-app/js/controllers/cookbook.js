@@ -712,6 +712,7 @@ tds.cookbook.controller.RecipeDetailController = function(scope, state, statePar
 				defaultView = 'wip';
 			}
 			if(scope.editor.selectedRVersion.hasWIP){
+				defaultView = 'wip';
 				// Only call getWipRecipe if there is the recipe has WIP
 				getWipData(defaultView);
 			}else{
@@ -1680,6 +1681,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	};
 
 	scope.showEditPopup = function() {
+		scope.editor.originalRecipeType = scope.editor.recipeType
 		var modalInstance = modal.open({
 			templateUrl: utils.url.applyRootPath('/components/cookbook/editor/recipe-code-editor-popup-template.html'),
 			controller: tds.cookbook.controller.RecipeCodeEditController,
@@ -1706,19 +1708,26 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 	};
 
 	scope.saveWIP = function() {
-		var tmpObj = angular.copy(scope.editor.selectedRWip);
-		var selectedId = stateParams.recipeId;
-		var selectedVersion = scope.editor.selectedRWip.versionNumber;
-		dataToSend = $.param(tmpObj)
-		cookbookService.saveWIP({details:selectedId}, dataToSend, function(){
-			log.info('Success on Saving WIP');
-			alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
-			scope.getRecipeData('wip');
-			rootScope.$broadcast("refreshRecipes");
-		}, function(){
-			log.warn('Error on Saving WIP');
-			alerts.addAlert({type: 'danger', msg: 'Error: Unable to save WIP'});
-		});
+		var proceedToSave = true
+		if(scope.editor.originalRecipeType && scope.editor.originalRecipeType == 'release' && scope.editor.selectedRecipe.hasWIP){
+			proceedToSave = confirm("There is already a WIP of this recipe. Press Okay to overwrite the existing WIP with this version of the recipe or Cancel to abort.")
+		}
+		if(proceedToSave){
+			var tmpObj = angular.copy(scope.editor.selectedRWip);
+			var selectedId = stateParams.recipeId;
+			var selectedVersion = scope.editor.selectedRWip.versionNumber;
+			dataToSend = $.param(tmpObj)
+			cookbookService.saveWIP({details:selectedId}, dataToSend, function(){
+				log.info('Success on Saving WIP');
+				alerts.addAlert({type: 'success', msg: 'WIP Saved', closeIn: 1500});
+				scope.getRecipeData('wip');
+				rootScope.$broadcast("refreshRecipes");
+			}, function(){
+				log.warn('Error on Saving WIP');
+				alerts.addAlert({type: 'danger', msg: 'Error: Unable to save WIP'});
+			});	
+		}
+		
 	};
 	
 	// Release
