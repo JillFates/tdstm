@@ -187,6 +187,7 @@ g.blackText.selected text {
 	margin-top: 3px;
 	background-color: white;
 	position: absolute;
+	width: 175px;
 }
 
 #legendDivId {

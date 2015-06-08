@@ -43,7 +43,7 @@
 								<td><b>Databases</b></td>
 							</tr>
 							<tr class="even compactClass">
-								<td><b>Storage</b></td>
+								<td><b>Storage (all)</b></td>
 							</tr>
 						</table>
 					</div>

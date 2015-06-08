@@ -6,7 +6,7 @@
 		</tr>
 	</table>
 </span>
-<div id="controlPanel" style="width: 160px;display: ${(showControls=='controls')?('block'):('none')};">
+<div id="controlPanel" style="display: ${(showControls=='controls')?('block'):('none')};">
 	<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
 		<tr>
 			<td style="padding: 3px 3px;" colspan="2"><h3>Control Panel</h3></td>
