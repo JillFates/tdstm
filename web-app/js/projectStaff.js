@@ -143,14 +143,16 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 				//scope.staffingTablestaffingTable = response.data;
 				$("#orderBy").val(orderBy)
 				$("#sortOn").val(sortOn)
+				$(window).scroll();
 
 
 			},
 			function(response){
 				tdsCommon.displayWsError(response, 'Error: An error occurred loading persons.', alerts);
+				$(window).scroll();
 			}
 		);
-
+		
 	}
 
 }

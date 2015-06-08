@@ -1,12 +1,12 @@
 <table id="staffingTable">
 	<thead>
-		<tr>
+		<tr id="headerRowId">
 			<th style="cursor: pointer;" ng-click="toggleSortOrder('fullName','fullName')">Name</th>
 			<th style="cursor: pointer;" ng-click="toggleSortOrder('company','company')">Company</th>
 			<th style="cursor: pointer;" ng-click="toggleSortOrder('team','team')">Team</th>
 			<g:if test="${projectId == 0}"> <th>Project</th></g:if>
 			<g:else><th>${project?.name}</th></g:else>
-			<g:each in ="${moveEventList}" var="moveEvent" >
+			<g:each in="${moveEventList}" var="moveEvent" >
 			<th>
 				${moveEvent.project}<br/>
 				${moveEvent.name}<br/>
@@ -65,7 +65,7 @@
 							<g:set var="inMoveEvent" value="${(projectStaff.moveEvents.tokenize(',').contains(moveEvent.id.toString()))}" />
 							<td id="${moveEvent.id}" class="${(inMoveEvent)?('checkedStaff'):('')}" nowrap="nowrap" title="${moveEvent.project} - ${moveEvent.name} - ${moveEvent.startTime}">
 								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"' }
-									ng-click="saveEventStaff2($event)""  ng-checked="${inMoveEvent}"
+									ng-click="saveEventStaff2($event)"  ng-checked="${inMoveEvent}"
 									value="${(inMoveEvent)?(1):(0)}" 
 									${(inMoveEvent)?('checked="checked"'):('')} />
 							</td>

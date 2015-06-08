@@ -11,7 +11,7 @@
 		<g:javascript src="angular/plugins/angular-resource.js" />
 		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}"></script>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
@@ -67,7 +67,8 @@
 							<input type="checkbox" name="assigned" id="assignedId"  ng-change = "loadFilteredStaff('fullName','staff')"
 								ng-model="onlyAssigned" ng-init="onlyAssigned=${assigned == 1}"/>
 					</td>
-					<%--<td>
+					<%--
+					<td>
 						<span><b>Location</b></span><br/>
 						<label for="location">
 							<g:select id="location" name="location"  from="${['All', 'Local']}"  value="${currLoc }" onChange="loadFilteredStaff('lastName','staff')"></g:select>
@@ -89,7 +90,8 @@
 							</select>
 						</label>
 					</td>
-					<%--<td>
+					<%--
+					<td>
 						<table style="border: 0px">
 							<tr>
 								<td><b>Phases</b></td>
@@ -131,11 +133,12 @@
 							 <option value="6"> 6 Month </option>
 							</select>
 						</label>
-					</td>--%>
+					</td>
+					--%>
 				</tr>
 			</table>
 			<br/>
-			<input type="hidden" id="manageStaff" value="manageStaff">
+			<input type="hidden" id="manageStaff" value="manageStaff" />
 			<div id="projectStaffTableId">
 				<g:render template="projectStaffTable"></g:render>
 			</div>
@@ -146,8 +149,19 @@
 			$(document).ready(function() {
 				$("#scale").val(${currScale})
 				$("#personGeneralViewId").dialog({ autoOpen: false })
+				
+				// handle the scrolling header
+				$(window).scroll( function() {
+					handleHeader();
+				});
+				handleHeader();
 			})
 			
+			function handleHeader () {
+				var scrollLimit = $('#staffingTable').offset().top;
+				var header = $('#headerRowId');
+				handleHeaderPositionGeneral(scrollLimit, header);
+			}
 			
 	 	</script>
 	 </body>
