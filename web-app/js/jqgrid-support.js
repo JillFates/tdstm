@@ -107,11 +107,36 @@ function initCheck() {
 	$('.cbox').change(validateMergeCount)
 }
 
+// handles positioning of the header on non-jqgrid tables
+function handleHeaderPositionGeneral (scrollLimit, header) {
+	var scroll = $(document).scrollTop();
+	
+	if (scroll > scrollLimit) {
+		freezeHeaderGeneral(header);
+	} else {
+		unfreezeHeaderGeneral(header);
+	}
+}
 
+// Freezes the header at the top of the window for non-jqgrid tables
+function freezeHeaderGeneral (header) {
+	if (header.parent().children('.floatingHeader').size() == 0) {
+		var clone = header.clone();
+		clone.attr('class', 'floatingHeader');
+		clone.css('left', $(header.children()[0]).offset().left - 2 + 'px');
+		header.children().each(function (a, b) {
+			if (clone.children().size() > a) {
+				$(clone.children()[a]).width($(b).width());
+				$(clone.children()[a]).on('click', function () {
+					b.click();
+				});
+			}
+		});
+		header.parent().append(clone);
+	}
+}
 
-
-
-
-
-
-
+// Unfreezes the header and returns it to its regular position for non-jqgrid tables
+function unfreezeHeaderGeneral (header) {
+	$('.floatingHeader').remove();
+}

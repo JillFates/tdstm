@@ -1,9 +1,9 @@
 
 <!-- Assets edit template -->
 
-<div ng-show="editMode(type.name)">
+<div ng-show="editMode(type.name)" class="fieldsPane">
 	<table>
-		<tr>
+		<tr id="buttonRowId">
 			<td colspan="10" class="buttons">
 				<div>
 					<span class="button">
@@ -14,7 +14,7 @@
 				</div>
 			</td>
 		</tr>
-		<tr>
+		<tr id="headerRowId">
 			<th>Field</th>
 			<th ng-repeat="phase in phases">{{phase.label}}</th>
 			<th>Help Text</th>

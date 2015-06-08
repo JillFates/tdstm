@@ -9,6 +9,8 @@
 	<%--TODO:the following bootstrap contains few extra methods which is usefull for angular bootstrap,once testing entire application with this js I will replace it with bootstrap.js--%>
 	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
 	<g:javascript src="controllers/fieldImportance.js" />
+	<jqgrid:resources />
+	<g:javascript src="jqgrid-support.js" />
 	<link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap-tabs.css')}" type="text/css"/>
 </head>
 <body>
@@ -61,6 +63,15 @@
 	currentMenuId = "#projectMenu";
 	$("#projectMenuId a").css('background-color','#003366')
 	$(".legend").css('margin-left',$(window).width()-375+"px")
+	
+	// handle the scrolling header
+	$(window).scroll( function() {
+		var headTable = $('.tab-pane.active .fieldsPane:not(.ng-hide) #buttonRowId');
+		var scrollLimit = headTable.offset().top + headTable.height();
+		var header = $('.tab-pane.active .fieldsPane:not(.ng-hide) #headerRowId');
+		handleHeaderPositionGeneral(scrollLimit, header);
+	});
 	</script>
+	
 </body>
 </html>

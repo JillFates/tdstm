@@ -1602,3 +1602,11 @@ div.centered {
 #tasksAndCommentsLabelId {
 	display: inline;
 }
+
+#headerRowId {
+	background-color: #ffffff;
+}
+.floatingHeader {
+	position: fixed;
+	top: 0px;
+}
