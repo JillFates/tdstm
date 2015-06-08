@@ -148,9 +148,10 @@ class DashboardController {
 		
 		def id = params.id
 		def currentProject = securityService.getUserCurrentProject()
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 
 		try {
-			def model = dashboardService.getTaskSummaryModel(id, loginUser, currentProject)
+			def model = dashboardService.getTaskSummaryModel(id, loginUser, currentProject, 6, viewUnpublished)
 			render(template: 'taskSummary', model:model)
 		} catch (e) {
 			render e.getMessage()

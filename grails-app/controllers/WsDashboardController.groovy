@@ -10,6 +10,7 @@ class WsDashboardController {
 	def jdbcTemplate
 	def securityService
 	def taskService
+	def userPreferenceService
 
 	/**
 	 * This control returns the data used to render the Event Dashboard including the work flow steps and the statistics of 
@@ -25,7 +26,9 @@ class WsDashboardController {
 		def moveBundleId = params.id
 		def moveEvent
 		def moveBundle
-
+		
+		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
+		
 		// Validate that the user is legitly accessing the proper move event
 		if (! moveEventId.isNumber() ) {
 			error = "Move event id is invalid"
@@ -88,10 +91,11 @@ class WsDashboardController {
 					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
 					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
 					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wft.trans_id
-					WHERE a.move_bundle_id = ${moveBundleId} AND t.move_event_id = ${moveEventId} AND t.is_published = 1
+					WHERE a.move_bundle_id = ${moveBundleId} AND t.move_event_id = ${moveEventId} ${viewUnpublished ? '' : 'AND t.is_published = 1'}
 					GROUP BY t.workflow_transition_id;
 				"""
 
+				
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 
 				// log.info "bundleData() SQL = $taskStatsSql"

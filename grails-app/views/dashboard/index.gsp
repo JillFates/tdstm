@@ -30,7 +30,7 @@
 							</select>
 							<tds:hasPermission permission="PublishTasks">
 								<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="submitForm();"/>
-								Include Unpublished Tasks
+								View Unpublished
 							</tds:hasPermission>
 						</span>
 					</g:form>
