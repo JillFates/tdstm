@@ -1610,3 +1610,7 @@ div.centered {
 	position: fixed;
 	top: 0px;
 }
+
+#buildInfoId {
+	float: left;
+}
