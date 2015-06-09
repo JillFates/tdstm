@@ -359,7 +359,7 @@
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
-									noSelection="['':'Please Select']">
+									noSelection="['stdprocess':'STD_PROCESS']">
 								</g:select><br><br>
 								<span class="name">
 									<label for="runbookOn">Runbook Driven:&nbsp;</label>
