@@ -14,28 +14,25 @@ class AuthController {
 	def auditService
 	def securityService
 	def userPreferenceService
+	def environmentService
 
 	def index() { redirect(action: 'login', params: params) }
 
 	def login() {
 		// Get the various security setup settings
+		// Adding the X-Login-URL header so that we can catch it in Ajax calls
+		def url = HtmlUtil.createLink([controller:'auth', action:'login', absolute:true])
+		response.setHeader('X-Login-URL', url)
 
-		def redirectURL = session.REDIRECT_URL
-		if (!redirectURL) {
-			// Adding the X-Login-URL header so that we can catch it in Ajax calls
-			def url = HtmlUtil.createLink([controller:'auth', action:'login', absolute:true])
-			response.setHeader('X-Login-URL', url)
-
-			def s = securityService.getLoginConfig()
-			return [ 
-				username:params.username, 
-				authority:params.authority, 
-				rememberMe:(params.rememberMe != null), 
-				loginConfig:securityService.getLoginConfig()
-			]
-		} else {
-			redirect( url:redirectURL )
-		}
+		def s = securityService.getLoginConfig()
+		def buildInfo = environmentService.getVersionText()
+		return [ 
+			username:params.username, 
+			authority:params.authority, 
+			rememberMe:(params.rememberMe != null), 
+			loginConfig:securityService.getLoginConfig(),
+			buildInfo:buildInfo
+		]
 	}
 
 	def signIn() {

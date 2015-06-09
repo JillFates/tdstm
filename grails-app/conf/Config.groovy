@@ -114,49 +114,49 @@ grails.mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail
 log4j = {
 	// Configure classes to log at the various logging levels (defaulting to error)
 	error 'org.codehaus.groovy.grails.web.servlet',  //  controllers
-		  'org.codehaus.groovy.grails.web.pages', //  GSP
-		  'org.codehaus.groovy.grails.web.sitemesh', //  layouts
-		  'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-		  'org.codehaus.groovy.grails.web.mapping', // URL mapping
-		  'org.codehaus.groovy.grails.commons', // core / classloading
-		  'org.codehaus.groovy.grails.plugins', // plugins
-		  'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
-		  'org.springframework',
-		  'net.sf.ehcache.hibernate',
-		  'grails.app.services.org.grails.plugin.resource',
-		  'grails.app.taglib.org.grails.plugin.resource',
-		  'grails.app.resourceMappers.org.grails.plugin.resource'
+		'org.codehaus.groovy.grails.web.pages', //  GSP
+		'org.codehaus.groovy.grails.web.sitemesh', //  layouts
+		'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+		'org.codehaus.groovy.grails.web.mapping', // URL mapping
+		'org.codehaus.groovy.grails.commons', // core / classloading
+		'org.codehaus.groovy.grails.plugins', // plugins
+		'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
+		'org.springframework',
+		'net.sf.ehcache.hibernate',
+		'grails.app.services.org.grails.plugin.resource',
+		'grails.app.taglib.org.grails.plugin.resource',
+		'grails.app.resourceMappers.org.grails.plugin.resource'
 	// trace 'org.hibernate'
 	// debug 'org.hibernate'
 	// info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
 	// off 'org.hibernate'
  
 	appenders {
-	   def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
-	   def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
-	   def logDirectory = 'target'
-	   if (System.properties.getProperty('catalina.base')) {
-		   logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
-	   }
+		def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"
+		def auditPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} - %m%n"
+		def logDirectory = 'target'
+		if (System.properties.getProperty('catalina.base')) {
+			logDirectory = "${System.properties.getProperty('catalina.base')}/logs"
+		}
  
-	   // Use this if we want to modify the default appender called 'stdout'.
-	   console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
+		// Use this if we want to modify the default appender called 'stdout'.
+		console name:'stdout', layout:pattern(conversionPattern: '[%t] %-5p %c{2} %x - %m%n')
  
-	   // Application log file
-	   rollingFile name:'applicationLog',
-			   file:"${logDirectory}/${appName}.log",
-			   maxFileSize:'500MB',
-			   maxBackupIndex:7,
-			   layout:pattern(conversionPattern: commonPattern)
+		// Application log file
+		rollingFile name:'applicationLog',
+				file:"${logDirectory}/${appName}.log",
+				maxFileSize:'500MB',
+				maxBackupIndex:7,
+				layout:pattern(conversionPattern: commonPattern)
  
-	   // Stacktrace log file
-	   // Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
-	   // 'null' name:'stacktrace'
-	   rollingFile name:'stacktraceLog',
-			   file:"$logDirectory/${appName}-stacktrace.log",
-			   maxFileSize:'500MB',
-			   maxBackupIndex:7,
-			   layout:pattern(conversionPattern: commonPattern)
+		// Stacktrace log file
+		// Use the 'null' line only, if we want to prevent creation of a stacktrace.log file.
+		// 'null' name:'stacktrace'
+		rollingFile name:'stacktraceLog',
+			file:"$logDirectory/${appName}-stacktrace.log",
+			maxFileSize:'500MB',
+			maxBackupIndex:7,
+			layout:pattern(conversionPattern: commonPattern)
 
 		// Audit log file
 		rollingFile name:'auditLog',
@@ -168,7 +168,7 @@ log4j = {
 	
 	// Set the logging level for the various log files:
 	info 'stdout', 'applicationLog'
-	//     , auditLog:'grails.app.service.AuditService',
+	//	, auditLog:'grails.app.service.AuditService',
 
 	info additivity: false
 	//additivity.grails=false
@@ -177,6 +177,9 @@ log4j = {
 
 //Maintenance file path
 tdsops.maintModeFile = "/tmp/tdstm-maint.txt"
+
+//Build number file path
+tdsops.buildFile = "/WEB-INF/tdstm/build.txt"
 
 // Audit configuration, valid options are: access and activity (default is access)
 // access: logging will include login, logout and security violations
