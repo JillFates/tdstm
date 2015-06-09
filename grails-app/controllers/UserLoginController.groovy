@@ -393,25 +393,14 @@ class UserLoginController {
 			render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance, companyId:companyId ])
 		}
 	}
-	/*======================================================
-	 *  Update recent page load time into userLogin
-	 *=====================================================*/
-	def updateLastPageLoad() {
-		def principal = SecurityUtils.subject?.principal
-		if( principal ){
-			def userLogin = UserLogin.findByUsername( principal )
-			userLogin.lastPage = TimeUtil.nowGMT()
-			userLogin.save(flush:true)
-			session.REDIRECT_URL = params.url
-		}
-		render "SUCCESS"
-	}
+	
 	def changePassword() {
 		def principal = SecurityUtils.subject?.principal
 		def userLoginInstance = UserLogin.findByUsername(principal)
 		render(view:'changePassword',model:[ userLoginInstance:userLoginInstance])
 		return [ userLoginInstance : userLoginInstance]
 	}
+	
 	def updatePassword() {
 		def subject = SecurityUtils.subject
 		def principal = subject.principal

@@ -1,9 +1,11 @@
 import org.apache.shiro.SecurityUtils
 
+
 class AuthFilters {
 	// List of controllers that we need to validate authorization on
 	static webSvcCtrl = ['moveEventNews', 'wsDashboard']
-  
+	def userService
+	
 	def filters = {
 	
 		newAuthFilter(controller:'*', action:'*') {
@@ -42,6 +44,9 @@ class AuthFilters {
 					}
 				}
 			} // before
+			after = {
+				userService.updateLastPageLoad()
+			}
 		} // uuidFilter
 	} // class
 }

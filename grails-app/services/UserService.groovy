@@ -10,14 +10,19 @@ import com.tdsops.common.exceptions.ConfigurationException
 import org.apache.shiro.authc.AccountException
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import org.apache.shiro.SecurityUtils;
 import org.apache.commons.lang.math.NumberUtils
 import com.tds.asset.AssetComment
 import com.tds.asset.Application
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.common.security.SecurityConfigParser
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.context.ApplicationContext
+import grails.util.Holders
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.transaction.TransactionDefinition
 
-
-class UserService {
+class UserService implements InitializingBean {
 	
 	// IoC
 	def personService
@@ -27,6 +32,10 @@ class UserService {
 	def projectService
 	def securityService
 
+	// The following vars are initialized in afterPropertiesSet after IoC
+	def ctx
+	def sessionFactory
+	
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
 	 */
@@ -42,6 +51,18 @@ class UserService {
 	}
 	 */
 
+	/**
+	 * This is a post initialization method to allow late configuration settings to occur
+	 */
+	public void afterPropertiesSet () throws Exception {
+
+		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
+		// Initialize some class level variables used repeatedly by the application
+		
+		ctx = Holders.grailsApplication.mainContext
+		sessionFactory = ctx.sessionFactory
+	}
+	 
 	/**
 	 * Used to find a user or provision the user based on the settings in the configuration file
 	 * which is used by the AD and SSO integration.
@@ -586,5 +607,17 @@ class UserService {
 		}
 		
 		return recentLogin
+	}
+	
+	// Updates the lastPage time for the current user
+	def updateLastPageLoad () {
+		def principal = SecurityUtils.subject?.principal
+		if (principal) {
+			UserLogin.withTransaction ([propagationBehavior: TransactionDefinition.PROPAGATION_REQUIRES_NEW]) {
+				def userLogin = UserLogin.findByUsername(principal)
+				userLogin.lastPage = TimeUtil.nowGMT()
+				userLogin.save(flush:true)
+			}
+		}
 	}
 }

@@ -16,7 +16,6 @@
 				$("#personDialog").dialog({ autoOpen: false });
 				$("#userPrefDivId").dialog({ autoOpen: false });
 
-				${remoteFunction(controller:'userLogin', action:'updateLastPageLoad', params:'\'url=\' + currentURL ')};
 				// Due to some issue with textarea overriding the value at intial load
 				$('textarea').each(function(){
 					$(this).val($(this).text());
