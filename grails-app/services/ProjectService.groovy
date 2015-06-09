@@ -224,9 +224,9 @@ class ProjectService {
 	 * @return
 	 */
 	def generateDefaultConfig(def type){
-		def defautlProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
+		def defaultProject = Project.findByProjectCode("TM_DEFAULT_PROJECT")
 		def returnMap = [:]
-		def data = FieldImportance.findByProjectAndEntityType(defautlProject,type)?.config
+		def data = FieldImportance.findByProjectAndEntityType(defaultProject,type)?.config
 		def phases = ValidationType.getListAsMap().keySet()
 		if(data)
 			returnMap=JSON.parse(data)
