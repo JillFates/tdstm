@@ -517,7 +517,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.commentInfo = []
 
-	$scope.commentInfo.currentAsset = parseInt($scope.ac.assetEntity)
+	$scope.commentInfo.currentAsset = parseInt($scope.ac.assetEntity ? $scope.ac.assetEntity : $scope.acData.assetId)
 
 	$scope.commentInfo.assetClasses = []
 
@@ -536,7 +536,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		$scope.commentInfo.assetClasses = data
 	});
 
-	commentService.getClassForAsset($scope.ac.assetEntity).then(function(data){
+	commentService.getClassForAsset($scope.commentInfo.currentAsset).then(function(data){
 		$scope.commentInfo.currentAssetClass = data
 		commentService.getAssetsByClass(data).then(function(data2){
 			$scope.commentInfo.assets = data2
@@ -673,7 +673,8 @@ tds.comments.service.CommentService = function(utils, http, q) {
 	 */
 	var getClassForAsset = function(assetId){
 		var deferred = q.defer()
-		http.get(utils.url.applyRootPath('/assetEntity/classForAsset?id='+assetId)).
+		if(assetId){
+			http.get(utils.url.applyRootPath('/assetEntity/classForAsset?id='+assetId)).
 	
 			success(function(data, status, headers, config) {
 				deferred.resolve(data.data.assetClass);
@@ -681,7 +682,11 @@ tds.comments.service.CommentService = function(utils, http, q) {
 			error(function(data, status, headers, config) {
 				deferred.reject(data);
 			}
-		);
+		);	
+		}else{
+			deferred.resolve([])
+		}
+		
 		
 		return deferred.promise
 	}
@@ -1241,7 +1246,10 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 	};
 
 	var assetTO = function(assetId, assetType) {
-		var tempAssetType = getRealAssetType(assetType);
+		var tempAssetType = null
+		if(assetType){
+			tempAssetType = getRealAssetType(assetType);
+		}
 		return {
 			assetId: assetId,
 			assetType: tempAssetType
