@@ -15,6 +15,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -525,6 +526,20 @@ class MoveBundleService {
 						break;
 					case "notes":
 						cellValue = exportList[r-startRow].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[r-startRow].notes)) : ''
+						break;
+					case "instructionsURL":
+						def instructionsString = exportList[r-startRow].instructionsLink;
+						def instructionsURL;
+						
+						if(HtmlUtil.isURL(instructionsString))
+						{
+							instructionsURL = instructionsString;
+						}
+						else if(HtmlUtil.isMarkupURL(instructionsString))
+						{
+							instructionsURL = HtmlUtil.parseMarkupURL(instructionsString)[1];
+						}
+						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(instructionsURL) : ''
 						break;
 					case "workflow":
 						cellValue = exportList[r-startRow].workflowTransition ? String.valueOf(exportList[r-startRow].workflowTransition?.name) : ''
