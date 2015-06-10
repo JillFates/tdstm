@@ -604,8 +604,8 @@ digraph runbook {
 			style = styleDef
 
 			tasks.each {
-				def task = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
-				def tooltip  = "${it.task_number}:" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(it.task).replaceAll(/\n/,'').replaceAll(/\r/,'')
+				def task = "${it.task_number}:" + it.task.encodeAsJSON()
+			    def tooltip  = "${it.task_number}:" + it.task.encodeAsJSON()
 				def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
 				
 				fillcolor = taskService.taskStatusColorMap[colorKey][1]
