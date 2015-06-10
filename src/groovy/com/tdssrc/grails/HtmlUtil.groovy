@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import org.apache.commons.validator.UrlValidator
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 
@@ -114,7 +115,76 @@ class HtmlUtil {
 	def public static createLink(map) {
 		g.createLink(map).toString()
 	}
+	
+	/**
+	* Used to detirmine whether or not a string is in URL format
+	* @param input to be checked for correct format
+	* @return boolean value for whether or not the string is in URL format
+	*/
+	public static boolean isURL(String input)
+	{
+		def isUrl = false
+		def label
+		
+		if (input) { 
 
+			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray();
+			UrlValidator urlValidator = new UrlValidator(schemes);
+
+			return urlValidator.isValid(input)
+			
+		}
+		return false
+	}
+	
+	public static boolean isMarkupURL(String input)
+	{
+		def isValidURL = false
+		def url
+		def label
+		// Attempt to split the URL from the label
+		if(input)
+		{
+			def tokens = input.tokenize('|')
+			url = tokens.size() > 1 ? tokens[1] : tokens[0]
+			label = tokens[0]
+			isValidURL = isURL(url)
+			if(isValidURL && label && label != url)
+			{
+				return true
+			}
+			else
+			{
+				return false
+			}
+		}
+		return false
+	}
+	
+	public static String[] parseMarkupURL(String input)
+	{
+		def isValidMarkupURL = false
+		def url
+		def label
+		if(input)
+		{
+			 isValidMarkupURL = isMarkupURL(input)
+			 
+			 if(isValidMarkupURL)
+			{
+				def tokens = input.tokenize('|')
+				url = tokens.size() > 1 ? tokens[1] : tokens[0]
+				label = tokens[0]
+				return [label,url]
+			}else if(isURL(input))
+			{
+				return [input,input]
+			}
+			
+		}
+		return ["",""]
+	}
+	
 	/** 
 	 * Used to create a Grails resource
 	 * @param map of the parameters
