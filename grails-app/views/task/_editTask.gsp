@@ -66,9 +66,8 @@
 					<tr>
 						<td valign="top" class="name"><label for="asset">Asset:</label></td>
 						<td valign="top">
-							<tds:select id="asset" name="asset" ng-model="ac.assetType" from="['Application','Server','Database','Storage','Other']" datasource="ds.assetTypes">
-							</tds:select>
-							<assets-by-type asset-type="ac.assetType" ng-model="ac.assetEntity" is-required="false"></assets-by-type>
+							<select ng-model="commentInfo.currentAssetClass" ng-change="assetClassChanged()" ng-options="assetClass.key as assetClass.label for assetClass in commentInfo.assetClasses"></select>
+							<select ng-model="commentInfo.currentAsset"  ng-options="asset.id as asset.name for asset in commentInfo.assets"></select>
 						</td>
 					</tr>
 					<tr class="prop">

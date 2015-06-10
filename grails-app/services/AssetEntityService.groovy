@@ -133,6 +133,99 @@ class AssetEntityService {
 
 	def jdbcTemplate
 
+
+	/** 
+	 * This map contains a key for each asset class and a list of their
+	 * related asset types.
+	 */
+	static typesInfoByClassMap = [
+				'APPLICATION': 		[ assetClass: AssetClass.APPLICATION, domain: Application ],
+				'SERVER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
+				'DATABASE': 		[ assetClass: AssetClass.DATABASE, domain: Database ],
+				'NETWORK-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNetworkDeviceTypes() ],
+				// 'NETWORK-LOGICAL': 	[],
+				'STORAGE-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getStorageTypes() ],
+				'STORAGE-LOGICAL': 	[ assetClass: AssetClass.STORAGE, domain: Files ],
+				'OTHER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ],
+			]
+
+
+	/**
+	 * This method returns a list of the different asset classes.
+	 */
+	 def getAssetClasses(){
+	 	return AssetClass.getClassOptions()
+	 }
+
+	/**
+	 * This method returns the assets for the given class name.
+	 * @param params: map of parameters to query for assets. Keys: assetClass, page, max.
+	 * @param limitResults: boolean to indicate that pagination/limit/offset are required.
+	 */
+	def getAssetsByClass(Map params, boolean limitResults = false){
+		def results = []
+		def project = securityService.getUserCurrentProject()
+		def additionalFilters = [sort:'assetName']
+		
+		// We'll query for assets if there's a valid asset class (and project).
+		if (project && typesInfoByClassMap.containsKey(params.assetClass)) {
+
+			def typeInfo = typesInfoByClassMap[params.assetClass]
+			def assetClass = typeInfo.assetClass
+			
+			// Checks if paging is required.
+			if(limitResults){
+				def max = 10
+				if (params.containsKey('max') && params.max.isInteger()) {
+					max = Integer.valueOf(params.max)
+					if (max > 25)
+						max = 25
+				}
+				def currentPage = 1
+				if (params.containsKey('page') && params.page.isInteger()) {
+					currentPage = Integer.valueOf(params.page)
+					if (currentPage == 0)
+						currentPage = 1
+				}
+				additionalFilters["max"] = max
+				additionalFilters["offset"] = currentPage == 1 ? 0 : (currentPage - 1) * max
+			}
+
+			// TODO: We should include more fields.
+			StringBuffer query = new StringBuffer("SELECT a.id as id, a.assetName as text")
+
+			StringBuffer fromQuery = new StringBuffer(" FROM ")
+									.append(typeInfo.domain.name)
+									.append(" AS a")
+
+			StringBuffer whereQuery = new StringBuffer(" WHERE a.project=:project AND a.assetClass=:assetClass") 
+			
+			def qparams = [project:project, assetClass:typeInfo.assetClass]
+
+			def doJoin = typeInfo.containsKey('assetType')
+			def notIn = typeInfo.containsKey('notIn') && typeInfo.notIn
+			
+			if (doJoin) {
+				if (notIn) {
+					fromQuery.append(" LEFT OUTER JOIN a.model AS m")
+					whereQuery.append(" AND COALESCE(m.assetType,'') NOT")
+				} else {
+					fromQuery.append(" JOIN a.model AS m")
+					whereQuery.append(" AND m.assetType ")
+				}
+				whereQuery.append(' IN (:assetType)')
+				qparams.assetType = typeInfo.assetType
+			}
+				
+			query.append(fromQuery).append(whereQuery)
+			def assets = typeInfo.domain.executeQuery(query.toString(), qparams, additionalFilters)
+			assets.each{a -> results << [id: a[0], name: a[1]]}
+			return results
+		}
+		
+		return results
+	}
+
 	/**
 	 * Constructor
 	 */

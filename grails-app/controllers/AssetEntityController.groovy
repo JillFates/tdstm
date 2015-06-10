@@ -3762,6 +3762,7 @@ class AssetEntityController {
 		render(template:'deviceChassisSelect', model:[options:options, domId:rackDomId, domName:rackDomName, domClass:domClass, value:id, forWhom:forWhom, sourceTarget:sourceTarget, tabindex:tabindex])
 	}
 
+
 	def retrieveAssetsByType() {
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
@@ -3812,7 +3813,29 @@ class AssetEntityController {
 			ServiceResults.internalError(response, log, e)
 		}
 	}
+
+	/**
+	 * This service retrieves all the assets for a given asset class.
+	 */
+	def assetsByClass(){
+		def results = assetEntityService.getAssetsByClass(params)
+		render(ServiceResults.success(results) as JSON)
+	}
 	
+
+	def assetClasses(){
+		def classes = assetEntityService.getAssetClasses()
+		def results = []
+		classes.each{ k,v -> results << [key:k, label:v]}
+		render(ServiceResults.success(results) as JSON)
+	}
+
+	def classForAsset(){
+		def asset = AssetEntity.get(params.id)
+		def assetClass = AssetClass.getClassOptionForAsset(asset)
+		render(ServiceResults.success([assetClass : assetClass]) as JSON)
+	}
+
 	/**
 	 * 
 	 */
@@ -3900,6 +3923,7 @@ class AssetEntityController {
 
 		return;
 	}
+
 	
 	/**
 	 * Returns a JSON object containing the data used by Select2 javascript library

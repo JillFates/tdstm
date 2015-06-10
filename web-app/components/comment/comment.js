@@ -15,7 +15,7 @@ tds.comments.directive = tds.comments.directive || {};
  * CONTROLLERS
  ************************/
 
-tds.comments.controller.MainController = function(rootScope, scope, modal, window, utils, commentUtils) {
+tds.comments.controller.MainController = function(rootScope, scope, modal, window, utils, commentUtils, commentService) {
 
 	var activePopups = {};
 
@@ -513,6 +513,39 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		}
 	}
 
+	/* ********************************************************************* */
+
+	$scope.commentInfo = []
+
+	$scope.commentInfo.currentAsset = parseInt($scope.ac.assetEntity)
+
+	$scope.commentInfo.assetClasses = []
+
+	$scope.commentInfo.currentAssetClass = null
+
+	$scope.commentInfo.assets = []
+
+	$scope.assetClassChanged = function(){
+		commentService.getAssetsByClass($scope.commentInfo.currentAssetClass).then(function(data){
+			$scope.commentInfo.assets = data
+			$scope.commentInfo.currentAsset = null
+		})
+	}
+
+	commentService.getAssetClasses().then(function(data){
+		$scope.commentInfo.assetClasses = data
+	});
+
+	commentService.getClassForAsset($scope.ac.assetEntity).then(function(data){
+		$scope.commentInfo.currentAssetClass = data
+		commentService.getAssetsByClass(data).then(function(data2){
+			$scope.commentInfo.assets = data2
+		})
+	});
+
+
+
+	/* ********************************************************************* */
 	function editComment(data) {
 		if (B2 != '') {
 			B2.Pause()
@@ -560,6 +593,9 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		//if(!isIE7OrLesser)
 		//	$("select.assetSelect").select2();
 	}
+
+
+
 
 	//
 	// Invoked by createCommentForm and editCommentDialog to make Ajax call to persist changes of new and existing assetComment classes
@@ -631,6 +667,52 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 tds.comments.service.CommentService = function(utils, http, q) {
 
 	http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+
+	/**
+	 * This function returns the Asset Class for a given Asset ID.
+	 */
+	var getClassForAsset = function(assetId){
+		var deferred = q.defer()
+		http.get(utils.url.applyRootPath('/assetEntity/classForAsset?id='+assetId)).
+	
+			success(function(data, status, headers, config) {
+				deferred.resolve(data.data.assetClass);
+			}).
+			error(function(data, status, headers, config) {
+				deferred.reject(data);
+			}
+		);
+		
+		return deferred.promise
+	}
+
+	var getAssetsByClass = function(assetClass){
+		var deferred = q.defer()
+		http.get(utils.url.applyRootPath('/assetEntity/assetsByClass?assetClass='+assetClass)).
+			success(function(data, status, headers, config) {
+				deferred.resolve(data.data)
+			}).
+			error(function(data, status, headers, config) {
+				deferred.reject(data)
+			}
+		);
+		return deferred.promise
+	}
+
+	var getAssetClasses = function(){
+		var deferred = q.defer()
+		http.get(utils.url.applyRootPath('/assetEntity/assetClasses')).
+			success(function(data, status, headers, config) {
+				deferred.resolve(data.data);
+			}).
+			error(function(data, status, headers, config) {
+				deferred.reject(data);
+			}
+		);
+		
+		return deferred.promise;
+	};
+
 
 	var getWorkflowTransitions = function(assetId, category, id) {
 		var deferred = q.defer();
@@ -1000,6 +1082,10 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		changeTaskEstTime: changeTaskEstTime,
 		getStaffRoles: getStaffRoles,
 		getAssetsByType: getAssetsByType,
+		setShowAllPreference: setShowAllPreference,
+		getAssetClasses: getAssetClasses,
+		getClassForAsset: getClassForAsset,
+		getAssetsByClass: getAssetsByClass,
 		setShowAllPreference: setShowAllPreference,
 		setViewUnpublishedPreference: setViewUnpublishedPreference
 	};
