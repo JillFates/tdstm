@@ -489,6 +489,15 @@ table.rack_elevation .rack_current {
 table.rack_elevation .rack_current a{
 	color: black;
 }
+table.rack_elevation .rack_current_dashed {
+	background: #7CFE80;
+	font-weight: bold;
+	font-size: 0.9em;
+	border: 1px dashed black;
+}
+table.rack_elevation .rack_current_dashed a{
+	color: black;
+}
 table.rack_elevation .rack_past {
 	background: #e7e7e7;
 	font-weight: bold;

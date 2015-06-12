@@ -1414,6 +1414,9 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 .rackDetailDiv {
 	display: none; position: absolute; width: 253px; border: 0px solid black; float: left; background-color: white; z-index: 99;
 }
+.rackDashedDetailDiv{
+	display: none; position: absolute; width: 253px; border: 0px dashed black; float: left; background-color: white; z-index: 99;
+}
 .compareColumn{
 	width: 250px
 }

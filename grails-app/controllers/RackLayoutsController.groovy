@@ -12,6 +12,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.math.NumberUtils
+import com.tdsops.tm.enums.domain.*
 
 class RackLayoutsController {
 	def assetEntityService
@@ -323,14 +324,28 @@ class RackLayoutsController {
 						} else {
 							cssClass = "rack_future"
 						}
-					} else  {
+					} else  if(assetEnity.assetEntity?.planStatus != AssetEntityPlanStatus.MOVED){
+						if(rack.source == 0)
+						{
+							cssClass = 'rack_current_dashed'
+							rackStyle = 'rack_current_dashed'
+						}
+						else
+						{
+							cssClass = 'rack_current'
+							rackStyle = 'rack_current'
+						}
+					}else {
 						cssClass = 'rack_current'
 						rackStyle = 'rack_current'
 					}
 					if(assetEnity.position == 0 || assetEnity.assetEntity?.model?.usize == 0 || assetEnity.assetEntity?.model?.usize == null ) {
 						rackStyle = 'rack_error'
 					}
+					if(!(assetEnity.assetEntity?.planStatus == AssetEntityPlanStatus.MOVED && rack.source == 1))
+					{
 					assetDetails << [asset:assetEnity, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
+					}
 				} else {
 					assetDetails << [asset:null, rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source, rackDetails:rack ]
 				}
