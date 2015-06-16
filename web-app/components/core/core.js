@@ -184,7 +184,7 @@ tds.core.interceptor.LoggedCheckerInterceptor = function() {
 						var errorDiv = angular.element(document.querySelector('#errorModalText'));
 						var errorsHTML = "<ul>";
 						for (var j = 0; j < json.errors.length; j++) {
-							errorsHTML = errorsHTML + "<li>" + json.errors[j] + "</li>";
+							errorsHTML = errorsHTML + "<li>" + json.errors[j].reason + "</li>";
 						}
 						errorsHTML = errorsHTML + "</ul>";
 						errorDiv.html(errorsHTML);
