@@ -78,7 +78,7 @@
 								</ul>
 								<br>
 								<tds:hasPermission permission='EditProjectStaff'>
-								<g:link class="mmlink" controller="person" action="manageProjectStaff">Manage</g:link>
+								<g:link class="mmlink" controller="person" action="manageProjectStaff" params="[role: 'PROJ_MGR']">Manage</g:link>
 								</tds:hasPermission>
 							</td>
 							<td class="name">Default Bundle:</td>

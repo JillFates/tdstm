@@ -161,9 +161,6 @@
 									</g:each>
 								</ul>
 								<br>
-								<tds:hasPermission permission='EditProjectStaff'>
-								<g:link class="mmlink" controller="person" action="manageProjectStaff">Manage</g:link>
-								</tds:hasPermission>
 							</td>
 							<td class="name">Default Bundle:</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
