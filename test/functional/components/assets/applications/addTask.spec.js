@@ -315,21 +315,23 @@ describe('Add task to an application', function(){
       it('should have Application selected by default', function(){
         if(process.env.BROWSER_NAME==='phantomjs'){
           taskModal.getAssetTypeSelected().then(function(op){
-            expect(op).toEqual('Application');
+            expect(op).toEqual('Applications');
           });
         }else{
-          expect(taskModal.assetTypeSelected.getText()).toEqual('Application');
+          expect(taskModal.assetTypeSelected.getText()).toEqual('Applications');
         }
       });
 
       it('should have this options', function(){
         taskModal.assetTypeOptions.then(function(options){
-          expect(options.length).toEqual(5);
-          expect(options[0].getText()).toEqual('Application');
-          expect(options[1].getText()).toEqual('Server');
-          expect(options[2].getText()).toEqual('Database');
-          expect(options[3].getText()).toEqual('Storage');
-          expect(options[4].getText()).toEqual('Other');
+          expect(options.length).toEqual(7);
+          expect(options[0].getText()).toEqual('Applications');
+          expect(options[1].getText()).toEqual('Databases');
+          expect(options[2].getText()).toEqual('Network Devices');
+          expect(options[3].getText()).toEqual('Other Devices');
+          expect(options[4].getText()).toEqual('Servers');
+          expect(options[5].getText()).toEqual('Storage Devices');
+          expect(options[6].getText()).toEqual('Logical Storage');
         });
       });
 

@@ -48,13 +48,15 @@ var TaskModal = function(){
     return browser.executeScript('return $("[ng-model=\'ac.category\'] option:checked").text()');
   };
   this.assetsLabel =  $('[for="asset"]');
-  this.assetType = element(by.model('ac.assetType'));
+  // this.assetType = element(by.model('ac.assetType'));
+  this.assetType = element(by.model('commentInfo.currentAssetClass'));
   this.assetTypeOptions = this.assetType.$$('option');
   this.assetTypeSelected = this.assetType.$('option:checked');
   this.getAssetTypeSelected = function(){
     return browser.executeScript('return $("[ng-model=\'ac.assetType\'] option:checked").text()');
   };
-  this.assetEntity = element(by.model('ac.assetEntity'));
+  // this.assetEntity = element(by.model('ac.assetEntity'));
+  this.assetEntity = element(by.model('commentInfo.currentAsset'));
   this.assetEntityOptions = this.assetEntity.$$('option');
   this.assetEntitySelected = this.assetEntity.$('option:checked');
   this.getAssetEntitySelected = function(){
