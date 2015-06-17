@@ -748,7 +748,7 @@ class MoveEventController {
 					         				'duration', 'estStart','estFinish','actStart',
 					         				'actFinish', 'workflow']
 			
-			def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 'instructionsURL' ,'',
+			def sheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', 'instructionsLink' ,'',
 					        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
 				        				]
 

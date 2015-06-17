@@ -527,19 +527,8 @@ class MoveBundleService {
 					case "notes":
 						cellValue = exportList[r-startRow].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[r-startRow].notes)) : ''
 						break;
-					case "instructionsURL":
-						def instructionsString = exportList[r-startRow].instructionsLink;
-						def instructionsURL;
-						
-						if(HtmlUtil.isURL(instructionsString))
-						{
-							instructionsURL = instructionsString;
-						}
-						else if(HtmlUtil.isMarkupURL(instructionsString))
-						{
-							instructionsURL = HtmlUtil.parseMarkupURL(instructionsString)[1];
-						}
-						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(instructionsURL) : ''
+					case "instructionsLink":
+						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(exportList[r-startRow].instructionsLink) : ''
 						break;
 					case "workflow":
 						cellValue = exportList[r-startRow].workflowTransition ? String.valueOf(exportList[r-startRow].workflowTransition?.name) : ''
