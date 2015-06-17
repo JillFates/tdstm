@@ -1137,6 +1137,16 @@ var EntityCrud = ( function($) {
 	// Called from the page to popup the Asset Entity details dialog
 	// getEntityDetails
 	pub.showAssetDetailView = function(assetClass, assetId) {
+		/*
+			Handling Angular Scope (root scope) outside Angular. This is
+			far from ideal, but it's required for keeping track of the current
+			asset when the user edits a comment from the asset modal.
+		*/
+		var $body = angular.element("#"+assetId)
+  		var $rootScope = $body.scope().$root
+  		$rootScope.$apply(function () {
+    		$rootScope.selectedAsset = assetId
+  		})
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetShowView('application', 'Application', assetId);

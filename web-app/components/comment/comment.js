@@ -161,6 +161,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 	this.editComment = function(commentTO) {
 		scope.$broadcast('forceDialogClose', ['crud']);
 		var view = (commentTO.commentType == 'comment') ? '/comment/editComment' : '/task/editTask';
+
 		modal.open({
 			templateUrl: utils.url.applyRootPath(view),
 			controller: tds.comments.controller.EditCommentDialogController,
@@ -517,7 +518,8 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.commentInfo = []
 
-	$scope.commentInfo.currentAsset = parseInt($scope.ac.assetEntity ? $scope.ac.assetEntity : $scope.acData.assetId)
+
+	$scope.commentInfo.currentAsset = parseInt((assetTO)? assetTO.assetId : $scope.$root.selectedAsset)
 
 	$scope.commentInfo.assetClasses = []
 
