@@ -24,22 +24,22 @@
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="bundleConflicts" id="bundleConflicts" checked="checked" />&nbsp; Bundle conflicts
+							<input type="checkbox" name="bundleConflicts" id="bundleConflicts" checked="checked" />&nbsp; <b>Bundle Conflict</b> - Having dependency references to assets assigned to unrelated bundles
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="unresolvedDep" id="unresolvedDep" checked="checked" />&nbsp;Unresolved dependencies
+							<input type="checkbox" name="unresolvedDep" id="unresolvedDep" checked="checked" />&nbsp; <b>Unresolved Dependencies</b> - Having dependencies with status <em>Unknown</em> or <em>Questioned</em>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="noApps" id="noApps" checked="checked" />&nbsp; No Application
+							<input type="checkbox" name="noApps" id="noApps" checked="checked" />&nbsp; <b>Missing Application</b> - Having no <em>Supports</em> dependency to application(s)
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="dbWithNoSupport" id="dbWithNoSupport" checked="checked" />&nbsp; DB with no support
+							<input type="checkbox" name="dbWithNoSupport" id="dbWithNoSupport" checked="checked" />&nbsp; <b>Unsupported</b> - Having no <em>Requires</em> dependency indication where database resides
 						</td>
 					</tr>
 					<tr class="buttonR">

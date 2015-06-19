@@ -24,22 +24,22 @@
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="bundleConflicts" id="bundleConflicts" checked="checked" />&nbsp; Bundle conflicts
+							<input type="checkbox" name="bundleConflicts" id="bundleConflicts" checked="checked" />&nbsp; <b>Bundle Conflict</b> - Having dependency references to assets assigned to unrelated bundles
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="unresolvedDep" id="unresolvedDep" checked="checked" />&nbsp;Unresolved dependencies
+							<input type="checkbox" name="unresolvedDep" id="unresolvedDep" checked="checked" />&nbsp;<b>Unresolved Dependencies</b> - Having dependencies with status <em>Unknown</em> or <em>Questioned</em>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="noRuns" id="noRuns" checked="checked" />&nbsp; No Runs On
+							<input type="checkbox" name="noRuns" id="noRuns" checked="checked" />&nbsp; <b>No Supports Dependencies</b> - Having no <em>Supports</em> relationship depicting its purpose
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="vmWithNoSupport" id="vmWithNoSupport" checked="checked" />&nbsp; VM with no support
+							<input type="checkbox" name="vmWithNoSupport" id="vmWithNoSupport" checked="checked" />&nbsp; <b>No VM Host</b>- VMs with no associated Host environment
 						</td>
 					</tr>
 					<tr class="buttonR">

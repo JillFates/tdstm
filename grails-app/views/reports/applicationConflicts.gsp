@@ -27,17 +27,17 @@
 					</tbody>
 					<tr>
 						<td>
-							<input type="checkbox" name="missing" id="missing" checked="checked" />&nbsp;Missing
+							<input type="checkbox" name="conflicts" id="conflicts" checked="checked" />&nbsp;<b>Bundle Conflict</b> - Having dependency references to assets assigned to unrelated bundles
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="unresolved" id="unresolved" checked="checked" />&nbsp;Unresolved
+							<input type="checkbox" name="unresolved" id="unresolved" checked="checked" />&nbsp;<b>Unresolved Dependencies</b> - Having dependencies with status <em>Unknown</em> or <em>Questioned</em>
 						</td>
 					</tr>
 					<tr>
 						<td>
-							<input type="checkbox" name="conflicts" id="conflicts" checked="checked" />&nbsp;Conflicts
+							<input type="checkbox" name="missing" id="missing" checked="checked" />&nbsp;<b>Missing Dependencies</b> - Having no defined <em>Supports</em> or <em>Requires</em> dependencies
 						</td>
 					</tr>
 					<tr class="buttonR">
