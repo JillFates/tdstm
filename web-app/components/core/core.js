@@ -175,11 +175,11 @@ tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
  */
 tds.core.interceptor.LoggedCheckerInterceptor = function() {
 	var servicesInterceptor = {
-		response: function(response) {
-			var loginRedirect = response.headers('x-login-url');
+		response: function(jsonResponse) {
+			var loginRedirect = jsonResponse.headers('x-login-url');
 			if (!loginRedirect) {
 				try {
-					var json = angular.fromJson(response.data);
+					var json = angular.fromJson(jsonResponse.data);
 					if (json.errors && json.errors.length > 0) {
 						var errorDiv = angular.element(document.querySelector('#errorModalText'));
 						var errorsHTML = "<ul>";
@@ -189,11 +189,11 @@ tds.core.interceptor.LoggedCheckerInterceptor = function() {
 						errorsHTML = errorsHTML + "</ul>";
 						errorDiv.html(errorsHTML);
 						$('#errorModal').modal('show');
-					} else {
-						return response;
+
 					}
+					return jsonResponse
 				} catch (e) {
-					return response;
+					return jsonResponse;
 				}
 			} else {
 				alert("Your session has expired and need to login again.");
