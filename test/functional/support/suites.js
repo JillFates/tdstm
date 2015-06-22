@@ -1,6 +1,6 @@
 module.exports = {
   test1: [
-    // '../components/projects/createProject.spec.js',
+    '../components/projects/createProject.spec.js',
     '../components/planning/bundles.spec.js',
     '../components/assets/applications/createApp.spec.js',
     '../components/assets/applications/addTask.spec.js',
@@ -30,7 +30,7 @@ module.exports = {
   ],
   admin:[
     '../components/admin/adminPortal.spec.js',
-    // '../components/admin/adminPortal/roleType.spec.js',
+    '../components/admin/adminPortal/roleType.spec.js',
     // '../components/admin/staff/merge.spec.js'//need database configuration
   ],
   regression:[ //Do not change the order of these files since some test depends on others.
@@ -46,7 +46,6 @@ module.exports = {
     '../components/admin/syncLibraries.spec.js',
     '../components/dataCenters/rooms.spec.js',
     '../components/dataCenters/rackElevations.spec.js',
-    // '../components/assets/dependencyAnalyzer.spec.js',
     '../components/userMenu/signOut.spec.js',
     '../components/login/login.spec.js'
     ], 
@@ -54,8 +53,8 @@ module.exports = {
     '../components/tasks/myTasks.spec.js',
     '../components/tasks/taskManager.spec.js',
     '../components/tasks/taskGraph.spec.js',
-    '../components/tasks/timeline.spec.js'
-    // '../components/tasks/cookbook.spec.js'
+    '../components/tasks/timeline.spec.js',
+    '../components/tasks/cookbook.spec.js'
     ],
     dashboards:[
     '../components/dashboards/eventDashboard.spec.js'
@@ -89,7 +88,8 @@ module.exports = {
     '../components/assets/devices/allDevicesList.spec.js',
     '../components/assets/devices/storageDevicesList.spec.js',
     '../components/assets/storage/storageList.spec.js',
-    '../components/assets/devices/devices.spec.js'
+    '../components/assets/devices/devices.spec.js',
+    '../components/assets/dependencyAnalyzer.spec.js',
     ],
     importExport:[     // Phantomjd does not support file download yet 
     '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
