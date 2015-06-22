@@ -6,7 +6,7 @@ databaseChangeLog = {
 	changeSet(author: "arecordon", id: "20150526 TM-3687 1") {
 		comment("Assigns 'Server' as assetType to models without a value for this field.")
 		sql("""
-			UPDATE model SET asset_type='Server' WHERE asset_type IS NULL OR LENGTH(TRIM(asset_type)) = 0
+			UPDATE model SET asset_type='Server' WHERE asset_type IS NULL
 		""")
 	}
 
