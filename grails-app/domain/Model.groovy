@@ -186,7 +186,8 @@ class Model {
 	}
 	
 	def getAssetTypeList(){
-		return EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"),[sort:'value',order:'asc'])?.value
+		def assetTypeList = EavAttributeOption.findAllByAttribute(EavAttribute.findByAttributeCode("assetType"),[sort:'value',order:'asc'])?.value
+		return assetTypeList.findAll({it.trim()})
 	}
 	/*******************************************************************
 	 * @return : Total number of connectors associated with this model
