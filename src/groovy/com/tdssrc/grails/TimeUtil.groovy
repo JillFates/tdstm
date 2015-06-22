@@ -10,6 +10,9 @@ import java.text.SimpleDateFormat
 class TimeUtil {
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
+	def static dateTimeFormats = ["MM/DD/YYYY", "DD/MM/YYYY"]
+	def static defaultTimeZone = "GNT"
+
 	def static dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
 	def static dateFormat = new SimpleDateFormat("MM/dd/yyyy")
 
@@ -191,11 +194,7 @@ class TimeUtil {
 	 * @return Date The current date set in GMT
 	 */
 	def public static nowGMT() {
-		SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss")
-		dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"))
-		SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss")
-		
-		return dateFormatLocal.parse( dateFormatGmt.format(new Date()) )
+		return new Date()
 	}
 	
 	/**
@@ -251,12 +250,11 @@ class TimeUtil {
 	def public static convertInToUserTZ = { date, tzId ->
 		Date ret
 		if (date) {
-			tzId = tzId ? tzId : "EDT"
-			def timeZoneId = timeZones[ tzId ]
-			TimeZone tz = TimeZone.getTimeZone( timeZoneId );
+			tzId = tzId ? tzId : defaultTimeZone
+			TimeZone tz = TimeZone.getTimeZone( tzId );
 			//java.sql.Timestamp
 			try {
-				ret = new Date(date.getTime() + tz.getRawOffset());				
+				ret = new Date(date.getTime());				
 			} catch (e) { 
 				// log.error "convertInToUserTZ(${date}, ${tzId}) had exception: e.toString()" 
 			}
@@ -316,4 +314,16 @@ class TimeUtil {
 	/*public static Date nowGMT() {
 		return convertInToGMT("now", "EDT" )
 	}*/
+
+
+	public static String getDateTimeFormat(value) {
+		def result = dateTimeFormats[0]
+		dateTimeFormats.each{ df ->
+			if (df == value) {
+				result = df
+			}
+		}
+		return result
+	}
+
 }

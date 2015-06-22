@@ -1251,7 +1251,28 @@ class PersonController {
 			
 		render true
 	}
-	
+
+	def savePreferences() {
+		def timezoneValue = params.timezone
+		def datetimeFormatValue = params.datetimeFormat
+
+		// Checks that timezone is valid
+		def timezone = TimeZone.getTimeZone(timezoneValue)
+
+		// Validate date time format
+		def datetimeFormat = TimeUtil.getDateTimeFormat(datetimeFormatValue)
+
+		userPreferenceService.setPreference( UserPreferenceService.TIMEZONE, timezone.getID() )
+		userPreferenceService.setPreference( UserPreferenceService.DATE_TIME_FORMAT, datetimeFormat )
+
+		def model = [
+			'timezone' : timezone.getID(),
+			'datetimeFormat' : datetimeFormat
+		]
+
+		render(ServiceResults.success(model) as JSON)
+	}
+
 	/**
 	 * This action is used to display Current logged user's Preferences with preference code (converted to comprehensive words)
 	 * with their corresponding value
@@ -1259,6 +1280,11 @@ class PersonController {
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
 	def editPreference() {
+
+		def timezones = Timezone.findAll()
+		//TODO: should this me added to the DB?
+		timezones << [code: "GTM", label: "GTM"]
+		def areas = userPreferenceService.timezonePickerAreas()
 		def loggedUser = securityService.getUserLogin()
 		def prefs = UserPreference.findAllByUserLogin( loggedUser ,[sort:"preferenceCode"])
 		def prefMap = [:]
@@ -1271,6 +1297,10 @@ class PersonController {
 						 "PMO_COLUMN1" : "PMO Column 1 Filter", "PMO_COLUMN2" : "PMO Column 2 Filter", "PMO_COLUMN3" : "PMO Column 3 Filter",
 						 "PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons", "MY_TASK":"My Task Refresh Time"
 					  ]
+
+		def currTimeZone = TimeUtil.defaultTimeZone;
+		def currDateTimeFormat = TimeUtil.dateTimeFormats[0];
+
 		prefs.each { pref->
 			switch( pref.preferenceCode ) {
 				case "MOVE_EVENT" :
@@ -1307,7 +1337,15 @@ class PersonController {
 					def value = pref.value == "0" ? "False" : "True"
 					prefMap.put((pref.preferenceCode), "Just Remaining Check / "+value)
 					break;
-				
+
+				case UserPreferenceService.DATE_TIME_FORMAT:
+					currDateTimeFormat = pref.value;
+					break;
+
+				case UserPreferenceService.TIMEZONE:
+					currTimeZone = pref.value;
+					break;
+
 				default :
 					prefMap.put((pref.preferenceCode), (labelMap[pref.preferenceCode] ?: pref.preferenceCode )+" / "+ pref.value)
 					break;
@@ -1315,7 +1353,8 @@ class PersonController {
 		}
 		
 		
-		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}])
+		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}, areas: areas, 
+				timezones: timezones, currTimeZone: currTimeZone, currDateTimeFormat: currDateTimeFormat])
 	}
 	
 	/**

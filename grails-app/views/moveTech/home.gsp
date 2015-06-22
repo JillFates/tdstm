@@ -18,15 +18,6 @@ dt {
 	function setFocus(){
 		document.bundleTeamAssetForm.search.focus();
 	}
-	function setUserTimeZone( tz ){
-		jQuery.ajax({
-		        type:"GET",
-		        async : true,
-		        cache: false,
-		        url:"../project/setUserTimeZone?tz="+tz
-		});
-  	}
-
 	window.addEventListener('load', function(){
 	setTimeout(scrollTo, 0, 0, 1);
 	}, false);
@@ -68,9 +59,6 @@ dt {
 					</g:if> 
 				</div>  
 				<div style="float:left; width:200px; margin:4px;">
-					<b>Timezone:</b> <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-                    			value="${session.getAttribute('CURR_TZ')?.CURR_TZ ? session.getAttribute('CURR_TZ')?.CURR_TZ : 'EDT'}" onchange="setUserTimeZone(this.value)"/>
-					<br />
 					<b>Currently Logged in as:</b>
 					<dl compact>
 						<dt>Project:&nbsp;</dt><dd>${project}</dd>

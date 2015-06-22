@@ -703,10 +703,6 @@
 			}	
 		});
 	}
-	function setUserPrefTimeZone () {
-		var timeZone = $("#timezone :selected").text()
-		${remoteFunction(controller:'project', action:'setUserTimeZone', params:'\'tz=\' + timeZone ', onComplete:'getMoveEventNewsDetails($(\'#moveEvent\').val());')}
-	}
 
 	/* function to load the user agent*/
 	if (navigator.appName == "Microsoft Internet Explorer") {

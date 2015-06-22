@@ -14,11 +14,16 @@ import com.tdssrc.grails.TimeUtil
 import com.tds.asset.AssetDependencyBundle
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.FieldImportance
+import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.converters.JSON
 
 class UserPreferenceService  {
 
 	static transactional = true
-	def securityService
+
+	public static final String TIMEZONE = "CURR_TZ"
+
+	public static final String DATE_TIME_FORMAT = "CURR_DT_FORMAT"
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	
@@ -374,6 +379,17 @@ class UserPreferenceService  {
 		if (toRemoveRoles.size() > 0) {
 			removeUserRoles(toRemoveRoles, person.id);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	def timezonePickerAreas() {
+		File worldMapAreasFile = ApplicationHolder.application.parentContext.getResource( "/templates/timezone/world_map_areas.json" ).getFile()
+
+		def timezones = JSON.parse(worldMapAreasFile.text)
+
+		return timezones
 	}
 
 }

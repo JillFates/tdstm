@@ -128,3 +128,27 @@ var tdsCommon = {
 }
 
 tdsCommon.autoClearDialogOnClose();
+
+
+/*
+ * TDS User Preference utils
+ */
+
+ var UserPreference = function() {
+
+ 	var savePreferences = function(formId) {
+		var data = $('#' + formId).serialize();
+		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function() {
+			alert("Preferences updated");
+			window.location.reload();
+		})
+		.fail(function() {
+			alert("Can't update user's preferences");
+		});
+ 	}
+
+	return {
+		savePreferences: savePreferences
+	}
+
+ }();

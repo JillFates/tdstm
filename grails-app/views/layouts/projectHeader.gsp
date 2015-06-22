@@ -105,19 +105,6 @@
 										&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span>
 									</a>
 								</div>
-								<div class="tzmenu">:&nbsp; <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' } time zone</span>
-									<ul>
-										<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
-										<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
-										<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
-										<li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
-										<li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
-										<li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
-										<li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
-										<li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
-										<li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
-									</ul>
-								</div>
 							</strong>
 							&nbsp;&nbsp;<g:link controller="auth" action="signOut"></g:link>
 						</shiro:isLoggedIn>

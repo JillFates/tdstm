@@ -460,14 +460,6 @@ class ProjectController {
 	}
 
 	/*
-	 * function to set the user preference time zone
-	 */
-	def setUserTimeZone() {
-		def timeZone = params.tz
-		userPreferenceService.setPreference( "CURR_TZ", timeZone )
-		render timeZone 
-	}
-	/*
 	* function to set the user preference powerType
 	*/
 	def setPower() {
