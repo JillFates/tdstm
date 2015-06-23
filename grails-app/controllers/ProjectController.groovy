@@ -481,7 +481,7 @@ class ProjectController {
 	 */
 	def fieldImportance() {
 		def project = securityService.getUserCurrentProject()
-		return [project:project]
+		return [project:project, hasEditProjectFieldSettingsPermission:RolePermissions.hasPermission("EditProjectFieldSettings")]
 	}
 	
 	/**
