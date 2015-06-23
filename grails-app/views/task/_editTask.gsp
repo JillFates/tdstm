@@ -72,7 +72,7 @@
 					</tr>
 					<tr class="prop">
 						<td> <label for="instructionsLink">Instructions Link:</td>
-						<td> <input id="instructionsLink" placeholder="Enter URL or Label|URL" value="{{ac.instructionsLink}}" ng-model="ac.instructionsLink" ng-maxlength="255"></input>
+						<td> <input id="instructionsLinkId" placeholder="Enter URL or Label|URL" ng-model="ac.instructionsLink" ng-maxlength="255"></input>
 						</td>
 					</tr>
 					<tr class="prop" id="durationEditId">

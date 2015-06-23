@@ -258,11 +258,7 @@ class TaskController {
 			if (includeDetails) {
 				actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
 			}
-
-			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
-			}
-
+			
 			if ( HtmlUtil.isMarkupURL(comment.instructionsLink)  )
 			{
 				actionBar << [label: HtmlUtil.parseMarkupURL(comment.instructionsLink)[0], icon: 'ui-icon-document', actionType: 'viewInstructions', redirect: 'taskManager']
@@ -274,6 +270,11 @@ class TaskController {
 				actionBar << [label: 'Instructions...', icon: 'ui-icon-document', actionType: 'viewInstructions', redirect: 'taskManager']
 				}
 			}
+
+			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
+			}
+
 			
 			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
 			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
