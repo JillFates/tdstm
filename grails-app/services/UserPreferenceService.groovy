@@ -17,13 +17,9 @@ import com.tds.asset.FieldImportance
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.converters.JSON
 
-class UserPreferenceService  {
+class UserPreferenceService {
 
 	static transactional = true
-
-	public static final String TIMEZONE = "CURR_TZ"
-
-	public static final String DATE_TIME_FORMAT = "CURR_DT_FORMAT"
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	

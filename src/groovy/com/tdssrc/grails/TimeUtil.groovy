@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 /**
@@ -10,11 +11,22 @@ import java.text.SimpleDateFormat
 class TimeUtil {
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
-	def static dateTimeFormats = ["MM/DD/YYYY", "DD/MM/YYYY"]
-	def static defaultTimeZone = "GNT"
+	def static final dateTimeFormats = ["MM/DD/YYYY", "DD/MM/YYYY"]
+	def static final defaultTimeZone = "GNT"
+
+	def static final String TIMEZONE_ATTR = "CURR_TZ"
+	def static final String DATE_TIME_FORMAT_ATTR = "CURR_DT_FORMAT"
 
 	def static dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
 	def static dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+
+	def static final FORMAT_DATE = "MM/dd/yyyy"
+	def static final FORMAT_DATE_TIME = "MM/dd/yyyy hh:mm a"
+	def static final FORMAT_DATE_TIME_2 = "MM-dd-yyyy hh:mm:ss a"
+	def static final FORMAT_DATE_TIME_3 = "E, d MMM 'at ' HH:mma"
+	def static final FORMAT_DATE_TIME_4 = "MM/dd kk:mm"
+	def static final FORMAT_DATE_TIME_5 = "yyyyMMdd"
+	def static final FORMAT_DATE_TIME_6 = "yyyy-MM-dd"
 
 	static final String SHORT='S'
 	static final String FULL='F'
@@ -276,38 +288,6 @@ class TimeUtil {
 	}
 
 	/**
-	 * Used to convert a string into a date that includes the Timezone
-	 * @param the datetime as a string
-	 * @return The date or null if it failed to parse it
-	 **/
-	def public static Date parseDateTime( String text) {
-		def dt
-
-		try {
-			dt = dateTimeFormat.parse(text)
-		} catch (java.text.ParseException e) {
-			// println "parseDateTime() invalid formated string $text"
-		}
-		return dt
-	}
-
-	/**
-	 * Used to convert a string into a date that includes the Timezone
-	 * @param the datetime as a string
-	 * @return The date or null if it failed to parse it
-	 **/
-	def public static Date parseDate( String text) {
-		def dt
-
-		try {
-			dt = dateFormat.parse(text)
-		} catch (java.text.ParseException e) {
-			// println "parseDateTime() invalid formated string $text"
-		}
-		return dt
-	}
-
-	/**
 	 * Used to get the current time in GMT
 	 * @return Date 	The current datetime in GMT
 	 */
@@ -324,6 +304,76 @@ class TimeUtil {
 			}
 		}
 		return result
+	}
+
+	public static String formatDate(session, dateValue) {
+		def formatter = createFormatter(FORMAT_DATE)
+		return formatDateTime(session, dateValue, formatter)
+	}
+
+	public static String formatDateTime(session, dateValue, formatterType=FORMAT_DATE_TIME) {
+		def formatter = createFormatter(formatterType)
+		return formatDateTime(session, dateValue, formatter)
+	}
+
+	public static String formatDateTime(session, dateValue, DateFormat formatter) {
+		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
+		return formatter.format(dateValue)
+	}
+
+	/**
+	 * Used to convert a string into a date that includes the Timezone
+	 * @param the datetime as a string
+	 * @return The date or null if it failed to parse it
+	 **/
+	public static Date parseDate(session, dateValue) {
+		def formatter = createFormatter(FORMAT_DATE)
+		return parseDateTime(session, dateValue, formatter)
+	}
+
+	/**
+	 * Used to convert a string into a date that includes the Timezone
+	 * @param the datetime as a string
+	 * @return The date or null if it failed to parse it
+	 **/
+	public static Date parseDateTime(session, dateValue, formatterType=FORMAT_DATE_TIME) {
+		def formatter = createFormatter(formatterType)
+		return parseDateTime(session, dateValue, formatter)
+	}
+
+	public static Date parseDateTime(session, dateValue, DateFormat formatter) {
+		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
+		return formatter.parse(dateValue)
+	}
+
+	private static DateFormat createFormatter(session, formatterType) {
+		def formatter
+		switch (formatterType) {
+			case FORMAT_DATE:
+				formatter = new SimpleDateFormat("MM/dd/yyyy")
+				break;
+			case FORMAT_DATE_TIME:
+				formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+				break;
+			case FORMAT_DATE_TIME_2:
+				formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a")
+				break;
+			case FORMAT_DATE_TIME_3:
+				formatter = new SimpleDateFormat("E, d MMM 'at ' HH:mma")
+				break;
+			case FORMAT_DATE_TIME_4:
+				formatter = new SimpleDateFormat("MM/dd kk:mm")
+				break;
+			case FORMAT_DATE_TIME_5:
+				formatter = new SimpleDateFormat("yyyyMMdd")
+				break;
+			case FORMAT_DATE_TIME_6:
+				formatter = new SimpleDateFormat("yyyy-MM-dd")
+				break;
+		}
+		return formatter
 	}
 
 }

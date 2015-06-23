@@ -1,7 +1,6 @@
 import grails.converters.JSON
 
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 import net.tds.util.jmesa.AssetEntityBean
 
@@ -370,15 +369,13 @@ class AssetEntityController {
 			// Get the title sheet
 			titleSheet = workbook.getSheet( "Title" )
 			if( titleSheet != null) {
-				SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
 				try {
-					exportTime = format.parse(WorkbookUtil.getStringCellValue(titleSheet, 1, 5))
+					exportTime = TimeUtil.parseDateTime(getSession(), WorkbookUtil.getStringCellValue(titleSheet, 1, 5), TimeUtil.FORMAT_DATE_TIME_2) 
 				}catch ( Exception e) {
 					log.error "Error formating import time: " + e.message
 					forward action:forwardAction, params: [error: 'The Export date time was not found on the Title sheet.']
 					return
 				}
-
 			} else {
 				forward action:forwardAction, params: [error: 'The required Title tab was not found in the spreadsheet.']
 				return
@@ -1615,28 +1612,25 @@ class AssetEntityController {
 		def personCreateObj
 		def dtCreated
 		def dtResolved
-		
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment){
 			if(assetComment.createdBy){
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
-				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+				dtCreated = TimeUtil.formatDateTime(getSession(), assetComment.dateCreated);
 			}
 			if (assetComment.dateResolved) {
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
-				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+				dtResolved = TimeUtil.formatDateTime(getSession(), assetComment.dateResolved);
 			}
 			
-			def etStart =  assetComment.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId)) : ''
+			def etStart =  assetComment.estStart ? TimeUtil.formatDateTime(getSession(), assetComment.estStart) : ''
 			
-			def etFinish = assetComment.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId)) : ''
+			def etFinish = assetComment.estFinish ? TimeUtil.formatDateTime(getSession(), assetComment.estFinish) : ''
 			
-			def atStart = assetComment.actStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId)) : ''
+			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(getSession(), assetComment.actStart) : ''
 			
-		    def dueDate = assetComment.dueDate ? dateFormatter.format(TimeUtil.convertInToUserTZ(assetComment.dueDate, tzId)): ''
+		    def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate): ''
 	
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
@@ -1644,7 +1638,7 @@ class AssetEntityController {
 			def noteList = assetComment.notes.sort{it.dateCreated}
 			def notes = []
 			noteList.each {
-				def dateCreated = it.dateCreated ? TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma") : ''
+				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
 				notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			}
 			
@@ -2184,8 +2178,6 @@ class AssetEntityController {
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		
 		def project = securityService.getUserCurrentProject()
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		def lastUpdatedTime = params.lastUpdated ? AssetComment.findAll("from AssetComment where project =:project \
 						and commentType =:comment and lastUpdated like '%${params.lastUpdated}%'",
 						[project:project,comment:AssetCommentType.COMMENT])?.lastUpdated : []
@@ -2218,7 +2210,7 @@ class AssetEntityController {
 				[
 					'',
 					(it.comment?.length()>50 ? (it.comment.substring(0,50) + '...') : it.comment).replace("\n",""), 
-					it.lastUpdated ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.lastUpdated, tzId)):'',
+					it.lastUpdated ? TimeUtil.formatDate(getSession(), it.lastUpdated):'',
 					it.commentType ,
 					it.assetEntity?.assetName ?:'',
 					it.assetEntity?.assetType ?:'',
@@ -2245,7 +2237,6 @@ class AssetEntityController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 
@@ -2253,8 +2244,6 @@ class AssetEntityController {
 		def person = securityService.getUserLoginPerson()
 		def moveBundleList
 		def today = new Date()
-		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm")
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		def moveEvent		
 		if ( params.moveEvent?.size() > 0) {
 			// zero (0) = All events
@@ -2455,9 +2444,9 @@ class AssetEntityController {
 			
 			def dueDate='' 
 			if (isRunbookTask) {
-				dueDate = it.estFinish ? runBookFormatter.format(TimeUtil.convertInToUserTZ(it.estFinish, tzId)) : ''
+				dueDate = it.estFinish ? TimeUtil.formatDateTime(getSession(), it.estFinish, TimeUtil.FORMAT_DATE_TIME_4) : ''
 			} else {
-				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
+				dueDate = it.dueDate ? TimeUtil.formatDate(getSession(), it.dueDate) : ''
 			}
 			
 			def deps = TaskDependency.findAllByPredecessor( it )
@@ -2546,9 +2535,7 @@ class AssetEntityController {
 				result = task.createdBy ? task.createdBy.toString(): ''
 			break;
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
-				result = task[value] ? dueFormatter.format(TimeUtil.convertInToUserTZ(task[value], tzId)) : ''
+				result = task[value] ? TimeUtil.formatDate(getSession(), task[value]) : ''
 			break;
 			default :
 				result= task[value]
@@ -3359,8 +3346,7 @@ class AssetEntityController {
 	def exportSpecialReport() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def formatter = new SimpleDateFormat("yyyyMMdd")
-		def today = formatter.format(new Date())
+		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		try{
 			def filePath = "/templates/TDS-Storage-Inventory.xls"
 			def filename = "${project.name}SpecialExport-${today}"
@@ -3845,8 +3831,7 @@ class AssetEntityController {
 	
 	def exportPoiDemo() {
 		def filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
-		def formatter = new SimpleDateFormat("yyyyMMdd")
-		def today = formatter.format(new Date())
+		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		def filename = "Demo_POI_Export-${today}" // Export file name
 		def project = securityService.getUserCurrentProject()
 

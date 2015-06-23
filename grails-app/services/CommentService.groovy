@@ -60,8 +60,6 @@ class CommentService {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		def date = new Date()
@@ -201,10 +199,10 @@ class CommentService {
 		    assetComment.resolution = params.resolution
 			if (params.containsKey('estStart')) {
 				// log.info "saveUpdateCommentAndNotes: estStart=[${params.estStart}]"
-				assetComment.estStart = params.estStart ? TimeUtil.convertInToGMT(estformatter.parse(params.estStart), tzId) : null
+				assetComment.estStart = params.estStart ? TimeUtil.parseDateTime(session, params.estStart) : null
 			}
 			if (params.containsKey('estFinish')) {
-				assetComment.estFinish = params.estFinish ? TimeUtil.convertInToGMT(estformatter.parse(params.estFinish), tzId)  : null
+				assetComment.estFinish = params.estFinish ? TimeUtil.parseDateTime(session, params.estFinish)  : null
 			}
 			if (params.containsKey('role')) {
 				assetComment.role = params.role ?: null
@@ -295,7 +293,7 @@ class CommentService {
 
 				if (params.containsKey('dueDate') ) { 
 					// log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
-					assetComment.dueDate = params.dueDate ? TimeUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)  : null
+					assetComment.dueDate = params.dueDate ? TimeUtil.parseDate(session, params.dueDate)  : null
 				}
 	
 			}

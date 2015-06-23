@@ -1262,8 +1262,8 @@ class PersonController {
 		// Validate date time format
 		def datetimeFormat = TimeUtil.getDateTimeFormat(datetimeFormatValue)
 
-		userPreferenceService.setPreference( UserPreferenceService.TIMEZONE, timezone.getID() )
-		userPreferenceService.setPreference( UserPreferenceService.DATE_TIME_FORMAT, datetimeFormat )
+		userPreferenceService.setPreference( TimeUtil.TIMEZONE_ATTR, timezone.getID() )
+		userPreferenceService.setPreference( TimeUtil.DATE_TIME_FORMAT_ATTR, datetimeFormat )
 
 		def model = [
 			'timezone' : timezone.getID(),
@@ -1338,11 +1338,11 @@ class PersonController {
 					prefMap.put((pref.preferenceCode), "Just Remaining Check / "+value)
 					break;
 
-				case UserPreferenceService.DATE_TIME_FORMAT:
+				case TimeUtil.DATE_TIME_FORMAT_ATTR:
 					currDateTimeFormat = pref.value;
 					break;
 
-				case UserPreferenceService.TIMEZONE:
+				case TimeUtil.TIMEZONE_ATTR:
 					currTimeZone = pref.value;
 					break;
 

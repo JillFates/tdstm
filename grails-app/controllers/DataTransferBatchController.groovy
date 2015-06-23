@@ -1,7 +1,5 @@
 import grails.converters.JSON
 
-import java.text.SimpleDateFormat
-
 import org.apache.commons.lang.math.NumberUtils
 import java.util.regex.Matcher
 // import org.apache.shiro.SecurityUtils
@@ -43,8 +41,6 @@ class DataTransferBatchController {
 		'sourceTeamSa':'SYS_ADMIN','targetTeamSa':'SYS_ADMIN',
 		'sourceTeamDba':'DB_ADMIN','targetTeamDba':'DB_ADMIN'
 	]
-
-	protected static formatter = new SimpleDateFormat("M-d-yyyy")
 
 	/**
 	 * The default index page loads the list page
