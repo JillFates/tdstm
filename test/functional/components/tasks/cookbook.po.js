@@ -21,7 +21,8 @@ var Cookbook = function (){
   //Editor Modal
   this.editorModal = $('[class="modal fade code-editor-modal in"]');
   // this.editorTextArea = this.editorModal.$('[ng-model="modal.sourceCode"]');
-  this.editorTextArea = $('[ng-model="modal.sourceCode"] .CodeMirror-code');
+  this.editorTextArea = $$('[ng-model="modal.sourceCode"] .CodeMirror-code pre');
+  this.modalCloseBtn = $('[ng-click="storeCode()"]');
 };
 
 Cookbook.prototype = {};
@@ -36,17 +37,12 @@ Cookbook.prototype.isCreateRecipeModalOpened = function() {
   });
 };
 
-Cookbook.prototype.isCreateRecipeModalClosed = function() {
-  var that = this;
+Cookbook.prototype.isModalClosed = function() {
   return browser.wait(function () {
     return $('body').getAttribute('class').then(function (val) {
       console.log('closed',val);
       return val==='';
     });
-    // return that.createModal.isDisplayed().then(function (valor) {
-      // console.log('valor en close',valor)
-      // return !valor;
-    // });
   }).then(function () {
     return true;
   });
@@ -61,6 +57,10 @@ Cookbook.prototype.isEditorModalOpened = function() {
   }).then(function () {
     return true;
   });
+};
+
+Cookbook.prototype.setTextToEditor = function(recipe) {
+  browser.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipe+'"');
 };
 
 module.exports =  Cookbook;

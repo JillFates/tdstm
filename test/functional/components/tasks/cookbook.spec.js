@@ -28,8 +28,6 @@ describe('Cookbook', function(){
 
   describe('Create a recipe', function(){
 
-    var createRecipebtn;
-
     it('should have "Create Recipe..." as label', function(){
       expect(cookbook.createRecipeBtn.getText()).toEqual('Create Recipe...');
     });
@@ -172,7 +170,7 @@ describe('Cookbook', function(){
 
     it('should save the recipe', function() {
       cookbook.modalButtons.get(0).click();
-      expect(cookbook.isCreateRecipeModalClosed()).toBe(true);
+      expect(cookbook.isModalClosed()).toBe(true);
     });
 
 
@@ -208,16 +206,16 @@ describe('Cookbook', function(){
 
   describe('Add a recipe', function() {
 
-    xit('should have Edit button', function() {
+    it('should have Edit button', function() {
       expect(cookbook.editEditorBtn.getText()).toEqual('Edit');
     });
 
-    xit('should open Editor after click on edit btn', function() {
+    it('should open Editor after click on edit btn', function() {
       cookbook.editEditorBtn.click();
       expect(cookbook.isEditorModalOpened()).toBe(true);
     });
 
-    xit('should add text to editor', function() {
+    it('should add text to editor', function() {
       var recipe = [
       'tasks: [',
       '  [',
@@ -234,10 +232,16 @@ describe('Cookbook', function(){
       '      ],',
       '  ],',
       ']'
-      ].join('\n');
+      ];
+      // browser.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipe.join('\\n')+'"');
+      cookbook.setTextToEditor(recipe.join('\\n'));
       cookbook.editorTextArea.click();
-      // cookbook.editorTextArea.sendKeys(recipe);
+      expect(cookbook.editorTextArea.getText()).toEqual(recipe);
+    });
 
+    it('should close Recipe modal', function () {
+      cookbook.modalCloseBtn.click();
+      expect(cookbook.isModalClosed()).toBe(true);
     });
     
   });//Add a recipe
