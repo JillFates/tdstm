@@ -73,7 +73,7 @@ class Model {
 		endOfLifeDate(nullable:true)
 		endOfLifeStatus( blank:true, nullable:true )
 		sourceURL( blank:true, nullable:true )
-		usize( nullable:true, inList:[1..52])
+		usize( nullable:true, inList:1..52)
 		height( nullable:true )
 		weight( nullable:true )
 		depth( nullable:true )
