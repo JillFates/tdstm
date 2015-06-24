@@ -1446,7 +1446,7 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 			};
 			commentService.getStaffRoles().then(
 				function(data) {
-					var unassigned =  {"id" : "0", "description" : "Unassigned"};
+					var unassigned =  {"id" : "", "description" : "Unassigned"};
 					var auto =  {"id" : "AUTO", "description" : "Automatic"};
 					var roles = data.data;
 										
@@ -1461,7 +1461,7 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 					roles.unshift(unassigned);
 					scope.roleTypes = roles;
 					if (!scope.$parent.ac.role || scope.$parent.ac.role == "") {
-						scope.$parent.ac.role = "0";
+						scope.$parent.ac.role = "";
 					}
 					validateModel();
 				},

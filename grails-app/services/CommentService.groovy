@@ -207,7 +207,7 @@ class CommentService {
 				assetComment.estFinish = params.estFinish ? TimeUtil.convertInToGMT(estformatter.parse(params.estFinish), tzId)  : null
 			}
 			if (params.containsKey('role')) {
-				assetComment.role = params.role ?: null
+				assetComment.role = params.role ?: ''
 			}
 			if (params.containsKey('instructionsLink')){
 				assetComment.instructionsLink = params.instructionsLink ?: null
