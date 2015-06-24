@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat
  * The TimeUtil class contains a collection of useful Time manipulation methods 
  */
 class TimeUtil {
+	//TODO: Remove!!!
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
 	def static final dateTimeFormats = ["MM/DD/YYYY", "DD/MM/YYYY"]
@@ -20,6 +21,7 @@ class TimeUtil {
 	def static dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy hh:mma z")
 	def static dateFormat = new SimpleDateFormat("MM/dd/yyyy")
 
+	// Valid date time formats
 	def static final FORMAT_DATE = "MM/dd/yyyy"
 	def static final FORMAT_DATE_TIME = "MM/dd/yyyy hh:mm a"
 	def static final FORMAT_DATE_TIME_2 = "MM-dd-yyyy hh:mm:ss a"
@@ -27,6 +29,11 @@ class TimeUtil {
 	def static final FORMAT_DATE_TIME_4 = "MM/dd kk:mm"
 	def static final FORMAT_DATE_TIME_5 = "yyyyMMdd"
 	def static final FORMAT_DATE_TIME_6 = "yyyy-MM-dd"
+	def static final FORMAT_DATE_TIME_7 = "dd-MMM"
+	def static final FORMAT_DATE_TIME_8 = "MMM dd,yyyy hh:mm a"
+	def static final FORMAT_DATE_TIME_9 = "MM-dd-yyyy hh:mm a"
+	def static final FORMAT_DATE_TIME_10 = "MMM dd"
+	def static final FORMAT_DATE_TIME_11 = "yyyy/MM/dd hh:mm:ss a"
 
 	static final String SHORT='S'
 	static final String FULL='F'
@@ -371,6 +378,21 @@ class TimeUtil {
 				break;
 			case FORMAT_DATE_TIME_6:
 				formatter = new SimpleDateFormat("yyyy-MM-dd")
+				break;
+			case FORMAT_DATE_TIME_7:
+				formatter = new SimpleDateFormat("dd-MMM")
+				break;
+			case FORMAT_DATE_TIME_8:
+				formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a")
+				break;
+			case FORMAT_DATE_TIME_9:
+				formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a")
+				break;
+			case FORMAT_DATE_TIME_10:
+				formatter = new SimpleDateFormat("MMM dd")
+				break;
+			case FORMAT_DATE_TIME_11:
+				formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a")
 				break;
 		}
 		return formatter

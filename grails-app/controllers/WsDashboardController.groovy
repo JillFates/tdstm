@@ -1,5 +1,4 @@
 import grails.converters.JSON
-import java.text.SimpleDateFormat
 import groovy.time.TimeCategory
 
 import com.tdssrc.grails.GormUtil
@@ -148,7 +147,6 @@ class WsDashboardController {
 
 		def sysTime = TimeUtil.nowGMT()
 		def sysTimeInMs = sysTime.getTime() / 1000
-		def sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a");
 
 		dataPointsForEachStep.each { data ->
 			
@@ -263,7 +261,7 @@ class WsDashboardController {
 				"moveBundleId" : moveBundleId,
 				"calcMethod":moveEvent?.calcMethod,
 				"planDelta" : moveEventPlannedSnapshot?.planDelta,
-				"systime": sdf.format(sysTime),
+				"systime": TimeUtil.formatDateTime(getSession(), sysTime, TimeUtil.FORMAT_DATE_TIME_11),
 				"planSum": [ 
 					"dialInd": moveEventPlannedSnapshot?.dialIndicator, "confText": "High", 
 					"confColor": "green", "compTime":planSumCompTime,
@@ -272,7 +270,7 @@ class WsDashboardController {
 				],
 				"revSum": [ 
 					"dialInd": moveEventRevisedSnapshot?.dialIndicator,
-					"compTime": revisedComp ? sdf.format(revisedComp) : "" 
+					"compTime": revisedComp ? TimeUtil.formatDateTime(getSession(), revisedComp, TimeUtil.FORMAT_DATE_TIME_11) : "" 
 				],
 				"steps": dataPointsForEachStep,
 				'runbookOn':project.runbookOn,

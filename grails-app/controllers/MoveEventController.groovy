@@ -3,8 +3,6 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import grails.converters.JSON
 import grails.converters.*
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.io.*
 
 import org.apache.poi.*
@@ -178,11 +176,9 @@ class MoveEventController {
         def moveEventInstance = MoveEvent.get( params.id )
         
 		if(moveEventInstance) {
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def estStartTime = params.estStartTime
 			if(estStartTime){
-				params.estStartTime =  GormUtil.convertInToGMT(formatter.parse( estStartTime ), tzId)
+				params.estStartTime = TimeUtil.parseDateTime(getSession(), estStartTime)
 			}
 				
             moveEventInstance.properties = params
@@ -218,11 +214,9 @@ class MoveEventController {
 	 * @return : redirect to the show method
 	 */
     def save() {
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def estStartTime = params.estStartTime
 		if(estStartTime){
-			params.estStartTime =  GormUtil.convertInToGMT(formatter.parse( estStartTime ), tzId)
+			params.estStartTime = TimeUtil.parseDateTime(getSession(), estStartTime)
 		}
 		
         def moveEventInstance = new MoveEvent(params)
@@ -289,7 +283,7 @@ class MoveEventController {
 				book = new HSSFWorkbook(new FileInputStream( file ));
 				def sheet = book.getSheet("moveEvent_results")
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 					for ( int r = 1; r <= moveEventResults.size(); r++ ) {
@@ -300,7 +294,7 @@ class MoveEventController {
 						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(moveEventResults[r-1].voided ))
 						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(moveEventResults[r-1].from_name ))
 						WorkbookUtil.addCell(sheet, 6, r, String.valueOf(moveEventResults[r-1].to_name ))
-						WorkbookUtil.addCell(sheet, 7, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].transition_time, tzId ))))
+						WorkbookUtil.addCell(sheet, 7, r, String.valueOf( TimeUtil.formatDateTime(getSession(), moveEventResults[r-1].transition_time) ))
 						WorkbookUtil.addCell(sheet, 8, r, String.valueOf(moveEventResults[r-1].username ))
 						WorkbookUtil.addCell(sheet, 9, r, String.valueOf(moveEventResults[r-1].team_name ))
 					}
@@ -311,11 +305,10 @@ class MoveEventController {
 						WorkbookUtil.addCell(sheet, 1, r, String.valueOf(moveEventResults[r-1].bundle_name ))
 						WorkbookUtil.addCell(sheet, 2, r, String.valueOf(moveEventResults[r-1].state_to ))
 						WorkbookUtil.addCell(sheet, 3, r, String.valueOf(moveEventResults[r-1].name ))
-						WorkbookUtil.addCell(sheet, 4, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].started, tzId )) ))
-						WorkbookUtil.addCell(sheet, 5, r, String.valueOf(formatter.format(GormUtil.convertInToUserTZ( moveEventResults[r-1].completed, tzId )) ))
+						WorkbookUtil.addCell(sheet, 4, r, String.valueOf( TimeUtil.formatDateTime(getSession(), moveEventResults[r-1].started) ))
+						WorkbookUtil.addCell(sheet, 5, r, String.valueOf( TimeUtil.formatDateTime(getSession(), moveEventResults[r-1].completed) ))
 					}	
 				}
-				tzId ? tzId : 'EDT'
 				WorkbookUtil.addCell(sheet, 0, moveEventResults.size() + 2, "Note: All times are in $tzId time zone")
 				
 				book.write(response.getOutputStream())
@@ -346,8 +339,7 @@ class MoveEventController {
 					def moveEventResults
 					def reportFields =[]
 					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-					DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-					def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+					def currDate = new Date()
 					def filename = 	"MoveResults-${moveEventInstance?.project?.name}-${moveEventInstance?.name}"
 					filename = filename.replace(" ", "_")
 					if(reportType != "SUMMARY"){
@@ -357,9 +349,9 @@ class MoveEventController {
 											"asset_id":results.asset_id, "team_name":results.team_name,
 											"asset_name":results.asset_name, "voided":results.voided, 
 											"from_name":results.from_name, "to_name":results.to_name, 
-											"transition_time":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.transition_time, tzId )) ),
-											"username":results.username,"timezone":tzId ? tzId : "EDT",
-											"rptTime":String.valueOf(formatter.format( currDate ) )]
+											"transition_time": TimeUtil.formatDateTime(getSession(), results.transition_time) ,
+											"username":results.username,"timezone":tzId,
+											"rptTime": TimeUtil.formatDateTime(getSession(), currDate) ]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
 								params:["_format":"PDF","_name":"${filename}-detailed","_file":"moveEventDeailedReport"])
@@ -368,9 +360,9 @@ class MoveEventController {
 						moveEventResults.each { results->
 							reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name, 
 											"state_to":results.state_to, "name":results.name,
-											"started":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.started, tzId )) ),
-											"completed":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.completed, tzId )) ),
-											"timezone":tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+											"started": TimeUtil.formatDateTime(getSession(), results.started),
+											"completed": TimeUtil.formatDateTime(getSession(), results.completed),
+											"timezone":tzId, "rptTime": TimeUtil.formatDateTime(getSession(), currDate) ]
 						}
 						chain(controller:'jasper',action:'index',model:[data:reportFields],
 								params:["_format":"PDF","_name":"${filename}-summary","_file":"moveEventSummaryReport"])
@@ -479,18 +471,16 @@ class MoveEventController {
 	    	
 			def moveEventNews = jdbcTemplate.queryForList( moveEventNewsQuery )
 			
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			DateFormat formatter = new SimpleDateFormat("MM/dd hh:mm a");
 			def news = new StringBuffer()
 			
 			moveEventNews.each{
-	    		news.append(String.valueOf(formatter.format(GormUtil.convertInToUserTZ( it.created, tzId ))) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;")	
+	    		news.append(String.valueOf( TimeUtil.formatDateTime(getSession(), it.created) +"&nbsp;:&nbsp;"+it.message+".&nbsp;&nbsp;"))
 	    	}
 			
 			// append recent tasks  whose status is completed, moveEvent is newsBarMode
 			def transitionComment = new StringBuffer()
 			if(moveEvent.newsBarMode =="on"){
-				def today = GormUtil.convertInToGMT( "now", tzId );
+				def today = new Date()
 				def currentPoolTime = new java.sql.Timestamp(today.getTime())
 				def tasksCompQuery="""SELECT comment,date_resolved AS dateResolved FROM asset_comment WHERE project_id= ${moveEvent.project.id} AND 
 					move_event_id=${moveEvent.id} AND status='Completed' AND
@@ -498,8 +488,7 @@ class MoveEventController {
 				def tasksCompList=jdbcTemplate.queryForList( tasksCompQuery )
 				tasksCompList.each{
 				 	def comment = it.comment
-					def dateResolved = String.valueOf( formatter.format(it.dateResolved ? GormUtil.convertInToUserTZ( it.dateResolved, tzId ) : 
-						GormUtil.convertInToUserTZ( it.dateResolved, tzId ) ) )
+					def dateResolved = it.dateResolved ? TimeUtil.formatDateTime(getSession(), it.dateResolved) : ''
 					transitionComment.append(comment+":&nbsp;&nbsp;"+dateResolved+".&nbsp;&nbsp;")
 				}
 			}
@@ -557,7 +546,6 @@ class MoveEventController {
 				def moveEventResults
 				def reportFields =[]
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 				def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
@@ -566,8 +554,8 @@ class MoveEventController {
 										"asset_id":results.asset_id, "team_name":results.team_name,
 										"asset_name":results.asset_name, "voided":results.voided,
 										"from_name":results.from_name, "to_name":results.to_name,
-										"transition_time":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.transition_time, tzId )) ),
-										"username":results.username,"timezone":tzId ? tzId : "EDT",
+										"transition_time": TimeUtil.formatDateTime(getSession(), results.transition_time),
+										"username":results.username,"timezone":tzId,
 										"rptTime":String.valueOf(formatter.format( currDate ) )]
 					}
 					render(view:"moveResultsWeb",model:[moveEventResults:reportFields])
@@ -576,9 +564,9 @@ class MoveEventController {
 					moveEventResults.each { results->
 						reportFields <<["move_bundle_id":results.move_bundle_id, "bundle_name":results.bundle_name,
 										"state_to":results.state_to, "name":results.name,
-										"started":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.started, tzId )) ),
-										"completed":String.valueOf(formatter.format(GormUtil.convertInToUserTZ( results.completed, tzId )) ),
-										"timezone":tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+										"started": TimeUtil.formatDateTime(getSession(), results.started),
+										"completed": TimeUtil.formatDateTime(getSession(), results.completed),
+										"timezone":tzId, "rptTime":String.valueOf(formatter.format( currDate ) )]
 					}
 					render(view:"moveResultsWeb",model:[moveEventResults:reportFields, summary:'summary'])
 				}
@@ -674,9 +662,7 @@ class MoveEventController {
 			moveEventInstance.save(flush:true)
 		}
 		def bundles = moveEventInstance.moveBundles
-		def today = new Date()
-		def formatter = new SimpleDateFormat("yyyy-MM-dd");
-		today = formatter.format(today)
+		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_6)
 		def moveEventList = MoveEvent.findAllByProject(project)
 		def applcationAssigned = 0
 		def assetCount = 0

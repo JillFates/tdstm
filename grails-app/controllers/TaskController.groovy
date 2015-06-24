@@ -10,7 +10,6 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import java.text.SimpleDateFormat
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.math.NumberUtils
 
@@ -759,8 +758,6 @@ digraph runbook {
 		def etext = ""
 		def comment
 		def commentId = NumberUtils.toInt(params.commentId)
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 		if (commentId >0) {
 			def day = NumberUtils.toInt(params.day)
 			def project = securityService.getUserCurrentProject()
@@ -804,8 +801,8 @@ digraph runbook {
 		} else {
 				etext = "Requested comment does not exist. "
 		}
-		def retMap=[etext:etext, estStart : comment?.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(comment?.estStart, tzId)) : '' ,
-					 estFinish: comment?.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(comment?.estFinish, tzId)) : '' ]
+		def retMap=[etext:etext, estStart : comment?.estStart ? TimeUtil.formatDateTime(getSession(), comment.estStart) : '' ,
+					 estFinish: comment?.estFinish ? TimeUtil.formatDateTime(getSession(), comment.estFinish ) : '' ]
 		render retMap as JSON
 	}
 	
@@ -856,10 +853,8 @@ digraph runbook {
 			publishedValues = [true, false]
 
 		// Define default data
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def defaultEstStart = TimeUtil.nowGMT()
-		def defaultStartDate = TimeUtil.convertInToUserTZ(defaultEstStart, tzId)
-		def data = [items:[], sinks:[], starts:[], roles:[], startDate:defaultStartDate, cyclicals:[:]]
+		def data = [items:[], sinks:[], starts:[], roles:[], startDate:defaultEstStart, cyclicals:[:]]
 
 		// if user used the event selector on the page, update their preferences with the new event
 		if (params.moveEventId && params.moveEventId.isLong())
@@ -911,9 +906,7 @@ digraph runbook {
 		if (!estStart) {
 			estStart = TimeUtil.nowGMT()
 		}
-		def startDate = TimeUtil.convertInToUserTZ(estStart, tzId)
-		
-		
+		def startDate = estStart
 		
 		// generate the JSON data used by d3
 		def items = []
@@ -1028,9 +1021,6 @@ digraph runbook {
 			graphs = runbookService.determineUniqueGraphs(dfsMap.starts, dfsMap.sinks, tmp)
 			estFinish = runbookService.computeStartTimes(startTime, tasks, deps, dfsMap.starts, dfsMap.sinks, graphs, tmp)
 
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-
 			results.append("Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>")
 			results.append("Start Vertices: " + (dfsMap.starts.size() > 0 ? dfsMap.starts : 'none') + '<br/>')
 			results.append("Sink Vertices: " + (dfsMap.sinks.size() > 0 ? dfsMap.sinks : 'none') + '<br/>')
@@ -1106,13 +1096,13 @@ digraph runbook {
 				def actual=''
 
 				if (t.constraintTime) {
-					constraintTime = formatter.format(TimeUtil.convertInToUserTZ(t.constraintTime, tzId)) + " ${t.constraintType}"
+					constraintTime = TimeUtil.formatDateTime(getSession(), t.constraintTime) + " ${t.constraintType}"
 				}
 				if (t.actStart) {
-					actStart = formatter.format(TimeUtil.convertInToUserTZ(t.actStart, tzId))
+					actStart = TimeUtil.formatDateTime(getSession(), t.actStart)
 				}
 				if (t.actFinish) {
-					actFinish = formatter.format(TimeUtil.convertInToUserTZ(t.actFinish, tzId))
+					actFinish = TimeUtil.formatDateTime(getSession(), t.actFinish)
 				}
 
 				if (t.actStart && t.actFinish) {
@@ -1338,10 +1328,6 @@ function goBack() { window.history.back() }
 			render "${backScript}Unable to find specified record. ${backButton}"
 			return
 		}
-		
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			
 		def isCleaner = partyRelationshipService.staffHasFunction(project.id, person.id, 'CLEANER')
 		def canPrint = request.getHeader ( "User-Agent" ).contains ( "MSIE" ) && isCleaner
@@ -1349,7 +1335,7 @@ function goBack() { window.history.back() }
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
 		noteList.each{
-			def dateCreated = TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma")
+			def dateCreated = TimeUtil.formatDateTime(getSession(), it.dateCreated, FORMAT_DATE_TIME_3)
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
 		
@@ -1371,7 +1357,7 @@ function goBack() { window.history.back() }
 			assignmentPerm = ! [AssetCommentStatus.DONE, AssetCommentStatus.TERMINATED].contains(assetComment.status)
 		}
 		
-		def dueDate = assetComment.dueDate ? dueFormatter.format(GormUtil.convertInToUserTZ(assetComment.dueDate, tzId)) : ''
+		def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate) : ''
 		
 		def successor = TaskDependency.findAllByPredecessor( assetComment )
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff

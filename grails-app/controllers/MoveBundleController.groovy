@@ -1,7 +1,5 @@
 import grails.converters.JSON
 
-import java.text.SimpleDateFormat
-
 import org.apache.commons.lang.StringUtils
 import org.quartz.SimpleTrigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -60,8 +58,6 @@ class MoveBundleController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		
 		def startDates = params.startTime ? MoveBundle.findAll("from MoveBundle where project =:project and startTime like '%${params.startTime}%'",[project:project])?.startTime : []
 		def completionDates = params.completionTime ? MoveBundle.findAll("from MoveBundle where project =:project and completionTime like '%${params.completionTime}%'",[project:project])?.completionTime : []
@@ -91,8 +87,8 @@ class MoveBundleController {
 		
 		def results = bundleList?.collect {
 			[ cell: [it.name, it.description, (it.useForPlanning ? 'Y' : 'N'), it.assetQty, 
-				(it.startTime ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.startTime, tzId)):''),
-				(it.completionTime ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.completionTime, tzId)):'')],
+				(it.startTime ? TimeUtil.formatDate(getSession(), it.startTime):''),
+				(it.completionTime ? TimeUtil.formatDate(getSession(), it.completionTime):'')],
 				 id: it.id]
 			}
 
@@ -231,14 +227,12 @@ class MoveBundleController {
 				moveBundleInstance.moveEvent = null
 			}
 			moveBundleInstance.operationalOrder = params.operationalOrder ? Integer.parseInt(params.operationalOrder) : 1
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def startTime = params.startTime
 			def completionTime = params.completionTime
 			
-			moveBundleInstance.startTime = startTime? GormUtil.convertInToGMT(formatter.parse( startTime ), tzId) : null
+			moveBundleInstance.startTime = startTime? TimeUtil.parseDateTime(getSession(), startTime) : null
 			
-			moveBundleInstance.completionTime =  completionTime ? GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId) : null
+			moveBundleInstance.completionTime =  completionTime ? TimeUtil.parseDateTime(getSession(), completionTime) : null
 
 			// TODO : SECURITY : Should be confirming that the rooms belong to the moveBundle.project instead of blindly assigning plus should be
 			// validating that the rooms even exist.			
@@ -301,17 +295,15 @@ class MoveBundleController {
 
 	def save() {
 
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def startTime = params.startTime
 		def completionTime = params.completionTime
 		if(startTime){
-			params.startTime =  GormUtil.convertInToGMT(formatter.parse( startTime ), tzId)
+			params.startTime =  TimeUtil.parseDateTime(getSession(), startTime)
 		}
 		if(completionTime){
-			params.completionTime =  GormUtil.convertInToGMT(formatter.parse( completionTime ), tzId)
+			params.completionTime =  TimeUtil.parseDateTime(getSession(), completionTime)
 		}
-		
+
 		params.sourceRoom = params.sourceRoom ? Room.read( params.sourceRoom ) : null 
 		
 		params.targetRoom = params.targetRoom ? Room.read( params.targetRoom ) : null
@@ -409,9 +401,7 @@ class MoveBundleController {
 	 */
 	def planningStats() {
 		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
 		def project = Project.get(projectId)
-		def bundleTimeformatter = new SimpleDateFormat("dd-MMM")
 		def appList = []
 		//def assetList = []
 		def eventStartDate = [:]
@@ -490,7 +480,7 @@ class MoveBundleController {
 			def eventWiseArgs = [project:project, moveBundles:moveBundles]
 			
 			def eventDates = moveEvent.getEventTimes()
-			eventStartDate << [(moveEvent.id):(eventDates.start ? bundleTimeformatter.format( GormUtil.convertInToUserTZ( eventDates.start, tzId) ) : 'TBD')]
+			eventStartDate << [(moveEvent.id):(eventDates.start ? TimeUtil.formatDateTime(getSession(), eventDates.start, TimeUtil.FORMAT_DATE_TIME_7) : 'TBD')]
 			
 			// Fetching application count that are assigned to current move event
 			assignedApplicationCount = moveBundles ? Application.executeQuery(appCountQuery, eventWiseArgs)[0] : 0
@@ -690,10 +680,9 @@ class MoveBundleController {
 		def assetDependencyList = jdbcTemplate.queryForList("select dependency_bundle as dependencyBundle from  asset_dependency_bundle \
 			where project_id = $projectId  group by dependency_bundle order by dependency_bundle  limit 48")
 		
-		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
-		time = date ? formatter.format(date) : ''
+		time = date ? TimeUtil.formatDateTime(getSession(), date, FORMAT_DATE_TIME_8) : ''
 		
 		def today = new Date()
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"

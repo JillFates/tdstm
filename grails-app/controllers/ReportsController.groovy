@@ -1,8 +1,6 @@
 import grails.converters.JSON
 import groovy.time.TimeCategory
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.io.*
 
 import javax.servlet.http.HttpServletRequest;
@@ -119,6 +117,7 @@ class ReportsController {
 		def reportName = params.reportName
 		def currProj = getSession().getAttribute( "CURR_PROJ" )
 		def projectId = currProj.CURR_PROJ
+		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def projectInstance = securityService.getUserCurrentProject();
 		if (!projectInstance) {
 			flash.message = "Please select project to view Reports"
@@ -156,9 +155,7 @@ class ReportsController {
 														"asset.moveBundle != null order By asset.moveBundle,asset.cart,asset.shelf")
 			}
 			
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
-			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+			def currDate = new Date()
 			//Source AssetList 
 			if( assetEntityList != null) {
 				assetEntityList.each { asset ->
@@ -203,7 +200,7 @@ class ReportsController {
 									'room':asset.sourceRoom, 'instructions':assetCommentString,
 									'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
 									'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
-									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) )]
+									'timezone':tzId, "rptTime": TimeUtil.formatDateTime(getSession(), currDate)]
 				}
 			}
 			//No Assets were found for selected moveBundle,team and Location
@@ -295,8 +292,7 @@ class ReportsController {
 			def assetCommentList = AssetComment.findAll( commentsQuery.toString() )
 			
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
-			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+			def currDate = new Date()
 			assetCommentList.each { assetComment ->
 				def createdBy
 				def sourceTargetRoom
@@ -315,7 +311,7 @@ class ReportsController {
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
 									'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
 									'clientName':projectInstance?.client?.name,"resolvedInfoInclude":resolvedInfoInclude,
-									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
+									'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
 				}
 				if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
@@ -326,7 +322,7 @@ class ReportsController {
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
 									'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
 									'clientName':projectInstance?.client?.name,
-									'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate )),
+									'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
 									'previousNote':WebUtil.listAsMultiValueString(assetComment.notes) ]
 				}
 			}
@@ -342,7 +338,7 @@ class ReportsController {
 								'owner':'',
 								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,
 								'clientName':projectInstance?.client?.name,
-								'timezone':tzId ? tzId : "EDT", "rptTime":String.valueOf(formatter.format( currDate ) ),
+								'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate),
 								'previousNote':'']
 				}
 
@@ -379,7 +375,7 @@ class ReportsController {
 							WorkbookUtil.addCell(sheet, 4, r+6, String.valueOf(reportFields[r].model ?:''))
 							WorkbookUtil.addCell(sheet, 5, r+6, String.valueOf(reportFields[r].commentCode ?:''))
 							WorkbookUtil.addCell(sheet, 6, r+6, String.valueOf(reportFields[r].commentType ?:''))
-							WorkbookUtil.addCell(sheet, 7, r+6, String.valueOf(reportFields[r].occuredAt ? formatter.format( reportFields[r].occuredAt ) : ""))
+							WorkbookUtil.addCell(sheet, 7, r+6, String.valueOf(reportFields[r].occuredAt ? TimeUtil.formatDateTime(getSession(), reportFields[r].occuredAt) : ""))
 							WorkbookUtil.addCell(sheet, 8, r+6, String.valueOf(reportFields[r].createdBy ?:''))
 							WorkbookUtil.addCell(sheet, 9, r+6, String.valueOf(reportFields[r].owner ?:''))
 							WorkbookUtil.addCell(sheet, 10, r+6, String.valueOf(WebUtil.listAsMultiValueString(reportFields[r].previousNote)?:''))
@@ -636,8 +632,7 @@ class ReportsController {
 			}
 			
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
-			DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+			def currDate = new Date()
 			//Source AssetList 
 			if( assetCablesList != null) {
 				assetCablesList.each { cable ->
@@ -662,7 +657,7 @@ class ReportsController {
 									'project_name':projectInstance?.name,
 									'bundle_name':bundleInstance?.name,
 									'report_type': reportName == 'cablingQA' ? "Cabling QA Report" : "Cabling Conflict Report",
-									'timezone':tzId ? tzId : "EDT", "rpt_time":String.valueOf(formatter.format( currDate ) )]
+									'timezone':tzId, "rpt_time": TimeUtil.formatDateTime(getSession(), currDate) ]
 				}
 			}
 			//No Assets were found for selected moveBundle,team and Location
@@ -1237,8 +1232,7 @@ class ReportsController {
 	 * @return : will generate a pdf file having task task list
 	 */
 	def exportTaskReportPdf(taskList, tzId, project){
-		def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		def currDate = new Date()
 		def reportFields = []
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 		taskList.each{task ->
@@ -1259,13 +1253,13 @@ class ReportsController {
 				"clientName":project?.client?.name,"team":task.role? task.role.toString():"",
 				'projectName':project?.name,'notes':task.notes? WebUtil.listAsMultiValueString(task.notes):"",
 				'duration':task.duration ? task.duration.toString():"", 
-				'estStart':task.estStart? formatter.format(GormUtil.convertInToUserTZ(task.estStart, tzId )).toString():"",
-				'estFinish':task.estFinish? formatter.format(GormUtil.convertInToUserTZ(task.estFinish, tzId )).toString(): "",
-				'actStart':task.actStart? formatter.format(GormUtil.convertInToUserTZ(task.actStart, tzId )).toString():"",
-				'actFinish':task.actFinish? formatter.format(GormUtil.convertInToUserTZ(task.actFinish, tzId )).toString():"",
-				"createdOn":task.dateCreated? formatter.format(GormUtil.convertInToUserTZ(task.dateCreated, tzId )).toString():"",
+				'estStart':task.estStart? TimeUtil.formatDate(getSession(), task.estStart):"",
+				'estFinish':task.estFinish? TimeUtil.formatDate(getSession(), task.estFinish): "",
+				'actStart':task.actStart? TimeUtil.formatDate(getSession(), task.actStart):"",
+				'actFinish':task.actFinish? TimeUtil.formatDate(getSession(), task.actFinish):"",
+				"createdOn":task.dateCreated? TimeUtil.formatDate(getSession(), task.dateCreated):"",
 				"createdBy":task.createdBy.toString() ,"moveEvent":task.moveEvent? task.moveEvent.toString():"",
-				'timezone':tzId ? tzId : "EDT","rptTime":String.valueOf(formatter.format( currDate ) )]
+				'timezone':tzId, "rptTime": TimeUtil.formatDate(getSession(), currDate) ]
 		}
 		if(reportFields.size() <= 0) {
 			flash.message = " No Assets Were found for  selected values  "

@@ -581,10 +581,6 @@ class MoveBundleService {
 	 */
 	def generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked, userLoginName, progressKey) {
 		
-		def date = new Date()
-		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		String time = formatter.format(date);
-
 		def sqlFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 		String sqlTime = sqlFormatter.format(date);
 		

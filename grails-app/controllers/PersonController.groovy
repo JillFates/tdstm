@@ -1,8 +1,5 @@
 import grails.converters.JSON
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
@@ -447,10 +444,8 @@ class PersonController {
 		def personInstance = Person.get( params.id )        
 		def companyId = params.companyId
 		def companyParty = Party.findById(companyId)
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def dateCreatedByFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.dateCreated, tzId ) )
-		def lastUpdatedFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.lastUpdated, tzId ) )
+		def dateCreatedByFormat = TimeUtil.formatDateTime(getSession(), personInstance.dateCreated)
+		def lastUpdatedFormat = TimeUtil.formatDateTime(getSession(), personInstance.lastUpdated)
 		if(!personInstance) {
 			flash.message = "Person not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
@@ -657,8 +652,6 @@ class PersonController {
 		def personId
 		if ( personInstance.validate() && personInstance.save(flush:true) ) {
 			personId = personInstance.id
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 			//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
 			def userLogin = UserLogin.findByPerson( personInstance )
 				if(userLogin){
@@ -671,7 +664,7 @@ class PersonController {
 					
 				if(params.expiryDate && params.expiryDate != "null"){
 					def expiryDate = params.expiryDate
-					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+					userLogin.expiryDate =  TimeUtil.parseDateTime(getSession(), expiryDate)
 				}
 				userLogin.active = personInstance.active
 				if(!userLogin.save()){
@@ -688,8 +681,7 @@ class PersonController {
 			}
 
 			def personExpDates = params.list("availability")
-			def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
-			personExpDates = personExpDates.collect{GormUtil.convertInToGMT(expFormatter.parse(it), tzId)}
+			personExpDates = personExpDates.collect{ TimeUtil.parseDate(getSession(), it) }
 			def existingExp = ExceptionDates.findAllByPerson(personInstance)
 			
 			if(personExpDates){
@@ -739,12 +731,9 @@ class PersonController {
 		}
 
 		def userLogin = UserLogin.findByPerson( person )
-		
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 
 		// TODO : JPM 5/2015 : Move the date formating into a reusable class
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-		def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
+		def expiryDate = userLogin.expiryDate ? TimeUtil.formatDateTime(getSession(), userLogin.expiryDate) : ""
 		
 		def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
 
@@ -1181,8 +1170,6 @@ class PersonController {
 		// TODO : JPM 5/2015 : Need to add security controls
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
-		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
-		def moveEventDateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 		if (project) {
 			def bundleStartDate = ""
 			def personAssignedToME = []
@@ -1193,13 +1180,13 @@ class PersonController {
 				startDate?.removeAll([null])
 				if (startDate.size()>0) {
 					if (startDate[0]) {
-						bundleStartDate = bundleTimeformatter.format(startDate[0])
+						bundleStartDate = TimeUtil.formatDateTime(getSession(), startDate[0], TimeUtil.FORMAT_DATE_TIME_10)
 					}
 				}
 				moveMap.put("project", moveEvent.project.name)
 				moveMap.put("name", moveEvent.name)
 				moveMap.put("startTime", bundleStartDate)
-				moveMap.put("startDate", moveEventDateFormatter.format(moveEvent.eventTimes.start))
+				moveMap.put("startDate", TimeUtil.formatDateTime(getSession(), moveEvent.eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6) )
 				moveMap.put("id", moveEvent.id)
 				
 				moveEventList << moveMap

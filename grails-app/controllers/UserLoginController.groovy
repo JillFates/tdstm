@@ -6,7 +6,6 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
-import java.text.SimpleDateFormat
 import grails.converters.JSON
 
 class UserLoginController {
@@ -226,11 +225,9 @@ class UserLoginController {
 			def companyId = params.companyId
 			if(userLoginInstance) {
 				try{
-					def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-					def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 					def expiryDate = params.expiryDate
 					if(expiryDate){
-						params.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+						params.expiryDate = TimeUtil.parseDateTime(getSession(), expiryDate)
 					}
 				} catch (Exception ex){
 					println"Invalid date format"
@@ -335,11 +332,9 @@ class UserLoginController {
 			return
 
 		try{
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def expiryDate = params.expiryDate
 			if(expiryDate){
-				params.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+				params.expiryDate = TimeUtil.parseDateTime(getSession(), expiryDate)
 			}
 		} catch (Exception ex){
 			println"Invalid date format"
