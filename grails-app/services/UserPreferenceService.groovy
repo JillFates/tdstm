@@ -3,6 +3,7 @@ import javax.servlet.http.HttpSession
 import org.apache.shiro.SecurityUtils
 import org.springframework.web.context.request.RequestContextHolder
 
+// TODO : JPM 6/2015 : Why are all of these packages being loaded???
 import com.tds.asset.ApplicationAssetMap
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
@@ -52,6 +53,7 @@ class UserPreferenceService  {
 	 * saved into the user's session
 	 */
 	def loadPreferences(UserLogin userLogin, String preferenceCode) {
+		// TODO : JPM 6/2015 : Just want to PUKE - this is loading all of the users' preferences into a map and storing as individual preferences - WTF?
 		if(userLogin){
 			def userPreference = UserPreference.findAllByUserLogin( userLogin )
 			
@@ -72,7 +74,7 @@ class UserPreferenceService  {
 	 * Method will access the map stored into the user's session and 
 	 * return the value if found otherwise return null
 	 */
-	def String get( String preferenceCode ) {
+	String get( String preferenceCode ) {
 		def value = null
 		def userLogin = securityService.getUserLogin()
 		if (userLogin) {
@@ -89,6 +91,42 @@ class UserPreferenceService  {
 		
 		// log.info "user preference $preferenceCode=$value"
 		return value
+	}
+
+	/* 
+	 * Used to retrieve a map of user preferences based on the list of codes that are passed. Those preferences that are not found
+	 * will default to a blank string value
+	 * @param codes - a list of one or more String preference codes to lookup
+	 * @param userLogin - the user whom to lookup the preference for. This is optional and if not supplied it will lookup the user from the session
+	 * @return A map containing the values of the various preferences
+	 */
+	Map getPreferences(List<String> codes, UserLogin userLogin=null) {
+		Map codesWithDefaults = [:]
+		codes.each { codesWithDefaults[it] = '' }
+		return getPreferences(codesWithDefaults, userLogin)
+	}
+
+	/* 
+	 * Used to retrieve a map of user preferences based on the list of codes that are passed with their default values if not found
+	 * @param codesWithDefaults - a map of preference codes with their default values
+	 * @param userLogin - the user whom to lookup the preference for, if not supplied it will lookup the user from the session
+	 * @return A map containing the values of the various preferences
+	 */
+	Map getPreferences(Map codesWithDefaults, UserLogin userLogin=null) {
+		// TODO : JPM 6/2015 : getPreferences should look to see if the value is already in the user session instead of always going back to the database
+		// TODO : JPM 6/2015 : How should we be handling the default values??? Should they come from the caller or should we just maintain a master list?
+		Map map = [:]
+		if (! userLogin) userLogin = securityService.getUserLogin()
+		if (! userLogin) return map
+
+		def codes = codesWithDefaults.keySet()
+		def ups = UserPreference.findAllByUserLoginAndPreferenceCodeInList( userLogin, codes)
+		codesWithDefaults.each { code, defVal -> 
+			def up = ups.find { it.preferenceCode == code }
+			map[code] = up ? up.value : defVal
+		}
+
+		return map  
 	}
 
 	/* 
