@@ -1142,11 +1142,14 @@ var EntityCrud = ( function($) {
 			far from ideal, but it's required for keeping track of the current
 			asset when the user edits a comment from the asset modal.
 		*/
-		var $body = angular.element("#"+assetId)
-  		var $rootScope = $body.scope().$root
-  		$rootScope.$apply(function () {
-    		$rootScope.selectedAsset = assetId
-  		})
+		var $asset = angular.element("#"+assetId)
+  		if($asset.scope()){
+  			var $rootScope = $asset.scope().$root
+  			$rootScope.$apply(function () {
+    			$rootScope.selectedAsset = assetId
+  			})	
+		}
+		
 		switch (assetClass) {
 			case "APPLICATION":
 				return fetchAssetShowView('application', 'Application', assetId);
