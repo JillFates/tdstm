@@ -682,7 +682,7 @@ class MoveBundleController {
 		
 		String time
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
-		time = date ? TimeUtil.formatDateTime(getSession(), date, FORMAT_DATE_TIME_8) : ''
+		time = date ? TimeUtil.formatDateTime(getSession(), date, TimeUtil.FORMAT_DATE_TIME_8) : ''
 		
 		def today = new Date()
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"

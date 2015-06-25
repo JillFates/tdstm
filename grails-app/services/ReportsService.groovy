@@ -1,12 +1,11 @@
 import org.apache.commons.lang3.StringUtils
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetDependency
 import com.tds.asset.AssetComment
 import com.tds.asset.Application
 import com.tds.asset.AssetType
 import org.springframework.transaction.annotation.Transactional
+import com.tdssrc.grails.TimeUtil
 
 @Transactional
 class ReportsService {
@@ -17,6 +16,7 @@ class ReportsService {
 	def securityService
 	def runbookService
 	def taskService
+	def userPreferenceService
 
 	static transactional = true
 
@@ -444,9 +444,8 @@ class ReportsService {
 	*/
 	def getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList) {
 		
+		def session = userPreferenceService.getSession()
 		def date = new Date()
-		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		def format = new SimpleDateFormat("yyyy-mm-dd hh:mm:sss");
 		String time = formatter.format(date);
 		def errorForEventTime = ""
 		def newsBarModeError = ""
@@ -462,10 +461,10 @@ class ReportsService {
 				def projectEndTime = 'Not Available'
 				
 				if (it.startTime) {
-					projectStartTime  = formatter.format(format.parse(it.startTime.toString()))
+					projectStartTime  = TimeUtil.formatDateTime(session, it.startTime, TimeUtil.FORMAT_DATE_TIME_8)
 				}
 				if (it.completionTime) {
-					projectEndTime  = formatter.format(format.parse(it.completionTime.toString()))
+					projectEndTime  = TimeUtil.formatDateTime(session, it.completionTime, TimeUtil.FORMAT_DATE_TIME_8)
 				}
 				
 				errorForEventTime += """<span style="color:green"><b>Event Time Period ${it.name}: OK </b>${projectStartTime} - ${projectEndTime}</span><br></br>"""

@@ -1,6 +1,6 @@
-import java.text.SimpleDateFormat;
 import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 /**
  * The StepSnapshot domain represents a point in time representation of the status of a Step in a MoveBundle. A group of
  * snapshot records will be created at one time for all MoveBundleStep records associated with a MoveBundle.
@@ -80,7 +80,7 @@ class StepSnapshot {
 	 */
 	def getProjectedTimeOver() {
 		def timeOver = 0
-		def nowTime = GormUtil.convertInToGMT( "now", "EDT" ).getTime()
+		def nowTime = TimeUtil.nowGMT().getTime()
 		if(!hasStarted()){
 			if( moveBundleStep.planStartTime.getTime() >  nowTime ) {
 				timeOver = ( nowTime + getProjectedTimeRemaining() * 1000 ) - moveBundleStep.planCompletionTime.getTime()
@@ -100,15 +100,10 @@ class StepSnapshot {
 	 * @return date - projected completion time
 	 */
 	def getProjectedCompletionTime() {
-	
-	// TODO : JPM : Shouldn't be converting TZ here....  We leave TZ switch in the web service ONLY
-	
-		// return moveBundleStep.planCompletionTime + projectedTimeOver
-		//def offsetTZ =  new Date().getTimezoneOffset() / 60 
 		def projectedCompletionTimeInseconds = ( moveBundleStep.planCompletionTime.getTime() / 1000 ) + getProjectedTimeOver()
 		def projectedCompletionTime = new Date( (Long)(projectedCompletionTimeInseconds * 1000) )
-		def dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		return dateformat.format(projectedCompletionTime)
+
+		return projectedCompletionTime
 	}
 
 	/**

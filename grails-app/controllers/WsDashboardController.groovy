@@ -156,7 +156,7 @@ class WsDashboardController {
 			
 			if ( data.snapshotId ) {
 				snapshot = StepSnapshot.findById( data.snapshotId )
-				data.put( "projComp", snapshot.getProjectedCompletionTime() )
+				data.put( "projComp", TimeUtil.formatDateTime(getSession(), snapshot.getProjectedCompletionTime()) )
 				data.put( "statColor", snapshot.getStatusColor() )
 				if (snapshot.moveBundleStep.showInGreen) {
 					data.put( "percentageStyle", "step_statusbar_good" )

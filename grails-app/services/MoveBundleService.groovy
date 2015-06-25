@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 
 import com.tds.asset.ApplicationAssetMap
@@ -426,9 +424,8 @@ class MoveBundleService {
  		log.info "dependencyConsoleMap() : stats=$stats}"
 		 
 		def depGrpCrt = projectInstance.depConsoleCriteria ? JSON.parse( projectInstance.depConsoleCriteria ) : [:]
-		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm a');
-		def generatedDate = depGrpCrt.modifiedDate ? formatter.format(TimeUtil.convertInToUserTZ(new Date(depGrpCrt.modifiedDate), tzId)):''
+		def session = userPreferenceService.getSession()
+		def generatedDate = depGrpCrt.modifiedDate ? TimeUtil.formatDateTime(session, depGrpCrt.modifiedDate):''
 		def map = [ 
 			company:projectInstance.client,
 			asset:'apps',
@@ -502,7 +499,6 @@ class MoveBundleService {
 	 * @return void
 	 */
 	def issueExport (def exportList, def columnList, def sheet, def tzId, def startRow = 0, def viewUnpublished = false) {
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 		for ( int r = startRow; r < (exportList.size() + startRow); r++ ) {
 			for (int c = 0; c < columnList.size(); ++c){
 				def cellValue
@@ -545,16 +541,16 @@ class MoveBundleService {
 						cellValue = exportList[r-startRow].workflowTransition ? String.valueOf(exportList[r-startRow].workflowTransition?.name) : ''
 						 break;
 					case "estStart":
-						 cellValue = exportList[r-startRow].estStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].estStart, tzId))) : ''
+						 cellValue = exportList[r-startRow].estStart ?  TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].estStart) : ''
 						 break;
 					case "estFinish":
-						 cellValue = exportList[r-startRow].estFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].estFinish, tzId))) : ''
+						 cellValue = exportList[r-startRow].estFinish ? TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].estFinish) : ''
 						 break;
 					case "actStart":
-						 cellValue = exportList[r-startRow].actStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].actStart, tzId))) : ''
+						 cellValue = exportList[r-startRow].actStart ? TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].actStart) : ''
 						 break;
 					case "actFinish":
-						 cellValue = exportList[r-startRow].actFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].dateResolved, tzId))) : ''
+						 cellValue = exportList[r-startRow].actFinish ? TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].actFinish) : ''
 						 break;
 					case "":
 						cellValue = ""
@@ -581,9 +577,7 @@ class MoveBundleService {
 	 */
 	def generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked, userLoginName, progressKey) {
 		
-		def sqlFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-		String sqlTime = sqlFormatter.format(date);
-		
+		String sqlTime = TimeUtil.formatDateTimeAsGMT(TimeUtil.nowGMT(), FORMAT_DATE_TIME_14)
 		def projectInstance = Project.get(projectId)
 		
 		// Get array of the valid status and connection types to check against in the inner loop

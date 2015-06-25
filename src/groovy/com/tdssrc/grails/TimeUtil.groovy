@@ -14,6 +14,7 @@ class TimeUtil {
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
 	def static final dateTimeFormats = ["MM/DD/YYYY", "DD/MM/YYYY"]
 	def static final defaultTimeZone = "GNT"
+	def static final GMT = "GMT"
 
 	def static final String TIMEZONE_ATTR = "CURR_TZ"
 	def static final String DATE_TIME_FORMAT_ATTR = "CURR_DT_FORMAT"
@@ -34,6 +35,10 @@ class TimeUtil {
 	def static final FORMAT_DATE_TIME_9 = "MM-dd-yyyy hh:mm a"
 	def static final FORMAT_DATE_TIME_10 = "MMM dd"
 	def static final FORMAT_DATE_TIME_11 = "yyyy/MM/dd hh:mm:ss a"
+	def static final FORMAT_DATE_TIME_12 = "MM-dd-yyyy"
+	def static final FORMAT_DATE_TIME_13 = "MM/dd kk:mm:ss"
+	// Used in sql queries
+	def static final FORMAT_DATE_TIME_14 = "yyyy-MM-dd hh:mm"
 
 	static final String SHORT='S'
 	static final String FULL='F'
@@ -314,19 +319,32 @@ class TimeUtil {
 	}
 
 	public static String formatDate(session, dateValue) {
-		def formatter = createFormatter(FORMAT_DATE)
+		def formatter = createFormatter(session, FORMAT_DATE)
 		return formatDateTime(session, dateValue, formatter)
 	}
 
-	public static String formatDateTime(session, dateValue, formatterType=FORMAT_DATE_TIME) {
-		def formatter = createFormatter(formatterType)
+	public static String formatDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
+		def formatter = createFormatter(session, formatterType)
 		return formatDateTime(session, dateValue, formatter)
 	}
 
 	public static String formatDateTime(session, dateValue, DateFormat formatter) {
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	}
+
+	public static String formatDateTimeWithTZ(tzId, dateValue, String formatterType=FORMAT_DATE_TIME) {
+		def formatter = createFormatter(null, FORMAT_DATE)
+		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	}
+
+	public static String formatDateTimeWithTZ(tzId, dateValue, DateFormat formatter) {
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		return formatter.format(dateValue)
+	}
+
+	public static String formatDateTimeAsGMT(dateValue, String formatterType=FORMAT_DATE_TIME) {
+		return formatDateTimeWithTZ(GMT, dateValue, formatterType)
 	}
 
 	/**
@@ -344,7 +362,7 @@ class TimeUtil {
 	 * @param the datetime as a string
 	 * @return The date or null if it failed to parse it
 	 **/
-	public static Date parseDateTime(session, dateValue, formatterType=FORMAT_DATE_TIME) {
+	public static Date parseDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
 		def formatter = createFormatter(formatterType)
 		return parseDateTime(session, dateValue, formatter)
 	}
@@ -355,7 +373,7 @@ class TimeUtil {
 		return formatter.parse(dateValue)
 	}
 
-	private static DateFormat createFormatter(session, formatterType) {
+	private static DateFormat createFormatter(session, String formatterType) {
 		def formatter
 		switch (formatterType) {
 			case FORMAT_DATE:
@@ -393,6 +411,15 @@ class TimeUtil {
 				break;
 			case FORMAT_DATE_TIME_11:
 				formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a")
+				break;
+			case FORMAT_DATE_TIME_12:
+				formatter = new SimpleDateFormat("MM-dd-yyyy")
+				break;
+			case FORMAT_DATE_TIME_13:
+				formatter = new SimpleDateFormat("MM/dd kk:mm:ss")
+				break;
+			case FORMAT_DATE_TIME_14:
+				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
 				break;
 		}
 		return formatter

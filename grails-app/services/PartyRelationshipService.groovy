@@ -1,5 +1,3 @@
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import org.apache.poi.*
 
 import com.tdssrc.grails.GormUtil
@@ -622,24 +620,6 @@ class PartyRelationshipService {
 		def roleTypeInstance = RoleType.findById('TEAM_MEMBER')
 		def teamMembers = PartyRelationship.findAll(" from PartyRelationship pr where pr.partyRelationshipType = 'PROJ_TEAM' and pr.roleTypeCodeFrom ='TEAM' and pr.partyIdFrom = $teamId and pr.roleTypeCodeTo = 'TEAM_MEMBER' ")
 		return teamMembers
-	}
-	/*--------------------------------------------------
-	 * To convert Date time into mm/dd/yy format
-	 * @author srinivas
-	 * @param 
-	 *---------------------------------------------------*/
-	 def convertDate(def date) {
-		 Date dt = date
-			String dtStr = dt.getClass().getName().toString();
-			String dtParam = dt.toString();	
-			DateFormat formatter ; 
-			formatter = new SimpleDateFormat("MM/dd/yy");
-			dtParam = formatter.format(dt);		
-			/* if null or any plain string */
-			if (dtParam != "null") {
-				dtParam = dtParam.trim();
-			}
-			return dtParam
 	}
 
 	/**
