@@ -1,4 +1,4 @@
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 /**
  * this class is used to provide a mapping between moveEvent and assigned person to that Event with role
@@ -47,10 +47,10 @@ class MoveEventStaff {
      * Date to insert in GMT
      */
     def beforeInsert = {
-        dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-        lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+        dateCreated = TimeUtil.nowGMT()
+        lastUpdated = TimeUtil.nowGMT()
     }
     def beforeUpdate = {
-        lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+        lastUpdated = TimeUtil.nowGMT()
     }
 }

@@ -370,7 +370,7 @@ class UserLoginController {
 				def tZPreference = new UserPreference()
 				tZPreference.userLogin = userLoginInstance
 				tZPreference.preferenceCode = "CURR_TZ"
-				tZPreference.value = "EDT"
+				tZPreference.value = "GMT"
 				tZPreference.save( insert: true)
 				flash.message = "UserLogin ${userLoginInstance} created"
 				redirect( action:"show", id:userLoginInstance.id, params:[ companyId:companyId ] )

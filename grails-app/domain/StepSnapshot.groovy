@@ -1,5 +1,4 @@
 import org.apache.shiro.SecurityUtils
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 /**
  * The StepSnapshot domain represents a point in time representation of the status of a Step in a MoveBundle. A group of
@@ -12,7 +11,7 @@ class StepSnapshot {
 	int duration				// The number of seconds that the task has been executing
 	int planDelta				// The number of seconds that the step is over(+)/under(-) the planned finish time.
 	int dialIndicator			// Quantity to display in the dial/gage on dashboard
-	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+	Date dateCreated = TimeUtil.nowGMT()
 
 	static constraints = { 
 		dateCreated( nullable:true )

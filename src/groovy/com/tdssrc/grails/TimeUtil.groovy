@@ -13,7 +13,7 @@ class TimeUtil {
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
 	def static final dateTimeFormats = ["MM/DD/YYYY", "DD/MM/YYYY"]
-	def static final defaultTimeZone = "GNT"
+	def static final defaultTimeZone = "GMT"
 	def static final GMT = "GMT"
 
 	def static final String TIMEZONE_ATTR = "CURR_TZ"
@@ -39,6 +39,8 @@ class TimeUtil {
 	def static final FORMAT_DATE_TIME_13 = "MM/dd kk:mm:ss"
 	// Used in sql queries
 	def static final FORMAT_DATE_TIME_14 = "yyyy-MM-dd hh:mm"
+	def static final FORMAT_DATE_TIME_15 = "yyyy-MM-dd HH:mm:ss"
+	def static final FORMAT_DATE_TIME_16 = "yyyy-MM-dd hh:mm a"
 
 	static final String SHORT='S'
 	static final String FULL='F'
@@ -230,83 +232,6 @@ class TimeUtil {
 		sqlFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"))
 		return sqlFormatGmt.format(new Date())
 	}
-	
-	/**
-	 * Converts date into GMT
-	 * @param date
-	 * @return converted Date
-	 */
-	def public static convertInToGMT = { date, tzId ->
-		Date ret
-		if(date){
-			TimeZone tz
-			if(date == 'now'){
-				tz  = TimeZone.getDefault()
-				Calendar calendar = Calendar.getInstance(tz);
-				date = calendar.getTime()
-				ret = new Date(date.getTime() - tz.getRawOffset());
-				// if we are now in DST, back off by the delta. Note that we are
-				// checking the GMT date, this is the KEY.
-				if (tz.inDaylightTime(ret)) {
-					Date dstDate = new Date(ret.getTime() - tz.getDSTSavings());
-					// check to make sure we have not crossed back into standard time
-					// this happens when we are on the cusp of DST (7pm the day before
-					// the change for PDT)
-					if (tz.inDaylightTime(dstDate))	{
-						ret = dstDate;
-					}
-				}
-			} else {
-				tzId = tzId ? tzId : "EDT"
-				def timeZoneId = timeZones[ tzId ]
-				tz = TimeZone.getTimeZone( timeZoneId )
-				ret = new Date(date.getTime() - tz.getRawOffset());
-			}
-		}
-		return ret;
-		
-	}
-	/**
-	 * Converts date from GMT to local format
-	 * @param date
-	 * @return converted Date
-	 */
-	def public static convertInToUserTZ = { date, tzId ->
-		Date ret
-		if (date) {
-			tzId = tzId ? tzId : defaultTimeZone
-			TimeZone tz = TimeZone.getTimeZone( tzId );
-			//java.sql.Timestamp
-			try {
-				ret = new Date(date.getTime());				
-			} catch (e) { 
-				// log.error "convertInToUserTZ(${date}, ${tzId}) had exception: e.toString()" 
-			}
-			
-			// println "convertInToUserTZ() date=${date}, tzId=${tzId}, newDate=${ret}"
-			// if we are now in DST, back off by the delta. Note that we are
-			// checking the GMT date, this is the KEY.
-			/*if (tz.inDaylightTime(ret)) {
-				Date dstDate = new Date(ret.getTime() + tz.getDSTSavings());
-				// check to make sure we have not crossed back into standard time
-				// this happens when we are on the cusp of DST (7pm the day before
-				// the change for PDT)
-				if (tz.inDaylightTime(dstDate))	{
-					ret = dstDate;
-				}
-			}*/
-		}
-		return ret;
-	}
-
-	/**
-	 * Used to get the current time in GMT
-	 * @return Date 	The current datetime in GMT
-	 */
-	/*public static Date nowGMT() {
-		return convertInToGMT("now", "EDT" )
-	}*/
-
 
 	public static String getDateTimeFormat(value) {
 		def result = dateTimeFormats[0]
@@ -354,7 +279,9 @@ class TimeUtil {
 	 **/
 	public static Date parseDate(session, dateValue) {
 		def formatter = createFormatter(FORMAT_DATE)
-		return parseDateTime(session, dateValue, formatter)
+		def newDate = parseDateTime(session, dateValue, formatter)
+		newDate.clearTime()
+		return newDate
 	}
 
 	/**
@@ -371,6 +298,23 @@ class TimeUtil {
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		return formatter.parse(dateValue)
+	}
+
+	/**
+	 * Parse a time value in users timezone and creates a date into GMT
+	 * @param session
+	 * @param timeValue
+	 * @return converted Date
+	 */
+	public static Date parseTime(session, timeValue) {
+		Date ret
+		if(timeValue){
+			def date = new Date(timeValue)
+			def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+			TimeZone tz = TimeZone.getTimeZone( tzId )
+			ret = new Date(date.getTime() - tz.getRawOffset());
+		}
+		return ret;
 	}
 
 	private static DateFormat createFormatter(session, String formatterType) {
@@ -420,6 +364,12 @@ class TimeUtil {
 				break;
 			case FORMAT_DATE_TIME_14:
 				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
+				break;
+			case FORMAT_DATE_TIME_15:
+				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+				break;
+			case FORMAT_DATE_TIME_16:
+				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a")
 				break;
 		}
 		return formatter

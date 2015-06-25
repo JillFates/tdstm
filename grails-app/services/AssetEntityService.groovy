@@ -1571,15 +1571,6 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Used to convert the Maint Expiration and Retire date parameters from strings to Dates
-	 * @param params - the map of the params
-	 */
-	public void parseMaintExpDateAndRetireDate(Object params, userTimeZone) {
-		params.maintExpDate = GormUtil.convertInToGMT( DateUtil.mdyToDate(params.maintExpDate), userTimeZone )
-		params.retireDate   = GormUtil.convertInToGMT( DateUtil.mdyToDate(params.retireDate ), userTimeZone )
-	}
-
-	/**
 	 * This method is used to get config by entityType and validation
 	 * @param type,validation
 	 * @return
@@ -2321,7 +2312,7 @@ class AssetEntityService {
 
 			def tzId = params.tzId
 			def currDate = TimeUtil.nowGMT()
-			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, currDate, FORMAT_DATE_TIME_5)
+			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
 			log.info "export() - Initial loading took ${TimeUtil.elapsed(started)}"
@@ -2538,7 +2529,7 @@ class AssetEntityService {
 									addCell(serverSheet, r, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 									break
 								case ~/Retire|MaintExp|Modified Date/:
-									addCell(serverSheet, r, colNum, TimeUtil.formatDateTimeWithTZ(tzId, a[attribute], FORMAT_DATE_TIME_12) )
+									addCell(serverSheet, r, colNum, TimeUtil.formatDateTimeWithTZ(tzId, a[attribute], TimeUtil.FORMAT_DATE_TIME_12) )
 									break
 
 								case ~/Source Blade|Target Blade/:
@@ -2620,7 +2611,7 @@ class AssetEntityService {
 									//log.info "export() : field class type=$app[assetColName].className()}"
 									break
 								case ~/Retire|MaintExp|Modified Date/:
-									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, app[assetColName], FORMAT_DATE_TIME_12) : ''
+									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
 									break
 								default:
 									colVal = app[assetColName]
@@ -2665,7 +2656,7 @@ class AssetEntityService {
 							if(colName == "DepGroup"){
 								addCell(dbSheet, r, dbMap[colName], assetDepBundleMap[database[r-1].id])
 							} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
-								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]), FORMAT_DATE_TIME_12) :''))
+								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]), TimeUtil.FORMAT_DATE_TIME_12) :''))
 							} else if ( database[r-1][attribute] == null ) {
 								addCell(dbSheet, r, dbMap[colName], "")
 							}else {
@@ -2702,7 +2693,7 @@ class AssetEntityService {
 							if (colName == "DepGroup") {
 								addCell(storageSheet, r, fileMap[colName], assetDepBundleMap[files[r-1].id] )
 							} else if(attribute == "retireDate" || attribute == "maintExpDate" || attribute == "lastUpdated"){
-								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]), FORMAT_DATE_TIME_12) :''))
+								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]), TimeUtil.FORMAT_DATE_TIME_12) :''))
 							} else if ( files[r-1][attribute] == null ) {
 								addCell(storageSheet, r, fileMap[colName], "")
 							} else {

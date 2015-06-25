@@ -252,6 +252,15 @@ class ControllerService {
 	}
 
 	/**
+	 * Used to convert the Maint Expiration and Retire date parameters from strings to Dates
+	 * @param params - the map of the params
+	 */
+	public void parseMaintExpDateAndRetireDate(Object params, session) {
+		params.maintExpDate = TimeUtil.parseDate(session, params.maintExpDate)
+		params.retireDate   = TimeUtil.parseDate(session, params.retireDate)
+	}
+
+	/**
 	 * Used by the various asset controller methods to perform save/update using a standardized method names on the domain service classes
 	 * @param assetServiceClass - a reference to the domain service class (e.g. databaseService)
 	 * @param assetClass - the type of class that the domain is
@@ -264,7 +273,7 @@ class ControllerService {
 		Long id = NumberUtil.toLong(params.id)
 		def isNew = id == null
 
-		assetEntityService.parseMaintExpDateAndRetireDate(params, session.getAttribute("CURR_TZ")?.CURR_TZ)
+		assetEntityService.parseMaintExpDateAndRetireDate(params, session)
 		
 		try {
 			(project, user) = getProjectAndUserForPage(controller, 'AssetEdit')

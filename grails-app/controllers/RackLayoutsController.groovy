@@ -306,7 +306,7 @@ class RackLayoutsController {
             		assetDetails<<[asset:assetEnitiesAtPosition[0], rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
 				} else if(assetEnitiesAtPosition.size() == 1) {
 					def assetEnity = assetEnitiesAtPosition[0]
-					def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+					def currentTime = TimeUtil.nowGMT().getTime()
 					if(assetEnity.overlapError) {
 						cssClass = 'rack_error'
 						rackStyle = 'rack_error'

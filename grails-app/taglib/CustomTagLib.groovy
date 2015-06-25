@@ -2,7 +2,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.apache.commons.validator.UrlValidator
 import org.apache.commons.codec.net.URLCodec
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
 import org.springframework.beans.SimpleTypeConverter
@@ -24,10 +23,7 @@ class CustomTagLib {
 		String dtParam = dt.toString();	
 		
 		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {	
-			DateFormat formatter ; 
-			formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss');
-			dt = GormUtil.convertInToUserTZ( dt, tzId )
-			dtParam = formatter.format(dt);		
+			dtParam = TimeUtil.formatDateTimeWithTZ(tzId, dt, TimeUtil.FORMAT_DATE_TIME_15)
 		}  
 		/* if null or any plain string */
 		out << ""
@@ -67,9 +63,7 @@ class CustomTagLib {
 		String dtParam = dt.toString();	
 		
 		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
-			DateFormat  formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
-			dt = GormUtil.convertInToUserTZ( dt , tzId )
-			dtParam = formatter.format( dt );		
+			dtParam = TimeUtil.formatDateTimeWithTZ(tzId, dt, TimeUtil.FORMAT_DATE_TIME_16)
 		}  
 		/* if null or any plain string */
 		if (dtParam != "null") {

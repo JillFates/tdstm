@@ -95,11 +95,11 @@ class MoveBundleService {
 		if( !moveBundleStep ){	
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
 		}
-		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
+		def session = userPreferenceService.getSession()
 		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
-		moveBundleStep.planStartTime = GormUtil.convertInToGMT( new Date( params["startTime_"+transitionId] ),tzId )
-		moveBundleStep.planCompletionTime = GormUtil.convertInToGMT( new Date( params["completionTime_"+transitionId] ),tzId )
+		moveBundleStep.planStartTime = TimeUtil.parseTime(session, params["startTime_"+transitionId])
+		moveBundleStep.planCompletionTime = TimeUtil.parseTime(session, params["completionTime_"+transitionId])
 		
 		//show the step progress in green when user select the beGreen option
 		if(beGreen && beGreen == 'on'){
@@ -577,7 +577,7 @@ class MoveBundleService {
 	 */
 	def generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked, userLoginName, progressKey) {
 		
-		String sqlTime = TimeUtil.formatDateTimeAsGMT(TimeUtil.nowGMT(), FORMAT_DATE_TIME_14)
+		String sqlTime = TimeUtil.formatDateTimeAsGMT(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_TIME_14)
 		def projectInstance = Project.get(projectId)
 		
 		// Get array of the valid status and connection types to check against in the inner loop

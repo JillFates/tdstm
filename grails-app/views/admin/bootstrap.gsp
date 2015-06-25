@@ -24,20 +24,6 @@
 	<li><a href="#">SignOut</a></li>
 </ul>
 </li>
-<li class="dropdown">
-  <a class="dropdown-toggle" data-toggle="dropdown" href="#">Using GMT Time <b class="caret"></b></a>
-  <ul id="menu1" class="dropdown-menu">
-        <li><a href="#">GMT</a></li>
-		<li><a href="#">PST</a></li>
-		<li><a href="#">PDT</a></li>
-		<li><a href="#">MST</a></li>
-		<li><a href="#">MDT</a></li>
-		<li><a href="#">CST</a></li>
-		<li><a href="#">CDT</a></li>
-		<li><a href="#">EST</a></li>
-		<li><a href="#">EDT</a></li>
-   </ul>
-</li>
 </ul>
 </div>
 <div class="navbar navbar-fixed-top">

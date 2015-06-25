@@ -939,7 +939,7 @@ class TaskService implements InitializingBean {
 
 		// Complete the task(s)
 		tasksToComplete.each() { activeTask ->
-			// activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
+			// activeTask.dateResolved = TimeUtil.nowGMT()
 			// activeTask.resolvedBy = userLogin.person
 			setTaskStatus(activeTask, AssetCommentStatus.DONE)
 			if ( ! (activeTask.validate() && activeTask.save(flush:true)) ) {

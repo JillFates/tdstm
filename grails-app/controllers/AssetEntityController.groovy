@@ -525,7 +525,7 @@ class AssetEntityController {
 					serverDataTransferBatch.dataTransferSet = dataTransferSetInstance
 					serverDataTransferBatch.project = project
 					serverDataTransferBatch.userLogin = userLogin
-					serverDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+					serverDataTransferBatch.exportDatetime = exportTime
 					serverDataTransferBatch.eavEntityType = eavEntityType
 					if(serverDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",serverDataTransferBatch.id)
@@ -590,7 +590,7 @@ class AssetEntityController {
 					appDataTransferBatch.dataTransferSet = dataTransferSetInstance
 					appDataTransferBatch.project = project
 					appDataTransferBatch.userLogin = userLogin
-					appDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+					appDataTransferBatch.exportDatetime = exportTime
 					appDataTransferBatch.eavEntityType = eavEntityType
 					if(appDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",appDataTransferBatch.id)
@@ -658,7 +658,7 @@ class AssetEntityController {
 					dbDataTransferBatch.dataTransferSet = dataTransferSetInstance
 					dbDataTransferBatch.project = project
 					dbDataTransferBatch.userLogin = userLogin
-					dbDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+					dbDataTransferBatch.exportDatetime = exportTime
 					dbDataTransferBatch.eavEntityType = eavEntityType
 					if(dbDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",dbDataTransferBatch.id)
@@ -721,7 +721,7 @@ class AssetEntityController {
 					fileDataTransferBatch.dataTransferSet = dataTransferSetInstance
 					fileDataTransferBatch.project = project
 					fileDataTransferBatch.userLogin = userLogin
-					fileDataTransferBatch.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
+					fileDataTransferBatch.exportDatetime = exportTime
 					fileDataTransferBatch.eavEntityType = eavEntityType
 					if(fileDataTransferBatch.save()){
 						session.setAttribute("BATCH_ID",fileDataTransferBatch.id)
@@ -1026,11 +1026,19 @@ class AssetEntityController {
 							continue;
 						}
 						
-						
 						def createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, ++cols, r )?.replace("'","\\'")
-						def dateCreated = DateUtil.parseImportedCreatedDate(createdDateInput)
+						def dateCreated = null
+						if (createdDateInput) {
+							try{
+								dateCreated = TimeUtil.parseDate(getSession(), createdDateInput)
+							} catch(Exception e){
+								return "Created date $val not in format. mm/dd/yyyy should be the format needed."
+							}
+						} else {
+							dateCreated = new Date()
+						}
 						if (dateCreated instanceof Date){
-							assetComment.dateCreated = TimeUtil.convertInToGMT(dateCreated, tzId)
+							assetComment.dateCreated = dateCreated
 						} else {
 							recordForAddition ? skippedAdded++ : skippedUpdated++
 							errorMsg.append("<li> $dateCreated .</li>")
@@ -1456,7 +1464,7 @@ class AssetEntityController {
 					map.put('model',Model.get(modelId) )
 
 				assetEntityInstance.properties = map
-				assetEntityInstance.lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+				assetEntityInstance.lastUpdated = Timetil.nowGMT()
 				if(!assetEntityInstance.assetTag){
 					assetEntityInstance.assetTag = "TDS-${assetEntityInstance.id}"
 				}

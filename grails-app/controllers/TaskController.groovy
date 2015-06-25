@@ -1335,7 +1335,7 @@ function goBack() { window.history.back() }
 		def noteList = assetComment.notes.sort{it.dateCreated}
 		def notes = []
 		noteList.each{
-			def dateCreated = TimeUtil.formatDateTime(getSession(), it.dateCreated, FORMAT_DATE_TIME_3)
+			def dateCreated = TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3)
 			notes << [dateCreated , it.createdBy.toString() ,it.note]
 		}
 		

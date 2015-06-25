@@ -546,7 +546,7 @@ class MoveEventController {
 				def moveEventResults
 				def reportFields =[]
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				def currDate = GormUtil.convertInToUserTZ(GormUtil.convertInToGMT( "now", "EDT" ),tzId)
+				def currDate = Timetil.nowGMT()
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 					moveEventResults.each { results->
@@ -556,7 +556,7 @@ class MoveEventController {
 										"from_name":results.from_name, "to_name":results.to_name,
 										"transition_time": TimeUtil.formatDateTime(getSession(), results.transition_time),
 										"username":results.username,"timezone":tzId,
-										"rptTime":String.valueOf(formatter.format( currDate ) )]
+										"rptTime": TimeUtil.formatDateTime(getSession(), currDate) ]
 					}
 					render(view:"moveResultsWeb",model:[moveEventResults:reportFields])
 				} else {
@@ -566,7 +566,7 @@ class MoveEventController {
 										"state_to":results.state_to, "name":results.name,
 										"started": TimeUtil.formatDateTime(getSession(), results.started),
 										"completed": TimeUtil.formatDateTime(getSession(), results.completed),
-										"timezone":tzId, "rptTime":String.valueOf(formatter.format( currDate ) )]
+										"timezone":tzId, "rptTime": TimeUtil.formatDateTime(getSession(), currDate) ]
 					}
 					render(view:"moveResultsWeb",model:[moveEventResults:reportFields, summary:'summary'])
 				}

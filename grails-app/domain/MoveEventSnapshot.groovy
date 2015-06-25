@@ -2,7 +2,7 @@
  * The MoveEventSnapshot domain is a point in time representation of the status of a MoveEvent. The values are computed via an
  * aggregate of MoveBundle.MoveBundleStep.StepSnapshot records.  These records are created as part of the MoveBundleService.
  */
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import org.apache.shiro.SecurityUtils
 
 class MoveEventSnapshot {
@@ -34,7 +34,7 @@ class MoveEventSnapshot {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
 	}
 
 }

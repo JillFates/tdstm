@@ -101,8 +101,7 @@ class ProjectUtilController {
 			 *  Create Project
 			 */
 			def templateInstance = Project.get(template)
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def startDateTime = GormUtil.convertInToGMT(new Date("$startDate"), tzId)
+			def startDateTime = TimeUtil.parseDate(getSession(), startDate)
 			def timeDelta = startDateTime.getTime() - templateInstance?.startDate?.getTime() > 0 ? startDateTime.getTime() - templateInstance?.startDate?.getTime() : 0
 			def completionDateTime = templateInstance?.completionDate?.getTime() ? new Date(templateInstance?.completionDate?.getTime() + timeDelta ) : null
 			projectInstance = new Project(name:name,

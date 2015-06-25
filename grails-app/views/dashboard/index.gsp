@@ -35,23 +35,6 @@
 						</span>
 					</g:form>
 				</div>
-				<%-- TODO - This timezone select looks as though it should be removed JPM 8/2014 --%>
-				<div style="height: 35px; display: none;">
-					<label> 
-						<select name="timezone" id="timezone"
-							onChange="setUserPrefTimeZone()" class="selecttext">
-								<option value="0">GMT</option>
-								<option value="-8">PST</option>
-								<option value="-7">PDT</option>
-								<option value="-7">MST</option>
-								<option value="-6">MDT</option>
-								<option value="-6">CST</option>
-								<option value="-5">CDT</option>
-								<option value="-5">EST</option>
-								<option value="-4">EDT</option>
-						</select> 
-					</label>
-				</div>
 				<div style="float: right; width: 150px; padding-top: 2px;">
 					<div style="float: right;">
 						<input type="button" value="Refresh:" id="update"
