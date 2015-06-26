@@ -4327,7 +4327,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 					taskBatch: settings.taskBatch,
 					isPublished: settings.publishTasks,
-					sendNotification: taskSpec.sendNotification ?: 0,
+					sendNotification: taskSpec.sendNotification ?: false,
 					project: moveEvent.project, 
 					moveEvent: moveEvent, 
 					commentType: AssetCommentType.TASK,
