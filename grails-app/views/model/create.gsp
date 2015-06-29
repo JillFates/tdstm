@@ -89,7 +89,7 @@
 				    <script type="text/javascript" charset="utf-8">
                     jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
                      </script> <input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="endOfLifeDate" id="endOfLifeDateId"
-					value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" />
+					value="<tds:convertDate date="${modelInstance?.endOfLifeDate}" />" />
        			 <g:hasErrors bean="${modelInstance}" field="endOfLifeDate">
 					<div class="errors">
 						<g:renderErrors bean="${modelInstance}" as="list" field="endOfLifeDate" />

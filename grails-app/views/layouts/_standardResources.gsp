@@ -44,6 +44,7 @@ if(moveEvent && moveEvent.estStartTime && moveEvent.estCompletionTime){
 <g:javascript src="select2.js"/>
 <g:javascript src="jquery.combox.js"/>	
 <g:javascript src="moment.min.js" />
+<g:javascript src="moment-timezone-with-data.min.js" />
 <g:javascript src="daterangepicker.js" />
 <g:javascript src="lodash/lodash.min.js" />
 <g:javascript src="tds-common.js" />

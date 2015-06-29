@@ -1127,6 +1127,7 @@ class ReportsController {
 		def taskList = []
 		def reqEvents = params.list("moveEvent").toList()
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def userDTFormat = getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
 		
 		if(reqEvents) {
 			def project = securityService.getUserCurrentProject()
@@ -1180,7 +1181,7 @@ class ReportsController {
 			//Generating XLS Sheet
 			switch(params._action_tasksReport){
 				case "Generate Xls" :
-					  exportTaskReportExcel(taskList, tzId, project)
+					  exportTaskReportExcel(taskList, tzId, userDTFormat, project)
 					  break;
 					  
 				case "Generate Pdf" :
@@ -1206,7 +1207,7 @@ class ReportsController {
 	 * @param project : project instance
 	 * @return : will generate a XLS file having task task list
 	 */
-	def exportTaskReportExcel(taskList, tzId, project){
+	def exportTaskReportExcel(taskList, tzId, userDTFormat, project){
 		File file =  ApplicationHolder.application.parentContext.getResource( "/templates/TaskReport.xls" ).getFile()
 		def filename = "${project.name}-TaskReport"
 
@@ -1222,7 +1223,7 @@ class ReportsController {
 					'dateCreated', 'createdBy', 'moveEvent']
 					
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
-		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, 7, viewUnpublished)
+		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, userDTFormat, 7, viewUnpublished)
 		
 		book.write(response.getOutputStream())
 	}

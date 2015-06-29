@@ -1142,7 +1142,8 @@ class AssetEntityController {
 		trigger.jobDataMap.put('key', key)
 		trigger.jobDataMap.put('username', username)
 		trigger.jobDataMap.put('projectId', projectId)
-		trigger.jobDataMap.put('tzId', getSession().getAttribute( "CURR_TZ" )?.CURR_TZ)
+		trigger.jobDataMap.put('tzId', getSession().getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ)
+		trigger.jobDataMap.put('userDTFormat', getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT)
 
 		trigger.setJobName('ExportAssetEntityJob')
 		trigger.setJobGroup('tdstm-export-asset')

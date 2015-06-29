@@ -1,5 +1,5 @@
 <div>
-	<h3>Generated for ${person} on <tds:convertDateTime  timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" date="${time}" />.</h3>
+	<h3>Generated for ${person} on <tds:convertDateTime  date="${time}" />.</h3>
 	<table>
 		<thead>
 			<tr>
@@ -31,8 +31,8 @@
 					<td>${project.clientName?:''}</td>
 					<td>${project.partnerName?:''}</td>
 					<td>${project.projName?:''}</td>
-					<td><tds:convertDate timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" date="${project.startDate}" /></td>
-					<td><tds:convertDate timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" date="${project.completionDate}" /></td>
+					<td><tds:convertDate  date="${project.startDate}" /></td>
+					<td><tds:convertDate  date="${project.completionDate}" /></td>
 					<td>${project.staffCount?:''}</td>
 					<td>${project.eventCount?:''}</td>
 					<td>${project.assetCount?:''}</td>

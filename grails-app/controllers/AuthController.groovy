@@ -111,7 +111,9 @@ class AuthController {
 					userPreferenceService.loadPreferences("CURR_PROJ")
 					userPreferenceService.loadPreferences("CURR_BUNDLE")
 					userPreferenceService.loadPreferences("MOVE_EVENT")
-					userPreferenceService.loadPreferences("CURR_TZ")
+					userPreferenceService.loadPreferences(TimeUtil.TIMEZONE_ATTR)
+					userPreferenceService.loadPreferences(TimeUtil.DATE_TIME_FORMAT_ATTR)
+
 					/*
 					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
 					 */

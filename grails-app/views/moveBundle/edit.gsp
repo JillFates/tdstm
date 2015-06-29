@@ -121,7 +121,7 @@
                       $("#startTime").datetimepicker();
                     });
                   </script><span><input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" id="startTime" name="startTime"
-        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+        					value="<tds:convertDateTime date="${moveBundleInstance?.startTime}"  format="12hrs" />" 
         					onchange="isValidDate(this.value, this.id,'startTimeImg')"/></span>
         					<span id="startTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
         					<g:hasErrors bean="${moveBundleInstance}" field="startTime">
@@ -143,7 +143,7 @@
                     });
                   </script> <span><input type="text" class="dateRange" size="15" style="width: 130px; height: 14px;" 
                   			id="completionTime" name="completionTime"
-				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+				        value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}"  format="12hrs" />" 
 				        onchange="isValidDate(this.value, this.id, 'completionTimeImg')"/></span>
 				        <span id="completionTimeImg" style="display: none;"><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 				        <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
@@ -299,14 +299,14 @@
 											<td style="padding: 0 6px;width: 310px;">
 												<div style="float: left;padding-right: 5px; ">
 													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }"
-														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planStartTime}' format="12hrs" />"
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
 													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>
 												<div style="float: left;">
 													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }"
-														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+														value="<tds:convertDateTime date='${dashboardStep.moveBundleStep?.planCompletionTime}' format="12hrs" />"
 														onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 														</span>
 													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
@@ -378,14 +378,14 @@
 											<td style="padding: 0 6px;width: 310px;">
 												<div style="float: left;padding-right: 10px;">
 													<span style="float: left;"><input type="text" name="startTime_${dashboardStep.step.id }" id="startTime_${dashboardStep.step.id }" 
-													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+													value="<tds:convertDateTime date='${moveBundleInstance?.startTime}' format="12hrs" />"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'start')"/>
 													</span>
 													<span id="startTimeImg_${dashboardStep.step.id }" style="float:left; display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>
 												</div>
 												<div style="float: left;">
 													<span style="float: left;"><input type="text" name="completionTime_${dashboardStep.step.id }" id="completionTime_${dashboardStep.step.id }" 
-													value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"
+													value="<tds:convertDateTime date='${moveBundleInstance?.completionTime}' format="12hrs" />"
 													onchange="validateDateInput(this.value, ${dashboardStep.step.id }, 'completion')"/>
 													</span>
 													<span id="completionTimeImg_${dashboardStep.step.id }" style="float: left;display: none;" title=""><img src="${resource(dir:'icons',file:'exclamation.png')}"></span>

@@ -63,7 +63,7 @@
 						</td>
 						<td id="estFinish_${item?.id}" data-itemId="${item?.id}" data-status="${item?.status}"
 							class="actionBar asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}">
-								<tds:convertDate date="${item?.estFinish}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
+								<tds:convertDate date="${item?.estFinish}" 
 									format="MM/dd kk:mm" />
 						</td>
 						

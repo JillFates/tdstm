@@ -163,7 +163,7 @@
 				                      $("#estStartTime").datetimepicker();
 				                    });
 				                  </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="estStartTime" name="estStartTime"
-				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" format="12hrs" />" 
 				                                   onchange="isValidDate(this.value)"/>
 				                                   <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
 				                    <div class="errors">

@@ -31,6 +31,7 @@ class Project extends PartyGroup {
     Integer customFieldsShown = 8
 	String depConsoleCriteria 
 	MoveBundle defaultBundle
+	Timezone timezone
     
 	// Custom field labels
     	String custom1
@@ -144,6 +145,7 @@ class Project extends PartyGroup {
 		workflowCode( blank:false, nullable:false )
 		projectType( blank:false, nullable:false, inList:['Standard', 'Template', 'Demo'] )
 		defaultBundle( nullable:true )
+		timezone( nullable:true )
 		// custom fields
 		custom1( blank:true, nullable:true )
 		custom2( blank:true, nullable:true )

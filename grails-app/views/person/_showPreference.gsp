@@ -11,7 +11,7 @@ $(document).ready(function(){
 <form id="userPreferencesForm">
 <div style="padding: 5px">
   <b>Time Zone:</b><g:select from="${timezones}" id="dateTimezone" value="${currTimeZone}" name="timezone"  optionKey="code" optionValue="label" />
-  <b style="padding-left: 30px">Date Format:</b><g:select from="${TimeUtil.dateTimeFormats}" id="datetimeFormat" name="datetimeFormat" value="${currDateTimeFormat}" />
+  <b style="padding-left: 30px">Date Format:</b><g:select from="${TimeUtil.dateTimeFormatTypes}" id="datetimeFormat" name="datetimeFormat" value="${currDateTimeFormat}" />
 </div>
 
 <img id="timezoneImage" src="${resource(dir:'images',file:'world_map_800.jpg')}" width="800" height="400" usemap="#timezoneMap"/>

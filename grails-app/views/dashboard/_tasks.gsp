@@ -47,9 +47,7 @@
 						data-status="${item?.status}"
 						class="actionBar asset_details_block ${item?.dueDate && item?.dueDate < TimeUtil.nowGMT() ? 'task_overdue' : ''}"
 						action-bar-cell config-table="config.table" comment-id="${item?.id}" asset-id="${item?.assetId}" status="${item?.status}" id-prefix="issueTrId_" master="false" table-col-span="${tableColCount}">
-						<tds:convertDate date="${item?.estFinish}"
-							timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"
-							format="MM/dd kk:mm" />
+						<tds:convertDate date="${item?.estFinish}" format="MM/dd kk:mm" />
 					</td>
 
 					<td id="statusTd_${item?.id}" class="actionBar asset_details_block"

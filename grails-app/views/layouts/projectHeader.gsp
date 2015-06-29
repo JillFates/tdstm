@@ -20,9 +20,6 @@
 				$('textarea').each(function(){
 					$(this).val($(this).text());
 				});
-				$('.tzmenu').click(function(){
-					$(".tzmenu ul").toggle();
-				});
 				$(".headerClass").mouseover(function(){
 					$(this).parent().find('a').addClass('mouseover');
 					$(this).parent().find('a').removeClass('mouseout');
@@ -79,6 +76,8 @@
 	<body>
 		<div class="main_body">
 			<input id="contextPath" type="hidden" value="${request.contextPath}"/>
+			<input id="tzId" type="hidden" value="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			<input id="userDTFormat" type="hidden" value="${request.getSession().getAttribute('CURR_TZ')?.CURR_DT_FORMAT}"/>		
 			<div class="tds_header">
 				<div class="header_left">
 					<g:if test="${setImage}">

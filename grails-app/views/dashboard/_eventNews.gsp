@@ -6,8 +6,7 @@
 			</td>
 		</g:if>
 		<td width="150px">
-			<tds:convertDateTime date="${news.dateCreated}" formate="yyyy/mm-dd hh:mm a" 
-				timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			<tds:convertDateTime date="${news.dateCreated}" format="yyyy/mm-dd hh:mm a" />
 		</td>
 		<td><g:link action="index" params="[moveEvent:news?.moveEvent?.id]">
 				${news.moveEvent.name}

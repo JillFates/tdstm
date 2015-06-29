@@ -180,7 +180,7 @@
 					alert("New Password does not meet the requirements")
 				else{
 					$("#loginUserId").html(ret[0].name)
-					$("#tzId").html(ret[0].tz)
+					$("#tzId").val(ret[0].tz)
 					$("#personDialog").dialog('close')
 					window.location.reload()
 				}

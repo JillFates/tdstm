@@ -53,7 +53,7 @@
 	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Application Profiles - ${project.name} : ${moveBundle}, SME : ${sme} and App Owner : ${appOwner}</b><br/>
-			This report generated on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
+			This report generated on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div>
 
 		<g:each var="appList" in="${applicationList}" var="application" status="i">

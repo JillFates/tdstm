@@ -37,8 +37,8 @@
 					<br/>
 				</g:each>
 				</td>
-				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.dateCreated}" /></td>
+				<td><tds:convertDateTime date="${projectTeamInstance?.projectTeam?.lastUpdated}" /></td>
 				<td>${projectTeamInstance?.projectTeam?.comment}</td>
 			</tr>
                     </g:each>

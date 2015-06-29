@@ -698,8 +698,7 @@ class PersonController {
 			} else {
 				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person",[person:personInstance])
 			}
-			
-			userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
+
 			userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
 			userPreferenceService.loadPreferences("CURR_TZ")
 			userPreferenceService.setPreference("START_PAGE", params.startPage )
@@ -1247,7 +1246,7 @@ class PersonController {
 		def timezone = TimeZone.getTimeZone(timezoneValue)
 
 		// Validate date time format
-		def datetimeFormat = TimeUtil.getDateTimeFormat(datetimeFormatValue)
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(datetimeFormatValue)
 
 		userPreferenceService.setPreference( TimeUtil.TIMEZONE_ATTR, timezone.getID() )
 		userPreferenceService.setPreference( TimeUtil.DATE_TIME_FORMAT_ATTR, datetimeFormat )
@@ -1286,7 +1285,7 @@ class PersonController {
 					  ]
 
 		def currTimeZone = TimeUtil.defaultTimeZone;
-		def currDateTimeFormat = TimeUtil.dateTimeFormats[0];
+		def currDateTimeFormat = TimeUtil.dateTimeFormatTypes[0];
 
 		prefs.each { pref->
 			switch( pref.preferenceCode ) {

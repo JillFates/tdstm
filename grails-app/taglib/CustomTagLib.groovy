@@ -16,68 +16,35 @@ class CustomTagLib {
 	 */
 	def convertDate = { attrs ->
 		Date dt = attrs['date'];
-		def tzId = attrs['timeZone']
 		def format = attrs['format']
 		
 		String dtStr = dt.getClass().getName().toString();
-		String dtParam = dt.toString();	
 		
-		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {	
-			dtParam = TimeUtil.formatDateTimeWithTZ(tzId, dt, TimeUtil.FORMAT_DATE_TIME_15)
-		}  
-		/* if null or any plain string */
 		out << ""
-		if (dtParam != "null") {
-			dtParam = dtParam.trim();
-			switch(format){
-				case "MM/dd" :
-					out << dtParam[5..6]+"/"+dtParam[8..9]
-					break
-				case "MM/dd kk:mm:ss" :
-					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..18]
-					break
-				case "MM/dd kk:mm" :
-					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..15]
-					break
-				case "M/d" :
-					out << (dtParam[5] =='0' ? dtParam[6] : dtParam[5..6])+'/'+ (dtParam[8] == '0'? dtParam[9]: dtParam[8..9])+'/'+dtParam[0..3]
-					break
-				case "M/d kk:mm" :
-					out << (dtParam[5] =='0' ? dtParam[6] : dtParam[5..6])+'/'+ (dtParam[8] == '0'? dtParam[9]: dtParam[8..9])+'/'+dtParam[0..3]+' '+dtParam[11..15]
-					break
-				default:
-					out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
-					break
+		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {
+			DateFormat formatter = TimeUtil.createFormatter(session, format)
+			if (formatter == null) {
+				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE)
 			}
-		}
+			out << TimeUtil.formatDateTime(session, dt, formatter)
+		}  
 	}
 	/*
 	 * Converts a date to User's Timezone and applies formating
 	 */
 	def convertDateTime = { attrs ->
 		Date dt = attrs['date'];
-		// TODO : convertDateTime - param formate is misspelled.  Also this should just use the date formatter instead of the multiple if/else conditions
-		def formate = attrs['formate'];
-		def tzId = attrs['timeZone']
+		def format = attrs['format'];
 		String dtStr = dt.getClass().getName().toString();
-		String dtParam = dt.toString();	
 		
+		out << ""
 		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
-			dtParam = TimeUtil.formatDateTimeWithTZ(tzId, dt, TimeUtil.FORMAT_DATE_TIME_16)
-		}  
-		/* if null or any plain string */
-		if (dtParam != "null") {
-			dtParam = dtParam.trim();
-			if(formate == "mm/dd"){
-				out << dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else if(formate == "hh:mm"){
-				out << dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else if(formate == "yyyy/mm-dd hh:mm a"){
-				out << dtParam[0..3]+"/"+dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else {
-				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+			DateFormat formatter = TimeUtil.createFormatter(session, format)
+			if (formatter == null) {
+				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE_TIME)
 			}
-		}
+			out << TimeUtil.formatDateTime(session, dt, formatter)
+		}  
 	}
 	/*
 	 * 

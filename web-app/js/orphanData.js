@@ -1,18 +1,7 @@
-var timeZones = []
-    timeZones['GMT'] = '0';
-    timeZones['PST'] = '-8';
-	timeZones['PDT'] = '-7';
-	timeZones['MST'] = '-7';
-	timeZones['MDT'] = '-6';
-	timeZones['CST'] = '-6';
-	timeZones['CDT'] = '-5';
-	timeZones['EST'] = '-5';
-	timeZones['EDT'] = '-4';
-	
 function getDeatiledReport( records, table ){
 	var dataLength = records.length;
-	var tz = $("#tzId").html()
-	var offset = timeZones[tz]
+	var timeZone = $("#tzId").val()
+	var userDTFormat = $("#userDTFormat").val()
 	var tbody = ""
 	if(dataLength != 0){
 		switch(table){
@@ -54,8 +43,8 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.asset_comment_id+"</td><td>"+record.asset_entity_id+"</td><td>"+record.category+"</td>"+
 							"<td>"+record.comment+"</td><td>"+record.comment_type+"</td><td>"+record.created_by+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.date_created, offset)+"</td><td>"+record.resolved_by +"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.date_resolved,offset)+"</td><td>"+record.resolution +"</td></tr>"
+							"<td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td><td>"+record.resolved_by +"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.date_resolved, userDTFormat, timeZone)+"</td><td>"+record.resolution +"</td></tr>"
 				}
 			break;
 			/* for asset_entity */
@@ -112,8 +101,8 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.batch_id+"</td><td>"+record.project_id+"</td><td>"+record.data_transfer_set_id+"</td>"+
-							"<td>"+record.user_login_id+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created, offset)+"</td><td nowrap>"+getConvertedTimeFormate(record.export_datetime, offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.last_modified, offset) +"</td><td>"+record.has_errors +"</td><td>"+record.status_code +"</td><td>"+record.transfer_mode +"</td></tr>"
+							"<td>"+record.user_login_id+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td><td nowrap>"+getConvertedTimeFormate(record.export_datetime, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.last_modified, userDTFormat, timeZone) +"</td><td>"+record.has_errors +"</td><td>"+record.status_code +"</td><td>"+record.transfer_mode +"</td></tr>"
 				}
 			break;
 			/* for data_transfer_comment */
@@ -197,7 +186,7 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.entity_id+"</td><td>"+record.attribute_set_id+"</td>"+
-							"<td>"+getConvertedTimeFormate(record.date_created, offset)+"</td><td>"+getConvertedTimeFormate(record.last_updated, offset)+"</td></tr>"
+							"<td>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td><td>"+getConvertedTimeFormate(record.last_updated, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for eav_entity_attribute */
@@ -275,7 +264,7 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.move_bundle_id+"</td><td>"+record.name+"</td><td>"+record.move_event_id+"</td>"+
 							"<td>"+record.project_id+"</td><td>"+record.description+"</td><td>"+record.operational_order+"</td>"+
-							"<td>"+getConvertedTimeFormate(record.start_time,offset)+"</td><td>"+getConvertedTimeFormate(record.completion_time,offset)+"</td></tr>"
+							"<td>"+getConvertedTimeFormate(record.start_time, userDTFormat, timeZone)+"</td><td>"+getConvertedTimeFormate(record.completion_time, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for move_bundle_step */
@@ -289,10 +278,10 @@ function getDeatiledReport( records, table ){
 						cssClass = 'even'
 					}
 					var record = records[i]
-					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_bundle_id+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.last_updated,offset)+"</td><td nowrap>"+getConvertedTimeFormate(record.plan_start_time,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.plan_completion_time,offset)+"</td><td nowrap>"+getConvertedTimeFormate(record.actual_start_time,offset)+"</td>"+
-							"<tdnowrap>"+getConvertedTimeFormate(record.actual_completion_time,offset)+"</td><td>"+record.calc_method+"</td><td>"+record.label+"</td>"+
+					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_bundle_id+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.last_updated, userDTFormat, timeZone)+"</td><td nowrap>"+getConvertedTimeFormate(record.plan_start_time, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.plan_completion_time, userDTFormat, timeZone)+"</td><td nowrap>"+getConvertedTimeFormate(record.actual_start_time, userDTFormat, timeZone)+"</td>"+
+							"<tdnowrap>"+getConvertedTimeFormate(record.actual_completion_time, userDTFormat, timeZone)+"</td><td>"+record.calc_method+"</td><td>"+record.label+"</td>"+
 							"<td>"+record.show_on_dashboard+"</td><td>"+record.transition_id+"</td></tr>"
 				}
 			break;
@@ -307,9 +296,9 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.move_event_id+"</td><td>"+record.project_id+"</td><td>"+record.name+"</td><td>"+record.description+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.actual_start_time,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.actual_completion_time,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.revised_completion_time,offset)+"</td></tr>"
+							"<td nowrap>"+getConvertedTimeFormate(record.actual_start_time, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.actual_completion_time, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.revised_completion_time, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for move_event_news */
@@ -323,9 +312,9 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.move_event_news_id+"</td><td>"+record.move_event_id+"</td><td>"+record.message+"</td>"+
-							"<td>"+record.created_by+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created,offset)+"</td>"+
+							"<td>"+record.created_by+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td>"+
 							"<td>"+record.is_archived+"</td><td>"+record.archived_by+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.date_archived,offset)+"</td><td nowrap>"+record.resolution+"</td></tr>"
+							"<td nowrap>"+getConvertedTimeFormate(record.date_archived, userDTFormat, timeZone)+"</td><td nowrap>"+record.resolution+"</td></tr>"
 				}
 			break;
 			/* for move_event_snapshot */
@@ -339,7 +328,7 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_event_id+"</td><td>"+record.dial_indicator+"</td>"+
-							"<td>"+record.plan_delta+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created,offset)+"</td></tr>"
+							"<td>"+record.plan_delta+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for party */
@@ -352,8 +341,8 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.party_id+"</td><td>"+record.party_type_id+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.date_created,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.last_updated,offset)+"</td></tr>"
+							"<td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.last_updated, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for party_relationship */
@@ -395,8 +384,8 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.project_id+"</td><td>"+record.client_id+"</td>"+
 							"<td>"+record.project_code+"</td><td>"+record.description+"</td><td>"+record.track_changes+"</td><td>"+record.workflow_code+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.start_date,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.completion_date,offset)+"</td></tr>"
+							"<td nowrap>"+getConvertedTimeFormate(record.start_date, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.completion_date, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for project_asset_map */
@@ -411,8 +400,8 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.project_id+"</td>"+
 							"<td>"+record.asset_id+"</td><td>"+record.current_state_id+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.created_date,offset)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.last_modified,offset)+"</td></tr>"
+							"<td nowrap>"+getConvertedTimeFormate(record.created_date, userDTFormat, timeZone)+"</td>"+
+							"<td nowrap>"+getConvertedTimeFormate(record.last_modified, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for project_logo */
@@ -455,7 +444,7 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_bundle_step_id+"</td>"+
 							"<td>"+record.tasks_count+"</td><td>"+record.tasks_completed+"</td>"+
-							"<td>"+getConvertedTimeFormate(record.date_created,offset)+"</td>"+
+							"<td>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td>"+
 							"<td>"+record.dial_indicator+"</td><td>"+convertIntoHHMM(record.duration)+"</td><td>"+record.plan_delta+"</td></tr>"
 				}
 			break;
@@ -471,8 +460,8 @@ function getDeatiledReport( records, table ){
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.user_login_id+"</td><td>"+record.username+"</td>"+
 							"<td>"+record.person_id+"</td><td>"+record.active+"</td>"+
-							"<td>"+getConvertedTimeFormate(record.created_date,offset)+"</td>"+
-							"<td>"+getConvertedTimeFormate(record.last_login,offset)+"</td></tr>"
+							"<td>"+getConvertedTimeFormate(record.created_date, userDTFormat, timeZone)+"</td>"+
+							"<td>"+getConvertedTimeFormate(record.last_login, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
 			/* for user_preference */
@@ -492,32 +481,18 @@ function getDeatiledReport( records, table ){
 	}
 	return thead + tbody
 }
-function getConvertedTimeFormate( dateString, offset ){
+function getConvertedTimeFormate( dateString, userDTFormat, timeZone ){
 	var timeString = ""
 	if(dateString){
-		var date = new Date(dateString)
-		var utcDate = date.getTime() ;
-	    var convertedDate = new Date(utcDate + (3600000*offset));
-		var month =  convertedDate.getMonth();
-		if( !isNaN(month) ){
-		   month = month + 1;
-		   var monthday    = convertedDate.getDate();
-		   var year        = convertedDate.getFullYear();
-		   
-		   var hour   = convertedDate.getHours();
-		   var minute = convertedDate.getMinutes();
-		   var second = convertedDate.getSeconds();
-		   var ap = "AM";
-		   if (hour   > 11) { ap = "PM";             }
-		   if (hour   > 12) { hour = hour - 12;      }
-		   if (hour   == 0) { hour = 12;             }
-		   if (month   < 10) { month   = "0" + month;   }
-		   if (monthday < 10) { monthday = "0" + monthday; }
-		   if (hour   < 10) { hour   = "0" + hour;   }
-		   if (minute < 10) { minute = "0" + minute; }
-		   if (second < 10) { second = "0" + second; }
-		   timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute +" " +  ap;
+		if (timeZone == null) {
+			timeZone = "GMT"
 		}
+		var format = "MM/DD/YYYY hh:mm a"
+		if (userDTFormat == "DD/MM/YYYY") {
+			format = "DD/MM/YYYY hh:mm a"
+		}
+		// Convert zulu datetime to a specific timezone/format
+		timeString = moment(dateString).tz(timeZone).format(format)
 	}
    return timeString;
 }

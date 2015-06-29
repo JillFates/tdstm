@@ -2311,8 +2311,9 @@ class AssetEntityService {
 			}
 
 			def tzId = params.tzId
+			def userDTFormat = params.userDTFormat
 			def currDate = TimeUtil.nowGMT()
-			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, currDate, TimeUtil.FORMAT_DATE_TIME_5)
+			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
 			log.info "export() - Initial loading took ${TimeUtil.elapsed(started)}"
@@ -2459,7 +2460,7 @@ class AssetEntityService {
 					titleInfoMap.add( projectId )
 					titleInfoMap.add( project.name )
 					titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
-					titleInfoMap.add( TimeUtil.formatDateTimeWithTZ(tzId, currDate) )
+					titleInfoMap.add( TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate) )
 					titleInfoMap.add( loginUser.person )
 					titleInfoMap.add( bundleNameList )
 					exportTitleInfo(titleInfoMap,titleSheet)
@@ -2529,7 +2530,7 @@ class AssetEntityService {
 									addCell(serverSheet, r, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 									break
 								case ~/Retire|MaintExp|Modified Date/:
-									addCell(serverSheet, r, colNum, TimeUtil.formatDateTimeWithTZ(tzId, a[attribute], TimeUtil.FORMAT_DATE_TIME_12) )
+									addCell(serverSheet, r, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12) )
 									break
 
 								case ~/Source Blade|Target Blade/:
@@ -2611,7 +2612,7 @@ class AssetEntityService {
 									//log.info "export() : field class type=$app[assetColName].className()}"
 									break
 								case ~/Retire|MaintExp|Modified Date/:
-									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
+									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
 									break
 								default:
 									colVal = app[assetColName]
@@ -2656,7 +2657,7 @@ class AssetEntityService {
 							if(colName == "DepGroup"){
 								addCell(dbSheet, r, dbMap[colName], assetDepBundleMap[database[r-1].id])
 							} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
-								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]), TimeUtil.FORMAT_DATE_TIME_12) :''))
+								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]), TimeUtil.FORMAT_DATE_TIME_12) :''))
 							} else if ( database[r-1][attribute] == null ) {
 								addCell(dbSheet, r, dbMap[colName], "")
 							}else {
@@ -2693,7 +2694,7 @@ class AssetEntityService {
 							if (colName == "DepGroup") {
 								addCell(storageSheet, r, fileMap[colName], assetDepBundleMap[files[r-1].id] )
 							} else if(attribute == "retireDate" || attribute == "maintExpDate" || attribute == "lastUpdated"){
-								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]), TimeUtil.FORMAT_DATE_TIME_12) :''))
+								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]), TimeUtil.FORMAT_DATE_TIME_12) :''))
 							} else if ( files[r-1][attribute] == null ) {
 								addCell(storageSheet, r, fileMap[colName], "")
 							} else {
@@ -2783,7 +2784,7 @@ class AssetEntityService {
 								addCell(roomSheet, r, 0, (rooms[r-1].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
 								if(column=='Date Created' || column=='Last Updated') {
-									addCell(roomSheet, r, i, rooms[r-1]."${roomMap[column]}" ? TimeUtil.formatDateTimeWithTZ(tzId, rooms[r-1]."${roomMap[column]}", TimeUtil.FORMAT_DATE) : "")
+									addCell(roomSheet, r, i, rooms[r-1]."${roomMap[column]}" ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, rooms[r-1]."${roomMap[column]}", TimeUtil.FORMAT_DATE) : "")
 								} else if(column =="Source") {
 									addCell(roomSheet, r, i, String.valueOf(rooms[r-1]."${roomMap[column]}" ==1 ? "Source" : "Target" ))
 								} else {
@@ -2901,7 +2902,7 @@ class AssetEntityService {
 
 						addCell(commentSheet, cr, 2, String.valueOf(assetcomment[cr-1].category))
 
-						addCell(commentSheet, cr, 3, String.valueOf(assetcomment[cr-1].dateCreated? TimeUtil.formatDateTimeWithTZ(tzId, assetcomment[cr-1].dateCreated, TimeUtil.FORMAT_DATE) : "") )
+						addCell(commentSheet, cr, 3, String.valueOf(assetcomment[cr-1].dateCreated? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetcomment[cr-1].dateCreated, TimeUtil.FORMAT_DATE) : "") )
 
 						addCell(commentSheet, cr, 4, String.valueOf(assetcomment[cr-1].createdBy))
 

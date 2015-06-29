@@ -498,7 +498,7 @@ class MoveBundleService {
 	 * @param sheet : sheet-name
 	 * @return void
 	 */
-	def issueExport (def exportList, def columnList, def sheet, def tzId, def startRow = 0, def viewUnpublished = false) {
+	def issueExport (def exportList, def columnList, def sheet, def tzId, userDTFormat, def startRow = 0, def viewUnpublished = false) {
 		for ( int r = startRow; r < (exportList.size() + startRow); r++ ) {
 			for (int c = 0; c < columnList.size(); ++c){
 				def cellValue
@@ -541,16 +541,16 @@ class MoveBundleService {
 						cellValue = exportList[r-startRow].workflowTransition ? String.valueOf(exportList[r-startRow].workflowTransition?.name) : ''
 						 break;
 					case "estStart":
-						 cellValue = exportList[r-startRow].estStart ?  TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].estStart) : ''
+						 cellValue = exportList[r-startRow].estStart ?  TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[r-startRow].estStart) : ''
 						 break;
 					case "estFinish":
-						 cellValue = exportList[r-startRow].estFinish ? TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].estFinish) : ''
+						 cellValue = exportList[r-startRow].estFinish ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[r-startRow].estFinish) : ''
 						 break;
 					case "actStart":
-						 cellValue = exportList[r-startRow].actStart ? TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].actStart) : ''
+						 cellValue = exportList[r-startRow].actStart ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[r-startRow].actStart) : ''
 						 break;
 					case "actFinish":
-						 cellValue = exportList[r-startRow].actFinish ? TimeUtil.formatDateTimeWithTZ(tzId, exportList[r-startRow].actFinish) : ''
+						 cellValue = exportList[r-startRow].actFinish ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[r-startRow].actFinish) : ''
 						 break;
 					case "":
 						cellValue = ""

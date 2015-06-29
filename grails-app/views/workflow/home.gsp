@@ -34,10 +34,10 @@
 				<td nowrap="nowrap">${workflows?.process}</td>
 				<td>${Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[","").replace("]","")}</td>
 				<td nowrap="nowrap">
-					<tds:convertDateTime date="${workflows?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+					<tds:convertDateTime date="${workflows?.dateCreated}" />
 				</td>
 				<td nowrap="nowrap">
-					<tds:convertDateTime date="${workflows?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+					<tds:convertDateTime date="${workflows?.lastUpdated}" />
 				</td>
 
 				<td nowrap="nowrap">${workflows?.updateBy}</td>

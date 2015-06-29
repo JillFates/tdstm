@@ -58,7 +58,8 @@ class CommentService {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def tzId = session.getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ
+		def userDTFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
 		
 		def date = new Date()
 		def assetEntity
@@ -431,7 +432,7 @@ class CommentService {
 						}
 						if(typeGood)
 						{
-							dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
+							dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew, userDTFormat: userDTFormat])
 							break;
 						}
 					}
@@ -461,7 +462,7 @@ class CommentService {
      */
     def dispatchTaskEmail(Map params) {
 		Trigger trigger = new SimpleTriggerImpl("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
-        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew,'tries':0L])
+        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'userDTFormat':params.userDTFormat, 'isNew':params.isNew,'tries':0L])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')
   
@@ -478,7 +479,7 @@ class CommentService {
 	 * @param tzId
 	 * @return
 	 */
-	def sendTaskEMail(taskId, tzId, isNew=true) {
+	def sendTaskEMail(taskId, tzId, userDTFormat, isNew=true) {
 		// Perform this withNewSession because it runs in a separate thread and the session would otherwise be lost
 		// TODO re-enable the withNewSession after upgrade to 2.x as there is a bug in 1.3 that we ran into
 		// https://github.com/grails/grails-core/commit/9a8e765e4a139f67bb150b6dd9f7e67b16ecb21e
@@ -516,7 +517,7 @@ class CommentService {
 			subject "${sub}"
 			body (
 				view:"/assetEntity/_taskEMailTemplate",
-				model: assetCommentModel(assetComment, tzId)
+				model: assetCommentModel(assetComment, tzId, userDTFormat)
 			)
 		}
 	}
@@ -526,7 +527,7 @@ class CommentService {
 	 * @param assetComment - the assetComment object to create a model of
 	 * @return map
 	 */
-	def assetCommentModel(assetComment, tzId) {
+	def assetCommentModel(assetComment, tzId, userDTFormat) {
 		def notes = assetComment.notes?.sort{it.dateCreated}
 		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
 		def createdBy = assetComment.createdBy
@@ -535,13 +536,13 @@ class CommentService {
 		def dueDate
 		def dtResolved
 		
-		dtCreated = TimeUtil.formatDateTimeWithTZ(tzId, assetComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
+		dtCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
 		
 		if(assetComment.dateResolved) {
-			dtResolved = TimeUtil.formatDateTimeWithTZ(tzId, assetComment.dateResolved, TimeUtil.FORMAT_DATE_TIME)
+			dtResolved = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dateResolved, TimeUtil.FORMAT_DATE_TIME)
 		}
 		if(assetComment.dueDate){
-			dueDate = TimeUtil.formatDateTimeWithTZ(tzId, assetComment.dueDate, TimeUtil.FORMAT_DATE)
+			dueDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dueDate, TimeUtil.FORMAT_DATE)
 		}
 		
 		[	assetComment:assetComment,

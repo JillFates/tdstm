@@ -48,7 +48,7 @@
 				<g:each in="${notes}" var="note">
 					<tr>
 						<td>
-							<tds:convertDate date="${note.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							<tds:convertDate date="${note.dateCreated}"  />
 						</td>
 						<td>${note.createdBy }</td>
 						<td>${note.note }</td>

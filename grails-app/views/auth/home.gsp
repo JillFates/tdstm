@@ -36,8 +36,8 @@ a:hover {
 					<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 						<td><g:link controller="person" action="show" id="${user.person?.id}">${user.person}</g:link></td>
 						<td><g:link controller="userLogin" action="show" id="${user.id}">${user.username}</g:link></td>
-						<td><tds:convertDateTime date="${user.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td><tds:convertDateTime date="${user.lastPage}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td><tds:convertDateTime date="${user.lastLogin}" /></td>
+						<td><tds:convertDateTime date="${user.lastPage}" /></td>
 					</tr>
 					</g:each>
 				</tbody>
@@ -64,8 +64,8 @@ a:hover {
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td><g:link controller="project" action="show" id="${eventList?.moveEvent?.project?.id}">${eventList?.moveEvent?.project?.name} - ${eventList?.moveEvent?.name}</g:link></td>
 							<td>${eventList?.status }</td>
-							<td><tds:convertDateTime date="${eventList?.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-							<td><tds:convertDateTime date="${eventList?.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td><tds:convertDateTime date="${eventList?.startTime}" /></td>
+							<td><tds:convertDateTime date="${eventList?.completionTime}" /></td>
 						</tr>
 						</g:each>
 					</g:if>
@@ -91,8 +91,8 @@ a:hover {
 							<g:each in="${upcomingBundles}" status="i"  var="bundle">		
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 								<td><g:link controller="project" action="show" id="${bundle.project?.id}">${bundle.project?.name} - ${bundle.name}</g:link></td>
-								<td><tds:convertDateTime date="${bundle.startTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-								<td><tds:convertDateTime date="${bundle.completionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+								<td><tds:convertDateTime date="${bundle.startTime}" /></td>
+								<td><tds:convertDateTime date="${bundle.completionTime}" /></td>
 							</tr>
 							</g:each>
 						</g:if>

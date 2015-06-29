@@ -25,9 +25,11 @@ class UserPreferenceService {
 	
 	// defaults holds global defaults for certain values 
 	// TODO - load these from application settings
-	protected static defaults = ['CURR_TZ':'EST']
+	protected static defaults = ['CURR_TZ':'GMT']
 
 	protected static Map SECURITY_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
+
+	def securityService
 
 	/*
 	 * Return current session object

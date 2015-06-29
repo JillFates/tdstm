@@ -25,11 +25,11 @@
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Created On:</td>
-		<td valign="top"  class="value"><tds:convertDateTime date="${workflow?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+		<td valign="top"  class="value"><tds:convertDateTime date="${workflow?.dateCreated}" /></td>
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Update On:</td>
-		<td valign="top"  class="value"><tds:convertDateTime date="${workflow?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+		<td valign="top"  class="value"><tds:convertDateTime date="${workflow?.lastUpdated}" /></td>
 	</tr>
 	<tr class="prop">
 		<td valign="top"  class="name">Updated By:</td>

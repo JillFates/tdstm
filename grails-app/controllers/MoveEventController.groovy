@@ -651,6 +651,7 @@ class MoveEventController {
 		def moveEventInstance = MoveEvent.get(params.eventId)
 		def currentVersion = moveEventInstance.runbookVersion
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def userDTFormat = getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
 		if (params.version=='on') {
 			if (moveEventInstance.runbookVersion) {
 				moveEventInstance.runbookVersion = currentVersion + 1
@@ -799,23 +800,23 @@ class MoveEventController {
 			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEventInstance.name ))
 			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEventInstance.name ))
 			
-			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5, viewUnpublished)
+			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, userDTFormat, 5, viewUnpublished)
 			
-			moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, 5, viewUnpublished)
+			moveBundleService.issueExport(applications, impactedAppColumnList, appSheet, tzId, userDTFormat, 5, viewUnpublished)
 			
-			moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, 4, viewUnpublished)
+			moveBundleService.issueExport(databases, dbColumnList, dbSheet, tzId, userDTFormat, 4, viewUnpublished)
 			
-			moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, 1, viewUnpublished)
+			moveBundleService.issueExport(files, filesColumnList, filesSheet, tzId, userDTFormat, 1, viewUnpublished)
 			
-			moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, 1, viewUnpublished)
+			moveBundleService.issueExport(others, othersColumnList, otherSheet,tzId, userDTFormat, 1, viewUnpublished)
 			
-			moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, 1, viewUnpublished)
+			moveBundleService.issueExport(unresolvedIssues, unresolvedIssueColumnList, issueSheet, tzId, userDTFormat, 1, viewUnpublished)
 			
-			moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, 7, viewUnpublished)
+			moveBundleService.issueExport(sheduleIssue, sheduleColumnList, scheduleSheet, tzId, userDTFormat, 7, viewUnpublished)
 			
-			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7, viewUnpublished)
+			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, userDTFormat, 7, viewUnpublished)
 			
-			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7, viewUnpublished)
+			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, userDTFormat, 7, viewUnpublished)
 			  
 			
 			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")

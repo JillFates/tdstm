@@ -91,7 +91,7 @@ tds.utils.stringUtils = function() {
 /**
  * Utilities functions
  */
-tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
+tds.core.utils = function(servRootPath) {
 
 	/**
 	 * Functions used to manage dates
@@ -101,37 +101,34 @@ tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
 		function formatDueDate(input) {
 			var currentDate = ""
 			if (input) {
-				var datePart = input.match(/\d+/g),
-					year = datePart[0].substring(0), // get only two digits
-					month = datePart[1],
-					day = datePart[2];
-				currentDate = month + '/' + day + '/' + year;
+				var momentObj = tdsCommon.parseDateTimeFromZulu(input);
+				currentDate = tdsCommon.formatDateTime(momentObj, tdsCommon.defaultShortDateFormat());
 			}
 			return currentDate
 		}
 
 		function formatDate(dateObj) {
-			return dateObj.format(dateFormat);
+			return tdsCommon.formatDateTime(dateObj, tdsCommon.defaultDateFormat());
 		}
 
 		function formatDateTime(dateObj) {
-			return dateObj.format(dateTimeFormat);
+			return tdsCommon.formatDateTime(dateObj, tdsCommon.defaultDateTimeFormat());
 		}
 
 		function createDateFromString(dateValue) {
-			return moment(dateValue, dateFormat);
+			return tdsCommon.parseDateTimeString(dateValue, tdsCommon.defaultDateFormat());
 		}
 
 		function createDateTimeFromString(dateValue) {
-			return moment(dateValue, dateTimeFormat);
+			return tdsCommon.parseDateTimeString(dateValue, tdsCommon.defaultDateTimeFormat());
 		}
 
 		function isValidDate(dateValue) {
-			return moment(dateValue, dateFormat, true).isValid();
+			return moment(dateValue, tdsCommon.defaultDateFormat(), true).isValid();
 		}
 
 		function isValidDateTime(dateValue) {
-			return moment(dateValue, dateTimeFormat, true).isValid();
+			return moment(dateValue, tdsCommon.defaultDateTimeFormat(), true).isValid();
 		}
 
 		return {
@@ -641,7 +638,7 @@ tds.core.directive.LoadingIndicator = function(timeout, utils) {
 /*****************************************
  * Directive datepicker
  */
-tds.core.directive.DatePicker = function(utils, dateFormat) {
+tds.core.directive.DatePicker = function(utils) {
 	return {
 		restrict: 'A',
 		require: 'ngModel',
@@ -653,7 +650,7 @@ tds.core.directive.DatePicker = function(utils, dateFormat) {
 				function($) {
 					element.daterangepicker({ 
 						timePicker: false, 
-						format: dateFormat,
+						format: tdsCommon.defaultDateFormat(),
 						singleDatePicker: true,
 						showDropdowns: false,
 						opens: 'left',
@@ -694,7 +691,7 @@ tds.core.directive.DatePicker = function(utils, dateFormat) {
 /*****************************************
  * Directive tdsrangepicker
  */
-tds.core.directive.RangePicker = function(utils, dateTimeFormat) {
+tds.core.directive.RangePicker = function(utils) {
 	return {
 		restrict: 'A',
 		require: 'ngModel',
@@ -770,7 +767,7 @@ tds.core.directive.RangePicker = function(utils, dateTimeFormat) {
 					element.daterangepicker({ 
 						timePicker: true, 
 						timePickerIncrement: 1, 
-						format: dateTimeFormat,
+						format: tdsCommon.defaultDateTimeFormat(),
 						showDropdowns: false,
 						startDate: moment().hours(0).minutes(0).seconds(0),
 						endDate: moment().add('d', 1).hours(0).minutes(0).seconds(0)
@@ -891,11 +888,9 @@ tds.core.directive.ActionButton = function(utils, window) {
 tds.core.module = angular.module('tdsCore', ['ngGrid', 'ngResource', 'ui.bootstrap']);
 
 tds.core.module.value('servRootPath', '/tdstm');
-tds.core.module.value('dateFormat', 'MM/DD/YYYY');
-tds.core.module.value('dateTimeFormat', 'MM/DD/YYYY h:mm A');
 tds.core.module.value('appCommonData', tds.core.service.commonDataService);
 
-tds.core.module.factory('utils', ['servRootPath', 'dateFormat', 'dateTimeFormat', tds.core.utils]);
+tds.core.module.factory('utils', ['servRootPath', tds.core.utils]);
 
 tds.core.module.factory('alerts', ['$rootScope', '$timeout', tds.core.service.AlertsService]);
 tds.core.module.factory('windowTimedUpdate', ['$window', tds.core.service.TimedUpdateService]);
@@ -913,7 +908,7 @@ tds.core.module.config(['$httpProvider',
 tds.core.module.directive('draggable', [tds.core.directive.Draggable]);
 tds.core.module.directive('centered', ['$window', tds.core.directive.Centered]);
 tds.core.module.directive('loadingIndicator', ['$timeout', 'utils', tds.core.directive.LoadingIndicator]);
-tds.core.module.directive('tdsdatepicker', ['utils', 'dateFormat', tds.core.directive.DatePicker]);
-tds.core.module.directive('tdsrangepicker', ['utils', 'dateTimeFormat', tds.core.directive.RangePicker]);
+tds.core.module.directive('tdsdatepicker', ['utils', tds.core.directive.DatePicker]);
+tds.core.module.directive('tdsrangepicker', ['utils', tds.core.directive.RangePicker]);
 tds.core.module.directive('tdsdurationpicker', ['utils', tds.core.directive.DurationPicker]);
 tds.core.module.directive('tdsactionbutton', ['utils', '$window', tds.core.directive.ActionButton]);

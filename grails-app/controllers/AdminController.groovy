@@ -355,11 +355,7 @@ class AdminController {
 
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PROJECT_LOGO-----------------------------------------*/
-			SELECT * FROM  ( SELECT 'project_logo' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_logo pl where pl.party_id not in (select pg.party_group_id from party_group pg)
-				UNION
-				SELECT 'project_logo' as mainTable,'party_id' as refId,'Null' as type,count(*) as totalCount FROM project_logo pl where pl.party_id is null
-				UNION
-				SELECT 'project_logo' as mainTable,'project_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)
+			SELECT * FROM ( SELECT 'project_logo' as mainTable,'project_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)
 				UNION
 				SELECT 'project_logo' as mainTable,'project_id' as refId,'Null' as type,count(*) as totalCount FROM project_logo pl where pl.project_id is null) pl
 			WHERE pl.totalCount > 0
@@ -386,7 +382,7 @@ class AdminController {
 				UNION
 				SELECT 'user_preference' as mainTable,'user_login_id' as refId,'Null' as type,count(*) as totalCount FROM user_preference up where up.user_login_id is null) up
 			WHERE up.totalCount > 0	"""
-			
+
 			summaryRecords << jdbcTemplate.queryForList( partySummaryQuery )
 
 			return[summaryRecords : summaryRecords];	
@@ -908,14 +904,6 @@ class AdminController {
 			
 			case "project_logo" :
 				switch (column){
-					case "party_id" :
-						if(type != "Null"){
-							query = "SELECT * FROM project_logo pl where pl.party_id not in (select pg.party_group_id from party_group pg)"
-						} else {
-							query = "SELECT * FROM project_logo pl where pl.party_id is null"
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
 					case "project_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)"

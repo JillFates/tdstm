@@ -6,7 +6,10 @@ var tdsCommon = {
 	
 	config: {
 		// The base path of the application URI
-		appBaseUri:  '/tdstm'
+		appBaseUri:  '/tdstm',
+		dateFormat: null,
+		dateTimeFormat: null,
+		dateShortFormat: null
 	},
 
 	// creates relative or fully qualified url to for the application
@@ -123,6 +126,79 @@ var tdsCommon = {
 		} else {
 			alert(msg);
 		}
+	},
+
+	/**
+	 * Check if user date format type is MM/DD/YY
+	 */
+	isFormatMMDDYYYY: function() {
+		var df = $("#userDTFormat").val();
+		return ((df != null) && (df == "MM/DD/YYYY"))
+	},
+
+	/**
+	 * Returns default date short format
+	 */
+	defaultShortDateFormat: function() {
+		if (this.config.dateShortFormat == null) {
+			this.config.dateShortFormat = "MM/DD/YY";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateShortFormat = "DD/MM/YY";
+			}
+		}
+		return this.config.dateShortFormat;
+	},
+
+	/**
+	 * Returns default date format
+	 */
+	defaultDateFormat: function() {
+		if (this.config.dateFormat == null) {
+			this.config.dateFormat = "MM/DD/YYYY";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateFormat = "DD/MM/YYYY";
+			}
+			console.log("defaultDateFormat: " + this.config.dateFormat)
+		}
+		return this.config.dateFormat;
+	},
+
+	/**
+	 * Returns default date time format
+	 */
+	defaultDateTimeFormat: function() {
+		if (this.config.dateTimeFormat == null) {
+			this.config.dateTimeFormat = "MM/DD/YYYY h:mm A";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateTimeFormat = "DD/MM/YYYY h:mm A";
+			}
+			console.log("defaultDateTimeFormat: " + this.config.dateTimeFormat)
+		}
+		return this.config.dateTimeFormat;
+	},
+
+	parseDateTimeFromZulu: function(stringValue, format) {
+		var result = "";
+		if (stringValue) {
+			result = moment(stringValue);
+		}
+		return result;
+	},
+	
+	parseDateTimeString: function(stringValue, format) {
+		var result = "";
+		if (stringValue) {
+			result = moment(stringValue, format);
+		}
+		return result;
+	},
+
+	formatDateTime: function(momentObj, format) {
+		var result = "";
+		if (momentObj) {
+			result = momentObj.format(format);
+		}
+		return result;
 	}
 
 }

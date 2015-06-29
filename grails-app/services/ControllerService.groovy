@@ -1,4 +1,5 @@
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetClass
 
 import javax.servlet.http.HttpSession
@@ -273,7 +274,7 @@ class ControllerService {
 		Long id = NumberUtil.toLong(params.id)
 		def isNew = id == null
 
-		assetEntityService.parseMaintExpDateAndRetireDate(params, session)
+		parseMaintExpDateAndRetireDate(params, session)
 		
 		try {
 			(project, user) = getProjectAndUserForPage(controller, 'AssetEdit')

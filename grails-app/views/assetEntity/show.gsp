@@ -99,7 +99,7 @@
 									<label for="retireDate">Retire Date:</label>
 								</td>
 								<td class="valueNW ${config.retireDate}">
-									<tds:convertDate date="${assetEntity?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+									<tds:convertDate date="${assetEntity?.retireDate}"  />
 								</td>
 								<td class="label ${config.planStatus}  ${highlightMap.planStatus?:''}" nowrap="nowrap">
 									<label for="planStatus">Plan Status</label>
@@ -115,7 +115,7 @@
 								<td class="valueNW ${config.railType}">${assetEntity.railType}</td>
 								<td class="label ${config.maintExpDate}  ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
 								<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${assetEntity?.maintExpDate}"
-									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+									 />
 							    </td>
 								<td class="label ${config.validation}  ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>
 								<td class="valueNW ${config.validation}">${assetEntity.validation}</td>

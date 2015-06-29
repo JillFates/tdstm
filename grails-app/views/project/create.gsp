@@ -300,7 +300,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
-									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);" /> 
+									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" /> 
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="startDate" />
@@ -317,7 +317,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	
-									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);" />
+									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" />" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
 								</g:hasErrors>
