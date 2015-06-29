@@ -233,7 +233,6 @@ describe('Cookbook', function(){
       '  ],',
       ']'
       ];
-      // browser.executeScript('return angular.element("#recipeModalSourceCode").scope().modal.sourceCode = "'+recipe.join('\\n')+'"');
       cookbook.setTextToEditor(recipe.join('\\n'));
       cookbook.editorTextArea.click();
       expect(cookbook.editorTextArea.getText()).toEqual(recipe);
@@ -245,6 +244,246 @@ describe('Cookbook', function(){
     });
     
   });//Add a recipe
+
+  describe('Save WIP Button', function() {
+    
+    it('should have "Save WIP" as label', function() {
+
+      expect(cookbook.saveWipBtn.getText()).toEqual('Save WIP');
+          
+        });    
+    it('should have "Save Wip" button enabled', function() {
+      expect(cookbook.saveWipBtn.getAttribute('disabled')).toBe(null);
+    });
+
+    it('should save WIP and disable the button', function() {
+      cookbook.saveWipBtn.click();
+      expect(cookbook.saveWipBtn.getAttribute('disabled')).toBe('true');
+    });
+    
+
+  });// Save WIP Button
+
+  describe('Check Syntax button', function() {
+    
+    it('should have "Check Syntax" as label', function() {
+      expect(cookbook.checkSyntaxBtn.getText()).toEqual('Check Syntax');
+    });
+    
+    it('should check syntax', function() {
+      cookbook.checkSyntaxBtn.click();
+      expect(cookbook.isCheckSyntaxModalOpened()).toBe(true);
+    });
+
+    it('should have an error displayed',function () {
+      expect(cookbook.checkSyntaxErrorDetails.getText()).toEqual('Task id 1100 \'filter/group\' references an invalid group BET_THIS_DOES_NOT_EXIST');
+    });
+
+    it('should close Check Syntax modal', function() {
+      cookbook.closeCheckSyntaxModal.click();
+      expect(cookbook.isCheckSyntaxModalClosed()).toBe(true);
+    });
+
+  }); // Check Syntax button
+
+  describe('Fix Recipe and check syntax', function() {
+
+    it('should edit the recipe',function () {
+      cookbook.editEditorBtn.click();
+      expect(cookbook.isEditorModalOpened()).toBe(true);    
+
+    });
+    
+    it('should add text to editor', function() {
+      var recipe = [
+      'tasks: [',
+      '  [',
+      '    id: 1100,',
+      '    description: \'Shutdown ALL applications\',',
+      '    title: \'Shutdown app ${it.assetName}\',',
+      '    workflow: \'AppShutdown\',',
+      '    team: \'APP_COORD\',',
+      '    category: \'shutdown\',',
+      '    duration: 10,',
+      '      filter : [',
+      '        class: \'application\'',
+      '      ],',
+      '  ],',
+      ']'
+      ];
+      cookbook.setTextToEditor(recipe.join('\\n'));
+      cookbook.editorTextAreaX.click();
+      expect(cookbook.editorTextArea.getText()).toEqual(recipe);
+    });
+
+    it('should close Recipe modal', function () {
+      cookbook.modalCloseBtn.click();
+      expect(cookbook.isModalClosed()).toBe(true);
+    });
+    
+    it('should save WIP and disable the button', function() {
+      cookbook.saveWipBtn.click();
+      expect(cookbook.saveWipBtn.getAttribute('disabled')).toBe('true');
+    });
+
+    it('should check syntax and no error is displayed', function() {
+      cookbook.checkSyntaxBtn.click();
+      expect(cookbook.isLoadingIndicatorHidden()).toBe(true);
+    });
+
+  }); //Fix Recipe and check syntax
+
+
+  describe('Task Generation Tab', function() {
+
+  it('should go to Task Generation tab', function() {
+    cookbook.pageTabs.get(0).click();
+    expect(cookbook.pageTabs.get(0).getAttribute('class')).toContain('active');
+  });
+
+
+    describe('Event Dropdown', function() {
+      
+      xit('should have "Event:" as label', function() {
+        expect(cookbook.eventLabel.getText()).toEqual('Event:'); 
+      });
+
+      it('should have "Please Select" option selected by default', function() {
+        expect(cookbook.eventSelected.getText()).toEqual('Please select');  
+      });
+
+      describe('Set as Default', function() {
+        
+        it('should have "Set As default" as text', function() {
+          expect(cookbook.setAsDefaultLink.getText()).toEqual('Set as Default');
+        });
+
+        it('should have "Set as Default" disabled ', function() {
+          expect(cookbook.setAsDefaultLink.getAttribute('disabled')).toBe('true');
+        });
+
+        it('should be displayed', function() {
+          expect(cookbook.setAsDefaultLink.getAttribute('class')).not.toContain('ng-hide');
+        });
+
+      }); // Set as Default
+
+      it('should select an event from the Dropdown', function() {
+        cookbook.eventOptions.get(1).click();
+        expect(cookbook.eventSelected.getText()).toEqual('Buildout');  
+      });
+
+      it('should have "Set As Default" enabled', function() {
+          expect(cookbook.setAsDefaultLink.getAttribute('disabled')).toBe(null);
+      });
+
+      it('should set the event as default and link should changed to "Clear Default"', function() {
+        cookbook.setAsDefaultLink.click();
+        expect(cookbook.setAsDefaultLink.getAttribute('class')).toContain('ng-hide');
+      });
+
+      describe('Clear Default', function() {
+        
+        it('should have "Set As default" as text', function() {
+          expect(cookbook.clearDefaultLink.getText()).toEqual('Clear Default');
+        });
+
+        it('should have "Clear Default" enabled ', function() {
+          expect(cookbook.clearDefaultLink.getAttribute('disabled')).toBe(null);
+        });
+
+        it('should be displayed', function() {
+          expect(cookbook.clearDefaultLink.getAttribute('class')).not.toContain('ng-hide');
+        });
+
+      }); // Clear Default
+
+      
+    }); //Event Dropdown
+
+
+    describe('Automatically publish tasks Checkbox', function() {
+      
+      it('should have "Automatically publish tasks" as label', function() {
+        expect(cookbook.autoPublishTaskLabel.getText()).toEqual('Automatically publish tasks');
+      });
+
+      it('should be unchecked by default', function() {
+        expect(cookbook.autoPublishTaskCheck.getAttribute('checked')).toBe(null);
+      });
+
+    });
+
+    describe('Generate using WIP checkbox', function() {
+      
+      it('should have "Generate using WIP" as label', function() {
+        expect(cookbook.generateUsingWipLabel.getText()).toEqual('Generate using WIP recipe');
+      });
+
+      it('should be disabled by default', function() {
+        expect(cookbook.generateUsingWipCheck.getAttribute('checked')).toBe(null);
+        
+      });
+
+    });
+
+    describe('Generate Tasks', function() {
+
+      describe('From WIP with "generate using wip recipe" unchecked', function() {
+
+        it('should have "Generate Tasks" as label on the button ', function() {
+          expect(cookbook.generateTasksBtn.getText()).toEqual('Generate Tasks');
+        });
+
+        it('should click on generate task button and error should be displayed', function() {
+          cookbook.generateTasksBtn.click();
+          expect(cookbook.isErrorMsgDisplayed()).toBe(true);
+        });
+
+        it('should validate error message', function() {
+          expect(cookbook.errorMsg.getText()).toEqual('Error: Unable to generate tasks. There is no released version of the recipe to generate tasks with');
+        });
+
+        it('should close error msg', function() {
+          cookbook.errorMsgCloseBtn.click();
+          expect($('[class="body ng-scope"] span').getAttribute('ng-bind')).toBe(null);
+        });
+
+      }); //From WIP with "generate using wip recipe" unchecked
+
+      describe('From WIP with "Generate using WIP recipe" checked', function() {
+        
+        it('should enable "Generate using WIP Recipe" checkbox', function() {
+          cookbook.generateUsingWipCheck.click();
+          expect(cookbook.generateUsingWipCheck.getAttribute('Checked')).toBe('true');
+        });
+
+        it('should click on generate task button', function() {
+          cookbook.generateTasksBtn.click();
+          expect(cookbook.isTaskGenerationTabsDisplayed()).toBe(true);
+        });
+
+        it('should have this result', function() {
+          expect(cookbook.sumaryList.getText()).toEqual('Status: Completed\nTasks Created: 4\nNumber of Exceptions: 4');
+        });
+
+
+
+      }); //From WIP with "Generate using WIP recipe" checked
+
+      describe('Generate Tasks with previously tasks created', function() {
+      
+        it('should click on generate task button', function() {
+          cookbook.generateTasksBtn.click();
+          var alertDialog = browser.driver.switchTo().alert();
+          expect(alertDialog.getText()).toEqual('There are tasks previously created with this recipe for the selected context.\n\nPress Okay to delete or Cancel to abort.');
+          alertDialog.accept();     
+        });
+        
+      });
+    });// Generate Tasks
+  });
+
 // describe('Editor Tab', function(){
 //   describe ('show diff button', function(){
 
