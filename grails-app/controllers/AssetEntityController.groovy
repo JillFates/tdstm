@@ -4201,7 +4201,10 @@ class AssetEntityController {
 			assetName: assetName,
 			levelsUp: levelsUp,
 			levelsDown: levelsDown,
-			assetClassesForSelect: assetClassesForSelect
+			assetClassesForSelect: assetClassesForSelect,
+			moveBundleList: assetEntityService.getMoveBundles(project),
+			dependencyStatus: assetEntityService.getDependencyStatuses(),
+			dependencyType: assetEntityService.getDependencyTypes()
 		]
 		render([assetId:params.assetId, model: model, view:'architectureGraph'])
 	}
