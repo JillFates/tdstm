@@ -114,8 +114,8 @@
 				return;
 			}
 			
-			var data = $.parseJSON(response.responseText);
 			
+			var data = $.parseJSON(response.responseText);
 			tasks = data.tasks;
 			
 			// populate the Team select
@@ -135,6 +135,7 @@
 			var svgData = d3.select('div.body')
 				.append('div')
 				.attr('id', 'svgContainerDivId');
+			
 			
 			svgData.html(data.svgText);
 			
@@ -278,64 +279,70 @@
 		
 		// highlight tasks matching the user's regex
 		function performSearch () {
-			if (graph != null) {
-				var searchString = $('#searchBoxId').val();
-				var nodes = $('g.node');
-				var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length-1) == '/');
-				var isRegex = false;
-				var regex = /.*/;
-				
-				// check if the user entered an invalid regex
-				if (hasSlashes) {
-					try {
-						regex = new RegExp(searchString.substring(1, searchString.length-1));
-						isRegex = _.isRegExp(regex);
-					} catch (e) {
-						alert(e);
-						searchString = '';
+			try {
+				if (graph != null) {
+					var searchString = $('#searchBoxId').val();
+					var nodes = $('g.node');
+					var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length-1) == '/');
+					var isRegex = false;
+					var regex = /.*/;
+					
+					// check if the user entered an invalid regex
+					if (hasSlashes) {
+						try {
+							regex = new RegExp(searchString.substring(1, searchString.length-1));
+							isRegex = _.isRegExp(regex);
+						} catch (e) {
+							alert(e);
+							searchString = '';
+						}
+					}
+					
+					// determine whether the "clear filter" icon should be usable
+					if (searchString != '')
+						$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
+					else
+						$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
+					
+					
+					var val = $('#teamSelectId').val();
+					var useRegex = (searchString != '');
+					var useRole = (val != 'ALL');				
+					for (var i = 0; i < tasks.size(); ++i) {
+						
+						// check this task against the regex
+						var name = (tasks[i].comment) ? (tasks[i].comment) : (tasks[i].task);
+						var taskNumber = (tasks[i].taskNumber) ? (tasks[i].taskNumber) : (tasks[i].task_number);
+						name = taskNumber + ':' + name;
+						var matchRegex = false;
+						if (isRegex && name.match(regex) != null)
+							matchRegex = true;
+						else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
+							matchRegex = true;
+								
+						// check this task against the role filter
+						var matchRole = false;
+						if ((tasks[i].role ? tasks[i].role : 'NONE') == val)
+							matchRole = true;
+						
+						// determine if this task should be highlighted
+						var highlight = true;
+						if ( (useRole && !matchRole) || (useRegex && !matchRegex) )
+							highlight = false;
+						if (!useRegex && !useRole)
+							highlight = false;
+						
+						// highlight the task
+						if (highlight)
+							$('#' + tasks[i].id).attr('class', 'node selected');
+						else
+							$('#' + tasks[i].id).attr('class', 'node unselected');
 					}
 				}
-				
-				// determine whether the "clear filter" icon should be usable
-				if (searchString != '')
-					$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
-				else
-					$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
-				
-				
-				var val = $('#teamSelectId').val();
-				var useRegex = (searchString != '');
-				var useRole = (val != 'ALL');				
-				for (var i = 0; i < tasks.size(); ++i) {
-					
-					// check this task against the regex
-					var name = (tasks[i].comment) ? (tasks[i].comment) : (tasks[i].task);
-					var taskNumber = (tasks[i].taskNumber) ? (tasks[i].taskNumber) : (tasks[i].task_number);
-					name = taskNumber + ':' + name;
-					var matchRegex = false;
-					if (isRegex && name.match(regex) != null)
-						matchRegex = true;
-					else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
-						matchRegex = true;
-							
-					// check this task against the role filter
-					var matchRole = false;
-					if ((tasks[i].role ? tasks[i].role : 'NONE') == val)
-						matchRole = true;
-					
-					// determine if this task should be highlighted
-					var highlight = true;
-					if ( (useRole && !matchRole) || (useRegex && !matchRegex) )
-						highlight = false;
-					if (!useRegex && !useRole)
-						highlight = false;
-					
-					// highlight the task
-					if (highlight)
-						$('#' + tasks[i].id).attr('class', 'node selected');
-					else
-						$('#' + tasks[i].id).attr('class', 'node unselected');
-				}
+			} catch (e) {
+				alert('Error occurred while performing highlight search');
+				console.log(e);
+				return false;
 			}
 			
 			return false;
