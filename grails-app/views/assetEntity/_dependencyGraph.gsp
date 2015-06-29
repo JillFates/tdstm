@@ -1,7 +1,7 @@
 <script type="text/javascript">
 
 var parameterPrecision = {'force':${multiple?10:100}, 'linkSize':10, 'friction':0.1, 'theta':0.1, 'width':100, 'height':100}
-var parameterRanges = {'force':[${multiple?-100:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1], 'width':[600,100000], 'height':[500,100000]}
+var parameterRanges = {'force':[${multiple?-500:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1], 'width':[600,100000], 'height':[500,100000]}
 
 $(document).ready(function() {
 	$('#appLabel').attr('checked',true)
@@ -24,7 +24,6 @@ $(document).ready(function() {
 		$('#filesLabel').attr('checked',false)
 	}
 	
-	updateHeight();
 	$('#width').val($('#item1').innerWidth());
 	
 	if( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
@@ -81,6 +80,7 @@ function openPanel (source) {
 	} else if (source == 'legendDivId') {
 		$('#controlPanel').css('display','none')
 		$('#legendDivId').css('display','block')
+		GraphUtil.correctLegendSize();
 	} else if (source == 'hide') {
 		$('#controlPanel').css('display','none')
 		$('#legendDivId').css('display','none')
@@ -136,7 +136,7 @@ $('#tabTypeId').val('graph')
 		<input type="hidden" id="filesChecked" value="${filesChecked}" />
 		<input type="hidden" id="listCheckId" value="?" />
 		
-		<div id="item1" style="float: left;z-index: 10000; width: 1200px; top: 0px; top: 0px;">
+		<div id="item1" style="float: left;" class="graphContainer">
 			<g:render template="map" model="${pageScope.variables}"/>
 		</div>
 	</div>

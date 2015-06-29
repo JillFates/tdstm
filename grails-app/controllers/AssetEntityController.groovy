@@ -52,6 +52,7 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.eav.*
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.DateUtil
@@ -76,6 +77,7 @@ class AssetEntityController {
 	def personService
 	def progressService
 	def projectService
+	def reportsService
 	def securityService
 	def sequenceService
 	def sessionFactory
@@ -2291,7 +2293,7 @@ class AssetEntityController {
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 
 		// TODO TM-2515 - SHOULD NOT need ANY of these queries as they should be implemented directly into the criteria
-	    def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
+		def dates = params.dueDate ? AssetComment.findAll("from AssetComment where project =:project and dueDate like '%${params.dueDate}%' ",[project:project])?.dueDate : []
 		def estStartdates = params.estStart ? AssetComment.findAll("from AssetComment where project=:project and estStart like '%${params.estStart}%' ",[project:project])?.estStart : []
 		def actStartdates = params.actStart ? AssetComment.findAll("from AssetComment where project=:project and actStart like '%${params.actStart}%' ",[project:project])?.actStart : []
 		def dateCreateddates = params.dateCreated ? AssetComment.findAll("from AssetComment where project=:project and dateCreated like '%${params.dateCreated}%' ",[project:project])?.dateCreated : []
@@ -2717,10 +2719,15 @@ class AssetEntityController {
 	def retrieveLists() {
 		def start = new Date()
 		session.removeAttribute('assetDependentlist')
-
+		
+		def loginUser = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def depGroups = JSON.parse(session.getAttribute('Dep_Groups'))
+		
+		def depGroups = []
+		def depGroupsJson = session.getAttribute('Dep_Groups')
+		if (depGroupsJson)
+			depGroups = JSON.parse(session.getAttribute('Dep_Groups'))
 		if (depGroups.size() == 0) {
 			depGroups = [-1]
 		}
@@ -2733,11 +2740,13 @@ class AssetEntityController {
 		if (params.dependencyBundle && params.dependencyBundle.isNumber() ) {
 			// Get just the assets for a particular dependency group id
 			mapQuery = " AND deps.bundle = ${params.dependencyBundle}"
+			depGroups = [params.dependencyBundle]
 			nodesQuery = " AND dependency_bundle = ${params.dependencyBundle} "
 		} else if (params.dependencyBundle == 'onePlus') {
 			// Get all the groups other than zero - these are the groups that have interdependencies
 			multiple = true;
 			mapQuery = " AND deps.bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
+			depGroups = depGroups-[0]
 			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups-[0])})"
 		} else {
 			// Get 'all' assets that were bundled
@@ -2746,7 +2755,7 @@ class AssetEntityController {
 			nodesQuery = " AND dependency_bundle in (${WebUtil.listAsMultiValueString(depGroups)})"
 		}
 		def queryFordepsList = """
-			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, 
+			SELECT DISTINCT deps.asset_id AS assetId, ae.asset_name AS assetName, deps.dependency_bundle AS bundle, mb.move_bundle_id AS moveBundleId, mb.name AS moveBundleName, 
 			ae.asset_type AS type, ae.asset_class AS assetClass, me.move_event_id AS moveEvent, me.name AS eventName, app.criticality AS criticality,
 			IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus
 			FROM ( 
@@ -2763,6 +2772,7 @@ class AssetEntityController {
 			"""
 			
 			
+		
 		assetDependentlist = jdbcTemplate.queryForList(queryFordepsList)
 		//log.error "getLists() : query for assetDependentlist took ${TimeUtil.elapsed(start)}"
 		// Took 0.296 seconds
@@ -2772,21 +2782,24 @@ class AssetEntityController {
 		// TODO : This pig of a list should NOT be stored into the session and the logic needs to be reworked
 		//session.setAttribute('assetDependentlist', assetDependentlist)
 		
-		def depMap = moveBundleService.dependencyConsoleMap(projectId, null, null, (params.dependencyBundle!="null")?(params.dependencyBundle):("all") )
-		depMap = depMap.gridStats
+		def depMap
+		def sortOn = params.sort?:"assetName"
+		def orderBy = params.orderBy?:"asc"
+		def asset
 		
+		if (params.entity != 'graph') {
+			depMap = moveBundleService.dependencyConsoleMap(projectId, null, null, (params.dependencyBundle!="null")?(params.dependencyBundle):("all") )
+			depMap = depMap.gridStats
+			
+		} else {
+			depMap = moveBundleService.dependencyConsoleMap(projectId, null, null, (params.dependencyBundle!="null")?(params.dependencyBundle):("all"), true)
+		}
 		def model = [entity: (params.entity ?: 'apps'), stats:depMap]
 		
-		def sortOn = params.sort?:"assetName"
-			
-		def orderBy = params.orderBy?:"asc"
 		model.dependencyBundle = params.dependencyBundle
 		model.asset = params.entity
 		model.orderBy = orderBy
 		model.sortBy = sortOn
-		
-		def serverTypes = AssetType.getAllServerTypes()
-		def asset
 		
 
 		
@@ -2826,8 +2839,9 @@ class AssetEntityController {
 				break
 
 			case "server":
-				def assetEntityList = assetDependentlist.findAll { serverTypes.contains(it.type) }
 				def assetList = []
+				def serverTypes = AssetType.getAllServerTypes()
+				def assetEntityList = assetDependentlist.findAll { serverTypes.contains(it.type) }
 				
 				assetEntityList.each {
 					asset = AssetEntity.read(it.assetId)
@@ -2899,27 +2913,25 @@ class AssetEntityController {
 				moveEventList =  uniqueMoveEventList.toList()
 				moveEventList.sort{it?.name}
 				
-				def eventColorCode = [:]
-				int colorDiff
-				if (moveEventList.size()) {
-					colorDiff = (232/moveEventList.size()).intValue()
-				}
+				Map requiredPrefs = ['dependencyConsoleApplicationLabel':'true', 
+					'dependencyConsoleServerLabel':'', 
+					'dependencyConsoleDatabaseLabel':'', 
+					'dependencyConsoleStoragePhysicalLabel':'', 
+					'dependencyConsoleFilesLabel':'', 
+					'dependencyConsoleNetworkLabel':'']
 				
-				def labelMap = ['Application':userPreferenceService.getPreference('dependencyConsoleApplicationLabel')?:'true',
-							    'Server':userPreferenceService.getPreference('dependencyConsoleServerLabel')?:'', 
-								'Database':userPreferenceService.getPreference('dependencyConsoleDatabaseLabel')?:'', 
-								'StoragePhysical':userPreferenceService.getPreference('dependencyConsoleStoragePhysicalLabel')?:'', 
-								'Files':userPreferenceService.getPreference('dependencyConsoleFilesLabel')?:'', 
-								'Network':userPreferenceService.getPreference('dependencyConsoleNetworkLabel')?:'']
+				Map prefMap = userPreferenceService.getPreferences(requiredPrefs, loginUser)
+				
+				def labelMap = ['Application':prefMap['dependencyConsoleApplicationLabel'], 
+					'Server':prefMap['dependencyConsoleServerLabel'], 
+					'Database':prefMap['dependencyConsoleDatabaseLabel'], 
+					'StoragePhysical':prefMap['dependencyConsoleStoragePhysicalLabel'], 
+					'Files':prefMap['dependencyConsoleFilesLabel'], 
+					'Network':prefMap['dependencyConsoleNetworkLabel']]
+				
 				def labelList = params.labelsList
 				labelList = labelList?.replace(" ","")
 				List labels = labelList ?  labelList.split(",") : []
-				
-				moveEventList.eachWithIndex{ event, i -> 
-					def colorCode = colorDiff * i
-					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
-					eventColorCode << [(event.name):colorsCode]
-				}
 				
 				// Create the Nodes
 				def graphNodes = []
@@ -2932,10 +2944,8 @@ class AssetEntityController {
 				def assetType = ''
 				def assetClass = ''
 				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
+				TreeMap<Long, String> moveBundleMap = new TreeMap<Long, String>();
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
-				log.info "t1 = ${t1}"
-				log.info "Iterating through list of ${assetDependentlist.size()} items"
-				
 				
 				assetDependentlist.each {
 					assetType = it.model?.assetType?:it.type
@@ -2961,21 +2971,44 @@ class AssetEntityController {
 						type = 'other'
 					}
 					
+					if (! moveBundleMap.containsKey(it.moveBundleId))
+						moveBundleMap.put(it.moveBundleId, it.moveBundleName);
+					
 					def moveEventName = it.eventName ?: ''
+					color = it.eventName ? 'grey' : 'red'
+					
 					graphNodes << [
 						id:it.assetId, name:it.assetName, 
-						type:type, group:it.bundle, 
+						type:type, group:it.moveBundleId, 
 						shape:shape, size:size, title:it.assetName, 
-						color:eventColorCode[moveEventName]?:'red', 
-						dependsOn:[], supports:[],
+						color:color, dependsOn:[], supports:[],
 						assetClass:it.assetClass
 					]
 				}
 				
+				// set the move bundle property to an index
+				def sorted = new ArrayList<Long>(moveBundleMap.keySet())
+				graphNodes.each {
+					def mbid = it.group
+					def index = sorted.indexOf(mbid);
+					it.group = index
+				}
+				
+				// set up the move bundle color map
+				int colorDiff
+				if (moveBundleMap.size())
+					colorDiff = (232/moveBundleMap.size()).intValue()
+				
+				def moveBundleColorCode = [:]
+				for (def i = 0; i < moveBundleMap.size(); i++) {
+					def id = moveBundleMap.keySet()
+					def colorCode = colorDiff * i
+					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
+					moveBundleColorCode << [(id):colorsCode]
+				}
+				
 				// Define a map of all the options for asset types
-				def assetTypes = [(AssetType.APPLICATION.toString()):"application", (AssetType.DATABASE.toString()):"database", (AssetType.VM.toString()):"serverVirtual", 
-					(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
-					(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "other":"other"]
+				def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
 				
 				// Create a seperate list of just the node ids to use while creating the links (this makes it much faster)
 				def nodeIds = []
@@ -2990,7 +3023,6 @@ class AssetEntityController {
 				if(assetDependentlist.size() > 0){
 					avg = td / assetDependentlist.size()
 				}
-				log.info "Iterating through list of ${assetDependentlist.size()} items took ${td} millis, with an average of ${avg} millis per item"
 				
 				// Set the defaults map to be used in the dependeny graph
 				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
@@ -2999,29 +3031,31 @@ class AssetEntityController {
 					defaults.linkSize = 100
 				}
 				
-				if (params.blackBackground in ['true','false'])
-					userPreferenceService.setPreference('dependencyConsoleBlackBg', params.blackBackground)
 				defaults.blackBackground = false
-				if ( userPreferenceService.getPreference('dependencyConsoleBlackBg') == 'true' ) {
-					defaults.blackBackground = userPreferenceService.getPreference('dependencyConsoleBlackBg') == 'true'
+				if (params.blackBackground in ['true','false']) {
+					userPreferenceService.setPreference('dependencyConsoleBlackBg', params.blackBackground)
+				}
+				if (params.blackBackground == 'true') {
+					defaults.blackBackground = true
 				}
 				
 				// Query for only the dependencies that will be shown
 				def depBundle = (params.dependencyBundle.isNumber() ? params.dependencyBundle : 0)
-				def query = """ 
-					SELECT * FROM ( 
-						SELECT ad.asset_id AS assetId, ad.dependent_id AS dependentId, status, 
-							IFNULL(adb.project_id, adb2.project_id) AS projectId, 
-							IFNULL(adb.dependency_bundle, adb2.dependency_bundle) AS bundle
-						FROM tdstm.asset_dependency ad 
-							LEFT OUTER JOIN asset_dependency_bundle adb ON (adb.asset_id = ad.asset_id) 
-							LEFT OUTER JOIN asset_dependency_bundle adb2 ON (adb2.asset_id = ad.dependent_id) 
-							GROUP BY asset_dependency_id 
-					) AS deps 
-					WHERE deps.projectId=${projectId} ${mapQuery}"""
-				def assetDependencies = jdbcTemplate.queryForList(query)
+				
+				def assetDependencies = AssetDependency.executeQuery("""
+					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future, ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId)
+					FROM AssetDependency ad, AssetDependencyBundle adb1, AssetDependencyBundle adb2, Project p
+					WHERE ad.asset = adb1.asset
+						AND ad.dependent = adb2.asset
+						AND adb1.dependencyBundle in (${WebUtil.listAsMultiValueString(depGroups)})
+						AND adb2.dependencyBundle in (${WebUtil.listAsMultiValueString(depGroups)})
+						AND adb1.project = p
+						AND adb2.project = p
+						AND p.id = ${projectId}
+					GROUP BY ad.id
+				""")
+				
 				def multiCheck = new Date()
-				def dependenciesList = new ArrayList(assetDependencies)
 				
 				
 				// Create the links
@@ -3030,19 +3064,15 @@ class AssetEntityController {
 				def opacity = 1
 				def statusColor = 'grey'
 				assetDependencies.each {
-					if(it.status=='Questioned') {
-						opacity = 1
+					opacity = 1
+					statusColor = 'grey'
+					if (! it.resolved)
 						statusColor='red'
-					} else if( ! ( it.status in ['Unknown','Validated'] ) ) {
+					else if( ! (it.status in [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED]) )
 						opacity = 0.2
-						statusColor = 'grey'
-					} else {
-						opacity = 1
-						statusColor = 'grey'
-					}
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
-					if(sourceIndex != -1 && targetIndex != -1){
+					if (sourceIndex != -1 && targetIndex != -1) {
 						graphLinks << ["id":i, "source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity]
 						i++
 					}
@@ -3066,19 +3096,18 @@ class AssetEntityController {
 				model.appChecked = labels.contains('apps')
 				model.serverChecked = labels.contains('servers')
 				model.filesChecked = labels.contains('files')
-				model.eventColorCode = eventColorCode
+				model.moveBundleColorCode = moveBundleColorCode
 				model.nodes = graphNodes as JSON
 				model.links = graphLinks as JSON
 				model.multiple = multiple
 				model.assetTypes = assetTypes as JSON
-				
-				
+				model.moveBundleMap = moveBundleMap as JSON
 				
 				// Render dependency graph
 				render(template:'dependencyGraph',model:model)
 				break
 		} // switch
-		log.debug "Loading dependency console took ${TimeUtil.elapsed(start)}"
+		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
 	}
 
 	/**
@@ -4151,21 +4180,30 @@ class AssetEntityController {
 		}
 		
 		def project = securityService.getUserCurrentProject()
-		def level = NumberUtils.toInt(params.level)
-		if (level == 0)
-			level = 3
+		def levelsUp = NumberUtils.toInt(params.levelsUp)
+		def levelsDown = NumberUtils.toInt(params.levelsDown)
+		if (levelsUp == 0)
+			levelsUp = 0
+		if (levelsDown == 0)
+			levelsDown = 3
 		
 		def assetName = null 
-		if(params.assetId){
+		if (params.assetId) {
 			def asset = AssetEntityHelper.getAssetById(project, null, params.assetId)
 			assetName = asset.assetName
 		}
 		
+		def assetClassesForSelect = AssetClass.getClassOptions()
+		assetClassesForSelect.put('ALL', 'All Classes');
+		
 		def model = [
-						assetId : params.assetId,
-						assetName: assetName
-					]
-		render([assetId:params.assetId, model: model, level:level, view:'architectureGraph'])
+			assetId : params.assetId,
+			assetName: assetName,
+			levelsUp: levelsUp,
+			levelsDown: levelsDown,
+			assetClassesForSelect: assetClassesForSelect
+		]
+		render([assetId:params.assetId, model: model, view:'architectureGraph'])
 	}
 	
 	/**
@@ -4180,7 +4218,8 @@ class AssetEntityController {
 		try {
 			def project = securityService.getUserCurrentProject()
 			def asset = AssetEntity.get(NumberUtils.toInt(params.assetId))
-			def level = NumberUtils.toInt(params.level)
+			def levelsUp = NumberUtils.toInt(params.levelsUp)
+			def levelsDown = NumberUtils.toInt(params.levelsDown)
 			def deps = []
 			def sups = []
 			def assetsList = []
@@ -4196,7 +4235,7 @@ class AssetEntityController {
 			if (params.mode.equals("assetId")) {
 				
 				// Check if the parameters are null
-				if (params.assetId == null || params.level == null) {
+				if (params.assetId == null || (params.levelsUp == null || params.levelsDown == null)) {
 					return [nodes:[] as JSON, links:[] as JSON, assetId:params.assetId, level:params.level]
 				}
 				
@@ -4205,7 +4244,7 @@ class AssetEntityController {
 				def constructDeps
 				constructDeps = { a, l ->
 					def indent = ""
-					for (int i = 0; i < level-l; ++i)
+					for (int i = 0; i < levelsDown-l; ++i)
 						indent += "  "
 					if (!stack.contains(a)) {
 						stack += a
@@ -4241,14 +4280,14 @@ class AssetEntityController {
 					}
 					
 				}
-				constructDeps(asset, level)
+				constructDeps(asset, levelsDown)
 				
 				// recursively get all the nodes and links that support the asset
 				stack = []
 				def constructSups
 				constructSups = { a, l ->
 					def indent = ""
-					for (int i = 0; i < level-l; ++i)
+					for (int i = 0; i < levelsUp-l; ++i)
 						indent += "  "
 					if (!stack.contains(a) && (!deps.contains(a) || a.assetName == asset.assetName)) {
 						stack += a
@@ -4283,7 +4322,7 @@ class AssetEntityController {
 						cyclicalDependencyList.push(AssetDependency.findByAssetAndDependent(a, stack[stack.size()-1]))
 					}
 				}
-				constructSups(asset, level)
+				constructSups(asset, levelsUp)
 			
 			// this mode hasn't been implemented yet
 			} else if (params.mode.equals("dependencyBundle")) {
@@ -4369,26 +4408,19 @@ class AssetEntityController {
 			def opacity = 1
 			def statusColor = 'grey'
 			dependencyList.each {
-				if (it.status=='Questioned') {
-					opacity = 1
-					statusColor='red'
-				} else if ( ! ( it.status in ['Unknown','Validated'] ) ) {
-					opacity = 0.2
-					statusColor = 'grey'
-				} else {
-					opacity = 1
-					statusColor = 'grey'
-				}
+				def statusString = AssetDependencyStatus.VALIDATED
+				if (! it.isStatusResolved)
+					statusString = AssetDependencyStatus.QUESTIONED
+				else if (it.isFuture)
+					statusString = AssetDependencyStatus.FUTURE
+				else if ( ! (it.status in [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED]) )
+					statusString = 'NotApplicable'
 				def sourceIndex = nodeIds.indexOf(it.asset.id)
 				def targetIndex = nodeIds.indexOf(it.dependent.id)
 				if (sourceIndex != -1 && targetIndex != -1) {
-					def isCyclical = (sups.contains(it.asset) != sups.contains(it.dependent)) && (deps.contains(it.asset) != deps.contains(it.dependent))
-					isCyclical = isCyclical || (it in cyclicalDependencyList)
-					isCyclical = isCyclical || (it in extraDependencies)
-					
 					graphLinks << ["id":i, "parentId":it.asset.id, "childId":it.dependent.id, "child":targetIndex, "parent":sourceIndex, 
-						"value":2, "statusColor":statusColor, "opacity":opacity, "redundant":false, "mutual":null, "cyclical":isCyclical]
-					i++
+						"value":2, "statusColor":statusColor, "opacity":opacity, "redundant":false, "mutual":null, "status":statusString]
+					++i
 				}
 			}
 			
@@ -4403,13 +4435,10 @@ class AssetEntityController {
 			}
 			
 			// maps asset type names to simpler versions
-			def assetTypes = [(AssetType.APPLICATION.toString()):"application", (AssetType.DATABASE.toString()):"database", (AssetType.VM.toString()):"serverVirtual", 
-						(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
-						(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "other":"other"]
-			
-			def model2 = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, level:params.level, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
-			
+			def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
+			def model2 = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
 			render(view:'_applicationArchitectureGraph', model:model2)
+			
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
 		} catch (EmptyResultException e) {
@@ -4421,4 +4450,10 @@ class AssetEntityController {
 		}
 	}
 
+	def graphLegend () {
+		def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
+		def model = [assetTypes:assetTypes]
+		render(view:'_graphLegend', model:model)
+	}
+	
 }

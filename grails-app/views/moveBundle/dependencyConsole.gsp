@@ -28,6 +28,7 @@
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.min.js"/>
 		<g:javascript src="load.shapes.js"/>
+		<g:javascript src="graph.js" />
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
@@ -41,7 +42,7 @@
 				<h1>Dependency Analyzer</h1>
 				<div style="position:absolute;margin: -25px 176px 0;">
 					<input type="checkbox" id="compactControl" name="compactControl" ${compactPref == 'true' ? 'checked="checked"' :''} onclick="compactControlPref( $(this) )"/>
-					&nbsp;<span> Compact Control </span>
+					&nbsp;<span> Compact Controls </span>
 				</div>
 				<div style="position: absolute; margin: -25px 300px 0;">
 					<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">
@@ -134,6 +135,7 @@
 		<div style="float:left;">
 			<tds:hasPermission permission='MoveBundleEditView'>
 				<div id="items1" style="display: none"></div>
+				<div id="spinnerDivId" style="display: none"></div>
 			</tds:hasPermission>
 			<g:render template="../assetEntity/modelDialog" />
 			<g:render template="../assetEntity/entityCrudDivs" />
@@ -167,17 +169,26 @@
 				$('#vm_'+id).addClass('vm_count')
 				$('#db_'+id).addClass('db_count')
 				$('#file_'+id).addClass('file_count')
+
+				$('.tabs li').removeClass('active');
+				
 				
 				switch (value) {
 					case "server" :
-						$('#assetCheck').attr('checked','false')
+						$('#serverli').addClass('active');
+						break;
 					case "apps" :
+						$('#appli').addClass('active');
+						break;
 					case "database" :
+						$('#dbli').addClass('active');
+						break;
 					case "files" :
+						$('#fileli').addClass('active');
+						break;
 					case "all" :
-						var bundle = $("#planningBundleSelectId").val()
-						${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle', onComplete:'listUpdate(XMLHttpRequest)') }
-						break
+						$('#allli').addClass('active');
+						break;
 					case "graph" :
 						var labelsList = "Application"
 						var blackBackground = null
@@ -193,8 +204,32 @@
 							blackBackground = false
 						compressList()
 						${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&force=\'+ force+\'&distance=\'+ distance + compressList() + \'&showControls=\'+ showControls + \'&blackBackground=\'+ blackBackground+\'&bundle=\'+ bundle', onComplete:'listUpdate(XMLHttpRequest)') }
-						break
+						$('#graphli').addClass('active');
+						break;
 				}
+				
+				var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
+				if (value != "graph") {
+					$('#assetCheck').attr('checked','false');
+					var bundle = $("#planningBundleSelectId").val()
+					${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + value +\'&dependencyBundle=\'+ dependencyBundle+\'&bundle=\'+ bundle', onComplete:'listUpdate(XMLHttpRequest)') }
+					$('#items1 .tabInner').html(spinnerDiv);
+				} else {
+					var svgElement = $('#svgContainerId');
+					if (svgElement.size() > 0) {
+						svgElement.css('opacity', 0);
+						spinnerDiv.addClass('graph')
+							.css('position', 'fixed')
+							.css('left', svgElement.offset().left + 'px')
+							.css('top', svgElement.offset().top + 'px')
+							.css('width', svgElement.innerWidth() + 'px')
+							.css('height', svgElement.innerHeight() + 'px')
+						$('#item1').append(spinnerDiv);
+					} else {
+						$('#items1 .tabInner').html(spinnerDiv);
+					}
+				}
+				
 			}
 			function listUpdate(e){
 				var resp = e.responseText;
@@ -249,15 +284,12 @@
 					}
 			    });
 			}
-			function compactDivToggle(data){
-				if(data=='true')
+			function compactDivToggle (data) {
+				if (data == 'true')
 					$(".compactClass").hide();
 				else
 					$(".compactClass").show();
-				if ($('#item1 svg').size() > 0) {
-					updateHeight();
-					rebuildMap($("#force").val(), $("#linkSize").val(), $("#friction").val(), $("#theta").val(), $("#widthId").val(), $("#heightId").val());
-				}
+				GraphUtil.resetGraphSize();
 			}
 		</script>
 

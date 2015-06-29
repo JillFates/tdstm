@@ -9,8 +9,10 @@ class AssetDependencyStatus {
 	static final String QUESTIONED='Questioned'
 	static final String UNKNOWN='Unknown'
 	static final String ARCHIVED='Archived'
+	static final String FUTURE='Future'
+	static final String TESTING='Testing'
 	static final getList() {
-		return [ UNKNOWN, QUESTIONED, VALIDATED, ARCHIVED, NA ]
+		return [ UNKNOWN, QUESTIONED, VALIDATED, ARCHIVED, NA, FUTURE, TESTING ]
 	}
 
 	/**

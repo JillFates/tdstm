@@ -22,9 +22,10 @@ function defineShapes (defs) {
 			.attr('fill', markers[keys[i]]);
 	}
 	
-	defs.select('#arrowheadSelected').attr("viewBox", "0 -6 10 12")
+	defs.select('#arrowheadSelected,#arrowheadCyclical')
+		.attr("viewBox", "0 -6 10 12")
 		.attr("markerHeight", 12)
-	$('#arrowheadSelected path').attr("d", "M0,-6L10,0L0,6");
+	$('#arrowheadSelected path,#arrowheadCyclical path').attr("d", "M0,-6L10,0L0,6");
 	
 	// define the custom database object
 	var databaseShape = defs

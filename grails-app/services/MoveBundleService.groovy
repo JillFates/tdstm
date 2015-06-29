@@ -31,26 +31,26 @@ class MoveBundleService {
 	def userPreferenceService
 	def sessionFactory
 	def assetEntityService
-    def partyRelationshipService
+	def partyRelationshipService
 	def securityService
 	def taskService
 	def progressService
 
 	/*----------------------------------------------
 	 * @author : Lokanada Reddy
-     * @param  : moveBundleId
+	 * @param  : moveBundleId
 	 * @return : assets count for a specified move bundle
 	 *---------------------------------------------*/
-    def assetCount( def moveBundleId ) {
-    	def assetsCountInBundle = jdbcTemplate.queryForInt("select count(a.asset_entity_id) from asset_entity a where a.move_bundle_id = ${moveBundleId}" )
+	def assetCount( def moveBundleId ) {
+		def assetsCountInBundle = jdbcTemplate.queryForInt("select count(a.asset_entity_id) from asset_entity a where a.move_bundle_id = ${moveBundleId}" )
 		return assetsCountInBundle
-    }
+	}
     
-    /* return all of the Transitions from the XML based on the workflow_code of the project that the move_bundle is associated with.
-     * @author Lokanada Reddy
-     * @param moveBundleId 
+	/* return all of the Transitions from the XML based on the workflow_code of the project that the move_bundle is associated with.
+	 * @author Lokanada Reddy
+	 * @param moveBundleId 
 	 * @return Map[step,movebundleStep,snapshot] 
-     */
+	 */
 	def getAllDashboardSteps( def moveBundle ) {
     	
 		
@@ -73,24 +73,24 @@ class MoveBundleService {
 			npe.printStackTrace()
 		}
 		return [dashboardSteps : dashboardSteps , remainingSteps : moveBundleSteps?.transitionId ]
-    }
-    /*----------------------------------------------------
-     * will update the moveBundles with moveEvent
-     * @author : Lokanada Reddy
-     * @param  : moveEvent, moveBundles
-     *--------------------------------------------------*/
+	}
+	/*----------------------------------------------------
+	 * will update the moveBundles with moveEvent
+	 * @author : Lokanada Reddy
+	 * @param  : moveEvent, moveBundles
+	 *--------------------------------------------------*/
 	def assignMoveEvent( def moveEvent, def moveBundles ){
 		MoveBundle.executeUpdate( "UPDATE MoveBundle mb SET mb.moveEvent = null where mb.moveEvent = :me",[ me:moveEvent ] )
 		moveBundles.each{
 			moveEvent.addToMoveBundles( MoveBundle.get( it ) )
 		}
-    }
+	}
 	/*----------------------------------------------------
-     * will update the moveBundles with moveEvent
-     * @author : Lokanada Reddy
-     * @param  : moveEvent, moveBundles
-     *--------------------------------------------------*/
-    def createMoveBundleStep(def moveBundle, def transitionId, def params){
+	 * will update the moveBundles with moveEvent
+	 * @author : Lokanada Reddy
+	 * @param  : moveEvent, moveBundles
+	 *--------------------------------------------------*/
+	def createMoveBundleStep(def moveBundle, def transitionId, def params){
 		
 		def beGreen = params["beGreen_"+transitionId]
 		def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle , transitionId) 
@@ -121,7 +121,7 @@ class MoveBundleService {
 	/* -----------------------------------------------
 	 * delete moveBundleStep and associsted records
 	 * @author : Lokanada Reddy
-     * @param  : moveBundleStep
+	 * @param  : moveBundleStep
 	 *----------------------------------------------*/
 	 def deleteMoveBundleStep( def moveBundleStep ){
 		 def stepSnapshot = StepSnapshot.executeUpdate("DELETE from StepSnapshot ss where ss.moveBundleStep = ?",[moveBundleStep]);
@@ -273,7 +273,7 @@ class MoveBundleService {
 			
 			jdbcTemplate.update("DELETE FROM user_preference WHERE value = ${moveBundleInstance.id}")
 			
-        	jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id  = ${moveBundleInstance.id} or party_id_to_id = ${moveBundleInstance.id}")
+		jdbcTemplate.update("DELETE FROM party_relationship where party_id_from_id  = ${moveBundleInstance.id} or party_id_to_id = ${moveBundleInstance.id}")
 			
 			MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle = ${moveBundleInstance.id}")
 			
@@ -289,7 +289,7 @@ class MoveBundleService {
 	 * @param moveBundleId - move bundle id to filter for bundle
 	 * @return MapArray of properties 
 	 */
-	def dependencyConsoleMap(projectId, moveBundleId, isAssigned, dependencyBundle) {
+	def dependencyConsoleMap (def projectId, def moveBundleId, def isAssigned, def dependencyBundle, def graph = false) {
 		def startAll = new Date()
 		def projectInstance = Project.get(projectId)
 		def dependencyConsoleList = []
@@ -320,9 +320,9 @@ class MoveBundleService {
 			SUM(if(a.asset_class = '${AssetClass.DATABASE.toString()}', 1, 0)) AS dbCount,
 			SUM(if(a.asset_class = '${AssetClass.APPLICATION.toString()}', 1, 0)) AS appCount,
 			( select 
-		   		SUM(if(ad1.status in 
-		   			(${AssetDependencyStatus.getReviewCodesAsString()}) OR ad2.status in (${AssetDependencyStatus.getReviewCodesAsString()}), 1,0) 
-		   		)
+				SUM(if(ad1.status in 
+					(${AssetDependencyStatus.getReviewCodesAsString()}) OR ad2.status in (${AssetDependencyStatus.getReviewCodesAsString()}), 1,0) 
+				)
 				from asset_entity sa join asset_dependency_bundle sadb ON sa.asset_entity_id=sadb.asset_id 
 				left join asset_dependency ad1 ON ad1.asset_id=sa.asset_entity_id 
 				left join asset_dependency ad2 ON ad2.asset_id=sa.asset_entity_id
@@ -348,7 +348,7 @@ class MoveBundleService {
 			}
 			
 			depSql.append(" GROUP BY adb.dependency_bundle ORDER BY adb.dependency_bundle ")
-			
+		
 		def dependList = jdbcTemplate.queryForList(depSql.toString())
 
 		if( moveBundleId )
@@ -360,7 +360,7 @@ class MoveBundleService {
 			userPreferenceService.getSession().setAttribute( 'Dep_Groups', (groups as JSON).toString() )
 	
 		dependList.each { group ->
-	 		def depGroupsDone = group.statusAssigned + group.statusMoved
+			def depGroupsDone = group.statusAssigned + group.statusMoved
 			def statusClass = ''
 			if ( group.moveBundles?.contains(',') || group.needsReview > 0 ) {
 				// Assets in multiple bundles or dependency status unknown or questioned
@@ -399,21 +399,19 @@ class MoveBundleService {
 			}
 		}
 		
-		if(isAssigned=="1")
+		// if this is being used for the dependency graph, this is all we need
+		if (graph)
+			return stats
+		
+		if (isAssigned == "1")
 			dependencyConsoleList = dependencyConsoleList.findAll{it.statusClass != "depGroupDone"}
-
-		// Get list of distinct dependencyBundle ids
-		// def assetDependencyList = dependList.groupBy({it.dependencyBundle}).dependencyBundle
-		// def assetDependencyList = dependList.dependencyBundle
-
-		// log.info "dependencyConsoleMap() : assetDependencyList = $assetDependencyList"
-		log.info "dependencyConsoleMap() : stats = $stats"
+		
 
 		def entities = assetEntityService.entityInfo( projectInstance )
  
 		// Used by the Assignment Dialog
-		def planningMoveBundles = MoveBundle.findAllByProjectAndUseForPlanning(projectInstance,true,[sort:'name'])
 		def allMoveBundles = MoveBundle.findAllByProject(projectInstance,[sort:'name'])
+		def planningMoveBundles = allMoveBundles.findAll{return it.useForPlanning}
 		def planStatusOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def assetDependencyList = AssetDependencyBundle.executeQuery("SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=$projectInstance.id") 
 		
@@ -422,13 +420,13 @@ class MoveBundleService {
 		def companiesList = PartyGroup.findAll( "from PartyGroup as p where partyType = 'COMPANY' order by p.name " )
 
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
- 		
- 		log.info "dependencyConsoleMap() : stats=$stats}"
 		 
 		def depGrpCrt = projectInstance.depConsoleCriteria ? JSON.parse( projectInstance.depConsoleCriteria ) : [:]
 		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm a');
 		def generatedDate = depGrpCrt.modifiedDate ? formatter.format(TimeUtil.convertInToUserTZ(new Date(depGrpCrt.modifiedDate), tzId)):''
+		def staffRoles = taskService.getRolesForStaff()
+		def compactPref = userPreferenceService.getPreference('depConsoleCompact')
 		def map = [ 
 			company:projectInstance.client,
 			asset:'apps',
@@ -454,13 +452,13 @@ class MoveBundleService {
 
 			partyGroupList:companiesList,
 			// personList:personList, 
-            staffRoles:taskService.getRolesForStaff(),
+			staffRoles:staffRoles,
 			availabaleRoles:availabaleRoles,
 			moveBundleId : moveBundleId,
 			isAssigned:isAssigned,
 			moveBundleList:allMoveBundles,
 			depGrpCrt:depGrpCrt,
-			compactPref:userPreferenceService.getPreference('depConsoleCompact')
+			compactPref:compactPref
 		]
 		log.info "dependencyConsoleMap() : OVERALL took ${TimeUtil.elapsed(startAll)}"
 
@@ -468,32 +466,32 @@ class MoveBundleService {
 	}
 	
 	/* Calculates the default paramters for the dependency map based on the number of nodes
-	* @param nodeCount the number of nodes in the map
-	* @return a map of values for the dependency map to use as parameters
-	*/
-	def getMapDefaults( def nodeCount) {
-		
-		def defaultsSmall = [ 'force':-500, 'linkSize':90, 'friction':0.8, 'theta':0.3, 'width':800, 'height':400 ]
-		def defaultsMedium = [ 'force':-400, 'linkSize':80, 'friction':0.8, 'theta':0.5, 'width':1200, 'height':600 ]
-		def defaultsLarge = [ 'force':-400, 'linkSize':90, 'friction':0.8, 'theta':1, 'width':2000, 'height':1000 ]
-		
+	 * @param nodeCount the number of nodes in the map
+	 * @return a map of values for the dependency map to use as parameters
+	 */
+	def getMapDefaults (def nodeCount) {
+
+		def defaultsSmall = [ 'force':-500, 'linkSize':90, 'friction':0.8, 'theta':0.3, 'maxEdgeCount':4, 'maxCutAttempts':200 ]
+		def defaultsMedium = [ 'force':-400, 'linkSize':80, 'friction':0.8, 'theta':0.5, 'maxEdgeCount':4, 'maxCutAttempts':200 ]
+		def defaultsLarge = [ 'force':-400, 'linkSize':90, 'friction':0.8, 'theta':1, 'maxEdgeCount':4, 'maxCutAttempts':200 ]
+
 		return (nodeCount<30) ? (defaultsSmall) : ( (nodeCount<200) ? (defaultsMedium) : (defaultsLarge) )
-    }
+	}
 	
-    /**
-      * Create Manual MoveEventSnapshot, when project is task driven. So dashboard dial default to manual 50
-      * @param moveEvent
-      * @param dialIndicator
-      * @return
-      */
-     def createManualMoveEventSnapshot( def moveEvent, def dialIndicator=50 ){
-         if(moveEvent.project.runbookOn ==1){
-             def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent , dialIndicator:dialIndicator )
-             if ( ! moveEventSnapshot.save( flush : true ) ){
-                 log.error("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
-             }
-         }
-     }
+	/**
+	 * Create Manual MoveEventSnapshot, when project is task driven. So dashboard dial default to manual 50
+	 * @param moveEvent
+	 * @param dialIndicator
+	 * @return
+	 */
+	def createManualMoveEventSnapshot( def moveEvent, def dialIndicator=50 ){
+		if(moveEvent.project.runbookOn ==1){
+			def moveEventSnapshot = new MoveEventSnapshot(moveEvent : moveEvent , dialIndicator:dialIndicator )
+			if ( ! moveEventSnapshot.save( flush : true ) ){
+				log.error("Unable to save changes to MoveEventSnapshot: ${moveEventSnapshot}")
+			}
+		}
+	}
 	/**
 	 * Method help to write data in excel sheet's appropriate column and remove redundant code.
 	 * @param exportList : list of data which is being export

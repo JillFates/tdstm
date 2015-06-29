@@ -633,7 +633,13 @@ svg {
 }
 
 #mapReferenceId {
-	width: 240px;
+	/*max-width: 50px;*/
+	width: 300px;
+	border-collapse: collapse;
+	border-bottom: 0px;
+}
+.graphContainer.fullscreen #mapReferenceId {
+	border-bottom: 1px solid #008000;
 }
 #mapReferenceId tr td{
 	border-left: 1px solid green;

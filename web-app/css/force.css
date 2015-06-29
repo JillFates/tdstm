@@ -8,6 +8,17 @@
 	pointer-events: none !important;
 }
 
+svg {
+	border: 1px solid rgb(0, 128, 0);
+}
+
+
+.root {
+	display: none !important;
+}
+circle {
+	pointer-events: none !important;
+}
 circle.node {
 	stroke: #fff;
 	stroke-width: 1.5px;
@@ -56,12 +67,26 @@ line.link.cut {
 	stroke-opacity: 0.8 !important;
 	marker-end: url(#arrowheadCut);
 }
+line.link.Future {
+	stroke-opacity: 0.9;
+	stroke-dasharray: 8,3;
+}
+
+line.link.Validated {
+	stroke-opacity: 1;
+}
+line.link.Questioned {
+	stroke: red;
+}
+line.link.NotApplicable {
+	stroke-opacity: 0.2;
+}
 
 #arrowheadRedundant {
 	opacity: 0.5 !important;
 }
 #arrowheadCyclical {
-	opacity: 0.3 !important;
+	opacity: 0.3;
 }
 #arrowheadSelected {
 	opacity: 1 !important;
@@ -138,10 +163,11 @@ g.blackText.selected text {
 	r: 1 !important;
 }
 
+/* Custom right click context menu for graphs */
 .customMenu {
 	display: none;
 	z-index: 1000;
-	position: absolute;
+	position: fixed;
 	overflow: hidden;
 	border: 1px solid #CCC;
 	white-space: nowrap;
@@ -151,8 +177,6 @@ g.blackText.selected text {
 	border-radius: 1px;
 	padding: 0;
 }
-
-/* Each of the items in the list */
 .customMenu li {
 	padding: 4px 24px;
 	cursor: pointer;
@@ -182,20 +206,184 @@ g.blackText.selected text {
 
 #controlPanel {
 	float: left;
-	border: 1px solid #ccc;
-	margin-left: 3px;
-	margin-top: 3px;
+	border: 1px solid #008000;
+	border-top: 0px;
+	margin-left: 0px;
+	margin-top: 0px;
 	background-color: white;
 	position: absolute;
-	width: 175px;
+	min-width: 120px;
 }
-
 #legendDivId {
 	float: left;
-	border: 1px solid #ccc;
-	margin-left: 3px;
-	margin-top: 3px;
-	width: 150px;
+	border: 1px solid #008000;
+	border-top: 0px;
+	margin-left: 0px;
+	margin-top: 0px;
 	background-color: white;
 	position: absolute;
+}
+
+#panelLink td {
+	border-bottom: 0px;
+}
+#panelLink td.open {
+	border-bottom: 1px solid #008000;
+}
+
+#scriptDivId {
+	padding: 0px;
+}
+
+.controlPanelLabel {
+	padding: 0px;
+	text-align: right;
+	white-space: nowrap;
+}
+.controlPanelControl {
+	padding-left: 5px;
+}
+img.pointer {
+	padding-bottom: 3px;
+	vertical-align: middle;
+	height: 18;
+}
+
+.graphContainer {
+	background-color: none;
+	position: relative;
+	z-index: 95;
+}
+.graphContainer.fullscreen {
+	background-color: #ffffff;
+	width: 0px;
+	padding: 0px;
+	z-index: 95;
+}
+.fullscreen svg {
+	border-width: 0px;
+}
+.graphContainer #toolsContainerId {
+	top: 0px;
+	left: 0px;
+	display: block;
+	position: relative;
+	padding: 0px;
+	z-index: 96;
+}
+.graphContainer.fullscreen #toolsContainerId {
+	top: 0px;
+	left: 0px;
+	display: block;
+	position: fixed;
+	z-index: 96;
+}
+
+.graphContainer.fullscreen #toolsContainerId #panelLink {
+	display: block;
+	position: relative;
+	background-color: #ffffff;
+	opacity: 0.8;
+	top: 0px;
+	left: 0px;
+}
+
+.graphContainer.fullscreen #toolsContainerId #legendDivId,.graphContainer.fullscreen #toolsContainerId #controlPanel {
+	display: block;
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+
+.graphContainer.fullscreen #svgContainerId svg {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+}
+
+.graphContainer #toolsContainerId #controlPanel input[type=button] {
+	width: 85px;
+}
+.graphContainer #toolsContainerId #controlPanel input[type=button]:hover {
+	background-color: lightgrey;
+}
+.graphContainer #toolsContainerId #controlPanel input[type=button]:active {
+	background-color: darkgrey;
+}
+
+.graphContainer #toolsContainerId #controlPanel .labelToggleCol {
+	vertical-align: middle;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.graphContainer #toolsContainerId #controlPanel .labelToggleCol  * {
+	vertical-align: middle;
+}
+.graphContainer #toolsContainerId #controlPanel .labelToggleCol svg {
+	padding-left: 10px;
+	width: 30px;
+	height: 30px;
+	border-width: 0px;
+}
+.graphContainer #toolsContainerId #controlPanel .labelToggleRow td:not(.labelToggleCol) * {
+	float: right;
+}
+.graphContainer #toolsContainerId #mapReferenceId td:hover {
+	background-color: #eeeeee;
+}
+.graphContainer #toolsContainerId #mapReferenceId td:active {
+	background-color: #cccccc;
+}
+
+#panelLink * {
+	white-space: nowrap;
+}
+.plusMinusIcon:hover {
+	-webkit-filter: saturate(1.5);
+	filter: saturate(1.5);
+}
+.plusMinusIcon:active {
+	-webkit-filter: saturate(10);
+	filter: saturate(10);
+}
+
+.hidden {
+	display: none !important;
+}
+
+.bundleColorExample {
+	padding: 0px;
+}
+#mapReferenceId h4 {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#spinnerDivId {
+	width: 600px;
+	height: 300px;
+	background-image: url(../images/spinner.gif);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 32px 32px;
+	border: 1px solid green;
+	padding: 5px;
+	margin: 5px;
+}
+#spinnerDivId.graph {
+	padding: 0px;
+	margin: 0px;
+}
+
+.loading {
+	opacity: 0.5;
+	background-image: url(../images/spinner.gif);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 32px 32px;
 }

@@ -41,9 +41,8 @@ class UserPreferenceService  {
 	 * saved into the user's session
 	 */
 	def loadPreferences(String preferenceCode) {
-		def principal = SecurityUtils.subject.principal
-		if(principal){
-			def userLogin = UserLogin.findByUsername( principal )
+		def userLogin = securityService.getUserLogin()
+		if (userLogin) {
 			loadPreferences( userLogin, preferenceCode)
 		}
 	}
@@ -142,10 +141,24 @@ class UserPreferenceService  {
 		if ( currProj != null ) {
 			prefValue = currProj[preferenceCode]
 		}
-		// log.info "getPreference: preferenceCode=$preferenceCode, currProj=$currProj, prefValue=$prefValue"
 		return prefValue
 	}
-	
+
+	/* 
+	 * Reads the preference stored in the database for the user specified by the parameters
+	 * @param String preferenceCode
+	 * @param UserLogin userLogin
+	 * @return String the user's saved preference or null if not found
+	 */
+	def String getPreference (String preferenceCode, UserLogin userLogin) {
+		loadPreferences(preferenceCode, userLogin)
+		def currProj = getSession().getAttribute(preferenceCode)
+		def prefValue
+		if (currProj != null) {
+			prefValue = currProj[preferenceCode]
+		}
+		return prefValue
+	}
 	
 	/*
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
@@ -183,12 +196,11 @@ class UserPreferenceService  {
 	 * @return true if the set was successful
 	 */
 	Boolean setPreference( UserLogin userLogin, String preferenceCode, String value ) {
-		
 		def saved = false
 		if (log.isDebugEnabled())
 			log.debug "setPreference: setting user ($userLogin) preference $preferenceCode=$value"
 
-		if (value && value != "null" && userLogin){
+		if (value && value != "null" && userLogin) {
 			def prefValue = getPreference(preferenceCode)
 	
 			//	remove the movebundle and event preferences if user switched to different project

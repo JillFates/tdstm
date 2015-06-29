@@ -23,6 +23,7 @@
 		<g:javascript src="d3/d3.min.js" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="load.shapes.js"/>
+		<g:javascript src="graph.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 	</head>
 <body>
@@ -32,115 +33,101 @@
 		<div class="message">${flash.message}</div>
 	</g:if>
 	
-	<span id="panelLink" colspan="2" style="padding: 0px;">
-		<table id="mapReferenceId">
-			<tr>
-				<td onclick="openPanel('controlPanel')"><h4>Control Panel</h4></td>
-				<td onclick="openPanel('legendDivId')"><h4>Legend</h4></td>
-			</tr>
-		</table>
-	</span>
-	
-	<div id="controlPanel" style="display: ${/*(showControls=='controls')?('block'):('none')*/'block'};">
-		<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
-			<tr>
-				<td style="padding: 3px 3px;" colspan="2"><h3>Control Panel</h3></td>
-			</tr>
-			<form style="display:inline-block;" id="graphFormId">
-				<tr title="Sets the asset to use a the root node">
-					<td style="padding: 0px;width: 30px;">Asset</td>
-					<td style="padding-left :5px;">
-						<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:150px" data-asset-type="ALL" />
-					</td>
-				</tr>
-				<tr title="Sets the max number of links to follow">
-					<td style="padding: 0px;width: 30px;">Levels</td>
-					<td style="padding-left :5px">
-						<g:select name="level" id="levelsId" from="${1..10}" value="${level}"></g:select>
-					</td>
-				</tr>
-				<tr title="Reloads the graph">
-					<td style="padding: 0px;"></td>
-					<td style="padding: 0px;">
-						<input type="submit" name="Submit Button" id="graphSubmitButtonId" value="Regenerate Graph">
-					</td>
-				</tr>
-			</form>
-			<tr title="Hides dependencies that are implied by other shown dependencies">
-				<td style="padding: 0px;width: 30px;">Hide Redundant</td>
-				<td style="padding-left :5px">
-					<input type="checkbox" id="hideRedundantCheckBoxId" />
-				</td>
-			</tr>
-			<tr title="Hides dependencies that would cause cycles in the structure">
-				<td style="padding: 0px;width: 30px;">Hide Cyclical</td>
-				<td style="padding-left :5px">
-					<input type="checkbox" id="hideCyclicalCheckBoxId" />
-				</td>
-			</tr>
-			<tr title="Shows labels for each asset">
-				<td style="padding: 0px;width: 30px;">Show Labels</td>
-				<td style="padding-left :5px">
-					<input type="checkbox" id="labelCheckBoxId" checked="checked" />
-				</td>
-			</tr>
-			<tr title="Sets the maximum number of rows the labels can use when stacking">
-				<td style="padding: 0px;width: 30px;">Max Label Offset</td>
-				<td style="padding-left :5px">
-					<g:select name="labelOffset" id="labelOffsetId" from="${1..4}" value="2"></g:select>
-				</td>
-			</tr>
-			<tr title="Sets the distance between nodes horizontally">
-				<td style="padding: 0px;width: 30px;">Horizontal Spacing</td>
-				<td style="padding-left :5px">
-					<input type="text" name="horizontalSpace" id="horizontalSpaceId" value="30" size="4" maxlength="10" style="width:20px;" />
-				</td>
-			</tr>
-			<tr title="Sets the distance between nodes vertically">
-				<td style="padding: 0px;width: 30px;">Vertical Spacing</td>
-				<td style="padding-left :5px">
-					<input type="text" name="verticalSpace" id="verticalSpaceId" value="80" size="4" maxlength="10" style="width:20px;" />
-				</td>
-			</tr>
+	<div id="item1" class="graphContainer">
+		<div id="toolsContainerId">
+			<span id="panelLink" style="padding: 0px;">
+				<table id="mapReferenceId">
+					<tr>
+						<td onclick="openPanel('controlPanel')"><h4>Control Panel</h4></td>
+						<td onclick="openPanel('legendDivId')"><h4>Legend</h4></td>
+						<td id="fullscreenButtonId" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></td>
+					</tr>
+				</table>
+			</span>
+		
+			<div id="controlPanel" style="display: ${/*(showControls=='controls')?('block'):('none')*/'block'};">
+				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
+					<tr>
+						<td style="padding: 3px 3px;" colspan="2"><h3>Control Panel</h3></td>
+					</tr>
+					<form style="display:inline-block;" id="graphFormId">
+						<tr title="Sets the asset to use as the root node">
+							<td class="controlPanelLabel">Asset</td>
+							<td class="controlPanelControl">
+								<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:150px" data-asset-type="ALL" />
+							</td>
+						</tr>
+						<tr title="Sets the asset classes that will show up in the asset search box">
+							<td class="controlPanelLabel">Search for Classes</td>
+							<td class="controlPanelControl">
+								<g:select name="assetClasses" id="assetClassesId" from="${assetClassesForSelect.values()}" keys="${assetClassesForSelect.keySet()}" value="ALL"></g:select>
+							</td>
+						</tr>
+						<tr title="Sets the max number of links to follow up">
+							<td class="controlPanelLabel">Levels Up</td>
+							<td class="controlPanelControl">
+								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon" onclick="modifyParameter('sub', this)"/>
+								<g:select name="levelsUp" id="levelsUpId" from="${0..10}" value="${levelsUp}"></g:select>
+								<img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon" onclick="modifyParameter('add', this)"/>
+							</td>
+						</tr>
+						<tr title="Sets the max number of links to follow down">
+							<td class="controlPanelLabel">Levels Down</td>
+							<td class="controlPanelControl">
+								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon" onclick="modifyParameter('sub', this)"/>
+								<g:select name="levelsDown" id="levelsDownId" from="${0..10}" value="${levelsDown}"></g:select>
+								<img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon" onclick="modifyParameter('add', this)"/>
+							</td>
+						</tr>
+						<tr title="Reloads the graph">
+							<td class="controlPanelControl" colspan="2">
+								<input type="submit" name="Submit Button" id="graphSubmitButtonId" class="pointer" value="Regenerate Graph">
+							</td>
+						</tr>
+					</form>
+					<tr title="Hides dependencies that are implied by other shown dependencies" style="display:none;">
+						<td class="controlPanelLabel">Hide Redundant</td>
+						<td class="controlPanelControl">
+							<input type="checkbox" id="hideRedundantCheckBoxId" />
+						</td>
+					</tr>
+					<tr title="Highlights cyclical structures in the dependency tree">
+						<td class="controlPanelLabel">Highlight Cycles</td>
+						<td class="controlPanelControl">
+							<input type="checkbox" id="highlightCyclicalCheckBoxId" />
+						</td>
+					</tr>
+					<tr title="Shows labels for each asset">
+						<td class="controlPanelLabel">Show Labels</td>
+						<td class="controlPanelControl">
+							<input type="checkbox" id="labelCheckBoxId" checked="checked" />
+						</td>
+					</tr>
+					<tr title="Sets the maximum number of rows the labels can use when stacking">
+						<td class="controlPanelLabel">Max Label Offset</td>
+						<td class="controlPanelControl">
+							<g:select name="labelOffset" id="labelOffsetId" from="${1..4}" value="2"></g:select>
+						</td>
+					</tr>
+					
+					<tr title="Sets the distance between nodes">
+						<td class="controlPanelLabel">Spacing</td>
+						<td class="controlPanelControl">
+							&nbsp;
+							<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon"/>
+							&nbsp;
+							<img src="${resource(dir:'icons',file:'arrow_out.png')}" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon"/>
+						</td>
+					</tr>
+					
+				</table>
+			</div>
 			
-		</table>
+			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true]}" />
+		</div>
+		<div id="svgContainerId"></div>
+		<div id="spinnerDivId" style="display: none"></div>
 	</div>
-	<div id="legendDivId" style="display: ${(showControls=='legend')?('block'):('none')};">
-		<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;width: 140px;" >
-			<tr><td style="padding: 3px 3px;" colspan="2"><h3>Legend</h3></td></tr>
-				<tr><td colspan="2"><span style="color: blue;"><h4>Nodes:</h4></span></td></tr>
-				<tr>
-					<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconApp.png')}" height="14" /></td>
-					<td><span style="vertical-align: text-top;">Applications</span></td>
-				</tr>
-				<tr>
-					<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconServer.png')}" height="14" /></td>
-					<td><span style="vertical-align: text-top;">Servers</span></td>
-				</tr>
-				<tr>
-					<td nowrap="nowrap" ><img src="${resource(dir:'images',file:'iconDB.png')}" height="14" /></td>
-					<td><span style="vertical-align: text-top;">Databases</span></td>
-				</tr>
-				<tr>
-					<td nowrap="nowrap"><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
-					<td><span style="vertical-align: text-top;">Storage Devices</span></td>
-				</tr>
-				<tr>
-					<td nowrap="nowrap"><img src="${resource(dir:'images',file:'iconStorage.png')}" height="21" /></td>
-					<td><span style="vertical-align: text-top;">Logical Storage</span></td>
-				</tr>
-				<tr>
-					<td nowrap="nowrap"><img src="${resource(dir:'images',file:'iconNetwork.png')}" height="16" /></td>
-					<td><span style="vertical-align: text-top;">Network</span></td>
-				</tr>
-				<tr><td width="5px"><hr style="width: 30px;height: 1px;background-color:rgb(56,56,56);"></hr></td><td>Valid Links</td></tr>
-				<tr><td><hr style="width: 30px;height: 1px;background-color:red;"></hr></td><td>Questioned</td></tr>
-				<tr><td><hr style="width: 30px;height: 1px;background-color:rgb(224,224,224);"></hr></td><td>N/A</td></tr>
-		</table>
-	</div>
-	
-	<br />
-	<div id="item1"></div>
 	
 	<g:render template="../assetEntity/modelDialog"/>
 	<g:render template="../assetEntity/entityCrudDivs" />
@@ -174,7 +161,15 @@
 		$('#assetSelectId').on('change', function (event) {
 			generateGraph();
 		});
-		$('#levelsId').on('change', function (event) {
+		$('#assetClassesId').on('change', function (event) {
+			$('#assetSelectId')
+				.attr('data-asset-type', $(this).val())
+				.data('asset-type', $(this).val());
+		});
+		$('#levelsUpId').on('change', function (event) {
+			generateGraph();
+		});
+		$('#levelsDownId').on('change', function (event) {
 			generateGraph();
 		});
 		
@@ -191,6 +186,8 @@
 	// makes an ajax call to get the graph data, then loads it into the DOM
 	function generateGraph () {
 		
+		$('#graphSubmitButtonId').attr('disabled', 'disabled');
+		
 		// get the params to use for the request
 		var params = {};
 		if ($('#assetSelectId').val() != '') {
@@ -200,7 +197,8 @@
 		} else {
 			return;
 		}
-		params.level = $('#levelsId').val();
+		params.levelsUp = $('#levelsUpId').val();
+		params.levelsDown = $('#levelsDownId').val();
 		params.mode = 'assetId';
 		
 		// make the ajax request for the graph data
@@ -211,11 +209,19 @@
 			type:'GET',
 			complete: loadGraph
 		});
+		
+		var svgElement = d3.select('#graphSvgId');
+		if (svgElement.size() == 0) {
+			var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
+			$('#svgContainerId').html(spinnerDiv);
+		} else {
+			svgElement.attr('class', 'loading');
+		}
 	}
 	
 	// loads the graph code into the DOM
 	function loadGraph (response) {
-		$('#item1').html(response.responseText);
+		$('#svgContainerId').html(response.responseText);
 	}
 	
 	// handles switching between the control panel and the legend
@@ -226,12 +232,29 @@
 			$('#controlPanel').css('display','block')
 			$('#legendDivId').css('display','none')
 		} else if (source == 'legendDivId') {
-			$('#controlPanel').css('display','none')
-			$('#legendDivId').css('display','block')
+			if (GraphUtil.graphExists()) {
+				$('#controlPanel').css('display','none')
+				$('#legendDivId').css('display','block')
+			} else {
+				
+			}
 		} else if (source == 'hide') {
 			$('#controlPanel').css('display','none')
 			$('#legendDivId').css('display','none')
 		}
+	}
+	
+	function modifyParameter (action, element) {
+		var input = $(element).parent().children('input,select');
+		var ids = ['levelsUpId', 'levelsDownId'];
+		if (action == 'add') {
+			if (ids.indexOf(input.attr('id')) != -1)
+				$('#' + input.attr('id')).val(parseInt($('#' + input.attr('id')).val()) + 1);
+		} else if (action == 'sub') {
+			if (ids.indexOf(input.attr('id')) != -1)
+				$('#' + input.attr('id')).val(parseInt($('#' + input.attr('id')).val()) - 1);
+		}
+		input.trigger('change');
 	}
 </script>
 

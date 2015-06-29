@@ -3,89 +3,93 @@
 /* 	these styles must be included here due to a bug in firefox
 	where marker styles don't work when used in external stylesheets. */
 div.item1 {
-	width: auto;
 	float: left;
 }
 
 line.link {
-	marker-end: url(#arrowhead);
 	stroke: grey;
 	stroke-opacity: 1;
 }
 line.link.selected {
 	stroke: green !important;
+}
+
+line.arrow {
+	marker-end: url(#arrowhead);
+}
+line.arrow.selected {
 	marker-end: url(#arrowheadSelected);
 }
-line.link.redundant {
-	marker-end: url(#arrowheadRedundant);
-}
-line.link.cyclical {
+line.arrow.cyclical:not(.selected) {
 	marker-end: url(#arrowheadCyclical);
 }
-
-line.link.questioned {
-	stroke: red;
+line.arrow.ignoreLabel {
+	marker-end: url(#arrowheadIgnoreLabel);
 }
-line.link.unknown {
-	stroke-opacity: 0.75;
+line.arrow.selected.ignoreLabel {
+	marker-end: url(#arrowheadSelectedIgnoreLabel);
 }
-
-circle {
-	pointer-events: none !important;
+line.arrow.cyclical.ignoreLabel:not(.selected) {
+	marker-end: url(#arrowheadCyclicalIgnoreLabel);
 }
 
-.root {
-	display: none !important;
+
+#arrowheadCyclical {
+	opacity: 1.0 !important;
 }
 </style>
 <script type="text/javascript">
 var force = d3.layout.force();
-var defaults = {"force":20, "width":$(window).width() - ($('div.body').offset().left * 4),"height":$(window).height() - ($('div.body').offset().top * 3),"blackBackground":false};
-var canvas = d3.select("div#item1")
-	.append("div")
-	.attr('id','svgContainerId')
-	.style('width', defaults.width + 'px')
-	.style('height', defaults.height + 'px')
-	.append("svg:svg");
+var defaults = {"width":getStandardWidth(), "height":getStandardHeight(), "blackBackground":false};
+
+var canvas = d3.select("div#svgContainerId")
+	.append("svg:svg")
+	.attr('id', 'graphSvgId');
 	
 // define the arrowhead markers used for marking dependencies
 canvas.append("defs");
 defineShapes(d3.select("defs"));
 
-// defines the resizing behavior of the graph
-$('#svgContainerId')
-	.resizable({
-		minHeight: 400,
-		minWidth: 1000,
-		helper: "ui-resizable-helper",
-		stop: function(e, ui) {	
-			rebuildMap($(this).width(), $(this).height());
-		}
-	});
+var arrowOffset = 8;
+var normalMarker = $('#arrowhead').clone();
+normalMarker.attr('id', $('#arrowhead').attr('id') + 'IgnoreLabel');
+$('#arrowhead')[0].setAttribute('refX', arrowOffset);
+
+var selectedMarker = $('#arrowheadSelected').clone();
+selectedMarker.attr('id', $('#arrowheadSelected').attr('id') + 'IgnoreLabel');
+$('#arrowheadSelected')[0].setAttribute('refX', arrowOffset);
+
+var cyclicalMarker = $('#arrowheadCyclical').clone();
+cyclicalMarker.attr('id', $('#arrowheadCyclical').attr('id') + 'IgnoreLabel');
+$('#arrowheadCyclical')[0].setAttribute('refX', arrowOffset);
+
+$("defs")
+	.append(normalMarker)
+	.append(selectedMarker)
+	.append(cyclicalMarker);
+
+// bind browser resizing to resizing the svg
+$(window).resize( function(a, b) {
+	GraphUtil.resetGraphSize();
+});
 
 // handle the checkbox to toggle hiding of redundant dependencies
-var hideRedundant = $('#hideRedundantCheckBoxId').is(':checked');
-$('#hideRedundantCheckBoxId').on('change', function (a, b) {
-	hideRedundant = a.target.checked;
-	force.alpha(0.007);
-});
-// handle the checkbox to toggle hiding of redundant dependencies
-var hideCyclical = $('#hideCyclicalCheckBoxId').is(':checked');
-$('#hideCyclicalCheckBoxId').on('change', function (a, b) {
-	hideCyclical = a.target.checked;
-	force.alpha(0.007);
+var highlightCyclical = $('#highlightCyclicalCheckBoxId').is(':checked');
+$('#highlightCyclicalCheckBoxId').on('change', function (a, b) {
+	highlightCyclical = a.target.checked;
+	GraphUtil.tickOnce(force);
 });
 // handle the checkbox to toggle hiding of node labels
 $('#labelCheckBoxId').on('change', function (a, b) {
-	force.alpha(0.007);
+	GraphUtil.tickOnce(force);
 });
 
 var zoomBehavior;
-var offsetGroup = canvas
-var vis = canvas
-var background
-var overlay
-var graph
+var offsetGroup = canvas;
+var vis = canvas;
+var background;
+var overlay;
+var graph;
 
 var links = null;
 var assets = null;
@@ -104,14 +108,18 @@ $('.select2-chosen').html(assets[0].name);
 
 var root = null;
 var assetsById;
-var graphstyle = "top:-120;z-index:-1;";
 var r = 5;
-var horizontalSpace = $('#horizontalSpaceId').val() ? $('#horizontalSpaceId').val() : 30;
-var verticalSpace = $('#verticalSpaceId').val() ? $('#verticalSpaceId').val() : 80;
-var fill = d3.scale.category20();
-var maxWeight;
+var horizontalSpace = 30;
+var verticalSpace = 80;
+var horizontalSpaceMod = 15;
+var verticalSpaceMod = 40;
 var widestRow = 0;
 var nodeSelected = null;
+var maxHorizontalSpace = 500;
+var maxVerticalSpace = 800;
+var minHorizontalSpace = 15;
+var minVerticalSpace = 30;
+var nodeOffsetIncrements = 2;
 
 // color constants
 // TODO: add an option for a black background
@@ -139,14 +147,18 @@ var floatMode = false;
 
 // execute layout initialization functions
 constructPointers();
+findCyclicalDependencies(assets[0]);
 var rootNode = createRootNode();
-findCyclicalDependencies(rootNode);
 findRedundantDependencies(rootNode);
 setNodeDirections();
 setY(assets[0], 0, 'down', 0, []);
 assets[0].qy = null;
 setY(assets[0], 0, 'up', 0, []);
 offsetRows();
+
+// call the function to create the graph
+var initialDimensions = GraphUtil.getProperGraphDimensions();
+buildMap (initialDimensions.width, initialDimensions.height);
 
 // changes the references to array indices to object pointers
 function constructPointers () {
@@ -165,6 +177,8 @@ function constructPointers () {
 			asset.children[j] = links[link];
 		});
 		
+		asset.allChildren = asset.children.clone();
+		asset.allParents = asset.parents.clone();
 		asset.height = 0;
 		asset.childGroups = [];
 		asset.siblingGroups = [];
@@ -183,6 +197,7 @@ function constructPointers () {
 		link.child = assets[link.child];
 		link.parent = assets[link.parent];
 		link.root = false;
+		link.partOfCycle = false;
 	});
 }
 
@@ -208,8 +223,10 @@ function setNodeDirections () {
 		
 		// break infinite loops
 		callCount++;
-		if (callCount > 100000)
+		if (callCount > 100000) {
+			console.log('setNodeDirections() in infinite loop');
 			return;
+		}
 		
 		if (node.distance == null || node.distance > indent)
 			node.distance = indent;
@@ -291,31 +308,55 @@ function createRootNode () {
 
 // find and mark any cyclical dependencies using a depth first search
 function findCyclicalDependencies (root) {
-	
 	var foundCycles = false;
 	var stack = [];
 	removeCycles();
-	searchPath(root, stack);
+	searchPath(root, stack, 'down');
+	searchPath(root, stack, 'up');
 	removeCycles();
+	links.sort(function (a, b) {
+		if (a.partOfCycle && !b.partOfCycle)
+			return 1;
+		else if (!a.partOfCycle && b.partOfCycle)
+			return -1;
+		else
+			return 0;
+	});
 	
 	// recursively traverse links, marking any that are cyclical
-	function searchPath (node, path) {
+	function searchPath (node, path, direction) {
 		
 		// check if we looped back to a previous node
 		if (path.indexOf(node) != -1) {
 			var tempPath = []
 			for (var i = 0; i < path.size(); i++)
-				tempPath.push(path[i].name);
-			tempPath.push(node.name);
+				tempPath.push(path[i]);
+			tempPath.push(node);
+			
+			var cycle = [];
+			for (var i = path.indexOf(node); i < tempPath.size() - 1; i++) {
+				//cycle.push(tempPath[i]);
+				var link = getLinkFromNodePair(tempPath[i], tempPath[i+1]);
+				link.partOfCycle = true;
+				cycle.push(link);
+			}
+			
 			return true;
 		}
 		
 		path.push(node);
 		
 		// call this for each of this node's children, and mark any links that are cyclical
-		for (var i = 0; i < node.children.size(); ++i)
-			if (node.children[i].cyclical != true)
-				node.children[i].cyclical = searchPath(node.children[i].child, path);
+		if (direction == 'down') {
+			for (var i = 0; i < node.children.size(); ++i)
+				if (node.children[i].cyclical != true)
+					node.children[i].cyclical = searchPath(node.children[i].child, path, direction);
+		
+		} else {
+			for (var i = 0; i < node.parents.size(); ++i)
+				if (node.parents[i].cyclical != true)
+					node.parents[i].cyclical = searchPath(node.parents[i].parent, path, direction);
+		}
 		
 		path.pop();
 		return false;
@@ -494,6 +535,15 @@ function rereferenceLink (link) {
 		t.push(link);
 }
 
+function getLinkFromNodePair (parent, child) {
+	var childList = parent.children;
+	for (var i = 0; i < childList.size(); i++) {
+		if (childList[i].child == child)
+			return childList[i];
+	}
+	return null;
+}
+
 // offsets the rows so that there are none with negative indices
 function offsetRows () {
 	var offset = 0;
@@ -510,15 +560,16 @@ function offsetRows () {
 
 // Build the layout model
 function buildMap (width, height) {
-	$('#item1').css('width', 'auto');
-	$('#item1').css('height', '');
-
+	
 	// Use the new parameters, or the defaults if not specified
 	var width 	 = 	( width 	? width 	: defaults['width'] 	);
 	var height 	 = 	( height 	? height 	: defaults['height'] 	);
 	
 	widthCurrent = width;
 	heightCurrent = height;
+	
+	outsideWidth = $(window).width() - width;
+	outsideHeight = $(window).height() - height;
 	
 	var node;
 	var link;
@@ -534,10 +585,7 @@ function buildMap (width, height) {
 	
 	// sets the x value for each node
 	setXValues();
-	
-	// creates all the svg elements and even listeners and binds them to the data
-	offsetX = (width / 2) - assets[0].qx;
-	offsetY = (height / 2) - assets[0].qy;
+	offsetY = 0 - (verticalSpace / 2);
 	constructSvg();
 	offsetX = 0;
 	offsetY = 0;
@@ -546,11 +594,13 @@ function buildMap (width, height) {
 	$('#labelOffsetId').unbind();
 	$('#labelOffsetId').change(function () {
 		setLabelOffsets(nodeMap);
-		force.alpha(0.007);
+		GraphUtil.tickOnce(force);
 	});
 	offsetX = (width / 2) - assets[0].qx;
-	offsetY = (height / 2) - assets[0].qy;
+	offsetY = 0 - (verticalSpace / 2);
 	background.remove();
+	force.alpha(1);
+	$('#graphSubmitButtonId').removeAttr('disabled');
 	
 	// constructs the svg DOM and defines the event listeners for them
 	function constructSvg () {
@@ -581,7 +631,6 @@ function buildMap (width, height) {
 			.on("drag", dragmove)
 			.on("dragend", dragend);
 		
-		var startAlpha = 0
 		var dragging = false;
 		var clicked = false;
 		
@@ -591,7 +640,6 @@ function buildMap (width, height) {
 				return;
 			}
 			closeMenu();
-			startAlpha = force.alpha();
 			dragging = true;
 			clicked = true;
 			d3.event.sourceEvent.stopPropagation();
@@ -616,7 +664,6 @@ function buildMap (width, height) {
 				if (nodeHere != node)
 					swapNodes(node, nodeHere);
 				
-				startAlpha = Math.min(startAlpha+0.005, 0.1);
 				node.x += d3.event.dx;
 				node.y = node.qy;
 				node.px = node.x;
@@ -627,9 +674,9 @@ function buildMap (width, height) {
 				node.fix = true;
 				node.fixed = true;
 			}
-			force.alpha(startAlpha);
 			d3.event.sourceEvent.stopPropagation();
 			setLabelOffsets(nodeMap);
+			force.alpha(Math.max(force.alpha(), 0.2));
 		}
 		
 		function dragend (d, i) {
@@ -643,6 +690,7 @@ function buildMap (width, height) {
 			if (clicked)
 				toggleNodeSelection(d);
 			d3.event.sourceEvent.stopPropagation();
+			force.alpha(1);
 		}
 		
 		// Rescales the contents of the svg. Called when the user scrolls.
@@ -657,7 +705,10 @@ function buildMap (width, height) {
 			if (d3.event && d3.event.srcElement.nodeName != 'use') {
 				zoom.scale(1);
 				zoom.translate([0,0]);
-				vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')');
+				if (d3.event.translate && d3.event.scale)
+					vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')');
+				else
+					vis.attr('transform','translate(' + [0, 0] + ')' + ' scale(' + 1 + ')');
 			} else if (!d3.event) {
 				zoom.scale(1);
 				zoom.translate([0,0]);
@@ -675,12 +726,10 @@ function buildMap (width, height) {
 		canvas
 			.attr("width", width)
 			.attr("height", height)
-			.attr("style", graphstyle)
 			.style('background-color', backgroundColor)
 			.style('cursor', 'default !important')
 			.on("dblclick", resetView)
 			.on("dblclick.zoom", null);
-		
 		
 		// Create the force layout
 		force
@@ -697,23 +746,31 @@ function buildMap (width, height) {
 		link = vis.selectAll("line.link")
 			.data(links).enter()
 			.append("svg:line")
-				.style("stroke", function(d) {return d.statusColor;})
-				.style("stroke-opacity", function (d) { return d.opacity;})
 				.attr("width", function(d) { return '1px' })
 				.attr("class", function(d) {
 					return 'link ' + d.status
-						+ (d.redundant?' redundant':'')
 						+ (d.root?' root':'')
-						+ (d.cyclical?' cyclical':'');
 				})
 				.attr("id", function(d) { return 'link-'+d.parent.id+'-'+d.child.id })
 				.attr("x1", function(d) { return d.child.x;})
 				.attr("y1", function(d) { return d.child.y;})
 				.attr("x2", function(d) { return d.parent.x;})
-				.attr("y2", function(d) { return d.parent.y;});
+				.attr("y2", function(d) { return d.parent.y;})
+				.style('marker-end', 'none');
 		
-		// move redundant dependencies to the bottom of the DOM
-		link.sort(function (a, b) { return !a.redundant; });
+		link.each(function (d, i) {
+			vis.append("svg:line")
+				.attr("id", 'sublink-'+d.parent.id+'-'+d.child.id)
+				.attr("class", 'arrow '
+					+ (d.root?' root':'')
+					+ ((d.partOfCycle && highlightCyclical) ? ' cyclical' : '')
+				)
+				.style('stroke-width',  '0px')
+				.attr("x1", d.child.x)
+				.attr("y1", d.child.y)
+				.attr("x2", d.parent.x)
+				.attr("y2", d.parent.y);
+		});
 		
 		// Add the nodes to the SVG
 		node = vis.selectAll("use")
@@ -750,17 +807,17 @@ function buildMap (width, height) {
 				.style("stroke-width", '1px');
 		
 		
-		node.append("title").text(function(d){ return d.id + ': ' + d.title })
+		node.append("title").text(function(d){ return d.id + ': ' + d.title });
 		
 		// Create the node labels
 		graph = vis.selectAll("g.node")
 			.data(assets).enter()
-			.append("svg:g")
+			.append("svg:g");
 		
 		if (backgroundColor == '#ffffff')
-			graph.attr("class", "node nodeLabel blackText")
+			graph.attr("class", "node nodeLabel blackText");
 		else
-			graph.attr("class", "node nodeLabel")
+			graph.attr("class", "node nodeLabel");
 		
 		graph.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 			.attr("id", function (d) {
@@ -773,10 +830,23 @@ function buildMap (width, height) {
 			.text(function(d) {
 				return d.name;
 			});
-			
+		
+		
+		// set the horizontal and vertical spacing so that the whole map fits on the page
+		var nx = nodeMap[1].size();
+		var ny = Object.keys(nodeMap).size();
+		horizontalSpace = Math.min(Math.max(Math.round(width / nx), minHorizontalSpace), maxHorizontalSpace);
+		verticalSpace = Math.min(Math.max(Math.round(height / ny), minVerticalSpace), maxVerticalSpace);
+		
+		updateXYValues();
+		offsetX = (width / 2) - assets[0].qx - horizontalSpace;
+		updateXYValues();
+		force.start();
 		
 		// Trigger action when the contexmenu is about to be shown
 		$(document).bind("contextmenu", function (event) {
+			if (event.shiftKey)
+				return;
 			var validTags = ['use', 'svg', 'g'];
 			var target = event.target;
 			var tag = target.tagName;
@@ -858,28 +928,18 @@ function buildMap (width, height) {
 			$(".customMenu")
 				.css('display', "none")
 				.children(".tempItem").remove();
-		}		
+		}
 		
-		// automatically update the graph when the horizontal spacing control is changed
-		$('#horizontalSpaceId').on('change', function (a, b) {
-			if (isNaN(a.target.value)) {
-				alert('invalid horizontal spacing value');
-				return;
-			}
-			horizontalSpace = a.target.value;
-			updateXYValues();
-			force.alpha(0.1);
+		// bind the increase spacing button
+		$('#spacingIncreaseId').unbind('click');
+		$('#spacingIncreaseId').on('click', function () {
+			updateSpacing('add');
 		});
 		
-		// automatically update the graph when the vertical spacing control is changed
-		$('#verticalSpaceId').on('change', function (a, b) {
-			if (isNaN(a.target.value)) {
-				alert('invalid vertical spacing value');
-				return;
-			}
-			verticalSpace = a.target.value;
-			updateXYValues();
-			force.alpha(0.1);
+		// bind the decrease spacing button
+		$('#spacingDecreaseId').unbind('click');
+		$('#spacingDecreaseId').on('click', function () {
+			updateSpacing('sub');
 		});
 	}
 	
@@ -920,9 +980,9 @@ function buildMap (width, height) {
 		
 		// Style the dependencies of the selected node
 		var useTarget = true;
-		$.each(node.parents, styleDependencies);
+		$.each(node.allParents, styleDependencies);
 		useTarget = false;
-		$.each(node.children, styleDependencies);
+		$.each(node.allChildren, styleDependencies);
 		
 		function styleDependencies (index, linkIndex) {
 			var link = linkIndex;
@@ -935,6 +995,7 @@ function buildMap (width, height) {
 			d3.selectAll('svg g g use').filter('#node-'+childNode.id)[0][0].classList.add('selected');
 			$('svg g g g text').filter('#label-'+childNode.id).parent()[0].classList.add('selected');
 			d3.selectAll('svg g g line').filter('#link-'+link.parent.id+'-'+link.child.id)[0][0].classList.add('selected');
+			d3.selectAll('svg g g line').filter('#sublink-'+link.parent.id+'-'+link.child.id)[0][0].classList.add('selected');
 		}
 		
 		// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
@@ -958,7 +1019,7 @@ function buildMap (width, height) {
 				o.classList.remove('selected');
 			})
 		}
-			force.alpha(Math.max(force.alpha(), 0.007));
+		GraphUtil.tickOnce();
 	}
 	
 	// gets a map representing the position of each node in the graph
@@ -1033,16 +1094,17 @@ function buildMap (width, height) {
 			if (assets[0].topHeavy)
 				difference = Math.ceil(widestRow / 2 - totalHeight / 2);
 			if (difference > 0)
-				for (var i = 0; i < assets.length; ++i) {
-					if ( (assets[0].topHeavy && assets[i].row >= rootRow) || (!assets[0].topHeavy && assets[i].row <= rootRow) ) {
-						var other = assets[i].col + Math.ceil(difference);
-						var otherNode = getNodeByXY(other * horizontalSpace, assets[i].row);
-						
-						var tmp = nodeMap[assets[i].row][assets[i].col];
-						nodeMap[assets[i].row][assets[i].col] = nodeMap[assets[i].row][otherNode.col];
-						nodeMap[assets[i].row][otherNode.col] = tmp;
-						otherNode.col -= difference;
-						assets[i].col += difference;
+				for (var i = 0; i < Object.keys(nodeMap).size(); ++i) {
+					var row = parseInt(Object.keys(nodeMap)[i]);
+					if ( (assets[0].topHeavy && row >= rootRow) || (!assets[0].topHeavy && row <= rootRow) ) {
+						for (var col = nodeMap[row].size() - 1; col >= Math.ceil(difference); --col) {
+							var tmp = nodeMap[row][col];
+							var otherNode = nodeMap[row][col - Math.ceil(difference)];
+							nodeMap[row][col] = nodeMap[row][otherNode.col];
+							nodeMap[row][otherNode.col] = tmp;
+							otherNode.col += difference;
+							tmp.col -= difference;
+						}
 					}
 				}
 		}
@@ -1132,7 +1194,26 @@ function buildMap (width, height) {
 	}
 	
 	
-	
+	// increases or decreases the space between the nodes
+	function updateSpacing (action) {
+		var newVerticalSpace = verticalSpace + verticalSpaceMod;
+		var newHorizontalSpace = horizontalSpace + horizontalSpaceMod;
+		if (action == 'sub') {
+			newVerticalSpace -= verticalSpaceMod * 2;
+			newHorizontalSpace -= horizontalSpaceMod * 2;
+		}
+		newVerticalSpace = Math.max(Math.min(newVerticalSpace, maxVerticalSpace), minVerticalSpace);
+		newHorizontalSpace = Math.max(Math.min(newHorizontalSpace, maxHorizontalSpace), minHorizontalSpace);
+		verticalSpace = newVerticalSpace;
+		horizontalSpace = newHorizontalSpace;
+		updateXYValues();
+		setLabelOffsets(nodeMap);
+		if (assets.size() < 100) {
+			force.alpha(0.1);
+		} else {
+			GraphUtil.tickOnce(force);
+		}
+	}
 	
 	// calculate stacking values for @param root
 	function calculateStacks (root) {
@@ -1167,6 +1248,7 @@ function buildMap (width, height) {
 			if (assets[i].direction == direction)
 				assets[i].col -= minIndex;
 		}
+		
 		return maxIndex - minIndex;
 		
 		// recursive function calculating the stack starting at a given node
@@ -1236,7 +1318,7 @@ function buildMap (width, height) {
 						inserted = false;
 					}
 					++high;
-					--low;
+					//--low;
 				}
 				maxIndex = Math.max(maxIndex, node.col + offsetHigh);
 				minIndex = Math.min(minIndex, node.col - offsetLow);
@@ -1365,6 +1447,7 @@ function buildMap (width, height) {
 		
 		// outputs the stack to the console for debugging
 		function outputStack (stack, useStack) {
+			console.log('OUTPUTTING STACK:');
 			var grid = [];
 			for (var i = 0; i < stack.length; ++i) {
 				if (stack[i] != null) {
@@ -1378,6 +1461,7 @@ function buildMap (width, height) {
 										grid[j][i-minIndex] = '@';
 									else
 										grid[j][i-minIndex] = '#';
+									grid[j][i-minIndex] = stack[i][j].name + ' ';
 								} else {
 									grid[j][i-minIndex] = ',';
 								}
@@ -1393,14 +1477,13 @@ function buildMap (width, height) {
 			for (var i = 0; i < grid.length; ++i) {
 				var str = '';
 				if (grid[i])
-//					for (var j = 0; j < grid[i].length; ++j) {
-					for (var j = 0; j < 300; ++j) {
+					for (var j = 0; j < maxWidth + 1; ++j) {
 						if (grid[i][j])
 							str += grid[i][j];
 						else
 							str += '.';
 					}
-				console.log(str);
+				console.log(str + ' ' + i);
 			}
 		}
 	}
@@ -1417,7 +1500,7 @@ function buildMap (width, height) {
 				for (var j = widestRow - 1; j > -1; --j) {
 					var node = nodeMap[keys[i]][j];
 					if (node != null) {
-						node.qx = node.col * horizontalSpace;
+						node.qx = node.col * horizontalSpace + (0.25 * horizontalSpace / nodeOffsetIncrements) * (i % nodeOffsetIncrements);
 						node.qy = node.row * verticalSpace;
 					}
 				}
@@ -1434,52 +1517,30 @@ function buildMap (width, height) {
 		});
 	}
 	
-/*	
-	// TODO: Add an option to show/hide these dots
-	// add dots to show the locations that nodes will snap to
-	var keys = Object.keys(nodeMap);
-	for (var i = 0; i < keys.size(); ++i) {
-		var nodeList = nodeMap[keys[i]];
-		for (var j = 0; j < nodeList.size(); ++j) {
-			vis.append('circle')
-				.attr('cx', j * horizontalSpace)
-				.attr('cy', nodeList[j].qy)
-				.attr('r', 1)
-				.attr('stroke', 'grey')
-				.attr('fill', 'grey')
-				.attr('opacity', '0.6')
-		}
-	}
-*/	
-	
-	// Tick function called "tick" of the d3 simulation
+	// Tick function called at every "tick" of the d3 simulation
 	function tick(e) {
 		
 		// move the nodes towards their intended positions
-		var k =  e.alpha
+		var k = e.alpha
+		var movementCutoff = 0.2;
+		var movement = false;
 		assets.forEach(function(o, i) {
 			if (!o.fix) {
+				if (Math.abs(o.qx - o.x) > movementCutoff || Math.abs(o.qy - o.y) > movementCutoff)
+					movement = true;
 				o.x += (o.qx - o.x) * k;
 				o.y += (o.qy - o.y) * k;
 			}
-			if (isNaN(o.x)) {
+			if (isNaN(o.x))
 				o.x = 0;
-			}
-			if (isNaN(o.qx)) {
+			if (isNaN(o.qx))
 				o.x = 0;
-			}
-			if (isNaN(k)) {
+			if (isNaN(k))
 				o.x = 0;
-			}
-		})
+		});
 		
 		// set the positional attributes for the nodes
 		node
-			.attr("y", function(d) {
-				return 0;
-				d.y = d.qy;
-				return d.qy
-			})
 			.attr("py", function(d) {
 				d.py = d.qy;
 				return d.qy;
@@ -1492,14 +1553,13 @@ function buildMap (width, height) {
 				return d.qy;
 			})
 			.attr("transform", function(d) {			
-				if (isNaN(d.x)) {
+				if (isNaN(d.x))
 					d.x = 0;
-				}
 				return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";
 			})
 			.style("fill", function(d) {
 				return (d.fillColor) ? (d.fillColor) : (d3.select(this).attr('fillColor'));
-			})
+			});
 			
 		// set the positional attributes for the links
 		link
@@ -1508,25 +1568,21 @@ function buildMap (width, height) {
 			.attr("x2", function(d) {return d.child.x;})
 			.attr("y2", function(d) {return d.child.y;})
 			.style("stroke", function(d) {
-				if (d.cyclical)
+				if (d.partOfCycle && highlightCyclical)
 					return 'blue';
-				if (d.redundant)
-					return 'orange';
 				if (d.selected)
 					return 'green';
-				return d.statusColor;
-				if (d.cyclical)
-					return 'green';
-				return '#cccccc';
-				return (d.fillColor) ? (d.fillColor) : (d3.select(this).attr('fillColor'))
+				return '';
 			})
-			.style("stroke-width", function(d) {return d.width})
-			.style("display", function(d) {
-				if (hideRedundant && d.redundant)
-					return 'none';
-				if (hideCyclical && d.cyclical)
-					return 'none';
-				return 'inline';
+			.style("stroke-width", function(d) {
+				if (d.partOfCycle && highlightCyclical)
+					return 3;
+				return d.width
+			})
+			.style("stroke-opacity", function(d) {
+				if (d.partOfCycle && highlightCyclical)
+					return 1.0;
+				return '';
 			})
 			.attr("transform", function(d) {return "translate(" + offsetX + "," + offsetY + ")";});
 		
@@ -1540,6 +1596,13 @@ function buildMap (width, height) {
 				return 0;
 			})
 			.attr("transform", function(d) {return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";});
+		
+		// update the arrowhead offsets
+		setMarkerPositions();
+		
+		// if all the nodes have settled then stop ticking
+		if (!movement)
+			force.alpha(0);
 	}
 	
 	// Gets the node at svg position x in the specified row
@@ -1583,39 +1646,6 @@ function buildMap (width, height) {
 			var tmp = b.col;
 			b.col = a.col;
 			a.col = tmp;
-			
-			// if we move the selected node, move all its direct children and parents as well
-			if (a == nodeSelected) {
-				var nodesToSwap = getChildren(a).concat(getParents(a));
-				var direction = a.col - b.col;
-				nodesToSwap.sort(function (x, y) {
-					if (x.col > y.col) {
-						if (direction > 0)
-							return -1;
-						return 1;
-					} else if (x.col < y.col) {
-						if (direction > 0)
-							return 1;
-						return -1;
-					} else if (x.col == y.col) {
-						return 0;
-					}
-				});
-				for (var i = 0; i < nodesToSwap.length; ++i) {
-					var node = nodesToSwap[i];
-					if (direction > 0) {
-						if (node != a && nodeMap[node.row].length > node.col+1) {
-							var other = nodeMap[node.row][node.col+1];
-							swapNodes(node, other);
-						}
-					} else {
-						if (node != a && node.col-1 > -1) {
-							var other = nodeMap[node.row][node.col-1];
-							swapNodes(node, other);
-						}
-					}
-				}
-			}
 		}
 		
 		// update the x and y positions to reflect the change from the swap
@@ -1638,7 +1668,7 @@ function buildMap (width, height) {
 				
 				if (node != null && ! node.dummy) {
 					
-					// get the positional data of this node's label 
+					// get the positional data of this node's label
 					var text = _.unescape($('#label-' + node.id)[0].innerHTML);
 					var rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
 					for (var k = text.length - 1; k >= 0; --k) {
@@ -1678,6 +1708,115 @@ function buildMap (width, height) {
 				}
 				return 0;
 			});
+		
+		setMarkerPositions();
+	}
+	
+	// Sets the offsets of the arrowhead on the lines so that they don't overlap the labels
+	function setMarkerPositions () {
+		
+		link.each(function (o, i) {
+			var line = $(link[0][i]);
+			var subLine = $('#sub' + line.attr('id'));
+			var label = $('#label-' + o.childId);
+			
+			if (subLine.size() == 0)
+				return;
+			
+			var lineRect = line[0].getBoundingClientRect();
+			var xStart = Math.min(lineRect.left, lineRect.right);
+			var yStart = lineRect.top;
+			var xEnd = Math.max(lineRect.left, lineRect.right);
+			var yEnd = lineRect.bottom;
+			var lineHeight = Math.abs(yStart - yEnd);
+			var lineWidth = Math.abs(xStart - xEnd);
+			var lineRatio = lineHeight / lineWidth;
+			
+			
+			var labelRect = label[0].getBoundingClientRect();
+			
+			// find out which side of the label is intersected if at all
+			var xVal = labelRect.left;
+			var slope = lineRatio;
+			var yInt = yStart - slope * xStart;
+			if (o.parent.x > o.child.x) {
+				xVal = labelRect.right;
+				slope *= -1;
+				yInt = (yStart - slope * xEnd);
+			}
+			var yVal = slope * xVal + yInt;
+			
+			var arrowY = labelRect.top;
+			if (!isNaN(yVal)) {
+				if (labelRect.bottom > yVal && labelRect.top < yVal) {
+					arrowY = yVal;
+				} else if (labelRect.bottom < yVal) {
+					var child = $('#node-' + o.childId);
+					var childRect = child[0].getBoundingClientRect();
+					var radius = (childRect.right - childRect.left) / 2;
+					var theta = Math.atan(Math.abs(slope));
+					arrowY = yEnd - Math.sin(theta) * radius;
+				}
+			}
+			
+			var fullHeight = yEnd - arrowY;
+			var fullWidth = fullHeight / lineRatio;
+			var fullOffset = Math.sqrt(fullHeight * fullHeight + fullWidth * fullWidth);
+			
+			var heightRatio = 1 - (fullHeight / lineHeight);
+			var widthRatio = 1 - (fullWidth / lineWidth);
+			
+			var qHeight = Math.max(o.parent.y, o.child.y) - Math.min(o.parent.y, o.child.y);
+			var finalY2 = Math.min(o.parent.y, o.child.y) + qHeight * heightRatio;
+			if (isNaN(finalY2) || !isFinite(finalY2))
+				finalY2 = line.attr('y2');
+			
+			var qWidth = Math.max(o.parent.x, o.child.x) - Math.min(o.parent.x, o.child.x);
+			var finalX2 = 0;
+
+			if (o.parent.x > o.child.x)
+				finalX2 = Math.max(o.parent.x, o.child.x) - qWidth * widthRatio;
+			else if (o.parent.x < o.child.x)
+				finalX2 = Math.min(o.parent.x, o.child.x) + qWidth * widthRatio;
+			else
+				finalX2 = line.attr('x2');
+			
+			
+			if (isNaN(finalX2) || !isFinite(finalX2))
+				finalX2 = line.attr('x2');
+			
+			
+			// set the css properties
+			subLine
+				.attr('x1', line.attr('x1'))
+				.attr('y1', line.attr('y1'))
+				.attr('transform', line.attr('transform'));
+			
+			
+			// highlight the arrowhead if it is cyclical and the checkbox is checked
+			subLine[0].classList = [];
+			if (o.cyclical) {
+				subLine[0].classList.add('ignoreLabel');
+				if (highlightCyclical)
+					subLine[0].classList.add('cyclical');
+				else
+					subLine[0].classList.remove('cyclical');				
+				subLine
+					.attr('y2', line.attr('y2'))
+					.attr('x2', line.attr('x2'));
+			} else {
+				subLine[0].classList.remove('ignoreLabel');
+				subLine
+					.attr('y2', finalY2)
+					.attr('x2', finalX2);
+				if (o.partOfCycle && highlightCyclical)
+					subLine[0].classList.add('cyclical');
+				else
+					subLine[0].classList.remove('cyclical');
+			}
+			subLine[0].classList.add('arrow');
+		});
+		
 	}
 	
 	/*
@@ -1752,6 +1891,9 @@ function buildMap (width, height) {
 				var tmp = node.parents;
 				node.parents = node.children;
 				node.children = tmp;
+				tmp = node.allParents;
+				node.allParents = node.allChildren;
+				node.allChildren = tmp;
 			}
 			
 			for (var i = 0; i < links.size(); ++i) {
@@ -1760,6 +1902,9 @@ function buildMap (width, height) {
 					var tmp = link.parent;
 					link.parent = link.child;
 					link.child = tmp;
+					tmp = link.parentId;
+					link.parentId = link.childId;
+					link.childId = tmp;
 				}
 			}
 		}
@@ -1861,8 +2006,10 @@ function buildMap (width, height) {
 				
 				// add this group to the matrix
 				for (var j = 0; j < group2.size(); ++j)
-					for (var k = 0; k < group2.size(); ++k)
-						++(groupMatrices[parentTask.id - firstIndex][group2[j].id - firstIndex][group2[k].id - firstIndex]);
+					for (var k = 0; k < group2.size(); ++k) {
+						if(groupMatrices[parentTask.id - firstIndex][group2[j].id - firstIndex] && groupMatrices[parentTask.id - firstIndex][group2[j].id - firstIndex][group2[k].id - firstIndex])
+							++(groupMatrices[parentTask.id - firstIndex][group2[j].id - firstIndex][group2[k].id - firstIndex]);
+					}
 				
 				// give each node a reference to this group
 				for (var j = 0; j < group2.length; ++j) {
@@ -1979,6 +2126,7 @@ function buildMap (width, height) {
 				if (groupStatus.size() != 0) {
 					var calls = 0;
 					while (bufferList.length > 0) {
+					
 						if (optimizeChildOrderLogging)
 							display(newList, groups);
 						
@@ -1986,7 +2134,7 @@ function buildMap (width, height) {
 						++calls;
 						if (calls > 1000)
 							break;
-						
+					
 						// calculate the status
 						for (var j = 0; j < groups.length; ++j) {
 							
@@ -2208,6 +2356,10 @@ function buildMap (width, height) {
 						}
 					}
 					
+					if (optimizeChildOrderLogging) {
+						console.log('BEFORE READDING DUPLICATES FOR ' + assets[i].name)
+						display(newList, groups);
+					}
 					
 					// put back all the duplicates
 					if (optimizeChildOrderLogging)
@@ -2216,7 +2368,7 @@ function buildMap (width, height) {
 						if (optimizeChildOrderLogging) {
 							var str = "[";
 							for (var k = 0; k < newList.length; ++k) {
-								str += newList[k].name + ', ';
+								str += newList[k].id + ', ';
 							}
 							str += ']';
 							console.log(str);
@@ -2227,21 +2379,34 @@ function buildMap (width, height) {
 						// check if this node is already in the list
 						if (newList.indexOf(node) == -1) {
 							
-							// this node is already in the list so add it next to its duplicate
-							for (var k = 0; k < newList.length; ++k) {
+							// this node isn't already in the list so add it next to its duplicate
+							var k = 0;
+							if (j % 2 == 1)
+								k = newList.length-1;
+							while ((j % 2 == 0 && k < newList.length) || (j % 2 == 1 && k > -1)) {
 								
 								var matching = true;
 								
 								if (matching && newList[k].id != node.id) {
 									
-									if (Object.keys(node.groups).length == Object.keys(newList[k].groups).length) {	
-										if (optimizeChildOrderLogging)
-											console.log('matching ' + node.name + ' to ' + newList[k].name);
+									if (Object.keys(node.groups).length == Object.keys(newList[k].groups).length && getMatchingGroups(node.groups, newList[k].groups) == Object.keys(node.groups).length) {
+										if (optimizeChildOrderLogging) {
+											console.log('matching[' + k + '] ' + node.name + ' to ' + newList[k].name);
+											console.log(Object.keys(node.groups) + '');
+											console.log(Object.keys(newList[k].groups) + '');
+										}
+										
+										// insert the duplicate in one of the adjacent spots to the found node
 										newList.splice(k, 0, node);
 										inserted = true;
-										k = newList.length;
+										break;
 									}
 								}
+								
+								if (j % 2 == 1)
+									--k;
+								else
+									++k;
 							}
 							
 							if (!inserted) {
@@ -2389,56 +2554,7 @@ function buildMap (width, height) {
 			return matches;
 		}
 		
-		// scores the child order given in list using groups
-		function evaluateStack (list, groups) {
-			var score = 0;
-			var tempScore = 0;
-			var foundFirst = false;
-			
-			for (var k = 0; k < groups.length; ++k) {
-				tempScore = 0;
-				foundFirst = false;
-				for (var j = 0; j < list.length; ++j) {
-					if (list[j].groups[k]) {
-						foundFirst = true;
-						score += tempScore;
-						tempScore = 0;
-					} else {
-						if (foundFirst)
-							++tempScore;
-					}
-				}
-			}
-			
-			return score;
-		}
 		
-		// removes children with identical sibling groups from list
-		function removeDuplicates (list, groups) {
-			
-			var uniqueRows = [];
-			var returnList = [];
-			
-			for (var j = 0; j < list.length; ++j) {
-				tempScore = 0;
-				foundFirst = false;
-				var node = list[j];
-				var output = '';
-				for (var k = 0; k < groups.length; ++k) {
-					if (node.groups[k] != null)
-						output += 'a';
-					else
-						output += 'b';
-					
-				}
-				if (uniqueRows.indexOf(output) == -1) {
-					uniqueRows.push(output);
-					returnList.push(node);
-				}
-			}
-			
-			return returnList;
-		}
 		
 		// outputs a visual representation of node's children and their sibling groups
 		function outputChildMatrix (node) {
@@ -2556,7 +2672,7 @@ function buildMap (width, height) {
 			$.each(intersection(getChildren(node), set), function (i, successor) {
 				
 				// if the successor has multiple parents, share its height between its parents
-				// TODO: this method does not produce the best possible layouts, the was height is distributed should be changed
+				// TODO: this method does not produce the best possible layouts, the way height is distributed should be changed
 				if (intersection(getParents(successor), set).size() != 1) {
 					
 					var oldList = getParents(successor);
@@ -2650,6 +2766,58 @@ function getDepString (asset) {
 	return depString;
 }
 
+// scores the child order given in list using groups
+function evaluateStack (list, groups) {
+	var score = 0;
+	var tempScore = 0;
+	var foundFirst = false;
+	
+	for (var k = 0; k < groups.length; ++k) {
+		tempScore = 0;
+		foundFirst = false;
+		for (var j = 0; j < list.length; ++j) {
+			if (list[j].groups[k]) {
+				foundFirst = true;
+				score += tempScore;
+				tempScore = 0;
+			} else {
+				if (foundFirst)
+					tempScore += list[j].duplicateSize;
+//					++tempScore;
+			}
+		}
+	}
+	
+	return score;
+}
+
+// removes children with identical sibling groups from list
+function removeDuplicates (list, groups) {
+	
+	var uniqueRows = [];
+	var returnList = [];
+	
+	for (var j = 0; j < list.length; ++j) {
+		var node = list[j];
+		var output = '';
+		for (var k = 0; k < groups.length; ++k) {
+			if (node.groups[k] != null)
+				output += 'a';
+			else
+				output += 'b';
+			
+		}
+		if (uniqueRows.indexOf(output) == -1) {
+			node.duplicateSize = 1;
+			uniqueRows.push(output);
+			returnList.push(node);
+		} else {
+			returnList[uniqueRows.indexOf(output)].duplicateSize++;
+		}
+	}
+	
+	return returnList;
+}
 
 // Used to rebuild the layout using the new parameters
 function rebuildMap (width, height, labels) {
@@ -2663,47 +2831,39 @@ function rebuildMap (width, height, labels) {
 	widthCurrent = width
 	heightCurrent = height
 	
-	offsetX = (width / 2) - assets[0].qx;
-	offsetY = (height / 2) - assets[0].qy;
-	
-	backgroundColor = $('#blackBackgroundId').is(':checked') ? '#000000' : '#ffffff'
+	var nx = widestRow;
+	horizontalSpace = Math.min(Math.max(Math.round(width / nx), minHorizontalSpace), maxHorizontalSpace);
+	offsetX = (width / 2) - assets[0].qx - horizontalSpace / 2;
 	
 	// Create the SVG element
 	canvas
 		.attr("width", width)
 		.attr("height", height)
-		.style('background-color', backgroundColor)
-	
-	background.attr('fill', backgroundColor)
 	
 	// Create the force layout
 	force
 		.size([width, height])
 		.start();
 	
-	// Delete all labels currently drawn
-	vis
-		.selectAll("text")
-		.remove();
-	
 	// Reset the list of types to show names for
 	nameList = [];
+}
+
+function resizeGraph (width, height) {
+	widthCurrent = width;
+	heightCurrent = height;
 	
-	// Add the new labels
-	graph
-		.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
-		.attr("class", "ignoresMouse")
-		.attr("dx", 8)
-		.attr("dy",".35em")
-		.text(function(d) {
-			return (nameList[d.type+''])?(d.name):('');
-		});
-		
-		if (backgroundColor == '#ffffff') {
-			graph.attr("class", "node nodeLabel blackText")
-		} else {
-			graph.attr("class", "node nodeLabel")
-		}
+	canvas
+		.attr("width", width)
+		.attr("height", height);
+	
+	var nx = widestRow;
+	horizontalSpace = Math.min(Math.max(Math.round(width / nx), minHorizontalSpace), maxHorizontalSpace);
+	offsetX = (width / 2) - assets[0].qx - horizontalSpace / 2;
+	
+	force
+		.size([width, height])
+		.start();
 }
 
 // Used by the defaults button to reset all control values to their default state
@@ -2721,8 +2881,67 @@ function stopMap () {
 	force.stop()
 }
 
-// call the function to create the graph
-buildMap (defaults.width, defaults.height);
+function getStandardWidth () {
+	return $(window).width() - ($('div.body').offset().left * 2);
+}
+
+function getStandardHeight () {
+	return $(window).height() - ($('div.body').offset().top * 3);
+}
+
+function getDependenciesString (node) {
+	var sortedParents = getParents(node);
+	sortedParents.sort(function (a, b) {
+		if (a.id > b.id)
+			return 1;
+		if (a.id < b.id)
+			return -1;
+		return 0;
+	});
+	var sortedChildren = getChildren(node);
+	sortedChildren.sort(function (a, b) {
+		if (a.id > b.id)
+			return 1;
+		if (a.id < b.id)
+			return -1;
+		return 0;
+	});
+	var output = 'p:';
+	sortedParents.each(function (o) {
+		output += o.id + ' ';
+	});
+	output += 'c:';
+	sortedChildren.each(function (o) {
+		output += o.id + ' ';
+	});
+	return output;
+}
+
+// returens the node for the asset with the given id
+function getNodeById (id) {
+	return assets.find(function (a) {
+		return a.id == id;
+	});
+}
+
+// outputs a visual representation of a list of nodes and their sibling groups
+function display (list, groups) {
+	console.log('--------------------------------------------');
+	for (var j = 0; j < list.length; ++j) {
+		var output = list[j].id + ': ';
+		for (var k = 0; k < groups.length; ++k) {
+			if (groups[k].indexOf(list[j]) != -1)
+				output += '\t@';
+			else
+				output += '\t.';
+		}
+		output += '\t ' + list[j].name;
+		console.log('\t > ' + output);
+	}
+	console.log('--------------------------------------------');
+}
+
+
 </script>
 <ul class="customMenu"></ul>
 </div>

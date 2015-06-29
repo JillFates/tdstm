@@ -1,5 +1,6 @@
 package com.tds.asset
-import com.tdssrc.grails.TimeUtil;
+import com.tdssrc.grails.TimeUtil
+import com.tdsops.tm.enums.domain.AssetDependencyStatus
 
 class AssetDependency {
 
@@ -20,6 +21,10 @@ class AssetDependency {
 	String c2
 	String c3
 	String c4
+	
+	Boolean isFuture
+	Boolean isStatusResolved
+	
 	static constraints = {
 		asset( nullable:false, unique:['dependent', 'type'] )
 		dependent( nullable:true)
@@ -56,6 +61,8 @@ class AssetDependency {
 		columns {
 			comment sqltype: 'text'
 		}
+		isFuture formula: "status = '${AssetDependencyStatus.FUTURE}'"
+		isStatusResolved formula: "status != '${AssetDependencyStatus.QUESTIONED}'"
 	}
 	/*
 	 * Date to insert in GMT

@@ -28,31 +28,12 @@ var canvas = d3.select("div#item1")
 canvas.append("defs");
 defineShapes(d3.select("defs"));
 
-$('#svgContainerId')
-	.resizable({
-		minHeight: 400,
-		minWidth: 1000,
-		helper: "ui-resizable-helper",
-		stop: function(e, ui) {
-			$('#heightId').val($(this).height());
-			$('#widthId').val($(this).width());
-			rebuildMap(true, $("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $(this).width(), $(this).height());
-			$(this).width('');
-			$(this).height('');
-		}
-	});
-/*
-$('#showCutLinksId').on('change', function (e) {
-	if (e.target.checked)
-		$('line.cut').each(function (i, o) {
-			o.classList.remove('hidden');
-		});
-	else
-		$('line.cut').each(function (i, o) {
-			o.classList.add('hidden');
-		});
+var outsideWidth = 0;
+var outsideHeight = 0;
+$(window).resize( function(a, b) {
+	GraphUtil.resetGraphSize();
 });
-*/
+
 var maxCutAttempts = $('#maxCutAttemptsId').val();
 if (isNaN(maxCutAttempts))
 	maxCutAttempts = 200;
@@ -79,12 +60,14 @@ var selectedBundle = '${dependencyBundle}';
 var assetTypes = ${assetTypes};
 var links = ${links};
 var nodes = ${nodes};
+var moveBundles = ${moveBundleMap};
 
 var cutLinks = [];
 var cutNodes = [];
-var graphstyle = "top:-120;z-index:-1;";
+var graphstyle = "z-index:-1;";
 var fill = d3.scale.category10();
 var gravity = ${multiple ? 0.05 : 0};
+var distanceIntervals = 500;
 var floatMode = false;
 var maxWeight;
 var groupCount = 1;
@@ -111,9 +94,6 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	console.log('building map with a height of ' + height + ' pixels');
 	
-	$('#item1').css('width', 'auto');
-	$('#item1').css('height', 'auto');
-
 	// Use the new parameters, or the defaults if not specified
 	var charge 	 =	( charge	? charge 	: defaults['force'] 	);
 	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	);
@@ -124,6 +104,15 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	widthCurrent = width;
 	heightCurrent = height;
+	
+	if (width == -1) {
+		widthCurrent = getStandardWidth();
+		width = widthCurrent;
+	}
+	if (height == -1) {
+		heightCurrent = getStandardHeight();
+		height = heightCurrent;
+	}
 	
 	var zoom = d3.behavior.zoom()
 		.on("zoom", zooming);
@@ -197,7 +186,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	}
 	
 	// Rescales the contents of the svg. Called when the user scrolls.
-	function zooming () {
+	function zooming (e) {
 		if (!dragging) {
 			vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')');
 		}
@@ -251,7 +240,6 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.size([width, height])
 		.theta(theta)
 		.start();
-
 	
 	// Add the links the the SVG
 	var link = vis.selectAll("line.link")
@@ -268,18 +256,10 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("y1", function(d) { return d.source.y;})
 			.attr("x2", function(d) { return d.target.x;})
 			.attr("y2", function(d) { return d.target.y;});
-
 	
 	// Add the nodes to the SVG
 	var node = vis.selectAll("use")
 		.data(nodes).enter()
-	
-	// Calculate the maximum weight value, which is used during the tick function
-	var maxWeight = 1
-	_(nodes).forEach(function(o) {
-		maxWeight = Math.max( maxWeight, (o.weight?o.weight:0) );
-		o.fix = false;
-	})
 	
 	// Create the nodes
 	node = node
@@ -304,10 +284,10 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("id", function(d) { return 'node-'+d.index })
 			.style('cursor', 'default')
 			.attr("fillColor", function(d) {
-				return fill(d.group) 
+				return fill(d.group);
 			})
 			.style("fill", function(d) {
-				return fill(d.group)
+				return fill(d.group);
 			})
 			.style("stroke", function(d) {
 				return d.color;
@@ -344,6 +324,30 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		});
 	
 	
+	// Load the move bundles into the legend
+	GraphUtil.addMoveBundlesToLegend(moveBundles, fill);
+	
+	// Calculate the maximum weight value, which is used during the tick function
+	var maxWeight = 1
+	_(nodes).forEach(function(o) {
+		maxWeight = Math.max( maxWeight, (o.weight?o.weight:0) );
+		o.fix = false;
+	})
+	
+	// set up the node families
+	var nodeFamilies = GraphUtil.setNodeFamilies(nodes);
+	var maxFamilyWeights = [];
+	nodeFamilies.each(function (family, i) {
+		var maxWeight = 1;
+		family.each(function (node, i) {
+			maxWeight = Math.max(maxWeight, node.weight);
+		});
+		maxFamilyWeights[i] = maxWeight;
+	});
+	if (nodeFamilies.size() < 5)
+		gravity = 0;
+	force.gravity(gravity);
+	
 	// run some initial ticks before displaying the graph
 	force.on("tick", simpleTick);
 	if (nodes.size() < 500)
@@ -352,6 +356,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		calmTick(20);
 	force.on("tick", tick);
 	force.tick();
+	
+	// Move the background to the correct place in the DOM
+	background.remove();
 	
 	// Toggles selection of a node
 	function toggleNodeSelection (id) {
@@ -429,10 +436,10 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			$(nodes).each(function(i, o) {
 				k = e.alpha;
 				if (! o.fix) {
-					if( maxWeight > 1 && (o.weight?o.weight:0) == 1 )
+					if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
 						k = 0;
-					o.y += (heightCurrent/2 - o.y) * k * ((o.weight+1) / maxWeight);
-					o.x += (widthCurrent/2 - o.x) * k * ((o.weight+1) / maxWeight);
+					o.y += (heightCurrent / 2 - o.y) * k;
+					o.x += (widthCurrent / 2 - o.x) * k;
 				}
 			});
 		}
@@ -446,14 +453,13 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			$(nodes).each(function(i, o) {
 				k = e.alpha;
 				if (! o.fix) {
-					if ( maxWeight > 1 && (o.weight?o.weight:0) == 1 )
+					if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
 						k = 0;
-					o.y += (heightCurrent/2 - o.y) * k * ((o.weight+1) / maxWeight);
-					o.x += (widthCurrent/2 - o.x) * k * ((o.weight+1) / maxWeight);
+					o.y += (heightCurrent / 2 - o.y) * k;
+					o.x += (widthCurrent / 2 - o.x) * k;
 				}
 			});
 		}
-		
 		var d = null;
 		// set the dynamic attributes for the nodes
 		$(node[0]).each(function (i, o) {
@@ -476,12 +482,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			o.x2.baseVal.value = d.target.x;
 			o.y2.baseVal.value = d.target.y;
 			if (d.cut == 2) {
-				//if ( ! $('#showCutLinksId').is(':checked') )
-				//	o.classList.add('hidden');
 				d.cut = 3;
 				o.classList.add('cut');
 			} else if (d.cut != 3) {
-				// TM-3722 
 				o.style.stroke = d.statusColor;
 			}
 		});
@@ -492,38 +495,25 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			o.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
 		});
 	}
-	
-	// Move the background to the correct place in the DOM
-	vis.append(background.remove());
 }
 
 
 // Used to rebuild the layout using the new parameters
 function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height, labels) {
-
 	// Use the new parameters, or the defaults if not specified
 	var charge 	 =	( charge	? charge 	: defaults['force'] 	)
 	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	)
 	var friction =	( friction	? friction 	: defaults['friction'] 	)
 	var theta 	 =	( theta	? theta 	: defaults['theta'] 	)
 	
-	widthCurrent 	= ( widthCurrent  ? widthCurrent  : defaults['width']  )
-	heightCurrent 	= ( heightCurrent ? heightCurrent : defaults['height'] )
+	// handle resizing when not in fullscreen mode
+	if (!GraphUtil.isFullscreen() && (width && height)) {
+		resizeGraph(width, height);
+	}
 	
-	var width	= ( width	? width  :	( widthCurrent	? widthCurrent	: defaults['width']	) )
-	var height	= ( height 	? height :	( heightCurrent 	? heightCurrent	: defaults['height']	) )
-	
-	widthCurrent = width
-	heightCurrent = height
-	
+	// handle the background color
 	backgroundColor = $('#blackBackgroundId').is(':checked') ? '#000000' : '#ffffff'
-	
-	// Create the SVG element
-	canvas
-		.attr("width", width)
-		.attr("height", height)
-		.style('background-color', backgroundColor)
-	
+	canvas.style('background-color', backgroundColor)
 	background.attr('fill', backgroundColor)
 	
 	// Create the force layout
@@ -531,8 +521,7 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 		.linkDistance(linkSize)
 		.friction(friction)
 		.charge(charge)
-		.theta(theta)
-		.size([width, height]);
+		.theta(theta);
 	
 	// Delete all labels currently drawn
 	vis
@@ -566,6 +555,19 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 		force.start();
 	else
 		force.tick();
+}
+
+function resizeGraph (width, height) {
+	widthCurrent = width;
+	heightCurrent = height;
+	
+	canvas
+		.attr("width", width)
+		.attr("height", height);
+	
+	force
+		.size([width, height])
+		.start();
 }
 	
 // calls the tick function n times without letting the browser paint in between
@@ -662,7 +664,6 @@ function cutAndRemove () {
 	var callCount = 0;
 	$('#minCutButtonId').attr('disabled', 'disable');
 	stopMap();
-	var progressBar = displayProgressBar();
 	
 	// find a neighborhood of nodes to use with a breadth first search
 	while (appCount < 2 && callCount < 1000) {
@@ -698,11 +699,13 @@ function cutAndRemove () {
 	
 	// if it looped this many times, no suitable neighborhood could be found
 	if (callCount >= 1000) {
+		$('#minCutButtonId').removeAttr('disabled');
 		alert('could not find any unpartitioned applications');
 		return;
 	}
 	
 	
+	var progressBar = displayProgressBar();
 	var edges = [];
 	var bestDifference = 9999;
 	var intervals = Math.ceil(maxCutAttempts / 100);
@@ -823,22 +826,60 @@ function undoCuts () {
 // Used by the defaults button to reset all control values to their default state
 function resetToDefaults () {
 	$('#labelTree input[type="text"]').each(function() {
-		$(this).val( defaults[$(this).attr('name')] )
+		if (defaults[$(this).attr('name')])
+			$(this).val( defaults[$(this).attr('name')] )
 	});
-	widthCurrent = defaults['width']
-	heightCurrent = defaults['height']
 	rebuildMap(true);
 }
 
 // Stops the map by setting the alpha value to 0
 function stopMap () {
-	//$('#playPauseButtonId').val('Resume')
 	force.stop()
+}
+
+// gets the normal width of this graph
+function getStandardWidth () {
+	var graphOffset = $('#svgContainerId').offset().left;
+	var pageWidth = $(window).width();
+	return pageWidth - graphOffset * 2;
+}
+
+// gets the normal height of this graph
+function getStandardHeight () {
+	var bottomMargin = $('#svgContainerId').offset().left;
+	var graphOffset = $('#svgContainerId').offset().top;
+	var pageHeight = $(window).height();
+	return pageHeight - graphOffset - bottomMargin;
+}
+
+function getInitialDimensions () {
+	var fullWidth = $('.main_bottom').width() - ($('#svgContainerId').offset().left * 2);
+	var width = Math.max(fullWidth, $('#width').val());
+	var height = $('#height').val();
+	return {width:width, height:height};
 }
 
 // reloads the graph as if the user clicked on the map tab again
 function resetMap () {
 	getList('graph', selectedBundle);
+}
+
+// gets the list of children for the specified node
+function getChildren (node) {
+	var nodes = [];
+	if (node) 
+		for (var i = 0; i < node.dependsOn.length; ++i)
+			nodes.push(links[node.dependsOn[i]].target);
+	return nodes;
+}
+
+// gets the list of parents for the specified node
+function getParents (node) {
+	var nodes = [];
+	if (node) 
+		for (var i = 0; i < node.supports.length; ++i)
+			nodes.push(links[node.supports[i]].source);
+	return nodes;
 }
 
 // initializes the progress bar for min cuts
