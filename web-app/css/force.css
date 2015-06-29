@@ -258,7 +258,7 @@ img.pointer {
 	background-color: #ffffff;
 	width: 0px;
 	padding: 0px;
-	z-index: 95;
+	z-index: 105;
 }
 .fullscreen svg {
 	border-width: 0px;
@@ -276,7 +276,7 @@ img.pointer {
 	left: 0px;
 	display: block;
 	position: fixed;
-	z-index: 96;
+	z-index: 106;
 }
 
 .graphContainer.fullscreen #toolsContainerId #panelLink {
