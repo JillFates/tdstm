@@ -16,6 +16,9 @@
 			    now.setDate(now.getDate() + 90) ;
 			    formatDate(now,'completionDate');
 		    }
+
+		    $("#timeZoneSelectPopup").dialog({ autoOpen: false });
+
 		    //appending the previous values.
 				if('${prevParam?.client?.id}'){
 					$("#clientId").val('${prevParam?.client?.id}');
@@ -346,10 +349,11 @@
 							<td class="valueNW">
 								<input type="text" id="projectManagerId" name="projectManagerId">
 							</td>
-							<td class="name">
-								<br>
+							<td class="name">Time Zone:</td>
+							<td class="valueNW">
+								<input type="text" id="timezone" name="timezone" value="${defaultTimeZone}" readonly style="width: 200px; padding-right: 20px">
+								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');">
 							</td>
-							<td class="valueNW"><br></td>
 						</tr>
 						<tr class="prop">
 							<td class="name">
@@ -392,6 +396,10 @@
 			</div>
 		</g:form>
 	</div>
+
+	<%-- DIV for select time zone --%>
+	<div id="timeZoneSelectPopup" style="display: none;min-width:250px;" title="Time Zone Select"></div>
+
 	<g:javascript>
 		initialize();
 	</g:javascript>

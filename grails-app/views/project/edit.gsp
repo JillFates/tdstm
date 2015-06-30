@@ -194,8 +194,11 @@
 									</div>
 								</g:hasErrors>
 							</td>
-							<td><br></td>
-							<td><br></td>
+							<td class="name">Time Zone:</td>
+							<td class="valueNW">
+								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
+								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');">
+							</td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
@@ -222,9 +225,15 @@
 				</span>
 			</div>
 		</g:form>
+
+		<%-- DIV for select time zone --%>
+		<div id="timeZoneSelectPopup" style="display: none;min-width:250px;" title="Time Zone Select"></div>
+
 	</div>
 	<script type="text/javascript">
 	$(document).ready(function() {
+
+		$("#timeZoneSelectPopup").dialog({ autoOpen: false });
 		
 		if ('${prevParam?.projectPartner}') {
 			$("#projectPartnerId").val('${prevParam?.projectPartner}');

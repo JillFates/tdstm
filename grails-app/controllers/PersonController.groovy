@@ -1268,8 +1268,6 @@ class PersonController {
 	def editPreference() {
 
 		def timezones = Timezone.findAll()
-		//TODO: should this me added to the DB?
-		timezones << [code: "GTM", label: "GTM"]
 		def areas = userPreferenceService.timezonePickerAreas()
 		def loggedUser = securityService.getUserLogin()
 		def prefs = UserPreference.findAllByUserLogin( loggedUser ,[sort:"preferenceCode"])

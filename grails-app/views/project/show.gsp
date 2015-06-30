@@ -91,8 +91,8 @@
 								<span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
 								${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
 							</td>
-							<td><br></td>
-							<td><br></td>
+							<td class="name">Time Zone:</td>
+							<td class="valueNW">${projectInstance.timezone?projectInstance.timezone.code:''}</td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>

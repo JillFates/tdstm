@@ -151,6 +151,22 @@
 		}		
 	}
 
+	var showTimeZoneSelect = function(timezoneId) {
+		new Ajax.Request(tdsCommon.createAppURL('/project/showTimeZoneSelect?timezone=' + $("#" + timezoneId).val()), {asynchronous:true,evalScripts:true,
+			onSuccess:function(e){
+				$("#timeZoneSelectPopup").html(e.responseText)
+				$("#timeZoneSelectPopup").dialog('option', 'width', 'auto')
+				$("#timeZoneSelectPopup").dialog("open")
+			}
+		})
+	}
+
+	var setTimeZone = function(selectTimezoneId, timezoneId) {
+		$("#" + timezoneId).val($("#" + selectTimezoneId).val());
+		$("#timeZoneSelectPopup").html("")
+		$('#timeZoneSelectPopup').dialog('close')
+	}
+
 	return {
 		loadCompanyPartners: loadCompanyPartners,
 		addPartnerSelect: addPartnerSelect,
@@ -158,7 +174,9 @@
 		initCompanyPartnersSelects: initCompanyPartnersSelects,
 		createStaffSelect: createStaffSelect,
 		setActiveClientId: setActiveClientId,
-		validSelectedPartners: validSelectedPartners
+		validSelectedPartners: validSelectedPartners,
+		showTimeZoneSelect: showTimeZoneSelect,
+		setTimeZone: setTimeZone
 	}
 
  }();

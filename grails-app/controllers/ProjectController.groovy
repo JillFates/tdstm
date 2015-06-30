@@ -154,6 +154,21 @@ class ProjectController {
 		}				 
 	}
 
+	private def retrievetimeZone(timezoneValue) {
+		def result
+		if (StringUtil.isBlank(timezoneValue)) {
+			result = Timezone.findByCode(TimeUtil.defaultTimeZone)
+		} else {
+			def tz = Timezone.findByCode(timezoneValue)
+			if (tz) {
+				result = tz
+			} else {
+				result = Timezone.findByCode(TimeUtil.defaultTimeZone)
+			}
+		}
+		return result
+	}
+
 	/*
 	 * Update the Project details
 	 */
@@ -170,6 +185,7 @@ class ProjectController {
 			if (completionDate){
 				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
 			}
+			params.timezone = retrievetimeZone(params.timezone)
 
 			params.runbookOn =  params.runbookOn ? 1 : 0
 			projectInstance.properties = params
@@ -276,9 +292,14 @@ class ProjectController {
 		def projectInstance = new Project()
 		projectInstance.properties = params
 		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+		def defaultTimeZone = TimeUtil.defaultTimeZone
+		def userTimeZone = userPreferenceService.get(TimeUtil.TIMEZONE_ATTR)
+		if (userTimeZone) {
+			defaultTimeZone = userTimeZone
+		}
 
 		return [ projectInstance:projectInstance, clients:projectDetails.clients , partners:projectDetails.partners , 
-					workflowCodes: projectDetails.workflowCodes ]
+					workflowCodes: projectDetails.workflowCodes, defaultTimeZone: defaultTimeZone ]
 	}
 
 	/*
@@ -298,6 +319,7 @@ class ProjectController {
 			params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
 		}
 		params.runbookOn =  params.runbookOn ? 1 : 0
+		params.timezone = retrievetimeZone(params.timezone)
 		def projectInstance = new Project(params)
 
 		def file = request.getFile('partnerImage')
@@ -578,6 +600,22 @@ class ProjectController {
 			}
 		}
 		render "success"
+	}
+
+	/**
+	 * Used to select project time zone
+	 * @param timezone default timezone selected
+	 * @render time zone view
+	 */
+	def showTimeZoneSelect() {
+		def timezone = params.timezone
+		if (StringUtil.isBlank(timezone)) {
+			timezone = TimeUtil.defaultTimeZone
+		}
+		def timezones = Timezone.findAll()
+		def areas = userPreferenceService.timezonePickerAreas()
+
+		render(template:"showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: timezone])
 	}
 
 	def showImportanceFields() {

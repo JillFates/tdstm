@@ -363,15 +363,17 @@ class UserLoginController {
 				def assignedRoles = request.getParameterValues("assignedRole");
 				def person = params.person.id
 				def personInstance = Person.findById( person )
+				def tzId = TimeUtil.defaultTimeZone
+				if (params.project) {
+					def project = Project.get(params.project)
+					tzId = project.timezone?project.timezone.code:TimeUtil.defaultTimeZone					
+				}
 				personInstance.active = userLoginInstance.active
 				userPreferenceService.setUserRoles(assignedRoles, person)
 				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "User Dashboard")
 				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
-				def tZPreference = new UserPreference()
-				tZPreference.userLogin = userLoginInstance
-				tZPreference.preferenceCode = "CURR_TZ"
-				tZPreference.value = "GMT"
-				tZPreference.save( insert: true)
+				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, TimeUtil.TIMEZONE_ATTR, tzId)
+				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, TimeUtil.DATE_TIME_FORMAT_ATTR, TimeUtil.getDefaultFormatType())
 				flash.message = "UserLogin ${userLoginInstance} created"
 				redirect( action:"show", id:userLoginInstance.id, params:[ companyId:companyId ] )
 				success = true

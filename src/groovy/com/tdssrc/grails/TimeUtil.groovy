@@ -14,7 +14,6 @@ class TimeUtil {
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
 	def static final dateTimeFormatTypes = ["MM/DD/YYYY", "DD/MM/YYYY"]
 	def static final defaultTimeZone = "GMT"
-	def static final GMT = "GMT"
 
 	def static final String TIMEZONE_ATTR = "CURR_TZ"
 	def static final String DATE_TIME_FORMAT_ATTR = "CURR_DT_FORMAT"
@@ -323,7 +322,7 @@ class TimeUtil {
 	 * @return The date formatted
 	 **/
 	public static String formatDateTimeAsGMT(dateValue, String formatterType=FORMAT_DATE_TIME) {
-		return formatDateTimeWithTZ(GMT, getDefaultFormatType(), dateValue, formatterType)
+		return formatDateTimeWithTZ(defaultTimeZone, getDefaultFormatType(), dateValue, formatterType)
 	}
 
 	/**

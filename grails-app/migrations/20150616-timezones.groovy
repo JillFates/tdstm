@@ -429,7 +429,8 @@ databaseChangeLog = {
 			('Pacific/Tarawa', 'Pacific/Tarawa'),
 			('Pacific/Tongatapu', 'Pacific/Tongatapu'),
 			('Pacific/Wake', 'Pacific/Wake'),
-			('Pacific/Wallis', 'Pacific/Wallis')
+			('Pacific/Wallis', 'Pacific/Wallis'),
+			('GMT', 'GMT')
 		""")
 		
 	}
