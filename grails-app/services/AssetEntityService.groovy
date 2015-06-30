@@ -54,8 +54,14 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.WorkbookUtil
 
+
+import org.apache.commons.lang.StringEscapeUtils
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
 @Transactional
 class AssetEntityService {
+
+	def dataSource
 
 	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should
 	protected static customLabels = [
@@ -3293,14 +3299,18 @@ class AssetEntityService {
 		}
 
 		// Handle the filtering by each column's text field
-		filterParams.each { fkey, fvalue ->
-			if ( fvalue ) {
-				// single quotes are stripped from the filter to prevent SQL injection
-				query.append( whereAnd() + " assets.${fkey} LIKE '%${fvalue.replaceAll("'", "")}%'")
-				firstWhere = false
+		def whereConditions = []
+		def queryParams = [:]
+		filterParams.each {key, val ->
+			if( val && val.trim().size()){
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
 			}
 		}
 		
+		if(whereConditions.size()){
+			firstWhere = false
+			query.append(" WHERE assets.${whereConditions.join(" AND assets.")}")
+		}
 		if (params.moveBundleId) {
 			// TODO : JPM 9/2014 : params.moveBundleId!='unAssigned' - is that even possible anymore? moveBundle can't be unassigned...
 			if (params.moveBundleId!='unAssigned') {
@@ -3325,7 +3335,14 @@ class AssetEntityService {
 		}
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		log.debug  "query = ${query}"
-		def assetList = jdbcTemplate.queryForList(query.toString())
+		
+		def assetList = []
+		if(queryParams.size()){
+			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+			assetList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		}else{
+			assetList = jdbcTemplate.queryForList(query.toString())
+		}
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		def totalRows = assetList.size()

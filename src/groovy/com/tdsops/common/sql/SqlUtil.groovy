@@ -3,6 +3,8 @@ package com.tdsops.common.sql
 import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.StringUtils
 
+import org.apache.commons.lang.StringEscapeUtils
+
 /** 
  * This class provides a number of utility functions
  */
@@ -190,4 +192,178 @@ class SqlUtil {
 	assert t=='G'
 	assert e=='NOT like'
 	*/
+
+	static parseParameter(prop, expr, params){
+		
+		expr = expr.trim()
+
+		def firstChar = expr[0]
+
+		def rest = expr.substring(1).trim()
+
+		def queryString
+
+		//println(firstChar ==~ /-|<|>|=|%|\"|&|\*/)
+
+		switch(firstChar){
+			/* Starts with '=' */
+			case "=":
+				queryString = buildSingleValueParameter(prop, rest, "=", params)
+				break
+			
+			/* Starts with '*' */
+			case "*":
+				queryString = buildSingleValueParameter(prop, parseStringParameter(rest, "%", ""), "LIKE", params)
+				break
+
+			/* Starts with '%' */
+			case "%":
+				queryString = buildSingleValueParameter(prop, parseStringParameter(rest, "", "%"), "LIKE", params)
+				break
+
+			/* Starts with '<' or '>' */
+			case ["<", ">"]:
+				/* Starts with '<=' or '>=' */
+				if(rest[0] == "="){
+					queryString = buildSingleValueParameter(prop, rest.substring(1), "${firstChar}=", params)
+				/* Starts with '<>' */
+				}else if(expr ==~ /^<>.*/){
+					queryString = buildDistinctParameter(prop, rest.substring(1), params)
+				/* Starts with '<' or '>' */
+				}else{
+					queryString = buildSingleValueParameter(prop, rest, firstChar, params)
+				}
+				
+				break
+			
+			/* Starts with '-' or '!' */
+			case ["-", "!"]:
+				switch(rest){
+					/* Start with '-' or '!' and it's a list of ':' separated values. */
+					case ~ /.*:.*/:
+						queryString = buildLikeList(prop, rest, "NOT LIKE", "AND", ":", params)
+						break
+					/* Start with '-' or '!' and it's a list of '|' separated values. */
+					case ~ /.*\|.*/:
+						queryString = buildInList(prop, "NOT IN", rest, params)
+						break
+					default:
+						/* Starts with '-' and it's not a list of values. */
+						if(firstChar == "-"){
+							queryString = buildDistinctParameter(prop, rest, params)	
+						/* Starts with '!' and it's not a list of values. */
+						}else{
+							queryString = buildSingleValueParameter(prop, rest, "<>", params)
+						}
+						
+						break
+				}
+				break
+			default:
+					switch(expr){
+						/* It's a list of '&' separated values. */
+						case ~ /.*&.*/:
+							queryString = buildLikeList(prop, expr, "LIKE", "AND", "&", params)
+							break
+						/* It's a list of '|' separated values. */
+						case ~ /.*\|.*/:
+							queryString = buildInList(prop, "IN", expr, params)
+							break
+						/* It's a list of ':' separated values. */
+						case ~ /.*:.*/:
+							queryString = buildLikeList(prop, expr, "LIKE", "OR", ":", params)
+							break
+						/* It starts and ends with double quotation marks. */
+						case ~ /^\".*\"/:
+							queryString = buildSingleValueParameter(prop, rest[0..-2], "=", params)
+							break
+						default:
+							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, "", "%"), "LIKE", params)
+							break
+					}
+					break
+		}
+
+		return queryString
+	}
+
+
+	/* ************************************************************************* */
+
+	/**
+	 * This method constructs simple not-like expressions for number and string
+	 * parameters.
+	 */
+	static buildDistinctParameter(prop, value, params){
+		def queryString
+		if(value.isNumber()){
+			queryString = buildSingleValueParameter(prop, parseNumberParameter(value), "<>", params)
+		}else{
+			queryString = buildSingleValueParameter(prop, parseStringParameter(value, "%", "%"), "NOT LIKE", params)
+		}
+		return queryString
+	}
+
+	/* ************************************************************************* */
+
+	static buildInList(prop, inOp, expr, params){
+
+		def values = []
+		expr.split("\\|").eachWithIndex{ value, idx ->
+			def paramKey = prop + idx
+			values << ":${paramKey}"
+			params[paramKey] = escapeStringParameter(value)
+		}
+		return "${prop} ${inOp}(${values.join(',')})"
+	}
+
+	/* ************************************************************************* */
+
+	static buildLikeList(prop, expr, likeOp, logicalOp, separator, params){
+		def conditions = []
+		expr.split(separator).eachWithIndex{ value, idx ->
+			conditions << buildSingleValueParameter(prop + idx, parseStringParameter(value, "%", "%"), likeOp, params, prop)
+		}
+		return "(${conditions.join(" ${logicalOp} ")})"
+	}
+
+
+	/* ************************************************************************* */
+
+	/**
+	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
+	 */
+	static buildSingleValueParameter(prop, value, operator, params, propName=prop){
+		params[prop] = value
+		return  "${propName} ${operator} :${prop}"
+	}
+
+	/* ************************************************************************* */
+
+	static escapeStringParameter(parameter){
+		return StringEscapeUtils.escapeJava(parameter.toString().trim())
+	}
+
+	/* ************************************************************************* */
+
+	/**
+	 * Surrounds the first parameter with the other 2
+	 * for constructing like-operations.
+	 */
+	static parseStringParameter(parameter, before, after){
+		return "${before}${escapeStringParameter(parameter)}${after}"
+	}
+
+	/* ************************************************************************* */
+
+	/**
+	 * Parses a String parameter to a number (Integer or Double).
+	 */
+	static parseNumberParameter(parameter){
+		return parameter.isInteger() ? parameter.toInteger() : parameter.toDouble()
+	}
+
+	/* ************************************************************************* */
+
+
 }

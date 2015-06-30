@@ -24,6 +24,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 
+import com.tdsops.common.sql.SqlUtil
+
 import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
@@ -179,23 +181,16 @@ class DatabaseController {
 		
 		def firstWhere = true
 		def queryParams = [:]
-		filterParams.each {
-			if( it.getValue()  && it.getValue().trim().size()){
-				
-				if (firstWhere) {
-					// single quotes are stripped from the filter to prevent SQL injection
-					query.append(" WHERE dbs.${it.getKey()} LIKE :${it.getKey()}")
-					firstWhere = false
-				} else {
-					query.append(" AND dbs.${it.getKey()} LIKE :${it.getKey()}")
-				}
-				def paramValue = ""
-				if(it.getValue()){
-					paramValue = it.getValue().replaceAll("'", "")
-				}
-				queryParams << [ (it.getKey()) : "%"+StringEscapeUtils.escapeJava(paramValue)+"%"]
+		def whereConditions = []
+		filterParams.each {key, val ->
+			if( val && val.trim().size()){
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
 			}
 		}
+		if(whereConditions.size()){
+			query.append(" WHERE dbs.${whereConditions.join(" AND ")}")
+		}
+
 		if(params.moveBundleId){
 			if(params.moveBundleId!='unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
@@ -213,6 +208,7 @@ class DatabaseController {
 
 		def dbsList = []
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
+		
 		if(queryParams.size()){
 			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
 			dbsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)

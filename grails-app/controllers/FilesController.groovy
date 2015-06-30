@@ -22,6 +22,11 @@ import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.WebUtil
 
 
+import com.tdsops.common.sql.SqlUtil
+
+import org.apache.commons.lang.StringEscapeUtils
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
 class FilesController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -35,6 +40,7 @@ class FilesController {
 	def userPreferenceService
 
 	def jdbcTemplate
+	def dataSource
 
 	def index() {
 		redirect action:'list', params:params
@@ -172,16 +178,16 @@ class FilesController {
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.dependent_id) != mb.move_bundle_id 
 			LEFT OUTER JOIN asset_dependency adc2 ON ae.asset_entity_id = adc2.dependent_id AND adc2.status IN (${validUnkownQuestioned}) 
 				AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id */
-		def firstWhere = true
-		filterParams.each {
-			if ( it.getValue() )
-				if (firstWhere) {
-					// single quotes are stripped from the filter to prevent SQL injection
-					query.append(" WHERE files.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
-					firstWhere = false
-				} else {
-					query.append(" AND files.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
-				}
+		def whereConditions = []
+		def queryParams = [:]
+		filterParams.each {key, val ->
+			if( val && val.trim().size()){
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
+			}
+		}
+		
+		if(whereConditions.size()){
+			query.append(" WHERE files.${whereConditions.join(" AND files.")}")
 		}
 		
 		if (params.moveBundleId) {
@@ -199,7 +205,15 @@ class FilesController {
 			query.append(" WHERE files.planStatus='${params.plannedStatus}'")
 		}
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
-		def filesList = jdbcTemplate.queryForList(query.toString())
+
+		def filesList = []
+		
+		if(queryParams.size()){
+			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+			filesList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		}else{
+			filesList = jdbcTemplate.queryForList(query.toString())
+		}
 		
 		def totalRows = filesList.size()
 		def numberOfPages = Math.ceil(totalRows / maxRows)

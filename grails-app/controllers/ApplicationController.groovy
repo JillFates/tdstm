@@ -15,6 +15,10 @@ import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WebUtil
 
+import com.tdsops.common.sql.SqlUtil
+
+import org.apache.commons.lang.StringEscapeUtils
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class ApplicationController {
 
@@ -28,6 +32,7 @@ class ApplicationController {
 	def userPreferenceService
 
 	def jdbcTemplate
+	def dataSource
 	
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
@@ -161,17 +166,19 @@ class ApplicationController {
 			AND (SELECT move_bundle_id from asset_entity WHERE asset_entity_id = adc.asset_id) != mb.move_bundle_id*/
 		
 		// Handle the filtering by each column's text field
-		def firstWhere = true
-		filterParams.each {
-			if( it.getValue() )
-				if (firstWhere) {
-					// single quotes are stripped from the filter to prevent SQL injection
-					query.append(" WHERE apps.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
-					firstWhere = false
-				} else {
-					query.append(" AND apps.${it.getKey()} LIKE '%${it.getValue().replaceAll("'", "")}%'")
-				}
+
+		def queryParams = [:]
+		def whereConditions = []
+		filterParams.each {key, val ->
+			if( val && val.trim().size()){
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
+			}
 		}
+
+		if(whereConditions.size()){
+			query.append(" WHERE apps.${whereConditions.join(" AND ")}")
+		}
+
 		if(params.latencys){
 			if(params.latencys!='unknown')
 				query.append(" WHERE apps.latency = '${params.latencys.replaceAll("'", "")}' ")
@@ -216,8 +223,15 @@ class ApplicationController {
 		
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
 		log.info "query = ${query}"
+		def appsList = []
+		if(queryParams.size()){
+			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
+			appsList = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
+		}else{
+			appsList = jdbcTemplate.queryForList(query.toString())
+		}
 
-		def appsList = jdbcTemplate.queryForList(query.toString())
+		//def appsList = jdbcTemplate.queryForList(query.toString())
 		
 		// Cut the list of selected applications down to only the rows that will be shown in the grid
 		def totalRows = appsList.size()
