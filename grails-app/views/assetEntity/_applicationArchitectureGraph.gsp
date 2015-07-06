@@ -1019,7 +1019,7 @@ function buildMap (width, height) {
 				o.classList.remove('selected');
 			})
 		}
-		GraphUtil.tickOnce();
+		GraphUtil.tickOnce(force);
 	}
 	
 	// gets a map representing the position of each node in the graph
