@@ -43,7 +43,7 @@
 					<td id="app_all">
 						<span id="allAppCount">${gridStats.app[0] ?: '&nbsp;' }</span>
 					</td>
-					<td id="app_onePlus">${	}</td>
+					<td id="app_onePlus">${gridStats.app[1] ?: '&nbsp;' }</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="app_${asset.dependencyBundle}">
 							${asset.appCount ?: '&nbsp;' }
