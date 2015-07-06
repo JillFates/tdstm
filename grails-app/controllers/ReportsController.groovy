@@ -194,15 +194,15 @@ class ReportsController {
 									"cart":cartShelf, "shelf":asset.shelf, "source_team_id":teamPartyGroup?.id, 
 									"move_bundle_id":asset?.moveBundle?.id,dlocation:asset.rackSource?asset.rackSource.location:'',
 									'projectName':partyGroupInstance?.name,
-									'startAt': projectInstance.startDate ? TimeUtil.formatDateTime(getSession(), projectInstance.startDate) : "", 
-									'completedAt': projectInstance.completionDate ? TimeUtil.formatDateTime(getSession(), projectInstance.completionDate) : "", 
+									'startAt': projectInstance.startDate, 
+									'completedAt': projectInstance.completionDate, 
 									'bundleName':bundleInstance?.name, 
 									'teamName':teamPartyGroup?.teamCode ? teamPartyGroup?.name+" - "+teamMembers : "", 
 									'location':"Source Team", 'truck':asset.truck, 
 									'room':asset.sourceRoom, 'instructions':assetCommentString,
 									'roomTagSort':roomTagSort,'truckTagSort':truckTagSort,
 									'assetTagSort': (asset.assetTag ? asset.assetTag : ""),'sourcetargetLoc':"s", 'usize':asset?.model?.usize,
-									'timezone':tzId, "rptTime": TimeUtil.formatDateTime(getSession(), currDate)]
+									'timezone':tzId, "rptTime": currDate]
 				}
 			}
 			//No Assets were found for selected moveBundle,team and Location
@@ -309,7 +309,7 @@ class ReportsController {
 									'sourceTargetRoom':sourceTargetRoom,
 									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
 									'model':(assetComment?.assetEntity?.manufacturer ? assetComment?.assetEntity?.manufacturer?.toString() : "")+" "+(assetComment?.assetEntity?.model ? assetComment?.assetEntity?.model : "" ), 
-									'occuredAt': assetComment.dateCreated ? TimeUtil.formatDateTime(getSession(), assetComment.dateCreated) : "", 
+									'occuredAt': assetComment.dateCreated, 
 									'createdBy':assetComment?.createdBy?.firstName+" "+assetComment?.createdBy?.lastName, 
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
 									'issue':assetComment?.comment, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
@@ -320,7 +320,7 @@ class ReportsController {
 				if( params.reportResolveInfo == "true" && assetComment.isResolved == 1 ) {
 					reportFields <<['assetName':null, 'assetTag':null, 'moveBundle' :null,'sourceTargetRoom':null,'model':null, 
 									'commentType':assetComment.commentType == 'issue' ? 'Task' : assetComment.commentType,
-									'occuredAt': assetComment.dateResolved ? TimeUtil.formatDateTime(getSession(), assetComment.dateResolved) : "", 
+									'occuredAt': assetComment.dateResolved, 
 									'createdBy':assetComment?.resolvedBy?.firstName+" "+assetComment?.resolvedBy?.lastName, 
 									'owner':assetComment?.assignedTo ? assetComment?.assignedTo?.firstName+" "+assetComment?.assignedTo?.lastName : '',
 									'issue':assetComment?.resolution, 'bundleNames':bundleNames,'projectName':partyGroupInstance?.name, 
@@ -336,7 +336,7 @@ class ReportsController {
 					moveEventNews?.resolution = moveEventNews?.resolution ? moveEventNews?.resolution : ''
 					reportFields <<['assetName':'', 'assetTag':'', 'moveBundle' :'','sourceTargetRoom':'','model':'',
 								'commentType':"news",
-								'occuredAt': moveEventNews.dateCreated ? TimeUtil.formatDateTime(getSession(), moveEventNews.dateCreated) : "", 
+								'occuredAt': moveEventNews.dateCreated, 
 								'createdBy':moveEventNews?.createdBy.toString(),
 								'owner':'',
 								'issue':moveEventNews.message +"/"+  moveEventNews?.resolution , 'bundleNames':'','projectName':projectInstance?.name,

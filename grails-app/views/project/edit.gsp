@@ -292,11 +292,10 @@
 		  completionDateObj.value = startDate;
 		  }
 		}
-		var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
 		function isValidDate( date ){
 			var returnVal = true;
-			if( date && !dateRegExp.test(date) ){
-				alert("Date should be in 'mm/dd/yyyy' format");
+			if( date && !tdsCommon.isValidDate(date) ){
+				alert("Date should be in '" + tdsCommon.defaultDateFormat() + "' format");
 				returnVal  =  false;
 			} 
 			return returnVal;

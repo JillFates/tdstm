@@ -9,7 +9,9 @@ var tdsCommon = {
 		appBaseUri:  '/tdstm',
 		dateFormat: null,
 		dateTimeFormat: null,
-		dateShortFormat: null
+		dateShortFormat: null,
+		jQueryDateFormat: null,
+		jQueryDateTimeFormat: null
 	},
 
 	// creates relative or fully qualified url to for the application
@@ -158,7 +160,6 @@ var tdsCommon = {
 			if (!this.isFormatMMDDYYYY()) {
 				this.config.dateFormat = "DD/MM/YYYY";
 			}
-			console.log("defaultDateFormat: " + this.config.dateFormat)
 		}
 		return this.config.dateFormat;
 	},
@@ -172,25 +173,52 @@ var tdsCommon = {
 			if (!this.isFormatMMDDYYYY()) {
 				this.config.dateTimeFormat = "DD/MM/YYYY h:mm A";
 			}
-			console.log("defaultDateTimeFormat: " + this.config.dateTimeFormat)
 		}
 		return this.config.dateTimeFormat;
 	},
 
-	parseDateTimeFromZulu: function(stringValue, format) {
-		var result = "";
-		if (stringValue) {
-			result = moment(stringValue);
+	/**
+	 * Returns jQuery date format
+	 */
+	jQueryDateFormat: function() {
+		if (this.config.jQueryDateFormat == null) {
+			this.config.jQueryDateFormat = "mm/dd/yy";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.jQueryDateFormat = "dd/mm/yy";
+			}
 		}
-		return result;
+		return this.config.jQueryDateFormat;
+	},
+
+	/**
+	 * Returns jQuery date time format
+	 */
+	jQueryDateTimeFormat: function() {
+		if (this.config.jQueryDateTimeFormat == null) {
+			this.config.jQueryDateTimeFormat = "mm/dd/yy h:i";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.jQueryDateTimeFormat = "'dd/mm/yy h:i";
+			}
+		}
+		return this.config.jQueryDateTimeFormat;
+	},
+
+	parseDateTimeFromZulu: function(stringValue, format) {
+		return moment(stringValue);
 	},
 	
 	parseDateTimeString: function(stringValue, format) {
-		var result = "";
-		if (stringValue) {
-			result = moment(stringValue, format);
-		}
-		return result;
+		return moment(stringValue, format);
+	},
+
+	isValidDate: function(stringValue) {
+		var d = moment(stringValue, this.defaultDateFormat());
+		return d.isValid()
+	},
+
+	isValidDateTime: function(stringValue) {
+		var d = moment(stringValue, this.defaultDateTimeFormat());
+		return d.isValid()
 	},
 
 	formatDateTime: function(momentObj, format) {

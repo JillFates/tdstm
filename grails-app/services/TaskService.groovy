@@ -3342,7 +3342,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 			taskBatch: settings.taskBatch,
 			isPublished: settings.publishTasks,
-			sendNotification: taskSpec.sendNotification ?: 0,
+			sendNotification: taskSpec.sendNotification? taskSpec.sendNotification : false,
 			project: moveEvent.project, 
 			moveEvent: moveEvent, 
 			assetEntity: asset,
@@ -3402,7 +3402,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 		
 		if (task.category == null) task.category = defCat
-		
+
 		// log.info "About to save task: ${task.category}"
 		if (! ( task.validate() && task.save(flush:true) ) ) {
 			log.error("createTaskFromSpec: Failed creating task error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
@@ -4327,7 +4327,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 					taskBatch: settings.taskBatch,
 					isPublished: settings.publishTasks,
-					sendNotification: taskSpec.sendNotification ?: 0,
+					sendNotification: taskSpec.sendNotification ?taskSpec.sendNotification: false,
 					project: moveEvent.project, 
 					moveEvent: moveEvent, 
 					commentType: AssetCommentType.TASK,
@@ -4437,7 +4437,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 				taskBatch: settings.taskBatch,
 				isPublished: settings.publishTasks,
-				sendNotification: taskSpec.sendNotification ?: 0,
+				sendNotification: taskSpec.sendNotification?taskSpec.sendNotification:false,
 				comment: title,
 				project: moveEvent.project, 
 				moveEvent: moveEvent, 

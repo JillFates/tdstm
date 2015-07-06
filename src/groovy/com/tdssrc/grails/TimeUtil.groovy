@@ -256,14 +256,15 @@ class TimeUtil {
 	}
 
 	/**
-	 * Used to format a Date into a date string format, based in the time zone and format defined in the session
+	 * Used to format a Date into a date string format, based in the format defined in the session
+	 * For dates (without time) is not required to applied a timezone.
 	 * @param dateValue the date to format
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date formatted
 	 **/
 	public static String formatDate(session, dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
-		return formatDateTime(session, dateValue, formatter)
+		return formatter.format(dateValue)
 	}
 
 	/**
@@ -326,18 +327,22 @@ class TimeUtil {
 	}
 
 	/**
-	 * Used to parse a string value into a Date, based in the time zone and format defined in the session
+	 * Used to parse a string value into a Date, based in the format defined in the session.
+	 * For dates (without time) is not required to applied a timezone.
 	 * @param dateValue the date to format
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date
 	 **/
 	public static Date parseDate(session, dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
-		def newDate = parseDateTime(session, dateValue, formatter)
-		if (newDate) {
-			newDate.clearTime()	
+		def result
+		try {
+			result = formatter.parse(dateValue)
+			result.clearTime()	
+		} catch (Exception e) {
+			System.out.println("Invalid date: " + e.getMessage())
 		}
-		return newDate
+		return result
 	}
 
 	/**
@@ -366,7 +371,7 @@ class TimeUtil {
 		try {
 			result = formatter.parse(dateValue)
 		} catch (Exception e) {
-			System.out.println("Invalid date: " + e.getMessage())
+			System.out.println("Invalid date time: " + e.getMessage())
 		}
 		return result
 	}

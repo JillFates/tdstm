@@ -446,7 +446,7 @@ class ReportsService {
 		
 		def session = userPreferenceService.getSession()
 		def date = new Date()
-		String time = formatter.format(date);
+		String time = TimeUtil.formatDateTime(session, date, TimeUtil.FORMAT_DATE_TIME_8)
 		def errorForEventTime = ""
 		def newsBarModeError = ""
 		def clientAccess = ""

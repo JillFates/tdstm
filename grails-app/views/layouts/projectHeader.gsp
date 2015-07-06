@@ -31,6 +31,9 @@
 						$('.headerClass').removeClass('mouseover');
 					}
 				});
+
+				$.datepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
+				$.datetimepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
 			});
 
 			function updateEventHeader( e ){
@@ -39,7 +42,6 @@
 				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
 				$("#moveEventStatus").html(newsAndStatus[0].status)
 			}
-
 		</script>
 	</head>
 	<% 
@@ -77,7 +79,7 @@
 		<div class="main_body">
 			<input id="contextPath" type="hidden" value="${request.contextPath}"/>
 			<input id="tzId" type="hidden" value="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
-			<input id="userDTFormat" type="hidden" value="${request.getSession().getAttribute('CURR_TZ')?.CURR_DT_FORMAT}"/>		
+			<input id="userDTFormat" type="hidden" value="${request.getSession().getAttribute('CURR_DT_FORMAT')?.CURR_DT_FORMAT}"/>		
 			<div class="tds_header">
 				<div class="header_left">
 					<g:if test="${setImage}">

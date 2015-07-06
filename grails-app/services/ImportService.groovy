@@ -1470,7 +1470,7 @@ class ImportService {
 				sb.append(WebUtil.getListAsli(warnings))
 
 			if (ignoredAssets)
-				importService.appendIgnoredAssets(sb, ignoredAssets)
+				appendIgnoredAssets(sb, ignoredAssets)
 
 			sb.append('</ul>')
 		}

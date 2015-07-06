@@ -555,7 +555,6 @@
 		}
 		return timeString
 	} 
-	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
     function validateStepsData(){
       var checked = true
       var keyOffStep = ""
@@ -642,10 +641,9 @@
     }
     function isValidDate( date , objId, imgObj){
         var returnVal = true;
-      	if( date && !objRegExp.test(date) ){
-          	//alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
+        if( date && !tdsCommon.isValidDateTime(date) ){
           	$("#"+objId).addClass("field_error");
-          	$("#"+imgObj).attr("title","Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+          	$("#"+imgObj).attr("title","Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
           	$("#"+imgObj).show();
           	returnVal  =  false;
       	} else if(date){
@@ -699,9 +697,9 @@
             	$("#startTime_"+stepId).addClass("field_error");
 	    		$("#startTimeImg_"+stepId).attr("title"," Step Start Time should not be blank")
 	          	$("#startTimeImg_"+stepId).show();
-            } else if( !objRegExp.test(value) ){
+            } else if(tdsCommon.isValidDateTime(value) ){
 	    		$("#startTime_"+stepId).addClass("field_error");
-	    		$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+	    		$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
 	          	$("#startTimeImg_"+stepId).show();
 	    	} else if(bundleStartTime > valueInMs || bundleCompletionTime < valueInMs){
 				$("#startTime_"+stepId).addClass("field_error");
@@ -721,9 +719,9 @@
             	$("#completionTime_"+stepId).addClass("field_error");
 	    		$("#completionTimeImg_"+stepId).attr("title"," Step Completion Time should not be blank")
 	          	$("#completionTimeImg_"+stepId).show();
-            } else if( !objRegExp.test(value) ){
+            } else if(tdsCommon.isValidDateTime(value) ){
 	    		$("#completionTime_"+stepId).addClass("field_error");
-	    		$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+	    		$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
 	          	$("#completionTimeImg_"+stepId).show();
 	    	} else if(bundleStartTime > valueInMs || bundleCompletionTime < valueInMs){
 				$("#completionTime_"+stepId).addClass("field_error");

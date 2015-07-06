@@ -23,6 +23,7 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.WorkbookUtil
 
@@ -546,7 +547,7 @@ class MoveEventController {
 				def moveEventResults
 				def reportFields =[]
 				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				def currDate = Timetil.nowGMT()
+				def currDate = TimeUtil.nowGMT()
 				if(reportType != "SUMMARY"){
 					moveEventResults = moveBundleService.getMoveEventDetailedResults( moveEvent )
 					moveEventResults.each { results->

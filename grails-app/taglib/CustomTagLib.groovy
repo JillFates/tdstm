@@ -26,7 +26,7 @@ class CustomTagLib {
 			if (formatter == null) {
 				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE)
 			}
-			out << TimeUtil.formatDateTime(session, dt, formatter)
+			out << TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, dt, formatter)
 		}  
 	}
 	/*
