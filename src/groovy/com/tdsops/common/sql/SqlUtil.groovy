@@ -275,7 +275,7 @@ class SqlUtil {
 							break
 						/* It starts and ends with double quotation marks. */
 						case ~ /^\".*\"/:
-							queryString = buildSingleValueParameter(prop, rest[0..-2], "=", params)
+							queryString = buildSingleValueParameter(prop, expr.substring(1, expr.length() - 1), "=", params)
 							break
 						default:
 							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, "", "%"), "LIKE", params)
@@ -324,7 +324,7 @@ class SqlUtil {
 		expr.split(separator).eachWithIndex{ value, idx ->
 			conditions << buildSingleValueParameter(prop + idx, parseStringParameter(value, "%", "%"), likeOp, params, prop)
 		}
-		return "(${conditions.join(" ${logicalOp} ")})"
+		return "${conditions.join(" ${logicalOp} ")}"
 	}
 
 
