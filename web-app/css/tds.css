@@ -928,7 +928,7 @@ td .label_sm {
 
 .tabs {
 	margin-top: 10px;
-	margin-left: 20px;
+	margin-left: 0px;
 }
 .tabs ul {
     list-style: none;
@@ -975,6 +975,15 @@ td .label_sm {
 .depGroupSelected {
 	box-shadow: 0px 4px 0px -2px #63A242 inset, 4px 0px 0px -2px #63A242 inset, -4px 0px 0px -2px #63A242 inset;
 	font-weight: bold;
+}
+#dependencyDivId.floating .depGroupSelected {
+	box-shadow: 0px 4px 0px -2px #63A242 inset, 4px 0px 0px -2px #63A242 inset, -4px 0px 0px -2px #63A242 inset, 0px -4px 0px -2px #63A242 inset;
+}
+#dependencyTableId td:not(.labelColumn) {
+	text-align: center;
+}
+#dependencyGroupsRowId td.pointer:hover {
+	background-color: #d0d0d0;
 }
 .app_count{
 	box-shadow: 4px 0px 0px -2px #63A242 inset, -4px 0px 0px -2px #63A242 inset;
@@ -1465,7 +1474,7 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	margin-right: 7px;
 }
 .menuLiIndex{
-	z-index: 99 !important;
+	z-index: 90 !important;
 }
 /* Date picker and Date range */
 .btn-success {
@@ -1611,21 +1620,15 @@ div.centered {
 }
 
 div#dependencyDivId {
-	/*position: relative;*/
 	overflow-x: scroll;
 	overflow-y: visible;
 	margin-left: 112px;
-	/*width: 400px;*/
 }
-/*div#dependencyDivId td {
-	display: block;
-}*/
 div#dependencyDivId td.labelColumn {
-	/*display: block;*/
 	white-space: nowrap;
 	width: 101px;
 	position: absolute;
-	left: 21px;
+	left: 16px;
 	top: auto;
 }
 

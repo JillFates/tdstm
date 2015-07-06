@@ -633,15 +633,11 @@ svg {
 }
 
 #mapReferenceId {
-	/*max-width: 50px;*/
 	width: 300px;
 	border-collapse: collapse;
 	border-bottom: 0px;
 }
-.graphContainer.fullscreen #mapReferenceId {
-	border-bottom: 1px solid #008000;
-}
-#mapReferenceId tr td{
+#mapReferenceId tr td:not(.spacer) {
 	border-left: 1px solid green;
 	border-right: 1px solid green;
 	text-align: center;
@@ -849,7 +845,25 @@ br.page-break-after {
 }
 
 .tabs {
-	min-width: 600px;
+	white-space: nowrap;
+}
+.tabs div * {
+	vertical-align: middle;
+}
+.tabs #depConsoleTabsId {
+	display: inline;
+	width: 500px;
+	height: 20px;
+}
+.tabs #viewTypeDivId {
+	display: inline;
+	width: 300px;
+	height: 20px;
+}
+.tabs .tabControls {
+	display: inline;
+	width: 100px;
+	height: 20px;
 }
 
 .disabledButton input{

@@ -2913,25 +2913,14 @@ class AssetEntityController {
 				moveEventList =  uniqueMoveEventList.toList()
 				moveEventList.sort{it?.name}
 				
-				Map requiredPrefs = ['dependencyConsoleApplicationLabel':'true', 
-					'dependencyConsoleServerLabel':'', 
-					'dependencyConsoleDatabaseLabel':'', 
-					'dependencyConsoleStoragePhysicalLabel':'', 
-					'dependencyConsoleFilesLabel':'', 
-					'dependencyConsoleNetworkLabel':'']
+				def defaultPrefs = ['colorBy':'group', 'appLbl':true, 'maxEdgeCount':4]
+				def graphPrefs = userPreferenceService.getPreference('depGraph', loginUser)
+				def prefsObject = [:]
+				if (graphPrefs)
+					prefsObject = JSON.parse(graphPrefs)
+				else
+					prefsObject = defaultPrefs
 				
-				Map prefMap = userPreferenceService.getPreferences(requiredPrefs, loginUser)
-				
-				def labelMap = ['Application':prefMap['dependencyConsoleApplicationLabel'], 
-					'Server':prefMap['dependencyConsoleServerLabel'], 
-					'Database':prefMap['dependencyConsoleDatabaseLabel'], 
-					'StoragePhysical':prefMap['dependencyConsoleStoragePhysicalLabel'], 
-					'Files':prefMap['dependencyConsoleFilesLabel'], 
-					'Network':prefMap['dependencyConsoleNetworkLabel']]
-				
-				def labelList = params.labelsList
-				labelList = labelList?.replace(" ","")
-				List labels = labelList ?  labelList.split(",") : []
 				
 				// Create the Nodes
 				def graphNodes = []
@@ -2944,7 +2933,9 @@ class AssetEntityController {
 				def assetType = ''
 				def assetClass = ''
 				def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
+				TreeMap<Long, String> dependencyBundleMap = new TreeMap<Long, String>();
 				TreeMap<Long, String> moveBundleMap = new TreeMap<Long, String>();
+				TreeMap<Long, String> moveEventMap = new TreeMap<Long, String>();
 				def t1 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				
 				assetDependentlist.each {
@@ -2971,40 +2962,51 @@ class AssetEntityController {
 						type = 'other'
 					}
 					
+					if (! dependencyBundleMap.containsKey(it.bundle))
+						dependencyBundleMap.put(it.bundle, 'Group ' + it.bundle);
 					if (! moveBundleMap.containsKey(it.moveBundleId))
 						moveBundleMap.put(it.moveBundleId, it.moveBundleName);
 					
-					def moveEventName = it.eventName ?: ''
+					def moveEventName = it.eventName ?: 'No Event'
 					color = it.eventName ? 'grey' : 'red'
+					def moveEventId = it.moveEvent ?: (long)0.0
+					def hasMoveEvent = it.eventName ? true : false
+					
+					if (! moveEventMap.containsKey(moveEventId))
+						moveEventMap.put(moveEventId, moveEventName);
 					
 					graphNodes << [
 						id:it.assetId, name:it.assetName, 
-						type:type, group:it.moveBundleId, 
+						type:type, depBundleId:it.bundle, 
+						moveBundleId:it.moveBundleId, moveEventId:moveEventId, hasMoveEvent:hasMoveEvent,
 						shape:shape, size:size, title:it.assetName, 
 						color:color, dependsOn:[], supports:[],
 						assetClass:it.assetClass
 					]
 				}
 				
-				// set the move bundle property to an index
-				def sorted = new ArrayList<Long>(moveBundleMap.keySet())
+				// set the dep bundle, move bundle, and move event properties to indices
+				def sortedDepBundles = new ArrayList<Long>(dependencyBundleMap.keySet())
+				def sortedMoveBundles = new ArrayList<Long>(moveBundleMap.keySet())
+				def sortedMoveEvents = new ArrayList<Long>(moveEventMap.keySet())
+				def dependencyGroupIndexMap = [:]
+				def moveBundleIndexMap = [:]
+				def moveEventIndexMap = [:]
 				graphNodes.each {
-					def mbid = it.group
-					def index = sorted.indexOf(mbid);
-					it.group = index
-				}
-				
-				// set up the move bundle color map
-				int colorDiff
-				if (moveBundleMap.size())
-					colorDiff = (232/moveBundleMap.size()).intValue()
-				
-				def moveBundleColorCode = [:]
-				for (def i = 0; i < moveBundleMap.size(); i++) {
-					def id = moveBundleMap.keySet()
-					def colorCode = colorDiff * i
-					def colorsCode = "rgb(${colorCode},${colorCode},${colorCode})"
-					moveBundleColorCode << [(id):colorsCode]
+					def mbid = it.depBundleId
+					def index = sortedDepBundles.indexOf(mbid)
+					it.depBundleIndex = index
+					dependencyGroupIndexMap[index] = dependencyBundleMap[mbid]
+					
+					mbid = it.moveBundleId
+					index = sortedMoveBundles.indexOf(mbid)
+					it.moveBundleIndex = index
+					moveBundleIndexMap[index] = moveBundleMap[mbid]
+					
+					mbid = it.moveEventId
+					index = sortedMoveEvents.indexOf(mbid)
+					it.moveEventIndex = index
+					moveEventIndexMap[index] = moveEventMap[mbid]
 				}
 				
 				// Define a map of all the options for asset types
@@ -3031,19 +3033,13 @@ class AssetEntityController {
 					defaults.linkSize = 100
 				}
 				
-				defaults.blackBackground = false
-				if (params.blackBackground in ['true','false']) {
-					userPreferenceService.setPreference('dependencyConsoleBlackBg', params.blackBackground)
-				}
-				if (params.blackBackground == 'true') {
-					defaults.blackBackground = true
-				}
-				
 				// Query for only the dependencies that will be shown
 				def depBundle = (params.dependencyBundle.isNumber() ? params.dependencyBundle : 0)
 				
 				def assetDependencies = AssetDependency.executeQuery("""
-					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future, ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId)
+					SELECT NEW MAP (ad.asset AS ASSET, ad.status AS status, ad.isFuture AS future, 
+						ad.isStatusResolved AS resolved, adb1.asset.id AS assetId, adb2.asset.id AS dependentId,
+						(CASE WHEN (ad.asset.moveBundle != ad.dependent.moveBundle AND ad.status in (${WebUtil.listAsMultiValueString(["'"+AssetDependencyStatus.UNKNOWN+"'", "'"+AssetDependencyStatus.VALIDATED+"'", "'"+AssetDependencyStatus.QUESTIONED+"'"])})) THEN (true) ELSE (false) END) AS bundleConflict)
 					FROM AssetDependency ad, AssetDependencyBundle adb1, AssetDependencyBundle adb2, Project p
 					WHERE ad.asset = adb1.asset
 						AND ad.dependent = adb2.asset
@@ -3066,14 +3062,20 @@ class AssetEntityController {
 				assetDependencies.each {
 					opacity = 1
 					statusColor = 'grey'
-					if (! it.resolved)
+					def notApplicable = false
+					def future = false
+					if (! it.resolved) {
 						statusColor='red'
-					else if( ! (it.status in [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED]) )
-						opacity = 0.2
+					} else if (it.status == AssetDependencyStatus.FUTURE) {
+						future = true
+					} else if( ! (it.status in [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED]) ) {
+						notApplicable = true
+					}
+					
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
 					if (sourceIndex != -1 && targetIndex != -1) {
-						graphLinks << ["id":i, "source":sourceIndex,"target":targetIndex,"value":2,"statusColor":statusColor,"opacity":opacity]
+						graphLinks << ["id":i, "source":sourceIndex, "target":targetIndex, "value":2, "statusColor":statusColor, "opacity":opacity, "unresolved":!it.resolved, "notApplicable":notApplicable, "future":future, "bundleConflict":it.bundleConflict]
 						i++
 					}
 				}
@@ -3090,24 +3092,29 @@ class AssetEntityController {
 				// Create the model that will be used while rendering the page
 				model.defaults = defaults
 				model.defaultsJson = defaults as JSON
-				model.labels = labels
-				model.labelMap = labelMap
+				model.defaultPrefs = defaultPrefs as JSON
+				model.graphPrefs = prefsObject
 				model.showControls = params.showControls
-				model.appChecked = labels.contains('apps')
-				model.serverChecked = labels.contains('servers')
-				model.filesChecked = labels.contains('files')
-				model.moveBundleColorCode = moveBundleColorCode
+				model.fullscreen = params.fullscreen ?: false
 				model.nodes = graphNodes as JSON
 				model.links = graphLinks as JSON
 				model.multiple = multiple
 				model.assetTypes = assetTypes as JSON
-				model.moveBundleMap = moveBundleMap as JSON
+				model.depBundleMap = dependencyGroupIndexMap as JSON
+				model.moveBundleMap = moveBundleIndexMap as JSON
+				model.moveEventMap = moveEventIndexMap as JSON
 				
 				// Render dependency graph
 				render(template:'dependencyGraph',model:model)
 				break
 		} // switch
 		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
+	}
+	
+	// removes the user's dependency analyzer map related preferences
+	def removeUserGraphPrefs () {
+		userPreferenceService.removePreference('depGraph');
+		render true
 	}
 
 	/**
@@ -3144,20 +3151,20 @@ class AssetEntityController {
 			workFlowTransition.removeAll(existingWorkflows)
 		}
 		def result
-        if (format == 'json') {
-        	def items = []
-        	workFlowTransition.each {
-        		items << [ id:it.id, name: it.name]
-        	}
-            result = ServiceResults.success(items) as JSON
-        } else {
-            result = ''
-            if(workFlowTransition.size()){
-                def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
-                                optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
-                result = HtmlUtil.generateSelect( paramsMap )
-            }
-        }
+		if (format == 'json') {
+			def items = []
+			workFlowTransition.each {
+				items << [ id:it.id, name: it.name]
+			}
+			result = ServiceResults.success(items) as JSON
+		} else {
+			result = ''
+			if(workFlowTransition.size()){
+				def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
+						  optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
+				result = HtmlUtil.generateSelect( paramsMap )
+			}
+		}
 		render result
 	}
     
@@ -3176,7 +3183,7 @@ class AssetEntityController {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def viewId = params.forView
-        def format = params.format
+		def format = params.format
 		def selectedId = 0
 		def person
 
@@ -3203,16 +3210,16 @@ class AssetEntityController {
 		}
 		list.sort { it.sortOn }
 		
-        def result
-        if (format == 'json') {
-            result = ServiceResults.success(list) as JSON
-        } else {
-            def firstOption = [value:'0', display:'Unassigned']
-            def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
-                optionKey:'id', optionValue:'nameRole', 
-                optionSelected:selectedId, firstOption:firstOption ]
-            result = HtmlUtil.generateSelect( paramsMap )
-        }
+		def result
+		if (format == 'json') {
+			result = ServiceResults.success(list) as JSON
+		} else {
+			def firstOption = [value:'0', display:'Unassigned']
+			def paramsMap = [selectId:viewId, selectName:viewId, options:list, 
+			optionKey:'id', optionValue:'nameRole', 
+			optionSelected:selectedId, firstOption:firstOption ]
+			result = HtmlUtil.generateSelect( paramsMap )
+		}
 		render result
 	}
 
@@ -3232,14 +3239,14 @@ class AssetEntityController {
 	/**
 	 * Generates an HTML SELECT control for the AssetComment.status property according to user role and current status of AssetComment(id)
 	 * @param	params.id	The ID of the AssetComment to generate the SELECT for
-     * @param   format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @param   format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return render HTML or a JSON array
 	 */
 	def updateStatusSelect() {
 		//Changing code to populate all select options without checking security roles.
 		def mapKey = 'ALL'//securityService.hasRole( ['ADMIN','SUPERVISOR','CLIENT_ADMIN','CLIENT_MGR'] ) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
-        def format = params.format
+		def format = params.format
 		def taskId = params.id
 		def status = taskId ? (AssetComment.read(taskId)?.status?: '*EMPTY*') : AssetCommentStatus.READY
 		def optionList = optionForRole.get(status)
@@ -3247,16 +3254,16 @@ class AssetEntityController {
 		def selectId = taskId ? "statusEditId" : "statusCreateId"
 		def optionSelected = taskId ? (status != '*EMPTY*' ? status : 'na' ): AssetCommentStatus.READY
 
-        def result
-        if (format == 'json') {
-            result = ServiceResults.success(optionList) as JSON
-        } else {
-            def paramsMap = [selectId:selectId, selectName:'statusEditId', selectClass:"task_${optionSelected.toLowerCase()}",
-                javascript:"onChange='this.className=this.options[this.selectedIndex].className'", 
-                options:optionList, optionSelected:optionSelected, firstOption:firstOption,
-                optionClass:""]
-            result = HtmlUtil.generateSelect( paramsMap )
-        }
+		def result
+		if (format == 'json') {
+			result = ServiceResults.success(optionList) as JSON
+		} else {
+			def paramsMap = [selectId:selectId, selectName:'statusEditId', selectClass:"task_${optionSelected.toLowerCase()}",
+			javascript:"onChange='this.className=this.options[this.selectedIndex].className'", 
+			options:optionList, optionSelected:optionSelected, firstOption:firstOption,
+			optionClass:""]
+			result = HtmlUtil.generateSelect( paramsMap )
+		}
 
 		render result
 	  }
@@ -3320,15 +3327,15 @@ class AssetEntityController {
      * @return render HTML
      */
     def successorTableHtml() {
-        def project = securityService.getUserCurrentProject()
-        def task = AssetComment.findByIdAndProject(params.commentId, project)
-        if ( ! task ) {
-            log.error "successorTableHtml - unable to find task $params.commentId for project $project.id"
-            render "An unexpected error occured"
-        } else {
-            def taskSuccessors = TaskDependency.findAllByPredecessor( task ).sort{ it.assetComment.taskNumber }
-            render taskService.genTableHtmlForDependencies(taskSuccessors, task, "successor")
-        }
+	def project = securityService.getUserCurrentProject()
+	def task = AssetComment.findByIdAndProject(params.commentId, project)
+	if ( ! task ) {
+		log.error "successorTableHtml - unable to find task $params.commentId for project $project.id"
+		render "An unexpected error occured"
+	} else {
+		def taskSuccessors = TaskDependency.findAllByPredecessor( task ).sort{ it.assetComment.taskNumber }
+		render taskService.genTableHtmlForDependencies(taskSuccessors, task, "successor")
+	}
     }
     
     /**
@@ -3419,13 +3426,13 @@ class AssetEntityController {
 	 * @param : id - Requested model's id
 	 * @return : assetType if exist for requested model else 0
 	 */
-    def retrieveAssetModelType() {
+	def retrieveAssetModelType() {
 		def assetType = 0
 		if(params.id && params.id.isNumber()){
 			def model = Model.read( params.id )
 			assetType = model.assetType ?: 0
 		} 
-	 render assetType
+		render assetType
 	}
 	
     /**
@@ -3554,22 +3561,22 @@ class AssetEntityController {
 	/**
 	 * This method is used to set Import perferences.(ImportApplication,ImportServer,ImportDatabase,
 	 * ImportStorage,ImportRoom,ImportRack,ImportDependency)
-	 * @param prefFor
-	 * @param selected
-	  */
-	 def setImportPerferences() {
-		 def key = params.prefFor
-		 def selected=params.selected
-		 if(selected){
-			 userPreferenceService.setPreference( key, selected )
-			 session.setAttribute(key,selected)
-		 }
-		 render true
-	 }
+	 * @param preference
+	 * @param value
+	 */
+	def setImportPerferences() {
+		def key = params.preference
+		def value = params.value
+		if (value) {
+			userPreferenceService.setPreference( key, value )
+			session.setAttribute(key,value)
+		}
+		render true
+	}
 	 /**
 	  * Action to return on list Dependency
 	  */
-	 def listDependencies() {
+	def listDependencies() {
 		def project = securityService.getUserCurrentProject();
 		if (!project) {
 			flash.message = "Please select project to view Dependencies"
@@ -3600,7 +3607,7 @@ class AssetEntityController {
 			// projectId: project.id,
 			servers: entities.servers
 		]
-	 }
+	}
 	/**
 	* This method is to show list of dependencies using jqgrid.
 	*/

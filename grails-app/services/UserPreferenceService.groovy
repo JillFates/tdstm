@@ -151,7 +151,7 @@ class UserPreferenceService  {
 	 * @return String the user's saved preference or null if not found
 	 */
 	def String getPreference (String preferenceCode, UserLogin userLogin) {
-		loadPreferences(preferenceCode, userLogin)
+		loadPreferences(userLogin, preferenceCode)
 		def currProj = getSession().getAttribute(preferenceCode)
 		def prefValue
 		if (currProj != null) {

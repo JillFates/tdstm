@@ -1,7 +1,7 @@
 <div style="margin-top: 10px; float: left;">
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
-		<div style="margin-left: 20px; margin-bottom: 10px;">
+		<div style="margin-left: 0px; margin-bottom: 10px;">
         	<div class="message" id="messageId" style="display:none">${flash.message}</div>
 			<h3>
 				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input  type="button"  class="submit" value="Regenerate..." onclick="showDependencyControlDiv()"  />
@@ -21,29 +21,29 @@
 			<img src="../images/processing.gif" />
 		</div>
 	</div>
-	<div style="border: 1px solid #63A242; margin-left: 20px;">
+	<div style="border: 1px solid #63A242; margin-left: 0px;">
 		<div id="dependencyDivId" style="overflow-x:scroll;">
 			<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
-				<tr class="odd">
+				<tr id="dependencyGroupsRowId" class="odd">
 					<td class="labelColumn"><b>Group</b></td>
-					<td id="span_all" class="pointer" onclick="getList($('#tabTypeId').val(), null)">
+					<td id="span_all" class="pointer" onclick="getList($('#tabTypeId').val(), null)" title="All Groups:&#013;Apps: &Tab;${gridStats.app[0]}&#013;Servers: &Tab;${gridStats.server[0] + gridStats.vm[0]}&#013;DBs: &Tab;${gridStats.db[0]}&#013;Storage: &Tab;${gridStats.storage[0]}">
 						<span class="depGroup">All</span>
 					</td>
-					<td id="span_onePlus" class="pointer" onclick="getList( $('#tabTypeId').val(), 'onePlus')">
+					<td id="span_onePlus" class="pointer" onclick="getList( $('#tabTypeId').val(), 'onePlus')" title="Group 1+:&#013;Apps: &Tab;${gridStats.app[1]}&#013;Servers: &Tab;${gridStats.server[1] + gridStats.vm[1]}&#013;DBs: &Tab;${gridStats.db[1]}&#013;Storage: &Tab;${gridStats.storage[1]}">
 						<span class="depGroup">1+</span>
 					</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
-						<td id="span_${asset.dependencyBundle}" class="${asset.statusClass} pointer" onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})">
+						<td id="span_${asset.dependencyBundle}" class="${asset.statusClass} pointer" onclick="getList( $('#tabTypeId').val().toLowerCase(), ${asset.dependencyBundle})" title="Group ${asset.dependencyBundle}:&#013;Apps: &Tab;${asset.appCount}&#013;Servers: &Tab;${asset.serverCount + asset.vmCount}&#013;DBs: &Tab;${asset.dbCount}&#013;Storage: &Tab;${asset.storageCount}">
 							<span class="depGroup">${asset.dependencyBundle}</span>
 						</td>
 					</g:each>
 				</tr>
 				<tr class="even">
 					<td class="labelColumn"><b>Applications</b></td>
-					<td id="app_all" class="app_count">
+					<td id="app_all">
 						<span id="allAppCount">${gridStats.app[0] ?: '&nbsp;' }</span>
 					</td>
-					<td id="app_onePlus">${gridStats.app[1]}</td>
+					<td id="app_onePlus">${	}</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="app_${asset.dependencyBundle}">
 							${asset.appCount ?: '&nbsp;' }
@@ -52,7 +52,7 @@
 				</tr>
 				<tr class="odd compactClass">
 					<td class="labelColumn"><b>Servers Physical</b></td>
-					<td id="server_all" class="server_count">
+					<td id="server_all">
 						<span id="allServerCount">${gridStats.server[0] ?: '&nbsp;' }</span></td>
 					<td id="server_onePlus">${gridStats.server[1] ?: '&nbsp;' }</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
@@ -63,7 +63,7 @@
 				</tr>
 				<tr class="even compactClass">
 					<td class="labelColumn"><b>Servers Virtual</b></td>
-					<td id="vm_all" class="vm_count">
+					<td id="vm_all">
 						<span id="allVirtualCount">${gridStats.vm[0] ?: '&nbsp;' }</span>
 					</td>
 					<td id="vm_onePlus">${gridStats.vm[1] ?: '&nbsp;' }</td>
@@ -75,7 +75,7 @@
 				</tr>
 				<tr class="odd compactClass">
 					<td class="labelColumn"><b>Databases</b></td>
-					<td id="db_all" class="db_count">
+					<td id="db_all">
 						<span id="allDatabaseCount">${gridStats.db[0] ?: '&nbsp;' }</span>
 					</td>
 					<td id="db_onePlus">${gridStats.db[1] ?: '&nbsp;' }</td>
@@ -87,7 +87,7 @@
 				</tr>
 				<tr class="even compactClass">
 					<td class="labelColumn"><b>Storage (all)</b></td>
-					<td id="file_all"  class="file_count">
+					<td id="file_all">
 						<span id="allFileCount">${gridStats.storage[0] ?: '&nbsp;' }</span>
 					</td>
 					<td id="file_onePlus">${gridStats.storage[1] ?: '&nbsp;' }</td>

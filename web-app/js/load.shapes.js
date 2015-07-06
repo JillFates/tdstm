@@ -5,7 +5,7 @@
 function defineShapes (defs) {
 	
 	// define the arrowhead markers used for marking dependencies
-	var markers = {'arrowhead':'#808080', 'arrowheadSelected':'#00dd00', 'arrowheadCyclical':'blue', 'arrowheadRedundant':'orange', 'arrowheadCut':'yellow'};
+	var markers = {'arrowhead':'#000000', 'arrowheadBlackBackground':'#ffffff', 'arrowheadNA':'#909090', 'arrowheadNABlackBackground':'#eeeeee', 'arrowheadUnresolved':'red', 'arrowheadSelected':'#00dd00', 'arrowheadCyclical':'blue', 'arrowheadRedundant':'orange', 'arrowheadCut':'orange', 'arrowheadBundleConflict':'red'};
 	var keys = Object.keys(markers);
 	for (var i = 0; i < keys.length; ++i) {
 		defs.append("marker")
@@ -22,10 +22,10 @@ function defineShapes (defs) {
 			.attr('fill', markers[keys[i]]);
 	}
 	
-	defs.select('#arrowheadSelected,#arrowheadCyclical')
+	defs.selectAll('#arrowheadSelected,#arrowheadCyclical,#arrowheadBundleConflict')
 		.attr("viewBox", "0 -6 10 12")
-		.attr("markerHeight", 12)
-	$('#arrowheadSelected path,#arrowheadCyclical path').attr("d", "M0,-6L10,0L0,6");
+		.attr("markerHeight", 12);
+	defs.selectAll('#arrowheadSelected path,#arrowheadCyclical path,#arrowheadBundleConflict path').attr("d", "M0,-6L10,0L0,6");
 	
 	// define the custom database object
 	var databaseShape = defs
@@ -106,6 +106,6 @@ function defineShapes (defs) {
 		.append("path")
 		.attr("id", "otherShapeId")
 		.attr("d", d3.svg.symbol().size(150).type('triangle-up'));
-		
+	
 	return null;
 }

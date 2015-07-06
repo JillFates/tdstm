@@ -7,6 +7,13 @@ var GraphUtil = (function ($) {
 	// public functions
 	var public = {};
 	
+	// public variables
+	public.force = null;
+	public.nodeBindings = null;
+	public.linkBindings = null;
+	public.labelBindings = null;
+	public.labelTextBindings = null;
+	
 	// returns true if the graph is loaded
 	public.graphExists = function () {
 		return ($('#svgContainerId').children('svg').size() > 0);
@@ -15,6 +22,14 @@ var GraphUtil = (function ($) {
 	// returns true if the graph is in fullscreen mode
 	public.isFullscreen = function () {
 		return $('#item1').hasClass('fullscreen');
+	}
+	
+	public.isBlackBackground = function () {
+		return $('#blackBackgroundId').is(':checked');
+	}
+	
+	public.isConflictsEnabled = function () {
+		return $('#bundleConflictsId').is(':checked');
 	}
 	
 	// resets the graph to the proper size
@@ -33,7 +48,7 @@ var GraphUtil = (function ($) {
 		if (public.graphExists()) {
 			var dimensions = public.getProperGraphDimensions();
 			resizeGraph(dimensions.width, dimensions.height);
-			public.correctLegendSize();
+			public.correctBothPanelSizes();
 		}
 	}
 	
@@ -52,6 +67,7 @@ var GraphUtil = (function ($) {
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
 		$('#fullscreenButtonId').children('h4').html('Normal Mode');
+		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
 	
@@ -59,40 +75,45 @@ var GraphUtil = (function ($) {
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
 		$('#fullscreenButtonId').children('h4').html('Full Screen');
+		public.moveDependencyGroups();
 		public.resetGraphSize();
-	}
-	
-	// adds the move bundle color indicator to the legend
-	public.addMoveBundlesToLegend = function (moveBundleMap, colors) {
-		var template = $('#templateBundleId');
-		$(Object.keys(moveBundleMap)).each(function (i, o) {
-			var newRow = template.clone();
-			newRow.removeClass('hidden');
-			var node = newRow.children('.bundleColorExample').children().children();
-			node.css('fill', colors(i));
-			var label = newRow.children('.bundleNameLabel');
-			label.html(moveBundleMap[o]);
-			$('#legendId').append(newRow);
-		});
-		$('#moveBundleKeyId').removeClass('hidden');
 	}
 	
 	// sets the size of the legend so that it can scroll when longer than the user's window
 	public.correctLegendSize = function () {
-		var legend = $('#legendDivId');
-		legend.css('height', '');
-		legend.css('overflow-y', '');
+		public.correctPanelSize('legendDivId');
+	}
+	
+	// sets the size of the control panel so that it can scroll when longer than the user's window
+	public.correctControlPanelSize = function () {
+		public.correctPanelSize('controlPanel');
+	}
+	
+	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
+	public.correctBothPanelSizes = function () {
+		public.correctLegendSize();
+		public.correctControlPanelSize();
+	}
+	
+	// sets the size of a panel so that it can scroll when longer than the user's window
+	public.correctPanelSize = function (panelId) {
+		var panel = $('#' + panelId);
+		panel.css('height', '');
+		panel.css('overflow-y', '');
 		var svgContainer = $('#svgContainerId svg');
-		var bottom = legend.offset().top + legend.height();
+		if (panel.size() == 0 || svgContainer.size() == 0)
+			return false;
+		
+		var bottom = panel.offset().top + panel.height();
 		var newBottom = svgContainer.offset().top + svgContainer.innerHeight();
 		
 		if (bottom >= newBottom) {
-			var newHeight = newBottom - legend.offset().top;
-			legend.css('height', newHeight);
-			legend.css('overflow-y', 'scroll');
+			var newHeight = newBottom - panel.offset().top;
+			panel.css('height', newHeight);
+			panel.css('overflow-y', 'scroll');
 		} else {
-			legend.css('height', '');
-			legend.css('overflow-y', '');
+			panel.css('height', '');
+			panel.css('overflow-y', '');
 		}
 	}
 	
@@ -157,7 +178,193 @@ var GraphUtil = (function ($) {
 		force.alpha(oldAlpha);
 	}
 	
-	// return the public object to make the publiclic functions accessable
+	// adds the move bundle color indicator to the legend
+	public.updateLegendColorKey = function (dataMap, colors, fillMode) {
+		var template = $('#colorKeyTemplateId');
+		$('.colorKey').remove();
+		$(Object.keys(dataMap)).each(function (i, o) {
+			var newRow = template.clone();
+			newRow
+				.addClass('colorKey')
+				.removeClass('hidden');
+			var node = newRow.children('.bundleColorExample').children().children();
+			node.css('fill', colors(i));
+			var label = newRow.children('.bundleNameLabel');
+			label.html(dataMap[o]);
+			$('#legendId').append(newRow);
+		});
+		$('#colorKeyLabelId').removeClass('hidden')
+		if (fillMode == 'group')
+			$('#colorKeyLabelId h4').html('Dependency Groups');
+		else if (fillMode == 'bundle')
+			$('#colorKeyLabelId h4').html('Move Bundles');
+		else
+			$('#colorKeyLabelId h4').html('Move Events');
+	}
+	
+	public.getFillMode = function () {
+		var checkedRadio = $('#colorByFormId input:checked');
+		if (checkedRadio.attr('id') == 'colorByDepGroupId')
+			return 'group';
+		if (checkedRadio.attr('id') == 'colorByMoveBundleId')
+			return 'bundle';
+		return 'event';
+	}
+	
+	public.getFillColor = function (node, colors, fillMode) {
+		if (fillMode == 'group') {
+			return colors(node.depBundleIndex);
+		} else if (fillMode == 'bundle') {
+			return colors(node.moveBundleIndex);
+		} else {
+			return colors(node.moveEventIndex);
+		}
+	}
+	
+	public.settleGraph = function (force, simpleTick, normalTick) {
+		force.on("tick", simpleTick);
+		for (var i = 0; i < 100; ++i) {
+			force.alpha(0.8);
+			force.tick();
+		}
+		force.stop();
+		force.on("tick", tick);
+		force.start();
+	}
+	
+	// called when the user clicks the show/hide layout adjustments twistie
+	public.toggleGraphTwistie = function () {
+		var container = $('#layoutControlContainerId');
+		var twistieRow = $('#twistieRowId');
+		if (twistieRow.hasClass('closed')) {
+			twistieRow.removeClass('closed').addClass('open');
+			container.slideDown(300, function () {
+				public.correctControlPanelSize();
+			});
+		} else {
+			twistieRow.removeClass('open').addClass('closed');
+			container.slideUp(300, function () {
+				public.correctControlPanelSize();
+			});
+		}
+	}
+	
+	public.updateNodeClasses = function () {
+		var bundle = public.getFilteredBundle();
+		public.nodeBindings.attr("class", function(d) {
+			return 'node'
+				+ ((d.selected == 1) ? ' selected selectedChild' : '')
+				+ ((d.selected == 2) ? ' selected selectedParent' : '')
+				+ ((public.isConflictsEnabled() && ! d.hasMoveEvent) ? ' noEvent' : '')
+				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
+				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
+		});
+	}
+	public.updateLinkClasses = function () {
+		public.linkBindings.attr("class", function(d) {
+			return 'link'
+				+ ((d.selected == 1) ? ' selected' : '')
+				+ ((d.unresolved) ? ' unresolved' : '')
+				+ ((d.notApplicable) ? ' notApplicable' : '')
+				+ ((d.future) ? ' future' : '')
+				+ ((d.cut == 3) ? ' cut' : '')
+				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
+				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
+		});
+	}
+	public.updateLabelClasses = function () {
+		var bundle = public.getFilteredBundle();
+		public.labelBindings.attr("class", function(d) {
+			return 'label'
+				+ ((d.selected > 0) ? ' selected' : '')
+				+ ((public.isBlackBackground()) ? ' blackBackground' : '')
+				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
+				+ ((! d.showLabel) ? ' hidden' : '');
+		});
+	}
+	
+	public.updateAllClasses = function () {
+		public.updateNodeClasses();
+		public.updateLinkClasses();
+		public.updateLabelClasses();
+	}
+	
+	public.checkSvgCompatibility = function () {
+		if ( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
+			$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
+	}
+	
+	// Restyles the first row of the dependency group table to handle fullscreen mode
+	public.moveDependencyGroups = function () {
+		if (public.isFullscreen()) {
+			$('#dependencyDivId').addClass('floating');
+			setGroupTablePosition();
+		} else {
+			$('#dependencyDivId').removeClass('floating');
+			setGroupTablePosition();
+		}
+	}
+	
+	// gets the move bundle id currently selected for filtering
+	public.getFilteredBundle = function () {
+		var value = $('#planningBundleSelectId').val();
+		value = parseInt(value);
+		return value;
+	}
+	
+	// returns true if there is a move bundle selected for filtering
+	public.isBundleFilterEnabled = function () {
+		return ! isNaN(public.getFilteredBundle());
+	}
+	
+	// returns true if the node is in the bundle
+	public.isInFilteredBundle = function (node, bundle) {
+		return (node.moveBundleId && node.moveBundleId == bundle);
+	}
+	
+	
+	public.hidePanel = function (panel) {
+		if (panel == 'control') {
+			$('#controlPanel').removeClass('openPanel');
+			$('#controlPanelTabId').removeClass('activeTab');
+		} else if (panel == 'legend') {
+			$('#legendDivId').removeClass('openPanel');
+			$('#legendTabId').removeClass('activeTab');
+		}
+	}
+	
+	public.openPanel = function (panel) {
+		if (panel == 'control') {
+			$('#controlPanel').addClass('openPanel');
+			$('#controlPanelTabId').addClass('activeTab');
+		} else if (panel == 'legend') {
+			$('#legendDivId').addClass('openPanel');
+			$('#legendTabId').addClass('activeTab');
+		}
+	}
+
+	// handles switching between the control panel and the legend
+	public.togglePanel = function (panel) {
+		if (panel == 'control') {
+			if ($('#controlPanelTabId.activeTab').size() > 0)
+				public.hidePanel('control');
+			else
+				public.openPanel('control');
+			public.hidePanel('legend');
+		} else if (panel == 'legend') {
+			if ($('#legendTabId.activeTab').size() > 0)
+				public.hidePanel('legend');
+			else
+				public.openPanel('legend');
+			public.hidePanel('control');
+		} else if (panel == 'hide') {
+			public.hidePanel('control');
+			public.hidePanel('legend');
+		}
+		public.correctBothPanelSizes();
+	}
+	
+	// return the public object to make the public functions accessable
 	return public;
 	
 })(jQuery); //passed 'jQuery' global variable into local parameter '$'

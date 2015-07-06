@@ -9,7 +9,7 @@
 <g:set var="fileTabClass" value="${entity=='files' ? 'active' : ''}" />
 <g:set var="bundle" value="${dependencyBundle=='onePlus' ? '\'onePlus\'': dependencyBundle}" />
 
-<ul>	
+<ul id="depConsoleTabsId">
 	<li id="graphli" class="${graphTabClass}"><a href="javascript:getList('graph',${bundle})">Map</a></li>
 	<li id="allli" class="${allTabClass}"><a href="javascript:getList('all',${bundle})">All</a></li>
 	<li id="appli" class="${appTabClass}"><a href="javascript:getList('apps',${bundle})">Apps(${stats.app[0]})</a></li>

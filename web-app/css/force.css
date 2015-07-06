@@ -13,6 +13,7 @@ svg {
 }
 
 
+/* Graph Nodes */
 .root {
 	display: none !important;
 }
@@ -25,6 +26,8 @@ circle.node {
 }
 use.node {
 	fill: #0000ff;
+	stroke: #000000;
+	stroke-width: 1.5px;
 }
 use.node.selectedParent {
 	fill: #00ff00 !important;
@@ -35,11 +38,21 @@ use.node.selectedChild {
 use.node.cut {
 	fill: #ff0000 !important;
 }
+use.node.blackBackground {
+	stroke: #ffffff;
+}
+use.node.noEvent {
+	stroke: red;
+}
+use.node.filtered {
+	opacity: 0.5;
+}
 
+/* Graph Vectors */
 line.link {
-	stroke: #999;
+	stroke: #000000;
 	stroke-width: 1px;
-	stroke-opacity: .6;
+	stroke-opacity: .9;
 	marker-end: url(#arrowhead);
 }
 line.link.selected {
@@ -63,8 +76,9 @@ line.link.cyclical {
 	stroke-dasharray: 8,3;
 }
 line.link.cut {
-	stroke: yellow !important;
-	stroke-opacity: 0.8 !important;
+	stroke: orange !important;
+	stroke-opacity: 1 !important;
+	stroke-width: 2px !important;
 	marker-end: url(#arrowheadCut);
 }
 line.link.Future {
@@ -78,10 +92,35 @@ line.link.Validated {
 line.link.Questioned {
 	stroke: red;
 }
-line.link.NotApplicable {
-	stroke-opacity: 0.2;
+
+line.link.blackBackground {
+	stroke: #ffffff;
+	marker-end: url(#arrowheadBlackBackground);
+}
+line.link.unresolved {
+	stroke: red;
+	marker-end: url(#arrowheadUnresolved);
+}
+line.link.notApplicable {
+	stroke: #888888;
+	stroke-opacity: 0.7;
+	marker-end: url(#arrowheadNA);
+}
+line.link.notApplicable.blackBackground {
+	marker-end: url(#arrowheadNABlackBackground);
+}
+line.link.bundleConflict {
+	stroke: red;
+	stroke-opacity: 1;
+	stroke-width: 3px;
+	stroke-dasharray: 8,3;
+	marker-end: url(#arrowheadBundleConflict);
+}
+line.link.future {
+	stroke-dasharray: 2,4;
 }
 
+/* Graph Arrowheads */
 #arrowheadRedundant {
 	opacity: 0.5 !important;
 }
@@ -91,19 +130,36 @@ line.link.NotApplicable {
 #arrowheadSelected {
 	opacity: 1 !important;
 }
-
-text {
-	cursor: default;
-	fill: #ffffff;
+#arrowheadNA {
+	opacity: 0.7;
 }
-.blackText text {
+#arrowheadNABlackBackground {
+	opacity: 0.7;
+}
+
+/* Graph Labels */
+g.label text {
+	cursor: default;
 	fill: #000000;
 }
-g.selected text {
+g.label.blackBackground text {
+	fill: #ffffff;
+}
+g.label.selected text {
+	fill: #009900;
+}
+g.label.selected.blackBackground text {
 	fill: #ccffcc;
 }
-g.blackText.selected text {
-	fill: #003300;
+g.label text.labelBackground {
+	stroke: #ffffff;
+	stroke-width: 3px;
+}
+g.label.blackBackground text.labelBackground {
+	stroke: #000000;
+}
+g.label.filtered text {
+	opacity: 0.5;
 }
 
 .ui-resizable-helper {
@@ -204,6 +260,13 @@ g.blackText.selected text {
 	background-color: #DEF;
 }
 
+
+div.graphPanel:not(.openPanel) {
+	display: none;
+}
+div.graphPanel.openPanel {
+	display: block;
+}
 #controlPanel {
 	float: left;
 	border: 1px solid #008000;
@@ -226,9 +289,6 @@ g.blackText.selected text {
 
 #panelLink td {
 	border-bottom: 0px;
-}
-#panelLink td.open {
-	border-bottom: 1px solid #008000;
 }
 
 #scriptDivId {
@@ -282,14 +342,12 @@ img.pointer {
 .graphContainer.fullscreen #toolsContainerId #panelLink {
 	display: block;
 	position: relative;
-	background-color: #ffffff;
 	opacity: 0.8;
 	top: 0px;
 	left: 0px;
 }
 
 .graphContainer.fullscreen #toolsContainerId #legendDivId,.graphContainer.fullscreen #toolsContainerId #controlPanel {
-	display: block;
 	position: relative;
 	top: 0px;
 	left: 0px;
@@ -301,40 +359,92 @@ img.pointer {
 	top: 0px;
 }
 
-.graphContainer #toolsContainerId #controlPanel input[type=button] {
-	width: 85px;
+#controlPanel * {
+	vertical-align: middle;
 }
-.graphContainer #toolsContainerId #controlPanel input[type=button]:hover {
-	background-color: lightgrey;
-}
-.graphContainer #toolsContainerId #controlPanel input[type=button]:active {
-	background-color: darkgrey;
+#controlPanel table.labelTree {
+	border-width: 0px;
 }
 
-.graphContainer #toolsContainerId #controlPanel .labelToggleCol {
+#controlPanel input[type=button].halfButton {
+	width: 95px;
+}
+#controlPanel input[type=button].fullButton {
+	width: 193px;
+}
+#controlPanel input[type=button]:hover {
+	background-color: #eeeeee;
+}
+#controlPanel input[type=button]:active {
+	background-color: #cccccc;
+}
+
+#controlPanel .labelToggleCol {
 	vertical-align: middle;
 	padding-top: 0px;
 	padding-bottom: 0px;
 }
 
-.graphContainer #toolsContainerId #controlPanel .labelToggleCol  * {
+#controlPanel .labelToggleCol  * {
 	vertical-align: middle;
 }
-.graphContainer #toolsContainerId #controlPanel .labelToggleCol svg {
+#controlPanel .labelToggleCol svg {
 	padding-left: 10px;
 	width: 30px;
 	height: 30px;
 	border-width: 0px;
 }
-.graphContainer #toolsContainerId #controlPanel .labelToggleRow td:not(.labelToggleCol) * {
+#controlPanel .labelToggleRow td:not(.labelToggleCol) * {
 	float: right;
 }
-.graphContainer #toolsContainerId #mapReferenceId td:hover {
-	background-color: #eeeeee;
+#controlPanel .labelToggleRow td:not(.labelToggleCol) {
+	padding-left: 4px;
 }
-.graphContainer #toolsContainerId #mapReferenceId td:active {
+#controlPanel #colorByFormId {
+	padding-left: 4px;
+}
+#mapReferenceId {
+	border-width: 0px;
+	margin-bottom: -1px;
+}
+.graphContainer #mapReferenceId #fullscreenButtonId {
+	border: 1px solid green;
+	background-image: url(../icons/application.png);
+	background-position-x: 5px;
+	background-position-y: 50%;
+	background-repeat: no-repeat;
+	background-color: #ffffff;
+	padding-bottom: 3px;
+	padding-left: 12px;
+	margin-bottom: 4px;
+	display: block;
+	position: relative;
+	z-index: 101;
+}
+.graphContainer.fullscreen #mapReferenceId #fullscreenButtonId {
+	background-image: url(../icons/layout_content.png);
+	border-top-width: 0px;
+}
+
+#mapReferenceId td.graphPanelTab:not(.activeTab) {
 	background-color: #cccccc;
 }
+#mapReferenceId td.graphPanelTab.activeTab {
+	background-color: #ffffff;
+}
+#mapReferenceId td.graphPanelTab {
+	border: 1px solid green;
+}
+.graphContainer.fullscreen #mapReferenceId td.graphPanelTab {
+	border-top-width: 0px;
+}
+#mapReferenceId td:hover h4 {
+	text-decoration: underline !important;
+}
+#mapReferenceId tr td.spacer {
+	background-color: transparent !important;
+}
+
 
 #panelLink * {
 	white-space: nowrap;
@@ -365,7 +475,7 @@ img.pointer {
 }
 
 #spinnerDivId {
-	width: 600px;
+	width: 800px;
 	height: 300px;
 	background-image: url(../images/spinner.gif);
 	background-position: center;
@@ -386,4 +496,56 @@ img.pointer {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 32px 32px;
+}
+
+#layoutControlContainerId {
+	padding: 0px;
+	margin: 0px;
+}
+
+#twistieRowId td {
+	vertical-align: bottom;
+}
+#twistieRowId svg {
+	vertical-align: bottom;
+	background-color: #ffffff;
+}
+#twistieRowId svg:hover {
+	background-color: #cccccc;
+}
+#twistieRowId #twistieId {
+	transform-origin: 6px 6px;
+}
+#twistieRowId.open #twistieId {
+	transform: rotate(0deg);
+}
+#twistieRowId.closed #twistieId {
+	transform: rotate(-90deg);
+}
+
+#dependencyTableId {
+	position: static;
+}
+
+#dependencyDivId.floating {
+	position: fixed;
+	top: 0px;
+	left: 320px;
+	z-index: 110;
+	margin-left: 0px;
+	border: 1px solid green;
+	border-top-width: 0px;
+}
+#dependencyDivId.floating .labelColumn {
+	display: none;
+}
+#dependencyDivId.floating #dependencyTableId tr {
+	display: none;
+}
+#dependencyDivId.floating #dependencyTableId tr#dependencyGroupsRowId {
+	display: block;
+}
+
+.ui-front {
+	z-index: 120 !important;
 }

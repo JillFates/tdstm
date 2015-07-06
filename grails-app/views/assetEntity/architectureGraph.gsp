@@ -38,18 +38,15 @@
 			<span id="panelLink" style="padding: 0px;">
 				<table id="mapReferenceId">
 					<tr>
-						<td onclick="openPanel('controlPanel')"><h4>Control Panel</h4></td>
-						<td onclick="openPanel('legendDivId')"><h4>Legend</h4></td>
+						<td id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></td>
+						<td id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></td>
 						<td id="fullscreenButtonId" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></td>
 					</tr>
 				</table>
 			</span>
 		
-			<div id="controlPanel" style="display: ${/*(showControls=='controls')?('block'):('none')*/'block'};">
+			<div id="controlPanel" class="graphPanel openPanel">
 				<table id="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
-					<tr>
-						<td style="padding: 3px 3px;" colspan="2"><h3>Control Panel</h3></td>
-					</tr>
 					<form style="display:inline-block;" id="graphFormId">
 						<tr title="Sets the asset to use as the root node">
 							<td class="controlPanelLabel">Asset</td>
@@ -123,7 +120,7 @@
 				</table>
 			</div>
 			
-			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true]}" />
+			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:false]}" />
 		</div>
 		<div id="svgContainerId"></div>
 		<div id="spinnerDivId" style="display: none"></div>
@@ -222,26 +219,6 @@
 	// loads the graph code into the DOM
 	function loadGraph (response) {
 		$('#svgContainerId').html(response.responseText);
-	}
-	
-	// handles switching between the control panel and the legend
-	function openPanel (source) {
-		if ( $('#'+source).css('display') == 'block' ) {
-			$('#'+source).css('display', 'none')
-		} else if (source == 'controlPanel') {
-			$('#controlPanel').css('display','block')
-			$('#legendDivId').css('display','none')
-		} else if (source == 'legendDivId') {
-			if (GraphUtil.graphExists()) {
-				$('#controlPanel').css('display','none')
-				$('#legendDivId').css('display','block')
-			} else {
-				
-			}
-		} else if (source == 'hide') {
-			$('#controlPanel').css('display','none')
-			$('#legendDivId').css('display','none')
-		}
 	}
 	
 	function modifyParameter (action, element) {

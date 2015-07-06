@@ -14,11 +14,10 @@ line.link.cut {
 </style>
 <script type="text/javascript">
 // If there is already an instance of force running in memory, it should be stopped before creating this one
-if (force != null) {
-	console.log("Force is not null, force="+force)
-	force.stop()
+if (GraphUtil.force != null) {
+	GraphUtil.force.stop()
 }
-force = d3.layout.force();
+GraphUtil.force = d3.layout.force();
 var canvas = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
@@ -34,18 +33,11 @@ $(window).resize( function(a, b) {
 	GraphUtil.resetGraphSize();
 });
 
-var maxCutAttempts = $('#maxCutAttemptsId').val();
-if (isNaN(maxCutAttempts))
-	maxCutAttempts = 200;
+var maxCutAttempts = ${defaults.maxCutAttempts};
 var maxEdgeCount = $('#maxEdgeCountId').val();
 if (isNaN(maxEdgeCount))
 	maxEdgeCount = 4;
-$('#maxCutAttemptsId').on('change', function (e) {
-	var newVal = parseInt(e.target.value);
-	if (!isNaN(newVal))
-		maxCutAttempts = newVal;
-});
-$('#maxEdgeCountId').on('change', function (e) {
+$('#maxEdgeCountId').unbind('change').on('change', function (e) {
 	var newVal = parseInt(e.target.value);
 	if (!isNaN(newVal))
 		maxEdgeCount = newVal;
@@ -54,22 +46,26 @@ $('#maxEdgeCountId').on('change', function (e) {
 var zoomBehavior;
 var vis = canvas;
 var background;
-var label;
 var defaults = ${defaultsJson};
+var defaultPrefs = ${defaultPrefs};
 var selectedBundle = '${dependencyBundle}';
 var assetTypes = ${assetTypes};
 var links = ${links};
 var nodes = ${nodes};
+var depBundles = ${depBundleMap};
 var moveBundles = ${moveBundleMap};
+var moveEvents = ${moveEventMap};
 
 var cutLinks = [];
 var cutNodes = [];
 var graphstyle = "z-index:-1;";
 var fill = d3.scale.category10();
+var fillMode = 'bundle';
 var gravity = ${multiple ? 0.05 : 0};
 var distanceIntervals = 500;
 var floatMode = false;
 var maxWeight;
+var maxFamilyWeights = [];
 var groupCount = 1;
 
 var nodeSelected = -1;
@@ -88,11 +84,9 @@ var nameList = getExpanededLabels();
 var progressBarCancelDisplayed = false;
 var cancelCut = false;
 
-			
+
 // Build the layout model
 function buildMap (charge, linkSize, friction, theta, width, height) {
-	
-	console.log('building map with a height of ' + height + ' pixels');
 	
 	// Use the new parameters, or the defaults if not specified
 	var charge 	 =	( charge	? charge 	: defaults['force'] 	);
@@ -146,7 +140,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	// fires on mousedown on a node
 	function dragstart (d, i) {
-		startAlpha = force.alpha();
+		startAlpha = GraphUtil.force.alpha();
 		dragging = true;		
 		clicked = true;
 		d3.event.sourceEvent.preventDefault();
@@ -157,8 +151,8 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	function dragmove (d, i) {
 		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
 			startAlpha = Math.min(startAlpha+0.005, 0.1);
-			if (force.alpha() < startAlpha) {
-				force.alpha(startAlpha);
+			if (GraphUtil.force.alpha() < startAlpha) {
+				GraphUtil.force.alpha(startAlpha);
 			}
 			
 			d.x += d3.event.dx;
@@ -209,6 +203,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		return;
 	}
 	
+	// updates the current fillMode
+	fillMode = GraphUtil.getFillMode();
+	
 	// Start each node in the center of the map
 	$.each(nodes, function() {
 		this.x = width/2+10*Math.random();
@@ -229,7 +226,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.on("dblclick.zoom", null);
 	
 	// Create the force layout
-	force
+	GraphUtil.force
 		.nodes(nodes)
 		.links(links)
 		.gravity(gravity)
@@ -242,15 +239,12 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.start();
 	
 	// Add the links the the SVG
-	var link = vis.selectAll("line.link")
+	GraphUtil.linkBindings = vis.selectAll("line.link")
 		.data(links).enter()
 		.append("svg:line")
-			// TM-3722	
-			.style("stroke", function(d) {return d.statusColor;})
-			.style("stroke-opacity", function (d) { return d.opacity;})
-			.attr("fillColor", function(d) { return d.statusColor; })
+		
 			.attr("width", function(d) { return '1px' })
-			.attr("class", function(d) { return 'link'})
+			.attr("class", function(d) { return 'link' })
 			.attr("id", function(d) { return 'link-'+d.source.index+'-'+d.target.index })
 			.attr("x1", function(d) { return d.source.x;})
 			.attr("y1", function(d) { return d.source.y;})
@@ -258,11 +252,11 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("y2", function(d) { return d.target.y;});
 	
 	// Add the nodes to the SVG
-	var node = vis.selectAll("use")
+	GraphUtil.nodeBindings = vis.selectAll("use")
 		.data(nodes).enter()
 	
 	// Create the nodes
-	node = node
+	GraphUtil.nodeBindings = GraphUtil.nodeBindings
 		.append("use")
 			.attr("xlink:href", function (d) {
 				return '#' + assetTypes[d.type] + 'ShapeId';
@@ -280,39 +274,41 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 				return getEntityDetails('planningConsole', 'Server', d.id);
 			})
 			.on("mousedown", mousedown)
-			.attr("fix", false)
 			.attr("id", function(d) { return 'node-'+d.index })
 			.style('cursor', 'default')
-			.attr("fillColor", function(d) {
-				return fill(d.group);
-			})
 			.style("fill", function(d) {
-				return fill(d.group);
+				return GraphUtil.getFillColor(d, fill, fillMode);
 			})
-			.style("stroke", function(d) {
-				return d.color;
-			})
-			.style("stroke-width", '2px')
 			.attr("cx", 0)
 			.attr("cy", 0)
 			.attr("transform", "translate(0, 0)");
 			
-	node.append("title").text(function(d){ return d.title });
+	GraphUtil.nodeBindings.append("title").text(function(d){ return d.title });
 	
 	// Create the labels
-	label = vis.selectAll("g.node")
+	GraphUtil.labelBindings = vis.selectAll("g.node")
 		.data(nodes).enter()
 		.append("svg:g")
 		.attr("cx", 0)
 		.attr("cy", 0)
 		.attr("transform", "translate(0, 0)");
 	
-	if (backgroundColor == '#ffffff')
-		label.attr("class", "node nodeLabel blackText")
-	else
-		label.attr("class", "node nodeLabel")
+	GraphUtil.labelBindings.attr("class", "label")
 	
-	label.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+		.attr("id", function (d) {
+			return "label2-" + d.id;
+		})
+		.attr("class", "ignoresMouse labelBackground")
+		.attr("dx", 12)
+		.attr("dy",".35em")
+		.text(function(d) {
+			if (d.name && d.name.length > 12)
+				return d.name.substr(0, 12) + '...';
+			return d.name;
+		});
+	
+	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 		.attr("id", function (d) {
 			return "label-" + d.id;
 		})
@@ -320,12 +316,42 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("dx", 12)
 		.attr("dy",".35em")
 		.text(function(d) {
-			return (nameList[assetTypes[d.type]])?(d.name):('');
+			if (d.name && d.name.length > 12)
+				return d.name.substr(0, 12) + '...';
+			return d.name;
 		});
 	
+	GraphUtil.force.nodes().each(function (o, i) {
+		o.showLabel = nameList[assetTypes[o.type]];
+	});
+	
+	// Update the classes for all data bound svg objects
+	GraphUtil.updateAllClasses();
+	
+	// bind the "color by" radio buttons
+	$('#colorByFormId').children().unbind('change').on('change', function (e) {
+		fillMode = GraphUtil.getFillMode();
+		GraphUtil.nodeBindings.style("fill", function(d) {
+			return GraphUtil.getFillColor(d, fill, fillMode);
+		});
+		if (fillMode == 'group')
+			GraphUtil.updateLegendColorKey(depBundles, fill, fillMode);
+		else if (fillMode == 'bundle')
+			GraphUtil.updateLegendColorKey(moveBundles, fill, fillMode);
+		else
+			GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode);
+	});
+	
+	
+	// bind the show budle conflicts checkbox
+	$('#bundleConflictsId').unbind('change').on('change', function (e) {
+		GraphUtil.updateLinkClasses();
+		GraphUtil.updateNodeClasses();
+	});
 	
 	// Load the move bundles into the legend
-	GraphUtil.addMoveBundlesToLegend(moveBundles, fill);
+	$('#colorByFormId').children(':checked').trigger('change');
+	
 	
 	// Calculate the maximum weight value, which is used during the tick function
 	var maxWeight = 1
@@ -336,7 +362,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	// set up the node families
 	var nodeFamilies = GraphUtil.setNodeFamilies(nodes);
-	var maxFamilyWeights = [];
+	maxFamilyWeights = [];
 	nodeFamilies.each(function (family, i) {
 		var maxWeight = 1;
 		family.each(function (node, i) {
@@ -346,157 +372,144 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	});
 	if (nodeFamilies.size() < 5)
 		gravity = 0;
-	force.gravity(gravity);
+	GraphUtil.force.gravity(gravity);
 	
 	// run some initial ticks before displaying the graph
-	force.on("tick", simpleTick);
+	GraphUtil.force.on("tick", simpleTick);
 	if (nodes.size() < 500)
 		calmTick(50);
 	else
 		calmTick(20);
-	force.on("tick", tick);
-	force.tick();
+	GraphUtil.force.on("tick", tick);
+	GraphUtil.force.tick();
 	
 	// Move the background to the correct place in the DOM
 	background.remove();
+}
+
+// Tick function without svg manipulation
+function simpleTick (e) {
+	if ( gravity == 0 && ! floatMode ) {
+		var k = e.alpha;
+		$(nodes).each(function(i, o) {
+			k = e.alpha;
+			if (! o.fix) {
+				if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
+					k = 0;
+				o.y += (heightCurrent / 2 - o.y) * k;
+				o.x += (widthCurrent / 2 - o.x) * k;
+			}
+		});
+	}
+}
+
+// Updates the dynamic attributes of the svg elements every tick of the simulation
+function tick (e) {
+	// move each node towards the center
+	if ( gravity == 0 && ! floatMode ) {
+		var k = e.alpha;
+		$(nodes).each(function(i, o) {
+			k = e.alpha;
+			if (! o.fix) {
+				if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
+					k = 0;
+				o.y += (heightCurrent / 2 - o.y) * k;
+				o.x += (widthCurrent / 2 - o.x) * k;
+			}
+		});
+	}
 	
-	// Toggles selection of a node
-	function toggleNodeSelection (id) {
-		if (nodeSelected == -1 && id == -1)
-			return; // No node is selected, so there is nothing to deselect
-		
-		var node = force.nodes()[id];
-		var selecting = true;
-		
-		if (nodeSelected == id) {
-			// deselecting
-			selecting = false;
-			nodeSelected = -1;
-		} else {
-			// selecting
-			if (nodeSelected != -1)
-				toggleNodeSelection(nodeSelected); // Another node is selected, so deselect that one first
-			nodeSelected = id;
+	var d = null;
+	
+	// set the dynamic attributes for the nodes
+	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
+		d = o.__data__;
+		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+		o.cx = o.x;
+		o.cy = o.y;
+		if (d.cut == 2) {
+			d.cut = 3;
+			o.fillColor = GraphUtil.getFillColor(d, fill, fillMode);
+			o.style.fill = GraphUtil.getFillColor(d, fill, fillMode);
 		}
+	});
+	
+	// set the dynamic attributes for the links
+	$(GraphUtil.linkBindings[0]).each(function (i, o) {
+		d = o.__data__;
+		o.x1.baseVal.value = d.source.x;
+		o.y1.baseVal.value = d.source.y;
+		o.x2.baseVal.value = d.target.x;
+		o.y2.baseVal.value = d.target.y;
+		if (d.cut == 2) {
+			d.cut = 3;
+			o.classList.add('cut');
+		}
+	});
+	
+	// set the dynamic attributes for the labels
+	$(GraphUtil.labelBindings[0]).each(function (i, o) {
+		d = o.__data__;
+		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
+	});
+}
+
+// Toggles selection of a node
+function toggleNodeSelection (id) {
+	if (nodeSelected == -1 && id == -1)
+		return; // No node is selected, so there is nothing to deselect
+	
+	var node = GraphUtil.force.nodes()[id];
+	
+	console.log(node);
+	
+	// check if we are selecting or deselecting
+	if (nodeSelected == id) {
+		// deselecting
+		nodeSelected = -1;
 		
+		// The funtion is deselecting a node, so remove the selected class from all elements
+		GraphUtil.force.links().each(function (link, i) {
+			link.selected = 0;
+		});
+		GraphUtil.force.nodes().each(function (node, i) {
+			node.selected = 0;
+		});
+		
+	} else {
+		// selecting
+		if (nodeSelected != -1)
+			toggleNodeSelection(nodeSelected); // Another node is selected, so deselect that one first
+		nodeSelected = id;
+	
 		// Style the selected node
-		var classes = d3.selectAll('svg g g use').filter('#node-'+node.index)[0][0].classList;
-		classes.add('selected');
-		classes.add('selectedParent');
-		$('svg g g g text').filter('#label-'+node.id).parent()[0].classList.add('selected');
+		node.selected = 2;
 		
 		// Style the dependencies of the selected node
 		var useTarget = true;
 		$.each(node.dependsOn, styleDependencies);
 		useTarget = false;
 		$.each(node.supports, styleDependencies);
-		
 		function styleDependencies (index, linkIndex) {
-			var link = force.links()[linkIndex];
+			var link = GraphUtil.force.links()[linkIndex];
 			var childNode = (useTarget)?(link.target):(link.source);
-			var classes = d3.selectAll('svg g g use').filter('#node-'+childNode.index)[0][0].classList;
-			classes.add('selected');
-			classes.add('selectedChild');
-			$('svg g g g text').filter('#label-'+childNode.id).parent()[0].classList.add('selected');
-			d3.selectAll('svg g g line').filter('#link-'+link.source.index+'-'+link.target.index)[0][0].classList.add('selected');
-		}
-		
-		// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-		if (selecting) {
-			var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
-			selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-				.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-				.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
-			selection.order();
-		} else { // The funtion is deselected a node, so remove the selected class from all elements
-			d3.selectAll('svg g g line').filter('.selected')[0].each(function(o){
-				o.classList.remove('selected');
-			})
-			d3.selectAll('svg g g use').filter('.selected')[0].each(function(o){
-				o.classList.remove('selected');
-				o.classList.remove('selectedParent');
-				o.classList.remove('selectedChild');
-			})
-			d3.selectAll('svg g g g').filter('.selected')[0].each(function(o){
-				o.classList.remove('selected');
-			})
-		}
-		
-		// run a tick to update the graph
-		force.tick();
-	}
-	
-	// Tick function without svg manipulation
-	function simpleTick (e) {
-		if ( gravity == 0 && ! floatMode ) {
-			var k = e.alpha;
-			$(nodes).each(function(i, o) {
-				k = e.alpha;
-				if (! o.fix) {
-					if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
-						k = 0;
-					o.y += (heightCurrent / 2 - o.y) * k;
-					o.x += (widthCurrent / 2 - o.x) * k;
-				}
-			});
+			link.selected = 1;
+			childNode.selected = 1;
 		}
 	}
 	
-	// Updates the dynamic attributes of the svg elements every tick of the simulation
-	function tick (e) {
-		// move each node towards the center
-		if ( gravity == 0 && ! floatMode ) {
-			var k = e.alpha;
-			$(nodes).each(function(i, o) {
-				k = e.alpha;
-				if (! o.fix) {
-					if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
-						k = 0;
-					o.y += (heightCurrent / 2 - o.y) * k;
-					o.x += (widthCurrent / 2 - o.x) * k;
-				}
-			});
-		}
-		var d = null;
-		// set the dynamic attributes for the nodes
-		$(node[0]).each(function (i, o) {
-			d = o.__data__;
-			o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-			o.cx = o.x;
-			o.cy = o.y;
-			if (d.cut == 2) {
-				d.cut = 3;
-				o.fillColor = fill(d.group);
-				o.style.fill = fill(d.group);
-			}
-		});
-		
-		// set the dynamic attributes for the links
-		$(link[0]).each(function (i, o) {
-			d = o.__data__;
-			o.x1.baseVal.value = d.source.x;
-			o.y1.baseVal.value = d.source.y;
-			o.x2.baseVal.value = d.target.x;
-			o.y2.baseVal.value = d.target.y;
-			if (d.cut == 2) {
-				d.cut = 3;
-				o.classList.add('cut');
-			} else if (d.cut != 3) {
-				o.style.stroke = d.statusColor;
-			}
-		});
-		
-		// set the dynamic attributes for the labels
-		$(label[0]).each(function (i, o) {
-			d = o.__data__;
-			o.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
-		});
-	}
+	GraphUtil.updateAllClasses();
+	
+	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
+	var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
+	selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
+		.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
+		.concat(d3.selectAll('svg g g line').filter('.selected')[0])
+		.concat(d3.selectAll('svg g g use').filter('.selected')[0])
+		.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
+		.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+	selection.order();
 }
-
 
 // Used to rebuild the layout using the new parameters
 function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height, labels) {
@@ -512,49 +525,36 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 	}
 	
 	// handle the background color
-	backgroundColor = $('#blackBackgroundId').is(':checked') ? '#000000' : '#ffffff'
+	var blackBackground = $('#blackBackgroundId').is(':checked');
+	backgroundColor = blackBackground ? '#000000' : '#ffffff'
 	canvas.style('background-color', backgroundColor)
 	background.attr('fill', backgroundColor)
 	
 	// Create the force layout
-	force
+	GraphUtil.force
 		.linkDistance(linkSize)
 		.friction(friction)
 		.charge(charge)
 		.theta(theta);
 	
-	// Delete all labels currently drawn
-	vis
-		.selectAll("text")
-		.remove();
-	
 	// Reset the list of types to show names for
 	nameList = getExpanededLabels();
 	
-	// Add the new labels
-	label
-		.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
-		.attr("id", function (d) {
-			return "label-" + d.id;
-		})
-		.attr("class", "ignoresMouse")
-		.attr("dx", 8)
-		.attr("dy",".35em")
-		.text(function(d) {
-			return (nameList[assetTypes[d.type]])?(d.name):('');
-		});
-		
-	if (backgroundColor == '#ffffff') {
-		label.attr("class", "node nodeLabel blackText")
-	} else {
-		label.attr("class", "node nodeLabel")
-	}
+	GraphUtil.force.nodes().each(function (o, i) {
+		o.showLabel = nameList[assetTypes[o.type]];
+	});
+	
+	// Update the classes for all data bound svg objects
+	GraphUtil.updateAllClasses();
+	
+	// updates the current fillMode
+	fillMode = GraphUtil.getFillMode();
 	
 	// if we only changed the labels or background color, only one tick is needed to reflect this change
 	if (layoutChanged)
-		force.start();
+		GraphUtil.force.start();
 	else
-		force.tick();
+		GraphUtil.force.tick();
 }
 
 function resizeGraph (width, height) {
@@ -565,7 +565,7 @@ function resizeGraph (width, height) {
 		.attr("width", width)
 		.attr("height", height);
 	
-	force
+	GraphUtil.force
 		.size([width, height])
 		.start();
 }
@@ -573,7 +573,7 @@ function resizeGraph (width, height) {
 // calls the tick function n times without letting the browser paint in between
 function calmTick (n) {
 	for (var i = 0; i < n; ++i) {
-		force.tick();
+		GraphUtil.force.tick();
 	}
 }
 
@@ -804,7 +804,7 @@ function cutAndRemove () {
 			}
 			
 			// update the graph for the modified link list
-			force.links(links)
+			GraphUtil.force.links(links)
 				.gravity(0.05)
 				.alpha(0.1);
 		
@@ -825,22 +825,66 @@ function undoCuts () {
 
 // Used by the defaults button to reset all control values to their default state
 function resetToDefaults () {
-	$('#labelTree input[type="text"]').each(function() {
+	// resets the force layout parameters
+	$('table.labelTree input[type="text"]').each(function() {
 		if (defaults[$(this).attr('name')])
 			$(this).val( defaults[$(this).attr('name')] )
 	});
+	
+	// deletes the user's graph preferences from the database
+	jQuery.ajax({
+		url:contextPath+'/assetEntity/removeUserGraphPrefs'
+	});
+	
+	// resets the graph preferences
+	var inputs = $('#preferencesformId input:not([type="button"]),#preferencesformId select');
+	inputs.each(function (i, o) {
+		var name = $(o).attr('name');
+		var type = $(o).attr('type');
+		var defaultValue = defaultPrefs[name];
+		if (defaultValue != undefined) {
+			if (type == 'checkbox') {
+				$(o).prop('checked', defaultValue)
+			} else if (type == 'text' || type == undefined) {
+				$(o).val(defaultValue)
+			} else if (type == 'radio') {
+				$(o).prop('checked', ($(o).val() == defaultValue))
+			}
+		} else {
+			$(o).prop('checked', false)
+		}
+	});
+	
+	// rebuild the map with the parameters
 	rebuildMap(true);
+}
+
+// Sets the user's graph preferences to the current values in the control panel
+function updateUserPrefs () {
+	var form = $('#preferencesformId');
+	var prefsArray = form.serializeArray();
+	var prefsObject = {};
+	prefsArray.each(function (pref, i) {
+		prefsObject[pref.name] = pref.value;
+	});
+	
+	jQuery.ajax({
+		url:contextPath+'/assetEntity/setImportPerferences',
+		data:{'preference':'depGraph', 'value':JSON.stringify(prefsObject)}
+	});
 }
 
 // Stops the map by setting the alpha value to 0
 function stopMap () {
-	force.stop()
+	GraphUtil.force.stop()
 }
 
 // gets the normal width of this graph
 function getStandardWidth () {
 	var graphOffset = $('#svgContainerId').offset().left;
 	var pageWidth = $(window).width();
+	if (GraphUtil.isFullscreen())
+		return pageWidth;
 	return pageWidth - graphOffset * 2;
 }
 
@@ -849,6 +893,8 @@ function getStandardHeight () {
 	var bottomMargin = $('#svgContainerId').offset().left;
 	var graphOffset = $('#svgContainerId').offset().top;
 	var pageHeight = $(window).height();
+	if (GraphUtil.isFullscreen())
+		return pageHeight;
 	return pageHeight - graphOffset - bottomMargin;
 }
 

@@ -8,7 +8,7 @@
 
 <div class="tabs">
 	<g:render template="depConsoleTabs" model="${[entity:entity, stats:stats, dependencyBundle:dependencyBundle]}"/>
-	<div id ="selectionFilesId">
+	<div id="selectionFilesId" class="tabControls">
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="files" />
 		<tds:hasPermission permission='MoveBundleEditView'>
