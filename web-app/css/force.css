@@ -261,31 +261,6 @@ g.label.filtered text {
 }
 
 
-div.graphPanel:not(.openPanel) {
-	display: none;
-}
-div.graphPanel.openPanel {
-	display: block;
-}
-#controlPanel {
-	float: left;
-	border: 1px solid #008000;
-	border-top: 0px;
-	margin-left: 0px;
-	margin-top: 0px;
-	background-color: white;
-	position: absolute;
-	min-width: 120px;
-}
-#legendDivId {
-	float: left;
-	border: 1px solid #008000;
-	border-top: 0px;
-	margin-left: 0px;
-	margin-top: 0px;
-	background-color: white;
-	position: absolute;
-}
 
 #panelLink td {
 	border-bottom: 0px;
@@ -318,7 +293,6 @@ img.pointer {
 	background-color: #ffffff;
 	width: 0px;
 	padding: 0px;
-	z-index: 105;
 }
 .fullscreen svg {
 	border-width: 0px;
@@ -336,20 +310,17 @@ img.pointer {
 	left: 0px;
 	display: block;
 	position: fixed;
-	z-index: 106;
 }
 
 .graphContainer.fullscreen #toolsContainerId #panelLink {
-	display: block;
-	position: relative;
 	opacity: 0.8;
 	top: 0px;
 	left: 0px;
 }
 
 .graphContainer.fullscreen #toolsContainerId #legendDivId,.graphContainer.fullscreen #toolsContainerId #controlPanel {
-	position: relative;
-	top: 0px;
+	margin-top: -1px;
+	top: 25px;
 	left: 0px;
 }
 
@@ -359,6 +330,7 @@ img.pointer {
 	top: 0px;
 }
 
+/* control panel stuff */
 #controlPanel * {
 	vertical-align: middle;
 }
@@ -403,9 +375,50 @@ img.pointer {
 #controlPanel #colorByFormId {
 	padding-left: 4px;
 }
+.plusMinusIcon:hover {
+	-webkit-filter: saturate(1.5);
+	filter: saturate(1.5);
+}
+.plusMinusIcon:active {
+	-webkit-filter: saturate(10);
+	filter: saturate(10);
+}
+
+
+div.graphPanel:not(.openPanel) {
+	display: none;
+}
+div.graphPanel.openPanel {
+	display: block;
+}
+#controlPanel {
+	float: left;
+	border: 1px solid #008000;
+	margin-left: 0px;
+	margin-top: 0px;
+	background-color: white;
+	position: absolute;
+	min-width: 120px;
+	padding-top: 10px;
+}
+#legendDivId {
+	float: left;
+	border: 1px solid #008000;
+	margin-left: 0px;
+	margin-top: 0px;
+	background-color: white;
+	position: absolute;
+	padding-top: 10px;
+}
+
 #mapReferenceId {
 	border-width: 0px;
 	margin-bottom: -1px;
+	padding: 0px;
+}
+#mapReferenceId div {
+	border: 1px solid green;
+	display: inline-block;
 }
 .graphContainer #mapReferenceId #fullscreenButtonId {
 	border: 1px solid green;
@@ -414,48 +427,63 @@ img.pointer {
 	background-position-y: 50%;
 	background-repeat: no-repeat;
 	background-color: #ffffff;
+	padding-top: 3px;
 	padding-bottom: 3px;
-	padding-left: 12px;
+	padding-left: 25px;
+	padding-right: 8px;
 	margin-bottom: 4px;
-	display: block;
+	margin-left: 20px;
+	display: inline-block;
 	position: relative;
 	z-index: 101;
+}
+.graphContainer #mapReferenceId #fullscreenButtonId:hover {
+	background-color: #eeeeee;
 }
 .graphContainer.fullscreen #mapReferenceId #fullscreenButtonId {
 	background-image: url(../icons/layout_content.png);
 	border-top-width: 0px;
 }
-
-#mapReferenceId td.graphPanelTab:not(.activeTab) {
+#mapReferenceId div.graphPanelTab:not(.activeTab) {
 	background-color: #cccccc;
 }
-#mapReferenceId td.graphPanelTab.activeTab {
+#mapReferenceId div.graphPanelTab.activeTab {
 	background-color: #ffffff;
+	margin-bottom: -1px;
+	padding-bottom: 6px;
 }
-#mapReferenceId td.graphPanelTab {
+#mapReferenceId div.graphPanelTab:not(.activeTab):hover {
+	background-color: #bbbbbb;
+}
+#mapReferenceId div.graphPanelTab.activeTab:hover {
+	background-color: #eeeeee;
+}
+#mapReferenceId div.graphPanelTab {
 	border: 1px solid green;
+	border-bottom: 0px;
+	margin-bottom: 0px;
+	padding-left: 8px;
+	padding-right: 8px;
+	position: relative;
+	/*z-index: 92 !important;*/
 }
-.graphContainer.fullscreen #mapReferenceId td.graphPanelTab {
+#mapReferenceId div.graphPanelTab:nth-last-child(n) {
+	z-index: 92 !important;
+}
+.graphContainer.fullscreen #mapReferenceId div.graphPanelTab:not(.activeTab) {
+	border-bottom: 1px solid green;
+}
+.graphContainer.fullscreen #mapReferenceId div.graphPanelTab.activeTab {
+	padding-bottom: 7px;
+}
+.graphContainer.fullscreen #mapReferenceId div.graphPanelTab {
 	border-top-width: 0px;
 }
-#mapReferenceId td:hover h4 {
-	text-decoration: underline !important;
-}
-#mapReferenceId tr td.spacer {
+#mapReferenceId div.spacer {
 	background-color: transparent !important;
 }
-
-
-#panelLink * {
-	white-space: nowrap;
-}
-.plusMinusIcon:hover {
-	-webkit-filter: saturate(1.5);
-	filter: saturate(1.5);
-}
-.plusMinusIcon:active {
-	-webkit-filter: saturate(10);
-	filter: saturate(10);
+#mapReferenceId div.graphPanelTab#legendTabId {
+	border-left-width: 0px;
 }
 
 .hidden {

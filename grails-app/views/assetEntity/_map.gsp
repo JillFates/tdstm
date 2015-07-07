@@ -1,20 +1,17 @@
 <div id="toolsContainerId">
 	<span id="panelLink" colspan="2" style="padding: 0px;">
-		<table id="mapReferenceId">
-			<tr>
-				<td id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></td>
-				<td id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></td>
-				<td class="spacer" ></td>
-				<td id="fullscreenButtonId" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></td>
-			</tr>
-		</table>
+		<div id="mapReferenceId">
+			<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
+			--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
+			<div id="fullscreenButtonId" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+		</div>
 	</span>
 	<div id="controlPanel" class="graphPanel">
 		<form id="preferencesformId">
 			<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
 				<tr>
 					<td colspan="3" style="padding: 0px;">
-						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton" onclick="stopMap()">
+						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton" onclick="GraphUtil.toggleFreeze()">
 					</td>
 				</tr>
 				

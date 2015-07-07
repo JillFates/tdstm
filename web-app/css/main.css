@@ -637,7 +637,7 @@ svg {
 	border-collapse: collapse;
 	border-bottom: 0px;
 }
-#mapReferenceId tr td:not(.spacer) {
+#mapReferenceId div:not(.spacer) {
 	border-left: 1px solid green;
 	border-right: 1px solid green;
 	text-align: center;

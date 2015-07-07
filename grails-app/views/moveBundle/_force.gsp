@@ -150,11 +150,6 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	// fires when the user drags a node
 	function dragmove (d, i) {
 		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
-			startAlpha = Math.min(startAlpha+0.005, 0.1);
-			if (GraphUtil.force.alpha() < startAlpha) {
-				GraphUtil.force.alpha(startAlpha);
-			}
-			
 			d.x += d3.event.dx;
 			d.y += d3.event.dy;
 			d.px = d.x;
@@ -163,6 +158,14 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			d.fix = true;
 			d.fixed = true;
 			clicked = false;
+			
+			startAlpha = Math.min(startAlpha+0.005, 0.1);
+			if (GraphUtil.force.alpha() < startAlpha) {
+				if (!GraphUtil.setAlpha(0.1)) {
+					GraphUtil.updateNodePosition(d);
+				}
+			}
+			
 			d3.event.sourceEvent.preventDefault();
 			d3.event.sourceEvent.stopPropagation();
 		}
@@ -235,8 +238,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.friction(friction)
 		.charge(charge)
 		.size([width, height])
-		.theta(theta)
-		.start();
+		.theta(theta);
+	
+	GraphUtil.startForce();
 	
 	// Add the links the the SVG
 	GraphUtil.linkBindings = vis.selectAll("line.link")
@@ -324,6 +328,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	GraphUtil.force.nodes().each(function (o, i) {
 		o.showLabel = nameList[assetTypes[o.type]];
 	});
+	
+	// add pointers to the bound elements
+	GraphUtil.addBindingPointers();
 	
 	// Update the classes for all data bound svg objects
 	GraphUtil.updateAllClasses();
@@ -552,7 +559,7 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 	
 	// if we only changed the labels or background color, only one tick is needed to reflect this change
 	if (layoutChanged)
-		GraphUtil.force.start();
+		GraphUtil.startForce();
 	else
 		GraphUtil.force.tick();
 }
@@ -566,8 +573,9 @@ function resizeGraph (width, height) {
 		.attr("height", height);
 	
 	GraphUtil.force
-		.size([width, height])
-		.start();
+		.size([width, height]);
+	
+	GraphUtil.startForce();
 }
 	
 // calls the tick function n times without letting the browser paint in between
@@ -804,9 +812,8 @@ function cutAndRemove () {
 			}
 			
 			// update the graph for the modified link list
-			GraphUtil.force.links(links)
-				.gravity(0.05)
-				.alpha(0.1);
+			GraphUtil.force.links(links).gravity(0.05);
+			GraphUtil.setAlpha(0.1);
 		
 		// no cuts could be found for the constraints, so update the user
 		} else {

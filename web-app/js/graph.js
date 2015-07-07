@@ -66,7 +66,7 @@ var GraphUtil = (function ($) {
 	// changes the graph to fullscreen mode
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Normal Mode');
+		$('#fullscreenButtonId').children('h4').html('Normal View');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -362,6 +362,92 @@ var GraphUtil = (function ($) {
 			public.hidePanel('legend');
 		}
 		public.correctBothPanelSizes();
+	}
+	
+	// returns true if the graph is frozen
+	public.isFrozen = function () {
+		return $('#playPauseButtonId').hasClass('enabled');
+	}
+	
+	public.enableFreeze = function () {
+		$('#playPauseButtonId')
+			.addClass('enabled')
+			.attr('value', 'Resume Graph');
+		public.force.stop();
+	}
+	
+	public.disableFreeze = function () {
+		$('#playPauseButtonId')
+			.removeClass('enabled')
+			.attr('value', 'Freeze Graph');
+		public.force.resume();
+	}
+	
+	public.toggleFreeze = function () {
+		if (public.isFrozen()) {
+			public.disableFreeze();
+		} else {
+			public.enableFreeze();
+		}
+	}
+	
+	// sets the alpha if the graph is not frozen
+	public.setAlpha = function (alpha) {
+		if ( ! public.isFrozen() )
+			public.force.alpha(alpha);
+		else
+			return false;
+		return true;
+	}
+	
+	// adds references back from the data objects to their bound elements
+	public.addBindingPointers = function () {
+		for (var i = 0; i < public.nodeBindings.size(); i++) {
+			var element = public.nodeBindings.first()[i];
+			element.__data__.nodeElement = d3.select(element);
+		}
+		for (var i = 0; i < public.labelBindings.size(); i++) {
+			var element = public.labelBindings.first()[i];
+			element.__data__.labelElement = d3.select(element);
+		}
+		for (var i = 0; i < public.linkBindings.size(); i++) {
+			var element = public.linkBindings.first()[i];
+			element.__data__.linkElement = d3.select(element);
+		}
+	}
+	
+	// gets a list of all links adjacent to this node
+	public.getAdjacentLinks = function (node) {
+		var list = [];
+		for (var i = 0; i < public.linkBindings.first().size(); i++) {
+			var link = public.linkBindings.first()[i].__data__;
+			if (link.source == node || link.target == node)
+				list.push(link);
+		}
+		
+		return list;
+	}
+	
+	public.updateNodePosition = function (node) {
+		node.nodeElement.attr('transform', 'translate(' + node.x + ' ' + node.y + ')');
+		node.nodeElement.attr('cx', node.x);
+		node.nodeElement.attr('cy', node.y);
+		var links = public.getAdjacentLinks(node);
+		for (var i = 0; i < links.size(); i++) {
+			var l = links[i];
+			var element = l.linkElement;
+			element.attr('x1', l.source.x);
+			element.attr('y1', l.source.y);
+			element.attr('x2', l.target.x);
+			element.attr('y2', l.target.y);
+		}
+		node.labelElement.attr('transform', 'translate(' + node.x + ' ' + node.y + ')');
+	}
+	
+	// unfreezes the graph and starts the force layout
+	public.startForce = function () {
+		public.disableFreeze();
+		public.force.start();
 	}
 	
 	// return the public object to make the public functions accessable

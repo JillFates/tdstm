@@ -959,17 +959,25 @@ td .label_sm {
     padding: 5px;
 
 }
-.depGroup {
+
+
+div#dependencyDivId tr.odd td {
+	background-color: #e0e0e0;
+}
+div#dependencyDivId tr.even td {
+	background-color: #ffffff;
+}
+div#dependencyDivId tr.odd td.depGroup {
 	cursor: pointer;
 	color: grey;
 }
-.depGroupConflict {
+div#dependencyDivId tr.odd td.depGroupConflict {
 	background-color: yellow;
 }
-.depGroupReady {
+div#dependencyDivId tr.odd td.depGroupReady {
 	background-color: lightgreen;
 }
-.depGroupDone {
+div#dependencyDivId tr.odd td.depGroupDone {
 	background-color: #5f9fcf;
 }
 .depGroupSelected {
@@ -977,7 +985,7 @@ td .label_sm {
 	font-weight: bold;
 }
 #dependencyDivId.floating .depGroupSelected {
-	box-shadow: 0px 4px 0px -2px #63A242 inset, 4px 0px 0px -2px #63A242 inset, -4px 0px 0px -2px #63A242 inset, 0px -4px 0px -2px #63A242 inset;
+	box-shadow: 0px 4px 0px -2px #00ff00 inset, 4px 0px 0px -2px #00ff00 inset, -4px 0px 0px -2px #00ff00 inset, 0px -4px 0px -2px #00ff00 inset;
 }
 #dependencyTableId td:not(.labelColumn) {
 	text-align: center;
@@ -1630,11 +1638,4 @@ div#dependencyDivId td.labelColumn {
 	position: absolute;
 	left: 16px;
 	top: auto;
-}
-
-div#dependencyDivId tr.odd td {
-	background-color: #e0e0e0;
-}
-div#dependencyDivId tr.even td {
-	background-color: #ffffff;
 }

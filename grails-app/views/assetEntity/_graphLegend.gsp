@@ -1,7 +1,6 @@
 <div id="legendDivId" class="graphPanel">
 	<table id="legendId" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
 		
-		<tr><td style="padding: 3px 3px;" colspan="2"><h3>Legend</h3></td></tr>
 		<tr><td colspan="2"><h4>Asset Classes</h4></td></tr>
 		
 		<g:each in="${assetTypes.keySet()}" var="type">
