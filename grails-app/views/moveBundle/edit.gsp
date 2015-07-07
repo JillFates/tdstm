@@ -1,7 +1,5 @@
-
-
 <html>
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="projectHeader" />
     <title>Edit Bundle</title>
@@ -10,34 +8,33 @@
 	<g:javascript src="jquery/jquery.ui.mouse.js"/>
 	<g:javascript src="jquery/jquery.ui.slider.js"/>
 
-	
-    <script type="text/javascript">
-	     function initialize(){
-	     	// This is called when the page loads to initialize Managers
-	     	$('#moveManagerId').val('${moveManager}');
-	      	$('#projectManagerId').val('${projectManager}');
-	     }
-	    /*
-	    	function to calculate the bundle duration to adjust the slider
-	    */ 
+	<script type="text/javascript">
+		function initialize(){
+			// This is called when the page loads to initialize Managers
+			$('#moveManagerId').val('${moveManager}');
+			$('#projectManagerId').val('${projectManager}');
+		}
+
+		/*
+			function to calculate the bundle duration to adjust the slider
+		*/ 
 		function calculateMaxDuration(){
-			var start = new Date($("#startTime").val()).getTime()
-				
-			var completion = new Date($("#completionTime").val()).getTime()
-			var startTime = 0
-			var completionTime = 300000
-			if(start){
-				startTime = new Date( start ).getTime()
+			var start = tdsCommon.parseDateTimeString($("#startTime").val())
+			var completion = tdsCommon.parseDateTimeString($("#completionTime").val())
+			var startTime = moment(0)
+			var completionTime = moment(300000)
+			if(start.isValid()){
+				startTime = start
 			}
-			if(completion){
-				completionTime = new Date( completion ).getTime()
+			if(completion.isValid()){
+				completionTime = completion
 			}
-			var durationInMinutes = (completionTime - startTime ) / 60000
+			var durationInMinutes = completionTime.diff(startTime, 'minutes');
 			return durationInMinutes  
 		} 
-    </script>
-  </head>
-  <body>
+	</script>
+</head>
+<body>
   	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
 			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
 	</div>
@@ -512,112 +509,92 @@
     */
     function showSliderInput( type, stepId, minuits ){
         if(type =="start"){
-        	var startTime = new Date($("#startTime").val())
-        	$("#startTime_"+stepId).val(convertDate(new Date(startTime.getTime() + minuits * 60000 )))
+        	var startTime = tdsCommon.parseDateTimeString($("#startTime").val());
+        	$("#startTime_"+stepId).val( convertDate( startTime.add(minuits, 'minutes') ) );
         	validateDateInput( $("#startTime_"+stepId).val(), stepId, "start")
         } else {
-        	var completionTime = new Date($("#completionTime").val())
+        	var completionTime = tdsCommon.parseDateTimeString($("#completionTime").val());
         	minuits = minuits - maxDuration
-        	$("#completionTime_"+stepId).val(convertDate(new Date(completionTime.getTime() + minuits * 60000 )))
+        	$("#completionTime_"+stepId).val( convertDate( completionTime.add(minuits, 'minutes') ) )
         	validateDateInput( $("#completionTime_"+stepId).val(), stepId, "completion")
         }
     }
 	function getDuration( dateString ){
-		var dateTime = new Date(dateString).getTime()
-		var startTime = new Date($("#startTime").val()).getTime()
-		var duration = (dateTime - startTime) / 60000
+		var dateTime = tdsCommon.parseDateTimeString(dateString);
+		var startTime = tdsCommon.parseDateTimeString($("#startTime").val());  
+		var duration = dateTime.diff(startTime, 'minutes');
 		return duration 
 	}
     
 	function convertDate( date ){
-		var timeString = ""
-		var month =  date.getMonth();
-			
-		if( !isNaN(month) ){
-			month = month + 1
-			var monthday    = date.getDate();
-			var year        = date.getFullYear();
-			
-			var hour   = date.getHours();
-			var minute = date.getMinutes();
-			var second = date.getSeconds();
-			if(month < 10 ){ month = "0"+ month }
-			if(monthday < 10 ){ monthday = "0"+ monthday }
-			var ap = "AM";
-			if (hour   > 11) { ap = "PM";             }
-			if (hour   > 12) { hour = hour - 12;      }
-			if (hour   == 0) { hour = 12 			  }
-			if (hour   < 10) { hour   = "0" + hour;   }
-			if (minute < 10) { minute = "0" + minute; }
-			if (second < 10) { second = "0" + second; }
-			
-			var timeString = month+"/"+monthday+"/"+year+" "+hour + ':' + minute + ' ' + ap;
-		}
-		return timeString
+		var momentDate = moment(date);
+		return tdsCommon.formatDateTime(momentDate);
 	} 
-    function validateStepsData(){
-      var checked = true
-      var keyOffStep = ""
-      var message = ""
-      var uncheckedSteps = new Array()
-      var bundleStart = $("#startTime").val()
-      var bundleStartTime = null
-      if (bundleStart == "") {
-        checked = false;
-        message = "Start date is mandatory\n";
-      } else {
-        bundleStartTime = new Date(bundleStart).getTime();
-      }
-      var bundleCompletion = $("#completionTime").val()
-      var bundleCompletionTime = null
-      if (bundleCompletion == "") {
-        checked = false;
-        message += "Completion date is mandatory";
-      } else {
-        bundleCompletionTime = new Date(bundleCompletion).getTime();
-      }
 
-      if (checked) {
-    	  $("input[title='Dashboard']").each(function(){
-    		  var id = $(this).attr("id")
-	    	  if($(this).is(':checked') ){
-		    	  var stepId = id.substring(9,id.length)
-		    	  var dashboardLabel = $("#dashboardLabel_"+stepId).val()
-		    	  var startTime = new Date($("#startTime_"+stepId).val()).getTime();
-		    	  var completionTime = new Date($("#completionTime_"+stepId).val()).getTime()
-		    	  // any step start/completion time that is earlier/later than the bundle start/completion should be changed to the bundle start/completion
-		    	  if( startTime < bundleStartTime ){
-		    		  $("#startTime_"+stepId).val(bundleStart)
-	  	    	  } else if( completionTime > bundleCompletionTime){
-	  	    		  $("#completionTime_"+stepId).val(bundleCompletion)
-	  	    	  }
-	  	    	  
-		    	  if( !$("#dashboardLabel_"+stepId).val()){
-				  	  checked =  false;
-				      message ="A Dashboard Label is required for each selected step.";
-					  return false;
-		    	  } else if( !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val() ) {
-					  checked =  false;
-					  message = "Start and Completion Times are required for each selected step.";
-					  return false;
-				  } else if( $(".field_error").length > 0){
-				      checked =  false;
-				      message = "The date time format is incorrect for the highlighted fields.";
-			    	  return false;
-		    	  }
-		    	  
-	    	  } else {
-	    		  uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length));
-	    	  }
-    	  });
-      }
-    	if( !checked ){
-    		alert(message);
-	    	return checked;
-    	} else {
-    		return checkForProgressSteps(uncheckedSteps);
-    	}
-    }
+	function validateStepsData(){
+		var checked = true
+		var keyOffStep = ""
+		var message = ""
+		var uncheckedSteps = new Array()
+		var bundleStart = $("#startTime").val()
+		var bundleStartTime = null
+		if (bundleStart == "") {
+			checked = false;
+			message = "Start date is mandatory\n";
+		} else {
+			bundleStartTime = tdsCommon.parseDateTimeString(bundleStart);
+		}
+		var bundleCompletion = $("#completionTime").val()
+		var bundleCompletionTime = null
+		if (bundleCompletion == "") {
+			checked = false;
+			message += "Completion date is mandatory";
+		} else {
+			bundleCompletionTime = tdsCommon.parseDateTimeString(bundleCompletion);
+		}
+
+		if (checked) {
+			$("input[title='Dashboard']").each(function(){
+				var id = $(this).attr("id")
+				if($(this).is(':checked') ){
+					var stepId = id.substring(9,id.length)
+					var dashboardLabel = $("#dashboardLabel_"+stepId).val()
+					var startTime = tdsCommon.parseDateTimeString($("#startTime_"+stepId).val());
+					var completionTime = tdsCommon.parseDateTimeString($("#completionTime_"+stepId).val());
+					// any step start/completion time that is earlier/later than the bundle start/completion should be changed to the bundle start/completion
+					if ( startTime.isBefore(bundleStartTime) ) {
+						$("#startTime_"+stepId).val(bundleStart)
+					} else if( completionTime.isAfter(bundleCompletionTime) ){
+						$("#completionTime_"+stepId).val(bundleCompletion)
+					}
+							
+					if ( !$("#dashboardLabel_"+stepId).val()){
+						checked =  false;
+						message ="A Dashboard Label is required for each selected step.";
+						return false;
+					} else if( !$("#startTime_"+stepId).val() || !$("#completionTime_"+stepId).val() ) {
+						checked =  false;
+						message = "Start and Completion Times are required for each selected step.";
+						return false;
+					} else if( $(".field_error").length > 0){
+						checked =  false;
+						message = "The date time format is incorrect for the highlighted fields.";
+						return false;
+					}
+						
+				} else {
+					uncheckedSteps.push(id.substring(id.indexOf("_")+1,id.length));
+				}
+			});
+		}
+		if( !checked ){
+			alert(message);
+			return checked;
+		} else {
+			return checkForProgressSteps(uncheckedSteps);
+		}
+	}
+
     function checkForProgressSteps(uncheckedSteps){
     	var moveBundle = $("#moveBundleId").val()
     	var checked = true
@@ -639,73 +616,75 @@
     		return validateDates();
     	}
     }
-    function isValidDate( date , objId, imgObj){
-        var returnVal = true;
-        if( date && !tdsCommon.isValidDateTime(date) ){
-          	$("#"+objId).addClass("field_error");
-          	$("#"+imgObj).attr("title","Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
-          	$("#"+imgObj).show();
-          	returnVal  =  false;
-      	} else if(date){
-      		$("#"+objId).removeClass("field_error");
-      		$("#"+imgObj).hide();
-      		var objDateinMs =  new Date(date).getTime()
-      		var alertMess
-      		maxDuration = calculateMaxDuration()
-      		$("input[title='Dashboard']").each(function(){
-  	    		if($(this).is(':checked') ){
-  	    			var id = $(this).attr("id")
-  		    	  	var stepId = id.substring(9,id.length)
-  		    	  	var stepStartTime = new Date($("#startTime_"+stepId).val()).getTime();
-  	    		  	var stepCompletionTime = new Date($("#completionTime_"+stepId).val()).getTime();
-  		    	  	if(objId =="startTime" ){
-  	  		    		if( stepStartTime < objDateinMs){
-		  		    		$("#startTime_"+stepId).val( $("#startTime").val() )
-	  			    		alertMess = "Step start times will be changed to the bundle start"
-  	  			   		}
-  	  		    		if( stepCompletionTime < objDateinMs){
-  	  		    			$("#completionTime_"+stepId).val( $("#completionTime").val() )
-  	  		    			alertMess = "Step completion times will be changed to the bundle completion"
-   	  		    	  	}
-  	    	  	  	} else if(objId =="completionTime"){
-  	  	    	  		if(stepCompletionTime > objDateinMs){
-	  		    			$("#completionTime_"+stepId).val( $("#completionTime").val() )
-	  	    	  			alertMess = "Step completion times will be changed to the bundle completion"
-	  	    	  	  	}
-  	  	    	  		if(stepStartTime > objDateinMs){
-	  		    			$("#startTime_"+stepId).val( $("#startTime").val() )
-	  	    	  			alertMess = "Step start times will be changed to the bundle start"
-	  	    	  	  	}
-  	    	  	  	}
-  		    		$("#slider_"+stepId).slider( "option", "max", maxDuration );
-  		    		$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
-  	    	  	}
-  	    	});
-      		if(alertMess){
-          		alert(alertMess)
-      		}
-      	}
-      	return returnVal;
+
+	function isValidDate( date, objId, imgObj) {
+		var returnVal = true;
+		if( date && !tdsCommon.isValidDateTime(date) ){
+			$("#"+objId).addClass("field_error");
+			$("#"+imgObj).attr("title","Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
+			$("#"+imgObj).show();
+			returnVal  =  false;
+		} else if(date) {
+			$("#"+objId).removeClass("field_error");
+			$("#"+imgObj).hide();
+			var objDateinMs = tdsCommon.parseDateTimeString(date);
+			var alertMess = ""
+			maxDuration = calculateMaxDuration()
+			$("input[title='Dashboard']").each(function() {
+				if($(this).is(':checked') ) {
+					var id = $(this).attr("id")
+					var stepId = id.substring(9,id.length)
+					var stepStartTime = tdsCommon.parseDateTimeString($("#startTime_"+stepId).val());
+					var stepCompletionTime = tdsCommon.parseDateTimeString($("#completionTime_"+stepId).val());
+					if ( objId =="startTime" ) {
+						if ( stepStartTime.isBefore(objDateinMs) ) {
+							$("#startTime_"+stepId).val( $("#startTime").val() )
+							alertMess += "Step start times will be changed to the bundle start\n"
+						}
+						if( stepCompletionTime.isBefore(objDateinMs) ) {
+							$("#completionTime_"+stepId).val( $("#completionTime").val() )
+							alertMess += "Step completion times will be changed to the bundle completion\n"
+						}
+					} else if(objId =="completionTime") {
+						if(stepCompletionTime.isAfter(objDateinMs) ) {
+							$("#completionTime_"+stepId).val( $("#completionTime").val() )
+							alertMess += "Step completion times will be changed to the bundle completion\n"
+						}
+						if(stepStartTime.isAfter(objDateinMs) ) {
+							$("#startTime_"+stepId).val( $("#startTime").val() )
+							alertMess += "Step start times will be changed to the bundle start\n"
+						}
+					}
+					$("#slider_"+stepId).slider( "option", "max", maxDuration );
+					$("#slider_"+stepId).slider( "option", "values", [getDuration($("#startTime_"+stepId).val()), getDuration($("#completionTime_"+stepId).val())] );
+				}
+			});
+			if (alertMess) {
+				alert(alertMess)
+			}
+		}
+		return returnVal;
 	}
+
     function validateDateInput(value, stepId, type){
-    	var bundleStartTime = new Date($("#startTime").val()).getTime()
-    	var bundleCompletionTime = new Date($("#completionTime").val()).getTime()
-    	var valueInMs = new Date(value).getTime()
+    	var bundleStartTime = tdsCommon.parseDateTimeString($("#startTime").val());
+    	var bundleCompletionTime = tdsCommon.parseDateTimeString($("#completionTime").val());
+    	var valueInMs = tdsCommon.parseDateTimeString(value);
         if(type == "start"){
-            var completionTime = new Date($("#completionTime_"+stepId).val()).getTime()
+            var completionTime = tdsCommon.parseDateTimeString($("#completionTime_"+stepId).val());
             if( !value ){
             	$("#startTime_"+stepId).addClass("field_error");
 	    		$("#startTimeImg_"+stepId).attr("title"," Step Start Time should not be blank")
 	          	$("#startTimeImg_"+stepId).show();
-            } else if(tdsCommon.isValidDateTime(value) ){
+            } else if(!tdsCommon.isValidDateTime(value) ){
 	    		$("#startTime_"+stepId).addClass("field_error");
 	    		$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
 	          	$("#startTimeImg_"+stepId).show();
-	    	} else if(bundleStartTime > valueInMs || bundleCompletionTime < valueInMs){
+	    	} else if(bundleStartTime.isAfter(valueInMs) || bundleCompletionTime.isBefore(valueInMs) ){
 				$("#startTime_"+stepId).addClass("field_error");
 				$("#startTimeImg_"+stepId).attr("title","Step Start Time should be in between Bundle Start Time and Completion Time.")
 				$("#startTimeImg_"+stepId).show()
-       		} else if(completionTime < valueInMs){
+       		} else if(completionTime.isBefore(valueInMs) ){
 				$("#startTime_"+stepId).addClass("field_error");
 				$("#startTimeImg_"+stepId).attr("title","Step Start Time should be less than the Step Completion Time.")
 				$("#startTimeImg_"+stepId).show()
@@ -714,20 +693,20 @@
 				$("#startTimeImg_"+stepId).hide()
        		}
         } else {
-        	var startTime = new Date($("#startTime_"+stepId).val()).getTime()
+        	var startTime = tdsCommon.parseDateTimeString($("#startTime_"+stepId).val());
             if( !value ){
             	$("#completionTime_"+stepId).addClass("field_error");
 	    		$("#completionTimeImg_"+stepId).attr("title"," Step Completion Time should not be blank")
 	          	$("#completionTimeImg_"+stepId).show();
-            } else if(tdsCommon.isValidDateTime(value) ){
+            } else if(!tdsCommon.isValidDateTime(value) ){
 	    		$("#completionTime_"+stepId).addClass("field_error");
 	    		$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in '" + tdsCommon.defaultDateTimeFormat() + "' format")
 	          	$("#completionTimeImg_"+stepId).show();
-	    	} else if(bundleStartTime > valueInMs || bundleCompletionTime < valueInMs){
+	    	} else if(bundleStartTime.isAfter(valueInMs) || bundleCompletionTime.isBefore(valueInMs) ) {
 				$("#completionTime_"+stepId).addClass("field_error");
 				$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be in between Bundle Start Time and Completion Time.")
 				$("#completionTimeImg_"+stepId).show()
-       		} else if(startTime > valueInMs){
+       		} else if(startTime.isAfter(valueInMs) ){
 				$("#completionTime_"+stepId).addClass("field_error");
 				$("#completionTimeImg_"+stepId).attr("title","Step Completion Time should be greater than the Step Start Time.")
 				$("#completionTimeImg_"+stepId).show()

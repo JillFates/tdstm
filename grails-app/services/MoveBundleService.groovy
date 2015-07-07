@@ -98,8 +98,8 @@ class MoveBundleService {
 		def session = userPreferenceService.getSession()
 		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
-		moveBundleStep.planStartTime = TimeUtil.parseTime(session, params["startTime_"+transitionId])
-		moveBundleStep.planCompletionTime = TimeUtil.parseTime(session, params["completionTime_"+transitionId])
+		moveBundleStep.planStartTime = TimeUtil.parseDateTime(session, params["startTime_"+transitionId])
+		moveBundleStep.planCompletionTime = TimeUtil.parseDateTime(session, params["completionTime_"+transitionId])
 		
 		//show the step progress in green when user select the beGreen option
 		if(beGreen && beGreen == 'on'){

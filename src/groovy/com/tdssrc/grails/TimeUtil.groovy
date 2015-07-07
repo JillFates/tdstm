@@ -377,23 +377,6 @@ class TimeUtil {
 	}
 
 	/**
-	 * Parse a time value in users timezone and creates a date into GMT
-	 * @param session
-	 * @param timeValue
-	 * @return converted Date
-	 */
-	public static Date parseTime(session, timeValue) {
-		Date ret
-		if(timeValue){
-			def date = new Date(timeValue)
-			def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-			TimeZone tz = TimeZone.getTimeZone( tzId )
-			ret = new Date(date.getTime() - tz.getRawOffset());
-		}
-		return ret;
-	}
-
-	/**
 	 * Creates a formatter based on the format type defined in the session
 	 * @param session
 	 * @param formatterType formatter type to be used

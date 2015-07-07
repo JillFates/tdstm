@@ -208,6 +208,9 @@ var tdsCommon = {
 	},
 	
 	parseDateTimeString: function(stringValue, format) {
+		if (typeof(format)==='undefined') {
+			format = this.defaultDateTimeFormat();
+		}
 		return moment(stringValue, format);
 	},
 
@@ -223,6 +226,9 @@ var tdsCommon = {
 
 	formatDateTime: function(momentObj, format) {
 		var result = "";
+		if (typeof(format)==='undefined') {
+			format = this.defaultDateTimeFormat();
+		}
 		if (momentObj) {
 			result = momentObj.format(format);
 		}
