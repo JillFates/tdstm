@@ -370,7 +370,7 @@ class AssetEntityController {
 			titleSheet = workbook.getSheet( "Title" )
 			if( titleSheet != null) {
 				try {
-					exportTime = TimeUtil.parseDateTime(getSession(), WorkbookUtil.getStringCellValue(titleSheet, 1, 5), TimeUtil.FORMAT_DATE_TIME_2) 
+					exportTime = TimeUtil.parseDateTime(getSession(), WorkbookUtil.getStringCellValue(titleSheet, 1, 5)) 
 				}catch ( Exception e) {
 					log.error "Error formating import time: " + e.message
 					forward action:forwardAction, params: [error: 'The Export date time was not found on the Title sheet.']
