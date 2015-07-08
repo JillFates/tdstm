@@ -78,6 +78,15 @@
                                 </td>
                             </tr> 
 
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="comment">Partner:</label>
+                                </td>
+                                <td valign="top">
+                                    <input type="checkbox" name="partner" value="Y"> <span style="padding-left: 5px"><b>Note:</b><i>Partners can participate on projects of other companies</i></span>
+                                </td>
+                            </tr> 
+
                         </tbody>
                     </table>
                 </div>

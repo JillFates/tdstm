@@ -49,6 +49,21 @@
                                 </td>
                             </tr> 
                         
+                            <tr class="prop">
+                                <td valign="top" class="name">
+                                    <label for="comment">Partner:</label>
+                                </td>
+                                <td valign="top">
+                                    <g:if test="${partner}">
+                                        <input type="checkbox" name="partner" value="" checked="true" disabled="true"> 
+                                    </g:if>
+                                    <g:else>
+                                        <input type="checkbox" name="partner" value="Y"> 
+                                    </g:else>
+                                    <span style="padding-left: 5px"><b>Note:</b><i>Partners can participate on projects of other companies</i></span>
+                                </td>
+                            </tr> 
+
                         </tbody>
                     </table>
                 </div>

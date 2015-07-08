@@ -7,7 +7,8 @@ class PartyGroupController {
 	def partyRelationshipService
     def userPreferenceService
 	def jdbcTemplate
-	
+	def securityService
+
     def index() { redirect(action:"list",params:params) }
 
     // the delete, save and update actions only accept POST requests
@@ -78,7 +79,7 @@ class PartyGroupController {
             flash.message = "PartyGroup not found with id ${params.id}"
             redirect(action:"list")
         }
-        else { return [ partyGroupInstance : partyGroupInstance ] }
+        else { return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ] }
     }
 
     def delete() {
@@ -117,7 +118,7 @@ class PartyGroupController {
             redirect(action:"list")
         }
         else {
-            return [ partyGroupInstance : partyGroupInstance ]
+            return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ]
         }
     }
 
@@ -128,6 +129,14 @@ class PartyGroupController {
             partyGroupInstance.properties = params
 			
             if( !partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
+
+	        	if (params.partner && params.partner == "Y" && !isAPartner(partyGroupInstance)) {
+	        		def personCompany = partyRelationshipService.getStaffCompany( securityService.getUserLogin().person )
+	        		if (personCompany) {
+	        			partyRelationshipService.savePartyRelationship( "PARTNERS", personCompany, "COMPANY", partyGroupInstance, "PARTNER" )
+	        		}
+	        	}
+
                 flash.message = "PartyGroup ${partyGroupInstance} updated"
                 redirect(action:"show",id:partyGroupInstance.id)
             }   else {
@@ -158,6 +167,12 @@ class PartyGroupController {
 	        	def companyParty = PartyGroup.findByName( "TDS" )
 	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroupInstance, "CLIENT" )
 
+	        	if (params.partner && params.partner == "Y") {
+	        		def personCompany = partyRelationshipService.getStaffCompany( securityService.getUserLogin().person )
+	        		if (personCompany) {
+	        			partyRelationshipService.savePartyRelationship( "PARTNERS", personCompany, "COMPANY", partyGroupInstance, "PARTNER" )
+	        		}
+	        	}
         	}
             flash.message = "PartyGroup ${partyGroupInstance} created"
             redirect(action:"show",id:partyGroupInstance.id)
@@ -166,4 +181,14 @@ class PartyGroupController {
             render(view:'create',model:[partyGroupInstance:partyGroupInstance])
         }
     }
+
+    private def isAPartner(partyGroupInstance) {
+       	def partner
+       	def personCompany = partyRelationshipService.getStaffCompany( securityService.getUserLogin().person )
+       	if (personCompany) {
+        	partner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $personCompany.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' and	p.partyIdTo = $partyGroupInstance.id")
+       	}
+       	return (partner != null)
+    }
+
 }

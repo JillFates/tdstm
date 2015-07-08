@@ -251,8 +251,11 @@ class TimeUtil {
 	def public static convertInToUserTZ = { date, tzId ->
 		Date ret
 		if (date) {
-			tzId = tzId ? tzId : "EDT"
+			tzId = (tzId != null) ? tzId : "EDT"
 			def timeZoneId = timeZones[ tzId ]
+			if (!timeZoneId) {
+				timeZoneId = "GMT"
+			}
 			TimeZone tz = TimeZone.getTimeZone( timeZoneId );
 			//java.sql.Timestamp
 			try {
