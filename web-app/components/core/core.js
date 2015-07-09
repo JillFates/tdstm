@@ -184,7 +184,15 @@ tds.core.interceptor.LoggedCheckerInterceptor = function() {
 						var errorDiv = angular.element(document.querySelector('#errorModalText'));
 						var errorsHTML = "<ul>";
 						for (var j = 0; j < json.errors.length; j++) {
-							errorsHTML = errorsHTML + "<li>" + json.errors[j].detail + "</li>";
+							var emsg = '';
+							if (json.errors[j] instanceof String) {
+								emsg = json.errors[j];
+							} else if (typeof(json.errors[j].detail) !== 'undefined') {
+								emsg = json.errors[j].detail
+							} else {
+								emsg = json.errors[j]
+							}
+							errorsHTML = errorsHTML + "<li>" + emsg + "</li>";
 						}
 						errorsHTML = errorsHTML + "</ul>";
 						errorDiv.html(errorsHTML);
