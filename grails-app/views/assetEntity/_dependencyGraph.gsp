@@ -1,6 +1,6 @@
 <script type="text/javascript">
-var parameterPrecision = {'force':${multiple?10:100}, 'linkSize':10, 'friction':0.1, 'theta':0.1, 'width':100, 'height':100}
-var parameterRanges = {'force':[${multiple?-500:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1], 'width':[600,100000], 'height':[500,100000]}
+var parameterPrecision = {'force':${multiple?10:100}, 'linkSize':10, 'friction':0.1, 'theta':0.1};
+var parameterRanges = {'force':[${multiple?-500:-1000}, 0], 'linkSize':[0,1000], 'friction':[0,1], 'theta':[0,1]};
 
 $(document).ready(function() {
 	var fullscreen = ${fullscreen};
@@ -18,13 +18,16 @@ $(document).ready(function() {
 		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
 	
 	$('#layoutControlContainerId').slideUp(0);
-})
+	GraphUtil.checkForDisabledButtons(parameterRanges);
+});
 
 // Called when the user clicks the + or - buttons on the control panel
 function modifyParameter (action, id) {
-	listCheck()
-	var value = parseFloat($("#"+id).val())
-	var type = id.substring(0, id.length-2)
+	var input = $("#" + id);
+	var value = parseFloat(input.val());
+	var type = input.attr('name');
+	var plusButton = input.parent().children('.plus');
+	var minusButton = input.parent().children('.minus');
 	
 	if (action == 'add')
 		value += parameterPrecision[type];
@@ -32,18 +35,27 @@ function modifyParameter (action, id) {
 		value -= parameterPrecision[type];
 	
 	if (parameterPrecision[type] == 0.1)
-		value = value.toPrecision(1)
+		value = value.toPrecision(1);
 	
-	val = value
-	var minValue = parameterRanges[type][0]
-	var maxValue = parameterRanges[type][1]
-	value = Math.min(Math.max(value, minValue), maxValue)
-	if (value != val && type != 'force') // let's not show the alert for force
-		alert((type.charAt(0).toUpperCase() + type.slice(1)) + " must be between " + minValue + " and " + maxValue)
+	var minValue = parameterRanges[type][0];
+	var maxValue = parameterRanges[type][1];
+	value = Math.min(Math.max(value, minValue), maxValue);
 	
-	$("#"+id).val( value )
-	rebuildMap(true, $("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $("#widthId").val(), $("#heightId").val());
+	if (value == minValue)
+		minusButton.addClass('disabled');
+	else
+		minusButton.removeClass('disabled');
+	if (value == maxValue)
+		plusButton.addClass('disabled');
+	else
+		plusButton.removeClass('disabled');
+	
+	if (action != 'none') {
+		input.val(value);
+		rebuildMap(true, $("#forceId").val(), $("#linkSizeId").val(), $("#frictionId").val(), $("#thetaId").val(), $("#widthId").val(), $("#heightId").val());
+	}
 }
+
 function listCheck () {
 	var labelsList = {}
 	$('table.labelTree input[type="checkbox"]').each(function() {

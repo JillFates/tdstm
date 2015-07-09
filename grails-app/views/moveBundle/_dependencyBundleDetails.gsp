@@ -43,10 +43,12 @@
 					<td id="app_all">
 						<span id="allAppCount">${gridStats.app[0] ?: '&nbsp;' }</span>
 					</td>
-					<td id="app_onePlus">${gridStats.app[1] ?: '&nbsp;' }</td>
+					<td id="app_onePlus">
+						<span>${gridStats.app[1] ?: '&nbsp;' }</span>
+					</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="app_${asset.dependencyBundle}">
-							${asset.appCount ?: '&nbsp;' }
+							<span>${asset.appCount ?: '&nbsp;' }</span>
 						</td>
 					</g:each>
 				</tr>
@@ -54,10 +56,12 @@
 					<td class="labelColumn"><b>Servers Physical</b></td>
 					<td id="server_all">
 						<span id="allServerCount">${gridStats.server[0] ?: '&nbsp;' }</span></td>
-					<td id="server_onePlus">${gridStats.server[1] ?: '&nbsp;' }</td>
+					<td id="server_onePlus">
+						<span>${gridStats.server[1] ?: '&nbsp;' }</span>
+					</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="server_${asset.dependencyBundle}">
-							${asset.serverCount ?: '&nbsp;' }
+							<span>${asset.serverCount ?: '&nbsp;' }</span>
 						</td>
 					</g:each>
 				</tr>
@@ -66,10 +70,12 @@
 					<td id="vm_all">
 						<span id="allVirtualCount">${gridStats.vm[0] ?: '&nbsp;' }</span>
 					</td>
-					<td id="vm_onePlus">${gridStats.vm[1] ?: '&nbsp;' }</td>
+					<td id="vm_onePlus">
+						<span>${gridStats.vm[1] ?: '&nbsp;' }</span>
+					</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="vm_${asset.dependencyBundle}">
-							${asset.vmCount ?: '&nbsp;' }
+							<span>${asset.vmCount ?: '&nbsp;' }</span>
 						</td>
 					</g:each>
 				</tr>
@@ -78,10 +84,12 @@
 					<td id="db_all">
 						<span id="allDatabaseCount">${gridStats.db[0] ?: '&nbsp;' }</span>
 					</td>
-					<td id="db_onePlus">${gridStats.db[1] ?: '&nbsp;' }</td>
+					<td id="db_onePlus">
+						<span>${gridStats.db[1] ?: '&nbsp;' }</span>
+					</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="db_${asset.dependencyBundle}">
-							${asset.dbCount ?: '&nbsp;' }
+							<span>${asset.dbCount ?: '&nbsp;' }</span>
 						</td>
 					</g:each>
 				</tr>
@@ -90,10 +98,12 @@
 					<td id="file_all">
 						<span id="allFileCount">${gridStats.storage[0] ?: '&nbsp;' }</span>
 					</td>
-					<td id="file_onePlus">${gridStats.storage[1] ?: '&nbsp;' }</td>
+					<td id="file_onePlus">
+						<span>${gridStats.storage[1] ?: '&nbsp;' }</span>
+					</td>
 					<g:each in="${dependencyConsoleList}" var="asset">
 						<td id="file_${asset.dependencyBundle ?: 0 }">
-							${asset.storageCount ?: '&nbsp;' }
+							<span>${asset.storageCount ?: '&nbsp;' }</span>
 						</td>
 					</g:each>
 				</tr>

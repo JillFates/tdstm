@@ -3113,7 +3113,8 @@ class AssetEntityController {
 	
 	// removes the user's dependency analyzer map related preferences
 	def removeUserGraphPrefs () {
-		userPreferenceService.removePreference('depGraph');
+		def preferenceName = params.preferenceName ?: 'depGraph'
+		userPreferenceService.removePreference(preferenceName)
 		render true
 	}
 

@@ -47,18 +47,22 @@ use.node.noEvent {
 use.node.filtered {
 	opacity: 0.5;
 }
+use.node.sourceAsset {
+	stroke-width: 2.5px;
+	stroke: #00aa00;
+}
 
 /* Graph Vectors */
+
 line.link {
 	stroke: #000000;
 	stroke-width: 1px;
-	stroke-opacity: .9;
+	stroke-opacity: 0.9;
 	marker-end: url(#arrowhead);
 }
-line.link.selected {
-	stroke: #00dd00 !important;
-	stroke-width: 3px;
-	marker-end: url(#arrowheadSelected);
+line.link.blackBackground {
+	stroke: #ffffff;
+	marker-end: url(#arrowheadBlackBackground);
 }
 line.link.redundant {
 	stroke: orange !important;
@@ -93,10 +97,6 @@ line.link.Questioned {
 	stroke: red;
 }
 
-line.link.blackBackground {
-	stroke: #ffffff;
-	marker-end: url(#arrowheadBlackBackground);
-}
 line.link.unresolved {
 	stroke: red;
 	marker-end: url(#arrowheadUnresolved);
@@ -119,6 +119,11 @@ line.link.bundleConflict {
 line.link.future {
 	stroke-dasharray: 2,4;
 }
+line.link.selected {
+	stroke: #00dd00 !important;
+	stroke-width: 3px;
+	marker-end: url(#arrowheadSelected) !important;
+}
 
 /* Graph Arrowheads */
 #arrowheadRedundant {
@@ -131,10 +136,10 @@ line.link.future {
 	opacity: 1 !important;
 }
 #arrowheadNA {
-	opacity: 0.7;
+	opacity: 0.6;
 }
 #arrowheadNABlackBackground {
-	opacity: 0.7;
+	opacity: 0.3;
 }
 
 /* Graph Labels */
@@ -149,7 +154,7 @@ g.label.selected text {
 	fill: #009900;
 }
 g.label.selected.blackBackground text {
-	fill: #ccffcc;
+	fill: #88ff88;
 }
 g.label text.labelBackground {
 	stroke: #ffffff;
@@ -190,6 +195,7 @@ g.label.filtered text {
 }
 
 
+/* Shapes */
 #databaseShapeBackgroundId {
 	stroke: black !important;
 }
@@ -383,6 +389,12 @@ img.pointer {
 	-webkit-filter: saturate(10);
 	filter: saturate(10);
 }
+.plusMinusIcon.disabled {
+	-webkit-filter: saturate(0);
+	filter: saturate(0);
+	opacity: 0.5;
+	cursor: default;
+}
 
 
 div.graphPanel:not(.openPanel) {
@@ -423,8 +435,7 @@ div.graphPanel.openPanel {
 .graphContainer #mapReferenceId #fullscreenButtonId {
 	border: 1px solid green;
 	background-image: url(../icons/application.png);
-	background-position-x: 5px;
-	background-position-y: 50%;
+	background-position: 5px 50%;
 	background-repeat: no-repeat;
 	background-color: #ffffff;
 	padding-top: 3px;
@@ -449,7 +460,6 @@ div.graphPanel.openPanel {
 }
 #mapReferenceId div.graphPanelTab.activeTab {
 	background-color: #ffffff;
-	margin-bottom: -1px;
 	padding-bottom: 6px;
 }
 #mapReferenceId div.graphPanelTab:not(.activeTab):hover {
@@ -465,16 +475,12 @@ div.graphPanel.openPanel {
 	padding-left: 8px;
 	padding-right: 8px;
 	position: relative;
-	/*z-index: 92 !important;*/
 }
-#mapReferenceId div.graphPanelTab:nth-last-child(n) {
+#mapReferenceId div.graphPanelTab.activeTab:nth-last-child(n) {
 	z-index: 92 !important;
 }
 .graphContainer.fullscreen #mapReferenceId div.graphPanelTab:not(.activeTab) {
 	border-bottom: 1px solid green;
-}
-.graphContainer.fullscreen #mapReferenceId div.graphPanelTab.activeTab {
-	padding-bottom: 7px;
 }
 .graphContainer.fullscreen #mapReferenceId div.graphPanelTab {
 	border-top-width: 0px;
@@ -576,4 +582,8 @@ div.graphPanel.openPanel {
 
 .ui-front {
 	z-index: 120 !important;
+}
+#head_crawler {
+	border-left: 0px !important;
+	border-right: 0px !important;
 }

@@ -155,19 +155,19 @@
 				var id = 'all'
 				if(dependencyBundle != null) id = dependencyBundle
 				
-				$('.depGroupSelected').removeClass('depGroupSelected')
-				$('.app_count').removeClass('app_count')
-				$('.server_count').removeClass('server_count')
-				$('.vm_count').removeClass('vm_count')
-				$('.db_count').removeClass('db_count')
-				$('.file_count').removeClass('file_count')
+				$('.depGroupSelected').removeClass('depGroupSelected').removeClass('selectedGroup')
+				$('.app_count').removeClass('app_count').removeClass('selectedGroup')
+				$('.server_count').removeClass('server_count').removeClass('selectedGroup')
+				$('.vm_count').removeClass('vm_count').removeClass('selectedGroup')
+				$('.db_count').removeClass('db_count').removeClass('selectedGroup')
+				$('.file_count').removeClass('file_count').removeClass('selectedGroup')
 				
-				$('#span_'+id).addClass('depGroupSelected')
-				$('#app_'+id).addClass('app_count')
-				$('#server_'+id).addClass('server_count')
-				$('#vm_'+id).addClass('vm_count')
-				$('#db_'+id).addClass('db_count')
-				$('#file_'+id).addClass('file_count')
+				$('#span_'+id).addClass('depGroupSelected').addClass('selectedGroup')
+				$('#app_'+id).addClass('app_count').addClass('selectedGroup')
+				$('#server_'+id).addClass('server_count').addClass('selectedGroup')
+				$('#vm_'+id).addClass('vm_count').addClass('selectedGroup')
+				$('#db_'+id).addClass('db_count').addClass('selectedGroup')
+				$('#file_'+id).addClass('file_count').addClass('selectedGroup')
 
 				$('.tabs li').removeClass('active');
 				var fullscreen = GraphUtil.isFullscreen();

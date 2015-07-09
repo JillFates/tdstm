@@ -14,6 +14,11 @@
 						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton" onclick="GraphUtil.toggleFreeze()">
 					</td>
 				</tr>
+				<tr>
+					<td colspan="3" style="padding: 0px;">
+						<input id="OptimizeButtonId" type="button" value="Optimize Graph" class="pointer fullButton" onclick="setIdealGraphPosition()">
+					</td>
+				</tr>
 				
 				<tr title="Sets the criteria used to determine node fill color">
 					<td colspan="3" style="padding-left :0px">
@@ -26,6 +31,13 @@
 							<input type="radio" id="colorByMoveEventId" name="colorBy" class="pointer" value="event" onchange="rebuildMap(false);" ${(graphPrefs.colorBy == 'event')?('checked="checked"'):('')}>
 							<label for="colorByMoveEventId" class="pointer">Event</label>
 						</div>
+					</td>
+				</tr>
+				<tr title="If checked, bundle conflicts will be highlighted">
+					<td colspan="3" style="padding-left :0px">
+						<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="pointer" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}>
+						<label for="bundleConflictsId" class="pointer">&nbsp;Show Bundle Conflicts</label>
+						
 					</td>
 				</tr>
 				<tr title="Sets the color of the background to black">
@@ -136,20 +148,6 @@
 					</td>
 				</tr>
 				
-				<tr title="If checked, bundle conflicts will be highlighted">
-					<td colspan="3" style="padding-left :0px">
-						<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="pointer" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}>
-						<label for="bundleConflictsId" class="pointer">&nbsp;Show Bundle Conflicts</label>
-						
-					</td>
-				</tr>
-				
-				<tr>
-					<td colspan="3" style="padding: 0px;">
-						<br />
-					</td>
-				</tr>
-				
 				<tr id="twistieRowId" class="closed">
 					<td colspan="3" style="padding: 0px;">
 						Layout:&nbsp;<svg class="pointer" style="width: 12px;height: 12px;border-width: 0px;" onclick="GraphUtil.toggleGraphTwistie()"><g transform="rotate(90 6 6)"><g id="twistieId" class=""><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
@@ -163,33 +161,33 @@
 				<tr class="layoutControl" title="Sets the amount of force between each node">
 					<td style="padding: 0px;width: 30px;">Force</td>
 					<td style="padding-left :5px;">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon" onclick="modifyParameter('sub','forceId')"/>
-						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${(multiple)?(-30):(defaults.force)}" disabled="disabled">
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon" onclick="modifyParameter('add','forceId')"/>
+						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','forceId')"/>
+						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${(multiple)?(-30):(defaults.force)}" disabled="disabled" />
+						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','forceId')"/>
 					</td>
 				</tr>
 				<tr class="layoutControl" title="Sets the desired length for the links">
 					<td style="padding: 0px;width: 30px;">Links</td>
 					<td style="padding-left :5px">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer plusMinusIcon" onclick="modifyParameter('sub','linkSizeId')"/>
-						<input type="text" id="linkSizeId" class="controlPanelprop" name="linkSize" value="${defaults.linkSize}" disabled="disabled" >
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer plusMinusIcon" onclick="modifyParameter('add','linkSizeId')"/>
+						<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','linkSizeId')"/>
+						<input type="text" id="linkSizeId" class="controlPanelprop" name="linkSize" value="${defaults.linkSize}" disabled="disabled" />
+						<img src="${resource(dir:'images',file:'plus.gif')}" height="18"  class="pointer plusMinusIcon plus" onclick="modifyParameter('add','linkSizeId')"/>
 					</td>
 				</tr>
 				<tr class="layoutControl" title="Sets the decay-rate of the nodes' velocity">
 					<td style="padding: 0px;width: 30px;">Friction</td>
 					<td style="padding-left :5px">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer plusMinusIcon" onclick="modifyParameter('sub','frictionId')"/>
-						<input type="text" id="frictionId" class="controlPanelprop" name="friction" value="${defaults.friction}" >
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon"  onclick="modifyParameter('add','frictionId')"/>
+						<img src="${resource(dir:'images',file:'minus.gif')}" height="18"  class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','frictionId')"/>
+						<input type="text" id="frictionId" class="controlPanelprop" name="friction" value="${defaults.friction}" disabled="disabled" />
+						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus"  onclick="modifyParameter('add','frictionId')"/>
 					</td>
 				</tr>
 				<tr class="layoutControl" title="Sets the accuracy of the forces (lower numbers will be slower, but more accurate)">
 					<td style="padding: 0px;width: 30px;">Theta</td>
-					<td style="padding-left :5px" class="pointer plusMinusIcon">
-						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon" onclick="modifyParameter('sub','thetaId')"/>
-						<input type="text" id="thetaId" class="controlPanelprop" name="theta" value="${defaults.theta}" disabled="disabled" >
-						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon" onclick="modifyParameter('add','thetaId')"/>
+					<td style="padding-left :5px">
+						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','thetaId')"/>
+						<input type="text" id="thetaId" class="controlPanelprop" name="theta" value="${defaults.theta}" disabled="disabled" />
+						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','thetaId')"/>
 					</td>
 				</tr>
 			</table>
@@ -204,12 +202,12 @@
 			
 			<tr>
 				<td colspan="3" style="padding: 0px;">
-					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton" onclick="updateUserPrefs()">
+					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton" onclick="GraphUtil.updateUserPrefs('depGraph')">
 				</td>
 			</tr>
 			<tr>
 				<td colspan="3" style="padding: 0px;">
-					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton" onclick="resetToDefaults()">
+					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton" onclick="GraphUtil.resetToDefaults('depGraph')">
 				</td>
 			</tr>
 		</table>

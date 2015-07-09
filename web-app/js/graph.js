@@ -171,11 +171,11 @@ var GraphUtil = (function ($) {
 	}
 	
 	// performs one tick of the 
-	public.tickOnce = function (force) {
-		var oldAlpha = force.alpha();
-		force.alpha(1);
-		force.tick();
-		force.alpha(oldAlpha);
+	public.tickOnce = function () {
+		var oldAlpha = public.force.alpha();
+		public.force.alpha(1);
+		public.force.tick();
+		public.force.alpha(oldAlpha);
 	}
 	
 	// adds the move bundle color indicator to the legend
@@ -255,8 +255,10 @@ var GraphUtil = (function ($) {
 			return 'node'
 				+ ((d.selected == 1) ? ' selected selectedChild' : '')
 				+ ((d.selected == 2) ? ' selected selectedParent' : '')
+				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && ! d.hasMoveEvent) ? ' noEvent' : '')
 				+ ((public.isBundleFilterEnabled() && ! public.isInFilteredBundle(d, bundle)) ? ' filtered' : '')
+				+ ((d.sourceAsset) ? ' sourceAsset' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
 		});
 	}
@@ -268,6 +270,7 @@ var GraphUtil = (function ($) {
 				+ ((d.notApplicable) ? ' notApplicable' : '')
 				+ ((d.future) ? ' future' : '')
 				+ ((d.cut == 3) ? ' cut' : '')
+				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
 		});
@@ -449,6 +452,97 @@ var GraphUtil = (function ($) {
 		public.disableFreeze();
 		public.force.start();
 	}
+	
+	
+	// Sets the user's graph preferences to the current values in the control panel
+	public.updateUserPrefs = function (preferenceName) {
+		var form = $('#preferencesformId');
+		var prefsArray = form.serializeArray();
+		var prefsObject = {};
+		prefsArray.each(function (pref, i) {
+			prefsObject[pref.name] = pref.value;
+		});
+		
+		jQuery.ajax({
+			url:contextPath+'/assetEntity/setImportPerferences',
+			data:{'preference':preferenceName, 'value':JSON.stringify(prefsObject)}
+		});
+	}
+
+	// Used by the defaults button to reset all control values to their default state
+	public.resetToDefaults = function (preferenceName) {
+		// resets the force layout parameters
+		$('table.labelTree input[type="text"]').each(function() {
+			if (defaults[$(this).attr('name')])
+				$(this).val( defaults[$(this).attr('name')] )
+		});
+		
+		// deletes the user's graph preferences from the database
+		jQuery.ajax({
+			url:contextPath+'/assetEntity/removeUserGraphPrefs',
+			data:{'preferenceName':preferenceName}
+		});
+		
+		// resets the graph preferences
+		var inputs = $('#preferencesformId input:not([type="button"]),#preferencesformId select');
+		inputs.each(function (i, o) {
+			var name = $(o).attr('name');
+			var type = $(o).attr('type');
+			var defaultValue = defaultPrefs[name];
+			if (defaultValue != undefined) {
+				if (type == 'checkbox') {
+					$(o).prop('checked', defaultValue)
+				} else if (type == 'text' || type == undefined) {
+					$(o).val(defaultValue)
+				} else if (type == 'radio') {
+					$(o).prop('checked', ($(o).val() == defaultValue))
+				}
+			} else {
+				$(o).prop('checked', false)
+			}
+		});
+		
+		// rebuild the map with the parameters
+		if (public.graphExists())
+			rebuildMap(true);
+		public.checkForDisabledButtons(parameterRanges);
+	}
+	
+	public.checkForDisabledButtons = function (parameterRanges) {
+		Object.keys(parameterRanges).each(function (o, i) {
+			modifyParameter('none', o + 'Id');
+		});
+	}
+	
+	// rotates the graph by a given number of degrees
+	public.rotateGraph = function (degrees) {
+		var nodes = public.force.nodes();
+		var originX = (widthCurrent / 2);
+		var originY = (heightCurrent / 2);
+		public.force.nodes().each(function (o, i) {
+			var dx = o.x - originX;
+			var dy = o.y - originY;
+			var distance = Math.sqrt(dx * dx + dy * dy);
+			var oldAngle = Math.degrees(Math.atan2(dy, dx));
+			var newAngle = Math.radians((oldAngle + degrees) % 360);
+			var newX = originX + distance * Math.cos(newAngle);
+			var newY = originY + distance * Math.sin(newAngle);
+			o.x = newX;
+			o.y = newY;
+			o.px = newX;
+			o.py = newY;
+		});
+	}
+
+	// Converts from degrees to radians.
+	Math.radians = function (degrees) {
+		return degrees * Math.PI / 180;
+	};
+
+	// Converts from radians to degrees.
+	Math.degrees = function (radians) {
+		return radians * 180 / Math.PI;
+	};
 	
 	// return the public object to make the public functions accessable
 	return public;

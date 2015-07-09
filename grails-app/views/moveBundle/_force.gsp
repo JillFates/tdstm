@@ -2,15 +2,39 @@
 <style>
 /* 	these styles must be included here due to a bug in firefox
 	where marker styles don't work when used in external stylesheets. */
+	
+
 line.link {
 	marker-end: url(#arrowhead);
 }
-line.link.selected {
-	marker-end: url(#arrowheadSelected);
+line.link.redundant {
+	marker-end: url(#arrowheadRedundant);
+}
+line.link.cyclical {
+	marker-end: url(#arrowheadCyclical);
 }
 line.link.cut {
 	marker-end: url(#arrowheadCut);
 }
+line.link.blackBackground {
+	marker-end: url(#arrowheadBlackBackground);
+}
+line.link.unresolved {
+	marker-end: url(#arrowheadUnresolved);
+}
+line.link.notApplicable {
+	marker-end: url(#arrowheadNA);
+}
+line.link.notApplicable.blackBackground {
+	marker-end: url(#arrowheadNABlackBackground);
+}
+line.link.bundleConflict {
+	marker-end: url(#arrowheadBundleConflict);
+}
+line.link.selected {
+	marker-end: url(#arrowheadSelected);
+}
+
 </style>
 <script type="text/javascript">
 // If there is already an instance of force running in memory, it should be stopped before creating this one
@@ -63,10 +87,12 @@ var fill = d3.scale.category10();
 var fillMode = 'bundle';
 var gravity = ${multiple ? 0.05 : 0};
 var distanceIntervals = 500;
+var graphPadding = 25;
 var floatMode = false;
 var maxWeight;
 var maxFamilyWeights = [];
 var groupCount = 1;
+var preferenceName = 'depGraph';
 
 var nodeSelected = -1;
 var defaultColor = '#0000ff';
@@ -108,10 +134,10 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		height = heightCurrent;
 	}
 	
-	var zoom = d3.behavior.zoom()
+	zoomBehavior = d3.behavior.zoom()
 		.on("zoom", zooming);
 	
-	canvas.call(zoom);
+	canvas.call(zoomBehavior);
 	
 	vis = canvas
 		.append('svg:g')
@@ -190,15 +216,10 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	}
 	
 	// Resets the scale and position of the map. Called when the user double clicks on the background
-	function resetView() {
-		zoom.scale(1);
-		zoom.translate([0,0]);
-		scale = 1;
-		translateX = 0;
-		translateY = 0;
-		zoomOffsetX = 0;
-		zoomOffsetY = 0;
-		vis.attr("transform", "translate(0)" + " scale(1)");
+	function resetView () {
+		if (d3.select(d3.event.srcElement)[0][0].nodeName == 'use')
+			return;
+		centerGraph();
 	}
 	
 	// Handle the panning when the user starts dragging the canvas
@@ -246,7 +267,6 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	GraphUtil.linkBindings = vis.selectAll("line.link")
 		.data(links).enter()
 		.append("svg:line")
-		
 			.attr("width", function(d) { return '1px' })
 			.attr("class", function(d) { return 'link' })
 			.attr("id", function(d) { return 'link-'+d.source.index+'-'+d.target.index })
@@ -254,6 +274,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("y1", function(d) { return d.source.y;})
 			.attr("x2", function(d) { return d.target.x;})
 			.attr("y2", function(d) { return d.target.y;});
+	
+	if ($.browser.mozilla)
+		GraphUtil.linkBindings.style('opacity', 1);
 	
 	// Add the nodes to the SVG
 	GraphUtil.nodeBindings = vis.selectAll("use")
@@ -268,6 +291,8 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("class", "node")
 			.call(dragBehavior)
 			.on("dblclick", function(d) {
+				if (nodeSelected == -1)
+					toggleNodeSelection(d.index);
 				return EntityCrud.showAssetDetailView(d.assetClass, d.id);
 				if (d.assetClass == 'APPLICATION')
 					return getEntityDetails('planningConsole', 'Application', d.id);
@@ -377,54 +402,43 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		});
 		maxFamilyWeights[i] = maxWeight;
 	});
+	
+	GraphUtil.force.gravity(0.05);
+	
+	var gravityNodesFound = 0;
 	if (nodeFamilies.size() < 5)
-		gravity = 0;
-	GraphUtil.force.gravity(gravity);
+		GraphUtil.force.nodes().each(function (o, i) {
+			if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
+				o.noGravity = true;
+			else
+				++gravityNodesFound;
+		});
+	
+	if (gravityNodesFound == 1 || nodeFamilies.size() == nodes.size())
+		GraphUtil.force.gravity(1);
 	
 	// run some initial ticks before displaying the graph
-	GraphUtil.force.on("tick", simpleTick);
 	if (nodes.size() < 500)
-		calmTick(50);
+		calmTick(200);
 	else
 		calmTick(20);
 	GraphUtil.force.on("tick", tick);
 	GraphUtil.force.tick();
 	
+	if (nodes.size() > 12)
+		setIdealGraphPosition();
+	
 	// Move the background to the correct place in the DOM
 	background.remove();
 }
 
-// Tick function without svg manipulation
-function simpleTick (e) {
-	if ( gravity == 0 && ! floatMode ) {
-		var k = e.alpha;
-		$(nodes).each(function(i, o) {
-			k = e.alpha;
-			if (! o.fix) {
-				if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
-					k = 0;
-				o.y += (heightCurrent / 2 - o.y) * k;
-				o.x += (widthCurrent / 2 - o.x) * k;
-			}
-		});
-	}
-}
-
 // Updates the dynamic attributes of the svg elements every tick of the simulation
 function tick (e) {
-	// move each node towards the center
-	if ( gravity == 0 && ! floatMode ) {
-		var k = e.alpha;
-		$(nodes).each(function(i, o) {
-			k = e.alpha;
-			if (! o.fix) {
-				if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
-					k = 0;
-				o.y += (heightCurrent / 2 - o.y) * k;
-				o.x += (widthCurrent / 2 - o.x) * k;
-			}
-		});
-	}
+	updateElementPositions();
+}
+
+// updates the attributes of all the svg elements
+function updateElementPositions () {
 	
 	var d = null;
 	
@@ -511,9 +525,9 @@ function toggleNodeSelection (id) {
 	var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
 	selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
 		.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
+		.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
 		.concat(d3.selectAll('svg g g line').filter('.selected')[0])
 		.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-		.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
 		.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
 	selection.order();
 }
@@ -576,8 +590,104 @@ function resizeGraph (width, height) {
 		.size([width, height]);
 	
 	GraphUtil.startForce();
-}
 	
+	if (nodes.size() > 12)
+		setIdealGraphPosition();
+}
+
+// centers the view onto the graph
+function centerGraph () {
+	var ranges = getGraphRanges();
+	var padding = graphPadding;
+	if (GraphUtil.isFullscreen())
+		padding *= 2;
+	var visWidth = ranges.maxX - ranges.minX;
+	var visHeight = ranges.maxY - ranges.minY;
+	var dimensions = GraphUtil.getProperGraphDimensions();
+	var graphWidth = dimensions.width - padding * 2;
+	var graphHeight = dimensions.height - padding * 2;
+	
+	var ratioX = graphWidth / visWidth;
+	var ratioY = graphHeight / visHeight;
+	var scaleAfter = Math.min(ratioX, ratioY);
+	
+	var translateBefore = zoomBehavior.translate();
+	var translateXAfter = (graphWidth / 2) - ((visWidth / 2) + ranges.minX) * scaleAfter + padding / 2;
+	var translateYAfter = (graphHeight / 2) - ((visHeight / 2) + ranges.minY) * scaleAfter + padding;
+	if (GraphUtil.isFullscreen())
+		translateYAfter += padding / 2;
+	var translateAfter = [translateXAfter, translateYAfter];
+	
+	zoomBehavior.scale(scaleAfter);
+	zoomBehavior.translate(translateAfter);
+	zoomBehavior.event(canvas);
+}
+
+// finds the rotation of the graph that requires the least zooming
+function findBestRotation () {
+	var padding = graphPadding;
+	if (GraphUtil.isFullscreen())
+		padding *= 2;
+	var dimensions = GraphUtil.getProperGraphDimensions();
+	var graphWidth = dimensions.width - padding * 2;
+	var graphHeight = dimensions.height - padding * 2;
+	var bestAngle = 0;
+	var bestScale = 0;
+	var iterations = 60;
+	var angleChange = 360 / iterations;
+	for (var i = 1; i <= iterations; i++) {
+		if (i == (iterations / 4) + 1) {
+			GraphUtil.rotateGraph(180 - angleChange);
+			i = 3 * (iterations / 4) - 1;
+		} else {
+			GraphUtil.rotateGraph(angleChange);
+			
+			var ranges = getGraphRanges();
+			
+			var visWidth = ranges.maxX - ranges.minX;
+			var visHeight = ranges.maxY - ranges.minY;
+			var ratioX = graphWidth / visWidth;
+			var ratioY = graphHeight / visHeight;
+			var scaleAfter = Math.min(ratioX, ratioY);
+			if (scaleAfter >= bestScale) {
+					bestScale = scaleAfter;
+					bestAngle = i * angleChange;
+			}
+		}
+	}
+	return bestAngle;
+}
+
+function getGraphRanges () {
+	var returnVal = {};
+	returnVal.minX = 9999999999;
+	returnVal.maxX = -9999999999;
+	returnVal.minY = 9999999999;
+	returnVal.maxY = -9999999999;
+	
+	GraphUtil.force.nodes().each(function(o, i) {
+		returnVal.minX = Math.min(returnVal.minX, o.x);
+		returnVal.maxX = Math.max(returnVal.maxX, o.x);
+		returnVal.minY = Math.min(returnVal.minY, o.y);
+		returnVal.maxY = Math.max(returnVal.maxY, o.y);
+	});
+	
+	return returnVal;
+}
+
+function setIdealGraphPosition () {
+	var angle = findBestRotation();
+	GraphUtil.rotateGraph(angle);
+	updateElementPositions();
+	centerGraph();
+	updateElementPositions();
+}
+
+function resetTranslate () {
+	zoomBehavior.translate([0, 0]);
+	zoomBehavior.event(canvas);
+}
+
 // calls the tick function n times without letting the browser paint in between
 function calmTick (n) {
 	for (var i = 0; i < n; ++i) {
@@ -760,6 +870,7 @@ function cutAndRemove () {
 	function executeCut () {
 		// if we found a good set of edges, execute the cut
 		if (edges.size() > 0) {
+			GraphUtil.force.chargeDistance(1000);
 			
 			// another node group will be added, so this counter must be incremented
 			++groupCount;
@@ -774,6 +885,7 @@ function cutAndRemove () {
 				if (edges[0].child.capturedFinal.indexOf(c) == -1) {
 					c.cut = 2;
 					c.group = groupCount;
+					c.noGravity = false;
 				}
 			});
 			edges[0].parent.cut = 2;
@@ -817,7 +929,7 @@ function cutAndRemove () {
 		
 		// no cuts could be found for the constraints, so update the user
 		} else {
-			alert('No dependency cuts could be found');
+			alert('No dependency splits could be found');
 		}
 		
 		$('#minCutButtonId').removeAttr('disabled');
@@ -830,56 +942,6 @@ function undoCuts () {
 	resetMap();
 }
 
-// Used by the defaults button to reset all control values to their default state
-function resetToDefaults () {
-	// resets the force layout parameters
-	$('table.labelTree input[type="text"]').each(function() {
-		if (defaults[$(this).attr('name')])
-			$(this).val( defaults[$(this).attr('name')] )
-	});
-	
-	// deletes the user's graph preferences from the database
-	jQuery.ajax({
-		url:contextPath+'/assetEntity/removeUserGraphPrefs'
-	});
-	
-	// resets the graph preferences
-	var inputs = $('#preferencesformId input:not([type="button"]),#preferencesformId select');
-	inputs.each(function (i, o) {
-		var name = $(o).attr('name');
-		var type = $(o).attr('type');
-		var defaultValue = defaultPrefs[name];
-		if (defaultValue != undefined) {
-			if (type == 'checkbox') {
-				$(o).prop('checked', defaultValue)
-			} else if (type == 'text' || type == undefined) {
-				$(o).val(defaultValue)
-			} else if (type == 'radio') {
-				$(o).prop('checked', ($(o).val() == defaultValue))
-			}
-		} else {
-			$(o).prop('checked', false)
-		}
-	});
-	
-	// rebuild the map with the parameters
-	rebuildMap(true);
-}
-
-// Sets the user's graph preferences to the current values in the control panel
-function updateUserPrefs () {
-	var form = $('#preferencesformId');
-	var prefsArray = form.serializeArray();
-	var prefsObject = {};
-	prefsArray.each(function (pref, i) {
-		prefsObject[pref.name] = pref.value;
-	});
-	
-	jQuery.ajax({
-		url:contextPath+'/assetEntity/setImportPerferences',
-		data:{'preference':'depGraph', 'value':JSON.stringify(prefsObject)}
-	});
-}
 
 // Stops the map by setting the alpha value to 0
 function stopMap () {
@@ -937,7 +999,7 @@ function getParents (node) {
 
 // initializes the progress bar for min cuts
 function displayProgressBar () {
-	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "<h1>Calculating Group Cut Suggestion</h1>");
+	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "<h1>Calculating Group Split Suggestion</h1>");
 	progressBarCancelDisplayed = false;
 	
 	return progressBar;

@@ -35,7 +35,7 @@
 		</g:if>
 		
 		<g:if test="${params.displayCuts}">
-			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cut" style="stroke-dasharray: none;"></line></svg></td><td>Cut Dependency</td></tr>
+			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cut" style="stroke-dasharray: none;"></line></svg></td><td>Suggested Splits</td></tr>
 		</g:if>
 		
 		
