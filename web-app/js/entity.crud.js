@@ -1619,7 +1619,7 @@ function submitCheckBox(){
 			$('#downArrow').css('display','none');
 			reloadDependencyGroupsSection()
 		}, function() {
-			alert("Please associate appropriate assets to one or more 'Planning' bundles before continuing"); 
+			location.reload();
 		},
 		"<h1>Generating Dependency Groups</h1>");
 	});

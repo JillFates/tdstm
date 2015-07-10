@@ -902,8 +902,9 @@ class MoveBundleController {
 			quartzScheduler.scheduleJob(trigger)	
 			progressService.update(key, 1, 'In progress')
 		}catch(ex){
-			log.error "generateDependency failed to create Quartz job : ${ex.getMessage()}"
-			progressService.update(key, 100I, ProgressService.COMPLETED, 'Failed: It appears that someone else is currently generating dependencies for this context and project.')
+			log.warn "generateDependency failed to create Quartz job : ${ex.getMessage()}"
+			progressService.update(key, 100I, ProgressService.FAILED,
+				'It appears that someone else is currently generating dependency groups for this project. Please try again later.')
 		}
 		
 		render(ServiceResults.success(['key' : key]) as JSON)
