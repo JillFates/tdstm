@@ -175,7 +175,7 @@
 	font:bold 12px Tahoma, helvetica, arial, sans-serif;
 	color:#9acaee;
 	padding:2px 6px;
-	border-right:1px solid #1376C0;
+	border-right: 0px solid #5f9fcf;
 	box-sizing: content-box;
 }
 .menu2 .title1 {
@@ -187,7 +187,7 @@
 	font: bold 12px Tahoma, helvetica, arial, sans-serif;
 	color:#F0F0F0;
 	padding:2px 6px;
-	border-right:1px solid #1376C0;
+	border-right:0px solid #5f9fcf;
 }
 .menu2 ul li a:hover, .menu2 ul li.current a {
 	color:darkblue;
@@ -195,7 +195,7 @@
 .menu2 ul li a:hover   {
 	color:#036;
 	background:lightblue;
-	border-right:1px solid lightblue;
+	border-right:0px solid lightblue;
 }
 .menu2 ul li a .menuhideright {
 	border-right:0px;
