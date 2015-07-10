@@ -4986,10 +4986,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 		def recipe = Recipe.get(recipeId.toInteger())
 		if (recipe == null) {
-			throw new EmptyResultException('Recipe doesn\'t exists');
+			throw new EmptyResultException('Recipe not found');
 		}
 		if (!recipe.project.equals(currentProject)) {
-			throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+			securityService.reportViolation("attempted to access recipe belonging to different project", loginUser)
+			throw new IllegalArgumentException('The recipe is not associated with the current project')
 		}
 		
 		includeLogs = includeLogs == null ? false : includeLogs.toBoolean()
@@ -5043,10 +5044,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		if (recipeId != null && recipeId.isNumber()) {
 			recipe = Recipe.get(recipeId.toInteger())
 			if (recipe == null) {
-				throw new EmptyResultException('Recipe doesn\'t exists');
+				throw new EmptyResultException('Recipe not found');
 			}
 			if (!recipe.project.equals(currentProject)) {
-				throw new IllegalArgumentException('The current project and the Move event project doesn\'t match')
+				securityService.reportViolation("attempted to access recipe belonging to different project", loginUser)
+				throw new IllegalArgumentException('The recipe is not associated with the current project')
 			}			
 		}
 		
@@ -5056,8 +5058,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		def startCreationDate = new Date()
-		startCreationDate = startCreationDate - limitDays.toInteger()
-		log.debug("Start date" + startCreationDate)
+		if (!listAll) startCreationDate = startCreationDate - limitDays.toInteger()
+		log.debug "listTaskBatches - Start date: $startCreationDate, limitDays=$limitDays, listAll: $listAll, recipeId=$recipeId, recipe=$recipe"
 		
 		def c = TaskBatch.createCriteria()
 		def queryResults = []

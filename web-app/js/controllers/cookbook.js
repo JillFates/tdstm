@@ -1255,7 +1255,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 	scope.tasks.colDef = [{field:'message', displayName:'Message', enableCellEdit: false, width: '100%'}];
 	scope.tasks.singleRecipe = (stateParams.recipeId != null);
 	scope.tasks.statePrefix = "recipes.detail.history";
-	scope.tasks.limitDays = '30';
+	scope.tasks.limitDays = 'All';
 
 	if (!scope.tasks.singleRecipe) {
 		scope.tasks.statePrefix = "generationHistory";
@@ -2595,6 +2595,7 @@ tds.cookbook.service.CookbookService = function(utils, http, resource) {
 					section: "listTaskBatches"
 				}
 			},
+			// TODO : JPM 7/2015 : Do not believe getTaskBatches is used
 			getTaskBatches: {
 				method: "GET",
 				params: {
