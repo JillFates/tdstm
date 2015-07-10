@@ -16,49 +16,41 @@ hibernate {
 // environment specific settings
 
 environments {
-	
 	development {
 		dataSource {
 			// TDS Transitional Manager
 			pooled = true
-			// dbCreate = "update" // one of 'create', 'create-drop','update'
-			//  dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			// url = "jdbc:mysql://localhost/tdstm_dev"
-			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			// Alternate options: 'create', 'create-drop','update'
+			dbCreate = ''
+
+			// url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
 			driverClassName = "com.mysql.jdbc.Driver"
 			username = "tdstm"
 			password = "tdstm"
 			
-	        //logSql = true 
+			// logSql = true 
 
 			properties {
-				minEvictableIdleTimeMillis=1800000
-				timeBetweenEvictionRunsMillis=1800000
-				// numTestsPerEvictionRun=3
+				// See following page for explaination of settings
+				// https://commons.apache.org/proper/commons-pool/api-1.6/org/apache/commons/pool/impl/GenericObjectPool.html
+				maxActive=70
+				maxIdle=15
+				initialSize=15
+
+				// Evictions set to 5 minutes of idle time
+				minEvictableIdleTimeMillis=(1000*60*5)
+				// Run evictions on idle connections every 60 seconds (default 5 seconds) 
+				timeBetweenEvictionRunsMillis=(1000*60)
+
 				testOnBorrow=true
-				testWhileIdle=true
-				testOnReturn=true
+				testWhileIdle=false
+				testOnReturn=false
 				removeAbandoned=true
 				removeAbandonedTimeout=600
-				validationQuery="SELECT 1"
+				validationQuery='/* ping */'
 			}
 		}
 	}
-	dbdiff {
-		dataSource {
-			// TDS Transitional Manager
-			pooled = true
-			// dbCreate = "update" // one of 'create', 'create-drop','update'
-			//  dbCreate = "create-drop" // one of 'create', 'create-drop','update'
-			// url = "jdbc:mysql://localhost/tdstm_dev"
-			url = "jdbc:mysql://localhost/tdstm_dbdiff?autoReconnect=true"
-			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstm"
-			password = "tdstm"
-			dbCreate = "create-drop"
-		}
-	} 
-
 	test {
 		dataSource {
 			dbCreate = "create"
@@ -69,25 +61,34 @@ environments {
 		dataSource {
 			// TDS Transitional Manager
 			driverClassName = "com.mysql.jdbc.Driver"
-			dbCreate = "update" // one of 'create', 'create-drop','update'
-			// url = "jdbc:mysql://localhost/tdstm"
-			// url = "jdbc:mysql://tdstm-dbserver/tdstm"
-			username = "tdstm"
-			password = "tdstm"
 
+			// Alternate options: 'create', 'create-drop','update'
+			dbCreate = '' 
+
+			// url = "jdbc:mysql://127.0.0.1/tdstm"
+			// username = ''
+			// password = ''
 			// loggingSql = true
 			// logSql = true 
 
 			properties {
-				minEvictableIdleTimeMillis=1800000
-				timeBetweenEvictionRunsMillis=1800000
-				// numTestsPerEvictionRun=3
+				// See following page for explaination of settings
+				// https://commons.apache.org/proper/commons-pool/api-1.6/org/apache/commons/pool/impl/GenericObjectPool.html
+				maxActive=70
+				maxIdle=15
+				initialSize=15
+
+				// Evictions set to 5 minutes of idle time
+				minEvictableIdleTimeMillis=(1000*60*5)
+				// Run evictions on idle connections every 60 seconds (default 5 seconds) 
+				timeBetweenEvictionRunsMillis=(1000*60)
+
 				testOnBorrow=true
-				testWhileIdle=true
-				testOnReturn=true
+				testWhileIdle=false
+				testOnReturn=false
 				removeAbandoned=true
 				removeAbandonedTimeout=600
-				validationQuery="SELECT 1"
+				validationQuery='/* ping */'
 			}
 		}
 	}
