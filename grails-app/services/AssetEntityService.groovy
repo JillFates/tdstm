@@ -127,7 +127,7 @@ class AssetEntityService {
 	
 	static ASSET_TYPE_NAME_MAP = [(AssetType.APPLICATION.toString()):"application", (AssetType.DATABASE.toString()):"database", (AssetType.VM.toString()):"serverVirtual", 
 						(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
-						(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "other":"other"]
+						(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "Other":"other"]
 	
 	static transactional = true
 

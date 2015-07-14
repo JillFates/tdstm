@@ -18,7 +18,7 @@
 				</tr>
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="OptimizeButtonId" type="button" value="Optimize Graph" class="pointer fullButton" onclick="setIdealGraphPosition()">
+						<input id="OptimizeButtonId" type="button" value="Maximize Graph" class="pointer fullButton" onclick="setIdealGraphPosition()">
 					</td>
 				</tr>
 				

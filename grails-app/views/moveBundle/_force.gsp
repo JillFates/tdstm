@@ -87,7 +87,7 @@ var fill = d3.scale.category10();
 var fillMode = 'bundle';
 var gravity = ${multiple ? 0.05 : 0};
 var distanceIntervals = 500;
-var graphPadding = 25;
+var graphPadding = 15;
 var floatMode = false;
 var maxWeight;
 var maxFamilyWeights = [];
@@ -248,13 +248,19 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.on("dblclick", resetView)
 		.on("dblclick.zoom", null);
 	
+	links
+	
 	// Create the force layout
 	GraphUtil.force
 		.nodes(nodes)
 		.links(links)
 		.gravity(gravity)
 		.linkDistance(linkSize)
-		.linkStrength(2)
+		.linkStrength(function (d) {
+			if (d.duplicate)
+				return 0;
+			return 3;
+		})
 		.friction(friction)
 		.charge(charge)
 		.size([width, height])
@@ -371,6 +377,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode);
 	});
 	
+	// set up dimensional data for the svg bindings
+	GraphUtil.setNodeDimensions();
+	getLabelWidths();
 	
 	// bind the show budle conflicts checkbox
 	$('#bundleConflictsId').unbind('change').on('change', function (e) {
@@ -443,13 +452,6 @@ function updateElementPositions () {
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
 		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-		o.cx = o.x;
-		o.cy = o.y;
-		if (d.cut == 2) {
-			d.cut = 3;
-			o.fillColor = GraphUtil.getFillColor(d, fill, fillMode);
-			o.style.fill = GraphUtil.getFillColor(d, fill, fillMode);
-		}
 	});
 	
 	// set the dynamic attributes for the links
@@ -556,7 +558,8 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 		.theta(theta);
 	
 	// Reset the list of types to show names for
-	GraphUtil.setShowLabels(GraphUtil.force.nodes());
+	if ( GraphUtil.setShowLabels(GraphUtil.force.nodes()) )
+		getLabelWidths();
 	
 	// Update the classes for all data bound svg objects
 	GraphUtil.updateAllClasses();
@@ -579,36 +582,40 @@ function resizeGraph (width, height) {
 		.attr("width", width)
 		.attr("height", height);
 	
+	var oldSize = GraphUtil.force.size();
+	var dx = width - oldSize[0];
+	var dy = height - oldSize[1];
+	GraphUtil.force.nodes().each(function (o, i) {
+		o.x += dx / 2;
+		o.y += dy / 2;
+	});
+	
 	GraphUtil.force
 		.size([width, height]);
 	
 	GraphUtil.startForce();
 	
-	if (nodes.size() > 12)
-		setIdealGraphPosition();
+	reoptimizeGraph();
 }
 
 // centers the view onto the graph
 function centerGraph () {
 	var ranges = getGraphRanges();
-	var padding = graphPadding;
-	if (GraphUtil.isFullscreen())
-		padding *= 2;
 	var visWidth = ranges.maxX - ranges.minX;
 	var visHeight = ranges.maxY - ranges.minY;
-	var dimensions = GraphUtil.getProperGraphDimensions();
-	var graphWidth = dimensions.width - padding * 2;
-	var graphHeight = dimensions.height - padding * 2;
+	
+	var dimensions = getDimensionsForOptimizing();
+	var graphWidth = dimensions.graphWidth;
+	var graphHeight = dimensions.graphHeight;
 	
 	var ratioX = graphWidth / visWidth;
 	var ratioY = graphHeight / visHeight;
 	var scaleAfter = Math.min(ratioX, ratioY);
 	
-	var translateBefore = zoomBehavior.translate();
-	var translateXAfter = (graphWidth / 2) - ((visWidth / 2) + ranges.minX) * scaleAfter + padding / 2;
-	var translateYAfter = (graphHeight / 2) - ((visHeight / 2) + ranges.minY) * scaleAfter + padding;
+	var translateXAfter = (graphWidth / 2) - ((visWidth / 2) + ranges.minX) * scaleAfter + graphPadding;
+	var translateYAfter = (graphHeight / 2) - ((visHeight / 2) + ranges.minY) * scaleAfter + graphPadding;
 	if (GraphUtil.isFullscreen())
-		translateYAfter += padding / 2;
+		translateYAfter += $('#dependencyDivId').height();
 	var translateAfter = [translateXAfter, translateYAfter];
 	
 	zoomBehavior.scale(scaleAfter);
@@ -618,15 +625,12 @@ function centerGraph () {
 
 // finds the rotation of the graph that requires the least zooming
 function findBestRotation () {
-	var padding = graphPadding;
-	if (GraphUtil.isFullscreen())
-		padding *= 2;
-	var dimensions = GraphUtil.getProperGraphDimensions();
-	var graphWidth = dimensions.width - padding * 2;
-	var graphHeight = dimensions.height - padding * 2;
+	var dimensions = getDimensionsForOptimizing();
+	var graphWidth = dimensions.graphWidth;
+	var graphHeight = dimensions.graphHeight;
 	var bestAngle = 0;
 	var bestScale = 0;
-	var iterations = 60;
+	var iterations = 180;
 	var angleChange = 360 / iterations;
 	for (var i = 1; i <= iterations; i++) {
 		if (i == (iterations / 4) + 1) {
@@ -659,10 +663,12 @@ function getGraphRanges () {
 	returnVal.maxY = -9999999999;
 	
 	GraphUtil.force.nodes().each(function(o, i) {
-		returnVal.minX = Math.min(returnVal.minX, o.x);
-		returnVal.maxX = Math.max(returnVal.maxX, o.x);
-		returnVal.minY = Math.min(returnVal.minY, o.y);
-		returnVal.maxY = Math.max(returnVal.maxY, o.y);
+		var offsetX = o.dimensions.width / 2;
+		var offsetY = o.dimensions.height / 2;
+		returnVal.minX = Math.min(returnVal.minX, o.x - offsetX);
+		returnVal.maxX = Math.max(returnVal.maxX, o.x + Math.max(o.labelWidth, offsetX));
+		returnVal.minY = Math.min(returnVal.minY, o.y - offsetY);
+		returnVal.maxY = Math.max(returnVal.maxY, o.y + offsetY);
 	});
 	
 	return returnVal;
@@ -674,6 +680,38 @@ function setIdealGraphPosition () {
 	updateElementPositions();
 	centerGraph();
 	updateElementPositions();
+}
+
+function reoptimizeGraph () {
+	zoomBehavior
+		.translate([0, 0])
+		.scale(1)
+		.event(canvas);
+	setIdealGraphPosition();
+}
+
+function getDimensionsForOptimizing () {
+	var dimensions = GraphUtil.getProperGraphDimensions();
+	var returnVal = {};
+	returnVal.graphWidth = dimensions.width - graphPadding * 2;
+	returnVal.graphHeight = dimensions.height - graphPadding * 2;
+	if (GraphUtil.isFullscreen())
+		returnVal.graphHeight -= $('#dependencyDivId').height();
+	return returnVal;
+}
+
+function getLabelWidths () {
+	GraphUtil.force.nodes().each(function (o, i) {
+		if (o.showLabel) {
+			var labelElement = o.labelElement.select('text:not(.labelBackground)')[0][0];
+			var extent = labelElement.getExtentOfChar(labelElement.getNumberOfChars() - 1);
+			var offset = labelElement.dx.baseVal.getItem(0).value;
+			var labelWidth = extent.x + extent.width + offset;
+			o.labelWidth = labelWidth;
+		} else {
+			o.labelWidth = 0;
+		}
+	});
 }
 
 function resetTranslate () {

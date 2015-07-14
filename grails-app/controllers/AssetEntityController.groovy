@@ -2959,7 +2959,7 @@ class AssetEntityController {
 					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getNetworkDeviceTypes()) {
 						type = AssetType.NETWORK.toString()
 					} else {
-						type = 'other'
+						type = 'Other'
 					}
 					
 					if (! dependencyBundleMap.containsKey(it.bundle))
@@ -3056,6 +3056,7 @@ class AssetEntityController {
 				
 				// Create the links
 				def graphLinks = []
+				def linkTable = [][]
 				def i = 0
 				def opacity = 1
 				def statusColor = 'grey'
@@ -3075,7 +3076,14 @@ class AssetEntityController {
 					def sourceIndex = nodeIds.indexOf(it.assetId)
 					def targetIndex = nodeIds.indexOf(it.dependentId)
 					if (sourceIndex != -1 && targetIndex != -1) {
-						graphLinks << ["id":i, "source":sourceIndex, "target":targetIndex, "value":2, "statusColor":statusColor, "opacity":opacity, "unresolved":!it.resolved, "notApplicable":notApplicable, "future":future, "bundleConflict":it.bundleConflict]
+						
+						// check if this link is the 2nd part of a 2-way dependency
+						if (! linkTable[sourceIndex])
+							linkTable[sourceIndex] = []
+						linkTable[sourceIndex][targetIndex] = true
+						def duplicate = (linkTable[targetIndex] && linkTable[targetIndex][sourceIndex])
+						
+						graphLinks << ["id":i, "source":sourceIndex, "target":targetIndex, "value":2, "statusColor":statusColor, "opacity":opacity, "unresolved":!it.resolved, "notApplicable":notApplicable, "future":future, "bundleConflict":it.bundleConflict, "duplicate":duplicate]
 						i++
 					}
 				}
@@ -4358,7 +4366,7 @@ class AssetEntityController {
 				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getNetworkDeviceTypes()) {
 					type = AssetType.NETWORK.toString()
 				} else {
-					type = 'other'
+					type = 'Other'
 				}
 				
 				graphNodes << [

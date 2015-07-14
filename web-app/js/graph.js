@@ -63,7 +63,6 @@ var GraphUtil = (function ($) {
 				public.disableFullscreen();
 			else
 				public.enableFullscreen();
-			public.resetGraphSize();
 		}
 	}
 	
@@ -574,9 +573,21 @@ var GraphUtil = (function ($) {
 	// Sets the showLabel property for every node
 	public.setShowLabels = function (nodes) {
 		var nameList = public.getExpanededLabels();
+		var changed = false;
 		
 		nodes.each(function (o, i) {
+			if (o.showLabel != nameList[assetTypes[o.type]])
+				changed = true;
 			o.showLabel = nameList[assetTypes[o.type]];
+		});
+		
+		return changed;
+	}
+	
+	public.setNodeDimensions = function () {
+		public.force.nodes().each(function (o, i) {
+			var element = o.nodeElement[0][0];
+			o.dimensions = element.getBBox();
 		});
 	}
 	
