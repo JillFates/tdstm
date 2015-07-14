@@ -4525,7 +4525,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		return msg
 	}
 
-
+	/**
+	 * Used to assign a person to a task based on references in the task spec that handles direct and indirect references
+	 * of the 'whom' property. It will handle references of:
+	 *    #fieldName - indirect field reference (lookup the value from the referenced field e.g. #testingBy)
+	 *    @teamName - name lookup (begins with @) - assigns the team instead of 'whom'
+	 *    user@domain.com - lookup person by their email (contains @)
+	 *    99999 - person id number
+	 *    first lastName - lookup person by their name
+	 *
+	 * @param task - the task object to perform the assignment on
+	 * @param taskSpec - the map with all of the task 
+	 */
 	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff ) {
 		def person
 
@@ -4533,11 +4544,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			def whom = taskSpec.whom
 
 			log.debug "assignWhomToTask() whom=$whom, task $task"
-
-			// whom can have one of the three following values
-			//    Persons' name (e.g. Banks, Robin J. )
-			//    Persons' email (e.g. robin.banks@example.com )
-			//    Indirect reference to other asset property (e.g. #testingBy)
 
 			// See if we have an indirect reference and if so, we will lookup the reference value that will result in either a person's name or @TEAM
 			if (whom[0] == '#') {
@@ -4560,13 +4566,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						return "Unable to resolve indirect whom reference (${taskSpec.whom})"
 					}
 
+					//
 					// If we got here, then the indirect either referenced a @team or a 'name', which will be resolved below
+					//
 
 				} catch (e) {
 					log.error "assignWhom: ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 					return "${e.getMessage()}, whom (${taskSpec.whom})"
 				}
-			}
+			} 
 
 			if (whom instanceof String) {
 				if (whom[0] == '@') {
