@@ -16,7 +16,7 @@
 		
 		<tr><td colspan="2"><h4>Dependencies</h4></td></tr>
 		
-		<g:set var="arrowheadOffset" value="${params.arrowheadOffset ? 45 : 30}" />
+		<g:set var="arrowheadOffset" value="${params.arrowheadOffset ? 45 : 40}" />
 		<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link Standard"></line></svg></td><td>Valid Links</td></tr>
 		<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link notApplicable"></line></svg></td><td>N/A</td></tr>
 		<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link unresolved"></line></svg></td><td>Questioned</td></tr>
@@ -26,16 +26,12 @@
 			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link bundleConflict"></line></svg></td><td>Bundle Conflict</td></tr>
 		</g:if>
 		
-		<g:if test="${params.displayFuture}">
-			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link Future"></line></svg></td><td>Future</td></tr>
-		</g:if>
-		
 		<g:if test="${params.displayCycles}">
-			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cyclical" style="stroke-dasharray: none;"></line></svg></td><td>Cycle</td></tr>
+			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cyclical"></line></svg></td><td>Cycle</td></tr>
 		</g:if>
 		
 		<g:if test="${params.displayCuts}">
-			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cut" style="stroke-dasharray: none;"></line></svg></td><td>Suggested Splits</td></tr>
+			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cut"></line></svg></td><td>Suggested Splits</td></tr>
 		</g:if>
 		
 		

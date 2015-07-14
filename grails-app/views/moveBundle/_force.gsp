@@ -99,13 +99,12 @@ var defaultColor = '#0000ff';
 var selectedParentColor = '#00ff00';
 var selectedChildColor = '#00cc99';
 var selectedLinkColor = '#00dd00';
-var backgroundColor = defaults.blackBackground ? '#000000' : '#ffffff';
+var backgroundColor = GraphUtil.isBlackBackground() ? '#000000' : '#ffffff';
 if (defaults.blackBackground);
 	$('marker#arrowhead').attr('fill', '#ffffff');
 
 var widthCurrent;
 var heightCurrent;
-var nameList = getExpanededLabels();
 
 var progressBarCancelDisplayed = false;
 var cancelCut = false;
@@ -350,9 +349,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			return d.name;
 		});
 	
-	GraphUtil.force.nodes().each(function (o, i) {
-		o.showLabel = nameList[assetTypes[o.type]];
-	});
+	GraphUtil.setShowLabels(GraphUtil.force.nodes());
 	
 	// add pointers to the bound elements
 	GraphUtil.addBindingPointers();
@@ -546,7 +543,7 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 	}
 	
 	// handle the background color
-	var blackBackground = $('#blackBackgroundId').is(':checked');
+	var blackBackground = GraphUtil.isBlackBackground();
 	backgroundColor = blackBackground ? '#000000' : '#ffffff'
 	canvas.style('background-color', backgroundColor)
 	background.attr('fill', backgroundColor)
@@ -559,11 +556,7 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 		.theta(theta);
 	
 	// Reset the list of types to show names for
-	nameList = getExpanededLabels();
-	
-	GraphUtil.force.nodes().each(function (o, i) {
-		o.showLabel = nameList[assetTypes[o.type]];
-	});
+	GraphUtil.setShowLabels(GraphUtil.force.nodes());
 	
 	// Update the classes for all data bound svg objects
 	GraphUtil.updateAllClasses();

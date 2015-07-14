@@ -5,41 +5,28 @@
 div.item1 {
 	float: left;
 }
-
 line.link {
-	stroke: grey;
-	stroke-opacity: 1;
-}
-line.link.selected {
-	stroke: green !important;
-}
-
-line.arrow {
 	marker-end: url(#arrowhead);
 }
-line.arrow.selected {
+line.link.unresolved {
+	marker-end: url(#arrowheadUnresolved);
+}
+line.link.notApplicable {
+	marker-end: url(#arrowheadNotApplicable);
+}
+line.link.selected {
 	marker-end: url(#arrowheadSelected);
 }
-line.arrow.cyclical:not(.selected) {
+line.link.cyclical:not(.selected) {
 	marker-end: url(#arrowheadCyclical);
 }
-line.arrow.ignoreLabel {
-	marker-end: url(#arrowheadIgnoreLabel);
-}
-line.arrow.selected.ignoreLabel {
-	marker-end: url(#arrowheadSelectedIgnoreLabel);
-}
-line.arrow.cyclical.ignoreLabel:not(.selected) {
-	marker-end: url(#arrowheadCyclicalIgnoreLabel);
-}
-
 
 #arrowheadCyclical {
 	opacity: 1.0 !important;
 }
 </style>
 <script type="text/javascript">
-var force = d3.layout.force();
+GraphUtil.force = d3.layout.force();
 var defaults = {"width":getStandardWidth(), "height":getStandardHeight(), "blackBackground":false};
 
 var canvas = d3.select("div#svgContainerId")
@@ -49,24 +36,8 @@ var canvas = d3.select("div#svgContainerId")
 // define the arrowhead markers used for marking dependencies
 canvas.append("defs");
 defineShapes(d3.select("defs"));
-
-var arrowOffset = 8;
-var normalMarker = $('#arrowhead').clone();
-normalMarker.attr('id', $('#arrowhead').attr('id') + 'IgnoreLabel');
-$('#arrowhead')[0].setAttribute('refX', arrowOffset);
-
-var selectedMarker = $('#arrowheadSelected').clone();
-selectedMarker.attr('id', $('#arrowheadSelected').attr('id') + 'IgnoreLabel');
-$('#arrowheadSelected')[0].setAttribute('refX', arrowOffset);
-
-var cyclicalMarker = $('#arrowheadCyclical').clone();
-cyclicalMarker.attr('id', $('#arrowheadCyclical').attr('id') + 'IgnoreLabel');
-$('#arrowheadCyclical')[0].setAttribute('refX', arrowOffset);
-
-$("defs")
-	.append(normalMarker)
-	.append(selectedMarker)
-	.append(cyclicalMarker);
+var arrowOffset = 16;
+d3.selectAll('defs marker').attr('refX', arrowOffset);
 
 // bind browser resizing to resizing the svg
 $(window).resize( function(a, b) {
@@ -77,11 +48,11 @@ $(window).resize( function(a, b) {
 var highlightCyclical = $('#highlightCyclicalCheckBoxId').is(':checked');
 $('#highlightCyclicalCheckBoxId').on('change', function (a, b) {
 	highlightCyclical = a.target.checked;
-	GraphUtil.tickOnce(force);
+	GraphUtil.tickOnce();
 });
 // handle the checkbox to toggle hiding of node labels
 $('#labelCheckBoxId').on('change', function (a, b) {
-	GraphUtil.tickOnce(force);
+	GraphUtil.tickOnce();
 });
 
 var zoomBehavior;
@@ -89,7 +60,6 @@ var offsetGroup = canvas;
 var vis = canvas;
 var background;
 var overlay;
-var graph;
 
 var links = null;
 var assets = null;
@@ -100,11 +70,13 @@ assetTypes = ${assetTypes};
 environment = '${environment}';
 
 // set the asset select to display the correct asset
-if ($('#assetSelectId').select2('data')) {
-	$('#assetSelectId').select2('data').id = assets[0].id;
-	$('#assetSelectId').select2('data').text = assets[0].name;
+if (assets.size() > 0) {
+	if ($('#assetSelectId').select2('data')) {
+		$('#assetSelectId').select2('data').id = assets[0].id;
+		$('#assetSelectId').select2('data').text = assets[0].name;
+	}
+	$('.select2-chosen').html(assets[0].name);
 }
-$('.select2-chosen').html(assets[0].name);
 
 var root = null;
 var assetsById;
@@ -120,45 +92,49 @@ var maxVerticalSpace = 800;
 var minHorizontalSpace = 15;
 var minVerticalSpace = 30;
 var nodeOffsetIncrements = 2;
+var preferenceName = 'depGraph';
 
 // color constants
-// TODO: add an option for a black background
 var defaultColor = '#0000ff';
 var nodeColor = '#5478BA';
 var selectedParentColor = '#00ff00';
 var selectedChildColor = '#00cc99';
 var selectedLinkColor = '#00dd00';
-var backgroundColor = defaults.blackBackground ? '#000000' : '#ffffff';
-if (defaults.blackBackground)
-	$('marker#arrowhead').attr('fill', '#ffffff');
-	
+var backgroundColor = GraphUtil.isBlackBackground() ? '#000000' : '#ffffff';
+
 if (assets.size() > 0)
-	$('#pageTitleId').html('Application Architecture Graph for ' + assets[0].name);
+	$('#pageTitleId').html('Architecture Graph for ' + assets[0].name);
 
 var widthCurrent;
 var heightCurrent;
+var initialDimensions = GraphUtil.getProperGraphDimensions();
 var offsetX = 0;
 var offsetY = 0;
-var nameList = [];
 var siblingGroups = [];
 var siblingGroupsReduced = [];
+var nodeMap = null
+var rootNode;
 
 var floatMode = false;
 
 // execute layout initialization functions
-constructPointers();
-findCyclicalDependencies(assets[0]);
-var rootNode = createRootNode();
-findRedundantDependencies(rootNode);
-setNodeDirections();
-setY(assets[0], 0, 'down', 0, []);
-assets[0].qy = null;
-setY(assets[0], 0, 'up', 0, []);
-offsetRows();
+if (assets.size() > 0) {
+	constructPointers();
+	findCyclicalDependencies(assets[0]);
+	rootNode = createRootNode();
+	findRedundantDependencies(rootNode);
+	setNodeDirections();
+	setY(assets[0], 0, 'down', 0, []);
+	assets[0].qy = null;
+	setY(assets[0], 0, 'up', 0, []);
+	offsetRows();
 
-// call the function to create the graph
-var initialDimensions = GraphUtil.getProperGraphDimensions();
-buildMap (initialDimensions.width, initialDimensions.height);
+	// call the function to create the graph
+	buildMap (initialDimensions.width, initialDimensions.height);
+} else {
+	GraphUtil.resetGraphSize();
+	canvas.style('background-color', backgroundColor);
+}
 
 // changes the references to array indices to object pointers
 function constructPointers () {
@@ -571,16 +547,13 @@ function buildMap (width, height) {
 	outsideWidth = $(window).width() - width;
 	outsideHeight = $(window).height() - height;
 	
-	var node;
-	var link;
-	
 	var firstTick = true;
 	removeNode(rootNode);
 	$('#label--10').parent().remove();
 	groupNodes();
 	
 	// construct a map of nodes by their y values
-	var nodeMap = null
+	nodeMap = null;
 	nodeMap = getNodeMap();
 	
 	// sets the x value for each node
@@ -589,18 +562,24 @@ function buildMap (width, height) {
 	constructSvg();
 	offsetX = 0;
 	offsetY = 0;
-	force.on("tick", tick);
+	GraphUtil.force.on("tick", tick);
 	setLabelOffsets(nodeMap);
 	$('#labelOffsetId').unbind();
 	$('#labelOffsetId').change(function () {
 		setLabelOffsets(nodeMap);
-		GraphUtil.tickOnce(force);
+		GraphUtil.tickOnce();
 	});
 	offsetX = (width / 2) - assets[0].qx;
 	offsetY = 0 - (verticalSpace / 2);
 	background.remove();
-	force.alpha(1);
+	GraphUtil.force.alpha(1);
+	
+	// The graph is loaded, so the "regenerate graph" button can be enabled again
 	$('#graphSubmitButtonId').removeAttr('disabled');
+	
+	// sets the property for the asset used as the source
+	assets[0].sourceAsset = true;
+	GraphUtil.updateAllClasses();
 	
 	// constructs the svg DOM and defines the event listeners for them
 	function constructSvg () {
@@ -635,23 +614,23 @@ function buildMap (width, height) {
 		var clicked = false;
 		
 		function dragstart (d, i) {
-			if (d3.event.sourceEvent.button == 2) {
+				d3.event.sourceEvent.preventDefault();
 				d3.event.sourceEvent.stopPropagation();
+			if (d3.event.sourceEvent.button == 2) {
 				return;
 			}
 			closeMenu();
 			dragging = true;
 			clicked = true;
-			d3.event.sourceEvent.stopPropagation();
 		}
 
 		function dragmove (d, i) {
+			d3.event.sourceEvent.preventDefault();
+			d3.event.sourceEvent.stopPropagation();
 			if (d3.event.sourceEvent.button == 2) {
-				d3.event.sourceEvent.stopPropagation();
 				return;
 			}
 			if (d3.event.dx == 0 && clicked) {
-				d3.event.sourceEvent.stopPropagation();
 				return;
 			}
 			
@@ -674,14 +653,14 @@ function buildMap (width, height) {
 				node.fix = true;
 				node.fixed = true;
 			}
-			d3.event.sourceEvent.stopPropagation();
 			setLabelOffsets(nodeMap);
-			force.alpha(Math.max(force.alpha(), 0.2));
+			GraphUtil.force.alpha(Math.max(GraphUtil.force.alpha(), 0.2));
 		}
 		
 		function dragend (d, i) {
+			d3.event.sourceEvent.preventDefault();
+			d3.event.sourceEvent.stopPropagation();
 			if (d3.event.sourceEvent.button == 2) {
-				d3.event.sourceEvent.stopPropagation();
 				return;
 			}
 			d.fix = false;
@@ -689,8 +668,7 @@ function buildMap (width, height) {
 			dragging = false;
 			if (clicked)
 				toggleNodeSelection(d);
-			d3.event.sourceEvent.stopPropagation();
-			force.alpha(1);
+			GraphUtil.force.alpha(1);
 		}
 		
 		// Rescales the contents of the svg. Called when the user scrolls.
@@ -732,7 +710,7 @@ function buildMap (width, height) {
 			.on("dblclick.zoom", null);
 		
 		// Create the force layout
-		force
+		GraphUtil.force
 			.gravity(0)
 			.linkDistance(0)
 			.linkStrength(0)
@@ -743,41 +721,23 @@ function buildMap (width, height) {
 			.start();
 		
 		// Add the links the the SVG
-		link = vis.selectAll("line.link")
+		GraphUtil.linkBindings = vis.selectAll("line.link")
 			.data(links).enter()
 			.append("svg:line")
 				.attr("width", function(d) { return '1px' })
-				.attr("class", function(d) {
-					return 'link ' + d.status
-						+ (d.root?' root':'')
-				})
+				.attr("class", function(d) { return 'link' })
 				.attr("id", function(d) { return 'link-'+d.parent.id+'-'+d.child.id })
 				.attr("x1", function(d) { return d.child.x;})
 				.attr("y1", function(d) { return d.child.y;})
 				.attr("x2", function(d) { return d.parent.x;})
-				.attr("y2", function(d) { return d.parent.y;})
-				.style('marker-end', 'none');
-		
-		link.each(function (d, i) {
-			vis.append("svg:line")
-				.attr("id", 'sublink-'+d.parent.id+'-'+d.child.id)
-				.attr("class", 'arrow '
-					+ (d.root?' root':'')
-					+ ((d.partOfCycle && highlightCyclical) ? ' cyclical' : '')
-				)
-				.style('stroke-width',  '0px')
-				.attr("x1", d.child.x)
-				.attr("y1", d.child.y)
-				.attr("x2", d.parent.x)
-				.attr("y2", d.parent.y);
-		});
+				.attr("y2", function(d) { return d.parent.y;});
 		
 		// Add the nodes to the SVG
-		node = vis.selectAll("use")
+		GraphUtil.nodeBindings = vis.selectAll("use")
 			.data(assets).enter();
 		
 		// Create the nodes
-		node = node
+		GraphUtil.nodeBindings = GraphUtil.nodeBindings
 			.append("svg:use")
 				.attr("xlink:href", function (d) {
 					return '#' + assetTypes[d.type] + 'ShapeId';
@@ -789,7 +749,6 @@ function buildMap (width, height) {
 				.call(dragBehavior)
 				.on("dblclick", function(d) {
 					$('#assetIdId').val(d.id);
-					$('#assetSelectId').val(d.id);
 					EntityCrud.showAssetDetailView(d.assetClass, d.id);
 				})
 				.on("mousedown", mousedown)
@@ -800,37 +759,57 @@ function buildMap (width, height) {
 				.attr("id", function(d) {
 					return 'node-' + d.id;
 				})
-				.style('cursor', 'default !important')
-				.style("stroke", function(d) {
-					return 'black';
-				})
-				.style("stroke-width", '1px');
+				.style('cursor', 'default !important');
 		
 		
-		node.append("title").text(function(d){ return d.id + ': ' + d.title });
+		GraphUtil.nodeBindings.append("title").text(function(d){ return d.title });
 		
 		// Create the node labels
-		graph = vis.selectAll("g.node")
+		GraphUtil.labelBindings = vis.selectAll("g.node")
 			.data(assets).enter()
-			.append("svg:g");
+			.append("svg:g")
+			.attr("class", "label");
 		
 		if (backgroundColor == '#ffffff')
-			graph.attr("class", "node nodeLabel blackText");
+			GraphUtil.labelBindings.attr("class", "node nodeLabel blackText");
 		else
-			graph.attr("class", "node nodeLabel");
+			GraphUtil.labelBindings.attr("class", "node nodeLabel");
 		
-		graph.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+		GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
+			.attr("id", function (d) {
+				return "label2-" + d.id;
+			})
+			.attr("class", "ignoresMouse labelBackground")
+			.attr("text-anchor", "middle")
+			.attr("dx", 0)
+			.attr("dy","-1.45em")
+			.text(function(d) {
+				if (d.name && d.name.length > 12)
+					return d.name.substr(0, 12) + '...';
+				return d.name;
+			});
+		
+		GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 			.attr("id", function (d) {
 				return "label-" + d.id;
 			})
 			.attr("class", "ignoresMouse")
 			.attr("text-anchor", "middle")
 			.attr("dx", 0)
-			.attr("dy","-1.85em")
+			.attr("dy","-1.45em")
 			.text(function(d) {
+				if (d.name && d.name.length > 12)
+					return d.name.substr(0, 12) + '...';
 				return d.name;
 			});
 		
+		GraphUtil.setShowLabels(assets);
+		
+		// add pointers to the bound elements
+		GraphUtil.addBindingPointers();
+	
+		// Update the classes for all data bound svg objects
+		GraphUtil.updateAllClasses();
 		
 		// set the horizontal and vertical spacing so that the whole map fits on the page
 		var nx = nodeMap[1].size();
@@ -841,7 +820,7 @@ function buildMap (width, height) {
 		updateXYValues();
 		offsetX = (width / 2) - assets[0].qx - horizontalSpace;
 		updateXYValues();
-		force.start();
+		GraphUtil.force.start();
 		
 		// Trigger action when the contexmenu is about to be shown
 		$(document).bind("contextmenu", function (event) {
@@ -945,81 +924,54 @@ function buildMap (width, height) {
 	
 	// Toggles selection of a node
 	function toggleNodeSelection (node) {
-		
 		if (nodeSelected == null && node == null)
 			return; // No node is selected, so there is nothing to deselect
 		
-		var parentColor = nodeColor;
-		var childColor = '';
-		var linkColor = '';
-		var linkWidth = '1px';
-		var selectedLinks = ['z','z'];
-		var selectedNodes = ['z','z'];
-		selectedNodes.push('node-' + node.id);
-		var selecting = true;
-		
+		// check if we are selecting or deselecting
 		if (nodeSelected == node) {
 			// deselecting
-			selecting = false;
-			nodeSelected = null;
+			nodeSelected = -1;
+			
+			// The funtion is deselecting a node, so remove the selected class from all elements
+			links.each(function (link, i) {
+				link.selected = 0;
+			});
+			assets.each(function (node, i) {
+				node.selected = 0;
+			});
+			
 		} else {
 			// selecting
-			if (nodeSelected != null)
+			if (nodeSelected != -1)
 				toggleNodeSelection(nodeSelected); // Another node is selected, so deselect that one first
-			parentColor = selectedParentColor
-			childColor = selectedChildColor;;
-			linkColor = selectedLinkColor;
-			linkWidth = '3px';
 			nodeSelected = node;
+		
+			// Style the selected node
+			node.selected = 2;
+			
+			// Style the dependencies of the selected node
+			var useTarget = true;
+			$.each(node.allChildren, styleDependencies);
+			useTarget = false;
+			$.each(node.allParents, styleDependencies);
+			function styleDependencies (index, link) {
+				var childNode = (useTarget)?(link.child):(link.parent);
+				link.selected = 1;
+				childNode.selected = 1;
+			}
 		}
 		
-		// Style the selected node
-		node.fillColor = parentColor;
-		d3.selectAll('svg g g use').filter('#node-'+node.id)[0][0].classList.add('selected');
-		$('svg g g g text').filter('#label-'+node.id).parent()[0].classList.add('selected');
-		
-		// Style the dependencies of the selected node
-		var useTarget = true;
-		$.each(node.allParents, styleDependencies);
-		useTarget = false;
-		$.each(node.allChildren, styleDependencies);
-		
-		function styleDependencies (index, linkIndex) {
-			var link = linkIndex;
-			var childNode = (useTarget)?(link.parent):(link.child);
-			link.fillColor = (linkColor ? linkColor : link.statusColor);
-			link.width = linkWidth;
-			childNode.fillColor = childColor ? childColor : nodeColor;
-			selectedLinks.push('link-'+link.parent.id+'-'+link.child.id);
-			selectedNodes.push('node-'+childNode.id);
-			d3.selectAll('svg g g use').filter('#node-'+childNode.id)[0][0].classList.add('selected');
-			$('svg g g g text').filter('#label-'+childNode.id).parent()[0].classList.add('selected');
-			d3.selectAll('svg g g line').filter('#link-'+link.parent.id+'-'+link.child.id)[0][0].classList.add('selected');
-			d3.selectAll('svg g g line').filter('#sublink-'+link.parent.id+'-'+link.child.id)[0][0].classList.add('selected');
-		}
+		GraphUtil.updateAllClasses();
 		
 		// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-		if (selecting) {
-			var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
-			selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-				.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-				.concat(d3.selectAll('svg g g g').filter('.selected')[0])
-				.concat(d3.selectAll('svg g g use').filter('.selected')[0]);
-			selection.order();
-		} else { // The function is deselected a node, so remove the selected class from all elements
-			d3.selectAll('svg g g line').filter('.selected')[0].each(function(o){
-				o.classList.remove('selected');
-			})
-			d3.selectAll('svg g g use').filter('.selected')[0].each(function(o){
-				o.classList.remove('selected');
-			})
-			d3.selectAll('svg g g g').filter('.selected')[0].each(function(o){
-				o.classList.remove('selected');
-			})
-		}
-		GraphUtil.tickOnce(force);
+		var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
+		selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg g g line').filter('.selected')[0])
+			.concat(d3.selectAll('svg g g use').filter('.selected')[0])
+			.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+		selection.order();
 	}
 	
 	// gets a map representing the position of each node in the graph
@@ -1209,9 +1161,9 @@ function buildMap (width, height) {
 		updateXYValues();
 		setLabelOffsets(nodeMap);
 		if (assets.size() < 100) {
-			force.alpha(0.1);
+			GraphUtil.force.alpha(0.1);
 		} else {
-			GraphUtil.tickOnce(force);
+			GraphUtil.tickOnce();
 		}
 	}
 	
@@ -1540,7 +1492,7 @@ function buildMap (width, height) {
 		});
 		
 		// set the positional attributes for the nodes
-		node
+		GraphUtil.nodeBindings
 			.attr("py", function(d) {
 				d.py = d.qy;
 				return d.qy;
@@ -1562,47 +1514,32 @@ function buildMap (width, height) {
 			});
 			
 		// set the positional attributes for the links
-		link
+		GraphUtil.linkBindings
 			.attr("x1", function(d) {return d.parent.x;})
 			.attr("y1", function(d) {return d.parent.y;})
 			.attr("x2", function(d) {return d.child.x;})
 			.attr("y2", function(d) {return d.child.y;})
-			.style("stroke", function(d) {
-				if (d.partOfCycle && highlightCyclical)
-					return 'blue';
-				if (d.selected)
-					return 'green';
-				return '';
-			})
-			.style("stroke-width", function(d) {
-				if (d.partOfCycle && highlightCyclical)
-					return 3;
-				return d.width
-			})
-			.style("stroke-opacity", function(d) {
-				if (d.partOfCycle && highlightCyclical)
-					return 1.0;
-				return '';
-			})
 			.attr("transform", function(d) {return "translate(" + offsetX + "," + offsetY + ")";});
 		
 		// set the positional attributes for the labels
-		graph
-			.attr("cx", function(d) {return d.x })
-			.attr("cy", function(d) {return d.y })
-			.attr("opacity", function(d) {
-				if ($('#labelCheckBoxId').is(':checked'))
-					return 1;
-				return 0;
+		
+		GraphUtil.labelBindings
+			.attr("cx", function(d) {
+				return d.x;
+			})
+			.attr("cy", function(d) {
+				return d.y;
 			})
 			.attr("transform", function(d) {return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";});
 		
-		// update the arrowhead offsets
-		setMarkerPositions();
+		// Update the classes for all data bound svg objects
+		GraphUtil.updateAllClasses();
+		
+		setLabelOffsets(nodeMap);
 		
 		// if all the nodes have settled then stop ticking
 		if (!movement)
-			force.alpha(0);
+			GraphUtil.force.alpha(0);
 	}
 	
 	// Gets the node at svg position x in the specified row
@@ -1650,173 +1587,6 @@ function buildMap (width, height) {
 		
 		// update the x and y positions to reflect the change from the swap
 		updateXYValues();
-	}
-	
-	// Sets the vertical offsets to make nearby labels more readable
-	function setLabelOffsets (nodeMap) {
-		var maxOffset = 2;
-		if (! isNaN($('#labelOffsetId').val()))
-			maxOffset = Math.min(Math.max($('#labelOffsetId').val(), 1), 4);
-		var labelPadding = 0.1;
-		var labelRows = [];
-		var keys = Object.keys(nodeMap);
-		for (var i = 0; i < keys.size(); ++i) {
-			var offset = maxOffset;
-			labelRows = [];
-			for (var j = 0; j < widestRow; ++j) {
-				var node = nodeMap[keys[i]][j];
-				
-				if (node != null && ! node.dummy) {
-					
-					// get the positional data of this node's label
-					var text = _.unescape($('#label-' + node.id)[0].innerHTML);
-					var rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
-					for (var k = text.length - 1; k >= 0; --k) {
-						if (text[k] != ' ') {
-							rect = $('#label-' + node.id)[0].getExtentOfChar(k);
-							k = 0;
-						}
-					}
-					var endX = rect.x + rect.width;
-					var startX = node.qx - endX;
-					endX = node.qx + endX;
-					
-					var row = 0;
-					
-					// check if there is a row the label can fit in
-					for (var k = 0; k < maxOffset; ++k) {
-						if (labelRows[k] == null || labelRows[k] < startX) {
-							row = k;
-							k = maxOffset;
-						}
-					}
-					
-					// insert the label into the row
-					offset = (row + 1) * -1;
-					nodeMap[keys[i]][j].labelOffset = offset + offset * labelPadding;
-					labelRows[row] = endX;
-				}
-			}
-		}
-		
-		// update all the labels y values
-		graph.attr("dy", function(d) {
-				if (d.labelOffset) {
-					$(this).children().attr('dy', d.labelOffset + 'em');
-				} else {
-					$(this).children().attr('dy', 0 + 'em');
-				}
-				return 0;
-			});
-		
-		setMarkerPositions();
-	}
-	
-	// Sets the offsets of the arrowhead on the lines so that they don't overlap the labels
-	function setMarkerPositions () {
-		
-		link.each(function (o, i) {
-			var line = $(link[0][i]);
-			var subLine = $('#sub' + line.attr('id'));
-			var label = $('#label-' + o.childId);
-			
-			if (subLine.size() == 0)
-				return;
-			
-			var lineRect = line[0].getBoundingClientRect();
-			var xStart = Math.min(lineRect.left, lineRect.right);
-			var yStart = lineRect.top;
-			var xEnd = Math.max(lineRect.left, lineRect.right);
-			var yEnd = lineRect.bottom;
-			var lineHeight = Math.abs(yStart - yEnd);
-			var lineWidth = Math.abs(xStart - xEnd);
-			var lineRatio = lineHeight / lineWidth;
-			
-			
-			var labelRect = label[0].getBoundingClientRect();
-			
-			// find out which side of the label is intersected if at all
-			var xVal = labelRect.left;
-			var slope = lineRatio;
-			var yInt = yStart - slope * xStart;
-			if (o.parent.x > o.child.x) {
-				xVal = labelRect.right;
-				slope *= -1;
-				yInt = (yStart - slope * xEnd);
-			}
-			var yVal = slope * xVal + yInt;
-			
-			var arrowY = labelRect.top;
-			if (!isNaN(yVal)) {
-				if (labelRect.bottom > yVal && labelRect.top < yVal) {
-					arrowY = yVal;
-				} else if (labelRect.bottom < yVal) {
-					var child = $('#node-' + o.childId);
-					var childRect = child[0].getBoundingClientRect();
-					var radius = (childRect.right - childRect.left) / 2;
-					var theta = Math.atan(Math.abs(slope));
-					arrowY = yEnd - Math.sin(theta) * radius;
-				}
-			}
-			
-			var fullHeight = yEnd - arrowY;
-			var fullWidth = fullHeight / lineRatio;
-			var fullOffset = Math.sqrt(fullHeight * fullHeight + fullWidth * fullWidth);
-			
-			var heightRatio = 1 - (fullHeight / lineHeight);
-			var widthRatio = 1 - (fullWidth / lineWidth);
-			
-			var qHeight = Math.max(o.parent.y, o.child.y) - Math.min(o.parent.y, o.child.y);
-			var finalY2 = Math.min(o.parent.y, o.child.y) + qHeight * heightRatio;
-			if (isNaN(finalY2) || !isFinite(finalY2))
-				finalY2 = line.attr('y2');
-			
-			var qWidth = Math.max(o.parent.x, o.child.x) - Math.min(o.parent.x, o.child.x);
-			var finalX2 = 0;
-
-			if (o.parent.x > o.child.x)
-				finalX2 = Math.max(o.parent.x, o.child.x) - qWidth * widthRatio;
-			else if (o.parent.x < o.child.x)
-				finalX2 = Math.min(o.parent.x, o.child.x) + qWidth * widthRatio;
-			else
-				finalX2 = line.attr('x2');
-			
-			
-			if (isNaN(finalX2) || !isFinite(finalX2))
-				finalX2 = line.attr('x2');
-			
-			
-			// set the css properties
-			subLine
-				.attr('x1', line.attr('x1'))
-				.attr('y1', line.attr('y1'))
-				.attr('transform', line.attr('transform'));
-			
-			
-			// highlight the arrowhead if it is cyclical and the checkbox is checked
-			subLine[0].classList = [];
-			if (o.cyclical) {
-				subLine[0].classList.add('ignoreLabel');
-				if (highlightCyclical)
-					subLine[0].classList.add('cyclical');
-				else
-					subLine[0].classList.remove('cyclical');				
-				subLine
-					.attr('y2', line.attr('y2'))
-					.attr('x2', line.attr('x2'));
-			} else {
-				subLine[0].classList.remove('ignoreLabel');
-				subLine
-					.attr('y2', finalY2)
-					.attr('x2', finalX2);
-				if (o.partOfCycle && highlightCyclical)
-					subLine[0].classList.add('cyclical');
-				else
-					subLine[0].classList.remove('cyclical');
-			}
-			subLine[0].classList.add('arrow');
-		});
-		
 	}
 	
 	/*
@@ -2820,7 +2590,7 @@ function removeDuplicates (list, groups) {
 }
 
 // Used to rebuild the layout using the new parameters
-function rebuildMap (width, height, labels) {
+function rebuildMap (layoutChanged, width, height, labels) {
 	
 	widthCurrent 	= ( widthCurrent  ? widthCurrent  : defaults['width']  )
 	heightCurrent 	= ( heightCurrent ? heightCurrent : defaults['height'] )
@@ -2828,25 +2598,18 @@ function rebuildMap (width, height, labels) {
 	var width	= ( width	? width  :	( widthCurrent	? widthCurrent	: defaults['width']	) )
 	var height	= ( height 	? height :	( heightCurrent 	? heightCurrent	: defaults['height']	) )
 	
-	widthCurrent = width
-	heightCurrent = height
-	
-	var nx = widestRow;
-	horizontalSpace = Math.min(Math.max(Math.round(width / nx), minHorizontalSpace), maxHorizontalSpace);
-	offsetX = (width / 2) - assets[0].qx - horizontalSpace / 2;
-	
-	// Create the SVG element
-	canvas
-		.attr("width", width)
-		.attr("height", height)
-	
-	// Create the force layout
-	force
-		.size([width, height])
-		.start();
-	
-	// Reset the list of types to show names for
-	nameList = [];
+	// Reevaluate which nodes should have their labels shown
+	if (assets.size() > 0) {
+		GraphUtil.setShowLabels(assets);
+		setLabelOffsets(nodeMap);
+		
+		resizeGraph(width, height);
+	}
+
+	// handle the background color
+	var blackBackground = GraphUtil.isBlackBackground();
+	backgroundColor = blackBackground ? '#000000' : '#ffffff';
+	canvas.style('background-color', backgroundColor);
 }
 
 function resizeGraph (width, height) {
@@ -2859,9 +2622,10 @@ function resizeGraph (width, height) {
 	
 	var nx = widestRow;
 	horizontalSpace = Math.min(Math.max(Math.round(width / nx), minHorizontalSpace), maxHorizontalSpace);
-	offsetX = (width / 2) - assets[0].qx - horizontalSpace / 2;
+	if (assets.size() > 0)
+		offsetX = (width / 2) - assets[0].qx - horizontalSpace / 2;
 	
-	force
+	GraphUtil.force
 		.size([width, height])
 		.start();
 }
@@ -2878,7 +2642,7 @@ function resetToDefaults () {
 
 // Stops the map by setting the alpha value to 0
 function stopMap () {
-	force.stop()
+	GraphUtil.force.stop()
 }
 
 function getStandardWidth () {
@@ -2941,6 +2705,64 @@ function display (list, groups) {
 	console.log('--------------------------------------------');
 }
 
+
+// Sets the vertical offsets to make nearby labels more readable
+function setLabelOffsets (nodeMap) {
+	var maxOffset = 2;
+	if (! isNaN($('#labelOffsetId').val()))
+		maxOffset = Math.min(Math.max($('#labelOffsetId').val(), 1), 4);
+	var labelPadding = 0.1;
+	var labelRows = [];
+	var keys = Object.keys(nodeMap);
+	for (var i = 0; i < keys.size(); ++i) {
+		var offset = maxOffset;
+		labelRows = [];
+		for (var j = 0; j < widestRow; ++j) {
+			var node = nodeMap[keys[i]][j];
+			
+			if (node != null && node.showLabel && ! node.dummy) {
+				
+				// get the positional data of this node's label
+				var text = _.unescape($('#label-' + node.id)[0].innerHTML);
+				var rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
+				for (var k = text.length - 1; k >= 0; --k) {
+					if (text[k] != ' ') {
+						rect = $('#label-' + node.id)[0].getExtentOfChar(k);
+						k = 0;
+					}
+				}
+				var endX = rect.x + rect.width;
+				var startX = node.qx - endX;
+				endX = node.qx + endX;
+				
+				var row = 0;
+				
+				// check if there is a row the label can fit in
+				for (var k = 0; k < maxOffset; ++k) {
+					if (labelRows[k] == null || labelRows[k] < startX) {
+						row = k;
+						k = maxOffset;
+					}
+				}
+				
+				// insert the label into the row
+				offset = (row + 1) * -1;
+				nodeMap[keys[i]][j].labelOffset = offset + offset * labelPadding;
+				labelRows[row] = endX;
+			}
+		}
+	}
+	
+	// update all the labels y values
+	GraphUtil.labelBindings.attr("dy", function(d) {
+			if (d.labelOffset) {
+				$(this).children().attr('dy', d.labelOffset - 0.4 + 'em');
+			} else {
+				$(this).children().attr('dy', 0 + 'em');
+			}
+			return 0;
+		});
+}
 
 </script>
 <ul class="customMenu"></ul>

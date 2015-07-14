@@ -63,15 +63,7 @@ function listCheck () {
 	});
 	return labelsList
 }
-function getExpanededLabels () {
-	var labelsList = [];
-	$('table.labelTree input[type="checkbox"]').each(function(i, o) {
-		$(o.classList).each(function(i, c) {
-			labelsList[c] = $(o).is(':checked');
-		});
-	});
-	return labelsList;
-}
+
 function depConsoleLabelUserpref ($me,forWhom) {
 	var isChecked = $me.is(":checked")
 	jQuery.ajax({

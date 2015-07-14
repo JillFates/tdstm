@@ -75,9 +75,10 @@ line.link.hidden {
 }
 line.link.cyclical {
 	stroke: blue !important;
-	stroke-opacity: 0.3 !important;
+	stroke-width: 3px;
+	stroke-opacity: 1;
 	marker-end: url(#arrowheadCyclical);
-	stroke-dasharray: 8,3;
+	stroke-dasharray: 3,3;
 }
 line.link.cut {
 	stroke: orange !important;
@@ -179,12 +180,6 @@ g.label.filtered text {
 	border: 2px dotted #00F;
 	z-index: 90 !important;
 }
-#legendDivId {
-	z-index: 91 !important;
-}
-#controlPanel {
-	z-index: 91 !important;
-}
 #svgContainerId {
 	border-width:1px;
 	padding: 0px !important;
@@ -261,7 +256,6 @@ g.label.filtered text {
 .customMenu li.refresh {
 	background: url(../icons/arrow_refresh.png);
 }
-
 .customMenu li:hover {
 	background-color: #DEF;
 }
@@ -282,7 +276,8 @@ g.label.filtered text {
 	white-space: nowrap;
 }
 .controlPanelControl {
-	padding-left: 5px;
+	padding-left: 0px;
+	padding-right: 0px;
 }
 img.pointer {
 	padding-bottom: 3px;
@@ -290,18 +285,19 @@ img.pointer {
 	height: 18;
 }
 
+.fullscreen svg {
+	border-width: 0px;
+}
 .graphContainer {
 	background-color: none;
 	position: relative;
-	z-index: 95;
+	z-index: 85;
 }
 .graphContainer.fullscreen {
 	background-color: #ffffff;
 	width: 0px;
 	padding: 0px;
-}
-.fullscreen svg {
-	border-width: 0px;
+	z-index: 95;
 }
 .graphContainer #toolsContainerId {
 	top: 0px;
@@ -309,13 +305,14 @@ img.pointer {
 	display: block;
 	position: relative;
 	padding: 0px;
-	z-index: 96;
+	z-index: 86;
 }
 .graphContainer.fullscreen #toolsContainerId {
 	top: 0px;
 	left: 0px;
 	display: block;
 	position: fixed;
+	z-index: 96;
 }
 
 .graphContainer.fullscreen #toolsContainerId #panelLink {
@@ -397,32 +394,32 @@ img.pointer {
 }
 
 
+/* Graph Panels */
 div.graphPanel:not(.openPanel) {
 	display: none;
 }
 div.graphPanel.openPanel {
 	display: block;
 }
-#controlPanel {
+#controlPanel,#legendDivId {
 	float: left;
 	border: 1px solid #008000;
 	margin-left: 0px;
 	margin-top: 0px;
+	padding: 5px;
 	background-color: white;
 	position: absolute;
-	min-width: 120px;
 	padding-top: 10px;
+	z-index: 81 !important;
 }
 #legendDivId {
-	float: left;
-	border: 1px solid #008000;
-	margin-left: 0px;
-	margin-top: 0px;
-	background-color: white;
-	position: absolute;
-	padding-top: 10px;
+	min-width: 140px;
+}
+#controlPanel {
+	min-width: 150px;
 }
 
+/* Panel Tabs */
 #mapReferenceId {
 	border-width: 0px;
 	margin-bottom: -1px;
@@ -447,6 +444,7 @@ div.graphPanel.openPanel {
 	display: inline-block;
 	position: relative;
 	z-index: 101;
+	vertical-align: top;
 }
 .graphContainer #mapReferenceId #fullscreenButtonId:hover {
 	background-color: #eeeeee;
@@ -456,14 +454,17 @@ div.graphPanel.openPanel {
 	border-top-width: 0px;
 }
 #mapReferenceId div.graphPanelTab:not(.activeTab) {
-	background-color: #cccccc;
+	background-color: #dddddd;
 }
 #mapReferenceId div.graphPanelTab.activeTab {
 	background-color: #ffffff;
 	padding-bottom: 6px;
 }
+#mapReferenceId div.graphPanelTab.activeTab h4 {
+	text-shadow: 0px 0px 0.25px black;
+}
 #mapReferenceId div.graphPanelTab:not(.activeTab):hover {
-	background-color: #bbbbbb;
+	background-color: #eeeeee;
 }
 #mapReferenceId div.graphPanelTab.activeTab:hover {
 	background-color: #eeeeee;
@@ -474,10 +475,12 @@ div.graphPanel.openPanel {
 	margin-bottom: 0px;
 	padding-left: 8px;
 	padding-right: 8px;
+	padding-top: 5px;
+	padding-bottom: 5px;
 	position: relative;
 }
 #mapReferenceId div.graphPanelTab.activeTab:nth-last-child(n) {
-	z-index: 92 !important;
+	z-index: 82 !important;
 }
 .graphContainer.fullscreen #mapReferenceId div.graphPanelTab:not(.activeTab) {
 	border-bottom: 1px solid green;
@@ -525,18 +528,24 @@ div.graphPanel.openPanel {
 }
 
 .loading {
-	opacity: 0.5;
+	opacity: 1;
 	background-image: url(../images/spinner.gif);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 32px 32px;
 }
+.loading > g {
+	opacity: 0.5;
+}
+.fullscreen .loading {
+	opacity: 1;
+}
 
+/* Layout twistie */
 #layoutControlContainerId {
 	padding: 0px;
 	margin: 0px;
 }
-
 #twistieRowId td {
 	vertical-align: bottom;
 }
@@ -557,10 +566,10 @@ div.graphPanel.openPanel {
 	transform: rotate(-90deg);
 }
 
+/* Dependency group table */
 #dependencyTableId {
 	position: static;
 }
-
 #dependencyDivId.floating {
 	position: fixed;
 	top: 0px;
@@ -586,4 +595,13 @@ div.graphPanel.openPanel {
 #head_crawler {
 	border-left: 0px !important;
 	border-right: 0px !important;
+}
+
+#levelsUpId,#levelsDownId {
+	width: 20px;
+	padding-right: 0px;
+}
+
+.noPadding {
+	padding: 0px !important;
 }

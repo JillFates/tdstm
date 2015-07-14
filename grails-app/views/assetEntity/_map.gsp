@@ -1,5 +1,5 @@
 <div id="toolsContainerId">
-	<span id="panelLink" colspan="2" style="padding: 0px;">
+	<span id="panelLink" colspan="2" class="noPadding">
 		<div id="mapReferenceId">
 			<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
 			--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
@@ -9,13 +9,15 @@
 	<div id="controlPanel" class="graphPanel">
 		<form id="preferencesformId">
 			<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
+				
+				<!-- Miscellaneous settings and controls -->
 				<tr>
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton" onclick="GraphUtil.toggleFreeze()">
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						<input id="OptimizeButtonId" type="button" value="Optimize Graph" class="pointer fullButton" onclick="setIdealGraphPosition()">
 					</td>
 				</tr>
@@ -42,26 +44,26 @@
 				</tr>
 				<tr title="Sets the color of the background to black">
 					<td colspan="3" style="padding-left :0px">
-						
 						<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)">
 						<label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
 					</td>
 				</tr>
 				
 				<tr>
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						<br />
 					</td>
 				</tr>
 				
+				<!-- Label checkboxes -->
 				<tr>
 					<td colspan="2" style="padding: 0px 0px 6px 0px ;text-align: left;"><h4>Show Labels:</h4></td>
 				</tr>
 				<tr class="labelToggleRow">
 					<td>
-						<input type="checkbox" id="Application" name="appLbl" value="true" ${(graphPrefs.appLbl) ? 'checked' : ''} class="pointer application" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleApplicationLabel');">
+						<input type="checkbox" id="Application" name="appLbl" value="true" ${(graphPrefs.appLbl) ? 'checked' : ''} class="pointer application" onchange="rebuildMap(false)">
 					</td>
-					<td colspan="2" style="padding: 0px;" class="labelToggleCol">
+					<td colspan="2" class="labelToggleCol noPadding">
 						<label for="Application" class="pointer">
 							<svg><use xlink:href="${'#applicationShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
 							Applications
@@ -70,9 +72,9 @@
 				</tr>
 				<tr class="labelToggleRow">
 					<td>
-						<input type="checkbox" name="srvLbl" id="Server" ${(graphPrefs.srvLbl) ? 'checked' : ''} value="true" class="pointer serverPhysical serverVirtual" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleServerLabel');"/>
+						<input type="checkbox" name="srvLbl" id="Server" ${(graphPrefs.srvLbl) ? 'checked' : ''} value="true" class="pointer serverPhysical serverVirtual" onchange="rebuildMap(false)"/>
 					</td>
-					<td colspan="2" style="padding: 0px;" class="labelToggleCol">
+					<td colspan="2" class="labelToggleCol noPadding">
 						<label for="Server" class="pointer">
 							<svg><use xlink:href="${'#serverPhysicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
 							Servers
@@ -81,9 +83,9 @@
 				</tr>
 				<tr class="labelToggleRow">
 					<td>
-						<input type="checkbox" name="dbLbl" id="Database" ${(graphPrefs.dbLbl) ? 'checked' : ''} value="true" class="pointer database" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleDatabaseLabel');"/>
+						<input type="checkbox" name="dbLbl" id="Database" ${(graphPrefs.dbLbl) ? 'checked' : ''} value="true" class="pointer database" onchange="rebuildMap(false)"/>
 					</td>
-					<td colspan="2" style="padding: 0px;" class="labelToggleCol">
+					<td colspan="2" class="labelToggleCol noPadding">
 						<label for="Database" class="pointer">
 							<svg><use xlink:href="${'#databaseShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
 							Databases
@@ -92,9 +94,9 @@
 				</tr>
 				<tr class="labelToggleRow">
 					<td>
-						<input type="checkbox" name="spLbl" id="StoragePhysical" ${(graphPrefs.spLbl) ? 'checked' : ''} value="true" class="pointer storagePhysical" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleStoragePhysicalLabel');"/>
+						<input type="checkbox" name="spLbl" id="StoragePhysical" ${(graphPrefs.spLbl) ? 'checked' : ''} value="true" class="pointer storagePhysical" onchange="rebuildMap(false)"/>
 					</td>
-					<td colspan="2" style="padding: 0px;" class="labelToggleCol">
+					<td colspan="2" class="labelToggleCol noPadding">
 						<label for="StoragePhysical" class="pointer">
 							<svg><use xlink:href="${'#storagePhysicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
 							Storage Devices
@@ -103,9 +105,9 @@
 				</tr>
 				<tr class="labelToggleRow">
 					<td>
-						<input type="checkbox" name="slLbl" id="Files" ${(graphPrefs.slLbl) ? 'checked' : ''} value="true" class="pointer storageLogical" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleFilesLabel');"/>
+						<input type="checkbox" name="slLbl" id="Files" ${(graphPrefs.slLbl) ? 'checked' : ''} value="true" class="pointer storageLogical" onchange="rebuildMap(false)"/>
 					</td>
-					<td colspan="2" style="padding: 0px;" class="labelToggleCol">
+					<td colspan="2" class="labelToggleCol noPadding">
 						<label for="Files" class="pointer">
 							<svg><use xlink:href="${'#storageLogicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
 							Logical Storage
@@ -114,9 +116,9 @@
 				</tr>
 				<tr class="labelToggleRow">
 					<td>
-						<input type="checkbox" name="netLbl" id="Network" ${(graphPrefs.netLbl) ? 'checked' : ''} value="true" class="pointer networkPhysical networkLogical" onchange="rebuildMap(false);depConsoleLabelUserpref($(this),'dependencyConsoleNetworkLabel');"/>
+						<input type="checkbox" name="netLbl" id="Network" ${(graphPrefs.netLbl) ? 'checked' : ''} value="true" class="pointer networkPhysical networkLogical" onchange="rebuildMap(false)"/>
 					</td>
-					<td colspan="2" style="padding: 0px;" class="labelToggleCol">
+					<td colspan="2" class="labelToggleCol noPadding">
 						<label for="Network" class="pointer">
 							<svg><use xlink:href="${'#networkPhysicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
 							Network
@@ -125,37 +127,39 @@
 				</tr>
 				
 				<tr>
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						<br />
 					</td>
 				</tr>
 				
+				<!-- Suggest splits controls -->
 				<tr>
-					<td colspan="3" style="padding: 0px;" >
+					<td colspan="3" class="noPadding" >
 						<input type="button" id="minCutButtonId" value="Suggest Splits" class="pointer halfButton" onclick="cutAndRemove()" title="Each time clicked will present a suggested division of the group by least number of cuts">
 						<input type="button" value="Undo Splits" class="pointer halfButton" onclick="undoCuts()" title="Undoes any previous cuts">
 					</td>
 				</tr>
 				<tr title="Maximum number of edges that can be cut at once">
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						<g:select name="maxEdgeCount" id="maxEdgeCountId" from="${1..20}" value="${graphPrefs.maxEdgeCount ? graphPrefs.maxEdgeCount : 4}"></g:select>
 						<label for="maxEdgeCountId" style="vertical-align: text-top;">&nbsp;Max dependencies cut</label>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						<br />
 					</td>
 				</tr>
 				
 				<tr id="twistieRowId" class="closed">
-					<td colspan="3" style="padding: 0px;">
+					<td colspan="3" class="noPadding">
 						Layout:&nbsp;<svg class="pointer" style="width: 12px;height: 12px;border-width: 0px;" onclick="GraphUtil.toggleGraphTwistie()"><g transform="rotate(90 6 6)"><g id="twistieId" class=""><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 					</td>
 				</tr>
 			</table>
 		</form>
 		
+		<!-- layout controls -->
 		<div id="layoutControlContainerId">
 			<table class="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
 				<tr class="layoutControl" title="Sets the amount of force between each node">
@@ -192,21 +196,23 @@
 				</tr>
 			</table>
 		</div>
+		
+		<!-- Preference controls -->
 		<table class="labelTree" cellpadding="0" cellspacing="0">
 				
 			<tr>
-				<td colspan="3" style="padding: 0px;">
+				<td colspan="3" class="noPadding">
 					<br />
 				</td>
 			</tr>
 			
 			<tr>
-				<td colspan="3" style="padding: 0px;">
+				<td colspan="3" class="noPadding">
 					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton" onclick="GraphUtil.updateUserPrefs('depGraph')">
 				</td>
 			</tr>
 			<tr>
-				<td colspan="3" style="padding: 0px;">
+				<td colspan="3" class="noPadding">
 					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton" onclick="GraphUtil.resetToDefaults('depGraph')">
 				</td>
 			</tr>

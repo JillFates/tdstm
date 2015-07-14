@@ -32,6 +32,10 @@ var GraphUtil = (function ($) {
 		return $('#bundleConflictsId').is(':checked');
 	}
 	
+	public.isHighlightCyclesEnabled = function () {
+		return $('#highlightCyclicalCheckBoxId').is(':checked');
+	}
+	
 	// resets the graph to the proper size
 	public.getProperGraphDimensions = function () {
 		var width = getStandardWidth();
@@ -66,7 +70,10 @@ var GraphUtil = (function ($) {
 	// changes the graph to fullscreen mode
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Normal View');
+		if ($('#fullscreenButtonId').hasClass('showMenu'))
+			$('#fullscreenButtonId').children('h4').html('Show Menu');
+		else
+			$('#fullscreenButtonId').children('h4').html('Normal View');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -272,6 +279,7 @@ var GraphUtil = (function ($) {
 				+ ((d.cut == 3) ? ' cut' : '')
 				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
+				+ ((public.isHighlightCyclesEnabled() && d.partOfCycle) ? ' cyclical' : '')
 				+ ((public.isBlackBackground()) ? ' blackBackground' : '');
 		});
 	}
@@ -297,13 +305,18 @@ var GraphUtil = (function ($) {
 			$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
 	}
 	
+	// returns true if this page has a dependency group table
+	public.hasDependencyGroups = function () {
+		return ($('#dependencyDivId').size() > 0);
+	}
+	
 	// Restyles the first row of the dependency group table to handle fullscreen mode
 	public.moveDependencyGroups = function () {
-		if (public.isFullscreen()) {
-			$('#dependencyDivId').addClass('floating');
-			setGroupTablePosition();
-		} else {
-			$('#dependencyDivId').removeClass('floating');
+		if (public.hasDependencyGroups()) {
+			if (public.isFullscreen())
+				$('#dependencyDivId').addClass('floating');
+			else
+				$('#dependencyDivId').removeClass('floating');
 			setGroupTablePosition();
 		}
 	}
@@ -457,7 +470,9 @@ var GraphUtil = (function ($) {
 	// Sets the user's graph preferences to the current values in the control panel
 	public.updateUserPrefs = function (preferenceName) {
 		var form = $('#preferencesformId');
+		var disabled = $('#preferencesformId').find(':input:disabled').removeAttr('disabled');
 		var prefsArray = form.serializeArray();
+		disabled.attr('disabled', 'disabled');
 		var prefsObject = {};
 		prefsArray.each(function (pref, i) {
 			prefsObject[pref.name] = pref.value;
@@ -543,6 +558,27 @@ var GraphUtil = (function ($) {
 	Math.degrees = function (radians) {
 		return radians * 180 / Math.PI;
 	};
+	
+
+	// Gets the list of types to show labels for
+	public.getExpanededLabels = function () {
+		var labelsList = {};
+		$('table.labelTree input[type="checkbox"]').each(function(i, o) {
+			$(o.classList).each(function(i, c) {
+				labelsList[c] = $(o).is(':checked');
+			});
+		});
+		return labelsList;
+	}
+	
+	// Sets the showLabel property for every node
+	public.setShowLabels = function (nodes) {
+		var nameList = public.getExpanededLabels();
+		
+		nodes.each(function (o, i) {
+			o.showLabel = nameList[assetTypes[o.type]];
+		});
+	}
 	
 	// return the public object to make the public functions accessable
 	return public;

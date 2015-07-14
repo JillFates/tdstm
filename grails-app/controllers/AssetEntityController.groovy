@@ -4204,6 +4204,14 @@ class AssetEntityController {
 		def assetClassesForSelect = AssetClass.getClassOptions()
 		assetClassesForSelect.put('ALL', 'All Classes');
 		
+		def defaultPrefs = ['levelsUp':0, 'levelsDown':3, 'appLbl':true, 'labelOffset':2, 'assetClasses':'ALL']
+		def graphPrefs = userPreferenceService.getPreference('archGraph', loginUser)
+		def prefsObject = [:]
+		if (graphPrefs)
+			prefsObject = JSON.parse(graphPrefs)
+		else
+			prefsObject = defaultPrefs
+		
 		def model = [
 			assetId : params.assetId,
 			assetName: assetName,
@@ -4212,7 +4220,9 @@ class AssetEntityController {
 			assetClassesForSelect: assetClassesForSelect,
 			moveBundleList: assetEntityService.getMoveBundles(project),
 			dependencyStatus: assetEntityService.getDependencyStatuses(),
-			dependencyType: assetEntityService.getDependencyTypes()
+			dependencyType: assetEntityService.getDependencyTypes(),
+			defaultPrefs:defaultPrefs as JSON, 
+			graphPrefs:prefsObject
 		]
 		render([assetId:params.assetId, model: model, view:'architectureGraph'])
 	}
@@ -4228,15 +4238,24 @@ class AssetEntityController {
 		}
 		try {
 			def project = securityService.getUserCurrentProject()
-			def asset = AssetEntity.get(NumberUtils.toInt(params.assetId))
+			def assetId = NumberUtils.toInt(params.assetId)
+			def asset = AssetEntity.get(assetId)
 			def levelsUp = NumberUtils.toInt(params.levelsUp)
 			def levelsDown = NumberUtils.toInt(params.levelsDown)
 			def deps = []
 			def sups = []
 			def assetsList = []
 			def dependencyList = []
-			def cyclicalDependencyList = []
-			def endPointStacks = [:]
+			
+			// maps asset type names to simpler versions
+			def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
+			
+			// Check if the parameters are null
+			if ((assetId == null || assetId == -1) || (params.levelsUp == null || params.levelsDown == null)) {
+				def model = [nodes:[] as JSON, links:[] as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
+				render(view:'_applicationArchitectureGraph', model:model)
+				return true
+			}
 			
 			if (asset.project != project) {
 				throw new UnauthorizedException();
@@ -4245,51 +4264,21 @@ class AssetEntityController {
 			// build the graph based on a specific asset
 			if (params.mode.equals("assetId")) {
 				
-				// Check if the parameters are null
-				if (params.assetId == null || (params.levelsUp == null || params.levelsDown == null)) {
-					return [nodes:[] as JSON, links:[] as JSON, assetId:params.assetId, level:params.level]
-				}
-				
 				// recursively get all the nodes and links that depend on the asset
 				def stack = []
 				def constructDeps
 				constructDeps = { a, l ->
-					def indent = ""
-					for (int i = 0; i < levelsDown-l; ++i)
-						indent += "  "
-					if (!stack.contains(a)) {
-						stack += a
-						deps.push(a)
-						if ( ! (a in assetsList) )
-							assetsList.push(a)
-						if (l > 0) {
-							def dependent = AssetDependency.findAllByAsset(a)
-							dependent.each {
-								def repeat = false
-								endPointStacks.get(a).each { endStack ->
-									endStack.each { parentAsset ->
-										if (it.dependent == parentAsset)
-											repeat = true
-									}
-								}
-								if (!repeat) {
-									if ( ! (it in dependencyList) )
-										dependencyList.push(it)
-									constructDeps(it.dependent, l-1)
-								} else {
-									cyclicalDependencyList.push(it)
-								}
-							}
-						} else {
-							if (endPointStacks.get(a) == null)
-								endPointStacks.put(a, [])
-							endPointStacks.get(a).push(stack)
+					deps.push(a)
+					if ( ! (a in assetsList) )
+						assetsList.push(a)
+					if (l > 0) {
+						def dependent = AssetDependency.findAllByAsset(a)
+						dependent.each {
+							if ( ! (it in dependencyList) )
+								dependencyList.push(it)
+							constructDeps(it.dependent, l-1)
 						}
-						stack -= a
-					} else {
-						cyclicalDependencyList.push(AssetDependency.findByAssetAndDependent(stack[stack.size()-1], a))
 					}
-					
 				}
 				constructDeps(asset, levelsDown)
 				
@@ -4297,40 +4286,16 @@ class AssetEntityController {
 				stack = []
 				def constructSups
 				constructSups = { a, l ->
-					def indent = ""
-					for (int i = 0; i < levelsUp-l; ++i)
-						indent += "  "
-					if (!stack.contains(a) && (!deps.contains(a) || a.assetName == asset.assetName)) {
-						stack += a
-						sups.push(a)
-						if ( ! (a in assetsList) )
-							assetsList.push(a)
-						if (l > 0) {
-							def supports = AssetDependency.findAllByDependent(a)
-							supports.each {
-								def repeat = deps.contains(it.asset)
-								endPointStacks.get(a).each { endStack ->
-									endStack.each { parentAsset ->
-										if (it.asset == parentAsset)
-											repeat = true
-									}
-								}
-								if (!repeat) {
-									if ( ! (it in dependencyList) )
-										dependencyList.push(it)
-									constructSups(it.asset, l-1)
-								} else {
-									cyclicalDependencyList.push(it)
-								}
-							}
-						} else {
-							if (endPointStacks.get(a) == null)
-								endPointStacks.put(a, [])
-							endPointStacks.get(a).push(stack)
+					sups.push(a)
+					if ( ! (a in assetsList) )
+						assetsList.push(a)
+					if (l > 0) {
+						def supports = AssetDependency.findAllByDependent(a)
+						supports.each {
+							if ( ! (it in dependencyList) )
+								dependencyList.push(it)
+							constructSups(it.asset, l-1)
 						}
-						stack -= a
-					} else {
-						cyclicalDependencyList.push(AssetDependency.findByAssetAndDependent(a, stack[stack.size()-1]))
 					}
 				}
 				constructSups(asset, levelsUp)
@@ -4419,18 +4384,16 @@ class AssetEntityController {
 			def opacity = 1
 			def statusColor = 'grey'
 			dependencyList.each {
-				def statusString = AssetDependencyStatus.VALIDATED
-				if (! it.isStatusResolved)
-					statusString = AssetDependencyStatus.QUESTIONED
-				else if (it.isFuture)
-					statusString = AssetDependencyStatus.FUTURE
-				else if ( ! (it.status in [AssetDependencyStatus.UNKNOWN, AssetDependencyStatus.VALIDATED]) )
-					statusString = 'NotApplicable'
+				def notApplicable = false
+				def future = it.isFuture
+				def unresolved = !it.isStatusResolved
+				if (it.status in [AssetDependencyStatus.ARCHIVED, AssetDependencyStatus.NA, AssetDependencyStatus.TESTING])
+					notApplicable = true
 				def sourceIndex = nodeIds.indexOf(it.asset.id)
 				def targetIndex = nodeIds.indexOf(it.dependent.id)
 				if (sourceIndex != -1 && targetIndex != -1) {
 					graphLinks << ["id":i, "parentId":it.asset.id, "childId":it.dependent.id, "child":targetIndex, "parent":sourceIndex, 
-						"value":2, "statusColor":statusColor, "opacity":opacity, "redundant":false, "mutual":null, "status":statusString]
+						"value":2, "opacity":opacity, "redundant":false, "mutual":null, "notApplicable":notApplicable, "future":future, "unresolved":unresolved]
 					++i
 				}
 			}
@@ -4445,10 +4408,8 @@ class AssetEntityController {
 				}
 			}
 			
-			// maps asset type names to simpler versions
-			def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
-			def model2 = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
-			render(view:'_applicationArchitectureGraph', model:model2)
+			def model = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
+			render(view:'_applicationArchitectureGraph', model:model)
 			
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
