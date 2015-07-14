@@ -23,6 +23,14 @@ class NumberUtilTests extends Specification {
 			NumberUtil.toLong('') == null
 	}
 
+	public void testToPositiveLong() {
+		int four=4
+
+		assertEquals 1L, NumberUtil.toPositiveLong('1')
+		assertEquals 5L, NumberUtil.toPositiveLong(-3L, 5L)
+		assertNull NumberUtil.toPositiveLong('-1')
+	}
+
 	public void testToInteger() {
 		int four=4
 
@@ -64,5 +72,24 @@ class NumberUtilTests extends Specification {
 			NumberUtil.toTinyInt('500') == null
 
 	}
-		
+	
+	public void testIsLong() {
+		assertTrue NumberUtil.isLong(50)
+		assertTrue NumberUtil.isLong(100L)
+		assertTrue NumberUtil.isLong('5')
+		assertTrue NumberUtil.isLong('12391023')
+		assertTrue NumberUtil.isLong('-1232135')
+		assertFalse NumberUtil.isLong('abc')
+		assertFalse NumberUtil.isLong(new Date())
+		assertFalse NumberUtil.isLong('123.12')
+		assertFalse NumberUtil.isLong(null)
+
+	}
+
+	public void testIsPostiveLong() {
+		assertTrue NumberUtil.isPositiveLong('5')
+		assertFalse NumberUtil.isPositiveLong('-5')
+		assertTrue NumberUtil.isPositiveLong(100)
+		assertFalse NumberUtil.isPositiveLong(-100L)
+	}
 }

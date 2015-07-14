@@ -56,6 +56,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdsops.common.lang.ExceptionUtil
 
 class TaskService implements InitializingBean {
@@ -4560,10 +4561,17 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					} else if ( whom?.isNumber() ) {
 						def whomId = whom.toLong()
 						person = projectStaff.find { it.id == whomId }
-						if ( ! person )
-							return "Indirect references an invalid person id ($whom) for ${taskSpec.whom}"
+						if ( ! person ) {
+							// Look if the person exist
+							person = Person.get(whomId)
+							if (person) {
+								return "Person $person ($whom) is not in project staff (${taskSpec.whom}), asset name: ${task?.assetEntity?.assetName}."
+							} else {
+								return "Person id $whom not exist (${taskSpec.whom}), asset name: ${task?.assetEntity?.assetName}."
+							}
+						}
 					} else if (! whom || whom.size() == 0 ) {
-						return "Unable to resolve indirect whom reference (${taskSpec.whom})"
+						return "Unable to resolve indirect whom reference (${taskSpec.whom}), asset name: ${task?.assetEntity?.assetName}."
 					}
 
 					//
@@ -4572,7 +4580,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				} catch (e) {
 					log.error "assignWhom: ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
-					return "${e.getMessage()}, whom (${taskSpec.whom})"
+					return "${e.getMessage()}, whom (${taskSpec.whom}), asset name: ${task?.assetEntity?.assetName}."
 				}
 			} 
 
@@ -4593,22 +4601,36 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						return "Staff referenced by email ($whom) not associated with project"
 				} else {
 
-					// Assignment by name
-					def map = personService.findPerson(whom, task.project, projectStaff)
-					def personMap = personService.findPersonByFullName(whom)
-					
-					if (!map.person && personMap.person ) {
-						return "Person by name ($whom) found but it is NOT a staff"
-					} else if ( map.isAmbiguous ) {
-						return "Staff referenced by name ($whom) was ambiguous"
+					if (NumberUtil.isLong(whom)) {
+						def whomId = NumberUtil.toLong(whom)
+						person = projectStaff.find { it.id == whomId }
+						if ( ! person ) {
+							// Look if the person exist
+							person = Person.get(whomId)
+							if (person) {
+								return "Person $person ($whom) is not in project staff (${taskSpec.whom}), asset name: ${task?.assetEntity?.assetName}."
+							} else {
+								return "Person id $whom not exist (${taskSpec.whom}), asset name: ${task?.assetEntity?.assetName}."
+							}
+						}
 					} else {
-						person = map.person
-					}
-					
-					if (personMap.person) {
-						person = personMap.person
-					} else {
-						return "Person by name ($whom) NOT found"
+						// Assignment by name
+						def map = personService.findPerson(whom, task.project, projectStaff)
+						def personMap = personService.findPersonByFullName(whom)
+						
+						if (!map.person && personMap.person ) {
+							return "Person by name ($whom) found but it is NOT a staff"
+						} else if ( map.isAmbiguous ) {
+							return "Staff referenced by name ($whom) was ambiguous"
+						} else {
+							person = map.person
+						}
+						
+						if (personMap.person) {
+							person = personMap.person
+						} else {
+							return "Person by name ($whom) NOT found"
+						}
 					}
 				}
 			}
