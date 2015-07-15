@@ -2041,7 +2041,7 @@ class AssetEntityController {
 	 * Used to set showAllAssetTasks preference , which is used to show all or hide the inactive tasks
 	 */
 	def setViewUnpublishedPreference () {
-		userPreferenceService.setPreference("viewUnpublished", params.viewUnpublished == '1' ? 'true' : 'false')
+		userPreferenceService.setPreference("viewUnpublished", (params.viewUnpublished == '1' || params.viewUnpublished == 'true') ? ('true') : ('false'))
 		render true
 	}
 	

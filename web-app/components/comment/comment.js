@@ -1932,16 +1932,16 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 			}
 			scope.updateViewUnpublished = function(comment) {
 				scope.comments = scope.comments;
-				commentService.setViewUnpublishedPreference(scope.viewUnpublished);
+				commentService.setViewUnpublishedPreference(scope.viewUnpublishedValue);
 			}
 			scope.commentFilter = function(comment) {
 				if (scope.showAll == '1') {
-					return (scope.viewUnpublished == '1' || comment.commentInstance.isPublished);
+					return (scope.viewUnpublishedValue == '1' || comment.commentInstance.isPublished);
 				} else {
 					return (
 						((comment.commentInstance.commentType == 'issue') && (comment.commentInstance.status != 'Completed'))
 						|| ((comment.commentInstance.commentType == 'comment') && (!comment.commentInstance.isResolved))
-					) && (scope.viewUnpublished == '1' || comment.commentInstance.isPublished);
+					) && (scope.viewUnpublishedValue == '1' || comment.commentInstance.isPublished);
 				}
 			}
 			scope.$on('commentChanged', function(evt, eventTO) {
