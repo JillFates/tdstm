@@ -160,7 +160,8 @@
 			function handleHeader () {
 				var scrollLimit = $('#staffingTable').offset().top;
 				var header = $('#headerRowId');
-				handleHeaderPositionGeneral(scrollLimit, header);
+				var leftOffset = header.offset().left;
+				handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
 			}
 			
 	 	</script>

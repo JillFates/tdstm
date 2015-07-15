@@ -1632,6 +1632,14 @@ div.centered {
 	position: fixed;
 	top: 0px;
 }
+.needHeaderBorder .floatingHeader {
+	border-left: 1px solid #63a242;
+}
+#editPermissionsTableId td,#editPermissionsTableId td {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	height: 100%;
+}
 
 #buildInfoId {
 	float: left;

@@ -3,13 +3,15 @@
  */
 
 // Set the defaults for any jqgrid
-defaults = $.jgrid.defaults
-defaults.rowNum = 25
-defaults.height = '100%'
-defaults.sortable = true
-defaults.rowList = ['25','100','500','1000']
-defaults.viewrecords = true
-defaults.datatype = 'json'
+if ($.jgrid && $.jgrid.defaults) {
+	defaults = $.jgrid.defaults
+	defaults.rowNum = 25
+	defaults.height = '100%'
+	defaults.sortable = true
+	defaults.rowList = ['25','100','500','1000']
+	defaults.viewrecords = true
+	defaults.datatype = 'json'
+}
 
 // freezes or unfreezes the header row based its location relative to the browser window
 function handleHeaderPosition () {
@@ -108,25 +110,26 @@ function initCheck() {
 }
 
 // handles positioning of the header on non-jqgrid tables
-function handleHeaderPositionGeneral (scrollLimit, header) {
+function handleHeaderPositionGeneral (scrollLimit, header, top, left) {
 	var scroll = $(document).scrollTop();
 	
 	if (scroll > scrollLimit) {
-		freezeHeaderGeneral(header);
+		freezeHeaderGeneral(header, top, left);
 	} else {
 		unfreezeHeaderGeneral(header);
 	}
 }
 
 // Freezes the header at the top of the window for non-jqgrid tables
-function freezeHeaderGeneral (header) {
+function freezeHeaderGeneral (header, top, left) {
 	if (header.parent().children('.floatingHeader').size() == 0) {
 		var clone = header.clone();
 		clone.attr('class', 'floatingHeader');
-		clone.css('left', $(header.children()[0]).offset().left - 2 + 'px');
+		clone.css('left', Math.floor(left) + 'px');
 		header.children().each(function (a, b) {
 			if (clone.children().size() > a) {
-				$(clone.children()[a]).width($(b).width());
+				var newWidth = b.scrollWidth - ($(b).innerWidth() - $(b).width());
+				$(clone.children()[a]).width(newWidth);
 				$(clone.children()[a]).on('click', function () {
 					b.click();
 				});

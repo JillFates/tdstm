@@ -2,7 +2,7 @@
 <!-- Assets edit template -->
 
 <div ng-show="editMode(type.name)" class="fieldsPane">
-	<table>
+	<table class="needHeaderBorder">
 		<tr id="buttonRowId">
 			<td colspan="10" class="buttons">
 				<div>

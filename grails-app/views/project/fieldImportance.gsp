@@ -73,7 +73,8 @@
 		var headTable = $('.tab-pane.active .fieldsPane:not(.ng-hide) #buttonRowId');
 		var scrollLimit = headTable.offset().top + headTable.height();
 		var header = $('.tab-pane.active .fieldsPane:not(.ng-hide) #headerRowId');
-		handleHeaderPositionGeneral(scrollLimit, header);
+		var leftOffset = $('.tab-pane.active .fieldsPane:not(.ng-hide) > table').offset().left;
+		handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
 	});
 	</script>
 	

@@ -1,33 +1,32 @@
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="projectHeader" />
-    <title>Show Role Permissions</title>
-  </head>
-  <body>
-  <g:if test="${flash.message}">
-      <div class="message">${flash.message}</div>
-    </g:if>
-    <tds:hasPermission permission='AdminMenuView'>
-    <div class="body">
-    <h1>Role Permissions</h1>
-	    <div class="buttons">
-      <g:form action="edit">
-          <span class="button">
-            <g:actionSubmit type="button" class="edit" value="Edit"/>
-          </span>
-  </g:form>
-    </div>
-    <div class="list" id="updateShow">
-			<table>
-				<thead>
-					<tr style="border: ; text-align: left">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="layout" content="projectHeader" />
+	<title>Show Role Permissions</title>
+	<g:javascript src="jqgrid-support.js" />
+</head>
+<body>
+	<g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+	</g:if>
+	<tds:hasPermission permission='AdminMenuView'>
+	<div class="body">
+		<h1>Role Permissions</h1>
+		<div id="buttonsDivId" class="buttons">
+			<g:form action="edit">
+				<span class="button">
+					<g:actionSubmit type="button" class="edit" value="Edit"/>
+				</span>
+			</g:form>
+		</div>
+		<div class="list" id="updateShow">
+			<table id="showPermissionsTableId">
+				<thead class="needHeaderBorder">
+					<tr id="headerRowId" class="needsBorder" style="border: ; text-align: left">
 						<th>Group</th>
 						<th>Permission Item</th>
 						<g:each in="${Permissions.Roles.values()}">
-							<th>
-								${it}
-							</th>
+							<th>${it}</th>
 						</g:each>
 						<th>Description</th>
 					</tr>
@@ -54,12 +53,28 @@
 					</g:each>
 				</tbody>
 			</table>
-		</div>   
-</div>
-    </tds:hasPermission>
-<script>
-	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
-</script>
+		</div>
+	</div>
+	</tds:hasPermission>
+	<script>
+		currentMenuId = "#adminMenu";
+		$("#adminMenuId a").css('background-color','#003366')
+		
+		// handle the scrolling header
+		var headTable;
+		var scrollLimit;
+		var header;
+		var leftOffset;
+		$(window).scroll( function() {
+			handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
+		});
+	
+		$(document).ready(function() {
+			headTable = $('#buttonsDivId');
+			scrollLimit = headTable.offset().top + headTable.height();
+			header = $('#headerRowId');
+			leftOffset = $('#showPermissionsTableId').offset().left;
+		});
+	</script>
 </body>
 </html>

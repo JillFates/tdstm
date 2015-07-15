@@ -75,7 +75,7 @@
 			<tds:hasPermission permission='PersonExpiryDate'>
 				<tr class="prop">
 					<td valign="top" class="name">
-						<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></label>
+						<label for="nickName"><b>Expiry Date:<span style="color: red">*</span></b></label>
 					</td>
 					<td valign="top" class="value">
 						<script type="text/javascript">
