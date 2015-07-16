@@ -460,7 +460,7 @@ class RackLayoutsController {
 				def query = "FROM AssetEntity AS a \
 					JOIN a.room$srcTrg AS room \
 					JOIN a.rack$srcTrg as rack \
-					WHERE a.project=:project AND a.assetClass=:assetClass AND a.assetType<>'Blade' \
+					WHERE a.project=:project AND a.assetClass=:assetClass AND (a.assetType IS NULL OR a.assetType<>'Blade') \
 					AND room.roomName=:roomName AND rack.tag=:rackName \
 					AND a.assetTag=:tag"
 
@@ -485,7 +485,6 @@ class RackLayoutsController {
 						rackId: rackId, 
 						redirectTo: redirectTo
 					]
-
 					queryParams.tag = tagValue
 					overlappedAssets = AssetEntity.findAll(query, queryParams)
 					log.debug "**** overlappedAssets = ${overlappedAssets.getClass().name} --- $overlappedAssets"
@@ -510,6 +509,7 @@ class RackLayoutsController {
 							if (overlappedAssetsSize > 1) {
 								cabling = ( (assetTag.indexOf("Devices Overlap") == -1) && showCabling == 'on' ? generateCablingLayout( overlappedAsset, backView ) : "" )
 							}
+							
 							if (printView) {
 								assetTag.append( StringUtil.ellipsis(assetTagValue.replace('~-','-'), 22) )
 							} else {
@@ -528,7 +528,6 @@ class RackLayoutsController {
 						}
 					} 
 				}
-
 				if (backView) {
 
 					def taskAnchors = ""
@@ -543,7 +542,7 @@ class RackLayoutsController {
 					if (cabling != "" && it.cssClass != "rack_error"){
 						def assetCables = AssetCableMap.findByAssetFrom(it.asset?.assetEntity)
 						if ( hasBlades && showCabling != 'on') {
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
+							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 							if ( !printView && assetCables ) {
 								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
 									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="../icons/disconnect.png"/>
@@ -552,7 +551,7 @@ class RackLayoutsController {
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;${taskAnchors}</td>")
 							}
 						} else {
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
+							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td rowspan='${rowspan}' colspan='3' class='${it.cssClass}'>")
 							row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag.toString()}</td>")
 							
 							if (includeBundleName)
@@ -569,9 +568,9 @@ class RackLayoutsController {
 						}
 					} else {
 						if( hasBlades && showCabling != 'on'){
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
+							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 						} else {
-							row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}${cabling}</td>")
+							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}${cabling}</td>")
 							if(includeBundleName)
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 							else
@@ -590,9 +589,9 @@ class RackLayoutsController {
 					}
 				} else {
 					if( hasBlades ){
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
+						row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 					} else if(cabling != ""){
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' colspan='2' class='${it.cssClass}'>")
+						row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td rowspan='${rowspan}' colspan='2' class='${it.cssClass}'>")
 						row.append("<table style='border:0;' cellpadding='0' cellspacing='0'><tr><td style='border:0;'>${assetTag.toString()}</td>")
 						if (includeBundleName)
 							row.append("<td style='border:0;'>${moveBundle}</td></tr>")
@@ -601,7 +600,7 @@ class RackLayoutsController {
 						row.append("<tr><td colspan='2' style='border:0;'>${cabling}</td></tr></table></td>")
 						
 					} else {
-						row.append("<td class='${it.rackStyle}'>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
+						row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 						if (includeBundleName)
 							row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>${moveBundle}</td>")
 						else
