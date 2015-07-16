@@ -141,7 +141,8 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 	};
 
 	$scope.setImportance = function (type,field, phase, value) {
-		$scope.importance[type][field]['phase'][phase] = value;
+		if ($scope.importance && $scope.importance[type] && $scope.importance[type][field] && $scope.importance[type][field]['phase'])
+			$scope.importance[type][field]['phase'][phase] = value;
 	};
 	$scope.updateAsset = function (type) {
 		$http({
