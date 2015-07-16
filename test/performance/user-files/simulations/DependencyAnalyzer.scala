@@ -6,9 +6,20 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 class DependencyAnalyzerTest extends Simulation {
-
+	
+	var startingURL = "http://localhost:8080"
+	var numUsers = 1
+	if(System.getProperty("startingURL") != null)
+	{
+		startingURL = System.getProperty("startingURL")
+	}
+	if(System.getProperty("numUsers") != null)
+	{
+		numUsers = Integer.getInteger("numUsers", 1)
+	}
+	
 	val httpProtocol = http
-		.baseURL("http://localhost:8080")
+		.baseURL(startingURL)
 		.inferHtmlResources()
 		.acceptHeader("*/*")
 		.acceptEncodingHeader("gzip, deflate")
@@ -31,13 +42,13 @@ class DependencyAnalyzerTest extends Simulation {
 
 	val headers_3 = Map(
 		"Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-		"Origin" -> "http://localhost:8080")
+		"Origin" -> startingURL)
 
 	val headers_4 = Map(
-		"Origin" -> "http://localhost:8080",
+		"Origin" -> startingURL,
 		"X-Requested-With" -> "XMLHttpRequest")
 
-    val uri1 = "http://localhost:8080/tdstm"
+    val uri1 = startingURL + "/tdstm"
 
 	val scn = scenario("DependencyAnalyzerTest")
 		.exec(http("request_0")
@@ -114,5 +125,5 @@ class DependencyAnalyzerTest extends Simulation {
 			.get("/tdstm/moveBundle/dependencyConsole")
 			.headers(headers_2))
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(scn.inject(atOnceUsers(numUsers))).protocols(httpProtocol)
 }

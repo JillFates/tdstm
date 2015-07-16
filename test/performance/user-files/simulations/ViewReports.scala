@@ -6,9 +6,18 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 class ViewReports extends Simulation {
-
+	var startingURL = "http://localhost:8080"
+	var numUsers = 50
+	if(System.getProperty("startingURL") != null)
+	{
+		startingURL = System.getProperty("startingURL")
+	}
+	if(System.getProperty("numUsers") != null)
+	{
+		numUsers = Integer.getInteger("numUsers", 1)
+	}
 	val httpProtocol = http
-		.baseURL("http://localhost:8080")
+		.baseURL(startingURL)
 		.inferHtmlResources()
 		.acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 		.acceptEncodingHeader("gzip, deflate")
@@ -18,14 +27,14 @@ class ViewReports extends Simulation {
 
 	val headers_0 = Map("Accept-Encoding" -> "gzip, deflate, sdch")
 
-	val headers_1 = Map("Origin" -> "http://localhost:8080")
+	val headers_1 = Map("Origin" -> startingURL)
 
 	val headers_2 = Map(
 		"Accept" -> "*/*",
-		"Origin" -> "http://localhost:8080",
+		"Origin" -> startingURL,
 		"X-Requested-With" -> "XMLHttpRequest")
 
-    val uri1 = "http://localhost:8080/tdstm"
+    val uri1 = startingURL + "/tdstm"
 
 	val scn = scenario("ViewReports")
 		.exec(http("request_0")
@@ -93,5 +102,5 @@ class ViewReports extends Simulation {
 			.formParam("viewUnpublished", "on")
 			.formParam("_action_tasksReport", "Generate Web"))
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(scn.inject(atOnceUsers(numUsers))).protocols(httpProtocol)
 }
