@@ -152,7 +152,12 @@
 							<tds:hasPermission permission='UserLoginView'>
 							<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Users</g:link></li>
 							</tds:hasPermission>
+							<tds:hasPermission permission='PersonImport'>
 							<li><g:link class="mmlink" controller="admin" action="importAccounts" onclick="hideMegaMenu('adminMegaMenu')">Import Accounts</g:link></li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='PersonExport'>
+							<li><g:link class="mmlink" controller="admin" action="exportAccounts" onclick="hideMegaMenu('adminMegaMenu')">Export Accounts</g:link></li>
+							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
 							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMCreatePerson?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
 							</tds:hasPermission>

@@ -146,6 +146,20 @@ class PartyRelationshipService {
 		
 		return personInstanceList
 	}
+
+	/* ********************************************************************* */
+
+	/**
+	 * This method returns all the project staff for the given company.
+	 */
+	def getCompanyProjectStaff(def companyId){
+		def query = "FROM Person s WHERE s.id IN (SELECT DISTINCT(partyIdTo) FROM PartyRelationship pr WHERE partyRelationshipType = 'PROJ_STAFF' AND partyIdFrom IN (SELECT id FROM Project WHERE client.id=:clientId)) ORDER BY lastName, firstName, middleName"
+
+		return Person.findAll(query, [clientId:companyId])
+	}
+
+	/* ********************************************************************* */
+
 	/*
 	 *  Return the Application staff
 	 */

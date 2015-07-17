@@ -1089,6 +1089,123 @@ class AdminController {
 	}
 	
 
+	/** ******************************************************************** */
+
+	/**
+	 * Process the Account Export request and outputs a CSV.
+	 */
+	def exportAccountsProcess(){
+
+		def persons = []
+
+		response.setHeader("Content-disposition", "attachment; filename=accounts.csv")
+        response.contentType = "application/vnd.ms-excel"
+
+        def outputStream = response.outputStream
+
+		if(params.partyRelTypeCode && params.company){
+			def company = params.company.toLong()
+			if(params.partyRelTypeCode == "STAFF"){
+				persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
+			}else if(params.partyRelTypeCode == "PROJ_STAFF"){
+				persons = partyRelationshipService.getCompanyProjectStaff(company)
+			}
+
+			outputStream << "username,firstname,middlename,lastname,phone,teams,role,email,password,active,expiryDate,isLocal\n"
+
+			if(persons){
+				if(params.login){
+					exportAccountsWithLoginInfo(persons, outputStream, company)
+				}else{
+					exportAccountsNoLoginInfo(persons, outputStream, company)
+				}
+			}
+			
+			outputStream.flush()
+          	outputStream.close()
+		}else{
+			render(view:"exportAccounts")	
+		}
+
+		
+	}
+
+	/** ******************************************************************** */
+
+	/**
+	 * Retrieves the default fields to be exported for a single account.
+	 */
+	private def getExportAccountDefaultFields(person, companyId){
+		def fields = [
+							"", // No username
+							person.firstName,
+							person.middleName,
+							person.lastName,
+							person.workPhone?:"",
+							person.getPersonRoles(companyId).join(";"),
+							"", // Roles
+							person.email?:"",
+							"", // empty password
+						]
+		return fields
+	}
+
+	/** ******************************************************************** */
+
+	/**
+	 * This method outputs all the fields separated by comma and appends
+	 * a line separator at the end.
+	 */
+	private def exportAccountFields(outputStream, fields){
+		outputStream << fields.join(",")
+		outputStream << "\n"
+	}
+
+	/** ******************************************************************** */
+
+	private void exportAccountsWithLoginInfo(persons, outputStream, companyId){
+		persons.each{ p->
+			def loginInfo = UserLogin.findByPerson(p)
+			def fields = getExportAccountDefaultFields(p, companyId)
+			if(loginInfo){
+				fields[0] = loginInfo.username
+				fields << loginInfo.active
+				fields << loginInfo.expiryDate
+				fields << (loginInfo.isLocal? "YES" : "NO")
+			}
+			exportAccountFields(outputStream, fields)
+		}
+	}
+
+	/** ******************************************************************** */
+
+	private void exportAccountsNoLoginInfo(persons, outputStream, companyId){
+		persons.each{ p->
+			def fields = getExportAccountDefaultFields(p, companyId)
+			fields << "" // Empty active
+			fields << "" // Empty expiryDate
+			fields << "" // Empty isLocal
+			exportAccountFields(outputStream, fields)
+		}
+
+	}
+
+	/** ******************************************************************** */
+	
+	/**
+	 * This method renders the Export Accounts form.
+	 * 
+	 */
+	def exportAccounts(){
+		if (!controllerService.checkPermission(this, 'PersonExport')){
+			return
+		}
+		render(view:"exportAccounts")
+	}
+	
+	/** ******************************************************************** */
+
+	
 	/**
 	 * A controller process to import user accounts
 	 */
