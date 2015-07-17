@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -20,6 +21,10 @@ import com.tds.asset.AssetDependencyBundle
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.WorkbookUtil
+import net.transitionmanager.ProjectDailyMetric
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class ProjectService {
 
@@ -667,6 +672,303 @@ class ProjectService {
 		} else {
 			return [message: "", success: false]
 		}
+	}
+
+	/**
+	 * This function is used by the daily project metrics job to generate daily metrics.
+	 * It search for active projects and for each one retrives specific metrics: assets, deps, users, tasks
+	 */
+	def activitySnapshot(params) {
+		log.info "Project Daily Metrics started."
+
+		// Date format for SQLs
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+		def startDate = findProjectDailyMetricsLastRunDay().clearTime()
+		def endDate = new Date().clearTime()
+
+		log.info "Project Daily Metrics will run from $startDate to $endDate"
+
+		def metricsByProject
+		def metrics
+		def projects
+		def sqlSearchDate
+
+		for (searchDate in startDate..endDate) {
+
+			sqlSearchDate = formatter.format(searchDate)
+
+			log.info "Project Daily Metrics. Processing date: $sqlSearchDate"
+
+			metricsByProject = [:]
+			metrics = []
+			projects = []
+
+			// ***************************
+			// Retrieve assets information
+			fillAssetsMetrics(metrics, metricsByProject, projects, searchDate, sqlSearchDate)
+
+			// ***************************
+			// Retrieve tasks information
+			fillTasksMetrics(metricsByProject, sqlSearchDate)
+
+			// *********************************
+			// Retrieve dependencies information
+			fillDependenciesMetrics(metricsByProject, sqlSearchDate)
+
+			// **************************************
+			// Retrieve person/user login information
+			fillUsersMetrics(metrics, metricsByProject, projects, sqlSearchDate)
+
+			// Deletes any existing record
+			def now = formatter.format(new Date())
+			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
+
+			metrics.each { metric ->
+				//TODO: Remove duplicated
+				if (!metric.save(flush:true)) {
+					log.error "generateDailyMetrics: failed to create ProjectDailyMetric: ${GormUtil.allErrorsString(metric)}"
+				}
+			}
+
+			log.info "Project Daily Metrics. End date: $sqlSearchDate"
+		}
+
+		log.info "Project Daily Metrics ended."
+	}
+
+	/**
+	 * Search for the last date that the process had been executed.
+	 * If no date is found then it returns current date.
+	 */
+	private def findProjectDailyMetricsLastRunDay() {
+
+		def result
+		def lastDateQuery = new StringBuffer("""
+			SELECT max(metric_date) as last_date FROM project_daily_metric
+		""")
+
+		def metricsLastDate = jdbcTemplate.queryForList(lastDateQuery.toString())
+
+		if (metricsLastDate[0]['last_date'] == null) {
+			result = new Date()
+		} else {
+			result = new Date(metricsLastDate[0]['last_date'].getTime())
+		}
+
+		return result;
+	}
+
+	/**
+	 * Function used by activitySnapshot to retrive assets information
+	 */
+	private def fillAssetsMetrics(metrics, metricsByProject, projects, searchDate, sqlSearchDate) {
+
+		def project
+		def bundle
+		def assetClass
+		def assetClassOption
+		def projectDailyMetric
+
+		def assetsCountsQuery = new StringBuffer("""
+			SELECT ae.project_id, ae.asset_class, m.asset_type, mb.use_for_planning, count(*) as count
+			FROM asset_entity ae
+			INNER JOIN move_bundle mb ON mb.move_bundle_id = ae.move_bundle_id
+			LEFT JOIN model m ON m.model_id = ae.model_id
+			INNER JOIN project p ON p.project_id = ae.project_id
+			WHERE p.completion_date > '$sqlSearchDate'
+			GROUP BY ae.project_id, ae.asset_class, m.asset_type, mb.use_for_planning
+			ORDER BY ae.project_id, mb.use_for_planning
+		""")
+
+		def assetsCountsList = jdbcTemplate.queryForList(assetsCountsQuery.toString())
+		assetsCountsList.each {
+			if ((project == null) || (project.id != it["project_id"])) {
+				project = Project.get(it["project_id"])
+				projects << project
+				projectDailyMetric = new ProjectDailyMetric()
+				projectDailyMetric.project = project
+				projectDailyMetric.metricDate = searchDate
+				metricsByProject[it["project_id"]] = projectDailyMetric
+				metrics << projectDailyMetric
+			}
+
+			assetClass = AssetClass.safeValueOf(it["asset_class"])
+			assetClassOption = AssetClass.getClassOptionForAsset(assetClass, it["asset_type"])
+
+			if (it["use_for_planning"]) {
+				switch(assetClassOption) {
+					case 'SERVER-DEVICE':
+						projectDailyMetric.planningServers += it["count"]
+						break;
+					case 'STORAGE-DEVICE':
+						projectDailyMetric.planningPhysicalStorages += it["count"]
+						break;
+					case 'NETWORK-DEVICE':
+						projectDailyMetric.planningNetworkDevices += it["count"]
+						break;
+					case 'OTHER-DEVICE':
+						projectDailyMetric.planningOtherDevices += it["count"]
+						break;
+					case 'APPLICATION':
+						projectDailyMetric.planningApplications += it["count"]
+						break;
+					case 'DATABASE':
+						projectDailyMetric.planningDatabases += it["count"]
+						break;
+					case 'STORAGE-LOGICAL':
+						projectDailyMetric.planningLogicalStorages += it["count"]
+						break;
+				}
+			} else {
+				switch(assetClassOption) {
+					case 'SERVER-DEVICE':
+						projectDailyMetric.nonPlanningServers += it["count"]
+						break;
+					case 'STORAGE-DEVICE':
+						projectDailyMetric.nonPlanningPhysicalStorages += it["count"]
+						break;
+					case 'NETWORK-DEVICE':
+						projectDailyMetric.nonPlanningNetworkDevices += it["count"]
+						break;
+					case 'OTHER-DEVICE':
+						projectDailyMetric.nonPlanningOtherDevices += it["count"]
+						break;
+					case 'APPLICATION':
+						projectDailyMetric.nonPlanningApplications += it["count"]
+						break;
+					case 'DATABASE':
+						projectDailyMetric.nonPlanningDatabases += it["count"]
+						break;
+					case 'STORAGE-LOGICAL':
+						projectDailyMetric.nonPlanningLogicalStorages += it["count"]
+						break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Function used by activitySnapshot to retrieve tasks information
+	 */
+	private def fillTasksMetrics(metricsByProject, sqlSearchDate) {
+
+		def projectDailyMetric
+
+		def tasksCountsQuery = new StringBuffer("""
+			SELECT ac.project_id, count(ac.asset_comment_id) as all_count, count(ac_done.asset_comment_id) as done_count
+			FROM project p
+			INNER JOIN asset_comment ac ON p.project_id = ac.project_id AND ac.comment_type = 'issue' AND ac.is_published = 1
+			LEFT JOIN asset_comment ac_done ON ac_done.asset_comment_id = ac.asset_comment_id AND ac_done.is_resolved = 1
+			WHERE p.completion_date > '$sqlSearchDate'
+			GROUP BY ac.project_id
+			ORDER BY ac.project_id
+		""")
+
+		def tasksCountsList = jdbcTemplate.queryForList(tasksCountsQuery.toString())
+
+		tasksCountsList.each {
+			projectDailyMetric = metricsByProject[it["project_id"]]
+			if (projectDailyMetric) {
+				projectDailyMetric.tasksAll = it["all_count"]
+				projectDailyMetric.tasksDone = it["done_count"]
+			}
+		}
+
+	}
+
+	/**
+	 * Function used by activitySnapshot to retrieve dependencies information
+	 */
+	private def fillDependenciesMetrics(metricsByProject, sqlSearchDate) {
+
+		def projectDailyMetric
+
+		def dependenciesCountsQuery = new StringBuffer("""
+			SELECT ae.project_id, count(*) as count
+			FROM asset_entity ae
+			INNER JOIN asset_dependency ad ON ae.asset_entity_id = ad.asset_id
+			INNER JOIN project p ON p.project_id = ae.project_id
+			WHERE p.completion_date > '$sqlSearchDate'
+			GROUP BY ae.project_id 
+			ORDER BY ae.project_id
+		""")
+
+		def dependenciesCountsList = jdbcTemplate.queryForList(dependenciesCountsQuery.toString())
+
+		dependenciesCountsList.each {
+			projectDailyMetric = metricsByProject[it["project_id"]]
+			if (projectDailyMetric) {
+				projectDailyMetric.dependencyMappings = it["count"]
+			}
+		}
+
+	}
+
+	/**
+	 * Function used by activitySnapshot to retrieve persons and user login information
+	 */
+	private def fillUsersMetrics(metrics, metricsByProject, projects, sqlSearchDate) {
+
+		def projectDailyMetric
+		def companyIds = [0]
+		def projectsMapByCompanyId = [:]
+
+		projects.each{ p ->
+			companyIds << p.client.id
+			projectsMapByCompanyId[p.client.id] = p 
+		}
+
+		def cIds = companyIds.join(",")
+
+		def personsCountsQuery = new StringBuffer("""
+			SELECT pg.party_group_id as companyId, count(p.person_id) AS totalPersons, count(u.username) as totalUserLogins, count(u_active.username) as activeUserLogins
+			FROM person p
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF' 
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id 
+			LEFT OUTER JOIN party pa on p.person_id=pa.party_id 
+			LEFT OUTER JOIN user_login u on p.person_id=u.person_id 
+			LEFT OUTER JOIN user_login u_active on p.person_id=u_active.person_id AND u_active.last_modified > ('$sqlSearchDate' - INTERVAL 1 DAY)
+			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id 
+			WHERE pg.party_group_id in ($cIds)
+			GROUP BY pg.party_group_id
+		""")
+
+		def personsCountsList = jdbcTemplate.queryForList(personsCountsQuery.toString())
+		def project
+
+		personsCountsList.each {
+			project = projectsMapByCompanyId[it["companyId"]]
+			projectDailyMetric = metricsByProject[project.id]
+			if (projectDailyMetric) {
+				projectDailyMetric.totalPersons = it["totalPersons"]
+				projectDailyMetric.totalUserLogins = it["totalUserLogins"]
+				projectDailyMetric.activeUserLogins = it["activeUserLogins"]
+			}
+		}
+	}
+
+	/**
+	 * Search activity metrics for the given project ids and in the specified date range
+	 */
+	def searchProjectActivityMetrics(projectIds, startDate, endDate) {
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		def sqlStartDate = formatter.format(startDate)
+		def sqlEndDate = formatter.format(endDate)
+		def projectIdsValue = projectIds.join(',')
+
+		def activitiesMetricsQuery = new StringBuffer("""
+			SELECT p.project_code, pdm.*
+			FROM project_daily_metric pdm
+			INNER JOIN project p ON p.project_id = pdm.project_id
+			WHERE pdm.metric_date >= '$sqlStartDate' AND pdm.metric_date <= '$sqlEndDate'
+			      AND p.project_id IN ($projectIdsValue)
+			ORDER BY p.project_code ASC, pdm.metric_date ASC
+		""")
+
+		def activitiesMetrics = jdbcTemplate.queryForList(activitiesMetricsQuery.toString())
+
+		return activitiesMetrics
 	}
 
 }

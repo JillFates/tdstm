@@ -87,4 +87,5 @@ databaseChangeLog = {
 	include file: '20150529-drop-party-column-from-project-logo.groovy'
 	include file: '20150602-add-column-instructions-link-to-asset-comment.groovy'
 	include file: '20150610-task-role-defaulted-to-blank.groovy'
+	include file: '20150710-poject-activity-metrics-table.groovy'
 }

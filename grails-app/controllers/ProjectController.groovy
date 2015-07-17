@@ -24,6 +24,10 @@ import com.tdssrc.grails.StringUtil
 import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.common.lang.ExceptionUtil
 
+import org.quartz.SimpleTrigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
+import org.quartz.Trigger
+
 class ProjectController {
 	def userPreferenceService
 	def partyRelationshipService
@@ -31,6 +35,7 @@ class ProjectController {
 	def projectService
 	def securityService
 	def controllerService
+	def quartzScheduler
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -603,6 +608,32 @@ class ProjectController {
 
 	def editImportanceFields() {
 		render( view: "editImportance", model: [])
+	}
+
+	/**
+	 * Used to launch the project metrics daily job for testing purposes.
+	 */
+	def launchProjectDailyMetricsJob() {
+		def success = true
+		def errorMessage = ""
+		if(RolePermissions.hasPermission("ShowProjectDailyMetrics")){
+
+			def params = [:]
+			def key = "ProjectDailyMetrics-" + UUID.randomUUID().toString()
+			def jobName = "TM-" + key
+			
+			// Delay 2 seconds to allow this current transaction to commit before firing off the job
+			Trigger trigger = new SimpleTriggerImpl(jobName, null, new Date(System.currentTimeMillis() + 2000) )
+			trigger.jobDataMap.putAll(params)
+			trigger.jobDataMap.put('key', key)
+			trigger.setJobName('ProjectDailyMetricsJob')
+			trigger.setJobGroup('tdstm-project-daily-metrics')
+			quartzScheduler.scheduleJob(trigger)
+		} else {
+			success = false
+			errorMessage = "User don't have permissions to do this action."
+		}
+		render( view: "projectDailyMetrics", model: [success: success, errorMessage: errorMessage])
 	}
 
 }

@@ -71,18 +71,27 @@ enum AssetClass {
 		]
 	}
 
-
 	/** 
 	 * Used to determine the Class Option based on the assetType
 	 * @param type - the asset type
 	 * @return the name of the class option
 	 */
 	static String getClassOptionForAsset(Object asset) {
+		return getClassOptionForAsset(asset?.assetClass, asset.model?.assetType)
+	}
+
+	/** 
+	 * Used to determine the Class Option based on the assetType
+	 * @param assetClass - the asset class
+	 * @param assetType - the asset type
+	 * @return the name of the class option
+	 */
+	static String getClassOptionForAsset(AssetClass assetClass, String assetType) {
 		String option
 
-		switch(asset?.assetClass) {
+		switch(assetClass) {
 			case AssetClass.DEVICE:
-				def type = asset.model?.assetType
+				def type = assetType
 				if (type) {
 					if (AssetType.getServerTypes().contains(type)) {
 						option = 'SERVER-DEVICE'
@@ -110,7 +119,7 @@ enum AssetClass {
 				break
 
 			default:
-				throw new RuntimeException("Unhandled switch statement for value ${asset.assetClass}")
+				throw new RuntimeException("Unhandled switch statement for value ${assetClass}")
 
 		}
 

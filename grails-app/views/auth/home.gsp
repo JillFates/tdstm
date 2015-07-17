@@ -142,6 +142,13 @@ a:hover {
 								<g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link>
 							</td>
 						</tr>
+						<tds:hasPermission permission='ShowProjectDailyMetrics'>
+						<tr class="odd">
+							<td colspan="2">
+								<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
+							</td>
+						</tr>
+						</tds:hasPermission>
 					</tbody>
 				</table>
 			</div>

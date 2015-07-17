@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.*
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.hssf.usermodel.HSSFCellStyle
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.IndexedColors
 
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
@@ -26,10 +30,12 @@ import com.tds.asset.AssetDependencyBundle
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
+import com.tdssrc.grails.NumberUtil
 import com.tds.util.workbook.*
 import com.tdsops.common.lang.ExceptionUtil
 
@@ -1464,5 +1470,176 @@ class ReportsController {
 			}
 		}
 	}
+
+	/**
+	 * Used to generate project activity metrics Report.
+	 */
+	def projectActivityMetrics() {
+		def projectInstance = controllerService.getProjectForPage(this, "ShowProjectDailyMetrics")
+		if (! projectInstance) 
+			return
+
+		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
+		def startDate = Calendar.instance
+		startDate.set(Calendar.DATE, 1)
+		startDate.add(Calendar.MONTH, -2)
+		startDate = startDate.time
+		def endDate = new Date()
+
+		render( view:'projectActivityMetricsReport', model:[userProjects: userProjects, startDate:startDate, endDate:endDate])
+	}
+
+	/**
+	 * Used to generate project activity metrics excel file.
+	 */
+	def projectActivityMetricsExport() {
+
+		def projectInstance = controllerService.getProjectForPage(this, "ShowProjectDailyMetrics")
+		if (! projectInstance) 
+			return
+
+		def projectIds = params.list("projectId").toList()
+		def startDate = params.startDate
+		def endDate = params.endDate
+		def includeNonPlanning = params.includeNonPlanning
+		def includeDemoProject = params.includeDemoProject
+
+		def validDates = true
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+		try {
+			startDate = formatter.parse(startDate)
+			endDate = formatter.parse(endDate)
+		} catch (Exception e) {
+			validDates = false
+		}
+		
+		if(projectIds && validDates) {
+			def allProjects = projectIds.find{it=='all'} ? true : false
+			def badProjectIds = false
+			def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+			def userProjects = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, ProjectStatus.ACTIVE)
+			def userProjectsMap = [:]
+			def invalidProjectIds = []
+			def allProjectIds = []
+
+			userProjects.each { p ->
+				if (Project.isDefaultProject(p)) {
+					if (includeDemoProject) {
+						userProjectsMap[p.id] = p
+						allProjectIds << p.id
+					}
+				} else {
+					userProjectsMap[p.id] = p
+					allProjectIds << p.id
+				}
+			}
+
+			if ( allProjects ) {
+				projectIds = allProjectIds
+			} else {
+				projectIds = projectIds.collect { id -> NumberUtil.toLong(id) }
+				// Verify that the user can accesss the proj
+				projectIds.each{ id -> 
+					if (!userProjectsMap[id]) {
+						invalidProjectIds << id
+						badProjectIds = true
+					}
+				}
+			}
+
+			//if found any bad id returning to the user
+			if( badProjectIds ){
+				flash.message = "Project ids $invalidProjectIds are not associated with current user."
+				redirect( action:"projectActivityMetrics")
+				return
+			}
+
+			def activityMetrics = projectService.searchProjectActivityMetrics(projectIds, startDate, endDate)
+
+		  	exportProjectActivityMetricsExcel(activityMetrics, includeNonPlanning)
+
+		} else{
+			flash.message = "Please select at least one project and valid dates."
+			redirect( action:"projectActivityMetrics")
+		}		
+	}
+
+	/**
+	 * Export task report in XLS format
+	 * @param activityMetrics: activity metrics
+	 * @param includeNonPlanning: display or not non planning information
+	 * @return : will generate a XLS file
+	 */
+	private def exportProjectActivityMetricsExcel(activityMetrics, includeNonPlanning) {
+		File file =  ApplicationHolder.application.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		def fileDate = formatter.format(new Date())
+		def filename = "ActivityMetrics-${fileDate}-Report"
+
+		//set MIME TYPE as Excel
+		response.setContentType( "application/vnd.ms-excel" )
+		response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+		
+		def book = new HSSFWorkbook(new FileInputStream( file ));
+		def metricsSheet = book.getSheet("metrics")
+					
+		def projectNameFont = book.createFont()
+		projectNameFont.setFontHeightInPoints((short)12)
+		projectNameFont.setFontName("Arial")
+		projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+
+		def projectNameCellStyle
+		projectNameCellStyle = book.createCellStyle()
+		projectNameCellStyle.setFont(projectNameFont)
+
+		DateFormat metricDateformatter = new SimpleDateFormat("MM/dd/yy")
+
+		def rowNum = 5
+		def project_code
+
+		activityMetrics.each{ am ->
+
+			if (project_code != am['project_code']) {
+				rowNum++
+				project_code = am['project_code']
+				WorkbookUtil.addCell(metricsSheet, 0, rowNum, am['project_code'])
+				WorkbookUtil.applyStyleToCell(metricsSheet, 0, rowNum, projectNameCellStyle)
+			}
+			
+			WorkbookUtil.addCell(metricsSheet, 1, rowNum, metricDateformatter.format(am['metric_date']))
+			WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Planning')
+			WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['planning_servers'])
+			WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['planning_applications'])
+			WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['planning_databases'])
+			WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['planning_network_devices'])
+			WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['planning_physical_storages'])
+			WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['planning_logical_storages'])
+			WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['planning_other_devices'])
+			WorkbookUtil.addCell(metricsSheet, 10, rowNum, am['dependency_mappings'])
+			WorkbookUtil.addCell(metricsSheet, 11, rowNum, am['tasks_all'])
+			WorkbookUtil.addCell(metricsSheet, 12, rowNum, am['tasks_done'])
+			WorkbookUtil.addCell(metricsSheet, 13, rowNum, am['total_persons'])
+			WorkbookUtil.addCell(metricsSheet, 14, rowNum, am['total_user_logins'])
+			WorkbookUtil.addCell(metricsSheet, 15, rowNum, am['active_user_logins'])
+
+			rowNum++
+
+			if (includeNonPlanning) {
+				WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Non Planning')
+				WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['non_planning_servers'])
+				WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['non_planning_applications'])
+				WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['non_planning_databases'])
+				WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['non_planning_network_devices'])
+				WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['non_planning_physical_storages'])
+				WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['non_planning_logical_storages'])
+				WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['non_planning_other_devices'])
+				rowNum++
+			}
+		}
+
+		book.write(response.getOutputStream())
+	}
+
 }
  
