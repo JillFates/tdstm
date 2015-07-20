@@ -74,8 +74,8 @@
 						{name:'lastname', index: 'lastname', width:'80'},
 						{name:'userLogin', width:'80'},
 						{name:'company',width:'100'},
-						{name:'dateCreated',width:'50', formatter:formatDate},
-						{name:'lastUpdated',width:'50', formatter:formatDate},
+						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridFormatDateCell},
+						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridFormatDateCell},
 						{name:'modelScore',width:'50'}"
 					sortname="'lastname'"
 					caption="listCaption"
@@ -89,11 +89,6 @@
 				</jqgrid:grid>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				
-				function formatDate (cellvalue, options, rowObject) {
-					if(cellvalue)
-						return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
-					return 'Never'
-				}
 			})
 		</script>
 	</head>

@@ -233,6 +233,19 @@ var tdsCommon = {
 			result = momentObj.format(format);
 		}
 		return result;
+	},
+
+	jqgridFormatDateCell: function(cellvalue, options, rowObject) {
+		if (cellvalue) {
+			var result = "";
+			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+			if (momentObj) {
+				result = momentObj.format(tdsCommon.defaultDateFormat());
+			}
+			return result;
+		} else {
+			return 'Never';
+		}
 	}
 
 }
