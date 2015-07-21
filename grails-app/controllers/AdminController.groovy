@@ -9,6 +9,8 @@ import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavEntityType
+import com.tdssrc.grails.ExportUtil
+import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -1095,37 +1097,41 @@ class AdminController {
 	 * Process the Account Export request and outputs a CSV.
 	 */
 	def exportAccountsProcess(){
+		try{
 
-		def persons = []
+			def persons = []
 
-		response.setHeader("Content-disposition", "attachment; filename=accounts.csv")
-        response.contentType = "application/vnd.ms-excel"
+			def filePath = "/templates/TDS-Accounts_template.xls"
+			def filename = "ExportAccounts-${new Date()}"
+	        def book = ExportUtil.workBookInstance(filename, filePath, response) 
+			def sheet = book.getSheet("Accounts")
 
-        def outputStream = response.outputStream
-
-		if(params.partyRelTypeCode && params.company){
-			def company = params.company.toLong()
-			if(params.partyRelTypeCode == "STAFF"){
-				persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
-			}else if(params.partyRelTypeCode == "PROJ_STAFF"){
-				persons = partyRelationshipService.getCompanyProjectStaff(company)
-			}
-
-			outputStream << "username,firstname,middlename,lastname,phone,teams,role,email,password,active,expiryDate,isLocal\n"
-
-			if(persons){
-				if(params.login){
-					exportAccountsWithLoginInfo(persons, outputStream, company)
-				}else{
-					exportAccountsNoLoginInfo(persons, outputStream, company)
+			if(params.partyRelTypeCode && params.company){
+				def company = params.company.toLong()
+				if(params.partyRelTypeCode == "STAFF"){
+					persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
+				}else if(params.partyRelTypeCode == "PROJ_STAFF"){
+					persons = partyRelationshipService.getCompanyProjectStaff(company)
 				}
+
+				if(persons){
+					if(params.login){
+						exportAccountsWithLoginInfo(persons, sheet, company)
+					}else{
+						exportAccountsNoLoginInfo(persons, sheet, company)
+					}
+				}
+				
+				book.write(response.getOutputStream())
 			}
-			
-			outputStream.flush()
-          	outputStream.close()
-		}else{
-			render(view:"exportAccounts")	
+
+		}catch(Exception e){
+			log.error "Exception occurred while exporting data" + e.printStackTrace()
+			flash.message = e.getMessage()
 		}
+
+		render(view:"exportAccounts")	
+		
 
 		
 	}
@@ -1153,18 +1159,18 @@ class AdminController {
 	/** ******************************************************************** */
 
 	/**
-	 * This method outputs all the fields separated by comma and appends
-	 * a line separator at the end.
+	 * This method outputs all the fields to the sheet.
 	 */
-	private def exportAccountFields(outputStream, fields){
-		outputStream << fields.join(",")
-		outputStream << "\n"
+	private def exportAccountFields(sheet, fields, rowNumber){
+		(0..fields.size()-1).each{
+			WorkbookUtil.addCell(sheet, it, rowNumber, fields[it])
+		}
 	}
 
 	/** ******************************************************************** */
 
-	private void exportAccountsWithLoginInfo(persons, outputStream, companyId){
-		persons.each{ p->
+	private void exportAccountsWithLoginInfo(persons, sheet, companyId){
+		persons.eachWithIndex{ p, index ->
 			def loginInfo = UserLogin.findByPerson(p)
 			def fields = getExportAccountDefaultFields(p, companyId)
 			if(loginInfo){
@@ -1173,19 +1179,19 @@ class AdminController {
 				fields << loginInfo.expiryDate
 				fields << (loginInfo.isLocal? "YES" : "NO")
 			}
-			exportAccountFields(outputStream, fields)
+			exportAccountFields(sheet, fields, index + 1)
 		}
 	}
 
 	/** ******************************************************************** */
 
-	private void exportAccountsNoLoginInfo(persons, outputStream, companyId){
-		persons.each{ p->
+	private void exportAccountsNoLoginInfo(persons, sheet, companyId){
+		persons.eachWithIndex{ p, index ->
 			def fields = getExportAccountDefaultFields(p, companyId)
 			fields << "" // Empty active
 			fields << "" // Empty expiryDate
 			fields << "" // Empty isLocal
-			exportAccountFields(outputStream, fields)
+			exportAccountFields(sheet, fields, index + 1)
 		}
 
 	}
