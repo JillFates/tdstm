@@ -436,9 +436,9 @@ class TimeUtil {
 				break;
 			case FORMAT_DATE_TIME_7:
 				if (isMMDDYYYY)
-					formatter = new SimpleDateFormat("dd-MMM")
-				else
 					formatter = new SimpleDateFormat("MMM-dd")
+				else
+					formatter = new SimpleDateFormat("dd-MMM")
 				break;
 			case FORMAT_DATE_TIME_8:
 				if (isMMDDYYYY)

@@ -76,11 +76,11 @@
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'50', fixed:false},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'${dbPref['1']}',width:'120'},
-						{name:'${dbPref['2']}', width:'120'},
-						{name:'${dbPref['3']}', width:'120'}, 
-						{name:'${dbPref['4']}', width:'120'},
-						{name:'${dbPref['5']}', width:'120'},
+						{name:'${dbPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${dbPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${dbPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${dbPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${dbPref['5']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"

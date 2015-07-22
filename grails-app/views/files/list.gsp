@@ -73,11 +73,11 @@
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'50'},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'${filesPref['1']}',width:'120'},
-						{name:'${filesPref['2']}', width:'120'},
-						{name:'${filesPref['3']}', width:'120'}, 
-						{name:'${filesPref['4']}', width:'120'},
-						{name:'${filesPref['5']}', width:'120'},
+						{name:'${filesPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${filesPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${filesPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${filesPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${filesPref['5']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"

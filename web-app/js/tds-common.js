@@ -235,7 +235,7 @@ var tdsCommon = {
 		return result;
 	},
 
-	jqgridFormatDateCell: function(cellvalue, options, rowObject) {
+	jqgridDateCellFormatter: function(cellvalue, options, rowObject) {
 		if (cellvalue) {
 			var result = "";
 			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
@@ -246,6 +246,27 @@ var tdsCommon = {
 		} else {
 			return 'Never';
 		}
+	},
+
+	jqgridPrefCellFormatter: function(cellvalue, options, rowObject) {
+		var result = cellvalue;
+		switch (options.colModel.name) {
+			case "lastUpdated":
+			case "retireDate":
+			case "maintExpDate":
+				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+				if (momentObj.isValid()) {
+					result = momentObj.format(tdsCommon.defaultDateTimeFormat());
+				} else {
+					result = "";
+				}
+				break;
+		}
+		return result;
+	},
+
+	timeZone: function() {
+		return $("#tzId").val()
 	}
 
 }

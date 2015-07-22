@@ -74,8 +74,8 @@
 						{name:'lastname', index: 'lastname', width:'80'},
 						{name:'userLogin', width:'80'},
 						{name:'company',width:'100'},
-						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridFormatDateCell},
-						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridFormatDateCell},
+						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'lastUpdated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
 						{name:'modelScore',width:'50'}"
 					sortname="'lastname'"
 					caption="listCaption"

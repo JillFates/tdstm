@@ -18,8 +18,8 @@
 			<jqgrid:grid id="companyId" url="'${createLink(action: 'listJson')}'"
 				colNames="'Name','Date Created', 'Last Updated'"
 				colModel="{name:'companyName', index: 'companyName', width:'150'},
-					{name:'dateCreated', width:'100', formatter:tdsCommon.jqgridFormatDateCell},
-					{name:'lastUpdated', width:'100', formatter:tdsCommon.jqgridFormatDateCell}"
+					{name:'dateCreated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter},
+					{name:'lastUpdated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter}"
 				sortname="'companyName'"
 				caption="listCaption"
 				gridComplete="function(){bindResize('companyId')}"

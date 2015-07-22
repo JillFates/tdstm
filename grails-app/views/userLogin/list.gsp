@@ -39,9 +39,9 @@
 						{name:'fullname', width:'100'},
 						{name:'roles',width:'100'},
 						{name:'company', width:'100'},
-						{name:'lastLogin',width:'50', formatter:tdsCommon.jqgridFormatDateCell},
-						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridFormatDateCell},
-						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridFormatDateCell}"
+						{name:'lastLogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'username'"
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId')}"

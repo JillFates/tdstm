@@ -112,7 +112,7 @@ function buildGraph (response, status) {
 	});
 
 	var x = d3.time.scale()
-		.domain([new Date(data.startDate), items[items.length-1].end])
+		.domain([parseStartDate(data.startDate), items[items.length-1].end])
 		.range([0, $('div.body').innerWidth() - 20 - $('div.body').offset().left]);
 	
 	var maxStack = calculateStacks();
@@ -408,7 +408,7 @@ function buildGraph (response, status) {
 	var brush = d3.svg.brush()
 		.x(x)
 		.on("brush", brushed)
-		.extent([new Date(data.startDate), new Date( Math.min( new Date(data.startDate).getTime() + 30 * 60000, x.domain()[1].getTime() ) )])
+		.extent([parseStartDate(data.startDate), new Date( Math.min( parseStartDate(data.startDate).getTime() + 30 * 60000, x.domain()[1].getTime() ) )])
 	
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
@@ -1102,7 +1102,7 @@ function buildGraph (response, status) {
 		}
 		
 		// convert all data to its proper format
-		var startTime = new Date(data.startDate);
+		var startTime = parseStartDate(data.startDate);
 		for (var i = 0; i < items.length; ++i) {
 			items[i].milestone = (items[i].startInitial == items[i].endInitial);
 			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial)*60000);
@@ -2050,3 +2050,14 @@ function clearFilter () {
 	$('#searchBoxId').val('');
 	performSearch();
 }
+
+/**
+ * Parse start date that comes in zulu format and apply the time zone offset to 
+ * have a Date object in the user's time zone.
+ */
+function parseStartDate(startDate) {
+	var momentTZ = moment().tz(tdsCommon.timeZone())
+	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate).add(momentTZ.utcOffset(), 'minutes');
+	return new Date(momentStartDate.valueOf());
+}
+
