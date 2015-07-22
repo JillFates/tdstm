@@ -283,7 +283,6 @@ tdsCommon.autoClearDialogOnClose();
  	var savePreferences = function(formId) {
 		var data = $('#' + formId).serialize();
 		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function() {
-			alert("Preferences updated");
 			window.location.reload();
 		})
 		.fail(function() {
