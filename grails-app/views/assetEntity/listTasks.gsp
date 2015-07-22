@@ -16,9 +16,9 @@
 	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="angular/plugins/angular-ui.js"/>
 	<g:javascript src="angular/plugins/angular-resource.js" />
-    <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-    <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-    <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 	<g:javascript src="cabling.js"/>
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
@@ -31,8 +31,14 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 	<script type="text/javascript">
+		var timerBar;
+		
 		$(document).ready(function() {
-			$('#issueTimebar').width("100%")
+		
+			timerBar = new TimerBar(60, 'RefreshTaskMgr', function () {
+				reloadGrid();
+				timerBar.resetTimer();
+			});
 			
 			$('#assetMenu').show();
 			$("#showEntityView").dialog({ autoOpen: false })
@@ -45,17 +51,7 @@
 			currentMenuId = "#assetMenu";
 			$("#teamMenuId a").css('background-color','#003366')
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
-			$("#selectTimedBarId").val(${timeToUpdate})			
-			taskManagerTimePref = ${timeToUpdate}
-			$(window).resize(function() {
-				B2.Restart(taskManagerTimePref)
-			});
 			
-			if (taskManagerTimePref != 0) {
-				B2.Start(taskManagerTimePref);
-			} else {
-				B2.Pause(0);
-			}
 			var event = ${filterEvent}
 			var justRemaining = ${justRemaining}
 			var justMyTasks = ${justMyTasks}
@@ -103,8 +99,7 @@
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
 				showPager="true">
 				<jqgrid:filterToolbar id="taskListId" searchOnEnter="false" />
-				<jqgrid:navigation id="taskListId" add="false" edit="false" 
-					  del="false" search="false" refresh="false" />
+				<jqgrid:navigation id="taskListId" add="false" edit="false" del="false" search="false" refresh="false" />
 				<jqgrid:refreshButton id="taskListId" />
 			</jqgrid:grid>
 			populateFilter();
@@ -161,7 +156,7 @@
 		
 		function instructionsLinkFormatter(cellVal,options,rowObject){
 			return '<span id="status_'+options.rowId+'" class="cellWithoutBackground '+rowObject[13] +' " action-bar-cell config-table="config.table" comment-id="'+options.rowId+'" asset-id="'+rowObject[16]+'" status="'+rowObject[19]+'" instructions-link="'+rowObject[7]+'">' + cellVal + '</span>';
-		 }
+		}
 		
 		function populateFilter(){
 			$("#gs_comment").val('${comment}')
@@ -176,14 +171,25 @@
 		}
 		$(document).keyup(function(e) {
 			// esc to stop timer
-			if (e.keyCode == 27) { if(B2 != '' && taskManagerTimePref != 0){ B2.Restart( taskManagerTimePref ); }}   
+			if (e.keyCode == 27) {
+				timerBar.resetTimer();
+			}
 		});
+		
+		function reloadGrid () {
+			var postData = $('#taskListIdGrid').jqGrid('getGridParam', 'postData');
+			postData.justRemaining = $('#justRemainingCB').is(':checked') ? 1 : 0;
+			postData.justMyTasks = $('#justMyTasksCB').is(':checked') ? 1 : 0;
+			postData.viewUnpublished = viewUnpublished ? 1 : 0;
+			$('#taskListId').trigger('reloadGrid').trigger('click')
+		}
 	</script>
 </head>
 <body>
 	<input type="hidden" id="timeBarValueId" value="0"/>
 	<div id="outerBodyId" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
-		<div class="taskTimebar" id="issueTimebar" >
+		<input type="hidden" id="timeBarValueId" value="0"/>
+		<div class="taskTimebar hide" id="issueTimebar" >
 			<div id="issueTimebarId"></div>
 		</div>
 		<div class="body fluid">
@@ -199,21 +205,23 @@
 			<input type="hidden" id="manageTaskId" value="manageTask"/>
 			<form name="commentForm" id="commentForm" method="post" action="listTasks">
 			<input type="hidden" name="justRemaining" id="justRemaining" value="${justRemaining}" />
-			<input type="hidden" name="justMyTasks"   id="justMyTasks"   value="${justMyTasks}"/>
-			<input type="hidden" name="viewUnpublished"   id="viewUnpublished"   value="${viewUnpublished}"/>
+			<input type="hidden" name="justMyTasks" id="justMyTasks" value="${justMyTasks}"/>
+			<input type="hidden" name="viewUnpublished" id="viewUnpublished" value="${viewUnpublished}"/>
 			<input type="hidden" id="myPage" value="taskManager" />
-			<span >
+			<span id="controlRowId">
 				<b>Event </b>
 			 	<g:select from="${moveEvents}" name="moveEvent" id="moveEventId" optionKey="id" optionValue="name" noSelection="${['0':' All']}" value="${filterEvent}" onchange="submitForm()" />
 				&nbsp;&nbsp;
-				<input type="checkbox" id="justRemainingCB" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="toggleCheckbox(this, 'justRemaining');"  />
-				<b> <label for="justRemainingCB" >Just Remaining</label></b>
-				<input type="checkbox" id="justMyTasksCB" ${ (justMyTasks=="1" ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'justMyTasks');"/>
-				<b><label for="justMyTasksCB" > Just Mine</label></b>&nbsp;&nbsp;
-				<tds:hasPermission permission="PublishTasks">
-					<input type="checkbox" id="viewUnpublishedCB" ${ (viewUnpublished=='1' ? 'checked="checked"':'') } onclick="toggleCheckbox(this, 'viewUnpublished');"/>
-					<b><label for="viewUnpublishedCB" > View unpublished</label></b>&nbsp;&nbsp;
-				</tds:hasPermission>
+				<span class="checkboxContainer">
+					<input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" /><!--
+					--><label for="justRemainingCB" class="pointer"><b>&nbsp;Just Remaining</b></label>&nbsp;&nbsp;
+					<input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/><!--
+					--><label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>&nbsp;&nbsp;
+					<tds:hasPermission permission="PublishTasks">
+						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/><!--
+						--><label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>&nbsp;&nbsp;
+					</tds:hasPermission>
+				</span>
 
 				<span style="float: right">
 					<span style="margin-right: 30px;">
@@ -221,9 +229,8 @@
 
 						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
 					</span>
-					<input type="button" value="Refresh" onclick="loadGrid()" style="cursor: pointer;">&nbsp;
-					<select id="selectTimedBarId"
-					    onchange="${remoteFunction(controller:'userLogin', action:'setTimePreference', params:'\'timer=\'+ this.value +\'&prefFor=TASKMGR_REFRESH\' ', onComplete:'changeTimebarPref(XMLHttpRequest)') }">
+					<input type="button" value="Refresh" onclick="timerBar.refreshFunction()" style="cursor: pointer;" />&nbsp;
+					<select id="selectTimedBarId">
 						<option value="0">Manual</option>
 						<option value="60" selected="selected">1 Min</option>
 						<option value="120">2 Min</option>
@@ -233,7 +240,6 @@
 					</select>
 				</span>				
 			</span>
-			<br/></br>
 			<jqgrid:wrapper id="taskListId" />
 		</div>
 		<input type="hidden" id="customizeFieldCount" value="6" />
@@ -253,12 +259,21 @@
 		<g:render template="../assetEntity/modelDialog" />
 		<g:render template="../assetEntity/entityCrudDivs" />
 		<g:render template="../assetEntity/dependentAdd" />
+		
+		<g:render template="../layouts/error"/>
 	</div>
- <g:render template="initAssetEntityData"/>
- <script type="text/javascript">
+	<g:render template="initAssetEntityData"/>
+<script type="text/javascript">
 function toggleCheckbox (chkbox, field) {
 	$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
 	submitForm()
+}
+function toggleViewUnpublished (e) {
+	var checkedValue = $(e.srcElement).is(':checked');
+	viewUnpublished = checkedValue;
+	setUserPreference('viewUnpublished', checkedValue, function () {
+		reloadGrid();
+	});
 }
 function submitForm () {
 	$('#commentForm').submit()
@@ -266,64 +281,7 @@ function submitForm () {
 
 function loadGrid () {
 	$(".ui-icon-refresh").click()
-	var timePref = $("#selectTimedBarId").val()
-	if(timePref != 0){
-		B2.Start(timePref);
-	} else{
-		B2.Pause(0);
-	}
 }
-
-function pageRefresh () {
-	window.location.reload()
-}
-
-function Bar (o) {
-	var obj = document.getElementById(o.ID);
-	this.oop = new zxcAnimate('width',obj,0);
-	this.max = $('#issueTimebar').width();
-	this.to = null;
-}
-Bar.prototype = {
-	Start:function (sec) {
-		clearTimeout(this.to);
-		this.oop.animate(0,$('#issueTimebar').width(),sec*1000);
-		this.srt = new Date();
-		this.sec = sec;
-		this.Time();
-	},
-	Time:function (sec) {
-		var oop = this
-			,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
-		//this.oop.obj.innerHTML=sec+' sec';
-		$('#timeBarValueId').val(sec)
-		if (sec > 0) {
-			this.to = setTimeout(function(){ oop.Time(); },1000);
-		} else {
-			loadGrid();
-		}
-	},
-	Pause:function (sec) {
-		clearTimeout(this.to);
-		if (sec == 0) {
-			this.oop.animate(sec,'',sec*1000);
-		} else {
-			this.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
-		}
-	},
-	Restart:function (sec) {
-		clearTimeout(this.to);
-		var second = $('#timeBarValueId').val()
-		this.oop.animate($('#issueTimebarId').width(),$('#issueTimebar').width(),second*1000);
-		this.srt = new Date();
-		this.sec = second;
-		this.Time();
-	}
-}
-
-B2 = new Bar({
-	ID:'issueTimebarId'
-});
 </script>
 </body>
 

@@ -27,8 +27,7 @@
 	</div>
 	<div id="taskId" style="float: left; margin: 2px 0;"></div>
 	<div id="assetIssueDiv" style="float: left; width: 100%;">
-		<table id="issueTable" cellspacing="0px"
-			style="width: 100%; margin-left: -1px;">
+		<table id="issueTable" cellspacing="0px" style="width: 100%; margin-left: 0px;">
 			<thead>
 				<tr>
 					<g:sortableColumn class="sort_column" style="" action="listUserTasks" property="number_comment" title="Task" params="['tab':tab,'search':search]"></g:sortableColumn>

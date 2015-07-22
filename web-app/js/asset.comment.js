@@ -1,3 +1,143 @@
+function pageRefresh () {
+	window.location.reload()
+}
+
+var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
+	
+	// public functions
+	var public = {};
+	
+	public.init = function () {
+		public.oop = new zxcAnimate('width', document.getElementById('issueTimebarId'), 0);
+		public.max = $('#issueTimebar').width();
+		public.to = null;
+		public.timerValue = null;
+		
+		if (refreshCallback)
+			public.refreshFunction = refreshCallback;
+		else
+			public.refreshFunction = function () {
+				window.location.reload();
+			};
+			
+		public.bindListeners();
+		public.getUserPreference();
+	}
+	
+	public.isManual = function () {
+		return (public.timerValue == 0)
+	}
+	
+	public.Start = function (sec) {
+		clearTimeout(public.to);
+		public.oop.animate(0,$('#issueTimebar').width(),sec*1000);
+		public.srt = new Date();
+		public.sec = sec;
+		public.Time();
+	}
+	
+	public.Time = function (sec) {
+		var oop = public;
+		var sec2 = public.sec-Math.floor((new Date()-public.srt)/1000);
+		$('#timeBarValueId').val(sec2)
+		if (sec2 > 0) {
+			public.to = setTimeout(function(){ oop.Time(); },1000);
+		} else if (isNaN(sec2)) {
+			var timePref = $("#selectTimedBarId").val()
+			if (timePref != 0) {
+				public.Start(timePref);
+			} else{
+				public.Pause(0);
+			}
+		} else {
+			public.refreshFunction();
+		}
+	}
+	
+	public.Pause = function (sec) {
+		clearTimeout(public.to);
+		if (sec == 0) {
+			public.oop.animate(sec,'',sec*1000);
+		} else {
+			public.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
+		}
+	}
+	
+	public.Restart = function (sec) {
+		clearTimeout(public.to);
+		var second = public.timerValue;
+		$('#timeBarValueId').val(second);
+		public.oop.animate(0, $('#issueTimebar').width(),second*1000);
+		public.srt = new Date();
+		public.sec = second;
+		public.Time();
+	}
+	
+	public.resetTimer = function () {
+		if (! public.isManual())
+			public.Restart(public.timerValue);
+	}
+
+	public.bindListeners = function () {
+		$('#selectTimedBarId').on('change', function (e) {
+			public.setTimerValue(e.srcElement.value);
+			public.setUserPreference(e.srcElement.value);
+		});
+		
+		$(window).resize(function() {
+			public.resetTimer();
+		});
+		
+	}
+	
+	public.setUpTimerBar = function (response) {
+		var responseObject = $.parseJSON(response.responseText);
+		var time = parseInt(responseObject.data.preferences[preferenceName]);
+		time = isNaN(time) ? defaultValue : time;
+		$("#selectTimedBarId").val(time);
+		
+		public.setTimerValue(time);
+	}
+	
+	public.setTimerValue = function (newTime) {
+		var timebar = $('#issueTimebar');
+		public.timerValue = newTime;
+		
+		if (newTime != 0) {
+			public.Start(newTime);
+			timebar.removeClass('hide');
+		} else {
+			public.Pause(0);
+			timebar.addClass('hide');
+		}
+	}
+	
+	public.getUserPreference = function () {
+		jQuery.ajax({
+			dataType: 'json',
+			url: tdsCommon.createAppURL('/ws/user/preferences/' + preferenceName),
+			data: {},
+			type:'GET',
+			complete: public.setUpTimerBar
+		});
+	}
+	
+	public.setUserPreference = function (newValue) {
+		jQuery.ajax({
+			dataType: 'json',
+			url: tdsCommon.createAppURL('/ws/user/preference'),
+			data: {'code':preferenceName,'value':newValue},
+			type:'POST'
+		});
+	}
+	
+	public.init();
+	
+	// return the public object to make the public functions accessable
+	return public;
+	
+}
+
 
 /**
  * Action to invoke Change status ajax call from TaskManager and MyTasks
@@ -12,7 +152,7 @@ function changeStatus(id, status, currentStatus, from){
 	// Disable status change buttons to prevent double-clicking
 	$('#start_button_'+id).removeAttr('onclick')
 	$('#done_button_'+id).removeAttr('onclick')
- 	$('#start_text_'+id).attr('class', 'task_button_disabled')
+	$('#start_text_'+id).attr('class', 'task_button_disabled')
 	$('#done_text_'+id).attr('class', 'task_button_disabled')
 	
 	$('#showCommentDialog #start_button_'+id).removeAttr('onclick')
@@ -20,7 +160,9 @@ function changeStatus(id, status, currentStatus, from){
 	$('#showCommentDialog #start_text_'+id).attr('class', 'task_button_disabled')
 	$('#showCommentDialog #done_text_'+id).attr('class', 'task_button_disabled')
 
-	if(from == "myTask"){ params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }}
+	if (from == "myTask") {
+		params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager','view':'myTask','tab':$('#tabId').val() }
+	}
 	jQuery.ajax({
 		url:contextPath+'/task/update',
 		data: params,
@@ -30,27 +172,27 @@ function changeStatus(id, status, currentStatus, from){
 				alert(data.error);
 			} else {
 				//alert(data.cssClass)
-				if(from=="taskManager"){
+				if (from=="taskManager") {
 					var cellId = '#status_' + id;
 					if ($(cellId).length == 0) {
 						cellId = '#statusTd_' + id;
 					}
 					$(cellId).html(data.assetComment.status)
 					$(cellId).parent().removeAttr('class').addClass(data.statusCss)
-				    $(cellId).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
-				    if(status=="Started"){ 
-					    // $('#startTdId_'+id).hide() 
-					}else if(status=="Completed"){
+					$(cellId).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
+					if (status=="Started") {
+					    // $('#startTdId_'+id).hide()
+					} else if (status=="Completed") {
 						//$('#startTdId_'+id).hide()
 						//$('#doneTdId_'+id).hide()
 					}
-				}else{
-					 $('#myTaskList').html(data)
-					 hideStatus(id, status)
-					 $('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
-					 if(status=='Started'){
-					 	$('#started_'+id).hide()
-					 }
+				} else {
+					$('#myTaskList').html(data)
+					hideStatus(id, status)
+					$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
+					if (status=='Started') {
+						$('#started_'+id).hide()
+					}
 				}
 				$("#showCommentTable #statusShowId").html(data.assetComment.status)
 				$("#showCommentTable #statusShowId").removeAttr('class').addClass(data.statusCss)
@@ -69,9 +211,9 @@ function changeStatus(id, status, currentStatus, from){
  * @param status
  * @param from
  */
-function assignTask(id, user, status, from){
-	if(B2 != ''){  B2.Pause(); }
-	if(B1 != ''){ B1.Pause(); }
+function assignTask(id, user, status, from) {
+	if (timerBar)
+		timerBar.resetTimer();
 	$('#assigntome_button_'+id).removeAttr('onclick')
 	$('#assigntome_text_'+id).attr('class', 'task_button_disabled')
 	
@@ -86,19 +228,15 @@ function assignTask(id, user, status, from){
 			if (data.errorMsg) {
 				alert(data.errorMsg);
 			} else {
-				if(from=="taskManager"){
+				if (from=="taskManager") {
 					 $('#assignedToName_'+id).html(data.assignedTo)
 					 // $('#row_d_'+id).hide()
-					if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref);}
-				}else{
-					 $('#assignedToNameSpan_'+id).html(data.assignedTo)
-					 if (B1 != '') {
-						 if(taskManagerTimePref != 0){ 
-						 	B1.Restart(taskManagerTimePref); 
-						 }else { 
-						  	B1.Pause(0);
-						 }
-					 }
+					if (timerBar)
+						timerBar.resetTimer();
+				} else {
+					$('#assignedToNameSpan_'+id).html(data.assignedTo)
+					if (timerBar)
+						timerBar.resetTimer();
 				}
 				$("#showCommentDialog #assignedToTdId").html(data.assignedTo)
 			}
@@ -114,117 +252,119 @@ function assignTask(id, user, status, from){
  * @param spanId
  */
 var actionBarLoadReq
-function getActionBarGrid(spanId){
-   if(B2 != ''){ B2.Pause() }
-   var id = spanId
-   $('#span_'+spanId).parent().parent().find('span').each(function(){
-		if($(this).attr("id")){
+function getActionBarGrid (spanId) {
+	if (timerBar)
+		timerBar.resetTimer();
+	var id = spanId
+	$('#span_'+spanId).parent().parent().find('span').each(function () {
+		if ($(this).attr("id"))
 			$(this).removeAttr('onclick')
-		}
-   });
-   $('#'+id).after("<tr id='load_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
-   if(actionBarLoadReq)actionBarLoadReq.abort();
-   actionBarLoadReq = jQuery.ajax({
-							url: contextPath+'/task/genActionBarHTML',
-							data: {'id':id},
-							type:'POST',
-							success: function(data, status, xhr) {
-									$('#load_d_'+id).remove()
-									var url = xhr.getResponseHeader('X-Login-URL');
-									if (url) {
-										alert("Your session has expired and need to login again.");
-										window.location.href = url;
-									} else {
-										if(!$("#row_d_"+id).html() && data)
-											$('#'+id).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
-											
-										$('#span_'+spanId).parent().parent().find('span').each(function(){
-											if($(this).attr("id")){
-												$(this).removeAttr('onclick')
-												$(this).unbind("click").bind("click", function(){
-													hideActionBarGrid("row_d_"+id,"span_"+spanId)
-											    });
-											}
-										})
-									 }
-							},
-				    		error: function(xhr, textStatus, errorThrown) {
-				    			$('#load_d_'+id).remove()
-				    			if(!$("#row_d_"+id).html()){
-									$('#'+id).after("<tr id='row_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+
-											"An unexpected error occurred while populating action bar.</td></tr>")
-				    			}
-				    			$('#span_'+spanId).parent().parent().find('span').each(function(){
-									if($(this).attr("id")){
-										$(this).removeAttr('onclick')
-										$(this).unbind("click").bind("click", function(){
-											hideActionBarGrid("row_d_"+id,"span_"+spanId)
-									    });
-									}
-								})
-				    		}
-						});
-}
-function getBulkActionBarGrid(taskIds){
-jQuery.ajax({
-	url: contextPath+'/task/genBulkActionBarHTML',
-	data: {'id':taskIds},
-	type:'POST',
-	success: function(resp, status, xhr) {
-		   for(i=0; i<taskIds.length; i++){
-			   var data = resp[taskIds[i]]
-			   $('#'+taskIds[i]).after("<tr id='load_d_"+taskIds[i]+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
-			   $('#load_d_'+taskIds[i]).remove()
-			   
-			   if(!$("#row_d_"+taskIds[i]).html() && data)
-					$('#'+taskIds[i]).after("<tr id='row_d_"+taskIds[i]+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
+	});
+	$('#'+id).after("<tr id='load_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
+	if (actionBarLoadReq)
+		actionBarLoadReq.abort();
+	actionBarLoadReq = jQuery.ajax({
+		url: contextPath+'/task/genActionBarHTML',
+		data: {'id':id},
+		type:'POST',
+		success: function (data, status, xhr) {
+			$('#load_d_'+id).remove()
+			var url = xhr.getResponseHeader('X-Login-URL');
+			if (url) {
+				alert("Your session has expired and need to login again.");
+				window.location.href = url;
+			} else {
+				if (!$("#row_d_"+id).html() && data)
+					$('#'+id).after("<tr id='row_d_"+id+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
 					
+				$('#span_'+spanId).parent().parent().find('span').each(function(){
+					if ($(this).attr("id")) {
+						$(this).removeAttr('onclick')
+						$(this).unbind("click").bind("click", function(){
+							hideActionBarGrid("row_d_"+id,"span_"+spanId)
+						});
+					}
+				})
+			}
+		},
+		error: function (xhr, textStatus, errorThrown) {
+			$('#load_d_'+id).remove()
+			if (!$("#row_d_"+id).html()) {
+				$('#'+id).after("<tr id='row_d_"+id+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+
+					"An unexpected error occurred while populating action bar.</td></tr>")
+			}
+			$('#span_'+spanId).parent().parent().find('span').each(function(){
+				if ($(this).attr("id")) {
+					$(this).removeAttr('onclick')
+					$(this).unbind("click").bind("click", function(){
+						hideActionBarGrid("row_d_"+id,"span_"+spanId)
+					});
+				}
+			})
+		}
+	});
+}
+
+function getBulkActionBarGrid(taskIds) {
+	jQuery.ajax({
+		url: contextPath+'/task/genBulkActionBarHTML',
+		data: {'id':taskIds},
+		type:'POST',
+		success: function(resp, status, xhr) {
+			for (i=0; i<taskIds.length; i++) {
+				var data = resp[taskIds[i]]
+				$('#'+taskIds[i]).after("<tr id='load_d_"+taskIds[i]+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar' ><img src='../images/spinner.gif'/></td></tr>")
+				$('#load_d_'+taskIds[i]).remove()
+
+				if (!$("#row_d_"+taskIds[i]).html() && data)
+						$('#'+taskIds[i]).after("<tr id='row_d_"+taskIds[i]+"'> <td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+data+"</td></tr>")
+						
+					$('#'+taskIds[i]).find('span').each(function(){
+						if ($(this).attr("id")) {
+							$(this).removeAttr('onclick')
+							var thisId = this.id.split('_')[1]
+							$(this).unbind("click").bind("click", function(){
+								hideActionBarGrid("row_d_"+thisId,this.id)
+							});
+						}
+					})
+			}
+			$('.bulkEdit').removeAttr("disabled");
+		},
+		error: function(xhr, textStatus, errorThrown) {
+			for (i=0; i<taskIds.length; i++) {
+				$('#load_d_'+taskIds[i]).remove()
+				if (!$("#row_d_"+taskIds[i]).html()) {
+					$('#'+taskIds[i]).after("<tr id='row_d_"+taskIds[i]+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+
+							"An unexpected error occurred while populating action bar.</td></tr>")
+				}
 				$('#'+taskIds[i]).find('span').each(function(){
-					if($(this).attr("id")){
+					if ($(this).attr("id")) {
 						$(this).removeAttr('onclick')
 						var thisId = this.id.split('_')[1]
 						$(this).unbind("click").bind("click", function(){
 							hideActionBarGrid("row_d_"+thisId,this.id)
-					    });
+						});
 					}
 				})
-		   }
-		   $('.bulkEdit').removeAttr("disabled");
-	},
-	error: function(xhr, textStatus, errorThrown) {
-		for(i=0; i<taskIds.length; i++){
-			$('#load_d_'+taskIds[i]).remove()
-			if(!$("#row_d_"+taskIds[i]).html()){
-				$('#'+taskIds[i]).after("<tr id='row_d_"+taskIds[i]+"'><td nowrap='nowrap' colspan='13' class='statusButtonBar'>"+
-						"An unexpected error occurred while populating action bar.</td></tr>")
 			}
-			$('#'+taskIds[i]).find('span').each(function(){
-				if($(this).attr("id")){
-					$(this).removeAttr('onclick')
-					var thisId = this.id.split('_')[1]
-					$(this).unbind("click").bind("click", function(){
-						hideActionBarGrid("row_d_"+thisId,this.id)
-				    });
-				}
-			})
 		}
-	}
-});
+	});
 }
 
 /**
  * 
  */
-function hideActionBars(){
+function hideActionBars() {
 	$('.jqTable').find('.statusButtonBar').each(function(){
 		$(this).parent().prev().find('span').each(function(){
 			var $id = $(this).attr("id");
-			if($id){
+			if ($id) {
 				var id = $id.split("_")[1];
 				$(this).removeAttr('onclick')
 				$(this).off("click").on("click", function(){
 					getActionBarGrid(id)
-			    });
+				});
 			}
 		});
 		$(this).parent().remove();
@@ -239,55 +379,24 @@ function hideActionBarGrid(rowId,spanId){
 	var id = spanId.split('_')[1]
 	$('#'+rowId).remove()
 	$('#'+spanId).parent().parent().find('span').each(function(){
-		if($(this).attr("id")){
+		if ($(this).attr("id")) {
 			$(this).removeAttr('onclick')
 			$(this).off("click").on("click", function(){
 				getActionBarGrid(id)
-		    });
+			});
 		}
 	})
-	if(B2 != '' && taskManagerTimePref != 0){ B2.Restart(taskManagerTimePref) }
+	
+	if (timerBar)
+		timerBar.resetTimer();
 }
-/**
- * Updated timer preferences
- * @param data
- */
-function changeTimebarPref(data){
-	 var timeUpdate = eval("(" + data.responseText + ")")
-		if(timeUpdate){
-			if($("#myPage").val() == 'taskManager'){
-				timedUpdate(timeUpdate[0].updateTime.TASKMGR_REFRESH)
-			} else {
-				timedUpdate(timeUpdate[0].updateTime.MYTASKS_REFRESH)
-			}
-		}
-}
-/**
- * updated bar preferences
- * @param timeoutPeriod
- */
-function timedUpdate(timeoutPeriod) {
-	 taskManagerTimePref = timeoutPeriod
-	 if(B1 != ''){
-		 if(taskManagerTimePref != 0){
-			 B1.Start(timeoutPeriod);
-		 } else {
-			 B1.Pause(0);
-		 }
-	 } else {
-		 if(taskManagerTimePref != 0){
-			 B2.Start(timeoutPeriod);
-		 } else {
-			 B2.Pause(0);
-		 }
-	 }
-}
+
 /**
  * Use to display time bar at task manager and my task page.
  * 
  */
 
-function zxcAnimate(mde,obj,srt){
+function zxcAnimate(mde,obj,srt) {
 	this.to=null;
 	this.obj=typeof(obj)=='object'?obj:document.getElementById(obj);
 	this.mde=mde.replace(/\W/g,'');
@@ -295,7 +404,7 @@ function zxcAnimate(mde,obj,srt){
 	return this;
 }
 
-zxcAnimate.prototype.animate=function(srt,fin,ms,scale,c){
+zxcAnimate.prototype.animate=function(srt,fin,ms,scale,c) {
 	clearTimeout(this.to);
 	this.time=ms||this.time||0;
 	this.neg=srt<0||fin<0;
@@ -307,7 +416,7 @@ zxcAnimate.prototype.animate=function(srt,fin,ms,scale,c){
 	this.cng();
 }
 
-zxcAnimate.prototype.cng=function(){
+zxcAnimate.prototype.cng=function() {
 	var oop=this,ms=new Date().getTime()-this.srttime;
 	this.data[0]=(this.c=='s')?(this.data[2]-this.data[1])*Math.sin(this.inc*ms)+this.data[1]:(this.c=='c')?this.data[2]-(this.data[2]-this.data[1])*Math.cos(this.inc*ms):(this.data[2]-this.data[1])/this.mS*ms+this.data[1];
 	this.apply();
@@ -315,24 +424,25 @@ zxcAnimate.prototype.cng=function(){
 	else {
 		this.data[0]=this.data[2];
 		this.apply();
-	 if (this.Complete) this.Complete(this);
+		if (this.Complete)
+			this.Complete(this);
 	}
 }
 
-zxcAnimate.prototype.apply=function(){
-	if (isFinite(this.data[0])){
+zxcAnimate.prototype.apply=function() {
+	if (isFinite(this.data[0])) {
 		if (this.data[0]<0&&!this.neg) this.data[0]=0;
 		if (this.mde!='opacity') this.obj.style[this.mde]=Math.floor(this.data[0])+'px';
 		else zxcOpacity(this.obj,this.data[0]);
 	}
 }
 
-function zxcOpacity(obj,opc){
+function zxcOpacity(obj,opc) {
 	if (opc<0||opc>100) return;
 	obj.style.filter='alpha(opacity='+opc+')';
 	obj.style.opacity=obj.style.MozOpacity=obj.style.WebkitOpacity=obj.style.KhtmlOpacity=opc/100-.001;
 }
-function changeEstTime(day,commentId,id){
+function changeEstTime(day,commentId,id) {
 	console.log(id)
 	var reqId=id.split("_")
 	jQuery.ajax({
@@ -340,9 +450,9 @@ function changeEstTime(day,commentId,id){
 		data: {'commentId':commentId,'day':day},
 		type:'POST',
 		success: function(resp) {
-			if(resp.etext !=""){
+			if (resp.etext != "") {
 				alert(resp.etext)
-			}else {
+			} else {
 					$("#"+id).removeAttr('onclick')
 					$("#"+reqId[0]+"_text_"+reqId[2]).removeAttr('class')
 					$("#"+reqId[0]+"_text_"+reqId[2]).attr('class', 'task_button_disabled')
@@ -357,14 +467,24 @@ function changeEstTime(day,commentId,id){
 	});
 }
 
-function toogleGenDetails(id){
-	if($("#rightTriangle_"+id).is(":visible")){
+function toogleGenDetails(id) {
+	if ($("#rightTriangle_"+id).is(":visible")) {
 		$("#rightTriangle_"+id).hide();
 		$("#downTriangle_"+id).show();
 		$("#predDivId_"+id).show();
-	}else {
+	} else {
 		$("#rightTriangle_"+id).show();
 		$("#downTriangle_"+id).hide();
 		$("#predDivId_"+id).hide();
 	}
+}
+
+// sets the user's preference for the specified code to the specified value
+function setUserPreference (code, value, callback) {
+	jQuery.ajax({
+		url: contextPath+'/ws/user/preference',
+		data: {'code':code,'value':value},
+		type:'POST',
+		success: callback
+	});
 }

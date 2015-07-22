@@ -17,92 +17,93 @@
 	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
 	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
-		<div class="menu4">
+	<input type="hidden" id="timeBarValueId" value="0"/>
+	<div class="taskTimebar hide" id="issueTimebar" >
+		<div id="issueTimebarId"></div>
+	</div>
+	<div class="menu4">
 		<g:if test="${isOnIE && isCleaner}">
-		<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
-			CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
-			style="height: 1px;"></OBJECT>
+			<OBJECT id="TF" classid="clsid:18D87050-AAC9-4e1a-AFF2-9D2304F88F7C"
+				CODEBASE="${resource(dir:'resource',file:'TFORMer60.cab')}"
+				style="height: 1px;"></OBJECT>
 		</g:if>
-			<ul>
-					<g:if test="${tab && tab == 'todo'}">
-						<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu mobselect"
-								action="listUserTasks" params='["tab":"todo"]'>Ready Tasks: <span id="toDOSpanId">${todoSize}</span>
-								
-							</g:link>
-						</li>
-						<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu"
-								action="listUserTasks" params='["tab":"all"]'>All Tasks: <span id="toDOAllSpanId">${allSize}</span>
-							</g:link>
-						</li>
-					</g:if>
-					<g:if test="${tab && tab == 'all'}">
-						<li onclick="setTab('todo')"><g:link elementId="taskLinkId" class="mobmenu"
-								action="listUserTasks" params='["tab":"todo"]'>Ready Tasks: <span id="allToDoSpanId">${todoSize}</span>
-							</g:link>
-						</li>
-						<li onclick="setTab('all')"><g:link elementId="taskLinkAllId" class="mobmenu mobselect"
-								action="listUserTasks" params='["tab":"all"]'>All Tasks: <span id="allSpanId">${allSize}</span>
-							</g:link>
-						</li>
-					</g:if>
-					<li><span style="float: right;">
-							<input type="button" value="Refresh" onclick="pageRefresh()" style="cursor: pointer;"/>&nbsp;
-							<select id="selectTimedBarId"
-							    onchange="${remoteFunction(controller:'userLogin', action:'setTimePreference', 
-								params:'\'timer=\'+ this.value +\'&prefFor=MYTASKS_REFRESH\' ', onComplete:'changeTimebarPref(XMLHttpRequest)') }">
-								<option value="0">Manual</option>
-								<option value="30">30 sec</option>
-								<option value="60">1 Min</option>
-								<option value="120">2 Min</option>
-								<option value="180">3 Min</option>
-								<option value="240">4 Min</option>
-								<option value="300">5 Min</option>
-							</select>
-						</span>
-					</li>
-			</ul>
-			   <div class="tab_search">
-					<g:form method="post" name="issueAssetForm" action="showIssue">
-						<input type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off"
-							onfocus="changeAction()" onblur="retainAction()" />
-						<input type="hidden" name="sort" value="${sort}" />
-						<input type="hidden" name="order" value="${order}" />
-						<input type="hidden" name="tab" id="tabId" value="${tab}" />
-						<input type="hidden" id="myPage" value="mytask" />
-			   			<span style="color: white;">Event : 
-			   			<g:select name='event' value="${moveEvent?.id}"
-    						noSelection="${['null':'All Events']}"
-    						from='${moveEventList}'
-    						optionKey="id" 
-    						optionValue="name"
-    						onfocus="changeAction()" onblur="retainAction()"
-    						onchange="submit()">
-    					</g:select>
-			   			</span>
-					</g:form>
-				</div>
-				</div>
-				<div class="issueTimebar" id="issueTimebar" >
-						<div id="issueTimebarId"></div>
-				</div>
-				<div id="detailId"
-					style="display: none; position: absolute; width: 420px; margin-top: 40px;">
-				</div>
-				<div class="mainbody">
-				     <div id="myTaskList">
-				           <g:render template="tasks"/>
-				     </div>
-				</div>
-				<g:render template="../assetEntity/modelDialog"/>
-				<g:render template="../assetEntity/entityCrudDivs" />
-				<g:render template="../assetEntity/dependentAdd" />
-	    <br />
-	    <input type="hidden" id="timeBarValueId" value="0"/>
+		<ul>
+			<g:if test="${tab && tab == 'todo'}">
+				<li onclick="setTab('todo')">
+					<g:link elementId="taskLinkId" class="mobmenu mobselect" action="listUserTasks" params='["tab":"todo"]'>
+						<span>Ready Tasks:</span> <span id="toDOSpanId">${todoSize}</span>
+					</g:link>
+				</li>
+				<li onclick="setTab('all')">
+					<g:link elementId="taskLinkAllId" class="mobmenu" action="listUserTasks" params='["tab":"all"]'>
+						<span>All Tasks:</span> <span id="toDOAllSpanId">${allSize}</span>
+					</g:link>
+				</li>
+			</g:if>
+			<g:if test="${tab && tab == 'all'}">
+				<li onclick="setTab('todo')">
+					<g:link elementId="taskLinkId" class="mobmenu" action="listUserTasks" params='["tab":"todo"]'>
+						<span>Ready Tasks:</span> <span id="allToDoSpanId">${todoSize}</span>
+					</g:link>
+				</li>
+				<li onclick="setTab('all')">
+					<g:link elementId="taskLinkAllId" class="mobmenu mobselect" action="listUserTasks" params='["tab":"all"]'>
+						<span>All Tasks:</span> <span id="allSpanId">${allSize}</span>
+					</g:link>
+				</li>
+			</g:if>
+			<li>
+				<span style="float: right;margin-right: 10px;">
+					<input type="button" value="Refresh" onclick="timerBar.refreshFunction()" style="cursor: pointer;" />&nbsp;
+					<select id="selectTimedBarId">
+						<option value="0">Manual</option>
+						<option value="30">30 sec</option>
+						<option value="60">1 Min</option>
+						<option value="120">2 Min</option>
+						<option value="180">3 Min</option>
+						<option value="240">4 Min</option>
+						<option value="300">5 Min</option>
+					</select>
+				</span>
+			</li>
+		</ul>
+		<div class="tab_search">
+			<g:form method="post" name="issueAssetForm" action="showIssue">
+				<input type="text" size="08" value="${search}" id="search" name="search" autocorrect="off" autocapitalize="off"
+					onfocus="changeAction()" onblur="retainAction()" />
+				<input type="hidden" name="sort" value="${sort}" />
+				<input type="hidden" name="order" value="${order}" />
+				<input type="hidden" name="tab" id="tabId" value="${tab}" />
+				<input type="hidden" id="myPage" value="mytask" />
+				<span style="color: white;">Event : 
+					<g:select name='event' value="${moveEvent?.id}"
+						noSelection="${['null':'All Events']}"
+						from='${moveEventList}'
+						optionKey="id" 
+						optionValue="name"
+						onfocus="changeAction()" onblur="retainAction()"
+						onchange="submit()">
+					</g:select>
+				</span>
+			</g:form>
+		</div>
+	</div>
+	<div id="detailId" style="display: none; position: absolute; width: 420px; margin-top: 40px;"></div>
+	<div class="mainbody">
+		<div id="myTaskList">
+			<g:render template="tasks"/>
+		</div>
+	</div>
+	<g:render template="../assetEntity/modelDialog"/>
+	<g:render template="../assetEntity/entityCrudDivs" />
+	<g:render template="../assetEntity/dependentAdd" />
+	<br />
 <%--
 /*
  **************************
@@ -114,9 +115,9 @@
 		<span class="ui-icon ui-icon-closethick" unselectable="on" onclick="closeBox()"></span>
 		<table id="showCommentTable" style="border: 0px;">
 			<tr class="prop">
-			   <td valign="top" class="name"><label for="comment"><b>Task:</b></label></td>
+				<td valign="top" class="name"><label for="comment"><b>Task:</b></label></td>
 				<td valign="top" class="value" colspan="3">
-				<span id="commentTdId_myTasks"></span>
+					<span id="commentTdId_myTasks"></span>
 				</td>
 			</tr>
 			<tr class="prop" id="predecessorShowTr">
@@ -155,13 +156,13 @@
 				<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 				<td valign="top" class="value" id="assetShowValueId" colspan="3"></td>
 			</tr>
-			<tr class = "issue" id="estStartShow">
+			<tr class="issue" id="estStartShow">
 				<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Est.Start:</label></td>
 				<td valign="top" class="value" id="estStartShowId" nowrap="nowrap"></td>
 				<td valign="top" class="name" nowrap="nowrap"><label for="estFinishShowId">Est.Finish:</label></td>
 				<td valign="top" class="value" id="estFinishShowId" nowrap="nowrap"></td>
 			</tr>
-			<tr class = "issue" id="actStartShow">
+			<tr class="issue" id="actStartShow">
 				<td valign="top" class="name"><label for="actStartShowId">Act.Start:</label></td>
 				<td valign="top" class="value" id="actStartShowId"></td>
 				<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Act.Finish:</label></td>
@@ -171,7 +172,7 @@
 	</div>
 
 <script type="text/javascript">
-	<g:if test="${isOnIE && isCleaner}">
+/*	<g:if test="${isOnIE && isCleaner}">*/
     /*
      * To load the installed printers into session by initializing TFORMer
      */
@@ -185,55 +186,42 @@
 		${remoteFunction(controller:'moveTech', action:'setPrintersIntoSession', params:'\'dropdown=\' + dropdown')}
 		
 	});
-	</g:if>
+/*	</g:if>*/
 	$(function() {
-		$('#issueTimebar').width("100%")
-		$('#selectTimedBarId').val(${timeToUpdate})
-		taskManagerTimePref = ${timeToUpdate}
-		if(taskManagerTimePref != 0){
-			B1.Start(taskManagerTimePref);
-		}else{
-			B1.Pause(0);
-		}
 		var searchedAssetId = '${searchedAssetId}'
 		var searchedAssetStatus = '${searchedAssetStatus}'
-		if( searchedAssetId ){
+		if (searchedAssetId) {
 			issueDetails(searchedAssetId,searchedAssetStatus);
-	    }
-		$(window).resize(function() {
-			B1.Restart(taskManagerTimePref)
-		});
+		}
 	});
 
-    $(".actionBar").die().live('click',function(){
+	$(".actionBar").die().live('click',function(){
 		var id = $(this).attr('data-itemId');
 		var status = $(this).attr('data-status');
 		var showStatusTr = $('#showStatusId_'+id);
-		if(status=='Started'){
+		if (status=='Started') {
 			$('#started_'+id).hide();
 			$('#image_'+id).hide();
 		}
-		if(!$(this).data('state')){
+		if (!$(this).data('state')) {
 			showStatusTr.toggle();
 			$(this).data('state',true);
-		} else{
+		} else {
 			showStatusTr.toggle();
 			$(this).data('state',false);
-			$('#detailTdId_'+id).hide();
-			if(taskManagerTimePref !=0){
-				B1.Restart(taskManagerTimePref);
-			}else {
-				B1.Pause(0);
-			}
+			$('#detailTdId_'+id).hide();			
+			if (timerBar)
+				timerBar.resetTimer();
 		}
 	});
 	
-	function setFocus(){
+	function setFocus() {
 		$("#search").val('').focus();
 	}
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
-		B1.Pause()
+		if (timerBar)
+			timerBar.resetTimer();
 		jQuery.ajax({
 			url: 'showIssue',
 			data: {'issueId':id},
@@ -269,7 +257,7 @@
 			}
 		});
 	}
-	function showAssetCommentMyTasks(id){
+	function showAssetCommentMyTasks(id) {
 		$('#dependencyBox').css('display','table');
 		jQuery.ajax({
 			url: '../assetEntity/showComment',
@@ -302,15 +290,12 @@
 			}
 		});
 	}
-	function closeBox(){
+	function closeBox() {
 		$('#dependencyBox').css("display","none");
 	}
-	function cancelButton(id,status){
-		if(taskManagerTimePref != 0){ 
-			B1.Restart( taskManagerTimePref ); 
-		} else {  
-			B1.Pause(0); 
-		}
+	function cancelButton(id,status) {
+		if (timerBar)
+			timerBar.resetTimer();
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
@@ -319,11 +304,11 @@
 	}
 
 function changeAction(){
-	 document.issueAssetForm.action = 'listUserTasks'
+	document.issueAssetForm.action = 'listUserTasks'
 }
 
 function retainAction(){
-	 document.issueAssetForm.action = 'showIssue'
+	document.issueAssetForm.action = 'showIssue'
 }
 function pageRefresh(){
 	document.issueAssetForm.action = 'listUserTasks'
@@ -334,58 +319,16 @@ function setTab(tab){
 	$("#tabId").val(tab)
 }
 
-	setFocus();
-
-	function Bar(o){
-	var obj=document.getElementById(o.ID);
-		this.oop=new zxcAnimate('width',obj,0);
-		this.max=$('#issueTable').width();
-		this.to=null;
-	}
-	Bar.prototype={
-		Start:function(sec){
-			clearTimeout(this.to);
-			this.oop.animate(0,$("#issueTimebar").width(),sec*1000);
-			this.srt=new Date();
-			this.sec=sec;
-			this.Time();
-		},
-		Time:function(sec){
-			var oop=this,sec=this.sec-Math.floor((new Date()-this.srt)/1000);
-		//	this.oop.obj.innerHTML=sec+' sec';
-	    	$('#timeBarValueId').val(sec)
-			if (sec>0){
-				this.to=setTimeout(function(){ oop.Time(); },1000);
-			}else{
-				pageRefresh();
-			}
-		},
-		Pause:function(sec){
-			clearTimeout(this.to);
-			if(sec==0){
-				this.oop.animate(sec,'',sec*1000);
-			}else{
-				this.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
-			}
-		},
-		Restart:function(sec){
-			clearTimeout(this.to);
-			var second = $('#timeBarValueId').val()
-			this.oop.animate($('#issueTimebarId').width(),$("#issueTimebar").width(),second*1000);
-			this.srt=new Date();
-			this.sec=second;
-			this.Time();
-		}
-	}
-
-	var B1=new Bar({
-		ID:'issueTimebarId'
-	});
+setFocus();
 </script>
 <script>
 	currentMenuId = "#teamMenuId";
 	$("#teamMenuId a").css('background-color','#003366')
+	var timerBar;
+	
 	$(document).ready(function() {
+		timerBar = new TimerBar(60, 'RefreshMyTasks', null);
+		
 		$("#showEntityView").dialog({ autoOpen: false })
 		$("#createEntityView").dialog({ autoOpen: false })
 		$("#editEntityView").dialog({ autoOpen: false })
@@ -395,7 +338,8 @@ function setTab(tab){
 		$("#createCommentDialog").dialog({ autoOpen: false })
 		$("#cablingDialogId").dialog({ autoOpen:false })
 	});
- </script>
- <g:render template="../assetEntity/initAssetEntityData"/>
+</script>
+	<g:render template="../assetEntity/initAssetEntityData"/>
+	<g:render template="../layouts/error"/>
 </body>
 </html>

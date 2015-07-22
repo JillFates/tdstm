@@ -9,6 +9,12 @@ $(document).ready(function () {
 		if (e.keyCode == 13)
 			$('#SubmitButtonId').submit();
 	});
+	
+	// calculate the position for the filter clear button
+	$('#filterClearId').css('left', function () {
+		return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
+	});
+	
 	generateGraph();
 });
 
@@ -27,11 +33,6 @@ function buildGraph (response, status) {
 	
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
-	
-	// calculate the position for the filter clear button
-	$('#filterClearId').css('left', function () {
-		return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
-	});
 	
 	// check for errors in the ajax call
 	if (status == 'error') {
@@ -469,7 +470,6 @@ function buildGraph (response, status) {
 	function display (resized, scaled) {
 		if (!ready)
 			return;
-		
 		
 		var startTime = 0;
 		if (window.performance && window.performance.now)
@@ -1650,6 +1650,10 @@ function buildGraph (response, status) {
 						}
 					}
 					
+					/*
+					console.log('BEFORE READDING DUPLICATES FOR ' + items[i].name)
+					display(newList, groups);
+					*/
 					
 					// put back all the duplicates
 					for (var j = 0; j < initialList.length; ++j) {
@@ -1676,6 +1680,11 @@ function buildGraph (response, status) {
 						}
 					}
 					
+					/*
+					console.log('AFTER READDING DUPLICATES FOR ' + items[i].name)
+					display(newList, groups);
+					*/
+					
 					function display (list, groups) {
 						console.log('--------------------------------------------');
 						for (var j = 0; j < list.length; ++j) {
@@ -1686,6 +1695,7 @@ function buildGraph (response, status) {
 								else
 									output += '\t.';
 							}
+							output += '\t:' + list[j].name;
 							console.log('\t > ' + output);
 						}
 						console.log('--------------------------------------------');

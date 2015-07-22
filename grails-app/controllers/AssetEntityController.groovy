@@ -1843,22 +1843,6 @@ class AssetEntityController {
 		}
 		return stateIdList
 	}
-	/*---------------------------------------------
-	 * Set browser Update time interval as user preference
-	 * @author : Lokanath Reddy
-	 * @param : time interval
-	 * @return : time interval
-	 *-------------------------------------------*/
-	def setTimePreference() {
-		def timer = params.timer
-		def updateTime =[]
-		if(timer){
-			userPreferenceService.setPreference( "SUPER_CONSOLE_REFRESH", "${timer}" )
-		}
-		def timeToUpdate = getSession().getAttribute("SUPER_CONSOLE_REFRESH")
-		updateTime <<[updateTime:timeToUpdate]
-		render updateTime as JSON
-	}
 
 	/* --------------------------------------
 	 * 	@author : Lokanada Reddy

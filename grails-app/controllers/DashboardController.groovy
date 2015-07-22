@@ -100,20 +100,6 @@ class DashboardController {
 	}
 	
 	/*---------------------------------------------------------
-	 * Will set user preference for DASHBOARD_REFRESH time
-	 * @author : Lokanath Reddy
-	 * @param  : refresh time 
-	 * @return : refresh time 
-	 *---------------------------------------------------------*/
-	def setTimePreference() {
-		def timer = params.timer
-		if(timer){
-			userPreferenceService.setPreference( "DASHBOARD_REFRESH", "${timer}" )
-		}
-		def timeToRefresh = getSession().getAttribute("DASHBOARD_REFRESH")
-		render timeToRefresh ? timeToRefresh.DASHBOARD_REFRESH : 'never'
-	}
-	/*---------------------------------------------------------
 	 * @author : Lokanada Reddy
 	 * @param  : project, bundle, and filters, moveEventNews data
 	 * @return : will save the data and redirect to action : newsEditorList

@@ -724,8 +724,8 @@ digraph runbook {
 	 */
 	def setLabelQuantityPref() {
 		def key = params.prefFor
-		def selected=params.list('selected[]')[0] ?:params.selected
-		if(selected){
+		def selected = params.list('selected[]')[0] ?:params.selected
+		if (selected) {
 			userPreferenceService.setPreference( key, selected )
 			session.setAttribute(key,selected)
 		}
@@ -762,7 +762,7 @@ digraph runbook {
 		def commentId = NumberUtils.toInt(params.commentId)
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		if (commentId >0) {
+		if (commentId > 0) {
 			def day = NumberUtils.toInt(params.day)
 			def project = securityService.getUserCurrentProject()
 			comment = AssetComment.findByIdAndProject(commentId,project)
@@ -965,9 +965,9 @@ digraph runbook {
 		render( view: "_showTask", model: [])
 	}
 
-    def list() {
-        render( view: "_list", model: [])
-    }
+	def list() {
+		render( view: "_list", model: [])
+	}
 
 	/**
 	 * Get task roles

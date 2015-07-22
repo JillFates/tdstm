@@ -67,15 +67,12 @@ function bindResize (gridId) {
  * @param String gridId The id of the grid
  */
 function resizeGrid (gridId) {
-	// Calculate the offset based on if there is a scrollbar or not
-	var horizontalOffset = 16;
-	if ($(document).height() > $(window).height())
-		horizontalOffset = 2;
+	var horizontalOffset = $('#'+gridId+'Wrapper').offset().left + 1;
+	var windowWidth = $(window).width();
 		
 	unfreezeHeader()
 	handleHeaderPosition()
-	
-	$('#'+gridId+'Wrapper').width($('.fluid').width()-horizontalOffset) // horizontalOffset comptensates for the border/padding/etc and scroll bar
+	$('#'+gridId+'Wrapper').width(windowWidth - horizontalOffset * 2) // horizontalOffset comptensates for the border/padding/etc and scroll bar
 	$('#'+gridId+'Grid').fluidGrid({ base:'#'+gridId+'Wrapper', offset: 0 });
 }
 

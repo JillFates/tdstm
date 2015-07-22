@@ -3,16 +3,30 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>Event Dashboard</title>
-	<link type="text/css" rel="stylesheet"
-		href="${resource(dir:'css',file:'dashboard.css')}" />
-	<link type="text/css" rel="stylesheet"
-		href="${resource(dir:'css',file:'tabcontent.css')}" />
-	<link rel="shortcut icon"
-		href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
+	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
+	<g:javascript src="asset.comment.js" />
 	<g:javascript src="yahoo.ui.dashboard.js" />
+	<g:javascript src="angular/angular.min.js" />
+	<g:javascript src="angular/plugins/angular-ui.js"/>	
+	<g:javascript src="cabling.js"/>
+	<g:javascript src="model.manufacturer.js"/>
+	<g:javascript src="angular/plugins/angular-resource.js" />
+	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<g:javascript src="bootstrap.js" />
+	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
 <div class="body_bg">
+	<input type="hidden" id="timeBarValueId" value="0"/>
+	<div class="taskTimebar hide" id="issueTimebar" >
+		<div id="issueTimebarId"></div>
+	</div>
 	<a name="page_up"></a>
 	<div id="doc">
 		<div id="bodycontent">
@@ -20,7 +34,7 @@
 				<div style="float: left; padding-top: 2px;">
 					<g:form action="index" controller="dashboard" name="dashboardForm">
 						<span>
-							<label for="moveEvent"><b>Event:</b> </label>&nbsp;
+							<label for="moveEvent"><b>Event:</b></label>&nbsp;
 							<select id="moveEvent" name="moveEvent" onchange="submitForm();">
 								<g:each status="i" in="${moveEventsList}" var="moveEventInstance">
 									<option value="${moveEventInstance?.id}">
@@ -29,8 +43,11 @@
 								</g:each>
 							</select>
 							<tds:hasPermission permission="PublishTasks">
-								<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="submitForm();"/>
-								View Unpublished
+								<span class="checkboxContainer">
+									&nbsp;&nbsp;
+									<input type="checkbox" name="viewUnpublished" id="viewUnpublishedId" class="pointer" ${viewUnpublished=='1' ? 'checked="checked"' : ''} onchange="toggleUnpublished(event)"/><!--
+									--><label for="viewUnpublishedId" class="pointer">&nbsp;View Unpublished</label>
+								</span>
 							</tds:hasPermission>
 						</span>
 					</g:form>
@@ -54,16 +71,14 @@
 				</div>
 				<div style="float: right; width: 150px; padding-top: 2px;">
 					<div style="float: right;">
-						<input type="button" value="Refresh:" id="update"
-							onclick="getMoveEventNewsDetails($('#moveEvent').val());updateTaskSummary();" /> 
-						<select name="updateTime" id="updateTimeId" class="selecttext"
-							onchange="${remoteFunction(action:'setTimePreference', params:'\'timer=\'+ this.value ' , onComplete:'timedUpdate(XMLHttpRequest.responseText)') }">
-							<option value="30000">30s</option>
-							<option value="60000">1m</option>
-							<option value="120000">2m</option>
-							<option value="300000">5m</option>
-							<option value="600000">10m</option>
-							<option value="never" selected="selected">Never</option>
+						<input type="button" value="Refresh:" id="update" onclick="refreshDashboard()" />
+						<select name="updateTime" id="selectTimedBarId" class="selecttext">
+							<option value="0" selected="selected">Manual</option>
+							<option value="30">30s</option>
+							<option value="60">1m</option>
+							<option value="120">2m</option>
+							<option value="300">5m</option>
+							<option value="600">10m</option>
 						</select>
 					</div>
 					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
@@ -429,7 +444,7 @@
 					<input class="delete" type="button" value="Delete" onclick="return submitDeleteNewsForm()" /> 
 				</span>
 				<span>
-					<input type="button" class="cancel" value="Cancel" onclick="timedUpdate( $('#updateTimeId').val() );$('#showEditCommentDialog').dialog('close');">
+					<input type="button" class="cancel" value="Cancel" onclick="$('#showEditCommentDialog').dialog('close');">
 				</span>
 			</div>
 			</form>
@@ -443,8 +458,11 @@
 	var tz = '${session.getAttribute('CURR_TZ')?.CURR_TZ}'
 	var stepWidth = 130;
 	var totalSteps = $('div.show_bundle_step').children().size();
+	var timerBar;
 	
 	$(document).ready(function() {
+		timerBar = new TimerBar(0, 'RefreshEventDB', refreshDashboard);
+		
 		$("#showEditCommentDialog").dialog({autoOpen: false});
 		$("#createNews").dialog({autoOpen: false});
 		setStepsWidth();
@@ -464,6 +482,13 @@
 		moveDataSteps();
 	})
 	
+	function refreshDashboard () {
+		getMoveEventNewsDetails($('#moveEvent').val());
+		updateTaskSummary();
+		if (timerBar)
+			timerBar.resetTimer();
+	}
+	
 	function submitForm (event) {
 		if ($('#viewUnpublishedId').is(':checked')) {
 			$('#viewUnpublishedId').attr('value', '1');
@@ -475,6 +500,13 @@
 			$('#dashboardForm').submit();
 			$('#viewUnpublishedId').removeAttr('checked');
 		}
+	}
+	
+	function toggleUnpublished (e) {
+		var checkedValue = $(e.srcElement).is(':checked');
+		setUserPreference('viewUnpublished', checkedValue, function () {
+			refreshDashboard();
+		});
 	}
 	
 	// recalculates the width of the container holding the step columns
@@ -601,26 +633,12 @@
 		YAHOO.util.Event.onAvailable('doc',YAHOO.example.init, YAHOO.example, true);
 	}
 	
-	/* set time to load the news and bundle data*/
-	var handler = 0
-	function timedUpdate (updateTime) {
-		if (updateTime != 'never') {
-			handler = setInterval("getMoveEventNewsDetails($('#moveEvent').val());updateTaskSummary();",updateTime);
-			$("#updateTimeId").val(updateTime)
-		} else {
-			clearInterval(handler)
-		}
-	}
-	
 	/* script to assign the event value*/
 	var moveEvent = "${moveEvent?.id}"
 	if (moveEvent) {
 		$("#moveEvent").val(moveEvent)
 	}
 	
-	timedUpdate( $("#updateTimeId").val() );	
-	var doUpdate = true;
-
 	/* Function to load the data for a particular MoveEvent */
 	function getMoveEventNewsDetails (moveEvent) {
 		$("#createNews").dialog("close");
@@ -630,9 +648,9 @@
 		$('#isResolvedId').attr("checked",false)
 		$("#showEditCommentDialog").dialog("close");
 		updateDash( $("#defaultBundleId").val() );
-		<%--	if(dialReload && doUpdate){
+/*		<%--	if(dialReload && doUpdate){
 			timer = setTimeout( "getDialsData($('#defaultBundleId').val() )", 5000 );
-		}--%>
+		}--%>*/
 		if (moveEvent) {
 			jQuery.ajax({
 				type:"GET",
@@ -642,9 +660,7 @@
 				dataType: 'json',
 				success:updateMoveEventNews,
 				error:function (xhr, ajaxOptions, thrownError){
-					if (doUpdate && errorCode ==  xhr.status) {
-						clearInterval(handler);
-						$("#update").css("color","red")
+					if (errorCode ==  xhr.status) {
 						if (xhr.status == "403") {
 							alert("403 Forbidden occurred, user don't have permission to load the current project data.");
 						}
@@ -691,7 +707,7 @@
 				$("#taskSummary").html(data)
 			},
 			error:function (xhr, ajaxOptions, thrownError){
-				if( doUpdate && errorCode ==  xhr.status ){
+				if (errorCode ==  xhr.status) {
 					clearInterval(handler);
 					$("#update").css("color","red")
 					if( xhr.status == "403"){
@@ -795,11 +811,8 @@
 				return getTimeFormate( convertedDate ) +" "+ (tsource2 ? tsource2 : "")
 			}
 		} catch (e) {
-			if (doUpdate) {
-				clearInterval(handler);
-				doUpdate = false;
-				$("#update").css("color","red")
-			}
+			clearInterval(handler);
+			$("#update").css("color","red")
 		}
 	}
 	
@@ -862,15 +875,11 @@
 				success:updateMoveBundleSteps,
 				error:function (xhr, ajaxOptions, thrownError){
 					if (errorCode ==  xhr.status ) {
-						clearInterval(handler);
-						doUpdate = false;
-						$("#update").css("color","red")
 						if (xhr.status == "403") {
 					 		alert("403 Forbidden occurred, user don't have permission to load the current project data.");
 						}	
 					} else {
 						errorCode = xhr.status;
-						doUpdate = false;
 					}
 		 		}
 			});
@@ -952,11 +961,11 @@
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
-					<tds:hasPermission permission='ViewPacingMeters'>
+					/*<tds:hasPermission permission='ViewPacingMeters'>*/
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).show();
 					post_init( "chart_"+moveBundleId+"_"+steps[i].tid, steps[i].dialInd )
 					// post_init( "chart_'+moveBundleId+'_'+steps[i].tid+'", '+steps[i].dialInd+' )
-					</tds:hasPermission>
+					/*</tds:hasPermission>*/
 				} else {
 					$("#chartdiv_"+moveBundleId+"_"+steps[i].tid ).hide();
 				}
@@ -966,11 +975,6 @@
 			setStepsWidth();
 			
 		} catch (ex) {
-			if (doUpdate) {
-				clearInterval(handler);
-				doUpdate = false;
-				$("#update").css("color","red")
-			}
 		}
 		
 	}
@@ -991,13 +995,13 @@
 		<%--//var myChart = new FusionCharts("${resource(dir:'swf',file:'AngularGauge.swf')}", "myChartId", "280", "136", "0", "0");
 		updateChartXML(divId, summaryDialData( dialInd ) );
 		//myChart.setDataXML( xmlData );
-	 	//myChart.render(divId); --%>
+	 	//myChart.render(divId);--%>
 	}
 	/*
 	will popup the dialog to create news
 	*/
 	function opencreateNews(){
-		timedUpdate('never');
+		timerBar.resetTimer();
 		$("#createNews").dialog('option', 'width', 'auto');
 		$("#createNews").dialog('option', 'position', ['center','top']);
 		$("#showEditCommentDialog").dialog("close");
@@ -1005,7 +1009,7 @@
 	}
 	function updateHidden(checkBoxId,hiddenId){
 		var resolve = $("#"+checkBoxId).is(':checked');
-		if(resolve){
+		if (resolve) {
 			$("#"+hiddenId).val(1);
 		} else {
 			$("#"+hiddenId).val(0);
@@ -1023,9 +1027,9 @@
 		
 		var validate = false;
 		if (moveEvent) {
-			if(resolveBoo && resolveVal == "") {
+			if (resolveBoo && resolveVal == "") {
 				alert('Please enter Resolution');
-			} else if( !news ){
+			} else if ( !news ) {
 				alert('Please enter Comment');
 			} else {
 				validate = true;
@@ -1035,7 +1039,6 @@
 		}
 
 		if (validate) {
-			timedUpdate( $("#updateTimeId").val() );
 			var form=$('#createNewsForm');
 			if (form.length) {
 				jQuery.ajax({
@@ -1074,7 +1077,6 @@
 		$('#resolutionNews').val("")
 		$('#isArchivedId').attr("checked",false)
 		$('#createNews').dialog('close');
-		timedUpdate( $("#updateTimeId").val() );
 	}
 
 	/* will popup the dialog to edit news */
@@ -1090,29 +1092,29 @@
 	 * @param  Ajax/JSON response object
 	 */
 	function showEditNewsForm( e ){
-		timedUpdate('never');
+		timerBar.resetTimer();
 		var assetComments = eval('(' + e.responseText + ')');
 		if (assetComments) {
 			
 			$('#commentId').val(assetComments[0].commentObject.id)
 			$('#assetTdId').val(assetComments[0].assetName)
 			$('#dateCreatedId').html(assetComments[0].dtCreated);
-			if(assetComments[0].personResolvedObj != null){
+			if (assetComments[0].personResolvedObj != null) {
 				$('#resolvedById').html(assetComments[0].personResolvedObj);
-			}else{
+			} else {
 				$('#resolvedById').html("");
 				$('#resolvedByEditId').html("");
 			}
 			$('#createdById').html(assetComments[0].personCreateObj);
 			$('#resolutionId').val(assetComments[0].commentObject.resolution);
 			
-			if(assetComments[0].commentObject.commentType != 'issue'){
+			if (assetComments[0].commentObject.commentType != 'issue') {
 
 				$('#commentTypeId').val("news")
 				$('#dateResolvedId').html(assetComments[0].dtResolved);
 				$('#isResolvedId').val(assetComments[0].commentObject.isArchived)
 				$('#commentTdId').val(assetComments[0].commentObject.message)
-				if(assetComments[0].commentObject.isArchived != 0){
+				if (assetComments[0].commentObject.isArchived != 0) {
 					$('#isResolvedId').attr('checked', true);
 					$("#isResolvedHiddenId").val(1);
 				} else {
@@ -1130,14 +1132,14 @@
 				$('#dateResolvedId').html(assetComments[0].dtResolved);
 				$('#isResolvedId').val(assetComments[0].commentObject.isResolved)
 				$('#commentTdId').val(assetComments[0].commentObject.comment)
-				if(assetComments[0].commentObject.isResolved != 0){
+				if (assetComments[0].commentObject.isResolved != 0) {
 					$('#isResolvedId').attr('checked', true);
 					$("#isResolvedHiddenId").val(1);
 				} else {
 					$('#isResolvedId').attr('checked', false);
 					$("#isResolvedHiddenId").val(0);
 				}
-				if(assetComments[0].commentObject.displayOption == "G"){
+				if (assetComments[0].commentObject.displayOption == "G") {
 					$("#displayOptionGid").attr('checked', true);
 				} else {
 					$("#displayOptionUid").attr('checked', true);
@@ -1153,7 +1155,7 @@
 			$("#showEditCommentDialog").dialog('option', 'position', ['center','top']);
 			$("#showEditCommentDialog").dialog("open");
 			$("#createNews").dialog("close");
-			}
+		}
 	}
 
 	/*
@@ -1163,9 +1165,7 @@
 		var id = $("#commentId").val();
 		var moveEvent = $("#moveEventId").val();	// Note that this comes from separate field
 
-		timedUpdate( $("#updateTimeId").val() );
-
-		var form=$('#editNewsForm');
+		var form = $('#editNewsForm');
 		if (form.length) {
 			jQuery.ajax({
 				url: tdsCommon.createAppURL('/newsEditor/updateNews'),
@@ -1194,10 +1194,8 @@
 	function submitDeleteNewsForm() {
 		var id = $("#commentId").val();
 		var moveEvent = $("#moveEventId").val();	// Note that this comes from separate field
-
-		timedUpdate( $("#updateTimeId").val() );
-
-		var form=$('#editNewsForm');
+		
+		var form = $('#editNewsForm');
 		if (form.length) {
 			jQuery.ajax({
 				url: tdsCommon.createAppURL('/newsEditor/deleteNews'),
@@ -1224,7 +1222,7 @@
 	// validate the manual summary input value
 	function validateManulaSummary(value){
 		var check = true
-		if( !isNaN(value) ){
+		if ( !isNaN(value) ) {
 			if(value > 100){
 				alert("Summary status should not be greater than 100")
 				check = false
@@ -1238,11 +1236,11 @@
 	// send the request to update the manual summary value if it is valid
 	function changeEventSummary(){
 		var value = $("#manualSummaryStatusId").val()
-		if(validateManulaSummary( value )){
-		var checkbox = $('#checkBoxId').is(":checked");
-		var moveEvent = $("#moveEventId").val();
-		${remoteFunction(controller:'moveEvent',action:'updateEventSumamry', params:'\'moveEventId=\'+moveEvent+\'&value=\'+value+\'&checkbox=\'+checkbox', onComplete:'updateDash( $("#defaultBundleId").val() )')};
-		$("#manualSumStatusSpan").hide();
+		if (validateManulaSummary( value )) {
+			var checkbox = $('#checkBoxId').is(":checked");
+			var moveEvent = $("#moveEventId").val();
+			${remoteFunction(controller:'moveEvent',action:'updateEventSumamry', params:'\'moveEventId=\'+moveEvent+\'&value=\'+value+\'&checkbox=\'+checkbox', onComplete:'updateDash( $("#defaultBundleId").val() )')};
+			$("#manualSumStatusSpan").hide();
 		}
 	}
 	// FUNCTION TO SET THE STEP DIV WIDTH.
@@ -1269,5 +1267,6 @@
 	currentMenuId = "#dashboardMenu";
 	$("#dashboardMenuId a").css('background-color','#003366')
 </script>
+	<g:render template="../layouts/error"/>
 </body>
 </html>

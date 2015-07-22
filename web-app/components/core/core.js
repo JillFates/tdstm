@@ -177,37 +177,7 @@ tds.core.interceptor.LoggedCheckerInterceptor = function() {
 	var servicesInterceptor = {
 		response: function(jsonResponse) {
 			var loginRedirect = jsonResponse.headers('x-login-url');
-			if (!loginRedirect) {
-				try {
-					var json = angular.fromJson(jsonResponse.data);
-					if (json.errors && json.errors.length > 0) {
-						var errorDiv = angular.element(document.querySelector('#errorModalText'));
-						var errorsHTML = "<ul>";
-						for (var j = 0; j < json.errors.length; j++) {
-							var emsg = '';
-							if (json.errors[j] instanceof String) {
-								emsg = json.errors[j];
-							} else if (typeof(json.errors[j].detail) !== 'undefined') {
-								emsg = json.errors[j].detail
-							} else {
-								emsg = json.errors[j]
-							}
-							errorsHTML = errorsHTML + "<li>" + emsg + "</li>";
-						}
-						errorsHTML = errorsHTML + "</ul>";
-						errorDiv.html(errorsHTML);
-						$('#errorModal').modal('show');
-
-					}
-					return jsonResponse
-				} catch (e) {
-					return jsonResponse;
-				}
-			} else {
-				alert("Your session has expired and need to login again.");
-				//location.reload();
-				window.location.href = loginRedirect;
-			}
+			return handleRequestResponse(jsonResponse, loginRedirect);
 		}
 	};
 	return servicesInterceptor;
@@ -220,49 +190,75 @@ function _goToLogin(url) {
 	}, 500);
 }
 
+/* Helper function used by the angular interceptor and AJAX prefilter to handle errors */
+function handleRequestResponse (jsonResponse, loginRedirect) {
+	if (!loginRedirect) {
+		try {
+			var json = angular.fromJson(jsonResponse.data);
+			if (json.errors && json.errors.length > 0) {
+				var errorDiv = angular.element(document.querySelector('#errorModalText'));
+				var errorsHTML = "<ul>";
+				for (var j = 0; j < json.errors.length; j++) {
+					var emsg = '';
+					if (json.errors[j] instanceof String) {
+						emsg = json.errors[j];
+					} else if (typeof(json.errors[j].detail) !== 'undefined') {
+						emsg = json.errors[j].detail
+					} else {
+						emsg = json.errors[j]
+					}
+					errorsHTML = errorsHTML + "<li>" + emsg + "</li>";
+				}
+				errorsHTML = errorsHTML + "</ul>";
+				errorDiv.html(errorsHTML);
+				$('#errorModal').modal('show');
+			}
+			return jsonResponse
+		} catch (e) {
+			return jsonResponse;
+		}
+	} else {
+		alert("Your session has expired and need to login again.");
+		window.location.href = loginRedirect;
+	}
+}
+
 /**
  * An Ajax Prefilter that is be applied to all Jquery Ajax calls. It will add the following functionality:
  *    1. Add checks for errors in the request and display them in the #messageDiv or as an alert
  *    2. Check for session expiration and redirect the user to the login page accordingly
  */
 $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-	//console.log("In the ajaxPrefilter");
 	var success = options.success;
-    options.success = function(data, textStatus, xhr) {
-    	var url = xhr.getResponseHeader('X-Login-URL');
-        if (url) {
-        	// The session must of expired if the X-Login-URL header was received
-        	alert("Your session has expired and need to login again.");
-        	_goToLogin(url);
-            return;
-        } else {
-        	// Check for error situations
-        	if (xhr.status == 200) {
-	        	//console.log("ajaxPrefilter was successful");
-        		if (success) {
-            		return success(data, textStatus, jqXHR);
-        		}
-        	} else {
-				var errmsg = "Unexpected error occurred";
-				var msgDiv = $('#messageDiv');
-				if (msgDiv.length) {
-					msgDiv.html(errmsg)
-				} else {
-					alert(errmsg);
+	options.success = function(data, textStatus, xhr) {
+		var url = xhr.getResponseHeader('X-Login-URL');
+		
+		if (!url) {
+			
+			handleRequestResponse({'data':data}, url);
+			// Check for error situations
+			if (xhr.status == 200 && data.status != 'error') {
+				if (success) {
+					return success(data, textStatus, jqXHR);
 				}
-				console.log("ajaxPrefilter received an error - " + errmsg);
+			} else {
 				return false;
-        	}
-        }
+			}
+		} else {
+			// The session must of expired if the X-Login-URL header was received
+			alert("Your session has expired and need to login again.");
+			_goToLogin(url);
+			return;
+		}
 	};
 
-    /*
-    var error = options.error;
-    options.error = function(jqXHR, textStatus, errorThrown) {
-    	$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
-        if(typeof(error) === "function") return error(jqXHR, textStatus, errorThrown);
-    };
-    */
+	/*
+	var error = options.error;
+	options.error = function(jqXHR, textStatus, errorThrown) {
+		$('#messageDiv').html("An unexpected error occurred and update was unsuccessful.");
+		if(typeof(error) === "function") return error(jqXHR, textStatus, errorThrown);
+	};
+	*/
 });
 
 /**
@@ -517,46 +513,25 @@ angular.module('modNgBlur', [])
 	});
 
 /**
- * updated bar preferences
- * @param timeoutPeriod
- */
-function timedUpdate(timeoutPeriod) {
-	taskManagerTimePref = timeoutPeriod
-	if (B1 != '') {
-		if (taskManagerTimePref != 0) {
-			B1.Start(timeoutPeriod);
-		} else {
-			B1.Pause(0);
-		}
-	} else {
-		if (taskManagerTimePref != 0) {
-			B2.Start(timeoutPeriod);
-		} else {
-			B2.Pause(0);
-		}
-	}
-}
-
-/**
  * Service used to administrate windows timed updates
  */
 tds.core.service.TimedUpdateService = function(window) {
 
 	var pause = function() {
-		if(window.B2 != '') {
+		if (window.B2 != '') {
 			window.B2.Pause(0);
 		}
-		if(window.B1 != '') {
+		if (window.B1 != '') {
 			window.B1.Pause(0);
 		}
 	}
 
 	var resume = function() {
 		var taskManagerTimePref = window.taskManagerTimePref;
-		if (window.B2 != '' && taskManagerTimePref != 0) { 
+		if (window.B2 != '' && taskManagerTimePref != 0) {
 			B2.Restart(taskManagerTimePref);
 		}
-		if (window.B1 != '' && taskManagerTimePref != 0){ 
+		if (window.B1 != '' && taskManagerTimePref != 0) {
 			B1.Restart(taskManagerTimePref); 
 		}
 	}

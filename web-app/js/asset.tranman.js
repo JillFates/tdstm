@@ -82,118 +82,117 @@ var stdErrorMsg = 'An unexpected error occurred. Please close and reload form to
  }
 var modelId
 var manufacturerId
-  // function to show asset dialog
-function showAssetDialog( e , action ) {
+// function to show asset dialog
+function showAssetDialog (e, action) {
 	
 	$('#createCommentDialog').dialog('close');
-    $('#commentsListDialog').dialog('close');
-    $('#editCommentDialog').dialog('close');
-    $('#showCommentDialog').dialog('close');
+	$('#commentsListDialog').dialog('close');
+	$('#editCommentDialog').dialog('close');
+	$('#showCommentDialog').dialog('close');
 	$('#changeStatusDialog').dialog('close');
 	$('#filterDialog').dialog('close');
     
 	var assetEntityAttributes = eval('(' + e.responseText + ')');
-    var autoComp = new Array();
-    
-    var showDiv = $("#showDiv");
-    var editDiv = $("#editDiv");
+	var autoComp = new Array();
+
+	var showDiv = $("#showDiv");
+	var editDiv = $("#editDiv");
 	// create tbody for CreateTable
 	var stbody = "";
-    var etbody = "";
+	var etbody = "";
 	// Rebuild the select
-    if (assetEntityAttributes) {
-    	var length = assetEntityAttributes.length;
-			 
-    	var stableLeft = "";
-		var etableLeft = "";
-		 
-		for (var i=0; i < length; i++ ) {
-		   	var attribute = assetEntityAttributes[i];
-			      
-		    var labelTd = "<td class='label' nowrap><label>"+attribute.label+""
-		    
-		    var labelTdE = ""
-	    	if(attribute.attributeCode == "manufacturer" && attribute.value != "" && attribute.value != null){
-	    		labelTdE = "<td class='label' nowrap><label><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a>"
-		    } else if(attribute.attributeCode == "model"&& attribute.value != "" && attribute.value != null ){
-		    	labelTdE = "<td class='label' nowrap><label><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a>"
-		    } else {
-		    	labelTdE = "<td class='label' nowrap>"+attribute.label
-		    }
-		    
-		    if(requiredFields.contains(attribute.attributeCode)){
-			  	var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
-			    labelTd += spanAst 
-			    labelTdE += spanAst
-		    }
-		    labelTd +="</label></td>"
-		    labelTdE +="</label></td>"
-		    	
-		    var inputTd = ""
-		    if(attribute.attributeCode == "manufacturer"){
-		    	inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.value+"</a></td>"
-		    } else if(attribute.attributeCode == "model"){
-		    	inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.value+"</a></td>"
-		    } else {
-		    	inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
-		    }
+	if (assetEntityAttributes) {
+		var length = assetEntityAttributes.length;
 
-		    // td for Edit page
-		    var inputTdE = "<td>";
-		    inputTdE += getInputType(attribute,'edit');
-		    inputTdE += "</td>"   
-		    
-		    if( i % 3 == 0){
-			   	stableLeft +="<tr>"+labelTd + inputTd
-			   	etableLeft +="<tr>"+labelTdE + inputTdE
-			} else if( i % 3 == 1){
+		var stableLeft = "";
+		var etableLeft = "";
+
+		for (var i = 0; i < length; i++ ) {
+			var attribute = assetEntityAttributes[i];
+
+			var labelTd = "<td class='label' nowrap><label>"+attribute.label+""
+
+			var labelTdE = ""
+			if (attribute.attributeCode == "manufacturer" && attribute.value != "" && attribute.value != null) {
+				labelTdE = "<td class='label' nowrap><label><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.label+"</a>"
+			} else if (attribute.attributeCode == "model"&& attribute.value != "" && attribute.value != null ) {
+				labelTdE = "<td class='label' nowrap><label><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.label+"</a>"
+			} else {
+				labelTdE = "<td class='label' nowrap>"+attribute.label
+			}
+			
+			if (requiredFields.contains(attribute.attributeCode)) {
+				var spanAst = "<span style='color:red;'>*</span>"//document.createElement("span")
+				labelTd += spanAst 
+				labelTdE += spanAst
+			}
+			labelTd +="</label></td>"
+			labelTdE +="</label></td>"
+		    	
+			var inputTd = ""
+			if (attribute.attributeCode == "manufacturer") {
+				inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showManufacturer("+attribute.manufacturerId+")' style='color:#00E'>"+attribute.value+"</a></td>"
+			} else if (attribute.attributeCode == "model") {
+				inputTd = "<td style='width:25%;color:#00f;' nowrap><a href='javascript:showModel("+attribute.modelId+")' style='color:#00E'>"+attribute.value+"</a></td>"
+			} else {
+				inputTd = "<td style='width:25%;' nowrap>"+attribute.value+"</td>"
+			}
+
+			// td for Edit page
+			var inputTdE = "<td>";
+			inputTdE += getInputType(attribute,'edit');
+			inputTdE += "</td>"   
+
+			if (i % 3 == 0) {
+				stableLeft +="<tr>"+labelTd + inputTd
+				etableLeft +="<tr>"+labelTdE + inputTdE
+			} else if (i % 3 == 1) {
 				stableLeft += labelTd + inputTd 
 				etableLeft += labelTdE + inputTdE 
 			} else {
 				stableLeft +=labelTd + inputTd+"</tr>"
 				etableLeft +=labelTdE + inputTdE+"</tr>"
 			}
-			
-		    var attribute = assetEntityAttributes[i];
-		    if(attribute.frontendInput == 'autocomplete'){
-		    	autoComp.push(attribute.attributeCode);
-		    }
+
+			var attribute = assetEntityAttributes[i];
+			if (attribute.frontendInput == 'autocomplete') {
+				autoComp.push(attribute.attributeCode);
+			}
 		}
 		stableLeft +="</table>"
-				
+
 		etableLeft +="</table>"
 
 		stbody +="<table>"+stableLeft+"</table>"
-		
-		
+
+
 		etbody += "<table>" + filedRequiredMess()
 		etbody += etableLeft+"</table>"
 
 		showDiv.html( stbody )
 		editDiv.html( etbody );
-    }
-	      
-	  new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}}) 
-	  $("#createDialog").dialog("close");
-	  if(action == 'edit'){
-	      $("#editDialog").dialog('option', 'width', '1000px');
-	      $("#editDialog").dialog('option', 'position', ['center','top']);
-	      $("#editDialog").dialog("open");
-	      $("#showDialog").dialog("close");
-	      $("#modelShowDialog").dialog("close")
-	      $("#manufacturerShowDialog").dialog("close")
-      } else if(action == 'show'){
-          $("#showDialog").dialog('option', 'width', '1000px');
-	      $("#showDialog").dialog('option', 'position', ['center','top']);
-	      $("#showDialog").dialog("open");
-	      $("#editDialog").dialog("close");
-	      $("#modelShowDialog").dialog("close")
-	      $("#manufacturerShowDialog").dialog("close")
-      }
-	  var assetType = $("#editassetTypeId").val()
-	  updateManufacturerOptions(assetType, manufacturerId, 2)
-	  timedUpdate('never')
-    }
+	}
+
+	new Ajax.Request(contextPath+'/assetEntity/retrieveAutoCompleteDate?autoCompParams='+autoComp,{asynchronous:true,evalScripts:true,onComplete:function(e){updateAutoComplete(e);}})
+	$("#createDialog").dialog("close");
+	if (action == 'edit') {
+		$("#editDialog").dialog('option', 'width', '1000px');
+		$("#editDialog").dialog('option', 'position', ['center','top']);
+		$("#editDialog").dialog("open");
+		$("#showDialog").dialog("close");
+		$("#modelShowDialog").dialog("close")
+		$("#manufacturerShowDialog").dialog("close")
+	} else if (action == 'show') {
+		$("#showDialog").dialog('option', 'width', '1000px');
+		$("#showDialog").dialog('option', 'position', ['center','top']);
+		$("#showDialog").dialog("open");
+		$("#editDialog").dialog("close");
+		$("#modelShowDialog").dialog("close")
+		$("#manufacturerShowDialog").dialog("close")
+	}
+	var assetType = $("#editassetTypeId").val()
+	updateManufacturerOptions(assetType, manufacturerId, 2)
+}
     function updateManufacturerOptions(assetType, manufacturerId, type){
     	new Ajax.Request(contextPath+'/manufacturer/retrieveManufacturersListAsJSON?assetType='+assetType,{
 			asynchronous:false,

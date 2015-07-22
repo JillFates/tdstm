@@ -956,7 +956,6 @@ class AssetEntityService {
 	 */
 	Map entityInfo(Project project, List groups=null){
 		def map = [ servers:[], applications:[], dbs:[], files:[], networks:[], dependencyType:[], dependencyStatus:[] ]
-
         if (groups == null || groups.contains(AssetType.SERVER.toString())) {
 			map.servers = AssetEntity.executeQuery(
 				"SELECT a.id, a.assetName FROM AssetEntity a " + 

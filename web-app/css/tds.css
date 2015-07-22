@@ -100,7 +100,7 @@
 	font: bold 16px helvetica, arial, sans-serif;
 	color:#ffffff;
 	width:auto;
-    float:left;
+	float:left;
 	text-align:center;
 	height:30px;
 	padding-top: 2px;
@@ -241,8 +241,8 @@
 }
 #userMegaMenu {
 	right: 107px;
-    top: 30px;
-    width: 300px;
+	top: 30px;
+	width: 300px;
 }
 #userAnchor{
 	float:left;
@@ -305,10 +305,10 @@
 }
 
 .menu3 {
-    width:100%;
-    height:auto;
-    float:left;
-    margin-top:0px;
+	width:100%;
+	height:auto;
+	float:left;
+	margin-top:0px;
 }
 
 .main_text_bottom {
@@ -466,104 +466,97 @@
 	float:left;
 }
 
- /* TABLE WRAPPER */  
+/* TABLE WRAPPER */  
   
-      div.scrollTable  
-      {  
-            
-        border: 1px solid black;  
-        width: 400px;  
-        overflow: hidden;  
-                    
-        *width : 400px;  
-        *height : 300px;  
-        *overflow : auto;  
+div.scrollTable  {
+	border: 1px solid black;  
+	width: 400px;  
+	overflow: hidden;  
+
+	*width : 400px;  
+	*height : 300px;  
+	*overflow : auto;  
+}
   
-      }  
+/* TABLE */  
   
-    /* TABLE */  
+div.scrollTable table {
+	width: 400px;  
+	border-collapse: collapse;  
+}  
   
-      div.scrollTable table{  
-        width: 400px;  
-        border-collapse: collapse;  
-      }  
+/* TABLE HEADER */  
   
-    /* TABLE HEADER */  
+div.scrollTable thead tr  {  
+	display: block;  
+
+	*display: inherit;  
+	*position: relative;  
+}  
   
-      div.scrollTable thead tr  
-      {  
-        display: block;  
-          
-        *display: inherit;  
-        *position: relative;  
-      }  
+div.scrollTable thead th {
+	border: 1px solid #AAA;  
+	border-bottom: 1px solid #333;  
+	background-color: #CCCCCC;  
+}  
   
-      div.scrollTable thead th{  
-        border: 1px solid #AAA;  
-        border-bottom: 1px solid #333;  
-        background-color: #CCCCCC;  
-      }  
+div.scrollTable thead th a,  
+div.scrollTable thead th a:link,  
+div.scrollTable thead th a:visited{  
+	display: block;  
+	padding: 4px;  
+	color: #000000;  
+}
   
-      div.scrollTable thead th a,  
-      div.scrollTable thead th a:link,  
-      div.scrollTable thead th a:visited{  
-        display: block;  
-        padding: 4px;  
-        color: #000000;  
-      }  
-  
-      div.scrollTable thead a:hover{  
-        background-color: #EEE;  
-        color: #00A;  
-      }  
-        
-    /* TABLE TBODY */  
+div.scrollTable thead a:hover{  
+	background-color: #EEE;  
+	color: #00A;  
+}  
+
+/* TABLE TBODY */  
       
+div.scrollTable tbody  {
+	display: block;  
+	overflow: auto;  
+	height: 290px;  
+	width: 100%;  
+
+	*display: inherit;  
+	*overflow: visible;  
+	*height: auto;
+}
+  
+div.scrollTable tbody td{  
+	padding: 3px;  
+	border-left: 0px;  
+}  
+  
+/* TABLE HEADER AND BODY CELLS */  
       
-      div.scrollTable tbody  
-      {  
-        display: block;  
-        overflow: auto;  
-        height: 290px;  
-        width: 100%;  
-  
-        *display: inherit;  
-        *overflow: visible;  
-        *height: auto;  
-                
-      }  
-  
-      div.scrollTable tbody td{  
-        padding: 3px;  
-        border-left: 0px;  
-      }  
-  
-    /* TABLE HEADER AND BODY CELLS */  
-      
-      div.scrollTable thead th,  
-      div.scrollTable tbody td{  
-        width: 102px;  
-      }  
-  
-      div.scrollTable thead th + th + th + th{  
-        width: 138px;  
-      }  
-  
-      div.scrollTable tbody td + td + td + td{  
-        width: 120px;  
-      }
+div.scrollTable thead th,  
+div.scrollTable tbody td{  
+	width: 102px;  
+}  
+
+div.scrollTable thead th + th + th + th{  
+	width: 138px;  
+}  
+
+div.scrollTable tbody td + td + td + td{  
+	width: 120px;  
+}
         
 /* class for dashboards */
 
 .task_hold{
-   background-color:#FFFF33 !important;
-   color:black;
-   font-weight: bold;
+	background-color:#FFFF33 !important;
+	color:black;
+	font-weight: bold;
 }
 .task_hold_overtime{
 	background-color:#FF0000;
 	color:black;
-   font-weight: bold;
+	font-weight: bold;
 }
 .task_planned {
 	background-color: #FFFFFF;
@@ -576,9 +569,9 @@
 	font-weight: bold;
 }
 .task_ready {
-   background-color: green !important;
-   color: white;
-   font-weight: bold;
+	background-color: green !important;
+	color: white;
+	font-weight: bold;
 }
 .task_started {
 	background-color: darkturquoise!important;
@@ -628,7 +621,7 @@
 	text-decoration: none!important;
 }
 .rack_task_ready {
-   background :url(../images/task_ready.png) no-repeat scroll 0 0 transparent !important;
+	background :url(../images/task_ready.png) no-repeat scroll 0 0 transparent !important;
 	text-decoration: none !important;
 }
 .rack_task_started {
@@ -709,7 +702,7 @@
 }
 
 /* dashboards label display for IE only */
-	.verticaltext {
+.verticaltext {
 	writing-mode: tb-rl;
 	filter: flipv fliph;
 	font-family: helvetica, arial, sans-serif;
@@ -720,21 +713,21 @@
 
 /* dash board vertical scroll for fire fox only */
 div.tableContainer tbody {
-  border: 1px solid gray;
+	border: 1px solid gray;
 }
 div.tableContainer tbody td{
-   border-bottom: 1px solid #E8E8E8;
-   border-right: 1px solid #E8E8E8;
+	border-bottom: 1px solid #E8E8E8;
+	border-right: 1px solid #E8E8E8;
 }
 div.tableContainer tbody tr:hover td { 
 	border-bottom: 1px solid green; border-top: 1px solid green; 
 }
 div.tableContainer thead th{
-   border-right: 1px solid #F8F8F8;
-   padding: 0px 6px;
+	border-right: 1px solid #F8F8F8;
+	padding: 0px 6px;
 }
 div.tableContainer thead th a {
-  display:inline;
+	display:inline;
 }
 
 .buttonClean input {
@@ -756,7 +749,7 @@ div.tableContainer thead th a {
 	background-color:yellow;
 }
 .void_transition {
-text-decoration: line-through;	
+	text-decoration: line-through;	
 }
 .cart_style span{
 	font-size: 16px;
@@ -820,7 +813,7 @@ text-decoration: line-through;
 	font-size:12px;
 	font-weight:bold;
 	color:#FFFFFF;
-	}
+}
 	
 .statusbar_bad{
 	text-align:center;
@@ -931,32 +924,32 @@ td .label_sm {
 	margin-left: 0px;
 }
 .tabs ul {
-    list-style: none;
+	list-style: none;
 }
 
 .tabs ul li {
-    float: left;
-    background: #eee;
-    border: 1px #aaa solid;
-    border-bottom: none;
-    margin-right: 10px;
-    padding: 5px;
+	float: left;
+	background: #eee;
+	border: 1px #aaa solid;
+	border-bottom: none;
+	margin-right: 10px;
+	padding: 5px;
 }
 
 .tabs ul li.active {
 	background-color : #fff;
-    margin-bottom: -1px;
-    padding-bottom: 6px;
+	margin-bottom: -1px;
+	padding-bottom: 6px;
 }
 
 .tabInner {
-    clear: both;
-    border: 1px solid #aaa;
-    overflow: hidden;
+	clear: both;
+	border: 1px solid #aaa;
+	overflow: hidden;
 }
 
 .tabInner div {
-    padding: 5px;
+	padding: 5px;
 
 }
 
@@ -1064,12 +1057,12 @@ div#dependencyDivId td.selectedGroup span {
 }
 
 dl dt {
-   font-weight: bold;
-   float: left;
-   margin-right: 2px;
+	font-weight: bold;
+	float: left;
+	margin-right: 2px;
 }
 dl dd {
-   margin: 2px;
+	margin: 2px;
 }
 
 .asset_details_block{
@@ -1103,51 +1096,51 @@ dl dd {
 }
 
 .statusButtonBar {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    box-shadow: inset 0px 3px 3px #888;
-    height: 30px;
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	box-shadow: inset 0px 3px 3px #888;
+	height: 30px;
 }
 .statusButton {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    border-radius:4px;
-    color: #666;
-    height: 20px;
-    font-size: 12px;
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	border: 1px solid #ccc;
+	border-radius:4px;
+	color: #666;
+	height: 20px;
+	font-size: 12px;
 	font-weight:bold;
-    margin-top: 5px;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    margin-left: 65px;
+	margin-top: 5px;
+	overflow: hidden;
+	padding: 0;
+	cursor: pointer;
+	margin-left: 65px;
 }
 .detailButton {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    border-radius:4px;
-    color: #666;
-    height: 20px;
-    font-size: 12px;
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	border: 1px solid #ccc;
+	border-radius:4px;
+	color: #666;
+	height: 20px;
+	font-size: 12px;
 	font-weight:bold;
-    margin-top: 5px;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    margin-left: 65px;
+	margin-top: 5px;
+	overflow: hidden;
+	padding: 0;
+	cursor: pointer;
+	margin-left: 65px;
 }
 .statusButton_mobile {
-    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
-    border: 1px solid #ccc;
-    border-radius:4px;
-    color: #666;
-    height: 20px;
-    font-size: 12px;
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+	border: 1px solid #ccc;
+	border-radius:4px;
+	color: #666;
+	height: 20px;
+	font-size: 12px;
 	font-weight:bold;
-    margin-top: 5px;
-    overflow: hidden;
-    padding: 0;
-    cursor: pointer;
-    margin-left: 35px;
+	margin-top: 5px;
+	overflow: hidden;
+	padding: 0;
+	cursor: pointer;
+	margin-left: 35px;
 }
 .action_button {
 	background-color:#aaefb8;
@@ -1177,68 +1170,88 @@ dl dd {
 	text-align: right;
 }
 .menu4 {
-    width:100%;
-    height:auto;
-    float:left;
-    background:#444;
-    margin-top:0px;
+	width:100%;
+	height:auto;
+	float:left;
+	background:#444;
+	margin-top:0px;
 }
 .menu4 ul {
-    width:auto;
-    padding-top:0px;
-    margin:0px;
-    padding-left:0px;
+	width:auto;
+	padding-top:0px;
+	margin:0px;
+	padding-left:0px;
 }
 .menu4 ul li {
-    display:inline;
+	display:inline;
 }
 .menu4 ul li a {
-    width:auto;
-    float: left;
-    height:21px;
-    text-decoration: none;
-    text-align:center;
-    font:bold 12px Tahoma, helvetica, arial, sans-serif;
-    color: white;
-    padding:2px 8px;
-    border-right:1px solid #666;
+	width:auto;
+	float: left;
+	height:21px;
+	text-decoration: none;
+	text-align:center;
+	font:bold 12px Tahoma, helvetica, arial, sans-serif;
+	color: white;
+	padding:2px 8px;
+	border-right:1px solid #666;
 }
 .menu4 .title1 {
-    width:auto;
-    float: left;
-    height:21px;
-    text-decoration: none;
-    text-align:center;
-    font: bold 12px helvetica, arial, sans-serif;
-    color: white;
-    padding:2px 8px;
-    border-right:1px solid #666;
+	width:auto;
+	float: left;
+	height:21px;
+	text-decoration: none;
+	text-align:center;
+	font: bold 12px helvetica, arial, sans-serif;
+	color: white;
+	padding:2px 8px;
+	border-right:1px solid #666;
 }
 .menu4 li a:hover, .menu4 li.current a {
-    color: white;
+	color: white;
 }
 .menu4 ul li a:visited  {
-    color: white;
+	color: white;
 }
 .menu4 ul li a:hover   {
-    color: yellow;
+	color: yellow;
 }
 
 .timebar {
-  float:left;width:220px;height:8px;background-Color:grey;
+	float:left;
+	width:220px;
+	height:8px;
+	background-Color:grey;
 }
 .issueTimebar {
-  float:left;height:8px;background-Color:grey;
+	float: left;
+	height: 8px;
+	background-Color: grey;
+	width: 100%;
 }
 #issueTimebarId {
-  height:8px;background-Color:green;color:white;text-Align:center;
+	height:8px;
+	background-Color:green;
+	color:white;
+	text-Align:center;
+	width: 0px;
+}
+#issueTimebar {
+	width: 100%;
 }
 .taskTimebar{
-	float:left;height:8px;background-Color:grey;width: 1349px;
+	float:left;
+	height:8px;
+	background-Color:grey;
+	width: 1349px;
 }
 
 #timebar {
-  width:30px;height:8px;background-Color:green;color:white;text-Align:center;
+	width:30px;
+	height:8px;
+	background-Color:green;
+	color:white;
+	text-Align:center;
 }
 
 .tab {
@@ -1343,12 +1356,12 @@ a.tab_deselect {
 	overflow: auto;
 }
 .cabling_div th {
-    background: none repeat scroll 0 0 #CCCCCC;
-    color: #000000;
-    font-size: 12px;
-    font-weight: bold;
-    line-height: 17px;
-    padding: 2px 6px;
+	background: none repeat scroll 0 0 #CCCCCC;
+	color: #000000;
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 17px;
+	padding: 2px 6px;
    	white-space :nowrap;
 }
 #issueTable {
@@ -1386,13 +1399,13 @@ a.tab_deselect {
 	box-shadow: 0px 3px 3px #888;
 }
 .slide { 
-    float: left;
-    margin-left: 5px;
+	float: left;
+	margin-left: 5px;
 }
 .personShow{
 	font: 12px/19px helvetica, arial, sans-serif;
-    padding: 5px 6px;
-    text-align: left;
+	padding: 5px 6px;
+	text-align: left;
 }
 .person{
 	min-height : 200px;
@@ -1451,7 +1464,7 @@ span.task_button_disabled { float: left; height: 16px; line-height: 16px;  paddi
 	width:80px;
 }
 .sizeScale input{
-    width: 40px
+	width: 40px
 }
 .addDepButton{
 	margin-top: 12px;
@@ -1613,8 +1626,8 @@ div.centered {
 
 /* Hide the span that Select2 creates */
 .select2-hidden-accessible {
-    display: none !important; 
-    visibility: hidden !important;
+	display: none !important; 
+	visibility: hidden !important;
 }
 
 .partner_select_row {
@@ -1656,4 +1669,7 @@ div#dependencyDivId td.labelColumn {
 	position: absolute;
 	left: 16px;
 	top: auto;
+}
+.hide {
+	display: none;
 }

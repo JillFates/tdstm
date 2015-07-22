@@ -15,6 +15,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tds.asset.AssetDependencyBundle
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.FieldImportance
+import com.tdsops.common.validation.ConstraintsValidator
 
 class UserPreferenceService  {
 
@@ -29,6 +30,32 @@ class UserPreferenceService  {
 
 	protected static Map SECURITY_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
 
+	private static Map prefCodeConstraints = [
+		viewUnpublished: [
+			type: 'boolean'
+		],
+		RefreshEventDB: [
+			type: 'integer',
+			inList: ['0', '30', '60', '120', '300', '600']
+		],
+		RefreshTaskMgr: [
+			type: 'integer',
+			inList: ['0', '60', '120', '180', '240', '300']
+		],
+		RefreshMyTasks: [
+			type: 'integer',
+			inList: ['0', '30', '60', '120', '180', '240', '300']
+		],
+		RefreshTaskGraph: [
+			type: 'integer',
+			inList: ['0', '60', '120', '180', '240', '300']
+		],
+		RefreshTimeline: [
+			type: 'integer',
+			inList: ['0', '60', '120', '180', '240', '300']
+		]
+	]
+	
 	/*
 	 * Return current session object
 	 */
@@ -425,5 +452,19 @@ class UserPreferenceService  {
 			removeUserRoles(toRemoveRoles, person.id);
 		}
 	}
-
+	
+	/* Saves a user preference after making sure that it passes validation using the constraints map */
+	def savePreference (String code, def value) {
+		if (code in prefCodeConstraints) {
+			def validated = ConstraintsValidator.validate(value, prefCodeConstraints[code])
+			if (! validated)
+				throw new InvalidParamException()
+			
+			setPreference(code, value)
+		} else {
+			throw new InvalidRequestException()
+		}
+		
+		return true
+	}
 }

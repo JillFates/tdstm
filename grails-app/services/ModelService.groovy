@@ -13,13 +13,13 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 
 class ModelService {
 
-    static transactional = true
+	static transactional = true
 
    	// Services and objects to be injected by IoC
 	def sessionFactory
 	def assetEntityAttributeLoaderService
 	def dataSource
-    def jdbcTemplate
+	def jdbcTemplate
 	def assetEntityService
 
    /**

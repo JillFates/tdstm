@@ -30,12 +30,10 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 
 	scope.$on('popupClosed', function(evt, popupType) {
 		activePopups[popupType] = false;
-		updateRefreshTimer();
 	});
 
 	scope.$on('newActivePopup', function(evt, popupType) {
 		activePopups[popupType] = true;
-		updateRefreshTimer();
 	});
 
 	scope.$on('commentsList', function(evt, assetTO, commentType) {
@@ -191,17 +189,6 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 		}
 		scope.bulkEditing = !scope.bulkEditing;
 		scope.bulkEdit = false;
-	}
-
-	var updateRefreshTimer = function() {
-		var selectTimed = angular.element('#selectTimedId');
-		if (selectTimed.length > 0) {
-			if (isPopupOpen()) {
-				window.timedUpdate('never');
-			} else {
-				window.timedUpdate(selectTimed.val());
-			}
-		}
 	}
 
 	var isPopupOpen = function() {
@@ -402,10 +389,6 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 				if ($scope.ac.resolution == null) {
 					$scope.ac.resolution = "";
 				}
-
-				if ($("#selectTimedId").length > 0) {
-					timedUpdate('never')
-				}
 			}
 		}
 		if (!isIE7OrLesser)
@@ -586,10 +569,6 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 				} else {
 					$scope.acData.notes = [];
 				}
-
-				if ($("#selectTimedId").length > 0) {
-					timedUpdate('never')
-				}
 			}
 		}
 		//if(!isIE7OrLesser)
@@ -606,10 +585,6 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		if(invalid){
 			alert("You must fill in all the required fields.")
 		}else{
-			// Bump the list timer if it exists
-			if ($("#selectTimedId").length > 0) {
-				timedUpdate($("#selectTimedId").val())
-			}
 
 			$scope.ac.id = $scope.ac.commentId;
 

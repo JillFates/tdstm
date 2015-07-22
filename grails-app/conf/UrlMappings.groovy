@@ -153,6 +153,11 @@ class UrlMappings {
 			action = [GET:"preferences"]
 		}
 		
+		"/ws/user/preference" {
+			controller = "wsUser"
+			action = [POST:"savePreference"]
+		}
+		
 		"/ws/progress" {
 			controller = "wsProgress"
 			action = [GET:"list"]

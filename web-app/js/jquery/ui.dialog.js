@@ -108,11 +108,6 @@ $.widget("ui.dialog", {
 				})
 				.click(function(event) {
 					self.close(event);
-					if($("#selectTimedId").length > 0){
-						timedUpdate($("#selectTimedId").val())
-					} else if($("#updateTimeId").length > 0){
-						timedUpdate($("#updateTimeId").val())
-					}
 					return false;
 				})
 				.appendTo(uiDialogTitlebar),
