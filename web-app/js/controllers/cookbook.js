@@ -74,6 +74,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	scope.convertTZ = function(date) {
 		var m = moment(date);
+		m.tz(tdsCommon.timeZone());
 		return tdsCommon.formatDateTime(m);
 	}
 
@@ -869,6 +870,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 
 	scope.convertTZ = function(date) {
 		var m = moment(date);
+		m.tz(tdsCommon.timeZone());
 		return tdsCommon.formatDateTime(m);
 	}
 
