@@ -233,12 +233,12 @@
 	}
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
+		B1.Pause()
 		jQuery.ajax({
 			url: 'showIssue',
 			data: {'issueId':id},
 			type:'POST',
 			success: function(data) {
-				B1.Pause()
 				$('#showStatusId_'+id).css('display','none')
 				//$('#issueTr_'+id).attr('onClick','cancelButton('+id+',"'+status+'")');
 				$('#detailId_'+id).html(data)
