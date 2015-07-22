@@ -240,6 +240,7 @@ var tdsCommon = {
 			var result = "";
 			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
 			if (momentObj) {
+				momentObj.tz(tdsCommon.timeZone());
 				result = momentObj.format(tdsCommon.defaultDateFormat());
 			}
 			return result;
@@ -256,6 +257,7 @@ var tdsCommon = {
 			case "maintExpDate":
 				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
 				if (momentObj.isValid()) {
+					momentObj.tz(tdsCommon.timeZone());
 					result = momentObj.format(tdsCommon.defaultDateTimeFormat());
 				} else {
 					result = "";

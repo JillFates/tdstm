@@ -102,6 +102,7 @@ tds.core.utils = function(servRootPath) {
 			var currentDate = ""
 			if (input) {
 				var momentObj = tdsCommon.parseDateTimeFromZulu(input);
+				momentObj.tz(tdsCommon.timeZone());
 				currentDate = tdsCommon.formatDateTime(momentObj, tdsCommon.defaultShortDateFormat());
 			}
 			return currentDate
