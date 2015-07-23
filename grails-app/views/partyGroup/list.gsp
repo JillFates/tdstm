@@ -16,8 +16,9 @@
 		$(document).ready(function() {
 			var listCaption ="Companies: <span class='capBtn'><input type='button' value='Create Company' onClick=\"window.location.href=\'"+contextPath+"/partyGroup/create\'\"/></span>"
 			<jqgrid:grid id="companyId" url="'${createLink(action: 'listJson')}'"
-				colNames="'Name','Date Created', 'Last Updated'"
+				colNames="'Name', 'Partner', 'Date Created', 'Last Updated'"
 				colModel="{name:'companyName', index: 'companyName', width:'150'},
+					{name:'partner', width:'30'},
 					{name:'dateCreated', width:'100', formatter:formatDate},
 					{name:'lastUpdated', width:'100', formatter:formatDate}"
 				sortname="'companyName'"
