@@ -81,10 +81,10 @@ class WsDashboardController {
 						SUM(IF(t.status='Completed',1,0)) AS tskComp,
 						SUM(IF(t.status='Hold',1,0)) AS tskHold,
 						ROUND(IF(count(*)>0,SUM(IF(t.status='Completed',1,0))/count(*)*100,100)) AS percComp,
-						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') AS planStart,
-						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') AS planComp,
-						DATE_FORMAT( MIN(IFNULL(t.act_start, t.date_resolved)),'%Y/%m/%d %r') AS actStart,
-						DATE_FORMAT( MAX(t.date_resolved), '%Y/%m/%d %r' ) AS actComp
+						mbs.plan_start_time AS planStart,
+						mbs.plan_completion_time AS planComp,
+						MIN(IFNULL(t.act_start, t.date_resolved)) AS actStart,
+						MAX(t.date_resolved) AS actComp
 					FROM asset_entity a
 					JOIN asset_comment t ON t.asset_entity_id = a.asset_entity_id
 					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
@@ -111,11 +111,11 @@ class WsDashboardController {
 						ss.id as snapshotId, 
 						mbs.label as label, 
 						mbs.calc_method as calcMethod,
-						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart,
-						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp,
-						DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart,
-						DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,
-						DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,
+						mbs.plan_start_time as planStart,
+						mbs.plan_completion_time as planComp,
+						mbs.actual_start_time as actStart,
+						mbs.actual_completion_time as actComp,
+						ss.date_created as dateCreated,
 						ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id 
@@ -128,11 +128,11 @@ class WsDashboardController {
 				/*	Get the steps that have not started / don't have step_snapshot records	*/						
 				def stepsNotUpdatedQuery = """
 					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
-						DATE_FORMAT( mbs.plan_start_time ,'%Y/%m/%d %r') as planStart,
-						DATE_FORMAT( mbs.plan_completion_time ,'%Y/%m/%d %r') as planComp,
-						DATE_FORMAT( mbs.actual_start_time ,'%Y/%m/%d %r') as actStart,
-						DATE_FORMAT( mbs.actual_completion_time ,'%Y/%m/%d %r') as actComp,
-						DATE_FORMAT( ss.date_created ,'%Y/%m/%d %r') as dateCreated,
+						mbs.plan_start_time as planStart,
+						mbs.plan_completion_time as planComp,
+						mbs.actual_start_time as actStart,
+						mbs.actual_completion_time as actComp,
+						ss.date_created as dateCreated,
 						ss.tasks_count as tskTot, ss.tasks_completed as tskComp, ss.dial_indicator as dialInd 
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
@@ -151,8 +151,8 @@ class WsDashboardController {
 		dataPointsForEachStep.each { data ->
 			
 			def snapshot 
-			def planCompTime = new Date( data.planComp ).getTime() / 1000  
-			def planStartTime = new Date( data.planStart ).getTime() / 1000
+			def planCompTime = data.planComp.getTime() / 1000  
+			def planStartTime = data.planStart.getTime() / 1000
 			
 			if ( data.snapshotId ) {
 				snapshot = StepSnapshot.findById( data.snapshotId )
@@ -202,7 +202,7 @@ class WsDashboardController {
 					data.put( "percentageStyle", "step_statusbar_good" )
 				}*/
 			} else {
-				def actCompTime = new Date( data.actComp ).getTime() / 1000
+				def actCompTime = data.actComp.getTime() / 1000
 				if ( actCompTime > planCompTime+59 ) {  // 59s added to planCompletion to consider the minutes instead of seconds 
 					data.put( "percentageStyle", "step_statusbar_bad" )
 				} else {
@@ -224,14 +224,14 @@ class WsDashboardController {
 		if ( moveEvent ) {
 			
 			def resultMap = jdbcTemplate.queryForMap( """
-				SELECT DATE_FORMAT( max(mb.completion_time) ,'%Y/%m/%d %r' ) as compTime,
-				DATE_FORMAT( min(mb.start_time) ,'%Y/%m/%d %r' ) as startTime
+				SELECT max(mb.completion_time) as compTime,
+				min(mb.start_time) as startTime
 				FROM move_bundle mb WHERE mb.move_event_id = ${moveEvent.id}
 				""" )
 
 			planSumCompTime = resultMap?.compTime
 			if (resultMap?.startTime) {
-				def eventStartTime = new Date( resultMap?.startTime ) 
+				def eventStartTime = new Date( resultMap.startTime.getTime() ) 
 				if (eventStartTime>sysTime) {
 					dayTime = TimeCategory.minus(eventStartTime, sysTime)
 					eventString = "<i>Time Remaining<i>"

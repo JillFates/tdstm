@@ -7,6 +7,7 @@ var tdsCommon = {
 	config: {
 		// The base path of the application URI
 		appBaseUri:  '/tdstm',
+		dateFormatNoYear: null,
 		dateFormat: null,
 		dateTimeFormat: null,
 		dateShortFormat: null,
@@ -139,6 +140,19 @@ var tdsCommon = {
 	},
 
 	/**
+	 * Returns a date format that don't have a year
+	 */
+	noYearDateFormat: function() {
+		if (this.config.dateFormatNoYear == null) {
+			this.config.dateFormatNoYear = "MM/DD h:mm A";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateFormatNoYear = "DD/MM h:mm A";
+			}
+		}
+		return this.config.dateFormatNoYear;
+	},
+
+	/**
 	 * Returns default date short format
 	 */
 	defaultShortDateFormat: function() {
@@ -263,6 +277,21 @@ var tdsCommon = {
 					result = "";
 				}
 				break;
+		}
+		return result;
+	},
+
+	parseAndFormatDateTimeFromZulu: function(stringValue, format) {
+		var result;
+		var momentObj = tdsCommon.parseDateTimeFromZulu(stringValue);
+		if (momentObj.isValid()) {
+			if (typeof(format)==='undefined') {
+				format = this.defaultDateTimeFormat();
+			}
+			momentObj.tz(tdsCommon.timeZone());
+			result = momentObj.format(format);
+		} else {
+			result = "";
 		}
 		return result;
 	},

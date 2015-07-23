@@ -641,16 +641,14 @@
 	/* Update the news once ajax call success*/
 	function updateMoveEventNews (news) {
 		
-		var offset = $("#timezone").val()
 		var newsLength = news.length;
 		var live = "";
 		var archived = "";
 		var scrollText = " ";
-		var myDate = new Date();
 		for (i = 0; i< newsLength; i++) {
 			var state = news[i].state;
 			var liId = news[i].type+"_"+news[i].id
-			var createdTime = convertTime(offset,news[i].created)
+			var createdTime = tdsCommon.parseAndFormatDateTimeFromZulu(news[i].created)
 			if (state == "A") {
 				archived +=	"<li id="+liId+" onclick='openEditNewsDialog(this.id)'><span class='newstime'>"+createdTime+" :</span> <span class='normaltext Arrowcursor'>"+news[i].text+"</span></li>";
 			} else {
@@ -718,104 +716,6 @@
 		}
 	}
 	
-	/*-----------------------------------------------------------
-	 * functions to convert Date & Time into respective timezones
-	 *-----------------------------------------------------------*/
-
-	function convertTime (offset, source, format) {
-		try {
-			//12/11: 12:30 PM: (0m)	 
-			if (source ==  "") {
-				return ""
-			} else if (source.substring(0,5).toLowerCase() ==  "total") {
-				return source
-			}
-										
-			var p = trimAll(source);
-			p = p.substring(p.length-1, p.length);
-			var tsource;
-			var tsource1;
-			var tsource2 = 0;
-			var temp
-			
-			if (p == ")") {
-			tsource = source.substring(0,source.length).split("(");
-				tsource1 = tsource[0];			
-				tsource1 = tsource1.substring(0,tsource1.length-2);
-				temp = tsource1;
-				tsource2 = trimAll(tsource[1]);	  
-			   // tsource2 = "(" + tsource2;
-				
-				var deltaTemp = tsource2.replace("m)","")
-				if (deltaTemp) {
-					deltaTemp = parseInt( deltaTemp )
-					var sign = ""
-					if (deltaTemp < 0) {
-						deltaTemp = deltaTemp * -1
-						sign = "-"
-					}
-					if (format=='m') {
-						tsource2 = "("+sign + deltaTemp+"m)"
-					} else if((parseInt( deltaTemp / 60 ))<10){
-						tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h "+ deltaTemp % 60 +"m)"
-					} else {
-						tsource2 = "("+sign + parseInt( deltaTemp / 60 ) +"h"+"+)"
-					}
-				}
-			} else {
-				temp = trimAll(source);
-			}
-			if (temp == "null") {
-				return "";
-			} else {
-				var date = new Date(temp);
-				var utcDate = date.getTime() ;
-				var convertedDate = new Date(utcDate + (3600000*offset));
-				return getTimeFormate( convertedDate ) +" "+ (tsource2 ? tsource2 : "")
-			}
-		} catch (e) {
-			if (doUpdate) {
-				clearInterval(handler);
-				doUpdate = false;
-				$("#update").css("color","red")
-			}
-		}
-	}
-	
-	function getTimeFormate (date) {
-		var timeString = ""
-		var month =  date.getMonth();
-		
-		if ( !isNaN(month) ) {
-		   month = month + 1;
-		   var monthday	= date.getDate();
-		   var year		= date.getFullYear();
-		   
-		   var hour   = date.getHours();
-		   var minute = date.getMinutes();
-		   var second = date.getSeconds();
-		   var ap = "AM";
-		   if (hour   > 11) { ap = "PM";			 }
-		   if (hour   > 12) { hour = hour - 12;	  }
-		   if (hour   == 0) { hour = 12;			 }
-		   if (hour   < 10) { hour   = "0" + hour;   }
-		   if (minute < 10) { minute = "0" + minute; }
-		   if (second < 10) { second = "0" + second; }
-		   var timeString = month+"/"+monthday+" "+hour + ':' + minute +" " +  ap;
-		}
-	   return timeString;
-	   
-	}
-	function trimAll (sString) {
-		while (sString.substring(0,1) == ' ') {
-			sString = sString.substring(1, sString.length);
-		}
-		while (sString.substring(sString.length-1, sString.length) == ' '){
-			sString = sString.substring(0,sString.length-1);
-		}
-		return sString;
-	}
-	
 	/* display bundle tab and call updateDash method to load the appropriate data*/
 	function displayBundleTab (Id) {
 		 $(".mbhactive").attr("class","mbhinactive");
@@ -861,8 +761,6 @@
 	
 	function updateMoveBundleSteps (bundleMap) {
 		try {
-			var offset = $("#timezone").val()
-
 			var snapshot = bundleMap.snapshot;
 			var runbookOn = snapshot.runbookOn;
 			var moveBundleId = snapshot.moveBundleId;
@@ -897,7 +795,7 @@
 				$('#checkBoxId').removeAttr("checked")
 			}
 			$("#manualSummaryStatusId").val( sumDialInd );
-			$("#spanPlanned").html(convertTime(offset, planSum.compTime))
+			$("#spanPlanned").html(tdsCommon.parseAndFormatDateTimeFromZulu(planSum.compTime))
 			$("#plannedStart").html(planSum.dayTime)
 			$("#eventDescription").html(planSum.eventDescription)
 			$("#eventStringId").html(planSum.eventString)
@@ -907,27 +805,39 @@
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? 0+ "%" : parseInt( (steps[i].tskComp / steps[i].tskTot ) * 100 ) +"%");
 				$("#percentage_"+moveBundleId+"_"+steps[i].tid).attr("class",steps[i].percentageStyle)
 				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(isNaN(steps[i].tskComp / steps[i].tskTot) ? "0 (of 0)" : steps[i].tskComp+" (of "+steps[i].tskTot+")");
-				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planStart));
-				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].planComp));
+				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planStart));
+				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planComp));
 				var startDelta = 0
 				var actDelta = 0
 				if( steps[i].actStart ){
-					startDelta = parseInt((new Date(steps[i].actStart).getTime() - new Date(steps[i].planStart).getTime())/60000);
+					var actStartTime = tdsCommon.parseDateTimeFromZulu(steps[i].actStart).valueOf()
+					var planStartTime = tdsCommon.parseDateTimeFromZulu(steps[i].planStart).valueOf()
+					startDelta = parseInt((actStartTime - planStartTime)/60000);
 					if(startDelta > 0){
 						$("#li_start_"+moveBundleId+"_"+steps[i].tid).removeClass("actstart");
 						$("#li_start_"+moveBundleId+"_"+steps[i].tid).addClass("actstart_red");
 					}
 				}
-				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actStart+": ("+ startDelta +"m)", 'm'));
+				var actStartFormatted = tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].actStart)
+				if (startDelta > 0) {
+					actStartFormatted += ": ("+ startDelta +"m)"
+				}
+				$("#act_start_"+moveBundleId+"_"+steps[i].tid).html(actStartFormatted);
 				if( steps[i].actStart && !steps[i].actComp && steps[i].calcMethod != "M" && ${runbookOn} != 1) {
 					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html("<span id='databox'>Total Devices "+steps[i].tskTot+" Completed "+steps[i].tskComp+"</span>")
 				} else {
-					actDelta = parseInt((new Date(steps[i].actComp).getTime() - new Date(steps[i].planComp).getTime())/60000);
+					var actCompTime = tdsCommon.parseDateTimeFromZulu(steps[i].actComp).valueOf()
+					var planCompTime = tdsCommon.parseDateTimeFromZulu(steps[i].planComp).valueOf()
+					actDelta = parseInt((actCompTime - planCompTime)/60000);
 					if(actDelta > 0){
 						$("#li_finish_"+moveBundleId+"_"+steps[i].tid).removeClass("actfinish");
 						$("#li_finish_"+moveBundleId+"_"+steps[i].tid).addClass("actfinish_red");
 					}
-					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(convertTime(offset, steps[i].actComp+": ("+actDelta+"m)", 'm'));
+					var actCompFormatted = tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].actComp)
+					if (actDelta > 0) {
+						actCompFormatted += ": ("+ actDelta +"m)"
+					}
+					$("#act_completion_"+moveBundleId+"_"+steps[i].tid).html(actCompFormatted);
 				}
 				var percentage = $("#percentage_"+moveBundleId+"_"+steps[i].tid).html()
 				if(percentage != "100%" && percentage != "0%"){
