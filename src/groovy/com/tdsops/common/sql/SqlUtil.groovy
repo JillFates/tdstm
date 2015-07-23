@@ -203,8 +203,6 @@ class SqlUtil {
 
 		def queryString
 
-		//println(firstChar ==~ /-|<|>|=|%|\"|&|\*/)
-
 		switch(firstChar){
 			/* Starts with '=' */
 			case "=":
@@ -278,7 +276,7 @@ class SqlUtil {
 							queryString = buildSingleValueParameter(prop, expr.substring(1, expr.length() - 1), "=", params)
 							break
 						default:
-							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, "", "%"), "LIKE", params)
+							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, "%", "%"), "LIKE", params)
 							break
 					}
 					break
