@@ -276,7 +276,8 @@ class SqlUtil {
 							queryString = buildSingleValueParameter(prop, expr.substring(1, expr.length() - 1), "=", params)
 							break
 						default:
-							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, "%", "%"), "LIKE", params)
+							def expr2 = parseStringParameter(expr, "%", "%").replaceAll("\\*", "%")
+							queryString = buildSingleValueParameter(prop, expr2, "LIKE", params)
 							break
 					}
 					break
