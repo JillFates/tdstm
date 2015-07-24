@@ -181,9 +181,11 @@ path {
 }
 
 .unfocussed {
-	opacity: 0.4 !important;
 	fill-opacity: 0.4 !important;
 	stroke-opacity: 0.4 !important;
+}
+.unfocussed .itemLabel {
+	color: rgba(0, 0, 0, 0.4) !important;
 }
 
 .background {
