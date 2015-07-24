@@ -184,11 +184,11 @@ class DatabaseController {
 		def whereConditions = []
 		filterParams.each {key, val ->
 			if( val && val.trim().size()){
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Database)
 			}
 		}
 		if(whereConditions.size()){
-			query.append(" WHERE dbs.${whereConditions.join(" AND ")}")
+			query.append(" WHERE dbs.${whereConditions.join(" AND dbs.")}")
 		}
 
 		if(params.moveBundleId){

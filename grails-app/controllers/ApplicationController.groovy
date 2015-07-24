@@ -171,12 +171,12 @@ class ApplicationController {
 		def whereConditions = []
 		filterParams.each {key, val ->
 			if( val && val.trim().size()){
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams, Application)
 			}
 		}
 
 		if(whereConditions.size()){
-			query.append(" WHERE apps.${whereConditions.join(" AND ")}")
+			query.append(" WHERE apps.${whereConditions.join(" AND apps.")}")
 		}
 
 		if(params.latencys){

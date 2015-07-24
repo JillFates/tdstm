@@ -3310,7 +3310,7 @@ class AssetEntityService {
 		def queryParams = [:]
 		filterParams.each {key, val ->
 			if( val && val.trim().size()){
-				whereConditions << SqlUtil.parseParameter(key, val, queryParams)
+				whereConditions << SqlUtil.parseParameter(key, val, queryParams, AssetEntity)
 			}
 		}
 		

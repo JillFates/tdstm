@@ -193,7 +193,7 @@ class SqlUtil {
 	assert e=='NOT like'
 	*/
 
-	static parseParameter(prop, expr, params){
+	static parseParameter(prop, expr, params, clazz){
 		
 		expr = expr.trim()
 
@@ -226,7 +226,7 @@ class SqlUtil {
 					queryString = buildSingleValueParameter(prop, rest.substring(1), "${firstChar}=", params)
 				/* Starts with '<>' */
 				}else if(expr ==~ /^<>.*/){
-					queryString = buildDistinctParameter(prop, rest.substring(1), params)
+					queryString = buildDistinctParameter(prop, rest.substring(1), params, clazz)
 				/* Starts with '<' or '>' */
 				}else{
 					queryString = buildSingleValueParameter(prop, rest, firstChar, params)
@@ -248,7 +248,7 @@ class SqlUtil {
 					default:
 						/* Starts with '-' and it's not a list of values. */
 						if(firstChar == "-"){
-							queryString = buildDistinctParameter(prop, rest, params)	
+							queryString = buildDistinctParameter(prop, rest, params, clazz)	
 						/* Starts with '!' and it's not a list of values. */
 						}else{
 							queryString = buildSingleValueParameter(prop, rest, "<>", params)
@@ -293,9 +293,11 @@ class SqlUtil {
 	 * This method constructs simple not-like expressions for number and string
 	 * parameters.
 	 */
-	static buildDistinctParameter(prop, value, params){
+	static buildDistinctParameter(prop, value, params, clazz){
+		// TODO Analyze column type
 		def queryString
-		if(value.isNumber()){
+		def fieldTypeIsNumber = isSubclassOf(fieldType(clazz, prop), Number)
+		if(value.isNumber() && fieldTypeIsNumber){
 			queryString = buildSingleValueParameter(prop, parseNumberParameter(value), "<>", params)
 		}else{
 			queryString = buildSingleValueParameter(prop, parseStringParameter(value, "%", "%"), "NOT LIKE", params)
@@ -360,6 +362,24 @@ class SqlUtil {
 	 */
 	static parseNumberParameter(parameter){
 		return parameter.isInteger() ? parameter.toInteger() : parameter.toDouble()
+	}
+
+	/* ************************************************************************* */
+
+	/**
+	 * This method determines the type of a given field.
+	 */	
+	static def fieldType(def clazz, def field){
+		return clazz.metaClass.properties.find{ it.name == field }.type
+	}
+
+	/* ************************************************************************* */
+
+	/**
+	 *  
+	 */
+	static def isSubclassOf(def clazz, def superClazz){
+		return superClazz.isAssignableFrom(clazz)
 	}
 
 	/* ************************************************************************* */
