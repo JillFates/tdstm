@@ -18,6 +18,7 @@ $(document).ready(function() {
 		$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
 	
 	$('#layoutControlContainerId').slideUp(0);
+	$('#labelControlContainerId').slideUp(0);
 	GraphUtil.checkForDisabledButtons(parameterRanges);
 });
 
@@ -64,13 +65,6 @@ function listCheck () {
 	return labelsList
 }
 
-function depConsoleLabelUserpref ($me,forWhom) {
-	var isChecked = $me.is(":checked")
-	jQuery.ajax({
-		url:contextPath+'/assetEntity/setImportPerferences',
-		data:{'value':isChecked, 'preference':forWhom}
-	});
-}
 $('#tabTypeId').val('graph')
   
 </script>

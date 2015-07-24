@@ -16,6 +16,7 @@ import com.tds.asset.AssetDependencyBundle
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.FieldImportance
 import com.tdsops.common.validation.ConstraintsValidator
+import grails.converters.JSON
 
 class UserPreferenceService  {
 
@@ -53,6 +54,45 @@ class UserPreferenceService  {
 		RefreshTimeline: [
 			type: 'integer',
 			inList: ['0', '60', '120', '180', '240', '300']
+		],
+		depGraph: [
+			type: 'string',
+			validator: {
+				def prefs = JSON.parse(it)	
+				def checkboxLabels = ['bundleConflicts', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
+				
+				if ( ! (prefs.colorBy in ['group', 'bundle', 'event']) )
+					return false
+				
+				checkboxLabels.each { label ->
+					if (prefs[label] && prefs[label] != 'true')
+						return false
+				}
+				if ( ! (Integer.parseInt(prefs.maxEdgeCount) in (1..20)) )
+					return false
+				return true
+			}
+		],
+		archGraph: [
+			type: 'string',
+			validator: {
+				def prefs = JSON.parse(it)	
+				def checkboxLabels = ['showCycles', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
+				
+				checkboxLabels.each { label ->
+					if (prefs[label] && prefs[label] != 'true')
+						return false
+				}
+				
+				if ( ! (Integer.parseInt(prefs.levelsUp) in (0..10)) )
+					return false
+				if ( ! (Integer.parseInt(prefs.levelsDown) in (0..10)) )
+					return false
+				if ( ! (Integer.parseInt(prefs.labelOffset) in (1..4)) )
+					return false
+					
+				return true
+			}
 		]
 	]
 	

@@ -67,6 +67,8 @@
 				<span class="checkboxContainer">
 					<input type="checkbox" id="useHeightCheckBoxId" class="pointer" checked="checked" /><!--
 					--><label for="useHeightCheckBoxId" class="pointer">&nbsp;Use Heights</label>&nbsp;&nbsp;
+				</span>
+				<span class="checkboxContainer">
 					<input type="checkbox" id="hideRedundantCheckBoxId" class="pointer" checked="checked" /><!--
 					--><label for="hideRedundantCheckBoxId" class="pointer">&nbsp;Hide Redundant</label>&nbsp;&nbsp;
 				</span>

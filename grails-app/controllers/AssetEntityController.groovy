@@ -2897,7 +2897,7 @@ class AssetEntityController {
 				moveEventList =  uniqueMoveEventList.toList()
 				moveEventList.sort{it?.name}
 				
-				def defaultPrefs = ['colorBy':'group', 'appLbl':true, 'maxEdgeCount':4]
+				def defaultPrefs = ['colorBy':'group', 'appLbl':'true', 'maxEdgeCount':'4']
 				def graphPrefs = userPreferenceService.getPreference('depGraph', loginUser)
 				def prefsObject = [:]
 				if (graphPrefs)
@@ -2965,7 +2965,7 @@ class AssetEntityController {
 						moveBundleId:it.moveBundleId, moveEventId:moveEventId, hasMoveEvent:hasMoveEvent,
 						shape:shape, size:size, title:it.assetName, 
 						color:color, dependsOn:[], supports:[],
-						assetClass:it.assetClass
+						assetClass:it.assetClass, cutGroup:0
 					]
 				}
 				
@@ -3080,7 +3080,6 @@ class AssetEntityController {
 					graphNodes[target].supports.add(it.id)
 				}
 				
-				
 				// Create the model that will be used while rendering the page
 				model.defaults = defaults
 				model.defaultsJson = defaults as JSON
@@ -3091,16 +3090,18 @@ class AssetEntityController {
 				model.nodes = graphNodes as JSON
 				model.links = graphLinks as JSON
 				model.multiple = multiple
-				model.assetTypes = assetTypes as JSON
+				model.assetTypes = assetTypes
+				model.assetTypesJson = assetTypes as JSON
 				model.depBundleMap = dependencyGroupIndexMap as JSON
 				model.moveBundleMap = moveBundleIndexMap as JSON
 				model.moveEventMap = moveEventIndexMap as JSON
+				model.depGroup = params.dependencyBundle
 				
 				// Render dependency graph
-				render(template:'dependencyGraph',model:model)
+				render(template:'dependencyGraph', model:model)
 				break
 		} // switch
-		log.error "Loading dependency console took ${TimeUtil.elapsed(start)}"
+		log.info "Loading dependency console took ${TimeUtil.elapsed(start)}"
 	}
 	
 	// removes the user's dependency analyzer map related preferences
@@ -4203,6 +4204,8 @@ class AssetEntityController {
 			prefsObject = JSON.parse(graphPrefs)
 		else
 			prefsObject = defaultPrefs
+			
+		def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
 		
 		def model = [
 			assetId : params.assetId,
@@ -4213,6 +4216,7 @@ class AssetEntityController {
 			moveBundleList: assetEntityService.getMoveBundles(project),
 			dependencyStatus: assetEntityService.getDependencyStatuses(),
 			dependencyType: assetEntityService.getDependencyTypes(),
+			assetTypes: assetTypes,
 			defaultPrefs:defaultPrefs as JSON, 
 			graphPrefs:prefsObject
 		]
@@ -4244,7 +4248,7 @@ class AssetEntityController {
 			
 			// Check if the parameters are null
 			if ((assetId == null || assetId == -1) || (params.levelsUp == null || params.levelsDown == null)) {
-				def model = [nodes:[] as JSON, links:[] as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
+				def model = [nodes:[] as JSON, links:[] as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes, assetTypesJson:assetTypes as JSON, environment: GrailsUtil.environment]
 				render(view:'_applicationArchitectureGraph', model:model)
 				return true
 			}
@@ -4400,7 +4404,7 @@ class AssetEntityController {
 				}
 			}
 			
-			def model = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes as JSON, environment: GrailsUtil.environment]
+			def model = [nodes:graphNodes as JSON, links:graphLinks as JSON, assetId:params.assetId, levelsUp:params.levelsUp, levelsDown:params.levelsDown, assetTypes:assetTypes, assetTypesJson:assetTypes as JSON, environment: GrailsUtil.environment]
 			render(view:'_applicationArchitectureGraph', model:model)
 			
 		} catch (UnauthorizedException e) {

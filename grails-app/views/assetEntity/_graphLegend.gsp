@@ -3,13 +3,15 @@
 		
 		<tr><td colspan="2"><h4>Asset Classes</h4></td></tr>
 		
-		<g:each in="${assetTypes.keySet()}" var="type">
+		<g:each in="${assetTypes}" var="entry" status="i">
+			<g:set var="type" value="${entry.getKey()}" />
+			<g:set var="names" value="${entry.getValue()}" />
 			<tr>
 				<td style="padding:0px;">
-					<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="${'#' + assetTypes[type] + 'ShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
+					<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="${'#' + names.internalName + 'ShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
 				</td>
 				<td>
-					${type}
+					${names.labelText ?: names.frontEndNamePlural}
 				</td>
 			</tr>
 		</g:each>
@@ -38,7 +40,7 @@
 		<tr id="colorKeyLabelId" class="hidden"><td colspan="2"><h4>Move Bundles</h4></td></tr>
 		<tr id="colorKeyTemplateId" class="hidden">
 			<td class="bundleColorExample">
-				<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="#applicationShapeId" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
+				<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="#applicationShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
 			</td>
 			<td class="bundleNameLabel"></td>
 		</tr>

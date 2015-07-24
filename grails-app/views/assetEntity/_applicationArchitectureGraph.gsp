@@ -66,7 +66,7 @@ var assets = null;
 var assetTypes = null;
 links = ${links};
 assets = ${nodes};
-assetTypes = ${assetTypes};
+assetTypes = ${assetTypesJson};
 environment = '${environment}';
 
 // set the asset select to display the correct asset
@@ -740,7 +740,7 @@ function buildMap (width, height) {
 		GraphUtil.nodeBindings = GraphUtil.nodeBindings
 			.append("svg:use")
 				.attr("xlink:href", function (d) {
-					return '#' + assetTypes[d.type] + 'ShapeId';
+					return '#' + assetTypes[d.type].internalName + 'ShapeId';
 				})
 				.attr("class", function (d) { 
 					return "node " + d.dir

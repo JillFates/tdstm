@@ -125,9 +125,17 @@ class AssetEntityService {
 	// List of all of the Integer properties for the potentially any of the asset classes
 	static ASSET_INTEGER_PROPERTIES = ['size', 'rateOfChange', 'priority', 'sourceBladePosition', 'targetBladePosition', 'sourceRackPosition', 'targetRackPosition']
 	
-	static ASSET_TYPE_NAME_MAP = [(AssetType.APPLICATION.toString()):"application", (AssetType.DATABASE.toString()):"database", (AssetType.VM.toString()):"serverVirtual", 
-						(AssetType.SERVER.toString()):"serverPhysical", (AssetType.FILES.toString()):"storageLogical", (AssetType.STORAGE.toString()):"storagePhysical", 
-						(AssetType.NETWORK.toString()):"networkLogical", (AssetType.NETWORK.toString()):"networkPhysical", "Other":"other"]
+	static ASSET_TYPE_NAME_MAP = [
+		(AssetType.APPLICATION.toString()) : [ internalName:"application", frontEndName:"Application", frontEndNamePlural:"Applications", labelPreferenceName:"appLbl", labelHandles:"application"], 
+		(AssetType.DATABASE.toString()) : [ internalName:"database", frontEndName:"Database", frontEndNamePlural:"Databases", labelPreferenceName:"dbLbl", labelHandles:"database"], 
+		(AssetType.SERVER.toString()) : [ internalName:"serverPhysical", frontEndName:"Physical Server", frontEndNamePlural:"Physical Servers", labelPreferenceName:"svrLbl", labelText:"Servers", labelHandles:"serverPhysical serverVirtual"], 
+		(AssetType.VM.toString()) : [ internalName:"serverVirtual", frontEndName:"Virtual Server", frontEndNamePlural:"Virtual Servers", labelPreferenceName:"svrLbl", labelHandles:""], 
+		(AssetType.FILES.toString()) : [ internalName:"storageLogical", frontEndName:"Logical Storage", frontEndNamePlural:"Logical Storage", labelPreferenceName:"slLbl", labelHandles:"storageLogical"], 
+		(AssetType.STORAGE.toString()) : [ internalName:"storagePhysical", frontEndName:"Physical Storage", frontEndNamePlural:"Physical Storage", labelPreferenceName:"slpLbl", labelText:"Storage Devices", labelHandles:"storagePhysical"], 
+		(AssetType.NETWORK.toString()) : [ internalName:"networkPhysical", frontEndName:"Network", frontEndNamePlural:"Network", labelPreferenceName:"netLbl", labelHandles:"networkPhysical networkLogical"], 
+		(AssetType.NETWORK.toString()) : [ internalName:"networkLogical", frontEndName:"Network", frontEndNamePlural:"Network", labelPreferenceName:"netLbl", labelHandles:""], 
+		"Other" : [ internalName:"other", frontEndName:"Other Device", frontEndNamePlural:"Other Devices", labelPreferenceName:"oLbl", labelHandles:"other"]
+	]
 	
 	static transactional = true
 

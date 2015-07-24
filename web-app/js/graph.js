@@ -80,7 +80,7 @@ var GraphUtil = (function ($) {
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Full Screen');
+		$('#fullscreenButtonId').children('h4').html('Fullscreen');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -239,16 +239,15 @@ var GraphUtil = (function ($) {
 	}
 	
 	// called when the user clicks the show/hide layout adjustments twistie
-	public.toggleGraphTwistie = function () {
-		var container = $('#layoutControlContainerId');
-		var twistieRow = $('#twistieRowId');
-		if (twistieRow.hasClass('closed')) {
-			twistieRow.removeClass('closed').addClass('open');
+	public.toggleGraphTwistie = function (twistieSpan) {
+		var container = $('#' + twistieSpan.attr('for'));
+		if (twistieSpan.hasClass('closed')) {
+			twistieSpan.removeClass('closed').addClass('open');
 			container.slideDown(300, function () {
 				public.correctControlPanelSize();
 			});
 		} else {
-			twistieRow.removeClass('open').addClass('closed');
+			twistieSpan.removeClass('open').addClass('closed');
 			container.slideUp(300, function () {
 				public.correctControlPanelSize();
 			});
@@ -275,7 +274,7 @@ var GraphUtil = (function ($) {
 				+ ((d.unresolved) ? ' unresolved' : '')
 				+ ((d.notApplicable) ? ' notApplicable' : '')
 				+ ((d.future) ? ' future' : '')
-				+ ((d.cut == 3) ? ' cut' : '')
+				+ ((d.cut) ? ' cut' : '')
 				+ ((d.root) ? ' root' : '')
 				+ ((public.isConflictsEnabled() && d.bundleConflict) ? ' bundleConflict' : '')
 				+ ((public.isHighlightCyclesEnabled() && d.partOfCycle) ? ' cyclical' : '')
@@ -476,11 +475,7 @@ var GraphUtil = (function ($) {
 		prefsArray.each(function (pref, i) {
 			prefsObject[pref.name] = pref.value;
 		});
-		
-		jQuery.ajax({
-			url:contextPath+'/assetEntity/setImportPerferences',
-			data:{'preference':preferenceName, 'value':JSON.stringify(prefsObject)}
-		});
+		setUserPreference(preferenceName, JSON.stringify(prefsObject));
 	}
 
 	// Used by the defaults button to reset all control values to their default state
@@ -491,11 +486,9 @@ var GraphUtil = (function ($) {
 				$(this).val( defaults[$(this).attr('name')] )
 		});
 		
-		// deletes the user's graph preferences from the database
-		jQuery.ajax({
-			url:contextPath+'/assetEntity/removeUserGraphPrefs',
-			data:{'preferenceName':preferenceName}
-		});
+		// resets the user's graph preferences to the defaults
+		setUserPreference(preferenceName, JSON.stringify(defaultPrefs));
+		
 		
 		// resets the graph preferences
 		var inputs = $('#preferencesformId input:not([type="button"]),#preferencesformId select');
@@ -576,9 +569,9 @@ var GraphUtil = (function ($) {
 		var changed = false;
 		
 		nodes.each(function (o, i) {
-			if (o.showLabel != nameList[assetTypes[o.type]])
+			if (o.showLabel != nameList[assetTypes[o.type].internalName])
 				changed = true;
-			o.showLabel = nameList[assetTypes[o.type]];
+			o.showLabel = nameList[assetTypes[o.type].internalName];
 		});
 		
 		return changed;
@@ -589,6 +582,37 @@ var GraphUtil = (function ($) {
 			var element = o.nodeElement[0][0];
 			o.dimensions = element.getBBox();
 		});
+	}
+	
+	// creates the round shadows for nodes after suggesting splits
+	public.createCutShadows = function (color) {
+		public.force.nodes().each(function (o, i) {
+			if (o.cutShadow)
+				$(o.cutShadow).remove();
+			var cutShadow = vis.append('circle')
+				.attr('id', 'cutShadow-' + o.id)
+				.attr('class', 'cutShadow')
+				.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
+				.style('fill', color(o.cutGroup))
+				.attr('r', 20);
+			o.cutShadow = cutShadow[0][0];
+		});
+		public.reorderDOM();
+	}
+	
+	
+	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
+	public.reorderDOM = function () {
+		var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
+		selection[0] = selection[0]
+			.concat(d3.selectAll('svg g g circle.cutShadow')[0])
+			.concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg g g line').filter('.selected')[0])
+			.concat(d3.selectAll('svg g g use').filter('.selected')[0])
+			.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+		selection.order();
 	}
 	
 	// return the public object to make the public functions accessable

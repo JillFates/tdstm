@@ -73,7 +73,7 @@ var background;
 var defaults = ${defaultsJson};
 var defaultPrefs = ${defaultPrefs};
 var selectedBundle = '${dependencyBundle}';
-var assetTypes = ${assetTypes};
+var assetTypes = ${assetTypesJson};
 var links = ${links};
 var nodes = ${nodes};
 var depBundles = ${depBundleMap};
@@ -88,10 +88,11 @@ var fillMode = 'bundle';
 var gravity = ${multiple ? 0.05 : 0};
 var distanceIntervals = 500;
 var graphPadding = 15;
+var cutLinkSize = 500;
 var floatMode = false;
 var maxWeight;
 var maxFamilyWeights = [];
-var groupCount = 1;
+var groupCount = 0;
 var preferenceName = 'depGraph';
 
 var nodeSelected = -1;
@@ -180,6 +181,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			d.px = d.x;
 			d.py = d.y;
 			
+			if (d.cutShadow)
+				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+			
 			d.fix = true;
 			d.fixed = true;
 			clicked = false;
@@ -248,14 +252,17 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.on("dblclick", resetView)
 		.on("dblclick.zoom", null);
 	
-	links
 	
 	// Create the force layout
 	GraphUtil.force
 		.nodes(nodes)
 		.links(links)
 		.gravity(gravity)
-		.linkDistance(linkSize)
+		.linkDistance(function (d) {
+			if (d.cut)
+				return 1000;
+			return linkSize;
+		})
 		.linkStrength(function (d) {
 			if (d.duplicate)
 				return 0;
@@ -291,7 +298,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	GraphUtil.nodeBindings = GraphUtil.nodeBindings
 		.append("use")
 			.attr("xlink:href", function (d) {
-				return '#' + assetTypes[d.type] + 'ShapeId';
+				return '#' + assetTypes[d.type].internalName + 'ShapeId';
 			})
 			.attr("class", "node")
 			.call(dragBehavior)
@@ -452,6 +459,8 @@ function updateElementPositions () {
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
 		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+		if (d.cutShadow)
+			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
 	});
 	
 	// set the dynamic attributes for the links
@@ -532,12 +541,7 @@ function toggleNodeSelection (id) {
 }
 
 // Used to rebuild the layout using the new parameters
-function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height, labels) {
-	// Use the new parameters, or the defaults if not specified
-	var charge 	 =	( charge	? charge 	: defaults['force'] 	)
-	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	)
-	var friction =	( friction	? friction 	: defaults['friction'] 	)
-	var theta 	 =	( theta	? theta 	: defaults['theta'] 	)
+function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height) {
 	
 	// handle resizing when not in fullscreen mode
 	if (!GraphUtil.isFullscreen() && (width && height)) {
@@ -551,11 +555,18 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 	background.attr('fill', backgroundColor)
 	
 	// Create the force layout
-	GraphUtil.force
-		.linkDistance(linkSize)
-		.friction(friction)
-		.charge(charge)
-		.theta(theta);
+	if (linkSize)
+		GraphUtil.force.linkDistance(function (d) {
+			if (d.cut)
+				return cutLinkSize;
+			return linkSize;
+		});
+	if (friction)
+		GraphUtil.force.friction(friction);
+	if (charge)
+		GraphUtil.force.charge(charge);
+	if (theta)
+		GraphUtil.force.theta(theta);
 	
 	// Reset the list of types to show names for
 	if ( GraphUtil.setShowLabels(GraphUtil.force.nodes()) )
@@ -618,9 +629,16 @@ function centerGraph () {
 		translateYAfter += $('#dependencyDivId').height();
 	var translateAfter = [translateXAfter, translateYAfter];
 	
-	zoomBehavior.scale(scaleAfter);
-	zoomBehavior.translate(translateAfter);
-	zoomBehavior.event(canvas);
+	scaleAfter = Math.min(scaleAfter, 2.0);
+	
+	if (scaleAfter < 2) {
+		zoomBehavior.scale(scaleAfter);
+		zoomBehavior.translate(translateAfter);
+	} else {
+		zoomBehavior.scale(1);
+		zoomBehavior.translate([0, 0]);
+	}
+		zoomBehavior.event(canvas);
 }
 
 // finds the rotation of the graph that requires the least zooming
@@ -647,8 +665,8 @@ function findBestRotation () {
 			var ratioY = graphHeight / visHeight;
 			var scaleAfter = Math.min(ratioX, ratioY);
 			if (scaleAfter >= bestScale) {
-					bestScale = scaleAfter;
-					bestAngle = i * angleChange;
+				bestScale = scaleAfter;
+				bestAngle = i * angleChange;
 			}
 		}
 	}
@@ -830,13 +848,13 @@ function cutAndRemove () {
 				if (node.type == 'Application')
 					++appCount;
 				for (var i = 0; i < node.dependsOn.size(); ++i) {
-					if (linkList.indexOf(links[node.dependsOn[i]]) == -1) {
+					if ((linkList.indexOf(links[node.dependsOn[i]]) == -1) && (! links[node.dependsOn[i]].cut)) {
 						linkList.push(links[node.dependsOn[i]]);
 						queue.unshift(links[node.dependsOn[i]].target);
 					}
 				}
 				for (var i = 0; i < node.supports.size(); ++i) {
-					if (linkList.indexOf(links[node.supports[i]]) == -1) {
+					if ((linkList.indexOf(links[node.supports[i]]) == -1) && (! links[node.supports[i]].cut)) {
 						linkList.push(links[node.supports[i]]);
 						queue.unshift(links[node.supports[i]].source);
 					}
@@ -901,7 +919,6 @@ function cutAndRemove () {
 	function executeCut () {
 		// if we found a good set of edges, execute the cut
 		if (edges.size() > 0) {
-			GraphUtil.force.chargeDistance(1000);
 			
 			// another node group will be added, so this counter must be incremented
 			++groupCount;
@@ -915,48 +932,24 @@ function cutAndRemove () {
 			$(edges[0].parent.capturedFinal).each(function (i, c) {
 				if (edges[0].child.capturedFinal.indexOf(c) == -1) {
 					c.cut = 2;
-					c.group = groupCount;
-					c.noGravity = false;
+					c.cutGroup = groupCount;
 				}
 			});
 			edges[0].parent.cut = 2;
-			edges[0].parent.group = groupCount;
+			edges[0].parent.cutGroup = groupCount;
 			
-			// set which links were be cut
+			// add shadows for the cut node
+			GraphUtil.createCutShadows(fill);
+			
+			// set which links were cut
 			$(edges).each(function (i, e) {
-				links[e.id].cut = 1;
+				links[e.id].cut = true;
 			});
 			
-			// set cut to 0 for any links that won't be cut
-			for (var i = 0; i < links.size(); ++i) {
-				if (links[i].cut != 1)
-					links[i].cut = 0;
-			}
-			
-			// remove the cut links from the graph
-			for (var i = 0; i < links.size(); ++i) {
-				for (var j = 0; j < links.size(); ++j) {
-					if (links[j].cut == 1) {
-						links[j].source.dependsOn.splice(links[j].source.dependsOn.indexOf(j), 1);
-						links[j].target.supports.splice(links[j].target.supports.indexOf(j), 1);
-						links[j].cut = 2;
-						cutLinks.push(links[j]);
-						links.splice(j, 1);
-						
-						for (var k = j; k < links.size(); ++k) {
-							links[k].id = k;
-							links[k].source.dependsOn[links[k].source.dependsOn.indexOf(k+1)] = k;
-							links[k].target.supports[links[k].target.supports.indexOf(k+1)] = k;
-						}
-						
-						j = links.size();
-					}
-				}
-			}
-			
 			// update the graph for the modified link list
-			GraphUtil.force.links(links).gravity(0.05);
-			GraphUtil.setAlpha(0.1);
+			GraphUtil.updateLinkClasses();
+			GraphUtil.disableFreeze();
+			rebuildMap(true, false, parseInt($('#linkSizeId').val()), false, false);
 		
 		// no cuts could be found for the constraints, so update the user
 		} else {
@@ -1026,6 +1019,12 @@ function getParents (node) {
 		for (var i = 0; i < node.supports.length; ++i)
 			nodes.push(links[node.supports[i]].source);
 	return nodes;
+}
+
+function getLinkDistance (link) {
+	var width = Math.abs(link.target.x - link.source.x);
+	var height = Math.abs(link.target.y - link.source.y);
+	return Math.sqrt(width*width + height*height);
 }
 
 // initializes the progress bar for min cuts

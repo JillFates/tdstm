@@ -27,6 +27,7 @@ circle.node {
 use.node {
 	fill: #0000ff;
 	stroke: #000000;
+	color: #000000;
 	stroke-width: 1.5px;
 }
 use.node.selectedParent {
@@ -40,6 +41,7 @@ use.node.cut {
 }
 use.node.blackBackground {
 	stroke: #ffffff;
+	color: #ffffff;
 }
 use.node.noEvent {
 	stroke: red;
@@ -50,6 +52,11 @@ use.node.filtered {
 use.node.sourceAsset {
 	stroke-width: 2.5px;
 	stroke: #00aa00;
+	color: #00aa00;
+}
+
+circle.cutShadow {
+	opacity: 0.4;
 }
 
 /* Graph Vectors */
@@ -191,30 +198,24 @@ g.label.filtered text {
 
 
 /* Shapes */
-#databaseShapeBackgroundId {
-	stroke: black !important;
-}
 #databaseShapeForegroundId {
-	fill: black !important;
-	stroke: black !important;
+	fill: currentColor;
+	stroke: currentColor;
 }
 #databaseShapeId path {
 	stroke-width: 1px !important;
 }
 #databaseShapeId circle {
-	fill: black !important;
-	stroke: black !important;
 	stroke-width: 1px !important;
 	cx: 25px !important;
 	r: 1 !important;
+	fill: currentColor;
+	stroke: currentColor;
 }
 #deviceShapeId path {
-	stroke: black !important;
 	stroke-width: 1px !important;
 }
 #deviceShapeId circle {
-	fill: black !important;
-	stroke: black !important;
 	stroke-width: 1px !important;
 	cx: 25px !important;
 	r: 1 !important;
@@ -341,23 +342,19 @@ img.pointer {
 	border-width: 0px;
 }
 
-#controlPanel input[type=button].halfButton {
+.halfButton {
 	width: 95px;
 }
-#controlPanel input[type=button].fullButton {
+.fullButton {
 	width: 193px;
-}
-#controlPanel input[type=button]:hover {
-	background-color: #eeeeee;
-}
-#controlPanel input[type=button]:active {
-	background-color: #cccccc;
 }
 
 #controlPanel .labelToggleCol {
 	vertical-align: middle;
 	padding-top: 0px;
 	padding-bottom: 0px;
+	padding-right: 0px;
+	padding-left: 5px;
 }
 
 #controlPanel .labelToggleCol  * {
@@ -369,14 +366,28 @@ img.pointer {
 	height: 30px;
 	border-width: 0px;
 }
+#controlPanel .labelToggleRow {
+	padding-left: 5px;
+}
 #controlPanel .labelToggleRow td:not(.labelToggleCol) * {
 	float: right;
 }
 #controlPanel .labelToggleRow td:not(.labelToggleCol) {
 	padding-left: 4px;
 }
+#controlPanel .labelToggleRow input {
+	margin-top: 4px;
+}
 #controlPanel #colorByFormId {
-	padding-left: 4px;
+	padding-left: 2px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+}
+#controlPanel #colorByFormId  span {
+	margin-right: 5px;
+}
+.plusMinusIcon {
+	opacity: 0.9999;
 }
 .plusMinusIcon:hover {
 	-webkit-filter: saturate(1.5);
@@ -429,29 +440,40 @@ div.graphPanel.openPanel {
 	border: 1px solid green;
 	display: inline-block;
 }
-.graphContainer #mapReferenceId #fullscreenButtonId {
-	border: 1px solid green;
-	background-image: url(../icons/application.png);
+.graphContainer .graphButton {
+	background-color: #ffffff;
+}
+.graphContainer .graphTabButton {
 	background-position: 5px 50%;
 	background-repeat: no-repeat;
-	background-color: #ffffff;
+	padding-left: 25px;
 	padding-top: 3px;
 	padding-bottom: 3px;
-	padding-left: 25px;
 	padding-right: 8px;
 	margin-bottom: 4px;
-	margin-left: 20px;
+	margin-left: 10px;
 	display: inline-block;
 	position: relative;
 	z-index: 101;
 	vertical-align: top;
 }
-.graphContainer #mapReferenceId #fullscreenButtonId:hover {
+.graphContainer .graphButton:hover {
 	background-color: #eeeeee;
 }
-.graphContainer.fullscreen #mapReferenceId #fullscreenButtonId {
+.graphContainer .graphButton:active {
+	background-color: #cccccc;
+}
+.graphContainer.fullscreen .graphTabButton {
+	border-top-width: 0px !important;
+}
+.graphContainer #fullscreenButtonId {
+	background-image: url(../icons/application.png);
+}
+.graphContainer.fullscreen #fullscreenButtonId {
 	background-image: url(../icons/layout_content.png);
-	border-top-width: 0px;
+}
+.graphContainer #refreshButtonId {
+	background-image: url(../icons/arrow_refresh.png);
 }
 #mapReferenceId div.graphPanelTab:not(.activeTab) {
 	background-color: #dddddd;
@@ -522,6 +544,9 @@ div.graphPanel.openPanel {
 	padding: 5px;
 	margin: 5px;
 }
+.fullscreen #spinnerDivId {
+	border: 0px;
+}
 #spinnerDivId.graph {
 	padding: 0px;
 	margin: 0px;
@@ -542,7 +567,7 @@ div.graphPanel.openPanel {
 }
 
 /* Layout twistie */
-#layoutControlContainerId {
+#layoutControlContainerId, #labelControlContainerId {
 	padding: 0px;
 	margin: 0px;
 }
@@ -553,16 +578,16 @@ div.graphPanel.openPanel {
 	vertical-align: bottom;
 	background-color: #ffffff;
 }
-#twistieRowId svg:hover {
+#twistieSpanId:hover svg {
 	background-color: #cccccc;
 }
 #twistieRowId #twistieId {
 	transform-origin: 6px 6px;
 }
-#twistieRowId.open #twistieId {
+#twistieSpanId.open #twistieId {
 	transform: rotate(0deg);
 }
-#twistieRowId.closed #twistieId {
+#twistieSpanId.closed #twistieId {
 	transform: rotate(-90deg);
 }
 
@@ -573,7 +598,7 @@ div.graphPanel.openPanel {
 #dependencyDivId.floating {
 	position: fixed;
 	top: 0px;
-	left: 320px;
+	left: 370px;
 	z-index: 110;
 	margin-left: 0px;
 	border: 1px solid green;
@@ -604,4 +629,13 @@ div.graphPanel.openPanel {
 
 .noPadding {
 	padding: 0px !important;
+}
+
+.graphContainer label {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }

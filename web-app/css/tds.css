@@ -996,6 +996,18 @@ div#dependencyDivId td.selectedGroup span {
 	filter: brightness(80%);
 	-webkit-filter: brightness(80%);
 }
+#dependencyGroupsRowId td.pointer.depGroupDone:hover {
+	filter: saturate(5);
+	-webkit-filter: saturate(5);
+}
+#dependencyGroupsRowId td.pointer:active {
+	filter: brightness(60%);
+	-webkit-filter: brightness(60%);
+}
+#dependencyGroupsRowId td.pointer.depGroupDone:active {
+	filter: saturate(10);
+	-webkit-filter: saturate(10);
+}
 .app_count{
 	box-shadow: 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
 }
@@ -1672,4 +1684,20 @@ div#dependencyDivId td.labelColumn {
 }
 .hide {
 	display: none;
+}
+
+#depConsoleTabsId li a {
+	font-weight: bold;
+	color: #606060;
+}
+#depConsoleTabsId li:hover a {
+	color: #000000;
+}
+#depConsoleTabsId li:hover {
+	filter: brightness(90%);
+	-webkit-filter: brightness(90%);
+}
+#depConsoleTabsId li:active {
+	filter: brightness(70%);
+	-webkit-filter: brightness(70%);
 }

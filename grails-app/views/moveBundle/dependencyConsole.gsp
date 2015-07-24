@@ -144,6 +144,7 @@
 			</div>
 			<g:render template="../assetEntity/dependentAdd" />
 			<g:render template="../assetEntity/initAssetEntityData"/>
+			<g:render template="../layouts/error"/>
 		</div>
 		</div>
 		<script type="text/javascript">
@@ -287,43 +288,22 @@
 				
 				ajaxRequest = ${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'"entity=" + value + "&dependencyBundle=" + dependencyBundle + "&bundle=" + bundle + "&sort=" + sort + "&orderBy=" + orderBy', onComplete:'listUpdate(XMLHttpRequest)') }
 			}
-			function compactControlPref($me){
-				var isChecked= $me.is(":checked")
-				jQuery.ajax({
-			        url:contextPath+'/moveBundle/setCompactControlPref',
-			        data:{'selected':isChecked, 'prefFor':'depConsoleCompact'},
-			        type:'POST',
-					success: function(data) {
-						compactDivToggle(data);
-					}
-			    });
-			}
-			function compactDivToggle (data) {
-				if (data == 'true')
-					$(".compactClass").hide();
-				else
-					$(".compactClass").show();
-				GraphUtil.resetGraphSize();
-			}
 			
 			function setGroupTablePosition () {
 				var windowWidth = $(window).width();
 				var rightOffset = $('#dependencyDivId').parent().offset().left;
 				var leftOffset = $('#dependencyDivId').offset().left;
-				var extraOffset = $('#mapReferenceId').outerWidth();
+				var extraOffset = $('#mapReferenceId').outerWidth() ? $('#mapReferenceId').outerWidth() : 0;
 				$("#dependencyDivId:not(.floating)").css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
 				$("#dependencyDivId.floating").css('max-width', (windowWidth - extraOffset - (rightOffset * 2)) + 'px');
 			}
+			
 		</script>
 
 		<script type="text/javascript">
 			
 			( function($) {
-			
-				var compactPref= '${compactPref}'
-				compactDivToggle(compactPref);
 				
-				// ${remoteFunction(controller:'assetEntity', action:'retrieveLists', params:'\'entity=\' + "apps" +\'&dependencyBundle=\'+ null', onComplete:'listUpdate(XMLHttpRequest)') }
 				$("#checkBoxDiv").dialog({ autoOpen: false, resizable: false })
 
 				$("#moveBundleSelectId").dialog({ autoOpen: false })

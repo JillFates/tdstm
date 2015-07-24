@@ -872,21 +872,24 @@ br.page-break-after {
 
 
 span.checkboxContainer {
-	display: inline-block;
+	display: inline;
 	vertical-align: middle;
+}
+span.checkboxContainer label {
+	display: inline;
 }
 span.checkboxContainer * {
 	vertical-align: middle;
 }
-
+span.checkboxContainer:hover input {
+	filter: brightness(90%);
+	-webkit-filter: brightness(90%);
+}
 span#controlRowId {
 	display: block;
 	vertical-align: middle;
 	margin-bottom: 10px;
 }
-/*span#controlRowId * {
-	vertical-align: middle;
-}*/
 
 div.ui-jqgrid-hbox {
 	padding-right: 0px !important;
@@ -907,8 +910,6 @@ a#taskLinkId * {
 a#taskLinkAllId * {
 	vertical-align: middle;
 }
-
-
 
 
 

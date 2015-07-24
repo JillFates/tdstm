@@ -215,13 +215,17 @@
 				<span class="checkboxContainer">
 					<input type="checkbox" id="justRemainingCB" class="pointer" ${ (justRemaining == '1' ? 'checked="checked"': '') } onclick="reloadGrid()" /><!--
 					--><label for="justRemainingCB" class="pointer"><b>&nbsp;Just Remaining</b></label>&nbsp;&nbsp;
+				</span>
+				<span class="checkboxContainer">
 					<input type="checkbox" id="justMyTasksCB" class="pointer" ${ (justMyTasks=='1' ? 'checked="checked"' : '') } onclick="reloadGrid()"/><!--
 					--><label for="justMyTasksCB" class="pointer"><b>&nbsp;Just Mine</b></label>&nbsp;&nbsp;
-					<tds:hasPermission permission="PublishTasks">
+				</span>
+				<tds:hasPermission permission="PublishTasks">
+					<span class="checkboxContainer">
 						<input type="checkbox" id="viewUnpublishedCB" class="pointer" ${ (viewUnpublished=='1' ? 'checked="checked"' : '') } onclick="toggleViewUnpublished(event);"/><!--
 						--><label for="viewUnpublishedCB" class="pointer"><b>&nbsp;View Unpublished</b></label>&nbsp;&nbsp;
-					</tds:hasPermission>
-				</span>
+					</span>
+				</tds:hasPermission>
 
 				<span style="float: right">
 					<span style="margin-right: 30px;">

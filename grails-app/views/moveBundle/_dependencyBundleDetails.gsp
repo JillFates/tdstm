@@ -2,17 +2,19 @@
 	<div class="compactClass">
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 0px; margin-bottom: 10px;">
-        	<div class="message" id="messageId" style="display:none">${flash.message}</div>
+			<div class="message" id="messageId" style="display:none">${flash.message}</div>
 			<h3>
-				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input  type="button"  class="submit" value="Regenerate..." onclick="showDependencyControlDiv()"  />
+				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input type="button" class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()" />
 			</h3>
-			 <div class="planBundleSel">
+			<div class="planBundleSel">
 				<g:form name="bundleForm" action="dependencyConsole">	
 					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />
 					Move Bundle: <g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}"
 					 				optionKey="id" value="${moveBundleId}" onchange="this.form.submit()"/>&nbsp;&nbsp;
-					 <input type="checkbox" id="assinedGroupCB" ${isAssigned == '1' ? 'checked="checked"': ''} onclick="assignedCheckbox( this )" />
-					 <label>Show ONLY Work In Progress</label>
+					<span class="checkboxContainer">
+						<input type="checkbox" id="assinedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onclick="assignedCheckbox( this )" /><!--
+						--><label for="assinedGroupCB" class="pointer">&nbsp;Show ONLY Work In Progress</label>
+					</span>
 				</g:form>
 			</div>
 			&nbsp;Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
@@ -22,7 +24,7 @@
 		</div>
 	</div>
 	<div style="border: 1px solid #63A242; margin-left: 0px;">
-		<div id="dependencyDivId" style="overflow-x:scroll;">
+		<div id="dependencyDivId" style="overflow-x:auto;">
 			<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0px;">
 				<tr id="dependencyGroupsRowId" class="odd">
 					<td class="labelColumn"><b>Group</b></td>

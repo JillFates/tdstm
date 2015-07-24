@@ -15,6 +15,7 @@
 		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
+		<g:javascript src="bootstrap.js" />
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
@@ -38,8 +39,8 @@
 			<span id="panelLink" class="noPadding">
 				<div id="mapReferenceId">
 					<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
-					--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div>
-					<div id="fullscreenButtonId" class="showMenu" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+					--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
+					--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 				</div>
 			</span>
 		
@@ -47,8 +48,8 @@
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
 						<td class="controlPanelControl" colspan="3">
-							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" />
-							<label for="assetSelectId">&nbsp;Asset</label>
+							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" /><!--
+							--><label for="assetSelectId">&nbsp;Asset</label>
 						</td>
 					</tr>
 				</table>
@@ -56,36 +57,40 @@
 					<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0" style="border: 0;" >
 						<tr title="Filters which class of assets are searched Asset search above">
 							<td class="controlPanelControl" colspan="3">
-								<g:select name="assetClasses" id="assetClassesId" from="${assetClassesForSelect.values()}" keys="${assetClassesForSelect.keySet()}" value="${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}"></g:select>
-								<label for="assetClassesId">&nbsp;Filter On</label>
+								<g:select name="assetClasses" id="assetClassesId" from="${assetClassesForSelect.values()}" keys="${assetClassesForSelect.keySet()}" value="${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}"></g:select><!--
+								--><label for="assetClassesId">&nbsp;Filter On</label>
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow up">
 							<td class="controlPanelControl" colspan="3">
-								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/>
-								<input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" />
-								<img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/>
-								<label for="levelsUpId">&nbsp;Tiers Up</label>
+								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/><!--
+								--><input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" /><!--
+								--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
+								--><label for="levelsUpId">&nbsp;Tiers Up</label>
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow down">
 							<td class="controlPanelControl" colspan="3">
-								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/>
-								<input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" />
-								<img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/>
-								<label for="assetSelectId">&nbsp;Tiers Down</label>
+								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/><!--
+								--><input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" /><!--
+								--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
+								--><label for="assetSelectId">&nbsp;Tiers Down</label>
 							</td>
 						</tr>
 						<tr title="Highlights cyclical structures in the dependency tree">
 							<td class="controlPanelControl" colspan="3">
-								<input type="checkbox" id="highlightCyclicalCheckBoxId" name="showCycles" class="pointer" ${(graphPrefs.showCycles) ? 'checked' : ''} />
-								<label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical Refs</label>
+								<span class="checkboxContainer">
+									<input type="checkbox" id="highlightCyclicalCheckBoxId" name="showCycles" class="pointer" value="true" ${(graphPrefs.showCycles) ? 'checked' : ''} /><!--
+									--><label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical Refs</label>
+								</span>
 							</td>
 						</tr>
 						<tr title="Sets the color of the background to black">
 							<td class="controlPanelControl" colspan="3">
-								<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)">
-								<label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
+								<span class="checkboxContainer">
+									<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)"><!--
+									--><label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
+								</span>
 							</td>
 						</tr>
 						<tr>
@@ -95,80 +100,37 @@
 						</tr>
 						
 						<!-- Label checkboxes -->
-						<tr id="twistieRowId" class="closed">
+						<tr id="twistieRowId">
 							<td colspan="3" class="noPadding">
-								Show Labels:&nbsp;<svg class="pointer" style="width: 12px;height: 12px;border-width: 0px;" onclick="GraphUtil.toggleGraphTwistie()"><g transform="rotate(90 6 6)"><g id="twistieId" class=""><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+								<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="labelControlContainerId">
+									Show Labels:&nbsp;<!--
+									--><svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+								</span>
 							</td>
 						</tr>
+						
 					</table>
-					<div id="layoutControlContainerId" style="display:none;">
-						<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0">
-							<tr class="labelToggleRow">
-								<td colspan="1">
-									<input type="checkbox" id="Application" name="appLbl" value="true" ${(graphPrefs.appLbl) ? 'checked' : ''} class="pointer application" onchange="rebuildMap(false)">
-								</td>
-								<td colspan="2" class="labelToggleCol noPadding">
-									<label for="Application" class="pointer">
-										<svg><use xlink:href="${'#applicationShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
-										Applications
-									</label>
-								</td>
-							</tr>
-							<tr class="labelToggleRow">
-								<td>
-									<input type="checkbox" name="srvLbl" id="Server" ${(graphPrefs.srvLbl) ? 'checked' : ''} value="true" class="pointer serverPhysical serverVirtual" onchange="rebuildMap(false)"/>
-								</td>
-								<td colspan="2" class="labelToggleCol noPadding">
-									<label for="Server" class="pointer">
-										<svg><use xlink:href="${'#serverPhysicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
-										Servers
-									</label>
-								</td>
-							</tr>
-							<tr class="labelToggleRow">
-								<td>
-									<input type="checkbox" name="dbLbl" id="Database" ${(graphPrefs.dbLbl) ? 'checked' : ''} value="true" class="pointer database" onchange="rebuildMap(false)"/>
-								</td>
-								<td colspan="2" class="labelToggleCol noPadding">
-									<label for="Database" class="pointer">
-										<svg><use xlink:href="${'#databaseShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
-										Databases
-									</label>
-								</td>
-							</tr>
-							<tr class="labelToggleRow">
-								<td>
-									<input type="checkbox" name="spLbl" id="StoragePhysical" ${(graphPrefs.spLbl) ? 'checked' : ''} value="true" class="pointer storagePhysical" onchange="rebuildMap(false)"/>
-								</td>
-								<td colspan="2" class="labelToggleCol noPadding">
-									<label for="StoragePhysical" class="pointer">
-										<svg><use xlink:href="${'#storagePhysicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
-										Storage Devices
-									</label>
-								</td>
-							</tr>
-							<tr class="labelToggleRow">
-								<td>
-									<input type="checkbox" name="slLbl" id="Files" ${(graphPrefs.slLbl) ? 'checked' : ''} value="true" class="pointer storageLogical" onchange="rebuildMap(false)"/>
-								</td>
-								<td colspan="2" class="labelToggleCol">
-									<label for="Files" class="pointer">
-										<svg><use xlink:href="${'#storageLogicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
-										Logical Storage
-									</label>
-								</td>
-							</tr>
-							<tr class="labelToggleRow">
-								<td>
-									<input type="checkbox" name="netLbl" id="Network" ${(graphPrefs.netLbl) ? 'checked' : ''} value="true" class="pointer networkPhysical networkLogical" onchange="rebuildMap(false)"/>
-								</td>
-								<td colspan="2" class="labelToggleCol noPadding">
-									<label for="Network" class="pointer">
-										<svg><use xlink:href="${'#networkPhysicalShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4; stroke: #666666;"></use></svg>
-										Network
-									</label>
-								</td>
-							</tr>
+					<div id="labelControlContainerId">
+						<table class="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
+							<g:each in="${assetTypes}" var="entry" status="i">
+								<g:set var="type" value="${entry.getKey()}" />
+								<g:set var="names" value="${entry.getValue()}" />
+								<g:if test="${ ! names.labelHandles.equals('') }">
+									<tr class="labelToggleRow">
+										<td colspan="3" class="labelToggleCol">
+											<div style="padding:0px;">
+												<span class="checkboxContainer">
+													<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
+													--><label for="${type}CheckboxId" class="pointer">
+														<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+														${names.labelText ?: names.frontEndNamePlural}
+													</label>
+												</span>
+											</div>
+										</td>
+									</tr>
+								</g:if>
+							</g:each>
 						</table>
 					</div>
 					<table class="labelTree" cellpadding="0" cellspacing="0">
@@ -181,16 +143,15 @@
 						
 						<tr title="Sets the maximum number of rows the labels can use when stacking">
 							<td class="controlPanelControl" colspan="3">
-								<g:select name="labelOffset" id="labelOffsetId" from="${1..4}" value="${(graphPrefs.labelOffset) ?: defaultPrefs.assetClasses}"></g:select>
-								&nbsp;Max Label Offset
+								<g:select name="labelOffset" id="labelOffsetId" from="${1..4}" value="${(graphPrefs.labelOffset) ?: defaultPrefs.assetClasses}"></g:select><!--
+								--><label for="labelOffsetId">&nbsp;Max Label Offset</label>
 							</td>
 						</tr>
 						<tr title="Sets the distance between nodes">
 							<td class="controlPanelControl" colspan="3">
-								<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon"/>
-								&nbsp;
-								<img src="${resource(dir:'icons',file:'arrow_out.png')}" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon"/>
-								&nbsp;Spacing
+								<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
+								--><img src="${resource(dir:'icons',file:'arrow_out.png')}" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
+								-->Spacing
 							</td>
 						</tr>
 						
@@ -233,6 +194,7 @@
 	<g:render template="../assetEntity/modelDialog"/>
 	<g:render template="../assetEntity/entityCrudDivs" />
 	<g:render template="../assetEntity/dependentAdd" />
+	<g:render template="../layouts/error"/>
 	<div id="createStaffDialog" style="display:none;">
 		<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
 	</div>
@@ -251,7 +213,7 @@
 	
 	$(document).ready(function () {
 		// close the labels twistie by default
-		$('#layoutControlContainerId').slideUp(0);
+		$('#labelControlContainerId').slideUp(0);
 
 		
 		// define the select2 for assets
