@@ -29,7 +29,7 @@
 		</g:if>
 		
 		<g:if test="${params.displayCycles}">
-			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cyclical"></line></svg></td><td>Cycle</td></tr>
+			<tr><td><svg style="width: 34px;height: 16px;border-width: 0px;"><line x1="1" y1="8" x2="${arrowheadOffset}" y2="8" class="link cyclical"></line></svg></td><td>Cyclical</td></tr>
 		</g:if>
 		
 		<g:if test="${params.displayCuts}">

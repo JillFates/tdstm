@@ -4197,7 +4197,7 @@ class AssetEntityController {
 		def assetClassesForSelect = AssetClass.getClassOptions()
 		assetClassesForSelect.put('ALL', 'All Classes');
 		
-		def defaultPrefs = ['levelsUp':0, 'levelsDown':3, 'appLbl':true, 'labelOffset':2, 'assetClasses':'ALL']
+		def defaultPrefs = ['levelsUp':'0', 'levelsDown':'3', 'showCycles':true, 'appLbl':true, 'labelOffset':'2', 'assetClasses':'ALL']
 		def graphPrefs = userPreferenceService.getPreference('archGraph', loginUser)
 		def prefsObject = [:]
 		if (graphPrefs)

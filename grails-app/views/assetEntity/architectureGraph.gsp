@@ -66,7 +66,7 @@
 								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/><!--
 								--><input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" /><!--
 								--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
-								--><label for="levelsUpId">&nbsp;Tiers Up</label>
+								--><label for="levelsUpId">&nbsp;Tiers Above</label>
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow down">
@@ -74,14 +74,14 @@
 								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/><!--
 								--><input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" /><!--
 								--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
-								--><label for="assetSelectId">&nbsp;Tiers Down</label>
+								--><label for="assetSelectId">&nbsp;Tiers Below</label>
 							</td>
 						</tr>
 						<tr title="Highlights cyclical structures in the dependency tree">
 							<td class="controlPanelControl" colspan="3">
 								<span class="checkboxContainer">
 									<input type="checkbox" id="highlightCyclicalCheckBoxId" name="showCycles" class="pointer" value="true" ${(graphPrefs.showCycles) ? 'checked' : ''} /><!--
-									--><label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical Refs</label>
+									--><label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical References</label>
 								</span>
 							</td>
 						</tr>

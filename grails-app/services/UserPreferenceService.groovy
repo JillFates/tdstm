@@ -78,7 +78,6 @@ class UserPreferenceService  {
 			validator: {
 				def prefs = JSON.parse(it)	
 				def checkboxLabels = ['showCycles', 'blackBackground', 'appLbl', 'srvLbl', 'dbLbl', 'spLbl', 'slLbl', 'netLbl']
-				
 				checkboxLabels.each { label ->
 					if (prefs[label] && prefs[label] != 'true')
 						return false
@@ -90,7 +89,7 @@ class UserPreferenceService  {
 					return false
 				if ( ! (Integer.parseInt(prefs.labelOffset) in (1..4)) )
 					return false
-					
+				
 				return true
 			}
 		]
