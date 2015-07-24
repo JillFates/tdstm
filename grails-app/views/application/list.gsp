@@ -18,9 +18,9 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>	
 		<g:javascript src="angular/plugins/angular-resource.js" />
-        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
@@ -96,7 +96,7 @@
 					gridComplete="function(){bindResize('applicationId');recompileDOM('applicationIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					showPager="true"
-					loadComplete="function(){resizeGrid()}"
+					loadComplete="function(){}"
 					postData="{filter: filter, event:event, latencys:latencys, plannedStatus:plannedStatus, validationFilter:validation, moveBundleId:moveBundleId,
 						assetName:appName, planStatus:planStatus, moveBundle:moveBundle, validation:validationFilter, sme:appSme, 
 						toValidate:toValidate,runbook:runbook, unassigned:unassigned}">
@@ -170,14 +170,14 @@
 						<input type="hidden" id="previousValue_${key}" value="${appPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${appPref[key]}" id="coloumnSelector_${appPref[key]}" value="${attribute.attributeCode}" 
-								${appPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
+								${appPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
 								onchange="setColumnAssetPref(this.value,'${key}','App_Columns')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
 					</div>
 				</div>
 			</g:each>
 			<div ng-controller="tds.comments.controller.MainController as comments">
-			    <jqgrid:wrapper id="applicationId" />
+				<jqgrid:wrapper id="applicationId" />
 			</div>
 			<g:render template="../assetEntity/modelDialog"/>
 			<g:render template="../assetEntity/entityCrudDivs" />

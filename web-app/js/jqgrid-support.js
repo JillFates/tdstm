@@ -86,12 +86,12 @@ function validateMergeCount() {
 		if ($("#cb_personIdGrid").is(':checked')) {
 			checkedLen--;
 		}
-		if(checkedLen > 1 && checkedLen < 26) {
+		if (checkedLen > 1 && checkedLen < 26) {
 			$("#compareMergeId").removeAttr("disabled")
 		} else {
 			$("#compareMergeId").attr("disabled","disabled")
 		}
-		if(checkedLen > 0) {
+		if (checkedLen > 0) {
 			$("#deleteAssetId").removeAttr("disabled")
 		} else {
 			$("#deleteAssetId").attr("disabled","disabled")
