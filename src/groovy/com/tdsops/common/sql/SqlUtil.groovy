@@ -209,16 +209,6 @@ class SqlUtil {
 				queryString = buildSingleValueParameter(prop, rest, "=", params)
 				break
 			
-			/* Starts with '*' */
-			case "*":
-				queryString = buildSingleValueParameter(prop, parseStringParameter(rest, "%", ""), "LIKE", params)
-				break
-
-			/* Starts with '%' */
-			case "%":
-				queryString = buildSingleValueParameter(prop, parseStringParameter(rest, "", "%"), "LIKE", params)
-				break
-
 			/* Starts with '<' or '>' */
 			case ["<", ">"]:
 				/* Starts with '<=' or '>=' */
@@ -245,11 +235,16 @@ class SqlUtil {
 					case ~ /.*\|.*/:
 						queryString = buildInList(prop, "NOT IN", rest, params)
 						break
+					/* Starts with '-' or '!' and it isn't a list. */
 					default:
-						/* Starts with '-' and it's not a list of values. */
-						if(firstChar == "-"){
+						/* If there are wildcards it must be handled as a LIKE operation. */
+						if(isOverriding(rest)){
+							// Parses de parameter accordingly.
+							queryString = buildDistinctParameter(prop, rest.replaceAll("\\*", "%"), params, clazz, true)
+						/* Starts with '-' and no overriding required. */
+						}else if(firstChar == "-"){
 							queryString = buildDistinctParameter(prop, rest, params, clazz)	
-						/* Starts with '!' and it's not a list of values. */
+						/* Starts with '!' and it's not a list of values and no overriding required. */
 						}else{
 							queryString = buildSingleValueParameter(prop, rest, "<>", params)
 						}
@@ -275,9 +270,9 @@ class SqlUtil {
 						case ~ /^\".*\"/:
 							queryString = buildSingleValueParameter(prop, expr.substring(1, expr.length() - 1), "=", params)
 							break
+						/* Default scenario (overriding may be required). */
 						default:
-							def expr2 = parseStringParameter(expr, "%", "%").replaceAll("\\*", "%")
-							queryString = buildSingleValueParameter(prop, expr2, "LIKE", params)
+							queryString = buildSingleValueParameter(prop, parseStringParameter(expr, true), "LIKE", params)
 							break
 					}
 					break
@@ -290,24 +285,34 @@ class SqlUtil {
 	/* ************************************************************************* */
 
 	/**
+	 * Determines whether the user is overriding the default filter logic.
+	 */
+	 private static isOverriding(expr){
+	 	return expr ==~ /.*[\*%].*/
+	 }
+
+
+	/* ************************************************************************* */
+
+	/**
 	 * This method constructs simple not-like expressions for number and string
 	 * parameters.
 	 */
-	static buildDistinctParameter(prop, value, params, clazz){
+	private static buildDistinctParameter(prop, value, params, clazz, checkOverriding=false){
 		// TODO Analyze column type
 		def queryString
 		def fieldTypeIsNumber = isSubclassOf(fieldType(clazz, prop), Number)
 		if(value.isNumber() && fieldTypeIsNumber){
 			queryString = buildSingleValueParameter(prop, parseNumberParameter(value), "<>", params)
 		}else{
-			queryString = buildSingleValueParameter(prop, parseStringParameter(value, "%", "%"), "NOT LIKE", params)
+			queryString = buildSingleValueParameter(prop, parseStringParameter(value, checkOverriding), "NOT LIKE", params)
 		}
 		return queryString
 	}
 
 	/* ************************************************************************* */
 
-	static buildInList(prop, inOp, expr, params){
+	private static buildInList(prop, inOp, expr, params){
 
 		def values = []
 		expr.split("\\|").eachWithIndex{ value, idx ->
@@ -320,10 +325,10 @@ class SqlUtil {
 
 	/* ************************************************************************* */
 
-	static buildLikeList(prop, expr, likeOp, logicalOp, separator, params){
+	private static buildLikeList(prop, expr, likeOp, logicalOp, separator, params){
 		def conditions = []
 		expr.split(separator).eachWithIndex{ value, idx ->
-			conditions << buildSingleValueParameter(prop + idx, parseStringParameter(value, "%", "%"), likeOp, params, prop)
+			conditions << buildSingleValueParameter(prop + idx, parseStringParameter(value, false), likeOp, params, prop)
 		}
 		return "${conditions.join(" ${logicalOp} ")}"
 	}
@@ -334,24 +339,33 @@ class SqlUtil {
 	/**
 	 * Constructs a simple expression like 'parameter = value', 'parameter <> value'
 	 */
-	static buildSingleValueParameter(prop, value, operator, params, propName=prop){
+	private static buildSingleValueParameter(prop, value, operator, params, propName=prop){
 		params[prop] = value
 		return  "${propName} ${operator} :${prop}"
 	}
 
 	/* ************************************************************************* */
 
-	static escapeStringParameter(parameter){
+	/**
+	 * Performs basic escaping on the string parameter.
+	 */
+	private static escapeStringParameter(parameter){
 		return StringEscapeUtils.escapeJava(parameter.toString().trim())
 	}
 
 	/* ************************************************************************* */
 
 	/**
-	 * Surrounds the first parameter with the other 2
-	 * for constructing like-operations.
+	 * Escapes the parameter accordingly and determines whether or not
+	 * it should include whildcards.
 	 */
-	static parseStringParameter(parameter, before, after){
+	private static parseStringParameter(parameter, checkOverride){
+		def (before,after) = ["%", "%"]
+		if((checkOverride) && (isOverriding(parameter))){
+			before = after = ""
+			parameter = parameter.replaceAll("\\*", "%")
+
+		}
 		return "${before}${escapeStringParameter(parameter)}${after}"
 	}
 
@@ -360,7 +374,7 @@ class SqlUtil {
 	/**
 	 * Parses a String parameter to a number (Integer or Double).
 	 */
-	static parseNumberParameter(parameter){
+	private static parseNumberParameter(parameter){
 		return parameter.isInteger() ? parameter.toInteger() : parameter.toDouble()
 	}
 
@@ -369,7 +383,7 @@ class SqlUtil {
 	/**
 	 * This method determines the type of a given field.
 	 */	
-	static def fieldType(def clazz, def field){
+	private static def fieldType(def clazz, def field){
 		return clazz.metaClass.properties.find{ it.name == field }.type
 	}
 
@@ -378,7 +392,7 @@ class SqlUtil {
 	/**
 	 *  
 	 */
-	static def isSubclassOf(def clazz, def superClazz){
+	private static def isSubclassOf(def clazz, def superClazz){
 		return superClazz.isAssignableFrom(clazz)
 	}
 
