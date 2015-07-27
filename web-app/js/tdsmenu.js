@@ -215,12 +215,12 @@
 		function showMegaMenu(e){
 			$(".headerClass").removeClass("ui-icon");
 			if(megamenuitem!=e)
-				$(".menu2 .active").removeClass('active').addClass('inActive')
-				$("#userMegaMenu").removeClass('active').addClass('inActive')
+				$(".menu2 .menuActive").removeClass('menuActive').addClass('inActive')
+				$("#userMegaMenu").removeClass('menuActive').addClass('inActive')
 			if($(e).hasClass('inActive'))
-				$(e).addClass('active').removeClass('inActive')
+				$(e).addClass('menuActive').removeClass('inActive')
 			else
-				$(e).addClass('inActive').removeClass('active')
+				$(e).addClass('inActive').removeClass('menuActive')
 			
 			resetmenu2();
 			if(e!=""){
@@ -324,10 +324,10 @@
 			}
 		}
 		function hideMegaMenu( id ){
-			$("#"+id).removeClass('inActive').addClass('active')
+			$("#"+id).removeClass('inActive').addClass('menuActive')
 		}
 		function closeMegaMenu() {
-			if(megamenuitem) $(megamenuitem).removeClass('active').addClass('inActive');
+			if(megamenuitem) $(megamenuitem).removeClass('menuActive').addClass('inActive');
 			resetmenu2();
 		}
 		function resetmenu2 () {

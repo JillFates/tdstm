@@ -651,7 +651,9 @@ tds.core.directive.DatePicker = function(utils) {
 				function($) {
 					element.daterangepicker({ 
 						timePicker: false, 
-						format: tdsCommon.defaultDateFormat(),
+						locale: {
+							format: tdsCommon.defaultDateFormat(),
+						},
 						singleDatePicker: true,
 						showDropdowns: false,
 						opens: 'left',
@@ -767,8 +769,10 @@ tds.core.directive.RangePicker = function(utils) {
 				function($) {
 					element.daterangepicker({ 
 						timePicker: true, 
-						timePickerIncrement: 1, 
-						format: tdsCommon.defaultDateTimeFormat(),
+						timePickerIncrement: 1,
+						locale: {
+							format: tdsCommon.defaultDateTimeFormat(),
+						}, 
 						showDropdowns: false,
 						startDate: moment().hours(0).minutes(0).seconds(0),
 						endDate: moment().add('d', 1).hours(0).minutes(0).seconds(0)

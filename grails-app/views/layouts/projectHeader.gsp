@@ -9,7 +9,7 @@
 		<g:layoutHead />
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs3.css')}" />
 		
 		<script type="text/javascript">
 			$(document).ready(function() {

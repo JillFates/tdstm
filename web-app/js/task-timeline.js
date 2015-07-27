@@ -2056,8 +2056,12 @@ function clearFilter () {
  * have a Date object in the user's time zone.
  */
 function parseStartDate(startDate) {
-	var momentTZ = moment().tz(tdsCommon.timeZone())
-	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate).add(momentTZ.utcOffset(), 'minutes');
+	var momentTZ = moment().tz(tdsCommon.timeZone());
+	var localTZOffset = new Date().getTimezoneOffset();
+	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
+	momentStartDate = momentStartDate.tz("GMT");
+	momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
 	return new Date(momentStartDate.valueOf());
 }
 
+ 
