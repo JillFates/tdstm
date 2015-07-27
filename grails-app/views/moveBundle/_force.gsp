@@ -13,9 +13,6 @@ line.link.redundant {
 line.link.cyclical {
 	marker-end: url(#arrowheadCyclical);
 }
-line.link.cut {
-	marker-end: url(#arrowheadCut);
-}
 line.link.blackBackground {
 	marker-end: url(#arrowheadBlackBackground);
 }
@@ -28,11 +25,14 @@ line.link.notApplicable {
 line.link.notApplicable.blackBackground {
 	marker-end: url(#arrowheadNABlackBackground);
 }
+line.link.cut {
+	marker-end: url(#arrowheadCut);
+}
 line.link.bundleConflict {
 	marker-end: url(#arrowheadBundleConflict);
 }
 line.link.selected {
-	marker-end: url(#arrowheadSelected);
+	marker-end: url(#arrowheadSelected) !important;
 }
 
 </style>
@@ -220,7 +220,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	// Resets the scale and position of the map. Called when the user double clicks on the background
 	function resetView () {
-		if (d3.select(d3.event.srcElement)[0][0].nodeName == 'use')
+		if (d3.select(d3.event.target)[0][0].nodeName == 'use')
 			return;
 		centerGraph();
 	}
@@ -515,29 +515,20 @@ function toggleNodeSelection (id) {
 		node.selected = 2;
 		
 		// Style the dependencies of the selected node
-		var useTarget = true;
-		$.each(node.dependsOn, styleDependencies);
-		useTarget = false;
-		$.each(node.supports, styleDependencies);
-		function styleDependencies (index, linkIndex) {
+		function styleDependencies (index, linkIndex, useTarget) {
 			var link = GraphUtil.force.links()[linkIndex];
 			var childNode = (useTarget)?(link.target):(link.source);
 			link.selected = 1;
 			childNode.selected = 1;
 		}
+		$.each(node.dependsOn, function (i, o) {styleDependencies(i, o, true)});
+		$.each(node.supports, function (i, o) {styleDependencies(i, o, false)});
 	}
 	
 	GraphUtil.updateAllClasses();
 	
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-	var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
-	selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-		.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-		.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-		.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-		.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-		.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
-	selection.order();
+	GraphUtil.reorderDOM();
 }
 
 // Used to rebuild the layout using the new parameters
@@ -569,11 +560,14 @@ function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, he
 		GraphUtil.force.theta(theta);
 	
 	// Reset the list of types to show names for
-	if ( GraphUtil.setShowLabels(GraphUtil.force.nodes()) )
-		getLabelWidths();
+	var labelsChanged = GraphUtil.setShowLabels(GraphUtil.force.nodes())
 	
 	// Update the classes for all data bound svg objects
 	GraphUtil.updateAllClasses();
+	
+	// Set the new label widths
+	if (labelsChanged)
+		getLabelWidths();
 	
 	// updates the current fillMode
 	fillMode = GraphUtil.getFillMode();
