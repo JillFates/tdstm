@@ -13,9 +13,9 @@
       }
       function isValidDate( date ){
         var returnVal = true;
-      	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-      	if( date && !objRegExp.test(date) ){
-          	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
+      	var momentObj = tdsCommon.parseDateTimeString(date)
+      	if( !momentObj.isValid()){
+          	alert("Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format");
           	returnVal  =  false;
       	} 
       	return returnVal;
@@ -163,7 +163,7 @@
 				                      $("#estStartTime").datetimepicker();
 				                    });
 				                  </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="estStartTime" name="estStartTime"
-				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" format="12hrs" />" 
+				                                   value="<tds:convertDateTime date="${moveEventInstance?.estStartTime}" />" 
 				                                   onchange="isValidDate(this.value)"/>
 				                                   <g:hasErrors bean="${moveEventInstance}" field="estStartTime">
 				                    <div class="errors">
