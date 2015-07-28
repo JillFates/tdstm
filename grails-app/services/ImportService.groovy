@@ -1139,7 +1139,7 @@ class ImportService {
 
 			if (performance) log.debug "$methodName Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
 
-			jobProgressUpdate(progressKey, rowNum, assetCount)
+			jobProgressUpdate(progressKey, rowNum-1, assetCount)
 
 			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
 				resetHibernateSession()
@@ -1572,7 +1572,8 @@ class ImportService {
 				}
 			}
 		} catch (e) {
-			warnings << "${e.toString()} (row $rowNum)"
+			log.error("Can't append blade to chasis: " + e.getMessage(), e)
+			warnings << "${e.getMessage()} (row $rowNum)"
 		}
 	}
 

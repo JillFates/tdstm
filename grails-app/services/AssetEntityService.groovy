@@ -520,6 +520,7 @@ class AssetEntityService {
 	 * @param bladePosition - the position to assign the blade to (optional)
 	 * @return a string that represents any warnings
 	 */
+	@Transactional(noRollbackFor=[InvalidRequestException, EmptyResultException])
 	String assignBladeToChassis(Project project, AssetEntity blade, String chassisId, boolean isSource, String bladePosition=null) {
 		String warnings
 		def srcOrTrgt = (isSource ? 'Source' : 'Target')
