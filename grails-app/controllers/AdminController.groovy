@@ -15,6 +15,8 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
+import org.springframework.web.multipart.*
+import org.springframework.web.multipart.commons.*
 
 import java.util.UUID
 
@@ -1106,17 +1108,16 @@ class AdminController {
 	        def book = ExportUtil.workBookInstance(filename, filePath, response) 
 			def sheet = book.getSheet("Accounts")
 
-			if(params.partyRelTypeCode && params.company){
-				def company = params.company.toLong()
+			if(params.partyRelTypeCode){
+				def company = securityService.getUserCurrentProject().client.id
 				if(params.partyRelTypeCode == "STAFF"){
 					persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
 				}else if(params.partyRelTypeCode == "PROJ_STAFF"){
 					persons = partyRelationshipService.getCompanyProjectStaff(company)
 				}
-
 				if(persons){
 					if(params.login){
-						exportAccountsWithLoginInfo(persons, sheet, company)
+						exportAccountsWithLoginInfo(persons, sheet, company, params.loginChoice)
 					}else{
 						exportAccountsNoLoginInfo(persons, sheet, company)
 					}
@@ -1142,14 +1143,26 @@ class AdminController {
 	 * Retrieves the default fields to be exported for a single account.
 	 */
 	private def getExportAccountDefaultFields(person, companyId){
+		def functions = partyRelationshipService.getCompanyStaffFunctions(companyId, person.id).description
+		def teams = []
+		functions.each{
+			teams << it.substring(it.lastIndexOf(':') +1).trim()
+		}
+
+		def roles = person.getPersonRoles(companyId).description
+		def roles2 = []
+		roles.each{
+			roles2 << it.substring(it.lastIndexOf(':') +1).trim()
+		}
+
 		def fields = [
 							"", // No username
 							person.firstName,
 							person.middleName,
 							person.lastName,
 							person.workPhone?:"",
-							person.getPersonRoles(companyId).join(";"),
-							"", // Roles
+							roles2.join(";"),
+							teams.join(";"),
 							person.email?:"",
 							"", // empty password
 						]
@@ -1169,11 +1182,11 @@ class AdminController {
 
 	/** ******************************************************************** */
 
-	private void exportAccountsWithLoginInfo(persons, sheet, companyId){
+	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
 		persons.eachWithIndex{ p, index ->
 			def loginInfo = UserLogin.findByPerson(p)
 			def fields = getExportAccountDefaultFields(p, companyId)
-			if(loginInfo){
+			if(loginInfo && (loginChoice == "A" || loginInfo.active == loginChoice)){
 				fields[0] = loginInfo.username
 				fields << loginInfo.active
 				fields << loginInfo.expiryDate
@@ -1188,9 +1201,9 @@ class AdminController {
 	private void exportAccountsNoLoginInfo(persons, sheet, companyId){
 		persons.eachWithIndex{ p, index ->
 			def fields = getExportAccountDefaultFields(p, companyId)
-			fields << "" // Empty active
+			/*fields << "" // Empty active
 			fields << "" // Empty expiryDate
-			fields << "" // Empty isLocal
+			fields << "" // Empty isLocal*/
 			exportAccountFields(sheet, fields, index + 1)
 		}
 
@@ -1206,7 +1219,9 @@ class AdminController {
 		if (!controllerService.checkPermission(this, 'PersonExport')){
 			return
 		}
-		render(view:"exportAccounts")
+
+		def project = securityService.getUserCurrentProject()
+		render(view:"exportAccounts", model:[project: project.name, client:project.client.name])
 	}
 	
 	/** ******************************************************************** */
@@ -1317,15 +1332,18 @@ class AdminController {
 					return map
 				}
 				
+
+				MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+				CommonsMultipartFile f = ( CommonsMultipartFile ) mpr.getFile("myFile")
+				
 				// Handle the file upload
-				def f = request.getFile('myFile')
 				if (f.empty) {
 					flash.message = 'Upload file appears to be empty'
 					return map
 				}
 
 				// Save for step 3
-				def upload = new File('/tmp/tdstm-account-import.csv')
+				def upload = new File('/tmp/tdstm-account-import.xls')
 				// upload.delete()
 				f.transferTo(upload)
 				def header = params.header == 'Y'
@@ -1363,7 +1381,7 @@ class AdminController {
 				def header = params.header == 'Y'
 				def role = params.role
 
-				def csv = new File('/tmp/tdstm-account-import.csv')
+				def csv = new File('/tmp/tdstm-account-import.xls')
 
 				people = parseCsv(csv, header)
 				lookForMatches()

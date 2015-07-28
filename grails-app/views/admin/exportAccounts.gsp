@@ -13,18 +13,18 @@
 	</g:if>
 
 		<div>
-			<h3>Step 1 - Upload Import File:</h3>
-
-
 			<g:uploadForm action="exportAccountsProcess">
 
-				<g:select name="company"
-	          		from="${partyRelationshipService.getCompaniesList()}"
-	          		optionKey="${{it.id}}" />
+				<span>Client: ${client}</label>
+	          	<br/>
+	          	<span>Project: ${project}</label>
 	          	<br/>
 	          	<input type="radio" name="partyRelTypeCode" value="STAFF">All Staff
 				<input type="radio" name="partyRelTypeCode" value="PROJ_STAFF" checked>Project Staff<br/>
 				<input type="checkbox" name="login" value="Y"> Include Login Information</br>
+				<input type="radio" name="loginChoice" value="A">All Logins
+				<input type="radio" name="loginChoice" value="Y" checked>Active Logins
+				<input type="radio" name="loginChoice" value="N">Inactive Logins<br/>
 				<input type="submit" />
 			</g:uploadForm> 
 
