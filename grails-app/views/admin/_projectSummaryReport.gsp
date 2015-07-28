@@ -17,7 +17,7 @@
 				<th nowrap>Total Assets Count</th>
 				<th>Project Description</th>
 				<th>Servers Total</th>
-				<th>Servers Active</th>
+				<th>Servers In Planning</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -42,7 +42,7 @@
 					<td>${project.totalAssetCount?:''}</td>
 					<td>${project.description?:''}</td>
 					<td>${project.totalServCount?:''}</td>
-					<td>${project.activeServCount?:''}</td>
+					<td>${project.inPlanningServCount?:''}</td>
 				</tr>
 			</g:each>
 		</tbody>
