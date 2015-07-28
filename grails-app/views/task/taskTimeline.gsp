@@ -18,6 +18,7 @@
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="lodash/lodash.min.js" />
+		<g:javascript src="TimerBar.js" />
 
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
@@ -25,19 +26,6 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'task-timeline.css')}" />
 		<g:javascript src="task-timeline.js" />
-		<script type="text/javascript">
-			var timerBar;
-			$(document).ready(function() {
-				timerBar = new TimerBar(60, 'RefreshTimeline', function () {
-					reloadGraph();
-					timerBar.resetTimer();
-				});
-			})
-			
-			function reloadGraph () {
-				submitForm();
-			}
-		</script>
 	</head>
 	<body>
 		<input type="hidden" id="timeBarValueId" value="0"/>
@@ -63,7 +51,7 @@
 				</span>
 			</tds:hasPermission>
 			<span style="float:right;">
-				Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30" size="3"/ style="width:20px;" />&nbsp;&nbsp;
+				Task Size (pixels): <input type="text" id="mainHeightFieldId" value="30" size="3" style="width:20px;" />&nbsp;&nbsp;
 				<span class="checkboxContainer">
 					<input type="checkbox" id="useHeightCheckBoxId" class="pointer" checked="checked" /><!--
 					--><label for="useHeightCheckBoxId" class="pointer">&nbsp;Use Heights</label>&nbsp;&nbsp;
@@ -72,21 +60,25 @@
 					<input type="checkbox" id="hideRedundantCheckBoxId" class="pointer" checked="checked" /><!--
 					--><label for="hideRedundantCheckBoxId" class="pointer">&nbsp;Hide Redundant</label>&nbsp;&nbsp;
 				</span>
-				<input type="button" value="Refresh" onclick="timerBar.refreshFunction()" style="cursor: pointer;" />&nbsp;
-				<select id="selectTimedBarId">
-					<option value="0" selected="selected">Manual</option>
-					<option value="60">1 Min</option>
-					<option value="120">2 Min</option>
-					<option value="180">3 Min</option>
-					<option value="240">4 Min</option>
-					<option value="300">5 Min</option>
-				</select>
-				
+				<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 			</span>
 			<br />
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 			<g:render template="../assetEntity/initAssetEntityData"/>
 			<g:render template="../layouts/error"/>
 		</div>
+		<script type="text/javascript">
+			var timerBar;
+			$(document).ready(function() {
+				timerBar = new TimerBar(60, 'RefreshTimeline', function () {
+					reloadGraph();
+					timerBar.resetTimer();
+				});
+			})
+			
+			function reloadGraph () {
+				submitForm();
+			}
+		</script>
 	</body>
 </html>

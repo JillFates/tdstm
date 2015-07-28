@@ -114,7 +114,7 @@ function buildGraph (response, status) {
 
 	var x = d3.time.scale()
 		.domain([new Date(data.startDate), items[items.length-1].end])
-		.range([0, $('div.body').innerWidth() - 20 - $('div.body').offset().left]);
+		.range([0, $(window).width() - $('div.body h1').offset().left * 2 - 10]);
 	
 	var maxStack = calculateStacks();
 	var miniHeight = ((maxStack+1)*miniRectHeight);

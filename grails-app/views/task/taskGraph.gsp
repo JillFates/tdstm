@@ -12,6 +12,7 @@
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />
 		<g:javascript src="lodash/lodash.min.js" />
+		<g:javascript src="TimerBar.js" />
 		
 		<g:javascript src="asset.tranman.js" />
 
@@ -372,15 +373,7 @@
 				</span>
 			</tds:hasPermission>
 			<span style="float:right;">
-				<input type="button" value="Refresh" onclick="timerBar.refreshFunction()" style="cursor: pointer;" />&nbsp;
-				<select id="selectTimedBarId">
-					<option value="0" selected="selected">Manual</option>
-					<option value="60">1 Min</option>
-					<option value="120">2 Min</option>
-					<option value="180">3 Min</option>
-					<option value="240">4 Min</option>
-					<option value="300">5 Min</option>
-				</select>
+				<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
 			</span>
 			<br>
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>

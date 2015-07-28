@@ -1,8 +1,18 @@
 package com.tdsops.common.validation
 
 import com.tdssrc.grails.NumberUtil
+import com.tdsops.common.lang.ExceptionUtil
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+@Singleton
 class ConstraintsValidator {
+	
+	private static log
+	
+	ConstraintsValidator () {
+		log = LogFactory.getLog(this.class)
+	}
 	
 	static boolean validate (String value, Map constraints) {
 		try {
@@ -34,6 +44,8 @@ class ConstraintsValidator {
 			
 			return validated
 		} catch (Exception e) {
+			log.error "Unexpected error : ${e.class} ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
+			throw e
 			return false
 		}
 	}

@@ -19,6 +19,7 @@
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<g:javascript src="TimerBar.js" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
@@ -71,15 +72,7 @@
 				</div>
 				<div style="float: right; width: 150px; padding-top: 2px;">
 					<div style="float: right;">
-						<input type="button" value="Refresh:" id="update" onclick="refreshDashboard()" />
-						<select name="updateTime" id="selectTimedBarId" class="selecttext">
-							<option value="0" selected="selected">Manual</option>
-							<option value="30">30s</option>
-							<option value="60">1m</option>
-							<option value="120">2m</option>
-							<option value="300">5m</option>
-							<option value="600">10m</option>
-						</select>
+						<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 300, 600]]}"/>
 					</div>
 					<%-- <div style="float: right;padding: 3px 0px;"> <a href="#page_down" class="nav_button">Page Down</a></div> --%>
 				</div>

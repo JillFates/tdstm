@@ -20,6 +20,7 @@
 	<g:javascript src="bootstrap.js" />
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
+	<g:javascript src="TimerBar.js" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 </head>
 <body>
@@ -60,16 +61,7 @@
 			</g:if>
 			<li>
 				<span style="float: right;margin-right: 10px;">
-					<input type="button" value="Refresh" onclick="timerBar.refreshFunction()" style="cursor: pointer;" />&nbsp;
-					<select id="selectTimedBarId">
-						<option value="0">Manual</option>
-						<option value="30">30 sec</option>
-						<option value="60">1 Min</option>
-						<option value="120">2 Min</option>
-						<option value="180">3 Min</option>
-						<option value="240">4 Min</option>
-						<option value="300">5 Min</option>
-					</select>
+					<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[30, 60, 120, 180, 240, 300]]}"/>
 				</span>
 			</li>
 		</ul>

@@ -26,6 +26,7 @@
 	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
+	<g:javascript src="TimerBar.js" />
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -233,16 +234,8 @@
 
 						<tdsactionbutton id="timeline" label="View Timeline" icon="/icons/timeline_marker.png" link="/task/taskTimeline"></tdsactionbutton>&nbsp;
 					</span>
-					<input type="button" value="Refresh" onclick="timerBar.refreshFunction()" style="cursor: pointer;" />&nbsp;
-					<select id="selectTimedBarId">
-						<option value="0">Manual</option>
-						<option value="60" selected="selected">1 Min</option>
-						<option value="120">2 Min</option>
-						<option value="180">3 Min</option>
-						<option value="240">4 Min</option>
-						<option value="300">5 Min</option>
-					</select>
-				</span>				
+					<g:render template="../assetEntity/timerBarControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+				</span>
 			</span>
 			<jqgrid:wrapper id="taskListId" />
 		</div>
@@ -253,7 +246,7 @@
 					<input type="hidden" id="previousValue_${key}" value="${taskPref[key]}" />
 					<g:each var="attribute" in="${attributesList}">
 						<label><input type="radio" name="coloumnSelector_${taskPref[key]}" id="coloumnSelector_${taskPref[key]}" value="${attribute}" 
-							${taskPref[key]==attribute?'checked':'' } 
+							${taskPref[key]==attribute ? 'checked' : '' } 
 							onchange="setColumnAssetPref(this.value,'${key}','Task_Columns')"/> ${attribute}</label><br>
 					</g:each>
 				</div>
