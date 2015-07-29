@@ -1370,7 +1370,6 @@ class AdminController {
 
 				map.people = people
 				map.step = 'review'
-				map.header = params.header
 
 				break
 
@@ -1382,7 +1381,6 @@ class AdminController {
 				def forcePasswordChange = params.forcePasswordChange == 'Y'
 				def password = params.password
 				def expireDays = NumberUtils.toInt(params.expireDays,90)
-				def header = params.header == 'Y'
 				def role = params.role
 
 				def book = new HSSFWorkbook(new FileInputStream( new File('/tmp/tdstm-account-import.xls')))
