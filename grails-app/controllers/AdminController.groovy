@@ -4,6 +4,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import groovy.time.TimeCategory
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.StringUtils
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.EavAttribute
@@ -17,8 +18,10 @@ import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 
 import java.util.UUID
+import java.text.SimpleDateFormat 
 
 class AdminController {
 	def jdbcTemplate
@@ -1183,13 +1186,14 @@ class AdminController {
 	/** ******************************************************************** */
 
 	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
+		def dateFormat = new SimpleDateFormat("yyyy-MM-dd")
 		persons.eachWithIndex{ p, index ->
 			def loginInfo = UserLogin.findByPerson(p)
 			def fields = getExportAccountDefaultFields(p, companyId)
 			if(loginInfo && (loginChoice == "A" || loginInfo.active == loginChoice)){
 				fields[0] = loginInfo.username
 				fields << loginInfo.active
-				fields << loginInfo.expiryDate
+				fields << dateFormat.format(loginInfo.expiryDate)
 				fields << (loginInfo.isLocal? "YES" : "NO")
 			}
 			exportAccountFields(sheet, fields, index + 1)
@@ -1240,33 +1244,34 @@ class AdminController {
 
 		def map = [step:'start', projectName:project.toString() ]
  
-		def filename = '/tmp/tdstm-account-import.csv'
+		def filename = '/tmp/tdstm-account-import.xls'
 
 		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 		List teamCodes = partyRelationshipService.getStaffingRoles()*.id
 
-		// Inline closure to parse the CSV file and return array of mapped fields
-		def parseCsv = {file, header ->
-			def first = true
+		// Inline closure to parse the XLS file and return array of mapped fields
+		def parseXLS = {book ->
+			def sheet = book.getSheet("Accounts")
+			def rows = sheet.getLastRowNum()
 			people = []
-			file.splitEachLine(",") { fields ->
-				if (first && header) {
-					first = false
-				} else {
-					people.add(
-						username: fields[0],
-						firstName: fields[1],
-						middleName: fields[2],
-						lastName: fields[3],
-						phone: fields[4],
-						teams: fields[5],
-						role: fields[6],
-						email: fields[7],
-						password: fields[8],
+			(1..rows).each{
+				people.add(
+						username: WorkbookUtil.getStringCellValue(sheet, 0, it ),
+						firstName: WorkbookUtil.getStringCellValue(sheet, 1, it ),
+						middleName: WorkbookUtil.getStringCellValue(sheet, 2, it ),
+						lastName: WorkbookUtil.getStringCellValue(sheet, 3, it ),
+						phone: WorkbookUtil.getStringCellValue(sheet, 4, it ),
+						teams: WorkbookUtil.getStringCellValue(sheet, 5, it ),
+						role: WorkbookUtil.getStringCellValue(sheet, 6, it ),
+						email: WorkbookUtil.getStringCellValue(sheet, 7, it ),
+						password: WorkbookUtil.getStringCellValue(sheet, 8, it ),
+						active: WorkbookUtil.getStringCellValue(sheet, 9, it ),
+						expiryDate: WorkbookUtil.getStringCellValue(sheet, 10, it ),
+						isLocal: WorkbookUtil.getStringCellValue(sheet, 11, it ),
 						errors: []
 					)
-				}
 			}
+			
 			return people
 		}
 
@@ -1341,14 +1346,13 @@ class AdminController {
 					flash.message = 'Upload file appears to be empty'
 					return map
 				}
-
 				// Save for step 3
 				def upload = new File('/tmp/tdstm-account-import.xls')
 				// upload.delete()
 				f.transferTo(upload)
-				def header = params.header == 'Y'
+				def book = new HSSFWorkbook(new FileInputStream( upload ))
 
-				people = parseCsv(upload, header)
+				people = parseXLS(book)
 				map.matches = lookForMatches()
 
 				// Validate the teams && role
@@ -1381,9 +1385,9 @@ class AdminController {
 				def header = params.header == 'Y'
 				def role = params.role
 
-				def csv = new File('/tmp/tdstm-account-import.xls')
+				def book = new HSSFWorkbook(new FileInputStream( new File('/tmp/tdstm-account-import.xls')))
 
-				people = parseCsv(csv, header)
+				people = parseXLS(book)
 				lookForMatches()
 
 				if (randomPassword) {
@@ -1520,6 +1524,7 @@ class AdminController {
 								active: (activateLogin ? 'Y' : 'N'),
 								expiryDate: expiryDate,
 								person: person,
+								isLocal: p.isLocal == "Y",
 								forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
 							)
 
@@ -1542,6 +1547,20 @@ class AdminController {
 							}
 						} else {
 							failed = true
+							if(u.username != p.username){
+								securityService.reportViolation("The account for ${p.lastName} ${p.firstName} already has login information associated, which is different from the one provided.", u)
+							}else if(controllerService.checkPermission(this, 'EditUserLogin')){
+								u.active = p.active
+								u.expiryDate = new Date().parse("yyyy-MM-dd", p.expiryDate)
+								u.isLocal = p.isLocal == "Y"
+								if (! u.validate() || !u.save(flush:true)) {
+									p.errors << "Error" + GormUtil.allErrorsString(u)
+									log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
+									failed = true
+								}
+							}else{
+								securityService.reportViolation("You don't have permissions for updating login information.", u)
+							}
 							p.errors << "Person already have a userlogin: $u"
 						}
 
