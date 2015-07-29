@@ -29,6 +29,8 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher
 import org.hibernate.FlushMode
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 class ImportService {
 
@@ -540,6 +542,7 @@ class ImportService {
 	 * @param timeZoneId - the timezone of the current user
 	 * @return map of the various attributes returned from the service
 	 */
+	@Transactional
 	Map invokeAssetImportProcess(Long projectId, Long userLoginId, Long batchId, String progressKey, timeZoneId) {
 		Map results = [:]
 		String errorMsg
@@ -916,237 +919,250 @@ class ImportService {
 		// Iterate over the rows
 		//
 		def dtvList
+		def rowNum
+		def asset
 
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
-			now = new Date()
+			try {
+				now = new Date()
 
-			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
-			def rowNum = rowId+1
-			log.debug "**** ROW $rowNum"
+				def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
+				rowNum = rowId+1
+				log.debug "**** ROW $rowNum"
 
-			// Get all of the property values imported for a given row
-			dtvList?.clear()
-			dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
+				// Get all of the property values imported for a given row
+				dtvList?.clear()
+				dtvList = DataTransferValue.findAllByDataTransferBatchAndRowId(dataTransferBatch, rowId)
 
-			def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
-			def asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
-			if (!asset) {
-				continue
-			}
-
-			if ( asset.id ) {
-				existingAssetsList << asset
-			} else {
-				// Initialize extra properties for new asset
-			}
-
-			def isNewValidate = (! asset.id)
-
-			// This will hold any of the source/target location, room and rack information
-			def locRoomRack = [source: [:], target: [:] ]
-
-			// Vars caught in the each loop below to be used to create mfg/model appropriately
-			String mfgName, modelName, usize, deviceType
-
-			// Vars caught in the each loop for setting the chassis and position
-			String sourceChassis, targetChassis, sourceBladePosition, targetBladePosition
-
-			// Iterate over the attributes to update the asset with
-			dtvList.each {
-				def attribName = it.eavAttribute.attributeCode
-
-				// If trying to set to NULL - call the closure to update the property and move on
-				if (it.importValue == "NULL") {
-					// Set the property to NULL appropriately
-					newVal = assetEntityAttributeLoaderService.setToNullOrBlank(asset, attribName, it.importValue, nullProps, blankProps)
-					if (newVal) {
-						// Error messages are returned otherwise it updated
-						warnings << "$newVal for row $rowNum, asset $asset"
-						errorConflictCount++
-					}
-					return
+				def assetEntityId = dataTransferValueRowList[dataTransferValueRow].assetEntityId
+				asset = assetEntityAttributeLoaderService.findAndValidateAsset(project, userLogin, domainClass, assetEntityId, dataTransferBatch, dtvList, eavAttributeSet, errorCount, errorConflictCount, ignoredAssets, rowNum)
+				if (!asset) {
+					continue
 				}
 
-				// log.debug "Processing attribName=$attribName"
+				if ( asset.id ) {
+					existingAssetsList << asset
+				} else {
+					// Initialize extra properties for new asset
+				}
 
-				switch (attribName) {
-					case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
-						// Legacy columns that are no longer used - see TM-3128
-						break
-					case 'manufacturer':
-						mfgName = it.correctedValue ?: it.importValue
-						break;
-					case 'model':
-						modelName = it.correctedValue ?: it.importValue
-						break;
-					case "assetType":
-						deviceType = it.correctedValue ?: it.importValue
-						break
-					case "usize":
-						usize = it.correctedValue ?: it.importValue
-						break
-					case "sourceChassis":
-						sourceChassis = it.correctedValue ?: it.importValue
-						// appendBladeToChassis(project, asset, it.importValue, true, warnings, rowNum)
-						break
-					case "targetChassis":
-						targetChassis = it.correctedValue ?: it.importValue
-						// appendBladeToChassis(project, asset, it.importValue, false, warnings, rowNum)
-						break
-					case 'sourceBladePosition':
-						sourceBladePosition = it.correctedValue ?: it.importValue
-						break
-					case 'targetBladePosition':
-						targetBladePosition = it.correctedValue ?: it.importValue
-						break
+				def isNewValidate = (! asset.id)
 
-					// case ~/^(location|room|rack)(Source|Target)\.(.+)/:
-					case ~/(source|target)(Location|Room|Rack)/:
-						// def field = Matcher.lastMatcher[0][1]
-						def disposition = Matcher.lastMatcher[0][1]
-						log.debug "*** disposition=$disposition"
-						// def child = Matcher.lastMatcher[0][3]
+				// This will hold any of the source/target location, room and rack information
+				def locRoomRack = [source: [:], target: [:] ]
 
-						def val = (it.correctedValue ?: it.importValue)?.trim()
-						if (val?.size()) {
-							// Store the properties into the map to be used later
-							locRoomRack[disposition][attribName] = val
+				// Vars caught in the each loop below to be used to create mfg/model appropriately
+				String mfgName, modelName, usize, deviceType
+
+				// Vars caught in the each loop for setting the chassis and position
+				String sourceChassis, targetChassis, sourceBladePosition, targetBladePosition
+
+				// Iterate over the attributes to update the asset with
+				dtvList.each {
+					def attribName = it.eavAttribute.attributeCode
+
+					// If trying to set to NULL - call the closure to update the property and move on
+					if (it.importValue == "NULL") {
+						// Set the property to NULL appropriately
+						newVal = assetEntityAttributeLoaderService.setToNullOrBlank(asset, attribName, it.importValue, nullProps, blankProps)
+						if (newVal) {
+							// Error messages are returned otherwise it updated
+							warnings << "$newVal for row $rowNum, asset $asset"
+							errorConflictCount++
 						}
-						break
-
-					default: 
-						// Try processing all common properties
-						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount)
-				}
-			}
-
-			//
-			// Process the Mfg / Model / Device Type assignment by utilizing a cache of the various mfg/model names
-			//
-			mfgName = StringUtil.defaultIfEmpty(mfgName, '')
-			modelName = StringUtil.defaultIfEmpty(modelName, '')
-			deviceType = StringUtil.defaultIfEmpty(deviceType, '')
-			String mmKey = "${mfgName}::${modelName}::${deviceType}::$usize::${isNewValidate ? 'new' : 'existing'}"
-			def mfg, model
-
-			Map mmm
-			if (mfgModelMap.containsKey(mmKey)) {
-				log.debug "$methodName Found cached mfgModelMap for key $mmKey, hasErrors=${mfgModelMap[mmKey].errorMsg?.size()}"
-				// We've already processed this mfg/model/type/usize/new|existing combination before so work from the cache
-				mfgModelMap[mmKey].refCount++
-				mmm = mfgModelMap[mmKey]
-			} else {
-				log.debug "$methodName Did not find asset in cache so calling assetEntityAttributeLoaderService.assignMfgAndModelToDevice()"
-				// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
-				Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
-				log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
-				mmm = [
-					errorMsg: results.errorMsg, 
-					warningMsg: results.warningMsg, 
-					mfgId: asset.manufacturer?.id, 
-					modelId: asset.model?.id,
-					deviceType: asset.assetType, 
-					refCount: 1
-				]
-				if (results.cachable)
-					mfgModelMap[mmKey] = mmm
-			}
-
-			// Now check the values against the Mfg/Model Map
-			if (mmm.warningMsg?.size()) {
-				warnings << "WARNING: $asset.assetName (row $rowNum) - ${mmm.warningMsg}"
-			}
-			if (mmm.errorMsg?.size() ) {
-				warnings << "ERROR: $asset.assetName (row $rowNum) - ${mmm.errorMsg}"
-				errorCount++
-				continue
-			} else {
-				if (asset.manufacturer?.id != mmm.mfgId)
-					asset.manufacturer = Manufacturer.get(mmm.mfgId)
-				if (asset.model?.id != mmm.modelId)
-					asset.model = Model.get(mmm.modelId)
-				asset.assetType = mmm.deviceType
-
-				log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
-			}
-
-			// 
-			// Deal with Chassis
-			//
-			if (asset.isaBlade()) {
-				if ( ! StringUtil.isBlank(sourceChassis)) {
-					appendBladeToChassis(project, asset, sourceChassis, sourceBladePosition, true, warnings, rowNum)
-				}
-				if ( ! StringUtil.isBlank(targetChassis)) {
-					appendBladeToChassis(project, asset, targetChassis, targetBladePosition, false, warnings, rowNum)
-				}
-			}
-
-			//
-			// Assign the Source/Target Location/Room/Rack properties for the asset
-			//
-			def errors
-			['source', 'target'].each { disposition ->
-				def d = locRoomRack[disposition]
-				if (d?.size()) {
-					// Check to see if they are trying to clear the fields with the NULL setting
-					if (d.values().contains(NULL_INDICATOR)) {
-						warnings << "NULL not supported for unsetting Loc/Room/Rack in $disposition (row $rowNum)"
 						return
 					}
 
-					// Need to capitalize the disposition to form the property names correctly
-					//disposition = disposition.capitalize()
+					// log.debug "Processing attribName=$attribName"
 
-					//Check that the chassis room is the same that the room defined in the spreadsheet
-					def validChassisRoom = true
-					if (asset.isaBlade()) {
-						def chassis = asset["${disposition}Chassis"]
-						if (chassis) {
-							def roomProp = ((disposition == 'source')? 'roomSource' : 'roomTarget')
-							if (chassis[roomProp]) {
-								def room = chassis[roomProp]
-								if (!room.roomName.equals(d["${disposition}Room"])) {
-									validChassisRoom = false
-									warnings << "Chassis room and device room don't match (row $rowNum)"
-								}
+					switch (attribName) {
+						case ~/sourceTeamMt|targetTeamMt|sourceTeamLog|targetTeamLog|sourceTeamSa|targetTeamSa|sourceTeamDba|targetTeamDba/:
+							// Legacy columns that are no longer used - see TM-3128
+							break
+						case 'manufacturer':
+							mfgName = it.correctedValue ?: it.importValue
+							break;
+						case 'model':
+							modelName = it.correctedValue ?: it.importValue
+							break;
+						case "assetType":
+							deviceType = it.correctedValue ?: it.importValue
+							break
+						case "usize":
+							usize = it.correctedValue ?: it.importValue
+							break
+						case "sourceChassis":
+							sourceChassis = it.correctedValue ?: it.importValue
+							// appendBladeToChassis(project, asset, it.importValue, true, warnings, rowNum)
+							break
+						case "targetChassis":
+							targetChassis = it.correctedValue ?: it.importValue
+							// appendBladeToChassis(project, asset, it.importValue, false, warnings, rowNum)
+							break
+						case 'sourceBladePosition':
+							sourceBladePosition = it.correctedValue ?: it.importValue
+							break
+						case 'targetBladePosition':
+							targetBladePosition = it.correctedValue ?: it.importValue
+							break
+
+						// case ~/^(location|room|rack)(Source|Target)\.(.+)/:
+						case ~/(source|target)(Location|Room|Rack)/:
+							// def field = Matcher.lastMatcher[0][1]
+							def disposition = Matcher.lastMatcher[0][1]
+							log.debug "*** disposition=$disposition"
+							// def child = Matcher.lastMatcher[0][3]
+
+							def val = (it.correctedValue ?: it.importValue)?.trim()
+							if (val?.size()) {
+								// Store the properties into the map to be used later
+								locRoomRack[disposition][attribName] = val
 							}
-						}
-					}
+							break
 
-					if (validChassisRoom) {
-						errors = deviceService.assignDeviceToLocationRoomRack(
-							asset, 
-							d["${disposition}Location"],
-							d["${disposition}Room"],
-							d["${disposition}Rack"],
-							(disposition == 'source') )
-					}
-					if (errors) {
-						warnings << "Unable to set $disposition Loc/Room/Rack (row $rowNum) : $errors"
+						default: 
+							// Try processing all common properties
+							assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount)
 					}
 				}
 
+				//
+				// Process the Mfg / Model / Device Type assignment by utilizing a cache of the various mfg/model names
+				//
+				mfgName = StringUtil.defaultIfEmpty(mfgName, '')
+				modelName = StringUtil.defaultIfEmpty(modelName, '')
+				deviceType = StringUtil.defaultIfEmpty(deviceType, '')
+				String mmKey = "${mfgName}::${modelName}::${deviceType}::$usize::${isNewValidate ? 'new' : 'existing'}"
+				def mfg, model
 
-			} // ['source', 'target'].each
+				Map mmm
+				if (mfgModelMap.containsKey(mmKey)) {
+					log.debug "$methodName Found cached mfgModelMap for key $mmKey, hasErrors=${mfgModelMap[mmKey].errorMsg?.size()}"
+					// We've already processed this mfg/model/type/usize/new|existing combination before so work from the cache
+					mfgModelMap[mmKey].refCount++
+					mmm = mfgModelMap[mmKey]
+				} else {
+					log.debug "$methodName Did not find asset in cache so calling assetEntityAttributeLoaderService.assignMfgAndModelToDevice()"
+					// We got a new combination so we have to do the more expensive lookup and possibly create mfg and model if user has perms
+					Map results = assetEntityAttributeLoaderService.assignMfgAndModelToDevice(userLogin, asset, mfgName, modelName, deviceType, deviceTypeMap, usize, canCreateMfgAndModel)
+					log.debug "$methodName call to assetEntityAttributeLoaderService.assignMfgAndModelToDevice() resulted in: $results"
+					mmm = [
+						errorMsg: results.errorMsg, 
+						warningMsg: results.warningMsg, 
+						mfgId: asset.manufacturer?.id, 
+						modelId: asset.model?.id,
+						deviceType: asset.assetType, 
+						refCount: 1
+					]
+					if (results.cachable)
+						mfgModelMap[mmKey] = mmm
+				}
 
-			// log.debug "$methodName asset $asset ${asset.sourceLocation}/${asset.sourceRoom}/${asset.sourceRack}"
+				// Now check the values against the Mfg/Model Map
+				if (mmm.warningMsg?.size()) {
+					warnings << "WARNING: $asset.assetName (row $rowNum) - ${mmm.warningMsg}"
+				}
+				if (mmm.errorMsg?.size() ) {
+					warnings << "ERROR: $asset.assetName (row $rowNum) - ${mmm.errorMsg}"
+					errorCount++
+					continue
+				} else {
+					if (asset.manufacturer?.id != mmm.mfgId)
+						asset.manufacturer = Manufacturer.get(mmm.mfgId)
+					if (asset.model?.id != mmm.modelId)
+						asset.model = Model.get(mmm.modelId)
+					asset.assetType = mmm.deviceType
 
-			log.debug "$methodName About to try saving isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
-			// Save the asset if it was changed or is new
-			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
-				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
+					log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
+				}
 
-			if (performance) log.debug "$methodName Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
+				// 
+				// Deal with Chassis
+				//
+				if (asset.isaBlade()) {
+					if ( ! StringUtil.isBlank(sourceChassis)) {
+						appendBladeToChassis(project, asset, sourceChassis, sourceBladePosition, true, warnings, rowNum)
+					}
+					if ( ! StringUtil.isBlank(targetChassis)) {
+						appendBladeToChassis(project, asset, targetChassis, targetBladePosition, false, warnings, rowNum)
+					}
+				}
 
-			jobProgressUpdate(progressKey, rowNum-1, assetCount)
+				//
+				// Assign the Source/Target Location/Room/Rack properties for the asset
+				//
+				def errors
+				['source', 'target'].each { disposition ->
+					def d = locRoomRack[disposition]
+					if (d?.size()) {
+						// Check to see if they are trying to clear the fields with the NULL setting
+						if (d.values().contains(NULL_INDICATOR)) {
+							warnings << "NULL not supported for unsetting Loc/Room/Rack in $disposition (row $rowNum)"
+							return
+						}
 
-			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
-				resetHibernateSession()
-				project = Project.get(projectId)
+						// Need to capitalize the disposition to form the property names correctly
+						//disposition = disposition.capitalize()
+
+						//Check that the chassis room is the same that the room defined in the spreadsheet
+						def validChassisRoom = true
+						if (asset.isaBlade()) {
+							def chassis = asset["${disposition}Chassis"]
+							if (chassis) {
+								def roomProp = ((disposition == 'source')? 'roomSource' : 'roomTarget')
+								if (chassis[roomProp]) {
+									def room = chassis[roomProp]
+									if (!room.roomName.equals(d["${disposition}Room"])) {
+										validChassisRoom = false
+										warnings << "Chassis room and device room don't match (row $rowNum)"
+									}
+								}
+							}
+						}
+
+						if (validChassisRoom) {
+							errors = deviceService.assignDeviceToLocationRoomRack(
+								asset, 
+								d["${disposition}Location"],
+								d["${disposition}Room"],
+								d["${disposition}Rack"],
+								(disposition == 'source') )
+						}
+						if (errors) {
+							warnings << "Unable to set $disposition Loc/Room/Rack (row $rowNum) : $errors"
+						}
+					}
+
+
+				} // ['source', 'target'].each
+
+				// log.debug "$methodName asset $asset ${asset.sourceLocation}/${asset.sourceRoom}/${asset.sourceRack}"
+
+				log.debug "$methodName About to try saving isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
+				// Save the asset if it was changed or is new
+				(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
+					asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
+
+				if (performance) log.debug "$methodName Updated/Adding DEVICE() took ${TimeUtil.elapsed(now)}"
+
+				jobProgressUpdate(progressKey, rowNum-1, assetCount)
+
+				if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
+					resetHibernateSession()
+					project = Project.get(projectId)
+				}
+
+				log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
+
+			} catch (Exception e) {
+				log.error("Can't process import row: " + e.getMessage(), e)
+				if (TransactionAspectSupport.currentTransactionStatus().isRollbackOnly()) {
+					throw e
+				} else {
+					warnings << "${e.getMessage()} (row $rowNum)"
+					asset.discard()
+				}
 			}
-
-			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
 		} // for
 
@@ -1514,66 +1530,62 @@ class ImportService {
 		sb.append('</ul></li>')
 	}
 
+	@Transactional(noRollbackFor=[InvalidRequestException, EmptyResultException])
 	void appendBladeToChassis(Project project, AssetEntity assetEntity, String chassisIdName, String bladePosition, boolean isSource, List warnings, int rowNum) {
-		try {
-			log.debug "appendBladeToChassis() chassisIdName=$chassisIdName, bladePosition=$bladePosition, isSource=$isSource"
-			if (!StringUtils.isBlank(chassisIdName) && assetEntity.isaBlade()) {
-				def chassisType = isSource?'source':'target'
-				if (chassisIdName.startsWith("id:")) {
-					// Parse out the  chassis id: Name
-					String chassisKey = null
-					String chassisName = null
-					// Check if there is a chassis name in the cell too
-					if (chassisIdName.indexOf(' ') > 0) {
-						chassisKey = chassisIdName.substring(0, chassisIdName.indexOf(' '))
-						chassisName = chassisIdName.substring(chassisIdName.indexOf(' ') + 1, chassisIdName.size())
-					} else {
-						chassisKey = chassisIdName
-					}
-					def chassisId = chassisKey.substring(3, chassisKey.size())
-					Long id = NumberUtil.toLong(chassisId)
-					if (id != null && id > 0) {
-						def chassis = AssetEntity.get(id)
-						if (chassis) {
-							if (chassis.project.id != project.id) {
-								securityService.reportViolation("in appendBladeToChassis - tried to access asset ($id) not associated with project (${project.id})")
-								warnings << "ERROR: No $chassisType chassis with id $chassisId found (row $rowNum)"
-							} else {
-								// Validates that the chassis name match with the chassis found
-								if (chassisName != null && (!chassisName.equals(chassis.assetName))) {
-									warnings << "WARNING: Chassis ($chassisIdName) for $chassisType does not match referenced name ($chassis.assetName) (row $rowNum)"
-								}
-								String bladeWarnings = assetEntityService.assignBladeToChassis(project, assetEntity, chassis.id.toString(), isSource, bladePosition)
-								if (bladeWarnings)
-									warnings << "WARNING: Blade $chassisName $bladeWarnings (row $rowNum)"
-							}
-						} else {
+		log.debug "appendBladeToChassis() chassisIdName=$chassisIdName, bladePosition=$bladePosition, isSource=$isSource"
+		if (!StringUtils.isBlank(chassisIdName) && assetEntity.isaBlade()) {
+			def chassisType = isSource?'source':'target'
+			if (chassisIdName.startsWith("id:")) {
+				// Parse out the  chassis id: Name
+				String chassisKey = null
+				String chassisName = null
+				// Check if there is a chassis name in the cell too
+				if (chassisIdName.indexOf(' ') > 0) {
+					chassisKey = chassisIdName.substring(0, chassisIdName.indexOf(' '))
+					chassisName = chassisIdName.substring(chassisIdName.indexOf(' ') + 1, chassisIdName.size())
+				} else {
+					chassisKey = chassisIdName
+				}
+				def chassisId = chassisKey.substring(3, chassisKey.size())
+				Long id = NumberUtil.toLong(chassisId)
+				if (id != null && id > 0) {
+					def chassis = AssetEntity.get(id)
+					if (chassis) {
+						if (chassis.project.id != project.id) {
+							securityService.reportViolation("in appendBladeToChassis - tried to access asset ($id) not associated with project (${project.id})")
 							warnings << "ERROR: No $chassisType chassis with id $chassisId found (row $rowNum)"
+						} else {
+							// Validates that the chassis name match with the chassis found
+							if (chassisName != null && (!chassisName.equals(chassis.assetName))) {
+								warnings << "WARNING: Chassis ($chassisIdName) for $chassisType does not match referenced name ($chassis.assetName) (row $rowNum)"
+							}
+							String bladeWarnings = assetEntityService.assignBladeToChassis(project, assetEntity, chassis.id.toString(), isSource, bladePosition)
+							if (bladeWarnings)
+								warnings << "WARNING: Blade $chassisName $bladeWarnings (row $rowNum)"
 						}
 					} else {
-						warnings << "ERROR: Invalid $chassisType chassis id ($chassisId) specified (row $rowNum)"
+						warnings << "ERROR: No $chassisType chassis with id $chassisId found (row $rowNum)"
 					}
 				} else {
-					// Proccess chassis name
-					def chassis = AssetEntity.findAllByAssetNameAndProject(chassisIdName, project)
-					if (chassis.size() > 0) {
-						// Check if we found more than one chassis
-						if (chassis.size() > 1) {
-							warnings << "ERROR: A non-unique blade chassis name ($chassisIdName) for $chassisType was referenced (row $rowNum)"
-						} else  {
-							def sChassis = chassis[0]
-							String bladeWarnings = assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource, bladePosition)
-							if (bladeWarnings)
-								warnings << "WARNING: Blade $chassisIdName $bladeWarnings (row $rowNum)"
-						}				
-					} else {
-						warnings << "ERROR: No $chassisType chassis found with name ($chassisIdName) (row $rowNum)"
-					}
+					warnings << "ERROR: Invalid $chassisType chassis id ($chassisId) specified (row $rowNum)"
+				}
+			} else {
+				// Proccess chassis name
+				def chassis = AssetEntity.findAllByAssetNameAndProject(chassisIdName, project)
+				if (chassis.size() > 0) {
+					// Check if we found more than one chassis
+					if (chassis.size() > 1) {
+						warnings << "ERROR: A non-unique blade chassis name ($chassisIdName) for $chassisType was referenced (row $rowNum)"
+					} else  {
+						def sChassis = chassis[0]
+						String bladeWarnings = assetEntityService.assignBladeToChassis(project, assetEntity, sChassis.id.toString(), isSource, bladePosition)
+						if (bladeWarnings)
+							warnings << "WARNING: Blade $chassisIdName $bladeWarnings (row $rowNum)"
+					}				
+				} else {
+					warnings << "ERROR: No $chassisType chassis found with name ($chassisIdName) (row $rowNum)"
 				}
 			}
-		} catch (e) {
-			log.error("Can't append blade to chasis: " + e.getMessage(), e)
-			warnings << "${e.getMessage()} (row $rowNum)"
 		}
 	}
 
