@@ -927,8 +927,10 @@ digraph runbook {
 			def role = t.role ?: 'NONE'
 			if ( t.role && ! (role in roles) )
 				roles.push(role)
-			items.push([ id:t.id, name:t.comment, startInitial:tmp['tasks'][t.id].tmpEarliestStart, endInitial:tmp['tasks'][t.id].tmpEarliestStart+t.duration,
-			predecessorIds:predecessorIds, criticalPath:tmp['tasks'][t.id].tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
+			
+			def task = tmp['tasks'][t.id]
+			items.push([ id:t.id, name:t.comment, startInitial:task.tmpEarliestStart, endInitial:task.tmpEarliestStart+t.duration,
+			predecessorIds:predecessorIds, criticalPath:task.tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
 			role:role, number:t.taskNumber])
 		}
 

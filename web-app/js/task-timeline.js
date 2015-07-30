@@ -10,9 +10,11 @@ $(document).ready(function () {
 			$('#SubmitButtonId').submit();
 	});
 	
-	// calculate the position for the filter clear button
-	$('#filterClearId').css('left', function () {
-		return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
+	$('#searchBoxId').on('keyup', handleClearFilterStatus);
+	
+	// disable the default option for the event select
+	$('#moveEventId').on('change', function () {
+		$(this).children().first().attr('disabled', 'disabled');
 	});
 	
 	generateGraph();
@@ -66,15 +68,27 @@ function buildGraph (response, status) {
 	// handle the checkbox to toggle hiding of redundant dependencies
 	var hideRedundant = $('#hideRedundantCheckBoxId').is(':checked');
 	$('#hideRedundantCheckBoxId').on('change', function (a, b) {
-		hideRedundant = a.target.checked;
-		if (hideRedundant)
-			$('.redundant').addClass('hidden');
-		else
-			$('.redundant').removeClass('hidden');
+		hideRedundant = $(this).is(':checked');
+		fullRedraw();
+	});
+	
+	// handle the checkbox to toggle highlighting of critical path tasks
+	var highlightCritical = $('#highlightCriticalPathId').is(':checked');
+	$('#highlightCriticalPathId').on('change', function (a, b) {
+		highlightCritical = $(this).is(':checked');
+		display(false, true);
+	});
+	
+	// handle the checkbox to toggle using task heights
+	var useHeights = $('#useHeightCheckBoxId').is(':checked');
+	$('#useHeightCheckBoxId').on('change', function (a, b) {
+		useHeights = $(this).is(':checked');
+		fullRedraw();
 	});
 	
 	// graph defaults
-	var miniRectHeight = 5;
+	var miniRectStroke = 1.0;
+	var miniRectHeight = 7 - miniRectStroke;
 	var mainRectHeight = 30;
 	var initialExtent = 1000000;
 	var anchorOffset = 10; // the length of the "point" at the end of task polygons
@@ -85,6 +99,9 @@ function buildGraph (response, status) {
 	var dependencies = [];
 	var siblingGroups = [];
 	var siblingGroupsReduced = [];
+	var parsedHeight = parseInt($('#mainHeightFieldId').val());
+	if (! isNaN(parsedHeight))
+		mainRectHeight = parsedHeight;
 	
 	sanitizeData(items, dependencies);
 
@@ -117,7 +134,7 @@ function buildGraph (response, status) {
 		.range([0, $(window).width() - $('div.body h1').offset().left * 2 - 10]);
 	
 	var maxStack = calculateStacks();
-	var miniHeight = ((maxStack+1)*miniRectHeight);
+	var miniHeight = ((maxStack+1)*miniRectHeight) + miniRectStroke;
 	var mainHeight = ((maxStack+1)*mainRectHeight*1.5);
 
 	var width = x.range()[1];
@@ -128,7 +145,6 @@ function buildGraph (response, status) {
 	var taskSelected = null;
 	var xPrev = 0;
 	var dragging = false;
-
 
 	// construct the SVG
 	var chart = d3.select('div.body')
@@ -143,7 +159,31 @@ function buildGraph (response, status) {
 		.append('rect')
 			.attr('width', width)
 			.attr('height', mainHeight);
-
+	
+	// construct the darkening filter for critical path highlighting
+	chart.select('defs')
+		.append('filter')
+		.attr('id', 'criticalFilterId')
+		.append('feColorMatrix')
+		.attr('type', 'matrix')
+		.attr('values', '\
+			0.7 0   0   0   0\
+			0   0.7 0   0   0\
+			0   0   0.7 0   0\
+			0   0   0   1   0');
+	
+	// construct the darkening filter for critical path highlighting
+	chart.select('defs')
+		.append('filter')
+		.attr('id', 'hoverFilterId')
+		.append('feColorMatrix')
+		.attr('type', 'matrix')
+		.attr('values', '\
+			1.2 0   0   0   0\
+			0   1.2 0   0   0\
+			0   0   1.2 0   0\
+			0   0   0   1   0');
+	
 	// construct the mini graph
 	var mini = chart.append('g')
 		.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
@@ -154,55 +194,67 @@ function buildGraph (response, status) {
 		.on('mousemove', drawMove)
 		.on('mouseup', drawEnd)
 		.on('mouseleave', drawEnd);
+		
+	var brushContainer;
 	
 	var tempBrush = null;
 	var tempBrushXInitial = 0;
-	var drawing = false;
+	var drawing = 0;
 		
+	// handle panning and time selection behavior on the mini graph
 	function drawStart () {
+		
 		tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 		
-		if (x.invert(tempBrushXInitial) > brush.extent()[1] || x.invert(tempBrushXInitial) < brush.extent()[0]) {
-			drawing = true;
-			tempBrush = mini.append('rect')
-				.attr('class', 'tempBrush')
+		if ( (d3.event.isLeftClick()) && (x.invert(tempBrushXInitial) > brush.extent()[1] || x.invert(tempBrushXInitial) < brush.extent()[0]) ) {
+			drawing = 1;
+			tempBrush = brushContainer.append('rect')
+				.attr('class', 'tempBrush hidden')
 				.attr('width', 0)
 				.attr('height', miniHeight)
 				.attr('x', d3.mouse(chart.node())[0] - margin.left)
-				.attr('y', 0);						
+				.attr('y', 0);
 		} else {
 			tempBrushXInitial = 0;
-			drawing = false;
+			drawing = 0;
 		}
 	}
 	
+	// handle panning and time selection behavior on the mini graph
 	function drawMove () {
-		if (drawing) {
+		if (drawing == 1) {
+			tempBrush.classed('hidden', false);
 			tempBrush
 				.attr( 'x', Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left) )
 				.attr( 'width', Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
 			display(false, false);
+			chart.classed('resizing', true);
 		} else {
 			if (tempBrush != null)
 				tempBrush.remove();
 			tempBrush = null;
 			tempBrushXInitial = 0;
+			chart.classed('resizing', false);
 		}
 	}
 	
+	// handle panning and time selection behavior on the mini graph
 	function drawEnd () {
-		if (drawing) {
+		if (drawing == 1) {
 			var xa = Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left);
 			var xb = Math.max(Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)), minExtentRange);
+			if (Math.abs(xa - xb) < minExtentRange)
+				xb = xa + minExtentRange;
 			brush.extent([x.invert(xa), x.invert(xa+xb)]);
 			
 			tempBrush.remove();
 			tempBrush = null;
 			tempBrushXInitial = 0;
-			drawing = false;
 			display(true, true);
 			display(false, false);
 		}
+		drawing = 0;
+		chart.classed('resizing', false);
 		display(false, false);
 	}
 	
@@ -250,6 +302,8 @@ function buildGraph (response, status) {
 			mainSelection
 				.attr( 'x', Math.min(mainSelectionXInitial, d3.mouse(chart.node())[0] - margin.left) )
 				.attr( 'width', Math.abs(mainSelectionXInitial - (d3.mouse(chart.node())[0] - margin.left)) );
+			if (dragging)
+				chart.classed('resizing', true);
 		} else {
 			var offset = -1 * x(brush.extent()[0]) - offsetInitial;
 			var minExtent = brush.extent()[0];
@@ -260,6 +314,8 @@ function buildGraph (response, status) {
 				mainTranslate += d3.event.dx;
 				display(false, false);
 //					}
+			if (dragging)
+				chart.classed('dragging', true);
 		}
 	}
 	
@@ -285,6 +341,8 @@ function buildGraph (response, status) {
 			display(false, false);
 			mainTranslate = 0;
 		}
+		chart.classed('dragging', false);
+		chart.classed('resizing', false);
 	}
 	
 	function getViewWidth () {
@@ -298,7 +356,7 @@ function buildGraph (response, status) {
 		.attr('class', 'background')
 		
 	// define the arrowhead marker used for marking dependencies
-	var arrowheadNames = ["arrowhead", "arrowheadSelected", "arrowheadRedundant", "arrowheadCyclical"];
+	var arrowheadNames = ["arrowhead", "arrowheadSelected", "arrowheadCritical", "arrowheadRedundant", "arrowheadCyclical"];
 	for (var i = 0; i < arrowheadNames.size(); ++i)
 		chart.select("defs")
 			.append("marker")
@@ -311,7 +369,19 @@ function buildGraph (response, status) {
 			.attr("orient", "auto")
 			.append("path")
 			.attr("d", "M0,-5L10,0L0,5");
-		
+	
+	// handle events from the task height text box
+	$('#mainHeightFieldId').on('change', function () {
+		var parsedHeight = parseInt($(this).val());
+		if (parsedHeight != mainRectHeight)
+			setupHeights(parsedHeight);
+	})
+	$('#mainHeightFieldId').on('keyup', function (e) {
+		var parsedHeight = parseInt($(this).val());
+		if ( (e.keyCode == 13) && (parsedHeight != mainRectHeight) )
+			setupHeights(parsedHeight);
+	})
+	
 	// construct the minutes axis for the main graph
 	var xMinuteAxis = d3.svg.axis()
 		.scale(x)
@@ -323,7 +393,7 @@ function buildGraph (response, status) {
 	// construct the minutes axis for the mini graph
 	var x1MinuteAxis = d3.svg.axis()
 		.scale(x1)
-		.orient('bottom')
+		.orient('top')
 		.ticks(d3.time.minutes, 15)
 		.tickFormat(d3.time.format('%H:%M'))
 		.tickSize(6, 0, 0);
@@ -339,18 +409,18 @@ function buildGraph (response, status) {
 	// construct the hours axis for the mini graph
 	var x1HourAxis = d3.svg.axis()
 		.scale(x1)
-		.orient('top')
+		.orient('bottom')
 		.ticks(d3.time.hours, 0.5)
 		.tickFormat(d3.time.format('%H:%M'))
 		.tickSize(6, 0, 0);
 
 	var mainMinuteAxis = main.append('g')
-		.attr('transform', 'translate(0,' + mainHeight + ')')
+		.attr('transform', 'translate(0,0.5)')
 		.attr('class', 'main axis minute')
 		.call(x1MinuteAxis);
-
+	
 	var mainHourAxis = main.append('g')
-		.attr('transform', 'translate(0,0.5)')
+		.attr('transform', 'translate(0,' + mainHeight + ')')
 		.attr('class', 'main axis hour')
 		.call(x1HourAxis)
 
@@ -363,19 +433,6 @@ function buildGraph (response, status) {
 		.attr('transform', 'translate(0,0.5)')
 		.attr('class', 'axis hour')
 		.call(xHourAxis)
-
-	// construct the line representing the current time
-	main.append('line')
-		.attr('y1', 0)
-		.attr('y2', mainHeight)
-		.attr('class', 'main todayLine')
-		
-	mini.append('line')
-		.attr('x1', x(now()) + 0.5)
-		.attr('y1', 0)
-		.attr('x2', x(now()) + 0.5)
-		.attr('y2', miniHeight)
-		.attr('class', 'todayLine');
 
 	// construct the container for the task polygons
 	var itemPolys = main.append('g')
@@ -415,7 +472,10 @@ function buildGraph (response, status) {
 	zoomScale = extentWidth / width;
 	x1.range([0, width / zoomScale]);
 
-	mini.append('g')
+	brushContainer = mini.append('g')
+		.attr('class', 'brushContainer');
+	
+	brushContainer.append('g')
 		.attr('class', 'x brush')
 		.call(brush)
 		.on("mousedown", function () {return})
@@ -426,26 +486,36 @@ function buildGraph (response, status) {
 
 	mini.selectAll('rect.background').remove();
 
+	// construct the line representing the current time
+	var mainNowLine = main.append('line')
+		.attr('y1', 0)
+		.attr('y2', mainHeight)
+		.attr('class', 'main todayLine')
+		
+	var miniNowLine = mini.append('line')
+		.attr('x1', x(now()) + 0.5)
+		.attr('y1', 0)
+		.attr('x2', x(now()) + 0.5)
+		.attr('y2', miniHeight)
+		.attr('class', 'todayLine');
+	
 	// shift the today line every 100 miliseconds
 	setInterval(function () {
-		main.select('.main.todayLine')
+		mainNowLine
 			.attr('x1', x1(now()) + 0.5)
 			.attr('x2', x1(now()) + 0.5);
-		mini.select('.todayLine')
+		miniNowLine
 			.attr('x1', x(now()) + 0.5)
 			.attr('x2', x(now()) + 0.5);
 	}, 100);
 	
+	// setup all the heights to fit to the rect height
+	setupHeights(mainRectHeight);
+	
 	$('#spinnerId').css('display', 'none');
-	$('#mainHeightFieldId').keyup(fullRedraw);
 	var offsetInitial =  -1 * x(brush.extent()[0]);
 	ready = true;
 	display(true, true);
-			
-	// calculate the position for the filter clear button
-	$('#filterClearId').css('left', function () {
-		return $('#searchBoxId').offset().left + $('#searchBoxId').outerWidth() - 20;
-	});
 	
 	/* define the global accessor functions */
 	
@@ -459,7 +529,12 @@ function buildGraph (response, status) {
 	
 	// called when the brush is dragged
 	function brushed () {
-		drawing = false;
+		var brushRange = Math.abs(brush.extent()[1] - brush.extent()[0]);
+		var minRange = Math.abs(x.invert(minExtentRange) - x.invert(0));
+		if (brushRange < minRange)
+			brush.extent([brush.extent()[0], new Date(brush.extent()[0].getTime() + minRange)]);
+			
+		drawing = -1;
 		if (d3.event.mode == "move")
 			display(false, false);
 		else
@@ -487,11 +562,12 @@ function buildGraph (response, status) {
 		itemPolys.attr('transform', 'translate(' + offset + ', 0)');
 		itemArrows.attr('transform', 'translate(' + offset + ', 0)');
 		itemLabels.attr('transform', 'translate(' + offset + ', 0)');
+		mainNowLine.attr('transform', 'translate(' + offset + ', 0)');
 		
 		// offset the axis
-		var offsetY = mainMinuteAxis[0][0].transform.baseVal.getItem(0).matrix.f;
-		mainHourAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
-		mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + offsetY + ')');
+		var offsetY = mainHourAxis[0][0].transform.baseVal.getItem(0).matrix.f;
+		mainHourAxis.attr('transform', 'translate(' + offset + ', ' + offsetY + ')');
+		mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
 		
 		if ( ! scaled )
 			return;
@@ -544,7 +620,12 @@ function buildGraph (response, status) {
 				showAssetComment(d.id, 'show');
 			})
 			.append('title')
-			.html(function(d) { return d.number + ': ' + d.name + ' - ' + d.assignedTo + ' - ' + d.status; });
+			.html(function(d) {
+				return d.number
+					+ ': ' + d.name
+					+ ' - ' + ((d.assignedTo != 'null') ? (d.assignedTo) : ('Unassigned'))
+					+ ' - ' + d.status;
+			});
 			
 		polys.exit().remove();
 		
@@ -616,7 +697,9 @@ function buildGraph (response, status) {
 			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
 		
 		// add any labels in the new domain extents
-		labels.enter().append('foreignObject')
+		labels.enter().append('g')
+			.attr('class', 'itemLabel')
+			.append('foreignObject')
 			.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
 			.attr('id', function(d) { return 'label-' + d.id; })
 			.attr('x', function(d) { return d.points.x; })
@@ -650,21 +733,36 @@ function buildGraph (response, status) {
 		itemPolys.selectAll('polygon').remove();
 		itemArrows.selectAll('line').remove();
 		itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); }).remove();
+		miniPolys.attr('points', function(d) { return getPointsMini(d); });
 		display(true, true);
+	}
+	
+	// setup all the heights to fit to the rect height
+	function setupHeights (newRectHeight) {
+		mainRectHeight = isNaN(newRectHeight) ? mainRectHeight : newRectHeight;
+		mainHeight = ((maxStack+1)*mainRectHeight) + margin.bottom;
+		height = mainHeight + miniHeight + margin.top + margin.bottom;
+		$('.main').height(mainHeight);
+		$('clippath rect').height(mainHeight);
+		chart.attr('height', height + margin.top + margin.bottom + 20);
+		background.attr('height', mainHeight);
+		mainHourAxis.attr('transform', 'translate(0,' + mainHeight + ')');
+		mainNowLine.attr('y2', mainHeight);
+		fullRedraw();
 	}
 	
 	// gets the css classes that apply to task @param d
 	function getClasses (d) {
-		var classString = ''
+		var classString = 'unselectable '
 			+ (d.selected ? 'selected ' : '')
 			+ (d.milestone ? 'milestone ' : '')
-			+ (d.criticalPath ? 'critical ' : '')
+			+ (d.criticalPath && highlightCritical ? 'critical ' : '')
 			+ (d.root ? 'root ' : '')
 			+ (d.redundant ? 'redundant ' : '')
 			+ (d.cyclical ? 'cyclical ' : '')
 			+ (d.end < now() ? 'past ' : 'future ')
 			+ (d.highlight ? 'highlighted ' : '')
-			+ (hideRedundant ? 'hidden ' : '')
+			+ (d.redundant && hideRedundant ? 'hidden ' : '')
 			+ (d.status);
 		if (d.status != 'Completed' && d.end < now())
 			classString += ' overdue ';
@@ -681,23 +779,27 @@ function buildGraph (response, status) {
 	// gets the points string for task polygons
 	function getPoints (d) {
 		var points = {};
+		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
-		var offset = Math.floor((Math.max(1, d.height)-1)/2);
+		var offset = Math.floor((taskHeight - 1) / 2);
 		var y = (d.stack-offset) * mainRectHeight + 0.4 * mainRectHeight + 0.5;
-		var w = x1(d.end) - x1(d.start);
-		var h = (mainRectHeight) * Math.max(1, d.height) - (mainRectHeight * 0.2);
-		var x2 = x + w - anchorOffset;
+		var w = x1(d.end) - x1(d.start) - 2;
+		var h = (mainRectHeight) * taskHeight - (mainRectHeight * 0.2);
+		var x2 = Math.max(x + anchorOffset - 2, x + w - anchorOffset);
+		if (w < anchorOffset)
+			x2 = x + w;
 		var y2 = y + (h/2);
 		return {x:x, y:y, x2:x2, y2:y2, w:w, h:h};
 	}
 	
 	// gets the points string for mini polygons
 	function getPointsMini (d) {
-		var offset = Math.floor((Math.max(1, d.height)-1)/2);
-		var xa = x(d.start);
-		var ya = (d.stack - offset) * (miniRectHeight);
-		var w = x(d.end) - x(d.start);
-		var h = (miniRectHeight) * Math.max(1, d.height);
+		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
+		var offset = Math.floor((taskHeight - 1) / 2);
+		var xa = Math.floor(x(d.start));
+		var ya = (d.stack - offset) * (miniRectHeight) + 1;
+		var w = Math.max(Math.floor(x(d.end)) - Math.floor(x(d.start)) - miniRectStroke, 1);
+		var h = (miniRectHeight) * taskHeight - miniRectStroke;
 		return xa + ',' + ya + ' '
 			 + (xa+w) + ',' + ya + ' '
 			 + (xa+w) + ',' + (ya+h) + ' '
@@ -1130,7 +1232,9 @@ function buildGraph (response, status) {
 			if (items[i].predecessorIds)
 				for (var j = 0; j < items[i].predecessorIds.length; ++j) {
 					var predecessorIndex = binarySearch(items, items[i].predecessorIds[j], 0, items.length-1)
-					var depObject = { "predecessor":items[predecessorIndex], "successor":items[i], "modifier":"hidden", "selected":false, "redundant":false, "cyclical":false };
+					var depObject = { "predecessor":items[predecessorIndex], "successor":items[i], "modifier":"hidden", "selected":false, "redundant":false, "cyclical":false, "criticalPath":false};
+					if (items[predecessorIndex].criticalPath && items[i].criticalPath)
+						depObject.criticalPath = true;
 					if (predecessorIndex != -1) {
 						depObject.root = items[predecessorIndex].root;
 						items[predecessorIndex].successors.push(depObject);
@@ -1864,7 +1968,8 @@ function buildGraph (response, status) {
 		}
 		
 		var set = [];
-		if ($('#useHeightCheckBoxId').is(':checked') && (items.size() > 0)) {
+//		if ($('#useHeightCheckBoxId').is(':checked') && (items.size() > 0)) {
+		if (items.size() > 0) {
 			getExclusiveSet(items[0], set);
 			exclusiveHeight(items[0], set);
 		}
@@ -2029,34 +2134,40 @@ function performSearch () {
 			}
 		}
 		
-		data.searchFilter = searchString;
-		if (searchString != '') {
-			$('#filterClearId').attr('class', 'ui-icon ui-icon-closethick');
-		} else {
-			$('#filterClearId').attr('class', 'disabled ui-icon ui-icon-closethick');
-		}
-		
-		_(data.items).forEach(function (task, i) {
+		if (data) {
+			data.searchFilter = searchString;
+			handleClearFilterStatus();
 			
-			var name = task.name;
-			
-			if (searchString == '') {
-				task.highlight = false;
-			} else {
-				if (isRegex && name.match(regex) != null)
-					task.highlight = true;
-				else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
-					task.highlight = true;
-				else
+			_(data.items).forEach(function (task, i) {
+				
+				var name = task.name;
+				
+				if (searchString == '') {
 					task.highlight = false;
-			}
-		});
-		forceDisplay();
+				} else {
+					if (isRegex && name.match(regex) != null)
+						task.highlight = true;
+					else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
+						task.highlight = true;
+					else
+						task.highlight = false;
+				}
+			});
+			forceDisplay();
+		}
 	}
 	return false;
 }
 
 function clearFilter () {
 	$('#searchBoxId').val('');
+	handleClearFilterStatus();
 	performSearch();
+}
+
+function handleClearFilterStatus () {
+	if ($('#searchBoxId').val() != '')
+		$('#filterClearId').removeClass('disabled');
+	else
+		$('#filterClearId').addClass('disabled');
 }

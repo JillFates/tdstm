@@ -29,24 +29,27 @@
 }
 
 polygon.miniItem {
-	stroke-width: 1;
+	stroke-width: 1.1;
 	stroke: black;
-	fill: green;
+	fill: lightgreen;
 }
 polygon.miniItem.selected {
 	fill: #00B0C0 !important;
+	stroke: #000044 !important;
 }
 
 
 polygon.miniItem.siblings.selected {
 	fill: red !important;
 }
-polygon.miniItem.egg {
-	fill: yellow !important;
-}
 
 polygon.miniItem.selectionParent {
 	fill: blue !important;
+}
+polygon.miniItem.critical {
+	fill: green;
+	stroke: orange;
+	stroke-width:1.5;
 }
 
 
@@ -55,6 +58,7 @@ polygon.mainItem {
 	stroke-width: 2;
 	fill: #FFFF00;
 	stroke: #FFFF00;
+	cursor: default;
 }
 polygon.mainItem.selected {
 	stroke: blue !important;
@@ -75,24 +79,28 @@ polygon.mainItem.Pending {
 }
 
 polygon.mainItem.overdue {
-	stroke: red;
+	stroke: darkred;
 }
 polygon.mainItem.ontime {
 	stroke: black;
 }
 polygon.mainItem.ahead {
-	stroke: green;
+	stroke: darkgreen;
 }
 
 polygon.mainItem:hover {
-	fill-opacity: 0.7 !important;
+	-webkit-filter: url(#hoverFilterId) !important;
+	filter: url(#hoverFilterId) !important;
 }
 
 polygon.mainItem.critical {
-	stroke-width: 4;
+	stroke-width: 3;
+	-webkit-filter: url(#criticalFilterId);
+	filter: url(#criticalFilterId);
+	stroke: orange;
 }
 polygon.mainItem.milestone {
-	fill-opacity: 0.75;
+	stroke-width: 1px;
 }
 
 polygon.mainItem.siblings {
@@ -137,6 +145,11 @@ path {
 
 #arrowhead path {
 	fill: darkgrey;
+	fill-opacity: 0.8;
+	stroke-opacity: 0.8;
+}
+#arrowheadCritical {
+	fill: #333333;
 	fill-opacity: 0.8;
 	stroke-opacity: 0.8;
 }
@@ -190,12 +203,14 @@ path {
 
 .background {
 	fill-opacity: 0;
+	cursor: -webkit-grab;
 }
 .itemLabel {
 	background-color: transparent !important;
 	cursor: default !important;
 	pointer-events: none !important;
 	font: 10px sans-serif !important;
+	vertical-align: middle !important;
 }
 .itemLabel.selected {
 	fill: #AA33AA;
@@ -225,7 +240,6 @@ polygon.highlighted.mainItem {
 }
 polygon.highlighted.miniItem {
 	stroke: #ff0000 !important;
-	fill: #448000 !important;
 }
 
 /* for the task search box */
@@ -238,8 +252,44 @@ span#filterClearId {
 	margin-top: 4px !important;
 	cursor: pointer !important;
 	opacity: 1 !important;
+	margin-left: -18px;
 }
 span#filterClearId.disabled {
-	opacity: 0.3 !important;
+	opacity: 0.1 !important;
 	cursor: auto !important;
+	pointer-events: none !important;
+}
+
+.chart {
+	border-top: 1px solid #008000;
+}
+
+.brushing {
+	cursor: col-resize !important;
+}
+.brushing g.brush * {
+	pointer-events: none !important;
+}
+.dragging, .dragging * {
+	cursor: -webkit-grabbing !important;
+}
+.resizing, .resizing * {
+	cursor: col-resize !important;
+}
+
+.critical * {
+	font-weight: 700 !important;
+}
+line.critical {
+	stroke: #333333;
+	marker-end: url(#arrowheadCritical);
+}
+
+.axis {
+	pointer-events: none !important;
+}
+g.itemLabel {
+	-webkit-clip-path: inset(0px -10px 0px 0px);
+	clip-path: inset(0px -10px 0px 0px);
+	clip: inset(0px -10px 0px 0px);
 }

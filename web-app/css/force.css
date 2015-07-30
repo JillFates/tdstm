@@ -639,3 +639,10 @@ div.graphPanel.openPanel {
 	-ms-user-select: none;
 	user-select: none;
 }
+
+#mapReferenceId .controlSpan {
+	margin-left: 10px;
+}
+.controlSpan input,.controlSpan select {
+	margin-left: 5px;
+}
