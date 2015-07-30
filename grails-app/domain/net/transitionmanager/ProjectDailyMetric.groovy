@@ -27,6 +27,7 @@ class ProjectDailyMetric {
 	Long totalPersons = 0
 	Long totalUserLogins = 0
 	Long activeUserLogins = 0
+	Date dateCreated
 	
     static constraints = {
 		project (nullable:false)
@@ -36,7 +37,6 @@ class ProjectDailyMetric {
 	static mapping  = {
 		table "project_daily_metric"
 		version false
-		autoTimestamp false
 		id column:'id'
 		columns {
 			planningServers column:'planning_servers'

@@ -78,6 +78,9 @@ databaseChangeLog = {
 			column(name: "active_user_logins", type: "MEDIUMINT", defaultValue: 0){
 				constraints(nullable:"true")
 			}
+			column(name: "date_created", type: "DATETIME", defaultValueComputed: "now()"){
+				constraints(nullable:"false")
+			}
 		}	
 	}
 
@@ -94,6 +97,15 @@ databaseChangeLog = {
 			((select id from permissions where permission_group = 'REPORTS' and permission_item= 'ShowProjectDailyMetrics'), 'CLIENT_ADMIN')""")
 		sql("""INSERT INTO role_permissions (permission_id, role) VALUES
 			((select id from permissions where permission_group = 'REPORTS' and permission_item= 'ShowProjectDailyMetrics'), 'CLIENT_MGR')""")
+	}
+
+	changeSet(author: "dscarpa", id: "20150719 TM-3965-3") {
+		comment('Add FKs to project activity metrics table')
+        sql("""ALTER TABLE `project_daily_metric`
+                 ADD CONSTRAINT `fk_projectDailyMetric_project` FOREIGN KEY (`project_id`)
+                    REFERENCES `project` (`project_id`)
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE""")
 	}
 
 }
