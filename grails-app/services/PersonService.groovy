@@ -55,7 +55,8 @@ class PersonService {
 		'move_event_staff':['person_id'],
 		'workflow':['updated_by'],
 		'recipe_version':['created_by_id'],
-		'task_batch':['created_by_id']
+		'task_batch':['created_by_id'],
+		'application':['shutdown_by', 'startup_by', 'testing_by']
 	]
 
 	static PERSON_DELETE_EXCEPTIONS_MAP = [
