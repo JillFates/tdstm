@@ -73,7 +73,7 @@ describe('User Menu', function() {
 
     xit('should load Mobile site after click on Use Mobile Site Link', function() {
       userMenu.selectUseMobileSite();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/clientTeams/listTasks?viewMode=mobile&tab=');
+      expect(menu.getCurrentUrl('/tdstm/clientTeams/listTasks?viewMode=mobile&tab=')).toEqual(process.env.BASE_URL+'/tdstm/clientTeams/listTasks?viewMode=mobile&tab=');
     });
 
   }); //Use Mobile site
@@ -83,7 +83,7 @@ describe('User Menu', function() {
     xit('should sign out successfully', function(){
       userMenu.open();
       userMenu.selectSignOut();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/auth/login');
+      expect(menu.getCurrentUrl('/tdstm/auth/login')).toEqual(process.env.BASE_URL+'/tdstm/auth/login');
     });
 
   });//signOut

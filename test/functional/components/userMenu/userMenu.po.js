@@ -33,7 +33,7 @@ var UserMenu = function() {
   };
   this.closeAccountDetailsModal = function () {
     browser.driver.findElement(by.css('[aria-describedby="personDialog"] [title="close"]')).click();
-  }
+  };
   this.isAccountDetailsModalOpened = function () {
     var that = this;
     return browser.wait(function(){
@@ -99,7 +99,7 @@ var UserMenu = function() {
 
   this.getUserMobileTitle = function () {
     return browser.driver.findElement(by.css('#mobtitle'));
-  }
+  };
 };
 UserMenu.prototype = {};
 
