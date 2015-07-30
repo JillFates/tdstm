@@ -38,7 +38,7 @@ describe('Database', function(){
   it('should load database List page after select Assets > Databases', function(){
     var menu = new Menu();
     menu.goToAssets('databases');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/database/list');
+    expect(menu.getCurrentUrl('/tdstm/database/list')).toEqual(process.env.BASE_URL+'/tdstm/database/list');
   });
 
   it('should have Database List as title', function(){
@@ -114,6 +114,7 @@ describe('Database', function(){
           createDBModal.saveBtn.click();
         }else{
           createDBModal.saveBtn.click();
+          browser.driver.sleep(1000);
           var alertDialog = browser.driver.switchTo().alert();
           expect(alertDialog.getText()).toEqual('Please provide a name for the asset');
           alertDialog.accept();
@@ -145,6 +146,7 @@ describe('Database', function(){
             createDBModal.saveBtn.click();
           }else{
           createDBModal.saveBtn.click();
+          browser.driver.sleep(1000);
           var alertDialog = browser.driver.switchTo().alert();
           expect(alertDialog.getText()).toEqual('Please enter numeric value for DB Size');
           alertDialog.accept();
@@ -160,6 +162,7 @@ describe('Database', function(){
             createDBModal.saveBtn.click();
           }else{
             createDBModal.saveBtn.click();
+            browser.driver.sleep(1000);
             var alertDialog = browser.driver.switchTo().alert();
             expect(alertDialog.getText()).toEqual('Please enter numeric value for DB Size');
             alertDialog.accept();        
@@ -232,6 +235,7 @@ describe('Database', function(){
           createDBModal.saveBtn.click();
         }else{
           createDBModal.saveBtn.click();
+          browser.driver.sleep(1000);
           var alertDialog = browser.driver.switchTo().alert();
           expect(alertDialog.getText()).toEqual('Please enter value for DB Format');
           alertDialog.accept();
@@ -437,9 +441,9 @@ describe('Database', function(){
         expect(createDBModal.getEnvironmentSelected()).toEqual(' Please Select');
       });
       
-      it('should have 7 elements on the list',function(){
+      it('should have 13 elements on the list',function(){
         var createDBModal = new DBCreateModal();
-        expect(createDBModal.environmentOptions.count()).toEqual(7);
+        expect(createDBModal.environmentOptions.count()).toEqual(13);
       });
 
       it('should have these options',function(){
@@ -453,6 +457,12 @@ describe('Database', function(){
           expect(list[4].getText()).toEqual('QA');
           expect(list[5].getText()).toEqual('Staging');
           expect(list[6].getText()).toEqual('UAT');
+          expect(list[7].getText()).toEqual('Test');
+          expect(list[8].getText()).toEqual('Integrated Test');
+          expect(list[9].getText()).toEqual('To be retired');
+          expect(list[10].getText()).toEqual('Unit Test');
+          expect(list[11].getText()).toEqual('Archive');
+          expect(list[12].getText()).toEqual('Retire');
         });
 
       });

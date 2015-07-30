@@ -7,7 +7,7 @@ describe('Server', function(){
   it('should load server List page after select Assets > Servers', function(){
     var menu = new Menu();
     menu.goToAssets('servers');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=server');
+    expect(menu.getCurrentUrl('/tdstm/assetEntity/list?filter=server')).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=server');
   });
 
   it('should have "Server List" as title', function(){

@@ -24,12 +24,12 @@ DependencyAnalizer.prototype.isProgressBarOpened = function() {
       return browser.executeScript('return $("#globalProgressBar").text()').then(function (valor) {
         return valor;
       });
-     }).then(function(){
+     },9000).then(function(){
       return browser.driver.findElement(by.id('globalProgressBar')).getAttribute('aria-hidden').then(function(text){
         return text==='false';
       });
      }); 
-  }).then(function(){
+  },9000).then(function(){
      return true;
   });
 };
@@ -39,18 +39,17 @@ DependencyAnalizer.prototype.isProgressBarClosed = function() {
     return browser.driver.findElement(by.id('globalProgressBar')).getAttribute('aria-hidden').then(function (text) {
       return text === 'true';
     });
-  }).then(function () {
+  },9000).then(function () {
     return true;
   });
 };
 
-
 DependencyAnalizer.prototype.isGenerationEnded = function() {
- return browser.driver.wait(function () {
+ return browser.wait(function () {
     return browser.driver.findElement(by.css('#progressStatus')).getText().then(function (text) {
       return text.indexOf('Finished') === -1;
       });
-  }).then(function () {
+  },9000).then(function () {
     return true;
   });
 };
@@ -61,7 +60,7 @@ DependencyAnalizer.prototype.isCloseButtonDisplayed = function() {
     return that.progressBarCloseBtn.getAttribute('style').then(function (valor) {
       return valor === '';
     });
-  }).then(function () {
+  },9000).then(function () {
     return true;
   });
 };

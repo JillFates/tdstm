@@ -7,7 +7,7 @@ describe('Dependency Analyzer page', function(){
   it('should go to Dependency AnalyzerPage after select Assets - Dependency Analyzer',function(){
     var menu = new Menu();
     menu.goToAssets('dependencyAnalizer');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/dependencyConsole');
+    expect(menu.getCurrentUrl('/tdstm/moveBundle/dependencyConsole')).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/dependencyConsole');
   });
 
   var depAnalizerPage = new DependencyAnalizer();
@@ -22,13 +22,13 @@ describe('Dependency Analyzer page', function(){
       
     });
 
-    it('should have Compact Control checkbox disabled as default', function() {
+    xit('should have Compact Control checkbox disabled as default', function() {
 
       expect(depAnalizerPage.controlCompactCheckbx.getAttribute('checked')).toBe(null);
 
     });
 
-    it('should have Control Compacted if you enable Compact Control checkbox', function() {
+    xit('should have Control Compacted if you enable Compact Control checkbox', function() {
       
       depAnalizerPage.controlCompactCheckbx.click();
       expect(depAnalizerPage.controlCompactCheckbx.getAttribute('checked')).toBe('true');
@@ -40,7 +40,7 @@ describe('Dependency Analyzer page', function(){
 
     });
 
-    it('should have Control Expanded if you disable Compact control checkbox', function() {
+    xit('should have Control Expanded if you disable Compact control checkbox', function() {
       depAnalizerPage.controlCompactCheckbx.click();
       expect(depAnalizerPage.controlCompactCheckbx.getAttribute('checked')).toBe(null);
       depAnalizerPage.compactClassElements.then(function (list) {

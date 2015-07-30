@@ -13,7 +13,7 @@ DatabaseList.prototype.isLoadingHidden = function () {
     return element(by.id(that.databaseLoadingId)).isDisplayed().then(function (valor) {
       return !valor;
     });
-  }).then(function () {
+  },8000).then(function () {
     return true;
   });
 };
@@ -39,7 +39,7 @@ DatabaseList.prototype.getListItems = function(expListItems,appName){
       	return false;
       }
     });
-  }).then(function () {
+  },8000).then(function () {
     return true;
   });
 };
@@ -48,7 +48,7 @@ DatabaseList.prototype.verifySearchResults = function(count,appName){
   var that = this;
   return browser.wait(function(){
     return that.getLoadingStyle()&&that.getListItems(count,appName);
-  }).then(function(){
+  },8000).then(function(){
       return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
         return list;
     });

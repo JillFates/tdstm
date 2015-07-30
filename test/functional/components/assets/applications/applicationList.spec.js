@@ -6,7 +6,7 @@ describe('Application List', function(){
   it('should load Application List page after select Assets List Apps', function(){
     var menu = new Menu();
     menu.goToAssets('applications');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/application/list');
+    expect(menu.getCurrentUrl('/tdstm/application/list')).toEqual(process.env.BASE_URL+'/tdstm/application/list');
   });
 
   it('should have as title Application List', function(){

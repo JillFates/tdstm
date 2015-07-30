@@ -1,6 +1,5 @@
 'use strict';
 var ManageBatches = function () {
-  this.get
   
 };
 ManageBatches.prototype = { };

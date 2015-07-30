@@ -7,7 +7,8 @@ describe('All Devices', function(){
   it('should load All Devices List page after select Assets > All Devicess', function(){
     var menu = new Menu();
     menu.goToAssets('allDevices');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=all');
+    var url = '/tdstm/assetEntity/list?filter=all';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
 
   it('should have "All Devices List" as title', function(){

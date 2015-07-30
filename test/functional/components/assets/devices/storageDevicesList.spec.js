@@ -7,7 +7,7 @@ describe('Storage Devices', function(){
   it('should load Storage Devices List page after select Assets > Storage Devicess', function(){
     var menu = new Menu();
     menu.goToAssets('storageDevices');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=storage');
+    expect(menu.getCurrentUrl('/tdstm/assetEntity/list?filter=storage')).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/list?filter=storage');
   });
 
   it('should have "Storage Devices List" as title', function(){

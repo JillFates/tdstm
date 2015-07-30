@@ -7,7 +7,7 @@ describe('Database List', function(){
   it('should load database List page after select Assets > Databases', function(){
     var menu = new Menu();
     menu.goToAssets('databases');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/database/list');
+    expect(menu.getCurrentUrl('/tdstm/database/list')).toEqual(process.env.BASE_URL+'/tdstm/database/list');
   });
 
   it('should have Database List as title', function(){

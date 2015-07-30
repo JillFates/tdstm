@@ -79,7 +79,7 @@ CreateAsset.prototype.isCreateModalOpened = function(){
     return that.createModal.isPresent().then(function(valor){
       return valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };
@@ -89,7 +89,7 @@ CreateAsset.prototype.isCreateModalClosed = function(){
     return that.createModal.isPresent().then(function(valor){
       return !valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };

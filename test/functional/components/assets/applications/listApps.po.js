@@ -14,7 +14,7 @@ ListApps.prototype.isLoadingHidden = function () {
     return element(by.id(that.applicationLoadingId)).isDisplayed().then(function (valor) {
       return !valor;
     });
-  }).then(function () {
+  },8000).then(function () {
     return true;
   });
 };
@@ -40,7 +40,7 @@ ListApps.prototype.getListItems = function(expListItems,appName){
       	return false;
       }
     });
-  }).then(function () {
+  },8000).then(function () {
     return true;
   });
 };
@@ -49,7 +49,7 @@ ListApps.prototype.verifySearchResults = function(count,appName){
   var that = this;
   return browser.wait(function(){
     return that.getLoadingStyle()&&that.getListItems(count,appName);
-  }).then(function(){
+  },8000).then(function(){
       return $$('[role="grid"] tbody tr.ui-widget-content').then(function(list){
         return list;
     });

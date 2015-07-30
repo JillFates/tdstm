@@ -6,7 +6,8 @@ describe('Logical Storage', function(){
   it('should load  Logical Storage List page after select Assets > Logical Storage', function(){
     var menu = new Menu();
     menu.goToAssets('logicalStorage');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/files/list');
+    var url = '/tdstm/files/list';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
 
   it('should have "Logical Storage List" as title', function(){

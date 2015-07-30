@@ -19,7 +19,7 @@ ViewAsset.prototype.isViewModalClosed = function(){
     return that.viewModal.getAttribute('style').then(function(style){
       return style.search('display: none;') !== -1;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };
@@ -29,7 +29,7 @@ ViewAsset.prototype.isViewModalOpened = function(){
     return that.viewModal.$('div.dialog').isPresent().then(function(valor){
       return valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };

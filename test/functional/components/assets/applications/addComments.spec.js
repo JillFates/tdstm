@@ -486,6 +486,7 @@ describe('Comments - Application', function(){
           commentModal.deleteCommentBtn.click();
         }else{
           commentModal.deleteCommentBtn.click();
+          browser.driver.sleep(1000);
           var alertDialog = browser.switchTo().alert();
           var message= 'Are you sure?';
           expect(alertDialog.getText()).toEqual(message);
