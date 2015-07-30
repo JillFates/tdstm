@@ -7,7 +7,8 @@ describe('Servers Conflicts',function(){
   
   it('should load Server Conflict Report page after click on Reports > Server Conflict', function(){
     menu.goToReports('serverConflicts');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/serverConflicts');
+    var url = '/tdstm/reports/serverConflicts';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
   it('should have Server Conflicts as title',function(){
     var serverConflictsPage = new Reports();
@@ -88,7 +89,8 @@ describe('Servers Conflicts',function(){
   it('should generate the report after click on generate button', function(){
     var serverConflictsPage = new Reports();
     serverConflictsPage.generateServerConflictsBtn().click();
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateServerConflicts');
+    var url = '/tdstm/reports/generateServerConflicts';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
 
   describe('generated report Web',function(){

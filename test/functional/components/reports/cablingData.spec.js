@@ -7,7 +7,8 @@ describe('Cabling Data Report',function(){
   
   it('should load Cabling Conflict Report page after click on Reports > Cabling Conflict', function(){
     menu.goToReports('cablingData');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData');
+    expect(menu.getCurrentUrl('/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData'))
+    .toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData');
   });
 
   describe('set Report Criteria and generate it', function(){

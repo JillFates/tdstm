@@ -8,7 +8,7 @@ describe('Application Migration Reports', function(){
   
   it('should load Application Migration Report page after click on Reports > Application Migration', function(){
     menu.goToReports('applicationMigrationResults');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationMigrationReport');
+    expect(menu.getCurrentUrl('/tdstm/reports/applicationMigrationReport')).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationMigrationReport');
   });
   
   it('should have Application Migration as title',function(){
@@ -76,7 +76,7 @@ describe('Application Migration Reports', function(){
     it('should click on generate report button',function(){
       var applicationMigrationPage = new Reports();
       applicationMigrationPage.generateApplicationMigrationBtn().click();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationMigration');
+      expect(menu.getCurrentUrl('/tdstm/reports/generateApplicationMigration')).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationMigration');
     });
     
     it('should get title from generated report',function(){

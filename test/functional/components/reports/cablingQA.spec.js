@@ -7,7 +7,9 @@ describe('Cabling QA Report',function(){
   
   it('should load Cabling QA Report page after click on Reports > Cabling QA', function(){
     menu.goToReports('cablingQA');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA');
+    var url = '/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA';
+    expect(menu.getCurrentUrl(url))
+    .toEqual(process.env.BASE_URL+url);
   });
 
   it('should have Cabling QA as title', function(){

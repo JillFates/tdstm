@@ -8,7 +8,8 @@ describe('Issue Report', function(){
 
   it('should load Application Migration Report page after click on Reports > Application Migration', function(){
     menu.goToReports('issueReport');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report');
+    var url = '/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
 
   it('should have Issue Report as title',function(){

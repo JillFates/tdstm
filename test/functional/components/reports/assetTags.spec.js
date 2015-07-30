@@ -6,7 +6,7 @@ describe('Asset Tags Reports Only runs on IE', function(){
  
   it('should load Asset Tags Report page after click on Reports > Asset Tags', function(){
     menu.goToReports('assetTags');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag');
+    expect(menu.getCurrentUrl('/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag')).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag');
   });
   
   it('should have Assets Tag as title',function(){

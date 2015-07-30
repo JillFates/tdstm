@@ -8,7 +8,8 @@ describe('Database Conflicts Reports', function(){
 
   it('should load Database Conflict Report page after click on Reports > Database Conflict', function(){
     menu.goToReports('databaseConflicts');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/databaseConflicts');
+    var url = '/tdstm/reports/databaseConflicts';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
   
   it('should have Application Conflicts as title',function(){
@@ -90,7 +91,8 @@ describe('Database Conflicts Reports', function(){
   it('should generate the report after click on generate button', function(){
     var databaseConflictsPage = new Reports();
     databaseConflictsPage.generateDatabaseConflictsBtn().click();
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateDatabaseConflicts');
+    var url ='/tdstm/reports/generateDatabaseConflicts';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
   
   describe('generated report web',function(){

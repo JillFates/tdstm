@@ -6,7 +6,8 @@ describe('Task Report',function(){
   
   it('should load Task Report page after click on Reports > Task Report', function(){
     menu.goToReports('taskReport');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report');
+    var url = '/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
 
   it('should have Task Report as title',function(){
@@ -95,7 +96,8 @@ describe('Task Report',function(){
     it('should generate the report after click on generate button', function(){
       var taskReportPage = new Reports();
       taskReportPage.generateTaskReport('web');
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/index');
+      var url = '/tdstm/reports/index';
+      expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
     });
   
     it('should get title from generated report',function(){

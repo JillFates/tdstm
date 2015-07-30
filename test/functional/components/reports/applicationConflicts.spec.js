@@ -7,7 +7,7 @@ describe('Application Conflicts',function(){
   
   it('should load Application Conflict Report page after click on Reports > Application Conflict', function(){
     menu.goToReports('applicationConflicts');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationConflicts');
+    expect(menu.getCurrentUrl('/tdstm/reports/applicationConflicts')).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationConflicts');
   });
   
   it('should have Application Conflicts as title',function(){
@@ -89,7 +89,7 @@ describe('Application Conflicts',function(){
     it('should generate the report after click on generate button', function(){
       var cablingConflictPage = new Reports();
       cablingConflictPage.generateApplicationConflictsBtn().click();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationConflicts');
+      expect(menu.getCurrentUrl('/tdstm/reports/generateApplicationConflicts')).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationConflicts');
     });
     
     it('should get title from generated report',function(){

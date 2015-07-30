@@ -6,7 +6,8 @@ describe('Pre-Event Checklist Reports', function(){
   
   it('should load Pre-Event Checklist Report page after click on Reports > Pre-Event Checklist', function(){
     menu.goToReports('preEventCheckList');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/preMoveCheckList');
+    var url ='/tdstm/reports/preMoveCheckList';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
   
   it('should have Pre-Event Checklist as title',function(){
@@ -42,7 +43,8 @@ describe('Pre-Event Checklist Reports', function(){
     it('should generate the report after click on generate button', function(){
       var preEventChecklistPage = new Reports();
       preEventChecklistPage.generatePreEventChecklistBtn().click();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateCheckList');
+      var url = '/tdstm/reports/generateCheckList';
+      expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
     });
   
     it('should get title from generated report',function(){

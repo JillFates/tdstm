@@ -6,7 +6,7 @@ describe('Report Summary', function(){
   
   it('should load Report Summary page after click on Reports >  Report Summary', function(){
     menu.goToReports('reportSummary');
-    expect(menu.getCurrentUrl()).toMatch(process.env.BASE_URL+'/tdstm/reports/index.projectId=\\d{4,6}');
+    expect(menu.getCurrentUrl('/tdstm/reports/index?projectId=')).toMatch(process.env.BASE_URL+'/tdstm/reports/index.projectId=\\d{4,6}');
   });
   
   it('should have 5 titles',function(){

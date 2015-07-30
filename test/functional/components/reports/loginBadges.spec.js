@@ -6,7 +6,8 @@ describe('Login Badges Reports Only runs on ie', function(){
   
   it('should load Login Badges Report page after click on Reports > Login Badges', function(){
     menu.goToReports('loginBadges');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges');
+    var url = '/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges';
+    expect(menu.getCurrentUrl(url)).toEqual(process.env.BASE_URL+url);
   });
   
   it('should have Login Badges as title',function(){

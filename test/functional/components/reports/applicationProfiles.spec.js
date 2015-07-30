@@ -10,7 +10,7 @@ describe('Application Profiles Report', function(){
   
   it('should load application Profiles page after click on Reports > Application Profiles', function(){
     menu.goToReports('applicationProfiles');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationProfiles');
+    expect(menu.getCurrentUrl('/tdstm/reports/applicationProfiles')).toEqual(process.env.BASE_URL+'/tdstm/reports/applicationProfiles');
   });
 
   describe('set Report Criteria and generate it', function(){
@@ -67,7 +67,7 @@ describe('Application Profiles Report', function(){
     it('should generate the report after click on generate button', function(){
       var appProfilesPage = new Reports();
       appProfilesPage.generateApplicationProfilesBtn().click();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
+      expect(menu.getCurrentUrl('/tdstm/reports/generateApplicationProfiles')).toEqual(process.env.BASE_URL+'/tdstm/reports/generateApplicationProfiles');
     });
 
     describe('generated report Web',function(){
