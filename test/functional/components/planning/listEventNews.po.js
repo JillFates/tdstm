@@ -23,9 +23,9 @@ ListEventNews.prototype.isCreateOpened = function() {
     return that.getCreateNewsModal().getAttribute('style').then(function (style) {
       return style.indexOf('display: block;') !==-1;
     });
-  }).then(function () {
+  },1000).then(function () {
     return true;
-  })
+  });
 };
 
 ListEventNews.prototype.isCreateModalClosed = function() {
@@ -34,9 +34,9 @@ ListEventNews.prototype.isCreateModalClosed = function() {
     return that.getCreateNewsModal().getAttribute('style').then(function (style) {
       return style.indexOf('display: none;') !==-1;
     });
-  }).then(function () {
+  },1000).then(function () {
     return true;
-  })
+  });
 };
 
 ListEventNews.prototype.getModalCancelBtn = function() {

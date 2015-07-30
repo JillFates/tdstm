@@ -9,7 +9,7 @@ describe('List Bundles', function() {
 
   it('should load list Bundles page after select Events/Bundles > List Bundles', function(){
     menu.goToPlanning('listBundles');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/list');
+    expect(menu.getCurrentUrl('/tdstm/moveBundle/list')).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/list');
   });
 
   it('should have "Bundle List" as Title',function () {
@@ -71,7 +71,7 @@ describe('List Bundles', function() {
 
     it('should select TBD bundle', function() {
       bundlePage.selectBundle(bundleId);
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/show/'+bundleId);
+      expect(menu.getCurrentUrl('/tdstm/moveBundle/show/')).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/show/'+bundleId);
         
     });
     xit('should not be able to delete it using "Delete" button', function() {
@@ -83,7 +83,7 @@ describe('List Bundles', function() {
 
     it('should go to Bundle list after click on "Bundle List" button', function() {
       bundlePage.clickBundleListBtn();
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/list');
+      expect(menu.getCurrentUrl('/tdstm/moveBundle/list')).toEqual(process.env.BASE_URL+'/tdstm/moveBundle/list');
     });
   
   });//Default bundle
@@ -92,12 +92,12 @@ describe('List Bundles', function() {
 
     it('should load create Bundle page after hitting create Bundle button',function(){
       bundlePage.clickOnCreateBundleBtn();
-      expect(bundlePage.getTitle().getText()).toEqual('Create Bundle');
+      expect(menu.getCurrentUrl('/tdstm/moveBundle/create'))
+        .toEqual(process.env.BASE_URL+'/tdstm/moveBundle/create');
     });
     
     it('should have moveBundle/create url', function(){
-      expect(menu.getCurrentUrl())
-        .toEqual(process.env.BASE_URL+'/tdstm/moveBundle/create');
+      expect(bundlePage.getTitle().getText()).toEqual('Create Bundle');
     });
 
     it('should set bundle Name', function(){

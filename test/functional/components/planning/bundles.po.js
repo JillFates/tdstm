@@ -59,7 +59,7 @@ ListBundles.prototype.getListItems = function(expListItems,appName){
         return false;
       }
     });
-  }).then(function () {
+  },1000).then(function () {
     return true;
   });
 };
@@ -68,7 +68,7 @@ ListBundles.prototype.verifySearchResults = function(count,appName){
   var that = this;
   return browser.driver.wait(function(){
     return that.getLoadingStyle()&&that.getListItems(count,appName);
-  }).then(function(){
+  },1000).then(function(){
       return browser.driver.findElements(by.css('[role="grid"] tbody tr.ui-widget-content')).then(function(list){
         return list;
     });
@@ -85,11 +85,18 @@ ListBundles.prototype.selectBundle = function(bundleId) {
   browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/show/'+bundleId+'"]')).click();
 };
 
-ListBundles.prototype.clickBundleListBtn = function(first_argument) {
+ListBundles.prototype.clickBundleListBtn = function() {
   browser.driver.findElement(by.css('a[href="/tdstm/moveBundle/list"].list')).click();
 };
 
 ListBundles.prototype.getErrors = function() {
-  return browser.driver.findElements(by.css('.errors li'));
+  return browser.driver.wait(function () {
+    return browser.driver.findElements(by.css('.errors li')).then(function (list) {
+      return list.length >0;
+    });
+    
+  },8000).then(function () {
+    return browser.driver.findElements(by.css('.errors li'));
+  });
 };
 module.exports = ListBundles;

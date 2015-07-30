@@ -1,17 +1,17 @@
 'use strict';
 var Menu = require('../menu/menu.po.js');
 var ListEventNews = require('./listEventNews.po.js');
-var News = require('../dashboards/news.po.js');
+// var News = require('../dashboards/news.po.js');
 
 describe('List Event News', function() {
 
   var menu = new Menu();
   var listEventNews = new ListEventNews();
-  var newsModal = new News();
+  // var newsModal = new News();
 
   it('should go to List Event News page', function() {
     menu.goToPlanning('listEventNews');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/newsEditor/newsEditorList');
+    expect(menu.getCurrentUrl('/tdstm/newsEditor/newsEditorList')).toEqual(process.env.BASE_URL+'/tdstm/newsEditor/newsEditorList');
   });
 
   xit('should have "Display News and Issues" as title',function () {
