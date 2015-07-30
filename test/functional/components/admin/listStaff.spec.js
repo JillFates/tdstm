@@ -6,7 +6,7 @@ describe('List Staff page', function(){
   it('should go to List Staff page after select Admin - List Staff', function(){
     var menu = new Menu();
     menu.goToAdmin('listStaff');
-    expect(menu.getCurrentUrl()).toMatch(process.env.BASE_URL+'/tdstm/person/list(/\\d{4,6}|)');
+    expect(menu.getCurrentUrl('/tdstm/person/list')).toMatch(process.env.BASE_URL+'/tdstm/person/list(/\\d{4,6}|)');
   });
 
   it('should have list Staff as title',function(){

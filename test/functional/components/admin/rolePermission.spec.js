@@ -6,7 +6,7 @@ describe('Role Permissions page', function(){
   it('should load Role Permissions page after select Admin - Role Permissions', function(){
     var menu = new Menu();
     menu.goToAdmin('rolePermissions');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/permissions/show');
+    expect(menu.getCurrentUrl('/tdstm/permissions/show')).toEqual(process.env.BASE_URL+'/tdstm/permissions/show');
   });
 
   it('should have "Role Permissions" as title', function() {

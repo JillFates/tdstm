@@ -7,7 +7,7 @@ describe('Admin Portal page', function(){
   it('should go to Admin Portal page after select Admin - Admin Portal',function(){
     var menu = new Menu();
     menu.goToAdmin('adminPortal');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/auth/home');
+    expect(menu.getCurrentUrl('/tdstm/auth/home')).toEqual(process.env.BASE_URL+'/tdstm/auth/home');
   });
 
   it('should have "Recent Users" Title', function(){

@@ -13,7 +13,7 @@ describe('Merge Staff', function(){
   it('should go to List Staff page after select Admin - List Staff', function(){
     var menu = new Menu();  
     menu.goToAdmin('listStaff');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/person/list');
+    expect(menu.getCurrentUrl('/tdstm/person/list')).toEqual(process.env.BASE_URL+'/tdstm/person/list');
   });
 
   it('should have list Staff as title',function(){
