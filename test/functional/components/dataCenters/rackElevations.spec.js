@@ -5,7 +5,7 @@ describe('Racks page', function(){
   it('should go to Racks View after select Data Centers - Racks',function(){
     var menu = new Menu();
     menu.goToDataCentars('rackElevations');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/rackLayouts/create');
+    expect(menu.getCurrentUrl('/tdstm/rackLayouts/create')).toEqual(process.env.BASE_URL+'/tdstm/rackLayouts/create');
   });
 
   it('should have "Rack View" Title', function(){

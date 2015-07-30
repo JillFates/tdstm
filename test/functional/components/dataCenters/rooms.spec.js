@@ -5,7 +5,7 @@ describe('Rooms page', function(){
   it('should go to Rooms View after select Data Centers - List Rooms',function(){
     var menu = new Menu();
     menu.goToDataCentars('listRooms');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/room/list?viewType=list');
+    expect(menu.getCurrentUrl('/tdstm/room/list?viewType=list')).toEqual(process.env.BASE_URL+'/tdstm/room/list?viewType=list');
   });
 
   it('should have "Room List" Title', function(){
