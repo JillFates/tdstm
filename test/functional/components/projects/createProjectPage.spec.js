@@ -6,11 +6,11 @@ describe('Create Project Page Validations', function() {
   var menu = new Menu();
   var listProjectPage =  new ListProjects();
   var projectPage = new Project();
-  var projId;
+  // var projId;
 
   it('should load Active list projects page after select Projects > List Projects', function(){
     menu.goToProjects('listProjects');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
+    expect(menu.getCurrentUrl('/tdstm/project/list?active=active')).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
   });
 
   it('should have Project List - Active Projects as title', function () {
@@ -19,6 +19,11 @@ describe('Create Project Page Validations', function() {
 
   it('should load create project page after hitting create project button',function(){
     listProjectPage.clickOnCreateProjectBtn();
+    expect(menu.getCurrentUrl('/tdstm/project/create')).toEqual(process.env.BASE_URL+'/tdstm/project/create');
+
+  });
+
+  it('should have "Create Project" as title', function() {
     expect(projectPage.getTitle().getText()).toEqual('Create Project');
   });
 

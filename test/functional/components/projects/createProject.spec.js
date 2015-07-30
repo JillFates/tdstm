@@ -12,6 +12,11 @@ describe('Create Project', function(){
     
     it('should load list projects page after select Project > List Projects', function(){
       menu.goToProjects('listProjects');
+      expect(menu.waitForURL('/tdstm/project/list?active=active')).toBe(true);
+    });
+
+    it('should have "Project List - Active Projects" as title',function  () {
+
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
     
@@ -40,22 +45,18 @@ describe('Create Project', function(){
       it('should delete the project if exists', function(){
         if(exist){
           listProjectPage.selectProjectfromListByPos(1,'TP01');
-          expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
-          if(process.env.BROWSER_NAME === 'phantomjs'){
-            browser.driver.executeScript('$(\'input[value="Delete"]\').attr("onclick","").click("true")');
-            projectPage.deleteCurrentProject();
-          }else{
-            projectPage.deleteCurrentProject();
-            var alertDialog = browser.driver.switchTo().alert();
-            var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
-            expect(alertDialog.getText()).toEqual(message);
-            alertDialog.accept();
-          }
+          expect(menu.waitForURL('/tdstm/project/show/'+projId)).toBe(true);
+          projectPage.deleteCurrentProject();
+          browser.driver.sleep(1000);
+          var alertDialog = browser.driver.switchTo().alert();
+          var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
+          expect(alertDialog.getText()).toEqual(message);
+          alertDialog.accept();
           browser.driver.wait(function() {
             return menu.getCurrentUrl().then(function(url){
               return url === process.env.BASE_URL+'/tdstm/project/list';
             });
-          }).then(function(){
+          },8000).then(function(){
             expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list');
           });
         }
@@ -65,7 +66,13 @@ describe('Create Project', function(){
 
     it('should load create project page after hitting create project button',function(){
       listProjectPage.clickOnCreateProjectBtn();
+      expect(menu.waitForURL('/tdstm/project/create')).toBe(true);
+
+    });
+
+    it('should have "Create Project" as title', function() {
       expect(projectPage.getTitle().getText()).toEqual('Create Project');
+
     });
 
     it('should have project/create url', function(){
@@ -139,12 +146,6 @@ describe('Create Project', function(){
         .getText()).toEqual('Completion Date: *');
     });
 
-    //   xit('validate default completion date', function(){
-    // // which is the logic of this field?
-    //    var selectop = browser.driver.findElement(by.css(project.cpcompletionDatefieldCss));
-    //     expect(selectop.getAttribute('value')).toEqual('08/24/2014');
-    //   });
-
     xit('should set Completion Date ', function(){
       projectPage.setCompletionDate('12/30/2014');
       expect(projectPage.getCompletionDate().getAttribute('value')).toEqual('12/30/2014');
@@ -166,8 +167,7 @@ describe('Create Project', function(){
 
     it('should save created project and go to project/show',function(){
       projectPage.save();
-      expect(menu.getCurrentUrl())
-        .toEqual(process.env.BASE_URL+'/tdstm/project/show');
+      expect(menu.waitForURL('/tdstm/project/show')).toBe(true);
     }); 
 
     it('should be displayed created project confirmation message', function(){

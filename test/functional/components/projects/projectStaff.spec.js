@@ -12,7 +12,7 @@ describe('Project Staff Page', function() {
 
   it('should get to Project Staff Page after select Projects > Project Staff on the menu', function () {
     menu.goToProjects('projectStaff');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/person/manageProjectStaff');
+    expect(menu.getCurrentUrl('/tdstm/person/manageProjectStaff')).toEqual(process.env.BASE_URL+'/tdstm/person/manageProjectStaff');
   });
 
   it('should have Project Staff as title', function () {
@@ -123,23 +123,23 @@ describe('Project Staff Page', function() {
     });
 
     it('should have x options listed', function() {
-      expect(projStaff.projectOptions.count()).toEqual(12);
+      expect(projStaff.projectOptions.count()).toEqual(8);
     });
 
     it('should have the following options', function() {
       projStaff.projectOptions.then(function (list) {
         expect(list[0].getText()).toEqual('All');
-        expect(list[1].getText()).toMatch('\\s*AFC\\s*');
-        expect(list[2].getText()).toMatch('\\s*Bemis Corp Prod\\s*');
-        expect(list[3].getText()).toMatch('\\s*BJs\\s*');
-        expect(list[4].getText()).toMatch('\\s*CLSA\\s*');
-        expect(list[5].getText()).toMatch('\\s*ExchangeMove2\\s*');
-        expect(list[6].getText()).toMatch('\\s*HBGUSA Exchange Migration\\s*');
-        expect(list[7].getText()).toMatch('\\s*HealthcoreNoAssets\\s*');
-        expect(list[8].getText()).toMatch('\\s*MarketingDemo\\s*');
-        expect(list[9].getText()).toMatch('\\s*Maxion Data Centers\\s*');
-        expect(list[10].getText()).toMatch('\\s*Travelers\\s*');
-        expect(list[11].getText()).toMatch('\\s*West\\s*');
+        // expect(list[1].getText()).toMatch('\\s*AFC\\s*');
+        expect(list[1].getText()).toMatch('\\s*Bemis Corp Prod\\s*');
+        // expect(list[3].getText()).toMatch('\\s*BJs\\s*');
+        // expect(list[4].getText()).toMatch('\\s*CLSA\\s*');
+        expect(list[2].getText()).toMatch('\\s*ExchangeMove2\\s*');
+        expect(list[3].getText()).toMatch('\\s*HBGUSA Exchange Migration\\s*');
+        expect(list[4].getText()).toMatch('\\s*HealthcoreNoAssets\\s*');
+        expect(list[5].getText()).toMatch('\\s*MarketingDemo\\s*');
+        expect(list[6].getText()).toMatch('\\s*Maxion Data Centers\\s*');
+        // expect(list[7].getText()).toMatch('\\s*Travelers\\s*');
+        expect(list[7].getText()).toMatch('\\s*West\\s*');
       });
     });
 
@@ -192,7 +192,7 @@ describe('Project Staff Page', function() {
       projStaff.tableHeads.get(1).click();
       // browser.sleep(8000);
       projStaff.getTableCompanyList().then(function (list) {
-        var origList = list;
+        // var origList = list;
         var sortList = list.slice(0);
         for(var i=0;i <sortList.length;i++){
           list[i]=list[i].toLowerCase();

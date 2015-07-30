@@ -8,6 +8,11 @@ describe('Field Settings', function() {
 	
 	it('should load field settings page after clicking Client/Project Field Settings', function() {
 		menu.goToProjects('fieldSettings');
+    expect(menu.getCurrentUrl('/tdstm/project/fieldImportance')).toEqual(process.env.BASE_URL+'/tdstm/project/fieldImportance');
+
+	});
+
+	it('sould have "Project Field Settings" as title', function() {
 		expect(fieldSettingsPage.getTitle().getText()).toEqual('Project Field Settings');
 	});
 	

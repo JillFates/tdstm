@@ -42,7 +42,7 @@ ListProjects.prototype.verifySearchResults = function(count) {
     return  browser.driver.findElements(by.css(that.projectsLinkListCss)).then(function(list){
       return list.length >=0 && list.length <=count;
     });
-  }).then(function(){
+  },8000).then(function(){
     browser.driver.findElements(by.css(that.projetsOnListCss)).then(function(list){
       d.fulfill(list);
     });

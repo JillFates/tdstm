@@ -8,7 +8,7 @@ describe('List Projects', function(){
 
   it('should load Active list projects page after select Projects > List Projects', function(){
     menu.goToProjects('listProjects');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
+    expect(menu.getCurrentUrl('/tdstm/project/list?active=active')).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
   });
 
   it('should have Project List - Active Projects as title', function () {
@@ -40,7 +40,7 @@ describe('List Projects', function(){
     });
 
     it('should be redirect to project/show/project+id', function(){
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
+      expect(menu.getCurrentUrl('/tdstm/project/show/')).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
     });
 
   }); // search by code and select it
@@ -48,6 +48,10 @@ describe('List Projects', function(){
   
   it('should load list projects page after select Client/Project ListProjects', function(){
     menu.goToProjects('listProjects');
+    expect(menu.getCurrentUrl('/tdstm/project/list?active=active')).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
+  });
+
+  it('should have Project List - Active Projects as title', function () {
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
   });
 
@@ -147,6 +151,12 @@ describe('List Projects', function(){
   it('should go to the completed projects section', function(){
     browser.sleep(1000);
     browser.driver.findElement(by.css('a[href="/tdstm/project/list?active=completed"]')).click();
+    expect(menu.getCurrentUrl('/tdstm/project/list?active=completed')).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=completed');
+
+
+  });
+
+  it('should have "Project List - Completed Projects" as title',function () {
     expect(listProjectPage.getTitle().getText()).toEqual('Project List - Completed Projects');
   });
 

@@ -8,10 +8,15 @@ describe('Delete a project', function(){
   var projectPage = new Project();
   var projId;
 
-  it('should load list projects page after select Client/Project ListProjects', function(){
-    menu.goToProjects('listProjects');
-    expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
-  });
+    it('should load list projects page after select Project > List Projects', function(){
+      menu.goToProjects('listProjects');
+      expect(menu.waitForURL('/tdstm/project/list?active=active')).toBe(true);
+    });
+
+    it('should have "Project List - Active Projects" as title',function  () {
+
+      expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
+    });
 
   it('should find the project to delete', function(){
     listProjectPage.setSearchProjectCode('TP01');
@@ -33,7 +38,7 @@ describe('Delete a project', function(){
   });
 
   it('should be redirect to project/show/project+id', function(){
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
+    expect(menu.getCurrentUrl('/tdstm/project/show/')).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
   });
 
   it('should delete the project after clicking on delete button', function(){
@@ -42,6 +47,7 @@ describe('Delete a project', function(){
       projectPage.deleteCurrentProject();
     }else{
       projectPage.deleteCurrentProject();
+      browser.driver.sleep(1000);
       var alertDialog = browser.driver.switchTo().alert();
       var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
       expect(alertDialog.getText()).toEqual(message);
@@ -54,7 +60,7 @@ describe('Delete a project', function(){
       return menu.getCurrentUrl().then(function(url){
         return url === process.env.BASE_URL+'/tdstm/project/list';
       });
-    }).then(function(){
+    },8000).then(function(){
       expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list');
     });
   });
