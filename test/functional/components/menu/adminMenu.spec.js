@@ -10,9 +10,9 @@ describe('Admin Menu', function(){
 
     describe('submenu',function(){
 
-      it('should displayed 15 links', function(){
+      it('should displayed 16 links', function(){
           menu.getAdminSubmenu().then(function(list){
-            expect(list.length).toEqual(15);
+            expect(list.length).toEqual(16);
           });
       });
       

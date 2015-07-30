@@ -2,18 +2,28 @@
 var Menu = function(){
 //Main Menu
   this.titleCss =  '.title';
-  this.getCurrentUrl = function(){
-    return browser.driver.getCurrentUrl();
+  this.getCurrentUrl = function(expUrl){
+
+    if(expUrl){
+     return browser.driver.wait(function () {
+      return browser.driver.getCurrentUrl().then(function (url) {
+        return url.indexOf(expUrl) !== -1;
+      });
+      },8000).then(function () {
+        return browser.driver.getCurrentUrl();
+      });
+    }else{
+      return browser.driver.getCurrentUrl();
+    }
   };
   
   this.waitForURL = function (expUrl) {
-    return browser.wait(function () {
+    return browser.driver.wait(function () {
       return browser.driver.getCurrentUrl().then(function (url) {
-        console.log('expurl', expUrl);
-        console.log('url',url);
-        return expUrl === url;
+
+        return process.env.BASE_URL+expUrl === url;
       });
-    }).then(function () {
+    },8000).then(function () {
       return true;
     });
   };

@@ -13,7 +13,7 @@ describe('Reports Menu', function(){
         menu.getReports().click();
         expect(menu.getReportsMegaMenu().getAttribute('class')).toEqual('megamenu reports active');
       });
-      it('should displayed 21 links', function(){
+      it('should displayed 20 links', function(){
         menu.getReportsSubmenu().then(function(list){
           expect(list.length).toEqual(20);
         });
@@ -68,9 +68,6 @@ describe('Reports Menu', function(){
       });
       it('should have Issue Report in the submenu', function(){
         expect(menu.getIssueReport().getText()).toEqual('Issue Report');
-      });
-      it('should have Event Results in the submenu', function(){
-        expect(menu.getEventResults().getText()).toEqual('Event Results');
       });
       it('should have Cabling QA in the submenu', function(){
         expect(menu.getCablingQA().getText()).toEqual('Cabling QA');
