@@ -9,7 +9,7 @@ module.exports = {
   test2:[
     '../components/assets/devices/createServer.spec.js',
     '../components/assets/databases/createDatabase.spec.js',
-    '../components/projects/deleteProject.spec.js'
+    '../components/projects/deleteProject.spec.js'   
   ],
   projects:[
     '../components/projects/listProjects.spec.js',
@@ -78,7 +78,6 @@ module.exports = {
     '../components/reports/transportWorksheets.spec.js',
     '../components/reports/applicationMigration.spec.js',
     '../components/reports/issueReport.spec.js',
-    '../components/reports/eventResults.spec.js',
     '../components/reports/cablingQA.spec.js'
     ],
     assets:[
@@ -89,7 +88,7 @@ module.exports = {
     '../components/assets/devices/storageDevicesList.spec.js',
     '../components/assets/storage/storageList.spec.js',
     '../components/assets/devices/devices.spec.js',
-    '../components/assets/dependencyAnalyzer.spec.js',
+    '../components/assets/dependencyAnalyzer.spec.js'
     ],
     importExport:[     // Phantomjd does not support file download yet 
     '../components/assets/importExport/impExp-devices-bladeChassis.spec.js',
