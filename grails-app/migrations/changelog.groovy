@@ -90,4 +90,5 @@ databaseChangeLog = {
 	include file: '20150610-task-role-defaulted-to-blank.groovy'
 	include file: '20150710-poject-activity-metrics-table.groovy'
 	include file: '20150721-remove-old-refresh-preferences.groovy'
+	include file: '20150731-add-additional-teams-to-role-type.groovy'
 }
