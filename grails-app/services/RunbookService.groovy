@@ -522,10 +522,10 @@ class RunbookService {
 	 * @param AssetComment task to find edge for
 	 * @param Map - The resulting graphs data from determineUniqueGraphs() method
 	 * @param tmp a data structure containing temporary data related to tasks and dependencies
-	 * @return The edge(aka TaskDependency) that would be the critical path for the task
+	 * @return A list of edges(aka TaskDependency) that would be the critical path for the task
 	 */
-	private TaskDependency findCriticalPath(task, edges, tmp) {
-		def edge
+	ArrayList<AssetComment> findCriticalPath(task, edges, tmp) {
+		def edgeList = []
 		def id = task.id.toString()
 
 		if (edges.containsKey(id)) {
@@ -537,23 +537,18 @@ class RunbookService {
 				if ( ! tmp['dependencies'][e.id].tmpIgnore ) {
 				
 					if (tmp['dependencies'][e.id].tmpPathDuration > maxDur) {
-						edge = e
+						edgeList = [e]
 						maxDur = tmp['dependencies'][e.id].tmpPathDuration
 						maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
-					} else if ( tmp['dependencies'][e.id].tmpPathDuration > maxDur ) {
-						def taskCount = maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
-						if (taskCount > maxTasks) {
-							edge = e
-							maxDur = tmp['dependencies'][e.id].tmpPathDuration
-							maxTasks = taskCount
-						}
+					} else if ( tmp['dependencies'][e.id].tmpPathDuration == maxDur ) {
+						edgeList.push(e)
 					}
 				}
-			} 
+			}
 		}
-		return edge
+		return edgeList
 	}
-
+	
 	/**
 	 * Used to compute the earliest and latest starts of a set of tasks in a directed graph
 	 * @param Integer the start time as an integer
@@ -565,7 +560,7 @@ class RunbookService {
 	 * @param tmp a data structure containing temporary data related to tasks and dependencies
 	 * @return ?
 	 */
-	def computeStartTimes(startTime, tasks, dependencies, starts, sinks, graphs, tmp) {	
+	def computeStartTimes(startTime, tasks, dependencies, starts, sinks, graphs, tmp) {
 
 		// 
 		// Initialization
@@ -617,28 +612,37 @@ class RunbookService {
 			// Determine Critical Path
 			// Perform a DFS process through the graph to determine the earliest starts on the initial critical path
 			//
-			def safety = 500
-			while (true) {
+			def safety = 1000
+			def criticalPathQueue = [[task:task, time:time]]
+			while (criticalPathQueue.size() > 0) {
 				if (--safety == 0) {
-					throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task ${task.taskNumber})")
+					throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task ${newTask.taskNumber})")
 				}
-				tmp['tasks'][task.id].tmpEstimatedStart = time
-				tmp['tasks'][task.id].tmpEarliestStart = time
-				tmp['tasks'][task.id].tmpLatestStart = time
-				tmp['tasks'][task.id].tmpCriticalPath = true
-				time += task.durationRemaining()
-				log.debug "computeStartTimes() DFS/CP task id=${task.id}, dur=${task.duration}. time=$time"
-
-				def edge = findCriticalPath(task, edgesByPred, tmp)
-				if (edge == null) {
-					// We presently on the sink vertex
-					break
-				} else {
-					task = edge.successor
-					if (tmp['tasks'][task.id].tmpBeenExplored) {
-						throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task: ${task.taskNumber}, edge: $edge)")
+				def queueEntry = criticalPathQueue.pop()
+				def newTime = queueEntry.time
+				def newTask = queueEntry.task
+				def newId = (long)(newTask.id)
+				tmp['tasks'][newId].tmpEstimatedStart = newTime
+				tmp['tasks'][newId].tmpEarliestStart = newTime
+				tmp['tasks'][newId].tmpLatestStart = newTime
+				tmp['tasks'][newId].tmpCriticalPath = true
+				newTime += newTask.durationRemaining()
+				time = newTime
+				log.debug "computeStartTimes() DFS/CP task id=${newTask.id}, dur=${newTask.duration}. time=$newTime"
+				
+				def edgeList = findCriticalPath(newTask, edgesByPred, tmp)
+				if (edgeList != null && edgeList.size() != 0) {
+					edgeList.each {
+						def nextTask = it.successor
+						def nextId = (long)(nextTask.id)
+						
+						if (tmp['tasks'][nextId]) {
+							if (! tmp['tasks'][nextId].tmpBeenExplored) {
+								tmp['tasks'][nextId].tmpBeenExplored = true
+								criticalPathQueue.push([task:nextTask, time:time])
+							}
+						}
 					}
-					tmp['tasks'][task.id].tmpBeenExplored = true
 				}
 			}
 
@@ -703,7 +707,7 @@ class RunbookService {
 								predTaskInfo.tmpBeenExplored = true
 							} else {
 								// Been here before so we need to compare the latest starts to set to the ealiest start of the two
-								if ( calcLatestStart < tmp['tasks'][edge.predecessor.id].tmpLatestStart ) 
+								if ( calcLatestStart < tmp['tasks'][edge.predecessor.id].tmpLatestStart )
 									tmp['tasks'][edge.predecessor.id].tmpLatestStart = calcLatestStart
 							}
 						}
@@ -761,8 +765,6 @@ class RunbookService {
 					log.debug "computeStartTimes() hit sink vertex $taskId"
 				}
 			}
-
-
 		} // for (int g=0; g < graphs.size(); g++)
 
 		return estFinish
