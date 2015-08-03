@@ -2075,22 +2075,22 @@ function shufflePerson(sFrom,sTo){
 $(document).ready(function() {
 	$(window).keydown(function(event){
 		if(event.keyCode == 13) {
-            if (event.srcElement.type == "textarea") {
-                return;
-            }
+			if (event.srcElement && event.srcElement.type == "textarea") {
+			    return;
+			}
 			event.preventDefault();
 			var activeSup = $('[id^=depComment_support_]:visible')
 			var activeDep = $('[id^=depComment_dependent_]:visible')
 			// NOTE : Order of the condition is MOST important as different div's open on another div
-			if(activeSup.find(".save").length > 0){
+			if (activeSup.find(".save").length > 0) {
 				activeSup.find(".save").click()
 				$('.ui-dialog').focus()
-			} else if(activeDep.find(".save").length > 0){
+			} else if (activeDep.find(".save").length > 0) {
 				activeDep.find(".save").click()
 				$('.ui-dialog').focus()
-			} else if($("#updateCloseId").length > 0){
+			} else if ($("#updateCloseId").length > 0) {
 				$("#updateCloseId").click();
-			} else if($("#updatedId").length > 0) {
+			} else if ($("#updatedId").length > 0) {
 				$("#updatedId").click();
 			}
 		
