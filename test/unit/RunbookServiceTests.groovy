@@ -378,8 +378,8 @@ class RunbookServiceTests extends Specification {
 		def edgesByPred = deps.asGroup { it.predecessor.id }
 
 		when:
-			def edge = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
-
+			def edges = runbookService.findCriticalPath(tasks[6], edgesByPred, tmp)
+			def edge = edges[0]
 		then:
 			edge != null //Edge should not be null
 			108 == edge.id //Critical edge should be
@@ -387,13 +387,15 @@ class RunbookServiceTests extends Specification {
 			assertEquals "Critical edge should be", 108, edge.id
 
 		when:
-			edge = runbookService.findCriticalPath(tasks[5], edgesByPred, tmp)
+			edges = runbookService.findCriticalPath(tasks[5], edgesByPred, tmp)
+			edge = edges[0]
 		then:
 			assertTrue 'Unrack - Edge should not be null', edge != null
 			assertEquals "Critical edge should be", 109, edge.id
 
 		when:
-			edge = runbookService.findCriticalPath(tasks[8], edgesByPred, tmp)
+			edges = runbookService.findCriticalPath(tasks[8], edgesByPred, tmp)
+			edge = edges[0]
 		then:
 			assertTrue 'Coffee - Edge should not be null', edge == null
 	}
