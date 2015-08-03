@@ -30,8 +30,21 @@ grails.config.locations = []
 // Load properties file that is passed in as an Java Startup argument
 def appConfigLocation = System.properties["${appName}.config.location"]
 if (appConfigLocation) {
-	File f = new File(appConfigLocation)
+	File f
+	try {
+		f = new File(appConfigLocation)
+	} catch (e) {
+		throw new RuntimeException("Unable to read the $appConfigLocation application configuration file")
+	}
+
 	if ( f.exists() ) {
+		try {
+			// Test that there are no errors in the config syntax
+			def config = new ConfigSlurper().parse(f.toURL())
+		} catch {
+			throw new RuntimeException("There appears to be an error in the $appConfigLocation application configuration file")
+		}
+
 		grails.config.locations << "file:${appConfigLocation}"
 	} else {
 		// For whatever reason log.error if bombing here...
@@ -40,19 +53,21 @@ if (appConfigLocation) {
 }
 
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
-grails.mime.types = [ html: ['text/html','application/xhtml+xml'],
-                      xml: ['text/xml', 'application/xml'],
-                      text: 'text-plain',
-                      js: 'text/javascript',
-                      rss: 'application/rss+xml',
-                      atom: 'application/atom+xml',
-                      css: 'text/css',
-                      csv: 'text/csv',
-                      all: '*/*',
-                      json: ['application/json','text/json'],
-                      form: 'application/x-www-form-urlencoded',
-                      multipartForm: 'multipart/form-data'
-                    ]
+grails.mime.types = [ 
+	html: ['text/html','application/xhtml+xml'],
+	xml: ['text/xml', 'application/xml'],
+	text: 'text-plain',
+	js: 'text/javascript',
+	rss: 'application/rss+xml',
+	atom: 'application/atom+xml',
+	css: 'text/css',
+	csv: 'text/csv',
+	all: '*/*',
+	json: ['application/json','text/json'],
+	form: 'application/x-www-form-urlencoded',
+	multipartForm: 'multipart/form-data'
+]
+
 // The default codec used to encode data with ${}
 grails.views.default.codec="none" // none, html, base64
 grails.views.gsp.encoding="UTF-8"
