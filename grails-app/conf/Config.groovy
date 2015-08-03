@@ -41,8 +41,8 @@ if (appConfigLocation) {
 		try {
 			// Test that there are no errors in the config syntax
 			def config = new ConfigSlurper().parse(f.toURL())
-		} catch {
-			throw new RuntimeException("There appears to be an error in the $appConfigLocation application configuration file")
+		} catch (e) {
+			throw new RuntimeException("There appears to be an error in the $appConfigLocation application configuration file. Error: ${e.getMessage()}")
 		}
 
 		grails.config.locations << "file:${appConfigLocation}"
