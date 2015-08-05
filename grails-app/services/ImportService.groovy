@@ -1289,7 +1289,7 @@ class ImportService {
 
 				// If trying to set to NULL - call the closure to update the property and move on
 				if (it.importValue == "NULL") {
-					assetEntityAttributeLoaderService.attribNameOrBlank(asset, attribName, it.importValue, nullProps, blankProps)
+					assetEntityAttributeLoaderService.setToNullOrBlank(asset, attribName, it.importValue, nullProps, blankProps)
 					return
 				}
 
