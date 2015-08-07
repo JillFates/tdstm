@@ -9,13 +9,18 @@ class DependencyAnalyzerTest extends Simulation {
 	
 	var startingURL = "http://localhost:8080"
 	var numUsers = 1
-	if(System.getProperty("startingURL") != null)
+	var rampTime = 0
+	if(!(sys.env.get("startingURL").isEmpty))
 	{
-		startingURL = System.getProperty("startingURL")
+		startingURL = sys.env.get("startingURL").get
 	}
-	if(System.getProperty("numUsers") != null)
+	if(!(sys.env.get("numUsers").isEmpty))
 	{
-		numUsers = Integer.getInteger("numUsers", 1)
+		numUsers = sys.env.get("numUsers").get.toInt
+	}
+	if(!(sys.env.get("rampTime").isEmpty))
+	{
+		rampTime = sys.env.get("rampTime").get.toInt
 	}
 	
 	val httpProtocol = http
@@ -66,8 +71,8 @@ class DependencyAnalyzerTest extends Simulation {
 			.post("/tdstm/auth/signIn")
 			.headers(headers_3)
 			.formParam("targetUri", "")
-			.formParam("username", "Jmartin")
-			.formParam("password", "Password7"))
+			.formParam("username", "jmartin")
+			.formParam("password", "xyzzy"))
 		.pause(1)
 		.exec(http("request_4")
 			.post("/tdstm/task/retrieveUserToDoCount")
@@ -125,5 +130,5 @@ class DependencyAnalyzerTest extends Simulation {
 			.get("/tdstm/moveBundle/dependencyConsole")
 			.headers(headers_2))
 
-	setUp(scn.inject(atOnceUsers(numUsers))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(numUsers) over(rampTime seconds))).protocols(httpProtocol)
 }

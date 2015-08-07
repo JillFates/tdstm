@@ -6,15 +6,21 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 class TaskGeneration extends Simulation {
+
 	var startingURL = "http://localhost:8080"
 	var numUsers = 1
-	if(System.getProperty("startingURL") != null)
+	var rampTime = 0
+	if(!(sys.env.get("startingURL").isEmpty))
 	{
-		startingURL = System.getProperty("startingURL")
+		startingURL = sys.env.get("startingURL").get
 	}
-	if(System.getProperty("numUsers") != null)
+	if(!(sys.env.get("numUsers").isEmpty))
 	{
-		numUsers = Integer.getInteger("numUsers", 1)
+		numUsers = sys.env.get("numUsers").get.toInt
+	}
+	if(!(sys.env.get("rampTime").isEmpty))
+	{
+		rampTime = sys.env.get("rampTime").get.toInt
 	}
 
 	val httpProtocol = http
@@ -87,7 +93,7 @@ class TaskGeneration extends Simulation {
 			.headers(headers_6)
 			.formParam("targetUri", "")
 			.formParam("username", "jmartin")
-			.formParam("password", "password7")
+			.formParam("password", "xyzzy")
 			.resources(http("request_7")
 			.get(uri1 + "/static/images/iconApp.png")
 			.headers(headers_3),
@@ -242,5 +248,5 @@ class TaskGeneration extends Simulation {
 			.get(uri1 + "/assetEntity/listTasks")
 			.headers(headers_3)))
 
-	setUp(scn.inject(atOnceUsers(numUsers))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(numUsers) over(rampTime seconds))).protocols(httpProtocol)
 }

@@ -6,16 +6,23 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 class ViewReports extends Simulation {
+
 	var startingURL = "http://localhost:8080"
-	var numUsers = 50
-	if(System.getProperty("startingURL") != null)
+	var numUsers = 1
+	var rampTime = 0
+	if(!(sys.env.get("startingURL").isEmpty))
 	{
-		startingURL = System.getProperty("startingURL")
+		startingURL = sys.env.get("startingURL").get
 	}
-	if(System.getProperty("numUsers") != null)
+	if(!(sys.env.get("numUsers").isEmpty))
 	{
-		numUsers = Integer.getInteger("numUsers", 1)
+		numUsers = sys.env.get("numUsers").get.toInt
 	}
+	if(!(sys.env.get("rampTime").isEmpty))
+	{
+		rampTime = sys.env.get("rampTime").get.toInt
+	}
+	
 	val httpProtocol = http
 		.baseURL(startingURL)
 		.inferHtmlResources()
@@ -46,7 +53,7 @@ class ViewReports extends Simulation {
 			.headers(headers_1)
 			.formParam("targetUri", "")
 			.formParam("username", "jmartin")
-			.formParam("password", "Password7"))
+			.formParam("password", "xyzzy"))
 		.pause(1)
 		.exec(http("request_2")
 			.post("/tdstm/task/retrieveUserToDoCount")
@@ -102,5 +109,5 @@ class ViewReports extends Simulation {
 			.formParam("viewUnpublished", "on")
 			.formParam("_action_tasksReport", "Generate Web"))
 
-	setUp(scn.inject(atOnceUsers(numUsers))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(numUsers) over(rampTime seconds))).protocols(httpProtocol)
 }
