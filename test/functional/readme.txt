@@ -29,7 +29,7 @@ For Windows the install will default to c:\Program Files\nodejs, for Mac/Linux? 
     cd c:\tm\qa
 
 
-2. Checkout working copy of TransitionManager Functional Testing Scripts
+4. Checkout working copy of TransitionManager Functional Testing Scripts
 
     svn co http://svn.tdsops.com/tdstm/trunk/test/functional
 
