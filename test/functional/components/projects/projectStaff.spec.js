@@ -5,10 +5,11 @@ var ProjectStaff = require('../projects/projectStaff.po.js');
 describe('Project Staff Page', function() {
   var menu = new Menu();
   var projStaff = new ProjectStaff();
-  var expectTeams = ['All','Account Manager', 'App Coordinator', 'Automatic', 'Database Admin', 'Database Admin-MSSQL',
-  'Database Admin-Oracle', 'Logistics Technician', 'Migration Analyst', 'Migration Lead', 'Move Manager', 'Move Technician',
-  'Move Technician-Sr', 'Network Admin', 'Project Admin', 'Project Manager', 'Storage Admin', 'System Admin', 'System Admin-Linux',
-  'System Admin-Win', 'Technician'];
+  var expectTeams = ['All','Account Manager', 'App Coordinator', 'Automatic', 'Backup Admin', 'Database Admin', 
+  'Database Admin-DB2','Database Admin-MSSQL', 'Database Admin-Oracle', 'Logistics Technician', 
+  'Migration Analyst', 'Migration Lead', 'Move Manager', 'Move Technician','Move Technician-Sr', 
+  'Network Admin','Project Admin','Project Manager','Storage Admin','System Admin','System Admin-AIX',
+  'System Admin-Linux', 'System Admin-Unix','System Admin-Win', 'Technician','VM Admin'];
 
   it('should get to Project Staff Page after select Projects > Project Staff on the menu', function () {
     menu.goToProjects('projectStaff');
@@ -25,8 +26,8 @@ describe('Project Staff Page', function() {
       expect(projStaff.teamLabel.getText()).toEqual('Team');
     });
  
-    it('should have 21 options on Team Dropdown', function() {
-      expect(projStaff.teamOptions.count()).toEqual(21);
+    it('should have 26 options on Team Dropdown', function() {
+      expect(projStaff.teamOptions.count()).toEqual(26);
     });
 
     for (var i=0; i< expectTeams.length;i++) {
