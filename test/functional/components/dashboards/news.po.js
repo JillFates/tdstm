@@ -11,7 +11,7 @@ News.prototype.isCreateOpened = function() {
     then(function(valor){
       return valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };
@@ -23,7 +23,7 @@ News.prototype.isCreateClosed = function() {
     then(function(valor){
       return !valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };
@@ -35,7 +35,7 @@ News.prototype.isEditOpened = function(){
     then(function(valor){
       return valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };
@@ -47,7 +47,7 @@ News.prototype.isEditClosed = function(){
     then(function(valor){
       return !valor;
     });
-  }).then(function(){
+  },8000).then(function(){
      return true;
   });
 };

@@ -21,7 +21,7 @@ describe('Event Dashboard', function(){
   it('should go to All Devices List page after select Assets > All Devices', function(){
     var menu = new Menu();
     menu.goToDashboards('eventDashboard');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/dashboard/index');
+    expect(menu.getCurrentUrl('/tdstm/dashboard/index')).toEqual(process.env.BASE_URL+'/tdstm/dashboard/index');
   });
   
   describe('Event Dropdown', function(){
@@ -119,6 +119,7 @@ describe('Event Dashboard', function(){
         it('should be required', function(){
           newsModal.getCreateBtn().click();
           if(process.env.BROWSER_NAME !== 'phantomjs'){
+            browser.driver.sleep(1000);
             var alertDialog = browser.driver.switchTo().alert();
             expect(alertDialog.getText()).toEqual('Please enter Comment');
             alertDialog.accept();        
