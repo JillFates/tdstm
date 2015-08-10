@@ -6,7 +6,7 @@ describe('Task Graph page', function(){
   it('should go to Task Graph', function(){
     var menu = new Menu();
     menu.goToTasks('taskGraph');
-    expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/task/taskGraph?initSession=true');
+    expect(menu.getCurrentUrl('/tdstm/task/taskGraph?initSession=true')).toEqual(process.env.BASE_URL+'/tdstm/task/taskGraph?initSession=true');
   });
 
   it('should have "Task Graph" as title',function(){
