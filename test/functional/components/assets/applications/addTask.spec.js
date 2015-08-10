@@ -171,14 +171,15 @@ describe('Add task to an application', function(){
           expect(taskModal.getTeamSelected()).toEqual('Unassigned');
       });
        
-      it('should have 21 options', function(){
-        expect(taskModal.teamOptions.count()).toEqual(21);
+      it('should have 26 options', function(){
+        expect(taskModal.teamOptions.count()).toEqual(26);
       });
       
       it('should have the following options' ,function(){
-        var values = ['0', 'ACCT_MGR','APP_COORD','AUTO','DB_ADMIN','DB_ADMIN_MS','DB_ADMIN_ORA','CLEANER',
-        'MIG_ANALYST','MIG_LEAD','MOVE_MGR','MOVE_TECH', 'MOVE_TECH_SR', 'NETWORK_ADMIN','PROJ_ADMIN','PROJ_MGR','STOR_ADMIN',
-        'SYS_ADMIN', 'SYS_ADMIN_LNX', 'SYS_ADMIN_WIN','TECH'];
+        var values = ['0', 'ACCT_MGR','APP_COORD','AUTO', 'BACKUP_ADMIN','DB_ADMIN','DBA_DB2',
+        'DB_ADMIN_MS','DB_ADMIN_ORA','CLEANER', 'MIG_ANALYST','MIG_LEAD','MOVE_MGR','MOVE_TECH', 
+        'MOVE_TECH_SR', 'NETWORK_ADMIN','PROJ_ADMIN','PROJ_MGR','STOR_ADMIN',
+        'SYS_ADMIN','SYS_ADMIN_AIX', 'SYS_ADMIN_LNX','SYS_ADMIN_UNIX', 'SYS_ADMIN_WIN','TECH','VM_ADMIN'];
         expect(taskModal.teamOptions.count()).toEqual(values.length);
         var i = 0;
         taskModal.teamOptions.each(function(val){
@@ -196,7 +197,7 @@ describe('Add task to an application', function(){
 
     it('Should be selected Project Manager team',function(){
       taskModal.teamOptions.get(13).click();
-      expect(taskModal.getTeamSelected()).toEqual('Network Admin');
+      expect(taskModal.getTeamSelected()).toEqual('Move Technician');
     });
 
     xit('should not enable fixed assignment check if team is assigned', function(){
