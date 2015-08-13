@@ -21,7 +21,7 @@ grails.project.dependency.resolution = {
 
 	repositories {
 		inherits true
-		mavenRepo("http://tmdev.tdsops.com/grails-maven")
+		mavenRepo("http://tmdevold.tdsops.com/grails-maven")
 		mavenRepo("http://repo.grails.org/grails/plugins/")
 		grailsPlugins()
 		grailsHome()
