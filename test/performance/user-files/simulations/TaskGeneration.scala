@@ -6,7 +6,7 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 class TaskGeneration extends Simulation {
-
+	
 	var startingURL = "http://localhost:8080"
 	var numUsers = 1
 	var rampTime = 0
@@ -22,231 +22,238 @@ class TaskGeneration extends Simulation {
 	{
 		rampTime = sys.env.get("rampTime").get.toInt
 	}
-
+	
 	val httpProtocol = http
 		.baseURL(startingURL)
 		.inferHtmlResources()
 		.acceptHeader("application/json, text/plain, */*")
-		.acceptEncodingHeader("gzip, deflate, sdch")
-		.acceptLanguageHeader("en-US,en;q=0.8")
-		.contentTypeHeader("application/x-www-form-urlencoded")
-		.userAgentHeader("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36")
+		.acceptEncodingHeader("gzip, deflate")
+		.acceptLanguageHeader("en-US,en;q=0.5")
+		.connection("keep-alive")
+		.contentTypeHeader("application/x-www-form-urlencoded; charset=UTF-8")
+		.userAgentHeader("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0")
 
-	val headers_0 = Map("Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+	val headers_0 = Map("Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 
-	val headers_1 = Map("Accept" -> "text/css,*/*;q=0.1")
+	val headers_2 = Map("Accept" -> "image/png,image/*;q=0.8,*/*;q=0.5")
 
-	val headers_3 = Map("Accept" -> "image/webp,*/*;q=0.8")
-
-	val headers_6 = Map(
-		"Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-		"Accept-Encoding" -> "gzip, deflate",
-		"Origin" -> startingURL)
-
-	val headers_13 = Map(
+	val headers_3 = Map(
 		"Accept" -> "*/*",
-		"Accept-Encoding" -> "gzip, deflate",
-		"Origin" -> startingURL,
+		"Pragma" -> "no-cache",
 		"X-Requested-With" -> "XMLHttpRequest")
 
-	val headers_20 = Map(
-		"Accept-Encoding" -> "gzip, deflate",
-		"Origin" -> startingURL)
+	val headers_5 = Map("Accept" -> "text/css,*/*;q=0.1")
 
-	val headers_39 = Map("Accept" -> "*/*")
+	val headers_8 = Map("Accept" -> "*/*")
 
-	val headers_43 = Map(
-		"Accept" -> "application/json, text/javascript, */*; q=0.01",
-		"X-Requested-With" -> "XMLHttpRequest")
+	val headers_44 = Map("Pragma" -> "no-cache")
 
-	val headers_45 = Map(
-		"Accept" -> "*/*",
-		"Accept-Encoding" -> "gzip, deflate",
-		"Content-Type" -> "application/x-www-form-urlencoded; charset=UTF-8",
-		"Origin" -> startingURL,
-		"X-Requested-With" -> "XMLHttpRequest")
+	val headers_64 = Map(
+		"Accept" -> "application/font-woff2;q=1.0,application/font-woff;q=0.9,*/*;q=0.8",
+		"Accept-Encoding" -> "identity")
 
-    val uri1 = startingURL + "/tdstm"
+    val uri1 = "http://localhost:8080/tdstm"
 
 	val scn = scenario("TaskGeneration")
 		.exec(http("request_0")
-			.get("/tdstm/auth/signOut")
-			.headers(headers_0)
-			.resources(http("request_1")
-			.get(uri1 + "/static/css/main.css")
-			.headers(headers_1),
-            http("request_2")
-			.get(uri1 + "/static/css/tds.css")
-			.headers(headers_1),
-            http("request_3")
-			.get(uri1 + "/static/images/spinner.gif")
-			.headers(headers_3),
-            http("request_4")
-			.get(uri1 + "/static/images/TMLoginLogo.gif")
-			.headers(headers_3),
-            http("request_5")
-			.get(uri1 + "/static/images/button_highlight.png")
-			.headers(headers_3)))
-		.pause(4)
-		.exec(http("request_6")
+			.get("/tdstm/auth/login")
+			.headers(headers_0))
+		.pause(2)
+		.exec(http("request_1")
 			.post("/tdstm/auth/signIn")
-			.headers(headers_6)
+			.headers(headers_0)
 			.formParam("targetUri", "")
 			.formParam("username", "jmartin")
 			.formParam("password", "xyzzy")
-			.resources(http("request_7")
-			.get(uri1 + "/static/images/iconApp.png")
-			.headers(headers_3),
-            http("request_8")
-			.get(uri1 + "/static/images/iconDB.png")
-			.headers(headers_3),
-            http("request_9")
-			.get(uri1 + "/static/images/iconServer.png")
-			.headers(headers_3),
-            http("request_10")
-			.get(uri1 + "/static/images/iconStorage.png")
-			.headers(headers_3),
-            http("request_11")
-			.get(uri1 + "/static/images/checked-icon.png")
-			.headers(headers_3),
-            http("request_12")
-			.get(uri1 + "/static/images/iconNetwork.png")
-			.headers(headers_3)))
-		.pause(5)
-		.exec(http("request_13")
+			.resources(http("request_2")
+			.get(uri1 + "/project/showImage/47")
+			.headers(headers_2)))
+		.pause(2)
+		.exec(http("request_3")
 			.post("/tdstm/task/retrieveUserToDoCount")
-			.headers(headers_13))
-		.pause(4)
-		.exec(http("request_14")
+			.headers(headers_3))
+		.pause(1)
+		.exec(http("request_4")
 			.get("/tdstm/cookbook/index")
 			.headers(headers_0)
-			.resources(http("request_15")
-			.get(uri1 + "/ws/cookbook/recipe/list?archived=n&context=All&rand=Rh2JRUVxNXLk59E"),
+			.resources(http("request_5")
+			.get(uri1 + "/static/css/ng-grid.css")
+			.headers(headers_5),
+            http("request_6")
+			.get(uri1 + "/static/css/mergely/mergely.css")
+			.headers(headers_5),
+            http("request_7")
+			.get(uri1 + "/static/css/codemirror/addon/show-hint.css")
+			.headers(headers_5),
+            http("request_8")
+			.get(uri1 + "/js/codemirror/addon/searchcursor.js")
+			.headers(headers_8),
+            http("request_9")
+			.get(uri1 + "/js/codemirror/addon/dialog.js")
+			.headers(headers_8),
+            http("request_10")
+			.get(uri1 + "/static/css/codemirror/addon/dialog.css")
+			.headers(headers_5),
+            http("request_11")
+			.get(uri1 + "/static/css/codemirror/codemirror.css")
+			.headers(headers_5),
+            http("request_12")
+			.get(uri1 + "/static/css/cookbook.css")
+			.headers(headers_5),
+            http("request_13")
+			.get(uri1 + "/js/codemirror/codemirror.js")
+			.headers(headers_8),
+            http("request_14")
+			.get(uri1 + "/js/codemirror/addon/show-hint.js")
+			.headers(headers_8),
+            http("request_15")
+			.get(uri1 + "/js/codemirror/addon/fullscreen.js")
+			.headers(headers_8),
             http("request_16")
-			.get(uri1 + "/ws/cookbook/recipe/28?rand=mKR7C57QIlBo4xR"),
+			.get(uri1 + "/js/angular/plugins/angular-ui-router.min.js")
+			.headers(headers_8),
             http("request_17")
-			.get(uri1 + "/ws/event/listEventsAndBundles?rand=BICxMW7bbRq82Je"),
+			.get(uri1 + "/static/css/codemirror/addon/fullscreen.css")
+			.headers(headers_5),
             http("request_18")
-			.get(uri1 + "/ws/task/findTaskBatchByRecipeAndContext?contextId=349&logs=false&rand=tE3YytS6zZkwuEH&recipeId=28")))
-		.pause(4)
-		.exec(http("request_19")
-			.get("/tdstm/ws/task/findTaskBatchByRecipeAndContext?contextId=364&logs=false&rand=3ronvcTy7bp3yFS&recipeId=28"))
+			.get(uri1 + "/static/css/tds-bootstrap.css")
+			.headers(headers_5),
+            http("request_19")
+			.get(uri1 + "/js/codemirror/ui-codemirror.js")
+			.headers(headers_8),
+            http("request_20")
+			.get(uri1 + "/js/codemirror/javascript.js")
+			.headers(headers_8),
+            http("request_21")
+			.get(uri1 + "/js/mergely/mergely.js")
+			.headers(headers_8),
+            http("request_22")
+			.get(uri1 + "/js/codemirror/addon/search.js")
+			.headers(headers_8),
+            http("request_23")
+			.get(uri1 + "/js/moment-timezone-with-data-2010-2020.js")
+			.headers(headers_8),
+            http("request_24")
+			.get(uri1 + "/js/codemirror/addon/javascript-hint.js")
+			.headers(headers_8),
+            http("request_25")
+			.get(uri1 + "/js/controllers/cookbook.js")
+			.headers(headers_8),
+            http("request_26")
+			.get(uri1 + "/project/showImage/47")
+			.headers(headers_2),
+            http("request_27")
+			.get(uri1 + "/components/core/loading-indicator.html"),
+            http("request_28")
+			.get(uri1 + "/components/cookbook/recipes-template.html"),
+            http("request_29")
+			.get(uri1 + "/icons/script_add.png")
+			.headers(headers_2),
+            http("request_30")
+			.get(uri1 + "/static/images/processing.gif")
+			.headers(headers_2),
+            http("request_31")
+			.get(uri1 + "/ws/cookbook/recipe/list?archived=n&context=All&rand=5GfCqBS4YFP6aoO"),
+            http("request_32")
+			.get(uri1 + "/icons/script_edit.png")
+			.headers(headers_2),
+            http("request_33")
+			.get(uri1 + "/icons/arrow_undo.png")
+			.headers(headers_2),
+            http("request_34")
+			.get(uri1 + "/icons/delete.png")
+			.headers(headers_2),
+            http("request_35")
+			.get(uri1 + "/icons/folder_go.png")
+			.headers(headers_2),
+            http("request_36")
+			.get(uri1 + "/icons/folder.png")
+			.headers(headers_2),
+            http("request_37")
+			.get(uri1 + "/components/cookbook/recipe-detail-template.html"),
+            http("request_38")
+			.get(uri1 + "/components/cookbook/generation/task-generation-template.html"),
+            http("request_39")
+			.get(uri1 + "/ws/cookbook/recipe/28?rand=v5Xts8l1lUIlPLg"),
+            http("request_40")
+			.get(uri1 + "/ws/event/listEventsAndBundles?rand=z9OJ4JoPdTkhNI9"),
+            http("request_41")
+			.get(uri1 + "/components/cookbook/generation/task-generation-start-template.html"),
+            http("request_42")
+			.get(uri1 + "/icons/table_gear.png")
+			.headers(headers_2)))
+		.pause(3)
+		.exec(http("request_43")
+			.get("/tdstm/ws/task/findTaskBatchByRecipeAndContext?contextId=349&logs=false&rand=WeT9ezIUUquxJUU&recipeId=28"))
 		.pause(6)
-		.exec(http("request_20")
+		.exec(http("request_44")
 			.post("/tdstm/ws/task/generateTasks?rand=")
-			.headers(headers_20)
-			.formParam("contextId", "364")
+			.headers(headers_44)
+			.formParam("contextId", "349")
 			.formParam("recipeId", "28")
 			.formParam("recipeVersionId", "")
 			.formParam("useWIP", "false")
 			.formParam("autoPublish", "false")
 			.formParam("deletePrevious", "true")
-			.resources(http("request_21")
+			.check(
+				regex("jobId.*?:.*?\"TaskBatch-([0-9]*?)\"")
+				.saveAs("jobId")
+			)
+			.resources(http("request_45")
 			.get(uri1 + "/components/cookbook/generation/task-generation-progress-template.html")))
 		.pause(1)
-		.exec(http("request_22")
-			.get("/tdstm/ws/progress/TaskBatch-3546?rand=jty0GTy4zfoDiRG")
-			.resources(http("request_23")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=1nN3aTRbZNFzJ1N"),
-            http("request_24")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=Kd2TkQu7nii9gFI"),
-            http("request_25")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=Ku3zuegyU95axIT"),
-            http("request_26")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=sUUYgO7OMIHIVqE"),
-            http("request_27")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=104ePyFv46eLLLR"),
-            http("request_28")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=6txg7SoC13rSdOg"),
-            http("request_29")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=CSh2ajaFrUYXEm9"),
-            http("request_30")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=0sVKwTqA5ryktjm"),
-            http("request_31")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=Mb85lCPxxIWlm7V"),
-            http("request_32")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=8V4LMEyCCf318RK"),
-            http("request_33")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=0kep7CsZB7GxO9B"),
-            http("request_34")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=1nrOse3ZNkuZrs3"),
-            http("request_35")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=UepGZRoBGpLYwLJ"),
-            http("request_36")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=Gb1oylTIz7pAqO8"),
-            http("request_37")
-			.get(uri1 + "/ws/progress/TaskBatch-3546?rand=CxEDkJ6BziQ3arK"),
-            http("request_38")
-			.get(uri1 + "/components/cookbook/generation/task-generation-completed-template.html"),
-            http("request_39")
+		
+		.exec(http("request_status")
+			.get(uri1 + "/ws/progress/TaskBatch-${jobId}?rand=")
+			.check(
+				regex("percentComp.*?:.*?([0-9]*)")
+				.saveAs("percentComp")
+			)
+		)
+		.pause(2)
+		
+		/** loop */
+		.asLongAs(session => session("percentComp").as[String].toInt!=100) {
+			exec(http("request_TaskBatch-${jobId}_Progress-${percentComp}%")
+				.get(uri1 + "/ws/progress/TaskBatch-${jobId}?rand=")
+				.check(
+					regex("percentComp.*?:.*?([0-9]*)")
+					.saveAs("percentComp")
+				)
+			)
+			.pause(2)
+		}
+
+		.exec(http("request_finish_${jobId}")		
+			.get(uri1 + "/components/cookbook/generation/task-generation-completed-template.html")
+            .resources(http("request_64")
 			.get(uri1 + "/static/fonts/glyphicons-halflings-regular.woff")
-			.headers(headers_39),
-            http("request_40")
-			.get(uri1 + "/ws/task/3546?rand=UXRQ0FRLAbLN2rE")))
+			.headers(headers_64),
+            http("request_65")
+			.get(uri1 + "/ws/task/${jobId}?rand=")
+		))
+			
 		.pause(4)
-		.exec(http("request_41")
-			.post("/tdstm/task/retrieveUserToDoCount")
-			.headers(headers_13))
-		.pause(2)
-		.exec(http("request_42")
-			.get("/tdstm/assetEntity/listTasks?initSession=true")
-			.headers(headers_0)
-			.resources(http("request_43")
-			.get(uri1 + "/assetEntity/listTaskJSON?moveEvent=0&justRemaining=0&justMyTasks=0&filter=&comment=&taskNumber=&assetEntity=&assetType=&dueDate=&status=&assignedTo=&role=&category=&viewUnpublished=0&_search=false&nd=1437061300790&rows=25&page=1&sidx=&sord=asc")
-			.headers(headers_43),
-            http("request_44")
-			.get(uri1 + "/assetEntity/listTasks?initSession=true")
-			.headers(headers_3)))
+		.exec(http("request_66")
+			.get("/tdstm/components/cookbook/history/task-batch-history-template.html")
+			.resources(http("request_67")
+			.get(uri1 + "/components/cookbook/history/task-batch-history-detail-template.html"),
+            http("request_68")
+			.get(uri1 + "/components/cookbook/history/task-batch-history-actions-template.html"),
+            http("request_69")
+			.get(uri1 + "/ws/task/listTaskBatches?limitDays=All&rand=randVal&recipeId=28"),
+            http("request_70")
+			.get(uri1 + "/icons/table_refresh.png")
+			.headers(headers_2)))
+		.pause(3)
+		.exec(http("request_tasks")
+			.get("/tdstm/components/cookbook/history/task-batch-history-tasks-template.html")
+			.resources(http("request_tasksView")
+			.get(uri1 + "/ws/task/${jobId}/tasks?rand=")))
 		.pause(10)
-		.exec(http("request_45")
-			.post("/tdstm/application/columnAssetPref")
-			.headers(headers_45)
-			.formParam("columnValue", "dateCreated")
-			.formParam("from", "1")
-			.formParam("previousValue", "assetName")
-			.formParam("type", "Task_Columns")
-			.resources(http("request_46")
-			.post(uri1 + "/assetEntity/listTasks")
-			.headers(headers_6)
-			.formParam("justRemaining", "0")
-			.formParam("justMyTasks", "0")
-			.formParam("viewUnpublished", "0")
-			.formParam("moveEvent", "0")
-			.formParam("coloumnSelector_assetName", "dateCreated")
-			.formParam("taskNumber", "")
-			.formParam("comment", "")
-			.formParam("assetName", "")
-			.formParam("assetType", "")
-			.formParam("dueDate", "")
-			.formParam("status", "")
-			.formParam("assignedTo", "")
-			.formParam("role", "")
-			.formParam("category", "")
-			.formParam("id", "")
-			.formParam("statusCss", "")
-			.formParam("coloumnSelector_assetType", "assetType")
-			.formParam("coloumnSelector_assignedTo", "assignedTo")
-			.formParam("coloumnSelector_role", "role")
-			.formParam("coloumnSelector_category", "category"),
-            http("request_47")
-			.get(uri1 + "/assetEntity/listTaskJSON?moveEvent=0&justRemaining=0&justMyTasks=0&filter=&comment=&taskNumber=&assetEntity=&assetType=&dueDate=&status=&assignedTo=&role=&category=&viewUnpublished=0&_search=false&nd=1437061314141&rows=25&page=1&sidx=&sord=asc")
-			.headers(headers_43),
-            http("request_48")
-			.get(uri1 + "/assetEntity/listTasks")
-			.headers(headers_3)))
-		.pause(2)
-		.exec(http("request_49")
-			.get("/tdstm/assetEntity/listTaskJSON?moveEvent=0&justRemaining=0&justMyTasks=0&filter=&comment=&taskNumber=&assetEntity=&assetType=&dueDate=&status=&assignedTo=&role=&category=&viewUnpublished=0&_search=false&nd=1437061317628&rows=25&page=1&sidx=dateCreated&sord=asc")
-			.headers(headers_43)
-			.resources(http("request_50")
-			.get(uri1 + "/assetEntity/listTasks")
-			.headers(headers_3),
-            http("request_51")
-			.get(uri1 + "/assetEntity/listTaskJSON?moveEvent=0&justRemaining=0&justMyTasks=0&filter=&comment=&taskNumber=&assetEntity=&assetType=&dueDate=&status=&assignedTo=&role=&category=&viewUnpublished=0&_search=false&nd=1437061318859&rows=25&page=1&sidx=dateCreated&sord=desc")
-			.headers(headers_43),
-            http("request_52")
-			.get(uri1 + "/assetEntity/listTasks")
-			.headers(headers_3)))
+		.exec(http("request_73")
+			.get("/tdstm/auth/signOut")
+			.headers(headers_0))
 
 	setUp(scn.inject(rampUsers(numUsers) over(rampTime seconds))).protocols(httpProtocol)
 }

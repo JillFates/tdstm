@@ -7,8 +7,24 @@ import io.gatling.jdbc.Predef._
 
 class ViewReports extends Simulation {
 
+	var startingURL = "http://localhost:8080"
+	var numUsers = 1
+	var rampTime = 0
+	if(!(sys.env.get("startingURL").isEmpty))
+	{
+		startingURL = sys.env.get("startingURL").get
+	}
+	if(!(sys.env.get("numUsers").isEmpty))
+	{
+		numUsers = sys.env.get("numUsers").get.toInt
+	}
+	if(!(sys.env.get("rampTime").isEmpty))
+	{
+		rampTime = sys.env.get("rampTime").get.toInt
+	}
+
 	val httpProtocol = http
-		.baseURL("http://localhost:8080")
+		.baseURL(startingURL)
 		.inferHtmlResources()
 		.acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 		.acceptEncodingHeader("gzip, deflate")
@@ -274,5 +290,5 @@ class ViewReports extends Simulation {
 		.exec(http("rSignOut")
 			.get("/tdstm/auth/signOut"))
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(numUsers) over(rampTime seconds))).protocols(httpProtocol)
 }
