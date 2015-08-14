@@ -80,7 +80,7 @@ ExportPage.prototype.isExportingModalOpened = function() {
         console.log(text);
         return text!=='';
       });
-  }).then(function(){
+  },9000).then(function(){
      return true;
   });
 };
@@ -91,7 +91,7 @@ ExportPage.prototype.isExportingModalClosed = function(filePath) {
     return browser.driver.findElement(by.id('progressBar')).getText().then(function(text){
       return text==='' && file.existsSync(filePath);
     });
-  }).then(function(){
+  },9000).then(function(){
      return true;
   });
 };

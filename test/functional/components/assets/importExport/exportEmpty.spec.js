@@ -20,16 +20,20 @@ describe('Export', function(){
     'workflow': 'Demo',
     'type':'Demo'
   };
+  var menu = new Menu();
 
   describe('Preconditions', function  () {
-
+    
     it('should load list projects page after select Client/Project ListProjects', function(){
-      var menu = new Menu();
       menu.goToProjects('listProjects');
+      expect(menu.getCurrentUrl('/tdstm/project/list?active=active')).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
+    });
+
+    it('should have "Project List - Active Projects" as title',function () {
       var listProjectPage = new ListProjects();
       expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
     });
-    
+
     describe('Cleanup',function(){
 
       it('should delete project if exists and return to project list', function () {
@@ -39,14 +43,14 @@ describe('Export', function(){
 
         listProjectPage.selectProjectIfExists(project['code']).then(function(pid){
           if(pid>0){
-            expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+pid);
+            expect(menu.getCurrentUrl('/tdstm/project/show/')).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+pid);
             projectPage.deleteProject();
             browser.driver.wait(function() {
               return menu.getCurrentUrl().then(function(url){
                 return url === process.env.BASE_URL+'/tdstm/project/list';
               });
-            }).then(function(){
-              expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/list');
+            },8000).then(function(){
+              expect(menu.getCurrentUrl('/tdstm/project/list')).toEqual(process.env.BASE_URL+'/tdstm/project/list');
             });
           }
         });
@@ -55,23 +59,24 @@ describe('Export', function(){
     });//cleanup
 
     describe('create a project',function () {
+      var menu = new Menu();
       var projectPage = new Project();
+
       it('should load create project page after hitting create project button',function(){
         var listProjectPage = new ListProjects();
         listProjectPage.clickOnCreateProjectBtn();
-        expect(projectPage.getTitle().getText()).toEqual('Create Project');
-      });
-
-      it('should have project/create url', function(){
-        var menu = new Menu();
-        expect(menu.getCurrentUrl())
+        expect(menu.getCurrentUrl('/tdstm/project/create'))
         .toEqual(process.env.BASE_URL+'/tdstm/project/create');
+      });
+      
+      it('should have "Create Project" as title',function () {
+        expect(projectPage.getTitle().getText()).toEqual('Create Project');
       });
 
       it('should create a project', function () {
         var menu = new Menu();
         projectPage.createProject(project);
-        expect(menu.getCurrentUrl())
+        expect(menu.getCurrentUrl('/tdstm/project/show'))
         .toEqual(process.env.BASE_URL+'/tdstm/project/show');
       });
 
@@ -101,7 +106,7 @@ describe('Export', function(){
     it('should load Export Assets page after select Assets > Export Assets', function(){
       var menu = new Menu();
       menu.goToAssets('exportAssets');
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/exportAssets');
+      expect(menu.getCurrentUrl('/tdstm/assetEntity/exportAssets')).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/exportAssets');
     });
     
     describe('generate Export',function () {

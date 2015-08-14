@@ -125,6 +125,7 @@ var Project = function(){
       browser.driver.findElement(by.css(this.deleteProjectbtnCss)).click();
     }else{
       browser.driver.findElement(by.css(this.deleteProjectbtnCss)).click();
+      browser.driver.sleep(1000);
       var alertDialog = browser.driver.switchTo().alert();
       // var message= 'Warning: This will delete the Test Project project and all of the assets, events, bundles, and any historic data?';
       // expect(alertDialog.getText()).toEqual(message);
