@@ -45,7 +45,7 @@ class ViewReports extends Simulation {
 		"Pragma" -> "no-cache",
 		"X-Requested-With" -> "XMLHttpRequest")
 
-    val uri1 = "http://localhost:8080/tdstm"
+    val uri1 = startingURL + "/tdstm"
 
 	val scn = scenario("ViewReports")
 		.exec(http("rAuth")

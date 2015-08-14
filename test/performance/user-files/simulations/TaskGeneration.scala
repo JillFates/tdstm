@@ -52,7 +52,7 @@ class TaskGeneration extends Simulation {
 		"Accept" -> "application/font-woff2;q=1.0,application/font-woff;q=0.9,*/*;q=0.8",
 		"Accept-Encoding" -> "identity")
 
-    val uri1 = "http://localhost:8080/tdstm"
+    val uri1 = startingURL + "/tdstm"
 
 	val scn = scenario("TaskGeneration")
 		.exec(http("request_0")
