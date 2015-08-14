@@ -9,18 +9,22 @@ var ListProjects = require('../../projects/listProjects.po.js');
 // var ConnectDatabase = require('./connectDatabase.po.js');
 
 describe('Import Export Devices - Blade Chassis', function() {
-  
+  var menu = new Menu();
+
   describe('Preconditions', function() {
     // check that project selected is marketing demo if not select it.
 
     describe('search by code and select it', function(){
       
       var projId;
-      var menu = new Menu();
       var listProjectPage =  new ListProjects();
       
       it('should load list projects page after select Client/Project ListProjects', function(){
         menu.goToProjects('listProjects');
+        expect(menu.getCurrentUrl('/tdstm/project/list?active=active')).toEqual(process.env.BASE_URL+'/tdstm/project/list?active=active');
+      });
+
+      it('should have "Project List - Active Projects" as title',function () {
         expect(listProjectPage.getTitle().getText()).toEqual('Project List - Active Projects');
       });
 
@@ -45,7 +49,7 @@ describe('Import Export Devices - Blade Chassis', function() {
       });
 
       it('should be redirect to project/show/project+id', function(){
-        expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
+        expect(menu.getCurrentUrl('/tdstm/project/show/')).toEqual(process.env.BASE_URL+'/tdstm/project/show/'+projId);
       });
 
     }); // search by code and select it
@@ -57,7 +61,7 @@ describe('Import Export Devices - Blade Chassis', function() {
     it('should load Import Assets page after select Assets > Import Assets', function(){
       var menu = new Menu();
       menu.goToAssets('importAssets');
-      expect(menu.getCurrentUrl()).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/assetImport');
+      expect(menu.getCurrentUrl('/tdstm/assetEntity/assetImport')).toEqual(process.env.BASE_URL+'/tdstm/assetEntity/assetImport');
     });
 
     it('should have "Asset Import" as title', function () {
@@ -65,7 +69,7 @@ describe('Import Export Devices - Blade Chassis', function() {
       expect(importPage.getTitle().getText()).toEqual('Asset Import');
     });
 
-    it('should have "TDS Master Spreadsheet" as import type',function () {
+    xit('should have "TDS Master Spreadsheet" as import type',function () {
       var importPage =  new ImportPage();
       expect(importPage.getImportTypeSelected()).toEqual('TDS Master Spreadsheet');
     });
@@ -125,10 +129,11 @@ describe('Import Export Devices - Blade Chassis', function() {
       var importPage =  new ImportPage();
       var resultMessage = importPage.getExpectedSucessMessage(7,0,0,0,0,0,0);
       importPage.getImportBtn().click(); 
+      // browser.driver.sleep(8000);
       expect(importPage.getResultMessage()).toEqual(resultMessage);
     });
 
-    it('should have Manage Batches: 1',function () {
+    xit('should have Manage Batches: 1',function () {
       var importPage =  new ImportPage();
       expect(importPage.getManageBatchesLink().getText()).toEqual('Manage Batches: 1');
     });
@@ -136,6 +141,10 @@ describe('Import Export Devices - Blade Chassis', function() {
     it('should go to Manage Batches after click on Manage Batches link',function () {
       var importPage =  new ImportPage();
       importPage.getManageBatchesLink().click();
+      expect(menu.getCurrentUrl('/tdstm/dataTransferBatch/list')).toEqual(process.env.BASE_URL+'/tdstm/dataTransferBatch/list');
+    });
+
+    it('should have "Manage Asset Import Batches" as title', function() {
       var manageBatches =  new ManageBatches();
       expect(manageBatches.getTitle().getText()).toEqual('Manage Asset Import Batches');
     });
@@ -185,6 +194,7 @@ describe('Import Export Devices - Blade Chassis', function() {
           manageBatches.getProcessLinkList().then(function (list) {
             list[0].click();
           }); 
+          browser.driver.sleep(1000);
           var alertDialog = browser.driver.switchTo().alert();
           var message= 'Please confirm that you want to post the imported assets to inventory?';
           expect(alertDialog.getText()).toEqual(message);
@@ -229,9 +239,15 @@ describe('Import Export Devices - Blade Chassis', function() {
       });
 
       it('should have status complete',function () {
-        browser.driver.get(process.env.BASE_URL+'/tdstm/dataTransferBatch/list');
+        expect(menu.getCurrentUrl('/tdstm/dataTransferBatch/list')).toEqual(process.env.BASE_URL+'/tdstm/dataTransferBatch/list');
         manageBatches.getStatusList().then(function (list) {
-          expect(list[0].getText()).toEqual('COMPLETED');
+          browser.driver.wait(function () {
+            return list[0].getText().then(function (text) {
+              return text ==='COMPLETED';
+            });
+          },8000).then(function () {
+            expect(list[0].getText()).toEqual('COMPLETED');
+          });
         });
       });
 
@@ -239,9 +255,15 @@ describe('Import Export Devices - Blade Chassis', function() {
         manageBatches.getRemoveLinkList().then(function (list) {
           list[0].click();
         }); 
-        // browser.driver.get(process.env.BASE_URL+'/tdstm/dataTransferBatch/list');
-        manageBatches.getBatchesList().then(function (list) {
-          expect(list.length).toEqual(0);
+
+        browser.driver.wait(function () {
+          return manageBatches.getBatchesList().then(function (list) {
+            return list.length === 0;
+          });
+        },8000).then(function () {
+          manageBatches.getBatchesList().then(function (list) {
+            expect(list.length).toEqual(0);
+          });
         });
       });
     }); // Manage Bathes

@@ -19,12 +19,12 @@ ManageBatches.prototype.isReviewModalOpened = function() {
       return browser.executeScript('return $("#globalProgressBar").text()').then(function (valor) {
         return valor;
       });
-     }).then(function(){
+     },9000).then(function(){
       return browser.driver.findElement(by.id('globalProgressBar')).getAttribute('aria-hidden').then(function(text){
         return text==='false';
       });
      }); 
-  }).then(function(){
+  },9000).then(function(){
      return true;
   });
 };
@@ -34,7 +34,7 @@ ManageBatches.prototype.isReviewEnded = function() {
   return browser.driver.wait(function(){
       return browser.driver.wait(function() {
       return that.isReviewModalOpened();
-    }).then(function () {
+    },9000).then(function () {
       return browser.driver.findElement(by.css('#globalProgressBar #progressTitle h1')).getText().then(function(text){
         return text.indexOf('Reviewing assets in batch') !== -1;
       });
@@ -49,12 +49,12 @@ ManageBatches.prototype.getPostingTitle = function() {
   return browser.driver.wait(function(){
     return browser.driver.wait(function() {
       return that.isReviewModalOpened();
-    }).then(function () {
+    },9000).then(function () {
       return browser.driver.findElement(by.css('#globalProgressBar #progressTitle h1')).getText().then(function(text){
         return text.indexOf('Posting assets to inventory for batch') !== -1;
       });
     });
-  }).then(function(){
+  },9000).then(function(){
     return browser.driver.findElement(by.css('#globalProgressBar #progressTitle h1')).getText();
   });
 };
@@ -64,7 +64,7 @@ ManageBatches.prototype.getReviewResults = function() {
     return browser.driver.findElement(by.css('#progressStatus')).getText().then(function (text) {
       return text.indexOf('Initializing...','In Progress','In progress') === -1;
       });
-  }).then(function () {
+  },9000).then(function () {
     return browser.driver.findElement(by.id('progressStatus')).getText().then(function (text) {
       return text;
     });
@@ -80,7 +80,7 @@ ManageBatches.prototype.isReviewModalClosed = function() {
     return browser.driver.findElement(by.id('globalProgressBar')).getAttribute('aria-hidden').then(function (text) {
       return text === 'true';
     });
-  }).then(function () {
+  },9000).then(function () {
     return true;
   });
 };
@@ -90,7 +90,7 @@ ManageBatches.prototype.getProcessLinkList = function() {
     return browser.driver.findElements(by.css('.list tbody [onclick^="return kickoffProcess"]')).then(function (list) {
       return list.length>0;
     });
-  }).then(function () {
+  },9000).then(function () {
     return browser.driver.findElements(by.css('.list tbody [onclick^="return kickoffProcess"]'));
   });
 };
@@ -100,7 +100,7 @@ ManageBatches.prototype.getRemoveLinkList = function() {
     return browser.driver.findElements(by.css('.list tbody a[href^="/tdstm/dataTransferBatch/delete?batchId="]')).then(function (list) {
       return list.length>0;
     });
-  }).then(function () {
+  },9000).then(function () {
     return browser.driver.findElements(by.css('.list tbody a[href^="/tdstm/dataTransferBatch/delete?batchId="]'));
   });
 };

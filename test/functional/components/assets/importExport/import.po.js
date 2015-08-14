@@ -71,15 +71,17 @@ ImportPage.prototype.isProgressBarDisplayed = function() {
     return browser.driver.findElement(by.id('progressBar')).getText().then(function(text){
       return text!=='';
     });
-  }).then(function(){
+  },9000).then(function(){
      return true;
   });
 };
 
 ImportPage.prototype.getResultMessage = function() {
   return browser.wait(function(){
-    return browser.driver.findElement(by.css('.body .message')).isDisplayed();
-  }).then(function(){
+    return browser.executeScript('return $(".body div").attr("class")').then(function (la) {
+      return la === 'message';
+    });
+  },9000).then(function(){
     return browser.driver.findElement(by.css('.body .message')).getText().then(function (text) {
       return text;
     }); 
