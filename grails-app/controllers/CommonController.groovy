@@ -1,6 +1,7 @@
 import grails.converters.JSON
 import com.tdssrc.grails.GormUtil
 import com.tdsops.tm.enums.domain.EntityType;
+import com.tdssrc.grails.HtmlUtil
 
 class CommonController {
 	def securityService
@@ -111,4 +112,7 @@ class CommonController {
 		render returnMap as JSON
 	}
 	
+	def validateLinkUrl(def linktext){
+		return HtmlUtil.isMarkupUrl(linktext);
+	}
 }
