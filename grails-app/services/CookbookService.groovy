@@ -1143,7 +1143,8 @@ class CookbookService {
 				inverse:true,
 				classification: ['device','database','application','storage'],
 				type:'',
-				status:''
+				status:'',
+				traverse:false
 			],
 			successor: [
 				defer: '',
