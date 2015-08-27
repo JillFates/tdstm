@@ -114,6 +114,12 @@ class AuthController {
 					userPreferenceService.loadPreferences(TimeUtil.TIMEZONE_ATTR)
 					userPreferenceService.loadPreferences(TimeUtil.DATE_TIME_FORMAT_ATTR)
 
+					// If the user don't have a time zone selected initialize it with GMT
+					if (session.getAttribute( TimeUtil.TIMEZONE_ATTR ).CURR_TZ == null) {
+						userPreferenceService.setPreference( TimeUtil.TIMEZONE_ATTR, TimeUtil.defaultTimeZone )
+						userPreferenceService.loadPreferences(TimeUtil.TIMEZONE_ATTR)
+					}
+
 					/*
 					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
 					 */
