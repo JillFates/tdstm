@@ -70,120 +70,62 @@
 				$("#personDialog").dialog("open");
 			}
 		}
-		function changePersonDetails(){
+		function changePersonDetails () {
 			var returnVal = true 
-	    	var firstName = $("#firstNameId").val()
-	    	var oldPassword = $("#oldPasswordId").val()
-	    	var newPassword = $("#newPasswordId").val()
-	        var email = $("#emailId").val()
-	        var expiryDate = $("#expiryDateId").val()
-	        var powerType = $("#powerTypeId").val()
-	        var startPage = $("#startPage").val()
-	        
-	        if(expiryDate + "" == "undefined"){
-	        	expiryDate = "null"
-			}
-			if(!firstName) {
-	            alert("First Name should not be blank ")
-	            returnVal = false
-	        } else if( email && !emailRegExp.test(email)){
-	        	 alert(email + " is not a valid e-mail address ")
-	             returnVal = false
-	        } else if(expiryDate != "null" && !expiryDate){
-	        	alert("Expiry Date should not be blank ")
-	            returnVal = false
-	        } else if(expiryDate != "null" && !dateRegExpForExp.test(expiryDate)){
-		        alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
-		        returnVal = false
-	        } else if(oldPassword+newPassword != ""){
-	            if(!oldPassword){
-		        	alert("Old Password should not be blank ")
-		            returnVal = false
-		        } else if(!checkPassword($("#newPasswordId")[0])){
-		        	alert("New Password does not meet all the requirements ")
-		            returnVal = false
-		        }
-	        }
-	        if(returnVal){
-				new Ajax.Request('/tdstm/person/checkPassword',{asynchronous:true,evalScripts:true,onComplete:function(e){updateWelcome(e)},parameters:'id=' + $('#personId').val() 
-											+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
-											+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#oldPasswordId').val()
-											+'&newPassword='+$('#newPasswordId').val()
-											+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
-											+'&powerType='+powerType+'&startPage='+startPage});
-	        }
-		}
-		function checkPassword(field) {
-			var requirements = 0;
-			var password = field.value;
-			var username;
-			if(field.id == "newPasswordId")
-				username = $('#prefUsernameId').val().toLowerCase();
-			else
-				username = $('#username').val().toLowerCase();
-			var context = 0;
-			var noMatch = {item:null};
-			var score = 0;
-			if (field.id == "newPasswordId" && $("[id='lengthRequirementId']").length > 1) {
-				context = 1;
-			}
-			score += passwordMatch(password.toLowerCase(), $("[id='usernameRequirementId']")[context], new RegExp('.*' + username + '.*'), 'Password must not contain the username', {item:null});
-			score += passwordMatch(password, $("[id='lengthRequirementId']")[context], /.{8}/, 'Password must be at least 8 characters long', {item:null});
-			requirements += passwordMatch(password, $("[id='lowercaseRequirementId']")[context], /[a-z]+/, 'Lowercase characters', noMatch);
-			requirements += passwordMatch(password, $("[id='uppercaseRequirementId']")[context], /[A-Z]+/, 'Uppercase characters', noMatch);
-			requirements += passwordMatch(password, $("[id='numericRequirementId']")[context], /[0-9]+/, 'Numeric characters', noMatch);
-			requirements += passwordMatch(password, $("[id='symbolRequirementId']")[context], /.*[~!@#\$%\^&\*_\-\+=`\|\\\(\)\{\}\[\]:;"'<>\,\.\?\/].*/, 'Nonalphanumeric characters', noMatch);
-			if (passwordMatch(requirements + "", $("[id='passwordRequirementsId']")[context], /[3-4]+/, 'Password must contain at least 3 of these requirements: ', noMatch) == 1){
-				score++;
-				if(noMatch.item != null)
-					noMatch.item.style.color = "#555555";
-			}
+			var firstName = $("#firstNameId").val()
+			var oldPassword = $("#personDialog #oldPasswordId").val()
+			var newPassword = $("#personDialog #passwordId").val()
+			var email = $("#emailId").val()
+			var expiryDate = $("#expiryDateId").val()
+			var powerType = $("#powerTypeId").val()
+			var startPage = $("#startPage").val()
 			
-			return (score == 3);
-		}
-		function passwordMatch(password, element, regex, baseText, noMatch){
-			var returnVal = 0;
-			color = '#cc0000';
-			text = '';
-
-			if (!(element.id == 'usernameRequirementId') == (password.match(regex) != null)){
-				color = '#00aa00';
-				text = ' OK';
-				returnVal = 1;
-			} else {
-				noMatch.item = element;
+			if (expiryDate + "" == "undefined") {
+				expiryDate = "null"
 			}
-			element.style.color = color;
-			element.innerHTML = baseText + text;
-			return returnVal;
-		}
-		function togglePasswordVisibility(box){
-			var newState = "text";
-			if(box.checked){
-				newState = 'password';
-			}
-			if(box.id == "showPasswordEditId"){
-				$("#password")[0].type = newState;
-			} else if(box.id == "showPasswordCreateId"){
-				$("#oldPasswordId")[0].type = newState;
-			} else{
-				$("#oldPasswordId")[0].type = newState;
-				$("#newPasswordId")[0].type = newState;
-			}
-		}
-		function updateWelcome( e ){
-			if (tdsCommon.isValidWsResponse(e, "Can't update person information", false)) {
-				var ret = eval("(" + e.responseText + ")");
-				if(ret[0].pass == "no")
-					alert("Old Password is incorrect")
-				else if(ret[0].pass == "invalid")
-					alert("New Password does not meet the requirements")
-				else{
-					$("#loginUserId").html(ret[0].name)
-					$("#tzId").html(ret[0].tz)
-					$("#personDialog").dialog('close')
-					window.location.reload()
+			if (!firstName) {
+				alert("First Name should not be blank ")
+				returnVal = false
+			} else if ( email && !emailRegExp.test(email)) {
+				alert(email + " is not a valid e-mail address ")
+				returnVal = false
+			} else if (expiryDate != "null" && !expiryDate) {
+				alert("Expiry Date should not be blank ")
+				returnVal = false
+			} else if (expiryDate != "null" && !dateRegExpForExp.test(expiryDate)) {
+				alert("Expiry Date should be in 'mm/dd/yyyy HH:MM AM/PM' format")
+				returnVal = false
+			} else if (oldPassword + newPassword != "") {
+				if (!oldPassword) {
+					alert("Old Password should not be blank ")
+					returnVal = false
+				} else if (!PasswordValidation.checkPassword($("#personDialog #passwordId")[0])) {
+					alert("New Password does not meet all the requirements ")
+					returnVal = false
 				}
+			}
+			if (returnVal) {
+				new Ajax.Request( tdsCommon.createAppURL('/person/updateAccount'), {
+					asynchronous:true,
+					evalScripts:true,
+					onComplete:function(e){ updateWelcome(e) },
+					parameters:'id=' + $('#personId').val() 
+						+'&firstName='+$('#firstNameId').val() +'&lastName='+$('#lastNameId').val() +'&middleName='+$('#middleNameId').val()
+						+'&nickName='+$('#nickNameId').val()+'&title='+$('#titleId').val()+'&oldPassword='+$('#personDialog #oldPasswordId').val()
+						+'&newPassword='+$('#personDialog #passwordId').val()
+						+'&timeZone='+$('#timeZoneId').val()+'&email='+$('#emailId').val()+'&expiryDate='+expiryDate
+						+'&powerType='+powerType+'&startPage='+startPage
+				});
+			}
+		}
+		
+		function updateWelcome( e ) {
+			var data = tdsCommon.isValidWsResponse(e, "An unexpected error occurred while attempting to perform the update.", false);
+			if (data !== false) {
+				$("#loginUserId").html(data.name)
+				$("#tzId").html(data.tz)
+				$("#personDialog").dialog('close')
+				window.location.reload()
 			}
 		}
 		function setUserTimeZone( tz ){

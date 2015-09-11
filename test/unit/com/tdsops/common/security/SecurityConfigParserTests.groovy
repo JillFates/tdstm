@@ -313,4 +313,152 @@ class SecurityConfigParserTests extends Specification {
 
 	*/
 
+	private Map createDefaultLocalUserSettings() {
+		Map config = [
+			tdstm:[ security:[localUser:[
+				enabled: true,
+				minPasswordLength: 8,
+				maxLoginFailureAttempts: 5,
+				failedLoginLockoutPeriodMinutes: 30,
+				clearLockoutsOnRestart: true,
+				passwordHistoryRetentionDays: 385 * 2,
+				passwordHistoryRetentionCount: 0,
+				maxPasswordAgeDays: 90
+			] ] ]
+		]
+		return config
+	}
+
+	/*
+	 * Tests valie local user setting
+	 */
+	public void testParseLocalSettings() {
+		Map config = createDefaultLocalUserSettings()
+		Map localUserSettings
+
+		localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+
+		assertTrue (localUserSettings != null)
+	}
+
+	/*
+	 * Tests local user setting with invalid property
+	 */
+	public void testParseLocalSettingsInvalidProperty() {
+		Map config = createDefaultLocalUserSettings()
+		config["tdstm"]["security"]["localUser"]["invalidProperty"] = true
+		Map localUserSettings
+
+		def expection = shouldFail{
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		}
+		assertEquals 'Configuration setting: property tdstm.security.localUser.invalidProperty is not valid.', expection
+	}
+
+	/*
+	 * Tests local user setting with invalid history params, both zero
+	 */
+	public void testParseLocalSettingsInvalidHistoryParamsZero() {
+		Map config = createDefaultLocalUserSettings()
+		config["tdstm"]["security"]["localUser"]["passwordHistoryRetentionDays"] = 0
+		config["tdstm"]["security"]["localUser"]["passwordHistoryRetentionCount"] = 0
+		Map localUserSettings
+
+		def expection = shouldFail{
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		}
+		assertEquals 'Configuration setting: tdstm.security.localUser.passwordHistoryRetentionDays or tdstm.security.localUser.passwordHistoryRetentionCount must be greather than zero.', expection
+	}
+
+	/*
+	 * Tests local user setting with invalid history params, both non zero
+	 */
+	public void testParseLocalSettingsInvalidHistoryParamsNonZero() {
+		Map config = createDefaultLocalUserSettings()
+		config["tdstm"]["security"]["localUser"]["passwordHistoryRetentionDays"] = 1
+		config["tdstm"]["security"]["localUser"]["passwordHistoryRetentionCount"] = 1
+		Map localUserSettings
+
+		def expection = shouldFail{
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		}
+		assertEquals 'Configuration setting: tdstm.security.localUser.passwordHistoryRetentionDays and tdstm.security.localUser.passwordHistoryRetentionCount are mutually exclusive, at least one must be zero.', expection
+	}
+
+	/*
+	 * Tests local user setting with negative param
+	 */
+	public void testParseLocalSettingsNegativeParam() {
+		Map config = createDefaultLocalUserSettings()
+		config["tdstm"]["security"]["localUser"]["maxLoginFailureAttempts"] = -1
+		Map localUserSettings
+
+		def expection = shouldFail{
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		}
+		assertEquals 'Configuration setting tdstm.security.localUser.maxLoginFailureAttempts property must have value greater or equal than zero (>=0)', expection
+	}
+
+	/*
+	 * Tests local user setting with negative param
+	 */
+	public void testParseLocalSettingsInvalidBooleanParam() {
+		Map config = createDefaultLocalUserSettings()
+		config["tdstm"]["security"]["localUser"]["clearLockoutsOnRestart"] = "true"
+		Map localUserSettings
+
+		def expection = shouldFail{
+			localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+		}
+		assertEquals 'Configuration setting tdstm.security.localUser.clearLockoutsOnRestart property has invalid value, options: true|false', expection
+	}
+
+	/*
+	 * Tests local user setting, when a property is not defined should take the default value
+	 */
+	public void testParseLocalSettingsDefaultValue() {
+		Map config = [
+			tdstm:[ security:[localUser:[:] ] ]
+		]
+
+		def localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+
+		assertEquals 'enabled', true, localUserSettings.enabled
+		assertEquals 'minPasswordLength', 8, localUserSettings.minPasswordLength
+		assertEquals 'maxLoginFailureAttempts', 5, localUserSettings.maxLoginFailureAttempts
+		assertEquals 'failedLoginLockoutPeriodMinutes', 1, localUserSettings.failedLoginLockoutPeriodMinutes
+		assertEquals 'clearLockoutsOnRestart', true, localUserSettings.clearLockoutsOnRestart
+		assertEquals 'passwordHistoryRetentionDays', 530, localUserSettings.passwordHistoryRetentionDays
+		assertEquals 'passwordHistoryRetentionCount', 0, localUserSettings.passwordHistoryRetentionCount
+		assertEquals 'maxPasswordAgeDays', 0, localUserSettings.maxPasswordAgeDays
+		assertEquals 'forgotMyPasswordResetTimeLimit', 60, localUserSettings.forgotMyPasswordResetTimeLimit
+		assertEquals 'welcomeEmailTimeLimit', 3*60*24, localUserSettings.welcomeEmailTimeLimit
+		assertEquals 'forgotMyPasswordRetainHistoryDays', 30, localUserSettings.forgotMyPasswordRetainHistoryDays
+
+	}
+
+	/*
+	 * Tests local user setting don't exist
+	 */
+	public void testParseLocalSettingsNotExist() {
+		Map config = [
+			tdstm:[ security:[:] ]
+		]
+
+		def localUserSettings = SecurityConfigParser.parseLocalUserSettings(config)	
+
+		assertEquals 'enabled', true, localUserSettings.enabled
+		assertEquals 'minPasswordLength', 8, localUserSettings.minPasswordLength
+		assertEquals 'maxLoginFailureAttempts', 5, localUserSettings.maxLoginFailureAttempts
+		assertEquals 'failedLoginLockoutPeriodMinutes', 1, localUserSettings.failedLoginLockoutPeriodMinutes
+		assertEquals 'clearLockoutsOnRestart', true, localUserSettings.clearLockoutsOnRestart
+		assertEquals 'passwordHistoryRetentionDays', 530, localUserSettings.passwordHistoryRetentionDays
+		assertEquals 'passwordHistoryRetentionCount', 0, localUserSettings.passwordHistoryRetentionCount
+		assertEquals 'maxPasswordAgeDays', 0, localUserSettings.maxPasswordAgeDays
+		assertEquals 'forgotMyPasswordResetTimeLimit', 60, localUserSettings.forgotMyPasswordResetTimeLimit
+		assertEquals 'welcomeEmailTimeLimit', 3*60*24, localUserSettings.welcomeEmailTimeLimit
+		assertEquals 'forgotMyPasswordRetainHistoryDays', 30, localUserSettings.forgotMyPasswordRetainHistoryDays
+
+	}
+
 }

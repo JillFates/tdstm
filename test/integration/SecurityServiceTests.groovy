@@ -29,24 +29,39 @@ class SecurityServiceTests extends GrailsUnitTestCase {
 
 	}
 
-
-    protected void setUp() {
-        super.setUp()
+	void testPasswordConstraints () {
+		def passwordMap = ['password':false, 'Password':false, 'password7':false, 'Password7':true, 'password!':false, 'Password!':true, 'password7!':true, 'Password7!':true, 'PASSWORD':false, 'PASSWORD7':false, 'PASSWORD7!':true, 'Password77!':false, 
+			'pswd':false, 'PSWD':false, '!!!!':false, '7777':false, 'pswd7':false, 'pswd!':false, 'Pswd':false, 'PSWD7':false, 'PSWD!':false, '77!!':false, 'Pswd7':false, 'Pswd!':false, 'pswd7!':false, 'PSWD7!':false, 'Pswd7!':false]
+		
+		passwordMap.each {
+			def key = it.key
+			def value = it.value
+			def actual = securityService.validPassword('Password7!', key)
+			if (it.value)
+				assertTrue "'${it.key}' is a valid password", securityService.validPassword('Password77!', it.key)
+			else
+				assertFalse "'${it.key}' is not a valid password", securityService.validPassword('Password77!', it.key)
+		}
+	}
+	
+	
+	protected void setUp() {
+		super.setUp()
 		securityService = new SecurityService()
-
+		
 		// Create a new person and login that has no access to stuff
 		newPerson = new Person(firstName:'Jack', lastName:'Rabbit', staffType:'Salary')
 		assertTrue "Create new person", (newPerson.validate() && newPerson.save())
 		newUser = new UserLogin(username:'xyzzy42', password:'guessit', person:newPerson, active:'Y', expiryDate:TimeUtil.nowGMT())
 		assertTrue "Creating new UserLogin", (newUser.validate() && newUser.save() ? true : false) 
-
+		
 		knownUser = UserLogin.findByUsername('jmartin')
 		assertNotNull 'Looking up known user jmartin', knownUser
 
 	}
-
-    protected void tearDown() {
-        super.tearDown()
-    }
-
+	
+	protected void tearDown() {
+		super.tearDown()
+	}
+	
 }

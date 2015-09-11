@@ -95,7 +95,7 @@
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
+				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper', angular.element(\$('#outerBodyId')[0]).scope());}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
 				showPager="true">

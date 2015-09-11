@@ -4,7 +4,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 import org.apache.shiro.SecurityUtils
-import org.apache.shiro.crypto.hash.Sha1Hash
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.apache.commons.lang3.StringUtils
 import grails.validation.ValidationException
@@ -18,6 +17,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
+import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.exceptions.ServiceException
 
 class PersonController {
 	
@@ -357,85 +358,40 @@ class PersonController {
 		// going to use the company associated with the current project.
 		def isAjaxCall = params.forWhom != "person"
 		def companyId
-		def companyParty
-
 		if (isAjaxCall) {
 			// First try to see if the person already exists for the current project
 			def project = securityService.getUserCurrentProject()
 			companyId = project.client.id
 		} else {
-			companyId = params.company
+			companyId = NumberUtil.toLong(params.company)
 		}
-		if ( companyId != "" ) {
-			companyParty = Party.findById( companyId )
-		}
+
 		def errMsg
 		def isExistingPerson = false 
-		def name
 		def person
 
-		// Look to allow easy breakout for exceptions
-		while(true) {
-			if (! companyParty) {
-				errMsg = 'Unable to locate proper company to associate person to'
-				break;
-			}
-
-			// Get list of all staff for the company and then try to find the individual so that we don't duplicate
-			// the creation.
-			def personList = partyRelationshipService.getCompanyStaff(companyId)
-			person = personList.find {
-				// Find person using case-insensitive search
-				StringUtils.equalsIgnoreCase(it.firstName, params.firstName) &&
-				( ( StringUtils.isEmpty(params.lastName) && StringUtils.isEmpty(it.lastName) ) ||  StringUtils.equalsIgnoreCase(it.lastName, params.lastName) ) &&
-				( ( StringUtils.isEmpty(params.middleName) && StringUtils.isEmpty(it.middleName) ) ||  StringUtils.equalsIgnoreCase(it.middleName, params.middleName) )
-			}
-
-			isExistingPerson = person ? true : false
-			if (isExistingPerson ) {
-				errMsg = 'A person with that name already exists'
-				break
-			} else {
-				// Create the person and relationship appropriately
-
-				person = new Person( params )
-				if ( !person.hasErrors() && person.save() ) {			
-					//Receiving added functions		
-					def functions = params.list("function")
-					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
-					if(functions){
-						userPreferenceService.setUserRoles(functions, person.id)
-						def staffCompany = partyRelationshipService.getStaffCompany(person)
-						//Adding requested functions to Person .
-						partyRelationshipService.updateStaffFunctions(staffCompany, person, functions, 'STAFF')
-					}
-					if (! isAjaxCall) {
-						// Just add a message for the form submission to know that the person was created
-						flash.message = "A record for ${person.toString()} was created"
-					}
-				} else {
-					errMsg = GormUtil.allErrorsString(person)
-					break
-				}
-			}
-
-			name = person.toString()
-			break
-		}
-		
-		if (errMsg)
-			log.info "save() had errors: $errMsg"
+		try {
+			Person byWhom = securityService.getUserLoginPerson()
+			person = personService.savePerson(params, byWhom, companyId, true)
+		} catch (e) {
+			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			errMsg = e.getMessage()
+		}		
 
 		if (isAjaxCall) {
-			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:person.lastNameFirst, isExistingPerson:isExistingPerson, fieldName:params.fieldName]
+			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:person.lastNameFirst, isExistingPerson:(person != null), fieldName:params.fieldName]
 			render map as JSON
 		} else {
-			if (errMsg) 
+			if (errMsg) {
 				flash.message = errMsg
+			} else {
+				// Just add a message for the form submission to know that the person was created
+				flash.message = "A record for ${person.toString()} was created"
+			}
 			redirect( action:"list", params:[ companyId:companyId ] )
 		}
-
 	}
+
 	/*
 	 *  Remote method to edit Staff Details
 	 *  Note: No reference found to this method
@@ -600,7 +556,6 @@ class PersonController {
 	 * Note: Used only in projectStaff.gsp
 	 */
 	def savePerson() {
-
 		if (! controllerService.checkPermission(this, 'PersonCreateView')) {
 			ServiceResults.unauthorized(response)
 			return
@@ -641,89 +596,22 @@ class PersonController {
 	 * @return : person firstname
 	 */
 	def updatePerson() {
-		Person person = validatePersonAccess(params.id)
-		if (!person) {
-			return
-		}
-	
-		def personInstance = Person.get(params.id)
-		def ret = []
-		params.travelOK == "1" ? params : (params.travelOK = 0)
-		
-		if(!personInstance.staffType && !params.staffType)
-			params.staffType = 'Hourly'
-		
-		personInstance.properties = params
-		def personId
-		if ( personInstance.validate() && personInstance.save(flush:true) ) {
-			personId = personInstance.id
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-			//getSession().setAttribute( "LOGIN_PERSON", ['name':personInstance.firstName, "id":personInstance.id ])
-			def userLogin = UserLogin.findByPerson( personInstance )
-				if(userLogin){
-				if(params.newPassword){
-					def password = params.newPassword
-					
-					if(password != null)
-						userLogin.password = new Sha1Hash(params.newPassword).toHex()
-				}
-					
-				if(params.expiryDate && params.expiryDate != "null"){
-					def expiryDate = params.expiryDate
-					userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
-				}
-				userLogin.active = personInstance.active
-				if(!userLogin.save()){
-					userLogin.errors.allErrors.each{println it}
-				}
-			}
-			def functions = params.list("function")
-			if(params.manageFuncs != '0' || functions){
-				def staffCompany = partyRelationshipService.getStaffCompany(personInstance)
-				def companyProject = Project.findByClient(staffCompany)
-				partyRelationshipService.updateStaffFunctions(staffCompany, personInstance, functions, 'STAFF')
-				if(companyProject)
-					partyRelationshipService.updateStaffFunctions(companyProject, personInstance,functions, "PROJ_STAFF")
-			}
+		try {
+			Person byWhom = securityService.getUserLoginPerson()
+			String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			Person person = personService.updatePerson(params, byWhom, tzId, true)
 
-			def personExpDates = params.list("availability")
-			def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
-			personExpDates = personExpDates.collect{GormUtil.convertInToGMT(expFormatter.parse(it), tzId)}
-			def existingExp = ExceptionDates.findAllByPerson(personInstance)
-			
-			if(personExpDates){
-				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person and exceptionDay not in (:dates) ",[person:personInstance, dates:personExpDates])
-				personExpDates.each { presentExpDate->
-					def exp = ExceptionDates.findByExceptionDayAndPerson(presentExpDate, personInstance)
-					if(!exp){
-						def expDates = new ExceptionDates()
-						expDates.exceptionDay = presentExpDate
-						expDates.person = personInstance
-						expDates.save(flush:true)
-					}
-				}
-			} else {
-				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person",[person:personInstance])
+			if (params.tab) {
+				forward( action:'loadGeneral', params:[tab: params.tab, personId:person.id])
+			} else { 
+				List results = [ name:person.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ ]
+				render results as JSON
+			}		
+		} catch (e) {
+			if (log.isDebugEnabled()) {
+				log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			}
-			
-			userPreferenceService.setPreference( "CURR_TZ", params.timeZone )
-			userPreferenceService.setPreference( "CURR_POWER_TYPE", params.powerType )
-			userPreferenceService.loadPreferences("CURR_TZ")
-			userPreferenceService.setPreference("START_PAGE", params.startPage )
-			userPreferenceService.loadPreferences("START_PAGE")
-			
-		} else {
-
-			// TODO : Error handling - this doesn't report to the user that there was any error
-			log.warn "updatePerson() unable to save $personInstance due to: " + GormUtil.allErrorsString(personInstance)
-
-		}
-		if (params.tab) {
-			forward( action:'loadGeneral', params:[tab: params.tab, personId:personId])
-		} else { 
-			ret << [ name:personInstance.firstName, tz:getSession().getAttribute( "CURR_TZ" )?.CURR_TZ ]
-			render  ret as JSON
+			ServiceResults.respondWithError(response, e.getMessage())
 		}
 	}
 
@@ -733,122 +621,93 @@ class PersonController {
 	 * @return person details as JSON
 	 */
 	def retrievePersonDetails() {
-		Person person = validatePersonAccess(params.id)
-		if (!person) {
-			return
+		try {
+			Person currentPerson = securityService.getUserLoginPerson()
+			Person person = personService.validatePersonAccess(params.id, currentPerson)
+			UserLogin userLogin = securityService.getPersonUserLogin( person )
+			
+			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+
+			// TODO : JPM 5/2015 : Move the date formating into a reusable class
+			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+			def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
+			
+			def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
+
+			render personDetails as JSON
+		} catch (e) {
+			ServiceResults.respondWithError(response, e.getMessage())
 		}
-
-		def userLogin = UserLogin.findByPerson( person )
-		
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-
-		// TODO : JPM 5/2015 : Move the date formating into a reusable class
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-		def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
-		
-		def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
-
-		render personDetails as JSON
 	}
 
 	/**
-	 * Used by controller methods to validate that the user can access a person and will respond with appropriate 
-	 * HTTP responses based on access constraints (e.g. Unauthorized or Not Found)
-	 * @param personId - the id of the person to access
-	 * @return Person - the person if can access or null
-	 */
-	private Person validatePersonAccess(String personId) {
-		def currentPerson = securityService.getUserLoginPerson()
-		if (!currentPerson) {
-			ServiceResults.unauthorized(response)
-			return null
-		}
-
-		// Make sure we have a legit id
-		if (! personId || ! personId.isNumber() || ! personId.isLong() ) {
-			render Service.Results.invalidParams('Invalid or missing person id requested') as JSON
-			return
-		}
-		def editSelf = ( personId == currentPerson.id.toString() )
-
-		// If not edit own account, the user must have privilege to edit the account
-		if ( ! editSelf && ! controllerService.checkPermission(this, 'PersonEditView')) {
-			ServiceResults.unauthorized(response)
-			return null
-		}
-
-		if (! editSelf) {
-			// TODO : JPM 5/2015 : Need to make sure showing/editing someone that the user has access to
-		}
-
-		def person = Person.findById( personId  )
-		if (! person) {
-			ServiceResults.notFound()
-			return null
-		}
-
-		return person
-	}
-
-
-	/**
-	 * Check if the user inputed password is correct, and if so call the update method
-	 * @author : Ross Macfarlane 
+	 * Update the person account that is invoked by the user himself
 	 * @param  : person id and input password
 	 * @return : pass:"no" or the return of the update method
 	 */
-	def checkPassword() {
-		if (params.oldPassword == "")
-			return updatePerson()
+	def updateAccount = {
+		String errMsg = ''
+		Map results = [:]
+		try {
+			Person byWhom = securityService.getUserLoginPerson()
+			params.id = byWhom.id
+			String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			Person person = personService.updatePerson(params, byWhom, tzId, false)
 
-		def password = params.newPassword ?: ''
-			
-		def userLogin = UserLogin.findByPerson(Person.findById(params.id))
-		if (securityService.validPassword(userLogin.username, params.newPassword)) {
-			def truePassword = userLogin.password
-			// TODO : JPM 5/2015 : Password encryption should be IN the securityService and NO WHERE ELSE. Should have passwordMatch method or something
-			def passwordInput = new Sha1Hash(params.oldPassword).toHex()
-			
-			if (truePassword.equals(passwordInput)) {
-				// TODO : JPM 5/2015 : The checkPassword and updatePerson functions are screwed up. The save button should be calling updatePerson directly
-				return updatePerson()
-			}
-		// TODO : JPM 5/2015 : Method should be returning standard ServiceResponse data	
-			def ret = []
-			ret << [pass:"no"]
-			render  ret as JSON
+			if (params.tab) {
+				// Funky use-case that we should try to get rid of
+				forward( action:'loadGeneral', params:[tab: params.tab, personId:person.id])
+				return
+			} else { 
+				results = [ name:person.firstName, tz:tzId ]
+			}	
+
+		} catch (InvalidParamException e) {
+			errMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errMsg = e.getMessage()
+		} catch (e) {
+			log.warn "updateAccount() failed : ${ExceptionUtil.stackTraceToString(e)}"
+			errMsg = 'An error occurred during the update process'
+		}
+
+		if (errMsg) {
+			ServiceResults.respondWithError(response, errMsg)
 		} else {
-			def ret = []
-			ret << [pass:"invalid"]
-			render ret as JSON
+			ServiceResults.respondWithSuccess(response, results)
 		}
 	}
 
 	/** 
 	 * Used to clear out person's preferences. User can clear out own or requires permission
 	 */
+// TODO : JPM 8/31/2015 : Need to test
 	def resetPreferences = {
-		Person person = validatePersonAccess(params.user)
-		if (!person) {
-			return
+		try {
+			Person currentPerson = securityService.getUserLoginPerson()
+			Person person = personService.validatePersonAccess(params.user, currentPerson)
+
+			UserLogin userLogin = securityService.getPersonUserLogin(person)
+			if (! userLogin) {
+				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
+				ServiceResponse.notFound()
+				return 
+			}
+			
+			// TODO : JPM 5/2015 : Change the way that the delete is occurring
+			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
+			prePreference.each{ preference->
+			  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
+				 preferenceInstance.delete()
+
+			}
+
+			userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
+			render person
+		} catch (e) {
+			ServiceResponse.respondWithError(response, e.getMessage())
 		}
 
-		UserLogin userLogin = UserLogin.findByPerson(person)
-		if (! userLogin) {
-			log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-			ServiceResults.notFound()
-			return 
-		}
-		
-		// TODO : JPM 5/2015 : Change the way that the delete is occurring
-		def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
-		prePreference.each{ preference->
-		  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-			 preferenceInstance.delete(flush:true)
-		}
-
-		userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
-		render person
 	}
 
 	/*

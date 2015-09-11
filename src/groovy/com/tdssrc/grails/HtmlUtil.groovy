@@ -4,12 +4,15 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import org.apache.commons.validator.UrlValidator
 import org.codehaus.groovy.grails.web.util.WebUtils
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
-
+import com.tdsops.common.grails.ApplicationContextHolder 
 /**
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
  */
 class HtmlUtil {
-	def static final g = new org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib()
+
+	// static final ApplicationTagLib g = new ApplicationTagLib()
+	static final ApplicationTagLib g = ApplicationContextHolder.getApplicationContext().getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+	// ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
 
 	/**
 	 * Generate the HTML for a SELECT control based on a map of parameters
@@ -113,7 +116,14 @@ class HtmlUtil {
 	 * @return String URL
 	 */
 	def public static createLink(map) {
-		g.createLink(map).toString()
+		def link = g.createLink(map)
+		String result = ''
+		if (link) {
+			result = link.toString()
+		} else {
+			println "HtmlUti.createLink() failed for map $map"
+		}
+		return result
 	}
 	
 	/**

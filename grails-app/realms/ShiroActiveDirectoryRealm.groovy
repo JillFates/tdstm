@@ -3,6 +3,7 @@ import org.apache.shiro.authc.CredentialsException
 import org.apache.shiro.authc.IncorrectCredentialsException
 import org.apache.shiro.authc.UnknownAccountException
 import org.apache.shiro.authc.SimpleAccount
+import org.apache.shiro.UnavailableSecurityManagerException
 
 import com.tdsops.common.security.ConnectorActiveDirectory
 //import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -94,7 +95,7 @@ class ShiroActiveDirectoryRealm {
 			initialize()
 
 		if (! isEnabled) {
-			throw new AccountException('Active Directory Realm is disabled')
+			throw new UnavailableSecurityManagerException('Active Directory Realm is disabled')
 		}
 
 		Map userInfo

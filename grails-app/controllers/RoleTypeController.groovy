@@ -6,8 +6,16 @@ class RoleTypeController {
     def allowedMethods = [ delete:'POST', save:'POST', update:'POST' ]
     // return list of Roles
     def list() {
+        def c = RoleType.createCriteria()
         if ( !params.max ) params.max = 25
-        [ roleTypeInstanceList: RoleType.list( params ) ]
+        def roleTypes = c.list{
+                            and{
+                                order('type','asc')
+                                order('level','desc')
+                                order('id', 'asc')
+                            }
+                        } 
+        [ roleTypeInstanceList: roleTypes]
     }
     // return RoleType details to show form
     def show() {

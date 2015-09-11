@@ -2,7 +2,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 //import org.apache.commons.dbcp.BasicDataSource
 // import org.apache.shiro.authc.credential.Sha512CredentialsMatcher
-import org.apache.shiro.authc.credential.Sha1CredentialsMatcher
+// import org.apache.shiro.authc.credential.Sha1CredentialsMatcher
+import com.tdsops.common.security.shiro.SHA2CredentialsMatcher
 
 import com.tdsops.common.grails.ApplicationContextHolder
  
@@ -34,11 +35,15 @@ beans = {
 	   dataSource = otherDataSource
 	}
 	*/
+
+	// Shiro Password Encryption configuration using custom AES encryption
+	credentialMatcher(SHA2CredentialsMatcher) {
+	}
 	
 	// Shiro Password Encryption configuration
-	credentialMatcher(Sha1CredentialsMatcher) {
-		storedCredentialsHexEncoded = true
-	}
+	//credentialMatcher(Sha1CredentialsMatcher) {
+	//	storedCredentialsHexEncoded = true
+	//}
 	/*
 	 * See http://suryazi.blogspot.com/2012/07/salting-password.html for more on this one
 	 * 

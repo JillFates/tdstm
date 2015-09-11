@@ -1,11 +1,17 @@
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
-import org.apache.shiro.crypto.hash.Sha1Hash
 import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.tm.enums.domain.PasswordResetStatus
+import com.tdsops.tm.enums.domain.PasswordResetType
+import com.tdsops.tm.enums.domain.EmailDispatchOrigin
+import net.transitionmanager.PasswordReset
+import net.transitionmanager.EmailDispatch
 
 class AuthController {
 	
@@ -15,6 +21,8 @@ class AuthController {
 	def securityService
 	def userPreferenceService
 	def environmentService
+	def emailDispatchService
+	def controllerService
 
 	def index() { redirect(action: 'login', params: params) }
 
@@ -203,7 +211,7 @@ class AuthController {
 		// retrive the list of events in progress
 		def currentLiveEvents = MoveEvent.findAll()
 		def moveEventsList = []
-		def thirtyDaysInMS = 2592000000
+		def thirtyDaysInMS = 60 * 24 * 30 * 1000
 		
 		currentLiveEvents.each{ moveEvent  ->
 			def completion = moveEvent.getEventTimes()?.completion?.getTime()
@@ -231,4 +239,96 @@ class AuthController {
 	def maintMode() {
 		//Do nothing
 	}
+
+	/**
+	 * The 1st step in the Forgot My Password process
+	 */
+	def forgotMyPassword() {
+		render( view:'_forgotMyPassword', model: [email: params.email ] )
+	}
+
+	/** 
+	 * The 2nd step in the passord reset process.
+	 * This will send the email notice to the user and then redirect them to the login form with a flash message
+	 * explaining the next step.
+	 */ 
+	def sendResetPassword() {
+		def email = params.email
+		def success = true
+		try {
+			securityService.sendResetPasswordEmail(email, request.getRemoteAddr(), PasswordResetType.FORGOT_MY_PASSWORD)
+		} catch (ServiceException se) {
+			flash.message = controllerService.getExceptionMessage(this, se)
+			success = false
+		}
+
+		render( view:'_forgotMyPassword', model: [email: params.email, success: success] )
+	}
+
+	/**
+	 * The 3rd step in the password reset process where the user is prompted for their email address and their new password.
+	 */
+	def resetPassword() {
+		String token = params.token
+		boolean validToken = true
+		PasswordReset pr
+
+		try {
+			pr = securityService.validateToken(token)
+		} catch (ServiceException se) {
+			auditService.logWarning("User failed to reset password with token '$token' from IP ${request.getRemoteAddr()}. ${se.getMessage()}.")
+			flash.message = controllerService.getExceptionMessage(this, se) + '. Please contact support if you require assistances.'
+			redirect(action: 'login')
+			return
+		}
+
+		render( view:'_resetPassword', model: [
+			token: pr.token, 
+			password: params.password, 
+			email: params.email, 
+			validToken: validToken,
+			username: pr.userLogin.username,
+			minPasswordLength: securityService.getUserLocalConfig().minPasswordLength
+		] )
+	}
+
+	/**
+	 * The 4th and final step in the user resetting their password. If successful the user will be logged in and redirected
+	 * to their landing page along with a message that their password was changed. If it fails it will return to the 
+	 * reset password form.
+	 */
+	def applyNewPassword() {
+		def token = params.token
+		def password = params.password
+		def email = params.email
+
+		try {
+			// Change password
+			PasswordReset pr = securityService.applyPasswordFromPasswordReset(token, password, email)
+
+			// Send email to notify about the change
+			def ed = emailDispatchService.basicEmailDispatchEntity(
+				EmailDispatchOrigin.PASSWORD_RESET,
+				"Your TransitionManager password has changed",
+				"passwordResetNotify",
+				"",
+				pr.userLogin.person.email,
+				pr.userLogin.person.email,
+				pr.userLogin.person,
+				pr.userLogin.person
+			)
+			emailDispatchService.createEmailJob(ed, [:])
+
+			// Login and redirect to home page
+			params.username = pr.userLogin.username
+			flash.message = 'Your new password was successfully changed.'
+			signIn()
+
+		} catch (Exception se) {
+			flash.message = controllerService.getExceptionMessage(this, se) + '. Please contact support if you require assistances.'
+			resetPassword()
+		}
+		
+	}
+
 }

@@ -10,7 +10,10 @@
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
+
 		<g:javascript src="tdsmenu.js" />
+		<g:javascript src="PasswordValidation.js" />
+
 		<script type="text/javascript">
 			$(document).ready(function() {
 				$("#personDialog").dialog({ autoOpen: false });
@@ -74,8 +77,10 @@
 		def user = UserLogin.findByPerson( person )
 		def username = user.username
 		def userPrefs = UserPreference.findAllByUserLogin(user)
-
+		def securityService = application.getAttribute("org.codehaus.groovy.grails.APPLICATION_CONTEXT").getBean("securityService")
+		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
 	%>
+	
 	<body>
 		<div class="main_body">
 			<input id="contextPath" type="hidden" value="${request.contextPath}"/>
@@ -503,7 +508,7 @@
 		
 
 		<%-- DIV for editing User Profile --%> 
-		<g:render template="../person/personEdit" model="[user:user]" />
+		<g:render template="../person/personEdit" model="[user:user, minPasswordLength:minPasswordLength]" />
  
 		<%-- DIV for editing User Preferences --%>
 		<div id="userPrefDivId" style="display: none;min-width:250px;" title="${session.getAttribute("LOGIN_PERSON").name } Preferences"></div>

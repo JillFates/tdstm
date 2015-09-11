@@ -101,6 +101,9 @@ class AuditService {
 		log.info "USER_ACTIVITY: $message"
 	}
 
+	def logWarning(message) {
+		log.warn "USER_ACTIVITY: $message"
+	}
 
 	/**
 	 * Check if the configuration property is set to activity

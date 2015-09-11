@@ -339,11 +339,19 @@ class ImportService {
 				// Validate the device type only if the Mfg/Model were not found
 				if (! found) {
 					String deviceType = DataTransferValue.findWhere(dataTransferBatch:dtb, rowId:rowId, eavAttribute:deviceTypeEavAttr)?.importValue
-					if (!deviceTypeMap.containsKey(deviceType.toLowerCase())) {
-						if (!invalidDeviceTypeMap.containsKey(deviceType)) {
-							invalidDeviceTypeMap[deviceType] = 1
+					String invalidType
+					if (deviceType?.size()) {
+						if (!deviceTypeMap.containsKey(deviceType.toLowerCase())) {
+							invalidType = deviceType
+						}
+					} else {
+						invalidType = 'NULL'
+					}
+					if (invalidType?.size()) {
+						if (!invalidDeviceTypeMap.containsKey(invalidType)) {
+							invalidDeviceTypeMap[invalidType] = 1
 						} else {
-							invalidDeviceTypeMap[deviceType]++
+							invalidDeviceTypeMap[invalidType]++
 						}
 					}
 				}

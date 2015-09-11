@@ -28,10 +28,27 @@ class TestCaseController {
 	def runbookService
 	def taskService	
 	def securityService
+	def serviceHelperService
+	def userPreferenceService
 	def userService
 
 	// def messageSource
 	
+	def testServiceHelper() {
+
+		def securitySrcv = serviceHelperService.getService('security')
+		def personSrcv = serviceHelperService.getService('person')
+		render 'It worked'
+
+	}
+
+	def testPersonGetAssignedProjects() {
+		def user = securityService.getUserLogin()
+		List projects = personService.getAssignedProjects(user.person)
+		render "Assigned to projects ${projects*.id}".toString()
+
+	}
+
 	def testPerms() {
 		def user = securityService.getUserLogin()
 

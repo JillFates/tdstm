@@ -183,6 +183,16 @@ class UrlMappings {
 			action = [GET:"maintMode"]
 		}
 
+		"/auth/resetPassword/$token" {
+			controller = "auth"
+			action = [GET:"resetPassword"]
+		}
+		
+		"/ws/admin/unlockAccount" {
+			controller = "wsAdmin"
+			action = [PUT:"unlockAccount"]
+		}
+
 		"500"(view:'/error')
 		"401"(view:'/unauthorized')
 	}

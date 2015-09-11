@@ -132,47 +132,8 @@
 					<input type="text" name ="modelScore" id ="modelScoreId" readonly="readonly" value="${person?.modelScore}"/>
 				</td>
 			</tr>
-			<tr class="js-password">
-				<td>
-					Hide password:
-				</td>
-				<td>
-					<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordId"/>
-				</td>
-			</tr>
-			<tr class="prop js-password">
-				<td valign="top" class="name">
-					<label for="password">Old Password:</label>
-				</td>
-				<td valign="top" class="value">
-					<input type="hidden" id="personId" name="personId" value=""/>
-					<input type="text" maxlength="25" name="oldPassword" id="oldPasswordId" value=""/>
-				</td>
-			</tr>
-			<tr class="prop js-password">
-				<td valign="top" class="name">
-					<label for="password">New Password:</label>
-				</td>
-				<td valign="top" class="value">
-					<input type="text" maxlength="25" name="newPassword" onkeyup="checkPassword(this)" id="newPasswordId" value=""/>
-				</td>
-			</tr>
-			<tr class="js-password">
-				<td>
-					Requirements:
-				</td>
-				<td>
-					<em id="usernameRequirementId">Password must not contain the username</em><br/>
-					<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
-					<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
-					<ul>
-						<li><em id="uppercaseRequirementId">Uppercase characters</em></li>
-						<li><em id="lowercaseRequirementId">Lowercase characters</em></li>
-						<li><em id="numericRequirementId">Numeric characters</em></li>
-						<li><em id="symbolRequirementId">Nonalphanumeric characters</em></li>
-					</ul>
-				</td>
-			</tr>
+			
+			<g:render template="../userLogin/setPasswordFields" model="${[changingPassword:true, minPasswordLength:minPasswordLength]}" />
 		  </tbody>
 		</table>
 	  </div>

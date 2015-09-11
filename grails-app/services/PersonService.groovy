@@ -1,15 +1,17 @@
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 
+import java.text.SimpleDateFormat
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.Application
-import Person
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.NumberUtil
 import grails.validation.ValidationException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdsops.common.security.SecurityUtil
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
@@ -22,6 +24,7 @@ class PersonService {
 	def partyRelationshipService
 	def securityService
 	def projectService
+	def userPreferenceService
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -766,6 +769,478 @@ class PersonService {
 		return message
 	}
 
+	/**
+	 * Used to validate that a user has the permissions to edit Staffing that the person/project are accessible as well. This will
+	 * validate and lookup values for project:project, person:person, teamRoleType:teamRoleType. If there are any problems it will 
+	 * throw the appropriate Exception.
+	 * @param user- the UserLogin that is attempting to edit staffing
+	 * @param projectId - the id of the project to assign/remove a person from
+	 * @param personId - the id of the person being editted
+	 * @param teamCode - the code of the team the person to be assigned/removed
+	 * @return A map containing the looked up project, person, teamRoleType
+	 */
+	Map validateUserCanEditStaffing(UserLogin user, String projectId, String personId, String teamCode) {
+		// Check if the user has permission to edit the staff
+		if ( ! securityService.hasPermission(user, "EditProjectStaff") ) {
+			securityService.reportViolation("attempted to alter staffing for person $personId on project $projectId without permission", user)
+			throw new UnauthorizedException("You do not have permission to manage staffing for projects and events")
+		}
+
+		if (projectId && ! NumberUtil.isPositiveLong(projectId)) {
+			throw new InvalidParamException("Invalid Project Id was specified")
+		}
+		def project = Project.get( projectId )
+		if (! project) {
+			log.warn  "validateUserCanEditStaffing() user $user called with invalid project id $projectId"
+			throw new InvalidParamException("Invalid project specified")
+		}
+
+		// Check if the person and events are not null
+		if ( !personId  || ! NumberUtil.isPositiveLong(personId)) {
+			log.debug "validateUserCanEditStaffing() user $user called with missing or invalid params (personId:$personId, projectId:$projectId, teamCode:$teamCode)"
+			throw new InvalidParamException("The person and event were not properly identified")
+		}
+		Person person = Person.get(personId)
+		if (! person) {
+			log.warn  "validateUserCanEditStaffing() user $user called with invalid person id $personId"
+			throw new InvalidParamException("Invalid person specified")
+		}
+
+		RoleType teamRoleType = RoleType.get(teamCode) 
+		if (! teamRoleType || ! teamRoleType.isTeamRole() ) {
+			log.warn "assignToProject() user $user called with invalid team code $teamCode"
+			throw new InvalidParamException("The specified team code was invalid")
+		}
+
+		// Check to see if the user should have access to the project
+		if (! getAvailableProjects(user.person, project)) {
+			securityService.reportViolation("Attempt to assign peson '$person' to project '$project' that the user is not associated with", user)
+			throw new UnauthorizedException("You do not have access to the project and therefore can not do the assignment")
+		}
+
+		// Check to see that the project for person to be assigned is one that is available
+		if (! getAvailableProjects(person, project)) {
+			securityService.reportViolation("Attempt to assign person '$person' to project '$project' that person is not associated with", user)
+			throw new UnauthorizedException("The person you are trying to assign to the project is not associated with the project")
+		}
+
+		return [project:project, person:person, teamRoleType:teamRoleType]
+	}
+
+	/**
+	 * Used to determine a person has the permission to access another person
+	 * @param byWhom - the Person that wants to access another Person
+	 * @param person - the Person to be accessed
+	 * @param forEdit - flag that when set to true will validate the accessor has permission to edit
+	 * @return true if byWhom has access to the person otherwise false
+	 */
+	boolean hasAccessToPerson(Person person, Person byWhom, boolean forEdit=false, boolean reportViolation=true) throws UnauthorizedException {
+
+		boolean hasAccess = false
+		List byWhomProjects = getAvailableProjects(byWhom)*.id
+		List personProjects = getAvailableProjects(person)*.id
+
+log.debug "hasAccessToPerson() byWhom projects: $byWhomProjects"
+log.debug "hasAccessToPerson() person projects: $personProjects"
+
+		if (forEdit && ! securityService.hasPermission(byWhom, 'EditUserLogin')) {
+			if (reportViolation) {
+				reportViolation("attempted to edit person $person (${person.id})", byWhom)
+			}
+			throw new UnauthorizedException('Do not have required permission to edit user')
+		}
+
+		if (byWhomProjects && personProjects) {
+			for(int i=0; i < personProjects.size(); i++) {
+				if (byWhomProjects.contains(personProjects[i])) {
+					hasAccess = true
+					break
+				}
+			}
+		}
+
+		if (! hasAccess) {
+			if (reportViolation) {
+				securityService.reportViolation("attempted to access person $person (${person.id}) without proper access", byWhom)
+			}
+			throw new UnauthorizedException('Do not have access to specified user')
+		}
+	}
+
+	/** 
+	 * Used to associate a person to a project as staff
+	 * @param user - the user performing the action
+	 * @param projectId - the id number of the project to remove the person from
+	 * @param personId - the id of the person to update
+	 * @param teamCode - the role (aka team) to assign the person to the project/event as
+	 * @return String - any value indicates an error otherwise blank means succes
+	 */
+	void addToProject(UserLogin user, String projectId, String personId, String teamCode, Map map=null) {
+		// The addToEvent may call this method as well
+		if (! map) {
+			map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
+		}
+		if (map.error) {
+			throw new InvalidRequestException(map.error)
+		}
+
+		// Add to the project if not assiged already
+		if (! isAssignedToProject(map.project, map.person)) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, 'STAFF')) {
+				auditService.logMessage("$user assigned ${map.person} to project ${map.project.name} as STAFF")
+			} else {
+				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
+			}			
+		}
+
+		if (! isAssignedToProjectTeam(map.project, map.person, map.teamRoleType)) {
+			log.debug "addToProject() map=$map" 
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, map.teamRoleType)) {
+				auditService.logMessage("$user assigned ${map.person} to project '${map.project.name}' on team $teamCode")
+			} else {
+				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
+			}			
+		} else {
+			log.warn "addToProject() called for project ${map.project}, person ${map.person}, team ${map.teamRoleType} but already exists"
+		}
+	}
+
+	/**
+	 * Used by a few methods to delete the Project Staffing assignments to an event
+	 * @param project - the Project that the events belong to
+	 * @param event - if supplied will delete just a particular event (optional)
+	 * @param person - the person to remove
+	 * @param team - if supplied will delete just the team (optional)
+	 * @return count of how many were deleted
+	 */
+	private int deleteFromEvent(Project project, MoveEvent event=null, Person person, RoleType team=null) {
+		int c = 0
+
+		assert project != null
+		assert person != null
+
+		List mes = MoveEventStaff.withCriteria {
+			and {
+				moveEvent {
+					eq('project', project)
+				}
+				eq('person', person)
+				if (event) {
+					eq('moveEvent', event)
+				}
+				if (team) {
+					eq('role', team)
+				}
+			}
+		}
+		mes?.each { 
+			it.delete() 
+			c++
+		}
+		return c
+	}
+
+	/**
+	 * A helper method used to lookup and validate that an event was properly referenced
+	 * @param project - the project that the event should belong to
+	 * @param eventId - the event id number to lookup
+	 * @return the event object
+	 */
+	private MoveEvent lookupEvent(Project project, String eventId) {
+		if (! NumberUtil.isPositiveLong(eventId)) {
+			throw new InvalidParamException('The event id number was invalid')
+		}
+		MoveEvent event = MoveEvent.get(eventId)
+		if (!event) {
+			throw new InvalidParamException('The event was not found')
+		}
+		if (event.project.id != project.id) {
+			securityService.reportViolation("attempted to access event ($eventId) that doen't match project ($project.id)")
+			throw new InvalidParamException('The event was not found')
+		}
+		return event
+	}
+
+	/** 
+	 * Used to remove a person from a project as staff and also clear out references to MoveEventStaff
+	 * @param user - the user performing the action
+	 * @param projectId - the id number of the project to remove the person from
+	 * @param personId - the id of the person to update
+	 * @param teamCode - the role (aka team) to assign the person to the project/event as
+	 * @return String - any value indicates an error otherwise blank means succes
+	 */
+	String removeFromProject(UserLogin user, String projectId, String personId, String teamCode) {
+		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
+		if (map.error) {
+			throw new InvalidRequestException(map.error)
+		}
+
+		// Remove all of the person's MoveEventStaff relationships for the project
+		deleteFromEvent(map.project, null, map.person, map.teamRoleType)
+
+		// Remove the Project Staff relationship for the project
+		List prs = partyRelationshipService.getProjectTeamMembers(map.project, map.teamRoleType, map.person)
+		prs?.each { 
+			log.debug "removeFromProject() deleting PartyRelationship $it"
+			it.delete()
+		}
+
+		// Remove the person from the project
+		PartyRelationship prProjectStaff = getProjectReference(map.project, map.person) 
+		if (prProjectStaff) {
+			log.debug "removeFromProject() deleting PartyRelationship $prProjectStaff"
+			prProjectStaff.delete()
+		} else {
+			log.warn "removeFromProject() No Project Staff record found for project $projectId and person $personId"
+		} 
+
+		auditService.logMessage("$user unassigned ${map.person} from project ${map.project.name}")
+	}
+
+	/** 
+	 * Used to associate a person to a project as staff
+	 * @param user - the user performing the action
+	 * @param projectId - the id number of the project to remove the person from
+	 * @param personId - the id of the person to update
+	 * @param teamCode - the role (aka team) to assign the person to the project/event as
+	 * @return String - any value indicates an error otherwise blank means succes
+	 */
+	void addToEvent(UserLogin user, String projectId, String eventId, String personId, String teamCode) {
+		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
+
+		// Add the Staff to the Project if not already assigned
+		if (! isAssignedToProjectTeam(map.project, map.person, map.teamRoleType)) {
+			addToProject(user, projectId, personId, teamCode, map)
+		}
+
+		MoveEvent event = lookupEvent(map.project, eventId)
+
+		// Add the person to the Event if not already assigned
+		if (! isAssignedToEventTeam(event, map.person, map.teamRoleType)) {
+			MoveEventStaff mes = new MoveEventStaff([person: map.person, moveEvent: event, role: map.teamRoleType])
+			if (mes.validate() && mes.save(flush:true)) {
+				auditService.logMessage("$user assigned ${map.person} to project '${map.project.name}' event '${event.name}' as $teamCode")
+			} else {
+				log.error "addToEvent() Unable to save MoveEventStaff record for person $personId, project $projectId, event $eventId, team $teamCode : " +
+					GormUtil.allErrorsString(mes)
+				throw new RuntimeException("Unable to save MoveEventStaff record : " + GormUtil.allErrorsString(mes))
+			}
+		} else {
+			log.warn "addToEvent() called for project ${map.project}, person ${map.person}, team ${map.teamRoleType} but already exists"
+		}
+	}
+
+	/** 
+	 * Used to remove a person from a project as staff and also clear out references to MoveEventStaff
+	 * @param user - the user performing the action
+	 * @param projectId - the id number of the project to remove the person from
+	 * @param personId - the id of the person to update
+	 * @param teamCode - the role (aka team) to assign the person to the project/event as
+	 * @return String - any value indicates an error otherwise blank means succes
+	 */
+	void removeFromEvent(UserLogin user, String projectId, String eventId, String personId, String teamCode) {
+		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
+
+		MoveEvent event = lookupEvent(map.project, eventId)
+
+		deleteFromEvent(map.project, event, map.person, map.teamRoleType)
+
+		auditService.logMessage("$user unassigned ${map.person} from project '${map.project.name}' team $teamCode")
+	}
+
+	/**
+	 * Used to determine if a person is assigned to a project as a STAFF member
+	 * @param person - the person whom to check 
+	 * @param project - the project to check if user is assigned to
+	 * @return The company whom the person is employeed
+	 */
+	boolean isAssignedToProject(Project project, Person person) {
+		return (getProjectTeamReference(project, person, 'STAFF') != null)
+	}
+
+	/**
+	 * Used to determine if a person is assigned to a project as a STAFF member
+	 * @param project - the project to check if user is assigned to
+	 * @param person - the person whom to check 
+	 * @param teamCode - the team code
+	 * @return The company whom the person is employeed
+	 */
+	boolean isAssignedToProjectTeam(Project project, Person person, teamCode) {
+		return (getProjectTeamReference(project, person, teamCode) != null)
+	}
+
+	/**
+	 * Used retrieve the 'STAFF' PartyRelationship reference for a person to a particular project
+	 * @param project - the project to check if user is assigned to
+	 * @param person - the person whom to check 
+	 * @param teamCode - the team code
+	 * @return The company whom the person is employeed
+	 */
+	PartyRelationship getProjectReference(Project project, Person person) {
+		return getProjectTeamReference(project, person, 'STAFF')
+	}
+
+	/**
+	 * Used retrieve the Team PartyRelationship reference for a person to a particular project
+	 * @param project - the project to check if user is assigned to
+	 * @param person - the person whom to check 
+	 * @param teamCode - the team code
+	 * @return The company whom the person is employeed
+	 */
+	PartyRelationship getProjectTeamReference(Project project, Person person, teamCode) {
+		assert person != null
+		assert project != null
+
+		PartyRelationshipType prtProjectStaff = PartyRelationshipType.get('PROJ_STAFF')
+		assert prtProjectStaff != null
+
+		RoleType rtProject = RoleType.get('PROJECT')
+		assert rtProject != null
+
+		// Lookup the RoleType(teamCode) if not already a RoleTeam
+		if (! (teamCode instanceof RoleType)) {
+			assert (teamCode instanceof String)
+			teamCode = RoleType.get(teamCode)
+			assert teamCode != null
+		}
+
+		def teamRef = PartyRelationship.createCriteria().get {
+			and {
+				eq('partyRelationshipType', prtProjectStaff)
+				eq('roleTypeCodeFrom', rtProject)
+				eq('roleTypeCodeTo', teamCode)
+				eq('partyIdFrom', project)
+				eq('partyIdTo', person)
+			}
+		}
+
+		return teamRef
+	}
+
+	/**
+	 * Used to determine if a person is assigned to an Event for a particular team role 
+	 * @param person - the person whom to check 
+	 * @param event - the event to check if user is assigned to
+	 * @param teamCode - the team code
+	 * @return The company whom the person is employeed
+	 */
+	boolean isAssignedToEventTeam(MoveEvent event, Person person, teamCode) {
+		return getEventTeamReference(event, person, teamCode) != null
+	}
+
+	/**
+	 * Used to retrieve an MoveEventStaff reference for a person assigned to an event with a give team code
+	 * @param person - the person whom to check 
+	 * @param event - the event to check if user is assigned to
+	 * @param teamCode - the team code
+	 * @return The MoveEventStaff record if found otherwise null
+	 */
+	MoveEventStaff getEventTeamReference(MoveEvent event, Person person, teamCode) {
+		assert person != null
+		assert event != null
+
+		// Lookup the RoleType(teamCode) if not already a RoleTeam
+		if (! (teamCode instanceof RoleType)) {
+			assert (teamCode instanceof String)
+			teamCode = RoleType.get(teamCode)
+			assert teamCode != null
+		}
+
+		return MoveEventStaff.createCriteria().get {
+			and {
+				eq('moveEvent', event)
+				eq('person', person)
+				eq('role', teamCode)
+			}
+		}
+	}
+
+	/**
+	 * Used to get the Employer of the given person
+	 * @param person - the person whom to lookup the employeer
+	 * @return The company whom the person is employeed
+	 */
+	PartyGroup getEmployer(Person person) {
+		assert person != null
+
+		def employer = PartyRelationship.createCriteria().get {
+			and {
+				eq('partyRelationshipType', PartyRelationshipType.get('STAFF'))
+				eq('roleTypeCodeFrom', RoleType.get('COMPANY'))
+				eq('roleTypeCodeTo', RoleType.get('STAFF'))
+				eq('partyIdTo', person)
+			}
+		}
+
+		return ( employer ? employer.partyIdFrom : null )
+	}
+
+	/**
+	 * Used to get a list of projects that the given person is assigned to
+	 * @param person - the person whom to lookup assigned projects
+	 * @param project - if supplied will filter the results to just the one project (optional)
+	 * @return The list of projects
+	 */
+	List<Project> getAssignedProjects(Person person, Project project=null) {
+		assert person != null
+
+		def c = PartyRelationship.createCriteria()
+		List projectList = c.list() {
+			eq('partyRelationshipType', PartyRelationshipType.get('PROJ_STAFF'))
+			and {
+				eq('roleTypeCodeFrom', RoleType.get('PROJECT'))
+				eq('partyIdTo', person)
+				if (project) {
+					eq('partyIdFrom', project)
+				}
+			}
+			projections {
+				groupProperty('partyIdFrom')
+			}
+		}
+		return projectList
+	}
+
+	/**
+	 * Used to get a list of projects that the given person could be associated with
+	 * @param person - the person whom to lookup the projects for
+	 * @param project - if supplied will filter the results to just the one project (optional)
+	 * @return The list of projects
+	 */
+	List<Project> getAvailableProjects(Person person, Project project=null, boolean excludeAssigned=false, Date cutoff=null) {
+		assert person != null
+
+		PartyGroup employer = getEmployer(person)
+		List projects = partyRelationshipService.companyProjects(employer, project)
+
+		//log.debug "getAvailableProjects() person $person ($person.id), employer $employer($employer.id), # projects ${projects?.size()}"
+		//log.debug "getAvailableProjects() list 1: ${projects*.id}"
+
+		// Optionally remove the assigned projects
+		if (excludeAssigned) {
+			List assignedProjects = getAssignedProjects(person, project)
+			if (assignedProjects) {
+				projects = projects - assignedProjects
+			}
+		}
+		// log.debug "getAvailableProjects() list 2: ${projects*.id}"
+		// Optionally remove the projects by completion date cutoff
+		if (cutoff)
+			projects = projects.findAll { it.completionDate >= cutoff }
+
+		// Sort the list descending by completion date
+		// projects.sort{ a, b -> a.completionDate < b.completionDate }
+
+		// Filter down to just the one project if the request was for just the one
+		if (project && projects) {
+			def theProject = projects.find { it.id == project.id }
+			projects = (theProject ? [theProject] : [])
+			// log.debug "getAvailableProjects() list 3: ${projects*.id}"
+		}
+
+		return projects
+	}
+
 	Boolean hasAccessToProject(Person person, Project project){
 		def projects =  projectService.getUserProjects(null, false, ProjectStatus.ANY, [personId:person.id])
 		def found = false
@@ -776,8 +1251,226 @@ class PersonService {
 					return
 				}
 			}	
-		}
-		
+		}	
 		return found
 	}
-}	
+
+	/**
+	 * Used to validate that the user can access a person and will respond with appropriate 
+	 * HTTP responses based on access constraints (e.g. Unauthorized or Not Found)
+	 * @param personId - the id of the person to access
+	 * @param byWhom - the Person that is attempting to access the Person
+	 * @return Person - the person if can access or null
+	 */
+	Person validatePersonAccess(personId, Person byWhom) 
+		throws UnauthorizedException, InvalidParamException, EmptyResultException {
+
+		if (!byWhom) throw new UnauthorizedException('Must specify whom is accessing person')
+		
+		if (! NumberUtil.isPositiveLong(personId))  throw new InvalidParamException('Invalid person id requested')	
+
+		// If not edit own account, the user must have privilege to edit the account
+		boolean editSelf = ( NumberUtil.toLong(personId) == NumberUtil.toLong(byWhom.id) )
+		if ( ! editSelf && ! securityService.hasPermission(byWhom, 'PersonEditView')) {
+			securityService.reportViolation("$byWhom attempted to edit Person($personId) without necessary permission")
+			throw new UnauthorizedException('Missing require permission to edit person')
+		}
+
+		if (! editSelf) {
+			// TODO : JPM 5/2015 : Need to make sure showing/editing someone that the user has access to
+		}
+
+		Person person = Person.findById(personId)
+		if (! person) {
+			throw new EmptyResultException()
+		}
+
+		return person
+	}
+
+	/**
+	 * Used by controller update an actual Person and possibly UserLogin. The logic works for cases where user updating their own 
+	 * account as well as an administrator updating others. In the case of the latter, there are more things that can be updated.
+	 * @param params - the form params that were passed 
+	 * @param byWhom - The person that is performing the update
+	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
+	 * @return The Person record being updated or throws an exception for various issues
+	 */
+	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false) 
+		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
+
+		Person person = validatePersonAccess(params.id, byWhom)
+	
+		def ret = []
+		params.travelOK == "1" ? params : (params.travelOK = 0)
+		
+		if (!person.staffType && !params.staffType) params.staffType = 'Hourly'
+		
+		// TODO : JPM 8/31/2015 : Replace person.properties = params with proper field assignments
+		person.properties = params
+
+		if ( ! person.save(flush:true) ) {
+			log.error "updatePerson() unable to save $person : " + GormUtil.allErrorsString(person)
+			throw new DomainUpdateException('An error occurred while attempting to save person changes')
+		}			
+
+		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+		
+		UserLogin userLogin = securityService.getPersonUserLogin( person )
+		if (userLogin) {
+			if (params.newPassword) {
+				securityService.validateAllowedToChangePassword(userLogin, byAdmin)
+
+				if (! byAdmin) {
+					// Verify that the user entered their old password correctly
+					if (!params.oldPassword) {
+						throw new InvalidParamException('The old password is required')
+					}
+
+					if (! userLogin.comparePassword(params.oldPassword, true)) {
+						throw new InvalidParamException('Old password entered does not match the existing password')
+					}
+
+					// Verify that the password isn't being changed to often
+					if (! securityService.verifyMinPeriodToChangePswd(userLogin) ) {
+						throw new DomainUpdateException('Minimum period for changing your password has not been met')
+					}
+				}
+				securityService.setUserLoginPassword(userLogin, params.newPassword)
+			}
+
+			if (byAdmin && params.expiryDate && params.expiryDate != "null") {
+				def expiryDate = params.expiryDate
+				userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+			}
+
+			// When Disabling Person - disable UserLogin
+			// When enabling Person - do NOT change UserLogin
+			if (person.active == 'N') {
+				userLogin.active = 'N'
+			}
+
+			if (!userLogin.save()) {
+				log.error "updatePerson() failed for $userLogin : " + GormUtil.allErrorsString(userLogin)
+				throw new DomainUpdateException('An error occurred while attempting to update the user changes')
+			}
+		}
+
+		// Additional changes allowed by adminstrator of a person
+		if (byAdmin) {
+			def functions = params.list("function")
+			if (params.manageFuncs != '0' || functions){
+				def staffCompany = partyRelationshipService.getStaffCompany(person)
+				def companyProject = Project.findByClient(staffCompany)
+				partyRelationshipService.updateStaffFunctions(staffCompany, person, functions, 'STAFF')
+				if (companyProject) {
+					partyRelationshipService.updateStaffFunctions(companyProject, person,functions, "PROJ_STAFF")
+				}
+			}
+
+			// TODO : JPM 8/31/2015 : Overhaul how exception dates are handled - shouldn't delete all then re-add
+			def personExpDates = params.list("availability")
+			def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
+			personExpDates = personExpDates.collect{GormUtil.convertInToGMT(expFormatter.parse(it), tzId)}
+			def existingExp = ExceptionDates.findAllByPerson(person)
+			if (personExpDates) {
+				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person and exceptionDay not in (:dates) ",[person:person, dates:personExpDates])
+				personExpDates.each { presentExpDate->
+					def exp = ExceptionDates.findByExceptionDayAndPerson(presentExpDate, person)
+					if (!exp){
+						def expDates = new ExceptionDates()
+						expDates.exceptionDay = presentExpDate
+						expDates.person = person
+						if (! expDates.save(flush:true) ) {
+							log.error "updatePerson() unable to save $person exception dates : " + GormUtil.allErrorsString(person)
+							throw new DomainUpdateException('An error occurred while attempting to save exception dates')
+						}
+					}
+				}
+			} else {
+				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person",[person:person])
+			}
+		}
+
+		if (! byAdmin) {
+			// Save some preferences
+			if (params.timeZone) {
+				userPreferenceService.setPreference("CURR_TZ", params.timeZone)
+				userPreferenceService.loadPreferences("CURR_TZ")
+			}
+
+			if (params.powerType) {
+				userPreferenceService.setPreference("CURR_POWER_TYPE", params.powerType)
+			}
+
+			if (params.startPage) {
+				userPreferenceService.setPreference("START_PAGE", params.startPage)
+				userPreferenceService.loadPreferences("START_PAGE")
+			}
+		}
+
+		return person
+
+	}
+
+	/**
+	 * Used by controller to create a Person. 
+	 * @param params - the form params that were passed 
+	 * @param byWhom - The person that is performing the update
+	 * @param companyId - The person company
+	 * @param byAdmin - Flag indicating that it is being done by the admin form (default false)
+	 * @return The Person record being created or throws an exception for various issues
+	 */
+	Person savePerson(Map params, Person byWhom, Long companyId, boolean byAdmin=false) 
+		throws DomainUpdateException, InvalidParamException {
+
+		def companyParty
+		def person
+
+		// Look to allow easy breakout for exceptions
+		while(true) {
+			if (companyId != null) {
+				companyParty = Party.findById( companyId )
+			}
+
+			if (!companyParty) {
+				throw new InvalidParamException('Unable to locate proper company to associate person to')
+			}
+
+			// Get list of all staff for the company and then try to find the individual so that we don't duplicate
+			// the creation.
+			def personList = partyRelationshipService.getCompanyStaff(companyId)
+			person = personList.find {
+				// Find person using case-insensitive search
+				StringUtils.equalsIgnoreCase(it.firstName, params.firstName) &&
+				( ( StringUtils.isEmpty(params.lastName) && StringUtils.isEmpty(it.lastName) ) ||  StringUtils.equalsIgnoreCase(it.lastName, params.lastName) ) &&
+				( ( StringUtils.isEmpty(params.middleName) && StringUtils.isEmpty(it.middleName) ) ||  StringUtils.equalsIgnoreCase(it.middleName, params.middleName) )
+			}
+
+			if (person != null) {
+				throw new DomainUpdateException('A person with that name already exists')
+			} else {
+				// Create the person and relationship appropriately
+				person = new Person( params )
+				if ( !person.hasErrors() && person.save() ) {
+					//Receiving added functions		
+					def functions = params.list("function")
+					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
+					if (functions) {
+						userPreferenceService.setUserRoles(functions, person.id)
+						def staffCompany = partyRelationshipService.getStaffCompany(person)
+						//Adding requested functions to Person .
+						partyRelationshipService.updateStaffFunctions(staffCompany, person, functions, 'STAFF')
+					}
+				} else {
+					log.error "savePerson() failed for $person : " + GormUtil.allErrorsString(person)
+					throw new DomainUpdateException('An error occurred while attempting to sace the person changes')
+				}
+			}
+			break
+		}
+
+		return person
+	}
+
+}

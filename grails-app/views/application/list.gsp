@@ -93,7 +93,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('applicationId');recompileDOM('applicationIdWrapper');}"
+					gridComplete="function(){bindResize('applicationId');recompileDOM('applicationIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					loadComplete="function(){resizeGrid('applicationId')}"
@@ -176,7 +176,7 @@
 					</div>
 				</div>
 			</g:each>
-			<div ng-controller="tds.comments.controller.MainController as comments">
+			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
 				<jqgrid:wrapper id="applicationId" />
 			</div>
 			<g:render template="../assetEntity/modelDialog"/>

@@ -1443,7 +1443,7 @@ a.tab_deselect {
 	background: #fff
 }
 .loginView{
-	width: 500px
+	width: 550px
 }
 a.task_action{float: left; position: relative; margin: 0 0 0 30px;cursor: pointer;}
 a#viewtaskgraph_button_graph{ margin: 5px 0 0 30px;}
@@ -1700,4 +1700,8 @@ div#dependencyDivId td.labelColumn {
 #depConsoleTabsId li:active {
 	filter: brightness(70%);
 	-webkit-filter: brightness(70%);
+}
+
+a.light {
+	font-weight: normal; 
 }

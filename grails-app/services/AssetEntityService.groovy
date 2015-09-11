@@ -2145,38 +2145,13 @@ class AssetEntityService {
 		return StringUtil.defaultIfEmpty(value, '')
 	}
 
-	 /*-------------------------------------------------------
-	  *  TO Add the Title Info to MasterSpreadSheet
-	  *  @author srinivas
-	  *  @param Title Information as a List and Workbook Sheet Object
-	  *-------------------------------------------------------*/
-	 private def exportTitleInfo(def titleFieldList,def titleSheet){
-		 def sheetContent
-		 def column = 2
-		 for (int titleField = 0; titleField < titleFieldList.size(); titleField++ ) {
-			 if( titleField == 2){
-				 addCell(titleSheet, (column-=1), 2, titleFieldList.get(titleField).toString())
-			 }else {
-				 addCell(titleSheet, column, 1, titleFieldList.get(titleField).toString())
-			 }
-			 column+=1
-		 }
-	 }
-
-	 private def addCell(sheet, rowIdx, columnIdx, value, type=null) {
-	 	def row = sheet.getRow(rowIdx)
-	 	if (!row) {
-	 		row = sheet.createRow(rowIdx)
-	 	}
-	 	def cell = row.getCell(columnIdx)
-	 	if (!cell) {
-			cell = row.createCell(columnIdx)
-	 	}
-	 	if (type) {
-	 		cell.setCellType(type)
-	 	}
-	 	cell.setCellValue(value)
-	 }
+	/**
+	 * A local function used to add a cell to a row in the supplied sheet
+	 * TODO : JPM 8/2015 : The WorkbookUtil methods have column, row order but everybody else in the world are row, column...
+	 */
+	private void addCell(sheet, rowIdx, columnIdx, value, type=null) {
+		WorkbookUtil.addCell(sheet, columnIdx, rowIdx, value, type)
+	}
 
 	/**
 	 * Updates progress for the give key only when is around 5%
@@ -2485,18 +2460,16 @@ class AssetEntityService {
 			} else {
 				//Add Title Information to master SpreadSheet
 				titleSheet = book.getSheet("Title")
-				SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
-				if(titleSheet != null) {
-					def titleInfoMap = new ArrayList();
-					titleInfoMap.add( project.client )
-					titleInfoMap.add( projectId )
-					titleInfoMap.add( project.name )
-					titleInfoMap.add( partyRelationshipService.getProjectManagers(projectId) )
-					titleInfoMap.add( format.format( currDate ) )
-					titleInfoMap.add( loginUser.person )
-					titleInfoMap.add( bundleNameList )
-					exportTitleInfo(titleInfoMap,titleSheet)
-					addCell(titleSheet, 0,30,"Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
+				SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
+				if (titleSheet != null) {
+					WorkbookUtil.addCell(titleSheet, 1, 2, project.client.toString())
+					WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
+					WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
+					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(projectId).toString())
+					WorkbookUtil.addCell(titleSheet, 1, 5, currDate)
+					WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
+					WorkbookUtil.addCell(titleSheet, 1, 7, bundleNameList.toString())
+					WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
 				}
 
 				//update data from Asset Entity table to EXCEL
@@ -2517,14 +2490,13 @@ class AssetEntityService {
 
 				log.info "export() - Updating spreadsheet headers took ${TimeUtil.elapsed(started)}"
 				started = new Date()
-				
 				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
 
 				//
 				// Device Export
 				//
 				if ( doDevice ) {
-					exportedEntity += "S"
+					exportedEntity += 'S'
 					for ( int r = 1; r <= assetSize; r++ ) {
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress')
@@ -2561,8 +2533,15 @@ class AssetEntityService {
 										continue
 									addCell(serverSheet, r, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 									break
-								case ~/Retire|MaintExp|Modified Date/:
+								case ~/Retire|MaintExp/:
 									addCell(serverSheet, r, colNum, stdDateFormat.format(a[attribute]))
+									break
+
+								case ~/Modified Date/:
+									if (a[attribute]) {
+										addCell(serverSheet, r, colNum, dateTimeFormat.format(
+											TimeUtil.convertInToUserTZ( a[attribute], tzId)) )
+									}
 									break
 
 								case ~/Source Blade|Target Blade/:
@@ -2643,14 +2622,15 @@ class AssetEntityService {
 									colVal = app[assetColName] ? 'Yes' : 'No'
 									//log.info "export() : field class type=$app[assetColName].className()}"
 									break
-								case ~/Retire|MaintExp|Modified Date/:
+								case ~/Retire|MaintExp/:
 									colVal = app[assetColName] ? stdDateFormat.format(app[assetColName]) : ''
+									break
+								case ~/Modified Date/:
+									colVal = dateTimeFormat.format(TimeUtil.convertInToUserTZ( app[assetColName], tzId))
 									break
 								default:
 									colVal = app[assetColName]
 							}
-
-							// log.info("export() : rowNum=$rowNum, colNum=$colNum, colVal=$colVal")
 
 							if ( colVal != null) {
 
@@ -2686,16 +2666,26 @@ class AssetEntityService {
 							def attribute = dbDTAMap.eavAttribute.attributeCode[coll]
 							//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 							def colName = dbColumnNameList.get(coll)
-							if(colName == "DepGroup"){
+							if (colName == "DepGroup") {
 								addCell(dbSheet, r, dbMap[colName], assetDepBundleMap[database[r-1].id])
-							} else if(attribute in ["retireDate", "maintExpDate", "lastUpdated"]){
-								addCell(dbSheet, r, dbMap[colName], (database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])) :''))
+							} else if(attribute in ['retireDate', 'maintExpDate', 'lastUpdated']) {
+								def dateValue = database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])
+								if (dateValue) {
+									if (attribute == 'lastUpdated') {
+										dateValue = dateTimeFormat.format(TimeUtil.convertInToUserTZ(dateValue, tzId))
+									} else {
+										dateValue = stdDateFormat.format(dateValue)
+									}
+								} else {
+									dateValue =''
+								}
+								addCell(dbSheet, r, dbMap[colName], dateValue)
 							} else if ( database[r-1][attribute] == null ) {
 								addCell(dbSheet, r, dbMap[colName], "")
-							}else {
-								if( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
+							} else {
+								if ( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
 									addCell(dbSheet, r, dbMap[colName], String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode))
-								}else {
+								} else {
 									addCell(dbSheet, r, dbMap[colName], String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])))
 								}
 							}
@@ -2725,8 +2715,18 @@ class AssetEntityService {
 							def colName = fileColumnNameList.get(coll)
 							if (colName == "DepGroup") {
 								addCell(storageSheet, r, fileMap[colName], assetDepBundleMap[files[r-1].id] )
-							} else if(attribute == "retireDate" || attribute == "maintExpDate" || attribute == "lastUpdated"){
-								addCell(storageSheet, r, fileMap[colName], (files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll]) ? stdDateFormat.format(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])) :''))
+							} else if(attribute in ['retireDate', 'maintExpDate', 'lastUpdated']) {
+								def dateValue = files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])
+								if (dateValue) {
+									if (attribute == 'lastUpdated') {
+										dateValue = dateTimeFormat.format(TimeUtil.convertInToUserTZ(dateValue, tzId))
+									} else {
+										dateValue = stdDateFormat.format(dateValue)
+									}
+								} else {
+									dateValue =''
+								}
+								addCell(storageSheet, r, fileMap[colName], dateValue)
 							} else if ( files[r-1][attribute] == null ) {
 								addCell(storageSheet, r, fileMap[colName], "")
 							} else {
@@ -2756,7 +2756,7 @@ class AssetEntityService {
 						//Add assetId for walkthrough template only.
 						addCell(dependencySheet, r, 0, (assetDependent[r-1].id), Cell.CELL_TYPE_NUMERIC)
 
-						for ( int coll = 0; coll < 11; coll++ ) {
+						for ( int coll = 0; coll < dependencyColumnNameList.size(); coll++ ) {
 							def addContentToSheet
 							switch(DTAMap[coll]){
 								case "assetName":

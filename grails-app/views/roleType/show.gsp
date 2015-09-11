@@ -21,6 +21,22 @@
         <table>
           <tbody>
 
+           <tr class="prop">
+              <td valign="top" class="name">Type:</td>
+
+              <td valign="top" class="value">${fieldValue(bean:roleTypeInstance, field:'type')}</td>
+
+            </tr>
+
+
+           <tr class="prop">
+              <td valign="top" class="name">Level:</td>
+
+              <td valign="top" class="value">${fieldValue(bean:roleTypeInstance, field:'level')}</td>
+
+            </tr>
+
+
 
             <tr class="prop">
               <td valign="top" class="name">Code:</td>

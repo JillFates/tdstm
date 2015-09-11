@@ -113,7 +113,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('assetListId');recompileDOM('assetListIdWrapper');}"
+					gridComplete="function(){bindResize('assetListId');recompileDOM('assetListIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,
@@ -190,20 +190,20 @@
 						<input type="hidden" id="previousValue_${key}" value="${assetPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${assetPref[key]}" id="coloumnSelector_${assetPref[key]}" value="${attribute.attributeCode}" 
-								${assetPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:2px;" 
+								${assetPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:2px;" 
 								onchange="setColumnAssetPref(this.value,'${key}','${prefType}')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
 					</div>
 				</div>
 			</g:each>
-			<div ng-controller="tds.comments.controller.MainController as comments">
-				  <jqgrid:wrapper id="assetListId" /> 
+			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
+				<jqgrid:wrapper id="assetListId" /> 
 			</div>
 		</div> <%-- End of Body --%>
 		<g:render template="modelDialog"/>
 		<g:render template="../assetEntity/entityCrudDivs" />
 		<g:render template="../assetEntity/dependentAdd" />
-        <g:render template="../assetEntity/initAssetEntityData"/>
+		<g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
 			$("#assetMenuId a").css('background-color','#003366')

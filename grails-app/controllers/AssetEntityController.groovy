@@ -18,7 +18,6 @@ import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
-import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.jmesa.facade.TableFacade
 import org.jmesa.facade.TableFacadeImpl
@@ -374,10 +373,11 @@ class AssetEntityController {
 			if( titleSheet != null) {
 				SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
 				try {
-					exportTime = format.parse(WorkbookUtil.getStringCellValue(titleSheet, 1, 5))
+					def cell = WorkbookUtil.getCell(titleSheet, 1, 5)
+					exportTime = cell.getDateCellValue()
 				}catch ( Exception e) {
-					log.error "Error formating import time: " + e.message
-					forward action:forwardAction, params: [error: 'The Export date time was not found on the Title sheet.']
+					log.info "Was unable to read the datetime for 'Export on': " + e.message
+					forward action:forwardAction, params: [error: "The 'Export on' date time was not found or invalid on the Title sheet." ]
 					return
 				}
 

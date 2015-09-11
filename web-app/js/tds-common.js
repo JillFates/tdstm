@@ -85,15 +85,38 @@ var tdsCommon = {
 	},
 
 	/**
-	 * Check if the response is valid and if not show a message
+	 * Check if the response is valid and return the response otherwise show the error appropriately
 	 */
 	isValidWsResponse: function(response, errorMsg, alerts) {
-		var isValid = true;
+		var isValid = false;
+		var data = false;
+
 		if (response.status != 200) {
-			isValid = false;
 			this.displayWsError(response, errorMsg, alerts);
+		} else {
+			data = eval("(" + response.responseText + ")");
+			// See if we have a result that has 'status'
+			if (data.status) {
+				isValid = (data.status == 'success');
+				if (isValid) {
+					if (data.data) {
+						// Remove the nested data structure to just return the data
+						data = data.data
+					}
+				} else {
+					if (data.errors) {
+						alert(data.errors);
+					} else {
+						alert("An error occurred while updating and/or updating information");
+					}
+				}
+			} else {
+				// Must be a non-standard ws response so we can only guess that it is okay
+				isValid = true;
+			}
 		}
-		return isValid;
+
+		return ( isValid ? data : false );
 	},
 
 	/**
@@ -123,6 +146,16 @@ var tdsCommon = {
 		} else {
 			alert(msg);
 		}
+	},
+
+	/**
+	 * Used to validate an email address format
+	 * @param email
+	 * @return boolean true if valid else false
+	 */
+	isValidEmail: function(email) {
+		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/ ;
+		return emailExp.test(email);
 	}
 
 }

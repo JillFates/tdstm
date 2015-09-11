@@ -10,6 +10,7 @@ import com.tds.asset.AssetType
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.common.exceptions.ServiceException
 
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -337,6 +338,17 @@ class ControllerService {
 
 	String getDefaultErrorMessage() {
 		return "An error occurred. Please contact support for further assistance."
+	}
+
+	/**
+	 * Check if the exception have a message code to look in the message.properties, and if not use default message
+	 */
+	String getExceptionMessage(Object controller, exception) {
+		if ((exception instanceof ServiceException) && exception.messageCode) {
+			return controller.message(code: exception.messageCode, args: exception.messageArgs)
+		} else {
+			return exception.getMessage()	
+		}
 	}
 
 }

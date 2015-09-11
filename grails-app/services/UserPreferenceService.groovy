@@ -22,6 +22,7 @@ class UserPreferenceService  {
 
 	static transactional = true
 	def securityService
+	def auditService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	
@@ -323,19 +324,39 @@ class UserPreferenceService  {
 		}
 	}
 	/*
-	 *	Set Roles to Persons in PartyRole  
+	 * Set Roles to Persons in PartyRole 
+	 * @return true or false indicating the occurrence of Security Violations. 
 	 */
 	// TODO : setUserRoles - Move to SecurityService
-	def setUserRoles( def roleType, def personId ){
-		def personInstance = Party.findById(personId)
-		roleType.each{role ->
-			def roleTypeInstance = RoleType.findById(role)
-			// Create Role Preferences to User
-			def dupPartyRole =  PartyRole.get( new PartyRole( party:personInstance, roleType:roleTypeInstance ) )
-			if(dupPartyRole == null){
-				def partyRole = new PartyRole( party:personInstance, roleType:roleTypeInstance ).save( insert:true )
+	def setUserRoles( def roleTypeList, def personId ) {
+		def person = Party.findById(personId)
+		def login = securityService.getUserLogin()
+		def securityViolations = false
+		roleTypeList.each { roleCode ->
+			if (! securityService.isRoleAssignable(login.person, roleCode)) {
+				securityService.reportViolation("Attempted to update user $person permission to assign security role $role, which is not permissible", login)
+				securityViolations = true
+			} else {
+				RoleType roleType = RoleType.findById(roleCode)
+				if (!roleType) {
+					securityService.reportViolation("attempted to update user $person permission with undefined role $roleCode", login)
+					securityViolations = true
+				} else {
+					// Create Role Preferences to User if it doesn't exist
+					PartyRole partyRole = PartyRole.findByPartyAndRoleType(person, roleType)
+					if (! partyRole) {
+						partyRole = new PartyRole( party:person, roleType:roleType )
+						if (! partyRole.save( insert:true )) {
+							log.error "setUserRoles() failed to add partyRole $partyRole : " + GormUtil.allErrorsString(partyRole)
+							securityViolations =  true
+						}
+					}
+				}
 			}
 		}
+
+		return securityViolations
+
 	}
 	/*----------------------------------------------------------
 	 * @author : Lokanath Reddy
@@ -450,9 +471,10 @@ class UserPreferenceService  {
 	 * @param userLogin
 	 * @param preference
 	 * @param value
-	 * @return
+	 * @return true if successfule
 	 */
-	def addOrUpdatePreferenceToUser(def userLogin, def preference, def value){
+	boolean addOrUpdatePreferenceToUser(UserLogin userLogin, String preference, value) {
+		boolean success=true
 		def userPreference = UserPreference.findByUserLoginAndPreferenceCode(userLogin, preference)
 		if(userPreference){
 			userPreference.value = value
@@ -465,7 +487,9 @@ class UserPreferenceService  {
 		}
 		if (! userPreference.save( insert: true, flush:true)) {
 			log.error "addPreference: failed insert : ${GormUtil.allErrorsString(userPreference)}"
+			success=false
 		}
+		return success
 	}
 	
 	/**

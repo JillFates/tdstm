@@ -748,7 +748,7 @@ class PartyRelationshipService {
 		def existingRoles = PartyRole.findAll(
 			"from PartyRole where party = :person and roleType.description like '${type}%' and roleType.id not in (:roles) group by roleType",
 			[roles:assignedRoles, person:person])?.roleType
-		if(existingRoles){
+		if (existingRoles) {
 			PartyRole.executeUpdate("delete from PartyRole where party = '$person.id' and roleType in (:roles)",[roles:existingRoles])
 		}
 	 }
@@ -957,5 +957,140 @@ class PartyRelationshipService {
 		def project = securityService.getUserCurrentProject()
 		
 		return PartyRelationship.find("from PartyRelationship where roleTypeCodeFrom='PROJECT' and partyIdFrom=${project.id} and partyIdTo=${userLogin.person.id}")
+	}
+
+	/**
+	 * Used to validate that a person is somehow related to a company
+	 * @param personId - the id of the person in question
+	 * @param companyId - the id of the company that is being referenced
+	 * @return true if person is associated to the company otherwise false
+	 */
+	boolean isPersonAssociatedToCompany(personId, companyId) {
+		def count = PartyRelationship.executeQuery("select count(*) from PartyRelationship where partyIdFrom=:cid and partyIdTo=:pid")[0]
+		log.debug "isPersonAssociatedToCompany(person:$personId, companyId:$companyId) found $count associations"
+		return count > 0
+	}
+
+	/**
+	 * Used to get a list of Partners for a specific company
+	 * @param company - the company to find partners for
+	 * @param sortOn - the property to sort on (default 'name')
+	 * @return A list of partners for the company
+	 */
+	List<PartyGroup> companyPartners(PartyGroup company, String sortOn='name') {
+		assert company != null
+
+		def args = [prt:PartyRelationshipType.read('PARTNERS'), rtcf: RoleType.read('COMPANY'), rtct: RoleType.read('PARTNER'), company:company]
+		String query = "select partyIdTo from PartyRelationship pr where \
+			pr.partyRelationshipType = :prt and \
+			pr.roleTypeCodeFrom = :rtcf and \
+			pr.roleTypeCodeTo = :rtct and \
+			pr.partyIdFrom = :company"
+		List partners = PartyRelationship.executeQuery(query, args)
+
+		if (partners && sortOn) {
+			partners?.sort{it.("$sortOn")}
+		}
+
+		return partners
+	}
+
+	/**
+	 * Used to get a list of Projects that a company owns, is participating as a Partner, or the client
+	 * @param company - the company to find the prjoects for
+	 * @param project - used to filter the list to a particular project (optional)
+	 * @param sortOn - the property to sort on (default 'name')
+	 * @return A list of partners for the company
+	 */
+	List<Project> companyProjects(PartyGroup company, Project project=null) {
+		assert company != null
+
+		def args = [
+			prtOwner: PartyRelationshipType.read('PROJ_COMPANY'), 
+			prtPartner: PartyRelationshipType.read('PROJ_PARTNER'), 
+			rtProject: RoleType.read('PROJECT'), 
+			rtPartner: RoleType.read('PARTNER'), 
+			rtCompany: RoleType.read('COMPANY'), 
+			company:company ]
+		if (project) {
+			args.project = project
+		}
+
+		String query = "select partyIdFrom from PartyRelationship pr where \
+			(	pr.partyRelationshipType = :prtOwner \
+				and pr.roleTypeCodeFrom = :rtProject \
+				and pr.roleTypeCodeTo = :rtCompany \
+				and pr.partyIdTo = :company \
+				${project ? 'and pr.partyIdFrom = :project' : ''} \
+			) or \
+			( 	pr.partyRelationshipType = :prtPartner \
+				and pr.roleTypeCodeFrom = :rtProject \
+				and pr.roleTypeCodeTo = :rtPartner \
+				and pr.partyIdTo = :company \
+				${project ? 'and pr.partyIdFrom = :project' : ''} \
+			)"
+
+		List projects = PartyRelationship.executeQuery(query, args)
+		// log.debug "companyProjects() for company $company : list 1 : projects ${projects*.id}"
+		// Add to the list those that for clients
+		if (project && ! projects.contains(project) && project.client == company) {
+			projects = [project]
+			// log.debug "companyProjects() for company $company : list 2 : projects ${projects*.id}"
+		} else {
+			List clientProjects = Project.findAllByClient(company)
+			if (clientProjects) {
+				projects += clientProjects
+				//log.debug "companyProjects() for company $company : list 3 : projects ${projects*.id}"
+			}
+		}
+
+		return projects
+	}
+
+	/**
+	 * Used to retrieve one or more team members of a project
+	 * @param project - the project to search for members
+	 * @param teamRoleType - The team Role Type code
+	 * @param person - used to filter the results to the individual person (optional)
+	 */
+	List<PartyRelationship> getProjectTeamMembers(Project project, RoleType teamRoleType=null, Person person=null) {
+
+		PartyRelationshipType prtProjectStaff = PartyRelationshipType.read('PROJ_STAFF')
+		RoleType rtProject = RoleType.read('PROJECT')
+		RoleType rtStaff = RoleType.read('STAFF')
+
+		assert prtProjectStaff != null
+		assert rtProject != null
+		assert teamRoleType != null
+
+		return PartyRelationship.withCriteria {
+			and {
+				eq('partyRelationshipType', prtProjectStaff)
+				eq('roleTypeCodeFrom', rtProject)
+				eq('partyIdFrom', project)
+				ne('roleTypeCodeTo', rtStaff)
+				if (teamRoleType) {
+					eq('roleTypeCodeTo', teamRoleType)
+				}
+				if (person) {
+					eq('partyIdTo', person)
+				}
+			}
+		}
+	}
+
+	/**
+	 * Used to retrieve one or more team members of a project (overloaded)
+	 * @param project - the project to search for members
+	 * @param teamCode - a String of the Team code
+	 * @param person - used to filter the results to the individual person (optional)
+	 */
+	PartyRelationship getProjectTeamMembers(Project project, String teamCode, Person person=null) {
+		RoleType rt = RoleType.read(teamCode)
+		if (! rt) {
+			log.warn "getProjectTeamMembers() called with invalid teamCode $teamCode"
+			return null
+		}
+		return getProjectTeamMembers(project, rt, person) 
 	}
 }

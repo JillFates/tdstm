@@ -20,6 +20,29 @@
 				<tr>
 					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 				</tr>
+
+              <tr class="prop">
+                  <td valign="top" class="name"><label for="id"><b>Code:&nbsp;<span style="color: red">*</span></b></label></td>
+                  <td>
+                    <g:select id="type" name="type" 
+                      from="${roleTypeInstance.constraints.type.inList}" value="${roleTypeInstance.type}"  
+                      noSelection="${['':'Please select']}">
+                    </g:select>
+                  </td>
+              </tr>
+
+              <tr class="prop">
+                <td valign="top" class="name"><label for="id"><b>Level:&nbsp;<span style="color: red">*</span></b></label></td>
+                <td valign="top"
+                    class="value ${hasErrors(bean:roleTypeInstance,field:'level','errors')}">
+                  <input type="text" id="level" name="level"
+                         value="${fieldValue(bean:roleTypeInstance,field:'level')}" /> <g:hasErrors
+                    bean="${roleTypeInstance}" field="level">
+                    <div class="errors"><g:renderErrors
+                      bean="${roleTypeInstance}" as="list" field="level" /></div>
+                </g:hasErrors></td>
+              </tr>
+
               <tr class="prop">
                 <td valign="top" class="name"><label for="id"><b>Code:&nbsp;<span style="color: red">*</span></b></label></td>
                 <td valign="top"

@@ -870,7 +870,6 @@ br.page-break-after {
 	color:gray;
 }
 
-
 span.checkboxContainer {
 	display: inline;
 	vertical-align: middle;
@@ -1212,6 +1211,19 @@ fieldset[disabled] .btn-default.active {
 	box-sizing: border-box;
 }
 
-
-
-
+#unlockButtonId {
+	background-position: 5px 50%;
+	background-repeat: no-repeat;
+	background-image: url(../icons/lock_delete.png);
+	padding-left: 25px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-right: 8px;
+	margin-bottom: 4px;
+	margin-left: 10px;
+	display: inline-block;
+	position: relative;
+	z-index: 101;
+	vertical-align: middle;
+	cursor: pointer;
+}

@@ -73,6 +73,6 @@
 	</div>
 	<script type="text/javascript">
 		$('#tabTypeId').val('database');
-		recompileDOM('item1');
+		recompileDOM('item1', angular.element($('div.body')[0]).scope());
 	</script>
 </div>

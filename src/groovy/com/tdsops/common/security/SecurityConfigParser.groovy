@@ -14,6 +14,22 @@ class SecurityConfigParser {
 
 	private static final String propNamePrefix = 'tdstm.security'
 
+	private static final validLocalUserSettingsNames = [
+		"enabled": true,
+		"minPasswordLength": 8,
+		"maxLoginFailureAttempts": 5,
+		"failedLoginLockoutPeriodMinutes": 1,
+		"clearLockoutsOnRestart": true,
+		"passwordHistoryRetentionDays": (265 * 2),
+		"passwordHistoryRetentionCount": 0,
+		"maxPasswordAgeDays": 0,
+		"forgotMyPasswordResetTimeLimit": 60,	// Minutes
+		"welcomeEmailTimeLimit": (3*24*60),		// 3 days
+		"forgotMyPasswordRetainHistoryDays": 30,
+		"minPeriodToChangePswd": 0,
+		"forceUseNewEncryption": false
+	]
+
 	// Used to convert a String to a boolean based on value being true|false, otherwise returns null
 	private static def trueFalse(String value) {
 		if (value in ['true','false']) {
@@ -45,6 +61,18 @@ class SecurityConfigParser {
 		}
 		if (! (value instanceof Boolean)) {
 			throw new ConfigurationException("Configuration setting ${propNamePrefix}.$propName property has invalid value, options: true|false")
+		}
+		return value
+	}
+
+	// Used to get the long value of a property and confirm that it has valid value otherwise throws an exception, it should be zero or possitive
+	private static Long zeroOrPositiveProp(String propName, value, defaultValue=null) {
+		if (value == null || (value instanceof groovy.util.ConfigObject)) {
+			value = defaultValue
+		}
+		value = NumberUtil.toLong(value, 0)
+		if (value < 0) {
+			throw new ConfigurationException("Configuration setting ${propNamePrefix}.$propName property must have value greater or equal than zero (>=0)")
 		}
 		return value
 	}
@@ -313,5 +341,127 @@ class SecurityConfigParser {
 			list = map.domains[domain].roleMap.keySet() as String[]
 		}
 		return list
+	}
+
+	/**
+	 * This method will parse the properties read from the configuration file and construct the appropriate map for the user local settings properties
+	 * @param properties - the configuration mapping for user local settions properties
+	 * @return A map of all of the necessary parameters
+	 */
+	public static Map parseLocalUserSettings(properties) {
+		Map map = [:]
+
+		Map localUser = (properties.tdstm.security.localUser != null) ? properties.tdstm.security.localUser : [:]
+
+		def localUserProps = localUser.keySet()
+
+		// Validates that all the properties are correct
+		localUserProps.each{ prop ->
+			if (validLocalUserSettingsNames[prop] == null) {
+				throw new ConfigurationException("Configuration setting: property ${propNamePrefix}.localUser.${prop} is not valid.")
+			}
+		}
+
+		// Flag if the local user accounts are supported, values true|false (default true)
+		map.enabled = boolProp('localUser.enabled', localUser.enabled, true)
+
+		// If not enabled then we're out of here
+		if (! map.enabled) {
+			return map
+		}
+
+		// Minimum number of characters the password must be (default 8)
+		map.minPasswordLength = zeroOrPositiveProp(
+			'localUser.minPasswordLength', 
+			localUser.minPasswordLength,
+			validLocalUserSettingsNames['minPasswordLength']
+		)
+
+		// Number of times user can fail login before the account is locked out, set to zero (0) prevents lockout, default 5
+		map.maxLoginFailureAttempts = zeroOrPositiveProp(
+			'localUser.maxLoginFailureAttempts',
+			localUser.maxLoginFailureAttempts,
+			validLocalUserSettingsNames['maxLoginFailureAttempts']
+		)
+
+		// How long to disable an account that failed logins to many times, set to zero (0) will lockout the account in definitely, default 30 minutes
+		map.failedLoginLockoutPeriodMinutes = zeroOrPositiveProp(
+			'localUser.failedLoginLockoutPeriodMinutes',
+			localUser.failedLoginLockoutPeriodMinutes,
+			validLocalUserSettingsNames['failedLoginLockoutPeriodMinutes']
+		)
+
+		// As a fail-safe, locked out accounts could be cleared when the application is restarted in the event of a DOS style attack (default true)
+		map.clearLockoutsOnRestart = boolProp(
+			'localUser.clearLockoutsOnRestart',
+			localUser.clearLockoutsOnRestart,
+			validLocalUserSettingsNames['clearLockoutsOnRestart']
+		)
+
+		// How long to retain password history to prevent re-use, set to zero (0) disables password history (default 2 years). This is mutually exclusive with passwordHistoryRetentionCount. 
+		map.passwordHistoryRetentionDays = zeroOrPositiveProp(
+			'localUser.passwordHistoryRetentionDays',
+			localUser.passwordHistoryRetentionDays,
+			validLocalUserSettingsNames['passwordHistoryRetentionDays']
+		)
+
+		// How many previous passwords to retain to prevent the user from reusing. This is  with passwordHistoryRetentionDays
+		map.passwordHistoryRetentionCount = zeroOrPositiveProp(
+			'localUser.passwordHistoryRetentionCount',
+			localUser.passwordHistoryRetentionCount,
+			validLocalUserSettingsNames['passwordHistoryRetentionCount']
+		)
+
+		// The maximum number of days a password can be used before the user must change it, set to zero (0) disable the feature (default 0 days)
+		map.maxPasswordAgeDays = zeroOrPositiveProp(
+			'localUser.maxPasswordAgeDays',
+			localUser.maxPasswordAgeDays,
+			validLocalUserSettingsNames['maxPasswordAgeDays']
+		)
+
+		// forgot my password reset time limit
+		map.forgotMyPasswordResetTimeLimit = zeroOrPositiveProp(
+			'localUser.forgotMyPasswordResetTimeLimit',
+			localUser.forgotMyPasswordResetTimeLimit,
+			validLocalUserSettingsNames['forgotMyPasswordResetTimeLimit']
+		) //(minutes)
+		
+		// forgot my password welcome email time limit
+		map.welcomeEmailTimeLimit = zeroOrPositiveProp(
+			'localUser.welcomeEmailTimeLimit',
+			localUser.welcomeEmailTimeLimit,
+			validLocalUserSettingsNames['welcomeEmailTimeLimit']
+		) //(2 days)
+		
+		// forgot my password retain history days
+		map.forgotMyPasswordRetainHistoryDays = zeroOrPositiveProp(
+			'localUser.forgotMyPasswordRetainHistoryDays',
+			localUser.forgotMyPasswordRetainHistoryDays,
+			validLocalUserSettingsNames['forgotMyPasswordRetainHistoryDays']
+		) 
+
+		// prevent the user from changing their password (hours)
+		map.minPeriodToChangePswd = zeroOrPositiveProp(
+			'localUser.minPeriodToChangePswd',
+			localUser.minPeriodToChangePswd,
+			validLocalUserSettingsNames['minPeriodToChangePswd']
+		) 
+
+		// Disable the forcing of users from changing their passwords if the encryption method was used was the obsolete one.
+		map.forceUseNewEncryption = boolProp(
+			'localUser.forceUseNewEncryption',
+			localUser.forceUseNewEncryption,
+			validLocalUserSettingsNames['forceUseNewEncryption']
+		)
+
+		if ((map.passwordHistoryRetentionDays == 0) && (map.passwordHistoryRetentionCount == 0)) {
+			throw new ConfigurationException("Configuration setting: ${propNamePrefix}.localUser.passwordHistoryRetentionDays or ${propNamePrefix}.localUser.passwordHistoryRetentionCount must be greather than zero.")
+		}
+
+		if ((map.passwordHistoryRetentionDays > 0) && (map.passwordHistoryRetentionCount > 0)) {
+			throw new ConfigurationException("Configuration setting: ${propNamePrefix}.localUser.passwordHistoryRetentionDays and ${propNamePrefix}.localUser.passwordHistoryRetentionCount are mutually exclusive, at least one must be zero.")
+		}
+
+		return map		
 	}
 }

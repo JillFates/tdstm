@@ -19,6 +19,7 @@ import com.tdsops.common.security.*
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdsops.common.security.SecurityUtil
 
 import java.util.UUID
 import java.text.SimpleDateFormat 
@@ -1379,7 +1380,7 @@ class AdminController {
 				def activateLogin = params.activateLogin == 'Y'
 				def randomPassword = params.randomPassword == 'Y'
 				def forcePasswordChange = params.forcePasswordChange == 'Y'
-				def password = params.password
+				def commonPassword = params.password
 				def expireDays = NumberUtils.toInt(params.expireDays,90)
 				def role = params.role
 
@@ -1389,10 +1390,7 @@ class AdminController {
 				lookForMatches()
 
 				if (randomPassword) {
-					password = UUID.randomUUID().toString()
-				}
-				if (password) {
-					password = securityService.encrypt(password)
+					commonPassword = UUID.randomUUID().toString()
 				}
 
 				def expiryDate = new Date()
@@ -1512,19 +1510,20 @@ class AdminController {
 					if (person && createUserLogin && p.username) {
 						def u = UserLogin.findByPerson(person)
 						if (!u) {
-							def userPass = password
+							def userPass = commonPassword
 							if (!StringUtils.isEmpty(p.password)) {
-								userPass = securityService.encrypt(p.password)
+								userPass = p.password
 							}
 							u = new UserLogin(
 								username: p.username,
-								password: userPass,
 								active: (activateLogin ? 'Y' : 'N'),
 								expiryDate: expiryDate,
 								person: person,
 								isLocal: p.isLocal == "Y",
 								forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
 							)
+
+							u.applyPassword(userPass)
 
 							if (! u.validate() || !u.save(flush:true)) {
 								p.errors << "Error" + GormUtil.allErrorsString(u)

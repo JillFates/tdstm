@@ -21,6 +21,20 @@
 	<div class="dialog">
 	<table>
 		<tbody>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="id">Type:</label></td>
+				<td valign="top"
+					class="value">${fieldValue(bean:roleTypeInstance,field:'type')}</td>
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><label for="id">Level:</label></td>
+				<td valign="top"
+					class="value">${fieldValue(bean:roleTypeInstance,field:'level')}</td>
+			</tr>
+
+
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Code:</label></td>
 				<td valign="top"

@@ -91,4 +91,10 @@ databaseChangeLog = {
 	include file: '20150710-poject-activity-metrics-table.groovy'
 	include file: '20150721-remove-old-refresh-preferences.groovy'
 	include file: '20150731-add-additional-teams-to-role-type.groovy'
+	include file: '20150803-add-roletype-type-and-level-columns.groovy'
+	include file: '20150803-new-user-login-properties.groovy'
+	include file: '20150807-email-dispatch.groovy'
+	include file: '20150806-password-reset.groovy'
+	include file: '20150810-add-new-user-login-permissions.groovy'
+	include file: '20150830-add-salt-prefix-to-user-login.groovy'
 }

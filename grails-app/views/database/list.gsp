@@ -11,9 +11,9 @@
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />
-        <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-        <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
@@ -88,7 +88,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper');}"
+					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
 						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate, unassigned:unassigned}"
@@ -153,15 +153,15 @@
 						<input type="hidden" id="previousValue_${key}" value="${dbPref[key]}" />
 						<g:each var="attribute" in="${attributesList}">
 							<label><input type="radio" name="coloumnSelector_${dbPref[key]}" id="coloumnSelector_${dbPref[key]}" value="${attribute.attributeCode}" 
-								${dbPref[key]==attribute.attributeCode?'checked':'' } style="margin-left:11px;" 
+								${dbPref[key]==attribute.attributeCode ? 'checked' : '' } style="margin-left:11px;" 
 								onchange="setColumnAssetPref(this.value,'${key}','Database_Columns')"/> ${attribute.frontendLabel}</label><br>
 						</g:each>
 					</div>
 				</div>
 			</g:each>
-            <div ng-controller="tds.comments.controller.MainController as comments">
+			<div id="commentScopeId" ng-controller="tds.comments.controller.MainController as comments">
 			    <jqgrid:wrapper id="databaseId" /> 
-            </div>
+			</div>
 			<g:render template="../assetEntity/entityCrudDivs" />
 			<g:render template="../assetEntity/dependentAdd" />
 		</div>

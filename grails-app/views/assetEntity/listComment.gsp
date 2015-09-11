@@ -61,7 +61,7 @@
 					sortname="'lastUpdated'"
 					sortorder="'desc'"
 					caption="'Asset Comment:'"
-					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper');}"
+					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
 					showPager="true">
 					<jqgrid:filterToolbar id="listCommentGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="listCommentGridId" add="false" edit="false" del="false" search="false"/>
@@ -84,7 +84,7 @@
 		</script>
 	</head>
 	<body>
-		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
+		<div id="commentScopeId" class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 			<h1>Asset Comment</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
