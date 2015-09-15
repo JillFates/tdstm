@@ -10,6 +10,7 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
 import java.text.SimpleDateFormat
 import grails.converters.JSON
+import com.tdsops.tm.enums.domain.PasswordResetType
 
 class UserLoginController {
 	
@@ -172,8 +173,9 @@ class UserLoginController {
 		} else { 
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
 			def assignedRoles = userPreferenceService.getAssignedRoles( userLoginInstance.person )
+			def canResetByAdmin = userLoginInstance.canResetPasswordByAdmin(securityService.getUserLoginPerson())
 			def cellValue = [id:userLoginInstance.id, username:userLoginInstance.username, lockedOutUntil:userLoginInstance.lockedOutUntil, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), userLoginInstance.lockedOutUntil), failedLoginAttempts:userLoginInstance.failedLoginAttempts] as JSON
-			return [ userLoginInstance : userLoginInstance, companyId:companyId, roleList:roleList, assignedRoles:assignedRoles, cellValue:cellValue ] 
+			return [ userLoginInstance : userLoginInstance, companyId:companyId, roleList:roleList, assignedRoles:assignedRoles, cellValue:cellValue, canResetPasswordByAdmin: canResetByAdmin ] 
 		}
 	}
 
@@ -460,5 +462,20 @@ class UserLoginController {
 			flash.message = msg
 			redirect(action:'changePassword', params:[ userLoginInstance:userLoginInstance ])
 		}
+	}
+
+	/**
+	 * This method triggers the password reset on a selected account.
+	 */
+	def sendPasswordReset = {
+		def userLogin = UserLogin.findById(params.id)
+		if(userLogin.canResetPasswordByAdmin(securityService.getUserLoginPerson())){
+			def emailParams = [sysAdminEmail : securityService.getUserLogin().person.email, username: userLogin.username]
+			securityService.sendResetPasswordEmail(userLogin.person.email, request.getRemoteAddr(), PasswordResetType.ADMIN_RESET, emailParams)
+		}else{
+
+		}
+		def msg = [success: true]
+		render msg as JSON
 	}
 }

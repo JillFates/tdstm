@@ -633,7 +633,7 @@ class SecurityService implements InitializingBean {
 	 * @param 
 	 * @param 
 	 */
-	void sendResetPasswordEmail(String email, String ipAddress, PasswordResetType resetType) throws ServiceException {
+	void sendResetPasswordEmail(String email, String ipAddress, PasswordResetType resetType, emailParams = [:]) throws ServiceException {
 
 		// Note - we will not throw exceptions indicating that the account exists or not as this is a method 
 		// that hackers poll systems to find valid accounts. The user will get a message that the email was sent
@@ -688,20 +688,35 @@ class SecurityService implements InitializingBean {
 
 			auditService.logMessage("Forgot My Password was requested for email $email from $ipAddress")
 			def token = nextAuthToken()
-			def emailParams = [
-				token: token,
-				expiredTime: getUserLocalConfig().forgotMyPasswordResetTimeLimit
-			]
+			emailParams["token"] = token
+			emailParams["expiredTime"] = getUserLocalConfig().forgotMyPasswordResetTimeLimits
+			
+			def dispatchOrigin = EmailDispatchOrigin.PASSWORD_RESET
+			def bodyTemplate = "passwordReset"
+			def personFrom = person
+			def personFromEmail = person.email
+			def createdBy = person
+			def subject = "Reset your password"
+
+			if(resetType == PasswordResetType.WELCOME){
+				dispatchOrigin = EmailDispatchOrigin.ACTIVATION
+				bodyTemplate = "accountActivation"
+				personFromEmail = emailParams.from
+				createdBy = getUserLogin().person
+				subject = "Welcome to TransitionManager"
+			}else if(resetType == PasswordResetType.ADMIN_RESET){
+				bodyTemplate = "adminResetPassword"
+			}
 
 			def ed = emailDispatchService.basicEmailDispatchEntity(
-				EmailDispatchOrigin.PASSWORD_RESET,
-				"Reset your password",
-				"passwordReset",
+				dispatchOrigin,
+				subject,
+				bodyTemplate,
 				emailParams as JSON,
-				person.email,
+				personFromEmail,
 				person.email,
 				person,
-				person
+				createdBy
 			)
 
 			String errMsg = "An error occurred and we were unable to send you a password reset. Please contact support for help."
@@ -709,7 +724,7 @@ class SecurityService implements InitializingBean {
 				def pr = createPasswordReset(token, ipAddress, userLogin, person, ed, resetType)		
 
 				if (pr) {
-					emailDispatchService.createEmailJob(ed, [:])
+					emailDispatchService.createEmailJob(ed, model)
 					log.debug "sendResetPasswordEmail() created token '$token' for $userLogin"
 				} else {
 					log.error "Forgot My Password request for email $email but emailDispatchService.basicEmailDispatchEntity failed"
@@ -756,7 +771,7 @@ class SecurityService implements InitializingBean {
 				tokenTTL = getUserLocalConfig().forgotMyPasswordResetTimeLimit * 60 * 1000
 				break
 			case PasswordResetType.WELCOME:
-				tokenTTL = getUserLocalConfig().welcomeEmailTimeLimit * 60 * 1000
+				tokenTTL = getUserLocalConfig().accountActivationTimeLimit * 60 * 1000
 				break
 			default:
 				log.error "createPasswordReset() has unhandled switch for option $resetType"

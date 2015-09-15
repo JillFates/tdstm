@@ -36,6 +36,7 @@ class ProjectController {
 	def securityService
 	def controllerService
 	def quartzScheduler
+	def grailsApplication
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -634,6 +635,44 @@ class ProjectController {
 			errorMessage = "User don't have permissions to do this action."
 		}
 		render( view: "projectDailyMetrics", model: [success: success, errorMessage: errorMessage])
+	}
+
+	def userActivationEmailsForm = {
+		if (!controllerService.checkPermission(this, 'SendUserActivations')){
+			return
+		}
+
+		def project = securityService.getUserCurrentProject()
+		def accounts = projectService.getAccountActivationUsers()
+		def defaultProject = Project.getDefaultProject()
+		render(view:"userActivationEmailsForm", model:[project: project.name, client:project.client.name, accounts:accounts, defaultProject: defaultProject.name])
+	}
+
+
+	def sendAccountActivationEmails = {
+		if (!controllerService.checkPermission(this, 'SendUserActivations')){
+			flash.message = "You are not allowed to perform this operation."
+			return
+		}
+		def accounts = projectService.getAccountActivationUsers()
+		List accountsToNotify = accounts.findAll{params["person_${it.personId}"] && params["person_${it.personId}"] == "on"}
+		// TODO: determine email
+		def fromEmail = null
+		String message = null
+		if(accountsToNotify){
+			if(params["sendFrom"] == "DEFAULT"){
+				fromEmail = grailsApplication.config.grails.mail.default.from
+			}else{
+				fromEmail = securityService.getUserLogin().person.email
+			}			
+			projectService.sendBulkActivationNotificationEmail(accountsToNotify, params["customMessage"], fromEmail, request.getRemoteAddr())	
+			message = "The Account Activation Notification has been sent out to the users."
+		}else{
+			message = "No Accounts selected for notification."
+		}
+		
+		flash.message = message
+		return userActivationEmailsForm()
 	}
 
 }

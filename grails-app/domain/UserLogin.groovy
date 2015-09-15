@@ -154,6 +154,7 @@ class UserLogin {
 		this.password = encryptPassword(unencryptedPassword)
 		this.forcePasswordChange = 'N'
 		this.failedLoginAttempts = 0
+		this.lockedOutUntil = null
 		return this.password
 	}
 

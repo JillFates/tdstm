@@ -323,7 +323,8 @@ class SecurityConfigParserTests extends Specification {
 				clearLockoutsOnRestart: true,
 				passwordHistoryRetentionDays: 385 * 2,
 				passwordHistoryRetentionCount: 0,
-				maxPasswordAgeDays: 90
+				maxPasswordAgeDays: 90,
+				accountActivationTimeLimit: 60 * 24 * 1
 			] ] ]
 		]
 		return config
@@ -432,8 +433,9 @@ class SecurityConfigParserTests extends Specification {
 		assertEquals 'passwordHistoryRetentionCount', 0, localUserSettings.passwordHistoryRetentionCount
 		assertEquals 'maxPasswordAgeDays', 0, localUserSettings.maxPasswordAgeDays
 		assertEquals 'forgotMyPasswordResetTimeLimit', 60, localUserSettings.forgotMyPasswordResetTimeLimit
-		assertEquals 'welcomeEmailTimeLimit', 3*60*24, localUserSettings.welcomeEmailTimeLimit
+		assertEquals 'accountActivationTimeLimit', 60*24*3, localUserSettings.accountActivationTimeLimit
 		assertEquals 'forgotMyPasswordRetainHistoryDays', 30, localUserSettings.forgotMyPasswordRetainHistoryDays
+
 
 	}
 
@@ -456,8 +458,9 @@ class SecurityConfigParserTests extends Specification {
 		assertEquals 'passwordHistoryRetentionCount', 0, localUserSettings.passwordHistoryRetentionCount
 		assertEquals 'maxPasswordAgeDays', 0, localUserSettings.maxPasswordAgeDays
 		assertEquals 'forgotMyPasswordResetTimeLimit', 60, localUserSettings.forgotMyPasswordResetTimeLimit
-		assertEquals 'welcomeEmailTimeLimit', 3*60*24, localUserSettings.welcomeEmailTimeLimit
+		assertEquals 'accountActivationTimeLimit', 60*24*3, localUserSettings.accountActivationTimeLimit
 		assertEquals 'forgotMyPasswordRetainHistoryDays', 30, localUserSettings.forgotMyPasswordRetainHistoryDays
+
 
 	}
 

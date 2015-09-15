@@ -6,7 +6,8 @@ package com.tdsops.tm.enums.domain
 enum EmailDispatchOrigin {
 
 	PASSWORD_RESET,
-	TASK;
+	TASK,
+	ACTIVATION;
 
 	static EmailDispatchOrigin safeValueOf(String key) {
 		EmailDispatchOrigin obj

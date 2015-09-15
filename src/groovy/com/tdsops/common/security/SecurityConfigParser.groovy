@@ -24,7 +24,7 @@ class SecurityConfigParser {
 		"passwordHistoryRetentionCount": 0,
 		"maxPasswordAgeDays": 0,
 		"forgotMyPasswordResetTimeLimit": 60,	// Minutes
-		"welcomeEmailTimeLimit": (3*24*60),		// 3 days
+		"accountActivationTimeLimit": (3*24*60),		// 3 days
 		"forgotMyPasswordRetainHistoryDays": 30,
 		"minPeriodToChangePswd": 0,
 		"forceUseNewEncryption": false
@@ -427,11 +427,11 @@ class SecurityConfigParser {
 		) //(minutes)
 		
 		// forgot my password welcome email time limit
-		map.welcomeEmailTimeLimit = zeroOrPositiveProp(
-			'localUser.welcomeEmailTimeLimit',
-			localUser.welcomeEmailTimeLimit,
-			validLocalUserSettingsNames['welcomeEmailTimeLimit']
-		) //(2 days)
+		map.accountActivationTimeLimit = zeroOrPositiveProp(
+			'localUser.accountActivationTimeLimit',
+			localUser.accountActivationTimeLimit,
+			validLocalUserSettingsNames['accountActivationTimeLimit']
+		) //(minutes)
 		
 		// forgot my password retain history days
 		map.forgotMyPasswordRetainHistoryDays = zeroOrPositiveProp(

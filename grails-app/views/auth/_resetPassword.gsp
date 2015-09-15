@@ -24,6 +24,7 @@
 				return false;
 			} else {
 				$(this).off("submit");
+				$("#resetPasswordSubmitButton").prop('disabled', true)
 				this.submit();
 			}
 		});
@@ -108,7 +109,7 @@
 							<tr>
 								<td colspan="2" style="text-align:center;" class="buttonR">
 									<g:if test="${validToken}">
-										<input type="submit" value="Update Password" />
+										<input type="submit" id="resetPasswordSubmitButton" value="Update Password" />
 									</g:if>
 								</td>
 							</tr>

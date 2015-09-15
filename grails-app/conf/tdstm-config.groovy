@@ -72,7 +72,7 @@ tdstm {
 			forgotMyPasswordResetTimeLimit = 60
 			
 			// forgot my password welcome email time limit
-			welcomeEmailTimeLimit = 2*24*60
+			accountActivationTimeLimit = 2*24*60
 			
 			// forgot my password retain history days
 			forgotMyPasswordRetainHistoryDays = 30

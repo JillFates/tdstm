@@ -38,10 +38,6 @@
 
 				<span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
 
-				<tds:hasPermission permission='CreateUserLogin'>
-					<span class="menuButton"><g:link class="create" action="create" params="[companyId:companyId]">Create UserLogin</g:link></span>
-				</tds:hasPermission>
-
 			</div>
 
 			<br/>

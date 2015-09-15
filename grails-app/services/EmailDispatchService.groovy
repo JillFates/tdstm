@@ -19,6 +19,8 @@ class EmailDispatchService {
 	def mailService
 	def quartzScheduler
 
+	static SimpleEmailDispatchJob = "EmailDispatchJob"
+
 	/**
 	 * Creates a new EmailDispatch entity initializing all attributes
 	 */
@@ -58,11 +60,13 @@ class EmailDispatchService {
 		}
 
 		trigger.jobDataMap.put('edId', emailDispatch.id)
-		trigger.setJobName('EmailDispatchJob')
+		trigger.setJobName("EmailDispatchJob")
 		trigger.setJobGroup('tdstm-send-email')
 
 		quartzScheduler.scheduleJob(trigger)
 	}
+
+	/* ********************************************************************** */
 
 	/**
 	 * Used to send an email using a template defined in EmailDispatch
@@ -118,6 +122,25 @@ class EmailDispatchService {
 						person: ed.toPerson.firstName + " " + ed.toPerson.lastName
 					]
 				break;
+			case "accountActivation":
+				result = [
+					person: ed.toPerson.firstName + " " + ed.toPerson.lastName,
+					customMessage: emailParams.customMessage,
+					serverURL: grailsApplication.config.grails.serverURL,
+					activationURL :  grailsApplication.config.grails.serverURL + "/auth/resetPassword/" + emailParams.token,
+					ttl: emailParams.expiredTime,
+					sysAdminEmail: emailParams.sysAdminEmail
+
+				]
+				break;
+			case "adminResetPassword":
+				result = [
+					person: ed.toPerson.firstName + " " + ed.toPerson.lastName,
+					activationURL :  grailsApplication.config.grails.serverURL + "/auth/resetPassword/" + emailParams.token,
+					ttl: emailParams.expiredTime,
+					username: emailParams.username
+				]
+				break;
 		}
 		return result
 	}
@@ -134,6 +157,12 @@ class EmailDispatchService {
 				break;
 			case "passwordResetNotify":
 				result = "/auth/_resetPasswordNotificationEmail"
+				break;
+			case "accountActivation":
+				result = "/auth/_accountActivationNotificationEmail"
+				break;
+			case "adminResetPassword":
+				result = "/admin/_ResetPasswordNotificationEmail"
 				break;
 		}
 		return result

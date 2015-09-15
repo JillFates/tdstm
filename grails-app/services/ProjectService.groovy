@@ -971,4 +971,46 @@ class ProjectService {
 		return activitiesMetrics
 	}
 
+	/**
+	 * This method will query for all the accounts that haven't been 
+	 * activated.
+	 * Rules: Has a userLogin account where lastLogin is null and localAccount=true and Active='Y' and expiry > now()
+	 */
+	def getAccountActivationUsers(){
+		def query = new StringBuffer("SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId,")
+			.append(" p.first_name AS firstName, p.last_name as lastName, p.email as email, pg.name AS company,")
+			.append(" u.expiry_date AS expiryDate, u.created_date AS dateCreated, pwd.lan as lastActivationNotice")
+			.append(" FROM party_role pr LEFT OUTER JOIN person p ON(p.person_id=pr.party_id)")
+			.append(" LEFT OUTER JOIN user_login u ON(u.person_id=p.person_id)")
+			.append(" LEFT OUTER JOIN (SELECT * FROM party_relationship WHERE party_relationship_type_id='STAFF' AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF') r ON(r.party_id_to_id=pr.party_id)")
+			.append(" LEFT OUTER JOIN party_group pg ON(pg.party_group_id=r.party_id_from_id)")
+			.append(" LEFT OUTER JOIN (SELECT MAX(created_date) AS lan, user_login_id FROM password_reset WHERE type='WELCOME') pwd ON(u.user_login_id = pwd.user_login_id)")
+			.append(" WHERE (u.is_local = 1 AND u.active = 'Y' AND u.expiry_date >= u.expiry_date > now()) AND p.email IS NOT NULL AND LENGTH(TRIM(p.email)) > 0 AND u.last_login IS NULL")
+			.append(" ORDER BY lastName, firstName")
+
+		def accounts = jdbcTemplate.queryForList(query.toString())
+		/* This validation is added because when there's an empty result set, we get a
+		   list with one record (for which all the values are null).*/
+		if(accounts.size() == 1 && accounts[0].email == null){
+			accounts.remove(0)
+		}
+		return accounts
+	}
+
+	/**
+	 * This method will send the account activation email to a selected list of accounts.
+	 * @param accounts: list of email addresses.
+	 * @param message: custom message to be included in the body of the email message.
+	 * @param from: email address of who is sending the email.
+	 * @param ipAddress: IP Address of the client's machine who triggered the notifications.
+	 */
+	def sendBulkActivationNotificationEmail(List accounts, String message, String from, String ipAddress){
+
+		def model = [customMessage: message, from:from]
+		accounts.each{account ->
+			sendResetPasswordEmail(account.email, ipAddress, PasswordResetType.WELCOME, model)
+		}
+		
+	}
+
 }
