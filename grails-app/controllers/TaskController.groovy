@@ -534,7 +534,7 @@ digraph runbook {
 			
 			def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && params.viewUnpublished == '1')
 			userPreferenceService.setPreference("viewUnpublished", viewUnpublished.toString())
-			
+			userPreferenceService.setPreference("MOVE_EVENT", moveEventId)
 			
 			jdbcTemplate.update('SET SESSION group_concat_max_len = 100000;')
 
