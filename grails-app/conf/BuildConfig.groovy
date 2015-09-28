@@ -74,4 +74,5 @@ grails.war.resources = { stagingDir ->
 	delete(file: "${stagingDir}/WEB-INF/lib/poi-3.0-FINAL.jar")
 	delete(file: "${stagingDir}/WEB-INF/lib/poi-3.5-FINAL-20090928.jar")
 	delete(file: "${stagingDir}/WEB-INF/lib/mysql-connector-java-5.1.6-bin.jar")
+	delete(file: "${stagingDir}/WEB-INF/lib/commons-codec-1.3.jar")
 } 
