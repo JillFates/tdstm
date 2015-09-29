@@ -2400,11 +2400,19 @@ tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $sta
 		$modalInstance.dismiss('close');
 	};
 
+	$modalInstance.opened.then(function() {
+		// Boostrap opened on modalInstance is data fetch ready, not DOM
+		setTimeout( function() {
+			$scope.toggleFullScreenMode();
+		}, 0);
+	});
+
 	$scope.toggleFullScreenMode = function(){
 		$(".modal-dialog").toggleClass("modal-dialog-fullscreen");
 		$(".modal-content").toggleClass("modal-content-fullscreen");
 		$(".modal-body").toggleClass("modal-body-fullscreen");
-		$(".CodeMirror-wrap").toggleClass("CodeMirror-wrap-fullscreen");
+		$(".modal-content  .CodeMirror-wrap").toggleClass("CodeMirror-wrap-fullscreen");
+		$scope.codeEditorOptions.fullScreen = !$scope.codeEditorOptions.fullScreen;
 		$("[ui-codemirror='codeEditorOptions']").toggleClass("sourceCode-fullscreen");
 	};
 }
