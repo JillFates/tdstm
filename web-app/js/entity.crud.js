@@ -1355,7 +1355,7 @@ var EntityCrud = ( function($) {
 		var modal = $('#depCommentDialog');
 
 		var suffix = type+'_'+rowNo;
-		var hiddenInput = $('#comment_'+suffix);
+		var hiddenInput = $('input:hidden[name=comment_'+suffix+']');
 		var textarea = $('#depCommentTextarea');
 		// Populate the textarea from the hidden field
 		if (! hiddenInput.val())
@@ -1397,7 +1397,7 @@ var EntityCrud = ( function($) {
 		var rowNo = $('#depCommentRowNo').val();
 		var textarea = $('#depCommentTextarea');
 
-		var hiddenInput = $('#comment_'+type+'_'+rowNo);
+		var hiddenInput = $('input:hidden[name=comment_'+type+'_'+rowNo+']')
 
 		hiddenInput.val(textarea.val());
 		modal.dialog('close');
