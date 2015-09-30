@@ -299,7 +299,7 @@ class UserLoginController {
 		userLoginInstance.properties = params
 		def expiryDate = new Date(now.getTime() + 7776000000) // 3 Months
 		userLoginInstance.expiryDate = expiryDate
-		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
+		def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.level desc ")
 		def project = securityService.getUserCurrentProject()
 
 		def currentUser = securityService.getUserLogin()
@@ -346,7 +346,6 @@ class UserLoginController {
 		def securityViolations = false
 		if (params.isLocal)
 			token = securityService.validPasswordStrength(params['username'], params['password'])
-		
 		if (token) {
 			userLoginInstance.applyPassword(params['password'])
 			
