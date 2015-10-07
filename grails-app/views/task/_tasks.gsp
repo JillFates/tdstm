@@ -15,7 +15,7 @@
 <div id="myIssueList" class="mobbodyweb" style="width: 100%">
 	<input id="issueId" name="issueId" type="hidden" value="" /> 
 	<input name="tab" id="tabId" type="hidden" value="${tab}" />
-	<div id="mydiv" onclick="this.style.display = 'none';setFocus();">
+	<div id="mydiv" style="padding-top: 5px;" onclick="this.style.display = 'none';setFocus();">
 		<g:if test="${flash.message}">
 			<br />
 			<div class="message">

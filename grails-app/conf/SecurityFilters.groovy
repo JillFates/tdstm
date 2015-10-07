@@ -95,23 +95,20 @@ class SecurityFilters {
 		/*
 		 *   Statements to Check the Session status
 		 */
-		sessionExpireCheck(controller:'*', action:'*') {
+		loginSessionCheck(controller:'*', action:'*') {
 			before = {
 				def subject = SecurityUtils.subject
 				def principal = subject.principal
-				if (controllerName == 'moveTech' && principal == null) {
-					return true
-				} else if (controllerName == "wsSequence") {
-					return true
-				} else if( controllerName != 'auth' && principal == null ) {
-					flash.message = "Your login session has expired.  Please login again."
-					redirect(controller:'auth', action:'login')
-					return false					
-				} else if( controllerName == 'auth' && principal == null && actionName == 'home') {
-					flash.message = "Your login session has expired.  Please login again."
-					redirect(controller:'auth', action:'login')
-					return false
+				if (! principal) {
+					if (controllerName != 'auth') {
+						// Deal with remembering URI requested and then redirect to auth/signIn
+						session.setAttribute("savedUrlForwardURI", (request.forwardURI - request.contextPath))
+						flash.message = "Your login session has expired. Please login again."
+						redirect(controller:'auth', action:'login')
+						return false
+					}
 				}
+				return true
 			}
 		}
 	} 

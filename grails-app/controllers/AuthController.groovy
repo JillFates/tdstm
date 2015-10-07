@@ -128,7 +128,6 @@ class AuthController {
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 					
 					Person.loggedInPerson = securityService.getUserLoginPerson();
-					def startPage = userPreferenceService.getPreference('START_PAGE')
 					if (browserTest) {
 						if (browserTestiPad) {
 							redirect(controller:'projectUtil')
@@ -136,27 +135,13 @@ class AuthController {
 							redirect(controller:'task', action:'listUserTasks', params:[viewMode:'mobile'])
 						}
 					} else {
-					   if (userPreferenceService.getPreference('CURR_PROJ')){
-							if(startPage =='Project Settings'){
-								redirect(controller:'projectUtil')
-							}else if(startPage=='Current Dashboard'){
-								 if(RolePermissions.hasPermission('MoveBundleShowView')){
-									  redirect(controller:'moveBundle',action:'planningStats')
-								 }else{
-									   redirect(controller:'projectUtil')
-								 }
-							} else if(startPage=='Admin Portal'){
-								redirect(action:'home')
-							} else if(startPage=='User Dashboard' || startPage == null){
-					   			redirect(controller:'dashboard', action:'userPortal')
-							} else{
-								redirect(controller:'projectUtil')
-							}
-					   } else if(startPage=='User Dashboard' || startPage == null){
-					   		redirect(controller:'dashboard', action:'userPortal')
-					   } else{
-							 redirect(controller:'projectUtil')
-					   }
+						targetUri = session.savedUrlForwardURI
+						log.info "SESSION targetUri: " + targetUri
+						if (targetUri != null) {
+							redirect(uri: targetUri)
+						} else {
+							redirectToPrefPage()
+						}
 					}
 					log.info "User '${params.username}' has signed in"
 					return
@@ -179,7 +164,31 @@ class AuthController {
 	
 		// Now redirect back to the login page.
 		redirect(action: 'login', params: loginMap())
+	}
 
+	private def redirectToPrefPage() {
+		def startPage = userPreferenceService.getPreference('START_PAGE')
+		if (userPreferenceService.getPreference('CURR_PROJ')) {
+			if (startPage =='Project Settings') {
+				redirect(controller:'projectUtil')
+			} else if(startPage=='Current Dashboard') {
+				if (RolePermissions.hasPermission('MoveBundleShowView')) {
+					redirect(controller:'moveBundle',action:'planningStats')
+				} else {
+					redirect(controller:'projectUtil')
+				}
+			} else if(startPage=='Admin Portal') {
+				redirect(action:'home')
+			} else if(startPage=='User Dashboard' || startPage == null) {
+				redirect(controller:'dashboard', action:'userPortal')
+			} else {
+				redirect(controller:'projectUtil')
+			}
+		} else if(startPage=='User Dashboard' || startPage == null) {
+			redirect(controller:'dashboard', action:'userPortal')
+		} else {
+			redirect(controller:'projectUtil')
+		}
 	}
 
 	def signOut() {
@@ -194,7 +203,7 @@ class AuthController {
 
 	def unauthorized() {
 		flash.message = 'You do not have permission to access this page.'
-		render( view:'home' )
+		redirectToPrefPage()
 	}
 	/*
 	 *  Action to navigate the admin control home page

@@ -1225,13 +1225,20 @@ digraph runbook {
 		def allSize = tasks['all'].size()
 
 		// Based on which tab the user is viewing we'll set taskList to the appropriate list to be returned to the user
-		if (params.tab=='all') {
+		if (params.tab=='none' && params.id != null) {
 			tab = 'all'
-			taskList = tasks['all']
 			allTasks = true
+			def taskId = NumberUtils.toLong(params.id)
+			taskList = tasks['all'].findAll { it.id == taskId }
 		} else {
-			tab = 'todo'
-			taskList = tasks['todo']
+			if (params.tab=='all') {
+				tab = 'all'
+				taskList = tasks['all']
+				allTasks = true
+			} else {
+				tab = 'todo'
+				taskList = tasks['todo']
+			}
 		}
 		
 		// Build the list and associate the proper CSS style
@@ -1253,7 +1260,8 @@ digraph runbook {
 			applications : entities.applications, dbs : entities.dbs, 
 			files : entities.files,  networks :entities.networks,
 			assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,moveEventList:moveEventList, moveEvent: moveEvent]
+			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,moveEventList:moveEventList, moveEvent: moveEvent,
+			selectedTaskId: params.id]
 		
 		if(search && taskList.size() > 0){
 			model  << [searchedAssetId : taskList*.id[0], searchedAssetStatus : taskList*.status[0]]
@@ -1410,26 +1418,31 @@ function goBack() { window.history.back() }
 	 * @param task/comment id
 	 * @return HTML that is used to display a task form an email
 	 */
-	def showTaskforEmail() {
+	def userTask() {
+		def task
+		if (params.id != null) {
+			task = AssetComment.get(params.id)
+			if (task) {
+				controllerService.switchContextToProject(task.project)
+			}
+		}
+
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
 		if (!project) {
 			return
 		}
 
-		def isValidUser= false
-		def task= AssetComment.get(params.id)
-		if(task?.assignedTo.id == userLogin.person.id){
-			def isPersonAssignedToProject = partyRelationshipService.isPersonAssignedToProject()
-			if(isPersonAssignedToProject)
-				isValidUser = true
+		def isValidUser = ((task) && (task.assignedTo) && (task.assignedTo.id == userLogin.person.id))
+
+		if (!isValidUser) {
+			if (task && task.taskNumber) {
+				flash.message = "You don't have permissions to access this task ${task.taskNumber}"
+			} else {
+				flash.message = "Task not found"
+			}
 		}
-		
-		if(isValidUser){
-			// if we are here good to go
-			return commentService.showOrEditTask(params)
-		} else {
-			redirect(controller:"task", action:"listUserTasks", params:[message:"you dont have permissions to access this task ${task.taskNumber}"])
-		}
+		params.tab='none'
+		listUserTasks()
 	}
 
 }

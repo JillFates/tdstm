@@ -724,7 +724,7 @@ class SecurityService implements InitializingBean {
 				def pr = createPasswordReset(token, ipAddress, userLogin, person, ed, resetType)		
 
 				if (pr) {
-					emailDispatchService.createEmailJob(ed, model)
+					emailDispatchService.createEmailJob(ed, emailParams)
 					log.debug "sendResetPasswordEmail() created token '$token' for $userLogin"
 				} else {
 					log.error "Forgot My Password request for email $email but emailDispatchService.basicEmailDispatchEntity failed"

@@ -82,7 +82,7 @@ class SecurityUtil {
 	 * Creates a random string
 	 */
 	public static String randomString(int len) {
-		return new BigInteger(130, randomGenerator).toString(16).substring(0, len)
+		return new BigInteger(len * 8, randomGenerator).toString(16).substring(0, len)
 	}
 
 }

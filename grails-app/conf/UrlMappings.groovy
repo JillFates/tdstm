@@ -1,28 +1,38 @@
 class UrlMappings {
     static mappings = {
       
-    	"/$controller/$action?/$id?"{
-    		constraints {
-			 // apply constraints here
-	      	}
-    	}
+		/**
+		 * View Controller
+		 */
+		"/task/userTask/$id" {
+			controller = "task"
+			action = [GET:"userTask"]
+		}
 
+		"/$controller/$action?/$id?"{
+			constraints {
+			 // apply constraints here
+			}
+		}
+
+		/**
+		 * Web Service Controller
+		 */
 		"/ws/application/listInBundle/$id" {
 			controller = "wsApplication"
 			action = [GET:"listInBundle"]
 		}
 
-
-    	"/ws/moveEventNews/$id?" {
-    		controller = "moveEventNews"
+		"/ws/moveEventNews/$id?" {
+			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
-    	}
-    	
-    	"/ws/dashboard/bundleData/$id?" {
-    		controller = "wsDashboard"
-			action = [GET:"bundleData"]
-    	}
+		}
 		
+		"/ws/dashboard/bundleData/$id?" {
+			controller = "wsDashboard"
+			action = [GET:"bundleData"]
+		}
+
 		"/ws/cookbook/recipe/list" {
 			controller = "wsCookbook"
 			action = [GET:"recipeList"]

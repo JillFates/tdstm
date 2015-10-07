@@ -23,6 +23,9 @@ class ControllerService {
 
 	def assetEntityService
 	def securityService
+	def personService
+	def userPreferenceService
+	def auditService
 
 	/** 
 	 * A utility service to just dump the parameters
@@ -348,6 +351,22 @@ class ControllerService {
 			return controller.message(code: exception.messageCode, args: exception.messageArgs)
 		} else {
 			return exception.getMessage()	
+		}
+	}
+
+	/**
+	 * Switch user project to the new project, only if the user have access to the project
+	 */
+	String switchContextToProject(Project newProject) {
+		def project = securityService.getUserCurrentProject()
+		def userLogin = securityService.getUserLogin()
+		if (project.id != newProject.id) {
+			if (personService.hasAccessToProject(userLogin.person, newProject)) {
+				userPreferenceService.setPreference("CURR_PROJ", "${newProject.id}")
+				userPreferenceService.loadPreferences("CURR_PROJ")
+			} else {
+				auditService.logSecurityViolation(userLogin.toString(), "Try to acccess project ${newProject.projectCode}")
+			}
 		}
 	}
 

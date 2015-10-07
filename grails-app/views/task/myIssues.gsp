@@ -215,7 +215,7 @@
 		if (timerBar)
 			timerBar.resetTimer();
 		jQuery.ajax({
-			url: 'showIssue',
+			url: tdsCommon.createAppURL('/task/showIssue'),
 			data: {'issueId':id},
 			type:'POST',
 			success: function(data) {
@@ -225,7 +225,7 @@
 				$('#detailTdId_'+id).css('display','table-row')
 				//$('#detailId_'+id).css('display','block')
 				$('#taskLinkId').removeClass('mobselect')
-				new Ajax.Request('../assetEntity/updateStatusSelect?id='+id,{asynchronous:false,evalScripts:true,
+				new Ajax.Request(tdsCommon.createAppURL('/assetEntity/updateStatusSelect?id='+id),{asynchronous:false,evalScripts:true,
 					onComplete:function(e){
 						var resp = e.responseText;
 						resp = resp.replace("statusEditId","statusEditId_"+id).replace("showResolve(this.value)","showResolve()")
@@ -234,7 +234,7 @@
 			 		}
 				})
 
-				new Ajax.Request('../assetEntity/isAllowToChangeStatus?id='+id,{asynchronous:false,evalScripts:true,
+				new Ajax.Request(tdsCommon.createAppURL('/assetEntity/isAllowToChangeStatus?id='+id),{asynchronous:false,evalScripts:true,
 					onComplete:function(e){
 						var resp = JSON.parse(e.responseText);
 						var disabledStr = "";
@@ -252,7 +252,7 @@
 	function showAssetCommentMyTasks(id) {
 		$('#dependencyBox').css('display','table');
 		jQuery.ajax({
-			url: '../assetEntity/showComment',
+			url: tdsCommon.createAppURL('/assetEntity/showComment'),
 			data: {'id':id},
 			type:'POST',
 			success: function(data) {
@@ -329,6 +329,10 @@ setFocus();
 		$("#editManufacturerView").dialog({ autoOpen: false})
 		$("#createCommentDialog").dialog({ autoOpen: false })
 		$("#cablingDialogId").dialog({ autoOpen:false })
+
+		<g:if test="${selectedTaskId}">
+		setTimeout(function(){ issueDetails(${selectedTaskId}); }, 500);
+		</g:if>
 	});
 </script>
 	<g:render template="../assetEntity/initAssetEntityData"/>

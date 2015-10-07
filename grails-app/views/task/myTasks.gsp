@@ -60,7 +60,7 @@
 				<input name="teamId" type="hidden" value="${teamId}" />
 				<input name="location" type="hidden" value="${location}" />
 				<input name="tab" type="hidden" value="${tab}" />
-				<div id="mydiv" onclick="this.style.display = 'none';setFocus();">
+				<div id="mydiv" style="padding-top: 5px;" onclick="this.style.display = 'none';setFocus();">
 					<g:if test="${flash.message}">
 						<br />
 						<div style="color: red;"><ul>${flash.message}</ul></div>
