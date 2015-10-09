@@ -175,10 +175,8 @@ class PartyRelationshipService {
 	 *  method to return list of companies
 	 */
 	def getCompaniesList(){
-		
-		def companies = PartyGroup.findAll( " from PartyGroup p where p.partyType = 'COMPANY' " )
+		def companies = PartyGroup.findAll( " from PartyGroup p where p.partyType = 'COMPANY' order by p.name " )
 		return companies
-	
 	}
 
 	/* 
@@ -1047,50 +1045,4 @@ class PartyRelationshipService {
 		return projects
 	}
 
-	/**
-	 * Used to retrieve one or more team members of a project
-	 * @param project - the project to search for members
-	 * @param teamRoleType - The team Role Type code
-	 * @param person - used to filter the results to the individual person (optional)
-	 */
-	List<PartyRelationship> getProjectTeamMembers(Project project, RoleType teamRoleType=null, Person person=null) {
-
-		PartyRelationshipType prtProjectStaff = PartyRelationshipType.read('PROJ_STAFF')
-		RoleType rtProject = RoleType.read('PROJECT')
-		RoleType rtStaff = RoleType.read('STAFF')
-
-		assert prtProjectStaff != null
-		assert rtProject != null
-		assert teamRoleType != null
-
-		return PartyRelationship.withCriteria {
-			and {
-				eq('partyRelationshipType', prtProjectStaff)
-				eq('roleTypeCodeFrom', rtProject)
-				eq('partyIdFrom', project)
-				ne('roleTypeCodeTo', rtStaff)
-				if (teamRoleType) {
-					eq('roleTypeCodeTo', teamRoleType)
-				}
-				if (person) {
-					eq('partyIdTo', person)
-				}
-			}
-		}
-	}
-
-	/**
-	 * Used to retrieve one or more team members of a project (overloaded)
-	 * @param project - the project to search for members
-	 * @param teamCode - a String of the Team code
-	 * @param person - used to filter the results to the individual person (optional)
-	 */
-	PartyRelationship getProjectTeamMembers(Project project, String teamCode, Person person=null) {
-		RoleType rt = RoleType.read(teamCode)
-		if (! rt) {
-			log.warn "getProjectTeamMembers() called with invalid teamCode $teamCode"
-			return null
-		}
-		return getProjectTeamMembers(project, rt, person) 
-	}
 }

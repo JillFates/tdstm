@@ -1,14 +1,17 @@
 import org.apache.shiro.authc.AccountException
 import org.apache.shiro.authc.CredentialsException
 import org.apache.shiro.authc.IncorrectCredentialsException
+import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.UnknownAccountException
 import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.UnavailableSecurityManagerException
 
 import com.tdsops.common.security.ConnectorActiveDirectory
-//import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdsops.common.security.shiro.MissingCredentialsException
+import com.tdsops.common.security.shiro.UnhandledAuthException
 
 import com.tdssrc.grails.HtmlUtil
+import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.SecurityConfigParser
 
@@ -44,7 +47,7 @@ class ShiroActiveDirectoryRealm {
 			initialized = true
 			log = LogFactory.getLog(this.class)
 			if (log.isDebugEnabled()) 
-				log.debug "ShiroActiveDirectoryRealm: initializing"
+				log.debug "initialize()"
 
 			ctx = ApplicationContextHolder.getApplicationContext()
 			def securityService = ctx.securityService
@@ -91,6 +94,8 @@ class ShiroActiveDirectoryRealm {
 	 * UnknownAccountException - when not auto provisioning and got a non-found account
 	 */
 	def authenticate(authToken) {
+		String logPrefix = 'authenticate()'
+
 		if (! initialized)
 			initialize()
 
@@ -101,54 +106,54 @@ class ShiroActiveDirectoryRealm {
 		Map userInfo
 		String username = authToken.username
 		String authority = authToken.host?.toLowerCase()
+		String msg
 
 		// The password is a char[] in AuthToken so we convert to a string
 		// TODO : Security doc mentions that keeping the password as char[] is safer for in-memory 
 		def password = authToken.password
-		password=password.toString() 
+		password=password?.toString() 
 
+		// User must enter a username and password for their credentials
+		if ( ! username?.size() || ! password?.size() ) {
+			throw new MissingCredentialsException('Both the username and password are required')
+		}
 
 		// Try to validate the domain using authority which is passed around in the Host
 		if (! authToken.host) {
-			throw new AccountException('Authentication authority is missing')
-		}
-		if (! config.domains.containsKey(authToken.host.toLowerCase())) {
-			throw new AccountException("Invalid authority (${authToken.host}) was specified")
+			log.info "$logPrefix Expected authToken.host/authority was missing from request"
+			throw new UnhandledAuthException('Authentication authority is missing')
 		}
 
-		// Null username is invalid
-		if (! username || ! password) {
-			throw new AccountException('Blank username and/or passwords are not allowed')
+		// Validate that the host is specified in the configuration
+		if (! config.domains.containsKey(authToken.host.toLowerCase())) {
+			msg = "Invalid authority (${authToken.host}) was specified"
+			log.error "$logPrefix $msg"
+			throw new UnhandledAuthException(msg)
 		}
 
 		if (log.isDebugEnabled() || config.debug)
-			log.debug "ShiroActiveDirectoryRealm: About to try authenticating $username"
+			log.debug "$logPrefix About to try authenticating $username"
 
 		// Try calling ActiveDirectory to Authenticate the user and get their information
-		try {
-			userInfo = ConnectorActiveDirectory.getUserInfo(authority, username, password, config)
-		} catch (RuntimeException e) {
-			def remoteIp = HtmlUtil.getRemoteIp()
-			log.warn "Login attempt failed (ShiroActiveDirectoryRealm) : user $username : IP ${remoteIp}"
-
-			if (e.getMessage() == 'Username not found')
-				throw new UnknownAccountException(e.getMessage())
-			else 
-				throw new IncorrectCredentialsException(e.getMessage())
+		userInfo = ConnectorActiveDirectory.getUserInfo(authority, username, password, config)
+		if (config.debug) {
+			log.info "$logPrefix Authenticated user '${userInfo.username}' in AD"
 		}
 
-		if (log.isDebugEnabled() || config.debug)
-			log.debug "ShiroActiveDirectoryRealm: Found user '${userInfo.username}' in Active Directory"
+		// Now attempt to lookup the user or provision the Person+UserLogin accordingly
+		def userLogin 
+		try {
+			userLogin = ctx.userService.findOrProvisionUser(userInfo, config, authority)
+		} catch (e) {
+			log.error "$logPrefix UserService.findOrProvisionUser failed : ${e.getMessage()}"
+			throw new DisabledAccountException('Unable to find or provision your TransitionManager account')
+		}
 
-		// Now attempt to lookup the user or provision accordingly
-		// Note that the findOrProvisionUser method can throw errors that Shiro will catch
-		def userLogin
-
-		def userService = ctx.userService
-		userLogin = userService.findOrProvisionUser(userInfo, config, authority)
-
-		if (log.isDebugEnabled() || config.debug)
-			log.debug "ShiroActiveDirectoryRealm: Returned with user '${userLogin.username}'"
+		// Ok so check a few things about the account
+		if (! userLogin.securityRoleCodes) {
+			log.warn "$logPrefix User $username has no assigned roles"
+			throw new DisabledAccountException('Your account has no assigned security role')
+		}
 
 		// Create a SimpleAccount to hand back to Shiro
 		def account = new SimpleAccount(userLogin.username, userLogin.password, 'ShiroActiveDirectoryRealm')

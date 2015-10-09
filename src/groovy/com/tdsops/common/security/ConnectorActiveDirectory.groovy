@@ -11,8 +11,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.security.shiro.UnhandledAuthException
 
 import com.tdsops.common.lang.ExceptionUtil
+
 /**
  * Class used to authenticate with Active Directory via LDAP protocol
  */
@@ -29,7 +31,9 @@ class ConnectorActiveDirectory {
 	}
 
 	/**
-	 * Used to authenticate and get user information from an Active Directory server
+	 * Used to authenticate and get user information from an Active Directory server. If any issues occur during the lookup
+	 * then it will throw a UnhandledAuthException exception as the user may be able to authenticate with a different realm.
+	 *
 	 * @param authority - the domain authority to check up against
 	 * @param username - the user login name to lookup
 	 * @param password - the password for the account
@@ -43,11 +47,13 @@ class ConnectorActiveDirectory {
 	 *		telephone
 	 *		mobile
 	 *		roles - a list of roles (e.g. User, Editor, Manager, Admin)
-	 * @throws ...
+	 * @throws UnhandledAuthException
 	 */
 	static Map getUserInfo(String authority, String username, String password, Map ldapConfig) {
 		String emsg = ''
+		String logPrefix = 'getUserInfo()'
 		Map userInfo = [:]
+		boolean isError = false
 		boolean debug = ldapConfig.debug
 		boolean serviceAuthSuccessful = false
 		Map domain 
@@ -68,6 +74,7 @@ class ConnectorActiveDirectory {
 					}
 					queryForUser = "(userPrincipalName=$queryUsername)"
 					break
+
 				case 'SAM':
 					// If the user is logging in with SAM check to see if the domain was part of the username and add it if not
 					if (domain.domain) {
@@ -79,24 +86,29 @@ class ConnectorActiveDirectory {
 							if (! userEnteredDomain || userEnteredDomain.toLowerCase() == domain.domain.toLowerCase()) {
 								queryUsername = domain.domain = '\\' + username
 							} else {
-								throw new javax.naming.AuthenticationException('Invalid domain specified')
+								emsg = 'Invalid domain specified'
+								log.info "$logPrefix $emsg by user $username, domain $userEnteredDomain"
+								throw new UnhandledAuthException(emsg)
 							}
 						}
 					}
 					queryForUser = "(sAMAccountName=$queryUsername)"
 					break
 				default:
-					throw new RuntimeException("Unhandle switch for domain.userSearchOn(${domain.userSearchOn})")
+					emsg = "Unhandle switch for domain.userSearchOn(${domain.userSearchOn})"
+					log.error "$logPrefix $emsg"
+					throw new UnhandledAuthException(emsg)
 			}
+
 			// This user type query is the equivalant of (&(objectCategory=person)(objectClass=user)) but more efficient
 			String queryUserType = '(samAccountType=805306368)'
 			queryForUser = "(&$queryUserType$queryForUser)"
 			if (debug)
-				log.info "LDAP query for user: $queryForUser"
+				log.info "$logPrefix LDAP query for user: $queryForUser"
 
 			// Connect using the service bind account
 			if (debug)
-				log.info "Initiating LDAP connection to ${domain.url[0]} with system account (${domain.serviceName})"
+				log.info "$logPrefix Initiating LDAP connection to ${domain.url[0]} with system account (${domain.serviceName})"
 			def ldap = LDAP.newInstance(domain.url[0], domain.serviceName, domain.servicePassword)
 
 			// Lookup the user by their sAMAccountName
@@ -105,22 +117,24 @@ class ConnectorActiveDirectory {
 			for (i=0; i < domain.userSearchBase.size(); i++) {
 				try {
 					String searchBase = domain.userSearchBase[i]
-					log.debug "Attempting ldap.search($queryUsername, ${searchBase}, SearchScope.SUB)"
+					if (debug)
+						log.debug "$logPrefix Attempting ldap.search($queryUsername, ${searchBase}, SearchScope.SUB)"
 					results = ldap.search(queryForUser, searchBase, SearchScope.SUB )
 					if (results.size()) {
 						if (debug)
-							log.info "Found user ${results[0].dn} in ${searchBase}"
+							log.info "$logPrefix Found user ${results[0].dn} in ${searchBase}"
 						break
 					}
 				} catch (javax.naming.NameNotFoundException userSearchEx) {
-					log.debug "UserSearch got javax.naming.NameNotFoundException exception"
+					log.info "$logPrefix UserSearch got javax.naming.NameNotFoundException exception"
 					// Don't need to do anything
 				}
 			}
 
 			if (! results.size()) {
-				log.info "Unable to locate username $username"
-				throw new javax.naming.NameNotFoundException('Unable to locate username')
+				if (debug)
+					log.info "$logPrefix Unable to locate username $username"
+				throw new UnhandledAuthException('Unable to locate username')
 			} 
 			
 			def u = results[0]
@@ -135,19 +149,19 @@ class ConnectorActiveDirectory {
 
 			// This will validate that the user credentials are valid and will tick the BadPwdCount if it fails
 			assert ldap.exists(u.dn)
-			log.info "Validated user credentials for $username with AD/LDAP"
+			log.info "$logPrefix Validated user credentials for $username with AD/LDAP"
 
 			// So we'll search through the roles to see what the user has defined
 			if (domain.roleMap && domain.roleMap.size()) {
 				if (debug)
-					log.info "About to lookup roles ${domain.roleMap} for mode ${domain.roleSearchMode}"
+					log.info "$logPrefix Looking up roles ${domain.roleMap} for mode ${domain.roleSearchMode}"
 
 				switch (domain.roleSearchMode) {
 					case 'nested':
 						// Grab the user's nested group memberships by iterating over one or more searchBase values
 						def queryNestedGroups = "(member:1.2.840.113556.1.4.1941:=${u.distinguishedname})"
 						if (debug)
-							log.info "About to search for nested groups for (${domain.roleBaseDN}) with query $queryNestedGroups"
+							log.info "$logPrefix About to search for nested groups for (${domain.roleBaseDN}) with query $queryNestedGroups"
 						def g = ldap.search(queryNestedGroups, domain.roleBaseDN, SearchScope.SUB)
 						if (g)
 							memberof.addAll(g*.dn)
@@ -157,27 +171,36 @@ class ConnectorActiveDirectory {
 						memberof = ( u.memberof instanceof List ? u.memberof : [ u.memberof.toString() ] )
 						break
 					default:
-						throw new RuntimeException("domain.roleSearchMode ${domain.roleSearchMode} is not supported")
+						emsg = "domain.roleSearchMode ${domain.roleSearchMode} is not supported"
+						log.error "$logPrefix $emsg"
+						throw new UnhandledAuthException(emsg)
 				}
 
 				if (debug) {
 					StringBuffer sb = new StringBuffer()
-					memberof.each {sb.append("\n\t$it")}
-					log.info "USER MEMBEROF (${domain.roleSearchMode.toUpperCase()}): $sb"
+					memberof.each {sb.append("\n\t'$it'")}
+					log.info "$logPrefix User MemberOf (${domain.roleSearchMode.toUpperCase()}): $sb"
 				}
 
 				// Search through roles and see if we can match up
 				memberof = memberof*.toLowerCase()
 				domain.roleMap.each { role, filter ->
-					def groupDN="$filter${domain.roleBaseDN ? ','+domain.roleBaseDN : ''}".toLowerCase()
-					if (memberof.find { it == groupDN })
+					def groupDN="$filter${domain.roleBaseDN ? ','+domain.roleBaseDN : ''}"
+					if (debug) 
+						log.info "$logPrefix searching MemberOf list for '$groupDN'"
+					if (memberof.find { it == groupDN.toLowerCase() }) {
 						roles << role
+						if (debug)
+							log.info "$logPrefix found $role"
+					}
 				}
 
 			} else {
 				if (debug)
-					log.info "No roles defined and using defaultRole (${domain.defaultRole})"
+					log.info "$logPrefix No roles defined and using defaultRole (${domain.defaultRole})"
+
 				assert domain.defaultRole
+
 				// Set their default role
 				roles << domain.defaultRole
 			}
@@ -200,38 +223,52 @@ class ConnectorActiveDirectory {
 				log.info ui.toString()
 			}
 
-			// Make sure that the user has at least one assigned role if we're updating roles via AD
-			if (domain.updateRoles && roles.size()==0) {
-				throw new javax.naming.AuthenticationException('User has no assigned roles')
-			}
-
 		} catch (javax.naming.directory.InvalidSearchFilterException e) {
-			emsg = "InvalidSearchFilterException occurred : ${e.getMessage()}" 
-			// log.error "$emsg : ${e.getMessage()}"
-		} catch (javax.naming.AuthenticationException ae) {
-			emsg = (ae.getMessage() ?: 'Invalid user password' )
-			if (debug)
-				log.info "$emsg : ${ae.getMessage()}"
-		} catch (javax.naming.NameNotFoundException nnfe) {
-			emsg = 'Username not found'
-			if (debug)
-				log.info "$emsg : ${nnfe.getMessage()}"
-		} catch (javax.naming.InvalidNameException ine) {
+			isError = ! serviceAuthSuccessful
+			emsg = 'InvalidSearchFilterException occurred for ' + (serviceAuthSuccessful ? 'user info search' : 'service lookup of user') 
+			logMessage("${emsg} : ${e.getMessage()}", serviceAuthSuccessful, isError, debug)
+		} catch (javax.naming.AuthenticationException e) {
+			isError = ! serviceAuthSuccessful
+			emsg = 'Invalid ' + ( serviceAuthSuccessful ? 'user' : 'service account') + " password"
+			logMessage("${emsg} : ${e.getMessage()}", serviceAuthSuccessful, isError, debug)
+		} catch (javax.naming.NameNotFoundException e) {
+			isError = ! serviceAuthSuccessful
+			emsg = ( serviceAuthSuccessful ? 'User' : 'Service account') + ' not found'
+			logMessage(emsg, serviceAuthSuccessful, isError, debug)
+		} catch (javax.naming.InvalidNameException e) {
 			emsg = 'User DN was invalid'
-			if (debug)
-				log.info "$emsg : ${ine.getMessage()}"
-		} catch (java.lang.NullPointerException npe) {
-			emsg = serviceAuthSuccessful ? 'Invalid user credentials' : 'Possibly invalid service account credentials or LDAP URL'
-			if (debug) 
-				log.info "$emsg\n${ExceptionUtil.stackTraceToString(npe)}"
+			logMessage("${emsg} : ${e.getMessage()}", serviceAuthSuccessful, isError, debug)
+		} catch (java.lang.NullPointerException e) {
+			isError = ! serviceAuthSuccessful
+			emsg = (serviceAuthSuccessful ? 'Invalid user credentials' : 'Possibly invalid service account credentials or LDAP URL')
+			logMessage(emsg, serviceAuthSuccessful, isError, debug)
+		} catch (UnhandledAuthException e) {
+			isError = ! serviceAuthSuccessful
+			emsg = e.getMessage()
+			logMessage(emsg, serviceAuthSuccessful, isError, debug)
 		} catch (Exception e) {
-			emsg = 'Unexpected error'
-			log.error "$emsg : ${e.class} ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
+			emsg = "Unexpected error with ${ (serviceAuthSuccessful ? 'service account' : 'user')} : ${e.getMessage()}"
+			logMessage(emsg, false, isError, debug, e)
 		}
 
-		if (emsg)
-			throw new javax.naming.AuthenticationException(emsg)
+		if (emsg) {
+			throw new UnhandledAuthException(emsg)
+		}
 
 		return userInfo
+	}
+
+	/**
+	 * Used to log messages for debug or error based on if it was a service account issue or not and debugging is enabled
+	 * @param msg - the message to log
+	 * @param serviceAuthSuccessful - flag that indicates that the Service Account was successfully authenticated
+	 * @param isDebugEnabled
+	 */
+	private static void logMessage(String msg, boolean serviceAuthSuccessful, boolean logError, boolean isDebugEnabled, Exception exception=null) {
+		if (logError) {
+			log.error msg + (exception != null ? " : ${ExceptionUtil.stackTraceToString(exception)}" : '')
+		} else if (isDebugEnabled) {
+			log.info msg + (exception != null ? " : ${ExceptionUtil.stackTraceToString(exception)}" : '')
+		}
 	}
 }

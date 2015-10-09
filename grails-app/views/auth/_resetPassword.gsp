@@ -12,15 +12,21 @@
 
 <g:javascript src="jquery-1.9.1.js"/>
 <g:javascript src="PasswordValidation.js" />
+<g:javascript src="tds-common.js" />
 
 <script type="text/javascript">
 	$( document ).ready(function() {
 		$("#forgotPasswordForm").on("submit", function(event) {
 			event.preventDefault();
 			var passwordField = $("#password");
+			var emailField = $("#email");
 			if (!PasswordValidation.checkPassword(passwordField[0])) {
 				alert("The password does not adhere to the specified requirements.");
 				passwordField.focus();
+				return false;
+			} else if (!tdsCommon.isValidEmail(emailField.val())) {
+				alert("Please enter a valid email address");
+				emailField.focus();
 				return false;
 			} else {
 				$(this).off("submit");

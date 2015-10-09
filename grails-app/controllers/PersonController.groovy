@@ -379,7 +379,7 @@ class PersonController {
 		}		
 
 		if (isAjaxCall) {
-			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:person.lastNameFirst, isExistingPerson:(person != null), fieldName:params.fieldName]
+			def map = errMsg ? [errMsg : errMsg] : [ id: person.id, name:person.lastNameFirst, isExistingPerson: false, fieldName:params.fieldName]
 			render map as JSON
 		} else {
 			if (errMsg) {
@@ -715,8 +715,9 @@ class PersonController {
 	 * @ returns - staff list.
 	 * 
 	 */
-	def manageProjectStaff() {
-		if (!controllerService.checkPermission(this, 'EditProjectStaff')) {
+	def manageProjectStaff = {
+		def (project, loginUser) = controllerService.getProjectAndUserForPage(this, 'ProjectStaffList')
+		if (!project) {
 			return
 		}
 
@@ -727,7 +728,6 @@ class PersonController {
 		def now = TimeUtil.nowGMT()
 		def projects = []
 		
-		def project = securityService.getUserCurrentProject()
 		def roleTypes = partyRelationshipService.getStaffingRoles()
 		def moveEventList = []
 		
@@ -742,7 +742,6 @@ class PersonController {
 		def moveEvents
 		def projectId = Project.findById( project.id) ? project.id : 0
 		def loginPerson = securityService.getUserLoginPerson()
-		def loginUser = securityService.getUserLogin()
 		def reqProjects = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectsPerm, ProjectStatus.ACTIVE)
 
 		if (projectId == 0) {

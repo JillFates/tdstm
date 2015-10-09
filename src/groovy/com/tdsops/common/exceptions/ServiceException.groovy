@@ -5,14 +5,19 @@ package com.tdsops.common.exceptions
  */
 class ServiceException extends Exception {
 
-	def messageCode
-	def messageArgs
+	String messageCode
+	List messageArgs
 
 	public ServiceException(String message) {
 		super(message);
 	}
 
-	public ServiceException(String message, String messageCode, messageArgs) {
+	public ServiceException(String message, String messageCode) {
+		super(message);
+		this.messageCode = messageCode
+	}
+
+	public ServiceException(String message, String messageCode, List messageArgs) {
 		super(message);
 		this.messageCode = messageCode
 		this.messageArgs = messageArgs

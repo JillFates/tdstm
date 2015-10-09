@@ -1,10 +1,10 @@
-<g:each in="${recentLogin.keySet()}" var="per">
-	<tr class="cursor" onclick="getUserDetails(${recentLogin[per].name.id})">
+<g:each in="${recentLogin}" var="loginInfo">
+	<tr class="cursor" onclick="getUserDetails(${loginInfo.personId})">
 		<td>
-			${recentLogin[per].project.name}
+			${loginInfo.projectName}
 		</td>
 		<td>
-			${recentLogin[per].name.lastNameFirst}
+			${loginInfo.personName}
 		</td>
 	</tr>
 </g:each>

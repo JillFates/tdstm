@@ -59,37 +59,37 @@
                          <tr>
 							<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 							</tr>
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
-                                    <g:select optionKey="id" from="${Person.list()}" id="person" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
-                                <g:hasErrors bean="${userLoginInstance}" field="person">
-					            <div class="errors">
-					                <g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                        
-                            <tr class="prop">
-                                <td valign="top" class="name">
-                                    <label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-                                    <input type="text" onkeyup="checkPassword($('#password')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
-                                <g:hasErrors bean="${userLoginInstance}" field="username">
-					            <div class="errors">
-					                <g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr>
-                            <tr>
-                            	<td valign="top" class="name">
-                                    <label for="isLocal">Local account:</label>
-                                </td>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
+									<g:select optionKey="id" from="${Person.list()}" id="person" name="personId" value="${userLoginInstance?.person?.id}" ></g:select>
+									<g:hasErrors bean="${userLoginInstance}" field="person">
+										<div class="errors">
+											<g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
+										</div>
+									</g:hasErrors>
+								</td>
+							</tr> 
+					
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
+								</td>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
+									<input type="text" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+									<g:hasErrors bean="${userLoginInstance}" field="username">
+										<div class="errors">
+											<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
+										</div>
+									</g:hasErrors>
+								</td>
+							</tr>
+							<tr>
+								<td valign="top" class="name">
+									<label for="isLocal">Local account:</label>
+								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
                                     <input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal)?'checked="checked"':''}  
                                     onchange="togglePasswordEditFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>

@@ -409,12 +409,11 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
-	 * Used to get a list of system roles.
-	 * 
-	 * @return List of roles
+	 * Used to get a list of RoleType that are for Security roles sorted by highest to lowest privilege level
+	 * @return List of RoleType
 	 */
-	def getSystemRoleTypes() {
-		return RoleType.findAll(" from RoleType rt WHERE rt.description like 'System%' ")
+	List<RoleType> getSecurityRoleTypes() {
+		return RoleType.findAllByType(RoleType.SECURITY, [sort:'level', order: 'desc'])
 	}
 
 	/**
@@ -689,7 +688,6 @@ class SecurityService implements InitializingBean {
 			auditService.logMessage("Forgot My Password was requested for email $email from $ipAddress")
 			def token = nextAuthToken()
 			emailParams["token"] = token
-			emailParams["expiredTime"] = getUserLocalConfig().forgotMyPasswordResetTimeLimits
 			
 			def dispatchOrigin = EmailDispatchOrigin.PASSWORD_RESET
 			def bodyTemplate = "passwordReset"
@@ -721,9 +719,14 @@ class SecurityService implements InitializingBean {
 
 			String errMsg = "An error occurred and we were unable to send you a password reset. Please contact support for help."
 			if (ed) {
+				def date = new Date(TimeUtil.nowGMT().time)
 				def pr = createPasswordReset(token, ipAddress, userLogin, person, ed, resetType)		
 
 				if (pr) {
+					String granularity = emailDispatchService.getExpiryGranularity(ed)
+					emailParams["expiredTime"] = TimeUtil.elapsed(date, pr.expiresAfter, granularity)
+					ed.paramsJson = emailParams as JSON
+					ed.save(flush:true)
 					emailDispatchService.createEmailJob(ed, emailParams)
 					log.debug "sendResetPasswordEmail() created token '$token' for $userLogin"
 				} else {
@@ -1030,6 +1033,7 @@ Dealt with:
 		}
 
 		if (params.isLocal) {
+			userLogin.isLocal = true
 			userLogin.forcePasswordChange = (params.forcePasswordChange ? 'Y' : 'N')
 			userLogin.passwordNeverExpires = (params.containsKey('passwordNeverExpires') && params.passwordNeverExpires.equals('true'))
 		} else {
@@ -1061,6 +1065,15 @@ Dealt with:
 			}
 		} catch (e) {
 			throw new InvalidParamException("The $dateFile field has invalid format")
+		}
+
+		if (!StringUtil.isBlank(params.username) && !userLogin.username.equals(params.username)) {
+			def newUserNameUserLogin = UserLogin.findByUsername(params.username)
+			if (newUserNameUserLogin != null) {
+				throw new InvalidParamException("The username you is selected is already in use.")
+			} else {
+				userLogin.username = params.username
+			}
 		}
 
 		// Try to save the user changes

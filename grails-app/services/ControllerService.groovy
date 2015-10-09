@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetType
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.common.exceptions.ServiceException
@@ -353,7 +354,6 @@ class ControllerService {
 			return exception.getMessage()	
 		}
 	}
-
 	/**
 	 * Switch user project to the new project, only if the user have access to the project
 	 */

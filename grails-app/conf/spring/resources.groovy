@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 // import org.apache.shiro.authc.credential.Sha512CredentialsMatcher
 // import org.apache.shiro.authc.credential.Sha1CredentialsMatcher
 import com.tdsops.common.security.shiro.SHA2CredentialsMatcher
+import com.tdsops.common.security.shiro.FirstExceptionStrategy
 
 import com.tdsops.common.grails.ApplicationContextHolder
  
@@ -38,6 +39,9 @@ beans = {
 
 	// Shiro Password Encryption configuration using custom AES encryption
 	credentialMatcher(SHA2CredentialsMatcher) {
+	}
+
+	shiroAuthenticationStrategy(FirstExceptionStrategy) {
 	}
 	
 	// Shiro Password Encryption configuration

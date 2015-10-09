@@ -12,6 +12,7 @@ import grails.validation.ValidationException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.builder.UserAuditBuilder
 
 /**
  * The PersonService class provides a number of functions to help in the management and access of Person objects
@@ -968,6 +969,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param personId - the id of the person to update
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 * @return String - any value indicates an error otherwise blank means succes
+	 * TODO : JPM : 9/23/2015 - removeFromProject() doesn't look like it will work and doesn't appear to be used...
 	 */
 	String removeFromProject(UserLogin user, String projectId, String personId, String teamCode) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
@@ -979,7 +981,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 		deleteFromEvent(map.project, null, map.person, map.teamRoleType)
 
 		// Remove the Project Staff relationship for the project
-		List prs = partyRelationshipService.getProjectTeamMembers(map.project, map.teamRoleType, map.person)
+		List prs = projectService.getTeamMembers(map.project, map.teamRoleType, map.person)
 		prs?.each { 
 			log.debug "removeFromProject() deleting PartyRelationship $it"
 			it.delete()
@@ -1353,6 +1355,8 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 			if (!userLogin.save()) {
 				log.error "updatePerson() failed for $userLogin : " + GormUtil.allErrorsString(userLogin)
 				throw new DomainUpdateException('An error occurred while attempting to update the user changes')
+			} else if (params.newPassword) {
+				auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged(userLogin))
 			}
 		}
 
@@ -1451,7 +1455,9 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 				throw new DomainUpdateException('A person with that name already exists')
 			} else {
 				// Create the person and relationship appropriately
-				person = new Person( params )
+				def reducedParams = new HashMap(params)
+				reducedParams.remove("company")
+				person = new Person( reducedParams )
 				if ( !person.hasErrors() && person.save() ) {
 					//Receiving added functions		
 					def functions = params.list("function")

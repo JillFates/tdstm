@@ -4,6 +4,7 @@ import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetType
 import com.tds.asset.FieldImportance
+import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
@@ -25,6 +26,9 @@ import com.tdssrc.grails.WorkbookUtil
 import net.transitionmanager.ProjectDailyMetric
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import net.transitionmanager.PasswordReset
+
+import org.hibernate.criterion.CriteriaSpecification
 
 class ProjectService {
 
@@ -35,6 +39,7 @@ class ProjectService {
 	def stateEngineService
 	def userPreferenceService
 	def sequenceService
+	def auditService
 
 	/**
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
@@ -974,26 +979,62 @@ class ProjectService {
 	/**
 	 * This method will query for all the accounts that haven't been 
 	 * activated.
+	 * Used to retrieve a list project users whom are eligible as activation notices
+	 * @param project - the project that the users are associated with which includes anybody assoicated with the project
+	 * @return A list of map objects including:
+	 *		UserLogin userLogin
+	 *		String firstName
+	 *		String lastName
+	 *		String email
+	 *		String company - company name
+	 *		List<String> roles - list of security roles the user has been assigned
+	 *		Date lastActivationNotice - Date of latest activation notice sent to the user otherwise null
+	 *		Date expiry - the expiry date of the user 
+	 *		Date created - the date the user was created
 	 * Rules: Has a userLogin account where lastLogin is null and localAccount=true and Active='Y' and expiry > now()
 	 */
-	def getAccountActivationUsers(){
-		def query = new StringBuffer("SELECT GROUP_CONCAT(role_type_id) AS roles, p.person_id AS personId,")
-			.append(" p.first_name AS firstName, p.last_name as lastName, p.email as email, pg.name AS company,")
-			.append(" u.expiry_date AS expiryDate, u.created_date AS dateCreated, pwd.lan as lastActivationNotice")
-			.append(" FROM party_role pr LEFT OUTER JOIN person p ON(p.person_id=pr.party_id)")
-			.append(" LEFT OUTER JOIN user_login u ON(u.person_id=p.person_id)")
-			.append(" LEFT OUTER JOIN (SELECT * FROM party_relationship WHERE party_relationship_type_id='STAFF' AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF') r ON(r.party_id_to_id=pr.party_id)")
-			.append(" LEFT OUTER JOIN party_group pg ON(pg.party_group_id=r.party_id_from_id)")
-			.append(" LEFT OUTER JOIN (SELECT MAX(created_date) AS lan, user_login_id FROM password_reset WHERE type='WELCOME') pwd ON(u.user_login_id = pwd.user_login_id)")
-			.append(" WHERE (u.is_local = 1 AND u.active = 'Y' AND u.expiry_date >= u.expiry_date > now()) AND p.email IS NOT NULL AND LENGTH(TRIM(p.email)) > 0 AND u.last_login IS NULL")
-			.append(" ORDER BY lastName, firstName")
+	List<Map> getAccountActivationUsers(Project project) {
+		assert project != null
 
-		def accounts = jdbcTemplate.queryForList(query.toString())
-		/* This validation is added because when there's an empty result set, we get a
-		   list with one record (for which all the values are null).*/
-		if(accounts.size() == 1 && accounts[0].email == null){
-			accounts.remove(0)
+		List accounts = []
+
+		// All the staff associated with the current project
+		List persons = getTeamMembers(project)
+		if (! persons) {
+			return accounts
 		}
+
+		// Now using that list, perform a join against the UserLogin in order to find the users that are candidates 
+		String query = 'select u' +
+			', (select max(reset.createdDate) from PasswordReset reset where reset.userLogin = u and reset.type=:type) as latestReset' +
+			' from UserLogin u' +
+			' where u.person in (:persons)' +
+			' and u.person.email is not null' +
+			' and u.active=\'Y\'' +
+			' and u.expiryDate > :expiry' +
+			' and u.lastLogin is null'
+
+		Map params = [persons:persons, expiry:new Date(), type:PasswordResetType.WELCOME]
+		List users = UserLogin.executeQuery(query, params)
+
+		users.each() { u ->
+			def userLogin = u[0]
+			def person = userLogin.person
+			accounts << [
+				userLogin: userLogin,
+				personId: person.id,
+				firstName: person.firstName, 
+				lastName : person.lastName, 
+				email: person.email,
+				company: person.getCompany().name, 
+				roles: userLogin.securityRoleCodes, 
+				expiry: userLogin.expiryDate, 
+				dateCreated: userLogin.createdDate,
+				lastActivationNotice: u[1], 
+				currentProject: userLogin.currentProject
+			]
+		}
+
 		return accounts
 	}
 
@@ -1005,12 +1046,93 @@ class ProjectService {
 	 * @param ipAddress: IP Address of the client's machine who triggered the notifications.
 	 */
 	def sendBulkActivationNotificationEmail(List accounts, String message, String from, String ipAddress){
-
 		def model = [customMessage: message, from:from]
 		accounts.each{account ->
-			sendResetPasswordEmail(account.email, ipAddress, PasswordResetType.WELCOME, model)
+			securityService.sendResetPasswordEmail(account.email, ipAddress, PasswordResetType.WELCOME, model)
 		}
 		
+	}
+
+	/**
+	 * Used to get the list of unique Team members associated with a project. This will allow filtering for a given role and/or person
+	 * @param project - the Project that the team is associated to
+	 * @param teamRoleType - the RoleType to optional filter on
+	 * @param person - the Person to optionally filter on
+	 * @return The list of persons found that are team members
+	 */
+	List<Person> getTeamMembers(Project project, RoleType teamRoleType=null, Person person=null) {
+		List persons = [] 
+		List relations = getTeamMemberRelationships(project, teamRoleType, person)
+		if (relations) {
+			// Get the unique Person objects
+			persons = relations*.partyIdTo?.unique { a,b -> a.id <=> b.id}		
+		}
+
+		return persons
+	}
+
+	/**
+	 * Used to get the list of unique Team members associated with a project. (overloaded)
+	 * @param project - the project to search for members
+	 * @param teamCode - a String of the Team code
+	 * @param person - used to filter the results to the individual person (optional)
+	 */
+	PartyRelationship getTeamMembers(Project project, String teamCode, Person person=null) {
+		RoleType rt = RoleType.read(teamCode)
+		if (! rt) {
+			log.warn "getTeamMembers() called with invalid teamCode $teamCode"
+			return null
+		}
+		return getTeamMembers(project, rt, person) 
+	}
+
+	/**
+	 * Used to retrieve one or more team member PartyRelationship references to a project
+	 * @param project - the project to search for members
+	 * @param teamRoleType - The team Role Type code
+	 * @param person - used to filter the results to the individual person (optional)
+	 */
+	List<PartyRelationship> getTeamMemberRelationships(Project project, def teamRoleType=null, Person person=null) {
+		RoleType rt 
+
+		if (teamRoleType) {
+			if ( (teamRoleType instanceof String) ) {
+				rt = RoleType.read(teamCode)
+				if (! rt) {
+					throw new InvalidParamException("getTeamMemberRelationships called with invalid teamCode $teamCode")
+				}
+			} else {
+				if ( (teamRoleType instanceof RoleType) ) {
+					rt = teamRoleType
+				} else {
+					throw new InvalidParamException("getTeamMemberRelationships called with unsupported RoleType ${teamRoleType.getClass().getName()}")
+				}
+			}
+		}
+
+		PartyRelationshipType prtProjectStaff = PartyRelationshipType.read('PROJ_STAFF')
+		RoleType rtProject = RoleType.read('PROJECT')
+		RoleType rtStaff = RoleType.read('STAFF')
+
+		assert prtProjectStaff != null
+		assert rtProject != null
+		//assert teamRoleType != null
+
+		return PartyRelationship.withCriteria {
+			// resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+			and {
+				eq('partyRelationshipType', prtProjectStaff)
+				eq('roleTypeCodeFrom', rtProject)
+				eq('partyIdFrom', project)
+				ne('roleTypeCodeTo', rtStaff)
+				if (rt) {
+					eq('roleTypeCodeTo', rt)
+				}
+				if (person) {
+					eq('partyIdTo', person)
+				}
+			}
+		}
 	}
 
 }

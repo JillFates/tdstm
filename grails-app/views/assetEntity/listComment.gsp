@@ -61,7 +61,7 @@
 					sortname="'lastUpdated'"
 					sortorder="'desc'"
 					caption="'Asset Comment:'"
-					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
+					gridComplete="function(){bindResize('listCommentGridId');recompileDOM('listCommentGridIdWrapper');}"
 					showPager="true">
 					<jqgrid:filterToolbar id="listCommentGridId" searchOnEnter="false" />
 					<jqgrid:navigation id="listCommentGridId" add="false" edit="false" del="false" search="false"/>

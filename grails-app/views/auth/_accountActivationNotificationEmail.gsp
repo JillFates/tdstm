@@ -3,7 +3,7 @@
 <head></head>
 <body>
 
-Dear ${person},<br>
+Hi ${person},<br>
 <p>
 ${customMessage}
 </p>

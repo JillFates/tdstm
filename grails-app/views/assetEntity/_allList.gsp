@@ -69,7 +69,7 @@
 	</div>
 	<script type="text/javascript">
 		$('#tabTypeId').val('all');
-		recompileDOM('item1', angular.element($('div.body')[0]).scope());
+		recompileDOM('item1');
 	</script>
 </div>
 

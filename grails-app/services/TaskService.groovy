@@ -1242,6 +1242,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def findCol		// The db column name that is used to find the adjacent task dep count on the outer edges of the neighborhood
 		//def nextCol		// The DB column name that represents the findCol property in the domain object
 		def depCountName	// The name of the property that will be injected into the edge nodes with the count (predecessorDepCount | successorDepCount)
+		boolean isPred = false // Flag for the neighbors closure.
+
 		// A recursive helper method that will traverse each of the neighbors out the # of blocks passed in
 		def neighbors
 		neighbors = { tId, depth ->
@@ -1279,7 +1281,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							// Try to match up the outer dep count to the task dependency node
 							def outerDep = outerDeps?.find() { od -> od.id == t[nextProp].id }
 							def outerDepCount = outerDep ? outerDep.cnt : 0
-							t.metaClass.setProperty(depCountName, outerDepCount)	
+							if(isPred){
+								t.setTmpPredecessorDepCount(outerDepCount)
+							}else{
+								t.setTmpSuccessorDepCount(outerDepCount)
+							}
+								
 							log.info "getNeighborhood(): Found $outerDepCount outer depend for task # ${t[findProp].taskNumber} (id:${t[findProp].id})"
 						}
 					}
@@ -1312,6 +1319,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		neighbors(taskId, blocksRight) 
 
 		// Get the predecessor
+		isPred = true
 		findProp = 'assetComment'
 		nextProp = 'predecessor'
 		findCol = 'asset_comment_id'
@@ -1564,6 +1572,16 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 
 	/**
+	 * Loads staffingRoles into static property
+	 */
+	@Synchronized
+	void loadStaffingRoles() {
+		if (! staffingRoles) {
+			staffingRoles = partyRelationshipService.getStaffingRoles()*.id
+		}
+	}
+
+	/**
 	 * Method used to generate tasks for a given TaskBatch object. This is designed to run asynch an as such will interact with the 
 	 * ProgressService to update the job with the status. 
 	 * @param taskBatch - the TaskBatch that contains all of the necessary data needed to generate the tasks
@@ -1574,6 +1592,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def detail = ''
 
 		log.debug "generateTasks(taskBatch:$taskBatch, publishTasks:$publishTasks) called"
+
+		loadStaffingRoles()
+
 		try {
 			generateTasks(taskBatch, publishTasks, progressKey)
 		} catch (RuntimeException e) {
@@ -1584,17 +1605,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// Mark the job's progress Competed or Failed accordingly 
 		progressService.update(progressKey, 100I, (errored ? 'Failed' : 'Completed'), detail)
-	}
-
-
-	/**
-	 * Loads staffingRoles into static property
-	 */
-	@Synchronized
-	void loadStaffingRoles() {
-		if (! staffingRoles) {
-			staffingRoles = partyRelationshipService.getStaffingRoles()*.id
-		}
 	}
 
 	/**
@@ -2091,7 +2101,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						latestMilestone = newTask 
 
 						// Indicate that the task is funnelling so that predecessor tasks' assets are moved through the task 
-						newTask.metaClass.setProperty('tmpIsFunnellingTask', true)		
+						newTask.setTmpIsFunnellingTask(true)		
 
 						// Identify that this taskSpec is a collection type
 						collectionTaskSpecIds << taskSpec.id
@@ -2103,7 +2113,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						def tasksNoSuccessors = []
 						taskList.each() { id, t ->
 							// Check to see if the task doesn't have a successor, that it isn't terminal and that it isn't the current Milestone task
-							if ( ! t.metaClass.hasProperty(t, 'hasSuccessorTaskFlag') && 
+							if ( ! t.getTmpHasSuccessorTaskFlag() && 
 								! terminalTasks.contains(t.id) &&
 								t.id != newTask.id ) {
 									tasksNoSuccessors << t
@@ -2161,7 +2171,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						newTask = createTaskFromSpec(recipeId, whom, taskList, moveEvent, taskSpec, projectStaff, settings, exceptions, null)
 
 						// Indicate that the task is funnelling so that predecessor tasks' assets are moved through the task 
-						newTask.metaClass.setProperty('tmpIsFunnellingTask', true)		
+						newTask.setTmpIsFunnellingTask(true)		
 
 						tasksNeedingPredecessors << newTask
 						mapMode = 'DIRECT_MODE'
@@ -2223,7 +2233,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 									// Throw the new task(s) into the collective taskList using the id as the key
 									actionTasks.each() { t ->
 										// Set flag that this is a funnelling task so that the predecessor logic will move all assets through it
-										t.metaClass.setProperty('tmpIsFunnellingTask', true)		
+										t.setTmpIsFunnellingTask(true)		
 										taskList[t.id] = t
 										// taskSpecTasks[taskSpec.id] << t
 									}
@@ -2623,7 +2633,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 											// We need to chain the peer task inside of this task so that subsequent task spec for the asset
 											// will connect follow the chain and connect to all of the peers.
-											tnp.metaClass.setProperty('chainPeerTask', assetsLatestTask[tnp.assetEntity.id])
+											tnp.setTmpChainPeerTask(assetsLatestTask[tnp.assetEntity.id])
 										}
 									}
 									break
@@ -2677,7 +2687,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 												depCount += createTaskDependency(predAssetTask, tnp, taskList, assetsLatestTask, settings, out)
 
 												// Check to see if the predecessor and the successor are funnels and if so, then move the asset forward to the new successor
-												if ( predAssetTask.metaClass.hasProperty(predAssetTask, 'tmpIsFunnellingTask') && tnp.metaClass.hasProperty(tnp, 'tmpIsFunnellingTask') ) {
+												if ( predAssetTask.getTmpIsFunnellingTask() != null && tnp.getTmpIsFunnellingTask() != null ) {
 													// assetsLatestTask[predAsset.id] = tnp
 													assignToAssetsLatestTask(predAsset, tnp, assetsLatestTask)
 												}
@@ -2685,7 +2695,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 												wasWired = true
 											} else {
 												// if (isGroupingSpec) {
-												if (tnp.metaClass.hasProperty(tnp, 'tmpIsFunnellingTask')) {
+												if (tnp.getTmpIsFunnellingTask() != null) {
 													// So no task previously existed for the asset so we're going to just wire the assets' last task to the gateway task 
 													// assetsLatestTask[predAsset.id] = tnp
 													assignToAssetsLatestTask(predAsset, tnp, assetsLatestTask)
@@ -2770,8 +2780,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 								// Check to see if there is a funnel predecessor for the asset and if so, create a dependency to it
 								if ( assetsLatestTask.containsKey(tnp.assetEntity.id) && 
-									 assetsLatestTask[tnp.assetEntity.id].metaClass.hasProperty(assetsLatestTask[tnp.assetEntity.id], 'tmpIsFunnellingTask')
-								) {
+									  assetsLatestTask[tnp.assetEntity.id].getTmpIsFunnellingTask() != null) {
 									if (isDebugEnabled) log.debug "Calling createTaskDependency from ASSET_DEP_MODE"
 									depCount += createTaskDependency(assetsLatestTask[tnp.assetEntity.id], tnp, taskList, assetsLatestTask, settings, out)
 									wasWired=true
@@ -2857,7 +2866,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 							case 'MULTI_ASSET_DEP_MODE':
 								// In this case each task already has multiple assets injected into it so we'll just create the 
 								// necessary dependencies for the associatedAssets define in the task.	
-								if (! tnp.metaClass.hasProperty(tnp, 'associatedAssets') ) {
+								if (! tnp.getTmpAssociatedAssets() ) {
 									msg = "Task was missing expected assets for dependencies of task $tnp"
 									log.info(msg)
 									bailOnTheGeneration(msg)
@@ -3483,8 +3492,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		*/
 
 		// Mark the predecessor task that it has a successor so it doesn't mess up the milestones
-		if ( ! predecessor.metaClass.hasProperty(predecessor, 'hasSuccessorTaskFlag') )
-			predecessor.metaClass.setProperty('hasSuccessorTaskFlag', true)
+		if ( ! predecessor.getTmpHasSuccessorTaskFlag() )
+			predecessor.setTmpHasSuccessorTaskFlag(true)
 
 		// Mark the Successor task to the PENDING status since it has to wait for the predecessor task to complete before it can begin
 		successor.status = AssetCommentStatus.PENDING
@@ -3496,7 +3505,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			log.info "createTaskDependency: pred asset latest task? ${assetsLatestTask.containsKey(predecessor.assetEntity.id)} - ${ (assetsLatestTask[predecessor.assetEntity.id] ?: '') }"
 
 		// Handle updating predecessor tasks' asset with successor task if it is a funnel type (e.g. gateway, milestone, set, truck, cart, etc)
-		if (predecessor.assetEntity && successor.metaClass.hasProperty(successor, 'tmpIsFunnellingTask') ) {
+		if (predecessor.assetEntity && successor.getTmpIsFunnellingTask() != null ) {
 			assignToAssetsLatestTask(predecessor.assetEntity, successor, assetsLatestTask)
 			// assetsLatestTask[predecessor.assetEntity.id] = successor
 			log.info "createTaskDependency: Updated assetsLatestTask for asset ${successor.assetEntity} with funnel task $successor"			
@@ -3515,7 +3524,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// Here is the recursive loop if the predecessor has a peer
-		if (predecessor.metaClass?.hasProperty(predecessor, 'chainPeerTask')) {
+		if (predecessor.getTmpChainPeerTask()) {
 			log.info "createTaskDependency: Invoking recursively due to predecessor having chainPeerTask (${predecessor.chainPeerTask})"
 			count += createTaskDependency( predecessor.chainPeerTask, successor, taskList, assetsLatestTask, settings, out, count)
 		}
@@ -3547,8 +3556,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				if (assetsLatestTask[asset.id].id != task.id && isNewer) {
 					log.debug "assignToAssetsLatestTask: Updated previous task (${assetsLatestTask[asset.id]}) with hasSuccessorTaskFlag"
 					// Mark the previous task as having a successor
-					if ( ! assetsLatestTask[asset.id].metaClass.hasProperty(assetsLatestTask[asset.id], 'hasSuccessorTaskFlag') )
-						assetsLatestTask[asset.id].metaClass.setProperty('hasSuccessorTaskFlag', true)
+					if ( ! assetsLatestTask[asset.id].getTmpHasSuccessorTaskFlag() )
+						assetsLatestTask[asset.id].setTmpHasSuccessorTaskFlag(true)
 				}
 			}
 
@@ -3574,7 +3583,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 */
 	// com.tds.asset.AssetComment, com.tds.asset.Application, java.lang.String, java.util.ArrayList, java.util.LinkedHashMap
 	private void setDeferment(AssetComment task, Object asset, String predSucc, String key, Map settings) {
-		def field = predSucc == 'p' ? 'tmpDefPred' : 'tmpDefSucc'
+	
+		boolean isPredSucc = predSucc == 'p' 
 
 		assert (asset instanceof AssetEntity)
 
@@ -3582,23 +3592,34 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("Use of ${predSucc=='p' ? 'predecessor' : 'successor'}.defer only allowed for asset based tasks (Task Spec ${settings.taskSpec.id})")	
 		}
 
-		if ( ! task.metaClass.hasProperty(task, field) ) {
-			// New deferment so just set it up
-			task.metaClass.setProperty(field, [:].withDefault {[]} )
-			task[field][key] << asset.id
-		} else {
+		def map = [:].withDefault {[]}
 
-			// See if this key exists on the task as a deferment
-			def hasKey = task[field].containsKey(key)
-			if (! hasKey || (hasKey && ! task[field][key].contains(asset.id) ) ) {
-				task[field][key] << asset.id
+		if(isPredSucc){
+			if(task.getTmpDefPred() != null){
+				map = task.getTmpDefPred()
+			}else{
+				task.setTmpDefPred(map)
+			}
+		}else{
+			if(task.getTmpDefSucc() != null){
+				map = task.getTmpDefSucc()
+			}else{
+				task.setTmpDefSucc(map)
 			}
 		}
 
-		log.debug "setDeferment: key:$key, mode:$predSucc, ${task[field]}, task:$task, asset:$asset"
+		def hasKey = map.containsKey(key)
+
+		if (! hasKey || (hasKey && ! map[key].contains(asset.id))){
+				map[key] << asset.id
+		}
+
+
+		log.debug "setDeferment: key:$key, mode:$predSucc, ${map}, task:$task, asset:$asset"
 		// Mark the task as already having a successor so as to prevent it from getting wired to a gateway or milestone
-		if (! task.metaClass.hasProperty(task, 'hasSuccessorTaskFlag') )
-			task.metaClass.setProperty('hasSuccessorTaskFlag', true)
+		if (! task.getTmpHasSuccessorTaskFlag()){
+			task.setTmpHasSuccessorTaskFlag(true)
+		}
 
 	}
 
@@ -3612,8 +3633,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		def list = []
 		if (['p','e'].contains( predSuccEither ) ) {
 			taskList.each { id, task -> 
-				if (task.metaClass.hasProperty('tmpDefPred') ) {
-					task.tmpDefPred.each { key, assets -> 
+				if (task.getTmpDefPred()) {
+					task.getTmpDefPred().each { key, assets -> 
 						assets.each { asset ->
 							list << [task:task, type:'predecessor', key:key, assetId:asset]
 						}
@@ -3623,8 +3644,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 		if (['s','e'].contains( predSuccEither ) ) {
 			taskList.each { id, task -> 
-				if (task.metaClass.hasProperty('tmpDefSucc') ) {
-					task.tmpDefPred.each { key, assets -> 
+				if (task.getTmpDefSucc() ) {
+					task.getTmpDefSucc().each { key, assets -> 
 						assets.each { asset ->
 							list << [task:task, type:'successor', key:key, assetId:asset]
 						}
@@ -3647,7 +3668,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @return void
 	 */
 	private int gatherDeferment(Map taskList, Map assetsLatestTask, AssetComment task, String predSucc, List keys, Map settings, StringBuffer out) {
-		def field = predSucc == 'p' ? 'tmpDefPred' : 'tmpDefSucc'
+		boolean isPred = predSucc == 'p'
+		
+
 		int depCount = 0
 		def assetId = task.assetEntity?.id
 
@@ -3655,9 +3678,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		// First attempt to find all tasks that have the specified deferment by looking for the deferment key and then find those with the source asset
 		taskList.each { id, t -> 
-			if (t.metaClass.hasProperty(t, field) ) {
+
+			def map = null
+			if(isPred){
+				map = t.getTmpDefPred()
+			}else{
+				map = t.getTmpDefSucc()
+			}
+
+			if(map != null){
 				keys.each { key ->
-					if ( t[field].containsKey(key) && t[field][key].contains(assetId) ) {
+
+					if ( map.containsKey(key) && map[key].contains(assetId) ) {
 						// Setup the proper dependencies as necessary
 						if (predSucc == 'p') {
 							log.debug "gatherDeferment: Gathered Predecessor - pred($t), succ($task)"
@@ -3668,10 +3700,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						}
 
 						// Now remove the asset deferral from the task and if the key is empty, then remove that too
-						t[field][key].remove( assetId )
-						if (t[field][key].size()==0) {
-							t[field].remove(key)
-							log.debug "gatherDeferment: emptied deferment for ${field}[$key]"
+						map[key].remove( assetId )
+						if (map[key].size()==0) {
+							map.remove(key)
+							//log.debug "gatherDeferment: emptied deferment for ${field}[$key]"
 						}
 					}
 				}
@@ -4396,7 +4428,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					// log.info "Added ${assocAssets.size()} assets as predecessors to task $task"
 					// assocAssets.each() { log.info "Asset $it" }
 				}
-				task.metaClass.setProperty('associatedAssets', assocAssets)
+				task.setTmpAssociatedAssets(assocAssets)
 
 				// Perform the AssignedTo logic
 				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff)
@@ -5171,4 +5203,3 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			];
 	}
 }
-

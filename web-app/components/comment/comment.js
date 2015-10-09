@@ -446,6 +446,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 					}
 				);
 			} else {
+				initAsset();
 				if (defaultCommentType == 'comment') {
 					$scope.$broadcast("noPendingRequests");
 				}
@@ -501,7 +502,6 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.commentInfo = []
 
-
 	$scope.commentInfo.currentAsset = parseInt((assetTO)? assetTO.assetId : $scope.$root.selectedAsset)
 
 	$scope.commentInfo.assetClasses = []
@@ -521,16 +521,15 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		$scope.commentInfo.assetClasses = data
 	});
 
-	commentService.getClassForAsset($scope.commentInfo.currentAsset).then(function(data){
-		$scope.commentInfo.currentAssetClass = data
-		commentService.getAssetsByClass(data).then(function(data2){
-			$scope.commentInfo.assets = data2
-		})
-	});
+	function initAsset() {
+		commentService.getClassForAsset($scope.commentInfo.currentAsset).then(function(data){
+			$scope.commentInfo.currentAssetClass = data
+			commentService.getAssetsByClass(data).then(function(data2){
+				$scope.commentInfo.assets = data2
+			})
+		});
+	}
 
-
-
-	/* ********************************************************************* */
 	function editComment(data) {
 		if (B2 != '') {
 			B2.Pause()
@@ -569,6 +568,17 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 				} else {
 					$scope.acData.notes = [];
 				}
+
+				if (ac.assetEntity != null) {
+					$scope.commentInfo.currentAsset = parseInt(ac.assetEntity);
+				}
+
+				initAsset();
+
+				if ($("#selectTimedId").length > 0) {
+					timedUpdate('never')
+				}
+
 			}
 		}
 		//if(!isIE7OrLesser)
@@ -587,6 +597,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 		}else{
 
 			$scope.ac.id = $scope.ac.commentId;
+			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
 
 			if (commentService.validDependencies($scope.dependencies)) {
 				if ($scope.isEdit) {
@@ -694,7 +705,6 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		
 		return deferred.promise;
 	};
-
 
 	var getWorkflowTransitions = function(assetId, category, id) {
 		var deferred = q.defer();
@@ -1068,7 +1078,6 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		getAssetClasses: getAssetClasses,
 		getClassForAsset: getClassForAsset,
 		getAssetsByClass: getAssetsByClass,
-		setShowAllPreference: setShowAllPreference,
 		setViewUnpublishedPreference: setViewUnpublishedPreference
 	};
 

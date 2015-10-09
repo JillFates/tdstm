@@ -4,5 +4,5 @@
 	<comment-inner-list asset-id="${asset.id}" pref-value="${prefValue}" view-unpublished-value="${viewUnpublishedValue}" has-publish-permission="${hasPublishPermission}"></comment-inner-list>
 </td>
 <script>
-	recompileDOM('commentsInnerList', angular.element($('div.body')[0]).scope());
+	recompileDOM('commentsInnerList');
 </script>

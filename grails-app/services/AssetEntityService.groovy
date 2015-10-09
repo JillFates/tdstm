@@ -151,7 +151,6 @@ class AssetEntityService {
 
 	def jdbcTemplate
 
-
 	/** 
 	 * This map contains a key for each asset class and a list of their
 	 * related asset types.
@@ -166,7 +165,6 @@ class AssetEntityService {
 				'STORAGE-LOGICAL': 	[ assetClass: AssetClass.STORAGE, domain: Files ],
 				'OTHER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ],
 			]
-
 
 	/**
 	 * This method returns a list of the different asset classes.

@@ -88,7 +88,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
+					gridComplete="function(){bindResize('databaseId');recompileDOM('databaseIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					postData="{filter: filter, event:event, plannedStatus:plannedStatus, validation:validation, moveBundleId:moveBundleId,
 						assetName:dbName, planStatus:planStatus, moveBundle:moveBundle, dbFormat:dbFormat, toValidate:toValidate, unassigned:unassigned}"

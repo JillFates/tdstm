@@ -5,8 +5,8 @@ import groovy.transform.EqualsAndHashCode
  */
 @EqualsAndHashCode(includes=['party', 'roleType'])
 class PartyRole implements Serializable {
-	Party party
-	RoleType roleType
+
+	static belongsTo = [ party:Party, roleType:RoleType ]
 
 	static mapping  = {	
 		version false

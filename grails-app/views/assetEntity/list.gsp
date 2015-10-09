@@ -113,7 +113,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('assetListId');recompileDOM('assetListIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
+					gridComplete="function(){bindResize('assetListId');recompileDOM('assetListIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					postData="{filter: filter, event:event, type:type, plannedStatus:plannedStatus, assetName:assetName, planStatus:planStatus, moveBundle:moveBundle,

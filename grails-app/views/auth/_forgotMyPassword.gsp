@@ -49,7 +49,7 @@
 					</g:if>
 					<g:else>
 						<h1 style="padding: 8px 0px; margin: 0em !important;">Password Assistant</h1>
-						<g:form action="sendResetPassword" name="forgotPasswordForm" onsubmit="return checkInputData();">
+						<g:form action="sendResetPassword" name="forgotPasswordForm">
 							<g:if test="${flash.message}">
 								<div class="message">${flash.message}</div>
 							</g:if>
@@ -66,7 +66,7 @@
 								<br/>
 								<p style="text-align:center;" class="buttonR">
 									<g:link action="login" class="light" style="margin-right: 16px;">Back to Login</g:link>
-									<input type="submit" value="Send" />
+									<input type="submit" id="resetPasswordSubmitButton" value="Send" />
 								</p>
 
 						</g:form>
@@ -79,32 +79,21 @@
 </div>
 <div class="logo"></div>
 <script type="text/javascript">
-
-	function getEmailField() {
-		return $("#email");
-	}
-
-	function setFocus() {
-		getEmailField().focus();
-	}
-
-	// Form validation
-	function checkInputData() {
-		//debugger;
-        var email = getEmailField.val();
-        if (!tdsCommon.isValidEmail(email)) {
-        	alert("Please enter a valid email address");
-        	setFocus();
-        	return false;
-        }
-        return true;
-	}
-
-	// Post page load 
 	$( document ).ready(function() {
-		setFocus();
+		$("#forgotPasswordForm").on("submit", function(event) {
+			event.preventDefault();
+			var emailField = $("#email");
+			if (!tdsCommon.isValidEmail(emailField.val())) {
+				alert("Please enter a valid email address");
+				emailField.focus();
+				return false;
+			} else {
+				$(this).off("submit");
+				$("#resetPasswordSubmitButton").prop('disabled', true)
+				this.submit();
+			}
+		});
 	});
-
 </script>
 </body>
 </html>

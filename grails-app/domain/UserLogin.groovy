@@ -1,5 +1,6 @@
-import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.SecurityUtil
 import net.transitionmanager.PasswordHistory
 
@@ -33,7 +34,7 @@ class UserLogin {
 	static hasMany = [
 		dataTransferBatch : DataTransferBatch
 	]
-	
+
 	static constraints = {
 		person( nullable: false )
 		username( blank: false, unique:true, size:2..50 )
@@ -77,11 +78,13 @@ class UserLogin {
 		'canResetPasswordByAdmin',
 		'canResetPasswordByUser',
 		'comparePassword',
+		'currentProject',
 		'disabled', 
 		'lockedOut', 
 		'hasEmail',
 		'passwordWasChanged', 
 		'personDetails', 
+		'securityRoleCodes',
 		'userActive'
 	]
 	
@@ -198,6 +201,31 @@ class UserLogin {
 			matched = newPswd.equals(this.password)
 		}
 		return matched
+	}
+
+	/**
+	 * Used to return the various Security Role Codes that the user has been assigned
+	 * @return the list of the security role codes
+	 */
+	List<String> getSecurityRoleCodes() {
+		return PartyRole.executeQuery(
+			'select pr.roleType.id from PartyRole pr where pr.party=:party and pr.roleType.type=:type order by pr.roleType.level desc',
+			[party:this.person, type:RoleType.SECURITY] )
+	}
+
+	/**
+	 * Used to determine the user's currently selected project
+	 * @return The project that the user's context is current set to
+	 */
+	Project getCurrentProject() {
+		String prefCodeValue = UserPreference.executeQuery("select value from UserPreference where userLogin=? and preferenceCode='CURR_PROJ'", [this])[0]
+		Long projectId = NumberUtil.toPositiveLong(prefCodeValue, 0)
+
+		Project project
+		if (projectId) {
+			project = Project.get(projectId)
+		}
+		return project
 	}
 
 	// -------------------------------

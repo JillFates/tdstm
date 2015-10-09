@@ -14,7 +14,8 @@ class TaskDependency {
 	Integer downstreamTaskCount	= 0	// The number of tasks that are downstream from the predecessor task
 	Integer pathDepth = 0			// The depth from the furthest sink task in the map
 	Integer pathDuration = 0		// The total duration forward to the furthest sink task on the path in the map
-
+	Integer tmpSuccessorDepCount 	// Tansient for TaskService.getNeighborhood
+	Integer tmpPredecessorDepCount 	// Tansient for TaskService.getNeighborhood
 	TaskDependencyType type = TaskDependencyType.getDefault()
 		
 	static constraints = {
@@ -33,8 +34,24 @@ class TaskDependency {
 		pathDuration sqltype: 'INT(6)'
 	}
 
-	static transients = ['successor']
-	
+	static transients = ['successor', 'tmpSuccessorDepCount', 'tmpPredecessorDepCount']
+
+	Integer getTmpSuccessorDepCount(){
+		return tmpSuccessorDepCount
+	}
+
+	void setTmpSuccessorDepCount(value){
+		tmpPredecessorDepCount = value
+	}
+
+	Integer getTmpPredecessorDepCount(){
+		return tmpPredecessorDepCount
+	}
+
+	void setTmpPredecessorDepCount(value){
+		tmpPredecessorDepCount = value
+	}
+
 	// Add successor accessors that are easier to understand than the assetComment property
 	void setSuccessor(AssetComment task) { this.assetComment = task }
 	AssetComment getSuccessor() { this.assetComment }

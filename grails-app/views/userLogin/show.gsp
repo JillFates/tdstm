@@ -159,6 +159,9 @@
 						<tds:hasPermission permission='UserLoginDelete'>
 							<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
 						</tds:hasPermission>
+						<tds:hasPermission permission='EditUserLogin'>
+							<span class="button"><input type="button" value="Send Password Reset" id="resetPassword"  <g:if test="${!canResetPasswordByAdmin}"> class="save disableButton" disabled</g:if> <g:else>class="save"</g:else> /></span>
+						</tds:hasPermission>
 					</g:form>
 				</div>
 			</tds:hasPermission>
@@ -166,6 +169,31 @@
 		<script>
 			currentMenuId = "#adminMenu";
 			$("#adminMenuId a").css('background-color','#003366')
+			$(document).ready(function(){
+				$("#resetPassword").click(function(){
+					$(this).prop('disabled', true)
+					$(this).toggleClass("disableButton")
+					var id = $("[name=id]").val()
+					$.ajax({
+						url: "../sendPasswordReset?id="+id,
+						type:'post',
+						success: function(data){
+							if(data && data.success){
+								alert("A password reset email notification has been sent to the user.")
+							}else{
+								alert("There was an error trying to reset the user's password. Please, contact your System Administrator.")
+							}
+							$("#resetPassword").removeProp('disabled')
+							$("#resetPassword").toggleClass("disableButton")
+						},
+						error: function(){
+							alert("There was an error trying to reset the user's password. Please, contact your System Administrator.")
+						}
+					})
+
+				});
+
+			});
 		</script>
 	</body>
 </html>

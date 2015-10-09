@@ -85,6 +85,16 @@ class AssetComment {
 	def static final planningCategories = AssetCommentCategory.getPlanningCategories()
 	def static final AUTOMATIC_ROLE = 'AUTO'
 
+
+	/* Transient properties for Task Generation. */
+	Boolean tmpIsFunnellingTask
+	Map tmpDefSucc
+	Map tmpDefPred
+	Boolean tmpHasSuccessorTaskFlag
+	def tmpChainPeerTask
+	List tmpAssociatedAssets
+	/* End transient properties for Task Generation.*/
+
 	static constraints = {	
 		// comment(size:255)	// TODO: add constraint for comment size
 		assetEntity(nullable:true )
@@ -203,7 +213,60 @@ class AssetComment {
 	}
 
 	// List of properties that should NOT be persisted
-	static transients = ['actFinish', 'assignedToString', 'assetName', 'statusDuration']
+	static transients = ['actFinish', 'assignedToString', 'assetName', 'statusDuration', 'tmpIsFunnellingTask', 'tmpDefSucc',
+						'tmpDefPred', 'tmpHasSuccessorTaskFlag', 'tmpChainPeerTask', 'tmpAssociatedAssets']
+
+
+	public void setTmpIsFunnellingTask(boolean value){
+		tmpIsFunnellingTask = value
+	}
+
+	public Boolean getTmpIsFunnellingTask(){
+		return tmpIsFunnellingTask
+	}
+
+	public void setTmpHasSuccessorTaskFlag(boolean value){
+		tmpHasSuccessorTaskFlag = value
+	}
+
+	public Boolean getTmpHasSuccessorTaskFlag(){
+		return tmpHasSuccessorTaskFlag
+	}
+
+
+	public void setTmpDefPred(Map value){
+		tmpDefPred = value
+	}
+
+	public Map getTmpDefPred(){
+		return tmpDefSucc
+	}
+
+	public void setTmpDefSucc(Map value){
+		tmpDefSucc = value
+	}
+
+	public Map getTmpDefSucc(){
+		return tmpDefSucc
+	}
+
+	public void setTmpChainPeerTask(value){
+		tmpChainPeerTask = value
+	}
+
+	def getTmpChainPeerTask(){
+		return tmpChainPeerTask
+	}
+
+	public void setTmpAssociatedAssets(List value){
+		tmpAssociatedAssets = value
+	}
+
+	public List getTmpAssociatedAssets(){
+		return tmpAssociatedAssets
+	}
+
+
 	
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique 
 	

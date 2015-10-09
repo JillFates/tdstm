@@ -31,6 +31,7 @@ class UserService implements InitializingBean {
 	def taskService
 	def projectService
 	def securityService
+	def jdbcTemplate
 
 	// The following vars are initialized in afterPropertiesSet after IoC
 	def ctx
@@ -171,29 +172,20 @@ class UserService implements InitializingBean {
 		} else {
 
 			// Update the person information if the configuration is set for it
-
 			if (domain.updateUserInfo) {
-				if (person.firstName != nameMap.first)
-					person.firstName = nameMap.first
-				if (person.middleName != nameMap.middle)
-					person.middleName = nameMap.middle
-				if (person.lastName != nameMap.last)
-					person.lastName = nameMap.last
-				if (person.email != userInfo.email)
-					person.email = userInfo.email
-				if (person.active != 'Y')
-					person.active = 'Y'
-				if (person.workPhone != userInfo.telephone)
-					person.workPhone = userInfo.telephone
-				if (person.mobilePhone != userInfo.mobile)
-					person.mobilePhone = userInfo.mobile
+				GormUtil.overridePropertyValueIfSet(person, 'firstName', nameMap.first)
+				GormUtil.overridePropertyValueIfSet(person, 'middleName', nameMap.middle)
+				GormUtil.overridePropertyValueIfSet(person, 'lastName', nameMap.last)
+				GormUtil.overridePropertyValueIfSet(person, 'email', userInfo.email)
+				GormUtil.overridePropertyValueIfSet(person, 'workPhone', userInfo.telephone)
+				GormUtil.overridePropertyValueIfSet(person, 'mobilePhone', userInfo.mobile)
 
 				if (person.isDirty()) {
 					if (debug)
 						log.debug "$mn Updating existing person record : ${person.dirtyPropertyNames}"
 					if (! person.save(flush:true)) {
-						log.error "$mn Failed updating Person due to ${GormUtil.allErrorsString(person)}"
-						throw new RuntimeException("Unexpected error while updating Person object")
+						log.error "$mn Failed updating Person ($person) due to ${GormUtil.allErrorsString(person)}"
+						throw new DomainUpdateException("Unexpected error while updating Person object")
 					}
 				}
 			}
@@ -586,26 +578,46 @@ class UserService implements InitializingBean {
 	}
 	
 	/**
-	 * 
+	 * Used in the dashboard to show which person are active 
+	 *
 	 * @param project
 	 * @return
 	 */
 	def getActivePeople( project ){ 
+
 		//to get active people of that particular user selected project.
-		def loginPersons = UserLogin.findAll()
-		def dateNow = TimeUtil.nowGMT()
-		def timeNow = dateNow.getTime()
-		def recentLogin = [:]
+		def recentLogin = []
 		def projects = getSelectedProject( project )
-		(loginPersons-securityService.getUserLogin()).each{
-			if(it?.lastPage && it?.lastPage.getTime()>timeNow-1800000){
-				def loginProjId = UserPreference.executeQuery("SELECT value FROM UserPreference where userLogin.id=? and preferenceCode=?",[it.id,'CURR_PROJ'])[0]
-				if(NumberUtils.toLong(loginProjId) in projects?.id){
-					recentLogin << [(it.id) : ['name':it.person, 'project':Project.get(loginProjId)]]
-				}
+		def currUserLogin = securityService.getUserLogin()
+		def projectIds = [0]
+
+		projects.each { p ->
+			projectIds << p.id
+		}
+		def projectIdsAsValue = projectIds.join(",")
+
+		def query = new StringBuffer("SELECT p.person_id, ul.user_login_id, p.first_name, p.last_name, p.middle_name, proj.project_id, pg.name AS project_name")
+			.append(" FROM (")
+			.append("     SELECT user_login_id, CAST(value AS UNSIGNED INTEGER) AS project_id")
+			.append("     FROM user_preference")
+			.append("     WHERE preference_code = 'CURR_PROJ' AND value IS NOT NULL)")
+			.append(" AS ul_project")
+			.append(" INNER JOIN user_login ul ON ul.user_login_id = ul_project.user_login_id")
+			.append(" INNER JOIN person p ON p.person_id = ul.person_id")
+			.append(" INNER JOIN project proj ON proj.project_id = ul_project.project_id")
+			.append(" INNER JOIN party_group pg ON proj.project_id = pg.party_group_id")
+			.append(" WHERE ul.last_page > (now() - INTERVAL 30 MINUTE) AND ul_project.project_id IN ($projectIdsAsValue)")
+
+		def users = jdbcTemplate.queryForList(query.toString())
+		def personName
+
+		if (users.size() > 0) {
+			users.each{ r ->
+				personName = ( r.last_name ? "${r.last_name}, ": '' ) + r.first_name + ( r.middle_name ? " $r.middle_name" : '' )
+				recentLogin << ['personId': r.person_id, 'projectName': r.project_name, 'personName': personName]
 			}
 		}
-		
+
 		return recentLogin
 	}
 	

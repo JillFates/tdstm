@@ -17,8 +17,8 @@
 			<g:form action="sendAccountActivationEmails">
 
 				<span>Email Sent From:</span><br/>
-	          	<input type="radio" name="sendFrom" value="DEFAULT" checked>Default Email - Configuration File<br/>
-				<input type="radio" name="sendFrom" value="ADMIN">Admin User's email<br/><br/>
+	          	<input type="radio" name="sendFrom" value="DEFAULT" checked>&nbsp;<span>System Email (${defaultEmail})</span><br/>
+				<input type="radio" name="sendFrom" value="ADMIN">&nbsp;<span>Your Email (${adminEmail})</span><br/><br/>
 				<span>Custom Message:</span><br>
 				<textarea name="customMessage" rows="5" cols="80">Welcome to TransitionManager.</textarea><br/><br/>
 				<table>
@@ -31,6 +31,7 @@
 							<th>Company</th>
 							<th>Default Project</th>
 							<th>Roles</th>
+							<th>Expiry</th>
 							<th>Last Act Notice</th>
 							<th>Created</th>
 						</tr>
@@ -39,7 +40,7 @@
 						<g:each in="${accounts}" var='account'>
 							
 							<td style="text-align: center;"> 
-							  <input type="checkbox" name="person_${account.personId}"> 
+							  <input type="checkbox" name="person" value="${account.personId}"> 
 							</td>
 
 							<td style="text-align: left;">
@@ -59,19 +60,23 @@
 							</td>
 							
 							<td style="text-align: left;">
-								${defaultProject}
+								${account.currentProject ? account.currentProject.projectCode : '' }
 							</td>
 							
 							<td style="text-align: left;">
-								${account.roles}
-							</td>
-							
-							<td style="text-align: left;">
-								${account.lastActivationNotice}
+								${account.roles ? account.roles.join(', ') : ''}
 							</td>
 
 							<td style="text-align: left;">
-								${account.dateCreated}
+								${account.expiry}
+							</td>
+							
+							<td style="text-align: left;">
+								<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+							</td>
+
+							<td style="text-align: left;">
+								<tds:convertDateTime date="${account?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
 							</td>
 
 						</g:each>
@@ -89,7 +94,7 @@
 
 					$("form").submit(function(e){
 						var preventDefault = true
-						var selectedAccounts = $("input:checkbox[name^=person]").length
+						var selectedAccounts = $("input:checkbox[name^=person]:checked").length
 						if(selectedAccounts > 0){
 							preventDefault = !(confirm("You are about to send an email notification to " + selectedAccounts + " accounts. Do you want to proceed?"))
 						}else{

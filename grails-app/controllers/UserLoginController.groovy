@@ -5,6 +5,7 @@ import com.tdssrc.grails.HtmlUtil
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
@@ -20,6 +21,7 @@ class UserLoginController {
 	def projectService
 	def jdbcTemplate
 	def controllerService
+	def auditService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -82,7 +84,7 @@ class UserLoginController {
 		}
 
 		// Search valid roles to display
-		def systemRoles = securityService.getSystemRoleTypes()
+		def systemRoles = securityService.getSecurityRoleTypes()
 		def systemRolesList = []
 		systemRoles.each { sr ->
 			systemRolesList << "'${sr.id}'"
@@ -374,6 +376,7 @@ class UserLoginController {
 				flash.message = "UserLogin ${userLoginInstance} created"
 				redirect( action:"show", id:userLoginInstance.id, params:[ companyId:companyId ] )
 				success = !securityViolations
+				auditService.saveUserAudit(UserAuditBuilder.newUserLogin(byWhom, userLoginInstance.username))
 			}
 		}
 		if (!success) {
@@ -396,7 +399,7 @@ class UserLoginController {
 			render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance, companyId:companyId, roleList:roleList, minPasswordLength:minPasswordLength ])
 		}
 	}
-	
+
 	/**
 	 * The 1st phase of user changing password during the forced password change process
 	 */
@@ -428,7 +431,8 @@ class UserLoginController {
 					// See if the user account is properly configured to a state that they're allowed to change their password
 					securityService.validateAllowedToChangePassword(userLoginInstance)
 				} catch (e) {
-					msg = "You are not allowed to change your password at this time. $e.getMessage()}."
+					def emsg = e.getMessage()
+					msg = "You are not allowed to change your password at this time."
 					break
 				}
 
@@ -442,6 +446,8 @@ class UserLoginController {
 					log.warn "updatePassword() failed to update user password for $userLoginInstance : " + GormUtil.allErrorsString(userLoginInstance)
 					msg = 'An error occured while trying to save your password'
 					break
+				} else {
+					auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged(userLoginInstance))
 				}
 
 				flash.message = "Password was successfully updated"

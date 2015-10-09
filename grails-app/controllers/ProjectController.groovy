@@ -15,7 +15,8 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 import com.tds.asset.FieldImportance
 import com.tdsops.tm.enums.domain.EntityType
-import com.tdsops.tm.enums.domain.ValidationType;
+import com.tdsops.tm.enums.domain.ValidationType
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
@@ -28,6 +29,8 @@ import org.quartz.SimpleTrigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 
+import org.apache.commons.lang.StringEscapeUtils
+
 class ProjectController {
 	def userPreferenceService
 	def partyRelationshipService
@@ -37,6 +40,7 @@ class ProjectController {
 	def controllerService
 	def quartzScheduler
 	def grailsApplication
+	def auditService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -262,6 +266,10 @@ class ProjectController {
 				}
 
 				projectService.updateProjectPartners(projectInstance, partnersIds)
+
+
+				// Audit project changes
+				auditService.saveUserAudit(UserAuditBuilder.projectConfig(securityService.getUserLogin(), projectInstance))
 
 				flash.message = "Project ${projectInstance} updated"
 				redirect(action:"show")
@@ -618,7 +626,6 @@ class ProjectController {
 		def success = true
 		def errorMessage = ""
 		if(RolePermissions.hasPermission("ShowProjectDailyMetrics")){
-
 			def params = [:]
 			def key = "ProjectDailyMetrics-" + UUID.randomUUID().toString()
 			def jobName = "TM-" + key
@@ -637,36 +644,71 @@ class ProjectController {
 		render( view: "projectDailyMetrics", model: [success: success, errorMessage: errorMessage])
 	}
 
+	/**
+ 	 * Renders the form so Admin's can initiate the bulk Account Activation
+ 	 * Notification process.
+	 */
 	def userActivationEmailsForm = {
-		if (!controllerService.checkPermission(this, 'SendUserActivations')){
+		Project project 
+		UserLogin userLogin 
+		(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'SendUserActivations')
+		if (!project){
 			return
 		}
 
-		def project = securityService.getUserCurrentProject()
-		def accounts = projectService.getAccountActivationUsers()
+		def accounts = projectService.getAccountActivationUsers( project )
+
 		def defaultProject = Project.getDefaultProject()
-		render(view:"userActivationEmailsForm", model:[project: project.name, client:project.client.name, accounts:accounts, defaultProject: defaultProject.name])
+		def defaultEmail = grailsApplication.config.grails.mail.default.from
+		defaultEmail = StringEscapeUtils.escapeHtml(defaultEmail)
+
+		Map model = [ 
+			project: project.name, 
+			client:project.client.name, 
+			accounts:accounts,
+			defaultEmail: defaultEmail, 
+			adminEmail: userLogin.person.email
+		]		
+		render view:"userActivationEmailsForm", model:model 
 	}
 
 
+	/**
+	 * Sends out an Activation Email to those accounts selected by the admin.
+	 */
 	def sendAccountActivationEmails = {
-		if (!controllerService.checkPermission(this, 'SendUserActivations')){
-			flash.message = "You are not allowed to perform this operation."
+		Project project 
+		UserLogin userLogin 
+		(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'SendUserActivations')
+		if (!project){
 			return
 		}
-		def accounts = projectService.getAccountActivationUsers()
-		List accountsToNotify = accounts.findAll{params["person_${it.personId}"] && params["person_${it.personId}"] == "on"}
-		// TODO: determine email
-		def fromEmail = null
 		String message = null
-		if(accountsToNotify){
-			if(params["sendFrom"] == "DEFAULT"){
-				fromEmail = grailsApplication.config.grails.mail.default.from
-			}else{
-				fromEmail = securityService.getUserLogin().person.email
-			}			
-			projectService.sendBulkActivationNotificationEmail(accountsToNotify, params["customMessage"], fromEmail, request.getRemoteAddr())	
-			message = "The Account Activation Notification has been sent out to the users."
+		def selectedAccounts = params.person
+		// Validate the user selected at least an account.
+		if(selectedAccounts){
+			try{
+				def accounts = projectService.getAccountActivationUsers(project)		
+				// Find the accounts that could get the notice and filter only those that were checked in the form
+				List accountsToNotify = accounts.findAll{ it.personId in selectedAccounts}
+				
+				if (accountsToNotify) {
+					String fromEmail = null
+					if (params["sendFrom"] == "DEFAULT") {
+						fromEmail = grailsApplication.config.grails.mail.default.from
+					} else {
+						fromEmail = userLogin.person.email
+					}			
+					projectService.sendBulkActivationNotificationEmail(accountsToNotify, params["customMessage"], fromEmail, request.getRemoteAddr())	
+					message = "The Account Activation Notification has been sent out to the users."
+				}else{
+					message = "No Accounts selected for notification."
+				}
+			}catch(Exception e){
+				message = "There was an error while processing the email notifications. Please contact Support."
+				log.error "An error occurred : ${e}"
+			}
+			
 		}else{
 			message = "No Accounts selected for notification."
 		}

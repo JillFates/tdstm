@@ -76,6 +76,18 @@ class Person extends Party {
 		}
 	}
 	
+	static transients = [
+		'company',
+	]
+
+
+	/**
+	 * This method returns the company for this person.
+	 */
+	Party getCompany(){
+		return partyRelationshipService.getStaffCompany(this)
+	}
+
 	/**
 	 * Get's the person's roles for a specified company
 	 * @param Integer - company id

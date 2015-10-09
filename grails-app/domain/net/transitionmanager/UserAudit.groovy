@@ -36,4 +36,7 @@ class UserAudit {
 		createdDate = TimeUtil.nowGMT()
 	}
 
+	String toString() {
+		return "UserAudit user (${ (userLogin ? userLogin.username : 'Unknown')}) '$message'"
+	}
 } 

@@ -12,6 +12,7 @@
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
+	<g:javascript src="projectStaff.js" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="angular/angular.min.js" />
 	<g:javascript src="angular/plugins/angular-ui.js"/>
@@ -49,6 +50,7 @@
 			$("#manufacturerShowDialog").dialog({ autoOpen: false })
 			$("#modelShowDialog").dialog({ autoOpen: false })
 			$("#cablingDialogId").dialog({ autoOpen:false })
+			$("#createStaffDialog").dialog({ autoOpen: false })
 			currentMenuId = "#assetMenu";
 			$("#teamMenuId a").css('background-color','#003366')
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
@@ -95,7 +97,7 @@
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper', angular.element(\$('#outerBodyId')[0]).scope());}"
+				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
 				showPager="true">
@@ -259,8 +261,11 @@
 		
 		<g:render template="../layouts/error"/>
 	</div>
-	<g:render template="initAssetEntityData"/>
-<script type="text/javascript">
+	<div id="createStaffDialog" style="display:none;" class="static-dialog">
+		<g:render template="../person/createStaff" model="['forWhom':'application']"></g:render>
+	</div>
+ <g:render template="initAssetEntityData"/>
+ <script type="text/javascript">
 function toggleCheckbox (chkbox, field) {
 	$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
 	submitForm()

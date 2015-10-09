@@ -93,7 +93,7 @@
 					rowNum="sizePref"
 					multiselect="true"
 					loadComplete="initCheck"
-					gridComplete="function(){bindResize('applicationId');recompileDOM('applicationIdWrapper', angular.element(\$('#commentScopeId')[0]).scope());}"
+					gridComplete="function(){bindResize('applicationId');recompileDOM('applicationIdWrapper');}"
 					onSelectRow="validateMergeCount"
 					showPager="true"
 					loadComplete="function(){resizeGrid('applicationId')}"

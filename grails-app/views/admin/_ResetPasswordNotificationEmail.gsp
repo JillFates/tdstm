@@ -3,7 +3,7 @@
 <head></head>
 <body>
 
-Hello ${person},<br>
+Hi ${person},<br>
 
 <p>
 Welcome to TransitionManager. A new account has been created for you but will need to activated ASAP. Please click on the following link or copy it into your browser. You will be presented with a secure web page where you be prompted for your email address and you can set you new password.

@@ -161,4 +161,16 @@ public class GormUtil {
 		}
 	}
 
+	/**
+	 * Used to set the value of a Domain object property if the value is not null/blank and different than existing value
+	 * @param object - the object to set the property on
+	 * @param propName - the String name of the property
+	 * @param value - an object value
+	 */
+	static void overridePropertyValueIfSet(Object domainObj, String propName, Object value) {
+		if (value != null && value && domainObj[propName] != value ) {
+			domainObj[propName] = value
+		}
+	}
+
 }

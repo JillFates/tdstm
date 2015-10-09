@@ -17,6 +17,11 @@ class TimeUtil {
 	static final String FULL='F'
 	static final String ABBREVIATED='A'
 
+	public static final String GRANULARITY_SECONDS = "S"
+	public static final String GRANULARITY_MINUTES = "M"
+	public static final String GRANULARITY_HOURS = "H"
+	public static final String GRANULARITY_DAYS = "D"
+
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of DAYS from an existing date
 	 * @param Date	a date to be adjusted
@@ -319,4 +324,25 @@ class TimeUtil {
 	/*public static Date nowGMT() {
 		return convertInToGMT("now", "EDT" )
 	}*/
+
+	/**
+     * This method determines the elapsed time between two dates and
+     * returns the value using the given granularity (D|H|M|S).
+	 */
+	public static Integer elapsed(Date start, Date end, String granularity){
+		TimeDuration duration = TimeUtil.elapsed(start, end)
+		Integer elapsed = duration.getDays()
+		granularity = granularity.toUpperCase()
+		if(granularity > GRANULARITY_DAYS){
+			elapsed = elapsed * 24 + duration.getHours()
+			if(granularity > GRANULARITY_HOURS){
+				elapsed = elapsed * 60 + duration.getMinutes()
+				if(granularity > GRANULARITY_MINUTES){
+					elapsed = elapsed * 60 + duration.getSeconds()
+				}
+
+			}
+		}
+		return elapsed
+	}
 }

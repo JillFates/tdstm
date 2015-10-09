@@ -2048,6 +2048,7 @@ class AssetEntityController {
 	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
 	 */
 	def listTasks() {
+
 		def user = securityService.getUserLogin()
 		try {
 			if (!RolePermissions.hasPermission('ViewTaskManager')) {
@@ -2126,6 +2127,7 @@ class AssetEntityController {
 			def timeToRefresh = userPreferenceService.getPreference("TASKMGR_REFRESH")
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+			def companiesList = partyRelationshipService.getCompaniesList()
 			return [timeToUpdate : timeToRefresh ?: 60,servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 					files:entities.files,networks:entities.networks, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 					moveEvents:moveEvents, filterEvent:filterEvent , justRemaining:justRemaining, justMyTasks:justMyTasks, filter:params.filter,
@@ -2134,7 +2136,9 @@ class AssetEntityController {
 					category: filters?.category ?:'', moveEvent:moveEvent, moveBundleList : moveBundleList, viewUnpublished : viewUnpublished,
 					staffRoles:taskService.getTeamRolesForTasks(), taskPref:taskPref, attributesList: assetCommentFields.keySet().sort{it}, modelPref:modelPref,
 					//staffRoles:taskService.getRolesForStaff(), 
-					sizePref:userPreferenceService.getPreference("assetListSize")?: '25']
+					sizePref:userPreferenceService.getPreference("assetListSize")?: '25',
+					partyGroupList: companiesList,
+					company: project.client]
 		} catch (RuntimeException uex) {
 			log.error uex.getMessage()
 			response.sendError( 401, "Unauthorized Error")
@@ -3847,20 +3851,19 @@ class AssetEntityController {
 	/**
 	 * This service retrieves all the assets for a given asset class.
 	 */
-	def assetsByClass(){
+	def assetsByClass = {
 		def results = assetEntityService.getAssetsByClass(params)
 		render(ServiceResults.success(results) as JSON)
 	}
-	
 
-	def assetClasses(){
+	def assetClasses = {
 		def classes = assetEntityService.getAssetClasses()
 		def results = []
 		classes.each{ k,v -> results << [key:k, label:v]}
 		render(ServiceResults.success(results) as JSON)
 	}
 
-	def classForAsset(){
+	def classForAsset = {
 		def asset = AssetEntity.get(params.id)
 		def assetClass = AssetClass.getClassOptionForAsset(asset)
 		render(ServiceResults.success([assetClass : assetClass]) as JSON)

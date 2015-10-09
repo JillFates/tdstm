@@ -52,7 +52,7 @@ class ApplicationController {
 		// TODO - This should be replaced with the staffRoles which is in the defaultModel already
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 
-		def companiesList = PartyGroup.findAll("from PartyGroup as p where partyType = 'COMPANY' order by p.name ")
+		def companiesList = partyRelationshipService.getCompaniesList()
 
 		def fieldPrefs = assetEntityService.getExistingPref('App_Columns')
 		

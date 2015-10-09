@@ -1,5 +1,8 @@
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
+import org.apache.shiro.authc.LockedAccountException
+import org.apache.shiro.authc.DisabledAccountException
+import com.tdsops.common.security.shiro.MissingCredentialsException
 import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -7,6 +10,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.tm.enums.domain.PasswordResetStatus
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
@@ -44,7 +48,6 @@ class AuthController {
 	}
 
 	def signIn() {
-
 		// helper closure used a few times 
 		def loginMap = {
 			// Keep the username and "remember me" setting so that the
@@ -73,6 +76,7 @@ class AuthController {
 		}
 		
 		String failureMsg = ''
+		String userMsg
 		try {
 			if (! params.username || ! params.password) {
 				throw new AuthenticationException("Missing user credentials")
@@ -92,6 +96,7 @@ class AuthController {
 				
 				if (log.isDebugEnabled())
 					log.debug "signIn: About to call securityService.getUserLogin()"
+
 				def userLogin = securityService.getUserLogin()
 				if (! userLogin) {
 					log.error "signIn() : unable to locate UserLogin for ${params.username}"
@@ -108,6 +113,9 @@ class AuthController {
 				} else {
 					// If a controller redirected to this page, redirect back
 					// to it. Otherwise redirect to the root URI.
+
+					auditService.saveUserAudit( UserAuditBuilder.login(userLogin))
+
 					def targetUri = params.targetUri ?: "/"
 					
 					// log.info "Redirecting to '${targetUri}'."
@@ -127,7 +135,6 @@ class AuthController {
 					def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad")
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 					
-					Person.loggedInPerson = securityService.getUserLoginPerson();
 					if (browserTest) {
 						if (browserTestiPad) {
 							redirect(controller:'projectUtil')
@@ -146,8 +153,17 @@ class AuthController {
 					log.info "User '${params.username}' has signed in"
 					return
 				}
-			} catch (AuthenticationException e){
-				failureMsg = e.getMessage()				
+			} catch (LockedAccountException e) {
+				failureMsg = e.getMessage()
+				userMsg = e.getMessage()
+			} catch (DisabledAccountException e) {
+				failureMsg = e.getMessage()
+				userMsg = e.getMessage()
+			} catch (MissingCredentialsException e) {
+				failureMsg = e.getMessage()
+				userMsg = 'Username and password are required'
+			} catch (AuthenticationException e) {
+				failureMsg = e.getMessage()
 			}
 
 		} catch(org.apache.shiro.authc.UnknownAccountException e) {
@@ -156,7 +172,12 @@ class AuthController {
 			failureMsg = e.getMessage()
 			log.error "Unexpected Authentication Exception for user '${params.username}' \n${ExceptionUtil.stackTraceToString(e)}"
 		}
-		flash.message = message(code: 'login.failed')
+		if (userMsg) {
+			flash.message = userMsg
+		} else {
+			flash.message = message(code: 'login.failed')
+		}
+
 		auditService.logMessage("${params.username} login attempt failed - $failureMsg")
 	
 		def remoteIp = HtmlUtil.getRemoteIp()
@@ -194,6 +215,10 @@ class AuthController {
 	def signOut() {
 		// Log the user out of the application
 		UserLogin userLogin = securityService.getUserLogin()
+
+		if (userLogin) {
+			auditService.saveUserAudit(UserAuditBuilder.logout(userLogin))
+		}
 		log.info "User $userLogin just logged out of the application"
 		SecurityUtils.subject?.logout()
 
@@ -319,7 +344,7 @@ class AuthController {
 			def ed = emailDispatchService.basicEmailDispatchEntity(
 				EmailDispatchOrigin.PASSWORD_RESET,
 				"Your TransitionManager password has changed",
-				"passwordResetNotify",
+				"passwordResetNotif",
 				"",
 				pr.userLogin.person.email,
 				pr.userLogin.person.email,
@@ -331,7 +356,7 @@ class AuthController {
 			// Login and redirect to home page
 			params.username = pr.userLogin.username
 			flash.message = 'Your new password was successfully changed.'
-			signIn()
+		 	signIn()
 
 		} catch (Exception se) {
 			flash.message = controllerService.getExceptionMessage(this, se) + '. Please contact support if you require assistances.'

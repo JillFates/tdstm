@@ -1,15 +1,22 @@
 import org.apache.shiro.authc.AccountException
 import org.apache.shiro.authc.IncorrectCredentialsException
 import org.apache.shiro.authc.UnknownAccountException
+import org.apache.shiro.authc.LockedAccountException
+import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.UnavailableSecurityManagerException
+
+import com.tdsops.common.security.shiro.UnhandledAuthException
+import com.tdsops.common.security.shiro.MissingCredentialsException
+import com.tdsops.common.security.shiro.UserLoginAccount
 
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.SecurityUtil
-import com.tdsops.common.security.shiro.UserLoginAccount
+import com.tdsops.common.builder.UserAuditBuilder
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
+import java.text.SimpleDateFormat
 
 class ShiroDbRealm {
 	
@@ -32,16 +39,18 @@ class ShiroDbRealm {
 	private void initRules() {
 		accessRules = []
 
-		accessRules << checkLocalSecuvityEnabled
+		accessRules << checkLocalSecurityEnabled
 		accessRules << checkValidUsername
 		accessRules << checkUserLoginExist
-		accessRules << checkExpirationDate
-		accessRules << execCredentialMatcher
+		accessRules << checkPassword
 		accessRules << checkLegacyPassword
+		accessRules << checkExpirationDate
 		accessRules << checkLockOutStatus
+		accessRules << checkUserActive
 		accessRules << checkPasswordExpirationDate
 		accessRules << checkFailsCount
 		accessRules << checkPasswordAge
+		accessRules << checkIfUserHasRoles
 		accessRules << checkIfAuthenticated
 
 	}
@@ -54,9 +63,13 @@ class ShiroDbRealm {
 		return grailsApplication.mainContext.getBean('auditService')
 	}
 
+	private def getUserPreferenceService() {
+		return grailsApplication.mainContext.getBean('userPreferenceService')
+	}
+
 	// ----------------------------------------------------------------------------------------
 	// Check if user local security is enabled
-	private def checkLocalSecuvityEnabled = { state ->
+	private def checkLocalSecurityEnabled = { state ->
 		log.debug "Rule: Check if user local security is enabled"
 		if (!getSecurityService().getUserLocalConfig().enabled) {
 			throw new UnavailableSecurityManagerException('DB Realm is disabled')
@@ -64,11 +77,11 @@ class ShiroDbRealm {
 	}
 
 	// ----------------------------------------------------------------------------------------
-	// Validates username
+	// Validates username and password
 	private def checkValidUsername = { state ->
 		log.debug "Rule: Validates username"
-		if (state.authToken.username == null) {
-			throw new AccountException('Blank usernames are not allowed by this realm.')
+		if (! ( state.authToken.username?.size() > 0 ) || ! (state.authToken.password?.size() > 0) ) {
+			throw new MissingCredentialsException('A username and password are required')
 		}
 	}
 
@@ -79,25 +92,16 @@ class ShiroDbRealm {
 		log.debug "Rule: Get the user with the given username. If the user is not found or if it is not a local"
 		state.user = UserLogin.findByUsername(state.authToken.username)
 		if (!state.user || !state.user.isLocal) {
-			throw new UnknownAccountException("No account found for user [${state.authToken.username}]")
+			throw new UnhandledAuthException("No account found for user [${state.authToken.username}]")
 		}
 		log.debug "Found user '${state.user.username}' in DB"
 	}
 
 	// ----------------------------------------------------------------------------------------
-	// Check user login expiration date
-	private def checkExpirationDate = { state ->
-		log.debug "Rule: Check user login expiration date"
-		if (state.user.expiryDate.time <= TimeUtil.nowGMT().time) {
-			throw new UnknownAccountException("Account expired for user [${state.user.username}]")
-		}
-	}
-
-	// ----------------------------------------------------------------------------------------
 	// Now check the user's password against the hashed value stored in the database.
 	// def account = new SimpleAccount(username, user.password, "jsecDbRealm")
-	private def execCredentialMatcher = { state ->
-		log.debug "Rule: Now check the user's password against the hashed value stored in the database."
+	private def checkPassword = { state ->
+		log.debug "Rule: Validate password against the hashed value stored in the database"
 		def credentialsSalt
 		state.account = new UserLoginAccount(state.user.username, state.user.password, "shiroDbRealm")
 		state.account.saltPrefix = state.user.saltPrefix 
@@ -112,38 +116,66 @@ class ShiroDbRealm {
 	private def checkLegacyPassword = { state ->
 		log.debug "Rule: Check using legacy password encryption"
 		if ( !state.authenticated ) {
-			if (SecurityUtil.encryptLegacy(new String(state.authToken.password)).equals(state.user.password) ) {
+			String enteredPswd = SecurityUtil.encryptLegacy(new String(state.authToken.password))
+			log.debug "enteredPswd=$enteredPswd, state.user.password=${state.user.password}"
+			if (enteredPswd.equals(state.user.password) ) {
 				state.authenticated = true
+				log.debug "      Authenticated"
 				if (getSecurityService().getUserLocalConfig().forceUseNewEncryption) {
 					// Set the userLogin so that they're forced to change their password
 					state.user.forcePasswordChange = 'Y'
-					state.user.save(flush:true)
+					state.user.save(flush:true, failOnError:true)
 				}
 			}
 		}
 	}
 
 	// ----------------------------------------------------------------------------------------
+	// Check user login expiration date
+	private def checkExpirationDate = { state ->
+		log.debug "Rule: Check user login expiration date"
+		if (state.user.expiryDate.time <= TimeUtil.nowGMT().time) {
+			getAuditService().logMessage("User ${state.user} attempted access while account is expired")
+			throw new DisabledAccountException("Your account has expired. Please contact support to have your account reactivated.")
+		}
+	}
+
+	// ----------------------------------------------------------------------------------------
 	// Check lock out status
 	private def checkLockOutStatus = { state ->
-		log.debug "Rule: Check lock out status"
+		log.debug "Rule: Check if account is locked out"
 		if (state.authenticated) {
 			if (state.user.lockedOutUntil) {
 				// Check to clear password lockouts
-				if ( (state.user.lockedOutUntil.time <= TimeUtil.nowGMT().time) && 
-					 (getSecurityService().getUserLocalConfig().failedLoginLockoutPeriodMinutes > 0)
-				) {
+				if ( state.user.lockedOutUntil.time <= TimeUtil.nowGMT().time ) {
 					// Unlock out user because lock out time expired
 					state.user.lockedOutUntil = null
 					state.user.failedLoginAttempts = 0
-					state.user.save(flush:true)
+					state.user.save(flush:true, failOnError:true)
 				} else {
 					getAuditService().logMessage("User ${state.user} attempted access while account is locked")
 					state.authenticated = false
-					def timeElapsed = TimeUtil.elapsed(TimeUtil.nowGMT(), state.user.lockedOutUntil)
-					throw new UnknownAccountException("Your account has been locked due to excessive login failure attempts. It will unlock in $timeElapsed.  You may contact support to expedite unlocking your account if you wish.")			
+
+					if (getSecurityService().getUserLocalConfig().failedLoginLockoutPeriodMinutes == 0) {
+						throw new LockedAccountException("Your account is presently locked. Please contact support to unlock your account.")
+					} else {
+						def tzId = getUserPreferenceService().getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+						SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
+						def lockoutUntil = dateTimeFormat.format(TimeUtil.convertInToUserTZ(state.user.lockedOutUntil, tzId))
+						throw new LockedAccountException("Your account is presently locked until $lockoutUntil. You may wait or contact support to have your account unlock.")
+					}
 				}
 			} 
+		}
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// Check user login is active
+	private def checkUserActive = { state ->
+		log.debug "Rule: Check if user login is active"
+		if (state.user.isDisabled()) {
+			getAuditService().logMessage("User ${state.user} attempted access while account is inactive")
+			throw new DisabledAccountException("Your account has been disabled. Please contact support to have your account reactivated.")
 		}
 	}
 
@@ -157,7 +189,7 @@ class ShiroDbRealm {
 			) {
 				// Set the userLogin so that they're forced to change their password
 				state.user.forcePasswordChange = 'Y'
-				state.user.save(flush:true)
+				state.user.save(flush:true, failOnError:true)
 				state.authenticated = true
 		}
 	}
@@ -165,32 +197,40 @@ class ShiroDbRealm {
 	// ----------------------------------------------------------------------------------------
 	// Check and increment max fails, lock out on fail
 	private def checkFailsCount = { state ->
-		log.debug "Rule: Check and increment max fails, lock out on fail"
-		if (!state.authenticated) {
+		log.debug "Rule: Check failed login attempts - increment fail count and lockout when exceeded"
+
+		def now = TimeUtil.nowGMT()
+
+		if (state.authenticated) {
+			if ( state.user.failedLoginAttempts > 0 ) {
+				// Clear out the failedLoginAttempts if the user authenticated their account
+				state.user.failedLoginAttempts = 0
+				state.user.save(flush:true, failOnError:true)
+			}
+		} else {
 			state.user.failedLoginAttempts++
 			def maxLoginFailureAttempts = getSecurityService().getUserLocalConfig().maxLoginFailureAttempts
+
+			// Lock out the account if they exceeded the max tries and the account isn't already locked
 			if ( (maxLoginFailureAttempts > 0) &&
-				 (state.user.failedLoginAttempts > maxLoginFailureAttempts)
+				 (state.user.failedLoginAttempts > maxLoginFailureAttempts) &&
+				 (state.user.lockedOutUntil == null || state.user.lockedOutUntil.time < now.time)
 			) {
 				String lockoutTime = 'indefintely'
 				def failedLoginLockoutPeriodMinutes = getSecurityService().getUserLocalConfig().failedLoginLockoutPeriodMinutes * 60 * 1000
 				def lockedOutUntil
 				if (failedLoginLockoutPeriodMinutes > 0) {
-					lockedOutUntil = new Date(TimeUtil.nowGMT().time + failedLoginLockoutPeriodMinutes)
+					// TODO - Use the TimeUtil.ago to compute the duration in hours/minutes
+					lockedOutUntil = new Date(now.time + failedLoginLockoutPeriodMinutes)
 					lockoutTime = "for ${failedLoginLockoutPeriodMinutes} minutes"
 				} else {
-					lockedOutUntil = new Date(TimeUtil.nowGMT().time + LOCK_INDEFINTELY_TIME)
+					lockedOutUntil = new Date(now.time + LOCK_INDEFINTELY_TIME)
 				}
-				state.user.failedLoginAttempts = 0
+
 				state.user.lockedOutUntil = lockedOutUntil
 				getAuditService().logMessage("User ${state.user}, account locked out $lockoutTime")
 			}
-			state.user.save(flush:true)
-		} else {
-			if (state.user.failedLoginAttempts > 0) {
-				state.user.failedLoginAttempts = 0
-				state.user.save(flush:true)
-			}
+			state.user.save(flush:true, failOnError:true)
 		}
 	}
 
@@ -205,25 +245,39 @@ class ShiroDbRealm {
 			) {
 				// Set the userLogin so that they're forced to change their password
 				state.user.forcePasswordChange = 'Y'
-				state.user.save(flush:true)
+				state.user.save(flush:true, failOnError:true)
 				state.authenticated = true
+		}
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// Make sure that the user account has at least one security role
+	private def checkIfUserHasRoles = { state ->
+		log.debug "Rule: Check for security roles"
+		if (state.authenticated && ! state.user.getSecurityRoleCodes() ) {
+			getAuditService().logMessage("User ${state.user}, account has no assigned security roles")
+
+			throw new DisabledAccountException("Your account has no assigned security role. Please contact support to have your account updated.")
 		}
 	}
 
 	// ----------------------------------------------------------------------------------------
 	// Not authenticated (This should be the last rule)
 	private def checkIfAuthenticated = { state ->
-		log.debug "Rule: Not authenticated (This should be the last rule)."
+		log.debug "Rule: Not authenticated (This should be the last rule)"
 		if (!state.authenticated) {
 			def remoteIp = HtmlUtil.getRemoteIp()
-			log.warn "Invalid password (DB realm) - IP ${remoteIp}"
-			throw new IncorrectCredentialsException("Invalid password for user '${state.authToken.username}'")
+			log.debug "Invalid password (DB realm) - IP ${remoteIp}"
+			// It would make sense to throw the IncorrectCredentialsException but since we're multi-Realm the user may have been
+			// authenticated with a previous or latter realm so we just report that this wasn't handled.
+			throw new UnhandledAuthException("Invalid password for user '${state.authToken.username}'")
 		}
 	}
-
+	/**
+	 * The principle Authentication method that is called by Shiro
+	 */
 	def authenticate(authToken) {
 		log.debug "Attempting to authenticate ${authToken.username} in DB realm..."
-		// log.error "authToken: ${authToken}"
 
 		// Defines the state that will be use to validate all the rules
 		def state = [
@@ -238,12 +292,11 @@ class ShiroDbRealm {
 			rule(state)
 		}
 
-		if (state.authenticated) {
-			return state.account
-		} else {
-			// This should never happen because a previous rule should throw an exception on fail.
-			throw new AccountException("Can't authenticate user.")
+		if (! state.authenticated) {
+			throw new UnhandledAuthException("Unable to authenticate user")
 		}
+
+		return state.account
 	}
 
 	/**
@@ -434,4 +487,5 @@ class ShiroDbRealm {
 
 		return (preferredConstructor != null ? preferredConstructor : fallbackConstructor)
 	*/}
+
 }

@@ -106,25 +106,26 @@ class EmailDispatchService {
 	 */
 	private def createModel(ed) {
 		def result = [:]
+		def emailParams = JSON.parse(ed.paramsJson)
+
 		//TODO: here we should create a model for each. This should be changed to a OOP approach
 		switch (ed.bodyTemplate) {
 			case "passwordReset":
-				def emailParams = JSON.parse(ed.paramsJson)
 				result = [
+						person: ed.toPerson.firstName,
 						resetPasswordUrl: grailsApplication.config.grails.serverURL + "/auth/resetPassword/" + emailParams.token,
 						expiredTime: emailParams.expiredTime,
-						person: ed.toPerson.firstName + " " + ed.toPerson.lastName,
 						supportEmail: "support@transitionaldata.com"
 					]
 				break;
 			case "passwordResetNotif":
 				result = [
-						person: ed.toPerson.firstName + " " + ed.toPerson.lastName
+						person: ed.toPerson.firstName
 					]
 				break;
 			case "accountActivation":
 				result = [
-					person: ed.toPerson.firstName + " " + ed.toPerson.lastName,
+					person: ed.toPerson.firstName,
 					customMessage: emailParams.customMessage,
 					serverURL: grailsApplication.config.grails.serverURL,
 					activationURL :  grailsApplication.config.grails.serverURL + "/auth/resetPassword/" + emailParams.token,
@@ -135,7 +136,7 @@ class EmailDispatchService {
 				break;
 			case "adminResetPassword":
 				result = [
-					person: ed.toPerson.firstName + " " + ed.toPerson.lastName,
+					person: ed.toPerson.firstName,
 					activationURL :  grailsApplication.config.grails.serverURL + "/auth/resetPassword/" + emailParams.token,
 					ttl: emailParams.expiredTime,
 					username: emailParams.username
@@ -155,7 +156,7 @@ class EmailDispatchService {
 			case "passwordReset":
 				result = "/auth/_resetPasswordEmail"
 				break;
-			case "passwordResetNotify":
+			case "passwordResetNotif":
 				result = "/auth/_resetPasswordNotificationEmail"
 				break;
 			case "accountActivation":
@@ -168,4 +169,23 @@ class EmailDispatchService {
 		return result
 	}
 
+
+	/**
+	 * Determines the granularity for the expiry date.
+	 */
+	public def getExpiryGranularity(ed) {
+		def result
+		switch (ed.bodyTemplate) {
+			case "passwordReset":
+				result = TimeUtil.GRANULARITY_MINUTES
+				break;
+			case "accountActivation":
+				result = TimeUtil.GRANULARITY_HOURS
+				break;
+			case "adminResetPassword":
+				result = TimeUtil.GRANULARITY_MINUTES
+				break;
+		}
+		return result
+	}
 }
