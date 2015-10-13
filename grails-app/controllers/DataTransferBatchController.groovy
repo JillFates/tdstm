@@ -197,19 +197,6 @@ class DataTransferBatchController {
 	 }
 
 	/**
-	 * Update Asset Racks once import batch process done.
-	 */
-/*	 
-	def updateAssetRacks() {
-		def assetsList = session.getAttribute("IMPORT_ASSETS")
-		assetsList.each { assetId ->
-			AssetEntity.get(assetId)?.updateRacks()
-		}
-		session.setAttribute("IMPORT_ASSETS",null)
-		render ""
-	}
-*/
-	/**
 	 *     Delete the Data Transfer Batch Instance
 	 */
 	def delete() {

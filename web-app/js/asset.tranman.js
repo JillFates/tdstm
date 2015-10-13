@@ -287,28 +287,7 @@ function showAssetDialog (e, action) {
 		}
 	}
   }
-    		
-  function callUpdateDialog( e ) {
-    	var assetEntityAttributes = eval('(' + e.responseText + ')');
-		var assetId = document.editForm.id.value
-    	var assetEntityParams = new Array()
-    	if (assetEntityAttributes) {
-    		var length = assetEntityAttributes.length
-		      	for (var i=0; i < length; i ++) {
-		      		var attributeCode = assetEntityAttributes[i].attributeCode;
-		      		var attributeValue = $('#edit'+attributeCode+'Id').val();
-		      		if(assetEntityAttributes[i].frontendInput == 'select'){
-			      		assetEntityParams.push(attributeCode+':'+attributeValue+'~');
-		      		} else {
-		      			assetEntityParams.push(attributeCode+':'+attributeValue+'~');
-		      		}
-		      	}
-    	}
-    var safeQueryString = escape( assetEntityParams );
-    new Ajax.Request(contextPath+'/assetEntity/updateAssetEntity?id='+assetId+'&assetEntityParams='+safeQueryString,{asynchronous:true,evalScripts:true,onComplete:function(e){showEditAsset(e);}})
-    
- }
-    
+
  //DEPRECATED
  function setAssetId(assetId){
 	$("#createAssetCommentId").val(assetId)
