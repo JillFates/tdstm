@@ -10,9 +10,9 @@ describe('Assets Menu', function(){
         expect(menu.getAssets().getText()).toEqual('Assets');
     });  
   
-    it('should displayed 16 links', function(){
+    it('should displayed 12 links', function(){
       menu.getAssetsSubmenu().then(function(list){
-        expect(list.length).toEqual(16);
+        expect(list.length).toEqual(12);
       });
     });
 
@@ -64,10 +64,7 @@ describe('Assets Menu', function(){
     it('should have Architecture Viewer in the submenu', function() {
       expect(menu.getArchitectureViewer().getText()).toEqual('Architecture Graph');
     });
-    it('should have Assets Help in the submenu', function(){
-      expect(menu.getAssetsHelp().getText()).toEqual('help');
-    });
-
+   
     it('should have Import Assets in the submenu', function(){
       expect(menu.getImportAssets().getText()).toEqual('Import Assets');
     });
@@ -78,10 +75,6 @@ describe('Assets Menu', function(){
 
     it('should have Export Assets in the submenu', function(){
       expect(menu.getExportAssets().getText()).toEqual('Export Assets');
-    });
-
-    it('should have Manage Data Help in the submenu', function(){
-      expect(menu.getManageDataHelp().getText()).toEqual('help');
     });
 
     it('should close Assets Menu',function(){

@@ -10,9 +10,9 @@ describe('Admin Menu', function(){
 
     describe('submenu',function(){
 
-      it('should displayed 16 links', function(){
+      it('should displayed 12 links', function(){
           menu.getAdminSubmenu().then(function(list){
-            expect(list.length).toEqual(16);
+            expect(list.length).toEqual(12);
           });
       });
       
@@ -32,10 +32,6 @@ describe('Admin Menu', function(){
         expect(menu.getAssetOptions().getText()).toEqual('Asset Options');
       });
       
-      it('should have HelpAdministration in the submenu', function(){
-        expect(menu.getAdministrationHelp().getText()).toEqual('help');
-      });
-      
       it('should have List Companies in the submenu', function(){
         expect(menu.getListCompanies().getText()).toEqual('List Companies');
       });
@@ -51,17 +47,9 @@ describe('Admin Menu', function(){
       it('should have Import Accounts in the submenu', function(){
         expect(menu.getImportAccounts().getText()).toEqual('Import Accounts');
       });
-
-      it('should have Manage Clients Help in the submenu', function(){
-        expect(menu.getManageClientsHelp().getText()).toEqual('help');
-      });
       
       it('should have List Workflows in the submenu', function(){
         expect(menu.getListWorkflows().getText()).toEqual('List Workflows');
-      });
-      
-      it('should have Manage Workflows Help in the submenu', function(){
-        expect(menu.getManageWorkflowsHelp().getText()).toEqual('help');
       });
       
       it('should have List Manufacturers in the submenu', function(){
@@ -74,10 +62,6 @@ describe('Admin Menu', function(){
       
       it('should have Sync Libraries in the submenu', function(){
         expect(menu.getSyncLibraries().getText()).toEqual('Sync Libraries');
-      });
-
-      it('should have Manage Model Library Help in the submenu', function(){
-        expect(menu.getMngModelHelp().getText()).toEqual('help');
       });
 
       it('should close admin Menu',function(){
