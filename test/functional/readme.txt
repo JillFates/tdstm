@@ -33,7 +33,6 @@ https://subversion.apache.org/packages.html  (SlikSVN for Windows provides non-r
 
 This command will prompt for your SVN credentials and then download the source code into a new directory 'functional'
 
-
 5. Download the Node packages for testing
 
     Windows:
