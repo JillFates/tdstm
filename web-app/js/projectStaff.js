@@ -385,29 +385,31 @@ function validatePersonForm(form) {
  * Ajax service function to call the person/save method and then update the select specified by fieldName
  */
 function createPersonDetails(forWhom){
-	jQuery.ajax({
-		url : contextPath+'/person/save',
-		data : $('#createDialogForm').serialize(),
-		type : 'POST',
-		success : function(data) {
-			if (data.errMsg) {
-				alert(data.errMsg)
-			} else {
-				$("#createStaffDialog").dialog('close')
-				if(!data.isExistingPerson){
-					$('select.assetSelect').append('<option value="'+data.id+'">'+data.name+'</option>');
-					$('#'+data.fieldName+' option[value="'+data.id+'"]').attr('selected','selected');
-					if(!isIE7OrLesser)
-						$("select.assetSelect").select2()
+	if (validatePersonForm('createDialogForm')) {
+		jQuery.ajax({
+			url : contextPath+'/person/save',
+			data : $('#createDialogForm').serialize(),
+			type : 'POST',
+			success : function(data) {
+				if (data.errMsg) {
+					alert(data.errMsg)
+				} else {
+					$("#createStaffDialog").dialog('close')
+					if(!data.isExistingPerson){
+						$('select.assetSelect').append('<option value="'+data.id+'">'+data.name+'</option>');
+						$('#'+data.fieldName+' option[value="'+data.id+'"]').attr('selected','selected');
+						if(!isIE7OrLesser)
+							$("select.assetSelect").select2()
+					}
+					else
+						$('#'+data.fieldName).val(data.id)
 				}
-				else
-					$('#'+data.fieldName).val(data.id)
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				alert("An unexpected error occurred : " + textStatus + " : " + errorThrown)
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred : " + textStatus + " : " + errorThrown)
-		}
-	});
+		});
+	}
 }
  
 function openPersonDiv(value, fieldName){

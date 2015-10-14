@@ -1458,7 +1458,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 				def reducedParams = new HashMap(params)
 				reducedParams.remove("company")
 				person = new Person( reducedParams )
-				if ( !person.hasErrors() && person.save() ) {
+				if ( person.validate() && person.save() ) {
 					//Receiving added functions		
 					def functions = params.list("function")
 					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
@@ -1470,7 +1470,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 					}
 				} else {
 					log.error "savePerson() failed for $person : " + GormUtil.allErrorsString(person)
-					throw new DomainUpdateException('An error occurred while attempting to sace the person changes')
+					throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString( person )}.")
 				}
 			}
 			break
