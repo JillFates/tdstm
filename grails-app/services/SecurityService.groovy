@@ -165,7 +165,7 @@ class SecurityService implements InitializingBean {
 	 * @param A permission tag name
 	 * @return boolean true if the user does have permission
 	 */
-	boolean hasPermission(UserLogin user, String permission) {
+	boolean hasPermission(UserLogin user, String permission, boolean reportViolation=false) {
 		def hasPerm = false
 		def roles = getRoles(user)
 
@@ -177,9 +177,16 @@ class SecurityService implements InitializingBean {
 				}
 			} else {
 				log.debug "Unable to find permission ($permission) for user ($user) with roles (${roles*.id})"
+				if(reportViolation){
+					reportViolation("Unable to find permission ($permission) for user ($user) with roles (${roles*.id})")	
+				}
+				
 			}
 		} else {
 			log.debug "Unable to find roles for user $user"
+			if(reportViolation){				
+				reportViolation("Unable to find roles for user $user")
+			}
 		}
 
 		return hasPerm
