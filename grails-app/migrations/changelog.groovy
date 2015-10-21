@@ -99,4 +99,5 @@ databaseChangeLog = {
 	include file: '20150830-add-salt-prefix-to-user-login.groovy'
 	include file: '20150828-add-SendUserActivations-permission.groovy'
 	include file: '20150930-add-new-eav-attribute-for-lun.groovy'
+	include file: '20151020-set-custom-fields-to-hidden.groovy'
 }

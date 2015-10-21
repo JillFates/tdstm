@@ -244,7 +244,11 @@ class ProjectService {
 			def attributes = getAttributes(type)?.attributeCode
 			returnMap = attributes.inject([:]){rmap, field->
 				def pmap = phases.inject([:]){map, item->
-					map[item]="N"
+					if (field.contains('custom')) {
+						map[item]="H"
+					} else {
+						map[item]="N"
+					}
 					return map
 				}
 				rmap[field] = ['phase': pmap]
