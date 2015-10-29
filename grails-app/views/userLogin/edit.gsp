@@ -8,7 +8,7 @@
 			$().ready(function() {
 				var isLocal = ${userLoginInstance.isLocal}
 				if (isLocal) {
-					$(".passwordsEditFields").show();
+					$(".passwordsEditFields").css('display', 'none');
 				} else {
 					$(".passwordsEditFields").hide();
 				}
@@ -33,12 +33,14 @@
 			function togglePasswordEditFields($me) {
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
+					$me.val(false)
 					$(".passwordsEditFields").hide();
 				} else {
+					$me.val(true)
 					$(".passwordsEditFields").show();
 				}
 			}
-		</script> 
+		</script>
 	</head>
     <body>
         <div class="body">
@@ -92,7 +94,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
                                     <input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal)?'checked="checked"':''}  
-                                    onchange="togglePasswordEditFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>
+                                    onchange="togglePasswordEditFields( $(this) )" />
                                 </td>
                             </tr>
 							<tr class="prop passwordsEditFields">

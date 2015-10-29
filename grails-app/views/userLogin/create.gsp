@@ -26,11 +26,13 @@
 
 			}
 
-			function togglePasswordFields($me){
+			function togglePasswordFields($me) {
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
+					$me.val(false)
 					$(".passwordsFields").hide();
 				} else {
+					$me.val(true)
 					$(".passwordsFields").show();
 				}
 			}
@@ -86,7 +88,7 @@
 									<label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-									<input type="text" maxlength="50" onkeyup="checkPassword($('#password')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
 									<g:hasErrors bean="${userLoginInstance}" field="username">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -100,7 +102,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
 									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}  
-										onchange="togglePasswordFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>
+										onchange="togglePasswordFields( $(this) )"/>
 								</td>
 							</tr>
 							<tr class="prop passwordsFields">
@@ -160,6 +162,7 @@
 									</g:hasErrors>
 								</td>
 							</tr>
+
 
 							<tr class="prop">
 								<td valign="top" class="name">

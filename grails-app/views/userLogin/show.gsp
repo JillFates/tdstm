@@ -60,11 +60,11 @@
 						<tr class="prop">
 							<td valign="top" class="name">Local account:</td>
 							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-								<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.isLocal}" disabled="disabled" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}/>
+								<input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" disabled="disabled" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}/>
 							</td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="forcePasswordChange">Force password change:</label>
 							</td>
@@ -74,7 +74,7 @@
 							</td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="passwordNeverExpiresId">Password never expires:</label>
 							</td>
@@ -89,12 +89,12 @@
 							<td nowrap="nowrap" valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'active')}</td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">Failed Logins:</td>
 							<td nowrap="nowrap" valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'failedLoginAttempts')}</td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">Locked Out Until:</td>
 							<td nowrap="nowrap" valign="middle" class="value">
 								<g:if test="${userLoginInstance?.lockedOutUntil}">
@@ -110,7 +110,7 @@
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">Password Expires:</td>
 							<td nowrap="nowrap" valign="top" class="value">
 								<g:if test="${userLoginInstance?.lockedOutUntil}">
@@ -170,6 +170,14 @@
 			currentMenuId = "#adminMenu";
 			$("#adminMenuId a").css('background-color','#003366')
 			$(document).ready(function(){
+
+				var isChecked = $("#isLocal").is(":checked")
+				if (!isChecked) {
+					$(".passwordsEditFields").hide();
+				} else {
+					$(".passwordsEditFields").show();
+				}
+
 				$("#resetPassword").click(function(){
 					$(this).prop('disabled', true)
 					$(this).toggleClass("disableButton")
