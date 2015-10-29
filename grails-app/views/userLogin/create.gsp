@@ -30,10 +30,10 @@
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
 					$me.val(false)
-					$(".passwordsFields").hide();
+					$(".passwordsEditFields").hide();
 				} else {
 					$me.val(true)
-					$(".passwordsFields").show();
+					$(".passwordsEditFields").show();
 				}
 			}
 		</script>          
@@ -105,7 +105,7 @@
 										onchange="togglePasswordFields( $(this) )"/>
 								</td>
 							</tr>
-							<tr class="prop passwordsFields">
+							<tr class="prop passwordsEditFields">
 								<td valign="top" class="name">
 									<label for="forcePasswordChange">Force password change:</label>
 								</td>
@@ -113,7 +113,7 @@
 									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="Y" />
 								</td>
 							</tr>
-							<tr class="prop passwordsFields">
+							<tr class="prop passwordsEditFields">
 								<td valign="top" class="name">
 									<label for="passwordNeverExpiresId">Password never expires:</label>
 								</td>
