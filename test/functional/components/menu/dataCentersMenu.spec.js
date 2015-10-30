@@ -1,5 +1,6 @@
 'use strict';
 var  Menu = require('./menu.po.js');
+var Links = 2;
 describe('Data Centers Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
@@ -9,10 +10,9 @@ describe('Data Centers Menu', function(){
     });
   
     describe('submenu',function(){
-
-      it('should displayed 3 links', function(){
+      it('should displayed 2 links', function(){
         menu.getDataCentersSubmenu().then(function(list){
-          expect(list.length).toEqual(3);
+          expect(list.length).toEqual(Links);
         });
       });
 
@@ -24,9 +24,6 @@ describe('Data Centers Menu', function(){
       });
       it('should have Racks in the submenu', function(){
         expect(menu.getRackElevations().getText()).toEqual('Rack Elevations');
-      });
-      it('should have Data Centers Help in the submenu', function(){
-        expect(menu.getDataCentersHelp().getText()).toEqual('help');
       });
       it('should close admin Menu',function(){
         menu.getDataCenters().click();
