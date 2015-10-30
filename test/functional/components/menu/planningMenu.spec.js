@@ -3,16 +3,16 @@ var  Menu = require('./menu.po.js');
 describe('Planning Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
-
+    var Links = 6;
     it('should have Planning as label',function(){
       expect(menu.getPlanning().getText()).toEqual('Planning');
     });
  
   
     describe('submenu',function(){
-      it('should displayed 7 links', function(){
+      it('should displayed 6 links', function(){
         menu.getPlanningSubmenu().then(function(list){
-          expect(list.length).toEqual(7);
+          expect(list.length).toEqual(Links);
         });
       });
 
@@ -32,14 +32,8 @@ describe('Planning Menu', function(){
       it('should have Export Runbook in the submenu', function(){
         expect(menu.getExportRunbook().getText()).toEqual('Export Runbook');
       });
-      it('should have Event help in the submenu', function(){
-        expect(menu.getEventHelp().getText()).toEqual('help');
-      });
       it('should have List Bundles in the submenu', function(){
         expect(menu.getListBundles().getText()).toEqual('List Bundles');
-      });
-      it('should have Bundles Help in the submenu', function(){
-        expect(menu.getBundlesHelp().getText()).toEqual('help');
       });
 
       it('should close Planning Menu',function(){
