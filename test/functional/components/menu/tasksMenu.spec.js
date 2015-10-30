@@ -3,6 +3,7 @@ var  Menu = require('./menu.po.js');
 describe('Tasks Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
+    var Links = 6;
 
     it('should have Tasks as label',function(){
       expect(menu.getTasks().getText()).toEqual('Tasks');
@@ -11,7 +12,7 @@ describe('Tasks Menu', function(){
     describe('submenu',function(){
       it('should displayed 6 links', function(){
         menu.getTasksSubmenu().then(function(list){
-          expect(list.length).toEqual(6);
+          expect(list.length).toEqual(Links);
         });
       });
 
@@ -19,7 +20,7 @@ describe('Tasks Menu', function(){
         menu.getTasks().click();
       });
       it('should have My Tasks in the submenu', function(){
-        expect(menu.getMyTasks().getText()).toMatch(/My Tasks \((\d*|\s)\)/);
+        expect(menu.getMyTasks().getText()).toMatch('My Tasks');//toMatch(/My Tasks \((\d*|\s)\)/);
       });
       it('should have Task Manager in the submenu', function(){
         expect(menu.getTaskManager().getText()).toEqual('Task Manager');
@@ -33,8 +34,8 @@ describe('Tasks Menu', function(){
       it('should have Cookbook in the submenu', function(){
         expect(menu.getCookbook().getText()).toEqual('Cookbook');
       });
-      it('should have TasksHelp in the submenu', function(){
-        expect(menu.getTasksHelp().getText()).toEqual('help');
+      it('should have Generation History in the submenu', function(){
+        expect(menu.getGenerationStory().getText()).toEqual('Generation History');
       });
 
       it('should close Tasks Menu',function(){
