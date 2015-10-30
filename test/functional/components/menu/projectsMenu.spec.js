@@ -34,9 +34,6 @@ describe('Projects Menu', function(){
       it('should have Field Settings in the submenu', function(){
         expect(menu.getFieldSettings().getText()).toEqual('Field Settings');
       });
-      it('should have help in the submenu', function(){
-        expect(menu.getProjectsHelp().getText()).toEqual('help');
-      });
 
       it('should close Projects Menu',function(){
         menu.getProjects().click();
