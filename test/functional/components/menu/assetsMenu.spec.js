@@ -1,5 +1,6 @@
 'use strict';
 var  Menu = require('./menu.po.js');
+var Links = 14
 describe('Assets Menu', function(){
   
   describe('Admin Role - Menu and submenu items', function(){
@@ -10,9 +11,9 @@ describe('Assets Menu', function(){
         expect(menu.getAssets().getText()).toEqual('Assets');
     });  
   
-    it('should displayed 12 links', function(){
+    it('should displayed 14 links', function(){
       menu.getAssetsSubmenu().then(function(list){
-        expect(list.length).toEqual(12);
+        expect(list.length).toEqual(Links);
       });
     });
 
@@ -42,11 +43,11 @@ describe('Assets Menu', function(){
     });
 
     it('should have Storage Devices in the submenu', function(){
-      expect(menu.getStorageDevices().getText()).toEqual('Storage-Devices');
+      expect(menu.getStorageDevices().getText()).toEqual('Storage Devices');
     });
 
     it('should have Logical Storage in the submenu', function(){
-      expect(menu.getLogicalStorage().getText()).toEqual('Storage-Logical');
+      expect(menu.getLogicalStorage().getText()).toEqual('Logical Storage');
     });
 
     it('should have Comments in the submenu', function(){
