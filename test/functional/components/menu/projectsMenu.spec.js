@@ -3,15 +3,16 @@ var  Menu = require('./menu.po.js');
 describe('Projects Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
+    var Links = 5;
 
     it('should have Projects as label',function(){
       expect(menu.getProjects().getText()).toEqual('Projects');
     });
   
     describe('submenu',function(){
-      it('should displayed 5 links', function(){
+      it('should displayed'+ Links +'links', function(){
         menu.getProjectsSubmenu().then(function(list){
-          expect(list.length).toEqual(5);
+          expect(list.length).toEqual(Links);
         });
       });
 
