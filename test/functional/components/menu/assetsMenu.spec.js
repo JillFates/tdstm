@@ -1,6 +1,6 @@
 'use strict';
 var  Menu = require('./menu.po.js');
-var Links = 14
+var Links = 14;
 describe('Assets Menu', function(){
   
   describe('Admin Role - Menu and submenu items', function(){
@@ -11,7 +11,7 @@ describe('Assets Menu', function(){
         expect(menu.getAssets().getText()).toEqual('Assets');
     });  
   
-    it('should displayed 14 links', function(){
+    it('should displayed ' + Links + ' links', function(){
       menu.getAssetsSubmenu().then(function(list){
         expect(list.length).toEqual(Links);
       });
