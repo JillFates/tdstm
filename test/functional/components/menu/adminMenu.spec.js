@@ -3,6 +3,7 @@ var  Menu = require('./menu.po.js');
 describe('Admin Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
+    var Links = 12;
       
     it('should have Admin as label',function(){
       expect(menu.getAdmin().getText()).toEqual('Admin');
@@ -10,9 +11,9 @@ describe('Admin Menu', function(){
 
     describe('submenu',function(){
 
-      it('should displayed 12 links', function(){
+      it('should displayed '+ Links +' links', function(){
           menu.getAdminSubmenu().then(function(list){
-            expect(list.length).toEqual(12);
+            expect(list.length).toEqual(Links);
           });
       });
       
