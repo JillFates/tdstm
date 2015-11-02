@@ -10,7 +10,7 @@ describe('Data Centers Menu', function(){
     });
   
     describe('submenu',function(){
-      it('should displayed 2 links', function(){
+      it('should displayed ' + Links + ' links', function(){
         menu.getDataCentersSubmenu().then(function(list){
           expect(list.length).toEqual(Links);
         });
