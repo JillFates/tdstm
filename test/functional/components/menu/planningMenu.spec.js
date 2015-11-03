@@ -3,7 +3,7 @@ var  Menu = require('./menu.po.js');
 describe('Planning Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
-    var Links = 6;
+    var Links = 8;
     it('should have Planning as label',function(){
       expect(menu.getPlanning().getText()).toEqual('Planning');
     });
@@ -19,7 +19,6 @@ describe('Planning Menu', function(){
       it('should open Planning Menu',function(){
         menu.getPlanning().click();
       });
-
       it('should have List Events in the submenu', function(){
         expect(menu.getListEvents().getText()).toEqual('List Events');
       });
