@@ -202,6 +202,7 @@
 			currProjObj = Project.findById(projectId);
 		}
 	%>
+	<r:layoutResources/>
 </head>
 <body>
 	<div class="body">
@@ -399,5 +400,6 @@
 		currentMenuId = "#projectMenu";
 		$("#projectMenuId a").css('background-color','#003366')
 	</script>
+	<r:layoutResources/>
 </body>
 </html>
