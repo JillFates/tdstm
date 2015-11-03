@@ -3,6 +3,7 @@ var  Menu = require('./menu.po.js');
 describe('Reports Menu', function(){
   describe('Admin Role', function(){
     var menu = new Menu();
+    var Links = 17;
 
     it('should have Reports as label',function(){
       expect(menu.getReports().getText()).toEqual('Reports');
@@ -13,9 +14,9 @@ describe('Reports Menu', function(){
         menu.getReports().click();
         expect(menu.getReportsMegaMenu().getAttribute('class')).toEqual('megamenu reports active');
       });
-      it('should displayed 20 links', function(){
+      it('should displayed '+ Links +' links', function(){
         menu.getReportsSubmenu().then(function(list){
-          expect(list.length).toEqual(20);
+          expect(list.length).toEqual(Links);
         });
       });
       it('should have Cabling Conflict in the submenu', function(){
@@ -26,9 +27,6 @@ describe('Reports Menu', function(){
       });
       it('should have Power in the submenu', function(){
         expect(menu.getPower().getText()).toEqual('Power');
-      });
-      it('should have Discovery Help in the submenu', function(){
-        expect(menu.getDiscoveryHelp().getText()).toEqual('help');
       });
       it('should have Application Profiles in the submenu', function(){
         expect(menu.getApplicationProfiles().getText()).toEqual('Application Profiles');
@@ -60,9 +58,6 @@ describe('Reports Menu', function(){
       it('should have Transport Worksheets in the submenu', function(){
         expect(menu.getTransportWorksheets().getText()).toEqual('Transport Worksheets');
       });
-      it('should have EventPrep Help in the submenu', function(){
-        expect(menu.getEventPrepHelp().getText()).toEqual('help');
-      });
       it('should have Application Migration Results in the submenu', function(){
         expect(menu.getApplicationMigrationResults().getText()).toEqual('Application Migration Results');
       });
@@ -71,9 +66,6 @@ describe('Reports Menu', function(){
       });
       it('should have Cabling QA in the submenu', function(){
         expect(menu.getCablingQA().getText()).toEqual('Cabling QA');
-      });
-      it('should have Event Day Help in the submenu', function(){
-        expect(menu.getEventDayHelp().getText()).toEqual('help');
       });
       it('should close Reports Menu',function(){
         menu.getReports().click();
