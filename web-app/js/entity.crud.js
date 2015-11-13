@@ -1102,6 +1102,8 @@ var EntityCrud = ( function($) {
 			if (!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
 
+			$('[data-toggle="popover"]').popover();
+
 			return true;
 		}
 		return false;

@@ -23,15 +23,9 @@ if type is blank, the extra underscore(_) will be avoided --%>
 </g:if>
 <g:else>
  	<g:if test="${ dependency.comment }" >
- 		<%-- TODO : JPM 10/2014 : Change the show mode for comments to use some sort of bubble to support large text --%>
- 		<a title="${ dependency.comment }"> 
-   			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-   		</a>
-   		<%-- Trying to get bootstrap popover to work...
- 		<a class="popover" data-toggle="popover" data-content="${dependency.comment}" data-placement="top" onclick="event.stopPropagation(); this.popover('toggle');"> 
-   			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
-   		</a>
-   		--%>
+ 		<a title="" data-toggle="popover" data-trigger="hover" data-content="${ dependency.comment }">
+			<img id="comment_${dependency.id}" src="${resource(dir:'icons',file:'comment.png')}" border="0px" />
+		</a>
    	</g:if>
 </g:else>
 
