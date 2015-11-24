@@ -225,9 +225,6 @@
 	<script type="text/javascript">
 	$(document).ready(function() {
 		
-		if ('${prevParam?.projectPartner}') {
-			$("#projectPartnerId").val('${prevParam?.projectPartner}');
-		}
 		var customCol = (${prevParam?.customFieldsShown?: projectInstance.customFieldsShown})?(${prevParam?.customFieldsShown?: projectInstance.customFieldsShown}):'0'
 		showCustomFields(customCol, 2);
 
