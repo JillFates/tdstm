@@ -96,10 +96,10 @@ class RackLayoutsController {
 	 */
 	def generateElevations() {
 
-		// TODO : JPM 10/2014 : generateElevations method is using incorrect permission (RoomEditView)
-		def (project,userLogin) = controllerService.getProjectAndUserForPage( this, 'RoomEditView' )
-		if (! project) 
+		def (project,userLogin) = controllerService.getProjectAndUserForPage( this )
+		if (! project){
 			return
+		}
 
 		def projectId = project.id
 
