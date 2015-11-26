@@ -1315,7 +1315,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		findProp = 'predecessor'
 		nextProp = 'assetComment'
 		findCol = 'predecessor_id'
-		depCountName = 'successorDepCount'
+		depCountName = 'tmpSuccessorDepCount'
 		neighbors(taskId, blocksRight) 
 
 		// Get the predecessor
@@ -1323,7 +1323,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		findProp = 'assetComment'
 		nextProp = 'predecessor'
 		findCol = 'asset_comment_id'
-		depCountName = 'predecessorDepCount'
+		depCountName = 'tmpPredecessorDepCount'
 		neighbors(taskId, blocksLeft) 
 
 		// Reduce the list to just the distinct/unique dependency since the above way to find dependencies can have overlap
