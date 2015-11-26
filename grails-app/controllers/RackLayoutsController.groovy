@@ -31,7 +31,7 @@ class RackLayoutsController {
 	 */
 	def create() {
 
-		def project = controllerService.getProjectForPage( this, 'RoomEditView' )
+		def project = controllerService.getProjectForPage( this )
 		if (! project) 
 			return
 
