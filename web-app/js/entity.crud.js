@@ -224,6 +224,7 @@ var EntityCrud = ( function($) {
 	pub.assetNameSelect2 = function(element) {
 		element.select2( {
 			minimumInputLength: 0,
+			width: '100%',
 			initSelection: function (element, callback) {
 				var data = { id: element.val(), text: element.data("asset-name")};
 				callback(data);

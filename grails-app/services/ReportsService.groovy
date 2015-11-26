@@ -87,9 +87,10 @@ class ReportsService {
 	 * @param int moveBundleId - The id of the moveBundle to generate the report for
 	 * @param boolean conflicts - If true, apps with dependencies in other moveBundles will be shown
 	 * @param boolean unresolved - If true, apps with dependencies with status 'Questioned' or 'Unknown' will be shown
+	 * @param int assetCap - number of assets to be retrieved.
 	 * @return Map - The parameters used by the view to generate the report
 	 */
-	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def missing, def planning, def owner) {
+	def genApplicationConflicts(def currProj , def moveBundleId, def conflicts, def unresolved, def missing, def planning, def owner, int assetCap) {
 		def projectInstance = Project.findById( currProj )
 		ArrayList appList = new ArrayList()
 		def appsInBundle
@@ -97,9 +98,9 @@ class ReportsService {
 		log.debug "****bundle:${moveBundleId} conflicts:${conflicts} unresolved:${unresolved} planning:${planning} missing: ${missing}"
 		
 		if(planning) {
-			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseForPlanning(projectInstance, true).toList())
+			appsInBundle = Application.findAllByMoveBundleInList(MoveBundle.findAllByProjectAndUseForPlanning(projectInstance, true).toList(), [max:assetCap])
 		} else {
-			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId))
+			appsInBundle = Application.findAllByMoveBundle(MoveBundle.findById(moveBundleId), [max:assetCap])
 		}
 		
 		if(owner!='null'){
@@ -667,11 +668,11 @@ class ReportsService {
 	/**
 	 *  Used to generate server conflicts Report.
 	 */
-	def genServerConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def runsOn, def vmSupport, def planning, params){
+	def genServerConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def runsOn, def vmSupport, def planning, params, int assetCap){
 		def project = securityService.getUserCurrentProject()
 		ArrayList assetList = new ArrayList()
 		def assetsInBundle = []
-		def maxR = params.rows ? Integer.valueOf(params.rows) : 50
+		def maxR = assetCap // params.rows ? Integer.valueOf(params.rows) : 50
 		def ofst = params.offset ? Integer.valueOf(params.offset) : 0
 		def appCount = params.appCount ?:0
 		log.debug "****bundle:${moveBundleId} bundleConflicts:${bundleConflicts} unresolvedDep:${unresolvedDep} RunsOn:${runsOn}  vmSupport:${vmSupport} planning:${planning} "
@@ -762,7 +763,7 @@ class ReportsService {
 				]
 	}
 	
-	def genDatabaseConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def noApps, def dbSupport, def planning){
+	def genDatabaseConflicts(def moveBundleId, def bundleConflicts, def unresolvedDep, def noApps, def dbSupport, def planning, int assetCap){
 		def project = securityService.getUserCurrentProject()
 		ArrayList assetList = new ArrayList()
 		def assetsInBundle = []
@@ -776,7 +777,7 @@ class ReportsService {
 		}
 		if(bundles){
 			assetsInBundle = AssetEntity.findAll("FROM AssetEntity WHERE moveBundle IN (:bundles) AND assetType IN (:type) ORDER BY assetName",
-								[bundles:bundles, type:[(AssetType.DATABASE).toString()]])
+								[bundles:bundles, type:[(AssetType.DATABASE).toString()]], [max:assetCap])
 		}
 		
 		log.debug "${assetsInBundle}"

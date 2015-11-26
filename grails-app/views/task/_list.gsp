@@ -34,11 +34,11 @@
             </table>
         </div>
         <div class="buttons">
-            <tds:hasPermission permission='CommentCrudView'>
-                <a ng-click="createTask()" class="comment-create-button">
-                <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
-                </a>
-            </tds:hasPermission>
+
+            <a ng-click="createTask()" class="comment-create-button">
+            <img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+            </a>
+
         </div>
     </div>
 </div>

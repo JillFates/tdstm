@@ -173,11 +173,46 @@ tds.core.utils = function(servRootPath, dateFormat, dateTimeFormat) {
 /**
  * Intercepector used to check if the user is logged in
  */
-tds.core.interceptor.LoggedCheckerInterceptor = function() {
+tds.core.interceptor.LoggedCheckerInterceptor = function($log) {
 	var servicesInterceptor = {
 		response: function(jsonResponse) {
 			var loginRedirect = jsonResponse.headers('x-login-url');
-			return handleRequestResponse(jsonResponse, loginRedirect);
+
+			if (!loginRedirect) {
+				var contentType = jsonResponse.headers('content-type')
+				var isJson = (contentType && contentType.indexOf("json") > -1);
+				if (isJson) {
+					try {
+						var json = angular.fromJson(jsonResponse.data);
+						if (json.errors && json.errors.length > 0) {
+							var errorDiv = angular.element(document.querySelector('#errorModalText'));
+							var errorsHTML = "<ul>";
+							for (var j = 0; j < json.errors.length; j++) {
+								var emsg = '';
+								if (json.errors[j] instanceof String) {
+									emsg = json.errors[j];
+								} else if (typeof(json.errors[j].detail) !== 'undefined') {
+									emsg = json.errors[j].detail
+								} else {
+									emsg = json.errors[j]
+								}
+								errorsHTML = errorsHTML + "<li>" + emsg + "</li>";
+							}
+							errorsHTML = errorsHTML + "</ul>";
+							errorDiv.html(errorsHTML);
+							$('#errorModal').modal('show');
+						}
+					} catch (e) {
+						$log.error("Invalid ServiceResult JSON format.", e);
+					}
+				}
+				return jsonResponse
+			} else {
+				alert("Your session has expired and need to login again.");
+				//location.reload();
+				window.location.href = loginRedirect;
+			}
+
 		}
 	};
 	return servicesInterceptor;
@@ -883,7 +918,7 @@ tds.core.module.factory('utils', ['servRootPath', 'dateFormat', 'dateTimeFormat'
 tds.core.module.factory('alerts', ['$rootScope', '$timeout', tds.core.service.AlertsService]);
 tds.core.module.factory('windowTimedUpdate', ['$window', tds.core.service.TimedUpdateService]);
 
-tds.core.module.factory('loggedCheckerInterceptor', [tds.core.interceptor.LoggedCheckerInterceptor]);
+tds.core.module.factory('loggedCheckerInterceptor', ['$log', tds.core.interceptor.LoggedCheckerInterceptor]);
 tds.core.module.factory('pendingRequestInterceptor', ['$q', '$rootScope', tds.core.interceptor.PendingRequestInterceptor]);
 
 tds.core.module.config(['$httpProvider',

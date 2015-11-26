@@ -26,6 +26,7 @@ import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 
 class MoveEventController {
@@ -627,6 +628,7 @@ class MoveEventController {
 		def databaseCount = 0
 		def fileCount = 0
 		def otherAssetCount = 0
+
 		if (bundles?.size() > 0) {
 			applcationAssigned = Application.countByMoveBundleInListAndProject(bundles,project)
 			assetCount = AssetEntity.findAllByMoveBundleInListAndAssetTypeNotInList(bundles,['Application','Database','Files'],params).size()
@@ -648,34 +650,47 @@ class MoveEventController {
 			publishedValues = [true, false]
 		
 		def preMoveSize = AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'premove', publishedValues)
-		def sheduleSize = AssetComment.countByMoveEventAndCategoryInListAndIsPublishedInList(moveEventInstance, ['shutdown','physical','moveday','startup'], publishedValues)
+		def scheduleSize = AssetComment.countByMoveEventAndCategoryInListAndIsPublishedInList(moveEventInstance, ['shutdown','physical','moveday','startup'], publishedValues)
 		def postMoveSize = AssetComment.countByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'postmove', publishedValues)
+
+
 		return [applcationAssigned:applcationAssigned, assetCount:assetCount, databaseCount:databaseCount, fileCount:fileCount, otherAssetCount:otherAssetCount,
-			    preMoveSize: preMoveSize, sheduleSize:sheduleSize, postMoveSize:postMoveSize, bundles:bundles,moveEventInstance:moveEventInstance]
+			    preMoveSize: preMoveSize, scheduleSize:scheduleSize, postMoveSize:postMoveSize, bundles:bundles,moveEventInstance:moveEventInstance]
+
 	}
 	
 	/**
 	 * The controller that actually does the runbook export generation to an Excel spreadsheet
 	 */
-	def exportRunbookToExcel = {
-		def projectId =  session.CURR_PROJ.CURR_PROJ
-		def project = Project.get(projectId)
-		def moveEventInstance = MoveEvent.get(params.eventId)
-		def currentVersion = moveEventInstance.runbookVersion
+	def exportRunbookToExcel() {
+
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
+		if (! project) {
+			return
+		}
+		def moveEvent = controllerService.getEventForPage(this, project, userLogin, params.eventId)
+		if (! moveEvent) {
+			return
+		}
+
+		def currentVersion = moveEvent.runbookVersion
+
 		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		if (params.version=='on') {
-			if (moveEventInstance.runbookVersion) {
-				moveEventInstance.runbookVersion = currentVersion + 1
+		if (params.version=='on'){
+			if (moveEvent.runbookVersion) {
+				moveEvent.runbookVersion = currentVersion + 1
 				currentVersion = currentVersion + 1
 			} else {
-				moveEventInstance.runbookVersion = 1
+				moveEvent.runbookVersion = 1
 				currentVersion = 1
 			}
-			moveEventInstance.save(flush:true)
+			moveEvent.save(flush:true)
 		}
-		def bundles = moveEventInstance.moveBundles
+
+		def bundles = moveEvent.moveBundles
 		def today = new Date()
-		def formatter = new SimpleDateFormat("yyyy-MM-dd");
+		def formatter = new SimpleDateFormat("yyyy-MM-dd")
+		def dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 		today = formatter.format(today)
 		def moveEventList = MoveEvent.findAllByProject(project)
 		def applcationAssigned = 0
@@ -691,7 +706,6 @@ class MoveEventController {
 		def unresolvedIssues = []
 		def preMoveIssue = []
 		def postMoveIssue = []
-		
 		
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 		def publishedValues = [true]
@@ -712,19 +726,21 @@ class MoveEventController {
 			def allAssets = AssetEntity.findAllByMoveBundleInListAndProject(bundles,project).id
 			String asset = allAssets.toString().replace("[","('").replace(",","','").replace("]","')")
 			unresolvedIssues = AssetComment.findAll("from AssetComment a where a.assetEntity in ${asset} and a.isResolved = :isResolved and a.commentType = :commentType and a.category in ('general', 'discovery', 'planning','walkthru') AND a.isPublished IN :publishedValues",[isResolved:0, commentType:'issue', publishedValues:publishedValues])
+
 		}
 		
-		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'premove', publishedValues) 
-		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInListAndIsPublishedInList(moveEventInstance, ['shutdown','physical','moveday','startup'], publishedValues)
-		postMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEventInstance, 'postmove', publishedValues) 
+		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEvent, 'premove', publishedValues) 
+		def sheduleIssue = AssetComment.findAllByMoveEventAndCategoryInListAndIsPublishedInList(moveEvent, ['shutdown','physical','moveday','startup'], publishedValues)
+		postMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(moveEvent, 'postmove', publishedValues) 
+
 		//TODO - Move controller code into Service .
-		def preMoveCheckListError = reportsService.generatePreMoveCheckList(projectId,moveEventInstance, viewUnpublished).allErrors.size()
+		def preMoveCheckListError = reportsService.generatePreMoveCheckList(project.id, moveEvent, viewUnpublished).allErrors.size()
 
 		try {
 			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
 			//set MIME TYPE as Excel
 			response.setContentType( "application/vnd.ms-excel" )
-			def filename = 	"${project.name} - ${moveEventInstance.name} Runbook v${currentVersion} -${today}"
+			def filename = 	"${project.name} - ${moveEvent.name} Runbook v${currentVersion} -${today}"
 			filename = filename.replace(".xls",'')
 			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
 			response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
@@ -752,45 +768,49 @@ class MoveEventController {
 					        				'duration', 'estStart','estFinish', 'actStart','actFinish', 'workflow'
 				        				]
 
+			def scheduleColumnList = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role', 'assignedTo', '',
+				{ it.durationInMinutes() }, '', 
+				'estStart', 'estFinish', 'actStart', 'actFinish', 'workflow'
+			]
+
 			def postMoveColumnList = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status', 'estFinish', 'dateResolved' , 'notes',
-				        				'taskDependencies','duration','estStart','estFinish','actStart',
-				        				'actFinish','workflow'
-				        			]
+				'taskDependencies','duration','estStart','estFinish','actStart',
+				'actFinish','workflow'
+			]
 						
 			def serverColumnList = ['id', 'application', 'assetName', '','serialNumber', 'assetTag', 'manufacturer', 'model', 'assetType', '', '', '']
 			
 			def appColumnList = ['assetName', 'appVendor', 'appVersion', 'appTech', 'appAccess', 'appSource','license','description',
-								 'supportType', 'sme', 'sme2', 'businessUnit','','retireDate','maintExpDate','appFunction',
-								 'environment','criticality','moveBundle', 'planStatus','userCount','userLocations','useFrequency',
-								 'drRpoDesc','drRtoDesc','moveDowntimeTolerance','validation','latency','testProc','startupProc',
-								 'url','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8'
-								 ]
+				'supportType', 'sme', 'sme2', 'businessUnit','','retireDate','maintExpDate','appFunction',
+				'environment','criticality','moveBundle', 'planStatus','userCount','userLocations','useFrequency',
+				'drRpoDesc','drRtoDesc','moveDowntimeTolerance','validation','latency','testProc','startupProc',
+				'url','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8'
+			]
 			
 			def impactedAppColumnList =['id' ,'assetName' ,'' ,'startupProc' ,'description' ,'sme' ,'' ,'' ,'' ,'' ,'' ,'' ]
 			
 			def dbColumnList = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType','retireDate', 'maintExpDate',
-								'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
-								'custom6','custom7','custom8'
-								]
+				'environment','ipAddress', 'planStatus','custom1','custom2', 'custom3', 'custom4','custom5',
+				'custom6','custom7','custom8'
+			]
 			
 			def filesColumnList = ['id', 'assetName', 'fileFormat', 'size', 'description', 'supportType','retireDate', 'maintExpDate',
-								   'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
-								   'custom6','custom7','custom8'
-								  ]
+				'environment','ipAddress', 'planStatus','custom1','custom2','custom3','custom4','custom5',
+				'custom6','custom7','custom8'
+			]
 			
 			def othersColumnList = ['id','application','assetName', 'shortName', 'serialNumber', 'assetTag', 'manufacturer',
-									'model','assetType','ipAddress', 'os', 'sourceLocation', 'sourceLocation','sourceRack',
-									'sourceRackPosition','sourceChassis','sourceBladePosition',
-									'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetChassis',
-									'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
-									'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
-			   						]
+				'model','assetType','ipAddress', 'os', 'sourceLocation', 'sourceLocation','sourceRack',
+				'sourceRackPosition','sourceChassis','sourceBladePosition',
+				'targetLocation','targetRoom','targetRack', 'targetRackPosition','targetChassis',
+				'targetBladePosition','custom1','custom2','custom3','custom4','custom5','custom6','custom7','custom8',
+				'moveBundle','truck','cart','shelf','railType','priority','planStatus','usize'
+			]
 			
 			def unresolvedIssueColumnList = ['id', 'comment', 'commentType','commentAssetEntity','resolution','resolvedBy','createdBy',
-			              				'dueDate','assignedTo','category','dateCreated','dateResolved', 'assignedTo','status','taskDependencies','duration','estStart','estFinish','actStart',
-			              				'actFinish','workflow'
-			              			]
-			
+				'dueDate','assignedTo','category','dateCreated','dateResolved', 'assignedTo','status','taskDependencies','duration','estStart','estFinish','actStart',
+				'actFinish','workflow'
+			]			
 			
 			def projManagers = projectService.getProjectManagersByProject(project.id)?.partyIdTo
 
@@ -810,8 +830,8 @@ class MoveEventController {
 			WorkbookUtil.addCell(summarySheet, 2, 3, String.valueOf(project.name ))
 			WorkbookUtil.addCell(summarySheet, 2, 6, String.valueOf(projManagers.join(",")))
 			WorkbookUtil.addCell(summarySheet, 4, 6, String.valueOf(""))
-			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEventInstance.name ))
-			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEventInstance.name ))
+			WorkbookUtil.addCell(summarySheet, 2, 4, String.valueOf(moveEvent.name ))
+			WorkbookUtil.addCell(summarySheet, 2, 10, String.valueOf(moveEvent.name ))
 			
 			moveBundleService.issueExport(assets, serverColumnList, serverSheet, tzId, 5, viewUnpublished)
 			
@@ -830,9 +850,18 @@ class MoveEventController {
 			moveBundleService.issueExport(preMoveIssue, preMoveColumnList, preMoveSheet, tzId, 7, viewUnpublished)
 			
 			moveBundleService.issueExport(postMoveIssue, postMoveColumnList,  postMoveSheet, tzId, 7, viewUnpublished)
-			  
-			
-			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' ")
+
+			// Update the Schedule/Tasks Sheet with the correct start/end times
+			Map times = moveEvent.getEventTimes()
+			times.start = TimeUtil.convertInToUserTZ(times.start, tzId)
+			times.completion = TimeUtil.convertInToUserTZ(times.completion, tzId)
+			WorkbookUtil.addCell(scheduleSheet, 5, 1, String.valueOf(dateTimeFormat.format(times.start)))
+			WorkbookUtil.addCell(scheduleSheet, 5, 3, String.valueOf(dateTimeFormat.format(times.completion)))
+
+			// Update the project staff
+			// TODO : JPM 11/2015 : Project staff should get list from ProjectService instead of querying PartyRelationship
+			def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = ${project.id} and p.roleTypeCodeFrom = 'PROJECT' ")
+
 			for ( int r = 8; r <= (projectStaff.size()+7); r++ ) {
 				def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = ${projectStaff[0].partyIdTo.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
 				WorkbookUtil.addCell(personelSheet, 1, r, String.valueOf( projectStaff[r-8].partyIdTo?.toString() ))

@@ -13,7 +13,7 @@ else
    CMD="$1 $2 $3 $4 $5 $6 $7 $8"
 fi
 
-export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M -server"
+export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -server -Djava.net.preferIPv4Stack=true"
 
 OPT="-reloading"
 OPT="$OPT -Dtdstm.config.location=/etc/tdstm-config.groovy"

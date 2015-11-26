@@ -1155,7 +1155,8 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 			status: 'Ready',
 			taskDependency: "",
 			taskSuccessor: "",
-			workflowTransition: ''
+			workflowTransition: '',
+			canEdit: true
 		};
 	};
 
@@ -1190,6 +1191,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		temp.status = ac.status;
 		temp.taskNumber = ac.taskNumber;
 		temp.workflowTransition = ac.workflowTransition ? ac.workflowTransition.id.toString() : '';
+		temp.canEdit = response.canEdit;
 
 		return temp;
 	};
@@ -1893,7 +1895,8 @@ tds.comments.directive.CommentInnerList = function(commentService, alerts, utils
 			assetId: '@assetId',
 			prefValue: '@prefValue',
 			viewUnpublishedValue: '@viewUnpublishedValue',
-			hasPublishPermission: '@hasPublishPermission'
+			hasPublishPermission: '@hasPublishPermission',
+			canEditComments: '@canEditComments'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/comments-inner-list-template.html'),
 		link: function(scope, element, attrs) {
@@ -1956,7 +1959,9 @@ tds.comments.directive.GridButtons = function(utils, commentUtils) {
 			assetId: '@assetId', //=rowId
 			assetType: '@assetType',
 			tasks: '@tasks',
-			comments: '@comments'
+			comments: '@comments',
+			canEditTasks: '@canEditTasks',
+			canEditComments: '@canEditComments'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/grid-buttons-template.html'),
 		link: function(scope, element, attrs) {

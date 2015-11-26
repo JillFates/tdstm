@@ -77,9 +77,13 @@ class Person extends Party {
 	}
 	
 	static transients = [
+		'assignedProjects',
+		'assignedTeams',
 		'company',
+		'suitableTeams',
+		'lastNameFirst',
+		'lastNameFirstAndTitle'
 	]
-
 
 	/**
 	 * This method returns the company for this person.
@@ -89,19 +93,61 @@ class Person extends Party {
 	}
 
 	/**
-	 * Get's the person's roles for a specified company
-	 * @param Integer - company id
-	 * @return Array of Staff Functions
+	 * Used to get the projects that the person is assigned to
 	 */
-	def getPersonRoles(companyId){
-		partyRelationshipService.getCompanyStaffFunctions(companyId, this.id)
+	List<Project> getAssignedProjects() {
+		String query = "SELECT p.partyIdFrom.id \
+			FROM PartyRelationship p \
+			WHERE p.partyRelationshipType = 'PROJ_STAFF' AND \
+			p.partyIdTo = :person AND \
+			p.roleTypeCodeFrom = 'PROJECT' AND \
+			p.roleTypeCodeTo = 'STAFF' ) \
+			ORDER BY name"
+		List projects = Project.executeQuery(query, [person:this])
+
+		return projects
 	}
-	
+
+	/**
+	 * Used to get the teams that a person is assigned to for a given project
+	 * @param project - the project to search for teams
+	 * @return a list of the RoleType records that represent the teams that a person belongs to a project
+	 */
+	List<RoleType> getAssignedTeams(Project project) {
+		String query = "SELECT roleTypeCodeTo \
+			FROM PartyRelationship p \
+			WHERE p.partyRelationshipType = 'PROJ_STAFF' AND \
+			p.roleTypeCodeFrom = 'PROJECT' AND \
+			p.partyIdFrom = :project AND \
+			p.partyIdTo = :person AND \
+			p.roleTypeCodeTo <> 'STAFF' ) \
+			ORDER BY p.description"
+		List teams = RoleType.executeQuery(query, [project:project, person:this])
+		return teams
+	}
+
+	/**
+	 * Used to retrieve the teams that a person has been indicated as being suitable to participate on	 
+	 * @return An array of the RoleType representing the teams that the person is associated with
+	 */
+	List<RoleType> getSuitableTeams() {
+		String query = "SELECT p.roleTypeCodeTo \
+			FROM PartyRelationship p \
+			WHERE p.partyRelationshipType = 'STAFF' AND \
+			p.roleTypeCodeFrom = 'COMPANY' AND \
+			p.partyIdFrom = :company AND \
+			p.partyIdTo = :person AND \
+			p.roleTypeCodeTo <> 'STAFF' ) \
+			ORDER BY description"
+		List teams = RoleType.executeQuery(query, [company:this.company, person:this])
+		return teams
+	}
+
 	/**
 	 * This method is used to get person's name in 'LastName, FirstName MiddleName' format 
 	 * @return person name in 'LastName, FirstName MiddleName' format
 	 */
-	def getLastNameFirst(){
+	String getLastNameFirst(){
 		return ( lastName ? "${lastName}, ": '' ) + firstName + (  middleName ? " $middleName" : '' )
 	}
 	
@@ -109,7 +155,7 @@ class Person extends Party {
 	 * This method is used to get person's name in 'LastName, FirstName MiddleName - Title' format
 	 * @return person name in 'LastName, FirstName MiddleName - Title' format
 	 */
-	def getLastNameFirstAndTitle(){
+	String getLastNameFirstAndTitle(){
 		return lastNameFirst+ ( title ? " - $title" : '' )
 	}
 	

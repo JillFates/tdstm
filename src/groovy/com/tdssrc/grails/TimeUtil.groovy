@@ -345,4 +345,32 @@ class TimeUtil {
 		}
 		return elapsed
 	}
+
+	/** 
+	 * Used to retrieve the Timezone offset of a given TZ to GMT as a string
+	 * @return The string representation of the offset to GMT (e.g. Americas/New York EST would be -4:00)
+	 */
+	public static String systemTimezoneOffsetToGMT() {
+		TimeZone tz = TimeZone.getDefault()
+		return timezoneOffset(tz)
+	}
+
+	/** 
+	 * Used to retrieve the Timezone offset of the system to GMT as a string
+	 * @param tz - a timezone to use compute the offset to GMT
+	 * @return The string representation of the offset to GMT (e.g. Americas/New York EST would be -4:00)
+	 */
+	public static String timezoneOffsetToGMT(TimeZone tz=null) {
+		Calendar cal = GregorianCalendar.getInstance(tz)
+		BigDecimal offsetInMillis = tz.getOffset(cal.getTimeInMillis())
+
+		//Double hr = (offsetInMillis / 3600000).toDouble()
+		BigDecimal msecInAHr = new BigDecimal('3600000')
+		int hr = offsetInMillis.divideToIntegralValue(msecInAHr).intValue()
+		int min = Math.abs((offsetInMillis / 60000).remainder(60)).intValue()
+
+		// println "hr=[$hr] min=[$min]"
+		String offset = String.format("%02d:%02d", hr.abs(), min)
+		return (hr >= 0 ? '+' : '-') + offset
+	}
 }

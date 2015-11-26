@@ -8,6 +8,8 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 
 import org.springframework.transaction.annotation.Transactional
 
@@ -106,7 +108,8 @@ class DeviceService {
 
 		def model = [
 			assetEntity: assetEntity, 
-			label: frontEndLabel
+			label: frontEndLabel,
+			canEdit: RolePermissions.hasPermission("AssetEdit")
 		]
 
 		model.putAll( assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity) )
@@ -256,8 +259,21 @@ class DeviceService {
 
 		// Assign all of the standard properties to the device class
 		(AssetEntityService.ASSET_PROPERTIES + AssetEntityService.CUSTOM_PROPERTIES + AssetEntityService.DEVICE_PROPERTIES).each { p ->
-			if (params.containsKey(p))
-				device[p] = params[p]
+			if (params.containsKey(p)) {
+				if (AssetEntityService.ASSET_DATE_PROPERTIES.contains(p)) {
+					if (params[p] instanceof String) {
+						if (StringUtil.isBlank(params[p])) {
+							device[p] = null
+						} else {
+							device[p] = TimeUtil.parseDate(params[p])
+						}
+					} else {
+						device[p] = params[p]	
+					}
+				} else {
+					device[p] = params[p]
+				}
+			}
 		}
 
 		// Would prefer using the bindData but have been having all sorts of issues with it

@@ -122,15 +122,17 @@ class ControllerService {
 	 *
 	 * @param perm - the permission (String) or permissions List<String> that the user requires
 	 */
-	boolean checkPermissionForWS(perm) {
+	boolean checkPermissionForWS(perm, logError=true) {
 		def user = securityService.getUserLogin()
 		boolean hasPerm = hasPermission(user, perm)
 
-		if (!hasPerm) {
+		if (!hasPerm && logError) {
 			def request = RequestContextHolder.currentRequestAttributes().request
 			securityService.reportViolation("attempted to access ${request.forwardURI} without permission ($perm)", user)
 			throw new UnauthorizedException("Don't have the permission $perm")
 		}
+
+		return hasPerm
 	}
 
 	/**

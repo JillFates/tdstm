@@ -2,6 +2,8 @@ import org.apache.shiro.SecurityUtils
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.exceptions.ServiceException
@@ -22,6 +24,7 @@ class UserLoginController {
 	def jdbcTemplate
 	def controllerService
 	def auditService
+	def personService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -151,13 +154,15 @@ class UserLoginController {
 		
 		def map = [controller:'userLogin', action:'listJson', id:"${params.companyId}"]
 		def listJsonUrl = HtmlUtil.createLink(map)
+		def acceptIconUrl = HtmlUtil.resource([dir: 'icons', file: 'accept.png', absolute: true])
+		def acceptImgTag = '<img src="' + acceptIconUrl + '"></img>'
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = userLoginInstanceList?.collect {
 			[ cell: [ [id:it.userLoginId, username:it.username, lockedOutUntil:it.locked, lockedOutTime:TimeUtil.ago(TimeUtil.nowGMT(), it.locked), failedLoginAttempts:it.failedAttempts], 
 			'<a href="'+HtmlUtil.createLink([controller:'userLogin', action:'show', id:"${it.userLoginId}"])+'">'+it.username+'</a>',
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.fullname+'</a>', 
-			it.roles, it.company, (it.isLocal) ? ('<img src="../icons/accept.png"></img>') : (''), it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
+			it.roles, it.company, (it.isLocal) ? (acceptImgTag) : (''), it.lastLogin, it.dateCreated, it.expiryDate ], id: it.userLoginId ]}
 			
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
@@ -213,15 +218,17 @@ class UserLoginController {
 			flash.message = "UserLogin not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
 		} else {
+			def currentUser = securityService.getUserLogin()
 			def person = userLoginInstance.person
 			def availableRoles = userPreferenceService.getAvailableRoles( person )
 			def assignedRoles = userPreferenceService.getAssignedRoles( person )
 			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-			def projectList = Project.list(sort:'name', order:'asc')
+			def projectList = personService.getAvailableProjects(person)
 			def projectId = userPreferenceService.getPreferenceByUserAndCode(userLoginInstance, "CURR_PROJ")
-			def maxLevel = securityService.getMaxAssignedRole(securityService.getUserLogin().person).level
+			def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level
+			def isCurrentUserLogin = (currentUser.id == userLoginInstance.id)
 			return [ userLoginInstance : userLoginInstance, availableRoles:availableRoles, assignedRoles:assignedRoles, companyId:companyId, roleList:roleList,
-					projectList:projectList,  projectId:projectId, minPasswordLength:minPasswordLength, maxLevel: maxLevel ]
+					projectList:projectList,  projectId:projectId, minPasswordLength:minPasswordLength, maxLevel: maxLevel, isCurrentUserLogin: isCurrentUserLogin ]
 		}
 	}
 
@@ -234,7 +241,7 @@ class UserLoginController {
 		String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		String errMsg
 		try {
-			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom.person, tzId, false)
+			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom, tzId, false)
 		} catch (UnauthorizedException e) {
 			errMsg = e.getMessage()
 		} catch (InvalidParamException e) {
@@ -305,7 +312,7 @@ class UserLoginController {
 		def project = securityService.getUserCurrentProject()
 
 		def currentUser = securityService.getUserLogin()
-		def projectList = projectService.getUserProjectsOrderBy(currentUser, false, ProjectStatus.ACTIVE)
+		def projectList = personService.getAvailableProjects(person?person:currentUser.person)
 		def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
 		def maxLevel = securityService.getMaxAssignedRole(currentUser.person).level 
 		return ['userLoginInstance':userLoginInstance, personInstance:person, companyId:companyId, roleList:roleList, projectList:projectList,
@@ -319,85 +326,48 @@ class UserLoginController {
 			return
 
 		UserLogin byWhom = securityService.getUserLogin()
+		UserLogin userLogin
+		String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		String errMsg
 
-		try{
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-			def expiryDate = params.expiryDate
-			if(expiryDate){
-				params.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
-			}
-			def passwordExpirationDate = params.passwordExpirationDate
-			if(passwordExpirationDate){
-				params.passwordExpirationDate =  GormUtil.convertInToGMT(formatter.parse( passwordExpirationDate ), tzId)
-			}
-			def lockedOutUntil = params.lockedOutUntil
-			if(lockedOutUntil){
-				params.lockedOutUntil =  GormUtil.convertInToGMT(formatter.parse( lockedOutUntil ), tzId)
-			}
-		} catch (Exception ex){
-			println "Invalid date format"
+		try {
+			userLogin = securityService.createOrUpdateUserLoginAndPermissions(params, byWhom, tzId, true)
+		} catch (UnauthorizedException e) {
+			errMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			errMsg = e.getMessage()
+		} catch (DomainUpdateException e) {
+			errMsg = e.getMessage()
+		} catch (e) {
+			log.error "save() failed : " + ExceptionUtil.stackTraceToString(e)
+			errMsg = 'An error occurred that prevents creates a user'
 		}
 
-		def userLoginInstance = new UserLogin(params)
-		//userLoginInstance.createdDate = new Date()
-		def companyId = params.companyId
-		//convert password onto Hash code
-		def success = false
-		def token = true
-		def securityViolations = false
-		if (params.isLocal)
-			token = securityService.validPasswordStrength(params['username'], params['password'])
-		if (token) {
-			userLoginInstance.applyPassword(params['password'])
-			
-			if(params.isLocal){
-				if(params.forcePasswordChange)
-					userLoginInstance.forcePasswordChange = 'Y'
-				else
-					userLoginInstance.forcePasswordChange = 'N'
-			}else{
-				userLoginInstance.isLocal = false
-				userLoginInstance.forcePasswordChange = 'N'
-			}
-			if(!userLoginInstance.hasErrors() && userLoginInstance.save()) {
-				def assignedRoles = request.getParameterValues("assignedRole");
-				def person = params.person.id
-				def personInstance = Person.findById( person )
-				personInstance.active = userLoginInstance.active
-				securityViolations = userPreferenceService.setUserRoles(assignedRoles, person)
-				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "START_PAGE", "User Dashboard")
-				userPreferenceService.addOrUpdatePreferenceToUser(userLoginInstance, "CURR_PROJ", params.project)
-				def tZPreference = new UserPreference()
-				tZPreference.userLogin = userLoginInstance
-				tZPreference.preferenceCode = "CURR_TZ"
-				tZPreference.value = "EDT"
-				tZPreference.save( insert: true)
-				flash.message = "UserLogin ${userLoginInstance} created"
-				redirect( action:"show", id:userLoginInstance.id, params:[ companyId:companyId ] )
-				success = !securityViolations
-				auditService.saveUserAudit(UserAuditBuilder.newUserLogin(byWhom, userLoginInstance.username))
+		if (errMsg) {
+			flash.message = errMsg
+			Map model = [ companyId:params.companyId ]
+			redirect( action:"create", id:params.personId, params:model)
+		} else {
+			flash.message = "UserLogin ${userLogin} created"
+			redirect( action:"show", id:userLogin.id, params:[ companyId:params.companyId ] )
+		}
+
+	}
+
+	/*======================================================
+	 *  Update recent page load time into userLogin
+	 *=====================================================*/
+	def updateLastPageLoad() {
+		def principal = SecurityUtils.subject?.principal
+		if( principal ){
+			def userLogin = UserLogin.findByUsername( principal )
+			if(userLogin){
+				userLogin.lastPage = TimeUtil.nowGMT()
+				userLogin.save(flush:true)
+				session.REDIRECT_URL = params.url	
 			}
 		}
-		if (!success) {
-			def assignedRole = request.getParameterValues("assignedRole");
-			def personId = params.personId
-			def personInstance
-			if(personId != null ){
-				personInstance = Person.findById( personId )
-			}
-			if (securityViolations) {
-				log.debug "securityViolations = $securityViolations"
-				securityService.securityViolations("Attempted to change $userLoginInstance without proper permissions : $securityViolations", byWhom)
-				flash.message = "It appears you do not have the required permission to make the requested change. This violation has been reported."
-			} else {
-				flash.message = "Password must follow all the requirements"
-			}
-			def roleList = RoleType.findAll("from RoleType r where r.description like 'system%' order by r.description ")
-			def minPasswordLength = securityService.getUserLocalConfig().minPasswordLength ?: 8
-				
-			render(view:'create',model:[ userLoginInstance:userLoginInstance,assignedRole:assignedRole,personInstance:personInstance, companyId:companyId, roleList:roleList, minPasswordLength:minPasswordLength ])
-		}
+		render "SUCCESS"
 	}
 
 	/**

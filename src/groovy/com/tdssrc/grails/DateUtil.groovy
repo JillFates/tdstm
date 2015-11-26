@@ -13,20 +13,33 @@ class DateUtil {
 	protected static simpleDateformatter = new SimpleDateFormat("MM/dd/yyyy")
 	protected static mdySdf = new SimpleDateFormat("MM/dd/yyyy")
 
+
 	/**
-	 * used to convert a string to a date in the format mm/dd/yyyy or m/d/yy
+	 * Used to convert a date into a String with the format mm/dd/yyyy 
+	 * @param the Date to convert 
+	 * @return String of the format
+	 */
+	static String formatDate(Date date) {
+		if (date) {
+			return simpleDateformatter.format(date)
+		} else {
+			return ''
+		}
+	}
+
+	/**
+	 * Used to convert a string to a date in the format mm/dd/yyyy or m/d/yy
 	 * @param the string to convert to a date
 	 * @return the date representation of the string or null if formating failed
 	 */
 	static Date parseDate(String val) {
 		def date
 		def newVal
-		if (val.size() ) {
-			newVal = val.replaceAll('/','-')
-			def e = newVal.split('-')
+		if (val?.size() ) {
+			newVal = val.replaceAll('-','/')
+			def e = newVal.split('/')
 			if (e.size() != 3) {
-				// log.debug "parseDate $val missing 3 elements"
-				return null
+				throw new java.text.ParseException()
 			}
 
 			// Convert two digit year to 4 digits if necessary
@@ -35,15 +48,11 @@ class DateUtil {
 
 			if (e[2].size() != 4) {
 				// log.debug "parseDate $val year not 4 digits"
-				return null				
+				throw new java.text.ParseException("Year has invalid format ($e[2])", 3)			
 			}
-			newVal = "${e[0]}-${e[1]}-${e[2]} 00:00:00 GMT"
+			newVal = "${e[0]}/${e[1]}/${e[2]} 00:00:00 GMT"
 
-			try {
-				date = formatter.parse(newVal)
-			} catch (Exception ex) {
-				println "parseDate $val failed to parse ${ex.getMessage()}"
-			}
+			date = simpleDateformatter.parse(newVal)
 		}
 		return date
 	}

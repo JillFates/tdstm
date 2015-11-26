@@ -155,21 +155,20 @@
                     </tr>
                 </table>
                 
-                <tds:hasPermission permission='CommentCrudView'>
-                    <div>
-                        <div class="buttons" style="white-space: nowrap;">
-                            <span class="button" class="slide">
-                            <span class="slide">
-                            <input class="tableedit" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" />
-                            </span>
-                            <span id="fromAssetId" class="slide">
-                            <input class="tabledelete" type="button" value="Delete" ng-click="deleteComment()" />
-                            </span>
-                            </span>
-                            <action-bar comment='ac' show-details='false' update-table='false'></action-bar>
-                        </div>
+                <div>
+                    <div class="buttons" style="white-space: nowrap;">
+                        <span class="button" class="slide">
+                        <span class="slide">
+                        <input class="tableedit" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" />
+                        </span>
+                        <span id="fromAssetId" class="slide">
+                        <input class="tabledelete" type="button" value="Delete" ng-click="deleteComment()" />
+                        </span>
+                        </span>
+                        <action-bar comment='ac' show-details='false' update-table='false'></action-bar>
                     </div>
-                </tds:hasPermission>
+                </div>
+
             </div>
         </div>
         <loading-indicator></loading-indicator>

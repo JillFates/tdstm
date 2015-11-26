@@ -3,9 +3,10 @@ package com.tdssrc.grails;
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import com.tdsops.common.grails.ApplicationContextHolder
+import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod 
+import org.hibernate.ScrollableResults
+import org.hibernate.ScrollMode
 
-import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod  
- 
 public class GormUtil {
 
     private static BindDynamicMethod bindDynamicMethod = new BindDynamicMethod()  
@@ -100,8 +101,8 @@ public class GormUtil {
 	}
 	
 	/**
-	 * This method is used to generate a list of the domain property names that the have the specified constraint. If at value is passed then 
-	 * only those properties having the constraint value as such will be returned.
+	 * This method is used to generate a list of the domain property names that the have the specified constraint. If a
+	 * value is passed then only those properties having the constraint value will be returned.
 	 * @param domain - the Domain class to find properties within
 	 * @param constraintName - String that defines the constraint name (presently supports nullable and blank)
 	 * @param value - if passed then it will check the constraint value against that to further filter the list
@@ -171,6 +172,36 @@ public class GormUtil {
 		if (value != null && value && domainObj[propName] != value ) {
 			domainObj[propName] = value
 		}
+	}
+
+	/**
+	 * Used to merge/reattach domain objects with a hibernate session
+	 * @param session - the Hibernate session object
+	 * @param domainObjects - a list of domain objects that need to be merged back into the session after the session flush
+	 */
+	static List mergeWithSession(org.hibernate.impl.SessionImpl session, List<Object> domainObjects) {
+		if (domainObjects != null) {
+			for (int i=0; i < domainObjects.size(); i++) {
+				domainObjects[i] = session.merge(domainObjects[i])
+			}
+		}
+		return domainObjects
+	}
+
+	/**
+	 * Used to flush/clear the hibernate session to eliminate memory/performance issues
+	 * @param session - the Hibernate session object
+	 * @param rowsProcessed - the count of how many rows have been proceeded
+	 * @param flushAfterLimit - the limit at which the session is flushed (default 50)
+	 * @return true if the limit was hit and the session was flushed otherwise false
+	 */
+	static boolean flushAndClearSession(org.hibernate.impl.SessionImpl session, int rowsProcessed, int flushAfterLimit=50) {
+		if (rowsProcessed % flushAfterLimit == 0) {
+			session.flush()
+			session.clear()
+			return true
+		}
+		return false
 	}
 
 }

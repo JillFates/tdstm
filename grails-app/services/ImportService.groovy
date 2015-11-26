@@ -204,18 +204,6 @@ class ImportService {
 	}
 
 	/**
-	 * Used to clear out the hibernate session of objects no longer needed to help performance. It will also merge the existing 
-	 * @param project - the project object
-	 * @param userLogin - the User login object
-	 * @param dtb - the data transfer batch being processed
-	 */
-	void resetHibernateSession() {
-		def hibernateSession = sessionFactory.getCurrentSession()
-		hibernateSession.flush()
-		hibernateSession.clear()
-	}
-
-	/**
 	 * This method is used to set the Hibernate Session FlushMode which might be helpful under certain condiitions
 	 */
 	private void setSessionFlushMode( flushMode=FlushMode.COMMIT ) {
@@ -246,6 +234,7 @@ class ImportService {
 	 */
 	Map reviewImportBatch(Long projectId, Long userLoginId, Long batchId, String progressKey) {
 		def startedAt = new Date()
+
 		String errorMsg = ''
 
 		String methodName = 'reviewImportBatch()'
@@ -372,7 +361,7 @@ class ImportService {
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
 
-			resetHibernateSession()
+			project = flushAndClearSession(sessionFactory.currentSession, rowNum, project)
 			
 		} // for
 
@@ -647,6 +636,7 @@ class ImportService {
 		// Flag if we want performance information throughout the method
 		boolean performance=true
 		def startedAt = new Date()
+		def importStartedAt = new Date()
 
 		String methodName = 'processApplicationImport()'
 		def newVal
@@ -706,6 +696,7 @@ class ImportService {
 		//
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			now = new Date()
+			startedAt = new Date()
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
 
@@ -813,10 +804,7 @@ class ImportService {
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
 
-			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
-				resetHibernateSession()
-				project = Project.get(projectId)
-			}
+			project = flushAndClearSession(sessionFactory.currentSession, rowNum, project)
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
@@ -847,7 +835,7 @@ class ImportService {
 			sb.append('</ul>')
 		}
 
-		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
+		def elapsedTime = TimeUtil.elapsed(importStartedAt).toString()
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 
 		sb.append("<br>Process batch took $elapsedTime to complete")
@@ -875,6 +863,7 @@ class ImportService {
 
 		boolean performance=true
 		def startedAt = new Date()
+		def importStartedAt = new Date()
 
 		Project project = Project.get(projectId)
 		UserLogin userLogin = UserLogin.get(userLoginId)
@@ -933,6 +922,7 @@ class ImportService {
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			try {
 				now = new Date()
+			startedAt = new Date()
 
 				def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 				rowNum = rowId+1
@@ -1155,10 +1145,7 @@ class ImportService {
 
 				jobProgressUpdate(progressKey, rowNum-1, assetCount)
 
-				if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
-					resetHibernateSession()
-					project = Project.get(projectId)
-				}
+				project = flushAndClearSession(sessionFactory.currentSession, rowNum, project)
 
 				log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
@@ -1171,6 +1158,9 @@ class ImportService {
 					asset.discard()
 				}
 			}
+
+			
+
 
 		} // for
 
@@ -1212,7 +1202,7 @@ class ImportService {
 			sb.append('</ul>')
 		}
 
-		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
+		def elapsedTime = TimeUtil.elapsed(importStartedAt).toString()
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
@@ -1234,6 +1224,8 @@ class ImportService {
 		def domainClass = AssetClass.domainClassFor(assetClass)
 
 		def startedAt = new Date()
+		def importStartedAt = new Date()
+
 		boolean performance=true
 		Project project = Project.get(projectId)
 		UserLogin userLogin = UserLogin.get(userLoginId)
@@ -1276,6 +1268,8 @@ class ImportService {
 
 		for ( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			now = new Date()
+			startedAt = new Date()
+
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
 
@@ -1318,10 +1312,7 @@ class ImportService {
 
 			jobProgressUpdate(progressKey, rowNum, assetCount)
 
-			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
-				resetHibernateSession()
-				project = Project.get(projectId)
-			}
+			project = flushAndClearSession(sessionFactory.currentSession, rowNum, project)
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
@@ -1350,7 +1341,7 @@ class ImportService {
 			sb.append('</ul>')
 		}
 
-		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
+		def elapsedTime = TimeUtil.elapsed(importStartedAt).toString()
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
@@ -1373,6 +1364,7 @@ class ImportService {
 
 		boolean performance=true
 		def startedAt = new Date()
+		def importStartedAt = new Date()
 
 		Project project = Project.get(projectId) 
 		UserLogin userLogin = UserLogin.get(userLoginId)
@@ -1415,6 +1407,7 @@ class ImportService {
 
 		for( int dataTransferValueRow=0; dataTransferValueRow < assetCount; dataTransferValueRow++ ) {
 			now = new Date()
+			startedAt = new Date()
 
 			def rowId = dataTransferValueRowList[dataTransferValueRow].rowId
 			def rowNum = rowId+1
@@ -1466,10 +1459,7 @@ class ImportService {
 			// Update status and clear hibernate session
 			jobProgressUpdate(progressKey, rowNum, assetCount)
 
-			if (rowNum.mod(HIBERNATE_BATCH_SIZE) == 0) {
-				resetHibernateSession()
-				project = Project.get(projectId)
-			}
+			project = flushAndClearSession(sessionFactory.currentSession, rowNum, project)
 
 			log.info "$methodName processed row $rowNum in ${TimeUtil.elapsed(startedAt)}"
 
@@ -1499,7 +1489,7 @@ class ImportService {
 			sb.append('</ul>')
 		}
 
-		def elapsedTime = TimeUtil.elapsed(startedAt).toString()
+		def elapsedTime = TimeUtil.elapsed(importStartedAt).toString()
 		log.info "$methodName Import process of $assetCount assets took $elapsedTime"
 		sb.append("<br>Elapsed time to process batch: $elapsedTime")
 
@@ -1595,6 +1585,21 @@ class ImportService {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Used to clear out the hibernate session of objects no longer needed to help performance. It will also merge the existing 
+	 * @param session - current hibernate session
+	 * @param rowsProcessed - number of row processed
+	 * @param project - the project object
+	 * @return current project
+	 */
+	def flushAndClearSession(session, rowsProcessed, project) {
+		def result = project
+		if (GormUtil.flushAndClearSession(session, rowsProcessed, HIBERNATE_BATCH_SIZE)) {
+			result = GormUtil.mergeWithSession(session, [project])[0]
+		}
+		return result
 	}
 
 }

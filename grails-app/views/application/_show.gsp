@@ -2,9 +2,9 @@
 	<tbody>
 		<tr>
 			<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>
-			<td style="font-weight:bold;" class="${config.assetName}">${applicationInstance.assetName}</td>
+			<td colspan="3" style="font-weight:bold;" class="${config.assetName}">${applicationInstance.assetName}</td>
 			<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
-			<td colspan="5" class="${config.description}">${applicationInstance.description}</td>
+			<td colspan="3" class="${config.description}">${applicationInstance.description}</td>
 		</tr>
 		<tr>
 			<td class="label" nowrap="nowrap"><label for="appAccess">Type</label></td>
@@ -60,9 +60,9 @@
 			<td class="label ${config.license} ${highlightMap.license?:''}" nowrap="nowrap"><label for="license">License</label></td>
 			<td class="valueNW ${config.license}">${applicationInstance.license}</td>
 			<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
-			<td class="${config.retireDate}"><tds:convertDate
-					date="${applicationInstance?.retireDate}"
-					timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+			<td class="${config.retireDate}">
+				<tds:formatDate date="${applicationInstance?.retireDate}" />
+			</td>
 			<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label></td>
 			<td class="${config.validation}">${applicationInstance.validation}</td>
 			<td class="label ${config.testProc} ${highlightMap.testProc?:''}" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
@@ -72,9 +72,8 @@
 			<td></td>
 			<td></td>
 			<td class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
-			<td class="valueNW ${config.maintExpDate}"><tds:convertDate
-					date="${applicationInstance?.maintExpDate}" formate="12hrs"
-					timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+			<td class="valueNW ${config.maintExpDate}">
+				<tds:formatDate date="${applicationInstance?.maintExpDate}" />
 			</td>
 			<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label></td>
 			<td class="valueNW ${config.latency}">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>

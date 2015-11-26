@@ -155,6 +155,12 @@ class ShiroActiveDirectoryRealm {
 			throw new DisabledAccountException('Your account has no assigned security role')
 		}
 
+		// Check if the userLogin is active
+		if(! userLogin.active){
+			log.warn "$logPrefix User $username is not active."
+			throw new DisabledAccountException('Your account has been locked out.')	
+		}
+
 		// Create a SimpleAccount to hand back to Shiro
 		def account = new SimpleAccount(userLogin.username, userLogin.password, 'ShiroActiveDirectoryRealm')
 

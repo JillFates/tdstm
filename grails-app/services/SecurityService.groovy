@@ -12,6 +12,7 @@ import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.exceptions.ServiceException
+import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.PasswordResetStatus
 import com.tdsops.tm.enums.domain.PasswordResetType
@@ -927,7 +928,7 @@ class SecurityService implements InitializingBean {
 	 * @param unencryptedPassword - the unencrypted password to set
 	 * @throws DomainUpdateException
 	 */
-	void setUserLoginPassword(UserLogin userLogin, String unencryptedPassword) throws DomainUpdateException, InvalidParamException {
+	void setUserLoginPassword(UserLogin userLogin, String unencryptedPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
 		// Make sure that the password strength is legitimate
 		if (! validPasswordStrength(userLogin.username, unencryptedPassword)) {
 			throw new InvalidParamException('The new password does not comply with password requirements')
@@ -940,7 +941,7 @@ class SecurityService implements InitializingBean {
 			throw new InvalidParamException('New password must be different from the old password')
 		}
 
-		if (! verifyPasswordHistory(userLogin, encryptedPassword)) {
+		if (!isNewUser && ! verifyPasswordHistory(userLogin, encryptedPassword)) {
 			throw new DomainUpdateException('Please provide a new password that was not previously used')
 		}
 
@@ -949,21 +950,26 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Used to update the UserLogin and the associated permissions for the account
 	 * @param params - the Map of the params coming from the browser form
-	 * @param byWhom - the Person that is performing the update
+	 * @param byWhom - the UserLogin that is performing the update
 	 * @param tzId - the timezone of the user performing the update
 	 * @param isNewUser - flag true indicating to create otherwise update an existing user
 	 * @return The UserLogin object that was created or updated 
 	 */
-	UserLogin createOrUpdateUserLoginAndPermissions(params, Person byWhom, String tzId, isNewUser) 
+	UserLogin createOrUpdateUserLoginAndPermissions(params, UserLogin byWhom, String tzId, isNewUser) 
 		throws InvalidParamException, UnauthorizedException {
 
 		UserLogin userLogin
 		Person person 
 		Project project
 
+		if (StringUtil.isBlank(params.username)) {
+			throw new InvalidParamException('Username should not be empty')
+		}
+
 		if (! NumberUtil.isPositiveLong(params.projectId)) {
 			throw new InvalidParamException('A project must be selected')
 		}
+
 		project = Project.get( params.projectId )
 		if (! project) {
 			throw new InvalidParamException('Specified project was not found')
@@ -974,11 +980,15 @@ class SecurityService implements InitializingBean {
 			if (! NumberUtil.isPositiveLong(params.personId)) {
 				throw new InvalidParamException('Person id was missing or invalid')
 			}
-			person = Person.get( params.id )
+			person = Person.get( params.personId )
 			if (!person) {
 				throw new InvalidParamException('Specified person was not found')
 			}
 			userLogin.person = person
+
+			if (StringUtil.isBlank(params.password)) {
+				throw new DomainUpdateException("Password should not be empty")
+			}
 
 		} else {
 			// Make sure we have a user to edit
@@ -996,7 +1006,7 @@ class SecurityService implements InitializingBean {
 		def personService = serviceHelperService.getService('person')
 
 		// Test that the user has access account being updated
-		personService.hasAccessToPerson(userLogin.person, byWhom, true, true)
+		personService.hasAccessToPerson(userLogin.person, byWhom.person, true, true)
 
 		// Determine if the specified person can be assigned to the specified project
 		// TODO Restore this feature, it disabled temporally by TM-4100
@@ -1034,11 +1044,6 @@ Dealt with:
 	isLocal: true
 */
 
-		// Attempt to set the password if it was set
-		if (params.password) {
-			setUserLoginPassword(userLogin, params.password)
-		}
-
 		if (params.isLocal) {
 			userLogin.isLocal = true
 			userLogin.forcePasswordChange = (params.forcePasswordChange ? 'Y' : 'N')
@@ -1074,7 +1079,8 @@ Dealt with:
 			throw new InvalidParamException("The $dateFile field has invalid format")
 		}
 
-		if (!StringUtil.isBlank(params.username) && !userLogin.username.equals(params.username)) {
+		def isCurrentUserLogin = (byWhom.id == userLogin.id)
+		if (!isCurrentUserLogin && !StringUtil.isBlank(params.username) && !userLogin.username.equals(params.username)) {
 			def newUserNameUserLogin = UserLogin.findByUsername(params.username)
 			if (newUserNameUserLogin != null) {
 				throw new InvalidParamException("The username you is selected is already in use.")
@@ -1083,6 +1089,13 @@ Dealt with:
 			}
 		}
 
+		// Attempt to set the password if it was set
+		if (params.password) {
+			setUserLoginPassword(userLogin, params.password, isNewUser)
+		}
+
+		userLogin.active = params.active
+
 		// Try to save the user changes
 		if (! userLogin.save(flush:true) ) {
 			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
@@ -1090,7 +1103,7 @@ Dealt with:
 
 		// When enabling user - enable Person
 		// When disable user - do NOT change Person
-		userLogin.active = params.active
+		
 		if ((userLogin.active == 'Y') && (person.active != 'Y')) {
 			person.active = 'Y'
 			if (!person.save(flush:true)) {
@@ -1122,6 +1135,17 @@ Dealt with:
 		//
 		if (! userPreferenceService.addOrUpdatePreferenceToUser(userLogin, "CURR_PROJ", params.projectId)) {
 			throw new DomainUpdateException('Unable to save selected project')
+		}
+		if (isNewUser) {
+			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, "START_PAGE", "User Dashboard")
+
+			def tZPreference = new UserPreference()
+			tZPreference.userLogin = userLogin
+			tZPreference.preferenceCode = "CURR_TZ"
+			tZPreference.value = "EDT"
+			tZPreference.save( insert: true)
+
+			auditService.saveUserAudit(UserAuditBuilder.newUserLogin(byWhom, userLogin.username))
 		}
 
 		return userLogin

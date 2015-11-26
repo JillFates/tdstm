@@ -41,11 +41,9 @@ $(document).ready(function() {
 		width : percentageOtherToValidate + "%"
 	}, 1000);
 
-	/*
-	$("#eventDataTableId").css('max-width',
-			$(window).width() * 2.0 / 100 + '%')
-	*/
-	
+
+	/*$("#eventDataTableId").css('max-width',
+			$(window).width() * 6.2/ 100 + '%')*/
 
 	$("#containerId").css('width',
 				$(window).width() - 50  + 'px')
@@ -65,7 +63,7 @@ $(document).ready(function() {
 
 	$(function(){
 	   if ($('#eventDataTableId').hasScrollBar())
-	   		$("#eventHeaderTableId").css("margin-top", "-26px")
+	   		$("#eventHeaderTableId").css("margin-top", "-4px")
 	});
 
 	(function($) {
@@ -78,6 +76,7 @@ $(document).ready(function() {
    
 	$(window).resize(
 		function() {
+
 			var scrollbarWasVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar was visible before the screen resize
 			/*$("#eventDataTableId").css('max-width',
 					$(window).width() *  2.0 / 100 + '%')
@@ -383,7 +382,7 @@ $(document).ready(function() {
 
 <%-- Execution Phase Section --%>
 
-			<div class="dashboard_div col-md-7 col-xs-7" style="float: left;">
+			<div class="dashboard_div col-md-8 col-xs-8 execution-phase" style="float: left;">
 				<span class="dashboard_head">Execution Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 
@@ -464,200 +463,198 @@ $(document).ready(function() {
 
 				</table>
 
-				<table class="dashboard_stat_table">
-					<tbody>
-						<tr>
-							<td style="width:138px;">
-								<div>
-									<table id="eventHeaderTableId" style="border: none;">
-										<thead>
-											<tr id="leftHeader"><th class="dashboard_stat_exec_td headerWidth"rowspan="3">&nbsp;</th> <td class="dashboard_stat_exec_td "></td></tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconApp.png')}"
-													height="12" /></td>
-												<td style="vertical-align: middle;">
-													<g:link controller="application" action="list" class="links">Applications</g:link>
-												</td>
-											</tr>
+				<div class="container-fluid">
+					<div class="row-fluid">
+						<div class="col-md-2 col-xs-2">
+							<div>
+								<table id="eventHeaderTableId" style="border: none;">
+									<thead>
+									<tr><th class="dashboard_stat_exec_td headerWidth">&nbsp;</th></tr>
+									<tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
+									<tr><td class="dashboard_stat_exec_td ">&nbsp;</td></tr>
+									</thead>
+									<tbody>
+									<tr>
+										<td class="dashboard_stat_icon_td"><img
+												src="${resource(dir:'images',file:'iconApp.png')}"
+												height="12" /></td>
+										<td style="vertical-align: middle;">
+											<g:link controller="application" action="list" class="links">Applications</g:link>
+										</td>
+									</tr>
 
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconServer.png')}"
-													height="12" /></td>
-												<td>
-													<g:link controller="assetEntity" params="[filter:'server']" action="list" class="links">Servers</g:link>
-												</td>
-											</tr>
+									<tr>
+										<td class="dashboard_stat_icon_td"><img
+												src="${resource(dir:'images',file:'iconServer.png')}"
+												height="12" /></td>
+										<td>
+											<g:link controller="assetEntity" params="[filter:'server']" action="list" class="links">Servers</g:link>
+										</td>
+									</tr>
 
-											<tr>
-												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td>
-													<g:link controller="assetEntity"
-														params="[filter:'physicalServer']"
-														action="list" class="links">&nbsp;&nbsp;&nbsp;Physical</g:link>
-												</td>
-											</tr>
+									<tr>
+										<td class="dashboard_stat_icon_td">&nbsp;</td>
+										<td>
+											<g:link controller="assetEntity"
+													params="[filter:'physicalServer']"
+													action="list" class="links">&nbsp;&nbsp;&nbsp;Physical</g:link>
+										</td>
+									</tr>
 
-											<tr>
-												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td>
-													<g:link controller="assetEntity"
-														params="[filter:'virtualServer']"
-														action="list" class="links">&nbsp;&nbsp;&nbsp;Virtual</g:link>
-												</td>
-											</tr>
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconDB.png')}"
-													height="12" />
-												</td>
-												<td><g:link controller="database" action="list"
+									<tr>
+										<td class="dashboard_stat_icon_td">&nbsp;</td>
+										<td>
+											<g:link controller="assetEntity"
+													params="[filter:'virtualServer']"
+													action="list" class="links">&nbsp;&nbsp;&nbsp;Virtual</g:link>
+										</td>
+									</tr>
+									<tr>
+										<td class="dashboard_stat_icon_td"><img
+												src="${resource(dir:'images',file:'iconDB.png')}"
+												height="12" />
+										</td>
+										<td><g:link controller="database" action="list"
 													class="links">Databases</g:link></td>
-											</tr>
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconStorage.png')}"
-													height="12" /></td>
-												<td nowrap="nowrap"><g:link controller="assetEntity" action="list" 
-													params="[filter:'storage']"
-													class="links">Physical Storage</g:link>
-												</td>
-											</tr>
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconStorage.png')}"
-													height="12" /></td>
-												<td><g:link controller="files" action="list"
+									</tr>
+									<tr>
+										<td class="dashboard_stat_icon_td"><img
+												src="${resource(dir:'images',file:'iconStorage.png')}"
+												height="12" /></td>
+										<td nowrap="nowrap"><g:link controller="assetEntity" action="list"
+																	params="[filter:'storage']"
+																	class="links">Physical Storage</g:link>
+										</td>
+									</tr>
+									<tr>
+										<td class="dashboard_stat_icon_td"><img
+												src="${resource(dir:'images',file:'iconStorage.png')}"
+												height="12" /></td>
+										<td><g:link controller="files" action="list"
 													class="links">Logical Storage</g:link>
-												</td>
-											</tr>
+										</td>
+									</tr>
 
-											<tr>
-												<td class="dashboard_stat_icon_td"><img
-													src="${resource(dir:'images',file:'iconNetwork.png')}"
-													height="12" /></td>
-												<td><g:link controller="assetEntity" 
+									<tr>
+										<td class="dashboard_stat_icon_td"><img
+												src="${resource(dir:'images',file:'iconNetwork.png')}"
+												height="12" /></td>
+										<td><g:link controller="assetEntity"
 													params="[filter:'other']"
 													action="list"
 													class="links">Other</g:link>
-												</td>
-											</tr>
-											<tr>
-												<td class="dashboard_stat_icon_td">&nbsp;</td>
-												<td><b>Open Tasks</b></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</td>
-							<td>
-								<div id="eventDataTableId" style="overflow-y: hidden;float: left;">
-									<table class="dashboard_stat_table">
-										<thead>
-											<tr>
-												<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom" id="rightHeader">
-													Unassigned
-												</th>
-								
+										</td>
+									</tr>
+									<tr>
+										<td class="dashboard_stat_icon_td">&nbsp;</td>
+										<td><b>Open Tasks</b></td>
+									</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="col-md-10 col-xs-10">
+							<div id="eventDataTableId" style="overflow-y: hidden;">
+								<table class="dashboard_stat_table">
+									<thead>
+									<tr>
+										<th rowspan="3" class="dashboard_stat_exec_td "  valign="bottom">
+											Unassigned
+										</th>
 
-												<g:each in="${moveEventList}" var="event">
-													<th class="dashboard_stat_exec_tdmc headerWidth" >
-														<g:link
-															controller="application" action="list"
-															params="[moveEvent:event.id]">
-															${event}
-														</g:link>
-													</th>
-												</g:each>
-												<th class="dashboard_stat_exec_tdmc"></th>
-											</tr>
-											<tr>
-												<g:each in="${moveEventList}" var="event">
-													<td class="dashboard_stat_exec_tdmc " style="font-size: 10px ;" nowrap>
-														<b>${eventStartDate[event.id]}</b>
-													</td>
-												</g:each>
-												<td></td>
-											</tr>
-											<tr>
-												<g:each in="${moveEventList}" var="event">
-													<td class="dashboard_stat_exec_tdmc" style="font-size: 10px;">
-														<b> ${event.runbookStatus ?: ''}</b>
-												</td>
-												</g:each>
-												<td>Done</td>
-											</tr>
-										</thead>
-										<tbody>
+										<g:each in="${moveEventList}" var="event">
+											<th class="dashboard_stat_exec_tdmc headerWidth" >
+												<g:link
+														controller="application" action="list"
+														params="[moveEvent:event.id]">
+													${event}
+												</g:link>
+											</th>
+										</g:each>
+										<th class="dashboard_stat_exec_tdmc"></th>
+									</tr>
+									<tr>
+										<g:each in="${moveEventList}" var="event">
+											<td class="dashboard_stat_exec_tdmc " style="font-size: 10px ;" nowrap>
+												<b>${eventStartDate[event.id]}</b>
+											</td>
+										</g:each>
+										<td></td>
+									</tr>
+									<tr>
+										<g:each in="${moveEventList}" var="event">
+											<td class="dashboard_stat_exec_tdmc" style="font-size: 10px;">
+												<b> ${event.runbookStatus ?: ''}</b>
+											</td>
+										</g:each>
+										<td>Done</td>
+									</tr>
+									</thead>
+									<tbody>
 
-											<%-- Applications --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:applicationCount, unassignedCount:unassignedAppCount, percDone:percAppDoneCount, controller:'application', filter:'application', list:appList]" 
-											/>
-			
-											<%-- Servers (Summary) --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:totalServerCount, unassignedCount:unassignedServerCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]" 
+									<%-- Applications --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:applicationCount, unassignedCount:unassignedAppCount, percDone:percAppDoneCount, controller:'application', filter:'application', list:appList]"
 											/>
 
-											<%-- Physical Servers --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalServerCount, percDone:percentagePhysicalServerCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]" 
-											/>
-										
-											<%-- Virtual Servers --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualServerCount, percDone:percVirtualServerCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]" 
+									<%-- Servers (Summary) --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:totalServerCount, unassignedCount:unassignedServerCount, percDone:0, controller:'assetEntity', filter:'server', list:allServerList]"
 											/>
 
-											<%-- Databases --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:dbCount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]" 
-											/>
-		
-											<%-- Physical Storage --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorageCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]" 
-											/>
-		
-											<%-- Logical Storage --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:fileCount, unassignedCount:unassignedFilesCount, percDone:percentageFilesCount, controller:'files', filter:'storage', list:filesList]" 
-											/>
-		
-											<%-- Other Devices --%>
-											<g:render template="planningStatsExecRow"
-												model="[assetCount:otherAssetCount, unassignedCount:unassignedOtherCount, percDone:percentageOtherCount, controller:'assetEntity', filter:'other', list:otherTypeList]" 
+									<%-- Physical Servers --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:phyServerCount, unassignedCount:unassignedPhysicalServerCount, percDone:percentagePhysicalServerCount, controller:'assetEntity', filter:'physicalServer', list:phyServerList]"
 											/>
 
-											<%-- Open Tasks --%>
-											<tr>
-												<td></td>
-												<g:each in="${openTasks}" var="tasks">
-													<td style="text-align: right;"><g:if
-															test="${tasks.count== 0 }">
-															<span class='colorGrey'>0</span>
-														</g:if> <g:else>
-															<g:link controller="assetEntity" action="listTasks"
-																params="[moveEvent:tasks.moveEvent, justRemaining:1]"
-																class="links">
-																${tasks.count}
-															</g:link>
-														</g:else></td>
-												</g:each>
-												<td></td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
+									<%-- Virtual Servers --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:virtServerCount, unassignedCount:unassignedVirtualServerCount, percDone:percVirtualServerCount, controller:'assetEntity', filter:'virtualServer', list:virtServerList]"
+											/>
 
-							</td>
-						</tr>
-					</tbody>
-				</table>
+									<%-- Databases --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:dbCount, unassignedCount:unassignedDbCount, percDone:percentageDBCount, controller:'database', filter:'db', list:dbList]"
+											/>
+
+									<%-- Physical Storage --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:phyStorageCount, unassignedCount:unAssignedPhyStorageCount, percDone:percentagePhyStorageCount, controller:'assetEntity', filter:'storage', list:phyStorageList]"
+											/>
+
+									<%-- Logical Storage --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:fileCount, unassignedCount:unassignedFilesCount, percDone:percentageFilesCount, controller:'files', filter:'storage', list:filesList]"
+											/>
+
+									<%-- Other Devices --%>
+									<g:render template="planningStatsExecRow"
+											  model="[assetCount:otherAssetCount, unassignedCount:unassignedOtherCount, percDone:percentageOtherCount, controller:'assetEntity', filter:'other', list:otherTypeList]"
+											/>
+
+									<%-- Open Tasks --%>
+									<tr>
+										<td></td>
+										<g:each in="${openTasks}" var="tasks">
+											<td style="text-align: right;"><g:if
+													test="${tasks.count== 0 }">
+												<span class='colorGrey'>0</span>
+											</g:if> <g:else>
+												<g:link controller="assetEntity" action="listTasks"
+														params="[moveEvent:tasks.moveEvent, justRemaining:1]"
+														class="links">
+													${tasks.count}
+												</g:link>
+											</g:else></td>
+										</g:each>
+										<td></td>
+									</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
 				
 				<script type="text/javascript">$(window).resize()/*Prevents the div from jumping around the page when it loads*/</script> 
 			</div>

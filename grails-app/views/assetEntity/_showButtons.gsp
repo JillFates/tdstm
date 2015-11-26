@@ -5,10 +5,12 @@
 <tds:hasPermission permission='AssetDelete'>
 	<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
 </tds:hasPermission>
-<tds:hasPermission permission="CommentCrudView">
-	<a href="javascript:createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
-		<img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
-	</a>
+
+<a href="javascript:createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
+	<img src="${resource(dir:'icons',file:'table_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Task
+</a>
+
+<tds:hasPermission permission="AssetEdit">
 	<a href="javascript:createIssue('${escapedName}','comment', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">
 		<img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
 	</a>

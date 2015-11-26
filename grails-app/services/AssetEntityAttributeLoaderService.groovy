@@ -1354,15 +1354,18 @@ class AssetEntityAttributeLoaderService {
 				}
 				break
 			case ~/maintExpDate|retireDate/:
+				log.debug "setCommonProperties() Have $property with value '$value'"
 				if (value) {
-					newVal = DateUtil.parseDate(value)
-					if (! newVal) {
-						warnings << "Unable to set date (${value}) for $property on row $rowNum" + 
+					try {
+						newVal = DateUtil.parseDate(value)
+						if (asset[property] != newVal ) {
+							asset[property] = newVal
+						}
+					} catch (e) {
+						warnings << "Invalid date (${value}) for $property on row $rowNum" + 
 							(asset.assetName ? ", asset '${asset.assetName}'" : '') +
-							', proper format mm-dd-yyyy'
+							', proper format mm/dd/yyyy'
 						errorConflictCount++
-					} else if (asset[property] != newVal ) {
-						asset[property] = newVal
 					}
 				}
 				break

@@ -2,13 +2,13 @@
 <a ng-if="tasks=='tasks'" ng-click="listBy('issue')" id="icon_task_{{assetId}}" title="Create Task or Show Tasks">
 	<img ng-src="{{applyRootPath('/images/task_exists.png')}}" border="0px"/>
 </a>
-<a ng-if="tasks=='noTasks'" ng-click="createCommentBy('issue')" id="icon_task_{{assetId}}" title="Create Task or Show Tasks">
+<a ng-if="(tasks=='noTasks') && canEditTasks" ng-click="createCommentBy('issue')" id="icon_task_{{assetId}}" title="Create Task or Show Tasks">
 	<img ng-src="{{applyRootPath('/icons/table_add.png')}}" border="0px"/>
 </a>
-<a ng-if="comments=='comments'" ng-click="listBy('comment')" id="icon_comment_{{assetId}}" title="Create Comment or Show Comments">
+<a ng-if="(comments=='comments')" ng-click="listBy('comment')" id="icon_comment_{{assetId}}" title="Create Comment or Show Comments">
 	<img ng-src="{{applyRootPath('/images/comment_exists.png')}}" border="0px"/>
 </a>
-<a ng-if="comments=='noComments'" ng-click="createCommentBy('comment')" id="icon_comment_{{assetId}}" title="Create Comment or Show Comments">
+<a ng-if="(comments=='noComments') && canEditComments" ng-click="createCommentBy('comment')" id="icon_comment_{{assetId}}" title="Create Comment or Show Comments">
 	<img ng-src="{{applyRootPath('/icons/comment_add.png')}}" border="0px"/>
 </a>
 </span>

@@ -14,7 +14,9 @@
 
 				$('#remove').click(function() {
 					return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
-				});  
+				});
+
+				$('#username').focus();
 
 			});
 
@@ -60,26 +62,25 @@
 								<td colspan="2">
 									<div class="required"> Fields marked ( * ) are mandatory </div> 
 									<input name="companyId" type="hidden" value="${companyId}" />
+									<input name="personId" type="hidden" value="${personInstance.id}" />
 								</td>
 							</tr>
+
 							<tr class="prop">
 								<td valign="top" class="name">
-									<label for="person"><b>Person:&nbsp;<span style="color: red">*</span></b></label>
+									<label for="person">Company:</label>
 								</td>
-								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'person','errors')}">
-									<g:if test="${personInstance}">
-										<g:select optionKey="id" from="${personInstance}" name="person.id" value="${personInstance?.id}" ></g:select>
-										<input type="hidden" name="personId" value="${personInstance?.id}" >
-									</g:if>
-									<g:else>
-										<g:select optionKey="id" from="${Person.executeQuery('from Person p where p.id not in (select person.id from UserLogin u) order by p.firstName')}" name="person.id" value="${userLoginInstance?.person?.id}" ></g:select>
-									</g:else>
+								<td valign="top" class="value">
+									${personInstance.company}
+								</td>
+							</tr>
 
-									<g:hasErrors bean="${userLoginInstance}" field="person">
-										<div class="errors">
-											<g:renderErrors bean="${userLoginInstance}" as="list" field="person"/>
-										</div>
-									</g:hasErrors>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="person">Person:</label>
+								</td>
+								<td valign="top" class="value">
+									${personInstance.lastNameFirst}
 								</td>
 							</tr> 
 						
@@ -88,7 +89,7 @@
 									<label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
-									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${fieldValue(bean:userLoginInstance,field:'username')}"/>
+									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${personInstance.email}" autocomplete="off" />
 									<g:hasErrors bean="${userLoginInstance}" field="username">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="username"/>
@@ -180,10 +181,10 @@
 						
 							<tr class="prop">
 								<td valign="top" class="name">
-									<label for="active">Project:</label>
+									<label for="active"><b>Project:&nbsp;<span style="color: red">*</span></b></label>
 								</td>
 								<td valign="top" class="value">
-									<g:select id="project" name="project" from="${projectList}" 
+									<g:select id="projectId" name="projectId" from="${projectList}" 
 										noSelection="${['':'Select a project...']}"
 										optionKey="id" optionValue="name"/>
 								</td>

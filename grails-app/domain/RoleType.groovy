@@ -54,7 +54,17 @@ class RoleType {
 		return (type.equals(TEAM))
 	}
 
-	String toString(){
-		description
+	String toString() {
+		String str = 'UNDEFINED'
+		if (description) {
+			// Strip off the prefix that contains the "Staff : " or other prefixes
+			int idx = description.lastIndexOf(':')
+			if (idx > 0) {
+				str = description.substring(++idx).trim()
+			} else {
+				str = description.trim()
+			}
+		} 
+		return str
 	}
 }

@@ -3,9 +3,14 @@
 		<input type="hidden" id="tabTypeId" name="tabType" value="${asset}" />
 		<div style="margin-left: 0px; margin-bottom: 10px;">
 			<div class="message" id="messageId" style="display:none">${flash.message}</div>
-			<h3>
-				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;<input type="button" class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()" />
-			</h3>
+        	<div style="width: 250px; margin-bottom: 3px">
+        		<h3>
+				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;
+				<tds:hasPermission permission='DepAnalyzerGenerate'>
+				<input  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
+				</tds:hasPermission>
+				</h3>
+			</div>
 			<div class="planBundleSel">
 				<g:form name="bundleForm" action="dependencyConsole">	
 					<input type="hidden" name="assinedGroup" id="assinedGroup" value="${isAssigned}" />

@@ -172,15 +172,14 @@
 				</table>
 			</div>
 		</div>
-		<tds:hasPermission permission='CommentCrudView'>
-			<div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
-				<span class="button">
-				<input class="tablesave" type="button" id="saveAndCloseBId" value="Save" ng-click="saveComment(true, form.$invalid)" />
-				</span>
-				<span class="button"><input type="button" class="cancel" value="Cancel" ng-click="close()"/>
-				</span>
-			</div>
-		</tds:hasPermission>
+
+		<div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
+			<span class="button">
+			<input class="tablesave" type="button" id="saveAndCloseBId" value="Save" ng-click="saveComment(true, form.$invalid)" />
+			</span>
+			<span class="button"><input type="button" class="cancel" value="Cancel" ng-click="close()"/>
+		</div>
+			
 	</form>
 	</div>
 </div>

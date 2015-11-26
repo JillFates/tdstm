@@ -22,6 +22,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.converters.JSON
 import com.tdsops.tm.asset.graph.*
+import org.apache.poi.ss.usermodel.Cell
 
 
 class MoveBundleService {
@@ -505,52 +506,63 @@ class MoveBundleService {
 			for (int c = 0; c < columnList.size(); ++c){
 				def cellValue
 				def attribName = columnList[c]
+				int rowIdx = r - startRow
+				boolean isNumber=false
+				// log.debug "*** attribName isa ${attribName.getClass().getName()} ${ (it instanceof Closure) }"
 				switch (attribName) {
+					case { it instanceof Closure }:
+						cellValue = attribName.call( exportList[rowIdx] )
+						break
 					case "taskDependencies":
 						if (viewUnpublished)
 							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
 						else
 							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".findAll{it.predecessor?.isPublished}.collect({ e -> (e.predecessor == null ? '' : e.predecessor.taskNumber) + ' ' + e.predecessor.comment?.toString()}))
-						break;
+						break
+					case 'taskNumber':
+						cellValue = exportList[rowIdx].taskNumber
+						isNumber = true
+						break
 					case "assetEntity":
-						cellValue = exportList[r-startRow]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[r-startRow]."${columnList[c]}"?.assetName) : ''
-						break;
-					case "duration":
-						def duration = exportList[r-startRow].duration ? (exportList[r-startRow].durationScale == "m" ? exportList[r-startRow]."${columnList[c]}" : exportList[r-startRow]."${columnList[c]}" + '' + exportList[r-startRow].durationScale) : ''
-						cellValue = exportList[r-startRow]."${columnList[c]}" ?  String.valueOf(duration) : ''
-						break;
+						cellValue = exportList[rowIdx]."${columnList[c]}"?.assetType == "Application" ?  String.valueOf(exportList[rowIdx]."${columnList[c]}"?.assetName) : ''
+						break
 					case "commentAssetEntity":
-						cellValue = exportList[r-startRow].assetEntity ?  String.valueOf(exportList[r-startRow].assetEntity?.assetName) : ''
-						break;
+						cellValue = exportList[rowIdx].assetEntity ?  String.valueOf(exportList[rowIdx].assetEntity?.assetName) : ''
+						break
 					case "notes":
-						cellValue = exportList[r-startRow].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[r-startRow].notes)) : ''
-						break;
+						cellValue = exportList[rowIdx].notes ?  String.valueOf(WebUtil.listAsMultiValueString(exportList[rowIdx].notes)) : ''
+						break
 					case "instructionsLink":
 						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(exportList[r-startRow].instructionsLink) : ''
 						break;
 					case "workflow":
-						cellValue = exportList[r-startRow].workflowTransition ? String.valueOf(exportList[r-startRow].workflowTransition?.name) : ''
-						 break;
+						cellValue = exportList[rowIdx].workflowTransition ? String.valueOf(exportList[rowIdx].workflowTransition?.name) : ''
+						 break
 					case "estStart":
-						 cellValue = exportList[r-startRow].estStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].estStart, tzId))) : ''
-						 break;
+						 cellValue = exportList[rowIdx].estStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].estStart, tzId))) : ''
+						 break
 					case "estFinish":
-						 cellValue = exportList[r-startRow].estFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].estFinish, tzId))) : ''
-						 break;
+						 cellValue = exportList[rowIdx].estFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].estFinish, tzId))) : ''
+						 break
 					case "actStart":
-						 cellValue = exportList[r-startRow].actStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].actStart, tzId))) : ''
-						 break;
+						 cellValue = exportList[rowIdx].actStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].actStart, tzId))) : ''
+						 break
 					case "actFinish":
-						 cellValue = exportList[r-startRow].actFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[r-startRow].dateResolved, tzId))) : ''
-						 break;
+						 cellValue = exportList[rowIdx].actFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].dateResolved, tzId))) : ''
+						 break
 					case "":
 						cellValue = ""
-						break;
+						break
 					default:
-						cellValue = String.valueOf(exportList[r-startRow]?."${columnList[c]}" ?:'')
-						break;
+						cellValue = String.valueOf(exportList[rowIdx]?."${columnList[c]}" ?:'')
+						break
 				}
-				WorkbookUtil.addCell(sheet, c, r, cellValue)
+
+				if (isNumber) {
+					WorkbookUtil.addCell(sheet, c, r, cellValue, Cell.CELL_TYPE_NUMERIC)
+				} else {
+					WorkbookUtil.addCell(sheet, c, r, cellValue)
+				}
 			}
 		}
 	}

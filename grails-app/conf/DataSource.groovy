@@ -25,10 +25,10 @@ environments {
 
 			// url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
 			driverClassName = "com.mysql.jdbc.Driver"
-			username = "tdstm"
-			password = "tdstm"
-			
-			// logSql = true 
+			username = "tdstmapp"
+			password = "tdstmpswd"
+			dbCreate = ''
+			logSql = false
 
 			properties {
 				// See following page for explaination of settings
@@ -54,7 +54,12 @@ environments {
 	test {
 		dataSource {
 			dbCreate = "create"
-			url = "jdbc:hsqldb:mem:testDb"
+			url = "jdbc:mysql://localhost/tdstm?autoReconnect=true"
+			driverClassName = "com.mysql.jdbc.Driver"
+			username = "tdstmapp"
+			password = "tdstmpswd"
+			dbCreate = ''
+			logSql = false
 		}
 	}
 	production {

@@ -1,7 +1,9 @@
 import grails.converters.JSON
 
 import org.codehaus.groovy.grails.web.json.JSONObject
+
 import groovy.time.TimeCategory
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -1095,9 +1097,6 @@ class AdminController {
 		def contextPath = request.contextPath
 		return [contextPath:contextPath]
 	}
-	
-
-	/** ******************************************************************** */
 
 	/**
 	 * Process the Account Export request and outputs a CSV.
@@ -1215,7 +1214,7 @@ class AdminController {
 	}
 
 	/** ******************************************************************** */
-	
+
 	/**
 	 * This method renders the Export Accounts form.
 	 * 
@@ -1231,7 +1230,25 @@ class AdminController {
 	
 	/** ******************************************************************** */
 
+	/**
+	 * Used to download the spreadsheet/CSV import template
+	 */
+	def importAccountsTemplate = {
+		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		if (!project) 
+			return
+
+		String filename = '/templates/AccountImportTemplate.csv'
+		File file = ApplicationHolder.application.parentContext.getResource(filename).getFile()
+
+		response.setHeader "Content-disposition", "attachment; filename=AccountImport-${project}.csv"
+		response.contentType = 'text/csv'
+		response.outputStream << file.text
+		response.outputStream.flush()
+	}
 	
+	/** ******************************************************************** */
+
 	/**
 	 * A controller process to import user accounts
 	 */
@@ -1255,6 +1272,7 @@ class AdminController {
 			def sheet = book.getSheet("Accounts")
 			def rows = sheet.getLastRowNum()
 			people = []
+
 			(1..rows).each{
 				people.add(
 						username: WorkbookUtil.getStringCellValue(sheet, 0, it ),
@@ -1272,7 +1290,6 @@ class AdminController {
 						errors: []
 					)
 			}
-			
 			return people
 		}
 
@@ -1353,7 +1370,9 @@ class AdminController {
 				f.transferTo(upload)
 				def book = new HSSFWorkbook(new FileInputStream( upload ))
 
+
 				people = parseXLS(book)
+
 				map.matches = lookForMatches()
 
 				// Validate the teams && role
@@ -1364,7 +1383,7 @@ class AdminController {
 						log.debug "teams=(${people[i].teams} -- $teams"
 						people[i].errors << validateTeams(teams)
 					}
-					if (!StringUtils.isEmpty(people[i].role) && !VALID_ROLES[people[i].role]) {
+					if (!StringUtils.isEmpty(people[i].role) && ! VALID_ROLES[people[i].role]) {
 						people[i].errors << "Invalid role: ${people[i].role}"
 					}
 				}
@@ -1386,7 +1405,9 @@ class AdminController {
 
 				def book = new HSSFWorkbook(new FileInputStream( new File('/tmp/tdstm-account-import.xls')))
 
+
 				people = parseXLS(book)
+
 				lookForMatches()
 
 				if (randomPassword) {
@@ -1446,6 +1467,7 @@ class AdminController {
 						if (person.validate() && person.save(flush:true)) {
 							log.info "importAccounts() : created person $person"
 							partyRelationshipService.addCompanyStaff(project.client, person)
+							partyRelationshipService.addProjectStaff(project, person)
 						} else {
 							p.errors << "Error" + GormUtil.allErrorsString(person)
 							failed = true

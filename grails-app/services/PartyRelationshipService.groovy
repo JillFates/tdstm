@@ -10,24 +10,44 @@ class PartyRelationshipService {
 	boolean transactional = true
 	def jdbcTemplate
 	def securityService
+	def serviceHelperService
 	
 	/*
 	 * method to save party Relationship
 	 */
 	def savePartyRelationship( def relationshipType, def partyIdFrom, def roleTypeIdFrom, def partyIdTo, def roleTypeIdTo ) {
-		try{
-			def partyRelationshipType = PartyRelationshipType.findById( relationshipType )
-			def roleTypeFrom = RoleType.findById( roleTypeIdFrom )
-			def roleTypeTo = RoleType.findById( roleTypeIdTo )
+		try {
+			def partyRelationshipType = ((relationshipType instanceof PartyRelationshipType) ?: PartyRelationshipType.findById( relationshipType ))
+			def roleTypeFrom = (roleTypeIdFrom instanceof RoleType) ? roleTypeIdFrom : RoleType.findById( roleTypeIdFrom )
+			def roleTypeTo = (roleTypeIdTo instanceof RoleType) ? roleTypeIdTo : RoleType.findById( roleTypeIdTo )
 			
-			def partyRelationship = new PartyRelationship( partyRelationshipType:partyRelationshipType, partyIdFrom:partyIdFrom, roleTypeCodeFrom:roleTypeFrom, partyIdTo:partyIdTo, roleTypeCodeTo:roleTypeTo, statusCode:"ENABLED" ).save( insert:true, flush:true )
-			partyRelationship = partyRelationship.save( insert:true)
+			assert partyRelationshipType != null
+			assert roleTypeFrom != null
+			assert roleTypeTo != null
+			assert (partyIdFrom instanceof Party)
+			assert (partyIdTo instanceof Party)
+
+			// log.debug "savePartyRelationship() partyRelationshipType=$partyRelationshipType, roleTypeFrom=$roleTypeFrom, roleTypeTo=$roleTypeTo, partyIdFrom=$partyIdFrom, partyIdTo=$partyIdTo"
+
+			def partyRelationship = new PartyRelationship( 
+				partyRelationshipType:partyRelationshipType, 
+				partyIdFrom:partyIdFrom, 
+				roleTypeCodeFrom:roleTypeFrom, 
+				partyIdTo:partyIdTo, 
+				roleTypeCodeTo:roleTypeTo, 
+				statusCode:"ENABLED" )
+
+			if (! partyRelationship.save( insert:true, flush:true ) ) {
+				log.error "savePartyRelationship() failed : ${GormUtil.allErrorsString(partyRelationship)}"
+				return null
+			}
+	
 			return partyRelationship
 		} catch (Exception e) {
-			log.error("Can't save party relationship: " + e.getMessage(), e)
+			log.error "savePartyRelationship() had exception ${e.getMessage()} : ${ExceptionUtil.stackTraceToString(e)}"
 		}
 	}
-	
+
 	/*
 	 * method to delete party Relationship
 	 */
@@ -79,7 +99,15 @@ class PartyRelationshipService {
 	 * @return Array of PartyRelationship
 	 */
 	def getCompanyPartners( company, sortOn='name') {
-		return searchPartners(company, "PARTNERS", "COMPANY", sortOn)
+
+		def query = "from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = :company and " +
+			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER'"
+		def partners = PartyRelationship.findAll( query, [company:company] )
+		if (partners && sortOn) {  
+			partners?.sort{it.partyIdTo.("$sortOn")}
+		}
+
+		return partners
 	}
 
 	/*
@@ -130,8 +158,8 @@ class PartyRelationshipService {
 	 * @return Party - the company Staff is associated with or NULL if no associations
 	 */
 	def getStaffCompany( def staff ) {
-		def relationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
-
+		def relationship = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
+		relationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
 		return relationship?.partyIdFrom
 	}
 	/*
@@ -293,11 +321,15 @@ class PartyRelationshipService {
 	/*
 	 *  Return the Project Staff
 	 */
-	def getProjectStaff( def projectId ){
-		def list = []
-		def projectStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType='PROJ_STAFF' and p.partyIdFrom=$projectId and p.roleTypeCodeFrom = 'PROJECT' ")
-		projectStaff.each{staff ->
+	List<Map> getProjectStaff( def projectId ){
+		List list = []
+		// TODO : JPM 11/2015 : The getProjectStaff should ONLY return the staff record but presently is returning teams too
+		def projectStaff = PartyRelationship.findAll("from PartyRelationship p " + 
+			"WHERE p.partyRelationshipType='PROJ_STAFF' AND p.partyIdFrom=$projectId AND p.roleTypeCodeFrom = 'PROJECT' ")
+			//	"WHERE p.partyRelationshipType='PROJ_STAFF' AND p.partyIdFrom=$projectId AND p.roleTypeCodeFrom = 'PROJECT' AND p.roleTypeCodeTo = 'STAFF'")
+		projectStaff.each { staff ->
 			def map = [:]
+			// TODO : JPM 11/2015 : company should be singular but someone screwed up a LONG time ago and it is a findAll instead of find
 			def company = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
 			map.company = company.partyIdFrom
 			map.name = staff.partyIdTo.toString()
@@ -660,12 +692,13 @@ class PartyRelationshipService {
 	 * @param Integer CompanyId - company id that the staff associate with
 	 * @return array of role codes
 	 */
-	def getCompanyStaffFunctions(def companyId, def staffId) {
-		
+	List<RoleType> getCompanyStaffFunctions(def companyId, def staffId) {
+		assert companyId
+		assert staffId	
 		def projectRoles = PartyRelationship.findAll("from PartyRelationship p \
 			where p.partyRelationshipType='STAFF' \
 			and p.roleTypeCodeFrom='COMPANY' \
-			and p.roleTypeCodeTo !='STAFF' \
+			and p.roleTypeCodeTo != 'STAFF' \
 			and p.partyIdFrom.id=? \
 			and p.partyIdTo.id=?", [companyId, staffId] )
 			
@@ -1043,6 +1076,93 @@ class PartyRelationshipService {
 		}
 
 		return projects
+	}
+
+	/**
+	 * Used to look up application staff for a given project; the staff is composed by: 
+	 * ALL Client Staff + Project Owner and Partner Staff, whom have been assigned to the project.
+	 * The lists should no include inactive persons
+	 * @param project - used to filter the list to a particular project (optional)
+	 * @return A list of persons
+	 */
+	List getProjectApplicationStaff(Project project) {
+		def companies = new StringBuffer('0')
+		def projService = serviceHelperService.getService('project')
+
+		def projectPartners = projService.getPartners(project)
+		if (projectPartners) {
+			projectPartners.each {
+				companies.append(",${it.id}")
+			}
+		}
+
+		def projectOwner = projService.getOwner(project)
+		if (projectOwner) {
+			companies.append(",${projectOwner.id}")
+		}
+
+		def query = new StringBuffer("""
+			SELECT * FROM (
+			 (
+				SELECT pr.party_id_to_id AS personId, 
+					CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '), 
+						IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
+						COALESCE(p.last_name, '')
+					) AS fullName
+				FROM tdstm.party_relationship pr 
+					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
+					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
+					INNER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
+						AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
+						AND pr2.party_id_from_id = ${project.id}
+						AND pr2.role_type_code_from_id = 'PROJECT'
+				WHERE pr.role_type_code_from_id in ('COMPANY') 
+					AND pr.party_relationship_type_id in ('STAFF') 
+					AND pr.party_id_from_id IN (${companies}) 
+					AND p.active = 'Y'
+				GROUP BY personId 
+				ORDER BY fullName ASC 
+			)
+			UNION
+			(
+				SELECT pr.party_id_to_id AS personId, 
+					CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '), 
+						IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
+						COALESCE(p.last_name, '')
+					) AS fullName
+				FROM tdstm.party_relationship pr 
+					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
+					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id 
+				WHERE pr.role_type_code_to_id in ('STAFF') 
+					AND pr.role_type_code_from_id in ('COMPANY') 
+					AND pr.party_relationship_type_id in ('STAFF') 
+					AND pr.party_id_from_id IN (${project.client.id}) 
+					AND p.active = 'Y'
+				GROUP BY personId 
+				ORDER BY fullName ASC 
+			) 
+            ) AS appStaff
+            ORDER BY fullName
+		""")
+		
+		def staffList = jdbcTemplate.queryForList(query.toString())
+
+		return staffList
+	}
+
+	/**
+	 * Retrieves a list of companies the person is associated to.
+	 * @param person for whom to look up the associated companies.
+	 * @return list of companies.
+	 */
+	List<Party> associatedCompanies(Person forWhom){
+		Party employer = forWhom.getCompany()
+		List<Party> partners = getCompanyPartners(employer)*.partyIdTo
+		List<Party> clients =  getCompanyClients(employer)*.partyIdTo
+		List<Party> companies = (partners + clients)
+		companies << employer
+		companies = companies.unique{ p1, p2 -> p1.id <=> p2.id}.sort { it.name }
+		return companies
 	}
 
 }

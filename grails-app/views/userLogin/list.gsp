@@ -33,12 +33,17 @@
 			setExportToLimit(id, '');
 			createHiddenInputFieldsForLimitAndSubmit(id);
 		}
+		function redirectToListStaff() {
+			if (confirm("Please click on the CREATE button of existing staff in the Admin > List Staff to create users. Click OK to go there now or Cancel to do nothing.")) {
+				window.location.href = tdsCommon.createAppURL("/person/index");
+			}
+		}
 		</script>
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var listCaption = "Users: \
 				<tds:hasPermission permission='CreateUserLogin'>\
-					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"window.location.href=\'"+contextPath+"/userLogin/create\'\"/></span> \
+					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"redirectToListStaff()\"/></span> \
 				</tds:hasPermission>\
 				<span class='capBtn'><input type='button' value=' Show ${isActive == 'N' ? 'Active' : 'Inactive'} Users' onClick=\"$(\'#showActiveId\').val(${(session.getAttribute('InActive') == 'N')?"\'Y\'":"\'N\'"});submitForm();\"/></span>"
 				$("#personGeneralViewId").dialog({ autoOpen: false })

@@ -59,6 +59,7 @@ class CommentService {
 	def saveUpdateCommentAndNotes(session, params, isNew = true,flash) {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
+		def canEditAsset = securityService.hasPermission(userLogin.person, 'AssetEdit')
 		
 		def formatter = new SimpleDateFormat("MM/dd/yyyy");
 		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
@@ -82,7 +83,7 @@ class CommentService {
 			}
 
 			// if assetEntity is passed, then validate that it valid and that the user has access to it (belongs to the current project)
-			if ( params.assetEntity ) {
+			if ( params.assetEntity && params.assetEntity != 'NaN') {
 				if (! params.assetEntity.isNumber() && params.assetEntity!='null') {
 					log.warn "saveUpdateCommentAndNotes: Invalid asset id (${params.assetEntity}"
 					errorMsg = "An unexpected asset id was received"
@@ -111,6 +112,14 @@ class CommentService {
 					errorMsg = 'The asset id was missing in the request'
 					break
 				}
+
+				// Check if the user can create comments
+				if ((params.commentType != AssetCommentType.TASK) && (!canEditAsset)) {
+					log.error "saveUpdateCommentAndNotes: User don't have permission to create comments"
+					errorMsg = "User don't have permission to create comments"
+					securityService.reportViolation("User don't have permission to create comments", userLogin)
+					break
+				}
 			
 				// Let's create a new Comment/Task
 				assetComment = new AssetComment()
@@ -133,7 +142,15 @@ class CommentService {
 					errorMsg = 'Was unable to find the task for the specified id'
 					break
 				}
-			
+
+				// Check if the user can edit comments
+				if ((assetComment.commentType != AssetCommentType.TASK) && (!canEditAsset)) {
+					log.error "saveUpdateCommentAndNotes: User don't have permission to edit comments"
+					errorMsg = "User don't have permission to edit comments"
+					securityService.reportViolation("User don't have permission to edit comments", userLogin)
+					break
+				}
+
 				// If params.currentStatus is passed along, the form is expecting the status to be in this state so if it has changed 
 				// then someone else beat the user to changing the status so we are going to stop and warn the user.
 				if (params.currentStatus) {

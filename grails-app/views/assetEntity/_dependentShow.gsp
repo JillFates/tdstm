@@ -1,7 +1,7 @@
 <td valign="top">
 			<div>
 				<h1>Supports:</h1>
-				<table style="width: 400px;">
+				<table style="min-width: 400px;">
 					<thead>
 						<tr>
 							<th>Frequency</th>
@@ -55,7 +55,7 @@
 		<td valign="top">
 			<div>
 				<h1>Is dependent on:</h1>
-				<table style="width: 400px;">
+				<table style="min-width: 400px;">
 					<thead>
 						<tr>
 							<th>Frequency</th>

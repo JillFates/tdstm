@@ -359,6 +359,8 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		owner ignoreNotFound: true
 		columns {
 			hasRemoteMgmt sqltype: 'tinyint(1)'
+			retireDate sqltype: 'date'
+			maintExpDate sqltype: 'date'
 		}
 		modifiedBy column:'modified_by'
 	}

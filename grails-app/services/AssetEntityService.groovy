@@ -13,6 +13,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Cell
 
+import org.hibernate.ScrollableResults
+import org.hibernate.ScrollMode
+
 import java.util.regex.Matcher
 
 // Used to wire up bindData
@@ -117,6 +120,11 @@ class AssetEntityService {
 		'sourceRackPosition', 'targetBladePosition'
 	]
 
+	// Properties strictly for ASSETS that are date (a.k.a. AssetEntity)
+	static ASSET_DATE_PROPERTIES = [ 
+		'purchaseDate', 'maintExpDate', 'retireDate'
+	]
+
 	// Properties strictly for APPLICATION
 	static APPLICATION_PROPERTIES = []
 	// Properties strictly for APPLICATION
@@ -150,6 +158,8 @@ class AssetEntityService {
 	def userPreferenceService
 
 	def jdbcTemplate
+
+	def sessionFactory
 
 	/** 
 	 * This map contains a key for each asset class and a list of their
@@ -1593,8 +1603,14 @@ class AssetEntityService {
 	 * @param params - the map of the params
 	 */
 	public void parseMaintExpDateAndRetireDate(Object params, userTimeZone) {
-		params.maintExpDate = GormUtil.convertInToGMT( DateUtil.mdyToDate(params.maintExpDate), userTimeZone )
-		params.retireDate   = GormUtil.convertInToGMT( DateUtil.mdyToDate(params.retireDate ), userTimeZone )
+		Date date
+		List props = ['maintExpDate', 'retireDate']
+		props.each { key ->
+			if (params[key]) {
+				params[key] = DateUtil.parseDate(params[key])
+				//params[key] = DateUtil.formatDate( date )
+			}
+		}
 	}
 
 	/**
@@ -1927,7 +1943,7 @@ class AssetEntityService {
 	 * 
 	 */
 	def saveImportCables(cablingSheet){
-		def warnMsg=""
+		def warnMsg = []
 		def cablingSkipped = 0
 		def cablingUpdated = 0
 		def project = securityService.getUserCurrentProject()
@@ -1951,53 +1967,55 @@ class AssetEntityService {
 			else
 				toConnectorTemp = toConnectorLabel
 			//if toAssetId is not there then get asset from assetname and toConnectorLabel
-			if(!toAsset && toAssetName){
-				if(cableType!='Power')
+			if (!toAsset && toAssetName) {
+				if(cableType!='Power') {
 					toAsset = AssetEntity.findByAssetNameAndProject( toAssetName, project)?.find{it.model.modelConnectors?.label.contains(toConnectorLabel)}
-				else
+				} else {
 					toAsset = fromAsset
+				}
 			}
 			def cableComment = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			def cableColor = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			def room = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			def cableStatus = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
 			def roomType = WorkbookUtil.getStringCellValue(cablingSheet, ++cols, r ).replace("'","\\'")
-			if(fromAsset){
+			if (fromAsset) {
 				def fromAssetConnectorsLabels= fromAsset.model?.modelConnectors?.label
 				if(fromAssetConnectorsLabels && fromAssetConnectorsLabels?.contains(fromConnectorLabel)){
 					def fromConnector = fromAsset.model?.modelConnectors.find{it.label == fromConnectorLabel}
 					def assetCable = AssetCableMap.findByAssetFromAndAssetFromPort(fromAsset,fromConnector)
 					if (!assetCable) {
 						log.info "Cable not found for $fromAsset and $fromConnector"
-						warnMsg += "<li>row "+(r+1)+" with connector $fromConnectorLabel and Asset Name $fromAssetName don't have a cable.</li>"
-						cablingSkipped+=1
+						warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName don't have a cable"
+						cablingSkipped++
 						continue
 					}
-					if(toAsset){
+					if (toAsset) {
 						def toAssetconnectorLabels= toAsset.model?.modelConnectors?.label
 						if(toAssetconnectorLabels.contains(toConnectorTemp)){
 							if(cableType=='Power'){
 								assetCable.toPower = toConnectorLabel
-							}else{
+							} else {
 								def toConnector = toAsset.model?.modelConnectors.find{it.label == toConnectorTemp}
 								def previousCable = AssetCableMap.findByAssetToAndAssetToPort(toAsset,toConnector)
-								if(previousCable !=assetCable){
+								if (previousCable !=assetCable) {
 									// Release the connection from other port to connect with FromPorts
 									AssetCableMap.executeUpdate("""Update AssetCableMap set assetTo=null,assetToPort=null, cableColor=null
-																			where assetTo = ? and assetToPort = ? """,[toAsset, toConnector])
+										where assetTo = ? and assetToPort = ? """,[toAsset, toConnector])
 								}
 								assetCable.assetToPort = toConnector
 							}
 						}
 						assetCable.assetTo = toAsset
-					}else {
+					} else {
 						assetCable.assetTo = null
 						assetCable.assetToPort = null
 						assetCable.toPower = ''
 					}
 					
-					if(AssetCableMap.constraints.cableColor.inList.contains(cableColor))
+					if (AssetCableMap.constraints.cableColor.inList.contains(cableColor)) {
 						assetCable.cableColor = cableColor
+					}
 						
 					assetCable.cableComment = cableComment
 					assetCable.cableStatus = cableStatus
@@ -2005,18 +2023,18 @@ class AssetEntityService {
 					if(AssetCableMap.constraints.assetLoc.inList.contains(roomType))
 						assetCable.assetLoc= roomType
 						
-					if(assetCable.dirtyPropertyNames.size()){
+					if( assetCable.dirtyPropertyNames.size() ) {
 						assetCable.save(flush:true)
-						cablingUpdated+=1
+						cablingUpdated++
 					}
 					
-				}else{
-					warnMsg += "<li>row "+(r+1)+" with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped.</li>"
-					cablingSkipped+=1
+				} else {
+					warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped"
+					cablingSkipped++
 				}
 				
 			}else{
-				warnMsg += "<li>row "+(r+1)+" with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped.</li>"
+				warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName does not exist & skipped"
 				cablingSkipped+=1
 			}
 		}
@@ -2213,7 +2231,7 @@ class AssetEntityService {
 			def serverDTAMap, appDTAMap, dbDTAMap, fileDTAMap
 
 			// Will hold the list of the assets for each of the classes
-			List asset, application, database, files
+			ScrollableResults asset, application, database, files
 
 			def assetEntityInstance
 
@@ -2263,6 +2281,7 @@ class AssetEntityService {
 			//
 			// Load the asset lists and property map files based on ALL or selected bundles for the classes selected for export
 			//
+			def session = sessionFactory.currentSession
 			String query = ' WHERE d.project=:project '
 			Map queryParams = [project:project]
 			// Setup for multiple bundle selection
@@ -2270,23 +2289,59 @@ class AssetEntityService {
 				for ( int i=0; i< bundleSize ; i++ ) {
 					bundles << bundle[i].toLong()
 				}
-				query += ' AND d.moveBundle.id IN (:bundles)'
-				queryParams.bundles = bundles
+				def bundleStr = bundles.join(",")
+				query += " AND d.moveBundle.id IN(${bundleStr})"
+				//queryParams.bundles = bundles
 			}
+			
+
+			int assetSize = 0
+			int appSize = 0
+			int dbSize = 0
+			int fileSize = 0
+
+			def getScrollableResults = { q, qParams ->
+				def hqlQuery = session.createQuery(q)
+				qParams.each{k, v ->
+						hqlQuery.setParameter(k, v)
+				}
+
+				return hqlQuery.scroll(ScrollMode.FORWARD_ONLY)
+
+
+			}
+
+
+			def countRows = { q, qParams ->
+				def tmpQueryStr = "SELECT COUNT(*) " + q
+				def countQuery = session.createQuery(tmpQueryStr) 
+				qParams.each{ k, v ->
+					countQuery.setParameter(k,v)
+				}
+				return ((Long)countQuery.uniqueResult()).intValue()
+			}
+
 			if ( doDevice ) {
-				asset = AssetEntity.findAll('FROM AssetEntity d' + query + " AND d.assetClass='${AssetClass.DEVICE}'", queryParams)
+				String deviceQuery = "FROM AssetEntity d" + query + " AND d.assetClass='${AssetClass.DEVICE}'"
+				asset = getScrollableResults(deviceQuery, queryParams)
+				assetSize = countRows(deviceQuery, queryParams)
 			}
 			if ( doApp ) {
-				application = Application.findAll('From Application d' + query,  queryParams)
-				// application = Application.findAll( "from Application m where m.project = :project and m.moveBundle.id in ( :bundles )", [project:project, bundles: bundles] )
+				String applicationQuery = "FROM Application d" + query
+				application = getScrollableResults(applicationQuery, queryParams)	
+				appSize = countRows(applicationQuery, queryParams)
+				
 			}
 			if ( doDB ) {
-				database = Database.findAll('From Database d' + query,  queryParams)
-				// database = Database.findAll( "from Database m where m.project = :project and m.moveBundle.id in ( :bundles )",	[project:project, bundles: bundles] )
+				String databaseQuery = "FROM Database d" + query
+				database = getScrollableResults(databaseQuery, queryParams)
+				dbSize = countRows(databaseQuery, queryParams)
 			}
 			if ( doStorage ) {
-				files = Files.findAll('From Files d' + query,  queryParams)
-				// files = Files.findAll( "from Files m where m.project = :project and m.moveBundle.id in ( :bundles )", [project:project, bundles: bundles] )
+				String filesQuery = "FROM Files d" + query
+				files = getScrollableResults(filesQuery, queryParams)
+				fileSize = countRows(filesQuery, queryParams)
+
 			}
 
 			// Have to load the maps because we update the column names across the top for all sheets
@@ -2296,7 +2351,7 @@ class AssetEntityService {
 			fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
 			
 			// Compute the total assets to be exported, used for progress meter
-			progressTotal = sizeOf(asset) + sizeOf(application) + sizeOf(database) + sizeOf(files)
+			progressTotal = assetSize + appSize + dbSize + fileSize
 			
 			//get template Excel
 			def book
@@ -2471,10 +2526,8 @@ class AssetEntityService {
 				}
 
 				//update data from Asset Entity table to EXCEL
-				def assetSize = sizeOf(asset)
-				def appSize = sizeOf(application)
-				def dbSize = sizeOf(database)
-				def fileSize = sizeOf(files)
+				
+				
 				def serverColumnNameListSize = sizeOf(serverColumnNameList)
 				def appcolumnNameListSize = sizeOf(appColumnNameList)
 				def dbcolumnNameListSize = sizeOf(dbColumnNameList)
@@ -2495,13 +2548,17 @@ class AssetEntityService {
 				//
 				if ( doDevice ) {
 					exportedEntity += 'S'
-					for ( int r = 1; r <= assetSize; r++ ) {
+					int deviceCount = 0
+					while(asset.next()){
+						def currentAsset = asset.get(0)
+						deviceCount++
+					//for ( int r = 1; r <= assetSize; r++ ) {
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress')
 						
 						//Add assetId for walkthrough template only.
 						if( serverSheetColumnNames.containsKey("assetId") ) {
-							addCell(serverSheet, r, 0, asset[r-1].id, Cell.CELL_TYPE_NUMERIC)
+							addCell(serverSheet, deviceCount, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC)
 						}
 
 						for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
@@ -2509,9 +2566,9 @@ class AssetEntityService {
 							def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
 							def colName = serverColumnNameList.get(coll)
 							def colNum = serverMap[colName]
-							def a = asset[r-1]
+							def a = currentAsset
 
-							if (r==1)
+							if (deviceCount == 1)
 								log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
 
 							if (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
@@ -2522,22 +2579,22 @@ class AssetEntityService {
 							switch(colName) {
 								case 'DepGroup':
 									// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
-									addCell(serverSheet, r, colNum, assetDepBundleMap[a.id])
+									addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id])
 									break
 								case ~/usize|SourcePos|TargetPos/:
 									def pos = a[attribute] ?: 0
 									// Don't bother populating position if it is a zero
 									if (pos == 0) 
 										continue
-									addCell(serverSheet, r, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
+									addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 									break
 								case ~/Retire|MaintExp/:
-									addCell(serverSheet, r, colNum, stdDateFormat.format(a[attribute]))
+									addCell(serverSheet, deviceCount, colNum, stdDateFormat.format(a[attribute]))
 									break
 
 								case ~/Modified Date/:
 									if (a[attribute]) {
-										addCell(serverSheet, r, colNum, dateTimeFormat.format(
+										addCell(serverSheet, deviceCount, colNum, dateTimeFormat.format(
 											TimeUtil.convertInToUserTZ( a[attribute], tzId)) )
 									}
 									break
@@ -2548,14 +2605,15 @@ class AssetEntityService {
 									if (chassis) {
 										value = "id:" + chassis.id + " " + chassis.assetName
 									}
-									addCell(serverSheet, r, colNum, value)
+									addCell(serverSheet, deviceCount, colNum, value)
 									break
 
 								default:
 									def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
-									addCell(serverSheet, r, colNum, value)
+									addCell(serverSheet, deviceCount, colNum, value)
 							}
 						}
+						GormUtil.flushAndClearSession(session, deviceCount)
 					}
 					log.info "export() - processing assets took ${TimeUtil.elapsed(started)}"
 					started = new Date()
@@ -2574,16 +2632,18 @@ class AssetEntityService {
 					def idColName = 'appId'
 					def hasIdCol = appSheetColumnNames.containsKey(idColName)
 
-					def rowNum = 0
-					application.each { app ->
-
+					
+					int applicationCount = 0
+					//application.each { app ->
+					while(application.next()){
+						def app = application.get(0)
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress')
-						rowNum++
+						applicationCount++
 
 						// Add the appId column to column 0 if it exists
 						if (hasIdCol) {
-							addCell(appSheet, rowNum, appSheetColumnNames[idColName], (Double)app.id, Cell.CELL_TYPE_NUMERIC)
+							addCell(appSheet, applicationCount, appSheetColumnNames[idColName], (Double)(app.id), Cell.CELL_TYPE_NUMERIC)
 						}
 
 						for (int i=0; i < appColumnNameList.size(); i++) {
@@ -2637,11 +2697,13 @@ class AssetEntityService {
 								}
 
 								if ( numericCols.contains(colName) )
-									addCell(appSheet, rowNum, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC)
+									addCell(appSheet, applicationCount, colNum, (Double)colVal, Cell.CELL_TYPE_NUMERIC)
 								else
-									addCell(appSheet, rowNum, colNum, colVal.toString())
+									addCell(appSheet, applicationCount, colNum, colVal.toString())
 							}
 						}
+						
+						GormUtil.flushAndClearSession(session, applicationCount)
 					}
 					log.info "export() - processing apps took ${TimeUtil.elapsed(started)}"
 					started = new Date()
@@ -2652,12 +2714,16 @@ class AssetEntityService {
 				//
 				if ( doDB ) {
 					exportedEntity += "D"
-					for ( int r = 1; r <= dbSize; r++ ) {
+					int databaseCount = 0
+					//for ( int r = 1; r <= dbSize; r++ ) {
+					while(database.next()){
+						def currentDatabase = database.get(0)
 						progressCount++
+						databaseCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress')
 						//Add assetId for walkthrough template only.
 						if( dbSheetColumnNames.containsKey("dbId") ) {
-							addCell(dbSheet, r, 0, (database[r-1].id), Cell.CELL_TYPE_NUMERIC)
+							addCell(dbSheet, databaseCount, 0, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC)
 						}
 						for ( int coll = 0; coll < dbcolumnNameListSize; coll++ ) {
 							def addContentToSheet
@@ -2665,9 +2731,9 @@ class AssetEntityService {
 							//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 							def colName = dbColumnNameList.get(coll)
 							if (colName == "DepGroup") {
-								addCell(dbSheet, r, dbMap[colName], assetDepBundleMap[database[r-1].id])
+								addCell(dbSheet, databaseCount, dbMap[colName], assetDepBundleMap[currentDatabase.id])
 							} else if(attribute in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-								def dateValue = database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])
+								def dateValue = currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
 									if (attribute == 'lastUpdated') {
 										dateValue = dateTimeFormat.format(TimeUtil.convertInToUserTZ(dateValue, tzId))
@@ -2677,17 +2743,19 @@ class AssetEntityService {
 								} else {
 									dateValue =''
 								}
-								addCell(dbSheet, r, dbMap[colName], dateValue)
-							} else if ( database[r-1][attribute] == null ) {
-								addCell(dbSheet, r, dbMap[colName], "")
+								addCell(dbSheet, databaseCount, dbMap[colName], dateValue)
+							} else if ( currentDatabase[attribute] == null ) {
+								addCell(dbSheet, databaseCount, dbMap[colName], "")
 							} else {
 								if ( bundleMoveAndClientTeams.contains(dbDTAMap.eavAttribute.attributeCode[coll]) ) {
-									addCell(dbSheet, r, dbMap[colName], String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode))
+									addCell(dbSheet, databaseCount, dbMap[colName], String.valueOf(currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll]).teamCode))
 								} else {
-									addCell(dbSheet, r, dbMap[colName], String.valueOf(database[r-1].(dbDTAMap.eavAttribute.attributeCode[coll])))
+									addCell(dbSheet, databaseCount, dbMap[colName], String.valueOf(currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll])))
 								}
 							}
 						}
+						
+						GormUtil.flushAndClearSession(session, databaseCount)
 					}
 					log.info "export() - processing databases took ${TimeUtil.elapsed(started)}"
 					started = new Date()
@@ -2698,13 +2766,17 @@ class AssetEntityService {
 				//
 				if ( doStorage ) {
 					exportedEntity += "F"
-					for ( int r = 1; r <= fileSize; r++ ) {
+					//for ( int r = 1; r <= fileSize; r++ ) {
+					int filesCount = 0
+					while(files.next()){
+						def currentFile = files.get(0)
 						progressCount++
+						filesCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress')
 						
 						// Add assetId for walkthrough template only.
 						if ( storageSheetColumnNames.containsKey("filesId") ) {
-							addCell(storageSheet, r, 0, (files[r-1].id), Cell.CELL_TYPE_NUMERIC)
+							addCell(storageSheet, filesCount, 0, (currentFile.id), Cell.CELL_TYPE_NUMERIC)
 						}
 
 						for ( int coll = 0; coll < filecolumnNameListSize; coll++ ) {
@@ -2712,9 +2784,9 @@ class AssetEntityService {
 							def attribute = fileDTAMap.eavAttribute.attributeCode[coll]
 							def colName = fileColumnNameList.get(coll)
 							if (colName == "DepGroup") {
-								addCell(storageSheet, r, fileMap[colName], assetDepBundleMap[files[r-1].id] )
+								addCell(storageSheet, filesCount, fileMap[colName], assetDepBundleMap[currentFile.id] )
 							} else if(attribute in ['retireDate', 'maintExpDate', 'lastUpdated']) {
-								def dateValue = files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])
+								def dateValue = currentFile.(fileDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
 									if (attribute == 'lastUpdated') {
 										dateValue = dateTimeFormat.format(TimeUtil.convertInToUserTZ(dateValue, tzId))
@@ -2724,14 +2796,16 @@ class AssetEntityService {
 								} else {
 									dateValue =''
 								}
-								addCell(storageSheet, r, fileMap[colName], dateValue)
-							} else if ( files[r-1][attribute] == null ) {
-								addCell(storageSheet, r, fileMap[colName], "")
+								addCell(storageSheet, filesCount, fileMap[colName], dateValue)
+							} else if ( currentFile[attribute] == null ) {
+								addCell(storageSheet, filesCount, fileMap[colName], "")
 							} else {
-								addCell(storageSheet, r, fileMap[colName], String.valueOf(files[r-1].(fileDTAMap.eavAttribute.attributeCode[coll])))
+								addCell(storageSheet, filesCount, fileMap[colName], String.valueOf(currentFile.(fileDTAMap.eavAttribute.attributeCode[coll])))
 							}
 
 						}
+						
+						GormUtil.flushAndClearSession(session, filesCount)
 					}
 					log.info "export() - processing storage took ${TimeUtil.elapsed(started)}"
 					started = new Date()

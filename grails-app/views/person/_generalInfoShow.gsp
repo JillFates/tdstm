@@ -17,6 +17,16 @@
 			<div>
 				<table class="personTable">
 					<tbody>
+
+						<tr class="prop">
+							<td valign="top" class="name"><label for="company">Company:</label>
+							</td>
+							<td valign="top" class="value" colspan="2"><span
+								class="personShow" id="companyId">
+									${company}
+							</span></td>
+						</tr>
+						
 						<tr class="prop">
 							<td valign="top" class="name"><label for="firstName">First
 										Name:&nbsp;
@@ -47,15 +57,6 @@
 									Name:</label></td>
 							<td valign="top" class="value" colspan="2" width="50%"><span
 								class="personShow" id="lastNameId"> ${person.lastName}
-							</span></td>
-						</tr>
-
-						<tr class="prop">
-							<td valign="top" class="name"><label for="company">Company:</label>
-							</td>
-							<td valign="top" class="value" colspan="2"><span
-								class="personShow" id="companyId">
-									${company}
 							</span></td>
 						</tr>
 

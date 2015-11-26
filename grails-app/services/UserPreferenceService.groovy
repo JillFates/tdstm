@@ -333,22 +333,24 @@ class UserPreferenceService  {
 		def login = securityService.getUserLogin()
 		def securityViolations = false
 		roleTypeList.each { roleCode ->
-			if (! securityService.isRoleAssignable(login.person, roleCode)) {
-				securityService.reportViolation("Attempted to update user $person permission to assign security role $role, which is not permissible", login)
-				securityViolations = true
-			} else {
-				RoleType roleType = RoleType.findById(roleCode)
-				if (!roleType) {
-					securityService.reportViolation("attempted to update user $person permission with undefined role $roleCode", login)
+			if (roleCode) {
+				if (! securityService.isRoleAssignable(login.person, roleCode)) {
+					securityService.reportViolation("Attempted to update user $person permission to assign security role $roleCode, which is not permissible", login)
 					securityViolations = true
 				} else {
-					// Create Role Preferences to User if it doesn't exist
-					PartyRole partyRole = PartyRole.findByPartyAndRoleType(person, roleType)
-					if (! partyRole) {
-						partyRole = new PartyRole( party:person, roleType:roleType )
-						if (! partyRole.save( insert:true )) {
-							log.error "setUserRoles() failed to add partyRole $partyRole : " + GormUtil.allErrorsString(partyRole)
-							securityViolations =  true
+					RoleType roleType = RoleType.findById(roleCode)
+					if (!roleType) {
+						securityService.reportViolation("attempted to update user $person permission with undefined role $roleCode", login)
+						securityViolations = true
+					} else {
+						// Create Role Preferences to User if it doesn't exist
+						PartyRole partyRole = PartyRole.findByPartyAndRoleType(person, roleType)
+						if (! partyRole) {
+							partyRole = new PartyRole( party:person, roleType:roleType )
+							if (! partyRole.save( insert:true )) {
+								log.error "setUserRoles() failed to add partyRole $partyRole : " + GormUtil.allErrorsString(partyRole)
+								securityViolations =  true
+							}
 						}
 					}
 				}

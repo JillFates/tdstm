@@ -82,5 +82,32 @@ class TimeUtilTests extends Specification {
 			'-48s' == TimeUtil.ago(delta)
 
 	}
-		
+
+	public void testTimezoneOffsetToGMT() {
+		// Only use timezones that do not support DST (lucky bastards)
+		List tzData = [
+			['Asia/Singapore', 					'+08:00'],
+			['Asia/Kathmandu', 					'+05:45'],
+			['Pacific/Tongatapu',				'+13:00'],
+			['America/Argentina/Buenos_Aires',	'-03:00'],
+			['America/Caracas', 				'-04:30'],
+			['America/Phoenix',					'-07:00']
+		]
+
+		for (int i=0; i < tzData.size(); i++) {
+			String tzs = tzData[i][0]
+			TimeZone tz = TimeZone.getTimeZone(tzs)
+			// println "TZ=$tzs\n$tz"
+
+			// Make sure the above timezones exist (if not found it is getTimeZone returns GMT)
+			assertEquals "Invalid TZ $tzs", tzs, tz.getID()
+
+			// Make sure that the test cases don't use DST
+			assertFalse "$tzs supports DST", tz.useDaylightTime()
+
+			// Check the results
+			assertEquals tzs, tzData[i][1], TimeUtil.timezoneOffsetToGMT(tz)
+		}
+	}
+	
 }

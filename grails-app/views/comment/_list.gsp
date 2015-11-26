@@ -21,7 +21,11 @@
                 </thead>
                 <tbody id="listCommentsTbodyId">
                     <tr class="comments-table-row" ng-repeat="comment in commentsData" id="commentTr_{{comment.commentInstance.id}}" ng-style="rowColor(comment)">
-                        <td><a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'comment_edit.png')}" border="0"></a></td>
+                        <td>
+                        <tds:hasPermission permission='AssetEdit'>
+                            <a id="link_{{comment.commentInstance.id}}" ng-click="edit(comment.commentInstance.id, comment.commentInstance.commentType)" name="205873"><img src="${resource(dir:'icons',file:'comment_edit.png')}" border="0"></a>
+                        </tds:hasPermission>
+                        </td>
                         <td id="comment_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{truncate(comment.commentInstance.comment)}}</td>
                         <td id="type_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{(comment.commentInstance.isResolved == '1'?'Archived':'')}}</td>
                         <td id="category_{{comment.commentInstance.id}}" ng-click="view(comment.commentInstance.id, comment.commentInstance.commentType)">{{truncate(comment.commentInstance.category)}}</td>
@@ -30,7 +34,7 @@
             </table>
         </div>
         <div class="buttons">
-            <tds:hasPermission permission='CommentCrudView'>
+            <tds:hasPermission permission='AssetEdit'>
                 <a ng-click="createComment()" class="comment-create-button">
                 <img src="${resource(dir:'icons',file:'comment_add.png')}" border="0px" style="margin-bottom: -4px;"/> &nbsp;&nbsp;Add Comment
                 </a>

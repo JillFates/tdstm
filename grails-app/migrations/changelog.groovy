@@ -100,4 +100,12 @@ databaseChangeLog = {
 	include file: '20150828-add-SendUserActivations-permission.groovy'
 	include file: '20150930-add-new-eav-attribute-for-lun.groovy'
 	include file: '20151020-set-custom-fields-to-hidden.groovy'
+	include file: '20151020-add-new-virtualization-teams.groovy'
+	include file: '20151019-move-event-staff-fix.groovy'
+	include file: '20151102-move-event-staff-rename.groovy'
+	include file: '20151109-change-some-asset-datetimes-to-date.groovy'
+	include file: '20151109-remove-invalid-party-relationship-references-to-party-table.groovy'
+	include file: '20151116-dependency-analyzer-permissions.groovy'
+	include file: '2015113-add-project-staff-partyrelationships.groovy'
+	include file: '2015117-set-old-persons-and-users-inactive.groovy'
 }

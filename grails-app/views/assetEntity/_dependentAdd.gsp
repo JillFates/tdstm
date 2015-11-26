@@ -12,7 +12,7 @@
 			<td><g:select name="dataFlowFreq_FIELD_SUFFIX" from="${com.tds.asset.AssetDependency.constraints.dataFlowFreq.inList}"></g:select></td>
 
 			<%-- Asset Class Options SELECT --%>
-			<td>
+			<td class="class-wrap-depend">
 				<%-- Set the default to Application if on Application edit otherwise default to Servers --%>
 				<g:select name="entity_FIELD_SUFFIX" 
 					onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 

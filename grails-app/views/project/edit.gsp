@@ -155,12 +155,24 @@
 								<label for="projectManager">Project Managers:</label>
 							</td>
 							<td class="valueNW">
-								<ul>
-									<g:each status="i" in="${projectManagers}" var="manager">
-									<li>${manager?.partyIdTo?.lastNameFirstAndTitle}</li>
-									</g:each>
-								</ul>
-								<br>
+								<select id="projectManagerId" name="projectManager">
+									<option value="" selected="selected">Please Select </option>
+									<optgroup label="${company.name}" >
+										<g:each status="i" in="${companyStaff}" var="companyStaff">
+											<option value="${companyStaff.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+										</g:each>
+									</optgroup>
+									<optgroup label="${projectInstance?.client}">
+										<g:each status="i" in="${clientStaff}" var="clientStaff">
+											<option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+										</g:each>
+									</optgroup>
+									<optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
+										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
+											<option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+										</g:each>
+									</optgroup>
+								</select>
 							</td>
 							<td class="name">Default Bundle:</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
@@ -191,8 +203,30 @@
 									</div>
 								</g:hasErrors>
 							</td>
-							<td><br></td>
-							<td><br></td>
+							<td class="name">
+								<label for="projectManager">Move Manager:</label>
+							</td>
+							<td class="valueNW">
+								<select id="moveManagerId" name="moveManager">
+									<option value="" selected="selected">Please Select</option>
+									<optgroup label="${company.name}">
+										<g:each status="i" in="${companyStaff}" var="companyStaff">
+											<option value="${companyStaff?.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+										</g:each>
+									</optgroup>
+									<optgroup label="${projectInstance?.client}">
+										<g:each status="i" in="${clientStaff}" var="clientStaff">
+											<option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+										</g:each>
+									</optgroup>
+									<optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
+										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
+											<option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
+										</g:each>
+									</optgroup>
+								</select>
+								<input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
+							</td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
@@ -240,7 +274,14 @@
 			placeholder: "Please Select",
 			width: "75%"
 		});
-
+		$("#projectManagerId").select2({
+			placeholder: "Please Select",
+			width: "75%"
+		});
+		$("#moveManagerId").select2({
+			placeholder: "Please Select",
+			width: "75%"
+		});
 		// Initialize company partners
 		var companyPartners = []
 		<g:each status="i" in="${companyPartners}" var="partner">

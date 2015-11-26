@@ -6,6 +6,7 @@ import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.StringUtil
 
 import grails.converters.JSON
 import groovy.time.TimeCategory
@@ -242,22 +243,26 @@ class TaskController {
 	def genActionBarForShowViewJson() {
 		def comment = AssetComment.get(params.id)
 		def userLogin = securityService.getUserLogin()
+		def project = securityService.getUserCurrentProject()
 		def actionBar = []
 		def includeDetails = params.includeDetails?params.includeDetails.toBoolean():false
 		def result
 
 		if (comment) {
-			if (comment.status in [ AssetCommentStatus.READY, AssetCommentStatus.STARTED]) {
-				def enabled = (comment.status ==  AssetCommentStatus.READY)
-				actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager', disabled: !enabled]
+			if (comment.project.id != project.id) {
+				ServiceResults.respondWithError(response, "Task was not found")
+			} else {
+				if (comment.status in [ AssetCommentStatus.READY, AssetCommentStatus.STARTED]) {
+					def enabled = (comment.status ==  AssetCommentStatus.READY)
+					actionBar << [label: 'Start', icon: 'ui-icon-play', actionType: 'changeStatus', newStatus: AssetCommentStatus.STARTED, redirect: 'taskManager', disabled: !enabled]
 
-				enabled = (comment.status in [ AssetCommentStatus.READY, AssetCommentStatus.STARTED])
-				actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager', disabled: !enabled]
-			}
+					enabled = (comment.status in [ AssetCommentStatus.READY, AssetCommentStatus.STARTED])
+					actionBar << [label: 'Done', icon: 'ui-icon-check', actionType: 'changeStatus', newStatus: AssetCommentStatus.DONE, redirect: 'taskManager', disabled: !enabled]
+				}
 
-			if (includeDetails) {
-				actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
-			}
+				if (includeDetails) {
+					actionBar << [label: 'Details...', icon: 'ui-icon-zoomin', actionType: 'showDetails']
+				}
 			
 			if ( HtmlUtil.isMarkupURL(comment.instructionsLink)  )
 			{
@@ -271,30 +276,33 @@ class TaskController {
 				}
 			}
 
-			if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
-				actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
-			}
+				if (userLogin.person.id != comment.assignedTo?.id && comment.status in [AssetCommentStatus.PENDING, AssetCommentStatus.READY, AssetCommentStatus.STARTED]){
+					actionBar << [label: 'Assign To Me', icon: 'ui-icon-person', actionType: 'assignTask', redirect: 'taskManager']
+				}
 
-			
-			def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
-			if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
-				actionBar << [label: 'Delay for:']
-				actionBar << [label: '1 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '1']
-				actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
-				actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
-			}
+				def hasDelayPrem = RolePermissions.hasPermission("CommentCrudView")
+				if(hasDelayPrem && comment.status ==  AssetCommentStatus.READY && !(comment.category in AssetComment.moveDayCategories)){
+					actionBar << [label: 'Delay for:']
+					actionBar << [label: '1 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '1']
+					actionBar << [label: '2 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '2']
+					actionBar << [label: '7 day', icon: 'ui-icon-seek-next', actionType: 'changeEstTime', delay: '7']
+				}
 
-			def depCount = TaskDependency.countByPredecessor( comment )
-			if (depCount > 0) {
-				actionBar << [label: 'Neighborhood', icon: 'tds-task-graph-icon', actionType: 'showNeighborhood']	
-			}
+				def depCount = TaskDependency.countByPredecessor( comment )
+				if (depCount > 0) {
+					actionBar << [label: 'Neighborhood', icon: 'tds-task-graph-icon', actionType: 'showNeighborhood']	
+				}
 
-			result = ServiceResults.success(actionBar) as JSON
+				result = ServiceResults.success(actionBar) as JSON
+			}
 		} else {
-			result = ServiceResults.fail([error:"invalid comment id (${params.id}) from user ${userLogin}"]) as JSON
+			ServiceResults.respondWithFailure(response, [error:"Task was not found."]) as JSON
 		}
 
-		render result
+		if (result) {
+			render result	
+		}
+
 	}
 
 	/**
@@ -605,8 +613,10 @@ digraph runbook {
 			style = styleDef
 
 			tasks.each {
+
 				def task = "${it.task_number}:" + it.task.encodeAsJSON()
 			    def tooltip  = "${it.task_number}:" + it.task.encodeAsJSON()
+
 				def colorKey = taskService.taskStatusColorMap.containsKey(it.status) ? it.status : 'ERROR'
 				
 				fillcolor = taskService.taskStatusColorMap[colorKey][1]

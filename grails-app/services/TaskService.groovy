@@ -223,6 +223,8 @@ class TaskService implements InitializingBean {
 				- If duedate exists and is older than today +5
 				- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
 			*/
+			// TODO : JPM 11/2015 : The DONE calculation below needs to change due to tickets TM-4249 and TM-4250
+			// This calculation is completely wrong.
 			sql.append(""", 
 				( ( CASE t.status 
 				WHEN '${AssetCommentStatus.HOLD}' THEN 900
@@ -1293,7 +1295,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					
 					if (depth==1) {
 						td.each() { t ->
-							log.info "getNeighborhood: dependency $t - $depCountName = ${t[depCountName]} outside dep"
+							//log.info "getNeighborhood: dependency $t - $depCountName = ${t[depCountName]} outside dep"
+							log.info "getNeighborhood: dependency $t"
 						}				
 					}
 
@@ -2875,7 +2878,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// This logic is used for the various grouping actions (e.g. cart, truck, set)
 								// Iterate over the associated assets that were stuffed into the task.associatedAssets list
 								def foundPred=false
-								tnp.associatedAssets.each() { assocAsset ->
+								tnp.getTmpAssociatedAssets().each() { assocAsset ->
 									// If an asset already has existing task, need to wire up the predecessor
 									if (assetsLatestTask.containsKey(assocAsset.id)) {
 										// Let's temporially stuff the asset into the task and then wire up the predecessors 
@@ -4498,8 +4501,10 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// Iterate over the list of Staff and create tasks if they have Logins
 		staffList.each() { staff ->
 			// Create a task if we're at the end of the Staff(person) and the person has a UserLogin
-			if (lastPerson && lastPerson.id != staff?.person?.id && UserLogin.findByPerson(staff.person)) {
-				createActualTask()
+			if (lastPerson && (lastPerson.id != staff?.person?.id)) {
+				if (UserLogin.findByPerson(lastPerson)) {
+					createActualTask()
+				}
 				lastPerson = staff.person
 				teams = []
 			}

@@ -846,14 +846,16 @@ class MoveBundleController {
 	 * Control function to render the Dependency Analyzer (was Dependency Console)
 	 */
 	def dependencyConsole() {
-	
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = controllerService.getProjectForPage(this, "DepAnalyzerView")
+		if (!project) 
+			return
+
 		Date start = new Date()
 		def assignedGroup = params.assinedGroup ?: userPreferenceService.getPreference("AssignedGroup") 
 		if(!assignedGroup)
 			assignedGroup = "1"
 		userPreferenceService.setPreference( "AssignedGroup", assignedGroup)
-		def map = moveBundleService.dependencyConsoleMap(projectId, params.bundle, assignedGroup, null)
+		def map = moveBundleService.dependencyConsoleMap(project.id, params.bundle, assignedGroup, null)
 		
 		//log.info "dependencyConsole() : moveBundleService.dependencyConsoleMap() took ${TimeUtil.elapsed(start)}"
 		return map
@@ -863,13 +865,20 @@ class MoveBundleController {
 	 * Controller to render the Dependency Bundle Details
 	 */
 	def dependencyBundleDetails() { 
-		def projectId = getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ
+		def project = controllerService.getProjectForPage(this, "DepAnalyzerView")
+		if (!project) 
+			return
+
 		// Now get the model and display results
 		def isAssigned = userPreferenceService.getPreference( "AssignedGroup" )?: "1"
-		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(projectId, params.bundle, isAssigned, null) )
+		render(template:'dependencyBundleDetails', model:moveBundleService.dependencyConsoleMap(project.id, params.bundle, isAssigned, null) )
 	}
 
 	def generateDependency() {
+		def project = controllerService.getProjectForPage(this, "DepAnalyzerGenerate")
+		if (!project) 
+			return
+
 		def baseName = "generateDependency"
 		def key = baseName + "-" + UUID.randomUUID().toString()
 		progressService.create(key)
@@ -890,7 +899,7 @@ class MoveBundleController {
 
 		trigger.jobDataMap.put('key', key)
 		trigger.jobDataMap.put('username', username)
-		trigger.jobDataMap.put('projectId', projectId)
+		trigger.jobDataMap.put('projectId', project.id)
 		trigger.jobDataMap.put('connectionTypes', connectionTypes)
 		trigger.jobDataMap.put('statusTypes', statusTypes)
 		trigger.jobDataMap.put('isChecked', isChecked)
@@ -914,6 +923,10 @@ class MoveBundleController {
 	 * Assigns one or more assets to a specified bundle
 	 */
 	def saveAssetsToBundle() {
+		def project = controllerService.getProjectForPage(this, "AssetEdit")
+		if (!project) 
+			return
+
 		def assetArray = params.assetVal
 		def moveBundleInstance = MoveBundle.findById(Integer.parseInt(params.moveBundle))
 		session.ASSIGN_BUNDLE = params.moveBundle

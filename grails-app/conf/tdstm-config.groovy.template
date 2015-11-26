@@ -250,8 +250,14 @@ graph {
 	 targetURI = '/../images/tmp/'
 }
 
-// Mail Properties
+/**
+ * Email Configuration Settings
+ */
 grails {
+
+	/* 
+	 * SMTP connection using typical no authenticated/secure communications
+	 */
 	mail {
 		host = '127.0.0.1'
 		port = 25
@@ -267,27 +273,58 @@ grails {
 			,'mail.smtp.ssl.enable': false
 			,'mail.smtp.socketFactory.fallback': true
 		]
-
 	}
-	/*
-	 mail {
-			host = "smtp.gmail.com"
-			port = 465
-			username = "tds.transition.manager@gmail.com"
-			password = "urbzjbkftjzeybaq"
-		props = [
-			"mail.smtp.auth":"true",
-			"mail.smtp.socketFactory.port":"465",
-			"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-			"mail.smtp.socketFactory.fallback":"false"
-			] 
 
-	 }
+	/*
+	 * SMTP connection using SSL connection
+	 *
+	mail {
+		host = 'smtp.gmail.com'
+		port = 465
+		username = '*** USERNAME ***'
+		password = '*** PASSWORD ***'
+		props = [
+			'mail.smtp.auth': true,
+			'mail.smtp.socketFactory.port': 465,
+			'mail.smtp.socketFactory.class':'javax.net.ssl.SSLSocketFactory',
+			'mail.smtp.starttls.enable': false, 
+			'mail.smtp.ssl.enable': true,
+			'mail.smtp.socketFactory.fallback': false
+		]
+	}
+	*/
+
+	/*
+	 * SMTP connection using TLS connection
+	 *
+	mail {
+		host = '*** HOSTNAME ***'
+		port = 587
+		username = '*** USERNAME ***'
+		password = '*** PASSWORD ***'
+		props = [
+			'mail.smtp.auth': true,
+			'mail.smtp.socketFactory.port':'587',
+			'mail.smtp.starttls.enable': true,
+			'mail.smtp.socketFactory.class': 'javax.net.ssl.SSLSocketFactory',
+			'mail.smtp.socketFactory.fallback': false,
+			'mail.debug':true
+		]
+	}
 	*/
 }
-grails.mail.default.from = "TDS Transition Manager <tds.transition.manager@gmail.com>"
-grails.mail.overrideAddress="TM DEBUG EMAILS<jmartin@transitionaldata.com>"
+// Toggle email on/off completely
+grails.mail.disabled=false
 
+// The email address that messages appear to come from if not specified in code
+grails.mail.default.from = "*** EMAIL ADDRESS ***"
+
+// Used to override the TO for messages - used for debugging to send all email to test account
+grails.mail.overrideAddress="*** EMAIL ADDRESS IF OVERRIDING ***"
+
+/**
+ * Logging configuration
+ */
 logback = {
 	appenders {
 		//def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"

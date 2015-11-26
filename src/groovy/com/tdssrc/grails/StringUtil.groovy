@@ -139,4 +139,95 @@ class StringUtil {
 		return (existingString?.size()>0) ? [existingString, newString].join(separator) : newString
 	}
 
+	/**
+	 * Escapes characters in JSON output
+	 *
+	 * @param str - the string to escape
+	 * @return the string encoded as JSON
+	 */
+	static String encodeAsJson(CharSequence str) {
+		if (str == null || str.length() == 0) {
+			return str;
+		}
+
+		StringBuilder sb = null;
+		int n = str.length(), i;
+		int startPos = -1;
+		char prevChar = (char)0;
+		for (i = 0; i < n; i++) {
+			char ch = str.charAt(i);
+			if (startPos == -1) {
+				startPos = i;
+			}
+			String escaped = escapeCharacter(ch, prevChar);
+			if (escaped != null) {
+				if (sb == null) {
+					sb = new StringBuilder();
+				}
+				if (i - startPos > 0) {
+					sb.append(str, startPos, i);
+				}
+				if (escaped.length() > 0) {
+					sb.append(escaped);
+				}
+				startPos = -1;
+			}
+			prevChar = ch;
+		}
+		if (sb != null) {
+			if (startPos > -1 && i - startPos > 0) {
+				sb.append(str, startPos, i);
+			}
+			return sb.toString();
+		}
+		else {
+			return str;
+		}
+	}
+
+	/**
+	 * Escape the character, return null if no replacement has to be made
+	 *
+	 * @param ch the character to escape
+	 * @param previousChar  the previous char
+	 * @return the replacement string, null if no replacement has to be made
+	 */
+	static String escapeCharacter(char ch, char previousChar) {
+		switch (ch) {
+			case '"':
+				return "\\\"";
+			case '\\':
+				return "\\\\";
+			case '\t':
+				return "\\t";
+			case '\n':
+				return "\\n";
+			case '\r':
+				return "\\r";
+			case '\f':
+				return "\\f";
+			case '\b':
+				return "\\b";
+			case '\u000B': // vertical tab: http://bclary.com/2004/11/07/#a-7.8.4
+				return "\\v";
+			case '\u2028':
+				return "\\u2028"; // Line separator
+			case '\u2029':
+				return "\\u2029"; // Paragraph separator
+			case '/':
+				// preserve special handling that exists in JSONObject.quote to improve security if JSON is embedded in HTML document
+				// prevents outputting "</" gets outputted with unicode escaping for the slash
+				if (previousChar == '<') {
+					return "\\u002f"; 
+				}
+				break;
+		}
+		if(ch < ' ') {
+			// escape all other control characters
+			return ch
+			//return "\\u" + StringGroovyMethods.padLeft(Integer.toHexString(ch), 4, "0");
+		}
+		return null;
+	}
+
 }

@@ -12,6 +12,20 @@ import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 class CustomTagLib {
 	static namespace = 'tds'
 	
+	/** 
+	 * Used to do standard format of a date
+	 * TODO : JPM 10/23/2015 : The formatDate was added because the convertDate is incorrectly do a Timezone shift of the date but shouldn't	
+	 */
+	def formatDate = { attrs ->
+		Date date = attrs['date']
+		if (date) {
+			DateFormat formatter = new SimpleDateFormat('MM/dd/yyyy')
+			out << formatter.format(date)
+		} else {
+			out << ''
+		}
+	}
+
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
 	 */

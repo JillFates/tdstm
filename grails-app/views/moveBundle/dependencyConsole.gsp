@@ -46,50 +46,50 @@
 					</g:link>
 				</div>
 			</div>
-			<tds:hasPermission permission='MoveBundleEditView'>
-				<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
-					<div id="checkBoxDivId">
-						<g:form name="checkBoxForm"> 
-							<div style="float: left; margin-left:18px;">
-								<fieldset>
-									<legend>Connection Type:</legend>
-									<g:each in="${dependencyType}" var="dependency">
-										<input type="checkbox" id="${dependency}"
-											name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
-											<span id="dependecy_${dependency}"> ${dependency}</span>
-										<br />
-									</g:each>
-								</fieldset>
-							</div>
-							&nbsp;
-							<div style="float: left;margin-left: 10px;">
-								<fieldset>
-									<legend>Connection Status:</legend>
-									<g:each in="${dependencyStatus}" var="dependencyStatusValue">
-										<input type="checkbox" id="${dependencyStatusValue}"
-											name="status" value="${dependencyStatusValue}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusValue) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusValue) ? '' : 'checked')}/>&nbsp;&nbsp;
-											<span id="dependecy_${dependencyStatusValue}"> ${dependencyStatusValue} </span>
-										<br />
-									</g:each>
-								</fieldset>
-								<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-										&nbsp;&nbsp; <span>Save as defaults</span>
-							</div>
-							<div class="buttonR">
-								<input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
-							</div>
-							
-						</g:form>
-					</div> 
-				</div>
-			</tds:hasPermission>
+
+			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
+				<div id="checkBoxDivId">
+					<g:form name="checkBoxForm"> 
+						<div style="float: left; margin-left:18px;">
+							<fieldset>
+								<legend>Connection Type:</legend>
+								<g:each in="${dependencyType}" var="dependency">
+									<input type="checkbox" id="${dependency}"
+										name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
+										<span id="dependecy_${dependency}"> ${dependency}</span>
+									<br />
+								</g:each>
+							</fieldset>
+						</div>
+						&nbsp;
+						<div style="float: left;margin-left: 10px;">
+							<fieldset>
+								<legend>Connection Status:</legend>
+								<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+									<input type="checkbox" id="${dependencyStatusInst}"
+										name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatus) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus) ? '' : 'checked')}/>&nbsp;&nbsp;
+										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
+									<br />
+								</g:each>
+							</fieldset>
+							<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+									&nbsp;&nbsp; <span>Save as defaults</span>
+						</div>
+						<div class="buttonR">
+							<input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
+						</div>
+						
+					</g:form>
+				</div> 
+			</div>
+
 
 			<div style="clear: both;"></div>
-			<tds:hasPermission permission='MoveBundleEditView'>
-				<div id = "dependencyBundleDetailsId" >
-					<g:render template="dependencyBundleDetails" />
-				</div>
-			</tds:hasPermission>
+
+			<div id = "dependencyBundleDetailsId" >
+				<g:render template="dependencyBundleDetails" />
+			</div>
+
 			<div style="clear: both;"></div>
 			
 			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
@@ -129,10 +129,8 @@
 			</div>
 		</div>
 		<div style="float:left;">
-			<tds:hasPermission permission='MoveBundleEditView'>
-				<div id="items1" style="display: none"></div>
-				<div id="spinnerDivId" style="display: none"></div>
-			</tds:hasPermission>
+			<div id="items1" style="display: none"></div>
+			<div id="spinnerDivId" style="display: none"></div>
 			<g:render template="../assetEntity/modelDialog" />
 			<g:render template="../assetEntity/entityCrudDivs" />
 			<div id="createStaffDialog" style="display:none;" class="static-dialog">

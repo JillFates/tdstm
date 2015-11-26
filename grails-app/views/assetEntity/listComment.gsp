@@ -73,8 +73,10 @@
 						return '<span class="Arrowcursor" ng-click="comments.showCommentById(\''+options.rowId+'\',\'comment\')">'+value+'</span>'
 				}
 				function myCustomFormatter (cellVal,options,rowObject) {
-					var editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
-						"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+					var editButton = '';
+					if (${canEditComments})
+						editButton = '<a ng-click="comments.editCommentById(\''+options.rowId+'\',\'comment\')">'+
+							"<img src='${resource(dir:'icons',file:'comment_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject) {

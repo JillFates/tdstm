@@ -42,16 +42,26 @@
 				</g:if>
 				<g:else>
 					<g:if test="${projectStaff.role != 'STAFF'}">
-						<td id="projectColumnId" class="js-staffProject ${(projectStaff.project==1)?('checkedStaff'):('')}" nowrap="nowrap" title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}">
-							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck"
-								ng-click="saveProjectStaff2($event)" 
-								<g:if test="${inProject}"> checked </g:if>
-								
-								value="${(inProject)?(1):(0)}" />
+
+						<td id="projectColumnId" 
+							class="js-staffProject ${(projectStaff.project==1)?('checkedStaff'):('')}" 
+							nowrap="nowrap" 
+							title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}"
+						>
+							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"'}
+								onClick="addRemoveProjectTeam($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
+								value="${(inProject)?(1):(0)}" 
+								${(projectStaff.project==1)?('checked="checked"'):('')} />
 						</td>
 					</g:if>
 					<g:else>
-						<td id="${projectColumnId}" nowrap="nowrap" title="${projectStaff.fullName} cannot be assigned using this team">
+						<td id="${projectColumnId}" nowrap="nowrap" title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name}">
+
+							<input id="staff_person_${projectStaff.personId}" type="checkbox" name="staffChangeCheck" ${editPermission ?: 'disabled = "disabled"'}
+								onClick="addRemoveProjectStaff($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
+								value="${(inProject)?(1):(0)}" 
+								${(projectStaff.project==1)?('checked="checked"'):('')} />
+
 						</td>
 					</g:else>
 				</g:else>

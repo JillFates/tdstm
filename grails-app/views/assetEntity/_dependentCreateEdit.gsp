@@ -26,7 +26,7 @@
 					<td><g:select name="dataFlowFreq_support_${support.id}" value="${support.dataFlowFreq}" from="${support.constraints.dataFlowFreq.inList}" /></td>
 
 					<%-- Class --%>
-					<td>
+					<td class="class-wrap-depend">
 						<g:select name="entity_support_${support.id}" 
 							id="entity_support_${support.id}" 
 							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 
@@ -47,7 +47,7 @@
 							data-asset-name="${support?.asset?.assetName}" 
 							data-asset-type="${type}"
 							data-slide="deps"  
-							onchange="changeMovebundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')" 
+							onchange="EntityCrud.updateDependentBundle(this.value,this.name,'${assetEntity?.moveBundle?.id}')"
 						/>
 					</td>
 
@@ -62,7 +62,7 @@
 						</g:if>
 						<g:elseif test="${supportBundle!=assetEntity.moveBundle }" >
 							<g:select from="${moveBundleList}" name="moveBundle_support_${support.id}" value="${supportBundle?.id}" 
-								optionKey="id" optionValue="name" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')" 
+								optionKey="id" optionValue="name" onchange="EntityCrud.changeDependentBundleColor(this.name,this.value,'${assetEntity?.moveBundle?.id}','')"
 								class="dep-${(support.status != 'Questioned' && support.status != 'Validated') ? 'Unknown' : support.status } depBundle"
 							></g:select>
 						</g:elseif>
@@ -125,7 +125,7 @@
 					</td>
 
 					<%-- Class option --%>
-					<td>
+					<td class="class-wrap-depend">
 						<g:select name="entity_dependent_${dependent.id}" 
 							id="entity_dependent_${dependent.id}" 
 							onChange="EntityCrud.updateDependentAssetNameSelect(this.name)" 

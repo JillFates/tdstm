@@ -11,7 +11,7 @@
 	<div id="selectionId" class="tabControls">
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="server" />
-		<tds:hasPermission permission='MoveBundleEditView'>
+		<tds:hasPermission permission='AssetEdit'>
 			<input id="state" type="button"  class="submit pointer" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${assetList?.asset?.id},'${session.ASSIGN_BUNDLE}')"  />
 		</tds:hasPermission>
 	</div>
@@ -41,10 +41,12 @@
 						<tr id="tag_row1" style="cursor: pointer;" class="${(i % 2) == 0 ? 'odd' : 'even'}">
 							<td nowrap="nowrap">
 								<g:checkBox name="checkBox" id="checkId_${asset.asset.id}" ></g:checkBox>
+								<g:if test="${haveAssetEditPerm}">
 								<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${asset.asset.id})" title="Edit Asset">
 									<img src="/tdstm/icons/database_edit.png" border="0px" />
 								</a> 
-								<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}"></grid-buttons>
+								</g:if>
+								<grid-buttons asset-id="${asset.asset?.id}" asset-type="${asset.asset?.assetType}" tasks="${asset.tasksStatus}" comments="${asset.commentsStatus}" can-edit-tasks="true" can-edit-comments="${haveAssetEditPerm}"></grid-buttons>
 							</td>
 							<td>
 								<span onclick="EntityCrud.showAssetDetailView('${assetClass}', ${asset.asset.id} )">${asset.asset.assetName}</span>

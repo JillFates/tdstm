@@ -77,9 +77,15 @@ class ConnectorActiveDirectory {
 
 				case 'SAM':
 					// If the user is logging in with SAM check to see if the domain was part of the username and add it if not
-					if (domain.domain) {
+					/**
+					 * We were originally adding (at least thinking that we were - code error) the domain to the query but in 
+					 * reality we don't need to so this code has been commented out. After we roll this out and confirm all clients are okay
+					 * then we can remove this.
+					 * TODO : JPM 10/2015 : Remove this code in 3.2.0
+					 *
+					if (false && domain.domain) {
 						if (! queryUsername.contains('\\')) {
-							queryUsername = domain.domain = '\\' + username
+							queryUsername = domain.domain + '\\' + username
 						} else {
 							// validate that the domain is the same as what is defined
 							String userEnteredDomain = queryUsername.split(/\\+/)[0]
@@ -92,6 +98,7 @@ class ConnectorActiveDirectory {
 							}
 						}
 					}
+					*/
 					queryForUser = "(sAMAccountName=$queryUsername)"
 					break
 				default:

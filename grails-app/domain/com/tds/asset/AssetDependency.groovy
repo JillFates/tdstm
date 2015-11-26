@@ -28,8 +28,8 @@ class AssetDependency {
 	static constraints = {
 		asset( nullable:false, unique:['dependent', 'type'] )
 		dependent( nullable:true)
-		type( blank:false, nullable:false )
-		dataFlowFreq(blank:true, nullable:true, inList:[
+		type( blank:false, nullable:false, size:0..255)
+		dataFlowFreq(blank:true, nullable:true, size:0..8, inList:[
 			"Unknown",
 			"constant",
 			"hourly",
@@ -37,19 +37,19 @@ class AssetDependency {
 			"weekly",
 			"monthly"
 		])
-		dataFlowDirection(blank:false, nullable:false , inList:[
+		dataFlowDirection(blank:false, nullable:false, size:0..14, inList:[
 			"Unknown",
 			"bi-directional",
 			"incoming",
 			"outgoing"
 		])
 		status(blank:false, nullable:false )
-		comment(blank:true, nullable:true)
+		comment(blank:true, nullable:true, size:0..255)
 		updatedBy( nullable:false )
-		c1( blank:true, nullable:true )
-		c2( blank:true, nullable:true )
-		c3( blank:true, nullable:true )
-		c4( blank:true, nullable:true )
+		c1( blank:true, nullable:true, size:0..255 )
+		c2( blank:true, nullable:true, size:0..255 )
+		c3( blank:true, nullable:true, size:0..255 )
+		c4( blank:true, nullable:true, size:0..255 )
 	}
 
 	static mapping={	

@@ -22,7 +22,7 @@
 		</label>
 	</td>
 	<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-		<input type="text" id="passwordId" class="passwordField" onkeyup="PasswordValidation.checkPassword(this)" name="password" value=""/>
+		<input type="text" id="passwordId" class="passwordField" onkeyup="PasswordValidation.checkPassword(this)" name="password" value="" autocomplete="off" />
 		
 		<g:hasErrors bean="${userLoginInstance}" field="password">
 			<div class="errors">

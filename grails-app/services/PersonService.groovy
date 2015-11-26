@@ -26,6 +26,7 @@ class PersonService {
 	def securityService
 	def projectService
 	def userPreferenceService
+	def auditService
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -220,6 +221,10 @@ class PersonService {
 		String where = " and P.firstName=:firstName and P.middleName=:middleName and P.lastName=:lastName"
 		String lastName = lastNameWithSuffix(nameMap)
 		List companies = [project.client]
+		if (! clientStaffOnly) {
+			companies << projectService.getOwner(project)
+			companies.addAll( projectService.getPartners(project) )
+		}
 
 		Map queryParams = [ 
 			companies: companies,
@@ -807,10 +812,13 @@ class PersonService {
 			throw new InvalidParamException("Invalid person specified")
 		}
 
-		RoleType teamRoleType = RoleType.get(teamCode) 
-		if (! teamRoleType || ! teamRoleType.isTeamRole() ) {
-			log.warn "assignToProject() user $user called with invalid team code $teamCode"
-			throw new InvalidParamException("The specified team code was invalid")
+		RoleType teamRoleType
+		if (teamCode) {
+			teamRoleType = RoleType.get(teamCode) 
+			if (! teamRoleType || ! teamRoleType.isTeamRole() ) {
+				log.warn "assignToProject() user $user called with invalid team code $teamCode"
+				throw new InvalidParamException("The specified team code was invalid")
+			}
 		}
 
 		// Check to see if the user should have access to the project
@@ -876,7 +884,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
-	void addToProject(UserLogin user, String projectId, String personId, String teamCode, Map map=null) {
+	void addToProjectTeam(UserLogin user, String projectId, String personId, String teamCode, Map map=null) {
 		// The addToEvent may call this method as well
 		if (! map) {
 			map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
@@ -895,14 +903,38 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 		}
 
 		if (! isAssignedToProjectTeam(map.project, map.person, map.teamRoleType)) {
-			log.debug "addToProject() map=$map" 
+			log.debug "addToProjectTeam() map=$map" 
 			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, map.teamRoleType)) {
 				auditService.logMessage("$user assigned ${map.person} to project '${map.project.name}' on team $teamCode")
 			} else {
 				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
 			}			
 		} else {
-			log.warn "addToProject() called for project ${map.project}, person ${map.person}, team ${map.teamRoleType} but already exists"
+			log.warn "addToProjectTeam() called for project ${map.project}, person ${map.person}, team ${map.teamRoleType} but already exists"
+		}
+	}
+
+	/** 
+	 * Used to associate a person to a project as staff
+	 * @param user - the user performing the action
+	 * @param projectId - the id number of the project to remove the person from
+	 * @param personId - the id of the person to update
+	 * @return String - any value indicates an error otherwise blank means succes
+	 */
+	void addToProject(UserLogin user, String projectId, String personId) {
+		// The addToEvent may call this method as well
+		def	map = validateUserCanEditStaffing(user, projectId, personId, null)
+		if (map.error) {
+			throw new InvalidRequestException(map.error)
+		}
+
+		// Add to the project if not assiged already
+		if (! isAssignedToProject(map.project, map.person)) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, 'STAFF')) {
+				auditService.logMessage("$user assigned ${map.person} to project ${map.project.name} as STAFF")
+			} else {
+				throw new DomainUpdateException("An error occurred while trying to assign the person to the event")
+			}			
 		}
 	}
 
@@ -947,6 +979,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param eventId - the event id number to lookup
 	 * @return the event object
 	 */
+	 // TODO : JPM 11/2015 : Refactor lookupEvent into EventService
 	private MoveEvent lookupEvent(Project project, String eventId) {
 		if (! NumberUtil.isPositiveLong(eventId)) {
 			throw new InvalidParamException('The event id number was invalid')
@@ -971,7 +1004,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @return String - any value indicates an error otherwise blank means succes
 	 * TODO : JPM : 9/23/2015 - removeFromProject() doesn't look like it will work and doesn't appear to be used...
 	 */
-	String removeFromProject(UserLogin user, String projectId, String personId, String teamCode) {
+	String removeFromProjectTeam(UserLogin user, String projectId, String personId, String teamCode) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
 		if (map.error) {
 			throw new InvalidRequestException(map.error)
@@ -980,11 +1013,42 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 		// Remove all of the person's MoveEventStaff relationships for the project
 		deleteFromEvent(map.project, null, map.person, map.teamRoleType)
 
+		// Remove the Project Staff Team relationship for the project
+		partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, map.teamRoleType.id)
+
+		// Remove from project staff if don't have more teams
+		List roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
+		if (roles.size() == 1 && roles[0].id.equals("STAFF")) {
+			partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, "STAFF")
+		}
+
+		auditService.logMessage("$user unassigned ${map.person} from project ${map.project.name}")
+	}
+
+	/** 
+	 * Used to remove a person from a project as staff and also clear out references to MoveEventStaff
+	 * @param user - the user performing the action
+	 * @param projectId - the id number of the project to remove the person from
+	 * @param personId - the id of the person to update
+	 * @return String - any value indicates an error otherwise blank means succes
+	 * TODO : JPM : 9/23/2015 - removeFromProject() doesn't look like it will work and doesn't appear to be used...
+	 */
+	String removeFromProject(UserLogin user, String projectId, String personId) {
+		Map map = validateUserCanEditStaffing(user, projectId, personId, null)
+		if (map.error) {
+			throw new InvalidRequestException(map.error)
+		}
+
+		// Remove all of the person's MoveEventStaff relationships for the project
+		deleteFromEvent(map.project, null, map.person, map.teamRoleType)
+
+
 		// Remove the Project Staff relationship for the project
-		List prs = projectService.getTeamMembers(map.project, map.teamRoleType, map.person)
-		prs?.each { 
-			log.debug "removeFromProject() deleting PartyRelationship $it"
-			it.delete()
+		List roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
+		roles?.each {
+			if (it.type.equals(RoleType.TEAM)) {
+				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, it.id)
+			}
 		}
 
 		// Remove the person from the project
@@ -1012,7 +1076,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 
 		// Add the Staff to the Project if not already assigned
 		if (! isAssignedToProjectTeam(map.project, map.person, map.teamRoleType)) {
-			addToProject(user, projectId, personId, teamCode, map)
+			addToProjectTeam(user, projectId, personId, teamCode, map)
 		}
 
 		MoveEvent event = lookupEvent(map.project, eventId)
@@ -1076,7 +1140,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param project - the project to check if user is assigned to
 	 * @param person - the person whom to check 
 	 * @param teamCode - the team code
-	 * @return The company whom the person is employeed
+	 * @return The PartyRelationshipReference that represents the person's relationship to a project
 	 */
 	PartyRelationship getProjectReference(Project project, Person person) {
 		return getProjectTeamReference(project, person, 'STAFF')
@@ -1158,26 +1222,6 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	}
 
 	/**
-	 * Used to get the Employer of the given person
-	 * @param person - the person whom to lookup the employeer
-	 * @return The company whom the person is employeed
-	 */
-	PartyGroup getEmployer(Person person) {
-		assert person != null
-
-		def employer = PartyRelationship.createCriteria().get {
-			and {
-				eq('partyRelationshipType', PartyRelationshipType.get('STAFF'))
-				eq('roleTypeCodeFrom', RoleType.get('COMPANY'))
-				eq('roleTypeCodeTo', RoleType.get('STAFF'))
-				eq('partyIdTo', person)
-			}
-		}
-
-		return ( employer ? employer.partyIdFrom : null )
-	}
-
-	/**
 	 * Used to get a list of projects that the given person is assigned to
 	 * @param person - the person whom to lookup assigned projects
 	 * @param project - if supplied will filter the results to just the one project (optional)
@@ -1212,7 +1256,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	List<Project> getAvailableProjects(Person person, Project project=null, boolean excludeAssigned=false, Date cutoff=null) {
 		assert person != null
 
-		PartyGroup employer = getEmployer(person)
+		PartyGroup employer = person.company
 		List projects = partyRelationshipService.companyProjects(employer, project)
 
 		//log.debug "getAvailableProjects() person $person ($person.id), employer $employer($employer.id), # projects ${projects?.size()}"
@@ -1300,8 +1344,10 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 */
 	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false) 
 		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
-
 		Person person = validatePersonAccess(params.id, byWhom)
+		if(!isAssociatedTo(byWhom, person.company)){
+			throw new UnauthorizedException("You do not have permission to manage staffing for the user's company")
+		}
 	
 		def ret = []
 		params.travelOK == "1" ? params : (params.travelOK = 0)
@@ -1477,6 +1523,21 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 		}
 
 		return person
+	}
+
+	def getPersonTeams() {
+
+	}
+
+	/**
+	 * Determines if a person is associated to a company.
+	 * @param Person trying to access the company.
+	 * @param Company the person is trying to access.
+	 */
+	boolean isAssociatedTo(Person whom, Party company){
+		List<Party> companies = partyRelationshipService.associatedCompanies(whom)
+		def c = companies.find{it.id == company.id }
+		return c != null
 	}
 
 }

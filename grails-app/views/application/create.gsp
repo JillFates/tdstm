@@ -35,9 +35,8 @@
 						<tbody>
 							<tr>
 								<td class="label ${config.assetName}  ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name<span style="color: red;">*</span></label></td>
-								<td>
-									<input type="text" id="assetName" class="${config.assetName}" name="assetName" 
-										value="${applicationInstance.assetName}" tabindex="9" /></td>
+								<td colspan="3">
+									<input type="text" id="assetName" class="${config.assetName}" name="assetName" value="${applicationInstance.assetName}" tabindex="9" /></td>
 								<td class="label ${config.description}  ${highlightMap.description?:''}" nowrap="nowrap"><label for="assetName">Description</label></td>
 								<td colspan="3">
 									<input type="text" id="description" class="${config.description}" name="description" 
@@ -71,8 +70,8 @@
 								</td>
 								<td class="label ${config.sme}  ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 								<td >
-									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="id" 
-										optionValue="${{it.lastNameFirst}}" 
+									<g:select from="${personList}" id="sme1" name="sme.id" class="${config.sme} personContact assetSelect"  optionKey="personId" 
+										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value,this.id)" 
 										noSelection="${['null':'Select...']}" 
 										tabIndex="21"
@@ -104,8 +103,8 @@
 								<td class="label ${config.sme2}  ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="id" 
-										optionValue="${{it.lastNameFirst}}" 
+									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId" 
+										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="22" 
 										noSelection="${['null':'Select...']}"
@@ -139,8 +138,8 @@
 								<td class="label ${config.appOwner}  ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
 								<td class="suffleTd">
 								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
-									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.appOwner} suffleSelect personContact assetSelect" optionKey="id" 
-										optionValue="${{it.lastNameFirst}}" 
+									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.appOwner} suffleSelect personContact assetSelect" optionKey="personId" 
+										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
 										tabindex="23" 
 										noSelection="${['null':' Select...']}" 
@@ -183,8 +182,10 @@
 								    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 									</script>
-									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
-									value="<tds:convertDate date="${applicationInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" /> 
+									<input type="text" class="dateRange ${config.retireDate}" size="15" 
+										style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
+										value="<tds:formatDate date="${applicationInstance?.retireDate}" />" 
+									/> 
 								</td>
 								<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
@@ -202,11 +203,13 @@
 							    <td  class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
 								<td valign="top" class="value ${hasErrors(bean:applicationInstance,field:'maintExpDate','errors')}">
 								    <script type="text/javascript" charset="utf-8">
-									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
+										jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 									</script>
-									<input type="text" class="dateRange ${config.maintExpDate}" size="15" style="width: 112px; height: 14px;" 
+									<input type="text" class="dateRange ${config.maintExpDate}" 
+										size="15" style="width: 112px; height: 14px;" 
 										name="maintExpDate" id="maintExpDate" tabindex="27" 
-									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />" /> 
+										value="<tds:formatDate date="${applicationInstance?.maintExpDate}" />"
+									/> 
 								</td>
 								<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>

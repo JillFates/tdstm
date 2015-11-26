@@ -48,9 +48,7 @@
 						</g:elseif>
 						<g:elseif test="${column =='Roles'}">
 							<td class="col_${person.id}">
-								<g:each in="${person.getPersonRoles(personsMap[person])}" var="role">
-									${role.description.substring(role.description.lastIndexOf(':') +1).trim()},
-								</g:each> 
+								${ person.getSuitableTeams().join(', ')}
 							</td>
 						</g:elseif>
 						<g:else>

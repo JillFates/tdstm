@@ -20,7 +20,7 @@
 <tbody id="listCommentsTbodyIds">
 <tr style="cursor: pointer;" ng-repeat="comment in comments | filter:commentFilter">
 	<td>
-		<a ng-if="comment.commentInstance.commentType == 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)"><img ng-src="{{applyRootPath('/icons/comment_edit.png')}}" border="0px"/></a>
+		<a ng-if="comment.commentInstance.commentType == 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)" ng-show="canEditComments"><img ng-src="{{applyRootPath('/icons/comment_edit.png')}}" border="0px"/></a>
 
 		<a ng-if="comment.commentInstance.commentType != 'comment'" href="#" ng-click="editComment(comment.commentInstance.id, comment.commentInstance.commentType)"><img ng-src="{{applyRootPath('/icons/table_edit.png')}}" border="0px"/></a>
 	</td>

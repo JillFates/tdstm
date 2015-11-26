@@ -280,7 +280,7 @@ class ApplicationController {
 		def environmentOptions = AssetOptions.findAllByType(AssetOptions.AssetOptionsType.ENVIRONMENT_OPTION)
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 	
-		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
+		def personList = partyRelationshipService.getProjectApplicationStaff( project )
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 		
 		//fieldImportance for Discovery by default
@@ -346,7 +346,7 @@ class ApplicationController {
 				appMoveInstance.save(flush:true)
 			}
 		}
-		def personList = partyRelationshipService.getCompanyStaff( project.client?.id )
+		def personList = partyRelationshipService.getProjectApplicationStaff( project )
 
 		def model = [
 			applicationInstance:applicationInstance, 

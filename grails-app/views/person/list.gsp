@@ -67,7 +67,7 @@
 					$("#formId").submit();
 				});
 				<jqgrid:grid id="personId" url="'${''+listJsonUrl?:'no'}'"
-					colNames="'First Name', 'Middle Name', 'Last Name', 'User Login', 'User Company', 'Date Created', 'Last Updated', 'Model Score'"
+					colNames="'First Name', 'Middle Name', 'Last Name', 'Username', 'User Company', 'Date Created', 'Last Updated', 'Model Score'"
 					colModel="{name:'firstname', width:'80'},
 						{name:'middlename', width:'80'},
 						{name:'lastname', index: 'lastname', width:'80'},

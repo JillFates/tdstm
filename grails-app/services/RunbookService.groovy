@@ -193,6 +193,7 @@ class RunbookService {
 
 		// This loop will perform DFS into the map until there are no elements remaining in the list
 		def loops = 0
+		int safetyValve = dependencies.size() * 20
 		while ( startNode != null ) {
 			//log.debug "dfsOfGraph() In while loop $loops"
 
@@ -205,9 +206,9 @@ class RunbookService {
 			}
 
 			// Make sure we don't blow up because we're stuck in an infinite loop (1,000 if an artifical number we won't exceed)
-			if (++loops == 1000 && startNode) {
-				//log.debug "** We broke out of the loop prematurely"
-				throw new RuntimeException('Exceeded the maximum looping (1,000) set for the processDFS')
+			if (--safetyValve < 1 && startNode) {
+				log.debug "processDFS() We broke out of the loop prematurely tasks ${tasks.size()}, dependencies ${dependencies.size()}, start node $startNode"
+				throw new RuntimeException('Exceeded the maximum looping set for the processDFS')
 			}
 		}
 
@@ -231,7 +232,7 @@ class RunbookService {
 
 	/**
 	 * Computes the accumulated durations of each edge through the graph to ultimately determine the critical paths
-	 * using a breath first search through the directed graph from the tail back to the front of the graphs
+	 * using a breath first search through the directed graph from the tail (Sink Vectors) back to the front of the graphs (Start Vectors)
 	 * @param	List<AssetComment>	List of all tasks in the map
 	 * @param	List<TaskDependency>	List of the edges in the map
 	 * @param	List<AssetComment>	List of start vertices
@@ -292,7 +293,7 @@ class RunbookService {
 				tasks.each { tmp['tasks'][it.id].tmpBeenExplored = false }
 			}
 
-			def ticks = tasks.size() * 10
+			def ticks = dependencies.size() * 25
 			while ( queue.size() > 0 ) {
 				// Pull the first task off the front of the queue
 				def taskId = queue.poll()
@@ -303,39 +304,43 @@ class RunbookService {
 				// Safety valve so we don't get in an infinite loop
 				if (--ticks == 0) {
 					log.error "processDurations() exceeded loop count"
-					throw new RuntimeException('Exceeded excepted loop count') 
+					throw new RuntimeException('processDurations exceeded excepted loop count') 
 				}
 
+				// Find all edges that would be predecessors of the current task
 				if (edgesBySucc.containsKey(task.id.toString())) {
 					//log.debug "processDurations() $task has ${edgesBySucc[task.id.toString()].size()} pred, tmpMaxPathDuration=${task.tmpMaxPathDuration}"
 
 					// The duration to the end of the map from the current task
-					def durationToCurrentTask = tmp['tasks'][task.id].tmpMaxPathDuration + ( task.durationInMinutes() ?: 0 )
+					def durationToSinkTask = tmp['tasks'][task.id].tmpMaxPathDuration + ( task.durationInMinutes() ?: 0 )
 
-					// Get the list of the downstream tasks for the current task
+					// Get the list of the downstream (predecessor or successors?) tasks for the current task
 					def downstreamTasks = tmp['tasks'][task.id].tmpDownstreamTasks
 
 					edgesBySucc[task.id.toString()].each { ebs -> 
-
+						// JPM : 10/2015 - why is there nested lists here?
 						ebs.each { edge ->
 							
-							// check if this edge should be ignored
+							// Check if this edge should be ignored (this would only happen if it was involved in a cyclical reference)
 							if ( ! tmp['dependencies'][edge.id].tmpIgnore && tmp['tasks'][edge.predecessor.id]) {
 
 								// Set the time it will take to finish all the remaining tasks along this current path 
 								// This will be the max time of any forked path downstream
-
-								tmp['dependencies'][edge.id].tmpPathDuration = durationToCurrentTask
+								// TODO : JPM 10/2015 - should check so we don't step on bigger values by accident
+								if (tmp['dependencies'][edge.id].tmpPathDuration < durationToSinkTask) {
+									tmp['dependencies'][edge.id].tmpPathDuration = durationToSinkTask
+								}
 
 								// Set the predecessor task's tmpMaxPathDuration to this edge if it is the longest route
-								if ( durationToCurrentTask > tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration ) {
-									tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration = durationToCurrentTask
+								if ( durationToSinkTask > tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration ) {
+									tmp['tasks'][edge.predecessor.id].tmpMaxPathDuration = durationToSinkTask
 								}
 
 								// Set the predecessor's tmpMapDepth one higher than the successor. If there were multiple paths
 								// to a task, we'll use the shortest path
-								if (tmp['tasks'][edge.predecessor.id].tmpMapDepth < currentMapDepth)
+								if (tmp['tasks'][edge.predecessor.id].tmpMapDepth < currentMapDepth) {
 									tmp['tasks'][edge.predecessor.id].tmpMapDepth = currentMapDepth
+								}
 
 								// Merge the downstream tasks from the current task plus add the current task to the upstream task
 								if (downstreamTasks) {
@@ -344,13 +349,12 @@ class RunbookService {
 								tmp['tasks'][edge.predecessor.id].tmpDownstreamTasks << [ (task.id):task ]
 
 								// Put each predecessor into the queue if it hasn't already been processed
-								if (! queue.contains( edge.predecessor.id ))
+								if (! queue.contains( edge.predecessor.id )) {
 									queue.add(edge.predecessor.id)
+								}
 							}
 						}
-
 					}
-
 				}
 			}
 
@@ -593,10 +597,8 @@ class RunbookService {
 
 		// 
 		// Main Loop
-		// 
-		
-		
-		// Iterate over the list of graphs and choose the first task within it to work on
+		// 			
+		// Iterate over the list of independent graphs
 		for (int g=0; g < graphs.size(); g++) {
 
 			// Find the start vertex that we should traverse based on the longest duration and tasks downstream
@@ -612,12 +614,16 @@ class RunbookService {
 			// Determine Critical Path
 			// Perform a DFS process through the graph to determine the earliest starts on the initial critical path
 			//
+
 			def safety = 1000
 			def criticalPathQueue = [[task:task, time:time]]
 			while (criticalPathQueue.size() > 0) {
-				if (--safety == 0) {
+
+				def safetyValve = dependencies.size() * 20
+				if (--safetyValve == 0) {
 					throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task ${newTask.taskNumber})")
 				}
+
 				def queueEntry = criticalPathQueue.pop()
 				def newTime = queueEntry.time
 				def newTask = queueEntry.task
@@ -666,16 +672,17 @@ class RunbookService {
 				tmp['tasks'][tasksMap[id].id].tmpBeenExplored = true
 
 				// Update the non-critical path sink tasks with the latest start
-				if (id != task.id.toString())
+				if (id != task.id.toString()) {
 					tmp['tasks'][tasksMap[id].id].tmpLatestStart = estFinish - tasksMap[id].duration
+				}
 			}
 
 			// We'll iterate until the queue is empty
-			safety = tasks.size() * 3
+			safetyValve = dependencies.size() * tasks.size()
 			while( queue.size() > 0 ) {
 
 				// Bail out of infinite loop
-				if ( --safety == 0 ) {
+				if ( --safetyValve == 0 ) {
 					throw new RuntimeException('computeStartTimes() caught in infinite loop - Latest Start')			
 				}
 
@@ -726,23 +733,23 @@ class RunbookService {
 			// Load the queue with all of the start vertices
 			queue.clear()
 			graphs[g].starts.each { id -> queue.push( id.toString() ) }
+			// log.debug "computeStartTimes() edgesByPred Keys: ${edgesByPred.keySet()}"
 
+			// Reset the tmpBeenExplored flag on all the tasks
 			tasks.each { 
 				tmp['tasks'][it.id].tmpBeenExplored = false
 			}
 
-			// log.debug "computeStartTimes() edgesByPred Keys: ${edgesByPred.keySet()}"
-
-			safety = tasks.size() * 3
+			safetyValve = dependencies.size() * tasks.size()
 			while( queue.size() ) {
 
 				// Bail out of infinite loop
-				if ( --safety == 0 ) {
+				if ( --safetyValve == 0 ) {
 					throw new RuntimeException('computeStartTimes() caught in infinite loop - Earliest Start')					
 				}
 
 				def taskId = queue.poll()
-				log.debug "computeStartTimes() Earliest task=$taskId, queue.size=${queue.size()}"
+				// log.debug "computeStartTimes() Earliest task=$taskId, queue.size=${queue.size()}"
 				if (edgesByPred.containsKey(taskId)) {
 					edgesByPred[taskId].each() { edge ->
 						def succTaskInfo = tmp['tasks'][edge.successor.id]

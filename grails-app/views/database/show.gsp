@@ -12,9 +12,9 @@
 					<tbody>
 						<tr class="prop">
 							<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>
-							<td class="valueNW ${config.assetName}" style="font-weight:bold;">${databaseInstance?.assetName}</td>
+							<td colspan="2" class="valueNW ${config.assetName}" style="max-width: 400px; font-weight:bold;">${databaseInstance?.assetName}</td>
 							<td class="label ${config.description} ${highlightMap.description?:''}" nowrap="nowrap"><label for="description">Description</label></td>
-							<td class="valueNW ${config.description}" colspan="5">${databaseInstance.description}</td>
+							<td colspan="2" style="max-width: 400px;" class="valueNW ${config.description}" >${databaseInstance.description}</td>
 						</tr>
 						<tr class="prop">
 							<td class="label" nowrap="nowrap"><label for="assetType">Type</label></td>
@@ -28,7 +28,9 @@
 							<td class="label ${config.dbFormat} ${highlightMap.dbFormat?:''}" nowrap="nowrap"><label for="dbFormat">Format</label></td>
 							<td class="valueNW ${config.dbFormat}">${databaseInstance?.dbFormat}</td>
 							<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
-							<td class="valueNW ${config.retireDate}"><tds:convertDate date="${databaseInstance?.retireDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="valueNW ${config.retireDate}">
+								<tds:formatDate date="${databaseInstance?.retireDate}" />
+							</td>
 							<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
 							<td class="valueNW ${config.moveBundle}" colspan="3">${databaseInstance?.moveBundle} : ${dependencyBundleNumber}</td>
 						</tr>
@@ -36,7 +38,9 @@
 							<td class="label ${config.size} ${highlightMap.size?:''}" nowrap="nowrap"><label for="size">Size/Scale</label></td>
 							<td class="valueNW ${config.size}">${databaseInstance?.size} &nbsp;&nbsp; ${databaseInstance.scale?.value()}</td>
 							<td class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
-							<td class="valueNW ${config.maintExpDate}"><tds:convertDate date="${databaseInstance?.maintExpDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></td>
+							<td class="valueNW ${config.maintExpDate}">
+								<tds:formatDate date="${databaseInstance?.maintExpDate}" />
+							</td>
 							<td class="label ${config.planStatus} ${highlightMap.planStatus?:''}" nowrap="nowrap"><label for="planStatus">Plan Status</label></td>
 							<td class="valueNW ${config.planStatus}" colspan="3">${databaseInstance?.planStatus}</td>
 						</tr>

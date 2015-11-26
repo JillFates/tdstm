@@ -11,7 +11,7 @@
 	<div id="selectionId" class="tabControls">
 		<input type="hidden" id="assetTypeId" name="assetType" value="${asset}" />
 		<input type="hidden" id="assetTypesId" name="assetType" value="all" />
-		<tds:hasPermission permission='MoveBundleEditView'>
+		<tds:hasPermission permission='AssetEdit'>
 			<input id="state" type="button" class="submit pointer" value="Assignment" onclick="changeMoveBundle($('#assetTypeId').val(),${assetList?.asset?.id},'${session.ASSIGN_BUNDLE}')"  />
 		</tds:hasPermission>
 	</div>

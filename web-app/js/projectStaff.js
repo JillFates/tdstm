@@ -160,16 +160,55 @@ tds.staffing.controller.MainController = function(scope, http, compile, alerts){
 tds.staffing.controller.MainController.$inject = ['$scope', '$http', '$compile', 'alerts'];	
 }
 
-
-
-
 /*
  * for making and Ajax call to load staff list using filters.  
  */
 var currentTabShow = "generalInfoShowId"
 var currentHeaderShow = "generalShowHeadId"
 
+function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
+	var role = $("#role").val()
+	var location = $("#location").val()
+	var project = $("#project").val()
+	var scale = $("#scale").val()
+	var onlyClientStaff = $("#clientStaffId").val()
+	var assigned = $("#assignedId").val()
+	var orderBy = orderBy ? orderBy : $("#orderBy").val()
+	var phaseArr = new Array();
+	if ($("#allPhase").val() == '1') {
+		phaseArr.push("all")
+	} else {
+		var checked = $("input[name='PhaseCheck']:checked")
+		$(checked).each(function() {
+			var phaseId = $(this).attr('id')//do stuff here with this
+			phaseArr.push(phaseId)
+		})
+	}
+	jQuery.ajax({
+		url : contextPath+'/person/loadFilteredStaff',
+		data : {
+			'role' : role,
+			'location' : location,
+			'project' : project,
+			'scale' : scale,
+			'phaseArr' : phaseArr,
+			'assigned' : assigned,
+			'onlyClientStaff' : onlyClientStaff,
+			'sortOn':sortOn,
+			'firstProp':firstProp,
+			'orderBy':orderBy
+			
+		},
+		type: 'POST',
+		success: function(data) {
+			$("#projectStaffTableId").html(data);
+		},
+		error: function (jqXHR, textStatus, errorThrown) {
+			alert("An error occurred (" + errorThrown + ")\nPlease reload the page to confirm if any changes were made.");
+		}
+	});
 
+}
 
 /*
  * when check  phase's all check box check all other checkboxes .  
@@ -307,6 +346,152 @@ function addBlackOutDay(){
 	
 }
 
+// Used to enable/disable an element
+function toggleDisabled(source) {
+	if (source.is(':disabled')) {
+		$(source).removeAttr("disabled");
+	} else {
+		$(source).attr("disabled", true);
+	}
+}
+
+/*
+ * Make a ajax call when user checks on checkbox for Project to add or remove the project team based on the 
+ * source checkbox argument. This will also remove the user from any events associated to the project.
+ */
+function addRemoveProjectTeam(source, personId, projectId, teamCode) {
+
+	var action = (source.is(':checked') ? 'add' : 'remove');
+
+	// Disable and indicate an action for the checkbox 
+	toggleChangedStyle(source);
+	toggleDisabled(source);
+
+	var personId = source.attr('id')
+	var roleType = source.parent().siblings('#roleColumnId').attr('title')
+	
+	var params = {'personId':personId, 'projectId':projectId, 'teamCode':teamCode};
+	var url = contextPath + '/person/' + action + 'ProjectTeam';
+	var errorMsg = '';
+	jQuery.ajax({
+		url: url,
+		data: params,
+		type:'POST',
+		async: false,
+		cache: false,
+		sourceElement: source,
+		success: function(data) {
+			console.log(data);
+			if (data.status == 'error') {
+				errorMsg = data.errors[0];
+				if (data.errors.length > 1)
+					console.log("Call to " + url + " failed : " + data.errors[1]);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			errorMsg = "An error occurred while attempting to " + action + " person team assignment to project";
+			console.log("Error " + textStatus + " : " + errorThrown);
+		}
+	});
+
+	if (errorMsg.length > 0) {
+		alert(errorMsg);
+		revertChange(source);
+		toggleDisabled(source);
+	} else {
+		loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
+	}
+}
+
+/*
+ * Make a ajax call when user checks on checkbox for Project to add or remove the project staff based on the 
+ * source checkbox argument. This will also remove the user from any events associated to the project.
+ */
+function addRemoveProjectStaff(source, personId, projectId, teamCode) {
+
+	var action = (source.is(':checked') ? 'add' : 'remove');
+
+	// Disable and indicate an action for the checkbox 
+	toggleChangedStyle(source);
+	toggleDisabled(source);
+
+	var personId = source.attr('id')
+	var personId = personId.replace('staff_person_','')
+	
+	var params = {'personId':personId, 'projectId':projectId};
+	var url = contextPath + '/person/' + action + 'ProjectStaff';
+	var errorMsg = '';
+	jQuery.ajax({
+		url: url,
+		data: params,
+		type:'POST',
+		async: false,
+		cache: false,
+		sourceElement: source,
+		success: function(data) {
+			console.log(data);
+			if (data.status == 'error') {
+				errorMsg = data.errors[0];
+				if (data.errors.length > 1)
+					console.log("Call to " + url + " failed : " + data.errors[1]);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			errorMsg = "An error occurred while attempting to " + action + " person assignment to project";
+			console.log("Error " + textStatus + " : " + errorThrown);
+		}
+	});
+
+	if (errorMsg.length > 0) {
+		alert(errorMsg);
+		revertChange(source);
+		toggleDisabled(source);
+	} else {
+		loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
+	}
+}
+
+/*
+ * Make a ajax call when user checks on checkbox for an Event to add or remove the project staff based on the 
+ * source checkbox argument. If the user wasn't previously assigned to a project, they will be done automatically.
+ */
+function addRemoveEventStaff(source, personId, projectId, eventId, teamCode) {
+	// Disable and indicate an action for the checkbox 
+	toggleChangedStyle(source);
+	toggleDisabled(source);
+
+	var action = (source.is(':checked') ? 'add' : 'remove');
+	var errorMsg = '';
+
+	toggleChangedStyle(source);
+	
+	var params = { 'personId':personId, 'projectId':projectId, 'eventId':eventId, 'teamCode':teamCode };
+	var url = contextPath + '/person/' + action + 'EventStaff';
+	jQuery.ajax({
+		url: url,
+		data: params,
+		type:'POST',
+		async: false,
+		cache: false,
+		success: function(data) {
+			console.log(data);
+			if (data.status == 'error') {
+				errorMsg = data.errors;
+			} else {
+				loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			errorMsg = "An unexpected error occurred while attempting to update Person's MoveEvent ";
+		}
+	});
+
+	// Deal with any errors
+	if (errorMsg.length > 0) {
+		alert(errorMsg);
+		revertChange(source);
+	}
+}
 
 /* 
  * Whenever a property is changed on the manage project staff list, give it a style to confirm that it has been modified

@@ -53,6 +53,7 @@ class ReportsController {
 	def securityService
 	def supervisorConsoleService 
 	def userPreferenceService
+	def sessionFactory
 
 	def index() { 
 		render(view:'index')
@@ -1051,20 +1052,35 @@ class ReportsController {
 			applicationOwner = Person.get(params.appOwner)
 			query.append(" AND p2.person_id=${params.appOwner} ")
 		}
-		log.info "query = ${query}"
-		def applicationList = jdbcTemplate.queryForList(query.toString())
 		
-		if( applicationList.size() > 100 ) {
-			flash.message = """Your criteria results in more than the maximum 100 applications that the report allows.
+		int assetCap = 100 // default value
+		if(params.report_max_assets){
+			try{
+				assetCap = params.report_max_assets.toInteger()
+			}catch(Exception e){
+				log.info("Invalid value given for assetCap: ${assetCap}")
+			}
+		}
+
+		query.append(" LIMIT ${assetCap}")
+
+		log.info "query = ${query}"
+		
+		def applicationList = jdbcTemplate.queryForList(query.toString())
+
+		if( applicationList.size() > 500 ) {
+			flash.message = """Your criteria results in more than the maximum 500 applications that the report allows.
 				Please adjust your criteria accordingly before resubmitting."""
 			redirect (action:'applicationProfiles', params:params)
 		}
 		
+		// TODO: we'd like to flush the session.
+		// def hibernateSession = sessionFactory.currentSession
 		ArrayList appList = new ArrayList()
 		//TODO:need to write a service method since the code used below is almost similar to application show.
-		applicationList.each{
-			def assetEntity = AssetEntity.get(it.id)
-			def applicationInstance = Application.get(it.id)
+		applicationList.eachWithIndex{ app, idx ->
+			def assetEntity = AssetEntity.get(app.id)
+			def applicationInstance = Application.get(app.id)
 			def assetComment 
 			def dependentAssets = AssetDependency.findAll("from AssetDependency as a  where asset = ? order by a.dependent.assetType,a.dependent.assetName asc",[assetEntity])
 			def supportAssets = AssetDependency.findAll("from AssetDependency as a  where dependent = ? order by a.asset.assetType,a.asset.assetName asc",[assetEntity])
@@ -1089,13 +1105,15 @@ class ReportsController {
 			def testingBy = assetEntity.testingBy  ? assetEntityService.resolveByName(assetEntity.testingBy) : ''
 			
 			def highlightMap = assetEntityService.getHighlightedInfo('Application', applicationInstance, configMap)
-			
+			// TODO: we'd like to flush the session.
+			// GormUtil.flushAndClearSession(hibernateSession, idx)
 			appList.add([ app : applicationInstance,supportAssets: supportAssets, dependentAssets:dependentAssets, 
 			  redirectTo : params.redirectTo, assetComment:assetComment, assetCommentList:assetCommentList,
 			  appMoveEvent:appMoveEvent, moveEventList:moveEventList, appMoveEvent:appMoveEventlist, project:project,
 			  dependencyBundleNumber:AssetDependencyBundle.findByAsset(applicationInstance)?.dependencyBundle ,prefValue:prefValue, 
 			  config:configMap.config, customs:configMap.customs,shutdownBy:shutdownBy, startupBy:startupBy, testingBy:testingBy,
 			  errors:params.errors, highlightMap:highlightMap])
+			
 		}
 		
 		return [applicationList:appList, moveBundle:currentBundle?:'Planning Bundles' , sme:currentSme?:'All' ,appOwner:applicationOwner?:'All', project:project]
@@ -1109,8 +1127,11 @@ class ReportsController {
 		def unresolved = params.unresolved == 'on'
 		def missing = params."missing" == 'on'
 		def appOwner = params.appOwner
+
+		int assetCap = params.report_max_assets?params.report_max_assets.toInteger():100
+
 		if( params.moveBundle == 'useForPlanning' )
-			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, true, appOwner)
+			return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, true, appOwner, assetCap)
 		
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1122,7 +1143,7 @@ class ReportsController {
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
 				//def eventsProjectInfo = getEventsProjectInfo(moveEventInstance,projectInstance,currProj,moveBundles,eventErrorList)
-				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, false, appOwner)//.add(['time':])
+				return reportsService.genApplicationConflicts(project.id, moveBundleId, conflicts, unresolved, missing, false, appOwner, assetCap)//.add(['time':])
 			}
 		}
 		flash.message = errorMsg
@@ -1312,9 +1333,18 @@ class ReportsController {
 		def noRunsOn = params.noRuns == 'on'
 		def vmWithNoSupport = params.vmWithNoSupport == 'on'
 		def view = params.rows ? "_serverConflicts" : "generateServerConflicts"
+
+		int assetCap = 100 // default value
+		if(params.report_max_assets){
+			try{
+				assetCap = params.report_max_assets.toInteger()
+			}catch(Exception e){
+				log.info("Invalid value given for assetCap: ${assetCap}")
+			}
+		}
 		
 		if( params.moveBundle == 'useForPlanning' ){
-				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, true, params))
+				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, true, params, assetCap))
 		}
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1325,7 +1355,7 @@ class ReportsController {
 				errorMsg = ""
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
-				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false, params))
+				render (view : view , model : reportsService.genServerConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noRunsOn, vmWithNoSupport, false, params, assetCap))
 				
 			}
 		}
@@ -1452,9 +1482,18 @@ class ReportsController {
 		def unresolvedDependencies = params.unresolvedDep == 'on'
 		def noApps = params.noApps == 'on'
 		def dbWithNoSupport = params.dbWithNoSupport == 'on'
+
+		int assetCap = 100 // default value
+		if(params.report_max_assets){
+			try{
+				assetCap = params.report_max_assets.toInteger()
+			}catch(Exception e){
+				log.info("Invalid value given for assetCap: ${assetCap}")
+			}
+		}
 		
 		if( params.moveBundle == 'useForPlanning' ){
-				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, true)
+				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, true, assetCap)
 		}
 		if( moveBundleId && moveBundleId.isNumber() ){
 			def isProjMoveBundle  = MoveBundle.findByIdAndProject( moveBundleId, project )
@@ -1465,7 +1504,7 @@ class ReportsController {
 				errorMsg = ""
 				userPreferenceService.setPreference( "MOVE_BUNDLE", "${moveBundleId}" )
 				moveBundleInstance = MoveBundle.get(moveBundleId)
-				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, false)
+				return reportsService.genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDependencies, noApps, dbWithNoSupport, false, assetCap)
 				
 			}
 		}

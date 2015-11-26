@@ -14,22 +14,29 @@
 
 	<g:if test="${step == 'start'}">
 		<div>
-			<h3>Step 1 - Upload Import File:</h3>
+			<h3>Step 1 - Upload Import File</h3>
 
-
+			<br>
 			<g:uploadForm action="importAccounts">
 				<input type="file" name="myFile" />
 				<input type="hidden" name="step" value="upload" />
 				<br />
+				<input type="checkbox" checked name="header" value="Y"> CSV contains a header record
+				</br>
 				<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
+				<br />
 				<br />
 				<input type="submit" />
 			</g:uploadForm> 
+
+			<br>
+			<g:link controller="admin" action="importAccountsTemplate">Download Import Template</g:link>
 	</g:if>
 
 	<g:if test="${step == 'review'}">
 		<div>
-			<h3>Step 2 - Review Accounts:</h3>
+			<h3>Step 2 - Review Accounts</h3>
+			<br>
 			<table>
 				<thead>
 					<tr>
@@ -110,6 +117,7 @@
 			<input type="text" name="password" size="10"> Default password to use (if blank in import)<br />
 			<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
 			<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />
+			<br>
 			<g:submitButton name="submit" value="Create Accounts" />
 			</g:form>
 

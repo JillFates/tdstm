@@ -16,6 +16,18 @@
 		<div class="dialog">
 			<table class="personTable">
 				<tbody>
+
+					<tr class="prop">
+	                   <td valign="top" class="name">
+	                       <label>Company:</label>
+	                   </td>
+	                   <td valign="top" class="value" colspan="2"><span
+								class="personShow" id="companyId">
+									${company}
+							</span></td>
+					</tr> 
+
+
 					<tr class="prop">
 						<td valign="top" class="name">
 							<label for="firstName"><b>First Name:&nbsp;<span style="color: red">*</span></b></label>
@@ -48,15 +60,6 @@
 						</td>
 						<td valign="top" class="value" colspan="2" width="50%">
 							<input type="text" maxlength="64" id="lastNameId" name="lastName" value="${person.lastName}" size="10" />
-						</td>
-					</tr>
-
-					<tr class="prop">
-						<td valign="top" class="name">
-							<label for="company">Company:</label>
-						</td>
-						<td valign="top" class="value" colspan="2">
-							<input type="text" maxlength="64" id="companyId" name="Company" value="${company}" />
 						</td>
 					</tr>
 

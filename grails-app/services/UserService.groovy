@@ -206,7 +206,7 @@ class UserService implements InitializingBean {
 			userLogin.externalGuid = guid 	// Set to the formulated one with company id
 		if ( userLogin.isLocal)
 			userLogin.isLocal = false
-		if (userLogin.active != 'Y')
+		if (createUser)
 			userLogin.active = 'Y'
 		if (userLogin.forcePasswordChange == 'Y')
 			userLogin.forcePasswordChange = 'N'

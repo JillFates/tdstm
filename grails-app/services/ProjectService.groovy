@@ -54,7 +54,13 @@ class ProjectService {
 	 * @param sortOrder - sort order, could be asc or desc
 	 * @return list of projects
 	 */
-	List<Project> getUserProjectsOrderBy(UserLogin userLogin, Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY, ProjectSortProperty sortOn = ProjectSortProperty.NAME, SortOrder sortOrder = SortOrder.ASC) {
+	List<Project> getUserProjectsOrderBy(
+		UserLogin userLogin, 
+		Boolean showAllProjPerm=false, 
+		ProjectStatus projectStatus=ProjectStatus.ANY, 
+		ProjectSortProperty sortOn = ProjectSortProperty.NAME, 
+		SortOrder sortOrder = SortOrder.ASC
+	) {
 		def searchParams = [:]
 		searchParams.sortOn = sortOn
 		searchParams.sortOrder = sortOrder
@@ -320,6 +326,19 @@ class ProjectService {
 	}	
 
 	/**
+	 * NOTE : use this method where ever we are getting project partner.
+	 * This method is used to get project partner  for requested project.
+	 * @param projectId
+	 * @return projectPartner
+	 */
+	def getProjectPartner( project ) {
+		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
+			and p.partyIdFrom = :project and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",
+			[project:project])
+		return projectPartner
+	}
+
+	/**
 	 * This method gets the data used to populate the project summary report
 	 * @param params
 	 * @return map
@@ -375,20 +394,23 @@ class ProjectService {
 	/**
 	 * This method used to get all clients,patners,managers and workflowcodes.
 	 */
-	def getProjectPatnerAndManagerDetails(){
-		def person = securityService.getUserLogin().person
-		def companyParty = partyRelationshipService.getStaffCompany( person )
+	def getProjectPatnerAndManagerDetails() {
+		Person whom = securityService.getUserLoginPerson()
 
-		if (!companyParty) {
-			companyParty = PartyGroup.findByName( "TDS" )
-		}
-
-		def clients = partyRelationshipService.getCompanyClients(companyParty)//	Populate a SELECT listbox with default list as earlier.
-		def partners = partyRelationshipService.getCompanyPartners(companyParty)		
+		def company = whom.company
+		
+		def clients = partyRelationshipService.getCompanyClients(company)//	Populate a SELECT listbox with default list as earlier.
+		def partners = partyRelationshipService.getCompanyPartners(company)*.partyIdTo
+		
+		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
+		def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${company.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+		managers?.sort{it.partyIdTo?.lastName}
+		
 		def workflowCodes = stateEngineService.getWorkflowCode()
 		
-		return [ clients:clients, partners:partners, workflowCodes: workflowCodes ]
+		return [ clients:clients, partners:partners, managers:managers, workflowCodes: workflowCodes ]
 	}
+
 	/**
 	 * This method used to get all clients,patners,managers and workflowcodes for action edit.
 	 */
@@ -413,12 +435,45 @@ class ProjectService {
 		def partnerStaff
 		def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'COMPANY' ")
 		//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
+		def projectPartner
+		def projectPartnerId
+		if (prevParam.projectPartner){
+			projectPartnerId = prevParam.projectPartner
+		} else {
+			projectPartnerId = projectPartner?.partyIdTo?.id
+		}
+		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
+		def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+		companyStaff.each {
+			if ( it.partyIdTo?.lastName == null ) {
+				it.partyIdTo?.lastName = ""
+			}
+		}
+		companyStaff.sort{it.partyIdTo?.lastName}
+		def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+			clientStaff.each {
+			if ( it.partyIdTo?.lastName == null ) {
+				it.partyIdTo?.lastName = ""
+			}
+		}
+		clientStaff.sort{it.partyIdTo?.lastName}
+
+		def workflowCodes = stateEngineService.getWorkflowCode()
 		def projectPartners = partyRelationshipService.getProjectPartners( projectInstance )
 		def projectManagers = getProjectManagersByProject(projectInstance.id)
-		def workflowCodes = stateEngineService.getWorkflowCode()
-		def companyPartners = partyRelationshipService.getCompanyPartners( projectCompany.partyIdTo )
-		return [projectPartners:projectPartners, projectManagers:projectManagers,
-			companyPartners:companyPartners,
+		def companyPartners = partyRelationshipService.getCompanyPartners( projectCompany.partyIdTo )*.partyIdTo
+		if (projectPartner != null) {
+			partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartnerId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+			partnerStaff.each {
+				if ( it.partyIdTo?.lastName == null ) {
+					it.partyIdTo?.lastName = ""
+				}
+			}
+			partnerStaff.sort{it.partyIdTo?.lastName}
+		}
+
+		return [projectPartners:projectPartners, projectManagers:projectManagers, moveManager:moveManager,
+			companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,
 			projectLogoForProject:projectLogoForProject, workflowCodes:workflowCodes ]
 	}
 
@@ -769,6 +824,49 @@ class ProjectService {
 	}
 
 	/**
+	 * Used to retrieve the companies that are partners of the project
+	 * @param project - the project to find the partners for
+	 * @return The list of partners associated with the project if any exist
+	 */
+	List<Party> getPartners(Project project) {
+		assert project != null
+
+		def params = [prt:PartyRelationshipType.read('PROJ_PARTNER'), rtcf: RoleType.read('PROJECT'), rtct: RoleType.read('PARTNER'), project:project]
+		// return params
+		def pids = PartyRelationship.executeQuery("select partyIdTo from PartyRelationship pr where \
+			pr.partyRelationshipType = :prt and \
+			pr.roleTypeCodeFrom = :rtcf and \
+			pr.roleTypeCodeTo = :rtct and \
+			pr.partyIdFrom = :project", params )
+
+		return pids
+	}
+
+	/**
+	 * Used to access the company that owns the project
+	 * @param project - the project to find the owning company for
+	 * @return The list of partners associated with the project if any exist
+	 */
+	Party getOwner(Project project) {
+		assert project != null
+
+		def params = [
+			prt:PartyRelationshipType.read('PROJ_COMPANY'), 
+			rtcf: RoleType.read('PROJECT'), 
+			rtct: RoleType.read('COMPANY'), 
+			project:project
+		]
+		
+		def owner = PartyRelationship.executeQuery("select partyIdTo from PartyRelationship pr where \
+			pr.partyRelationshipType = :prt and \
+			pr.roleTypeCodeFrom = :rtcf and \
+			pr.roleTypeCodeTo = :rtct and \
+			pr.partyIdFrom = :project", params )
+
+		return owner ? owner[0] : null
+	}
+
+	/**
 	 * Function used by activitySnapshot to retrive assets information
 	 */
 	private def fillAssetsMetrics(metrics, metricsByProject, projects, searchDate, sqlSearchDate) {
@@ -1053,8 +1151,99 @@ class ProjectService {
 		def model = [customMessage: message, from:from]
 		accounts.each{account ->
 			securityService.sendResetPasswordEmail(account.email, ipAddress, PasswordResetType.WELCOME, model)
+		}		
+	}
+
+	/**
+	 * Used to get the list of all persons associated to a project
+	 * @param project - the Project that the team is associated to
+	 * @return The list of persons found that are team members
+	 */
+	List<Person> getAssignedStaff(Project project) {
+		String query = "from Person s where s.id in (SELECT p.partyIdTo.id FROM PartyRelationship p \
+			WHERE p.partyRelationshipType = 'PROJ_STAFF' AND \
+			p.partyIdFrom.id = :project AND \
+			p.roleTypeCodeFrom ='PROJECT' AND \
+			p.roleTypeCodeTo = 'STAFF') \
+			ORDER BY s.firstName, s.lastName"
+		List persons = Person.findAll(query, [project:project.id], [sort: 'firstName'])
+
+		return persons
+	}
+
+	/*
+	 * Used to retrieve a list of all staff that could be assigned to a project. The staff that are available will be 
+	 * contingent on what user is requesting the list and their relationship to the project. The use-cases are:
+	 *    - Staff of Owner:   ALL owner, partner(s) and client staff without limitations (when the Only Assigned is not checked)
+	 *    - Staff of Partner: ONLY assigned staff to the project
+	 *    - Staff of Client:  ONLY assigned staff of Owner and Partner and All Client Staff without limitation
+	 *
+	 * @param project - the project to look for persons
+	 * @return The list consistening of a Map of staff details that includes:
+	 *    - PartyGroup company
+	 *    - String name
+	 *    - teams
+	 *    - Person staff 
+	 *    - boolean assigned 
+	 */	
+	List<Map> getAssignableStaff(Project project, Person forWhom) {
+
+		// Get the list of all Staff for the owner, partners and client
+		PartyGroup employer = forWhom.company
+		PartyGroup owner = project.owner
+		PartyGroup client = project.client
+
+		// Get the existing list of assigned staff 
+		List<Map> assignedStaffDetail = getAssignedStaff(project)
+		//assignedStaffDetail.each { 
+		//	it.assigned = true 
+		//	it.company = it.company[0]
+		//}
+		Map assignedStaffIds = assignedStaffDetail*.id.groupBy { it }
+
+		// Based on the whom is making the request and the 
+		boolean isOwnerStaff = owner.id == employer.id
+		boolean isClientStaff = project.client.id == employer.id
+		boolean isPartnerStaff = ! (isOwnerStaff && isClientStaff)
+
+		// For Owner's staff we'll add all the non-assigned staff of the owner and partner(s)
+		if (isOwnerStaff) {
+
+			// Add any Owner staff that are not already assigned to the project
+			List ownerStaff = partyRelationshipService.getCompanyStaff(owner.id)
+			ownerStaff.each { staff -> 
+				if (! assignedStaffIds.containsKey(staff.id)) {
+					assignedStaffDetail << staff
+				}
+			}
+
+			// Add any partner staff that are not already associated to the project
+			List partnerStaff = []
+			List partnerList = getPartners(project)
+			partnerList.each { partner ->
+				partnerStaff = partyRelationshipService.getCompanyStaff(partner.id)
+				partnerStaff.each { staff -> 
+					if (! assignedStaffIds.containsKey(staff.id)) {
+						assignedStaffDetail << staff
+					}
+				}
+			}
 		}
-		
+
+		// For Owner or Client Staff we'll add all of the non-assigned client staff to the list
+		if (isOwnerStaff || isClientStaff) {
+			List clientStaff = partyRelationshipService.getCompanyStaff(client.id)
+			clientStaff.each { staff -> 
+				if (! assignedStaffIds.containsKey(staff.id)) {
+					assignedStaffDetail << staff
+				}
+			}
+		}
+
+		// Strip out any inactive staff
+		assignedStaffDetail.removeAll { it.active != 'Y' }
+		assignedStaffDetail.sort { it.toString() }
+		return assignedStaffDetail
 	}
 
 	/**
@@ -1081,7 +1270,7 @@ class ProjectService {
 	 * @param teamCode - a String of the Team code
 	 * @param person - used to filter the results to the individual person (optional)
 	 */
-	PartyRelationship getTeamMembers(Project project, String teamCode, Person person=null) {
+	List<Person> getTeamMembers(Project project, String teamCode, Person person=null) {
 		RoleType rt = RoleType.read(teamCode)
 		if (! rt) {
 			log.warn "getTeamMembers() called with invalid teamCode $teamCode"

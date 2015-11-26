@@ -78,7 +78,7 @@
 				<jqgrid:grid id="applicationId" url="'${createLink(action: 'listJson')}'"
 					editurl="'${createLink(action: 'deleteBulkAsset')}'"
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType', 'Event'"
-					colModel="{name:'act', index: 'act' , sortable: false, ${hasPerm? 'formatter:myCustomFormatter,' :''} search:false, width:'65', fixed:true},
+					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
 						{name:'${appPref['1']}',width:'120'},
 						{name:'${appPref['2']}', width:'120'},
@@ -123,9 +123,12 @@
 			}
 
 			function myCustomFormatter (cellVal,options,rowObject) {
-				var editButton = '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'+
+				var editButton = '';
+				if (${hasPerm}) {
+					editButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+');" title=\'Edit Asset\'>'+
 					"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
-				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[8] + "' tasks='" + rowObject[7] + "' comments='" + rowObject[10] + "'></grid-buttons>"
+				}
+				editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[8] + "' tasks='" + rowObject[7] + "' comments='" + rowObject[10] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>"
 				return editButton
 			}
 			function deleteMessage(response, postdata) {

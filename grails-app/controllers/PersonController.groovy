@@ -37,6 +37,23 @@ class PersonController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [delete:'POST', save:'POST', update:'POST']
 
+
+
+def test = {
+	Person byWhom = securityService.getUserLoginPerson()
+	Project project = Project.get(2445)
+	//List suitableTeams = getSuitableTeams(byWhom)
+	//List assignedTeams = getAssignedTeams(project, byWhom)
+	render "Person $byWhom" +
+		"<br>Assigned Projects: ${byWhom.assignedProjects}<br>" +
+		"<br>Assigned Teams:${byWhom.getAssignedTeams(project)}" +
+//		"<br>Assigned Teams:${assignedTeams}" +
+
+
+		"<br>Suitable Teams: ${byWhom.suitableTeams}" + 
+//		"<br>Suitable Teams: ${suitableTeams}" + 
+		"<br>Company:${byWhom.company}"
+}
 	/**
 	 * Generates a list view of persons related to company
 	 * @param id - company id
@@ -58,8 +75,8 @@ class PersonController {
 			listJsonUrl = HtmlUtil.createLink(map)+'/All'
 		}
 		
-		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
-		
+		//def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
+		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.getUserLoginPerson())
 		// Used to set the default value of company select in the create staff dialog
 		if(companyId && companyId != 'All')
 			company = PartyGroup.find( "from PartyGroup as p where partyType = 'COMPANY' AND p.id = ?", [companyId.toLong()] )
@@ -156,13 +173,14 @@ class PersonController {
 		def listJsonUrl = HtmlUtil.createLink(map)
 		def createUrl = HtmlUtil.createLink([controller:'userLogin', action:'create'])
 		def editUrl = HtmlUtil.createLink([controller:'userLogin', action:'edit'])
+		def addUserIconUrl = HtmlUtil.resource([dir: 'icons', file: 'user_add.png', absolute: true])
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = personInstanceList?.collect {
 			[ cell: ['<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.firstname+'</a>', 
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.middlename+'</a>', 
 			'<a href="javascript:loadPersonDiv('+it.personId+',\'generalInfoShow\')">'+it.lastname+'</a>', 
-			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, it), 
+			genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, addUserIconUrl, it), 
 			it.company, it.dateCreated, it.lastUpdated, it.modelScore], id: it.personId ]}
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 		render jsonData as JSON
@@ -178,7 +196,7 @@ class PersonController {
 	 * @param editUrl url used to edit login configuration for the current person
 	 * @param person person object to be displayed
 	 */
-	private def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, person) {
+	private def genCreateEditLink(haveCreateUserLoginPerm, haveEditUserLoginPerm, createUrl, editUrl, addUserIconUrl, person) {
 		def element = ""
 		if (person.userLoginId) {
 			if (haveEditUserLoginPerm) {
@@ -188,7 +206,7 @@ class PersonController {
 			}
 		} else {
 			if (haveCreateUserLoginPerm) {
-				element = '<a href="' + createUrl + '/' + person.personId + '">' + person.userLogin + '</a>'
+				element = '<a href="' + createUrl + '/' + person.personId + '"><img src="' + addUserIconUrl + '" /> Create User</a>'
 			} else {
 				element = ''
 			}
@@ -472,6 +490,9 @@ class PersonController {
 				def projectParty = Project.findById(projectId)
 				if(companyId != ""){
 					def companyParty = Party.findById(companyId)
+					if(!personService.isAssociatedTo(personInstance, companyParty)){
+						throw new DomainUpdateException("The person ${personInstance} is not associated with the company ${companyParty}")
+					}
 					partyRelationshipService.updatePartyRelationshipPartyIdFrom("STAFF", companyParty, 'COMPANY', personInstance, "STAFF")
 				}
 				def partyRelationship = partyRelationshipService.updatePartyRelationshipRoleTypeTo("PROJ_STAFF", projectParty, 'PROJECT', personInstance, roleType)
@@ -600,8 +621,11 @@ class PersonController {
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
 			String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+			/*Party newCompany = Party.findByName(params["Company"])
+			if(!personService.isAssociatedTo(person, newCompany)){
+				throw new DomainUpdateException("The person ${personInstance} is not associated with the company ${newCompany}")
+			}*/
 			Person person = personService.updatePerson(params, byWhom, tzId, true)
-
 			if (params.tab) {
 				forward( action:'loadGeneral', params:[tab: params.tab, personId:person.id])
 			} else { 
@@ -609,6 +633,7 @@ class PersonController {
 				render results as JSON
 			}		
 		} catch (e) {
+			e.printStackTrace()
 			if (log.isDebugEnabled()) {
 				log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			}
@@ -691,7 +716,7 @@ class PersonController {
 			UserLogin userLogin = securityService.getPersonUserLogin(person)
 			if (! userLogin) {
 				log.error "resetPreferences() Unable to find UserLogin for person $person.id $person"
-				ServiceResponse.notFound()
+				ServiceResults.notFound(response)
 				return 
 			}
 			
@@ -706,35 +731,40 @@ class PersonController {
 			userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
 			render person
 		} catch (e) {
-			ServiceResponse.respondWithError(response, e.getMessage())
+			ServiceResults.respondWithError(response, e.getMessage())
 		}
 
 	}
 
 	/*
-	 * Redirect to project staff page with relevant data
-	 * @ returns - staff list.
-	 * 
+	 * The primary controller method to bootstrap the Project Staff administration screen which then 
+	 * leverages the loadFilteredStaff method to populate list in an Ajax call
+	 * @return The HTML for the controls at the top of the form and the Javascript to load the data.
 	 */
-	def manageProjectStaff = {
+	def manageProjectStaff() {
 		def (project, loginUser) = controllerService.getProjectAndUserForPage(this, 'ProjectStaffList')
 		if (!project) {
 			return
 		}
 
+		def loginPerson = loginUser.person
 		def start = new Date()
 		
 		def hasShowAllProjectsPerm = RolePermissions.hasPermission("ShowAllProjects")
-		def hasEditTdsPerm = RolePermissions.hasPermission("EditTDSPerson")
+
 		def now = TimeUtil.nowGMT()
-		def projects = []
+
+		List roleTypes = partyRelationshipService.getStaffingRoles()
+
+		// If no role then default it to ALL (0)
+		String role = params.role ? params.role : "0"
 		
-		def roleTypes = partyRelationshipService.getStaffingRoles()
 		def moveEventList = []
 		
 		// set the defaults for the checkboxes
-		def assigned = userPreferenceService.getPreference("ShowAssignedStaff") ?: '0'
-		def onlyClientStaff = userPreferenceService.getPreference("ShowClientStaff") ?: '0'
+
+		def assigned = userPreferenceService.getPreference("ShowAssignedStaff") ?: '1'
+		def onlyClientStaff = userPreferenceService.getPreference("ShowClientStaff") ?: '1'
 		
 		def currRole = params.role ? params.role : (userPreferenceService.getPreference("StaffingRole")?:"0")
 		def currLoc = userPreferenceService.getPreference("StaffingLocation")?:"All"
@@ -742,75 +772,38 @@ class PersonController {
 		def currScale = userPreferenceService.getPreference("StaffingScale")?:"6"
 		def moveEvents
 		def projectId = Project.findById( project.id) ? project.id : 0
-		def loginPerson = securityService.getUserLoginPerson()
 		def reqProjects = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectsPerm, ProjectStatus.ACTIVE)
 
-		if (projectId == 0) {
-			projects = reqProjects
-		}else{
-			// Add only the indicated project if exists and based on user's associate to the project
-			project = Project.read( projectId )
-			if (project) {
-				if ( hasShowAllProjectsPerm ) {
-					projects << project
-				} else {
-					// Lets make sure that the user has access to it (is assoicated with the project)
-					def staffProjectRoles = partyRelationshipService.getProjectStaffFunctions(projectId, loginPerson.id)
-					if (staffProjectRoles.size() > 0) {
-						projects << project
-					}
-				}
-			} else {
-				log.error("Didn't find project $projectId")
-			}
-		}
-		if (projectId == 0) {
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:(projects?:project)])
-		} else {
-			project = Project.read(projectId)
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project =:project order by m.project.name , m.name asc",[project:project])
-		}
-		
-		def companies = new StringBuffer('0')
-		def projectList = new StringBuffer('0')
-		projects.each {
-			companies.append(",${it.client.id}")
-			projectList.append(",${it.id}")
-		}
-		// if the "only client staff" button is not checked, show TDS employees as well
-		if (onlyClientStaff == '0')
-			companies.append(",18")
-		
-		// if the user doesn't have permission to edit TDS employees, remove TDS from the companies list
-		if( ! hasEditTdsPerm ) {
-			def tdsIndex = companies.indexOf("18")
-			if(tdsIndex != -1)
-				companies.replace(tdsIndex, tdsIndex+1, "0")
-		}
-		
-
-		def staffList = projectService.getStaffList(assigned, currRole, projectList, companies, 'fullName ASC, team ASC ')
-		
-		// Limit the events to today-30 days and newer (ie. don't show events over a month ago) 
-		moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > new Date().minus(30)}
-		def paramsMap = [sortOn : 'fullName', firstProp : 'staff', orderBy : 'asc']
-		
+		List projects = personService.getAvailableProjects(loginPerson)
+	
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
-		return [projects:reqProjects, projectId:project.id, roleTypes:roleTypes, staffList:staffList,
-			moveEventList:retrieveBundleHeader( moveEvents ), currRole:currRole, currLoc:currLoc,
-			currPhase:currPhase, currScale:currScale, project:project, editPermission:editPermission,
-			assigned:assigned, onlyClientStaff:onlyClientStaff]
+
+		return [
+			project: project, 
+			projects: projects, 
+			projectId: project.id, 
+			roleTypes: roleTypes, 
+			currRole: currRole, 
+			editPermission: editPermission,
+			assigned: assigned, 
+			onlyClientStaff: onlyClientStaff
+		]
+
 		log.error "Loading staff list took ${TimeUtil.elapsed(start)}"
 	}
-	
+
 	/*
-	 * Generates an HTML table of Project Staffing based on a number of filters
+	 * Generates an HTML table of Project Staffing based on a number of filter parameters called by AJAX service.
+	 * The list of staff that appear is going to be contingent based on what user is viewing the page. The use-cases are:
+	 *    Staff of Owner - see all owner, partner and client staff without limitations (when the Only Assigned is not checked)
+	 *    Staff of Partner - ONLY assigned staff to the project
+	 *    Staff of Client - ONLY assigned staff of Owner and Partner and All Client Staff without limitation
 	 *
-	 * @param Integer projectId - id of project from select, 0 for ALL
-	 * @param String roletype - of role to filter staff list, '0' for all roles
-	 * @param Integer scale - duration in month  to filter staff list (1,2,3,6)
-	 * @param location - location to filter staff list
-	 * @return HTML 
+	 * @param project - id of project from select, 0 for ALL
+	 * @param role - the code for filtering staff list, '0' for all roles
+	 * @param assigned - flag if 1 indicates only assigned staff, 0 indicates all
+	 * @param onlyClientStaff - flag if 1 indicates only include staff of the client, 0 indicates all available staff
+	 * @return HTML table of the data
 	 */
 	def loadFilteredStaff() {
 		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
@@ -818,118 +811,179 @@ class PersonController {
 			return
 		}
 
-		def role = request.JSON.role ?: 'AUTO'
-		def projectId = (request.JSON.project.isNumber()) ? (request.JSON.project.toLong()) : (0)
-		def scale = request.JSON.scale
-		def location = request.JSON.location
-		def phase = request.JSON["phaseArr[]"]
-		def assigned = request.JSON.assigned ? '1' : '0'
-		def onlyClientStaff = request.JSON.onlyClientStaff ? '1' : '0'
-		def loginPerson = securityService.getUserLoginPerson()
-		def sortableProps = [ 'fullName', 'company', 'team']
+		UserLogin userLogin = securityService.getUserLogin()
+		Person loginPerson = userLogin.person
+
+		//
+		// Deal with filter parameters
+		//
+		String role = params.role ?: 'AUTO'
+		Long projectId = NumberUtil.toPositiveLong(params.project, -1)
+		if (projectId < 1) {
+			render 'Invalid project number was specified'
+			return
+		}
+
+		Project project = Project.read(projectId)
+		if (! project) {
+			render 'Specified Project was not found'
+			return
+		}
+		List accessibleProjects = personService.getAvailableProjects(loginPerson)
+		if (! accessibleProjects.find {it.id == projectId } ) {
+			securityService.reportViolation("attempted to access project staffing for project $project without necessary access rights", userLogin)
+			render 'Specified Project was not found'
+			return
+		}
+
+		def assigned = ( params.containsKey('assigned') && '01'.contains(params.assigned) ? params.assigned : '1' )
+		def onlyClientStaff = ( params.containsKey('onlyClientStaff') && '01'.contains(params.onlyClientStaff) ? params.onlyClientStaff : '1' )
+		def location = params.location
+
+		def sortableProps = ['fullName', 'company', 'team']
+
 		def orders = ['asc', 'desc']
 		
-		//code which is used to resolve the bug in TM-2585: 
-		//alphasorting is reversed each time when the user checks or unchecks the two filtering checkboxes.
-		if(request.JSON.firstProp != 'staff'){
-			session.setAttribute("Staff_OrderBy",request.JSON.orderBy)
-			session.setAttribute("Staff_SortOn",request.JSON.sortOn)
-		}else{
-			request.JSON.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
-			request.JSON.sortOn = session.getAttribute("Staff_SortOn")?:'fullName'
+		// code which is used to resolve the bug in TM-2585: 
+		// alphasorting is reversed each time when the user checks or unchecks the two filtering checkboxes.
+		if (params.firstProp != 'staff') {
+			session.setAttribute("Staff_OrderBy", params.orderBy)
+			session.setAttribute("Staff_SortOn", params.sortOn)
+		} else {
+			params.orderBy = session.getAttribute("Staff_OrderBy")?:'asc'
+			params.sortOn = session.getAttribute("Staff_SortOn")?:'fullName'
 		}
 		
-		def paramsMap = [sortOn : request.JSON.sortOn in sortableProps ? request.JSON.sortOn : 'fullName',
-		firstProp : request.JSON.firstProp, 
-		orderBy : request.JSON.orderBy in orders ? request.JSON.orderBy : 'asc']
+		// TODO : JPM 11/2015 : Do not believe the firstProp is used in method loadFilteredStaff
+		def paramsMap = [
+			sortOn : params.sortOn in sortableProps ? params.sortOn : 'fullName',
+			firstProp : params.firstProp, 
+			orderBy : params.orderBy in orders ? params.orderBy : 'asc'
+		]
+
 		def sortString = "${paramsMap.sortOn} ${paramsMap.orderBy}"
 		sortableProps.each {
 			sortString = sortString + ', ' + it + ' asc'
 		}
 		
-		//log.info("projectId:$projectId, role:$role, scale:$scale, location:$location, assigned:$assigned, paramsMap:$paramsMap")
-		
 		// Save the user preferences from the filter
-		userPreferenceService.setPreference("StaffingRole",role)
-		userPreferenceService.setPreference("StaffingLocation",location)
-		userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
-		userPreferenceService.setPreference("StaffingScale",scale)
-		
+		//userPreferenceService.setPreference("StaffingLocation",location)
+		//userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
+		//userPreferenceService.setPreference("StaffingScale",scale)	
+		userPreferenceService.setPreference("StaffingRole",role)		
 		userPreferenceService.setPreference("ShowClientStaff",onlyClientStaff.toString())
 		userPreferenceService.setPreference("ShowAssignedStaff",assigned.toString())
 
-		def now = TimeUtil.nowGMT()
 		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")
-		def hasEditTdsPerm = RolePermissions.hasPermission("EditTDSPerson")
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 		
-		def project
-		def moveEvents 
-		def projectList = []
+		List moveEvents 
+		List projectList = [project]
 		
-		/* Create the list of projects to use in the view.
-		 * If the projectId is 0, use all active projects.
-		 * Otherwise, use the project specified by projectId. */
-		if (projectId == 0) {
-			// Just get a list of the active projects
-			def loginUser = securityService.getUserLogin()
-			projectList = projectService.getUserProjectsOrderBy(loginUser, hasShowAllProjectPerm, ProjectStatus.ACTIVE)
-		} else {
-			// Add only the indicated project if exists and based on user's associate to the project
-			project = Project.read( projectId )
-			if (project) {
-				if ( hasShowAllProjectPerm ) {
-					projectList << project
-				} else {
-					// Lets make sure that the user has access to it (is assoicated with the project)
-					def staffProjectRoles = partyRelationshipService.getProjectStaffFunctions(projectId, loginPerson.id)
-					if (staffProjectRoles.size() > 0) {
-						projectList << project
-					}
+		// Find all Events for one or more Projects and the Staffing for the projects
+		// Limit the list of events to those that completed within the past 30 days or have no completion and have started in the past 90 days
+		if (projectList.size() > 0) {
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
+			def now = TimeUtil.nowGMT()
+		
+			moveEvents = moveEvents.findAll {
+				def eventTimes = it.eventTimes
+				if ( eventTimes 
+					&& ( 
+						( eventTimes.completion && eventTimes.completion > now.minus(30) ) ||
+						( ! eventTimes.completion && eventTimes.start && eventTimes.start > now.minus(90) )
+					)
+				) {
+					return true
 				}
-			} else {
-				log.error("Didn't find project $projectId")
+				return false
 			}
 		}
 		
-		
-		// Find all Events for one or more Projects and the Staffing for the projects
-		if (projectList.size() > 0) {
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
+		String projects = "${project.id}"
+		StringBuffer companies = new StringBuffer("${project.client.id}")
+		if (onlyClientStaff == '0') {
+			// Add the owner company and any partner companies associated with the project
+			companies.append(", ${project.owner.id}")
+			def projectPartners = projectService.getPartners(project)
+			if (projectPartners) {
+				companies.append(',' + projectPartners*.id.join(','))
+			}
+		}
+
+		// Get the list of staff that should be displayed based on strictly assigned or available staff
+		List staff
+		if (assigned == '1') {
+			staff = projectService.getAssignedStaff(project)
+		} else {
+			staff = projectService.getAssignableStaff(project, loginPerson)
+		}
+
+		List staffList
+
+		// If there is no staff then there is no need to perform the query
+		if (staff) {
+			// The staffIds will help filter down who can appear in the list
+			String staffIds = staff.id.join(',')
+
+			def query = new StringBuffer("""
+				SELECT * FROM (
+					SELECT pr.party_id_to_id AS personId, 
+						p.last_name AS lastName,
+						CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '), 
+							IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
+							COALESCE(p.last_name, '')
+						) AS fullName, 
+						company.name AS company, 
+						pr.role_type_code_to_id AS role, 
+						SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, 
+						pr2.party_id_to_id IS NOT NULL AS project, 
+						IFNULL(CONVERT(GROUP_CONCAT(mes.move_event_id) USING 'utf8'), 0) AS moveEvents, 
+						IFNULL(CONVERT(GROUP_CONCAT(DATE_FORMAT(ed.exception_day, '%Y-%m-%d')) USING 'utf8'),'') AS unavailableDates 
+					FROM tdstm.party_relationship pr 
+						LEFT OUTER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
+						LEFT OUTER JOIN exception_dates ed ON ed.person_id = p.person_id 
+						LEFT OUTER JOIN party_group company ON company.party_group_id = pr.party_id_from_id 
+						LEFT OUTER JOIN role_type rt ON rt.role_type_code = pr.role_type_code_to_id 
+						LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id 
+							AND pr2.role_type_code_to_id = pr.role_type_code_to_id 
+							AND pr2.party_id_from_id IN (${projects}) 
+							AND pr2.role_type_code_from_id = 'PROJECT'
+						LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id 
+							AND mes.role_id = pr.role_type_code_to_id 
+					WHERE pr.role_type_code_from_id in ('COMPANY') 
+						AND pr.party_relationship_type_id in ('STAFF') 
+						AND pr.party_id_from_id IN (${companies}) 
+						AND p.active = 'Y'
+						AND pr.party_id_to_id IN (${staffIds})
+					GROUP BY role, personId 
+					ORDER BY fullName ASC 
+				) AS companyStaff 
+				WHERE 1=1 
+			""")
 			
-			// Limit the events to today-30 days and newer (ie. don't show events over a month ago)
-			moveEvents = moveEvents.findAll{it.eventTimes.start && it.eventTimes.start > now.minus(30)}
-		}
-		
-		def companies = new StringBuffer('0')
-		def projects = new StringBuffer('0')
-		projectList.each {
-			companies.append(",${it.client.id}")
-			projects.append(",${it.id}")
-		}
-		
-		// if the "only client staff" button is not checked, show TDS employees as well
-		if (onlyClientStaff == '0')
-			companies.append(",18")
-		
-		// if the user doesn't have permission to edit TDS employees, remove TDS from the companies list
-		if( ! hasEditTdsPerm ) {
-			def tdsIndex = companies.indexOf("18")
-			if(tdsIndex != -1)
-				companies.replace(tdsIndex, tdsIndex+1, "0")
+			// Filter on the role (aka teams) if there is a filter for it
+			if (role != '0')
+				query.append("AND companyStaff.role = '${role}' ")
+
+			query.append(" ORDER BY fullName ASC, team ASC ")
+			// log.debug "loadFilteredStaff() query=$query"
+			staffList = jdbcTemplate.queryForList(query.toString())
 		}
 
+		render(
+			template: "projectStaffTable", 
+			model:[
+				staffList:staffList, 
+				moveEventList:retrieveBundleHeader(moveEvents),
+				projectId:projectId, 
+				project:project, 
+				editPermission:editPermission,
+				sortOn: params.sortOn, 
+				firstProp: params.firstProp, 
+				orderBy: params.orderBy != 'asc' ? 'asc' :'desc']
+		)	
 
-		def staffList = projectService.getStaffList(assigned, role, projects, companies, sortString)
-		
-		/*staffList.each {
-			log.info "A ${it}"
-		}*/
-		
-		render(template:"projectStaffTable" ,model:[staffList:staffList, moveEventList:retrieveBundleHeader(moveEvents),
-					projectId:projectId, project:project, editPermission:editPermission,
-					sortOn : params.sortOn, firstProp : params.firstProp, orderBy : params.orderBy != 'asc' ? 'asc' :'desc'])
-		
 	}
 
 	/*
@@ -938,7 +992,7 @@ class PersonController {
 	 *@param role - type of role to filter staff list
 	 *@param scale - duration in month  to filter staff list
 	 *@param location - location to filter staff list
-	 * Note: There is no reference to this method
+	 *TODO : JPM 11/2015 : There is no reference to PersonController.getStaffList method so it should be removed
 	 */
 	def retrieveStaffList(def projectList, def role, def scale, def location,def assigned,def paramsMap){
 		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
@@ -1024,9 +1078,10 @@ class PersonController {
 		if( subject.hasRole("PROJ_MGR")){
 			isProjMgr = true
 		}
+		def partyGroupList = partyRelationshipService.associatedCompanies(securityService.getUserLoginPerson())
 		
 		render(template:tab ,model:[person:person, company:company, personFunctions:personFunctions, availabaleFunctions:availabaleFunctions, 
-			sizeOfassigned:(personFunctions.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr])
+			sizeOfassigned:(personFunctions.size()+1), blackOutdays:blackOutdays, isProjMgr:isProjMgr, partyGroupList:partyGroupList])
 			
 	}
 	
@@ -1048,6 +1103,7 @@ class PersonController {
 				def moveMap = new HashMap()
 				def moveBundle = moveEvent?.moveBundles
 				def startDate = moveBundle.startTime.sort()
+				def eventTimes = moveEvent.eventTimes
 				startDate?.removeAll([null])
 				if (startDate.size()>0) {
 					if (startDate[0]) {
@@ -1057,7 +1113,7 @@ class PersonController {
 				moveMap.put("project", moveEvent.project.name)
 				moveMap.put("name", moveEvent.name)
 				moveMap.put("startTime", bundleStartDate)
-				moveMap.put("startDate", moveEventDateFormatter.format(moveEvent.eventTimes.start))
+				moveMap.put("startDate", (eventTimes.start ? moveEventDateFormatter.format(moveEvent.eventTimes.start) : '') )
 				moveMap.put("id", moveEvent.id)
 				
 				moveEventList << moveMap
@@ -1248,4 +1304,209 @@ class PersonController {
 		msg += "${personMerged.size() ? WebUtil.listAsMultiValueString(personMerged) : 'None of Person '} Merged to ${toPerson}"
 		render msg
 	}
+
+	/*
+	 * Ajax service used to add the staff association to a project
+	 * @params params.projectId
+	 * @params params.personId
+	 * @return JSON response 
+	 */
+	def addProjectStaff() {
+		String userMsg
+		try {
+			UserLogin userLogin = securityService.getUserLogin()
+
+			// Make the service call - note that the Permission is checked within the service
+			personService.addToProject(userLogin, params.projectId, params.personId)
+
+			ServiceResults.respondWithSuccess(response)
+
+		} catch (DomainUpdateException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidRequestException e) {
+			userMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			userMsg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace("addProjectTeam()", e)
+			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the project', e.getMessage()])
+		}
+
+		if (userMsg) {
+			ServiceResults.respondWithError(response, userMsg)
+		}
+	}
+
+	/*
+	 * Ajax service used to remove the staff association to a project and events and teams
+	 * @params params.projectId
+	 * @params params.personId
+	 * @return JSON response 
+	 */
+	def removeProjectStaff() {
+		String userMsg
+		UserLogin userLogin
+		try {
+			userLogin = securityService.getUserLogin()
+
+			// Make the service call - note that the Permission is checked within the service
+			personService.removeFromProject(userLogin, params.projectId, params.personId)
+
+			ServiceResults.respondWithSuccess(response)
+
+		} catch (DomainUpdateException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidRequestException e) {
+			userMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			userMsg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace("removeProjectTeam()", e)
+			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the project', e.getMessage()])
+		}
+
+		if (userMsg) {
+			log.debug "removeProjectTeam($userLogin, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
+			ServiceResults.respondWithError(response, userMsg)
+		}
+	}
+
+	/*
+	 * Ajax service used to add the staff association to a project for a given team code
+	 * @params params.projectId
+	 * @params params.personId
+	 * @params params.teamCode
+	 * @return JSON response 
+	 */
+	def addProjectTeam() {
+		String userMsg
+		try {
+			UserLogin userLogin = securityService.getUserLogin()
+
+			// Make the service call - note that the Permission is checked within the service
+			personService.addToProjectTeam(userLogin, params.projectId, params.personId, params.teamCode)
+
+			ServiceResults.respondWithSuccess(response)
+
+		} catch (DomainUpdateException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidRequestException e) {
+			userMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			userMsg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace("addProjectTeam()", e)
+			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the project', e.getMessage()])
+		}
+
+		if (userMsg) {
+			ServiceResults.respondWithError(response, userMsg)
+		}
+	}
+
+	/*
+	 * Ajax service used to remove the staff association to a project and events for a given team code
+	 * @params params.projectId
+	 * @params params.personId
+	 * @params params.teamCode
+	 * @return JSON response 
+	 */
+	def removeProjectTeam() {
+		String userMsg
+		UserLogin userLogin
+		try {
+			userLogin = securityService.getUserLogin()
+
+			// Make the service call - note that the Permission is checked within the service
+			personService.removeFromProjectTeam(userLogin, params.projectId, params.personId, params.teamCode)
+
+			ServiceResults.respondWithSuccess(response)
+
+		} catch (DomainUpdateException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidRequestException e) {
+			userMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			userMsg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace("removeProjectTeam()", e)
+			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the project', e.getMessage()])
+		}
+
+		if (userMsg) {
+			log.debug "removeProjectTeam($userLogin, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
+			ServiceResults.respondWithError(response, userMsg)
+		}
+	}
+
+	/*
+	 * Method to add Staff to project through Ajax Overlay 
+	 * @
+	 */
+	def addEventStaff() {
+		String userMsg
+		try {
+			UserLogin userLogin = securityService.getUserLogin()
+
+			// Make the service call - note that the Permission is checked within the service
+			personService.addToEvent(userLogin, params.projectId, params.eventId, params.personId, params.teamCode)
+			ServiceResults.respondWithSuccess(response)
+
+		} catch (DomainUpdateException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidRequestException e) {
+			userMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			userMsg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace("addEventStaff()", e)
+			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the event', e.getMessage()])
+		}
+
+		if (userMsg) {
+			ServiceResults.respondWithError(response, userMsg)
+		}
+	}
+
+	/*
+	 * Method to add Staff to project through Ajax Overlay 
+	 * @
+	 */
+	def removeEventStaff() {
+		String userMsg
+		try {
+			UserLogin userLogin = securityService.getUserLogin()
+
+			// Make the service call - note that the Permission is checked within the service
+			personService.removeFromEvent(userLogin, params.projectId, params.eventId, params.personId, params.teamCode)
+			ServiceResults.respondWithSuccess(response)
+
+		} catch (DomainUpdateException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidParamException e) {
+			userMsg = e.getMessage()
+		} catch (InvalidRequestException e) {
+			userMsg = e.getMessage()
+		} catch (UnauthorizedException e) {
+			userMsg = e.getMessage()
+		} catch (e) {
+			log.error ExceptionUtil.messageWithStacktrace("removeEventStaff()", e)
+			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the event', e.getMessage()])
+		}
+
+		if (userMsg) {
+			ServiceResults.respondWithError(response, userMsg)
+		}
+	}	
+
 }

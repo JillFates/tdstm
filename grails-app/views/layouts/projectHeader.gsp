@@ -230,8 +230,10 @@
 							<g:if test="${roomId}">
 								<li><g:link class="mmlink" params="[roomId:roomId]" controller="room" onclick="hideMegaMenu('racksMegaMenu')">Room ${room?.location}/${room?.roomName}</g:link></li>
 							</g:if>
-							<li><g:link class="mmlink" controller="rackLayouts" action="create" onclick="hideMegaMenu('racksMegaMenu')">Rack Elevations</g:link></li>
 							<tds:hasPermission permission='HelpMenuView'>
+							<li><g:link class="mmlink" controller="rackLayouts" action="create" onclick="hideMegaMenu('racksMegaMenu')">Rack Elevations</g:link></li>
+							</tds:hasPermission>
+							<tds:hasPermission permission='AssetEdit'>
 								<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
 							</tds:hasPermission>
 						</ul>
@@ -254,7 +256,7 @@
 							<li><g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')"> Storage-Logical</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">Comments</g:link></li>
 							<li><g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')"> Dependencies</g:link></li>
-							<tds:hasPermission permission='MoveBundleEditView'>
+							<tds:hasPermission permission='DepAnalyzerView'>
 							  <li><g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">Dependency Analyzer</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='ArchitectureView'>

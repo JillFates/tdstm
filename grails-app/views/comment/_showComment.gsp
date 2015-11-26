@@ -43,10 +43,10 @@
 				<div class="buttons" style="white-space: nowrap;">
 					<span class="button" class="slide">
 					<span class="slide">
-					<input class="edit-comment" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" />
+					<input class="edit-comment" type="button" value="Edit" id="commentButtonEditId" ng-click="editComment();" ng-show="ac.canEdit" />
 					</span>
 					<span id="fromAssetId" class="slide">
-					<input class="delete-comment" type="button" value="Delete" ng-click="deleteComment()" />
+					<input class="delete-comment" type="button" value="Delete" ng-click="deleteComment()" ng-show="ac.canEdit" />
 					</span>
 					</span>
 				</div>

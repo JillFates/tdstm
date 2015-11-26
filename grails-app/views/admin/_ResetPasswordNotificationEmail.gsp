@@ -11,7 +11,7 @@ Welcome to TransitionManager. A new account has been created for you but will ne
 
 ${activationURL}
 
-<p>It is important that you activate your account ASAP as the activation period will expire in ${ttl} from when this email was generated.</p>
+<p>It is important that you activate your account ASAP as the activation period will expire in ${ttl} minutes from when this email was generated.</p>
 
 <p>In the future you can access the TransitionManager website your username will be: ${username}</p>
 
