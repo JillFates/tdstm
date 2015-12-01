@@ -678,7 +678,7 @@ class RunbookService {
 			}
 
 			// We'll iterate until the queue is empty
-			safetyValve = dependencies.size() * tasks.size()
+			def safetyValve = dependencies.size() * tasks.size()
 			while( queue.size() > 0 ) {
 
 				// Bail out of infinite loop
