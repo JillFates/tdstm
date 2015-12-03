@@ -11,7 +11,6 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
-import java.text.SimpleDateFormat
 import grails.converters.JSON
 import com.tdsops.tm.enums.domain.PasswordResetType
 

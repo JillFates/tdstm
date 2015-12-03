@@ -1,6 +1,6 @@
 package com.tds.asset
 
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 /** 
   * CommentNote represents a note created by users and associated to AssetComment (aka Task)
@@ -30,11 +30,11 @@ class CommentNote {
 	}
 	
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	
 	String toString(){

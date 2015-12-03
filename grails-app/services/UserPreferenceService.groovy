@@ -16,19 +16,20 @@ import com.tds.asset.AssetDependencyBundle
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tds.asset.FieldImportance
 import com.tdsops.common.validation.ConstraintsValidator
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import grails.converters.JSON
 
-class UserPreferenceService  {
+class UserPreferenceService {
 
 	static transactional = true
-	def securityService
 	def auditService
+	def securityService
 	
 	protected static customLabels = ['Custom1','Custom2','Custom3','Custom4','Custom5','Custom6','Custom7','Custom8']
 	
 	// defaults holds global defaults for certain values 
 	// TODO - load these from application settings
-	protected static defaults = ['CURR_TZ':'EST']
+	protected static defaults = ['CURR_TZ':'GMT']
 
 	protected static Map SECURITY_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
 
@@ -532,4 +533,15 @@ class UserPreferenceService  {
 		
 		return true
 	}
+	/**
+	 * 
+	 */
+	def timezonePickerAreas() {
+		File worldMapAreasFile = ApplicationHolder.application.parentContext.getResource( "/templates/timezone/world_map_areas.json" ).getFile()
+
+		def timezones = JSON.parse(worldMapAreasFile.text)
+
+		return timezones
+	}
+
 }

@@ -3,8 +3,7 @@ import org.apache.shiro.SecurityUtils
 
 import com.tds.asset.AssetEntity;
 import com.tdssrc.grails.GormUtil
-import java.text.SimpleDateFormat
-import java.text.DateFormat
+
 class MoveBundleAssetController {
 	def partyRelationshipService
 	def assetEntityAttributeLoaderService

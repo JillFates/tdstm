@@ -9,7 +9,7 @@
 		<g:layoutHead />
 
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dropDown.css')}" />    
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs2.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'daterangepicker-bs3.css')}" />
 
 		<g:javascript src="tdsmenu.js" />
 		<g:javascript src="PasswordValidation.js" />
@@ -23,9 +23,6 @@
 				$('textarea').each(function(){
 					$(this).val($(this).text());
 				});
-				$('.tzmenu').click(function(){
-					$(".tzmenu ul").toggle();
-				});
 				$(".headerClass").mouseover(function(){
 					$(this).parent().find('a').addClass('mouseover');
 					$(this).parent().find('a').removeClass('mouseout');
@@ -37,6 +34,9 @@
 						$('.headerClass').removeClass('mouseover');
 					}
 				});
+
+				$.datepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
+				$.datetimepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
 			});
 
 			function updateEventHeader( e ){
@@ -45,7 +45,6 @@
 				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
 				$("#moveEventStatus").html(newsAndStatus[0].status)
 			}
-
 		</script>
 	</head>
 	<% 
@@ -84,6 +83,8 @@
 	<body>
 		<div class="main_body">
 			<input id="contextPath" type="hidden" value="${request.contextPath}"/>
+			<input id="tzId" type="hidden" value="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+			<input id="userDTFormat" type="hidden" value="${request.getSession().getAttribute('CURR_DT_FORMAT')?.CURR_DT_FORMAT}"/>		
 			<div class="tds_header">
 				<div class="header_left">
 					<g:if test="${setImage}">
@@ -109,19 +110,6 @@
 									<a class="headerClass" onmouseover="hoverMegaMenu('#userMegaMenu')" href="javascript:showMegaMenu('#userMegaMenu')" style="float:left;text-decoration:none;display:inline">
 										&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }</span>
 									</a>
-								</div>
-								<div class="tzmenu">:&nbsp; <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' } time zone</span>
-									<ul>
-										<li><a href="javascript:setUserTimeZone('GMT')">GMT</a></li>
-										<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
-										<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
-										<li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
-										<li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
-										<li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
-										<li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
-										<li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
-										<li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
-									</ul>
 								</div>
 							</strong>
 							&nbsp;&nbsp;<g:link controller="auth" action="signOut"></g:link>

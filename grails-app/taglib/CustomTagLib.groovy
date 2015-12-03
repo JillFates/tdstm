@@ -2,7 +2,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.apache.commons.validator.UrlValidator
 import org.apache.commons.codec.net.URLCodec
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
 import org.springframework.beans.SimpleTypeConverter
@@ -12,92 +11,40 @@ import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 class CustomTagLib {
 	static namespace = 'tds'
 	
-	/** 
-	 * Used to do standard format of a date
-	 * TODO : JPM 10/23/2015 : The formatDate was added because the convertDate is incorrectly do a Timezone shift of the date but shouldn't	
-	 */
-	def formatDate = { attrs ->
-		Date date = attrs['date']
-		if (date) {
-			DateFormat formatter = new SimpleDateFormat('MM/dd/yyyy')
-			out << formatter.format(date)
-		} else {
-			out << ''
-		}
-	}
-
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
 	 */
 	def convertDate = { attrs ->
 		Date dt = attrs['date'];
-		def tzId = attrs['timeZone']
 		def format = attrs['format']
 		
 		String dtStr = dt.getClass().getName().toString();
-		String dtParam = dt.toString();	
 		
-		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {	
-			DateFormat formatter ; 
-			formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss');
-			dt = GormUtil.convertInToUserTZ( dt, tzId )
-			dtParam = formatter.format(dt);		
-		}  
-		/* if null or any plain string */
 		out << ""
-		if (dtParam != "null") {
-			dtParam = dtParam.trim();
-			switch(format){
-				case "MM/dd" :
-					out << dtParam[5..6]+"/"+dtParam[8..9]
-					break
-				case "MM/dd kk:mm:ss" :
-					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..18]
-					break
-				case "MM/dd kk:mm" :
-					out << dtParam[5..6]+'/'+dtParam[8..9]+' '+dtParam[11..15]
-					break
-				case "M/d" :
-					out << (dtParam[5] =='0' ? dtParam[6] : dtParam[5..6])+'/'+ (dtParam[8] == '0'? dtParam[9]: dtParam[8..9])+'/'+dtParam[0..3]
-					break
-				case "M/d kk:mm" :
-					out << (dtParam[5] =='0' ? dtParam[6] : dtParam[5..6])+'/'+ (dtParam[8] == '0'? dtParam[9]: dtParam[8..9])+'/'+dtParam[0..3]+' '+dtParam[11..15]
-					break
-				default:
-					out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]
-					break
+		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {
+			DateFormat formatter = TimeUtil.createFormatter(session, format)
+			if (formatter == null) {
+				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE)
 			}
-		}
+			out << TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, dt, formatter)
+		}  
 	}
 	/*
 	 * Converts a date to User's Timezone and applies formating
 	 */
 	def convertDateTime = { attrs ->
 		Date dt = attrs['date'];
-		// TODO : convertDateTime - param formate is misspelled.  Also this should just use the date formatter instead of the multiple if/else conditions
-		def formate = attrs['formate'];
-		def tzId = attrs['timeZone']
+		def format = attrs['format'];
 		String dtStr = dt.getClass().getName().toString();
-		String dtParam = dt.toString();	
 		
+		out << ""
 		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
-			DateFormat  formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
-			dt = GormUtil.convertInToUserTZ( dt , tzId )
-			dtParam = formatter.format( dt );		
-		}  
-		/* if null or any plain string */
-		if (dtParam != "null") {
-			dtParam = dtParam.trim();
-			if(formate == "mm/dd"){
-				out << dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else if(formate == "hh:mm"){
-				out << dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else if(formate == "yyyy/mm-dd hh:mm a"){
-				out << dtParam[0..3]+"/"+dtParam[5..6]+"/"+dtParam[8..9]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
-			} else {
-				out << dtParam[5..6]+"/"+dtParam[8..9]+"/"+dtParam[0..3]+" "+dtParam[11..12]+":"+dtParam[14..15]+" "+dtParam[17..18]
+			DateFormat formatter = TimeUtil.createFormatter(session, format)
+			if (formatter == null) {
+				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE_TIME)
 			}
-		}
+			out << TimeUtil.formatDateTime(session, dt, formatter)
+		}  
 	}
 	/*
 	 * 

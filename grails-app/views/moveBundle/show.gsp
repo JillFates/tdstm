@@ -127,14 +127,14 @@
             <tr class="prop">
               <td valign="top" class="name">Start Time:</td>
 
-              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.startTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" /></td>
 
             </tr>
 
             <tr class="prop">
               <td valign="top" class="name">Completion Time:</td>
 
-              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.completionTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+              <td valign="top" class="value"><tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" /></td>
 
             </tr>
 
@@ -235,8 +235,8 @@
 						<td>
 							${dashboardStep.moveBundleStep.label}
 						</td>
-						<td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planStartTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
-						<td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planCompletionTime}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+						<td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planStartTime}" /></td>
+						<td><tds:convertDateTime date="${dashboardStep.moveBundleStep.planCompletionTime}" /></td>
 						<td><tds:formatIntoHHMMSS value="${dashboardStep.moveBundleStep?.planDuration}"/></td>
 						<td>
 						<g:if test="${dashboardStep.moveBundleStep?.calcMethod != 'L'}">

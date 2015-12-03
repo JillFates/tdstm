@@ -67,19 +67,6 @@
 			<div style="float: left;">
 	              		Welcome,&nbsp;<span id="loginUserId">${session.getAttribute("LOGIN_PERSON").name }(${person?.modelScore}) </span>
 	              	</div>
-		 	<div class="tzmenu">&nbsp;-&nbsp;using <span id="tzId">${session.getAttribute("CURR_TZ")?.CURR_TZ ? session.getAttribute("CURR_TZ")?.CURR_TZ : 'EDT' }</span>
-			 time<ul>   
-				<li><a href="javascript:setUserTimeZone('GMT')">GMT </a></li>
-				<li><a href="javascript:setUserTimeZone('PST')">PST</a></li>
-				<li><a href="javascript:setUserTimeZone('PDT')">PDT</a></li>
-				<li><a href="javascript:setUserTimeZone('MST')">MST</a></li>
-				<li><a href="javascript:setUserTimeZone('MDT')">MDT</a></li>
-				<li><a href="javascript:setUserTimeZone('CST')">CST</a></li>
-				<li><a href="javascript:setUserTimeZone('CDT')">CDT</a></li>
-				<li><a href="javascript:setUserTimeZone('EST')">EST</a></li>
-				<li><a href="javascript:setUserTimeZone('EDT')">EDT</a></li>
-				</ul>
-		     </div>
 	              	&nbsp;| 
 	              </strong>
               </g:remoteLink>
@@ -191,16 +178,6 @@
                         </td>
                     </tr>
                 </tds:hasPermission>
-                
-                <tr class="prop">
-                    <td valign="top" class="name">
-                        <label for="title">Time Zone:</label>
-                    </td>
-                    <td valign="top" class="value">
-                        <g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-                        value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-                    </td>
-                </tr>
                 
                     <tr class="prop">
                         <td valign="top" class="name">

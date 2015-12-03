@@ -1,8 +1,5 @@
 import grails.converters.JSON
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import org.apache.commons.lang3.StringUtils
@@ -422,10 +419,8 @@ def test = {
 		def personInstance = Person.get( params.id )        
 		def companyId = params.companyId
 		def companyParty = Party.findById(companyId)
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def dateCreatedByFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.dateCreated, tzId ) )
-		def lastUpdatedFormat = formatter.format(GormUtil.convertInToUserTZ( personInstance.lastUpdated, tzId ) )
+		def dateCreatedByFormat = TimeUtil.formatDateTime(getSession(), personInstance.dateCreated)
+		def lastUpdatedFormat = TimeUtil.formatDateTime(getSession(), personInstance.lastUpdated)
 		if(!personInstance) {
 			flash.message = "Person not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
@@ -618,6 +613,7 @@ def test = {
 	 * @return : person firstname
 	 */
 	def updatePerson() {
+
 		try {
 			Person byWhom = securityService.getUserLoginPerson()
 			String tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
@@ -637,7 +633,11 @@ def test = {
 			if (log.isDebugEnabled()) {
 				log.debug "updatePerson() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			}
+
+			userPreferenceService.loadPreferences("CURR_TZ")
+
 			ServiceResults.respondWithError(response, e.getMessage())
+
 		}
 	}
 
@@ -654,9 +654,7 @@ def test = {
 			
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 
-			// TODO : JPM 5/2015 : Move the date formating into a reusable class
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-			def expiryDate = userLogin.expiryDate ? formatter.format(GormUtil.convertInToUserTZ(userLogin.expiryDate,tzId)) : ""
+			def expiryDate = userLogin.expiryDate ? TimeUtil.formatDateTime(getSession(), userLogin.expiryDate) : ""
 			
 			def personDetails = [person:person, expiryDate: expiryDate, isLocal:userLogin.isLocal]
 
@@ -1094,8 +1092,6 @@ def test = {
 		// TODO : JPM 5/2015 : Need to add security controls
 		def project = securityService.getUserCurrentProject()
 		def moveEventList = []
-		def bundleTimeformatter = new SimpleDateFormat("MMM dd")
-		def moveEventDateFormatter = new SimpleDateFormat("yyyy-MM-dd")
 		if (project) {
 			def bundleStartDate = ""
 			def personAssignedToME = []
@@ -1107,13 +1103,13 @@ def test = {
 				startDate?.removeAll([null])
 				if (startDate.size()>0) {
 					if (startDate[0]) {
-						bundleStartDate = bundleTimeformatter.format(startDate[0])
+						bundleStartDate = TimeUtil.formatDateTime(getSession(), startDate[0], TimeUtil.FORMAT_DATE_TIME_10)
 					}
 				}
 				moveMap.put("project", moveEvent.project.name)
 				moveMap.put("name", moveEvent.name)
 				moveMap.put("startTime", bundleStartDate)
-				moveMap.put("startDate", (eventTimes.start ? moveEventDateFormatter.format(moveEvent.eventTimes.start) : '') )
+				moveMap.put("startDate", (eventTimes.start ? TimeUtil.formatDateTime(getSession(), eventTimes.start, TimeUtil.FORMAT_DATE_TIME_6) : '') )
 				moveMap.put("id", moveEvent.id)
 				
 				moveEventList << moveMap
@@ -1165,7 +1161,28 @@ def test = {
 			
 		render true
 	}
-	
+
+	def savePreferences() {
+		def timezoneValue = params.timezone
+		def datetimeFormatValue = params.datetimeFormat
+
+		// Checks that timezone is valid
+		def timezone = TimeZone.getTimeZone(timezoneValue)
+
+		// Validate date time format
+		def datetimeFormat = TimeUtil.getDateTimeFormatType(datetimeFormatValue)
+
+		userPreferenceService.setPreference( TimeUtil.TIMEZONE_ATTR, timezone.getID() )
+		userPreferenceService.setPreference( TimeUtil.DATE_TIME_FORMAT_ATTR, datetimeFormat )
+
+		def model = [
+			'timezone' : timezone.getID(),
+			'datetimeFormat' : datetimeFormat
+		]
+
+		render(ServiceResults.success(model) as JSON)
+	}
+
 	/**
 	 * This action is used to display Current logged user's Preferences with preference code (converted to comprehensive words)
 	 * with their corresponding value
@@ -1173,6 +1190,9 @@ def test = {
 	 * @return : A Map containing key as preference code and value as map'svalue.
 	 */
 	def editPreference() {
+
+		def timezones = Timezone.findAll()
+		def areas = userPreferenceService.timezonePickerAreas()
 		def loggedUser = securityService.getUserLogin()
 		def prefs = UserPreference.findAllByUserLogin( loggedUser ,[sort:"preferenceCode"])
 		def prefMap = [:]
@@ -1185,6 +1205,10 @@ def test = {
 			"PMO_COLUMN1" : "PMO Column 1 Filter", "PMO_COLUMN2" : "PMO Column 2 Filter", "PMO_COLUMN3" : "PMO Column 3 Filter",
 			"PMO_COLUMN4" : "PMO Column 4 Filter", "ShowAddIcons" : "Rack Add Icons", "MY_TASK":"My Task Refresh Time"
 		]
+
+		def currTimeZone = TimeUtil.defaultTimeZone;
+		def currDateTimeFormat = TimeUtil.dateTimeFormatTypes[0];
+
 		prefs.each { pref->
 			switch( pref.preferenceCode ) {
 				case "MOVE_EVENT" :
@@ -1221,7 +1245,15 @@ def test = {
 					def value = pref.value == "0" ? "False" : "True"
 					prefMap.put((pref.preferenceCode), "Just Remaining Check / "+value)
 					break;
-				
+
+				case TimeUtil.DATE_TIME_FORMAT_ATTR:
+					currDateTimeFormat = pref.value;
+					break;
+
+				case TimeUtil.TIMEZONE_ATTR:
+					currTimeZone = pref.value;
+					break;
+
 				default :
 					prefMap.put((pref.preferenceCode), (labelMap[pref.preferenceCode] ?: pref.preferenceCode )+" / "+ pref.value)
 					break;
@@ -1229,7 +1261,8 @@ def test = {
 		}
 		
 		
-		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}])
+		render(template:"showPreference",model:[prefMap:prefMap.sort{it.value}, areas: areas, 
+				timezones: timezones, currTimeZone: currTimeZone, currDateTimeFormat: currDateTimeFormat])
 	}
 	
 	/**

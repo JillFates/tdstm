@@ -23,9 +23,9 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WorkbookUtil
+import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.ProjectDailyMetric
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import net.transitionmanager.PasswordReset
 
 import org.hibernate.criterion.CriteriaSpecification
@@ -745,9 +745,6 @@ class ProjectService {
 	def activitySnapshot(params) {
 		log.info "Project Daily Metrics started."
 
-		// Date format for SQLs
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
 		def startDate = findProjectDailyMetricsLastRunDay().clearTime()
 		def endDate = new Date().clearTime()
 
@@ -760,7 +757,7 @@ class ProjectService {
 
 		for (searchDate in startDate..endDate) {
 
-			sqlSearchDate = formatter.format(searchDate)
+			sqlSearchDate = TimeUtil.gmtDateSQLFormat(searchDate)
 
 			log.info "Project Daily Metrics. Processing date: $sqlSearchDate"
 
@@ -785,7 +782,7 @@ class ProjectService {
 			fillUsersMetrics(metrics, metricsByProject, projects, sqlSearchDate)
 
 			// Deletes any existing record
-			def now = formatter.format(new Date())
+			def now = TimeUtil.gmtDateSQLFormat(new Date())
 			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
 
 			metrics.each { metric ->
@@ -1059,9 +1056,8 @@ class ProjectService {
 	 * Search activity metrics for the given project ids and in the specified date range
 	 */
 	def searchProjectActivityMetrics(projectIds, startDate, endDate) {
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		def sqlStartDate = formatter.format(startDate)
-		def sqlEndDate = formatter.format(endDate)
+		def sqlStartDate = TimeUtil.gmtDateSQLFormat(startDate)
+		def sqlEndDate = TimeUtil.gmtDateSQLFormat(endDate)
 		def projectIdsValue = projectIds.join(',')
 
 		def activitiesMetricsQuery = new StringBuffer("""

@@ -50,9 +50,9 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">Start Date:</td>
-							<td class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td class="valueNW"><tds:convertDate date="${projectInstance?.startDate}" /></td>
 							<td class="name">Completion Date:</td>
-							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" /></td>
 						</tr>
 						<tr class="prop">
 							<td class="name">Associated Partners:</td>
@@ -91,16 +91,16 @@
 								<span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
 								${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
 							</td>
-							<td><br></td>
-							<td><br></td>
+							<td class="name">Time Zone:</td>
+							<td class="valueNW">${projectInstance.timezone?projectInstance.timezone.code:''}</td>
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
-							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							<td class="valueNW"><tds:convertDateTime date="${projectInstance?.dateCreated}" /> </td>
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
-							<td class="valueNW" colspan="3"><tds:convertDateTime date="${projectInstance?.lastUpdated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> </td>
+							<td class="valueNW" colspan="3"><tds:convertDateTime date="${projectInstance?.lastUpdated}" /> </td>
 						</tr>
 					</tbody>
 				</table>

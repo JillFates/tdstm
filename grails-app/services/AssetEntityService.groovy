@@ -1,7 +1,5 @@
 import grails.converters.JSON
 
-import java.text.SimpleDateFormat
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
@@ -45,7 +43,6 @@ import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
@@ -1599,21 +1596,6 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Used to convert the Maint Expiration and Retire date parameters from strings to Dates
-	 * @param params - the map of the params
-	 */
-	public void parseMaintExpDateAndRetireDate(Object params, userTimeZone) {
-		Date date
-		List props = ['maintExpDate', 'retireDate']
-		props.each { key ->
-			if (params[key]) {
-				params[key] = DateUtil.parseDate(params[key])
-				//params[key] = DateUtil.formatDate( date )
-			}
-		}
-	}
-
-	/**
 	 * This method is used to get config by entityType and validation
 	 * @param type,validation
 	 * @return
@@ -2367,12 +2349,10 @@ class AssetEntityService {
 				exportType = exportType.substring(0, masterIndex)
 			}
 
-			SimpleDateFormat exportFileFormat = new SimpleDateFormat("yyyyMMdd")
-			SimpleDateFormat stdDateFormat = new SimpleDateFormat("MM-dd-yyyy")
-
 			def tzId = params.tzId
-			def currDate = TimeUtil.convertInToUserTZ(TimeUtil.nowGMT(),tzId)
-			def exportDate = exportFileFormat.format(currDate)
+			def userDTFormat = params.userDTFormat
+			def currDate = TimeUtil.nowGMT()
+			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
 			log.info "export() - Initial loading took ${TimeUtil.elapsed(started)}"
@@ -2513,13 +2493,12 @@ class AssetEntityService {
 			} else {
 				//Add Title Information to master SpreadSheet
 				titleSheet = book.getSheet("Title")
-				SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
 				if (titleSheet != null) {
 					WorkbookUtil.addCell(titleSheet, 1, 2, project.client.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
 					WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(projectId).toString())
-					WorkbookUtil.addCell(titleSheet, 1, 5, currDate)
+					WorkbookUtil.addCell(titleSheet, 1, 5, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate))
 					WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 7, bundleNameList.toString())
 					WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
@@ -2588,14 +2567,14 @@ class AssetEntityService {
 										continue
 									addCell(serverSheet, deviceCount, colNum, (Double)pos, Cell.CELL_TYPE_NUMERIC)
 									break
+
 								case ~/Retire|MaintExp/:
-									addCell(serverSheet, deviceCount, colNum, stdDateFormat.format(a[attribute]))
+									addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
 									break
 
 								case ~/Modified Date/:
 									if (a[attribute]) {
-										addCell(serverSheet, deviceCount, colNum, dateTimeFormat.format(
-											TimeUtil.convertInToUserTZ( a[attribute], tzId)) )
+										addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_2))
 									}
 									break
 
@@ -2681,10 +2660,10 @@ class AssetEntityService {
 									//log.info "export() : field class type=$app[assetColName].className()}"
 									break
 								case ~/Retire|MaintExp/:
-									colVal = app[assetColName] ? stdDateFormat.format(app[assetColName]) : ''
+									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
 									break
 								case ~/Modified Date/:
-									colVal = dateTimeFormat.format(TimeUtil.convertInToUserTZ( app[assetColName], tzId))
+									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_2) : ''
 									break
 								default:
 									colVal = app[assetColName]
@@ -2736,9 +2715,9 @@ class AssetEntityService {
 								def dateValue = currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
 									if (attribute == 'lastUpdated') {
-										dateValue = dateTimeFormat.format(TimeUtil.convertInToUserTZ(dateValue, tzId))
+										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									} else {
-										dateValue = stdDateFormat.format(dateValue)
+										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									}
 								} else {
 									dateValue =''
@@ -2789,9 +2768,9 @@ class AssetEntityService {
 								def dateValue = currentFile.(fileDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
 									if (attribute == 'lastUpdated') {
-										dateValue = dateTimeFormat.format(TimeUtil.convertInToUserTZ(dateValue, tzId))
+										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									} else {
-										dateValue = stdDateFormat.format(dateValue)
+										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									}
 								} else {
 									dateValue =''
@@ -2867,7 +2846,6 @@ class AssetEntityService {
 
 					def roomSheet = getWorksheet('Room')
 
-					def formatter = new SimpleDateFormat("MM/dd/yyyy")
 					def rooms = Room.findAllByProject(project)
 					def roomSize = rooms.size()
 					def roomMap = ['roomId':'id', 'Name':'roomName', 'Location':'location', 'Depth':'roomDepth', 'Width':'roomWidth',
@@ -2889,7 +2867,7 @@ class AssetEntityService {
 								addCell(roomSheet, r, 0, (rooms[r-1].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
 								if(column=='Date Created' || column=='Last Updated') {
-									addCell(roomSheet, r, i, rooms[r-1]."${roomMap[column]}" ?String.valueOf( formatter.format(rooms[r-1]."${roomMap[column]}")): "")
+									addCell(roomSheet, r, i, rooms[r-1]."${roomMap[column]}" ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, rooms[r-1]."${roomMap[column]}", TimeUtil.FORMAT_DATE) : "")
 								} else if(column =="Source") {
 									addCell(roomSheet, r, i, String.valueOf(rooms[r-1]."${roomMap[column]}" ==1 ? "Source" : "Target" ))
 								} else {
@@ -2968,7 +2946,6 @@ class AssetEntityService {
 				def commentSheet = getWorksheet("Comments")
 
 				def commentIt = new ArrayList()
-				SimpleDateFormat createDateFormat = new SimpleDateFormat("MM/dd/yyyy")
 				def allAssets
 
 				// TODO : JPM 9/2014 : The way that 
@@ -3008,7 +2985,7 @@ class AssetEntityService {
 
 						addCell(commentSheet, cr, 2, String.valueOf(assetcomment[cr-1].category))
 
-						addCell(commentSheet, cr, 3, String.valueOf(assetcomment[cr-1].dateCreated? createDateFormat.format(assetcomment[cr-1].dateCreated) : ''))
+						addCell(commentSheet, cr, 3, String.valueOf(assetcomment[cr-1].dateCreated? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetcomment[cr-1].dateCreated, TimeUtil.FORMAT_DATE) : "") )
 
 						addCell(commentSheet, cr, 4, String.valueOf(assetcomment[cr-1].createdBy))
 

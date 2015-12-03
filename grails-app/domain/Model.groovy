@@ -133,7 +133,8 @@ class Model {
 		modelName
 	}
 	def beforeInsert = {
-		dateCreated = lastModified = TimeUtil.nowGMT()
+		dateCreated = TimeUtil.nowGMT()
+		lastModified = TimeUtil.nowGMT()
 		if(assetType == "Blade Chassis"){
 			if(!bladeRows)
 				bladeRows = 2
@@ -162,7 +163,6 @@ class Model {
 	}
 	def beforeUpdate = {
 		lastModified = TimeUtil.nowGMT()
-		
 		if(assetType == "Blade Chassis"){
 			if(!bladeRows)
 				bladeRows = 2

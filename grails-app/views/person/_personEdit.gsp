@@ -91,16 +91,6 @@
 
 			<tr class="prop">
 				<td valign="top" class="name">
-					<label for="title">Time Zone:</label>
-				</td>
-				<td valign="top" class="value">
-					<g:select name="timeZone" id="timeZoneId" from="${['GMT','PST','PDT','MST','MDT','CST','CDT','EST','EDT']}" 
-					value="${session.getAttribute('CURR_TZ')?.CURR_TZ}"/>
-				</td>
-			</tr>
-			
-			<tr class="prop">
-				<td valign="top" class="name">
 					<label for="startPage">Start Page:</label>
 				</td>
 				<td valign="top" class="value">

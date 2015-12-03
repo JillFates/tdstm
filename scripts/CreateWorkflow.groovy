@@ -1,5 +1,5 @@
 import org.codehaus.groovy.grails.commons.ApplicationHolder
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 
 def jdbcTemplate = ctx.getBean("jdbcTemplate")
 println "Creating Workflow........."
@@ -77,7 +77,7 @@ println """Definition of table `workflow_transition_map` ....."""
 			def transList = new StringBuffer()
 			def xml = new XmlSlurper().parse(xmlFile)
 			// create workflow record.....
-			def workflow = new Workflow( process : xml.@code.text(), dateCreated : GormUtil.convertInToGMT( "now", "EDT" ) )
+			def workflow = new Workflow( process : xml.@code.text(), dateCreated : TimeUtil.nowGMT() )
 			workflow.errors.allErrors.each() { it }
 			if( !workflow.hasErrors() && workflow.save(flush:true) ) {
 				xml.transitions.each{

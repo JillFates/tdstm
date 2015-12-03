@@ -29,10 +29,10 @@ class ModelSyncBatch {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = TimeUtil.convertInToGMT( "now", "EDT" )
-		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastModified = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastModified = TimeUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.nowGMT()
 	}
 }

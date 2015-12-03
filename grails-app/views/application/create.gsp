@@ -182,10 +182,8 @@
 								    <script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 									</script>
-									<input type="text" class="dateRange ${config.retireDate}" size="15" 
-										style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
-										value="<tds:formatDate date="${applicationInstance?.retireDate}" />" 
-									/> 
+									<input type="text" class="dateRange ${config.retireDate}" size="15" style="width: 112px; height: 14px;" name="retireDate" id="retireDate" tabindex="26"
+									value="<tds:convertDate date="${applicationInstance?.retireDate}" />" /> 
 								</td>
 								<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label>
 								</td>
@@ -208,8 +206,7 @@
 									<input type="text" class="dateRange ${config.maintExpDate}" 
 										size="15" style="width: 112px; height: 14px;" 
 										name="maintExpDate" id="maintExpDate" tabindex="27" 
-										value="<tds:formatDate date="${applicationInstance?.maintExpDate}" />"
-									/> 
+										value="<tds:convertDate date="${applicationInstance?.maintExpDate}"  />" /> 
 								</td>
 								<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label>
 								</td>

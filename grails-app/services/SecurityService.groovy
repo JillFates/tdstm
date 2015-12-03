@@ -26,7 +26,6 @@ import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.EmailDispatch
 import grails.converters.JSON
-import java.text.SimpleDateFormat
 import groovy.time.TimeCategory
 
 class SecurityService implements InitializingBean {
@@ -961,6 +960,7 @@ class SecurityService implements InitializingBean {
 		UserLogin userLogin
 		Person person 
 		Project project
+		def session = serviceHelperService.getService('userPreference').getSession()
 
 		if (StringUtil.isBlank(params.username)) {
 			throw new InvalidParamException('Username should not be empty')
@@ -1058,22 +1058,20 @@ Dealt with:
 		// Attempt to deal with parsing the dates
 		String dateField
 		try {
-			def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-
 			if (params.expiryDate) {
 				dateField = 'Expiry'
-				userLogin.expiryDate = GormUtil.convertInToGMT(formatter.parse( params.expiryDate ), tzId)
+				userLogin.expiryDate = TimeUtil.parseDateTime(session, params.expiryDate)
 			}
 
 			if (params.passwordExpirationDate) {
 				dateField = 'Password Expiration'
-				userLogin.passwordExpirationDate =  GormUtil.convertInToGMT(formatter.parse( params.passwordExpirationDate ), tzId)
+				userLogin.passwordExpirationDate = TimeUtil.parseDateTime(session, params.passwordExpirationDate)
 			}
 
 			// TODO : should changing the locked out until be allowed? 
 			if (params.lockedOutUntil) {
 				dateField = 'Locked Out Until'
-				userLogin.lockedOutUntil =  GormUtil.convertInToGMT(formatter.parse( params.lockedOutUntil ), tzId)
+				userLogin.lockedOutUntil = TimeUtil.parseDateTime(session, params.lockedOutUntil)
 			}
 		} catch (e) {
 			throw new InvalidParamException("The $dateFile field has invalid format")

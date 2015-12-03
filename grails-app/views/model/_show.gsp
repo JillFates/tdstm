@@ -54,7 +54,7 @@
 		</tr>
 		<tr>
 		    <td>End of Life Date:</td>
-		    <td><tds:convertDate date="${modelInstance?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+		    <td><tds:convertDate date="${modelInstance?.endOfLifeDate}" /></td>
             <td>End of Life Status:</td>
 			<td>${modelInstance?.endOfLifeStatus}</td>
         </tr>

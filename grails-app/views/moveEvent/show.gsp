@@ -69,7 +69,7 @@
 						</tr>
                         <tr class="prop">
 				            <td  class="name">Estimated Start:</td>
-				            <td class="valueNW">${fieldValue(bean:moveEventInstance, field:'estStartTime')}</td>
+				            <td class="valueNW"><tds:convertDateTime date="${moveEventInstance?.estStartTime}" /></td>
 						</tr>
                     </tbody>
                 </table>

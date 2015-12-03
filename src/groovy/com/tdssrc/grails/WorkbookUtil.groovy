@@ -5,10 +5,6 @@ import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.hssf.util.CellReference
 
-import com.tdssrc.grails.DateUtil as TdsDateUtil
-
-import java.text.SimpleDateFormat
-
 /**
  * The WorkbookUtil class contains a collection of useful Apache POI manipulation methods
  * 
@@ -68,27 +64,35 @@ class WorkbookUtil {
 	}
 
 	/**
-	 * Used to read a Date from a Cell which will check if it is a numeric cell and use the getDateCellValue but if the cell 
-	 * is a String it will then attempt to parse the value
-	 * @param sheet - the sheet to read from
-	 * @param columnIdx - the column offset to the cell
-	 * @param rowIdx - the row offset to the cell
-	 * @return A date value if the cell position contains a value otherwise null
+	 * Used to attempt to access a date value from a cell
+	 * @param sheet - the sheet to extract the value
+	 * @param columnIdx - the column to reference (offset starts at zero)
+	 * @param rowIdx - the row to reference (offset start at zero)
+	 * @param session - user session
+	 * @param dateFormat - the format to use if parsing a string value
+	 * @return The date from the specified cell or null if empty
+	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
+	 * @throws ParseException - if the field contains an invalid formatted String value
+	 * 
 	 */
-	public static getDateCellValue(sheet, columnIdx, rowIdx) {
-		def result = null
-		def cell = getCell(sheet, columnIdx, rowIdx)
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, String formatterType=null) {
+		Date result
+		Cell cell = getCell(sheet, columnIdx, rowIdx)
+
+		if (!formatterType) formatterType = TimeUtil.FORMAT_DATE_TIME_22
+
 		if (cell) {
-		    if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC && DateUtil.isCellDateFormatted(cell) ) {
-				result = cell.getDateCellValue()
-			} else {
-				String val = cell.getStringCellValue()
-				if (val) {
-					// Attempt to parse the string into a date
-					result = TdsDateUtil.parseDate(val)
-				}
+			switch (cell.getCellType()) {
+				case Cell.CELL_TYPE_NUMERIC:
+					result = cell.getDateCellValue()
+					break;
+				case Cell.CELL_TYPE_STRING:
+					result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType) 
+					break;
+				default:
+					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
 			}
-		} 
+		}
 		return result
 	}
 
@@ -151,39 +155,6 @@ class WorkbookUtil {
 		if (cell) {
 			cell.setCellStyle(style)
 		}
-	}
-
-	/**
-	 * Used to attempt to access a date value from a cell
-	 * @param sheet - the sheet to extract the value
-	 * @param columnIdx - the column to reference (offset starts at zero)
-	 * @param rowIdx - the row to reference (offset start at zero)
-	 * @param dateFormat - the format to use if parsing a string value
-	 * @return The date from the specified cell or null if empty
-	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
-	 * @throws ParseException - if the field contains an invalid formatted String value
-	 * 
-	 */
-	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, SimpleDateFormat dateFormat) {
-		Date result
-		Cell cell = getCell(sheet, columnIdx, rowIdx)
-
-		if (!dateFormat) dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
-
-		if (cell) {
-			switch (cell.getCellType()) {
-				case Cell.CELL_TYPE_NUMERIC:
-					result = cell.getDateCellValue()
-					break;
-				case Cell.CELL_TYPE_STRING:
-					String dateStr = cell.getStringCellValue()?.replaceAll('-','/')
-					if (dateStr) result = dateFormat.parse(dateStr)
-					break;
-				default:
-					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
-			}
-		}
-		return result
 	}
 
 	/** 

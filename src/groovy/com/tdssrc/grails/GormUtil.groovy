@@ -55,26 +55,6 @@ public class GormUtil {
 		text.append('</ul>')
 		return text.toString()
 	}
-
-	/**
-	 * Converts date into GMT
-	 * @param date
-	 * @return converted Date
-	 * @deprecated GormUtil.convertInToGMT has be refactored to the DateUtil.convertInToGMT method
-	 */
-	def public static convertInToGMT( date, tzId ) {
-		return TimeUtil.convertInToGMT(date, tzId)
-	}
-
-	/**
-	 * Converts date from GMT to local format
-	 * @param date
-	 * @return converted Date
-	 * @deprecated GormUtil.convertInToUserTZ has be refactored to the DateUtil.convertInTOUserTZ method
-	 */
-	def public static convertInToUserTZ(date, tzId) {
-		return TimeUtil.convertInToUserTZ(date, tzId)
-	}
 	
 	/*
 	 * Convert a list into a comma delimited of type String to use inside sql statement.

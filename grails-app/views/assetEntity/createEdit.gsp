@@ -365,7 +365,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" id="retireDate" name="retireDate"
-									value="<tds:formatDate date="${assetEntityInstance?.retireDate}" />"
+									value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
 									class="dateRange ${config.retireDate}"
 									size="15" style="width: 112px; height: 14px;"
 									tabindex="230"
@@ -411,7 +411,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" id="maintExpDate" name="maintExpDate"
-									value="<tds:formatDate date="${assetEntityInstance?.maintExpDate}" />"
+									value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
 									class="dateRange ${config.maintExpDate}"
 									size="15" style="width: 112px; height: 14px;"
 									tabindex="235"

@@ -16,7 +16,6 @@ import com.tdssrc.eav.EavEntityAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.AssetCableStatus
-import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -1357,7 +1356,7 @@ class AssetEntityAttributeLoaderService {
 				log.debug "setCommonProperties() Have $property with value '$value'"
 				if (value) {
 					try {
-						newVal = DateUtil.parseDate(value)
+						newVal = TimeUtil.parseDate(value)
 						if (asset[property] != newVal ) {
 							asset[property] = newVal
 						}

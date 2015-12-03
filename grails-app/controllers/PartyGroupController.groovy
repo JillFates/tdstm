@@ -200,7 +200,7 @@ class PartyGroupController {
 	        	def partyRelationship = partyRelationshipService.savePartyRelationship( "CLIENTS", companyParty, "COMPANY", partyGroup, "CLIENT" )
         	}
             flash.message = "PartyGroup ${partyGroup} created"
-            redirect(action:show,id:partyGroup.id)
+            redirect(action:'show',id:partyGroup.id)
         }
         else {
             render(view:'create',model:[partyGroupInstance:partyGroup])

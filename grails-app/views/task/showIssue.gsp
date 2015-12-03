@@ -85,14 +85,14 @@
 				<tr class="prop issue" id="estStartShowId"  >
 					<td valign="top" class="name"><label for="estStart">Est. Start:</label></td>
 					<td valign="top" class="value" id="estStartShowId_${assetComment.id}" nowrap="nowrap">
-					<tds:convertDate date="${assetComment.estStart}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+					<tds:convertDate date="${assetComment.estStart}" format="M/d kk:mm" /></td>
 				</tr>
 			</g:if>
 			<g:if test="${assetComment.estFinish}">	
 				<tr class="prop issue" id="estFinishShowId"  >
 					<td valign="top" class="name"><label for="estFinish">Est. Finish:</label></td>
 					<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" nowrap="nowrap">
-					<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+					<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" /></td>
 				</tr>
 			</g:if>
 			<tr class="prop issue" id="dueDateShowId"  >
@@ -102,7 +102,7 @@
 					jQuery(function($){$('.dateEditRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
             		</script>
 	          		<input type="text" class="dateEditRange" size="15" style="" name="dueDateCreateId" id="dueDateCreateId"
-							value="${dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+							value="${dueDate}" />
 				</td>
             </tr>
 			<tr class="prop">
@@ -125,7 +125,7 @@
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 				<td valign="top" class="value"><span id="categoryEditId">${assetComment?.createdBy} on 
-				<tds:convertDate date="${assetComment?.dateCreated}" format="M/d" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
+				<tds:convertDate date="${assetComment?.dateCreated}" format="M/d" /></span></td>
 			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name">
@@ -174,7 +174,7 @@
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
 					<td valign="top" class="value">
 						<span id="resolvedByTd" >${assetComment.resolvedBy} on 
-						<tds:convertDate date="${assetComment?.dateResolved}" format="M/d" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
+						<tds:convertDate date="${assetComment?.dateResolved}" format="M/d" /></span>
 					</td>
 				</tr> 
 			</g:if>
@@ -203,7 +203,7 @@
 				<dl>
 				<dt>Comment:</dt><dd>&nbsp;${assetComment.comment}</dd>
 				<dt>Assigned to:</dt><dd>&nbsp;${assetComment?.assignedTo}</dd>
-				<dt>Due Date:</dt><dd>&nbsp;<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></dd>
+				<dt>Due Date:</dt><dd>&nbsp;<tds:convertDate date="${assetComment?.dueDate}" /></dd>
 				<dt>Created by:</dt><dd>&nbsp;${assetComment?.createdBy} at ${assetComment?.dateCreated} </dd>
 				<dt>Comment Type:</dt><dd>&nbsp;${assetComment?.commentType}</dd>
 		   		<dt>Category:</dt><dd>&nbsp;${assetComment?.category}</dd>

@@ -62,9 +62,9 @@
 						{name:'roles',width:'100'},
 						{name:'company', width:'100'},
 						{name:'isLocal', width:'80', fixed:true},
-						{name:'lastLogin',width:'50', formatter:formatDate},
-						{name:'dateCreated',width:'50', formatter:formatDate},
-						{name:'expiryDate',width:'50', formatter:formatDate}"
+						{name:'lastLogin',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'dateCreated',width:'50', formatter:tdsCommon.jqgridDateCellFormatter},
+						{name:'expiryDate',width:'50', formatter:tdsCommon.jqgridDateCellFormatter}"
 					sortname="'username'"
 					caption="listCaption"
 					gridComplete="function(){bindResize('userLoginId');recompileDOM('userLoginIdWrapper', angular.element(\$('div.body')[0]).scope())}"
@@ -73,12 +73,6 @@
 					<jqgrid:navigation id="userLoginId" add="false" edit="false" del="false" search="false" refresh="true" />
 				</jqgrid:grid>
 				$.jgrid.formatter.integer.thousandsSeparator='';
-				
-				function formatDate (cellvalue, options, rowObject) {
-					if(cellvalue)
-						return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
-					return 'Never'
-				}
 				
 				function actionFormatter (cellVal, options, rowObject) {
 					var unlockButton = '';

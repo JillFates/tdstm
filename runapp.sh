@@ -16,7 +16,7 @@ fi
 export GRAILS_OPTS="-XX:MaxPermSize=1024m -Xmx1024M -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -server -Djava.net.preferIPv4Stack=true"
 
 OPT="-reloading"
-OPT="$OPT -Dtdstm.config.location=/etc/tdstm-config.groovy"
+OPT="$OPT -Duser.timezone=GMT  -Dtdstm.config.location=/etc/tdstm-config.groovy"
 
 grails $OPT $CMD
 

@@ -58,13 +58,12 @@
 	         
 	         <g:elseif test="${column =='End Of Life Date'}">
 	         	<td id="${columnList.get(column)+'_td_'+model.id}" class="col_${model.id}" nowrap="nowrap">
-	         	 	<span class="showAll showFrom_${model.id} check"><tds:convertDate date="${model.(columnList.get(column))}" 
-	         		 	timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" /></span>
+	         	 	<span class="showAll showFrom_${model.id} check"><tds:convertDate date="${model.(columnList.get(column))}" /></span>
 	         		<span class="editAll editTarget_${model.id}" style="display: none;"><script type="text/javascript" charset="utf-8">
 	                    jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 					</script>
 					<input type="text" class="dateRange input_${model.id}" size="15" style="width:112px;height:14px;" name="endOfLifeDate" id="${columnList.get(column)+'_edit_'+model.id}"
-	                   value="<tds:convertDate date="${model?.endOfLifeDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" />
+	                   value="<tds:convertDate date="${model?.endOfLifeDate}" />" />
 		         	</span>	
 	         	</td>
 	         </g:elseif>

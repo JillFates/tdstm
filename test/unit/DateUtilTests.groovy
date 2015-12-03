@@ -1,5 +1,6 @@
 import com.tdssrc.grails.DateUtil as DU
 import static java.util.Calendar.OCTOBER
+import java.text.SimpleDateFormat
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -23,16 +24,18 @@ class DateUtilTests extends Specification {
 	}
 
 	void testMmddyyyy() {
+		def formatter = new SimpleDateFormat("M-d-yyyy")
+		formatter.setTimeZone(TimeZone.getTimeZone("GMT"))
+		def validDate = formatter.format(testDate)
+		def formattedDate = formatter.format(DU.parseDate('10/5/2014'))
+
 		expect:
 			// 10/5/2014
-			testDate == DU.mdyToDate('10/5/2014')
-			// 10/05/2014
-			testDate == DU.mdyToDate('10/05/2014')
+			validDate == formattedDate
 			// Should be null
-			DU.mdyToDate('19/7/2014') == null
-			DU.mdyToDate('2/30/2014') == null
-			DU.mdyToDate('') == null
-			DU.mdyToDate(null) == null
+			DU.parseDate('30/2014') == null
+			DU.parseDate('11/30/114') == null
+			DU.parseDate('') == null
 	}
 
     // Utility method to create a date that had time set to 00:00:00

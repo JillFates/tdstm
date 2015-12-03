@@ -151,7 +151,7 @@
 				<g:each in="${blackOutdays}" var="blackOutDay">
 					<tr>
 						<td><span class="personShow">
-								<tds:convertDate date="${blackOutDay.exceptionDay}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+								<tds:convertDate date="${blackOutDay.exceptionDay}" />
 							</span>
 						</td>
 					</tr>

@@ -68,7 +68,7 @@
                          
                             <td>${dataTransferBatch.id}</td>
                         
-                            <td><tds:convertDateTime date="${dataTransferBatch?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            <td><tds:convertDateTime date="${dataTransferBatch?.dateCreated}" /></td>
                         
                             <td>${dataTransferBatch?.userLogin?.person}</td>
                         

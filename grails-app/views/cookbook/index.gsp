@@ -39,7 +39,8 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:javascript src="moment-timezone-with-data-2010-2020.js" />
+	<g:javascript src="moment.min.js" />
+	<g:javascript src="moment-timezone-with-data.min.js" />
 	<script type="text/javascript">
 		var userPreferences = {
 			"CURR_TZ" : "${userPreferenceService.get('CURR_TZ')}"

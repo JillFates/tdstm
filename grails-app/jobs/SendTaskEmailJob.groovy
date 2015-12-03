@@ -26,11 +26,12 @@ class SendTaskEmailJob {
 		def dataMap = context.mergedJobDataMap
         def taskId = dataMap.getLongValue('taskId');
         def tzId = dataMap.get('tzId').toString();
+        def userDTFormat = dataMap.get('userDTFormat')
         def isNew = dataMap.getBooleanValue('isNew')
 		long tries = dataMap.getLongValue('tries') + 1
 		//log.info "execute: taskId=$taskId, tzId=$tzId, isNew=$isNew"
 		
-		def result = commentService.sendTaskEMail(taskId, tzId, isNew)
+		def result = commentService.sendTaskEMail(taskId, tzId, userDTFormat, isNew)
 		
 		if(result=='reschedule'){
 			if(tries<3){

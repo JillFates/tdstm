@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 
 import com.tds.asset.ApplicationAssetMap
@@ -98,11 +96,11 @@ class MoveBundleService {
 		if( !moveBundleStep ){	
 			moveBundleStep = new MoveBundleStep(moveBundle:moveBundle, transitionId:transitionId)
 		}
-		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ	
+		def session = userPreferenceService.getSession()
 		moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
-		moveBundleStep.planStartTime = GormUtil.convertInToGMT( new Date( params["startTime_"+transitionId] ),tzId )
-		moveBundleStep.planCompletionTime = GormUtil.convertInToGMT( new Date( params["completionTime_"+transitionId] ),tzId )
+		moveBundleStep.planStartTime = TimeUtil.parseDateTime(session, params["startTime_"+transitionId])
+		moveBundleStep.planCompletionTime = TimeUtil.parseDateTime(session, params["completionTime_"+transitionId])
 		
 		//show the step progress in green when user select the beGreen option
 		if(beGreen && beGreen == 'on'){
@@ -423,9 +421,8 @@ class MoveBundleService {
 		def availabaleRoles = partyRelationshipService.getStaffingRoles()
 		 
 		def depGrpCrt = projectInstance.depConsoleCriteria ? JSON.parse( projectInstance.depConsoleCriteria ) : [:]
-		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm a');
-		def generatedDate = depGrpCrt.modifiedDate ? formatter.format(TimeUtil.convertInToUserTZ(new Date(depGrpCrt.modifiedDate), tzId)):''
+		def session = userPreferenceService.getSession()
+		def generatedDate = depGrpCrt.modifiedDate ? TimeUtil.formatDateTime(session, depGrpCrt.modifiedDate):''
 		def staffRoles = taskService.getRolesForStaff()
 		def compactPref = userPreferenceService.getPreference('depConsoleCompact')
 		def map = [ 
@@ -500,8 +497,7 @@ class MoveBundleService {
 	 * @param sheet : sheet-name
 	 * @return void
 	 */
-	def issueExport (def exportList, def columnList, def sheet, def tzId, def startRow = 0, def viewUnpublished = false) {
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
+	def issueExport (def exportList, def columnList, def sheet, def tzId, userDTFormat, def startRow = 0, def viewUnpublished = false) {
 		for ( int r = startRow; r < (exportList.size() + startRow); r++ ) {
 			for (int c = 0; c < columnList.size(); ++c){
 				def cellValue
@@ -539,16 +535,16 @@ class MoveBundleService {
 						cellValue = exportList[rowIdx].workflowTransition ? String.valueOf(exportList[rowIdx].workflowTransition?.name) : ''
 						 break
 					case "estStart":
-						 cellValue = exportList[rowIdx].estStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].estStart, tzId))) : ''
+						 cellValue = exportList[rowIdx].estStart ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[rowIdx].estStart) : ''
 						 break
 					case "estFinish":
-						 cellValue = exportList[rowIdx].estFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].estFinish, tzId))) : ''
+						 cellValue = exportList[rowIdx].estFinish ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[rowIdx].estFinish) : ''
 						 break
 					case "actStart":
-						 cellValue = exportList[rowIdx].actStart ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].actStart, tzId))) : ''
+						 cellValue = exportList[rowIdx].actStart ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[rowIdx].actStart) : ''
 						 break
 					case "actFinish":
-						 cellValue = exportList[rowIdx].actFinish ? String.valueOf(estformatter.format(TimeUtil.convertInToUserTZ(exportList[rowIdx].dateResolved, tzId))) : ''
+						 cellValue = exportList[rowIdx].actFinish ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, exportList[rowIdx].actFinish) : ''
 						 break
 					case "":
 						cellValue = ""
@@ -580,13 +576,7 @@ class MoveBundleService {
 	 */
 	def generateDependencyGroups(projectId, connectionTypes, statusTypes, isChecked, userLoginName, progressKey) {
 		
-		def date = new Date()
-		def formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a");
-		String time = formatter.format(date);
-
-		def sqlFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-		String sqlTime = sqlFormatter.format(date);
-		
+		String sqlTime = TimeUtil.formatDateTimeAsGMT(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_TIME_14)
 		def projectInstance = Project.get(projectId)
 		
 		// Get array of the valid status and connection types to check against in the inner loop

@@ -152,7 +152,34 @@
 								</td>
 							</tr>
 						</g:each>
-			  
+
+			  			<tr class="prop">
+                            <td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
+                            
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" /></td>
+                            
+                        </tr>
+                        <tr class="prop">
+                            <td valign="top" class="name">Created Date:</td>
+                            
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" /></td>
+                            
+                        </tr>
+                        
+                     	<tr class="prop">
+                            <td valign="top" class="name">Last Modified:</td>
+                            
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastModified}" /></td>
+                            
+                        </tr>
+                        
+                        <tr class="prop">
+                            <td valign="top" class="name">Last Login:</td>
+                            
+                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" /></td>
+                            
+                        </tr>
+
 					</tbody>
 				</table>
 			</div>
@@ -204,8 +231,6 @@
 							alert("There was an error trying to reset the user's password. Please, contact your System Administrator.")
 						}
 					})
-
-				});
 
 			});
 		</script>

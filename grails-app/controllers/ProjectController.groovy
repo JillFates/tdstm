@@ -9,8 +9,6 @@ import com.tds.asset.FieldImportance;
 
 import grails.converters.JSON
 
-import java.text.SimpleDateFormat
-
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 import com.tds.asset.FieldImportance
@@ -60,8 +58,6 @@ class ProjectController {
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		
 		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
 		def now = TimeUtil.nowGMT()
@@ -84,8 +80,8 @@ class ProjectController {
 		def results = projectList?.collect { 
 			def startDate = ''
 			def completionDate = ''
-			startDate = it.startDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.startDate, tzId)) : ''
-			completionDate = it.completionDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.completionDate, tzId)) : ''
+			startDate = it.startDate ? TimeUtil.formatDate(getSession(), it.startDate) : ''
+			completionDate = it.completionDate ? TimeUtil.formatDate(getSession(), it.completionDate) : ''
 			[ cell: [it.projectCode, it.name, startDate, completionDate,it.comment], id: it.id,]
 		}
 
@@ -179,6 +175,21 @@ class ProjectController {
 		}				 
 	}
 
+	private def retrievetimeZone(timezoneValue) {
+		def result
+		if (StringUtil.isBlank(timezoneValue)) {
+			result = Timezone.findByCode(TimeUtil.defaultTimeZone)
+		} else {
+			def tz = Timezone.findByCode(timezoneValue)
+			if (tz) {
+				result = tz
+			} else {
+				result = Timezone.findByCode(TimeUtil.defaultTimeZone)
+			}
+		}
+		return result
+	}
+
 	/*
 	 * Update the Project details
 	 */
@@ -189,17 +200,15 @@ class ProjectController {
 		
 		if( projectInstance ) {
 			//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
-			def formatter = new SimpleDateFormat("MM/dd/yyyy");
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-
 			def startDate = params.startDate
 			def completionDate = params.completionDate
 			if (startDate) {
-				params.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
+				params.startDate = TimeUtil.parseDate(getSession(), startDate)
 			}
 			if (completionDate){
-				params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
+				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
 			}
+			params.timezone = retrievetimeZone(params.timezone)
 
 			params.runbookOn =  params.runbookOn ? 1 : 0
 			projectInstance.properties = params
@@ -368,6 +377,11 @@ class ProjectController {
 		def projectInstance = new Project()
 		projectInstance.properties = params
 		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+		def defaultTimeZone = TimeUtil.defaultTimeZone
+		def userTimeZone = userPreferenceService.get(TimeUtil.TIMEZONE_ATTR)
+		if (userTimeZone) {
+			defaultTimeZone = userTimeZone
+		}
 
 		return [ 
 			clients:projectDetails.clients, 
@@ -391,15 +405,14 @@ class ProjectController {
 		//projectInstance.dateCreated = new Date()
 		def startDate = params.startDate
 		def completionDate = params.completionDate   
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		if(startDate){
-			params.startDate =  GormUtil.convertInToGMT(formatter.parse(startDate), tzId)
+			params.startDate = TimeUtil.parseDate(getSession(), startDate)
 		}
 		if(completionDate){
-			params.completionDate =  GormUtil.convertInToGMT(formatter.parse(completionDate), tzId)
+			params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
 		}
 		params.runbookOn =  params.runbookOn ? 1 : 0
+		params.timezone = retrievetimeZone(params.timezone)
 		def projectInstance = new Project(params)
 
 		def file = request.getFile('partnerImage')
@@ -621,14 +634,6 @@ class ProjectController {
 	}
 
 	/*
-	 * function to set the user preference time zone
-	 */
-	def setUserTimeZone() {
-		def timeZone = params.tz
-		userPreferenceService.setPreference( "CURR_TZ", timeZone )
-		render timeZone 
-	}
-	/*
 	* function to set the user preference powerType
 	*/
 	def setPower() {
@@ -756,6 +761,22 @@ class ProjectController {
 			}
 		}
 		render "success"
+	}
+
+	/**
+	 * Used to select project time zone
+	 * @param timezone default timezone selected
+	 * @render time zone view
+	 */
+	def showTimeZoneSelect() {
+		def timezone = params.timezone
+		if (StringUtil.isBlank(timezone)) {
+			timezone = TimeUtil.defaultTimeZone
+		}
+		def timezones = Timezone.findAll()
+		def areas = userPreferenceService.timezonePickerAreas()
+
+		render(template:"showTimeZoneSelect",model:[areas: areas, timezones: timezones, currTimeZone: timezone])
 	}
 
 	def showImportanceFields() {

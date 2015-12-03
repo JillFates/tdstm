@@ -19,8 +19,8 @@
 				colNames="'Name', 'Partner', 'Date Created', 'Last Updated'"
 				colModel="{name:'companyName', index: 'companyName', width:'150'},
 					{name:'partner', width:'30'},
-					{name:'dateCreated', width:'100', formatter:formatDate},
-					{name:'lastUpdated', width:'100', formatter:formatDate}"
+					{name:'dateCreated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter},
+					{name:'lastUpdated', width:'100', formatter:tdsCommon.jqgridDateCellFormatter}"
 				sortname="'companyName'"
 				caption="listCaption"
 				gridComplete="function(){bindResize('companyId')}"
@@ -29,13 +29,7 @@
 				<jqgrid:navigation id="companyId" add="false" edit="false" del="false" search="false"/>
 				<jqgrid:refreshButton id="companyId" />
 			</jqgrid:grid>
-			$.jgrid.formatter.integer.thousandsSeparator='';
-			
-			function formatDate (cellvalue, options, rowObject) {
-				if(cellvalue)
-					return cellvalue.substring(0,10) // Cut off the timestamp portion of the date
-				return 'Never'
-			}
+			$.jgrid.formatter.integer.thousandsSeparator='';			
 		});
 		</script>
 	</head>

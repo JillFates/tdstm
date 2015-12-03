@@ -103,8 +103,8 @@ div.menu_new:hover ul {
 	background-color: #354E81;
 }
 
-.active {
-	display: block;
+.menuActive {
+	display: inline-block;
 }
 
 .inActive {

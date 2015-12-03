@@ -3,7 +3,7 @@
  * information entered by the user plus some properties that are determined during the execution of the 
  * move event.  
  */
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 class MoveBundleStep {	
 	static final String METHOD_LINEAR="L"
 	static final String METHOD_MANUAL="M"
@@ -58,11 +58,11 @@ class MoveBundleStep {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-    	dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+    	dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-    	lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+    	lastUpdated = TimeUtil.nowGMT()
 	}
 	/**
 	 * calculates the total time that step is planned to take to complete
@@ -88,7 +88,7 @@ class MoveBundleStep {
 	 */
 	def getActualDuration( def asOfTime ) {
 		def timeDuration
-		if ( ! asOfTime ) asOfTime = GormUtil.convertInToGMT( "now", "EDT" )
+		if ( ! asOfTime ) asOfTime = TimeUtil.nowGMT()
 		
 		if( actualStartTime && actualCompletionTime ){
 			timeDuration = actualCompletionTime.getTime() - actualStartTime.getTime()

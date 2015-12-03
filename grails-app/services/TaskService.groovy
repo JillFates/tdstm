@@ -942,7 +942,7 @@ class TaskService implements InitializingBean {
 
 		// Complete the task(s)
 		tasksToComplete.each() { activeTask ->
-			// activeTask.dateResolved = GormUtil.convertInToGMT( "now", "EDT" )
+			// activeTask.dateResolved = TimeUtil.nowGMT()
 			// activeTask.resolvedBy = userLogin.person
 			setTaskStatus(activeTask, AssetCommentStatus.DONE)
 			if ( ! (activeTask.validate() && activeTask.save(flush:true)) ) {
@@ -3415,7 +3415,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 		
 		if (task.category == null) task.category = defCat
-		
+
 		// log.info "About to save task: ${task.category}"
 		if (! ( task.validate() && task.save(flush:true) ) ) {
 			log.error("createTaskFromSpec: Failed creating task error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")

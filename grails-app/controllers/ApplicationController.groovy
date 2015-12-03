@@ -1,7 +1,5 @@
 import grails.converters.JSON
 
-import java.text.SimpleDateFormat
-
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency

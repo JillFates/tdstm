@@ -47,7 +47,6 @@
 						</td>
 						<td class="valueNW ${config.sourceRoom}" >${roomSource?.roomName}</td>
 						<td class="valueNW ${config.targetRoom}">${roomTarget?.roomName}</td>
-
 					</tr>
 					<tr class="prop">
 						<td class="label ${config.shortName}  ${highlightMap.shortName?:''}" nowrap="nowrap"><label for="shortName">Alt Name</label></td>
@@ -92,7 +91,7 @@
 							<label for="retireDate">Retire Date:</label>
 						</td>
 						<td class="valueNW ${config.retireDate}">
-							<tds:formatDate date="${assetEntity?.retireDate}" />
+							<tds:convertDate date="${assetEntity?.retireDate}" />
 						</td>
 						<td class="label ${config.moveBundle}  ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
 						<td class="valueNW ${config.moveBundle}">${assetEntity.moveBundle}${(dependencyBundleNumber != null)?' : ' : ''}${dependencyBundleNumber}</td>
@@ -106,7 +105,7 @@
 						<td class="valueNW ${config.railType}">${assetEntity.railType}</td>
 						<td class="label ${config.maintExpDate}  ${highlightMap.maintExpDate?:''}"><label for="maintExpDate">Maint Exp.</label></td>
 						<td class="valueNW ${config.maintExpDate}">
-							<tds:formatDate date="${assetEntity?.maintExpDate}" />
+							<tds:convertDate date="${assetEntity?.maintExpDate}" />
 						</td>
 						<td class="label ${config.planStatus}  ${highlightMap.planStatus?:''}" nowrap="nowrap">
 							<label for="planStatus">Plan Status</label>

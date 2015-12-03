@@ -113,7 +113,7 @@ class WorkflowController {
 		def message
 		if(process && principal){
 			def userLogin = UserLogin.findByUsername( principal )
-			def dateNow = GormUtil.convertInToGMT( "now", "EDT" )
+			def dateNow = TimeUtil.nowGMT()
 			def workflowInstance = new Workflow( process : process, 
 										dateCreated : dateNow,
 										lastUpdated : dateNow,

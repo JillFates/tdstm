@@ -222,7 +222,7 @@ class SecurityConfigParser {
 
 		// Map all of the individual fields for each of the domains with the default values
 		map.domainList.each { domainCode -> 
-			Map dm = [autoProvision:false, updateUser:false, updateRoles:false, defaultRole:'', defaultTimezone:'EST']
+			Map dm = [autoProvision:false, updateUser:false, updateRoles:false, defaultRole:'', defaultTimezone:'GMT']
 			String errMsg = "Security properties tdstm.security"
 
 			String p = "ldap.domains.$domainCode"
@@ -289,7 +289,7 @@ class SecurityConfigParser {
 					}
 				}
 
-				defaultTimezone = prop("${p}.defaultTimezone", d.defaultTimezone) ?: 'EST'
+				defaultTimezone = prop("${p}.defaultTimezone", d.defaultTimezone) ?: 'GMT'
 			}
 			map.domains.put(domainCode.toLowerCase(), dm)
 		}

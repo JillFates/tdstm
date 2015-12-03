@@ -104,7 +104,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
-									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
+									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="startDate" />
@@ -121,7 +121,7 @@
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
 								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId" 
-									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" onchange="isValidDate(this.value);" />
+									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" />" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
 								</g:hasErrors>
@@ -203,6 +203,7 @@
 									</div>
 								</g:hasErrors>
 							</td>
+
 							<td class="name">
 								<label for="projectManager">Move Manager:</label>
 							</td>
@@ -226,21 +227,23 @@
 									</optgroup>
 								</select>
 								<input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
-							</td>
+
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
 							<td class="valueNW">
-								<tds:convertDateTime date="${projectInstance?.dateCreated}"
-									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+								<tds:convertDateTime date="${projectInstance?.dateCreated}" />
 							</td>
+							<td class="name">Time Zone:</td>
+							<td class="valueNW">
+								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
+								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');">
 							</td>
 						</tr>
 						<tr>
 							<td class="name"><label for="lastUpdated">Last Updated:</label></td>
 							<td class="valueNW" colspan="3">
-								<tds:convertDateTime date="${projectInstance?.lastUpdated}"
-									timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+								<tds:convertDateTime date="${projectInstance?.lastUpdated}" />
 							</td>
 						</tr>
 					</tbody>
@@ -255,9 +258,15 @@
 				</span>
 			</div>
 		</g:form>
+
+		<%-- DIV for select time zone --%>
+		<div id="timeZoneSelectPopup" style="display: none;min-width:250px;" title="Time Zone Select"></div>
+
 	</div>
 	<script type="text/javascript">
 	$(document).ready(function() {
+
+		$("#timeZoneSelectPopup").dialog({ autoOpen: false });
 		
 		var customCol = (${prevParam?.customFieldsShown?: projectInstance.customFieldsShown})?(${prevParam?.customFieldsShown?: projectInstance.customFieldsShown}):'0'
 		showCustomFields(customCol, 2);
@@ -320,11 +329,10 @@
 		  completionDateObj.value = startDate;
 		  }
 		}
-		var dateRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d$/;
 		function isValidDate( date ){
 			var returnVal = true;
-			if( date && !dateRegExp.test(date) ){
-				alert("Date should be in 'mm/dd/yyyy' format");
+			if( date && !tdsCommon.isValidDate(date) ){
+				alert("Date should be in '" + tdsCommon.defaultDateFormat() + "' format");
 				returnVal  =  false;
 			} 
 			return returnVal;

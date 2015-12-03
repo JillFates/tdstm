@@ -44,7 +44,7 @@
 	<div class="body" style="width:1000px;" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Application Migration Results - ${project.name} : ${moveBundle}</b><br/>
-			This analysis was performed on <tds:convertDateTime date="${new Date()}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/> for ${session.getAttribute("LOGIN_PERSON").name }.
+			This analysis was performed on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${session.getAttribute("LOGIN_PERSON").name }.
 		</div> 
 		<div style="color: black; font-size: 15px;text-align: center;">
 			${time}

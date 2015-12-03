@@ -99,7 +99,6 @@ databaseChangeLog = {
 	include file: '20150830-add-salt-prefix-to-user-login.groovy'
 	include file: '20150828-add-SendUserActivations-permission.groovy'
 	include file: '20150930-add-new-eav-attribute-for-lun.groovy'
-	include file: '20151020-set-custom-fields-to-hidden.groovy'
 	include file: '20151020-add-new-virtualization-teams.groovy'
 	include file: '20151019-move-event-staff-fix.groovy'
 	include file: '20151102-move-event-staff-rename.groovy'
@@ -108,4 +107,8 @@ databaseChangeLog = {
 	include file: '20151116-dependency-analyzer-permissions.groovy'
 	include file: '2015113-add-project-staff-partyrelationships.groovy'
 	include file: '2015117-set-old-persons-and-users-inactive.groovy'
+	include file: '20150616-timezones.groovy'
+	include file: '20150626-add-column-timezone-to-project.groovy'
+	include file: '20150827-set-timezone-and-datetime-user-preferences.groovy'
+	include file: '20151020-set-custom-fields-to-hidden.groovy'
 }

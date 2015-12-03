@@ -1,13 +1,13 @@
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 
-import java.text.SimpleDateFormat
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tds.asset.Application
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.TimeUtil
 import grails.validation.ValidationException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -1345,6 +1345,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	Person updatePerson(Map params, Person byWhom, String tzId, boolean byAdmin=false) 
 		throws DomainUpdateException, UnauthorizedException, InvalidParamException, EmptyResultException {
 		Person person = validatePersonAccess(params.id, byWhom)
+		def session = userPreferenceService.getSession()
 		if(!isAssociatedTo(byWhom, person.company)){
 			throw new UnauthorizedException("You do not have permission to manage staffing for the user's company")
 		}
@@ -1361,9 +1362,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 			log.error "updatePerson() unable to save $person : " + GormUtil.allErrorsString(person)
 			throw new DomainUpdateException('An error occurred while attempting to save person changes')
 		}			
-
-		def formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
-		
+	
 		UserLogin userLogin = securityService.getPersonUserLogin( person )
 		if (userLogin) {
 			if (params.newPassword) {
@@ -1389,7 +1388,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 
 			if (byAdmin && params.expiryDate && params.expiryDate != "null") {
 				def expiryDate = params.expiryDate
-				userLogin.expiryDate =  GormUtil.convertInToGMT(formatter.parse( expiryDate ), tzId)
+				userLogin.expiryDate = TimeUtil.parseDate(session, expiryDate)
 			}
 
 			// When Disabling Person - disable UserLogin
@@ -1420,8 +1419,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 
 			// TODO : JPM 8/31/2015 : Overhaul how exception dates are handled - shouldn't delete all then re-add
 			def personExpDates = params.list("availability")
-			def expFormatter = new SimpleDateFormat("MM/dd/yyyy")
-			personExpDates = personExpDates.collect{GormUtil.convertInToGMT(expFormatter.parse(it), tzId)}
+			personExpDates = personExpDates.collect{ TimeUtil.parseDate(session, it) }
 			def existingExp = ExceptionDates.findAllByPerson(person)
 			if (personExpDates) {
 				ExceptionDates.executeUpdate("delete from ExceptionDates where person = :person and exceptionDay not in (:dates) ",[person:person, dates:personExpDates])

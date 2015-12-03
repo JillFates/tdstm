@@ -74,7 +74,8 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 
 	scope.convertTZ = function(date) {
 		var m = moment(date);
-		return m.tz(userPreferences['CURR_TZ']).format("YYYY-MM-DD h:mm a");
+		m.tz(tdsCommon.timeZone());
+		return tdsCommon.formatDateTime(m);
 	}
 
 	rowToShow = null;
@@ -865,6 +866,14 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		context: scope.modalContextSelector
 	}
 
+	scope.dateCellTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text>{{convertTZ(row.getProperty(col.field))}}</span></div>';
+
+	scope.convertTZ = function(date) {
+		var m = moment(date);
+		m.tz(tdsCommon.timeZone());
+		return tdsCommon.formatDateTime(m);
+	}
+
 	scope.clone = {
 		contextArray : [{name: 'All'}, {name: 'Event'}, {name: 'Bundle'}, {name: 'Application'}],
 		projectsArray : [],
@@ -897,7 +906,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 		{field:'recipe', displayName:'Recipe', enableCellEdit: false, width: '**'},
 		{field:'description', displayName:'Description', enableCellEdit: false, width: '**'},
 		{field:'editor', displayName:'Editor', enableCellEdit: false, width: '**'},
-		{field:'last', displayName:'Last', enableCellEdit: false, width: '**'},
+		{field:'last', displayName:'Last', enableCellEdit: false, width: '**', cellTemplate : scope.dateCellTemplate},
 		{field:'version', displayName:'Version', enableCellEdit: false, width: '**'},
 	];
 	

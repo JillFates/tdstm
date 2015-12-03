@@ -156,7 +156,6 @@
 									</ul>
 								</td>
 							</tr>
-
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="passwordExpirationDate">Password Expires:</label>
@@ -168,7 +167,7 @@
 										});
 									</script>
 									<input type="text" class="dateRange" id="passwordExpirationDate" name="passwordExpirationDate"
-										value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										value="<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" formate="12hrs" />"/>
 									<g:hasErrors bean="${userLoginInstance}" field="passwordExpirationDate">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="passwordExpirationDate"/>
@@ -195,7 +194,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'lockedOutUntil', 'errors')}">
 									<input type="text" class="dateRange" id="lockedOutUntilId" name="lockedOutUntil" readonly="true"
-										value="<tds:convertDateTime date="${userLoginInstance?.lockedOutUntil}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>"/>
+										value="<tds:convertDateTime date="${userLoginInstance?.lockedOutUntil}" formate="12hrs" />"/>
 									<g:hasErrors bean="${userLoginInstance}" field="lockedOutUntil">
 										<div class="errors">
 											<g:renderErrors bean="${userLoginInstance}" as="list" field="lockedOutUntil"/>

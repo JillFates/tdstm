@@ -16,10 +16,9 @@
       }
       function isValidDate( date ){
         var returnVal = true;
-      	var objRegExp  = /^(0[1-9]|1[012])[/](0[1-9]|[12][0-9]|3[01])[/](19|20)\d\d ([0-1][0-9]|[2][0-3])(:([0-5][0-9])){1,2} ([APap][Mm])$/;
-      	if( date && !objRegExp.test(date) ){
-          	alert("Date should be in 'mm/dd/yyyy HH:MM AM/PM' format");
-          	returnVal  =  false;
+        if( date && !tdsCommon.isValidDateTime(date) ){
+          alert("Date should be in '" + tdsCommon.defaultDateTimeFormat() + "' format");
+          returnVal  =  false;
       	} 
       	return returnVal;
       }
@@ -117,7 +116,7 @@
                       $("#startTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="startTime" name="startTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.startTime}" format="12hrs" />" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="startTime">
                     <div class="errors">
@@ -137,7 +136,7 @@
                       $("#completionTime").datetimepicker();
                     });
                   </script> <input type="text" class="dateRange" size="15" style="width: 132px; height: 14px;" id="completionTime" name="completionTime"
-                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" formate="12hrs" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>" 
+                                   value="<tds:convertDateTime date="${moveBundleInstance?.completionTime}" format="12hrs" />" 
                                    onchange="isValidDate(this.value)"/>
                                    <g:hasErrors bean="${moveBundleInstance}" field="completionTime">
                     <div class="errors">

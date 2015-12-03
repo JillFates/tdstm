@@ -16,8 +16,6 @@ import com.tdsops.common.builder.UserAuditBuilder
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 
-import java.text.SimpleDateFormat
-
 class ShiroDbRealm {
 	
 	static authTokenClass = org.apache.shiro.authc.UsernamePasswordToken
@@ -160,8 +158,7 @@ class ShiroDbRealm {
 						throw new LockedAccountException("Your account is presently locked. Please contact support to unlock your account.")
 					} else {
 						def tzId = getUserPreferenceService().getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-						SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
-						def lockoutUntil = dateTimeFormat.format(TimeUtil.convertInToUserTZ(state.user.lockedOutUntil, tzId))
+						def lockoutUntil = dateTimeFormat.format(TimeUtil.formatDateTimeWithTZ(tzId, TimeUtil.getDefaultFormatType(), state.user.lockedOutUntil, TimeUtil.FORMAT_DATE_TIME_2))
 						throw new LockedAccountException("Your account is presently locked until $lockoutUntil. You may wait or contact support to have your account unlock.")
 					}
 				}

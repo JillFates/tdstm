@@ -114,7 +114,7 @@ class DashboardController {
 			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			moveEventNewsInstance.isArchived = 1
 			moveEventNewsInstance.archivedBy = loginUser.person
-			moveEventNewsInstance.dateArchived = GormUtil.convertInToGMT( "now", tzId )
+			moveEventNewsInstance.dateArchived = Timetil.nowGMT()
 		}
 		moveEventNewsInstance.save(flush:true)
 		redirect(action:"index")

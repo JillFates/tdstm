@@ -5,7 +5,6 @@
 //import com.tdssrc.eav.EavAttributeOption
 //import com.tdsops.tm.enums.domain.SizeScale
 //import com.tdsops.tm.enums.domain.AssetCableStatus
-//import com.tdssrc.grails.DateUtil
 
 
 import com.tdssrc.eav.EavAttribute
@@ -1484,7 +1483,7 @@ class ImportService {
 				sb.append(WebUtil.getListAsli(warnings))
 
 			if (ignoredAssets)
-				importService.appendIgnoredAssets(sb, ignoredAssets)
+				appendIgnoredAssets(sb, ignoredAssets)
 
 			sb.append('</ul>')
 		}

@@ -24,7 +24,6 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdsops.common.security.SecurityUtil
 
 import java.util.UUID
-import java.text.SimpleDateFormat 
 
 class AdminController {
 	def jdbcTemplate
@@ -365,11 +364,7 @@ class AdminController {
 
 			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR PROJECT_LOGO-----------------------------------------*/
-			SELECT * FROM  ( SELECT 'project_logo' as mainTable,'party_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_logo pl where pl.party_id not in (select pg.party_group_id from party_group pg)
-				UNION
-				SELECT 'project_logo' as mainTable,'party_id' as refId,'Null' as type,count(*) as totalCount FROM project_logo pl where pl.party_id is null
-				UNION
-				SELECT 'project_logo' as mainTable,'project_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)
+			SELECT * FROM ( SELECT 'project_logo' as mainTable,'project_id' as refId,'Orphan' as type,count(*) as totalCount FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)
 				UNION
 				SELECT 'project_logo' as mainTable,'project_id' as refId,'Null' as type,count(*) as totalCount FROM project_logo pl where pl.project_id is null) pl
 			WHERE pl.totalCount > 0
@@ -396,7 +391,7 @@ class AdminController {
 				UNION
 				SELECT 'user_preference' as mainTable,'user_login_id' as refId,'Null' as type,count(*) as totalCount FROM user_preference up where up.user_login_id is null) up
 			WHERE up.totalCount > 0	"""
-			
+
 			summaryRecords << jdbcTemplate.queryForList( partySummaryQuery )
 
 			return[summaryRecords : summaryRecords];	
@@ -918,14 +913,6 @@ class AdminController {
 			
 			case "project_logo" :
 				switch (column){
-					case "party_id" :
-						if(type != "Null"){
-							query = "SELECT * FROM project_logo pl where pl.party_id not in (select pg.party_group_id from party_group pg)"
-						} else {
-							query = "SELECT * FROM project_logo pl where pl.party_id is null"
-						}
-						orphanDeatils = jdbcTemplate.queryForList(query)
-					break;
 					case "project_id" :
 						if(type != "Null"){
 							query = "SELECT * FROM project_logo pl where pl.project_id not in (select pr.project_id from project pr)"
@@ -1186,14 +1173,14 @@ class AdminController {
 	/** ******************************************************************** */
 
 	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
-		def dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+		def session = getSession()
 		persons.eachWithIndex{ p, index ->
 			def loginInfo = UserLogin.findByPerson(p)
 			def fields = getExportAccountDefaultFields(p, companyId)
 			if(loginInfo && (loginChoice == "A" || loginInfo.active == loginChoice)){
 				fields[0] = loginInfo.username
 				fields << loginInfo.active
-				fields << dateFormat.format(loginInfo.expiryDate)
+				fields << TimeUtil.formatDateTime(session, loginInfo.expiryDate, TimeUtil.FORMAT_DATE_TIME_6)
 				fields << (loginInfo.isLocal? "YES" : "NO")
 			}
 			exportAccountFields(sheet, fields, index + 1)
@@ -1233,7 +1220,7 @@ class AdminController {
 	/**
 	 * Used to download the spreadsheet/CSV import template
 	 */
-	def importAccountsTemplate = {
+	def importAccountsTemplate() {
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
 			return
@@ -1262,33 +1249,38 @@ class AdminController {
 
 		def map = [step:'start', projectName:project.toString() ]
  
-		def filename = '/tmp/tdstm-account-import.xls'
+		def filename = '/tmp/tdstm-account-import.csv'
 
 		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 		List teamCodes = partyRelationshipService.getStaffingRoles()*.id
 
-		// Inline closure to parse the XLS file and return array of mapped fields
-		def parseXLS = {book ->
-			def sheet = book.getSheet("Accounts")
-			def rows = sheet.getLastRowNum()
+		// Inline closure to parse the CSV file and return array of mapped fields
+		def parseCsv = {file, header, createUserLogin ->
+			def first = true
 			people = []
 
-			(1..rows).each{
-				people.add(
-						username: WorkbookUtil.getStringCellValue(sheet, 0, it ),
-						firstName: WorkbookUtil.getStringCellValue(sheet, 1, it ),
-						middleName: WorkbookUtil.getStringCellValue(sheet, 2, it ),
-						lastName: WorkbookUtil.getStringCellValue(sheet, 3, it ),
-						phone: WorkbookUtil.getStringCellValue(sheet, 4, it ),
-						teams: WorkbookUtil.getStringCellValue(sheet, 5, it ),
-						role: WorkbookUtil.getStringCellValue(sheet, 6, it ),
-						email: WorkbookUtil.getStringCellValue(sheet, 7, it ),
-						password: WorkbookUtil.getStringCellValue(sheet, 8, it ),
-						active: WorkbookUtil.getStringCellValue(sheet, 9, it ),
-						expiryDate: WorkbookUtil.getStringCellValue(sheet, 10, it ),
-						isLocal: WorkbookUtil.getStringCellValue(sheet, 11, it ),
-						errors: []
-					)
+			file.splitEachLine(",") { fields ->
+				if (first && header) {
+					first = false
+				} else {
+					// Checks that the username is not null when importing user login info, also.
+					boolean validUserInfo = createUserLogin ? fields[0] : true
+					// Checks for required fields: first name, last name, email.
+					if(fields[1] && fields[3] && fields[7] && validUserInfo){
+						people.add(
+							username: fields[0],
+							firstName: fields[1],
+							middleName: fields[2],
+							lastName: fields[3],
+							phone: fields[4],
+							teams: fields[5],
+							role: fields[6]?.toUpperCase(),
+							email: fields[7],
+							password: fields[8],
+							errors: []
+						)	
+					}
+				}
 			}
 			return people
 		}
@@ -1355,24 +1347,20 @@ class AdminController {
 					return map
 				}
 				
-
-				MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-				CommonsMultipartFile f = ( CommonsMultipartFile ) mpr.getFile("myFile")
-				
 				// Handle the file upload
+				def f = request.getFile('myFile')
 				if (f.empty) {
 					flash.message = 'Upload file appears to be empty'
 					return map
 				}
+
 				// Save for step 3
-				def upload = new File('/tmp/tdstm-account-import.xls')
+				def upload = new File('/tmp/tdstm-account-import.csv')
 				// upload.delete()
 				f.transferTo(upload)
-				def book = new HSSFWorkbook(new FileInputStream( upload ))
+				def header = params.header == 'Y'
 
-
-				people = parseXLS(book)
-
+				people = parseCsv(upload, header, false)
 				map.matches = lookForMatches()
 
 				// Validate the teams && role
@@ -1390,6 +1378,7 @@ class AdminController {
 
 				map.people = people
 				map.step = 'review'
+				map.header = params.header
 
 				break
 
@@ -1401,13 +1390,12 @@ class AdminController {
 				def forcePasswordChange = params.forcePasswordChange == 'Y'
 				def commonPassword = params.password
 				def expireDays = NumberUtils.toInt(params.expireDays,90)
+				def header = params.header == 'Y'
 				def role = params.role
 
-				def book = new HSSFWorkbook(new FileInputStream( new File('/tmp/tdstm-account-import.xls')))
+				def csv = new File('/tmp/tdstm-account-import.csv')
 
-
-				people = parseXLS(book)
-
+				people = parseCsv(csv, header, createUserLogin)
 				lookForMatches()
 
 				if (randomPassword) {
@@ -1541,7 +1529,6 @@ class AdminController {
 								active: (activateLogin ? 'Y' : 'N'),
 								expiryDate: expiryDate,
 								person: person,
-								isLocal: p.isLocal == "Y",
 								forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
 							)
 
@@ -1566,20 +1553,6 @@ class AdminController {
 							}
 						} else {
 							failed = true
-							if(u.username != p.username){
-								securityService.reportViolation("The account for ${p.lastName} ${p.firstName} already has login information associated, which is different from the one provided.", u)
-							}else if(controllerService.checkPermission(this, 'EditUserLogin')){
-								u.active = p.active
-								u.expiryDate = new Date().parse("yyyy-MM-dd", p.expiryDate)
-								u.isLocal = p.isLocal == "Y"
-								if (! u.validate() || !u.save(flush:true)) {
-									p.errors << "Error" + GormUtil.allErrorsString(u)
-									log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
-									failed = true
-								}
-							}else{
-								securityService.reportViolation("You don't have permissions for updating login information.", u)
-							}
 							p.errors << "Person already have a userlogin: $u"
 						}
 

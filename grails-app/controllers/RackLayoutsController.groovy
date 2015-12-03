@@ -11,6 +11,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.tm.enums.domain.*
 
@@ -306,7 +307,7 @@ class RackLayoutsController {
             		assetDetails<<[asset:assetEnitiesAtPosition[0], rack:i, cssClass:cssClass, rackStyle:rackStyle, source:rack.source ]
 				} else if(assetEnitiesAtPosition.size() == 1) {
 					def assetEnity = assetEnitiesAtPosition[0]
-					def currentTime = GormUtil.convertInToGMT( "now", tzId ).getTime()
+					def currentTime = TimeUtil.nowGMT().getTime()
 					if(assetEnity.overlapError) {
 						cssClass = 'rack_error'
 						rackStyle = 'rack_error'

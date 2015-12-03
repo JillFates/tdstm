@@ -118,7 +118,7 @@ tdstm {
 					defaultProject = 2445
 
 					// The default timezone to set for the user when first provisioned
-					defaultTimezone = 'EST'
+					defaultTimezone = 'GMT'
 
 					// When true the system will refresh the user's personal information each time that the authenticate successfully
 					updateUserInfo = true

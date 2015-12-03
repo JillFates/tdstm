@@ -60,9 +60,9 @@
 			<td class="label ${config.license} ${highlightMap.license?:''}" nowrap="nowrap"><label for="license">License</label></td>
 			<td class="valueNW ${config.license}">${applicationInstance.license}</td>
 			<td class="label ${config.retireDate} ${highlightMap.retireDate?:''}" nowrap="nowrap"><label for="retireDate">Retire</label></td>
-			<td class="${config.retireDate}">
-				<tds:formatDate date="${applicationInstance?.retireDate}" />
-			</td>
+			<td class="${config.retireDate}"><tds:convertDate
+					date="${applicationInstance?.retireDate}"
+			/></td>
 			<td class="label ${config.validation} ${highlightMap.validation?:''}" nowrap="nowrap"><label for="validation">Validation</label></td>
 			<td class="${config.validation}">${applicationInstance.validation}</td>
 			<td class="label ${config.testProc} ${highlightMap.testProc?:''}" nowrap="nowrap"><label for="testProc">Test Proc OK</label></td>
@@ -72,8 +72,9 @@
 			<td></td>
 			<td></td>
 			<td class="label ${config.maintExpDate} ${highlightMap.maintExpDate?:''}" nowrap="nowrap"><label for="maintExpDate">Maint Exp.</label></td>
-			<td class="valueNW ${config.maintExpDate}">
-				<tds:formatDate date="${applicationInstance?.maintExpDate}" />
+			<td class="valueNW ${config.maintExpDate}"><tds:convertDate
+					date="${applicationInstance?.maintExpDate}" format="12hrs"
+					 />
 			</td>
 			<td class="label ${config.latency} ${highlightMap.latency?:''}" nowrap="nowrap"><label for="latency">Latency OK</label></td>
 			<td class="valueNW ${config.latency}">${applicationInstance.latency ? applicationInstance.latency : '?'}</td>

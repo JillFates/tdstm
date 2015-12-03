@@ -1,5 +1,3 @@
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.Date
 
 import org.apache.shiro.SecurityUtils
@@ -61,9 +59,8 @@ class CommentService {
 		def project = securityService.getUserCurrentProject()
 		def canEditAsset = securityService.hasPermission(userLogin.person, 'AssetEdit')
 		
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def tzId = session.getAttribute( "CURR_TZ" )?.CURR_TZ
+		def tzId = session.getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ
+		def userDTFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
 		
 		def date = new Date()
 		def assetEntity
@@ -218,10 +215,10 @@ class CommentService {
 		    assetComment.resolution = params.resolution
 			if (params.containsKey('estStart')) {
 				// log.info "saveUpdateCommentAndNotes: estStart=[${params.estStart}]"
-				assetComment.estStart = params.estStart ? TimeUtil.convertInToGMT(estformatter.parse(params.estStart), tzId) : null
+				assetComment.estStart = params.estStart ? TimeUtil.parseDateTime(session, params.estStart) : null
 			}
 			if (params.containsKey('estFinish')) {
-				assetComment.estFinish = params.estFinish ? TimeUtil.convertInToGMT(estformatter.parse(params.estFinish), tzId)  : null
+				assetComment.estFinish = params.estFinish ? TimeUtil.parseDateTime(session, params.estFinish)  : null
 			}
 			if (params.containsKey('role')) {
 				assetComment.role = params.role ?: ''
@@ -312,7 +309,7 @@ class CommentService {
 
 				if (params.containsKey('dueDate') ) { 
 					// log.info "saveUpdateCommentAndNotes: dueDate=[${params.dueDate}]"
-					assetComment.dueDate = params.dueDate ? TimeUtil.convertInToGMT(formatter.parse(params.dueDate), tzId)  : null
+					assetComment.dueDate = params.dueDate ? TimeUtil.parseDate(session, params.dueDate)  : null
 				}
 	
 			}
@@ -392,13 +389,12 @@ class CommentService {
 				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0) ? true : false
 			
 				def statusCss = taskService.getCssClassForStatus(assetComment.status )
-				def lastUpadatedFormatter  = new SimpleDateFormat("MM/dd kk:mm:ss");
 				map = [ assetComment : assetComment,
 				        status : status ? true : false,
 				        cssClass:css,
 				        statusCss:statusCss, 
 				        assignedToName: assetComment.assignedTo?(assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName):"",
-						lastUpdatedDate:lastUpadatedFormatter.format(GormUtil.convertInToUserTZ(assetComment.lastUpdated,tzId)) ]
+						lastUpdatedDate: TimeUtil.formatDateTime(session, assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13) ]
 				
 				// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 				def loginPerson = userLogin.person	// load so that we don't have a lazyInit issue
@@ -453,7 +449,7 @@ class CommentService {
 						}
 						if(typeGood)
 						{
-							dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew])
+							dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew, userDTFormat: userDTFormat])
 							break;
 						}
 					}
@@ -483,7 +479,7 @@ class CommentService {
      */
     def dispatchTaskEmail(Map params) {
 		Trigger trigger = new SimpleTriggerImpl("tm-sendEmail-${params.taskId}" + System.currentTimeMillis(), null, new Date(System.currentTimeMillis() + 5000) )
-        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'isNew':params.isNew,'tries':0L])
+        trigger.jobDataMap.putAll( [ 'taskId':params.taskId, 'tzId':params.tzId, 'userDTFormat':params.userDTFormat, 'isNew':params.isNew,'tries':0L])
 		trigger.setJobName('SendTaskEmailJob')
 		trigger.setJobGroup('tdstm')
   
@@ -500,7 +496,7 @@ class CommentService {
 	 * @param tzId
 	 * @return
 	 */
-	def sendTaskEMail(taskId, tzId, isNew=true) {
+	def sendTaskEMail(taskId, tzId, userDTFormat, isNew=true) {
 		// Perform this withNewSession because it runs in a separate thread and the session would otherwise be lost
 		// TODO re-enable the withNewSession after upgrade to 2.x as there is a bug in 1.3 that we ran into
 		// https://github.com/grails/grails-core/commit/9a8e765e4a139f67bb150b6dd9f7e67b16ecb21e
@@ -538,7 +534,7 @@ class CommentService {
 			subject "${sub}"
 			body (
 				view:"/assetEntity/_taskEMailTemplate",
-				model: assetCommentModel(assetComment, tzId)
+				model: assetCommentModel(assetComment, tzId, userDTFormat)
 			)
 		}
 	}
@@ -548,9 +544,7 @@ class CommentService {
 	 * @param assetComment - the assetComment object to create a model of
 	 * @return map
 	 */
-	def assetCommentModel(assetComment, tzId) {
-		def formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a");
-		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
+	def assetCommentModel(assetComment, tzId, userDTFormat) {
 		def notes = assetComment.notes?.sort{it.dateCreated}
 		def assetName = assetComment.assetEntity ? "${assetComment.assetEntity.assetName} (${assetComment.assetEntity.assetType})" : null
 		def createdBy = assetComment.createdBy
@@ -559,17 +553,13 @@ class CommentService {
 		def dueDate
 		def dtResolved
 		
-		try {
-			dtCreated = formatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId))
-		} catch (e) {
-			dtCreated = formatter.format(assetComment.dateCreated)
-		}
+		dtCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dateCreated, TimeUtil.FORMAT_DATE_TIME)
 		
 		if(assetComment.dateResolved) {
-			dtResolved = formatter.format(GormUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+			dtResolved = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dateResolved, TimeUtil.FORMAT_DATE_TIME)
 		}
 		if(assetComment.dueDate){
-			dueDate = dateFormatter.format(assetComment.dueDate);
+			dueDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetComment.dueDate, TimeUtil.FORMAT_DATE)
 		}
 		
 		[	assetComment:assetComment,
@@ -639,27 +629,25 @@ class CommentService {
 		def dtCreated
 		def dtResolved
 		def project = securityService.getUserCurrentProject()
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-		def tzId = userPreferenceService.getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+		def session = userPreferenceService.getSession()
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment){
 			if(assetComment.createdBy){
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
-				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+				dtCreated = TimeUtil.formatDateTime(session, assetComment.dateCreated)
 			}
 			if(assetComment.dateResolved){
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
-				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+				dtResolved = TimeUtil.formatDateTime(session, assetComment.dateResolved)
 			}
 			
-			def etStart =  assetComment.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId)) : ''
+			def etStart =  assetComment.estStart ? TimeUtil.formatDateTime(session, assetComment.estStart) : ''
 			
-			def etFinish = assetComment.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId)) : ''
+			def etFinish = assetComment.estFinish ? TimeUtil.formatDateTime(session, assetComment.estFinish) : ''
 			
-			def atStart = assetComment.actStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId)) : ''
+			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(session, assetComment.actStart) : ''
 			
-			def dueDate = assetComment.dueDate ? dateFormatter.format(TimeUtil.convertInToUserTZ(assetComment.dueDate, tzId)): ''
+			def dueDate = assetComment.dueDate ? TimeUtil.formatDate(session, assetComment.dueDate) : ''
 	
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
@@ -667,7 +655,7 @@ class CommentService {
 			def noteList = assetComment.notes.sort{it.dateCreated}
 			def notes = []
 			noteList.each {
-				def dateCreated = it.dateCreated ? TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma") : ''
+				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(session, it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
 				notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			}
 			

@@ -80,11 +80,11 @@
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType', 'Event'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'${appPref['1']}',width:'120'},
-						{name:'${appPref['2']}', width:'120'},
-						{name:'${appPref['3']}', width:'120'}, 
-						{name:'${appPref['4']}', width:'120'},
-						{name:'${appPref['5']}', width:'120'},
+						{name:'${appPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${appPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${appPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
+						{name:'${appPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${appPref['5']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true},
 						{name:'event', hidden: true} "

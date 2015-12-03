@@ -6,7 +6,13 @@ var tdsCommon = {
 	
 	config: {
 		// The base path of the application URI
-		appBaseUri:  '/tdstm'
+		appBaseUri:  '/tdstm',
+		dateFormatNoYear: null,
+		dateFormat: null,
+		dateTimeFormat: null,
+		dateShortFormat: null,
+		jQueryDateFormat: null,
+		jQueryDateTimeFormat: null
 	},
 
 	// creates relative or fully qualified url to for the application
@@ -156,8 +162,200 @@ var tdsCommon = {
 	isValidEmail: function(email) {
 		var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/ ;
 		return emailExp.test(email);
+	},
+
+	/**
+	 * Check if user date format type is MM/DD/YY
+	 */
+	isFormatMMDDYYYY: function() {
+		var df = $("#userDTFormat").val();
+		return ((df != null) && (df == "MM/DD/YYYY"))
+	},
+
+	/**
+	 * Returns a date format that don't have a year
+	 */
+	noYearDateFormat: function() {
+		if (this.config.dateFormatNoYear == null) {
+			this.config.dateFormatNoYear = "MM/DD h:mm A";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateFormatNoYear = "DD/MM h:mm A";
+			}
+		}
+		return this.config.dateFormatNoYear;
+	},
+
+	/**
+	 * Returns default date short format
+	 */
+	defaultShortDateFormat: function() {
+		if (this.config.dateShortFormat == null) {
+			this.config.dateShortFormat = "MM/DD/YY";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateShortFormat = "DD/MM/YY";
+			}
+		}
+		return this.config.dateShortFormat;
+	},
+
+	/**
+	 * Returns default date format
+	 */
+	defaultDateFormat: function() {
+		if (this.config.dateFormat == null) {
+			this.config.dateFormat = "MM/DD/YYYY";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateFormat = "DD/MM/YYYY";
+			}
+		}
+		return this.config.dateFormat;
+	},
+
+	/**
+	 * Returns default date time format
+	 */
+	defaultDateTimeFormat: function() {
+		if (this.config.dateTimeFormat == null) {
+			this.config.dateTimeFormat = "MM/DD/YYYY h:mm A";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.dateTimeFormat = "DD/MM/YYYY h:mm A";
+			}
+		}
+		return this.config.dateTimeFormat;
+	},
+
+	/**
+	 * Returns jQuery date format
+	 */
+	jQueryDateFormat: function() {
+		if (this.config.jQueryDateFormat == null) {
+			this.config.jQueryDateFormat = "mm/dd/yy";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.jQueryDateFormat = "dd/mm/yy";
+			}
+		}
+		return this.config.jQueryDateFormat;
+	},
+
+	/**
+	 * Returns jQuery date time format
+	 */
+	jQueryDateTimeFormat: function() {
+		if (this.config.jQueryDateTimeFormat == null) {
+			this.config.jQueryDateTimeFormat = "mm/dd/yy h:i";
+			if (!this.isFormatMMDDYYYY()) {
+				this.config.jQueryDateTimeFormat = "'dd/mm/yy h:i";
+			}
+		}
+		return this.config.jQueryDateTimeFormat;
+	},
+
+	parseDateTimeFromZulu: function(stringValue, format) {
+		return moment(stringValue);
+	},
+	
+	parseDateTimeString: function(stringValue, format) {
+		if (typeof(format)==='undefined') {
+			format = this.defaultDateTimeFormat();
+		}
+		return moment(stringValue, format);
+	},
+
+	isValidDate: function(stringValue) {
+		var d = moment(stringValue, this.defaultDateFormat());
+		return d.isValid()
+	},
+
+	isValidDateTime: function(stringValue) {
+		var d = moment(stringValue, this.defaultDateTimeFormat());
+		return d.isValid()
+	},
+
+	formatDateTime: function(momentObj, format) {
+		var result = "";
+		if (typeof(format)==='undefined') {
+			format = this.defaultDateTimeFormat();
+		}
+		if (momentObj) {
+			result = momentObj.format(format);
+		}
+		return result;
+	},
+
+	jqgridDateCellFormatter: function(cellvalue, options, rowObject) {
+		if (cellvalue) {
+			var result = "";
+			var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+			if (momentObj) {
+				momentObj.tz(tdsCommon.timeZone());
+				result = momentObj.format(tdsCommon.defaultDateFormat());
+			}
+			return result;
+		} else {
+			return 'Never';
+		}
+	},
+
+	jqgridPrefCellFormatter: function(cellvalue, options, rowObject) {
+		var result = cellvalue;
+		switch (options.colModel.name) {
+			case "lastUpdated":
+			case "retireDate":
+			case "maintExpDate":
+				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+				if (momentObj.isValid()) {
+					momentObj.tz(tdsCommon.timeZone());
+					result = momentObj.format(tdsCommon.defaultDateTimeFormat());
+				} else {
+					result = "";
+				}
+				break;
+		}
+		return result;
+	},
+
+	parseAndFormatDateTimeFromZulu: function(stringValue, format) {
+		var result;
+		var momentObj = tdsCommon.parseDateTimeFromZulu(stringValue);
+		if (momentObj.isValid()) {
+			if (typeof(format)==='undefined') {
+				format = this.defaultDateTimeFormat();
+			}
+			momentObj.tz(tdsCommon.timeZone());
+			result = momentObj.format(format);
+		} else {
+			result = "";
+		}
+		return result;
+	},
+
+	timeZone: function() {
+		return $("#tzId").val()
 	}
 
 }
 
 tdsCommon.autoClearDialogOnClose();
+
+
+/*
+ * TDS User Preference utils
+ */
+
+ var UserPreference = function() {
+
+ 	var savePreferences = function(formId) {
+		var data = $('#' + formId).serialize();
+		$.post(tdsCommon.createAppURL('/person/savePreferences'), data, function() {
+			window.location.reload();
+		})
+		.fail(function() {
+			alert("Can't update user's preferences");
+		});
+ 	}
+
+	return {
+		savePreferences: savePreferences
+	}
+
+ }();

@@ -86,7 +86,7 @@
 			<tr class="prop issue" id="estFinishShowId"  >
 				<td valign="top" class="name"><label for="estFinish">Est.Finish:</label></td>
 				<td valign="top" class="value" id="estFinishShowId_${assetComment.id}" colspan="3" nowrap="nowrap">
-				<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
+				<tds:convertDate date="${assetComment.estFinish}" format="M/d kk:mm" />
 				</td>
 			</tr>
 			<tr class="prop">
@@ -107,7 +107,7 @@
 		   	<tr class="prop">
 				<td valign="top" class="name"><label for="createdBy">Created By:</label></td>
 				<td valign="top" class="value" colspan="3"><span id="categoryEditId">${assetComment?.createdBy} on 
-				<tds:convertDate date="${assetComment?.dateCreated}" format="M/d" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span></td>
+				<tds:convertDate date="${assetComment?.dateCreated}" format="M/d" /></span></td>
 			</tr>
 			<tr class="prop" >
 				<td valign="top" class="name">
@@ -155,7 +155,7 @@
 				<tr class="prop">
 					<td valign="top" class="name"><label for="resolution">Resolved By:</label></td>
 					<td valign="top" class="value">
-						<span id="resolvedByTd" >${assetComment.resolvedBy} on <tds:convertDate date="${assetComment?.dateResolved}" format="M/d" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></span>
+						<span id="resolvedByTd" >${assetComment.resolvedBy} on <tds:convertDate date="${assetComment?.dateResolved}" format="M/d" /></span>
 					</td>
 				</tr> 
 			</g:if>
@@ -211,7 +211,7 @@
 				<dl>
 				<dt>Comment:</dt><dd>&nbsp;${assetComment.comment}</dd>
 				<dt>Assigned to:</dt><dd>&nbsp;${assetComment?.assignedTo}</dd>
-				<dt>Due Date:</dt><dd>&nbsp;<tds:convertDate date="${assetComment?.dueDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></dd>
+				<dt>Due Date:</dt><dd>&nbsp;<tds:convertDate date="${assetComment?.dueDate}" /></dd>
 				<dt>Created by:</dt><dd>&nbsp;${assetComment?.createdBy} at ${assetComment?.dateCreated} </dd>
 				<dt>Comment Type:</dt><dd>&nbsp;${assetComment?.commentType}</dd>
 		   		<dt>Category:</dt><dd>&nbsp;${assetComment?.category}</dd>

@@ -41,7 +41,7 @@
                         
                             <td>${fieldValue(bean:modelSyncBatchInstance, field:'id')}</td>
                         
-                            <td><tds:convertDate date="${modelSyncBatchInstance?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
+                            <td><tds:convertDate date="${modelSyncBatchInstance?.dateCreated}" /></td>
                         
                             <td>${modelSyncBatchInstance?.createdBy?.person?.lastNameFirst}</td>
                         

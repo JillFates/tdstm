@@ -31,7 +31,7 @@
 						<g:elseif test="${column =='Black Out Dates'}">
 							<td class="col_${person.id}">
 								<g:each in="${person.(columnList.get(column))?.exceptionDay}" var="expDay">
-									<tds:convertDate date="${expDay}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />,
+									<tds:convertDate date="${expDay}"  />,
 								</g:each> 
 							</td>
 						</g:elseif>
@@ -89,7 +89,7 @@
 								<span>
 									<tds:convertDateTime
 										date="${userLogin?.(loginInfoColumns.get(column))}"
-										timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+										 />
 								</span>
 							</g:if>
 							<g:else>

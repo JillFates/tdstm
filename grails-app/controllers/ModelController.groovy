@@ -1,8 +1,6 @@
 import grails.converters.JSON
 
 import java.io.*
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 import org.apache.poi.*
 import org.apache.poi.hssf.usermodel.HSSFSheet
@@ -109,9 +107,7 @@ class ModelController {
 		def result
 		switch(value){
 			case ~/dateCreated|lastModified|endOfLifeDate/:
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
-				result = model[value] ? dueFormatter.format(TimeUtil.convertInToUserTZ(model[value], tzId)) : ''
+				result = model[value] ? TimeUtil.formatDate(getSession(), model[value]) : ''
 			break;
 			case 'modelConnectors':
 				result= model.noOfConnectors
@@ -226,8 +222,6 @@ class ModelController {
 			def powerUsed = params.powerUse ? Float.parseFloat(params.powerUse) : 0
 			def powerType = params.powerType
 			def endOfLifeDate = params.endOfLifeDate
-			def formatter = new SimpleDateFormat("MM/dd/yyyy");
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			//def principal = SecurityUtils.subject?.principal
 			//def user
 			
@@ -247,7 +241,7 @@ class ModelController {
 				}
 			}
 			if(endOfLifeDate){
-				params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
+				params.endOfLifeDate = TimeUtil.parseDate(getSession(), endOfLifeDate)
 			}
 			if( powerType == "Amps"){
 				powerNameplate =  powerNameplate * 120
@@ -435,8 +429,6 @@ class ModelController {
 			}
 			def modelStatus = modelInstance?.modelStatus 
 			def endOfLifeDate = params.endOfLifeDate
-			def formatter = new SimpleDateFormat("MM/dd/yyyy");
-			def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 			def principal = SecurityUtils.subject?.principal
 			def person
 			if( user ){
@@ -458,7 +450,7 @@ class ModelController {
 			     }
 			}
 			if(endOfLifeDate){
-				params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(endOfLifeDate), tzId)
+				params.endOfLifeDate = TimeUtil.parseDate(getSession(), endOfLifeDate)
 			}
 			
 	        if (modelInstance) {
@@ -830,10 +822,8 @@ class ModelController {
 		def msg = ""
 		def assetUpdated = 0
 		//Saving toModel before merge
-		def formatter = new SimpleDateFormat("MM/dd/yyyy");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		if(params.endOfLifeDate){
-			params.endOfLifeDate =  GormUtil.convertInToGMT(formatter.parse(params.endOfLifeDate), tzId)
+			params.endOfLifeDate =  TimeUtil.formatDate(getSession(), params.endOfLifeDate)
 		} else {
 			params.endOfLifeDate=null
 		}
@@ -870,8 +860,7 @@ class ModelController {
         try {
         	File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Sync_model_template.xls" ).getFile()
 			//set MIME TYPE as Excel
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			def filename = 	"TDS-Sync-Data-"+formatter.format(new Date())+".xls"
+			def filename = 	"TDS-Sync-Data-"+TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_6)+".xls"
 					filename = filename.replace(" ", "_")
 			response.setContentType( "application/vnd.ms-excel" )
 			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
@@ -881,7 +870,6 @@ class ModelController {
 			def manuSheet = book.getSheet("manufacturer")
 			def manufacturers = params.exportCheckbox ? Model.findAll("FROM Model where sourceTDS = 1 GROUP BY manufacturer").manufacturer :
 			 Manufacturer.findAll()
-			def dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 			
 			for ( int r = 0; r < manufacturers.size(); r++ ) {
 				WorkbookUtil.addCell(manuSheet, 0, r+1, String.valueOf(manufacturers[r].id ))
@@ -926,8 +914,8 @@ class ModelController {
 				WorkbookUtil.addCell(modelSheet, 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :""))
 				WorkbookUtil.addCell(modelSheet, 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:""))
 				WorkbookUtil.addCell(modelSheet, 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :""))
-				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? dateFormatter.format(models[r].dateCreated) : ''))
-				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? dateFormatter.format(models[r].lastModified) : ''))
+				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].dateCreated ? TimeUtil.formatDate(getSession(), models[r].dateCreated) : ''))
+				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].lastModified ? TimeUtil.formatDate(getSession(), models[r].lastModified) : ''))
 
 			}
 			def connectorSheet = book.getSheet("connector")

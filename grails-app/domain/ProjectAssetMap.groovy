@@ -3,7 +3,7 @@
  * by a company but can be associated to one or more projects.
  * */
 import com.tds.asset.AssetEntity;
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 class ProjectAssetMap {
 	Project project
 	AssetEntity asset
@@ -28,10 +28,10 @@ class ProjectAssetMap {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		createdDate = GormUtil.convertInToGMT( "now", "EDT" )
-		lastModified = GormUtil.convertInToGMT( "now", "EDT" )
+		createdDate = TimeUtil.nowGMT()
+		lastModified = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastModified = GormUtil.convertInToGMT( "now", "EDT" )
+		lastModified = TimeUtil.nowGMT()
 	}
 }

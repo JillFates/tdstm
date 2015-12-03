@@ -1,4 +1,4 @@
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 class Workflow {
 	
 	String process
@@ -25,11 +25,11 @@ class Workflow {
 	 * Date to insert in GMT
 	 */
 	def beforeInsert = {
-		dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		dateCreated = TimeUtil.nowGMT()
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	def beforeUpdate = {
-		lastUpdated = GormUtil.convertInToGMT( "now", "EDT" )
+		lastUpdated = TimeUtil.nowGMT()
 	}
 	String toString() {
 		process

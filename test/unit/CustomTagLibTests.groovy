@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import com.tdssrc.grails.GormUtil
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+import com.tdssrc.grails.TimeUtil
 
 @TestFor(CustomTagLib)
 class CustomTagLibTests extends Specification {
@@ -20,31 +21,93 @@ class CustomTagLibTests extends Specification {
 	}
 
 	void testConvertDate() {
-		def format = [
-			"MM/dd kk:mm:ss" : [["GMT":"08/21 20:00:00"],["PST":"08/21 12:00:00"],["PDT":"08/21 13:00:00"],["MST":"08/21 13:00:00"],["MDT":"08/21 14:00:00"],
-								["CST":"08/21 14:00:00"],["CDT":"08/21 15:00:00"],["EST":"08/21 15:00:00"],["EDT":"08/21 16:00:00"]],
-			"MM/dd": [["GMT":"08/21"],["PST":"08/21"],["PDT":"08/21"],["MST":"08/21"],["MDT":"08/21"],
-					  ["CST":"08/21"],["CDT":"08/21"],["EST":"08/21"],["EDT":"08/21"]],
-			"null": [["GMT":"08/21/2012"],["PST":"08/21/2012"],	["PDT":"08/21/2012"],["MST":"08/21/2012"],["MDT":"08/21/2012"],
-					 ["CST":"08/21/2012"],["CDT":"08/21/2012"],["EST":"08/21/2012"],["EDT":"08/21/2012"]]
-		]
 
-		def date = new Date("08/21/2012 20:00:00")
+		// Create a reference test date
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		def date = sdf.parse("2012-08-21T01:00:00-0000")
 
 		def correct = true
 		def convertedDate
+		def sessionTimeZone = ""
+		def sessionDateFormat
+		def formatsToTest
 
-		format.each{ key, value ->
+		// Mock session behaviour
+		def session = [
+			"getAttribute": { param ->
+				if ("CURR_DT_FORMAT" == param) {
+					return ["CURR_DT_FORMAT": sessionDateFormat]
+				} else if ("CURR_TZ" == param) {
+					return ["CURR_TZ": sessionTimeZone]
+				}
+			}
+		]
 
-			value.each{ formatValue  ->
+		CustomTagLib.metaClass.session = session
 
-				formatValue.each{ timeZone, expectedDate ->
-					convertedDate = applyTemplate('<tds:convertDate date="${date}" timeZone="${timeZone}" format="${format}" />', [date:date, timeZone:timeZone, format:key])
+		// ******************************************
+		// Test dates using date format: "MM/DD/YYYY"
+		sessionDateFormat = "MM/DD/YYYY"
+		formatsToTest = [
+			"$TimeUtil.FORMAT_DATE_TIME" : [
+				["GMT":"08/21/2012 01:00 AM"],
+				["America/Argentina/Buenos_Aires":"08/20/2012 10:00 PM"],
+				["America/New_York":"08/20/2012 09:00 PM"]
+			],
+			"$TimeUtil.FORMAT_DATE": [
+				["GMT":"08/21/2012"],
+				["America/Argentina/Buenos_Aires":"08/20/2012"],
+				["America/New_York":"08/20/2012"]
+			]
+		]
+
+		formatsToTest.each{ format, formatTestConfigs ->
+
+			formatTestConfigs.each{ testConfig  ->
+
+				testConfig.each{ timeZone, expectedDate ->
+
+					sessionTimeZone = timeZone
+
+					convertedDate = applyTemplate('<tds:convertDateTime date="${date}" timeZone="${timeZone}" format="${format}" />', [date:date, timeZone:timeZone, format:format])
+
 					correct = correct && expectedDate.equals(convertedDate)
 				}
+
 			}
 		}
 
+		// ******************************************
+		// Test dates using date format: "DD/MM/YYYY"
+		sessionDateFormat = "DD/MM/YYYY"
+		formatsToTest = [
+			"$TimeUtil.FORMAT_DATE_TIME" : [
+				["GMT":"21/08/2012 01:00 AM"],
+				["America/Argentina/Buenos_Aires":"20/08/2012 10:00 PM"],
+				["America/New_York":"20/08/2012 09:00 PM"]
+			],
+			"$TimeUtil.FORMAT_DATE": [
+				["GMT":"21/08/2012"],
+				["America/Argentina/Buenos_Aires":"20/08/2012"],
+				["America/New_York":"20/08/2012"]
+			]
+		]
+
+		formatsToTest.each{ format, formatTestConfigs ->
+
+			formatTestConfigs.each{ testConfig  ->
+
+				testConfig.each{ timeZone, expectedDate ->
+
+					sessionTimeZone = timeZone
+
+					convertedDate = applyTemplate('<tds:convertDateTime date="${date}" timeZone="${timeZone}" format="${format}" />', [date:date, timeZone:timeZone, format:format])
+
+					correct = correct && expectedDate.equals(convertedDate)
+				}
+
+			}
+		}
 		expect:
 			correct
 	}

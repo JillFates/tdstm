@@ -1,7 +1,6 @@
 import grails.converters.JSON
 
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 import net.tds.util.jmesa.AssetEntityBean
 
@@ -55,7 +54,6 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdssrc.eav.*
 import com.tdssrc.grails.ApplicationConstants
-import com.tdssrc.grails.DateUtil
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
@@ -100,9 +98,6 @@ class AssetEntityController {
 
 	// Contains list of the default Custom# column names (e.g. ['Custom1','Custom2','Custom3',...])
 	protected static List customLabels = customLabelsNameList()
-
-	static SimpleDateFormat formatDate = new SimpleDateFormat('MM/dd/yyyy')
-
 
 	// TODO : JPM 9/2014 : Need to remove the references to the team static vars bundleMoveAndClientTeams, targetTeamType, sourceTeamType, teamsByType
 	protected static bundleMoveAndClientTeams = ['sourceTeamMt','sourceTeamLog','sourceTeamSa','sourceTeamDba','targetTeamMt','targetTeamLog','targetTeamSa','targetTeamDba']
@@ -345,10 +340,10 @@ class AssetEntityController {
 			} else {
 				if ( (dtaMapField.columnName in importColumnsDateType) )  {
 					if (!StringUtil.isBlank(cellValue)) {
-						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, formatDate)
+						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, getSession())
 						// Convert to string in the date format
 						if (dateValue) {
-							cellValue = formatDate.format(dateValue)
+							cellValue = TimeUtil.formatDate(getSession(), dateValue)
 						} else {
 							cellValue = ''
 						}
@@ -762,8 +757,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	 */
 	def upload() {
 
-		SimpleDateFormat formatDatetime = new SimpleDateFormat('MM/dd/yyyy hh:mm:ss a');
-
 		// ------
 		// Some variables that are referenced by the following closures
 		// ------
@@ -927,9 +920,10 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 			// Get the title sheet
 			titleSheet = workbook.getSheet( "Title" )
+
 			if (titleSheet != null) {			
 				try {
-					exportTime = WorkbookUtil.getDateCellValue(titleSheet, 1, 5, formatDatetime)
+					exportTime = TimeUtil.parseDateTime(getSession(), WorkbookUtil.getStringCellValue(titleSheet, 1, 5)) 
 				} catch ( Exception e) {
 					log.info "Was unable to read the datetime for 'Export on': " + e.message
 					failWithError "The 'Exported On' datetime was not found or was invalid in the Title sheet"
@@ -1343,14 +1337,14 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						// Try reading the created date as a date and if that fails try as a string and parse
 						cols++
 						def dateCreated
-						def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r )	
+						def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession())	
 						if (createdDateInput) {
 							dateCreated = createdDateInput
 						} else {
 							// Try parsing the input
 							createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, cols, r )?.replace("'","\\'")
 							if (createdDateInput) {
-								dateCreated = DateUtil.parseImportedCreatedDate(createdDateInput)
+								dateCreated = TimeUtil.parseDate(getSession(), createdDateInput)
 								if ( ! (dateCreated instanceof Date) ) {
 									importResults.errors << "Invalid Created Date '$createdDateInput' (row ${rowNum})"
 									continue
@@ -1491,7 +1485,8 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		trigger.jobDataMap.put('key', key)
 		trigger.jobDataMap.put('username', username)
 		trigger.jobDataMap.put('projectId', projectId)
-		trigger.jobDataMap.put('tzId', getSession().getAttribute( "CURR_TZ" )?.CURR_TZ)
+		trigger.jobDataMap.put('tzId', getSession().getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ)
+		trigger.jobDataMap.put('userDTFormat', getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT)
 
 		trigger.setJobName('ExportAssetEntityJob')
 		trigger.setJobGroup('tdstm-export-asset')
@@ -1857,28 +1852,25 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def personCreateObj
 		def dtCreated
 		def dtResolved
-		
-		def estformatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-		def dateFormatter = new SimpleDateFormat("MM/dd/yyyy ");
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
+
 		def assetComment = AssetComment.get(params.id)
 		if(assetComment){
 			if(assetComment.createdBy){
 				personCreateObj = Person.find("from Person p where p.id = $assetComment.createdBy.id")?.toString()
-				dtCreated = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateCreated, tzId));
+				dtCreated = TimeUtil.formatDateTime(getSession(), assetComment.dateCreated);
 			}
 			if (assetComment.dateResolved) {
 				personResolvedObj = Person.find("from Person p where p.id = $assetComment.resolvedBy.id")?.toString()
-				dtResolved = estformatter.format(TimeUtil.convertInToUserTZ(assetComment.dateResolved, tzId));
+				dtResolved = TimeUtil.formatDateTime(getSession(), assetComment.dateResolved);
 			}
 			
-			def etStart =  assetComment.estStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estStart, tzId)) : ''
+			def etStart =  assetComment.estStart ? TimeUtil.formatDateTime(getSession(), assetComment.estStart) : ''
 			
-			def etFinish = assetComment.estFinish ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.estFinish, tzId)) : ''
+			def etFinish = assetComment.estFinish ? TimeUtil.formatDateTime(getSession(), assetComment.estFinish) : ''
 			
-			def atStart = assetComment.actStart ? estformatter.format(TimeUtil.convertInToUserTZ(assetComment.actStart, tzId)) : ''
+			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(getSession(), assetComment.actStart) : ''
 			
-		    def dueDate = assetComment.dueDate ? dateFormatter.format(TimeUtil.convertInToUserTZ(assetComment.dueDate, tzId)): ''
+		    def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate): ''
 	
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
@@ -1886,7 +1878,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			def noteList = assetComment.notes.sort{it.dateCreated}
 			def notes = []
 			noteList.each {
-				def dateCreated = it.dateCreated ? TimeUtil.convertInToUserTZ(it.dateCreated, tzId).format("E, d MMM 'at ' HH:mma") : ''
+				def dateCreated = it.dateCreated ? TimeUtil.formatDateTime(getSession(), it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3) : ''
 				notes << [ dateCreated , it.createdBy.toString() ,it.note]
 			}
 			
@@ -2417,8 +2409,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		
 		def project = securityService.getUserCurrentProject()
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		def lastUpdatedTime = params.lastUpdated ? AssetComment.findAll("from AssetComment where project =:project \
 						and commentType =:comment and lastUpdated like '%${params.lastUpdated}%'",
 						[project:project,comment:AssetCommentType.COMMENT])?.lastUpdated : []
@@ -2451,7 +2441,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				[
 					'',
 					(it.comment?.length()>50 ? (it.comment.substring(0,50) + '...') : it.comment).replace("\n",""), 
-					it.lastUpdated ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.lastUpdated, tzId)):'',
+					it.lastUpdated ? TimeUtil.formatDate(getSession(), it.lastUpdated):'',
 					it.commentType ,
 					it.assetEntity?.assetName ?:'',
 					it.assetEntity?.assetType ?:'',
@@ -2478,7 +2468,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		userPreferenceService.setPreference("assetListSize", "${maxRows}")
 
@@ -2486,8 +2475,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def person = securityService.getUserLoginPerson()
 		def moveBundleList
 		def today = new Date()
-		def runBookFormatter = new SimpleDateFormat("MM/dd kk:mm")
-		def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
 		def moveEvent		
 		if ( params.moveEvent?.size() > 0) {
 			// zero (0) = All events
@@ -2688,9 +2675,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			
 			def dueDate='' 
 			if (isRunbookTask) {
-				dueDate = it.estFinish ? runBookFormatter.format(TimeUtil.convertInToUserTZ(it.estFinish, tzId)) : ''
+				dueDate = it.estFinish ? TimeUtil.formatDateTime(getSession(), it.estFinish, TimeUtil.FORMAT_DATE_TIME_4) : ''
 			} else {
-				dueDate = it.dueDate ? dueFormatter.format(TimeUtil.convertInToUserTZ(it.dueDate, tzId)) : ''
+				dueDate = it.dueDate ? TimeUtil.formatDate(getSession(), it.dueDate) : ''
 			}
 			
 			def deps = TaskDependency.findAllByPredecessor( it )
@@ -2779,9 +2766,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				result = task.createdBy ? task.createdBy.toString(): ''
 			break;
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart/:
-				def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
-				def dueFormatter = new SimpleDateFormat("MM/dd/yyyy")
-				result = task[value] ? dueFormatter.format(TimeUtil.convertInToUserTZ(task[value], tzId)) : ''
+				result = task[value] ? TimeUtil.formatDate(getSession(), task[value]) : ''
 			break;
 			default :
 				result= task[value]
@@ -3635,8 +3620,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	def exportSpecialReport() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
-		def formatter = new SimpleDateFormat("yyyyMMdd")
-		def today = formatter.format(new Date())
+		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		try{
 			def filePath = "/templates/TDS-Storage-Inventory.xls"
 			def filename = "${project.name}SpecialExport-${today}"
@@ -4124,8 +4108,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	
 	def exportPoiDemo() {
 		def filePath = "/templates/TDSMaster_Poi_template.xls" // Template file Path
-		def formatter = new SimpleDateFormat("yyyyMMdd")
-		def today = formatter.format(new Date())
+		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		def filename = "Demo_POI_Export-${today}" // Export file name
 		def project = securityService.getUserCurrentProject()
 

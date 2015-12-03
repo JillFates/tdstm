@@ -1,9 +1,9 @@
-import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.TimeUtil
 class MoveEventNews {
 	MoveEvent moveEvent
 	String message
 	Integer isArchived = 0
-	Date dateCreated = GormUtil.convertInToGMT( "now", "EDT" )
+	Date dateCreated = TimeUtil.nowGMT()
 	Date dateArchived 
 	String resolution
 	Person archivedBy

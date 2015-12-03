@@ -594,6 +594,7 @@ class RunbookService {
 		def edgesBySucc = dependencies.asGroup { it.successor.id }
 
 		def estFinish
+		def safetyValve
 
 		// 
 		// Main Loop
@@ -619,7 +620,7 @@ class RunbookService {
 			def criticalPathQueue = [[task:task, time:time]]
 			while (criticalPathQueue.size() > 0) {
 
-				def safetyValve = dependencies.size() * 20
+				safetyValve = dependencies.size() * 20
 				if (--safetyValve == 0) {
 					throw new RuntimeException("computeStartTimes() caught in infinite loop for Critical Path (task ${newTask.taskNumber})")
 				}
