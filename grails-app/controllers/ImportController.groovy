@@ -184,6 +184,7 @@ class ImportController {
 				trigger.jobDataMap.put('userLoginId', userLogin.id)
 				trigger.jobDataMap.put('projectId', project.id)
 				trigger.jobDataMap.put('timeZoneId', getSession().getAttribute( "CURR_TZ" )?.CURR_TZ)
+				trigger.jobDataMap.put('dtFormat', getSession().getAttribute( "CURR_DT_FORMAT" )?.CURR_DT_FORMAT)
 
 				trigger.setJobName('AssetImportProcessJob')			// Please note that the JobName must matche the class file name
 				trigger.setJobGroup('tdstm-asset-import-process')	// and that the group should be specifed in the Job

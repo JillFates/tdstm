@@ -24,30 +24,29 @@ class TimeUtilTests extends Specification {
 	public void testAgoWithTwoDates() {
 		Date start = new Date()
 		Date end
+		def validDates = true
 		use( TimeCategory ) {
-			when:
-		    	end = start + 1.day + 2.hours + 5.minutes + 21.seconds
-		    then:
-		    	'1d 2h' == TimeUtil.ago(start, end)
-		    	'1-day 2-hrs' == TimeUtil.ago(start, end, TimeUtil.ABBREVIATED)
-		    	'1-day 2-hours' == TimeUtil.ago(start, end, TimeUtil.FULL)
+			end = start + 1.day + 2.hours + 5.minutes + 21.seconds
 
-		    when:
-		    	end = start + 3.hours
-		    then:
-		    	'3h' == TimeUtil.ago(start, end)
+			validDates = validDates && ('1d 2h' == TimeUtil.ago(start, end))
+			validDates = validDates && ('1-day 2-hrs' == TimeUtil.ago(start, end, TimeUtil.ABBREVIATED))
+			validDates = validDates && ('1-day 2-hours' == TimeUtil.ago(start, end, TimeUtil.FULL))
 
-		    when:
-		    	end = start + 3.hours + 24.minutes
-		    then:
-		    	'3h 24m' == TimeUtil.ago(start, end)
+			end = start + 3.hours
 
-		    when:
-		    	end = start + 3.hours + 11.seconds
-		    then:
-		    	'3h' == TimeUtil.ago(start, end)
+			validDates = validDates && ('3h' == TimeUtil.ago(start, end))
+
+			end = start + 3.hours + 24.minutes
+
+			validDates = validDates && ('3h 24m' == TimeUtil.ago(start, end))
+
+			end = start + 3.hours + 11.seconds
+
+			validDates = validDates && ('3h' == TimeUtil.ago(start, end))
 		}
 
+		expect:
+			validDates
 	}
 
 	public void testAgoWithTimeDuration() {
@@ -83,31 +82,50 @@ class TimeUtilTests extends Specification {
 
 	}
 
-	public void testTimezoneOffsetToGMT() {
-		// Only use timezones that do not support DST (lucky bastards)
-		List tzData = [
-			['Asia/Singapore', 					'+08:00'],
-			['Asia/Kathmandu', 					'+05:45'],
-			['Pacific/Tongatapu',				'+13:00'],
-			['America/Argentina/Buenos_Aires',	'-03:00'],
-			['America/Caracas', 				'-04:30'],
-			['America/Phoenix',					'-07:00']
+	public void testParseDate() {
+		// ******************************************
+		// Test dates using date format: "MM/DD/YYYY"
+		def sessionDateFormat = "MM/DD/YYYY"
+		def sessionTimeZone = "GMT"
+
+		// Mock session behaviour
+		def session = [
+			"getAttribute": { param ->
+				if ("CURR_DT_FORMAT" == param) {
+					return ["CURR_DT_FORMAT": sessionDateFormat]
+				} else if ("CURR_TZ" == param) {
+					return ["CURR_TZ": sessionTimeZone]
+				}
+			}
 		]
 
-		for (int i=0; i < tzData.size(); i++) {
-			String tzs = tzData[i][0]
-			TimeZone tz = TimeZone.getTimeZone(tzs)
-			// println "TZ=$tzs\n$tz"
+		def testDate = new Date()
+		testDate.clearTime()
+		testDate.set(year: 2014, month: 9, date: 5)
 
-			// Make sure the above timezones exist (if not found it is getTimeZone returns GMT)
-			assertEquals "Invalid TZ $tzs", tzs, tz.getID()
-
-			// Make sure that the test cases don't use DST
-			assertFalse "$tzs supports DST", tz.useDaylightTime()
-
-			// Check the results
-			assertEquals tzs, tzData[i][1], TimeUtil.timezoneOffsetToGMT(tz)
-		}
+		expect:
+			testDate.equals(TimeUtil.parseDate(session, '10/5/2014'))
 	}
-	
+
+	public void testParseDateTime() {
+		def sessionDateFormat = "MM/DD/YYYY"
+		def sessionTimeZone = "GMT"
+
+		// Mock session behaviour
+		def session = [
+			"getAttribute": { param ->
+				if ("CURR_DT_FORMAT" == param) {
+					return ["CURR_DT_FORMAT": sessionDateFormat]
+				} else if ("CURR_TZ" == param) {
+					return ["CURR_TZ": sessionTimeZone]
+				}
+			}
+		]
+
+		def testDate = new Date(Date.UTC(114, 9, 5, 10, 15, 0))
+
+		expect:
+			testDate.equals(TimeUtil.parseDateTime(session, '10/5/2014 10:15 AM'))
+	}
+
 }

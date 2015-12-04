@@ -20,6 +20,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WorkbookUtil
+import com.tdssrc.grails.TimeUtil
 
 class AssetEntityAttributeLoaderService {
 
@@ -1319,9 +1320,11 @@ class AssetEntityAttributeLoaderService {
 	 * @param Integer the row number being processed
 	 * @param List the list of warning messages
 	 * @param Integer the counter for error conflicts
+	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @param dtFormat - the date time format of the current user
 	 * @return void
 	 */	 
-	def setCommonProperties(project, asset, dtv, rowNum, warnings, errorConflictCount) {
+	def setCommonProperties(project, asset, dtv, rowNum, warnings, errorConflictCount, tzId, dtFormat) {
 		// def handled = true
 		def property = dtv.eavAttribute.attributeCode
 		def value = dtv.importValue
@@ -1356,15 +1359,16 @@ class AssetEntityAttributeLoaderService {
 				log.debug "setCommonProperties() Have $property with value '$value'"
 				if (value) {
 					try {
-						newVal = TimeUtil.parseDate(value)
-						if (asset[property] != newVal ) {
-							asset[property] = newVal
+						def newDate = TimeUtil.parseDate(dtFormat, value, TimeUtil.FORMAT_DATE)
+						if (asset[property] != newDate ) {
+							asset[property] = newDate
 						}
 					} catch (e) {
 						warnings << "Invalid date (${value}) for $property on row $rowNum" + 
 							(asset.assetName ? ", asset '${asset.assetName}'" : '') +
 							', proper format mm/dd/yyyy'
 						errorConflictCount++
+						log.error("Can't parse date value for property $property: " + e.getMessage(), e)
 					}
 				}
 				break

@@ -536,10 +536,11 @@ class ImportService {
 	 * @param batchId - the id number of the DataTransferBatch to be processed
 	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param timeZoneId - the timezone of the current user
+	 * @param dtFormat - the date time format of the current user
 	 * @return map of the various attributes returned from the service
 	 */
 	@Transactional
-	Map invokeAssetImportProcess(Long projectId, Long userLoginId, Long batchId, String progressKey, timeZoneId) {
+	Map invokeAssetImportProcess(Long projectId, Long userLoginId, Long batchId, String progressKey, timeZoneId, dtFormat) {
 		Map results = [:]
 		String errorMsg
 		String methodName = 'invokeAssetImportProcess()'
@@ -572,7 +573,7 @@ class ImportService {
 						assert domainName
 						String servicMethodName = "process${domainName}Import"
 
-						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId) 
+						results = this."$servicMethodName"(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat) 
 						errorMsg = results.error
 						dtb = dtb.merge()
 						if (errorMsg) {
@@ -628,9 +629,10 @@ class ImportService {
 	 * @param batchId - the id number of the batch to be processed
 	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @param dtFormat - the date time format of the current user
 	 * @return map of the various attributes returned from the service
 	 */
-	private Map processApplicationImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processApplicationImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId, dtFormat) {
 
 		// Flag if we want performance information throughout the method
 		boolean performance=true
@@ -784,7 +786,7 @@ class ImportService {
 
 					default:
 						// Try processing all common properties
-						assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount)
+						assetEntityAttributeLoaderService.setCommonProperties(project, application, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 
 				} // switch(attribName)
 
@@ -851,9 +853,10 @@ class ImportService {
 	 * @param batchId - the id number of the batch to be processed
 	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @param dtFormat - the date time format of the current user
 	 * @return map of the various attributes returned from the service
 	 */
-	private Map processAssetEntityImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processAssetEntityImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId, dtFormat) {
 		String methodName='processAssetEntityImport()'
 		AssetClass assetClass = AssetClass.DEVICE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1019,7 +1022,7 @@ class ImportService {
 
 						default: 
 							// Try processing all common properties
-							assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount)
+							assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 					}
 				}
 
@@ -1215,9 +1218,10 @@ class ImportService {
 	 * @param batchId - the id number of the batch to be processed
 	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @param dtFormat - the date time format of the current user
 	 * @return map of the various attributes returned from the service
 	 */
-	private Map processDatabaseImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processDatabaseImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId, dtFormat) {
 		String methodName='processDatabaseImport()'
 		AssetClass assetClass = AssetClass.DATABASE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1299,7 +1303,7 @@ class ImportService {
 
 					default:
 						// Try processing all common properties
-						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount)
+						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 
 				}
 
@@ -1354,9 +1358,10 @@ class ImportService {
 	 * @param batchId - the id number of the batch to be processed
 	 * @param progressKey - the key reference the progressService job to update users of the progress
 	 * @param tzId - the timezone of the user whom is logged in to compute dates based on their TZ
+	 * @param dtFormat - the date time format of the current user
 	 * @return map of the various attributes returned from the service
 	 */
-	private Map processFilesImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId) {
+	private Map processFilesImport(Long projectId, Long userLoginId, Long batchId, String progressKey, tzId, dtFormat) {
 		String methodName='processAssetEntityImport()'
 		AssetClass assetClass = AssetClass.STORAGE
 		def domainClass = AssetClass.domainClassFor(assetClass)
@@ -1446,7 +1451,7 @@ class ImportService {
 
 					default:
 						// Try processing all common properties
-						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount)
+						assetEntityAttributeLoaderService.setCommonProperties(project, asset, it, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 				}
 
 			}

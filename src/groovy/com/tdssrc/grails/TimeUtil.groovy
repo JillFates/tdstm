@@ -4,11 +4,16 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods 
  */
 class TimeUtil {
+
+	private static final LOG = LogFactory.getLog(TimeUtil.class)
+
 	//TODO: Remove!!!
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
@@ -358,7 +363,27 @@ class TimeUtil {
 			result = formatter.parse(dateValue)
 			result.clearTime()	
 		} catch (Exception e) {
-			System.out.println("Invalid date: " + e.getMessage())
+			LOG.error("Invalid date: " + e.getMessage(), e)
+		}
+		return result
+	}
+
+	/**
+	 * Used to parse a string value into a Date, based in the format defined by formatType.
+	 * For dates (without time) is not required to applied a timezone.
+	 * @param formatType the format type to be used, valid values defined in dateTimeFormatTypes
+	 * @param dateValue the date to format
+	 * @param the formatterType defines the format to be used
+	 * @return The date
+	 **/
+	public static Date parseDate(String formatType, String dateValue, String formatterType=FORMAT_DATE) {
+		def formatter = createFormatterForType(formatType, formatterType)
+		def result
+		try {
+			result = formatter.parse(dateValue)
+			result.clearTime()	
+		} catch (Exception e) {
+			LOG.error("Invalid date: " + e.getMessage(), e)
 		}
 		return result
 	}
@@ -389,7 +414,7 @@ class TimeUtil {
 		try {
 			result = formatter.parse(dateValue)
 		} catch (Exception e) {
-			System.out.println("Invalid date time: " + e.getMessage())
+			LOG.error("Invalid date time: " + e.getMessage(), e)
 		}
 		return result
 	}

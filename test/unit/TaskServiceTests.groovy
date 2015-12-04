@@ -216,21 +216,34 @@ class TaskServiceTests extends Specification {
 			msg == null
 			checkDurations(label, task, 10, TimeScale.H)
 
-		when:
+	}
+
+	void testSetTaskDurationInvalidProperty() {
+		def task = new AssetComment()
+		task.assetEntity = new AssetEntity()
+
+		def msg 
+		def label
+		shouldFail(Exception) {
 			label = 'Indirect with invalid property'
 			resetTaskDuration(task)
 			task.assetEntity.custom1 = null
 			msg = taskService.setTaskDuration(task, '#fubar,10h')
-		then:
-			msg != null
+		}
+	}
 
-		when:
+	void testSetTaskDurationInvalidNumber() {
+		def task = new AssetComment()
+		task.assetEntity = new AssetEntity()
+
+		def msg 
+		def label
+		shouldFail(Exception) {
 			label = 'Indirect with invalid default'
 			resetTaskDuration(task)
 			task.assetEntity.custom1 = 10
 			msg = taskService.setTaskDuration(task, '#fubar, abc')
-		then:
-			msg != null
+		}
 	}
 
 }

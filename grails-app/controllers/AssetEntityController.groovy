@@ -340,7 +340,7 @@ class AssetEntityController {
 			} else {
 				if ( (dtaMapField.columnName in importColumnsDateType) )  {
 					if (!StringUtil.isBlank(cellValue)) {
-						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, getSession())
+						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, getSession(), TimeUtil.FORMAT_DATE_TIME_12)
 						// Convert to string in the date format
 						if (dateValue) {
 							cellValue = TimeUtil.formatDate(getSession(), dateValue)
@@ -402,7 +402,7 @@ class AssetEntityController {
 		} catch (Exception e) {
 			results.errors << "Insert failed : ${e.getMessage()}"
 			// skipped << "$sheetName [row ${( rowOffset + 1 )}] <ul><li>${errorMsgList.join('<li>')}</ul>"
-			log.error "insertRowValues() Importing row ${( rowOffset + 1 )} failed : ${e.getMessage()}"
+			log.error("insertRowValues() Importing row ${( rowOffset + 1 )} failed : ${e.getMessage()}", e)
 			success = false
 		}
 		return success
@@ -757,6 +757,18 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	 */
 	def upload() {
 
+		// ----------------------------------------------
+		// Actual start of the method
+		// ----------------------------------------------
+
+		def (project, userLogin) = controllerService.getProjectAndUserForPage(this, 'Import')
+		if (!project) {
+			warnMsg=flash.message
+			flash.message=null
+			forward (action:forwardAction, params:[error:warnMsg])
+			return
+		}
+
 		// ------
 		// Some variables that are referenced by the following closures
 		// ------
@@ -824,18 +836,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			}
 		}
 
-		// ----------------------------------------------
-		// Actual start of the method
-		// ----------------------------------------------
-
-		def (project, userLogin) = controllerService.getProjectAndUserForPage(this, 'Import')
-		if (!project) {
-			warnMsg=flash.message
-			flash.message=null
-			forward (action:forwardAction, params:[error:warnMsg])
-			return
-		}
-
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 
@@ -892,10 +892,10 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def currentUser = null
 
 		//get column name and sheets
-		retrieveColumnNames(serverDTAMap, serverColumnslist, project)
-		retrieveColumnNames(appDTAMap, appColumnslist, project)
-		retrieveColumnNames(databaseDTAMap, databaseColumnslist, project)
-		retrieveColumnNames(filesDTAMap, filesColumnslist, project)
+		//retrieveColumnNames(serverDTAMap, serverColumnslist, project)
+		//retrieveColumnNames(appDTAMap, appColumnslist, project)
+		//retrieveColumnNames(databaseDTAMap, databaseColumnslist, project)
+		//retrieveColumnNames(filesDTAMap, filesColumnslist, project)
 
 		int dependencyCount = 0
 		int cablingCount = 0
@@ -1337,7 +1337,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						// Try reading the created date as a date and if that fails try as a string and parse
 						cols++
 						def dateCreated
-						def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession())	
+						def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), TimeUtil.FORMAT_DATE)	
 						if (createdDateInput) {
 							dateCreated = createdDateInput
 						} else {

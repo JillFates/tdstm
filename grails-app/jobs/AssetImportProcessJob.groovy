@@ -25,7 +25,8 @@ class AssetImportProcessJob {
 	 void execute(context) {
 	 	String errorMsg
 	 	String progressKey
-	 	String timeZoneId 
+	 	String timeZoneId
+	 	String dtFormat
 	 	Map results
 	 	Long projectId, userLoginId, batchId
 
@@ -39,12 +40,13 @@ class AssetImportProcessJob {
 			userLoginId = dataMap.getLongValue('userLoginId')
 			progressKey = dataMap.getString('progressKey')
 			timeZoneId = dataMap.getString('timeZoneId')
+			dtFormat = dataMap.getString('dtFormat')
 
-			log.debug "execute() batchId=$batchId, projectId=$projectId, userLoginId=$userLoginId, timeZoneId=$timeZoneId, progressKey=$progressKey"
+			log.debug "execute() batchId=$batchId, projectId=$projectId, userLoginId=$userLoginId, timeZoneId=$timeZoneId, progressKey=$progressKey, dtFormat=$dtFormat"
 
 			log.info "execute() is about to invoke importService.invokeAssetImportProcess to start processing batch ($batchId)"
 
-			results = importService.invokeAssetImportProcess(projectId, userLoginId, batchId, progressKey, timeZoneId)
+			results = importService.invokeAssetImportProcess(projectId, userLoginId, batchId, progressKey, timeZoneId, dtFormat)
 
 			log.info "execute() return from importService.invokeAssetImportProcess() : results=$results"
 			
