@@ -50,7 +50,7 @@
 			</g:if>
 
 			<div id="processDiv" style="display: none;">
-				<img src="${resource(dir:'images',file:'processing.gif')}" /> Merging In Progress...
+				<img src="../images/processing.gif" /> Merging In Progress...
 			</div>
 			<div id="roomListView" style="width:500px;">
 				<g:if test="${roomId && viewType != 'list'}">

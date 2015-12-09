@@ -141,7 +141,7 @@
 					</tr>
 					<tr id="processDiv" ng-show="havePredecessor">
 						<td></td>
-						<td><img id="processingId" src="${resource(dir:'images',file:'processing.gif')}" ng-show="!predecessorLoaded" /></td>
+						<td><img id="processingId" src="../images/processing.gif" ng-show="!predecessorLoaded" /></td>
 					</tr>
 					<tr ng-show="isEdit">
 						<td valign="top" class="name"><label for="createdBy">Created By:</label></td>

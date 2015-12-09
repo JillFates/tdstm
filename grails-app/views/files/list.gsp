@@ -98,7 +98,7 @@
 
 				<g:each var="key" in="['1','2','3','4','5']">
 					var filePref= '${filesPref[key]}';
-					$("#storageIdGrid_"+filePref).append('<img src="${resource(dir:\'images\',file:\'select2Arrow.png\')}" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
+					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
 				</g:each>
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';

@@ -218,7 +218,7 @@ a:hover {
 	<div id="flushOldBatchId" class="personShow" style="display: none;" title="Flush import data">
 	<div id="respMsgId" style="display: none" class="message"></div>
 	<div id="processDivId" style="display: none">
-		<img src="${resource(dir:'images',file:'processing.gif')}" />
+		<img src="../images/processing.gif" />
 	</div>
 	<input type="radio" name="deleteHistory" id="doNothing" value="doNothing" checked="checked"> <label for="doNothing">Do Nothing </label><br>
 	<input type="radio" name="deleteHistory" id="overTwoMonths" value="overTwoMonths" > <label for="overTwoMonths">Over Two Months</label><br>
@@ -232,10 +232,10 @@ a:hover {
 </div>
 <div id="showOrCleanTypeId" title="Clean Asset Types">
 	<div id="cleanProcessId" style="display: none; " >
-		Processing...<img src="${resource(dir:'images',file:'processing.gif')}" /> 
+		Processing...<img src="../images/processing.gif" /> 
 	</div>
 	<div id="cleanProcessDivId" class="cleanProcessDiv">
-		<img src="${resource(dir:'images',file:'processing.gif')}" />
+		<img src="../images/processing.gif" />
 	</div>
 	<div class="buttons">
 		<input type="button" id="cleanTypes" class="save" value="Clean" onclick="cleanTypes()"/> 

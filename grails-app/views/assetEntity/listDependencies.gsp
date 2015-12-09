@@ -58,7 +58,7 @@
 				</jqgrid:grid>
 				<g:each var="key" in="['1','2']">
 					var depPref= '${depPref[key]}';
-					$("#dependencyGridIdGrid_"+depPref).append('<img src="${resource(dir:\'images\',file:\'select2Arrow.png\')}" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+depPref+'\',\'dependencyGrid\',\''+${key}+'\')">');
+					$("#dependencyGridIdGrid_"+depPref).append('<img src="../images/select2Arrow.png" class="selectImage editSelectimage_'+${key}+'" style="position:relative;float:right;margin-top: -15px;" onclick="showSelect(\''+depPref+'\',\'dependencyGrid\',\''+${key}+'\')">');
 				</g:each>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObject) {

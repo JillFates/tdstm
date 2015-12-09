@@ -31,7 +31,7 @@
 </g:form>
 </div>
 <div id="processDiv" style="display: none;">
-	<img src="${resource(dir:'images',file:'processing.gif')}" />
+	<img src="../images/processing.gif" />
 </div>
 <br></br>
 <div id="projectReportDiv" style="display:none;min-width: 1000px;"></div>

@@ -133,7 +133,7 @@ function pageRefresh(){
 	document.issueAssetForm.action = 'listTasks'
 	document.issueAssetForm.submit()
 }
-var image = "<tr><td><div><img src='"+contextPath+"${resource(dir:'images',file:'processing.gif')}'></div></td></tr>"
+var image = "<tr><td><div><img src='"+contextPath+"/images/processing.gif'></div></td></tr>"
 function loadRelatedEntities(id){
 	jQuery.ajax({
 		url: contextPath+'/dashboard/retrieveRelatedEntities',
