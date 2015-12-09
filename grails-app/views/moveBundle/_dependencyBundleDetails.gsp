@@ -25,7 +25,7 @@
 			&nbsp;Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered
 		</div>
 		<div id="processDiv" style="display: none;">
-			<img src="../images/processing.gif" />
+			<img src="${resource(dir:'images',file:'processing.gif')}" />
 		</div>
 	</div>
 	<div style="border: 1px solid #63A242; margin-left: 0px;">

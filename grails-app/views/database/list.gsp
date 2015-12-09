@@ -110,7 +110,7 @@
 			 });
 			<g:each var="key" in="['1','2','3','4','5']">
 				var dbPref= '${dbPref[key]}';
-				$("#databaseIdGrid_"+dbPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+dbPref+'\',\'database\',\''+${key}+'\')">');
+				$("#databaseIdGrid_"+dbPref).append('<img src="${resource(dir:\'images\',file:\'select2Arrow.png\')}" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+dbPref+'\',\'database\',\''+${key}+'\')">');
 			</g:each>
 				
 			$.jgrid.formatter.integer.thousandsSeparator='';
