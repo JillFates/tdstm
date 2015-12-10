@@ -16,6 +16,7 @@ import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import net.transitionmanager.PasswordReset
 import net.transitionmanager.EmailDispatch
+import grails.converters.JSON
 
 class AuthController {
 	
@@ -353,7 +354,7 @@ class AuthController {
 				EmailDispatchOrigin.PASSWORD_RESET,
 				"Your TransitionManager password has changed",
 				"passwordResetNotif",
-				"",
+				[:] as JSON,
 				pr.userLogin.person.email,
 				pr.userLogin.person.email,
 				pr.userLogin.person,
