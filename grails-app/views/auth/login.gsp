@@ -5,9 +5,10 @@
 	<title>Login</title>
 	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
 	<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<meta name="viewport" content="height=device-height,width=device-width" />
-	
+	<g:javascript src="jquery-1.9.1.js"/>
 	<g:javascript library="application" />
 </head>
 <body onload="setFieldFocus()">
@@ -25,6 +26,15 @@
 
 	/* break us out of any containing div or iframes */
 	if (top != self) { top.location.replace(self.location.href); }
+
+	$(document).ready(function() {
+		$("#submitButton").click(function(){
+					$("#overlay").css('display', 'inline')
+					$("#submitButton").attr('disabled', true)
+					var form = $("form")[0]
+					form.submit()
+		})
+	})
 
 </script>
 
@@ -90,7 +100,7 @@
 							</tr>
 							<tr>
 								<td class="buttonR" colspan="2" style="text-align:center;">
-									<input type="submit" value="Sign in" />
+									<input type="submit" value="Sign in" id="submitButton" />
 									<br style="height: 4px;"><br/>
 									<g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link>
 								</td>
@@ -116,5 +126,23 @@
 	</div>
 </div>
 <div class="logo"></div>
+
+
+		<div id="overlay">
+		    <div id="overlay-wrapper">
+		        <div id="floatingBarsG">
+		            <div class="blockG" id="rotateG_01"></div>
+		            <div class="blockG" id="rotateG_02"></div>
+		            <div class="blockG" id="rotateG_03"></div>
+		            <div class="blockG" id="rotateG_04"></div>
+		            <div class="blockG" id="rotateG_05"></div>
+		            <div class="blockG" id="rotateG_06"></div>
+		            <div class="blockG" id="rotateG_07"></div>
+		            <div class="blockG" id="rotateG_08"></div>
+		        </div>
+		    </div>
+		</div>
+
+
 </body>
 </html>
