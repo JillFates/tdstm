@@ -231,7 +231,7 @@
 							alert("There was an error trying to reset the user's password. Please, contact your System Administrator.")
 						}
 					})
-
+				})
 			});
 		</script>
 	</body>
