@@ -52,6 +52,7 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.ValidationType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.AssetDependencyType
 import com.tdssrc.eav.*
 import com.tdssrc.grails.ApplicationConstants
 import com.tdssrc.grails.ExportUtil
@@ -1015,6 +1016,20 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					dependencySkipped--
 				}
 
+				def assetDepTypeList = AssetDependencyType.getList()
+				def assetDepStatusList = AssetDependencyStatus.getList()
+
+				def lookupValue = { value, list->
+				    def result = "Unknown"
+				    x.each{
+				        if(it.equalsIgnoreCase(value)){
+				            result = it
+				        }
+				    }
+				    return result
+
+				}
+
 				for ( int r = 1; r <= dependencySheetRow ; r++ ) {
 					// Assume that the dependency is skipped and we'll decrement when the row is saved at the bottom
 					dependencySkipped++
@@ -1166,14 +1181,17 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					if (assetDep) {
 						assetDep.asset = asset
 						assetDep.dependent = dependent
-						assetDep.type = WorkbookUtil.getStringCellValue(dependencySheet, 7, r, "").replace("'","\\'")
+						def tmpType = WorkbookUtil.getStringCellValue(dependencySheet, 7, r, "").replace("'","\\'")
+						assetDep.type = lookupValue(tmpType, assetDepTypeList)
 						
 						assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "").replace("'","\\'") ?: 
 							(isNew ? "Unknown" : assetDep.dataFlowFreq)
 						assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "").replace("'","\\'") ?: 
 							(isNew ? "Unknown" : assetDep.dataFlowDirection)
-						assetDep.status = WorkbookUtil.getStringCellValue(dependencySheet,10, r , "").replace("'","\\'") ?: 
+						
+						def tmpStatus = WorkbookUtil.getStringCellValue(dependencySheet,10, r , "").replace("'","\\'") ?: 
 							(isNew ? "Unknown" : assetDep.status)
+						assetDep.status = lookupValue(tmpStatus, assetDepStatusList)
 						
 						def depComment = WorkbookUtil.getStringCellValue(dependencySheet, 11, r , "").replace("'","\\'")
 						def length = depComment.length()
