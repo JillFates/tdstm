@@ -1272,7 +1272,7 @@ var EntityCrud = ( function($) {
 		// Stuff the new row html into the table
 		var dependencyList = $('#'+supportDepend+'List');
 		if (dependencyList.length)
-			dependencyList.append("<tr id='"+rowId+"'>"+rowData+'</tr>');
+			dependencyList.prepend("<tr id='"+rowId+"'>"+rowData+'</tr>');
 		else
 			console.log('EntityCrud.addAssetDependencyRow() unable to locate #'+supportDepend+'List');
 
