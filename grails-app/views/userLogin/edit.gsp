@@ -7,9 +7,7 @@
 			var flag 
 			$().ready(function() {
 				var isLocal = ${userLoginInstance.isLocal}
-				if (isLocal) {
-					$(".passwordsEditFields").css('display', 'none');
-				} else {
+				if (!isLocal) {
 					$(".passwordsEditFields").hide();
 				}
 
