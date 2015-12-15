@@ -661,17 +661,7 @@ class CommentService {
 			
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
-			
-			// TODO : Runbook : the use of maxVal is incorrect.  I believe that this is for the max assetComment.taskNumber but is getting taskDependency.id. This fails
-			// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
-			// while assigning in the map.  Logic should test for null.
-			def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
-			if (maxVal) {
-				maxVal++
-			} else {
-				maxVal = 1
-			}
-			
+		
 			def predecessorTable = ""
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
@@ -708,7 +698,7 @@ class CommentService {
 				assetComment:assetComment, personCreateObj:personCreateObj, personResolvedObj:personResolvedObj, dtCreated:dtCreated ?: "",
 				dtResolved:dtResolved ?: "", assignedTo:assetComment.assignedTo?.toString() ?:'', assetName:assetComment.assetEntity?.assetName ?: "",
 				eventName:assetComment.moveEvent?.name ?: "", dueDate:dueDate, etStart:etStart, etFinish:etFinish,atStart:atStart,notes:notes,
-				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,maxVal:maxVal,
+				workflow:workflow,roles:roles, predecessorTable:predecessorTable, successorTable:successorTable,
 				cssForCommentStatus:cssForCommentStatus, statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
 				successorsCount:successorsCount, predecessorsCount:predecessorsCount, assetId:assetComment.assetEntity?.id ?: "" ,
 				assetType:assetComment.assetEntity?.assetType ,staffRoles:taskService.getRolesForStaff(), servers : entities.servers, 

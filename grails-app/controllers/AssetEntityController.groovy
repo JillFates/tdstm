@@ -1903,16 +1903,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
 			
-			// TODO : Runbook : the use of maxVal is incorrect.  I believe that this is for the max assetComment.taskNumber but is getting taskDependency.id. This fails
-			// when there are no taskDependencies as Null gets incremented down in the map return.  Plus the property should be completely calculated here instead of incrementing
-			// while assigning in the map.  Logic should test for null.
-			def maxVal = TaskDependency.list([sort:'id',order:'desc',max:1])?.id[0]
-			if (maxVal) {
-				maxVal++
-			} else {
-				maxVal = 1
-			}
-			
 			def instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
 			def instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
 			
@@ -1973,7 +1963,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				roles:roles?:'Unassigned', 
 				predecessorTable:predecessorTable, 
 				successorTable:successorTable,
-				maxVal:maxVal,
 				cssForCommentStatus: cssForCommentStatus, 
 				statusWarn: taskService.canChangeStatus ( assetComment ) ? 0 : 1, 
 				successorsCount: successorsCount, 
