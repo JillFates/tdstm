@@ -112,4 +112,5 @@ databaseChangeLog = {
 	include file: '20150827-set-timezone-and-datetime-user-preferences.groovy'
 	include file: '20151020-set-custom-fields-to-hidden.groovy'
 	include file: '20151214-fix-invalid-status-and-type-values-in-assetdep.groovy'
+	include file: '20151214-remove-new-or-old-column-from-asset-entity.groovy'
 }
