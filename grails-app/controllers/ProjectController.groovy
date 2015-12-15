@@ -858,8 +858,7 @@ class ProjectController {
 			try{
 				def accounts = projectService.getAccountActivationUsers(project)		
 				// Find the accounts that could get the notice and filter only those that were checked in the form
-				List accountsToNotify = accounts.findAll{ it.personId in selectedAccounts}
-				
+				List accountsToNotify = accounts.findAll{ it.personId.toString() in selectedAccounts}
 				if (accountsToNotify) {
 					String fromEmail = null
 					if (params["sendFrom"] == "DEFAULT") {

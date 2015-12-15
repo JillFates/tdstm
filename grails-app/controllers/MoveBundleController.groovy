@@ -504,7 +504,8 @@ class MoveBundleController {
 			def filesCount = moveBundles ? Files.executeQuery(filesCountQuery, eventWiseArgs)[0] : 0
 			filesList << ['moveEvent':moveEvent.id , 'count':filesCount]
 			
-			def otherCount = moveBundles ? AssetEntity.executeQuery(otherCountQuery, eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes() ])[0] : 0
+			def otherCount = moveBundles ? AssetEntity.executeQuery(otherCountQuery, 
+				eventWiseArgs + [ assetClass:AssetClass.DEVICE, type:AssetType.getNonOtherTypes() ])[0] : 0
 			otherTypeList << [ moveEvent:moveEvent.id , count:otherCount ]
 			
 			def openIssues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status IN (:status) \
@@ -617,7 +618,9 @@ class MoveBundleController {
 		def assignedPhysicalAsset = totalPhysicalServerCount - unassignedPhysicalServerCount
 		def assignedVirtualAsset = totalVirtualServerCount - unassignedVirtualServerCount
 		def totalServerCount = totalPhysicalServerCount + totalVirtualServerCount
-		def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount - phyNetworkCount
+		// def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount - phyNetworkCount
+		// TODO : JPM 12/2015 TM-4332 : We're including the Network Devices in the Other count for the time being
+		def otherAssetCount = totalDeviceCount - totalServerCount - phyStorageCount
 		def unassignedOtherCount = unassignedAllDeviceCount - unassignedPhysicalServerCount - unassignedVirtualServerCount - unAssignedPhyStorageCount - unAssignedPhyNetworkCount
 
 		// TODO - this is unnecessary and could just load the map

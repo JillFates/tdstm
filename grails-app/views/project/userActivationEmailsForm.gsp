@@ -38,47 +38,47 @@
 					</thead>
 					<tbody>
 						<g:each in="${accounts}" var='account'>
-							
-							<td style="text-align: center;"> 
-							  <input type="checkbox" name="person" value="${account.personId}"> 
-							</td>
+							<tr>
+								<td style="text-align: center;"> 
+								  <input type="checkbox" name="person" value="${account.personId}"> 
+								</td>
 
-							<td style="text-align: left;">
-								${account.firstName}
-							</td>
+								<td style="text-align: left;">
+									${account.firstName}
+								</td>
 
-							<td style="text-align: left;">
-								${account.lastName}
-							</td>
-							
-							<td style="text-align: left;">
-								${account.email}
-							</td>
-							
-							<td style="text-align: left;">
-								${account.company}
-							</td>
-							
-							<td style="text-align: left;">
-								${account.currentProject ? account.currentProject.projectCode : '' }
-							</td>
-							
-							<td style="text-align: left;">
-								${account.roles ? account.roles.join(', ') : ''}
-							</td>
+								<td style="text-align: left;">
+									${account.lastName}
+								</td>
+								
+								<td style="text-align: left;">
+									${account.email}
+								</td>
+								
+								<td style="text-align: left;">
+									${account.company}
+								</td>
+								
+								<td style="text-align: left;">
+									${account.currentProject ? account.currentProject.projectCode : '' }
+								</td>
+								
+								<td style="text-align: left;">
+									${account.roles ? account.roles.join(', ') : ''}
+								</td>
 
-							<td style="text-align: left;">
-								${account.expiry}
-							</td>
-							
-							<td style="text-align: left;">
-								<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-							</td>
+								<td style="text-align: left;">
+									${account.expiry}
+								</td>
+								
+								<td style="text-align: left;">
+									<tds:convertDateTime date="${account?.lastActivationNotice}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+								</td>
 
-							<td style="text-align: left;">
-								<tds:convertDateTime date="${account?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
-							</td>
-
+								<td style="text-align: left;">
+									<tds:convertDateTime date="${account?.dateCreated}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}" />
+								</td>
+							</tr>
 						</g:each>
 
 					</tbody>

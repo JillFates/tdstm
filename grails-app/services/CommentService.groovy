@@ -661,7 +661,6 @@ class CommentService {
 			
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
-		
 			def predecessorTable = ""
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {

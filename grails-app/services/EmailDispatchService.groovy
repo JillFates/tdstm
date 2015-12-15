@@ -130,8 +130,8 @@ class EmailDispatchService {
 					serverURL: grailsApplication.config.grails.serverURL,
 					activationURL :  grailsApplication.config.grails.serverURL + "/auth/resetPassword/" + emailParams.token,
 					ttl: emailParams.expiredTime,
-					sysAdminEmail: emailParams.from
-
+					sysAdminEmail: emailParams.from,
+					username: emailParams.username
 				]
 				break;
 			case "adminResetPassword":

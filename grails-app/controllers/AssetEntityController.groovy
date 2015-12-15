@@ -665,6 +665,8 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				def assetName = WorkbookUtil.getStringCellValue(sheetObject, assetNameColIndex, r )
 				if (! assetName) {
 					errorMsg = "missing required 'name'"
+					results.errors << "$assetSheetName [row ${( r + 1 )}] - $errorMsg"
+					rowHasErrors = true
 				} else { 
 
 					// Now check to see if the asset references a pre-existing asset by id #
@@ -925,6 +927,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			if (titleSheet != null) {			
 				try {
 					exportTime = TimeUtil.parseDateTime(getSession(), WorkbookUtil.getStringCellValue(titleSheet, 1, 5)) 
+					exportTime = GormUtil.convertInToGMT( exportTime, tzId )
 				} catch ( Exception e) {
 					log.info "Was unable to read the datetime for 'Export on': " + e.message
 					failWithError "The 'Exported On' datetime was not found or was invalid in the Title sheet"
@@ -1081,7 +1084,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 								dependencyError " invalid AssetDependencyId reference '$depId' (in A$rowNum)"
 								continue
 							}
-							log.debug "upload() found dependency by id"
+							log.debug "upload() found dependency by id $depId"
 						}
 					}
 
@@ -1150,18 +1153,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						}
 					}
 
-					/*
-					// This logic is already handled above
-
-					// Validate that the IDs specified in the spreadsheet are valid and associate to the project
-					List assetRefIds = [asset?.id, dependent?.id]
-					List invalidIdList = assetEntityService.validateAssetList(assetRefIds, project)
-					if ( invalidIdList ) {
-						importResults.errors << "Dependency Row $rowNum has invalid asset references ${invalidIdList}</li>"
-						continue
-					}
-					*/
-
 					def isNew = false
 					if (!assetDep) {
 
@@ -1170,6 +1161,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 						if (! assetDep) {						
 							assetDep = new AssetDependency()
+							assetDep.createdBy = userLogin.person
 							isNew = true
 						} else {
 						     String msg = message(code: "assetEntity.dependency.warning", args: [asset.assetName, dependent.assetName])
@@ -1207,21 +1199,18 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						assetDep.c4 = WorkbookUtil.getStringCellValue(dependencySheet, 15, r , "").replace("'","\\'")
 						assetDep.updatedBy = userLogin.person
 
-						if (isNew) {
-							assetDep.createdBy = userLogin.person
-						}
-
 						// Make sure that there are no domain constraint errors
 						if (assetDep.hasErrors()) {
 							dependencyError "Validation errors exist (row $rowNum) : ${GormUtil.allErrorsString(assetDep)}"
 							continue
 						} 
 
-						// If the Dependency wasn't changed jump out
-						if (! assetDep.dirtyPropertyNames) {
+						if (! isNew && ! assetDep.dirtyPropertyNames) {
 							dependencyUnchanged++
 							dependencySkipped--
 							continue
+						} else {
+							log.info "Changed fields ${assetDep.dirtyPropertyNames}"
 						}
 
 						// Attempt to save the record

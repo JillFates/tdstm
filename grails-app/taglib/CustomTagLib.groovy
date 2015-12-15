@@ -285,8 +285,7 @@ class CustomTagLib {
         if (from && datasource) {
             def first=true;
             def label;
-            out << "ng-options=\"item.v as item.l for item in $datasource  \" "
-            
+
             out << "ng-init=\"$datasource=["
             from.eachWithIndex {el, i ->
                 def keyValue = null
@@ -331,6 +330,10 @@ class CustomTagLib {
             out << '<option value="' << (noSelection.key == null ? "" : noSelection.key) << '"'
             out << '>' << noSelection.value.encodeAsHTML() << '</option>'
             out.println()
+        }
+
+        if(from && datasource) {
+        	out << "<option ng-selected=\"{{$ngModel == item.v}}\" value={{item.v}} ng-repeat=\"item in $datasource\">{{item.l}} </option> "
         }
 
         

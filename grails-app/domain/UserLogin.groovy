@@ -155,7 +155,6 @@ class UserLogin {
 			throw new DomainUpdateException('The user password is not managed in the application')
 		}
 		this.password = encryptPassword(unencryptedPassword)
-		this.forcePasswordChange = 'N'
 		this.failedLoginAttempts = 0
 		this.lockedOutUntil = null
 		return this.password

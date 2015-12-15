@@ -1144,8 +1144,9 @@ class ProjectService {
 	 * @param ipAddress: IP Address of the client's machine who triggered the notifications.
 	 */
 	def sendBulkActivationNotificationEmail(List accounts, String message, String from, String ipAddress){
-		def model = [customMessage: message, from:from]
 		accounts.each{account ->
+			// We instantiate the model map each time to clear out any data from the previous account.
+			def model = [customMessage: message, from: from, username: account.userLogin.username ]
 			securityService.sendResetPasswordEmail(account.email, ipAddress, PasswordResetType.WELCOME, model)
 		}		
 	}

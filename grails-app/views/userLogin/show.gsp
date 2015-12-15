@@ -119,7 +119,7 @@
 						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">Password Expires:</td>
 							<td nowrap="nowrap" valign="top" class="value">
-								<g:if test="${userLoginInstance?.lockedOutUntil}">
+								<g:if test="${userLoginInstance?.passwordExpirationDate}">
 									<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
 								</g:if>
 								<g:else>Never</g:else>

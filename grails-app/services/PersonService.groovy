@@ -1284,6 +1284,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 			// log.debug "getAvailableProjects() list 3: ${projects*.id}"
 		}
 
+		projects = projects.sort { it.name }
 		return projects
 	}
 

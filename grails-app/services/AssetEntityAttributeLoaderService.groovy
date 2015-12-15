@@ -363,7 +363,7 @@ class AssetEntityAttributeLoaderService {
 		def modifiedSinceExport = (asset.lastUpdated && asset.lastUpdated >= dataTransferBatch.exportDatetime)
 
 		if ( modifiedSinceExport ) {
-			log.debug "importValidation() Asset $asset was modified since the export"
+			log.info "importValidation() Asset $asset was modified at ${asset.lastUpdated}, after the export at ${dataTransferBatch.exportDatetime}"
 			// If the asset has been modified, see how many of the fields are in conflict
 			dtvList.each { dtValue->
 				def attribName = dtValue.eavAttribute.attributeCode
