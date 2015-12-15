@@ -104,56 +104,32 @@
 									<label for="isLocal">Local account:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
-                                    <input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal)?'checked="checked"':''}  
-                                    onchange="togglePasswordEditFields( $(this) )" />
-                                </td>
+									<input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}  
+										onchange="togglePasswordEditFields( $(this) )" onclick='if(this.checked){this.value = true} else {this.value = false }'/>
+								</td>
                             </tr>
+
 							<tr class="prop passwordsEditFields">
-                                <td valign="top" class="name">
-                                    <label for="forcePasswordChange">Force password change:</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
-                                    <input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" ${(userLoginInstance.forcePasswordChange=='Y')?'checked="checked"':''}/>
-                                </td>
-                            </tr> 
-                        	<tr class='passwordsEditFields'>
-								<td>
-									Hide password:
+								<td valign="top" class="name">
+									<label for="forcePasswordChange">Force password change:</label>
 								</td>
-								<td>
-									<input type="checkbox" onchange="togglePasswordVisibility(this)" id="showPasswordEditId"/>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'forcePasswordChange','errors')}">
+									<input type="checkbox" id="forcePasswordChange" name="forcePasswordChange" value="${userLoginInstance.forcePasswordChange}" ${(userLoginInstance.forcePasswordChange=='Y') ? 'checked="checked"' : ''}/>
 								</td>
 							</tr>
-                            <tr class="prop passwordsEditFields">
-                                <td valign="top" class="name">
-                                    <label for="password">Password:&nbsp;</label>
-                                </td>
-                                <td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'password','errors')}">
-                                    <input type="text" id="password" onkeyup="checkPassword(this)" name="password" value=""/>
+
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label for="passwordNeverExpiresId">Password never expires:</label>
+								</td>
 								
-                                <g:hasErrors bean="${userLoginInstance}" field="password">
-					            <div class="errors">
-					                <g:renderErrors bean="${userLoginInstance}" as="list" field="password"/>
-					            </div>
-					            </g:hasErrors>
-                                </td>
-                            </tr> 
-                            <tr class="passwordsEditFields">
-								<td>
-									Requirements:
-								</td>
-								<td>
-									<em id="usernameRequirementId">Password must not contain the username</em><br/>
-									<em id="lengthRequirementId">Password must be at least 8 characters long</em><br/>
-									<b id="passwordRequirementsId">Password must contain at least 3 of these requirements: </b><br/>
-									<ul>
-										<li><em id="uppercaseRequirementId">Uppercase characters</em></li>
-										<li><em id="lowercaseRequirementId">Lowercase characters</em></li>
-										<li><em id="numericRequirementId">Numeric characters</em></li>
-										<li><em id="symbolRequirementId">Nonalphanumeric characters</em></li>
-									</ul>
+								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'passwordNeverExpires','errors')}">
+									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" ${userLoginInstance.passwordNeverExpires ? 'checked="checked"' : ''}/>
 								</td>
 							</tr>
+
+							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength]}" />
+
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="passwordExpirationDate">Password Expires:</label>
