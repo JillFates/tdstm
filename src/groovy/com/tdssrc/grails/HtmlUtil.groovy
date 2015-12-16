@@ -121,9 +121,26 @@ class HtmlUtil {
 		if (link) {
 			result = link.toString()
 		} else {
-			println "HtmlUti.createLink() failed for map $map"
+			println "HtmlUtil.createLink() failed for map $map"
 		}
 		return result
+	}
+
+
+	/**
+	 * Creates a link to a given resource.
+	 * @param map - parameters to g:resource
+	 * @return url as String
+	 */
+	def public static createLinkToResource(map){
+		def link = g.resource(map)
+		String resourceUrl = ""
+		if(link){
+			resourceUrl = link.toString() 
+		}else{
+			println "HtmlUtil.createLinkToResource failed for parameters: $map"
+		}
+		return resourceUrl
 	}
 	
 	/**
@@ -147,52 +164,37 @@ class HtmlUtil {
 		return false
 	}
 	
-	public static boolean isMarkupURL(String input)
-	{
+	public static boolean isMarkupURL(String input){
 		def isValidURL = false
-		def url
-		def label
-		// Attempt to split the URL from the label
-		if(input)
-		{
+		if(input){
 			def tokens = input.tokenize('|')
-			url = tokens.size() > 1 ? tokens[1] : tokens[0]
-			label = tokens[0]
+			def url = tokens.size() > 1 ? tokens[1] : tokens[0]
 			isValidURL = isURL(url)
-			if(isValidURL && label && label != url)
-			{
-				return true
-			}
-			else
-			{
-				return false
-			}
 		}
-		return false
+		return isValidURL
 	}
 	
-	public static String[] parseMarkupURL(String input)
-	{
-		def isValidMarkupURL = false
-		def url
-		def label
-		if(input)
-		{
-			 isValidMarkupURL = isMarkupURL(input)
-			 
-			 if(isValidMarkupURL)
-			{
+	public static List parseMarkupURL(String input, String defaultLabel = ""){
+		def url = ""
+		def label = ""
+		def result = null
+		// If input isn't null
+		if(input){
+			// If input has a valid URL
+			if(isMarkupURL(input)){
 				def tokens = input.tokenize('|')
-				url = tokens.size() > 1 ? tokens[1] : tokens[0]
-				label = tokens[0]
-				return [label,url]
-			}else if(isURL(input))
-			{
-				return [input,input]
+				def urlTokenPosition = 1
+				if(tokens.size() > 1){
+					label = tokens[0]
+				}else{
+					urlTokenPosition = 0
+					label = defaultLabel
+				}
+				result = [label, tokens[urlTokenPosition]]
 			}
 			
 		}
-		return ["",""]
+		return result
 	}
 	
 	/** 
