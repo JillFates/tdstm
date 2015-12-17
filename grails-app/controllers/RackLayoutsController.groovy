@@ -14,7 +14,6 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.tm.enums.domain.*
-import com.tdssrc.grails.HtmlUtil
 
 class RackLayoutsController {
 	def assetEntityService
@@ -433,7 +432,7 @@ class RackLayoutsController {
 		def rackId = paramsMap.rackId
 		def forWhom = paramsMap.forWhom
 		boolean printView = paramsMap.printView
-		String disconnectImgUrl = HtmlUtil.createLinkToResource( [dir: "icons", file : "disconnect.png", absolute: true])
+
 		asset.each {
 			def row = new StringBuffer("<tr>")
 			if (it.asset) {
@@ -547,7 +546,7 @@ class RackLayoutsController {
 							row.append("<td class='${it.rackStyle}' ${it.rackStyle == 'rack_error' ? 'title=\"Device has no defined model, size is unknown\"' : ''}>${it.rack}</td><td colspan='2' rowspan='${rowspan}' class='${it.cssClass}'>${assetTag.toString()}</td>")
 							if ( !printView && assetCables ) {
 								row.append("""<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' 
-									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="${disconnectImgUrl}"/>
+									onclick='openCablingDiv(${it.asset?.assetEntity.id})'></a> <img src="../icons/disconnect.png"/>
 									&nbsp${taskAnchors}</td>""")
 							} else {
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp;${taskAnchors}</td>")
@@ -562,7 +561,7 @@ class RackLayoutsController {
 								row.append("<td style='border:0;'>&nbsp;</td>")
 
 							if ( !printView && assetCables )
-								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='${disconnectImgUrl}'/> &nbsp; ${taskAnchors}</a></td></tr>")
+								row.append("<td style='border:0;'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='../icons/disconnect.png'/> &nbsp; ${taskAnchors}</a></td></tr>")
 							else
 								row.append("<td style='border:0;'>&nbsp;${taskAnchors}</td></tr>")
 								
@@ -581,7 +580,7 @@ class RackLayoutsController {
 						if (it.cssClass != "rack_error") {
 							def assetCables = AssetCableMap.findByAssetFrom(it.asset?.assetEntity)
 							if ( !printView && assetCables )
-								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='${disconnectImgUrl}' height='12' width='12' title='Cabling'/> ${taskAnchors}</a></td>")
+								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'><a href='#' onclick='openCablingDiv(${it.asset?.assetEntity.id})'> <img src='../icons/disconnect.png' height='12' width='12' title='Cabling'/> ${taskAnchors}</a></td>")
 							else
 								row.append("<td rowspan='${rowspan}' class='${it.cssClass}'>&nbsp; ${taskAnchors}</td>")
 							
@@ -618,8 +617,7 @@ class RackLayoutsController {
 					def roomName = it.rackDetails.room?.roomName
 					def locationName = it.rackDetails.room?.location
 					def rackParameter = it.rackDetails.id
-					def rackAdd2ImgUrl = HtmlUtil.createLinkToResource([ dir: "i", file: "rack_add2.png", absolute:true])
-					row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="${rackAdd2ImgUrl}">
+					row.append("""<div ${showIconPref ? '' : 'style="display:none"'}  class="rack_menu create_${rackId}"><img src="../i/rack_add2.png">
 						<ul>
 							<li><a href="javascript:${forWhom ? "createAuditPage" : "EntityCrud.showAssetCreateView"}('DEVICE','${it.source}','${rackParameter}','${roomParameter}','${it.rackDetails.location}','${it.rack}')">Create asset  </a></li>
 							<li><a href="javascript:listDialog('','','asc','${it.source}','${it.rackDetails.id}','${it.rackDetails.room?.id}','${it.rackDetails.location}','${it.rack}')">Assign asset </a></li>
@@ -773,8 +771,7 @@ class RackLayoutsController {
 							assetLocation = assetEntity.targetLocation
 						}
 
-						def rackAdd2ImgUrl = HtmlUtil.createLinkToResource([ dir: "i", file: "rack_add2.png", absolute:true])
-						bladeTable.append("""<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="${rackAdd2ImgUrl}"/>
+						bladeTable.append("""<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="../i/rack_add2.png"/>
 							<ul>
 								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'EntityCrud.showAssetCreateView'}('DEVICE','${assetDetails.source}','${assetEntity?.id}','${assetRoom}','${assetLocation}', '${i}', true, '${assetEntity.manufacturer?.id}','Blade','${assetEntity.moveBundle?.id}')">Create asset</a></li>
 								<li><a href="javascript:listBladeDialog('${assetDetails.source}','${assetEntity.id}','${i}','assign','${assetRoom}','${assetLocation}')">Assign asset </a></li>
@@ -1113,8 +1110,7 @@ class RackLayoutsController {
 				def assetCableMapList = AssetCableMap.findAllByAssetFrom( assetEntity )
 				assetCableMapList.each { assetCable ->
 					cableDiagram.append("<div style=\"top:${assetCable.assetFromPort.connectorPosY / 2}px ;left:${assetCable.assetFromPort.connectorPosX}px\">")
-					def cableStatusImgUrl = HtmlUtil.createLinkToResource([ dir: "i/cabling", file: "${assetCable.cableStatus}.png", absolute:true])
-					cableDiagram.append("<div><img src=\"${cableStatusImgUrl}\"/></div>")
+					cableDiagram.append("<div><img src=\"../i/cabling/${assetCable.cableStatus}.png\"/></div>")
 					cableDiagram.append("<div class=\"connector_${assetCable.assetFromPort.labelPosition}\"><span>${assetCable.assetFromPort.label}</span> </div>")
 					cableDiagram.append('</div>')
 				}
