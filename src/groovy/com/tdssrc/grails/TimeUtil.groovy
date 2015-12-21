@@ -358,12 +358,15 @@ class TimeUtil {
 	 **/
 	public static Date parseDate(session, dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
-		def result
-		try {
-			result = formatter.parse(dateValue)
-			result.clearTime()	
-		} catch (Exception e) {
-			LOG.error("Invalid date: " + e.getMessage(), e)
+		def result = null
+		if(dateValue){
+			try {
+				result = formatter.parse(dateValue)
+				result.clearTime()	
+			} catch (Exception e) {
+				LOG.error("Invalid date: " + e.getMessage(), e)
+			}
+
 		}
 		return result
 	}
