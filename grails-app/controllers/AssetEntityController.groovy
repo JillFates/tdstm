@@ -1891,9 +1891,16 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			
 			// Get the name of the User Role by Name to display
 			def roles = securityService.getRoleName(assetComment.role)
+
+			def instructionsLinkURL = null
+			def instructionsLinkLabel = null
+
+			if(assetComment.instructionsLink){
+				instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
+				instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
+			}
+
 			
-			def instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
-			def instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
 			
 			def predecessorTable = ""
             def predecessorList = []
