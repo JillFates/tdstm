@@ -248,7 +248,7 @@
 		<g:each in="${assetCablingDetails}" status="i" var="assetCable">
 			<div id="connector${i}" style="top:${assetCable.connectorPosY / 2}px ;left:${assetCable.connectorPosX}px ">
 				<div>
-					<img src="../i/cabling/${assetCable.status}.png"/>
+					<img src="${resource(dir:'i/cabling',file:assetCable.status + '.png')}"/>
 				</div>
 				<div class="connector_${assetCable.labelPosition}">
 					<span>${assetCable.label}</span>

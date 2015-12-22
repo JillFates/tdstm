@@ -38,7 +38,7 @@
 								<g:checkBox name="checkBox" id="checkId_${files.asset?.id}" ></g:checkBox>
 								<g:if test="${haveAssetEditPerm}">
 								<a href="javascript:EntityCrud.showAssetEditView('${files.asset.assetClass}', ${files.asset.id})" title="Edit Asset">
-									<img src="/tdstm/icons/database_edit.png" border="0px" />
+									<img src="${resource(dir:'tdstm/icons',file:'database_edit.png')}" border="0px" />
 								</a>
 								</g:if>
 								<grid-buttons asset-id="${files.asset?.id}" asset-type="${files.asset?.assetType}" tasks="${files.tasksStatus}" comments="${files.commentsStatus}" can-edit-tasks="true" can-edit-comments="${haveAssetEditPerm}"></grid-buttons>

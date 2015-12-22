@@ -98,7 +98,7 @@
 
 				<g:each var="key" in="['1','2','3','4','5']">
 					var filePref= '${filesPref[key]}';
-					$("#storageIdGrid_"+filePref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+filePref+'\',\'storage\',\''+${key}+'\')">');
+					$("#storageIdGrid_"+filePref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect(\'"+filePref+"\',\'storage\',\'"+${key}+"\')\">");
 				</g:each>
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
@@ -111,7 +111,7 @@
 					var editButton = '';
 					if (${hasPerm}) {
 						editButton += '<a href="javascript:EntityCrud.showAssetEditView(\'${assetClass}\','+options.rowId+')" title=\'Edit Asset\'>'+
-							"<img src='${resource(dir:'icons',file:'database_edit.png')}' border='0px'/>"+"</a>&nbsp;&nbsp;"
+							"<img src=\"${resource(dir:'icons',file:'database_edit.png')}\" border='0px'/>"+"</a>&nbsp;&nbsp;"
 					}
 					editButton += "<grid-buttons asset-id='" + options.rowId + "' asset-type='" + rowObject[8] + "' tasks='" + rowObject[7] + "' comments='" + rowObject[9] + "' can-edit-tasks='true' can-edit-comments='" + ${hasPerm} + "'></grid-buttons>";
 					return editButton

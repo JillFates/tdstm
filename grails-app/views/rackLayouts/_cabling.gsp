@@ -229,7 +229,7 @@ angular.bootstrap($("#cablingDialogId").children()[0], ["cablingApp${assetId}"])
 	<g:if test="${assetCablingDetails}">
 		<g:each in="${assetCablingDetails}" var="assetCabling">
 			<div id='connector${assetCabling.id}' style='top: ${(assetCabling.connectorPosY / 2)}px; left: ${assetCabling.connectorPosX}px;'>
-				<a href='#'><div><img id='${assetCabling.status}' src='../i/cabling/${assetCabling.status.toLowerCase()}.png'></div></a>
+				<a href='#'><div><img id='${assetCabling.status}' src="${resource(dir:'i/cabling',file:assetCabling.status.toLowerCase() + '.png')}"></div></a>
 				<div class='connector_${assetCabling.labelPosition}'><span>${assetCabling.label}</span></div>
 			</div>
 		</g:each>
