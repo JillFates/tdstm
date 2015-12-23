@@ -97,10 +97,6 @@ class ReportsController {
 				render( view:'loginBadgeLabelReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, browserTest: browserTest])
 				break
-			case "MoveResults" :
-				def moveEventInstanceList = MoveEvent.findAllByProject( projectInstance )
-				render( view:'moveResults', model:[moveEventInstanceList : moveEventInstanceList ])
-				break
 			case "CablingQA":  
 				render( view:'cablingQAReport',
 					model:[moveBundleInstanceList: moveBundleInstanceList, projectInstance:projectInstance, type:'QA'])

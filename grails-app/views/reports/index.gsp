@@ -74,7 +74,6 @@
 				</thead>
 				<tbody>
 			<tr><td><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" class="home">Issue Report</a> </td><td style="width:12px"> </td><td style="width:12px">E</td><td style="width:12px">P</td></tr>
-			<tr><td><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=MoveResults" class="home">Move Results</a> </td><td style="width:12px"> </td><td style="width:12px">E</td><td style="width:12px">P</td></tr>
 			<tr><td><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA" class="home">Cabling QA</a> </td><td style="width:12px"> </td><td style="width:12px"> </td><td style="width:12px">P</td></tr>
 				</tbody>
 			</table>
