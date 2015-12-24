@@ -604,9 +604,12 @@ class TaskService implements InitializingBean {
 	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
 	* @return String the SELECT control
 	*/
-	def genSelectForPredecessors(project, category, task, moveEventId) {	
+	def genSelectForPredecessors(project, category, task, moveEventId, page=-1, pageSize=50) {
 		
-		StringBuffer query = new StringBuffer("FROM AssetComment a WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
+		StringBuffer queryList = new StringBuffer("FROM AssetComment a ")
+		StringBuffer queryCount = new StringBuffer("SELECT count(*) FROM AssetComment a ")
+		StringBuffer query = new StringBuffer("WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
+ 	
 		if (category) {
 			if ( categoryList.contains(category) ) {
 				query.append("AND a.category='${category}' ")
@@ -635,9 +638,20 @@ class TaskService implements InitializingBean {
 		
 		// Add the sort and generate the list
 		query.append('ORDER BY a.taskNumber ASC')
-		def taskList = AssetComment.findAll( query.toString() )
+		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
+		def total = resultTotal[0]
+
+		def taskList
+		if (page == -1) {
+			taskList = AssetComment.findAll( queryList.append(query).toString() )
+		} else {
+			taskList = AssetComment.findAll( queryList.append(query).toString(), [max: pageSize, offset: page] )
+		}
 		
-		return taskList
+		return [
+			list: taskList,
+			total: total
+		]
 	}
 	
 	/**

@@ -557,11 +557,11 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 				$scope.dependencies.successors = $scope.acData.successorList;
 
 				$scope.enableMoveEvent = ((!$scope.isEdit) ||
-					                      ( ($scope.isEdit) &&
-					                      	($scope.dependencies.predecessors.length == 0) &&
-					                      	($scope.dependencies.successors.length == 0)
-					                      )
-					                     );
+										  ( ($scope.isEdit) &&
+											($scope.dependencies.predecessors.length == 0) &&
+											($scope.dependencies.successors.length == 0)
+										  )
+										 );
 
 				if ($scope.ac.commentType == 'issue') {
 					$scope.statuWarnId = $scope.acData.statusWarn;
@@ -1315,9 +1315,9 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					roles.push(auto);
 					
 					roles.sort(function(a, b) {
-					    if (a.nameRole < b.nameRole) return -1;
-					    if (a.nameRole > b.nameRole) return 1;
-					    return 0;
+						if (a.nameRole < b.nameRole) return -1;
+						if (a.nameRole > b.nameRole) return 1;
+						return 0;
 					});
 
 					roles.unshift(unassigned);
@@ -1439,9 +1439,9 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 					roles.push(auto);
 										
 					roles.sort(function(a, b) {
-					    if (a.description < b.description) return -1;
-					    if (a.description > b.description) return 1;
-					    return 0;
+						if (a.description < b.description) return -1;
+						if (a.description > b.description) return 1;
+						return 0;
 					});		
 					
 					roles.unshift(unassigned);
@@ -1528,12 +1528,23 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			ngModel: '=ngModel',
 			deleted: '=deleted',
 			moveEvent: '=moveEvent',
+			prefix: '=prefix',
 			eventName: '@eventName'
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/task-dependencies-template.html'),
 		link: function(scope, element, attrs) {
 			var depByCategory = {};
+			scope.categoryOptions = {
+				placeholder: "Select...",
+				dataTextField: "name",
+				dataValueField: "id",
+				dataSource: {
+					data: tds.core.service.commonDataService.getCategories()
+				}
+			};
+
 			scope.categories = tds.core.service.commonDataService.getCategories();
+			var indexSec=0;
 			var checkTaskIdExist = function (dependency) {
 				var exist = false;
 				for (var i=0; i < dependency.list.length; i++) {
@@ -1547,10 +1558,46 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					dependency.taskId = '';
 				}
 			}
+			scope.taskOptionsDS = function(dependency, tasksCombobox) {
+				var ds = {
+					placeholder: "Select...",
+					dataTextField: "desc",
+					dataValueField: "id",
+					filter: "contains",
+					minLength: 1,
+					dataSource: {
+						type: "json",
+						transport: {
+							read: {
+								url: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
+								dataType: 'json',
+								type: 'GET'
+							}
+						},
+						schema: {
+							data: function(reply) {
+							  return reply.data.list
+							},
+							total: function(reply) {
+							  return reply.data.total
+							},
+						},
+						pageSize: 10,
+						serverPaging: true,
+						serverFiltering: true
+					}
+				};
+				dependency.tasksCombobox = tasksCombobox
+				return ds;
+			}
 			scope.initDependencyList = function(dependency) {
-				scope.updateDependencyList(dependency);
+				//scope.updateDependencyList(dependency);
 			};
 			scope.updateDependencyList = function(dependency) {
+				if (dependency.tasksCombobox) {
+				//	dependency.tasksCombobox.dataSource.read();	
+				}
+				/*
 				moveEvent = (scope.moveEvent==null?'':scope.moveEvent);
 				if (!depByCategory[dependency.category]) {
 					depByCategory[dependency.category] = {};
@@ -1570,6 +1617,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						}
 					);
 				}
+				*/
 			};
 			scope.deleteRow = function(index) {
 				if (scope.ngModel[index].id) {
@@ -1589,7 +1637,9 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						category: scope.categories[1].id,
 						list: [],
 						id: '',
-						taskId: ''
+						taskId: '',
+						tasksCombobox: null,
+						index: 'dep' + scope.prefix + (indexSec++)
 					});
 				}
 			});
@@ -1981,7 +2031,7 @@ tds.comments.directive.GridButtons = function(utils, commentUtils) {
 /*****************************************
  * Comments module configuration
  */
-tds.comments.module = angular.module('tdsComments', ['tdsCore']);
+tds.comments.module = angular.module('tdsComments', ['tdsCore', 'kendo.directives']);
 
 tds.comments.module.factory('commentService', ['utils', '$http', '$q', tds.comments.service.CommentService]);
 tds.comments.module.factory('commentUtils', ['$q', '$interval', 'appCommonData', tds.comments.util.CommentUtils]);

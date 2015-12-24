@@ -1023,13 +1023,13 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				def assetDepStatusList = AssetDependencyStatus.getList()
 
 				def lookupValue = { value, list->
-				    def result = "Unknown"
-				    x.each{
-				        if(it.equalsIgnoreCase(value)){
-				            result = it
-				        }
-				    }
-				    return result
+					def result = "Unknown"
+					x.each{
+						if(it.equalsIgnoreCase(value)){
+							result = it
+						}
+					}
+					return result
 
 				}
 
@@ -1164,7 +1164,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 							assetDep.createdBy = userLogin.person
 							isNew = true
 						} else {
-						     String msg = message(code: "assetEntity.dependency.warning", args: [asset.assetName, dependent.assetName])
+							 String msg = message(code: "assetEntity.dependency.warning", args: [asset.assetName, dependent.assetName])
 							 dependencyError "$msg (row $rowNum)"
 							 continue
 						}
@@ -1261,7 +1261,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				int commentAdded=0
 				int commentUpdated=0	
 				int commentUnchanged=0		
- 				int commentCount=commentsSheet.getLastRowNum()
+				int commentCount=commentsSheet.getLastRowNum()
 				//def skippedUpdated=0
 				//def skippedAdded=0
 
@@ -1658,7 +1658,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				else
 					forward(action:'create', params:model)
 				  break;
-		    case "application":
+			case "application":
 				  redirect( controller:'application', action:'list')
 				  break;
 			case "database":
@@ -1670,16 +1670,16 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			case "listComment":
 				  forward(action:'listComment')
 				  break;
-		    case "roomAudit":
+			case "roomAudit":
 				  forward(action:'show', params:[redirectTo:redirectTo, source:model.source, assetType:model.assetType])
 				  break;
-		    case "dependencyConsole":
+			case "dependencyConsole":
 				  forward(action:'retrieveLists', params:[entity:model.tabType,labelsList:model.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
 				  break;
 			case "listTask":
 				  render "Asset ${entity.assetName} updated."
 				  break;
-		    case "dependencies":
+			case "dependencies":
 				  redirect(action:'listDependencies')
 				  break;
 
@@ -1877,7 +1877,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			
 			def atStart = assetComment.actStart ? TimeUtil.formatDateTime(getSession(), assetComment.actStart) : ''
 			
-		    def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate): ''
+			def dueDate = assetComment.dueDate ? TimeUtil.formatDate(getSession(), assetComment.dueDate): ''
 	
 			def workflowTransition = assetComment?.workflowTransition
 			def workflow = workflowTransition?.name
@@ -1903,7 +1903,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			
 			
 			def predecessorTable = ""
-            def predecessorList = []
+			def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
 			if (taskDependencies.size() > 0) {
 				taskDependencies = taskDependencies.sort{ it.predecessor.taskNumber }
@@ -1912,24 +1912,24 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					def task = taskDep.predecessor
 					def css = taskService.getCssClassForStatus(task.status)
 					def taskDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
-                    predecessorList << [id: taskDep.id, taskId: task.id, category: task.category, desc: taskDesc, taskNumber: task.taskNumber, status: task.status]
+					predecessorList << [id: taskDep.id, taskId: task.id, category: task.category, desc: taskDesc, taskNumber: task.taskNumber, status: task.status]
 					predecessorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task.taskNumber ? task.taskNumber+':' :''}${taskDesc}</td></tr>""")
-			    }
+				}
 				predecessorTable.append('</tbody></table>')
 			}
 			def taskSuccessors = TaskDependency.findAllByPredecessor( assetComment )
 			def successorsCount= taskSuccessors.size()
 			def predecessorsCount = taskDependencies.size()
 			def successorTable = ""
-            def successorList = []
+			def successorList = []
 			if (taskSuccessors.size() > 0) {
 				taskSuccessors = taskSuccessors.sort{ it.assetComment.taskNumber }
 				successorTable = new StringBuffer('<table  cellspacing="0" style="border:0px;" ><tbody>')
 				taskSuccessors.each() { successor ->
 					def task = successor.assetComment
 					def css = taskService.getCssClassForStatus(task.status)
-                    def succDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
-                    successorList << [id: successor.id, taskId: task.id, category: task.category, desc: succDesc, taskNumber: task.taskNumber, status: task.status]
+					def succDesc = task.comment?.length()>50 ? task.comment.substring(0,50): task.comment
+					successorList << [id: successor.id, taskId: task.id, category: task.category, desc: succDesc, taskNumber: task.taskNumber, status: task.status]
 					successorTable.append("""<tr class="${css}" style="cursor:pointer;" onClick="showAssetComment(${task.id}, 'show')"><td>${task.category}</td><td>${task}</td>""")
 				}
 				successorTable.append("""</tbody></table>""")
@@ -2201,7 +2201,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		controllerService.saveUpdateAssetHandler(this, session, deviceService, AssetClass.DEVICE, params)
 		session.AE?.JQ_FILTERS = params
 	}
- 	
+	
 	/**
 	* Renders the detail of an AssetEntity 
 	*/
@@ -2237,11 +2237,11 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	}
 
 	/**
-     * This action is used to get list of all Manufacturerss ordered by manufacturer name display at
-     * assetEntity CRUD and AssetAudit CRUD
-     * @param assetType : requested assetType for which we need to get manufacturer list
-     * @return : render to manufacturerView
-     */
+	 * This action is used to get list of all Manufacturerss ordered by manufacturer name display at
+	 * assetEntity CRUD and AssetAudit CRUD
+	 * @param assetType : requested assetType for which we need to get manufacturer list
+	 * @return : render to manufacturerView
+	 */
 	def retrieveManufacturersList() {
 		def assetType = params.assetType
 		def manufacturers = Model.findAll("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
@@ -2395,7 +2395,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			def entities = assetEntityService.entityInfo( project )
 			def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
 			def canEditComments = controllerService.checkPermissionForWS('AssetEdit', false)
-		    return [ rediectTo:'comment', servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
+			return [ rediectTo:'comment', servers:entities.servers, applications:entities.applications, dbs:entities.dbs,
 				files:entities.files, dependencyType:entities.dependencyType, dependencyStatus:entities.dependencyStatus, assetDependency: new AssetDependency(),
 				moveBundleList:moveBundleList, canEditComments: canEditComments ]
 	}
@@ -2838,7 +2838,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			planStatus = assetOptionInstance.id
 			
 		}else {
-		    assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
+			assetOptionInstance.type = AssetOptions.AssetOptionsType.DEPENDENCY_STATUS
 			assetOptionInstance.value = params.dependencyStatus
 			if(!assetOptionInstance.save(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
@@ -2848,7 +2848,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 		planStatusList =['id':planStatus]
 		
-	    render planStatusList as JSON
+		render planStatusList as JSON
 	}
 	
 	/**
@@ -2867,12 +2867,12 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 		}else if(params.assetOptionType=="dependency"){
-		    assetOptionInstance = AssetOptions.get(params.dependecyId)
+			assetOptionInstance = AssetOptions.get(params.dependecyId)
 			if(!assetOptionInstance.delete(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
 		}else if(params.assetOptionType=="environment"){
-		    assetOptionInstance = AssetOptions.get(params.environmentId)
+			assetOptionInstance = AssetOptions.get(params.environmentId)
 			if(!assetOptionInstance.delete(flush:true)){
 				assetOptionInstance.errors.allErrors.each { log.error  it }
 			}
@@ -3359,7 +3359,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	/**
 	 * This action is used to get workflowTransition select for comment id
 	 * @param assetCommentId : id of assetComment
-     * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return select or a JSON array
 	 */
 	def retrieveWorkflowTransition() {
@@ -3372,7 +3372,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def workflowCode = assetEntity?.moveBundle?.workflowCode ?: project.workflowCode
 		def workFlowInstance = Workflow.findByProcess(workflowCode)
 		def workFlowTransition = WorkflowTransition.findAllByWorkflowAndCategory(workFlowInstance, params.category)
-        
+		
 		//def workFlowTransition = WorkflowTransition.findAllByWorkflow(workFlowInstance) TODO : should be removed after completion of this new feature
 		if(assetEntity){
 			def existingWorkflows = assetCommentId ? AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId ).workflowTransition : AssetComment.findAllByAssetEntity(assetEntity ).workflowTransition
@@ -3395,12 +3395,12 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 		render result
 	}
-    
+	
 	/**
 	 * Provides a SELECT control with Staff associated with a project and the assigned staff selected if task id included
 	 * @param forView - The CSS ID for the SELECT control
 	 * @param id - the id of the existing task (aka comment)
-     * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return HTML select of staff belongs to company and TDS or a JSON array
 	 * 
 	 */
@@ -3549,12 +3549,12 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	}
 	
 	/**
-     * Generates an HTML table containing all the successor for a task with corresponding Category and Tasks SELECT controls for
-     * a speciied assetList of successors HTML SELECT control for the AssetComment at editing time
-     * @param   params.id   The ID of the AssetComment to load  successor SELECT for
-     * @return render HTML
-     */
-    def successorTableHtml() {
+	 * Generates an HTML table containing all the successor for a task with corresponding Category and Tasks SELECT controls for
+	 * a speciied assetList of successors HTML SELECT control for the AssetComment at editing time
+	 * @param   params.id   The ID of the AssetComment to load  successor SELECT for
+	 * @return render HTML
+	 */
+	def successorTableHtml() {
 	def project = securityService.getUserCurrentProject()
 	def task = AssetComment.findByIdAndProject(params.commentId, project)
 	if ( ! task ) {
@@ -3564,9 +3564,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def taskSuccessors = TaskDependency.findAllByPredecessor( task ).sort{ it.assetComment.taskNumber }
 		render taskService.genTableHtmlForDependencies(taskSuccessors, task, "successor")
 	}
-    }
-    
-    /**
+	}
+	
+	/**
 	 * Generates the HTML SELECT for a single Predecessor
 	 * Used to generate a SELECT control for a project and category with an optional task. When a task is presented the list will
 	 * also be filtered on tasks from the moveEvent.
@@ -3574,15 +3574,15 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	 * taskDependencyEdit or taskDependencySave accordingly since having an Id means that we're in edit mode vs create mode.
 	 * @param commentId - the comment (aka task) that the predecessor will use
 	 * @param category - comment category to filter the list of tasks by
-     * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
+	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
 	 * @return String - HTML Select of prdecessor list or a JSON 
 	 */
 	def predecessorSelectHtml() {
 		def project = securityService.getUserCurrentProject()
 		def projectId = project.id
 		def task
-        def format=params.format
-        def moveEventId=params.moveEvent
+		def format=params.format
+		def moveEventId=params.moveEvent
 		
 		if (params.commentId) { 
 			task = AssetComment.findByIdAndProject(params.commentId, project)
@@ -3592,28 +3592,59 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 
 		def taskList = taskService.genSelectForPredecessors(project, params.category, task, moveEventId)
-        def result
-	    
-        if (format=='json') {
-            def list = []
-            list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
-            taskList.each {
-                def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
-                list << [ id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
-            }
-            result = ServiceResults.success(list) as JSON
-        } else {
-            // Build the SELECT HTML
-            def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
-            def selectName = params.forWhom
-            def firstOption = [value:'', display:'Please Select']
-            def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList, optionKey:'id', firstOption:firstOption]
-            result = HtmlUtil.generateSelect( paramsMap )
-        }
+		def result
+		
+		if (format=='json') {
+			def list = []
+			list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
+			taskList.list.each {
+				def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
+				list << [ id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
+			}
+			result = ServiceResults.success(list) as JSON
+		} else {
+			// Build the SELECT HTML
+			def cssId = task ? 'taskDependencyEditId' : 'taskDependencyId'
+			def selectName = params.forWhom
+			def firstOption = [value:'', display:'Please Select']
+			def paramsMap = [ selectId:cssId, selectName:selectName, options:taskList.list, optionKey:'id', firstOption:firstOption]
+			result = HtmlUtil.generateSelect( paramsMap )
+		}
 
 		render result
 	}
 	
+	def tasksSearch() {
+		def project = securityService.getUserCurrentProject()
+		def projectId = project.id
+		def task
+		def moveEventId=params.moveEvent
+		def page=Long.parseLong(params.page)
+		def pageSize=Long.parseLong(params.pageSize)
+		def filter=params.list('filter[filters][0][value]')
+		
+		if (params.commentId == 2) { 
+			task = AssetComment.findByIdAndProject(params.commentId, project)
+			if ( ! task ) {
+				log.warn "predecessorSelectHtml - Unable to find task id ${params.commentId} in project $project.id"
+			}
+		}
+
+		def tasksData = taskService.genSelectForPredecessors(project, params.category, task, moveEventId, page, pageSize)
+		def result
+		
+		def list = []
+		list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
+		tasksData.list.each {
+			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
+			list << [ id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
+		}
+		tasksData.list = list
+		result = ServiceResults.success(tasksData) as JSON
+
+		render result
+	}
+
 	/**
 	 * Export Special Report 
 	 * @param NA
@@ -3662,11 +3693,11 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		render assetType
 	}
 	
-    /**
-     * This action is used to populate the dependency section of the asset forms for support and dependent relationships
-     * @param id : asset id
-     * @return : HTML code containing support and dependent edit form
-     */
+	/**
+	 * This action is used to populate the dependency section of the asset forms for support and dependent relationships
+	 * @param id : asset id
+	 * @return : HTML code containing support and dependent edit form
+	 */
 	def populateDependency() {
 
 		def returnMap = [:]
@@ -3821,7 +3852,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			columnLabelpref << [ (key):attributes[value] ]
 		}
 		 
-	 	return [
+		return [
 			applications: entities.applications,
 			assetDependency: new AssetDependency(),
 			attributesList: attributes.keySet().sort{it},
@@ -4066,9 +4097,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			def result = [:]
 			result.list = []
 			result.type = assetType
-        	assets.each {
-        		result.list << [ id:it[0], name: it[1]]
-        	}
+			assets.each {
+				result.list << [ id:it[0], name: it[1]]
+			}
 			render(ServiceResults.success(result) as JSON)
 		} catch (UnauthorizedException e) {
 			ServiceResults.forbidden(response)
@@ -4305,7 +4336,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					// Convert the columns into a map that Select2 requires
 					results = results.collect{ r -> [ id:r[0], text:r[1] ]}			
 				}
-	 		} else {
+			} else {
 				// TODO - Return an error perhaps by setting total to -1 and adding an extra property for a message
 				log.error "assetListForSelect2() doesn't support param assetClassOption ${params.assetClassOption}"
 			}

@@ -130,10 +130,10 @@
 								</tr>
 								<tr>
 									<td style="vertical-align: top;">
-										<task-dependencies ng-model="dependencies.predecessors" deleted="dependencies.deletedPredecessors" comment-id='ac.commentId' event-name="predecessor" move-event='ac.moveEvent'></task-dependencies>
+										<task-dependencies ng-model="dependencies.predecessors" deleted="dependencies.deletedPredecessors" comment-id='ac.commentId' event-name="predecessor" move-event='ac.moveEvent' prefix="pred"></task-dependencies>
 									</td>
 									<td style="vertical-align: top;">
-										<task-dependencies ng-model="dependencies.successors" deleted="dependencies.deletedSuccessors" comment-id='ac.commentId' event-name="successor" move-event='ac.moveEvent'></task-dependencies>
+										<task-dependencies ng-model="dependencies.successors" deleted="dependencies.deletedSuccessors" comment-id='ac.commentId' event-name="successor" move-event='ac.moveEvent' prefix="succ"></task-dependencies>
 									</td>
 								</tr>
 						    </table>
