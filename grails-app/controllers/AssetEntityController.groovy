@@ -927,7 +927,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			if (titleSheet != null) {			
 				try {
 					exportTime = TimeUtil.parseDateTime(getSession(), WorkbookUtil.getStringCellValue(titleSheet, 1, 5)) 
-					exportTime = GormUtil.convertInToGMT( exportTime, tzId )
 				} catch ( Exception e) {
 					log.info "Was unable to read the datetime for 'Export on': " + e.message
 					failWithError "The 'Exported On' datetime was not found or was invalid in the Title sheet"
