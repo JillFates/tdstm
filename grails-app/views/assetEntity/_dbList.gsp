@@ -38,8 +38,7 @@
 							<td>
 							<g:checkBox name="checkBox" id="checkId_${database.asset.id}" ></g:checkBox>
 							<g:if test="${haveAssetEditPerm}">
-							<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${database.asset.id})" title="Edit Asset"><img
-									src="/tdstm/icons/database_edit.png" border="0px" />
+							<a href="javascript:EntityCrud.showAssetEditView('${assetClass}', ${database.asset.id})" title="Edit Asset"><img src="${resource(dir:'icons',file:'database_edit.png')}" border="0px" />
 							</a> 
 							</g:if>
 							<grid-buttons asset-id="${database.asset?.id}" asset-type="${database.asset?.assetType}" tasks="${database.tasksStatus}" comments="${database.commentsStatus}" can-edit-tasks="true" can-edit-comments="${haveAssetEditPerm}"></grid-buttons>
