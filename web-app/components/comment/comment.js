@@ -1565,21 +1565,21 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					dataValueField: "id",
 					filter: "contains",
 					virtual: {
-						itemHeight: 26,
+						itemHeight: 60,
 						valueMapper: function(options) {
 							// If a value has been selected, server must return the index
 							// on this way if value selected is 50 and we are on page 1, widget will request
 							// the page 5 to get the selected field.
 						}
 					},
-					height: 100,
+					height: 120,
 					dataSource: {
 						transport: {
 							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
 							type: "get",
 							dataType: "json",
 						},
-						pageSize: 5,
+						pageSize: 8,
 						serverPaging: true,
 						schema: {
 							data: function(reply) {
