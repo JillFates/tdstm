@@ -1564,32 +1564,37 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					dataTextField: "desc",
 					dataValueField: "id",
 					filter: "contains",
-					minLength: 1,
+					virtual: {
+						itemHeight: 26,
+						valueMapper: function(options) {
+							// If a value has been selected, server must return the index
+							// on this way if value selected is 50 and we are on page 1, widget will request
+							// the page 5 to get the selected field.
+						}
+					},
+					height: 100,
 					dataSource: {
-						type: "json",
 						transport: {
-							read: {
-								url: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
-								dataType: 'json',
-								type: 'GET'
-							}
+							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
+							type: "get",
+							dataType: "json",
 						},
+						pageSize: 5,
+						serverPaging: true,
 						schema: {
 							data: function(reply) {
-							  return reply.data.list
+								return reply.data.list
 							},
 							total: function(reply) {
-							  return reply.data.total
-							},
+								return reply.data.total
+							}
 						},
-						pageSize: 10,
-						serverPaging: true,
-						serverFiltering: true
 					}
 				};
 				dependency.tasksCombobox = tasksCombobox
 				return ds;
-			}
+			};
+
 			scope.initDependencyList = function(dependency) {
 				//scope.updateDependencyList(dependency);
 			};
