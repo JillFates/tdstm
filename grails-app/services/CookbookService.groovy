@@ -753,7 +753,7 @@ class CookbookService {
 					log.debug('PROJECT ' + project)
 					if (project != null) {
 						def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
-						def projects = projectService.getUserProjects(loginUser, projectHasPermission, ProjectStatus.ACTIVE)*.id
+						def projects = projectService.getUserProjects(loginUser, projectHasPermission, ProjectStatus.ANY)*.id
 
 						log.debug('PROJECTS of USER ' + projects)
 						

@@ -961,8 +961,10 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 	scope.optionsSelected = function(arg){
 		if(scope.clone.selectedContext && scope.clone.selectedProject/* && $scope.clone.selectedProjectState*/){
 			log.info('fill the grid');
+			var putContextName = (scope.clone.selectedContext && scope.clone.contextArray[scope.clone.selectedContext])? scope.clone.contextArray[scope.clone.selectedContext].name: '',
+				putProjectId = (scope.clone.selectedProject && scope.clone.projectsArray[scope.clone.selectedProject])? scope.clone.projectsArray[scope.clone.selectedProject].id: '';
 			cookbookService.getListOfRecipes(
-				{context: scope.clone.selectedContext.name, projectType: scope.clone.selectedProject.id, rand: tdsCommon.randomString(16)}, 
+				{context: putContextName, projectType: putProjectId, rand: tdsCommon.randomString(16)},
 				function(data){
 					log.info('Success on getting Recipes to Clone');
 					log.info(data.data.list);
