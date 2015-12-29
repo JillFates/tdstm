@@ -24,7 +24,7 @@ tds.comments.controller.MainController = function(rootScope, scope, modal, windo
 	scope.config.table = {};
 	scope.bulkEditing = false;
 	scope.bulkEdit = false;
-	
+
 	//commentsScope is used after "jqgrid:grid" creates dynamic dom elements to $compile the grid
 	rootScope.commentsScope = scope;
 
@@ -663,19 +663,19 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		var deferred = q.defer()
 		if(assetId){
 			http.get(utils.url.applyRootPath('/assetEntity/classForAsset?id='+assetId)).
-	
+
 			success(function(data, status, headers, config) {
 				deferred.resolve(data.data.assetClass);
 			}).
 			error(function(data, status, headers, config) {
 				deferred.reject(data);
 			}
-		);	
+		);
 		}else{
 			deferred.resolve([])
 		}
-		
-		
+
+
 		return deferred.promise
 	}
 
@@ -702,7 +702,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 				deferred.reject(data);
 			}
 		);
-		
+
 		return deferred.promise;
 	};
 
@@ -1311,9 +1311,9 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					var unassigned =  {"id" : "0", "nameRole" : "Unassigned"};
 					var auto =  {"id" : "AUTO", "nameRole" : "Automatic"};
 					var roles = data.data;
-					
+
 					roles.push(auto);
-					
+
 					roles.sort(function(a, b) {
 						if (a.nameRole < b.nameRole) return -1;
 						if (a.nameRole > b.nameRole) return 1;
@@ -1332,12 +1332,12 @@ tds.comments.directive.AssignedToSelect = function(commentService, alerts, utils
 					alerts.showGenericMsg();
 				}
 			);
-			scope.$watch('ngModel', function(nVal) { 
+			scope.$watch('ngModel', function(nVal) {
 				var expression = attrs['ngChange'];
 				if (expression) {
 					scope.$parent.$eval(expression);
 				}
-			});  
+			});
 		}
 	};
 };
@@ -1435,15 +1435,15 @@ tds.comments.directive.StaffRoles = function(commentService, alerts, utils) {
 					var unassigned =  {"id" : "", "description" : "Unassigned"};
 					var auto =  {"id" : "AUTO", "description" : "Automatic"};
 					var roles = data.data;
-										
+
 					roles.push(auto);
-										
+
 					roles.sort(function(a, b) {
 						if (a.description < b.description) return -1;
 						if (a.description > b.description) return 1;
 						return 0;
-					});		
-					
+					});
+
 					roles.unshift(unassigned);
 					scope.roleTypes = roles;
 					if (!scope.$parent.ac.role || scope.$parent.ac.role == "") {
@@ -1529,11 +1529,12 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			deleted: '=deleted',
 			moveEvent: '=moveEvent',
 			prefix: '=prefix',
-			eventName: '@eventName'
+			eventName: '@eventName',
 		},
 		templateUrl: utils.url.applyRootPath('/components/comment/task-dependencies-template.html'),
 		link: function(scope, element, attrs) {
 			var depByCategory = {};
+
 			scope.categoryOptions = {
 				placeholder: "Select...",
 				dataTextField: "name",
@@ -1558,7 +1559,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					dependency.taskId = '';
 				}
 			}
-			scope.taskOptionsDS = function(dependency, tasksCombobox) {
+			scope.taskOptionsDS = function(dependency) {
 				var ds = {
 					placeholder: "Select...",
 					dataTextField: "desc",
@@ -1578,6 +1579,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
 							type: "get",
 							dataType: "json",
+							cache: false
 						},
 						pageSize: 8,
 						serverPaging: true,
@@ -1591,17 +1593,16 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						},
 					}
 				};
-				dependency.tasksCombobox = tasksCombobox
-				return ds;
+
+                return ds;
 			};
 
-			scope.initDependencyList = function(dependency) {
-				//scope.updateDependencyList(dependency);
-			};
 			scope.updateDependencyList = function(dependency) {
-				if (dependency.tasksCombobox) {
-				//	dependency.tasksCombobox.dataSource.read();	
-				}
+
+                var config = scope.taskOptionsDS(dependency);
+                dependency.dropdown.setDataSource(config.dataSource);
+                dependency.dropdown.refresh();
+
 				/*
 				moveEvent = (scope.moveEvent==null?'':scope.moveEvent);
 				if (!depByCategory[dependency.category]) {
@@ -1741,7 +1742,7 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 					}
 				);
 			};
-			
+
 			scope.viewInstructions = function(button) {
 				window.open(scope.comment.instructionsLink,'_blank');
 			};
@@ -1862,7 +1863,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				if (scope.configTable[scope.commentId]) {
 					hideContent();
 				} else {
-					loadContent();	
+					loadContent();
 				}
 			});
 			var isActiveActionBar = function() {
@@ -1928,7 +1929,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				scope.$on('showActionBars', function(evt) {
 					var currentStatus = angular.element('#status_' + scope.commentId).html();
 					if ((currentStatus == 'Ready') || (currentStatus == 'Started')) {
-						loadContent();	
+						loadContent();
 					}
 				});
 				scope.$on('hideActionBars', function(evt) {
@@ -2071,7 +2072,7 @@ function recompileDOM (gridElementId, compileScope) {
 				$compile(gridElement)(compileScope);
 			else
 				$compile(gridElement)($rootScope.commentsScope);
-		});		
+		});
 	} else {
 		location.reload();
 		console.log("We were not able to recompile");
