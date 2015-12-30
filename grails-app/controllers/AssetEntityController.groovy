@@ -3621,23 +3621,23 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def moveEventId=params.moveEvent
 		def page=Long.parseLong(params.page)
 		def pageSize=Long.parseLong(params.pageSize)
-		def filter=params.list('filter[filters][0][value]')
+		def filterDesc=params.list('filter[filters][0][value]')
 		
-		if (params.commentId == 2) { 
+		if (params.commentId) { 
 			task = AssetComment.findByIdAndProject(params.commentId, project)
 			if ( ! task ) {
 				log.warn "predecessorSelectHtml - Unable to find task id ${params.commentId} in project $project.id"
 			}
 		}
 
-		def tasksData = taskService.genSelectForPredecessors(project, params.category, task, moveEventId, page, pageSize)
+		def tasksData = taskService.genSelectForPredecessors(project, params.category, task, moveEventId, page, pageSize, filterDesc)
 		def result
 		
 		def list = []
 		list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
 		tasksData.list.each {
 			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
-			list << [ id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
+			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber]
 		}
 		tasksData.list = list
 		result = ServiceResults.success(tasksData) as JSON

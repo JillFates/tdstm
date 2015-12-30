@@ -602,9 +602,12 @@ class TaskService implements InitializingBean {
 	* @param project - the project object to filter tasks to include
 	* @param category - a task category to filter on (optional) 
 	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	* @param page - page to load
+	* @param pageSize - page size to use
+	* @param filterDesc - filter by task description
 	* @return String the SELECT control
 	*/
-	def genSelectForPredecessors(project, category, task, moveEventId, page=-1, pageSize=50) {
+	def genSelectForPredecessors(project, category, task, moveEventId, page=-1, pageSize=50, filterDesc=null) {
 		
 		StringBuffer queryList = new StringBuffer("FROM AssetComment a ")
 		StringBuffer queryCount = new StringBuffer("SELECT count(*) FROM AssetComment a ")
@@ -618,10 +621,8 @@ class TaskService implements InitializingBean {
 				category=''
 			}
 		}
-		if (moveEventId) {
-			query.append("AND a.moveEvent='${moveEventId}' ")
-		} else {
-			query.append("AND a.moveEvent is null ")
+		if (filterDesc) {
+			query.append("AND a.comment like '%${filterDesc}%' ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
@@ -634,6 +635,12 @@ class TaskService implements InitializingBean {
 			if (task.moveEvent) {
 				query.append("AND a.moveEvent.id=${task.moveEvent.id} ")
 			}
+		} else {
+			if (moveEventId) {
+				query.append("AND a.moveEvent='${moveEventId}' ")
+			} else {
+				query.append("AND a.moveEvent is null ")
+			}
 		}
 		
 		// Add the sort and generate the list
@@ -645,7 +652,7 @@ class TaskService implements InitializingBean {
 		if (page == -1) {
 			taskList = AssetComment.findAll( queryList.append(query).toString() )
 		} else {
-			taskList = AssetComment.findAll( queryList.append(query).toString(), [max: pageSize, offset: page] )
+			taskList = AssetComment.findAll( queryList.append(query).toString(), [max: pageSize, offset: ((page - 1) * pageSize)] )
 		}
 		
 		return [
