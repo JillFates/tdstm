@@ -103,17 +103,20 @@
 				loadFilteredStaff('lastName','staff');
 				
 				// handle the scrolling header
-				//$(window).scroll( function() {
-				//	handleHeader();
-				//});
-				//handleHeader();
+				$(window).scroll( function() {
+					handleHeader();
+				});
+				handleHeader();
 			})
 			
 			function handleHeader () {
-				var scrollLimit = $('#staffingTable').offset().top;
-				var header = $('#headerRowId');
-				var leftOffset = header.offset().left;
-				handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
+
+				if($('#staffingTable').length > 0) {
+					var scrollLimit = $('#staffingTable').offset().top;
+					var header = $('#headerRowId');
+					var leftOffset = header.offset().left;
+					handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
+				}
 			}
 			
 	 	</script>
