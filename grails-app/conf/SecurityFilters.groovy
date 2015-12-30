@@ -102,7 +102,10 @@ class SecurityFilters {
 				if (! principal) {
 					if (controllerName != 'auth') {
 						// Deal with remembering URI requested and then redirect to auth/signIn
-						session.setAttribute("savedUrlForwardURI", (request.forwardURI - request.contextPath))
+						def savedUrlForwardURI = (request.forwardURI - request.contextPath)
+						if (savedUrlForwardURI.contains("task/userTask")) {
+							session.setAttribute("savedUrlForwardURI", savedUrlForwardURI)	
+						}
 						flash.message = "Your login session has expired. Please login again."
 						redirect(controller:'auth', action:'login')
 						return false
