@@ -54,7 +54,7 @@ class UserLoginController {
 			active = 'Y'
 		}
 		
-		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort{it.name}
+		def partyGroupList = PartyGroup.findAllByPartyType( PartyType.read("COMPANY")).sort { a, b -> a.name.compareToIgnoreCase b.name }
 		
 		return [companyId:companyId ,partyGroupList:partyGroupList,listJsonUrl:listJsonUrl]
 	}
