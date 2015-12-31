@@ -192,7 +192,7 @@ body{
 	line-height:26px;
 }
 #bodytop{
-	height:175px;
+	min-height:175px;
 	margin-left: 8%;
 }
 
@@ -239,10 +239,10 @@ body{
 	}
 
 .teamcol{
-	width:160px;
+	max-width:160px;
 }
 .teamcountcolumn{
-	width:50px;
+	max-width:50px;
 	text-align:right;
 }
 .teambarcolumn{
@@ -281,10 +281,9 @@ body{
 	
 #newssection{
 	border:1px solid #e4e2e2;
-	background-image:url(../images/news_bg.jpg);
-	background-position:top;
-	background-repeat:repeat;
-	height:200px;
+	background-color: #F4F4F4;
+	min-height:200px;
+	overflow-y: auto;
 	margin-top:3px;
 	}
 	
@@ -806,6 +805,7 @@ input, select, textarea {
 }
 .teamBreakdown.toprightcontent {
 	width: 50%; 
+	max-width: 600px;
 }
 .teamBreakdown {
 	margin-top:5px;
@@ -818,6 +818,7 @@ input, select, textarea {
 }
 .taskCountSpan{
 	font-size:40px;
+	background-color: #fefefe;
 	border:1px solid black;
 	padding-left: 15px;
 	padding-right: 15px;
