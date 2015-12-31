@@ -114,4 +114,5 @@ databaseChangeLog = {
 	include file: '20151214-fix-invalid-status-and-type-values-in-assetdep.groovy'
 	include file: '20151214-remove-new-or-old-column-from-asset-entity.groovy'
 	include file: '20151209-nullout-invalid-person-ref.groovy'
+	include file: '20151230-remove-from-role-user-dep-analyzer-view.groovy'
 }
