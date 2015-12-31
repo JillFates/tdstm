@@ -1021,9 +1021,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				def assetDepTypeList = AssetDependencyType.getList()
 				def assetDepStatusList = AssetDependencyStatus.getList()
 
-				def lookupValue = { value, list->
+				def lookupValue = { value, list ->
 				    def result = "Unknown"
-				    x.each{
+				    list.each{
 				        if(it.equalsIgnoreCase(value)){
 				            result = it
 				        }
