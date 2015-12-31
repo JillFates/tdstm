@@ -26,7 +26,7 @@
 
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
-		<g:javascript src="d3/d3.min.js"/>
+		<g:javascript src="d3/d3.js"/>
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="graph.js" />
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />

@@ -7,7 +7,7 @@
 		<g:javascript src="asset.tranman.js"/>
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
-		<g:javascript src="d3/d3.min.js"/>
+		<g:javascript src="d3/d3.js"/>
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>	
 		<g:javascript src="angular/plugins/angular-resource.js" />

@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		
 		<g:javascript src="asset.comment.js" />
-		<g:javascript src="d3/d3.min.js"/>
+		<g:javascript src="d3/d3.js"/>
 		<g:javascript src="angular/angular.min.js" />
 		<g:javascript src="angular/plugins/angular-ui.js"/>
 		<g:javascript src="angular/plugins/angular-resource.js" />

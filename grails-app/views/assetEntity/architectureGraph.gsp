@@ -21,7 +21,7 @@
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
-		<g:javascript src="d3/d3.min.js" />
+		<g:javascript src="d3/d3.js" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="graph.js" />
