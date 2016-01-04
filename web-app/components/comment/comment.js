@@ -1567,7 +1567,11 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					filter: "contains",
 					virtual: {
 						itemHeight: 60,
-						valueMapper: function(options) {
+						valueMapper: {
+							read: utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + dependency.category + '&commentId=' + scope.commentId),
+							type: "get",
+							dataType: "json",
+							cache: false
 							// If a value has been selected, server must return the index
 							// on this way if value selected is 50 and we are on page 1, widget will request
 							// the page 5 to get the selected field.
@@ -1579,7 +1583,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
 							type: "get",
 							dataType: "json",
-							cache: false
+							cache: true
 						},
 						pageSize: 8,
 						serverPaging: true,
