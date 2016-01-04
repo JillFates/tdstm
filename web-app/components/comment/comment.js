@@ -798,6 +798,19 @@ tds.comments.service.CommentService = function(utils, http, q) {
 			checkDependenciesLoops(depData);
 	};
 
+	var getIndexValueMapper = function(category, commentId){
+		var deferred = q.defer();
+
+		http.get(utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + category + '&commentId=' + commentId)).
+			success(function(data, status, headers, config) {
+				deferred.resolve(data);
+			}).
+			error(function(data, status, headers, config) {
+				deferred.reject(data);
+			});
+		return deferred.promise;
+	};
+
 	var createDependenciesArray = function(dependencies) {
 		var result = [];
 		var noIdCount = -1;
@@ -1069,6 +1082,7 @@ tds.comments.service.CommentService = function(utils, http, q) {
 		getDependencies: getDependencies,
 		deleteComment: deleteComment,
 		validDependencies: validDependencies,
+		getIndexValueMapper: getIndexValueMapper,
 		changeTaskStatus: changeTaskStatus,
 		assignTaskToMe: assignTaskToMe,
 		changeTaskEstTime: changeTaskEstTime,
@@ -1567,14 +1581,12 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					filter: "contains",
 					virtual: {
 						itemHeight: 60,
-						valueMapper: {
-							read: utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + dependency.category + '&commentId=' + scope.commentId),
-							type: "get",
-							dataType: "json",
-							cache: false
-							// If a value has been selected, server must return the index
-							// on this way if value selected is 50 and we are on page 1, widget will request
-							// the page 5 to get the selected field.
+						valueMapper: function(options) {
+							commentService.getIndexValueMapper(dependency.category, scope.commentId).then(
+								function(data) {
+									return options(data);
+								}, function(data) { }
+							);
 						}
 					},
 					height: 120,
