@@ -29,10 +29,10 @@
 
 	$(document).ready(function() {
 		$("#submitButton").click(function(){
-					$("#overlay").css('display', 'inline')
-					$("#submitButton").attr('disabled', true)
-					var form = $("form")[0]
-					form.submit()
+			$("#overlay").css('display', 'inline')
+			$("#submitButton").attr('disabled', true)
+			var form = $("form")[0]
+			form.submit()
 		})
 	})
 
@@ -52,11 +52,12 @@
 			
 		</tr>
 	</table>
-	<div class="mainbody" >
+	<div class="mainbody">
 		<table width="100%" style="border: 0; vertical-align: top;" align="center" cellpadding="0" cellspacing="0">
 			<tr>
-				<td  valign="top" style="width:292px" >
+				<td valign="top" style="width:292px">
 				<div class="colum_login">
+				
 				<div class="left_cornerlog"></div>
 				<div class="border_toplog"></div>
 				<div class="right_cornerlog"></div>
@@ -122,10 +123,14 @@
 					</table>
 				</g:form>
 				</div>
+				
 				<div class="left_bcornerlog"></div>
 				<div class="border_botlog"></div>
 				<div class="right_bcornerlog"></div>
-				<iframe src="/tdstm/build.txt" width="240" height="30" marginwidth="0" marginheight="0" scrolling="no" frameborder="0"></iframe>
+				<div id="buildInfoId">
+					<pre style="word-wrap: break-word; white-space: pre-wrap;">${buildInfo}</pre>
+				</div>
+				
 				</div>
 				</td>
 			</tr>
