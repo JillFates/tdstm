@@ -3615,7 +3615,10 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 	}
 	
 	def tasksSearch() {
-		def project = securityService.getUserCurrentProject()
+		def project = controllerService.getProjectForPage( this )
+		if (! project) 
+			return
+
 		def projectId = project.id
 		def task
 		def moveEventId=params.moveEvent
@@ -3641,6 +3644,31 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 		tasksData.list = list
 		result = ServiceResults.success(tasksData) as JSON
+
+		render result
+	}
+
+	def taskSearchMap() {
+		def project = controllerService.getProjectForPage( this )
+		if (! project) 
+			return
+
+		def projectId = project.id
+		def moveEventId=params.moveEvent
+		def taskId=params.taskId
+		def task
+		def filterDesc=params.list('filter[filters][0][value]')
+		
+		if (params.commentId) { 
+			task = AssetComment.findByIdAndProject(params.commentId, project)
+			if ( ! task ) {
+				log.warn "predecessorSelectHtml - Unable to find task id ${params.commentId} in project $project.id"
+			}
+		}
+
+		def taskIdx = taskService.searchTaskIndexForTask(project, params.category, task, moveEventId, taskId)
+
+		def result = ServiceResults.success([taskIdx.intValue()]) as JSON
 
 		render result
 	}

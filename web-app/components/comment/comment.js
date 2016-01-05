@@ -798,10 +798,10 @@ tds.comments.service.CommentService = function(utils, http, q) {
 			checkDependenciesLoops(depData);
 	};
 
-	var getIndexValueMapper = function(category, commentId){
+	var getIndexValueMapper = function(category, commentId, taskId){
 		var deferred = q.defer();
 
-		http.get(utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + category + '&commentId=' + commentId)).
+		http.get(utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + category + '&commentId=' + commentId + '&taskId=' + taskId)).
 			success(function(data, status, headers, config) {
 				deferred.resolve(data);
 			}).
@@ -1582,9 +1582,9 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					virtual: {
 						itemHeight: 60,
 						valueMapper: function(options) {
-							commentService.getIndexValueMapper(dependency.category, scope.commentId).then(
+							commentService.getIndexValueMapper(dependency.category, scope.commentId, dependency.taskId).then(
 								function(data) {
-									return options(data);
+									options.success(data.data);
 								}, function(data) { }
 							);
 						}

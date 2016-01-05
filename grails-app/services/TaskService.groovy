@@ -661,6 +661,58 @@ class TaskService implements InitializingBean {
 		]
 	}
 	
+	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
+
+		def taskIndex
+
+		StringBuffer query = new StringBuffer("""
+			SELECT rownum FROM (
+				SELECT asset_comment_id, task_number,@rownum:=@rownum+1 as rownum 
+				FROM asset_comment ac, (SELECT @rownum:=0) r
+				WHERE ac.project_id=${project.id} AND ac.comment_type='${AssetCommentType.TASK}' 
+		""")
+ 	
+		if (category) {
+			if ( categoryList.contains(category) ) {
+				query.append("AND ac.category='${category}' ")
+			} else {
+				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
+				category=''
+			}
+		}
+
+		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
+		if (task) { 
+			if (! category && task.category) {
+				query.append("AND ac.category='${task.category}' ")
+			}				
+			query.append("AND ac.asset_comment_id != ${task.id} ")
+		
+			if (task.moveEvent) {
+				query.append("AND ac.move_event_id=${task.moveEvent.id} ")
+			}
+		} else {
+			if (moveEventId) {
+				query.append("AND ac.move_event_id=${moveEventId} ")
+			} else {
+				query.append("AND ac.move_event_id is null ")
+			}
+		}
+		
+		// Add the sort and generate the list
+		query.append("""
+				ORDER BY ac.task_number ASC
+			) tasks_rows
+			WHERE tasks_rows.asset_comment_id = ${taskId}
+		""")
+
+		def tasksInfo = jdbcTemplate.queryForList(query.toString())
+		
+		taskIndex = tasksInfo[0]['rownum']
+		
+		return taskIndex
+	}
+
 	/**
 	 * Returns Boolean value to warn status is overriding or not
 	 * @param AssetComment as task
