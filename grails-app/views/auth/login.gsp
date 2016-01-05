@@ -105,16 +105,23 @@
 									<g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link>
 								</td>
 							</tr>
-							<g:if test="${ (!request.getHeader('User-Agent')) || request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
-							<tr>
-								<td colspan="2">
-									<div class="message">Warning: This site no longer supports versions of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
-								</td>
-							</tr>
+							<g:if test="${request.getHeader('User-Agent')}">
+								<g:if test="${request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
+									<tr>
+										<td colspan="2">
+											<div class="message">Warning: This site no longer supports versions of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
+										</td>
+									</tr>
+								</g:if>
 							</g:if>
+							<g:else>
+								<div class="message">Warning: Unable to determine your browser type and therefore unable to guarantee the site will work properly.</div>
+							</g:else>
+							
 						</tbody>
 					</table>
-				</g:form></div>
+				</g:form>
+				</div>
 				<div class="left_bcornerlog"></div>
 				<div class="border_botlog"></div>
 				<div class="right_bcornerlog"></div>
