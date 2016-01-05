@@ -622,6 +622,24 @@ class ImportService {
 		}
 	}
 
+	/**
+	 * This method will iterate over a list of properties that may not have been set during the import process and then 
+	 * assign default values appropriately.
+	 */
+	private void processRequiredProperties(project, assetObj, rowNum, warnings, errorConflictCount, tzId, dtFormat) {
+		List requiredProps = ['assetTag', 'moveBundle', 'planStatus', 'validation']
+		requiredProps.each { prop ->
+			if (! assetObj[prop]) {
+				Map dtvMap = [ 
+					importValue: '',
+					eavAttribute: [attributeCode : prop ]
+				]
+				assetEntityAttributeLoaderService.setCommonProperties(project, assetObj, dtvMap, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+			}
+		}
+	}
+
+
 	/**	
 	 * This process will iterate over the assets imported into the specified batch and update the Application appropriately
 	 * @param projectId - the id of the project that the user is logged into and the batch is associated with
@@ -796,7 +814,10 @@ class ImportService {
 					errorConflictCount++
 				}
 
-			}	// dtvList.each				
+			}	// dtvList.each	
+
+			// Update various common properties that may not have been set by the above loop
+			processRequiredProperties(project, application, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
@@ -1076,6 +1097,9 @@ class ImportService {
 					log.debug "$methodName Just set MfgModelType isDirty=${asset.isDirty()} asset $asset ${asset.model} ${asset.manufacturer} ${asset.assetType}"
 				}
 
+				// Update various common properties that may not have been set by the above loop
+				processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+
 				// 
 				// Deal with Chassis
 				//
@@ -1309,6 +1333,9 @@ class ImportService {
 
 			}
 
+			// Update various common properties that may not have been set by the above loop
+			processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
+
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(
 				asset, assetsList, rowNum, insertCount, updateCount, errorCount, warnings)
@@ -1455,6 +1482,9 @@ class ImportService {
 				}
 
 			}
+
+			// Update various common properties that may not have been set by the above loop
+			processRequiredProperties(project, asset, rowNum, warnings, errorConflictCount, tzId, dtFormat)
 
 			// Save the asset if it was changed or is new
 			(insertCount, updateCount, errorCount) = assetEntityAttributeLoaderService.saveAssetChanges(

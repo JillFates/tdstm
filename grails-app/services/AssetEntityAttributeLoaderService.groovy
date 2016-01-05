@@ -1335,7 +1335,7 @@ class AssetEntityAttributeLoaderService {
 			log.debug "setCommonProperties() updating ${clazz}.${property} with [$value] (row $rowNum)"
 
 		switch (property) {
-			case ~/assetTag|assetName/:
+			case 'assetTag':
 				// This is a special case when the clazz is AssetEntity as we construct the assetName & assetTag if not presented
 				if (clazz == 'AssetEntity') {
 					if (! asset[property] && ! value ) {
@@ -1349,7 +1349,7 @@ class AssetEntityAttributeLoaderService {
 				if (newVal)
 					asset[property] = newVal
 				break
-			case "moveBundle":
+			case 'moveBundle':
 				if(!asset.id || dtv.importValue){
 					def moveBundle = getdtvMoveBundle(dtv, project)
 						asset[property] = moveBundle
