@@ -85,7 +85,7 @@
 							<g:if test="${loginConfig.authorityPrompt == 'hidden'}">
 								<input type="hidden" name="authority" value="${loginConfig.authorityName}">
 							</g:if>
-
+							
 							<tr>
 								<td>Username:</td>
 								<td>
@@ -105,10 +105,10 @@
 									<g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link>
 								</td>
 							</tr>
-							<g:if test="${ request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
+							<g:if test="${ (!request.getHeader('User-Agent')) || request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
 							<tr>
-								<td colspan="2" >
-									<div class="message" >Warning: This site no longer supports version of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
+								<td colspan="2">
+									<div class="message">Warning: This site no longer supports versions of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
 								</td>
 							</tr>
 							</g:if>
@@ -127,22 +127,20 @@
 </div>
 <div class="logo"></div>
 
-
-		<div id="overlay">
-		    <div id="overlay-wrapper">
-		        <div id="floatingBarsG">
-		            <div class="blockG" id="rotateG_01"></div>
-		            <div class="blockG" id="rotateG_02"></div>
-		            <div class="blockG" id="rotateG_03"></div>
-		            <div class="blockG" id="rotateG_04"></div>
-		            <div class="blockG" id="rotateG_05"></div>
-		            <div class="blockG" id="rotateG_06"></div>
-		            <div class="blockG" id="rotateG_07"></div>
-		            <div class="blockG" id="rotateG_08"></div>
-		        </div>
-		    </div>
+<div id="overlay">
+	<div id="overlay-wrapper">
+		<div id="floatingBarsG">
+			<div class="blockG" id="rotateG_01"></div>
+			<div class="blockG" id="rotateG_02"></div>
+			<div class="blockG" id="rotateG_03"></div>
+			<div class="blockG" id="rotateG_04"></div>
+			<div class="blockG" id="rotateG_05"></div>
+			<div class="blockG" id="rotateG_06"></div>
+			<div class="blockG" id="rotateG_07"></div>
+			<div class="blockG" id="rotateG_08"></div>
 		</div>
-
+	</div>
+</div>
 
 </body>
 </html>
