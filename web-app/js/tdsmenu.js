@@ -400,11 +400,17 @@
 
 		var timeout = 500;
 		var megamenuitem = 0;
+		// Global click method should be avoided completely. This will be refactored with the new incoming menu
 		$(document).click(function(e){
-	        if (!$(e.target).is('.tzmenu,#tzId')) {
-	        	$(".tzmenu ul").hide();
-	        }
-	        if (!$(e.target).is('.headerClass')) {
-	        	closeMegaMenu();
-	        }
+			if(e){
+				var htmlElement = $(e.target);
+				if(htmlElement && htmlElement.length && htmlElement.get(0).tagName && htmlElement.get(0).tagName !== 'svg'){
+					if (!$(e.target).is('.tzmenu,#tzId')) {
+						$(".tzmenu ul").hide();
+					}
+					if (!$(e.target).is('.headerClass')) {
+						closeMegaMenu();
+					}
+				}
+			}
 		});

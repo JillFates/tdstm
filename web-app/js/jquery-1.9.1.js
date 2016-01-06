@@ -4107,15 +4107,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 		Expr.filter["ID"] = function( id ) {
 			var attrId = id.replace( runescape, funescape );
 			return function( elem ) {
-				if(typeof elem.getAttribute !== strundefined) {
-					return elem.getAttribute("id") === attrId;
-				}
-				//We are dealing with a SVGInstance on IE/FF
-				if(elem && elem.correspondingElement && elem.correspondingElement.id){
-					return elem.correspondingElement.id === attrId;
-				}
-
-				return false;
+				return elem.getAttribute("id") === attrId;
 			};
 		};
 	} else {
