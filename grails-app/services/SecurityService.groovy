@@ -1136,12 +1136,8 @@ Dealt with:
 		}
 		if (isNewUser) {
 			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, "START_PAGE", "User Dashboard")
-
-			def tZPreference = new UserPreference()
-			tZPreference.userLogin = userLogin
-			tZPreference.preferenceCode = "CURR_TZ"
-			tZPreference.value = "EDT"
-			tZPreference.save( insert: true)
+			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, TimeUtil.TIMEZONE_ATTR, TimeUtil.defaultTimeZone)
+			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, TimeUtil.DATE_TIME_FORMAT_ATTR, TimeUtil.getDefaultFormatType())
 
 			auditService.saveUserAudit(UserAuditBuilder.newUserLogin(byWhom, userLogin.username))
 		}

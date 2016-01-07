@@ -137,6 +137,12 @@ class AuthController {
 						userPreferenceService.loadPreferences(TimeUtil.TIMEZONE_ATTR)
 					}
 
+					// If the user don't have a date format selected initialize it
+					if (session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR ).CURR_DT_FORMAT == null) {
+						userPreferenceService.setPreference( TimeUtil.DATE_TIME_FORMAT_ATTR, TimeUtil.getDefaultFormatType() )
+						userPreferenceService.loadPreferences(TimeUtil.DATE_TIME_FORMAT_ATTR)
+					}
+
 					/*
 					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
 					 */
