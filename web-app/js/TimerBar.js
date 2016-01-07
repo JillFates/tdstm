@@ -84,8 +84,11 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 	// binds event listeners to DOM elements that affect the timerbar
 	public.bindListeners = function () {
 		$('#selectTimedBarId').on('change', function (e) {
-			public.setTimerValue(e.srcElement.value);
-			public.setUserPreference(e.srcElement.value);
+			var element = e.srcElement;
+			if (!element)
+				element = e.target;
+			public.setTimerValue(element.value);
+			public.setUserPreference(element.value);
 		});
 		
 		$(window).resize(function() {
