@@ -2,7 +2,7 @@
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
-	-moz-user-select: moz-none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
@@ -90,14 +90,13 @@ polygon.mainItem.ahead {
 
 polygon.mainItem:hover {
 	-webkit-filter: url(#hoverFilterId) !important;
-	filter: url(#hoverFilterId) !important;
+	opacity: 0.8;
 }
 
 polygon.mainItem.critical {
-	stroke-width: 3;
+	stroke-width: 4 !important;
 	-webkit-filter: url(#criticalFilterId);
-	filter: url(#criticalFilterId);
-	stroke: orange;
+	stroke: #ff9900;
 }
 polygon.mainItem.milestone {
 	stroke-width: 1px;

@@ -153,7 +153,8 @@ function buildGraph (response, status) {
 		.attr('width', width + margin.right + margin.left)
 		.attr('height', height + margin.top + margin.bottom + 20)
 		.attr('class', 'chart unselectable');
-
+	
+	// create the defs section
 	chart.append('defs').append('clipPath')
 		.attr('id', 'clip')
 		.append('rect')
@@ -171,8 +172,8 @@ function buildGraph (response, status) {
 			0   0.7 0   0   0\
 			0   0   0.7 0   0\
 			0   0   0   1   0');
-	
-	// construct the darkening filter for critical path highlighting
+			
+	// construct the light filter for hovering over tasks
 	chart.select('defs')
 		.append('filter')
 		.attr('id', 'hoverFilterId')
@@ -508,7 +509,7 @@ function buildGraph (response, status) {
 			.attr('x1', x(now()) + 0.5)
 			.attr('x2', x(now()) + 0.5);
 	}, 100);
-	
+
 	// setup all the heights to fit to the rect height
 	setupHeights(mainRectHeight);
 	
@@ -675,7 +676,6 @@ function buildGraph (response, status) {
 		lines.sort(function (a, b) { return a.selected - b.selected; });
 		lines.exit().remove();
 
-		
 		// update the item labels
 		labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
 			.data(visItems, function (d) { return d.id; })
@@ -773,6 +773,7 @@ function buildGraph (response, status) {
 		var teamSelect = $('#teamSelectId');
 		if (teamSelect.val() != 'ALL' && teamSelect.val() != d.role)
 			classString += ' unfocussed ';
+		
 		return classString;
 	}
 	
