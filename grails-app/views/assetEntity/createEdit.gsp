@@ -5,8 +5,6 @@
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
 
-<g:include view="/layouts/_error.gsp" />
-
 <g:form method="post" name="createEditAssetForm" action="${action}">
 
 	<%-- TODO : JPM 10/2014 - Need to determine if the filter params are necessary--%>

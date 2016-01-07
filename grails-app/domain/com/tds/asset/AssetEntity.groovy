@@ -180,7 +180,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	
 	static constraints = {
 		application( blank:true, nullable:true )
-		assetName( blank:false, nullable:false )
+		assetName( blank:false, nullable:false, size:0..255 )
 		shortName( blank:true, nullable:true )
 		assetType( blank:true, nullable:true )
 		priority( nullable:true, validator: 
@@ -200,7 +200,7 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		maintContract( blank:true, nullable:true )
 		maintExpDate( nullable:true )
 		retireDate( nullable:true )
-		description( blank:true, nullable:true )
+		description( blank:true, nullable:true, size:0..255 )
 		supportType( blank:true, nullable:true )
 		environment( blank:true, nullable:true, size:0..20, validator: 
 			CustomValidators.inList(

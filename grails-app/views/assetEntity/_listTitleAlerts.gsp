@@ -8,3 +8,4 @@
 		<div>
 			<div id="messageId" class="message" style="display:none"></div>
 		</div>
+		<g:include view="/layouts/_error.gsp" />

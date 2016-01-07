@@ -723,20 +723,17 @@ var EntityCrud = ( function($) {
 				url: url,
 				data: data,
 				type:'POST',
-				async: false,
-				success: function(resp) {
-					if (resp.status == 'error') {
-						alert(resp.errors);
-						buttonClicked.one(function() {
-							pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
-						});
-						assetUpdateInvoked = false;
-						buttonClicked.disabled = false;
-						return false;
-					} else {
-						pub.showAssetDetailView(assetClass, resp.data.asset.id);
-						$(document).trigger('entityAssetUpdated');
-					}
+				//async: false,
+				complete: function(resp, status) {
+					buttonClicked.one(function() {
+						pub.EntityCrud.performAssetUpdate(buttonClicked, assetClass);
+					});
+					assetUpdateInvoked = false;
+					buttonClicked.disabled = false;
+				},
+				success: function(resp, dataType) {
+					pub.showAssetDetailView(assetClass, resp.data.asset.id);
+					$(document).trigger('entityAssetUpdated');
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var err = jqXHR.responseText;
