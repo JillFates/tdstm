@@ -663,7 +663,7 @@ class TaskService implements InitializingBean {
 	
 	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
 
-		def taskIndex
+		def taskIndex = 0
 
 		StringBuffer query = new StringBuffer("""
 			SELECT rownum FROM (
@@ -708,8 +708,10 @@ class TaskService implements InitializingBean {
 
 		def tasksInfo = jdbcTemplate.queryForList(query.toString())
 		
-		taskIndex = tasksInfo[0]['rownum']
-		
+		if (tasksInfo[0] != null) {
+			taskIndex = tasksInfo[0]['rownum'] + 1
+		}
+
 		return taskIndex
 	}
 

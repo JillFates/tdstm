@@ -3638,6 +3638,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		
 		def list = []
 		list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
+		tasksData.total++
 		tasksData.list.each {
 			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
 			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber]
