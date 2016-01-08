@@ -2,6 +2,7 @@
 // global functions for accessing the graph outside the scope of the main function
 var getData = function () {return null}
 var forceDisplay = function () {return null}
+var debug = {};
 
 $(document).ready(function () {
 	// check keyup on the search field for the enter key
@@ -94,6 +95,9 @@ function buildGraph (response, status) {
 	var anchorOffset = 10; // the length of the "point" at the end of task polygons
 	var margin = {top: 20, right: 0, bottom: 15, left: 0};
 	var minExtentRange = 10;
+	var labelFloatOffset = 1;
+	var labelPadding = 10;
+	var scrollingLabelsPerformanceCutoff = 50;
 	var items = data.items;
 	var starts = data.starts;
 	var dependencies = [];
@@ -252,11 +256,12 @@ function buildGraph (response, status) {
 			tempBrush = null;
 			tempBrushXInitial = 0;
 			display(true, true);
-			display(false, false);
+			display(true, true);
 		}
 		drawing = 0;
 		chart.classed('resizing', false);
 		display(false, false);
+		chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 1000000) + ')';
 	}
 	
 	// Sets the custom dragging behavior
@@ -278,7 +283,6 @@ function buildGraph (response, status) {
 	var mainSelection = null;
 	var mainSelectionXInitial = 0;
 	var selectingMain = false;
-	var mainTranslate = 0;
 	
 	// handle panning and time selection behavior on the main graph
 	function dragStart () {
@@ -306,15 +310,11 @@ function buildGraph (response, status) {
 			if (dragging)
 				chart.classed('resizing', true);
 		} else {
-			var offset = -1 * x(brush.extent()[0]) - offsetInitial;
 			var minExtent = brush.extent()[0];
 			var maxExtent = brush.extent()[1];
 			var timeShift = (maxExtent - minExtent) * (d3.event.dx / width);
-//					if (minExtent-timeShift > x.domain()[0] && maxExtent-timeShift < x.domain()[1]) {
 				brush.extent([new Date(minExtent-timeShift), new Date(maxExtent-timeShift)]);
-				mainTranslate += d3.event.dx;
 				display(false, false);
-//					}
 			if (dragging)
 				chart.classed('dragging', true);
 		}
@@ -337,10 +337,11 @@ function buildGraph (response, status) {
 			mainSelection = null;
 			mainSelectionXInitial = 0;
 			display(true, true);
-			display(false, false);
+			display(true, true);
 		} else {
 			display(false, false);
-			mainTranslate = 0;
+			correctLabelPositions();
+			chart[0][0].style.webkitTransform = 'scale(' + (1 + Math.random() / 100000) + ')';
 		}
 		chart.classed('dragging', false);
 		chart.classed('resizing', false);
@@ -467,6 +468,7 @@ function buildGraph (response, status) {
 	var brush = d3.svg.brush()
 		.x(x)
 		.on("brush", brushed)
+		.on("brushend", brushedEnd)
 		.extent([parseStartDate(data.startDate), new Date( Math.min( parseStartDate(data.startDate).getTime() + 30 * 60000, x.domain()[1].getTime() ) )])
 	
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
@@ -509,7 +511,7 @@ function buildGraph (response, status) {
 			.attr('x1', x(now()) + 0.5)
 			.attr('x2', x(now()) + 0.5);
 	}, 100);
-
+	
 	// setup all the heights to fit to the rect height
 	setupHeights(mainRectHeight);
 	
@@ -518,8 +520,8 @@ function buildGraph (response, status) {
 	ready = true;
 	display(true, true);
 	
-	/* define the global accessor functions */
 	
+	/* define the global accessor functions */
 	getData = function () {
 		return data;
 	}
@@ -536,14 +538,20 @@ function buildGraph (response, status) {
 			brush.extent([brush.extent()[0], new Date(brush.extent()[0].getTime() + minRange)]);
 			
 		drawing = -1;
-		if (d3.event.mode == "move")
+		if (d3.event.mode == "move") {
 			display(false, false);
-		else
+		} else {
 			display(false, true);
+		}
+	}
+	
+	// called when the brush is released
+	function brushedEnd () {
+		correctLabelPositions();
 	}
 	
 	// updates the svg
-	function display (resized, scaled) {
+	function display (resized, scaled, repainting) {
 		if (!ready)
 			return;
 		
@@ -570,27 +578,31 @@ function buildGraph (response, status) {
 		mainHourAxis.attr('transform', 'translate(' + offset + ', ' + offsetY + ')');
 		mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
 		
-		if ( ! scaled )
+		if ( (! scaled) && (! repainting) )
 			return;
 		
-		var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
-		zoomScale = extentWidth / width;
-		x1.range([0, width / zoomScale]);
-		
-		// update the scales for the axis
-		x1MinuteAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
-		x1HourAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
-		mainMinuteAxis.call(x1MinuteAxis);
-		mainHourAxis.call(x1HourAxis);
-		
-		$.each(items, function (i, d) {
-			d.points = getPoints(d);
-		});
+		if (scaled) {
+			var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
+			zoomScale = extentWidth / width;
+			x1.range([0, width / zoomScale]);
+			
+			// update the scales for the axis
+			x1MinuteAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
+			x1HourAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
+			mainMinuteAxis.call(x1MinuteAxis);
+			mainHourAxis.call(x1HourAxis);
+			
+			$.each(items, function (i, d) {
+				d.points = getPoints(d);
+			});
+		}
 
 		// update any existing item polys
 		polys = itemPolys.selectAll('polygon')
-			.data(visItems, function (d) { return d.id; })
-			.attr('points', function(d) {
+			.data(visItems, function (d) { return d.id; });
+			
+		if (scaled)
+			polys.attr('points', function(d) {
 				var p = d.points;
 				return p.x + ',' + p.y + ' '
 					 + p.x2 + ',' + p.y + ' '
@@ -598,7 +610,7 @@ function buildGraph (response, status) {
 					 + p.x2 + ',' + (p.y+p.h) + ' '
 					 + p.x + ',' + (p.y+p.h) + ' ';
 			})
-			.attr('class', function(d) { return 'mainItem ' + getClasses(d); });
+		polys.attr('class', function(d) { return 'mainItem ' + getClasses(d); });
 		
 		// add any task polys in the new domain extents
 		polys.enter()
@@ -615,7 +627,6 @@ function buildGraph (response, status) {
 			.attr('id', function(d) { return 'task-' + d.id; })
 			.on("click", function(d) {
 				toggleTaskSelection(d);
-				display(false, false);
 			})
 			.on("dblclick", function(d) {
 				showAssetComment(d.id, 'show');
@@ -632,25 +643,28 @@ function buildGraph (response, status) {
 		
 		// update any existing dependency lines
 		lines = itemArrows.selectAll('line')
-			.data(visDeps, function (d) { return d.predecessor.id + '-' + d.successor.id; })
-			.attr('x1', function(d) {
-				var start = x1(d.predecessor.start);
-				var end = x1(d.predecessor.end);
-				var lowest = start + (end - start) * 0.75;
-				return Math.round(Math.max( lowest, end-anchorOffset ));
-			})
-			.attr('x2', function(d) {
-				var start = x1(d.successor.start);
-				var end = x1(d.successor.end);
-				var highest = start + (end - start) * 0.25;
-				return Math.round(Math.min( highest, start+anchorOffset ));
-			})
-			.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
+			.data(visDeps, function (d) { return d.predecessor.id + '-' + d.successor.id; });
+			
+		if (scaled)
+			lines
+				.attr('x1', function(d) {
+					var start = x1(d.predecessor.start);
+					var end = x1(d.predecessor.end);
+					var lowest = start + (end - start) * 0.75;
+					return Math.round(Math.max( lowest, end-anchorOffset ));
+				})
+				.attr('x2', function(d) {
+					var start = x1(d.successor.start);
+					var end = x1(d.successor.end);
+					var highest = start + (end - start) * 0.25;
+					return Math.round(Math.min( highest, start+anchorOffset ));
+				})
 		
 		if (resized)
 			lines
 				.attr('y1', function(d) { return d.predecessor.points.y2; })
 				.attr('y2', function(d) { return d.successor.points.y2; })
+		lines.attr('class', function(d) { return 'dependency mainItem ' + getClasses(d); });
 		
 		// add any dependency lines in the new domain extents
 		lines.enter().insert('line')
@@ -673,51 +687,63 @@ function buildGraph (response, status) {
 		
 	
 		// move any selected lines to the top of the DOM
-		lines.sort(function (a, b) { return a.selected - b.selected; });
+		if (taskSelected != null)
+			lines.sort(function (a, b) { return a.selected - b.selected; });
 		lines.exit().remove();
-
+		
 		// update the item labels
 		labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
-			.data(visItems, function (d) { return d.id; })
-			.attr('x', function(d) { return d.points.x; })
-			.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
-			.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
-			
+			.data(visItems, function (d) { return d.id; });
+		
+		if (scaled)
+			labels
+				.attr('x', function(d) { return d.points.x; })
+				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); });
+				
 		if (resized)
 			labels
 				.attr('y', function(d) { return d.points.y; })
 				.attr('height', function(d) { return d.points.h; })
+		labels.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} );
 		
 		// update the item labels' children
 		itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
-			.selectAll(':first-child')
+			.select(':first-child')
 			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
-			.selectAll(':first-child')
-			.selectAll(':first-child')
+			.select(':first-child')
+			.select(':first-child')
 			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; });
 		
 		// add any labels in the new domain extents
-		labels.enter().append('g')
-			.attr('class', 'itemLabel')
+		labels.enter()
+			.append('g')
+				.attr('class', 'itemLabel')
 			.append('foreignObject')
-			.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
-			.attr('id', function(d) { return 'label-' + d.id; })
-			.attr('x', function(d) { return d.points.x; })
-			.attr('y', function(d) { return d.points.y; })
-			.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
-			.attr('height', function(d) { return d.points.h; })
+				.attr('class', function(d) { return 'itemLabel unselectable mainItem ' + getClasses(d);} )
+				.attr('id', function(d) { return 'label-' + d.id; })
+				.attr('x', function(d) { return d.points.x; })
+				.attr('y', function(d) { return d.points.y; })
+				.attr('width', function(d) { return Math.max(0, d.points.w - anchorOffset); })
+				.attr('height', function(d) { return d.points.h; })
 			.append('xhtml:body')
-			.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
-			.attr('class', 'itemLabel')
+				.attr('style', function(d) { return 'height: ' + d.points.h + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+				.attr('class', 'itemLabel')
 			.append('div')
-			.attr('class', 'itemLabel')
-			.attr('align', 'center')
+				.attr('class', 'itemLabel')
+				.attr('align', 'center')
 			.append('p')
-			.attr('class', 'itemLabel')
-			.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
-			.html(function (d) { return d.number + ': ' + d.name; });
+				.attr('class', 'itemLabel')
+				.attr('style', function(d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
+			.append('span')
+				.attr('class', 'itemLabel')
+				.html(function (d) { return d.number + ': ' + d.name; });
 
 		labels.exit().remove();
+		
+		if (scaled) {
+			calculateLabelOffsets();
+			correctLabelPositions();
+		}
 		
 		// updates the mini graph
 		miniPolys
@@ -736,6 +762,69 @@ function buildGraph (response, status) {
 		miniPolys.attr('points', function(d) { return getPointsMini(d); });
 		display(true, true);
 	}
+	
+	function calculateLabelOffsets () {
+		var pageOffset = x1(brush.extent()[0]);
+		var svgOffset = $(chart[0][0]).offset().left;
+		$('span.itemLabel').each(function (i, o) {
+			var pageX1 = $(o).offset().left - svgOffset;
+			var pageX2 = pageX1 + $(o).width();
+			o.__data__.labelStart = pageX1 + pageOffset;
+			o.__data__.labelEnd = pageX2 + pageOffset;
+		});
+	}
+	debug.calculateLabelOffsets = calculateLabelOffsets;
+	
+	// Offsets the labels horizontally so that they aren't cut off by the sides of the screen
+	function correctLabelPositions () {
+		
+		var visStart = x1(brush.extent()[0]);
+		var visEnd = x1(brush.extent()[1]);
+		labels = itemLabels.selectAll(function() { return this.getElementsByTagName("foreignObject"); })
+			.data(items, function (d) { return d.id; });
+			
+		labels[0].each( function (o,i) {
+			
+			var d = o.__data__;
+			var pageX = visStart - d.labelStart;
+			var pageX2 = visEnd - d.labelEnd;
+			
+			var newX = d.points.x;
+			var newW = Math.max(0, d.points.w - anchorOffset);
+			
+			// check if the task is visible
+			if (x1(d.end) > visStart && x1(d.start) < visEnd) {
+				// check if it should be floating left
+				if (d.labelStart < visStart && pageX > 0) {
+					newX = d.labelStart + pageX + labelFloatOffset;
+					newW = Math.max(0, Math.min(d.labelEnd - d.labelStart + labelPadding, x1(d.end) - newX - labelPadding - labelFloatOffset - anchorOffset));
+				// check if it should be floating right
+				} else if (d.labelEnd > visEnd && pageX2 < 0) {
+					newX = Math.max(d.labelStart + pageX2 - labelFloatOffset - labelPadding, x1(d.start));
+					newW = Math.max(0, Math.min((d.labelEnd - d.labelStart) + labelPadding, visEnd - x1(d.start)));
+				// else it is positioned normally
+				} else {
+					o.__data__.useOffset = false;
+				}
+			} else {
+				o.__data__.useOffset = false;
+			}
+			
+			o.__data__.labelX = newX;
+			o.__data__.labelW = newW;
+			
+			d3.select(o)
+				.attr('x', newX)
+				.attr('width', newW)
+				.select(':first-child')
+				.attr('style', function(d) { return 'height: ' + o.__data__.points.h + 'px !important;max-width: ' + newW + 'px !important;'; })
+				.select(':first-child')
+				.select(':first-child')
+				.attr('style', function(d) { return 'width: ' + newW + 'px !important;max-width: ' + newW + 'px !important;'; });
+			
+		});
+	}
+	debug.correctLabelPositions = correctLabelPositions;
 	
 	// setup all the heights to fit to the rect height
 	function setupHeights (newRectHeight) {
@@ -821,7 +910,7 @@ function buildGraph (response, status) {
 
 
 	// Toggles selection of a task
-	function toggleTaskSelection(taskObject) {
+	function toggleTaskSelection(taskObject, skipRepaint) {
 		
 		if (dragging)
 			return;
@@ -836,7 +925,7 @@ function buildGraph (response, status) {
 			
 		// selecting
 		} else {
-			toggleTaskSelection(taskSelected) // if another task is selected, deselect that one first
+			toggleTaskSelection(taskSelected, true) // if another task is selected, deselect that one first
 			taskSelected = taskObject;
 		}
 
@@ -863,8 +952,9 @@ function buildGraph (response, status) {
 		
 		if ( ! selecting )
 			taskSelected = null;
-			
-		display(true, true);
+		
+		if ( ! skipRepaint )
+			display(false, false, true);
 	}
 	
 	// moves the brush to the selected location
