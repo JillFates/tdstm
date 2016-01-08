@@ -6,17 +6,8 @@
 	<title>Application Conflicts</title>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
-	<g:javascript src="angular/angular.min.js" />
-	<g:javascript src="angular/plugins/angular-ui.js"/>	
-	<g:javascript src="angular/plugins/angular-resource.js" />
-	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
+	<g:render template="../layouts/angularResources" />
 	<g:javascript src="asset.comment.js" />
-	<g:javascript src="cabling.js"/>	
-	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
-	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 	<script>
 		$(document).ready(function() {
 			$("#showEntityView").dialog({ autoOpen: false })

@@ -8,9 +8,8 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
 
-	<g:javascript src="bootstrap.js" />
-	<g:javascript src="angular/angular.min.js" />
-	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+	<g:render template="../layouts/angularResources" />
+
 	<g:javascript src="progressBar.js" />
 	
 	<script type="text/javascript">

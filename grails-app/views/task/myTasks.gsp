@@ -12,14 +12,7 @@
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="model.manufacturer.js"/>
-	<g:javascript src="angular/angular.min.js" />
-	<g:javascript src="angular/plugins/angular-ui.js"/>
-	<g:javascript src="angular/plugins/angular-resource.js" />
-	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-	<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
-	<g:javascript src="bootstrap.js" />
-	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
+	<g:render template="../layouts/angularResources" />
 	
 <script type="text/javascript">
 	window.addEventListener('load', function(){

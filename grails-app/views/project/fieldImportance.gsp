@@ -5,9 +5,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>Project Field Settings</title>
-	<g:javascript src="angular/angular.min.js" />
+	<g:render template="../layouts/angularResources" />
 	<%--TODO:the following bootstrap contains few extra methods which is usefull for angular bootstrap,once testing entire application with this js I will replace it with bootstrap.js--%>
-	<g:javascript src="ui-bootstrap-tpls-0.10.0.js" />
 	<g:javascript src="controllers/fieldImportance.js" />
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
