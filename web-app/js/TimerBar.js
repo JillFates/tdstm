@@ -46,7 +46,7 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 			var timePref = $("#selectTimedBarId").val()
 			if (timePref != 0) {
 				public.Start(timePref);
-			} else{
+			} else {
 				public.Pause(0);
 			}
 		} else {
@@ -62,6 +62,27 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 		} else {
 			public.oop.animate($('#issueTimebarId').width(),$('#issueTimebarId').width(),sec*1000);
 		}
+	}
+	
+	// resumes the timer
+	public.Resume = function () {
+		clearTimeout(public.to);
+		if (public.sec != 0) {
+			var remainingTime = $('#timeBarValueId').val();
+			var currentTime = public.sec - remainingTime;
+			public.srt = new Date() - currentTime * 1000;
+			public.oop.animate($('#issueTimebarId').width(), $('#issueTimebar').width(), remainingTime*1000);
+			if (currentTime > 0 && currentTime < public.sec + 1)
+				public.Time();
+			else
+				public.Restart();
+		}
+	}
+	
+	// resumes the timer if no modals are open
+	public.attemptResume = function () {
+		if ( ! public.areActionBarsOpen() )
+			public.Resume();
 	}
 	
 	// restarts the timer
@@ -95,6 +116,9 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 			public.resetTimer();
 		});
 		
+		$('div[role=dialog]').on('dialogclose', function () {
+			public.attemptResume();
+		});
 	}
 	
 	// reinitializes the timerbar using the response data from getUserPreference
@@ -140,6 +164,13 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 			data: {'code':preferenceName,'value':newValue},
 			type:'POST'
 		});
+	}
+	
+	public.areActionBarsOpen = function () {
+		var taskActionBars = $('#actionBarId').size();
+		if (taskActionBars > 0)
+			return true;
+		return false;
 	}
 	
 	/*	This ugly zxcAnimate code should be replaced when we implement a new animation library.

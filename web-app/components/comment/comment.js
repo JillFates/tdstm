@@ -337,6 +337,8 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 
 	$scope.close = function() {
 		commentUtils.closePopup($scope, 'showComment');
+		if (timerBar)
+			timerBar.attemptResume();
 	};
 
 	$scope.$on('forceDialogClose', function(evt, types) {
@@ -374,6 +376,8 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 	}
 
 	function showAssetCommentDialog(data) {
+		if (timerBar)
+			timerBar.Pause();
 
 		if (data && data[0]) {
 			if (data[0].error) {
@@ -434,6 +438,8 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.removePopupOpenedListener = $scope.$on('popupOpened', function(evt) {
 		$timeout(function() {
+			if (timerBar)
+				timerBar.Pause();
 			$scope.removePopupOpenedListener();
 			$scope.$emit('newActivePopup', 'editComment');
 			if ($scope.isEdit) {
@@ -457,6 +463,8 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.close = function() {
 		commentUtils.closePopup($scope, 'editComment');
+		if (timerBar)
+			timerBar.attemptResume();
 	};
 
 	$scope.$on('forceDialogClose', function(evt, types) {
@@ -1829,6 +1837,8 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				if (!isActiveActionBar()) {
 					windowTimedUpdate.resume();
 				}
+				if (timerBar)
+					timerBar.attemptResume();
 			}
 			var loadContent = function() {
 
@@ -1859,6 +1869,8 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				}
 			}
 			var showContent = function(content) {
+				if (timerBar)
+					timerBar.Pause();
 				windowTimedUpdate.pause();
 				var row = angular.element('#' + scope.rowPrefix + scope.commentId);
 				var newRow = compile(content)(scope);

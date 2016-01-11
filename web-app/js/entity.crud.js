@@ -180,10 +180,10 @@ var EntityCrud = ( function($) {
 	pub.closeCreateModal = function() {
 		pub.getCreateModal().dialog('close'); 
 	};
-	pub.closeEditModal = function() { 
+	pub.closeEditModal = function() {
 		pub.getEditModal().dialog('close');
 	};
-	pub.closeShowModal = function() { 
+	pub.closeShowModal = function() {
 		pub.getShowModal().dialog('close'); 
 	};
 
@@ -1027,6 +1027,9 @@ var EntityCrud = ( function($) {
 			editModal.dialog('option', 'width', 'auto');
 			editModal.dialog('option', 'position', ['center','top']);
 			editModal.dialog('open');
+			
+			if (timerBar)
+				timerBar.Pause();
 
 			if(!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
@@ -1084,11 +1087,6 @@ var EntityCrud = ( function($) {
 	var presentAssetShowView = function(html, fieldHelpType) {
 		var showModal = pub.getShowModal();
 
-		// Disable refresh bar if it exists
-		if (B2 != '') {
-			B2.Pause()
-		}
-
 		if (showModal.length) {
 			pub.closeCreateModal();
 			pub.closeEditModal();
@@ -1096,6 +1094,8 @@ var EntityCrud = ( function($) {
 			showModal.dialog('option', 'width', 'auto');
 			showModal.dialog('option', 'position', ['center','top']);
 			showModal.dialog('open');
+			if (timerBar)
+				timerBar.Pause();
 			updateAssetTitle(fieldHelpType);
 			if (!isIE7OrLesser)
 				getHelpTextAsToolTip(fieldHelpType);
@@ -1180,6 +1180,9 @@ var EntityCrud = ( function($) {
 			createModal.dialog('open');
 			pub.closeEditModal();
 			pub.closeShowModal();
+			
+			if (timerBar)
+				timerBar.Pause();
 			pub.populateAssetEditView(fieldHelpType, source, rackOrChassisId, roomId, location, position, 'create', isBlade);
 			return true;
 		} else {
@@ -1443,6 +1446,8 @@ function changeDocTitle ( newTitle ) {
 	});
 	$(".ui-dialog .ui-dialog-titlebar-close").click(function(){
 		$(document).attr('title', title);
+		if (timerBar)
+			timerBar.attemptResume();
 	});
 	$( "#deps" ).tooltip({
 		 position: {
