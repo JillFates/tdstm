@@ -141,12 +141,6 @@
 							</td>
 						</tr>
 						
-						<tr title="Sets the maximum number of rows the labels can use when stacking">
-							<td class="controlPanelControl" colspan="3">
-								<g:select name="labelOffset" id="labelOffsetId" from="${1..4}" value="${(graphPrefs.labelOffset) ?: defaultPrefs.assetClasses}"></g:select><!--
-								--><label for="labelOffsetId">&nbsp;Max Label Offset</label>
-							</td>
-						</tr>
 						<tr title="Sets the distance between nodes">
 							<td class="controlPanelControl" colspan="3">
 								<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
@@ -205,8 +199,9 @@
 	
 	// if the user navigated here from an asset crud button, there will be a specific asset to start with
 	var initialAssetId = ${assetId ?: 'null'};
-	var parameterRanges = {'levelsUp':[0, 9], 'levelsDown':[0, 9]};
+	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
 	var defaultPrefs = ${defaultPrefs};
+	var assetSelectWidth = 130;
 
 	// Used to track ajax requests and abort them when needed
 	var ajaxRequest;
@@ -253,6 +248,9 @@
 				$('#s2id_assetSelectId').find("a").removeClass("select2-default");	
 			}
 		}
+		
+		// set the width for the asset select2
+		$('#s2id_assetSelectId').css('width', assetSelectWidth + 'px');
 		
 		generateGraph();
 	});

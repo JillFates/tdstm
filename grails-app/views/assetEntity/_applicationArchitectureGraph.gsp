@@ -564,11 +564,6 @@ function buildMap (width, height) {
 	offsetY = 0;
 	GraphUtil.force.on("tick", tick);
 	setLabelOffsets(nodeMap);
-	$('#labelOffsetId').unbind();
-	$('#labelOffsetId').change(function () {
-		setLabelOffsets(nodeMap);
-		GraphUtil.tickOnce();
-	});
 	offsetX = (width / 2) - assets[0].qx;
 	offsetY = 0 - (verticalSpace / 2);
 	background.remove();
@@ -951,14 +946,14 @@ function buildMap (width, height) {
 			
 			// Style the dependencies of the selected node
 			var useTarget = true;
-			$.each(node.allChildren, styleDependencies);
-			useTarget = false;
-			$.each(node.allParents, styleDependencies);
 			function styleDependencies (index, link) {
 				var childNode = (useTarget)?(link.child):(link.parent);
 				link.selected = 1;
 				childNode.selected = 1;
 			}
+			$.each(node.allChildren, styleDependencies);
+			useTarget = false;
+			$.each(node.allParents, styleDependencies);
 		}
 		
 		GraphUtil.updateAllClasses();
@@ -2709,8 +2704,6 @@ function display (list, groups) {
 // Sets the vertical offsets to make nearby labels more readable
 function setLabelOffsets (nodeMap) {
 	var maxOffset = 2;
-	if (! isNaN($('#labelOffsetId').val()))
-		maxOffset = Math.min(Math.max($('#labelOffsetId').val(), 1), 4);
 	var labelPadding = 0.1;
 	var labelRows = [];
 	var keys = Object.keys(nodeMap);
