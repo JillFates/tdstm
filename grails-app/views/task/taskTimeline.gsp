@@ -123,7 +123,7 @@
 		<script type="text/javascript">
 			var timerBar;
 			$(document).ready(function() {
-				timerBar = new TimerBar(60, 'RefreshTimeline', function () {
+				timerBar = new TimerBar(0, 'RefreshTimeline', function () {
 					reloadGraph();
 					timerBar.resetTimer();
 				});

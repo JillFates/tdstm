@@ -37,7 +37,7 @@
 		
 		$(document).ready(function() {
 		
-			timerBar = new TimerBar(60, 'RefreshTaskMgr', function () {
+			timerBar = new TimerBar(0, 'RefreshTaskMgr', function () {
 				reloadGrid();
 				timerBar.resetTimer();
 			});
