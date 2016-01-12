@@ -437,7 +437,7 @@
 	var timerBar;
 	
 	$(document).ready(function() {
-		timerBar = new TimerBar(0, 'RefreshEventDB', refreshDashboard);
+		timerBar = new TimerBar(60, 'RefreshEventDB', refreshDashboard);
 		
 		$("#showEditCommentDialog").dialog({autoOpen: false});
 		$("#createNews").dialog({autoOpen: false});
