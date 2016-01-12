@@ -496,6 +496,10 @@ td.buttonR .powerIcon {
 	vertical-align: baseline;
 }
 
+span.clear_filter {
+	cursor: pointer;
+}
+
 .menuButton a.save {
 	background: transparent url(../icons/database_save.png) 5px 50% no-repeat;
 	color: #333;
@@ -1334,3 +1338,14 @@ div.dialog input#assetName {
 div.dialog input#description {
     width: 98%;
 }
+
+/* TODO: Review with Kendo CSS for Dropdown*/
+span.k-dropdown span.k-dropdown-wrap span.k-select {
+	padding-top: 7px;
+}
+
+.k-list-container .k-list .k-item
+{
+	padding-right: 25px;
+}
+

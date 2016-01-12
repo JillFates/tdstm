@@ -748,7 +748,6 @@ tds.comments.service.CommentService = function(utils, http, q) {
 
 		http.post(utils.url.applyRootPath('/assetEntity/updateStatusSelect?format=json&id=' + commentId)).
 		success(function(data, status, headers, config) {
-			console.log(data);
 			deferred.resolve(data);
 		}).
 		error(function(data, status, headers, config) {
@@ -1580,16 +1579,19 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					dataValueField: "id",
 					filter: "contains",
 					virtual: {
-						itemHeight: 60,
+						itemHeight: 20,
 						valueMapper: function(options) {
-							commentService.getIndexValueMapper(dependency.category, scope.commentId, dependency.taskId).then(
-								function(data) {
-									options.success(data.data);
-								}, function(data) { }
-							);
+							if(options.value && options.value !== '') {
+								//options.value is the dependency.taskId that was assigned in the model, is the same value
+								commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
+									function(data) {
+										options.success(data.data);
+									}, function(data) {}
+								);
+							}
 						}
 					},
-					height: 120,
+					height: 220,
 					dataSource: {
 						transport: {
 							read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
@@ -1597,7 +1599,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 							dataType: "json",
 							cache: true
 						},
-						pageSize: 8,
+						pageSize: 100,
 						serverPaging: true,
 						schema: {
 							data: function(reply) {
@@ -1614,32 +1616,14 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			};
 
 			scope.updateDependencyList = function(dependency) {
-
-                var config = scope.taskOptionsDS(dependency);
-                dependency.dropdown.setDataSource(config.dataSource);
-                dependency.dropdown.refresh();
-
-				/*
-				moveEvent = (scope.moveEvent==null?'':scope.moveEvent);
-				if (!depByCategory[dependency.category]) {
-					depByCategory[dependency.category] = {};
+				var config = scope.taskOptionsDS(dependency);
+				if (!dependency.taskId || dependency.dropdown.dataSource.data().length > 0) {
+					dependency.dropdown.setDataSource(config.dataSource);
+					dependency.dropdown.refresh();
 				}
-				if (depByCategory[dependency.category][moveEvent]) {
-					dependency.list = depByCategory[dependency.category][moveEvent];
-					checkTaskIdExist(dependency);
-				} else {
-					commentService.getDependencies(dependency.category, '', '', moveEvent).then(
-						function(data) {
-							depByCategory[dependency.category][moveEvent] = data.data;
-							dependency.list = depByCategory[dependency.category][moveEvent];
-							checkTaskIdExist(dependency);
-						},
-						function(data) {
-							alerts.showGenericMsg();
-						}
-					);
-				}
-				*/
+
+				dependency.dropdown.list.width("230");
+				dependency.dropdown.list.css("white-space","nowrap");
 			};
 			scope.deleteRow = function(index) {
 				if (scope.ngModel[index].id) {
