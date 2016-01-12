@@ -10,25 +10,25 @@
 	<script type="text/javascript">
 
 		$(document).ready(function() {
-		    var now = new Date();
-		    if(!'${prevParam?.startDate}'){
-			    formatDate(now,'startDate');
-			    now.setDate(now.getDate() + 90) ;
-			    formatDate(now,'completionDate');
-		    }
+			var now = new Date();
+			if (!'${prevParam?.startDate}') {
+				formatDate(now,'startDate');
+				now.setDate(now.getDate() + 90) ;
+				formatDate(now,'completionDate');
+			}
 
-		    $("#timeZoneSelectPopup").dialog({ autoOpen: false });
+			$("#timeZoneSelectPopup").dialog({ autoOpen: false });
 
-		    //appending the previous values.
-				if('${prevParam?.client?.id}'){
-					$("#clientId").val('${prevParam?.client?.id}');
-				}
+			//appending the previous values.
+			if ('${prevParam?.client?.id}') {
+				$("#clientId").val('${prevParam?.client?.id}');
+			}
 
-				if('${prevParam?.projectPartner}'){
-					$("#projectPartnerId").val('${prevParam?.projectPartner}');
-				}
+			if ('${prevParam?.projectPartner}') {
+				$("#projectPartnerId").val('${prevParam?.projectPartner}');
+			}
 
-				showCustomFields('${prevParam?.customFieldsShown ?: '0'}', 2);
+			showCustomFields('${prevParam?.customFieldsShown ?: '0'}', 2);
 
 
 			// Initialize company partners
@@ -54,43 +54,41 @@
 			});
 		})
 		
-		function formatDate(dateValue,value)
-		  {
-		    var M = "" + (dateValue.getMonth()+1);
-		    var MM = "0" + M;
-		    MM = MM.substring(MM.length-2, MM.length);
-		    var D = "" + (dateValue.getDate());
-		    var DD = "0" + D;
-		    DD = DD.substring(DD.length-2, DD.length);
-		    var YYYY = "" + (dateValue.getFullYear()); 
-			  var currentDate = MM + "/" +DD + "/" + YYYY
-			  if(value=='startDate'){
-			    $("#startDateId").val(currentDate);
-			  }else{
-			    $("#completionDateId").val(currentDate);
-			    }
+		function formatDate (dateValue,value) {
+			var M = "" + (dateValue.getMonth()+1);
+			var MM = "0" + M;
+			MM = MM.substring(MM.length-2, MM.length);
+			var D = "" + (dateValue.getDate());
+			var DD = "0" + D;
+			DD = DD.substring(DD.length-2, DD.length);
+			var YYYY = "" + (dateValue.getFullYear()); 
+			var currentDate = MM + "/" +DD + "/" + YYYY
+			if (value == 'startDate') {
+				$("#startDateId").val(currentDate);
+			} else {
+				$("#completionDateId").val(currentDate);
+			}
 		  }
 
 		function showCustomFields(value, columnCount) {
-		  $(".custom_table").hide();
-		  if(value=='0'){
-			  $("#custom_table").hide();
-		  } else {
-			 for(i=1;i<=value;){
-			    $("#custom_table").show();
-			  $("#custom_count_"+i).show();
-			  i=i+parseInt(columnCount)
-			 }
-		   }  
+			$(".custom_table").hide();
+			if (value == '0') {
+				$("#custom_table").hide();
+			} else {
+				for(i=1; i<=value;) {
+					$("#custom_table").show();
+					$("#custom_count_"+i).show();
+					i = i + parseInt(columnCount)
+				}
+			}  
 		}
 			  
-		function updateMastersList(e){
+		function updateMastersList(e) {
 		// The response comes back as a bunch-o-JSON
 			
 			// evaluate JSON
 
 			var rselect = document.getElementById('projectManagerId')
-			var mselect = document.getElementById('moveManagerId')
 			var projectPartner = document.getElementById('projectPartnerId');
 			var projectClient = document.getElementById('clientId');
 			var projectPartnerVal = 'None'
@@ -109,78 +107,71 @@
 			var partnerPmOptgroup
 			var partnerMmOptgroup
 			// create Option group for Customer
-			if(compPmExeOptgroup == null){
+			if (compPmExeOptgroup == null) {
 				custPmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				custPmOptgroup = compPmExeOptgroup
 			}
-			if(compMmExeOptgroup == null){
+			if (compMmExeOptgroup == null) {
 				custMmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				custMmOptgroup = compMmExeOptgroup
 			}
 			// create Option group for Client
-			if(clientPmExeOptgroup == null){
+			if (clientPmExeOptgroup == null) {
 				clientPmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				clientPmOptgroup = clientPmExeOptgroup
 			}
-			if(clientMmExeOptgroup == null){
+			if (clientMmExeOptgroup == null) {
 				clientMmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				clientMmOptgroup = clientMmExeOptgroup
 			}
 			// create Option group for Partner
-			if(partnerPmExeOptgroup == null){
+			if (partnerPmExeOptgroup == null) {
 				partnerPmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				partnerPmOptgroup = partnerPmExeOptgroup
 			}
-			if(partnerMmExeOptgroup == null){
+			if (partnerMmExeOptgroup == null) {
 				partnerMmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				partnerMmOptgroup = partnerMmExeOptgroup
 			}
 			// label assign for Customer
 			custPmOptgroup.label = "${company.name}";
-			  custPmOptgroup.id = "compPmGroup";
+			custPmOptgroup.id = "compPmGroup";
 			custMmOptgroup.label = "${company.name}";
-			  custMmOptgroup.id = "compMmGroup";
+			custMmOptgroup.id = "compMmGroup";
 			clientPmOptgroup.label = projectClientVal;
-			  clientPmOptgroup.id = "clientPmGroup";
+			clientPmOptgroup.id = "clientPmGroup";
 			clientMmOptgroup.label = projectClientVal;
-			  clientMmOptgroup.id = "clientMmGroup";
-			if(projectPartnerVal != "None" ){
+			clientMmOptgroup.id = "clientMmGroup";
+			if (projectPartnerVal != "None" ) {
 				partnerPmOptgroup.label = projectPartnerVal;
 				partnerPmOptgroup.id = "partnerPmGroup";
 				partnerMmOptgroup.label = projectPartnerVal;
 				partnerMmOptgroup.id = "partnerMmGroup";
 			} else {
-				  partnerPmOptgroup.label = "";
+				partnerPmOptgroup.label = "";
 				partnerMmOptgroup.label = "";
 			}
 			try {
 				rselect.appendChild(custPmOptgroup, null) // standards compliant; doesn't work in IE
-				mselect.appendChild(custMmOptgroup, null) 
-				rselect.appendChild(clientPmOptgroup, null) 
-				mselect.appendChild(clientMmOptgroup, null) 
-				rselect.appendChild(partnerPmOptgroup, null) 
-				mselect.appendChild(partnerMmOptgroup, null) 
-			  } catch(ex) {
+				rselect.appendChild(clientPmOptgroup, null)
+				rselect.appendChild(partnerPmOptgroup, null)
+			} catch(ex) {
 				rselect.appendChild(custPmOptgroup) // IE only
-				mselect.appendChild(custMmOptgroup) 
-				rselect.appendChild(clientPmOptgroup) 
-				mselect.appendChild(clientMmOptgroup) 
-				rselect.appendChild(partnerPmOptgroup) 
-				mselect.appendChild(partnerMmOptgroup)
-			  }
+				rselect.appendChild(clientPmOptgroup)
+				rselect.appendChild(partnerPmOptgroup)
+			}
 			//  Clear all previous options
 			var l = rselect.length
 			// var compSatff = document.getElementById('companyManagersId').value
 			while (l > 1) {
 				l--
-				rselect.remove(l) 
-				mselect.remove(l)
+				rselect.remove(l)
 			}
 			var managers = eval("(" + e.responseText + ")")
 			// Rebuild the select
@@ -198,14 +189,14 @@
 					try {
 						custPmOptgroup.appendChild(popt, null) // standards compliant; doesn't work in IE
 						custMmOptgroup.appendChild(mopt, null) 
-					} catch(ex) {
+					} catch (ex) {
 						custPmOptgroup.appendChild(popt) // IE only
 						custMmOptgroup.appendChild(mopt) 
 					}
 				}
 				// Assign Client Staff 
 				var clientStaffLength = managers.clientStaff.length
-			     // if(clientStaffLength == ""){
+			     // if (clientStaffLength == "") {
 					//clientPmOptgroup.label = ""
 					//clientMmOptgroup.label = ""
 				//}
@@ -220,7 +211,7 @@
 					try {
 						clientPmOptgroup.appendChild(cpopt, null) // standards compliant; doesn't work in IE
 						clientMmOptgroup.appendChild(cmopt, null) 
-					} catch(ex) {
+					} catch (ex) {
 						clientPmOptgroup.appendChild(cpopt) // IE only
 						clientMmOptgroup.appendChild(cmopt) 
 					}
@@ -237,91 +228,91 @@
 					try {
 						partnerPmOptgroup.appendChild(ppopt, null) // standards compliant; doesn't work in IE
 						partnerMmOptgroup.appendChild(pmopt, null) 
-					} catch(ex) {
+					} catch (ex) {
 						partnerPmOptgroup.appendChild(ppopt) // IE only
 						partnerMmOptgroup.appendChild(pmopt) 
 					}
 				}
 			}
-			if(compMmExeOptgroup == null){
+			if (compMmExeOptgroup == null) {
 				custMmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				custMmOptgroup = compMmExeOptgroup
 			}
 			// create Option group for Client
-			if(clientPmExeOptgroup == null){
+			if (clientPmExeOptgroup == null) {
 				clientPmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				clientPmOptgroup = clientPmExeOptgroup
 			}
-			if(clientMmExeOptgroup == null){
+			if (clientMmExeOptgroup == null) {
 				clientMmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				clientMmOptgroup = clientMmExeOptgroup
 			}
 			// create Option group for Partner
-			if(partnerPmExeOptgroup == null){
+			if (partnerPmExeOptgroup == null) {
 				partnerPmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				partnerPmOptgroup = partnerPmExeOptgroup
 			}
-			if(partnerMmExeOptgroup == null){
+			if (partnerMmExeOptgroup == null) {
 				partnerMmOptgroup = document.createElement('optgroup');
-			}else{
+			} else {
 				partnerMmOptgroup = partnerMmExeOptgroup
 			}
 			// label assign for Customer
 			custPmOptgroup.label = "TDS";
-			  custPmOptgroup.id = "compPmGroup";
+			custPmOptgroup.id = "compPmGroup";
 			custMmOptgroup.label = "TDS";
-			  custMmOptgroup.id = "compMmGroup";
+			custMmOptgroup.id = "compMmGroup";
 			clientPmOptgroup.label = projectClientVal;
-			  clientPmOptgroup.id = "clientPmGroup";
+			clientPmOptgroup.id = "clientPmGroup";
 			clientMmOptgroup.label = projectClientVal;
-			  clientMmOptgroup.id = "clientMmGroup";
-			if(projectPartnerVal != "None" ){
+			clientMmOptgroup.id = "clientMmGroup";
+			if (projectPartnerVal != "None" ) {
 				partnerPmOptgroup.label = projectPartnerVal;
 				partnerPmOptgroup.id = "partnerPmGroup";
 				partnerMmOptgroup.label = projectPartnerVal;
 				partnerMmOptgroup.id = "partnerMmGroup";
 			} else {
-				  partnerPmOptgroup.label = "";
+				partnerPmOptgroup.label = "";
 				partnerMmOptgroup.label = "";
 			}
 
 			Project.setActiveClientId($("#clientId").select2("val"));
 		}
 
-		function initialize(){
+		function initialize() {
 			var clientObj = document.getElementById('clientId').value
 			${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ clientObj', onComplete:'updateMastersList(XMLHttpRequest)')}
 		}
-		function setCompletionDate(startDate){
-		var completionDateObj = document.createProjectForm.completionDate;
-		if(completionDateObj.value == ""){
-			completionDateObj.value = startDate;
+		function setCompletionDate(startDate) {
+			var completionDateObj = document.createProjectForm.completionDate;
+			if (completionDateObj.value == "") {
+				completionDateObj.value = startDate;
+			}
 		}
-		}
-		function isValidDate( date ){
-		    var returnVal = true;
-			if( date && !tdsCommon.isValidDate(date) ){
+		function isValidDate( date ) {
+			var returnVal = true;
+			if ( date && !tdsCommon.isValidDate(date) ) {
 				alert("Date should be in '" + tdsCommon.defaultDateFormat() + "' format");
 				returnVal  =  false;
 			} 
 			return returnVal;
-		  }
-		  function validateDates(){
+		}
+		function validateDates() {
 			var returnval = false
 			var startDateId = $("#startDateId").val();
 			var completionDateId = $("#completionDateId").val();
-			if(isValidDate(startDateId) && isValidDate(completionDateId)){
-			  returnval = true;
+			if (isValidDate(startDateId) && isValidDate(completionDateId)) {
+				returnval = true;
 			} 
 			return returnval;
-		  }
-			function validateForm() {
-				return validateDates() && Project.validSelectedPartners();
-			}
+		}
+		function validateForm() {
+			return validateDates() && Project.validSelectedPartners();
+		}
 	    </script>
 	<%
 		def currProj = session.getAttribute("CURR_PROJ");
