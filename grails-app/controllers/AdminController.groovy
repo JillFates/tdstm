@@ -36,7 +36,6 @@ class AdminController {
 	def userPreferenceService
 	def auditService
 
-	private static Map VALID_ROLES = ['USER':true,'EDITOR':true,'SUPERVISOR':true]
 	private static String DEFAULT_ROLE = 'USER'
 
 	def index() { }
@@ -1139,11 +1138,7 @@ class AdminController {
 			teams << it.substring(it.lastIndexOf(':') +1).trim()
 		}
 
-		def roles = person.getPersonRoles(companyId).description
-		def roles2 = []
-		roles.each{
-			roles2 << it.substring(it.lastIndexOf(':') +1).trim()
-		}
+		def roles = securityService.getAssignedRoles(person).id
 
 		def fields = [
 							"", // No username
@@ -1151,8 +1146,8 @@ class AdminController {
 							person.middleName,
 							person.lastName,
 							person.workPhone?:"",
-							roles2.join(";"),
 							teams.join(";"),
+							roles.join(";"),
 							person.email?:"",
 							"", // empty password
 						]
@@ -1252,7 +1247,7 @@ class AdminController {
 		def filename = '/tmp/tdstm-account-import.csv'
 
 		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
-		List teamCodes = partyRelationshipService.getStaffingRoles()*.id
+		List teamCodes = partyRelationshipService.getStaffingRoles().description
 
 		// Inline closure to parse the CSV file and return array of mapped fields
 		def parseCsv = {file, header, createUserLogin ->
@@ -1339,6 +1334,10 @@ class AdminController {
 			teams = teams*.trim()
 		}
 
+		// Retrieves all the roles that this user is allowed to assign.
+		def validRoles = securityService.getAssignableRoles(securityService.getUserLoginPerson())
+		def validRoleCodes = validRoles.id
+
 		switch (params.step) {
 
 			case 'upload':
@@ -1371,9 +1370,20 @@ class AdminController {
 						log.debug "teams=(${people[i].teams} -- $teams"
 						people[i].errors << validateTeams(teams)
 					}
-					if (!StringUtils.isEmpty(people[i].role) && ! VALID_ROLES[people[i].role]) {
-						people[i].errors << "Invalid role: ${people[i].role}"
+
+					def currentRoles = people[i].role.split(";")
+					def invalidRoles = []
+
+					currentRoles.each{
+						if(!validRoleCodes.contains(it)){
+							invalidRoles << it
+						}
 					}
+
+					if (!StringUtils.isEmpty(people[i].role) && invalidRoles){
+						people[i].errors << "Invalid role: ${invalidRoles.join(';')}"
+					}
+
 				}
 
 				map.people = people
@@ -1413,7 +1423,7 @@ class AdminController {
 				def failedPeople = []
 				def created = 0
 
-				if (!StringUtils.isEmpty(role) && !VALID_ROLES[role]) {
+				if (!StringUtils.isEmpty(role) && !validRoleCodes.contains(role)) {
 					failed = true
 					people = []
 				}
@@ -1474,10 +1484,10 @@ class AdminController {
 					}
 
 					def userRole = role
-					if (!StringUtils.isEmpty(p.role) && VALID_ROLES[p.role]) {
+					if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
 						userRole = p.role
 					}
-					if (!VALID_ROLES[userRole]) {
+					if (!validRoleCodes.contains(userRole)) {
 						userRole = DEFAULT_ROLE
 					}
 					if (!failed && !StringUtils.isEmpty(userRole)) {
