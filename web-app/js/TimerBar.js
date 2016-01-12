@@ -170,6 +170,10 @@ var TimerBar = function (defaultValue, preferenceName, refreshCallback) {
 		var taskActionBars = $('#actionBarId').size();
 		if (taskActionBars > 0)
 			return true;
+		var taskRows = $('tr.taskDetailsRow');
+		for (var i = 0; i < taskRows.size(); i++)
+			if ($(taskRows[i]).css('display') != 'none')
+				return true;
 		return false;
 	}
 	

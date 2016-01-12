@@ -201,9 +201,7 @@
 		} else {
 			showStatusTr.toggle();
 			$(this).data('state',false);
-			$('#detailTdId_'+id).hide();			
-			if (typeof timerBar !== 'undefined')
-				timerBar.resetTimer();
+			$('#detailTdId_'+id).hide();
 		}
 	});
 	
@@ -213,7 +211,7 @@
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
 		if (typeof timerBar !== 'undefined')
-			timerBar.resetTimer();
+			timerBar.Pause();
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/task/showIssue'),
 			data: {'issueId':id},
@@ -251,12 +249,13 @@
 	}
 	function showAssetCommentMyTasks(id) {
 		$('#dependencyBox').css('display','table');
+		if (typeof timerBar !== 'undefined')
+			timerBar.Pause();
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/assetEntity/showComment'),
 			data: {'id':id},
 			type:'POST',
 			success: function(data) {
-				B1.Pause()
 				var ac = data[0];
 				$('#predecessorShowTd').html(ac.predecessorTable)
 				$('#successorShowTd').html(ac.successorTable)
@@ -286,13 +285,13 @@
 		$('#dependencyBox').css("display","none");
 	}
 	function cancelButton(id,status) {
-		if (typeof timerBar !== 'undefined')
-			timerBar.resetTimer();
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')
 		$('#taskLinkId').addClass('mobselect')
 		$('#showStatusId_'+id).css('display','table-row')
 		//$('#issueTr_'+id).attr('onClick','issueDetails('+id+',"'+status+'")');
+		if (typeof timerBar !== 'undefined')
+			timerBar.attemptResume();
 	}
 
 function changeAction(){

@@ -111,7 +111,7 @@
 						</td>
 					</tr>
 					
-					<tr id="detailTdId_${item?.id}" style="display: none">
+					<tr id="detailTdId_${item?.id}" class="taskDetailsRow" style="display: none">
 						<td colspan="6">
 							<div id="detailId_${item?.id}" style="width: 100%"></div>
 						</td>

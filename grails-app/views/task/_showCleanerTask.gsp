@@ -36,12 +36,12 @@
 		<input type="hidden" name="RepPath" id="RepPath" />
 		<input type="hidden" name="urlPath" id="urlPath" value="<g:resource dir="resource" file="racking_label.tff" absolute="true"/>" />
 		<input type="hidden" name="model" id="model" value="${assetEntity?.model}" />
-        <input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" />
-        <input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" />
-        <input type="hidden" name="room" id="room" value="${assetEntity?.targetRoom}" />
-        <input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRack}" />
-        <input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" />
-        <input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
+		<input type="hidden" name="cart" id="cart" value="${assetEntity?.cart}" />
+		<input type="hidden" name="shelf" id="shelf" value="${assetEntity?.shelf}" />
+		<input type="hidden" name="room" id="room" value="${assetEntity?.targetRoom}" />
+		<input type="hidden" name="rack" id="rack" value="${assetEntity?.targetRack}" />
+		<input type="hidden" name="upos" id="upos" value="${assetEntity?.targetRackPosition}" />
+		<input type="hidden" name="cartQty" id="cartQty" value="${cartQty}" />
 		<table style="margin-left: -2px;">
 			<tr>
 				<td class="heading" colspan=2><a class="heading" href="#comments">Task details:</a></td>
@@ -288,48 +288,48 @@
 </div>
 <script type="text/javascript">
 $( function() {
-	 if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
-	       $('#noteId_'+${assetComment.id}).hide()
-	       $('#resolutionId_'+${assetComment.id}).show()
-	 }
-		 document.onkeyup = keyCheck;
+	if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
+		$('#noteId_'+${assetComment.id}).hide()
+		$('#resolutionId_'+${assetComment.id}).show()
+	}
+	document.onkeyup = keyCheck;
 });
 
- function showResolve(){
-   if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
-       $('#noteId_'+${assetComment.id}).hide()
-       $('#resolutionId_'+${assetComment.id}).show()
-   }else{
-	   $('#noteId_'+${assetComment.id}).show()
-       $('#resolutionId_'+${assetComment.id}).hide()
-   }
- }
-function keyCheck( e ){
+function showResolve() {
+	if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
+		$('#noteId_'+${assetComment.id}).hide()
+		$('#resolutionId_'+${assetComment.id}).show()
+	} else {
+		$('#noteId_'+${assetComment.id}).show()
+		$('#resolutionId_'+${assetComment.id}).hide()
+	}
+}
+function keyCheck( e ) {
 	var currentFocus = document.activeElement.id
 	var focusId = currentFocus.substring(0,currentFocus.indexOf("_"))
-	if(currentFocus != 'search' && focusId != 'editComment' && focusId != 'noteEditId' ){
-	  if(!e && window.event) e=window.event;
-	  var keyID = e.keyCode;
-	  if(keyID == 13){
-		  $("#printAndDoneButton").click()
-		  return;
-	  } else if(keyID == 80){
-	       startprintjob();
-	  }
-	  var labelQty = keyID - 48 
-	  if (labelQty > 0 && labelQty < 10) {
-	      $('#labelQuantity').focus()
-		  if($("input:focus").length < 1) {
-		  	$('#labelQuantity').val(labelQty);
-		  }
-	  }
-    }
+	if (currentFocus != 'search' && focusId != 'editComment' && focusId != 'noteEditId' ) {
+		if (!e && window.event) e=window.event;
+		var keyID = e.keyCode;
+		if (keyID == 13) {
+			$("#printAndDoneButton").click()
+			return;
+		} else if (keyID == 80) {
+			startprintjob();
+		}
+		var labelQty = keyID - 48 
+		if (labelQty > 0 && labelQty < 10) {
+			$('#labelQuantity').focus()
+			if ($("input:focus").length < 1) {
+				$('#labelQuantity').val(labelQty);
+			}
+		}
+	}
 }
-		
 
- function printAndMarkDone(id, status, currentStatus){
- 	startprintjob();
-	 jQuery.ajax({
+
+function printAndMarkDone(id, status, currentStatus) {
+	startprintjob();
+	jQuery.ajax({
 		url: '../task/update',
 		data: {'id':id,'status':status,'currentStatus':currentStatus,view:'myTask'},
 		type:'POST',
@@ -337,68 +337,68 @@ function keyCheck( e ){
 			if (typeof data.error !== 'undefined') {
 				alert(data.error);
 			} else {
-				 hideStatus(id, status)
-				 $('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
-				 if(status=='Started'){
-				 	$('#started_'+id).hide()
-				 }
-				 $("#search").focus()
+				hideStatus(id, status)
+				$('#issueTrId_'+id).attr('onClick','hideStatus('+id+',"'+status+'")')
+				if (status=='Started') {
+					$('#started_'+id).hide()
+				}
+				$("#search").focus()
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			alert("An unexpected error occurred while attempting to update task/comment")
 		}
 	});
- }
+}
  
- function validateComment(objId){
-	 var status = $('#statusEditId_'+${assetComment.id}).val()
-	 var params = {   'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
-						 'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-						 'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
-						 'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
-						}
-		 jQuery.ajax({
-				url: '../task/update',
-				data: params,
-				type:'POST',
-				success: function(data) {
-					if (typeof data.error !== 'undefined') {
-					} else {
-					     $('#myTaskList').html(data)
-					     $('#showStatusId_'+objId).show()
-						 $('#issueTrId_'+id).each(function(){
-							$(this).removeAttr('onclick')
-							$(this).unbind("click").bind("click", function(){
-								hideStatus(objId,status)
-						    });
-						})
-						 if(status=='Started'){
-						 	$('#started_'+objId).hide()
-						 }
-						 B1.Restart(60);
-					}
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					alert("An unexpected error occurred while attempting to update task/comment")
+function validateComment(objId){
+	var status = $('#statusEditId_'+${assetComment.id}).val()
+	var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
+		'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
+		'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
+		'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val()
+	}
+	jQuery.ajax({
+		url: '../task/update',
+		data: params,
+		type:'POST',
+		success: function(data) {
+			if (typeof data.error !== 'undefined') {
+			} else {
+				$('#myTaskList').html(data)
+				$('#showStatusId_'+objId).show()
+				$('#issueTrId_'+id).each(function(){
+					$(this).removeAttr('onclick')
+					$(this).unbind("click").bind("click", function(){
+						hideStatus(objId,status)
+					});
+				})
+				if (status=='Started') {
+					$('#started_'+objId).hide()
 				}
-			});
- }
- function truncate( text ){
-		var trunc = text
-		if(text){
-			if(text.length > 50){
-				trunc = trunc.substring(0, 50);
-				trunc += '...'
+				timerBar.Restart();
 			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while attempting to update task/comment")
 		}
-		return trunc;
- }
+	});
+}
+function truncate( text ){
+	var trunc = text
+	if(text){
+		if(text.length > 50){
+			trunc = trunc.substring(0, 50);
+			trunc += '...'
+		}
+	}
+	return trunc;
+}
 
- function hideStatus(id,status){
+function hideStatus(id,status){
 	$('#showStatusId_'+id).hide()
 	$('#detailTdId_'+id).css('display','none')
-	B1.Start(60);
+	timerBar.Start();
 }
 
  </script>

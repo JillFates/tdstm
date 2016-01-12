@@ -551,22 +551,13 @@ angular.module('modNgBlur', [])
 tds.core.service.TimedUpdateService = function(window) {
 
 	var pause = function() {
-		if (window.B2 != '') {
-			window.B2.Pause(0);
-		}
-		if (window.B1 != '') {
-			window.B1.Pause(0);
-		}
+		if (typeof timerBar !== 'undefined')
+			timerBar.Pause();
 	}
 
 	var resume = function() {
-		var taskManagerTimePref = window.taskManagerTimePref;
-		if (window.B2 != '' && taskManagerTimePref != 0) {
-			B2.Restart(taskManagerTimePref);
-		}
-		if (window.B1 != '' && taskManagerTimePref != 0) {
-			B1.Restart(taskManagerTimePref); 
-		}
+		if (typeof timerBar !== 'undefined')
+			timerBar.attemptResume();
 	}
 
 	return {

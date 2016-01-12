@@ -289,81 +289,83 @@
 </div>
 <script type="text/javascript">
 $( function() {
-	 var objId = ${assetComment.id}
-	 if($('#statusEditId_'+objId).val()=='Completed'){
-	       $('#noteId_'+objId).hide()
-	       $('#resolutionId_'+objId).show()
-	 }
-	
+	var objId = ${assetComment.id}
+	if($('#statusEditId_'+objId).val()=='Completed'){
+		$('#noteId_'+objId).hide()
+		$('#resolutionId_'+objId).show()
+	}
+
 	// Disable the AssignTo SELECT if user doensn't have permission
 	var editAssignTo=${assignmentPerm ? 'true' : 'false'}
 	if (!editAssignTo) {
 		$('#assignedToEditId_'+objId).attr('disabled', 'disabled');
 	}
 	
-	 /*
-	 var updatePerm = ${permissionForUpdate}
-	 $("#editComment_"+objId).keypress(function(e){
-		 if(updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
-		 else if(!updatePerm && e.keyCode==13) {e.preventDefault(); }
-	 });
+	/*
+	var updatePerm = ${permissionForUpdate}
+	$("#editComment_"+objId).keypress(function(e){
+		if(updatePerm && e.keyCode==13){e.preventDefault(); validateComment(objId); }
+		else if(!updatePerm && e.keyCode==13) {e.preventDefault(); }
+	});
 	*/
 });
 
- function showResolve(){
-   if($('#statusEditId_'+${assetComment.id}).val()=='Completed'){
-       $('#noteId_'+${assetComment.id}).hide()
-       $('#resolutionId_'+${assetComment.id}).show()
-   }else{
-	   $('#noteId_'+${assetComment.id}).show()
-       $('#resolutionId_'+${assetComment.id}).hide()
-   }
- }
- function validateComment(objId){
+function showResolve(){
+	if ($('#statusEditId_'+${assetComment.id}).val()=='Completed') {
+		$('#noteId_'+${assetComment.id}).hide()
+		$('#resolutionId_'+${assetComment.id}).show()
+	} else {
+		$('#noteId_'+${assetComment.id}).show()
+		$('#resolutionId_'+${assetComment.id}).hide()
+	}
+}
+function validateComment(objId){
 	var status = $('#statusEditId_'+objId).val()
 	var params = {'comment':$('#editComment_'+objId).val(), 'resolution':$('#resolutionEditId_'+objId).val(), 
-					'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
-					'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
-					'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val(),
-					'dueDate':$("#dueDateCreateId").val()
+		'category':$('#categoryEditId_'+objId).val(), 'assignedTo':$('#assignedToEditId_'+objId).val(),
+		'status':$('#statusEditId_'+objId).val(),'currentStatus':$('#currentStatus_'+objId).val(), 
+		'note':$('#noteEditId_'+objId).val(),'id':objId,'view':'myTask', 'tab': $('#tabId').val(),
+		'dueDate':$("#dueDateCreateId").val()
+	}
+	jQuery.ajax({
+		url: tdsCommon.createAppURL('/task/update'),
+		data: params,
+		type:'POST',
+		success: function(data) {
+			if (typeof data.error !== 'undefined') {
+				alert(data.error);
+			} else {
+				$('#myTaskList').html(data)
+				$('#showStatusId_'+objId).show()
+				$('#issueTrId_'+objId).each(function(){
+					$(this).removeAttr('onclick')
+					$(this).unbind("click").bind("click", function(){
+						hideStatus(objId,status)
+					});
+				})
+				if (status=='Started') {
+					$('#started_'+objId).hide()
 				}
-		 jQuery.ajax({
-				url: tdsCommon.createAppURL('/task/update'),
-				data: params,
-				type:'POST',
-				success: function(data) {
-					if (typeof data.error !== 'undefined') {
-						alert(data.error);
-					} else {
-					     $('#myTaskList').html(data)
-					     $('#showStatusId_'+objId).show()
-						 $('#issueTrId_'+objId).each(function(){
-							$(this).removeAttr('onclick')
-							$(this).unbind("click").bind("click", function(){
-								hideStatus(objId,status)
-						    });
-						})
-						 if(status=='Started'){
-						 	$('#started_'+objId).hide()
-						 }
-						 B1.Restart(60);
-					}
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					alert("An unexpected error occurred while attempting to update task/comment")
-				}
-			});
- }
- function truncate( text ){
-		var trunc = text
-		if(text){
-			if(text.length > 50){
-				trunc = trunc.substring(0, 50);
-				trunc += '...'
+				
+				if (typeof timerBar !== 'undefined')
+					timerBar.Restart();
 			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			alert("An unexpected error occurred while attempting to update task/comment")
 		}
-		return trunc;
- }
+	});
+}
+function truncate( text ){
+	var trunc = text
+	if(text){
+		if(text.length > 50){
+			trunc = trunc.substring(0, 50);
+			trunc += '...'
+		}
+	}
+	return trunc;
+}
 </script>
 <script>
 	currentMenuId = "#teamMenuId";
