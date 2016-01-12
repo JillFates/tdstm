@@ -337,7 +337,7 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 
 	$scope.close = function() {
 		commentUtils.closePopup($scope, 'showComment');
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.attemptResume();
 	};
 
@@ -376,7 +376,7 @@ tds.comments.controller.ShowCommentDialogController = function($window, $scope, 
 	}
 
 	function showAssetCommentDialog(data) {
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.Pause();
 
 		if (data && data[0]) {
@@ -438,7 +438,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.removePopupOpenedListener = $scope.$on('popupOpened', function(evt) {
 		$timeout(function() {
-			if (timerBar)
+			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 			$scope.removePopupOpenedListener();
 			$scope.$emit('newActivePopup', 'editComment');
@@ -463,7 +463,7 @@ tds.comments.controller.EditCommentDialogController = function($scope, $modalIns
 
 	$scope.close = function() {
 		commentUtils.closePopup($scope, 'editComment');
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.attemptResume();
 	};
 
@@ -1837,7 +1837,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				if (!isActiveActionBar()) {
 					windowTimedUpdate.resume();
 				}
-				if (timerBar)
+				if (typeof timerBar !== 'undefined')
 					timerBar.attemptResume();
 			}
 			var loadContent = function() {
@@ -1869,7 +1869,7 @@ tds.comments.directive.ActionBarCell = function(commentService, alerts, utils, t
 				}
 			}
 			var showContent = function(content) {
-				if (timerBar)
+				if (typeof timerBar !== 'undefined')
 					timerBar.Pause();
 				windowTimedUpdate.pause();
 				var row = angular.element('#' + scope.rowPrefix + scope.commentId);

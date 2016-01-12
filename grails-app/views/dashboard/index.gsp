@@ -461,7 +461,7 @@
 	function refreshDashboard () {
 		getMoveEventNewsDetails($('#moveEvent').val());
 		updateTaskSummary();
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.resetTimer();
 	}
 	

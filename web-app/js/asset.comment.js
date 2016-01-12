@@ -71,7 +71,7 @@ function changeStatus(id, status, currentStatus, from){
  * @param from
  */
 function assignTask(id, user, status, from) {
-	if (timerBar)
+	if (typeof timerBar !== 'undefined')
 		timerBar.resetTimer();
 	$('#assigntome_button_'+id).removeAttr('onclick')
 	$('#assigntome_text_'+id).attr('class', 'task_button_disabled')
@@ -90,11 +90,11 @@ function assignTask(id, user, status, from) {
 				if (from=="taskManager") {
 					 $('#assignedToName_'+id).html(data.assignedTo)
 					 // $('#row_d_'+id).hide()
-					if (timerBar)
+					if (typeof timerBar !== 'undefined')
 						timerBar.resetTimer();
 				} else {
 					$('#assignedToNameSpan_'+id).html(data.assignedTo)
-					if (timerBar)
+					if (typeof timerBar !== 'undefined')
 						timerBar.resetTimer();
 				}
 				$("#showCommentDialog #assignedToTdId").html(data.assignedTo)
@@ -112,7 +112,7 @@ function assignTask(id, user, status, from) {
  */
 var actionBarLoadReq
 function getActionBarGrid (spanId) {
-	if (timerBar)
+	if (typeof timerBar !== 'undefined')
 		timerBar.resetTimer();
 	var id = spanId
 	$('#span_'+spanId).parent().parent().find('span').each(function () {
@@ -246,7 +246,7 @@ function hideActionBarGrid(rowId,spanId){
 		}
 	})
 	
-	if (timerBar)
+	if (typeof timerBar !== 'undefined')
 		timerBar.resetTimer();
 }
 

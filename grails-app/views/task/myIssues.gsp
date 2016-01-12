@@ -202,7 +202,7 @@
 			showStatusTr.toggle();
 			$(this).data('state',false);
 			$('#detailTdId_'+id).hide();			
-			if (timerBar)
+			if (typeof timerBar !== 'undefined')
 				timerBar.resetTimer();
 		}
 	});
@@ -212,7 +212,7 @@
 	}
 	function issueDetails(id,status) {
 		// hideStatus(id,status)
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.resetTimer();
 		jQuery.ajax({
 			url: tdsCommon.createAppURL('/task/showIssue'),
@@ -286,7 +286,7 @@
 		$('#dependencyBox').css("display","none");
 	}
 	function cancelButton(id,status) {
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.resetTimer();
 		//$('#myIssueList').css('display','block')
 		$('#detailTdId_'+id).css('display','none')

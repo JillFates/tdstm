@@ -675,7 +675,7 @@ function buildMap (width, height) {
 		
 		// Resets the scale and position of the map. Called when the user double clicks on the background
 		function resetView () {
-			if (d3.event && d3.event.srcElement.nodeName != 'use') {
+			if (d3.event && (!d3.event.srcElement || d3.event.srcElement.nodeName != 'use')) {
 				zoom.scale(1);
 				zoom.translate([0,0]);
 				if (d3.event.translate && d3.event.scale)

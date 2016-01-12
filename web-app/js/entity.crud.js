@@ -1028,7 +1028,7 @@ var EntityCrud = ( function($) {
 			editModal.dialog('option', 'position', ['center','top']);
 			editModal.dialog('open');
 			
-			if (timerBar)
+			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 
 			if(!isIE7OrLesser)
@@ -1094,7 +1094,7 @@ var EntityCrud = ( function($) {
 			showModal.dialog('option', 'width', 'auto');
 			showModal.dialog('option', 'position', ['center','top']);
 			showModal.dialog('open');
-			if (timerBar)
+			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 			updateAssetTitle(fieldHelpType);
 			if (!isIE7OrLesser)
@@ -1181,7 +1181,7 @@ var EntityCrud = ( function($) {
 			pub.closeEditModal();
 			pub.closeShowModal();
 			
-			if (timerBar)
+			if (typeof timerBar !== 'undefined')
 				timerBar.Pause();
 			pub.populateAssetEditView(fieldHelpType, source, rackOrChassisId, roomId, location, position, 'create', isBlade);
 			return true;
@@ -1446,7 +1446,7 @@ function changeDocTitle ( newTitle ) {
 	});
 	$(".ui-dialog .ui-dialog-titlebar-close").click(function(){
 		$(document).attr('title', title);
-		if (timerBar)
+		if (typeof timerBar !== 'undefined')
 			timerBar.attemptResume();
 	});
 	$( "#deps" ).tooltip({
