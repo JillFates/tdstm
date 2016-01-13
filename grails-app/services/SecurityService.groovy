@@ -974,7 +974,7 @@ class SecurityService implements InitializingBean {
 		if (! project) {
 			throw new InvalidParamException('Specified project was not found')
 		}
-
+		
 		if (isNewUser) {
 			userLogin = new UserLogin()
 			if (! NumberUtil.isPositiveLong(params.personId)) {
@@ -1043,11 +1043,21 @@ Dealt with:
 	active: Y
 	isLocal: true
 */
-
+		
 		if (params.isLocal) {
 			userLogin.isLocal = true
 			userLogin.forcePasswordChange = (params.forcePasswordChange ? 'Y' : 'N')
 			userLogin.passwordNeverExpires = (params.containsKey('passwordNeverExpires') && params.passwordNeverExpires.equals('true'))
+			
+			def email = params.email ?: ''
+			def emailUsers = Person.findAllByEmail(email)
+			emailUsers.each {
+				if (it.id != person.id)
+					throw new InvalidParamException('Email "' + email + '" is already in use by another user')
+			}
+			if (!email || StringUtil.isBlank(email))
+				throw new InvalidParamException('Invalid email')
+			person.email = email
 		} else {
 			userLogin.isLocal = false
 			userLogin.forcePasswordChange = 'N'
@@ -1102,7 +1112,7 @@ Dealt with:
 		// When enabling user - enable Person
 		// When disable user - do NOT change Person
 		
-		if ((userLogin.active == 'Y') && (person.active != 'Y')) {
+		if (userLogin.active == 'Y') {
 			person.active = 'Y'
 			if (!person.save(flush:true)) {
 				throw new DomainUpdateException('Unable to update person : ' + GormUtil.allErrorsString(person))

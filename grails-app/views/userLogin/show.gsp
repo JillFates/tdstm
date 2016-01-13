@@ -30,16 +30,16 @@
 		<g:javascript src="asset.comment.js" />
 	</head>
 	<body>
-        
+		
 		<div class="body">
 			<h1>UserLogin</h1>
-
+			
 			<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
-
+				
 				<span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
-
+				
 			</div>
-
+			
 			<br/>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -47,21 +47,26 @@
 			<div class="dialog loginView" ng-app="tdsAdmin" ng-controller="tds.admin.controller.MainController as admin">
 				<table>
 					<tbody>
-
+						
 						<tr class="prop">
 							<td valign="top" class="name">Company:</td>
 							<td nowrap="nowrap" valign="top" class="value">${userLoginInstance?.person?.company}</td>
 						</tr>
-
+						
 						<tr class="prop">
 							<td valign="top" class="name">Person:</td>
 							<td nowrap="nowrap" valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
 						</tr>
-					  
+						
 						<tr class="prop">
 							<td valign="top" class="name">Username:</td>
 							<td valign="top" class="value">${fieldValue(bean:userLoginInstance, field:'username')}</td>
-						</tr> 
+						</tr>
+						
+						<tr class="prop">
+							<td valign="top" class="name">Email:</td>
+							<td valign="top" class="value">${userLoginInstance?.person?.email ?: '<em>Required Email is missing</em>'}</td>
+						</tr>
 						
 						<tr class="prop">
 							<td valign="top" class="name">Local account:</td>
@@ -110,7 +115,7 @@
 								<g:else>Not Locked Out</g:else>
 							</td>
 						</tr>
-
+						
 						<tr class="prop">
 							<td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
@@ -140,7 +145,7 @@
 							<td valign="top" class="name">Last Login:</td>
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
-
+						
 						<g:each in="${roleList}" var="role">
 							<tr class="prop">
 								<td valign="top" class="name" >
@@ -152,34 +157,34 @@
 								</td>
 							</tr>
 						</g:each>
-
-			  			<tr class="prop">
-                            <td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
-                            
-                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" /></td>
-                            
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">Created Date:</td>
-                            
-                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" /></td>
-                            
-                        </tr>
-                        
-                     	<tr class="prop">
-                            <td valign="top" class="name">Last Modified:</td>
-                            
-                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastModified}" /></td>
-                            
-                        </tr>
-                        
-                        <tr class="prop">
-                            <td valign="top" class="name">Last Login:</td>
-                            
-                            <td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" /></td>
-                            
-                        </tr>
-
+						
+						<tr class="prop">
+							<td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
+							
+							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" /></td>
+							
+						</tr>
+						<tr class="prop">
+							<td valign="top" class="name">Created Date:</td>
+							
+							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.createdDate}" /></td>
+							
+						</tr>
+						
+						<tr class="prop">
+							<td valign="top" class="name">Last Modified:</td>
+							
+							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastModified}" /></td>
+							
+						</tr>
+						
+						<tr class="prop">
+							<td valign="top" class="name">Last Login:</td>
+							
+							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.lastLogin}" /></td>
+							
+						</tr>
+						
 					</tbody>
 				</table>
 			</div>

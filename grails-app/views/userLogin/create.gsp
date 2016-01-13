@@ -3,53 +3,57 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<meta name="layout" content="projectHeader" />
 		<title>Create UserLogin</title>
-
-		<script type="text/javascript">  
-
+		
+		<script type="text/javascript">
+			
 			$().ready(function() {
-
+				
 				$('#add').click(function() {
 					return !$('#availableRoleId option:selected').remove().appendTo('#assignedRoleId');
-				});  
-
+				});
+				
 				$('#remove').click(function() {
 					return !$('#assignedRoleId option:selected').remove().appendTo('#availableRoleId');
 				});
-
+				
 				$('#username').focus();
-
+				
 			});
-
+			
 			function selectAllAssigned(){
-
+				
 				$('#assignedRoleId').each(function(){
 					$("#assignedRoleId option").attr("selected","selected");
 				});
-
+				
 			}
-
+			
 			function togglePasswordFields($me) {
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
 					$me.val(false)
 					$(".passwordsEditFields").hide();
+					$("#emailFieldId").hide();
+					$("#emailDisplayId").show();
 				} else {
 					$me.val(true)
 					$(".passwordsEditFields").show();
+					$("#emailFieldId").show();
+					$("#emailDisplayId").hide();
 				}
 			}
-		</script>          
+		</script>
 	</head>
 	<body>
-
-    
+		
+		
 		<div class="body">
 			<h1>Create UserLogin</h1>
-
+			
 			<div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 				<span class="menuButton"><g:link class="list" action="list" id="${companyId}"  params="[filter:true]">UserLogin List</g:link></span>
 			</div>
-
+			
 			<br/>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
@@ -65,7 +69,7 @@
 									<input name="personId" type="hidden" value="${personInstance.id}" />
 								</td>
 							</tr>
-
+							
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="person">Company:</label>
@@ -74,7 +78,7 @@
 									${personInstance.company}
 								</td>
 							</tr>
-
+							
 							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="person">Person:</label>
@@ -82,11 +86,11 @@
 								<td valign="top" class="value">
 									${personInstance.lastNameFirst}
 								</td>
-							</tr> 
-						
-							<tr class="prop">
+							</tr>
+							
+							<tr class="prop requiredField">
 								<td valign="top" class="name">
-									<label for="username"><b>Username (use email):&nbsp;<span style="color: red">*</span></b></label>
+									<label for="username">Username (use email):</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'username','errors')}">
 									<input type="text" maxlength="50" onkeyup="PasswordValidation.checkPassword($('#passwordId')[0])" id="username" name="username" value="${personInstance.email}" autocomplete="off" />
@@ -96,7 +100,16 @@
 										</div>
 									</g:hasErrors>
 								</td>
-							</tr> 
+							</tr>
+							<tr class="prop requiredField">
+								<td valign="top" class="name">
+									<label for="email">Email:</label>
+								</td>
+								<td valign="top" class="value">
+									<input type="text" id="emailInputId" name="email" value="${personInstance?.email}" autocomplete="off" />
+									<span id="emailDisplayId" style="display:none;">${personInstance?.email}</span>
+								</td>
+							</tr>
 							<tr>
 								<td valign="top" class="name">
 									<label for="isLocal">Local account:</label>
@@ -122,7 +135,7 @@
 									<input type="checkbox" id="passwordNeverExpiresId" name="passwordNeverExpires" value="true" />
 								</td>
 							</tr>
-					
+							
 							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength]}" />
 							
 							<tr class="prop">
@@ -163,10 +176,10 @@
 									</g:hasErrors>
 								</td>
 							</tr>
-
-							<tr class="prop">
+							
+							<tr class="prop requiredField">
 								<td valign="top" class="name">
-									<label for="active"><b>Active:&nbsp;<span style="color: red">*</span></b></label>
+									<label for="active">Active:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'active','errors')}">
 									<g:select id="active" name="active" from="${userLoginInstance.constraints.active.inList}" value="${userLoginInstance.active}" ></g:select>
@@ -177,10 +190,10 @@
 									</g:hasErrors>
 								</td>
 							</tr>
-						
-							<tr class="prop">
+							
+							<tr class="prop requiredField">
 								<td valign="top" class="name">
-									<label for="active"><b>Project:&nbsp;<span style="color: red">*</span></b></label>
+									<label for="active">Project:</label>
 								</td>
 								<td valign="top" class="value">
 									<g:select id="projectId" name="projectId" from="${projectList}" 

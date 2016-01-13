@@ -1705,3 +1705,12 @@ div#dependencyDivId td.labelColumn {
 a.light {
 	font-weight: normal; 
 }
+
+.requiredField label {
+	font-weight: bold;
+}
+tr.requiredField label:after {
+	content: " *";
+	font-weight: bold;
+	color: red;
+}
