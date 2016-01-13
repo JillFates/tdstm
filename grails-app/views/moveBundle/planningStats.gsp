@@ -5,115 +5,57 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 	<meta name="layout" content="projectHeader" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-
+	<g:javascript src="bootstrap.js" />
 <script type="text/javascript">
-$(document).ready(function() { 
+$(document).ready(function() {
 	currentMenuId = "#dashboardMenu";
-	$("#dashboardMenuId a").css('background-color','#003366')
-	
-	var percentageAppToValidate= 100 - ${percentageAppToValidate}
-	$("#discoverybar").animate({width: percentageAppToValidate+"%" }, 1000);
-	$("#applicationbar").animate({width: percentageAppToValidate+"%" }, 1000);
-	
-	var percentageBundleReady="${percentageBundleReady}";
-	$("#analysisbar").animate({width: percentageBundleReady+"%" }, 1000);
-	
-	$("#confirmedbar").animate({width: "${confirmedAppPerc}%" }, 1000);
-	
-	$("#appmovedbar").animate({width: "${movedAppPerc}%" }, 1000);
+	$("#dashboardMenuId a").css('background-color', '#003366');
+
+	var percentageAppToValidate = 100 - ${percentageAppToValidate}
+			$("#discoverybar").animate({width: percentageAppToValidate + "%"}, 1000);
+	$("#applicationbar").animate({width: percentageAppToValidate + "%"}, 1000);
+
+	var percentageBundleReady = "${percentageBundleReady}";
+	$("#analysisbar").animate({width: percentageBundleReady + "%"}, 1000);
+
+	$("#confirmedbar").animate({width: "${confirmedAppPerc}%"}, 1000);
+
+	$("#appmovedbar").animate({width: "${movedAppPerc}%"}, 1000);
 
 	$("#assignmentbar").animate({width: "${assignedAppPerc}%"}, 1000);
-	
-	var percentagePSToValidate=100-"${percentagePSToValidate}";
-	$("#physicalbar").animate({width: percentagePSToValidate+"%" }, 1000);
-	
-	var percentageVMToValidate=100-"${percentageVMToValidate}";
-	$("#virtualbar").animate({width: percentageVMToValidate+"%" }, 1000);
-	
-	var percentageDBToValidate=100-"${percentageDBToValidate}";
-	$("#dbbar").animate({width: percentageDBToValidate+"%" }, 1000);
-	
-	var percentageStorToValidate=100-"${percentageStorToValidate}";
-	$("#filebar").animate({width: percentageStorToValidate+"%" }, 1000);
-	
-	var percentageOtherToValidate=100-"${percentageOtherToValidate}";
+
+	var percentagePSToValidate = 100 - "${percentagePSToValidate}";
+	$("#physicalbar").animate({width: percentagePSToValidate + "%"}, 1000);
+
+	var percentageVMToValidate = 100 - "${percentageVMToValidate}";
+	$("#virtualbar").animate({width: percentageVMToValidate + "%"}, 1000);
+
+	var percentageDBToValidate = 100 - "${percentageDBToValidate}";
+	$("#dbbar").animate({width: percentageDBToValidate + "%"}, 1000);
+
+	var percentageStorToValidate = 100 - "${percentageStorToValidate}";
+	$("#filebar").animate({width: percentageStorToValidate + "%"}, 1000);
+
+	var percentageOtherToValidate = 100 - "${percentageOtherToValidate}";
 	$("#assetbar").animate({
-		width : percentageOtherToValidate + "%"
+		width: percentageOtherToValidate + "%"
 	}, 1000);
 
+	$('[data-toggle="popover"]').popover();
 
-	/*$("#eventDataTableId").css('max-width',
-			$(window).width() * 6.2/ 100 + '%')*/
-
-	$("#containerId").css('width',
-				$(window).width() - 50  + 'px')
-	
-	$("#eventDataTableId").css('max-width',
-				$(".dashboard_div.col-md-7.col-xs-7").width() - $("#eventHeaderTableId").width()-50)
-
-	if($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width())
-	{
-		$('#leftHeader').height($('#rightHeader').height() + 6 );
-	}
-	else
-	{
-		$('#leftHeader').height($('#rightHeader').height() - 6);
-	}		
-	});
-
-	$(function(){
-	   if ($('#eventDataTableId').hasScrollBar())
-	   		$("#eventHeaderTableId").css("margin-top", "-4px")
-	});
-
-	(function($) {
-	    $.fn.hasScrollBar = function() {
-	        return this.get(0).scrollWidth > this.width();
-	    }
-				
-	})(jQuery);
-
-   
-	$(window).resize(
-		function() {
-
-			var scrollbarWasVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar was visible before the screen resize
-			/*$("#eventDataTableId").css('max-width',
-					$(window).width() *  2.0 / 100 + '%')
-					*/
-
-			$("#containerId").css('width',
-			$(window).width() - 50  + 'px')
-			
-			$("#eventDataTableId").css('max-width',
-				$(".dashboard_div.col-md-7.col-xs-7").width() - $("#eventHeaderTableId").width()-50)
-			
-			
-			var scrollbarIsVisible = ($("#eventDataTableId").get(0).scrollWidth > $("#eventDataTableId").width()) //If the scrollbar is visible after the screen resize
-			
-			if((!scrollbarWasVisible) || (scrollbarWasVisible && !scrollbarIsVisible)) //realign the tables according to whether or not the scrollbar is present
-			{
-				if(scrollbarIsVisible)
-				{
-					$('#leftHeader').height($('#rightHeader').height() + $('#rightHeader').height()*.08 -20 );
-				}
-				else
-				{
-					$('#leftHeader').height($('#rightHeader').height() - 6);
-				}
-			}
-			
-	});
+});
 </script>
 <g:javascript src="entity.crud.js" /></head>
 <body>
-	<div class="body">
-		<div id="containerId" class="container">
+	<div class="container-full">
+		<div class="execution-phase-wrapper">
+				<!-- Full-width content -->
+
 			<h1>Planning Dashboard</h1>
 
 <%-- Analysis Phase --%>
 
-			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:260px">
+			<div class="dashboard_div col-xs-2 .col-lg-2" style="width:260px">
 				<span class="dashboard_head">Discovery Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 					<tr>
@@ -210,7 +152,7 @@ $(document).ready(function() {
 
 <%-- Analysis Phase --%>
 
-			<div class="dashboard_div col-md-2 col-xs-2" style="float: left; width:250px">
+			<div class="dashboard_div col-xs-2 .col-lg-2" style="width:250px">
 				<span class="dashboard_head">Analysis Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 					<tr>
@@ -382,7 +324,7 @@ $(document).ready(function() {
 
 <%-- Execution Phase Section --%>
 
-			<div class="dashboard_div col-md-8 col-xs-8 execution-phase" style="float: left;">
+			<div class="dashboard_div col-xs-8 .col-lg-8 execution-phase">
 				<span class="dashboard_head">Execution Phase</span>
 				<table style="margin-bottom: 10px; border-spacing: 0px;">
 
@@ -475,12 +417,8 @@ $(document).ready(function() {
 									</thead>
 									<tbody>
 									<tr>
-										<td class="dashboard_stat_icon_td"><img
-												src="${resource(dir:'images',file:'iconApp.png')}"
-												height="12" /></td>
-										<td style="vertical-align: middle;">
-											<g:link controller="application" action="list" class="links">Applications</g:link>
-										</td>
+										<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconApp.png')}" height="12" /></td>
+										<td style="vertical-align: middle;"> <g:link controller="application" action="list" class="links">Applications</g:link></td>
 									</tr>
 
 									<tr>
@@ -553,7 +491,7 @@ $(document).ready(function() {
 								</table>
 							</div>
 						</div>
-						<div class="col-md-10 col-xs-10">
+						<div class="col-md-10 col-xs-10" >
 							<div id="eventDataTableId" style="overflow-y: hidden;">
 								<table class="dashboard_stat_table">
 									<thead>
@@ -563,10 +501,8 @@ $(document).ready(function() {
 										</th>
 
 										<g:each in="${moveEventList}" var="event">
-											<th class="dashboard_stat_exec_tdmc headerWidth" >
-												<g:link
-														controller="application" action="list"
-														params="[moveEvent:event.id]">
+											<th class="dashboard_stat_exec_tdmc dashboard_stat_exec_tdmc_title" >
+												<g:link controller="application" action="list" params="[moveEvent:event.id]" data-toggle="popover" data-trigger="hover" data-content="${event}" data-placement="top">
 													${event}
 												</g:link>
 											</th>
@@ -655,9 +591,9 @@ $(document).ready(function() {
 						</div>
 					</div>
 				</div>
-				
-				<script type="text/javascript">$(window).resize()/*Prevents the div from jumping around the page when it loads*/</script> 
+
 			</div>
+
 		</div>
 	</div>
 </body>

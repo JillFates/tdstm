@@ -331,74 +331,77 @@ tr#applicationDependentId td.class-wrap-depend {
 * Now it will behaves per media queries
 */
 
-@media (min-width: 1401px) {
-    div.execution-phase.col-md-8 {
-        width: 60%;
-    }
+#eventDataTableId table {
+	width: inherit;
+}
+@media (min-width: 1554px) {
+	div.execution-phase{
+		width: 63%;
+	}
 
-    div#eventDataTableId {
-        margin-left: 0px;
-    }
+	div#eventDataTableId {
+		margin-left: 0px;
+	}
 }
 
-
-@media (min-width: 1150px) and (max-width: 1400px) {
-    div.execution-phase.col-md-8 {
-        width: 50%;
-    }
-
-    div#eventDataTableId {
-       margin-left: 37px;
-    }
+@media (min-width: 1346px) and (max-width: 1555px) {
+	div.execution-phase {
+		width: 60%;
+	}
 }
 
-@media (min-width: 1045px) and (max-width: 1149px) {
-    div.execution-phase {
-        width: 48%;
-    }
-
-    div#eventDataTableId {
-        width: 263px;
-        margin-left: 62px;
-    }
+@media (min-width: 1083px) and (max-width: 1345px) {
+	div.execution-phase {
+		width: 50%;
+	}
+	div#eventDataTableId {
+		margin-left: 40px;
+	}
 }
 
-@media (min-width: 1000px) and (max-width: 1144px) {
-    div.execution-phase {
-        width: 45%;
-    }
+@media (min-width: 914px) and (max-width: 1082px) {
+	div.execution-phase {
+		width: 40%;
+	}
 
-    div#eventDataTableId {
-        width: 263px;
-        margin-left: 62px;
-    }
+	div#eventDataTableId {
+		margin-left: 65px;
+	}
 }
 
-@media (min-width: 948px) and (max-width: 1044px) {
-    div.execution-phase {
-        width: 38%;
-    }
+@media (min-width: 400px) and (max-width: 913px) {
+	div.execution-phase {
+		width: 95%;
+	}
 
-    div#eventDataTableId {
-        width: 72%;
-        margin-left: 70px;
-    }
+	div#eventDataTableId {
+		margin-left: 5px;
+	}
 }
 
-@media(max-width: 947px) {
-    div.execution-phase {
-        width: 100%;
-    }
-
-    div#eventDataTableId {
-        width: 80%;
-        margin-left: 70px;
-    }
+@media (max-width: 750px) {
+	div#eventDataTableId {
+		margin-left: 40px;
+	}
 }
 
+.dashboard_stat_exec_tdmc_title {
+	width: 48px;
+	max-width: 48px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
+.container-full {
+	margin: 0 auto;
+	width: 100%;
+	overflow-x: hidden;
+}
 
-
+.container-full .execution-phase-wrapper {
+	margin-left: 20px;
+}
 
 /* ACTION BUTTONS */
 
@@ -1425,10 +1428,11 @@ div.dialog input#description {
 
 .popover.top .arrow:after {
 	bottom: 1px;
-	margin-left: -10px;
+	margin-left: -30px !important;
 	border-top-color: #ffffff;
 	border-bottom-width: 0;
 	content: " ";
+	margin-top: -1px !important;
 }
 
 .popover.right .arrow {
