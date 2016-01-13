@@ -132,7 +132,7 @@
 
 				<g:each var="key" in="['1','2','3','4','5']">
 					var assetPref= '${assetPref[key]}';
-					$("#assetListIdGrid_" + assetPref).append('<img src="../images/select2Arrow.png" class="selectImage customizeSelect editSelectimage_'+${key}+'" onclick="showSelect(\''+assetPref+'\',\'assetList\',\''+${key}+'\')">');
+					$("#assetListIdGrid_" + assetPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+assetPref+"','assetList','"+${key}+"')\">");
 				</g:each>
 			
 				$.jgrid.formatter.integer.thousandsSeparator = '';
