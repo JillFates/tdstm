@@ -102,7 +102,7 @@
 								</td>
 								<td class="label ${config.sme2}  ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 								<td class="suffleTd">
-								 <img src="../images/swapicon.png" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
+								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme1','sme2')" class="SuffleImage"  alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="sme2" name="sme2.id" class="${config.sme2} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
@@ -137,7 +137,7 @@
 								</td>
 								<td class="label ${config.appOwner}  ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwnerId">App Owner</label></td>
 								<td class="suffleTd">
-								 <img src="../images/swapicon.png" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
+								 <img src="${resource(dir:'images',file:'swapicon.png')}" onclick="shufflePerson('sme2','appOwner')" class="SuffleImage" alt="Swap Contacts" title="Swap Contacts"/>
 									<g:select from="${personList}" id="appOwner" name="appOwner.id" class="${config.appOwner} suffleSelect personContact assetSelect" optionKey="personId" 
 										optionValue="${{it.fullName}}" 
 										onchange="openPersonDiv(this.value, this.id)" 
