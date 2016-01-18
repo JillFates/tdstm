@@ -31,13 +31,14 @@ var defaults = {"width":getStandardWidth(), "height":getStandardHeight(), "black
 
 var canvas = d3.select("div#svgContainerId")
 	.append("svg:svg")
+	.attr('class', 'chart')
 	.attr('id', 'graphSvgId');
 	
 // define the arrowhead markers used for marking dependencies
-canvas.append("defs");
-defineShapes(d3.select("defs"));
+var defs = canvas.append("defs");
+defs.html(appSVGShapes.getAll());
+defineShapes(defs);
 var arrowOffset = 16;
-d3.selectAll('defs marker').attr('refX', arrowOffset);
 
 // bind browser resizing to resizing the svg
 $(window).resize( function(a, b) {
@@ -735,7 +736,7 @@ function buildMap (width, height) {
 		GraphUtil.nodeBindings = GraphUtil.nodeBindings
 			.append("svg:use")
 				.attr("xlink:href", function (d) {
-					return '#' + assetTypes[d.type].internalName + 'ShapeId';
+					return '#' + appSVGShapes.shape[assetTypes[d.type].internalName].id;
 				})
 				.attr("class", function (d) { 
 					return "node " + d.dir
@@ -959,13 +960,13 @@ function buildMap (width, height) {
 		GraphUtil.updateAllClasses();
 		
 		// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-		var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
-		selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+		var selection = d3.selectAll('svg.chart > g g g').filter(':not(.selected)').filter('.selected');
+		selection[0] = selection[0].concat(d3.selectAll('svg.chart > g g line').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g line').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter('.selected')[0]);
 		selection.order();
 	}
 	
@@ -1502,7 +1503,7 @@ function buildMap (width, height) {
 			.attr("transform", function(d) {			
 				if (isNaN(d.x))
 					d.x = 0;
-				return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";
+				return "translate(" + (d.x + offsetX + GraphUtil.shapeOffset) + "," + (d.y + offsetY + GraphUtil.shapeOffset) + ")";
 			})
 			.style("fill", function(d) {
 				return (d.fillColor) ? (d.fillColor) : (d3.select(this).attr('fillColor'));
@@ -2749,7 +2750,7 @@ function setLabelOffsets (nodeMap) {
 	// update all the labels y values
 	GraphUtil.labelBindings.attr("dy", function(d) {
 			if (d.labelOffset) {
-				$(this).children().attr('dy', d.labelOffset - 0.4 + 'em');
+				$(this).children().attr('dy', d.labelOffset - 0.8 + 'em');
 			} else {
 				$(this).children().attr('dy', 0 + 'em');
 			}

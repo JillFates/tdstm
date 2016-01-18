@@ -328,7 +328,7 @@ img.pointer {
 	left: 0px;
 }
 
-.graphContainer.fullscreen #svgContainerId svg {
+.graphContainer.fullscreen #svgContainerId > svg {
 	position: fixed;
 	left: 0px;
 	top: 0px;
@@ -645,4 +645,8 @@ div.graphPanel.openPanel {
 }
 .controlSpan input,.controlSpan select {
 	margin-left: 5px;
+}
+
+defs svg {
+	stroke-width: 2.5px;
 }

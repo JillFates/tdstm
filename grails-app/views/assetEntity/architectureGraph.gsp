@@ -23,6 +23,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 		<g:javascript src="d3/d3.js" />
 		<g:javascript src="lodash/lodash.min.js" />
+		<g:javascript src="svg.js"/>
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="graph.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
@@ -122,7 +123,7 @@
 												<span class="checkboxContainer">
 													<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
 													--><label for="${type}CheckboxId" class="pointer">
-														<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+														<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="0" y="0" style="fill: #1f77b4;"></use></svg>
 														${names.labelText ?: names.frontEndNamePlural}
 													</label>
 												</span>
@@ -179,7 +180,7 @@
 				</table>
 			</div>
 			
-			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:false]}" />
+			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:true]}" />
 		</div>
 		<div id="svgContainerId"></div>
 		<div id="spinnerDivId" style="display: none"></div>

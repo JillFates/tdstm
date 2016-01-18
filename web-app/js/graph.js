@@ -13,6 +13,7 @@ var GraphUtil = (function ($) {
 	public.linkBindings = null;
 	public.labelBindings = null;
 	public.labelTextBindings = null;
+	public.shapeOffset = -8;
 	
 	// returns true if the graph is loaded
 	public.graphExists = function () {
@@ -600,18 +601,17 @@ var GraphUtil = (function ($) {
 		public.reorderDOM();
 	}
 	
-	
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
 	public.reorderDOM = function () {
-		var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
+		var selection = d3.selectAll('svg.chart > g g g').filter(':not(.selected)').filter('.selected');
 		selection[0] = selection[0]
-			.concat(d3.selectAll('svg g g circle.cutShadow')[0])
-			.concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+			.concat(d3.selectAll('svg.chart > g g circle.cutShadow')[0])
+			.concat(d3.selectAll('svg.chart > g g line').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g line').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter('.selected')[0]);
 		selection.order();
 	}
 	

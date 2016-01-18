@@ -63,6 +63,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
+import com.tdsops.tm.asset.graph.AssetClassUtil
 
 class AssetEntityController {
 
@@ -90,6 +91,8 @@ class AssetEntityController {
 
 	def jdbcTemplate
 	def quartzScheduler
+	
+	def assetClassUtil = new AssetClassUtil()
 	
 	// def missingHeader = ""
 	int added = 0
@@ -3160,24 +3163,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					assetClass = it.assetClass
 					size = 150
 					
-					if (it.assetClass == AssetClass.APPLICATION.toString()) {
-						type = AssetType.APPLICATION.toString()
+					type = assetClassUtil.getImageName(assetClass, assetType)
+					if (type == AssetType.APPLICATION.toString())
 						size = it.criticality ? criticalitySizes[it.criticality] : 200
-					} else if (it.assetClass == AssetClass.DATABASE.toString()) {
-						type = AssetType.DATABASE.toString()
-					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getVirtualServerTypes()) {
-						type = AssetType.VM.toString()
-					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getPhysicalServerTypes()) {
-						type = AssetType.SERVER.toString()
-					} else if (it.assetClass == AssetClass.STORAGE.toString()) {
-						type = AssetType.FILES.toString()
-					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getStorageTypes()) {
-						type = AssetType.STORAGE.toString()
-					} else if (it.assetClass == AssetClass.DEVICE.toString() && assetType in AssetType.getNetworkDeviceTypes()) {
-						type = AssetType.NETWORK.toString()
-					} else {
-						type = 'Other'
-					}
 					
 					if (! dependencyBundleMap.containsKey(it.bundle))
 						dependencyBundleMap.put(it.bundle, 'Group ' + it.bundle);
@@ -3239,7 +3227,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				def t2 = TimeUtil.elapsed(start).getMillis() + TimeUtil.elapsed(start).getSeconds()*1000
 				def td = t2-t1
 				def avg = 0
-				if(assetDependentlist.size() > 0){
+				if (assetDependentlist.size() > 0){
 					avg = td / assetDependentlist.size()
 				}
 				
@@ -4565,6 +4553,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			def color = ''
 			def type = ''
 			def assetType = ''
+			def assetClass = ''
 			def criticalitySizes = ['Minor':150, 'Important':200, 'Major':325, 'Critical':500]
 			
 			// create a node for each asset
@@ -4572,25 +4561,12 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				
 				// get the type used to determine the icon used for this asset's node 
 				assetType = it.model?.assetType?:it.assetType
+				assetClass = it.assetClass?.toString() ?: ''
 				size = 150
-				if (it.assetClass == AssetClass.APPLICATION) {
-					type = AssetType.APPLICATION.toString()
+				
+				type = assetClassUtil.getImageName(assetClass, assetType)
+				if (type == AssetType.APPLICATION.toString())
 					size = it.criticality ? criticalitySizes[it.criticality] : 200
-				} else if (it.assetClass == AssetClass.DATABASE) {
-					type = AssetType.DATABASE.toString()
-				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getVirtualServerTypes()) {
-					type = AssetType.VM.toString()
-				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getPhysicalServerTypes()) {
-					type = AssetType.SERVER.toString()
-				} else if (it.assetClass == AssetClass.STORAGE) {
-					type = AssetType.FILES.toString()
-				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getStorageTypes()) {
-					type = AssetType.STORAGE.toString()
-				} else if (it.assetClass == AssetClass.DEVICE && assetType in AssetType.getNetworkDeviceTypes()) {
-					type = AssetType.NETWORK.toString()
-				} else {
-					type = 'Other'
-				}
 				
 				graphNodes << [
 					id:it.id, name:it.assetName, 

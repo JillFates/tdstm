@@ -26,7 +26,7 @@ function defineShapes (defs) {
 		.attr("viewBox", "0 -6 10 12")
 		.attr("markerHeight", 12);
 	defs.selectAll('#arrowheadSelected path,#arrowheadCyclical path,#arrowheadBundleConflict path').attr("d", "M0,-6L10,0L0,6");
-	
+	/*
 	// define the custom database object
 	var databaseShape = defs
 		.append("g")
@@ -106,6 +106,6 @@ function defineShapes (defs) {
 		.append("path")
 		.attr("id", "otherShapeId")
 		.attr("d", d3.svg.symbol().size(150).type('triangle-up'));
-	
+	*/
 	return null;
 }

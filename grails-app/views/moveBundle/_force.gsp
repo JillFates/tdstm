@@ -45,10 +45,12 @@ GraphUtil.force = d3.layout.force();
 var canvas = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
-	.append("svg:svg");
+	.append("svg:svg")
+	.attr('class','chart');
 
 // define the shapes used for the svg
-canvas.append("defs");
+var defs = canvas.append("defs");
+defs.html(appSVGShapes.getAll());
 defineShapes(d3.select("defs"));
 
 var outsideWidth = 0;
@@ -245,7 +247,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	canvas
 		.attr("width", width)
 		.attr("height", height)
-		.attr("class", 'draggable')
+		.attr("class", 'draggable chart')
 		.attr("style", graphstyle)
 		.style('background-color', backgroundColor)
 		.style('cursor', 'default')
@@ -298,7 +300,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	GraphUtil.nodeBindings = GraphUtil.nodeBindings
 		.append("use")
 			.attr("xlink:href", function (d) {
-				return '#' + assetTypes[d.type].internalName + 'ShapeId';
+				return '#' + appSVGShapes.shape[assetTypes[d.type].internalName].id;
 			})
 			.attr("class", "node")
 			.call(dragBehavior)
@@ -458,7 +460,7 @@ function updateElementPositions () {
 	// set the dynamic attributes for the nodes
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
-		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+		o.transform.baseVal.getItem(0).setTranslate(d.x + GraphUtil.shapeOffset, d.y + GraphUtil.shapeOffset);
 		if (d.cutShadow)
 			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
 	});
