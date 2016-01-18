@@ -287,7 +287,7 @@ class ProjectController {
 			
 			if( !projectInstance.hasErrors() && projectInstance.save() ) {
 				
-				def partnersIds
+				def partnersIds = params.projectPartners
 				
 				/*
 				if ( projectManagerId != "" && projectManagerId != null ) {
@@ -473,6 +473,10 @@ class ProjectController {
 		//	redirect( action:"show",  imageId: result.imageId )
 
 		if ( !projectInstance.hasErrors() && projectInstance.save() ) {
+
+			// save partners
+			projectService.updateProjectPartners(projectInstance, params.projectPartners)
+
 			if(file && file.getContentType() == "application/octet-stream"){
 				//Nonthing to perform.
 			} else if(params.projectPartner){
