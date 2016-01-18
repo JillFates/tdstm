@@ -1343,21 +1343,20 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						// Try reading the created date as a date and if that fails try as a string and parse
 						cols++
 						def dateCreated
-						def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), TimeUtil.FORMAT_DATE)	
+						//def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), TimeUtil.FORMAT_DATE)
+						def createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, cols, r )
 						if (createdDateInput) {
-							dateCreated = createdDateInput
-						} else {
-							// Try parsing the input
-							createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, cols, r )?.replace("'","\\'")
-							if (createdDateInput) {
-								dateCreated = TimeUtil.parseDate(getSession(), createdDateInput)
-								if ( ! (dateCreated instanceof Date) ) {
-									importResults.errors << "Invalid Created Date '$createdDateInput' (row ${rowNum})"
-									continue
-								}
-							} else if (recordForAddition) {
-								dateCreated = new Date()
+							if(createdDateInput ==~ /'.*'/){
+								createdDateInput = createdDateInput[1..-2]
 							}
+							createdDateInput = createdDateInput.replace("'", "\\'")
+							dateCreated = TimeUtil.parseDate(getSession(), createdDateInput)
+							if ( ! (dateCreated instanceof Date) ) {
+								importResults.errors << "Invalid Created Date '$createdDateInput' (row ${rowNum})"
+								continue
+							}
+						} else if (recordForAddition) {
+								dateCreated = new Date()
 						}
 
 						// We need to keep track of the dateCreated change as it turns out the dirtyPropertyNames will NOT return this property
