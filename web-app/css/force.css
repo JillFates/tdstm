@@ -378,6 +378,11 @@ img.pointer {
 #controlPanel .labelToggleRow input {
 	margin-top: 4px;
 }
+
+#controlPanel .labelToggleRow span.checkboxContainer svg {
+	padding-top: 12px !important;
+	padding-left: 6px !important;
+}
 #controlPanel #colorByFormId {
 	padding-left: 2px;
 	padding-bottom: 0px;
