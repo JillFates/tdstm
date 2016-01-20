@@ -807,6 +807,7 @@ class RackLayoutsController {
 	 * Return AssetCableMap record details to display at RackLayout cabling screen
 	 */
 	def retrieveCablingDetails() {
+		
 		def project = securityService.getUserCurrentProject()
 		def moveBundleList = MoveBundle.findAllByProject( project )
 		userPreferenceService.loadPreferences("CURR_BUNDLE")
@@ -901,9 +902,6 @@ class RackLayoutsController {
 					type: it.assetFromPort.type,
 				]
 			]
-			println(">>>>>>>>>>>>>>>>>>>>>")
-			println(assetCablingMap)
-			println(">>>>>>>>>>>>>>>>>>>>>")
 			assetRows << [(it.id):'h']
 		}
 		render( 
