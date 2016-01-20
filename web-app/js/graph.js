@@ -13,7 +13,7 @@ var GraphUtil = (function ($) {
 	public.linkBindings = null;
 	public.labelBindings = null;
 	public.labelTextBindings = null;
-	public.shapeOffset = -8;
+	public.shapeOffset = -20;
 	
 	// returns true if the graph is loaded
 	public.graphExists = function () {
