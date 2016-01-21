@@ -346,8 +346,6 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("dx", 12)
 		.attr("dy",".35em")
 		.text(function(d) {
-			if (d.name && d.name.length > 12)
-				return d.name.substr(0, 12) + '...';
 			return d.name;
 		});
 	
@@ -359,8 +357,6 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("dx", 12)
 		.attr("dy",".35em")
 		.text(function(d) {
-			if (d.name && d.name.length > 12)
-				return d.name.substr(0, 12) + '...';
 			return d.name;
 		});
 	

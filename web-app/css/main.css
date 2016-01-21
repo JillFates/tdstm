@@ -984,6 +984,12 @@ span.checkboxContainer:hover input {
 	filter: brightness(90%);
 	-webkit-filter: brightness(90%);
 }
+
+div.checkboxContainer {
+	height: 35px;
+	padding: 5px;
+}
+
 span#controlRowId {
 	display: block;
 	vertical-align: middle;

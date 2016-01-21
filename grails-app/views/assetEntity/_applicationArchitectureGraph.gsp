@@ -780,8 +780,6 @@ function buildMap (width, height) {
 			.attr("dx", 0)
 			.attr("dy","-1.45em")
 			.text(function(d) {
-				if (d.name && d.name.length > 12)
-					return d.name.substr(0, 12) + '...';
 				return d.name;
 			});
 		
@@ -794,8 +792,6 @@ function buildMap (width, height) {
 			.attr("dx", 0)
 			.attr("dy","-1.45em")
 			.text(function(d) {
-				if (d.name && d.name.length > 12)
-					return d.name.substr(0, 12) + '...';
 				return d.name;
 			});
 		
@@ -1515,7 +1511,17 @@ function buildMap (width, height) {
 			.attr("y1", function(d) {return d.parent.y;})
 			.attr("x2", function(d) {return d.child.x;})
 			.attr("y2", function(d) {return d.child.y;})
-			.attr("transform", function(d) {return "translate(" + offsetX + "," + offsetY + ")";});
+			.attr("transform", function(d) {
+					var positionXEndPoint = offsetX  + GraphUtil.shapeOffset + 12;
+					var positionYEndPoint = offsetY  + GraphUtil.shapeOffset + 10;
+
+					if(d.parent && d.parent.x && d.child && d.child.x) {
+						if(d.parent.x > d.child.x) {
+							positionXEndPoint += 8;
+						}
+					}
+					return "translate(" + positionXEndPoint + "," + positionYEndPoint + ")";
+			});
 		
 		// set the positional attributes for the labels
 		
@@ -1526,7 +1532,7 @@ function buildMap (width, height) {
 			.attr("cy", function(d) {
 				return d.y;
 			})
-			.attr("transform", function(d) {return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";});
+			.attr("transform", function(d) {return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY + GraphUtil.labelShapeOffset) + ")";});
 		
 		// Update the classes for all data bound svg objects
 		GraphUtil.updateAllClasses();

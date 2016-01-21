@@ -14,6 +14,7 @@ var GraphUtil = (function ($) {
 	public.labelBindings = null;
 	public.labelTextBindings = null;
 	public.shapeOffset = -20;
+	public.labelShapeOffset = -2;
 	
 	// returns true if the graph is loaded
 	public.graphExists = function () {

@@ -120,13 +120,13 @@
 									<tr class="labelToggleRow">
 										<td colspan="3" class="labelToggleCol">
 											<div style="padding:0px;">
-												<span class="checkboxContainer">
+												<div class="checkboxContainer">
 													<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
 													--><label for="${type}CheckboxId" class="pointer">
 														<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="0" y="0" style="fill: #1f77b4;"></use></svg>
 														${names.labelText ?: names.frontEndNamePlural}
 													</label>
-												</span>
+												</div>
 											</div>
 										</td>
 									</tr>
