@@ -14,15 +14,19 @@ grails.plugin.location.'eav-model' = "./pluginscustom/eav-model-0.1"
 grails.project.dependency.resolution = {
 	// inherit Grails' default dependencies
 	inherits("global") {
-		excludes "itext" 
+		// @TODO : JPM 1/2016 : See TM-3868
+		// excludes 'itext', 'grails-plugin-log4j', 'log4j' 
+		excludes 'itext'
 	}
 	
 	log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
 
 	repositories {
 		inherits true
-		mavenRepo("http://tmdevold.tdsops.com/grails-maven")
-		mavenRepo("http://repo.grails.org/grails/plugins/")
+		mavenRepo('http://tmdevold.tdsops.com/grails-maven')
+		mavenRepo('http://repo.grails.org/grails/plugins/')
+		// TODO : JPM 1/2016 : See TM-3868
+		// mavenRepo('http://repo.grails.org/grails/libs-releases')
 		grailsPlugins()
 		grailsHome()
 		grailsCentral()
@@ -40,6 +44,8 @@ grails.project.dependency.resolution = {
 		compile 'net.sf.jasperreports:jasperreports:4.5.1'
 		compile 'commons-collections:commons-collections:3.2.1'
 		compile 'com.canoo.webtest:webtest:3.0'
+		// TODO : JPM 1/2016 : See TM-3868
+		// compile "org.grails.plugins:logback:0.3.1"
 	}
 
 	plugins {
@@ -76,3 +82,17 @@ grails.war.resources = { stagingDir ->
 	delete(file: "${stagingDir}/WEB-INF/lib/mysql-connector-java-5.1.6-bin.jar")
 	delete(file: "${stagingDir}/WEB-INF/lib/commons-codec-1.3.jar")
 } 
+
+/*
+ * If the application is being run locally, set the Logback configuration file
+ * system property.  This is necessary as Grails will attempt to compile the .groovy
+ * file instead of simply adding it to the classpath "as is".  There is a corresponding
+ * event handler in 'scripts/Events.groovy' that takes care of making sure that the
+ * Groovy configuration file makes it into the WAR in its un-compiled state.
+ * See http://jdpgrailsdev.github.io/blog/2014/03/24/grails_logback.html
+ */
+// TODO : JPM 1/2016 : See TM-3868
+//if(new File("${basedir}/grails-app/conf/logback.groovy").exists()) {
+//    System.setProperty('logback.configurationFile', "${basedir}/grails-app/conf/logback.groovy")		
+//}
+
