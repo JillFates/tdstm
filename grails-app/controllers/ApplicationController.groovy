@@ -114,13 +114,21 @@ class ApplicationController {
 		//def validUnkownQuestioned = "'${AssetDependencyStatus.VALIDATED}'," + unknownQuestioned
 		def justPlanning = userPreferenceService.getPreference("assetJustPlanning")?:'true'
 		def customizeQuery = assetEntityService.getAppCustomQuery(appPref)
-		def query = new StringBuffer("""SELECT * FROM ( SELECT a.app_id AS appId, ae.asset_name AS assetName,a.latency AS latency,
-										IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event,""")
-		if(customizeQuery.query){
+		def query = new StringBuffer("""SELECT * FROM ( 
+			SELECT a.app_id AS appId, ae.asset_name AS assetName,a.latency AS latency,
+				IF(ac_task.comment_type IS NULL, 'noTasks','tasks') AS tasksStatus, 
+				IF(ac_comment.comment_type IS NULL, 'noComments','comments') AS commentsStatus,me.move_event_id AS event, """)
+
+		if (customizeQuery.query) {
 			query.append(customizeQuery.query)
 		}	
 		
-		query.append(""" ae.asset_type AS assetType,ae.validation AS validation,ae.plan_status AS planStatus,me.runbook_status AS runbookStatus
+		query.append(""" ae.asset_type AS assetType,
+			ae.validation AS validation,
+			ae.plan_status AS planStatus,
+			me.runbook_status AS runbookStatus, 
+			ae.move_bundle_id, 
+			mb.name as moveBundle
 			FROM application a 
 			LEFT OUTER JOIN asset_entity ae ON a.app_id=ae.asset_entity_id
 			LEFT OUTER JOIN asset_comment ac_task ON ac_task.asset_entity_id=ae.asset_entity_id AND ac_task.comment_type = 'issue'
@@ -186,6 +194,7 @@ class ApplicationController {
 		if(params.moveBundleId){
 			if(params.moveBundleId!='unAssigned'){
 				def bundleName = MoveBundle.get(params.moveBundleId)?.name
+				// @TODO : JPM 1/2016 : Fix for SQL injections @SECURITY
 				query.append(" WHERE apps.moveBundle  = '${bundleName}' ")
 			}else{
 				query.append(" WHERE apps.moveBundle IS NULL ")
