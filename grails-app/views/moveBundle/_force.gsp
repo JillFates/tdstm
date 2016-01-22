@@ -185,7 +185,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			
 			if (d.cutShadow)
 				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-			
+
 			d.fix = true;
 			d.fixed = true;
 			clicked = false;
@@ -288,7 +288,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("y1", function(d) { return d.source.y;})
 			.attr("x2", function(d) { return d.target.x;})
 			.attr("y2", function(d) { return d.target.y;});
-	
+
 	if ($.browser.mozilla)
 		GraphUtil.linkBindings.style('opacity', 1);
 	
@@ -457,8 +457,9 @@ function updateElementPositions () {
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
 		o.transform.baseVal.getItem(0).setTranslate(d.x + GraphUtil.shapeOffset, d.y + GraphUtil.shapeOffset);
-		if (d.cutShadow)
+		if (d.cutShadow){
 			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+		}
 	});
 	
 	// set the dynamic attributes for the links
@@ -472,6 +473,29 @@ function updateElementPositions () {
 			d.cut = 3;
 			o.classList.add('cut');
 		}
+	});
+
+	GraphUtil.linkBindings.attr("transform", function(d) {
+		var positionXEndPoint = 0,
+			positionYEndPoint = 0;
+
+		if(d.target.x && d.target.x  && d.target.y && d.target.y ){
+			var sourceX =  d.source.x - d.target.x,
+				sourceY =  d.source.y - d.target.y;
+			if(sourceX < 77 ){
+				positionXEndPoint = -8;
+			}
+
+			if(sourceY < 80 ){
+				if(sourceY >= 51 && sourceY <= 80 )
+					positionYEndPoint = 0;
+				else
+					positionYEndPoint = -8;
+			}
+
+		}
+
+		return "translate(" + positionXEndPoint + "," + positionYEndPoint + ")";
 	});
 	
 	// set the dynamic attributes for the labels
@@ -859,7 +883,7 @@ function cutAndRemove () {
 	// if it looped this many times, no suitable neighborhood could be found
 	if (callCount >= 1000) {
 		$('#minCutButtonId').removeAttr('disabled');
-		alert('could not find any unpartitioned applications');
+		alert('Unable to determine any applicable splits');
 		return;
 	}
 	
