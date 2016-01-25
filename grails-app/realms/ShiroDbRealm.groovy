@@ -210,7 +210,7 @@ class ShiroDbRealm {
 
 			// Lock out the account if they exceeded the max tries and the account isn't already locked
 			if ( (maxLoginFailureAttempts > 0) &&
-				 (state.user.failedLoginAttempts > maxLoginFailureAttempts) &&
+				 (state.user.failedLoginAttempts >= maxLoginFailureAttempts) &&
 				 (state.user.lockedOutUntil == null || state.user.lockedOutUntil.time < now.time)
 			) {
 				String lockoutTime = 'indefintely'
