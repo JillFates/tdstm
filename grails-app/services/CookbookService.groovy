@@ -1020,7 +1020,7 @@ class CookbookService {
 	*/
 	List<Map> basicValidateSyntax( sourceCode ) {
 
-		def session = serviceHelperService.getService('userPreference').getSession()
+		def session = serviceHelperService?.getService('userPreference')?.getSession()
 
 		def errorList = [] as HashSet
 		def recipe
