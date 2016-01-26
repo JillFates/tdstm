@@ -194,6 +194,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			if (GraphUtil.force.alpha() < startAlpha) {
 				if (!GraphUtil.setAlpha(0.1)) {
 					GraphUtil.updateNodePosition(d);
+					updateElementPositions();
 				}
 			}
 			
@@ -494,7 +495,6 @@ function updateElementPositions () {
 			}
 
 		}
-
 		return "translate(" + positionXEndPoint + "," + positionYEndPoint + ")";
 	});
 	
