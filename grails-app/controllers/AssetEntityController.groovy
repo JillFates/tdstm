@@ -1894,12 +1894,17 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			def instructionsLinkLabel = null
 
 			if(assetComment.instructionsLink){
-				instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
-				instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
+				List<String> instructionsLinkInfo = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)
+				if(instructionsLinkInfo){
+					if(instructionsLinkInfo.size() > 1){
+						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[1]
+						instructionsLinkLabel = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]	
+					}else{
+						instructionsLinkURL = HtmlUtil.parseMarkupURL(assetComment.instructionsLink)[0]
+					}
+				}
 			}
 
-			
-			
 			def predecessorTable = ""
             def predecessorList = []
 			def taskDependencies = assetComment.taskDependencies
