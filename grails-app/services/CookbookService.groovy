@@ -35,6 +35,7 @@ class CookbookService {
 	def partyRelationshipService
 	def securityService
 	def progressService
+	def serviceHelperService
 
 	/**
 	 * Checks if person can access project. If it can't then it throws an {@link UnauthorizedException}
@@ -1018,6 +1019,9 @@ class CookbookService {
 	* 5) Duplicate reference
 	*/
 	List<Map> basicValidateSyntax( sourceCode ) {
+
+		def session = serviceHelperService.getService('userPreference').getSession()
+
 		def errorList = [] as HashSet
 		def recipe
 		def msg
@@ -1502,7 +1506,7 @@ class CookbookService {
 						if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}/ ) {
 							t = TimeUtil.parseDate(ct)
 						} else if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}.*/ ) {
-							t = TimeUtil.parseDateTime(ct)
+							t = TimeUtil.parseDateTime(session, ct)
 						} else if ( ct ==~ /^#.*/ ) {
 							t = ct
 						} else if ( ct ==~ /^(?i)(\d{1,}|es|ec).*/ ) {
