@@ -57,7 +57,8 @@
 						 <td class="name"><label for="comment">Instructions Link:</label></td>
                         <td valign="top" class="value" id="instructionsLinkValueId" colspan="3">
 							<g:set var="instructionsLink" value="{{ac.instructionsLink}}"/>
-							<a ng-href="{{acData.instructionsLinkURL}}">{{acData.instructionsLinkLabel}}<a>
+							<a ng-href="{{acData.instructionsLinkURL}}" ng-show="acData.instructionsLinkURL.length > 0" >{{acData.instructionsLinkLabel ? acData.instructionsLinkLabel : acData.instructionsLinkURL}}</a>
+                            <span ng-hide="acData.instructionsLinkURL.length > 0">{{ac.instructionsLink}}</span>
                         </td>
 					</tr>
                     <tr id="workFlowShow">
