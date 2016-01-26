@@ -121,6 +121,7 @@ class ShiroDbRealm {
 				log.debug "      Authenticated"
 				if (getSecurityService().getUserLocalConfig().forceUseNewEncryption) {
 					// Set the userLogin so that they're forced to change their password
+	  				log.debug "      Set forcePasswordChange"
 					state.user.forcePasswordChange = 'Y'
 					state.user.save(flush:true, failOnError:true)
 				}
@@ -185,6 +186,7 @@ class ShiroDbRealm {
 			 state.user.passwordExpirationDate.time <= TimeUtil.nowGMT().time
 			) {
 				// Set the userLogin so that they're forced to change their password
+				log.debug "    Set forcePasswordChange"
 				state.user.forcePasswordChange = 'Y'
 				state.user.save(flush:true, failOnError:true)
 				state.authenticated = true
@@ -241,6 +243,7 @@ class ShiroDbRealm {
 			 ((state.user.passwordChangedDate.time + (maxPasswordAgeDays * 24 * 60 * 60 * 1000)) < TimeUtil.nowGMT().time)
 			) {
 				// Set the userLogin so that they're forced to change their password
+				log.debug "    Set forcePasswordChange"
 				state.user.forcePasswordChange = 'Y'
 				state.user.save(flush:true, failOnError:true)
 				state.authenticated = true
