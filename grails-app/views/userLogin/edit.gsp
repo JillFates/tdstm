@@ -134,7 +134,7 @@
 							</td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="passwordNeverExpiresId">Password never expires:</label>
 							</td>
@@ -146,7 +146,7 @@
 						
 						<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength]}" />
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="passwordExpirationDate">Password Expires:</label>
 							</td>
@@ -272,6 +272,9 @@
 			</g:form>
 		</div>
 	<script>
+		$(document).ready(function(){
+			togglePasswordEditFields($("#isLocal"))
+		})
 //					<input class="cancel" onclick="return confirm('Are you sure?');" value="Delete" />
 	currentMenuId = "#adminMenu";
 	$("#adminMenuId a").css('background-color','#003366')
