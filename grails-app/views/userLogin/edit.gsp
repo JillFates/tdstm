@@ -178,7 +178,7 @@
 								</g:hasErrors>
 							</td>
 						</tr>
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="lockedOutUntilId">Locked Out Until:</label>
 							</td>
