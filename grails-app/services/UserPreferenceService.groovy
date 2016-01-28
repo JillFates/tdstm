@@ -89,8 +89,6 @@ class UserPreferenceService {
 					return false
 				if ( ! (Integer.parseInt(prefs.levelsDown) in (0..10)) )
 					return false
-				if ( ! (Integer.parseInt(prefs.labelOffset) in (1..4)) )
-					return false
 				
 				return true
 			}
