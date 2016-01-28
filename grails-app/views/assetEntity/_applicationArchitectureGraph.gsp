@@ -1508,7 +1508,7 @@ function buildMap (width, height) {
 		// set the dynamic attributes for the links
 		$(GraphUtil.linkBindings[0]).each(function (i, o) {
 			var d = o.__data__;
-			
+
 			var targetEdge = GraphUtil.targetEdge(d.parent, d.child);
 			if(d.notApplicable && d.notApplicable == true) {
 				targetEdge.x = d.child.x;

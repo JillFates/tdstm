@@ -8,7 +8,7 @@
 			<g:set var="names" value="${entry.getValue()}" />
 			<tr>
 				<td style="padding:0px;">
-					<svg style="width: 35px; height: 35px; border-width: 0px;"><use xlink:href="${'#' + names.internalName + 'ShapeId'}" class="node" x="0" y="0" style="fill: #1f77b4;"></use></svg>
+					<svg style="width: 35px; height: 35px; border-width: 0px;"><use xlink:href="${'#' + names.internalName + 'ShapeId'}" class="node" x="17" y="15" style="fill: #1f77b4;"></use></svg>
 				</td>
 				<td style="padding-bottom: 8px;">
 					${names.labelText ?: names.frontEndNamePlural}
