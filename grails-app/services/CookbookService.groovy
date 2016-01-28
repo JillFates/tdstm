@@ -1504,7 +1504,7 @@ class CookbookService {
 						def ct = task.constraintTime
 						def t
 						if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}/ ) {
-							t = TimeUtil.parseDate(ct)
+							t = TimeUtil.parseDate(session, ct)
 						} else if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}.*/ ) {
 							t = TimeUtil.parseDateTime(session, ct)
 						} else if ( ct ==~ /^#.*/ ) {
