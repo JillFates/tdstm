@@ -11,7 +11,7 @@
 					<svg style="width: 35px; height: 35px; border-width: 0px;"><use xlink:href="${'#' + names.internalName + 'ShapeId'}" class="node" x="17" y="15" style="fill: #1f77b4;"></use></svg>
 				</td>
 				<td style="padding-bottom: 8px;">
-					${names.labelText ?: names.frontEndNamePlural}
+					${names.labelText ?: names.frontEndName}
 				</td>
 			</tr>
 		</g:each>

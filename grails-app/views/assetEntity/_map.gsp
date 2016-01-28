@@ -111,7 +111,7 @@
 										<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
 										--><label for="${type}CheckboxId" class="pointer">
 											<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="10" y="15" style="fill: #1f77b4;"></use></svg>
-											${names.labelText ?: names.frontEndNamePlural}
+											${names.labelText ?: names.frontEndName}
 										</label>
 									</div>
 								</div>
