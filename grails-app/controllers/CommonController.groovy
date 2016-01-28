@@ -7,6 +7,7 @@ class CommonController {
 	def securityService
 	def projectService
 	def controllerService
+	def assetEntityService
 
 	def index() { }
 
@@ -98,17 +99,8 @@ class CommonController {
 	def retrieveTooltips() {
 		def returnMap =[:]
 		def entityType = EntityType.getKeyByText(params.type)
-		def category = EntityType.getListAsCategory( entityType )
 		def project = securityService.getUserCurrentProject()
-		try{
-			def attributes = projectService.getAttributes(entityType)?.attributeCode
-			attributes.each{ k ->
-				def keyMap = KeyValue.findAllByCategoryAndKey(category, k).find{it.project==project}
-				returnMap << [(k): keyMap?.value]
-			}
-		}catch(Exception ex){
-			log.error "An error occurred : ${ex}"
-		}
+		returnMap = assetEntityService.retrieveTooltips(entityType, project)
 		render returnMap as JSON
 	}
 	

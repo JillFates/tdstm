@@ -53,7 +53,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdssrc.eav.EavEntityAttribute
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.WorkbookUtil
-
+import com.tdsops.tm.enums.domain.EntityType;
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -3629,4 +3629,24 @@ class AssetEntityService {
 		return result
 	}
 
+	/**
+	 * Used to get Key,values of Help Text and append to asset cruds.
+	 * @param entityType type of entity.
+	 * @param project to look for
+	 * @return tooltips map
+	 */
+	def retrieveTooltips(entityType, project) {
+		def returnMap = [:]
+		def category = EntityType.getListAsCategory( entityType )
+		try{
+			def attributes = projectService.getAttributes(entityType)?.attributeCode
+			attributes.each{ k ->
+				def keyMap = KeyValue.findAllByCategoryAndKey(category, k).find{it.project==project}
+				returnMap << [(k): keyMap?.value]
+			}
+		}catch(Exception ex){
+			log.error("An error occurred : ${ex.message}", ex)
+		}
+		return returnMap
+	}
 }

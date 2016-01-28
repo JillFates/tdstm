@@ -39,6 +39,7 @@ class ProjectController {
 	def quartzScheduler
 	def grailsApplication
 	def auditService
+	def assetEntityService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -746,9 +747,11 @@ class ProjectController {
 	 *@return 
 	 */
 	def retriveDefaultImportance() {
+		def defaultProject = Project.getDefaultProject()
 		def entityType = request.JSON.entityType
-		def parseData = projectService.generateDefaultConfig(entityType)
-		render parseData as JSON
+		def fieldsData = projectService.generateDefaultConfig(entityType)
+		def tooltipsData = assetEntityService.retrieveTooltips(entityType, defaultProject)
+		render(ServiceResults.success(['fields' : fieldsData, 'tooltips': tooltipsData]) as JSON)
 	}
 	/**
 	 *This action is used to project customFieldsShown

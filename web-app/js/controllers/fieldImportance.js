@@ -167,6 +167,15 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			alert("An Unexpected error while showing the asset fields.")
 		});
 	}
+
+	var shouldReplaceFields = function(ftype, fkey) {
+		var label = $('#' + ftype + '_' + fkey);
+		return (
+			(label.size() > 0) &&
+			(label.val().toLowerCase() === fkey) &&
+			(label.val().lastIndexOf("Custom", 0) === 0)
+		);
+	}
 	
 	$scope.retriveDefaultImp = function (type) {
 		if (confirm('This action will reset the field highlighting to the defaults. You will still be required to click Update to save the changes. Press Okay to continue or Cancel to abort.'))
@@ -175,12 +184,20 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 				method: "POST",
 				data:{'entityType':type}
 			}).success (function(resp) {
-				$(Object.keys(resp)).each(function (i, key) {
-					var label = $('#' + type + '_' + key);
-					var dontReplace = (label.size() > 0) && (label.val().toLowerCase() != key);
-					if (!dontReplace)
-						$scope.importance[type][key] = resp[key];
+				// Update fields importance
+				var fields = resp.data.fields
+				$(Object.keys(fields)).each(function (i, key) {
+					if (shouldReplaceFields(type, key)) {
+						$scope.importance[type][key] = fields[key];
+					}
 				});
+				// Update Tooltips
+				var tooltips = resp.data.tooltips
+				for(k=1;k<=96;k++){
+					if (shouldReplaceFields(type, 'custom' + k)) {
+						$scope.help[type]['custom' + k] = tooltips['custom' + k]
+					}
+				}
 			}).error(function(resp, status, headers, config) {
 				alert("An Unexpected error while showing the asset fields.")
 			});
