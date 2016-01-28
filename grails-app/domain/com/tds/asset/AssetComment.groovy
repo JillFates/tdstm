@@ -93,6 +93,7 @@ class AssetComment {
 	Boolean tmpHasSuccessorTaskFlag
 	def tmpChainPeerTask
 	List tmpAssociatedAssets
+	Boolean isImported = false
 	/* End transient properties for Task Generation.*/
 
 	static constraints = {	
@@ -214,7 +215,7 @@ class AssetComment {
 
 	// List of properties that should NOT be persisted
 	static transients = ['actFinish', 'assignedToString', 'assetName', 'statusDuration', 'tmpIsFunnellingTask', 'tmpDefSucc',
-						'tmpDefPred', 'tmpHasSuccessorTaskFlag', 'tmpChainPeerTask', 'tmpAssociatedAssets']
+						'tmpDefPred', 'tmpHasSuccessorTaskFlag', 'tmpChainPeerTask', 'tmpAssociatedAssets', 'isImported' ]
 
 
 	public void setTmpIsFunnellingTask(boolean value){
@@ -337,8 +338,10 @@ class AssetComment {
 	}
 	
 	def beforeInsert = {
-		dateCreated = TimeUtil.nowGMT()
-		lastUpdated = dateCreated
+		if (!isImported) {
+			dateCreated = TimeUtil.nowGMT()
+			lastUpdated = dateCreated
+		}
 	}
 	
 	def beforeUpdate = {

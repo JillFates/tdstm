@@ -341,7 +341,7 @@ class AssetEntityController {
 			} else {
 				if ( (dtaMapField.columnName in importColumnsDateType) )  {
 					if (!StringUtil.isBlank(cellValue)) {
-						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, getSession(), TimeUtil.FORMAT_DATE_TIME_12)
+						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, getSession(), [TimeUtil.FORMAT_DATE_TIME_12])
 						// Convert to string in the date format
 						if (dateValue) {
 							cellValue = TimeUtil.formatDate(getSession(), dateValue)
@@ -1308,6 +1308,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						} else {
 							assetComment = new AssetComment()
 							assetComment.project = project
+							assetComment.isImported = true
 							recordForAddition = true
 						}
 
@@ -1342,21 +1343,17 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						
 						// Try reading the created date as a date and if that fails try as a string and parse
 						cols++
-						def dateCreated
-						//def createdDateInput = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), TimeUtil.FORMAT_DATE)
-						def createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, cols, r )
-						if (createdDateInput) {
-							if(createdDateInput ==~ /'.*'/){
-								createdDateInput = createdDateInput[1..-2]
-							}
-							createdDateInput = createdDateInput.replace("'", "\\'")
-							dateCreated = TimeUtil.parseDate(getSession(), createdDateInput)
-							if ( ! (dateCreated instanceof Date) ) {
-								importResults.errors << "Invalid Created Date '$createdDateInput' (row ${rowNum})"
-								continue
-							}
-						} else if (recordForAddition) {
-								dateCreated = new Date()
+						def validFormats = [
+							TimeUtil.FORMAT_DATE_TIME,
+							TimeUtil.FORMAT_DATE_TIME_22, 
+							TimeUtil.FORMAT_DATE_TIME_24, 
+							TimeUtil.FORMAT_DATE_TIME_25, 
+							TimeUtil.FORMAT_DATE
+						]
+						def dateCreated = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), validFormats)
+						//def createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, cols, r )
+						if (!dateCreated) {
+							dateCreated = new Date()
 						}
 
 						// We need to keep track of the dateCreated change as it turns out the dirtyPropertyNames will NOT return this property

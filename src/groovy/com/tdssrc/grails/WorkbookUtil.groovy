@@ -69,25 +69,31 @@ class WorkbookUtil {
 	 * @param columnIdx - the column to reference (offset starts at zero)
 	 * @param rowIdx - the row to reference (offset start at zero)
 	 * @param session - user session
-	 * @param dateFormat - the format to use if parsing a string value
+	 * @param dateFormat - list if formats to use if parsing a string value
 	 * @return The date from the specified cell or null if empty
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
 	 * @throws ParseException - if the field contains an invalid formatted String value
 	 * 
 	 */
-	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, String formatterType=null) {
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, formatterTypes=null) {
 		Date result
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
 
-		if (!formatterType) formatterType = TimeUtil.FORMAT_DATE_TIME_22
+		if (!formatterTypes) formatterTypes = [TimeUtil.FORMAT_DATE_TIME_22]
 
 		if (cell) {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_NUMERIC:
 					result = cell.getDateCellValue()
+					result = TimeUtil.moveDateToTZ(result, session)
 					break;
 				case Cell.CELL_TYPE_STRING:
-					result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType) 
+					for(def formatterType : formatterTypes) {
+						result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType)
+						if (result) {
+							break
+						}
+					}
 					break;
 				default:
 					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")

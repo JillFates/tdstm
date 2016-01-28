@@ -49,6 +49,8 @@ class TimeUtil {
 	def static final FORMAT_DATE_TIME_21 = "mm/dd"
 	def static final FORMAT_DATE_TIME_22 = "MM/dd/yyyy hh:mm:ss a"
 	def static final FORMAT_DATE_TIME_23 = "MM/dd/yy"
+	def static final FORMAT_DATE_TIME_24 = "MM/dd/yyyy hh:mm:ss"
+	def static final FORMAT_DATE_TIME_25 = "MM/dd/yyyy hh:mm"
 
 	static final String SHORT='S'
 	static final String FULL='F'
@@ -399,8 +401,8 @@ class TimeUtil {
 	 * @return The date
 	 **/
 	public static Date parseDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
-		def formatter = createFormatter(session, formatterType)
-		return parseDateTime(session, dateValue, formatter)
+		DateFormat formatter = createFormatter(session, formatterType)
+		return parseDateTimeWithFormatter(session, dateValue, formatter)
 	}
 
 	/**
@@ -410,7 +412,7 @@ class TimeUtil {
 	 * @param the formatter defines the format to be used
 	 * @return The date
 	 **/
-	public static Date parseDateTime(session, dateValue, DateFormat formatter) {
+	public static Date parseDateTimeWithFormatter(session, dateValue, DateFormat formatter) {
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		def result
@@ -574,9 +576,39 @@ class TimeUtil {
 				else
 					formatter = new SimpleDateFormat("dd/MM/yy")
 				break;
+			case FORMAT_DATE_TIME_24:
+				if (isMMDDYYYY)
+					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
+				else
+					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
+				break;
+			case FORMAT_DATE_TIME_25:
+				if (isMMDDYYYY)
+					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm")
+				else
+					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")
+				break;
 		}
 
 		return formatter
+	}
+
+	/**
+	 * Used to move a Date to GMT
+	 * @param dateValue the date to move
+	 * @param session the session information (to get timezone and format type)
+	 * @return The date
+	 **/
+	public static Date moveDateToTZ(dateValue, session) {
+		def result
+		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String dateFormatted = formatter.format(dateValue);
+
+        formatter.setTimeZone(TimeZone.getTimeZone(tzId));
+        result = formatter.parse(dateFormatted);
+		return result
 	}
 
 }
