@@ -86,6 +86,7 @@ class ApplicationController {
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		def project = securityService.getUserCurrentProject()
+		def firstWhere = true
 		
 		def filterParams = ['assetName':params.assetName,'depNumber':params.depNumber,'depResolve':params.depResolve,'depConflicts':params.depConflicts,'event':params.event]
 		def attributes = projectService.getAttributes('Application')
