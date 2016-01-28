@@ -1499,29 +1499,28 @@ function buildMap (width, height) {
 			.attr("transform", function(d) {			
 				if (isNaN(d.x))
 					d.x = 0;
-				return "translate(" + (d.x + offsetX + GraphUtil.shapeOffset) + "," + (d.y + offsetY + GraphUtil.shapeOffset) + ")";
+				return "translate(" + (d.x) + "," + (d.y) + ")";
 			})
 			.style("fill", function(d) {
 				return (d.fillColor) ? (d.fillColor) : (d3.select(this).attr('fillColor'));
 			});
-			
-		// set the positional attributes for the links
-		GraphUtil.linkBindings
-			.attr("x1", function(d) {return d.parent.x;})
-			.attr("y1", function(d) {return d.parent.y;})
-			.attr("x2", function(d) {return d.child.x;})
-			.attr("y2", function(d) {return d.child.y;})
-			.attr("transform", function(d) {
-					var positionXEndPoint = offsetX  + GraphUtil.shapeOffset + 12;
-					var positionYEndPoint = offsetY  + GraphUtil.shapeOffset + 10;
 
-					if(d.parent && d.parent.x && d.child && d.child.x) {
-						if(d.parent.x > d.child.x) {
-							positionXEndPoint += 8;
-						}
-					}
-					return "translate(" + positionXEndPoint + "," + positionYEndPoint + ")";
-			});
+		// set the dynamic attributes for the links
+		$(GraphUtil.linkBindings[0]).each(function (i, o) {
+			var d = o.__data__;
+			
+			var targetEdge = GraphUtil.targetEdge(d.parent, d.child);
+			if(d.notApplicable && d.notApplicable == true) {
+				targetEdge.x = d.child.x;
+				targetEdge.y = d.child.y;
+			}
+
+			o.x1.baseVal.value = d.parent.x;
+			o.y1.baseVal.value = d.parent.y;
+			o.x2.baseVal.value = targetEdge.x;
+			o.y2.baseVal.value = targetEdge.y;
+
+		});
 		
 		// set the positional attributes for the labels
 		
@@ -1532,7 +1531,7 @@ function buildMap (width, height) {
 			.attr("cy", function(d) {
 				return d.y;
 			})
-			.attr("transform", function(d) {return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY + GraphUtil.labelShapeOffset) + ")";});
+			.attr("transform", function(d) {return "translate(" + (d.x) + "," + (d.y) + ")";});
 		
 		// Update the classes for all data bound svg objects
 		GraphUtil.updateAllClasses();

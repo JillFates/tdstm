@@ -337,14 +337,14 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("cy", 0)
 		.attr("transform", "translate(0, 0)");
 	
-	GraphUtil.labelBindings.attr("class", "label")
+	GraphUtil.labelBindings.attr("class", "label");
 	
 	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 		.attr("id", function (d) {
 			return "label2-" + d.id;
 		})
 		.attr("class", "ignoresMouse labelBackground")
-		.attr("dx", 12)
+		.attr("dx", 16)
 		.attr("dy",".35em")
 		.text(function(d) {
 			return d.name;
@@ -355,7 +355,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			return "label-" + d.id;
 		})
 		.attr("class", "ignoresMouse")
-		.attr("dx", 12)
+		.attr("dx", 16)
 		.attr("dy",".35em")
 		.text(function(d) {
 			return d.name;
@@ -457,7 +457,7 @@ function updateElementPositions () {
 	// set the dynamic attributes for the nodes
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
-		o.transform.baseVal.getItem(0).setTranslate(d.x + GraphUtil.shapeOffset, d.y + GraphUtil.shapeOffset);
+		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
 		if (d.cutShadow){
 			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
 		}
@@ -466,36 +466,17 @@ function updateElementPositions () {
 	// set the dynamic attributes for the links
 	$(GraphUtil.linkBindings[0]).each(function (i, o) {
 		d = o.__data__;
+
+		var targetEdge = GraphUtil.targetEdge(d.source, d.target);
+
 		o.x1.baseVal.value = d.source.x;
 		o.y1.baseVal.value = d.source.y;
-		o.x2.baseVal.value = d.target.x;
-		o.y2.baseVal.value = d.target.y;
+		o.x2.baseVal.value = targetEdge.x;
+		o.y2.baseVal.value = targetEdge.y;
 		if (d.cut == 2) {
 			d.cut = 3;
 			o.classList.add('cut');
 		}
-	});
-
-	GraphUtil.linkBindings.attr("transform", function(d) {
-		var positionXEndPoint = 0,
-			positionYEndPoint = 0;
-
-		if(d.target.x && d.target.x  && d.target.y && d.target.y ){
-			var sourceX =  d.source.x - d.target.x,
-				sourceY =  d.source.y - d.target.y;
-			if(sourceX < 77 ){
-				positionXEndPoint = -8;
-			}
-
-			if(sourceY < 80 ){
-				if(sourceY >= 51 && sourceY <= 80 )
-					positionYEndPoint = 0;
-				else
-					positionYEndPoint = -8;
-			}
-
-		}
-		return "translate(" + positionXEndPoint + "," + positionYEndPoint + ")";
 	});
 	
 	// set the dynamic attributes for the labels
