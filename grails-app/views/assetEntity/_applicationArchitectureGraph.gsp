@@ -76,7 +76,11 @@ if (assets.size() > 0) {
 		$('#assetSelectId').select2('data').id = assets[0].id;
 		$('#assetSelectId').select2('data').text = assets[0].name;
 	}
-	$('.select2-chosen').html(assets[0].name);
+	var select2List = $('.select2-chosen');
+	if(select2List.length) {
+		// There are two Select2, one for Asset Classes and one for Filter
+		$(select2List[0]).html(assets[0].name);
+	}
 }
 
 var root = null;

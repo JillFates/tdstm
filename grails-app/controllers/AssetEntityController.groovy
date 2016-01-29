@@ -4395,7 +4395,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			ServiceResults.internalError(response, log, e)
 		}
 	}
-	
+
 	def architectureViewer() {
 		def loginUser = securityService.getUserLogin()
 		if (loginUser == null) {
@@ -4429,7 +4429,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			prefsObject = defaultPrefs
 			
 		def assetTypes = assetEntityService.ASSET_TYPE_NAME_MAP
-		
+
 		def model = [
 			assetId : params.assetId,
 			assetName: assetName,
@@ -4441,7 +4441,8 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			dependencyType: assetEntityService.getDependencyTypes(),
 			assetTypes: assetTypes,
 			defaultPrefs:defaultPrefs as JSON, 
-			graphPrefs:prefsObject
+			graphPrefs:prefsObject,
+			assetClassesForSelect2: AssetClass.getClassOptionsDefinition()
 		]
 		render([assetId:params.assetId, model: model, view:'architectureGraph'])
 	}

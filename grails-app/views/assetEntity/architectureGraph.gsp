@@ -49,8 +49,7 @@
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
 						<td class="controlPanelControl" colspan="3">
-							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" /><!--
-							--><label for="assetSelectId">&nbsp;Asset</label>
+							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" />
 						</td>
 					</tr>
 				</table>
@@ -58,8 +57,7 @@
 					<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0" style="border: 0;" >
 						<tr title="Filters which class of assets are searched Asset search above">
 							<td class="controlPanelControl" colspan="3">
-								<g:select name="assetClasses" id="assetClassesId" from="${assetClassesForSelect.values()}" keys="${assetClassesForSelect.keySet()}" value="${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}"></g:select><!--
-								--><label for="assetClassesId">&nbsp;Filter On</label>
+								<input type="hidden" id="assetClassesId" name="assetClasses" class="filterScrollSelect" style="width:130px" />
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow up">
@@ -202,7 +200,7 @@
 	var initialAssetId = ${assetId ?: 'null'};
 	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
 	var defaultPrefs = ${defaultPrefs};
-	var assetSelectWidth = 130;
+	var assetSelectWidth = 172;
 
 	// Used to track ajax requests and abort them when needed
 	var ajaxRequest;
@@ -215,6 +213,8 @@
 		// define the select2 for assets
 		if (!isIE7OrLesser) {
 			EntityCrud.assetNameSelect2( $(".scrollSelect") );
+			$("#select2-chosen-1").html('Select an Asset');
+			filterSelect2( $(".filterScrollSelect"), ${assetClassesForSelect2} );
 		}
 		
 		// bind the custom submit behavior for the control panel
@@ -330,6 +330,20 @@
 		else
 			plusButton.removeClass('disabled');
 		input.trigger('change');
+	}
+
+	// Asset is on the entity.crud.js because is generic, the filter On is only used here.
+	function filterSelect2(element, data) {
+		element.select2( {
+			minimumInputLength: 0,
+			width: assetSelectWidth,
+			/*initSelection: function (element, callback) {
+				var data = { id: '${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}'};
+				callback(data);
+			},*/
+			placeholder: "Filter: All Classes",
+			data: data
+		} );
 	}
 </script>
 

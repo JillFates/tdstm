@@ -71,6 +71,25 @@ enum AssetClass {
 		]
 	}
 
+	/**
+	 * A list of the Asset Class Options used for filtering
+	 * @return String
+	 */
+	static String getClassOptionsDefinition() {
+		def assetMap = getClassOptions();
+		def assetClassesForSelect2 = new ArrayList<String>(getClassOptions().keySet())
+		def results = [];
+
+		results.push("{ id: 'ALL', 'text': 'Filter: All Classes' }");
+
+		assetClassesForSelect2.each {
+			def value = assetMap[it]
+			results.push("{ id: '${it}', 'text': '${value}' }")
+		}
+
+		return results
+	}
+
 	/** 
 	 * Used to determine the Class Option based on the assetType
 	 * @param type - the asset type
