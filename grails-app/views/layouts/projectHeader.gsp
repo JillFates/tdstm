@@ -91,7 +91,7 @@
 						<img src="${createLink(controller:'project', action:'showImage', id:setImage)}" style="height: 30px;"/>
 					</g:if>
 					<g:else>      	
-						<a href="http://www.transitionaldata.com/service/transitionmanager" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" style="float: left;border: 0px;height: 30px;"/></a>
+						<img src="${resource(dir:'images',file:'TMMenuLogo.png')}" style="float: left;border: 0px;height: 30px;"/>
 					</g:else>
 				</div>
 				<div class="title">&nbsp;TransitionManager&trade; 
