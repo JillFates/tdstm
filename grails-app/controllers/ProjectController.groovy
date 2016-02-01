@@ -154,6 +154,7 @@ class ProjectController {
 
 	def edit() {
 		def projectInstance = controllerService.getProjectForPage(this, "ProjectEditView")
+		def projectPartners = partyRelationshipService.getProjectPartners( projectInstance )
 		PartyGroup company = projectInstance.owner
 		def projectDetails
 		def moveBundles
@@ -172,6 +173,7 @@ class ProjectController {
 				companyPartners: projectDetails.companyPartners,
 				projectLogoForProject: projectDetails.projectLogoForProject, 
 				workflowCodes: projectDetails.workflowCodes, 
+				projectPartners: projectPartners,
 				moveBundles:moveBundles ]
 		}				 
 	}
