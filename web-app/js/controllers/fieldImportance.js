@@ -209,21 +209,12 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			method: "POST",
 			data:{'entityType':type}
 		}).success (function(resp) {
-			$scope.help=resp;
+			$scope.help = resp;
 		}).error(function(resp, status, headers, config) {
 			alert("An Unexpected error while showing the asset fields.")
 		});
 	}
 	$scope.updateHelp = function (type) {
-		//Need to find a solution for the sluggish behaviour of ng-model,for now done using javascript.
-		for(i=0;i<$scope.fields[type].length; i++){
-			var fieldLabel= $scope.fields[type][i].label
-			$scope.help[type][fieldLabel] =$("#help_"+type+"_"+fieldLabel).val()
-		}
-		for(k=0;k<96;k++){
-			$scope.fields['customs'][k].id = $("#"+type+"_"+$scope.fields['customs'][k].label).val();
-			$scope.help[type][$scope.fields['customs'][k].label] =$("#help_"+type+"_"+$scope.fields['customs'][k].label).val();
-		}
 		$http({
 			url : contextPath+"/common/tooltipsUpdate",
 			method: "POST",
