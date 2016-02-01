@@ -89,6 +89,7 @@
 			// evaluate JSON
 
 			var rselect = document.getElementById('projectManagerId')
+			var mselect = document.getElementById('projectManagerId')
 			var projectPartner = document.getElementById('projectPartnerId');
 			var projectClient = document.getElementById('clientId');
 			var projectPartnerVal = 'None'
