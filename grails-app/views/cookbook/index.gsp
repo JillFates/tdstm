@@ -14,7 +14,8 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'mergely/mergely.css')}" />	
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
-	<g:javascript src="angular/angular.min.js" />
+
+	<g:render template="../layouts/angularResources" />
 	<g:javascript src="codemirror/codemirror.js" />
 	<g:javascript src="codemirror/ui-codemirror.js" />
 	<g:javascript src="codemirror/addon/dialog.js" />
@@ -25,16 +26,9 @@
 	<g:javascript src="codemirror/addon/javascript-hint.js" />
 	<g:javascript src="codemirror/javascript.js" />
 	<g:javascript src="mergely/mergely.js" />	
-	<g:javascript src="bootstrap.js" />
-	<g:javascript src="angular/plugins/angular-ui.js"/>	
-	<g:javascript src="angular/plugins/angular-resource.js" />
-	<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
-	<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
-	<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
+
 	<g:javascript src="angular/plugins/angular-ui-router.min.js" />
 	<g:javascript src="controllers/cookbook.js" />
-	<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-	<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />

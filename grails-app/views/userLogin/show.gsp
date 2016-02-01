@@ -4,15 +4,10 @@
 		<meta name="layout" content="projectHeader" />
 		<title>UserLogin</title>
 		
-		<g:javascript src="angular/angular.min.js" />
-		<g:javascript src="angular/plugins/angular-ui.js"/>
-		<g:javascript src="angular/plugins/angular-resource.js" />
-		<script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+		<g:render template="../layouts/angularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminController.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminService.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'unlockAccountDirective.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
-		<script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}"  />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}"  />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}"  />
@@ -23,10 +18,6 @@
 		<g:javascript src="projectStaff.js" />
 		<g:javascript src="person.js" />
 		<g:javascript src="jqgrid-support.js" />
-		<g:javascript src="bootstrap.js" />
-		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
-		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
-		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 		<g:javascript src="asset.comment.js" />
 	</head>
 	<body>

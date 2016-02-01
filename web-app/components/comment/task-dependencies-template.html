@@ -1,24 +1,15 @@
-<table style="border: 0px; width:100px">
-    <tbody>
-    <tr ng-repeat="dependency in ngModel">
-        <td>
-            <select ng-init="initDependencyList(dependency)" ng-model="dependency.category"
-                    ng-change="updateDependencyList(dependency, true)">
-                <option ng-selected="{{dependency.category == c.id}}" value="{{c.id}}" ng-repeat="c in categories">
-                    {{c.name}}
-                </option>
-            </select>
-        </td>
-        <td>
-            <select ng-model="dependency.taskId">
-                <option ng-selected="{{dependency.taskId == item.id}}" value={{item.id}}
-                        ng-repeat="item in dependency.list">{{item.taskNumber?item.taskNumber+':'+item.desc:item.desc}}
-                </option>
-            </select>
-        </td>
-        <td>
-            <a ng-click="deleteRow($index)"><span class="clear_filter"><u>X</u></span></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<table style="border: 0px; width:100px"><tbody>
+<tr ng-repeat="dependency in ngModel">
+    <td>
+        <select kendo-drop-down-list ng-model="dependency.category" k-options="categoryOptions" k-on-change="updateDependencyList(dependency)"></select>
+        <!-- ng-model="dependency.category" ng-change="updateDependencyList(dependency, true)" ng-options="c.id as c.name for c in categories">-->
+    </td>
+    <td>
+        <select class="dependencies-subset-dropdown" kendo-drop-down-list="dependency.dropdown"  ng-model="dependency.taskId" k-options="taskOptionsDS(dependency)"></select>
+        <!--ui-select ng-model="dependency.taskId"></ui-select-->
+    </td>
+    <td>
+        <a ng-click="deleteRow($index)"><span class="clear_filter"><u>X</u></span></a>
+    </td>
+</tr>
+</tbody></table>

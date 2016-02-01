@@ -602,11 +602,17 @@ class TaskService implements InitializingBean {
 	* @param project - the project object to filter tasks to include
 	* @param category - a task category to filter on (optional) 
 	* @param taskId - an optional task Id that the filtering will use to eliminate as an option and also filter on it's moveEvent
+	* @param page - page to load
+	* @param pageSize - page size to use
+	* @param filterDesc - filter by task description
 	* @return String the SELECT control
 	*/
-	def genSelectForPredecessors(project, category, task, moveEventId) {	
+	def genSelectForPredecessors(project, category, task, moveEventId, page=-1, pageSize=50, filterDesc=null) {
 		
-		StringBuffer query = new StringBuffer("FROM AssetComment a WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
+		StringBuffer queryList = new StringBuffer("FROM AssetComment a ")
+		StringBuffer queryCount = new StringBuffer("SELECT count(*) FROM AssetComment a ")
+		StringBuffer query = new StringBuffer("WHERE a.project=${project.id} AND a.commentType='${AssetCommentType.TASK}' ")
+ 	
 		if (category) {
 			if ( categoryList.contains(category) ) {
 				query.append("AND a.category='${category}' ")
@@ -615,10 +621,8 @@ class TaskService implements InitializingBean {
 				category=''
 			}
 		}
-		if (moveEventId) {
-			query.append("AND a.moveEvent='${moveEventId}' ")
-		} else {
-			query.append("AND a.moveEvent is null ")
+		if (filterDesc) {
+			query.append("AND a.comment like '%${filterDesc}%' ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
@@ -631,15 +635,86 @@ class TaskService implements InitializingBean {
 			if (task.moveEvent) {
 				query.append("AND a.moveEvent.id=${task.moveEvent.id} ")
 			}
+		} else {
+			if (moveEventId) {
+				query.append("AND a.moveEvent='${moveEventId}' ")
+			} else {
+				query.append("AND a.moveEvent is null ")
+			}
 		}
 		
 		// Add the sort and generate the list
 		query.append('ORDER BY a.taskNumber ASC')
-		def taskList = AssetComment.findAll( query.toString() )
+		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
+		def total = resultTotal[0]
+
+		def taskList
+		if (page == -1) {
+			taskList = AssetComment.findAll( queryList.append(query).toString() )
+		} else {
+			taskList = AssetComment.findAll( queryList.append(query).toString(), [max: pageSize, offset: ((page - 1) * pageSize)] )
+		}
 		
-		return taskList
+		return [
+			list: taskList,
+			total: total
+		]
 	}
 	
+	def searchTaskIndexForTask(project, category, task, moveEventId, taskId) {
+
+		def taskIndex = 0
+
+		StringBuffer query = new StringBuffer("""
+			SELECT rownum FROM (
+				SELECT asset_comment_id, task_number,@rownum:=@rownum+1 as rownum 
+				FROM asset_comment ac, (SELECT @rownum:=0) r
+				WHERE ac.project_id=${project.id} AND ac.comment_type='${AssetCommentType.TASK}' 
+		""")
+ 	
+		if (category) {
+			if ( categoryList.contains(category) ) {
+				query.append("AND ac.category='${category}' ")
+			} else {
+				log.warn "genSelectForPredecessors - unexpected category filter '$category'"
+				category=''
+			}
+		}
+
+		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
+		if (task) { 
+			if (! category && task.category) {
+				query.append("AND ac.category='${task.category}' ")
+			}				
+			query.append("AND ac.asset_comment_id != ${task.id} ")
+		
+			if (task.moveEvent) {
+				query.append("AND ac.move_event_id=${task.moveEvent.id} ")
+			}
+		} else {
+			if (moveEventId) {
+				query.append("AND ac.move_event_id=${moveEventId} ")
+			} else {
+				query.append("AND ac.move_event_id is null ")
+			}
+		}
+		
+		// Add the sort and generate the list
+		query.append("""
+				ORDER BY ac.task_number ASC
+			) tasks_rows
+			WHERE tasks_rows.asset_comment_id = ${taskId}
+		""")
+
+		def tasksInfo = jdbcTemplate.queryForList(query.toString())
+		
+		if (tasksInfo[0] != null) {
+			taskIndex = tasksInfo[0]['rownum'] + 1
+		}
+
+		return taskIndex
+	}
+
 	/**
 	 * Returns Boolean value to warn status is overriding or not
 	 * @param AssetComment as task
