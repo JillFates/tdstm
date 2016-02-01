@@ -116,7 +116,7 @@
 							</td>
 						</tr>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/></td>
 						</tr>
@@ -158,7 +158,7 @@
 							</tr>
 						</g:each>
 						
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
 							
 							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" /></td>

@@ -116,7 +116,7 @@
 								</td>
 								<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
 									<input type="checkbox" id="isLocal" name="isLocal" value="true" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}  
-										onchange="togglePasswordFields( $(this) )"/>
+										onchange="togglePasswordEditFields( $(this) )"/>
 								</td>
 							</tr>
 							<tr class="prop passwordsEditFields">
@@ -138,7 +138,7 @@
 							
 							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength]}" />
 							
-							<tr class="prop">
+							<tr class="prop passwordsEditFields">
 								<td valign="top" class="name">
 									<label for="expiryDate"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</label>
 								</td>
@@ -324,6 +324,26 @@
 	<script>
 		currentMenuId = "#adminMenu";
 		$("#adminMenuId a").css('background-color','#003366')
+
+		function togglePasswordEditFields($me) {
+				var isChecked = $me.is(":checked")
+				if (!isChecked) {
+					$me.val(false)
+					$(".passwordsEditFields").hide();
+					$("#emailFieldId").hide();
+					$("#emailDisplayId").show();
+				} else {
+					$me.val(true)
+					$(".passwordsEditFields").show();
+					$("#emailFieldId").show();
+					$("#emailDisplayId").hide();
+				}
+		}
+
+		$(document).ready(function(){
+			togglePasswordEditFields($("#isLocal"))
+
+		})
 	</script>
 	</body>
 </html>
