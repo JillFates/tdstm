@@ -82,8 +82,14 @@ class Person extends Party {
 		'company',
 		'suitableTeams',
 		'lastNameFirst',
-		'lastNameFirstAndTitle'
+		'lastNameFirstAndTitle',
+		'name'
 	]
+
+
+	String name(){
+		return getLastNameFirst()
+	}
 
 	/**
 	 * This method returns the company for this person.
