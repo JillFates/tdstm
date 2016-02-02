@@ -60,7 +60,7 @@
 						</tr>
 						
 						<tr class="prop">
-							<td valign="top" class="name">Local account:</td>
+							<td valign="top" class="name">Local Account:</td>
 							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
 								<input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" disabled="disabled" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}/>
 							</td>

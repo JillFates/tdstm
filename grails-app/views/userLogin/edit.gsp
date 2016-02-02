@@ -114,7 +114,7 @@
 						
 						<tr>
 							<td valign="top" class="name">
-								<label for="isLocal">Local account:</label>
+								<label for="isLocal">Local Account:</label>
 							</td>
 							<td valign="top" class="value ${hasErrors(bean:userLoginInstance,field:'isLocal','errors')}">
 								<input type="checkbox" id="isLocal" name="isLocal" value="${userLoginInstance.isLocal}" ${(userLoginInstance.isLocal) ? 'checked="checked"' : ''}  
