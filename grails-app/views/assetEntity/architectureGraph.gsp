@@ -345,7 +345,13 @@
 			data: data
 		} );
 	}
-</script>
 
+	$(document).ready(function () {
+		// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
+		$('#graphSVGContainer').append(appSVGShapes.getAll());
+	});
+
+</script>
+<div style="display: none;" id="graphSVGContainer"></div>
 </body>
 </html>
