@@ -16,6 +16,7 @@ var GraphUtil = (function ($) {
 	public.shapeOffset = -20;
 	public.labelShapeOffset = -8
 	public.nodeRadius = 28;
+	public.labelHeightDefault = 15; // Modify if the size of the text from the rect is different.
 
 	// returns true if the graph is loaded
 	public.graphExists = function () {
@@ -443,6 +444,18 @@ var GraphUtil = (function ($) {
 		}
 
 		return list;
+	}
+
+	// Basic function to create a Rectangle on pure js
+	public.createRect = function(x, y, h, w){
+		var svgNS = "http://www.w3.org/2000/svg",
+			rect = document.createElementNS(svgNS, 'rect');
+		rect.setAttributeNS(null, 'x', x);
+		rect.setAttributeNS(null, 'y', y);
+		rect.setAttributeNS(null, 'height', h);
+		rect.setAttributeNS(null, 'width', w);
+
+		return rect;
 	}
 
 	public.updateNodePosition = function (node) {

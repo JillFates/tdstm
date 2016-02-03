@@ -25,7 +25,9 @@ line.link.cyclical:not(.selected) {
 	opacity: 1.0 !important;
 }
 </style>
+
 <script type="text/javascript">
+
 GraphUtil.force = d3.layout.force();
 var defaults = {"width":getStandardWidth(), "height":getStandardHeight(), "blackBackground":false};
 
@@ -2726,36 +2728,61 @@ function setLabelOffsets (nodeMap) {
 			if (node != null && node.showLabel && ! node.dummy) {
 				
 				// get the positional data of this node's label
-				var text = _.unescape($('#label-' + node.id)[0].innerHTML);
-				var rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
-				for (var k = text.length - 1; k >= 0; --k) {
-					if (text[k] != ' ') {
-						rect = $('#label-' + node.id)[0].getExtentOfChar(k);
-						k = 0;
+				var text = _.unescape($('#label-' + node.id)[0].textContent);
+				if(text.length > 0 ){
+
+					var rect = validateRectBrowser(node, text.length);
+
+
+					for (var k = text.length - 1; k >= 0; --k) {
+						if (text[k] != ' ') {
+							rect = validateRectBrowser(node, k);
+							k = 0;
+						}
 					}
-				}
-				var endX = rect.x + rect.width;
-				var startX = node.qx - endX;
-				endX = node.qx + endX;
-				
-				var row = 0;
-				
-				// check if there is a row the label can fit in
-				for (var k = 0; k < maxOffset; ++k) {
-					if (labelRows[k] == null || labelRows[k] < startX) {
-						row = k;
-						k = maxOffset;
+
+					var endX = rect.x + rect.width;
+					var startX = node.qx - endX;
+					endX = node.qx + endX;
+
+					var row = 0;
+
+					// check if there is a row the label can fit in
+					for (var k = 0; k < maxOffset; ++k) {
+						if (labelRows[k] == null || labelRows[k] < startX) {
+							row = k;
+							k = maxOffset;
+						}
 					}
+
+					// insert the label into the row
+					offset = (row + 1) * -1;
+					nodeMap[keys[i]][j].labelOffset = offset + offset * labelPadding;
+					labelRows[row] = endX;
+
 				}
-				
-				// insert the label into the row
-				offset = (row + 1) * -1;
-				nodeMap[keys[i]][j].labelOffset = offset + offset * labelPadding;
-				labelRows[row] = endX;
 			}
 		}
 	}
-	
+
+	/**
+	 *  Firefox and IE has some issues to render or access
+	 *  a rectangle after this was already created,
+	 *  one of the method affected is getExtentOfChar
+ 	 */
+
+	function validateRectBrowser(node, w) {
+		var rect;
+
+		try {
+			rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
+		} catch(err) { // if browser doesn't support the operation we fallback to manually creacte the rect
+			rect = GraphUtil.createRect(node.x, node.y, GraphUtil.labelHeightDefault, w);
+		}
+
+		return rect;
+	}
+
 	// update all the labels y values
 	GraphUtil.labelBindings.attr("dy", function(d) {
 			if (d.labelOffset) {
