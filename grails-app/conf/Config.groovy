@@ -194,7 +194,7 @@ log4j = {
 tdsops.maintModeFile = "/tmp/tdstm-maint.txt"
 
 //Build number file path
-tdsops.buildFile = "/WEB-INF/tdstm/build.txt"
+tdsops.buildFile = "/build.txt"
 
 // Audit configuration, valid options are: access and activity (default is access)
 // access: logging will include login, logout and security violations
