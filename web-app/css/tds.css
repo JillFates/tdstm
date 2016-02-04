@@ -984,10 +984,14 @@ div#dependencyDivId td.selectedGroup span {
 }
 .depGroupSelected {
 	box-shadow: 0px 5px 0px -2px inset, 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
+	-webkit-box-shadow: inset 0px 5px 0px -2px orange, inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
+	-moz-box-shadow: inset 0px 5px 0px -2px orange, inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
 	font-weight: bold;
 }
 #dependencyDivId.floating .depGroupSelected {
 	box-shadow: 0px 5px 0px -2px inset, 5px 0px 0px -2px inset, -5px 0px 0px -2px inset, 0px -5px 0px -2px inset;
+	-webkit-box-shadow: inset 0px 5px 0px -2px orange, inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange, inset 0px -5px 0px -2px orange;
+	-moz-box-shadow: inset 0px 5px 0px -2px orange, inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange, inset 0px -5px 0px -2px orange;
 }
 #dependencyTableId td:not(.labelColumn) {
 	text-align: center;
@@ -1010,20 +1014,30 @@ div#dependencyDivId td.selectedGroup span {
 }
 .app_count{
 	box-shadow: 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
+	-webkit-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
+	-moz-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
 }
 .server_count{
 	background-color: white;
 	box-shadow: 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
+	-webkit-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
+	-moz-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
 }
 .vm_count{
 	box-shadow: 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
+	-webkit-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
+	-moz-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
 }
 .db_count{
 	background-color: white;
 	box-shadow: 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
+	-webkit-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
+	-moz-box-shadow: inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
 }
 .file_count{
 	box-shadow: 0px -5px 0px -2px inset, 5px 0px 0px -2px inset, -5px 0px 0px -2px inset;
+	-webkit-box-shadow: inset 0px -5px 0px -2px orange, inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
+	-moz-box-shadow: inset 0px -5px 0px -2px orange, inset 5px 0px 0px -2px orange, inset -5px 0px 0px -2px orange;
 }
 #dependency_group {
 	overflow-x:scroll; 
