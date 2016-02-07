@@ -2688,7 +2688,7 @@ function getDependenciesString (node) {
 	return output;
 }
 
-// returens the node for the asset with the given id
+// returns the node for the asset with the given id
 function getNodeById (id) {
 	return assets.find(function (a) {
 		return a.id == id;
@@ -2726,7 +2726,7 @@ function setLabelOffsets (nodeMap) {
 			var node = nodeMap[keys[i]][j];
 			
 			if (node != null && node.showLabel && ! node.dummy) {
-				
+
 				// get the positional data of this node's label
 				var text = _.unescape($('#label-' + node.id)[0].textContent);
 				if(text.length > 0 ){
@@ -2755,9 +2755,25 @@ function setLabelOffsets (nodeMap) {
 						}
 					}
 
+					// If the node do not have a parent, it means is the top node, set the label offset to up
+					var labelOffsetPosition = 4.5;
+					if(node && node.allParents ){
+						if(node.allParents.length <= 0) {
+							labelOffsetPosition = 0;
+						} else if (node.allParents.length > 0){
+							var parentNode = node.allParents[0];
+							if(parentNode.linkElement[0] && parentNode.linkElement[0][0]){
+								var linkRelated = parentNode.linkElement[0][0].__data__;
+								if(linkRelated && linkRelated.notApplicable) {
+									labelOffsetPosition = 0;
+								}
+							}
+						}
+					}
+
 					// insert the label into the row
 					offset = (row + 1) * -1;
-					nodeMap[keys[i]][j].labelOffset = offset + offset * labelPadding;
+					nodeMap[keys[i]][j].labelOffset = (offset + offset * labelPadding) + labelOffsetPosition;
 					labelRows[row] = endX;
 
 				}
@@ -2776,7 +2792,7 @@ function setLabelOffsets (nodeMap) {
 
 		try {
 			rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
-		} catch(err) { // if browser doesn't support the operation we fallback to manually creacte the rect
+		} catch(err) { // if browser doesn't support the operation we fallback to manually create the rect
 			rect = GraphUtil.createRect(node.x, node.y, GraphUtil.labelHeightDefault, w);
 		}
 
