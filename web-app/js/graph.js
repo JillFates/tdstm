@@ -610,7 +610,7 @@ var GraphUtil = (function ($) {
 				.attr('class', 'cutShadow')
 				.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
 				.style('fill', color(o.cutGroup))
-				.attr('r', 30);
+				.attr('r', 22);
 			o.cutShadow = cutShadow[0][0];
 		});
 		public.reorderDOM();

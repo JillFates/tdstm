@@ -875,7 +875,7 @@ function cutAndRemove () {
 	
 	// called iteratively using setTimeout to prevent locking up the thread with long executions
 	function findBestCut (i) {
-		
+
 		// check if the job should be canceled
 		if (cancelCut) {
 			cancelCut = false;
