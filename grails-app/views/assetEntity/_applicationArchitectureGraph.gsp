@@ -11,9 +11,9 @@ line.link {
 line.link.unresolved {
 	marker-end: url(#arrowheadUnresolved);
 }
-line.link.notApplicable {
+/*line.link.notApplicable {
 	marker-end: url(#arrowheadNotApplicable);
-}
+}*/
 line.link.selected {
 	marker-end: url(#arrowheadSelected);
 }
@@ -1515,16 +1515,10 @@ function buildMap (width, height) {
 		$(GraphUtil.linkBindings[0]).each(function (i, o) {
 			var d = o.__data__;
 
-			var targetEdge = GraphUtil.targetEdge(d.parent, d.child);
-			if(d.notApplicable && d.notApplicable == true) {
-				targetEdge.x = d.child.x;
-				targetEdge.y = d.child.y;
-			}
-
 			o.x1.baseVal.value = d.parent.x;
 			o.y1.baseVal.value = d.parent.y;
-			o.x2.baseVal.value = targetEdge.x;
-			o.y2.baseVal.value = targetEdge.y;
+			o.x2.baseVal.value = d.child.x;
+			o.y2.baseVal.value = d.child.y;
 
 		});
 		
@@ -2726,7 +2720,7 @@ function setLabelOffsets (nodeMap) {
 			var node = nodeMap[keys[i]][j];
 			
 			if (node != null && node.showLabel && ! node.dummy) {
-
+				console.log(node);
 				// get the positional data of this node's label
 				var text = _.unescape($('#label-' + node.id)[0].textContent);
 				if(text.length > 0 ){
@@ -2747,6 +2741,7 @@ function setLabelOffsets (nodeMap) {
 
 					var row = 0;
 
+					// maxOffset = the max val is 2, since one go up, one below
 					// check if there is a row the label can fit in
 					for (var k = 0; k < maxOffset; ++k) {
 						if (labelRows[k] == null || labelRows[k] < startX) {
@@ -2755,24 +2750,18 @@ function setLabelOffsets (nodeMap) {
 						}
 					}
 
-					// If the node do not have a parent, it means is the top node, set the label offset to up
 					var labelOffsetPosition = 4.5;
-					if(node && node.allParents ){
+					if(node && node.allParents ){ // If the node do not have a parent, it means is the top node, set the label offset to up
 						if(node.allParents.length <= 0) {
 							labelOffsetPosition = 0;
-						} else if (node.allParents.length > 0){
-							var parentNode = node.allParents[0];
-							if(parentNode.linkElement[0] && parentNode.linkElement[0][0]){
-								var linkRelated = parentNode.linkElement[0][0].__data__;
-								if(linkRelated && linkRelated.notApplicable) {
-									labelOffsetPosition = 0;
-								}
-							}
 						}
 					}
 
 					// insert the label into the row
 					offset = (row + 1) * -1;
+					if(row > 0){ // The label doesn't fit, add a more offSet to be below
+						offset += 2;
+					}
 					nodeMap[keys[i]][j].labelOffset = (offset + offset * labelPadding) + labelOffsetPosition;
 					labelRows[row] = endX;
 

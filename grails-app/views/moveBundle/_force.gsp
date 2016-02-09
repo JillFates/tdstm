@@ -467,12 +467,10 @@ function updateElementPositions () {
 	$(GraphUtil.linkBindings[0]).each(function (i, o) {
 		d = o.__data__;
 
-		var targetEdge = GraphUtil.targetEdge(d.source, d.target);
-
 		o.x1.baseVal.value = d.source.x;
 		o.y1.baseVal.value = d.source.y;
-		o.x2.baseVal.value = targetEdge.x;
-		o.y2.baseVal.value = targetEdge.y;
+		o.x2.baseVal.value = d.target.x;
+		o.y2.baseVal.value = d.target.y;
 		if (d.cut == 2) {
 			d.cut = 3;
 			o.classList.add('cut');
