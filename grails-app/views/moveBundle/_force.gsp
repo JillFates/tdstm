@@ -344,7 +344,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			return "label2-" + d.id;
 		})
 		.attr("class", "ignoresMouse labelBackground")
-		.attr("dx", 16)
+		.attr("dx", 18)
 		.attr("dy",".35em")
 		.text(function(d) {
 			return d.name;
@@ -355,7 +355,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			return "label-" + d.id;
 		})
 		.attr("class", "ignoresMouse")
-		.attr("dx", 16)
+		.attr("dx", 18)
 		.attr("dy",".35em")
 		.text(function(d) {
 			return d.name;
@@ -459,7 +459,13 @@ function updateElementPositions () {
 		d = o.__data__;
 		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
 		if (d.cutShadow){
-			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+
+			var yOffset = d.y;
+			if(d && d.type === 'Other') {
+				yOffset = d.y - 5;
+			}
+
+			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, yOffset);
 		}
 	});
 	
@@ -467,10 +473,12 @@ function updateElementPositions () {
 	$(GraphUtil.linkBindings[0]).each(function (i, o) {
 		d = o.__data__;
 
+		var targetEdge = GraphUtil.targetEdge(d.source, d.target);
+
 		o.x1.baseVal.value = d.source.x;
 		o.y1.baseVal.value = d.source.y;
-		o.x2.baseVal.value = d.target.x;
-		o.y2.baseVal.value = d.target.y;
+		o.x2.baseVal.value = targetEdge.x;
+		o.y2.baseVal.value = targetEdge.y;
 		if (d.cut == 2) {
 			d.cut = 3;
 			o.classList.add('cut');

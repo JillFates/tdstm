@@ -11,7 +11,7 @@ function defineShapes (defs) {
 		defs.append("marker")
 			.attr("id", keys[i])
 			.attr("viewBox", "0 -5 10 10")
-			.attr("refX", 28)
+			.attr("refX", 0)
 			.attr("refY", 0)
 			.attr("markerUnits", "userSpaceOnUse")
 			.attr("markerWidth", 10)

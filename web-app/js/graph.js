@@ -605,6 +605,7 @@ var GraphUtil = (function ($) {
 		public.force.nodes().each(function (o, i) {
 			if (o.cutShadow)
 				$(o.cutShadow).remove();
+
 			var cutShadow = vis.append('circle')
 				.attr('id', 'cutShadow-' + o.id)
 				.attr('class', 'cutShadow')

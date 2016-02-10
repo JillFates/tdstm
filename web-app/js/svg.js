@@ -7,7 +7,7 @@ var appSVGShapes = (function ($) {
         },
         database: {
             id: 'databaseShapeId',
-            svg: '<svg xmlns="http://www.w3.org/2000/svg" ><g id="databaseShapeId" transform="translate(-15, -15) scale(0.28)">	<path id="svg_3" fill="#FFFFFF" stroke="#FFFFFF" d="M6.4,23h100v30H6.4L6.4,23z"/><path id="svg_1" d="M6.4,23c0-8.6,22.4-15.6,50-15.6s50,7,50,15.6S84,38.6,56.4,38.6c-3.4,0-3.4,9.7,0,9.7c14.4,0,27.1-1.5,36.7-4.4c5.4-1.7,10.1-4.3,13.3-6.8c0,56.9,0,38.7,0,54.5c0,8.6-22.4,15.6-50,15.6s-50-7-50-15.6C6.4,68.8,6.4,45.9,6.4,23z"/></g></svg>'
+            svg: '<svg xmlns="http://www.w3.org/2000/svg" ><g id="databaseShapeId" transform="translate(-15, -15) scale(0.28)">	<path id="svg_3" fill="#FFFFFF" stroke="#FFFFFF" d="M10,23h92.9v30H10V23z"/><path id="svg_1" d="M10,23c0-8.6,20.8-15.6,46.4-15.6s46.4,7,46.4,15.6S82,38.6,56.4,38.6c-3.2,0-3.2,9.7,0,9.7c13.4,0,25.2-1.5,34.1-4.4c5-1.7,9.4-4.3,12.3-6.8c0,56.9,0,38.7,0,54.5c0,8.6-20.8,15.6-46.4,15.6S10,100.2,10,91.6C10,68.8,10,45.9,10,23z"/></g></svg>'
         },
         networkLogical: {
             id: 'networkLogicalShapeId',

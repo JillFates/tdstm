@@ -1515,10 +1515,16 @@ function buildMap (width, height) {
 		$(GraphUtil.linkBindings[0]).each(function (i, o) {
 			var d = o.__data__;
 
+			var targetEdge = GraphUtil.targetEdge(d.parent, d.child);
+			if(d.notApplicable && d.notApplicable == true) {
+				targetEdge.x = d.child.x;
+				targetEdge.y = d.child.y;
+			}
+
 			o.x1.baseVal.value = d.parent.x;
 			o.y1.baseVal.value = d.parent.y;
-			o.x2.baseVal.value = d.child.x;
-			o.y2.baseVal.value = d.child.y;
+			o.x2.baseVal.value = targetEdge.x;
+			o.y2.baseVal.value = targetEdge.y;
 
 		});
 		
