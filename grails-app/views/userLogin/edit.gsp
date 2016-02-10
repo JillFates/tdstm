@@ -273,19 +273,18 @@
 	var form = $("form[name='editUserForm']")[0]
 	$(form).submit(function(event){
 		var emailValue = $("#emailFieldId").val()
-		var emailOkay = false
 		var errMsg = ""
-		if(emailValue){
-			if(!tdsCommon.isValidEmail(emailValue)){
-				errMsg = "Email address is invalid."
+		if($("#isLocal").is(":checked")){
+			if(emailValue){
+				if(!tdsCommon.isValidEmail(emailValue)){
+					errMsg = "Email address is invalid."
+				}
 			}else{
-				emailOkay = true
+				errMsg = "Email address is required!"
 			}
-		}else{
-			errMsg = "Email address is required!"
 		}
-
-    	if(!emailOkay){
+	
+    	if(errMsg.length > 0){
     		event.preventDefault()
     		alert(errMsg)
     	}
