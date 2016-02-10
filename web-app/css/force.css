@@ -410,7 +410,9 @@ img.pointer {
 	opacity: 0.5;
 	cursor: default;
 }
+svg#serverVirtualShapeLeftPanel {
 
+}
 
 /* Graph Panels */
 div.graphPanel:not(.openPanel) {
