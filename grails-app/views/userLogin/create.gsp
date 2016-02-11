@@ -326,7 +326,7 @@
 
 		var form = $("form[name='createUserForm']")[0]
 		$(form).submit(function(event){
-			var emailValue = $("#emailFieldId").val()
+			var emailValue = $("#emailInputId").val()
 			var errMsg = ""
 			if($("#isLocal").is(":checked")){
 				if(emailValue){
