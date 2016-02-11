@@ -58,7 +58,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:form action="save" method="post" >
+			<g:form action="save" method="post" name="createUserForm" >
 				<div class="dialog loginView">
 					<table>
 						<tbody>
@@ -322,6 +322,29 @@
 			</g:form>
 		</div>
 	<script>
+
+
+		var form = $("form[name='createUserForm']")[0]
+		$(form).submit(function(event){
+			var emailValue = $("#emailFieldId").val()
+			var errMsg = ""
+			if($("#isLocal").is(":checked")){
+				if(emailValue){
+					if(!tdsCommon.isValidEmail(emailValue)){
+						errMsg = "Email address is invalid."
+					}
+				}else{
+					errMsg = "Email address is required!"
+				}
+			}
+		
+	    	if(errMsg.length > 0){
+	    		event.preventDefault()
+	    		alert(errMsg)
+	    	}
+		})
+
+
 		currentMenuId = "#adminMenu";
 		$("#adminMenuId a").css('background-color','#003366')
 
