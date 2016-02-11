@@ -84,7 +84,7 @@ var moveEvents = ${moveEventMap};
 
 var cutLinks = [];
 var cutNodes = [];
-var graphstyle = "z-index:-1;";
+var graphstyle = "z-index:90;";
 var fill = d3.scale.category10();
 var fillMode = 'bundle';
 var gravity = ${multiple ? 0.05 : 0};
