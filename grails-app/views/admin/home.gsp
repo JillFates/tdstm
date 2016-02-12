@@ -131,19 +131,14 @@ a:hover {
 						</tr>
 						<tr class="odd">
 							<td>
-								<g:link controller="task" action="eventTimelineResults" params="[eventId:0, showAll:'false']" style="color:black">Task Critical Path Calculator</g:link>
+								<g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link>
 							</td>
 							<td>
 								<g:link controller="admin" action="bootstrap" target="_blank" style="color:black" >Bootstrap Menus</g:link> 
 							</td>
 						</tr>
-						<tr class="even">
-							<td>
-								<g:link controller="admin" action="systemInfo" style="color:black">System Info</g:link>
-							</td>
-						</tr>
 						<tds:hasPermission permission='ShowProjectDailyMetrics'>
-						<tr class="odd">
+						<tr class="even">
 							<td colspan="2">
 								<g:link controller="project" action="launchProjectDailyMetricsJob" style="color:black">Launch Project Daily Metrics Job</g:link>
 							</td>

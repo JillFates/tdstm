@@ -102,6 +102,17 @@
 										</span>
 									</td>
 								</tr>
+
+								<tds:hasPermission permission='CriticalPathExport'>
+								<tr title="Export Critical Path Data of an event">
+									<td colspan="3" style="padding-left :0px">
+										<span>
+											<label id="exportCriticalPathButton" for="exportCriticalPath" class="pointer" onclick="exportCriticalPath()"><img src='${resource(dir:'icons',file:'hourglass_go.png')}' border='0px'/>&nbsp;Export Timeline Data</label>
+										</span>
+									</td>
+								</tr>
+								</tds:hasPermission>
+
 							</table>
 						</form>
 					</div>
@@ -119,7 +130,7 @@
 					timerBar.resetTimer();
 				});
 			})
-			
+
 			function reloadGraph () {
 				submitForm();
 			}

@@ -30,12 +30,16 @@ function displayWarningOrErrorMsg(isCyclical) {
 	else
 		message.html('<br />There is insufficient task data to create a graph for this event');
 	$('#spinnerId').css('display', 'none');
+	// disable export button
+	$('#exportCriticalPathButton').addClass('disabledLabel');
 }
 
 function buildGraph (response, status) {
 	
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
+	// restore export button
+	$('#exportCriticalPathButton').removeClass('disabledLabel');
 	
 	// check for errors in the ajax call
 	if (status == 'error') {
@@ -2276,3 +2280,9 @@ function parseStartDate(startDate) {
 	return new Date(momentStartDate.valueOf());
 }
 
+function exportCriticalPath() {
+	var eventId = $('#moveEventId').val();
+	if (eventId && (eventId != 0) && (!$('#exportCriticalPathButton').hasClass('disabledLabel'))) {
+		window.open(tdsCommon.createAppURL("/task/eventTimelineResults?showAll=false&eventId=" + eventId), '_blank');
+	}
+}

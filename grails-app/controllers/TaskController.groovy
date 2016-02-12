@@ -1009,7 +1009,7 @@ digraph runbook {
 		Boolean showAll = (params.showAll == 'true')
 		String meId = params.eventId	
 
-		def (project, user) = controllerService.getProjectAndUserForPage( this )
+		def (project, user) = controllerService.getProjectAndUserForPage( this, 'CriticalPathExport' )
 		if (! project) 
 			return
 
