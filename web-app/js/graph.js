@@ -15,7 +15,7 @@ var GraphUtil = (function ($) {
 	public.labelTextBindings = null;
 	public.shapeOffset = -20;
 	public.labelShapeOffset = -8
-	public.nodeRadius = 28;
+	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
 	public.labelHeightDefault = 15; // Modify if the size of the text from the rect is different.
 
 	// returns true if the graph is loaded
@@ -637,9 +637,14 @@ var GraphUtil = (function ($) {
 			y1 = source.y,
 			x2 = target.x,
 			y2 = target.y,
-			angle = Math.atan2(y2 - y1, x2 - x1);
+			angle = Math.atan2(y2 - y1, x2 - x1),
+			nodeRadius = public.nodeRadius["Default"];
+		
+			if(target.type && public.nodeRadius[target.type]) {
+				nodeRadius = public.nodeRadius[target.type];
+			}
 
-		return { x: x2 - Math.cos(angle) * (public.nodeRadius), y: y2 - Math.sin(angle) * (public.nodeRadius) };
+		return { x: x2 - Math.cos(angle) * (nodeRadius), y: y2 - Math.sin(angle) * (nodeRadius) };
 	};
 
 	// return the public object to make the public functions accessable

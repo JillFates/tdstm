@@ -483,6 +483,7 @@ function updateElementPositions () {
 			d.cut = 3;
 			o.classList.add('cut');
 		}
+
 	});
 	
 	// set the dynamic attributes for the labels
