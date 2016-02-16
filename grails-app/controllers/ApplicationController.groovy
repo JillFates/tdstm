@@ -230,7 +230,7 @@ class ApplicationController {
 		}
 		
 		query.append(" ORDER BY ${sortIndex} ${sortOrder}")
-		log.info "query = ${query}"
+		// log.debug "query = ${query}"
 		def appsList = []
 		if(queryParams.size()){
 			def namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource)
