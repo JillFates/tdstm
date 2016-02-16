@@ -1,12 +1,12 @@
 <div class="menu4">
 	<ul>
 		<li><a href="#" id="generalEditHeadId" class="mobmenu mobselect"
-			onclick="switchTab(${person.id},'generalInfoEditId','generalEditHeadId')">General</a></li>
+			onclick="switchTab(${person.id},'generalInfoEditId','generalEditHeadId')">Person/Contact</a></li>
 		<li><a href="#" id="availEditHeadId" class="mobmenu"
 			onclick="switchTab(${person.id},'availabilityEditId','availEditHeadId')">Availability</a></li>
 		<tds:hasPermission permission='EditTDSPerson'>
 			<li><a href="#" id="tdsEditHeadId" class="mobmenu"
-				onclick="switchTab(${person.id},'tdsUtilityEditId','tdsEditHeadId')">TDS</a></li>
+				onclick="switchTab(${person.id},'tdsUtilityEditId','tdsEditHeadId')">Misc</a></li>
 		</tds:hasPermission>
 	</ul>
 </div>
@@ -215,7 +215,7 @@
 					<tbody>
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label for="keyWords">KeyWords:</label>
+								<label for="keyWords">Keywords:</label>
 							</td>
 							<td valign="top" class="value" >
 								<input type="text" maxlength="64" id="keyWordsId" name="keyWords" size="40" value="${person.keyWords}" />
@@ -224,7 +224,7 @@
 
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label for="tdsNote">TDS Note:</label>
+								<label for="tdsNote">Comments:</label>
 							</td>
 							<td valign="top" class="value" colspan="2" >
 								<input type="text" maxlength="64" id="tdsNoteId" name="tdsNote" value="${person.tdsNote}" size="40" />
@@ -233,7 +233,7 @@
 
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label for="tdsLink">TDS Link</label>
+								<label for="tdsLink">Contact URL:</label>
 							</td>
 							<td valign="top" class="value" colspan="2">
 								<input type="text" id="tdsLinkId" name="tdsLink" size="40" value="${person.tdsLink}" />
@@ -242,7 +242,7 @@
 
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label for="staffType">StaffType:</label>
+								<label for="staffType">Staff Type:</label>
 							</td>
 							<td valign="top" class="value" colspan="2">
 								<g:select id="staffTypeId" name="staffType" from="${Person.constraints.staffType.inList}" value="Salary" />
@@ -251,7 +251,7 @@
 
 						<tr class="prop">
 							<td valign="top" class="name">
-								<label for="travelOK">TravelOK:</label>
+								<label for="travelOK">Can Travel:</label>
 							</td>
 							<td valign="top" class="value" colspan="2">
 								<input type="checkbox" id="travleOKId" name="travelOK"
