@@ -1,12 +1,12 @@
 <div class="menu4">
 	<ul>
 		<li><a href="#" id="generalShowHeadId" class="mobmenu mobselect"
-			onclick="switchTab(${person.id},'generalInfoShowId','generalShowHeadId')">General</a></li>
+			onclick="switchTab(${person.id},'generalInfoShowId','generalShowHeadId')">Person/Contact</a></li>
 		<li><a href="#" id="availShowHeadId" class="mobmenu"
 			onclick="switchTab(${person.id},'availabilityShowId','availShowHeadId')">Availability</a></li>
 		<tds:hasPermission permission='EditTDSPerson'>
 			<li><a href="#" id="tdsShowHeadId" class="mobmenu"
-				onclick="switchTab(${person.id},'tdsUtilityShowId','tdsShowHeadId')">TDS</a></li>
+				onclick="switchTab(${person.id},'tdsUtilityShowId','tdsShowHeadId')">Misc</a></li>
 		</tds:hasPermission>
 	</ul>
 </div>
@@ -168,7 +168,7 @@
               <tbody class="personShow">
                 <tr class="prop">
 					<td valign="top" class="name personShow">
-						<label for="keyWords">KeyWords :</label>
+						<label for="keyWords">Keywords :</label>
 					</td>
 					<td valign="top" class="value personShow" style="width: 40px" >
 						<span id="keyWordsId" >${person.keyWords }</span >
@@ -177,7 +177,7 @@
 
                 <tr class="prop">
                   <td valign="top" class="name personShow">
-                    <label for="tdsNote">TDS Note :</label>
+                    <label for="tdsNote">Comments :</label>
                   </td>
                   <td valign="top" class="value personShow" colspan="2"  width="50%">
                     <span id="tdsNoteId" >${person.tdsNote}</span>
@@ -186,7 +186,7 @@
                 
                 <tr class="prop">
                   <td valign="top personShow" class="name">
-                    <label for="tdsLink">TDS Link :</label>
+                    <label for="tdsLink">Contact URL :</label>
                   </td>
                   <td valign="top" class="value personShow" colspan="2">
                     <span id="tdsLinkId" >${person.tdsLink}</span>
@@ -195,7 +195,7 @@
 
                 <tr class="prop">
                   <td valign="top" class="name personShow">
-                    <label for="staffType ">StaffType :</label>
+                    <label for="staffType ">Staff Type :</label>
                   </td>
                   <td valign="top" class="value personShow" colspan="2">
                     <span id="staffTypeId" >${person.staffType}</span>
@@ -203,7 +203,7 @@
                 </tr>
                  <tr class="prop">
                   <td valign="top" class="name personShow" >
-                    <label for="travelOK ">TravelOK :</label>
+                    <label for="travelOK ">Can Travel :</label>
                   </td>
                   <td valign="top" class="value personShow" colspan="2">
                     <span id="travelOK" ><input type="checkbox" ${person.travelOK == 1 ? 'checked="checked"':''} disabled="disabled"/> </span>
