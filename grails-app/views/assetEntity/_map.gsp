@@ -147,7 +147,7 @@
 					<td style="padding: 0px;width: 30px;">Force</td>
 					<td style="padding-left :5px;">
 						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','forceId')"/>
-						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${(multiple)?(-30):(defaults.force)}" disabled="disabled" />
+						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${defaults.force}" disabled="disabled" />
 						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','forceId')"/>
 					</td>
 				</tr>

@@ -3235,7 +3235,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				def defaults = moveBundleService.getMapDefaults(graphNodes.size())
 				if ( multiple ) {
 					defaults.force = -200
-					defaults.linkSize = 100
+					defaults.linkSize = 140
 				}
 				
 				// Query for only the dependencies that will be shown

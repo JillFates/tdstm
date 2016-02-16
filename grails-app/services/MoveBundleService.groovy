@@ -463,17 +463,17 @@ class MoveBundleService {
 		return map
 	}
 	
-	/* Calculates the default paramters for the dependency map based on the number of nodes
+	/* Calculates the default parameters for the dependency map based on the number of nodes
 	 * @param nodeCount the number of nodes in the map
 	 * @return a map of values for the dependency map to use as parameters
 	 */
 	def getMapDefaults (def nodeCount) {
 
 		def defaultsSmall = [ 'force':-500, 'linkSize':90, 'friction':0.7, 'theta':1, 'maxCutAttempts':200 ]
-		def defaultsMedium = [ 'force':-400, 'linkSize':80, 'friction':0.7, 'theta':1, 'maxCutAttempts':150 ]
-		def defaultsLarge = [ 'force':-400, 'linkSize':90, 'friction':0.7, 'theta':1, 'maxCutAttempts':100 ]
+		def defaultsMedium = [ 'force':-500, 'linkSize':100, 'friction':0.7, 'theta':1, 'maxCutAttempts':150 ]
+		def defaultsLarge = [ 'force':-500, 'linkSize':120, 'friction':0.7, 'theta':1, 'maxCutAttempts':100 ]
 
-		return (nodeCount<30) ? (defaultsSmall) : ( (nodeCount<200) ? (defaultsMedium) : (defaultsLarge) )
+		return (nodeCount <= 50) ? (defaultsSmall) : ( (nodeCount<=200) ? (defaultsMedium) : (defaultsLarge) )
 	}
 	
 	/**
