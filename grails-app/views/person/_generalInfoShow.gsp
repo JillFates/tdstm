@@ -185,7 +185,7 @@
                 </tr>
                 
                 <tr class="prop">
-                  <td valign="top personShow" class="name">
+                  <td valign="top personShow" class="name personShow">
                     <label for="tdsLink">Contact URL :</label>
                   </td>
                   <td valign="top" class="value personShow" colspan="2">
