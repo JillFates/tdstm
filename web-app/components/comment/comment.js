@@ -2105,5 +2105,3 @@ function addLoadingIndicator(gridElementId) {
 	gridElement.attr('loading-indicator', true);
 }
 */
-
-angular.module('TaskModal',['Validation'])

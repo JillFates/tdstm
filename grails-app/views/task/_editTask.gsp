@@ -1,4 +1,4 @@
-<div ng-app="TaskModal" draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 1000px" tabindex="-1">
+<div draggable id="editTaskPopup" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front" style="width: 1000px" tabindex="-1">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
 		<span id="ui-id-5" class="ui-dialog-title">{{(isEdit)?'Edit Task':'Create Task'}}</span>
 		<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" ng-click="close()">
@@ -71,8 +71,8 @@
 						</td>
 					</tr>
 					<tr class="prop">
-						<td> <label for="instructionsLink">Instructions Link: {{ x }}</td>
-						<td> <input id="instructionsLinkId" tm-linkable-url placeholder="Enter URL or Label|URL" ng-model="ac.instructionsLink" ng-maxlength="255" ></input>
+						<td> <label for="instructionsLink">Instructions Link:</td>
+						<td> <input id="instructionsLinkId" placeholder="Enter URL or Label|URL" ng-model="ac.instructionsLink" ng-maxlength="255"></input>
 						</td>
 					</tr>
 					<tr class="prop" id="durationEditId">
