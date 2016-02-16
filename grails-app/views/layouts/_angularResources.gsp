@@ -8,6 +8,7 @@
 <!-- Kendo Directives -->
 <script src="${resource(dir:'dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
 <script type="text/javascript" src="${resource(dir:'components/core',file:'core.js')}"></script>
+<script type="text/javascript" src="${resource(dir:'components/comment',file:'comment.js')}"></script>
 <script type="text/javascript" src="${resource(dir:'components/asset',file:'asset.js')}" /></script>
 <g:javascript src="cabling.js"/>
 <g:javascript src="bootstrap.js" />
