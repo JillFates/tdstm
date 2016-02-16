@@ -234,10 +234,10 @@ class WsDashboardController {
 				def eventStartTime = new Date( resultMap.startTime.getTime() ) 
 				if (eventStartTime>sysTime) {
 					dayTime = TimeCategory.minus(eventStartTime, sysTime)
-					eventString = "<i>Time Remaining<i>"
+					eventString = "<i>Event Countdown<i>"
 				} else {
 					dayTime = TimeCategory.minus(sysTime, eventStartTime)
-					eventString = "<i>Event Time<i>"
+					eventString = "<i>Event Elapsed Time<i>"
 				}
 			}
 			/*

@@ -71,8 +71,7 @@
 						</div>
 						Event Status vs. Plan <br /> 
 						<span id="manualSumStatusSpan" style="display: none; width: 10px;"> 
-							<span style="font-weight: normal; font-size: 12px;">Manual :</span> 
-							<input type="checkbox" name="manual" value="" id="checkBoxId" /> 
+							<input type="hidden" name="manual" value="M" id="checkBoxId" /> 
 							<input type="text" value="" name="manualSummaryStatus" id="manualSummaryStatusId" size="3" maxlength="3"
 								onblur="validateManulaSummary(this.value)" />&nbsp; 
 							<input type="button" value="Save" onclick="changeEventSummary()" />
