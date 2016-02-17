@@ -1788,10 +1788,10 @@ class AssetEntityService {
 	def cablingReportData( assetCablesList, cablingSheet ){
 		for ( int r = 2; r <= assetCablesList.size(); r++ ) {
 			addCell(cablingSheet, r, 0, String.valueOf(assetCablesList[r-2].assetFromPort?.type ))
-			addCell(cablingSheet, r, 1, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" ))
+			addCell(cablingSheet, r, 1, assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
 			addCell(cablingSheet, r, 2, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" ))
 			addCell(cablingSheet, r, 3, String.valueOf(assetCablesList[r-2].assetFromPort?.label ))
-			addCell(cablingSheet, r, 4, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" ))
+			addCell(cablingSheet, r, 4, assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
 			addCell(cablingSheet, r, 5, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" ))
 			if(assetCablesList[r-2].assetFromPort && assetCablesList[r-2].assetFromPort.type && assetCablesList[r-2].assetFromPort.type !='Power'){
 				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" ))
@@ -2979,7 +2979,7 @@ class AssetEntityService {
 
 						addCell(commentSheet, cr, 0, String.valueOf(assetcomment[cr-1].id))
 
-						addCell(commentSheet, cr, 1, String.valueOf(assetcomment[cr-1].assetEntity.id))
+						addCell(commentSheet, cr, 1, assetcomment[cr-1].assetEntity.id, Cell.CELL_TYPE_NUMERIC)
 
 						addCell(commentSheet, cr, 2, String.valueOf(assetcomment[cr-1].category))
 
