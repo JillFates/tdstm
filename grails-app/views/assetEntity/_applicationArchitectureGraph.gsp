@@ -11,9 +11,9 @@ line.link {
 line.link.unresolved {
 	marker-end: url(#arrowheadUnresolved);
 }
-line.link.notApplicable {
+/*line.link.notApplicable {
 	marker-end: url(#arrowheadNotApplicable);
-}
+}*/
 line.link.selected {
 	marker-end: url(#arrowheadSelected);
 }
@@ -25,19 +25,22 @@ line.link.cyclical:not(.selected) {
 	opacity: 1.0 !important;
 }
 </style>
+
 <script type="text/javascript">
+
 GraphUtil.force = d3.layout.force();
 var defaults = {"width":getStandardWidth(), "height":getStandardHeight(), "blackBackground":false};
 
 var canvas = d3.select("div#svgContainerId")
 	.append("svg:svg")
+	.attr('class', 'chart')
 	.attr('id', 'graphSvgId');
 	
 // define the arrowhead markers used for marking dependencies
-canvas.append("defs");
-defineShapes(d3.select("defs"));
+var defs = canvas.append("defs");
+defs.html(appSVGShapes.getAll());
+defineShapes(defs);
 var arrowOffset = 16;
-d3.selectAll('defs marker').attr('refX', arrowOffset);
 
 // bind browser resizing to resizing the svg
 $(window).resize( function(a, b) {
@@ -75,7 +78,11 @@ if (assets.size() > 0) {
 		$('#assetSelectId').select2('data').id = assets[0].id;
 		$('#assetSelectId').select2('data').text = assets[0].name;
 	}
-	$('.select2-chosen').html(assets[0].name);
+	var select2List = $('.select2-chosen');
+	if(select2List.length) {
+		// There are two Select2, one for Asset Classes and one for Filter
+		$(select2List[0]).html(assets[0].name);
+	}
 }
 
 var root = null;
@@ -735,7 +742,7 @@ function buildMap (width, height) {
 		GraphUtil.nodeBindings = GraphUtil.nodeBindings
 			.append("svg:use")
 				.attr("xlink:href", function (d) {
-					return '#' + assetTypes[d.type].internalName + 'ShapeId';
+					return '#' + appSVGShapes.shape[assetTypes[d.type].internalName].id;
 				})
 				.attr("class", function (d) { 
 					return "node " + d.dir
@@ -779,8 +786,6 @@ function buildMap (width, height) {
 			.attr("dx", 0)
 			.attr("dy","-1.45em")
 			.text(function(d) {
-				if (d.name && d.name.length > 12)
-					return d.name.substr(0, 12) + '...';
 				return d.name;
 			});
 		
@@ -793,8 +798,6 @@ function buildMap (width, height) {
 			.attr("dx", 0)
 			.attr("dy","-1.45em")
 			.text(function(d) {
-				if (d.name && d.name.length > 12)
-					return d.name.substr(0, 12) + '...';
 				return d.name;
 			});
 		
@@ -959,13 +962,13 @@ function buildMap (width, height) {
 		GraphUtil.updateAllClasses();
 		
 		// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-		var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
-		selection[0] = selection[0].concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+		var selection = d3.selectAll('svg.chart > g g g').filter(':not(.selected)').filter('.selected');
+		selection[0] = selection[0].concat(d3.selectAll('svg.chart > g g line').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g line').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter('.selected')[0]);
 		selection.order();
 	}
 	
@@ -1502,19 +1505,28 @@ function buildMap (width, height) {
 			.attr("transform", function(d) {			
 				if (isNaN(d.x))
 					d.x = 0;
-				return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";
+				return "translate(" + (d.x) + "," + (d.y) + ")";
 			})
 			.style("fill", function(d) {
 				return (d.fillColor) ? (d.fillColor) : (d3.select(this).attr('fillColor'));
 			});
-			
-		// set the positional attributes for the links
-		GraphUtil.linkBindings
-			.attr("x1", function(d) {return d.parent.x;})
-			.attr("y1", function(d) {return d.parent.y;})
-			.attr("x2", function(d) {return d.child.x;})
-			.attr("y2", function(d) {return d.child.y;})
-			.attr("transform", function(d) {return "translate(" + offsetX + "," + offsetY + ")";});
+
+		// set the dynamic attributes for the links
+		$(GraphUtil.linkBindings[0]).each(function (i, o) {
+			var d = o.__data__;
+
+			var targetEdge = GraphUtil.targetEdge(d.parent, d.child);
+			if(d.notApplicable && d.notApplicable == true) {
+				targetEdge.x = d.child.x;
+				targetEdge.y = d.child.y;
+			}
+
+			o.x1.baseVal.value = d.parent.x;
+			o.y1.baseVal.value = d.parent.y;
+			o.x2.baseVal.value = targetEdge.x;
+			o.y2.baseVal.value = targetEdge.y;
+
+		});
 		
 		// set the positional attributes for the labels
 		
@@ -1525,7 +1537,7 @@ function buildMap (width, height) {
 			.attr("cy", function(d) {
 				return d.y;
 			})
-			.attr("transform", function(d) {return "translate(" + (d.x + offsetX) + "," + (d.y + offsetY) + ")";});
+			.attr("transform", function(d) {return "translate(" + (d.x) + "," + (d.y) + ")";});
 		
 		// Update the classes for all data bound svg objects
 		GraphUtil.updateAllClasses();
@@ -2676,7 +2688,7 @@ function getDependenciesString (node) {
 	return output;
 }
 
-// returens the node for the asset with the given id
+// returns the node for the asset with the given id
 function getNodeById (id) {
 	return assets.find(function (a) {
 		return a.id == id;
@@ -2714,42 +2726,78 @@ function setLabelOffsets (nodeMap) {
 			var node = nodeMap[keys[i]][j];
 			
 			if (node != null && node.showLabel && ! node.dummy) {
-				
+				console.log(node);
 				// get the positional data of this node's label
-				var text = _.unescape($('#label-' + node.id)[0].innerHTML);
-				var rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
-				for (var k = text.length - 1; k >= 0; --k) {
-					if (text[k] != ' ') {
-						rect = $('#label-' + node.id)[0].getExtentOfChar(k);
-						k = 0;
+				var text = _.unescape($('#label-' + node.id)[0].textContent);
+				if(text.length > 0 ){
+
+					var rect = validateRectBrowser(node, text.length);
+
+
+					for (var k = text.length - 1; k >= 0; --k) {
+						if (text[k] != ' ') {
+							rect = validateRectBrowser(node, k);
+							k = 0;
+						}
 					}
-				}
-				var endX = rect.x + rect.width;
-				var startX = node.qx - endX;
-				endX = node.qx + endX;
-				
-				var row = 0;
-				
-				// check if there is a row the label can fit in
-				for (var k = 0; k < maxOffset; ++k) {
-					if (labelRows[k] == null || labelRows[k] < startX) {
-						row = k;
-						k = maxOffset;
+
+					var endX = rect.x + rect.width;
+					var startX = node.qx - endX;
+					endX = node.qx + endX;
+
+					var row = 0;
+
+					// maxOffset = the max val is 2, since one go up, one below
+					// check if there is a row the label can fit in
+					for (var k = 0; k < maxOffset; ++k) {
+						if (labelRows[k] == null || labelRows[k] < startX) {
+							row = k;
+							k = maxOffset;
+						}
 					}
+
+					var labelOffsetPosition = 4.5;
+					if(node && node.allParents ){ // If the node do not have a parent, it means is the top node, set the label offset to up
+						if(node.allParents.length <= 0) {
+							labelOffsetPosition = 0;
+						}
+					}
+
+					// insert the label into the row
+					offset = (row + 1) * -1;
+					if(row > 0){ // The label doesn't fit, add a more offSet to be below
+						offset += 2;
+					}
+					nodeMap[keys[i]][j].labelOffset = (offset + offset * labelPadding) + labelOffsetPosition;
+					labelRows[row] = endX;
+
 				}
-				
-				// insert the label into the row
-				offset = (row + 1) * -1;
-				nodeMap[keys[i]][j].labelOffset = offset + offset * labelPadding;
-				labelRows[row] = endX;
 			}
 		}
 	}
-	
+
+	/**
+	 *  Firefox and IE has some issues to render or access
+	 *  a rectangle after this was already created,
+	 *  one of the method affected is getExtentOfChar
+ 	 */
+
+	function validateRectBrowser(node, w) {
+		var rect;
+
+		try {
+			rect = $('#label-' + node.id)[0].getExtentOfChar(text.length - 1);
+		} catch(err) { // if browser doesn't support the operation we fallback to manually create the rect
+			rect = GraphUtil.createRect(node.x, node.y, GraphUtil.labelHeightDefault, w);
+		}
+
+		return rect;
+	}
+
 	// update all the labels y values
 	GraphUtil.labelBindings.attr("dy", function(d) {
 			if (d.labelOffset) {
-				$(this).children().attr('dy', d.labelOffset - 0.4 + 'em');
+				$(this).children().attr('dy', d.labelOffset - 0.8 + 'em');
 			} else {
 				$(this).children().attr('dy', 0 + 'em');
 			}

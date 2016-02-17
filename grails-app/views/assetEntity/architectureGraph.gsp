@@ -15,6 +15,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<g:javascript src="d3/d3.js" />
 		<g:javascript src="lodash/lodash.min.js" />
+		<g:javascript src="svg.js"/>
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="graph.js" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
@@ -40,8 +41,7 @@
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
 						<td class="controlPanelControl" colspan="3">
-							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" /><!--
-							--><label for="assetSelectId">&nbsp;Asset</label>
+							<input type="hidden" id="assetSelectId" name="assetList" class="scrollSelect" style="width:130px" data-asset-type="ALL" />
 						</td>
 					</tr>
 				</table>
@@ -49,8 +49,7 @@
 					<table class="labelTree savedToPrefs" cellpadding="0" cellspacing="0" style="border: 0;" >
 						<tr title="Filters which class of assets are searched Asset search above">
 							<td class="controlPanelControl" colspan="3">
-								<g:select name="assetClasses" id="assetClassesId" from="${assetClassesForSelect.values()}" keys="${assetClassesForSelect.keySet()}" value="${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}"></g:select><!--
-								--><label for="assetClassesId">&nbsp;Filter On</label>
+								<input type="hidden" id="assetClassesId" name="assetClasses" class="filterScrollSelect" style="width:130px" />
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow up">
@@ -111,13 +110,13 @@
 									<tr class="labelToggleRow">
 										<td colspan="3" class="labelToggleCol">
 											<div style="padding:0px;">
-												<span class="checkboxContainer">
+												<div class="checkboxContainer">
 													<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
 													--><label for="${type}CheckboxId" class="pointer">
-														<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
-														${names.labelText ?: names.frontEndNamePlural}
+														<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+														${names.labelText ?: names.frontEndName}
 													</label>
-												</span>
+												</div>
 											</div>
 										</td>
 									</tr>
@@ -171,7 +170,7 @@
 				</table>
 			</div>
 			
-			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:false]}" />
+			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:true]}" />
 		</div>
 		<div id="svgContainerId"></div>
 		<div id="spinnerDivId" style="display: none"></div>
@@ -193,7 +192,7 @@
 	var initialAssetId = ${assetId ?: 'null'};
 	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
 	var defaultPrefs = ${defaultPrefs};
-	var assetSelectWidth = 130;
+	var assetSelectWidth = 172;
 
 	// Used to track ajax requests and abort them when needed
 	var ajaxRequest;
@@ -206,6 +205,8 @@
 		// define the select2 for assets
 		if (!isIE7OrLesser) {
 			EntityCrud.assetNameSelect2( $(".scrollSelect") );
+			$("#select2-chosen-1").html('Select an Asset');
+			filterSelect2( $(".filterScrollSelect"), ${assetClassesForSelect2} );
 		}
 		
 		// bind the custom submit behavior for the control panel
@@ -322,7 +323,27 @@
 			plusButton.removeClass('disabled');
 		input.trigger('change');
 	}
-</script>
 
+	// Asset is on the entity.crud.js because is generic, the filter On is only used here.
+	function filterSelect2(element, data) {
+		element.select2( {
+			minimumInputLength: 0,
+			width: assetSelectWidth,
+			/*initSelection: function (element, callback) {
+				var data = { id: '${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}'};
+				callback(data);
+			},*/
+			placeholder: "Filter: All Classes",
+			data: data
+		} );
+	}
+
+	$(document).ready(function () {
+		// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
+		$('#graphSVGContainer').append(appSVGShapes.getAll());
+	});
+
+</script>
+<div style="display: none;" id="graphSVGContainer"></div>
 </body>
 </html>

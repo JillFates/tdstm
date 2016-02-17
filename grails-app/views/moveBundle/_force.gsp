@@ -45,10 +45,12 @@ GraphUtil.force = d3.layout.force();
 var canvas = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
-	.append("svg:svg");
+	.append("svg:svg")
+	.attr('class','chart');
 
 // define the shapes used for the svg
-canvas.append("defs");
+var defs = canvas.append("defs");
+defs.html(appSVGShapes.getAll());
 defineShapes(d3.select("defs"));
 
 var outsideWidth = 0;
@@ -82,7 +84,7 @@ var moveEvents = ${moveEventMap};
 
 var cutLinks = [];
 var cutNodes = [];
-var graphstyle = "z-index:-1;";
+var graphstyle = "z-index:90;";
 var fill = d3.scale.category10();
 var fillMode = 'bundle';
 var gravity = ${multiple ? 0.05 : 0};
@@ -183,7 +185,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			
 			if (d.cutShadow)
 				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-			
+
 			d.fix = true;
 			d.fixed = true;
 			clicked = false;
@@ -192,6 +194,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			if (GraphUtil.force.alpha() < startAlpha) {
 				if (!GraphUtil.setAlpha(0.1)) {
 					GraphUtil.updateNodePosition(d);
+					updateElementPositions();
 				}
 			}
 			
@@ -245,7 +248,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	canvas
 		.attr("width", width)
 		.attr("height", height)
-		.attr("class", 'draggable')
+		.attr("class", 'draggable chart')
 		.attr("style", graphstyle)
 		.style('background-color', backgroundColor)
 		.style('cursor', 'default')
@@ -286,7 +289,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("y1", function(d) { return d.source.y;})
 			.attr("x2", function(d) { return d.target.x;})
 			.attr("y2", function(d) { return d.target.y;});
-	
+
 	if ($.browser.mozilla)
 		GraphUtil.linkBindings.style('opacity', 1);
 	
@@ -298,7 +301,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	GraphUtil.nodeBindings = GraphUtil.nodeBindings
 		.append("use")
 			.attr("xlink:href", function (d) {
-				return '#' + assetTypes[d.type].internalName + 'ShapeId';
+				return '#' + appSVGShapes.shape[assetTypes[d.type].internalName].id;
 			})
 			.attr("class", "node")
 			.call(dragBehavior)
@@ -334,18 +337,16 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("cy", 0)
 		.attr("transform", "translate(0, 0)");
 	
-	GraphUtil.labelBindings.attr("class", "label")
+	GraphUtil.labelBindings.attr("class", "label");
 	
 	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 		.attr("id", function (d) {
 			return "label2-" + d.id;
 		})
 		.attr("class", "ignoresMouse labelBackground")
-		.attr("dx", 12)
+		.attr("dx", 18)
 		.attr("dy",".35em")
 		.text(function(d) {
-			if (d.name && d.name.length > 12)
-				return d.name.substr(0, 12) + '...';
 			return d.name;
 		});
 	
@@ -354,11 +355,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			return "label-" + d.id;
 		})
 		.attr("class", "ignoresMouse")
-		.attr("dx", 12)
+		.attr("dx", 18)
 		.attr("dy",".35em")
 		.text(function(d) {
-			if (d.name && d.name.length > 12)
-				return d.name.substr(0, 12) + '...';
 			return d.name;
 		});
 	
@@ -459,21 +458,32 @@ function updateElementPositions () {
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
 		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-		if (d.cutShadow)
-			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
+		if (d.cutShadow){
+
+			var yOffset = d.y;
+			if(d && d.type === 'Other') {
+				yOffset = d.y - 5;
+			}
+
+			d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, yOffset);
+		}
 	});
 	
 	// set the dynamic attributes for the links
 	$(GraphUtil.linkBindings[0]).each(function (i, o) {
 		d = o.__data__;
+
+		var targetEdge = GraphUtil.targetEdge(d.source, d.target);
+
 		o.x1.baseVal.value = d.source.x;
 		o.y1.baseVal.value = d.source.y;
-		o.x2.baseVal.value = d.target.x;
-		o.y2.baseVal.value = d.target.y;
+		o.x2.baseVal.value = targetEdge.x;
+		o.y2.baseVal.value = targetEdge.y;
 		if (d.cut == 2) {
 			d.cut = 3;
 			o.classList.add('cut');
 		}
+
 	});
 	
 	// set the dynamic attributes for the labels
@@ -861,7 +871,7 @@ function cutAndRemove () {
 	// if it looped this many times, no suitable neighborhood could be found
 	if (callCount >= 1000) {
 		$('#minCutButtonId').removeAttr('disabled');
-		alert('could not find any unpartitioned applications');
+		alert('Unable to determine any applicable splits');
 		return;
 	}
 	
@@ -874,7 +884,7 @@ function cutAndRemove () {
 	
 	// called iteratively using setTimeout to prevent locking up the thread with long executions
 	function findBestCut (i) {
-		
+
 		// check if the job should be canceled
 		if (cancelCut) {
 			cancelCut = false;

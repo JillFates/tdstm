@@ -3,39 +3,43 @@
  */
 
 var GraphUtil = (function ($) {
-	
+
 	// public functions
 	var public = {};
-	
+
 	// public variables
 	public.force = null;
 	public.nodeBindings = null;
 	public.linkBindings = null;
 	public.labelBindings = null;
 	public.labelTextBindings = null;
-	
+	public.shapeOffset = -20;
+	public.labelShapeOffset = -8
+	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
+	public.labelHeightDefault = 15; // Modify if the size of the text from the rect is different.
+
 	// returns true if the graph is loaded
 	public.graphExists = function () {
 		return ($('#svgContainerId').children('svg').size() > 0);
 	}
-	
+
 	// returns true if the graph is in fullscreen mode
 	public.isFullscreen = function () {
 		return $('#item1').hasClass('fullscreen');
 	}
-	
+
 	public.isBlackBackground = function () {
 		return $('#blackBackgroundId').is(':checked');
 	}
-	
+
 	public.isConflictsEnabled = function () {
 		return $('#bundleConflictsId').is(':checked');
 	}
-	
+
 	public.isHighlightCyclesEnabled = function () {
 		return $('#highlightCyclicalCheckBoxId').is(':checked');
 	}
-	
+
 	// resets the graph to the proper size
 	public.getProperGraphDimensions = function () {
 		var width = getStandardWidth();
@@ -46,7 +50,7 @@ var GraphUtil = (function ($) {
 		}
 		return {width:width, height:height};
 	}
-	
+
 	// resets the graph to the proper size
 	public.resetGraphSize = function () {
 		if (public.graphExists()) {
@@ -55,7 +59,7 @@ var GraphUtil = (function ($) {
 			public.correctBothPanelSizes();
 		}
 	}
-	
+
 	// toggles full screen mode for any graph
 	public.toggleFullscreen = function () {
 		if (public.graphExists()) {
@@ -65,7 +69,7 @@ var GraphUtil = (function ($) {
 				public.enableFullscreen();
 		}
 	}
-	
+
 	// changes the graph to fullscreen mode
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
@@ -76,7 +80,7 @@ var GraphUtil = (function ($) {
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
-	
+
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
@@ -84,23 +88,23 @@ var GraphUtil = (function ($) {
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
-	
+
 	// sets the size of the legend so that it can scroll when longer than the user's window
 	public.correctLegendSize = function () {
 		public.correctPanelSize('legendDivId');
 	}
-	
+
 	// sets the size of the control panel so that it can scroll when longer than the user's window
 	public.correctControlPanelSize = function () {
 		public.correctPanelSize('controlPanel');
 	}
-	
+
 	// sets the size of the legend and control panel so that they can scroll when longer than the user's window
 	public.correctBothPanelSizes = function () {
 		public.correctLegendSize();
 		public.correctControlPanelSize();
 	}
-	
+
 	// sets the size of a panel so that it can scroll when longer than the user's window
 	public.correctPanelSize = function (panelId) {
 		var panel = $('#' + panelId);
@@ -109,10 +113,10 @@ var GraphUtil = (function ($) {
 		var svgContainer = $('#svgContainerId svg');
 		if (panel.size() == 0 || svgContainer.size() == 0)
 			return false;
-		
+
 		var bottom = panel.offset().top + panel.height();
 		var newBottom = svgContainer.offset().top + svgContainer.innerHeight();
-		
+
 		if (bottom >= newBottom) {
 			var newHeight = newBottom - panel.offset().top;
 			panel.css('height', newHeight);
@@ -122,13 +126,13 @@ var GraphUtil = (function ($) {
 			panel.css('overflow-y', '');
 		}
 	}
-	
+
 	// calculates node families
 	public.setNodeFamilies = function (nodes) {
 		var uncheckedNodes = nodes.clone();
 		var family = 0
 		var nodeFamilies = [];
-		
+
 		// build the families
 		nodes.each(function (node, i) {
 			var index = uncheckedNodes.indexOf(node);
@@ -141,7 +145,7 @@ var GraphUtil = (function ($) {
 				nodeFamilies[node.family].push(node);
 			}
 		});
-		
+
 		// sort the families
 		nodeFamilies.sort(function (a, b) {
 			if (a.size() > b.size())
@@ -150,17 +154,17 @@ var GraphUtil = (function ($) {
 				return -1;
 			return 0;
 		});
-		
+
 		// update the family references after sorting
 		nodeFamilies.each(function (f, i) {
 			f.each(function (node) {
 				node.family = i;
 			});
 		});
-		
+
 		return nodeFamilies;
 	}
-	
+
 	function traverseNodesForFamily (node, uncheckedNodes, family) {
 		var index = uncheckedNodes.indexOf(node);
 		if (index != -1) {
@@ -172,18 +176,18 @@ var GraphUtil = (function ($) {
 			getParents(node).each(function (parent, i) {
 				traverseNodesForFamily(parent, uncheckedNodes, family);
 			});
-			
+
 		}
 	}
-	
-	// performs one tick of the 
+
+	// performs one tick of the
 	public.tickOnce = function () {
 		var oldAlpha = public.force.alpha();
 		public.force.alpha(1);
 		public.force.tick();
 		public.force.alpha(oldAlpha);
 	}
-	
+
 	// adds the move bundle color indicator to the legend
 	public.updateLegendColorKey = function (dataMap, colors, fillMode) {
 		var template = $('#colorKeyTemplateId');
@@ -207,7 +211,7 @@ var GraphUtil = (function ($) {
 		else
 			$('#colorKeyLabelId h4').html('Move Events');
 	}
-	
+
 	public.getFillMode = function () {
 		var checkedRadio = $('#colorByFormId input:checked');
 		if (checkedRadio.attr('id') == 'colorByDepGroupId')
@@ -216,7 +220,7 @@ var GraphUtil = (function ($) {
 			return 'bundle';
 		return 'event';
 	}
-	
+
 	public.getFillColor = function (node, colors, fillMode) {
 		if (fillMode == 'group') {
 			return colors(node.depBundleIndex);
@@ -226,7 +230,7 @@ var GraphUtil = (function ($) {
 			return colors(node.moveEventIndex);
 		}
 	}
-	
+
 	public.settleGraph = function (force, simpleTick, normalTick) {
 		force.on("tick", simpleTick);
 		for (var i = 0; i < 100; ++i) {
@@ -237,7 +241,7 @@ var GraphUtil = (function ($) {
 		force.on("tick", tick);
 		force.start();
 	}
-	
+
 	// called when the user clicks the show/hide layout adjustments twistie
 	public.toggleGraphTwistie = function (twistieSpan) {
 		var container = $('#' + twistieSpan.attr('for'));
@@ -253,7 +257,7 @@ var GraphUtil = (function ($) {
 			});
 		}
 	}
-	
+
 	public.updateNodeClasses = function () {
 		var bundle = public.getFilteredBundle();
 		public.nodeBindings.attr("class", function(d) {
@@ -291,23 +295,23 @@ var GraphUtil = (function ($) {
 				+ ((! d.showLabel) ? ' hidden' : '');
 		});
 	}
-	
+
 	public.updateAllClasses = function () {
 		public.updateNodeClasses();
 		public.updateLinkClasses();
 		public.updateLabelClasses();
 	}
-	
+
 	public.checkSvgCompatibility = function () {
 		if ( ! document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1") )
 			$('.tabInner').html('Your browser does not support SVG, see <a href="http://caniuse.com/svg">http://caniuse.com/svg</a> for more details.');
 	}
-	
+
 	// returns true if this page has a dependency group table
 	public.hasDependencyGroups = function () {
 		return ($('#dependencyDivId').size() > 0);
 	}
-	
+
 	// Restyles the first row of the dependency group table to handle fullscreen mode
 	public.moveDependencyGroups = function () {
 		if (public.hasDependencyGroups()) {
@@ -318,25 +322,25 @@ var GraphUtil = (function ($) {
 			setGroupTablePosition();
 		}
 	}
-	
+
 	// gets the move bundle id currently selected for filtering
 	public.getFilteredBundle = function () {
 		var value = $('#planningBundleSelectId').val();
 		value = parseInt(value);
 		return value;
 	}
-	
+
 	// returns true if there is a move bundle selected for filtering
 	public.isBundleFilterEnabled = function () {
 		return ! isNaN(public.getFilteredBundle());
 	}
-	
+
 	// returns true if the node is in the bundle
 	public.isInFilteredBundle = function (node, bundle) {
 		return (node.moveBundleId && node.moveBundleId == bundle);
 	}
-	
-	
+
+
 	public.hidePanel = function (panel) {
 		if (panel == 'control') {
 			$('#controlPanel').removeClass('openPanel');
@@ -346,7 +350,7 @@ var GraphUtil = (function ($) {
 			$('#legendTabId').removeClass('activeTab');
 		}
 	}
-	
+
 	public.openPanel = function (panel) {
 		if (panel == 'control') {
 			$('#controlPanel').addClass('openPanel');
@@ -377,26 +381,26 @@ var GraphUtil = (function ($) {
 		}
 		public.correctBothPanelSizes();
 	}
-	
+
 	// returns true if the graph is frozen
 	public.isFrozen = function () {
 		return $('#playPauseButtonId').hasClass('enabled');
 	}
-	
+
 	public.enableFreeze = function () {
 		$('#playPauseButtonId')
 			.addClass('enabled')
 			.attr('value', 'Resume Graph');
 		public.force.stop();
 	}
-	
+
 	public.disableFreeze = function () {
 		$('#playPauseButtonId')
 			.removeClass('enabled')
 			.attr('value', 'Freeze Graph');
 		public.force.resume();
 	}
-	
+
 	public.toggleFreeze = function () {
 		if (public.isFrozen()) {
 			public.disableFreeze();
@@ -404,7 +408,7 @@ var GraphUtil = (function ($) {
 			public.enableFreeze();
 		}
 	}
-	
+
 	// sets the alpha if the graph is not frozen
 	public.setAlpha = function (alpha) {
 		if ( ! public.isFrozen() )
@@ -413,7 +417,7 @@ var GraphUtil = (function ($) {
 			return false;
 		return true;
 	}
-	
+
 	// adds references back from the data objects to their bound elements
 	public.addBindingPointers = function () {
 		for (var i = 0; i < public.nodeBindings.size(); i++) {
@@ -429,7 +433,7 @@ var GraphUtil = (function ($) {
 			element.__data__.linkElement = d3.select(element);
 		}
 	}
-	
+
 	// gets a list of all links adjacent to this node
 	public.getAdjacentLinks = function (node) {
 		var list = [];
@@ -438,10 +442,22 @@ var GraphUtil = (function ($) {
 			if (link.source == node || link.target == node)
 				list.push(link);
 		}
-		
+
 		return list;
 	}
-	
+
+	// Basic function to create a Rectangle on pure js
+	public.createRect = function(x, y, h, w){
+		var svgNS = "http://www.w3.org/2000/svg",
+			rect = document.createElementNS(svgNS, 'rect');
+		rect.setAttributeNS(null, 'x', x);
+		rect.setAttributeNS(null, 'y', y);
+		rect.setAttributeNS(null, 'height', h);
+		rect.setAttributeNS(null, 'width', w);
+
+		return rect;
+	}
+
 	public.updateNodePosition = function (node) {
 		node.nodeElement.attr('transform', 'translate(' + node.x + ' ' + node.y + ')');
 		node.nodeElement.attr('cx', node.x);
@@ -457,14 +473,14 @@ var GraphUtil = (function ($) {
 		}
 		node.labelElement.attr('transform', 'translate(' + node.x + ' ' + node.y + ')');
 	}
-	
+
 	// unfreezes the graph and starts the force layout
 	public.startForce = function () {
 		public.disableFreeze();
 		public.force.start();
 	}
-	
-	
+
+
 	// Sets the user's graph preferences to the current values in the control panel
 	public.updateUserPrefs = function (preferenceName) {
 		var form = $('#preferencesformId');
@@ -485,11 +501,11 @@ var GraphUtil = (function ($) {
 			if (defaults[$(this).attr('name')])
 				$(this).val( defaults[$(this).attr('name')] )
 		});
-		
+
 		// resets the user's graph preferences to the defaults
 		setUserPreference(preferenceName, JSON.stringify(defaultPrefs));
-		
-		
+
+
 		// resets the graph preferences
 		var inputs = $('#preferencesformId input:not([type="button"]),#preferencesformId select');
 		inputs.each(function (i, o) {
@@ -508,19 +524,19 @@ var GraphUtil = (function ($) {
 				$(o).prop('checked', false)
 			}
 		});
-		
+
 		// rebuild the map with the parameters
 		if (public.graphExists())
 			rebuildMap(true);
 		public.checkForDisabledButtons(parameterRanges);
 	}
-	
+
 	public.checkForDisabledButtons = function (parameterRanges) {
 		Object.keys(parameterRanges).each(function (o, i) {
 			modifyParameter('none', o + 'Id');
 		});
 	}
-	
+
 	// rotates the graph by a given number of degrees
 	public.rotateGraph = function (degrees) {
 		var nodes = public.force.nodes();
@@ -550,7 +566,7 @@ var GraphUtil = (function ($) {
 	Math.degrees = function (radians) {
 		return radians * 180 / Math.PI;
 	};
-	
+
 
 	// Gets the list of types to show labels for
 	public.getExpanededLabels = function () {
@@ -562,60 +578,76 @@ var GraphUtil = (function ($) {
 		});
 		return labelsList;
 	}
-	
+
 	// Sets the showLabel property for every node
 	public.setShowLabels = function (nodes) {
 		var nameList = public.getExpanededLabels();
 		var changed = false;
-		
+
 		nodes.each(function (o, i) {
 			if (o.showLabel != nameList[assetTypes[o.type].internalName])
 				changed = true;
 			o.showLabel = nameList[assetTypes[o.type].internalName];
 		});
-		
+
 		return changed;
 	}
-	
+
 	public.setNodeDimensions = function () {
 		public.force.nodes().each(function (o, i) {
 			var element = o.nodeElement[0][0];
 			o.dimensions = element.getBBox();
 		});
 	}
-	
+
 	// creates the round shadows for nodes after suggesting splits
 	public.createCutShadows = function (color) {
 		public.force.nodes().each(function (o, i) {
 			if (o.cutShadow)
 				$(o.cutShadow).remove();
+
 			var cutShadow = vis.append('circle')
 				.attr('id', 'cutShadow-' + o.id)
 				.attr('class', 'cutShadow')
 				.attr('transform', 'translate(' + o.x + ',' + o.y + ')')
 				.style('fill', color(o.cutGroup))
-				.attr('r', 20);
+				.attr('r', 22);
 			o.cutShadow = cutShadow[0][0];
 		});
 		public.reorderDOM();
 	}
-	
-	
+
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
 	public.reorderDOM = function () {
-		var selection = d3.selectAll('svg g g g').filter(':not(.selected)').filter('.selected');
+		var selection = d3.selectAll('svg.chart > g g g').filter(':not(.selected)').filter('.selected');
 		selection[0] = selection[0]
-			.concat(d3.selectAll('svg g g circle.cutShadow')[0])
-			.concat(d3.selectAll('svg g g line').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g use').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g g').filter(':not(.selected)')[0])
-			.concat(d3.selectAll('svg g g line').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g use').filter('.selected')[0])
-			.concat(d3.selectAll('svg g g g').filter('.selected')[0]);
+			.concat(d3.selectAll('svg.chart > g g circle.cutShadow')[0])
+			.concat(d3.selectAll('svg.chart > g g line').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter(':not(.selected)')[0])
+			.concat(d3.selectAll('svg.chart > g g line').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g use').filter('.selected')[0])
+			.concat(d3.selectAll('svg.chart > g g g').filter('.selected')[0]);
 		selection.order();
-	}
-	
+	};
+
+	// Adjust the line based on a radius of the object to match the edge instead of the center
+	public.targetEdge = function(source, target){
+		var x1 = source.x,
+			y1 = source.y,
+			x2 = target.x,
+			y2 = target.y,
+			angle = Math.atan2(y2 - y1, x2 - x1),
+			nodeRadius = public.nodeRadius["Default"];
+		
+			if(target.type && public.nodeRadius[target.type]) {
+				nodeRadius = public.nodeRadius[target.type];
+			}
+
+		return { x: x2 - Math.cos(angle) * (nodeRadius), y: y2 - Math.sin(angle) * (nodeRadius) };
+	};
+
 	// return the public object to make the public functions accessable
 	return public;
-	
+
 })(jQuery); //passed 'jQuery' global variable into local parameter '$'

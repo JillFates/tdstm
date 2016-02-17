@@ -107,13 +107,13 @@
 						<tr class="labelToggleRow">
 							<td colspan="3" class="labelToggleCol">
 								<div style="padding:0px;">
-									<span class="checkboxContainer">
+									<div class="checkboxContainer">
 										<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
 										--><label for="${type}CheckboxId" class="pointer">
-											<svg><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
-											${names.labelText ?: names.frontEndNamePlural}
+											<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+											${names.labelText ?: names.frontEndName}
 										</label>
-									</span>
+									</div>
 								</div>
 							</td>
 						</tr>
@@ -147,7 +147,7 @@
 					<td style="padding: 0px;width: 30px;">Force</td>
 					<td style="padding-left :5px;">
 						<img src="${resource(dir:'images',file:'minus.gif')}" height="18" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub','forceId')"/>
-						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${(multiple)?(-30):(defaults.force)}" disabled="disabled" />
+						<input type="text" id="forceId" class="controlPanelprop" name="force" value="${defaults.force}" disabled="disabled" />
 						<img src="${resource(dir:'images',file:'plus.gif')}" height="18" class="pointer plusMinusIcon plus" onclick="modifyParameter('add','forceId')"/>
 					</td>
 				</tr>

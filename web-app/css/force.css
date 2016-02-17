@@ -328,7 +328,7 @@ img.pointer {
 	left: 0px;
 }
 
-.graphContainer.fullscreen #svgContainerId svg {
+.graphContainer.fullscreen #svgContainerId > svg {
 	position: fixed;
 	left: 0px;
 	top: 0px;
@@ -366,6 +366,7 @@ img.pointer {
 	height: 30px;
 	border-width: 0px;
 }
+
 #controlPanel .labelToggleRow {
 	padding-left: 5px;
 }
@@ -378,6 +379,12 @@ img.pointer {
 #controlPanel .labelToggleRow input {
 	margin-top: 4px;
 }
+
+#controlPanel .labelToggleRow div.checkboxContainer svg {
+	padding-left: 6px !important;
+	padding-right: 5px !important;
+}
+
 #controlPanel #colorByFormId {
 	padding-left: 2px;
 	padding-bottom: 0px;
@@ -403,7 +410,9 @@ img.pointer {
 	opacity: 0.5;
 	cursor: default;
 }
+svg#serverVirtualShapeLeftPanel {
 
+}
 
 /* Graph Panels */
 div.graphPanel:not(.openPanel) {
@@ -645,4 +654,8 @@ div.graphPanel.openPanel {
 }
 .controlSpan input,.controlSpan select {
 	margin-left: 5px;
+}
+
+defs svg {
+	stroke-width: 2.5px;
 }

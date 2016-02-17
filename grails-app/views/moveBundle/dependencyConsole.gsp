@@ -20,6 +20,7 @@
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="cabling.js"/>
 		<g:javascript src="d3/d3.js"/>
+		<g:javascript src="svg.js"/>
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="graph.js" />
  
@@ -209,17 +210,23 @@
 					}
 					$('#items1 .tabInner').html(spinnerDiv);
 				} else {
+
 					var svgElement = $('#svgContainerId');
 					if (svgElement.size() > 0) {
+						var leftPosition = svgElement.offset().left,
+							topPosition = svgElement.offset().top;
+
 						if (fullscreen) {
 							svgElement = $('#svgContainerId').children('svg');
 							spinnerDiv.css('background-color', '#ffffff');
+							leftPosition = $('#toolsContainerId').offset().left;
+							topPosition = $('#toolsContainerId').offset().top;
 						}
 						svgElement.css('opacity', 0);
 						spinnerDiv.addClass('graph')
 							.css('position', 'fixed')
-							.css('left', svgElement.offset().left + 'px')
-							.css('top', svgElement.offset().top + 'px')
+							.css('left', leftPosition + 'px')
+							.css('top', topPosition + 'px')
 							.css('width', svgElement.innerWidth() - 2 + 'px')
 							.css('height', svgElement.innerHeight() + 'px');
 						$('#item1').append(spinnerDiv);
@@ -285,6 +292,11 @@
 				$("#dependencyDivId:not(.floating)").css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
 				$("#dependencyDivId.floating").css('max-width', (windowWidth - extraOffset - (rightOffset * 2)) + 'px');
 			}
+
+			$(document).ready(function () {
+				// Safari doesn't render correctly svg inline, since the D3 is who is injecting, we preload the values injecting in the DOM.
+				$('#graphSVGContainer').append(appSVGShapes.getAll());
+			});
 			
 		</script>
 
@@ -306,6 +318,6 @@
 			})(jQuery);		
 			
 		</script>
-
+<div style="display: none;" id="graphSVGContainer"></div>
 	</body>
 </html>

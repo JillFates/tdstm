@@ -8,10 +8,10 @@
 			<g:set var="names" value="${entry.getValue()}" />
 			<tr>
 				<td style="padding:0px;">
-					<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="${'#' + names.internalName + 'ShapeId'}" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+					<svg id="${names.internalName}ShapeLeftPanel" style="width: 35px; height: 35px; border-width: 0px;"><use xlink:href="${'#' + names.internalName + 'ShapeId'}" class="node" x="17" y="15" style="fill: #1f77b4;"></use></svg>
 				</td>
-				<td>
-					${names.labelText ?: names.frontEndNamePlural}
+				<td style="padding-bottom: 8px;">
+					${names.labelText ?: names.frontEndName}
 				</td>
 			</tr>
 		</g:each>
@@ -40,7 +40,7 @@
 		<tr id="colorKeyLabelId" class="hidden"><td colspan="2"><h4>Move Bundles</h4></td></tr>
 		<tr id="colorKeyTemplateId" class="hidden">
 			<td class="bundleColorExample">
-				<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="#applicationShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+				<svg style="width: 30px;height: 30px;border-width: 0px;"><use xlink:href="#applicationShapeId" class="node" x="0" y="0" style="fill: #1f77b4;"></use></svg>
 			</td>
 			<td class="bundleNameLabel"></td>
 		</tr>
