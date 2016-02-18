@@ -153,7 +153,7 @@ class UserLoginController {
 		
 		def map = [controller:'userLogin', action:'listJson', id:"${params.companyId}"]
 		def listJsonUrl = HtmlUtil.createLink(map)
-		def acceptIconUrl = HtmlUtil.resource([dir: 'icons', file: 'accept.png', absolute: true])
+		def acceptIconUrl = HtmlUtil.resource([dir: 'icons', file: 'accept.png', absolute: false])
 		def acceptImgTag = '<img src="' + acceptIconUrl + '"></img>'
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly

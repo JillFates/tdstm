@@ -170,7 +170,7 @@ def test = {
 		def listJsonUrl = HtmlUtil.createLink(map)
 		def createUrl = HtmlUtil.createLink([controller:'userLogin', action:'create'])
 		def editUrl = HtmlUtil.createLink([controller:'userLogin', action:'edit'])
-		def addUserIconUrl = HtmlUtil.resource([dir: 'icons', file: 'user_add.png', absolute: true])
+		def addUserIconUrl = HtmlUtil.resource([dir: 'icons', file: 'user_add.png', absolute: false])
 		
 		// Due to restrictions in the way jqgrid is implemented in grails, sending the html directly is the only simple way to have the links work correctly
 		def results = personInstanceList?.collect {

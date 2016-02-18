@@ -1,9 +1,9 @@
 def appName = appName?:"tdstm"
 
 grails.project.groupId = tdstm
-grails.resources.adhoc.patterns = ['/components/*', '/css/*', '/fonts/*', '/i/*', '/icons/*', '/images/*', '/js/*', '/reports/*', '/resource/*', '/static/*', '/swf/*', '/templates/*', '/plugins/*', '/d3/*']
+grails.resources.adhoc.patterns = ['/components/*', '/css/*', '/fonts/*', '/i/*', '/icons/*', '/images/*', '/js/*', '/reports/*', '/resource/*', '/static/*', '/swf/*', '/templates/*', '/plugins/*', '/d3/*', '/dist/*']
 grails.resources.adhoc.patterns = []
-grails.resources.adhoc.includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**', '/js/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**', '/plugins/**', '/d3/**'] 
+grails.resources.adhoc.includes = ['/components/**', '/css/**', '/fonts/**', '/i/**', '/icons/**', '/images/**', '/js/**', '/reports/**', '/resource/**', '/static/**', '/swf/**', '/templates/**', '/plugins/**', '/d3/**', '/dist/**'] 
 grails.resources.adhoc.excludes = ["*"]
 grails.resources.rewrite.css = false
 
