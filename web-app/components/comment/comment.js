@@ -1572,7 +1572,26 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					dependency.taskId = '';
 				}
 			}
-			scope.taskOptionsDS = function(dependency) {
+
+			/**
+			 * Initialized the DataSource for dependency
+			 * @param dependency
+			 * @returns {*}
+			 */
+			scope.taskOptionsDS = function(dependency, updatedDependencyList) {
+				if(dependency.taskId !== '' && !updatedDependencyList) {
+					return createDataSourceForLazyLoad(dependency);
+				} else {
+					return createNormalDataSource(dependency);
+				}
+			};
+
+			/**
+			 * When the DataSource is for a new Dependency, load at first time
+			 * @param dependency
+			 * @returns {{placeholder: string, dataTextField: string, dataValueField: string, filter: string, virtual: {itemHeight: number, valueMapper: Function}, height: number, dataSource: {transport: {read: *, type: string, dataType: string, cache: boolean}, pageSize: number, serverPaging: boolean, schema: {data: Function, total: Function}}}}
+			 */
+			function createNormalDataSource(dependency) {
 				var ds = {
 					placeholder: "Select...",
 					dataTextField: "desc",
@@ -1608,23 +1627,100 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 							total: function(reply) {
 								return reply.data.total
 							}
-						},
+						}
 					}
 				};
 
-                return ds;
-			};
+				return ds;
+			}
 
-			scope.updateDependencyList = function(dependency) {
-				var config = scope.taskOptionsDS(dependency);
-				if (!dependency.taskId || dependency.dropdown.dataSource.data().length > 0) {
-					dependency.dropdown.setDataSource(config.dataSource);
-					dependency.dropdown.refresh();
+			/**
+			 * When the DataSource is for an existing one, let modify the flow to do lazy load on user interaction.
+			 * @param dependency
+			 * @returns {{placeholder: string, dataTextField: string, dataValueField: string, filter: string, autoBind: boolean, height: number, virtual: {itemHeight: number, valueMapper: Function}}}
+			 */
+			function createDataSourceForLazyLoad(dependency) {
+
+				var ds = {
+					placeholder: "Select...",
+					dataTextField: "desc",
+					dataValueField: "id",
+					filter: "contains",
+					autoBind: false,
+					height: 220,
+					virtual: {
+						itemHeight: 20,
+						valueMapper: function(options) {
+							if(options.value && options.value !== '' && ds.initializedWidget) {
+
+								if(ds.loadedDataSource){
+									commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
+										function(data) {
+											options.success(data.data);
+										}, function(data) {}
+									);
+								} else if(!ds.loadedDataSource) {
+									ds.loadedDataSource = true;
+									createNewDataSource(dependency);
+								}
+
+							}
+
+							ds.initializedWidget = true;
+						}
+					}
+				};
+
+				for( var i = 0; i < scope.ngModel.length; i++) {
+					if(scope.ngModel[i].taskId === dependency.taskId) {
+						ds.text = scope.ngModel[i].taskNumber + ": " + scope.ngModel[i].desc;
+						break;
+					}
+				}
+
+				ds.initializedWidget = false;
+				ds.loadedDataSource = false;
+
+				return ds;
+			}
+
+			/**
+			 * if required, we can just pass another Data Source to our widget.
+			 * @param dependency
+			 */
+			function createNewDataSource(dependency) {
+				var remoteDataSource = new kendo.data.DataSource({
+					transport: {
+						read: utils.url.applyRootPath('/assetEntity/tasksSearch?category=' + dependency.category + '&commentId=' + scope.commentId),
+						type: "get",
+						dataType: "json",
+						cache: true
+					},
+					pageSize: 100,
+					serverPaging: true,
+					schema: {
+						data: function (reply) {
+							return reply.data.list
+						},
+						total: function (reply) {
+							return reply.data.total
+						}
+					}
+				});
+
+				dependency.dropdown.setDataSource(remoteDataSource);
+				remoteDataSource.read();
+			}
+
+			scope.updateDependencyList = function(dependency, onPreload) {
+				if(!onPreload) {
+					createNewDataSource(dependency);
 				}
 
 				dependency.dropdown.list.width("230");
 				dependency.dropdown.list.css("white-space","nowrap");
 			};
+
 			scope.deleteRow = function(index) {
 				if (scope.ngModel[index].id) {
 					scope.deleted[scope.ngModel[index].id] = scope.ngModel[index].id;
@@ -1633,7 +1729,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			};
 			scope.$watch('moveEvent', function(nValue, oValue) {
 				angular.forEach(scope.ngModel, function(dependency) {
-					scope.updateDependencyList(dependency);
+					scope.updateDependencyList(dependency, true);
 				});
 			});
 			scope.internalControl = scope.control || {};
