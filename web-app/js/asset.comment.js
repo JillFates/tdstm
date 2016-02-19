@@ -9,6 +9,10 @@ function changeStatus(id, status, currentStatus, from){
 	var params = {'id':id,'status':status,'currentStatus':currentStatus,redirectTo:'taskManager'}
 	
 	// Disable status change buttons to prevent double-clicking
+
+	var doneCss = $('#done_text_'+id).attr('class')
+	var doneOnClick = $('#done_button_'+id).attr('onclick')
+
 	$('#start_button_'+id).removeAttr('onclick')
 	$('#done_button_'+id).removeAttr('onclick')
 	$('#start_text_'+id).attr('class', 'task_button_disabled')
@@ -41,6 +45,8 @@ function changeStatus(id, status, currentStatus, from){
 					$(cellId).removeAttr('class').addClass(data.statusCss).addClass('cellWithoutBackground')
 					if (status=="Started") {
 					    // $('#startTdId_'+id).hide()
+					    $('#done_button_'+id).attr('onclick', doneOnClick)
+					    $('#done_text_'+id).attr('class', doneCss)
 					} else if (status=="Completed") {
 						//$('#startTdId_'+id).hide()
 						//$('#doneTdId_'+id).hide()
