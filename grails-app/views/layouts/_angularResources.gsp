@@ -19,4 +19,4 @@
 <link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 <!-- Kendo UI Material Theme -->
 <link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.common-material.min.css')}">
-<link type="text/css" rel="stylesheet" href="${resource(absolute: false, dir:'dist/css/kendo',file:'kendo.material.min.css')}">
+<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.material.min.css')}">
