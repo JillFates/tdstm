@@ -659,6 +659,28 @@ td.buttons{
 	margin-top: 0px !important;
 }
 
+.ui-jqgrid-htable,
+.ui-jqgrid-btable,
+.ui-jqgrid-pager,
+.ui-jqgrid-view,
+.ui-jqgrid-bdiv,
+.ui-jqgrid-hdiv,
+.ui-jqgrid-hbox,
+.ui-jqgrid { max-width: 100% !important; }
+
+.ui-jqgrid-htable { padding-right: 17px; }
+.ui-jqgrid-hbox { padding-right: 0px !important; }
+
+.ui-jqgrid-htable,
+.ui-jqgrid-btable,
+.ui-jqgrid-pager,
+.ui-jqgrid-view,
+.ui-jqgrid-bdiv,
+.ui-jqgrid-hdiv,
+.ui-jqgrid-hbox,
+.ui-jqgrid { max-width: 100% !important; width:100% !important; }
+
+
 .ui-jqgrid-htable {
 	border-width: 0px !important;
 }
