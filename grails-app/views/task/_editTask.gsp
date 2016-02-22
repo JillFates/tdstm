@@ -72,8 +72,7 @@
 					</tr>
 					<tr class="prop">
 						<td> <label for="instructionsLink">Instructions Link:</td>
-						<td> <input id="instructionsLinkId" placeholder="Enter URL or Label|URL" ng-model="ac.instructionsLink" ng-maxlength="255"></input>
-						</td>
+						<td> <tm-linkable-url> </tm-linkable-url></td>
 					</tr>
 					<tr class="prop" id="durationEditId">
 						<td valign="top" class="name"><label for="durationEdit ">Duration:</label></td>

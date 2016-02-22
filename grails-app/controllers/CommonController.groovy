@@ -104,7 +104,22 @@ class CommonController {
 		render returnMap as JSON
 	}
 	
-	def validateLinkUrl(def linktext){
-		return HtmlUtil.isMarkupUrl(linktext);
+	def tmLinkableUrl (){
+		def errMsg = null
+		try{
+			def linkableUrl = params["linkableUrl"]
+			def isLinkableUrl = HtmlUtil.isMarkupURL(linkableUrl)
+			if(!isLinkableUrl){
+				errMsg = "The format of the linkable URL is invalid."
+			}
+		}catch(e){
+			e.printStackTrace()
+			errMsg = "There's been an error validating the Linkable Url."
+		}
+		if(errMsg){
+			ServiceResults.respondWithError(response, errMsg)
+		}else{
+			ServiceResults.respondWithSuccess(response, [])
+		}
 	}
 }

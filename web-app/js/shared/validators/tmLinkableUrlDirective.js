@@ -19,9 +19,9 @@ app.directive('ensureUnique', ['$http', function($http) {
 }]);
 */
 
-tds.comments.directive.TmLinkableUrl = function($http) {
+tds.comments.directive.TmLinkableUrl = function($http, utils) {
   return {
-            template: '<input id=\"instructionsLinkId\" placeholder=\"Enter URL or Label|URL\" ng-model=\"ac.instructionsLink\" ng-maxlength=\"255\"></input>',
+            template: '<input id=\"instructionsLinkId\" ng-blur=\"validateInstructionsLink()\" placeholder=\"Enter URL or Label|URL\" ng-model=\"ac.instructionsLink\" ng-maxlength=\"255\"></input>',
             restrict: 'E',
             link: function (scope, element, attrs, ngModel) {
               /*attrs.$observe('ngModel', function(value){ 
@@ -30,9 +30,23 @@ tds.comments.directive.TmLinkableUrl = function($http) {
                 });
               });*/
             },
-            controller: function () {
+            controller: function ($scope) {
+              $scope.validateInstructionsLink = function(){
+                var ilValue = $scope.ac.instructionsLink
+                $("#saveAndCloseBId").attr('disabled', true)
+                $http.get(utils.url.applyRootPath("/common/tmLinkableUrl?linkableUrl=" + ilValue))
+                  .success(function(data, status, headers, config) {
+                    if(data.status == "error" && data.errors){
+                      alert(data.errors[0])
+                    }
+                    $("#saveAndCloseBId").removeAttr('disabled')
+                  })
+                  .error(function(data, status, headers, config) {
+                    alert("There's been an error validating the Linkable Url.")
+                });
 
+              }
             }
         };
    }
-tds.comments.module.directive('tmLinkableUrl', ['$http', tds.comments.directive.TmLinkableUrl]);
+tds.comments.module.directive('tmLinkableUrl', ['$http', 'utils',  tds.comments.directive.TmLinkableUrl]);
