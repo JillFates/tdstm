@@ -19,15 +19,20 @@ app.directive('ensureUnique', ['$http', function($http) {
 }]);
 */
 
-angular.module('Validation', [])
-  .directive('tmLinkableUrl', function($http){
-    return{
-      restrict: 'A',
-      require: 'ngModel',
-      link: function(scope, elem, attrs, ctrl){
-        scope.$watch(attrs.ngModel, function(){
-          alert(attrs)
-        })
-      }
-    }
-  })
+tds.comments.directive.TmLinkableUrl = function($http) {
+  return {
+            template: '<input id=\"instructionsLinkId\" placeholder=\"Enter URL or Label|URL\" ng-model=\"ac.instructionsLink\" ng-maxlength=\"255\"></input>',
+            restrict: 'E',
+            link: function (scope, element, attrs, ngModel) {
+              /*attrs.$observe('ngModel', function(value){ 
+                scope.$watch(value,function(newValue){ 
+                    console.log(newValue);  // el nuevo valor, recuerdo que cuando se genera, es un nuevo valor
+                });
+              });*/
+            },
+            controller: function () {
+
+            }
+        };
+   }
+tds.comments.module.directive('tmLinkableUrl', ['$http', tds.comments.directive.TmLinkableUrl]);
