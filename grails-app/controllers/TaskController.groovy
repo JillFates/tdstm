@@ -5,8 +5,9 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 
 import grails.converters.JSON
 import groovy.time.TimeCategory
@@ -690,40 +691,82 @@ digraph runbook {
 	 * Used to render neighborhood task graphs by passing the id argument to the taskGraph
 	 */
 	def neighborhoodGraph() {
-		Long id = params.id?.isLong() ? params.id.toLong() : 0L
-		forward action:'taskGraph', params: ['neighborhoodTaskId':id]
+		forward action:'taskGraph', params: ['neighborhoodTaskId': params.id]
 	}
 
+	/**
+	 * Generates the main view for Event Task and Neighborhood Task Graphs
+	 */
 	def taskGraph() {
-		// handle project
-		def project = securityService.getUserCurrentProject()
-		if ( ! project ) {
-			flash.message = "You must select a project in order to use the task timeline."
-			redirect(controller:"project", action:"list")
+		// Check user perms and get the project/user account
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'ViewTaskGraph')
+		if (!project) {
+			// Bounce them if they don't have a project or no perms for this controller
 			return
 		}
-		
-		// handle neighborhood graph specification
-		def neighborhoodTaskId = params.neighborhoodTaskId ?: -1
+
+		// Lookup a neighborhood task and adjust accordingly if the user passed a valid id
+		AssetComment neighborTask
+		def neighborhoodTaskId = NumberUtil.toPositiveLong(params.neighborhoodTaskId, -1)
+		if (neighborhoodTaskId > 0) {
+			neighborTask = AssetComment.get(neighborhoodTaskId)
+			if (neighborTask) {
+				// Make sure the user is trying to reference a task associated with their present project
+				if (neighborTask.project.id != project.id) {
+					securityService.reportViolation("Attempt to access task ($neighborhoodTaskId) not associated with project ${project.projectCode}", user)
+					neighborhoodTaskId = -1
+					neighborTask = null
+				}
+			}
+		}
 
 		// if user used the event selector on the page, update their preferences with the new event
-		if (params.moveEventId && params.moveEventId.isLong())
-			userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+		// TODO : JPM 2/2016 Refactor this into a method
+		Long meId 
+		if (params.moveEventId) {
+			meId = NumberUtil.toPositiveLong(params.moveEventId, -1)
+			if (meId > 0) {
+				MoveEvent me = MoveEvent.get(meId)
+				if (me) {
+					if (me.project.id == project.id) {
+						userPreferenceService.setPreference("MOVE_EVENT", params.moveEventId)
+					} else {
+						securityService.reportViolation("Attempt to reference event id ($meId) not associated with project ${project.projectCode}", user)
+						meId = 0
+					}
+				}
+			}
+		}
 
-		// handle move events
-		def moveEvents = MoveEvent.findAllByProject(project)
+		String viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
+
+		List eventList = MoveEvent.findAllByProject(project)
+		def selectedEventId = 0
+
 		def eventPref = userPreferenceService.getPreference("MOVE_EVENT") ?: '0'
-		long selectedEventId = 0
-		if (neighborhoodTaskId != -1) {
-			selectedEventId = AssetComment.get(neighborhoodTaskId)?.moveEvent?.id
-			userPreferenceService.setPreference("MOVE_EVENT", selectedEventId.toString())
-		} else if (eventPref.isLong() && eventPref.toLong() != 0) {
-			selectedEventId = eventPref.toLong()
+		if (eventPref != '0' && eventPref != meId && ! eventList.find {it.id == eventPref}) {
+			// The user preference references an invalid event so we should clear it out
+			eventPref = "0"
+			userPreferenceService.removePreference("MOVE_EVENT")
+		}
+
+		// Determine what the Selected Event should be with the following rules
+		//    1. If user clicked on a neighborhood task, get the event from that task. If the task is not assigned to an event - try next
+		//    2. Otherwise if the user specified an event use it 
+		//	  3. Lastly use the user's saved preference
+		if (neighborTask) {
+			selectedEventId = neighborTask.moveEvent?.id
+		} 
+		if (! selectedEventId) {
+			selectedEventId = meId ?: eventPref
 		}
 		
-		def viewUnpublished = userPreferenceService.getPreference("viewUnpublished") == 'true' ? '1' : '0'
-		
-		return [moveEvents:moveEvents, selectedEventId:selectedEventId, neighborhoodTaskId:neighborhoodTaskId, viewUnpublished:viewUnpublished]
+		return [
+			moveEvents: eventList, 
+			selectedEventId: selectedEventId, 
+			neighborhoodTaskId: neighborhoodTaskId, 
+			viewUnpublished: viewUnpublished
+		]
 	}
 	
 	/**
