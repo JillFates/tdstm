@@ -89,9 +89,12 @@ class WorkbookUtil {
 					break;
 				case Cell.CELL_TYPE_STRING:
 					for(def formatterType : formatterTypes) {
-						result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType)
-						if (result) {
-							break
+						try{
+							result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType)
+							if (result) {
+								break
+							}
+						}catch(e){
 						}
 					}
 					break;

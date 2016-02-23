@@ -419,7 +419,7 @@ class TimeUtil {
 		try {
 			result = formatter.parse(dateValue)
 		} catch (Exception e) {
-			LOG.error("Invalid date time: " + e.getMessage(), e)
+			LOG.warn("Invalid date time: " + dateValue)
 		}
 		return result
 	}
