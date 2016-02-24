@@ -1020,8 +1020,6 @@ class CookbookService {
 	*/
 	List<Map> basicValidateSyntax( sourceCode ) {
 
-		def session = serviceHelperService?.getService('userPreference')?.getSession()
-
 		def errorList = [] as HashSet
 		def recipe
 		def msg
@@ -1504,9 +1502,9 @@ class CookbookService {
 						def ct = task.constraintTime
 						def t
 						if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}/ ) {
-							t = TimeUtil.parseDate(session, ct)
+							t = TimeUtil.parseDate(TimeUtil.FORMAT_DATE, ct)
 						} else if (ct ==~ /\d{1,2}\/\d{1,2}\/\d{4}.*/ ) {
-							t = TimeUtil.parseDateTime(session, ct)
+							t = TimeUtil.parseDate(TimeUtil.FORMAT_DATE_TIME, ct, TimeUtil.FORMAT_DATE_TIME)
 						} else if ( ct ==~ /^#.*/ ) {
 							t = ct
 						} else if ( ct ==~ /^(?i)(\d{1,}|es|ec).*/ ) {
