@@ -73,9 +73,9 @@
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
-					{name:'comment', width:450, formatter:taskFormatter},
+					{name:'comment', width:350, formatter:taskFormatter},
 					{name:'${taskPref['1']}', formatter:assetFormatter, width:120},
-					{name:'${taskPref['2']}', formatter:taskFormatter, width:120},
+					{name:'${taskPref['2']}', formatter:taskFormatter, width:90},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false, width:70},
 					{name:'dueDate', formatter: dueFormatter, width:80},
 					{name:'status', formatter: statusFormatter, width:70},
