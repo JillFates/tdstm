@@ -802,6 +802,11 @@ svg {
 	width: 140px !important;
 }
 
+#applicationIdGrid_moveBundle {
+	display: block;
+	width: initial !important;
+}
+
 .ui-jqgrid-htable thead {
 	z-index: 15 !important;
 	border-bottom: 1px solid #CCCCCC !important;
