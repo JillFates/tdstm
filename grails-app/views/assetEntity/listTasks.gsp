@@ -17,7 +17,7 @@
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
 	<g:javascript src="TimerBar.js" />
-	
+
 	<g:render template="../layouts/angularResources" />
 
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
@@ -69,21 +69,15 @@
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>"
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
-				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
-					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
+				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
-					{name:'comment', width:680, formatter:taskFormatter},
-					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
-					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
-					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
-					{name:'dueDate', formatter: dueFormatter},
-					{name:'status', formatter: statusFormatter},
-					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
-					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
-					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
-					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
-					{name:'score', formatter:taskFormatter, search:false, width:70},
+					{name:'comment', width:550, formatter:taskFormatter},
+					{name:'${taskPref['1']}', formatter:assetFormatter, width:120},
+					{name:'${taskPref['2']}', formatter:taskFormatter, width:120},
+					{name:'updated', formatter: updatedFormatter,sortable:false,search:false, width:70},
+					{name:'dueDate', formatter: dueFormatter, width:80},
+					{name:'status', formatter: statusFormatter, width:80},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
