@@ -73,17 +73,17 @@
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
-					{name:'comment', width:550, formatter:taskFormatter},
+					{name:'comment', width:450, formatter:taskFormatter},
 					{name:'${taskPref['1']}', formatter:assetFormatter, width:120},
 					{name:'${taskPref['2']}', formatter:taskFormatter, width:120},
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false, width:70},
 					{name:'dueDate', formatter: dueFormatter, width:80},
-					{name:'status', formatter: statusFormatter, width:80},
+					{name:'status', formatter: statusFormatter, width:70},
 					{name:'${taskPref['3']}', formatter:taskFormatter, width:120},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:120},
-					{name:'${taskPref['5']}', formatter:taskFormatter, width:120},
+					{name:'${taskPref['5']}', formatter:taskFormatter, width:90},
 					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
-					{name:'score', formatter:taskFormatter, search:false, width:70},
+					{name:'score', formatter:taskFormatter, search:false, width:60},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
