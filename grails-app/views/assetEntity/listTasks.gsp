@@ -69,7 +69,8 @@
 				<tdsactionbutton id='bulkEdit' label='Bulk Edit' icon='' link='' ng-click='comments.bulkEditTasks()'></tdsactionbutton>"
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
-				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status', 'id', 'statusCss'"
+				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
+					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
 					{name:'comment', width:550, formatter:taskFormatter},
@@ -78,6 +79,11 @@
 					{name:'updated', formatter: updatedFormatter,sortable:false,search:false, width:70},
 					{name:'dueDate', formatter: dueFormatter, width:80},
 					{name:'status', formatter: statusFormatter, width:80},
+					{name:'${taskPref['3']}', formatter:taskFormatter, width:120},
+					{name:'${taskPref['4']}', formatter:taskFormatter, width:120},
+					{name:'${taskPref['5']}', formatter:taskFormatter, width:120},
+					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
+					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
