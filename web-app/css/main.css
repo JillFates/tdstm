@@ -802,9 +802,14 @@ svg {
 	width: 140px !important;
 }
 
-#applicationIdGrid_moveBundle {
+/* TM-4614 see jqgrid-support.js line 70*/
+.thForceTableFixed {
 	display: block;
 	width: initial !important;
+}
+
+.thForceTableFixed .ui-jqgrid-sortable {
+	padding-top: 1px;
 }
 
 .ui-jqgrid-htable thead {

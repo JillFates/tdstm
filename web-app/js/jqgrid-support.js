@@ -67,6 +67,12 @@ function bindResize (gridId) {
  * @param String gridId The id of the grid
  */
 function resizeGrid (gridId) {
+	/**
+	 * Polyfill
+	 * Introduced by the last changes on CSS3 that in browser like Safari
+	 * the table-fixed thread as is supposed and max-width is not allowed anymore at table level.
+	 */
+	$('.ui-jqgrid-htable tr:nth-child(1) th.ui-th-column:visible:last').addClass('thForceTableFixed');
 	var horizontalOffset = $('#'+gridId+'Wrapper').offset().left + 1;
 	var windowWidth = $(window).width();
 		
