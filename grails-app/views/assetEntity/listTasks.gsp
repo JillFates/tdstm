@@ -70,7 +70,7 @@
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
-					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
+					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60},
 					{name:'comment', width:240, formatter:taskFormatter},
@@ -82,8 +82,6 @@
 					{name:'${taskPref['3']}', formatter:taskFormatter, width:60},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:60},
 					{name:'${taskPref['5']}', formatter:taskFormatter, width:70},
-					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:20},
-					{name:'score', formatter:taskFormatter, search:false, width:30},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
