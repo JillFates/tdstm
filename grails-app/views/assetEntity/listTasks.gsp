@@ -10,16 +10,16 @@
 	<meta name="layout" content="projectHeader" />
 	<title>Task Manager</title>
 	<g:javascript src="asset.tranman.js" />
+	<g:javascript src="asset.comment.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="projectStaff.js" />
 	<g:javascript src="model.manufacturer.js"/>
-
+	<jqgrid:resources />
+	<g:javascript src="jqgrid-support.js" />
 	<g:javascript src="TimerBar.js" />
 
 	<g:render template="../layouts/angularResources" />
-	<g:javascript src="asset.comment.js" />
-	<jqgrid:resources />
-	<g:javascript src="jqgrid-support.js" />
+
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
@@ -72,20 +72,21 @@
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
 					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
-					{name:'taskNumber', formatter:taskFormatter, width:60},
-					{name:'comment', width:240, formatter:taskFormatter},
-					{name:'${taskPref['1']}', formatter:assetFormatter, width:75},
-					{name:'${taskPref['2']}', formatter:taskFormatter, width:75},
-					{name:'updated', formatter: updatedFormatter,sortable:false,search:false, width:55},
-					{name:'dueDate', formatter: dueFormatter, width:55},
-					{name:'status', formatter: statusFormatter, width:35},
-					{name:'${taskPref['3']}', formatter:taskFormatter, width:60},
-					{name:'${taskPref['4']}', formatter:taskFormatter, width:60},
-					{name:'${taskPref['5']}', formatter:taskFormatter, width:70},
+					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
+					{name:'comment', width:680, formatter:taskFormatter},
+					{name:'${taskPref['1']}', formatter:assetFormatter, width:200},
+					{name:'${taskPref['2']}', formatter:taskFormatter, width:200},
+					{name:'updated', formatter: updatedFormatter,sortable:false,search:false},
+					{name:'dueDate', formatter: dueFormatter},
+					{name:'status', formatter: statusFormatter},
+					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
+					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
 				rowNum="sizePref"
+				scrollOffset="0"
 				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
