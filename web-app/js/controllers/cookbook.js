@@ -2419,10 +2419,10 @@ tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $sta
 	});
 
 	$scope.toggleFullScreenMode = function(){
-		$(".modal-dialog").toggleClass("modal-dialog-fullscreen");
-		$(".modal-content").toggleClass("modal-content-fullscreen");
-		$(".modal-body").toggleClass("modal-body-fullscreen");
-		$(".modal-content  .CodeMirror-wrap").toggleClass("CodeMirror-wrap-fullscreen");
+		$("div.code-editor-modal .modal-dialog").toggleClass("modal-dialog-fullscreen");
+		$("div.code-editor-modal .modal-content").toggleClass("modal-content-fullscreen");
+		$("div.code-editor-modal .modal-body").toggleClass("modal-body-fullscreen");
+		$("div.code-editor-modal .modal-content  .CodeMirror-wrap").toggleClass("CodeMirror-wrap-fullscreen");
 		$scope.codeEditorOptions.fullScreen = !$scope.codeEditorOptions.fullScreen;
 		$("[ui-codemirror='codeEditorOptions']").toggleClass("sourceCode-fullscreen");
 	};
