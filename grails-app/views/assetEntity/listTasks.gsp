@@ -70,7 +70,7 @@
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
-					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'id', 'statusCss'"
+					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}',  'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
 					{name:'comment', width:680, formatter:taskFormatter},
@@ -82,6 +82,7 @@
 					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
+					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
