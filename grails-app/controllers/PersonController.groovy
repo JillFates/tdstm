@@ -721,12 +721,15 @@ def test = {
 			// TODO : JPM 5/2015 : Change the way that the delete is occurring
 			def prePreference = UserPreference.findAllByUserLogin(userLogin).preferenceCode
 			prePreference.each{ preference->
-			  def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
-				 preferenceInstance.delete()
-
+			  	def preferenceInstance = UserPreference.findByPreferenceCodeAndUserLogin(preference,userLogin)
+				 	// When clearing preference, the RefreshMyTasks should be the same.
+				  	if(preferenceInstance.preferenceCode != 'RefreshMyTasks') {
+						preferenceInstance.delete()
+				  	}
 			}
 
 			userPreferenceService.setPreference("START_PAGE", "Current Dashboard" )
+			// Is there any reason to return an object? can't be just a POST/UPDATE -no return- operation?
 			render person
 		} catch (e) {
 			ServiceResults.respondWithError(response, e.getMessage())
