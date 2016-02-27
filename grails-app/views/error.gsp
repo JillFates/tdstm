@@ -30,7 +30,7 @@
 		<input id="contextPath" type="hidden" value="/tdstm"/>
 		<div class="tds_header">
 			<div class="header_left">
-				<a href="http://www.transitionaldata.com/" target="new"><img src="${resource(dir:'tdstm/images',file:'tds3.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
+				<a href="http://www.transitionaldata.com/" target="new"><img src="${resource(dir:'images',file:'TMMenuLogo.png')}" style="float: left;border: 0px;height: 30px;"/></a>      	    	 
 			</div>
 			<div class="title">&nbsp;TransitionManager&trade; Error</div>
 		</div>
