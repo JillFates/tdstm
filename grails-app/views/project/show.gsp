@@ -55,7 +55,7 @@
 							<td class="valueNW"><tds:convertDate date="${projectInstance?.completionDate}" /></td>
 						</tr>
 						<tr class="prop">
-							<td class="name">Associated Partners:</td>
+							<td class="name">Associated Partner(s):</td>
 							<td class="valueNW">
 								<ul>
 								<g:each status="i" in="${projectPartners}" var="partner">
@@ -63,7 +63,7 @@
 								</g:each>
 								</ul>
 							</td>
-							<td class="name">Partner Image:</td>
+							<td class="name">Partner Logo:</td>
 							<td class="valueNW">
 								<g:if test="${projectLogoForProject}"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></g:if>
 							</td>
@@ -73,12 +73,12 @@
 							<td class="valueNW">
 								<ul>
 									<g:each status="i" in="${projectManagers}" var="manager">
-									<li>${manager?.partyIdTo?.lastNameFirstAndTitle}</li>
+									<li>${manager.toString() + (manager.title ? ', '+manager.title : '') }</li>
 									</g:each>
 								</ul>
 								<br>
 								<tds:hasPermission permission='EditProjectStaff'>
-								<g:link class="mmlink" controller="person" action="manageProjectStaff" params="[role: 'PROJ_MGR']">Manage</g:link>
+								<g:link class="mmlink" controller="person" action="manageProjectStaff" params="[role: 'PROJ_MGR', clientStaff: '1']">Manage</g:link>
 								</tds:hasPermission>
 							</td>
 							<td class="name">Default Bundle:</td>
@@ -86,10 +86,8 @@
 						</tr>
 						<tr class="prop">
 							<td class="name">Workflow:</td>
-							<td class="valueNW" nowrap="nowrap">${fieldValue(bean:projectInstance, field:'workflowCode')} &nbsp;&nbsp;
-								<span class="name">Runbook Driven: </span>&nbsp;
-								<span class="valueNW"><input type="checkbox" name="runbookOn" id="runbookOn" 
-								${ (projectInstance.runbookOn==1 ? 'checked="checked"':'') } disabled="disabled" /></span>
+							<td class="valueNW" nowrap="nowrap">
+								${fieldValue(bean:projectInstance, field:'workflowCode')} 
 							</td>
 							<td class="name">Time Zone:</td>
 							<td class="valueNW">${projectInstance.timezone?projectInstance.timezone.code:''}</td>

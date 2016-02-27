@@ -316,12 +316,14 @@
 		}
 	    </script>
 	<%
+	/*
 		def currProj = session.getAttribute("CURR_PROJ");
 		def projectId = currProj.CURR_PROJ;
 		def currProjObj;
 		if (projectId != null) {
 			currProjObj = Project.findById(projectId);
 		}
+	*/
 	%>
 	<r:layoutResources/>
 </head>
@@ -344,7 +346,10 @@
 								<label for="client"><b>Client:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW">
-								<select id="clientId" name="client.id" onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(XMLHttpRequest)' )}">
+								<select id="clientId" name="client.id" tabindex="100" 
+								data-placeholder="Please select a client"
+								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(XMLHttpRequest)' )}">
+									<option value=""></option>
 									<g:each in="${clients}" var="client" status="i">
 									    <option value="${client.partyIdTo.id}">${client.partyIdTo}</option>
 									</g:each>
@@ -354,7 +359,7 @@
 								<label for="projectCode"><b>Project Code:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectCode','errors')}">
-								<input type="text" id="projectCode" name="projectCode" maxlength="20" value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
+								<input type="text" id="projectCode" name="projectCode" tabindex="110" maxlength="20" value="${fieldValue(bean:projectInstance,field:'projectCode')}" />
 								<g:hasErrors bean="${projectInstance}" field="projectCode">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="projectCode" />
@@ -367,7 +372,7 @@
 								<label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'name','errors')}">
-								<input type="text" id="name" name="name" maxlength="64" value="${fieldValue(bean:projectInstance,field:'name')}" />
+								<input type="text" id="name" name="name" tabindex="120" maxlength="64" value="${fieldValue(bean:projectInstance,field:'name')}" />
 								<g:hasErrors bean="${projectInstance}" field="name">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="name" />
@@ -378,7 +383,7 @@
 								<label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
-								<g:select id="projectType" name="projectType" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
+								<g:select id="projectType" name="projectType" tabindex="130" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
 								<g:hasErrors bean="${projectInstance}" field="projectType">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
 								</g:hasErrors>
@@ -390,6 +395,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 								<textarea rows="3" cols="40" id="description" name="description" 
+									tabindex="140"
 									placeholder="Enter a short description of the project"
 									onkeydown="textCounter(this.id,200);" 
 									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
@@ -404,6 +410,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
 								<textarea rows="3" cols="40" id="comment" name="comment"
+									tabindex="150"
 									onkeydown="textCounter(this.id,200);"
 									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 								<g:hasErrors bean="${projectInstance}" field="comment">
@@ -421,7 +428,7 @@
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
+								<input type="text" class="dateRange" tabindex="160" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
 									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" /> 
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
@@ -438,7 +445,7 @@
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId"	
+								<input type="text" class="dateRange" tabindex="170" size="15" style="width: 112px; height: 14px;" id="completionDateId"	
 									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" />" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
@@ -448,17 +455,17 @@
 
 						<tr class="prop">
 							<td class="name">
-								<label for="projectPartner">Partners:</label>
+								<label for="projectPartner">Associated Partner(s):</label>
 							</td>
 							<td class="valueNW">
-								<input type="button" value="Add Partner" onclick="Project.addPartnerSelect('#partnersContainer');">
+								<input type="button" value="Add Partner" tabindex="180" onclick="Project.addPartnerSelect('#partnersContainer');">
 								<div id="partnersContainer"></div>
 							</td>
 							<td class="name">
-								<label for="client">Partner Image:</label>
+								<label for="client">Partner Logo:</label>
 							</td>
 							<td class="valueNW">
-								<input type="file" name="partnerImage" id="partnerImage" />
+								<input type="file" name="partnerImage" id="partnerImage" tabindex="190" />
 							</td>
 						</tr>
 						<tr class="prop">
@@ -466,12 +473,12 @@
 								<label for="projectManager">Project Manager:</label>
 							</td>
 							<td class="valueNW">
-								<input type="text" id="projectManagerId" name="projectManagerId">
+								<input type="text" id="projectManagerId" name="projectManagerId" tabindex="200">
 							</td>
 							<td class="name">Time Zone:</td>
 							<td class="valueNW">
 								<input type="text" id="timezone" name="timezone" value="${defaultTimeZone}" readonly style="width: 200px; padding-right: 20px">
-								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');">
+								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');" tabindex="210">
 							</td>
 						</tr>
 						<tr class="prop">
@@ -482,19 +489,9 @@
 								<g:select id="workflowCode" name="workflowCode"
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
-									noSelection="['STD_PROCESS':'STD_PROCESS']">
-								</g:select><br><br>
-								<span class="name">
-									<label for="runbookOn">Runbook Driven:&nbsp;</label>
-								</span>
-								<span class="value ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
-									<input type="checkbox" name="runbookOn" id="runbookOn" ${projectInstance.runbookOn ? 'checked="checked"' : ''} />
-									<g:hasErrors bean="${projectInstance}" field="runbookOn">
-										<div class="errors">
-											<g:renderErrors bean="${projectInstance}" as="list" field="runbookOn" />
-										</div>
-									</g:hasErrors>
-								</span>
+									noSelection="['STD_PROCESS':'STD_PROCESS']" 
+									tabindex="220">
+								</g:select>
 								<g:hasErrors bean="${projectInstance}" field="workflowCode">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="workflowCode" />
@@ -507,10 +504,10 @@
 			</div>
 			<div class="buttons">
 				<span class="button">
-					<input class="save" type="submit" value="Save" onclick="return validateForm();" />
+					<input class="save" type="submit" value="Save" tabindex="300" onclick="return validateForm();" />
 				</span>
 				<span class="button">
-					<input type="button" class="cancel" value="Cancel" onclick="window.history.back()" />
+					<input type="button" class="cancel" value="Cancel" tabindex="310" onclick="window.history.back()" />
 				</span>
 			</div>
 		</g:form>
@@ -521,11 +518,21 @@
 
 	<g:javascript>
 		initialize();
+
+		$(window).load(function() {
+			currentMenuId = "#projectMenu";
+			$("#projectMenuId a").css('background-color','#003366');
+
+			// Disable the Enter Key from submitting the form (issue with the select2)
+			$(window).keydown( function(event) {
+				if(event.keyCode == 13) {
+					event.preventDefault();
+					return false;
+				}
+			});
+		});
 	</g:javascript>
-	<script>
-		currentMenuId = "#projectMenu";
-		$("#projectMenuId a").css('background-color','#003366')
-	</script>
+
 	<r:layoutResources/>
 </body>
 </html>

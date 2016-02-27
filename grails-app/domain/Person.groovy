@@ -86,9 +86,13 @@ class Person extends Party {
 		'name'
 	]
 
-
-	String name(){
-		return getLastNameFirst()
+	/**
+	 * This method was incorrectly implemented but not sure where it may be used so an exception has been
+	 * added so that we may catch any possible location in testing. At some point we can blow away this method.
+	 * JPM 2/26/2016
+	 */
+	String name() {
+		throw new RuntimeException("Person.name method should not be used")
 	}
 
 	/**

@@ -619,39 +619,86 @@ class ProjectService {
 		}
 	}
 
-	def updateProjectPartners(projectInstance, partnersIds) {
-		// Get current partners in the database
-		def currentPartnersIds = []
-		def currentPartners = partyRelationshipService.getProjectPartners(projectInstance)
-		if (currentPartners) {
-			currentPartners.each{ p ->
-				currentPartnersIds << p.id
+	/**
+	 * Used to add/remove partners from a project by taking the 
+	 * @param projectInstance - the project that is being updated
+	 * @param partnerIds - a single id or a list of ids
+	 * @throws InvalidParamException when the partner ids are invalid or not associated with the owner of the project
+	 */
+	void updateProjectPartners(Project projectInstance, def partnersIds) {
+
+		// Get a list of the partners associated to the owner of the project plus the partners assigned to the project
+		Party projectOwner = projectInstance.getOwner() 
+		List ownerPartners = partyRelationshipService.getCompanyPartners(projectOwner)
+		List ownerPartnerIds = ownerPartners*.partyIdTo.id
+
+		// Get current partners associated to the project
+		List currentPartners = partyRelationshipService.getProjectPartners(projectInstance)
+		List currentPartnersIds = currentPartners*.id
+
+		// Convert the Partner Ids parameter into a List if not already (single values appear as a string)
+		if (partnersIds == null) {
+			partnersIds = []
+		} else if ( partnersIds instanceof String ) {
+			log.debug "param partnersIds is ${partnersIds?.getClass().getName()} : $partnersIds"
+			if (partnersIds) {
+				partnersIds = [ partnersIds ]
+			} else {
+				// The string could be null
+				partnersIds = []
 			}
+		} else {
+			// Need to cast the Ljava.lang.String to List
+			List ids = []
+			partnersIds.each { if (it) ids << it }
+			partnersIds = ids
+			// Lets weed out the possibility of duplicates
+			partnersIds.unique()
 		}
-		// Convert selected partners to long
+		
+		// Convert partners to Long
 		def newPartnersIds = []
-		if (partnersIds) {
-			partnersIds.each{ p ->
-				if (!StringUtil.isBlank(p)) {
-					newPartnersIds << NumberUtil.toLong(p)	
+		partnersIds.each { p ->
+			Long pid
+			if (p instanceof Long) {
+				pid = p
+			} else {
+				pid = NumberUtil.toPositiveLong(p, -1)
+				if (pid == -1) {
+					throw new InvalidParamException("Invalid partner id was specified ($p)")
 				}
 			}
+
+			// Make sure that the partner Id is a valid partner assoicated with the company
+			if (! ownerPartnerIds.contains(pid)) {
+				log.debug "Project $projectInstance owner $projectOwner partner ids are $ownerPartnerIds"
+				throw new InvalidParamException("Partner id specified is not associated with project ($pid)")
+			}
+			newPartnersIds << pid
 		}
+
 		// Define which partners should be deleted because are not in the new list
-		def toDeletePartners = currentPartnersIds - newPartnersIds
+		List toDeletePartners = currentPartnersIds - newPartnersIds
 		// Define which partners should be created because are new in the list
-		def toAddPartners = newPartnersIds - currentPartnersIds
-		def partnerParty = null
+		List toAddPartners = newPartnersIds - currentPartnersIds
+
+		Party partnerParty
 
 		// Add partners to the relationship 
-		toAddPartners.each{ partnerId ->
+		toAddPartners.each { partnerId ->
 			partnerParty = Party.findById(partnerId)
+			if (! partnerParty) {
+				throw new InvalidParamException("Partner id specified is not found ($partnerId)")
+			} else if (partnerParty.partyType.id != 'COMPANY') {
+				log.debug "Check partner type failed $partnerParty where type is ${partnerParty?.partyType}"
+				throw new InvalidParamException("Partner id specified is not a company ($partnerId)")
+			}
 			partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
 		}
 		
 		// Delete partners from the relationship
 		def partnerStaff
-		toDeletePartners.each{ partnerId ->
+		toDeletePartners.each { partnerId ->
 			partnerParty = Party.findById(partnerId)
 			def query = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = :partnerParty and " +
 				"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
@@ -662,8 +709,9 @@ class ProjectService {
 					idsToDelete << ps.partyIdTo.id
 				}
 				def idsToDeleteValue = idsToDelete.join(",")
+
 				jdbcTemplate.update("DELETE FROM party_relationship WHERE party_relationship_type_id = 'PROJ_STAFF' AND " +
-						"party_id_from_id = $projectInstance.id AND role_type_code_from_id = 'PROJECT' AND party_id_to_id IN ($idsToDeleteValue)")
+					"party_id_from_id = $projectInstance.id AND role_type_code_from_id = 'PROJECT' AND party_id_to_id IN ($idsToDeleteValue)")
 			}
 
 			partyRelationshipService.deletePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )

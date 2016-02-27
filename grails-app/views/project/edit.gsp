@@ -36,7 +36,7 @@
 							<td class="name">Project Code:</td>
 					
 							<td class="valueNW ${hasErrors(bean:projectInstance, field:'projectCode','errors')}">
-								<input type="text" id="projectCode" name="projectCode" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
+								<input type="text" id="projectCode" name="projectCode" indextab="110" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
 								<g:hasErrors bean="${projectInstance}" field="projectCode">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="projectCode" />
@@ -49,7 +49,7 @@
 								<label for="name"><b>Project Name:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'name','errors')}">
-								<input type="text" id="name" name="name" maxlength="64" value="${fieldValue(bean:projectInstance,field:'name')}" />
+								<input type="text" id="name" name="name" maxlength="64" indextab="120" value="${fieldValue(bean:projectInstance,field:'name')}" />
 								<g:hasErrors bean="${projectInstance}" field="name">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="name" />
@@ -60,7 +60,7 @@
 								<label for="projectType"><b>Project Type:&nbsp;<span style="color: red">*</span></b></label>
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'projectType','errors')}">
-								<g:select id="projectType" name="projectType" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
+								<g:select id="projectType" name="projectType" indextab="130" from="${projectInstance.constraints.projectType.inList}" value="${projectInstance.projectType}"></g:select>
 								<g:hasErrors bean="${projectInstance}" field="projectType">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="projectType" /></div>
 								</g:hasErrors>
@@ -72,6 +72,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'description','errors')}">
 								<textarea rows="3" cols="40" id="description" name="description"
+									indextab="140" 
 									placeholder="Enter a short description of the project"
 									onkeydown="textCounter(this.id,200);"
 									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'description')}</textarea>
@@ -86,6 +87,7 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'comment','errors')}">
 								<textarea rows="3" cols="40" id="comment" name="comment"
+									indextab="150" 
 									onkeydown="textCounter(this.id,200);"
 									onkeyup="textCounter(this.id,200);">${fieldValue(bean:projectInstance,field:'comment')}</textarea>
 								<g:hasErrors bean="${projectInstance}" field="comment">
@@ -103,7 +105,7 @@
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
+								<input type="text" class="dateRange" indextab="160" size="15" style="width: 112px; height: 14px;" name="startDate" id="startDateId"
 									value="<tds:convertDate date="${prevParam?.startDate?: projectInstance?.startDate}" />" onchange="setCompletionDate(this.value);isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="startDate">
 									<div class="errors">
@@ -120,7 +122,7 @@
 								<script type="text/javascript" charset="utf-8">
 									jQuery(function($){$('.dateRange').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true,beforeShow: customRange});function customRange(input) {return null;}});
 								</script>
-								<input type="text" class="dateRange" size="15" style="width: 112px; height: 14px;" id="completionDateId" 
+								<input type="text" class="dateRange" indextab="170" size="15" style="width: 112px; height: 14px;" id="completionDateId" 
 									name="completionDate" value="<tds:convertDate date="${prevParam?.completionDate?: projectInstance?.completionDate}" />" onchange="isValidDate(this.value);" />
 								<g:hasErrors bean="${projectInstance}" field="completionDate">
 									<div class="errors"><g:renderErrors bean="${projectInstance}" as="list" field="completionDate" /></div>
@@ -130,23 +132,23 @@
 		
 						<tr class="prop">
 							<td class="name">
-								<label for="projectPartners">Partners:</label>
+								<label for="projectPartners">Associated Partner(s):</label>
 							</td>
 							<td class="valueNW">
-								<input type="button" value="Add Partner" onclick="Project.addPartnerSelect('#partnersContainer');">
+								<input type="button" value="Add Partner" indextab="180" onclick="Project.addPartnerSelect('#partnersContainer');">
 								<div id="partnersContainer"></div>
 							</td>
 							<td class="name">
-								<label for="client">Partner Image:</label>
+								<label for="client">Partner Logo:</label>
 							</td>
 							<g:if test="${projectLogoForProject}">
 								<td class="valueNW">
-									<g:link  action="deleteImage" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link>
+									<g:link action="deleteImage" indextab="200" params='["id":projectInstance?.id]'><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;border:0px;"/><img src="${resource(dir:'icons',file:'delete.png' )}" style="border:0px;padding:6px;"/></g:link>
 								</td>
 							</g:if>
 							<g:else>				
 								<td class="valueNW">
-									<input type="file" name="partnerImage" id="partnerImage" />
+									<input type="file" name="partnerImage" indextab="200" id="partnerImage" />
 								</td>				
 							</g:else>
 						</tr>
@@ -155,28 +157,16 @@
 								<label for="projectManager">Project Managers:</label>
 							</td>
 							<td class="valueNW">
-								<select id="projectManagerId" name="projectManager">
-									<option value="" selected="selected">Please Select </option>
-									<optgroup label="${company.name}" >
-										<g:each status="i" in="${companyStaff}" var="companyStaff">
-											<option value="${companyStaff.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectInstance?.client}">
-										<g:each status="i" in="${clientStaff}" var="clientStaff">
-											<option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectPartner?.partyIdTo}" id="pmGroup">
-										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
-											<option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-								</select>
+								<ul>
+									<g:each status="i" in="${projectManagers}" var="manager">
+									<li>${manager.toString() + (manager.title ? ', '+manager.title : '') }</li>
+									</g:each>
+								</ul>
 							</td>
 							<td class="name">Default Bundle:</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'defaultBundle','errors')}">
 								<g:select id="defaultBundle" name="defaultBundle.id"
+									indextab="220" 
 									from="${moveBundles}" optionKey="id" optionValue="name"
 									value="${projectInstance?.defaultBundle.id}"></g:select>
 							</td>
@@ -187,16 +177,11 @@
 							</td>
 							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
 								<g:select id="workflowCode" name="workflowCode"
+									indextab="230" 
 									from="${workflowCodes}"
 									value="${projectInstance?.workflowCode}"
 									noSelection="['':'Please Select']" onChange="warnForWorkflow()">
-								</g:select><br><br>
-								<span class="name">
-									<label for="runbookOn">Runbook Driven:&nbsp;</label>
-								</span>
-								<span class="valueNW ${hasErrors(bean: projectInstance, field: 'runbookOn', 'errors')}">
-									<input type="checkbox" name="runbookOn" id="runbookOn" ${ (projectInstance.runbookOn == 1 ? 'checked="checked"' : '') } />
-								</span>
+								</g:select>
 								<g:hasErrors bean="${projectInstance}" field="workflowCode">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="workflowCode" />
@@ -204,40 +189,17 @@
 								</g:hasErrors>
 							</td>
 
-							<td class="name">
-								<label for="projectManager">Move Manager:</label>
-							</td>
+							<td class="name">Time Zone:</td>
 							<td class="valueNW">
-								<select id="moveManagerId" name="moveManager">
-									<option value="" selected="selected">Please Select</option>
-									<optgroup label="${company.name}">
-										<g:each status="i" in="${companyStaff}" var="companyStaff">
-											<option value="${companyStaff?.partyIdTo?.id}">${companyStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectInstance?.client}">
-										<g:each status="i" in="${clientStaff}" var="clientStaff">
-											<option value="${clientStaff?.partyIdTo?.id}">${clientStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-									<optgroup label="${projectPartner?.partyIdTo}" id="mmGroup">
-										<g:each status="i" in="${partnerStaff}" var="partnerStaff">
-											<option value="${partnerStaff?.partyIdTo?.id}">${partnerStaff?.partyIdTo?.lastNameFirstAndTitle}</option>
-										</g:each>
-									</optgroup>
-								</select>
-								<input type="hidden" id="companyManagersId" value="${companyStaff.size()+clientStaff.size()+ 1}" />
-
+								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
+								<input type="button" value="Change" indextab="240" onclick="Project.showTimeZoneSelect('timezone');">
+							</td>
+							
 						</tr>
 						<tr class="prop">
 							<td class="name"><label for="dateCreated">Date Created:</label></td>
 							<td class="valueNW">
 								<tds:convertDateTime date="${projectInstance?.dateCreated}" />
-							</td>
-							<td class="name">Time Zone:</td>
-							<td class="valueNW">
-								<input type="text" id="timezone" name="timezone" value="${projectInstance.timezone?projectInstance.timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
-								<input type="button" value="Change" onclick="Project.showTimeZoneSelect('timezone');">
 							</td>
 						</tr>
 						<tr>
