@@ -101,7 +101,7 @@
 			<g:each var="key" in="['1','2','3','4','5']">
 				var taskPref= '${taskPref[key]}';
 				
-				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+")\">");
+				$("#taskListIdGrid_"+taskPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+taskPref+"','taskList','"+${key}+"')\">");
 			</g:each>
 		})
 		
