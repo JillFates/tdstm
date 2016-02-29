@@ -2726,7 +2726,6 @@ function setLabelOffsets (nodeMap) {
 			var node = nodeMap[keys[i]][j];
 			
 			if (node != null && node.showLabel && ! node.dummy) {
-				console.log(node);
 				// get the positional data of this node's label
 				var text = _.unescape($('#label-' + node.id)[0].textContent);
 				if(text.length > 0 ){
