@@ -1049,7 +1049,7 @@ digraph runbook {
 	def eventTimelineResults() {
 
 		// Get the form parameters
-		Boolean showAll = true
+		Boolean showAll = (params.showAll == 'true')
 		String meId = params.eventId	
 
 		def (project, user) = controllerService.getProjectAndUserForPage( this, 'CriticalPathExport' )
@@ -1126,7 +1126,8 @@ digraph runbook {
 			if (showAll) {
 				durationExtra = "<th>Act Duration</th><th>Deviation</th>"
 				timesExtra = "<th>Act Start</th>"
-				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th>"
+				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th><th>Class</th>" + 
+					"<th>Asset Id</th><th>Asset Name</th>"
 			}
 
 			results.append("""<h1>Tasks Details</h1>
@@ -1178,7 +1179,12 @@ digraph runbook {
 				if (showAll) {
 					durationExtra = "<td>$actual</td><td>$deviation</td>"
 					timesExtra = "<td>$actStart</td>"
-					tailExtra = "<td>${t.taskSpec ?: ''}</td><td>${t.hardAssigned==1 ? 'Yes' : ''}</td><td>${t.resolvedBy ?: ''}</td>"
+					tailExtra = "<td>${t.taskSpec ?: ''}</td>" +
+						"<td>${t.hardAssigned==1 ? 'Yes' : ''}</td>" +
+						"<td>${t.resolvedBy ?: ''}</td>" +
+						"<td>${t.assetEntity ? t.assetEntity.assetClass : ''}</td>" +
+						"<td>${t.assetEntity ? t.assetEntity.id : ''}</td>" +
+						"<td>${t.assetEntity ? t.assetEntity.assetName.encodeAsHTML() : ''}</td>"
 				}
 
 				// TODO : add in computation for time differences if both constraint time est and/or actual
@@ -1186,7 +1192,9 @@ digraph runbook {
 	 			def criticalPath = (t.duration > 0 && tmp['tasks'][t.id].tmpEarliestStart == tmp['tasks'][t.id].tmpLatestStart ? 'Yes' : '&nbsp;')
 
 				results.append( """<tr>
-					<td>${t.id}</td><td>${t.taskNumber}</td><td>${t.comment}</td><td>${t.duration}</td>
+					<td>${t.id}</td><td>${t.taskNumber}</td>
+					<td>${t.comment.encodeAsHTML()}</td>
+					<td>${t.duration}</td>
 					${durationExtra}
 					<td>${tmp['tasks'][t.id].tmpEarliestStart}</td><td>${tmp['tasks'][t.id].tmpLatestStart}</td><td>$constraintTime</td>
 					${timesExtra}
