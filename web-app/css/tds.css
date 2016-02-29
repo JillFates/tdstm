@@ -1731,3 +1731,7 @@ tr.requiredField label:after {
 label.disabledLabel {
 	color:gray;
 }
+
+.footnote {
+	font-style: italic;
+}
