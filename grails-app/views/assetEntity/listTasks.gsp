@@ -70,7 +70,7 @@
 
 			<jqgrid:grid id="taskListId"  url="'${createLink(action: 'listTaskJSON')}'"
 				colNames="'Action', 'Task', 'Description', '${modelPref['1']}', '${modelPref['2']}', 'Updated', 'Due', 'Status',
-					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}',  'Score', 'id', 'statusCss'"
+					'${modelPref['3']}', '${modelPref['4']}', '${modelPref['5']}', 'Suc.', 'Score', 'id', 'statusCss'"
 				colModel="{name:'act', index: 'act' , sortable: false, formatter: myCustomFormatter, search:false, width:50, fixed:true},
 					{name:'taskNumber', formatter:taskFormatter, width:60, fixed:true},
 					{name:'comment', width:680, formatter:taskFormatter},
@@ -82,13 +82,14 @@
 					{name:'${taskPref['3']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['4']}', formatter:taskFormatter, width:200},
 					{name:'${taskPref['5']}', formatter:taskFormatter, width:200},
+					{name:'suc', formatter:taskFormatter,sortable:false,search:false, width:50},
 					{name:'score', formatter:taskFormatter, search:false, width:70},
 					{name:'id', hidden: true},
 					{name:'statusCss', hidden: true}"
 				caption="listCaption"
 				rowNum="sizePref"
 				scrollOffset="0"
-				gridComplete="function(){bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
+				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId');recompileDOM('taskListIdWrapper');}"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
 					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished}"
 				showPager="true">
@@ -96,6 +97,7 @@
 				<jqgrid:navigation id="taskListId" add="false" edit="false" del="false" search="false" refresh="false" />
 				<jqgrid:refreshButton id="taskListId" />
 			</jqgrid:grid>
+
 			populateFilter();
 
 			<g:each var="key" in="['1','2','3','4','5']">

@@ -142,6 +142,18 @@ function freezeHeaderGeneral (header, top, left) {
 	}
 }
 
+/**
+ * $.browser was deprecated in newer versions, so let's use the normal way
+ * The grid is being draw using a tag lib outside our repo, this will be executed a few seconds before the grid is ready
+ * @returns {boolean}
+ */
+function processTaskSafariColumns() {
+	var isSafari = (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1);
+	if(isSafari) {
+		jQuery("#taskListIdGrid").jqGrid('hideCol',["suc","score"]);
+	}
+}
+
 // Unfreezes the header and returns it to its regular position for non-jqgrid tables
 function unfreezeHeaderGeneral (header) {
 	$('.floatingHeader').remove();
