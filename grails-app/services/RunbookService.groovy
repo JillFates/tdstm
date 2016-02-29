@@ -523,28 +523,34 @@ class RunbookService {
 
 	/**
 	 * Used to determine the the critical path for a particular task
-	 * @param AssetComment task to find edge for
-	 * @param Map - The resulting graphs data from determineUniqueGraphs() method
-	 * @param tmp a data structure containing temporary data related to tasks and dependencies
-	 * @return A list of edges(aka TaskDependency) that would be the critical path for the task
+	 * @param task - the AssetComment task to find edge for
+	 * @param edges - a Map of the resulting graphs data from determineUniqueGraphs() method
+	 * @param tmp - a data structure containing temporary data related to tasks and dependencies
+	 * @return A list containing one or edges(aka TaskDependency) that would be the critical path for the task
 	 */
-	ArrayList<AssetComment> findCriticalPath(task, edges, tmp) {
+	private ArrayList<AssetComment> findCriticalPath(task, edges, tmp) {
 		def edgeList = []
 		def id = task.id.toString()
 
 		if (edges.containsKey(id)) {
-			def maxDur=0
-			def maxTasks=0
+			def maxDur=-1
+			// def maxTasks=0
+
+			// We're going to go through the list once to find the max duration of all edges
 			edges[id].each { e ->
-				
 				// check if this edge should be ignored
 				if ( ! tmp['dependencies'][e.id].tmpIgnore ) {
-				
-					if (tmp['dependencies'][e.id].tmpPathDuration > maxDur) {
-						edgeList = [e]
-						maxDur = tmp['dependencies'][e.id].tmpPathDuration
-						maxTasks = tmp['tasks'][e.successor.id].tmpDownstreamTasks.size()
-					} else if ( tmp['dependencies'][e.id].tmpPathDuration == maxDur ) {
+					def possibleMaxDur = tmp['dependencies'][e.id].tmpPathDuration
+					if (possibleMaxDur > maxDur) {
+						maxDur = possibleMaxDur
+					}
+				}
+			}
+
+			if (maxDur > -1) {
+				// Now lets go through and add the edges that match the max duration
+				edges[id].each { e ->
+					if ( ! tmp['dependencies'][e.id].tmpIgnore && tmp['dependencies'][e.id].tmpPathDuration == maxDur) {
 						edgeList.push(e)
 					}
 				}
