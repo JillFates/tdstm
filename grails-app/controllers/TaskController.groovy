@@ -1049,7 +1049,7 @@ digraph runbook {
 	def eventTimelineResults() {
 
 		// Get the form parameters
-		Boolean showAll = (params.showAll == 'true')
+		Boolean showAll = true
 		String meId = params.eventId	
 
 		def (project, user) = controllerService.getProjectAndUserForPage( this, 'CriticalPathExport' )
@@ -1178,7 +1178,7 @@ digraph runbook {
 				if (showAll) {
 					durationExtra = "<td>$actual</td><td>$deviation</td>"
 					timesExtra = "<td>$actStart</td>"
-					tailExtra = "<td>${t.taskSpec}</td><td>${t.hardAssigned==1 ? 'Yes' : ''}</td><td>${t.resolvedBy ?: ''}</td>"
+					tailExtra = "<td>${t.taskSpec ?: ''}</td><td>${t.hardAssigned==1 ? 'Yes' : ''}</td><td>${t.resolvedBy ?: ''}</td>"
 				}
 
 				// TODO : add in computation for time differences if both constraint time est and/or actual
