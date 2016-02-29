@@ -1289,7 +1289,7 @@ tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stat
 			'ng-click="tasks.tasksGridActions(row, \'publishUnpublish\', $event)"/>'+
 		'</span>'+
 		'</div>';
-	var recipeTemplate = '<a href="#/recipes/{{row.entity.recipeId}}/code/logs">{{row.entity.recipeName}}</a>';
+	var recipeTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><a href="#/recipes/{{row.entity.recipeId}}/code/logs">{{row.entity.recipeName}}</a></div>';
 
 	var lastLoop;
 	var layoutPluginTasks = new ngGridLayoutPlugin();
