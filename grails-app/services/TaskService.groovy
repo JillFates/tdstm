@@ -184,7 +184,8 @@ class TaskService implements InitializingBean {
 			t.hard_assigned AS hardAssigned,
 			t.duration AS duration,
 			t.duration_scale AS durationScale,
-			t.category""")
+			t.category,
+			t.instructions_link AS instructionsLink""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
 		if ( ! countOnly) {

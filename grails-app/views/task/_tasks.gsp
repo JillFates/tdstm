@@ -85,7 +85,7 @@
 							<tds:actionButton label="Done" icon="ui-icon-check" id="${item?.id}"  
 								onclick="changeStatus('${item?.id}','${AssetCommentStatus.DONE}', '${item?.status}', 'taskManager')"/>
 							</g:if>
-							
+						
 							<tds:actionButton label="Details..." icon="ui-icon-zoomin" id="${item?.id}"  
 								onclick="issueDetails(${item?.id},'${item?.status}')"/>
 							<g:if test="${item.successors > 0 || item.predecessors > 0}">
@@ -97,6 +97,20 @@
 							<tds:actionButton label="Assign To Me" icon="ui-icon-person" id="${item?.id}"  
 								onclick="assignTask('${item?.id}','${issue.item.assignedTo}', '${issue.item.status}','myTask')"/>
 							</g:if>
+
+							<g:if test="${ HtmlUtil.isMarkupURL(issue.item.instructionsLink) }">
+								<g:if test="${ HtmlUtil.isURL(issue.item.instructionsLink) }">
+									<tds:actionButton label="Instructions..." icon="ui-icon-document"
+										onclick="window.open(HtmlUtil.parseMarkupURL(issue.item.instructionsLink)[1], '_blank');"/>
+								
+								</g:if>
+								<g:else>
+									<tds:actionButton label="${HtmlUtil.parseMarkupURL(issue.item.instructionsLink)[0]}" icon="ui-icon-document"
+										onclick="window.open('${HtmlUtil.parseMarkupURL(issue.item.instructionsLink)[1]}', '_blank');"/>
+								</g:else>
+							</g:if>
+
+
 							<tds:hasPermission permission='CommentCrudView'>
 								<g:if test="${issue.item.status == AssetCommentStatus.READY && !(item.category in AssetComment.moveDayCategories)}">
 									<span class="delay_myTasks">Delay for:</span>
