@@ -33,17 +33,23 @@ tds.comments.directive.TmLinkableUrl = function($http, utils) {
             controller: function ($scope) {
               $scope.validateInstructionsLink = function(){
                 var ilValue = $scope.ac.instructionsLink
-                $("#saveAndCloseBId").attr('disabled', true)
-                $http.get(utils.url.applyRootPath("/common/tmLinkableUrl?linkableUrl=" + ilValue))
-                  .success(function(data, status, headers, config) {
-                    if(data.status == "error" && data.errors){
-                      // Do nothing (Service Results displays the error message to the user).
-                    }
-                    $("#saveAndCloseBId").removeAttr('disabled')
-                  })
-                  .error(function(data, status, headers, config) {
-                    alert("There's been an error validating the Linkable Url.")
-                });
+                if(ilValue.length > 1){
+                  $("#saveAndCloseBId").attr('disabled', true)
+                  $http.get(utils.url.applyRootPath("/common/tmLinkableUrl?linkableUrl=" + ilValue))
+                    .success(function(data, status, headers, config) {
+                      if(data.status == "error" && data.errors){
+                        // Do nothing (Service Results displays the error message to the user).
+                      }else{
+                        $("#saveAndCloseBId").removeAttr('disabled')
+                      }
+                    })
+                    .error(function(data, status, headers, config) {
+                      alert("There's been an error validating the Linkable Url.")
+                  });  
+                }else{
+                  $("#saveAndCloseBId").removeAttr('disabled')
+                }
+                
 
               }
             }

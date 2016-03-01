@@ -1095,7 +1095,7 @@ a#taskLinkAllId * {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: 1040;
+	z-index: 10040;
 	display: none;
 	overflow: auto;
 	overflow-y: auto;
@@ -1120,7 +1120,7 @@ a#taskLinkAllId * {
 #errorModal .modal-dialog {
 	background-color: rgba(0, 0, 0, 0);
 	position: relative;
-	z-index: 1050;
+	z-index: 10050;
 	width: auto;
 	margin: 10px;
 }
@@ -1143,7 +1143,7 @@ a#taskLinkAllId * {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: 9999;
+	z-index: 10030;
 	background-color: #000000;
 }
 
