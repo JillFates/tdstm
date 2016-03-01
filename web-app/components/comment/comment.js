@@ -1848,7 +1848,12 @@ tds.comments.directive.ActionBar = function(commentService, alerts, utils, comme
 			};
 
 			scope.viewInstructions = function(button) {
-				window.open(scope.comment.instructionsLink,'_blank');
+				var iLinkArray = scope.comment.instructionsLink.split("|")
+				var iLink = scope.comment.instructionsLink
+				if(iLinkArray.length > 1){
+					iLink = iLinkArray[1]
+				}
+				window.open(iLink,'_blank');
 			};
 
 			scope.changeEstTime = function(button) {
