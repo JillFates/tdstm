@@ -37,7 +37,7 @@ tds.comments.directive.TmLinkableUrl = function($http, utils) {
                 $http.get(utils.url.applyRootPath("/common/tmLinkableUrl?linkableUrl=" + ilValue))
                   .success(function(data, status, headers, config) {
                     if(data.status == "error" && data.errors){
-                      alert(data.errors[0])
+                      // Do nothing (Service Results displays the error message to the user).
                     }
                     $("#saveAndCloseBId").removeAttr('disabled')
                   })
