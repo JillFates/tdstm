@@ -222,161 +222,108 @@ class ProjectController {
 	 * Update the Project details
 	 */
 	def update() {
-		def (projectInstance, user) = controllerService.getProjectAndUserForPage(this, 'ProjectEditView')
-		if (!projectInstance) {
-			return
-		}
+		Project.withTransaction { status ->
 
-		PartyGroup company = projectInstance.owner
-		
-		//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
-		def startDate = params.startDate
-		def completionDate = params.completionDate
-		if (startDate) {
-			params.startDate = TimeUtil.parseDate(getSession(), startDate)
-		}
-		if (completionDate){
-			params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
-		}
-		params.timezone = retrievetimeZone(params.timezone)
-
-		params.runbookOn = 1
-		projectInstance.properties = params
-
-		//Get the Partner Image file from the multi-part request
-		def file = request.getFile('partnerImage')
-		def image			
-		// List of OK mime-types
-
-		// Closure that will create the standard model used for the view
-		def makeModel = {
-			return [
-				company: company,
-				projectInstance: projectInstance, 
-				projectPartner: projectDetails.projectPartner, 
-				projectManager: projectDetails.projectManager, 
-				moveManager: projectDetails.moveManager, 
-				companyStaff: projectDetails.companyStaff, 
-				clientStaff: projectDetails.clientStaff, 
-				partnerStaff: projectDetails.partnerStaff, 
-				companyPartners: projectDetails.companyPartners, 
-				workflowCodes: projectDetails.workflowCodes,
-				projectLogoForProject: projectDetails.projectLogoForProject, 
-				prevParam:params
-			]
-		}
-
-		if( file ) {
-			def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-			if( file.getContentType() && file.getContentType() != "application/octet-stream"){
-				if(params.projectPartner == ""){
-					def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-					flash.message = " Please select Associated Partner to upload Image. "
-					render( view:'edit', model:makeModel() )
-					return
-				} else if (! okcontents.contains(file.getContentType())) {
-					def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-					flash.message = "Image must be one of: ${okcontents}"
-					render( view:'edit', model:makeModel() )
-					return
-				}
-			}
-						
-			image = ProjectLogo.fromUpload(file)		   
-			image.project = projectInstance
-			def imageSize = image.getSize()
-			if ( imageSize > 50000 ) {
-				def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-				flash.message = " Image size is too large. Please select proper Image"
-				render( view:'edit', model:makeModel() )
+			def (projectInstance, user) = controllerService.getProjectAndUserForPage(this, 'ProjectEditView')
+			if (!projectInstance) {
 				return
 			}
-			if( file.getContentType() == "application/octet-stream"){
-				//Nonthing to perform.
-			} else if (params.projectPartner) {
-				if(!image.save()){
+
+			PartyGroup company = projectInstance.owner
+			
+			//  When the Start date is initially selected and Completion Date is blank, set completion date to the Start date
+			def startDate = params.startDate
+			def completionDate = params.completionDate
+			if (startDate) {
+				params.startDate = TimeUtil.parseDate(getSession(), startDate)
+			}
+			if (completionDate){
+				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
+			}
+			params.timezone = retrievetimeZone(params.timezone)
+
+			params.runbookOn = 1
+			projectInstance.properties = params
+
+			//Get the Partner Image file from the multi-part request
+			def file = request.getFile('partnerImage')
+			def image			
+			// List of OK mime-types
+
+			// Closure that will create the standard model used for the view
+			def makeModel = {
+				return [
+					company: company,
+					projectInstance: projectInstance, 
+					projectPartner: projectDetails.projectPartner, 
+					projectManager: projectDetails.projectManager, 
+					moveManager: projectDetails.moveManager, 
+					companyStaff: projectDetails.companyStaff, 
+					clientStaff: projectDetails.clientStaff, 
+					partnerStaff: projectDetails.partnerStaff, 
+					companyPartners: projectDetails.companyPartners, 
+					workflowCodes: projectDetails.workflowCodes,
+					projectLogoForProject: projectDetails.projectLogoForProject, 
+					prevParam:params
+				]
+			}
+
+			if( file ) {
+				def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+				if( file.getContentType() && file.getContentType() != "application/octet-stream"){
+					if(params.projectPartner == ""){
+						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
+						flash.message = " Please select Associated Partner to upload Image. "
+						render( view:'edit', model:makeModel() )
+						return
+					} else if (! okcontents.contains(file.getContentType())) {
+						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
+						flash.message = "Image must be one of: ${okcontents}"
+						render( view:'edit', model:makeModel() )
+						return
+					}
+				}
+							
+				image = ProjectLogo.fromUpload(file) 
+				image.project = projectInstance
+				def imageSize = image.getSize()
+				if ( imageSize > 50000 ) {
 					def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-					flash.message = " Image Upload Error."
-					render( view:'edit', model:makeModel())
+					flash.message = " Image size is too large. Please select proper Image"
+					render( view:'edit', model:makeModel() )
 					return
 				}
-			}
-		} else {
-			image = ProjectLogo.findByProject(projectInstance)
-			if(image && !params.projectPartner){
-				image.delete(flush:true)
-			}
-		}
-		
-		if( !projectInstance.hasErrors() && projectInstance.save() ) {
-			
-			def partnersIds = params.projectPartners
-			
-			/*
-			if ( projectManagerId != "" && projectManagerId != null ) {
-				def projectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $projectManagerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-				def projectManagerParty = Party.findById( projectManagerId )
-				def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
-				//	condition to check whether Project Manager has changed or not
-				if ( projectManager == null ) {
-					def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-					if ( otherprojectManager != null && otherprojectManager != "" ) {
-						//	Delete existing partner and reinsert new partner For Project, if partner changed
-						otherprojectManager.delete()
-						def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-					} else {
-						//	Create Project Manager if there is no Project Managet for this project
-						def projectManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+				if( file.getContentType() == "application/octet-stream"){
+					//Nonthing to perform.
+				} else if (params.projectPartner) {
+					if(!image.save()){
+						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
+						flash.message = " Image Upload Error."
+						render( view:'edit', model:makeModel())
+						return
 					}
 				}
 			} else {
-				//	if user select a blank then remove Project Manager
-				def otherprojectManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
-				if ( otherprojectManager != null && otherprojectManager != "" ) {
-					otherprojectManager.delete()
+				image = ProjectLogo.findByProject(projectInstance)
+				if(image && !params.projectPartner){
+					image.delete(flush:true)
 				}
 			}
-			*/
-			//---------------------------------------
-			// Statements to re-insert MoveManager
-			//---------------------------------------
 			
-			/*
-			if ( moveManagerId != "" && moveManagerId != null ) {
-				def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.partyIdTo = $moveManagerId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-				def moveManagerParty = Party.findById( moveManagerId )
-				def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
-				//	condition to check whether Move Manager has changed or not
+			if( !projectInstance.hasErrors() && projectInstance.save() ) {
 				
-				if ( moveManager == null ) {
-					def othermoveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-					if ( othermoveManager != null && othermoveManager != "" ) {
-						//	Delete existing partner and reinsert new partner For Move, if partner changed
-						othermoveManager.delete()
-						def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-					} else {
-						//	Create Move Manager if there is no Move Managet for this project
-						def moveManagerRel = new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-					}
-				}
-			} else {
-				// if user select a blank then remove Move Manager 
-				def othermoveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-				if ( othermoveManager != null && othermoveManager != "" ) {
-					othermoveManager.delete()
-				}
+				def partnersIds = params.projectPartners
+
+				projectService.updateProjectPartners(projectInstance, partnersIds)
+
+				// Audit project changes
+				auditService.saveUserAudit(UserAuditBuilder.projectConfig(securityService.getUserLogin(), projectInstance))
+
+				flash.message = "Project ${projectInstance} updated"
+				redirect(action:"show")
+				
 			}
-			*/
-
-			projectService.updateProjectPartners(projectInstance, partnersIds)
-
-			// Audit project changes
-			auditService.saveUserAudit(UserAuditBuilder.projectConfig(securityService.getUserLogin(), projectInstance))
-
-			flash.message = "Project ${projectInstance} updated"
-			redirect(action:"show")
-			
-		}
+		} // Project.withTransaction(t) {
 	}
 
 	/*
@@ -410,35 +357,68 @@ class ProjectController {
 	 * create the project and PartyRelationships for the fields prompted
 	 */
 	def save() {
-		if (!controllerService.checkPermission(this, 'CreateProject')) 
-			return
+		Project.withTransaction { status ->
+			if (!controllerService.checkPermission(this, 'CreateProject')) {
+				return
+			}
 
-		Person whom = securityService.getUserLoginPerson()
-		PartyGroup company = whom.company
+			Person whom = securityService.getUserLoginPerson()
+			PartyGroup company = whom.company
 
-		//projectInstance.dateCreated = new Date()
-		def startDate = params.startDate
-		def completionDate = params.completionDate   
-		if(startDate){
-			params.startDate = TimeUtil.parseDate(getSession(), startDate)
-		}
-		if(completionDate){
-			params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
-		}
-		params.runbookOn =  1	// Default to ON
-		params.timezone = retrievetimeZone(params.timezone)
-		def projectInstance = new Project(params)
+			//projectInstance.dateCreated = new Date()
+			def startDate = params.startDate
+			def completionDate = params.completionDate   
+			if(startDate){
+				params.startDate = TimeUtil.parseDate(getSession(), startDate)
+			}
+			if(completionDate){
+				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
+			}
+			params.runbookOn =  1	// Default to ON
+			params.timezone = retrievetimeZone(params.timezone)
+			def projectInstance = new Project(params)
 
-		def file = request.getFile('partnerImage')
+			def file = request.getFile('partnerImage')
 
-		//def result = projectService.saveProject(projectInstance, file, params.projectPartners, params.projectManagerId)
+			//def result = projectService.saveProject(projectInstance, file, params.projectPartners, params.projectManagerId)
 
-		def image	  
-		// List of OK mime-types
-		def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-		if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
-			if (params.projectPartner == ""){
-		   		flash.message = " Please select Associated Partner to upload Image. "
+			def image	  
+			// List of OK mime-types
+			def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+			if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
+				if (params.projectPartner == ""){
+			   		flash.message = " Please select Associated Partner to upload Image. "
+					def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+					render( view:'create', model:[ 
+						company: company,
+						projectInstance:projectInstance, 
+						clients:projectDetails.clients, 
+						partners:projectDetails.partners,
+						managers:projectDetails.managers, 
+						workflowCodes: projectDetails.workflowCodes,
+						prevParam:params] )
+					return;
+				} else if (! okcontents.contains(file.getContentType())) {
+					flash.message = "Image must be one of: ${okcontents}"
+					def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+					render( view:'create', model:[
+						company: whom.company, 
+						projectInstance:projectInstance, 
+						clients:projectDetails.clients, 
+						partners:projectDetails.partners,
+						managers:projectDetails.managers, 
+						workflowCodes: projectDetails.workflowCodes,
+						prevParam:params] )
+					return;
+				}		
+			}
+		  //save image
+			image = ProjectLogo.fromUpload(file)		   
+			image.project = projectInstance
+
+			def imageSize = image.getSize()
+			if( imageSize > 50000 ) {
+				flash.message = " Image size is too large. Please select proper Image"
 				def projectDetails = projectService.getProjectPatnerAndManagerDetails()
 				render( view:'create', model:[ 
 					company: company,
@@ -449,98 +429,67 @@ class ProjectController {
 					workflowCodes: projectDetails.workflowCodes,
 					prevParam:params] )
 				return;
-			} else if (! okcontents.contains(file.getContentType())) {
-				flash.message = "Image must be one of: ${okcontents}"
+			}
+
+			if ( !projectInstance.hasErrors() && projectInstance.save() ) {
+				def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", company, "COMPANY" )
+
+				// save partners
+				projectService.updateProjectPartners(projectInstance, params.projectPartners)
+
+				if(file && file.getContentType() == "application/octet-stream"){
+					//Nonthing to perform.
+				} else if(params.projectPartner){
+					image.save()
+				}
+				//def client = params.projectClient
+				def partner = params.projectPartner
+				def projectManager = params.projectManager
+				def moveManager = params.moveManager	  	
+
+				if ( partner != null && partner != "" ) {				
+					def partnerParty = Party.findById(partner)
+					//	For Project to Partner PartyRelationship
+					def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
+				}
+				
+				if ( projectManager != null && projectManager != "" ) {			
+					def projectManagerParty = Party.findById(projectManager)
+					//def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
+					//	For Project to ProjectManager PartyRelationship
+					def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
+						//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+				}
+				
+				if ( moveManager != null && moveManager != "" ) {				
+					def moveManagerParty = Party.findById(moveManager)
+					//def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
+					//	For Project to MoveManager PartyRelationship
+					def moveManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveManagerParty, "MOVE_MGR" )
+						//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
+				}
+				// set the projectInstance as CURR_PROJ
+				userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
+				//Will create a bundle name TBD and set it as default bundle for project   
+				projectInstance.getProjectDefaultBundle()
+				
+				flash.message = "Project ${projectInstance} created"
+				redirect( action:"show",  imageId:image.id )
+
+			} else {
 				def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-				render( view:'create', model:[
-					company: whom.company, 
+
+				render( view:'create', model:[ 
+					company: company,
 					projectInstance:projectInstance, 
 					clients:projectDetails.clients, 
 					partners:projectDetails.partners,
 					managers:projectDetails.managers, 
 					workflowCodes: projectDetails.workflowCodes,
 					prevParam:params] )
-				return;
-			}		
-		}
-	  //save image
-		image = ProjectLogo.fromUpload(file)		   
-		image.project = projectInstance
 
-		def imageSize = image.getSize()
-		if( imageSize > 50000 ) {
-			flash.message = " Image size is too large. Please select proper Image"
-			def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-			render( view:'create', model:[ 
-				company: company,
-				projectInstance:projectInstance, 
-				clients:projectDetails.clients, 
-				partners:projectDetails.partners,
-				managers:projectDetails.managers, 
-				workflowCodes: projectDetails.workflowCodes,
-				prevParam:params] )
-			return;
-		}
-
-		if ( !projectInstance.hasErrors() && projectInstance.save() ) {
-
-			def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", company, "COMPANY" )
-
-			// save partners
-			projectService.updateProjectPartners(projectInstance, params.projectPartners)
-
-			if(file && file.getContentType() == "application/octet-stream"){
-				//Nonthing to perform.
-			} else if(params.projectPartner){
-				image.save()
 			}
-			//def client = params.projectClient
-			def partner = params.projectPartner
-			def projectManager = params.projectManager
-			def moveManager = params.moveManager	  	
-
-			if ( partner != null && partner != "" ) {				
-				def partnerParty = Party.findById(partner)
-				//	For Project to Partner PartyRelationship
-				def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
-			}
-			
-			if ( projectManager != null && projectManager != "" ) {			
-				def projectManagerParty = Party.findById(projectManager)
-				//def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
-				//	For Project to ProjectManager PartyRelationship
-				def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
-					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-			}
-			
-			if ( moveManager != null && moveManager != "" ) {				
-				def moveManagerParty = Party.findById(moveManager)
-				//def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
-				//	For Project to MoveManager PartyRelationship
-				def moveManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveManagerParty, "MOVE_MGR" )
-					//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-			}
-			// set the projectInstance as CURR_PROJ
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
-			//Will create a bundle name TBD and set it as default bundle for project   
-			projectInstance.getProjectDefaultBundle()
-			
-			flash.message = "Project ${projectInstance} created"
-			redirect( action:"show",  imageId:image.id )
-
-		} else {
-			def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-
-			render( view:'create', model:[ 
-				company: company,
-				projectInstance:projectInstance, 
-				clients:projectDetails.clients, 
-				partners:projectDetails.partners,
-				managers:projectDetails.managers, 
-				workflowCodes: projectDetails.workflowCodes,
-				prevParam:params] )
-
-		}
+		} // Project.withTransaction
 	}
 
 	/*

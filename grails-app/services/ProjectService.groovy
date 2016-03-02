@@ -443,7 +443,7 @@ class ProjectService {
 			projectPartnerId = projectPartner?.partyIdTo?.id
 		}
 		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'MOVE_MGR' ")
-		def companyStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+		def companyStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 		companyStaff.each {
 			if ( it.partyIdTo?.lastName == null ) {
 				it.partyIdTo?.lastName = ""
@@ -620,7 +620,10 @@ class ProjectService {
 	}
 
 	/**
-	 * Used to add/remove partners from a project by taking the 
+	 * Used to add/remove partners from a project by comparing the list of partner ids passed. If a partner is 
+	 * removed from a project, all the partner staff is also removed. Any tasks assigned to the individuals will be 
+	 * unassigned however historical references of staff will remain.
+	 *
 	 * @param projectInstance - the project that is being updated
 	 * @param partnerIds - a single id or a list of ids
 	 * @throws InvalidParamException when the partner ids are invalid or not associated with the owner of the project
@@ -694,30 +697,43 @@ class ProjectService {
 				throw new InvalidParamException("Partner id specified is not a company ($partnerId)")
 			}
 			partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
+			log.info "updateProjectPartners() Added partner $partnerParty to project $projectInstance"
 		}
 		
 		// Delete partners from the relationship
-		def partnerStaff
+		String findPartnerStaff = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' " + 
+			"and p.partyIdFrom = :partner and " +
+			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
+
+		String deleteProjectStaff = "DELETE FROM PartyRelationship pr WHERE pr.partyRelationshipType='PROJ_STAFF' " + 
+			"AND pr.partyIdFrom = :project AND pr.roleTypeCodeFrom = 'PROJECT' " +
+			"AND pr.partyIdTo IN (:staff)"
+
+		String unassignStaffTasks = "UPDATE AssetComment task SET task.assignedTo=NULL WHERE task.project = :project " +
+			"AND task.assignedTo IN (:staff)"
+
 		toDeletePartners.each { partnerId ->
 			partnerParty = Party.findById(partnerId)
-			def query = "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = :partnerParty and " +
-				"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'"
-			partnerStaff = PartyRelationship.findAll( query, [partnerParty:partnerParty] )
-			if (partnerStaff.size() > 0) {
-				def idsToDelete = []
-				partnerStaff.each{ ps ->
-					idsToDelete << ps.partyIdTo.id
+			if (partnerParty) {
+				log.info "updateProjectPartners() Removing partner $partnerParty from project $projectInstance"
+	
+				List partnerStaff = PartyRelationship.findAll(findPartnerStaff, [partner: partnerParty] )?.partyIdTo
+				if (partnerStaff.size() > 0) {
+					def c = PartyRelationship.executeUpdate(deleteProjectStaff, [project:projectInstance, staff:partnerStaff])
+					log.info "updateProjectPartners() Removed $c partner staff assignments from project $projectInstance"
+
+					c = AssetComment.executeUpdate(unassignStaffTasks, [project: projectInstance, staff: partnerStaff])
+					log.info "updateProjectPartners() Unassigned staff from $c task(s) for project $projectInstance"
 				}
-				def idsToDeleteValue = idsToDelete.join(",")
 
-				jdbcTemplate.update("DELETE FROM party_relationship WHERE party_relationship_type_id = 'PROJ_STAFF' AND " +
-					"party_id_from_id = $projectInstance.id AND role_type_code_from_id = 'PROJECT' AND party_id_to_id IN ($idsToDeleteValue)")
+				partyRelationshipService.deletePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
 			}
-
-			partyRelationshipService.deletePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
 		}
 	}
 
+	/**
+	 * Used to save new Projects
+	 */
 	def saveProject(projectInstance, file, projectPartners, projectManager) {
 
 		def workflowCodes = []
