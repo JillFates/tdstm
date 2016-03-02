@@ -48,7 +48,7 @@
 		}
 
 		// Do not delete partner if it was not his parent selected.
-		if($("#companyPartnerSelect" + partnerIdx).select2("data") != null && $('#projectManagerId').select2('data') != null) {
+		if($("#companyPartnerSelect" + partnerIdx).select2("data") != null && $('#projectManagerId').select2('data') != null && $('#projectManagerId').select2('data').id) {
 			var selectedDeletePartner = $("#companyPartnerSelect" + partnerIdx).select2("data").text;
 			var selectedManager = $('#projectManagerId').select2('data').text;
 			resetManager = selectedManager.indexOf(selectedDeletePartner) != -1;
@@ -185,6 +185,19 @@
 		$('#timeZoneSelectPopup').dialog('close')
 	}
 
+	 /*
+	  * validate the text area size
+	  */
+	 function textCounter(fieldId, maxlimit) {
+		 var value = $("#"+fieldId).val()
+		 if (value.length > maxlimit) { // if too long...trim it!
+			 $("#"+fieldId).val(value.substring(0, maxlimit));
+			 return false;
+		 } else {
+			 return true;
+		 }
+	 }
+
 	return {
 		loadCompanyPartners: loadCompanyPartners,
 		addPartnerSelect: addPartnerSelect,
@@ -194,7 +207,8 @@
 		setActiveClientId: setActiveClientId,
 		validSelectedPartners: validSelectedPartners,
 		showTimeZoneSelect: showTimeZoneSelect,
-		setTimeZone: setTimeZone
+		setTimeZone: setTimeZone,
+		textCounter: textCounter
 	}
 
  }();
