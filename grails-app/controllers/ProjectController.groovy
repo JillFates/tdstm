@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 import java.util.List;
 import java.util.Map;
 
@@ -546,10 +548,13 @@ class ProjectController {
 	 */
 	def retrievePartnerStaffList() {
 		Person whom = securityService.getUserLoginPerson()
-		def client = params.client
-		def partner = params.partner
-		def json = []
+		def client = request.JSON.client
+		def partners = []
+		if(request.JSON.partners) {
+			partners = new JsonSlurper().parseText(request.JSON.partners)
+		}
 		def pStaff = []
+		def json = []
 		def cStaff = []
 		def compStaff = []
 		def tdsParty = whom.company.id
@@ -575,19 +580,20 @@ class ProjectController {
 				 
 			}
 		}
-		if ( partner != "" && partner != null ) {
-			def partnerParty = PartyGroup.findById( partner ).id
-			// get list of all STAFF relationship to Client
-			def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $partnerParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
-			partnerStaff.sort{it.partyIdTo.lastName}
-			partnerStaff.each{partyRelationship ->
-			def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
-				def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
-				pStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
-				 
+		if ( partners != "" && partners != null ) {
+			partners.each { partnerId ->
+				def partnerParty = PartyGroup.findById( partnerId ) // Security Check to multitenance
+				// get list of all STAFF relationship to Client
+				def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${partnerParty.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
+				partnerStaff.sort{it.partyIdTo.lastName}
+				partnerStaff.each{partyRelationship ->
+					def fullName = partyRelationship.partyIdTo.toString()
+					//def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : "" remove
+					pStaff <<[id:partyRelationship.partyIdTo.id, text:fullName + ", " + partnerParty.name]
+				}
 			}
 		}
-		
+
 		json = [ identifier:"id", company:whom.company, compStaff:compStaff, clientStaff:cStaff, partnerStaff:pStaff ]
 		render json as JSON
 	}

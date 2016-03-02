@@ -347,8 +347,7 @@
 							</td>
 							<td class="valueNW">
 								<select id="clientId" name="client.id" tabindex="100" 
-								data-placeholder="Please select a client"
-								onchange="${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ this.value +\'&partner=\'+document.getElementById(\'projectPartnerId\').value', onComplete:'updateMastersList(XMLHttpRequest)' )}">
+								data-placeholder="Please select a client">
 									<option value=""></option>
 									<g:each in="${clients}" var="client" status="i">
 									    <option value="${client.partyIdTo.id}">${client.partyIdTo}</option>
@@ -459,7 +458,7 @@
 							</td>
 							<td class="valueNW">
 								<input type="button" value="Add Partner" tabindex="180" onclick="Project.addPartnerSelect('#partnersContainer');">
-								<div id="partnersContainer"></div>
+								<div class="create-project-partner-container" id="partnersContainer"></div>
 							</td>
 							<td class="name">
 								<label for="client">Partner Logo:</label>

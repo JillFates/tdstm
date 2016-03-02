@@ -1348,6 +1348,12 @@ fieldset[disabled] .btn-default.active {
 	cursor: pointer;
 }
 
+/*Down here, should be revisited when implementing new ui, so are safe to delete later on */
+
+.create-project-partner-container#partnersContainer abbr.select2-search-choice-close {
+	display: none;
+}
+
 /* CUSTOM Field Responsive CSS - TODO: This will be removed and included on SASS compilation later on */
 
 div.dialog input#assetName {

@@ -41,16 +41,26 @@
 	}
 
 	var deleteCompanyPartner = function(partnerIdx) {
-		var deletePartner = true;
+		var deletePartner = true,
+			resetManager = true;
 		if (initialPartners[$("#companyPartnerSelect" + partnerIdx).select2("val")]) {
 			deletePartner = confirm("Removing a partner will remove all the partner's staff associated with the project. Click 'Okay' to continue otherwise click 'Cancel'");
+		}
+
+		// Do not delete partner if it was not his parent selected.
+		if($("#companyPartnerSelect" + partnerIdx).select2("data") != null && $('#projectManagerId').select2('data') != null) {
+			var selectedDeletePartner = $("#companyPartnerSelect" + partnerIdx).select2("data").text;
+			var selectedManager = $('#projectManagerId').select2('data').text;
+			resetManager = selectedManager.indexOf(selectedDeletePartner) != -1;
 		}
 
 		if (deletePartner) {
 			$("#companyPartnerContainer" + partnerIdx).remove();
 			var index = activeSelectIdxs.indexOf(partnerIdx);
 			if (index > -1) { activeSelectIdxs.splice(index, 1); }
-			resetSelectPartners();
+			if(resetManager) {
+				resetSelectPartners();
+			}
 		}
 	}
 
@@ -96,18 +106,26 @@
 			ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 				url: tdsCommon.createAppURL('/project/retrievePartnerStaffList'),
 				dataType: 'json',
-				quietMillis: 250,
+				quietMillis: 600,
+				type: 'POST',
+				params: { // extra parameters that will be passed to ajax
+					contentType: "application/json; charset=utf-8",
+				},
 				data: function (term, page) {
-					return {
+					return JSON.stringify({
 						q: term, // search term
 						partners: selectPartnersIds(),
 						role: 'PROJ_MGR',
 						client: clientId
-					};
+					});
 				},
 				results: function (data, page) { // parse the results into the format expected by Select2.
 					// since we are using custom formatting functions we do not need to alter the remote JSON data
-					return { results: data.results };
+					var results = data.partnerStaff;
+					if(!results) { // why the data object returns 6 properties if we are just waiting one?
+						results = [];
+					}
+					return { results: results };
 				},
 				cache: true
 			},
@@ -128,7 +146,7 @@
 			}
 			$(containerId).select2("val", initialValue.id);
 		}
-		activeStaffSelects.push(containerId)
+		activeStaffSelects.push(containerId);
 	}
 
 	var repoFormatResult = function(data) {
