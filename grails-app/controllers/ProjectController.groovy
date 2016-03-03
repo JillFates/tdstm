@@ -20,8 +20,9 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavEntityType
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import org.apache.commons.lang.math.NumberUtils
 import com.tdsops.common.lang.ExceptionUtil
 
@@ -493,57 +494,97 @@ class ProjectController {
 	}
 
 	/*
-	 *  Action to render partner staff as JSON  
+	 * An Ajax web service that is use to retrieve the list of active staff that can be associated with any project. This is typically
+	 * used with the Project create process so there won't be a project. There staff list will consist of those from the user's company,
+	 * the staff of the partners of the user's company and the staff of the company indicated as the client.
+	 * 
+	 * @params request.JSON.client - the selected client that the project will be for
+	 * @params request.JSON.partners - the ids of partners to be associated with the project
+	 * @params request.JSON.role - the role to lookup (e.g. PROJ_MGR)
+	 * @params request.JSON.q - the search query to filter on persons name
+	 * @return JSON array:
+ 	 * 		staffList: List<Map> of staff [id:person.id, text: "firstName lastName, Company"]
 	 */
-	def retrievePartnerStaffList() {
+	def fetchStaffList() {
+
 		Person whom = securityService.getUserLoginPerson()
-		def client = request.JSON.client
-		def partners = []
-		if(request.JSON.partners) {
-			partners = new JsonSlurper().parseText(request.JSON.partners)
-		}
-		def pStaff = []
-		def json = []
-		def cStaff = []
-		def compStaff = []
-		def tdsParty = whom.company.id
-		// get list of all STAFF relationship to Client
-		def tdsStaff = PartyRelationship.findAll( "from PartyRelationship p \
-			where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $tdsParty \
-			AND p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ")
-		tdsStaff.sort{ "${it.partyIdTo.lastName} $it.partyIdTo.firstName}" }
-		tdsStaff.each{partyRelationship ->
-		def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
-			def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : ""
-			compStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
-		}
-		if ( client != "" && client != null ) {
-			def clientParty = PartyGroup.findById( client ).id
-			// get list of all STAFF relationship to Client
-			def clientStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $clientParty and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
-			clientStaff.sort{it.partyIdTo.lastName}
-			clientStaff.each{partyRelationship ->
-			def fullName = partyRelationship.partyIdTo.lastName ? partyRelationship.partyIdTo.lastName+", "+partyRelationship.partyIdTo.firstName : partyRelationship.partyIdTo.firstName
-				def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : "" 
-				cStaff <<[id:partyRelationship.partyIdTo.id, name:fullName+title]
-				 
+
+		String query = request.JSON.q ? request.JSON.q.toLowerCase() : ''
+
+		def client
+		Long clientId = NumberUtil.toPositiveLong(request.JSON.client, -1)
+		if (clientId > 0) {
+			// Validate that the client is associated with the user's company
+			List allClients = partyRelationshipService.getCompanyClients(whom.company)*.partyIdTo
+			client = allClients.find { it.id == clientId }
+			if (! client ) {
+				securityService.reportViolation("attempted to access unassociated client (id $pid)", user)
+			}
+		} else {
+			if (clientId == -1) {
+				log.warn "retrievePartnerStaffList() called with invalid client id ($clientId)"
 			}
 		}
-		if ( partners != "" && partners != null ) {
-			partners.each { partnerId ->
-				def partnerParty = PartyGroup.findById( partnerId ) // Security Check to multitenance
-				// get list of all STAFF relationship to Client
-				def partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${partnerParty.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' " )
-				partnerStaff.sort{it.partyIdTo.lastName}
-				partnerStaff.each{partyRelationship ->
-					def fullName = partyRelationship.partyIdTo.toString()
-					//def title = partyRelationship.partyIdTo.title ? " - "+partyRelationship.partyIdTo.title : "" remove
-					pStaff <<[id:partyRelationship.partyIdTo.id, text:fullName + ", " + partnerParty.name]
+
+		List partnersList = []
+		if (request.JSON.partners) {
+			// Get the list of all of the user's company's partners
+			List allPartnersList = partyRelationshipService.getCompanyPartners(whom.company)*.partyIdTo
+	
+			// Iterate over the list of partner ids we received and attempt to match up to a partner in allPartnersList
+			new JsonSlurper().parseText(request.JSON.partners).each { p ->
+				Long pid = NumberUtil.toPositiveLong(p, -1)
+				if (pid > 0) {
+					def partner = allPartnersList.find { it.id == pid }					
+					if (partner) {
+						partnersList.add(partner)
+					} else {
+						securityService.reportViolation("attempted to access unassociated partner (id $pid)", user)
+					}
+				} else {
+					log.warn "retrievePartnerStaffList() called with invalid partner id ($p)"
 				}
 			}
 		}
 
-		json = [ identifier:"id", company:whom.company, compStaff:compStaff, clientStaff:cStaff, partnerStaff:pStaff ]
+		// Use the passed role or default all staff
+		String staffRole = request.JSON.role ?: 'STAFF'
+		List<Map> staffList = []
+		String staffQuery = "FROM PartyRelationship p \
+			WHERE p.partyRelationshipType = 'STAFF' AND p.partyIdFrom = :company \
+			AND p.roleTypeCodeFrom.id = 'COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
+
+		// Closure to do query and load the staff into the staffList variable for the given company
+		def getCompanyStaffClosure = { def company ->
+			List companyStaff = PartyRelationship.findAll(staffQuery, [company:company, staffRole:staffRole]).partyIdTo
+			String lowerCompany = company.toString().toLowerCase()
+			companyStaff.findAll({ it.active == 'Y' }).each { s ->
+				String name = s.toString()
+
+				// If there was a query then filter on the name
+				if (query && ! ( name.toLowerCase().contains(query) || lowerCompany.contains(query)) ) {
+					return
+				}
+
+				// Create text as: firstName lastName, Company
+				staffList.add([id:s.id, text: "${s.toString()}, ${company.name}" ])
+			}
+		}
+
+		getCompanyStaffClosure(whom.getCompany())
+		
+		if (client) {
+			getCompanyStaffClosure(client)
+		}
+
+		partnersList.each { partner ->
+			getCompanyStaffClosure(partner)
+		}
+
+		// Now sort the list on the persons' name
+		staffList.sort { it.text }
+
+		Map json = [ staffList:staffList ]
 		render json as JSON
 	}
 	
