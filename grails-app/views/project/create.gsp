@@ -284,10 +284,6 @@
 			Project.setActiveClientId($("#clientId").select2("val"));
 		}
 
-		function initialize() {
-			var clientObj = document.getElementById('clientId').value
-			${remoteFunction(action:'retrievePartnerStaffList', params:'\'client=\'+ clientObj', onComplete:'updateMastersList(XMLHttpRequest)')}
-		}
 		function setCompletionDate(startDate) {
 			var completionDateObj = document.createProjectForm.completionDate;
 			if (completionDateObj.value == "") {
@@ -516,8 +512,6 @@
 	<div id="timeZoneSelectPopup" style="display: none;min-width:250px;" title="Time Zone Select"></div>
 
 	<g:javascript>
-		initialize();
-
 		$(window).load(function() {
 			currentMenuId = "#projectMenu";
 			$("#projectMenuId a").css('background-color','#003366');
