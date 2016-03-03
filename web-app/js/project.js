@@ -97,7 +97,22 @@
 		}
 	}
 
+	 /**
+	  * Get the selected client id on int format always.
+	  * Sending string will results on a false positive param.
+ 	  * @returns {Number}
+      */
+	var getSelectedClientId = function(){
+		clientId = $("#clientId").select2("data").id;
+		if(!clientId) {
+			clientId = 0;
+		}
+
+		return parseInt(clientId);
+	}
+
 	var createStaffSelect = function(containerId, initialValue) {
+
 		$(containerId).select2({
 			placeholder: "Please Select",
 			width: "75%",
@@ -116,7 +131,7 @@
 						q: term, // search term
 						partners: selectPartnersIds(),
 						role: 'PROJ_MGR',
-						client: clientId
+						client: getSelectedClientId()
 					});
 				},
 				results: function (data, page) { // parse the results into the format expected by Select2.
