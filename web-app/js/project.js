@@ -104,7 +104,7 @@
 			minimumInputLength: 1,
 			allowClear: true,
 			ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
-				url: tdsCommon.createAppURL('/project/retrievePartnerStaffList'),
+				url: tdsCommon.createAppURL('/project/fetchStaffList'),
 				dataType: 'json',
 				quietMillis: 600,
 				type: 'POST',
@@ -121,7 +121,7 @@
 				},
 				results: function (data, page) { // parse the results into the format expected by Select2.
 					// since we are using custom formatting functions we do not need to alter the remote JSON data
-					var results = data.partnerStaff;
+					var results = data.staffList;
 					if(!results) { // why the data object returns 6 properties if we are just waiting one?
 						results = [];
 					}
