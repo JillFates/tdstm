@@ -102,12 +102,12 @@
 	  * Sending string will results on a false positive param.
  	  * @returns {Number}
       */
-	var getSelectedClientId = function(){
-		clientId = $("#clientId").select2("data").id;
-		if(!clientId) {
+	var getSelectedClientId = function() {
+		 if ($("#clientId").select2("data") != null && $("#clientId").select2("data").id) {
+		 	clientId = $("#clientId").select2("data").id;
+	 	} else if(!clientId) {
 			clientId = 0;
 		}
-
 		return parseInt(clientId);
 	}
 
@@ -116,7 +116,7 @@
 		$(containerId).select2({
 			placeholder: "Please Select",
 			width: "75%",
-			minimumInputLength: 1,
+			minimumInputLength: 0,
 			allowClear: true,
 			ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 				url: tdsCommon.createAppURL('/project/fetchStaffList'),
