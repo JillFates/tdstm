@@ -1069,13 +1069,20 @@ class CookbookService {
 						
 					} else if ( CU.isaList(map[n]) ) {
 
-						// Check if the value of a property exists in the map defined list
-						// Need to strip out any boolean expressions
-						def cleanedExp = v.replaceAll( /[!=<>]/, '' )
-						if ( ! map[n].contains( cleanedExp ) ) {
+						if(v in String){
+							// Check if the value of a property exists in the map defined list
+							// Need to strip out any boolean expressions
+							def cleanedExp = v.replaceAll( /[!=<>]/, '' )
+							if ( ! map[n].contains( cleanedExp ) ) {
+								errorList << [ error: 1, reason: 'Invalid syntax', 
+									detail: "$label in element $i property '$n' contains invalid value '$v'" ]
+							}
+						}else{
 							errorList << [ error: 1, reason: 'Invalid syntax', 
-								detail: "$label in element $i property '$n' contains invalid value '$v'" ]
+									detail: "Simple value expected for property '$n' but '$v' was given." ]
 						}
+
+						
 					}
 				}
 				else {
