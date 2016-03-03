@@ -36,6 +36,7 @@ class ProjectController {
 	def userPreferenceService
 	def partyRelationshipService
 	def stateEngineService
+	def personService
 	def projectService
 	def securityService
 	def controllerService
@@ -354,8 +355,13 @@ class ProjectController {
 			workflowCodes: projectDetails.workflowCodes ]
 	}
 
-	/*
-	 * create the project and PartyRelationships for the fields prompted
+	/**
+	 * Used by the Project Create to actually create the project along with the following other tasks:
+	 *    - associate partner companies
+	 *    - associate the Project Manager 
+	 *    - save a partner logo 
+	 *    - create the default 'TBD' bundle
+	 * @permission CreateProject
 	 */
 	def save() {
 		Project.withTransaction { status ->
@@ -363,16 +369,17 @@ class ProjectController {
 				return
 			}
 
-			Person whom = securityService.getUserLoginPerson()
+			UserLogin user = securityService.getUserLogin()
+			Person whom = user.person
 			PartyGroup company = whom.company
 
 			//projectInstance.dateCreated = new Date()
 			def startDate = params.startDate
 			def completionDate = params.completionDate   
-			if(startDate){
+			if (startDate) {
 				params.startDate = TimeUtil.parseDate(getSession(), startDate)
 			}
-			if(completionDate){
+			if (completionDate) {
 				params.completionDate = TimeUtil.parseDate(getSession(), completionDate)
 			}
 			params.runbookOn =  1	// Default to ON
@@ -380,9 +387,6 @@ class ProjectController {
 			def projectInstance = new Project(params)
 
 			def file = request.getFile('partnerImage')
-
-			//def result = projectService.saveProject(projectInstance, file, params.projectPartners, params.projectManagerId)
-
 			def image	  
 			// List of OK mime-types
 			def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
@@ -413,7 +417,8 @@ class ProjectController {
 					return;
 				}		
 			}
-		  //save image
+
+			// Save Partner Logo Image
 			image = ProjectLogo.fromUpload(file)		   
 			image.project = projectInstance
 
@@ -429,52 +434,35 @@ class ProjectController {
 					managers:projectDetails.managers, 
 					workflowCodes: projectDetails.workflowCodes,
 					prevParam:params] )
-				return;
+				return
 			}
-
 			if ( !projectInstance.hasErrors() && projectInstance.save() ) {
 				def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", company, "COMPANY" )
 
-				// save partners
-				projectService.updateProjectPartners(projectInstance, params.projectPartners)
+				// Save the partners
+				def partnersIds = params.projectPartners
+				projectService.updateProjectPartners(projectInstance, partnersIds)
 
-				if(file && file.getContentType() == "application/octet-stream"){
+				// Deal with the Project Manager if one is supplied
+				Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
+				if (projectManagerId > 0) {
+					personService.addToProjectTeam(user, "${projectInstance.id}", "${projectManagerId}", "PROJ_MGR")
+				}
+
+				// Deal with the image
+				if (file && file.getContentType() == "application/octet-stream"){
 					//Nonthing to perform.
-				} else if(params.projectPartner){
+				} else if(projectManagerId > 0) {
 					image.save()
 				}
-				//def client = params.projectClient
-				def partner = params.projectPartner
-				def projectManager = params.projectManager
-				def moveManager = params.moveManager	  	
-
-				if ( partner != null && partner != "" ) {				
-					def partnerParty = Party.findById(partner)
-					//	For Project to Partner PartyRelationship
-					def projectPartnerRel = partyRelationshipService.savePartyRelationship("PROJ_PARTNER", projectInstance, "PROJECT", partnerParty, "PARTNER" )
-				}
 				
-				if ( projectManager != null && projectManager != "" ) {			
-					def projectManagerParty = Party.findById(projectManager)
-					//def projectManagerRoleType = RoleType.findById( "PROJ_MGR" )
-					//	For Project to ProjectManager PartyRelationship
-					def projectManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", projectManagerParty, "PROJ_MGR" )  
-						//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:projectManagerParty, roleTypeCodeTo:projectManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-				}
-				
-				if ( moveManager != null && moveManager != "" ) {				
-					def moveManagerParty = Party.findById(moveManager)
-					//def moveManagerRoleType = RoleType.findById( "MOVE_MGR" )
-					//	For Project to MoveManager PartyRelationship
-					def moveManagerRel = partyRelationshipService.savePartyRelationship("PROJ_STAFF", projectInstance, "PROJECT", moveManagerParty, "MOVE_MGR" )
-						//new PartyRelationship( partyRelationshipType:projectStaffRelationshipType, partyIdFrom:projectInstance, roleTypeCodeFrom:projectRoleType, partyIdTo:moveManagerParty, roleTypeCodeTo:moveManagerRoleType, statusCode:"ENABLED" ).save( insert:true )
-				}
 				// set the projectInstance as CURR_PROJ
 				userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
-				//Will create a bundle name TBD and set it as default bundle for project   
+
+				// Will create a bundle name TBD and set it as default bundle for project   
 				projectInstance.getProjectDefaultBundle()
 				
-				flash.message = "Project ${projectInstance} created"
+				flash.message = "Project ${projectInstance} was created"
 				redirect( action:"show",  imageId:image.id )
 
 			} else {

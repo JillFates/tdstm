@@ -882,6 +882,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
+	 * @param map - Used to load various data and errors to reference
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
 	void addToProjectTeam(UserLogin user, String projectId, String personId, String teamCode, Map map=null) {
