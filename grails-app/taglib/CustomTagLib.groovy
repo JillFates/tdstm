@@ -4,7 +4,6 @@ import org.apache.commons.validator.UrlValidator
 import org.apache.commons.codec.net.URLCodec
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.HtmlUtil
-import org.springframework.beans.SimpleTypeConverter
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 
@@ -340,5 +339,18 @@ class CustomTagLib {
         out << "</select>"
         
     }
+
+	/*
+	 * Draw an SVG Icon from the source based on the SVG Name
+	 * Also apply regex to prevent directory traversal
+	 * @param name - name of the svg to show on on icons/svg
+	 */
+	def svgIcon = { attrs ->
+		String name = attrs['name']
+		if(name != '' && name != null) {
+			name = name.replaceAll(/\./, "")
+			out << "<img src='${resource(dir: 'icons/svg', file: name + '.svg')}' />"
+		}
+	}
 
 }
