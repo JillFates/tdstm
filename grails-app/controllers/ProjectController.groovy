@@ -247,13 +247,9 @@ class ProjectController {
 			params.runbookOn = 1
 			projectInstance.properties = params
 
-			//Get the Partner Image file from the multi-part request
-			def file = request.getFile('partnerImage')
-			def image			
-			// List of OK mime-types
-
 			// Closure that will create the standard model used for the view
-			def makeModel = {
+			def buildModel = {
+				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 				return [
 					company: company,
 					projectInstance: projectInstance, 
@@ -270,54 +266,30 @@ class ProjectController {
 				]
 			}
 
-			if( file ) {
-				def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-				if( file.getContentType() && file.getContentType() != "application/octet-stream"){
-					if(params.projectPartner == ""){
-						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-						flash.message = " Please select Associated Partner to upload Image. "
-						render( view:'edit', model:makeModel() )
-						return
-					} else if (! okcontents.contains(file.getContentType())) {
-						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-						flash.message = "Image must be one of: ${okcontents}"
-						render( view:'edit', model:makeModel() )
-						return
-					}
-				}
-							
-				image = ProjectLogo.fromUpload(file) 
-				image.project = projectInstance
-				def imageSize = image.getSize()
-				if ( imageSize > 50000 ) {
-					def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-					flash.message = " Image size is too large. Please select proper Image"
-					render( view:'edit', model:makeModel() )
-					return
-				}
-				if( file.getContentType() == "application/octet-stream"){
-					//Nonthing to perform.
-				} else if (params.projectPartner) {
-					if(!image.save()){
-						def projectDetails = projectService.getprojectEditDetails(projectInstance,params)
-						flash.message = " Image Upload Error."
-						render( view:'edit', model:makeModel())
-						return
-					}
-				}
-			} else {
-				image = ProjectLogo.findByProject(projectInstance)
-				if(image && !params.projectPartner){
-					image.delete(flush:true)
-				}
+			// Check validity of the uploaded image
+			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
+			if (logoFile && (logoFile instanceof String)) {
+				flash.message = logoFile
+				render( view:'edit', model:buildModel(true) )
+				return
 			}
+
+			// Logic to delete the projectLogo
+							
 			
-			if( !projectInstance.hasErrors() && projectInstance.save() ) {
+			if( ! projectInstance.hasErrors() && projectInstance.save() ) {
 				
 				def partnersIds = params.projectPartners
 
 				projectService.updateProjectPartners(projectInstance, partnersIds)
 
+				ProjectLogo projectLogo
+
+				// Deal with the image
+				if (logoFile) {
+					projectLogo = ProjectLogo.createOrUpdate(projectInstance, logoFile)
+				}
+				
 				// Audit project changes
 				auditService.saveUserAudit(UserAuditBuilder.projectConfig(securityService.getUserLogin(), projectInstance))
 
@@ -336,10 +308,11 @@ class ProjectController {
 			return
 
 		Person whom = securityService.getUserLoginPerson()
+		def company = whom.company
 
 		def projectInstance = new Project()
 		projectInstance.properties = params
-		def projectDetails = projectService.getProjectPatnerAndManagerDetails()
+		def projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 		def defaultTimeZone = TimeUtil.defaultTimeZone
 		def userTimeZone = userPreferenceService.get(TimeUtil.TIMEZONE_ATTR)
 		if (userTimeZone) {
@@ -348,11 +321,12 @@ class ProjectController {
 
 		return [ 
 			clients:projectDetails.clients, 
-			company: whom.company,
+			company: company,
 			managers:projectDetails.managers, 
 			partners:projectDetails.partners, 
 			projectInstance:projectInstance, 
-			workflowCodes: projectDetails.workflowCodes ]
+			workflowCodes: projectDetails.workflowCodes 
+		]
 	}
 
 	/**
@@ -373,7 +347,9 @@ class ProjectController {
 			Person whom = user.person
 			PartyGroup company = whom.company
 
-			//projectInstance.dateCreated = new Date()
+			//
+			// Properly set some of the parameters that before injecting into the Project domain
+			//
 			def startDate = params.startDate
 			def completionDate = params.completionDate   
 			if (startDate) {
@@ -384,100 +360,73 @@ class ProjectController {
 			}
 			params.runbookOn =  1	// Default to ON
 			params.timezone = retrievetimeZone(params.timezone)
+
 			def projectInstance = new Project(params)
 
-			def file = request.getFile('partnerImage')
-			def image	  
-			// List of OK mime-types
-			def okcontents = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
-			if( file && file.getContentType() && file.getContentType() != "application/octet-stream" ){
-				if (params.projectPartner == ""){
-			   		flash.message = " Please select Associated Partner to upload Image. "
-					def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-					render( view:'create', model:[ 
-						company: company,
-						projectInstance:projectInstance, 
-						clients:projectDetails.clients, 
-						partners:projectDetails.partners,
-						managers:projectDetails.managers, 
-						workflowCodes: projectDetails.workflowCodes,
-						prevParam:params] )
-					return;
-				} else if (! okcontents.contains(file.getContentType())) {
-					flash.message = "Image must be one of: ${okcontents}"
-					def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-					render( view:'create', model:[
-						company: whom.company, 
-						projectInstance:projectInstance, 
-						clients:projectDetails.clients, 
-						partners:projectDetails.partners,
-						managers:projectDetails.managers, 
-						workflowCodes: projectDetails.workflowCodes,
-						prevParam:params] )
-					return;
-				}		
-			}
+			def partnersIds = params.projectPartners
 
-			// Save Partner Logo Image
-			image = ProjectLogo.fromUpload(file)		   
-			image.project = projectInstance
-
-			def imageSize = image.getSize()
-			if( imageSize > 50000 ) {
-				flash.message = " Image size is too large. Please select proper Image"
-				def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-				render( view:'create', model:[ 
+			// Closure to construct the model used for the create or show views
+			def buildModel = { discardChanges ->
+				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+				Map model = [ 
 					company: company,
 					projectInstance:projectInstance, 
 					clients:projectDetails.clients, 
 					partners:projectDetails.partners,
 					managers:projectDetails.managers, 
 					workflowCodes: projectDetails.workflowCodes,
-					prevParam:params] )
+					prevParam:params
+				]
+
+				if (discardChanges) {
+					projectInstance.discard()
+				}
+				return model
+			}
+
+			// Check validity of the uploaded image
+			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
+			if (logoFile && (logoFile instanceof String)) {
+				flash.message = logoFile
+				render( view:'create', model:buildModel(true) )
 				return
 			}
-			if ( !projectInstance.hasErrors() && projectInstance.save() ) {
-				def projectCompanyRel = partyRelationshipService.savePartyRelationship("PROJ_COMPANY", projectInstance, "PROJECT", company, "COMPANY" )
 
-				// Save the partners
-				def partnersIds = params.projectPartners
-				projectService.updateProjectPartners(projectInstance, partnersIds)
-
-				// Deal with the Project Manager if one is supplied
-				Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
-				if (projectManagerId > 0) {
-					personService.addToProjectTeam(user, "${projectInstance.id}", "${projectManagerId}", "PROJ_MGR")
-				}
-
-				// Deal with the image
-				if (file && file.getContentType() == "application/octet-stream"){
-					//Nonthing to perform.
-				} else if(projectManagerId > 0) {
-					image.save()
-				}
-				
-				// set the projectInstance as CURR_PROJ
-				userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
-
-				// Will create a bundle name TBD and set it as default bundle for project   
-				projectInstance.getProjectDefaultBundle()
-				
-				flash.message = "Project ${projectInstance} was created"
-				redirect( action:"show",  imageId:image.id )
-
-			} else {
-				def projectDetails = projectService.getProjectPatnerAndManagerDetails()
-
-				render( view:'create', model:[ 
-					company: company,
-					projectInstance:projectInstance, 
-					clients:projectDetails.clients, 
-					partners:projectDetails.partners,
-					managers:projectDetails.managers, 
-					workflowCodes: projectDetails.workflowCodes,
-					prevParam:params] )
-
+			// Check the project for erorr
+			if ( projectInstance.hasErrors() || ! projectInstance.save(flush:true) ) {
+				// flash.message = GormUtil.allErrorsString(projectInstance)
+				flash.message = 'Some properties were not properly defined'
+				render( view:'create', model:buildModel(true) )
+				return
 			}
+
+			// Set the owner relationshipd on the project to the user's company
+			projectInstance.setOwner(company)
+
+			// Save the partners to be related to the project
+			projectService.updateProjectPartners(projectInstance, partnersIds)
+
+			// Deal with the Project Manager if one is supplied
+			Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
+			if (projectManagerId > 0) {
+				personService.addToProjectTeam(user, "${projectInstance.id}", "${projectManagerId}", "PROJ_MGR")
+			}
+
+			// Deal with the adding the project logo if one was supplied
+			ProjectLogo projectLogo
+			if (logoFile) {
+				projectLogo = ProjectLogo.createOrUpdate(projectInstance, logoFile)
+			}
+			
+			// Set the projectInstance as CURR_PROJ
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
+
+			// Will create a bundle name TBD and set it as default bundle for project   
+			projectInstance.getProjectDefaultBundle()
+			
+			flash.message = "Project ${projectInstance} was created"
+			redirect( action:"show",  imageId:projectLogo?.id )
+
 		} // Project.withTransaction
 	}
 
@@ -601,29 +550,36 @@ class ProjectController {
 			
 	}
 	
+	/**
+	 * Used to render a project logo if it exists
+	 */
 	def showImage() {
-			if( params.id ) {
-				def projectLogo = ProjectLogo.findById( params.id )
-		 		def image = projectLogo?.partnerImage?.binaryStream
-		 		response.contentType = 'image/jpg'		
-		 		response.outputStream << image
-			} else {
-				return;
-			}
-	 }
-	
-	def deleteImage() {			 
-		 	 def projectInstance = Project.get( getSession().getAttribute( "CURR_PROJ" ).CURR_PROJ )
-			 def imageInstance = ProjectLogo.findByProject(projectInstance)
-			 if(imageInstance){
-				 flash.message = "Image deleted"
-				 imageInstance.delete(flush:true)
-				 redirect(action:'show',id:projectInstance.id )
-			 } else {
-				 flash.message = "No Image to delete"
-				 redirect(action:'show',id:projectInstance.id )
-			 }
-			 
+		if( params.id ) {
+			def projectLogo = ProjectLogo.findById( params.id )
+	 		def image = projectLogo?.partnerImage?.binaryStream
+	 		response.contentType = 'image/jpg'
+	 		response.outputStream << image
+		}
+	}
+
+	/**
+	 * Used to delete the project logo for the project in the users context
+	 */	
+	def deleteImage() {	
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'ProjectEditView')
+		if (!project) {
+			return
+		}
+
+		def pl = ProjectLogo.findByProject(project)
+		if (pl) {
+			flash.message = "Project logo was deleted"
+			pl.delete(flush:true)
+			redirect(action:'show',id:project.id )
+		} else {
+			flash.message = "Project logo was not found"
+			redirect(action:'show',id:project.id )
+		}
 	}
 
 	/*
@@ -708,8 +664,9 @@ class ProjectController {
 	 */
 	def updateFieldImportance() {
 		def project = controllerService.getProjectForPage(this, "EditProjectFieldSettings")
-		if (! project)
+		if (! project) {
 			return
+		}
 		
 		def entityType = request.JSON.entityType
 		def allConfig = request.JSON.jsonString as JSON;
@@ -729,6 +686,7 @@ class ProjectController {
 		
 		render "success"
 	}
+
 	/**
 	 *This action is used to retrive default project field importance and display it to user
 	 *@param : entityType type of entity for which user is requested for importance .
@@ -741,6 +699,7 @@ class ProjectController {
 		def tooltipsData = assetEntityService.retrieveTooltips(entityType, defaultProject)
 		render(ServiceResults.success(['fields' : fieldsData, 'tooltips': tooltipsData]) as JSON)
 	}
+
 	/**
 	 *This action is used to project customFieldsShown
 	 *@param : custom count.

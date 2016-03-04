@@ -63,7 +63,7 @@
 								</g:each>
 								</ul>
 							</td>
-							<td class="name">Partner Logo:</td>
+							<td class="name">Project Logo:</td>
 							<td class="valueNW">
 								<g:if test="${projectLogoForProject}"><img src="${createLink(controller:'project', action:'showImage', id:projectLogoForProject.id)}" style="height: 30px;"/></g:if>
 							</td>

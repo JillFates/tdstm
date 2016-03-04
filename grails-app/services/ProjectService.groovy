@@ -392,18 +392,16 @@ class ProjectService {
 		return projects
 	}
 	/**
-	 * This method used to get all clients,patners,managers and workflowcodes.
+	 * This method used to get all clients, partners, managers and workflowcodes.
 	 */
-	def getProjectPatnerAndManagerDetails() {
-		Person whom = securityService.getUserLoginPerson()
-
-		def company = whom.company
+	def getCompanyPartnerAndManagerDetails(PartyGroup company) {
 		
 		def clients = partyRelationshipService.getCompanyClients(company)//	Populate a SELECT listbox with default list as earlier.
 		def partners = partyRelationshipService.getCompanyPartners(company)*.partyIdTo
 		
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${company.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
+		def managers = PartyRelationship.findAll( 
+			"from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = ${company.id} and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 		managers?.sort{it.partyIdTo?.lastName}
 		
 		def workflowCodes = stateEngineService.getWorkflowCode()
@@ -925,6 +923,22 @@ class ProjectService {
 			pr.partyIdFrom = :project", params )
 
 		return owner ? owner[0] : null
+	}
+
+	/**
+	 * Used to set the company that owns the project
+	 * @param project - the project to set the owner on
+	 * @param owner - the company to set the project owner to
+	 * @return The project object
+	 */
+	Project setOwner(Project project, PartyGroup owner) {
+		assert project
+		assert owner
+		assert owner.partyType.id == 'COMPANY'
+
+		partyRelationshipService.savePartyRelationship("PROJ_COMPANY", project, "PROJECT", owner, "COMPANY" )
+
+		return project
 	}
 
 	/**

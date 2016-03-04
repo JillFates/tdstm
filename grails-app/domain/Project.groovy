@@ -261,7 +261,14 @@ class Project extends PartyGroup {
 		}
 	}
 	
-	static transients = [ 'isDefaultProject', 'getDefaultProject', 'readDefaultProject', 'active', 'status', 'getProjectDefaultBundle', 'getOwner' ]
+	static transients = [ 
+		'defaultProject', 
+		'readDefaultProject', 
+		'active', 
+		'status', 
+		'projectDefaultBundle', 
+		'owner' 
+	]
 
 	String toString() {
 		"$projectCode : $name"
@@ -308,6 +315,7 @@ class Project extends PartyGroup {
 	def getProjectDefaultBundle() {
 		return projectService.getDefaultBundle(this)
 	}
+
 	/**
 	 * Used to access the owner of the project
 	 * @return the project owner
@@ -316,6 +324,14 @@ class Project extends PartyGroup {
 		return projectService.getOwner(this)
 	}
 	
+	/**
+	 * Used to set the owner of the project
+	 * @return the project owner
+	 */
+	void setOwner(PartyGroup owner) {
+		projectService.setOwner(this, owner)
+	}
+
 	/**
 	 * Can be used to determine project status, valid values are active or completed
 	 * @return String - could be active or completed

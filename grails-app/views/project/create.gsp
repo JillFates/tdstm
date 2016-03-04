@@ -256,10 +256,12 @@
 								<div class="create-project-partner-container" id="partnersContainer"></div>
 							</td>
 							<td class="name">
-								<label for="client">Partner Logo:</label>
+								<label for="client">Project Logo:</label>
 							</td>
 							<td class="valueNW">
-								<input type="file" name="partnerImage" id="partnerImage" tabindex="190" />
+								<input type="file" name="projectLogo" id="projectLogo" tabindex="190" />
+								<br>
+								<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span> 
 							</td>
 						</tr>
 						<tr class="prop">

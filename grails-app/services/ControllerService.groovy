@@ -382,4 +382,71 @@ class ControllerService {
 		}
 	}
 
+	/**
+	 * Used to handle uploaded files 
+	 * @param file - the File object that will be set upon success
+	 * @param controller - the reference to the controller
+	 * @param paramName - the request parameter name of the upload file
+	 * @param maxSize - the maximum size allowed for file (default 0 - not checked)
+	 * @param contentTypes - a List of acceptable content-types (default [] - allows any)
+	 * @return blank if successful otherwise an error message as to the failure
+	 */
+	Object getUploadFile(Object controller, String paramName, def maxSize=0, List contentTypes=[]) {
+		def localFile
+		String emsg = ''
+		assert paramName
+		if (controller.params[paramName]) {
+			while (true) {
+				localFile = controller.request.getFile(paramName)
+				if (! localFile) {
+					emsg = 'Unable to retrieve uploaded file'
+					break
+				}
+
+				if (localFile.isEmpty()) {
+					localFile = null
+					break
+				}
+
+				if (maxSize > 0) {
+					if (localFile.size > maxSize) {
+						emsg = "Uploaded file exceeds size limit of ${sprintf('%,3d', maxSize)} bytes"
+						break
+					}
+				}
+
+				if (contentTypes.size()) {
+					String ct = localFile.getContentType() 
+					if (! ct) {
+						emsg =  "Upload file was missing required content-type"
+						break
+					} 
+					if (! contentTypes.contains(ct)) {
+						emsg =  "Content-type of the upload file was invalid"
+						break
+					}
+				}
+				// We're good so set the param var with the localFile reference
+				break
+			}
+
+		}
+
+		return emsg ?: localFile
+	}
+
+	/**
+	 * Used to handle uploaded image files that is restricted to content-types of
+	 *    ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+	 * @param file - the File object that will be set upon success
+	 * @param controller - the reference to the controller
+	 * @param paramName - the request parameter name of the upload file
+	 * @param maxSize - the maximum size allowed for file (default 0 - not checked)
+	 * @return blank if successful otherwise an error message as to the failure
+	 */
+	Object getUploadImageFile(Object controller, String paramName, def maxSize=0) {
+		List contentTypes = ['image/png', 'image/x-png', 'image/jpeg', 'image/pjpeg', 'image/gif']
+		return getUploadFile(controller, paramName, maxSize, contentTypes)
+	}
+
 }
