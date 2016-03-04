@@ -10,8 +10,8 @@
 # Configuration Settings
 SDK_INIT=~/.sdkman/bin/sdkman-init.sh
 GRAILS_VERSION=2.3.11
-JVM_MEMORY=1526m
-JVM_PERMGEN=512m
+JVM_MEMORY=1024m
+JVM_PERMGEN=256m
 
 if [ ! -f $SDK_INIT ]; then
    echo "Please install the SDKMan! before trying to use this script (see http://sdkman.io/)"
@@ -52,9 +52,11 @@ export GRAILS_OPTS
 # -------------------
 # The following are commandline options to pass into Grails directly
 # -------------------
+# This has to be the first setting if it is to be used. For QA you probably should comment out.
+OPTS="-reloading"
 
 # Configuration to point to our own tdstm-config.groovy file
-OPT="-Dtdstm.config.location=/etc/tdstm-config.groovy"
+OPT="$OPTS -Dtdstm.config.location=/opt/tranman/etc/tdstm-config.groovy"
 
 # Set Grails to disable recompile and reloading to improve performance (QA Only)
 #OPTS="$OPTS -Ddisable.auto.recompile=true -Dgrails.gsp.enable.reload=false -noreloading"
