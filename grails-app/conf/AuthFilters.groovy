@@ -8,9 +8,12 @@ class AuthFilters {
 	
 	def filters = {
 	
+		String initialRequest
+
 		newAuthFilter(controller:'*', action:'*') {
 			before = {
-					
+				initialRequest = "$controllerName/$actionName"			
+
 				def moveObject
 				def subject = SecurityUtils.subject
 				if( webSvcCtrl.contains( controllerName ) && subject.principal){
@@ -32,10 +35,12 @@ class AuthFilters {
 					} else if( RolePermissions.hasPermission("MoveEventStatus") ){		// verify the user role as ADMIN
 						return true;
 					} else {
-						def moveEventProjectClientStaff = PartyRelationship.find( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' "+
-											" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
-											" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = ${person.id}" )
-						if(!moveEventProjectClientStaff){		// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle
+						def moveEventProjectClientStaff = PartyRelationship.find( 
+							"from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
+							" and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'COMPANY'"+
+							" and p.roleTypeCodeTo = 'STAFF' and p.partyIdTo = ${person.id}" )
+						if(!moveEventProjectClientStaff){		
+							// if not ADMIN check whether user is associated to the Party that is associate to the Project.client of the moveEvent / MoveBundle
 							response.sendError( 403 , "Forbidden" )
 							return false
 						} else{
@@ -44,8 +49,12 @@ class AuthFilters {
 					}
 				}
 			} // before
+
 			after = {
-				userService.updateLastPageLoad()
+				if (initialRequest!= 'auth/signIn') {
+					// We don't want to update lastPageLoad when logging in
+					userService.updateLastPageLoad(SecurityUtils.subject?.principal?.toString())
+				}
 			}
 		} // uuidFilter
 	} // class

@@ -392,27 +392,6 @@ class UserPreferenceService {
 		 
 		return assignedRoles
 	}
-	/*
-	 * Update the lastlogin once user has logged in.
-	 * @param  : login username.
-	 */
-	// TODO : updateLastLogin - Move to SecurityService
-	def updateLastLogin( username ){
-		if (log.isDebugEnabled()) 
-			log.debug "updateLastLogin: updating user=$username, ${username.class}"
-		if( username ) {
-			username = username.toString()
-			def userLogin = UserLogin.findByUsername( username )
-			if (log.isDebugEnabled()) 
-				log.debug "updateLastLogin: found userLogin=$userLogin"
-			def person = userLogin.person
-			if (log.isDebugEnabled()) 
-				log.debug "updateLastLogin: updating user=$username person=$person"
-			getSession().setAttribute( "LOGIN_PERSON", ['name':person.firstName, "id":person.id ])
-			userLogin.lastLogin = TimeUtil.nowGMT()
-			userLogin.save(flush:true)
-		}
-	}
 		
 	/*
 	 * Set user preferred columns for For PMO dashboard.

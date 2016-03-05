@@ -620,15 +620,50 @@ class UserService implements InitializingBean {
 
 		return recentLogin
 	}
-	
-	// Updates the lastPage time for the current user
-	def updateLastPageLoad () {
-		def principal = SecurityUtils.subject?.principal
-		if (principal) {
-			UserLogin.withTransaction ([propagationBehavior: TransactionDefinition.PROPAGATION_REQUIRES_NEW]) {
-				def userLogin = UserLogin.findByUsername(principal)
-				userLogin.lastPage = TimeUtil.nowGMT()
+
+	/**
+	 * Update the User to log the their last login
+	 * @param username - username of the one that just logged in
+	 */
+	void updateLastLogin( String username, session ){
+		if ( username ) {
+			UserLogin userLogin = UserLogin.findByUsername( username )
+			if (! userLogin) {
+				log.error "updateLastLogin() was unable to find user $username"
+			} else {
+				Person person = userLogin.person
+				session.setAttribute( "LOGIN_PERSON", ['name':person.firstName, "id":person.id ])
+
+				def now = TimeUtil.nowGMT()
+				userLogin.lastLogin = now
+				userLogin.lastPage = now
 				userLogin.save(flush:true)
+			}
+		}
+	}
+	
+	/**
+	 * Update the User's last page load time. This needs to be done in a separate transaction so that it doesn't 
+	 * potentially get rolled back with the whole page. It can fail due to Optimistic Locking which we'll just ignore.
+	 * @param username - username of the one that just logged in
+	 */
+	void updateLastPageLoad(String username) {
+		if (username) {
+			try {
+				UserLogin.withTransaction ([propagationBehavior: TransactionDefinition.PROPAGATION_REQUIRES_NEW]) { status ->
+					UserLogin userLogin = UserLogin.findByUsername(username)
+					def now = TimeUtil.nowGMT()
+					if (userLogin) {
+						if ((userLogin.lastPage - now) > 500) {
+							userLogin.lastPage = now
+							userLogin.save(flush:true)
+						}
+					} else {
+						log.error "updateLastPageLoad() was unable to find user $username"
+					}
+				}
+			} catch (e) {
+				log.warn "updateLastPageLoad() failed for user $username - ${e.getMessage()}"
 			}
 		}
 	}

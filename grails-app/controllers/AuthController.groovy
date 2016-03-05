@@ -23,11 +23,12 @@ class AuthController {
 	def shiroSecurityManager
 
 	def auditService
-	def securityService
-	def userPreferenceService
+	def controllerService
 	def environmentService
 	def emailDispatchService
-	def controllerService
+	def securityService
+	def userPreferenceService
+	def userService
 
 	def index() { redirect(action: 'login', params: params) }
 
@@ -119,12 +120,6 @@ class AuthController {
 
 					def targetUri = params.targetUri ?: "/"
 					
-					// log.info "Redirecting to '${targetUri}'."
-		
-					//redirect(uri: targetUri)
-					/*
-					 *  call loadPreferences() to load CURR_PROJ MAP into session
-					 */
 					userPreferenceService.loadPreferences("CURR_PROJ")
 					userPreferenceService.loadPreferences("CURR_BUNDLE")
 					userPreferenceService.loadPreferences("MOVE_EVENT")
@@ -143,10 +138,8 @@ class AuthController {
 						userPreferenceService.loadPreferences(TimeUtil.DATE_TIME_FORMAT_ATTR)
 					}
 
-					/*
-					 *  call userPreferenceService.updateLastLogin( params.username ) to update the last login time
-					 */
-					userPreferenceService.updateLastLogin( params.username )
+					userService.updateLastLogin( params.username.toString(), getSession() )
+
 					def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad")
 					def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
 					
