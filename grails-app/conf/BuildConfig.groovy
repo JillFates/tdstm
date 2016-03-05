@@ -49,9 +49,9 @@ grails.project.dependency.resolution = {
 	}
 
 	plugins {
+		build   ':tomcat:7.0.54'
 		runtime ':resources:1.2.8'
 		runtime ':hibernate:3.6.10.19'
-		build ':tomcat:7.0.54'
 		runtime ':database-migration:1.4.0'
 		compile (":shiro:1.2.1") {
 			excludes([name: 'quartz', group: 'org.opensymphony.quartz'])
@@ -71,7 +71,7 @@ grails.project.dependency.resolution = {
 		compile ':jqgrid:3.8.0.1'
 		compile ':plugin-config:0.2.0'
 		compile ':jquery-ui:1.8.15'
-		compile ":grails-melody:1.54.0"
+		compile ':grails-melody:1.54.0'
 	}
 }
 
@@ -82,6 +82,16 @@ grails.war.resources = { stagingDir ->
 	delete(file: "${stagingDir}/WEB-INF/lib/mysql-connector-java-5.1.6-bin.jar")
 	delete(file: "${stagingDir}/WEB-INF/lib/commons-codec-1.3.jar")
 } 
+
+// Set runtime forking to save memory and improve performance while in development
+// See the following for more information http://grails.github.io/grails-doc/2.3.x/guide/single.html#forkedMode
+forkConfig = [maxMemory: 1024, minMemory: 64, debug: false, maxPerm: 256] 
+grails.project.fork = [    
+	test: forkConfig, // configure settings for the test-app JVM    
+	run: forkConfig, // configure settings for the run-app JVM    
+	war: forkConfig, // configure settings for the run-war JVM    
+	console: forkConfig // configure settings for the Swing console JVM 
+]
 
 /*
  * If the application is being run locally, set the Logback configuration file
