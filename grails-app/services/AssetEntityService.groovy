@@ -1162,13 +1162,18 @@ class AssetEntityService {
 
 		def (device, model) = getCommonDeviceModelForCreateEdit(project, null, params)
 
-		// Attempt to set the default bundle for the device based on the user's preferences
-		def bundleId = userPreferenceService.get('MOVE_BUNDLE')
-		if (bundleId) {
-			def bundle = MoveBundle.read(bundleId)
-			if (bundle && bundle.project == project) {
-				device.moveBundle = bundle
+		// Attempt to set the default bundle for the device based on project and then on user's preferences
+		def bundle = project.defaultBundle
+
+		if (!bundle) {
+			def bundleId = userPreferenceService.get('MOVE_BUNDLE')
+			if (bundleId) {
+				bundle = MoveBundle.read(bundleId)
 			}
+		}
+
+		if (bundle && bundle.project == project) {
+			device.moveBundle = bundle
 		}
 
 		return [device, model]
