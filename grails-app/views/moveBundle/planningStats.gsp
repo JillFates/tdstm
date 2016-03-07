@@ -94,32 +94,32 @@ $(document).ready(function() {
 				<table class="dashboard_stat_table">
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:applicationCount,filter:'application',assetType:'application',title:'Applications',validate:appToValidate,barId:'applicationbar',iconName:'iconApp.png']">
+							model="[assetCount:applicationCount,filter:'application',assetType:'application',title:'Applications',validate:appToValidate,barId:'applicationbar',iconName:'application']">
 						</g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount: phyServerCount,filter:'physicalServer',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar',iconName:'iconServer.png']"></g:render>
+							model="[assetCount: phyServerCount,filter:'physicalServer',assetType:'assetEntity',title:'Physical Servers',validate:psToValidate,barId:'physicalbar',iconName:'serverPhysical']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount: virtServerCount,filter:'virtualServer',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar',iconName:'iconServer.png']"></g:render>
+							model="[assetCount: virtServerCount,filter:'virtualServer',assetType:'assetEntity',title:'Virtual Servers',validate:vsToValidate,barId:'virtualbar',iconName:'serverVirtual']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:dbCount,filter:'db',assetType:'database',title:'Databases',validate:dbToValidate,barId:'dbbar',iconName:'iconDB.png']"></g:render>
+							model="[assetCount:dbCount,filter:'db',assetType:'database',title:'Databases',validate:dbToValidate,barId:'dbbar',iconName:'database']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:phyStorageCount,filter:'storage',assetType:'assetEntity',title:'Physical Storage',validate:phyStorageToValidate,barId:'filebar',iconName:'iconStorage.png']"></g:render>
+							model="[assetCount:phyStorageCount,filter:'storage',assetType:'assetEntity',title:'Physical Storage',validate:phyStorageToValidate,barId:'filebar',iconName:'storagePhysical']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logic Storage',validate:fileToValidate,barId:'filebar',iconName:'iconStorage.png']"></g:render>
+							model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logic Storage',validate:fileToValidate,barId:'filebar',iconName:'storageLogical']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:otherAssetCount,filter:'other',assetType:'assetEntity',title:'Other Devices',validate:otherToValidate,barId:'assetbar',iconName:'iconNetwork.png']"></g:render>
+							model="[assetCount:otherAssetCount,filter:'other',assetType:'assetEntity',title:'Other Devices',validate:otherToValidate,barId:'assetbar',iconName:'other']"></g:render>
 					</tr>
 				</table>
 				<br />
@@ -417,21 +417,19 @@ $(document).ready(function() {
 									</thead>
 									<tbody>
 									<tr>
-										<td class="dashboard_stat_icon_td"><img src="${resource(dir:'images',file:'iconApp.png')}" height="12" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="application" width="17" height="17" /></td>
 										<td style="vertical-align: middle;"> <g:link controller="application" action="list" class="links">Applications</g:link></td>
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td"><img
-												src="${resource(dir:'images',file:'iconServer.png')}"
-												height="12" /></td>
+										<td class="dashboard_stat_icon_td">&nbsp;</td>
 										<td>
 											<g:link controller="assetEntity" params="[filter:'server']" action="list" class="links">Servers</g:link>
 										</td>
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td">&nbsp;</td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverPhysical" width="17" height="17" /></td>
 										<td>
 											<g:link controller="assetEntity"
 													params="[filter:'physicalServer']"
@@ -440,7 +438,7 @@ $(document).ready(function() {
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td">&nbsp;</td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="serverVirtual" width="17" height="17" /></td>
 										<td>
 											<g:link controller="assetEntity"
 													params="[filter:'virtualServer']"
@@ -448,35 +446,26 @@ $(document).ready(function() {
 										</td>
 									</tr>
 									<tr>
-										<td class="dashboard_stat_icon_td"><img
-												src="${resource(dir:'images',file:'iconDB.png')}"
-												height="12" />
-										</td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="database" width="17" height="17" /></td>
 										<td><g:link controller="database" action="list"
 													class="links">Databases</g:link></td>
 									</tr>
 									<tr>
-										<td class="dashboard_stat_icon_td"><img
-												src="${resource(dir:'images',file:'iconStorage.png')}"
-												height="12" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="storagePhysical" width="17" height="17" /></td>
 										<td nowrap="nowrap"><g:link controller="assetEntity" action="list"
 																	params="[filter:'storage']"
 																	class="links">Physical Storage</g:link>
 										</td>
 									</tr>
 									<tr>
-										<td class="dashboard_stat_icon_td"><img
-												src="${resource(dir:'images',file:'iconStorage.png')}"
-												height="12" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="storageLogical" width="17" height="17" /></td>
 										<td><g:link controller="files" action="list"
 													class="links">Logical Storage</g:link>
 										</td>
 									</tr>
 
 									<tr>
-										<td class="dashboard_stat_icon_td"><img
-												src="${resource(dir:'images',file:'iconNetwork.png')}"
-												height="12" /></td>
+										<td class="dashboard_stat_icon_td"><tds:svgIcon name="other" width="17" height="17" /></td>
 										<td><g:link controller="assetEntity"
 													params="[filter:'other']"
 													action="list"
