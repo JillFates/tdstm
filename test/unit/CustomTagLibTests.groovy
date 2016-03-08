@@ -149,16 +149,18 @@ class CustomTagLibTests extends Specification {
         applyTemplate('<tds:textAsLink text="${text}" />', [text: null]).equals('')
     }
 
-    /*void testSVGIcon() {
-        expect:*/
-        // Verify it render the svg in a img tag for better support
-        //applyTemplate('<tds:svgIcon name="${name}" />', [name: "application"]).startsWith('<img')
+    void testSVGIcon() {
+        expect:
+        // Verify it render the svg
+        applyTemplate('<tds:svgIcon name="${name}" />', [name: "application"]).startsWith('<svg')
         // Test it contacts properly the svg method
-        //applyTemplate('<tds:svgIcon name="${name}" />', [name: "application"]).contains('application.svg')
+        applyTemplate('<tds:svgIcon name="${name}" />', [name: "application"]).contains('application.svg')
         // Prevent Directory traversal
-        //applyTemplate('<tds:svgIcon name="${name}" />', [name: "../application"]).contains('application.svg')
+        applyTemplate('<tds:svgIcon name="${name}" />', [name: "../application"]).contains('application.svg')
+        // Css attached to the element
+        applyTemplate('<tds:svgIcon name="${name}" styleClass="${styleClass}" />', [name: "../application", styleClass: "myClass"]).contains('myClass')
         // Do not fail on empty name
-        //applyTemplate('<tds:svgIcon name="${name}" />', [name: ""]).isEmpty()
-   /* }*/
+        applyTemplate('<tds:svgIcon name="${name}" />', [name: ""]).isEmpty()
+    }
 
 }

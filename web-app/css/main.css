@@ -1354,8 +1354,18 @@ fieldset[disabled] .btn-default.active {
 	display: none;
 }
 
-.tds-svg  {
+table.dashboard_stat_table tbody td {
+	height: 27px;
+}
+
+#eventHeaderTableId tbody td {
+	height: 27px;
+}
+
+.tds-svg-icons  {
 	border: 0px;
+	width: 17px;
+	height: 17px;
 }
 
 /* CUSTOM Field Responsive CSS - TODO: This will be removed and included on SASS compilation later on */

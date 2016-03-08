@@ -115,7 +115,7 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"
-							model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logic Storage',validate:fileToValidate,barId:'filebar',iconName:'storageLogical']"></g:render>
+							model="[assetCount:fileCount,filter:'storage',assetType:'files',title:'Logical Storage',validate:fileToValidate,barId:'filebar',iconName:'storageLogical']"></g:render>
 					</tr>
 					<tr>
 						<g:render template="discoveryGraph"

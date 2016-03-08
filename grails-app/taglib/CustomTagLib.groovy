@@ -1,3 +1,5 @@
+import com.tdssrc.grails.NumberUtil
+
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.apache.commons.validator.UrlValidator
@@ -344,30 +346,22 @@ class CustomTagLib {
 	 * Draw an SVG Icon from the source based on the SVG Name
 	 * Also apply regex to prevent directory traversal
 	 * @param name - name of the svg to show on on icons/svg
-	 * @param styleClass - to have more control, it attach a class under tds-svg domain to modify the element as desired
+	 * @param styleClass - to have more control, it attach a class under tds-svg-icons domain to modify the element as desired
 	 * @param width - default as 0 if no provided
 	 * @param height - default as 0 if no provided
 	 */
 	def svgIcon = { attrs ->
-		String name = attrs['name']
-		String styleClass = attrs['styleClass']
-		String height = attrs['height']
-		String width = attrs['width']
+		def name = attrs['name']
+		def styleClass = attrs['styleClass']
+		def height = NumberUtil.toPositiveLong(attrs['height'], 0)
+		def width = NumberUtil.toPositiveLong(attrs['width'], 0)
 		if(name != '' && name != null) {
 			if(styleClass == null) {
 				styleClass = ''
 			}
 
-			if(width == null) {
-				width = 0
-			}
-
-			if(height == null) {
-				height = 0
-			}
-
 			name = name.replaceAll(/\./, "")
-			out << "<svg style='width: ${width}px; height: ${height}px;' class='tds-svg ${styleClass}' viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'> " +
+			out << "<svg style='${height > 0 ? 'height: ' + height + 'px;' : '' } ${width > 0 ? 'width: ' + width + 'px;' : '' }' class='tds-svg-icons ${styleClass}' viewBox='0 0 115 115' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'> " +
 					"<image x='0' y='0' height='110px' width='110px' fill='#1f77b4'  xmlns:xlink='http://www.w3.org/1999/xlink' xlink:href='${resource(dir: 'icons/svg', file: name + '.svg')}'></image>" +
 					"</svg>"
 		}
