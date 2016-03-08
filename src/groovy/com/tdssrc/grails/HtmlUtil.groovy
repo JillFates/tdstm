@@ -150,16 +150,12 @@ class HtmlUtil {
 	*/
 	public static boolean isURL(String input)
 	{
-		def isUrl = false
-		def label
-		input = input.trim()
-		if (input && !input.contains(" ")) { 
-
+		input = input?.trim()
+		if (input) { 
 			String[] schemes = ['HTTP', 'http','HTTPS', 'https', 'FTP', 'ftp', 'FTPS', 'ftps', 'SMB', 'smb', 'FILE', 'file'].toArray();
 			UrlValidator urlValidator = new UrlValidator(schemes);
 
-			return urlValidator.isValid(input)
-			
+			return urlValidator.isValid(input)			
 		}
 		return false
 	}
