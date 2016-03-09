@@ -20,7 +20,10 @@ class CollectionUtilsTests extends Specification {
 		def list = [[name:"IContact"], [name:"iContact"], [name:"A"], [name:"K"], [name:"k"]]
 
 		def expectedSort = [[name:"A"], [name:"iContact"], [name:"IContact"], [name:"k"], [name:"K"]]
-		list.sort(caseInsensitiveSorterBuilder({ it.name }))
+
+		def sorter = CollectionUtils.caseInsensitiveSorterBuilder({ it.name })
+		list.sort(sorter)
+
 		expect:
 			assert expectedSort == list							
 	}
