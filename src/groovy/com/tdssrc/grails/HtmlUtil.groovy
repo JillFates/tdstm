@@ -9,10 +9,13 @@ import com.tdsops.common.grails.ApplicationContextHolder
  * The HtmlUtil class contains method to generate HTML from server side e.g. Select Box
  */
 class HtmlUtil {
+	//260309 @tavo_luna: Changing static call initialization to SINGLETON-LAZY loading (faster startup)
+	static private ApplicationTagLib TAG_LIB = null
 
-	// static final ApplicationTagLib g = new ApplicationTagLib()
-	static final ApplicationTagLib g = ApplicationContextHolder.getApplicationContext().getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
-	// ApplicationHolder.application.mainContext.getBean( 'org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib' )
+	static private ApplicationTagLib getTagLib(){
+		if(!TAG_LIB) TAG_LIB = ApplicationContextHolder.getApplicationContext().getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib')
+		return TAG_LIB
+	}
 
 	/**
 	 * Generate the HTML for a SELECT control based on a map of parameters
@@ -116,7 +119,7 @@ class HtmlUtil {
 	 * @return String URL
 	 */
 	def public static createLink(map) {
-		def link = g.createLink(map)
+		def link =  getTagLib().createLink(map)
 		String result = ''
 		if (link) {
 			result = link.toString()
@@ -133,7 +136,7 @@ class HtmlUtil {
 	 * @return url as String
 	 */
 	def public static createLinkToResource(map){
-		def link = g.resource(map)
+		def link = getTagLib().resource(map)
 		String resourceUrl = ""
 		if(link){
 			resourceUrl = link.toString() 
@@ -199,7 +202,7 @@ class HtmlUtil {
 	 * @return A string representing the resource as HTML resource
 	 */
 	public static String resource(Map map) {
-		g.resource(map).toString()
+		getTagLib().resource(map).toString()
 	}
 
 	/**
