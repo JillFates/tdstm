@@ -3,6 +3,7 @@ import org.apache.poi.*
 import com.tdssrc.grails.GormUtil
 import com.tds.asset.AssetComment
 import com.tdsops.common.lang.ExceptionUtil
+import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
 
 class PartyRelationshipService {
 
@@ -84,10 +85,12 @@ class PartyRelationshipService {
 		def query = "from PartyRelationship p where p.partyRelationshipType = 'CLIENTS' and p.partyIdFrom = :company and " +
 			"p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'CLIENT'"
 		def clients = PartyRelationship.findAll( query, [company:company] )
-		if (clients && sortOn) {
-			clients?.sort{it.partyIdTo?.("$sortOn")}
-		}
 
+		if (clients && sortOn) {
+			//OLB: Check the imports, some Functional programming Magic
+			def sorter = caseInsensitiveSorterBuilder({ it.partyIdTo?.("$sortOn") })
+			clients?.sort(sorter)
+		}
 		return clients
 	}   
 
