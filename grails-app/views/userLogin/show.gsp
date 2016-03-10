@@ -108,7 +108,12 @@
 						</tr>
 						
 						<tr class="prop passwordsEditFields">
-							<td valign="top" class="name">Password Expires:</td>
+							<td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>							
+							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" /></td>							
+						</tr>
+
+						<tr class="prop passwordsEditFields">
+							<td valign="top" class="name"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</td>
 							<td nowrap="nowrap" valign="top" class="value">
 								<g:if test="${userLoginInstance?.passwordExpirationDate}">
 									<tds:convertDateTime date="${userLoginInstance?.passwordExpirationDate}" timeZone="${request.getSession().getAttribute('CURR_TZ')?.CURR_TZ}"/>
@@ -129,12 +134,6 @@
 							</tr>
 						</g:each>
 						
-						<tr class="prop passwordsEditFields">
-							<td valign="top" class="name"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</td>
-							
-							<td nowrap="nowrap" valign="top" class="value"><tds:convertDateTime date="${userLoginInstance?.expiryDate}" /></td>
-							
-						</tr>
 						<tr class="prop">
 							<td valign="top" class="name">Created Date:</td>
 							

@@ -138,7 +138,7 @@
 							
 							<g:render template="setPasswordFields" model="${[changingPassword:false, minPasswordLength:minPasswordLength]}" />
 							
-							<tr class="prop passwordsEditFields">
+							<tr class="prop">
 								<td valign="top" class="name">
 									<label for="expiryDate"><g:message code="userLogin.expiryDate.label" default="Expiry Date" />:</label>
 								</td>
@@ -159,7 +159,7 @@
 							</tr>
 							<tr class="prop">
 								<td valign="top" class="name">
-									<label for="passwordExpirationDateId">Password Expires:</label>
+									<label for="passwordExpirationDateId"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</label>
 								</td>
 								<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'passwordExpirationDate', 'errors')}">
 									<script type="text/javascript">
