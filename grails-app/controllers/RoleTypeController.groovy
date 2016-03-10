@@ -93,7 +93,7 @@ class RoleTypeController {
         }
         if(!roleTypeInstance.hasErrors() && idCheck != 1 && roleTypeInstance.save(insert:true) ) {
             flash.message = "RoleType ${roleTypeInstance.id} created"
-            redirect( action:"show", id:roleTypeInstance.id )
+            redirect( action:"list")
         }
         else {
             render( view:'create', model:[roleTypeInstance:roleTypeInstance] )
