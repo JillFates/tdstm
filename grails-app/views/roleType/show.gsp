@@ -28,14 +28,14 @@
 
             </tr>
 
-
+          <g:if test="${roleTypeInstance.type == 'SECURITY'}">
            <tr class="prop">
               <td valign="top" class="name">Level:</td>
 
               <td valign="top" class="value">${fieldValue(bean:roleTypeInstance, field:'level')}</td>
 
             </tr>
-
+          </g:if>
 
 
             <tr class="prop">

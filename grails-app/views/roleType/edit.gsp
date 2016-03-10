@@ -28,12 +28,22 @@
 					class="value">${fieldValue(bean:roleTypeInstance,field:'type')}</td>
 			</tr>
 
+
+			<g:if test="${roleTypeInstance.type == 'SECURITY'}">
+	            
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Level:</label></td>
-				<td valign="top"
-					class="value">${fieldValue(bean:roleTypeInstance,field:'level')}</td>
+				<td valign="top"class="value ${hasErrors(bean:roleTypeInstance,field:'level','errors')}">
+					<input type="text" id="level" name="level"
+					value="${fieldValue(bean:roleTypeInstance,field:'level')}" />
+					<g:hasErrors bean="${roleTypeInstance}" field="level">
+                    	<div class="errors">
+                    		<g:renderErrors bean="${roleTypeInstance}" as="list" field="level" />
+                    	</div>
+                	</g:hasErrors>
+				</td>
 			</tr>
-
+			</g:if>
 
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Code:</label></td>

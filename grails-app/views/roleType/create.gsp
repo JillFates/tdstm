@@ -26,12 +26,12 @@
                   <td>
                     <g:select id="type" name="type" 
                       from="${roleTypeInstance.constraints.type.inList}" value="${roleTypeInstance.type}"  
-                      noSelection="${['':'Please select']}">
+                      noSelection="${['':'Please select']}" onchange="typeChanged()">
                     </g:select>
                   </td>
               </tr>
 
-              <tr class="prop">
+              <tr class="prop" id="levelRow">
                 <td valign="top" class="name"><label for="id"><b>Level:&nbsp;<span style="color: red">*</span></b></label></td>
                 <td valign="top"
                     class="value ${hasErrors(bean:roleTypeInstance,field:'level','errors')}">
@@ -84,5 +84,18 @@
         </div>
         <div class="buttons"><span class="button"><input class="save" type="submit" value="Save" /></span></div>
     </g:form></div>
+    <script>
+
+
+    function typeChanged(){
+      var type = $("#type").val()
+      if(type == "SECURITY"){
+        $("#levelRow").css("display", "")
+      }else{
+        $("#level").val("")
+        $("#levelRow").css("display", "none")
+      }
+    }
+    </script>
   </body>
 </html>

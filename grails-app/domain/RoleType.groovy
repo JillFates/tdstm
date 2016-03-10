@@ -21,6 +21,7 @@ class RoleType {
 	String type
 	Integer level
 
+
 	static hasMany = [
 		partyRoles: PartyRole
 	]
@@ -66,5 +67,11 @@ class RoleType {
 			}
 		} 
 		return str
+	}
+
+	def beforeValidate(){
+		if(this.level == null && this.type != "SECURITY" ){
+			this.level = 0
+		}
 	}
 }
