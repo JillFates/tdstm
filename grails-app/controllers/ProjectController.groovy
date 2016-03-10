@@ -422,7 +422,7 @@ class ProjectController {
 			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )	
 
 			// Will create a bundle name TBD and set it as default bundle for project   
-			projectInstance.getProjectDefaultBundle()
+			projectInstance.getProjectDefaultBundle(params["defaultBundleName"])
 			
 			flash.message = "Project ${projectInstance} was created"
 			redirect( action:"show",  imageId:projectLogo?.id )

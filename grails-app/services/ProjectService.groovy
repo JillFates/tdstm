@@ -581,19 +581,21 @@ class ProjectService {
 	/**
 	 * Used retrieve the default Bundle configured for the project or create one if it does not exist
 	 * @param project
+	 * @param defaultBundleName name to be given to the default bundle, should it be created.
 	 * @return MoveBundle - the default bundle assigned to the project or will create it on the fly
 	 */
-	MoveBundle getDefaultBundle(Project project ) {
-		return project.defaultBundle ?: createDefaultBundle( project )
+	MoveBundle getDefaultBundle(Project project, String defaultBundleName = null ) {
+		return project.defaultBundle ?: createDefaultBundle( project, defaultBundleName )
 	}
 	
 	/**
 	 * Method is used to create createDefaultBundle  
 	 * @param project
+	 * @param defaultBundle
 	 * @return project's default move bundle 
 	 */
-	MoveBundle createDefaultBundle (Project project ) {
-		def defaultCode = 'TBD'
+	MoveBundle createDefaultBundle (Project project, String defaultBundleName ) {
+		def defaultCode = defaultBundleName?:'TBD'
 		// TODO : JPM 7/2014 - we could run into two separate processes attempting to create the default project at the same time so a lock should be implemented
 		if(!project.defaultBundle){
 			def moveBundle = MoveBundle.findByNameAndProject(defaultCode, project)

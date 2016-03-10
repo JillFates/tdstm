@@ -310,10 +310,11 @@ class Project extends PartyGroup {
     /**
      * 
      * Method csn used to get default move bundle for for a current project.
+     * @param Default Bundle name (in case a new one is to be created).
      * @return default moveBundle for current project
      */
-	def getProjectDefaultBundle() {
-		return projectService.getDefaultBundle(this)
+	def getProjectDefaultBundle(String defaultBundleName = null) {
+		return projectService.getDefaultBundle(this, defaultBundleName)
 	}
 
 	/**

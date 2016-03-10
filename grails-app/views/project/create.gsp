@@ -264,6 +264,19 @@
 								<span class="footnote">Select a jpg or gif file smaller than 50KB to appear in header</span> 
 							</td>
 						</tr>
+
+
+						<tr class="prop">
+							<td class="name"></td><td class="valueNW"></td>	
+							<td class="name">
+								<label for="client">Default Bundle:</label>
+							</td>
+							<td class="valueNW">
+								<input type="text" id="defaultBundle" name="defaultBundleName" tabindex="110" maxlength="60" value="TBD" />
+							</td>
+						</tr>
+
+
 						<tr class="prop">
 							<td class="name">
 								<label for="projectManager">Project Manager:</label>
