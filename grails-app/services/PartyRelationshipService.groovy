@@ -417,7 +417,8 @@ class PartyRelationshipService {
 			"p.partyIdFrom IN (:companies) AND p.roleTypeCodeFrom='COMPANY'", [companies:companies])
 
 		def persons = staffing*.partyIdTo
-		persons.sort  { a, b -> a.lastNameFirst.compareToIgnoreCase b.lastNameFirst }
+
+		persons = persons.unique().sort  { a, b -> a.lastNameFirst.compareToIgnoreCase b.lastNameFirst }
 
 		return persons
 	}
