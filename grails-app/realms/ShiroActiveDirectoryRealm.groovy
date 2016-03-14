@@ -167,6 +167,9 @@ class ShiroActiveDirectoryRealm {
 		return account
 	}
 
+	/**
+	 * Hardcoded permission athorization for shiro-protect-any
+	 */
 	def isPermitted(principal, requiredPermission) {
 		String perm
 

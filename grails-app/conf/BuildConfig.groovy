@@ -72,6 +72,7 @@ grails.project.dependency.resolution = {
 		compile ':plugin-config:0.2.0'
 		compile ':jquery-ui:1.8.15'
 		compile ':grails-melody:1.54.0'
+		
 		//@tavo_luna: shiro protection for grails-melody
 		compile ':shiro-protect-any:0.1.0'
 	}
@@ -87,15 +88,15 @@ grails.war.resources = { stagingDir ->
 
 // Set runtime forking to save memory and improve performance while in development
 // See the following for more information http://grails.github.io/grails-doc/2.3.x/guide/single.html#forkedMode
-
-forkConfig = [maxMemory: 1024, minMemory: 64, debug: false, maxPerm: 256] 
+/*
+forkConfig = [maxMemory: 1596, minMemory: 512, debug: false, maxPerm: 512] 
 grails.project.fork = [    
 	test: forkConfig, // configure settings for the test-app JVM    
 	run: forkConfig, // configure settings for the run-app JVM    
 	war: forkConfig, // configure settings for the run-war JVM    
 	console: forkConfig // configure settings for the Swing console JVM 
 ]
-
+*/
 /*
  * If the application is being run locally, set the Logback configuration file
  * system property.  This is necessary as Grails will attempt to compile the .groovy

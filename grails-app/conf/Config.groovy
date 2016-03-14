@@ -102,10 +102,10 @@ security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.FirstSuc
 
 
 // default shiro configuration
-security.shiro.redirectUrl = "/auth/unauthorized"
+ security.shiro.redirectUrl = "/auth/unauthorized"
 // now the actual plugin configuration
 // specify all non-controller URLs that shall require authentication
-security.shiro.shiroAnyProtector.urls = ["/monitoring"]
+ security.shiro.shiroAnyProtector.urls = ["/monitoring"]
 
 
 //
