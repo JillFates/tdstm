@@ -167,4 +167,21 @@ class ShiroActiveDirectoryRealm {
 		return account
 	}
 
+	def isPermitted(principal, requiredPermission) {
+		String perm
+
+		switch (requiredPermission) {
+			case ~/^monitoring:.*/:
+				perm = 'monitoring'
+				break
+		}
+
+		if(perm) {
+			UserLogin user = UserLogin.findByUsername(principal)
+			return getSecurityService().hasPermission(user, perm, true)
+		}
+
+		return true
+	}
+
 }

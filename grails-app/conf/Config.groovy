@@ -100,6 +100,14 @@ security.shiro.annotationdriven.enabled = true
 // security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy()
 security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.FirstSuccessfulStrategy()
 
+
+// default shiro configuration
+security.shiro.redirectUrl = "/auth/unauthorized"
+// now the actual plugin configuration
+// specify all non-controller URLs that shall require authentication
+security.shiro.shiroAnyProtector.urls = ["/monitoring"]
+
+
 //
 // SendMail Configuration
 //
