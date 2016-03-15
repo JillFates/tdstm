@@ -79,6 +79,8 @@ class TaskBatch {
 
 	def beforeDelete = {
 		// Remove any tasks that were created by the batch
+		// 160315 OLB: the dependencies of AssetComment are deleted using fk cascade strategy
+		// TODO: We should test and check all the dependencies created to be sure that everything is removed
 		AssetComment.executeUpdate('delete AssetComment ac where ac.taskBatch=:taskBatch', [taskBatch:this])
 	}
 
