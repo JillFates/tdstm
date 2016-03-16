@@ -1126,8 +1126,6 @@ class AdminController {
 		
 	}
 
-	/** ******************************************************************** */
-
 	/**
 	 * Retrieves the default fields to be exported for a single account.
 	 */
@@ -1146,6 +1144,7 @@ class AdminController {
 							person.middleName,
 							person.lastName,
 							person.workPhone?:"",
+							person.company.name,
 							teams.join(";"),
 							roles.join(";"),
 							person.email?:"",
@@ -1153,8 +1152,6 @@ class AdminController {
 						]
 		return fields
 	}
-
-	/** ******************************************************************** */
 
 	/**
 	 * This method outputs all the fields to the sheet.
@@ -1164,8 +1161,6 @@ class AdminController {
 			WorkbookUtil.addCell(sheet, it, rowNumber, fields[it])
 		}
 	}
-
-	/** ******************************************************************** */
 
 	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
 		def session = getSession()
@@ -1182,8 +1177,6 @@ class AdminController {
 		}
 	}
 
-	/** ******************************************************************** */
-
 	private void exportAccountsNoLoginInfo(persons, sheet, companyId){
 		persons.eachWithIndex{ p, index ->
 			def fields = getExportAccountDefaultFields(p, companyId)
@@ -1194,8 +1187,6 @@ class AdminController {
 		}
 
 	}
-
-	/** ******************************************************************** */
 
 	/**
 	 * This method renders the Export Accounts form.
@@ -1209,8 +1200,7 @@ class AdminController {
 		def project = securityService.getUserCurrentProject()
 		render(view:"exportAccounts", model:[project: project.name, client:project.client.name])
 	}
-	
-	/** ******************************************************************** */
+
 
 	/**
 	 * Used to download the spreadsheet/CSV import template
@@ -1229,7 +1219,6 @@ class AdminController {
 		response.outputStream.flush()
 	}
 	
-	/** ******************************************************************** */
 
 	/**
 	 * A controller process to import user accounts
@@ -1268,10 +1257,11 @@ class AdminController {
 							middleName: fields[2],
 							lastName: fields[3],
 							phone: fields[4],
-							teams: fields[5],
-							role: fields[6]?.toUpperCase(),
-							email: fields[7],
-							password: fields[8],
+							company: fields[5],
+							teams: fields[6],
+							role: fields[7]?.toUpperCase(),
+							email: fields[8],
+							password: fields[9],
 							errors: []
 						)	
 					}
