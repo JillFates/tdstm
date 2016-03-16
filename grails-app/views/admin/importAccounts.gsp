@@ -21,7 +21,7 @@
 				<input type="file" name="myFile" />
 				<input type="hidden" name="step" value="upload" />
 				<br />
-				<input type="checkbox" checked name="header" value="Y"> CSV contains a header record
+				<input type="checkbox" checked name="header" value="Y"> XLS contains a header record
 				</br>
 				<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
 				<br />

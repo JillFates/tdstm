@@ -1220,12 +1220,12 @@ class AdminController {
 		if (!project) 
 			return
 
-		String filename = '/templates/AccountImportTemplate.csv'
+		String filename = '/templates/TDS-Accounts_template.xls'
 		File file = ApplicationHolder.application.parentContext.getResource(filename).getFile()
 
-		response.setHeader "Content-disposition", "attachment; filename=AccountImport-${project}.csv"
-		response.contentType = 'text/csv'
-		response.outputStream << file.text
+		response.setHeader "Content-disposition", "attachment; filename=AccountImport-${project}.xls"
+		response.contentType = 'application/vnd.ms-excel'
+		response.outputStream << file.newInputStream()
 		response.outputStream.flush()
 	}
 	
