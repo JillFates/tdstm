@@ -1,6 +1,7 @@
 'use strict';
 var Login = require('./login.po.js');
 describe('Login Test', function(){
+  browser.ignoreSynchronization = true;
   var loginPage = new Login();
 
   it('should have "Username:" as label for username', function(){
@@ -14,7 +15,7 @@ describe('Login Test', function(){
       expect(label.getText()).toEqual('Password:');
     });
   });  
-
+/*
   describe('"Invalid userName and/or password" validation message', function(){
 
     beforeEach(function(){
@@ -47,7 +48,7 @@ describe('Login Test', function(){
     });
 
   }); //"Invalid userName and/or password" validation message
-  
+  */
   it('should login to tdstm with valid userName/Password', function(){
     loginPage.clearUsername();
     loginPage.setUsername(process.env.USER_NAME);
@@ -55,5 +56,4 @@ describe('Login Test', function(){
     loginPage.clickSingInBtn();
     expect(loginPage.getAfterLoginTitle().getText()).toMatch(/TransitionManager™.*/);
     });
-
 });

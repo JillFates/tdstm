@@ -14,8 +14,8 @@ var Login = function() {
   };
   
   this.getUserNameLabel = function(){
-     return browser.driver.findElements(by.css(this.fieldLabelsCss)).then(function(labels){
-      return labels[0];
+    return browser.driver.findElements(by.css(this.fieldLabelsCss)).then(function(labels){
+    return labels[0];
     });
   };
   this.setUsername = function(name) {
@@ -26,7 +26,7 @@ var Login = function() {
   };
   this.getPasswordLabel = function(){
      return browser.driver.findElements(by.css(this.fieldLabelsCss)).then(function(labels){
-      return labels[2];
+     return labels[2];
     });
   };
   this.setPassword = function(password){
