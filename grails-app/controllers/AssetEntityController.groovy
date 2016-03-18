@@ -429,7 +429,6 @@ class AssetEntityController {
 		DataTransferSet dataTransferSet, 
 		String entityClassName, 
 		int numOfAssets, 
-		Date exportTime
 	) {
 		def eavEntityType = EavEntityType.findByDomainName(entityClassName)
 		def dtb = new DataTransferBatch()
@@ -438,8 +437,7 @@ class AssetEntityController {
 		dtb.dataTransferSet = dataTransferSet
 		dtb.project = project
 		dtb.userLogin = userLogin
-		// dtb.exportDatetime = GormUtil.convertInToGMT( exportTime, tzId )
-		dtb.exportDatetime = exportTime
+		dtb.exportDatetime = new Date()
 		dtb.eavEntityType = eavEntityType
 
 		if ( dtb.save() ) {
