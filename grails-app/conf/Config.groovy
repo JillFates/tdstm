@@ -152,6 +152,7 @@ log4j = {
 	// debug 'org.hibernate'
 	// info 'org.codehaus.groovy.grails.web.mapping' // URL mapping
 	// off 'org.hibernate'
+	// debug 'liquibase'
  
 	appenders {
 		def commonPattern = "%d{[EEE, dd-MMM-yyyy @ HH:mm:ss.SSS]} [%t] %-5p %c %x - %m%n"

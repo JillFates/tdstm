@@ -116,4 +116,5 @@ databaseChangeLog = {
 	include file: '20151209-nullout-invalid-person-ref.groovy'
 	include file: '20151230-remove-from-role-user-dep-analyzer-view.groovy'
 	include file: '20160210-new-security-permission-for-critical-path.groovy'
+	include file: '20160310-add-permission-monitoring-permission.groovy'
 }
