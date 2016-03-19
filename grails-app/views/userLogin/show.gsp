@@ -21,7 +21,9 @@
 		<g:javascript src="asset.comment.js" />
 	</head>
 	<body>
-		
+		<!-- BEGIN Modal Dialogs -->
+		<div id="personGeneralViewId"></div>
+		<!-- END Modal Dialogs -->
 		<div class="body">
 			<h1>UserLogin</h1>
 			
@@ -37,8 +39,7 @@
 			</g:if>
 			<div class="dialog loginView" ng-app="tdsAdmin" ng-controller="tds.admin.controller.MainController as admin">
 				<table>
-					<tbody>
-						
+					<tbody>						
 						<tr class="prop">
 							<td valign="top" class="name">Company:</td>
 							<td nowrap="nowrap" valign="top" class="value">${userLoginInstance?.person?.company}</td>
@@ -46,7 +47,11 @@
 						
 						<tr class="prop">
 							<td valign="top" class="name">Person:</td>
-							<td nowrap="nowrap" valign="top" class="value"><g:link controller="person" action="show" id="${userLoginInstance?.person?.id}">${userLoginInstance?.person?.encodeAsHTML()}</g:link></td>
+							<td nowrap="nowrap" valign="top" class="value">
+								<a href="javascript:loadPersonDiv(${userLoginInstance?.person?.id},'generalInfoShow')">
+									${userLoginInstance?.person?.encodeAsHTML()}
+								</a>
+							</td>
 						</tr>
 						
 						<tr class="prop">
@@ -178,6 +183,7 @@
 			currentMenuId = "#adminMenu";
 			$("#adminMenuId a").css('background-color','#003366')
 			$(document).ready(function(){
+				$("#personGeneralViewId").dialog({ autoOpen: false })
 
 				var isChecked = $("#isLocal").is(":checked")
 				if (!isChecked) {
