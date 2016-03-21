@@ -1,5 +1,6 @@
 target
 target-eclipse
+plugins
 .classpath
 .project
 .settings
