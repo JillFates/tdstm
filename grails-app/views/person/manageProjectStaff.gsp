@@ -118,6 +118,11 @@
 					handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
 				}
 			}
+
+			// Used to make it easier for users to click the surrounding area of the checkbox
+			function clickCheckbox(elem) {
+				$(':checkbox', elem).trigger('click');
+			}
 			
 	 	</script>
 	 </body>
