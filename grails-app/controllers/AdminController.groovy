@@ -1148,7 +1148,12 @@ class AdminController {
 							teams.join(";"),
 							roles.join(";"),
 							person.email?:"",
-							"", // empty password
+							person.title,
+							person.department,
+							person.location,
+							person.stateProv,
+							person.country,
+							person.mobilePhone,
 						]
 		return fields
 	}
@@ -1164,16 +1169,34 @@ class AdminController {
 
 	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
 		def session = getSession()
-		persons.eachWithIndex{ p, index ->
+		def index = 1
+		def now = new Date()
+		persons.each{ p ->
 			def loginInfo = UserLogin.findByPerson(p)
-			def fields = getExportAccountDefaultFields(p, companyId)
-			if(loginInfo && (loginChoice == "A" || loginInfo.active == loginChoice)){
-				fields[0] = loginInfo.username
-				fields << loginInfo.active
-				fields << TimeUtil.formatDateTime(session, loginInfo.expiryDate, TimeUtil.FORMAT_DATE_TIME_6)
-				fields << (loginInfo.isLocal? "YES" : "NO")
+			if(loginInfo){
+				def isLoginInfoOkay = (loginChoice == "A")
+				if(!isLoginInfoOkay){
+					// If we're exporting inactive accounts
+					if(loginChoice == "N"){
+						isLoginInfoOkay = (p.active == "N" && loginInfo.active != "Y") || (loginInfo.passwordExpirationDate < now || loginInfo.expiryDate < now)
+					}else{ // exporting active accounts
+						isLoginInfoOkay = (p.active == loginInfo.active == "Y") && (loginInfo.passwordExpirationDate > now || loginInfo.expiryDate > now)
+					}
+				}
+
+				if(isLoginInfoOkay){
+					def fields = getExportAccountDefaultFields(p, companyId)
+					fields[0] = loginInfo.username
+					fields << loginInfo.active
+					fields << "" // empty password
+					fields << TimeUtil.formatDateTime(session, loginInfo.expiryDate, TimeUtil.FORMAT_DATE_TIME_6)
+					fields << ((loginInfo.passwordExpirationDate) ? TimeUtil.formatDateTime(session, loginInfo.passwordExpirationDate, TimeUtil.FORMAT_DATE_TIME_6) : "")
+					fields << (loginInfo.isLocal? "YES" : "NO")
+					fields << (loginInfo.passwordNeverExpires? "YES" : "NO")
+					exportAccountFields(sheet, fields, index++)
+				}
 			}
-			exportAccountFields(sheet, fields, index + 1)
+			
 		}
 	}
 
@@ -1233,11 +1256,63 @@ class AdminController {
 
 		def map = [step:'start', projectName:project.toString() ]
  
-		def filename = '/tmp/tdstm-account-import.csv'
+		def filename = '/tmp/tdstm-account-import.xls'
+
 
 		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 		List teamCodes = partyRelationshipService.getStaffingRoles().description
 
+		/*
+			Closure that parses the XLS file and returns a map
+			containing the information for all the records read.
+		*/
+		def parseXLS = {workbook, header, createUserLogin ->
+			int firstAccountRow = header ? 1 : 0
+			def accountsSheet = workbook.getSheet( "Accounts" )
+			int lastRow = accountsSheet.getLastRowNum()
+			def accounts = []
+			for(int i = firstAccountRow; i <= lastRow; i++){
+
+				String username = WorkbookUtil.getStringCellValue(accountsSheet, 0, i)
+				boolean validUserInfo = createUserLogin ? username : true
+
+				// Read required fields			
+				String firstName = WorkbookUtil.getStringCellValue(accountsSheet, 1, i)
+				String lastName = WorkbookUtil.getStringCellValue(accountsSheet, 3, i)
+				String email = WorkbookUtil.getStringCellValue(accountsSheet, 8, i)
+				if(validUserInfo && firstName && lastName && email){
+					accounts.add(
+						username: username,
+						firstName: firstName,
+						middleName: WorkbookUtil.getStringCellValue(accountsSheet, 2, i),
+						lastName: lastName,
+						phone: WorkbookUtil.getStringCellValue(accountsSheet, 4, i),
+						company: WorkbookUtil.getStringCellValue(accountsSheet, 5, i),
+						teams: WorkbookUtil.getStringCellValue(accountsSheet, 6, i),
+						role: WorkbookUtil.getStringCellValue(accountsSheet, 7, i),
+						email: email,
+						title: WorkbookUtil.getStringCellValue(accountsSheet, 9, i),
+						department: WorkbookUtil.getStringCellValue(accountsSheet, 10, i),
+						location: WorkbookUtil.getStringCellValue(accountsSheet, 11, i),
+						stateProv: WorkbookUtil.getStringCellValue(accountsSheet, 12, i),
+						country: WorkbookUtil.getStringCellValue(accountsSheet, 13, i),
+						mobile: WorkbookUtil.getStringCellValue(accountsSheet, 14, i),
+						active: WorkbookUtil.getStringCellValue(accountsSheet, 15, i),
+						password: WorkbookUtil.getStringCellValue(accountsSheet, 16, i),
+						accountExpiration: WorkbookUtil.getStringCellValue(accountsSheet, 17, i),
+						passwordExpiration: WorkbookUtil.getStringCellValue(accountsSheet, 18, i),
+						passwordNeverExpires: WorkbookUtil.getStringCellValue(accountsSheet, 19, i),
+						isLocal: WorkbookUtil.getStringCellValue(accountsSheet, 20, i),
+						
+						errors: [],
+
+					)
+				}
+
+			}
+			return accounts
+		}
+		/*
 		// Inline closure to parse the CSV file and return array of mapped fields
 		def parseCsv = {file, header, createUserLogin ->
 			def first = true
@@ -1268,7 +1343,7 @@ class AdminController {
 				}
 			}
 			return people
-		}
+		}*/
 
 		def validateTeams = { teams -> 
 			String errors = ''
@@ -1343,13 +1418,21 @@ class AdminController {
 					return map
 				}
 
-				// Save for step 3
-				def upload = new File('/tmp/tdstm-account-import.csv')
+
 				// upload.delete()
-				f.transferTo(upload)
+				
 				def header = params.header == 'Y'
 
-				people = parseCsv(upload, header, false)
+				MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+				CommonsMultipartFile xls = ( CommonsMultipartFile ) mpr.getFile("myFile")
+				def xlsWorkbook = new HSSFWorkbook( xls.inputStream )
+
+				people = parseXLS(xlsWorkbook, header, false)
+
+				// Save for step 3
+				def upload = new File("/tmp/tdstm-account-import.xls")
+				f.transferTo(upload)
+
 				map.matches = lookForMatches()
 
 				// Validate the teams && role
@@ -1393,9 +1476,13 @@ class AdminController {
 				def header = params.header == 'Y'
 				def role = params.role
 
-				def csv = new File('/tmp/tdstm-account-import.csv')
+				//MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
+				//CommonsMultipartFile xls = ( CommonsMultipartFile ) mpr.getFile('/tmp/tdstm-account-import.xls')
 
-				people = parseCsv(csv, header, createUserLogin)
+				HSSFWorkbook xlsWorkbook = new HSSFWorkbook(new FileInputStream(new File('/tmp/tdstm-account-import.xls')))
+
+
+				people = parseXLS(xlsWorkbook, header, createUserLogin)
 				lookForMatches()
 
 				if (randomPassword) {
@@ -1430,16 +1517,20 @@ class AdminController {
 							p.errors << "Unable to find previous Person match"
 							failed = true
 						} else {
-							if ((person.email != p.email) ||
-							    (person.workPhone != p.phone) ) {
-								person.email = p.email
-								person.workPhone = p.phone
-								if (person.validate() && person.save(flush:true)) {
-									log.info "importAccounts() : updated person $person"
-								} else {
-									p.errors << "Error" + GormUtil.allErrorsString(person)
-									failed = true
-								}
+							person.email = p.email
+							person.workPhone = p.phone
+							person.title = p.title
+							person.deparment = p.department
+							person.location = p.location
+							person.stateProv = p.stateProv
+							person.country = p.country
+							person.mobilePhone = p.mobile
+
+							if (person.validate() && person.save(flush:true)) {
+								log.info "importAccounts() : updated person $person"
+							} else {
+								p.errors << "Error" + GormUtil.allErrorsString(person)
+								failed = true
 							}
 						}
 					} else {
@@ -1449,6 +1540,12 @@ class AdminController {
 							lastName:p.lastName,
 							email:p.email,
 							workPhone: p.phone,
+							title: p.title,
+							department: p.department,
+							location: p.location,
+							stateProv: p.stateProv,
+							country: p.country,
+							mobilePhone: p.mobile,
 							staffType: 'Salary'
 							)
 					
