@@ -1236,14 +1236,14 @@ class ProjectService {
 	 * @param project - the Project that the team is associated to
 	 * @return The list of persons found that are team members
 	 */
-	List<Person> getAssignedStaff(Project project) {
+	List<Person> getAssignedStaff(Project project, String team='STAFF') {
 		String query = "from Person s where s.id in (SELECT p.partyIdTo.id FROM PartyRelationship p \
 			WHERE p.partyRelationshipType = 'PROJ_STAFF' AND \
 			p.partyIdFrom.id = :project AND \
-			p.roleTypeCodeFrom ='PROJECT' AND \
-			p.roleTypeCodeTo = 'STAFF') \
+			p.roleTypeCodeFrom.id = 'PROJECT' AND \
+			p.roleTypeCodeTo.id = :team ) \
 			ORDER BY s.firstName, s.lastName"
-		List persons = Person.findAll(query, [project:project.id], [sort: 'firstName'])
+		List persons = Person.findAll(query, [project:project.id, team:team], [sort: 'firstName'])
 
 		return persons
 	}

@@ -915,10 +915,17 @@ def test = {
 		// Get the list of staff that should be displayed based on strictly assigned or available staff
 		List staff
 		if (assigned == '1') {
-			staff = projectService.getAssignedStaff(project)
+			if (role == '0') {
+				staff = projectService.getAssignedStaff(project)
+			} else {
+				staff = projectService.getAssignedStaff(project, role)
+			}
+
 		} else {
 			staff = projectService.getAssignableStaff(project, loginPerson)
 		}
+
+
 
 		List staffList
 
