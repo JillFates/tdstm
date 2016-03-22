@@ -21,6 +21,12 @@ grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 def appenderFileName = appName ?: "tdstm"	// If not defined (for local config)
 
 tdstm {
+
+	admin {
+		// The command to be executed to restart the application
+		serviceRestartCommand='service tomcat_tranman01 restart'
+	}
+	
 	security {
 
 		// Audit configuration, valid options are: access and activity (default is access)
