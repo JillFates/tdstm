@@ -534,7 +534,6 @@ class RunbookService {
 
 		if (edges.containsKey(id)) {
 			def maxDur=-1
-			// def maxTasks=0
 
 			// We're going to go through the list once to find the max duration of all edges
 			edges[id].each { e ->
@@ -556,6 +555,7 @@ class RunbookService {
 				}
 			}
 		}
+
 		return edgeList
 	}
 	
@@ -644,16 +644,14 @@ class RunbookService {
 				log.debug "computeStartTimes() DFS/CP task id=${newTask.id}, dur=${newTask.duration}. time=$newTime"
 				
 				def edgeList = findCriticalPath(newTask, edgesByPred, tmp)
-				if (edgeList != null && edgeList.size() != 0) {
-					edgeList.each {
-						def nextTask = it.successor
-						def nextId = (long)(nextTask.id)
-						
-						if (tmp['tasks'][nextId]) {
-							if (! tmp['tasks'][nextId].tmpBeenExplored) {
-								tmp['tasks'][nextId].tmpBeenExplored = true
-								criticalPathQueue.push([task:nextTask, time:time])
-							}
+				edgeList?.each {
+					def nextTask = it.successor
+					def nextId = (long)(nextTask.id)
+					
+					if (tmp['tasks'][nextId]) {
+						if (! tmp['tasks'][nextId].tmpBeenExplored) {
+							tmp['tasks'][nextId].tmpBeenExplored = true
+							criticalPathQueue.push([task:nextTask, time:time])
 						}
 					}
 				}

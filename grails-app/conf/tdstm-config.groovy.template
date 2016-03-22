@@ -26,7 +26,7 @@ tdstm {
 		// The command to be executed to restart the application
 		serviceRestartCommand='service tomcat_tranman01 restart'
 	}
-	
+
 	security {
 
 		// Audit configuration, valid options are: access and activity (default is access)
@@ -227,7 +227,8 @@ environments {
 				testWhileIdle=true
 				testOnReturn=true
 				removeAbandoned=true
-				removeAbandonedTimeout=600
+				// Should be set to the longest running query (default 60 seconds)
+				removeAbandonedTimeout=(60*5)
 				validationQuery='/* ping */'
 			}
 		}
