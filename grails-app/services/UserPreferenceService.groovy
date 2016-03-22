@@ -266,14 +266,22 @@ class UserPreferenceService {
 		if (log.isDebugEnabled())
 			log.debug "setPreference: setting user ($userLogin) preference $preferenceCode=$value"
 
+		// Date start = new Date()
+
 		if (value && value != "null" && userLogin) {
 			def prefValue = getPreference(preferenceCode)
 	
+			//log.debug "setPreference() phase 1 took ${TimeUtil.elapsed(start)}"
+			//start = new Date()
+
 			//	remove the movebundle and event preferences if user switched to different project
 			if (preferenceCode == "CURR_PROJ" && prefValue && prefValue != value){
 				removeProjectAssociatedPreferences(userLogin)	
 			}
 			
+			//log.debug "setPreference() phase 2 took ${TimeUtil.elapsed(start)}"
+			//start = new Date()
+
 			if ( prefValue == null ) {
 				//	Statements to create UserPreference to login user
 				def userPreference = new UserPreference( value: value )
@@ -291,8 +299,15 @@ class UserPreferenceService {
 					log.error "setPreference: failed update : ${GormUtil.allErrorsString(userPreference)}"
 				}
 			}
+
+			// log.debug "setPreference() phase 3 took ${TimeUtil.elapsed(start)}"
+			// start = new Date()
+
 			// call loadPreferences() to load CURR_PROJ MAP into session
 			loadPreferences(userLogin, preferenceCode)
+		
+			// log.debug "setPreference() phase 4 took ${TimeUtil.elapsed(start)}"
+
 		}
 		return saved
 

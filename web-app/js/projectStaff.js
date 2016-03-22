@@ -462,8 +462,6 @@ function addRemoveEventStaff(source, personId, projectId, eventId, teamCode) {
 
 	var action = (source.is(':checked') ? 'add' : 'remove');
 	var errorMsg = '';
-
-	toggleChangedStyle(source);
 	
 	var params = { 'personId':personId, 'projectId':projectId, 'eventId':eventId, 'teamCode':teamCode };
 	var url = contextPath + '/person/' + action + 'EventStaff';
@@ -497,29 +495,26 @@ function addRemoveEventStaff(source, personId, projectId, eventId, teamCode) {
  * Whenever a property is changed on the manage project staff list, give it a style to confirm that it has been modified
  */
 function toggleChangedStyle (source) {
-	if(source.val() == 0)
-		source.parent().addClass('uncheckedStaff')
-	else
-		source.parent().addClass('checkedStaffTemp')
+	var cssClass = $(source).is(':checked') ? 'checkedStaffTemp' : 'uncheckedStaff';
+	$(source).parent().addClass(cssClass);
 }
 
 /*
  * To Close dialog and set global variable again on default.
  */
 function closePersonDiv(divId){
-	currentTabShow = "generalInfoShowId"
-	currentHeaderShow = "generalShowHeadId"
-	$('#'+divId).dialog('close')
+	currentTabShow = "generalInfoShowId";
+	currentHeaderShow = "generalShowHeadId";
+	$('#'+divId).dialog('close');
 }
 
 /**
  * open staff create dialog
  */
 function createDialog() {
-	$("#createStaffDialog").show()
-	$("#createStaffDialog").dialog('option', 'width', 500)
-	$("#createStaffDialog").dialog("open")
-
+	$("#createStaffDialog").show();
+	$("#createStaffDialog").dialog('option', 'width', 500);
+	$("#createStaffDialog").dialog("open");
 }
 
 /**

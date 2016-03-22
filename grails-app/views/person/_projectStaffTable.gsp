@@ -49,7 +49,7 @@
 							nowrap="nowrap" 
 							title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}"
 						>
-							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"'}
+							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ? '' : 'disabled = "disabled"'}
 								onClick="addRemoveProjectTeam($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
 								value="${(inProject)?(1):(0)}" 
 								${(projectStaff.project==1 ? 'checked="checked"' : '')} />
@@ -61,7 +61,7 @@
 							onClick="clickCheckbox(this);"
 						>
 
-							<input id="staff_person_${projectStaff.personId}" type="checkbox" name="staffChangeCheck" ${editPermission ?: 'disabled = "disabled"'}
+							<input id="staff_person_${projectStaff.personId}" type="checkbox" name="staffChangeCheck" ${editPermission ? '' : 'disabled = "disabled"'}
 								onClick="addRemoveProjectStaff($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
 								value="${(inProject)?(1):(0)}" 
 								${(projectStaff.project==1 ? 'checked="checked"' : '')} />
@@ -77,14 +77,14 @@
 						</g:if>
 						<g:else>
 							<g:set var="inMoveEvent" value="${(projectStaff.moveEvents.tokenize(',').contains(moveEvent.id.toString()))}" />
-							<td id="${moveEvent.id}" class="${(inMoveEvent)?('checkedStaff'):('')}" nowrap="nowrap" 
+							<td id="${moveEvent.id}" class="${( inMoveEvent ? 'checkedStaff' : '' )}" nowrap="nowrap" 
 								title="${moveEvent.project} - ${moveEvent.name} - ${moveEvent.startTime}"
 								onClick="clickCheckbox(this);"
 							>
-								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ?: 'disabled = "disabled"' }
-									ng-click="saveEventStaff2($event)"  ng-checked="${inMoveEvent}"
-									value="${(inMoveEvent)?(1):(0)}" 
-									${( inMoveEvent ? 'checked="checked"' : '' )} />
+								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${(editPermission ? '' : 'disabled = "disabled"') }
+									onClick="addRemoveEventStaff($(this),${projectStaff.personId},${project.id}, ${moveEvent.id},'${projectStaff.role}');"
+									value="${(inMoveEvent ? '1' : '0' )}" 
+									${ ( inMoveEvent ? 'checked="checked"' : '' )} />
 							</td>
 						</g:else>
 					</g:if>

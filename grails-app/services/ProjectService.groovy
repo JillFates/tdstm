@@ -892,15 +892,15 @@ class ProjectService {
 	List<Party> getPartners(Project project) {
 		assert project != null
 
-		def params = [prt:PartyRelationshipType.read('PROJ_PARTNER'), rtcf: RoleType.read('PROJECT'), rtct: RoleType.read('PARTNER'), project:project]
-		// return params
-		def pids = PartyRelationship.executeQuery("select partyIdTo from PartyRelationship pr where \
-			pr.partyRelationshipType = :prt and \
-			pr.roleTypeCodeFrom = :rtcf and \
-			pr.roleTypeCodeTo = :rtct and \
+		def params = [project:project]
+
+		def partners = PartyRelationship.executeQuery("select partyIdTo from PartyRelationship pr where \
+			pr.partyRelationshipType.id = 'PROJ_PARTNER' and \
+			pr.roleTypeCodeFrom.id = 'PROJECT' and \
+			pr.roleTypeCodeTo.id = 'PARTNER' and \
 			pr.partyIdFrom = :project", params )
 
-		return pids
+		return partners
 	}
 
 	/**
@@ -912,16 +912,13 @@ class ProjectService {
 		assert project != null
 
 		def params = [
-			prt:PartyRelationshipType.read('PROJ_COMPANY'), 
-			rtcf: RoleType.read('PROJECT'), 
-			rtct: RoleType.read('COMPANY'), 
 			project:project
 		]
 		
 		def owner = PartyRelationship.executeQuery("select partyIdTo from PartyRelationship pr where \
-			pr.partyRelationshipType = :prt and \
-			pr.roleTypeCodeFrom = :rtcf and \
-			pr.roleTypeCodeTo = :rtct and \
+			pr.partyRelationshipType.id = 'PROJ_COMPANY' and \
+			pr.roleTypeCodeFrom.id = 'PROJECT' and \
+			pr.roleTypeCodeTo.id = 'COMPANY' and \
 			pr.partyIdFrom = :project", params )
 
 		return owner ? owner[0] : null

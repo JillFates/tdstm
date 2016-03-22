@@ -812,6 +812,8 @@ def test = {
 			return
 		}
 
+		//Date start = new Date()
+
 		UserLogin userLogin = securityService.getUserLogin()
 		Person loginPerson = userLogin.person
 
@@ -830,12 +832,19 @@ def test = {
 			render 'Specified Project was not found'
 			return
 		}
+
+		// log.debug "loadFilteredStaff() phase 1 took ${TimeUtil.elapsed(start)}"
+		// start = new Date()
+
 		List accessibleProjects = personService.getAvailableProjects(loginPerson)
 		if (! accessibleProjects.find {it.id == projectId } ) {
 			securityService.reportViolation("attempted to access project staffing for project $project without necessary access rights", userLogin)
 			render 'Specified Project was not found'
 			return
 		}
+
+		// log.debug "loadFilteredStaff() phase 2 took ${TimeUtil.elapsed(start)}"
+		// start = new Date()
 
 		def assigned = ( params.containsKey('assigned') && '01'.contains(params.assigned) ? params.assigned : '1' )
 		def onlyClientStaff = ( params.containsKey('onlyClientStaff') && '01'.contains(params.onlyClientStaff) ? params.onlyClientStaff : '1' )
@@ -866,25 +875,42 @@ def test = {
 		sortableProps.each {
 			sortString = sortString + ', ' + it + ' asc'
 		}
+
+		// log.debug "loadFilteredStaff() phase 3 took ${TimeUtil.elapsed(start)}"
+		// start = new Date()
 		
-		// Save the user preferences from the filter
-		//userPreferenceService.setPreference("StaffingLocation",location)
-		//userPreferenceService.setPreference("StaffingPhases",phase.toString().replace("[", "").replace("]", ""))
-		//userPreferenceService.setPreference("StaffingScale",scale)	
-		userPreferenceService.setPreference("StaffingRole",role)		
-		userPreferenceService.setPreference("ShowClientStaff",onlyClientStaff.toString())
-		userPreferenceService.setPreference("ShowAssignedStaff",assigned.toString())
+		// Save the user preferences from the filter if the preference has changed
+		String prefValue
+		Map prefMap = [
+			StaffingRole: role, 
+			ShowClientStaff: onlyClientStaff.toString(),
+			ShowAssignedStaff: assigned.toString()
+		]
+		prefMap.each {k,v ->
+			prefValue = userPreferenceService.getPreference(k, userLogin)
+			if (prefValue != v) {
+				userPreferenceService.setPreference(userLogin, k, v)
+			}
+		}
+
+		// log.debug "loadFilteredStaff() phase 4 took ${TimeUtil.elapsed(start)} (user preferences)"
+		// start = new Date()
 
 		def hasShowAllProjectPerm = RolePermissions.hasPermission("ShowAllProjects")
 		def editPermission  = RolePermissions.hasPermission('EditProjectStaff')
 		
+		// log.debug "loadFilteredStaff() phase 4b took ${TimeUtil.elapsed(start)}"
+		// start = new Date()
+
 		List moveEvents 
 		List projectList = [project]
 		
 		// Find all Events for one or more Projects and the Staffing for the projects
-		// Limit the list of events to those that completed within the past 30 days or have no completion and have started in the past 90 days
+		// Limit the list of events to those that completed within the past 30 days or have no completion and have started 
+		// in the past 90 days
 		if (projectList.size() > 0) {
-			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",[project:projectList])
+			moveEvents = MoveEvent.findAll("from MoveEvent m where project in (:project) order by m.project.name , m.name asc",
+				[project:projectList])
 			def now = TimeUtil.nowGMT()
 		
 			moveEvents = moveEvents.findAll {
@@ -900,17 +926,25 @@ def test = {
 				return false
 			}
 		}
-		
+		// log.debug "loadFilteredStaff() phase 5 took ${TimeUtil.elapsed(start)} Get Events"
+		// start = new Date()
+
 		String projects = "${project.id}"
 		StringBuffer companies = new StringBuffer("${project.client.id}")
 		if (onlyClientStaff == '0') {
 			// Add the owner company and any partner companies associated with the project
 			companies.append(", ${project.owner.id}")
 			def projectPartners = projectService.getPartners(project)
+
+			// log.debug "loadFilteredStaff() phase 5b took ${TimeUtil.elapsed(start)} Get Partners"
+			// start = new Date()
+
 			if (projectPartners) {
 				companies.append(',' + projectPartners*.id.join(','))
 			}
 		}
+		// log.debug "loadFilteredStaff() phase 5c took ${TimeUtil.elapsed(start)} Get Companies"
+		// start = new Date()
 
 		// Get the list of staff that should be displayed based on strictly assigned or available staff
 		List staff
@@ -925,9 +959,10 @@ def test = {
 			staff = projectService.getAssignableStaff(project, loginPerson)
 		}
 
-
-
 		List staffList
+
+		// log.debug "loadFilteredStaff() phase 6 took ${TimeUtil.elapsed(start)}"
+		// start = new Date()
 
 		// If there is no staff then there is no need to perform the query
 		if (staff) {
@@ -975,9 +1010,13 @@ def test = {
 				query.append("AND companyStaff.role = '${role}' ")
 
 			query.append(" ORDER BY fullName ASC, team ASC ")
+
 			// log.debug "loadFilteredStaff() query=$query"
 			staffList = jdbcTemplate.queryForList(query.toString())
 		}
+
+		// log.debug "loadFilteredStaff() phase 7 took ${TimeUtil.elapsed(start)}"
+		// start = new Date()
 
 		render(
 			template: "projectStaffTable", 
