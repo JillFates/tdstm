@@ -1748,7 +1748,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 		if (scope.editor.editingRecipe) {
 			alert("You have unsaved changes. Please click Save WIP or Undo before proceeding.");
 		} else {
-			var confirmation = confirm("You are about to create a release of the recipe that will be a perminant version of the source.\n\nPress OK to continue otherwise press Cancel.");
+			var confirmation = confirm("You are about to create a release of the recipe that will be a permanent version of the source.\n\nPress OK to continue otherwise press Cancel.");
 			if (confirmation == true){
 				cookbookService.release({moreDetails:selectedId}, dataToSend, function(data) {
 					log.info('Success on Releasing');
