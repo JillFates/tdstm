@@ -203,6 +203,15 @@ class UrlMappings {
 			action = [PUT:"unlockAccount"]
 		}
 
+		"/tdstm/restartAppService" {
+			controller = "auth"
+			action = [
+				GET: "restartAppServiceForm",
+				POST:"restartAppServiceAction"
+			]
+		}
+
+
 		"500"(view:'/error')
 		"401"(view:'/unauthorized')
 	}

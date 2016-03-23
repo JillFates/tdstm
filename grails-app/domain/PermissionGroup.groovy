@@ -1,7 +1,6 @@
 
 
-public enum PermissionGroup {
-	
+public enum PermissionGroup {	
 	NAVIGATION('Navigation'),
 	ASSETENTITY('Asset Entity'),
 	PROJECT('Project'),
@@ -20,7 +19,8 @@ public enum PermissionGroup {
 	TASK('Task'),
 	USER('User'),
 	PARTY('Party'),
-	COOKBOOK('Cookbook')
+	COOKBOOK('Cookbook'),
+	ADMIN('Admin')
 	
 	String name
 	
@@ -34,7 +34,7 @@ public enum PermissionGroup {
 	
 	static list() {
 		 [NAVIGATION,ASSETENTITY,PROJECT,CONSOLE,ASSETTRACKER,CLIENTTEAMS,COOKBOOK,DASHBOARD,MOVEBUNDLE,
-			 MOVEEVENT,MODEL,PERSON,RACKLAYOUT,ROLETYPE,ROOMLAYOUT,REPORTS,TASK,USER,PARTY]
+			 MOVEEVENT,MODEL,PERSON,RACKLAYOUT,ROLETYPE,ROOMLAYOUT,REPORTS,TASK,USER,PARTY, ADMIN]
 		}
 	String toString() {
 		return name

@@ -17,6 +17,9 @@ import ch.qos.logback.core.rolling.FixedWindowRollingPolicy
 // Set the DEFAULT URL to use for the site
 grails.serverURL = "https://tmlocal.tdsops.com/tdstm"
 
+// Restart application command
+tdstm.admin.serviceRestartCommand = "service tomcat_tranman01 restart"
+
 // Set log4j appender file name
 def appenderFileName = appName ?: "tdstm"	// If not defined (for local config)
 
