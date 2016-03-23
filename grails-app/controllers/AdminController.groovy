@@ -1176,7 +1176,6 @@ class AdminController {
 	 */
 	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
 		def session = getSession()
-		def index = 1
 		def now = new Date()
 		persons.eachWithIndex{ p, index ->
 			def loginInfo = UserLogin.findByPerson(p)
