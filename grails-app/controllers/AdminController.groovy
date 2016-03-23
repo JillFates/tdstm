@@ -1088,6 +1088,10 @@ class AdminController {
 	 * Process the Account Export request and outputs a CSV.
 	 */
 	def exportAccountsProcess(){
+
+		Project project = controllerService.getProjectForPage(this, 'PersonExport')
+		if (!project) 
+			return
 		try{
 
 			def persons = []
@@ -1111,7 +1115,7 @@ class AdminController {
 						exportAccountsNoLoginInfo(persons, sheet, company)
 					}
 				}
-				
+				println(persons.lastName)
 				book.write(response.getOutputStream())
 			}
 
@@ -1167,45 +1171,55 @@ class AdminController {
 		}
 	}
 
+	/**
+	 * This method exports the accounts along with their login information.
+	 */
 	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
 		def session = getSession()
 		def index = 1
 		def now = new Date()
-		persons.each{ p ->
+		persons.eachWithIndex{ p, index ->
 			def loginInfo = UserLogin.findByPerson(p)
 			if(loginInfo){
 				def isLoginInfoOkay = (loginChoice == "A")
 				if(!isLoginInfoOkay){
-					// If we're exporting inactive accounts
-					if(loginChoice == "N"){
-						isLoginInfoOkay = (p.active == "N" && loginInfo.active != "Y") || ((loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate < now)
-					}else{ // exporting active accounts
-						isLoginInfoOkay = (p.active == loginInfo.active == "Y") && (!(loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate > now || loginInfo.passwordNeverExpires == "Y")
-					}
-				}
 
+					if(loginChoice == "Y"){
+	
+						if(p.active == "Y" && loginInfo.active == "Y" && loginInfo.expiryDate > now && (loginInfo.passwordNeverExpires || !(loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
+							isLoginInfoOkay = true
+						}
+					}else{
+						if(p.active == "N" || loginInfo.active == "N" || loginInfo.expiryDate < now  || (!loginInfo.passwordNeverExpires && (loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
+							isLoginInfoOkay = true
+						}
+					}
+
+				}
+				def fields = getExportAccountDefaultFields(p, companyId)
 				if(isLoginInfoOkay){
-					def fields = getExportAccountDefaultFields(p, companyId)
+					
 					fields[0] = loginInfo.username
 					fields << loginInfo.active
 					fields << "" // empty password
 					fields << TimeUtil.formatDateTime(session, loginInfo.expiryDate, TimeUtil.FORMAT_DATE_TIME_6)
 					fields << ((loginInfo.passwordExpirationDate) ? TimeUtil.formatDateTime(session, loginInfo.passwordExpirationDate, TimeUtil.FORMAT_DATE_TIME_6) : "")
-					fields << (loginInfo.isLocal? "YES" : "NO")
-					fields << (loginInfo.passwordNeverExpires? "YES" : "NO")
-					exportAccountFields(sheet, fields, index++)
+					fields << (loginInfo.isLocal? "Y" : "N")
+					fields << (loginInfo.passwordNeverExpires? "Y" : "N")
 				}
+				exportAccountFields(sheet, fields, index)
 			}
 			
 		}
 	}
 
+	/**
+	 * Method that exports Accounts when User Login information is not to be
+	 * included in the XLS.
+	 */
 	private void exportAccountsNoLoginInfo(persons, sheet, companyId){
 		persons.eachWithIndex{ p, index ->
 			def fields = getExportAccountDefaultFields(p, companyId)
-			/*fields << "" // Empty active
-			fields << "" // Empty expiryDate
-			fields << "" // Empty isLocal*/
 			exportAccountFields(sheet, fields, index + 1)
 		}
 
