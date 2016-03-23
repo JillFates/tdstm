@@ -1180,7 +1180,7 @@ class AdminController {
 					if(loginChoice == "N"){
 						isLoginInfoOkay = (p.active == "N" && loginInfo.active != "Y") || ((loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate < now)
 					}else{ // exporting active accounts
-						isLoginInfoOkay = (p.active == loginInfo.active == "Y") && (!(loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate > now)
+						isLoginInfoOkay = (p.active == loginInfo.active == "Y") && (!(loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate > now || loginInfo.passwordNeverExpires == "Y")
 					}
 				}
 
