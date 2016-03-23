@@ -1178,9 +1178,9 @@ class AdminController {
 				if(!isLoginInfoOkay){
 					// If we're exporting inactive accounts
 					if(loginChoice == "N"){
-						isLoginInfoOkay = (p.active == "N" && loginInfo.active != "Y") || (loginInfo.passwordExpirationDate < now || loginInfo.expiryDate < now)
+						isLoginInfoOkay = (p.active == "N" && loginInfo.active != "Y") || ((loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate < now)
 					}else{ // exporting active accounts
-						isLoginInfoOkay = (p.active == loginInfo.active == "Y") && (loginInfo.passwordExpirationDate > now || loginInfo.expiryDate > now)
+						isLoginInfoOkay = (p.active == loginInfo.active == "Y") && (!(loginInfo.passwordExpirationDate < now && loginInfo.isLocal) || loginInfo.expiryDate > now)
 					}
 				}
 
