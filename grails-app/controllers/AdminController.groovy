@@ -1505,161 +1505,178 @@ class AdminController {
 					people = []
 				}
 
+				def projectCompanies = partyRelationshipService.getProjectCompanies(project.id)
+
 				people.each() { p -> 
-					def person
-					boolean failed = false
-					boolean haveMessage = false
 
-					if (p.match ) {
-						// Find the person
-						person = findPerson(p)
-						if (! person) {
-							p.errors << "Unable to find previous Person match"
-							failed = true
-						} else {
-							person.email = p.email
-							person.workPhone = p.phone
-							person.title = p.title
-							person.deparment = p.department
-							person.location = p.location
-							person.stateProv = p.stateProv
-							person.country = p.country
-							person.mobilePhone = p.mobile
+					def company = projectCompanies.find{it.partyIdTo.name == p.company}
+					if(!company){
+						p.errors << "Unable to assign ${p.name} to ${p.company}"
+						
+					}else{
 
-							if (person.validate() && person.save(flush:true)) {
-								log.info "importAccounts() : updated person $person"
-							} else {
-								p.errors << "Error" + GormUtil.allErrorsString(person)
-								failed = true
-							}
-						}
-					} else {
-						person = new Person(
-							firstName:p.firstName, 
-							middleName:p.middleName, 
-							lastName:p.lastName,
-							email:p.email,
-							workPhone: p.phone,
-							title: p.title,
-							department: p.department,
-							location: p.location,
-							stateProv: p.stateProv,
-							country: p.country,
-							mobilePhone: p.mobile,
-							staffType: 'Salary'
-							)
-					
-						if (person.validate() && person.save(flush:true)) {
-							log.info "importAccounts() : created person $person"
-							partyRelationshipService.addCompanyStaff(project.client, person)
-							partyRelationshipService.addProjectStaff(project, person)
-						} else {
-							p.errors << "Error" + GormUtil.allErrorsString(person)
-							failed = true
-						}
+						def person
+						boolean failed = false
+						boolean haveMessage = false
 
-						// Assign the user to one or more teams appropriately
-						if (!failed && p.teams) {
-							List teams = splitTeams(p.teams)
-
-							teams.each { t ->
-								if (teamCodes.contains(t)) {
-									partyRelationshipService.addStaffFunction(person, t, project.client, project)
-								}
-							}
-						}
-					}
-
-					def userRole = role
-					if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
-						userRole = p.role
-					}
-					if (!validRoleCodes.contains(userRole)) {
-						userRole = DEFAULT_ROLE
-					}
-					if (!failed && !StringUtils.isEmpty(userRole)) {
-						log.debug "importAccounts() : creating Role $userRole for $person"
-						// Delete previous security roles if they exist
-						def assignedRoles = []
-						def assignRole = false
-						if (p.match) {
-							def personRoles = userPreferenceService.getAssignedRoles(person);
-							personRoles.each { r ->
-								assignedRoles << r.id
-								if (r.id != userRole) {
-									assignRole = true
-								}
-							}
-							if (assignRole) {
-								userPreferenceService.deleteSecurityRoles(person)
-							}
-							if (personRoles.size() == 0) {
-								assignRole = true
-							}
-						} else {
-							assignRole = true
-						}
-						if (assignRole) {
-							userPreferenceService.setUserRoles([userRole], person.id)
-
-							// Audit role changes
-							def currentUser = securityService.getUserLogin()
-							if (p.match) {
-								p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
-								haveMessage = true
-								auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
-							} else {
-								auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
-							}
-						}
-					}
-
-					if (person && createUserLogin && p.username) {
-						def u = UserLogin.findByPerson(person)
-						if (!u) {
-							def userPass = commonPassword
-							if (!StringUtils.isEmpty(p.password)) {
-								userPass = p.password
-							}
-							u = new UserLogin(
-								username: p.username,
-								active: (activateLogin ? 'Y' : 'N'),
-								expiryDate: expiryDate,
-								person: person,
-								forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
-							)
-
-							u.applyPassword(userPass)
-
-							if (! u.validate() || !u.save(flush:true)) {
-								p.errors << "Error" + GormUtil.allErrorsString(u)
-								log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
+						if (p.match ) {
+							// Find the person
+							person = findPerson(p)
+							if (! person) {
+								p.errors << "Unable to find previous Person match"
 								failed = true
 							} else {
-								log.info "importAccounts() : created UserLogin $u"
-								def up = new UserPreference(
-									userLogin: u,
-									preferenceCode: 'CURR_PROJ',
-									value: project.id.toString()
-								)
-								if (! up.validate() || ! up.save()) {
-									log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-									p.errors << "Setting Default Project Errored"
+								person.email = p.email
+								person.workPhone = p.phone
+								person.title = p.title
+								person.deparment = p.department
+								person.location = p.location
+								person.stateProv = p.stateProv
+								person.country = p.country
+								person.mobilePhone = p.mobile
+
+								if (person.validate() && person.save(flush:true)) {
+									log.info "importAccounts() : updated person $person"
+									partyRelationshipService.addCompanyStaff(company, person)
+								} else {
+									p.errors << "Error" + GormUtil.allErrorsString(person)
 									failed = true
 								}
 							}
 						} else {
-							failed = true
-							p.errors << "Person already have a userlogin: $u"
+							person = new Person(
+								firstName:p.firstName, 
+								middleName:p.middleName, 
+								lastName:p.lastName,
+								email:p.email,
+								workPhone: p.phone,
+								title: p.title,
+								department: p.department,
+								location: p.location,
+								stateProv: p.stateProv,
+								country: p.country,
+								mobilePhone: p.mobile,
+								staffType: 'Salary'
+								)
+						
+							if (person.validate() && person.save(flush:true)) {
+								log.info "importAccounts() : created person $person"
+								partyRelationshipService.addCompanyStaff(company, person)
+								partyRelationshipService.addProjectStaff(project, person)
+							} else {
+								p.errors << "Error" + GormUtil.allErrorsString(person)
+								failed = true
+							}
+
+							// Assign the user to one or more teams appropriately
+							if (!failed && p.teams) {
+								List teams = splitTeams(p.teams)
+
+								teams.each { t ->
+									if (teamCodes.contains(t)) {
+										partyRelationshipService.addStaffFunction(person, t, project.client, project)
+									}
+								}
+							}
 						}
 
-						if (!failed) created++
+						def userRole = role
+						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
+							userRole = p.role
+						}
+						if (!validRoleCodes.contains(userRole)) {
+							userRole = DEFAULT_ROLE
+						}
+						if (!failed && !StringUtils.isEmpty(userRole)) {
+							log.debug "importAccounts() : creating Role $userRole for $person"
+							// Delete previous security roles if they exist
+							def assignedRoles = []
+							def assignRole = false
+							if (p.match) {
+								def personRoles = userPreferenceService.getAssignedRoles(person);
+								personRoles.each { r ->
+									assignedRoles << r.id
+									if (r.id != userRole) {
+										assignRole = true
+									}
+								}
+								if (assignRole) {
+									userPreferenceService.deleteSecurityRoles(person)
+								}
+								if (personRoles.size() == 0) {
+									assignRole = true
+								}
+							} else {
+								assignRole = true
+							}
+							if (assignRole) {
+								userPreferenceService.setUserRoles([userRole], person.id)
+
+								// Audit role changes
+								def currentUser = securityService.getUserLogin()
+								if (p.match) {
+									p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
+									haveMessage = true
+									auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
+								} else {
+									auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
+								}
+							}
+						}
+
+						if (person && createUserLogin && p.username) {
+							def u = UserLogin.findByPerson(person)
+							if (!u) {
+								def userPass = commonPassword
+								if (!StringUtils.isEmpty(p.password)) {
+									userPass = p.password
+								}
+								u = new UserLogin(
+									username: p.username,
+									active: (activateLogin ? 'Y' : 'N'),
+									expiryDate: expiryDate,
+									person: person,
+									forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
+								)
+
+								u.applyPassword(userPass)
+
+								if (! u.validate() || !u.save(flush:true)) {
+									p.errors << "Error" + GormUtil.allErrorsString(u)
+									log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
+									failed = true
+								} else {
+									log.info "importAccounts() : created UserLogin $u"
+									def up = new UserPreference(
+										userLogin: u,
+										preferenceCode: 'CURR_PROJ',
+										value: project.id.toString()
+									)
+									if (! up.validate() || ! up.save()) {
+										log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
+										p.errors << "Setting Default Project Errored"
+										failed = true
+									}
+								}
+							} else {
+								failed = true
+								p.errors << "Person already have a userlogin: $u"
+							}
+
+							if (!failed) created++
+
+						}
+
+						if (failed || haveMessage) {
+							failedPeople << p	
+						}
+
+
+
 
 					}
 
-					if (failed || haveMessage) {
-						failedPeople << p	
-					}
+					
 
 				} // people.each
 
