@@ -1735,3 +1735,18 @@ label.disabledLabel {
 .footnote {
 	font-style: italic;
 }
+
+/*
+  160324 @tavo_luna: styles for image alignment on menu items
+  <li><img><div>...</div><li>
+*/
+.megamenu li img{
+	vertical-align: middle;
+}
+.megamenu li svg{
+	vertical-align: middle;
+}
+.megamenu li div{
+	display: inline-block;
+	vertical-align: middle;
+}

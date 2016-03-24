@@ -238,62 +238,62 @@
 							<li>								
 								<g:link class="mmlink" controller="assetEntity" action="assetSummary">
 									<g:img uri="/icons/application_view_columns.png" width="16" height="16"/>
-									Summary Table
+									<div>Summary Table</div>
 								</g:link>
 							</li>	
 							<li>
 								<g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')"> 
 									<tds:svgIcon name="application" width="16" height="16" />
-									Applications
+									<div>Applications</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')">
 									<tds:svgIcon name="serverPhysical" width="16" height="16" />
-									Servers
+									<div>Servers</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
 									<tds:svgIcon name="other" width="16" height="16" />
-									All Devices
+									<div>All Devices</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="database"    action="list" onclick="hideMegaMenu('assetMegaMenu')">
 									<tds:svgIcon name="database" width="16" height="16" />
-									Databases
+									<div>Databases</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')">
 									<tds:svgIcon name="storagePhysical" width="16" height="16" />
-									Storage-Devices
+									<div>Storage-Devices</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')">
 									<tds:svgIcon name="storageLogical" width="16" height="16" />
-									Storage-Logical
+									<div>Storage-Logical</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
 									<g:img uri="/icons/comments.png" width="16" height="16"/>
-									Comments
+									<div>Comments</div>
 								</g:link>
 							</li>
 							<li>
 								<g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
 									<g:img uri="/icons/bricks.png" width="16" height="16"/>
-									Dependencies
+									<div>Dependencies</div>
 								</g:link>
 							</li>
 							<tds:hasPermission permission='DepAnalyzerView'>
 							  <li>
 							  	<g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-							  		<g:img uri="/icons/brick-inspect.png" width="16" height="16"/>
-										Dependency Analyzer
+							  		<g:img uri="/icons/brick_magnify.png" width="16" height="16"/>
+										<div>Dependency Analyzer</div>
 							  	</g:link>
 							  </li>
 							</tds:hasPermission>
@@ -301,7 +301,7 @@
 							  <li>
 							  	<g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
 							  		<g:img uri="/icons/chart_organisation.png" width="16" height="16"/>
-										Architecture Graph
+										<div>Architecture Graph</div>
 							  	</g:link>
 							  </li>
 							</tds:hasPermission>
