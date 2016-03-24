@@ -1,4 +1,11 @@
-<html>
+<%
+  def assetClassMap = [
+    AssetEntity:'device',
+    Application:'app',
+    Database:'db',
+    Files:'files'
+  ]
+%><html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="projectHeader" />
@@ -86,35 +93,15 @@
                             </td>
 
                             <td>
-								<g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">
-									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'AssetEntity'}">
-										<span id="deviceReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="kickoffProcess('device', 'r', '${dataTransferBatch.id}')">Review</a> |
-										</span>
-										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
-									</g:if> 
-
-									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Application'}">
-										<span id="appReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="kickoffProcess('app', 'r', '${dataTransferBatch.id}')">Review</a> |
-										</span>
-										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
-									</g:if> 
-
-									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Database'}">
-										<span id="dbReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="kickoffProcess('db', 'r', '${dataTransferBatch.id}')">Review</a> | 
-										</span>
-										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
-									</g:if>
-
-									<g:if test="${dataTransferBatch?.eavEntityType?.domainName == 'Files'}">
-										<span id="filesReviewId_${dataTransferBatch.id}">
-											<a href="javascript:" onclick="kickoffProcess('files', 'r', '${dataTransferBatch.id}')">Review</a> |
-										</span>
-										<g:link action="delete" params="[batchId:dataTransferBatch.id]">Remove</g:link>
-									</g:if> 
-
+								<g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">                    
+                  <% def className = assetClassMap[dataTransferBatch?.eavEntityType?.domainName] %>
+                  <span id="deviceReviewId_${dataTransferBatch.id}">
+                    <a href="javascript:" onclick="kickoffProcess('${className}', 'r', '${dataTransferBatch.id}')">Review</a> |
+                  </span>
+                  <a href="#" title="View Log" class="lnkViewLog" data-log="${dataTransferBatch?.importResults}"><g:img uri="/icons/script_error.png" width="16" height="16" alt="View Log"/></a> |
+                  <g:link action="delete" params="[batchId:dataTransferBatch.id]" title="Delete Batch">
+                    <g:img uri="/icons/delete.png" width="16" height="16" alt="Delete Batch"/>
+                  </g:link>									
 								</g:if>
 								<g:else>
 									<g:if test="${dataTransferBatch?.hasErrors == 1}">
@@ -135,9 +122,29 @@
             </div>
         </div>
 
+    <!-- Modal -->
+    <div id="dlgLog" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h5 class="modal-title" id="myModalLabel">Import Results</h5>
+          </div>
+          <div class="modal-body" style="height:20em; overflow-y:auto"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 		<g:javascript src="jquery/ui.progressbar.js"/>
 		<script type="text/javascript">
+      //Manage Import Results Dialog
+      $("a.lnkViewLog").on("click", function(e){
+        $("#dlgLog div.modal-body").html($(e.currentTarget).attr("data-log"));
+        $("#dlgLog").modal({show:true});
+      })
 
 			var messageDiv = $("#messageId");
 
