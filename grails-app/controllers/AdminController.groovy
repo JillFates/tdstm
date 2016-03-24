@@ -1087,7 +1087,7 @@ class AdminController {
 	/**
 	 * Process the Account Export request and outputs a CSV.
 	 */
-	def exportAccountsProcess(){
+	def exportAccountsProcess() {
 
 		Project project = controllerService.getProjectForPage(this, 'PersonExport')
 		if (!project) 
@@ -1133,9 +1133,10 @@ class AdminController {
 	/**
 	 * Retrieves the default fields to be exported for a single account.
 	 */
-	private def getExportAccountDefaultFields(person, companyId){
+	private List getExportAccountDefaultFields(person, companyId) {
 		def functions = partyRelationshipService.getCompanyStaffFunctions(companyId, person.id).description
-		def teams = []
+		List teams = []
+
 		functions.each{
 			teams << it.substring(it.lastIndexOf(':') +1).trim()
 		}
@@ -1143,30 +1144,30 @@ class AdminController {
 		def roles = securityService.getAssignedRoles(person).id
 
 		def fields = [
-							"", // No username
-							person.firstName,
-							person.middleName,
-							person.lastName,
-							person.workPhone?:"",
-							person.company.name,
-							teams.join(";"),
-							roles.join(";"),
-							person.email?:"",
-							person.title,
-							person.department,
-							person.location,
-							person.stateProv,
-							person.country,
-							person.mobilePhone,
-						]
+			"", // No username
+			person.firstName,
+			person.middleName,
+			person.lastName,
+			person.workPhone?:"",
+			person.company.name,
+			teams.join(";"),
+			roles.join(";"),
+			person.email?:"",
+			person.title,
+			person.department,
+			person.location,
+			person.stateProv,
+			person.country,
+			person.mobilePhone,
+		]
 		return fields
 	}
 
 	/**
-	 * This method outputs all the fields to the sheet.
+	 * This method outputs all the fields to the sheet
 	 */
-	private def exportAccountFields(sheet, fields, rowNumber){
-		(0..fields.size()-1).each{
+	private void exportAccountFields(sheet, fields, rowNumber){
+		(0..fields.size()-1).each {
 			WorkbookUtil.addCell(sheet, it, rowNumber, fields[it])
 		}
 	}
@@ -1174,7 +1175,7 @@ class AdminController {
 	/**
 	 * This method exports the accounts along with their login information.
 	 */
-	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice){
+	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice) {
 		def session = getSession()
 		def now = new Date()
 		persons.eachWithIndex{ p, index ->
@@ -1183,8 +1184,7 @@ class AdminController {
 				def isLoginInfoOkay = (loginChoice == "A")
 				if(!isLoginInfoOkay){
 
-					if(loginChoice == "Y"){
-	
+					if(loginChoice == "Y"){	
 						if(p.active == "Y" && loginInfo.active == "Y" && loginInfo.expiryDate > now && (loginInfo.passwordNeverExpires || !(loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
 							isLoginInfoOkay = true
 						}
@@ -1196,7 +1196,7 @@ class AdminController {
 
 				}
 				def fields = getExportAccountDefaultFields(p, companyId)
-				if(isLoginInfoOkay){
+				if (isLoginInfoOkay) {
 					
 					fields[0] = loginInfo.username
 					fields << loginInfo.active
@@ -1206,7 +1206,7 @@ class AdminController {
 					fields << (loginInfo.isLocal? "Y" : "N")
 					fields << (loginInfo.passwordNeverExpires? "Y" : "N")
 				}
-				exportAccountFields(sheet, fields, index)
+				exportAccountFields(sheet, fields, (index+1))
 			}
 			
 		}
@@ -1268,9 +1268,12 @@ class AdminController {
 		def people
 
 		def map = [step:'start', projectName:project.toString() ]
- 
+
+// TODO : JPM 3/2016 : The filename is defined here but hardcoded below. Second, the file needs to be random so two imports don't step on each other and needs to be deleted at the end. Need to determine where the file should be written.
 		def filename = '/tmp/tdstm-account-import.xls'
 
+// TODO : JPM 3/2016 : The column mappings should be defined via a Map instead of hard coding for both the import and export
+// TODO : JPM 3/2016 : Lets make first row ALWAYS the header so no need prompting or accounting for the variable
 
 		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 		List teamCodes = partyRelationshipService.getStaffingRoles().description
@@ -1284,7 +1287,7 @@ class AdminController {
 			def accountsSheet = workbook.getSheet( "Accounts" )
 			int lastRow = accountsSheet.getLastRowNum()
 			def accounts = []
-			for(int i = firstAccountRow; i <= lastRow; i++){
+			for (int i = firstAccountRow; i <= lastRow; i++) {
 
 				String username = WorkbookUtil.getStringCellValue(accountsSheet, 0, i)
 				boolean validUserInfo = createUserLogin ? username : true
@@ -1293,7 +1296,7 @@ class AdminController {
 				String firstName = WorkbookUtil.getStringCellValue(accountsSheet, 1, i)
 				String lastName = WorkbookUtil.getStringCellValue(accountsSheet, 3, i)
 				String email = WorkbookUtil.getStringCellValue(accountsSheet, 8, i)
-				if(validUserInfo && firstName && lastName && email){
+				if (validUserInfo && firstName && lastName && email){
 					accounts.add(
 						username: username,
 						firstName: firstName,
@@ -1325,39 +1328,8 @@ class AdminController {
 			}
 			return accounts
 		}
-		/*
-		// Inline closure to parse the CSV file and return array of mapped fields
-		def parseCsv = {file, header, createUserLogin ->
-			def first = true
-			people = []
 
-			file.splitEachLine(",") { fields ->
-				if (first && header) {
-					first = false
-				} else {
-					// Checks that the username is not null when importing user login info, also.
-					boolean validUserInfo = createUserLogin ? fields[0] : true
-					// Checks for required fields: first name, last name, email.
-					if(fields[1] && fields[3] && fields[7] && validUserInfo){
-						people.add(
-							username: fields[0],
-							firstName: fields[1],
-							middleName: fields[2],
-							lastName: fields[3],
-							phone: fields[4],
-							company: fields[5],
-							teams: fields[6],
-							role: fields[7]?.toUpperCase(),
-							email: fields[8],
-							password: fields[9],
-							errors: []
-						)	
-					}
-				}
-			}
-			return people
-		}*/
-
+// TODO : JPM 3/2016 : Should be able to just use LIST math to remove valid teams (e.g. invalidTeams = teams - teamCodes)
 		def validateTeams = { teams -> 
 			String errors = ''
 			teams.each { tc -> 
@@ -1367,6 +1339,8 @@ class AdminController {
 			}
 			return errors
 		}
+
+// TODO : JPM 3/2016 : Believe that we have a person match function in PersonService that we might be able to leverage
 
 		def findPerson = { personInfo ->
 			def person = staff.find {
@@ -1407,6 +1381,7 @@ class AdminController {
 			return matches
 		}
 
+// TODO : JPM 3/2016 : Refactor into function into com.tdsops.common.lang.StringUtils as standard split function (unittest)
 		def splitTeams = { t ->
 			List teams = t.split(';')
 			teams = teams*.trim()
@@ -1525,9 +1500,7 @@ class AdminController {
 					def company = projectCompanies.find{it.partyIdTo.name == p.company}
 					if(!company){
 						p.errors << "Unable to assign ${p.name} to ${p.company}"
-						
 					}else{
-
 						def person
 						boolean failed = false
 						boolean haveMessage = false
@@ -1683,13 +1656,7 @@ class AdminController {
 						if (failed || haveMessage) {
 							failedPeople << p	
 						}
-
-
-
-
 					}
-
-					
 
 				} // people.each
 
