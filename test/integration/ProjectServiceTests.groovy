@@ -13,6 +13,23 @@ class ProjectServiceTests  extends Specification {
 		assert project
 	}
 
+	def "Test the getStaff"() {
+		// Get a list of staff for a project
+		when:
+			List staff = projectService.getStaff(project)
+		then:
+			staff != null
+			def numOfStaff = staff.size()
+			numOfStaff > 0
+
+		// Find a subset of the staff (assuming that there are PMs on the project)
+		when:
+			staff = projectService.getStaff(project, 'PROJ_MGR')
+		then:
+			staff != null
+			staff.size() < numOfStaff
+	}
+
 	def "Test the getProjectManagersByProject"() {
 		// Get a list of PMs
 		when:

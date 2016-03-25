@@ -1101,17 +1101,17 @@ class AdminController {
 	        def book = ExportUtil.workBookInstance(filename, filePath, response) 
 			def sheet = book.getSheet("Accounts")
 
-			if(params.partyRelTypeCode){
+			if (params.partyRelTypeCode) {
 				def company = securityService.getUserCurrentProject().client.id
-				if(params.partyRelTypeCode == "STAFF"){
+				if (params.partyRelTypeCode == "STAFF"){
 					persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
-				}else if(params.partyRelTypeCode == "PROJ_STAFF"){
-					persons = partyRelationshipService.getCompanyProjectStaff(company)
+				} else if(params.partyRelTypeCode == "PROJ_STAFF") {
+					persons = projectService.getStaff(project)
 				}
-				if(persons){
-					if(params.login){
+				if (persons) {
+					if (params.login) {
 						exportAccountsWithLoginInfo(persons, sheet, company, params.loginChoice)
-					}else{
+					} else {
 						exportAccountsNoLoginInfo(persons, sheet, company)
 					}
 				}
@@ -1119,14 +1119,12 @@ class AdminController {
 				book.write(response.getOutputStream())
 			}
 
-		}catch(Exception e){
+		} catch(Exception e) {
 			log.error "Exception occurred while exporting data" + e.printStackTrace()
-			flash.message = e.getMessage()
+			flash.message = "An error occurred while attempting to export accounts"
 		}
 
 		render(view:"exportAccounts")	
-		
-
 		
 	}
 

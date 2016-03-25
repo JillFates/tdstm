@@ -69,7 +69,7 @@ class ProjectService {
 
 
 
-	List getStaffList(onlyAssigned, role, projects, companies, sorting){
+	List getStaffList(onlyAssigned, role, projects, companies, sorting) {
 		
 		def query = new StringBuffer("""
 			SELECT * FROM (
@@ -187,24 +187,43 @@ class ProjectService {
 	 * @return partyRelationShip instance
 	 */
 	def getProjectManagersByProject(def project) {
-		project = StringUtil.toLongIfString(project)
-		boolean byId = (project instanceof Long)
-
-		List list = PartyRelationship.executeQuery("select pr.partyIdTo from PartyRelationship pr \
-			where pr.partyRelationshipType.id = 'PROJ_STAFF' \
-			and pr.partyIdFrom${byId ? '.id' : ''} = :project \
-			and pr.roleTypeCodeFrom.id = 'PROJECT' \
-			and pr.roleTypeCodeTo.id = 'PROJ_MGR'",
-			[project:project] )
-		if (list) {
-			list = list.findAll { it.isEnabled() }
-		}
-		if (list) {
-			list.sort { it.toString() }
-		}
-
+		List list = getStaff(project, 'PROJ_MGR')
 		return list
 	}
+
+	/**
+	 * This method returns a list of all the project staff for a project
+	 * @param project - a project object or the id of a project
+	 * @param team - if provided will filter the staff for a given team or list of teams otherwise defaults to any STAFF
+	 * @param includeDisable - a flag to indicate if disabled staff should be included (default false)
+	 * @return list of staff
+	 */
+	List<Person> getStaff(def project, def team='STAFF', Boolean includeDisabled=false){
+		project = StringUtil.toLongIfString(project)
+		boolean byId = (project instanceof Long)
+		List teamList
+		if (team instanceof String) {
+			teamList = [team]
+		} else {
+			assert (team instanceof List)
+			teamList = team
+		}
+
+		String query = """select distinct pr.partyIdTo from PartyRelationship pr
+			where pr.partyRelationshipType.id = 'PROJ_STAFF'
+				and pr.partyIdFrom${byId ? '.id' : ''} = :project
+				and pr.roleTypeCodeFrom.id = 'PROJECT'
+				and pr.roleTypeCodeTo.id in (:teamList)"""
+
+		List staffList = PartyRelationship.executeQuery(query, [project:project, teamList:teamList])
+		if (! includeDisabled) {
+			staffList = staffList.findAll {it.isEnabled()}
+		}
+		if (staffList) {
+			staffList.sort { it.toString() }
+		}
+		return staffList
+	}	
 	
 	/**
 	 * This action is used to get the fields, splitted fields in to two to handle common customs.
