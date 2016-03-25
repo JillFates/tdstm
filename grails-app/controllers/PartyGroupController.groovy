@@ -93,8 +93,9 @@ class PartyGroupController {
 		if(!partyGroupInstance) {
 			flash.message = "PartyGroup not found with id ${params.id}"
 			redirect(action:"list")
+		} else { 
+			return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ] 
 		}
-		else { return [ partyGroupInstance : partyGroupInstance, partner: isAPartner(partyGroupInstance) ] }
 	}
 
 	def delete() {
@@ -146,9 +147,9 @@ class PartyGroupController {
 			if( !partyGroupInstance.hasErrors() && partyGroupInstance.save()) {
 
 				if (params.partner && params.partner == "Y" && !isAPartner(partyGroupInstance)) {
-					def personCompany = partyRelationshipService.getStaffCompany( securityService.getUserLogin().person )
-					if (personCompany) {
-						partyRelationshipService.savePartyRelationship( "PARTNERS", personCompany, "COMPANY", partyGroupInstance, "PARTNER" )
+					def company = partyRelationshipService.getCompanyOfStaff( securityService.getUserLogin().person )
+					if (company) {
+						partyRelationshipService.savePartyRelationship( "PARTNERS", company, "COMPANY", partyGroupInstance, "PARTNER" )
 					}
 				}
 
@@ -207,9 +208,10 @@ class PartyGroupController {
         }
     }
 
+// TODO : JPM 3/2016 : isAPartner method should be in a service AND shoud take the company as a company instead of looking it up based on the user
 	private def isAPartner(partyGroupInstance) {
 		def partner
-		def personCompany = partyRelationshipService.getStaffCompany( securityService.getUserLogin().person )
+		def personCompany = securityService.getUserLogin().person.company
 		if (personCompany) {
 			partner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PARTNERS' and p.partyIdFrom = $personCompany.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'PARTNER' and	p.partyIdTo = $partyGroupInstance.id")
 		}

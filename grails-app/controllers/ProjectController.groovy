@@ -94,8 +94,9 @@ class ProjectController {
 
 		render jsonData as JSON
 	}
+
 	/*
-	 *  return the details of Project
+	 *  Used to display the project information
 	 */
 	def show() {
 
@@ -108,7 +109,7 @@ class ProjectController {
 		//stateEngineService.loadWorkflowTransitionsIntoMap(projectInstance.workflowCode, 'project')
 
 		def loginPerson = securityService.getUserLoginPerson()
-		def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
+		def userCompany = loginPerson.company
 
 		// Save and load various user preferences
 		userPreferenceService.setPreference( "CURR_PROJ", "${currProjectInstance.id}" )
@@ -132,10 +133,7 @@ class ProjectController {
 		def projectLogoForProject = ProjectLogo.findByProject(currProjectInstance)
 		List projectPartners = partyRelationshipService.getProjectPartners( currProjectInstance )
 
-		List projectManagers = projectService.getProjectManagersByProject(currProjectInstance.id)?.partyIdTo
-		projectManagers.sort { a,b ->
-			a.firstName <=> b.firstName ?: a.lastName <=> b.lastName 
-		}
+		List projectManagers = projectService.getProjectManagersByProject(currProjectInstance.id)
 
 		return [ 
 			projectInstance: currProjectInstance, 
@@ -181,7 +179,7 @@ class ProjectController {
 			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
 			moveBundles = MoveBundle.findAllByProject(projectInstance)
 
-			List projectManagers = projectService.getProjectManagersByProject(projectInstance.id)?.partyIdTo
+			List projectManagers = projectService.getProjectManagersByProject(projectInstance)
 			projectManagers.sort { a,b ->
 				a.firstName <=> b.firstName ?: a.lastName <=> b.lastName 
 			}

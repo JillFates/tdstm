@@ -135,7 +135,7 @@ class ProjectService {
 		def projParams=searchParams.params?: [:]
 		def personId = searchParams.personId?:userLogin.person.id
 		def person = Person.get(personId)
-		def companyParty = partyRelationshipService.getStaffCompany( person )
+		def companyParty = person.company
 
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
@@ -186,11 +186,24 @@ class ProjectService {
 	 * @param projectId
 	 * @return partyRelationShip instance
 	 */
-	def getProjectManagersByProject(def projectId){
-		def projectManagers = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' \
-				and p.partyIdFrom = $projectId and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PROJ_MGR' ")
+	def getProjectManagersByProject(def project) {
+		project = StringUtil.toLongIfString(project)
+		boolean byId = (project instanceof Long)
 
-		return projectManagers
+		List list = PartyRelationship.executeQuery("select pr.partyIdTo from PartyRelationship pr \
+			where pr.partyRelationshipType.id = 'PROJ_STAFF' \
+			and pr.partyIdFrom${byId ? '.id' : ''} = :project \
+			and pr.roleTypeCodeFrom.id = 'PROJECT' \
+			and pr.roleTypeCodeTo.id = 'PROJ_MGR'",
+			[project:project] )
+		if (list) {
+			list = list.findAll { it.isEnabled() }
+		}
+		if (list) {
+			list.sort { it.toString() }
+		}
+
+		return list
 	}
 	
 	/**
@@ -416,7 +429,7 @@ class ProjectService {
 		def currProj = userPreferenceService.getSession().getAttribute("CURR_PROJ");
 		def currProjectInstance = Project.get( currProj.CURR_PROJ )
 		def loginPerson = securityService.getUserLoginPerson()
-		def userCompany = partyRelationshipService.getStaffCompany( loginPerson )
+		def userCompany = loginPerson.company
 
 		userPreferenceService.setPreference( "PARTYGROUP", "${userCompany?.id}" )
 		
@@ -767,9 +780,9 @@ class ProjectService {
 			//def client = params.projectClient
 		
 			def person = securityService.getUserLogin().person
-			def companyParty = partyRelationshipService.getStaffCompany( person )
+			def companyParty = person.company
 			if (!companyParty) {
-				companyParty = PartyGroup.findByName( "TDS" )
+				return [message: "Unable to find company for your account", success: false]
 			}
 
 			// For Project to Company PartyRelationship

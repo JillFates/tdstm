@@ -1381,7 +1381,7 @@ class AdminController {
 			return matches
 		}
 
-// TODO : JPM 3/2016 : Refactor into function into com.tdsops.common.lang.StringUtils as standard split function (unittest)
+// TODO : JPM 3/2016 : Refactor into function into StringUtils as standard split function (unittest)
 		def splitTeams = { t ->
 			List teams = t.split(';')
 			teams = teams*.trim()

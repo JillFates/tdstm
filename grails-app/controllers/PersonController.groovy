@@ -132,7 +132,7 @@ def test = {
 			if(!companyId){
 				// Still if no luck setting companyId as logged-in user's companyId .
 				def person = securityService.getUserLogin().person
-				companyId = partyRelationshipService.getStaffCompany(person)?.id
+				companyId = person.company.id
 			}
 		}
 		if(companyId){
@@ -259,7 +259,7 @@ def test = {
 			flash.message = "Person not found with id ${params.id}"
 			redirect( action:"list", params:[ id:companyId ] )
 		} else { 
-			def company = partyRelationshipService.getStaffCompany( personInstance )
+			def company = personInstance.company
 			
 			return [ personInstance : personInstance, companyId:company.id ] 
 		}
@@ -446,7 +446,7 @@ def test = {
 		def map = new HashMap()
 		def personInstance = Person.read( params.id )
 		def role = params.role
-		def company = partyRelationshipService.getStaffCompany( personInstance )
+		def company = personInstance.company
 		if(company == null){
 			map.put("companyId","")
 		}else{
@@ -1114,7 +1114,7 @@ def test = {
 		def person = Person.get(params.personId)
 		def blackOutdays = person.blackOutDates?.sort{it.exceptionDay}
 		def subject = SecurityUtils.subject
-		def company = partyRelationshipService.getStaffCompany( person )
+		def company = person.company
 		def companyProject = Project.findByClient( company )
 		def personFunctions = []
 		personFunctions = partyRelationshipService.getCompanyStaffFunctions(company.id, person.id)
@@ -1332,7 +1332,7 @@ def test = {
 			def id = it.isLong()?Long.parseLong(it):null
 			def person = id?Person.get(id):null
 			if(person){
-				personsMap << [(person) : partyRelationshipService.getStaffCompany( person )?.id]
+				personsMap << [(person) : person.company.id]
 				def userLogin = UserLogin.findByPerson(person)
 				userLogins << userLogin
 			}

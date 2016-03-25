@@ -1,9 +1,6 @@
 import grails.test.mixin.TestFor
-// import spock.lang.Specification
 import spock.lang.*
 
-// @TestFor(PartyRelationshipService)
-// @TestFor(PersonService)
 class PartyRelationshipServiceTests  extends Specification {
 	
 	def partyRelationshipService
@@ -15,30 +12,17 @@ class PartyRelationshipServiceTests  extends Specification {
 	MoveEvent moveEvent
 	Person person
 
-/*
-	@Shared byWhom = Person.get(100)	// John Martin
-	@Shared userLogin = UserLogin.findByPerson(byWhom)
-	@Shared project = Project.get(2445)	// Demo Project
-	@Shared moveEvent = MoveEvent.findAllByProject(project, [max:1]) // Grab any one of the events
-	@Shared person = personService.savePerson(personMap, byWhom, project.client.id, true)
-	def setupSpec() {
-		// Validate the shared vars are initialized correctly
-		assert byWhom
-		assert userLogin
-		assert project
-		assert moveEvent
-		assert person
-	}
-*/
+	static Long byWhomId=100
+	static Long projectId=2445
 
 	def setup() {
-		byWhom = Person.get(100)	// John Martin
+		byWhom = Person.get(byWhomId)	// John Martin
 		assert byWhom
 
 		userLogin = UserLogin.findByPerson(byWhom)
 		assert userLogin
 
-		project = Project.get(2445)	// Demo Project
+		project = Project.get(projectId)	// Demo Project
 		assert project
 
 		moveEvent = MoveEvent.findAllByProject(project, [max:1])[0] // Grab any one of the events
@@ -113,6 +97,47 @@ class PartyRelationshipServiceTests  extends Specification {
 			moveEventAssignments = MoveEventStaff.findAllByPersonAndMoveEvent(person, moveEvent)
 		then: 
 			! moveEventAssignments?.find { it.role.id == 'PROJ_MGR'}
+	}
+
+	def "Test getStaffCompany"() {
+		// Get company by Person object
+		when:
+			def company = partyRelationshipService.getStaffCompany(byWhom)
+		then:
+			company != null
+
+		// Get company by id number
+		when:
+			company = partyRelationshipService.getStaffCompany(byWhomId)
+		then:
+			company != null
+
+		// Get company by string of number
+		when:
+			company = partyRelationshipService.getStaffCompany("$byWhomId")
+		then:
+			company != null
+	}
+
+	def "Test getCompanyStaff"() {
+		// Get the list of staff for the company whom byWhom is assigned (TDS)
+		when:
+			def company = byWhom.company
+			List staffList = partyRelationshipService.getCompanyStaff(company)
+		then:
+			staffList != null
+			def staffSize = staffList.size()
+			staffSize > 0
+
+		// Disable one of the staff and make sure that the list size drops by one
+		when: 
+			def staff = staffList[0]
+			staff.disable()
+			assert staff.save()
+		then:
+			partyRelationshipService.getCompanyStaff(company).size() == (staffSize - 1)
+			// Include the disabled accounts
+			partyRelationshipService.getCompanyStaff(company, true)
 	}
 
 }

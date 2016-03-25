@@ -1,5 +1,7 @@
 package com.tdssrc.grails
 
+import com.tdssrc.grails.NumberUtil
+
 /**
  * The StringUtil class contains a collection of useful string manipulation methods 
  */
@@ -228,6 +230,27 @@ class StringUtil {
 			//return "\\u" + StringGroovyMethods.padLeft(Integer.toHexString(ch), 4, "0");
 		}
 		return null;
+	}
+
+	/**
+	 * Used to determine if a variable is an instance of String or Groovy GString
+	 * @param v - the variable to examine
+	 * @return true if variable is one of the two types otherwise false
+	 */
+	static boolean instanceOfString( v ) {
+		return (v instanceof String) || (v instanceof org.codehaus.groovy.runtime.GStringImpl)
+	}
+
+	/**
+	 * Used to convert a variable to a long IF the variable is a String otherwise it returns the original variable
+	 * @param v - a variable to examine
+	 * @return the original variable or the Long value if the variable was a String
+	 */
+	static def toLongIfString( v ) {
+		if (instanceOfString(v)) {
+			return NumberUtil.toLong(v)
+		}
+		return v
 	}
 
 }

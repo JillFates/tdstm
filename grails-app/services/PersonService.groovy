@@ -1410,7 +1410,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 		// Additional changes allowed by adminstrator of a person
 		if (byAdmin) {
 			List teams = params.list("function")
-			if (params.manageFuncs != '0' || functions) {
+			if (params.manageFuncs != '0' || teams) {
 				partyRelationshipService.updateAssignedTeams(person, teams)
 			}
 

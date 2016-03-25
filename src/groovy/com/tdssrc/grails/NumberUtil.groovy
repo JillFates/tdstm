@@ -13,6 +13,7 @@ class NumberUtil {
 	static boolean isLong(val) {
 		switch (val) {
 			case String: 
+			case org.codehaus.groovy.runtime.GStringImpl:
 				return (val?.isNumber() && val.isLong())
 			case Long:
 			case Integer:
@@ -40,6 +41,7 @@ class NumberUtil {
 		Long result
 		switch (value) {
 			case String:
+			case org.codehaus.groovy.runtime.GStringImpl:
 				result = isLong(value) ? value.toLong() : defVal
 				break
 			case Integer:

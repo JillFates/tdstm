@@ -1,6 +1,8 @@
 import org.apache.poi.*
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tds.asset.AssetComment
 import com.tdsops.common.lang.ExceptionUtil
 import static com.tdsops.common.lang.CollectionUtils.caseInsensitiveSorterBuilder
@@ -155,26 +157,46 @@ class PartyRelationshipService {
 	}
 	
 	/** 
-	 * Used to retrieve the Company (Party) for which a person is associated as a "STAFF" member
+	 * Used to retrieve the Company for which a person is associated as a "STAFF" member
 	 * @param Party - the staff member
 	 * @return Party - the company Staff is associated with or NULL if no associations
 	 */
-	def getStaffCompany( def staff ) {
-		def relationship = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
-		relationship = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdTo = $staff.id and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF'")
-		return relationship?.partyIdFrom
+	PartyGroup getCompanyOfStaff( def staff ) {
+		staff = StringUtil.toLongIfString(staff)
+		boolean byId = (staff instanceof Long)
+		String query = """select pr.partyIdFrom from
+			PartyRelationship pr where
+			pr.partyRelationshipType.id = 'STAFF'
+			and pr.roleTypeCodeFrom.id = 'COMPANY'
+			and pr.roleTypeCodeTo.id = 'STAFF'
+			and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
+		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff:staff])
+
+		return (company ? company[0] : null)
 	}
+
 	/*
-	 *  Method will return Company Staff
+	 * Used to return a list of Persons that are staff of the company
+	 * @param company - the company to look up (id or object)
+	 * @param includeDisabled - flag to control if disabled staff are included in list (default false)
+	 * @return the list of the staff for the company
 	 */
-	def getCompanyStaff( def companyId ){
-		
-		def query = "from Person s where s.id in " + 
-		" (select p.partyIdTo from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $companyId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' ) " + 
-		" order by s.lastName, s.firstName"
-		def personInstanceList = Person.findAll( query )
-		
-		return personInstanceList
+	List<Person> getCompanyStaff( def company, Boolean includeDisabled=false ) {
+		company = StringUtil.toLongIfString(company)
+		boolean byId = (company instanceof Long)
+		String query = """from Person p where p.id in (
+			select pr.partyIdTo.id from PartyRelationship pr 
+			where pr.partyRelationshipType.id = 'STAFF'
+				and pr.partyIdFrom${(byId ? '.id' : '')} = :company
+				and pr.roleTypeCodeFrom.id = 'COMPANY'
+				and pr.roleTypeCodeTo.id = 'STAFF')
+			order by p.lastName, p.firstName"""
+
+		def list = Person.executeQuery( query, [company:company] )
+		if (! includeDisabled) {
+			list = list.findAll { it.isEnabled() }
+		}
+		return list
 	}
 
 	/* ********************************************************************* */
@@ -464,7 +486,7 @@ class PartyRelationshipService {
 		def company
 		projectStaff.each { staff ->
 			def map = new HashMap()
-			company = clientStaffOnly ? getStaffCompany(staff.partyIdTo) : null
+			company = clientStaffOnly ? staff.partyIdTo.company : null
 			if (! clientStaffOnly || ( clientStaffOnly && company?.id == project.client.id ) ) 
 				list << [company:company, name:staff.partyIdTo.toString(), staff:staff.partyIdTo, role:staff.roleTypeCodeTo ]
 		}

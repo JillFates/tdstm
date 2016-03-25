@@ -117,7 +117,7 @@ class UserLoginController {
 				if (!companyId) {
 					// Still if no luck setting companyId as logged-in user's companyId .
 					def person = userLogin.person
-					companyId = partyRelationshipService.getStaffCompany(person)?.id
+					companyId = person.company.id
 				}
 			}
 			if (companyId) {

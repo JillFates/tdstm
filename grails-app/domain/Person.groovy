@@ -80,10 +80,11 @@ class Person extends Party {
 		'assignedProjects',
 		'assignedTeams',
 		'company',
-		'suitableTeams',
+		'enabled',
 		'lastNameFirst',
 		'lastNameFirstAndTitle',
-		'name'
+		'name',
+		'suitableTeams'
 	]
 
 	/**
@@ -99,7 +100,7 @@ class Person extends Party {
 	 * This method returns the company for this person.
 	 */
 	Party getCompany(){
-		return partyRelationshipService.getStaffCompany(this)
+		return partyRelationshipService.getCompanyOfStaff(this)
 	}
 
 	/**
@@ -151,6 +152,21 @@ class Person extends Party {
 			ORDER BY description"
 		List teams = RoleType.executeQuery(query, [company:this.company, person:this])
 		return teams
+	}
+
+	/**
+	 * Used to determine if the Person is enabled 
+	 * @return true if active otherwise false
+	 */
+	boolean isEnabled() {
+		return active == 'Y'
+	}
+
+	/**
+	 * Used to disable an person
+	 */
+	void disable() {
+		active = 'N'
 	}
 
 	/**
