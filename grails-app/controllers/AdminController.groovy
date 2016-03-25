@@ -1822,7 +1822,8 @@ class AdminController {
 			 'virtMemCommit':virtMemCommit,
 			 'sysProps':sysProps,
 			 'osMxBean':osMxBean,
-			 'rt': rt
+			 'rt': rt,
+			 'groovyVersion': GroovySystem.getVersion()
 			]
 		)
 	}

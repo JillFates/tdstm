@@ -151,6 +151,8 @@
 	<tr><td align=right>VM Vendor: </td><td>${rtMXBean.getVmVendor()}</td></tr>
 	<tr><td align=right>VM Name: </td><td>${rtMXBean.getVmName()}</td></tr>
 	<tr><td align=right>VM Version: </td><td>${sysProps['java.runtime.version']}</td></tr>
+	<tr><td align=right>Groovy Version: </td><td>${groovyVersion}</td></tr>
+
 
 	<tr><td align=right valign=top>
 		Input Args:
