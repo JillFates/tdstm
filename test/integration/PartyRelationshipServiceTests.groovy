@@ -99,22 +99,22 @@ class PartyRelationshipServiceTests  extends Specification {
 			! moveEventAssignments?.find { it.role.id == 'PROJ_MGR'}
 	}
 
-	def "Test getStaffCompany"() {
+	def "Test getCompanyOfStaff"() {
 		// Get company by Person object
 		when:
-			def company = partyRelationshipService.getStaffCompany(byWhom)
+			def company = partyRelationshipService.getCompanyOfStaff(byWhom)
 		then:
 			company != null
 
 		// Get company by id number
 		when:
-			company = partyRelationshipService.getStaffCompany(byWhomId)
+			company = partyRelationshipService.getCompanyOfStaff(byWhomId)
 		then:
 			company != null
 
 		// Get company by string of number
 		when:
-			company = partyRelationshipService.getStaffCompany("$byWhomId")
+			company = partyRelationshipService.getCompanyOfStaff("$byWhomId")
 		then:
 			company != null
 	}

@@ -14,15 +14,22 @@ class ProjectServiceTests  extends Specification {
 	}
 
 	def "Test the getProjectManagersByProject"() {
+		// Get a list of PMs
 		when:
-			List pms = projectService.getProjectManagersByProject()
-
+			List pms = projectService.getProjectManagersByProject(project)
 		then:
 			pms != null
-			pms?.size() > 0
-
 			def numOfPms = pms.size()
-//			pms[0].
+			numOfPms > 0
+
+		// Disable one of the PMs on the project and then refetch the list which should have one less now
+		when:
+			def staff = pms[0]
+			staff.disable()
+			assert staff.save()
+			pms = projectService.getProjectManagersByProject(project)
+		then:
+			( numOfPms > 1 && ( pms.size() == (numOfPms - 1)) ) || ( numOfPms == 1 && ! pms)
 
 	}
 
