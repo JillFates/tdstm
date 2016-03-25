@@ -1447,12 +1447,12 @@ def test = {
 		} catch (UnauthorizedException e) {
 			userMsg = e.getMessage()
 		} catch (e) {
-			log.error ExceptionUtil.messageWithStacktrace("removeProjectTeam()", e)
+			log.error ExceptionUtil.messageWithStacktrace("removeProjectStaff()", e)
 			ServiceResults.respondWithError(response, ['An error occurred while trying to unassign the person from the project', e.getMessage()])
 		}
 
 		if (userMsg) {
-			log.debug "removeProjectTeam($userLogin, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
+			log.debug "removeFromProject($userLogin, $params.projectId, $params.personId, $params.teamCode) failed - $userMsg"
 			ServiceResults.respondWithError(response, userMsg)
 		}
 	}
