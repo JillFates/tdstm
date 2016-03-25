@@ -31,4 +31,20 @@ class StringUtilTests extends Specification {
 			s == StringUtil.ellipsis(s, 50)
 	}
 
+
+	def "Test instanceOfString"() {
+		expect:
+			StringUtil.instanceOfString('a single quoted string')			
+			StringUtil.instanceOfString("a double quoted string (a.k.a. GString")
+			! StringUtil.instanceOfString(123L)
+			! StringUtil.instanceOfString( new Date() )
+	}
+
+	def "Test toLongIfString"() {
+		expect: 
+			(StringUtil.toLongIfString('1') instanceof Long)
+			(StringUtil.toLongIfString("1") instanceof Long)
+			! (StringUtil.toLongIfString(new Date()) instanceof Long)
+	}
+	
 }
