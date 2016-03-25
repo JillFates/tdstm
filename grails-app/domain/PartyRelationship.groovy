@@ -58,5 +58,9 @@ class PartyRelationship implements Serializable {
 		}
 		return result
 	}
+
+	String toString() {
+		"$partyRelationshipType : $roleTypeCodeFrom ${partyIdFrom.id} : $roleTypeCodeTo ${partyIdTo.id}"
+	}
 	
 }

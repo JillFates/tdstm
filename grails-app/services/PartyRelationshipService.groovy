@@ -831,56 +831,116 @@ class PartyRelationshipService {
 	}
 	 
 	/**
-	 * Update the user functions based on the functions list.
-	 * @param project - project that associated with staff
-	 * @param person - to which staff assign function
-	 * @param functionIds - functions list that assigned to staff
+	 * Update the team association(s) of a person to a party
+	 * @param partyIdFrom - The company or Project that the person is to be associated with
+	 * @param person - the person to manage the team relationship(s) for
+	 * @param teamCodes - a list of the team codes that the person should be assigned to
 	 * @return nothing
 	 */
-	def updateStaffFunctions(partyIdFrom, person, functionIds, def prTypeId="STAFF" ) {
-		
-		def prType = PartyRelationshipType.read(prTypeId)
-		def roleType = RoleType.read(prType=="STAFF"?"PROJECT":"COMPANY")
-		def roleTypeCodeTo = RoleType.read('STAFF')
-		// If user deleted all functions.
-		def functionQuery = "from PartyRelationship where partyRelationshipType = :type and partyIdTo =:person and roleTypeCodeTo != :roleTypeCodeTo"
-		if(!functionIds){
-			def existingFuncToDelete = PartyRelationship.findAll(functionQuery, 
-				[type:prType, person:person,roleTypeCodeTo:roleTypeCodeTo ])
-			PartyRelationship.withNewSession { s -> 
-				existingFuncToDelete*.delete()
-				s.flush()
-				s.clear()
-			}
-			return;
+	def updateAssignedTeams(Party person, List teamCodes) {
+
+		boolean debugEnabled = log.isDebugEnabled()
+
+		List allTeamCodes = getTeamCodes()
+		List invalidTeamCodes = ( teamCodes ? teamCodes - allTeamCodes : [])
+		if (invalidTeamCodes) {
+			securityService.reportViolation("attempted to assign invalid team codes ($invalidTeamCodes) to $person")
+			throw new InvalidRequestException("Invalid team code was provided ($invalidTeamCodes)")
 		}
+
+		List teamsToRemove = ( teamCodes ? allTeamCodes - teamCodes : allTeamCodes )
+
+		// Query to find appropriate relationships
+		String query = "from PartyRelationship pr where " + 
+			"pr.partyRelationshipType.id = :type and " +
+			"pr.roleTypeCodeFrom.id = :typeFrom and " +
+			"pr.partyIdTo = :person and " +
+			"pr.roleTypeCodeTo.id in (:teams)"
+
+		// Remove any Team assignment that the person has assigned that are not in the teamCodes list
+		List toDelete = PartyRelationship.findAll(query, [type:'STAFF', typeFrom:'COMPANY', person:person, teams:teamsToRemove])
+		if (toDelete) {
+			log.debug "updateAssignedTeams() for $person - removing Company Team assignments ${toDelete*.roleTypeCodeTo.id}"
+			toDelete*.delete()
+		}
+
+		// Remove Team assignments to any projects
+		toDelete = PartyRelationship.findAll(query, [type:'PROJ_STAFF', typeFrom:'PROJECT', person:person, teams:teamsToRemove])
+		if (toDelete) {
+			if (debugEnabled) {
+				List deleteDetail = toDelete.collect { "Project: ${it.partyIdFrom} Team: ${it.roleTypeCodeTo.id}" }
+				log.debug "updateAssignedTeams() for $person - removing Project Team assignments ${deleteDetail}"
+			}
+			toDelete*.delete()
+		}
+
+		// Remove any MoveEvent assignments
+		toDelete = MoveEventStaff.findAll(
+			"from MoveEventStaff where person=:person and role.id in (:teams)",
+			[person:person, teams:teamsToRemove] 
+		)
+		if (toDelete) {
+			if (debugEnabled) {
+				List deleteDetails = toDelete.collect { "Event: ${it.moveEvent} Team: ${it.role.id}" }
+				log.debug "updateAssignedTeams() for $person - removing team event assignments $deleteDetails"
+			}
+			toDelete*.delete()
+		}
+
+		// Now get the list of Teams that the person is assigned to and determine if we need to assign them to any new ones
+		if (teamCodes) {
+			List existingTeamsRoleType = getCompanyStaffFunctions(person.company.id, person.id)
+			List existingTeamCodes = existingTeamsRoleType*.id
+
+			List teamsToAssign = teamCodes - existingTeamCodes
+			if (teamsToAssign) {
+				log.debug "updateAssignedTeams() for $person - adding team assignments $teamsToAssign"
+				Party company = person.company
+
+				PartyRelationshipType coStaffPRType = PartyRelationshipType.read('STAFF')
+				RoleType coRoleType = RoleType.read('COMPANY')
+
+				teamsToAssign.each { teamCode ->
+					PartyRelationship pr = new PartyRelationship()
+					pr.partyRelationshipType = coStaffPRType
+					pr.roleTypeCodeFrom = coRoleType
+					pr.roleTypeCodeTo = RoleType.read(teamCode)
+					pr.partyIdFrom = company
+					pr.partyIdTo = person
+					pr.save(failOnError:true)
+				}
+			}
+		}
+		/*
 		
-		// If we are here, assuming we have some functions assigned to staff
-		
-		def functions = RoleType.getAll(functionIds)
+		def teams = RoleType.getAll(teamIds)
 		
 		// Delete the functions that are deleted from UI
-		def existingFuncToDelete = PartyRelationship.findAll(functionQuery+" and partyIdFrom = :partyIdFrom  and roleTypeCodeTo not in (:functions)", 
-			[type:prType, partyIdFrom:partyIdFrom, person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
+		def existingFuncToDelete = PartyRelationship.findAll(functionQuery+" and partyIdFrom=:partyIdFrom and roleTypeCodeTo not in (:functions)", 
+			[type:prType, partyIdFrom:partyIdFrom, person:person, teams:teams, roleTypeCodeTo:roleTypeCodeTo ])
 		
 		// Delete all functions when deleting from Company
-		if(prTypeId=='STAFF'){
-			def deletedFuncts = PartyRelationship.findAll(functionQuery+" and roleTypeCodeTo not in (:functions)", 
-					[type:PartyRelationshipType.read('PROJ_STAFF'), person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
-			 
-			def deletedEventStaff = MoveEventStaff.findAll("from MoveEventStaff where person =:person and role not in ( :role)",
-				 [person:person, role:functions])
-			 
+		if (prTypeId=='STAFF'){
+			 			 
 			PartyRelationship.withNewSession { s -> 
-				deletedFuncts*.delete() 
-				s.flush()
-				s.clear()
+				List teamsRefToDelete = PartyRelationship.findAll(functionQuery+" and roleTypeCodeTo not in (:functions)", 
+					[type:PartyRelationshipType.read('PROJ_STAFF'), person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
+				if (teamsRefToDelete) {
+					teamsRefToDelete*.delete() 
+					s.flush()
+					s.clear()
+				}
 			}
 
 			MoveEventStaff.withNewSession { s -> 
-				deletedEventStaff*.delete()
-				s.flush()
-				s.clear()			
+				List eventStaff = MoveEventStaff.findAll(
+					"from MoveEventStaff where person =:person and role not in ( :role)",
+					[person:person, role:functions] )
+				if (eventStaff) {
+					eventStaff*.delete()
+					s.flush()
+					s.clear()
+				}
 			}
 		}
 
@@ -898,7 +958,7 @@ class PartyRelationshipService {
 		functions.removeAll(existingFuncToIgnore)
 		
 		// Iterate through the functions and assign to staff if not exists
-		functions.each{ func ->
+		functions.each { func ->
 			def partyRT = new PartyRelationship( 
 				partyRelationshipType : prType, 
 				partyIdFrom : partyIdFrom,
@@ -912,8 +972,23 @@ class PartyRelationshipService {
 			}
 		}
 		// TODO : return some message to send back to UI
+		*/
 	}
 	
+	/**
+	 * Used to fetch a list of Team Role Types
+	 */
+	List<RoleType> getTeamRoleTypes() {
+		return RoleType.findAllByType(RoleType.TEAM)
+	}
+
+	/**
+	 * Used to fetch a list of the Team Codes that are maintained in the RoleType table
+	 */
+	List<String> getTeamCodes() {
+		return getTeamRoleTypes().id
+	}
+
 	/**
 	 * Used to get list of functions that a Staff member has been assigned to on a Project
 	 * @param instance function - function for which fetching assignee list

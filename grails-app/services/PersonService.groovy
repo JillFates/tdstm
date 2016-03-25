@@ -785,7 +785,7 @@ class PersonService {
 	 * @param teamCode - the code of the team the person to be assigned/removed
 	 * @return A map containing the looked up project, person, teamRoleType
 	 */
-	Map validateUserCanEditStaffing(UserLogin user, String projectId, String personId, String teamCode) {
+	Map validateUserCanEditStaffing(UserLogin user, def projectId, def personId, String teamCode) {
 		// Check if the user has permission to edit the staff
 		if ( ! securityService.hasPermission(user, "EditProjectStaff") ) {
 			securityService.reportViolation("attempted to alter staffing for person $personId on project $projectId without permission", user)
@@ -885,7 +885,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param map - Used to load various data and errors to reference
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
-	void addToProjectTeam(UserLogin user, String projectId, String personId, String teamCode, Map map=null) {
+	void addToProjectTeam(UserLogin user, def projectId, def personId, String teamCode, Map map=null) {
 		// The addToEvent may call this method as well
 		if (! map) {
 			map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
@@ -981,7 +981,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @return the event object
 	 */
 	 // TODO : JPM 11/2015 : Refactor lookupEvent into EventService
-	private MoveEvent lookupEvent(Project project, String eventId) {
+	private MoveEvent lookupEvent(Project project, def eventId) {
 		if (! NumberUtil.isPositiveLong(eventId)) {
 			throw new InvalidParamException('The event id number was invalid')
 		}
@@ -1023,7 +1023,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 			partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, "STAFF")
 		}
 
-		auditService.logMessage("$user unassigned ${map.person} from project ${map.project.name}")
+		auditService.logMessage("$user unassigned ${map.person} from team $teamCode of project ${map.project.name}")
 	}
 
 	/** 
@@ -1072,7 +1072,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 	 * @param teamCode - the role (aka team) to assign the person to the project/event as
 	 * @return String - any value indicates an error otherwise blank means succes
 	 */
-	void addToEvent(UserLogin user, String projectId, String eventId, String personId, String teamCode) {
+	void addToEvent(UserLogin user, def projectId, def eventId, def personId, String teamCode) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, teamCode)
 
 		// Add the Staff to the Project if not already assigned
@@ -1112,7 +1112,7 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 
 		deleteFromEvent(map.project, event, map.person, map.teamRoleType)
 
-		auditService.logMessage("$user unassigned ${map.person} from project '${map.project.name}' team $teamCode")
+		auditService.logMessage("$user unassigned ${map.person} from team $teamCode for event $event of project ${map.project.name}")
 	}
 
 	/**
@@ -1409,14 +1409,9 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 
 		// Additional changes allowed by adminstrator of a person
 		if (byAdmin) {
-			def functions = params.list("function")
-			if (params.manageFuncs != '0' || functions){
-				def staffCompany = partyRelationshipService.getStaffCompany(person)
-				def companyProject = Project.findByClient(staffCompany)
-				partyRelationshipService.updateStaffFunctions(staffCompany, person, functions, 'STAFF')
-				if (companyProject) {
-					partyRelationshipService.updateStaffFunctions(companyProject, person,functions, "PROJ_STAFF")
-				}
+			List teams = params.list("function")
+			if (params.manageFuncs != '0' || functions) {
+				partyRelationshipService.updateAssignedTeams(person, teams)
 			}
 
 			// TODO : JPM 8/31/2015 : Overhaul how exception dates are handled - shouldn't delete all then re-add
@@ -1488,8 +1483,9 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 			}
 
 			// Get list of all staff for the company and then try to find the individual so that we don't duplicate
-			// the creation.
+			// the creation
 			def personList = partyRelationshipService.getCompanyStaff(companyId)
+			// TODO : JPM 3/2016 : savePerson() Switch the person lookup to use the finder service
 			person = personList.find {
 				// Find person using case-insensitive search
 				StringUtils.equalsIgnoreCase(it.firstName, params.firstName) &&
@@ -1502,17 +1498,21 @@ log.debug "hasAccessToPerson() person projects: $personProjects"
 			} else {
 				// Create the person and relationship appropriately
 				def reducedParams = new HashMap(params)
-				reducedParams.remove("company")
+				reducedParams.remove('company')
+				reducedParams.remove('function')
+
 				person = new Person( reducedParams )
-				if ( person.validate() && person.save() ) {
-					//Receiving added functions		
-					def functions = params.list("function")
-					def partyRelationship = partyRelationshipService.savePartyRelationship( "STAFF", companyParty, "COMPANY", person, "STAFF" )
-					if (functions) {
-						userPreferenceService.setUserRoles(functions, person.id)
-						def staffCompany = partyRelationshipService.getStaffCompany(person)
-						//Adding requested functions to Person .
-						partyRelationshipService.updateStaffFunctions(staffCompany, person, functions, 'STAFF')
+				if ( person.save() ) {
+					// Assign the person to the company
+					partyRelationshipService.addCompanyStaff(companyParty, person)
+
+					def teamCodes = params.containsKey('function') ? params.function : []
+					if (teamCodes instanceof String) {
+						teamCodes = [ teamCodes ]
+					}
+					if (teamCodes) {
+						// Assign the person to the appropriate teams
+						partyRelationshipService.updateAssignedTeams(person, teamCodes)						
 					}
 				} else {
 					log.error "savePerson() failed for $person : " + GormUtil.allErrorsString(person)
