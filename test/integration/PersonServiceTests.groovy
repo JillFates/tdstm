@@ -156,11 +156,15 @@ class PersonServiceTests extends Specification {
 			String meId = moveEvent.id.toString()
 			String personId = person.id.toString()
 		then:
+			// Add SYS_ADMIN to the first MoveEvent and check that the person is assigned at the project and event level
 			personService.assignToProjectEvent(adminPerson.userLogin, personId, meId, 'SYS_ADMIN', '1') == ''
 			personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
-			! personService.isAssignedToProjectTeam(project, person, 'DB_ADMIN')
 			personService.isAssignedToEventTeam(event, person, 'SYS_ADMIN')
+			// Do a negative check for a team that wasn't assigned
+			! personService.isAssignedToProjectTeam(project, person, 'DB_ADMIN')
 			! personService.isAssignedToEventTeam(event, person, 'DB_ADMIN')
+
+			
 	}
 
 	/*

@@ -1,26 +1,26 @@
 
 
 public enum PermissionGroup {	
-	NAVIGATION('Navigation'),
+	ADMIN('Admin'),
 	ASSETENTITY('Asset Entity'),
-	PROJECT('Project'),
-	CONSOLE('Console'),
 	ASSETTRACKER('Asset Tracker'),
 	CLIENTTEAMS('Client Teams'),
+	CONSOLE('Console'),
+	COOKBOOK('Cookbook'),
 	DASHBOARD('Dashboard'),
+	MODEL('Model'),
 	MOVEBUNDLE("Move Bundle"),
 	MOVEEVENT("Move Event"),
-	MODEL('Model'),
+	NAVIGATION('Navigation'),
+	PARTY('Party'),
 	PERSON('Person'),
+	PROJECT('Project'),
 	RACKLAYOUT('Rack Layout'),
+	REPORTS('Reports'),
 	ROLETYPE('Role Type'),
 	ROOMLAYOUT('room'),
-	REPORTS('Reports'),
 	TASK('Task'),
-	USER('User'),
-	PARTY('Party'),
-	COOKBOOK('Cookbook'),
-	ADMIN('Admin')
+	USER('User')
 	
 	String name
 	
@@ -33,9 +33,30 @@ public enum PermissionGroup {
 	}
 	
 	static list() {
-		 [NAVIGATION,ASSETENTITY,PROJECT,CONSOLE,ASSETTRACKER,CLIENTTEAMS,COOKBOOK,DASHBOARD,MOVEBUNDLE,
-			 MOVEEVENT,MODEL,PERSON,RACKLAYOUT,ROLETYPE,ROOMLAYOUT,REPORTS,TASK,USER,PARTY, ADMIN]
-		}
+		 [ 
+			ADMIN,
+			MODEL,
+			MOVEEVENT,
+			PARTY, 
+			PERSON,
+			RACKLAYOUT,
+			REPORTS,
+			ROLETYPE,
+			ROOMLAYOUT,
+			TASK,
+			USER,
+		 	ASSETENTITY,
+		 	ASSETTRACKER,
+		 	CLIENTTEAMS,
+		 	CONSOLE,
+		 	COOKBOOK,
+		 	DASHBOARD,
+		 	MOVEBUNDLE,
+		 	NAVIGATION,
+		 	PROJECT
+		]
+	}
+	
 	String toString() {
 		return name
 	}

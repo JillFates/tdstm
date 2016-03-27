@@ -135,9 +135,9 @@ class ProjectService {
 
 	/** 
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all 
-	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
-	 * is false then the list will be restricted to those that the user has been assigned to via a relation in the 
-	 * PartyRelationship table.
+	 * projects affiliated with the individual's company. If showAllProjPerm is false then the list will be restricted to those that 
+	 * the user has been assigned to via an association in the PartyRelationship table. The list will be filtered by the projectState 
+	 * and possibly the pagination params. 
 	 *
 	 * @param userLogin - the user to lookup projects for
 	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
@@ -174,24 +174,13 @@ log.debug "** getUserProjects personId=$personId, companyParty=${companyParty.id
 			projectIds = partyRelationshipService.companyProjects(companyParty).id
 log.debug "** getUserProjects (showAllProjPerm) ids: $projectIds"
 		} else {
-			// Find all of the projects that the user is assigned to
-			/*
-			def projQuery = "SELECT pr.partyIdFrom.id FROM PartyRelationship pr WHERE \
-				( (pr.partyIdTo = ${personId} AND pr.partyRelationshipType = 'PROJ_STAFF') OR \
-				  (pr.partyIdTo = ${companyParty.id} AND pr.partyRelationshipType = 'PROJ_COMPANY') ) \
-				  AND pr.roleTypeCodeFrom = 'PROJECT' "
-			projectIds = PartyRelationship.executeQuery(projQuery)
-			if (!projectIds) {
-				return []
-			}
-			*/
 			projectIds = getProjectsWherePersonIsStaff(person, projectStatus).id
 log.debug "** getUserProjects (!showAllProjPerm) ids: $projectIds"
 		}
 		if (!projectIds) {
 				return []
 		}
-		
+
 		def startDates = projParams.startDate ? Project.findAll("from Project where startDate like '%${projParams.startDate}%'")?.startDate : []
 		def completionDates = projParams.completionDate ? Project.findAll("from Project where completionDate like '%${projParams.completionDate}%'")?.completionDate : []
 		// if !showAllProjPerm then filter in('id', userProjectIds)

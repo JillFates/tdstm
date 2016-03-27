@@ -175,7 +175,7 @@ class ShiroActiveDirectoryRealm {
 
 		switch (requiredPermission) {
 			case ~/^monitoring:.*/:
-				perm = 'monitoring'
+				perm = 'ViewAdminTools'
 				break
 		}
 
