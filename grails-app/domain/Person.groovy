@@ -24,7 +24,7 @@ class Person extends Party {
 	String staffType = 'Salary'
 	Integer travelOK = 1
 	
-	static Person loggedInPerson
+	// static Person loggedInPerson
 
 	static hasMany =[
 		blackOutDates : ExceptionDates
@@ -83,6 +83,7 @@ class Person extends Party {
 		'enabled',
 		'lastNameFirst',
 		'lastNameFirstAndTitle',
+		'loginUser',
 		'name',
 		'suitableTeams'
 	]
@@ -167,6 +168,13 @@ class Person extends Party {
 	 */
 	void disable() {
 		active = 'N'
+	}
+
+	/**
+	 * Used to retrieve the UserLogin for a given person
+	 */
+	UserLogin getUserLogin() {
+		return UserLogin.findByPerson( this )
 	}
 
 	/**

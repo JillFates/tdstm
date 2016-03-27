@@ -41,34 +41,6 @@ class ProjectService {
 	def sequenceService
 	def auditService
 
-	/**
-	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
-	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
-	 * is false then the list will be restricted to those that the user has been assigned to via a relation in the
-	 * PartyRelationship table.
-	 *
-	 * @param userLogin - the user to lookup projects for
-	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
-	 * @param projectStatus - the status of the project, options [any | active | completed] (default any)
-	 * @param sortOn - field used to sort, could be name or projectCode
-	 * @param sortOrder - sort order, could be asc or desc
-	 * @return list of projects
-	 */
-	List<Project> getUserProjectsOrderBy(
-		UserLogin userLogin, 
-		Boolean showAllProjPerm=false, 
-		ProjectStatus projectStatus=ProjectStatus.ANY, 
-		ProjectSortProperty sortOn = ProjectSortProperty.NAME, 
-		SortOrder sortOrder = SortOrder.ASC
-	) {
-		def searchParams = [:]
-		searchParams.sortOn = sortOn
-		searchParams.sortOrder = sortOrder
-		return getUserProjects(userLogin, showAllProjPerm, projectStatus, searchParams)
-	}
-
-
-
 	List getStaffList(onlyAssigned, role, projects, companies, sorting) {
 		
 		def query = new StringBuffer("""
@@ -109,6 +81,58 @@ class ProjectService {
 		return jdbcTemplate.queryForList(query.toString())
 	}
 
+	/**
+	 * Returns a list of projects that a person is assigned as staff
+	 * @param person - the person to search for their projects
+	 * @param ProjectStatus projectStatus=ProjectStatus.ANY
+	 * @return List of projects
+	 */
+	List<Project> getProjectsWherePersonIsStaff(Person person, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
+		StringBuffer query = new StringBuffer("""from Project p 
+			where p.id in (
+				select pr.partyIdFrom.id from PartyRelationship pr 
+				where pr.partyRelationshipType.id = 'PROJ_STAFF' and
+					pr.roleTypeCodeFrom.id = 'PROJECT' and
+					pr.roleTypeCodeTo.id = 'STAFF' and
+					pr.partyIdTo = :person ) """)
+		Map params = [ person:person ]
+
+		if (projectStatus != ProjectStatus.ANY) {
+			query.append("and p.completionDate ${(projectStatus==ProjectStatus.ACTIVE ? '>=' : '<')} :date")
+			params.date = new Date()
+		}
+
+		List projects = Project.executeQuery(query.toString(), params)
+		projects?.sort { it.name }
+		return projects
+	}
+
+	/**
+	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all
+	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
+	 * is false then the list will be restricted to those that the user has been assigned to via a relation in the
+	 * PartyRelationship table.
+	 *
+	 * @param userLogin - the user to lookup projects for
+	 * @param showAllProjPerm - flag if the user has the ShowAllProject permission (default false)
+	 * @param projectStatus - the status of the project, options [any | active | completed] (default any)
+	 * @param sortOn - field used to sort, could be name or projectCode
+	 * @param sortOrder - sort order, could be asc or desc
+	 * @return list of projects
+	 */
+	List<Project> getUserProjectsOrderBy(
+		UserLogin userLogin, 
+		Boolean showAllProjPerm=false, 
+		ProjectStatus projectStatus=ProjectStatus.ANY, 
+		ProjectSortProperty sortOn = ProjectSortProperty.NAME, 
+		SortOrder sortOrder = SortOrder.ASC
+	) {
+		def searchParams = [:]
+		searchParams.sortOn = sortOn
+		searchParams.sortOrder = sortOrder
+		return getUserProjects(userLogin, showAllProjPerm, projectStatus, searchParams)
+	}
+
 	/** 
 	 * Returns a list of projects that the user has access to. If showAllProjPerm is true then the user has access to all 
 	 * projects and the list will be filtered by the projectState and possibly the pagination params. If showAllProjPerm
@@ -121,7 +145,12 @@ class ProjectService {
 	 * @param params - parameters to manage the resultset/pagination [maxRows, currentPage, sortOn, orderBy]
 	 * @return list of projects
 	 */
-	List<Project> getUserProjects(UserLogin userLogin, Boolean showAllProjPerm=false, ProjectStatus projectStatus=ProjectStatus.ANY, Map searchParams=[:]) {
+	List<Project> getUserProjects(
+		UserLogin userLogin, 
+		Boolean showAllProjPerm=false, 
+		ProjectStatus projectStatus=ProjectStatus.ANY, 
+		Map searchParams=[:]
+	) {
 		def projects = []
 		def projectIds = []
 		def timeNow = new Date() 
@@ -137,17 +166,32 @@ class ProjectService {
 		def person = Person.get(personId)
 		def companyParty = person.company
 
+log.debug "** getUserProjects personId=$personId, companyParty=${companyParty.id}"
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
-		if (!showAllProjPerm) {
+		if (showAllProjPerm) {
+			// Find all the projects that are available for the user's company as client or as partner or owner
+			projectIds = partyRelationshipService.companyProjects(companyParty).id
+log.debug "** getUserProjects (showAllProjPerm) ids: $projectIds"
+		} else {
+			// Find all of the projects that the user is assigned to
+			/*
 			def projQuery = "SELECT pr.partyIdFrom.id FROM PartyRelationship pr WHERE \
 				( (pr.partyIdTo = ${personId} AND pr.partyRelationshipType = 'PROJ_STAFF') OR \
 				  (pr.partyIdTo = ${companyParty.id} AND pr.partyRelationshipType = 'PROJ_COMPANY') ) \
 				  AND pr.roleTypeCodeFrom = 'PROJECT' "
 			projectIds = PartyRelationship.executeQuery(projQuery)
-			if (!projectIds) return projects;
+			if (!projectIds) {
+				return []
+			}
+			*/
+			projectIds = getProjectsWherePersonIsStaff(person, projectStatus).id
+log.debug "** getUserProjects (!showAllProjPerm) ids: $projectIds"
 		}
-
+		if (!projectIds) {
+				return []
+		}
+		
 		def startDates = projParams.startDate ? Project.findAll("from Project where startDate like '%${projParams.startDate}%'")?.startDate : []
 		def completionDates = projParams.completionDate ? Project.findAll("from Project where completionDate like '%${projParams.completionDate}%'")?.completionDate : []
 		// if !showAllProjPerm then filter in('id', userProjectIds)
@@ -156,7 +200,7 @@ class ProjectService {
 		// if params has pagination params, then add to the filtering
 		projects = Project.createCriteria().list(max: maxRows, offset: rowOffset) {
 			if (projectIds){
-				'in'("id", projectIds)
+				'in'('id', projectIds)
 			}
 			if(projParams.projectCode)
 				ilike('projectCode', "%${projParams.projectCode}%")
@@ -832,6 +876,25 @@ class ProjectService {
 		} else {
 			return [message: "", success: false]
 		}
+	}
+
+	/**
+	 * Used to get a list of projects where the company is the client of project(s)
+	 * @param company - the company to find projects for
+	 * @param projectStatus - filter on the projects based on being ACTIVE|COMPLETED|ANY (default ACTIVE)
+	 * @return the list of projects of the company 
+	 */
+	List<Project> getProjectsWhereClient(PartyGroup company, ProjectStatus projectStatus=ProjectStatus.ACTIVE) {
+		StringBuffer query = new StringBuffer("from Project p where p.client = :client")
+		Map params = [client:company]
+		if (projectStatus != ProjectStatus.ANY) {
+			query.append(" and p.completionDate ${(projectStatus==ProjectStatus.ACTIVE ? '>=' : '<')} :completionDate")
+			params.completionDate = new Date()
+		}
+		query.append(" order by p.name")
+		//println "getProjectsWhereClient() query=$query, params=$params"
+		List projects = Project.executeQuery(query.toString(), params)
+		return projects
 	}
 
 	/**

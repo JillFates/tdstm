@@ -1,61 +1,184 @@
-import grails.test.*
+import spock.lang.*
 
-import com.tdssrc.grails.GormUtil
+class PersonServiceTests extends Specification {
 
-class PersonServiceTests extends GrailsUnitTestCase {
-	
+	def partyRelationshipService	
 	def personService
-
+	def projectService
 	def project
-	def attributeSet
-	def moveEvent
-	def moveBundle
-    
+	Person person
+	Person adminPerson
+	def personHelper
+	def projectHelper
 
-	void testFindPersonString() {
-		def person
+	def setup() {
+		projectHelper = new ProjectTestHelper(projectService)
+		project = projectHelper.getProject()
 
+		personHelper = new PersonTestHelper(personService)
+		adminPerson = personHelper.getAdminPerson()
+	}
+
+	def "1. Test the savePerson method with NO default project "() {
+		when:
+			Person newPerson = personHelper.createPerson(adminPerson, project.client)
+		then:
+			newPerson != null
+			newPerson.company.id == project.client.id
+			! personService.hasAccessToProject(newPerson, project)
+			! personService.isAssignedToProject(project, newPerson)
+
+		// Now try adding the person to the project so that they have access to the project
+		when:
+			personService.addToProject(adminPerson.userLogin, project.id.toString(), newPerson.id.toString())
+		then:
+			personService.hasAccessToProject(newPerson, project)
+			personService.isAssignedToProject(project, newPerson)
+	}
+
+	def "2. Test the savePerson method with default project "() {
+		when:
+			Person newPerson = personHelper.createPerson(adminPerson, project.client, project)
+		then:
+			newPerson != null
+			newPerson.company.id == project.client.id
+			personService.hasAccessToProject(newPerson, project)
+	}
+
+	def "3. Test finding persons by their name using a string that must be parsed "() {
 		// Know person for the project
-		person = personService.findPerson("Robin Banks", project)
-		assertNotNull person
-		assertEqual 6, person.id
+		when:
+			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin'])
+			Map results = personService.findPerson("Robin Banks", project)
+		then:
+			! results.isAmbiguous
+			results.person != null
+			results.person.firstName == 'Robin'
+			results.person.lastName == 'Banks'
 
 		// Known person not on the project
-		person = personService.findPerson("John Martin", project)
-		assertNull person
+		when:
+			results = personService.findPerson(adminPerson.toString(), project)
+		then:
+			results.person == null
 
 		// Fake person
-		person = personService.findPerson("Robert E. Lee", project)
-		assertNull person
+		when:
+			results = personService.findPerson("Robert E. Lee", project)
+		then:
+			results.person == null
 
+		// Create a 2nd person that will cause ambiguous lookup
+		when:
+			Person secondPerson = personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin', middleName: 'T'])
+			results = personService.findPerson("Robin", project)
+		then:
+			results.isAmbiguous
+			results.person == null
 	}
 
-	void testFindPersonMap() {
-		def person
-
+	def "4. Test finding persons by their name using a mapped name "() {
 		// Know person for the project
-		person = personService.findPerson([first:'Robin', last:'Banks'], project)
-		assertNotNull person
-		assertEqual 6, person.id
+		when: 
+			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin'])
+			Map results = personService.findPerson([first:'Robin', last:'Banks'], project)
+		then:
+			! results.isAmbiguous
+			results.person != null
+			results.person.firstName == 'Robin'
+			results.person.lastName == 'Banks'
 
 		// Known person not on the project
-		person = personService.findPerson([first:'John', last:'Martin'], project)
-		assertNull person
+		when:
+			results = personService.findPerson([first:adminPerson.firstName, last:adminPerson.lastName], project)
+		then:
+			results.person == null
 
 		// Fake person
-		person = personService.findPerson([first:'Robert', middle:'E.', last:'Lee'], project)
-		assertNull person
+		when:
+			results = personService.findPerson([first:'Robert', middle:'E.', last:'Lee'], project)
+		then:
+			results.person == null
+
+		// Create a 2nd person that will cause ambiguous lookup
+		when:
+			personHelper.createPerson(adminPerson, project.client, null, [lastName:'Banks', firstName:'Robin', middleName: 'T'])
+			results = personService.findPerson("Robin", project)
+		then:
+			results.isAmbiguous
+			results.person == null
+
+		// Ambiguous search with middle initial where there are two persons (one with and one without middle initial)
+		// TODO : JPM 3/2016 : TM-4756 Fix ambiguous person search
+		/*
+		when:
+			results = personService.findPerson("Robin Banks", project)
+		then:
+			results.isAmbiguous
+			results.person == null
+		*/
+	}
+
+	def "5. Test project team assignment when creating person "() {
+		when: 
+			Person person = personHelper.createPerson(adminPerson, project.client, null, 
+				[lastName:'Buster', firstName:'Block'], 
+				['SYS_ADMIN', 'DB_ADMIN'])
+			List teams = personService.getPersonTeamCodes(person)
+		then:
+			teams.size() == 2
+			teams.contains('SYS_ADMIN')
+			teams.contains('DB_ADMIN')
+			teams[0] == 'DB_ADMIN'	// Should be sorted alphabetical
+			// Check individually
+			personService.isAssignedToTeam(person, 'SYS_ADMIN')
+			personService.isAssignedToTeam(person, 'DB_ADMIN')
+			! personService.isAssignedToTeam(person, 'PROJ_MGR')
+
+		// Add a new team to the person's repertoire 
+		when:
+			Map results = [:]
+			personService.addToProjectTeam(adminPerson.userLogin, project.id.toString(), person.id.toString(), 'PROJ_MGR', results)
+			teams = personService.getPersonTeamCodes(person)
+		then:
+			teams.size() == 3
+			teams.contains('PROJ_MGR')
+			personService.isAssignedToTeam(person, 'PROJ_MGR')
+			personService.isAssignedToProjectTeam(project, person, 'PROJ_MGR')
+			! personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
 
 	}
 
-    protected void setUp() {
-        super.setUp()
-		personService = new PersonService()
-		project = Project.read(457)
+	def "6. Test move event team assignment when creating person "() {
+		when: 
+			Person person = personHelper.createPerson(adminPerson, project.client)
+			MoveEvent moveEvent = projectHelper.getFirstMoveEvent(project)
+			String meId = moveEvent.id.toString()
+			String personId = person.id.toString()
+		then:
+			personService.assignToProjectEvent(adminPerson.userLogin, personId, meId, 'SYS_ADMIN', '1') == ''
+			personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
+			! personService.isAssignedToProjectTeam(project, person, 'DB_ADMIN')
+			personService.isAssignedToEventTeam(event, person, 'SYS_ADMIN')
+			! personService.isAssignedToEventTeam(event, person, 'DB_ADMIN')
 	}
 
-    protected void tearDown() {
-        super.tearDown()
-    }
+	/*
+		TODO : JPM 3/2016 : personService.hasAccessToPerson() does not work correctly
+	def "7. Test if a person has access to another person based on who they are "() {
+		when: 
+			// Make sure that the adminPerson is assigned to the project
+			Map results = [:]
+			personService.addToProjectTeam(adminPerson.userLogin, project.id.toString(), adminPerson.id.toString(), 'PROJ_MGR', results)
+			Person person = personHelper.createPerson(adminPerson, project.client)
+		then: 
+			// Admin should be able to access the person
+			personService.hasAccessToPerson(adminPerson, person, true, false) 
 
+			// client person should not have access to admin
+			! personService.hasAccessToPerson(person, adminPerson, true, false) 
+			! personService.hasAccessToPerson(person, adminPerson, false, false) 
+
+	}
+	*/
 }

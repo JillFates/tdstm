@@ -222,7 +222,6 @@ class SecurityService implements InitializingBean {
 	}
 
 	/**
->>>>>>> .merge-right.r6121
 	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
 	 * should be returned (e.g. Staff or System). When a project is presented the method will return roles associate to the project otherwise
 	 * it return the user's global role.
@@ -992,10 +991,11 @@ class SecurityService implements InitializingBean {
 
 		} else {
 			// Make sure we have a user to edit
-			if (! NumberUtil.isPositiveLong(params.id)) {
+			Long userId = NumberUtil.toPositiveLong(params.id, -1)
+			if ( userId == -1 ) {
 				throw new InvalidParamException('User id was missing or invalid')
 			}
-			userLogin = UserLogin.get( params.id )
+			userLogin = UserLogin.get( userId )
 			if (!userLogin) {
 				throw new InvalidParamException('Specified user was not found')
 			}
@@ -1006,7 +1006,7 @@ class SecurityService implements InitializingBean {
 		def personService = serviceHelperService.getService('person')
 
 		// Test that the user has access account being updated
-		personService.hasAccessToPerson(userLogin.person, byWhom.person, true, true)
+		personService.hasAccessToPerson(byWhom.person, person, true, true)
 
 		// Determine if the specified person can be assigned to the specified project
 		// TODO Restore this feature, it disabled temporally by TM-4100
@@ -1146,6 +1146,8 @@ Dealt with:
 		}
 		if (isNewUser) {
 			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, "START_PAGE", "User Dashboard")
+			// TODO : JPM 3/2016 : Default preferences for user for TZ/Date format should be based on the selected project
+			// The date format should be encapsulated or we should add the default Date format on the project as well.
 			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, TimeUtil.TIMEZONE_ATTR, TimeUtil.defaultTimeZone)
 			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, TimeUtil.DATE_TIME_FORMAT_ATTR, TimeUtil.getDefaultFormatType())
 

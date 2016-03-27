@@ -367,16 +367,16 @@ def test = {
 	 * @param forWhom - used to indicate if the submit is from a person form otherwise it is invoked from Ajax call
 	 */
 	def save() {
-		if (!controllerService.checkPermission(this, 'PersonCreateView')) 
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonCreateView')
+		if (! project) {
 			return
+		}
 
 		// When forWhom == 'person' we're working with the company submitted with the form otherwise we're 
 		// going to use the company associated with the current project.
 		def isAjaxCall = params.forWhom != "person"
 		def companyId
 		if (isAjaxCall) {
-			// First try to see if the person already exists for the current project
-			def project = securityService.getUserCurrentProject()
 			companyId = project.client.id
 		} else {
 			companyId = NumberUtil.toLong(params.company)
@@ -387,8 +387,8 @@ def test = {
 		def person
 
 		try {
-			Person byWhom = securityService.getUserLoginPerson()
-			person = personService.savePerson(params, byWhom, companyId, true)
+			Person byWhom = user.person
+			person = personService.savePerson(params, byWhom, companyId, project, true)
 		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
 			errMsg = e.getMessage()
@@ -1174,13 +1174,10 @@ def test = {
 	 * @return if updated successful return true else return false
 	 */
 	def saveEventStaff() {
-		// Validates the user is logged in.
-		if (!controllerService.checkPermission(this, 'EditProjectStaff')) {
-			ServiceResults.unauthorized(response)
-			return
-		}
-		try{
-			String message = personService.assignToProject(request.JSON.personId, request.JSON.eventId, request.JSON.roleType, NumberUtil.toInteger(request.JSON.val))
+		// Security is checked in the service method
+		try {
+			UserLogin byWhom = securityService.getUserLogin()
+			String message = personService.assignToProjectEvent(byWhom, request.JSON.personId, request.JSON.eventId, request.JSON.roleType, NumberUtil.toInteger(request.JSON.val))
 			def flag = message.size() == 0
 			render(ServiceResults.success(['flag':flag, 'message':message]) as JSON)
 		} catch (UnauthorizedException e) {
@@ -1551,7 +1548,7 @@ def test = {
 		} catch (UnauthorizedException e) {
 			userMsg = e.getMessage()
 		} catch (e) {
-			log.error ExceptionUtil.messageWithStacktrace("addEventStaff()", e)
+			log.error ExceptionUtil.stackTraceToString(e)
 			ServiceResults.respondWithError(response, ['An error occurred while trying to add the person to the event', e.getMessage()])
 		}
 

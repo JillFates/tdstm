@@ -58,13 +58,16 @@ class ProjectController {
 	 * @return : list of projects as JSON
 	 */
 	def listJson() {
+		UserLogin user = securityService.getUserLogin()
+
 		def sortIndex = params.sidx ?: 'projectCode'
 		def sortOrder  = params.sord ?: 'asc'
 		def maxRows = Integer.valueOf(params.rows)
 		def currentPage = Integer.valueOf(params.page) ?: 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
 		
-		def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		// def projectHasPermission = RolePermissions.hasPermission("ShowAllProjects")
+		boolean showAllProjPerm = securityService.hasPermission(user, 'ShowAllProjects')
 		def now = TimeUtil.nowGMT()
 
 		def searchParams = [:]
@@ -75,9 +78,10 @@ class ProjectController {
 		searchParams.params = params
 
 		ProjectStatus projectStatus = ProjectStatus.valueOfParam(params.isActive)
-		projectStatus = (projectStatus!=null)?projectStatus:ProjectStatus.COMPLETED
+		projectStatus = (projectStatus!=null) ? projectStatus : ProjectStatus.COMPLETED
 
-		def projectList = projectService.getUserProjects(securityService.getUserLogin(), projectHasPermission, projectStatus, searchParams)
+//		def projectList = projectService.getUserProjects(user, projectHasPermission, projectStatus, searchParams)
+		def projectList = projectService.getUserProjects(user, showAllProjPerm, projectStatus, searchParams)
 		
 		def totalRows = projectList?.totalCount
 		def numberOfPages = totalRows ? Math.ceil(totalRows / maxRows) : 1

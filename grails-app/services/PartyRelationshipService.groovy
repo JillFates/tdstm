@@ -681,24 +681,39 @@ class PartyRelationshipService {
 	}
 
 	/**
-	 * Used to get list of functions that a Staff have
-	 * @param Integer staffId - staff person id
-	 * @param Integer CompanyId - company id that the staff associate with
-	 * @return array of role codes
+	 * Used to get list of Teams that a staff member of a company has
+	 * @param company - the company id or object that the person is staff of
+	 * @param staff - the staff id or object of the person to look up
+	 * @param teamCode - 
+	 * @return a list of the RoleType team codes
 	 */
-	List<RoleType> getCompanyStaffFunctions(def companyId, def staffId) {
-		assert companyId
-		assert staffId	
-		def projectRoles = PartyRelationship.findAll("from PartyRelationship p \
-			where p.partyRelationshipType='STAFF' \
-			and p.roleTypeCodeFrom='COMPANY' \
-			and p.roleTypeCodeTo != 'STAFF' \
-			and p.partyIdFrom.id=? \
-			and p.partyIdTo.id=?", [companyId, staffId] )
+	List<RoleType> getCompanyStaffFunctions(def company, def staff, String teamCode=null) {
+		assert company
+		assert staff	
+
+		company = StringUtil.toLongIfString(company)
+		staff = StringUtil.toLongIfString(staff)
+		boolean companyById = (company instanceof Long)
+		boolean staffById = (staff instanceof Long)
+
+		Map params = [company:company, staff:staff]
+		StringBuffer query = new StringBuffer("""select pr.roleTypeCodeTo from PartyRelationship pr
+			where pr.partyRelationshipType.id='STAFF' 
+			and pr.roleTypeCodeFrom.id = 'COMPANY'
+			and pr.roleTypeCodeTo.id != 'STAFF'
+			and pr.partyIdFrom${companyById ? '.id' : ''} = :company
+			and pr.partyIdTo${staffById ? '.id' : ''} = :staff """)
+		if (teamCode) {
+			query.append(" and pr.roleTypeCodeTo.id = :teamCode")
+			params.teamCode = teamCode
+		} else {
+			query.append(" and pr.roleTypeCodeTo.id != 'STAFF'")
+		}
+		query.append(" order by pr.roleTypeCodeTo.id")
+
+		List teams = PartyRelationship.executeQuery(query.toString(), params)
 			
-		def functions = projectRoles.roleTypeCodeTo
-		
-		return functions
+		return teams
 	}
 	
 	/**
@@ -920,68 +935,6 @@ class PartyRelationshipService {
 				}
 			}
 		}
-		/*
-		
-		def teams = RoleType.getAll(teamIds)
-		
-		// Delete the functions that are deleted from UI
-		def existingFuncToDelete = PartyRelationship.findAll(functionQuery+" and partyIdFrom=:partyIdFrom and roleTypeCodeTo not in (:functions)", 
-			[type:prType, partyIdFrom:partyIdFrom, person:person, teams:teams, roleTypeCodeTo:roleTypeCodeTo ])
-		
-		// Delete all functions when deleting from Company
-		if (prTypeId=='STAFF'){
-			 			 
-			PartyRelationship.withNewSession { s -> 
-				List teamsRefToDelete = PartyRelationship.findAll(functionQuery+" and roleTypeCodeTo not in (:functions)", 
-					[type:PartyRelationshipType.read('PROJ_STAFF'), person:person, functions:functions, roleTypeCodeTo:roleTypeCodeTo ])
-				if (teamsRefToDelete) {
-					teamsRefToDelete*.delete() 
-					s.flush()
-					s.clear()
-				}
-			}
-
-			MoveEventStaff.withNewSession { s -> 
-				List eventStaff = MoveEventStaff.findAll(
-					"from MoveEventStaff where person =:person and role not in ( :role)",
-					[person:person, role:functions] )
-				if (eventStaff) {
-					eventStaff*.delete()
-					s.flush()
-					s.clear()
-				}
-			}
-		}
-
-		PartyRelationship.withNewSession { s -> 
-			existingFuncToDelete*.delete()
-			s.flush()
-			s.clear()
-		}
-
-		// get the list of functions that are already exists to ignore
-		def existingFuncToIgnore = PartyRelationship.findAll(functionQuery+" and roleTypeCodeTo in (:functions) and partyIdFrom = :partyIdFrom ",
-			[type:prType, partyIdFrom:partyIdFrom, person:person, functions:functions,roleTypeCodeTo:roleTypeCodeTo ])?.roleTypeCodeTo		
-		
-		// remove the existing functions to avoid multiple checks
-		functions.removeAll(existingFuncToIgnore)
-		
-		// Iterate through the functions and assign to staff if not exists
-		functions.each { func ->
-			def partyRT = new PartyRelationship( 
-				partyRelationshipType : prType, 
-				partyIdFrom : partyIdFrom,
-				roleTypeCodeFrom:roleType,
-				partyIdTo : person, 
-				roleTypeCodeTo : func 
-			)
-			if ( !partyRT.validate() || !partyRT.save() ) {
-				def etext = "Unable to create Staff function " + GormUtil.allErrorsString( partyRT )
-				log.error( etext )
-			}
-		}
-		// TODO : return some message to send back to UI
-		*/
 	}
 	
 	/**
@@ -1105,30 +1058,24 @@ class PartyRelationshipService {
 	List<Project> companyProjects(PartyGroup company, Project project=null) {
 		assert company != null
 
-		def args = [
-			prtOwner: PartyRelationshipType.read('PROJ_COMPANY'), 
-			prtPartner: PartyRelationshipType.read('PROJ_PARTNER'), 
-			rtProject: RoleType.read('PROJECT'), 
-			rtPartner: RoleType.read('PARTNER'), 
-			rtCompany: RoleType.read('COMPANY'), 
-			company:company ]
+		def args = [ company:company ]
 		if (project) {
 			args.project = project
 		}
 
-		String query = "select partyIdFrom from PartyRelationship pr where \
-			(	pr.partyRelationshipType = :prtOwner \
-				and pr.roleTypeCodeFrom = :rtProject \
-				and pr.roleTypeCodeTo = :rtCompany \
-				and pr.partyIdTo = :company \
-				${project ? 'and pr.partyIdFrom = :project' : ''} \
-			) or \
-			( 	pr.partyRelationshipType = :prtPartner \
-				and pr.roleTypeCodeFrom = :rtProject \
-				and pr.roleTypeCodeTo = :rtPartner \
-				and pr.partyIdTo = :company \
-				${project ? 'and pr.partyIdFrom = :project' : ''} \
-			)"
+		String query = """select partyIdFrom from PartyRelationship pr where
+			(	pr.partyRelationshipType.id = 'PROJ_COMPANY'
+				and pr.roleTypeCodeFrom.id = 'PROJECT'
+				and pr.roleTypeCodeTo.id = 'COMPANY'
+				and pr.partyIdTo = :company
+				${project ? 'and pr.partyIdFrom = :project' : ''}
+			) or
+			( 	pr.partyRelationshipType.id = 'PROJ_PARTNER'
+				and pr.roleTypeCodeFrom.id = 'PROJECT'
+				and pr.roleTypeCodeTo.id = 'PARTNER'
+				and pr.partyIdTo = :company
+				${project ? 'and pr.partyIdFrom = :project' : ''}
+			)"""
 
 		List projects = PartyRelationship.executeQuery(query, args)
 		// log.debug "companyProjects() for company $company : list 1 : projects ${projects*.id}"

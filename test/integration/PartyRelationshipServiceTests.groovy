@@ -5,6 +5,7 @@ class PartyRelationshipServiceTests  extends Specification {
 	
 	def partyRelationshipService
 	def personService
+	def projectService
 
 	Person byWhom
 	UserLogin userLogin
@@ -12,25 +13,18 @@ class PartyRelationshipServiceTests  extends Specification {
 	MoveEvent moveEvent
 	Person person
 
-	static Long byWhomId=100
-	static Long projectId=2445
-
 	def setup() {
-		byWhom = Person.get(byWhomId)	// John Martin
-		assert byWhom
+		def projectHelper = new ProjectTestHelper(projectService)
+		project = projectHelper.getProject()
+		moveEvent = projectHelper.getFirstMoveEvent(project)
 
-		userLogin = UserLogin.findByPerson(byWhom)
+		def personHelper = new PersonTestHelper(personService)
+		byWhom = personHelper.getAdminPerson()
+
+		userLogin = byWhom.userLogin
 		assert userLogin
 
-		project = Project.get(projectId)	// Demo Project
-		assert project
-
-		moveEvent = MoveEvent.findAllByProject(project, [max:1])[0] // Grab any one of the events
-		assert moveEvent
-
-		Map personMap = [firstName:"Test ${new Date()}", lastName: 'User', active:'Y', function: ['PROJ_MGR'] ]
-		person = personService.savePerson(personMap, byWhom, project.client.id, true)
-		assert person
+		person = personHelper.createPerson(byWhom, project.client)
 	}
 
 	def "Test the getTeamRoleTypes"() {
@@ -108,13 +102,13 @@ class PartyRelationshipServiceTests  extends Specification {
 
 		// Get company by id number
 		when:
-			company = partyRelationshipService.getCompanyOfStaff(byWhomId)
+			company = partyRelationshipService.getCompanyOfStaff(byWhom.id)
 		then:
 			company != null
 
 		// Get company by string of number
 		when:
-			company = partyRelationshipService.getCompanyOfStaff("$byWhomId")
+			company = partyRelationshipService.getCompanyOfStaff("${byWhom.id}")
 		then:
 			company != null
 	}
