@@ -9,6 +9,7 @@ class MoveEventNewsController {
 	 * @return : union (AssetComments , MoveEventNews) 
 	 */
 	def list() {
+
 			def projectId = getSession().getAttribute("CURR_PROJ")?.CURR_PROJ
 			def moveEventId = params.id
 			def moveEvent
@@ -25,7 +26,7 @@ class MoveEventNewsController {
 			if(moveEvent){
 				def holdId = stateEngineService.getStateId( moveEvent.project.workflowCode, "Hold" )
 				def assetCommentsQuery = new StringBuffer( """SELECT ac.asset_comment_id as id,  'I' as type,
-									date_created as created,  
+									now() as created,  
 									if(display_option = 'G', CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text, 
 									if(is_resolved = 0, 'L','A') as state from asset_comment ac 
 									left join asset_entity ae on (ae.asset_entity_id = ac.asset_entity_id) 
