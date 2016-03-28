@@ -183,7 +183,7 @@
 				d3.select('#svgContainerDivId')
 					.attr('style', 'width:' + width + 'px !important; height:' + height + 'px !important;');
 			
-				svg = d3.select('svg')
+				svg = d3.select('#svgContainerDivId svg')
 					.attr('style', 'width:' + width + 'px !important; height:' + height + 'px !important;')
 					.attr('width', width)
 					.attr('height', height);
