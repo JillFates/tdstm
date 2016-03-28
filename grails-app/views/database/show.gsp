@@ -48,7 +48,6 @@
 							<td class="label ${config.validation} ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>
 							<td class="valueNW ${config.validation}" colspan="3">${databaseInstance.validation}</td>
 						</tr>
-						<g:render template="../assetEntity/customShow" model="[assetEntity:databaseInstance, 'project':project]"></g:render>
 					</tbody>
 				</table>
 			</div></td>

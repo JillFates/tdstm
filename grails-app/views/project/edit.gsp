@@ -231,9 +231,6 @@
 	$(document).ready(function() {
 
 		$("#timeZoneSelectPopup").dialog({ autoOpen: false });
-		
-		var customCol = (${prevParam?.customFieldsShown?: projectInstance.customFieldsShown})?(${prevParam?.customFieldsShown?: projectInstance.customFieldsShown}):'0'
-		showCustomFields(customCol, 2);
 
 		$("#workflowCode").select2({
 			placeholder: "Please Select",
@@ -265,19 +262,6 @@
 
 		editProject();
 	});
-
-	 function showCustomFields(value, columnCount) {
-	  $(".custom_table").hide();
-	  if(value=='0'){
-		  $("#custom_table").hide();
-	  } else {
-			 for(i=1;i<=value;){
-			$("#custom_table").show();
-			$("#custom_count_"+i).show();
-			i=i+parseInt(columnCount)
-		 }
-		}  
-	 }
 		
 		function editProject(){
 			var projectPartners = []

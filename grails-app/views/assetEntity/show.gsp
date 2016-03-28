@@ -131,7 +131,6 @@
 						<td class="valueNW ${config.validation}">${assetEntity.validation}</td>
 						<td>&nbsp;</td>
 					</tr>
-					<g:render template="customShow" ></g:render>
 					</tbody>
 				</table>
 				</div>

@@ -1456,8 +1456,8 @@ class AssetEntityService {
 		def attributes = projectService.getAttributes(listType)
 
 		// Create a list of the "custom##" fields that are currently selectable
-		def projectCustoms = project.customFieldsShown+1
-		def nonCustomList = project.customFieldsShown != Project.CUSTOM_FIELD_COUNT ? (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it} : []
+		def projectCustoms = 1
+		def nonCustomList = (projectCustoms..Project.CUSTOM_FIELD_COUNT).collect{"custom"+it}
 		
 		// Remove the non project specific attributes and sort them by attributeCode
 		def appAttributes = attributes.findAll{ 
@@ -1625,11 +1625,6 @@ class AssetEntityService {
 		//used to hide the customs whose fieldImportance is "H"
 		def customs = []
 		def hiddenConfig = []
-		(1..(project.customFieldsShown)).each{i->
-			customs << i
-			if(config.('custom'+i)=='H')
-			hiddenConfig << i
-		}
 		customs.removeAll(hiddenConfig)
 		
 		return [project:project, config:config, customs:customs]
