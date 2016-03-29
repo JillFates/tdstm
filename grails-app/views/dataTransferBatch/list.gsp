@@ -48,26 +48,6 @@
             </thead>
             <tbody>
             <g:each in="${dataTransferBatchList}" status="i" var="dataTransferBatch">
-            	
-	            <%-- 
-	            	-- Generate the Process buttons that will be used to replace the Review after the review function is called 
-	            	--%>
-
-								<span id="deviceProcessId_${dataTransferBatch.id}" style="display: none;" >
-									<a href="javascript:" onclick="return kickoffProcess('device', 'p', '${dataTransferBatch.id}');" >Process</a> |
-								</span>
-
-								<span id="appProcessId_${dataTransferBatch.id}" style="display: none;" >
-									<a href="javascript:" onclick="return kickoffProcess('app', 'p', '${dataTransferBatch.id}');" >Process</a> |
-								</span>
-
-								<span id="dbProcessId_${dataTransferBatch.id}" style="display: none;" >
-									<a href="javascript:" onclick="return kickoffProcess('db', 'p', '${dataTransferBatch.id}');" >Process</a> |
-								</span>
-
-								<span id="filesProcessId_${dataTransferBatch.id}" style="display: none;" >
-									<a href="javascript:" onclick="return kickoffProcess('files', 'p', '${dataTransferBatch.id}');" >Process</a> |
-								</span>
                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                  
                     <td>${dataTransferBatch.id}</td>
@@ -91,23 +71,29 @@
                     </td>
 
                     <td>
-											<g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">                    
-			                  <% def className = assetClassMap[dataTransferBatch?.eavEntityType?.domainName] %>
-			                  <span id="dtb_${dataTransferBatch.id}">
-			                    <a href="javascript:" onclick="kickoffProcess('${className}', 'r', '${dataTransferBatch.id}')">Review</a> |
-			                  </span>
-											</g:if><g:else>
-												<g:if test="${dataTransferBatch?.hasErrors == 1}">
-													<a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a> | 
-												</g:if>
-											</g:else>
-											<% def dataLog = dataTransferBatch?.importResults %>
+											<g:link action="delete" params="[batchId:dataTransferBatch.id]" title="Delete Batch">
+                        <g:img uri="/icons/delete.png" width="16" height="16" alt="Delete Batch"/>
+                      </g:link> | 
+											<% def dataLog = dataTransferBatch?.importResults %>                      
 											<g:if test="${dataLog}">
 												<a href="#" title="View Log" class="lnkViewLog" data-log="${dataLog.encodeAsHTML()}"><g:img uri="/icons/script_error.png" width="16" height="16" alt="View Log"/></a> 
-											</g:if><g:else><div style="display:inline-block;width:16px;text-align: center;">-</div></g:else> |
-											<g:link action="delete" params="[batchId:dataTransferBatch.id]" title="Delete Batch">
-												<g:img uri="/icons/delete.png" width="16" height="16" alt="Delete Batch"/>
-											</g:link>
+											</g:if><g:else><div style="display:inline-block;width:16px;text-align: center;">-</div></g:else>
+                      <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">                    
+                        <% def className = assetClassMap[dataTransferBatch?.eavEntityType?.domainName] %>
+                        <span id="${className}ReviewId_${dataTransferBatch.id}">
+                           | <a href="javascript:" onclick="kickoffProcess('${className}', 'r', '${dataTransferBatch.id}')">Review</a>
+                        </span>
+                        <%-- 
+                          -- Generate the Process button that will be used to replace the Review after the review function is called 
+                        --%>
+                        <span id="${className}ProcessId_${dataTransferBatch.id}" style="display: none;" >
+                           | <a href="javascript:" onclick="return kickoffProcess('${className}', 'p', '${dataTransferBatch.id}');">Process</a>
+                        </span>
+                      </g:if><g:else>
+                        <g:if test="${dataTransferBatch?.hasErrors == 1}">
+                           | <a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a>
+                        </g:if>
+                      </g:else>
                     </td>
                     
                     </tr>
