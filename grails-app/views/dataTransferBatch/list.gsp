@@ -16,10 +16,16 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
 		<g:render template="../layouts/angularResources" />
 		<g:javascript src="progressBar.js" />
+    <style type="text/css">
+      .block-anchor{
+        text-align: center;
+        width: 70px;
+        display: inline-block;
+      }
+    </style>
 	
 	</head>
     <body>
-    
 	    <br>
         <div class="body fluid">
 			<h1>Manage Asset Import Batches</h1>
@@ -71,32 +77,35 @@
                     </td>
 
                     <td>
-											<g:link action="delete" params="[batchId:dataTransferBatch.id]" title="Delete Batch">
-                        <g:img uri="/icons/delete.png" width="16" height="16" alt="Delete Batch"/>
-                      </g:link> | 
+                      <% def showDiv = true %>
+                      <div class="block-anchor">
+                        <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">                    
+                          <% def className = assetClassMap[dataTransferBatch?.eavEntityType?.domainName] %>
+                          <span id="${className}ReviewId_${dataTransferBatch.id}">
+                            <a href="javascript:" onclick="kickoffProcess('${className}', 'r', '${dataTransferBatch.id}')">Review</a>
+                          </span>                          
+                          <%-- 
+                            -- Generate the Process button that will be used to replace the Review after the review function is called 
+                          --%>
+                          <span id="${className}ProcessId_${dataTransferBatch.id}" style="display: none;" >
+                            <a href="javascript:" onclick="return kickoffProcess('${className}', 'p', '${dataTransferBatch.id}');">Process</a>
+                          </span>                          
+                        </g:if><g:else>
+                          <g:if test="${dataTransferBatch?.hasErrors == 1}">
+                            <a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a>
+                          </g:if><g:else><% showDiv = false %></g:else>
+                        </g:else>
+                      </div>
+                      <span ${(!showDiv)?"style='visibility:hidden'":""}>|</span>										
 											<% def dataLog = dataTransferBatch?.importResults %>                      
 											<g:if test="${dataLog}">
-												<a href="#" title="View Log" class="lnkViewLog" data-log="${dataLog.encodeAsHTML()}"><g:img uri="/icons/script_error.png" width="16" height="16" alt="View Log"/></a> 
+												<a href="#" title="View Log" class="lnkViewLog" data-log="${dataLog.encodeAsHTML()}"><g:img uri="/icons/script_error.png" width="16" height="16" alt="View Log"/></a> | 
 											</g:if><g:else><div style="display:inline-block;width:16px;text-align: center;">-</div></g:else>
-                      <g:if test="${dataTransferBatch?.statusCode == 'PENDING'}">                    
-                        <% def className = assetClassMap[dataTransferBatch?.eavEntityType?.domainName] %>
-                        <span id="${className}ReviewId_${dataTransferBatch.id}">
-                           | <a href="javascript:" onclick="kickoffProcess('${className}', 'r', '${dataTransferBatch.id}')">Review</a>
-                        </span>
-                        <%-- 
-                          -- Generate the Process button that will be used to replace the Review after the review function is called 
-                        --%>
-                        <span id="${className}ProcessId_${dataTransferBatch.id}" style="display: none;" >
-                           | <a href="javascript:" onclick="return kickoffProcess('${className}', 'p', '${dataTransferBatch.id}');">Process</a>
-                        </span>
-                      </g:if><g:else>
-                        <g:if test="${dataTransferBatch?.hasErrors == 1}">
-                           | <a href="errorsListView?id=${dataTransferBatch?.id}">View Errors</a>
-                        </g:if>
-                      </g:else>
+                      <g:link action="delete" params="[batchId:dataTransferBatch.id]" title="Delete Batch">
+                        <g:img uri="/icons/delete.png" width="16" height="16" alt="Delete Batch"/>
+                      </g:link>
                     </td>
-                    
-                    </tr>
+                  </tr>
                 </g:each>
                 </tbody>
             </table>
