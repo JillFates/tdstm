@@ -18,6 +18,7 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
+import com.tdsops.common.os.Shell
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -28,6 +29,7 @@ import java.util.UUID
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory
+	def grailsApplication
 
 	def controllerService
 	def partyRelationshipService
@@ -40,6 +42,32 @@ class AdminController {
 
 	def index() { }
 
+	def restartAppServiceForm(){
+		if(!controllerService.checkPermission(this, 'RestartApplication')){ return }
+		def cmd = grailsApplication.config.tdstm.admin.serviceRestartCommand
+		[restartable:!!cmd]
+	}
+
+	def restartAppServiceAction(){
+		def cmd = grailsApplication.config.tdstm.admin.serviceRestartCommand
+
+		if(!controllerService.checkPermission(this, 'RestartApplication')){
+			render(status: 401)
+			return
+		}else if(!cmd){
+			render(status: 400, text:g.message(code:"tdstm.admin.serviceRestartCommand.error"))
+			return
+		} 
+		def username = securityService.getUserLogin().username
+
+		def logStr = g.message(code:"tdstm.admin.serviceRestartCommand.log", args:[username, cmd])		 
+		Shell.systemLog(logStr)
+		log.info(logStr)
+		Shell.executeCommand(cmd)
+
+		render "OK"
+	}
+	
 	def orphanSummary() {
 
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
