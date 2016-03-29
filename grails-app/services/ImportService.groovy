@@ -366,7 +366,7 @@ class ImportService {
 
 		if (performance) log.debug "Reviewing $assetCount batch records took ${TimeUtil.elapsed(now)}"
 
-		sb.append("<b>Results</b><ul>" + 
+		sb.append("<h3>Review Import for Batch $batchId</h3><ul>" + 
 			"<li>Assets in batch: $assetCount</li>" +
 			"</ul>"
 		) 
@@ -417,7 +417,7 @@ class ImportService {
 
 		jobProgressFinish(progressKey, info)
 
-		dtb.importResults = info
+		dtb.importResults = combineDataTransferBatchImportResults(dtb, info)
 
 		return [elapsedTime: elapsedTime, info:info]
 	}
@@ -554,12 +554,14 @@ class ImportService {
 				session.setFlushMode(FlushMode.COMMIT)				
 				
 				errorMsg = validateImportBatchCanBeProcessed(projectId, userLoginId, batchId, progressKey)
-				if (errorMsg)
+				if (errorMsg) {
 					break
+				}
 
 				DataTransferBatch.withTransaction { tx -> 
 
 					DataTransferBatch dtb = DataTransferBatch.get(batchId)
+
 
 					// Update the batch status to POSTING
 					dtb.statusCode = DataTransferBatch.POSTING
@@ -578,10 +580,10 @@ class ImportService {
 						dtb = dtb.merge()
 						if (errorMsg) {
 							dtb.statusCode = DataTransferBatch.PENDING
-							dtb.importResults = errorMsg
+							dtb.importResults = combineDataTransferBatchImportResults(dtb, errorMsg)
 						} else {
 							dtb.statusCode = DataTransferBatch.COMPLETED
-							dtb.importResults = results.info
+							dtb.importResults = combineDataTransferBatchImportResults(dtb, results.info)
 							results.batchStatusCode = DataTransferBatch.COMPLETED
 						}
 						if ( !dtb.validate() || !dtb.save(flush:true) ) {
@@ -620,6 +622,37 @@ class ImportService {
 			jobProgressFinish(progressKey, results.info)
 			return results
 		}
+	}
+
+	/**
+	 * Private method to combine the DataTransferBatch importResults information with additional Results from posting of assets.
+	 * This will attempt to append the additional results but if it would exceed the maxSize constraint it will
+	 * attempt to save the latest results or something less appropriately.
+	 * @param dtb - the DataTransferBatch to be updated
+	 * @param results - A Sting containing the information to save
+	 * @return The string of the combined results (Process Results <hr> Import Results)
+	 */
+	private String combineDataTransferBatchImportResults(DataTransferBatch dtb, String results) { 
+		Long maxSizeImportResults = GormUtil.getConstraintMaxSize(dtb, 'importResults')
+		String current = dtb.importResults ?: ''
+		String s = ''
+		def currSize = current.size()
+		def resultsSize = results.size()
+		if ( (resultsSize+currSize) <= maxSizeImportResults ) {
+			s = results + (currSize > 0 ? "\n<hr>\n" + current : '')
+		} else if (resultsSize <= maxSizeImportResults) {
+			s = results
+		} else {
+			String msg = "<p>The process results contents exceeded the size that can be saved to the database so it was not saved.</p>\n<hr>\n"
+			def msgSize = msg.size()
+			if ((msgSize + currSize ) <= maxSizeImportResults) {
+
+				s = msg + dtb.importResults
+			} else {
+				s = msg
+			}
+		}
+		return s
 	}
 
 	/**
@@ -835,7 +868,7 @@ class ImportService {
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 		def sb = new StringBuilder(
-			"<b>Process Results for Batch ${batchId}:</b><ul>" +
+			"<h3>Process Results for Batch ${batchId}:</h3><ul>" +
 			"<li>Assets in Batch: ${assetCount}</li>" + 
 			"<li>Records Inserted: ${insertCount}</li>"+
 			"<li>Records Updated: ${updateCount}</li>" + 
@@ -1201,7 +1234,7 @@ class ImportService {
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
 		def sb = new StringBuilder(
-			"<b>Process Results for Batch ${batchId}:</b><ul>" + 
+			"<h3>Process Results for Batch ${batchId}:</h3><ul>" + 
 			"<li>Assets in Batch: ${data.assetsInBatch}</li>" + 
 			"<li>Records Inserted: ${insertCount}</li>"+
 			"<li>Records Updated: ${updateCount}</li>" + 
@@ -1350,7 +1383,7 @@ class ImportService {
 
 		def assetIdErrorMess = unknowAssets ? "(${unknowAssets.substring(0,unknowAssets.length()-1)})" : unknowAssets
 
-		def sb = new StringBuilder("<b>Process Results for Batch ${batchId}:</b><ul>" + 
+		def sb = new StringBuilder("<h3>Process Results for Batch ${batchId}:</h3><ul>" + 
 			"<li>Assets in Batch: ${assetCount}</li>" + 
 			"<li>Records Inserted: ${insertCount}</li>" +
 			"<li>Records Updated: ${updateCount}</li>" + 

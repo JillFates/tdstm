@@ -1,24 +1,54 @@
-import grails.test.*
-
-import com.tds.test.TestDomain
 import com.tdssrc.grails.GormUtil
 
-class GormUtilTests extends GrailsUnitTestCase {
+import spock.lang.Specification
+
+class GormUtilTests extends Specification  {
 	
 	// IOC variables
 	def sessionFactory
 
-	protected void setUp() {
-		super.setUp()
-	}
 
-	protected void tearDown() {
-		super.tearDown()
+	def "Test isDomainClass"() {
+		when: 
+			def domain = new com.tds.asset.AssetDependency()
+			String prop = 'comment'
+		then:
+			GormUtil.isDomainClass(domain)
+			! GormUtil.isDomainClass(new Date())
+
+	}	
+
+	def "Test the getConstraintMaxSize"() {
+		// Positive test first
+		when:
+			def domain = new com.tds.asset.AssetDependency()
+			String prop = 'comment'
+		then: 'Accessing a property that has the constraint should return a value'
+			GormUtil.getConstraintMaxSize(domain, prop) > 0
+
+		// Now test the various negative test cases
+		when:
+			GormUtil.getConstraintMaxSize(domain, 'nonExistentProperty')
+		then: 'Passing an invalid property name should throw an exception'
+			RuntimeException ex = thrown()
+			ex.message.contains('invalid property name')
+
+		when:
+			GormUtil.getConstraintMaxSize(domain, 'asset')
+		then: 'Passing a property that does not have the maxSize constraint should throw an exception'
+			ex = thrown()
+			ex.message.contains('does not have the maxSize constraint')
+
+		when:
+			GormUtil.getConstraintMaxSize(new Date(), prop)
+		then: 'Passing a non-domain should throw an exception'
+			ex = thrown()
+			ex.message.contains('non-domain class was provided')
+
 	}
 
 	/**
 	 * 
-	 */
 	void testGetDomainPropertiesWithConstraint() {
 
 		def list = []
@@ -60,20 +90,16 @@ class GormUtilTests extends GrailsUnitTestCase {
 		//list = GormUtil.getDomainPropertiesWithConstraint(TestDomain, 'inList').sort()
 		//assertEquals 'Test "inList" for null', ['color'], list
 
-		/*
-			age nullable:true
-			color 
-			label nullable:true
-			name blank:false
-			note
-			score inList:[1,2,3,4,5]
-		*/
+			// age nullable:true
+			// color 
+			// label nullable:true
+			// name blank:false
+			// note
+			// score inList:[1,2,3,4,5]
 
 	}
 
-	/**
-	 * tests the GormUtil.flushAndClearSession and mergeWithSession functionality
-	 */
+	// tests the GormUtil.flushAndClearSession and mergeWithSession functionality
 	void testFlushAndClearSession() {
 		def session = sessionFactory.getCurrentSession()
 		assertTrue 'validate we have a session', (session != null)
@@ -101,5 +127,7 @@ class GormUtilTests extends GrailsUnitTestCase {
 		assertEquals 'lastAssetId was updated', lastAssetId, project.lastAssetId
 
 	}
+	*/
+
 
 }

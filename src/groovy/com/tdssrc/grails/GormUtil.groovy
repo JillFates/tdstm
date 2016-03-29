@@ -1,4 +1,4 @@
-package com.tdssrc.grails;
+package com.tdssrc.grails
 
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
@@ -182,6 +182,37 @@ public class GormUtil {
 			return true
 		}
 		return false
+	}
+
+	/**
+	 * Used to access the maxSize constraint value on a property of a Domain class
+	 * @param domainClass - the Domain class to access the property on
+	 * @param propertyName - the name of the property to get the maxSize constraint of 
+	 * @return The value set in the maxSize constraint
+	 */
+	static Long getConstraintMaxSize(def domainClass, String propertyName) {
+		if (! isDomainClass(domainClass)) {
+			throw new RuntimeException("An non-domain class was provided for getMaxSize constraint")
+		}
+		if (! domainClass.constraints[propertyName]) {
+			throw new RuntimeException("An invalid property name ($propertyName) was specified")
+		}
+		def constraint = domainClass.constraints[propertyName].getAppliedConstraint( 'maxSize' )
+		if (! constraint) {
+			throw new RuntimeException("Property $propertyName does not have the maxSize constraint")
+		}
+
+		return constraint.getMaxSize()
+	}
+
+	/**
+	 * Used to determine if an object is a Domain class
+	 * @param clazz - the class to evaluate to determine if it is a Domain class
+	 * @return true if the object is a Domain class otherwise false
+	 */
+	static boolean isDomainClass( def clazz ) {
+		def grailsApp = com.tdsops.common.grails.ApplicationContextHolder.getGrailsApplication()
+		return grailsApp.isDomainClass( clazz?.getClass() )
 	}
 
 }

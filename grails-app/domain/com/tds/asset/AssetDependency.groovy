@@ -44,7 +44,7 @@ class AssetDependency {
 			"outgoing"
 		])
 		status(blank:false, nullable:false )
-		comment(blank:true, nullable:true, size:0..255)
+		comment(blank:true, nullable:true, minSize:0, maxSize:255)
 		updatedBy( nullable:false )
 		c1( blank:true, nullable:true, size:0..255 )
 		c2( blank:true, nullable:true, size:0..255 )

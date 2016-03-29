@@ -5,8 +5,11 @@ import spock.lang.*
 
 class ProjectServiceTests  extends Specification {
 	
+	// IOC
 	def projectService
 	def personService
+
+	// Initialized by setup()
 	def projectHelper
 	def personHelper
 	Project project
@@ -60,6 +63,7 @@ class ProjectServiceTests  extends Specification {
 			def personHelper = new PersonTestHelper(personService)
 			Person adminPerson = personHelper.getAdminPerson()
 
+			// Default is ProjectStatus.ACTIVE
 			List projects = projectService.getProjectsWherePersonIsStaff(adminPerson)
 			int activeCount = projects?.size()
 		then: 

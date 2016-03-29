@@ -612,7 +612,7 @@ class AssetEntityController {
 
 			importSheetValues(results, dataTransferBatch, projectCustomLabels, sheetInfo)
 
-			// dataTransferBatch.
+			results.dataTransferBatch = dataTransferBatch
 
 			log.debug "processSheet() sheet $sheetName results = $results"
 		} catch (e) {
@@ -796,6 +796,8 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		// Initialize the results
 		sheetList.each { uploadResults[it] = [addedCount:0, skippedCount:0, processed:false, summary:''] }
 		
+		DataTransferBatch dataTransferBatch
+
 		// ------
 		// The following section are a few Closures to help simplify the code
 		// ------
@@ -820,14 +822,18 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				failWithError "Unhandled Sheet '$theSheetName' - please contact support"
 			}
 
+			// Save the transfer batch so it can be used by the saveProcessResultsToBatch closure below
+			dataTransferBatch = theResults.dataTransferBatch
+
 			uploadResults[theSheetName].with {
 				addedCount = theResults.added
 				skippedCount = theResults.skipped?.size() ?: 0
 				processed = true
 				summary = theResults.summary
-				errorList = theResults.errors
+				errorList = theResults.errors ?: []
 				erroredCount = (errorList?.size() ?: 0)
 			}
+			uploadResults.skipped = theResults.skipped
 			
 			if (theResults.skipped) {
 				skipped.addAll(theResults.skipped)
@@ -841,6 +847,22 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				flagToManageBatches = true
 			}
 		}
+
+		/**
+		 * A closure for saving the results back into the task batch 
+		 * Note that the taskBatch which is created in a function get tucked into the results so that we can
+		 * use it here to save the results. While ugly, this was a quick way of getting it to work.
+		 * @param theSheetName - the name of the sheet
+		 * @param theResults - contains the results from the processResults function
+		 */
+		def saveProcessResultsToBatch = { theSheetName, theResults ->
+			// Generate the results and save into the batch for historical reference
+			// log.debug "saveProcessResultsToBatch: theSheetName=$theSheetName, theResults = $theResults"
+			StringBuffer sprtbMsg = generateResults(theResults, theResults[theSheetName].skipped, [theSheetName], false)
+			dataTransferBatch.importResults = sprtbMsg.toString()
+			dataTransferBatch.save()
+		}		
+
 
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
@@ -944,7 +966,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 			def hibernateSession = sessionFactory.getCurrentSession()
 
-			DataTransferBatch dataTransferBatch
 			Map importResults
 			String sheetName, domainClassName
 
@@ -956,6 +977,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				domainClassName = 'AssetEntity'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'assetId', 'Name', 0, domainClassName, exportTime)
 				processResults(sheetName, importResults)
+				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
 
 			// ----
@@ -966,6 +988,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				domainClassName = 'Application'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'appId', 'Name', 0, domainClassName, exportTime)
 				processResults(sheetName, importResults)
+				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
 
 			// ----
@@ -976,6 +999,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				domainClassName = 'Database'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'dbId', 'Name', 0, domainClassName, exportTime)
 				processResults(sheetName, importResults)
+				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
 
 			// ----
@@ -986,6 +1010,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				domainClassName = 'Files'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'filesId', 'Name', 0, domainClassName, exportTime)
 				processResults(sheetName, importResults)
+				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
 
 			// ----
@@ -1417,6 +1442,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			// -----
 			// Construct the results detail to display to the user
 			// -----
+			/*
 			StringBuffer message = new StringBuffer( "<b>Spreadsheet import was successful</b><br>\n")
 			if (flagToManageBatches) {
 				message.append("<p>Please click the Manage Batches below to review and post these changes</p><br>\n")
@@ -1444,20 +1470,19 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					}
 				}
 			}
-/*
-			if (errorMsgList.size()) {
-				message.append( errorMsgList.collect { "<li>$it</li>"}.join("\n") )
-			}
-*/
+
 			if (skipped.size()) {
 				message.append("</ul></p>\n<br><p>Rows Skipped: <ul>\n")
 				message.append( "<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul>")
 				message.append( skipped.collect { "<li>$it</li>" }.join("\n") )
 			}
 
-			message.append("</ul></p>\n")				
-			
-			forward action:forwardAction, params: [message: message.toString()]
+			message.append("</ul></p>\n")
+			*/
+
+			StringBuffer message = generateResults(uploadResults, skipped, sheetList, flagToManageBatches)
+
+			forward action:forwardAction, params: [ message: message.toString() ]
 
 		} catch( NumberFormatException e ) {
 			log.error "AssetImport Failed ${ExceptionUtil.stackTraceToString(e)}"
@@ -1468,6 +1493,61 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 	}
 	
+
+	/**
+	 * Used to generate the import results
+	 * @param results - a Map containing the information collected during the import process
+	 * @param skipped - a List of the rows that were skipped
+	 * @param sheetList - a List that contains the name of each sheet that was included in the import process
+	 * @param notifyManageBatches - a boolean to control if the Manage Batches message is included in the results
+	 */
+	private StringBuffer generateResults(Map results, List skipped, List sheetList, Boolean notifyManageBatches) {
+		StringBuffer message = new StringBuffer( "<h3>Spreadsheet import was successful</h3>\n")
+		if (notifyManageBatches) {
+			message.append("<p>Please click the Manage Batches below to review and post these changes</p><br>\n")
+		}
+		message.append("<p>Results: <ul>\n")
+		sheetList.each { 
+			if (results[it].processed) {
+				if (results[it].summary) {
+					message.append("<li>$it: ${results[it].summary}</li>\n")
+				} else {
+					message.append("<li>$it: ${results[it].addedCount} loaded</li>\n")
+				}
+			}
+		}
+		message.append("</ul></p><br>\n")
+
+		// Handle the errors and skipped rows
+		if ( sheetList.find { results[it].errorList?.size() }) {
+			message.append("<p>Errors: <ul>\n")
+			sheetList.each { 
+				if (results[it].processed) {
+					if (results[it].errorList.size()) {
+						message.append("<li>$it:<ul>")
+						message.append( results[it].errorList.collect { "<li>$it</li>"}.join("\n") )
+						message.append("</li></ul>\n")
+					}
+				}
+			}
+			message.append("\n</ul></p>\n")
+		}
+
+		if (skipped?.size()) {
+			message.append("<br><p>Rows Skipped: <ul>\n")
+			message.append( "<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul>")
+			message.append( skipped.collect { "<li>$it</li>" }.join("\n") )
+			message.append("\n</ul></p>\n")
+		}
+
+		message.append("</p>\n")		
+		return message
+	}
+
+	/** 
+	 * Used to kick off the export process that will schedule a Quartz job to run in background so that the user will get
+	 * an immediate response and can poll for the status of the job.
+	 */
 	def export() {
 		if (!controllerService.checkPermission(this, 'Export')){
 			return
