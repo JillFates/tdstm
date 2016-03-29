@@ -166,16 +166,13 @@ class ProjectService {
 		def person = Person.get(personId)
 		def companyParty = person.company
 
-log.debug "** getUserProjects personId=$personId, companyParty=${companyParty.id}"
 		// If !showAllProjPerm, then need to find distinct project ids where the PartyRelationship.partyIdTo.id = userLogin.person.id
 		// and PartyRelationshipType=PROJ_STAFF and RoleTypeCodeFrom=PROJECT
 		if (showAllProjPerm) {
 			// Find all the projects that are available for the user's company as client or as partner or owner
 			projectIds = partyRelationshipService.companyProjects(companyParty).id
-log.debug "** getUserProjects (showAllProjPerm) ids: $projectIds"
 		} else {
 			projectIds = getProjectsWherePersonIsStaff(person, projectStatus).id
-log.debug "** getUserProjects (!showAllProjPerm) ids: $projectIds"
 		}
 		if (!projectIds) {
 				return []
@@ -215,11 +212,11 @@ log.debug "** getUserProjects (!showAllProjPerm) ids: $projectIds"
 	}
 
 	/**
-	 * This method is used to get partyRelationShip instance to fetch project managers for requested project.
-	 * @param projectId
-	 * @return partyRelationShip instance
+	 * This method is used to get a list of the project managers for requested project
+	 * @param project - The project object or id to find Project Manager associated to
+	 * @return List of Person instances
 	 */
-	def getProjectManagersByProject(def project) {
+	List<Person> getProjectManagers(def project) {
 		List list = getStaff(project, 'PROJ_MGR')
 		return list
 	}
@@ -522,9 +519,9 @@ log.debug "** getUserProjects (!showAllProjPerm) ids: $projectIds"
 		clientStaff.sort{it.partyIdTo?.lastName}
 
 		def workflowCodes = stateEngineService.getWorkflowCode()
-		def projectPartners = partyRelationshipService.getProjectPartners( projectInstance )
-		def projectManagers = getProjectManagersByProject(projectInstance.id)
-		def companyPartners = partyRelationshipService.getCompanyPartners( projectCompany.partyIdTo )*.partyIdTo
+		List projectPartners = partyRelationshipService.getProjectPartners( projectInstance )
+		List projectManagers = getProjectManagers(projectInstance)
+		List companyPartners = partyRelationshipService.getCompanyPartners( projectCompany.partyIdTo )*.partyIdTo
 		if (projectPartner != null) {
 			partnerStaff = PartyRelationship.findAll( "from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectPartnerId and p.roleTypeCodeFrom = 'COMPANY' and p.roleTypeCodeTo = 'STAFF' order by p.partyIdTo" )
 			partnerStaff.each {

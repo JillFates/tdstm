@@ -137,7 +137,7 @@ class ProjectController {
 		def projectLogoForProject = ProjectLogo.findByProject(currProjectInstance)
 		List projectPartners = partyRelationshipService.getProjectPartners( currProjectInstance )
 
-		List projectManagers = projectService.getProjectManagersByProject(currProjectInstance.id)
+		List projectManagers = projectService.getProjectManagers(currProjectInstance)
 
 		return [ 
 			projectInstance: currProjectInstance, 
@@ -183,7 +183,7 @@ class ProjectController {
 			projectDetails = projectService.getprojectEditDetails(projectInstance,[:])
 			moveBundles = MoveBundle.findAllByProject(projectInstance)
 
-			List projectManagers = projectService.getProjectManagersByProject(projectInstance)
+			List projectManagers = projectService.getProjectManagers(projectInstance)
 			projectManagers.sort { a,b ->
 				a.firstName <=> b.firstName ?: a.lastName <=> b.lastName 
 			}

@@ -700,7 +700,7 @@ class MoveEventController {
 				'actFinish','workflow'
 			]			
 			
-			def projManagers = projectService.getProjectManagersByProject(project.id)?.partyIdTo
+			List projManagers = projectService.getProjectManagers(project)
 
 			def projectNameFont = book.createFont()
 			projectNameFont.setFontHeightInPoints((short)14)
