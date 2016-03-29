@@ -318,8 +318,13 @@ class CommentService {
 			// should be the last update to Task properties before saving.	
 			taskService.setTaskStatus( assetComment, params.status )		
         
-			def dirtyPropNames = assetComment.dirtyPropertyNames
-        	log.debug "saveUpdateCommentAndNotes() about to save task/comment $assetComment"
+			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
+			Person byWhom = userLogin.person	// load so that we don't have a lazyInit issue
+			boolean addingNote = assetComment.commentType == AssetCommentType.TASK && params.note?.size() > 0
+
+			// Note that shouldSendNotification has to be called before calling save on the object
+			boolean shouldSendNotification = shouldSendNotification(assetComment, byWhom, isNew, addingNote) 
+
 			if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
 			
 				// Deal with Notes if there are any
@@ -335,7 +340,7 @@ class CommentService {
 					if ( commentNote.hasErrors() || ! commentNote.save(flush:true)){
 						// TODO error won't bubble up to the user
 						log.error "saveUpdateCommentAndNotes: Saving comment notes faild - " + GormUtil.allErrorsString(commentNote)
-						errorMsg = 'An unexpected error occurred while saving your change'
+						errorMsg = 'An unexpected error occurred while saving your comment'
 						break
 					}
 				}
@@ -384,75 +389,21 @@ class CommentService {
 				}
 
 				// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
-				def css =  assetComment.dueDate < date ? 'Lightpink' : 'White'
-			
-				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0) ? true : false
-			
-				def statusCss = taskService.getCssClassForStatus(assetComment.status )
-				map = [ assetComment : assetComment,
-				        status : status ? true : false,
-				        cssClass:css,
-				        statusCss:statusCss, 
-				        assignedToName: assetComment.assignedTo?(assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName):"",
-						lastUpdatedDate: TimeUtil.formatDateTime(session, assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13) ]
+				def css =  (assetComment.dueDate < date ? 'Lightpink' : 'White')
+				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0) ? true : fals			
+
+				map = [ 
+					assetComment : assetComment,
+					status : status ? true : false,
+					cssClass:css,
+					statusCss: taskService.getCssClassForStatus(assetComment.status ), 
+					assignedToName: assetComment.assignedTo?(assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName):"",
+					lastUpdatedDate: TimeUtil.formatDateTime(session, assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13) 
+				]
 				
-				// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
-				def loginPerson = userLogin.person	// load so that we don't have a lazyInit issue
-				if ( assetComment.commentType == AssetCommentType.TASK && 
-					assetComment.assignedTo	&& 
-					assetComment.assignedTo.id != loginPerson.id && 
-					assetComment.sendNotification &&
-					(AssetCommentStatus.READY || AssetCommentStatus.STARTED) &&
-					assetComment.isPublished) 
-				{
-					for(int i = 0; i< dirtyPropNames.size(); i++ )
-					{	
-						def typeGood = false;
-						if(dirtyPropNames[i] != assetComment.dirtyPropertyNames[i])
-						{
-						switch(dirtyPropNames[i])
-							{
-								case "assignedTo":
-									typeGood = true;
-								break;
-								case "comment":
-									typeGood = true;
-								break;
-								case "assetEntity":
-									typeGood = true;
-								break;
-								case "moveEvent":
-									typeGood = true;
-								break;
-								case "status":
-									typeGood = true;
-								break;
-								case "dueDate":
-									typeGood = true;
-								break;
-								case "priority":
-									typeGood = true;
-								break;
-								case "estStart":
-									typeGood = true;
-								break;
-								case "actStart":
-									typeGood = true;
-								break;
-								case "estFinish":
-									typeGood = true;
-								break;
-								case "role":
-									typeGood = true;
-								break;
-							}
-						}
-						if(typeGood)
-						{
-							dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew, userDTFormat: userDTFormat])
-							break;
-						}
-					}
+				// Now refine if the task should be sent based on it being new or updated
+				if (shouldSendNotification) {
+					dispatchTaskEmail([taskId:assetComment.id, tzId:tzId, isNew:isNew, userDTFormat: userDTFormat])
 				}
 			
 				break
@@ -470,6 +421,50 @@ class CommentService {
 		} else {
 			return map
 		}
+	}
+
+	/** 
+	 * Internal method used to determine if any of the Task comments were modified that would trigger a notification
+	 * NOTE: This method should be called before the task is actual saved as it checks for dirty properties which get
+	 * wiped out on the save.
+	 * @param task - the task to check if a notification is warranted
+	 * @param triggeredByWhom - the person that created/modified the task 
+	 * @param isNew - a flag that indicates if the task was just created
+	 * @return true if a notification should be sent
+	 */
+	private boolean shouldSendNotification(AssetComment task, Person triggeredByWhom, boolean isNew, boolean addingNote) {
+		boolean warranted = ( 
+			task.commentType == AssetCommentType.TASK && 
+			task.sendNotification &&
+			task.isPublished &&
+			(task.status == AssetCommentStatus.READY || task.status == AssetCommentStatus.STARTED) &&
+			task.assignedTo	&& 
+			task.assignedTo.id != triggeredByWhom.id
+			) 
+
+		// Now refine if the task should be sent based on it being new or updated
+		if (warranted) {
+			if (isNew) {
+				// Only send notices for tasks if they are manually created
+				shouldSendNotification = ! task.autoGenerated
+			} else {
+				if (! addingNote) {
+					// Only send if any the appropriate properties of the task was modified
+					List propsToNotifyOn = ['actStart', 'assetEntity', 'assignedTo', 'comment', 'dueDate', 'estFinish', 'estStart', 'moveEvent', 'priority', 'role', 'status']
+					List dirtyPropNames = task.dirtyPropertyNames
+					// log.debug "shouldSendNotification() the dirty properties include $dirtyPropNames"
+					warranted = false
+					for(int i = 0; i< dirtyPropNames.size(); i++ ) {
+						if (propsToNotifyOn.contains(dirtyPropNames[i])) {
+							warranted = true
+							break
+						}
+					}
+				}
+			}
+		}
+		// log.debug "shouldSendNotification() returns $warranted"
+		return 	warranted	
 	}
 	
     /**
