@@ -880,17 +880,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			failWithError 'Unable to locate Data Import definition for ${params.dataTransferSet}'
 		}
 
-/*
-		// List serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSet, "Devices" )
-		List appDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSet, "Applications" )
-		List databaseDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSet, "Databases" )
-		List filesDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSet, "Files" )
-
-		List appColumnslist = getColumnNamesForDTAMap(appDTAMap, project)
-		List databaseColumnslist = getColumnNamesForDTAMap(databaseDTAMap, project)
-		List filesColumnslist = getColumnNamesForDTAMap(filesDTAMap, project)
-*/
-
 		// Contains map of the custom fields name values to match with the spreadsheet
 		Map projectCustomLabels = new HashMap()
 		for (int i = 1; i<= Project.CUSTOM_FIELD_COUNT; i++) {
@@ -1437,48 +1426,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				processResults('Comments', importResults)
 
 			} // Process Comment Imports
-
-
-			// -----
-			// Construct the results detail to display to the user
-			// -----
-			/*
-			StringBuffer message = new StringBuffer( "<b>Spreadsheet import was successful</b><br>\n")
-			if (flagToManageBatches) {
-				message.append("<p>Please click the Manage Batches below to review and post these changes</p><br>\n")
-			}
-			message.append("<br><p>Results: <ul>\n")
-			sheetList.each { 
-				if (uploadResults[it].processed) {
-					if (uploadResults[it].summary) {
-						message.append("<li>$it: ${uploadResults[it].summary}</li>\n")
-					} else {
-						message.append("<li>$it: ${uploadResults[it].addedCount} loaded</li>\n")
-					}
-				}
-			}
-			message.append("</ul><br>\n")
-
-			// Handle the errors and skipped rows
-			message.append("<p>Errors: <ul>\n")
-			sheetList.each { 
-				if (uploadResults[it].processed) {
-					if (uploadResults[it].errorList.size()) {
-						message.append("<li>$it:<ul>")
-						message.append( uploadResults[it].errorList.collect { "<li>$it</li>"}.join("\n") )
-						message.append("</li></ul>\n")
-					}
-				}
-			}
-
-			if (skipped.size()) {
-				message.append("</ul></p>\n<br><p>Rows Skipped: <ul>\n")
-				message.append( "<li>${skipped.size()} spreadsheet row${skipped.size()==0 ? ' was' : 's were'} skipped: <ul>")
-				message.append( skipped.collect { "<li>$it</li>" }.join("\n") )
-			}
-
-			message.append("</ul></p>\n")
-			*/
 
 			StringBuffer message = generateResults(uploadResults, skipped, sheetList, flagToManageBatches)
 
