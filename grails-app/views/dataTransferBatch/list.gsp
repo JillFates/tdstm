@@ -99,7 +99,7 @@
                       <span ${(!showDiv)?"style='visibility:hidden'":""}>|</span>										
 											<% def dataLog = dataTransferBatch?.importResults %>                      
 											<g:if test="${dataLog}">
-												<a href="#" title="View Log" class="lnkViewLog" data-log="${dataLog.encodeAsHTML()}"><g:img uri="/icons/script_error.png" width="16" height="16" alt="View Log"/></a> | 
+												<a href="#" data-link="${createLink(action: 'importResults', id: dataTransferBatch?.id)}" title="View Log" class="lnkViewLog"><g:img uri="/icons/script_error.png" width="16" height="16" alt="View Log"/></a> | 
 											</g:if><g:else><div style="display:inline-block;width:16px;text-align: center;">-</div></g:else>
                       <g:link action="delete" params="[batchId:dataTransferBatch.id]" title="Delete Batch">
                         <g:img uri="/icons/delete.png" width="16" height="16" alt="Delete Batch"/>
@@ -136,8 +136,15 @@
 		<script type="text/javascript">
       //Manage Import Results Dialog
       $("a.lnkViewLog").on("click", function(e){
-        $("#dlgLog div.modal-body").html($(e.currentTarget).attr("data-log"));
-        $("#dlgLog").modal({show:true});
+        e.preventDefault();
+        var uri = $(e.currentTarget).attr("data-link");
+        $.get(uri).done(function(data){
+          var msg = data.data.importResults
+          if(msg){
+            $("#dlgLog div.modal-body").html(msg);
+            $("#dlgLog").modal({show:true});
+          }
+        });        
       })
 
 			var messageDiv = $("#messageId");

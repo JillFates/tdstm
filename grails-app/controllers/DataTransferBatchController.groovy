@@ -50,6 +50,14 @@ class DataTransferBatchController {
 	// the delete, save and update actions only accept POST requests
 	def allowedMethods = [save:'POST', update:'POST']
 
+	def importResults(){
+		def dtb = DataTransferBatch.get(params.id)
+		if(dtb){
+			render(ServiceResults.success([importResults:dtb?.importResults]) as JSON)
+		}else{
+			ServiceResults.methodFailure(response)
+		}
+	}
 
 	/**
 	 * Return list of dataTransferBatchs for associated Project and Mode = Import
