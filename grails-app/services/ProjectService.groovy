@@ -368,7 +368,7 @@ class ProjectService {
 	 * @return newly formatted assetTag
 	 */
 	def getNextAssetTag( project ){
-		return "TDS-"+ String.format("%05d", sequenceService.next(project.clientId, 'AssetTag'))
+		return "TM-"+ String.format("%05d", sequenceService.next(project.clientId, 'AssetTag'))
 	}
 
 	/**
@@ -380,7 +380,7 @@ class ProjectService {
 	def getNewAssetTag( project, asset ) {
 		def tag = ''
 		if (asset.id) {
-			tag = "TDS-${asset.id}"
+			tag = "TM-${asset.id}"
 		} else {
 			tag = getNextAssetTag(project) 
 		}
