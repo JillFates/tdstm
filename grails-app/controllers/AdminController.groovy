@@ -31,33 +31,58 @@ class AdminController {
 	def sessionFactory
 	def grailsApplication
 
+	def auditService
+	def coreService
 	def controllerService
 	def partyRelationshipService
 	def projectService
 	def securityService
 	def userPreferenceService
-	def auditService
+	def userService
 
 	private static String DEFAULT_ROLE = 'USER'
+	private static String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
 
 	def index() { }
 
+	/**
+	 * Used to render the Application Restart Form
+	 * @Permission RestartApplication
+	 */
 	def restartAppServiceForm(){
-		if(!controllerService.checkPermission(this, 'RestartApplication')){ return }
-		def cmd = grailsApplication.config.tdstm.admin.serviceRestartCommand
-		[restartable:!!cmd]
-	}
+		if (!controllerService.checkPermission(this, 'RestartApplication')) { 
+			return 
+		}
+//		log.debug "appName=${coreService.getAppName()}"
+//		log.debug "appConfig=${coreService.getAppConfig()}"
+		log.debug "appConfigSetting=${}"
 
+
+		String restartCmd = coreService.getAppConfigSetting(APP_RESTART_CMD_PROPERTY)
+		boolean restartable = !! restartCmd
+		int activityTimeLimit = 5
+		List users = userService.usersWithRecentActivity(activityTimeLimit)
+
+		log.debug "restartAppServiceForm() restartCmd=$restartCmd, restartable=$restartable"
+		model:[ restartable: restartable, users: users, activityTimeLimit: activityTimeLimit ]
+	}	
+
+	/**
+	 * Action to invoke a Application Restart process if the property has been configured with a proper command. This will 
+	 * look for the tdstm.admin.serviceRestartCommand property and attempt to shell out to the OS and run if defined.
+	 * @Permission RestartApplication
+	 */
 	def restartAppServiceAction(){
 		def cmd = grailsApplication.config.tdstm.admin.serviceRestartCommand
 
-		if(!controllerService.checkPermission(this, 'RestartApplication')){
+		if (!controllerService.checkPermission(this, 'RestartApplication')) {
 			render(status: 401)
 			return
-		}else if(!cmd){
+		} else if (!!cmd) {
 			render(status: 400, text:g.message(code:"tdstm.admin.serviceRestartCommand.error"))
 			return
 		} 
+
 		def username = securityService.getUserLogin().username
 
 		def logStr = g.message(code:"tdstm.admin.serviceRestartCommand.log", args:[username, cmd])		 

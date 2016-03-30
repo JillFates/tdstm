@@ -667,4 +667,18 @@ class UserService implements InitializingBean {
 			}
 		}
 	}
+
+	/**
+	 * Used to retrieve a list of users with recent activity
+	 * @param inPastMinutes - the number of minutes since latest activity (default 5)
+	 * @return A list of the username
+	 * @Permission RestartApplication
+	 * TODO : JPM 3/2016 : Change to use new permission that is more applicable
+	 */
+	List usersWithRecentActivity(int inPastMinutes=5) {
+		String query = "SELECT username FROM user_login WHERE last_page > (NOW() - INTERVAL $inPastMinutes DAY) ORDER BY username"
+		List users = jdbcTemplate.queryForList(query)
+		log.debug "usersWithRecentActivity() users=$users"
+		return users*.username
+	}
 }

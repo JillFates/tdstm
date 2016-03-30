@@ -107,6 +107,22 @@ security.shiro.authentication.strategy = new org.apache.shiro.authc.pam.FirstSuc
 // specify all non-controller URLs that shall require authentication
  security.shiro.shiroAnyProtector.urls = ["/monitoring"]
 
+// Application Configuration settings used for testing 
+environments {
+	test {
+		tdstm {
+			testing {
+				foo {
+					intVal = 123
+					stringVal = 'abc'
+					configVal {
+						hasSomeProp = true
+					}
+				}
+			}
+		}
+	}
+}
 
 //
 // SendMail Configuration
