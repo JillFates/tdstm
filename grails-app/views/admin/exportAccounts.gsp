@@ -11,7 +11,7 @@
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:uploadForm action="exportAccountsProcess">
+			<g:form id="exportAccounts" action="exportAccountsProcess">
 
 			<table>
 				<tbody>
@@ -59,19 +59,25 @@
 
 				</tbody>
 			</table>
-			</g:uploadForm> 
+			</g:form> 
 		</div>
 	</div>
 
 	<script type="text/javascript">
 		$(window).load(function() {
-			currentMenuId = "#projectMenu";
+			currentMenuId = "#adminMenu";
 			$("#projectMenuId a").css('background-color','#003366');
 		});
 
 		// Used to enable/disable the LoginChoice radio button
 		function toggleLoginChoice(chkbox) {
 			$('[name="loginChoice"]').attr('disabled', ! chkbox.checked);
+		}
+
+		// Used to disable the button after it is clicked so users don't double-click
+		function disableButton(button) {
+			button.disabled = true;
+			$('#exportAccounts').submit();
 		}
 	</script>
 </body>

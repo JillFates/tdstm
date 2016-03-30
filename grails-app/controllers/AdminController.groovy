@@ -31,6 +31,7 @@ class AdminController {
 	def sessionFactory
 	def grailsApplication
 
+	def accountImportExportService
 	def auditService
 	def coreService
 	def controllerService
@@ -1101,7 +1102,6 @@ class AdminController {
 	 * This method is used to clean the UnUsed Asset types
 	 */
 	def cleanAssetTypes() {
-
 		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
 		if (!project) 
 			return
@@ -1125,154 +1125,7 @@ class AdminController {
 	}
 
 	/**
-	 * Just a sample of the Twitter Bootstrap implementation
-	 */
-	def bootstrap() {
-		def contextPath = request.contextPath
-		return [contextPath:contextPath]
-	}
-
-	/**
-	 * Process the Account Export request and outputs a CSV.
-	 */
-	def exportAccountsProcess() {
-
-		Project project = controllerService.getProjectForPage(this, 'PersonExport')
-		if (!project) 
-			return
-		try{
-
-			def persons = []
-
-			def filePath = "/templates/TDS-Accounts_template.xls"
-			def filename = "ExportAccounts-${new Date()}"
-	        def book = ExportUtil.workBookInstance(filename, filePath, response) 
-			def sheet = book.getSheet("Accounts")
-
-			if (params.partyRelTypeCode) {
-				def company = securityService.getUserCurrentProject().client.id
-				if (params.partyRelTypeCode == "STAFF"){
-					persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
-				} else if(params.partyRelTypeCode == "PROJ_STAFF") {
-					persons = projectService.getStaff(project)
-				}
-				if (persons) {
-					if (params.login) {
-						exportAccountsWithLoginInfo(persons, sheet, company, params.loginChoice)
-					} else {
-						exportAccountsNoLoginInfo(persons, sheet, company)
-					}
-				}
-				println(persons.lastName)
-				book.write(response.getOutputStream())
-			}
-
-		} catch(Exception e) {
-			log.error "Exception occurred while exporting data" + e.printStackTrace()
-			flash.message = "An error occurred while attempting to export accounts"
-		}
-
-		render(view:"exportAccounts")	
-		
-	}
-
-	/**
-	 * Retrieves the default fields to be exported for a single account.
-	 */
-	private List getExportAccountDefaultFields(person, companyId) {
-		def functions = partyRelationshipService.getCompanyStaffFunctions(companyId, person.id).description
-		List teams = []
-
-		functions.each{
-			teams << it.substring(it.lastIndexOf(':') +1).trim()
-		}
-
-		def roles = securityService.getAssignedRoles(person).id
-
-		def fields = [
-			"", // No username
-			person.firstName,
-			person.middleName,
-			person.lastName,
-			person.workPhone?:"",
-			person.company.name,
-			teams.join(";"),
-			roles.join(";"),
-			person.email?:"",
-			person.title,
-			person.department,
-			person.location,
-			person.stateProv,
-			person.country,
-			person.mobilePhone,
-		]
-		return fields
-	}
-
-	/**
-	 * This method outputs all the fields to the sheet
-	 */
-	private void exportAccountFields(sheet, fields, rowNumber){
-		(0..fields.size()-1).each {
-			WorkbookUtil.addCell(sheet, it, rowNumber, fields[it])
-		}
-	}
-
-	/**
-	 * This method exports the accounts along with their login information.
-	 */
-	private void exportAccountsWithLoginInfo(persons, sheet, companyId, loginChoice) {
-		def session = getSession()
-		def now = new Date()
-		persons.eachWithIndex{ p, index ->
-			def loginInfo = UserLogin.findByPerson(p)
-			if(loginInfo){
-				def isLoginInfoOkay = (loginChoice == "A")
-				if(!isLoginInfoOkay){
-
-					if(loginChoice == "Y"){	
-						if(p.active == "Y" && loginInfo.active == "Y" && loginInfo.expiryDate > now && (loginInfo.passwordNeverExpires || !(loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
-							isLoginInfoOkay = true
-						}
-					}else{
-						if(p.active == "N" || loginInfo.active == "N" || loginInfo.expiryDate < now  || (!loginInfo.passwordNeverExpires && (loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
-							isLoginInfoOkay = true
-						}
-					}
-
-				}
-				def fields = getExportAccountDefaultFields(p, companyId)
-				if (isLoginInfoOkay) {
-					
-					fields[0] = loginInfo.username
-					fields << loginInfo.active
-					fields << "" // empty password
-					fields << TimeUtil.formatDateTime(session, loginInfo.expiryDate, TimeUtil.FORMAT_DATE_TIME_6)
-					fields << ((loginInfo.passwordExpirationDate) ? TimeUtil.formatDateTime(session, loginInfo.passwordExpirationDate, TimeUtil.FORMAT_DATE_TIME_6) : "")
-					fields << (loginInfo.isLocal? "Y" : "N")
-					fields << (loginInfo.passwordNeverExpires? "Y" : "N")
-				}
-				exportAccountFields(sheet, fields, (index+1))
-			}
-			
-		}
-	}
-
-	/**
-	 * Method that exports Accounts when User Login information is not to be
-	 * included in the XLS.
-	 */
-	private void exportAccountsNoLoginInfo(persons, sheet, companyId){
-		persons.eachWithIndex{ p, index ->
-			def fields = getExportAccountDefaultFields(p, companyId)
-			exportAccountFields(sheet, fields, index + 1)
-		}
-
-	}
-
-	/**
-	 * This method renders the Export Accounts form.
-	 * 
+	 * This method renders the Export Accounts form
 	 */
 	def exportAccounts(){
 		if (!controllerService.checkPermission(this, 'PersonExport')){
@@ -1283,6 +1136,42 @@ class AdminController {
 		render(view:"exportAccounts", model:[project: project.name, client:project.client.name])
 	}
 
+	/**
+	 * Used to export project staff and users to a spreadsheet
+	 * @response Excel Spreadsheet 
+	 */
+	def exportAccountsProcess() {
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+		if (!project) {
+			return
+		}
+
+		try {
+			boolean inclLogin = params.login == 'Y'
+			String loginOpt = params.loginChoice
+			String staffOpt = params.partyRelTypeCode
+			def session = getSession()
+
+			def spreadsheet = accountImportExportService.generateAccountExportSpreadsheet(session, user, project, staffOpt, inclLogin, loginOpt)
+
+			// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
+			String projectName = project.projectCode.replaceAll(' ','')
+			String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
+			String filename = "ExportAccounts-$projectName-$formattedDate"
+
+			// Send the file out to the browser
+			ExportUtil.setExcelContentType(response, filename)
+			spreadsheet.write(response.getOutputStream() )
+			return
+
+		} catch (EmptyResultException e) {
+			flash.message e.getMessage()
+		} catch (e) { 
+			log.error "Exception occurred while exporting data" + e.printStackTrace()
+			flash.message = "An error occurred while attempting to export accounts"
+		}
+		render(view:"exportAccounts")	
+	}
 
 	/**
 	 * Used to download the spreadsheet/CSV import template
