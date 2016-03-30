@@ -53,17 +53,12 @@ class AdminController {
 		if (!controllerService.checkPermission(this, 'RestartApplication')) { 
 			return 
 		}
-//		log.debug "appName=${coreService.getAppName()}"
-//		log.debug "appConfig=${coreService.getAppConfig()}"
-		log.debug "appConfigSetting=${}"
-
 
 		String restartCmd = coreService.getAppConfigSetting(APP_RESTART_CMD_PROPERTY)
-		boolean restartable = !! restartCmd
+		boolean restartable = restartCmd != null
 		int activityTimeLimit = 5
-		List users = userService.usersWithRecentActivity(activityTimeLimit)
+		List users = userService.usernamesWithRecentActivity(activityTimeLimit)
 
-		log.debug "restartAppServiceForm() restartCmd=$restartCmd, restartable=$restartable"
 		model:[ restartable: restartable, users: users, activityTimeLimit: activityTimeLimit ]
 	}	
 
@@ -73,12 +68,12 @@ class AdminController {
 	 * @Permission RestartApplication
 	 */
 	def restartAppServiceAction(){
-		def cmd = grailsApplication.config.tdstm.admin.serviceRestartCommand
+		String cmd = coreService.getAppConfigSetting(APP_RESTART_CMD_PROPERTY)
 
-		if (!controllerService.checkPermission(this, 'RestartApplication')) {
+		if (! controllerService.checkPermission(this, 'RestartApplication')) {
 			render(status: 401)
 			return
-		} else if (!!cmd) {
+		} else if (cmd == null) {
 			render(status: 400, text:g.message(code:"tdstm.admin.serviceRestartCommand.error"))
 			return
 		} 

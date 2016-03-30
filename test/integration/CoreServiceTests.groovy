@@ -21,6 +21,18 @@ class CoreServiceTests extends Specification {
    			ex.message.contains('configuration not found')
 	}
 
+	def "getConfigSetting"() {
+		when:
+			def setting = coreService.getConfigSetting('dataSource')
+		then: 'Should return ConfigObject valid setting from grails-app/conf/Config.groovy'
+			(setting instanceof groovy.util.ConfigObject)
+
+		when:
+			setting = coreService.getConfigSetting('dataSource.driverClassName')
+		then: 'Should return String valid setting from grails-app/conf/Config.groovy'
+			(setting instanceof String)
+	}
+
 	def "getAppConfigSetting"() {
 		when:
 			def setting = coreService.getAppConfigSetting('testing.foo.intVal')
@@ -44,7 +56,6 @@ class CoreServiceTests extends Specification {
 		then: 'Missing settings should return null value'
 			setting == null
 	}
-
 
 	def "getEnvironment"() {
 		expect:

@@ -675,10 +675,10 @@ class UserService implements InitializingBean {
 	 * @Permission RestartApplication
 	 * TODO : JPM 3/2016 : Change to use new permission that is more applicable
 	 */
-	List usersWithRecentActivity(int inPastMinutes=5) {
-		String query = "SELECT username FROM user_login WHERE last_page > (NOW() - INTERVAL $inPastMinutes DAY) ORDER BY username"
+	List usernamesWithRecentActivity(int inPastMinutes=5) {
+		String query = "SELECT username FROM user_login WHERE last_page > (NOW() - INTERVAL $inPastMinutes MINUTE) ORDER BY username"
 		List users = jdbcTemplate.queryForList(query)
-		log.debug "usersWithRecentActivity() users=$users"
+		// log.debug "usersWithRecentActivity() users=$users"
 		return users*.username
 	}
 }

@@ -16,7 +16,7 @@ class CoreService {
 	String getAppName() {
 		//String name = grailsApplication.getMetadata()['app.name']
 		String name = grailsApplication.metadata['app.name']
-		log.debug "getAppName() name=$name"
+		// log.debug "getAppName() name=$name"
 		if (!name) {
 			throw new GrailsConfigurationException("Unable to determine application name")
 		}
@@ -39,28 +39,38 @@ class CoreService {
 	}
 
 	/**
-	 * Used to retrieve a particular application configuration setting
+	 * Used to retrieve any particular configuration setting
+	 * @param setting - the dot name of the property (e.g. 'dataSource.url')
+	 * @return The property setting or null if not defined
+	 * @throws GrailsConfigurationException if application name or app configuration not found
+	 */
+	def getConfigSetting(String setting) {
+		def config = grailsApplication.config
+		// Iterate over the list of the property dot naming convention to see that the property is set
+		List settingList = setting.split(/\./)
+		for (int i=0; i < settingList.size() - 1; i++) {
+			if (! config.containsKey(settingList[i])) {
+				return null
+			} 
+			config = config[settingList[i]]
+		}
+		config = config[ settingList[-1] ]
+		if ( (config instanceof groovy.util.ConfigObject) && config.isEmpty()) {
+			config = 
+			null
+		}
+		return config
+	}
+
+	/**
+	 * Used to retrieve an Application specific configuration setting
 	 * @param setting - the dot name of the property (e.g. 'security.ldap')
 	 * @return The property setting or null if not defined
 	 * @throws GrailsConfigurationException if application name or app configuration not found
 	 */
 	def getAppConfigSetting(String setting) {
-		// TODO : JPM 3/2016 : Change code to use isSet when upgrading to Grails 2.5 or later
-		def appConfig = getAppConfig()
-
-		// Iterate over the list of the property dot naming convention to see that the property is set
-		List settingList = setting.split(/\./)
-		for (int i=0; i < settingList.size() - 1; i++) {
-			if (! appConfig.containsKey(settingList[i])) {
-				return null
-			} 
-			appConfig = appConfig[settingList[i]]
-		}
-		appConfig = appConfig[ settingList[-1] ]
-		if ( (appConfig instanceof groovy.util.ConfigObject) && appConfig.isEmpty()) {
-			appConfig = null
-		}
-		return appConfig
+		setting = "${getAppName()}.${setting}"
+		return getConfigSetting(setting)
 	}
 
 	/**
