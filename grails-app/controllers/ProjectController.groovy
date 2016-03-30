@@ -703,23 +703,6 @@ class ProjectController {
 	}
 
 	/**
-	 *This action is used to project customFieldsShown
-	 *@param : custom count.
-	 *@render string 'success'.
-	 */
-	def updateProjectCustomShown() {
-		if(RolePermissions.hasPermission("EditProjectFieldSettings")){
-			def project = securityService.getUserCurrentProject()
-			project.customFieldsShown = NumberUtils.toInt(request.JSON.customCount,48)
-			if(!project.validate() || !project.save(flush:true)){
-				def etext = "Project customs unable to Update "+GormUtil.allErrorsString( project )
-				log.error( etext )
-			}
-		}
-		render "success"
-	}
-
-	/**
 	 * Used to select project time zone
 	 * @param timezone default timezone selected
 	 * @render time zone view

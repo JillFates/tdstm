@@ -28,7 +28,7 @@ class Project extends PartyGroup {
     String projectType = "Standard"
 	Integer lastAssetId
 	Integer runbookOn=1		// Flag that indicates that the project should use the runbook mode for various screens
-    Integer customFieldsShown = 8
+    Integer customFieldsShown = CUSTOM_FIELD_COUNT
 	String depConsoleCriteria 
 	MoveBundle defaultBundle
 	Timezone timezone
