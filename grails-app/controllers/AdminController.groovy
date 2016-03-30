@@ -1157,11 +1157,11 @@ class AdminController {
 			// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
 			String projectName = project.projectCode.replaceAll(' ','')
 			String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
-			String filename = "ExportAccounts-$projectName-$formattedDate"
+			String filename = "${accountImportExportService.EXPORT_FILENAME_PREFIX}-$projectName-$formattedDate"
 
 			// Send the file out to the browser
-			ExportUtil.setExcelContentType(response, filename)
-			spreadsheet.write(response.getOutputStream() )
+			accountImportExportService.sendSpreadsheetToBrowser(response, spreadsheet, filename)
+
 			return
 
 		} catch (EmptyResultException e) {
@@ -1181,13 +1181,9 @@ class AdminController {
 		if (!project) 
 			return
 
-		String filename = '/templates/TDS-Accounts_template.xls'
-		File file = ApplicationHolder.application.parentContext.getResource(filename).getFile()
-
-		response.setHeader "Content-disposition", "attachment; filename=AccountImport-${project}.xls"
-		response.contentType = 'application/vnd.ms-excel'
-		response.outputStream << file.newInputStream()
-		response.outputStream.flush()
+		String filename = accountImportExportService.EXPORT_FILENAME_PREFIX
+		def spreadsheet = accountImportExportService.getAccountExportTemplate()
+		accountImportExportService.sendSpreadsheetToBrowser(response, spreadsheet, filename)
 	}
 	
 

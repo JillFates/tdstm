@@ -17,6 +17,9 @@ class AccountImportExportService {
 	static final LOGIN_OPT_ACTIVE = 'Y'
 	static final LOGIN_OPT_INACTIVE = 'N'
 
+	static final ACCOUNT_EXPORT_TEMPLATE = '/templates/TDS-Accounts_template.xls'
+	static final EXPORT_FILENAME_PREFIX = 'AccountExport'
+
 	static final Map accountSpreadsheetColumnMap = [
 		username      : [colPos:0,  type:'U'],
 		firstName     : [colPos:1,  type:'P'],
@@ -40,6 +43,29 @@ class AccountImportExportService {
 		passwordFixed : [colPos:19, type:'U'],
 		accountLocal  : [colPos:20, type:'U']
 	]
+
+	/** 
+	 * Used to retrieve a blank Account Export Spreadsheet
+	 * @return The blank spreadsheet
+	 */
+	HSSFWorkbook getAccountExportTemplate() {
+		// Load the spreadsheet template and populate it
+		String templateFilename = ACCOUNT_EXPORT_TEMPLATE
+        HSSFWorkbook book = ExportUtil.loadSpreadsheetTemplate(templateFilename) 
+        return book
+	}
+
+	/**
+	 * Used to output a spreadsheet to the browser
+	 * @param response - the servlet response object
+	 * @param spreadsheet - the spreadsheet object
+	 * @param filename - the filename that it should be saved as on the client
+	 */ 
+	void sendSpreadsheetToBrowser(Object response, HSSFWorkbook spreadsheet, String filename) {
+		ExportUtil.setExcelContentType(response, filename)
+		spreadsheet.write( response.getOutputStream() )
+		response.outputStream.flush()
+	}
 
 	/**
 	 * Used to generate a spreadsheet of project staff and optionally their login information
@@ -78,9 +104,7 @@ class AccountImportExportService {
 			throw new EmptyResultException('No accounts were found for given filter')
 		}
 
-		// Load the spreadsheet template and populate it
-		String templateFilename = '/templates/TDS-Accounts_template.xls'
-        def book = ExportUtil.loadSpreadsheetTemplate(templateFilename) 
+		def book = getAccountExportTemplate()
 		def sheet = book.getSheet("Accounts")
 		populateAccountSpreadsheet(session, persons, sheet, company, includeUserLogins, userLoginOption)
 
@@ -119,7 +143,7 @@ class AccountImportExportService {
 
 					if (isLoginInfoOkay) {
 						// Add the User properties to the map
-						map << userToFieldMap(user, session)
+						map << userLoginToFieldMap(user, session)
 					}
 				}
 			}
@@ -175,7 +199,7 @@ class AccountImportExportService {
 	 * @param session - the request session which is used to access the timezone information
 	 * @return a map of the person information
 	 */
-	private Map userToFieldMap(UserLogin user, Object session) {
+	private Map userLoginToFieldMap(UserLogin user, Object session) {
 		Map map = [
 			username      : user.username,
 			accountLocal  : user.isLocal? "Y" : "N",
