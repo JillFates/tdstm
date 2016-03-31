@@ -18,12 +18,13 @@
 
 			<br>
 			<g:uploadForm action="importAccounts">
-				<input type="file" name="myFile" />
+				<input type="file" name="${fileParamName}" />
 				<input type="hidden" name="step" value="upload" />
 				<br />
-				<input type="checkbox" checked name="header" value="Y"> XLS contains a header record
-				</br>
-				<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
+				<br />
+				<label>
+					<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
+				</label>
 				<br />
 				<br />
 				<input type="submit" />
@@ -40,15 +41,9 @@
 			<table>
 				<thead>
 					<tr>
-						<th>Username</th>
-						<th>First Name</th>
-						<th>Middle Name</th>
-						<th>Last Name</th>
-						<th>Phone</th>
-						<th>Team(s)</th>
-						<th>Role</th>
-						<th>Email</th>
-						<th>Password</th>
+						<g:each var="label" in="${labels}">
+							<th>${label}</th>
+						</g:each>
 						<th>Match</th>
 						<th>Errors</th>
 					</tr>
@@ -57,19 +52,13 @@
 					<g:set var="counter" value="${0}" />
 					<g:each in="${people}" var="person">
 						<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
-								<td>${person.username}</td>
-								<td>${person.firstName}</td>
-								<td>${person.middleName}</td>
-								<td>${person.lastName}</td>
-								<td>${person.phone}</td>
-								<td>${person.teams}</td>
-								<td>${person.role}</td>
-								<td>${person.email}</td>
-								<td>${person.password}</td>
-								<td>${person.match}</td>
-								<td>
-									<g:each in="${person.errors}" var="error">${error}<br></g:each>
-								</td>
+							<g:each var="propName" in="${properties}">
+								<td>${person.get(propName)}</td>
+							</g:each>
+							<td>${person.match}</td>
+							<td>
+								<g:each in="${person.errors}" var="error">${error}<br></g:each>
+							</td>
 						</tr>
 					</g:each>
 				</tbody>
@@ -85,6 +74,7 @@
 						<th>First Name</th>
 						<th>Middle Name</th>
 						<th>Last Name</th>
+						<th>Email</th>
 						<th>Matched On</th>
 					</tr>
 				</thead>
@@ -92,11 +82,12 @@
 					<g:set var="counter" value="${0}" />
 					<g:each in="${matches}" var="person">
 						<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
-								<td>${person.username}</td>
-								<td>${person.firstName}</td>
-								<td>${person.middleName}</td>
-								<td>${person.lastName}</td>
-								<td>${person.match}</td>
+							<td>${person.username}</td>
+							<td>${person.firstName}</td>
+							<td>${person.middleName}</td>
+							<td>${person.lastName}</td>
+							<td>${person.email}</td>
+							<td>${person.match}</td>
 						</tr>
 					</g:each>
 				</tbody>
@@ -110,6 +101,7 @@
 			<input type="hidden" name="step" value="post" />
 			<input type="hidden" name="header" value="${header}" />
 			<input type="hidden" name="timezone" value="${timezone}" />
+			<input type="hidden" name="filename" value="${filename}" />
 			<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
 			<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
 			<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password at next login<br />
@@ -118,7 +110,7 @@
 			<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
 			<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />
 			<br>
-			<g:submitButton name="submit" value="Create Accounts" />
+			<g:submitButton name="submit" value="Create/Update Accounts" />
 			</g:form>
 
 		</div>

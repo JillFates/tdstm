@@ -49,12 +49,14 @@ class CommentService {
 	]
     
 	/**
-	 * Used to persist changes to the AssetComment and CommentNote from various forms
-	 * @param params 
-	 * @isNew - boolean flag that indicates if it is new or an update
+	 * Used to persist changes to the AssetComment and CommentNote from various forms for both Tasks and Comments
+	 * @param session - the user session
+	 * @param params - the request params
+	 * @param isNew - a flag to indicate of the request was for a new (true) or existing (false)
+	 * @param flash - the controller flash message object to stuff messages into (YUK!!!)
 	 * @return map of the AssetComment data used to refresh the view
 	 */
-	def saveUpdateCommentAndNotes(session, params, isNew = true,flash) {
+	def saveUpdateCommentAndNotes(session, params, isNew=true, flash) {
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
 		def canEditAsset = securityService.hasPermission(userLogin.person, 'AssetEdit')

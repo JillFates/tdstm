@@ -10,42 +10,14 @@ import grails.converters.JSON
 class ServiceResults {
 
 	/**
-	 * Returns a success response to be serialized as json
-	 * @param map the Map data to be added to the response object
-	 * @return the response map
-	 */
-	static Map success(map = [:]) {
-		def renderMap = [:]
-		renderMap.status = 'success'
-		renderMap.data = map
-		
-		return renderMap
-	}  
-
-	/**
 	 * Used to respond to a request with a success message
 	 * @param response - the HTTP response object
 	 * @param map - a Map of any returning data (optional)
 	 * @return void
 	 */
 	static void respondWithSuccess(response, map = [:]) {
-		response.outputStream << (success(map) as JSON)
+		respondAsJson(response, success(map))
 	}	
-
-// TODO - JPM 5/2015 - I think that the fail() and respondWithFailure should? return list instead of map?
-
-	/**
-	 * Returns a fail response to be serialized as json
-	 * @param map the Map data to be added to the response object
-	 * @return the response map
-	 */
-	static def fail(map = [:]) {
-		def renderMap = [:]
-		renderMap.status = 'fail'
-		renderMap.data = map
-		
-		return renderMap
-	}
 
 	/**
 	 * Used to respond to a request with a Failure message
@@ -54,27 +26,9 @@ class ServiceResults {
 	 * @return void
 	 */
 	static void respondWithFailure(response, map = [:]) {
-		response.outputStream << (fail(map) as JSON)
+		respondAsJson(response, fail(map))
 	}	
-	
-	/**
-	 * Returns a error response to be serialized as json
-	 * @param object an array or map to be set as errors
-	 * @return the response map
-	 */
-	static Map errors(errorStringOrList) {
-		def renderMap = [:]
 
-		renderMap.status = 'error'
-		if (errorStringOrList instanceof List) {
-			renderMap.errors = errorStringOrList
-		} else {
-			renderMap.errors = [ errorStringOrList ]
-		}
-		
-		return renderMap
-	}
-	
 	/**
 	 * Used to respond to a request with a Failure message
 	 * @param response - the HTTP response object
@@ -85,6 +39,47 @@ class ServiceResults {
 		respondAsJson(response, errors(errorMsgs))
 	}	
 
+	/**
+	 * Returns a success response to be serialized as json
+	 * @param map the Map data to be added to the response object
+	 * @return the response map
+	 */
+	static Map success(map = [:]) {
+		def renderMap = [:]
+		renderMap.status = 'success'
+		renderMap.data = map		
+		return renderMap
+	}
+
+	// TODO - JPM 5/2015 - I think that the fail() and respondWithFailure should? return list instead of map?
+	/**
+	 * Returns a fail response to be serialized as json
+	 * @param map the Map data to be added to the response object
+	 * @return the response map
+	 */
+	static def fail(map = [:]) {
+		def renderMap = [:]
+		renderMap.status = 'fail'
+		renderMap.data = map
+		return renderMap
+	}
+	
+	/**
+	 * Returns a error response to be serialized as json
+	 * @param object an array or map to be set as errors
+	 * @return the response map
+	 */
+	static Map errors(errorStringOrList) {
+		def renderMap = [:]
+		renderMap.status = 'error'
+		if (errorStringOrList instanceof List) {
+			renderMap.errors = errorStringOrList
+		} else {
+			renderMap.errors = [ errorStringOrList ]
+		}		
+		return renderMap
+	}
+	
 	/**
 	 * Returns a warning response to be serialized as json
 	 * @param object an array or map to be set as warnings
@@ -98,7 +93,6 @@ class ServiceResults {
 		} else {
 			renderMap.warnings = [ warnStringOrList ]
 		}
-		println "warnings = $renderMap"
 		return renderMap
 	}
 
@@ -112,10 +106,14 @@ class ServiceResults {
 		respondAsJson(response, warnings(warningMsgs))
 	}	
 	
-	static respondAsJson(response, object) {
-		if (! object)
-			object = [:]
-		response.setHeader('content-type', 'application/json')
+	/**
+	 * Used to respond to the browser via the servlet response by returning an object formatted as JSON
+	 * @param response - the servlet response object
+	 * @param object - the object to be rendered as JSON 
+	 */
+	static respondAsJson(response, object=[:]) {
+		response.setStatus(200)
+		setContentTypeJson(response)
 		response.outputStream << ( object as JSON )
 	}
 
@@ -186,4 +184,10 @@ class ServiceResults {
 		response.sendError(404, 'Not Found')
 	}	
 
+	/**
+	 * Used to set the ContentType to JSON
+	 */
+	static void setContentTypeJson(response) {
+		response.setContentType('text/json')
+	}
 }

@@ -19,10 +19,13 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
 import com.tdsops.common.os.Shell
-import org.springframework.web.multipart.*
-import org.springframework.web.multipart.commons.*
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdsops.common.security.SecurityUtil
+
+
+
+//import org.springframework.web.multipart.*
+//import org.springframework.web.multipart.commons.*
 
 import java.util.UUID
 
@@ -1177,22 +1180,135 @@ class AdminController {
 	 * Used to download the spreadsheet/CSV import template
 	 */
 	def importAccountsTemplate() {
-		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
-		if (!project) 
+		Project project = controllerService.getProjectForPage(this, 'PersonImport')
+		if (!project) {
 			return
+		}
 
 		String filename = accountImportExportService.EXPORT_FILENAME_PREFIX
 		def spreadsheet = accountImportExportService.getAccountExportTemplate()
 		accountImportExportService.sendSpreadsheetToBrowser(response, spreadsheet, filename)
 	}
 	
+	/**
+	 * Used to retrieve the account information during the import process after it has been read in from the 
+	 * uploaded spreadsheet and reviewed for errors.
+	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
+	 * @return JSON { accounts: List of accounts }
+	 */
+	def importAccountsReviewData() {
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+		if (!project) {
+			ServiceResults.respondWithError(response, flash.message)
+			flash.message = ''
+			return
+		}
+		if (! params.filename) {
+			ServiceResults.respondWithError(response, "Request was missing the required filename reference")
+			return
+		}
+		try {
+			List accounts = accountImportExportService.loadAndValidateSpreadsheet(user, project, params.filename)
+			ServiceResults.respondAsJson(response, accounts )
+		} catch(e) {
+			log.error "Exception occurred while importing data: " + e.printStackTrace()
+
+			ServiceResults.respondWithError(response,
+				[ "An error occurred while attempting to export accounts", e.getMessage()]  )
+		}
+
+	}
+
+	/**
+	 * Used to import accounts including persons and optionally their userLogin accounts. This is a three
+	 * step form that take param.step to track at what point the user is in the process. The steps include:
+	 *     start  - The user is presented a form
+	 *     upload - The user has uploaded the spreadsheet which is saved to a temporary random filename and the user
+	 *              is presented with the validation results
+	 *     post   - The previously confirmed and this submission will reload the saved spreadsheet and post the 
+	 *              changes to the database and delete the spreadsheet.
+	 */	 
+	def importAccounts() {
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+		if (!project) {
+			return
+		}
+
+		String currentStep = (params.step ?: 'start')
+		String fileParamName = 'importSpreadsheet'
+		Map map = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
+		String view = 'importAccounts'
+
+		try {
+
+			switch (params.step) {
+
+				case 'upload':
+					if (params.verifyProject != 'Y') {
+						flash.message = "You must confirm the project to import into before continuing"
+						return map
+					}
+
+					// Handle the file upload
+					def file = request.getFile(fileParamName)
+					if (file.empty) {
+						flash.message = 'The spreadsheet you uploaded appears to be empty'
+						return map
+					}
+
+					// Save the spreadsheet file and then read it into a HSSFWorkbook
+					String filename = accountImportExportService.saveImportSpreadsheet(request, fileParamName)
+					HSSFWorkbook spreadsheet = accountImportExportService.readImportSpreadsheet(filename)
+
+					// Read in the accounts and then validate them
+					List accounts = accountImportExportService.readAccountsFromSpreadsheet(spreadsheet)
+					List teamCodes = partyRelationshipService.getStaffingRoles().description
+					map.people = accountImportExportService.validateUploadedAccounts(accounts, teamCodes)
+
+					List staff = partyRelationshipService.getCompanyStaff( project.client.id )
+					map.matches = accountImportExportService.searchAccountsForExisting(map.people, staff)					
+
+					view = 'importAccountsReview'
+					map.step = 'review'
+					map.filename = filename
+					map.labels = accountImportExportService.getLabelsInColumnOrder()
+					map.properties = accountImportExportService.getPropertiesInColumnOrder()
+					map.gridMap = accountImportExportService.accountSpreadsheetColumnMap
+
+					break
+
+
+				case 'post':
+					boolean createUserLogin = params.createUserlogin == 'Y'
+					boolean activateLogin = params.activateLogin == 'Y'
+					boolean randomPassword = params.randomPassword == 'Y'
+					boolean forcePasswordChange = params.forcePasswordChange == 'Y'
+					def commonPassword = params.password
+					def expireDays = NumberUtils.toInt(params.expireDays,90)
+					def role = params.role
+					String filename = params.filename
+
+					boolean header = params.header == 'Y'
+					break
+
+				default:
+					break
+
+			}
+		} catch (e) {
+			log.error "Exception occurred while importing data (step $currentStep)" + e.printStackTrace()
+			flash.message = "An error occurred while attempting to export accounts"
+		}
+
+		render view:view, model:map	
+	}
 
 	/**
 	 * A controller process to import user accounts
 	 */
-	def importAccounts() {
+	def importAccountsOLD() {
 
-		Project project = controllerService.getProjectForPage(this, 'AdminMenuView')
+		Project project = controllerService.getProjectForPage(this, 'PersonImport')
 		if (!project) 
 			return
 
@@ -1209,56 +1325,6 @@ class AdminController {
 		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 		List teamCodes = partyRelationshipService.getStaffingRoles().description
 
-		/*
-			Closure that parses the XLS file and returns a map
-			containing the information for all the records read.
-		*/
-		def parseXLS = {workbook, header, createUserLogin ->
-			int firstAccountRow = header ? 1 : 0
-			def accountsSheet = workbook.getSheet( "Accounts" )
-			int lastRow = accountsSheet.getLastRowNum()
-			def accounts = []
-			for (int i = firstAccountRow; i <= lastRow; i++) {
-
-				String username = WorkbookUtil.getStringCellValue(accountsSheet, 0, i)
-				boolean validUserInfo = createUserLogin ? username : true
-
-				// Read required fields			
-				String firstName = WorkbookUtil.getStringCellValue(accountsSheet, 1, i)
-				String lastName = WorkbookUtil.getStringCellValue(accountsSheet, 3, i)
-				String email = WorkbookUtil.getStringCellValue(accountsSheet, 8, i)
-				if (validUserInfo && firstName && lastName && email){
-					accounts.add(
-						username: username,
-						firstName: firstName,
-						middleName: WorkbookUtil.getStringCellValue(accountsSheet, 2, i),
-						lastName: lastName,
-						phone: WorkbookUtil.getStringCellValue(accountsSheet, 4, i),
-						company: WorkbookUtil.getStringCellValue(accountsSheet, 5, i),
-						teams: WorkbookUtil.getStringCellValue(accountsSheet, 6, i),
-						role: WorkbookUtil.getStringCellValue(accountsSheet, 7, i),
-						email: email,
-						title: WorkbookUtil.getStringCellValue(accountsSheet, 9, i),
-						department: WorkbookUtil.getStringCellValue(accountsSheet, 10, i),
-						location: WorkbookUtil.getStringCellValue(accountsSheet, 11, i),
-						stateProv: WorkbookUtil.getStringCellValue(accountsSheet, 12, i),
-						country: WorkbookUtil.getStringCellValue(accountsSheet, 13, i),
-						mobile: WorkbookUtil.getStringCellValue(accountsSheet, 14, i),
-						active: WorkbookUtil.getStringCellValue(accountsSheet, 15, i),
-						password: WorkbookUtil.getStringCellValue(accountsSheet, 16, i),
-						accountExpiration: WorkbookUtil.getStringCellValue(accountsSheet, 17, i),
-						passwordExpiration: WorkbookUtil.getStringCellValue(accountsSheet, 18, i),
-						passwordNeverExpires: WorkbookUtil.getStringCellValue(accountsSheet, 19, i),
-						isLocal: WorkbookUtil.getStringCellValue(accountsSheet, 20, i),
-						
-						errors: [],
-
-					)
-				}
-
-			}
-			return accounts
-		}
 
 // TODO : JPM 3/2016 : Should be able to just use LIST math to remove valid teams (e.g. invalidTeams = teams - teamCodes)
 		def validateTeams = { teams -> 
@@ -1273,51 +1339,6 @@ class AdminController {
 
 // TODO : JPM 3/2016 : Believe that we have a person match function in PersonService that we might be able to leverage
 
-		def findPerson = { personInfo ->
-			def person = staff.find {
-				it.firstName == personInfo.firstName &&
-				(it.lastName == personInfo.lastName || ( ! it.lastName && ! personInfo.lastName)) &&
-				(it.middleName == personInfo.middleName || ( ! it.middleName && ! personInfo.middleName))
-			} 
-			return person
-		}
-
-		def lookForMatches = { 
-			def matches = []
-			// Look over the people and try to find them in the system and then mark them as existing if they are.
-			for (int i=0 ; i < people.size; i++) {
-				/*
-				def person = staff.find {
-					it.firstName == people[i].firstName &&
-					(it.lastName == people[i].lastName || ( ! it.lastName && ! people[i].lastName)) &&
-					(it.middleName == people[i].middleName || ( ! it.middleName && ! people[i].middleName))
-				} 
-				*/
-				def person = findPerson(people[i])
-
-				if (person) {
-					people[i].match = 'person'
-					matches << people[i]
-
-				} else {
-					if (people[i].username) {
-						def user = UserLogin.findByUsername(people[i].username)
-						if (user) {
-							people[i].match = 'username:'+user.id 
-							matches << people[i]
-						}
-					}
-				}
-			}
-			return matches
-		}
-
-// TODO : JPM 3/2016 : Refactor into function into StringUtils as standard split function (unittest)
-		def splitTeams = { t ->
-			List teams = t.split(';')
-			teams = teams*.trim()
-		}
-
 		// Retrieves all the roles that this user is allowed to assign.
 		def validRoles = securityService.getAssignableRoles(securityService.getUserLoginPerson())
 		def validRoleCodes = validRoles.id
@@ -1325,22 +1346,18 @@ class AdminController {
 		switch (params.step) {
 
 			case 'upload':
+/*
 				if (params.verifyProject != 'Y') {
 					flash.message = "You must confirm the project to import into before continuing"
 					return map
 				}
 				
 				// Handle the file upload
-				def f = request.getFile('myFile')
-				if (f.empty) {
+				def f = request.getFile('importSpreadsheet')
+				if (f.empty()) {
 					flash.message = 'Upload file appears to be empty'
 					return map
 				}
-
-
-				// upload.delete()
-				
-				def header = params.header == 'Y'
 
 				MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 				CommonsMultipartFile xls = ( CommonsMultipartFile ) mpr.getFile("myFile")
@@ -1348,10 +1365,13 @@ class AdminController {
 
 				people = parseXLS(xlsWorkbook, header, false)
 
-				// Save for step 3
-				def upload = new File("/tmp/tdstm-account-import.xls")
-				f.transferTo(upload)
+				// Generate a random filename to store the spreadsheet between page loads
+				map.filename = "AccountImpoort-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
 
+				// Save for step 3
+				def upload = new File(map.filename)
+				f.transferTo(upload)
+*/
 				map.matches = lookForMatches()
 
 				// Validate the teams && role
