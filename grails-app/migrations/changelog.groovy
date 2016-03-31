@@ -87,7 +87,7 @@ databaseChangeLog = {
 	include file: '20150520-create-column-send-notification-in-asset-comment.groovy'
 	include file: '20150529-drop-party-column-from-project-logo.groovy'
 	include file: '20150602-add-column-instructions-link-to-asset-comment.groovy'
-	include file: '20150610-task-role-defaulted-to-blank.groovy'
+	//include file: '20150610-task-role-defaulted-to-blank.groovy'
 	include file: '20150710-poject-activity-metrics-table.groovy'
 	include file: '20150721-remove-old-refresh-preferences.groovy'
 	include file: '20150731-add-additional-teams-to-role-type.groovy'
@@ -120,5 +120,4 @@ databaseChangeLog = {
 	//include file: '20160315-fix-orphan-records-asset_comment.groovy'
 	include file: '20160321-add-permission-restartapplication-admin.groovy'
 	include file: '20160325-recreate-orphaned-staff-team-references.groovy'
-	include file: '20160330-defaults-project-custom-fields-shown-to-96.groovy'
 }
