@@ -9,7 +9,7 @@
 	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
 </head>
 <body>
-<div class="body">
+<div class="body import-review">
 	<h1>Import Accounts - Step 2 &gt; Review Accounts</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>

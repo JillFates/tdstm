@@ -1534,3 +1534,14 @@ span.k-dropdown span.k-dropdown-wrap span.k-select {
 {
 	padding-right: 25px;
 }
+
+/* Modify the right border*/
+
+div.import-review {
+	float: none !important;
+}
+
+div.import-review div.k-grid-content-locked {
+	border-width: 0 2px 0 0;
+	border-right-color: #888;
+}
