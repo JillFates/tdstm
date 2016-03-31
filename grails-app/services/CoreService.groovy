@@ -79,4 +79,17 @@ class CoreService {
 	def getEnvironment() {
 		return grails.util.Environment.current.toString()
 	}
+
+	/**
+	 * Used to retrieve the configuration setting used to determine the "temp" directory the application
+	 * should use for writing files to.
+	 */
+	String getAppTempDirectory() {
+		String propName = 'graph.tmpDir'
+		String tmpDir = getConfigSetting(propName)
+		if (! tmpDir) {
+			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($propName)")
+		}
+		return tmpDir
+	}
 }

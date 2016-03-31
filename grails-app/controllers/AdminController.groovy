@@ -1257,7 +1257,7 @@ class AdminController {
 					}
 
 					// Save the spreadsheet file and then read it into a HSSFWorkbook
-					String filename = accountImportExportService.saveImportSpreadsheet(request, fileParamName)
+					String filename = accountImportExportService.saveImportSpreadsheet(request, user, fileParamName)
 					HSSFWorkbook spreadsheet = accountImportExportService.readImportSpreadsheet(filename)
 
 					// Read in the accounts and then validate them

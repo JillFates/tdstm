@@ -12,6 +12,7 @@ import org.springframework.web.multipart.commons.*
 
 class AccountImportExportService {
 
+	def coreService
 	def partyRelationshipService
 	def projectService
 	def securityService	
@@ -252,18 +253,21 @@ class AccountImportExportService {
 	 * Used to pull the uploaded file from the request and save it to a temporary file with a randomly generated
 	 * name. After saving the file the filename and File handle are returned in a list.
 	 * @param request - the servlet request object
+	 * @param byWhom - the user that is saving the file (will use their id as part of the filename)
 	 * @param paramName - the name of the form parameter that contains the upload file
 	 * @return The name of the filename that was saved (excluding the path)
 	 */
-	String saveImportSpreadsheet(Object request, String paramName) {
+	String saveImportSpreadsheet(Object request, UserLogin byWhom, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 		CommonsMultipartFile xlsFile = ( CommonsMultipartFile ) mpr.getFile(paramName)
 		
 		// Generate a random filename to store the spreadsheet between page loads
-		String filename = "AccountImport-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
+		String filename = "AccountImport-${byWhom.id}-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
 
 		// Save file locally
-		String fqfn=getTempDirectory() + '/' + filename		
+		String fqfn=coreService.getAppTempDirectory() + '/' + filename	
+		log.info "saveImportSpreadsheet() user $byWhom uploaded AccountImport spreadsheet to $fqfn"	
+
 		File localFile = new File(fqfn)
 		xlsFile.transferTo(localFile)
 
