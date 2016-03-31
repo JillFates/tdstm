@@ -5,157 +5,40 @@
 	<title>Import Accounts</title>
 </head>
 <body>
-<div class="body">
-<div>
-	<h1>Import Accounts</h1>
-	<g:if test="${flash.message}">
-		<div class="message">${flash.message}</div>
-	</g:if>
+	<div class="body">
+		<h1>Import Accounts - Step 1 &gt; Upload Import File</h1>
+		<g:if test="${flash.message}">
+			<div class="message">${flash.message}</div>
+		</g:if>
 
-	<g:if test="${step == 'start'}">
 		<div>
-			<h3>Step 1 - Upload Import File</h3>
+			<p>
+			This form is used to import and manage staff and user login accounts for the current project. To begin you 
+			should download a blank spreadsheet template (link below) or use the <i>Export Accounts</i> menu option to 
+			manage existing accounts. Upon making changes in the spreadsheet you can upload the file and step through the
+			verification process and post your changes to the application.
+			</p>
 
-			<br>
-			<g:uploadForm action="importAccounts">
-				<input type="file" name="${fileParamName}" />
-				<input type="hidden" name="step" value="upload" />
-				<br />
-				<br />
-				<label>
-					<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
-				</label>
-				<br />
-				<br />
-				<input type="submit" />
-			</g:uploadForm> 
+			<p>
+				<br>
+				Select the spreadsheet file to be uploaded:<br>
+				<g:uploadForm action="importAccounts">
+					<input type="file" name="${fileParamName}" />
+					<input type="hidden" name="step" value="upload" />
+					<br />
+					<br />
+					<label>
+						<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
+					</label>
+					<br />
+					<br />
+					<input type="submit" value="Upload Spreadsheet" />
+				</g:uploadForm> 
 
-			<br>
-			<g:link controller="admin" action="importAccountsTemplate">Download Import Template</g:link>
-	</g:if>
-
-	<g:if test="${step == 'review'}">
-		<div>
-			<h3>Step 2 - Review Accounts</h3>
-			<br>
-			<table>
-				<thead>
-					<tr>
-						<g:each var="label" in="${labels}">
-							<th>${label}</th>
-						</g:each>
-						<th>Match</th>
-						<th>Errors</th>
-					</tr>
-				</thead>
-				<tbody>
-					<g:set var="counter" value="${0}" />
-					<g:each in="${people}" var="person">
-						<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
-							<g:each var="propName" in="${properties}">
-								<td>${person.get(propName)}</td>
-							</g:each>
-							<td>${person.match}</td>
-							<td>
-								<g:each in="${person.errors}" var="error">${error}<br></g:each>
-							</td>
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
-			
-			<br />
-
-			<h2>Matched (Existing) Users</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Username</th>
-						<th>First Name</th>
-						<th>Middle Name</th>
-						<th>Last Name</th>
-						<th>Email</th>
-						<th>Matched On</th>
-					</tr>
-				</thead>
-				<tbody>
-					<g:set var="counter" value="${0}" />
-					<g:each in="${matches}" var="person">
-						<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
-							<td>${person.username}</td>
-							<td>${person.firstName}</td>
-							<td>${person.middleName}</td>
-							<td>${person.lastName}</td>
-							<td>${person.email}</td>
-							<td>${person.match}</td>
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
-			<b>Note:</b> <i>Security roles are going to be overriden for matched users.</i>
-
-			<br/>
-			<br/>
-
-			<g:form action="importAccounts">
-			<input type="hidden" name="step" value="post" />
-			<input type="hidden" name="header" value="${header}" />
-			<input type="hidden" name="timezone" value="${timezone}" />
-			<input type="hidden" name="filename" value="${filename}" />
-			<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
-			<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
-			<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password at next login<br />
-			<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or  <br /-->
-			<input type="text" name="password" size="10"> Default password to use (if blank in import)<br />
-			<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
-			<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />
-			<br>
-			<g:submitButton name="submit" value="Create/Update Accounts" />
-			</g:form>
-
+				<br>
+				<g:link controller="admin" action="importAccountsTemplate">Click here</g:link> to download a blank Account Import template.
+			</p>
 		</div>
-	</g:if>
-
-	<g:if test="${step == 'results'}">
-		<div>
-			<h2>Results</h2>
-
-			${created} accounts were created
-
-			<g:if test="${failedPeople.size() > 0}">
-				<h3>Accounts status:</h3>
-				<table>
-					<thead>
-						<tr>
-							<th>Username</th>
-							<th>First Name</th>
-							<th>Middle Name</th>
-							<th>Last Name</th>
-							<th>Phone</th>
-							<th>Email</th>
-							<th>Error/Message</th>
-						</tr>
-					</thead>
-					<tbody>
-						<g:set var="counter" value="${0}" />
-						<g:each in="${failedPeople}" var="person">
-							<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
-									<td>${person.username}</td>
-									<td>${person.firstName}</td>
-									<td>${person.middleName}</td>
-									<td>${person.lastName}</td>
-									<td>${person.phone}</td>
-									<td>${person.email}</td>
-									<td>									
-										<g:each in="${person.errors}" var="error">${error}<br></g:each>
-									</td>
-							</tr>
-						</g:each>
-					</tbody>
-				</table>
-			</g:if>
-		</div>
-	</g:if>
-
+	</div>
 </body>
 </html>

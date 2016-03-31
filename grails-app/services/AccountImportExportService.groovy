@@ -288,7 +288,10 @@ class AccountImportExportService {
 
 	/**
 	 * Used to load the spreadsheet into memory and validate that the information is correct
-	 * @param filename - the name of the spreadsheet
+	 * @param byWhom - the user that is making the request
+	 * @param project - the project that the import is being applied against
+	 * @param filename - the name of the temporarilly saved spreadsheet
+	 * @controllerMethod
 	 */
 	List loadAndValidateSpreadsheet(UserLogin byWhom, Project project, String filename) {
 		// Load the spreadsheet
@@ -306,6 +309,68 @@ class AccountImportExportService {
 		searchAccountsForExisting(accounts, staff)
 
 		return accounts
+	}
+
+	/**
+	 * This method is used to load the spreadsheet into memory and validate that it contains some information. If 
+	 * successful it will save the file with a random name and then return the model containing the filename.
+	 * @param byWhom - the user that is making the request
+	 * @param project - the project that the import is being applied against
+	 * @param request - the servlet request object
+	 * @param fileParamName - the servlet request params name of the var that references the upload spreadsheet file
+	 * @return a Map of data used in the controller view including:
+	 *    filename - the local filename of the spreadsheet
+	 *    people - the accounts that were read from the spreadsheet
+	 *    labels - the list column header labels used in the accounts list
+	 *    properties - the list of the property names used in the accounts list
+	 *    gridMap - the meta data used by the data grid
+	 * @controllerMethod
+	 */
+	Map importAccount_Step1_Upload(UserLogin byWhom, Project project, Object request, String fileParamName) {
+		Map model = [:]
+
+		// Handle the file upload
+		def file = request.getFile(fileParamName)
+		if (file.empty) {
+			throw new EmptyResultException('The file you uploaded appears to be empty')
+		}
+
+		// Save the spreadsheet file and then read it into a HSSFWorkbook
+		model.filename = saveImportSpreadsheet(request, byWhom, fileParamName)
+		HSSFWorkbook spreadsheet = readImportSpreadsheet(model.filename)
+
+		// Read in the accounts and then validate them
+		List accounts = readAccountsFromSpreadsheet(spreadsheet)
+
+		if (!accounts) {
+			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
+		}
+
+		return model
+	}
+
+	/**
+	 * Used to populate the model with the necessary properties for the Review form
+	 * @param byWhom - the user that is making the request
+	 * @param project - the project that the import is being applied against
+	 * @param request - the servlet request object
+	 * @param filename - the filename of the locally saved spreadsheet
+	 * @return a Map of data used in the controller view including:
+	 *    filename - the local filename of the spreadsheet
+	 *    people - the accounts that were read from the spreadsheet
+	 *    labels - the list column header labels used in the accounts list
+	 *    properties - the list of the property names used in the accounts list
+	 *    gridMap - the meta data used by the data grid
+	 * @controllerMethod
+	 */
+	Map importAccount_Step2_Review(UserLogin byWhom, Project project, Object request, String filename) {
+		Map model = [:]
+		model.filename = filename
+		model.labels = getLabelsInColumnOrder()
+		model.properties = getPropertiesInColumnOrder()
+		model.gridMap = accountSpreadsheetColumnMap
+
+		return model
 	}
 
 	/**

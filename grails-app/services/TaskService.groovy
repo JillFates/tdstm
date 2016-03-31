@@ -310,8 +310,8 @@ class TaskService implements InitializingBean {
 			sql.append( (sortAndOrder ? ', ' : '') + 'score DESC, task_number ASC' )
 		}
 		
-		log.debug "getUserTasks: SQL: " + sql.toString()
-		log.debug "getUserTasks: SQL params: " + sqlParams
+		// log.debug "getUserTasks: SQL: " + sql.toString()
+		// log.debug "getUserTasks: SQL params: " + sqlParams
 		
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
 		def allTasks = namedParameterJdbcTemplate.queryForList( sql.toString(), sqlParams )

@@ -10,7 +10,7 @@
 </head>
 <body>
 <div class="body">
-	<h1>Import Accounts - Review Accounts</h1>
+	<h1>Import Accounts - Step 2 &gt; Review Accounts</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
@@ -43,7 +43,8 @@
 						locked: ${gridOpt.locked},
 						lockable: false,
 						width: ${gridOpt.width}
-					},</g:each>
+					},
+					</g:each>
 					{
 						field: "errors",
 						title: "Errors",
@@ -73,23 +74,29 @@
 
 		<div>
 			<br />
-
+			<p>
+			Please review the above information for accuracy before submitting the form.
+			<br><br>
 			<g:form action="importAccounts">
-			<input type="hidden" name="step" value="post" />
-			<input type="hidden" name="header" value="${header}" />
-			<input type="hidden" name="timezone" value="${timezone}" />
-			<input type="hidden" name="filename" value="${filename}" />
-			<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
-			<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
-			<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password at next login<br />
-			<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or  <br /-->
-			<input type="text" name="password" size="10"> Default password to use (if blank in import)<br />
-			<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
-			<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />
+			<div>
+				<input type="hidden" name="step" value="post" />
+				<input type="hidden" name="header" value="${header}" />
+				<input type="hidden" name="timezone" value="${timezone}" />
+				<input type="hidden" name="filename" value="${filename}" />
+				<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
+				<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
+				<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password at next login<br />
+				<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or  <br />
+			</div>
+			<div>
+				<input type="text" name="password" size="10"> Default password to use (if blank in import)<br />
+				<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
+				<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />
+			</div>
 			<br>
 			<g:submitButton name="submit" value="Create/Update Accounts" />
 			</g:form>
-
+			</p>
 		</div>
 	</div>
 </div>

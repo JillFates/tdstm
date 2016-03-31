@@ -1233,50 +1233,40 @@ class AdminController {
 		if (!project) {
 			return
 		}
-
+		String formAction='importAccounts'
 		String currentStep = (params.step ?: 'start')
 		String fileParamName = 'importSpreadsheet'
-		Map map = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
+		Map model = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
 		String view = 'importAccounts'
+
+		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
+		// in the upload step to forward to the review so we look for the stepAlt and use it if found.
+		String step = params.stepAlt ?: params.step
 
 		try {
 
-			switch (params.step) {
+			switch (step) {
 
 				case 'upload':
 					if (params.verifyProject != 'Y') {
 						flash.message = "You must confirm the project to import into before continuing"
-						return map
+						return model
 					}
 
-					// Handle the file upload
-					def file = request.getFile(fileParamName)
-					if (file.empty) {
-						flash.message = 'The spreadsheet you uploaded appears to be empty'
-						return map
-					}
+					model << accountImportExportService.importAccount_Step1_Upload(user, project, request, fileParamName)
 
-					// Save the spreadsheet file and then read it into a HSSFWorkbook
-					String filename = accountImportExportService.saveImportSpreadsheet(request, user, fileParamName)
-					HSSFWorkbook spreadsheet = accountImportExportService.readImportSpreadsheet(filename)
-
-					// Read in the accounts and then validate them
-					List accounts = accountImportExportService.readAccountsFromSpreadsheet(spreadsheet)
-					List teamCodes = partyRelationshipService.getStaffingRoles().description
-					map.people = accountImportExportService.validateUploadedAccounts(accounts, teamCodes)
-
-					List staff = partyRelationshipService.getCompanyStaff( project.client.id )
-					map.matches = accountImportExportService.searchAccountsForExisting(map.people, staff)					
-
-					view = 'importAccountsReview'
-					map.step = 'review'
-					map.filename = filename
-					map.labels = accountImportExportService.getLabelsInColumnOrder()
-					map.properties = accountImportExportService.getPropertiesInColumnOrder()
-					map.gridMap = accountImportExportService.accountSpreadsheetColumnMap
-
+					// Redirect the user to the Review step
+					forward( action:formAction, params: [stepAlt:'review', filename:model.filename] )
+					return
 					break
 
+				case 'review':
+
+					// This step we'll serve up the review template that will in turn fetch the review data 
+					// via an Ajax request
+					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params.filename)
+					view = "${formAction}Review"
+					break
 
 				case 'post':
 					boolean createUserLogin = params.createUserlogin == 'Y'
@@ -1289,18 +1279,24 @@ class AdminController {
 					String filename = params.filename
 
 					boolean header = params.header == 'Y'
+					view = "${formAction}Results"
+
 					break
 
 				default:
+					// The default which is the first step to prompt for the spreadsheet to upload
 					break
 
 			}
+
+		} catch (EmptyResultException e) {
+			flash.message = e.getMessage()
 		} catch (e) {
 			log.error "Exception occurred while importing data (step $currentStep)" + e.printStackTrace()
-			flash.message = "An error occurred while attempting to export accounts"
+			flash.message = "An error occurred while attempting to import accounts"
 		}
 
-		render view:view, model:map	
+		render view:view, model:model	
 	}
 
 	/**
@@ -1344,65 +1340,6 @@ class AdminController {
 		def validRoleCodes = validRoles.id
 
 		switch (params.step) {
-
-			case 'upload':
-/*
-				if (params.verifyProject != 'Y') {
-					flash.message = "You must confirm the project to import into before continuing"
-					return map
-				}
-				
-				// Handle the file upload
-				def f = request.getFile('importSpreadsheet')
-				if (f.empty()) {
-					flash.message = 'Upload file appears to be empty'
-					return map
-				}
-
-				MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-				CommonsMultipartFile xls = ( CommonsMultipartFile ) mpr.getFile("myFile")
-				def xlsWorkbook = new HSSFWorkbook( xls.inputStream )
-
-				people = parseXLS(xlsWorkbook, header, false)
-
-				// Generate a random filename to store the spreadsheet between page loads
-				map.filename = "AccountImpoort-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
-
-				// Save for step 3
-				def upload = new File(map.filename)
-				f.transferTo(upload)
-*/
-				map.matches = lookForMatches()
-
-				// Validate the teams && role
-				for (int i=0; i < people.size(); i++) {
-					people[i].errors = []
-					if (people[i].teams) {
-						List teams = splitTeams(people[i].teams)
-						log.debug "teams=(${people[i].teams} -- $teams"
-						people[i].errors << validateTeams(teams)
-					}
-
-					def currentRoles = people[i].role.split(";")
-					def invalidRoles = []
-
-					currentRoles.each{
-						if(!validRoleCodes.contains(it)){
-							invalidRoles << it
-						}
-					}
-
-					if (!StringUtils.isEmpty(people[i].role) && invalidRoles){
-						people[i].errors << "Invalid role: ${invalidRoles.join(';')}"
-					}
-
-				}
-
-				map.people = people
-				map.step = 'review'
-				map.header = params.header
-
-				break
 
 			case 'post':
 
