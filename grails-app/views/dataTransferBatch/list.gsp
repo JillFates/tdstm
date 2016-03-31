@@ -144,6 +144,9 @@
             $("#dlgLog div.modal-body").html(msg);
             $("#dlgLog").modal({show:true});
           }
+        }).fail(function(jqXHR, textStatus, errorThrown){
+          console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
+          alert('An error occurred while invoking retrieving the information.');          
         });        
       })
 
@@ -158,7 +161,7 @@
 			function kickoffProcess(assetClass, reviewOrProcess, batchId) {
 				if (postingFlag) {
 					alert('You can only perform one action at a time.');
-					return;
+					return false;
 				}
 				if ( reviewOrProcess == 'p') {
 					if (! confirm('Please confirm that you want to post the imported assets to inventory?') ) {
@@ -171,41 +174,36 @@
 
 				var title = '<h1>'+(reviewOrProcess=='r' ? 'Reviewing assets in batch ' : 'Posting assets to inventory for batch ')+batchId;
 				var uri = '/import/invokeAssetImport' + (reviewOrProcess=='r'?'Review':'Process') + '/' + batchId;
-				$.ajax({
-					type: "POST",
-					async: true,
-					url: tdsCommon.createAppURL(uri),
-					dataType: "json",
-					success: function (response, textStatus, jqXHR) { 
-						if (response.status == 'error') {
-							alert(response.errors);
-							console.log('Error: kickoffProcess() : ' + response.errors);
-						} else {
-							var results = response.data.results;
-							progressKey = results.progressKey;	// Used to get the progress updates
+				$.post(
+          tdsCommon.createAppURL(uri)
+        ).done(function(data){
+          if (data.status == 'error') {
+            alert(data.errors);
+            console.log('Error: kickoffProcess() : ' + data.errors);
+          } else {
+            var results = data.data.results;
+            progressKey = results.progressKey;  // Used to get the progress updates
 
-							var progressModal = tds.ui.progressBar(
-								progressKey, 
-								5000, 
-								function() {
-									processFinished(assetClass, batchId, reviewOrProcess); 
-								}, 
-								function() { 
-									processFailed(assetClass, batchId, reviewOrProcess);
-								},
-								title
-							);
-						}
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						// stopProgressBar();
-						console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
-						alert('An error occurred while invoking the posting process.');
-						postingFlag = false;
-					}
-				});
-
-				postingFlag=false;
+            var progressModal = tds.ui.progressBar(
+              progressKey, 
+              5000, 
+              function() {
+                processFinished(assetClass, batchId, reviewOrProcess); 
+              }, 
+              function() { 
+                processFailed(assetClass, batchId, reviewOrProcess);
+              },
+              title
+            );
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown){
+          // stopProgressBar();
+          console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
+          alert('An error occurred while invoking the posting process.');          
+        }).always(function(){
+          postingFlag = false;
+        });
+        
 				return false;
 			}
 
@@ -223,29 +221,23 @@
 				console.log("showProcessResults() was called");
 
 				// Get the status of the batch and update the list accordingly
-				$.ajax({
-					type: "POST",
-					async: true,
-					url: tdsCommon.createAppURL('/import/importResults/'+batchId),
-					dataType: "json",
-					success: function (response, textStatus, jqXHR) { 
-						if (response.status == 'error') {
-							console.log('Error: showProcessResults() : ' + response.errors);
-							$("#statusCode"+batchId).html( results.batchStatusCode);
-						} else {
-							var results = response.data;
-							$("#statusCode"+batchId).html( results.batchStatusCode);
-						}
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
-						alert('An error occurred while getting the posting results.');
-					}
-				});
-				
-				// allow another action to occur
-				postingFlag=false;
-
+        $.post(
+          tdsCommon.createAppURL('/import/importResults/'+batchId)
+        ).done(function(data){
+          if (data.status == 'error') {
+            console.log('Error: showProcessResults() : ' + data.errors);
+            $("#statusCode"+batchId).html( results.batchStatusCode);
+          } else {
+            var results = data.data;
+            $("#statusCode"+batchId).html( results.batchStatusCode);
+          }
+        }).fail(function(jqXHR, textStatus, errorThrown){
+          console.log('ERROR: kickoffProcess() failed : ' + errorThrown);
+          alert('An error occurred while getting the posting results.');
+        }).always(function(){
+          // allow another action to occur
+          postingFlag=false;
+        });				
 			}
 
 			// This is called when the progress view receives a failure message
@@ -253,11 +245,10 @@
 				console.log("Progress failed for "+ assetClass+ " batch "+ batchId+ " for " + (reviewOrProcess=='r' ? 'Review' : 'Posting'));
 			}
 
-    		currentMenuId = "#assetMenu";
-    		$("#assetMenuId a").css('background-color','#003366')
+    	currentMenuId = "#assetMenu";
+    	$("#assetMenuId a").css('background-color','#003366');
 			$('#assetMenu').show();
 			$('#reportsMenu').hide();
-
 
 		</script>
 		

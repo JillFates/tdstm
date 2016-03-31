@@ -44,7 +44,7 @@ class ImportController {
 
 		while (true) {
 			try {
-
+				
 				(project, userLogin) = controllerService.getProjectAndUserForPage(this, 'import')
 				if (!project) {
 					errorMsg = flash.message
