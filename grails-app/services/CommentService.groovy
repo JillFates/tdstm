@@ -390,7 +390,7 @@ class CommentService {
 
 				// TODO - comparison of the assetComment.dueDate may not work if the dueDate is stored in GMT
 				def css =  (assetComment.dueDate < date ? 'Lightpink' : 'White')
-				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0) ? true : fals			
+				def status = (assetComment.commentType == AssetCommentType.TASK && assetComment.isResolved == 0)	
 
 				map = [ 
 					assetComment : assetComment,
