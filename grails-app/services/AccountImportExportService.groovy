@@ -26,37 +26,40 @@ class AccountImportExportService {
 	static final TEMPLATE_TAB_NAME = 'Accounts'
 
 	static final Map accountSpreadsheetColumnMap = [
-		username      : [colPos:0,  type:'U', width:100, locked:true, label:'Username'],
-		firstName     : [colPos:1,  type:'P', width:100, locked:true, label:'First Name'],
-		middleName    : [colPos:2,  type:'P', width:100, locked:true, label:'Middle Name'],
-		lastName      : [colPos:3,  type:'P', width:100, locked:true, label:'Last Name'],
-		company       : [colPos:5,  type:'P', width:100, locked:true, label:'Company'],
-		workPhone     : [colPos:4,  type:'P', width:100, locked:false, label:'Work Phone'],
-		mobilePhone   : [colPos:14, type:'P', width:100, locked:false, label:'Mobile Phone'],
-		email         : [colPos:8,  type:'P', width:100, locked:false, label:'Email'],
-		title         : [colPos:9,  type:'P', width:100, locked:false, label:'Title'],
-		department    : [colPos:10, type:'P', width:100, locked:false, label:'Department'],
-		location      : [colPos:11, type:'P', width:100, locked:false, label:'Location/City'],
-		state         : [colPos:12, type:'P', width:100, locked:false, label:'State/Prov'],
-		country       : [colPos:13, type:'P', width:100, locked:false, label:'Country'],
-		teams         : [colPos:6,  type:'P', width:100, locked:false, label:'Team(s)'],
-		roles         : [colPos:7,  type:'P', width:100, locked:false, label:'Security Role(s)'],
-		loginActive   : [colPos:15, type:'U', width:100, locked:false, label:'Login Active'],
-		password      : [colPos:16, type:'U', width:100, locked:false, label:'Password'],
-		accountExp    : [colPos:17, type:'U', width:100, locked:false, label:'Account Exp'],
-		passwordExp   : [colPos:18, type:'U', width:100, locked:false, label:'Password Exp'],
-		passwordFixed : [colPos:19, type:'U', width:100, locked:false, label:'Permanent Pswd'],
-		accountLocal  : [colPos:20, type:'U', width:100, locked:false, label:'Local Account'],
-		//errors        : [colPos:21, type:'T', label:'Errors'],
-		//match         : [colPos:22, type:'T', label:'Matched'],
+		personId      : [ssPos:1,  formPos:1,  type:'U', width:100, locked:true,  label:'ID'],
+		firstName     : [ssPos:2,  formPos:2,  type:'P', width:100, locked:true,  label:'First Name'],
+		middleName    : [ssPos:3,  formPos:3,  type:'P', width:100, locked:true,  label:'Middle Name'],
+		lastName      : [ssPos:4,  formPos:4,  type:'P', width:100, locked:true,  label:'Last Name'],
+		company       : [ssPos:5,  formPos:5,  type:'P', width:100, locked:true,  label:'Company'],
+		errors        : [ssPos:0,  formPos:6,  type:'T', width:200, locked:false, label:'Errors'],
+		workPhone     : [ssPos:6,  formPos:7,  type:'P', width:100, locked:false, label:'Work Phone'],
+		mobilePhone   : [ssPos:7,  formPos:8,  type:'P', width:100, locked:false, label:'Mobile Phone'],
+		email         : [ssPos:8,  formPos:9,  type:'P', width:100, locked:false, label:'Email'],
+		title         : [ssPos:9,  formPos:10, type:'P', width:100, locked:false, label:'Title'],
+		department    : [ssPos:10, formPos:11, type:'P', width:100, locked:false, label:'Department'],
+		location      : [ssPos:11, formPos:12, type:'P', width:100, locked:false, label:'Location/City'],
+		state         : [ssPos:12, formPos:13, type:'P', width:100, locked:false, label:'State/Prov'],
+		country       : [ssPos:13, formPos:14, type:'P', width:100, locked:false, label:'Country'],
+		teams         : [ssPos:14, formPos:15, type:'P', width:100, locked:false, label:'Team(s)'],
+		roles         : [ssPos:16, formPos:16, type:'P', width:100, locked:false, label:'Security Role(s)'],
+		username      : [ssPos:17, formPos:17, type:'U', width:100, locked:false, label:'Username'],
+		accountLocal  : [ssPos:18, formPos:18, type:'U', width:100, locked:false, label:'Local Account?'],
+		loginActive   : [ssPos:19, formPos:19, type:'U', width:100, locked:false, label:'Login Active?'],
+		accountExp    : [ssPos:20, formPos:20, type:'U', width:100, locked:false, label:'Account Expiration'],
+		passwordExp   : [ssPos:21, formPos:21, type:'U', width:100, locked:false, label:'Password Expiration'],
+		passwordFixed : [ssPos:22, formPos:22, type:'U', width:100, locked:false, label:'Pswd Never Expires?'],
+		match         : [ssPos:0,  formPos:24, type:'T', width:100, locked:false, label:'Matched']
 	]
 
 
 	/**
 	 * Used to get the labels in column order
 	 */ 
-	List getLabelsInColumnOrder() {
-		List list = accountSpreadsheetColumnMap.collect { prop, info ->  [info.get('colPos'), info.get('label')] }
+	List getLabelsInColumnOrder(type) {
+		assert ['ssPos', 'formPos'].contains(type)
+
+		Map subMap = accountSpreadsheetColumnMap.findAll { it.value.get(type) > 0 }
+		List list = subMap.collect { prop, info ->  [info.get(type), info.get('label')] }
 		list.sort { it[0] }
 		list = list.collect { it[1] }
 
@@ -66,8 +69,9 @@ class AccountImportExportService {
 	/**
 	 * Used to get the property names of the accountSpreadsheetColumnMap in the column order
 	 */
-	List getPropertiesInColumnOrder() {
-		List list = accountSpreadsheetColumnMap.collect { prop, info ->  [info.get('colPos'), prop] }
+	List getPropertiesInColumnOrder(type) {
+		Map subMap = accountSpreadsheetColumnMap.findAll { it.value.get(type) > 0 }
+		List list = subMap.collect { prop, info ->  [info.get(type), prop] }
 		list.sort { it[0] }
 		list = list.collect { it[1] }
 
@@ -81,8 +85,12 @@ class AccountImportExportService {
 	HSSFWorkbook getAccountExportTemplate() {
 		// Load the spreadsheet template and populate it
 		String templateFilename = ACCOUNT_EXPORT_TEMPLATE
-        HSSFWorkbook book = ExportUtil.loadSpreadsheetTemplate(templateFilename) 
-        return book
+        HSSFWorkbook spreadsheet = ExportUtil.loadSpreadsheetTemplate(templateFilename)
+        updateSpreadsheetHeader(spreadsheet)
+        addRolesToSpreadsheet(spreadsheet)
+        addTeamsToSpreadsheet(spreadsheet)
+
+        return spreadsheet
 	}
 
 	/**
@@ -183,13 +191,62 @@ class AccountImportExportService {
 	}	
 
 	/**
-	 * This method outputs all the fields to the sheet
+	 * This method outputs all the account mapped fields to a row in the sheet
+	 * @param sheet - the spreadsheet to update
+	 * @param account - the map of the account properties
+	 * @param rowNumber - the row in the spreadsheet to insert the values 
 	 */
 	private void addRowToAccountSpreadsheet(sheet, Map account, int rowNumber) {
-		accountSpreadsheetColumnMap.each { prop, info ->
-			if (account.containsKey(prop)) {
-				WorkbookUtil.addCell(sheet, info.colPos, rowNumber, account[prop])
+		List properties = getPropertiesInColumnOrder('ssPos')
+		// log.debug "addRowToAccountSpreadsheet() properties=$properties, sheet isa ${sheet.getClass().getName()}"
+		for (int i=0; i < properties.size(); i++) {
+			if (account.containsKey(properties[i])) {
+				WorkbookUtil.addCell(sheet, i, rowNumber, account[properties[i]])
 			}
+		}
+	}
+
+	/**
+	 * This method is used to update the header labels on the spreadsheet to match the mapping table
+	 * @param sheet - the spreadsheet to update
+	 */
+	private void updateSpreadsheetHeader(sheet) {
+		List labels = getLabelsInColumnOrder('ssPos')
+		def tab = sheet.getSheet(TEMPLATE_TAB_NAME)
+
+		for(int i=0; i < labels.size(); i++) { 
+			WorkbookUtil.addCell(tab, i, 0, labels[i])
+		}
+	}
+
+	/**
+	 * Used to write the teams to the spreadsheet Teams tab
+	 * @param sheet - the spreadsheet to write to
+	 */
+	private void addTeamsToSpreadsheet(sheet) {
+		def tab = sheet.getSheet('Teams')
+		assert tab		
+		List teams = RoleType.findAllByType(RoleType.TEAM, [order:'description'])
+		int row = 1
+		teams.each {t ->
+			WorkbookUtil.addCell(tab, 0, row, t.id)
+			WorkbookUtil.addCell(tab, 1, row++, t.toString())
+		}
+	}
+
+	/**
+	 * Used to write the teams to the spreadsheet Teams tab
+	 * @param sheet - the spreadsheet to write to
+	 */
+	private void addRolesToSpreadsheet(sheet) {
+		def tab = sheet.getSheet('Roles')
+		assert tab		
+		List roles = RoleType.findAllByType(RoleType.SECURITY, [order:'level'])
+		int row = 1
+		roles.each {r ->
+			if (r.id == 'TEST_ROLE') return
+			WorkbookUtil.addCell(tab, 0, row, r.id)
+			WorkbookUtil.addCell(tab, 1, row++, r.toString())
 		}
 	}
 
@@ -199,11 +256,12 @@ class AccountImportExportService {
 	 * @return a map of the person information
 	 */
 	private Map personToFieldMap(Person person) {
-		List teams = partyRelationshipService.getCompanyStaffFunctions(person.company, person)*.toString()
+		List teams = partyRelationshipService.getCompanyStaffFunctions(person.company, person)*.id
 
 		List roles = securityService.getAssignedRoles(person).id
 
 		Map map = [
+			personId     : person.id,
 			firstName    : person.firstName ?: '', 
 			middleName   : person.middleName ?: '', 
 			lastName     : person.lastName ?: '', 
@@ -216,8 +274,8 @@ class AccountImportExportService {
 			location     : person.location ?: '', 
 			state        : person.stateProv ?: '', 
 			country      : person.country ?: '', 
-			teams        : teams.join(";"), 
-			roles        : roles.join(";")
+			teams        : teams.join(", "), 
+			roles        : roles.join(", ")
 		]  
 
 		return map
@@ -230,16 +288,17 @@ class AccountImportExportService {
 	 * @return a map of the person information
 	 */
 	private Map userLoginToFieldMap(UserLogin user, Object session) {
+		def pswdExpDate=''
+		if (user.passwordExpirationDate) {
+			pswdExpDate = TimeUtil.formatDateTime(session, user.passwordExpirationDate, TimeUtil.FORMAT_DATE) 
+		}
 		Map map = [
 			username      : user.username,
-			accountLocal  : user.isLocal? "Y" : "N",
-			loginActive   : user.active,
-			password      : '',	// NEVER export the password
-			accountExp    : TimeUtil.formatDateTime(session, user.expiryDate, TimeUtil.FORMAT_DATE_TIME_6),
-			passwordExp   : ( user.passwordExpirationDate 
-								? TimeUtil.formatDateTime(session, user.passwordExpirationDate, TimeUtil.FORMAT_DATE_TIME_6) 
-								: ''),
-			passwordFixed : user.passwordNeverExpires? "Y" : "N",
+			accountLocal  : (user.isLocal ? 'Y' : 'N'),
+			loginActive   : (user.active ? 'Y' : 'N'),
+			accountExp    : TimeUtil.formatDateTime(session, user.expiryDate, TimeUtil.FORMAT_DATE),
+			passwordExp   : pswdExpDate,
+			passwordFixed : (user.passwordNeverExpires ? 'Y' : 'N')
 		]
 		return map
 	}
@@ -366,8 +425,8 @@ class AccountImportExportService {
 	Map importAccount_Step2_Review(UserLogin byWhom, Project project, Object request, String filename) {
 		Map model = [:]
 		model.filename = filename
-		model.labels = getLabelsInColumnOrder()
-		model.properties = getPropertiesInColumnOrder()
+		model.labels = getLabelsInColumnOrder('formPos')
+		model.properties = getPropertiesInColumnOrder('formPos')
 		model.gridMap = accountSpreadsheetColumnMap
 
 		return model
@@ -482,10 +541,12 @@ class AccountImportExportService {
 		def accountsSheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
 		int lastRow = accountsSheet.getLastRowNum()
 		List accounts = []
+
+		List properties = getPropertiesInColumnOrder('ssPos')
 		for (int row = firstAccountRow; row <= lastRow; row++) {
 			Map account = [:]
-			accountSpreadsheetColumnMap.each { prop, info ->
-				account.put(prop, WorkbookUtil.getStringCellValue(accountsSheet, info.colPos, row))
+			properties.each { 
+				account.put(it[1], WorkbookUtil.getStringCellValue(accountsSheet, (it[0] - 1), row))
 			}
 			account.put('errors', [])
 			accounts.add(account)

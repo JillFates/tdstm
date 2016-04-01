@@ -1248,6 +1248,10 @@ class AdminController {
 			switch (step) {
 
 				case 'upload':
+					// This step will save the spreadsheet that was posted to the server after reading it 
+					// and verifying that it has some accounts in it. If successful it will do a forward to 
+					// the review step.
+
 					if (params.verifyProject != 'Y') {
 						flash.message = "You must confirm the project to import into before continuing"
 						return model
@@ -1261,27 +1265,233 @@ class AdminController {
 					break
 
 				case 'review':
+					// This step will serve up the review template that in turn fetch the review data 
+					// via an Ajax request.
 
-					// This step we'll serve up the review template that will in turn fetch the review data 
-					// via an Ajax request
 					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params.filename)
 					view = "${formAction}Review"
 					break
 
 				case 'post':
-					boolean createUserLogin = params.createUserlogin == 'Y'
-					boolean activateLogin = params.activateLogin == 'Y'
-					boolean randomPassword = params.randomPassword == 'Y'
-					boolean forcePasswordChange = params.forcePasswordChange == 'Y'
-					def commonPassword = params.password
-					def expireDays = NumberUtils.toInt(params.expireDays,90)
-					def role = params.role
+					// This is the daddy of the steps in that it is going to post the changes back to the 
+					// database either creating or updating Person and/or UserLogin records.
+
+					Map options = [
+						createUserLogin: (params.createUserlogin == 'Y'),
+						activateLogin: (params.activateLogin == 'Y'),
+						randomPassword: (params.randomPassword == 'Y'),
+						forcePasswordChange: (params.forcePasswordChange == 'Y'),
+						commonPassword: params.password,
+						userRoles: StringUtil.splitter(params.role, ',', [' ', ';', '|'])
+					]
+
 					String filename = params.filename
+
+					int expireDays = 90
+					if (params.expireDays) {
+						expireDays = NumberUtils.toPositiveLong(params.expireDays, -1)
+						if (expireDays == -1) {
+							throw new InvalidParamException("The expiry days value must be a positive number")
+						}
+					}
+
+					break
+
+/*
 
 					boolean header = params.header == 'Y'
 					view = "${formAction}Results"
+//
+// ------------------------
+//
+				String error=''
+				List accounts = loadAndValidateSpreadsheet(user, project, params.filename)
 
-					break
+				if (!randomPassword) {
+					commonPassword = UUID.randomUUID().toString()
+				}
+
+				// Compute the date into the future based on the user input
+				Date defaultExpiryDate = new Date()
+				use (TimeCategory) {
+					defaultExpiryDate = expiryDate + expireDays.days
+				}
+
+
+				log.info "expiryDate=$expiryDate"
+
+				def failedPeople = []
+				def created = 0
+
+				if (!StringUtils.isEmpty(role) && !validRoleCodes.contains(role)) {
+					failed = true
+					people = []
+				}
+
+				def projectCompanies = partyRelationshipService.getProjectCompanies(project.id)
+
+				people.each() { p -> 
+							Map userSettings = [
+								username: ,
+								password: ,
+								activateLogin: , // boolean
+								expiryDate: ,
+								forcePasswordChange: , // boolean
+							]
+
+					def company = projectCompanies.find{it.partyIdTo.name == p.company}
+					if (!company) {
+						p.errors << "Unable to assign ${p.name} to ${p.company}"
+					} else {
+						def person
+						boolean failed = false
+						boolean haveMessage = false
+
+						if (p.match ) {
+							// Find the person
+							person = findPerson(p)
+							if (! person) {
+								p.errors << "Unable to find previous Person match"
+								failed = true
+							} else {
+								person.email = p.email
+								person.workPhone = p.phone
+								person.title = p.title
+								person.deparment = p.department
+								person.location = p.location
+								person.stateProv = p.stateProv
+								person.country = p.country
+								person.mobilePhone = p.mobile
+
+								if (person.validate() && person.save(flush:true)) {
+									log.info "importAccounts() : updated person $person"
+									partyRelationshipService.addCompanyStaff(company, person)
+								} else {
+									p.errors << "Error" + GormUtil.allErrorsString(person)
+									failed = true
+								}
+							}
+						} else {
+							person = new Person(
+								firstName:p.firstName, 
+								middleName:p.middleName, 
+								lastName:p.lastName,
+								email:p.email,
+								workPhone: p.phone,
+								title: p.title,
+								department: p.department,
+								location: p.location,
+								stateProv: p.stateProv,
+								country: p.country,
+								mobilePhone: p.mobile,
+								staffType: 'Salary'
+								)
+						
+							if (person.validate() && person.save(flush:true)) {
+								log.info "importAccounts() : created person $person"
+								partyRelationshipService.addCompanyStaff(company, person)
+								partyRelationshipService.addProjectStaff(project, person)
+							} else {
+								p.errors << "Error" + GormUtil.allErrorsString(person)
+								failed = true
+							}
+
+							// Assign the user to one or more teams appropriately
+							if (!failed && p.teams) {
+								List teams = splitTeams(p.teams)
+
+								teams.each { t ->
+									if (teamCodes.contains(t)) {
+										partyRelationshipService.addStaffFunction(person, t, project.client, project)
+									}
+								}
+							}
+						}
+
+						def userRole = role
+						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
+							userRole = p.role
+						}
+						if (!validRoleCodes.contains(userRole)) {
+							userRole = DEFAULT_ROLE
+						}
+						if (!failed && !StringUtils.isEmpty(userRole)) {
+							log.debug "importAccounts() : creating Role $userRole for $person"
+							// Delete previous security roles if they exist
+							def assignedRoles = []
+							def assignRole = false
+							if (p.match) {
+								def personRoles = userPreferenceService.getAssignedRoles(person);
+								personRoles.each { r ->
+									assignedRoles << r.id
+									if (r.id != userRole) {
+										assignRole = true
+									}
+								}
+								if (assignRole) {
+									userPreferenceService.deleteSecurityRoles(person)
+								}
+								if (personRoles.size() == 0) {
+									assignRole = true
+								}
+							} else {
+								assignRole = true
+							}
+							if (assignRole) {
+								userPreferenceService.setUserRoles([userRole], person.id)
+
+								// Audit role changes
+								def currentUser = securityService.getUserLogin()
+								if (p.match) {
+									p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
+									haveMessage = true
+									auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
+								} else {
+									auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
+								}
+							}
+						}
+
+						// Create/Update UserLogin
+						if (person && createUserLogin && p.username) {
+
+							error = createUserForAccount(person, project, userSettings)
+							if (error) {
+								p.errors << error
+								haveMessage = true
+							}
+
+							if (!failed) created++
+
+						}
+
+						if (failed || haveMessage) {
+							failedPeople << p	
+						}
+					}
+
+				} // people.each
+
+				map.step = 'results'
+				map.failedPeople = failedPeople
+				map.created = created
+
+
+			default: 
+				break
+
+		} // switch
+
+		return map
+
+
+*/
+
+//
+// ------------------------
+//
+
+
 
 				default:
 					// The default which is the first step to prompt for the spreadsheet to upload
@@ -1299,6 +1509,49 @@ class AdminController {
 		render view:view, model:model	
 	}
 
+	private String createUserForAccount(Person person, Project project, Map userSettings) {
+/*
+		def u = UserLogin.findByPerson(person)
+		if (!u) {
+			def userPass = commonPassword
+			if (!StringUtils.isEmpty(userSettings.password)) {
+				userPass = userSettings.password
+			}
+			u = new UserLogin(
+				username: userSettings.username,
+				active: userSettings.activateLogin
+				expiryDate: userSettings.expiryDate,
+				person: person,
+				forcePasswordChange: userSettings.forcePasswordChange
+			)
+
+			u.applyPassword(userPass)
+
+			if (! u.validate() || !u.save(flush:true)) {
+				p.errors << "Error" + GormUtil.allErrorsString(u)
+				log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
+				failed = true
+			} else {
+				log.info "importAccounts() : created UserLogin $u"
+				def up = new UserPreference(
+					userLogin: u,
+					preferenceCode: 'CURR_PROJ',
+					value: project.id.toString()
+				)
+				if (! up.validate() || ! up.save()) {
+					log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
+					p.errors << "Setting Default Project Errored"
+					failed = true
+				}
+			}
+		} else {
+			failed = true
+			p.errors << "Person already have a userlogin: $u"
+		}
+*/
+	}
+
+
 	/**
 	 * A controller process to import user accounts
 	 */
@@ -1311,33 +1564,6 @@ class AdminController {
 		def people
 
 		def map = [step:'start', projectName:project.toString() ]
-
-// TODO : JPM 3/2016 : The filename is defined here but hardcoded below. Second, the file needs to be random so two imports don't step on each other and needs to be deleted at the end. Need to determine where the file should be written.
-		def filename = '/tmp/tdstm-account-import.xls'
-
-// TODO : JPM 3/2016 : The column mappings should be defined via a Map instead of hard coding for both the import and export
-// TODO : JPM 3/2016 : Lets make first row ALWAYS the header so no need prompting or accounting for the variable
-
-		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
-		List teamCodes = partyRelationshipService.getStaffingRoles().description
-
-
-// TODO : JPM 3/2016 : Should be able to just use LIST math to remove valid teams (e.g. invalidTeams = teams - teamCodes)
-		def validateTeams = { teams -> 
-			String errors = ''
-			teams.each { tc -> 
-				if (! teamCodes.contains(tc)) {
-					errors += (errors ? ', ' : 'Invalid team code(s): ') + tc
-				}
-			}
-			return errors
-		}
-
-// TODO : JPM 3/2016 : Believe that we have a person match function in PersonService that we might be able to leverage
-
-		// Retrieves all the roles that this user is allowed to assign.
-		def validRoles = securityService.getAssignableRoles(securityService.getUserLoginPerson())
-		def validRoleCodes = validRoles.id
 
 		switch (params.step) {
 

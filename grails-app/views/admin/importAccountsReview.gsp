@@ -7,6 +7,19 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.common.min.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.default.min.css')}" />
 	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
+
+	<style type="text/css">
+.wrapper .post {
+-moz-border-radius:7px 7px 7px 7px;
+border:1px solid silver;
+float:left;
+margin:10px;
+min-height:100px;
+padding:5px;
+width:200px;
+}
+
+</style>
 </head>
 <body>
 <div class="body import-review">
@@ -73,30 +86,41 @@
 
 
 		<div>
-			<br />
 			<p>
-			Please review the above information for accuracy before submitting the form.
-			<br><br>
+				Please review the above information for accuracy before submitting the form.
+			</p>
+			<br>
 			<g:form action="importAccounts">
-			<div>
 				<input type="hidden" name="step" value="post" />
 				<input type="hidden" name="header" value="${header}" />
 				<input type="hidden" name="timezone" value="${timezone}" />
 				<input type="hidden" name="filename" value="${filename}" />
-				<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
-				<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
-				<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password at next login<br />
-				<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or  <br />
-			</div>
-			<div>
-				<input type="text" name="password" size="10"> Default password to use (if blank in import)<br />
-				<input type="text" name="role" size="10" value="USER"> Default Security Role [USER,EDITOR,SUPERVISOR] (if not in import)<br />
-				<input type="text" name="expireDays" value="90" size="4"> Days before account expires<br />
-			</div>
-			<br>
-			<g:submitButton name="submit" value="Create/Update Accounts" />
+			<table>
+				<tr>
+					<td>
+						<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
+						<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
+						<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password on next login<br />
+					</td>
+					<td>
+						<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or <br/>
+						<input type="text" name="password" size="10"> Default password to use <i>(if blank in import)</i>
+					</td>
+					<td>
+						<select name="role"> 
+							<option value="USER">USER</option>
+							<option value="EDITOR">EDITOR</option>
+							<option value="SUPERVISOR">SUPERVISOR</option>
+						</select>
+						Default Security Role <i>(if blank in import)</i><br/>
+						<input type="text" name="expireDays" value="90" size="4"> Days before account(s) expires<br />
+					</td>
+					<td>
+						<g:submitButton name="submit" value="Create/Update Accounts" />
+					</td>
+				</tr>
+			</table>
 			</g:form>
-			</p>
 		</div>
 	</div>
 </div>

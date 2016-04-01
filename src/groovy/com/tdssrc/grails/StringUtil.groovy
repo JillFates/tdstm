@@ -253,4 +253,25 @@ class StringUtil {
 		return v
 	}
 
+	/**
+	 * Used to split strings using one or more delimiters and trimming the resulting elements in the list
+	 * @param str - the string to be split
+	 * @param delim - the delimiter to split the string on (default ',')
+	 * @param alterDelim - a list of alternate delimiters
+	 * @return the list of individual elements from the list
+	 */
+	static List splitter(String str, String delim=',', List alterDelims=[]) {
+		if (delim == '.' || alterDelims?.contains('.')) {
+			throw RuntimeException("The split() method does not support the period (.) character as a delimiter")
+		}
+
+		// Replace all alternate delimiters with the specified delimiter
+		alterDelims.each {
+			str = str.replace(it, delim)
+		}
+
+		List list = str.split(delim)
+		list = list.collect { it.trim() }
+		return list
+	}
 }

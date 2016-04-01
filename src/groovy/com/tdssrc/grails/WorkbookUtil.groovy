@@ -22,9 +22,10 @@ class WorkbookUtil {
 	}
 
 	public static addCell(sheet, columnIdx, rowIdx, value, type=null) {
-		def row = sheet.getRow(rowIdx)
+		//println "columnIdx=$columnIdx, rowIdx=$rowIdx, value=$value, rowIdx isa ${rowIdx.getClass().getName()}, sheet isa ${sheet.getClass().getName()}"
+		def row = sheet.getRow((int)rowIdx)
 		if (!row) {
-			row = sheet.createRow(rowIdx)
+			row = sheet.createRow((int)rowIdx)
 		}
 		def cell = row.getCell(columnIdx)
 		if (!cell) {

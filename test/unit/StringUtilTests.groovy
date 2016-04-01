@@ -90,4 +90,35 @@ class StringUtilTests extends Specification {
 			"one,two".equals(SU.concat('one', 'two'))
 			"one : two".equals(SU.concat('one', 'two', ' : '))
 	}
+
+	void testSplitter() {
+		when:
+			List list = ['one','two','three']
+		then: 'Should properly split and trim the values using default or passed in delimiter'
+			list == SU.splitter('one, two, three  ')
+			list == SU.splitter('one; two; three  ', ';')
+			list == SU.splitter('  one| two: three  ', ';', [',', ':', '|'])
+
+		then: 'Should properly split and trim the values using alternate delimiter'
+			list == SU.splitter('  one| two: three  ', ';', [',', ':', '|'])
+
+		when:
+			String str = 'this string should not be split'
+			List singleItem = SU.splitter(str)
+		then: 'Should return single string in a list when delimeter is not found'
+			singleItem.size() == 1
+			singleItem[0].equals(str)
+
+		when: 
+			SU.splitter('one, two, three  ', '.')
+		then: 'Should throw an exception when the delimeter is a period (.)'
+			RuntimeException ex = thrown()
+
+		when: 
+			SU.splitter('one, two, three  ', ';', ['f', '.', ';'])
+		then: 'Should throw an exception when one of the alternate delimeters is a period (.)'
+			ex = thrown()
+
+	}
+
 }
