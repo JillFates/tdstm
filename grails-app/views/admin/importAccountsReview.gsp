@@ -6,7 +6,10 @@
 
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.common.min.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.default.min.css')}" />
+
 	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
+
+	<g:javascript src="bootstrap.js" />
 
 	<style type="text/css">
 .wrapper .post {
@@ -32,12 +35,45 @@ width:200px;
 
 	<script>
 		$(document).ready(function() {
+
+			/**
+			 * Handle errors when the import process fails
+			 * It follows the format status: "customerror", errorThrown: "custom error", errors: Array[2],
+			 * @param data
+             */
+			function processErrors(data) {
+				var errorMsg = "";
+
+				if(data.status) {
+					errorMsg += '<strong> ' + data.status + ' </strong><br />';
+				}
+
+				if(data.errors && data.errors.length > 0) {
+					errorMsg += '<ul>';
+					for(var i = 0; i < data.errors.length; i++){
+						errorMsg +=	'<li> ' + data.errors[i] + ' </li>'
+					}
+					errorMsg += '</ul>';
+				}
+
+				$('#errorModalText').html(errorMsg);
+				$('#errorModal').modal('show');
+
+				var gridElement = $("#grid");
+				gridElement.find('.k-grid-content').remove();
+				gridElement.find('.k-grid-content-locked').remove();
+				gridElement.height(50);
+
+				$("#createSubmit").hide();
+			}
+
 			$("#grid").kendoGrid({
 				dataSource: {
 					type: "json",
 					transport: {
 						read: "${createLink(action:'importAccountsReviewData', params:[filename:filename])}"
 					},
+					error: processErrors,
 					schema: {
 						model: {
 							fields: {
@@ -108,7 +144,7 @@ width:200px;
 						<input type="text" name="expireDays" value="90" size="4"> Days before account(s) expires<br />
 					</td>
 					<td>
-						<g:submitButton name="submit" value="Create/Update Accounts" />
+						<g:submitButton id="createSubmit" name="submit" value="Create/Update Accounts" />
 					</td>
 				</tr>
 			</table>
@@ -116,5 +152,6 @@ width:200px;
 		</div>
 	</div>
 </div>
+<g:include view="/layouts/_error.gsp" />
 </body>
 </html>
