@@ -84,10 +84,17 @@ class AdminController {
 
 		def username = securityService.getUserLogin().username
 
+		// Log to the app log as well as to the system log that we're going to restart the app
 		def logStr = g.message(code:"tdstm.admin.serviceRestartCommand.log", args:[username, cmd])		 
 		Shell.systemLog(logStr)
 		log.info(logStr)
-		Shell.executeCommand(cmd)
+
+		List results = Shell.executeCommand(cmd)
+
+		// Now log the results
+		logStr = g.message(code:'tdstm.admin.serviceRestartCommand.results', args:[results.toString()])
+		Shell.systemLog(logStr)
+		log.info(logStr)
 
 		render "OK"
 	}

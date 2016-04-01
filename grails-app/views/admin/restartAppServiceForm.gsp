@@ -81,7 +81,7 @@
 					if(proceed){
 						$.post("restartAppService")
 						.done(function(){
-							$("body").append("<div class='modal'><div class='center'><h1><strong>The Service is Restarting... this could take a while</strong></h1></div></div>");
+							$("body").append("<div class='modal'><div class='center'><h1><strong>The application is restarting that will take approximately 1 to 2 minutes...</strong></h1></div></div>");
 							setTimeout(function(){
 								window.location.replace("${createLink(uri: '/')}");
 							}, 60 * 1000);
