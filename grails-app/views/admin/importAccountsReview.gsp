@@ -50,26 +50,18 @@ width:200px;
 					pageSize: 30
 				},
 				columns: [
-					<g:each var="propName" in="${properties}"><g:set var="gridOpt" value="${gridMap[propName]}" />{
+				<g:set var="isFirstElement" value="${true}"/>
+				<g:each var="propName" in="${properties}"><g:set var="gridOpt" value="${gridMap[propName]}" />
+					<g:if test="${isFirstElement}"><g:set var="isFirstElement" value="${false}"/></g:if>
+					<g:else>,</g:else>
+					{
 						field: "${propName}",
 						title: "${gridOpt.label}",
 						locked: ${gridOpt.locked},
 						lockable: false,
 						width: ${gridOpt.width}
-					},
-					</g:each>
-					{
-						field: "errors",
-						title: "Errors",
-						locked: false,
-						width: 100
-					},  
-					{
-						field: "match",
-						title: "Matched on",
-						lockable: false,
-						width: 50
 					}
+				</g:each>
 				],
 				height: 540,
 				sortable: true,

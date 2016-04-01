@@ -2,6 +2,7 @@
  * AccountImportExportService - A set of service methods the importing and exporting of project staff and users
  */
 
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.WorkbookUtil
@@ -26,11 +27,11 @@ class AccountImportExportService {
 	static final TEMPLATE_TAB_NAME = 'Accounts'
 
 	static final Map accountSpreadsheetColumnMap = [
-		personId      : [ssPos:1,  formPos:1,  type:'U', width:100, locked:true,  label:'ID'],
-		firstName     : [ssPos:2,  formPos:2,  type:'P', width:100, locked:true,  label:'First Name'],
-		middleName    : [ssPos:3,  formPos:3,  type:'P', width:100, locked:true,  label:'Middle Name'],
-		lastName      : [ssPos:4,  formPos:4,  type:'P', width:100, locked:true,  label:'Last Name'],
-		company       : [ssPos:5,  formPos:5,  type:'P', width:100, locked:true,  label:'Company'],
+		personId      : [ssPos:1,  formPos:1,  type:'U', width:50,  locked:true,  label:'ID'],
+		firstName     : [ssPos:2,  formPos:2,  type:'P', width:90,  locked:true,  label:'First Name'],
+		middleName    : [ssPos:3,  formPos:3,  type:'P', width:90,  locked:true,  label:'Middle Name'],
+		lastName      : [ssPos:4,  formPos:4,  type:'P', width:90,  locked:true,  label:'Last Name'],
+		company       : [ssPos:5,  formPos:5,  type:'P', width:90,  locked:true,  label:'Company'],
 		errors        : [ssPos:0,  formPos:6,  type:'T', width:200, locked:false, label:'Errors'],
 		workPhone     : [ssPos:6,  formPos:7,  type:'P', width:100, locked:false, label:'Work Phone'],
 		mobilePhone   : [ssPos:7,  formPos:8,  type:'P', width:100, locked:false, label:'Mobile Phone'],
@@ -360,7 +361,7 @@ class AccountImportExportService {
 		List accounts = readAccountsFromSpreadsheet(spreadsheet)
 
 		// Validate the sheet
-		List teamCodes = partyRelationshipService.getStaffingRoles().description
+		List teamCodes = partyRelationshipService.getStaffingRoles().id
 		validateUploadedAccounts(accounts, teamCodes)
 
 		// Attempt to match the persons to existing users
@@ -438,38 +439,29 @@ class AccountImportExportService {
 	 * @param accounts - the list of accounts that are read from the spreadsheet
 	 * @return the accounts list updated with errors
 	 */
-	List<Map> validateUploadedAccounts(List<Map> people, List teamCodes) {
+	List<Map> validateUploadedAccounts(List<Map> accounts, List teamCodes) {
+		String errors = ''
 		// Retrieves all the roles that this user is allowed to assign.
 		List validRoles = securityService.getAssignableRoles(securityService.getUserLoginPerson())
 		List validRoleCodes = validRoles.id
 
-		// TODO : JPM 3/2016 : Refactor into function into StringUtils as standard split function (unittest)
-		def splitTeams = { t ->
-			List teams = t.split(';')
-			teams = teams*.trim()
-		}
 
-		// TODO : JPM 3/2016 : Should be able to just use LIST math to remove valid teams (e.g. invalidTeams = teams - teamCodes)
-		def validateTeams = { teams -> 
-			String errors = ''
-			teams.each { tc -> 
-				if (! teamCodes.contains(tc)) {
-					errors += (errors ? ', ' : 'Invalid team code(s): ') + tc
-				}
-			}
-			return errors
-		}
 
 		// Validate the teams && role
-		for (int i=0; i < people.size(); i++) {
-			people[i].errors = []
-			if (people[i].teams) {
-				List teams = splitTeams(people[i].teams)
-				log.debug "teams=(${people[i].teams} -- $teams"
-				people[i].errors << validateTeams(teams)
+		for (int i=0; i < accounts.size(); i++) {
+			accounts[i].errors = []
+
+			List teams = StringUtil.splitter(accounts[i].teams, ',', [';',':','|'])
+			log.debug "validateUploadedAccounts() split teams=$teams"
+			if (teams) {
+				List invalidTeams = teams - teamCodes
+				log.debug "validateUploadedAccounts() invalidTeams=$invalidTeams"
+				if (invalidTeams) {
+					accounts[i].errors << 'Invalid Teams: ' + invalidTeams.join(',')
+				}
 			}
 
-			def currentRoles = people[i].role?.split(";")
+			def currentRoles = accounts[i].role?.split(";")
 			def invalidRoles = []
 
 			currentRoles.each{
@@ -478,13 +470,13 @@ class AccountImportExportService {
 				}
 			}
 
-			if (!StringUtils.isEmpty(people[i].role) && invalidRoles) {
-				people[i].errors << "Invalid role: ${invalidRoles.join(';')}"
+			if (!StringUtils.isEmpty(accounts[i].role) && invalidRoles) {
+				accounts[i].errors << "Invalid role: ${invalidRoles.join(';')}"
 			}
 
 		}
 
-		return people
+		return accounts
 	}
 
 	/**
@@ -545,8 +537,9 @@ class AccountImportExportService {
 		List properties = getPropertiesInColumnOrder('ssPos')
 		for (int row = firstAccountRow; row <= lastRow; row++) {
 			Map account = [:]
+			int pIdx = 0
 			properties.each { 
-				account.put(it[1], WorkbookUtil.getStringCellValue(accountsSheet, (it[0] - 1), row))
+				account.put(it, WorkbookUtil.getStringCellValue(accountsSheet, pIdx++, row))
 			}
 			account.put('errors', [])
 			accounts.add(account)
