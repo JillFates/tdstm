@@ -254,7 +254,10 @@ class CommentService {
 				}
 			}
 			if (params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
-			if (params.sendNotification?.isNumber()) assetComment.sendNotification = Integer.parseInt(params.sendNotification)
+
+			// TM-4765: @tavo_luna: assign the new Notification Value with a NULL safe operation that defaults to 'true'
+			assetComment.sendNotification = (params.sendNotification ?: true).toBoolean()
+			
 			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
 			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
 			if (params.duration?.isInteger()) assetComment.duration = Integer.parseInt(params.duration)
@@ -262,7 +265,7 @@ class CommentService {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())		
 				log.debug "saveUpdateCommentAndNotes - TimeScale=${assetComment.durationScale}"
 			}
-			if (params.sendNotification?.isInteger())assetComment.sendNotification=Integer.parseInt(params.sendNotification)
+			
 			// Issues (aka tasks) have a number of additional properties to be managed 
 			if ( assetComment.commentType == AssetCommentType.TASK ) {
 				if ( params.containsKey('moveEvent') ) {
@@ -328,7 +331,6 @@ class CommentService {
 			boolean shouldSendNotification = shouldSendNotification(assetComment, byWhom, isNew, addingNote) 
 
 			if (! assetComment.hasErrors() && assetComment.save(flush:true)) {
-			
 				// Deal with Notes if there are any
 				if (assetComment.commentType == AssetCommentType.TASK && params.note){
 					// TODO The adding of commentNote should be a method on the AssetComment instead of reverse injections plus the save above can handle both. Right now if this fails, everything keeps on as though it didn't which is wrong.

@@ -31,7 +31,7 @@
 								<br><input type="checkbox" id="hardAssignedEdit" name="hardAssignedEdit" value="1" ng-model="ac.hardAssigned" ng-true-value="1" ng-false-value="0" ng-disabled="ac.assignedTo == ''" />&nbsp;
 								<label for="hardAssignedEdit">Fixed Assignment</label>
 								&nbsp;&nbsp;&nbsp;
-								<input type="checkbox" id="sendNotificationEdit" name="sendNotificationEdit" value="1" ng-checked="ac.sendNotification == 'true'" ng-model="ac.sendNotification" ng-true-value="1" ng-false-value="0" />&nbsp;
+								<input type="checkbox" id="sendNotificationEdit" name="sendNotificationEdit" ng-model="ac.sendNotification"/>&nbsp;
 								<label for="sendNotificationEdit">Send Notifications</label>
 						</td>
 					</tr>

@@ -1142,6 +1142,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		if (assetData == null) {
 			assetData = assetTO('', 'Server');
 		}
+
 		return {
 			assetClass: assetData.assetClass,
 			assetEntity: assetData.assetId?assetData.assetId.toString():'',
@@ -1160,7 +1161,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 			estStart: '',
 			forWhom: '',
 			hardAssigned: '0',
-			sendNotification: '0',
+			sendNotification: true,
 			isResolved: '0',
 			instructionsLink: '',
 			manageDependency: 1,
@@ -1200,7 +1201,7 @@ tds.comments.util.CommentUtils = function(q, interval, appCommonData) {
 		temp.estFinish = response.etFinish;
 		temp.estStart = response.etStart;
 		temp.hardAssigned = ac.hardAssigned ? ac.hardAssigned.toString() : '0';
-		temp.sendNotification = ac.sendNotification ? ac.sendNotification.toString() : '0';
+		temp.sendNotification = ac.sendNotification;
 		temp.instructionsLink = ac.instructionsLink ? ac.instructionsLink.toString() : '';
 		temp.isResolved = ac.isResolved ? ac.isResolved.toString() : '0';
 		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
