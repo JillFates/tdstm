@@ -227,4 +227,15 @@ app.controller('assetFieldImportanceCtrl', function ($scope,$http,fieldFactory) 
 			alert("An Unexpected error while saving asset fields.")
 		});
 	}
+	$scope.updateCustomFieldsShown = function(){
+		$http({
+			url : contextPath+'/project/updateProjectCustomShown',
+			method: "POST",
+			data:{'customCount': $scope.customShown}
+		}).success (function(resp) {
+			console.log(resp);
+		}).error(function(resp, status, headers, config) {
+			alert("An Unexpected error while showing the asset fields.")
+		});
+	}
 });
