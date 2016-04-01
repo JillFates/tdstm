@@ -10,7 +10,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 				'<div class="modal-header">' +
 					'<h4 id="progressTitle" class="modal-title" id="myModalLabel">Modal title</h4>' +
 				'</div>' +
-				'<div class="modal-body">' +
+				'<div class="modal-body" style="max-height:20em; overflow-y:auto">' +
 					'<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>' +
 					'<div id="innerGlobalProgressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; font-size: 11px; font-family: verdana;">0%</div>' +
 					'<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>' +
@@ -88,7 +88,12 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 	}
 
 	var showProgressBar = function() {
-		$('#globalProgressBar').modal('show');
+		console.log("Show Progress Bar!!!!");
+		//@tavo_luna: prevent dialog to close if clicked outside or after presing [ESC]
+		$('#globalProgressBar').modal({
+			backdrop: 'static',
+ 			keyboard: false
+		});
 	}
 
 	var updateProgress = function() {
@@ -189,6 +194,7 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 
 						if (showClose) {
 							closeButton.show();
+
 							closeButton.click(function() {
 								closeButton.hide();
 								if (failed) {

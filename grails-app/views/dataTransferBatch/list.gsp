@@ -124,7 +124,7 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h5 class="modal-title" id="myModalLabel">Import Results</h5>
           </div>
-          <div class="modal-body" style="height:20em; overflow-y:auto"></div>
+          <div class="modal-body" style="max-height:20em; overflow-y:auto"></div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
