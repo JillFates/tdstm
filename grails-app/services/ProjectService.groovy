@@ -385,19 +385,6 @@ class ProjectService {
 			tag = getNextAssetTag(project) 
 		}
 		return tag
-	}	
-
-	/**
-	 * NOTE : use this method where ever we are getting project partner.
-	 * This method is used to get project partner  for requested project.
-	 * @param projectId
-	 * @return projectPartner
-	 */
-	def getProjectPartner( project ) {
-		def projectPartner = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_PARTNER' \
-			and p.partyIdFrom = :project and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'PARTNER' ",
-			[project:project])
-		return projectPartner
 	}
 
 	/**
@@ -535,6 +522,51 @@ class ProjectService {
 		return [projectPartners:projectPartners, projectManagers:projectManagers, moveManager:moveManager,
 			companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,
 			projectLogoForProject:projectLogoForProject, workflowCodes:workflowCodes ]
+	}
+
+	/**
+	 * Used to fetch a list of the companies associated with the project which includes the owner, client and any partners
+	 * @param project - the project to query
+	 * @return A list of the companies
+	 */
+	List<PartyGroup> getCompanies(Project project) {
+		List companies = []
+		companies << project.client
+		companies << project.owner
+		companies.addAll( project.partners )
+		return companies
+	}
+
+	/**
+	 * Used to fetch a map of the companies associated with the project which include the owner, client and 
+	 * any partners. The map key will be the name and value the company object. By default it will force to lowercase the 
+	 * company name. 
+	 * @param project - the project to query
+	 * @param toLowercase - flag if true (default) will force the company names to lowercase otherwise they remain untouched
+	 * @return A map of [CompanyName : PartyGroup company]
+	 */
+	Map getCompaniesMappedByName(Project project, boolean toLowercase=true) {
+		List companies = getCompanies(project)
+		Map mapped = [:]
+		companies.each {
+			mapped << (toLowercase ? [ (it.name.toLowerCase()): it] : [ (it.name): it])
+		}		
+		return mapped
+	}
+
+	/**
+	 * Used to fetch a map of the companies associated with the project which include the owner, client and 
+	 * any partners. The map key will be the id and value the company object.
+	 * @param project - the project to query
+	 * @return A map of ['id' : PartyGroup company]
+	 */
+	Map getCompaniesMappedById(Project project) {
+		List companies = getCompanies(project)
+		Map mapped = [:]
+		companies.each {
+			mapped << [ (it.id.toString()): it]
+		}		
+		return mapped
 	}
 
 	/*

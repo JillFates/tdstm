@@ -102,6 +102,9 @@ class StringUtilTests extends Specification {
 		then: 'Should properly split and trim the values using alternate delimiter'
 			list == SU.splitter('  one| two: three  ', ';', [',', ':', '|'])
 
+		then: 'Should return empty list when null value is passed'
+			SU.splitter(null).size() == 0
+			
 		when:
 			String str = 'this string should not be split'
 			List singleItem = SU.splitter(str)

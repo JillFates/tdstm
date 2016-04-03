@@ -261,6 +261,10 @@ class StringUtil {
 	 * @return the list of individual elements from the list
 	 */
 	static List splitter(String str, String delim=',', List alterDelims=[]) {
+		if (!str) {
+			return []
+		}
+
 		if (delim == '.' || alterDelims?.contains('.')) {
 			throw RuntimeException("The split() method does not support the period (.) character as a delimiter")
 		}
@@ -274,4 +278,5 @@ class StringUtil {
 		list = list.collect { it.trim() }
 		return list
 	}
+
 }

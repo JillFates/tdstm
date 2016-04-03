@@ -91,38 +91,95 @@ class PersonService {
 	}
 
 	/** 
-	 * Used to find a person by their name for a specified client
-	 * @param client - The client that the person would be associated as Staff
+	 * Used to find a person by their name that is staff of the specified company
+	 * @param company - The company that the person would be associated as Staff
 	 * @param nameMap - a map of the person's name (map [first, last, middle])
 	 * @return A list of the person(s) found that match the name or null if none found
 	 */
+	// List findByClientAndName(PartyGroup client, Map nameMap) {
+	List<Person> findByClientAndName(PartyGroup company, Map nameMap) {
+		Map queryParams = [company:company.id]
+		def (first,middle,last) = [false,false,false]
 
-	List findByClientAndName(PartyGroup client, Map nameMap) {
-		def map = [client:client.id]
-		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr JOIN person p ON p.person_id=pr.party_id_to_id')
-		query.append(' WHERE pr.party_id_from_id=:client')
+		StringBuffer query = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr')
+		query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
+		query.append(' WHERE pr.party_id_from_id=:company')
 		query.append(' AND pr.role_type_code_from_id="COMPANY"')
 		query.append(' AND pr.role_type_code_to_id="STAFF"')
 		// query.append(' ')
 		if (nameMap.first) {
-			map.first = nameMap.first
+			queryParams.first = nameMap.first
 			query.append(' AND p.first_name=:first' )
 		}
 		if (nameMap.last) {
-			map.last = nameMap.last
+			queryParams.last = nameMap.last
 			query.append(' AND p.last_name=:last' )
 		}
 
 		def persons
-		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), map)
+		def pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 
 		if (nameMap.middle) {
 			// Try to lookup the person with their middle name as well
-			map.middle = nameMap.last
+			queryParams.middle = nameMap.middle
 			query.append(' AND p.middle_name=:middle' )
-			pIds.addAll( namedParameterJdbcTemplate.queryForList(query.toString(), map) )
+			pIds.addAll( namedParameterJdbcTemplate.queryForList(query.toString(), queryParams) )
 		}
 
+		if (pIds) {
+			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
+		}
+
+		return persons
+	}  
+
+	/** 
+	 * Used to find a person by their name that is staff of the specified company
+	 * @param company - The company that the person would be associated as Staff
+	 * @param nameMap - a map of the person's name (map [first, last, middle])
+	 * @return A list of the person(s) found that match the name or null if none found
+	 */
+	// TODO : JPM 4/2016 : findByCompanyAndName is replacing findByClientAndName
+	List<Person> findByCompanyAndName(PartyGroup company, Map nameMap) {
+		List persons = []
+		Map queryParams = [company:company.id]
+		def (first,middle,last) = [false,false,false]
+
+		StringBuffer select = new StringBuffer('SELECT party_id_to_id as id FROM party_relationship pr')
+			select.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
+			select.append(' WHERE pr.party_id_from_id=:company')
+			select.append(' AND pr.role_type_code_from_id="COMPANY"')
+			select.append(' AND pr.role_type_code_to_id="STAFF" ')
+
+		StringBuffer query = new StringBuffer( select )
+		if (nameMap.first) {
+			queryParams.first = nameMap.first
+			query.append(' AND p.first_name=:first' )
+			first = true
+		}
+		if (nameMap.middle) {
+			queryParams.middle = nameMap.middle
+			query.append(' AND p.middle_name=:middle' )
+			middle = true			
+		}
+		if (nameMap.last) {
+			queryParams.last = nameMap.last
+			query.append(' AND p.last_name=:last' )
+			last = true
+		}
+		if (first && middle && last) {
+			// Union to try and find individuals with just first and last, middle not set
+			query.append(' UNION ')
+			query.append(select)
+			query.append(" AND p.first_name=:first AND p.last_name=:last AND COALESCE(p.middle_name,'') = '' ")
+		}
+		if (first) {
+			// Union to try and find individuals with just first, middle and last not set
+			query.append(' UNION ')
+			query.append(select)
+			query.append(" AND p.first_name=:first AND COALESCE(p.last_name,'') = '' AND COALESCE(p.middle_name,'') = '' ")
+		}
+		List pIds = namedParameterJdbcTemplate.queryForList(query.toString(), queryParams)
 		if (pIds) {
 			persons = Person.findAll('from Person p where p.id in (:ids)', [ids:pIds*.id])
 		}

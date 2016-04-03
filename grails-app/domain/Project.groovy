@@ -10,6 +10,7 @@ class Project extends PartyGroup {
 	def static final DEFAULT_PROJECT_ID = 2
 	def static final CUSTOM_FIELD_COUNT = 96
 	def projectService
+	def partyRelationshipService
 	
 	static isDefaultProject(aProjectRef) {
 		if (aProjectRef instanceof Project) {
@@ -262,12 +263,13 @@ class Project extends PartyGroup {
 	}
 	
 	static transients = [ 
-		'defaultProject', 
-		'readDefaultProject', 
 		'active', 
-		'status', 
+		'defaultProject', 
+		'owner',
+		'partners',
 		'projectDefaultBundle', 
-		'owner' 
+		'readDefaultProject', 
+		'status'
 	]
 
 	String toString() {
@@ -307,6 +309,14 @@ class Project extends PartyGroup {
 		completionDate.compareTo(new Date()) > 0
 	}
 	
+	/**
+	 * Used to access the list of partners associated with a project
+	 * @return the project owner
+	 */
+	List<PartyGroup> getPartners() {
+		return partyRelationshipService.getProjectPartners( this )
+	}
+
     /**
      * 
      * Method csn used to get default move bundle for for a current project.

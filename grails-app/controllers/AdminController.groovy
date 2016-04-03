@@ -16,6 +16,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
 import com.tdsops.common.os.Shell
@@ -1215,15 +1216,58 @@ class AdminController {
 			return
 		}
 		try {
-			List accounts = accountImportExportService.loadAndValidateSpreadsheet(user, project, params.filename)
+			Map options = importParamsToOptionsMap(params)
+			List accounts = accountImportExportService.loadAndValidateSpreadsheet(user, project, params.filename, options)
 			ServiceResults.respondAsJson(response, accounts )
 		} catch(e) {
 			log.error "Exception occurred while importing data: " + e.printStackTrace()
 
 			ServiceResults.respondWithError(response,
-				[ "An error occurred while attempting to export accounts", e.getMessage()]  )
+				[ "An error occurred while attempting to import accounts", e.getMessage()]  )
 		}
 
+	}
+
+	/**
+	 * Used to load the request parameters from params into a Map that has been validated and formatted
+	 * @param params - the request parameters
+	 * @return the map of the parameters
+	 */
+	private Map importParamsToOptionsMap(params) {
+		Map options = [
+			createUserLogin: (params.createUserlogin == 'Y'),
+			activateLogin: (params.activateLogin == 'Y'),
+			randomPassword: (params.randomPassword == 'Y'),
+			forcePasswordChange: (params.forcePasswordChange == 'Y'),
+			commonPassword: params.password,
+			userRoles: StringUtil.splitter(params.role, ',', [' ', ';', '|'])
+		]
+		if (params.filename) {
+			filename: params.filename
+		}
+
+		return options
+	}
+
+	/**
+	 * Used to reverse the options Map back into something that can be used as params for a page request
+	 * @param options - the map created by the importParamsToOptionsMap method
+	 * @param a map that can be used with requests
+	 */
+	private Map importOptionsAsParams(Map options) {
+		Map params = [
+			createUserLogin: (options.createUserLogin ? 'Y' : 'N'),
+			activateLogin: (options.activateLogin ? 'Y' : 'N'),
+			randomPassword: (options.randomPassword ? 'Y' : 'N'),
+			forcePasswordChange: (options.forcePasswordChange ? 'Y' : 'N'),
+			commonPassword: options.commonPassword,
+			userRoles: options.userRoles.join(',')
+		]
+		if (options.filename) {
+			params.filename = options.filename
+		}
+
+		return params
 	}
 
 	/**
@@ -1244,6 +1288,7 @@ class AdminController {
 		String currentStep = (params.step ?: 'start')
 		String fileParamName = 'importSpreadsheet'
 		Map model = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
+		Map options
 		String view = 'importAccounts'
 
 		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
@@ -1265,7 +1310,7 @@ class AdminController {
 					}
 
 					model << accountImportExportService.importAccount_Step1_Upload(user, project, request, fileParamName)
-
+//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
 					// Redirect the user to the Review step
 					forward( action:formAction, params: [stepAlt:'review', filename:model.filename] )
 					return
@@ -1274,8 +1319,16 @@ class AdminController {
 				case 'review':
 					// This step will serve up the review template that in turn fetch the review data 
 					// via an Ajax request.
-
+					options = importParamsToOptionsMap(params)
 					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params.filename)
+					if (!options.filename && model.filename) {
+	log.debug "importAccounts() step=$step set filename=${model.filename}"
+						options.filename = model.filename
+					}
+					model.optionsAsParams = importOptionsAsParams(options)
+
+//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
+
 					view = "${formAction}Review"
 					break
 
@@ -1283,16 +1336,8 @@ class AdminController {
 					// This is the daddy of the steps in that it is going to post the changes back to the 
 					// database either creating or updating Person and/or UserLogin records.
 
-					Map options = [
-						createUserLogin: (params.createUserlogin == 'Y'),
-						activateLogin: (params.activateLogin == 'Y'),
-						randomPassword: (params.randomPassword == 'Y'),
-						forcePasswordChange: (params.forcePasswordChange == 'Y'),
-						commonPassword: params.password,
-						userRoles: StringUtil.splitter(params.role, ',', [' ', ';', '|'])
-					]
-
 					String filename = params.filename
+					options = importParamsToOptionsMap(params)
 
 					int expireDays = 90
 					if (params.expireDays) {

@@ -2,6 +2,7 @@
  * AccountImportExportService - A set of service methods the importing and exporting of project staff and users
  */
 
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.ExportUtil
@@ -10,11 +11,14 @@ import org.apache.commons.lang.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
+import org.apache.commons.lang.StringUtils
+//import org.apache.commons.validator.routines.EmailValidator
 
 class AccountImportExportService {
 
 	def coreService
 	def partyRelationshipService
+	def personService
 	def projectService
 	def securityService	
 
@@ -32,7 +36,7 @@ class AccountImportExportService {
 		middleName    : [ssPos:3,  formPos:3,  type:'P', width:90,  locked:true,  label:'Middle Name'],
 		lastName      : [ssPos:4,  formPos:4,  type:'P', width:90,  locked:true,  label:'Last Name'],
 		company       : [ssPos:5,  formPos:5,  type:'P', width:90,  locked:true,  label:'Company'],
-		errors        : [ssPos:0,  formPos:6,  type:'T', width:200, locked:false, label:'Errors'],
+		errors        : [ssPos:0,  formPos:6,  type:'T', width:200, locked:false, label:'Errors', xtemplate:'kendo-errors-template'],
 		workPhone     : [ssPos:6,  formPos:7,  type:'P', width:100, locked:false, label:'Work Phone'],
 		mobilePhone   : [ssPos:7,  formPos:8,  type:'P', width:100, locked:false, label:'Mobile Phone'],
 		email         : [ssPos:8,  formPos:9,  type:'P', width:100, locked:false, label:'Email'],
@@ -131,7 +135,7 @@ class AccountImportExportService {
 
 		List persons = []
 
-		// Now get the staff for the project
+		// Get the staff for the project
 		def company = project.client.id
 		if (staffOption == "STAFF"){
 			persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
@@ -145,6 +149,7 @@ class AccountImportExportService {
 
 		def book = getAccountExportTemplate()
 		def sheet = book.getSheet(TEMPLATE_TAB_NAME)
+
 		populateAccountSpreadsheet(session, persons, sheet, company, includeUserLogins, userLoginOption)
 
 		return book
@@ -257,8 +262,8 @@ class AccountImportExportService {
 	 * @return a map of the person information
 	 */
 	private Map personToFieldMap(Person person) {
-		List teams = partyRelationshipService.getCompanyStaffFunctions(person.company, person)*.id
 
+		List teams = partyRelationshipService.getCompanyStaffFunctions(person.company, person)*.id
 		List roles = securityService.getAssignedRoles(person).id
 
 		Map map = [
@@ -348,12 +353,13 @@ class AccountImportExportService {
 
 	/**
 	 * Used to load the spreadsheet into memory and validate that the information is correct
-	 * @param byWhom - the user that is making the request
-	 * @param project - the project that the import is being applied against
+	 * @param byWhom   - the user that is making the request
+	 * @param project  - the project that the import is being applied against
 	 * @param filename - the name of the temporarilly saved spreadsheet
+	 * @param options  - the options that the user chose when submitting the form
 	 * @controllerMethod
 	 */
-	List loadAndValidateSpreadsheet(UserLogin byWhom, Project project, String filename) {
+	List loadAndValidateSpreadsheet(UserLogin byWhom, Project project, String filename, Map options) {
 		// Load the spreadsheet
 		HSSFWorkbook spreadsheet = readImportSpreadsheet(filename)
 
@@ -361,12 +367,7 @@ class AccountImportExportService {
 		List accounts = readAccountsFromSpreadsheet(spreadsheet)
 
 		// Validate the sheet
-		List teamCodes = partyRelationshipService.getStaffingRoles().id
-		validateUploadedAccounts(accounts, teamCodes)
-
-		// Attempt to match the persons to existing users
-		List staff = partyRelationshipService.getCompanyStaff( project.client.id )
-		searchAccountsForExisting(accounts, staff)
+		validateUploadedAccounts(accounts, project, options)
 
 		return accounts
 	}
@@ -439,20 +440,139 @@ class AccountImportExportService {
 	 * @param accounts - the list of accounts that are read from the spreadsheet
 	 * @return the accounts list updated with errors
 	 */
-	List<Map> validateUploadedAccounts(List<Map> accounts, List teamCodes) {
-		String errors = ''
+	List<Map> validateUploadedAccounts(List<Map> accounts, Project project, Map options) {
+
 		// Retrieves all the roles that this user is allowed to assign.
-		List validRoles = securityService.getAssignableRoles(securityService.getUserLoginPerson())
-		List validRoleCodes = validRoles.id
+		List validRoleCodes = securityService.getAssignableRoles(securityService.getUserLoginPerson()).id
+		List teamCodes = partyRelationshipService.getStaffingRoles().id
+		// def emailValidator = EmailValidator.getInstance()
 
+		PartyGroup client = project.client
+		Map companiesByNames = projectService.getCompaniesMappedByName(project)
+		Map companiesById = projectService.getCompaniesMappedById(project)
 
+		// Validate the teams, roles, company and any other things need be validated
 
-		// Validate the teams && role
 		for (int i=0; i < accounts.size(); i++) {
 			accounts[i].errors = []
 
+			boolean invalidCompany=false
+			PartyGroup company
+
+			// StringUtils.equalsIgnoreCase()
+			// Validate that the company name specified is one of the project related companies
+			if (accounts[i].company) {
+				company = companiesByNames.get(accounts[i].company.toLowerCase())
+				if (company) {
+					accounts[i].companyId = company.id
+				} else {
+					accounts[i].errors << 'Company not found'
+					invalidCompany = true
+				}
+			} else {
+				// Default the project company if it wasn't specified
+				accounts[i].company = client.name
+				accounts[i].companyId = client.id
+			}
+
+			Person personById, personByEmail, personByUserLogin, personByName, personToUse
+
+			// If it is an existing person (has an id), lets see if the person someone from the project
+			if (accounts[i].personId) {
+				Long pid = NumberUtil.toPositiveLong(accounts[i].personId, -1)
+				if (pid == -1) {
+					accounts[i].errors << 'Invalid person ID'
+				} else {
+					personById = Person.get(accounts[i].personId)
+					if (personById) {
+						accounts[i].match << "personId:${accounts[i].personId}"
+						if (personById.company.id != accounts[i].companyId) {
+							accounts[i].errors << 'Account by ID conflicts with company'
+							accounts[i].companyId = null
+						} else {
+							personToUse = personById
+						}
+					} else {
+						accounts[i].errors << 'Person by ID not found'
+					}
+				}
+			}
+
+			// Attempt to lookup account by username
+			if (accounts[i].username) {
+				personByUserLogin = UserLogin.findByUsername(accounts[i].username)?.person
+				if (personByUserLogin) {
+					if (personById) {
+						if (personByUserLogin.id != personByUserLogin.id) {
+							accounts[i].errors << 'Account by email conflicts with ID'
+						}
+					} else {
+						if (personByUserLogin.company.id != company.id) {
+							accounts[i].errors << 'Account by username conflicts with company'
+						} else {
+							personToUse = personByUserLogin
+						}
+					}
+				}
+			}
+
+log.debug "\n\n\n***\ni=$i, company=$company, ${accounts[i]}"
+			// Attempt to lookup account by email
+			if (accounts[i].email) {
+				personByEmail = Person.findByEmail(accounts[i].email)
+				if (personByEmail) {
+					if (personById && personByEmail.id != personById.id) {
+						accounts[i].errors << 'Account by email conflicts with ID'
+					}
+					if (personByUserLogin && personByEmail.id != personByUserLogin.id) {
+						accounts[i].errors << 'Account by email conflicts with username'
+					}					
+					// Check to see if the email address is valid
+					//if (! emailValidator.isValid(accounts[i].email)) {
+					//	accounts[i].errors << 'Invalid email format'
+					//}
+					if (!personToUse && !accounts[i].errors) {
+						personToUse = personByEmail
+					}
+				}
+			}
+
+			// Attempt to find the person by name which is only possible if we know the company
+			if (company) {
+				Map nameMap = [first:accounts[i].firstName,
+					middle:accounts[i].middleName,
+					last:accounts[i].lastName
+				]
+				List people = personService.findByCompanyAndName(company, nameMap)
+				if (people.size() > 0) {
+					if (people.size() > 1) {
+						accounts[i].errors << 'Found ambiguity searching by name'
+					} else {
+						personByName = people[0]
+						// See if the name match is different than the above
+						if (personById && personById.id != personByName.id) {
+							accounts[i].errors << 'Account by name conflicts with ID'
+						}
+						if (personByUserLogin && personByUserLogin.id != personByName.id) {
+							accounts[i].errors << 'Account by name conflicts with username'
+						}
+						if (personByEmail && personByEmail.id != personByName.id) {
+							accounts[i].errors << 'Account by name conflicts with email'
+						}
+						if (!personToUse && !accounts[i].errors) {
+							personToUse = personByName
+							accounts[i].match << 'name'
+						}
+					}
+				}
+			}
+
+			// Set a flag on the account if it is going to be a new account
+			accounts[i].isNewAccount = (! personToUse)
+
+			// Validate the Teams
 			List teams = StringUtil.splitter(accounts[i].teams, ',', [';',':','|'])
-			log.debug "validateUploadedAccounts() split teams=$teams"
+			// log.debug "validateUploadedAccounts() split teams=$teams"
 			if (teams) {
 				List invalidTeams = teams - teamCodes
 				log.debug "validateUploadedAccounts() invalidTeams=$invalidTeams"
@@ -461,64 +581,34 @@ class AccountImportExportService {
 				}
 			}
 
-			def currentRoles = accounts[i].role?.split(";")
-			def invalidRoles = []
-
-			currentRoles.each{
-				if(!validRoleCodes.contains(it)){
-					invalidRoles << it
-				}
-			}
+			// Review the security roles that are going to be assigned to the person
+			List currentRoles = []
+			List invalidRoles = []
+			if (accounts[i].role) {
+				currentRoles = StringUtil.splitter(accounts[i].role, ',', [';',':','|'])
+				invalidRoles = currentRoles - validRoleCodes
+			}			
 
 			if (!StringUtils.isEmpty(accounts[i].role) && invalidRoles) {
 				accounts[i].errors << "Invalid role: ${invalidRoles.join(';')}"
 			}
 
+			// Attempt to match the persons to existing users
+			// List staff = partyRelationshipService.getCompanyStaff( project.client.id )
+			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
+
+			// Set the icon to be displayed base on what is being done
+			if (accounts[i].errors) {
+				accounts[i].icon = '/tdstm/icons/exclamation.png'
+			} else if (accounts[i].isNewAccount) {
+				accounts[i].icon = '/tdstm/icons/add.png'				
+			} else {
+				accounts[i].icon = '/tdstm/icons/pencil.png'
+			}
+
 		}
 
 		return accounts
-	}
-
-	/**
-	 * Used to scan the list of accounts and attempt to match them up with existing accounts 
-	 * properties errors when anything is found.
-	 * @param accounts - the list of accounts that are read from the spreadsheet
-	 * @param staff - the list of staff that is associated with the project some how
-	 * @return the accounts list updated with errors
-	 */
-	List searchAccountsForExisting(List people, List staff) { 
-		List matches = []
-
-		// TODO : JPM 3/2016 : Believe that we have a person match function in PersonService that we might be able to leverage
-		// TODO : JPM 3/2016 : the findPerson is NOT case-insensitive which can/will cause problems
-		def findPerson = { personInfo ->
-			def person = staff.find {
-				it.firstName == personInfo.firstName &&
-				(it.lastName == personInfo.lastName || ( ! it.lastName && ! personInfo.lastName)) &&
-				(it.middleName == personInfo.middleName || ( ! it.middleName && ! personInfo.middleName))
-			} 
-			return person
-		}
-
-		// Look over the people and try to find them in the system and then mark them as existing if they are.
-		for (int i=0 ; i < people.size; i++) {
-			def person = findPerson(people[i])
-
-			if (person) {
-				people[i].match = 'person'
-				matches << people[i]
-
-			} else {
-				if (people[i].username) {
-					def user = UserLogin.findByUsername(people[i].username)
-					if (user) {
-						people[i].match = 'username:'+user.id 
-						matches << people[i]
-					}
-				}
-			}
-		}
-		return matches
 	}	
 
 	/**
@@ -539,9 +629,11 @@ class AccountImportExportService {
 			Map account = [:]
 			int pIdx = 0
 			properties.each { 
-				account.put(it, WorkbookUtil.getStringCellValue(accountsSheet, pIdx++, row))
+				account.put(it, WorkbookUtil.getStringCellValue(accountsSheet, pIdx++, row).trim())
 			}
-			account.put('errors', [])
+			account.errors = []
+			account.match = []
+
 			accounts.add(account)
 		}
 		return accounts

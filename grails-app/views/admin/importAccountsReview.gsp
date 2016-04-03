@@ -33,14 +33,28 @@ width:200px;
 
 	<div id="grid" style="margin:1em; width=1000px;"></div>
 
+	<script type="text/x-kendo-tmpl" id="kendo-errors-template">
+		#if (errors.size()) > 0 {#
+		<div class="">
+			<ul>
+				#var errorList = JSON.parse(errors);#
+				#for (var i=0,len=errorList.length; i<len; i++) {#
+					<li>${'$'}{ errorList[i] }</li>
+				#}#
+			</ul>
+		</div>
+		#}#
+	</script>
+
 	<script>
+
 		$(document).ready(function() {
 
 			/**
 			 * Handle errors when the import process fails
 			 * It follows the format status: "customerror", errorThrown: "custom error", errors: Array[2],
 			 * @param data
-             */
+			 */
 			function processErrors(data) {
 				var errorMsg = "";
 
@@ -48,7 +62,7 @@ width:200px;
 					errorMsg += '<strong> ' + data.status + ' </strong><br />';
 				}
 
-				if(data.errors && data.errors.length > 0) {
+				if (data.errors && data.errors.length > 0) {
 					errorMsg += '<ul>';
 					for(var i = 0; i < data.errors.length; i++){
 						errorMsg +=	'<li> ' + data.errors[i] + ' </li>'
@@ -71,7 +85,7 @@ width:200px;
 				dataSource: {
 					type: "json",
 					transport: {
-						read: "${createLink(action:'importAccountsReviewData', params:[filename:filename])}"
+						read: "${createLink(action:'importAccountsReviewData', params:optionsAsParams)}"
 					},
 					error: processErrors,
 					schema: {
@@ -86,14 +100,18 @@ width:200px;
 					pageSize: 30
 				},
 				columns: [
+					{ template: '<img src="#= icon #" />', width:30, locked: true },
+		
 				<g:set var="isFirstElement" value="${true}"/>
-				<g:each var="propName" in="${properties}"><g:set var="gridOpt" value="${gridMap[propName]}" />
+				<g:each var="propName" in="${properties}">
+					<g:set var="gridOpt" value="${gridMap[propName]}" />
 					<g:if test="${isFirstElement}"><g:set var="isFirstElement" value="${false}"/></g:if>
 					<g:else>,</g:else>
 					{
 						field: "${propName}",
 						title: "${gridOpt.label}",
 						locked: ${gridOpt.locked},
+						<g:if test="${gridOpt.template}">template: kendo.template($('#${gridOpt.template}').html()),</g:if>
 						lockable: false,
 						width: ${gridOpt.width}
 					}
