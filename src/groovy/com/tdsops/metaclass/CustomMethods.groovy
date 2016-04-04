@@ -55,5 +55,13 @@ class CustomMethods {
 			}
 			return result
 		}
+
+		/**
+		 * Boolean.asYN - used to convert a Boolean to a String consisting of 'Y' for true or 'N' for false
+		 */
+		Boolean.metaClass.asYN {
+			return (delegate ? 'Y' : 'N')
+		}
+
 	}
 }

@@ -11,18 +11,30 @@
 
 	<g:javascript src="bootstrap.js" />
 
+	<%--
 	<style type="text/css">
-.wrapper .post {
--moz-border-radius:7px 7px 7px 7px;
-border:1px solid silver;
-float:left;
-margin:10px;
-min-height:100px;
-padding:5px;
-width:200px;
-}
+		.wrapper .post {
+			-moz-border-radius:7px 7px 7px 7px;
+			border:1px solid silver;
+			float:left;
+			margin:10px;
+			min-height:100px;
+			padding:5px;
+			width:200px;
+		}
+	</style>
+	--%>
 
-</style>
+	<style type="text/css">
+		.k-grid  .k-grid-header  .k-header  .k-link {
+		    height: auto;
+		}
+		  
+		.k-grid  .k-grid-header  .k-header {
+		    white-space: normal;
+		}
+	</style>
+
 </head>
 <body>
 <div class="body import-review">
@@ -144,22 +156,30 @@ width:200px;
 			<table>
 				<tr>
 					<td>
-						<input type="checkbox" name="createUserlogin" value="Y"> Create user logins <br />
-						<input type="checkbox" name="activateLogin" value="Y"> Activate user logins <br />
-						<input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password on next login<br />
+						<label><input type="checkbox" name="createUserlogin" value="Y"> Create/Update user logins</label>
+						<br />
+						<label><input type="checkbox" name="activateLogin" value="Y"> Activate user logins</label>
+						<br />
+						<label><input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password on next login</label>
 					</td>
+					<%-- 
 					<td>
-						<input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or <br/>
-						<input type="text" name="password" size="10"> Default password to use <i>(if blank in import)</i>
+						For new User Logins only:<ul>
+							<li><input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or </li>
+							<li><input type="text" name="password" size="10"> Default password to use <i>(if blank in import)</i></li>
+						</ul>
 					</td>
+					--%>
 					<td>
 						<select name="role"> 
-							<option value="USER">USER</option>
-							<option value="EDITOR">EDITOR</option>
-							<option value="SUPERVISOR">SUPERVISOR</option>
+							<label><option value="USER">USER</option></label>
+							<label><option value="EDITOR">EDITOR</option></label>
+							<label><option value="SUPERVISOR">SUPERVISOR</option></label>
 						</select>
-						Default Security Role <i>(if blank in import)</i><br/>
-						<input type="text" name="expireDays" value="90" size="4"> Days before account(s) expires<br />
+						Default Security Role <i>(if blank in import)</i>
+						<br/>
+						<label><input type="text" name="expireDays" value="90" size="4"> Days before account(s) expires</label>
+						<br />
 					</td>
 					<td>
 						<g:submitButton id="createSubmit" name="submit" value="Create/Update Accounts" />

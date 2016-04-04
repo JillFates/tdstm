@@ -261,7 +261,7 @@ class StringUtil {
 	 * @return the list of individual elements from the list
 	 */
 	static List splitter(String str, String delim=',', List alterDelims=[]) {
-		if (!str) {
+		if (isBlank(str)) {
 			return []
 		}
 

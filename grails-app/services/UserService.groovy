@@ -396,11 +396,14 @@ class UserService implements InitializingBean {
 
 			// Then try to find by their name
 			if (! persons) {
-				if (debug)
-					log.debug "$mn Looking up person by name"
-				persons = personService.findByClientAndName(client, nameMap)
 				if (debug) 
-					log.debug "$mn personService.findByClientAndName found ${persons?.size()} people"
+					log.debug "$mn Looking up person by name"
+
+				// The nameMap was first,middle,last but throughout the code we refer to firstName,...
+				Map correctNameMap = [firstName:nameMap.first, middleName:nameMap.middle, lastName:nameMap.last]	
+				persons = personService.findByCompanyAndName(client, correctNameMap)
+				if (debug) 
+					log.debug "$mn personService.findByCompanyAndName found ${persons?.size()} people"
 			} 
 
 			// If we have any persons, try to find their respective user accounts

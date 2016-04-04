@@ -1467,6 +1467,56 @@ class ProjectService {
 	}
 
 	/**
+	 * Used to associate a person to a project with a certain team
+	 * @param project - the project the person will be associated with
+	 * @param person - the person to be assigned
+	 * @param teamCodes - a single team code or a list of team codes
+	 */
+	void addTeamMember(Project project, Person person, teamCodes) {
+		partyRelationshipService.addProjectStaff(project, person)
+
+		if (! (teamCodes instanceof List)) {
+			teamCodes = [ teamCodes ]
+		}
+		List currentTeams = person.getAssignedTeams(project).id
+		teamCodes.each {tc ->
+			if (! currentTeams.contains(tc)) {
+				partyRelationshipService.addStaffFunction(person, tc, person.company, project)
+			}
+		}
+	}
+
+	/**
+	 * Used to remove a person from a team on a project. This will also remove any assignments that the 
+	 * person may have to a move event.
+	 * @param project - the project the person will be associated with
+	 * @param person - the person to be assigned
+	 * @param teamCodes - a single team code or a list of team codes
+	 * @return the number of teams that were deleted
+	 */
+	int removeTeamMember(Project project, Person person, teamCodes) {
+		if (! (teamCodes instanceof List)) {
+			teamCodes = [ teamCodes ]
+		}
+
+		// Remove person/team references in the MoveEventStaff table			
+		String mesQuery = """DELETE from MoveEventStaff mes where
+			person=:person and role.id in (:teams) and
+			mes.moveEvent.id in ( (select me.id from MoveEvent me where me.project = :project) )"""
+		MoveEventStaff.executeUpdate(mesQuery, [project:project, person:person, teams:teamCodes])
+
+		// Remove Team assignments for the individual against the project 
+		String prQuery = """DELETE from PartyRelationship pr where
+			pr.partyRelationshipType = 'PROJ_STAFF' and
+			pr.roleTypeCodeFrom.id='PROJECT' and
+			pr.partyIdFrom=:project and
+			pr.partyIdTo=:person"""
+		int count = PartyRelationship.executeUpdate(prQuery, [project:project, person:person]) 
+
+		return count
+	}
+
+	/**
 	 * Used to retrieve one or more team member PartyRelationship references to a project
 	 * @param project - the project to search for members
 	 * @param teamRoleType - The team Role Type code

@@ -104,7 +104,13 @@ class StringUtilTests extends Specification {
 
 		then: 'Should return empty list when null value is passed'
 			SU.splitter(null).size() == 0
-			
+
+		when: 			
+			def result = SU.splitter('   ')
+		then: 'Should return empty list when a string of spaces is passed'
+			(result instanceof List)
+			result.size() == 0
+
 		when:
 			String str = 'this string should not be split'
 			List singleItem = SU.splitter(str)

@@ -718,10 +718,12 @@ class PartyRelationshipService {
 	
 	/**
 	 * Used to get list of functions that a Staff member has been assigned to on a Project
-	 * @param Integer staffId - staff person id
-	 * @param Integer projectId - project id that the staff may be associate with
-	 * @return array of role codes
+	 * @param project - the project Object or ID of the project to search against
+	 * @param staff - the staff person object or ID of the person to search for 
+	 * @param includeStaffRecord - flag to determine if 'STAFF' records should be included (default true)
+	 * @return list of RoleTypes a person is assigned to for a project
 	 */
+/*
 	def getProjectStaffFunctions(def projectId, def staffId) {
 		
 		def projectRoles = PartyRelationship.findAll("from PartyRelationship p \
@@ -734,6 +736,26 @@ class PartyRelationshipService {
 		
 		// log.info "getProjectStaffFunction(projectId:$projectId, staffId:$staffId) - $functions"
 		return functions
+	}
+*/
+	List<RoleType> getProjectStaffFunctions(project, staff, boolean includeStaffRecord=true) {
+		project = StringUtil.toLongIfString(project)
+		staff = StringUtil.toLongIfString(staff)
+		boolean projectById = (project instanceof Long)
+		boolean staffById = (staff instanceof Long)
+
+		StringBuffer query = new StringBuffer("select roleTypeCodeTo from PartyRelationship p \
+			where p.partyRelationshipType='PROJ_STAFF' \
+			and p.roleTypeCodeFrom.id='PROJECT' \
+			and p.partyIdFrom${(projectById ? '.id' : '')} = :project \
+			and p.partyIdTo${(projectById ? '.id' : '')} = :staff ")
+		if (includeStaffRecord) {
+			query.append(" and p.roleTypeCodeTo.id <> 'STAFF'")
+		}
+
+		def teams = PartyRelationship.executeQuery(query.toString(), [project:project, staff:staff] )
+
+		return teams
 	}
 	
 	/**
@@ -913,14 +935,13 @@ class PartyRelationshipService {
 
 		// Now get the list of Teams that the person is assigned to and determine if we need to assign them to any new ones
 		if (teamCodes) {
-			List existingTeamsRoleType = getCompanyStaffFunctions(person.company.id, person.id)
+			def personCompany = person.company 	// lazy loading
+			List existingTeamsRoleType = getCompanyStaffFunctions(personCompany.id, person.id)
 			List existingTeamCodes = existingTeamsRoleType*.id
 
 			List teamsToAssign = teamCodes - existingTeamCodes
 			if (teamsToAssign) {
 				log.debug "updateAssignedTeams() for $person - adding team assignments $teamsToAssign"
-				Party company = person.company
-
 				PartyRelationshipType coStaffPRType = PartyRelationshipType.read('STAFF')
 				RoleType coRoleType = RoleType.read('COMPANY')
 
@@ -929,7 +950,7 @@ class PartyRelationshipService {
 					pr.partyRelationshipType = coStaffPRType
 					pr.roleTypeCodeFrom = coRoleType
 					pr.roleTypeCodeTo = RoleType.read(teamCode)
-					pr.partyIdFrom = company
+					pr.partyIdFrom = personCompany
 					pr.partyIdTo = person
 					pr.save(failOnError:true)
 				}

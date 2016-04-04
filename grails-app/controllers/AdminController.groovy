@@ -1216,7 +1216,7 @@ class AdminController {
 			return
 		}
 		try {
-			Map options = importParamsToOptionsMap(params)
+			Map options = accountImportExportService.importParamsToOptionsMap(params)
 			List accounts = accountImportExportService.loadAndValidateSpreadsheet(user, project, params.filename, options)
 			ServiceResults.respondAsJson(response, accounts )
 		} catch(e) {
@@ -1225,49 +1225,6 @@ class AdminController {
 			ServiceResults.respondWithError(response,
 				[ "An error occurred while attempting to import accounts", e.getMessage()]  )
 		}
-
-	}
-
-	/**
-	 * Used to load the request parameters from params into a Map that has been validated and formatted
-	 * @param params - the request parameters
-	 * @return the map of the parameters
-	 */
-	private Map importParamsToOptionsMap(params) {
-		Map options = [
-			createUserLogin: (params.createUserlogin == 'Y'),
-			activateLogin: (params.activateLogin == 'Y'),
-			randomPassword: (params.randomPassword == 'Y'),
-			forcePasswordChange: (params.forcePasswordChange == 'Y'),
-			commonPassword: params.password,
-			userRoles: StringUtil.splitter(params.role, ',', [' ', ';', '|'])
-		]
-		if (params.filename) {
-			filename: params.filename
-		}
-
-		return options
-	}
-
-	/**
-	 * Used to reverse the options Map back into something that can be used as params for a page request
-	 * @param options - the map created by the importParamsToOptionsMap method
-	 * @param a map that can be used with requests
-	 */
-	private Map importOptionsAsParams(Map options) {
-		Map params = [
-			createUserLogin: (options.createUserLogin ? 'Y' : 'N'),
-			activateLogin: (options.activateLogin ? 'Y' : 'N'),
-			randomPassword: (options.randomPassword ? 'Y' : 'N'),
-			forcePasswordChange: (options.forcePasswordChange ? 'Y' : 'N'),
-			commonPassword: options.commonPassword,
-			userRoles: options.userRoles.join(',')
-		]
-		if (options.filename) {
-			params.filename = options.filename
-		}
-
-		return params
 	}
 
 	/**
@@ -1310,7 +1267,6 @@ class AdminController {
 					}
 
 					model << accountImportExportService.importAccount_Step1_Upload(user, project, request, fileParamName)
-//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
 					// Redirect the user to the Review step
 					forward( action:formAction, params: [stepAlt:'review', filename:model.filename] )
 					return
@@ -1319,15 +1275,15 @@ class AdminController {
 				case 'review':
 					// This step will serve up the review template that in turn fetch the review data 
 					// via an Ajax request.
-					options = importParamsToOptionsMap(params)
+					options = accountImportExportService.importParamsToOptionsMap(params)
 					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params.filename)
 					if (!options.filename && model.filename) {
-	log.debug "importAccounts() step=$step set filename=${model.filename}"
+						// log.debug "importAccounts() step=$step set filename=${model.filename}"
 						options.filename = model.filename
 					}
-					model.optionsAsParams = importOptionsAsParams(options)
+					model.optionsAsParams = accountImportExportService.importOptionsAsParams(options)
 
-//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
+					//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
 
 					view = "${formAction}Review"
 					break
@@ -1336,20 +1292,26 @@ class AdminController {
 					// This is the daddy of the steps in that it is going to post the changes back to the 
 					// database either creating or updating Person and/or UserLogin records.
 
-					String filename = params.filename
-					options = importParamsToOptionsMap(params)
+					// String filename = params.filename
+					options = accountImportExportService.importParamsToOptionsMap(params)
 
-					int expireDays = 90
-					if (params.expireDays) {
-						expireDays = NumberUtils.toPositiveLong(params.expireDays, -1)
-						if (expireDays == -1) {
-							throw new InvalidParamException("The expiry days value must be a positive number")
-						}
+					List optionErrors = accountImportExportService.validateImportOptions(options)
+					if (optionErrors) {
+						throw new InvalidParamException(optionErrors.toString())
 					}
 
+					// Here's the money maker call that will update existing accounts and create new ones accordingly
+					Map results = accountImportExportService.importAccount_Step3_PostChanges(user, project, options)
+
+
+					render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
+
+					return
+// n: No signature of method: AccountImportExportService.importAccount_Step3_PostResults() is applicable for argument types: (UserLogin, Project, net.bull.javamelody.JspWrapper$HttpRequestWrapper3, java.util.LinkedHashMap) values: [jmartin, MarketingDemo : MarketingDemo, ...]
 					break
 
-/*
+
+/*	
 
 					boolean header = params.header == 'Y'
 					view = "${formAction}Results"
@@ -1460,6 +1422,8 @@ class AdminController {
 							}
 						}
 
+// -----------------						
+
 						def userRole = role
 						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
 							userRole = p.role
@@ -1551,6 +1515,10 @@ class AdminController {
 
 			}
 
+		} catch (DomainUpdateException e) {
+			flash.message = e.getMessage()
+		} catch (InvalidParamException e) {
+			flash.message = e.getMessage()
 		} catch (EmptyResultException e) {
 			flash.message = e.getMessage()
 		} catch (e) {
