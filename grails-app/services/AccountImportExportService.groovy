@@ -2,6 +2,7 @@
  * AccountImportExportService - A set of service methods the importing and exporting of project staff and users
  */
 
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
@@ -14,6 +15,8 @@ import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 import org.apache.commons.lang.StringUtils
 import grails.transaction.*
+import groovy.json.*
+
 //import org.apache.commons.validator.routines.EmailValidator
 
 class AccountImportExportService {
@@ -34,6 +37,7 @@ class AccountImportExportService {
 	static final ACCOUNT_EXPORT_TEMPLATE = '/templates/AccountsImportExport.xls'
 	static final EXPORT_FILENAME_PREFIX = 'AccountExport'
 	static final TEMPLATE_TAB_NAME = 'Accounts'
+	static final ORIGIN_SUFFIX = '_'
 
 	/*
 	 * The following map is used to drive the Import and Export tables and forms. The properties consist of:
@@ -46,19 +50,19 @@ class AccountImportExportService {
 	 */
 	static final Map accountSpreadsheetColumnMap = [
 		personId      : [ssPos:1,  formPos:1,  type:'I', width:50,  locked:true,  label:'ID'],
-		firstName     : [ssPos:2,  formPos:2,  type:'P', width:90,  locked:true,  label:'First Name'],
-		middleName    : [ssPos:3,  formPos:3,  type:'P', width:90,  locked:true,  label:'Middle Name'],
-		lastName      : [ssPos:4,  formPos:4,  type:'P', width:90,  locked:true,  label:'Last Name'],
+		firstName     : [ssPos:2,  formPos:2,  type:'P', width:90,  locked:true,  label:'First Name', template:"\"#= showChanges(data, 'firstName') #\""],
+		middleName    : [ssPos:3,  formPos:3,  type:'P', width:90,  locked:true,  label:'Middle Name', template:"\"#= showChanges(data, 'middleName') #\""],
+		lastName      : [ssPos:4,  formPos:4,  type:'P', width:90,  locked:true,  label:'Last Name', template:"\"#= showChanges(data, 'lastName') #\""],
 		company       : [ssPos:5,  formPos:5,  type:'T', width:90,  locked:true,  label:'Company'],
-		errors        : [ssPos:0,  formPos:6,  type:'T', width:200, locked:false, label:'Errors', xtemplate:'kendo-errors-template'],
-		workPhone     : [ssPos:6,  formPos:7,  type:'P', width:100, locked:false, label:'Work Phone'],
-		mobilePhone   : [ssPos:7,  formPos:8,  type:'P', width:100, locked:false, label:'Mobile Phone'],
-		email         : [ssPos:8,  formPos:9,  type:'P', width:100, locked:false, label:'Email'],
-		title         : [ssPos:9,  formPos:10, type:'P', width:100, locked:false, label:'Title'],
-		department    : [ssPos:10, formPos:11, type:'P', width:100, locked:false, label:'Department'],
-		location      : [ssPos:11, formPos:12, type:'P', width:100, locked:false, label:'Location/City'],
-		stateProv     : [ssPos:12, formPos:13, type:'P', width:100, locked:false, label:'State/Prov'],
-		country       : [ssPos:13, formPos:14, type:'P', width:100, locked:false, label:'Country'],
+		errors        : [ssPos:0,  formPos:6,  type:'T', width:240, locked:false, label:'Errors', template: "kendo.template(\$('#error-template').html())" ],
+		workPhone     : [ssPos:6,  formPos:7,  type:'P', width:100, locked:false, label:'Work Phone', template:"\"#= showChanges(data, 'workPhone') #\""],
+		mobilePhone   : [ssPos:7,  formPos:8,  type:'P', width:100, locked:false, label:'Mobile Phone', template:"\"#= showChanges(data, 'mobilePhone') #\""],
+		email         : [ssPos:8,  formPos:9,  type:'P', width:100, locked:false, label:'Email', template:"\"#= showChanges(data, 'email') #\""],
+		title         : [ssPos:9,  formPos:10, type:'P', width:100, locked:false, label:'Title', template:"\"#= showChanges(data, 'title') #\""],
+		department    : [ssPos:10, formPos:11, type:'P', width:100, locked:false, label:'Department', template:"\"#= showChanges(data, 'department') #\""],
+		location      : [ssPos:11, formPos:12, type:'P', width:100, locked:false, label:'Location/City', template:"\"#= showChanges(data, 'location') #\""],
+		stateProv     : [ssPos:12, formPos:13, type:'P', width:100, locked:false, label:'State/Prov', template:"\"#= showChanges(data, 'stateProv') #\""],
+		country       : [ssPos:13, formPos:14, type:'P', width:100, locked:false, label:'Country', template:"\"#= showChanges(data, 'country') #\""],
 		personTeams   : [ssPos:14, formPos:15, type:'T', width:150, locked:false, label:'Person Team(s)'],
 		projectTeams  : [ssPos:15, formPos:15, type:'T', width:150, locked:false, label:'Project Team(s)'],
 		roles         : [ssPos:16, formPos:17, type:'T', width:100, locked:false, label:'Security Role(s)'],
@@ -91,7 +95,7 @@ class AccountImportExportService {
 		List accounts = readAccountsFromSpreadsheet(spreadsheet)
 
 		// Validate the sheet
-		validateUploadedAccounts(accounts, project, options)
+		accounts = validateUploadedAccounts(accounts, project, options)
 
 		return accounts
 	}
@@ -150,10 +154,21 @@ class AccountImportExportService {
 	 */
 	Map importAccount_Step2_Review(UserLogin byWhom, Project project, Object request, String filename) {
 		Map model = [:]
+
 		model.filename = filename
 		model.labels = getLabelsInColumnOrder('formPos')
 		model.properties = getPropertiesInColumnOrder('formPos')
 		model.gridMap = accountSpreadsheetColumnMap
+		model.originalSuffix = ORIGIN_SUFFIX
+
+		/*
+		// This was an experiment to see if we could inject the data into the page -- failure
+		Map options = [filename: filename]
+		List accounts = loadAndValidateSpreadsheet(byWhom, project, filename, options)
+		// Remove properties that shouldn't be sent over in the JSON
+		accounts.remove('person')
+		model.accountsAsJSON =  new JsonBuilder( accounts ).toPrettyString()
+		*/
 
 		return model
 	}
@@ -200,7 +215,9 @@ class AccountImportExportService {
 			}
 			
 			// Create / Update the persons
-			def (person, error, changed) = addOrUpdatePerson(user, accounts[i], options)
+			def (person, account, error, changed) = addOrUpdatePerson(user, accounts[i], options)
+			accounts[i] = account
+
 			log.debug "importAccount_Step3_PostChanges() call to addOrUpdatePerson() returned person=$person, error=$error, changed=$changed"
 			if (error) {
 				accounts[i].postErrors << error
@@ -250,6 +267,7 @@ class AccountImportExportService {
 	 * @param options - the map of the options
 	 * @return a list containing:
 	 *    Person - the person created or updated
+	 *    Map - the map of the account
 	 *    String - an error message if the save or update failed
 	 *    boolean - a flag indicating if the account was changed (true) or unchanged (false)
 	 */
@@ -265,16 +283,7 @@ class AccountImportExportService {
 		}
 
 		// Update the person with the values passed in
-		accountSpreadsheetColumnMap.each {prop, info ->
-			if (info.type == 'P' && prop != 'personId') {
-				if ((person[prop] == null && account[prop]) ||
-					(person[prop] != account[prop] ) )
-				{
-					person[prop] = account[prop]
-				}
-				
-			}
-		}
+		account = applyChangesToPerson(person, account)
 
 		List dirtyProps = person.dirtyPropertyNames
 		log.debug "addOrUpdatePerson() ${person} account.isNewAccount=${account.isNewAccount}, dirtyProps=$dirtyProps"
@@ -299,7 +308,7 @@ class AccountImportExportService {
 			}
 		}
 
-		return [person, error, changed]
+		return [person, account, error, changed]
 	}
 
 	/**
@@ -1069,19 +1078,14 @@ class AccountImportExportService {
 
 			// Load a temporary Person domain object with the properties from the spreadsheet and see if any
 			// of the valids will break the validation constraints
-			Person validatePerson = new Person()
-			accountSpreadsheetColumnMap.each {prop, info ->
-				if (info.type == 'P') {
-					validatePerson[prop] = accounts[i][prop]
-				}
-			}
+			Person validatePerson = (personToUse ? personToUse : new Person())
+			accounts[i] = applyChangesToPerson(validatePerson, accounts[i])
 			if (! validatePerson.validate()) {
 				validatePerson.errors.allErrors.each {
 					accounts[i].errors << "${it.getField()} error ${it.getCode()}"
 				}
 			}
 			validatePerson.discard()
-
 
 			// Validate the Teams
 			['person', 'project'].each { tp ->
@@ -1121,18 +1125,42 @@ class AccountImportExportService {
 			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
 
 			// Set the icon to be displayed base on what is being done
+			// TODO : JPM 4/2016 : Should NOT be hard coding the filename references to the images
 			if (accounts[i].errors) {
-				accounts[i].icon = '/tdstm/icons/exclamation.png'
+				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'exclamation.png', absolute: false])
 			} else if (accounts[i].isNewAccount) {
-				accounts[i].icon = '/tdstm/icons/add.png'				
+				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'add.png', absolute: false])
 			} else {
-				accounts[i].icon = '/tdstm/icons/pencil.png'
+				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'pencil.png', absolute: false])
 			}
 
 		}
 
 		return accounts
 	}	
+
+	/**
+	 * Used to load any property a person object where the values are different
+	 * @param person - the person object to be changed
+	 * @param account - the Map containing all of the changes
+	 * @return 
+	 */
+	private Map applyChangesToPerson(Person person, Map account) {
+		boolean existing = person.id
+		accountSpreadsheetColumnMap.each {prop, info ->
+			if (info.type == 'P' && prop != 'personId') {
+				if (existing && (person[prop] == null && account[prop]) ||
+					(person[prop] != account[prop] ) )
+				{
+					// Save the original value so it can be displayed later
+					account["${prop}$ORIGIN_SUFFIX"] = person[prop]
+					person[prop] = account[prop]
+				}
+				
+			}
+		}
+		return account
+	}
 
 	/**
 	 * Used to read the Account Import Spreadsheet and load up a list of account+user properties. This will 

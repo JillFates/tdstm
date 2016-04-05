@@ -1218,7 +1218,21 @@ class AdminController {
 		try {
 			Map options = accountImportExportService.importParamsToOptionsMap(params)
 			List accounts = accountImportExportService.loadAndValidateSpreadsheet(user, project, params.filename, options)
+
+			// Remove properties that shouldn't be sent over in the JSON and change the error list to a 
+			// delimited (|) string so that we can split it in the Kendo grid afterward
+			for(int i=0; i < accounts.size(); i++) {
+				['person', 'companyObj'].each {prop ->
+					if (accounts[i][prop]) {
+						accounts[i][prop].discard()
+					}
+					accounts[i].remove(prop)
+				}
+				accounts[i].errors = (accounts[i].errors ? accounts[i].errors.join('|') : '')
+			}
+			
 			ServiceResults.respondAsJson(response, accounts )
+
 		} catch(e) {
 			log.error "Exception occurred while importing data: " + e.printStackTrace()
 
@@ -1282,6 +1296,7 @@ class AdminController {
 						options.filename = model.filename
 					}
 					model.optionsAsParams = accountImportExportService.importOptionsAsParams(options)
+					//model.accountsAsJSON = model.accounts
 
 					//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
 

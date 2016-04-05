@@ -11,18 +11,12 @@
 
 	<g:javascript src="bootstrap.js" />
 
-	<%--
-	<style type="text/css">
-		.wrapper .post {
-			-moz-border-radius:7px 7px 7px 7px;
-			border:1px solid silver;
-			float:left;
-			margin:10px;
-			min-height:100px;
-			padding:5px;
-			width:200px;
-		}
-	</style>
+	<%-- 
+		TODO : JPM 4/2016 : Add logic to resize the table to adjust for the size of the browser
+		See http://jsfiddle.net/dimodi/4eNu4/2/ as an example
+
+		TODO : JPM 4/2016 : Apply row level template to grey out the rows that are not going to be changing
+		See http://jsfiddle.net/FcWBQ/
 	--%>
 
 	<style type="text/css">
@@ -37,7 +31,7 @@
 
 </head>
 <body>
-<div class="body import-review">
+<div class="body account-import-review">
 	<h1>Import Accounts - Step 2 &gt; Review Accounts</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
@@ -45,17 +39,37 @@
 
 	<div id="grid" style="margin:1em; width=1000px;"></div>
 
-	<script type="text/x-kendo-tmpl" id="kendo-errors-template">
-		#if (errors.size()) > 0 {#
-		<div class="">
-			<ul>
-				#var errorList = JSON.parse(errors);#
-				#for (var i=0,len=errorList.length; i<len; i++) {#
-					<li>${'$'}{ errorList[i] }</li>
-				#}#
-			</ul>
-		</div>
+	<script>
+		// Used to render the changes made in a view
+		function showChanges(model, propertyName) {
+			var origPropName = propertyName + '${originalSuffix}';
+
+			// if (model[origPropName]) {
+			if (model.hasOwnProperty(origPropName)) {
+				return '<span class="change">' + model[propertyName] + 
+					'</span>' + 
+					(model[origPropName] ? '<br><span class="current">' + model[origPropName] + '</span>' : '');
+			} else {
+				return model[propertyName];
+			}
+		}
+
+		// alert(errorsTemplate({personId: 123, age:50}));
+	</script>
+
+	<script type="text/x-kendo-tmpl" id="error-template">
+		#if (errors) {#
+			<div class="">
+				<ul>
+					#var errorList = errors.split('|');#
+					#for (var i=0,len=errorList.length; i<len; i++) {#
+						<li>${'$'}{ errorList[i] }</li>
+					#}#
+				</ul>
+			</div>
 		#}#
+
+
 	</script>
 
 	<script>
@@ -123,7 +137,7 @@
 						field: "${propName}",
 						title: "${gridOpt.label}",
 						locked: ${gridOpt.locked},
-						<g:if test="${gridOpt.template}">template: kendo.template($('#${gridOpt.template}').html()),</g:if>
+						<g:if test="${gridOpt.template}">template: ${gridOpt.template},</g:if>
 						lockable: false,
 						width: ${gridOpt.width}
 					}
