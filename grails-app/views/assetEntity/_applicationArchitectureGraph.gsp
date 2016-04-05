@@ -35,7 +35,7 @@ var canvas = d3.select("div#svgContainerId")
 	.append("svg:svg")
 	.attr('class', 'chart')
 	.attr('id', 'graphSvgId');
-	
+
 // define the arrowhead markers used for marking dependencies
 var defs = canvas.append("defs");
 defs.html(appSVGShapes.getAll());
@@ -543,11 +543,10 @@ function offsetRows () {
 
 // Build the layout model
 function buildMap (width, height) {
-	
 	// Use the new parameters, or the defaults if not specified
 	var width 	 = 	( width 	? width 	: defaults['width'] 	);
 	var height 	 = 	( height 	? height 	: defaults['height'] 	);
-	
+
 	widthCurrent = width;
 	heightCurrent = height;
 	
@@ -562,7 +561,7 @@ function buildMap (width, height) {
 	// construct a map of nodes by their y values
 	nodeMap = null;
 	nodeMap = getNodeMap();
-	
+
 	// sets the x value for each node
 	setXValues();
 	offsetY = 0 - (verticalSpace / 2);
@@ -585,20 +584,20 @@ function buildMap (width, height) {
 	
 	// constructs the svg DOM and defines the event listeners for them
 	function constructSvg () {
-		
-		var zoom = d3.behavior.zoom()
-			.on("zoom", zooming);
-			
-		canvas.call(zoom);
+
+		zoomBehavior = d3.behavior.zoom().on("zoom", zooming);
+
+		canvas.call(zoomBehavior);
 		
 		offsetGroup = canvas
 			.append('svg:g')
 				.on("dblclick.zoom", null)
 				.style('width', 'auto')
-				.style('height', 'auto');
+				.style('height', 'auto')
+				.attr('id', 'graphPanel');
 		
 		vis = offsetGroup.append('svg:g');
-		
+
 		background = vis
 			.append('svg:rect')
 				.attr('width', width)
@@ -683,16 +682,13 @@ function buildMap (width, height) {
 		// Resets the scale and position of the map. Called when the user double clicks on the background
 		function resetView () {
 			if (d3.event && (!d3.event.srcElement || d3.event.srcElement.nodeName != 'use')) {
-				zoom.scale(1);
-				zoom.translate([0,0]);
+				zoomBehavior.scale(1);
+				centerGraph();
 				if (d3.event.translate && d3.event.scale)
 					vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')');
-				else
-					vis.attr('transform','translate(' + [0, 0] + ')' + ' scale(' + 1 + ')');
 			} else if (!d3.event) {
-				zoom.scale(1);
-				zoom.translate([0,0]);
-				vis.attr('transform','translate(' + [0, 0] + ')' + ' scale(' + 1 + ')');
+				zoomBehavior.scale(1);
+				centerGraph();
 			}
 		}
 		
@@ -710,7 +706,7 @@ function buildMap (width, height) {
 			.style('cursor', 'default !important')
 			.on("dblclick", resetView)
 			.on("dblclick.zoom", null);
-		
+
 		// Create the force layout
 		GraphUtil.force
 			.gravity(0)
@@ -721,7 +717,7 @@ function buildMap (width, height) {
 			.size([width, height])
 			.theta(0)
 			.start();
-		
+
 		// Add the links the the SVG
 		GraphUtil.linkBindings = vis.selectAll("line.link")
 			.data(links).enter()
@@ -819,7 +815,7 @@ function buildMap (width, height) {
 		offsetX = (width / 2) - assets[0].qx - horizontalSpace;
 		updateXYValues();
 		GraphUtil.force.start();
-		
+
 		// Trigger action when the contexmenu is about to be shown
 		$(document).bind("contextmenu", function (event) {
 			if (event.shiftKey)
@@ -1469,11 +1465,12 @@ function buildMap (width, height) {
 	
 	// Tick function called at every "tick" of the d3 simulation
 	function tick(e) {
-		
+		centerGraph();
 		// move the nodes towards their intended positions
 		var k = e.alpha
 		var movementCutoff = 0.2;
 		var movement = false;
+
 		assets.forEach(function(o, i) {
 			if (!o.fix) {
 				if (Math.abs(o.qx - o.x) > movementCutoff || Math.abs(o.qy - o.y) > movementCutoff)
@@ -1545,8 +1542,32 @@ function buildMap (width, height) {
 		setLabelOffsets(nodeMap);
 		
 		// if all the nodes have settled then stop ticking
-		if (!movement)
+		if (!movement) {
 			GraphUtil.force.alpha(0);
+		}
+	}
+
+	/**
+	 * It always center the Graph in the center of the page
+	 * it takes the zoom behavior that was created in the init
+	 */
+	function centerGraph() {
+		// First let-s calculate the last Graph Size
+		var horizontalSpace = $("#graphSvgId").width() / 2;
+		var verticalSpace = $("#graphSvgId").height() / 2;
+
+		// Then if everything goes fine, the panel that old the graph itself has the last size
+		if($("#graphPanel")[0]){
+			var horizontalGraphSpace = $("#graphPanel")[0].getBBox().width / 2;
+			var verticalGraphSpace = $("#graphPanel")[0].getBBox().height / 2;
+
+			var centerX = (horizontalSpace - horizontalGraphSpace) + 200;
+			var centerY = (verticalSpace - verticalGraphSpace);
+
+			zoomBehavior.translate([centerX, -centerY]);
+			vis.attr('transform','translate(' + [centerX, -centerY] + ')' + ' scale(' + 1 + ')');
+
+		}
 	}
 	
 	// Gets the node at svg position x in the specified row
@@ -1628,7 +1649,7 @@ function buildMap (width, height) {
 	
 	// sorts the order of children for every node and calculates the row/col for each node
 	function groupNodes () {
-		
+
 		swapDirections();
 		
 		calculateExEnds();
