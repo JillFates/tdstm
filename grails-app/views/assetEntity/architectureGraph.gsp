@@ -329,10 +329,7 @@
 		element.select2( {
 			minimumInputLength: 0,
 			width: assetSelectWidth,
-			/*initSelection: function (element, callback) {
-				var data = { id: '${(graphPrefs.assetClasses) ?: defaultPrefs.assetClasses}'};
-				callback(data);
-			},*/
+			
 			placeholder: "Filter: All Classes",
 			data: data
 		} );
