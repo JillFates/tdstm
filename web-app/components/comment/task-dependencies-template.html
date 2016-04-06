@@ -2,11 +2,9 @@
 <tr ng-repeat="dependency in ngModel">
     <td>
         <select kendo-drop-down-list ng-model="dependency.category" k-options="categoryOptions" k-on-change="updateDependencyList(dependency)"></select>
-        <!-- ng-model="dependency.category" ng-change="updateDependencyList(dependency, true)" ng-options="c.id as c.name for c in categories">-->
     </td>
     <td>
         <select class="dependencies-subset-dropdown" kendo-drop-down-list="dependency.dropdown" ng-model="dependency.taskId" k-options="taskOptionsDS(dependency, false)"></select>
-        <!--ui-select ng-model="dependency.taskId"></ui-select-->
     </td>
     <td>
         <a ng-click="deleteRow($index)" style="text-decoration:none;pointer:hover" title="Delete"><span class="clear_filter">&times;</span></a>
