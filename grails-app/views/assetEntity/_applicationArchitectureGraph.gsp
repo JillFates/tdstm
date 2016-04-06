@@ -1561,7 +1561,7 @@ function buildMap (width, height) {
 			var horizontalGraphSpace = $("#graphPanel")[0].getBBox().width / 2;
 			var verticalGraphSpace = $("#graphPanel")[0].getBBox().height / 2;
 
-			var centerX = (horizontalSpace - horizontalGraphSpace) + 200;
+			var centerX = (horizontalSpace - horizontalGraphSpace);
 			var centerY = (verticalSpace - verticalGraphSpace);
 
 			zoomBehavior.translate([centerX, -centerY]);
