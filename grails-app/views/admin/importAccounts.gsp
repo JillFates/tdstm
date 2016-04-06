@@ -17,7 +17,7 @@
 		});
 	</script>
 	<div class="body">
-		<h1>Import Accounts </h1>
+		<h1>Import Accounts - Step 1 &gt; Upload Import File</h1>
 		<g:if test="${flash.message}">
 			<div class="message">${flash.message}</div>
 		</g:if>
@@ -25,10 +25,10 @@
 		<div>
 			<br />
 			<div class="panel panel-default account-import-step1">
-				<div class="panel-heading"><label class="stepNum">Step 1 </label> &gt; Upload Import File</div>
+				<div class="panel-heading">This form is used to import and manage staff and user login accounts for the current project.</div>
 				<div class="panel-body">
 					<p>
-						This form is used to import and manage staff and user login accounts for the current project. To begin you
+						To begin you
 						should download a blank spreadsheet template (link below) or use the <i>Export Accounts</i> menu option to
 					manage existing accounts. Upon making changes in the spreadsheet you can upload the file and step through the
 					verification process and post your changes to the application.
