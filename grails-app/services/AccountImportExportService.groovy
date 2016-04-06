@@ -37,7 +37,18 @@ class AccountImportExportService {
 	static final ACCOUNT_EXPORT_TEMPLATE = '/templates/AccountsImportExport.xls'
 	static final EXPORT_FILENAME_PREFIX = 'AccountExport'
 	static final TEMPLATE_TAB_NAME = 'Accounts'
-	static final ORIGIN_SUFFIX = '_'
+
+	// Used to indicate the alternate property name with the original and defaulted values
+	// that are stored in the account map (e.g. firstName, firstName_o and firstName_d)
+	static final ORIGINAL_SUFFIX = '_o'
+	static final DEFAULTED_SUFFIX = '_d'
+
+	static final IMPORT_OPTION_BOTH='B'
+	static final IMPORT_OPTION_PERSON='P'
+	static final IMPORT_OPTION_USERLOGIN='U'
+
+	// Users can split Teams and Security roles on the follow characters as well as the default comma (,)
+	static final List DELIM_OPTIONS = [';',':','|'] 
 
 	/*
 	 * The following map is used to drive the Import and Export tables and forms. The properties consist of:
@@ -49,34 +60,34 @@ class AccountImportExportService {
 	 *    label: 	the column heading label in the grid and export spreadsheet
 	 */
 	static final Map accountSpreadsheetColumnMap = [
-		personId      : [ssPos:1,  formPos:1,  type:'I', width:50,  locked:true,  label:'ID'],
-		firstName     : [ssPos:2,  formPos:2,  type:'P', width:90,  locked:true,  label:'First Name', template:"\"#= showChanges(data, 'firstName') #\""],
-		middleName    : [ssPos:3,  formPos:3,  type:'P', width:90,  locked:true,  label:'Middle Name', template:"\"#= showChanges(data, 'middleName') #\""],
-		lastName      : [ssPos:4,  formPos:4,  type:'P', width:90,  locked:true,  label:'Last Name', template:"\"#= showChanges(data, 'lastName') #\""],
-		company       : [ssPos:5,  formPos:5,  type:'T', width:90,  locked:true,  label:'Company'],
-		errors        : [ssPos:0,  formPos:6,  type:'T', width:240, locked:false, label:'Errors', template: "kendo.template(\$('#error-template').html())" ],
-		workPhone     : [ssPos:6,  formPos:7,  type:'P', width:100, locked:false, label:'Work Phone', template:"\"#= showChanges(data, 'workPhone') #\""],
-		mobilePhone   : [ssPos:7,  formPos:8,  type:'P', width:100, locked:false, label:'Mobile Phone', template:"\"#= showChanges(data, 'mobilePhone') #\""],
-		email         : [ssPos:8,  formPos:9,  type:'P', width:100, locked:false, label:'Email', template:"\"#= showChanges(data, 'email') #\""],
-		title         : [ssPos:9,  formPos:10, type:'P', width:100, locked:false, label:'Title', template:"\"#= showChanges(data, 'title') #\""],
-		department    : [ssPos:10, formPos:11, type:'P', width:100, locked:false, label:'Department', template:"\"#= showChanges(data, 'department') #\""],
-		location      : [ssPos:11, formPos:12, type:'P', width:100, locked:false, label:'Location/City', template:"\"#= showChanges(data, 'location') #\""],
-		stateProv     : [ssPos:12, formPos:13, type:'P', width:100, locked:false, label:'State/Prov', template:"\"#= showChanges(data, 'stateProv') #\""],
-		country       : [ssPos:13, formPos:14, type:'P', width:100, locked:false, label:'Country', template:"\"#= showChanges(data, 'country') #\""],
-		personTeams   : [ssPos:14, formPos:15, type:'T', width:150, locked:false, label:'Person Team(s)'],
-		projectTeams  : [ssPos:15, formPos:15, type:'T', width:150, locked:false, label:'Project Team(s)'],
-		roles         : [ssPos:16, formPos:17, type:'T', width:100, locked:false, label:'Security Role(s)'],
-		username      : [ssPos:17, formPos:18, type:'U', width:120, locked:false, label:'Username'],
-		accountLocal  : [ssPos:18, formPos:19, type:'U', width:100, locked:false, label:'Local Account?'],
-		loginActive   : [ssPos:19, formPos:20, type:'U', width:100, locked:false, label:'Login Active?'],
-		accountExp    : [ssPos:20, formPos:21, type:'U', width:100, locked:false, label:'Account Expiration'],
-		passwordExp   : [ssPos:21, formPos:22, type:'U', width:100, locked:false, label:'Password Expiration'],
-		passwordFixed : [ssPos:22, formPos:23, type:'U', width:100, locked:false, label:'Pswd Never Expires?'],
-		match         : [ssPos:0,  formPos:24, type:'T', width:100, locked:false, label:'Matched On']
+		personId      : [type:'number', ssPos:1,  formPos:1,  domain:'I', width:50,  locked:true,  label:'ID'],
+		firstName     : [type:'string', ssPos:2,  formPos:2,  domain:'P', width:90,  locked:true,  label:'First Name', template:"\"#= showChanges(data, 'firstName') #\""],
+		middleName    : [type:'string', ssPos:3,  formPos:3,  domain:'P', width:90,  locked:true,  label:'Middle Name', template:"\"#= showChanges(data, 'middleName') #\""],
+		lastName      : [type:'string', ssPos:4,  formPos:4,  domain:'P', width:90,  locked:true,  label:'Last Name', template:"\"#= showChanges(data, 'lastName') #\""],
+		company       : [type:'string', ssPos:5,  formPos:5,  domain:'T', width:90,  locked:true,  label:'Company', template:"\"#= showChanges(data, 'company') #\""],
+		errors        : [type:'list',   ssPos:0,  formPos:6,  domain:'T', width:240, locked:false, label:'Errors', template: "kendo.template(\$('#error-template').html())" ],
+		workPhone     : [type:'string', ssPos:6,  formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', template:"\"#= showChanges(data, 'workPhone') #\""],
+		mobilePhone   : [type:'string', ssPos:7,  formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', template:"\"#= showChanges(data, 'mobilePhone') #\""],
+		email         : [type:'string', ssPos:8,  formPos:9,  domain:'P', width:100, locked:false, label:'Email', template:"\"#= showChanges(data, 'email') #\""],
+		title         : [type:'string', ssPos:9,  formPos:10, domain:'P', width:100, locked:false, label:'Title', template:"\"#= showChanges(data, 'title') #\""],
+		department    : [type:'string', ssPos:10, formPos:11, domain:'P', width:100, locked:false, label:'Department', template:"\"#= showChanges(data, 'department') #\""],
+		location      : [type:'string', ssPos:11, formPos:12, domain:'P', width:100, locked:false, label:'Location/City', template:"\"#= showChanges(data, 'location') #\""],
+		stateProv     : [type:'string', ssPos:12, formPos:13, domain:'P', width:100, locked:false, label:'State/Prov', template:"\"#= showChanges(data, 'stateProv') #\""],
+		country       : [type:'string', ssPos:13, formPos:14, domain:'P', width:100, locked:false, label:'Country', template:"\"#= showChanges(data, 'country') #\""],
+		personTeams   : [type:'list',   ssPos:14, formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)'],
+		projectTeams  : [type:'list',   ssPos:15, formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)'],
+		roles         : [type:'list',   ssPos:16, formPos:17, domain:'T', width:100, locked:false, label:'Security Role(s)', template:"\"#= showChanges(data, 'roles') #\""],
+		username      : [type:'string', ssPos:17, formPos:18, domain:'U', width:120, locked:false, label:'Username'],
+		accountLocal  : [type:'string', ssPos:18, formPos:19, domain:'U', width:100, locked:false, label:'Local Account?'],
+		loginActive   : [type:'string', ssPos:19, formPos:20, domain:'U', width:100, locked:false, label:'Login Active?'],
+		accountExp    : [type:'string', ssPos:20, formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration'],
+		passwordExp   : [type:'string', ssPos:21, formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration'],
+		passwordFixed : [type:'string', ssPos:22, formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?'],
+		match         : [type:'list',   ssPos:0,  formPos:24, domain:'T', width:100, locked:false, label:'Matched On']
 	]
 
 	/*********************************************************************************************************
-	 ** Controller Methods
+	 ** Controller methods
 	 *********************************************************************************************************/
 
 	/**
@@ -95,7 +106,7 @@ class AccountImportExportService {
 		List accounts = readAccountsFromSpreadsheet(spreadsheet)
 
 		// Validate the sheet
-		accounts = validateUploadedAccounts(accounts, project, options)
+		validateUploadedAccounts(byWhom, accounts, project, options)
 
 		return accounts
 	}
@@ -152,23 +163,27 @@ class AccountImportExportService {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
-	Map importAccount_Step2_Review(UserLogin byWhom, Project project, Object request, String filename) {
+	Map importAccount_Step2_Review(UserLogin byWhom, Project project, Object request, Object params) {
 		Map model = [:]
+		Map optionLabels = [
+			(IMPORT_OPTION_BOTH): 'Person and UserLogin',
+			(IMPORT_OPTION_PERSON): 'Person only',
+			(IMPORT_OPTION_USERLOGIN): 'UserLogin only'
+		]
 
-		model.filename = filename
+		String processOption = params.processOption
+		if (! processOption || ! optionLabels.containsKey(processOption)) {
+			log.debug "params=$params"
+			throw new InvalidParamException('The import option must be specified')
+		}
+
+		model.filename = params.filename
 		model.labels = getLabelsInColumnOrder('formPos')
 		model.properties = getPropertiesInColumnOrder('formPos')
 		model.gridMap = accountSpreadsheetColumnMap
-		model.originalSuffix = ORIGIN_SUFFIX
-
-		/*
-		// This was an experiment to see if we could inject the data into the page -- failure
-		Map options = [filename: filename]
-		List accounts = loadAndValidateSpreadsheet(byWhom, project, filename, options)
-		// Remove properties that shouldn't be sent over in the JSON
-		accounts.remove('person')
-		model.accountsAsJSON =  new JsonBuilder( accounts ).toPrettyString()
-		*/
+		model.defaultSuffix = DEFAULTED_SUFFIX
+		model.originalSuffix = ORIGINAL_SUFFIX
+		model.processOptionDesc = optionLabels[processOption]
 
 		return model
 	}
@@ -203,7 +218,6 @@ class AccountImportExportService {
 			unchangedPerson: 0,
 			teamsUpdated: 0
 		]
-
 		
 		for(int i=0; i < accounts.size(); i++) {
 			accounts[i].postErrors = []
@@ -215,45 +229,42 @@ class AccountImportExportService {
 			}
 			
 			// Create / Update the persons
-			def (person, account, error, changed) = addOrUpdatePerson(user, accounts[i], options)
-			accounts[i] = account
+			if (options.flagToUpdatePerson) {
+				def (error, changed) = addOrUpdatePerson(user, accounts[i], options)
 
-			log.debug "importAccount_Step3_PostChanges() call to addOrUpdatePerson() returned person=$person, error=$error, changed=$changed"
-			if (error) {
-				accounts[i].postErrors << error
-				results.failedPerson << "Row ${i+2} $error"
-			} else {
-				accounts[i].person = person
-				if (accounts[i].isNewAccount) {
-					results.createdPerson++
-				}
-
-				// Update teams
-				def teamChanged = addOrUpdateTeams(user, accounts[i], project, options)
-				if (teamChanged) {
-					results.teamsUpdated++
-				}
-				/*
-				if (teamError) {
-					accounts[i].postError << teamError
-				}
-				*/
-
-				if (changed || teamChanged) {
-					results.updatedPerson++
+				log.debug "importAccount_Step3_PostChanges() call to addOrUpdatePerson() returned person=${accounts[i].person}, error=$error, changed=$changed"
+				if (error) {
+					accounts[i].postErrors << error
+					results.failedPerson << "Row ${i+2} $error"
 				} else {
-					results.unchangedPerson++
+					if (accounts[i].isNewAccount) {
+						results.createdPerson++
+					}
+
+					// Update teams
+					def teamChanged = addOrUpdateTeams(user, accounts[i], project, options)
+					if (teamChanged) {
+						results.teamsUpdated++
+					}
+
+					if (changed || teamChanged) {
+						results.updatedPerson++
+					} else {
+						results.unchangedPerson++
+					}
 				}
 			}
 
 			// Deal with the userLogin
-			if (options.createUserlogin) {
+			if (options.flagToUpdateUserLogin) {
 
 			}
 
 		}
 
-		throw new DomainUpdateException(results.toString())	
+		// Throw an exception so we don't commit the data while testing (to be removed)
+		throw new DomainUpdateException(results.toString())
+
 		return results	
 	}
 
@@ -262,308 +273,21 @@ class AccountImportExportService {
 	 *********************************************************************************************************/
 
 	/**
-	 * Used to add or update the person
-	 * @param account - the account information
-	 * @param options - the map of the options
-	 * @return a list containing:
-	 *    Person - the person created or updated
-	 *    Map - the map of the account
-	 *    String - an error message if the save or update failed
-	 *    boolean - a flag indicating if the account was changed (true) or unchanged (false)
+	 * Used to determine based on user import options if the Person should be updated
+	 * @param options - the map of the form params
+	 * @return true if the user selected the correct options to update the Person otherwise false
 	 */
-	List addOrUpdatePerson(UserLogin byWhom, Map account, Map options) {
-		Person person
-		String error
-		boolean changed=false
-
-		if (account.isNewAccount) {
-			person = new Person()
-		} else {
-			person = account.person
-		}
-
-		// Update the person with the values passed in
-		account = applyChangesToPerson(person, account)
-
-		List dirtyProps = person.dirtyPropertyNames
-		log.debug "addOrUpdatePerson() ${person} account.isNewAccount=${account.isNewAccount}, dirtyProps=$dirtyProps"
-		if ( account.isNewAccount || dirtyProps.size() ) {
-			if (! person.validate()) {
-				log.debug "addOrUpdatePerson() ${person} person.validate() failed"
-
-				// TODO : JPM 4/2016 : Stuff the failed properties into an errors object to bubble up to the UI
-				// person.errors.allErrors.each { log.debug "Property ${it.getField()} failed ${it.getCode()}" }
-				error = GormUtil.allErrorsString(person)
-				person.discard()
-			} else {
-				person.save(flush:true)
-				changed = true
-
-				if (account.isNewAccount) {
-					partyRelationshipService.addCompanyStaff(account.companyObj, person)
-					auditService.logMessage("$byWhom created new person $person for company ${account.company}")
-				} else {
-					auditService.logMessage("$byWhom updated person $person - modified properties $dirtyProps")
-				}
-			}
-		}
-
-		return [person, account, error, changed]
+	private boolean shouldUpdatePerson(Map options) {
+		return [IMPORT_OPTION_PERSON, IMPORT_OPTION_BOTH].contains(options.processOption)
 	}
 
 	/**
-	 * Used to update the person's teams associated to themselves/company and to the project
-	 * by examining the personTeams and projectTeams lists passed in the account map. If the codes have 
-	 * a minus(-) suffix then the team will be removed otherwise it is added if it doesn't already exist.
-	 * @param byWhom - the UserLogin that invoked the update
-	 * @param account - the account map with all of the information about the person/user
-	 * @param project - the project to associate the person's teams to
-	 * @param options - the options that the user selected for the update
-	 * @return a flag that indicates if the update updating anything (true) or remained unchanged (false)
+	 * Used to determine based on user import options if the UserLogin should be updated
+	 * @param options - the map of the form params
+	 * @return true if the user selected the correct options to update the UserLogin otherwise false
 	 */
-	boolean addOrUpdateTeams(UserLogin byWhom, Map account, Project project, Map options) {
-		List suitableTeams = []
-		List projectTeams = []
-
-		// Check to see if there were any teams specified for the user
-		if (! account.personTeams && ! account.projectTeams) {
-			log.debug "addOrUpdateTeams() bailed as there were no changes - account.personTeams=${account.personTeams?.getClass().getName()}, account.projectTeams=${account.projectTeams?.getClass().getName()}"
-			return false
-		}
-
-		assert (account.person instanceof Person)
-		boolean changed = false
-
-		String personName = account.person.toString()
-
-		// Find team codes with minus (-) prefix that are to be deleted
-		List personTeamsToDelete = account.personTeams.findAll { it[0] == '-' }
-		List projectTeamsToDelete = account.projectTeams.findAll{ it[0] == '-' }
-
-		// Determine the existing project team assignments that are being deleted from the person and remove them
-		// from the team adds if they're there.
-		def projectTeamsToAdd = account.projectTeams - projectTeamsToDelete
-
-		log.debug "addOrUpdateTeams() teams for person $personName account.personTeams=${account.personTeams}; projectTeamsToAdd=$projectTeamsToAdd"
-		// The teams for the person should be all that were specified that don't start with minus (-)
-		List teamsForPerson = account.personTeams 
-		if (projectTeamsToAdd) {
-			teamsForPerson.addAll(projectTeamsToAdd)
-		}
-		if (personTeamsToDelete) {
-			teamsForPerson.removeAll(personTeamsToDelete)
-		}
-		teamsForPerson = teamsForPerson.unique()
-
-		log.debug "addOrUpdateTeams() teams for person $personName $teamsForPerson"
-
-		if (! account.isNewAccount) {
-			suitableTeams = account.person.getSuitableTeams().id
-			// For existing accounts we need to get all of their accounts + any new ones that were specified
-			teamsForPerson.addAll(suitableTeams)
-			teamsForPerson = teamsForPerson.unique()
-
-			// Try removing the teams again now that we have the teams from the database
-			teamsForPerson = teamsForPerson - personTeamsToDelete
-
-			// Determine if there are any new or removed teams
-			changed = (suitableTeams - teamsForPerson) || (teamsForPerson - suitableTeams) 
-			log.debug "addOrUpdateTeams() teams for existing person $personName : teams=$teamsForPerson"
-		} else {
-			changed = (teamsForPerson.size() > 0)
-		}
-
-		if (changed) {
-			log.debug "addOrUpdateTeams() changing ${personName}'s teams $teamsForPerson"
-			partyRelationshipService.updateAssignedTeams(account.person, teamsForPerson)
-		}
-
-		// Now lets deal with assignment at the project level
-		projectTeams = partyRelationshipService.getProjectStaffFunctions(project, account.person, false).id
-		projectTeamsToAdd = projectTeamsToAdd - projectTeams
-		if (projectTeamsToAdd) {
-			projectService.addTeamMember(project, account.person, projectTeamsToAdd)
-			changed = true
-		}
-
-		if (projectTeamsToDelete) {
-			// Strip off the leading minus (-)
-			projectTeamsToDelete = projectTeamsToDelete.collect { it.substring(1) }
-			log.debug "addOrUpdateTeams() deleting ${personName}'s project teams $projectTeamsToDelete"
-			int count = projectService.removeTeamMember(project, account.person, projectTeamsToDelete)
-			if (count) {
-				changed = true
-			}
-		}
-
-		return changed
-	}
-
-// TODO : JPM 4/2016 : Set timezone to that of the project when creating the user
-
-	/**
-	 * Used to add or update a person's UserLogin account and set the security role(s) accordingly based on their
-	 * security level.
-	 * @param byWhom - the UserLogin that invoked the update
-	 * @param account - the account map with all of the information about the person/user
-	 * @param options - the options that the user selected for the update
-	 * @return a flag that indicates if the update updating anything (true) or remained unchanged (false)
-	 */
-	boolean addOrUpdateUser(UserLogin byWhom, Map account, Map options) {
-		if (! securityService.hasPermission(byWhom, 'EditUserLogin', true)) {
-			throw new UnauthorizedException('You are unauthorized to edit UserLogins')
-		}
-
-		UserLogin userLogin = account.person.userLogin
-		if (! userLogin ) {
-			if (account.username) {
-				userLogin = new UserLogin()
-				userLogin.username = account.username
-				userLogin.person = account.person
-				userLogin.active = options.activateLogin.asYN()
-				userLogin.forcePasswordChange = options.forcePasswordChange.asYN()
-			} else {
-				// Nothing to be done here
-				return false
-			}
-		}
-
-		userLogin.expiryDate = options.expiryDate
-	}
-
-
-
-
-/*
-
-						def userRole = role
-						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
-							userRole = p.role
-						}
-						if (!validRoleCodes.contains(userRole)) {
-							userRole = DEFAULT_ROLE
-						}
-						if (!failed && !StringUtils.isEmpty(userRole)) {
-							log.debug "importAccounts() : creating Role $userRole for $person"
-							// Delete previous security roles if they exist
-							def assignedRoles = []
-							def assignRole = false
-							if (p.match) {
-								def personRoles = userPreferenceService.getAssignedRoles(person);
-								personRoles.each { r ->
-									assignedRoles << r.id
-									if (r.id != userRole) {
-										assignRole = true
-									}
-								}
-								if (assignRole) {
-									userPreferenceService.deleteSecurityRoles(person)
-								}
-								if (personRoles.size() == 0) {
-									assignRole = true
-								}
-							} else {
-								assignRole = true
-							}
-							if (assignRole) {
-								userPreferenceService.setUserRoles([userRole], person.id)
-
-								// Audit role changes
-								def currentUser = securityService.getUserLogin()
-								if (p.match) {
-									p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
-									haveMessage = true
-									auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
-								} else {
-									auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
-								}
-							}
-						}
-
-						// Create/Update UserLogin
-						if (person && createUserLogin && p.username) {
-
-							error = createUserForAccount(person, project, userSettings)
-							if (error) {
-								p.errors << error
-								haveMessage = true
-							}
-
-							if (!failed) created++
-
-						}
-
-						if (failed || haveMessage) {
-							failedPeople << p	
-						}
-					}
-
-				} // people.each
-
-
-		def u = UserLogin.findByPerson(person)
-		if (!u) {
-			def userPass = commonPassword
-			if (!StringUtils.isEmpty(userSettings.password)) {
-				userPass = userSettings.password
-			}
-			u = new UserLogin(
-				username: userSettings.username,
-				active: userSettings.activateLogin
-				expiryDate: userSettings.expiryDate,
-				person: person,
-				forcePasswordChange: userSettings.forcePasswordChange
-			)
-
-			u.applyPassword(userPass)
-
-			if (! u.validate() || !u.save(flush:true)) {
-				p.errors << "Error" + GormUtil.allErrorsString(u)
-				log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
-				failed = true
-			} else {
-				log.info "importAccounts() : created UserLogin $u"
-				def up = new UserPreference(
-					userLogin: u,
-					preferenceCode: 'CURR_PROJ',
-					value: project.id.toString()
-				)
-				if (! up.validate() || ! up.save()) {
-					log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-					p.errors << "Setting Default Project Errored"
-					failed = true
-				}
-			}
-		} else {
-			failed = true
-			p.errors << "Person already have a userlogin: $u"
-		}
-*/				
-
-
-
-	/**
-	 * Used to setup some new options used for the account import posting process
-	 * @return the options with a few new values
-	 */
-	String generateRandonPassword() {
-		return UUID.randomUUID().toString()
-	}
-
-	/**
-	 * Used to compute a date some number of days into the future
-	 * @param daysOffset - the number of days into the future (+) or past (-)
-	 * @param current - the date to start with (default to now)
-	 * @return the date based on the days offset
-	 */
-	Date daysOffset(int daysOffset, Date current=new Date()) {
-		Date offsetDate
-		// Compute the date into the future based on the user input
-		use (TimeCategory) {
-			offsetDate = current + daysOffset
-		}
-
-		return offsetDate
+	private boolean shouldUpdateUserLogin(Map options) {
+		return [IMPORT_OPTION_USERLOGIN, IMPORT_OPTION_BOTH].contains(options.processOption)
 	}
 
 	/**
@@ -598,20 +322,17 @@ class AccountImportExportService {
 	 * @return the map of the parameters
 	 */
 	Map importParamsToOptionsMap(params) {
-		Map options = [
-			createUserLogin: params.createUserlogin?.toBoolean(),
-			activateLogin: (params.activateLogin == 'Y'),
-			randomPassword: (params.randomPassword == 'Y'),
-			forcePasswordChange: (params.forcePasswordChange == 'Y'),
-			commonPassword: params.password,
-			userRoles: StringUtil.splitter(params.role, ',', [' ', ';', '|'])
+		Map options = [ 
+			processOption:params.processOption,
+			
 		]
+
+		options.flagToUpdatePerson = shouldUpdatePerson(options)
+		options.flagToUpdateUserLogin = shouldUpdateUserLogin(options)
+
 		if (params.filename) {
 			options.filename = params.filename
 		}
-
-		// log.debug "importParamsToOptionsMap \n     params=$params\n     options=$options"
-
 		return options
 	}
 
@@ -621,14 +342,7 @@ class AccountImportExportService {
 	 * @param a map that can be used with requests
 	 */
 	Map importOptionsAsParams(Map options) {
-		Map params = [
-			createUserLogin: (options.createUserLogin ? 'Y' : 'N'),
-			activateLogin: (options.activateLogin ? 'Y' : 'N'),
-			randomPassword: (options.randomPassword ? 'Y' : 'N'),
-			forcePasswordChange: (options.forcePasswordChange ? 'Y' : 'N'),
-			commonPassword: options.commonPassword,
-			userRoles: options.userRoles.join(',')
-		]
+		Map params = [processOption: options.processOption]
 		if (options.filename) {
 			params.filename = options.filename
 		}
@@ -657,6 +371,30 @@ class AccountImportExportService {
 		// Check if the user has perms to create/edit users
 
 		return errors
+	}
+
+	/**
+	 * Used to setup some new options used for the account import posting process
+	 * @return the options with a few new values
+	 */
+	String generateRandonPassword() {
+		return UUID.randomUUID().toString()
+	}
+
+	/**
+	 * Used to compute a date some number of days into the future
+	 * @param daysOffset - the number of days into the future (+) or past (-)
+	 * @param current - the date to start with (default to now)
+	 * @return the date based on the days offset
+	 */
+	Date daysOffset(int daysOffset, Date current=new Date()) {
+		Date offsetDate
+		// Compute the date into the future based on the user input
+		use (TimeCategory) {
+			offsetDate = current + daysOffset
+		}
+
+		return offsetDate
 	}
 
 	/** 
@@ -934,235 +672,6 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to validate the list of accounts that were uploaded and will populate the individual maps with 
-	 * properties errors when anything is found.
-	 * @param accounts - the list of accounts that are read from the spreadsheet
-	 * @return the accounts list updated with errors
-	 */
-	List<Map> validateUploadedAccounts(List<Map> accounts, Project project, Map options) {
-
-		// Retrieves all the roles that this user is allowed to assign.
-		List validRoleCodes = securityService.getAssignableRoles(securityService.getUserLoginPerson()).id
-		List teamCodes = partyRelationshipService.getStaffingRoles().id
-		// def emailValidator = EmailValidator.getInstance()
-
-		PartyGroup client = project.client
-		Map companiesByNames = projectService.getCompaniesMappedByName(project)
-		Map companiesById = projectService.getCompaniesMappedById(project)
-
-		// Validate the teams, roles, company and any other things need be validated
-
-		for (int i=0; i < accounts.size(); i++) {
-			accounts[i].errors = []
-
-			boolean invalidCompany=false
-			PartyGroup company
-
-			// StringUtils.equalsIgnoreCase()
-			// Validate that the company name specified is one of the project related companies
-			if (accounts[i].company) {
-				company = companiesByNames.get(accounts[i].company.toLowerCase())
-				if (company) {
-					accounts[i].companyId = company.id
-					accounts[i].companyObj = company
-				} else {
-					accounts[i].errors << 'Company not found'
-					invalidCompany = true
-				}
-			} else {
-				// Default the project company if it wasn't specified
-				accounts[i].company = client.name
-				accounts[i].companyId = client.id
-				accounts[i].companyObj = client
-			}
-
-			Person personById, personByEmail, personByUserLogin, personByName, personToUse
-
-			// If it is an existing person (has an id), lets see if the person someone from the project
-			if (accounts[i].personId) {
-				Long pid = NumberUtil.toPositiveLong(accounts[i].personId, -1)
-				if (pid == -1) {
-					accounts[i].errors << 'Invalid person ID'
-				} else {
-					personById = Person.get(accounts[i].personId)
-					if (personById) {
-						accounts[i].match << "personId:${accounts[i].personId}"
-						if (personById.company.id != accounts[i].companyId) {
-							accounts[i].errors << 'Account by ID conflicts with company'
-							accounts[i].companyId = null
-						} else {
-							personToUse = personById
-						}
-					} else {
-						accounts[i].errors << 'Person by ID not found'
-					}
-				}
-			}
-
-			// Attempt to lookup account by username
-			if (accounts[i].username) {
-				personByUserLogin = UserLogin.findByUsername(accounts[i].username)?.person
-				if (personByUserLogin) {
-					if (personById) {
-						if (personByUserLogin.id != personByUserLogin.id) {
-							accounts[i].errors << 'Account by email conflicts with ID'
-						}
-					} else {
-						if (personByUserLogin.company.id != company.id) {
-							accounts[i].errors << 'Account by username conflicts with company'
-						} else {
-							personToUse = personByUserLogin
-						}
-					}
-				}
-			}
-
-			// Attempt to lookup account by email
-			if (accounts[i].email) {
-				personByEmail = Person.findByEmail(accounts[i].email)
-				if (personByEmail) {
-					if (personById && personByEmail.id != personById.id) {
-						accounts[i].errors << 'Account by email conflicts with ID'
-					}
-					if (personByUserLogin && personByEmail.id != personByUserLogin.id) {
-						accounts[i].errors << 'Account by email conflicts with username'
-					}					
-					// Check to see if the email address is valid
-					//if (! emailValidator.isValid(accounts[i].email)) {
-					//	accounts[i].errors << 'Invalid email format'
-					//}
-					if (!personToUse && !accounts[i].errors) {
-						personToUse = personByEmail
-					}
-				}
-			}
-
-			// Attempt to find the person by name which is only possible if we know the company
-			if (company) {
-				Map nameMap = [first:accounts[i].firstName,
-					middle:accounts[i].middleName,
-					last:accounts[i].lastName
-				]
-				List people = personService.findByCompanyAndName(company, nameMap)
-				if (people.size() > 0) {
-					if (people.size() > 1) {
-						accounts[i].errors << 'Found ambiguity searching by name'
-					} else {
-						personByName = people[0]
-						// See if the name match is different than the above
-						if (personById && personById.id != personByName.id) {
-							accounts[i].errors << 'Account by name conflicts with ID'
-						}
-						if (personByUserLogin && personByUserLogin.id != personByName.id) {
-							accounts[i].errors << 'Account by name conflicts with username'
-						}
-						if (personByEmail && personByEmail.id != personByName.id) {
-							accounts[i].errors << 'Account by name conflicts with email'
-						}
-						if (!personToUse && !accounts[i].errors) {
-							personToUse = personByName
-							accounts[i].match << 'name'
-						}
-					}
-				}
-			}
-
-			// Set a flag on the account if it is going to be a new account
-			if (personToUse) {
-				accounts[i].isNewAccount = false
-				accounts[i].person = personToUse
-			} else {
-				accounts[i].isNewAccount = true
-				accounts[i].person = null
-			}
-
-			// Load a temporary Person domain object with the properties from the spreadsheet and see if any
-			// of the valids will break the validation constraints
-			Person validatePerson = (personToUse ? personToUse : new Person())
-			accounts[i] = applyChangesToPerson(validatePerson, accounts[i])
-			if (! validatePerson.validate()) {
-				validatePerson.errors.allErrors.each {
-					accounts[i].errors << "${it.getField()} error ${it.getCode()}"
-				}
-			}
-			validatePerson.discard()
-
-			// Validate the Teams
-			['person', 'project'].each { tp ->
-				String teamProperty = "${tp}Teams"
-				// Strip off the minus (-) prefix to validate the team codes
-				String teamsWithoutMinus = accounts[i][teamProperty]?.replaceAll('-','')
-
-				List teams = StringUtil.splitter(teamsWithoutMinus, ',', [';',':','|'])
-				if (teams) {
-					List invalidTeams = teams - teamCodes
-					// log.debug "validateUploadedAccounts() invalidTeams=$invalidTeams"
-					if (invalidTeams) {
-						accounts[i].errors << "Invalid $tp team(s) ${invalidTeams.join(',')}"
-					}
-
-					// Now put the appropriate team codes into the account map
-					accounts[i][teamProperty] = StringUtil.splitter(accounts[i][teamProperty], ',', [';',':','|'])
-				} else {
-					accounts[i][teamProperty] = []
-				}
-			}
-
-			// Review the security roles that are going to be assigned to the person
-			List currentRoles = []
-			List invalidRoles = []
-			if (accounts[i].role) {
-				currentRoles = StringUtil.splitter(accounts[i].role, ',', [';',':','|'])
-				invalidRoles = currentRoles - validRoleCodes
-			}			
-
-			if (!StringUtils.isEmpty(accounts[i].role) && invalidRoles) {
-				accounts[i].errors << "Invalid role: ${invalidRoles.join(';')}"
-			}
-
-			// Attempt to match the persons to existing users
-			// List staff = partyRelationshipService.getCompanyStaff( project.client.id )
-			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
-
-			// Set the icon to be displayed base on what is being done
-			// TODO : JPM 4/2016 : Should NOT be hard coding the filename references to the images
-			if (accounts[i].errors) {
-				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'exclamation.png', absolute: false])
-			} else if (accounts[i].isNewAccount) {
-				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'add.png', absolute: false])
-			} else {
-				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'pencil.png', absolute: false])
-			}
-
-		}
-
-		return accounts
-	}	
-
-	/**
-	 * Used to load any property a person object where the values are different
-	 * @param person - the person object to be changed
-	 * @param account - the Map containing all of the changes
-	 * @return 
-	 */
-	private Map applyChangesToPerson(Person person, Map account) {
-		boolean existing = person.id
-		accountSpreadsheetColumnMap.each {prop, info ->
-			if (info.type == 'P' && prop != 'personId') {
-				if (existing && (person[prop] == null && account[prop]) ||
-					(person[prop] != account[prop] ) )
-				{
-					// Save the original value so it can be displayed later
-					account["${prop}$ORIGIN_SUFFIX"] = person[prop]
-					person[prop] = account[prop]
-				}
-				
-			}
-		}
-		return account
-	}
-
-	/**
 	 * Used to read the Account Import Spreadsheet and load up a list of account+user properties. This will 
 	 * iterate over the accountSpreadsheetColumnMap Map to pluck the values out of the appropriate columns of
 	 * each row and add to the map that is returned for each person/userlogin.
@@ -1188,237 +697,657 @@ class AccountImportExportService {
 			accounts.add(account)
 		}
 		return accounts
+	}
+
+	/**
+	 * Used to validate the list of accounts that were uploaded and will populate the individual maps with 
+	 * properties errors when anything is found. This will update the accounts data with the following information:
+	 *    - set companyObj to the company
+	 *    - set companyId to the id of the company (seems redundant...)
+	 *    - set person properties with ORIGINAL_SUFFIX suffix if the value has been changed from the original
+	 *    - set isNewAccount to indicate if the person is new or not
+	 *    - appends any error messages to errors list
+	 * @param accounts - the list of accounts that are read from the spreadsheet
+	 * @return the accounts list updated with errors
+	 */
+	private void validateUploadedAccounts(UserLogin byWhom, List<Map> accounts, Project project, Map options) {
+
+		List usernameList
+		List validRoleCodes
+		List teamCodes
+		List assignableRoleCodes = securityService.getAssignableRoleCodes(byWhom.person)
+
+		// def emailValidator = EmailValidator.getInstance()
+
+		List personIdList = accounts.findAll { it.personId }.collect {it.personId }
+
+		// Get all of the email address that were uploaded
+		List emailList = accounts.findAll( { it.email })?.collect({it.email.toLowerCase()})
+
+		PartyGroup client = project.client
+		Map companiesByNames = projectService.getCompaniesMappedByName(project)
+		Map companiesById = projectService.getCompaniesMappedById(project)
+
+		if (options.flagToUpdatePerson) {
+			// Retrieves all the team codes that this user is allowed to assign
+			teamCodes = partyRelationshipService.getStaffingRoles().id
+		}
+
+		if (options.flagToUpdateUserLogin) {
+			// Retrieves all the roles that this user is allowed to assign.
+			validRoleCodes = securityService.getAssignableRoles(securityService.getUserLoginPerson()).id
+
+			// Get all of the usernames that were uploaded
+			usernameList = accounts.findAll( { it.username })?.collect({it.username.toLowerCase()})
+		}
+
+
+		// Validate the teams, roles, company and any other things need be validated
+		for (int i=0; i < accounts.size(); i++) {
+			accounts[i].errors = []
+
+			Boolean found
+			Person personById, personByEmail, personByUsername, personByName
+
+			// Attempt to find the person by the personId
+			if (fetchPersonByPersonId(accounts[i])) {
+				personById = accounts[i].person
+			}
+
+			// Attempt to find the person by their email
+			if (fetchPersonByEmail(accounts[i])) {
+				personByEmail = accounts[i].person
+			}
+
+			// Attempt to find the person by their username
+			if (fetchPersonByUsername(accounts[i])) {
+				personByUsername = accounts[i].person
+			}
+
+			// Now attempt to find by company and validate it matches the company of the person found above (if the case)
+			validateCompanyName(accounts[i], project, companiesById)
+
+			// Now attempt to find the person by their name
+			List people = findPersonsByName(accounts[i])
+			if (people.size() > 0) {
+				if (people.size() > 1) {
+					accounts[i].errors << 'Found multiple people by name'
+				} else {
+					personByName = people[0]
+					// See if the name match is different than the above
+					if (personById && personById.id != personByName.id) {
+						accounts[i].errors << 'Account by name conflicts with ID'
+					}
+					if (personByUsername && personByUsername.id != personByName.id) {
+						accounts[i].errors << 'Account by name conflicts with username'
+					}
+					if (personByEmail && personByEmail.id != personByName.id) {
+						accounts[i].errors << 'Account by name conflicts with email'
+					}
+					if (!accounts[i].errors && ! accounts[i].person) {
+						accounts[i].person = personByName
+						accounts[i].match << 'name'
+					}
+				}
+			}
+
+			log.debug "validateUploadedAccounts() account.person=${accounts[i].person != null}, personById=${personById!=null}, personByEmail=${personByEmail!=null}, personByUsername=${personByUsername!=null}, personByName=${personByName!=null}"
+			// Set a flag on the account if it is going to be a new account
+			if (accounts[i].person == null) {
+				log.debug "validateUploadedAccounts() - creating blank Person"
+				accounts[i].isNewAccount = true
+				accounts[i].person = new Person()
+			} else {
+				accounts[i].isNewAccount = false
+			}
+
+			// Check for duplication person ids in the list
+			String pid = accounts[i].person.id
+			if (pid && personIdList.findAll{ it == pid }.size() > 1) {
+				accounts[i].errors << 'Duplicate Person ID referenced'
+			}
+
+			// Check the username to make sure it isn't used by more than one row
+			if (emailList.findAll{ it == accounts[i].email.toLowerCase() }.size()>1) {
+				accounts[i].errors << 'Email referenced on multiple rows'
+			}
+
+			// Load a temporary Person domain object with the properties from the spreadsheet and see if any
+			// of the valids will break the validation constraints
+			Person.withNewSession { session -> 
+				Person personToValidate = (accounts[i].person?.id ? Person.get((accounts[i].person.id)) : new Person() )
+				log.debug "validateUploadedAccounts() About to do the personToValidate ==> account.person=${accounts[i].person != null}, id=${accounts[i].person.id}, personToValidate=$personToValidate id=${personToValidate.id}"
+				applyChangesToPerson(personToValidate, accounts[i], options.flagToUpdatePerson)
+				if (! personToValidate.validate()) {
+					personToValidate.errors.allErrors.each {
+						accounts[i].errors << "${it.getField()} error ${it.getCode()}"
+					}
+				}
+				personToValidate.discard()
+			}
+
+			// Check the username to make sure it isn't used by more than one row
+			if (usernameList.findAll{ it == accounts[i].username.toLowerCase() }.size()>1) {
+				accounts[i].errors << 'Username referenced on multiple rows'
+			}
+
+			if (options.flagToUpdatePerson) {
+				// Attempt to validate the teams that are assigned
+				validateTeams(accounts[i], teamCodes) 
+			}
+
+			// Validate user and security roles if user requested to update Users
+			if (options.flagToUpdateUserLogin) {
+				boolean canUpdateUser = accounts[i].username
+				// Check if user is trying to create a user without a person already created 
+				if (canUpdateUser && accounts[i].isNewAccount && !options.flagToUpdatePerson) {
+					accounts[i].errors << 'User can not be created without a saved person'
+					canUpdateUser = false
+				}
+
+				if (canUpdateUser) {
+					// Validate that the teams codes are correct and map out what are to add and delete appropriately
+					validateSecurityRoles(byWhom, accounts[i], validRoleCodes, assignableRoleCodes)
+				}	
+
+			}
+
+			// Attempt to match the persons to existing users
+			// List staff = partyRelationshipService.getCompanyStaff( project.client.id )
+			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
+
+			// Set the icon to be displayed base on what is being done
+			// TODO : JPM 4/2016 : Should NOT be hard coding the filename references to the images
+			if (accounts[i].errors) {
+				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'exclamation.png', absolute: false])
+			} else if (accounts[i].isNewAccount) {
+				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'add.png', absolute: false])
+			} else {
+				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'pencil.png', absolute: false])
+			}
+
+		}
 	}	
 
+	/**
+	 * Used to lookup the person by the personId property and will update the account map with the following:
+	 *    person - the person if found and was valid
+	 *    errors - appends any errors that occurred
+	 * @param account - the map used to track the person/user properties
+	 * @return returns 
+	 *    true - if the lookup was successful,
+	 *    false - if no id was present
+	 *    null - if there were any errors
+	 */
+	private Boolean fetchPersonByPersonId(Map account) {
+		Boolean ok
+		if (! account.personId) {
+			ok = false
+		} else {
+			Long pid = NumberUtil.toPositiveLong(account.personId, -1)
+			if (pid == -1) {
+				account.errors << 'Invalid person ID value'
+			} else {
+				def person = Person.get(pid)
+				if (! person) {
+					account.errors << 'Person by ID not found'
+				} else {
+					account.person = person
+					account.match << 'personId'
+					ok = true
+				}
+			}
+		}
+		return ok
+	}
 
+	/**
+	 * Used to lookup the person by their email address property and will update the account map with the following:
+	 *    person - the person if found and was valid
+	 *    errors - appends any errors that occurred
+	 * @param account - the map used to track the person/user properties
+	 * @return returns 
+	 *    true - if the lookup was successful,
+	 *    false - if no id was present
+	 *    null - if there were any errors
+	 */
+	private Boolean fetchPersonByEmail(Map account) {
+		Boolean ok
+		if (! account.email) {
+			ok = false
+		} else {
+			def person = Person.findByEmail(account.email)
+			if (! person) {
+				ok = false
+			} else {
+				// Check for a person mismatch 
+				if (account.person) {
+					if (person.id != account.person.id) {
+						accounts.errors << 'Email found mismatched found person'
+					} else {
+						ok = true
+					}
+				} else {
+					account.person = person
+					account.match << 'email'
+					ok = true
+				}
+			} 
+		}
+		return ok
+	}
 
-/****** 
- ** IMPORT SECTION
- ******/
+	/**
+	 * Used to lookup the person by their username and will update the account map with the following:
+	 *    person - the person if found and was valid
+	 *    errors - appends any errors that occurred
+	 * @param account - the map used to track the person/user properties
+	 * @return returns 
+	 *    true - if the lookup was successful,
+	 *    false - if no id was present
+	 *    null - if there were any errors
+	 */
+	private Boolean fetchPersonByUsername(Map account) {
+		Boolean ok
+		if (! account.username) {
+			ok = false
+		} else {
+			UserLogin userLogin = UserLogin.findByUsername(account.username)
+			if (userLogin) {
+				if (account.person) {
+					if (account.person.id != userLogin.person.id) {
+						account.errors << 'Username mismatched found person'
+					} else {
+						ok = true
+					}
+				} else {
+					ok = true
+				}
+				if (ok) {
+					account.match << 'username'
+					if (! account.person) {
+						account.person = userLogin.person
+					}
+				}
+			}
+		}
+		return ok
+	}
 
+	/**
+	 * Used to lookup the person by their username and will update the account map with the following:
+	 *    person - the person if found and was valid
+	 *    errors - appends any errors that occurred
+	 * @param account - the map used to track the person/user properties
+	 * @return returns 
+	 *    true - if the lookup was successful,
+	 *    false - if no id was present
+	 *    null - if there were any errors
+	 */
+	private List findPersonsByName(Map account) {
+		List people = []
+		// Attempt to find the person by name which is only possible if we know the company
+		if (account.companyObj) {
+			Map nameMap = [first:account.firstName,
+				middle:account.middleName,
+				last:account.lastName
+			]
+			people = personService.findByCompanyAndName(account.companyObj, nameMap)
+		}
+		return people
+	}
 
-	def importAccounts() {
+	/**
+	 * Used to validate the company accounts against the previous found person.company if found and compare by looking up
+	 * the company by name. If the company name was blank and we found one then we'll default it.
+	 * The method will populate the following properties on the account map accordingly:
+	 *    company - set as default if not previously specified
+	 *    company$DEFAULTED_SUFFIX - the default value for the data grid
+	 *    errors - appends any errors that occurred
+	 * @param account - the map used to track the person/user properties
+	 * @param companiesById - the map of the companies affilated with the project
+	 * @return returns true if the lookup was successful, false if not or Null if the routine err
+	 */
+	private Boolean validateCompanyName(Map account, Project project, Map companiesById) {
+		Boolean ok
+		PartyGroup company
 
-
-		switch (params.step) {
-
-
-			case 'post':
-
-				def createUserLogin = params.createUserlogin == 'Y'
-				def activateLogin = params.activateLogin == 'Y'
-				def randomPassword = params.randomPassword == 'Y'
-				def forcePasswordChange = params.forcePasswordChange == 'Y'
-				def commonPassword = params.password
-				def expireDays = NumberUtils.toInt(params.expireDays,90)
-				def header = params.header == 'Y'
-				def role = params.role
-
-				HSSFWorkbook xlsWorkbook = new HSSFWorkbook(new FileInputStream(new File('/tmp/tdstm-account-import.xls')))
-
-
-				people = parseXLS(xlsWorkbook, header, createUserLogin)
-				lookForMatches()
-
-				if (randomPassword) {
-					commonPassword = UUID.randomUUID().toString()
+		while (true) {
+			// First off if a person was previously found, lets validate that their company is affliated with the project
+			if (account.person) {
+				company = account.person.company
+				if (! companiesById.containsKey(company.id.toString())) {
+					account.errors << 'Person is from non-affilated company'
+					break
 				}
 
-				def expiryDate = new Date()
+				// If the sheet has the company name lets see if it matches the person's organization
+				if (account.company) {
+					if (account.company.toLowerCase() != company.name.toLowerCase()) {
+						account.errors << "Person's company did not match company name"
+						break
+					}
+					ok = true
+					break
+				}
+			}
 
-				use(TimeCategory) {
-					expiryDate = expiryDate + expireDays.days
+			if (account.company) {
+				// Attempt to find the company by name
+				company = PartyGroup.findByName(account.company)
+				if (! company) {
+					account.errors << 'Unable to find company by name' 
+				} else {
+					if (companiesById.containsKey(company.id.toString())) {
+						account.company = company.name
+						ok = true
+					} else {
+						account.errors << 'Company not affilated with project'
+					}
+				}
+			} else {
+				// Set the company default to the project.client when the company wasn't specified and 
+				// we haven't found a person account
+				company = project.client
+				account.company = company.name
+				account["company$DEFAULTED_SUFFIX"] = company.name				
+				ok = false
+			}
+			break
+		}
+
+		if (ok) {
+			account.companyObj = company
+		}
+
+		return ok
+	}
+
+	/**
+	 * Used to validate that the team codes are correct and will set the ORIGINAL or DEFAULT appropriately
+	 * @param account - the Account map to review
+	 * @return true if validated with no errors otherwise false
+	 */
+	private boolean validateTeams(Map account, List teamCodes) {
+		boolean ok = true
+
+		// Review the personTeam and the projectTeam
+		['person', 'project'].each { tp ->
+			// TODO : cross check the addition and removal of teams  between the two lists
+			// TODO : update the ORIGINAL and DEFAULT property settings to reflect the changes, note we might need a different template for this
+			// to show both the results and the uploaded (with minus potentially)
+			String teamProperty = "${tp}Teams"
+			// Strip off the minus (-) prefix to validate the team codes
+			String teamsWithoutMinus = account[teamProperty]?.replaceAll('-','')
+
+			List teams = StringUtil.splitter(teamsWithoutMinus, ',', DELIM_OPTIONS)
+			if (teams) {
+				List invalidTeams = teams - teamCodes
+				if (invalidTeams) {
+					ok = false
+					account.errors << "Invalid $tp team(s) ${invalidTeams.join(',')}"
 				}
 
-				log.info "expiryDate=$expiryDate"
+				// Now put the appropriate team codes into the account map
+				account[teamProperty] = StringUtil.splitter(account[teamProperty], ',', DELIM_OPTIONS)
+			} else {
+				account[teamProperty] = []
+			}
+		}
+		return ok
+	}
+	/**
+	 * Used to review and validate the account.roles values. When successful it will create map property roleActions that contain
+	 * the various changes that need to occur for the user security settings. In addition this logic will:
+	 *    - validate that the codes are legitimate
+	 *    - validate that the user is only modifying roles for which he has capabilities of
+	 *    - create list of adds and deletes for the team codes for person and project
+	 * @param byWhom - the individual that is making the modifications
+	 * @param account - the Map containing all of the changes
+	 * @param validRoleCodes - a list of the valid role codes in the system
+	 * @param assignableRoleCodes - a list of the role codes that byWhom has the privilege of
+	 * @param A flag that indicates success (true) or an error occurred (false)
+	 */	 
+	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List assignableRoleCodes ) {
+		boolean ok=false
 
-				def failedPeople = []
-				def created = 0
+log.debug "*** validateSecurityRoles() account=${account.firstName + ' ' + account.lastName}, person=${account.person}, dirty=${account.person.dirtyPropertyNames}"
+		// Validate the Setup the default security role if necessary
+		UserLogin userLogin 
+		if (account.person.id) {
+			userLogin = account.person.userLogin
+		}
 
-				if (!StringUtils.isEmpty(role) && !validRoleCodes.contains(role)) {
-					failed = true
-					people = []
+		// Validate the roles
+		// Review the security roles that are going to be assigned to the person
+		List currentRoles = []
+		List invalidRoles = []
+		if (account.roles) {
+			String rolesWithoutMinus = account.roles?.replaceAll('-','')
+			currentRoles = StringUtil.splitter(rolesWithoutMinus, ',', DELIM_OPTIONS)
+			invalidRoles = currentRoles - validRoleCodes
+			if (invalidRoles) {
+				account.errors << "Invalid role: ${invalidRoles.join(';')}"
+			} else {
+				account.roles = StringUtil.splitter(account.roles, ',', DELIM_OPTIONS)
+				if (! account.isNewAccount && userLogin) {
+					// Set the original values
+					List origRoles = securityService.getRoles(userLogin)?.id
+					List chgRoles = account.roles
+					// log.debug "VALIDATING ROLES: ${account.person}\nOrig: $origRoles\n Chg: $chgRoles"
+					// See if there are any differences in the uses' changing roles and the original
+					if ( (chgRoles - origRoles) || (origRoles - chgRoles) ) {
+						// If so then save off the original
+						account["roles${ORIGINAL_SUFFIX}"] = origRoles.join(', ')
+					}
 				}
+			}
 
-				def projectCompanies = partyRelationshipService.getProjectCompanies(project.id)
-
-				people.each() { p -> 
-
-					def company = projectCompanies.find{it.partyIdTo.name == p.company}
-					if(!company){
-						p.errors << "Unable to assign ${p.name} to ${p.company}"
-					}else{
-						def person
-						boolean failed = false
-						boolean haveMessage = false
-
-						if (p.match ) {
-							// Find the person
-							person = findPerson(p)
-							if (! person) {
-								p.errors << "Unable to find previous Person match"
-								failed = true
-							} else {
-								person.email = p.email
-								person.workPhone = p.phone
-								person.title = p.title
-								person.deparment = p.department
-								person.location = p.location
-								person.stateProv = p.stateProv
-								person.country = p.country
-								person.mobilePhone = p.mobile
-
-								if (person.validate() && person.save(flush:true)) {
-									log.info "importAccounts() : updated person $person"
-									partyRelationshipService.addCompanyStaff(company, person)
-								} else {
-									p.errors << "Error" + GormUtil.allErrorsString(person)
-									failed = true
-								}
+		} else {
+			// Set the default role 
+			account.roles = [DEFAULT_ROLE]
+			account["roles${DEFAULTED_SUFFIX}"] = DEFAULT_ROLE
+		}		
+	}
+	/**
+	 * Used to load any property a person object where the values are different
+	 * @param person - the person object to be changed
+	 * @param account - the Map containing all of the changes
+	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
+	 * @return 
+	 */
+	private Map applyChangesToPerson(Person person, Map account, boolean shouldUpdatePerson) {
+		boolean existing = person.id
+		accountSpreadsheetColumnMap.each {prop, info ->
+			if (info.domain == 'P') {
+				if (existing) {
+					// Attempt to save the original value
+					if (account[prop]) {
+						if ( (! person[prop]) || ( person[prop] && person[prop] != account[prop] ) ) {
+							// Save the original value so it can be displayed later
+							if (shouldUpdatePerson) {
+								account["${prop}$ORIGINAL_SUFFIX"] = (person[prop] ?: '')
 							}
-						} else {
-							person = new Person(
-								firstName:p.firstName, 
-								middleName:p.middleName, 
-								lastName:p.lastName,
-								email:p.email,
-								workPhone: p.phone,
-								title: p.title,
-								department: p.department,
-								location: p.location,
-								stateProv: p.stateProv,
-								country: p.country,
-								mobilePhone: p.mobile,
-								staffType: 'Salary'
-								)
-						
-							if (person.validate() && person.save(flush:true)) {
-								log.info "importAccounts() : created person $person"
-								partyRelationshipService.addCompanyStaff(company, person)
-								partyRelationshipService.addProjectStaff(project, person)
-							} else {
-								p.errors << "Error" + GormUtil.allErrorsString(person)
-								failed = true
-							}
-
-							// Assign the user to one or more teams appropriately
-							if (!failed && p.teams) {
-								List teams = splitTeams(p.teams)
-
-								teams.each { t ->
-									if (teamCodes.contains(t)) {
-										partyRelationshipService.addStaffFunction(person, t, project.client, project)
-									}
-								}
-							}
+							person[prop] = account[prop]
 						}
-
-						def userRole = role
-						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
-							userRole = p.role
-						}
-						if (!validRoleCodes.contains(userRole)) {
-							userRole = DEFAULT_ROLE
-						}
-						if (!failed && !StringUtils.isEmpty(userRole)) {
-							log.debug "importAccounts() : creating Role $userRole for $person"
-							// Delete previous security roles if they exist
-							def assignedRoles = []
-							def assignRole = false
-							if (p.match) {
-								def personRoles = userPreferenceService.getAssignedRoles(person);
-								personRoles.each { r ->
-									assignedRoles << r.id
-									if (r.id != userRole) {
-										assignRole = true
-									}
-								}
-								if (assignRole) {
-									userPreferenceService.deleteSecurityRoles(person)
-								}
-								if (personRoles.size() == 0) {
-									assignRole = true
-								}
-							} else {
-								assignRole = true
-							}
-							if (assignRole) {
-								userPreferenceService.setUserRoles([userRole], person.id)
-
-								// Audit role changes
-								def currentUser = securityService.getUserLogin()
-								if (p.match) {
-									p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
-									haveMessage = true
-									auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
-								} else {
-									auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
-								}
-							}
-						}
-
-						if (person && createUserLogin && p.username) {
-							def u = UserLogin.findByPerson(person)
-							if (!u) {
-								def userPass = commonPassword
-								if (!StringUtils.isEmpty(p.password)) {
-									userPass = p.password
-								}
-								u = new UserLogin(
-									username: p.username,
-									active: (activateLogin ? 'Y' : 'N'),
-									expiryDate: expiryDate,
-									person: person,
-									forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
-								)
-
-								u.applyPassword(userPass)
-
-								if (! u.validate() || !u.save(flush:true)) {
-									p.errors << "Error" + GormUtil.allErrorsString(u)
-									log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
-									failed = true
-								} else {
-									log.info "importAccounts() : created UserLogin $u"
-									def up = new UserPreference(
-										userLogin: u,
-										preferenceCode: 'CURR_PROJ',
-										value: project.id.toString()
-									)
-									if (! up.validate() || ! up.save()) {
-										log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-										p.errors << "Setting Default Project Errored"
-										failed = true
-									}
-								}
-							} else {
-								failed = true
-								p.errors << "Person already have a userlogin: $u"
-							}
-
-							if (!failed) created++
-
-						}
-
-						if (failed || haveMessage) {
-							failedPeople << p	
+					} else {
+						// Attempt to save the default value
+						if ( person[prop] && !account[prop]) {
+							account["${prop}$DEFAULTED_SUFFIX"] = person[prop]
 						}
 					}
+				} else {
+					person[prop] = account[prop]
+				}
+			}
+		}
+		return account
+	}
 
-				} // people.each
+	/**
+	 * Used to add or update the person
+	 * @param account - the account information
+	 * @param options - the map of the options
+	 * @return a list containing:
+	 *    Person - the person created or updated
+	 *    Map - the map of the account
+	 *    String - an error message if the save or update failed
+	 *    boolean - a flag indicating if the account was changed (true) or unchanged (false)
+	 */
+	List addOrUpdatePerson(UserLogin byWhom, Map account, Map options) {
+		String error
+		boolean changed=false
 
-				map.step = 'results'
-				map.failedPeople = failedPeople
-				map.created = created
-				break
+		Person person = account.person
 
-			default: 
-				break
+		// Update the person with the values passed in
+		account = applyChangesToPerson(person, account, options.flagToUpdatePerson)
 
-		} // switch
+		List dirtyProps = person.dirtyPropertyNames
+		log.debug "addOrUpdatePerson() ${person} account.isNewAccount=${account.isNewAccount}, dirtyProps=$dirtyProps"
+		if ( account.isNewAccount || dirtyProps.size() ) {
+			if (! person.validate()) {
+				log.debug "addOrUpdatePerson() ${person} person.validate() failed"
 
-		return map
+				// TODO : JPM 4/2016 : Stuff the failed properties into an errors object to bubble up to the UI
+				// person.errors.allErrors.each { log.debug "Property ${it.getField()} failed ${it.getCode()}" }
+				error = GormUtil.allErrorsString(person)
+				person.discard()
+			} else {
+				person.save(flush:true)
+				changed = true
 
+				if (account.isNewAccount) {
+					partyRelationshipService.addCompanyStaff(account.companyObj, person)
+					auditService.logMessage("$byWhom created new person $person for company ${account.company}")
+				} else {
+					auditService.logMessage("$byWhom updated person $person - modified properties $dirtyProps")
+				}
+			}
+		}
+
+		return [error, changed]
+	}
+
+	/**
+	 * Used to add or update a person's UserLogin account and set the security role(s) accordingly based on their
+	 * security level.
+	 * @param byWhom - the UserLogin that invoked the update
+	 * @param account - the account map with all of the information about the person/user
+	 * @param options - the options that the user selected for the update
+	 * @return a flag that indicates if the update updating anything (true) or remained unchanged (false)
+	 */
+	boolean addOrUpdateUser(UserLogin byWhom, Map account, Map options) {
+		if (! securityService.hasPermission(byWhom, 'EditUserLogin', true)) {
+			throw new UnauthorizedException('You are unauthorized to edit UserLogins')
+		}
+
+		UserLogin userLogin = account.person.userLogin
+		if (! userLogin ) {
+			if (account.username) {
+				userLogin = new UserLogin()
+				userLogin.username = account.username
+				userLogin.person = account.person
+				userLogin.active = options.activateLogin.asYN()
+				userLogin.forcePasswordChange = options.forcePasswordChange.asYN()
+
+				// TODO : JPM 4/2016 : Set timezone to that of the project when creating the user
+
+			} else {
+				// Nothing to be done here
+				return false
+			}
+		}
+
+		userLogin.expiryDate = options.expiryDate
+	}
+
+	/**
+	 * Used to update the person's teams associated to themselves/company and to the project
+	 * by examining the personTeams and projectTeams lists passed in the account map. If the codes have 
+	 * a minus(-) suffix then the team will be removed otherwise it is added if it doesn't already exist.
+	 * @param byWhom - the UserLogin that invoked the update
+	 * @param account - the account map with all of the information about the person/user
+	 * @param project - the project to associate the person's teams to
+	 * @param options - the options that the user selected for the update
+	 * @return a flag that indicates if the update updating anything (true) or remained unchanged (false)
+	 */
+	boolean addOrUpdateTeams(UserLogin byWhom, Map account, Project project, Map options) {
+		List suitableTeams = []
+		List projectTeams = []
+
+		// Check to see if there were any teams specified for the user
+		if (! account.personTeams && ! account.projectTeams) {
+			log.debug "addOrUpdateTeams() bailed as there were no changes - account.personTeams=${account.personTeams?.getClass().getName()}, account.projectTeams=${account.projectTeams?.getClass().getName()}"
+			return false
+		}
+
+		assert (account.person instanceof Person)
+		boolean changed = false
+
+		String personName = account.person.toString()
+
+		// Find team codes with minus (-) prefix that are to be deleted
+		List personTeamsToDelete = account.personTeams.findAll { it[0] == '-' }
+		List projectTeamsToDelete = account.projectTeams.findAll{ it[0] == '-' }
+
+		// Determine the existing project team assignments that are being deleted from the person and remove them
+		// from the team adds if they're there.
+		def projectTeamsToAdd = account.projectTeams - projectTeamsToDelete
+
+		log.debug "addOrUpdateTeams() teams for person $personName account.personTeams=${account.personTeams}; projectTeamsToAdd=$projectTeamsToAdd"
+		// The teams for the person should be all that were specified that don't start with minus (-)
+		List teamsForPerson = account.personTeams 
+		if (projectTeamsToAdd) {
+			teamsForPerson.addAll(projectTeamsToAdd)
+		}
+		if (personTeamsToDelete) {
+			teamsForPerson.removeAll(personTeamsToDelete)
+		}
+		teamsForPerson = teamsForPerson.unique()
+
+		log.debug "addOrUpdateTeams() teams for person $personName $teamsForPerson"
+
+		if (! account.isNewAccount) {
+			suitableTeams = account.person.getSuitableTeams().id
+			// For existing accounts we need to get all of their accounts + any new ones that were specified
+			teamsForPerson.addAll(suitableTeams)
+			teamsForPerson = teamsForPerson.unique()
+
+			// Try removing the teams again now that we have the teams from the database
+			teamsForPerson = teamsForPerson - personTeamsToDelete
+
+			// Determine if there are any new or removed teams
+			changed = (suitableTeams - teamsForPerson) || (teamsForPerson - suitableTeams) 
+			log.debug "addOrUpdateTeams() teams for existing person $personName : teams=$teamsForPerson"
+		} else {
+			changed = (teamsForPerson.size() > 0)
+		}
+
+		if (changed) {
+			log.debug "addOrUpdateTeams() changing ${personName}'s teams $teamsForPerson"
+			partyRelationshipService.updateAssignedTeams(account.person, teamsForPerson)
+		}
+
+		// Now lets deal with assignment at the project level
+		projectTeams = partyRelationshipService.getProjectStaffFunctions(project, account.person, false).id
+		projectTeamsToAdd = projectTeamsToAdd - projectTeams
+		if (projectTeamsToAdd) {
+			projectService.addTeamMember(project, account.person, projectTeamsToAdd)
+			changed = true
+		}
+
+		if (projectTeamsToDelete) {
+			// Strip off the leading minus (-)
+			projectTeamsToDelete = projectTeamsToDelete.collect { it.substring(1) }
+			log.debug "addOrUpdateTeams() deleting ${personName}'s project teams $projectTeamsToDelete"
+			int count = projectService.removeTeamMember(project, account.person, projectTeamsToDelete)
+			if (count) {
+				changed = true
+			}
+		}
+
+		return changed
 	}
 
 }

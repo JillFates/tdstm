@@ -1185,7 +1185,7 @@ class AdminController {
 	}
 
 	/**
-	 * Used to download the spreadsheet/CSV import template
+	 * Used to download the spreadsheet import template
 	 */
 	def importAccountsTemplate() {
 		Project project = controllerService.getProjectForPage(this, 'PersonImport')
@@ -1195,6 +1195,7 @@ class AdminController {
 
 		String filename = accountImportExportService.EXPORT_FILENAME_PREFIX
 		def spreadsheet = accountImportExportService.getAccountExportTemplate()
+
 		accountImportExportService.sendSpreadsheetToBrowser(response, spreadsheet, filename)
 	}
 	
@@ -1282,7 +1283,7 @@ class AdminController {
 
 					model << accountImportExportService.importAccount_Step1_Upload(user, project, request, fileParamName)
 					// Redirect the user to the Review step
-					forward( action:formAction, params: [stepAlt:'review', filename:model.filename] )
+					forward( action:formAction, params: [stepAlt:'review', filename:model.filename, processOption: params.processOption] )
 					return
 					break
 
@@ -1290,7 +1291,7 @@ class AdminController {
 					// This step will serve up the review template that in turn fetch the review data 
 					// via an Ajax request.
 					options = accountImportExportService.importParamsToOptionsMap(params)
-					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params.filename)
+					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params)
 					if (!options.filename && model.filename) {
 						// log.debug "importAccounts() step=$step set filename=${model.filename}"
 						options.filename = model.filename
@@ -1322,207 +1323,7 @@ class AdminController {
 					render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
 
 					return
-// n: No signature of method: AccountImportExportService.importAccount_Step3_PostResults() is applicable for argument types: (UserLogin, Project, net.bull.javamelody.JspWrapper$HttpRequestWrapper3, java.util.LinkedHashMap) values: [jmartin, MarketingDemo : MarketingDemo, ...]
 					break
-
-
-/*	
-
-					boolean header = params.header == 'Y'
-					view = "${formAction}Results"
-//
-// ------------------------
-//
-				String error=''
-				List accounts = loadAndValidateSpreadsheet(user, project, params.filename)
-
-				if (!randomPassword) {
-					commonPassword = UUID.randomUUID().toString()
-				}
-
-				// Compute the date into the future based on the user input
-				Date defaultExpiryDate = new Date()
-				use (TimeCategory) {
-					defaultExpiryDate = expiryDate + expireDays.days
-				}
-
-
-				log.info "expiryDate=$expiryDate"
-
-				def failedPeople = []
-				def created = 0
-
-				if (!StringUtils.isEmpty(role) && !validRoleCodes.contains(role)) {
-					failed = true
-					people = []
-				}
-
-				def projectCompanies = partyRelationshipService.getProjectCompanies(project.id)
-
-				people.each() { p -> 
-							Map userSettings = [
-								username: ,
-								password: ,
-								activateLogin: , // boolean
-								expiryDate: ,
-								forcePasswordChange: , // boolean
-							]
-
-					def company = projectCompanies.find{it.partyIdTo.name == p.company}
-					if (!company) {
-						p.errors << "Unable to assign ${p.name} to ${p.company}"
-					} else {
-						def person
-						boolean failed = false
-						boolean haveMessage = false
-
-						if (p.match ) {
-							// Find the person
-							person = findPerson(p)
-							if (! person) {
-								p.errors << "Unable to find previous Person match"
-								failed = true
-							} else {
-								person.email = p.email
-								person.workPhone = p.phone
-								person.title = p.title
-								person.deparment = p.department
-								person.location = p.location
-								person.stateProv = p.stateProv
-								person.country = p.country
-								person.mobilePhone = p.mobile
-
-								if (person.validate() && person.save(flush:true)) {
-									log.info "importAccounts() : updated person $person"
-									partyRelationshipService.addCompanyStaff(company, person)
-								} else {
-									p.errors << "Error" + GormUtil.allErrorsString(person)
-									failed = true
-								}
-							}
-						} else {
-							person = new Person(
-								firstName:p.firstName, 
-								middleName:p.middleName, 
-								lastName:p.lastName,
-								email:p.email,
-								workPhone: p.phone,
-								title: p.title,
-								department: p.department,
-								location: p.location,
-								stateProv: p.stateProv,
-								country: p.country,
-								mobilePhone: p.mobile,
-								staffType: 'Salary'
-								)
-						
-							if (person.validate() && person.save(flush:true)) {
-								log.info "importAccounts() : created person $person"
-								partyRelationshipService.addCompanyStaff(company, person)
-								partyRelationshipService.addProjectStaff(project, person)
-							} else {
-								p.errors << "Error" + GormUtil.allErrorsString(person)
-								failed = true
-							}
-
-							// Assign the user to one or more teams appropriately
-							if (!failed && p.teams) {
-								List teams = splitTeams(p.teams)
-
-								teams.each { t ->
-									if (teamCodes.contains(t)) {
-										partyRelationshipService.addStaffFunction(person, t, project.client, project)
-									}
-								}
-							}
-						}
-
-// -----------------						
-
-						def userRole = role
-						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
-							userRole = p.role
-						}
-						if (!validRoleCodes.contains(userRole)) {
-							userRole = DEFAULT_ROLE
-						}
-						if (!failed && !StringUtils.isEmpty(userRole)) {
-							log.debug "importAccounts() : creating Role $userRole for $person"
-							// Delete previous security roles if they exist
-							def assignedRoles = []
-							def assignRole = false
-							if (p.match) {
-								def personRoles = userPreferenceService.getAssignedRoles(person);
-								personRoles.each { r ->
-									assignedRoles << r.id
-									if (r.id != userRole) {
-										assignRole = true
-									}
-								}
-								if (assignRole) {
-									userPreferenceService.deleteSecurityRoles(person)
-								}
-								if (personRoles.size() == 0) {
-									assignRole = true
-								}
-							} else {
-								assignRole = true
-							}
-							if (assignRole) {
-								userPreferenceService.setUserRoles([userRole], person.id)
-
-								// Audit role changes
-								def currentUser = securityService.getUserLogin()
-								if (p.match) {
-									p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
-									haveMessage = true
-									auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
-								} else {
-									auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
-								}
-							}
-						}
-
-						// Create/Update UserLogin
-						if (person && createUserLogin && p.username) {
-
-							error = createUserForAccount(person, project, userSettings)
-							if (error) {
-								p.errors << error
-								haveMessage = true
-							}
-
-							if (!failed) created++
-
-						}
-
-						if (failed || haveMessage) {
-							failedPeople << p	
-						}
-					}
-
-				} // people.each
-
-				map.step = 'results'
-				map.failedPeople = failedPeople
-				map.created = created
-
-
-			default: 
-				break
-
-		} // switch
-
-		return map
-
-
-*/
-
-//
-// ------------------------
-//
-
-
 
 				default:
 					// The default which is the first step to prompt for the spreadsheet to upload

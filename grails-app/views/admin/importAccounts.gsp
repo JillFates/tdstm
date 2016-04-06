@@ -27,8 +27,16 @@
 					<input type="hidden" name="step" value="upload" />
 					<br />
 					<br />
+					Import Option: 
+					<select name="processOption">
+						<option value="B" selected>Both Person and UserLogin</option>
+						<option value="P">Person only</option>
+						<option value="U">UserLogin only</option>
+					</select>
+					<br>
+					<br>
 					<label>
-						<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import into project ${projectName}
+						<input type="checkbox" name="verifyProject" value="Y"> YES - I want to import accounts into project ${projectName}
 					</label>
 					<br />
 					<br />

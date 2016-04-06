@@ -42,13 +42,15 @@
 	<script>
 		// Used to render the changes made in a view
 		function showChanges(model, propertyName) {
-			var origPropName = propertyName + '${originalSuffix}';
+			var originalPropName = propertyName + '${originalSuffix}';
+			var defaultPropName = propertyName + '${defaultSuffix}';
 
-			// if (model[origPropName]) {
-			if (model.hasOwnProperty(origPropName)) {
+			if (model.hasOwnProperty(defaultPropName)) {
+				return '<span class="default">' + model[defaultPropName] + '</span>';
+			} else if (model.hasOwnProperty(originalPropName)) {
 				return '<span class="change">' + model[propertyName] + 
 					'</span>' + 
-					(model[origPropName] ? '<br><span class="current">' + model[origPropName] + '</span>' : '');
+					(model[originalPropName] ? '<br><span class="original">' + model[originalPropName] + '</span>' : '');
 			} else {
 				return model[propertyName];
 			}
@@ -167,39 +169,8 @@
 				<input type="hidden" name="header" value="${header}" />
 				<input type="hidden" name="timezone" value="${timezone}" />
 				<input type="hidden" name="filename" value="${filename}" />
-			<table>
-				<tr>
-					<td>
-						<label><input type="checkbox" name="createUserlogin" value="Y"> Create/Update user logins</label>
-						<br />
-						<label><input type="checkbox" name="activateLogin" value="Y"> Activate user logins</label>
-						<br />
-						<label><input type="checkbox" name="forcePasswordChange" value="Y" checked> Force change password on next login</label>
-					</td>
-					<%-- 
-					<td>
-						For new User Logins only:<ul>
-							<li><input type="checkbox" name="randomPassword" value="Y"> Generate random passwords or </li>
-							<li><input type="text" name="password" size="10"> Default password to use <i>(if blank in import)</i></li>
-						</ul>
-					</td>
-					--%>
-					<td>
-						<select name="role"> 
-							<label><option value="USER">USER</option></label>
-							<label><option value="EDITOR">EDITOR</option></label>
-							<label><option value="SUPERVISOR">SUPERVISOR</option></label>
-						</select>
-						Default Security Role <i>(if blank in import)</i>
-						<br/>
-						<label><input type="text" name="expireDays" value="90" size="4"> Days before account(s) expires</label>
-						<br />
-					</td>
-					<td>
-						<g:submitButton id="createSubmit" name="submit" value="Create/Update Accounts" />
-					</td>
-				</tr>
-			</table>
+
+				<g:submitButton id="createSubmit" name="submit" value="Post changes to ${processOptionDesc}" />
 			</g:form>
 		</div>
 	</div>

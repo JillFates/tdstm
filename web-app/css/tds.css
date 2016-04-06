@@ -1759,10 +1759,14 @@ div.account-import-review div.k-grid-content-locked {
 	border-width: 0 2px 0 0;
 	border-right-color: #888;
 }
-div.account-import-review span.current {
+div.account-import-review span.original {
 	text-decoration: line-through;
 	color: #888888;
 }
 div.account-import-review span.change {
+	font-weight: bold;
+}
+div.account-import-review span.default {
+	font-style: italic;
 	font-weight: bold;
 }
