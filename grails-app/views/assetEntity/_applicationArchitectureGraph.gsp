@@ -59,6 +59,7 @@ $('#labelCheckBoxId').on('change', function (a, b) {
 });
 
 var zoomBehavior;
+var onInitialGraphExecution = true;
 var offsetGroup = canvas;
 var vis = canvas;
 var background;
@@ -1465,7 +1466,7 @@ function buildMap (width, height) {
 	
 	// Tick function called at every "tick" of the d3 simulation
 	function tick(e) {
-		centerGraph();
+
 		// move the nodes towards their intended positions
 		var k = e.alpha
 		var movementCutoff = 0.2;
@@ -1543,6 +1544,11 @@ function buildMap (width, height) {
 		
 		// if all the nodes have settled then stop ticking
 		if (!movement) {
+			// Only after tick has finished and is the first time
+			if(onInitialGraphExecution)  {
+				centerGraph();
+				onInitialGraphExecution = false;
+			}
 			GraphUtil.force.alpha(0);
 		}
 	}
