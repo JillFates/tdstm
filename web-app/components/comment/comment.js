@@ -807,7 +807,6 @@ tds.comments.service.CommentService = function(utils, http, q) {
 
 	var getIndexValueMapper = function(category, commentId, taskId){
 		var deferred = q.defer();
-
 		http.get(utils.url.applyRootPath('/assetEntity/taskSearchMap?category=' + category + '&commentId=' + commentId + '&taskId=' + taskId)).
 			success(function(data, status, headers, config) {
 				deferred.resolve(data);
@@ -1587,7 +1586,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			 * @param dependency
 			 * @returns {*}
 			 */
-			scope.taskOptionsDS = function(dependency, updatedDependencyList) {
+			scope.taskOptionsDS = function(dependency, updatedDependencyList) {				
 				if(dependency.taskId !== '' && !updatedDependencyList) {
 					return createDataSourceForLazyLoad(dependency);
 				} else {
@@ -1608,15 +1607,12 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					filter: "contains",
 					virtual: {
 						itemHeight: 20,
-						valueMapper: function(options) {
-							if(options.value && options.value !== '') {
-								//options.value is the dependency.taskId that was assigned in the model, is the same value
-								commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
-									function(data) {
-										options.success(data.data);
-									}, function(data) {}
-								);
-							}
+						valueMapper: function(options) {					
+							commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
+								function(data) {
+									options.success(data.data);
+								}, function(data) {}
+							);
 						}
 					},
 					height: 220,
@@ -1629,6 +1625,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						},
 						pageSize: 100,
 						serverPaging: true,
+						serverFiltering: true,						
 						schema: {
 							data: function(reply) {
 								return reply.data.list
@@ -1639,7 +1636,6 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						}
 					}
 				};
-
 				return ds;
 			}
 
@@ -1649,7 +1645,6 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			 * @returns {{placeholder: string, dataTextField: string, dataValueField: string, filter: string, autoBind: boolean, height: number, virtual: {itemHeight: number, valueMapper: Function}}}
 			 */
 			function createDataSourceForLazyLoad(dependency) {
-
 				var ds = {
 					placeholder: "Select...",
 					dataTextField: "desc",
@@ -1707,6 +1702,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 					},
 					pageSize: 100,
 					serverPaging: true,
+					serverFiltering: true,	
 					schema: {
 						data: function (reply) {
 							return reply.data.list
@@ -1722,14 +1718,13 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 			}
 
 			scope.updateDependencyList = function(dependency, onPreload) {
-				if(!onPreload) {
+				if(!onPreload) {					
 					createNewDataSource(dependency);
 				}
 
 				dependency.dropdown.list.width("230");
 				dependency.dropdown.list.css("white-space","nowrap");
 			};
-
 			scope.deleteRow = function(index) {
 				if (scope.ngModel[index].id) {
 					scope.deleted[scope.ngModel[index].id] = scope.ngModel[index].id;

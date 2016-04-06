@@ -622,8 +622,8 @@ class TaskService implements InitializingBean {
 				category=''
 			}
 		}
-		if (filterDesc) {
-			query.append("AND a.comment like '%${filterDesc}%' ")
+		if (filterDesc) { //160405 @tavo_luna: if we have a filter, this will be applied to the comment and the taskNumber
+			query.append("AND (a.taskNumber like '%${filterDesc}%' or a.comment like '%${filterDesc}%') ")
 		}
 
 		// If there is a task we can add some additional filtering like not including self in the list of predecessors and filtering on moveEvent
@@ -646,6 +646,7 @@ class TaskService implements InitializingBean {
 		
 		// Add the sort and generate the list
 		query.append('ORDER BY a.taskNumber ASC')
+		log.info(query)
 		def resultTotal = AssetComment.executeQuery(queryCount.append(query).toString())
 		def total = resultTotal[0]
 
@@ -710,7 +711,7 @@ class TaskService implements InitializingBean {
 		def tasksInfo = jdbcTemplate.queryForList(query.toString())
 		
 		if (tasksInfo[0] != null) {
-			taskIndex = tasksInfo[0]['rownum'] + 1
+			taskIndex = tasksInfo[0]['rownum']
 		}
 
 		return taskIndex

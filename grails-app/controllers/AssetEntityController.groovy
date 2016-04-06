@@ -3630,6 +3630,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		render result
 	}
 	
+	/**
+	 * returns a list of tasks paginated and filtered  
+	 */
 	def tasksSearch() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
@@ -3640,7 +3643,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def moveEventId=params.moveEvent
 		def page=Long.parseLong(params.page)
 		def pageSize=Long.parseLong(params.pageSize)
-		def filterDesc=params.list('filter[filters][0][value]')
+		def filterDesc=params['filter[filters][0][value]']
 		
 		if (params.commentId) { 
 			task = AssetComment.findByIdAndProject(params.commentId, project)
@@ -3650,21 +3653,24 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 
 		def tasksData = taskService.genSelectForPredecessors(project, params.category, task, moveEventId, page, pageSize, filterDesc)
-		def result
 		
 		def list = []
+		
 		list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
 		tasksData.total++
+
 		tasksData.list.each {
 			def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
 			list << [ id: it.id, desc: it.taskNumber + ': ' + desc, category: it.category, taskNumber: it.taskNumber]
 		}
-		tasksData.list = list
-		result = ServiceResults.success(tasksData) as JSON
 
-		render result
+		tasksData.list = list
+		render( ServiceResults.success(tasksData) as JSON )
 	}
 
+	/**
+	 * Return the task index in the search
+	 */
 	def taskSearchMap() {
 		def project = controllerService.getProjectForPage( this )
 		if (! project) 
@@ -3674,7 +3680,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		def moveEventId=params.moveEvent
 		def taskId=params.taskId
 		def task
-		def filterDesc=params.list('filter[filters][0][value]')
 		
 		if (params.commentId) { 
 			task = AssetComment.findByIdAndProject(params.commentId, project)
@@ -3685,9 +3690,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 		def taskIdx = taskService.searchTaskIndexForTask(project, params.category, task, moveEventId, taskId)
 
-		def result = ServiceResults.success([taskIdx.intValue()]) as JSON
-
-		render result
+		render( ServiceResults.success([taskIdx.intValue()]) as JSON )
 	}
 
 	/**
