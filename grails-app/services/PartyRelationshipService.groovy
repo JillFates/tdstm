@@ -744,12 +744,13 @@ class PartyRelationshipService {
 		boolean projectById = (project instanceof Long)
 		boolean staffById = (staff instanceof Long)
 
-		StringBuffer query = new StringBuffer("select roleTypeCodeTo from PartyRelationship p \
-			where p.partyRelationshipType='PROJ_STAFF' \
-			and p.roleTypeCodeFrom.id='PROJECT' \
-			and p.partyIdFrom${(projectById ? '.id' : '')} = :project \
-			and p.partyIdTo${(projectById ? '.id' : '')} = :staff ")
-		if (includeStaffRecord) {
+		StringBuffer query = new StringBuffer("""select roleTypeCodeTo from PartyRelationship p
+			where p.partyRelationshipType='PROJ_STAFF'
+			and p.roleTypeCodeFrom.id='PROJECT'
+			and p.partyIdFrom${(projectById ? '.id' : '')} = :project
+			and p.partyIdTo${(projectById ? '.id' : '')} = :staff """)
+		
+		if (! includeStaffRecord) {
 			query.append(" and p.roleTypeCodeTo.id <> 'STAFF'")
 		}
 

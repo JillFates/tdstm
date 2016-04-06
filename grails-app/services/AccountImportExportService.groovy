@@ -30,22 +30,22 @@ class AccountImportExportService {
 	def projectService
 	def securityService	
 
-	static final LOGIN_OPT_ALL = 'A'
-	static final LOGIN_OPT_ACTIVE = 'Y'
-	static final LOGIN_OPT_INACTIVE = 'N'
+	static final String LOGIN_OPT_ALL = 'A'
+	static final String LOGIN_OPT_ACTIVE = 'Y'
+	static final String LOGIN_OPT_INACTIVE = 'N'
 
-	static final ACCOUNT_EXPORT_TEMPLATE = '/templates/AccountsImportExport.xls'
-	static final EXPORT_FILENAME_PREFIX = 'AccountExport'
-	static final TEMPLATE_TAB_NAME = 'Accounts'
+	static final String ACCOUNT_EXPORT_TEMPLATE = '/templates/AccountsImportExport.xls'
+	static final String EXPORT_FILENAME_PREFIX = 'AccountExport'
+	static final String TEMPLATE_TAB_NAME = 'Accounts'
 
 	// Used to indicate the alternate property name with the original and defaulted values
 	// that are stored in the account map (e.g. firstName, firstName_o and firstName_d)
-	static final ORIGINAL_SUFFIX = '_o'
-	static final DEFAULTED_SUFFIX = '_d'
+	static final String ORIGINAL_SUFFIX = '_o'
+	static final String DEFAULTED_SUFFIX = '_d'
 
-	static final IMPORT_OPTION_BOTH='B'
-	static final IMPORT_OPTION_PERSON='P'
-	static final IMPORT_OPTION_USERLOGIN='U'
+	static final String IMPORT_OPTION_BOTH='B'
+	static final String IMPORT_OPTION_PERSON='P'
+	static final String IMPORT_OPTION_USERLOGIN='U'
 
 	// Users can split Teams and Security roles on the follow characters as well as the default comma (,)
 	static final List DELIM_OPTIONS = [';',':','|'] 
@@ -60,30 +60,32 @@ class AccountImportExportService {
 	 *    label: 	the column heading label in the grid and export spreadsheet
 	 */
 	static final Map accountSpreadsheetColumnMap = [
-		personId      : [type:'number', ssPos:1,  formPos:1,  domain:'I', width:50,  locked:true,  label:'ID'],
-		firstName     : [type:'string', ssPos:2,  formPos:2,  domain:'P', width:90,  locked:true,  label:'First Name', template:"\"#= showChanges(data, 'firstName') #\""],
-		middleName    : [type:'string', ssPos:3,  formPos:3,  domain:'P', width:90,  locked:true,  label:'Middle Name', template:"\"#= showChanges(data, 'middleName') #\""],
-		lastName      : [type:'string', ssPos:4,  formPos:4,  domain:'P', width:90,  locked:true,  label:'Last Name', template:"\"#= showChanges(data, 'lastName') #\""],
-		company       : [type:'string', ssPos:5,  formPos:5,  domain:'T', width:90,  locked:true,  label:'Company', template:"\"#= showChanges(data, 'company') #\""],
-		errors        : [type:'list',   ssPos:0,  formPos:6,  domain:'T', width:240, locked:false, label:'Errors', template: "kendo.template(\$('#error-template').html())" ],
-		workPhone     : [type:'string', ssPos:6,  formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', template:"\"#= showChanges(data, 'workPhone') #\""],
-		mobilePhone   : [type:'string', ssPos:7,  formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', template:"\"#= showChanges(data, 'mobilePhone') #\""],
-		email         : [type:'string', ssPos:8,  formPos:9,  domain:'P', width:100, locked:false, label:'Email', template:"\"#= showChanges(data, 'email') #\""],
-		title         : [type:'string', ssPos:9,  formPos:10, domain:'P', width:100, locked:false, label:'Title', template:"\"#= showChanges(data, 'title') #\""],
-		department    : [type:'string', ssPos:10, formPos:11, domain:'P', width:100, locked:false, label:'Department', template:"\"#= showChanges(data, 'department') #\""],
-		location      : [type:'string', ssPos:11, formPos:12, domain:'P', width:100, locked:false, label:'Location/City', template:"\"#= showChanges(data, 'location') #\""],
-		stateProv     : [type:'string', ssPos:12, formPos:13, domain:'P', width:100, locked:false, label:'State/Prov', template:"\"#= showChanges(data, 'stateProv') #\""],
-		country       : [type:'string', ssPos:13, formPos:14, domain:'P', width:100, locked:false, label:'Country', template:"\"#= showChanges(data, 'country') #\""],
-		personTeams   : [type:'list',   ssPos:14, formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)'],
-		projectTeams  : [type:'list',   ssPos:15, formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)'],
-		roles         : [type:'list',   ssPos:16, formPos:17, domain:'T', width:100, locked:false, label:'Security Role(s)', template:"\"#= showChanges(data, 'roles') #\""],
-		username      : [type:'string', ssPos:17, formPos:18, domain:'U', width:120, locked:false, label:'Username'],
-		accountLocal  : [type:'string', ssPos:18, formPos:19, domain:'U', width:100, locked:false, label:'Local Account?'],
-		loginActive   : [type:'string', ssPos:19, formPos:20, domain:'U', width:100, locked:false, label:'Login Active?'],
-		accountExp    : [type:'string', ssPos:20, formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration'],
-		passwordExp   : [type:'string', ssPos:21, formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration'],
-		passwordFixed : [type:'string', ssPos:22, formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?'],
-		match         : [type:'list',   ssPos:0,  formPos:24, domain:'T', width:100, locked:false, label:'Matched On']
+		personId               : [type:'number',  ssPos:0,    formPos:1,  domain:'I', width:50,  locked:true,  label:'ID'],																	
+		firstName              : [type:'string',  ssPos:1,    formPos:2,  domain:'P', width:90,  locked:true,  label:'First Name', template:"\"#= showChanges(data, 'firstName') #\""],
+		middleName             : [type:'string',  ssPos:2,    formPos:3,  domain:'P', width:90,  locked:true,  label:'Middle Name', template:"\"#= showChanges(data, 'middleName') #\""],
+		lastName               : [type:'string',  ssPos:3,    formPos:4,  domain:'P', width:90,  locked:true,  label:'Last Name', template:"\"#= showChanges(data, 'lastName') #\""],
+		company                : [type:'string',  ssPos:4,    formPos:5,  domain:'T', width:90,  locked:true,  label:'Company', template:"\"#= showChanges(data, 'company') #\""],
+		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors', template: "kendo.template(\$('#error-template').html())" ],
+		workPhone              : [type:'string',  ssPos:5,    formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', template:"\"#= showChanges(data, 'workPhone') #\""],
+		mobilePhone            : [type:'string',  ssPos:6,    formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', template:"\"#= showChanges(data, 'mobilePhone') #\""],
+		email                  : [type:'string',  ssPos:7,    formPos:9,  domain:'P', width:100, locked:false, label:'Email', template:"\"#= showChanges(data, 'email') #\""],
+		title                  : [type:'string',  ssPos:8,    formPos:10, domain:'P', width:100, locked:false, label:'Title', template:"\"#= showChanges(data, 'title') #\""],
+		department             : [type:'string',  ssPos:9,    formPos:11, domain:'P', width:100, locked:false, label:'Department', template:"\"#= showChanges(data, 'department') #\""],
+		location               : [type:'string',  ssPos:10,   formPos:12, domain:'P', width:100, locked:false, label:'Location/City', template:"\"#= showChanges(data, 'location') #\""],
+		stateProv              : [type:'string',  ssPos:11,   formPos:13, domain:'P', width:100, locked:false, label:'State/Prov', template:"\"#= showChanges(data, 'stateProv') #\""],
+		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country', template:"\"#= showChanges(data, 'country') #\""],
+		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)', template:"\"#= showChanges(data, 'personTeams') #\""],
+		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)', template:"\"#= showChanges(data, 'projectTeams') #\""],
+		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:100, locked:false, label:'Security Role(s)', template:"\"#= showChanges(data, 'roles') #\""],
+		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username', template:"\"#= showChanges(data, 'username') #\""],
+		isLocal                : [type:'boolean', ssPos:17,   formPos:19, domain:'U', width:100, locked:false, label:'Local Account?', template:"\"#= showChanges(data, 'isLocal') #\""],
+		active                 : [type:'string',  ssPos:18,   formPos:20, domain:'U', width:100, locked:false, label:'Login Active?', template:"\"#= showChanges(data, 'active') #\""],
+		expiryDate             : [type:'string',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', template:"\"#= showChanges(data, 'expiryDate') #\""],
+		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', template:"\"#= showChanges(data, 'passwordExpirationDate') #\""],
+		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', template:"\"#= showChanges(data, 'passwordNeverExpires') #\""],
+		forcePasswordChange    : [type:'string',  ssPos:22,   formPos:24, domain:'U', width:100, locked:false, label:'Force Chg Pswd?', template:"\"#= showChanges(data, 'forcePasswordChange') #\""],
+		lastLogin              : [type:'datetime',ssPos:23,   formPos:24, domain:'T', width:100, locked:false, label:'Last Login (readonly)'],
+		match                  : [type:'list',    ssPos:null, formPos:25, domain:'T', width:100, locked:false, label:'Matched On']
 	]
 
 	/*********************************************************************************************************
@@ -138,6 +140,15 @@ class AccountImportExportService {
 		// Save the spreadsheet file and then read it into a HSSFWorkbook
 		model.filename = saveImportSpreadsheet(request, byWhom, fileParamName)
 		HSSFWorkbook spreadsheet = readImportSpreadsheet(model.filename)
+
+		if (! validateSpreadsheetHeader(spreadsheet)) {
+			String fqfn=getFilenameWithPath(model.filename)
+			if (! new File(fqfn).delete()) {
+				log.error "Unable to delete temporary account import worksheet $fqfn"
+			}
+			throw new InvalidParamException('The spreadsheet column headers did not match the expected format. Please '+ 
+				' export a new template before attempt an import.')
+		}
 
 		// Read in the accounts and then validate them
 		List accounts = readAccountsFromSpreadsheet(spreadsheet)
@@ -324,7 +335,6 @@ class AccountImportExportService {
 	Map importParamsToOptionsMap(params) {
 		Map options = [ 
 			processOption:params.processOption,
-			
 		]
 
 		options.flagToUpdatePerson = shouldUpdatePerson(options)
@@ -477,36 +487,19 @@ class AccountImportExportService {
 	private void populateAccountSpreadsheet(session, Project project, List persons, sheet, companyId, includeUserLogins, userLoginOption) {
 		Date now = new Date()
 		persons.eachWithIndex{ person, index ->
-			Map map = personToFieldMap(person, project)
+			Map account = personToFieldMap(person, project)
 
 			if (includeUserLogins) {
-				UserLogin user = UserLogin.findByPerson(person)
-				if (user) {
-					boolean isLoginInfoOkay = (userLoginOption == LOGIN_OPT_ALL)
-					if (! isLoginInfoOkay) {
-						// Check if the user matches the filter options
-						if (userLoginOption == LOGIN_OPT_ACTIVE) {	
-							// TODO : JPM 3/2016 : The UserLogin.userActive function should probably include the additional checks that are here
-							if (user.userActive() && (user.passwordNeverExpires || !(user.isLocal && user.passwordExpirationDate < now))){
-							// if (p.active == "Y" && user.active == "Y" && user.expiryDate > now && (loginInfo.passwordNeverExpires || !(loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
-								isLoginInfoOkay = true
-							}
-						} else if (userLoginOption == LOGIN_OPT_INACTIVE) {
-							if (!user.userActive() || (!user.passwordNeverExpires && (user.isLocal && user.passwordExpirationDate < now))){
-								// if (p.active == "N" || loginInfo.active == "N" || loginInfo.expiryDate < now  || (!loginInfo.passwordNeverExpires && (loginInfo.isLocal && loginInfo.passwordExpirationDate < now))){
-								isLoginInfoOkay = true
-							}
-						}
-					}
-
-					if (isLoginInfoOkay) {
-						// Add the User properties to the map
-						map << userLoginToFieldMap(user, session)
-					}
+				UserLogin userLogin = person.userLogin
+				if (userLogin) {
+					Map userMap = userLoginToFieldMap(userLogin, session)
+					// log.debug "userMap = $userMap"
+					account.putAll(userMap)
 				}
 			}
 
-			addRowToAccountSpreadsheet(sheet, map, (index+1))			
+			// Now that we have the map, we can iterate over the account map
+			addRowToAccountSpreadsheet(sheet, account, (index+1))			
 		}
 	}	
 
@@ -517,11 +510,11 @@ class AccountImportExportService {
 	 * @param rowNumber - the row in the spreadsheet to insert the values 
 	 */
 	private void addRowToAccountSpreadsheet(sheet, Map account, int rowNumber) {
-		List properties = getPropertiesInColumnOrder('ssPos')
-		// log.debug "addRowToAccountSpreadsheet() properties=$properties, sheet isa ${sheet.getClass().getName()}"
-		for (int i=0; i < properties.size(); i++) {
-			if (account.containsKey(properties[i])) {
-				WorkbookUtil.addCell(sheet, i, rowNumber, account[properties[i]])
+		// Loop through the SpreadSheet Map and add to the cells
+		accountSpreadsheetColumnMap.each { prop, info ->
+			def colPos = info.ssPos
+			if (colPos != null) {
+				WorkbookUtil.addCell(sheet, colPos, rowNumber, account[prop])
 			}
 		}
 	}
@@ -531,12 +524,35 @@ class AccountImportExportService {
 	 * @param sheet - the spreadsheet to update
 	 */
 	private void updateSpreadsheetHeader(sheet) {
-		List labels = getLabelsInColumnOrder('ssPos')
 		def tab = sheet.getSheet(TEMPLATE_TAB_NAME)
-
-		for(int i=0; i < labels.size(); i++) { 
-			WorkbookUtil.addCell(tab, i, 0, labels[i])
+		accountSpreadsheetColumnMap.each { prop, info ->
+			def colPos = info.ssPos
+			if (colPos != null) {
+				WorkbookUtil.addCell(tab, colPos, 0, info.label)
+			}
 		}
+	}
+
+	/**
+	 * This method will compare the column headers to the map to determine if the spreadsheet being read in
+	 * matches the format that we are expecting.
+	 * @param sheet - the spreadsheet to inspect
+	 * @return true if the headers match otherwise false
+	 */
+	private boolean validateSpreadsheetHeader(sheet) {
+		boolean ok = true
+		def tab = sheet.getSheet(TEMPLATE_TAB_NAME)
+		accountSpreadsheetColumnMap.each { prop, info ->
+			def colPos = info.ssPos
+			if (colPos != null) {
+				def label = WorkbookUtil.getCell(tab, colPos, 0)
+				if (info.label.toString() != label.toString()) {
+					log.debug "validateSpreadsheetHeader() expected '${info.label}' but found '$label' for column ${WorkbookUtil.columnCode(colPos)}"
+					ok = false
+				}
+			}
+		}
+		return ok
 	}
 
 	/**
@@ -564,7 +580,8 @@ class AccountImportExportService {
 		List roles = RoleType.findAllByType(RoleType.SECURITY, [order:'level'])
 		int row = 1
 		roles.each {r ->
-			if (r.id == 'TEST_ROLE') return
+			if (r.id == 'TEST_ROLE') 
+				return
 			WorkbookUtil.addCell(tab, 0, row, r.id)
 			WorkbookUtil.addCell(tab, 1, row++, r.toString())
 		}
@@ -576,29 +593,18 @@ class AccountImportExportService {
 	 * @return a map of the person information
 	 */
 	private Map personToFieldMap(Person person, Project project) {
+		Map map = buildMapForDomain(person, 'P')
 
+		// Deal with transient properties that we can't handle through the map just yet...
 		List personTeams = person.getSuitableTeams().id
 		List projectTeams = partyRelationshipService.getProjectStaffFunctions(project, person).id
 		List roles = securityService.getAssignedRoles(person).id
 
-		Map map = [
-			personId     : person.id,
-			firstName    : person.firstName ?: '', 
-			middleName   : person.middleName ?: '', 
-			lastName     : person.lastName ?: '', 
-			company      : person.company.name ?: '', 
-			workPhone    : person.workPhone ?: '',
-			mobilePhone  : person.mobilePhone ?: '', 
-			email        : person.email ?: '', 
-			title        : person.title ?: '',
-			department   : person.department ?: '', 
-			location     : person.location ?: '', 
-			stateProv    : person.stateProv ?: '', 
-			country      : person.country ?: '', 
-			personTeams  : personTeams.join(", "), 
-			projectTeams : projectTeams.join(", "), 
-			roles        : roles.join(", ")
-		]  
+		map.personTeams  = personTeams.join(", ") 
+		map.projectTeams = projectTeams.join(", ") 
+		map.roles        = roles.join(", ")
+		map.personId = person.id
+		map.company = person.company.name
 
 		return map
 	}
@@ -609,19 +615,37 @@ class AccountImportExportService {
 	 * @param session - the request session which is used to access the timezone information
 	 * @return a map of the person information
 	 */
-	private Map userLoginToFieldMap(UserLogin user, Object session) {
-		def pswdExpDate=''
-		if (user.passwordExpirationDate) {
-			pswdExpDate = TimeUtil.formatDateTime(session, user.passwordExpirationDate, TimeUtil.FORMAT_DATE) 
+	private Map userLoginToFieldMap(UserLogin user, Object session) {	
+		Map map = buildMapForDomain(user, 'U')
+
+		// Handle Transient properties
+		map.lastLogin = user.lastLogin
+
+		return map
+	}
+
+	/**
+	 * Used to create a map of properties from a Domain object by using the accountSpreadsheetColumnMap 
+	 * to determine the properties to fetch.
+	 * @param domainObj - the object to pull the values from (Person, UserLogin)
+	 * @param domainCode - the code for the domain property in the Map e.g. P)erson or U)ser
+	 * @return The map containing the values from the domain that are identified
+	 */
+	private Map buildMapForDomain(Object domainObj, String domainCode) {
+		Map map = [:]
+		accountSpreadsheetColumnMap.each { prop, info ->
+			if (info.domain != domainCode) {
+				return
+			}
+			switch (info.type) {
+				case 'boolean':
+					map[prop] = (domainObj[prop] ? 'Y' : 'N')
+					break
+				default:	
+					map[prop] = domainObj[prop]
+					break
+			}
 		}
-		Map map = [
-			username      : user.username,
-			accountLocal  : (user.isLocal ? 'Y' : 'N'),
-			loginActive   : (user.active ? 'Y' : 'N'),
-			accountExp    : TimeUtil.formatDateTime(session, user.expiryDate, TimeUtil.FORMAT_DATE),
-			passwordExp   : pswdExpDate,
-			passwordFixed : (user.passwordNeverExpires ? 'Y' : 'N')
-		]
 		return map
 	}
 
@@ -641,13 +665,23 @@ class AccountImportExportService {
 		String filename = "AccountImport-${byWhom.id}-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
 
 		// Save file locally
-		String fqfn=coreService.getAppTempDirectory() + '/' + filename	
+		String fqfn=getFilenameWithPath(filename)
 		log.info "saveImportSpreadsheet() user $byWhom uploaded AccountImport spreadsheet to $fqfn"	
 
 		File localFile = new File(fqfn)
 		xlsFile.transferTo(localFile)
 
 		return filename
+	}
+
+	/**
+	 * This is used to get the fully qualified filename with path of where the temporary files are written
+	 * @param filename - the name of the file without a path
+	 * @return the filename with the path prefix
+	 */
+	private String getFilenameWithPath(String filename) {
+		String fqfn=coreService.getAppTempDirectory() + '/' + filename	
+		return fqfn
 	}
 
 	/**
@@ -679,18 +713,25 @@ class AccountImportExportService {
 		int lastRow = accountsSheet.getLastRowNum()
 		List accounts = []
 
-		List properties = getPropertiesInColumnOrder('ssPos')
 		for (int row = firstAccountRow; row <= lastRow; row++) {
 			Map account = [:]
 			int pIdx = 0
-			properties.each { 
-				account.put(it, WorkbookUtil.getStringCellValue(accountsSheet, pIdx++, row).trim())
+			accountSpreadsheetColumnMap.each { prop, info ->
+				Integer colPos = info.ssPos
+				if (colPos != null) {
+					def value
+					switch( info.type ) {
+						default:
+							value = WorkbookUtil.getStringCellValue(accountsSheet, colPos, row).trim()
+					}
+					account[prop] = value
+				}
 			}
 			account.errors = []
 			account.match = []
-
 			accounts.add(account)
 		}
+
 		return accounts
 	}
 
@@ -1147,10 +1188,12 @@ class AccountImportExportService {
 
 		} else {
 			// Set the default role 
-			account.roles = [DEFAULT_ROLE]
-			account["roles${DEFAULTED_SUFFIX}"] = DEFAULT_ROLE
+			String dsrc = securityService.getDefaultSecurityRoleCode()
+			account.roles = [dsrc]
+			account["roles${DEFAULTED_SUFFIX}"] = dsrc
 		}		
 	}
+
 	/**
 	 * Used to load any property a person object where the values are different
 	 * @param person - the person object to be changed

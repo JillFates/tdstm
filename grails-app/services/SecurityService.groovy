@@ -32,6 +32,8 @@ class SecurityService implements InitializingBean {
 	
 	static transactional = true
 
+	static final String DEFAULT_SECURITY_ROLE_CODE='USER'
+
 	// IoC
 	def jdbcTemplate
 	def auditService
@@ -43,6 +45,14 @@ class SecurityService implements InitializingBean {
 	def loginConfigMap = [usernamePlaceholder:'enter your freaking username', authorityPrompt:'prompt', authorityLabel:'DOMAIN!', authorityName:'TDS']
 	def userLocalConfigMap = [:]
 
+	
+	/**
+	 * Used to return the default security code that should be assigned to individuals if not is specified.
+	 * @return The security code
+	 */
+	String getDefaultSecurityRoleCode() {
+		return DEFAULT_SECURITY_ROLE_CODE
+	}
 	
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
