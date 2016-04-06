@@ -77,6 +77,8 @@
 	<script>
 
 		$(document).ready(function() {
+			// Track load of the Grid has been processed correctly
+			var loadValidation = true;
 
 			/**
 			 * Handle errors when the import process fails
@@ -84,6 +86,7 @@
 			 * @param data
 			 */
 			function processErrors(data) {
+				loadValidation = false;
 				var errorMsg = "";
 
 				if(data.status) {
@@ -104,7 +107,7 @@
 				var gridElement = $("#grid");
 				gridElement.find('.k-grid-content').remove();
 				gridElement.find('.k-grid-content-locked').remove();
-				gridElement.height(50);
+				gridElement.height(80);
 
 				$("#createSubmit").hide();
 			}
@@ -153,9 +156,32 @@
 				filterable: true,
 				columnMenu: true,
 				pageable: false,
+				dataBound: function() {
+					resizeGrid();
+				}
+			});
 
+			function resizeGrid() {
+				var gridElement = $("#grid");
+				var dataArea = gridElement.find(".k-grid-content");
+				// Grid with locked columns has two  containers
+				var dataAreaLocked = gridElement.find(".k-grid-content-locked");
+				var newHeight = $(window).innerHeight() - 200;
+				var diff = gridElement.innerHeight() - dataArea.innerHeight();
+				gridElement.height(newHeight);
+				dataArea.height(newHeight - diff);
+				dataAreaLocked.height(newHeight - diff);
+			}
+
+			$(window).resize(function(){
+				if(loadValidation) {
+					resizeGrid();
+				}
 			});
 		});
+
+
+
 		</script>
 
 
