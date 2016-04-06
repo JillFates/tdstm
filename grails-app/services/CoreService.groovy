@@ -90,6 +90,9 @@ class CoreService {
 		if (! tmpDir) {
 			throw new GrailsConfigurationException("The application temp directory configuration setting was not found ($propName)")
 		}
+		if (tmpDir[-1] == '/') {
+			tmpDir = tmpDir[0..-2] 
+		}
 		return tmpDir
 	}
 }

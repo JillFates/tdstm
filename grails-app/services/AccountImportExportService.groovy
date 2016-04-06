@@ -625,11 +625,6 @@ class AccountImportExportService {
 		return map
 	}
 
-	private String getTempDirectory() {
-		// TODO : JPM 3/2016 : getTempDirectory has to pull the configuration property
-		return "/data/tmp"
-	}
-
 	/**
 	 * Used to pull the uploaded file from the request and save it to a temporary file with a randomly generated
 	 * name. After saving the file the filename and File handle are returned in a list.
@@ -665,7 +660,7 @@ class AccountImportExportService {
 			throw new InvalidParamException('The import filename parameter was missing')
 		}
 
-		String fqfn=getTempDirectory() + '/' + filename	
+		String fqfn = "${coreService.getAppTempDirectory()}/$filename"
 		File file = new File(fqfn)
 		HSSFWorkbook xlsWorkbook = new HSSFWorkbook(new FileInputStream(file))
 		return xlsWorkbook
@@ -791,7 +786,7 @@ class AccountImportExportService {
 				}
 			}
 
-			log.debug "validateUploadedAccounts() account.person=${accounts[i].person != null}, personById=${personById!=null}, personByEmail=${personByEmail!=null}, personByUsername=${personByUsername!=null}, personByName=${personByName!=null}"
+			// log.debug "validateUploadedAccounts() account.person=${accounts[i].person != null}, personById=${personById!=null}, personByEmail=${personByEmail!=null}, personByUsername=${personByUsername!=null}, personByName=${personByName!=null}"
 			// Set a flag on the account if it is going to be a new account
 			if (accounts[i].person == null) {
 				log.debug "validateUploadedAccounts() - creating blank Person"
@@ -816,7 +811,6 @@ class AccountImportExportService {
 			// of the valids will break the validation constraints
 			Person.withNewSession { session -> 
 				Person personToValidate = (accounts[i].person?.id ? Person.get((accounts[i].person.id)) : new Person() )
-				log.debug "validateUploadedAccounts() About to do the personToValidate ==> account.person=${accounts[i].person != null}, id=${accounts[i].person.id}, personToValidate=$personToValidate id=${personToValidate.id}"
 				applyChangesToPerson(personToValidate, accounts[i], options.flagToUpdatePerson)
 				if (! personToValidate.validate()) {
 					personToValidate.errors.allErrors.each {
@@ -855,19 +849,27 @@ class AccountImportExportService {
 			// Attempt to match the persons to existing users
 			// List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
-
-			// Set the icon to be displayed base on what is being done
-			// TODO : JPM 4/2016 : Should NOT be hard coding the filename references to the images
-			if (accounts[i].errors) {
-				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'exclamation.png', absolute: false])
-			} else if (accounts[i].isNewAccount) {
-				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'add.png', absolute: false])
-			} else {
-				accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: 'pencil.png', absolute: false])
-			}
-
 		}
+
+		// Update all the accounts icons
+		setIconsOnAccounts(accounts)
 	}	
+
+	/**
+	 * Used to assign the correct icon to the individual accounts based on the state of the account
+	 * @param accounts - the list of account maps
+	 */
+	private void setIconsOnAccounts(List accounts) {
+		for (int i=0; i < accounts.size() ; i++) {
+			String icon = 'pencil.png'
+			if (accounts[i].errors) {
+				icon = 'exclamation.png'
+			} else if (accounts[i].isNewAccount) {
+				icon = 'add.png'				
+			}
+			accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: icon, absolute: false])
+		}
+	}
 
 	/**
 	 * Used to lookup the person by the personId property and will update the account map with the following:
@@ -1096,6 +1098,7 @@ class AccountImportExportService {
 		}
 		return ok
 	}
+
 	/**
 	 * Used to review and validate the account.roles values. When successful it will create map property roleActions that contain
 	 * the various changes that need to occur for the user security settings. In addition this logic will:
@@ -1111,7 +1114,6 @@ class AccountImportExportService {
 	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List assignableRoleCodes ) {
 		boolean ok=false
 
-log.debug "*** validateSecurityRoles() account=${account.firstName + ' ' + account.lastName}, person=${account.person}, dirty=${account.person.dirtyPropertyNames}"
 		// Validate the Setup the default security role if necessary
 		UserLogin userLogin 
 		if (account.person.id) {
