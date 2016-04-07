@@ -15,7 +15,7 @@
 <body>
 <div class="body_bg">
 	<input type="hidden" id="timeBarValueId" value="0"/>
-	<div class="taskTimebar hide" id="issueTimebar" >
+	<div class="taskTimebar hide" id="issueTimebar"  style="float: none !important;">
 		<div id="issueTimebarId"></div>
 	</div>
 	<a name="page_up"></a>
