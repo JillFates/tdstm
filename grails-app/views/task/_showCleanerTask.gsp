@@ -236,7 +236,7 @@
 		 	<div style="float: left;width: 100%">
 				<table style="float: left;margin-left: -2px;">
 				<tr>
-					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Storage' : assetComment?.assetEntity?.assetType} Details</a></td>
+					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Logical Storage' : assetComment?.assetEntity?.assetType} Details</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 				</tr>
 				<tr><td colspan=2>
