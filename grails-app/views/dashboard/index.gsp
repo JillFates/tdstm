@@ -1115,7 +1115,8 @@
 	function changeEventSummary(){
 		var value = $("#manualSummaryStatusId").val()
 		if (validateManulaSummary( value )) {
-			var checkbox = $('#checkBoxId').is(":checked");
+			//var checkbox = $('#checkBoxId').is(":checked");
+			var checkbox = true;
 			var moveEvent = $("#moveEventId").val();
 			${remoteFunction(controller:'moveEvent',action:'updateEventSumamry', params:'\'moveEventId=\'+moveEvent+\'&value=\'+value+\'&checkbox=\'+checkbox', onComplete:'updateDash( $("#defaultBundleId").val() )')};
 			$("#manualSumStatusSpan").hide();
