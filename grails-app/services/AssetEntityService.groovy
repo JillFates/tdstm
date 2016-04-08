@@ -2501,7 +2501,7 @@ class AssetEntityService {
 					WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
 					WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(projectId).toString())
-					WorkbookUtil.addCell(titleSheet, 1, 5, currDate, Cell.CELL_TYPE_NUMERIC)
+					WorkbookUtil.addCell(titleSheet, 1, 5, new Date(), Cell.CELL_TYPE_NUMERIC)
 					WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 7, bundleNameList.toString())
 					WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")

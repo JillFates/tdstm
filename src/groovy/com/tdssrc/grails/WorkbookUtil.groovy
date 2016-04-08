@@ -47,7 +47,7 @@ class WorkbookUtil {
 				value = getStringCellValue(sheet, c, 0)
 				if (!StringUtil.isBlank(value)) {
 					result = c + 1;
-					break;
+					break
 				}
 				c--
 			}
@@ -85,20 +85,22 @@ class WorkbookUtil {
 		if (cell) {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_NUMERIC:
+					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
 					result = cell.getDateCellValue()
-					result = TimeUtil.moveDateToTZ(result, session)
-					break;
+					// result = TimeUtil.moveDateToTZ(result, session)
+					break
 				case Cell.CELL_TYPE_STRING:
 					for(def formatterType : formatterTypes) {
-						try{
+						try {
 							result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType)
 							if (result) {
 								break
 							}
-						}catch(e){
+						} catch(e) {
+							// TODO : JPM 4/2016 : We should report an error that we were unable to read the date value here
 						}
 					}
-					break;
+					break
 				default:
 					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
 			}
@@ -113,13 +115,13 @@ class WorkbookUtil {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_BOOLEAN:
 					result = cell.getBooleanCellValue()? 1 : 0;
-					break;
+					break
 				case Cell.CELL_TYPE_NUMERIC:
 					result = cell.getNumericCellValue().intValue()
-					break;
+					break
 				case Cell.CELL_TYPE_STRING:
 					result = Integer.parseInt(cell.getStringCellValue())
-					break;
+					break
 				default:
 					throw new NumberFormatException("Invalid cell number.")
 			}
@@ -134,27 +136,27 @@ class WorkbookUtil {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_BLANK:
 					result = ''
-					break;
+					break
 				case Cell.CELL_TYPE_BOOLEAN:
 					result = cell.getBooleanCellValue().toString()
-					break;
+					break
 				case Cell.CELL_TYPE_ERROR:
 					result = 'error'
-					break;
+					break
 				case Cell.CELL_TYPE_FORMULA:
 					result = cell.getCellFormula()
-					break;
+					break
 				case Cell.CELL_TYPE_NUMERIC:
 					if (DateUtil.isCellDateFormatted(cell)) {
 						result = cell.getDateCellValue().toString()
 					} else {
 						result = cell.getNumericCellValue().intValue().toString()
 					}
-					break;
+					break
 				case Cell.CELL_TYPE_STRING:
 					result = cell.getStringCellValue()?.trim()
 					if (sanitizeString) result = this.sanitize(result)
-					break;
+					break
 			}
 		}
 		return result?:defaultValue
