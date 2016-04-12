@@ -54,12 +54,12 @@
 
 			if (hasCurrVal && hasOrigVal && hasDefVal) {
 				// A unique case with Security Roles and Teams where we need to show original, the changes and the results
-				str = '<span class="default">' + model[defaultPropName] + '</span>';
+				str = '<span class="change">' + model[defaultPropName] + '</span>';
 				if (model[originalPropName]) {
 					str = str + '<br><span class="original">' + model[originalPropName] + '</span>';
 				}
 				if (model[propertyName]) {
-					str = str + '<br><span class="change">' + model[propertyName] + '</span>';
+					str = str + '<br><span class="userData">' + model[propertyName] + '</span>';
 				}
 			} else if(hasDefVal) {
 				// A value was defaulted in from pre-existing user or application defaults

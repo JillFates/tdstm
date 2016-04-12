@@ -1135,6 +1135,7 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 					switch (info.type) {
 						case 'string':
 						case 'boolean':
+						case 'list':
 							value = WorkbookUtil.getStringCellValue(sheet, colPos, row).trim()
 							break
 						case 'datetime': 
@@ -1606,16 +1607,24 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 		List chgPersonTeams = StringUtil.splitter(account.personTeams, ',', DELIM_OPTIONS)
 		List chgProjectTeams = StringUtil.splitter(account.projectTeams, ',', DELIM_OPTIONS)
 
-log.debug "validateTeams(${account.firstName} ${account.lastName}) \n\tcurrPersonTeams=$currPersonTeams\n\tcurrProjectTeams=$currProjectTeams\n\tchgPersonTeams=$chgPersonTeams\n\tchgProjectTeams=$chgProjectTeams"
 		Map changeMap =	determineTeamChanges(allTeamCodes, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
-log.debug "validateTeams() \n\tchangeMap=$changeMap"
+
+		log.debug "validateTeams(${account.firstName} ${account.lastName}) \n\tcurrPersonTeams=$currPersonTeams\n\tcurrProjectTeams=$currProjectTeams\n\tchgPersonTeams=$chgPersonTeams\n\tchgProjectTeams=$chgProjectTeams"
+		log.debug "validateTeams() \n\tchangeMap=$changeMap"
+
 		ok = ! changeMap.error
 		if (ok) {
 			// Update the account.teams with the various information to show the changes, etc
-			setOriginalValue(account, 'personTeams', currPersonTeams.join(', '))
-			setOriginalValue(account, 'projectTeams', currProjectTeams.join(', '))
-			account.personTeams = changeMap.resultPersonTeams
-			account.partyTeams = changeMap.resultPartyTeams
+			if (changeMap.personHasChanges) {
+				setOriginalValue(account, 'personTeams', currPersonTeams.join(', '))
+				setDefaultedValue(account, 'personTeams', changeMap.resultPerson.join(', '))
+				account.personTeams = chgPersonTeams.join(', ')
+			}
+			if (changeMap.projectHasChanges) {
+				setOriginalValue(account, 'projectTeams', currProjectTeams.join(', '))
+				setDefaultedValue(account, 'projectTeams', changeMap.resultProject.join(', '))
+				account.projectTeams = chgProjectTeams.join(', ')
+			}
 		} else {
 			account.errors << changeMap.error
 		}
@@ -1782,7 +1791,9 @@ log.debug "validateTeams() \n\tchangeMap=$changeMap"
 	 *        resultPerson: a list of the resulting teams assigned to the person personally after the changes are applied
 	 *       resultProject: a list of the resulting teams assigned to the person for the project after the changes are applied
 	 *              errors: an error message string indicating any errors
-	 *          hasChanges: a boolean indicating if there were changes or not
+	 *          hasChanges: a boolean when true indicates that there were changes to either the person or project lists
+	 *    personHasChanges: a boolean when true indicates that there was a change for the Person team list
+	 *   projectHasChanges: a boolean when true indicates that there was a change for the Project team list
 	 */
 	private Map determineTeamChanges(List allTeams, List currPersonTeams, List chgPersonTeams, List currProjectTeams, List chgProjectTeams) {
 
@@ -1791,6 +1802,8 @@ log.debug "validateTeams() \n\tchangeMap=$changeMap"
 		// Used to reset the results array and inject the error message before the code bails out 
 		def panicButton = { errorMessage ->
 			map.hasChanges=false
+			map.personHasChanges=false
+			map.projectHasChanges=false
 			map.addToPerson = []
 			map.deleteFromPerson = []
 			map.addToProject = []
@@ -1848,18 +1861,18 @@ log.debug "validateTeams() \n\tchangeMap=$changeMap"
 					if (alreadyInList) {
 						resultPersonTeams.remove(team)
 						map.deleteFromPerson << team
-						map.hasChanges = true
+						map.personHasChanges = true
 					}
 					if (resultProjectTeams.contains(team)) {
 						resultProjectTeams.remove(team)
 						map.deleteFromProject << team
-						map.hasChanges = true
+						map.projectHasChanges = true
 					}
 				} else if ( !toDelete && ! alreadyInList) {
 					// Adding a team only impacts the Person List
 					resultPersonTeams << team
 					map.addToPerson << team
-					map.hasChanges = true
+					map.personHasChanges = true
 				}
 
 			}
@@ -1875,18 +1888,19 @@ log.debug "validateTeams() \n\tchangeMap=$changeMap"
 					// Delete the team
 					resultProjectTeams.remove(team)
 					map.deleteFromProject << team
-					map.hasChanges = true
+					map.projectHasChanges = true
 				} else if ( !toDelete ) {
 					// Add the team
 					if ( ! alreadyInList) {
 						resultProjectTeams << team
 						map.addToProject << team
+						map.projectHasChanges
 					}
 					if (! resultPersonTeams.contains(team)) {
 						resultPersonTeams << team
 						map.addToPerson << team
+						map.personHasChanges
 					}
-					map.hasChanges = true
 				}
 			}
 
@@ -1894,6 +1908,7 @@ log.debug "validateTeams() \n\tchangeMap=$changeMap"
 			map.resultProject = resultProjectTeams.sort()
 			map.addToPerson = map.addToPerson.sort()
 			map.addToProject = map.addToProject.sort()
+			map.hasChanges = (map.personHasChanges || map.projectHasChanges)
 
 			break
 		}
