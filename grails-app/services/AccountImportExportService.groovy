@@ -81,7 +81,12 @@ class AccountImportExportService {
 	static final validator_date = { val, Map options -> 
 		boolean valid = false
 		if (val) {
-			valid = TimeUtil.parseDate(val, options.dateFormatter) != null
+			if (val instanceof Date) {
+				valid=true
+			} else {
+log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatter isa ${options.dateFormatter?.getClass().getName()}"
+				valid = TimeUtil.parseDate(val, options.dateFormatter) != null
+			}
 		}
 		return valid
 	}
@@ -199,7 +204,7 @@ class AccountImportExportService {
 	void generateImportTemplateToBrowser(response, session, UserLogin byWhom, Project project, String filename) {
 		HSSFWorkbook workbook = getAccountExportTemplate()
 
-		Map sheetOptions = getSheetOptions(session)
+		Map sheetOptions = getUserPreferences(session)
 
 		updateSpreadsheetTitleTab(byWhom, project, workbook, sheetOptions)
 
@@ -415,13 +420,13 @@ class AccountImportExportService {
 	 *********************************************************************************************************/
 
 	/**
-	 * This map is used to provide the formatting details that will be used in rendering and reading the spreadsheet
+	 * This map is used to provide the user preferences for formatting date/times that will be used in rendering and reading the spreadsheet
 	 * @return The map that contains:
 	 *		tzId - the user's timezone id
 	 *		dateFormat - the date format used for outputing and parse date properties
 	 *		dateTimeFormat - the datetime format used for outputing and parse datetime properties
 	 */
-	private Map getSheetOptions(HttpSession session) {
+	private Map getUserPreferences(HttpSession session) {
 		Map map = [ 
 			userTzId: TimeUtil.getUserTimezone(session),
 			userDateFormat: TimeUtil.getUserDateFormat(session)
@@ -450,15 +455,11 @@ class AccountImportExportService {
 	 * @return A map containing the values from the title page plus the userTzId, and userDateFormat and formatters
 	 */
 	private Map getSheetInfoAndOptions(session, Project project, HSSFWorkbook workbook) {
+
 		// Collect the details off of the title sheet including the project id, exportedOn and the timezone when the data was exported
-		Map sheetInfoOpts = readTitleSheetInfo(project, workbook)
+		Map sheetInfoOpts = getUserPreferences(session)
 
-		Map sheetOpts = getSheetOptions(session) 
-
-		// log.debug "getSheetInfoAndOptions() \n\tsheetInfoOpts=$sheetInfoOpts\n\tsheetOpts=$sheetOpts"
-
-		// Get the TZ and date formats and then merge with the sheetInfo
-		sheetInfoOpts.putAll( sheetOpts )
+		readTitleSheetInfo(project, workbook, sheetInfoOpts)
 	
 		return sheetInfoOpts
 	}
@@ -685,7 +686,7 @@ class AccountImportExportService {
 
 		log.debug "generateAccountExportSpreadsheet() found $persons.size() staff to export"
 
-		Map sheetInfoOpts = getSheetOptions(session)
+		Map sheetInfoOpts = getUserPreferences(session)
 
 		def workbook = getAccountExportTemplate()
 
@@ -834,7 +835,7 @@ class AccountImportExportService {
 	 * @param sheet - the spreadsheet to update
 	 */
 	 //HSSFWorkbook
-	private Map readTitleSheetInfo(Project project, workbook) {
+	private Map readTitleSheetInfo(Project project, workbook, Map sheetOpts) {
 
 		def sheet = workbook.getSheet(TEMPLATE_TAB_TITLE)
 		if (!sheet) {
@@ -855,7 +856,7 @@ class AccountImportExportService {
 					val = WorkbookUtil.getIntegerCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
 					break
 				case 'Datetime':
-					val = WorkbookUtil.getDateCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1], map.sheetTzId)
+					val = WorkbookUtil.getDateCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1], sheetOpts.sheetTzId, sheetOpts.dateTimeFormatter)
 					break
 				case 'String':
 					val = WorkbookUtil.getStringCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
@@ -865,14 +866,19 @@ class AccountImportExportService {
 			} 
 		}
 
-		map.sheetTzId = getCell('timezone')
-		map.sheetProjectId = getCell('projectId')
-		map.sheetDateFormat = getCell('dateFormat')
+		sheetOpts.sheetTzId = getCell('timezone')
+		sheetOpts.sheetProjectId = getCell('projectId')
+		sheetOpts.sheetDateFormat = getCell('dateFormat')
 
 		// Note that the exportedOn property is dependent on timezone being previously loaded
-		map.sheetExportedOn = getCell('exportedOn')	
+		sheetOpts.sheetExportedOn = getCell('exportedOn')	
+		if (sheetOpts.sheetExportedOn == -1) {
+			log.error "*** readTitleSheetInfo() the Exported On wasn't properly read from the spreadsheet" 
+			// TODO : JPM 4/2016 : Once this is solved then the exception can be re-enabled
+			// throw new InvalidRequestException("Unable to parse the Exported On value from the '${TEMPLATE_TAB_TITLE}' sheet")			
+		}
 
-		return map
+		return sheetOpts
 	} 
 
 	/**
@@ -1042,10 +1048,10 @@ class AccountImportExportService {
 					value = value.asBoolean()
 					break
 				case 'date':
-					value = TimeUtil.parseDate(value, sheetInfoOpts.dateFormatter)
+					value = (value instanceof Date ? value : TimeUtil.parseDate(value, sheetInfoOpts.dateFormatter))
 					break
 				case 'datetime':
-					value = TimeUtil.parseDateTimeWithFormatter(sheetInfoOpts.sheetTzId, value, sheetInfoOpts.dateTimeFormatter)
+					value = (value instanceof Date ? value : TimeUtil.parseDateTimeWithFormatter(sheetInfoOpts.sheetTzId, value, sheetInfoOpts.dateTimeFormatter))
 					break
 			}
 		}
@@ -1112,11 +1118,11 @@ class AccountImportExportService {
 	 * @param spreadsheet - the spreadsheet to read from
 	 * @return the list that is read in
 	 */
-	private List<Map> readAccountsFromSpreadsheet(spreadsheet, Map sheetInfo) {
+	private List<Map> readAccountsFromSpreadsheet(spreadsheet, Map sheetInfoOpts) {
 
 		int firstAccountRow = 1
-		def accountsSheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
-		int lastRow = accountsSheet.getLastRowNum()
+		def sheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
+		int lastRow = sheet.getLastRowNum()
 		List accounts = []
 
 		for (int row = firstAccountRow; row <= lastRow; row++) {
@@ -1124,8 +1130,20 @@ class AccountImportExportService {
 			int pIdx = 0
 			accountSpreadsheetColumnMap.each { prop, info ->
 				Integer colPos = info.ssPos
+				def value
 				if (colPos != null) {
-					def value = WorkbookUtil.getStringCellValue(accountsSheet, colPos, row).trim()
+					switch (info.type) {
+						case 'string':
+						case 'boolean':
+							value = WorkbookUtil.getStringCellValue(sheet, colPos, row).trim()
+							break
+						case 'datetime': 
+							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.dateTimeFormatter)
+							break
+						case 'date':
+							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.dateFormatter)
+							break
+					}
 					account[prop] = value
 				}
 			}

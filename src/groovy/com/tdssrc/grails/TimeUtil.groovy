@@ -345,7 +345,7 @@ class TimeUtil {
 	 * @param the formatterType defines the format to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTime(HttpSession session, dateValue, String formatterType=FORMAT_DATE_TIME) {
+	public static String formatDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
 		def formatter = createFormatter(session, formatterType)
 		return formatDateTime(session, dateValue, formatter)
 	}
@@ -357,7 +357,7 @@ class TimeUtil {
 	 * @param the formatter defines the formatter to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTime(HttpSession session, dateValue, DateFormat formatter) {
+	public static String formatDateTime(session, dateValue, DateFormat formatter) {
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}

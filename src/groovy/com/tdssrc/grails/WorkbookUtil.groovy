@@ -4,7 +4,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.hssf.util.CellReference
-
+import java.text.DateFormat
 /**
  * The WorkbookUtil class contains a collection of useful Apache POI manipulation methods
  * 
@@ -79,7 +79,7 @@ class WorkbookUtil {
 	public static getDateCellValue(
 		Sheet sheet, 
 		Integer columnIdx, Integer rowIdx, 
-		javax.servlet.http.HttpSession session, 
+		session, 
 		String formatterTypes=null
 	) {
 		Date result
@@ -121,19 +121,14 @@ class WorkbookUtil {
 	 * @param rowIdx - the row to reference (offset start at zero)
 	 * @param tzId - the timezone id that the string would have been generated with
 	 * @param dateFormat - list if formats to use if parsing a string value
+	 * @param failedIndicator - a value that can be checked to determine if parsing was involved and it failed (default -1)
 	 * @return The date from the specified cell or null if empty
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
 	 * @throws ParseException - if the field contains an invalid formatted String value
 	 * 
 	 */
-	public static getDateCellValue(
-		Sheet sheet, 
-		Integer columnIdx, 
-		Integer rowIdx, 
-		String tzId, 
-		String formatterTypes=TimeUtil.FORMAT_DATE_TIME_22
-	) {
-		Date result
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormat, failedIndicator=-1) {
+		def result
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
 
 		if (cell) {
@@ -141,20 +136,21 @@ class WorkbookUtil {
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
 					result = cell.getDateCellValue()
+println "*** getDateCellValue() got NUMERIC value $result"
 					// result = TimeUtil.moveDateToTZ(result, session)
 					break
+
 				case Cell.CELL_TYPE_STRING:
-					for(def formatterType : formatterTypes) {
-						try {
-							result = TimeUtil.parseDateTimeWithFormatter(tzId, cell.getStringCellValue(), formatterType)
-							if (result) {
-								break
-							}
-						} catch(e) {
-							// TODO : JPM 4/2016 : We should report an error that we were unable to read the date value here
+					String str = cell.getStringCellValue()
+					if (str) { 
+						result = TimeUtil.parseDateTimeWithFormatter(tzId, str, dateFormat)
+						if (!result) {
+							result = failedIndicator
 						}
 					}
+println "*** getDateCellValue() got STRING value str=$str, result=$result"
 					break
+
 				default:
 					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
 			}

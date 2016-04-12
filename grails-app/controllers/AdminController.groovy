@@ -1272,7 +1272,7 @@ def test() {
 			def session = getSession()
 			Map formOptions = accountImportExportService.importParamsToOptionsMap(params)
 			List accounts = accountImportExportService.loadAndValidateSpreadsheet(session, user, project, params.filename, formOptions)
-			Map sheetOptions = accountImportExportService.getSheetOptions(session)
+			Map sheetOptions = accountImportExportService.getUserPreferences(session)
 			// Remove properties that shouldn't be sent over in the JSON and change the error list to a 
 			// delimited (|) string so that we can split it in the Kendo grid afterward
 			for(int i=0; i < accounts.size(); i++) {

@@ -35,12 +35,12 @@ class TestCaseController {
 	
 	def elapsed() {
 		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
-		List now = [ new Date() ]
+		List now = [new Date()]
 
 		sb.append("elapsed now=$now <br>")
 
 		sleep(3000)
-		sb.append("elapsed time was ${TimeUtil.elapsed(now)} now=$now <br>")
+		sb.append("elapsed time was ${ TimeUtil.elapsed(now) } now=$now <br>")
 		sleep(1000)
 		sb.append("elapsed time was ${TimeUtil.elapsed(now)} now=$now <br>")
 
