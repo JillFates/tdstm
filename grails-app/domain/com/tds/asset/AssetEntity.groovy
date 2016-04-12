@@ -404,16 +404,19 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	}
 
 	/**
-	 * Used to access the AssetType as we normalize to the model.assetType. This will use the model.assetType if there is a model or use
-	 * the legacy AssetEntity.assetType for assets that don't have an assigned model.
+	 * Used to access the AssetType as we normalize to the model.assetType in the following way:
+	 * use the model.assetType for those with a model and assetClass == AssetClass.DEVICE,
+	 * in case that there is no model and this.assetType == 'Files' we change this to 'Logical Storage'
+	 * return AssetEntity.assetType in any other case.
 	 */
 	String getAssetType() {
-		String at
+		String at = this.assetType
 		if (this.assetClass == AssetClass.DEVICE) {
-			at = (this.model ? this.model.assetType : this.assetType)
-		} else {
-			at = this.assetType
+			at = this.model ? 
+					 this.model.assetType : 
+					 at == "Files" ? "Logical Storage" : at
 		}
+
 		return at
 	}
 

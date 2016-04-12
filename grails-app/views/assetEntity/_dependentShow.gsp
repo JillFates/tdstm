@@ -19,7 +19,7 @@
 									${support?.dataFlowFreq}
 								</td>
 								<td class="dep-${support.status}">
-									${support?.asset?.assetType == 'Files' ? 'Logical Storage' : support?.asset?.assetType}
+									${support?.asset?.assetType}
 								</td>
 								<td class="dep-${support.status}">
 									${support?.asset?.assetName}
@@ -73,7 +73,7 @@
 									${dependent.dataFlowFreq}
 								</td>
 								<td class="dep-${dependent.status}">
-									${dependent.dependent?.assetType == 'Files' ? 'Logical Storage' : dependent.dependent?.assetType}
+									${dependent.dependent?.assetType}
 								</td>
 								<td class="dep-${dependent.status}">
 									${dependent.dependent?.assetName}

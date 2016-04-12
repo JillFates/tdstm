@@ -229,48 +229,48 @@
 			<div style="float: left;width:100%">
 				<table style="float: left;margin-left: -2px;">
 				<tr>
-					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType == 'Files' ? 'Logical Storage' : assetComment?.assetEntity?.assetType} Highlights</a></td>
+					<td class="heading"><a href="#detail">${assetComment?.assetEntity?.assetType} Highlights</a></td>
 					<td><span style="float:right;"><a href="#top">Top</a></span></td>
 				</tr>
 				<tr class="prop"><td colspan=2>
 				<dl>
-	            	<g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
-		                <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
-						<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
-	               </g:if>
-	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Database'}">
-	                    <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
-						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
-	                </g:elseif>
-	                <g:elseif test="${assetComment?.assetEntity?.assetType=='Files'}">
-	                    <dt>Storage Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
-						<dt>Storage Size:</dt><dd>&nbsp;${assetComment?.assetEntity.size}</dd>
-						<dt>Storage Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
-						<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
-	                </g:elseif>
-	                <g:else>
-						<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetTag}</dd>
-						<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
-						<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
-						<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
-						<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
-					  	<dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
-						<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
-						<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
-						<g:if test="${location == 'source'}">			   	
-					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
-						</g:if>
-						<g:else>				
-					   		<dt>Truck:</dt><dd>&nbsp;${assetComment?.assetEntity.truck}</dd>
-					   		<dt>Cart/Shelf:</dt><dd>&nbsp;${assetComment?.assetEntity.cart}/${assetComment?.assetEntity.shelf}</dd>
-					   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
-							<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
-						</g:else>
+	      	<g:if test="${assetComment?.assetEntity?.assetType=='Application'}">
+	            <dt>Application Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+							<dt>Validation:</dt><dd>&nbsp;${assetComment?.assetEntity.validation}</dd>
+							<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+							<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+		      </g:if>
+		      <g:elseif test="${assetComment?.assetEntity?.assetType=='Database'}">
+		          <dt>Database Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+							<dt>DB Size:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+							<dt>DB Format:</dt><dd>&nbsp;${assetComment?.assetEntity.dbFormat}</dd>
+							<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+	        </g:elseif>
+	        <g:elseif test="${assetComment?.assetEntity?.assetType=='Files'}">
+	            <dt>Storage Name:</dt><dd>&nbsp;${assetComment?.assetEntity.assetName}</dd>
+							<dt>Storage Size:</dt><dd>&nbsp;${assetComment?.assetEntity.size}</dd>
+							<dt>Storage Format:</dt><dd>&nbsp;${assetComment?.assetEntity.fileFormat}</dd>
+							<dt>Bundle:</dt><dd>&nbsp;${assetComment?.assetEntity.moveBundle}</dd>
+	        </g:elseif>
+	        <g:else>
+							<dt>Asset Tag:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetTag}</dd>
+							<dt>Asset Name:</dt><dd>&nbsp;${assetComment?.assetEntity?.assetName}</dd>
+							<dt>Model:</dt><dd>&nbsp;${assetComment?.assetEntity?.model}</dd>
+							<dt>Serial #:</dt><dd>&nbsp;${assetComment?.assetEntity?.serialNumber}</dd>
+							<dt>Current Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRack}/${assetComment?.assetEntity.sourceRackPosition}</dd>
+						  <dt>Target Loc/Pos:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRack}/${assetComment?.assetEntity.targetRackPosition}</dd>
+							<dt>Source Room:</dt><dd>&nbsp;${assetComment?.assetEntity.sourceRoom}</dd>
+							<dt>Target Room:</dt><dd>&nbsp;${assetComment?.assetEntity.targetRoom}</dd>
+							<g:if test="${location == 'source'}">			   	
+						   	<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+							</g:if>
+							<g:else>				
+						   		<dt>Truck:</dt><dd>&nbsp;${assetComment?.assetEntity.truck}</dd>
+						   		<dt>Cart/Shelf:</dt><dd>&nbsp;${assetComment?.assetEntity.cart}/${assetComment?.assetEntity.shelf}</dd>
+						   		<dt>Plan Status:</dt><dd>&nbsp;${assetComment?.assetEntity.planStatus}</dd>
+								<dt>Rail Type:</dt><dd>&nbsp;${assetComment?.assetEntity.railType}</dd>  			   	
+							</g:else>
 					</g:else>
 					<g:if test="${project.customFieldsShown > 0}">
 						<g:each in="${ (1..project.customFieldsShown) }" var="i" >
