@@ -35,6 +35,10 @@ class ApplicationContextHolder implements ApplicationContextAware {
 		TEST_BEANS[name] ?: getApplicationContext().getBean(name)
 	}
  
+ 	static Object getService(String name) {
+ 		getBean(name)
+ 	}
+
 	static GrailsApplication getGrailsApplication() {
 		getBean('grailsApplication')
 	}

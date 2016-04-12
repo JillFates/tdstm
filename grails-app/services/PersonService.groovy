@@ -22,11 +22,13 @@ class PersonService {
 	def jdbcTemplate
 	def namedParameterJdbcTemplate
 	def sessionFactory
-	def partyRelationshipService
-	def securityService
-	def projectService
-	def userPreferenceService
+
 	def auditService
+	def moveEventService
+	def partyRelationshipService
+	def projectService
+	def securityService
+	def userPreferenceService
 	
 	static List SUFFIXES = [
 		"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -798,6 +800,7 @@ class PersonService {
 	 */
 	String assignToProjectEvent(UserLogin byWhom, personId, eventId, teamCode, toAssign ) {
 		String message = ""
+
 		// Check if the user has permission to edit the staff
 		if ( ! securityService.hasPermission(byWhom, 'EditProjectStaff', true) ) {
 			return "You do not have permission to assign staff to events"
@@ -809,7 +812,7 @@ class PersonService {
 			return "The selected person and/or move event ids are invalid"
 		}
 
-		if (toAssign != '0' && toAssign != '1') {
+		if ( ! ['0','1'].contains(toAssign) ) {
 			return "The action was not properly identified"
 		}
 
@@ -819,52 +822,35 @@ class PersonService {
 			return "The selected person and/or move event were not found"
 		}
 
-		RoleType roleTypeInstance = RoleType.findById( teamCode )
-		if (!roleTypeInstance) {
-			return "An invalid team code was specified"
-		}
-
+		// Check that the individual that is attempting to assign someone has access to the project in the first place
 		Project project = moveEvent.project
 		if (! hasAccessToProject(byWhom.person, project)) {
 			securityService.reportViolation("attempted to modify staffing on project $project with proper access", byWhom)
 			return "You do not have access to the project specified"
 		}
 
-		if (! hasAccessToProject(person, project)) {
-			securityService.reportViolation("attempted to modify staffing on project $project with proper access", byWhom)
-			return "The person you are attempting to modify does not have access to the project specified"
+		// Now make sure that the person being assigned is affiliated with the project in some manor
+		if (! getAvailableProjects(person, project)) {
+			securityService.reportViolation("attempted to assign a person (${person.id}) to project $project that is not affilated with", byWhom)
+			return "$person is not authorized to access the project"
 		}
 
-		// Fetch the assignment if it exists
-		MoveEventStaff moveEventStaff = MoveEventStaff.findByStaffAndEventAndRole(person, moveEvent, roleTypeInstance)
+		if (toAssign) {
 
-		// Deal with removing the assignment if indicated
-		if (! toAssign) {
-			// Just going to remove the relationship
-			if (moveEventStaff) {
-				moveEventStaff.delete(flush:true)
-				auditService.logMessage("$byWhom unassigned ${person} from on team $teamCode of project '${project.name}' event $moveEvent")
+			// First add to the project for the team if not already
+			addToProjectTeamSecured(byWhom, project, person, teamCode)
+
+			// Add the individual the the move event
+			moveEventService.addTeamMember(moveEvent, person, teamCode)
+			auditService.logMessage("assigned ${person} on team $teamCode of project ${project.name} event $moveEvent")
+
+		} else {
+
+			// Attempt to delete the team assignment on the event (assuming it exists)
+			if (moveEventService.removeTeamMember(moveEvent, person, teamCode)) {
+				auditService.logMessage("$byWhom unassigned ${person} on team $teamCode of project ${project.name} event $moveEvent")
 			}
-			return
 		}
-
-		//
-		// We are to now add the assignment
-		//
-
-		// First add to the project for the team if not already
-		addToProjectTeamSecured(byWhom, project, person, teamCode)
-
-		// Now create the MoveEventStaff record
-		moveEventStaff = new MoveEventStaff()
-		moveEventStaff.person = person
-		moveEventStaff.moveEvent = moveEvent
-		moveEventStaff.role = roleTypeInstance
-		if (! moveEventStaff.save(flush:true)) {
-			log.error "assignToProjectEvent() failed to create MoveEventStaff(${person.id}, ${moveEvent.id}, $teamCode) : ${GormUtil.allErrorsString(moveEventStaff)}"
-			return "An error occurred attempting to create the event assignment"
-		}
-		auditService.logMessage("$byWhom assigned ${person} to team $teamCode of project '${project.name}' event $moveEvent")
 
 		return ''
 	}

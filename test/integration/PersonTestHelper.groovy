@@ -1,11 +1,25 @@
+/**
+ * ProjectTestHelper is a helper class that can be used by the test cases to fetch, create and do other 
+ * helpful data preparation necessary to be used by the integration tests. The intent of these helper classes 
+ * is to do the heavy lifting for the ITs so that they an focus on the good stuff.
+ * 
+ * These helpers should not rely on any pre-existing data and will generate anything that is necessary. At least
+ * that's the idea...
+ */
+
+import com.tdsops.common.grails.ApplicationContextHolder
 
 class PersonTestHelper {
 	def personService
+	def securityService
+
 	Long adminPersonId = 100 
 
-	PersonTestHelper(personService) {
+	PersonTestHelper() {
+		personService = ApplicationContextHolder.getService('personService')		
+		securityService = ApplicationContextHolder.getService('securityService')		
 		assert (personService instanceof PersonService)
-		this.personService = personService
+		assert (securityService instanceof SecurityService)
 	}
 
 	/**
@@ -37,6 +51,10 @@ class PersonTestHelper {
 	Person getAdminPerson() {
 		Person admin = Person.get(adminPersonId)
 		assert admin
+
+		// Make certain that the user has the permission we're expecting
+		assert securityService.assignRoleCode(admin, 'ADMIN')
+
 		return admin
 	}
 

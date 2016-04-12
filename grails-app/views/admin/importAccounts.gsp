@@ -28,8 +28,7 @@
 				<div class="panel-heading">This form is used to import and manage staff and user login accounts for the current project.</div>
 				<div class="panel-body">
 					<p>
-						To begin you
-						should download a blank spreadsheet template (link below) or use the <i>Export Accounts</i> menu option to
+					To begin you should download a blank spreadsheet template (link below) or use the <i>Export Accounts</i> menu option to
 					manage existing accounts. Upon making changes in the spreadsheet you can upload the file and step through the
 					verification process and post your changes to the application.
 					</p>
@@ -39,7 +38,7 @@
 
 						<input id="uploadFile" placeholder="Choose File" disabled="disabled" />
 						<div class="fileUpload btn btn-default">
-							<span>Upload</span>
+							<span>Select</span>
 							<input id="uploadBtn" type="file" class="upload" name="${fileParamName}" />
 						</div>
 

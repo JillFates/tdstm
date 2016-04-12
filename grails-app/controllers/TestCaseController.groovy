@@ -29,9 +29,87 @@ class TestCaseController {
 	def serviceHelperService
 	def userPreferenceService
 	def userService
+	def accountImportExportService
 
 	// def messageSource
 	
+	def elapsed() {
+		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
+		List now = [ new Date() ]
+
+		sb.append("elapsed now=$now <br>")
+
+		sleep(3000)
+		sb.append("elapsed time was ${TimeUtil.elapsed(now)} now=$now <br>")
+		sleep(1000)
+		sb.append("elapsed time was ${TimeUtil.elapsed(now)} now=$now <br>")
+
+		render sb.toString()
+	}
+
+	def tz() {
+		String tz = session.getAttribute( 'CURR_TZ' ).CURR_TZ
+		String dateFormat = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )[TimeUtil.DATE_TIME_FORMAT_ATTR]
+		String now = TimeUtil.formatDateTime(getSession(), new Date())
+		// String str = session.getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )
+		render "session isa ${session.getClass().getName()}, TZ=$tz<br>dateFormat=$dateFormat<br>now=$now".toString()
+	}
+
+	def securityRoleChanges() {
+		List allRoles = securityService.getAllRoleCodes()
+		// List currentRoles = ['ADMIN', 'SUPERVISOR', 'USER']
+		List currentRoles = ['WHAT', 'USER', 'ADMIN']
+		List authorizedRoles = ['SUPERVISOR', 'CLIENT_ADMIN']
+		List changes = ['CLIENT_MGR']
+
+		Map map = accountImportExportService.determineSecurityRoleChanges(allRoles, currentRoles, changes, authorizedRoles)
+		String out = "Results were:<br> <pre>current: $currentRoles\nchanges:$changes\nauthorized:$authorizedRoles\n$map</pre>"
+		render out.toString()
+	}
+
+	def teamCodeChanges() {
+		List allTeams = ['A','B','C','D','E']
+		List currPersonTeams = ['A','E']
+		List chgPersonTeams = ['A', '-E', '-D']
+		List currProjectTeams = ['D', 'E']
+		List chgProjectTeams = ['B']
+
+		List resultPerson = ['A', 'B']
+		List resultProject = ['B']
+		List addToPerson = ['B'], addToProject = ['B']
+		List deleteFromPerson = ['E'], deleteFromProject = ['E', 'D']
+
+		Map map = accountImportExportService.determineTeamChanges(allTeams, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
+		StringBuffer out = new StringBuffer("Results were:<br> <pre>")
+		out.append("\n\t        allTeams: $allTeams")
+		out.append("\n\t currPersonTeams: $currPersonTeams")
+		out.append("\n\t  chgPersonTeams: $chgPersonTeams")
+		out.append("\n\tcurrProjectTeams: $currProjectTeams")
+		out.append("\n\t chgProjectTeams: $chgProjectTeams")
+		out.append("\n\t         results: $map")
+		out.append("</pre>")
+
+		out.append("<br>Testing for Invalid codes in chgPersonTeams:")
+		map = accountImportExportService.determineTeamChanges(allTeams, currPersonTeams, ['Z'], currProjectTeams, chgProjectTeams)
+		out.append("<br>\tResults: <pre>$map</pre>")
+
+		out.append("<br>Testing for Invalid codes in chgPersonTeams:")
+		map = accountImportExportService.determineTeamChanges(allTeams, currPersonTeams, chgPersonTeams, currProjectTeams, ['Z'])
+		out.append("<br>\tResults: <pre>$map</pre>")
+
+		render out.toString()
+	}
+
+	//determineTeamChanges(List allTeams, List currPersonTeams, List chgPersonTeams, List currProjectTeams, List chgProjectTeams)
+
+	def checkMinusList() {
+		List valid   = ['A','B','C','D','E']
+		List toCheck = ['A','-B','Q','-Z']
+		List results = accountImportExportService.checkMinusListForInvalidCodes(valid, toCheck)
+		String out="Checking of <pre>valid: $valid\ntoCheck: $toCheck\nresults: $results"
+		render out.toString()
+	}
+
 	def testServiceHelper() {
 
 		def securitySrcv = serviceHelperService.getService('security')

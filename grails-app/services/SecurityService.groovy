@@ -41,8 +41,8 @@ class SecurityService implements InitializingBean {
 	def serviceHelperService
 
 	def ldapConfigMap = [:]
-//	def loginConfigMap = [:]
-	def loginConfigMap = [usernamePlaceholder:'enter your freaking username', authorityPrompt:'prompt', authorityLabel:'DOMAIN!', authorityName:'TDS']
+	def loginConfigMap = [:]
+	// def loginConfigMap = [usernamePlaceholder:'Enter yo username', authorityPrompt:'prompt', authorityLabel:'DOMAIN!', authorityName:'TDS']
 	def userLocalConfigMap = [:]
 
 	
@@ -53,7 +53,15 @@ class SecurityService implements InitializingBean {
 	String getDefaultSecurityRoleCode() {
 		return DEFAULT_SECURITY_ROLE_CODE
 	}
-	
+
+	/**
+	 * Used to generate random passwords
+	 * @return a random string of characters
+	 */
+	String generateRandonPassword() {
+		return UUID.randomUUID().toString()
+	}
+
 	/**
 	 * This is a post initialization method to allow late configuration settings to occur
 	 */
@@ -130,147 +138,6 @@ class SecurityService implements InitializingBean {
 		return this.userLocalConfigMap
 	}
 
-	/**
-	 * Used to determine if the current user has a specified role
-	 * @param	role	a String representing a role
-	 * @return 	bool	true or false indicating if the user has the role
-	 * @Usage  if ( securityService.hasRole( 'PROJ_MGR' ) ...
-	 */
-	def hasRole( role ) {
-		return SecurityUtils.subject.hasRole( role )
-	}
-	
-	/**
-	 * Used to determine if the current user has a role within an array of roles
-	 * @param	roles	a array of String representing a role
-	 * @return 	bool	true or false indicating if the user has the role
-	 * @Usage  if ( securityService.hasRole( ['ADMIN','SUPERVISOR']) ...
-	 */
-	boolean hasRole( java.util.ArrayList roles ) {
-		boolean found = false
-		roles.each() {
-			if (! found && SecurityUtils.subject.hasRole( it ) ) {
-				found = true
-			}
-		}
-		return found
-	}
-	
-	/**
-	 * Used to get a list of the security roles that a user has
-	 * @param The UserLogin object of the user being queried
-	 * @return A list of roles if the user has any
-	 */
-	List<RoleType> getRoles(UserLogin user) {
-		def roles = []
-		if( user ) {
-			roles = PartyRole.findAllByParty(user.person)
-		}
-		return roles*.roleType
-	}
-	
-	/**
-	 * Used to determine if a UserLogin has a particular permission
-	 * @param A UserLogin object for the given user
-	 * @param A permission tag name
-	 * @return boolean true if the user does have permission
-	 */
-	boolean hasPermission(UserLogin user, String permission, boolean reportViolation=false) {
-		def hasPerm = false
-		def roles = getRoles(user)
-
-		if (roles) {
-			def permObj = Permissions.findByPermissionItem(permission)
-			if (permObj) {
-				if (RolePermissions.findByPermissionAndRoleInList(permObj, roles*.id)) {
-					hasPerm=true
-				}
-			} else {
-				log.debug "Unable to find permission ($permission) for user ($user) with roles (${roles*.id})"
-				if(reportViolation){
-					reportViolation("Unable to find permission ($permission) for user ($user) with roles (${roles*.id})")	
-				}
-				
-			}
-		} else {
-			log.debug "Unable to find roles for user $user"
-			if(reportViolation){				
-				reportViolation("Unable to find roles for user $user")
-			}
-		}
-
-		return hasPerm
-	}
-
-	/**
-	 * Overloaded version of hasPermission used with Person instead of UserLogin
-	 */
-	boolean hasPermission(Person person, String permission, boolean reportViolation=false) {
-		UserLogin user = getPersonUserLogin(person)
-		if (user) {
-			return hasPermission(user, permission, reportViolation)
-		} else {
-			return false
-		}
-	}
-
-	/**
-	 * Overload of hasPermission (userLogin, permission, reportViolation) that is used to determine if a the currently logged in user has a particular permission
-	 * @param A permission tag name
-	 * @param reportViolation - flag that when true and the user doesn't have the specified permission a violation is reported (default false)
-	 * @return boolean true if the user does have permission
-	 */
-	boolean hasPermission(String permission, boolean reportViolation=false) {
-		UserLogin userLogin = getUserLogin()
-
-		if (!userLogin) {
-			reportViolation("a user that is not logged in attempted an action requiring the $permission permission")
-			return false
-		}
-
-		return hasPermission(userLogin, permission, reportViolation)
-	}
-
-	/**
-	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
-	 * should be returned (e.g. Staff or System). When a project is presented the method will return roles associate to the project otherwise
-	 * it return the user's global role.
-	 * 
-	 * @param user
-	 * @param roleType
-	 * @param projectId
-	 * @return List of roles
-	 */
-	def getPersonRoles( def person, RoleTypeGroup roleTypeGroup, Project project=null ) {
-
-		def likeFilter = "${roleTypeGroup} : %"
-		def prefixSize = "${roleTypeGroup} : ".length()
-		def roles=[]
-		
-		if (project) {
-			// Need to lookup the User's Party role to the Project
-			def client=project.client
-			// TODO: runbook : getPersonRoles not fully implemented when the project is passed.  Need to test...
-			// THIS SHOULD BE LOOKING AT PARTY GROUP, NOT party_relationship - don't use
-			def sql = """SELECT role_type_code_to_id
-				FROM party_relationship
-				WHERE party_relationship_type_id='PROJ_STAFF' AND party_id_from_id=${client.id} AND party_id_to_id=${person.id} AND status_code='ENABLED'"""
-			// log.error "getPersonRoles: sql=${sql}"
-			roles = jdbcTemplate.queryForList(sql)
-			
-			log.error "Using getPersonRoles in unsupported manor"
-			// log.error "*** Getting from PartyRelationship"
-			
-		} else {
-			// Get the User's default role(s)
-			PartyRole.findAllByParty( person )?.each() {
-				roles << it.roleType.id
-			}	
-			// log.error "*** Getting from PartyRole: roles=${roles}"
-		}	
-		return roles	
-	}
-	
 	/** 
 	 * Used to get user's current project
 	 */
@@ -293,6 +160,7 @@ class SecurityService implements InitializingBean {
 		def bundleId = RequestContextHolder.currentRequestAttributes().getSession().getAttribute( "CURR_BUNDLE" )?.CURR_BUNDLE
 		return bundleId
 	}
+
 	/**
 	 *
 	 * Used to get user's current MoveEventId
@@ -304,12 +172,12 @@ class SecurityService implements InitializingBean {
 	}
 	
 	/**
-     * Checks whether current user is allow to edit pending status for a task or not.
+     * Checks whether current user is allow to edit pending status for a task or not
+     * TODO : JPM 4/2016 : isChangePendingStatusAllowed method here is OBSCURED and should be removed but used in tasks
 	 */
-	 def isChangePendingStatusAllowed() {
-	 	return hasPermission(getUserLogin(), 'ChangePendingStatus')
-	 }
-
+	boolean isChangePendingStatusAllowed() {
+		return hasPermission(getUserLogin(), 'ChangePendingStatus')
+	}
 
 	/**
 	 * Used to get the UserLogin object of the currently logged in user
@@ -343,19 +211,6 @@ class SecurityService implements InitializingBean {
 	def getUserLoginPerson() {
 		def userLogin = getUserLogin()
 		return userLogin?.person
-	}
-	
-	/**
-	 * Returns the name of a RoleType which currently contains a "GROUP : " prefix that this method strips off
-	 * @param roleCode
-	 * @return String 
-	 */
-	def getRoleName( roleCode ) {
-		def name=''
-		def roleType =  RoleType.get(roleCode)?.description
-		// log.error "getRoleName: roleType=${roleType}"
-		if (roleType) name = roleType.substring(roleType.lastIndexOf(':')+1)
-		return name
 	}
 	
 	/**
@@ -411,6 +266,10 @@ class SecurityService implements InitializingBean {
 		auditService.logSecurityViolation(username, message)
 	}
 
+	void reportViolation(org.codehaus.groovy.runtime.GStringImpl message, UserLogin user=null) {
+		reportViolation(message.toString(), user)
+	}
+
 	/**
 	 * Overloaded method to report security violations by passing Person instead of UserLogin
 	 * @param message to be reported
@@ -422,6 +281,10 @@ class SecurityService implements InitializingBean {
 			user = getPersonUserLogin(person)
 		}
 		reportViolation(message, user)
+	}
+
+	void reportViolation(org.codehaus.groovy.runtime.GStringImpl message, Person person) {
+		reportViolation(message.toString(), person)
 	}
 
 	/**
@@ -449,114 +312,6 @@ class SecurityService implements InitializingBean {
 		log.info("Cleanup Password Reset: Finished.")
 	}
 
-	/** 
-	 * The list of security roles a person is assigned to sort on level DESC 
-	 */
-	List<RoleType> getAssignedRoles(Person person){
-		def assignedRoles = []
-		if(person){
-			def roleTypes = PartyRole.findAllByParty(person)*.roleType	
-			assignedRoles = roleTypes.sort({it.level}).reverse()
-		}
-		return assignedRoles
-	}
-
-	/** 
-	 * The list of security role codes that a person has sort on id ASC
-	 */
-	List<String> getAssignedRoleCodes(Person person){
-		def assignedRoles = getAssignedRoles(person)
-		return getAssignedRoles.sort({it.id})*.description
-	}
-
-	/**
-	 * The list of security roles that a person can assign. If the person 
-	 * doesn't have _EditUserLogin_ then no roles are returned.
-	 * If excludeAssigned, the roles that the user already has are excluded 
-	 * from the list.
-	 */
-	List<RoleType> getAssignableRoles(Person person, boolean excludeAssigned=false){
-		def assignableRoles = []
-		if(person && hasPermission(getUserLogin(), "EditUserLogin")){
-			// All roles
-			def roles = getRoles()
-			// Assumes getAssignedRoles sorts by level desc.
-			def assignedRoles = getAssignedRoles(person)
-			// Assigned role with the highest level.
-			def maxAssignedLevel = assignedRoles[0].level
-			// List of the roles to exclude from the result (assigned role descriptions).
-			def excludeRoles = excludeAssigned ? assignedRoles*.description : []
-			/* Filter the existing roles, obtaining those with lower (or equal)
-			   level and not included in the list of roles to excude. */
-			assignableRoles = roles.findAll({(it.level <= maxAssignedLevel) && (!excludeRoles.contains(it.description))})
-		}
-
-		return assignableRoles
-		
-	}
- 
- 	/** 
-	 * The list of security role codes that a person can assign. If the person 
-	 * doesn't have _EditUserLogin_ then no roles are returned.
-	 * If excludeAssigned, the roles that the user already has are excluded 
-	 * from the list.
-	 */
-	List<String> getAssignableRoleCodes(Person person, boolean excludeAssigned=false){
-		return getAssignableRoles(person, excludeAssigned)*.id
-	}
-
-	/**
-	 * Used to determine if the person has the permissions to assign a given role.
-	 * If excludeAssigned, the roles that the user already has are excluded 
-	 * from the list.
-	 */
-	Boolean isRoleAssignable(Person person, RoleType roleType, boolean excludeAssigned=false){
-		return  roleType ? isRoleAssignable(person, roleType.description, excludeAssigned) : []
-	}
-
-	/**
-	 * Overloaded method that looks up the RoleType first. If excludeAssigned then the roles that the user already 
-	 * has are excluded from the list.
-	 */
-	Boolean isRoleAssignable(Person person, String roleType, boolean excludeAssigned=false){
-		def isAssignable = false
-		def assignableRoleCodes = getAssignableRoleCodes(person, excludeAssigned)
-		if (assignableRoleCodes) {
-			isAssignable = assignableRoleCodes.contains(roleType)
-		}
-		return isAssignable
-	}
-
-	// Returns a list of ALL security RoleType object sort on level DESC
-	List<RoleType> getRoles(){
-		return RoleType.list([sort: "level", order:"desc"])
-	}
-
-	// Returns a list of ALL security role codes sort on id ASC
-	List<String> getRoleCodes(){
-		return RoleType.list([sort: "id", order:"asc"])*.description
-	}
-
-	/** 
-	 * Returns the highest level security RoleType that the person has been assigned. 
-	 */
-	RoleType getMaxAssignedRole(Person person) {
-		return getAssignedRoles(person)[0]
-	}
-
-	/** 
-	 * Returns the highest level security RoleType defined. 
-	 */
-	RoleType getMaxRole() {
-		return getRoles()[0]
-	}
-
-	/** 
-	 * Returns the roles that the current user is allow to assign. 
-	 */
-	List<String> getAssignableRoleCodes(boolean excludeAssigned=false) {
-		return getAssignableRoleCodes(getUserLoginPerson(), excludeAssigned)
-	}
 
 	/**
 	 * Unlocks a user's account 
@@ -1028,31 +783,31 @@ class SecurityService implements InitializingBean {
 		//
 		// Update the UserLogin information
 
-/*
-Properties to contend with:
-	companyId:
-	personId:5665
-	passwordNeverExpires:true
-	active:Y
-	_action_Update:Update
+		/*
+		Properties to contend with:
+			companyId:
+			personId:5665
+			passwordNeverExpires:true
+			active:Y
+			_action_Update:Update
 
-Dealt with:
-	expiryDate: 07/06/2016 05:31 PM
-	passwordExpirationDate: 09/17/2015 05:13 AM
-	passwordNeverExpires: true
-	_action_Update: Update
-	projectId: 5791
-	password:
-	assignedRole: ADMIN
-	assignedRole: CLIENT_ADMIN
-	assignedRole: CLIENT_MGR
-	id: 653
-	username: abc
-	lockedOutUntil:
-	personId: 5665
-	active: Y
-	isLocal: true
-*/
+		Dealt with:
+			expiryDate: 07/06/2016 05:31 PM
+			passwordExpirationDate: 09/17/2015 05:13 AM
+			passwordNeverExpires: true
+			_action_Update: Update
+			projectId: 5791
+			password:
+			assignedRole: ADMIN
+			assignedRole: CLIENT_ADMIN
+			assignedRole: CLIENT_MGR
+			id: 653
+			username: abc
+			lockedOutUntil:
+			personId: 5665
+			active: Y
+			isLocal: true
+		*/
 		
 		if (params.isLocal) {
 			userLogin.isLocal = true
@@ -1166,4 +921,432 @@ Dealt with:
 
 		return userLogin
 	}
+
+	// ---------------------------------
+	// Role Access related methods
+	// ---------------------------------
+
+	/**
+	 * Used to lookup a SECURITY RoleType 
+	 * @param roleCode - the role type code
+	 * @return the role type if it exists or NULL if the code was invalid
+	 */
+	RoleType getSecurityRoleType(String roleCode) {
+		String q = 'from RoleType rt where rt.id=:code and rt.type=:type'
+		RoleType rt = RoleType.find(q, [code:roleCode, type:RoleType.SECURITY])
+		if (!rt) {
+			log.warn "getSecurityRoleType() called with invalid code $roleCode"
+		}
+		return rt
+	}
+
+	/**
+	 * Returns the name of a RoleType which currently contains a "GROUP : " prefix that this method strips off
+	 * @param roleCode
+	 * @return String 
+	 */
+	def getRoleName( roleCode ) {
+		def name=''
+		def roleType =  RoleType.get(roleCode)?.description
+		// log.error "getRoleName: roleType=${roleType}"
+		if (roleType) name = roleType.substring(roleType.lastIndexOf(':')+1)
+		return name
+	}
+
+	/**
+	 * Used to determine if the current user has a specified role
+	 * @param	role	a String representing a role
+	 * @return 	bool	true or false indicating if the user has the role
+	 * @Usage  if ( securityService.hasRole( 'PROJ_MGR' ) ...
+	 */
+	def hasRole( role ) {
+		return SecurityUtils.subject.hasRole( role )
+	}
+	
+	/**
+	 * Used to determine if the current user has a role within an array of roles
+	 * @param	roles	a array of String representing a role
+	 * @return 	bool	true or false indicating if the user has the role
+	 * @Usage  if ( securityService.hasRole( ['ADMIN','SUPERVISOR']) ...
+	 */
+	boolean hasRole( java.util.ArrayList roles ) {
+		boolean found = false
+		roles.each() {
+			if (! found && SecurityUtils.subject.hasRole( it ) ) {
+				found = true
+			}
+		}
+		return found
+	}
+
+	/**
+	 * Used to determine if a UserLogin has a particular permission. The reportViolation 
+	 * parameter when true will report a security violation if the individual does not 
+	 * have the specified permission.
+	 * @param user - the UserLogin object for the given user
+	 * @param permission - the permission name string
+	 * @param rptVio - a flag to report assess violation if user doesn't have checked perm (default false)
+	 * @return boolean true if the user does have permission
+	 */
+	boolean hasPermission(UserLogin user, String permission, boolean rptVio=false) {
+		boolean hasPerm = false
+
+		if (! user) {
+			throw new InvalidParamException('hasPermission() called with null UserLogin')
+		}
+		if (! permission) {
+			throw new InvalidParamException('hasPermission() called with null permission code')
+		}
+
+		def roles = getAssignedRoleCodes(user.person)
+
+		if (roles) {
+			Permissions permObj = Permissions.findByPermissionItem(permission)
+			if (permObj) {
+				if (RolePermissions.findByPermissionAndRoleInList(permObj, roles)) {
+					hasPerm=true
+				} else if (rptVio) {
+					reportViolation("attempted action requiring unallowed permission $permission", user)
+				}
+			} else {
+				log.error "hasPermission() called with unknown permission code $permission by $user"
+				rptVio = false 	// disabling because the error log is good enough
+			}
+		} else {
+			log.error "hasPermission() called by $user that has no assiged roles"
+		}
+
+		if (!hasPerm && rptVio) {
+			reportViolation("attempted action requiring unallowed permission $permission", user)
+		}
+
+		return hasPerm
+	}
+
+	/**
+	 * Overloaded version of hasPermission used with Person instead of UserLogin
+	 */
+	boolean hasPermission(Person person, String permission, boolean rptVio=false) {
+		UserLogin user = person.userLogin
+		if (user) {
+			return hasPermission(user, permission, rptVio)
+		} else {
+			return false
+		}
+	}
+
+	/**
+	 * Overload of hasPermission (userLogin, permission, reportViolation) that is used to determine if a the currently logged in user has a particular permission
+	 * @param A permission tag name
+	 * @param reportViolation - flag that when true and the user doesn't have the specified permission a violation is reported (default false)
+	 * @return boolean true if the user does have permission
+	 */
+	boolean hasPermission(String permission, boolean rptVio=false) {
+		// Attempt to get the user from the session
+		UserLogin userLogin = getUserLogin()
+
+		if (! userLogin) {
+			reportViolation("an unauthenticated person attempted an action requiring '$permission permission")
+			return false
+		}
+		return hasPermission(userLogin, permission, rptVio)
+	}
+
+	/**
+	 * Used to get a list of roles that have been assigned to a user. The roleTypeGroup provides a filtering for the type of Roles that 
+	 * should be returned (e.g. Staff or System). When a project is presented the method will return roles associate to the project otherwise
+	 * it return the user's global role.
+	 * 
+	 * @param user
+	 * @param roleType
+	 * @param projectId
+	 * @return List of roles
+	 */
+	def getPersonRoles( def person, RoleTypeGroup roleTypeGroup, Project project=null ) {
+
+		def likeFilter = "${roleTypeGroup} : %"
+		def prefixSize = "${roleTypeGroup} : ".length()
+		def roles=[]
+		
+		if (project) {
+			// Need to lookup the User's Party role to the Project
+			def client=project.client
+			// TODO: runbook : getPersonRoles not fully implemented when the project is passed.  Need to test...
+			// THIS SHOULD BE LOOKING AT PARTY GROUP, NOT party_relationship - don't use
+			def sql = """SELECT role_type_code_to_id
+				FROM party_relationship
+				WHERE party_relationship_type_id='PROJ_STAFF' AND party_id_from_id=${client.id} AND party_id_to_id=${person.id} AND status_code='ENABLED'"""
+			// log.error "getPersonRoles: sql=${sql}"
+			roles = jdbcTemplate.queryForList(sql)
+			
+			log.error "Using getPersonRoles in unsupported manor"
+			// log.error "*** Getting from PartyRelationship"
+			
+		} else {
+			// Get the User's default role(s)
+			PartyRole.findAllByParty( person )?.each() {
+				roles << it.roleType.id
+			}	
+			// log.error "*** Getting from PartyRole: roles=${roles}"
+		}	
+		return roles	
+	}
+	
+	// Returns a list of ALL security role codes sort on id ASC
+	// TODO : JPM 4/2016 : the getRoleCodes method returns the description of roles - don't see the point and the method name doesn't seem right
+	List<String> getRoleCodes() {
+		return RoleType.list([sort: "id", order:"asc"])*.description
+	}
+
+	/**
+	 * Used to retrieve the list of all security RoleType objects in the application 
+	 * sorted with highest privileged role first. The list can be filtered by the level
+	 * where by which if the maxLevel parameter is included only a subset of the roles where
+	 * the RoleType.level <= to the parameter.
+	 * @param maxLevel - used to filter roles by the security level (default null)
+	 * @return a List of security RoleType objects
+	 */
+	List<RoleType> getAllRoles(Integer maxLevel=null) {
+		List list = RoleType.withCriteria {
+			eq ('type', RoleType.SECURITY)
+			if (maxLevel) {
+				and {
+					le('level', maxLevel)
+				}
+			}
+			order('level', 'desc')
+		}
+		return list
+	}
+
+	/**
+	 * Used to retrieve the list of all security RoleType Codes in the application 
+	 * sorted with highest privileged role first. The list can be filtered by the level
+	 * where by which if the maxLevel parameter is included only a subset of the roles where
+	 * the RoleType.level <= to the parameter.
+	 * @param maxLevel - used to filter roles by the security level (default null)
+	 * @return a List of security codes
+	 */
+	List<String> getAllRoleCodes(Integer maxLevel=null) {
+		return getAllRoles(maxLevel)*.id
+	}
+
+	/** 
+	 * The list of security roles a Person is assigned to which is sorted 
+	 * on the role level DESC 
+	 * @param person - the Person object to get the assigned roles for
+	 * @return the list of Security RoleTypes 
+	 */
+	List<RoleType> getAssignedRoles(Person person) {
+        String query = """from RoleType r where r.type = :type and r.id in 
+            (select pr.roleType.id from PartyRole pr where pr.party=:person group by pr.roleType.id)
+            order by r.level desc"""
+
+        List roles = RoleType.executeQuery(query, [person:person, type:RoleType.SECURITY])
+		return roles
+	}
+
+	/** 
+	 * The list of security roles a UserLogin is assigned to which is sorted 
+	 * on the role level DESC 
+	 * @param user - the UserLogin to get the assigned roles for
+	 * @return the list of Security RoleTypes 
+	 */
+	List<RoleType> getAssignedRoles(UserLogin user) {
+		return getAssignedRoles(user.person)
+	}
+
+	/** 
+	 * The list of security role codes that a person has sort on id ASC
+	 * @param person - the person for whom it will lookup assigned roles
+	 * @return a list of the role codes
+	 */
+	List<String> getAssignedRoleCodes(Person person) {
+		return getAssignedRoles(person)*.id
+	}
+
+	/** 
+	 * The list of security role codes that a UserLogin has sort on id ASC
+	 * @param user - the UserLogin for whom it will lookup assigned roles
+	 * @return a list of the role codes
+	 */
+	List<String> getAssignedRoleCodes(UserLogin user) {
+		return getAssignedRoles(user.person)*.id
+	}
+
+	/**
+	 * The list of security roles that a person can assign base on the individual's highest priviledged
+	 * role. The list should include that role plus all lessor roles. If the person doesn't have
+	 * the EditUserLogin permission then no roles are assignable hence an empty list.
+	 * @param person - the person for whom we are determining can assign some roles
+	 * @return The list of security role that the individual can assign
+	 */
+	List<RoleType> getAssignableRoles(Person person) {
+		List assignableRoles = []
+
+		if (hasPermission(person.userLogin, 'EditUserLogin')) {
+			RoleType maxRoleOfPerson = getMaxAssignedRole(person)
+			if (maxRoleOfPerson) {
+				assignableRoles = getAllRoles(maxRoleOfPerson.level)
+			}
+		}
+
+		return assignableRoles
+		/*	
+			// JPM 4/2016 : this was some of the logic for filter but wasn't used so stripped out 
+			def assignableRoles = []
+			if (person && hasPermission(person.getUserLogin(), "EditUserLogin")) {
+				// All roles
+				def roles = getAllRoles()
+				// Assumes getAssignedRoles sorts by level desc.
+				def assignedRoles = getAssignedRoles(person)
+				// Assigned role with the highest level.
+				def maxAssignedLevel = assignedRoles[0].level
+				// List of the roles to exclude from the result (assigned role descriptions).
+				def excludeRoles = excludeAssigned ? assignedRoles*.description : []
+				// Filter the existing roles, obtaining those with lower (or equal)
+				//   level and not included in the list of roles to excude.
+				assignableRoles = roles.findAll({(it.level <= maxAssignedLevel) && (!excludeRoles.contains(it.description))})
+			}
+		*/
+	}
+ 
+ 	/** 
+	 * The list of security role codes that a person can assign. If the person 
+	 * doesn't have _EditUserLogin_ then no roles are returned.
+	 */
+	List<String> getAssignableRoleCodes(Person person){
+		return getAssignableRoles(person)*.id
+	}
+
+	/** 
+	 * Returns the roles that the current user is allow to assign. 
+	 */
+	List<String> getAssignableRoleCodes() {
+		return getAssignableRoleCodes(getUserLoginPerson())
+	}
+
+	/**
+	 * Used to determine if the person has the permissions to assign a given role.
+	 * If excludeAssigned, the roles that the user already has are excluded 
+	 * from the list.
+	 */
+	Boolean isRoleAssignable(Person person, RoleType roleType) {
+		return (roleType ? isRoleAssignable(person, roleType.description) : [])
+	}
+
+	/**
+	 * Overloaded method that looks up the RoleType first. If excludeAssigned then the roles that the user already 
+	 * has are excluded from the list.
+	 */
+	Boolean isRoleAssignable(Person person, String roleType) {
+		def isAssignable = false
+		def assignableRoleCodes = getAssignableRoleCodes(person)
+		if (assignableRoleCodes) {
+			isAssignable = assignableRoleCodes.contains(roleType)
+		}
+		return isAssignable
+	}
+
+	/** 
+	 * Returns the highest level security RoleType that the person has been assigned. 
+	 */
+	RoleType getMaxAssignedRole(Person person) {
+		return getAssignedRoles(person)[0]
+	}
+
+	/** 
+	 * Returns the highest level security RoleType defined. 
+	 */
+	RoleType getMaxRole() {
+		return getAllRoles()[0]
+	}
+
+	/**
+	 * Used to assign a security role to a person
+	 * @param person - the person to assign the role to
+	 * @param roleCode - the role code to assign
+	 * @return The PartyRole that was assign or was previously assigned
+	 * @throws InvalidParamException - if the role code is invalid
+	 */
+	PartyRole assignRoleCode(Person person, String roleCode) {
+		PartyRole pr
+
+		RoleType rt = RoleType.get(roleCode)
+		if ( !rt || rt.type != RoleType.SECURITY ) {
+			throw new InvalidParamException("Invalid role code $roleCode specified")
+		} 
+
+		// Check to see if the role has already been assigned
+		pr = PartyRole.findByPartyAndRoleType(person, rt)
+		if (pr) {
+			log.warn "assignRoleCode() called to assign code $roleCode to $person but it already exists"
+		} else {
+			pr = new PartyRole(party:person, roleType:rt)
+			pr.save(failOnError: true)
+		}
+		return pr
+	}
+
+	/**
+	 * Used to assign a security role to a person
+	 * @param person - the person to assign the role to
+	 * @param roleCode - the role code to assign
+	 * @return The PartyRole that was assign or was previously assigned
+	 * @throws InvalidParamException - if the role code is invalid
+	 */
+	List<PartyRole> assignRoleCodes(Person person, List<String> roleCodes) {
+		List prs = []
+		roleCodes.each { rc ->
+			prs << assignRoleCode(person, rc)
+		}
+		return prs
+	}
+
+	/**
+	 * Used to unassign a single security role for a given person
+	 * @param person - the person to assign the role to
+	 * @param roleCode - the role code to unassign
+	 * @return The number of assignments that were removed
+	 * @throws InvalidParamException - if the role code is invalid
+	 */
+	int unassignRoleCode(Person person, String roleCode) {
+		int deleted = unassignRoleCodes(person, [ roleCode ])
+		if (deleted > 1) {
+			log.error "unassignRoleCode() deleted $deleted assignments for person ${person.id} but expected no more than 1"
+		}
+		return deleted
+	}
+
+	/**
+	 * Used to unassign a list of security roles for a given person
+	 * @param person - the person to assign the role to
+	 * @param roleCodes - the list of role codes to unassign
+	 * @return The number of assignments that were removed
+	 * @throws InvalidParamException - if the role code is invalid
+	 */
+	int unassignRoleCodes(Person person, List<String> roleCodes) {
+		int deleted = 0
+		String query = 'delete PartyRole pr where pr.party=:person and pr.roleType in (:roles)'
+
+		// Iterate over the list of roleCodes and lookup the RoleType for them
+		List rts = []
+		roleCodes.each { rc ->
+			RoleType rt = getSecurityRoleType(rc)
+			if (!rt) {
+				log.warn "removeRoleCodes() called with invalid code $rc while updating person $person"
+			} else {
+				rts << rt
+			}
+		}
+
+		// If we found some 
+		if (rts) {
+			deleted = PartyRole.executeUpdate(query, [person:person, roles:rts])
+		}
+
+		log.info "removeRoleCodes() deleted $deleted security roles for person ${person.id} $roleCodes"
+		return deleted
+	}
+
 }

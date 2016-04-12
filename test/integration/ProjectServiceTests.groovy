@@ -15,8 +15,8 @@ class ProjectServiceTests  extends Specification {
 	Project project
 
 	def setup() {
-		personHelper = new PersonTestHelper(personService)
-		projectHelper = new ProjectTestHelper(projectService)
+		personHelper = new PersonTestHelper()
+		projectHelper = new ProjectTestHelper()
 		project = projectHelper.getProject()
 	}
 
@@ -37,10 +37,10 @@ class ProjectServiceTests  extends Specification {
 			staff.size() < numOfStaff
 	}
 
-	def "2. Test the getProjectManagersByProject "() {
+	def "2. Test the getProjectManagers "() {
 		// Get a list of PMs
 		when:
-			List pms = projectService.getProjectManagersByProject(project)
+			List pms = projectService.getProjectManagers(project)
 		then:
 			pms != null
 			def numOfPms = pms.size()
@@ -51,7 +51,7 @@ class ProjectServiceTests  extends Specification {
 			def staff = pms[0]
 			staff.disable()
 			assert staff.save()
-			pms = projectService.getProjectManagersByProject(project)
+			pms = projectService.getProjectManagers(project)
 		then:
 			( numOfPms > 1 && ( pms.size() == (numOfPms - 1)) ) || ( numOfPms == 1 && ! pms)
 
@@ -60,7 +60,7 @@ class ProjectServiceTests  extends Specification {
 	def "3. Test getProjectsWherePersonIsStaff "() {
 		// Try looking up Active projects
 		when:
-			def personHelper = new PersonTestHelper(personService)
+			def personHelper = new PersonTestHelper()
 			Person adminPerson = personHelper.getAdminPerson()
 
 			// Default is ProjectStatus.ACTIVE
@@ -134,5 +134,17 @@ class ProjectServiceTests  extends Specification {
 			projectService.getUserProjects(null, false, ProjectStatus.COMPLETED, [personId: person.id]).size() == 0
 	}
 
+	def "6. Test defaultAccountExpirationDate"() {
+		when:
+			Date compDate = new Date() + 45
+			Project project = new Project()
+		then:
+			projectService.defaultAccountExpirationDate(project) > compDate
 
+		when: 
+			project.completionDate = compDate
+		then:
+			projectService.defaultAccountExpirationDate(project) == compDate
+
+	}
 }

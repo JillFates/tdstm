@@ -12,10 +12,10 @@ class PersonServiceTests extends Specification {
 	def projectHelper
 
 	def setup() {
-		projectHelper = new ProjectTestHelper(projectService)
+		projectHelper = new ProjectTestHelper()
 		project = projectHelper.getProject()
 
-		personHelper = new PersonTestHelper(personService)
+		personHelper = new PersonTestHelper()
 		adminPerson = personHelper.getAdminPerson()
 	}
 
@@ -33,7 +33,8 @@ class PersonServiceTests extends Specification {
 			personService.addToProject(adminPerson.userLogin, project.id.toString(), newPerson.id.toString())
 		then:
 			personService.hasAccessToProject(newPerson, project)
-			personService.isAssignedToProject(project, newPerson)
+			personService.isAssignedToProject(project, newPerson)			
+
 	}
 
 	def "2. Test the savePerson method with default project "() {
@@ -149,20 +150,32 @@ class PersonServiceTests extends Specification {
 
 	}
 
-	def "6. Test move event team assignment when creating person "() {
-		when: 
+	def "6. Test assigning a person to a move event team directly by an admin user"() {
+		setup:
+			String errMsg
+
+		when: 'setting up the new person and getting an event to work with'
 			Person person = personHelper.createPerson(adminPerson, project.client)
 			MoveEvent moveEvent = projectHelper.getFirstMoveEvent(project)
+		then:  'validate that we got the person and moveEvent we were expecting'
+			assert person
+			assert moveEvent
+			moveEvent.project.id == project.id
+
+		when: 'getting the params needed'
 			String meId = moveEvent.id.toString()
 			String personId = person.id.toString()
-		then:
-			// Add SYS_ADMIN to the first MoveEvent and check that the person is assigned at the project and event level
+		then: """attempt to assign a person as a SYS_ADMIN to the first MoveEvent of the project before the person 
+			is assigned to the project"""
 			personService.assignToProjectEvent(adminPerson.userLogin, personId, meId, 'SYS_ADMIN', '1') == ''
+
+		then: 'validate that the person is assigned at the project and event level'
 			personService.isAssignedToProjectTeam(project, person, 'SYS_ADMIN')
-			personService.isAssignedToEventTeam(event, person, 'SYS_ADMIN')
-			// Do a negative check for a team that wasn't assigned
+			personService.isAssignedToEventTeam(moveEvent, person, 'SYS_ADMIN')
+		
+		then: 'Do a negative check for a team that were not assigned'
 			! personService.isAssignedToProjectTeam(project, person, 'DB_ADMIN')
-			! personService.isAssignedToEventTeam(event, person, 'DB_ADMIN')
+			! personService.isAssignedToEventTeam(moveEvent, person, 'DB_ADMIN')
 
 			
 	}

@@ -48,7 +48,7 @@
 						</g:elseif>
 						<g:elseif test="${column =='Roles'}">
 							<td class="col_${person.id}">
-								${ person.getSuitableTeams().join(', ')}
+								${ person.getTeamsCanParticipateIn().join(', ')}
 							</td>
 						</g:elseif>
 						<g:else>

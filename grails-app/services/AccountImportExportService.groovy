@@ -16,6 +16,8 @@ import org.springframework.web.multipart.commons.*
 import org.apache.commons.lang.StringUtils
 import grails.transaction.*
 import groovy.json.*
+import java.text.SimpleDateFormat
+import javax.servlet.http.HttpSession 
 
 //import org.apache.commons.validator.routines.EmailValidator
 
@@ -36,7 +38,13 @@ class AccountImportExportService {
 
 	static final String ACCOUNT_EXPORT_TEMPLATE = '/templates/AccountsImportExport.xls'
 	static final String EXPORT_FILENAME_PREFIX = 'AccountExport'
-	static final String TEMPLATE_TAB_NAME = 'Accounts'
+	static final String IMPORT_FILENAME_PREFIX = 'AccountImport'
+
+
+	static final String TEMPLATE_TAB_NAME  = 'Accounts'
+	static final String TEMPLATE_TAB_TITLE = 'Title'
+	static final String TEMPLATE_TAB_ROLES = 'Roles'
+	static final String TEMPLATE_TAB_TEAMS = 'Teams'
 
 	// Used to indicate the alternate property name with the original and defaulted values
 	// that are stored in the account map (e.g. firstName, firstName_o and firstName_d)
@@ -47,50 +55,157 @@ class AccountImportExportService {
 	static final String IMPORT_OPTION_PERSON='P'
 	static final String IMPORT_OPTION_USERLOGIN='U'
 
+	static final String DEFAULT_SECURITY_ROLE='USER'
+
 	// Users can split Teams and Security roles on the follow characters as well as the default comma (,)
 	static final List DELIM_OPTIONS = [';',':','|'] 
+
+	// Used in the map below to set the various template strings used by Kendo
+	static final changeTmpl = { prop ->
+		"\"#= showChanges(data, '$prop') #\""
+	}
+	static final errorListTmpl = { prop ->
+		"kendo.template(\$('#error-template').html())"
+	}
+
+	// Closures used for validating imported data
+	static final validator_YN = { val, options ->
+		boolean valid = false
+		if (val && (val instanceof String)) {
+			valid = ['Y','N'].contains(val.toUpperCase()) 
+		}
+		return valid
+	}
+
+	// Closure used to validate that a string can be parsed as a Date
+	static final validator_date = { val, Map options -> 
+		boolean valid = false
+		if (val) {
+			valid = TimeUtil.parseDate(val, options.dateFormatter) != null
+		}
+		return valid
+	}
+
+	// Closure used to validate that a string can be parsed as a DateTime
+	static final validator_datetime = { val, Map options -> 
+		boolean valid = false
+		if (val) {
+			valid = TimeUtil.parseDateTime(options.sheetTzId, val, options.dateTimeFormatter) != null
+		}
+		return valid
+	}
+
+	static final xfrmToYN = { val, options ->
+		(val != null && (val instanceof Boolean) ? val.asYN() : val) 
+		return val
+	}
+
+	static final xfrmDateToString = { val, options ->
+		(val != null && (val instanceof Date) ? TimeUtil.formatDate(val, options.dateFormatter) : val) 
+		return val
+	}
+
+	// Transformer that is used to populate the spreadsheet using the user's TZ
+	static final xfrmDateTimeToString = { val, options ->
+		(val != null && (val instanceof Date) ? TimeUtil.formatDateTimeWithTZ(options.userTzId, val, options.dateTimeFormatter) : val) 
+		return val
+	}
 
 	/*
 	 * The following map is used to drive the Import and Export tables and forms. The properties consist of:
 	 *    ssPos: 	the position that the property appears in the spreadsheet
 	 *    formPos: 	the position that the property appears in the online form
-	 * 	  type: 	P)erson, U)serLogin, T)ransitent
+	 * 	  type: 	P)erson, U)serLogin, T)ransient
 	 *    width: 	the width in the online grid
 	 *    locked: 	a flag to indicate that the column is locked (for horizontal scrolling)
 	 *    label: 	the column heading label in the grid and export spreadsheet
 	 */
 	static final Map accountSpreadsheetColumnMap = [
-		personId               : [type:'number',  ssPos:0,    formPos:1,  domain:'I', width:50,  locked:true,  label:'ID'],																	
-		firstName              : [type:'string',  ssPos:1,    formPos:2,  domain:'P', width:90,  locked:true,  label:'First Name', template:"\"#= showChanges(data, 'firstName') #\""],
-		middleName             : [type:'string',  ssPos:2,    formPos:3,  domain:'P', width:90,  locked:true,  label:'Middle Name', template:"\"#= showChanges(data, 'middleName') #\""],
-		lastName               : [type:'string',  ssPos:3,    formPos:4,  domain:'P', width:90,  locked:true,  label:'Last Name', template:"\"#= showChanges(data, 'lastName') #\""],
-		company                : [type:'string',  ssPos:4,    formPos:5,  domain:'T', width:90,  locked:true,  label:'Company', template:"\"#= showChanges(data, 'company') #\""],
-		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors', template: "kendo.template(\$('#error-template').html())" ],
-		workPhone              : [type:'string',  ssPos:5,    formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', template:"\"#= showChanges(data, 'workPhone') #\""],
-		mobilePhone            : [type:'string',  ssPos:6,    formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', template:"\"#= showChanges(data, 'mobilePhone') #\""],
-		email                  : [type:'string',  ssPos:7,    formPos:9,  domain:'P', width:100, locked:false, label:'Email', template:"\"#= showChanges(data, 'email') #\""],
-		title                  : [type:'string',  ssPos:8,    formPos:10, domain:'P', width:100, locked:false, label:'Title', template:"\"#= showChanges(data, 'title') #\""],
-		department             : [type:'string',  ssPos:9,    formPos:11, domain:'P', width:100, locked:false, label:'Department', template:"\"#= showChanges(data, 'department') #\""],
-		location               : [type:'string',  ssPos:10,   formPos:12, domain:'P', width:100, locked:false, label:'Location/City', template:"\"#= showChanges(data, 'location') #\""],
-		stateProv              : [type:'string',  ssPos:11,   formPos:13, domain:'P', width:100, locked:false, label:'State/Prov', template:"\"#= showChanges(data, 'stateProv') #\""],
-		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country', template:"\"#= showChanges(data, 'country') #\""],
-		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)', template:"\"#= showChanges(data, 'personTeams') #\""],
-		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)', template:"\"#= showChanges(data, 'projectTeams') #\""],
-		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:100, locked:false, label:'Security Role(s)', template:"\"#= showChanges(data, 'roles') #\""],
-		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username', template:"\"#= showChanges(data, 'username') #\""],
-		isLocal                : [type:'boolean', ssPos:17,   formPos:19, domain:'U', width:100, locked:false, label:'Local Account?', template:"\"#= showChanges(data, 'isLocal') #\""],
-		active                 : [type:'string',  ssPos:18,   formPos:20, domain:'U', width:100, locked:false, label:'Login Active?', template:"\"#= showChanges(data, 'active') #\""],
-		expiryDate             : [type:'string',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', template:"\"#= showChanges(data, 'expiryDate') #\""],
-		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', template:"\"#= showChanges(data, 'passwordExpirationDate') #\""],
-		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', template:"\"#= showChanges(data, 'passwordNeverExpires') #\""],
-		forcePasswordChange    : [type:'string',  ssPos:22,   formPos:24, domain:'U', width:100, locked:false, label:'Force Chg Pswd?', template:"\"#= showChanges(data, 'forcePasswordChange') #\""],
+		personId               : [type:'number',  ssPos:0,    formPos:1, domain:'I', width:50,  locked:true, label:'ID'],																	
+		firstName              : [type:'string',  ssPos:1,    formPos:2, domain:'P', width:90,  locked:true, label:'First Name', 
+									template:changeTmpl('firstName')],
+		middleName             : [type:'string',  ssPos:2,    formPos:3,  domain:'P', width:90,  locked:true,  label:'Middle Name',
+									 template:changeTmpl('middleName')],
+		lastName               : [type:'string',  ssPos:3,    formPos:4, domain:'P', width:90,  locked:true,  label:'Last Name', 
+								 	template:changeTmpl('lastName')],
+		company                : [type:'string',  ssPos:4,    formPos:5, domain:'T', width:90,  locked:true,  label:'Company', 
+									template:changeTmpl('company')],
+		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors', 
+									template:errorListTmpl() ],
+		workPhone              : [type:'string',  ssPos:5,    formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', 
+									template:changeTmpl('workPhone')],
+		mobilePhone            : [type:'string',  ssPos:6,    formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', 
+									template:changeTmpl('mobilePhone')],
+		email                  : [type:'string',  ssPos:7,    formPos:9,  domain:'P', width:100, locked:false, label:'Email', 
+									template:changeTmpl('email')],
+		title                  : [type:'string',  ssPos:8,    formPos:10, domain:'P', width:100, locked:false, label:'Title', 
+									template:changeTmpl('title')],
+		department             : [type:'string',  ssPos:9,    formPos:11, domain:'P', width:100, locked:false, label:'Department', 
+									template:changeTmpl('department')],
+		location               : [type:'string',  ssPos:10,   formPos:12, domain:'P', width:100, locked:false, label:'Location/City', 
+									template:changeTmpl('location')],
+		stateProv              : [type:'string',  ssPos:11,   formPos:13, domain:'P', width:100, locked:false, label:'State/Prov', 
+									template:changeTmpl('stateProv')],
+		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country', 
+									template:changeTmpl('country')],
+		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)', 
+									template:changeTmpl('personTeams')],
+		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)', 
+									template:changeTmpl('projectTeams')],
+		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:100, locked:false, label:'Security Role(s)', 
+									template:changeTmpl('roles'), defaultValue: DEFAULT_SECURITY_ROLE],
+		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username', 
+									template:changeTmpl('username')],
+		isLocal                : [type:'boolean', ssPos:17,   formPos:19, domain:'U', width:100, locked:false, label:'Local Account?', 
+									template:changeTmpl('isLocal'), defaultValue: 'Y', validator: validator_YN, transform: xfrmToYN],
+		active                 : [type:'string',  ssPos:18,   formPos:20, domain:'U', width:100, locked:false, label:'Login Active?', 
+									template:changeTmpl('active'), defaultValue: 'N', validator: validator_YN],
+		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
+									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date],
+		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', 
+									template:changeTmpl('passwordExpirationDate'), transform:xfrmDateToString, validator:validator_date],
+		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', 
+									template:changeTmpl('passwordNeverExpires'), defaultValue: 'N', validator: validator_YN],
+		forcePasswordChange    : [type:'string',  ssPos:22,   formPos:24, domain:'U', width:100, locked:false, label:'Force Chg Pswd?', 
+									template:changeTmpl('forcePasswordChange'), defaultValue: 'N', validator: validator_YN ],
 		lastLogin              : [type:'datetime',ssPos:23,   formPos:24, domain:'T', width:100, locked:false, label:'Last Login (readonly)'],
 		match                  : [type:'list',    ssPos:null, formPos:25, domain:'T', width:100, locked:false, label:'Matched On']
+	]
+
+	// The map of the location of the various properties on the Title page of the Account Spreadsheet
+	static final Map TitlePropMap = [
+		 clientName: [1,3, 'String'],
+		  projectId: [1,4, 'Integer'],
+		projectName: [2,4, 'String'],
+		 exportedBy: [1,5, 'String'],
+		 exportedOn: [1,6, 'Datetime'],
+		   timezone: [1,7, 'String'],
+		 dateFormat: [1,8, 'String']
 	]
 
 	/*********************************************************************************************************
 	 ** Controller methods
 	 *********************************************************************************************************/
+
+	/** 
+	 * Used to load a blank import template that updates the title sheet and then downloads the file to the 
+	 * end user.
+	 * @param response - the HttpResponse object
+	 * @param session - the HttpSession object
+	 * @param byWhom - the user that is attempting to download the spreadsheet template
+	 * @param project - the user's currently selected project 
+	 * @param filename - the name of the file that the download should have for the mime-type
+	 */
+	void generateImportTemplateToBrowser(response, session, UserLogin byWhom, Project project, String filename) {
+		HSSFWorkbook workbook = getAccountExportTemplate()
+
+		Map sheetOptions = getSheetOptions(session)
+
+		updateSpreadsheetTitleTab(byWhom, project, workbook, sheetOptions)
+
+		sendSpreadsheetToBrowser(response, workbook, filename)
+
+	}
 
 	/**
 	 * Used to load the spreadsheet into memory and validate that the information is correct
@@ -100,17 +215,13 @@ class AccountImportExportService {
 	 * @param options  - the options that the user chose when submitting the form
 	 * @controllerMethod
 	 */
-	List loadAndValidateSpreadsheet(UserLogin byWhom, Project project, String filename, Map options) {
+	List loadAndValidateSpreadsheet(session, UserLogin byWhom, Project project, String filename, Map formOptions) {
 		// Load the spreadsheet
-		HSSFWorkbook spreadsheet = readImportSpreadsheet(filename)
+		HSSFWorkbook workbook = readImportSpreadsheet(filename)
 
-		// Read in the accounts and then validate them
-		List accounts = readAccountsFromSpreadsheet(spreadsheet)
+		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 
-		// Validate the sheet
-		validateUploadedAccounts(byWhom, accounts, project, options)
-
-		return accounts
+		return validateSpreadsheetContent(byWhom, project, workbook, sheetInfoOpts, formOptions)
 	}
 
 	/**
@@ -128,7 +239,7 @@ class AccountImportExportService {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
-	Map importAccount_Step1_Upload(UserLogin byWhom, Project project, Object request, String fileParamName) {
+	Map importAccount_Step1_Upload(session, UserLogin byWhom, Project project, Object request, String fileParamName) {
 		Map model = [:]
 
 		// Handle the file upload
@@ -139,9 +250,23 @@ class AccountImportExportService {
 
 		// Save the spreadsheet file and then read it into a HSSFWorkbook
 		model.filename = saveImportSpreadsheet(request, byWhom, fileParamName)
-		HSSFWorkbook spreadsheet = readImportSpreadsheet(model.filename)
+		HSSFWorkbook workbook = readImportSpreadsheet(model.filename)
 
-		if (! validateSpreadsheetHeader(spreadsheet)) {
+		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
+
+		if (sheetInfoOpts.sheetProjectId.toString() != project.id.toString()) {
+			throw new InvalidRequestException('The imported spreadsheet did not originate from the currently selected project')
+		}
+
+		if (! sheetInfoOpts.sheetTzId) {
+			throw new InvalidRequestException('The imported spreadsheet was missing the Timezone value on the Title sheet')
+		}
+
+		if (! sheetInfoOpts.sheetDateFormat) {
+			throw new InvalidRequestException('The imported spreadsheet was missing the Date Format value on the Title sheet')
+		}
+
+		if (! validateSpreadsheetHeader(workbook)) {
 			String fqfn=getFilenameWithPath(model.filename)
 			if (! new File(fqfn).delete()) {
 				log.error "Unable to delete temporary account import worksheet $fqfn"
@@ -150,8 +275,8 @@ class AccountImportExportService {
 				' export a new template before attempt an import.')
 		}
 
-		// Read in the accounts and then validate them
-		List accounts = readAccountsFromSpreadsheet(spreadsheet)
+		// Read in the accounts just to see that we're able to without errors
+		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
 
 		if (!accounts) {
 			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
@@ -174,7 +299,7 @@ class AccountImportExportService {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
-	Map importAccount_Step2_Review(UserLogin byWhom, Project project, Object request, Object params) {
+	Map importAccount_Step2_Review(session, UserLogin byWhom, Project project, Object request, Object params) {
 		Map model = [:]
 		Map optionLabels = [
 			(IMPORT_OPTION_BOTH): 'Person and UserLogin',
@@ -214,9 +339,15 @@ class AccountImportExportService {
 	 * @controllerMethod
 	 */
 	@Transactional	
-	Map importAccount_Step3_PostChanges(UserLogin user, Project project, Object options) {
+	Map importAccount_Step3_PostChanges(session, UserLogin byWhom, Project project, Object formOptions) {
+
+		HSSFWorkbook workbook = readImportSpreadsheet(formOptions.filename)
+
+		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
+
 		// Read in the accounts and then validate them
-		List accounts = loadAndValidateSpreadsheet(user, project, options.filename, options)
+		// List accounts = loadAndValidateSpreadsheet(user, project, formOptions.filename, formOptions)
+		List accounts = validateSpreadsheetContent(byWhom, project, workbook, sheetInfoOpts, formOptions)
 		if (!accounts) {
 			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
 		}
@@ -241,7 +372,7 @@ class AccountImportExportService {
 			
 			// Create / Update the persons
 			if (options.flagToUpdatePerson) {
-				def (error, changed) = addOrUpdatePerson(user, accounts[i], options)
+				def (error, changed) = addOrUpdatePerson(user, accounts[i], sheetInfoOpts, formOptions)
 
 				log.debug "importAccount_Step3_PostChanges() call to addOrUpdatePerson() returned person=${accounts[i].person}, error=$error, changed=$changed"
 				if (error) {
@@ -284,6 +415,55 @@ class AccountImportExportService {
 	 *********************************************************************************************************/
 
 	/**
+	 * This map is used to provide the formatting details that will be used in rendering and reading the spreadsheet
+	 * @return The map that contains:
+	 *		tzId - the user's timezone id
+	 *		dateFormat - the date format used for outputing and parse date properties
+	 *		dateTimeFormat - the datetime format used for outputing and parse datetime properties
+	 */
+	private Map getSheetOptions(HttpSession session) {
+		Map map = [ 
+			userTzId: TimeUtil.getUserTimezone(session),
+			userDateFormat: TimeUtil.getUserDateFormat(session)
+		]
+
+		// Get the appropriate date and datetime formatter based on the user's preferences for middle or little endian date formats
+		map.dateFormatter = TimeUtil.createFormatterForType(map.dateFormat, TimeUtil.FORMAT_DATE)
+		map.dateTimeFormatter = TimeUtil.createFormatterForType(map.dateFormat, TimeUtil.FORMAT_DATE_TIME_22)
+
+		if (! map.dateFormatter ) {
+			throw new RuntimeException("Unable to load Date formatter for ${map.dateFormat}")
+		}
+		if (! map.dateTimeFormatter) {
+			throw new RuntimeException("Unable to load DateTime formatter for ${map.dateTimeFormat}")
+		}
+
+		return map
+	}
+
+	/**
+	 * Used to read in the TitleSheet information and load the TZ and Date/DateTime formatters used for most of the 
+	 * application.
+	 * @param session 
+	 * @param project
+	 * @param workbook
+	 * @return A map containing the values from the title page plus the userTzId, and userDateFormat and formatters
+	 */
+	private Map getSheetInfoAndOptions(session, Project project, HSSFWorkbook workbook) {
+		// Collect the details off of the title sheet including the project id, exportedOn and the timezone when the data was exported
+		Map sheetInfoOpts = readTitleSheetInfo(project, workbook)
+
+		Map sheetOpts = getSheetOptions(session) 
+
+		// log.debug "getSheetInfoAndOptions() \n\tsheetInfoOpts=$sheetInfoOpts\n\tsheetOpts=$sheetOpts"
+
+		// Get the TZ and date formats and then merge with the sheetInfo
+		sheetInfoOpts.putAll( sheetOpts )
+	
+		return sheetInfoOpts
+	}
+
+	/**
 	 * Used to determine based on user import options if the Person should be updated
 	 * @param options - the map of the form params
 	 * @return true if the user selected the correct options to update the Person otherwise false
@@ -324,7 +504,7 @@ class AccountImportExportService {
 		list.sort { it[0] }
 		list = list.collect { it[1] }
 
-		return list		
+		return list
 	}
 
 	/**
@@ -384,29 +564,57 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to setup some new options used for the account import posting process
-	 * @return the options with a few new values
+	 * Used to assign the correct icon to the individual accounts based on the state of the account
+	 * @param accounts - the list of account maps
 	 */
-	String generateRandonPassword() {
-		return UUID.randomUUID().toString()
+	private void setIconsOnAccounts(List accounts) {
+		for (int i=0; i < accounts.size() ; i++) {
+			String icon = 'pencil.png'
+			if (accounts[i].errors) {
+				icon = 'exclamation.png'
+			} else if (accounts[i].isNewAccount) {
+				icon = 'add.png'				
+			}
+			accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: icon, absolute: false])
+		}
 	}
 
 	/**
-	 * Used to compute a date some number of days into the future
-	 * @param daysOffset - the number of days into the future (+) or past (-)
-	 * @param current - the date to start with (default to now)
-	 * @return the date based on the days offset
+	 * Used to set the appropriate property on the account Map to indicate that a defaulted value
+	 * was used on the Account. This also sets the actual property value since it is defaulting afterall.
+	 * @param account - the Map with all of the account information
+	 * @param property - the name of the property to set 
+	 * @param value - the value to set the defaulted field to
 	 */
-	Date daysOffset(int daysOffset, Date current=new Date()) {
-		Date offsetDate
-		// Compute the date into the future based on the user input
-		use (TimeCategory) {
-			offsetDate = current + daysOffset
-		}
-
-		return offsetDate
+	private void setDefaultedValue(Map account, String property, value) {
+		setValue(account, DEFAULTED_SUFFIX, property, value)
+		account[property] = value
 	}
 
+	/**
+	 * Used to set the appropriate property on the account Map to indicate that the original value is being
+	 * changed on the Account.
+	 * @param account - the Map with all of the account information
+	 * @param property - the name of the property to set 
+	 * @param value - the original value that the domain object had
+	 */
+	private void setOriginalValue(Map account, String property, value) {
+		setValue(account, ORIGINAL_SUFFIX, property, value)
+	}
+
+	/**
+	 * Used by setDefaultedValue and setOriginalValue to do the bulk of the work. You shouldn't be calling this
+	 * method directly.
+	 * @param account - the Map with all of the account information
+	 * @param suffix - the suffix that is tacked onto the end of the variable name
+	 * @param property - the name of the property to set 
+	 * @param value - the value to set the defaulted field to
+	 */
+	private void setValue(Map account, String suffix, String property, value) {
+		String prop = "$property$suffix".toString()
+		account[prop] = value
+	}
+	
 	/** 
 	 * Used to retrieve a blank Account Export Spreadsheet
 	 * @return The blank spreadsheet
@@ -439,20 +647,10 @@ class AccountImportExportService {
 	 * @param controller - the controller from which this method is being invoked
 	 * @param byWhom - the user that invoked the method
 	 * @param project - the user's project context
-	 * @param staffOption - the option to export STAFF (all of the client staff) or PROJ_STAFF (all individuals assigned to project)
-	 * @param includeUserLogins - a boolean flag if user information should be exported 
-	 * @param userLoginOption - an option to indicate A:All users, Y:Active users, or N: Inactive users
+	 * @param formOptions - A map of the form variables submitted by the user
 	 * @permission PersonExport 
 	 */
-	HSSFWorkbook generateAccountExportSpreadsheet(
-		Object session,
-		UserLogin byWhom, 
-		Project project,
-		String staffOption, 
-		boolean includeUserLogins=false, 
-		String userLoginOption=null
-	) {
-		// Project project = controllerService.getProjectForPage(this, 'PersonExport')
+	HSSFWorkbook generateAccountExportSpreadsheet(Object session, UserLogin byWhom, Project project, Map formOptions) {
 		if (!project) {
 			return
 		}
@@ -460,46 +658,104 @@ class AccountImportExportService {
 		List persons = []
 
 		// Get the staff for the project
-		def company = project.client.id
-		if (staffOption == "STAFF"){
-			persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(company))
-		} else if(staffOption == "PROJ_STAFF") {
-			persons = projectService.getStaff(project)
+		switch (formOptions.staffType) {
+			case 'CLIENT_STAFF':
+				persons = partyRelationshipService.getAllCompaniesStaffPersons([project.client])
+				break
+
+			case 'AVAIL_STAFF':
+				// TODO : JPM 4/2016 : This needs to be reviewed because we're not returning all of the correct accounts
+				Long companyId = project.client.id
+				
+				// persons = partyRelationshipService.getAllCompaniesStaffPersons(Party.findById(companyId))
+				persons = projectService.getAssignableStaff(project, byWhom.person)
+				break
+
+			case 'PROJ_STAFF':
+				persons = projectService.getStaff(project)
+				break
+
+			default:
+				throw new InvalidParamException("The staffing type parameter was invalid")
 		}
 
 		if (! persons) {
 			throw new EmptyResultException('No accounts were found for given filter')
 		}
 
-		def book = getAccountExportTemplate()
-		def sheet = book.getSheet(TEMPLATE_TAB_NAME)
+		log.debug "generateAccountExportSpreadsheet() found $persons.size() staff to export"
 
-		populateAccountSpreadsheet(session, project, persons, sheet, company, includeUserLogins, userLoginOption)
+		Map sheetInfoOpts = getSheetOptions(session)
 
-		return book
+		def workbook = getAccountExportTemplate()
+
+		populateAccountSpreadsheet(byWhom, project, persons, workbook, formOptions, sheetInfoOpts)
+
+		return workbook
 	}
 
 	/**
 	 * This method will iterate over the list of persons and populate the spreadsheet appropriately
-	 * @param includeUserLogins - a boolean flag if user information should be exported 
-	 * @param userLoginOption - an option to indicate A:All users, Y:Active users, or N: Inactive users
+	 * @param byWhom - the user that is making the request for the spreadsheet
+	 * @param project - the project associated to the accounts being exported
+	 * @param persons - the list of persons to be exported
+	 * @param workbook - the spreadsheet workbook to be populated
+	 * @param formOptions - a map of options from the user input fomr 
+	 * @param sheetInfoOpts - a map of options used in formating dates in the sheet
 	 */
-	private void populateAccountSpreadsheet(session, Project project, List persons, sheet, companyId, includeUserLogins, userLoginOption) {
-		Date now = new Date()
-		persons.eachWithIndex{ person, index ->
-			Map account = personToFieldMap(person, project)
+	private void populateAccountSpreadsheet( 
+		UserLogin byWhom, 
+		Project project, 
+		List persons, 
+		HSSFWorkbook workbook, 
+		Map formOptions,
+		Map sheetInfoOpts) {
 
-			if (includeUserLogins) {
+		List elapsedNow = [new Date()]
+
+		updateSpreadsheetTitleTab(byWhom, project, workbook, sheetInfoOpts)
+
+		// log.debug "updateSpreadsheetTitleTab took ${ TimeUtil.elapsed(elapsedNow) }"
+
+		def sheet = workbook.getSheet(TEMPLATE_TAB_NAME)
+
+		Date now = new Date()
+		int row = 1
+		int max = persons.size()
+		persons.eachWithIndex{ person, index ->
+			if (row % 10 == 0) {
+				log.info "Exported $row staff records of $max"
+			}
+			Map account = personToFieldMap(person, project, sheetInfoOpts)
+
+		//log.debug "personToFieldMap took ${ TimeUtil.elapsed(elapsedNow) }"
+
+
+			if (formOptions.includeLogin=='Y') {
 				UserLogin userLogin = person.userLogin
 				if (userLogin) {
-					Map userMap = userLoginToFieldMap(userLogin, session)
-					// log.debug "userMap = $userMap"
-					account.putAll(userMap)
+					boolean includeLogin = formOptions.loginChoice=='0'
+					if (!includeLogin) {
+						boolean isActive = userLogin.userActive()
+						if ((formOptions.loginChoice=='1' && isActive) || (formOptions.loginChoice=='2' && !isActive)) {
+							includeLogin = true
+						}
+					}
+					if (includeLogin) {
+						Map userMap = userLoginToFieldMap(userLogin, sheetInfoOpts)
+						// log.debug "userMap = $userMap"
+						account.putAll(userMap)
+						// log.debug "userLoginToFieldMap took ${ TimeUtil.elapsed(elapsedNow) }"
+					}
+
 				}
 			}
 
 			// Now that we have the map, we can iterate over the account map
-			addRowToAccountSpreadsheet(sheet, account, (index+1))			
+			addRowToAccountSpreadsheet(sheet, account, row++, sheetInfoOpts)
+		
+			// log.debug "addRowToAccountSpreadsheet took ${ TimeUtil.elapsed(elapsedNow) }"
+
 		}
 	}	
 
@@ -509,12 +765,16 @@ class AccountImportExportService {
 	 * @param account - the map of the account properties
 	 * @param rowNumber - the row in the spreadsheet to insert the values 
 	 */
-	private void addRowToAccountSpreadsheet(sheet, Map account, int rowNumber) {
+	private void addRowToAccountSpreadsheet(sheet, Map account, int rowNumber, Map sheetInfoOpts) {
 		// Loop through the SpreadSheet Map and add to the cells
 		accountSpreadsheetColumnMap.each { prop, info ->
 			def colPos = info.ssPos
 			if (colPos != null) {
-				WorkbookUtil.addCell(sheet, colPos, rowNumber, account[prop])
+				def val = account[prop]
+				if (val && info.transform) {
+					val = info.transform(val, sheetInfoOpts)
+				}
+				WorkbookUtil.addCell(sheet, colPos, rowNumber, val)
 			}
 		}
 	}
@@ -532,6 +792,88 @@ class AccountImportExportService {
 			}
 		}
 	}
+
+	/**
+	 * This method is used to update the spreadsheet title tab with various information about the export that 
+	 * will come in handy on a subsequent import.
+	 * @param session - the servlet container session 
+	 * @param byWhom - the user that is requesting the export
+	 * @param project - the project that this export is for
+	 * @param sheet - the spreadsheet to update
+	 */
+	private void updateSpreadsheetTitleTab(UserLogin byWhom, Project project, sheet, sheetOptions) {
+		def tab = sheet.getSheet(TEMPLATE_TAB_TITLE)
+
+		if (!tab) {
+			throw new EmptyResultException("The $TEMPLATE_TAB_TITLE sheet is missing from the workbook")
+		}
+
+		def exportedOn = TimeUtil.formatDateTimeWithTZ(sheetOptions.userTzId, sheetOptions.dateTimeFormat, new Date())
+
+		def addToCell = { prop, val ->
+			if (! TitlePropMap.containsKey(prop)) {
+				throw new RuntimeException("updateSpreadsheetTitleTab() referenced invalid element '$prop' of TitlePropMap")
+			}
+			WorkbookUtil.addCell(tab, TitlePropMap[prop][0], TitlePropMap[prop][1], val)
+		}
+
+		addToCell('clientName', project.client.toString())
+
+		addToCell('projectId', project.id.toString())
+		addToCell('projectName', project.name.toString())
+		addToCell('exportedBy', byWhom.person.toString())
+		addToCell('exportedOn', exportedOn)
+		addToCell('timezone', sheetOptions.userTzId)
+		addToCell('dateFormat', sheetOptions.userDateFormat)
+	}
+
+	/**
+	 * This method is used to read the spreadsheet title tab that should have various information from the export that 
+	 * is required for the import process (e.g. timezone and exportedOn)
+	 * @param project - the project that this export is for
+	 * @param sheet - the spreadsheet to update
+	 */
+	 //HSSFWorkbook
+	private Map readTitleSheetInfo(Project project, workbook) {
+
+		def sheet = workbook.getSheet(TEMPLATE_TAB_TITLE)
+		if (!sheet) {
+			throw new InvalidRequestException("The spreadsheet was missing the '${TEMPLATE_TAB_TITLE}' sheet")
+		}
+
+		Map map = [:]
+
+		// Helper closure that will get cell values from the sheet based on the col/row mapping in the TitlePropMap MAP
+		// Note that the Datetime case will depend on the map.timezone property read from the spreadsheet
+		def getCell = { prop ->
+			def val
+			String type = TitlePropMap[prop][2]
+			// log.debug "getCell($prop,$type)"
+			// log.debug "   for col ${TitlePropMap[prop][0]}, row ${TitlePropMap[prop][1]}"
+			switch (type) {
+				case 'Integer': 
+					val = WorkbookUtil.getIntegerCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
+					break
+				case 'Datetime':
+					val = WorkbookUtil.getDateCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1], map.sheetTzId)
+					break
+				case 'String':
+					val = WorkbookUtil.getStringCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
+					break;
+				default:
+					throw new RuntimeException("readTitleSheetInfo.getCell had unhandled case for $type")
+			} 
+		}
+
+		map.sheetTzId = getCell('timezone')
+		map.sheetProjectId = getCell('projectId')
+		map.sheetDateFormat = getCell('dateFormat')
+
+		// Note that the exportedOn property is dependent on timezone being previously loaded
+		map.sheetExportedOn = getCell('exportedOn')	
+
+		return map
+	} 
 
 	/**
 	 * This method will compare the column headers to the map to determine if the spreadsheet being read in
@@ -556,6 +898,26 @@ class AccountImportExportService {
 	}
 
 	/**
+	 * This method will read in all of the content from the accounts sheet and the invoke the validation logic
+	 * @param byWhom - the user that is invoking the upload process
+	 * @param project - the user's project in his context
+	 * @param workbook - the spreadsheet that was loaded
+	 * @param sheetInfoOpts - the map containing the information from the workbook title and the TZ/Date stuff
+	 * @param formOptions - the user input params from the form
+	 * @return The list of accounts mapped out
+	 */
+	List<Map> validateSpreadsheetContent(UserLogin byWhom, Project project, HSSFWorkbook workbook, Map sheetInfoOpts, Map formOptions) {
+
+		// Read in the accounts and then validate them
+		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
+
+		// Validate the sheet
+		validateUploadedAccounts(byWhom, accounts, project, sheetInfoOpts, formOptions)
+
+		return accounts
+	}
+
+	/**
 	 * Used to write the teams to the spreadsheet Teams tab
 	 * @param sheet - the spreadsheet to write to
 	 */
@@ -577,7 +939,8 @@ class AccountImportExportService {
 	private void addRolesToSpreadsheet(sheet) {
 		def tab = sheet.getSheet('Roles')
 		assert tab		
-		List roles = RoleType.findAllByType(RoleType.SECURITY, [order:'level'])
+		List roles = securityService.getAllRoles()
+		//RoleType.findAllByType(RoleType.SECURITY, [order:'level'])
 		int row = 1
 		roles.each {r ->
 			if (r.id == 'TEST_ROLE') 
@@ -592,13 +955,18 @@ class AccountImportExportService {
 	 * @param person - the person to map to the AccountFieldMap format
 	 * @return a map of the person information
 	 */
-	private Map personToFieldMap(Person person, Project project) {
-		Map map = buildMapForDomain(person, 'P')
-
+	private Map personToFieldMap(Person person, Project project, Map sheetInfoOpts) {
+		List enow = [new Date()]
+		Map map = buildMapFromDomain(person, 'P', sheetInfoOpts)
+		//log.debug "   buildMapFromDomain took ${TimeUtil.elapsed(enow)}"
 		// Deal with transient properties that we can't handle through the map just yet...
-		List personTeams = person.getSuitableTeams().id
-		List projectTeams = partyRelationshipService.getProjectStaffFunctions(project, person).id
-		List roles = securityService.getAssignedRoles(person).id
+		List personTeams = person.getTeamsCanParticipateIn().id
+		
+		//log.debug "   getTeamsCanParticipateIn took ${TimeUtil.elapsed(enow)}"
+		List projectTeams = partyRelationshipService.getProjectStaffFunctionCodes(project, person)
+		//log.debug "   getProjectStaffFunctionCodes took ${TimeUtil.elapsed(enow)}"
+		List roles = securityService.getAssignedRoleCodes(person)
+		//log.debug "   getAssignedRoleCodes took ${TimeUtil.elapsed(enow)}"
 
 		map.personTeams  = personTeams.join(", ") 
 		map.projectTeams = projectTeams.join(", ") 
@@ -612,14 +980,14 @@ class AccountImportExportService {
 	/**
 	 * Used to map a Person to the accountSpreadsheetColumnMap format
 	 * @param user - the UserLogin to map to the AccountFieldMap format
-	 * @param session - the request session which is used to access the timezone information
+	 * @param sheetInfoOpts - a map that includes the tzId and date/time formats
 	 * @return a map of the person information
 	 */
-	private Map userLoginToFieldMap(UserLogin user, Object session) {	
-		Map map = buildMapForDomain(user, 'U')
+	private Map userLoginToFieldMap(UserLogin user, Map sheetInfoOpts) {	
+		Map map = buildMapFromDomain(user, 'U', sheetInfoOpts)
 
 		// Handle Transient properties
-		map.lastLogin = user.lastLogin
+		map.lastLogin = (user.lastLogin ? TimeUtil.formatDateTimeWithTZ(sheetInfoOpts.userTzId, user.lastLogin, sheetInfoOpts.dateTimeFormatter) : '')
 
 		return map
 	}
@@ -629,17 +997,24 @@ class AccountImportExportService {
 	 * to determine the properties to fetch.
 	 * @param domainObj - the object to pull the values from (Person, UserLogin)
 	 * @param domainCode - the code for the domain property in the Map e.g. P)erson or U)ser
+	 * @param sheetInfoOpts - a map containing the user tzId and date/time formats
 	 * @return The map containing the values from the domain that are identified
 	 */
-	private Map buildMapForDomain(Object domainObj, String domainCode) {
+	private Map buildMapFromDomain(Object domainObj, String domainCode, Map sheetInfoOpts) {
 		Map map = [:]
 		accountSpreadsheetColumnMap.each { prop, info ->
 			if (info.domain != domainCode) {
 				return
 			}
 			switch (info.type) {
+				case 'date':
+					map[prop] = (domainObj[prop] ? TimeUtil.formatDate(domainObj[prop], sheetInfoOpts.dateFormatter) : '')
+					break
+				case 'datetime':
+					map[prop] = (domainObj[prop] ? TimeUtil.formatDateTimeWithTZ(sheetInfoOpts.userTzId, domainObj[prop], sheetInfoOpts.dateTimeFormatter) : '')
+					break
 				case 'boolean':
-					map[prop] = (domainObj[prop] ? 'Y' : 'N')
+					map[prop] = (domainObj[prop].asYN())
 					break
 				default:	
 					map[prop] = domainObj[prop]
@@ -647,6 +1022,45 @@ class AccountImportExportService {
 			}
 		}
 		return map
+	}
+
+	/**
+	 * Used to transform a value coming from the spreadsheet into the format that the domain object is 
+	 * expected based on the definition in accountSpreadsheetColumnMap. 
+	 * @param property - the name of the property
+	 * @param value - the value to transform
+	 * @return the transformed value
+	 */
+	private Object transformValueToDomainType(String property, value, Map sheetInfoOpts) {
+		String type = accountSpreadsheetColumnMap[property]?.type
+		if (! type) {
+			throw RuntimeException("Unable to find '$property' in field definition map")
+		}
+		if (value != null) {
+			switch (type) {
+				case 'boolean':
+					value = value.asBoolean()
+					break
+				case 'date':
+					value = TimeUtil.parseDate(value, sheetInfoOpts.dateFormatter)
+					break
+				case 'datetime':
+					value = TimeUtil.parseDateTimeWithFormatter(sheetInfoOpts.sheetTzId, value, sheetInfoOpts.dateTimeFormatter)
+					break
+			}
+		}
+		// log.debug "*** transformValueToDomainType() property=$property, type=$type, $value isa ${value?.getClass()?.getName()}"
+		return value
+	}
+
+	/**
+	 * This is used to get the fully qualified filename with path of where the temporary files are written
+	 * @param filename - the name of the file without a path
+	 * @return the filename with the path prefix
+	 */
+	private String getFilenameWithPath(String filename) {
+		String fqfn=coreService.getAppTempDirectory() + '/' + filename	
+		return fqfn
 	}
 
 	/**
@@ -659,7 +1073,7 @@ class AccountImportExportService {
 	 */
 	String saveImportSpreadsheet(Object request, UserLogin byWhom, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-		CommonsMultipartFile xlsFile = ( CommonsMultipartFile ) mpr.getFile(paramName)
+		CommonsMultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
 		
 		// Generate a random filename to store the spreadsheet between page loads
 		String filename = "AccountImport-${byWhom.id}-" + com.tdsops.common.security.SecurityUtil.randomString(10)+'.xls'
@@ -672,16 +1086,6 @@ class AccountImportExportService {
 		xlsFile.transferTo(localFile)
 
 		return filename
-	}
-
-	/**
-	 * This is used to get the fully qualified filename with path of where the temporary files are written
-	 * @param filename - the name of the file without a path
-	 * @return the filename with the path prefix
-	 */
-	private String getFilenameWithPath(String filename) {
-		String fqfn=coreService.getAppTempDirectory() + '/' + filename	
-		return fqfn
 	}
 
 	/**
@@ -703,11 +1107,13 @@ class AccountImportExportService {
 	/**
 	 * Used to read the Account Import Spreadsheet and load up a list of account+user properties. This will 
 	 * iterate over the accountSpreadsheetColumnMap Map to pluck the values out of the appropriate columns of
-	 * each row and add to the map that is returned for each person/userlogin.
+	 * each row and add to the map that is returned for each person/userlogin. The values are just saved in their
+	 * String type and will be manipulated later.
 	 * @param spreadsheet - the spreadsheet to read from
 	 * @return the list that is read in
-	*/
-	private List<Map> readAccountsFromSpreadsheet(spreadsheet) {
+	 */
+	private List<Map> readAccountsFromSpreadsheet(spreadsheet, Map sheetInfo) {
+
 		int firstAccountRow = 1
 		def accountsSheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
 		int lastRow = accountsSheet.getLastRowNum()
@@ -719,11 +1125,7 @@ class AccountImportExportService {
 			accountSpreadsheetColumnMap.each { prop, info ->
 				Integer colPos = info.ssPos
 				if (colPos != null) {
-					def value
-					switch( info.type ) {
-						default:
-							value = WorkbookUtil.getStringCellValue(accountsSheet, colPos, row).trim()
-					}
+					def value = WorkbookUtil.getStringCellValue(accountsSheet, colPos, row).trim()
 					account[prop] = value
 				}
 			}
@@ -736,22 +1138,44 @@ class AccountImportExportService {
 	}
 
 	/**
+	 * Used to render a list of error messages from the Gorm constraints violations
+	 * @param domainObj - the domain object to generate the list of errors on
+	 * @return list of errors
+	 */
+	private List gormValidationErrors(domainObj) {
+		List msgs = []
+		domainObj.errors.allErrors.each {
+			msgs << "${it.getField()} error ${it.getCode()}"
+		}
+		return msgs
+	}
+
+	/**
 	 * Used to validate the list of accounts that were uploaded and will populate the individual maps with 
-	 * properties errors when anything is found. This will update the accounts data with the following information:
+	 * properties errors when anything is found. The logic will update the accounts object that is passed into
+	 * the method.  The logic will update the accounts data with the following information:
 	 *    - set companyObj to the company
 	 *    - set companyId to the id of the company (seems redundant...)
 	 *    - set person properties with ORIGINAL_SUFFIX suffix if the value has been changed from the original
 	 *    - set isNewAccount to indicate if the person is new or not
+	 *    - set default values 
+	 *    - load in information from the pre-existing person and userLogin domains
 	 *    - appends any error messages to errors list
+	 * @param byWhom - the user invoking the upload
 	 * @param accounts - the list of accounts that are read from the spreadsheet
-	 * @return the accounts list updated with errors
+	 * @param project - the user's project in their context
+	 * @param sheetInfoOpts - the worksheet title page info plus the TZ/Date stuff
+	 * @param formOptions - form params from the page submission
 	 */
-	private void validateUploadedAccounts(UserLogin byWhom, List<Map> accounts, Project project, Map options) {
+	private void validateUploadedAccounts(UserLogin byWhom, List<Map> accounts, Project project, Map sheetInfoOpts, Map formOptions) {
 
 		List usernameList
 		List validRoleCodes
-		List teamCodes
-		List assignableRoleCodes = securityService.getAssignableRoleCodes(byWhom.person)
+		
+// TODO : JPM 4/2016 : readAccountsFromSpreadsheet - need to check the person last modified against the spreadsheet time
+
+		// Get the list of roles that the byWhom can assign to others
+		List authorizedRoleCodes = securityService.getAssignableRoleCodes(byWhom.person)
 
 		// def emailValidator = EmailValidator.getInstance()
 
@@ -759,24 +1183,28 @@ class AccountImportExportService {
 
 		// Get all of the email address that were uploaded
 		List emailList = accounts.findAll( { it.email })?.collect({it.email.toLowerCase()})
+		
+		List allTeamCodes
 
 		PartyGroup client = project.client
 		Map companiesByNames = projectService.getCompaniesMappedByName(project)
 		Map companiesById = projectService.getCompaniesMappedById(project)
 
-		if (options.flagToUpdatePerson) {
-			// Retrieves all the team codes that this user is allowed to assign
-			teamCodes = partyRelationshipService.getStaffingRoles().id
-		}
-
-		if (options.flagToUpdateUserLogin) {
+		if (formOptions.flagToUpdateUserLogin) {
 			// Retrieves all the roles that this user is allowed to assign.
-			validRoleCodes = securityService.getAssignableRoles(securityService.getUserLoginPerson()).id
+			authorizedRoleCodes = securityService.getAssignableRoleCodes(byWhom.person)
+			validRoleCodes = securityService.getAllRoleCodes()
 
 			// Get all of the usernames that were uploaded
 			usernameList = accounts.findAll( { it.username })?.collect({it.username.toLowerCase()})
 		}
 
+		if (formOptions.flagToUpdatePerson) {
+			// Get all teams except AUTO and we need to stuff STAFF into it
+			allTeamCodes = partyRelationshipService.getTeamCodes()
+			allTeamCodes << 'STAFF'
+			log.debug "allTeamCodes = $allTeamCodes"
+		}
 
 		// Validate the teams, roles, company and any other things need be validated
 		for (int i=0; i < accounts.size(); i++) {
@@ -827,7 +1255,6 @@ class AccountImportExportService {
 				}
 			}
 
-			// log.debug "validateUploadedAccounts() account.person=${accounts[i].person != null}, personById=${personById!=null}, personByEmail=${personByEmail!=null}, personByUsername=${personByUsername!=null}, personByName=${personByName!=null}"
 			// Set a flag on the account if it is going to be a new account
 			if (accounts[i].person == null) {
 				log.debug "validateUploadedAccounts() - creating blank Person"
@@ -836,6 +1263,43 @@ class AccountImportExportService {
 			} else {
 				accounts[i].isNewAccount = false
 			}
+
+			//
+			// Now for som Person specific validation
+			//
+			if (formOptions.flagToUpdatePerson) {
+				validatePerson(byWhom, accounts[i], sheetInfoOpts)
+
+				// Get all teams except AUTO
+				validateTeams(accounts[i], project, allTeamCodes) 
+			}
+
+			//
+			// User specific validation
+			//
+			if (formOptions.flagToUpdateUserLogin) {
+				
+				// Validate user and security roles if user requested to update Users
+				boolean canUpdateUser = accounts[i].username
+				// TODO : JPM 4/2016 : check for new create user permission
+				// Check if user is trying to create a user without a person already created 
+				if (canUpdateUser && accounts[i].isNewAccount && !formOptions.flagToUpdatePerson) {
+					accounts[i].errors << 'User can not be created without a saved person'
+					canUpdateUser = false
+				}
+
+				if (canUpdateUser) {
+					validateUserLogin(byWhom, accounts[i], project, sheetInfoOpts)
+
+					// Validate that the teams codes are correct and map out what are to add and delete appropriately
+					validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes)
+				}	
+
+			}
+
+			// Checks for duplicate references in the spreadsheet for personId, email and username after
+			// the above code potentially loaded some default data from pre-existing accounts. That can result
+			// in duplicate people and/or userlogins.
 
 			// Check for duplication person ids in the list
 			String pid = accounts[i].person.id
@@ -848,46 +1312,11 @@ class AccountImportExportService {
 				accounts[i].errors << 'Email referenced on multiple rows'
 			}
 
-			// Load a temporary Person domain object with the properties from the spreadsheet and see if any
-			// of the valids will break the validation constraints
-			Person.withNewSession { session -> 
-				Person personToValidate = (accounts[i].person?.id ? Person.get((accounts[i].person.id)) : new Person() )
-				applyChangesToPerson(personToValidate, accounts[i], options.flagToUpdatePerson)
-				if (! personToValidate.validate()) {
-					personToValidate.errors.allErrors.each {
-						accounts[i].errors << "${it.getField()} error ${it.getCode()}"
-					}
-				}
-				personToValidate.discard()
-			}
-
 			// Check the username to make sure it isn't used by more than one row
 			if (usernameList.findAll{ it == accounts[i].username.toLowerCase() }.size()>1) {
 				accounts[i].errors << 'Username referenced on multiple rows'
 			}
 
-			if (options.flagToUpdatePerson) {
-				// Attempt to validate the teams that are assigned
-				validateTeams(accounts[i], teamCodes) 
-			}
-
-			// Validate user and security roles if user requested to update Users
-			if (options.flagToUpdateUserLogin) {
-				boolean canUpdateUser = accounts[i].username
-				// Check if user is trying to create a user without a person already created 
-				if (canUpdateUser && accounts[i].isNewAccount && !options.flagToUpdatePerson) {
-					accounts[i].errors << 'User can not be created without a saved person'
-					canUpdateUser = false
-				}
-
-				if (canUpdateUser) {
-					// Validate that the teams codes are correct and map out what are to add and delete appropriately
-					validateSecurityRoles(byWhom, accounts[i], validRoleCodes, assignableRoleCodes)
-				}	
-
-			}
-
-			// Attempt to match the persons to existing users
 			// List staff = partyRelationshipService.getCompanyStaff( project.client.id )
 			// TODO : JPM 4/2016 : Should check if the user can see people unassigned to the project  
 		}
@@ -897,19 +1326,560 @@ class AccountImportExportService {
 	}	
 
 	/**
-	 * Used to assign the correct icon to the individual accounts based on the state of the account
-	 * @param accounts - the list of account maps
+	 * Used to validate the UserLogin properties that were imported are valid and to update the account 
+	 * Map with the appropriate values for tracking changes as well setting default values where applicable.
+	 * If the account doesn't have an expiration date then it will attempt to get it from the project expiration 
+	 * otherwise it will default N days in the future.
+	 *
+	 * The method will populate the following properties on the account map accordingly:
+	 *    errors - appends any errors that occurred
+	 * @param byWhom - the user that invoked the upload process
+	 * @param account - the map used to track the person/user properties
+	 * @param sheetInfoOpts - the workbook title sheet info + the TzID and date stuff
+	 * @return returns true if the lookup was successful, false if not or Null if the routine err
 	 */
-	private void setIconsOnAccounts(List accounts) {
-		for (int i=0; i < accounts.size() ; i++) {
-			String icon = 'pencil.png'
-			if (accounts[i].errors) {
-				icon = 'exclamation.png'
-			} else if (accounts[i].isNewAccount) {
-				icon = 'add.png'				
-			}
-			accounts[i].icon = HtmlUtil.resource([dir: 'icons', file: icon, absolute: false])
+	private Boolean validatePerson(UserLogin byWhom, Map account, Map sheetInfoOpts) {
+		Boolean ok = false
+		// Load a temporary Person domain object with the properties from the spreadsheet and see if any
+		// of the valids will break the validation constraints
+		Person.withNewSession { ses -> 
+			Person personToValidate = (account.person?.id ? Person.get((account.person.id)) : new Person() )
+
+			applyChangesToPerson(personToValidate, account, sheetInfoOpts, true)
+
+			ok = personToValidate.validate() 
+			if (! ok) {
+				/*
+				personToValidate.errors.allErrors.each {
+					account.errors << "${it.getField()} error ${it.getCode()}"
+				}
+				*/
+				account.errors.addAll(gormValidationErrors(personToValidate))
+			} 
+			personToValidate.discard()
 		}
+		return ok
+	}
+
+	/**
+	 * Used to validate the UserLogin properties that were imported are valid and to update the account 
+	 * Map with the appropriate values for tracking changes as well setting default values where applicable.
+	 * If the account doesn't have an expiration date then it will attempt to get it from the project expiration 
+	 * otherwise it will default N days in the future.
+	 *
+	 * The method will populate the following properties on the account map accordingly:
+	 *    errors - appends any errors that occurred
+	 * @param byWhom - the user that invoked the upload process
+	 * @param account - the map used to track the person/user properties
+	 * @param project - the user's project in their context
+	 * @param sheetInfoOpts - the workbook title sheet info + the TzID and date stuff
+	 * @return returns true if the lookup was successful, false if not or Null if the routine err
+	 */
+	private Boolean validateUserLogin(UserLogin byWhom, Map account, Project project, Map sheetInfoOpts) {
+		Boolean ok=true
+
+		UserLogin.withNewSession { ses ->
+			boolean isExisting = !!account.person.id
+			UserLogin userLogin
+			if (isExisting) {
+				userLogin = account.person.userLogin
+			}
+			if (!userLogin) {
+				userLogin = new UserLogin()
+
+				// We need a real person associated with the UserLogin to pass validation so we
+				// can use the byWhom if necessary.
+				userLogin.person = ( isExisting ? account.person : byWhom.person )
+				// Set the password for the test
+				userLogin.password = 'phoof'
+				userLogin.expiryDate = projectService.defaultAccountExpirationDate(project)
+			}
+
+			// Iterate through the accountSpreadsheetColumnMap for all of the UserLogin attributes
+			// setting the defaults and changed on the account map. Also setting the values on the domain
+			// object so that we can test that there won't be any validation errors later.
+			accountSpreadsheetColumnMap.each { prop, info ->
+				if (info.domain != 'U') return
+
+				def value = account[prop]
+				if (value) {
+					if (info.validator) {
+						if (! info.validator.call(value, sheetInfoOpts)) {
+							account.errors << "$prop has an invalid value"
+							ok = false
+							return
+						}
+					} else {
+						// Manual validation? 
+					}
+
+					// Set the property on the UserLogin object
+					userLogin[prop] = transformValueToDomainType(prop, value, sheetInfoOpts) 
+				} else {
+					if (isExisting && userLogin[prop]) {
+						value = userLogin[prop]
+					} else {
+						if ( info.containsKey('defaultValue')) {
+							value = info.defaultValue
+						} else {
+							return
+						}
+					}
+
+					setDefaultedValue(account, prop, value)
+					userLogin[prop] = transformValueToDomainType(prop, value, sheetInfoOpts)
+				}
+			}
+
+			// Determine if we have enough information to assume that the administrator is trying to update or
+			// create a new user
+			if (userLogin.username) {
+				if (! userLogin.validate()) {
+					account.errors.addAll(gormValidationErrors(userLogin))
+					ok = false
+				}
+			}
+			userLogin.discard()
+		}
+		return ok
+	}
+
+	/**
+	 * Used to validate the company accounts against the previous found person.company if found and compare by looking up
+	 * the company by name. If the company name was blank and we found one then we'll default it.
+	 * The method will populate the following properties on the account map accordingly:
+	 *    company - set as default if not previously specified
+	 *    company$DEFAULTED_SUFFIX - the default value for the data grid
+	 *    errors - appends any errors that occurred
+	 * @param account - the map used to track the person/user properties
+	 * @param companiesById - the map of the companies affilated with the project
+	 * @return returns true if the lookup was successful, false if not or Null if the routine err
+	 */
+	private Boolean validateCompanyName(Map account, Project project, Map companiesById) {
+		Boolean ok
+		PartyGroup company
+
+		while (true) {
+			// First off if a person was previously found, lets validate that their company is affliated with the project
+			if (account.person) {
+				company = account.person.company
+				if (! companiesById.containsKey(company.id.toString())) {
+					account.errors << 'Person is from non-affilated company'
+					break
+				}
+
+				// If the sheet has the company name lets see if it matches the person's organization
+				if (account.company) {
+					if (account.company.toLowerCase() != company.name.toLowerCase()) {
+						account.errors << "Person's company did not match company name"
+						break
+					}
+					ok = true
+					break
+				}
+			}
+
+			if (account.company) {
+				// Attempt to find the company by name
+				company = PartyGroup.findByName(account.company)
+				if (! company) {
+					account.errors << 'Unable to find company by name' 
+				} else {
+					if (companiesById.containsKey(company.id.toString())) {
+						account.company = company.name
+						ok = true
+					} else {
+						account.errors << 'Company not affilated with project'
+					}
+				}
+			} else {
+				// Set the company default to the project.client when the company wasn't specified and 
+				// we haven't found a person account
+				company = project.client
+				setDefaultedValue(account, 'company', company.name)
+				// account.company = company.name
+				// account["company$DEFAULTED_SUFFIX"] = company.name				
+				ok = false
+			}
+			break
+		}
+
+		if (ok) {
+			account.companyObj = company
+		}
+
+		return ok
+	}
+
+	/**
+	 * Used to review and validate the account.roles values. When successful it will create map property roleActions that contain
+	 * the various changes that need to occur for the user security settings. In addition this logic will:
+	 *    - validate that the codes are legitimate
+	 *    - validate that the user is only modifying roles for which he has capabilities of
+	 *    - create list of adds and deletes for the team codes for person and project
+	 * @param byWhom - the individual that is making the modifications
+	 * @param account - the Map containing all of the changes
+	 * @param validRoleCodes - a list of the valid role codes in the system
+	 * @param authorizedRoleCodes - a list of the role codes that byWhom is authorized to manage
+	 * @param A flag that indicates success (true) or an error occurred (false)
+	 */	 
+	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List authorizedRoleCodes ) {
+		boolean ok=false
+		
+		String prop='roles'
+		List currentRoles = []
+
+		// Validate the Setup the default security role if necessary
+		UserLogin userLogin 
+		if (account.person.id) {
+			userLogin = account.person.userLogin
+			if (userLogin) {
+				currentRoles = securityService.getAssignedRoleCodes(userLogin)
+			}
+		}
+
+		String importedRoles = account[prop]
+		List roleChanges = StringUtil.splitter(importedRoles, ',', DELIM_OPTIONS)
+
+		// Add the DEFAULT security code if it appears that the user wouldn't otherwise be assigned one
+		if (! currentRoles && ! roleChanges.find { it[0] != '-' }) {
+			log.debug "validateSecurityRoles() set default role"
+			roleChanges << securityService.getDefaultSecurityRoleCode()
+		}
+
+		Map changeMap = determineSecurityRoleChanges(validRoleCodes, currentRoles, roleChanges, authorizedRoleCodes)
+		log.debug "validateSecurityRoles() changeMap=$changeMap"
+		if (changeMap.error) {
+			account.errors << changeMap.error
+		} else {
+			ok = true
+			if (changeMap.hasChanges) {
+				// For roles we are going to want to show the imported values along with the original and the resulting 
+				// changes so we'll use all three underlying properties
+				setOriginalValue(account, prop, currentRoles.join(', '))
+				setDefaultedValue(account, prop, changeMap.results.join(', '))
+				account[prop] = importedRoles
+
+				// Save the changeMap to be used later on by the update logic
+				account.securityChanges = changeMap
+			}
+		}
+		return ok
+
+	}
+
+	/**
+	 * Used to validate that the team codes are correct and will set the ORIGINAL or DEFAULT appropriately
+	 * @param account - the Account map to review
+	 * @return true if validated with no errors otherwise false
+	 */
+	private boolean validateTeams(Map account, Project project, List allTeamCodes) {
+		boolean ok = true
+
+		List currPersonTeams=[], currProjectTeams=[]
+		if (account.person.id) {
+			currPersonTeams = account.person.getTeamsCanParticipateIn().id
+	
+			// currProjectTeams= account.person.getTeamsAssignedTo(project)
+			currProjectTeams = partyRelationshipService.getProjectStaffFunctionCodes(project, account.person)
+
+		}
+
+		List chgPersonTeams = StringUtil.splitter(account.personTeams, ',', DELIM_OPTIONS)
+		List chgProjectTeams = StringUtil.splitter(account.projectTeams, ',', DELIM_OPTIONS)
+
+log.debug "validateTeams(${account.firstName} ${account.lastName}) \n\tcurrPersonTeams=$currPersonTeams\n\tcurrProjectTeams=$currProjectTeams\n\tchgPersonTeams=$chgPersonTeams\n\tchgProjectTeams=$chgProjectTeams"
+		Map changeMap =	determineTeamChanges(allTeamCodes, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
+log.debug "validateTeams() \n\tchangeMap=$changeMap"
+		ok = ! changeMap.error
+		if (ok) {
+			// Update the account.teams with the various information to show the changes, etc
+			setOriginalValue(account, 'personTeams', currPersonTeams.join(', '))
+			setOriginalValue(account, 'projectTeams', currProjectTeams.join(', '))
+			account.personTeams = changeMap.resultPersonTeams
+			account.partyTeams = changeMap.resultPartyTeams
+		} else {
+			account.errors << changeMap.error
+		}
+
+		return ok
+	}
+
+	// A helper method used to determine if a value has leading minus
+	boolean isMinus(String str) { 
+		return (str?.startsWith('-'))
+	}
+
+	// A helper method that will strip off a minus prefix if it exists
+	String stripTheMinus(String str) { 
+		String r = str
+		if ( isMinus(str) ) {
+			r = (str.size() > 1 ? str.substring(1).trim() : '')
+		}
+		return r
+	}
+
+	/**
+	 * Used to compare a list against another list wher the list to check may have a minus (-) prefix
+	 * @param validCodes the list of the valid codes to compare against
+	 * @param codesToCheck - the list of codes to validate
+	 * @return a list of the invalid codes or empty if all match
+	 */
+	private List checkMinusListForInvalidCodes(List<String> validCodes, List<String> codesToCheck) {
+		String error
+		List list = codesToCheck.collect { stripTheMinus(it) }
+		list.removeAll(validCodes)
+		return list
+	}
+
+	/**
+	 * Used to determine the actions that should be done based on the current roles and a list of actions. This
+	 * will return a Map [add: [list of roles], delete:[list of roles], error:'Message if violation'].
+	 * @param allRoles - the list of all of the security roles
+	 * @param currentRoles - the list of security role codes that the user already has
+	 * @param changes - a list of the updated roles which the intent of removal will have a minus (-) prefix
+	 * @param authorizedRoleCodes - a list of the roles that the individual can assign based on their security level
+	 * @return A Map object that will contain the following elements:
+	 *        add: a list of roles to be added
+	 *     delete: a list of roles to be deleted
+	 *     result: a list of the resulting roles after the changes are applied
+	 *     errors: an error message String if invalid codes are referenced or tried to assign 
+	 * hasChanges: a boolean indicating if there were changes or not
+	 */
+	private Map determineSecurityRoleChanges(List allRoles, List currentRoles, List changes, List authorizedRoleCodes) {
+
+		Map map = [:]
+
+		// Used to reset the results array and inject the error message before the code bails out 
+		def panicButton = { errorMessage ->
+			map.hasChanges=false
+			map.add = []
+			map.delete = []
+			map.error = errorMessage 
+		}
+
+		panicButton ''	// Initialize the map without an error message
+
+		List remainingCodes = []
+
+		log.debug "determineSecurityRoleChanges() \n   allRoles=$allRoles\n   currentRoles=$currentRoles\n   changes=$changes\n   authorizedRoleCodes=$authorizedRoleCodes" 
+
+		while (true) {
+			List list
+			//
+			// First validate that there are no invalid codes
+			//
+
+			// Check the roles currently assigned to the user (coming from the system)
+			list = currentRoles - allRoles
+			if (list) {
+				// This shouldn't happen but just in case
+				map.error = "System issue with invalid security role${list.size() > 1 ? 's' : ''} $list"
+				break
+			}
+
+			// We'll assume that the accessible roles are legit as they're pulled from the same table as the allRoles
+
+			// Check the updatedRoles which may contain leading minus (-) character indicating removal
+			list = checkMinusListForInvalidCodes(allRoles, changes)
+			log.debug "determineSecurityRoleChanges()          changes: $changes"
+			log.debug "determineSecurityRoleChanges() withMinusRemoved: $list"
+			list = list - allRoles
+			if (list) {
+				panicButton "Invalid security code${list.size() > 1 ? 's' : ''} $list"
+				break
+			}
+
+			// Now we're going to go through the list of changes and apply them to the current list
+			remainingCodes = currentRoles.clone()
+			List violationCodes = []
+			changes.each { chgCode ->
+				// Determine if there is a security violation. Note that a user may have security roles 
+				// previously assigned that are higher than what the individual who is making the changes can
+				// assign so as long as the code was in the original list we're fine. The individual can not
+				// add or remove codes above their clearence.
+				boolean toDelete = isMinus(chgCode)
+				String code = stripTheMinus(chgCode)
+
+				if ( ! authorizedRoleCodes.contains(code) ) {
+					boolean alreadyAssignedToUser = currentRoles.contains(code) 
+					// See if they are trying to add or delete an unauthorize code
+					if ( ( !alreadyAssignedToUser && ! toDelete) || (alreadyAssignedToUser && toDelete) ) {
+						violationCodes << code
+						return
+					}
+				}
+
+				// Check for violations
+				if (violationCodes) {
+					panicButton "Specified unauthorized security role${violationCodes.size()>1?'s':''} ($violationCodes)"
+					return
+				}
+				
+				boolean alreadyInList = remainingCodes.contains(code)
+				if (toDelete && alreadyInList) {
+					remainingCodes = remainingCodes - code
+					map.delete << code
+					map.hasChanges = true
+				} else if ( !toDelete && ! alreadyInList) {
+					remainingCodes << code
+					map.add << code
+					map.hasChanges = true
+				}
+			}
+
+			//println "\n   remainingCodes=$remainingCodes\n   $allRoles=$allRoles\n   currentRoles=$currentRoles\n   changes=$changes" +
+			 "\n   authorizedRoleCodes=$authorizedRoleCodes\n   map=$map" +
+			 "\n   remainingCodes=${remainingCodes ? true : false} ${remainingCodes.size()}"
+
+			if (remainingCodes) {
+				map.results = remainingCodes.sort()
+			} else {
+				panicButton "Deleting all security roles not permitted"
+			}
+			break
+		}
+		return map
+	}
+
+	/**
+	 * Used to determine the actions that should be done based on the current teams assigned to the person directly as well as 
+	 * to the project. Here are a few rules to how the changes will work:
+	 *    - Any team code with a minus (-) prefix in the chgPersonTeams or chgProjectTeams is an indicator to delete the 
+	 *      appropriate reference
+	 *    - If a chgPersonTeams entry contains a minus then the team is removed from the person as well as *ALL* projects
+	 *    - If a chgProjectTeams is listed that is not associated to the person's existing personal list then it will be added
+	 *
+	 * The end result of the method will return a Map than can be used to update the person's references to teams.
+	 * @param allTeams - the list of all of the team codes
+	 * @param currPersonTeams - the list of team codes that the user already has assigned personally assigned
+	 * @param chgPersonTeams - a list of the changes to the personal teams codes which if have the minus (-) prefix should be removed
+	 * @param currPartyTeams - the list of team codes that the user already has assigned to the project
+	 * @param chgPartyTeams - a list of the changes to the project teams codes which if have the minus (-) prefix should be removed
+	 * @return A Map object that will contain the following elements:
+	 *         addToPerson: a list of teams to add to the person
+	 *    deleteFromPerson: a list of teams to be deleted from the person
+	 *        addToProject: a list of teams to add to the project
+	 *   deleteFromProject: a list of teams to be deleted from the project
+	 *        resultPerson: a list of the resulting teams assigned to the person personally after the changes are applied
+	 *       resultProject: a list of the resulting teams assigned to the person for the project after the changes are applied
+	 *              errors: an error message string indicating any errors
+	 *          hasChanges: a boolean indicating if there were changes or not
+	 */
+	private Map determineTeamChanges(List allTeams, List currPersonTeams, List chgPersonTeams, List currProjectTeams, List chgProjectTeams) {
+
+		Map map = [:]
+
+		// Used to reset the results array and inject the error message before the code bails out 
+		def panicButton = { errorMessage ->
+			map.hasChanges=false
+			map.addToPerson = []
+			map.deleteFromPerson = []
+			map.addToProject = []
+			map.deleteFromProject = []
+			map.resultPerson = []
+			map.resultProject = []
+			map.error = errorMessage 
+		}
+		panicButton ''	// Initialize the map without an error message
+
+		//log.debug "determineTeamChanges() \n\tallTeams=$allTeams" +
+		//	"\n\t currPersonTeams=$currPersonTeams\n\t chgPersonTeams=$chgPersonTeams" +
+		//	"\n\t currProjectTeams=$currProjectTeams\n\t chgProjectTeams=$chgProjectTeams" 
+
+		while (true) {
+			List list
+
+			// Check the roles currently assigned to the user (coming from the system)
+			[currPersonTeams, currProjectTeams].each { teams ->
+				list = teams.clone()
+				list.removeAll(allTeams)
+				if (list) {
+					// This shouldn't happen but just in case
+					panicButton "System issue with invalid team role${list.size() > 1 ? 's' : ''} $list"
+					log.debug "WTF??? allTeams=$allTeams"
+				}
+			}
+			if (map.error) {
+				break
+			}
+
+			// Check the chgPersonTeams and chgProjectTeams for invalid codes
+			[chgPersonTeams, chgProjectTeams].each { teams ->
+				list = checkMinusListForInvalidCodes(allTeams, teams)
+				if (list) {
+					panicButton "Invalid team code${list.size() > 1?'s':''} $list referenced"
+				}
+			}
+			if (map.error) {
+				break
+			}
+
+			List resultPersonTeams = currPersonTeams.clone()
+			List resultProjectTeams = currProjectTeams.clone()
+
+			// Now we're going to go through the person team list of changes and add/remove based on the change list
+			// noting that any deletes may affect the project list
+			chgPersonTeams.each { chgTeam ->
+				boolean toDelete = isMinus(chgTeam)
+				String team = stripTheMinus(chgTeam)
+				boolean alreadyInList = resultPersonTeams.contains(team)
+
+				if (toDelete) {
+					// Deleting a team for a Person can impact the Project assignment as well
+					if (alreadyInList) {
+						resultPersonTeams.remove(team)
+						map.deleteFromPerson << team
+						map.hasChanges = true
+					}
+					if (resultProjectTeams.contains(team)) {
+						resultProjectTeams.remove(team)
+						map.deleteFromProject << team
+						map.hasChanges = true
+					}
+				} else if ( !toDelete && ! alreadyInList) {
+					// Adding a team only impacts the Person List
+					resultPersonTeams << team
+					map.addToPerson << team
+					map.hasChanges = true
+				}
+
+			}
+
+			// Next we're going to go through the project team list of changes and add/remove based on the change list
+			// noting that any additions may affect the person list
+			chgProjectTeams.each { chgTeam ->
+				boolean toDelete = isMinus(chgTeam)
+				String team = stripTheMinus(chgTeam)
+				boolean alreadyInList = resultProjectTeams.contains(team)
+
+				if (toDelete && alreadyInList) {
+					// Delete the team
+					resultProjectTeams.remove(team)
+					map.deleteFromProject << team
+					map.hasChanges = true
+				} else if ( !toDelete ) {
+					// Add the team
+					if ( ! alreadyInList) {
+						resultProjectTeams << team
+						map.addToProject << team
+					}
+					if (! resultPersonTeams.contains(team)) {
+						resultPersonTeams << team
+						map.addToPerson << team
+					}
+					map.hasChanges = true
+				}
+			}
+
+			map.resultPerson = resultPersonTeams.sort()
+			map.resultProject = resultProjectTeams.sort()
+			map.addToPerson = map.addToPerson.sort()
+			map.addToProject = map.addToProject.sort()
+
+			break
+		}
+		return map
 	}
 
 	/**
@@ -966,7 +1936,7 @@ class AccountImportExportService {
 				// Check for a person mismatch 
 				if (account.person) {
 					if (person.id != account.person.id) {
-						accounts.errors << 'Email found mismatched found person'
+						account.errors << 'Email cross referenced other person'
 					} else {
 						ok = true
 					}
@@ -999,7 +1969,7 @@ class AccountImportExportService {
 			if (userLogin) {
 				if (account.person) {
 					if (account.person.id != userLogin.person.id) {
-						account.errors << 'Username mismatched found person'
+						account.errors << 'Username cross-reference other person'
 					} else {
 						ok = true
 					}
@@ -1041,195 +2011,6 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to validate the company accounts against the previous found person.company if found and compare by looking up
-	 * the company by name. If the company name was blank and we found one then we'll default it.
-	 * The method will populate the following properties on the account map accordingly:
-	 *    company - set as default if not previously specified
-	 *    company$DEFAULTED_SUFFIX - the default value for the data grid
-	 *    errors - appends any errors that occurred
-	 * @param account - the map used to track the person/user properties
-	 * @param companiesById - the map of the companies affilated with the project
-	 * @return returns true if the lookup was successful, false if not or Null if the routine err
-	 */
-	private Boolean validateCompanyName(Map account, Project project, Map companiesById) {
-		Boolean ok
-		PartyGroup company
-
-		while (true) {
-			// First off if a person was previously found, lets validate that their company is affliated with the project
-			if (account.person) {
-				company = account.person.company
-				if (! companiesById.containsKey(company.id.toString())) {
-					account.errors << 'Person is from non-affilated company'
-					break
-				}
-
-				// If the sheet has the company name lets see if it matches the person's organization
-				if (account.company) {
-					if (account.company.toLowerCase() != company.name.toLowerCase()) {
-						account.errors << "Person's company did not match company name"
-						break
-					}
-					ok = true
-					break
-				}
-			}
-
-			if (account.company) {
-				// Attempt to find the company by name
-				company = PartyGroup.findByName(account.company)
-				if (! company) {
-					account.errors << 'Unable to find company by name' 
-				} else {
-					if (companiesById.containsKey(company.id.toString())) {
-						account.company = company.name
-						ok = true
-					} else {
-						account.errors << 'Company not affilated with project'
-					}
-				}
-			} else {
-				// Set the company default to the project.client when the company wasn't specified and 
-				// we haven't found a person account
-				company = project.client
-				account.company = company.name
-				account["company$DEFAULTED_SUFFIX"] = company.name				
-				ok = false
-			}
-			break
-		}
-
-		if (ok) {
-			account.companyObj = company
-		}
-
-		return ok
-	}
-
-	/**
-	 * Used to validate that the team codes are correct and will set the ORIGINAL or DEFAULT appropriately
-	 * @param account - the Account map to review
-	 * @return true if validated with no errors otherwise false
-	 */
-	private boolean validateTeams(Map account, List teamCodes) {
-		boolean ok = true
-
-		// Review the personTeam and the projectTeam
-		['person', 'project'].each { tp ->
-			// TODO : cross check the addition and removal of teams  between the two lists
-			// TODO : update the ORIGINAL and DEFAULT property settings to reflect the changes, note we might need a different template for this
-			// to show both the results and the uploaded (with minus potentially)
-			String teamProperty = "${tp}Teams"
-			// Strip off the minus (-) prefix to validate the team codes
-			String teamsWithoutMinus = account[teamProperty]?.replaceAll('-','')
-
-			List teams = StringUtil.splitter(teamsWithoutMinus, ',', DELIM_OPTIONS)
-			if (teams) {
-				List invalidTeams = teams - teamCodes
-				if (invalidTeams) {
-					ok = false
-					account.errors << "Invalid $tp team(s) ${invalidTeams.join(',')}"
-				}
-
-				// Now put the appropriate team codes into the account map
-				account[teamProperty] = StringUtil.splitter(account[teamProperty], ',', DELIM_OPTIONS)
-			} else {
-				account[teamProperty] = []
-			}
-		}
-		return ok
-	}
-
-	/**
-	 * Used to review and validate the account.roles values. When successful it will create map property roleActions that contain
-	 * the various changes that need to occur for the user security settings. In addition this logic will:
-	 *    - validate that the codes are legitimate
-	 *    - validate that the user is only modifying roles for which he has capabilities of
-	 *    - create list of adds and deletes for the team codes for person and project
-	 * @param byWhom - the individual that is making the modifications
-	 * @param account - the Map containing all of the changes
-	 * @param validRoleCodes - a list of the valid role codes in the system
-	 * @param assignableRoleCodes - a list of the role codes that byWhom has the privilege of
-	 * @param A flag that indicates success (true) or an error occurred (false)
-	 */	 
-	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List assignableRoleCodes ) {
-		boolean ok=false
-
-		// Validate the Setup the default security role if necessary
-		UserLogin userLogin 
-		if (account.person.id) {
-			userLogin = account.person.userLogin
-		}
-
-		// Validate the roles
-		// Review the security roles that are going to be assigned to the person
-		List currentRoles = []
-		List invalidRoles = []
-		if (account.roles) {
-			String rolesWithoutMinus = account.roles?.replaceAll('-','')
-			currentRoles = StringUtil.splitter(rolesWithoutMinus, ',', DELIM_OPTIONS)
-			invalidRoles = currentRoles - validRoleCodes
-			if (invalidRoles) {
-				account.errors << "Invalid role: ${invalidRoles.join(';')}"
-			} else {
-				account.roles = StringUtil.splitter(account.roles, ',', DELIM_OPTIONS)
-				if (! account.isNewAccount && userLogin) {
-					// Set the original values
-					List origRoles = securityService.getRoles(userLogin)?.id
-					List chgRoles = account.roles
-					// log.debug "VALIDATING ROLES: ${account.person}\nOrig: $origRoles\n Chg: $chgRoles"
-					// See if there are any differences in the uses' changing roles and the original
-					if ( (chgRoles - origRoles) || (origRoles - chgRoles) ) {
-						// If so then save off the original
-						account["roles${ORIGINAL_SUFFIX}"] = origRoles.join(', ')
-					}
-				}
-			}
-
-		} else {
-			// Set the default role 
-			String dsrc = securityService.getDefaultSecurityRoleCode()
-			account.roles = [dsrc]
-			account["roles${DEFAULTED_SUFFIX}"] = dsrc
-		}		
-	}
-
-	/**
-	 * Used to load any property a person object where the values are different
-	 * @param person - the person object to be changed
-	 * @param account - the Map containing all of the changes
-	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
-	 * @return 
-	 */
-	private Map applyChangesToPerson(Person person, Map account, boolean shouldUpdatePerson) {
-		boolean existing = person.id
-		accountSpreadsheetColumnMap.each {prop, info ->
-			if (info.domain == 'P') {
-				if (existing) {
-					// Attempt to save the original value
-					if (account[prop]) {
-						if ( (! person[prop]) || ( person[prop] && person[prop] != account[prop] ) ) {
-							// Save the original value so it can be displayed later
-							if (shouldUpdatePerson) {
-								account["${prop}$ORIGINAL_SUFFIX"] = (person[prop] ?: '')
-							}
-							person[prop] = account[prop]
-						}
-					} else {
-						// Attempt to save the default value
-						if ( person[prop] && !account[prop]) {
-							account["${prop}$DEFAULTED_SUFFIX"] = person[prop]
-						}
-					}
-				} else {
-					person[prop] = account[prop]
-				}
-			}
-		}
-		return account
-	}
-
-	/**
 	 * Used to add or update the person
 	 * @param account - the account information
 	 * @param options - the map of the options
@@ -1239,14 +2020,14 @@ class AccountImportExportService {
 	 *    String - an error message if the save or update failed
 	 *    boolean - a flag indicating if the account was changed (true) or unchanged (false)
 	 */
-	List addOrUpdatePerson(UserLogin byWhom, Map account, Map options) {
+	List addOrUpdatePerson(UserLogin byWhom, Map account, Map sheetInfoOpts, Map formOptions) {
 		String error
 		boolean changed=false
 
 		Person person = account.person
 
 		// Update the person with the values passed in
-		account = applyChangesToPerson(person, account, options.flagToUpdatePerson)
+		account = applyChangesToPerson(person, account, formOptions.flagToUpdatePerson)
 
 		List dirtyProps = person.dirtyPropertyNames
 		log.debug "addOrUpdatePerson() ${person} account.isNewAccount=${account.isNewAccount}, dirtyProps=$dirtyProps"
@@ -1282,7 +2063,7 @@ class AccountImportExportService {
 	 * @param options - the options that the user selected for the update
 	 * @return a flag that indicates if the update updating anything (true) or remained unchanged (false)
 	 */
-	boolean addOrUpdateUser(UserLogin byWhom, Map account, Map options) {
+	boolean addOrUpdateUser(UserLogin byWhom, Map account, Map sheetInfoOpts, Map formOptions) {
 		if (! securityService.hasPermission(byWhom, 'EditUserLogin', true)) {
 			throw new UnauthorizedException('You are unauthorized to edit UserLogins')
 		}
@@ -1293,8 +2074,8 @@ class AccountImportExportService {
 				userLogin = new UserLogin()
 				userLogin.username = account.username
 				userLogin.person = account.person
-				userLogin.active = options.activateLogin.asYN()
-				userLogin.forcePasswordChange = options.forcePasswordChange.asYN()
+				userLogin.active = formOptions.activateLogin.asYN()
+				userLogin.forcePasswordChange = formOptions.forcePasswordChange.asYN()
 
 				// TODO : JPM 4/2016 : Set timezone to that of the project when creating the user
 
@@ -1304,7 +2085,7 @@ class AccountImportExportService {
 			}
 		}
 
-		userLogin.expiryDate = options.expiryDate
+		userLogin.expiryDate = formOptions.expiryDate
 	}
 
 	/**
@@ -1317,8 +2098,8 @@ class AccountImportExportService {
 	 * @param options - the options that the user selected for the update
 	 * @return a flag that indicates if the update updating anything (true) or remained unchanged (false)
 	 */
-	boolean addOrUpdateTeams(UserLogin byWhom, Map account, Project project, Map options) {
-		List suitableTeams = []
+	boolean addOrUpdateTeams(UserLogin byWhom, Map account, Project project, Map sheetInfoOpts, Map options) {
+		List teamsCanParticapateIn = []
 		List projectTeams = []
 
 		// Check to see if there were any teams specified for the user
@@ -1354,16 +2135,16 @@ class AccountImportExportService {
 		log.debug "addOrUpdateTeams() teams for person $personName $teamsForPerson"
 
 		if (! account.isNewAccount) {
-			suitableTeams = account.person.getSuitableTeams().id
+			teamsCanParticapateIn = account.person.getTeamsCanParticipateIn().id
 			// For existing accounts we need to get all of their accounts + any new ones that were specified
-			teamsForPerson.addAll(suitableTeams)
+			teamsForPerson.addAll(teamsCanParticapateIn)
 			teamsForPerson = teamsForPerson.unique()
 
 			// Try removing the teams again now that we have the teams from the database
 			teamsForPerson = teamsForPerson - personTeamsToDelete
 
 			// Determine if there are any new or removed teams
-			changed = (suitableTeams - teamsForPerson) || (teamsForPerson - suitableTeams) 
+			changed = (teamsCanParticapateIn - teamsForPerson) || (teamsForPerson - teamsCanParticapateIn) 
 			log.debug "addOrUpdateTeams() teams for existing person $personName : teams=$teamsForPerson"
 		} else {
 			changed = (teamsForPerson.size() > 0)
@@ -1393,6 +2174,43 @@ class AccountImportExportService {
 		}
 
 		return changed
+	}
+
+	/**
+	 * Used to load any property a person object where the values are different
+	 * @param person - the person object to be changed
+	 * @param account - the Map containing all of the changes
+	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
+	 * @return 
+	 */
+	private Map applyChangesToPerson(Person person, Map account, Map sheetInfoOpts, boolean shouldUpdatePerson) {
+		boolean existing = person.id
+		accountSpreadsheetColumnMap.each {prop, info ->
+			if (info.domain == 'P') {
+				if (existing) {
+					// Attempt to save the original value
+					if (account[prop]) {
+						if ( (! person[prop]) || ( person[prop] && person[prop] != account[prop] ) ) {
+							// Save the original value so it can be displayed later
+							if (shouldUpdatePerson) {
+								setOriginalValue(account, prop, (person[prop] ?: '') )
+								// account["${prop}$ORIGINAL_SUFFIX"] = (person[prop] ?: '')
+							}
+							person[prop] = account[prop]
+						}
+					} else {
+						// Attempt to save the default value
+						if ( person[prop]) {
+							setDefaultedValue(account, prop, person[prop])
+							// account["${prop}$DEFAULTED_SUFFIX"] = person[prop]
+						}
+					}
+				} else {
+					person[prop] = transformValueToDomainType(prop, account[prop], sheetInfoOpts)
+				}
+			}
+		}
+		return account
 	}
 
 }

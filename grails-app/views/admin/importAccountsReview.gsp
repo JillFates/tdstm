@@ -42,9 +42,43 @@
 	<script>
 		// Used to render the changes made in a view
 		function showChanges(model, propertyName) {
+			var hasCurrVal = model.hasOwnProperty(propertyName);
+			var hasOrigVal = model.hasOwnProperty(propertyName + '${originalSuffix}');
+			var hasDefVal  = model.hasOwnProperty(propertyName + '${defaultSuffix}');
 			var originalPropName = propertyName + '${originalSuffix}';
 			var defaultPropName = propertyName + '${defaultSuffix}';
+			var str = '';
+			
+			if (propertyName == '')
+			console.log('hasCurrVal='+hasCurrVal + ', hasOrigVal=' + hasOrigVal + ', hasDefVal=' + hasDefVal);
 
+			if (hasCurrVal && hasOrigVal && hasDefVal) {
+				// A unique case with Security Roles and Teams where we need to show original, the changes and the results
+				str = '<span class="default">' + model[defaultPropName] + '</span>';
+				if (model[originalPropName]) {
+					str = str + '<br><span class="original">' + model[originalPropName] + '</span>';
+				}
+				if (model[propertyName]) {
+					str = str + '<br><span class="change">' + model[propertyName] + '</span>';
+				}
+			} else if(hasDefVal) {
+				// A value was defaulted in from pre-existing user or application defaults
+				str = '<span class="default">' + model[defaultPropName] + '</span>';
+				if (hasCurrVal && ! (model[defaultPropName] == model[propertyName]) ) {
+					str += '<br><span class="change">' + model[propertyName] + '</span>';
+				}
+			} else if(hasOrigVal) {
+				str = '<span class="change">' + model[propertyName] + '</span>' + 
+					(model[originalPropName] ? '<br><span class="original">' + model[originalPropName] + '</span>' : '');
+			} else {
+				str = '<span class="unchanged">' + model[propertyName] + '</span>';
+			}
+
+			return str;
+
+/*
+			var originalPropName = propertyName + '${originalSuffix}';
+			var defaultPropName = propertyName + '${defaultSuffix}';
 			if (model.hasOwnProperty(defaultPropName)) {
 				return '<span class="default">' + model[defaultPropName] + '</span>';
 			} else if (model.hasOwnProperty(originalPropName)) {
@@ -54,6 +88,7 @@
 			} else {
 				return model[propertyName];
 			}
+*/
 		}
 
 		// alert(errorsTemplate({personId: 123, age:50}));

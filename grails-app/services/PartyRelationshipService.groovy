@@ -419,17 +419,23 @@ class PartyRelationshipService {
 	 */
 	def getAllCompaniesStaffPersons( companies ) {
 
-		if (! companies instanceof List) 
+		if (! companies instanceof List) {
 			companies = [companies]
+		}
 
-		def staffing = PartyRelationship.findAll("FROM PartyRelationship p WHERE p.partyRelationshipType='STAFF' AND " +
-			"p.partyIdFrom IN (:companies) AND p.roleTypeCodeFrom='COMPANY'", [companies:companies])
+		String query = """select p.partyIdTo from PartyRelationship p where
+			p.partyRelationshipType='STAFF' AND
+			p.partyIdFrom IN (:companies) AND 
+			p.roleTypeCodeFrom='COMPANY' AND
+			p.roleTypeCodeTo='STAFF'"""
 
-		def persons = staffing*.partyIdTo
+		List staff = PartyRelationship.executeQuery(query, [companies:companies], [sort:'partyIdTo'])
 
-		persons = persons.unique().sort  { a, b -> a.lastNameFirst.compareToIgnoreCase b.lastNameFirst }
+		// def persons = staffing*.partyIdTo
 
-		return persons
+		//persons = persons.unique().sort  { a, b -> a.lastNameFirst.compareToIgnoreCase b.lastNameFirst }
+
+		return staff
 	}
 
 	/*
@@ -604,8 +610,7 @@ class PartyRelationshipService {
 		}
 		return name 
 	}
-	
-  
+	 
 	/*
 	 *  Return the Staff which are not assign to projectTeam
 	 */
@@ -738,7 +743,56 @@ class PartyRelationshipService {
 		return functions
 	}
 */
+
+
+	/**
+	 * Used by the getProjectStaffFunctionCodes and getProjectStaffFunctions methods to construct the shared
+	 * query and query parameters.
+	 * @param project - the project object or id to query on
+	 * @param staff - the staff person object or id to query on
+	 * @param includeStaffRecord - flag to indicate if the STAFF record should be included in the results
+	 * @return a list consisting of [query, paramsMap]
+	 */
+	private List getProjectStaffFunctions_queryAndMap( project, staff, boolean includeStaffRecord=true, boolean queryJustId) {
+		project = StringUtil.toLongIfString(project)
+		staff = StringUtil.toLongIfString(staff)
+		boolean projectById = (project instanceof Long)
+		boolean staffById = (staff instanceof Long)
+
+		Map params = [project:project, staff:staff]
+
+		StringBuffer query = new StringBuffer("select p.roleTypeCodeTo${queryJustId ? '.id' : ''} ")
+
+		query.append("""from PartyRelationship p
+			where p.partyRelationshipType='PROJ_STAFF'
+			and p.roleTypeCodeFrom.id='PROJECT'
+			and p.partyIdFrom${(projectById ? '.id' : '')} = :project
+			and p.partyIdTo${(projectById ? '.id' : '')} = :staff 
+			order by p.roleTypeCodeTo.id""")
+		
+		if (! includeStaffRecord) {
+			query.append(" and p.roleTypeCodeTo.type=:teamType ")
+			params.teamType = RoleType.TEAM
+		}
+
+		return [query.toString(), params]
+	}
+
+	/**
+	 * Used to retrieve a list of the Team Codes that a person is assigned to for a specified project
+	 * @param project - the project object or id to query on
+	 * @param staff - the staff person object or id to query on
+	 * @param includeStaffRecord - flag to indicate if the STAFF record should be included in the results
+	 * @return a list of team codes that the user is assigned for the project
+	 */
+	List<String> getProjectStaffFunctionCodes(project, staff, boolean includeStaffRecord=true) {
+		def (query, params) = getProjectStaffFunctions_queryAndMap(project, staff, includeStaffRecord, true)
+		List teamCodes = PartyRelationship.executeQuery(query, params)
+		return teamCodes
+	}
+
 	List<RoleType> getProjectStaffFunctions(project, staff, boolean includeStaffRecord=true) {
+		/*
 		project = StringUtil.toLongIfString(project)
 		staff = StringUtil.toLongIfString(staff)
 		boolean projectById = (project instanceof Long)
@@ -755,8 +809,12 @@ class PartyRelationshipService {
 		}
 
 		def teams = PartyRelationship.executeQuery(query.toString(), [project:project, staff:staff] )
+		*/
 
-		return teams
+		def (query, params) = getProjectStaffFunctions_queryAndMap(project, staff, includeStaffRecord, false)
+		List teamRoleTypes = PartyRelationship.executeQuery(query, params)
+
+		return teamRoleTypes
 	}
 	
 	/**
@@ -960,20 +1018,6 @@ class PartyRelationshipService {
 	}
 	
 	/**
-	 * Used to fetch a list of Team Role Types
-	 */
-	List<RoleType> getTeamRoleTypes() {
-		return RoleType.findAllByType(RoleType.TEAM)
-	}
-
-	/**
-	 * Used to fetch a list of the Team Codes that are maintained in the RoleType table
-	 */
-	List<String> getTeamCodes() {
-		return getTeamRoleTypes().id
-	}
-
-	/**
 	 * Used to get list of functions that a Staff member has been assigned to on a Project
 	 * @param instance function - function for which fetching assignee list
 	 * @param instance project - project that the staff may be associate with
@@ -1009,11 +1053,40 @@ class PartyRelationshipService {
 	}
 
 	/**
+	 * Used to fetch a list of Team Role Types sorted by the description
+	 * @param includeAuto - a flag to indicate if the AUTO team should be included in the list (default false)
+	 * @return The list of the TEAM RoleType
+	 */
+	List<RoleType> getTeamRoleTypes(boolean includeAuto=false) {
+		List roles = RoleType.withCriteria {
+			eq ('type', RoleType.TEAM)
+			if (! includeAuto) {
+				and {
+					ne('id', 'AUTO')
+				}
+			}
+			order('description', 'asc')
+		}
+		return roles
+	}
+
+	/**
+	 * Used to fetch a list of the Team Codes that are maintained in the RoleType table
+	 * @param includeAuto - a flag to indicate if the AUTO team should be included in the list (default false)
+	 * @return The list of the TEAM RoleType codes
+	 */
+	List<String> getTeamCodes(boolean includeAuto=false) {
+		return getTeamRoleTypes(includeAuto).id
+	}
+
+	/**
 	 * Returns a list of the roles/teams that staff can be assigned to. Note that the description has the "Staff : " stripped off.
 	 * @param boolean indicating if the Automatic role should be included in the list (default true)
 	 * @return A list containing maps of all roles with the description cleaned up. Map format of [id, description]
 	 */
-	static List<Map> getStaffingRoles(includeAuto = true) {
+	List<Map> getStaffingRoles(includeAuto = true) {
+		List roles = getTeamRoleTypes(includeAuto)
+		/*
 		def roles = RoleType.findAllByDescriptionIlike("Staff%", [sort:'description'])
 		def list = []
 		roles.each { r -> 
@@ -1021,12 +1094,15 @@ class PartyRelationshipService {
 				return
 			list << [ id: r.id, description: r.description.replaceFirst('Staff : ', '') ]
 		} 
+		*/
+		List list = roles.collect {[id:it.id, description:it.toString()]}
 		return list
 	}
+
 	/**
-	 * Returns whether a person assigned to project or not.
-	 */
-	
+	 * Returns whether a person assigned to project or not
+	 * TODO : JPM 4/2016 : isPersonAssignedToProject is not properly implemented and should be moved to the ProjectService
+	 */	
 	def isPersonAssignedToProject(){
 		def userLogin = securityService.getUserLogin()
 		def project = securityService.getUserCurrentProject()
@@ -1039,6 +1115,7 @@ class PartyRelationshipService {
 	 * @param personId - the id of the person in question
 	 * @param companyId - the id of the company that is being referenced
 	 * @return true if person is associated to the company otherwise false
+	 * TODO : JPM 4/2016 : isPersonAssociatedToCompany is not properly implemented and should be moved to the ProjectService
 	 */
 	boolean isPersonAssociatedToCompany(personId, companyId) {
 		def count = PartyRelationship.executeQuery("select count(*) from PartyRelationship where partyIdFrom=:cid and partyIdTo=:pid")[0]

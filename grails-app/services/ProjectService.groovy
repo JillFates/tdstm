@@ -345,6 +345,7 @@ class ProjectService {
 		}
 		return parseData
 	}
+
 	/**
 	 *This method used to get attributes from eavAttribute based on EntityType.
 	 * @param entityType
@@ -1051,6 +1052,20 @@ class ProjectService {
 		partyRelationshipService.savePartyRelationship("PROJ_COMPANY", project, "PROJECT", owner, "COMPANY" )
 
 		return project
+	}
+
+	/**
+	 * This is used to determine what the default expiration date for users should be for a given project
+	 * @param p - the Project to determine the exiration on
+	 * @return an expiration date
+	 */
+	Date defaultAccountExpirationDate(Project project) {
+		Date exp = project.completionDate
+		if (!exp) {
+			// TODO : JPM 4/2016 : should try examining the events to see if they have a greater date than the project.completionDate
+			exp = new Date() + 90
+		}
+		return exp
 	}
 
 	/**

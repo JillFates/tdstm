@@ -2,7 +2,11 @@ package com.tdssrc.grails
 
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import grails.test.*
+
+import com.tdssrc.grails.TimeUtil
+import java.text.DateFormat
+
+//import grails.test.*
 import spock.lang.Specification
 
 /**
@@ -128,4 +132,43 @@ class TimeUtilTests extends Specification {
 			testDate.equals(TimeUtil.parseDateTime(session, '10/5/2014 10:15 AM'))
 	}
 
+	def 'Test the createFormatterForType with various options'() {
+		setup:
+			String username = 'UserName7!'
+
+		expect: """Iterating through the various date/datetime formats that the createFormatterForType method returns
+				a valid DateFormat object for both the middle-endian and little-endian date formats """
+
+			( TimeUtil.createFormatterForType(TimeUtil.MIDDLE_ENDIAN, formatName) instanceof DateFormat) 			
+			( TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, formatName) instanceof DateFormat) 
+
+		where:
+			formatName                   | formatValue
+			TimeUtil.FORMAT_DATE         | "MM/dd/yyyy"
+			TimeUtil.FORMAT_DATE_TIME    | "MM/dd/yyyy hh:mm a"
+			TimeUtil.FORMAT_DATE_TIME_2  | "MM-dd-yyyy hh:mm:ss a"
+			TimeUtil.FORMAT_DATE_TIME_3  | "E, d MMM 'at ' HH:mma"
+			TimeUtil.FORMAT_DATE_TIME_4  | "MM/dd kk:mm"
+			TimeUtil.FORMAT_DATE_TIME_5  | "yyyyMMdd"
+			TimeUtil.FORMAT_DATE_TIME_6  | "yyyy-MM-dd"
+			TimeUtil.FORMAT_DATE_TIME_7  | "dd-MMM"
+			TimeUtil.FORMAT_DATE_TIME_8  | "MMM dd,yyyy hh:mm a"
+			TimeUtil.FORMAT_DATE_TIME_9  | "MM-dd-yyyy hh:mm a"
+			TimeUtil.FORMAT_DATE_TIME_10 | "MMM dd"
+			TimeUtil.FORMAT_DATE_TIME_11 | "yyyy/MM/dd hh:mm:ss a"
+			TimeUtil.FORMAT_DATE_TIME_12 | "MM-dd-yyyy"
+			TimeUtil.FORMAT_DATE_TIME_13 | "MM/dd kk:mm:ss"
+			TimeUtil.FORMAT_DATE_TIME_14 | "yyyy-MM-dd hh:mm" //Used in
+			TimeUtil.FORMAT_DATE_TIME_15 | "yyyy-MM-dd HH:mm:ss" //Used
+			TimeUtil.FORMAT_DATE_TIME_16 | "yyyy-MM-dd hh:mm a" //Used 
+			TimeUtil.FORMAT_DATE_TIME_17 | "MM/dd"
+			TimeUtil.FORMAT_DATE_TIME_18 | "M/d"
+			TimeUtil.FORMAT_DATE_TIME_19 | "M/d kk:mm"
+			TimeUtil.FORMAT_DATE_TIME_20 | "hh:mm"
+			TimeUtil.FORMAT_DATE_TIME_21 | "mm/dd"
+			TimeUtil.FORMAT_DATE_TIME_22 | "MM/dd/yyyy hh:mm:ss a"
+			TimeUtil.FORMAT_DATE_TIME_23 | "MM/dd/yy"
+			TimeUtil.FORMAT_DATE_TIME_24 | "MM/dd/yyyy hh:mm:ss"
+			TimeUtil.FORMAT_DATE_TIME_25 | "MM/dd/yyyy hh:mm"		 
+	}
 }

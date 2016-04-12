@@ -1770,7 +1770,12 @@ div.account-import-review span.default {
 	font-style: italic;
 	font-weight: bold;
 }
-
+div.account-import-review span.unchanged {
+	color: #888888;
+}
+div.account-import-review span.userData {
+	color: #888888;
+}
 
 div.account-import-step1 input#uploadFile {
 	height: 33px;

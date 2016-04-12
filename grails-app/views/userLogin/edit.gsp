@@ -78,7 +78,7 @@
 								<label for="person">Person:</label>
 							</td>
 							<td valign="top" class="value">
-								${userLoginInstance.person.lastNameFirst}
+								${userLoginInstance.person}
 							</td>
 						</tr> 
 						

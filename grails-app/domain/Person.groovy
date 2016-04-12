@@ -2,6 +2,7 @@ class Person extends Party {
 
 	def partyRelationshipService
 
+
 	String firstName
 	String middleName = ""
 	String lastName = ""
@@ -85,7 +86,9 @@ class Person extends Party {
 		'lastNameFirstAndTitle',
 		'loginUser',
 		'name',
-		'suitableTeams'
+		'suitableTeams',
+		'teamsAssignedTo',
+		'teamsCanParticipateIn'
 	]
 
 	/**
@@ -125,16 +128,34 @@ class Person extends Party {
 	 * @param project - the project to search for teams
 	 * @return a list of the RoleType records that represent the teams that a person belongs to a project
 	 */
-	List<RoleType> getAssignedTeams(Project project) {
-		String query = "SELECT roleTypeCodeTo \
-			FROM PartyRelationship p \
-			WHERE p.partyRelationshipType = 'PROJ_STAFF' AND \
-			p.roleTypeCodeFrom = 'PROJECT' AND \
-			p.partyIdFrom = :project AND \
-			p.partyIdTo = :person AND \
-			p.roleTypeCodeTo <> 'STAFF' ) \
-			ORDER BY p.description"
-		List teams = RoleType.executeQuery(query, [project:project, person:this])
+	List<RoleType> getTeamsCanParticipateIn() {
+		String query = """SELECT roleTypeCodeTo
+			FROM PartyRelationship p
+			WHERE p.partyRelationshipType = 'STAFF' AND
+				p.roleTypeCodeFrom = 'COMPANY' AND
+				p.partyIdFrom = :company AND
+				p.partyIdTo = :person AND
+				p.roleTypeCodeTo.type = :team )
+			ORDER BY p.description"""
+		List teams = RoleType.executeQuery(query, [company:this.company, person:this, team:RoleType.TEAM])
+		return teams
+	}
+
+	/**
+	 * Used to get the teams that a person is assigned to for a given project
+	 * @param project - the project to search for teams
+	 * @return a list of the RoleType records that represent the teams that a person belongs to a project
+	 */
+	List<RoleType> getTeamsAssignedTo(Project project) {
+		String query = """SELECT roleTypeCodeTo
+			FROM PartyRelationship p
+			WHERE p.partyRelationshipType = 'PROJ_STAFF' AND
+				p.roleTypeCodeFrom = 'PROJECT' AND
+				p.partyIdFrom = :project AND
+				p.partyIdTo = :person AND
+				p.roleTypeCodeTo.type = :team )
+			ORDER BY p.description"""
+		List teams = RoleType.executeQuery(query, [project:project, person:this, team:RoleType.TEAM])
 		return teams
 	}
 

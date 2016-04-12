@@ -6,6 +6,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import javax.servlet.http.HttpSession
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods 
@@ -17,7 +18,13 @@ class TimeUtil {
 	//TODO: Remove!!!
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
 							CST:"GMT-06:00", CDT:"GMT-05:00", EST:"GMT-05:00",EDT:"GMT-04:00"]
-	def static final dateTimeFormatTypes = ["MM/DD/YYYY", "DD/MM/YYYY"]
+
+	static final String MIDDLE_ENDIAN = 'MM/DD/YYYY'	// Primarily in the US
+	static final String LITTLE_ENDIAN = 'DD/MM/YYYY'	// Used outside US and China
+	static final String BIG_ENDIAN    = 'YYYY/MM/DD'	// Used principally in China but not used in TM today
+
+	def static final dateTimeFormatTypes = [MIDDLE_ENDIAN, LITTLE_ENDIAN]
+
 	def static final defaultTimeZone = "GMT"
 
 	def static final String TIMEZONE_ATTR = "CURR_TZ"
@@ -25,16 +32,16 @@ class TimeUtil {
 
 
 	// Valid date time formats
-	def static final FORMAT_DATE = "MM/dd/yyyy"
-	def static final FORMAT_DATE_TIME = "MM/dd/yyyy hh:mm a"
-	def static final FORMAT_DATE_TIME_2 = "MM-dd-yyyy hh:mm:ss a"
-	def static final FORMAT_DATE_TIME_3 = "E, d MMM 'at ' HH:mma"
-	def static final FORMAT_DATE_TIME_4 = "MM/dd kk:mm"
-	def static final FORMAT_DATE_TIME_5 = "yyyyMMdd"
-	def static final FORMAT_DATE_TIME_6 = "yyyy-MM-dd"
-	def static final FORMAT_DATE_TIME_7 = "dd-MMM"
-	def static final FORMAT_DATE_TIME_8 = "MMM dd,yyyy hh:mm a"
-	def static final FORMAT_DATE_TIME_9 = "MM-dd-yyyy hh:mm a"
+	def static final FORMAT_DATE         = "MM/dd/yyyy"
+	def static final FORMAT_DATE_TIME    = "MM/dd/yyyy hh:mm a"
+	def static final FORMAT_DATE_TIME_2  = "MM-dd-yyyy hh:mm:ss a"
+	def static final FORMAT_DATE_TIME_3  = "E, d MMM 'at ' HH:mma"
+	def static final FORMAT_DATE_TIME_4  = "MM/dd kk:mm"
+	def static final FORMAT_DATE_TIME_5  = "yyyyMMdd"
+	def static final FORMAT_DATE_TIME_6  = "yyyy-MM-dd"
+	def static final FORMAT_DATE_TIME_7  = "dd-MMM"
+	def static final FORMAT_DATE_TIME_8  = "MMM dd,yyyy hh:mm a"
+	def static final FORMAT_DATE_TIME_9  = "MM-dd-yyyy hh:mm a"
 	def static final FORMAT_DATE_TIME_10 = "MMM dd"
 	def static final FORMAT_DATE_TIME_11 = "yyyy/MM/dd hh:mm:ss a"
 	def static final FORMAT_DATE_TIME_12 = "MM-dd-yyyy"
@@ -60,6 +67,26 @@ class TimeUtil {
 	public static final String GRANULARITY_MINUTES = "M"
 	public static final String GRANULARITY_HOURS = "H"
 	public static final String GRANULARITY_DAYS = "D"
+
+
+	/**
+	 * Used to get the user perferred timezone
+	 * @param session - the HttpSession user session object
+	 * @return the timezone id string
+	 */
+	public static String getUserTimezone(HttpSession session) {
+		String tzId = session.getAttribute(TimeUtil.TIMEZONE_ATTR)[TimeUtil.TIMEZONE_ATTR] ?: TimeUtil.defaultTimeZone
+		return tzId
+	}	 
+
+	/**
+	 * Used to get the user perferred timezone
+	 * @param session - the HttpSession user session object
+	 * @return the timezone id string
+	 */
+	public static String getUserDateFormat(HttpSession session) {
+		return session.getAttribute(TimeUtil.DATE_TIME_FORMAT_ATTR)[TimeUtil.DATE_TIME_FORMAT_ATTR] ?: TimeUtil.dateTimeFormatTypes[0]
+	}	 
 
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of DAYS from an existing date
@@ -107,8 +134,16 @@ class TimeUtil {
 	 * @param Date	starting Datetime
 	 * @return TimeDuration
 	 */
-	public static TimeDuration elapsed(def start) {
+	public static TimeDuration elapsed(Date start) {
+		def e = 
+		start = new Date()
 		return elapsed(start, new Date())
+	}
+
+	public static TimeDuration elapsed(List startList) {
+		def e = elapsed(startList[0], new Date())
+		startList[0] = new Date()
+		return e
 	}
 
 	/**
@@ -287,8 +322,19 @@ class TimeUtil {
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date formatted
 	 **/
-	public static String formatDate(session, dateValue) {
+	public static String formatDate(HttpSession session, String dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
+		return formatter.format(dateValue)
+	}
+
+	/**
+	 * Used to format a Date into a date string format, based in the format defined in the session
+	 * For dates (without time) is not required to applied a timezone.
+	 * @param dateValue the date to format
+	 * @param session the session information (to get timezone and format type)
+	 * @return The date formatted
+	 **/
+	public static String formatDate(dateValue, DateFormat formatter) {
 		return formatter.format(dateValue)
 	}
 
@@ -299,7 +345,7 @@ class TimeUtil {
 	 * @param the formatterType defines the format to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
+	public static String formatDateTime(HttpSession session, dateValue, String formatterType=FORMAT_DATE_TIME) {
 		def formatter = createFormatter(session, formatterType)
 		return formatDateTime(session, dateValue, formatter)
 	}
@@ -311,7 +357,7 @@ class TimeUtil {
 	 * @param the formatter defines the formatter to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTime(session, dateValue, DateFormat formatter) {
+	public static String formatDateTime(HttpSession session, dateValue, DateFormat formatter) {
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
@@ -324,7 +370,7 @@ class TimeUtil {
 	 * @param the formatterType defines the format to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTimeWithTZ(tzId, formatType, dateValue, String formatterType=FORMAT_DATE_TIME) {
+	public static String formatDateTimeWithTZ(String tzId, String formatType, dateValue, String formatterType=FORMAT_DATE_TIME) {
 		def formatter = createFormatterForType(formatType, formatterType)
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
@@ -336,7 +382,7 @@ class TimeUtil {
 	 * @param the formatter to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTimeWithTZ(tzId, dateValue, DateFormat formatter) {
+	public static String formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter) {
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		return formatter.format(dateValue)
 	}
@@ -360,17 +406,7 @@ class TimeUtil {
 	 **/
 	public static Date parseDate(session, dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
-		def result = null
-		if(dateValue){
-			try {
-				result = formatter.parse(dateValue)
-				result.clearTime()	
-			} catch (Exception e) {
-				LOG.error("Invalid date: " + e.getMessage(), e)
-			}
-
-		}
-		return result
+		return parseDate(dateValue, formatter)
 	}
 
 	/**
@@ -383,12 +419,23 @@ class TimeUtil {
 	 **/
 	public static Date parseDate(String formatType, String dateValue, String formatterType=FORMAT_DATE) {
 		def formatter = createFormatterForType(formatType, formatterType)
+		return parseDate(dateValue, formatter)
+	}
+
+	/**
+	 * Used to parse a string value into a Date using a knowed DateFormat class. If the parse fails the 
+	 * method will return a null
+	 * @param dateValue - the String value of the date to be parsed
+	 * @param formatter - the DateFormat object to use to parse the date
+	 * @return The date or null if unparseable
+	 **/
+	public static Date parseDate(String dateValue, DateFormat formatter) {
 		def result
 		try {
 			result = formatter.parse(dateValue)
 			result.clearTime()	
 		} catch (Exception e) {
-			LOG.error("Invalid date: " + e.getMessage(), e)
+			LOG.warn("parseDate() encountered invalid date ($dateValue): " + e.getMessage(), e)
 		}
 		return result
 	}
@@ -414,6 +461,17 @@ class TimeUtil {
 	 **/
 	public static Date parseDateTimeWithFormatter(session, dateValue, DateFormat formatter) {
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+		return parseDateTimeWithFormatter(tzId, dateValue, formatter)
+	}
+
+	/**
+	 * Used to parse a string value into a Date, based in the time zone and format defined in the session
+	 * @param tzId - the timezone id to parse the datetime value with
+	 * @param dateValue - the datetime value to be parsed
+	 * @param formatter - the string format that defines the layout of the datetime
+	 * @return The date other null
+	 **/
+	public static Date parseDateTimeWithFormatter(String tzId, dateValue, DateFormat formatter) {
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		def result
 		try {
@@ -432,7 +490,7 @@ class TimeUtil {
 		TimeDuration duration = TimeUtil.elapsed(start, end)
 		Integer elapsed = duration.getDays()
 		granularity = granularity.toUpperCase()
-		if(granularity > GRANULARITY_DAYS){
+		if (granularity > GRANULARITY_DAYS){
 			elapsed = elapsed * 24 + duration.getHours()
 			if(granularity > GRANULARITY_HOURS){
 				elapsed = elapsed * 60 + duration.getMinutes()
@@ -455,139 +513,151 @@ class TimeUtil {
 	}
 
 	/**
-	 * Creates a formatter
-	 * @param formatType the format type to be used, valid values defined in dateTimeFormatTypes
-	 * @param formatterType formatter type to be used
-	 * @return formatter
+	 * Creates a formatter based on the options presented. Based on the formatType being set to the
+	 * user preference of MMDDYYYY or DDMMYYYY then the method will return the equivilent format for 
+	 * the middle-endian (US) or little-endian (most other countries)
+	 * https://en.wikipedia.org/wiki/Date_format_by_country or all others
+	 * @param userPrefFormat - the format type to be used, valid values defined in dateTimeFormatTypes
+	 * @param formatterType - the formatter type to be used
+	 * @return formatter - the middle or little-endian version of the format desired
 	 */
-	private static DateFormat createFormatterForType(String formatType, String formatterType) {
+	private static DateFormat createFormatterForType(String userPrefFormat, String formatterType) {
 		def formatter
-		def isMMDDYYYY = (formatType == getDefaultFormatType())
+		def isMMDDYYYY = (userPrefFormat == getDefaultFormatType())
 		switch (formatterType) {
 			case FORMAT_DATE:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd/yyyy")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy")
-				break;
+				break
 			case FORMAT_DATE_TIME:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a")
-				break;
+				break
 			case FORMAT_DATE_TIME_2:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a")
 				else
 					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a")
-				break;
+				break
 			case FORMAT_DATE_TIME_3:
 				formatter = new SimpleDateFormat("E, d MMM 'at ' HH:mma")
-				break;
+				break
 			case FORMAT_DATE_TIME_4:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd kk:mm")
 				else
 					formatter = new SimpleDateFormat("dd/MM kk:mm")
-				break;
+				break
 			case FORMAT_DATE_TIME_5:
 				formatter = new SimpleDateFormat("yyyyMMdd")
-				break;
+				break
 			case FORMAT_DATE_TIME_6:
 				formatter = new SimpleDateFormat("yyyy-MM-dd")
-				break;
+				break
 			case FORMAT_DATE_TIME_7:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MMM-dd")
 				else
 					formatter = new SimpleDateFormat("dd-MMM")
-				break;
+				break
 			case FORMAT_DATE_TIME_8:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a")
 				else
 					formatter = new SimpleDateFormat("dd MMM yyyy hh:mm a")
-				break;
+				break
 			case FORMAT_DATE_TIME_9:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a")
 				else
 					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm a")
-				break;
+				break
 			case FORMAT_DATE_TIME_10:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MMM dd")
 				else
 					formatter = new SimpleDateFormat("dd MMM")
-				break;
+				break
 			case FORMAT_DATE_TIME_11:
 				formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a")
-				break;
+				break
 			case FORMAT_DATE_TIME_12:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM-dd-yyyy")
 				else
 					formatter = new SimpleDateFormat("dd-MM-yyyy")
-				break;
+				break
 			case FORMAT_DATE_TIME_13:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd kk:mm:ss")
 				else
 					formatter = new SimpleDateFormat("dd/MM kk:mm:ss")
-				break;
+				break
 			case FORMAT_DATE_TIME_14:
 				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm")
-				break;
+				break
 			case FORMAT_DATE_TIME_15:
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-				break;
+				break
 			case FORMAT_DATE_TIME_16:
 				formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm a")
-				break;
+				break
 
 			case FORMAT_DATE_TIME_17:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd")
 				else
-					formatter = new SimpleDateFormat("dd/")
-				break;
+					formatter = new SimpleDateFormat("dd/MM")
+				break
 			case FORMAT_DATE_TIME_18:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("M/d")
 				else
 					formatter = new SimpleDateFormat("d/M")
-				break;
+				break
 			case FORMAT_DATE_TIME_19:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("M/d kk:mm")
 				else
 					formatter = new SimpleDateFormat("M/d kk:mm")
-				break;
+				break
+			case FORMAT_DATE_TIME_20:
+				formatter = new SimpleDateFormat("hh:mm")
+				break
+			case FORMAT_DATE_TIME_21:
+				if (isMMDDYYYY)
+					formatter = new SimpleDateFormat("mm/dd")
+				else
+					formatter = new SimpleDateFormat("dd/mm")
+				break
 			case FORMAT_DATE_TIME_22:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a")
-				break;
+				break
 			case FORMAT_DATE_TIME_23:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd/yy")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yy")
-				break;
+				break
 			case FORMAT_DATE_TIME_24:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
-				break;
+				break
 			case FORMAT_DATE_TIME_25:
 				if (isMMDDYYYY)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")
-				break;
+				break
 		}
 
 		return formatter
@@ -599,7 +669,7 @@ class TimeUtil {
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date
 	 **/
-	public static Date moveDateToTZ(dateValue, session) {
+	public static Date moveDateToTZ(dateValue, HttpSession session) {
 		def result
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
@@ -612,4 +682,3 @@ class TimeUtil {
 	}
 
 }
-

@@ -3,7 +3,6 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 import groovy.time.TimeCategory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -20,7 +19,8 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.common.security.*
 import com.tdsops.common.os.Shell
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+// import org.codehaus.groovy.grails.commons.ApplicationHolder
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.SecurityUtil
 
 
@@ -47,6 +47,13 @@ class AdminController {
 
 	private static String DEFAULT_ROLE = 'USER'
 	private static String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
+
+
+def test() {
+	def obj = ApplicationContextHolder.getService('securityService')
+	render "The object is ${ obj ? obj.getClass().getName() : 'null'}".toString()
+}
+
 
 	def index() { }
 
@@ -1139,12 +1146,28 @@ class AdminController {
 	 * This method renders the Export Accounts form
 	 */
 	def exportAccounts(){
-		if (!controllerService.checkPermission(this, 'PersonExport')){
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+		if (!project) {
 			return
 		}
+		def company = user.person.company
+		Map model = [
+			project: project.name,
+			client:project.client.name, 
+			company:company
+		]
 
-		def project = securityService.getUserCurrentProject()
-		render(view:"exportAccounts", model:[project: project.name, client:project.client.name])
+		Map paramDefaults = [
+			'staffType': 'PROJ_STAFF',
+			'includeLogin': 'Y',
+			'loginChoice': '1'
+		]
+		paramDefaults.each { key, defVal ->
+			model[key] = (params.containsKey(key) ? params[key] : defVal)
+		}
+
+
+		render(view:"exportAccounts", model:model)
 	}
 
 	/**
@@ -1157,13 +1180,16 @@ class AdminController {
 			return
 		}
 
+		Map formOptions = [
+			staffType: params.staffType,				// CLIENT_STAFF | AVAIL_STAFF | PROJ_STAFF
+			includeLogin: params.includeLogin,			// Y)es if checked
+			loginChoice: params.loginChoice				// 0=All, 1=Active, 2=Inactive
+		]
+
 		try {
-			boolean inclLogin = params.login == 'Y'
-			String loginOpt = params.loginChoice
-			String staffOpt = params.partyRelTypeCode
 			def session = getSession()
 
-			def spreadsheet = accountImportExportService.generateAccountExportSpreadsheet(session, user, project, staffOpt, inclLogin, loginOpt)
+			def spreadsheet = accountImportExportService.generateAccountExportSpreadsheet(session, user, project, formOptions)
 
 			// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
 			String projectName = project.projectCode.replaceAll(' ','')
@@ -1175,28 +1201,51 @@ class AdminController {
 
 			return
 
+		} catch (InvalidParamException e) {
+			flash.message = e.getMessage()
 		} catch (EmptyResultException e) {
-			flash.message e.getMessage()
+			flash.message = e.getMessage()
 		} catch (e) { 
 			log.error "Exception occurred while exporting data" + e.printStackTrace()
 			flash.message = "An error occurred while attempting to export accounts"
 		}
-		render(view:"exportAccounts")	
+
+		redirect (action:"exportAccounts", params:formOptions)	
 	}
 
 	/**
 	 * Used to download the spreadsheet import template
 	 */
 	def importAccountsTemplate() {
-		Project project = controllerService.getProjectForPage(this, 'PersonImport')
+		def (project, byWhom) = controllerService.getProjectAndUserForPage(this, 'PersonImport')
 		if (!project) {
 			return
 		}
 
-		String filename = accountImportExportService.EXPORT_FILENAME_PREFIX
-		def spreadsheet = accountImportExportService.getAccountExportTemplate()
+		try {
 
-		accountImportExportService.sendSpreadsheetToBrowser(response, spreadsheet, filename)
+			// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
+			String projectName = project.projectCode.replaceAll(' ','')
+			String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
+			String filename = "${accountImportExportService.IMPORT_FILENAME_PREFIX}-$projectName-$formattedDate"
+
+			accountImportExportService.generateImportTemplateToBrowser(response, session, byWhom, project, filename)
+			return
+
+		} catch (InvalidRequestException e) {
+			flash.message = e.getMessage()
+		} catch (DomainUpdateException e) {
+			flash.message = e.getMessage()
+		} catch (InvalidParamException e) {
+			flash.message = e.getMessage()
+		} catch (EmptyResultException e) {
+			flash.message = e.getMessage()
+		} catch (e) {
+			log.error "Exception occurred while downloading the Account Import template : " + e.printStackTrace()
+			flash.message = "An error occurred while attempting to download the Account Import template"
+		}
+
+		forward (action:'importAccounts')
 	}
 	
 	/**
@@ -1217,9 +1266,13 @@ class AdminController {
 			return
 		}
 		try {
-			Map options = accountImportExportService.importParamsToOptionsMap(params)
-			List accounts = accountImportExportService.loadAndValidateSpreadsheet(user, project, params.filename, options)
-
+			// TODO : JPM 4/2016 : importAccountsReviewData This method should be refactored so that the bulk of the logic
+			// is implemented in the service.
+			
+			def session = getSession()
+			Map formOptions = accountImportExportService.importParamsToOptionsMap(params)
+			List accounts = accountImportExportService.loadAndValidateSpreadsheet(session, user, project, params.filename, formOptions)
+			Map sheetOptions = accountImportExportService.getSheetOptions(session)
 			// Remove properties that shouldn't be sent over in the JSON and change the error list to a 
 			// delimited (|) string so that we can split it in the Kendo grid afterward
 			for(int i=0; i < accounts.size(); i++) {
@@ -1228,6 +1281,14 @@ class AdminController {
 						accounts[i][prop].discard()
 					}
 					accounts[i].remove(prop)
+				}
+				[ 'isLocal', 
+				  'isLocal'+accountImportExportService.ORIGINAL_SUFFIX, 
+				  'isLocal'+accountImportExportService.DEFAULTED_SUFFIX
+				].each { p ->
+					if (accounts[i].containsKey(p)) {
+						accounts[i][p] = accountImportExportService.xfrmToYN(accounts[i][p], sheetOptions)
+					}
 				}
 				accounts[i].errors = (accounts[i].errors ? accounts[i].errors.join('|') : '')
 			}
@@ -1262,6 +1323,7 @@ class AdminController {
 		Map model = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
 		Map options
 		String view = 'importAccounts'
+		def session = getSession()
 
 		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
 		// in the upload step to forward to the review so we look for the stepAlt and use it if found.
@@ -1281,7 +1343,7 @@ class AdminController {
 						return model
 					}
 
-					model << accountImportExportService.importAccount_Step1_Upload(user, project, request, fileParamName)
+					model << accountImportExportService.importAccount_Step1_Upload(session, user, project, request, fileParamName)
 					// Redirect the user to the Review step
 					forward( action:formAction, params: [stepAlt:'review', filename:model.filename, processOption: params.processOption] )
 					return
@@ -1291,7 +1353,7 @@ class AdminController {
 					// This step will serve up the review template that in turn fetch the review data 
 					// via an Ajax request.
 					options = accountImportExportService.importParamsToOptionsMap(params)
-					model << accountImportExportService.importAccount_Step2_Review(user, project, request, params)
+					model << accountImportExportService.importAccount_Step2_Review(session, user, project, request, params)
 					if (!options.filename && model.filename) {
 						// log.debug "importAccounts() step=$step set filename=${model.filename}"
 						options.filename = model.filename
@@ -1317,7 +1379,7 @@ class AdminController {
 					}
 
 					// Here's the money maker call that will update existing accounts and create new ones accordingly
-					Map results = accountImportExportService.importAccount_Step3_PostChanges(user, project, options)
+					Map results = accountImportExportService.importAccount_Step3_PostChanges(session, user, project, options)
 
 
 					render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
@@ -1331,6 +1393,8 @@ class AdminController {
 
 			}
 
+		} catch (InvalidRequestException e) {
+			flash.message = e.getMessage()
 		} catch (DomainUpdateException e) {
 			flash.message = e.getMessage()
 		} catch (InvalidParamException e) {

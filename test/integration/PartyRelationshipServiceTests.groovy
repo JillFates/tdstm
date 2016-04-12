@@ -14,11 +14,11 @@ class PartyRelationshipServiceTests  extends Specification {
 	Person person
 
 	def setup() {
-		def projectHelper = new ProjectTestHelper(projectService)
+		def projectHelper = new ProjectTestHelper()
 		project = projectHelper.getProject()
 		moveEvent = projectHelper.getFirstMoveEvent(project)
 
-		def personHelper = new PersonTestHelper(personService)
+		def personHelper = new PersonTestHelper()
 		byWhom = personHelper.getAdminPerson()
 
 		userLogin = byWhom.userLogin
@@ -42,13 +42,44 @@ class PartyRelationshipServiceTests  extends Specification {
 	def "Test the getTeamCodes"() {
 		when:
 			List teams = partyRelationshipService.getTeamCodes()
-
 		then:
 			teams != null
 			teams?.size() > 1
 			teams.contains('SYS_ADMIN')
 			! teams.contains('BOGUS_TEAM_CODE_THAT_WOULD_NOT_EXIST')
+		then: 'the AUTO team should not appear by default'
+			! teams.contains('AUTO')
 
+		when:
+			teams = partyRelationshipService.getTeamCodes(true)
+		then:
+			teams != null
+			teams?.size() > 1
+		then: 'the AUTO team should now appear'
+			teams.contains('AUTO')
+	}
+
+
+	def "Test the getStaffingRoles method"() {
+		when:
+			List roles = partyRelationshipService.getStaffingRoles()
+		then:
+			roles != null
+			roles?.size() > 1
+			roles.find { it.id == 'SYS_ADMIN'}
+			! roles.find { it.id == 'BOGUS_TEAM_CODE_THAT_WOULD_NOT_EXIST'}
+		then: 'the AUTO team should appear by default'
+			roles.find { it.id == 'AUTO'}
+
+		when:
+			roles = partyRelationshipService.getStaffingRoles(false)
+		then: 'the AUTO team should appear by default so this is a test to see if it does not when passed false'
+			roles.size > 1
+			! roles.find { it.id == 'AUTO'}
+		then: 'test that the list is sorted by the description'
+			for(int i=0; i < roles.size() - 1; i++) {
+				roles[i].description < roles[i+1].description
+			}
 	}
 
 	def "Test team assignment to company staff"() {
