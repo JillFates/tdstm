@@ -133,6 +133,15 @@ class WorkbookUtil {
 
 		if (cell) {
 			switch (cell.getCellType()) {
+				case Cell.CELL_TYPE_BLANK:
+					break
+
+				case Cell.CELL_TYPE_ERROR:
+				case Cell.CELL_TYPE_BOOLEAN:
+				case Cell.CELL_TYPE_FORMULA: 
+					result = failedIndicator
+					break
+
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
 					result = cell.getDateCellValue()
@@ -152,7 +161,7 @@ println "*** getDateCellValue() got STRING value str=$str, result=$result"
 					break
 
 				default:
-					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
+					throw new IllegalArgumentException("Invalid date value in ${columnCode(columnIdx)}${rowIdx+1} (${cell.getCellType()})")
 			}
 		}
 		return result
