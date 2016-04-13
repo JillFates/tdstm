@@ -1777,6 +1777,38 @@ div.account-import-review span.userData {
 	color: #888888;
 }
 
+div.body-disabled-float {
+	float: none !important;
+}
+div.account-export .form-group label{
+	font-weight: normal !important;
+}
+
+div.account-export .panel-body {
+	max-width: 680px !important;
+}
+
+div.account-export .input-max-size {
+	max-width: 250px !important;
+}
+
+div.account-export .footnote {
+	color: #666;
+	font-weight: bold;
+}
+
+div.account-export .panel-body .radio-staff-group {
+	padding-top: 0px !important;
+}
+
+div.account-export .exportIcon {
+	margin-left: 6px;
+}
+
+div.account-export div.login-export-info {
+	margin: 5px 0px 5px 30px;
+}
+
 div.account-import-step1 input#uploadFile {
 	height: 33px;
 	width: 250px;

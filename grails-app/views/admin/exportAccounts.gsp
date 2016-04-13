@@ -3,66 +3,77 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>Export Accounts</title>
+
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+	<g:javascript src="bootstrap.js" />
 </head>
 <body>
-	<div class="body">
-		<div>
+	<div class="body body-disabled-float">
 			<h1>Export Accounts</h1>
 			<g:if test="${flash.message}">
 				<div class="message">${flash.message}</div>
 			</g:if>
-			<g:form id="exportAccounts" action="exportAccountsProcess">
 
-			<table>
-				<tbody>
-					<tr class="prop">
-						<td class="name">Client:</td>
-						<td class="valueNW">${client}</td>
-					</tr>
-					<tr class="prop">
-						<td class="name">Project:</td>
-						<td class="valueNW">${project}</td>
-					</tr>
 
-					<tr class="prop">
-						<td class="name">Staffing:</td>
-						<td class="valueNW">
-							<label><input type="radio" name="staffType" value="CLIENT_STAFF" ${staffType=='CLIENT_STAFF'?'checked':''}>&nbsp; Client staff</label>
-							<br>
-							<label><input type="radio" name="staffType" value="AVAIL_STAFF" ${staffType=='AVAIL_STAFF'?'checked':''}>&nbsp; All available staff from client, partners and ${company}</label>
-							<br>
-							<label><input type="radio" name="staffType" value="PROJ_STAFF" ${staffType=='PROJ_STAFF'?'checked':''}>&nbsp; Only staff assigned to the project</label>
-						</td>
-					</tr>
+			<div>
+				<br />
+				<div class="panel panel-default account-export">
+					<div class="panel-heading">This form is used to export staff and user login accounts for the current project.</div>
+					<div class="panel-body">
+						<g:form id="exportAccounts" action="exportAccountsProcess" class="form-horizontal">
+							<div class="form-group">
+								<label for="clientName" class="col-sm-2 control-label">Client:</label>
+								<div class="col-sm-10">
+									<label class="form-control input-max-size" id="clientName" >${client}</label>
+								</div>
+							</div>
 
-					<tr class="prop">
-						<td class="name" rowspan="2">User Login:</td>
-						<td class="valueNW">
-							<label><input type="checkbox" name="includeLogin" value="Y" ${includeLogin=='Y'?'checked':''} onClick="toggleLoginChoice(this);">&nbsp; Export Login Information</label>
-						</td>
-					</tr>
-					<tr class="prop">
-						<td class="valueNW">
-							<label><input type="radio" name="loginChoice" value="0" ${loginChoice=='0'?'checked':''}>&nbsp; All Logins </label>
-							<br>  
-							<label><input type="radio" name="loginChoice" value="1" ${loginChoice=='1'?'checked':''}>&nbsp; Active Logins</label>
-							<br> 
-							<label><input type="radio" name="loginChoice" value="2" ${loginChoice=='2'?'checked':''}>&nbsp; Inactive Logins</label>
-							<br><br>
-							<span class="footnote">Note that passwords are never exported</span>
-						</td>
-					</tr>
+							<div class="form-group">
+								<label for="projectName" class="col-sm-2 control-label">Project:</label>
+								<div class="col-sm-10">
+									<label class="form-control input-max-size" id="projectName" >${project}</label>
+								</div>
+							</div>
 
-					<tr>
-						<td colspan="2">			
-							<input type="submit" value="Export to Excel" class="button">
-						</td>
-					</tr>
 
-				</tbody>
-			</table>
-			</g:form> 
-		</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label radio-staff-group">Staffing:</label>
+								<div class="col-sm-10">
+									<label><input type="radio" name="staffType" value="CLIENT_STAFF" ${staffType=='CLIENT_STAFF'?'checked':''}>&nbsp; Client staff</label>
+									<br>
+									<label><input type="radio" name="staffType" value="AVAIL_STAFF" ${staffType=='AVAIL_STAFF'?'checked':''}>&nbsp; All available staff from client, partners and ${company}</label>
+									<br>
+									<label><input type="radio" name="staffType" value="PROJ_STAFF" ${staffType=='PROJ_STAFF'?'checked':''}>&nbsp; Only staff assigned to the project</label>
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label radio-staff-group">User Login:</label>
+								<div class="col-sm-10">
+									<label><input type="checkbox" name="includeLogin" value="Y" ${includeLogin=='Y'?'checked':''} onClick="toggleLoginChoice(this);">&nbsp; Export Login Information</label>
+									<br>
+									<div class="login-export-info">
+										<label><input type="radio" name="loginChoice" value="0" ${loginChoice=='0'?'checked':''}>&nbsp; All Logins </label>
+										<br>
+										<label><input type="radio" name="loginChoice" value="1" ${loginChoice=='1'?'checked':''}>&nbsp; Active Logins</label>
+										<br>
+										<label><input type="radio" name="loginChoice" value="2" ${loginChoice=='2'?'checked':''}>&nbsp; Inactive Logins</label>
+										<br>
+									</div>
+									<span class="footnote">Note that passwords are never exported</span>
+								</div>
+							</div>
+
+
+							<button type="submit" class="btn btn-default">
+								Export to Excel
+								<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
+							</button>
+						</g:form>
+					</div>
+				</div>
+			</div>
 	</div>
 
 	<script type="text/javascript">
