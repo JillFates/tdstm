@@ -1,18 +1,41 @@
-package com.tdssrc.grails
-
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 
 import com.tdssrc.grails.TimeUtil
 import java.text.DateFormat
+import java.sql.Timestamp
 
-//import grails.test.*
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession
+
+import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 /**
  * Unit test cases for the TimeUtil class
+ * Note that in order to test with the HttpSession that this test spec is using the AdminController not for any thing in particular
+ * but it allows the tests to access the session and manipulate it appropriately.
 */
+@TestFor(AdminController)
 class TimeUtilTests extends Specification {
+
+	def 'Test the formatDate for invalid type (GrailsHttpSession, Timestamp)'() {
+		// No signature of method: static com.tdssrc.grails.TimeUtil.formatDate() is applicable for argument types: 
+		// (org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession, java.sql.Timestamp)
+		// TM-4795
+		setup:
+			// Mock the bullshit format of session attributes ...
+			def mockSession = new GrailsHttpSession(request)
+			mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': TimeUtil.MIDDLE_ENDIAN ] )
+			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': 'GMT' ] )
+
+			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
+			long oneDay = 60*60*24*1000
+			Timestamp ts = new Timestamp(oneDay)
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDate(mockSession, ts) == '01/02/1970'
+			TimeUtil.formatDate(ts, formatter) == '02/01/1970'
+	}
 	
 	public void testAgoWithSeconds() {
 		expect:

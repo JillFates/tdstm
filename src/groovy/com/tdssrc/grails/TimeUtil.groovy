@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import javax.servlet.http.HttpSession
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods 
@@ -318,14 +319,14 @@ class TimeUtil {
 
 	/**
 	 * Used to format a Date into a date string format, based in the format defined in the session
-	 * For dates (without time) is not required to applied a timezone.
+	 * 
 	 * @param dateValue the date to format
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date formatted
 	 **/
-	public static String formatDate(HttpSession session, String dateValue) {
+	public static String formatDate(HttpSession session, Date dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
-		return formatter.format(dateValue)
+		return formatDateTime(session, dateValue, formatter)
 	}
 
 	/**
@@ -335,8 +336,8 @@ class TimeUtil {
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date formatted
 	 **/
-	public static String formatDate(dateValue, DateFormat formatter) {
-		return formatter.format(dateValue)
+	public static String formatDate(Date dateValue, DateFormat formatter) {
+		return formatDateTimeWithTZ('GMT', dateValue, formatter)
 	}
 
 	/**
