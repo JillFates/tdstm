@@ -433,8 +433,8 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 		]
 
 		// Get the appropriate date and datetime formatter based on the user's preferences for middle or little endian date formats
-		map.dateFormatter = TimeUtil.createFormatterForType(map.dateFormat, TimeUtil.FORMAT_DATE)
-		map.dateTimeFormatter = TimeUtil.createFormatterForType(map.dateFormat, TimeUtil.FORMAT_DATE_TIME_22)
+		map.dateFormatter = TimeUtil.createFormatterForType(map.userDateFormat, TimeUtil.FORMAT_DATE)
+		map.dateTimeFormatter = TimeUtil.createFormatterForType(map.userDateFormat, TimeUtil.FORMAT_DATE_TIME_22)
 
 		if (! map.dateFormatter ) {
 			throw new RuntimeException("Unable to load Date formatter for ${map.dateFormat}")
@@ -743,6 +743,8 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 						}
 					}
 					if (includeLogin) {
+						log.debug "populateAccountSpreadsheet() calling userLoginToFieldMap with sheetInfoOpts=$sheetInfoOpts"	
+						
 						Map userMap = userLoginToFieldMap(userLogin, sheetInfoOpts)
 						// log.debug "userMap = $userMap"
 						account.putAll(userMap)
@@ -1191,7 +1193,7 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 		List usernameList
 		List validRoleCodes
 		
-// TODO : JPM 4/2016 : readAccountsFromSpreadsheet - need to check the person last modified against the spreadsheet time
+		// TODO : JPM 4/2016 : readAccountsFromSpreadsheet - need to check the person last modified against the spreadsheet time
 
 		// Get the list of roles that the byWhom can assign to others
 		List authorizedRoleCodes = securityService.getAssignableRoleCodes(byWhom.person)

@@ -25,10 +25,10 @@ class TimeUtil {
 
 	def static final dateTimeFormatTypes = [MIDDLE_ENDIAN, LITTLE_ENDIAN]
 
-	def static final defaultTimeZone = "GMT"
+	def static final defaultTimeZone = 'GMT'
 
-	def static final String TIMEZONE_ATTR = "CURR_TZ"
-	def static final String DATE_TIME_FORMAT_ATTR = "CURR_DT_FORMAT"
+	def static final String TIMEZONE_ATTR = 'CURR_TZ'
+	def static final String DATE_TIME_FORMAT_ATTR = 'CURR_DT_FORMAT'
 
 
 	// Valid date time formats
@@ -75,7 +75,8 @@ class TimeUtil {
 	 * @return the timezone id string
 	 */
 	public static String getUserTimezone(HttpSession session) {
-		String tzId = session.getAttribute(TimeUtil.TIMEZONE_ATTR)[TimeUtil.TIMEZONE_ATTR] ?: TimeUtil.defaultTimeZone
+		String tzId = session.getAttribute(TIMEZONE_ATTR)[TIMEZONE_ATTR] ?: defaultTimeZone
+
 		return tzId
 	}	 
 
@@ -85,7 +86,7 @@ class TimeUtil {
 	 * @return the timezone id string
 	 */
 	public static String getUserDateFormat(HttpSession session) {
-		return session.getAttribute(TimeUtil.DATE_TIME_FORMAT_ATTR)[TimeUtil.DATE_TIME_FORMAT_ATTR] ?: TimeUtil.dateTimeFormatTypes[0]
+		return session.getAttribute(DATE_TIME_FORMAT_ATTR)[DATE_TIME_FORMAT_ATTR] ?: MIDDLE_ENDIAN
 	}	 
 
 	/**
@@ -523,22 +524,22 @@ class TimeUtil {
 	 */
 	private static DateFormat createFormatterForType(String userPrefFormat, String formatterType) {
 		def formatter
-		def isMMDDYYYY = (userPrefFormat == getDefaultFormatType())
+		def isMiddleEndian = (userPrefFormat.toString() == MIDDLE_ENDIAN)
 		switch (formatterType) {
 			case FORMAT_DATE:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd/yyyy")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy")
 				break
 			case FORMAT_DATE_TIME:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm a")
 				break
 			case FORMAT_DATE_TIME_2:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a")
 				else
 					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a")
@@ -547,7 +548,7 @@ class TimeUtil {
 				formatter = new SimpleDateFormat("E, d MMM 'at ' HH:mma")
 				break
 			case FORMAT_DATE_TIME_4:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd kk:mm")
 				else
 					formatter = new SimpleDateFormat("dd/MM kk:mm")
@@ -559,25 +560,25 @@ class TimeUtil {
 				formatter = new SimpleDateFormat("yyyy-MM-dd")
 				break
 			case FORMAT_DATE_TIME_7:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MMM-dd")
 				else
 					formatter = new SimpleDateFormat("dd-MMM")
 				break
 			case FORMAT_DATE_TIME_8:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MMM dd,yyyy hh:mm a")
 				else
 					formatter = new SimpleDateFormat("dd MMM yyyy hh:mm a")
 				break
 			case FORMAT_DATE_TIME_9:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm a")
 				else
 					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm a")
 				break
 			case FORMAT_DATE_TIME_10:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MMM dd")
 				else
 					formatter = new SimpleDateFormat("dd MMM")
@@ -586,13 +587,13 @@ class TimeUtil {
 				formatter = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss a")
 				break
 			case FORMAT_DATE_TIME_12:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM-dd-yyyy")
 				else
 					formatter = new SimpleDateFormat("dd-MM-yyyy")
 				break
 			case FORMAT_DATE_TIME_13:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd kk:mm:ss")
 				else
 					formatter = new SimpleDateFormat("dd/MM kk:mm:ss")
@@ -608,19 +609,19 @@ class TimeUtil {
 				break
 
 			case FORMAT_DATE_TIME_17:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd")
 				else
 					formatter = new SimpleDateFormat("dd/MM")
 				break
 			case FORMAT_DATE_TIME_18:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("M/d")
 				else
 					formatter = new SimpleDateFormat("d/M")
 				break
 			case FORMAT_DATE_TIME_19:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("M/d kk:mm")
 				else
 					formatter = new SimpleDateFormat("M/d kk:mm")
@@ -629,31 +630,31 @@ class TimeUtil {
 				formatter = new SimpleDateFormat("hh:mm")
 				break
 			case FORMAT_DATE_TIME_21:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("mm/dd")
 				else
 					formatter = new SimpleDateFormat("dd/mm")
 				break
 			case FORMAT_DATE_TIME_22:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a")
 				break
 			case FORMAT_DATE_TIME_23:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd/yy")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yy")
 				break
 			case FORMAT_DATE_TIME_24:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss")
 				break
 			case FORMAT_DATE_TIME_25:
-				if (isMMDDYYYY)
+				if (isMiddleEndian)
 					formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm")
 				else
 					formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm")
