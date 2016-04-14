@@ -130,12 +130,12 @@ class StringUtilTests extends Specification {
 
 	}
 
-	def 'Test the clean function that should remove all control characters from a string'() {
+	def 'Test the sanitize function that should remove all control characters from a string'() {
 		// while not touching the ASCII printible characters. This will remove the typical CR, LF, BS
 		// along with Unicode Control characters, Line and Paragraph separators, etc {
 
 		expect:
-			SU.clean(value) == result
+			SU.sanitize(value) == result
 
 		where:
 			value 				| result
