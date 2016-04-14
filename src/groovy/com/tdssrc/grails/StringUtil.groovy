@@ -303,4 +303,26 @@ class StringUtil {
 		}
 		return result
 	}
+
+	/**
+	 * Used to compare various string values as boolean
+	 * @param str - the string to compare
+	 * @return true/false if it matches either list otherwize null for undeterminable
+	 */
+	static Boolean toBoolean(String str) {
+		List trueList = ['y','yes','t','true','1']
+		List falseList = ['n', 'no', 'f', 'false', '0']
+		Boolean isTrue
+		if (str != null) {
+			String match = str.toLowerCase()
+			if (trueList.contains(match)) {
+				isTrue = true
+			} else {
+				if (falseList.contains(match)) {
+					isTrue = false
+				}
+ 			}
+ 		}
+		return isTrue
+	}
 }

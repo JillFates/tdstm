@@ -172,4 +172,25 @@ class StringUtilTests extends Specification {
 			*/
 	}
 
+	def "Test the toBoolean method that compares different strings for y/n|1/0|yes/no, etc "() {
+		expect: 
+			SU.toBoolean(value) == result
+		where:
+			value   | result
+			'y'     | true
+			'yes'   | true
+			't'     | true
+			'true'  | true
+			'1'     | true
+			'n'     | false
+			'no'    | false
+			'f'     | false
+			'false' | false
+			'0'     | false
+			null	| null
+			'a'		| null
+			'2'		| null
+			''		| null
+
+	}
 }

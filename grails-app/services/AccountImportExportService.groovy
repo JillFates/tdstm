@@ -9,6 +9,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.GormUtil
+import com.tdsops.common.grails.ApplicationContextHolder
 import org.apache.commons.lang.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.web.multipart.*
@@ -174,18 +175,39 @@ class AccountImportExportService {
 		return list.join('|')
 	}
 
+	// ------------------------------------------------------------------------
+	// Default closures are used to set computed default values on properties
+	// ------------------------------------------------------------------------
+
+	static final defaultExpiration = { propertyName, accountMap, options ->
+		if (!options.containsKey('project') || ! (options.project instanceof Project)) {
+			throw new RuntimeException('Require Project object was not passed in the options map')
+		}
+
+		// For some reason the projectService on the class is not in scope to the closure so 
+		// we'll fetch it from the App Context.
+		def service = ApplicationContextHolder.getService('projectService')
+		return service.defaultAccountExpirationDate(options.project)
+	}
+
 	// --------------------------------
 	// Meta Definition Maps
 	// --------------------------------
 
 	/*
 	 * The following map is used to drive the Import and Export tables and forms. The properties consist of:
-	 *    ssPos: 	the position that the property appears in the spreadsheet
-	 *    formPos: 	the position that the property appears in the online form
-	 * 	  type: 	P)erson, U)serLogin, T)ransient
-	 *    width: 	the width in the online grid
-	 *    locked: 	a flag to indicate that the column is locked (for horizontal scrolling)
-	 *    label: 	the column heading label in the grid and export spreadsheet
+	 *        ssPos: the position that the property appears in the spreadsheet
+	 *      formPos: the position that the property appears in the online form
+	 * 	       type: P)erson, U)serLogin, T)ransient
+	 *        width: the width in the online grid
+	 *       locked: a flag to indicate that the column is locked (for horizontal scrolling)
+	 *        label: the column heading label in the grid and export spreadsheet
+	 *     template: a closure that will render the appropriate content used by the Kendo UI Grid
+	 *    transform: a closure that will take the property value and the sheetInfoOpts map to compute the value to be rendered
+	 *				 in the data grid.
+	 *    validator: a closure that takes the property and sheetInfoOpts Map and will evaluate the current value to determine if it is valid
+	 * defaultValue: a literal value to be used as a default when not supplied by the user or a closure to compute a value
+	 *				 by using the account and the sheetInfoOpts maps that are passed into the closure.
 	 */
 	static final Map accountSpreadsheetColumnMap = [
 		personId               : [type:'number',  ssPos:0,    formPos:1, domain:'I', width:50,  locked:true, label:'ID',
@@ -199,7 +221,7 @@ class AccountImportExportService {
 		company                : [type:'string',  ssPos:4,    formPos:5, domain:'T', width:90,  locked:true,  label:'Company', 
 									template:changeTmpl('company')],
 		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors', 
-									template:errorListTmpl(), transform:xfrmListToPipedString ],
+									template:errorListTmpl(), templateClass:'error', transform:xfrmListToPipedString ],
 		workPhone              : [type:'string',  ssPos:5,    formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', 
 									template:changeTmpl('workPhone')],
 		mobilePhone            : [type:'string',  ssPos:6,    formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', 
@@ -229,7 +251,8 @@ class AccountImportExportService {
 		active                 : [type:'string',  ssPos:18,   formPos:20, domain:'U', width:100, locked:false, label:'Login Active?', 
 									template:changeTmpl('active'), defaultValue: 'N', validator: validator_YN],
 		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
-									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date],
+									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date,
+									defaultValue:defaultExpiration],
 		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', 
 									template:changeTmpl('passwordExpirationDate'), transform:xfrmDateToString, validator:validator_date],
 		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', 
@@ -574,6 +597,9 @@ class AccountImportExportService {
 		Map sheetInfoOpts = getUserPreferences(session)
 		readTitleSheetInfo(project, workbook, sheetInfoOpts)
 
+		// Save a reference to the project in the Map
+		sheetInfoOpts.project = project
+
 		return sheetInfoOpts
 	}
 
@@ -770,12 +796,41 @@ class AccountImportExportService {
 	 */
 	private getPropertyDefaultValue(String propName) {
 		def result
+		String defValPropName = 'defaultValue'
 		if (accountSpreadsheetColumnMap.containsKey(propName)) {
-			if (accountSpreadsheetColumnMap[propName].containsKey('default')) {
-				result = accountSpreadsheetColumnMap[propName].default
+			if (accountSpreadsheetColumnMap[propName].containsKey(defValPropName)) {
+				result = accountSpreadsheetColumnMap[propName][defValPropName]
 			}
 		} else {
-			throw new RuntimeException("getPropertyDefault called with invalid property name $propName")
+			throw new RuntimeException("getPropertyDefaultValue() called with invalid property name $propName")
+		}
+		return result
+	}
+
+	/**
+	 * Utility method used to evaluate the default value of a property if defined. The default value may be a literal or
+	 * a closure that must be used to compute the value. In this case it uses the sheetInfoOpts that contains any context
+	 * data that might be necessary (e.g. the Project or the User)
+	 * @param propertyName - the name of the property
+	 * @param account - the Map with all of the account details
+	 * @param sheetInfoOpts - the Map containing all of the context related data
+	 * @param defValue - the default value pulled from the Meta Map, if null it will be looked up on demand
+	 * @return the literal or computed default value for a given property
+	 */
+	def evaluateDefaultValue(String propertyName, Map account, Map sheetInfoOpts, def defValue=null) {
+		// TODO : JPM 4/2016 : convert evaluateDefaultValue to a method from a closure
+		def result
+		if (defValue == null) {
+			defValue = getPropertyDefaultValue(propertyName)
+		}
+		if (defValue instanceof Closure) {
+			// Invoke the default closure
+			result = defValue(propertyName, account, sheetInfoOpts)
+			log.debug "evaluateDefaultValue($propertyName) computed the default $result"
+		} else {
+			// Convert the data type into the type that the system expects
+			result = transformValueToDomainType(propertyName, defValue, sheetInfoOpts)
+			log.debug "evaluateDefaultValue($propertyName) literal '$defValue' transformValueToDomainType to '$result'"
 		}
 		return result
 	}
@@ -805,6 +860,18 @@ class AccountImportExportService {
 			msgs << "${it.getField()} error ${it.getCode()}"
 		}
 		return msgs
+	}
+
+	/**
+	 * Used to set the error codes onto the properties that errored so that we can put the error 
+	 * in context of where the error is.
+	 * @param account - the Map with all of the account details
+	 * @param domainObj - the domain object to generate the list of errors on
+	 */
+	private registerGormErrorsOnProperties(Map account, domainObj) {
+		domainObj.errors.allErrors.each {
+			setErrorValue(account, it.getField(), it.getCode())
+		}
 	}
 
 	// ---------------------------
@@ -1242,24 +1309,29 @@ class AccountImportExportService {
 	 */
 	private Object transformValueToDomainType(String property, value, Map sheetInfoOpts) {
 		String type = accountSpreadsheetColumnMap[property]?.type
+		def result
 		if (! type) {
 			throw RuntimeException("Unable to find '$property' in field definition map")
 		}
 		if (value != null) {
 			switch (type) {
 				case 'boolean':
-					value = value.asBoolean()
+					result = StringUtil.toBoolean(value)
+					log.debug "transformValueToDomainType($property, $value)=$result"
 					break
 				case 'date':
-					value = (value instanceof Date ? value : TimeUtil.parseDate(value, sheetInfoOpts.dateFormatter))
+					result = (value instanceof Date ? value : TimeUtil.parseDate(value, sheetInfoOpts.dateFormatter))
 					break
 				case 'datetime':
-					value = (value instanceof Date ? value : TimeUtil.parseDateTimeWithFormatter(sheetInfoOpts.sheetTzId, value, sheetInfoOpts.dateTimeFormatter))
+					result = (value instanceof Date ? value : TimeUtil.parseDateTimeWithFormatter(sheetInfoOpts.sheetTzId, value, sheetInfoOpts.dateTimeFormatter))
 					break
+				default:
+					// For properties (e.g. String that don't get converted)
+					result = value
 			}
 		}
-		// log.debug "*** transformValueToDomainType() property=$property, type=$type, $value isa ${value?.getClass()?.getName()}"
-		return value
+		// log.debug "*** transformValueToDomainType() property=$property, type=$type, $result isa ${result?.getClass()?.getName()}"
+		return result
 	}
 
 	// ---------------------------
@@ -1539,6 +1611,7 @@ class AccountImportExportService {
 				
 				// Validate user and security roles if user requested to update Users
 				boolean canUpdateUser = (accounts[i].username?.size() > 0)
+		log.debug "1. canUpdateUser=$canUpdateUser"		
 				// TODO : JPM 4/2016 : check for new create user permission
 				// Check if user is trying to create a user without a person already created 
 				if (canUpdateUser && accounts[i].flags.isNewAccount && !formOptions.flagToUpdatePerson) {
@@ -1546,14 +1619,17 @@ class AccountImportExportService {
 					canUpdateUser = false
 				}
 
+		log.debug "2. canUpdateUser=$canUpdateUser"		
 				if (canUpdateUser) {
 					accounts[i].flags.canUpdateUser = true
-					validateUserLogin(byWhom, accounts[i], project, sheetInfoOpts)
+				}
+				validateUserLogin(byWhom, accounts[i], project, sheetInfoOpts)
 
-					// Validate that the teams codes are correct and map out what are to add and delete appropriately
-					validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes)
-				}	
+				// Validate that the teams codes are correct and map out what are to add and delete appropriately
+				validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes)
+			
 			}
+
 			if (!accounts[i].flags.canUpdateUser) {
 				accounts[i].flags.canUpdateUser = false
 			}
@@ -1610,6 +1686,9 @@ class AccountImportExportService {
 
 			ok = personToValidate.validate() 
 			if (! ok) {
+				account.errors.addAll(gormValidationErrors(personToValidate))
+				registerGormErrorsOnProperties(account, personToValidate)
+
 				/*
 				personToValidate.errors.allErrors.each {
 					account.errors << "${it.getField()} error ${it.getCode()}"
@@ -1657,6 +1736,18 @@ class AccountImportExportService {
 				//	userLogin.expiryDate = projectService.defaultAccountExpirationDate(project)
 			}
 
+			applyChangesToDomainObject(userLogin, account, sheetInfoOpts, true, true)
+
+			ok = userLogin.validate() 
+			if (! ok) {
+				registerGormErrorsOnProperties(account, userLogin)
+				account.errors.addAll(gormValidationErrors(userLogin))
+			} 
+			userLogin.discard()
+		}
+		return ok
+
+	/*
 			// Iterate through the accountSpreadsheetColumnMap for all of the UserLogin attributes
 			// setting the defaults and changed on the account map. Also setting the values on the domain
 			// object so that we can test that there won't be any validation errors later.
@@ -1696,7 +1787,6 @@ class AccountImportExportService {
 					}
 				}
 			}
-
 			// Determine if we have enough information to assume that the administrator is trying to update or
 			// create a new user
 			if (userLogin.username) {
@@ -1708,6 +1798,7 @@ class AccountImportExportService {
 			userLogin.discard()
 		}
 		return ok
+	*/
 	}
 
 	/**
@@ -1794,6 +1885,7 @@ class AccountImportExportService {
 		
 		String prop='roles'
 		List currentRoles = []
+		boolean isNewUser = true
 
 		// Validate the Setup the default security role if necessary
 		UserLogin userLogin 
@@ -1801,6 +1893,7 @@ class AccountImportExportService {
 			userLogin = account.person.userLogin
 			if (userLogin) {
 				currentRoles = securityService.getAssignedRoleCodes(userLogin)
+				isNewUser = false
 			}
 		}
 
@@ -1813,7 +1906,8 @@ class AccountImportExportService {
 		// Add the DEFAULT security code if it appears that the user wouldn't otherwise be assigned one
 		if (! currentRoles && ! roleChanges.find { it[0] != '-' }) {
 			log.debug "validateSecurityRoles() set default role"
-			roleChanges << securityService.getDefaultSecurityRoleCode()
+			def defRole = securityService.getDefaultSecurityRoleCode()
+			roleChanges << defRole
 			setDefaultedValue(account, prop, roleChanges)
 			setDefaulted = true
 		}
@@ -1822,20 +1916,17 @@ class AccountImportExportService {
 		log.debug "validateSecurityRoles() changeMap=$changeMap"
 		if (changeMap.error) {
 			account.errors << changeMap.error
+			setErrorValue(account, prop, [changeMap.error])
 		} else {
 			ok = true
 			if (changeMap.hasChanges) {
 				// For roles we are going to want to show the imported values along with the original and the resulting 
 				// changes so we'll use all three underlying properties
-				if (!setDefaulted) {
-					setOriginalValue(account, prop, currentRoles)
+				setOriginalValue(account, prop, currentRoles)
+				if (!setDefaulted && !isNewUser) {
 					setDefaultedValue(account, prop, changeMap.results)
 				}
-				// setOriginalValue(account, prop, currentRoles.join(', '))
-				// setDefaultedValue(account, prop, changeMap.results.join(', '))
-				// account[prop] = importedRoles
-				// account[prop] = account[prop].join(', ')
-
+				
 				// Save the changeMap to be used later on by the update logic
 				account.securityChanges = changeMap
 			}
@@ -2314,9 +2405,17 @@ class AccountImportExportService {
 					// Get the transformer if one exists
 					def transformer = (info.containsKey('transform') ? info.transform : false)
 					
+					def value = row[prop]
+
+					// Remove duplicate error messages that can happen because the Person is validated and then the UserLogin that 
+					// has a reference to the person. If the person has a constraints error then it gets logged twice.
+					if (prop == 'errors' && value.size() > 0) {
+						value.unique()
+					}
+
 					// Add the value to the account map
 					if (transformer) {
-						account[prop] = transformer(row[prop], sheetInfoOpts)
+						account[prop] = transformer(value, sheetInfoOpts)
 						// log.debug "transformAccounts() $prop from '${row[prop]}'' to '${account[prop]}'"
 					} else {
 						account[prop] = row[prop]
@@ -2341,7 +2440,8 @@ class AccountImportExportService {
 						account[p] = row[p]
 					}
 				}
-			} 
+			}
+
 			list << account
 		}
 		// return accounts
@@ -2382,7 +2482,7 @@ class AccountImportExportService {
 			log.debug "applyPersonChanges() About to apply changes to $person"
 
 			// Update the person with the values passed in
-			applyChangesToDomainObject(person, account, sheetInfoOpts, true)
+			applyChangesToDomainObject(person, account, sheetInfoOpts, true, true)
 
 			changed = (isNew || person.dirtyPropertyNames.size()>0)
 
@@ -2429,7 +2529,7 @@ class AccountImportExportService {
 		boolean isNew = ! userLogin.id
 
 		// Update the person with the values passed in
-		applyChangesToDomainObject(userLogin, account, sheetInfoOpts, formOptions.flagToUpdateUserLogin)
+		applyChangesToDomainObject(userLogin, account, sheetInfoOpts, formOptions.flagToUpdateUserLogin, true)
 		if (isNew) {
 			userLogin.person = account.person
 		}
@@ -2495,7 +2595,7 @@ class AccountImportExportService {
 
 	/**
 	 * This method serves two purposes:
-	 *    1. Applies values from the account map into the domain object passed in
+	 *    1. Applies values from the account map into the domain object passed in when shouldUpdateDomain is true
 	 *    2. Updates the account map to track changed, Defaulted and Original values that is used in the review process
 	 *
 	 * Note: When applying changes to existing domains there needs to be some caution to prevent overwritting existing information
@@ -2508,7 +2608,7 @@ class AccountImportExportService {
 	 * @param sheetInfoOpts - a Map containing TZ, Date formatters, etc used for transforming values 
 	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
 	 */
-	private void applyChangesToDomainObject(Object domainObject, Map account, Map sheetInfoOpts, boolean shouldUpdateDomain) {
+	private void applyChangesToDomainObject(Object domainObject, Map account, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
 		log.debug "applyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
 
 		boolean isNew = ! domainObject.id
@@ -2518,6 +2618,10 @@ class AccountImportExportService {
 
 		boolean blockBlankOverwrites = account.flags.blockBlankOverwrites
 
+		// Used to indicate that user entered data into the spreadsheet when the domain update
+		// option was declined/not selected.
+		boolean unplannedChange = false
+
 		accountSpreadsheetColumnMap.each { prop, info ->
 			if (info.domain != domainCode) {
 				return // Skip property
@@ -2525,16 +2629,106 @@ class AccountImportExportService {
 
 			// Note that origValueTransformed for null values will return as a blank String such that the comparison to the spreadsheet values will match
 			String origValueTransformed = transformProperty(prop, domainObject[prop], sheetInfoOpts)
-			String currValueTransformed = transformProperty(prop, account[prop], sheetInfoOpts)
+			String chgValueTransformed = transformProperty(prop, account[prop], sheetInfoOpts)
+			
+			// Check for null or blank)
+			boolean valuesEqual = origValueTransformed == chgValueTransformed
+			boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)			
+			boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
 
-			// Check for null or blank
-			boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)
-			boolean chgValueIsBlank = StringUtil.isBlank(currValueTransformed)
+			log.debug "\r\n\r\n****** applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop "
+			log.debug "existing='${domainObject[prop]==null ? 'null' : domainObject[prop]}' formatted to '${origValueTransformed==null?'null':origValueTransformed}'"
+			log.debug "changed is '${account[prop]==null?'null':account[prop]}' value='${chgValueTransformed ==null?'null': chgValueTransformed}'"
+			log.debug "blockBlankOverwrites=$blockBlankOverwrites"
+			log.debug "origValueIsBlank=$origValueIsBlank, chgValueIsBlank=$chgValueIsBlank, valuesEqual=$valuesEqual"
+			log.debug "account.errors=${account.errors.size()>0 ? true : false}"
+
+			if (isNew) {
+				// Working with a new Domain object
+				if (chgValueIsBlank) {
+					if (shouldUpdateDomain) {
+						// Try to first default it from the model has a default value 
+						def defPropertyValue = evaluateDefaultValue(prop, account, sheetInfoOpts)
+						if (defPropertyValue != null) {
+							setDefaultedValue(account, prop, defPropertyValue)
+						} else if (! origValueIsBlank ) {
+							// Then we will fall back to the default values on the domain class itself
+							setDefaultedValue(account, prop, domainObject[prop])
+						}
+					}
+				} else {
+					if (shouldUpdateDomain) {
+						if (! valuesEqual) {
+							setOriginalValue(account, prop, domainObject[prop])
+						}
+					} else {
+						unplannedChange = true
+						setErrorValue(account, prop, 'Unplanned change')
+					}
+				} 
+			} else {
+				// Working with an existing Domain object
+				if (chgValueIsBlank) {
+					// User didn't give us any changes so do we want to overwrite existing values?
+					// Only if there was a perfect match from an export - which is flagged with the 
+					// setting account.flags.blockBlankOverwrites. 
+					if (!origValueIsBlank) {
+						if (!blockBlankOverwrites) {
+							if (shouldUpdateDomain) {
+								// Guess we can overwrite the value
+								setOriginalValue(account, prop, domainObject[prop])
+							} else {
+								unplannedChange = true
+								setErrorValue(account, prop, 'Unplanned change')							}
+						} else {
+							// Show the current values by default, not that they are being changed...
+							setDefaultedValue(account, prop, domainObject[prop])
+						}
+					}
+				} else {
+					// The user gave us some changes so what to do
+					if (shouldUpdateDomain) {
+						if (! valuesEqual) {
+							setOriginalValue(account, prop, domainObject[prop])
+						}
+					} else {
+						unplannedChange = true
+						setErrorValue(account, prop, 'Unplanned change')
+					}
+				}
+			}
+
+			if (! account.errors && shouldUpdateDomain) {
+				// Let's see what the current value is now and if different from the original then we will
+				// update the actual domain property, finally...
+				chgValueTransformed = transformProperty(prop, account[prop], sheetInfoOpts)
+				chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
+				if (! chgValueIsBlank && chgValueTransformed != origValueTransformed) {
+					domainObject[prop] = account[prop]
+				}
+			}
+		} // accountSpreadsheetColumnMap.each
+
+		if (unplannedChange) {
+			account.errors << "Updating $className not selected but was ${isNew ? 'added' : 'changed'}"
+		}
+
+	}
+		/*
+
+			log.debug "\r\n\r\n****** applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop "
+			log.debug "existing='${domainObject[prop]==null ? 'null' : domainObject[prop]}' formatted to '${origValueTransformed==null?'null':origValueTransformed}'"
+			log.debug "changed is '${account[prop]==null?'null':account[prop]}' value='${currValueTransformed ==null?'null': currValueTransformed}'"
+			log.debug "blockBlankOverwrites=$blockBlankOverwrites"
+			log.debug "origValueIsBlank=$origValueIsBlank, chgValueIsBlank=$chgValueIsBlank, valuesEqual=$valuesEqual"
+			log.debug "account.errors=${account.errors.size()>0 ? true : false}"
+
+			// Handle a default value from the Meta Map
 
 			if (blockBlankOverwrites && chgValueIsBlank && !origValueIsBlank) {
 				setDefaultedValue(account, prop, domainObject[prop])
 			} else {
-				if (!chgValueIsBlank && currValueTransformed != origValueTransformed) {
+				if (!chgValueIsBlank && !valuesEqual) {
 					if (shouldUpdateDomain) {
 						setOriginalValue(account, prop, domainObject[prop])
 					} else {
@@ -2548,7 +2742,6 @@ class AccountImportExportService {
 				domainObject[prop] = newValueAsDomainType
 			}
 
-			/*
 			if (account[prop] != null) {				
 				// Have a new value to apply possibly?
 				boolean matched = origValueTransformed == account[prop]
@@ -2601,8 +2794,8 @@ class AccountImportExportService {
 					}
 				}
 			}
-			*/
 		}
 	}
+	*/
 
 }

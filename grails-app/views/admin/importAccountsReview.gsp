@@ -57,10 +57,13 @@
 				console.log('hasCurrVal='+hasCurrVal + ', hasOrigVal=' + hasOrigVal + ', hasDefVal=' + hasDefVal);
 
 			if (hasErrVal) {
-				str = '<span class="error">' + model[errorPropName] + '</span>';
+				// Display an error message
+				str = (hasCurrVal ? '<span class="change">' + model[propertyName] + '</span><br>' : '') +
+					'<span class="error">' + model[errorPropName] + '</span>';
+
 			} else if (hasCurrVal && hasOrigVal && hasDefVal) {
 				// A unique case with Security Roles and Teams where we need to show original, the changes and the results
-				str = '<span class="change">' + model[defaultPropName] + '</span>';
+				str = '<br><span class="change">' + model[defaultPropName] + '</span>';
 				if (model[originalPropName]) {
 					str = str + '<br><span class="original">' + model[originalPropName] + '</span>';
 				}
@@ -184,6 +187,7 @@
 						title: "${gridOpt.label}",
 						locked: ${gridOpt.locked},
 						<g:if test="${gridOpt.template}">template: ${gridOpt.template},</g:if>
+						<g:if test="${gridOpt.templateClass}">attributes: { "class": "${gridOpt.templateClass}" },</g:if>
 						lockable: false,
 						width: ${gridOpt.width}
 					}

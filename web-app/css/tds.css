@@ -1779,6 +1779,9 @@ div.account-import-review span.userData {
 div.account-import-review span.error {
 	color: #FF0000;
 }
+div.account-import-review .error {
+	color: #FF0000;
+}
 
 div.body-disabled-float {
 	float: none !important;
