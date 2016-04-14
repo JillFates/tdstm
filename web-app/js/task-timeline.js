@@ -410,8 +410,8 @@ $(document).ready(function () {
 		var x1MinuteAxis = d3.svg.axis()
 			.scale(x1)
 			.orient('top')
-			.ticks(d3Linear.time, d3Linear.tick)
-			.tickFormat(d3Linear.format)
+			.ticks(d3Linear.lowerScale.time, d3Linear.lowerScale.tick)
+			.tickFormat(d3Linear.lowerScale.format)
 			.tickSize(6, 0, 0);
 
 		// construct the hours axis for the main graph
@@ -2330,6 +2330,39 @@ $(document).ready(function () {
 		return Math.floor((utc2 - utc1) / _DEF);
 	}
 
+	function applyScaleDefinition(msConversion, scale) {
+		if( msConversion === _MS_PER_MIN) {
+			scale.time = d3.time.minute;
+			scale.tick = 10;
+			scale.format = d3.time.format('%H:%M');
+		}
+		if( msConversion === _MS_PER_HOUR) {
+			scale.time = d3.time.hour;
+			scale.tick = 5;
+			scale.format = d3.time.format('%b %d - %H:%M');
+		}
+		if( msConversion === _MS_PER_DAY) {
+			scale.time = d3.time.day;
+			scale.tick = 1;
+			scale.format = d3.time.format('%b %d');
+		}
+		if( msConversion === _MS_PER_WEEK) {
+			scale.time = d3.time.week;
+			scale.tick = 1;
+			scale.format = d3.time.format('%b %d %Y - (week %W)');
+		}
+		if( msConversion === _MS_PER_MONTH) {
+			scale.time = d3.time.month;
+			scale.tick = 1;
+			scale.format = d3.time.format('%B %Y');
+		}
+		if( msConversion === _MS_PER_YEAR) {
+			scale.time = d3.time.year;
+			scale.tick = 1;
+			scale.format = d3.time.format('%B %d %Y');
+		}
+	}
+
 	/**
 	 * @param date1 the init Start Date
 	 * @param date2 the last End Date
@@ -2339,48 +2372,23 @@ $(document).ready(function () {
 	function getTimeFormatToDraw(date1, date2) {
 		var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 			difference = 0,
-			d3TickJump = 10, // By Default is each 10 minutes
-			d3TimeFormat = d3.time.format('%H:%M'), // due minutes default format
-			d3Time = d3.time.minute; //By default is by minutes
+			scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute},
+			d3LowerScale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute}; // By Default the min slice is minutes, so copy this as the lower possible scale
+
 		for(var i = 0; i < msConversion.length; i++) {
 			difference = dateDiffByDef(date1, date2, msConversion[i]);
 			if(difference <= _MAX_TICK_PERFORMANCE ) {
-				if( msConversion[i] === _MS_PER_MIN) {
-					d3Time = d3.time.minute;
-					d3TickJump = 10;
-					d3TimeFormat = d3.time.format('%H:%M');
-				}
-				if( msConversion[i] === _MS_PER_HOUR) {
-					d3Time = d3.time.hour;
-					d3TickJump = 5;
-					d3TimeFormat = d3.time.format('%B %d - %H:%M');
-				}
-				if( msConversion[i] === _MS_PER_DAY) {
-					d3Time = d3.time.day;
-					d3TickJump = 1;
-					d3TimeFormat = d3.time.format('%B %d');
-				}
-				if( msConversion[i] === _MS_PER_WEEK) {
-					d3Time = d3.time.week;
-					d3TickJump = 1;
-					d3TimeFormat = d3.time.format('%B %d %Y - (week %W)');
-				}
-				if( msConversion[i] === _MS_PER_MONTH) {
-					d3Time = d3.time.month;
-					d3TickJump = 1;
-					d3TimeFormat = d3.time.format('%B %Y');
-				}
-				if( msConversion[i] === _MS_PER_YEAR) {
-					d3Time = d3.time.year;
-					d3TickJump = 1;
-					d3TimeFormat = d3.time.format('%B %d %Y');
+				applyScaleDefinition(msConversion[i], scale)
+				if(i > 0) {
+					applyScaleDefinition(msConversion[i-1], d3LowerScale);
 				}
 				break;
 			}
 		}
 
+		scale.lowerScale = d3LowerScale;
 		// Return the config
-		return { tick: d3TickJump, format: d3TimeFormat, time: d3Time};
+		return scale;
 	}
 
 
