@@ -75,13 +75,18 @@
 					</g:if>
 					return unlockButton;
 				}
+
+				$("#unlockUserDialog").dialog({
+      				autoOpen: false,
+      				modal: true
+    			});
+
 			})
 			
 			function submitForm () {
 				$("#formId").submit();
 			}
 		</script>
-			
 	</head>
 	<body>
 		<div class="body fluid" ng-app="tdsAdmin" ng-controller="tds.admin.controller.MainController as admin">
@@ -98,6 +103,23 @@
 			</div>
 			<jqgrid:wrapper id="userLoginId" />
 			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
+		</div>
+
+		<div id="unlockUserDialog" title="Unlock User Login">
+		<ul>
+			<li id="udUsername"></li>
+			<li id="udFailedLogins"></li>
+			<li id="udLockedOutUntil"></li>
+		</ul><br/>
+  		<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>
+		</div>
+		<div id="unlockUserDialog" title="Unlock User Login">
+		<ul>
+			<li id="udUsername"></li>
+			<li id="udFailedLogins"></li>
+			<li id="udLockedOutUntil"></li>
+		</ul><br/>
+  		<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>
 		</div>
 	</body>
 </html>

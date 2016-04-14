@@ -192,6 +192,11 @@
 					$(".passwordsEditFields").show();
 				}
 
+				$("#unlockUserDialog").dialog({
+      				autoOpen: false,
+      				modal: true
+    			});
+
 				$("#resetPassword").click(function(){
 					$(this).prop('disabled', true)
 					$(this).toggleClass("disableButton")
@@ -215,5 +220,13 @@
 				})
 			});
 		</script>
+				<div id="unlockUserDialog" title="Unlock User Login">
+					<ul>
+						<li id="udUsername"></li>
+						<li id="udFailedLogins"></li>
+						<li id="udLockedOutUntil"></li>
+					</ul><br/>
+			  		<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>
+				</div>
 	</body>
 </html>
