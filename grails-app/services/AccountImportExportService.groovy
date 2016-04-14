@@ -238,7 +238,8 @@ class AccountImportExportService {
 									template:changeTmpl('forcePasswordChange'), defaultValue: 'N', validator: validator_YN ],
 		lastLogin              : [type:'datetime',ssPos:23,   formPos:24, domain:'T', width:100, locked:false, label:'Last Login (readonly)',
 									transform:xfrmDateTimeToString ],
-		matches                : [type:'list',    ssPos:null, formPos:25, domain:'T', width:100, locked:false, label:'Matched On']
+		matches                : [type:'list',    ssPos:null, formPos:25, domain:'T', width:100, locked:false, label:'Matched On', 
+									transform: xfrmListToString]
 	]
 
 	// The map of the location of the various properties on the Title page of the Account Spreadsheet
@@ -1484,6 +1485,7 @@ class AccountImportExportService {
 			// Now attempt to find the person by their name
 			List people = findPersonsByName(accounts[i])
 			if (people.size() > 0) {
+				accounts[i].matches << 'name'
 				if (people.size() > 1) {
 					accounts[i].errors << 'Found multiple people by name'
 				} else {
@@ -1500,7 +1502,6 @@ class AccountImportExportService {
 					}
 					if (!accounts[i].errors && ! accounts[i].person) {
 						accounts[i].person = personByName
-						accounts[i].matches << 'name'
 					}
 				}
 			}
