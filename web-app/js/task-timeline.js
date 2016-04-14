@@ -19,6 +19,7 @@ $(document).ready(function () {
 	});
 
 	generateGraph();
+});
 
 
 	function displayWarningOrErrorMsg(isCyclical) {
@@ -52,7 +53,7 @@ $(document).ready(function () {
 			displayWarningOrErrorMsg(response.responseText == 'cyclical')
 			return;
 		}
-		 
+
 		var data = $.parseJSON(response.responseText);
 		data = data.data;
 		var ready = false;
@@ -2383,4 +2384,3 @@ $(document).ready(function () {
 	}
 
 
-});
