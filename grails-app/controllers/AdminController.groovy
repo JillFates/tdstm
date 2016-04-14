@@ -1268,13 +1268,15 @@ def test() {
 		try {
 			// TODO : JPM 4/2016 : importAccountsReviewData This method should be refactored so that the bulk of the logic
 			// is implemented in the service.
-			
+
 			def session = getSession()
 			Map formOptions = accountImportExportService.importParamsToOptionsMap(params)
 			List accounts = accountImportExportService.loadAndValidateSpreadsheet(session, user, project, params.filename, formOptions)
-			Map sheetOptions = accountImportExportService.getUserPreferences(session)
+
+			//Map sheetOptions = accountImportExportService.getUserPreferences(session)
 			// Remove properties that shouldn't be sent over in the JSON and change the error list to a 
 			// delimited (|) string so that we can split it in the Kendo grid afterward
+			/*
 			for(int i=0; i < accounts.size(); i++) {
 				['person', 'companyObj'].each {prop ->
 					if (accounts[i][prop]) {
@@ -1292,7 +1294,7 @@ def test() {
 				}
 				accounts[i].errors = (accounts[i].errors ? accounts[i].errors.join('|') : '')
 			}
-			
+			*/
 			ServiceResults.respondAsJson(response, accounts )
 
 		} catch(e) {
@@ -1313,7 +1315,9 @@ def test() {
 	 *              changes to the database and delete the spreadsheet.
 	 */	 
 	def importAccounts() {
-		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+
+		// TODO : JPM 4/2016 : importAccounts - check permissions based on importing person and users (options if person but not user should update the import form as well)
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'EditUserLogin')
 		if (!project) {
 			return
 		}
@@ -1343,9 +1347,9 @@ def test() {
 						return model
 					}
 
-					model << accountImportExportService.importAccount_Step1_Upload(session, user, project, request, fileParamName)
+					model = accountImportExportService.importAccount_Step1_Upload(session, user, project, request, fileParamName)
 					// Redirect the user to the Review step
-					forward( action:formAction, params: [stepAlt:'review', filename:model.filename, processOption: params.processOption] )
+					forward( action:formAction, params: [stepAlt:'review', filename:model.filename, importOption: params.importOption] )
 					return
 					break
 
@@ -1353,14 +1357,17 @@ def test() {
 					// This step will serve up the review template that in turn fetch the review data 
 					// via an Ajax request.
 					options = accountImportExportService.importParamsToOptionsMap(params)
-					model << accountImportExportService.importAccount_Step2_Review(session, user, project, request, params)
+					model << accountImportExportService.importAccount_Step2_Review(session, user, project, request, options)
+					// log.debug "importAccounts() case 'review':\n\toptions=$options\n\tmodel=$model"
 					if (!options.filename && model.filename) {
 						// log.debug "importAccounts() step=$step set filename=${model.filename}"
 						options.filename = model.filename
 					}
-					model.optionsAsParams = accountImportExportService.importOptionsAsParams(options)
-					//model.accountsAsJSON = model.accounts
 
+					// This is used by the AJAX request in the form to construct the URL appropriately
+					model.paramsForReviewDataRequest = [filename:model.filename, importOption:params.importOption]
+
+					// log.debug "importAccounts() in step 'review' model=$model"
 					//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
 
 					view = "${formAction}Review"

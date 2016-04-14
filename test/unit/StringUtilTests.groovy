@@ -130,4 +130,46 @@ class StringUtilTests extends Specification {
 
 	}
 
+	def 'Test the clean function that should remove all control characters from a string'() {
+		// while not touching the ASCII printible characters. This will remove the typical CR, LF, BS
+		// along with Unicode Control characters, Line and Paragraph separators, etc {
+
+		expect:
+			SU.clean(value) == result
+
+		where:
+			value 				| result
+			" abcdefghijklm "	| 'abcdefghijklm'
+			" nopqrstuvwxyz "	| 'nopqrstuvwxyz'
+			" ABCDEFGHIJKLM "	| 'ABCDEFGHIJKLM'
+			" NOPQRSTUVWXYZ "	| 'NOPQRSTUVWXYZ'
+			" 01234567890 "		| '01234567890'
+			"!@#\$%^&*()-_=+`~"	| '!@#$%^&*()-_=+`~'
+			"',.<>/?\\"			| '\',.<>/?\\'
+			" CR\r. "			| 'CR+.'
+			" LF\n. "			| 'LF+.'
+			" FF\f. "			| 'FF+.'
+			" TAB\t. "			| 'TAB+.'
+			" DQuote\". "		| 'DQuote".'
+			' SQuote\'. '		| 'SQuote\'.'
+			" \t White\t. \t "	| 'White+.'
+			" .\bBACKSPACE. "	| '.~BACKSPACE.'
+			" .\u2028LineSep"	| '.~LineSep'
+			" .\u2029ParaSep"	| '.~ParaSep'	
+			" .\u00000000. "	| '.~0000.'
+			" .\u00090009. "	| '.+0009.'
+			" .\u00850085. "	| '.~0085.'
+			" [\u007f007f] "	| '[~007f]'
+			" [\u008f008f] "	| '[~008f]'
+
+			/*
+			" .\ u000A000A. "	| '.~000A.'
+			" .\ u000D000D. "	| '.~000D.'
+			" .\ uFFFFFFFF. "	| '.~FFFF.'
+			" .\ uFFFEFFFE. "	| '.~FFFE.'
+			" [\ u00A000A0] "	| '[~00A0]'
+			" [\ u0A400A40] "	| '[~0A40]'
+			*/
+	}
+
 }

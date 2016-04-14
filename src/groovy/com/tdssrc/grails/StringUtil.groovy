@@ -279,4 +279,28 @@ class StringUtil {
 		return list
 	}
 
+	/**
+	 * Used to replace all of the escape characters (CR|LF|TAB|Backspace|FormFeed|single/double quote) with plus(+) and replaces
+	 * any non-printable, control and special unicode character with a tilda (~). The method will also remove any leading and trailing whitespaces.
+	 *
+	 * TODO : JPM 4/2016 : sanitize() - need to review for better Unicode support and what the deal is with the \b that flakes out.
+	 *
+	 * References:
+	 *    http://stackoverflow.com/questions/1367322/what-are-all-the-escape-characters-in-java
+	 *    http://www.regular-expressions.info/unicode.html
+	 *    http://unicode.org/charts/
+	 * @param str - the string to be sanitized
+	 * @return the freshly sanitized string
+	 */
+	static String sanitize(String str) {
+		String result
+		if (str != null) {
+			result = str.trim()
+			// NOTE stripping out the \b causes + to be added to beginning and end of string for some strange reason
+			result = result.replaceAll(/\r|\n|\t|\f/, '+')
+			// invisible control characters and unused code points; Line (u2028) and Paragraph (u2029) separators .
+			result = result.replaceAll(/\p{C}|\p{Zl}|\p{Zp}/, '~')
+		}
+		return result
+	}
 }

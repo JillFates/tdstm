@@ -7,6 +7,7 @@ import com.tds.asset.AssetEntity
 import com.tds.asset.Database
 import com.tds.asset.Files
 
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.GormUtil
 
@@ -33,6 +34,11 @@ class TestCaseController {
 
 	// def messageSource
 	
+	def cleanString() {
+		def a = " a\tstring\nwith\rcharacters \u000bA\u007cB\u008fC that\r\ncan\fhave funcky\'character\"in it"
+		def b = StringUtil.clean(a)
+		render ('[' + b + ']').toString()
+	}
 	def elapsed() {
 		StringBuffer sb = new StringBuffer("<h1>Testing the Elapsed Method</h1>")
 		List now = [new Date()]

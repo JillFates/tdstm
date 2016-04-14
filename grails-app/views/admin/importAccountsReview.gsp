@@ -42,17 +42,23 @@
 	<script>
 		// Used to render the changes made in a view
 		function showChanges(model, propertyName) {
-			var hasCurrVal = model.hasOwnProperty(propertyName);
-			var hasOrigVal = model.hasOwnProperty(propertyName + '${originalSuffix}');
-			var hasDefVal  = model.hasOwnProperty(propertyName + '${defaultSuffix}');
 			var originalPropName = propertyName + '${originalSuffix}';
 			var defaultPropName = propertyName + '${defaultSuffix}';
+			var errorPropName = propertyName + '${errorSuffix}';
+			var hasCurrVal = model.hasOwnProperty(propertyName);
+			var hasOrigVal = model.hasOwnProperty(originalPropName);
+			var hasDefVal  = model.hasOwnProperty(defaultPropName);
+			var hasErrVal  = model.hasOwnProperty(errorPropName);
+			// var hasOrigVal = model.hasOwnProperty(propertyName + '${originalSuffix}');
+			//var hasDefVal  = model.hasOwnProperty(propertyName + '${defaultSuffix}');
 			var str = '';
 			
 			if (propertyName == '')
-			console.log('hasCurrVal='+hasCurrVal + ', hasOrigVal=' + hasOrigVal + ', hasDefVal=' + hasDefVal);
+				console.log('hasCurrVal='+hasCurrVal + ', hasOrigVal=' + hasOrigVal + ', hasDefVal=' + hasDefVal);
 
-			if (hasCurrVal && hasOrigVal && hasDefVal) {
+			if (hasErrVal) {
+				str = '<span class="error">' + model[errorPropName] + '</span>';
+			} else if (hasCurrVal && hasOrigVal && hasDefVal) {
 				// A unique case with Security Roles and Teams where we need to show original, the changes and the results
 				str = '<span class="change">' + model[defaultPropName] + '</span>';
 				if (model[originalPropName]) {
@@ -151,7 +157,7 @@
 				dataSource: {
 					type: "json",
 					transport: {
-						read: "${createLink(action:'importAccountsReviewData', params:optionsAsParams)}"
+						read: "${createLink(action:'importAccountsReviewData', params:paramsForReviewDataRequest)}"
 					},
 					error: processErrors,
 					schema: {
@@ -159,7 +165,7 @@
 							fields: {
 								<g:each var="propName" in="${properties}">${propName}: { type: "string" },</g:each>
 								errors: { type: "string" },
-								match: { type: "string" }
+								matches: { type: "string" }
 							}
 						}
 					},
@@ -230,8 +236,9 @@
 				<input type="hidden" name="header" value="${header}" />
 				<input type="hidden" name="timezone" value="${timezone}" />
 				<input type="hidden" name="filename" value="${filename}" />
+				<input type="hidden" name="importOption" value="${importOption}" />
 
-				<g:submitButton id="createSubmit" name="submit" value="Post changes to ${processOptionDesc}" />
+				<g:submitButton id="createSubmit" name="submit" value="Post changes to ${importOptionDesc}" />
 			</g:form>
 		</div>
 	</div>

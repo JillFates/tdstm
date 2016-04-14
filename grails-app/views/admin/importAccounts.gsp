@@ -46,7 +46,7 @@
 
 						<br />
 						Import Option:<br>
-						<select id="importOption" name="processOption">
+						<select id="importOption" name="importOption">
 							<option value="B" selected>Both Person and UserLogin</option>
 							<option value="P">Person only</option>
 							<option value="U">UserLogin only</option>

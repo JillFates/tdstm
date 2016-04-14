@@ -4,10 +4,9 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import javax.servlet.http.HttpSession
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods 
