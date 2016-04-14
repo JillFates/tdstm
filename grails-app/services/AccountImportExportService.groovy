@@ -226,6 +226,7 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 
+		//log.info "OLB: sheetInfoOpts: ${sheetInfoOpts}"
 		return validateSpreadsheetContent(byWhom, project, workbook, sheetInfoOpts, formOptions)
 	}
 
@@ -280,7 +281,8 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 				' export a new template before attempt an import.')
 		}
 
-		// Read in the accounts just to see that we're able to without errors
+		log.info("OLB: WE RUN readAccountsFromSpreadsheet and don't use it? Check if is safe to remove this line (validations maybe?)")
+		// Read in the accounts just to see that we're able to without errors		
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
 
 		if (!accounts) {
@@ -376,7 +378,7 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 			}
 			
 			// Create / Update the persons
-			if (options.flagToUpdatePerson) {
+			if (formOptions.flagToUpdatePerson) {
 				def (error, changed) = addOrUpdatePerson(user, accounts[i], sheetInfoOpts, formOptions)
 
 				log.debug "importAccount_Step3_PostChanges() call to addOrUpdatePerson() returned person=${accounts[i].person}, error=$error, changed=$changed"
@@ -389,7 +391,7 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 					}
 
 					// Update teams
-					def teamChanged = addOrUpdateTeams(user, accounts[i], project, options)
+					def teamChanged = addOrUpdateTeams(user, accounts[i], project, formOptions)
 					if (teamChanged) {
 						results.teamsUpdated++
 					}
@@ -403,7 +405,7 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 			}
 
 			// Deal with the userLogin
-			if (options.flagToUpdateUserLogin) {
+			if (formOptions.flagToUpdateUserLogin) {
 
 			}
 
@@ -458,9 +460,8 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 
 		// Collect the details off of the title sheet including the project id, exportedOn and the timezone when the data was exported
 		Map sheetInfoOpts = getUserPreferences(session)
-
 		readTitleSheetInfo(project, workbook, sheetInfoOpts)
-	
+
 		return sheetInfoOpts
 	}
 
@@ -872,6 +873,9 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 		sheetOpts.sheetProjectId = getCell('projectId')
 		sheetOpts.sheetDateFormat = getCell('dateFormat')
 
+		//Get the Sheet Formatter
+		sheetOpts.sheetDateFormatter = TimeUtil.getFormatter(sheetOpts.sheetDateFormat) ?: sheetOpts.dateFormatter
+
 		// Note that the exportedOn property is dependent on timezone being previously loaded
 		sheetOpts.sheetExportedOn = getCell('exportedOn')	
 		if (sheetOpts.sheetExportedOn == -1) {
@@ -1121,7 +1125,6 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 	 * @return the list that is read in
 	 */
 	private List<Map> readAccountsFromSpreadsheet(spreadsheet, Map sheetInfoOpts) {
-
 		int firstAccountRow = 1
 		def sheet = spreadsheet.getSheet( TEMPLATE_TAB_NAME )
 		int lastRow = sheet.getLastRowNum()
@@ -1144,9 +1147,14 @@ log.debug "*** validator_date() val isa ${val?.getClass().getName()} and formatt
 							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.dateTimeFormatter)
 							break
 						case 'date':
-							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.dateFormatter)
+							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateFormatter) //dateFormatter)
+							//log.info("OLB: VALUE CLASS ${value?.class}")
+							//We have the Date value we format it back to the User/Session selected Format
+							if(value) value = sheetInfoOpts.dateFormatter.format(value)
+							//log.info("OLB: ${colPos}, ${info.type}, ${value}")
 							break
 					}
+					
 					account[prop] = value
 				}
 			}

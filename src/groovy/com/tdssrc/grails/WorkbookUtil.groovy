@@ -1,5 +1,7 @@
 package com.tdssrc.grails;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Sheet
@@ -12,7 +14,8 @@ import java.text.DateFormat
  *
  */
 class WorkbookUtil {
-	
+	private static final LOG = LogFactory.getLog(WorkbookUtil.class)
+
 	public static getSheetNames(workbook) {
 		def result = []
 		for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -91,7 +94,7 @@ class WorkbookUtil {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
-					result = cell.getDateCellValue()
+					result = cell.getDateCellValue()					
 					// result = TimeUtil.moveDateToTZ(result, session)
 					break
 				case Cell.CELL_TYPE_STRING:
@@ -143,27 +146,30 @@ class WorkbookUtil {
 					break
 
 				case Cell.CELL_TYPE_NUMERIC:
+					//LOG.info "Cell is Numeric"
 					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
 					result = cell.getDateCellValue()
-println "*** getDateCellValue() got NUMERIC value $result"
-					// result = TimeUtil.moveDateToTZ(result, session)
 					break
 
-				case Cell.CELL_TYPE_STRING:
+				case Cell.CELL_TYPE_STRING:					
 					String str = cell.getStringCellValue()
+					//LOG.info "Cell is String: $str"
 					if (str) { 
-						result = TimeUtil.parseDateTimeWithFormatter(tzId, str, dateFormat)
+						// I change the following for the old fashion parser 
+						//result = TimeUtil.parseDateTimeWithFormatter(tzId, str, dateFormat)
+						try{ result = dateFormat.parse(str) }catch(e){}
 						if (!result) {
 							result = failedIndicator
 						}
 					}
-println "*** getDateCellValue() got STRING value str=$str, result=$result"
 					break
 
 				default:
 					throw new IllegalArgumentException("Invalid date value in ${columnCode(columnIdx)}${rowIdx+1} (${cell.getCellType()})")
 			}
 		}
+		//LOG.info "OLB: getDateCellValue: $result : ${result?.class}"
+
 		return result
 	}
 	public static getIntegerCellValue(sheet, columnIdx, rowIdx) {

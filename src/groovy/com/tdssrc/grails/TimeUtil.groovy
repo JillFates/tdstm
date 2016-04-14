@@ -479,7 +479,7 @@ class TimeUtil {
 		try {
 			result = formatter.parse(dateValue)
 		} catch (Exception e) {
-			LOG.warn("Invalid date time: " + dateValue)
+			LOG.warn("Invalid date time: $dateValue, $tzId, ${formatter.toPattern()}")
 		}
 		return result
 	}
@@ -681,6 +681,23 @@ class TimeUtil {
         formatter.setTimeZone(TimeZone.getTimeZone(tzId));
         result = formatter.parse(dateFormatted);
 		return result
+	}
+
+	/**
+	 * Get the Date formatter according to the string, this string si ussing all Uppercase,
+	 * we should catch the Formatters
+	 * SELF NOTE: I don't quite get this Utility class, all formatters shoud be catched, unless we use multiple threads
+	 * I don't see why we need to create them everyime
+	 *
+	 * @author @tavo_luna
+	 */
+	public static DateFormat getFormatter(String format){
+		DateFormat df 
+		try{
+			String jfstr = format.replace('Y', 'y').replace('D','d')
+			df = new SimpleDateFormat(jfstr)
+		}catch(e){}
+		return df 
 	}
 
 }
