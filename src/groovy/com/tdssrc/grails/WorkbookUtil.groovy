@@ -122,7 +122,6 @@ class WorkbookUtil {
 	 * @param sheet - the sheet to extract the value
 	 * @param columnIdx - the column to reference (offset starts at zero)
 	 * @param rowIdx - the row to reference (offset start at zero)
-	 * @param tzId - the timezone id that the string would have been generated with
 	 * @param dateFormat - list if formats to use if parsing a string value
 	 * @param failedIndicator - a value that can be checked to determine if parsing was involved and it failed (default -1)
 	 * @return The date from the specified cell or null if empty
@@ -130,7 +129,7 @@ class WorkbookUtil {
 	 * @throws ParseException - if the field contains an invalid formatted String value
 	 * 
 	 */
-	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormat, failedIndicator=-1) {
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) {
 		def result
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
 
@@ -146,12 +145,9 @@ class WorkbookUtil {
 					break
 
 				case Cell.CELL_TYPE_NUMERIC:
-					// Dates stored in the spreadsheet are done so in the TZ of the Spreadsheet, so we read it and the shift it.					
-					result = cell.getDateCellValue()
-					// We shift 
-					// TODO: if this Date doesn't have Time Part we shouldnt shift it
-					result = TimeUtil.moveDatefromTz2GMT(result, tzId)
-					LOG.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
+					// Dates stored in the spreadsheet are done since they are already stored without TZ					
+					result = cell.getDateCellValue()					
+					//LOG.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
 					break
 
 				case Cell.CELL_TYPE_STRING:					
@@ -162,7 +158,7 @@ class WorkbookUtil {
 						if (!result) {
 							result = failedIndicator
 						}
-						LOG.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
+						//LOG.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
 					}
 					break
 

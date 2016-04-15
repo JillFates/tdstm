@@ -145,7 +145,7 @@ class AccountImportExportService {
 		String r = ''
 		if (val != null) {
 			if (val instanceof Date) {
-				r = TimeUtil.formatDate(val, options.dateTimeFormatter)
+				r = TimeUtil.formatDateTimeWithTZ(options.userTzId, val, options.dateTimeFormatter)
 				// log.debug "xfrmDateTimeToString() did formatDate on val($val) and got r($r)"
 			} else {
 				log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
@@ -250,11 +250,13 @@ class AccountImportExportService {
 									template:changeTmpl('isLocal'), defaultValue: 'Y', validator: validator_YN, transform: xfrmToYN],
 		active                 : [type:'string',  ssPos:18,   formPos:20, domain:'U', width:100, locked:false, label:'Login Active?', 
 									template:changeTmpl('active'), defaultValue: 'N', validator: validator_YN],
-		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
+/*		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
 									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date,
 									defaultValue:defaultExpiration],
-//		expiryDate             : [type:'datetime',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
-//									template:changeTmpl('expiryDate'), transform:xfrmDateTimeToString, validator:validator_datetime],
+*/
+		expiryDate             : [type:'datetime',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
+									template:changeTmpl('expiryDate'), transform:xfrmDateTimeToString, validator:validator_datetime, 
+									defaultValue:defaultExpiration],
 		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', 
 									template:changeTmpl('passwordExpirationDate'), transform:xfrmDateToString, validator:validator_date],
 		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', 
@@ -971,7 +973,7 @@ class AccountImportExportService {
 					val = WorkbookUtil.getIntegerCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
 					break
 				case 'Datetime':
-					val = WorkbookUtil.getDateCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1], sheetOpts.sheetTzId, sheetOpts.dateTimeFormatter)
+					val = WorkbookUtil.getDateCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1], sheetOpts.dateTimeFormatter)
 					break
 				case 'String':
 					val = WorkbookUtil.getStringCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
@@ -988,8 +990,8 @@ class AccountImportExportService {
 		// @tavo_luna: Get the Sheet Formatter
 		// Date Formatter is forced to be UTC/GMT, and the Date time is based on the sheet creation Timezone
 		sheetOpts.sheetDateFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE) ?: sheetOpts.dateFormatter
-		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME_22, sheetOpts.sheetTzId) ?: sheetOpts.dateTimeFormatter
-		log.info("OLB: sheetOpts: $sheetOpts")
+		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME_22) ?: sheetOpts.dateTimeFormatter
+		//log.info("OLB: sheetOpts: $sheetOpts")
 
 
 		// Note that the exportedOn property is dependent on timezone being previously loaded
@@ -1432,14 +1434,19 @@ class AccountImportExportService {
 				if (colPos != null) {
 					switch (info.type) {
 						case 'datetime': 
-							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateTimeFormatter)
+							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetDateTimeFormatter)
 							if (value == -1) {
 								value = ''
 								account.errors << "Invalid date value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
+							}else{
+								// We shift to the Sheet's TZ					
+								def oldvalue = value
+								value = TimeUtil.moveDatefromGMTtoTZ(value, sheetInfoOpts.sheetTzId)
+								//log.info("OLB: SHIFT: '$oldvalue' => '$value'")
 							}
 							break
 						case 'date':
-							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateFormatter) //dateFormatter)
+							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetDateFormatter) //dateFormatter)
 							if (value == -1) {
 								value = ''
 								account.errors << "Invalid datetime value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"

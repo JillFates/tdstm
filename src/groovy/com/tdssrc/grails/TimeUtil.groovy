@@ -520,12 +520,13 @@ class TimeUtil {
 	 * @param formatterType - the formatter type to be used
 	 * @param timezone - timezone to set the formatter
 	 * @return formatter - the middle or little-endian version of the format desired
-	 */
+	 *//*
 	public static DateFormat createFormatterForType(String userPrefFormat, String formatterType, String timezone) {
 		def formatter = createFormatterForType(userPrefFormat, formatterType)
 		formatter?.setTimeZone(TimeZone.getTimeZone(timezone))
 		return formatter
 	}
+	*/
 
 	/**
 	 * Creates a formatter based on the options presented. Based on the formatType being set to the
@@ -691,13 +692,13 @@ class TimeUtil {
 	}
 
 	/**
-	 * Used to move a Date to GMT
+	 * Used to move a Date from GMT to TZ
 	 * @param dateValue the date to move
 	 * @param session the session information (to get timezone and format type)
 	 * @return The date
 	 **/
-	public static Date moveDatefromTz2GMT(Date date, String fromTZ) {
-		return moveDateToTZ(date, "GMT", fromTZ)
+	public static Date moveDatefromGMTtoTZ(Date date, String toTZ) {
+		return moveDateToTZ(date, "GMT", toTZ)
 	}
 
 	/**
@@ -710,12 +711,15 @@ class TimeUtil {
 	 */
 	public static Date moveDateToTZ(Date date, String fromTZ, String toTZ){
 		def result
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-    formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
-    String dateFormatted = formatter.format(date)
+		if(date!=null){
+	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+	    formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
+	    String dateFormatted = formatter.format(date)
 
-    formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
-    return formatter.parse(dateFormatted)
+	    formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
+	    result = formatter.parse(dateFormatted)
+	  }
+	  return result
 	}
 
 }
