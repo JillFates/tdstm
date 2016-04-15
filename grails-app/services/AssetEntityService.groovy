@@ -2169,8 +2169,28 @@ class AssetEntityService {
 	}
 
 	/**
-	 * Download data form Asset Entity table into Excel file
+	 * This is the actual method that will generate the Excel export which it typically called by a Quartz
+	 * job so that the user request can happen quickly. The job then will post progress updates to report back
+	 * to the user referencing the params.key.
+	 * The user's system timezone is critical to computing the datetimes in the spreadsheet since the application
+	 * runs in GMT but Excel/Apache POI assume that the spreadsheet is in the system timezone. So if we generate a 
+	 * spreadsheet and stuff a 
 	 * @param Datatransferset,Project,Movebundle
+	 *		params.key - the key to reference for progress status
+	 *		params.projectId - the project for which to export assets
+	 *		params.bundle - the bundle to export
+	 *		params.dataTransferSet - 
+	 *		params.username - the user that made the request
+	 *		params.tzId - the user's timezone (IMPORTANT that this be their system TZ and not their user preference*)
+	 *		params.asset - flag to export devices
+	 *		params.application - flag to export apps
+	 *		params.database - flag to export databases
+	 *		params.files - flag to export storage
+	 *		params.dependency - flag to export dependencies
+	 *		params.room - flag to export room details
+	 *		params.rack - flag to export rack data
+	 *		params.cable - flag to export cabling
+	 *		params.comment - flag to export comments
 	 **/
 	void export(params) {
 		def key = params.key
