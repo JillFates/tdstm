@@ -514,6 +514,20 @@ class TimeUtil {
 	}
 
 	/**
+	 * Builder to get a Formatter based on the middle-endian or little-endian, the formatter type, and the tyme zone to use to Parse Dates
+	 * @author @tavo_luna
+	 * @param @param userPrefFormat - the format type to be used, valid values defined in dateTimeFormatTypes
+	 * @param formatterType - the formatter type to be used
+	 * @param timezone - timezone to set the formatter
+	 * @return formatter - the middle or little-endian version of the format desired
+	 */
+	public static DateFormat createFormatterForType(String userPrefFormat, String formatterType, String timezone) {
+		def formatter = createFormatterForType(userPrefFormat, formatterType)
+		formatter?.setTimeZone(TimeZone.getTimeZone(timezone))
+		return formatter
+	}
+
+	/**
 	 * Creates a formatter based on the options presented. Based on the formatType being set to the
 	 * user preference of MMDDYYYY or DDMMYYYY then the method will return the equivilent format for 
 	 * the middle-endian (US) or little-endian (most other countries)
@@ -522,7 +536,7 @@ class TimeUtil {
 	 * @param formatterType - the formatter type to be used
 	 * @return formatter - the middle or little-endian version of the format desired
 	 */
-	private static DateFormat createFormatterForType(String userPrefFormat, String formatterType) {
+	public static DateFormat createFormatterForType(String userPrefFormat, String formatterType) {
 		def formatter
 		def isMiddleEndian = (userPrefFormat.toString() == MIDDLE_ENDIAN)
 		switch (formatterType) {
@@ -673,30 +687,35 @@ class TimeUtil {
 	public static Date moveDateToTZ(dateValue, HttpSession session) {
 		def result
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String dateFormatted = formatter.format(dateValue);
-
-        formatter.setTimeZone(TimeZone.getTimeZone(tzId));
-        result = formatter.parse(dateFormatted);
-		return result
+		return moveDateToTZ("GMT", tzId)
 	}
 
 	/**
-	 * Get the Date formatter according to the string, this string si ussing all Uppercase,
-	 * we should catch the Formatters
-	 * SELF NOTE: I don't quite get this Utility class, all formatters shoud be catched, unless we use multiple threads
-	 * I don't see why we need to create them everyime
-	 *
+	 * Used to move a Date to GMT
+	 * @param dateValue the date to move
+	 * @param session the session information (to get timezone and format type)
+	 * @return The date
+	 **/
+	public static Date moveDatefromTz2GMT(Date date, String fromTZ) {
+		return moveDateToTZ(date, "GMT", fromTZ)
+	}
+
+	/**
+	 * Generic TimeZone Shifter
+	 * gets a Date and shifts it from a TZ to another TZ
+	 * @param date the date to move
+	 * @fromTZ TZ where the Date Begins
+	 * @toTZ TZ where we want the Date Equivalent
 	 * @author @tavo_luna
 	 */
-	public static DateFormat getFormatter(String format){
-		DateFormat df 
-		try{
-			String jfstr = format.replace('Y', 'y').replace('D','d')
-			df = new SimpleDateFormat(jfstr)
-		}catch(e){}
-		return df 
+	public static Date moveDateToTZ(Date date, String fromTZ, String toTZ){
+		def result
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
+    String dateFormatted = formatter.format(date)
+
+    formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
+    return formatter.parse(dateFormatted)
 	}
 
 }

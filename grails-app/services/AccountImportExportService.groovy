@@ -253,6 +253,8 @@ class AccountImportExportService {
 		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
 									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date,
 									defaultValue:defaultExpiration],
+//		expiryDate             : [type:'datetime',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
+//									template:changeTmpl('expiryDate'), transform:xfrmDateTimeToString, validator:validator_datetime],
 		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', 
 									template:changeTmpl('passwordExpirationDate'), transform:xfrmDateToString, validator:validator_date],
 		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', 
@@ -983,8 +985,11 @@ class AccountImportExportService {
 		sheetOpts.sheetProjectId = getCell('projectId')
 		sheetOpts.sheetDateFormat = getCell('dateFormat')
 
-		//Get the Sheet Formatter
-		sheetOpts.sheetDateFormatter = TimeUtil.getFormatter(sheetOpts.sheetDateFormat) ?: sheetOpts.dateFormatter
+		// @tavo_luna: Get the Sheet Formatter
+		// Date Formatter is forced to be UTC/GMT, and the Date time is based on the sheet creation Timezone
+		sheetOpts.sheetDateFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE) ?: sheetOpts.dateFormatter
+		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME_22, sheetOpts.sheetTzId) ?: sheetOpts.dateTimeFormatter
+		log.info("OLB: sheetOpts: $sheetOpts")
 
 
 		// Note that the exportedOn property is dependent on timezone being previously loaded
@@ -1427,7 +1432,7 @@ class AccountImportExportService {
 				if (colPos != null) {
 					switch (info.type) {
 						case 'datetime': 
-							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.dateTimeFormatter)
+							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateTimeFormatter)
 							if (value == -1) {
 								value = ''
 								account.errors << "Invalid date value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
@@ -1435,10 +1440,6 @@ class AccountImportExportService {
 							break
 						case 'date':
 							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateFormatter) //dateFormatter)
-							//log.info("OLB: VALUE CLASS ${value?.class}")
-							//We have the Date value we format it back to the User/Session selected Format
-							// if(value) value = sheetInfoOpts.dateFormatter.format(value)
-							//log.info("OLB: ${colPos}, ${info.type}, ${value}")
 							if (value == -1) {
 								value = ''
 								account.errors << "Invalid datetime value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"

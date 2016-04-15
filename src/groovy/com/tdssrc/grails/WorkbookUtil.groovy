@@ -146,21 +146,23 @@ class WorkbookUtil {
 					break
 
 				case Cell.CELL_TYPE_NUMERIC:
-					//LOG.info "Cell is Numeric"
-					// Dates stored in the spreadsheet are done so in GMT so we shouldn't need to convert it.
+					// Dates stored in the spreadsheet are done so in the TZ of the Spreadsheet, so we read it and the shift it.					
 					result = cell.getDateCellValue()
+					// We shift 
+					// TODO: if this Date doesn't have Time Part we shouldnt shift it
+					result = TimeUtil.moveDatefromTz2GMT(result, tzId)
+					LOG.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
 					break
 
 				case Cell.CELL_TYPE_STRING:					
 					String str = cell.getStringCellValue()
-					//LOG.info "Cell is String: $str"
-					if (str) { 
-						// I change the following for the old fashion parser 
-						//result = TimeUtil.parseDateTimeWithFormatter(tzId, str, dateFormat)
-						try{ result = dateFormat.parse(str) }catch(e){}
+					if (str) {
+
+						try{ result = dateFormat.parse(str) }catch(e){ LOG.info("OLB: ${e.getMessage()}; FORMAT:\"${dateFormat.toPattern()}\""); }
 						if (!result) {
 							result = failedIndicator
 						}
+						LOG.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
 					}
 					break
 
@@ -168,7 +170,6 @@ class WorkbookUtil {
 					throw new IllegalArgumentException("Invalid date value in ${columnCode(columnIdx)}${rowIdx+1} (${cell.getCellType()})")
 			}
 		}
-		//LOG.info "OLB: getDateCellValue: $result : ${result?.class}"
 
 		return result
 	}
