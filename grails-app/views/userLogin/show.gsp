@@ -221,12 +221,6 @@
 			});
 		</script>
 				<div id="unlockUserDialog" title="Unlock User Login">
-					<ul>
-						<li id="udUsername"></li>
-						<li id="udFailedLogins"></li>
-						<li id="udLockedOutUntil"></li>
-					</ul><br/>
-			  		<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>
 				</div>
 	</body>
 </html>

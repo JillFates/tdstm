@@ -11,9 +11,14 @@ tds.admin.service = tds.admin.service || {};
 
 tds.admin.controller.MainController = function (scope, modal, utils, adminService) {
 	this.showUnlockUserConfirm = function (id, username, lockedOutUntil, failedLoginAttempts, element, refresh) {
-		$("#udUsername").text('Username: ' + username)
-		$("#udFailedLogins").text('Failed logins: ' + failedLoginAttempts)
-		$("#udLockedOutUntil").text('Account locked out for: ' + lockedOutUntil)
+
+		var msg = "<ul><li>Username: " + username + "</li>" +
+		"<li>Failed Logins: " + failedLoginAttempts+ "</li>" + 
+		"<li>Account locked out for: " + lockedOutUntil + "</li>" +
+		"<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>"
+
+		$("#unlockUserDialog").html(msg)
+
 		$("#unlockUserDialog").dialog({
 	      buttons : {
 	        "Confirm" : function() {

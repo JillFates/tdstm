@@ -32,6 +32,14 @@
 		</script>
 		<script type="text/javascript">
 			$(document).ready(function() {
+
+
+				$("#unlockUserDialog").dialog({
+      				autoOpen: false,
+      				modal: true
+    			});
+
+
 				var listCaption = "Users: \
 				<tds:hasPermission permission='CreateUserLogin'>\
 					<span class='capBtn'><input type='button' value='Create User Login' onClick=\"redirectToListStaff()\"/></span> \
@@ -76,11 +84,7 @@
 					return unlockButton;
 				}
 
-				$("#unlockUserDialog").dialog({
-      				autoOpen: false,
-      				modal: true
-    			});
-
+				
 			})
 			
 			function submitForm () {
@@ -89,6 +93,10 @@
 		</script>
 	</head>
 	<body>
+		<div id="unlockUserDialog" title="Unlock User Login">
+	
+		</div>
+
 		<div class="body fluid" ng-app="tdsAdmin" ng-controller="tds.admin.controller.MainController as admin">
 			<h1 ng-teast>UserLogin List - ${isActive == 'N' ? 'Inactive' : 'Active'} Users</h1>
 			<br/>
@@ -104,22 +112,6 @@
 			<jqgrid:wrapper id="userLoginId" />
 			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 		</div>
-
-		<div id="unlockUserDialog" title="Unlock User Login">
-		<ul>
-			<li id="udUsername"></li>
-			<li id="udFailedLogins"></li>
-			<li id="udLockedOutUntil"></li>
-		</ul><br/>
-  		<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>
-		</div>
-		<div id="unlockUserDialog" title="Unlock User Login">
-		<ul>
-			<li id="udUsername"></li>
-			<li id="udFailedLogins"></li>
-			<li id="udLockedOutUntil"></li>
-		</ul><br/>
-  		<p>You are about to unlock user account, press Okay to continue or press Cancel to abort.</p>
-		</div>
+		
 	</body>
 </html>
