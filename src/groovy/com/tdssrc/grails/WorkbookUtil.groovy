@@ -14,7 +14,7 @@ import java.text.DateFormat
  *
  */
 class WorkbookUtil {
-	private static final LOG = LogFactory.getLog(WorkbookUtil.class)
+	private static final log = LogFactory.getLog(WorkbookUtil.class)
 
 	public static getSheetNames(workbook) {
 		def result = []
@@ -116,6 +116,15 @@ class WorkbookUtil {
 		return result
 	}
 
+	public static getDateTimeCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormat, failedIndicator=-1) {
+		Date date = getDateCellValue(sheet, columnIdx, rowIdx, dateFormat, failedIndicator)
+		if(tzId){
+			def olddate = date
+			date = TimeUtil.moveDatefromGMTtoTZ(date, tzId)
+			log.info("OLB: SHIFT: '$olddate' => '$date'")
+		}
+		return date
+	}
 
 	/**
 	 * Used to attempt to access a date value from a cell
@@ -147,7 +156,7 @@ class WorkbookUtil {
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done since they are already stored without TZ					
 					result = cell.getDateCellValue()					
-					LOG.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
+					log.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
 					break
 
 				case Cell.CELL_TYPE_STRING:					
@@ -156,10 +165,10 @@ class WorkbookUtil {
 						try{ 
 							result = dateFormat.parse(str) 
 						}catch(e){ 
-							LOG.info("OLB: ${e.getMessage()}; FORMAT:\"${dateFormat.toPattern()}\""); 
+							log.info("OLB: ${e.getMessage()}; FORMAT:\"${dateFormat.toPattern()}\""); 
 							result = failedIndicator
 						}
-						LOG.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
+						log.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
 					}
 					break
 

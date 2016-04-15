@@ -1434,15 +1434,10 @@ class AccountImportExportService {
 				if (colPos != null) {
 					switch (info.type) {
 						case 'datetime': 
-							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetDateTimeFormatter)
+							value = WorkbookUtil.getDateTimeCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateTimeFormatter)
 							if (value == -1) {
 								value = ''
 								account.errors << "Invalid date value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
-							}else{
-								// We shift to the Sheet's TZ					
-								def oldvalue = value
-								value = TimeUtil.moveDatefromGMTtoTZ(value, sheetInfoOpts.sheetTzId)
-								log.info("OLB: SHIFT: '$oldvalue' => '$value'")
 							}
 							break
 						case 'date':
