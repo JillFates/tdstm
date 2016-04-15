@@ -147,18 +147,19 @@ class WorkbookUtil {
 				case Cell.CELL_TYPE_NUMERIC:
 					// Dates stored in the spreadsheet are done since they are already stored without TZ					
 					result = cell.getDateCellValue()					
-					//LOG.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
+					LOG.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
 					break
 
 				case Cell.CELL_TYPE_STRING:					
 					String str = cell.getStringCellValue()
 					if (str) {
-
-						try{ result = dateFormat.parse(str) }catch(e){ LOG.info("OLB: ${e.getMessage()}; FORMAT:\"${dateFormat.toPattern()}\""); }
-						if (!result) {
+						try{ 
+							result = dateFormat.parse(str) 
+						}catch(e){ 
+							LOG.info("OLB: ${e.getMessage()}; FORMAT:\"${dateFormat.toPattern()}\""); 
 							result = failedIndicator
 						}
-						//LOG.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
+						LOG.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
 					}
 					break
 

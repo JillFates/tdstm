@@ -1442,7 +1442,7 @@ class AccountImportExportService {
 								// We shift to the Sheet's TZ					
 								def oldvalue = value
 								value = TimeUtil.moveDatefromGMTtoTZ(value, sheetInfoOpts.sheetTzId)
-								//log.info("OLB: SHIFT: '$oldvalue' => '$value'")
+								log.info("OLB: SHIFT: '$oldvalue' => '$value'")
 							}
 							break
 						case 'date':
