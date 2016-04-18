@@ -346,9 +346,10 @@ class TimeUtil {
 	 * @param the formatterType defines the format to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTime(session, dateValue, String formatterType=FORMAT_DATE_TIME) {
+	public static String formatDateTime(HttpSession session, dateValue, String formatterType=FORMAT_DATE_TIME) {
 		def formatter = createFormatter(session, formatterType)
-		return formatDateTime(session, dateValue, formatter)
+		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+		return formatDateTime(tzId, dateValue, formatter)
 	}
 
 	/**
@@ -358,7 +359,12 @@ class TimeUtil {
 	 * @param the formatter defines the formatter to be used
 	 * @return The date formatted
 	 **/
-	public static String formatDateTime(session, dateValue, DateFormat formatter) {
+	public static String formatDateTime(HttpSession session, dateValue, DateFormat formatter) {
+		if (!formatter) {
+			// TODO : JPM 4/2016 : formatDateTimeWithTZ should throw InvalidParamException vs RuntimeException (fix below and test cases too)
+			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
+			throw new RuntimeException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
+		}
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
@@ -384,6 +390,11 @@ class TimeUtil {
 	 * @return The date formatted
 	 **/
 	public static String formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter) {
+		println "formatDateTimeWithTZ() tzId=$tzId, dateValue=$dateValue, formatter=${formatter ? formatter.toPattern() : null}"
+		if (!formatter) {
+			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
+			throw new RuntimeException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
+		}
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		return formatter.format(dateValue)
 	}

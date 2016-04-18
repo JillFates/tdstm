@@ -318,7 +318,7 @@ class AccountImportExportService {
 
 		Map sheetOptions = getUserPreferences(session)
 
-		updateSpreadsheetTitleTab(byWhom, project, workbook, sheetOptions)
+		updateTitleSheetInfo(byWhom, project, workbook, sheetOptions)
 
 		sendSpreadsheetToBrowser(response, workbook, filename)
 
@@ -678,11 +678,13 @@ class AccountImportExportService {
 		map.dateTimeFormatter = TimeUtil.createFormatterForType(map.userDateFormat, TimeUtil.FORMAT_DATE_TIME_22)
 
 		if (! map.dateFormatter ) {
-			throw new RuntimeException("Unable to load Date formatter for ${map.dateFormat}")
+			throw new RuntimeException("Unable to load Date formatter for ${map.dateFormatter}")
 		}
 		if (! map.dateTimeFormatter) {
-			throw new RuntimeException("Unable to load DateTime formatter for ${map.dateTimeFormat}")
+			throw new RuntimeException("Unable to load DateTime formatter for ${map.dateTimeFormatter}")
 		}
+
+		log.debug "getUserPreferences() preferences=$map, dateFormatter=${map.dateFormatter.toPattern()}, dateTimeFormatter=${map.dateTimeFormatter.toPattern()}"
 
 		return map
 	}
@@ -1151,18 +1153,20 @@ class AccountImportExportService {
 	 * @param project - the project that this export is for
 	 * @param sheet - the spreadsheet to update
 	 */
-	private void updateSpreadsheetTitleTab(UserLogin byWhom, Project project, sheet, sheetOptions) {
+	private void updateTitleSheetInfo(UserLogin byWhom, Project project, sheet, sheetOptions) {
 		def tab = sheet.getSheet(TEMPLATE_TAB_TITLE)
 
 		if (!tab) {
 			throw new EmptyResultException("The $TEMPLATE_TAB_TITLE sheet is missing from the workbook")
 		}
 
-		def exportedOn = TimeUtil.formatDateTimeWithTZ(sheetOptions.userTzId, sheetOptions.dateTimeFormat, new Date())
+		def exportedOn = TimeUtil.formatDateTimeWithTZ(sheetOptions.userTzId, new Date(), sheetOptions.dateTimeFormatter)
+		log.debug "updateTitleSheetInfo() sheetOptions=$sheetOptions"
+		log.debug "updateTitleSheetInfo() exportedOn=$exportedOn, dateTimeFormat=${sheetOptions.dateTimeFormatter.toPattern()}"
 
 		def addToCell = { prop, val ->
 			if (! TitlePropMap.containsKey(prop)) {
-				throw new RuntimeException("updateSpreadsheetTitleTab() referenced invalid element '$prop' of TitlePropMap")
+				throw new RuntimeException("updateTitleSheetInfo() referenced invalid element '$prop' of TitlePropMap")
 			}
 			WorkbookUtil.addCell(tab, TitlePropMap[prop][0], TitlePropMap[prop][1], val)
 		}
@@ -1360,9 +1364,9 @@ class AccountImportExportService {
 
 		List elapsedNow = [new Date()]
 
-		updateSpreadsheetTitleTab(byWhom, project, workbook, sheetInfoOpts)
+		updateTitleSheetInfo(byWhom, project, workbook, sheetInfoOpts)
 
-		// log.debug "updateSpreadsheetTitleTab took ${ TimeUtil.elapsed(elapsedNow) }"
+		// log.debug "updateTitleSheetInfo took ${ TimeUtil.elapsed(elapsedNow) }"
 
 		def sheet = workbook.getSheet(TEMPLATE_TAB_NAME)
 
@@ -2170,8 +2174,12 @@ class AccountImportExportService {
 			}
 		}
 
-		if (! shouldUpdateUserLogin(sheetInfoOpts) && changeMap.hasChanges) {
-			account.errors << 'Unplanned change on security roles'
+		if (! shouldUpdateUserLogin(sheetInfoOpts)) {
+			if (changeMap.hasChanges) {
+				account.errors << 'Unplanned change on security roles'
+			} 
+// TODO : FIX THIS LOGIC
+			//if (has)
 		}
 
 		return ok

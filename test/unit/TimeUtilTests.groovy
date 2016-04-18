@@ -18,25 +18,7 @@ import spock.lang.Specification
 @TestFor(AdminController)
 class TimeUtilTests extends Specification {
 
-	def 'Test the formatDate for invalid type (GrailsHttpSession, Timestamp)'() {
-		// No signature of method: static com.tdssrc.grails.TimeUtil.formatDate() is applicable for argument types: 
-		// (org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession, java.sql.Timestamp)
-		// TM-4795
-		setup:
-			// Mock the bullshit format of session attributes ...
-			def mockSession = new GrailsHttpSession(request)
-			mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': TimeUtil.MIDDLE_ENDIAN ] )
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': 'GMT' ] )
 
-			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
-			long oneDay = 60*60*24*1000
-			Timestamp ts = new Timestamp(oneDay)
-			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
-		expect:
-			TimeUtil.formatDate(mockSession, ts) == '01/02/1970'
-			TimeUtil.formatDate(ts, formatter) == '02/01/1970'
-	}
-	
 	public void testAgoWithSeconds() {
 		expect:
 		'25s' == TimeUtil.ago(25)
@@ -193,5 +175,49 @@ class TimeUtilTests extends Specification {
 			TimeUtil.FORMAT_DATE_TIME_23 | "MM/dd/yy"
 			TimeUtil.FORMAT_DATE_TIME_24 | "MM/dd/yyyy hh:mm:ss"
 			TimeUtil.FORMAT_DATE_TIME_25 | "MM/dd/yyyy hh:mm"		 
+	}
+
+	//
+	// formatDate tests
+	//
+
+	def 'Test formatDate(HttpSession session, Date dateValue) and formatDate(Date dateValue, DateFormat formatter)'() {
+		// No signature of method: static com.tdssrc.grails.TimeUtil.formatDate() is applicable for argument types: 
+		// (org.codehaus.groovy.grails.web.servlet.mvc.GrailsHttpSession, java.sql.Timestamp)
+		// TM-4795
+		setup:
+			// Mock the bullshit format of session attributes ...
+			def mockSession = new GrailsHttpSession(request)
+			mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': TimeUtil.MIDDLE_ENDIAN ] )
+			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': 'GMT' ] )
+
+			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
+			long oneDay = 60*60*24*1000
+			Timestamp ts = new Timestamp(oneDay)
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDate(mockSession, ts) == '01/02/1970'
+			TimeUtil.formatDate(ts, formatter) == '02/01/1970'
+	}
+	
+	def 'Test formatDateTime(HttpSession session, dateValue, DateFormat formatter)'() {
+		setup:
+			// Mock the bullshit format of session attributes ...
+			def mockSession = new GrailsHttpSession(request)
+			mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': TimeUtil.MIDDLE_ENDIAN ] )
+			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': 'GMT' ] )
+		when:
+			TimeUtil.formatDateTime(mockSession, new Date(), null)
+		then: 'Make sure that a null formatter causes an exception'
+			// thrown(InvalidParamException)
+			thrown(RuntimeException)
+	}
+
+	def 'Test formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter)'() {
+		when:
+			TimeUtil.formatDateTime('GMT', new Date(), null)
+		then: 'Make sure that a null formatter causes an exception'
+			// thrown(InvalidParamException)
+			thrown(RuntimeException)
 	}
 }
