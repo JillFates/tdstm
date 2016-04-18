@@ -201,6 +201,7 @@ class TimeUtilTests extends Specification {
 	}
 
 	def 'Test formatDate(String tzId, Date dateValue, DateFormat formatter)'() {
+		setup:
 			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
 			long twoDays = 60*60*48*1000	// Have to push the time out two days since we're stripping off the time portion
 			Timestamp timestamp = new Timestamp(twoDays).clearTime()
@@ -220,6 +221,16 @@ class TimeUtilTests extends Specification {
 		then: 'Make sure that a null formatter causes an exception'
 			// thrown(InvalidParamException)
 			thrown(RuntimeException)
+	}
+
+	def 'Test formatDateTime(String tzId, Date dateValue, DateFormat formatter)'() {
+		setup:
+			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
+			long twoDays = 60*60*48*1000	// Have to push the time out two days since we're stripping off the time portion
+			Timestamp timestamp = new Timestamp(twoDays).clearTime()
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDateTime('GMT', timestamp, formatter) == '02/01/1970'
 	}
 
 	def 'Test formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter)'() {
