@@ -343,6 +343,12 @@ class AccountImportExportService {
 			throw new UnauthorizedException('Do not have the required permission to export user information')
 		}
 
+		int loginChoice = NumberUtil.toPositiveLong(formOptions.loginChoice, -1)
+		if (loginChoice < 0 || loginChoice > 4) {
+				throw new InvalidParamException('The User Login Filter option was not properly specified')
+		}
+		formOptions.loginChoice = loginChoice
+
 		def spreadsheet = generateAccountExportSpreadsheet(session, byWhom, project, formOptions)
 
 		// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
@@ -1378,29 +1384,55 @@ class AccountImportExportService {
 				log.info "Exported $row staff records of $max"
 			}
 			Map account = personToFieldMap(person, project, sheetInfoOpts)
+			
+			boolean includeAccount=false
+			UserLogin userLogin = person.userLogin
 
 			//log.debug "personToFieldMap took ${ TimeUtil.elapsed(elapsedNow) }"
+			switch (formOptions.loginChoice) {
+				case 1:
+					// With login account
+					if (userLogin) {
+						includeAccount=true
+					}
+					break
 
+				case 2:
+					// With NO login account
+					if (! userLogin) {
+						includeAccount=true
+					}
+					break
+
+				case 3: 
+					// With ACTIVE account
+					if (userLogin && userLogin.userActive()) {
+						includeAccount=true
+					}
+					break
+
+				case 4:
+					// With INACTIVE account
+					if (userLogin && ! userLogin.userActive()) {
+						includeAccount=true
+					}
+					break
+
+				default:
+					includeAccount=true
+			}
+
+			if (! includeAccount) {
+				return
+			}
 
 			if (formOptions.includeLogin=='Y') {
-				UserLogin userLogin = person.userLogin
+
 				if (userLogin) {
-					boolean includeLogin = formOptions.loginChoice=='0'
-					if (!includeLogin) {
-						boolean isActive = userLogin.userActive()
-						if ((formOptions.loginChoice=='1' && isActive) || (formOptions.loginChoice=='2' && !isActive)) {
-							includeLogin = true
-						}
-					}
-					if (includeLogin) {
-						// log.debug "populateAccountSpreadsheet() calling userLoginToFieldMap with sheetInfoOpts=$sheetInfoOpts"	
-
-						Map userMap = userLoginToFieldMap(userLogin, sheetInfoOpts)
-						// log.debug "userMap = $userMap"
-						account.putAll(userMap)
-						// log.debug "userLoginToFieldMap took ${ TimeUtil.elapsed(elapsedNow) }"
-					}
-
+					Map userMap = userLoginToFieldMap(userLogin, sheetInfoOpts)
+					// log.debug "userMap = $userMap"
+					account.putAll(userMap)
+					// log.debug "userLoginToFieldMap took ${ TimeUtil.elapsed(elapsedNow) }"
 				}
 			}
 
@@ -2125,6 +2157,7 @@ class AccountImportExportService {
 	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List authorizedRoleCodes, Map sheetInfoOpts ) {
 		boolean ok=false
 		
+		log.debug "validateSecurityRoles() validating by byWhom - authorizedRoleCodes=$authorizedRoleCodes"
 		String prop='roles'
 		List currentRoles = []
 		boolean isNewUser = true
@@ -2334,7 +2367,7 @@ class AccountImportExportService {
 
 				// Check for violations
 				if (violationCodes) {
-					panicButton "Specified unauthorized security role${violationCodes.size()>1?'s':''} ($violationCodes)"
+					panicButton "Unauthorized security role ${violationCodes.size()>1?'s':''} (${violationCodes.join(', ')})"
 					return
 				}
 				

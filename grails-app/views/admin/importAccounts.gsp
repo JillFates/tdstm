@@ -58,8 +58,6 @@
 						</label>
 						<br />
 						<br />
-
-						<br />
 						<button type="submit" class="btn btn-default">
 							Upload Spreadsheet
 							<span class="uploadIcon glyphicon glyphicon-upload" aria-hidden="true"></span>

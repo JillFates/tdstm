@@ -49,22 +49,25 @@
 
 
 							<div class="form-group">
-								<label class="col-sm-2 control-label radio-staff-group">User Login:</label>
+								<label class="col-sm-2 control-label select-login-choice">User Logins:</label>
 								<div class="col-sm-10">
-									<label><input type="checkbox" name="includeLogin" value="Y" ${includeLogin=='Y'?'checked':''} onClick="toggleLoginChoice(this);">&nbsp; Export Login Information</label>
-									<br>
-									<div class="login-export-info">
-										<label><input type="radio" name="loginChoice" value="0" ${loginChoice=='0'?'checked':''}>&nbsp; All Logins </label>
-										<br>
-										<label><input type="radio" name="loginChoice" value="1" ${loginChoice=='1'?'checked':''}>&nbsp; Active Logins</label>
-										<br>
-										<label><input type="radio" name="loginChoice" value="2" ${loginChoice=='2'?'checked':''}>&nbsp; Inactive Logins</label>
-										<br>
+									<div>
+										<select id="loginChoice" name="loginChoice">
+											<option value="0" ${!loginChoice ? 'checked':''}>Select Optional Filter</option>
+											<option value="1" ${loginChoice=='1'?'checked':''}>With Login Account</option>
+											<option value="2" ${loginChoice=='2'?'checked':''}>Without Login Account</option>
+											<option value="3" ${loginChoice=='3'?'checked':''}>Active Accounts</option>
+											<option value="4" ${loginChoice=='4'?'checked':''}>Inactive Accounts</option>
+										</select>
 									</div>
-									<span class="footnote">Note that passwords are never exported</span>
+									<br>
+									<label><input type="checkbox" name="includeLogin" value="Y" ${includeLogin=='Y'?'checked':''} onClick="toggleLoginChoice(this);">&nbsp; Include Login Information in Export</label>
+									<br>
+									<span class="footnote">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Note that passwords are never exported</span>
 								</div>
 							</div>
 
+							<br>
 
 							<button type="submit" class="btn btn-default">
 								Export to Excel

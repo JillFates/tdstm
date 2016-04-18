@@ -1808,6 +1808,12 @@ div.account-export .panel-body .radio-staff-group {
 	padding-top: 0px !important;
 }
 
+div.account-export select#loginChoice {
+	height: 32px;
+	width: 250px;
+	margin-top: 0px;
+}
+
 div.account-export .exportIcon {
 	margin-left: 6px;
 }
