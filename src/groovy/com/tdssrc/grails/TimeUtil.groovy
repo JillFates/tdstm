@@ -520,13 +520,12 @@ class TimeUtil {
 	 * @param formatterType - the formatter type to be used
 	 * @param timezone - timezone to set the formatter
 	 * @return formatter - the middle or little-endian version of the format desired
-	 *//*
+	 */
 	public static DateFormat createFormatterForType(String userPrefFormat, String formatterType, String timezone) {
 		def formatter = createFormatterForType(userPrefFormat, formatterType)
 		formatter?.setTimeZone(TimeZone.getTimeZone(timezone))
 		return formatter
 	}
-	*/
 
 	/**
 	 * Creates a formatter based on the options presented. Based on the formatType being set to the
@@ -680,46 +679,67 @@ class TimeUtil {
 	}
 
 	/**
-	 * Used to move a Date to GMT
-	 * @param dateValue the date to move
-	 * @param session the session information (to get timezone and format type)
-	 * @return The date
+	 * Used to move a Date to GMT which will fetch the user's configured timezone
+	 * in order to determine the timezone that the date is currently in.
+	 * @param dateValue - the date to move
+	 * @param session - the session information (to get timezone and format type)
+	 * @return the adjusted date
 	 **/
 	public static Date moveDateToTZ(dateValue, HttpSession session) {
 		def result
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
-		return moveDateToTZ("GMT", tzId)
+		return moveDateToTZ('GMT', tzId)
 	}
 
 	/**
 	 * Used to move a Date from GMT to TZ
-	 * @param dateValue the date to move
-	 * @param session the session information (to get timezone and format type)
-	 * @return The date
+	 * @param dateValue - the date to move
+	 * @param session - the session information (to get timezone and format type)
+	 * @return the adjusted date
 	 **/
-	public static Date moveDatefromGMTtoTZ(Date date, String toTZ) {
-		return moveDateToTZ(date, "GMT", toTZ)
+	public static Date moveDateFromGMT(Date date, String toTZ) {
+		return moveDateToTZ(date, 'GMT', toTZ)
 	}
 
 	/**
-	 * Generic TimeZone Shifter
-	 * gets a Date and shifts it from a TZ to another TZ
-	 * @param date the date to move
-	 * @fromTZ TZ where the Date Begins
-	 * @toTZ TZ where we want the Date Equivalent
+	 * Used to adjust a Date from GMT to a specified Timezone
+	 * @param dateValue - the date to adjust
+	 * @param session - the session information (to get timezone and format type)
+	 * @return The adjusted date
+	 **/
+	public static Date moveDateToGMT(Date date, String toTZ) {
+		if (toTZ == 'GMT') {
+			return date
+		} else {
+			return moveDateToTZ(date, 'GMT', toTZ)
+		}
+	}
+
+	/**
+	 * A generic TimeZone Shifter to adjust a date from one timezone to another
+	 * @param date - the date to move
+	 * @param fromTZ - the timezone that the date was generated in
+	 * @param toTZ -  the timezone that the date will be adjusted to
+	 * @return the adjusted date
 	 * @author @tavo_luna
 	 */
 	public static Date moveDateToTZ(Date date, String fromTZ, String toTZ){
 		def result
-		if(date!=null){
-	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-	    formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
-	    String dateFormatted = formatter.format(date)
 
-	    formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
-	    result = formatter.parse(dateFormatted)
-	  }
-	  return result
+		if (fromTZ == toTZ) {
+			return date
+		}
+
+		if (date != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
+			formatter.setTimeZone(TimeZone.getTimeZone(fromTZ))
+			String dateFormatted = formatter.format(date)
+
+			formatter.setTimeZone(TimeZone.getTimeZone(toTZ))
+			result = formatter.parse(dateFormatted)
+		}
+		
+		return result
 	}
 
 }

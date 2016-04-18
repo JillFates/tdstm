@@ -155,14 +155,14 @@ class ProjectService {
 		def projectIds = []
 		def timeNow = new Date() 
 		
-		searchParams=searchParams?:[:]
+		searchParams = searchParams ?: [:]
 		def maxRows = searchParams.maxRows ? Integer.valueOf(searchParams.maxRows) : Project.count()
 		def currentPage = searchParams.currentPage ? Integer.valueOf(searchParams.currentPage) : 1
 		def rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		def sortOn = searchParams.sortOn?:ProjectSortProperty.PROJECT_CODE
-		def sortOrder = searchParams.sortOrder?:SortOrder.ASC
-		def projParams=searchParams.params?: [:]
-		def personId = searchParams.personId?:userLogin.person.id
+		def sortOn = searchParams.sortOn ?: ProjectSortProperty.PROJECT_CODE
+		def sortOrder = searchParams.sortOrder ?: SortOrder.ASC
+		def projParams=searchParams.params ?: [:]
+		def personId = searchParams.personId ?: userLogin.person.id
 		def person = Person.get(personId)
 		def companyParty = person.company
 
@@ -175,7 +175,7 @@ class ProjectService {
 			projectIds = getProjectsWherePersonIsStaff(person, projectStatus).id
 		}
 		if (!projectIds) {
-				return []
+			return []
 		}
 
 		def startDates = projParams.startDate ? Project.findAll("from Project where startDate like '%${projParams.startDate}%'")?.startDate : []
@@ -1493,7 +1493,7 @@ class ProjectService {
 		if (! (teamCodes instanceof List)) {
 			teamCodes = [ teamCodes ]
 		}
-		List currentTeams = person.getAssignedTeams(project).id
+		List currentTeams = person.getTeamsAssignedTo(project).id
 		teamCodes.each {tc ->
 			if (! currentTeams.contains(tc)) {
 				partyRelationshipService.addStaffFunction(person, tc, person.company, project)

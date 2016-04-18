@@ -1,20 +1,24 @@
-package com.tdssrc.grails;
+package com.tdssrc.grails
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.hssf.util.CellReference
 import java.text.DateFormat
+import java.util.TimeZone
+
 /**
  * The WorkbookUtil class contains a collection of useful Apache POI manipulation methods
- * 
- * @author Diego Scarpa <diego.scarpa@bairesdev.com>
- *
  */
+@Singleton
 class WorkbookUtil {
-	private static final log = LogFactory.getLog(WorkbookUtil.class)
+	private static log = LogFactory.getLog(WorkbookUtil.class)
+
+	WorkbookUtil() {
+		log = LogFactory.getLog(this.class)
+	}
 
 	public static getSheetNames(workbook) {
 		def result = []
@@ -68,7 +72,9 @@ class WorkbookUtil {
 	}
 
 	/**
-	 * Used to attempt to access a date value from a cell
+	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will use the 
+	 * user's currently configured timezone to read the values as string.
+	 *
 	 * @param sheet - the sheet to extract the value
 	 * @param columnIdx - the column to reference (offset starts at zero)
 	 * @param rowIdx - the row to reference (offset start at zero)
@@ -77,14 +83,9 @@ class WorkbookUtil {
 	 * @return The date from the specified cell or null if empty
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
 	 * @throws ParseException - if the field contains an invalid formatted String value
-	 * 
+	 * @deprecated Please use getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) 
 	 */
-	public static getDateCellValue(
-		Sheet sheet, 
-		Integer columnIdx, Integer rowIdx, 
-		session, 
-		String formatterTypes=null
-	) {
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, String formatterTypes=null) {
 		Date result
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
 
@@ -116,69 +117,96 @@ class WorkbookUtil {
 		return result
 	}
 
-	public static getDateTimeCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormat, failedIndicator=-1) {
-		Date date = getDateCellValue(sheet, columnIdx, rowIdx, dateFormat, failedIndicator)
-		if(tzId){
-			def olddate = date
-			date = TimeUtil.moveDatefromGMTtoTZ(date, tzId)
-			log.info("OLB: SHIFT: '$olddate' => '$date'")
-		}
-		return date
-	}
-
 	/**
-	 * Used to attempt to access a date value from a cell
+	 * Used to read a date value from a cell in a spreadsheet using a DateFormat formatter which will make an assumption
+	 * that the date in the spreadsheet is in GMT.
+	 * 
+	 * The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
+	 * if the cell type is wrong or there was a parser error.
+	 *
 	 * @param sheet - the sheet to extract the value
 	 * @param columnIdx - the column to reference (offset starts at zero)
 	 * @param rowIdx - the row to reference (offset start at zero)
-	 * @param dateFormat - list if formats to use if parsing a string value
+	 * @param dateFormatter - a DateFormat object used to parser the date from a string
 	 * @param failedIndicator - a value that can be checked to determine if parsing was involved and it failed (default -1)
-	 * @return The date from the specified cell or null if empty
+	 * @return The date from the specified cell, null if empty or the failedIndicator if unable to parse
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
-	 * @throws ParseException - if the field contains an invalid formatted String value
-	 * 
 	 */
-	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) {
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormatter, failedIndicator=-1) {
+		def value = getDateTimeCellValue(sheet, columnIdx, rowIdx, 'GMT', dateFormatter, failedIndicator)
+		if (value != null && value != failedIndicator) {
+			// Strip any time component of the date
+			value.clearTime()
+		}
+		return value
+	}
+
+	/**
+	 * Used to read a datetime value from a cell in a spreadsheet using a DateFormat formatter. The formatter will be set to the
+	 * timezone that was passed. This will attempt to read the numeric value which will have a datetime that was generated into 
+	 * the timezone of the user's Timezone so it will read it in and convert the date back to GMT appropriately. 
+	 *
+	 * The method should return the value as a Date if valid, a null if the cell was empty or will return the failedIndicator value
+	 * if the cell type is wrong or there was a parser error.
+	 *
+	 * @param sheet - the sheet to extract the value
+	 * @param columnIdx - the column to reference (offset starts at zero)
+	 * @param rowIdx - the row to reference (offset start at zero)
+	 * @param tzId - the timezone used when the dates were written to the spreadsheet
+	 * @param dateFormatter - a DateFormat object used to parser the date from a string
+	 * @param failedIndicator - a value that can be checked to determine if parsing was involved and it failed (default -1)
+	 * @return The date from the specified cell, null if empty or the failedIndicator if unable to parse
+	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
+	 */
+	public static getDateTimeCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, String tzId, DateFormat dateFormatter, failedIndicator=-1) {
 		def result
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
-
+		// println "getDateTimeCellValue() called for $columnIdx,$rowIdx, cellType=${cell.getCellType()} FORMAT:'${ dateFormatter.toPattern() }'"
 		if (cell) {
 			switch (cell.getCellType()) {
 				case Cell.CELL_TYPE_BLANK:
 					break
 
-				case Cell.CELL_TYPE_ERROR:
-				case Cell.CELL_TYPE_BOOLEAN:
-				case Cell.CELL_TYPE_FORMULA: 
-					result = failedIndicator
-					break
-
 				case Cell.CELL_TYPE_NUMERIC:
+					// We are assuming that the dates in the spreadsheet are written in the timezone of the user (para)
 					// Dates stored in the spreadsheet are done since they are already stored without TZ					
-					result = cell.getDateCellValue()					
-					log.info("OLB: CELL_TYPE_NUMERIC '${cell}' => '$result'")
+					Date dateInTz = cell.getDateCellValue()	
+
+					// Now we need to shift the date to GMT so that it is correct TZ
+					result = TimeUtil.moveDateToGMT(dateInTz, tzId)
+					// println "getDateTimeCellValue() CELL_TYPE_NUMERIC cell '${cell}'=>'$dateInTz' adjusted from $tzId to GMT=> $result"
+
 					break
 
 				case Cell.CELL_TYPE_STRING:					
 					String str = cell.getStringCellValue()
 					if (str) {
-						try{ 
-							result = dateFormat.parse(str) 
-						}catch(e){ 
-							log.info("OLB: ${e.getMessage()}; FORMAT:\"${dateFormat.toPattern()}\""); 
+						try {
+							// Let's not assume that the user set the Timezone on the parser
+							// println "getDateTimeCellValue() CELL_TYPE_STRING str=$str; cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})" 
+							TimeZone tz=TimeZone.getTimeZone(tzId)
+							dateFormatter.setTimeZone(tz)
+							result = dateFormatter.parse(str) 
+						} catch (e) { 
+							// log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${ dateFormat.toPattern() }'"
+							// println "getDateTimeCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }" 
 							result = failedIndicator
 						}
-						log.info("OLB: CELL_TYPE_STRING '$str' => '$result'")
+						// println "getDateTimeCellValue() CELL_TYPE_STRING cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})" 
+						// println "getDateTimeCellValue() CELL_TYPE_STRING '$str' => '$result'"
 					}
 					break
 
 				default:
-					throw new IllegalArgumentException("Invalid date value in ${columnCode(columnIdx)}${rowIdx+1} (${cell.getCellType()})")
+					// If the cell type is any other value just fail
+					result = failedIndicator
+					break
 			}
 		}
 
 		return result
 	}
+
 	public static getIntegerCellValue(sheet, columnIdx, rowIdx) {
 		def result = null
 		def cell = getCell(sheet, columnIdx, rowIdx)

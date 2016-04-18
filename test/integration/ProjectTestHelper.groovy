@@ -8,14 +8,18 @@
  */
 
 import com.tdsops.common.grails.ApplicationContextHolder
-
+import org.apache.commons.lang.RandomStringUtils as RSU
 
 class ProjectTestHelper {
-	def projectService
-	Long projectId = 2445 
 
+	static def projectService
+	static def partyRelationshipService
+	static final Long projectId = 2445 
+
+	// Constructor - Used to initialize the class
 	ProjectTestHelper() {
-		projectService = ApplicationContextHolder.getService('projectService')	
+		projectService = ApplicationContextHolder.getService('projectService')
+		partyRelationshipService = ApplicationContextHolder.getService('partyRelationshipService')
 		assert (projectService instanceof ProjectService)
 	}
 
@@ -38,6 +42,63 @@ class ProjectTestHelper {
 		List moveEvent = MoveEvent.findAllByProject(project, [max:1]) // Grab any one of the events
 		assert moveEvent
 		return moveEvent[0]
+	}
+
+	/**
+	 * Used to create a project
+	 */
+	Project createProject(PartyGroup company=null) {
+
+		Project project = new Project()
+		project.with {
+			client = createCompany('Owner')
+			projectCode = RSU.randomAlphabetic(10)
+			description = 'Test project created by the ProjectTestHelper'
+			startDate = new Date()
+			completionDate = startDate + 30
+			client = createClient()
+			workflowCode = 'STD_PROCESS'
+			timezone = 'GMT'
+		}
+
+		project.save(failOnError:true)
+
+		// Save the company that owns the project
+		if (!company) {
+			company = createCompany('Owner')
+		}
+		project.owner = company
+		project.save(failOnError:true)
+
+		return project
+	}
+
+	/** 
+	 * Used to create a company
+	 * @param prefix - a prefix string that will prefix the company name if provided
+	 * @return a freshly minted company
+	 */
+	PartyGroup createCompany(String prefix) {
+		PartyType pt = PartyType.get('COMPANY')
+		PartyGroup company = new PartyGroup()
+		company.with {
+			type = pt
+			name = (prefix ? "$prefix " : '') + RSU.randomAlphabetic(10)
+		}
+
+		company.save(failOnError:true)
+	}
+
+	/** 
+	 * Used to create a company as a client and assign them as a client of a company
+	 * @param prefix - a prefix string that will prefix the company name if provided
+	 * @return a freshly minted company
+	 */
+	PartyGroup createClient(PartyGroup company) {
+		PartyType pt = PartyType.get('COMPANY')
+
+		PartyGroup client = createCompany('Client')
+		partyRelationshipService.assignClientToCompany(client, company)
 	}
 
 }

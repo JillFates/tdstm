@@ -68,6 +68,24 @@ class PartyRelationshipService {
 	}
 	
 	/**
+	 * Used to assign a company as a client of another
+	 * @param client - the company to be the client in the relationship
+	 * @param company - the company that will have the other as a client
+	 */
+	void assignClientToCompany(PartyGroup client, PartyGroup company) {
+		savePartyRelationship( "CLIENTS", company, "COMPANY", client, "CLIENT" )
+	}
+
+	/**
+	 * Used to assign a company as a client of another
+	 * @param client - the company to be the partner in the relationship
+	 * @param company - the company that will have the other as a client
+	 */
+	void assignPartnerToCompany(PartyGroup partner, PartyGroup company) {
+		savePartyRelationship( "PARTNERS", company, "COMPANY", partner, "PARTNER" )
+	}
+
+	/**
 	 * Used to retrieve the Company PartyGroup for a given Party
 	 * @param Party - a party object to get the Company PartyGroup
 	 * @return PartyGroup - the partyGroup that represents the company
@@ -576,6 +594,7 @@ class PartyRelationshipService {
 		}
 		
 	}
+
 	/*
 	 *  Method will return the Project Team Members
 	 */

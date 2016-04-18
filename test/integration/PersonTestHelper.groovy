@@ -31,7 +31,7 @@ class PersonTestHelper {
 	 * @param teams - a list of teams to add the person to (default ['PROJ_MGR'])
 	 * @return the newly created person
 	 */
-	Person createPerson(Person byWhom, PartyGroup company, Project project=null, Map personProps=null, List teams=['PROJ_MGR']) {
+	Person createPerson(Person byWhom, PartyGroup company, Project project=null, Map personProps=null, List teams=['PROJ_MGR'], roles=null) {
 		Map personMap = [firstName:"Test ${new Date()}", lastName: 'User', active:'Y', function: teams ]
 
 		// Apply any changes passed into the method
@@ -41,6 +41,14 @@ class PersonTestHelper {
 
 		Person person = personService.savePerson(personMap, byWhom, company.id, project, true)
 		assert person
+
+		if (roles) {
+			if (roles instanceof String) [
+				roles = [roles]
+			]
+			securityService.assignRoleCodes(person, roles)
+		}
+
 		return person
 	}
 

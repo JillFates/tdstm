@@ -1145,7 +1145,7 @@ def test() {
 	/**
 	 * This method renders the Export Accounts form
 	 */
-	def exportAccounts(){
+	def exportAccounts() {
 		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
 		if (!project) {
 			return
@@ -1175,7 +1175,7 @@ def test() {
 	 * @response Excel Spreadsheet 
 	 */
 	def exportAccountsProcess() {
-		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+		def (project, byWhom) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
 		if (!project) {
 			return
 		}
@@ -1187,18 +1187,8 @@ def test() {
 		]
 
 		try {
-			def session = getSession()
-
-			def spreadsheet = accountImportExportService.generateAccountExportSpreadsheet(session, user, project, formOptions)
-
-			// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
-			String projectName = project.projectCode.replaceAll(' ','')
-			String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
-			String filename = "${accountImportExportService.EXPORT_FILENAME_PREFIX}-$projectName-$formattedDate"
-
-			// Send the file out to the browser
-			accountImportExportService.sendSpreadsheetToBrowser(response, spreadsheet, filename)
-
+			// def session = getSession()
+			accountImportExportService.generateAccountsExportToBrowser(session, response, byWhom, project, formOptions) 
 			return
 
 		} catch (InvalidParamException e) {
@@ -1223,15 +1213,13 @@ def test() {
 		}
 
 		try {
-
 			// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
 			String projectName = project.projectCode.replaceAll(' ','')
 			String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 			String filename = "${accountImportExportService.IMPORT_FILENAME_PREFIX}-$projectName-$formattedDate"
 
-			accountImportExportService.generateImportTemplateToBrowser(response, session, byWhom, project, filename)
+			accountImportExportService.generateImportTemplateToBrowser(session, response, byWhom, project, filename)
 			return
-
 		} catch (InvalidRequestException e) {
 			flash.message = e.getMessage()
 		} catch (DomainUpdateException e) {
@@ -1269,32 +1257,9 @@ def test() {
 			// TODO : JPM 4/2016 : importAccountsReviewData This method should be refactored so that the bulk of the logic
 			// is implemented in the service.
 
-			def session = getSession()
 			Map formOptions = accountImportExportService.importParamsToOptionsMap(params)
-			List accounts = accountImportExportService.loadAndValidateSpreadsheet(session, user, project, params.filename, formOptions)
+			List accounts = accountImportExportService.generateReviewData(session, user, project, params.filename, formOptions)
 
-			//Map sheetOptions = accountImportExportService.getUserPreferences(session)
-			// Remove properties that shouldn't be sent over in the JSON and change the error list to a 
-			// delimited (|) string so that we can split it in the Kendo grid afterward
-			/*
-			for(int i=0; i < accounts.size(); i++) {
-				['person', 'companyObj'].each {prop ->
-					if (accounts[i][prop]) {
-						accounts[i][prop].discard()
-					}
-					accounts[i].remove(prop)
-				}
-				[ 'isLocal', 
-				  'isLocal'+accountImportExportService.ORIGINAL_SUFFIX, 
-				  'isLocal'+accountImportExportService.DEFAULTED_SUFFIX
-				].each { p ->
-					if (accounts[i].containsKey(p)) {
-						accounts[i][p] = accountImportExportService.xfrmToYN(accounts[i][p], sheetOptions)
-					}
-				}
-				accounts[i].errors = (accounts[i].errors ? accounts[i].errors.join('|') : '')
-			}
-			*/
 			ServiceResults.respondAsJson(response, accounts )
 
 		} catch(e) {
@@ -1323,9 +1288,12 @@ def test() {
 		}
 		String formAction='importAccounts'
 		String currentStep = (params.step ?: 'start')
+
+		// fileParamName is the name of the parameter that the file will be uploaded as
 		String fileParamName = 'importSpreadsheet'
 		Map model = [ step:currentStep, projectName:project.name, fileParamName:fileParamName ]
-		Map options
+		
+		Map options = accountImportExportService.importParamsToOptionsMap(params)
 		String view = 'importAccounts'
 		def session = getSession()
 
@@ -1336,6 +1304,14 @@ def test() {
 		try {
 
 			switch (step) {
+				case 'cancel':
+					String filename = params.filename
+					if (filename) {
+						accountImportExportService.cancelImport(user, project, options)
+					}
+					flash.message = "The previous import was cancelled"
+					model.step='' 	// start over
+					break
 
 				case 'upload':
 					// This step will save the spreadsheet that was posted to the server after reading it 
@@ -1347,7 +1323,8 @@ def test() {
 						return model
 					}
 
-					model = accountImportExportService.importAccount_Step1_Upload(session, user, project, request, fileParamName)
+					options.fileParamName = fileParamName
+					model = accountImportExportService.processFileUpload(session, request, user, project, options)
 					// Redirect the user to the Review step
 					forward( action:formAction, params: [stepAlt:'review', filename:model.filename, importOption: params.importOption] )
 					return
@@ -1356,8 +1333,7 @@ def test() {
 				case 'review':
 					// This step will serve up the review template that in turn fetch the review data 
 					// via an Ajax request.
-					options = accountImportExportService.importParamsToOptionsMap(params)
-					model << accountImportExportService.importAccount_Step2_Review(session, user, project, request, options)
+					model << accountImportExportService.generateModelForReview(session, user, project, options)
 					// log.debug "importAccounts() case 'review':\n\toptions=$options\n\tmodel=$model"
 					if (!options.filename && model.filename) {
 						// log.debug "importAccounts() step=$step set filename=${model.filename}"
@@ -1377,16 +1353,13 @@ def test() {
 					// This is the daddy of the steps in that it is going to post the changes back to the 
 					// database either creating or updating Person and/or UserLogin records.
 
-					// String filename = params.filename
-					options = accountImportExportService.importParamsToOptionsMap(params)
-
 					List optionErrors = accountImportExportService.validateImportOptions(options)
 					if (optionErrors) {
 						throw new InvalidParamException(optionErrors.toString())
 					}
 
 					// Here's the money maker call that will update existing accounts and create new ones accordingly
-					Map results = accountImportExportService.importAccount_Step3_PostChanges(session, user, project, options)
+					Map results = accountImportExportService.postChangesToAccounts(session, user, project, options)
 
 
 					render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
@@ -1413,7 +1386,7 @@ def test() {
 			flash.message = "An error occurred while attempting to import accounts"
 		}
 
-		render view:view, model:model	
+		render view:view, model:model
 	}
 
 	private String createUserForAccount(Person person, Project project, Map userSettings) {

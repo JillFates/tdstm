@@ -312,15 +312,13 @@ class StringUtil {
 	static Boolean toBoolean(String str) {
 		List trueList = ['y','yes','t','true','1']
 		List falseList = ['n', 'no', 'f', 'false', '0']
-		Boolean isTrue
+		Boolean isTrue=null
 		if (str != null) {
 			String match = str.toLowerCase()
 			if (trueList.contains(match)) {
 				isTrue = true
-			} else {
-				if (falseList.contains(match)) {
-					isTrue = false
-				}
+			} else if (falseList.contains(match)) {
+				isTrue = false
  			}
  		}
 		return isTrue

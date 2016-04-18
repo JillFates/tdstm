@@ -120,4 +120,5 @@ databaseChangeLog = {
 	//include file: '20160315-fix-orphan-records-asset_comment.groovy'
 	include file: '20160321-add-permission-restartapplication-admin.groovy'
 	include file: '20160325-recreate-orphaned-staff-team-references.groovy'
+	include file: '20160415-add-perms-for-accountImportExprt.groovy'
 }

@@ -11,6 +11,7 @@ import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.GormUtil
 import com.tdsops.common.grails.ApplicationContextHolder
 import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang.RandomStringUtils as RSU
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
@@ -54,6 +55,7 @@ class AccountImportExportService {
 	static final String DEFAULTED_SUFFIX = '_d'
 	static final List   SUFFIX_LIST = [ORIGINAL_SUFFIX, DEFAULTED_SUFFIX, ERROR_SUFFIX]
 
+	static final String IMPORT_OPTION_PARAM_NAME='importOption'
 	static final String IMPORT_OPTION_BOTH='B'
 	static final String IMPORT_OPTION_PERSON='P'
 	static final String IMPORT_OPTION_USERLOGIN='U'
@@ -65,6 +67,10 @@ class AccountImportExportService {
 
 	// Users can split Teams and Security roles on the follow characters as well as the default comma (,)
 	static final List DELIM_OPTIONS = [';',':','|'] 
+
+	// ------------------------------------------------------------------------
+	// Kendo Template builder closures 
+	// ------------------------------------------------------------------------
 
 	// Used in the map below to set the various template strings used by Kendo
 	static final changeTmpl = { prop ->
@@ -118,12 +124,21 @@ class AccountImportExportService {
 	// Tranformers are used when converting to write to spreadsheet
 	// -------------------------------------------------------------
 
+	// Used to transform a string which will change null to blank
+	static final xfrmString = { val, options ->
+		String r = val ?: '' 
+		return r
+	}
+
+	// @IntegrationTest
 	static final xfrmToYN = { val, options ->
-		String r = ''
-		// (val != null && (val instanceof Boolean) ? val.asYN() : val)
-		if (val != null && (val instanceof Boolean)) {
+		String r = val
+		if (val == null) {
+			r = ''
+		} else if (val instanceof Boolean) {
 			r = (val ? 'Y' : 'N')
 		} 
+		// log.debug "xfrmToYN val=$val, r=$r"
 		return r
 	}
 
@@ -134,6 +149,7 @@ class AccountImportExportService {
 				r = TimeUtil.formatDate(val, options.dateFormatter)
 				// log.debug "xfrmDateToString() did formatDate on val($val) and got r($r)"
 			} else {
+				r = val
 				log.error "xfrmDateToString() got unexpected data type ${val?.getClass()?.getName()}"
 			}
 		} 
@@ -145,9 +161,10 @@ class AccountImportExportService {
 		String r = ''
 		if (val != null) {
 			if (val instanceof Date) {
-				r = TimeUtil.formatDateTimeWithTZ(options.userTzId, val, options.dateTimeFormatter)
+				r = TimeUtil.formatDate(val, options.dateTimeFormatter)
 				// log.debug "xfrmDateTimeToString() did formatDate on val($val) and got r($r)"
 			} else {
+				r = val
 				log.error "xfrmDateTimeToString() got unexpected data type ${val?.getClass()?.getName()}"
 			}
 		} 
@@ -155,9 +172,10 @@ class AccountImportExportService {
 	}
 
 	// Transforms a List to a comma separated list
+	// @IntegrationTest
 	static final xfrmListToString = { list, options -> 
 		if (! (list instanceof List)) {
-			throw new RuntimeException("xfrmListToString() called with ${list.getClass().getName()} $list")
+			throw new LogicException("xfrmListToString() called with ${list.getClass().getName()} $list")
 		}
 		String r = ''
 		if (list != null) {
@@ -168,9 +186,10 @@ class AccountImportExportService {
 	}
 
 	// Transforms a List to a pipe (|) separated string 
+	// @IntegrationTest
 	static final xfrmListToPipedString = { list, options -> 
 		if (! (list instanceof List)) {
-			throw new RuntimeException("xfrmListToPipedString() called with ${list.getClass().getName()} $list")
+			throw new LogicException("xfrmListToPipedString() called with ${list.getClass().getName()} $list")
 		}
 		return list.join('|')
 	}
@@ -213,31 +232,31 @@ class AccountImportExportService {
 		personId               : [type:'number',  ssPos:0,    formPos:1, domain:'I', width:50,  locked:true, label:'ID',
 									template:changeTmpl('personId')],																	
 		firstName              : [type:'string',  ssPos:1,    formPos:2, domain:'P', width:90,  locked:true, label:'First Name', 
-									template:changeTmpl('firstName')],
+									template:changeTmpl('firstName'), transform:xfrmString],
 		middleName             : [type:'string',  ssPos:2,    formPos:3,  domain:'P', width:90,  locked:true,  label:'Middle Name',
-									 template:changeTmpl('middleName')],
+									 template:changeTmpl('middleName'), transform:xfrmString],
 		lastName               : [type:'string',  ssPos:3,    formPos:4, domain:'P', width:90,  locked:true,  label:'Last Name', 
-								 	template:changeTmpl('lastName')],
+								 	template:changeTmpl('lastName'), transform:xfrmString],
 		company                : [type:'string',  ssPos:4,    formPos:5, domain:'T', width:90,  locked:true,  label:'Company', 
-									template:changeTmpl('company')],
+									template:changeTmpl('company'), transform:xfrmString],
 		errors                 : [type:'list',    ssPos:null, formPos:6,  domain:'T', width:240, locked:false, label:'Errors', 
 									template:errorListTmpl(), templateClass:'error', transform:xfrmListToPipedString ],
 		workPhone              : [type:'string',  ssPos:5,    formPos:7,  domain:'P', width:100, locked:false, label:'Work Phone', 
-									template:changeTmpl('workPhone')],
+									template:changeTmpl('workPhone'), transform:xfrmString],
 		mobilePhone            : [type:'string',  ssPos:6,    formPos:8,  domain:'P', width:100, locked:false, label:'Mobile Phone', 
-									template:changeTmpl('mobilePhone')],
+									template:changeTmpl('mobilePhone'), transform:xfrmString],
 		email                  : [type:'string',  ssPos:7,    formPos:9,  domain:'P', width:100, locked:false, label:'Email', 
-									template:changeTmpl('email')],
+									template:changeTmpl('email'), transform:xfrmString],
 		title                  : [type:'string',  ssPos:8,    formPos:10, domain:'P', width:100, locked:false, label:'Title', 
-									template:changeTmpl('title')],
+									template:changeTmpl('title'), transform:xfrmString],
 		department             : [type:'string',  ssPos:9,    formPos:11, domain:'P', width:100, locked:false, label:'Department', 
-									template:changeTmpl('department')],
+									template:changeTmpl('department'), transform:xfrmString],
 		location               : [type:'string',  ssPos:10,   formPos:12, domain:'P', width:100, locked:false, label:'Location/City', 
-									template:changeTmpl('location')],
+									template:changeTmpl('location'), transform:xfrmString],
 		stateProv              : [type:'string',  ssPos:11,   formPos:13, domain:'P', width:100, locked:false, label:'State/Prov', 
-									template:changeTmpl('stateProv')],
+									template:changeTmpl('stateProv'), transform:xfrmString],
 		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country', 
-									template:changeTmpl('country')],
+									template:changeTmpl('country'), transform:xfrmString],
 		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)', 
 									template:changeTmpl('personTeams'), transform: xfrmListToString ],
 		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)', 
@@ -245,24 +264,21 @@ class AccountImportExportService {
 		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:100, locked:false, label:'Security Role(s)', 
 									template:changeTmpl('roles'), defaultValue: DEFAULT_SECURITY_ROLE, transform: xfrmListToString],
 		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username', 
-									template:changeTmpl('username')],
+									template:changeTmpl('username'), transform:xfrmString, transform:xfrmString, defaultOnError:{RSU.randomAlphabetic(10)}],
 		isLocal                : [type:'boolean', ssPos:17,   formPos:19, domain:'U', width:100, locked:false, label:'Local Account?', 
 									template:changeTmpl('isLocal'), defaultValue: 'Y', validator: validator_YN, transform: xfrmToYN],
 		active                 : [type:'string',  ssPos:18,   formPos:20, domain:'U', width:100, locked:false, label:'Login Active?', 
-									template:changeTmpl('active'), defaultValue: 'N', validator: validator_YN],
-/*		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
+									template:changeTmpl('active'), transform:xfrmString, defaultValue: 'N', validator: validator_YN],
+		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
 									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date,
 									defaultValue:defaultExpiration],
-*/
-		expiryDate             : [type:'datetime',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
-									template:changeTmpl('expiryDate'), transform:xfrmDateTimeToString, validator:validator_datetime, 
-									defaultValue:defaultExpiration],
+// TODO : swtich passwordExpirationDate back to date after testing
 		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', 
 									template:changeTmpl('passwordExpirationDate'), transform:xfrmDateToString, validator:validator_date],
 		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', 
 									template:changeTmpl('passwordNeverExpires'), defaultValue: 'N', validator: validator_YN, transform:xfrmToYN],
 		forcePasswordChange    : [type:'string',  ssPos:22,   formPos:24, domain:'U', width:100, locked:false, label:'Force Chg Pswd?', 
-									template:changeTmpl('forcePasswordChange'), defaultValue: 'N', validator: validator_YN ],
+									template:changeTmpl('forcePasswordChange'), transform:xfrmString, defaultValue: 'N', validator: validator_YN ],
 		lastLogin              : [type:'datetime',ssPos:23,   formPos:24, domain:'T', width:100, locked:false, label:'Last Login (readonly)',
 									transform:xfrmDateTimeToString ],
 		matches                : [type:'list',    ssPos:null, formPos:25, domain:'T', width:100, locked:false, label:'Matched On', 
@@ -281,19 +297,23 @@ class AccountImportExportService {
 	]
 
 	// --------------------------------
-	// Controller Methods
+	// Controller called methods
 	// --------------------------------
 
 	/** 
 	 * Used to load a blank import template that updates the title sheet and then downloads the file to the 
 	 * end user.
-	 * @param response - the HttpResponse object
 	 * @param session - the HttpSession object
+	 * @param response - the HttpResponse object
 	 * @param byWhom - the user that is attempting to download the spreadsheet template
 	 * @param project - the user's currently selected project 
 	 * @param filename - the name of the file that the download should have for the mime-type
 	 */
-	void generateImportTemplateToBrowser(response, session, UserLogin byWhom, Project project, String filename) {
+	void generateImportTemplateToBrowser(session, response, UserLogin byWhom, Project project, String filename) {
+		if (! securityService.hasPermission(byWhom, 'PersonExport', true)) {
+			throw new UnauthorizedException('Do not have the required permission for this action')
+		}
+
 		HSSFWorkbook workbook = getAccountExportTemplate()
 
 		Map sheetOptions = getUserPreferences(session)
@@ -305,6 +325,36 @@ class AccountImportExportService {
 	}
 
 	/**
+	 * Used to generate the spreadsheet of accounts based on the user submitted options and will stream
+	 * it directly to the browser.
+	 * @param session - the HttpSession 
+	 * @param response - the HttpResponse object to write the spreadsheet to
+	 * @param byWhom - the user that is invoking the request
+	 * @param project - the user's current project
+	 * @param formOptions - the params values used by the request
+	 * @permission PersonExport, EditUserLogin
+	 */
+	void generateAccountsExportToBrowser(session, response, UserLogin byWhom, Project project, Map formOptions) {
+		if (! securityService.hasPermission(byWhom, 'PersonExport', true)) {
+			throw new UnauthorizedException('Do not have the required permission for to export personnel information')
+		}
+
+		if (shouldUpdateUserLogin(formOptions) && ! securityService.hasPermission(byWhom, 'ExportUserLogin', true)) {
+			throw new UnauthorizedException('Do not have the required permission to export user information')
+		}
+
+		def spreadsheet = generateAccountExportSpreadsheet(session, byWhom, project, formOptions)
+
+		// Formulate the download filename ExportAccounts + ProjectCode + yyyymmdd sans the extension
+		String projectName = project.projectCode.replaceAll(' ','')
+		String formattedDate = TimeUtil.formatDateTime(session, new Date(), TimeUtil.FORMAT_DATE_TIME_5)
+		String filename = "${EXPORT_FILENAME_PREFIX}-$projectName-$formattedDate"
+		
+		// Send the file out to the browser
+		sendSpreadsheetToBrowser(response, spreadsheet, filename)
+	}
+
+	/**
 	 * Used to load the spreadsheet into memory and validate that the information is correct
 	 * @param byWhom   - the user that is making the request
 	 * @param project  - the project that the import is being applied against
@@ -312,11 +362,21 @@ class AccountImportExportService {
 	 * @param options  - the options that the user chose when submitting the form
 	 * @controllerMethod
 	 */
-	List loadAndValidateSpreadsheet(session, UserLogin byWhom, Project project, String filename, Map formOptions) {
+	List generateReviewData(session, UserLogin byWhom, Project project, String filename, Map formOptions) {
+		if (! securityService.hasPermission(byWhom, 'PersonImport', true)) {
+			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
+		}
+
+		if (shouldUpdateUserLogin(formOptions) && ! securityService.hasPermission(byWhom, 'ImportUserLogin', true)) {
+			throw new UnauthorizedException('Do not have the required permission to import user information')
+		}
+
 		// Load the spreadsheet
 		HSSFWorkbook workbook = readImportSpreadsheet(filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
+		sheetInfoOpts.putAll(formOptions)
+
 		List accounts = validateSpreadsheetContent(byWhom, project, workbook, sheetInfoOpts, formOptions)
 		return transformAccounts(accounts, sheetInfoOpts)
 	}
@@ -324,9 +384,10 @@ class AccountImportExportService {
 	/**
 	 * This method is used to load the spreadsheet into memory and validate that it contains some information. If 
 	 * successful it will save the file with a random name and then return the model containing the filename.
+	 * @param session - the HttpSession object
+	 * @param request - the servlet request object
 	 * @param byWhom - the user that is making the request
 	 * @param project - the project that the import is being applied against
-	 * @param request - the servlet request object
 	 * @param fileParamName - the servlet request params name of the var that references the upload spreadsheet file
 	 * @return a Map of data used in the controller view including:
 	 *    filename - the local filename of the spreadsheet
@@ -336,20 +397,29 @@ class AccountImportExportService {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
-	Map importAccount_Step1_Upload(session, UserLogin byWhom, Project project, Object request, String fileParamName) {
+	Map processFileUpload(session, Object request, UserLogin byWhom, Project project, Map formOptions) {
+		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission(byWhom, 'PersonImport', true)) {
+			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
+		}
+
+		if (formOptions.flagToUpdateUserLogin && ! securityService.hasPermission(byWhom, 'ImportUserLogin', true)) {
+			throw new UnauthorizedException('Do not have the required permission to import user information')
+		}
+
 		Map model = [:]
 
 		// Handle the file upload
-		def file = request.getFile(fileParamName)
-		if (file.empty) {
+		def file = request.getFile(formOptions.fileParamName)
+		if (! file || file.empty) {
 			throw new EmptyResultException('The file you uploaded appears to be empty')
 		}
 
 		// Save the spreadsheet file and then read it into a HSSFWorkbook
-		model.filename = saveImportSpreadsheet(request, byWhom, fileParamName)
+		model.filename = saveImportSpreadsheet(request, byWhom, formOptions.fileParamName)
 		HSSFWorkbook workbook = readImportSpreadsheet(model.filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
+		sheetInfoOpts.putAll(formOptions)		
 
 		if (sheetInfoOpts.sheetProjectId.toString() != project.id.toString()) {
 			throw new InvalidRequestException('The imported spreadsheet did not originate from the currently selected project')
@@ -397,7 +467,15 @@ class AccountImportExportService {
 	 *    gridMap - the meta data used by the data grid
 	 * @controllerMethod
 	 */
-	Map importAccount_Step2_Review(session, UserLogin byWhom, Project project, Object request, Object params) {
+	Map generateModelForReview(session, UserLogin byWhom, Project project, Map formOptions) {
+		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission(byWhom, 'PersonImport', true)) {
+			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
+		}
+
+		if (formOptions.flagToUpdateUserLogin && ! securityService.hasPermission(byWhom, 'ImportUserLogin', true)) {
+			throw new UnauthorizedException('Do not have the required permission to import user information')
+		}
+
 		Map model = [:]
 		Map optionLabels = [
 			(IMPORT_OPTION_BOTH): 'Person and UserLogin',
@@ -405,21 +483,20 @@ class AccountImportExportService {
 			(IMPORT_OPTION_USERLOGIN): 'UserLogin only'
 		]
 
-		String importOption = params.importOption
-		if (! importOption || ! optionLabels.containsKey(importOption)) {
-			log.error "importAccount_Step2_Review() params=$params"
+		if (! formOptions[IMPORT_OPTION_PARAM_NAME] || ! optionLabels.containsKey(formOptions[IMPORT_OPTION_PARAM_NAME])) {
+			log.warn "User $byWhom invoked generateModelForReview() with invalid/missing importOption params=$formOptions"
 			throw new InvalidParamException('The import option must be specified')
 		}
 
-		model.filename = params.filename
+		model.filename = formOptions.filename
 		model.labels = getLabelsInColumnOrder('formPos')
 		model.properties = getPropertiesInColumnOrder('formPos')
 		model.gridMap = accountSpreadsheetColumnMap
 		model.defaultSuffix = DEFAULTED_SUFFIX
 		model.originalSuffix = ORIGINAL_SUFFIX
 		model.errorSuffix = ERROR_SUFFIX
-		model.importOption = params.importOption
-		model.importOptionDesc = optionLabels[importOption]
+		model.importOption = formOptions[IMPORT_OPTION_PARAM_NAME]
+		model.importOptionDesc = optionLabels[formOptions[IMPORT_OPTION_PARAM_NAME]]	// Used to display the user's option selection
 
 		return model
 	}
@@ -439,14 +516,21 @@ class AccountImportExportService {
 	 * @controllerMethod
 	 */
 	@Transactional	
-	Map importAccount_Step3_PostChanges(session, UserLogin byWhom, Project project, Object formOptions) {
+	Map postChangesToAccounts(session, UserLogin byWhom, Project project, Object formOptions) {
+		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission(byWhom, 'PersonImport', true)) {
+			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
+		}
+
+		if (formOptions.flagToUpdateUserLogin && ! securityService.hasPermission(byWhom, 'ImportUserLogin', true)) {
+			throw new UnauthorizedException('Do not have the required permission to import user information')
+		}
 
 		HSSFWorkbook workbook = readImportSpreadsheet(formOptions.filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
+		sheetInfoOpts.putAll(formOptions)
 
 		// Read in the accounts and then validate them
-		// List accounts = loadAndValidateSpreadsheet(user, project, formOptions.filename, formOptions)
 		List accounts = validateSpreadsheetContent(byWhom, project, workbook, sheetInfoOpts, formOptions)
 		if (!accounts) {
 			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
@@ -464,7 +548,7 @@ class AccountImportExportService {
 		]
 		List updatedAccounts = []
 
-		log.debug "importAccount_Step3_PostChanges() formOptions=$formOptions - processing ${accounts.size()} accounts"
+		log.debug "postChangesToAccounts() formOptions=$formOptions - processing ${accounts.size()} accounts"
 		StringBuffer chgSB = new StringBuffer('<h2>Change History</h2>')
 
 		for (int i=0; i < accounts.size(); i++) {
@@ -485,7 +569,7 @@ class AccountImportExportService {
 			if (formOptions.flagToUpdatePerson) {
 				(error, personChanged) = applyPersonChanges(person, accounts[i], sheetInfoOpts, formOptions)
 
-				log.debug "importAccount_Step3_PostChanges() call to applyPersonChanges() returned person=${accounts[i].person}, error=$error, personChanged=$personChanged"
+				log.debug "postChangesToAccounts() call to applyPersonChanges() returned person=${accounts[i].person}, error=$error, personChanged=$personChanged"
 				if (error) {
 					accounts[i].errors << ["Row ${i+2} $error"]
 					updateAccounts << accounts[i]
@@ -556,8 +640,23 @@ class AccountImportExportService {
 		return results	
 	}
 
+	/**
+	 * Used to cancel a previously started import process
+	 * @param params - the parameters from the HttpRequest
+	 */
+	void cancelPreviousUpload(UserLogin byWhom, Project project, Map formOptions) {
+		boolean hasPersonPerm = securityService.hasPermission(byWhom, 'PersonImport', false)
+		boolean hasUserLoginPerm = securityService.hasPermission(byWhom, 'ImportUserLogin', false)
+		if (! (hasPersonPerm || hasUserLoginPerm)) {
+			securityService.reportViolation("attempted to cancel an account import for project $project", byWhom)
+			throw new UnauthorizedException('Do not have the required permission perform this action')
+		}
+
+		// Delete the upload file
+	}
+
 	// --------------------------------
-	// General purpose Helper Methods
+	// General purpose helper methods
 	// --------------------------------
 
 	/**
@@ -566,6 +665,7 @@ class AccountImportExportService {
 	 *		tzId - the user's timezone id
 	 *		dateFormat - the date format used for outputing and parse date properties
 	 *		dateTimeFormat - the datetime format used for outputing and parse datetime properties
+	 * @IntegrationTest
 	 */
 	private Map getUserPreferences(HttpSession session) {
 		Map map = [ 
@@ -613,7 +713,7 @@ class AccountImportExportService {
 	 * @return true if the user selected the correct options to update the Person otherwise false
 	 */
 	private boolean shouldUpdatePerson(Map options) {
-		return [IMPORT_OPTION_PERSON, IMPORT_OPTION_BOTH].contains(options.importOption)
+		return [IMPORT_OPTION_PERSON, IMPORT_OPTION_BOTH].contains(options[IMPORT_OPTION_PARAM_NAME])
 	}
 
 	/**
@@ -622,7 +722,29 @@ class AccountImportExportService {
 	 * @return true if the user selected the correct options to update the UserLogin otherwise false
 	 */
 	private boolean shouldUpdateUserLogin(Map options) {
-		return [IMPORT_OPTION_USERLOGIN, IMPORT_OPTION_BOTH].contains(options.importOption)
+		return [IMPORT_OPTION_USERLOGIN, IMPORT_OPTION_BOTH].contains(options[IMPORT_OPTION_PARAM_NAME])
+	}
+
+	/**
+	 * Used to determine if any of the UserLogin properties have been set by the user
+	 * based on there being an Original value set. Keep in mind if the value was Defaulted there
+	 * could be both the Original and Defaulted.
+	 * @param account - the account to examine
+	 * @return true if changes were detected otherwise false
+	 */
+	def hasUserLoginPropertiesSet = { account ->
+		boolean found = accountSpreadsheetColumnMap.find { prop, info -> 
+			boolean yup = ( info.domain=='U' && 
+				info["${prop}${ORIGINAL_SUFFIX}".toString()] && 
+				! info["${prop}${DEFAULTED_SUFFIX}".toString()] )
+			if (yup) { 
+				log.debug "hasUserLoginPropertiesSet() property $prop has been set"
+			}
+			return yup
+		}
+
+		debugLogAccountInfo("hasUserLoginPropertiesSet(found=$found)", account, 'UserLogin')
+		return found 
 	}
 
 	/**
@@ -658,7 +780,7 @@ class AccountImportExportService {
 	 */
 	Map importParamsToOptionsMap(params) {
 		Map options = [ 
-			importOption:params.importOption,
+			importOption:params[IMPORT_OPTION_PARAM_NAME],
 		]
 
 		options.flagToUpdatePerson = shouldUpdatePerson(options)
@@ -676,7 +798,7 @@ class AccountImportExportService {
 	 * @param a map that can be used with requests
 	 */
 	Map importOptionsAsParams(Map options) {
-		Map params = [importOption: options.importOption]
+		Map params = [importOption: options[IMPORT_OPTION_PARAM_NAME]]
 		if (options.filename) {
 			params.filename = options.filename
 		}
@@ -771,6 +893,94 @@ class AccountImportExportService {
 	}
 	
 	/**
+	 * Used to determine if an error was previously recorded against a property
+	 * @param account - the account map information
+	 * @param property - the name of the property
+	 * @return true if a previous error was recorded on the property
+	 * @IntegrationTest
+	 */
+	def propertyHasError = { account, property ->
+		return account.containsKey("${property}${ERROR_SUFFIX}".toString())
+	}
+	
+	/**
+	 * Used to remove errors if they got recorded
+	 * Note that this does not remove errors recorded against the account, just the property
+	 * @param account - the account Map with all the goodies
+	 * @param prop - the property for which to remove the error 
+	 */
+	def removeErrorValue = { account, prop ->
+		if (accountSpreadsheetColumnMap.containsKey(prop)) {
+			String errorProp = "$prop$ERROR_SUFFIX".toString()
+			accountSpreadsheetColumnMap[prop].remove(errorProp)
+		}
+	}
+
+	/**
+	 * Utility method used to evaluate the default value of a property if defined. The default value may be a literal or
+	 * a closure that must be used to compute the value. In this case it uses the sheetInfoOpts that contains any context
+	 * data that might be necessary (e.g. the Project or the User)
+	 * @param propertyName - the name of the property
+	 * @param account - the Map with all of the account details
+	 * @param sheetInfoOpts - the Map containing all of the context related data
+	 * @param defValue - the default value pulled from the Meta Map, if null it will be looked up on demand
+	 * @return the literal or computed default value for a given property
+	 */
+	def evaluateDefaultValue(String propertyName, Map account, Map sheetInfoOpts, def defValue=null) {
+		// TODO : JPM 4/2016 : convert evaluateDefaultValue to a method from a closure
+		def result
+		if (defValue == null) {
+			defValue = getPropertyDefaultValue(propertyName)
+		}
+		if (defValue instanceof Closure) {
+			// Invoke the default closure
+			result = defValue(propertyName, account, sheetInfoOpts)
+			log.debug "evaluateDefaultValue($propertyName) computed the default $result"
+		} else {
+			// Convert the data type into the type that the system expects
+			result = transformValueToDomainType(propertyName, defValue, sheetInfoOpts)
+			log.debug "evaluateDefaultValue($propertyName) literal '$defValue' transformValueToDomainType to '$result'"
+		}
+		return result
+	}
+
+	/**
+	 * Used to determine a property has had a default value set on it
+	 * @param account - the account map information
+	 * @param property - the name of the property
+	 * @return true if a previous error was recorded on the property
+	 * @IntegrationTest
+	 */
+	def propertyHasDefaulted = { account, property ->
+		return account.containsKey("${property}${DEFAULTED_SUFFIX}".toString())
+	}
+
+	/**
+	 * Used to remove the traces of any property having had a defaulted value set for a given domain on an account map. This is
+	 * useful when we're not updating a particular domain so we don't want to show defaulted values which would cause confusion
+	 * in the review process.
+	 * @param account - the account map with all of the goodies
+	 * @param domainName - the name of the domain to clear the properties on
+	 */
+	def clearDefaultedValues = { account, domainName ->
+		String domainCode = domainName[0]
+		accountSpreadsheetColumnMap.each { prop, info ->
+			if (info.domain == domainCode) {
+				String defaulted = "${prop}${DEFAULTED_SUFFIX}".toString()
+				if (account.containsKey(defaulted)) {
+					account.remove(defaulted)
+	
+					String original = "${prop}${ORIGINAL_SUFFIX}".toString()
+					if (account.containsKey(original)) {
+						account.remove(original)
+					}
+				}
+				account[prop] = null
+			}
+		}
+	}
+
+	/**
 	 * Utility method used to transform a property where there is a tranform defined in the accountSpreadsheetColumnMap map for a property
 	 * otherwise it just returns the current value
 	 * @param propName - the name of the property
@@ -811,34 +1021,6 @@ class AccountImportExportService {
 		return result
 	}
 
-	/**
-	 * Utility method used to evaluate the default value of a property if defined. The default value may be a literal or
-	 * a closure that must be used to compute the value. In this case it uses the sheetInfoOpts that contains any context
-	 * data that might be necessary (e.g. the Project or the User)
-	 * @param propertyName - the name of the property
-	 * @param account - the Map with all of the account details
-	 * @param sheetInfoOpts - the Map containing all of the context related data
-	 * @param defValue - the default value pulled from the Meta Map, if null it will be looked up on demand
-	 * @return the literal or computed default value for a given property
-	 */
-	def evaluateDefaultValue(String propertyName, Map account, Map sheetInfoOpts, def defValue=null) {
-		// TODO : JPM 4/2016 : convert evaluateDefaultValue to a method from a closure
-		def result
-		if (defValue == null) {
-			defValue = getPropertyDefaultValue(propertyName)
-		}
-		if (defValue instanceof Closure) {
-			// Invoke the default closure
-			result = defValue(propertyName, account, sheetInfoOpts)
-			log.debug "evaluateDefaultValue($propertyName) computed the default $result"
-		} else {
-			// Convert the data type into the type that the system expects
-			result = transformValueToDomainType(propertyName, defValue, sheetInfoOpts)
-			log.debug "evaluateDefaultValue($propertyName) literal '$defValue' transformValueToDomainType to '$result'"
-		}
-		return result
-	}
-
 	// A helper method used to determine if a value has leading minus
 	boolean isMinus(String str) { 
 		return (str?.startsWith('-'))
@@ -874,8 +1056,58 @@ class AccountImportExportService {
 	 */
 	private registerGormErrorsOnProperties(Map account, domainObj) {
 		domainObj.errors.allErrors.each {
-			setErrorValue(account, it.getField(), it.getCode())
+			String prop=it.getField()
+			if (! propertyHasError(account, prop)) {
+				setErrorValue(account, prop, it.getCode())
+			}
 		}
+	}
+
+	/**
+	 * Used to verify for a given domain if unplanned changes should be identified because the user's input option
+	 * was to exclude the domain
+	 * @param options - the sheet options that are passed around 
+	 * @param domainName - the name of the domain being processed
+	 * @return a boolean indicating true if changes should be identify changes
+	 */
+	def shouldIdentifyUnplannedChanges = { options, domainName ->
+		boolean should=false
+		if (domainName == 'Person' && ! shouldUpdatePerson(options)) {
+			should = true
+		} else if (domainName == 'UserLogin' && ! shouldUpdateUserLogin(options)) {
+			should = true
+		}
+		return should
+	}
+
+	/**
+	 * Used for outputting an account or the whole accounts list to the debug log
+	 * @param header - a string header message
+	 * @param accounts - a single account or the list of accounts
+	 */
+	def debugLogAccountInfo = { header, accounts, domainName ->
+		List list = (accounts instanceof Map) ? [ accounts ] : accounts
+		
+		// Used to possibly filter the domain to list properties for
+		List domainCodes = ['P','U','T']
+
+		StringBuffer sb = new StringBuffer()
+		if (domainName) {
+			domainCodes = [ domainName[0] ]
+		}
+
+		list.each { account ->
+			sb.append("\n\n$header:")
+			accountSpreadsheetColumnMap.each { prop, info -> 
+				if (info.domain in domainCodes) {
+					String acctPropAlternates = "${prop}_".toString()
+					account.findAll({ acctPropName, value -> acctPropName == prop ||  acctPropName.startsWith(acctPropAlternates) }).each { p, v ->
+						sb.append("\n\t$p=$v") 
+					}
+				}
+			}
+		}
+		log.debug sb.toString()
 	}
 
 	// ---------------------------
@@ -964,20 +1196,26 @@ class AccountImportExportService {
 		// Helper closure that will get cell values from the sheet based on the col/row mapping in the TitlePropMap MAP
 		// Note that the Datetime case will depend on the map.timezone property read from the spreadsheet
 		def getCell = { prop ->
+			def (col, row, type) = TitlePropMap[prop]
 			def val
-			String type = TitlePropMap[prop][2]
+
 			// log.debug "getCell($prop,$type)"
 			// log.debug "   for col ${TitlePropMap[prop][0]}, row ${TitlePropMap[prop][1]}"
 			switch (type) {
 				case 'Integer': 
-					val = WorkbookUtil.getIntegerCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
+					val = WorkbookUtil.getIntegerCellValue(sheet, col, row)
+					break
+				case 'Date':
+					// log.debug "readTitleSheetInfo() calling WorkbookUtil.getDateCellValue for $col, $row with ${sheetOpts.sheetDateFormatter.toPattern()}"
+					val = WorkbookUtil.getDateCellValue(sheet, col, row, sheetOpts.sheetDateFormatter)
 					break
 				case 'Datetime':
-					val = WorkbookUtil.getDateCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1], sheetOpts.dateTimeFormatter)
+					// log.debug "readTitleSheetInfo() calling WorkbookUtil.getDateTimeCellValue for $col, $row with ${sheetOpts.sheetDateTimeFormatter.toPattern()}"
+					val = WorkbookUtil.getDateTimeCellValue(sheet, col, row, sheetOpts.sheetTzId, sheetOpts.sheetDateTimeFormatter)
 					break
 				case 'String':
-					val = WorkbookUtil.getStringCellValue(sheet, TitlePropMap[prop][0], TitlePropMap[prop][1])
-					break;
+					val = WorkbookUtil.getStringCellValue(sheet, col, row)
+					break
 				default:
 					throw new RuntimeException("readTitleSheetInfo.getCell had unhandled case for $type")
 			} 
@@ -987,19 +1225,17 @@ class AccountImportExportService {
 		sheetOpts.sheetProjectId = getCell('projectId')
 		sheetOpts.sheetDateFormat = getCell('dateFormat')
 
-		// @tavo_luna: Get the Sheet Formatter
 		// Date Formatter is forced to be UTC/GMT, and the Date time is based on the sheet creation Timezone
-		sheetOpts.sheetDateFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE) ?: sheetOpts.dateFormatter
-		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME_22) ?: sheetOpts.dateTimeFormatter
-		//log.info("OLB: sheetOpts: $sheetOpts")
-
+		sheetOpts.sheetDateFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE)
+		assert sheetOpts.sheetDateFormatter
+		sheetOpts.sheetDateTimeFormatter = TimeUtil.createFormatterForType(sheetOpts.sheetDateFormat, TimeUtil.FORMAT_DATE_TIME_22, sheetOpts.sheetTzId)
+		assert sheetOpts.sheetDateTimeFormatter
 
 		// Note that the exportedOn property is dependent on timezone being previously loaded
 		sheetOpts.sheetExportedOn = getCell('exportedOn')	
 		if (sheetOpts.sheetExportedOn == -1) {
 			log.error "*** readTitleSheetInfo() the Exported On wasn't properly read from the spreadsheet" 
-			// TODO : JPM 4/2016 : Once this is solved then the exception can be re-enabled
-			// throw new InvalidRequestException("Unable to parse the Exported On value from the '${TEMPLATE_TAB_TITLE}' sheet")			
+			throw new InvalidRequestException("Unable to parse the 'Exported On' value from the '${TEMPLATE_TAB_TITLE}' sheet")			
 		}
 
 		return sheetOpts
@@ -1286,23 +1522,12 @@ class AccountImportExportService {
 			if (info.domain != domainCode) {
 				return
 			}
-			map[prop] = domainObj[prop]
-			/*
-			switch (info.type) {
-				case 'date':
-					map[prop] = (domainObj[prop] ? TimeUtil.formatDate(domainObj[prop], sheetInfoOpts.dateFormatter) : '')
-					break
-				case 'datetime':
-					map[prop] = (domainObj[prop] ? TimeUtil.formatDateTimeWithTZ(sheetInfoOpts.userTzId, domainObj[prop], sheetInfoOpts.dateTimeFormatter) : '')
-					break
-				case 'boolean':
-					map[prop] = (domainObj[prop].asYN())
-					break
-				default:	
-					map[prop] = domainObj[prop]
-					break
+			if (info.type == 'date' && domainObj[prop]) {
+				// For dates we need to strip out the time element
+				map[prop] = domainObj[prop].clearTime()
+			} else {
+				map[prop] = domainObj[prop]
 			}
-			*/
 		}
 		return map
 	}
@@ -1359,8 +1584,11 @@ class AccountImportExportService {
 		// Read in the accounts and then validate them
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
 
+		//debugLogAccountInfo('validateSpreadsheetContent before', accounts)
 		// Validate the sheet
 		validateUploadedAccounts(byWhom, accounts, project, sheetInfoOpts, formOptions)
+
+		//debugLogAccountInfo('validateSpreadsheetContent after', accounts)
 
 		return accounts
 	}
@@ -1430,21 +1658,36 @@ class AccountImportExportService {
 			int pIdx = 0
 			accountSpreadsheetColumnMap.each { prop, info ->
 				Integer colPos = info.ssPos
-				def value
+				def value=null
 				if (colPos != null) {
 					switch (info.type) {
 						case 'datetime': 
 							value = WorkbookUtil.getDateTimeCellValue(sheet, colPos, row, sheetInfoOpts.sheetTzId, sheetInfoOpts.sheetDateTimeFormatter)
 							if (value == -1) {
-								value = ''
 								account.errors << "Invalid date value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
+								setErrorValue(account, prop, 'Invalid datetime')
+								value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
 							}
 							break
 						case 'date':
 							value = WorkbookUtil.getDateCellValue(sheet, colPos, row, sheetInfoOpts.sheetDateFormatter) //dateFormatter)
 							if (value == -1) {
-								value = ''
 								account.errors << "Invalid datetime value in ${WorkbookUtil.columnCode(colPos)}${row + FIRST_DATA_ROW_OFFSET}"
+								setErrorValue(account, prop, 'Invalid date')
+								value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
+							}
+							break
+
+						case 'boolean':
+							value = StringUtil.sanitize( WorkbookUtil.getStringCellValue(sheet, colPos, row) )
+							if (value?.size()>0) {
+								Boolean bv = StringUtil.toBoolean(value)
+								if (bv == null) {
+									account[prop] = value
+									setErrorValue(account, prop, 'Must be Y|N')
+								} else {
+									value = bv
+								}
 							}
 							break
 
@@ -1456,18 +1699,16 @@ class AccountImportExportService {
 									setErrorValue(account, prop, value)
 								}
 							}
-							if (!account.errors) {
-								if (info.type == 'boolean') {
-									value = (value.size() ? value.asBoolean() : null)
-								} else if (info.type == 'list') {
-									value = StringUtil.splitter(value, ',', DELIM_OPTIONS)
-								} 
-							}
+
+							if (info.type == 'list') {
+								value = StringUtil.splitter(value, ',', DELIM_OPTIONS)
+							} 
 							break
 					}
 
 					// if (prop == 'roles')  log.debug "+=+=+=+=+=+=+ roles = ${value}"
-					account[prop] = (account.errors.size() > 0 ? null : value)
+					// account[prop] = (account.errors.size() > 0 ? null : value)
+					account[prop] = value
 				}
 			}
 			accounts.add(account)
@@ -1516,7 +1757,7 @@ class AccountImportExportService {
 		Map companiesByNames = projectService.getCompaniesMappedByName(project)
 		Map companiesById = projectService.getCompaniesMappedById(project)
 
-		if (formOptions.flagToUpdateUserLogin) {
+		if (true || formOptions.flagToUpdateUserLogin) {
 			// Retrieves all the roles that this user is allowed to assign.
 			authorizedRoleCodes = securityService.getAssignableRoleCodes(byWhom.person)
 			validRoleCodes = securityService.getAllRoleCodes()
@@ -1525,7 +1766,7 @@ class AccountImportExportService {
 			usernameList = accounts.findAll( { it.username })?.collect({it.username.toLowerCase()})
 		}
 
-		if (formOptions.flagToUpdatePerson) {
+		if (true || formOptions.flagToUpdatePerson) {
 			// Get all teams except AUTO and we need to stuff STAFF into it
 			allTeamCodes = partyRelationshipService.getTeamCodes()
 			allTeamCodes << 'STAFF'
@@ -1555,7 +1796,7 @@ class AccountImportExportService {
 			}
 
 			// Now attempt to find by company and validate it matches the company of the person found above (if the case)
-			validateCompanyName(accounts[i], project, companiesById)
+			validateCompanyName(accounts[i], project, companiesById, sheetInfoOpts)
 
 			// Now attempt to find the person by their name
 			List people = findPersonsByName(accounts[i])
@@ -1600,7 +1841,7 @@ class AccountImportExportService {
 			//
 			// Now for some Person specific validation
 			//
-			if (formOptions.flagToUpdatePerson) {
+			if (true || formOptions.flagToUpdatePerson) {
 				validatePerson(byWhom, accounts[i], sheetInfoOpts)
 
 				// Get all teams except AUTO
@@ -1610,7 +1851,7 @@ class AccountImportExportService {
 			//
 			// User specific validation
 			//
-			if (formOptions.flagToUpdateUserLogin) {
+			if (true || formOptions.flagToUpdateUserLogin) {
 				
 				// Validate user and security roles if user requested to update Users
 				boolean canUpdateUser = (accounts[i].username?.size() > 0)
@@ -1629,7 +1870,7 @@ class AccountImportExportService {
 				validateUserLogin(byWhom, accounts[i], project, sheetInfoOpts)
 
 				// Validate that the teams codes are correct and map out what are to add and delete appropriately
-				validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes)
+				validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes, sheetInfoOpts)
 			
 			}
 
@@ -1648,12 +1889,12 @@ class AccountImportExportService {
 			}
 
 			// Check the username to make sure it isn't used by more than one row
-			if (emailList.findAll{ it == accounts[i].email.toLowerCase() }.size()>1) {
+			if (emailList.findAll{ it == accounts[i].email?.toLowerCase() }.size() > 1) {
 				accounts[i].errors << 'Email referenced on multiple rows'
 			}
 
 			// Check the username to make sure it isn't used by more than one row
-			if (usernameList.findAll{ it == accounts[i].username.toLowerCase() }.size()>1) {
+			if (usernameList.findAll{ it == accounts[i].username?.toLowerCase() }.size() > 1) {
 				accounts[i].errors << 'Username referenced on multiple rows'
 			}
 
@@ -1682,6 +1923,9 @@ class AccountImportExportService {
 		Boolean ok = false
 		// Load a temporary Person domain object with the properties from the spreadsheet and see if any
 		// of the valids will break the validation constraints
+
+		debugLogAccountInfo('**** validatePerson', account, 'Person')
+
 		Person.withNewSession { ses -> 
 			Person personToValidate = (account.person?.id ? Person.get((account.person.id)) : new Person() )
 
@@ -1720,11 +1964,15 @@ class AccountImportExportService {
 	 */
 	private Boolean validateUserLogin(UserLogin byWhom, Map account, Project project, Map sheetInfoOpts) {
 		Boolean ok=true
+		boolean hasUserChanges = hasUserLoginPropertiesSet(account)
+		boolean shouldUpdateUser = shouldUpdateUserLogin(sheetInfoOpts)
 
 		UserLogin.withNewSession { ses ->
-			boolean isExisting = !!account.person.id
+			boolean personExists = !!account.person.id
 			UserLogin userLogin
-			if (isExisting) {
+
+			// Get or create a UserLogin
+			if (personExists) {
 				userLogin = account.person.userLogin
 			}
 			if (!userLogin) {
@@ -1733,75 +1981,62 @@ class AccountImportExportService {
 
 				// We need a real person associated with the UserLogin to pass validation so we
 				// can use the byWhom if necessary.
-				userLogin.person = ( isExisting ? account.person : byWhom.person )
+				userLogin.person = ( personExists ? account.person : byWhom.person )
 				// Set the password for the test
 				userLogin.password = 'phoof'
 				//	userLogin.expiryDate = projectService.defaultAccountExpirationDate(project)
 			}
 
+			if (hasUserChanges) {
+				if ( !shouldUpdateUser) {
+					// TODO : iterate over the changed fields and put the error changed values					
+				} else {
+					// Let's check to make sure that the person has an email address which is a requirement
+				}
+			}
+
+			// Let's check to make sure that the person has a username and  email address which are required for existing
+			// User logins or when we're in the process of creating a new one
+			if (( ! account.flags.isNewUserLogin || (account.flags.isNewUserLogin && hasUserChanges) ) ) {
+				if (! account.email ) {
+					setErrorValue(account, 'email', 'Required')
+					account.errors << 'Email Required'
+				}
+
+				if (! account.username) {
+					setErrorValue(account, 'username', 'Required')
+					account.errors << 'Username Required'
+
+					// Throw a bogus username on the domain for the validation purposes
+					userLogin.username = RSU.randomAlphabetic(10)
+				}
+			}
+
+			debugLogAccountInfo('validateUserLogin BEFORE', account, 'UserLogin')
+
 			applyChangesToDomainObject(userLogin, account, sheetInfoOpts, true, true)
 
-			ok = userLogin.validate() 
-			if (! ok) {
-				registerGormErrorsOnProperties(account, userLogin)
-				account.errors.addAll(gormValidationErrors(userLogin))
-			} 
-			userLogin.discard()
-		}
-		return ok
+			debugLogAccountInfo("validateUserLogin AFTER (hasUserChanges=$hasUserChanges)", account, 'UserLogin')
 
-	/*
-			// Iterate through the accountSpreadsheetColumnMap for all of the UserLogin attributes
-			// setting the defaults and changed on the account map. Also setting the values on the domain
-			// object so that we can test that there won't be any validation errors later.
-			accountSpreadsheetColumnMap.each { prop, info ->
-				if (info.domain != 'U') return
-
-				def value = account[prop]
-				boolean isString = info.type == 'string'
-
-				log.debug "validateUserLogin() prop $prop, value=$value, isString=$isString, isExisting=$isExisting"
-				if (value != null || isString &&  value != '') {
-					// Set the property on the UserLogin object
-					// userLogin[prop] = transformValueToDomainType(prop, value, sheetInfoOpts) 
-					userLogin[prop] = value
-				} else {
-					log.debug "validateUserLogin() here"
-					if (isExisting && userLogin[prop]) {
-						value = userLogin[prop]
-					} else {
-						if ( info.containsKey('defaultValue')) {
-							value = info.defaultValue
-							log.debug "validateUserLogin() set default value for prop $prop to $value"
-						} 
-					}
-					if (prop == 'expiryDate' && value == null) {
-						log.debug "validateUserLogin() setexpiryDate from defaultAccountExpirationDate"
-						setDefaultedValue(account, prop, projectService.defaultAccountExpirationDate(project))
-					}
-
-					if (value != null || isString && value != '') {
-						log.debug "validateUserLogin() set default to $value"
-						value = transformValueToDomainType(prop, value, sheetInfoOpts)
-						setDefaultedValue(account, prop, value)
-						// userLogin[prop] =  
-					} else {
-						log.debug "validateUserLogin() SKIPPED..."
-					}
-				}
-			}
-			// Determine if we have enough information to assume that the administrator is trying to update or
-			// create a new user
-			if (userLogin.username) {
-				if (! userLogin.validate()) {
+			if ( shouldUpdateUser && hasUserChanges ) {
+				ok = userLogin.validate() 
+				if (! ok ) {
+					registerGormErrorsOnProperties(account, userLogin)
 					account.errors.addAll(gormValidationErrors(userLogin))
-					ok = false
 				}
 			}
+
 			userLogin.discard()
 		}
+
+		// If we are not going to be updating the UserLogin then we should remove any of the defaulted values
+		// so that in the UI it doesn't look like anything occurred
+		if (! shouldUpdateUser || ! hasUserChanges) {
+			log.debug "validateUserLogin() calling clearDefaultedValues()"
+			clearDefaultedValues(account, 'UserLogin')
+		}
+
 		return ok
-	*/
 	}
 
 	/**
@@ -1815,7 +2050,7 @@ class AccountImportExportService {
 	 * @param companiesById - the map of the companies affilated with the project
 	 * @return returns true if the lookup was successful, false if not or Null if the routine err
 	 */
-	private Boolean validateCompanyName(Map account, Project project, Map companiesById) {
+	private Boolean validateCompanyName(Map account, Project project, Map companiesById, Map sheetInfoOpts) {
 		Boolean ok
 		PartyGroup company
 
@@ -1883,7 +2118,7 @@ class AccountImportExportService {
 	 * @param authorizedRoleCodes - a list of the role codes that byWhom is authorized to manage
 	 * @param A flag that indicates success (true) or an error occurred (false)
 	 */	 
-	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List authorizedRoleCodes ) {
+	private boolean validateSecurityRoles(UserLogin byWhom, Map account, List validRoleCodes, List authorizedRoleCodes, Map sheetInfoOpts ) {
 		boolean ok=false
 		
 		String prop='roles'
@@ -1934,6 +2169,11 @@ class AccountImportExportService {
 				account.securityChanges = changeMap
 			}
 		}
+
+		if (! shouldUpdateUserLogin(sheetInfoOpts) && changeMap.hasChanges) {
+			account.errors << 'Unplanned change on security roles'
+		}
+
 		return ok
 	}
 
@@ -2570,32 +2810,30 @@ class AccountImportExportService {
 	private List applyTeamsChanges(UserLogin byWhom, Map account, Project project, Map sheetInfoOpts, Map options) {
 		List teamsCanParticapateIn = []
 		List projectTeams = []
+		String error
+		boolean changed = false
 
 		// Check to see if there were any teams specified for the user
 		if (! account.personTeams && ! account.projectTeams) {
 			log.debug "applyTeamsChanges() bailed as there were no changes - account.personTeams=${account.personTeams?.getClass().getName()}, account.projectTeams=${account.projectTeams?.getClass().getName()}"
-			return false
+		} else {
+
+			assert (account.person instanceof Person)
+			String personName = account.person.toString()
+
+			//log.debug "applyTeamsChanges() account.personTeams isa ${account.personTeams.getClass().getName()} and = ${account.personTeams}"
+			//log.debug "applyTeamsChanges() account.projectTeams isa ${account.projectTeams.getClass().getName()} and = ${account.projectTeams}"
+			//log.debug "applyTeamsChanges() account=$account"
+
+			Map chgMap = account.teamChangeMap
+			if (chgMap.hasChanges) {
+				changed = true
+			}
 		}
-
-		assert (account.person instanceof Person)
-		boolean changed = false
-		String error
-		String personName = account.person.toString()
-
-		//log.debug "applyTeamsChanges() account.personTeams isa ${account.personTeams.getClass().getName()} and = ${account.personTeams}"
-		//log.debug "applyTeamsChanges() account.projectTeams isa ${account.projectTeams.getClass().getName()} and = ${account.projectTeams}"
-		//log.debug "applyTeamsChanges() account=$account"
-
-		Map chgMap = account.teamChangeMap
-		if (chgMap.hasChanges) {
-			changed = true
-		}
-
 // TODO : Make the actual changes to the team assignments
 
 		return [error, changed]
 	}
-
 	/**
 	 * This method serves two purposes:
 	 *    1. Applies values from the account map into the domain object passed in when shouldUpdateDomain is true
@@ -2612,26 +2850,47 @@ class AccountImportExportService {
 	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
 	 */
 	private void applyChangesToDomainObject(Object domainObject, Map account, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
-		log.debug "applyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
+		log.debug "\n\n\n\n*******\napplyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
 
 		boolean isNew = ! domainObject.id
 		String className = domainObject.getClass().getName()
 		String domainCode = className[0]
 		assert ['P','U'].contains(domainCode)
-
+		boolean identifyUnplannedChanges=shouldIdentifyUnplannedChanges(sheetInfoOpts, className)
 		boolean blockBlankOverwrites = account.flags.blockBlankOverwrites
+
+		log.debug "applyChangesToDomainObject() identifyUnplannedChanges=${identifyUnplannedChanges ? 'TRUE' : 'false'} for domain $className"
 
 		// Used to indicate that user entered data into the spreadsheet when the domain update
 		// option was declined/not selected.
 		boolean unplannedChange = false
+		String unChgdLabel='Unplanned change'
 
 		accountSpreadsheetColumnMap.each { prop, info ->
 			if (info.domain != domainCode) {
+				// log.debug "applyChangesToDomainObject() Skipped - wrong domain info.domain=$info.domain,domainCode=$domainCode, prop=$prop"
 				return // Skip property
 			}
 
+			log.debug "\r\n\r\n****** applyChangesToDomainObject() Processing property $prop"
+
+			if (propertyHasError(account, prop)) {
+				log.debug "applyChangesToDomainObject() SKIPPED property $prop due to it having an error"
+				if (accountSpreadsheetColumnMap.containsKey('defaultOnError')) {
+					// Set a default value so that the domain validation will not fail
+					domainObject[prop] = accountSpreadsheetColumnMap.defaultOnError()
+				}
+				return
+			}
+
 			// Note that origValueTransformed for null values will return as a blank String such that the comparison to the spreadsheet values will match
-			String origValueTransformed = transformProperty(prop, domainObject[prop], sheetInfoOpts)
+			def origValue = domainObject[prop]	
+			if (info.type == 'date' && origValue != null) {
+				// We have a special case with date in that the value coming from the database could have a time element so we need to 
+				// clear the time so that we don't have in appropriate indication that the value was changed.
+				origValue.clearTime()
+			}	
+			String origValueTransformed = transformProperty(prop, origValue, sheetInfoOpts)
 			String chgValueTransformed = transformProperty(prop, account[prop], sheetInfoOpts)
 			
 			// Check for null or blank)
@@ -2639,15 +2898,17 @@ class AccountImportExportService {
 			boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)			
 			boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
 
-			log.debug "\r\n\r\n****** applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop "
+			log.debug "applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop value"
 			log.debug "existing='${domainObject[prop]==null ? 'null' : domainObject[prop]}' formatted to '${origValueTransformed==null?'null':origValueTransformed}'"
 			log.debug "changed is '${account[prop]==null?'null':account[prop]}' value='${chgValueTransformed ==null?'null': chgValueTransformed}'"
-			log.debug "blockBlankOverwrites=$blockBlankOverwrites"
+			log.debug "blockBlankOverwrites=$blockBlankOverwrites, shouldUpdateDomain=$shouldUpdateDomain, isNew=$isNew"
 			log.debug "origValueIsBlank=$origValueIsBlank, chgValueIsBlank=$chgValueIsBlank, valuesEqual=$valuesEqual"
 			log.debug "account.errors=${account.errors.size()>0 ? true : false}"
 
 			if (isNew) {
-				// Working with a new Domain object
+				//
+				// Working with a NEW Domain object
+				// 
 				if (chgValueIsBlank) {
 					if (shouldUpdateDomain) {
 						// Try to first default it from the model has a default value 
@@ -2660,29 +2921,35 @@ class AccountImportExportService {
 						}
 					}
 				} else {
-					if (shouldUpdateDomain) {
+					// if (shouldUpdateDomain) {
 						if (! valuesEqual) {
 							setOriginalValue(account, prop, domainObject[prop])
 						}
-					} else {
-						unplannedChange = true
-						setErrorValue(account, prop, 'Unplanned change')
-					}
+					//} else {
+						if (identifyUnplannedChanges) {
+							unplannedChange = true
+							setErrorValue(account, prop, unChgdLabel)
+						}
+					//}
 				} 
 			} else {
-				// Working with an existing Domain object
+				//
+				// Working with an EXISTING Domain object
+				//
 				if (chgValueIsBlank) {
 					// User didn't give us any changes so do we want to overwrite existing values?
 					// Only if there was a perfect match from an export - which is flagged with the 
 					// setting account.flags.blockBlankOverwrites. 
-					if (!origValueIsBlank) {
-						if (!blockBlankOverwrites) {
-							if (shouldUpdateDomain) {
+					if (! origValueIsBlank) {
+						if (! blockBlankOverwrites) {
+							//if (shouldUpdateDomain) {
 								// Guess we can overwrite the value
 								setOriginalValue(account, prop, domainObject[prop])
-							} else {
-								unplannedChange = true
-								setErrorValue(account, prop, 'Unplanned change')							}
+							//} else {
+								if (identifyUnplannedChanges) {
+									unplannedChange = true
+									setErrorValue(account, prop, unChgdLabel)
+								}
 						} else {
 							// Show the current values by default, not that they are being changed...
 							setDefaultedValue(account, prop, domainObject[prop])
@@ -2690,18 +2957,19 @@ class AccountImportExportService {
 					}
 				} else {
 					// The user gave us some changes so what to do
-					if (shouldUpdateDomain) {
+					// if (true || shouldUpdateDomain) {
 						if (! valuesEqual) {
 							setOriginalValue(account, prop, domainObject[prop])
+							if (identifyUnplannedChanges) {
+								unplannedChange = true
+								setErrorValue(account, prop, unChgdLabel)
+							}
 						}
-					} else {
-						unplannedChange = true
-						setErrorValue(account, prop, 'Unplanned change')
-					}
+					//}
 				}
 			}
 
-			if (! account.errors && shouldUpdateDomain) {
+			if (! propertyHasError(account, prop)) {
 				// Let's see what the current value is now and if different from the original then we will
 				// update the actual domain property, finally...
 				chgValueTransformed = transformProperty(prop, account[prop], sheetInfoOpts)
@@ -2713,92 +2981,9 @@ class AccountImportExportService {
 		} // accountSpreadsheetColumnMap.each
 
 		if (unplannedChange) {
-			account.errors << "Updating $className not selected but was ${isNew ? 'added' : 'changed'}"
+			account.errors << "Unplanned change(s) for $className"
 		}
 
 	}
-		/*
-
-			log.debug "\r\n\r\n****** applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop "
-			log.debug "existing='${domainObject[prop]==null ? 'null' : domainObject[prop]}' formatted to '${origValueTransformed==null?'null':origValueTransformed}'"
-			log.debug "changed is '${account[prop]==null?'null':account[prop]}' value='${currValueTransformed ==null?'null': currValueTransformed}'"
-			log.debug "blockBlankOverwrites=$blockBlankOverwrites"
-			log.debug "origValueIsBlank=$origValueIsBlank, chgValueIsBlank=$chgValueIsBlank, valuesEqual=$valuesEqual"
-			log.debug "account.errors=${account.errors.size()>0 ? true : false}"
-
-			// Handle a default value from the Meta Map
-
-			if (blockBlankOverwrites && chgValueIsBlank && !origValueIsBlank) {
-				setDefaultedValue(account, prop, domainObject[prop])
-			} else {
-				if (!chgValueIsBlank && !valuesEqual) {
-					if (shouldUpdateDomain) {
-						setOriginalValue(account, prop, domainObject[prop])
-					} else {
-						account.errors << "$className not set to update but ${info.label} was changed"
-					}
-				}
-			}
-
-			if (!account.errors && shouldUpdateDomain) {
-				def newValueAsDomainType = transformValueToDomainType(prop, account[prop], sheetInfoOpts)
-				domainObject[prop] = newValueAsDomainType
-			}
-
-			if (account[prop] != null) {				
-				// Have a new value to apply possibly?
-				boolean matched = origValueTransformed == account[prop]
-				if (! matched) {
-					log.debug "applyChangesToDomainObject() values did not match $prop existing='${domainObject[prop]}'' formatted to '$origValueTransformed' and changed is '${account[prop]}'"
-				}
-
-				// Check for null or blank
-				boolean origValueIsBlank = StringUtil.isBlank(domainObject[prop])
-				boolean chgValueIsBlank = StringUtil.isBlank(account[prop])
-
-				if (blockBlankOverwrites && chgValueIsBlank && !origValueIsBlank) {
-					setDefaultedValue(account, prop, domainObject[prop])
-				} else {
-
-					def newValueAsDomainType = transformValueToDomainType(prop, account[prop], sheetInfoOpts)
-
-					// For existing Person/UserLogin the overriding of properties will be based on account.flags.matchedPersonById - if the person was 
-					// found by id then we're going to assume that the fields were properly populated and will ignore values with blanks if that occurs. 
-					if ( ! chgValueIsBlank && ( origValueIsBlank || !matched ) ) {
-						if (isNew) {
-							domainObject[prop] = newValueAsDomainType
-						} else {
-							// Dealing with existing person so we only overwrite properties if the person matched on the person ID
-							if (account.flags.matchedPersonById) {
-								setOriginalValue(account, prop, (origValueTransformed ?: ''))
-								if (shouldUpdateDomain) {
-									domainObject[prop] = newValueAsDomainType
-								}
-							} else {
-								log.info "Account Import ignored change '${account[prop]}' to the property $prop on $className for $domainObject due to non ID match"
-							}
-						}
-					} else {
-						log.debug "applyChangesToDomainObject() skipped the update origValueTransformed='$origValueTransformed', account[prop]='${account[prop]}'"
-					}
-				}
-			} else {
-				// Set the defaulted value on the Account
-				def defaultValue = ( origValueTransformed != null ? origValueTransformed : '') 
-				if (defaultValue != '') {
-					setDefaultedValue(account, prop, defaultValue)
-				}
-
-				if (isNew) {
-					// Attempt to set what should be the default on the domain object
-					defaultValue = getPropertyDefaultValue(prop)
-					if (defaultValue != '' && shouldUpdateDomain) {
-						domainObject[prop] = transformValueToDomainType(prop, defaultValue, sheetInfoOpts)
-					}
-				}
-			}
-		}
-	}
-	*/
 
 }

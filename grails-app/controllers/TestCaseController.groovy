@@ -34,6 +34,11 @@ class TestCaseController {
 
 	// def messageSource
 	
+	def shouldUpdatePerson() {
+		Map opt = [(accountImportExportService.IMPORT_OPTION_PARAM_NAME): accountImportExportService.IMPORT_OPTION_PERSON ]
+		render (accountImportExportService.shouldUpdatePerson(opt) ? 'shouldUpdatePerson=TRUE' : 'shouldUpdatePerson=FALSE FAILED!!!!')
+	}
+
 	def cleanString() {
 		def a = " a\tstring\nwith\rcharacters \u000bA\u007cB\u008fC that\r\ncan\fhave funcky\'character\"in it"
 		def b = StringUtil.clean(a)

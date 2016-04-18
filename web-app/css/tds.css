@@ -1774,7 +1774,8 @@ div.account-import-review span.unchanged {
 	color: #888888;
 }
 div.account-import-review span.userData {
-	color: #888888;
+	background-color: #888888;
+	color: #ffffff;
 }
 div.account-import-review span.error {
 	color: #FF0000;
