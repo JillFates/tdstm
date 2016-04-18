@@ -179,7 +179,7 @@ class TimeUtilTests extends Specification {
 
 	//
 	// formatDate tests
-	//
+	//F
 
 	def 'Test formatDate(HttpSession session, Date dateValue) and formatDate(Date dateValue, DateFormat formatter)'() {
 		// No signature of method: static com.tdssrc.grails.TimeUtil.formatDate() is applicable for argument types: 
@@ -198,6 +198,15 @@ class TimeUtilTests extends Specification {
 		expect:
 			TimeUtil.formatDate(mockSession, ts) == '01/02/1970'
 			TimeUtil.formatDate(ts, formatter) == '02/01/1970'
+	}
+
+	def 'Test formatDate(String tzId, Date dateValue, DateFormat formatter)'() {
+			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
+			long twoDays = 60*60*48*1000	// Have to push the time out two days since we're stripping off the time portion
+			Timestamp timestamp = new Timestamp(twoDays).clearTime()
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDate('GMT', timestamp, formatter) == '02/01/1970'
 	}
 	
 	def 'Test formatDateTime(HttpSession session, dateValue, DateFormat formatter)'() {

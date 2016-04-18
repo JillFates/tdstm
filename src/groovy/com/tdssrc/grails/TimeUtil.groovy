@@ -370,6 +370,19 @@ class TimeUtil {
 	}
 
 	/**
+	 * Used to format a Date into a date string format, based in the formatter provided plus the timezone passed
+	 * @param tzId - the timezone to render a date for
+	 * @param dateValue - the date to format
+	 * @param formatter - the formatter to use for the conversion of the date to a string
+	 * @return The date formatted as a string
+	 * @deprecated formatting a date with a Timezone should not be used as Dates should be handled as an absolute (no time element date)
+	 **/
+	public static String formatDate(String tzId, Date dateValue, DateFormat formatter) {
+		LOG.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
+		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	}
+
+	/**
 	 * Used to format a Date into a string format, based in the time zone and format defined as parameters
 	 * @param dateValue the date to format
 	 * @param tzId the time zone to be used
