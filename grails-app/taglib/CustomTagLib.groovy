@@ -14,39 +14,48 @@ class CustomTagLib {
 	
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
+	 * @param date - the date to be formated
+	 * @param format - the String format to use to format the date into a string
+	 * @param mockSession - used by tests to pass in a mock session
+	 * @return a date formatted appropriately
 	 */
 	def convertDate = { attrs ->
-		Date dt = attrs['date'];
+		Date dateValue = attrs['date'];
 		def format = attrs['format']
-		
-		String dtStr = dt.getClass().getName().toString();
-		
+		def sessionObj = (attrs.containsKey('mockSession') ? attrs.mockSession : session)
+		String dateParamClassName = dateValue.getClass().getName().toString();
+
 		out << ""
-		if (dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp")) {
-			DateFormat formatter = TimeUtil.createFormatter(session, format)
-			if (formatter == null) {
-				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE)
+		if (dateValue) {
+			dateValue.clearTime()
+			if (dateParamClassName.equals("java.util.Date") || dateParamClassName.equals("java.sql.Timestamp")) {
+				DateFormat formatter = TimeUtil.createFormatter(sessionObj, format)
+				if (formatter == null) {
+					formatter = TimeUtil.createFormatter(sessionObj, TimeUtil.FORMAT_DATE)
+				}
+				out << TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, dateValue, formatter)
 			}
-			out << TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, dt, formatter)
-		}  
+		}
 	}
 	/*
 	 * Converts a date to User's Timezone and applies formating
 	 */
-	def convertDateTime = { attrs ->
-		Date dt = attrs['date'];
-		def format = attrs['format'];
-		String dtStr = dt.getClass().getName().toString();
-		
+	def convertDateTime = { attrs, body ->
+		Date dateValue = attrs['date']
+		def format = attrs['format']
+		String dateParamClassName = dateValue.getClass().getName().toString();
+		def sessionObj = (attrs.containsKey('mockSession') ? attrs.mockSession : session)
+
 		out << ""
-		if( dtStr.equals("java.util.Date") || dtStr.equals("java.sql.Timestamp") ){	
-			DateFormat formatter = TimeUtil.createFormatter(session, format)
+		if( dateParamClassName.equals("java.util.Date") || dateParamClassName.equals("java.sql.Timestamp") ){	
+			DateFormat formatter = TimeUtil.createFormatter(sessionObj, format)
 			if (formatter == null) {
-				formatter = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE_TIME)
+				formatter = TimeUtil.createFormatter(sessionObj, TimeUtil.FORMAT_DATE_TIME)
 			}
-			out << TimeUtil.formatDateTime(session, dt, formatter)
+			out << TimeUtil.formatDateTime(sessionObj, dateValue, formatter)
 		}  
 	}
+
 	/*
 	 * 
 	 */
