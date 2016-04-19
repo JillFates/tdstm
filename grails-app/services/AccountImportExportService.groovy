@@ -391,6 +391,7 @@ class AccountImportExportService {
 		sheetInfoOpts.putAll(formOptions)
 
 		List accounts = validateSpreadsheetContent(byWhom, project, workbook, sheetInfoOpts, formOptions)
+
 		return transformAccounts(accounts, sheetInfoOpts)
 	}
 
@@ -2118,6 +2119,8 @@ class AccountImportExportService {
 			//
 			if (true || formOptions.flagToUpdatePerson) {
 				validatePerson(byWhom, accounts[i], sheetInfoOpts)
+				debugLogAccountInfo('validateUploadedAccounts() Person after validatePerson', accounts[i], 'Person')
+				debugLogAccountInfo('validateUploadedAccounts() UserLogin after validatePerson', accounts[i], 'UserLogin')
 
 				// Get all teams except AUTO
 				validateTeams(accounts[i], project, allTeamCodes) 
@@ -2130,15 +2133,15 @@ class AccountImportExportService {
 				
 				// Validate user and security roles if user requested to update Users
 				boolean canUpdateUser = (accounts[i].username?.size() > 0)
-		log.debug "1. canUpdateUser=$canUpdateUser"		
+				log.debug "validateUploadedAccounts() 1. canUpdateUser=$canUpdateUser"		
 				// TODO : JPM 4/2016 : check for new create user permission
 				// Check if user is trying to create a user without a person already created 
 				if (canUpdateUser && accounts[i].flags.isNewAccount && !formOptions.flagToUpdatePerson) {
 					accounts[i].errors << 'User can not be created without a saved person'
 					canUpdateUser = false
 				}
+				log.debug "validateUploadedAccounts() 2. canUpdateUser=$canUpdateUser"
 
-		log.debug "2. canUpdateUser=$canUpdateUser"		
 				if (canUpdateUser) {
 					accounts[i].flags.canUpdateUser = true
 				}
@@ -2146,7 +2149,8 @@ class AccountImportExportService {
 
 				// Validate that the teams codes are correct and map out what are to add and delete appropriately
 				validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes, sheetInfoOpts)
-			
+				debugLogAccountInfo('validateUploadedAccounts() Person after validateSecurityRoles', accounts[i], 'Person')
+				debugLogAccountInfo('validateUploadedAccounts() UserLogin after validateSecurityRoles', accounts[i], 'UserLogin')
 			}
 
 			if (!accounts[i].flags.canUpdateUser) {
@@ -2242,8 +2246,8 @@ class AccountImportExportService {
 		boolean hasUserChanges = hasUserLoginPropertiesSet(account)
 		boolean shouldUpdateUser = shouldUpdateUserLogin(sheetInfoOpts)
 
-log.debug "validateUserLogin() hasUserChanges=$hasUserChanges, shouldUpdateUser=$shouldUpdateUser"
-debugLogAccountInfo("validateUserLogin", account, 'UserLogin')
+		log.debug "validateUserLogin() hasUserChanges=$hasUserChanges, shouldUpdateUser=$shouldUpdateUser"
+		debugLogAccountInfo("validateUserLogin", account, 'UserLogin')
 
 		UserLogin.withNewSession { ses ->
 			boolean personExists = !!account.person.id
@@ -2294,11 +2298,12 @@ debugLogAccountInfo("validateUserLogin", account, 'UserLogin')
 
 			applyChangesToDomainObject(userLogin, account, sheetInfoOpts, true, true)
 
-	
-debugLogAccountInfo("validateUserLogin AFTER (hasUserChanges=$hasUserChanges)", account, 'UserLogin')
+			debugLogAccountInfo("validateUserLogin AFTER (hasUserChanges=$hasUserChanges)", account, 'UserLogin')
+
 			hasUserChanges = hasUserLoginPropertiesSet(account)
-debugLogAccountInfo("validateUserLogin() after the applyChangesToDomainObject", account, 'UserLogin')
-log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
+
+			debugLogAccountInfo("validateUserLogin() after the applyChangesToDomainObject", account, 'UserLogin')
+			log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 
 			if ( shouldUpdateUser && hasUserChanges ) {
 				ok = userLogin.validate() 
@@ -2307,7 +2312,6 @@ log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 					account.errors.addAll(gormValidationErrors(userLogin))
 				}
 			}
-
 			userLogin.discard()
 		}
 
@@ -2457,7 +2461,7 @@ log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 			if (changeMap.hasChanges) {
 				account.errors << 'Unplanned change on security roles'
 			} 
-// TODO : FIX THIS LOGIC
+			// TODO : FIX THIS LOGIC
 			//if (has)
 		}
 
