@@ -2294,16 +2294,17 @@ class AccountImportExportService {
 				}
 			}
 
-			debugLogAccountInfo('validateUserLogin BEFORE', account, 'UserLogin')
+			debugLogAccountInfo("validateUserLogin BEFORE applyChangesToDomainObject() hasUserChanges=$hasUserChanges", account, 'UserLogin')
 
 			applyChangesToDomainObject(userLogin, account, sheetInfoOpts, true, true)
 
-			debugLogAccountInfo("validateUserLogin AFTER (hasUserChanges=$hasUserChanges)", account, 'UserLogin')
+			debugLogAccountInfo("validateUserLogin AFTER applyChangesToDomainObject() hasUserChanges=$hasUserChanges", account, 'UserLogin')
 
 			hasUserChanges = hasUserLoginPropertiesSet(account)
 
-			debugLogAccountInfo("validateUserLogin() after the applyChangesToDomainObject", account, 'UserLogin')
-			log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
+			debugLogAccountInfo("validateUserLogin() AFTER hasUserLoginPropertiesSet() hasUserChanges=$hasUserChanges", account, 'UserLogin')
+			
+			// log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 
 			if ( shouldUpdateUser && hasUserChanges ) {
 				ok = userLogin.validate() 
