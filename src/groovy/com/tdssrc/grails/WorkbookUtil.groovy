@@ -174,7 +174,7 @@ class WorkbookUtil {
 
 					// Now we need to shift the date to GMT so that it is correct TZ
 					result = TimeUtil.moveDateToGMT(dateInTz, tzId)
-					println "getDateTimeCellValue() CELL_TYPE_NUMERIC cell '${cell}'=>'$dateInTz' adjusted from $tzId to GMT=> $result"
+					// println "getDateTimeCellValue() CELL_TYPE_NUMERIC cell '${cell}'=>'$dateInTz' adjusted from $tzId to GMT=> $result"
 
 					break
 
@@ -183,17 +183,17 @@ class WorkbookUtil {
 					if (str) {
 						try {
 							// Let's not assume that the user set the Timezone on the parser
-							println "getDateTimeCellValue() CELL_TYPE_STRING str=$str; cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})" 
+							// println "getDateTimeCellValue() CELL_TYPE_STRING str=$str; cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})" 
 							TimeZone tz=TimeZone.getTimeZone(tzId)
 							dateFormatter.setTimeZone(tz)
 							result = dateFormatter.parse(str) 
 						} catch (e) { 
 							log.debug "getDateCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }; FORMAT:'${ dateFormatter.toPattern() }'"
-							println "getDateTimeCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }" 
+							// println "getDateTimeCellValue() CELL_TYPE_STRING parser error ${ e.getMessage() }" 
 							result = failedIndicator
 						}
-						println "getDateTimeCellValue() CELL_TYPE_STRING cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})" 
-						println "getDateTimeCellValue() CELL_TYPE_STRING '$str' => '$result'"
+						// println "getDateTimeCellValue() CELL_TYPE_STRING cell='${cell}' Formatter:'${ dateFormatter.toPattern() }' cell (${columnCode(columnIdx) + rowIdx+1})" 
+						// println "getDateTimeCellValue() CELL_TYPE_STRING '$str' => '$result'"
 					}
 					break
 

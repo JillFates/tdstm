@@ -118,6 +118,25 @@ class ServiceResults {
 	}
 
 	/**
+	 * Used to respond to the browser via the servlet response by returning an object formatted as JSON
+	 * @param response - the servlet response object
+	 * @param object - the object to be rendered as JSON 
+	 */
+	static respondAsJson(response, File file) {
+		response.setStatus(200)
+		setContentTypeJson(response)
+		//def fis = file.newInputStream()
+
+		//response.outputStream << fis
+		//fis.close()
+		//response.flush()
+		String json = file.text
+		println "json=$json"
+		response.outputStream << json
+		response.flushBuffer()
+	}
+
+	/**
 	 * Sends an unauthorized error
 	 * @param response the response object
 	 */

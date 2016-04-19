@@ -131,6 +131,28 @@ class StringUtil {
 	}
 
 	/**
+	 * Used to validate that any string/file name reference that is passed via the browser 
+	 * does not contain any directory tranversal notations (e.g. /root, ../../etc/passwd, etc). This 
+	 * will not allow the following strings in the name:  '..', '/', '\', '&', '?' and the '%' which can be used
+	 * to encode other characters. It will also fail if a null is passed as this shouldn't be considered safe...
+	 * @reference https://www.owasp.org/index.php/Path_Traversal
+	 * @param str - the string to inspect
+	 * @return true if there were violations detected otherwise false
+	 */
+	static boolean containsPathTraversals(String str) {
+		boolean someoneIsTryingToHack = true
+
+		if (str != null) { 
+			// Make sure that the user can NOT perform any PATH tranversal
+			List pathTraversals = ['..', '/', '\\', '%', '&', '?']
+
+			someoneIsTryingToHack = ( str.startsWith('.') || StringUtil.containsAny(str, pathTraversals) )
+		}
+
+		return someoneIsTryingToHack
+	}
+
+	/**
 	 * Used to concat a string to a null, blank or existing string and using a separator appropriately
 	 * @param existingString - the existing string (maybe)
 	 * @param newString - the string to append to existingString

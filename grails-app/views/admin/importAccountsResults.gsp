@@ -3,50 +3,239 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="projectHeader" />
 	<title>Import Accounts</title>
+
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.common.min.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.default.min.css')}" />
+
+	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
+
+	<g:javascript src="bootstrap.js" />
+
+	<style type="text/css">
+		.k-grid  .k-grid-header  .k-header  .k-link {
+		    height: auto;
+		}
+		  
+		.k-grid  .k-grid-header  .k-header {
+		    white-space: normal;
+		}
+	</style>
+
 </head>
 <body>
-	<div class="body">
-		<h1>Import Accounts - Step 3 &gt; Results</h1>
-		<g:if test="${flash.message}">
-			<div class="message">${flash.message}</div>
-		</g:if>
+<div class="body account-import-review">
+	<h1>Import Accounts - Posting Results</h1>
+	<g:if test="${flash.message}">
+		<div class="message">${flash.message}</div>
+	</g:if>
+
+	<div id="grid" style="margin:1em; width=1000px;"></div>
+
+	<script>
+		// Used to render the changes made in a view
+		function showChanges(model, propertyName) {
+			var originalPropName = propertyName + '${originalSuffix}';
+			var defaultPropName = propertyName + '${defaultSuffix}';
+			var errorPropName = propertyName + '${errorSuffix}';
+			var hasCurrVal = model.hasOwnProperty(propertyName);
+			var hasOrigVal = model.hasOwnProperty(originalPropName);
+			var hasDefVal  = model.hasOwnProperty(defaultPropName);
+			var hasErrVal  = model.hasOwnProperty(errorPropName);
+			// var hasOrigVal = model.hasOwnProperty(propertyName + '${originalSuffix}');
+			//var hasDefVal  = model.hasOwnProperty(propertyName + '${defaultSuffix}');
+			var str = '';
+			
+			if (propertyName == '')
+				console.log('hasCurrVal='+hasCurrVal + ', hasOrigVal=' + hasOrigVal + ', hasDefVal=' + hasDefVal);
+
+			if (hasErrVal) {
+				// Display an error message
+				str = (hasCurrVal ? '<span class="change">' + model[propertyName] + '</span><br>' : '') +
+					'<span class="error">' + model[errorPropName] + '</span>';
+
+			} else if (hasCurrVal && hasOrigVal && hasDefVal) {
+				// A unique case with Security Roles and Teams where we need to show original, the changes and the results
+				str = '<br><span class="change">' + model[defaultPropName] + '</span>';
+				if (model[originalPropName]) {
+					str = str + '<br><span class="original">' + model[originalPropName] + '</span>';
+				}
+				if (model[propertyName]) {
+					str = str + '<br><span class="userData">' + model[propertyName] + '</span>';
+				}
+			} else if(hasDefVal) {
+				// A value was defaulted in from pre-existing user or application defaults
+				str = '<span class="default">' + model[defaultPropName] + '</span>';
+				if (hasCurrVal && ! (model[defaultPropName] == model[propertyName]) ) {
+					str += '<br><span class="change">' + model[propertyName] + '</span>';
+				}
+			} else if(hasOrigVal) {
+				str = '<span class="change">' + model[propertyName] + '</span>' + 
+					(model[originalPropName] ? '<br><span class="original">' + model[originalPropName] + '</span>' : '');
+			} else {
+				str = '<span class="unchanged">' + model[propertyName] + '</span>';
+			}
+
+			return str;
+
+
+		}
+
+		// Used by the cancel button to call the cancel action
+		function callCancelImport(fn) {
+			var url = '${createLink(action: 'cancelImport')}'
+			window.location = url + '/' + fn;
+		}
+
+	</script>
+
+	<script type="text/x-kendo-tmpl" id="error-template">
+		#if (errors) {#
+			<div class="">
+				<ul>
+					#var errorList = errors.split('|');#
+					#for (var i=0,len=errorList.length; i<len; i++) {#
+						<li>${'$'}{ errorList[i] }</li>
+					#}#
+				</ul>
+			</div>
+		#}#
+
+
+	</script>
+
+	<script>
+
+		$(document).ready(function() {
+			// Track load of the Grid has been processed correctly
+			var loadValidation = true;
+
+			/**
+			 * Handle errors when the import process fails
+			 * It follows the format status: "customerror", errorThrown: "custom error", errors: Array[2],
+			 * @param data
+			 */
+			function processErrors(data) {
+				loadValidation = false;
+				var errorMsg = "";
+
+				if(data.status) {
+					errorMsg += '<strong> ' + data.status + ' </strong><br />';
+				}
+
+				if (data.errors && data.errors.length > 0) {
+					errorMsg += '<ul>';
+					for(var i = 0; i < data.errors.length; i++){
+						errorMsg +=	'<li> ' + data.errors[i] + ' </li>'
+					}
+					errorMsg += '</ul>';
+				}
+
+				$('#errorModalText').html(errorMsg);
+				$('#errorModal').modal('show');
+
+				var gridElement = $("#grid");
+				gridElement.find('.k-grid-content').remove();
+				gridElement.find('.k-grid-content-locked').remove();
+				gridElement.height(80);
+
+				$("#createSubmit").hide();
+			}
+
+			$("#grid").kendoGrid({
+				dataSource: {
+					type: "json",
+					transport: {
+						read: "${createLink(action:'importAccountsPostResultsData', params:paramsForReviewDataRequest)}"
+					},
+					error: processErrors,
+					schema: {
+						model: {
+							fields: {
+								<g:each var="propName" in="${properties}">${propName}: { type: "string" },</g:each>
+								errors: { type: "string" },
+								matches: { type: "string" }
+							}
+						}
+					},
+					pageSize: 30
+				},
+				columns: [
+					{ template: '<img src="#= icon #" />', width:30, locked: true },
+		
+				<g:set var="isFirstElement" value="${true}"/>
+				<g:each var="propName" in="${properties}">
+					<g:set var="gridOpt" value="${gridMap[propName]}" />
+					<g:if test="${isFirstElement}"><g:set var="isFirstElement" value="${false}"/></g:if>
+					<g:else>,</g:else>
+					{
+						field: "${propName}",
+						title: "${gridOpt.label}",
+						locked: ${gridOpt.locked},
+						<g:if test="${gridOpt.template}">template: ${gridOpt.template},</g:if>
+						<g:if test="${gridOpt.templateClass}">attributes: { "class": "${gridOpt.templateClass}" },</g:if>
+						lockable: false,
+						width: ${gridOpt.width}
+					}
+				</g:each>
+				],
+				height: 540,
+				sortable: true,
+				reorderable: false,
+				groupable: false,
+				resizable: true,
+				filterable: true,
+				columnMenu: true,
+				pageable: false,
+				dataBound: function() {
+					resizeGrid();
+				}
+			});
+
+			function resizeGrid() {
+				var gridElement = $("#grid");
+				var dataArea = gridElement.find(".k-grid-content");
+				// Grid with locked columns has two  containers
+				var dataAreaLocked = gridElement.find(".k-grid-content-locked");
+				var newHeight = $(window).innerHeight() - 200;
+				var diff = gridElement.innerHeight() - dataArea.innerHeight();
+				gridElement.height(newHeight);
+				dataArea.height(newHeight - diff);
+				dataAreaLocked.height(newHeight - diff);
+			}
+
+			$(window).resize(function(){
+				if(loadValidation) {
+					resizeGrid();
+				}
+			});
+		});
+
+		</script>
 
 		<div>
-			${created} accounts were created
+			
+			<h3>Results Summary</h3>
+			<ul>
+				<li>People Created: ${results.personCreated}</li>
+				<li>People Updated: ${results.personUpdated}</li>
+				<li>People Skipped: ${results.personSkipped}</li>
+				<li>People Unchanged: ${results.personUnchanged}</li>
+				<li>People With Errors: ${results.personError}</li>
 
-			<g:if test="${failedPeople.size() > 0}">
-				<h3>Accounts status:</h3>
-				<table>
-					<thead>
-						<tr>
-							<th>Username</th>
-							<th>First Name</th>
-							<th>Middle Name</th>
-							<th>Last Name</th>
-							<th>Phone</th>
-							<th>Email</th>
-							<th>Error/Message</th>
-						</tr>
-					</thead>
-					<tbody>
-						<g:set var="counter" value="${0}" />
-						<g:each in="${failedPeople}" var="person">
-							<tr class="${(counter % 2) == 0 ? 'even' : 'odd'}">
-									<td>${person.username}</td>
-									<td>${person.firstName}</td>
-									<td>${person.middleName}</td>
-									<td>${person.lastName}</td>
-									<td>${person.phone}</td>
-									<td>${person.email}</td>
-									<td>									
-										<g:each in="${person.errors}" var="error">${error}<br></g:each>
-									</td>
-							</tr>
-						</g:each>
-					</tbody>
-				</table>
-			</g:if>
+				<li>User Logins  Created: ${results.userLoginCreated}</li>
+				<li>User Logins  Updated: ${results.userLoginUpdated}</li>
+				<li>User Logins  With Errors: ${results.userLoginError}</li>
+			</ul>
+			<%-- 
+			personSkipped: 0,
+			personUnchanged: 0,
+			teamsUpdated: 0,
+			teamsError: 0,
+			userLoginError:0
+			--%>
 		</div>
 	</div>
+</div>
+<g:include view="/layouts/_error.gsp" />
 </body>
 </html>

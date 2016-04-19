@@ -48,13 +48,6 @@ class AdminController {
 	private static String DEFAULT_ROLE = 'USER'
 	private static String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
 
-
-def test() {
-	def obj = ApplicationContextHolder.getService('securityService')
-	render "The object is ${ obj ? obj.getClass().getName() : 'null'}".toString()
-}
-
-
 	def index() { }
 
 	/**
@@ -1271,6 +1264,36 @@ def test() {
 	}
 
 	/**
+	 * Used to retrieve the account information during the import process after it has been read in from the 
+	 * uploaded spreadsheet and reviewed for errors.
+	 * @params filename - the filename that the temporary uploaded spreadsheet was saved as
+	 * @return JSON { accounts: List of accounts }
+	 */
+	def importAccountsPostResultsData() {
+		def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonExport')
+		if (!project) {
+			ServiceResults.respondWithError(response, flash.message)
+			flash.message = ''
+			return
+		}
+		if (! params.filename) {
+			ServiceResults.respondWithError(response, "Request was missing the required filename reference")
+			return
+		}
+		try {
+			Map formOptions = accountImportExportService.importParamsToOptionsMap(params)
+			accountImportExportService.generatePostResultsDataToBrowser(session, response, user, project, params.filename, formOptions)
+			return 
+
+		} catch(e) {
+			log.error "importAccountsPostResultsData() Exception occurred while retrieving import accounts post results: " + e.printStackTrace()
+
+			ServiceResults.respondWithError(response,
+				[ "An error occurred while attempting to retrieve import accounts post results", e.getMessage()]  )
+		}
+	}
+
+	/**
 	 * Used to import accounts including persons and optionally their userLogin accounts. This is a three
 	 * step form that take param.step to track at what point the user is in the process. The steps include:
 	 *     start  - The user is presented a form
@@ -1280,7 +1303,6 @@ def test() {
 	 *              changes to the database and delete the spreadsheet.
 	 */	 
 	def importAccounts() {
-
 		// TODO : JPM 4/2016 : importAccounts - check permissions based on importing person and users (options if person but not user should update the import form as well)
 		def (project, user) = controllerService.getProjectAndUserForPage(this, 'EditUserLogin')
 		if (!project) {
@@ -1300,18 +1322,9 @@ def test() {
 		// There is a bug or undocumented feature that doesn't allow overriding params when forwarding which is used
 		// in the upload step to forward to the review so we look for the stepAlt and use it if found.
 		String step = params.stepAlt ?: params.step
-
 		try {
 
 			switch (step) {
-				case 'cancel':
-					String filename = params.filename
-					if (filename) {
-						accountImportExportService.cancelImport(user, project, options)
-					}
-					flash.message = "The previous import was cancelled"
-					model.step='' 	// start over
-					break
 
 				case 'upload':
 					// This step will save the spreadsheet that was posted to the server after reading it 
@@ -1359,12 +1372,27 @@ def test() {
 					}
 
 					// Here's the money maker call that will update existing accounts and create new ones accordingly
-					Map results = accountImportExportService.postChangesToAccounts(session, user, project, options)
+					model.results = accountImportExportService.postChangesToAccounts(session, user, project, options)
+					
+					log.debug "importAccounts() post results = ${model.results}"
+
+					model << accountImportExportService.generateModelForPostResults(session, user, project, options)
+					if (!options.filename && model.filename) {
+						// log.debug "importAccounts() step=$step set filename=${model.filename}"
+						options.filename = model.filename
+					}
+
+					// This is used by the AJAX request in the form to construct the URL appropriately
+					model.paramsForReviewDataRequest = [filename:model.filename, importOption:params.importOption]
+
+					view = "${formAction}Results"
+					log.debug "importAccounts() view = $view"
 
 
-					render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
 
-					return
+					// render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
+
+					// return
 					break
 
 				default:
@@ -1372,6 +1400,48 @@ def test() {
 					break
 
 			}
+
+		} catch (e) {
+			switch (e) {
+				case InvalidRequestException:
+				case DomainUpdateException:
+				case InvalidParamException:
+				case EmptyResultException:
+					log.debug "importAccounts() exception ${e.getClass().getName()} ${e.getMessage()}"
+					flash.message = e.getMessage()
+					break
+				default: 
+					log.error "Exception occurred while importing data (step $currentStep)" + e.printStackTrace()
+					flash.message = "An error occurred while attempting to import accounts"				
+			}
+			// Attempt to delete the temporary uploaded worksheet if an exception occurred
+			if (options.filename) {
+				accountImportExportService.deletePreviousUpload(user, options)
+			}
+
+		}
+
+		log.debug "importAccounts() Finishing up controller step=$step, view=$view, model=$model"
+		render view:view, model:model
+	}
+
+	/**
+	 * Used to cancel an account import process that is in flight. This basically will delete the uploaded spreadsheet
+	 * and then redirect the user back to the Import Account view.
+	 * @param params.filename - the filename that the temporary uploaded spreadsheet was saved as
+	 * @return JSON { accounts: List of accounts }
+	 */
+	def cancelImport() {
+		try {
+			def (project, user) = controllerService.getProjectAndUserForPage(this, 'PersonImport')
+			if (!project) {
+				return
+			}
+
+			Map options = [filename: params.id]
+
+			accountImportExportService.cancelPreviousUpload(user, project, options)
+			flash.message = "The previous import was cancelled"
 
 		} catch (InvalidRequestException e) {
 			flash.message = e.getMessage()
@@ -1382,290 +1452,11 @@ def test() {
 		} catch (EmptyResultException e) {
 			flash.message = e.getMessage()
 		} catch (e) {
-			log.error "Exception occurred while importing data (step $currentStep)" + e.printStackTrace()
-			flash.message = "An error occurred while attempting to import accounts"
+			log.error "cancelImport() Unexpected exception occurred while cancelling Account Import" + e.printStackTrace()
+			flash.message = "An error occurred while attempting to cancel Account Import"
 		}
 
-		render view:view, model:model
-	}
-
-	private String createUserForAccount(Person person, Project project, Map userSettings) {
-/*
-		def u = UserLogin.findByPerson(person)
-		if (!u) {
-			def userPass = commonPassword
-			if (!StringUtils.isEmpty(userSettings.password)) {
-				userPass = userSettings.password
-			}
-			u = new UserLogin(
-				username: userSettings.username,
-				active: userSettings.activateLogin
-				expiryDate: userSettings.expiryDate,
-				person: person,
-				forcePasswordChange: userSettings.forcePasswordChange
-			)
-
-			u.applyPassword(userPass)
-
-			if (! u.validate() || !u.save(flush:true)) {
-				p.errors << "Error" + GormUtil.allErrorsString(u)
-				log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
-				failed = true
-			} else {
-				log.info "importAccounts() : created UserLogin $u"
-				def up = new UserPreference(
-					userLogin: u,
-					preferenceCode: 'CURR_PROJ',
-					value: project.id.toString()
-				)
-				if (! up.validate() || ! up.save()) {
-					log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-					p.errors << "Setting Default Project Errored"
-					failed = true
-				}
-			}
-		} else {
-			failed = true
-			p.errors << "Person already have a userlogin: $u"
-		}
-*/
-	}
-
-
-	/**
-	 * A controller process to import user accounts
-	 */
-	def importAccountsOLD() {
-
-		Project project = controllerService.getProjectForPage(this, 'PersonImport')
-		if (!project) 
-			return
-
-		def people
-
-		def map = [step:'start', projectName:project.toString() ]
-
-		switch (params.step) {
-
-			case 'post':
-
-				def createUserLogin = params.createUserlogin == 'Y'
-				def activateLogin = params.activateLogin == 'Y'
-				def randomPassword = params.randomPassword == 'Y'
-				def forcePasswordChange = params.forcePasswordChange == 'Y'
-				def commonPassword = params.password
-				def expireDays = NumberUtils.toInt(params.expireDays,90)
-				def header = params.header == 'Y'
-				def role = params.role
-
-				//MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
-				//CommonsMultipartFile xls = ( CommonsMultipartFile ) mpr.getFile('/tmp/tdstm-account-import.xls')
-
-				HSSFWorkbook xlsWorkbook = new HSSFWorkbook(new FileInputStream(new File('/tmp/tdstm-account-import.xls')))
-
-
-				people = parseXLS(xlsWorkbook, header, createUserLogin)
-				lookForMatches()
-
-				if (randomPassword) {
-					commonPassword = UUID.randomUUID().toString()
-				}
-
-				def expiryDate = new Date()
-
-				use(TimeCategory) {
-					expiryDate = expiryDate + expireDays.days
-				}
-
-				log.info "expiryDate=$expiryDate"
-
-				def failedPeople = []
-				def created = 0
-
-				if (!StringUtils.isEmpty(role) && !validRoleCodes.contains(role)) {
-					failed = true
-					people = []
-				}
-
-				def projectCompanies = partyRelationshipService.getProjectCompanies(project.id)
-
-				people.each() { p -> 
-
-					def company = projectCompanies.find{it.partyIdTo.name == p.company}
-					if(!company){
-						p.errors << "Unable to assign ${p.name} to ${p.company}"
-					}else{
-						def person
-						boolean failed = false
-						boolean haveMessage = false
-
-						if (p.match ) {
-							// Find the person
-							person = findPerson(p)
-							if (! person) {
-								p.errors << "Unable to find previous Person match"
-								failed = true
-							} else {
-								person.email = p.email
-								person.workPhone = p.phone
-								person.title = p.title
-								person.deparment = p.department
-								person.location = p.location
-								person.stateProv = p.stateProv
-								person.country = p.country
-								person.mobilePhone = p.mobile
-
-								if (person.validate() && person.save(flush:true)) {
-									log.info "importAccounts() : updated person $person"
-									partyRelationshipService.addCompanyStaff(company, person)
-								} else {
-									p.errors << "Error" + GormUtil.allErrorsString(person)
-									failed = true
-								}
-							}
-						} else {
-							person = new Person(
-								firstName:p.firstName, 
-								middleName:p.middleName, 
-								lastName:p.lastName,
-								email:p.email,
-								workPhone: p.phone,
-								title: p.title,
-								department: p.department,
-								location: p.location,
-								stateProv: p.stateProv,
-								country: p.country,
-								mobilePhone: p.mobile,
-								staffType: 'Salary'
-								)
-						
-							if (person.validate() && person.save(flush:true)) {
-								log.info "importAccounts() : created person $person"
-								partyRelationshipService.addCompanyStaff(company, person)
-								partyRelationshipService.addProjectStaff(project, person)
-							} else {
-								p.errors << "Error" + GormUtil.allErrorsString(person)
-								failed = true
-							}
-
-							// Assign the user to one or more teams appropriately
-							if (!failed && p.teams) {
-								List teams = splitTeams(p.teams)
-
-								teams.each { t ->
-									if (teamCodes.contains(t)) {
-										partyRelationshipService.addStaffFunction(person, t, project.client, project)
-									}
-								}
-							}
-						}
-
-						def userRole = role
-						if (!StringUtils.isEmpty(p.role) && validRoleCodes.contains(p.role)) {
-							userRole = p.role
-						}
-						if (!validRoleCodes.contains(userRole)) {
-							userRole = DEFAULT_ROLE
-						}
-						if (!failed && !StringUtils.isEmpty(userRole)) {
-							log.debug "importAccounts() : creating Role $userRole for $person"
-							// Delete previous security roles if they exist
-							def assignedRoles = []
-							def assignRole = false
-							if (p.match) {
-								def personRoles = userPreferenceService.getAssignedRoles(person);
-								personRoles.each { r ->
-									assignedRoles << r.id
-									if (r.id != userRole) {
-										assignRole = true
-									}
-								}
-								if (assignRole) {
-									userPreferenceService.deleteSecurityRoles(person)
-								}
-								if (personRoles.size() == 0) {
-									assignRole = true
-								}
-							} else {
-								assignRole = true
-							}
-							if (assignRole) {
-								userPreferenceService.setUserRoles([userRole], person.id)
-
-								// Audit role changes
-								def currentUser = securityService.getUserLogin()
-								if (p.match) {
-									p.errors << "Roles ${assignedRoles.join(',')} removed and assigned role ${userRole}."
-									haveMessage = true
-									auditService.logMessage("$currentUser changed ${person} roles, removed ${assignedRoles.join(',')} and assigned the role ${userRole}.")
-								} else {
-									auditService.logMessage("$currentUser assigned to ${person} the role ${userRole}.")
-								}
-							}
-						}
-
-						if (person && createUserLogin && p.username) {
-							def u = UserLogin.findByPerson(person)
-							if (!u) {
-								def userPass = commonPassword
-								if (!StringUtils.isEmpty(p.password)) {
-									userPass = p.password
-								}
-								u = new UserLogin(
-									username: p.username,
-									active: (activateLogin ? 'Y' : 'N'),
-									expiryDate: expiryDate,
-									person: person,
-									forcePasswordChange: (forcePasswordChange ? 'Y' : 'N')
-								)
-
-								u.applyPassword(userPass)
-
-								if (! u.validate() || !u.save(flush:true)) {
-									p.errors << "Error" + GormUtil.allErrorsString(u)
-									log.debug "importAccounts() UserLogin.validate/save failed - ${GormUtil.allErrorsString(u)}"
-									failed = true
-								} else {
-									log.info "importAccounts() : created UserLogin $u"
-									def up = new UserPreference(
-										userLogin: u,
-										preferenceCode: 'CURR_PROJ',
-										value: project.id.toString()
-									)
-									if (! up.validate() || ! up.save()) {
-										log.error "importAccounts() : failed creating User Preference for $person : " + GormUtil.allErrorsString(up)
-										p.errors << "Setting Default Project Errored"
-										failed = true
-									}
-								}
-							} else {
-								failed = true
-								p.errors << "Person already have a userlogin: $u"
-							}
-
-							if (!failed) created++
-
-						}
-
-						if (failed || haveMessage) {
-							failedPeople << p	
-						}
-					}
-
-				} // people.each
-
-				map.step = 'results'
-				map.failedPeople = failedPeople
-				map.created = created
-				break
-
-			default: 
-				break
-
-		} // switch
-
-		return map
-
+		redirect (action:'importAccounts' )
 	}
 
 	/**

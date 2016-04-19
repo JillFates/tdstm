@@ -85,22 +85,15 @@
 
 			return str;
 
-/*
-			var originalPropName = propertyName + '${originalSuffix}';
-			var defaultPropName = propertyName + '${defaultSuffix}';
-			if (model.hasOwnProperty(defaultPropName)) {
-				return '<span class="default">' + model[defaultPropName] + '</span>';
-			} else if (model.hasOwnProperty(originalPropName)) {
-				return '<span class="change">' + model[propertyName] + 
-					'</span>' + 
-					(model[originalPropName] ? '<br><span class="original">' + model[originalPropName] + '</span>' : '');
-			} else {
-				return model[propertyName];
-			}
-*/
+
 		}
 
-		// alert(errorsTemplate({personId: 123, age:50}));
+		// Used by the cancel button to call the cancel action
+		function callCancelImport(fn) {
+			var url = '${createLink(action: 'cancelImport')}'
+			window.location = url + '/' + fn;
+		}
+
 	</script>
 
 	<script type="text/x-kendo-tmpl" id="error-template">
@@ -225,10 +218,7 @@
 			});
 		});
 
-
-
 		</script>
-
 
 		<div>
 			<p>
@@ -242,8 +232,15 @@
 				<input type="hidden" name="filename" value="${filename}" />
 				<input type="hidden" name="importOption" value="${importOption}" />
 
-				<g:submitButton id="createSubmit" name="submit" value="Post changes to ${importOptionDesc}" />
+				<g:actionSubmit id="createSubmit" value="Post changes to ${importOptionDesc}" action="importAccounts" />
+
+				<%--
+				<g:actionSubmit id="cancelButton" value="Cancel" action="cancelImport" params="filename=$filename" />
+				--%>
+
+				<input type="button" id="cancelImport" class="cancel" value="Cancel" onclick="callCancelImport('${filename}');"/>
 			</g:form>
+
 		</div>
 	</div>
 </div>

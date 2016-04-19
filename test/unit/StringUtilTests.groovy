@@ -193,4 +193,25 @@ class StringUtilTests extends Specification {
 			''		| null
 
 	}
+
+	def "Test the containsPathTraversals for any possible hacks"() {
+		expect:
+			SU.containsPathTraversals(value) == result
+		where:
+			value 			| result
+			'../asf'		| true
+			'./asf'			| true
+			'blah/../root'	| true
+			'blah\\..\\root'| true		// Windoze backslashes 
+			'%2e%2e%2froot'	| true		// Encoding of ../
+			'%c0%afroot'	| true		// Double encoding /
+			'%c1%9croot'	| true		// Double encoding \
+			'foo?xyz'		| true		// Not necessarily a hack but we're not going to allow it anyways
+			'bar&123'		| true		// Ditto
+			null 			| true		// A null let's fail it for good measure
+			'file.ext'		| false		// Good filename
+			'file'			| false
+			''				| false
+
+	}
 }
