@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.hssf.util.CellReference
 import java.text.DateFormat
 import java.util.TimeZone
+import java.util.Collection
 
 /**
  * The WorkbookUtil class contains a collection of useful Apache POI manipulation methods
@@ -85,7 +86,7 @@ class WorkbookUtil {
 	 * @throws ParseException - if the field contains an invalid formatted String value
 	 * @deprecated Please use getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) 
 	 */
-	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, String formatterTypes=null) {
+	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, Collection formatterTypes=null) {
 		Date result
 		Cell cell = getCell(sheet, columnIdx, rowIdx)
 
@@ -99,9 +100,10 @@ class WorkbookUtil {
 					// result = TimeUtil.moveDateToTZ(result, session)
 					break
 				case Cell.CELL_TYPE_STRING:
+					String cellVal = cell.getStringCellValue()
 					for(def formatterType : formatterTypes) {
 						try {
-							result = TimeUtil.parseDateTime(session, cell.getStringCellValue(), formatterType)
+							result = TimeUtil.parseDate(session, cellVal, formatterType)
 							if (result) {
 								break
 							}
@@ -109,6 +111,8 @@ class WorkbookUtil {
 							// TODO : JPM 4/2016 : We should report an error that we were unable to read the date value here
 						}
 					}
+
+					if(!result) log.warn("Can't Parse '$cellVal' using any of the formatters declared in $formatterTypes")
 					break
 				default:
 					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")

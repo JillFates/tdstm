@@ -323,6 +323,7 @@ class AssetEntityController {
 	 * @return An error message if it failed to add the value to the buffer
 	 */
 	private String rowToImportValues(
+		Map sheetInfo,
 		StringBuffer sqlStrBuff,
 		HSSFSheet sheetRef, 
 		Integer rowOffset, 
@@ -344,10 +345,11 @@ class AssetEntityController {
 			} else {
 				if ( (dtaMapField.columnName in importColumnsDateType) )  {
 					if (!StringUtil.isBlank(cellValue)) {
-						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, getSession(), [TimeUtil.FORMAT_DATE_TIME_12])
-						// Convert to string in the date format
+						def dateValue = WorkbookUtil.getDateCellValue(sheetRef, colOffset, rowOffset, sheetInfo.dateFormatter)
+						// Convert to string in the Date format
 						if (dateValue) {
-							cellValue = TimeUtil.formatDate(getSession(), dateValue)
+							cellValue = TimeUtil.formatDate(dateValue, sheetInfo.userDateFormatter)
+							//cellValue = TimeUtil.formatDate(getSession(), dateValue)
 						} else {
 							cellValue = ''
 						}
@@ -600,7 +602,7 @@ class AssetEntityController {
 	}
 
 	// Method process one of the asset class sheets
-	private Map processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, assetIdColName, assetNameColName, headerRowNum, domainName, timeOfExport) {
+	private Map processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, assetIdColName, assetNameColName, headerRowNum, domainName, timeOfExport, sheetConf) {
 
 		Map results = initializeImportResultsMap()
 		try {
@@ -609,6 +611,8 @@ class AssetEntityController {
 			if (! dataTransferBatch) {
 				failForTransferBatchError(assetSheetName)
 			}
+
+			sheetInfo << sheetConf
 
 			importSheetValues(results, dataTransferBatch, projectCustomLabels, sheetInfo)
 
@@ -711,7 +715,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 						if ( dtaAttrib != null ) {
 
 							// Add the SQL VALUES(...) to the sqlValues StringBuffer for the current spreadsheet cell
-							errorMsg = rowToImportValues(sqlValues, sheetObject, r, cols, dtaAttrib, assetId, dataTransferBatch.id)
+							errorMsg = rowToImportValues(sheetInfo, sqlValues, sheetObject, r, cols, dtaAttrib, assetId, dataTransferBatch.id)
 							if (errorMsg) {
 								rowHasErrors = true
 								results.errors << "$assetSheetName [row ${( r + 1 )}] - $errorMsg"
@@ -934,14 +938,28 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				}
 			}
 
+			def sheetConf = [:]
+
 			// Get the title sheet
 			titleSheet = workbook.getSheet( "Title" )
 
 			if (titleSheet != null) {			
 				try {
 					String tzId = WorkbookUtil.getStringCellValue(titleSheet, 1, 8)
-					String dateTimeStrFormat = WorkbookUtil.getStringCellValue(titleSheet, 1, 9)
-					def dateTimeFormatter = TimeUtil.createFormatterForType(dateTimeStrFormat, TimeUtil.FORMAT_DATE_TIME_22)
+					String dateFormatType = WorkbookUtil.getStringCellValue(titleSheet, 1, 9)
+					def dateTimeFormatter = TimeUtil.createFormatterForType(dateFormatType, TimeUtil.FORMAT_DATE_TIME_22)
+					def dateFormatter = TimeUtil.createFormatterForType(dateFormatType, TimeUtil.FORMAT_DATE_TIME_12)
+
+					String userTzId = getSession().getAttribute(TimeUtil.TIMEZONE_ATTR )?.CURR_TZ
+					String userDTFormat = getSession().getAttribute(TimeUtil.DATE_TIME_FORMAT_ATTR)?.CURR_DT_FORMAT
+
+					def userDateFormatter = TimeUtil.createFormatterForType(userDTFormat, TimeUtil.FORMAT_DATE)
+
+					sheetConf.tzId = tzId
+					sheetConf.dateFormatType = dateFormatType
+					sheetConf.dateFormatter = dateFormatter
+					sheetConf.userDateFormatter = userDateFormatter
+
 					exportTime = WorkbookUtil.getDateTimeCellValue(titleSheet, 1, 7, tzId, dateTimeFormatter)
 				} catch ( Exception e) {
 					log.info "Was unable to read the datetime for 'Export on': " + e.message
@@ -964,7 +982,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			if (params.asset == 'asset') {
 				sheetName='Devices'
 				domainClassName = 'AssetEntity'
-				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'assetId', 'Name', 0, domainClassName, exportTime)
+				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'assetId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
@@ -975,7 +993,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			if (params.application == 'application') {
 				sheetName='Applications'
 				domainClassName = 'Application'
-				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'appId', 'Name', 0, domainClassName, exportTime)
+				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'appId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
@@ -986,7 +1004,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			if (params.database == 'database') {
 				sheetName='Databases'
 				domainClassName = 'Database'
-				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'dbId', 'Name', 0, domainClassName, exportTime)
+				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'dbId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
@@ -997,7 +1015,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			if (params.storage == 'storage') {
 				sheetName='Storage'
 				domainClassName = 'Files'
-				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'filesId', 'Name', 0, domainClassName, exportTime)
+				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'filesId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
 			}
