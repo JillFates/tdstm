@@ -348,7 +348,7 @@ class TimeUtil {
 	 * @deprecated formatting a date with a Timezone should not be used as Dates should be handled as an absolute (no time element date)
 	 **/
 	public static String formatDate(String tzId, Date dateValue, DateFormat formatter) {
-		LOG.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
+		log.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
 
@@ -391,7 +391,7 @@ class TimeUtil {
 	 * @deprecated formatting a date with a Timezone should not be used as Dates should be handled as an absolute (no time element date)
 	 **/
 	public static String formatDateTime(String tzId, Date dateValue, DateFormat formatter) {
-		LOG.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
+		log.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
 
