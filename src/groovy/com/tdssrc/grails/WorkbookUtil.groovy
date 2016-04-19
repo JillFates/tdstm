@@ -169,7 +169,7 @@ class WorkbookUtil {
 
 				case Cell.CELL_TYPE_NUMERIC:
 					// We are assuming that the dates in the spreadsheet are written in the timezone of the user (para)
-					// Dates stored in the spreadsheet are done since they are already stored without TZ					
+					// Dates stored in the spreadsheet are done since they are already stored without TZ
 					Date dateInTz = cell.getDateCellValue()	
 
 					// Now we need to shift the date to GMT so that it is correct TZ

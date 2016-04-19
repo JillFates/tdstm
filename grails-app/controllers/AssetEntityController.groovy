@@ -214,7 +214,7 @@ class AssetEntityController {
 		
 		def prefMap = [:]
 		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportCabling', 'ImportComment'].each{t->
-		   prefMap << [(t) : userPreferenceService.getPreference(t)]
+			prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
 		def isMSIE = false
@@ -280,7 +280,7 @@ class AssetEntityController {
 		
 		def prefMap = [:]
 		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack', 'ImportCabling','ImportComment'].each {t->
-		   prefMap << [(t) : userPreferenceService.getPreference(t)]
+			prefMap << [(t) : userPreferenceService.getPreference(t)]
 		}
 		
 		render (view:"exportAssets", model : [projectId: projectId,
@@ -868,7 +868,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		session.setAttribute("TOTAL_ASSETS",0)
 
 		def projectId = project.id
-		def tzId = getSession().getAttribute( "CURR_TZ" )?.CURR_TZ
 		
 		if (! params.dataTransferSet) {
 			failWithError 'Import request was missing expected parameter(s)'
@@ -940,9 +939,10 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 			if (titleSheet != null) {			
 				try {
-					
-					exportTime = WorkbookUtil.getDateCellValue(titleSheet, 1, 5, getSession())
-
+					String tzId = WorkbookUtil.getStringCellValue(titleSheet, 1, 8)
+					String dateTimeStrFormat = WorkbookUtil.getStringCellValue(titleSheet, 1, 9)
+					def dateTimeFormatter = TimeUtil.createFormatterForType(dateTimeStrFormat, TimeUtil.FORMAT_DATE_TIME_22)
+					exportTime = WorkbookUtil.getDateTimeCellValue(titleSheet, 1, 7, tzId, dateTimeFormatter)
 				} catch ( Exception e) {
 					log.info "Was unable to read the datetime for 'Export on': " + e.message
 					failWithError "The 'Exported On' datetime was not found or was invalid in the Title sheet"
@@ -1041,13 +1041,13 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				def assetDepStatusList = AssetDependencyStatus.getList()
 
 				def lookupValue = { value, list ->
-				    def result = "Unknown"
-				    list.each{
-				        if(it.equalsIgnoreCase(value)){
-				            result = it
-				        }
-				    }
-				    return result
+					def result = "Unknown"
+					list.each{
+						if(it.equalsIgnoreCase(value)){
+							result = it
+						}
+					}
+					return result
 				}
 
 				for ( int r = 1; r <= dependencySheetRow ; r++ ) {
@@ -1672,42 +1672,42 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 		switch (redirectTo) {
 			case "room":
-				  redirect( controller:'room', action:'list' )
-				  break;
+					redirect( controller:'room', action:'list' )
+					break;
 			case "rack":
-				  session.setAttribute("USE_FILTERS", "true")
-				  redirect( controller:'rackLayouts',action:'create' )
-				  break;
+					session.setAttribute("USE_FILTERS", "true")
+					redirect( controller:'rackLayouts',action:'create' )
+					break;
 			case "assetAudit":
 				if (saved)
 					render(template:'auditDetails',	model:[assetEntity:entity, source:model.source, assetType:model.assetType])
 				else
 					forward(action:'create', params:model)
-				  break;
+					break;
 			case "application":
-				  redirect( controller:'application', action:'list')
-				  break;
+					redirect( controller:'application', action:'list')
+					break;
 			case "database":
-				  redirect( controller:'database', action:'list')
-				  break;
+					redirect( controller:'database', action:'list')
+					break;
 			case "files":
-				  redirect( controller:'files', action:'list')
-				  break;
+					redirect( controller:'files', action:'list')
+					break;
 			case "listComment":
-				  forward(action:'listComment')
-				  break;
+					forward(action:'listComment')
+					break;
 			case "roomAudit":
-				  forward(action:'show', params:[redirectTo:redirectTo, source:model.source, assetType:model.assetType])
-				  break;
+					forward(action:'show', params:[redirectTo:redirectTo, source:model.source, assetType:model.assetType])
+					break;
 			case "dependencyConsole":
-				  forward(action:'retrieveLists', params:[entity:model.tabType,labelsList:model.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
-				  break;
+					forward(action:'retrieveLists', params:[entity:model.tabType,labelsList:model.labels, dependencyBundle:session.getAttribute("dependencyBundle")])
+					break;
 			case "listTask":
-				  render "Asset ${entity.assetName} updated."
-				  break;
+					render "Asset ${entity.assetName} updated."
+					break;
 			case "dependencies":
-				  redirect(action:'listDependencies')
-				  break;
+					redirect(action:'listDependencies')
+					break;
 
 			case 'list':
 			default:
@@ -1724,7 +1724,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					}
 					render(ServiceResults.success(model) as JSON)
 				}
-		  }
+		}
 	}
 
 	/*--------------------------------------------------------
@@ -3405,7 +3405,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			result = ''
 			if(workFlowTransition.size()){
 				def paramsMap = [selectId:'workFlowId', selectName:'workFlow', options:workFlowTransition, firstOption : [value:'', display:''],
-						  optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
+						optionKey:'id', optionValue:'name', optionSelected:assetComment?.workflowTransition?.id]
 				result = HtmlUtil.generateSelect( paramsMap )
 			}
 		}
@@ -3510,7 +3510,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		}
 
 		render result
-	  }
+	}
 	
 	/**
 	 * Generates an HTML table containing all the predecessor for a task with corresponding Category and Tasks SELECT controls for
@@ -3881,9 +3881,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 		render true
 	}
 
-	 /**
-	  * Action to return on list Dependency
-	  */
+	/**
+	 * Action to return on list Dependency
+	 */
 	def listDependencies() {
 		def project = securityService.getUserCurrentProject();
 		if (!project) {

@@ -177,7 +177,7 @@ class AssetEntityService {
 	 * This method returns a list of the different asset classes.
 	 */
 	 def getAssetClasses(){
-	 	return AssetClass.getClassOptions()
+		return AssetClass.getClassOptions()
 	 }
 
 	/**
@@ -256,8 +256,8 @@ class AssetEntityService {
 	AssetEntityService() {
 		// This will wire up the bindData method to the service
 		// See http://nerderg.com/Grails
- 		GroovyDynamicMethodsInterceptor i = new GroovyDynamicMethodsInterceptor(this)
-        i.addDynamicMethodInvocation(new BindDynamicMethod())
+		GroovyDynamicMethodsInterceptor i = new GroovyDynamicMethodsInterceptor(this)
+				i.addDynamicMethodInvocation(new BindDynamicMethod())
 	}
 	*/
 
@@ -937,9 +937,9 @@ class AssetEntityService {
 				app.project_id=${project.id}
 				AND app.asset_type = 'Application' )"""
 
-	  def splList =   jdbcTemplate.queryForList( queryForSpecialExport )
+		def splList =   jdbcTemplate.queryForList( queryForSpecialExport )
 											
-	  return splList
+		return splList
 	}
 	
 	/**
@@ -970,7 +970,7 @@ class AssetEntityService {
 	 */
 	Map entityInfo(Project project, List groups=null){
 		def map = [ servers:[], applications:[], dbs:[], files:[], networks:[], dependencyType:[], dependencyStatus:[] ]
-        if (groups == null || groups.contains(AssetType.SERVER.toString())) {
+				if (groups == null || groups.contains(AssetType.SERVER.toString())) {
 			map.servers = AssetEntity.executeQuery(
 				"SELECT a.id, a.assetName FROM AssetEntity a " + 
 				"WHERE assetClass=:ac AND assetType in (:types) AND project=:project ORDER BY assetName", 
@@ -1679,20 +1679,20 @@ class AssetEntityService {
 		// log.info "getAssetsByType() types=$types"
 
 		if (types) {
-		  entities = AssetEntity.findAllByProjectAndAssetTypeInList(project, types, [sort:'assetName'])
+			entities = AssetEntity.findAllByProjectAndAssetTypeInList(project, types, [sort:'assetName'])
 		} else {
 			log.warn "getAssetsByType() calledwith unhandled type '$assetType'"
 		}	
 
 		/*
 			if (assetType=='Server' || assetType=='Blade' || assetType=='VM'){
-			  entities = AssetEntity.findAll('from AssetEntity where assetType in (:type) and project = :project order by assetName asc ',
-				  [type:["Server", "VM", "Blade"], project:project])
+				entities = AssetEntity.findAll('from AssetEntity where assetType in (:type) and project = :project order by assetName asc ',
+					[type:["Server", "VM", "Blade"], project:project])
 			} else if (assetType != 'Application' && assetType != 'Database' && assetType != 'Files'){
-			  entities = AssetEntity.findAll('from AssetEntity where assetType not in (:type) and project = :project order by assetName asc ',
-				  [type:["Server", "VM", "Blade", "Application", "Database", "Files"], project:project])
+				entities = AssetEntity.findAll('from AssetEntity where assetType not in (:type) and project = :project order by assetName asc ',
+					[type:["Server", "VM", "Blade", "Application", "Database", "Files"], project:project])
 			} else{
-			  entities = AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[assetType, project])
+				entities = AssetEntity.findAll('from AssetEntity where assetType = ? and project = ? order by assetName asc ',[assetType, project])
 			}
 		}
 		*/
@@ -2043,7 +2043,7 @@ class AssetEntityService {
 				targetCable.assetLoc= 'T'
 				if(!targetCable.save(flush:true)){
 					def etext = "Unable to create AssetCableMap" +
-	                GormUtil.allErrorsString( targetCable )
+									GormUtil.allErrorsString( targetCable )
 					println etext
 				}
 				cableExist << targetCable
@@ -2115,7 +2115,6 @@ class AssetEntityService {
 		return Room.findAll("FROM Room WHERE project =:project order by location, roomName", [project:project])
 	}
 
-
 	/**
 	 * Used to retrieve the values of DEVICE properties based on the attribute name
 	 * @param asset - the asset to retrieve the property from
@@ -2182,6 +2181,7 @@ class AssetEntityService {
 	 *		params.dataTransferSet - 
 	 *		params.username - the user that made the request
 	 *		params.tzId - the user's timezone (IMPORTANT that this be their system TZ and not their user preference*)
+	 * 		params.userDTFormat - the user's Date Format (MIDDLE_ENDIAN, LITTLE_ENDIAN)
 	 *		params.asset - flag to export devices
 	 *		params.application - flag to export apps
 	 *		params.database - flag to export databases
@@ -2521,9 +2521,14 @@ class AssetEntityService {
 					WorkbookUtil.addCell(titleSheet, 1, 3, projectId.toString())
 					WorkbookUtil.addCell(titleSheet, 2, 3, project.name.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 4, partyRelationshipService.getProjectManagers(projectId).toString())
-					WorkbookUtil.addCell(titleSheet, 1, 5, new Date(), Cell.CELL_TYPE_NUMERIC)
+					WorkbookUtil.addCell(titleSheet, 1, 5, bundleNameList.toString())
 					WorkbookUtil.addCell(titleSheet, 1, 6, loginUser.person.toString())
-					WorkbookUtil.addCell(titleSheet, 1, 7, bundleNameList.toString())
+				
+					def exportedOn = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, new Date(), TimeUtil.FORMAT_DATE_TIME_22)
+					WorkbookUtil.addCell(titleSheet, 1, 7, exportedOn)
+					WorkbookUtil.addCell(titleSheet, 1, 8, tzId)
+					WorkbookUtil.addCell(titleSheet, 1, 9, userDTFormat)
+
 					WorkbookUtil.addCell(titleSheet, 30, 0, "Note: All times are in ${tzId ? tzId : 'EDT'} time zone")
 				}
 
@@ -2872,9 +2877,9 @@ class AssetEntityService {
 					def rooms = Room.findAllByProject(project)
 					def roomSize = rooms.size()
 					def roomMap = ['roomId':'id', 'Name':'roomName', 'Location':'location', 'Depth':'roomDepth', 'Width':'roomWidth',
-								   'Source':'source', 'Address':'address', 'City':'city', 'Country':'country', 'StateProv':'stateProv',
-								   'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
-								  ]
+									 'Source':'source', 'Address':'address', 'City':'city', 'Country':'country', 'StateProv':'stateProv',
+									 'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
+									]
 					
 					def roomCol = roomSheet.getRow(0).getLastCellNum()
 					def roomSheetColumns = []
@@ -2898,9 +2903,9 @@ class AssetEntityService {
 								}
 							}
 						}
-				  }
-				  log.info "export() - processing rooms took ${TimeUtil.elapsed(started)}"
-				  started = new Date()
+					}
+					log.info "export() - processing rooms took ${TimeUtil.elapsed(started)}"
+					started = new Date()
 				}
 				
 				//
@@ -2914,9 +2919,9 @@ class AssetEntityService {
 					def racks = Rack.findAllByProject(project)
 					def rackSize = racks.size()
 					def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
-								   'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
-								   'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
-								  ]
+									 'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
+									 'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
+									]
 
 					def rackCol = rackSheet.getRow(0).getLastCellNum()
 					def rackSheetColumns = []
@@ -2931,15 +2936,15 @@ class AssetEntityService {
 							if(column == 'rackId'){
 								addCell(rackSheet, r, 0, (racks[r-1].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
-							   if(column =="Source")
+								 if(column =="Source")
 									addCell(rackSheet, r, i, String.valueOf(racks[r-1]."${rackMap[column]}" ==1 ? "Source" : "Target" ))
-							   else
+								 else
 									addCell(rackSheet, r, i, String.valueOf(racks[r-1]."${rackMap[column]}"?: "" ))
 							}
 						}
-				  }
-				  log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
-				  started = new Date()
+					}
+					log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
+					started = new Date()
 				}
 				
 			}
@@ -3073,23 +3078,23 @@ class AssetEntityService {
 	 */
 	 // TODO : JPM 9/2014 : The updateColumnHeaders probable won't work beyond 24 custom columns how this is written - should use regex test instead
 	 // customLabels is defined as a static at the top
-   	def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
-	   	for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
-		   def cellData = sheet.getRow(0).getCell(head)?.getStringCellValue()
-		   def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
-		   if (attributeMap?.attributeCode && customLabels.contains( cellData )) {
-			   def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
-			   addCell(sheet, 0, head, columnLabel)
-		   }
-	   }
-	   return sheet
-   }
+		def updateColumnHeaders(sheet, entityDTAMap, sheetColumnNames, project){
+			for ( int head =0; head <= sheetColumnNames.size(); head++ ) {
+			 def cellData = sheet.getRow(0).getCell(head)?.getStringCellValue()
+			 def attributeMap = entityDTAMap.find{it.columnName ==  cellData }?.eavAttribute
+			 if (attributeMap?.attributeCode && customLabels.contains( cellData )) {
+				 def columnLabel = project[attributeMap?.attributeCode] ? project[attributeMap?.attributeCode] : cellData
+				 addCell(sheet, 0, head, columnLabel)
+			 }
+		 }
+		 return sheet
+	 }
 
 
-   /**
-    * Used by the AssetEntity List to populate the initial List view
-    */
-   Map getDeviceModelForList(Project project, UserLogin userLogin, session, params, tzId) {
+	 /**
+		* Used by the AssetEntity List to populate the initial List view
+		*/
+	 Map getDeviceModelForList(Project project, UserLogin userLogin, session, params, tzId) {
 		def filters = session.AE?.JQ_FILTERS
 		session.AE?.JQ_FILTERS = []
 
@@ -3133,10 +3138,10 @@ class AssetEntityService {
 		return model
 	}
 
-   /** 
-    * Used to retrieve the data used by the AssetEntity List
-    */
-   Map getDeviceDataForList(Project project, UserLogin userLogin, session, params, tzId) {
+	 /** 
+		* Used to retrieve the data used by the AssetEntity List
+		*/
+	 Map getDeviceDataForList(Project project, UserLogin userLogin, session, params, tzId) {
 		def filterParams = [
 			assetName: params.assetName, 
 			assetType: params.assetType, 
@@ -3349,7 +3354,7 @@ class AssetEntityService {
 				query.append("\nAND COALESCE(ae.asset_type,'') NOT IN (${GormUtil.asQuoteCommaDelimitedString(AssetType.getNonOtherTypes())}) " )
 				break
 
- 			case 'all': 
+			case 'all': 
 				break
 		}
 
@@ -3461,17 +3466,17 @@ class AssetEntityService {
 		return [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
 
 	}
-   
-   /**
-    * Returns the list of models from a specific manufacturer and asset type
-    * 
-    * @param manufacturerId the id of the manufacturer
-    * @param assetType the type of asset
-    * @param term the term to be searched
-    * @param currentProject the current project
-    * @return the map of models
-    */
-   List modelsOf(String manufacturerId, String assetType, String term, currentProject) {
+	 
+	 /**
+		* Returns the list of models from a specific manufacturer and asset type
+		* 
+		* @param manufacturerId the id of the manufacturer
+		* @param assetType the type of asset
+		* @param term the term to be searched
+		* @param currentProject the current project
+		* @return the map of models
+		*/
+	 List modelsOf(String manufacturerId, String assetType, String term, currentProject) {
 		def manufacturer
 		def result = []
 		List words = []
@@ -3573,52 +3578,52 @@ class AssetEntityService {
 
 		return result
 	}
-   
-   /**
-    * Obtains the list of manufactures using the assetType and term
-    * 
-    * @param assetType the type of asset
-    * @param term the term to be searched
-    * @param currentProject the current project
-    * @return the map of manufacturers
-    */
-   def manufacturersOf(assetType, term, currentProject) {
-	   def hql = "SELECT distinct m.id, m.name FROM Manufacturer m";
-	   def joinTables = ""
-	   def condition = ""
-	   def hqlParams = []
-	   
-	   if (StringUtils.isNotBlank(term)) {
-		   if (hqlParams.isEmpty()) {
-			   condition = condition + " WHERE m.name LIKE ?"
-		   } else {
-			   condition = condition + " AND m.name LIKE ?"
-		   }
-		   hqlParams.add("%" + term + "%")
-	   }
+	 
+	 /**
+		* Obtains the list of manufactures using the assetType and term
+		* 
+		* @param assetType the type of asset
+		* @param term the term to be searched
+		* @param currentProject the current project
+		* @return the map of manufacturers
+		*/
+	 def manufacturersOf(assetType, term, currentProject) {
+		 def hql = "SELECT distinct m.id, m.name FROM Manufacturer m";
+		 def joinTables = ""
+		 def condition = ""
+		 def hqlParams = []
+		 
+		 if (StringUtils.isNotBlank(term)) {
+			 if (hqlParams.isEmpty()) {
+				 condition = condition + " WHERE m.name LIKE ?"
+			 } else {
+				 condition = condition + " AND m.name LIKE ?"
+			 }
+			 hqlParams.add("%" + term + "%")
+		 }
 
-	   if (StringUtils.isNotBlank(assetType)) {
-		   joinTables = " LEFT OUTER JOIN m.models as model";
-		   if (hqlParams.isEmpty()) {
-			   condition = condition + " WHERE model.assetType = ?"
-		   } else {
-			   condition = condition + " AND model.assetType = ?"
-		   }
-		   hqlParams.add(assetType)
-	   }
+		 if (StringUtils.isNotBlank(assetType)) {
+			 joinTables = " LEFT OUTER JOIN m.models as model";
+			 if (hqlParams.isEmpty()) {
+				 condition = condition + " WHERE model.assetType = ?"
+			 } else {
+				 condition = condition + " AND model.assetType = ?"
+			 }
+			 hqlParams.add(assetType)
+		 }
 
-	   def manufacturers = Manufacturer.executeQuery(hql + joinTables + condition, hqlParams)
-	   def result = manufacturers.collect { manufacturer ->
+		 def manufacturers = Manufacturer.executeQuery(hql + joinTables + condition, hqlParams)
+		 def result = manufacturers.collect { manufacturer ->
 			return [
-			   "id" : manufacturer[0],
-			   "text" : manufacturer[1]
-		   ];
-	   }
-	   
-	   return result
-   }
+				 "id" : manufacturer[0],
+				 "text" : manufacturer[1]
+			 ];
+		 }
+		 
+		 return result
+	 }
 
-   /**
+	 /**
 	* Obtains the list of asset types using the manufacturer and term
 	* 
 	* @param manufacturer the manufacturer 

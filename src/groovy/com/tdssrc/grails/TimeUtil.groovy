@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession
  */
 class TimeUtil {
 
-	private static final LOG = LogFactory.getLog(TimeUtil.class)
+	private static final log = LogFactory.getLog(TimeUtil.class)
 
 	//TODO: Remove!!!
 	def static timeZones = [GMT:"GMT-00:00", PST:"GMT-08:00", PDT:"GMT-07:00", MST:"GMT-07:00", MDT:"GMT-06:00", 
@@ -220,24 +220,24 @@ class TimeUtil {
 			ago.append('-')
 		}
 
-        if (days != 0) {
-        	ago.append("${days}${ ( format == SHORT ? 'd' : ( '-day' + (days == 1 ? '' : 's') ) ) }")
-        } 
-        // Hours
-        if (hours != 0) {
+		if (days != 0) {
+			ago.append("${days}${ ( format == SHORT ? 'd' : ( '-day' + (days == 1 ? '' : 's') ) ) }")
+		} 
+		// Hours
+		if (hours != 0) {
 			space = (ago.length() > 1 ? ' ' : '')
 			ago.append("${space}${hours}${ ( format == SHORT ? 'h' : ( format==FULL ? '-hour' : '-hr' ) + ( hours == 1 ? '' : 's') ) }") 
-        }
-        // Minutes
-        if ( days == 0 && minutes > 0 ) {
+		}
+		// Minutes
+		if ( days == 0 && minutes > 0 ) {
 			space = (ago.length() > 1 ? ' ' : '')
 			ago.append("${space}${minutes}${ ( format == SHORT ? 'm' : ( format==FULL ? '-minute' : '-min' ) + (minutes == 1 ? '' : 's') ) }") 
-        } 
-        // Only show seconds if day/hr are zero
-        if ( days == 0 && hours == 0 && seconds > 0 ) {
+		} 
+				// Only show seconds if day/hr are zero
+		if ( days == 0 && hours == 0 && seconds > 0 ) {
 			space = (ago.length() > 1 ? ' ' : '')
 			ago.append("${space}${seconds}${ ( format == SHORT ? 's' : ( format==FULL ? '-second' : '-sec' ) + (seconds == 1 ? '' : 's') ) }") 
-        }
+		}
 
 		return ago.toString()
 	}
@@ -251,7 +251,7 @@ class TimeUtil {
 		Date start = new Date()
 		Date end
 		use( TimeCategory ) {
-		    end = start + (secs).seconds
+			end = start + (secs).seconds
 		}
 		return ago( elapsed(start, end), format)
 	}
@@ -473,7 +473,8 @@ class TimeUtil {
 			result = formatter.parse(dateValue)
 			result.clearTime()	
 		} catch (Exception e) {
-			LOG.warn("parseDate() encountered invalid date ($dateValue): " + e.getMessage(), e)
+			log.warn("parseDate() encountered invalid date ($dateValue) format '${formatter?.toPattern()}' : ${e.getMessage()}")
+			log.debug("Exception:",e)
 		}
 		return result
 	}
@@ -515,14 +516,14 @@ class TimeUtil {
 		try {
 			result = formatter.parse(dateValue)
 		} catch (Exception e) {
-			LOG.warn("Invalid date time: $dateValue, $tzId, ${formatter.toPattern()}")
+			log.warn("Invalid date time: $dateValue, $tzId, ${formatter.toPattern()}")
 		}
 		return result
 	}
 
 	/**
-     * This method determines the elapsed time between two dates and
-     * returns the value using the given granularity (D|H|M|S).
+	 * This method determines the elapsed time between two dates and
+	 * returns the value using the given granularity (D|H|M|S).
 	 */
 	public static Integer elapsed(Date start, Date end, String granularity){
 		TimeDuration duration = TimeUtil.elapsed(start, end)
@@ -553,7 +554,7 @@ class TimeUtil {
 	/**
 	 * Builder to get a Formatter based on the middle-endian or little-endian, the formatter type, and the tyme zone to use to Parse Dates
 	 * @author @tavo_luna
-	 * @param @param userPrefFormat - the format type to be used, valid values defined in dateTimeFormatTypes
+	 * @param userPrefFormat - the format type to be used, valid values defined in dateTimeFormatTypes
 	 * @param formatterType - the formatter type to be used
 	 * @param timezone - timezone to set the formatter
 	 * @return formatter - the middle or little-endian version of the format desired
