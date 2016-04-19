@@ -234,11 +234,12 @@
 
 				<g:actionSubmit id="createSubmit" value="Post changes to ${importOptionDesc}" action="importAccounts" />
 
-				<%--
-				<g:actionSubmit id="cancelButton" value="Cancel" action="cancelImport" params="filename=$filename" />
-				--%>
-
 				<input type="button" id="cancelImport" class="cancel" value="Cancel" onclick="callCancelImport('${filename}');"/>
+
+				<br><br>
+
+				<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
+
 			</g:form>
 
 		</div>

@@ -1367,9 +1367,12 @@ class AdminController {
 					// database either creating or updating Person and/or UserLogin records.
 
 					List optionErrors = accountImportExportService.validateImportOptions(options)
+
 					if (optionErrors) {
 						throw new InvalidParamException(optionErrors.toString())
 					}
+
+					options.testMode = params.testMode == 'Y'
 
 					// Here's the money maker call that will update existing accounts and create new ones accordingly
 					model.results = accountImportExportService.postChangesToAccounts(session, user, project, options)
@@ -1421,7 +1424,7 @@ class AdminController {
 
 		}
 
-		log.debug "importAccounts() Finishing up controller step=$step, view=$view, model=$model"
+		// log.debug "importAccounts() Finishing up controller step=$step, view=$view, model=$model"
 		render view:view, model:model
 	}
 

@@ -403,7 +403,6 @@ class AccountImportExportService {
 	 * @controllerMethod
 	 */
 	List generatePostResultsDataToBrowser(session, response, UserLogin byWhom, Project project, String filename, Map formOptions) {
-/*		
 		if (! securityService.hasPermission(byWhom, 'PersonImport', true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
 		}
@@ -411,7 +410,7 @@ class AccountImportExportService {
 		if (shouldUpdateUserLogin(formOptions) && ! securityService.hasPermission(byWhom, 'ImportUserLogin', true)) {
 			throw new UnauthorizedException('Do not have the required permission to import user information')
 		}
-*/
+
 		String fqfn = getJsonFilename(filename)
 		File file = new File(fqfn)
 		if (! file || !file.exists()) {
@@ -612,6 +611,7 @@ class AccountImportExportService {
 			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
 		}
 
+
 		Map results = [
 			personSkipped: 0,
 			personCreated: 0,
@@ -629,6 +629,8 @@ class AccountImportExportService {
 
 		log.debug "postChangesToAccounts() formOptions=$formOptions - processing ${accounts.size()} accounts"
 		StringBuffer chgSB = new StringBuffer('<h2>Change History</h2>')
+		StringBuffer errorsSB = new StringBuffer('<br><h2>Errors</h2><table><tr><th>Row</th><th>Errors</th></tr>')
+		boolean recordedErrors = false
 
 		for (int i=0; i < accounts.size(); i++) {
 			accounts[i].postErrors = []
@@ -638,6 +640,11 @@ class AccountImportExportService {
 				if (formOptions.flagToUpdatePerson) {
 					results.personSkipped++
 				}
+				if (formOptions.testMode) {
+					recordedErrors = true
+					errorsSB.append("<tr><td>${i+2}</td><td><ul><li>" + accounts[i].errors.join('<li>') + '</ul></td></tr>')
+				}
+
 				continue
 			}
 
@@ -744,18 +751,26 @@ class AccountImportExportService {
 			}
 
 			// Add something to the temporary results view
-			if (personChanged || userChanged || teamsChanged || securityRolesChanged) {
-				chgSB.append("\r\n<br>Changes for ${person} (${person.id}):<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
-				StringBuffer changeMsg = new StringBuffer("***** Change History for $person changed:")
-				accounts[i].changeHistory.each { prop, origVal ->
-					String p = prop.split(/\./)[1]
-					changeMsg.append("\n\t$prop was '$origVal' now is '${accounts[i][p]}'")
-					chgSB.append("<tr><td>$prop</td><td>$origVal</td><td>${accounts[i][p]}</td></tr>\r\n")
-				}
-				log.info changeMsg.toString()
-				chgSB.append("</table>\r\n")
-			}
+			if (formOptions.testMode) {
 
+				if (personChanged || userChanged || teamsChanged || securityRolesChanged) {
+					chgSB.append("\r\n<br>Changes for ${person} (${person.id}):<br><table><th>Property</th><th>Orig Value</th><th>New Value</th></tr>\r\n")
+					StringBuffer changeMsg = new StringBuffer("***** Change History for $person changed:")
+					accounts[i].changeHistory.each { prop, origVal ->
+						String p = prop.split(/\./)[1]
+						changeMsg.append("\n\t$prop was '$origVal' now is '${accounts[i][p]}'")
+						chgSB.append("<tr><td>$prop</td><td>$origVal</td><td>${accounts[i][p]}</td></tr>\r\n")
+					}
+					log.info changeMsg.toString()
+					chgSB.append("</table>\r\n")
+				}
+
+				if (accounts[i].errors) {
+					recordedErrors = true
+					errorsSB.append("<tr><td>${i+2}</td><td><ul><li>" + accounts[i].errors.join('<li>') + '</ul></td></tr>')
+				}
+
+			}
 
 		}
 
@@ -768,7 +783,12 @@ class AccountImportExportService {
 		deleteUploadedSpreadsheet(formOptions.filename)
 
 		// Throw an exception so we don't commit the data while testing (to be removed)
-		//throw new DomainUpdateException('<H2>Import Results</H2>' + results.toString() + chgSB.toString() )
+		if (formOptions.testMode) {
+			errorsSB.append('</table>')
+			String resultData = results.toString() + chgSB.toString() + 
+				(recordedErrors ? errorsSB.toString() : '')
+			throw new DomainUpdateException('<H2>Test Mode - Import Results</H2>' + resultData )
+		}
 
 		return results	
 	}
@@ -836,7 +856,7 @@ class AccountImportExportService {
 			throw new RuntimeException("Unable to load DateTime formatter for ${map.dateTimeFormatter}")
 		}
 
-		log.debug "getUserPreferences() preferences=$map, dateFormatter=${map.dateFormatter.toPattern()}, dateTimeFormatter=${map.dateTimeFormatter.toPattern()}"
+		// log.debug "getUserPreferences() preferences=$map, dateFormatter=${map.dateFormatter.toPattern()}, dateTimeFormatter=${map.dateTimeFormatter.toPattern()}"
 
 		return map
 	}
@@ -1262,10 +1282,14 @@ class AccountImportExportService {
 
 		list.each { account ->
 			sb.append("$header:")
+			log.debug "debugLogAccountInfo() account isa ${account.getClass().getName()} ${account.firstName} ${account.lastName}"
 			accountSpreadsheetColumnMap.each { prop, info -> 
 				if (info.domain in domainCodes) {
 					String acctPropAlternates = "${prop}_".toString()
-					account.findAll({ acctPropName, value -> acctPropName == prop ||  acctPropName.startsWith(acctPropAlternates) }).each { p, v ->
+					Map properties = account.findAll { acctPropName, value -> 
+						acctPropName == prop ||  acctPropName.startsWith(acctPropAlternates) 
+					}
+					properties.each { p, v ->
 						sb.append("\n\t$p=$v") 
 					}
 				}

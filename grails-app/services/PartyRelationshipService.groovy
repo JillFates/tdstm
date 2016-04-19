@@ -339,7 +339,8 @@ class PartyRelationshipService {
 				roleTypeCodeTo:roleTypeTo, 
 				statusCode:"ENABLED" )
 			if ( ! partyRelationship.validate() || ! partyRelationship.save( insert:true, flush:true ) ) {
-				log.error "updatePartyRelationshipPartyIdFrom() failed to create relationship " + GormUtil.allErrorsString(PartyRelationship)				
+				log.error "updatePartyRelationshipPartyIdFrom() failed to create relationship " + GormUtil.allErrorsString(partyRelationship)				
+				throw new DomainUpdateException('Unable to update party relationship')
 				partyRelationship = null
 			}
 		}
