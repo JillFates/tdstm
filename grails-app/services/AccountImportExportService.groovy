@@ -629,7 +629,7 @@ class AccountImportExportService {
 
 		log.debug "postChangesToAccounts() formOptions=$formOptions - processing ${accounts.size()} accounts"
 		StringBuffer chgSB = new StringBuffer('<h2>Change History</h2>')
-		StringBuffer errorsSB = new StringBuffer('<br><h2>Errors</h2><table><tr><th>Row</th><th>Errors</th></tr>')
+		StringBuffer errorsSB = new StringBuffer('<br><h2>Errors</h2><table><tr><th width=20>Row</th><th>Name</th><th>Errors</th></tr>')
 		boolean recordedErrors = false
 
 		for (int i=0; i < accounts.size(); i++) {
@@ -642,7 +642,8 @@ class AccountImportExportService {
 				}
 				if (formOptions.testMode) {
 					recordedErrors = true
-					errorsSB.append("<tr><td>${i+2}</td><td><ul><li>" + accounts[i].errors.join('<li>') + '</ul></td></tr>')
+					errorsSB.append("<tr><td>${i+2}</td><td>${accounts[i].firstName} ${accounts[i].lastName}</td><td><ul><li>" + 
+						accounts[i].errors.join('<li>') + '</ul></td></tr>')
 				}
 
 				continue
@@ -767,7 +768,8 @@ class AccountImportExportService {
 
 				if (accounts[i].errors) {
 					recordedErrors = true
-					errorsSB.append("<tr><td>${i+2}</td><td><ul><li>" + accounts[i].errors.join('<li>') + '</ul></td></tr>')
+					errorsSB.append("<tr><td>${i+2}</td><td>${accounts[i].firstName} ${accounts[i].lastName}</td><td><ul><li>" + 
+						accounts[i].errors.join('<li>') + '</ul></td></tr>')
 				}
 
 			}
@@ -2331,7 +2333,7 @@ log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 	 * @return returns true if the lookup was successful, false if not or Null if the routine err
 	 */
 	private Boolean validateCompanyName(Map account, Project project, Map companiesById, Map sheetInfoOpts) {
-		Boolean ok
+		Boolean ok = false
 		PartyGroup company
 
 		while (true) {
@@ -2373,8 +2375,8 @@ log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 				company = project.client
 				setDefaultedValue(account, 'company', company.name)
 				// account.company = company.name
-				// account["company$DEFAULTED_SUFFIX"] = company.name				
-				ok = false
+				// account["company$DEFAULTED_SUFFIX"] = company.name
+				ok = true				
 			}
 			break
 		}
