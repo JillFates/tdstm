@@ -684,4 +684,34 @@ class UserService implements InitializingBean {
 		// log.debug "usersWithRecentActivity() users=$users"
 		return users*.username
 	}
+
+
+	/**
+	 * This method updates the following User Preferences:
+	 * - Current Project
+	 * - Move Event
+	 * - Current Bundle
+	 * - Current Room
+	 *
+	 * @param user - a given UserLogin
+	 * @param projectId - the id of the project to be assigned to the user.
+	 *
+	 * @return true: context updated / false: unable to update.
+	 */
+	boolean changeProjectContext(UserLogin user, long projectId){
+		def contextUpdated = false
+		def projectInstance = Project.read(projectId)
+		if(projectService.hasAccessToProject(user, projectInstance)){
+			userPreferenceService.setPreference("CURR_PROJ", "${projectId}")
+			userPreferenceService.removePreference("MOVE_EVENT")
+			userPreferenceService.removePreference("CURR_BUNDLE")
+			userPreferenceService.removePreference("CURR_ROOM")		
+			contextUpdated = true
+		}else{
+			securityService.reportViolation("Attempted to access project: $projectId.")
+		}
+
+		return contextUpdated
+
+	}
 }

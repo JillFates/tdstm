@@ -1580,4 +1580,34 @@ class ProjectService {
 		}
 	}
 
+	/**
+	 * This method determines if a given user has access to a particular
+	 * project.
+	 *
+	 * @param userLogin - A given user.
+	 * @param project - Project to look up.
+	 * @return - true: the user has acess, false otherwise.
+	 */
+	 boolean hasAccessToProject(UserLogin userLogin, Project project){
+	 	def hasAccess = false
+	 	if(project && userLogin){
+	 		def projects = getUserProjects(userLogin, RolePermissions.hasPermission("ShowAllProjects"))
+	 		hasAccess = project.id in projects.id
+	 	}
+	 	return hasAccess
+	 }
+
+
+	 /**
+	 * This method determines if the current user has access to a particular
+	 * project.
+	 * 
+	 * @param project - Project to look up.
+	 * @return - true: the user has access, false otherwise.
+	 */
+	 boolean hasAccessToProject(Project project){
+	 	UserLogin userLogin = securityService.getUserLogin()
+	 	return hasAccessToProject(userLogin, project)
+	 }
+
 }

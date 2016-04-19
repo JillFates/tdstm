@@ -28,6 +28,7 @@ class PersonController {
 	def sessionFactory
 	def jdbcTemplate
 	def controllerService
+	def userService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -807,6 +808,7 @@ def test = {
 	 * @return HTML table of the data
 	 */
 	def loadFilteredStaff() {
+		
 		if (!controllerService.checkPermission(this, 'ProjectStaffList')) {
 			ServiceResults.unauthorized(response)
 			return
@@ -816,6 +818,9 @@ def test = {
 
 		UserLogin userLogin = securityService.getUserLogin()
 		Person loginPerson = userLogin.person
+
+
+		def currentProject = securityService.getUserCurrentProject()
 
 		//
 		// Deal with filter parameters
@@ -832,6 +837,13 @@ def test = {
 			render 'Specified Project was not found'
 			return
 		}
+
+		
+
+		if(currentProject.id != projectId){
+			userService.changeProjectContext(userLogin, projectId)
+		}
+
 
 		// log.debug "loadFilteredStaff() phase 1 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()

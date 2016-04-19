@@ -530,23 +530,34 @@ class ProjectController {
 	def cancel() {
 		redirect(controller:'projectUtil')
 	}
+
 	/*
-	 * Action to setPreferences
+	 * This method updates the user's project. It also resets
+	 * the preferences for:
+
 	 */
 	def addUserPreference() {
 		def selectProject = params.id
+		String errMsg = null
+		UserLogin user = securityService.getUserLogin()
 		if(selectProject){
-			def projectInstance = Project.read(params.id)
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
-			def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
+			if(userService.changeProjectContext(user, selectProject)){
+				def browserTest = request.getHeader("User-Agent").toLowerCase().contains("mobile")
+				if ( browserTest || params.mobileSelect )
+					redirect(controller:'task', action:'listUserTasks', params:[viewMode:'mobile'])
+				else
+					redirect(controller:'project', action:"show", id: params.id )
+
+			}else{
+				errMsg = "Unable to update your Project Preference."
+			}
 			
-			
-			if ( browserTest || params.mobileSelect )
-				redirect(controller:'task', action:'listUserTasks', params:[viewMode:'mobile'])
-			else
-				redirect(controller:'project', action:"show", id: params.id )
 		} else {
-			flash.message = "Please select Project"
+			errMsg = "Please select Project"
+		}
+
+		if(errMsg){
+			flash.message = errMsg
 			redirect( action:"list" )
 		}
 			

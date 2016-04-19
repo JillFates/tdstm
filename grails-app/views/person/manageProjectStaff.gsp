@@ -76,7 +76,7 @@
 					<td>
 						<span><b id="projectLabel">Project</b></span><br/>
 						<label for="project">
-							<select id="project" name="project" ng-model="selectedProject" ng-change="loadFilteredStaff('fullNameName','staff')" ng-init="selectedProject=${projectId}">
+							<select id="project" name="project" ng-model="selectedProject" onChange="loadFilteredStaff('fullNameName','staff')" ng-init="selectedProject=${projectId}">
 								<g:each in="${projects}" var="project">
 									<option value="${project.id}">
 										${project.name}
