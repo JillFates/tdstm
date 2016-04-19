@@ -80,11 +80,14 @@ class MoveEventController {
 				'in'('newsBarMode', newsBM)
 
 			def eventsOption = params.eventsOption
-			
+
 			if(eventsOption && eventsOption != "X"){
 				Date now = new Date()
 				if(eventsOption == "A"){
-					ge("actualCompletionTime", now)
+					or{
+						isNull("actualCompletionTime")
+						ge("actualCompletionTime", now)
+					}
 				}else if(eventsOption == "C"){
 					lt("actualCompletionTime", now)
 				}
