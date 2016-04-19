@@ -376,7 +376,7 @@ class TimeUtil {
 		if (!formatter) {
 			// TODO : JPM 4/2016 : formatDateTimeWithTZ should throw InvalidParamException vs RuntimeException (fix below and test cases too)
 			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
-			throw new RuntimeException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
+			throw new RuntimeException('formatDateTime called with missing DateFormat formatter parameter')
 		}
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
@@ -391,7 +391,6 @@ class TimeUtil {
 	 * @deprecated formatting a date with a Timezone should not be used as Dates should be handled as an absolute (no time element date)
 	 **/
 	public static String formatDateTime(String tzId, Date dateValue, DateFormat formatter) {
-		log.warn "Deprecated formatDate() called with timezone parameter - should be using formatDate(Date, DateFormat)"
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
 
@@ -416,11 +415,14 @@ class TimeUtil {
 	 * @return The date formatted
 	 **/
 	public static String formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter) {
-		println "formatDateTimeWithTZ() tzId=$tzId, dateValue=$dateValue, formatter=${formatter ? formatter.toPattern() : null}"
-		if (!formatter) {
+		if (! formatter) {
 			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
 			throw new RuntimeException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
 		}
+		if (tzId == null) {
+			throw new RuntimeException('formatDateTimeWithTZ called with null timezone')
+		}
+
 		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
 		return formatter.format(dateValue)
 	}
