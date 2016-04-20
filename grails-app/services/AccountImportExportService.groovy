@@ -266,7 +266,7 @@ class AccountImportExportService {
 		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)', 
 									template:changeTmpl('personTeams'), transform: xfrmListToString ],
 		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)', 
-									template:changeTmpl('projectTeams'), , transform: xfrmListToString ],
+									template:changeTmpl('projectTeams'), transform: xfrmListToString ],
 		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:120, locked:false, label:'Security Role(s)',
 									template:changeTmpl('roles'), defaultValue: DEFAULT_SECURITY_ROLE, transform: xfrmListToString],
 		username               : [type:'string',  ssPos:16,   formPos:18, domain:'U', width:120, locked:false, label:'Username', 
