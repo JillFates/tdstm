@@ -4,31 +4,41 @@
 	<meta name="layout" content="projectHeader" />
 	<title>Import Accounts</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.common.min.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.default.min.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'bootstrap.css')}"/>
+	<!-- Kendo UI Material Theme -->
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.common-material.min.css')}">
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.material.min.css')}">
 
 	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
 
 	<g:javascript src="bootstrap.js" />
 
-	<%-- 
-		TODO : JPM 4/2016 : Add logic to resize the table to adjust for the size of the browser
-		See http://jsfiddle.net/dimodi/4eNu4/2/ as an example
+	<%--
 
 		TODO : JPM 4/2016 : Apply row level template to grey out the rows that are not going to be changing
 		See http://jsfiddle.net/FcWBQ/
 	--%>
 
-	<style type="text/css">
-		.k-grid  .k-grid-header  .k-header  .k-link {
-		    height: auto;
+	<style>
+		.k-grid-toolbar {
+			border-color: #5f9fcf;
+			background-color: #5f9fcf;
+			padding: 7px;
+			font-size: 15px;
 		}
-		  
-		.k-grid  .k-grid-header  .k-header {
-		    white-space: normal;
-		}
-	</style>
 
+		th a:link {
+			width: inherit !important;
+		}
+
+		.k-grid .k-alt {
+			background-color: #f1f1f1;
+		}
+
+		.btn-post {
+			margin-right: 10px;
+		}
+</style>
 </head>
 <body>
 <div class="body account-import-review">
@@ -149,6 +159,7 @@
 			}
 
 			$("#grid").kendoGrid({
+				toolbar: kendo.template('Please review the following information for accuracy before submitting the form.'),
 				dataSource: {
 					type: "json",
 					transport: {
@@ -167,7 +178,7 @@
 					pageSize: 30
 				},
 				columns: [
-					{ template: '<img src="#= icon #" />', width:30, locked: true },
+					{ template: '<img src="#= icon #" />', width:50, locked: true },
 		
 				<g:set var="isFirstElement" value="${true}"/>
 				<g:each var="propName" in="${properties}">
@@ -223,22 +234,21 @@
 			<p>
 				Please review the above information for accuracy before submitting the form.
 			</p>
-			<br>
-			<g:form action="importAccounts">
+			<g:form action="importAccounts" class="form-inline">
 				<input type="hidden" name="step" value="post" />
 				<input type="hidden" name="header" value="${header}" />
 				<input type="hidden" name="timezone" value="${timezone}" />
 				<input type="hidden" name="filename" value="${filename}" />
 				<input type="hidden" name="importOption" value="${importOption}" />
-
-				<g:actionSubmit id="createSubmit" value="Post changes to ${importOptionDesc}" action="importAccounts" />
-
-				<input type="button" id="cancelImport" class="cancel" value="Cancel" onclick="callCancelImport('${filename}');"/>
-
-				<br><br>
-
-				<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
-
+				<div >
+					<div style="float: left">
+						<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
+					</div>
+					<div style="float: right; margin-right: 20px;">
+						<button type="submit" class="btn btn-default btn-post">Post changes to ${importOptionDesc} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+						<button type="button" id="cancelImport" class="btn btn-default" onclick="callCancelImport('${filename}');">Cancel <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+					</div>
+				</div>
 			</g:form>
 
 		</div>
