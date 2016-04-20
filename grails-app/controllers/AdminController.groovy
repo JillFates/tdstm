@@ -1356,9 +1356,6 @@ class AdminController {
 					// This is used by the AJAX request in the form to construct the URL appropriately
 					model.paramsForReviewDataRequest = [filename:model.filename, importOption:params.importOption]
 
-					// log.debug "importAccounts() in step 'review' model=$model"
-					//log.debug "importAccounts() step=$step -- params=$params -- model=$model"
-
 					view = "${formAction}Review"
 					break
 
@@ -1391,11 +1388,6 @@ class AdminController {
 					view = "${formAction}Results"
 					log.debug "importAccounts() view = $view"
 
-
-
-					// render "<h1>Results of the POST</h1><pre>${results.toString()}</pre>"
-
-					// return
 					break
 
 				default:

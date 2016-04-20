@@ -41,8 +41,7 @@
 			var hasOrigVal = model.hasOwnProperty(originalPropName);
 			var hasDefVal  = model.hasOwnProperty(defaultPropName);
 			var hasErrVal  = model.hasOwnProperty(errorPropName);
-			// var hasOrigVal = model.hasOwnProperty(propertyName + '${originalSuffix}');
-			//var hasDefVal  = model.hasOwnProperty(propertyName + '${defaultSuffix}');
+			
 			var str = '';
 			
 			if (propertyName == '')

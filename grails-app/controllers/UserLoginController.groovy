@@ -137,7 +137,7 @@ class UserLoginController {
 						query.append(" AND users.${it.getKey()} LIKE '%${it.getValue()}%'")
 					}
 			}
-			
+			log.debug "listJson() Query for User Login List: $query"
 			userLoginInstanceList = jdbcTemplate.queryForList(query.toString())
 		} else {
 			userLoginInstanceList = []
