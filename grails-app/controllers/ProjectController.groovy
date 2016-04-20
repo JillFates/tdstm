@@ -44,6 +44,7 @@ class ProjectController {
 	def grailsApplication
 	def auditService
 	def assetEntityService
+	def userService
 
 	def index() { redirect(action:"list",params:params) }
 
@@ -537,7 +538,7 @@ class ProjectController {
 
 	 */
 	def addUserPreference() {
-		def selectProject = params.id
+		long selectProject = params.id.toLong()
 		String errMsg = null
 		UserLogin user = securityService.getUserLogin()
 		if(selectProject){
