@@ -85,6 +85,16 @@
 							</select>
 						</label>
 					</td>
+					<td>
+						<span><b>Events Option</b></span><br/>
+						<select id="eventsOption" name="eventsOption" onChange="loadFilteredStaff('fullNameName','staff')">
+							<option value="A">Active</option>
+							<option value="X">All</option>
+							<option value="C">Completed</option>
+						</select>
+
+
+					</td>
 
 				</tr>
 			</table>

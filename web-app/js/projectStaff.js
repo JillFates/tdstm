@@ -175,6 +175,7 @@ function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
 	var assigned = $("#assignedId").val()
 	var orderBy = orderBy ? orderBy : $("#orderBy").val()
 	var phaseArr = new Array();
+	var eventsOption = $("#eventsOption").val()
 	if ($("#allPhase").val() == '1') {
 		phaseArr.push("all")
 	} else {
@@ -196,7 +197,8 @@ function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
 			'onlyClientStaff' : onlyClientStaff,
 			'sortOn':sortOn,
 			'firstProp':firstProp,
-			'orderBy':orderBy
+			'orderBy':orderBy,
+			'eventsOption' : eventsOption
 			
 		},
 		type: 'POST',

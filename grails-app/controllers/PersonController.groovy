@@ -925,17 +925,20 @@ def test = {
 				[project:projectList])
 			def now = TimeUtil.nowGMT()
 		
+			def eventsOption = params.eventsOption
+			
+			if(eventsOption in ["A", "C"])
 			moveEvents = moveEvents.findAll {
 				def eventTimes = it.eventTimes
-				if ( eventTimes 
-					&& ( 
-						( eventTimes.completion && eventTimes.completion > now.minus(30) ) ||
-						( ! eventTimes.completion && eventTimes.start && eventTimes.start > now.minus(90) )
-					)
-				) {
-					return true
-				}
-				return false
+				if ( eventTimes){
+					if(eventsOption == "A"){
+						return (( eventTimes.completion && eventTimes.completion > now.minus(30) ) ||
+						( ! eventTimes.completion && eventTimes.start && eventTimes.start > now.minus(90) ))
+					}else{
+						return (eventTimes.completion && eventTimes.completion < now)
+					}
+				} 
+					  
 			}
 		}
 		// log.debug "loadFilteredStaff() phase 5 took ${TimeUtil.elapsed(start)} Get Events"

@@ -78,20 +78,6 @@ class MoveEventController {
 				ilike('runbookStatus', "%${params.runbookStatus}%")
 			if (newsBM)
 				'in'('newsBarMode', newsBM)
-
-			def eventsOption = params.eventsOption
-
-			if(eventsOption && eventsOption != "X"){
-				Date now = new Date()
-				if(eventsOption == "A"){
-					or{
-						isNull("actualCompletionTime")
-						ge("actualCompletionTime", now)
-					}
-				}else if(eventsOption == "C"){
-					lt("actualCompletionTime", now)
-				}
-			}
 				
 			order(new Order(sortIndex, sortOrder=='asc').ignoreCase())
 		}
