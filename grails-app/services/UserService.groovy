@@ -708,7 +708,7 @@ class UserService implements InitializingBean {
 			userPreferenceService.removePreference("CURR_ROOM")		
 			contextUpdated = true
 		}else{
-			securityService.reportViolation("Attempted to access project: $projectId.")
+			securityService.reportViolation("Attempted to access unavailable project $projectId", user)
 		}
 
 		return contextUpdated
