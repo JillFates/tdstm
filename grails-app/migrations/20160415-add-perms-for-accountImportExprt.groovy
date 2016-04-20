@@ -33,15 +33,15 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "jmartin", id: "20160415 TM-4735-1") {
+	changeSet(author: "jmartin", id: "20160415 TM-4735-1-fixed") {
 		comment('Move the PersonExport permission to the PERSON group from TASK')
 		preConditions(onFail:'MARK_RAN') {
-			sqlCheck(expectedResult:'0', 
+			sqlCheck(expectedResult:'1', 
 				'select count(*) from permissions where permission_group="TASK" and permission_item = "PersonExport"')
 		}
 
 		sql("""UPDATE permissions SET permission_group='PERSON' 
-			WHERE permission_group='TASK' AND permission_item='ExportPerson""")
+			WHERE permission_group='TASK' AND permission_item='PersonExport'""")
 	}
 
 }
