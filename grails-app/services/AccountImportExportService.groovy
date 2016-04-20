@@ -10,6 +10,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.GormUtil
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.lang.CollectionUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.RandomStringUtils as RSU
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -1278,7 +1279,7 @@ class AccountImportExportService {
 	 * @param accounts - a single account or the list of accounts
 	 */
 	private void debugLogAccountInfo(String header, Map accounts, String domainName) {
-		List list = ( accounts instanceof List ) ? accounts : [ accounts ]
+		Collection list = CollectionUtils.asCollection(accounts)
 		
 		// Used to possibly filter the domain to list properties for
 		List domainCodes = ['P','U','T']
@@ -2015,7 +2016,6 @@ class AccountImportExportService {
 	 * @param formOptions - form params from the page submission
 	 */
 	private void validateUploadedAccounts(UserLogin byWhom, List<Map> accounts, Project project, Map sheetInfoOpts, Map formOptions) {
-
 		List usernameList
 		List validRoleCodes
 		//log.debug "validateUploadedAccounts() formOptions=$formOptions"
@@ -2305,6 +2305,7 @@ class AccountImportExportService {
 			applyChangesToDomainObject(userLogin, account, sheetInfoOpts, true, true)
 
 			debugLogAccountInfo("validateUserLogin AFTER applyChangesToDomainObject() hasUserChanges=$hasUserChanges", account, 'UserLogin')
+
 
 			hasUserChanges = hasUserLoginPropertiesSet(account)
 

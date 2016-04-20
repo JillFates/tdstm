@@ -1,5 +1,6 @@
 package com.tdsops.common.lang
 
+import java.util.Collection
 import java.util.ArrayList
 import java.util.LinkedHashMap
 
@@ -20,12 +21,32 @@ class CollectionUtils {
 	}
 
 	/**
+	 * Function to promote an Object to a Collection 
+	 * @author @tavo_luna
+	 * @param object the object to transform
+	 * @return Collection Object
+	 */
+	static Collection asCollection(object){
+		return isCollectionOrArray(object)?object:[object]
+	}
+
+	/**
+	 * check if the given object is a Collection, or a Java Array
+	 * @author @tavo_luna
+	 * @param object the object to check
+	 * @return true if the object is instance of Collection or array, false in any other case
+	 */
+	static boolean isCollectionOrArray(object) {    
+    (object instanceof Collection) || object.getClass().isArray()
+	}
+
+	/**
 	 * Used to determine if an object is a List
 	 * @param object - the object being tested
 	 * @return true if the object is a java.util.ArrayList
 	 */
 	static boolean isaList( Object object ) {
-		return object instanceof ArrayList
+		return (object instanceof ArrayList)
 	}
 
 	/**
@@ -34,7 +55,7 @@ class CollectionUtils {
 	 * @return true if the object is a java.util.LinkedHashMap
 	 */
 	static boolean isaMap( Object object ) {
-		return object instanceof LinkedHashMap
+		return (object instanceof LinkedHashMap)
 	}
 
 	/**
