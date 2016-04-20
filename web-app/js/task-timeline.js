@@ -2344,22 +2344,22 @@ $(document).ready(function () {
 		if( msConversion === _MS_PER_DAY) {
 			scale.time = d3.time.day;
 			scale.tick = 1;
-			scale.format = d3.time.format('%b %d');
+			scale.format = d3.time.format('%I %P');
 		}
 		if( msConversion === _MS_PER_WEEK) {
 			scale.time = d3.time.week;
 			scale.tick = 1;
-			scale.format = d3.time.format('%b %d %Y - (week %W)');
+			scale.format = d3.time.format('%a %d');
 		}
 		if( msConversion === _MS_PER_MONTH) {
 			scale.time = d3.time.month;
 			scale.tick = 1;
-			scale.format = d3.time.format('%B %Y');
+			scale.format = d3.time.format('%b %Y');
 		}
 		if( msConversion === _MS_PER_YEAR) {
 			scale.time = d3.time.year;
 			scale.tick = 1;
-			scale.format = d3.time.format('%B %d %Y');
+			scale.format = d3.time.format('%Y');
 		}
 	}
 
@@ -2382,6 +2382,13 @@ $(document).ready(function () {
 				if(i > 0) {
 					applyScaleDefinition(msConversion[i-1], d3LowerScale);
 				}
+
+				// Same days, reduce the tick to 1, just minutes
+				if(difference === 0 && msConversion[i] === _MS_PER_MIN) {
+					//scale.tick = 1;
+					//d3LowerScale.tick = 1;
+				}
+
 				break;
 			}
 		}
