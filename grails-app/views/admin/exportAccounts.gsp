@@ -61,7 +61,10 @@
 										</select>
 									</div>
 									<br>
-									<label><input type="checkbox" name="includeLogin" value="Y" ${includeLogin=='Y'?'checked':''} onClick="toggleLoginChoice(this);">&nbsp; Include Login Information in Export</label>
+									
+									<!--<input type="checkbox" name="includeLogin" value="Y" ${includeLogin=='Y'?'checked':''} onClick="toggleLoginChoice(this);">&nbsp; Include Login Information in Export</label>
+									-->
+									<input type="hidden" name="includeLogin" value="Y"/>
 									<br>
 									<span class="footnote">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Note that passwords are never exported</span>
 								</div>
