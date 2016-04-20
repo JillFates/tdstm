@@ -277,7 +277,7 @@ class AccountImportExportService {
 		expiryDate             : [type:'date',  ssPos:19,   formPos:21, domain:'U', width:100, locked:false, label:'Account Expiration', 
 									template:changeTmpl('expiryDate'), transform:xfrmDateToString, validator:validator_date,
 									defaultValue:defaultExpiration],
-// TODO : swtich passwordExpirationDate back to date after testing
+	// TODO : swtich passwordExpirationDate back to date after testing
 		passwordExpirationDate : [type:'date',    ssPos:20,   formPos:22, domain:'U', width:100, locked:false, label:'Password Expiration', 
 									template:changeTmpl('passwordExpirationDate'), transform:xfrmDateToString, validator:validator_date],
 		passwordNeverExpires   : [type:'boolean', ssPos:21,   formPos:23, domain:'U', width:100, locked:false, label:'Pswd Never Expires?', 
@@ -326,7 +326,6 @@ class AccountImportExportService {
 		updateTitleSheetInfo(byWhom, project, workbook, sheetOptions)
 
 		sendSpreadsheetToBrowser(response, workbook, filename)
-
 	}
 
 	/**
@@ -650,7 +649,6 @@ class AccountImportExportService {
 				continue
 			}
 
-			Person person = accounts[i].person
 			String error
 			boolean personChanged = false
 			boolean userChanged = false
@@ -660,6 +658,10 @@ class AccountImportExportService {
 
 			// Reset the errors on the account
 			accounts[i].errors = []
+
+			Person person = accounts[i].person			
+			person.attach()
+			// UserLogin userLogin = 
 
 			// Create / Update the persons
 			if (formOptions.flagToUpdatePerson) {
@@ -909,7 +911,7 @@ class AccountImportExportService {
 	 * @param account - the account to examine
 	 * @return true if changes were detected otherwise false
 	 */
-	def hasUserLoginPropertiesSet = { account ->
+	private boolean hasUserLoginPropertiesSet(Map account) {
 
 		debugLogAccountInfo('In hasUserLoginPropertiesSet about to see if there are changes:', account, 'UserLogin')		
 		log.debug "hasUserLoginPropertiesSet() account isa ${account.getClass().getName()}"
@@ -937,7 +939,7 @@ class AccountImportExportService {
 	/**
 	 * Used to get the labels in column order
 	 */
-	List getLabelsInColumnOrder(type) {
+	private List getLabelsInColumnOrder(type) {
 		assert ['ssPos', 'formPos'].contains(type)
 
 		Map subMap = accountSpreadsheetColumnMap.findAll { it.value.get(type) > 0 }
@@ -951,7 +953,7 @@ class AccountImportExportService {
 	/**
 	 * Used to get the property names of the accountSpreadsheetColumnMap in the column order
 	 */
-	List getPropertiesInColumnOrder(type) {
+	private List getPropertiesInColumnOrder(type) {
 		Map subMap = accountSpreadsheetColumnMap.findAll { it.value.get(type) > 0 }
 		List list = subMap.collect { prop, info ->  [info.get(type), prop] }
 		list.sort { it[0] }
@@ -965,7 +967,7 @@ class AccountImportExportService {
 	 * @param params - the request parameters
 	 * @return the map of the parameters
 	 */
-	Map importParamsToOptionsMap(params) {
+	private Map importParamsToOptionsMap(params) {
 		Map options = [ 
 			importOption:params[IMPORT_OPTION_PARAM_NAME],
 		]
@@ -984,7 +986,7 @@ class AccountImportExportService {
 	 * @param options - the map created by the importParamsToOptionsMap method
 	 * @param a map that can be used with requests
 	 */
-	Map importOptionsAsParams(Map options) {
+	private Map importOptionsAsParams(Map options) {
 		Map params = [importOption: options[IMPORT_OPTION_PARAM_NAME]]
 		if (options.filename) {
 			params.filename = options.filename
@@ -998,7 +1000,7 @@ class AccountImportExportService {
 	 * @param options - the map created by the importParamsToOptionsMap method
 	 * @param a list of the errors which will be blank if no errors
 	 */
-	List validateImportOptions(Map options) {
+	private List validateImportOptions(Map options) {
 		List errors = []
 
 		int expireDays = 90
@@ -1086,7 +1088,7 @@ class AccountImportExportService {
 	 * @return true if a previous error was recorded on the property
 	 * @IntegrationTest
 	 */
-	def propertyHasError = { account, property ->
+	private boolean propertyHasError(Map account, String property) {
 		return account.containsKey("${property}${ERROR_SUFFIX}".toString())
 	}
 	
@@ -1096,7 +1098,7 @@ class AccountImportExportService {
 	 * @param account - the account Map with all the goodies
 	 * @param prop - the property for which to remove the error 
 	 */
-	def removeErrorValue = { account, prop ->
+	private void removeErrorValue(Map account, String prop) {
 		if (accountSpreadsheetColumnMap.containsKey(prop)) {
 			String errorProp = "$prop$ERROR_SUFFIX".toString()
 			accountSpreadsheetColumnMap[prop].remove(errorProp)
@@ -1113,7 +1115,7 @@ class AccountImportExportService {
 	 * @param defValue - the default value pulled from the Meta Map, if null it will be looked up on demand
 	 * @return the literal or computed default value for a given property
 	 */
-	def evaluateDefaultValue(String propertyName, Map account, Map sheetInfoOpts, def defValue=null) {
+	private evaluateDefaultValue(String propertyName, Map account, Map sheetInfoOpts, def defValue=null) {
 		// TODO : JPM 4/2016 : convert evaluateDefaultValue to a method from a closure
 		def result
 		if (defValue == null) {
@@ -1138,7 +1140,7 @@ class AccountImportExportService {
 	 * @return true if a previous error was recorded on the property
 	 * @IntegrationTest
 	 */
-	def propertyHasDefaulted = { account, property ->
+	private boolean propertyHasDefaulted(Map account, String property) {
 		return account.containsKey("${property}${DEFAULTED_SUFFIX}".toString())
 	}
 
@@ -1149,7 +1151,7 @@ class AccountImportExportService {
 	 * @param account - the account map with all of the goodies
 	 * @param domainName - the name of the domain to clear the properties on
 	 */
-	def clearDefaultedValues = { account, domainName ->
+	private void clearDefaultedValues(Map account, String domainName) {
 		String domainCode = domainName[0]
 		accountSpreadsheetColumnMap.each { prop, info ->
 			if (info.domain == domainCode) {
@@ -1209,12 +1211,12 @@ class AccountImportExportService {
 	}
 
 	// A helper method used to determine if a value has leading minus
-	boolean isMinus(String str) { 
+	private boolean isMinus(String str) { 
 		return (str?.startsWith('-'))
 	}
 
 	// A helper method that will strip off a minus prefix if it exists
-	String stripTheMinus(String str) { 
+	private String stripTheMinus(String str) { 
 		String r = str
 		if ( isMinus(str) ) {
 			r = (str.size() > 1 ? str.substring(1).trim() : '')
@@ -1257,7 +1259,7 @@ class AccountImportExportService {
 	 * @param domainName - the name of the domain being processed
 	 * @return a boolean indicating true if changes should be identify changes
 	 */
-	def shouldIdentifyUnplannedChanges = { options, domainName ->
+	private boolean shouldIdentifyUnplannedChanges(Map options, String domainName) {
 		boolean should=false
 		if (domainName == 'Person' && ! shouldUpdatePerson(options)) {
 			should = true
@@ -1272,7 +1274,7 @@ class AccountImportExportService {
 	 * @param header - a string header message
 	 * @param accounts - a single account or the list of accounts
 	 */
-	def debugLogAccountInfo = { header, accounts, domainName ->
+	private void debugLogAccountInfo(String header, Map accounts, String domainName) {
 		List list = ( accounts instanceof List ) ? accounts : [ accounts ]
 		
 		// Used to possibly filter the domain to list properties for
@@ -1309,7 +1311,7 @@ class AccountImportExportService {
 	 * Used to retrieve a blank Account Export Spreadsheet
 	 * @return The blank spreadsheet
 	 */
-	HSSFWorkbook getAccountExportTemplate() {
+	private HSSFWorkbook getAccountExportTemplate() {
 		// Load the spreadsheet template and populate it
 		String templateFilename = ACCOUNT_EXPORT_TEMPLATE
         HSSFWorkbook spreadsheet = ExportUtil.loadSpreadsheetTemplate(templateFilename)
@@ -1462,7 +1464,7 @@ class AccountImportExportService {
 	 * @param spreadsheet - the spreadsheet object
 	 * @param filename - the filename that it should be saved as on the client
 	 */ 
-	void sendSpreadsheetToBrowser(Object response, HSSFWorkbook spreadsheet, String filename) {
+	private void sendSpreadsheetToBrowser(Object response, HSSFWorkbook spreadsheet, String filename) {
 		ExportUtil.setExcelContentType(response, filename)
 		spreadsheet.write( response.getOutputStream() )
 		response.outputStream.flush()
@@ -1513,7 +1515,7 @@ class AccountImportExportService {
 	 * @param formOptions - A map of the form variables submitted by the user
 	 * @permission PersonExport 
 	 */
-	HSSFWorkbook generateAccountExportSpreadsheet(Object session, UserLogin byWhom, Project project, Map formOptions) {
+	private HSSFWorkbook generateAccountExportSpreadsheet(Object session, UserLogin byWhom, Project project, Map formOptions) {
 		if (!project) {
 			return
 		}
@@ -1821,7 +1823,7 @@ class AccountImportExportService {
 	 * @param formOptions - the user input params from the form
 	 * @return The list of accounts mapped out
 	 */
-	List<Map> validateSpreadsheetContent(UserLogin byWhom, Project project, HSSFWorkbook workbook, Map sheetInfoOpts, Map formOptions) {
+	private List<Map> validateSpreadsheetContent(UserLogin byWhom, Project project, HSSFWorkbook workbook, Map sheetInfoOpts, Map formOptions) {
 
 		// Read in the accounts and then validate them
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
@@ -1843,7 +1845,7 @@ class AccountImportExportService {
 	 * @param paramName - the name of the form parameter that contains the upload file
 	 * @return The name of the filename that was saved (excluding the path)
 	 */
-	String saveImportSpreadsheet(Object request, UserLogin byWhom, String paramName) {
+	private String saveImportSpreadsheet(Object request, UserLogin byWhom, String paramName) {
 		MultipartHttpServletRequest mpr = ( MultipartHttpServletRequest )request
 		CommonsMultipartFile xlsFile = ( CommonsMultipartFile )mpr.getFile(paramName)
 		
@@ -1866,7 +1868,7 @@ class AccountImportExportService {
 	 * @param filename - the spreadsheet filename
 	 * @return the FQPN to the where the JSON file is written to
 	 */
-	def getJsonFilename = { filename ->
+	private String getJsonFilename(String filename) {
 		// Swap out the XLS? extension and replace with .json
 		filename = filename.substring(0, filename.lastIndexOf('.')) + '.json'
 		
@@ -1881,7 +1883,7 @@ class AccountImportExportService {
 	 * @param filename - the filename to spreadsheet (which assumes it is in the app configured tmp directory)
 	 * @return the spreadsheet itself
 	 */
-	def saveResultsAsJson = { accounts, filename ->
+	private String saveResultsAsJson(List accounts, String filename) {
 		String fqfn = getJsonFilename(filename) 
 		log.debug "saveResultsAsJson() filename=$filename fqfn=$fqfn"
 		File file = new File(fqfn)
@@ -1896,7 +1898,7 @@ class AccountImportExportService {
 	 * @param filename - the filename to spreadsheet (which assumes it is in the app configured tmp directory)
 	 * @return the spreadsheet itself
 	 */
-	HSSFWorkbook readImportSpreadsheet(String filename) {
+	private HSSFWorkbook readImportSpreadsheet(String filename) {
 		if (! filename) {
 			throw new InvalidParamException('The import filename parameter was missing')
 		}
@@ -2119,6 +2121,7 @@ class AccountImportExportService {
 			//
 			if (true || formOptions.flagToUpdatePerson) {
 				validatePerson(byWhom, accounts[i], sheetInfoOpts)
+
 				debugLogAccountInfo('validateUploadedAccounts() Person after validatePerson', accounts[i], 'Person')
 				debugLogAccountInfo('validateUploadedAccounts() UserLogin after validatePerson', accounts[i], 'UserLogin')
 
@@ -2303,7 +2306,7 @@ class AccountImportExportService {
 			hasUserChanges = hasUserLoginPropertiesSet(account)
 
 			debugLogAccountInfo("validateUserLogin() AFTER hasUserLoginPropertiesSet() hasUserChanges=$hasUserChanges", account, 'UserLogin')
-			
+
 			// log.debug "validateUserLogin() hasUserChanges now=$hasUserChanges"
 
 			if ( shouldUpdateUser && hasUserChanges ) {
@@ -3065,7 +3068,7 @@ class AccountImportExportService {
 
 		boolean isNew = ! userLogin.id
 
-debugLogAccountInfo('In applyUserLoginChanges, about to call apply to Domain', account, 'UserLogin')
+		debugLogAccountInfo('In applyUserLoginChanges, about to call apply to Domain', account, 'UserLogin')
 		// Update the person with the values passed in
 		applyChangesToDomainObject(userLogin, account, sheetInfoOpts, formOptions.flagToUpdateUserLogin, true)
 		if (isNew) {
@@ -3146,7 +3149,7 @@ debugLogAccountInfo('In applyUserLoginChanges, about to call apply to Domain', a
 	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
 	 */
 	private void applyChangesToDomainObject(Object domainObject, Map account, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
-		log.debug "\n\n\n\n*******\napplyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
+		log.debug "\n\n*******\napplyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
 
 		boolean isNew = ! domainObject.id
 		String className = domainObject.getClass().getName()
