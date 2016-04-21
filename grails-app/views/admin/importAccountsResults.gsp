@@ -4,20 +4,50 @@
 	<meta name="layout" content="projectHeader" />
 	<title>Import Accounts</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.common.min.css')}" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'/dist/css/kendo',file:'kendo.default.min.css')}" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'bootstrap.css')}"/>
+	<!-- Kendo UI Material Theme -->
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.common-material.min.css')}">
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.material.min.css')}">
 
 	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
 
 	<g:javascript src="bootstrap.js" />
 
 	<style type="text/css">
-		.k-grid  .k-grid-header  .k-header  .k-link {
-		    height: auto;
+		.k-grid-toolbar {
+			border-color: #5f9fcf;
+			background-color: #5f9fcf;
+			padding: 7px;
+			font-size: 15px;
 		}
-		  
-		.k-grid  .k-grid-header  .k-header {
-		    white-space: normal;
+
+		th a:link {
+			width: inherit !important;
+		}
+
+		.k-grid .k-alt {
+			background-color: #f1f1f1;
+		}
+
+		.btn-post {
+			margin-right: 10px;
+		}
+
+		.panel-default {
+			margin-left: 13px;
+			margin-right: 13px;
+			margin-top: 10px;
+		}
+		.panel-body {
+			padding-top: 0px;
+			padding-bottom: 0px
+		}
+		.list-group {
+			width: 300px;
+		}
+
+		#grid {
+			min-height: 200px;
 		}
 	</style>
 
@@ -28,6 +58,66 @@
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
+
+
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<h3>Results Summary </h3>
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-3">
+						<ul class="list-group">
+							<li class="list-group-item">
+								<span class="badge">${results.personCreated}</span>
+								People Created:
+							</li>
+							<li class="list-group-item">
+								<span class="badge">${results.personUpdated}</span>
+								People Updated:
+							</li>
+							<li class="list-group-item">
+								<span class="badge">${results.personSkipped}</span>
+								People Skipped:
+							</li>
+							<li class="list-group-item">
+								<span class="badge">${results.personUnchanged}</span>
+								People Unchanged:
+							</li>
+							<li class="list-group-item">
+								<span class="badge">${results.personError}</span>
+								People With Errors:
+							</li>
+						</ul>
+
+					</div>
+					<div class="col-md-9">
+						<ul class="list-group">
+							<li class="list-group-item">
+								<span class="badge">${results.userLoginCreated}</span>
+								User Logins  Created:
+							</li>
+							<li class="list-group-item">
+								<span class="badge">${results.userLoginUpdated}</span>
+								User Logins  Updated:
+							</li>
+							<li class="list-group-item">
+								<span class="badge">${results.userLoginError}</span>
+								User Logins  With Errors:
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<%--
+			personSkipped: 0,
+			personUnchanged: 0,
+			teamsUpdated: 0,
+			teamsError: 0,
+			userLoginError:0
+			--%>
+		</div>
+	</div>
 
 	<div id="grid" style="margin:1em; width=1000px;"></div>
 
@@ -195,7 +285,7 @@
 				var dataArea = gridElement.find(".k-grid-content");
 				// Grid with locked columns has two  containers
 				var dataAreaLocked = gridElement.find(".k-grid-content-locked");
-				var newHeight = $(window).innerHeight() - 200;
+				var newHeight = $(window).innerHeight() - $('.panel-body').height() - 140;
 				var diff = gridElement.innerHeight() - dataArea.innerHeight();
 				gridElement.height(newHeight);
 				dataArea.height(newHeight - diff);
@@ -211,28 +301,6 @@
 
 		</script>
 
-		<div>
-			
-			<h3>Results Summary</h3>
-			<ul>
-				<li>People Created: ${results.personCreated}</li>
-				<li>People Updated: ${results.personUpdated}</li>
-				<li>People Skipped: ${results.personSkipped}</li>
-				<li>People Unchanged: ${results.personUnchanged}</li>
-				<li>People With Errors: ${results.personError}</li>
-
-				<li>User Logins  Created: ${results.userLoginCreated}</li>
-				<li>User Logins  Updated: ${results.userLoginUpdated}</li>
-				<li>User Logins  With Errors: ${results.userLoginError}</li>
-			</ul>
-			<%-- 
-			personSkipped: 0,
-			personUnchanged: 0,
-			teamsUpdated: 0,
-			teamsError: 0,
-			userLoginError:0
-			--%>
-		</div>
 	</div>
 </div>
 <g:include view="/layouts/_error.gsp" />
