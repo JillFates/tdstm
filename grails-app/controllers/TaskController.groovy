@@ -9,6 +9,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 
+import java.text.DateFormat
 import grails.converters.JSON
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
@@ -975,9 +976,18 @@ digraph runbook {
 				roles.push(role)
 			
 			def task = tmp['tasks'][t.id]
-			items.push([ id:t.id, name:t.comment, startInitial:task.tmpEarliestStart, endInitial:task.tmpEarliestStart+t.duration,
-			predecessorIds:predecessorIds, criticalPath:task.tmpCriticalPath, assignedTo:t.assignedTo.toString(), status:t.status,
-			role:role, number:t.taskNumber])
+			items.push( [ 
+				id:t.id, 
+				number:t.taskNumber,
+				name:t.comment, 
+				startInitial:task.tmpEarliestStart, 
+				endInitial:task.tmpEarliestStart+t.durationInMinutes(),
+				predecessorIds:predecessorIds, 
+				criticalPath:task.tmpCriticalPath, 
+				assignedTo:t.assignedTo.toString(), 
+				status:t.status,
+				role:role, 
+			] )
 		}
 
 		// Sort the roles aka teams
@@ -1141,6 +1151,10 @@ digraph runbook {
 					$tailExtra
 					</tr>""")
 
+
+			DateFormat dateTimeFormat = TimeUtil.createFormatter(session, TimeUtil.FORMAT_DATE_TIME)
+			String userTzId = TimeUtil.getUserTimezone(session)
+
 			tasks.each { t ->
 
 				def person = t.assignedTo ?: ''
@@ -1153,13 +1167,13 @@ digraph runbook {
 				def actual=''
 
 				if (t.constraintTime) {
-					constraintTime = TimeUtil.formatDateTime(getSession(), t.constraintTime) + " ${t.constraintType}"
+					constraintTime = TimeUtil.formatDateTimeWithTZ(userTzId, t.constraintTime, dateTimeFormat) + " ${t.constraintType}"
 				}
 				if (t.actStart) {
-					actStart = TimeUtil.formatDateTime(getSession(), t.actStart)
+					actStart = TimeUtil.formatDateTimeWithTZ(userTzId, t.actStart, dateTimeFormat)
 				}
 				if (t.actFinish) {
-					actFinish = TimeUtil.formatDateTime(getSession(), t.actFinish)
+					actFinish = TimeUtil.formatDateTimeWithTZ(userTzId, t.actFinish, dateTimeFormat)
 				}
 
 				if (t.actStart && t.actFinish) {
@@ -1194,11 +1208,18 @@ digraph runbook {
 				results.append( """<tr>
 					<td>${t.id}</td><td>${t.taskNumber}</td>
 					<td>${t.comment.encodeAsHTML()}</td>
-					<td>${t.duration}</td>
+					<td>${t.durationInMinutes()}</td>
 					${durationExtra}
-					<td>${tmp['tasks'][t.id].tmpEarliestStart}</td><td>${tmp['tasks'][t.id].tmpLatestStart}</td><td>$constraintTime</td>
+					<td>${tmp['tasks'][t.id].tmpEarliestStart}</td>
+					<td>${tmp['tasks'][t.id].tmpLatestStart}</td>
+					<td>$constraintTime</td>
 					${timesExtra}
-					<td>$actFinish</td><td>${t.priority}</td><td>$criticalPath</td><td>${team}</td><td>$person</td><td>${t.category}</td>
+					<td>$actFinish</td>
+					<td>${t.priority}</td>
+					<td>$criticalPath</td>
+					<td>${team}</td>
+					<td>$person</td>
+					<td>${t.category}</td>
 					$tailExtra
 					</tr>""")
 			}
