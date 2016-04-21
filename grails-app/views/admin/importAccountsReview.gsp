@@ -38,6 +38,10 @@
 		.btn-post {
 			margin-right: 10px;
 		}
+
+		#grid {
+			min-height: 200px;
+		}
 </style>
 </head>
 <body>
@@ -196,44 +200,20 @@
 					}
 				</g:each>
 				],
-				height: 540,
 				sortable: true,
 				reorderable: false,
 				groupable: false,
 				resizable: true,
 				filterable: true,
 				columnMenu: true,
-				pageable: false,
-				dataBound: function() {
-					resizeGrid();
-				}
+				pageable: false
 			});
 
-			function resizeGrid() {
-				var gridElement = $("#grid");
-				var dataArea = gridElement.find(".k-grid-content");
-				// Grid with locked columns has two  containers
-				var dataAreaLocked = gridElement.find(".k-grid-content-locked");
-				var newHeight = $(window).innerHeight() - 200;
-				var diff = gridElement.innerHeight() - dataArea.innerHeight();
-				gridElement.height(newHeight);
-				dataArea.height(newHeight - diff);
-				dataAreaLocked.height(newHeight - diff);
-			}
-
-			$(window).resize(function(){
-				if(loadValidation) {
-					resizeGrid();
-				}
-			});
 		});
 
 		</script>
 
 		<div>
-			<p>
-				Please review the above information for accuracy before submitting the form.
-			</p>
 			<g:form action="importAccounts" class="form-inline">
 				<input type="hidden" name="step" value="post" />
 				<input type="hidden" name="header" value="${header}" />
@@ -244,11 +224,14 @@
 					<div style="float: left">
 						<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
 					</div>
-					<div style="float: right; margin-right: 20px;">
+					<div style="float: right; margin-right: 14px;">
 						<button type="submit" class="btn btn-default btn-post">Post changes to ${importOptionDesc} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
 						<button type="button" id="cancelImport" class="btn btn-default" onclick="callCancelImport('${filename}');">Cancel <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
 					</div>
 				</div>
+				<br />
+				<br />
+				<br />
 			</g:form>
 
 		</div>
