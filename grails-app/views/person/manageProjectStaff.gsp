@@ -93,9 +93,10 @@
 							<option value="C">Completed</option>
 						</select>
 
-
+						<span id="spinner" class="spinner" style="margin-left:10px; position:inherit;">
+							<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+						</span>
 					</td>
-
 				</tr>
 			</table>
 			<br/>
@@ -130,7 +131,7 @@
 			}
 
 			// Used to make it easier for users to click the surrounding area of the checkbox
-			function clickCheckbox(elem) {
+			function clkCB(elem) {
 				$(':checkbox', elem).trigger('click');
 			}
 			

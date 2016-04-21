@@ -32,7 +32,6 @@
 	    <script type="text/javascript">
 
 	      	function editPersonDialog( e ) {
-
 		      var person = eval('(' + e.responseText + ')')
 		        document.editForm.company.value = person.companyId
 		      	document.editForm.id.value = person.id

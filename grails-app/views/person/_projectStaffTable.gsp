@@ -17,8 +17,6 @@
 	</thead>
 	<tbody>
 		<g:each in="${staffList}" status="i" var="projectStaff">
-			<g:set var="inProject" value="${projectStaff.project == 1}" />
-			<g:set var="roleHasVowel" value="${projectStaff.team.getAt(0).find(/[aeiouAEIOU]/)}" />
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" >
 				<td nowrap="nowrap" class="js-staffFullName">
 					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
@@ -30,7 +28,7 @@
 						${projectStaff?.company}
 					</span>
 				</td>
-				<td id="roleColumnId" class="js-staffRole" nowrap="nowrap" title="${projectStaff.role}">
+				<td id="roleColumnId" class="js-staffRole" nowrap="nowrap">
 					<span style="cursor: pointer;" id="${projectStaff?.personId}" onClick="loadPersonDiv(this.id,'generalInfoShow')">
 						${projectStaff?.team}
 					</span>
@@ -44,26 +42,23 @@
 					<g:if test="${projectStaff.role != 'STAFF'}">
 
 						<td id="projectColumnId" 
-							onClick="clickCheckbox(this);"
+							onClick="clkCB(this);"
 							class="js-staffProject ${(projectStaff.project==1 ? 'checkedStaff' :'' )}" 
-							nowrap="nowrap" 
-							title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name} as a${(roleHasVowel)?('n'):('')} ${projectStaff?.team}"
-						>
+							nowrap="nowrap">
 							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ? '' : 'disabled = "disabled"'}
 								onClick="addRemoveProjectTeam($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
-								value="${(inProject)?(1):(0)}" 
+								value="${inProjectValue}" 
 								${(projectStaff.project==1 ? 'checked="checked"' : '')} />
 						</td>
 					</g:if>
 					<g:else>
 						<td id="${projectColumnId}" nowrap="nowrap" 
-							title="${projectStaff.fullName} is ${(inProject)?(''):('not ')}part of project ${project?.name}"
-							onClick="clickCheckbox(this);"
+							onClick="clkCB(this);"
 						>
 
 							<input id="staff_person_${projectStaff.personId}" type="checkbox" name="staffChangeCheck" ${editPermission ? '' : 'disabled = "disabled"'}
-								onClick="addRemoveProjectStaff($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
-								value="${(inProject)?(1):(0)}" 
+								onClick="togPrjStaff($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
+								value="${inProjectValue}" 
 								${(projectStaff.project==1 ? 'checked="checked"' : '')} />
 
 						</td>
@@ -72,25 +67,24 @@
 				<g:each in="${moveEventList}" var="moveEvent">
 					<g:if test="${projectStaff.role != 'STAFF'}">
 						<g:if test="${projectStaff.unavailableDates.tokenize(',').contains(moveEvent.startDate)}">
-							<td id="${moveEvent.id}" class="unavailibleStaff" nowrap="nowrap" title="${projectStaff.fullName} is not available on ${moveEvent.startTime}">
+							<td id="${moveEvent.id}" class="unavailibleStaff" nowrap="nowrap" title="Not available on ${moveEvent.startTime}">
+								<input type="checkbox" disabled />
 							</td>
 						</g:if>
 						<g:else>
 							<g:set var="inMoveEvent" value="${(projectStaff.moveEvents.tokenize(',').contains(moveEvent.id.toString()))}" />
 							<td id="${moveEvent.id}" class="${( inMoveEvent ? 'checkedStaff' : '' )}" nowrap="nowrap" 
-								title="${moveEvent.project} - ${moveEvent.name} - ${moveEvent.startTime}"
-								onClick="clickCheckbox(this);"
+								onClick="clkCB(this);"
 							>
 								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${(editPermission ? '' : 'disabled = "disabled"') }
-									onClick="addRemoveEventStaff($(this),${projectStaff.personId},${project.id}, ${moveEvent.id},'${projectStaff.role}');"
+									onClick="togEvtStaff($(this),${projectStaff.personId},${project.id}, ${moveEvent.id},'${projectStaff.role}');"
 									value="${(inMoveEvent ? '1' : '0' )}" 
 									${ ( inMoveEvent ? 'checked="checked"' : '' )} />
 							</td>
 						</g:else>
 					</g:if>
 					<g:else>
-						<td id="${moveEvent.id}" nowrap="nowrap" title="${projectStaff.fullName} cannot be assigned using this team">
-						</td>
+						<td>&nbsp;</td>
 					</g:else>
 				</g:each>
 				

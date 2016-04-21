@@ -988,10 +988,11 @@ def test = {
 				SELECT * FROM (
 					SELECT pr.party_id_to_id AS personId, 
 						p.last_name AS lastName,
-						CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '), 
-							IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
-							COALESCE(p.last_name, '')
-						) AS fullName, 
+						CONCAT( COALESCE(p.first_name,''), 
+							IF(p.middle_name IS NULL OR p.middle_name = '', '', ' '),
+							COALESCE(p.middle_name, ''),
+							IF(p.last_name IS NULL OR p.last_name = '', '', ' '),
+							COALESCE(p.last_name, '') ) AS fullName,
 						company.name AS company, 
 						pr.role_type_code_to_id AS role, 
 						SUBSTRING(rt.description, INSTR(rt.description, ":")+2) AS team, 
@@ -1032,6 +1033,21 @@ def test = {
 
 		// log.debug "loadFilteredStaff() phase 7 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
+
+log.debug "staffList.size() = ${staffList.size()}"  // 515
+//staffList = [ staffList[0..8] ]
+// staffList = staffList[0..8]
+//staffList[0].unavailableDates = ''
+//staffList[0].role = 'STAFF'
+staffList.each { it ->
+	it.put('teamStartsWithVowel', (it.team?.size() > 0 ? 'aeiou'.contains(it.team[0].toLowerCase()) : false ))
+	it.put('inProject', (it.project ? true : false)) 
+	it.put('inProjectValue', (it.project ? '1' : '0')) 
+}
+
+// staffList[0].team = 'STAFF'
+
+// log.debug "****\n****\nstaffList=$staffList\n****\n****"
 
 		render(
 			template: "projectStaffTable", 

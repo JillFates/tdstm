@@ -167,6 +167,9 @@ var currentTabShow = "generalInfoShowId"
 var currentHeaderShow = "generalShowHeadId"
 
 function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
+
+	showSpinner();
+
 	var role = $("#role").val()
 	var location = $("#location").val()
 	var project = $("#project").val()
@@ -204,12 +207,22 @@ function loadFilteredStaff(sortOn , firstProp, orderBy, changed) {
 		type: 'POST',
 		success: function(data) {
 			$("#projectStaffTableId").html(data);
+			hideSpinner();
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
+			hideSpinner();
 			alert("An error occurred (" + errorThrown + ")\nPlease reload the page to confirm if any changes were made.");
 		}
 	});
 
+}
+
+// Used to hide the process spin
+function hideSpinner() {
+	$('#spinner').hide();
+}
+function showSpinner() {
+	$('#spinner').show();
 }
 
 /*
@@ -409,7 +422,7 @@ function addRemoveProjectTeam(source, personId, projectId, teamCode) {
  * Make a ajax call when user checks on checkbox for Project to add or remove the project staff based on the 
  * source checkbox argument. This will also remove the user from any events associated to the project.
  */
-function addRemoveProjectStaff(source, personId, projectId, teamCode) {
+function togPrjStaff(source, personId, projectId, teamCode) {
 
 	var action = (source.is(':checked') ? 'add' : 'remove');
 
@@ -467,7 +480,7 @@ function addRemoveProjectStaff(source, personId, projectId, teamCode) {
  * Make a ajax call when user checks on checkbox for an Event to add or remove the project staff based on the 
  * source checkbox argument. If the user wasn't previously assigned to a project, they will be done automatically.
  */
-function addRemoveEventStaff(source, personId, projectId, eventId, teamCode) {
+function togEvtStaff(source, personId, projectId, eventId, teamCode) {
 	// Disable and indicate an action for the checkbox 
 	toggleChangedStyle(source);
 	toggleDisabled(source);
