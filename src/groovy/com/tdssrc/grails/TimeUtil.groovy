@@ -470,14 +470,17 @@ class TimeUtil {
 	 * @return The date or null if unparseable
 	 **/
 	public static Date parseDate(String dateValue, DateFormat formatter) {
-		def result
-		try {
-			result = formatter.parse(dateValue)
-			result.clearTime()	
-		} catch (Exception e) {
-			log.warn("parseDate() encountered invalid date ($dateValue) format '${formatter?.toPattern()}' : ${e.getMessage()}")
-			log.debug("Exception:",e)
+		def result = null
+		if(!StringUtil.isBlank(dateValue)){
+			try {
+				result = formatter.parse(dateValue)
+				result.clearTime()	
+			} catch (Exception e) {
+				log.warn("parseDate() encountered invalid date ($dateValue) format '${formatter?.toPattern()}' : ${e.getMessage()}")
+				log.debug("Exception:",e)
+			}	
 		}
+		
 		return result
 	}
 

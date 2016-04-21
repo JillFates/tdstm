@@ -240,4 +240,15 @@ class TimeUtilTests extends Specification {
 			// thrown(InvalidParamException)
 			thrown(RuntimeException)
 	}
+
+
+	def 'Test ParseDate when passing blank or null date values'(){
+		setup:
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.MIDDLE_ENDIAN, TimeUtil.FORMAT_DATE)
+			def blankValueDate = TimeUtil.parseDate("", formatter)
+			def nullValueDate = TimeUtil.parseDate(null, formatter)
+		expect:
+			blankValueDate == null
+			nullValueDate == null
+	}
 }
