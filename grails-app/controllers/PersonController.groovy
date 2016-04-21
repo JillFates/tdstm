@@ -1034,20 +1034,10 @@ def test = {
 		// log.debug "loadFilteredStaff() phase 7 took ${TimeUtil.elapsed(start)}"
 		// start = new Date()
 
-log.debug "staffList.size() = ${staffList.size()}"  // 515
-//staffList = [ staffList[0..8] ]
-// staffList = staffList[0..8]
-//staffList[0].unavailableDates = ''
-//staffList[0].role = 'STAFF'
-staffList.each { it ->
-	it.put('teamStartsWithVowel', (it.team?.size() > 0 ? 'aeiou'.contains(it.team[0].toLowerCase()) : false ))
-	it.put('inProject', (it.project ? true : false)) 
-	it.put('inProjectValue', (it.project ? '1' : '0')) 
-}
-
-// staffList[0].team = 'STAFF'
-
-// log.debug "****\n****\nstaffList=$staffList\n****\n****"
+		// The template uses this value for the checkboxes
+		staffList.each { it ->
+			it.put('inProjectValue', (it.project ? '1' : '0')) 
+		}
 
 		render(
 			template: "projectStaffTable", 
