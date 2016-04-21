@@ -423,14 +423,23 @@ function addRemoveProjectTeam(source, personId, projectId, teamCode) {
  * source checkbox argument. This will also remove the user from any events associated to the project.
  */
 function togPrjStaff(source, personId, projectId, teamCode) {
-
-	var action = (source.is(':checked') ? 'add' : 'remove');
+	// Note that the checkbox is toggled before this method is called so if it is unchecked then the function should be remove
+	var sourceChecked = source.is(':checked');
+	var action = (source.is(':checked') ? 'add' : 'remove' );
 
 	var confirmMsg = "This action will remove the person from all assigned tasks, SME and/or Application Owner references and any Team and Event associations for the project. These changes can not be undone. Please click OK to proceed otherwise press Cancel."
-
-	var keepGoing = (action != 'remove' || (action == 'remove' && confirm(confirmMsg)))
-	if(keepGoing){
-	
+	var keepGoing = true;
+	if (action == 'remove') {
+		if (! confirm(confirmMsg)) {
+			keepGoing = false;
+			// Should toggle the checkbox back to checked
+			// TODO - TM-4810 - some reason the onClick is firing twice
+		}
+	}
+	// var keepGoing = (action != 'remove' || (action == 'remove' && confirm(confirmMsg)));
+	console.log("togPrjStaff: source=' + source + ' - action="+action + ' sourceChecked='+sourceChecked);
+	if (keepGoing) {
+		console.log("In the keepGoing...");
 		// Disable and indicate an action for the checkbox 
 		toggleChangedStyle(source);
 		toggleDisabled(source);
