@@ -413,44 +413,54 @@ function addRemoveProjectStaff(source, personId, projectId, teamCode) {
 
 	var action = (source.is(':checked') ? 'add' : 'remove');
 
-	// Disable and indicate an action for the checkbox 
-	toggleChangedStyle(source);
-	toggleDisabled(source);
+	var confirmMsg = "This action will remove the person from all assigned tasks, SME and/or Application Owner references and any Team and Event associations for the project. These changes can not be undone. Please click OK to proceed otherwise press Cancel."
 
-	var personId = source.attr('id')
-	var personId = personId.replace('staff_person_','')
+	var keepGoing = (action != 'remove' || (action == 'remove' && confirm(confirmMsg)))
+	if(keepGoing){
 	
-	var params = {'personId':personId, 'projectId':projectId};
-	var url = contextPath + '/person/' + action + 'ProjectStaff';
-	var errorMsg = '';
-	jQuery.ajax({
-		url: url,
-		data: params,
-		type:'POST',
-		async: false,
-		cache: false,
-		sourceElement: source,
-		success: function(data) {
-			console.log(data);
-			if (data.status == 'error') {
-				errorMsg = data.errors[0];
-				if (data.errors.length > 1)
-					console.log("Call to " + url + " failed : " + data.errors[1]);
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			errorMsg = "An error occurred while attempting to " + action + " person assignment to project";
-			console.log("Error " + textStatus + " : " + errorThrown);
-		}
-	});
-
-	if (errorMsg.length > 0) {
-		alert(errorMsg);
-		revertChange(source);
+		// Disable and indicate an action for the checkbox 
+		toggleChangedStyle(source);
 		toggleDisabled(source);
-	} else {
-		loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
+
+		var personId = source.attr('id')
+		var personId = personId.replace('staff_person_','')
+		
+		var params = {'personId':personId, 'projectId':projectId};
+		var url = contextPath + '/person/' + action + 'ProjectStaff';
+		var errorMsg = '';
+		jQuery.ajax({
+			url: url,
+			data: params,
+			type:'POST',
+			async: false,
+			cache: false,
+			sourceElement: source,
+			success: function(data) {
+				console.log(data);
+				if (data.status == 'error') {
+					errorMsg = data.errors[0];
+					if (data.errors.length > 1)
+						console.log("Call to " + url + " failed : " + data.errors[1]);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				errorMsg = "An error occurred while attempting to " + action + " person assignment to project";
+				console.log("Error " + textStatus + " : " + errorThrown);
+			}
+		});
+
+		if (errorMsg.length > 0) {
+			alert(errorMsg);
+			revertChange(source);
+			toggleDisabled(source);
+		} else {
+			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
+		}
+
+
 	}
+
+	
 }
 
 /*
