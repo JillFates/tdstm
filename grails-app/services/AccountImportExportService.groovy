@@ -3312,31 +3312,22 @@ class AccountImportExportService {
 	private List applySecurityRoleChanges(UserLogin byWhom, Map account){
 		String error
 		boolean changed = false
-		
-		// Check to see if there were any teams specified for the user
-		if (!account.roles_o) {
-			log.debug "applySecurityRoleChanges() bailed as there were no changes"
-		} else {
+
+		// Check to see if there were any security changes
+		if(account?.securityChanges) {			
 			UserLogin userLogin
 			if(account.person?.id){
 				userLogin = account.person?.userLogin
 			}
 			//TODO: @tavo_luna: What if it's a new User? I can't assume that is has been created before, I need a builder to ask for the user or create it to be reused elsewhere
-			if (userLogin) {
+			if (userLogin){
 				def person = userLogin.person
 
-				def currentRoles = securityService.getAssignedRoleCodes(userLogin)
-				def newRoles = account.roles
-				def rolesToRemove = currentRoles - newRoles
-				def rolesToAdd    = newRoles - currentRoles
-
-				log.debug "OLB: rolesToRemove: $rolesToRemove"
-				log.debug "OLB: rolesToAdd: $rolesToAdd"
+				def rolesToRemove = account.securityChanges.delete
+				def rolesToAdd    = account.securityChanges.add
 				
 				if(rolesToRemove) securityService.unassignRoleCodes(person, rolesToRemove)
 				if(rolesToAdd)    securityService.assignRoleCodes(person, rolesToAdd)
-
-				log.debug "OLB: Now the Assigned Roles are: ${securityService.getAssignedRoleCodes(userLogin)}"
 				
 				changed = true
 			}
