@@ -1043,7 +1043,7 @@ def test = {
 				editPermission:editPermission,
 				sortOn: params.sortOn, 
 				firstProp: params.firstProp, 
-				orderBy: params.orderBy != 'asc' ? 'asc' :'desc']
+				orderBy: paramsMap.orderBy != 'asc' ? 'asc' :'desc']
 		)	
 
 	}
