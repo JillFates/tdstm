@@ -592,7 +592,6 @@ class AccountImportExportService {
 	 */
 	@Transactional	
 	Map postChangesToAccounts(session, UserLogin byWhom, Project project, Object formOptions) {
-
 		if (formOptions.flagToUpdatePerson && ! securityService.hasPermission(byWhom, 'PersonImport', true)) {
 			throw new UnauthorizedException('Do not have the required permission for to import personnel information')
 		}
@@ -623,7 +622,9 @@ class AccountImportExportService {
 			teamsError: 0,
 			userLoginCreated: 0,
 			userLoginUpdated: 0,
-			userLoginError:0
+			userLoginError:0,
+			securityRoleError:0,
+			securityRolesUpdated:0
 		]
 
 		List updatedAccounts = []
@@ -725,8 +726,13 @@ class AccountImportExportService {
 					}
 				}
 
-
-				// TODO : Add call to applySecurityRoleChanges()
+				(error, securityRolesChanged) = applySecurityRoleChanges(byWhom, accounts[i])
+				if (error) {
+					results.securityRoleError++
+					accounts[i].errors << error
+				} else if (securityRolesChanged) {
+					results.securityRolesUpdated++						
+				}
 
 			}
 
@@ -3286,7 +3292,56 @@ class AccountImportExportService {
 		if (unplannedChange) {
 			account.errors << "Unplanned change(s) for $className"
 		}
-
 	}
 
+	/**
+	 * Used to update the person's SecurityRoles associated to them
+	 * by examining the SecurityRoles of the person and the roles lists passed in the account map. 
+	 * Removing those not pressent in the new array and adding the new ones
+	 *************************
+	 * TODO: If I remove all roles from the Spreadsheet the account.roles gets filled with some roles, I don't know if I should commit those or just fail.
+	 * also should I double check the security and if those roles belongs to me? (I think this has already been done on the review step.) my best guess is 
+	 * I should, but I'll check before anything else. 
+	 *************************
+	 * @author @tavo_luna
+	 *
+	 * @param byWhom - the UserLogin that invoked the update  <-- TODO: @tavo_luna Not sure if I need this yet...
+	 * @param account - the account map with all of the information about the person/use
+	 * @return an array with [errorMessage, flagThatThereWereChanges]
+	 */
+	private List applySecurityRoleChanges(UserLogin byWhom, Map account){
+		String error
+		boolean changed = false
+		
+		// Check to see if there were any teams specified for the user
+		if (!account.roles_o) {
+			log.debug "applySecurityRoleChanges() bailed as there were no changes"
+		} else {
+			UserLogin userLogin
+			if(account.person?.id){
+				userLogin = account.person?.userLogin
+			}
+			//TODO: @tavo_luna: What if it's a new User? I can't assume that is has been created before, I need a builder to ask for the user or create it to be reused elsewhere
+			if (userLogin) {
+				def person = userLogin.person
+
+				def currentRoles = securityService.getAssignedRoleCodes(userLogin)
+				def newRoles = account.roles
+				def rolesToRemove = currentRoles - newRoles
+				def rolesToAdd    = newRoles - currentRoles
+
+				log.debug "OLB: rolesToRemove: $rolesToRemove"
+				log.debug "OLB: rolesToAdd: $rolesToAdd"
+				
+				if(rolesToRemove) securityService.unassignRoleCodes(person, rolesToRemove)
+				if(rolesToAdd)    securityService.assignRoleCodes(person, rolesToAdd)
+
+				log.debug "OLB: Now the Assigned Roles are: ${securityService.getAssignedRoleCodes(userLogin)}"
+				
+				changed = true
+			}
+		}
+
+		return [error, changed]
+	}
 }
