@@ -2506,7 +2506,13 @@ class AccountImportExportService {
 
 		Map changeMap =	determineTeamChanges(allTeamCodes, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
 
-		log.debug "validateTeams(${account.firstName} ${account.lastName}) \n\tcurrPersonTeams=$currPersonTeams\n\tcurrProjectTeams=$currProjectTeams\n\tchgPersonTeams=$chgPersonTeams\n\tchgProjectTeams=$chgProjectTeams"
+		log.debug """
+			validateTeams(${account.firstName} ${account.lastName})
+					currPersonTeams=$currPersonTeams
+					currProjectTeams=$currProjectTeams
+					chgPersonTeams=$chgPersonTeams
+					chgProjectTeams=$chgProjectTeams
+		"""
 		log.debug "validateTeams() \n\tchangeMap=$changeMap"
 
 		ok = ! changeMap.error
@@ -3128,18 +3134,38 @@ class AccountImportExportService {
 		} else {
 
 			assert (account.person instanceof Person)
+			Person person = account.person
 			String personName = account.person.toString()
 
-			//log.debug "applyTeamsChanges() account.personTeams isa ${account.personTeams.getClass().getName()} and = ${account.personTeams}"
-			//log.debug "applyTeamsChanges() account.projectTeams isa ${account.projectTeams.getClass().getName()} and = ${account.projectTeams}"
-			//log.debug "applyTeamsChanges() account=$account"
+			log.debug "applyTeamsChanges() account.personTeams isa ${account.personTeams.getClass().getName()} and = ${account.personTeams}"
+			log.debug "applyTeamsChanges() account.projectTeams isa ${account.projectTeams.getClass().getName()} and = ${account.projectTeams}"
+			log.debug "applyTeamsChanges() account=$account"
 
 			Map chgMap = account.teamChangeMap
-			if (chgMap.hasChanges) {
+			if (chgMap?.hasChanges){
+				if(chgMap.personHasChanges) {
+					def personTeams = chgMap.resultPerson //@tavo_luna ugly hack to test removing STAFF:    - ["STAFF"]
+					log.debug "partyRelationshipService.updateAssignedTeams($person, $personTeams)"
+					partyRelationshipService.updateAssignedTeams(person, personTeams)
+				}
+
+				if(chgMap.projectHasChanges) {
+					def deleteTeamsFromProject = chgMap.deleteFromProject
+					if(deleteTeamsFromProject){
+						log.debug "projectService.removeTeamMember($project, $person, $deleteTeamsFromProject)"
+						projectService.removeTeamMember(project, person, deleteTeamsFromProject)						
+					}
+
+					def addTeamsToProject = chgMap.addToProject
+					if(addTeamsToProject){
+						log.debug "projectService.addTeamMember($project, $person, $addTeamsToProject)"
+						projectService.addTeamMember(project, person, addTeamsToProject)	
+					}
+				}
+				
 				changed = true
 			}
 		}
-		// TODO : Make the actual changes to the team assignments
 
 		return [error, changed]
 	}
