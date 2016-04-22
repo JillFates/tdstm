@@ -20,7 +20,9 @@
 			<td class="label ${config.appVendor} ${highlightMap.appVendor?:''}" nowrap="nowrap"><label for="appVendor">Vendor</label></td>
 			<td class="valueNW ${config.appVendor}">${applicationInstance.appVendor}</td>
 			<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
-			<td class="valueNW ${config.sme}">${applicationInstance.sme?.lastNameFirst}</td>
+			<td class="valueNW ${config.sme}">
+				<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
+			</td>
 			<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 			<td class="valueNW ${config.environment}">${applicationInstance.environment}</td>
 			<td class="label ${config.userLocations} ${highlightMap.userLocations?:''}" nowrap="nowrap"><label for="userLocations">User Location</label></td>
@@ -30,7 +32,9 @@
 			<td class="label ${config.appVersion} ${highlightMap.appVersion?:''}" nowrap="nowrap"><label for="appVersion">Version</label></td>
 			<td class="valueNW ${config.appVersion}">${applicationInstance.appVersion}</td>
 			<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
-			<td class="valueNW ${config.sme2}">${applicationInstance.sme2?.lastNameFirst}</td>
+			<td class="valueNW ${config.sme2}">
+				<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
+			</td>
 			<td class="label ${config.criticality} ${highlightMap.criticality?:''}" nowrap="nowrap"><label for="criticality">Criticality</label></td>
 			<td class="valueNW ${config.criticality}">${applicationInstance.criticality}</td>
 			<td class="label ${config.useFrequency} ${highlightMap.useFrequency?:''}" nowrap="nowrap"><label for="useFrequency">Use Frequency</label></td>
@@ -40,7 +44,9 @@
 			<td class="label ${config.appTech} ${highlightMap.appTech?:''}" nowrap="nowrap"><label for="appTech">Tech.</label></td>
 			<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
 			<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
-			<td class="valueNW ${config.appOwner}">${applicationInstance.appOwner?.lastNameFirst}</td>
+			<td class="valueNW ${config.appOwner}">
+				<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
+			</td>
 			<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
 			<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} : ${dependencyBundleNumber}</td>
 			<td class="label ${config.drRpoDesc} ${highlightMap.drRpoDesc?:''}" nowrap="nowrap"><label for="drRpoDesc">DR RPO</label></td>

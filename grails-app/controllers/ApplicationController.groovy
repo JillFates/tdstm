@@ -354,6 +354,9 @@ class ApplicationController {
 				appMoveInstance.save(flush:true)
 			}
 		}
+
+		// The list to show in the App Owner and SME selects should include ALL staff (project owner and partners)
+		// along with ALL of the client staff that their person accounts are active.
 		def personList = partyRelationshipService.getProjectApplicationStaff( project )
 
 		def model = [

@@ -1215,8 +1215,8 @@ class PartyRelationshipService {
 
 	/**
 	 * Used to look up application staff for a given project; the staff is composed by: 
-	 * ALL Client Staff + Project Owner and Partner Staff, whom have been assigned to the project.
-	 * The lists should no include inactive persons
+	 * ALL Client Staff + Project Owner and Partner Staff whom have been assigned to the project.
+	 * The lists should exclude any inactive persons
 	 * @param project - used to filter the list to a particular project (optional)
 	 * @return A list of persons
 	 */
@@ -1236,13 +1236,17 @@ class PartyRelationshipService {
 			companies.append(",${projectOwner.id}")
 		}
 
-		def query = new StringBuffer("""
+		def query = new StringBuffer()
+
+		// Query for the project owner and partner staff that are associated to the project
+		query.append("""
 			SELECT * FROM (
 			 (
 				SELECT pr.party_id_to_id AS personId, 
 					CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '), 
 						IFNULL(p.middle_name,''), IF(p.middle_name IS NULL, '', ' '),
-						COALESCE(p.last_name, '')
+						COALESCE(p.last_name, ''),
+						', ', pg.name
 					) AS fullName
 				FROM tdstm.party_relationship pr 
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
@@ -1257,8 +1261,12 @@ class PartyRelationshipService {
 					AND p.active = 'Y'
 				GROUP BY personId 
 				ORDER BY fullName ASC 
-			)
-			UNION
+			)""" )
+
+		query.append(" UNION ")
+
+		// Query for the client Staff
+		query.append("""
 			(
 				SELECT pr.party_id_to_id AS personId, 
 					CONCAT( IFNULL(p.first_name,''), IF(p.first_name IS NULL, '', ' '), 

@@ -376,4 +376,23 @@ class CustomTagLib {
 		}
 	}
 
+	/**
+	 * Used in the Application show view to show Owner/SMEs name and if the person is not staff of the 
+	 * project client then it will include the name of their company as well.
+	 * @param client - the company that is the client
+	 * @param person - the person to output the name of
+	 * @return the person's name and company if staff of project owner or partner
+	 *   owner/partner staff -  Robin Banks, Acme
+	 *   client staff - Jim Lockar
+	 */
+	def nameAndCompany = { attrs ->
+		def client = attrs.client
+		def person = attrs.person
+		def personCo = person?.company
+
+		out << (person ? person.toString() : '')
+		if (client && personCo && client.id != personCo.id) {
+			out << ', ' + personCo.name
+		}
+	}
 }

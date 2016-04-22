@@ -1391,6 +1391,7 @@ class AssetEntityService {
 			highlightMap:highlightMap, 
 			prefValue:prefValue, 
 			project:project,
+			client: project.client,
 			redirectTo:params.redirectTo, 
 			supportAssets:supportAssets,
 			viewUnpublishedValue:viewUnpublishedValue,
