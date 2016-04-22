@@ -76,6 +76,7 @@
 								<span class="badge">${results.personUpdated}</span>
 								People Updated:
 							</li>
+<%--
 							<li class="list-group-item">
 								<span class="badge">${results.personSkipped}</span>
 								People Skipped:
@@ -84,6 +85,7 @@
 								<span class="badge">${results.personUnchanged}</span>
 								People Unchanged:
 							</li>
+--%>
 							<li class="list-group-item">
 								<span class="badge">${results.personError}</span>
 								People With Errors:

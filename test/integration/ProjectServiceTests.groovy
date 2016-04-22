@@ -122,7 +122,7 @@ class ProjectServiceTests  extends Specification {
 			allProjects == (activeProjects + completedProjects)
 	}
 
-	def "5. Test assess by users to projects "() {
+	def "5. Test access by users to projects "() {
 		when:
 			Person adminPerson = personHelper.getAdminPerson()
 			Person person = personHelper.createPerson(adminPerson, project.client, project)

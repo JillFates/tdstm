@@ -263,9 +263,9 @@ class AccountImportExportService {
 									template:changeTmpl('stateProv'), transform:xfrmString],
 		country                : [type:'string',  ssPos:12,   formPos:14, domain:'P', width:100, locked:false, label:'Country', 
 									template:changeTmpl('country'), transform:xfrmString],
-		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:150, locked:false, label:'Person Team(s)', 
+		personTeams            : [type:'list',    ssPos:13,   formPos:15, domain:'T', width:190, locked:false, label:'Person Team(s)', 
 									template:changeTmpl('personTeams'), transform: xfrmListToString ],
-		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:150, locked:false, label:'Project Team(s)', 
+		projectTeams           : [type:'list',    ssPos:14,   formPos:15, domain:'T', width:190, locked:false, label:'Project Team(s)', 
 									template:changeTmpl('projectTeams'), transform: xfrmListToString ],
 		roles                  : [type:'list',    ssPos:15,   formPos:17, domain:'T', width:120, locked:false, label:'Security Role(s)',
 									template:changeTmpl('roles'), defaultValue: DEFAULT_SECURITY_ROLE, transform: xfrmListToString],
@@ -661,13 +661,11 @@ class AccountImportExportService {
 			accounts[i].errors = []
 
 			Person person = accounts[i].person			
-			// person.attach()
-			// UserLogin userLogin = 
 
 			// Create / Update the persons and associated teams
 			if (formOptions.flagToUpdatePerson) {
 				(error, personChanged) = applyPersonChanges(person, accounts[i], sheetInfoOpts, formOptions)
-
+				boolean personAndOrTeamsChanged = false
 				log.debug "postChangesToAccounts() call to applyPersonChanges() returned person=${accounts[i].person}, error=$error, personChanged=$personChanged"
 				if (error) {
 					accounts[i].errors << ["Row ${i+2} $error"]
@@ -678,51 +676,55 @@ class AccountImportExportService {
 						results.personCreated++
 					} else {
 						if (personChanged) {
-							results.personUpdated++
-						} else {
-							results.personUnchanged++
+							personAndOrTeamsChanged = true
 						}
 					}
 
-					// Update teams
+					// Update both the person personal teams as well as the team assignments to the project
 					(error, teamsChanged) = applyTeamsChanges(byWhom, accounts[i], project, sheetInfoOpts, formOptions)
 					if (error) {
 						results.teamsError++
 						accounts[i].errors << error
 					} else if (teamsChanged) {
 						results.teamsUpdated++
+						personAndOrTeamsChanged = true
 					}
-
-				// TODO : JPM 4/2016 : Only update team projects if the person is being assigned to the project
-
 				}
+
+				// Track the metrics of adds/updates
+				if (personAndOrTeamsChanged) {
+					results.personUpdated++
+				} else if (! accounts[i].flags.isNewAccount) {
+					results.personUnchanged++
+				}
+
 			}
 
 			// Deal with the userLogin
-			if (! error && accounts[i].flags.canUpdateUser) {				
+			if (! error && accounts[i].flags.canUpdateUser) {
+				boolean updateUserAndOrSecurity = false
+				boolean isNewUser = accounts[i].flags.isNewUserLogin
 				UserLogin userLogin
 				if (person.id) {
-					userLogin = person.userLogin
-					if (!userLogin) {
+					if (isNewUser) {
 						userLogin = new UserLogin()
 						userLogin.person = person
+					} else {
+						userLogin = person.userLogin
 					}
 				} else {
 					throw new RuntimeException("Can not create a UserLogin until Person is saved for $person")
 				}
-
-				// TODO : JPM 4/2016 : Need to save the security roles as well
-
 
 				(error, userChanged) = applyUserLoginChanges(userLogin, accounts[i], sheetInfoOpts, formOptions)
 				if (error) {
 					results.userLoginError++
 					accounts[i].errors << error
 				} else if (userChanged) {
-					if (accounts[i].flags.isNewUserLogin) {
+					if (isNewUser) {
 						results.userLoginCreated++
 					} else {
-						results.userLoginUpdated++
+						updateUserAndOrSecurity = true
 					}
 				}
 
@@ -731,9 +733,14 @@ class AccountImportExportService {
 					results.securityRoleError++
 					accounts[i].errors << error
 				} else if (securityRolesChanged) {
-					results.securityRolesUpdated++						
+					updateUserAndOrSecurity = true
+					results.securityRolesUpdated++
 				}
 
+				// Track the update metrics base of either user or security updated
+				if (updateUserAndOrSecurity && ! isNewUser) {
+					results.userLoginUpdated++
+				} 
 			}
 
 			// Add the account to the new updatedAccounts to be displayed on the results page
@@ -749,10 +756,12 @@ class AccountImportExportService {
 					List keys = [prop, origKey, defKey, errKey]
 					boolean hasTransform = info.transform
 					keys.each { key ->
-						if (hasTransform) {
-							account[key] = info.transform(accounts[i][key], sheetInfoOpts)
-						} else {
-							account[key] = accounts[i][key]
+						if (accounts[i].containsKey(key)) {
+							if (hasTransform) {
+								account[key] = info.transform(accounts[i][key], sheetInfoOpts)
+							} else {
+								account[key] = accounts[i][key]
+							}
 						}
 					}
 					
@@ -1113,6 +1122,23 @@ class AccountImportExportService {
 			String errorProp = "$prop$ERROR_SUFFIX".toString()
 			accountSpreadsheetColumnMap[prop].remove(errorProp)
 		}
+	}
+
+	def getOriginalValue = { account, property ->
+		return getPropertyValue(account, ORIGINAL_SUFFIX, property)
+	}
+
+	def getDefaultedValue = { account, property ->
+		return getPropertyValue(account, DEFAULTED_SUFFIX, property)
+	}
+
+	def getErrorValue = { account, property ->
+		return getPropertyValue(account, ERROR_SUFFIX, property)
+	}
+
+	def getPropertyValue = { account, suffix, property ->
+		String prop = "$property$suffix".toString()
+		return account[prop]
 	}
 
 	/**
@@ -2719,14 +2745,14 @@ class AccountImportExportService {
 		while (true) {
 			List list
 
-			// Check the roles currently assigned to the user (coming from the system)
+			// Check the roles currently assigned to the person (coming from the system)
 			[currPersonTeams, currProjectTeams].each { teams ->
 				list = teams.clone()
 				list.removeAll(allTeams)
 				if (list) {
 					// This shouldn't happen but just in case
 					panicButton "System issue with invalid team role${list.size() > 1 ? 's' : ''} $list"
-					log.debug "WTF??? allTeams=$allTeams"
+					log.error "determineTeamChanges() accounted person with invalid team assignment(s) $allTeams"
 				}
 			}
 			if (map.error) {
@@ -2792,12 +2818,14 @@ class AccountImportExportService {
 					if ( ! alreadyInList) {
 						resultProjectTeams << team
 						map.addToProject << team
-						map.projectHasChanges
+						map.projectHasChanges = true
 					}
-					if (! resultPersonTeams.contains(team)) {
+					// Check the Person personal teams and add if the person doesn't already have the assignment
+					// but keep in mind that the person already has the STAFF assignment.
+					if (team != 'STAFF' && ! resultPersonTeams.contains(team)) {
 						resultPersonTeams << team
 						map.addToPerson << team
-						map.personHasChanges
+						map.personHasChanges = true
 					}
 				}
 			}
@@ -3113,6 +3141,48 @@ class AccountImportExportService {
 	}
 
 	/**
+	 * Used to update the person's SecurityRoles associated to them
+	 * by examining the SecurityRoles of the person and the roles lists passed in the account map. 
+	 * Removing those not pressent in the new array and adding the new ones
+	 *************************
+	 * TODO: If I remove all roles from the Spreadsheet the account.roles gets filled with some roles, I don't know if I should commit those or just fail.
+	 * also should I double check the security and if those roles belongs to me? (I think this has already been done on the review step.) my best guess is 
+	 * I should, but I'll check before anything else. 
+	 *************************
+	 * @author @tavo_luna
+	 *
+	 * @param byWhom - the UserLogin that invoked the update  <-- TODO: @tavo_luna Not sure if I need this yet...
+	 * @param account - the account map with all of the information about the person/use
+	 * @return an array with [errorMessage, flagThatThereWereChanges]
+	 */
+	private List applySecurityRoleChanges(UserLogin byWhom, Map account){
+		String error
+		boolean changed = false
+
+		// Check to see if there were any security changes
+		if(account?.securityChanges) {			
+			UserLogin userLogin
+			if(account.person?.id){
+				userLogin = account.person?.userLogin
+			}
+			//TODO: @tavo_luna: What if it's a new User? I can't assume that is has been created before, I need a builder to ask for the user or create it to be reused elsewhere
+			if (userLogin){
+				def person = userLogin.person
+
+				def rolesToRemove = account.securityChanges.delete
+				def rolesToAdd    = account.securityChanges.add
+				
+				if(rolesToRemove) securityService.unassignRoleCodes(person, rolesToRemove)
+				if(rolesToAdd)    securityService.assignRoleCodes(person, rolesToAdd)
+				
+				changed = true
+			}
+		}
+
+		return [error, changed]
+	}
+
+	/**
 	 * Used to update the person's teams associated to themselves/company and to the project
 	 * by examining the personTeams and projectTeams lists passed in the account map. If the codes have 
 	 * a minus(-) suffix then the team will be removed otherwise it is added if it doesn't already exist.
@@ -3142,24 +3212,26 @@ class AccountImportExportService {
 			log.debug "applyTeamsChanges() account=$account"
 
 			Map chgMap = account.teamChangeMap
-			if (chgMap?.hasChanges){
+			if (chgMap?.hasChanges) {
 				if(chgMap.personHasChanges) {
 					def personTeams = chgMap.resultPerson //@tavo_luna ugly hack to test removing STAFF:    - ["STAFF"]
 					log.debug "partyRelationshipService.updateAssignedTeams($person, $personTeams)"
 					partyRelationshipService.updateAssignedTeams(person, personTeams)
+					account.changeHistory.put("Person.personTeams".toString(), getOriginalValue(account, 'personTeams') )
 				}
 
 				if(chgMap.projectHasChanges) {
 					def deleteTeamsFromProject = chgMap.deleteFromProject
-					if(deleteTeamsFromProject){
+					if (deleteTeamsFromProject) {
 						log.debug "projectService.removeTeamMember($project, $person, $deleteTeamsFromProject)"
 						projectService.removeTeamMember(project, person, deleteTeamsFromProject)						
 					}
 
 					def addTeamsToProject = chgMap.addToProject
-					if(addTeamsToProject){
+					if (addTeamsToProject) {
 						log.debug "projectService.addTeamMember($project, $person, $addTeamsToProject)"
 						projectService.addTeamMember(project, person, addTeamsToProject)	
+						account.changeHistory.put("Person.projectTeams".toString(), getOriginalValue(account, 'projectTeams'))
 					}
 				}
 				
@@ -3176,7 +3248,7 @@ class AccountImportExportService {
 	 *
 	 * Note: When applying changes to existing domains there needs to be some caution to prevent overwritting existing information
 	 * in the case that the import of a person/userLogin occurred as a result of someone just entering values in the spreadsheet and 
-	 * a match of the person happens to occur. In this scenario we can not be certain that the person entered all of the information so
+	 * a match of the person happens to occur. In this scenario we can not be certain that the person  entered all of the information so
 	 * we will ONLY overwrite values with blanks if we the load was matched on the person's id. This match indicates that the spreadsheet
 	 * originated from an export so all of the data should be there.
 	 * @param domainObject - the Person or UserLogin domain object to populate
@@ -3320,45 +3392,5 @@ class AccountImportExportService {
 		}
 	}
 
-	/**
-	 * Used to update the person's SecurityRoles associated to them
-	 * by examining the SecurityRoles of the person and the roles lists passed in the account map. 
-	 * Removing those not pressent in the new array and adding the new ones
-	 *************************
-	 * TODO: If I remove all roles from the Spreadsheet the account.roles gets filled with some roles, I don't know if I should commit those or just fail.
-	 * also should I double check the security and if those roles belongs to me? (I think this has already been done on the review step.) my best guess is 
-	 * I should, but I'll check before anything else. 
-	 *************************
-	 * @author @tavo_luna
-	 *
-	 * @param byWhom - the UserLogin that invoked the update  <-- TODO: @tavo_luna Not sure if I need this yet...
-	 * @param account - the account map with all of the information about the person/use
-	 * @return an array with [errorMessage, flagThatThereWereChanges]
-	 */
-	private List applySecurityRoleChanges(UserLogin byWhom, Map account){
-		String error
-		boolean changed = false
 
-		// Check to see if there were any security changes
-		if(account?.securityChanges) {			
-			UserLogin userLogin
-			if(account.person?.id){
-				userLogin = account.person?.userLogin
-			}
-			//TODO: @tavo_luna: What if it's a new User? I can't assume that is has been created before, I need a builder to ask for the user or create it to be reused elsewhere
-			if (userLogin){
-				def person = userLogin.person
-
-				def rolesToRemove = account.securityChanges.delete
-				def rolesToAdd    = account.securityChanges.add
-				
-				if(rolesToRemove) securityService.unassignRoleCodes(person, rolesToRemove)
-				if(rolesToAdd)    securityService.assignRoleCodes(person, rolesToAdd)
-				
-				changed = true
-			}
-		}
-
-		return [error, changed]
-	}
 }

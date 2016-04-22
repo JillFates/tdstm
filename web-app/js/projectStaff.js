@@ -432,6 +432,7 @@ function togPrjStaff(source, personId, projectId, teamCode) {
 	if (action == 'remove') {
 		if (! confirm(confirmMsg)) {
 			keepGoing = false;
+			return false;
 			// Should toggle the checkbox back to checked
 			// TODO - TM-4810 - some reason the onClick is firing twice
 		}
