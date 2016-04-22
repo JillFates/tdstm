@@ -230,7 +230,7 @@
 										value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:config.shutdownBy]"></g:render>
+								  <g:render template="bySelect" model="[name:'shutdownBy', id:'shutdownById', className:'${config.shutdownBy} assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByIdFixed" name="shutdownFixed" value="0"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" disabled="disabled"/>Fixed
 								</td>
@@ -246,7 +246,7 @@
 							<tr>
 							<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:config.startupBy]"></g:render>
+								   <g:render template="bySelect"  model="[name:'startupBy', id:'startupById', className:'${config.startupBy} assetSelect']"></g:render>
 									<input type="checkbox" id="startupByIdFixed"  name="startupFixed" value="0"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }"  disabled="disabled"/>Fixed
 								</td>
@@ -259,7 +259,7 @@
 								
 								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:config.testingBy]"></g:render>
+								  <g:render template="bySelect" model="[name:'testingBy', id:'testingById', className:'${config.testingBy} assetSelect']"></g:render>
 									<input type="checkbox" id="testingByIdFixed" name="testingFixed" value="0"  disabled="disabled"
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" />Fixed
 								</td>
@@ -295,3 +295,6 @@
 	currentMenuId = "#assetMenu";
 	$("#assetMenuId a").css('background-color','#003366')
 </script>
+<style>
+	#select2-drop{ width: 200px !important; } 
+</style>

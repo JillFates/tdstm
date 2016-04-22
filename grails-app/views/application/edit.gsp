@@ -2,6 +2,10 @@
 <%-- <g:set var="assetClass" value="${(new Application()).assetClass}" /> --%>
 <g:set var="assetClass" value="Application" />
 
+<style>
+	#select2-drop{ width: 200px !important; } 
+</style>
+
 <script type="text/javascript">
 	$("#appl_assetName").val($('#gs_assetName').val())
 	$("#appl_sme").val($('#gs_sme').val())
@@ -24,7 +28,7 @@
 		$("#testingByEditId").val('${applicationInstance.testingBy}')
 		if(!isIE7OrLesser)
 			$("select.assetSelect").select2();
-		changeDocTitle('${escapedName}');
+		changeDocTitle('${escapedName}');		
 	})
 </script>
 <g:form method="post" action="update" name="createEditAssetForm" onsubmit="return validateFields('Edit',this.name)">
@@ -241,7 +245,7 @@
 									value="${applicationInstance.externalRefId}" tabindex="28" /></td>
 								<td class="label ${config.shutdownBy} ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
 								<td >
-								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:config.shutdownBy]"></g:render>
+								   <g:render template="bySelect" model="[name:'shutdownBy' , id:'shutdownByEditId', className:'${config.shutdownBy} assetSelect']"></g:render>
 									<input type="checkbox" id="shutdownByEditIdFixed"  name="shutdownFixed" value="${applicationInstance.shutdownFixed} "
 										${!applicationInstance.shutdownBy || applicationInstance.shutdownBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
@@ -249,14 +253,15 @@
 								</td>
 								<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Shutdown Duration </label>
 								</td>
-								<td ><input type="text" id="shutdownDuration" name="shutdownDuration"
-											value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
+								<td>
+									<input type="text" id="shutdownDuration" name="shutdownDuration"
+										value="${applicationInstance.shutdownDuration}" tabindex="55" size="7"/>m
 								</td>
 							</tr>
 							<tr>
 								<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:config.startupBy]"></g:render>
+								   <g:render template="bySelect" model="[name:'startupBy', id:'startupByEditId', className:'${config.startupBy} assetSelect']"></g:render>
 									<input type="checkbox" id="startupByEditIdFixed" name="startupFixed" value="${applicationInstance.startupFixed}"
 										${!applicationInstance.startupBy || applicationInstance.startupBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
@@ -271,7 +276,7 @@
 								
 								<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
 								<td colspan="1" nowrap="nowrap">
-								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:config.testingBy]"></g:render>
+								  <g:render template="bySelect" model="[name:'testingBy', id:'testingByEditId', className:'${config.testingBy} assetSelect']"></g:render>
 									<input type="checkbox" id="testingByEditIdFixed" name="testingFixed" value="${applicationInstance.testingFixed}"
 										${!applicationInstance.testingBy || applicationInstance.testingBy.contains('@') ? 'disabled="disabled"' : ''}
 										onclick="if(this.checked){this.value = 1} else {this.value = 0 }" 
