@@ -4,6 +4,7 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.sql.Timestamp
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import javax.servlet.http.HttpSession
@@ -392,6 +393,11 @@ class TimeUtil {
 	 **/
 	public static String formatDateTime(String tzId, Date dateValue, DateFormat formatter) {
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
+	}
+
+	public static String formatDateTime(String tzId, Long time, DateFormat formatter) {
+		Timestamp dateTime =  new Timestamp(time)
+		return formatDateTimeWithTZ(tzId, dateTime, formatter)
 	}
 
 	/**

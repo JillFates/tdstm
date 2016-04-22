@@ -233,6 +233,18 @@ class TimeUtilTests extends Specification {
 			TimeUtil.formatDateTime('GMT', timestamp, formatter) == '02/01/1970'
 	}
 
+
+	def 'Test formatDateTime(String tzId, Long dateValue, DateFormat formatter)'() {
+		// TM-4823
+		setup:
+			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
+			long oneDay = 60*60*24*1000
+			Long timeAsLong = new Timestamp(oneDay).clearTime().getTime()
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDateTime('GMT', timeAsLong, formatter) == '02/01/1970'
+	}
+
 	def 'Test formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter)'() {
 		when:
 			TimeUtil.formatDateTime('GMT', new Date(), null)
