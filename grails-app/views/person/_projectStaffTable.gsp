@@ -42,22 +42,20 @@
 					<g:if test="${projectStaff.role != 'STAFF'}">
 
 						<td id="projectColumnId" 
-							onClick="clkCB(this);"
+							onClick="clkCB(event, $(this),${projectStaff.personId},${project.id}, null, '${projectStaff.role}', 'addRemoveProjectTeam');"
 							class="js-staffProject ${(projectStaff.project==1 ? 'checkedStaff' :'' )}" 
 							nowrap="nowrap">
 							<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${editPermission ? '' : 'disabled = "disabled"'}
-								onClick="addRemoveProjectTeam($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
 								value="${inProjectValue}" 
 								${(projectStaff.project==1 ? 'checked="checked"' : '')} />
 						</td>
 					</g:if>
 					<g:else>
 						<td id="${projectColumnId}" nowrap="nowrap" 
-							onClick="clkCB(this);"
+							onClick="clkCB(event, $(this), ${projectStaff.personId}, ${project.id}, null, '${projectStaff.role}', 'togPrjStaff');"
 						>
 
 							<input id="staff_person_${projectStaff.personId}" type="checkbox" name="staffChangeCheck" ${editPermission ? '' : 'disabled = "disabled"'}
-								onClick="togPrjStaff($(this),${projectStaff.personId},${project.id},'${projectStaff.role}');" 
 								value="${inProjectValue}" 
 								${(projectStaff.project==1 ? 'checked="checked"' : '')} />
 
@@ -74,12 +72,9 @@
 						<g:else>
 							<g:set var="inMoveEvent" value="${(projectStaff.moveEvents.tokenize(',').contains(moveEvent.id.toString()))}" />
 							<td id="${moveEvent.id}" class="${( inMoveEvent ? 'checkedStaff' : '' )}" nowrap="nowrap" 
-								onClick="clkCB(this);"
-							>
+								onClick="clkCB(event, $(this), ${projectStaff.personId}, ${project.id}, ${moveEvent.id},'${projectStaff.role}', 'togEvtStaff');">
 								<input id="${projectStaff.personId}" type="checkbox" name="staffCheck" ${(editPermission ? '' : 'disabled = "disabled"') }
-									onClick="togEvtStaff($(this),${projectStaff.personId},${project.id}, ${moveEvent.id},'${projectStaff.role}');"
-									value="${(inMoveEvent ? '1' : '0' )}" 
-									${ ( inMoveEvent ? 'checked="checked"' : '' )} />
+									   value="${(inMoveEvent ? '1' : '0' )}" ${ ( inMoveEvent ? 'checked="checked"' : '' )} />
 							</td>
 						</g:else>
 					</g:if>

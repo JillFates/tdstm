@@ -479,6 +479,7 @@ function togPrjStaff(source, personId, projectId, teamCode){
 	          $(this).dialog("close");
 	        },
 	        "Cancel" : function() {
+				toggleChangeChckboxState(source);
 	          $(this).dialog("close");
 	        }
 	      }
@@ -486,6 +487,18 @@ function togPrjStaff(source, personId, projectId, teamCode){
 	    $("#unselectDialog").dialog("open");
 	    $("#unselectDialog").parent().find(".ui-dialog-buttonpane").css('width', 'auto')
 
+	}
+}
+
+/**
+ * If the user cancel the button, we need to reverte to the original state
+ * @param source
+ */
+function toggleChangeChckboxState(source){
+	if(source.is(':checked') ){
+		source.prop( "checked", false );
+	} else {
+		source.prop( "checked", true);
 	}
 }
 

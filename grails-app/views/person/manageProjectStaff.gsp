@@ -137,8 +137,19 @@
 			}
 
 			// Used to make it easier for users to click the surrounding area of the checkbox
-			function clkCB(elem) {
-				$(':checkbox', elem).trigger('click');
+			function clkCB(event, elem, personId, projectId, moveEventId , projectStaffRole, action) {
+				if( $(event.target).is("td")) {
+					toggleChangeChckboxState($(':checkbox', elem));
+				}
+
+				if(action === 'addRemoveProjectTeam') {
+					addRemoveProjectTeam($(':checkbox', elem), personId, projectId, projectStaffRole);
+				} else if(action === 'togPrjStaff') {
+					togPrjStaff($(':checkbox', elem), personId, projectId, projectStaffRole);
+				} else if(action === 'togEvtStaff') {
+					togEvtStaff($(':checkbox', elem), personId, projectId, moveEventId, projectStaffRole);
+				}
+
 			}
 			
 	 	</script>
