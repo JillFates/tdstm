@@ -235,10 +235,12 @@
 				<input type="hidden" name="timezone" value="${timezone}" />
 				<input type="hidden" name="filename" value="${filename}" />
 				<input type="hidden" name="importOption" value="${importOption}" />
-				<div >
-					<div style="float: left">
-						<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
-					</div>
+				<div>
+					<g:if env="development">
+						<div style="float: left">
+							<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
+						</div>
+					</g:if>
 					<div style="float: right; margin-right: 14px;">
 						<button type="submit" class="btn btn-default btn-post" onclick="validateBeforePost();">
 							POST changes to ${importOptionDesc} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
