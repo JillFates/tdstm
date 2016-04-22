@@ -118,6 +118,12 @@
 					handleHeader();
 				});
 				handleHeader();
+
+				$("#unselectDialog").dialog({
+      				autoOpen: false,
+      				modal: true
+    			});
+    			
 			})
 			
 			function handleHeader () {
@@ -136,5 +142,9 @@
 			}
 			
 	 	</script>
+
+	 	<div id="unselectDialog" title="Unlock User Login">
+	
+		</div>
 	 </body>
  </html>

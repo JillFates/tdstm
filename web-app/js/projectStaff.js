@@ -401,10 +401,52 @@ function addRemoveProjectTeam(source, personId, projectId, teamCode) {
 				errorMsg = data.errors[0];
 				if (data.errors.length > 1)
 					console.log("Call to " + url + " failed : " + data.errors[1]);
+			}else{
+				loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			errorMsg = "An error occurred while attempting to " + action + " person team assignment to project";
+			console.log("Error " + textStatus + " : " + errorThrown);
+		}
+	});
+
+	if (errorMsg.length > 0) {
+		alert(errorMsg);
+		//revertChange(source);
+		toggleDisabled(source);
+	}
+}
+
+
+
+function toggleProjectStaff(source, personId, projectId, teamCode, sourceChecked){
+	toggleChangedStyle(source);
+	toggleDisabled(source);
+
+	var personId = source.attr('id')
+	var personId = personId.replace('staff_person_','')
+	var action = sourceChecked ? "add" : "remove"
+	var params = {'personId':personId, 'projectId':projectId};
+	var url = contextPath + '/person/' + action + 'ProjectStaff';
+	var errorMsg = '';
+	jQuery.ajax({
+		url: url,
+		data: params,
+		type:'POST',
+		async: false,
+		cache: false,
+		sourceElement: source,
+		success: function(data) {
+			console.log(data);
+			if (data.status == 'error') {
+				errorMsg = data.errors[0];
+				if (data.errors.length > 1)
+					console.log("Call to " + url + " failed : " + data.errors[1]);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			errorMsg = "An error occurred while attempting to " + action + " person assignment to project";
 			console.log("Error " + textStatus + " : " + errorThrown);
 		}
 	});
@@ -418,72 +460,33 @@ function addRemoveProjectTeam(source, personId, projectId, teamCode) {
 	}
 }
 
+
 /*
  * Make a ajax call when user checks on checkbox for Project to add or remove the project staff based on the 
  * source checkbox argument. This will also remove the user from any events associated to the project.
  */
-function togPrjStaff(source, personId, projectId, teamCode) {
-	// Note that the checkbox is toggled before this method is called so if it is unchecked then the function should be remove
+function togPrjStaff(source, personId, projectId, teamCode){
 	var sourceChecked = source.is(':checked');
-	var action = (source.is(':checked') ? 'add' : 'remove' );
-
-	var confirmMsg = "This action will remove the person from all assigned tasks, SME and/or Application Owner references and any Team and Event associations for the project. These changes can not be undone. Please click OK to proceed otherwise press Cancel."
-	var keepGoing = true;
-	if (action == 'remove') {
-		if (! confirm(confirmMsg)) {
-			keepGoing = false;
-			return false;
-			// Should toggle the checkbox back to checked
-			// TODO - TM-4810 - some reason the onClick is firing twice
-		}
-	}
-	// var keepGoing = (action != 'remove' || (action == 'remove' && confirm(confirmMsg)));
-	console.log("togPrjStaff: source=' + source + ' - action="+action + ' sourceChecked='+sourceChecked);
-	if (keepGoing) {
-		console.log("In the keepGoing...");
-		// Disable and indicate an action for the checkbox 
-		toggleChangedStyle(source);
-		toggleDisabled(source);
-
-		var personId = source.attr('id')
-		var personId = personId.replace('staff_person_','')
-		
-		var params = {'personId':personId, 'projectId':projectId};
-		var url = contextPath + '/person/' + action + 'ProjectStaff';
-		var errorMsg = '';
-		jQuery.ajax({
-			url: url,
-			data: params,
-			type:'POST',
-			async: false,
-			cache: false,
-			sourceElement: source,
-			success: function(data) {
-				console.log(data);
-				if (data.status == 'error') {
-					errorMsg = data.errors[0];
-					if (data.errors.length > 1)
-						console.log("Call to " + url + " failed : " + data.errors[1]);
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				errorMsg = "An error occurred while attempting to " + action + " person assignment to project";
-				console.log("Error " + textStatus + " : " + errorThrown);
-			}
-		});
-
-		if (errorMsg.length > 0) {
-			alert(errorMsg);
-			revertChange(source);
-			toggleDisabled(source);
-		} else {
-			loadFilteredStaff($("#sortOn").val(),$("#firstProp").val(), $("#orderBy").val() != 'asc' ? 'asc' :'desc' );
-		}
-
+	if(sourceChecked){
+		toggleProjectStaff(source, personId, projectId, teamCode, sourceChecked)
+	}else{
+		var confirmMsg = "This action will remove the person from all assigned tasks, SME and/or Application Owner references and any Team and Event associations for the project. These changes can not be undone. Please click OK to proceed otherwise press Cancel."	
+		$("#unselectDialog").html(confirmMsg)
+		$("#unselectDialog").dialog({
+	      buttons : {
+	        "Confirm" : function() {
+	          toggleProjectStaff(source, personId, projectId, teamCode, sourceChecked)
+	          $(this).dialog("close");
+	        },
+	        "Cancel" : function() {
+	          $(this).dialog("close");
+	        }
+	      }
+	    });
+	    $("#unselectDialog").dialog("open");
+	    $("#unselectDialog").parent().find(".ui-dialog-buttonpane").css('width', 'auto')
 
 	}
-
-	
 }
 
 /*
