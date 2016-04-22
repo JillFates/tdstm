@@ -1514,6 +1514,11 @@ class ProjectService {
 			teamCodes = [ teamCodes ]
 		}
 
+		if (teamCodes.contains('STAFF')) {
+			// If you are getting this exception you should look at the PersonService.removeFromProject method
+			throw new InvalidParamException('STAFF can not be removed by removeTeamMember method')
+		}
+		
 		// Remove person/team references in the MoveEventStaff table			
 		String mesQuery = """DELETE from MoveEventStaff mes where
 			person=:person and role.id in (:teams) and

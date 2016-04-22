@@ -101,6 +101,21 @@
 
 		}
 
+		// Used to popup a confirmation message if the user is removing STAFF from the project
+		function validateBeforePost() {
+			var atrfp=${accountsToRemoveFromProject};
+			if (atrfp > 0) {
+				var areIs = (atrfp == 1 ? ' is ' : ' are ');
+				var msg = 'There' + areIs + atrfp + ' account' + (atrfp == 1 ? '' : 's') +
+					' that' +  areIs + 'identified with "-STAFF" to be removed from the project. This action will remove the person from all ' +
+					'assigned tasks; event teams; association to the project and for non-client staff unassignment of Application Owner ' +
+					'and/or SME references. These changes can not be undone. Please click OK to proceed otherwise press Cancel.';
+				return confirm(msg);
+			} else {
+				return true;
+			}
+		}
+
 		// Used by the cancel button to call the cancel action
 		function callCancelImport(fn) {
 			var url = '${createLink(action: 'cancelImport')}'
@@ -225,7 +240,9 @@
 						<label><input type="checkbox" name="testMode" value="Y" checked /> Test Mode (disable committing changes)</label>
 					</div>
 					<div style="float: right; margin-right: 14px;">
-						<button type="submit" class="btn btn-default btn-post">Post changes to ${importOptionDesc} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+						<button type="submit" class="btn btn-default btn-post" onclick="validateBeforePost();">
+							POST changes to ${importOptionDesc} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+						</button>
 						<button type="button" id="cancelImport" class="btn btn-default" onclick="callCancelImport('${filename}');">Cancel <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
 					</div>
 				</div>

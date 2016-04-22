@@ -1145,12 +1145,17 @@ class PersonService {
 	}
 
 	/** 
-	 * Used to remove a person from a project as staff and also clear out references to MoveEventStaff
+	 * Used to remove a person from a project as staff and also clear out various association that the individual may have
+	 * When disassociating a person from the project there are a few things to be done:
+	 * 	  1. Remove their association to the project in PartyRelationship for STAFF and any TEAM relations
+	 * 	  2. Remove any TEAM assignments to Events
+	 * 	  3. Remove Task assignments that the individual may have had
+	 * 	  4. Remove references in the Application By properties (e.g. shutdownBy, startupBy)
+	 * 	  5. For individuals that are NOT staff of the client, remove any association they have as app owner or SMEs
 	 * @param user - the user performing the action
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
 	 * @return String - any value indicates an error otherwise blank means succes
-	 * TODO : JPM : 9/23/2015 - removeFromProject() doesn't look like it will work and doesn't appear to be used...
 	 */
 	String removeFromProject(UserLogin user, String projectId, String personId) {
 		Map map = validateUserCanEditStaffing(user, projectId, personId, null)
@@ -1158,15 +1163,17 @@ class PersonService {
 			throw new InvalidRequestException(map.error)
 		}
 
-		// Remove all of the person's MoveEventStaff relationships for the project
-		deleteFromEvent(map.project, null, map.person, map.teamRoleType)
+		Map metrics = [teamsUnassigned:0, appOwnerUnassigned:0, smeUnassigned:0, sme2Unassigned:0]
 
+		// Remove all of the person's MoveEventStaff relationships for the project
+		metrics.eventsUnassigned = deleteFromEvent(map.project, null, map.person, map.teamRoleType)
 
 		// Remove the Project Staff relationship for the project
 		List roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
 		roles?.each {
 			if (it.type.equals(RoleType.TEAM)) {
 				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, it.id)
+				metrics.teamsUnassigned++
 			}
 		}
 
@@ -1175,11 +1182,40 @@ class PersonService {
 		if (prProjectStaff) {
 			log.debug "removeFromProject() deleting PartyRelationship $prProjectStaff"
 			prProjectStaff.delete()
+			metrics.staffUnassigned = 1
 		} else {
 			log.warn "removeFromProject() No Project Staff record found for project $projectId and person $personId"
 		} 
 
-		auditService.logMessage("$user unassigned ${map.person} from project ${map.project.name}")
+		Map qparams = [project:map.project, person:map.person]
+
+		// Now lets start clearing out the other references starting with Task assignments
+		String sql = 'update AssetComment task set  task.assignedTo=null where task.project=:project and task.assignedTo=:person'
+		metrics.tasksUnassigned = AssetComment.executeUpdate(sql, qparams)
+
+		qparams.person = map.person.id.toString()
+		['shutdownBy', 'startupBy', 'testingBy'].each {
+			sql = "update Application a set a.${it}=null where a.project=:project and a.${it}=:person"
+			metrics["${it}Unassigned".toString()] = Application.executeUpdate(sql, qparams)
+		}
+
+		def employer = map.person.company
+		// log.debug "removeFromProject() project=${map.project.id}, employer=$employer (${employer.id}), project client=${map.project.client} (${map.project.client.id})"
+		if (map.project.client.id != employer.id) {
+			
+			qparams.person = map.person
+
+			sql = 'update AssetEntity a set a.appOwner=null where a.project=:project and a.appOwner=:person'
+			metrics.appOwnerUnassigned = AssetEntity.executeUpdate(sql, qparams)
+
+			['sme', 'sme2'].each {
+				sql = "update Application a set a.${it}=null where a.project=:project and a.${it}=:person"
+				metrics["${it}Unassigned".toString()] = Application.executeUpdate(sql, qparams)
+			}
+
+		}
+
+		auditService.logMessage("$user unassigned ${map.person} from project ${map.project.name} - results $metrics")
 	}
 
 	/** 

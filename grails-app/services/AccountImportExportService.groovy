@@ -537,6 +537,13 @@ class AccountImportExportService {
 		model.importOption = formOptions[IMPORT_OPTION_PARAM_NAME]
 		model.importOptionDesc = optionLabels[formOptions[IMPORT_OPTION_PARAM_NAME]]	// Used to display the user's option selection
 
+		// Need to load the spreadsheet into the list of accounts so we can determine the accountsToRemoveFromProject param. This param 
+		// will be used to determine if warning message should be show when it is > 0 when user is about to post
+		HSSFWorkbook workbook = readImportSpreadsheet(formOptions.filename)
+		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
+		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
+		model.accountsToRemoveFromProject = countRemoveFromProject(accounts)	
+
 		return model
 	}
 
@@ -610,7 +617,6 @@ class AccountImportExportService {
 		if (!accounts) {
 			throw new EmptyResultException('Unable to read the spreadsheet or the spreadsheet was empty')
 		}
-
 
 		Map results = [
 			personSkipped: 0,
@@ -1124,21 +1130,63 @@ class AccountImportExportService {
 		}
 	}
 
-	def getOriginalValue = { account, property ->
-		return getPropertyValue(account, ORIGINAL_SUFFIX, property)
+	/**
+	 * Used to access the ORIGINAL value set on the account
+	 * @param account - the Map of the account
+	 * @param property - the propertyName
+	 * @return the value set on the property
+	 */
+	private getOriginalValue(Map account, String property) {
+		return getPropertyValue(account, property, ORIGINAL_SUFFIX)
 	}
 
-	def getDefaultedValue = { account, property ->
-		return getPropertyValue(account, DEFAULTED_SUFFIX, property)
+	/**
+	 * Used to access the DEFAULTED value set on the account
+	 * @param account - the Map of the account
+	 * @param property - the propertyName
+	 * @return the value set on the property
+	 */
+	private getDefaultedValue(Map account, String property) {
+		return getPropertyValue(account, property, DEFAULTED_SUFFIX)
 	}
 
-	def getErrorValue = { account, property ->
-		return getPropertyValue(account, ERROR_SUFFIX, property)
+	/**
+	 * Used to access the ERROR value set on the account
+	 * @param account - the Map of the account
+	 * @param property - the propertyName
+	 * @return the value set on the property
+	 */
+	private getErrorValue(Map account, String property) {
+		return getPropertyValue(account, property, ERROR_SUFFIX)
 	}
 
-	def getPropertyValue = { account, suffix, property ->
+	/**
+	 * Used by the above get*Value methods to access the original/defaulted/error 
+	 * value set on the account.
+	 * @param account - the Map of the account
+	 * @param property - the propertyName
+	 * @param suffix - the suffix for the property name
+	 * @return the value set on the property
+	 */
+	private getPropertyValue(Map account, String property, String suffix) {
 		String prop = "$property$suffix".toString()
 		return account[prop]
+	}
+
+	/**
+	 * Used to determine the number of accounts that are flagged to be removed from the project
+	 * @param accounts - the list of all of the accounts
+	 * @return the count of accounts to be removed from the project
+	 */	
+	private countRemoveFromProject(accounts) {
+		int count = 0
+		accounts.each { acct ->
+			// Look through the projectTeam for any -STAFF references
+			if ( acct.projectTeams.find( { tc -> isMinus(tc) && stripTheMinus(tc) == 'STAFF'} ) ) {
+				count++
+			}
+		}
+		return count
 	}
 
 	/**
@@ -2157,8 +2205,8 @@ class AccountImportExportService {
 			if (true || formOptions.flagToUpdatePerson) {
 				validatePerson(byWhom, accounts[i], sheetInfoOpts)
 
-				debugLogAccountInfo('validateUploadedAccounts() Person after validatePerson', accounts[i], 'Person')
-				debugLogAccountInfo('validateUploadedAccounts() UserLogin after validatePerson', accounts[i], 'UserLogin')
+				//debugLogAccountInfo('validateUploadedAccounts() Person after validatePerson', accounts[i], 'Person')
+				//debugLogAccountInfo('validateUploadedAccounts() UserLogin after validatePerson', accounts[i], 'UserLogin')
 
 				// Get all teams except AUTO
 				validateTeams(accounts[i], project, allTeamCodes) 
@@ -2171,14 +2219,14 @@ class AccountImportExportService {
 				
 				// Validate user and security roles if user requested to update Users
 				boolean canUpdateUser = (accounts[i].username?.size() > 0)
-				log.debug "validateUploadedAccounts() 1. canUpdateUser=$canUpdateUser"		
+				//log.debug "validateUploadedAccounts() 1. canUpdateUser=$canUpdateUser"		
 				// TODO : JPM 4/2016 : check for new create user permission
 				// Check if user is trying to create a user without a person already created 
 				if (canUpdateUser && accounts[i].flags.isNewAccount && !formOptions.flagToUpdatePerson) {
 					accounts[i].errors << 'User can not be created without a saved person'
 					canUpdateUser = false
 				}
-				log.debug "validateUploadedAccounts() 2. canUpdateUser=$canUpdateUser"
+				//log.debug "validateUploadedAccounts() 2. canUpdateUser=$canUpdateUser"
 
 				if (canUpdateUser) {
 					accounts[i].flags.canUpdateUser = true
@@ -2187,8 +2235,8 @@ class AccountImportExportService {
 
 				// Validate that the teams codes are correct and map out what are to add and delete appropriately
 				validateSecurityRoles(byWhom, accounts[i], validRoleCodes, authorizedRoleCodes, sheetInfoOpts)
-				debugLogAccountInfo('validateUploadedAccounts() Person after validateSecurityRoles', accounts[i], 'Person')
-				debugLogAccountInfo('validateUploadedAccounts() UserLogin after validateSecurityRoles', accounts[i], 'UserLogin')
+				//debugLogAccountInfo('validateUploadedAccounts() Person after validateSecurityRoles', accounts[i], 'Person')
+				//debugLogAccountInfo('validateUploadedAccounts() UserLogin after validateSecurityRoles', accounts[i], 'UserLogin')
 			}
 
 			if (!accounts[i].flags.canUpdateUser) {
@@ -2531,15 +2579,16 @@ class AccountImportExportService {
 		List chgProjectTeams = account.projectTeams
 
 		Map changeMap =	determineTeamChanges(allTeamCodes, currPersonTeams, chgPersonTeams, currProjectTeams, chgProjectTeams)
-
+		/* 
 		log.debug """
 			validateTeams(${account.firstName} ${account.lastName})
-					currPersonTeams=$currPersonTeams
-					currProjectTeams=$currProjectTeams
-					chgPersonTeams=$chgPersonTeams
-					chgProjectTeams=$chgProjectTeams
+				currPersonTeams=$currPersonTeams
+				currProjectTeams=$currProjectTeams
+				chgPersonTeams=$chgPersonTeams
+				chgProjectTeams=$chgProjectTeams
 		"""
 		log.debug "validateTeams() \n\tchangeMap=$changeMap"
+		*/
 
 		ok = ! changeMap.error
 		if (ok) {
@@ -2738,10 +2787,6 @@ class AccountImportExportService {
 		}
 		panicButton ''	// Initialize the map without an error message
 
-		//log.debug "determineTeamChanges() \n\tallTeams=$allTeams" +
-		//	"\n\t currPersonTeams=$currPersonTeams\n\t chgPersonTeams=$chgPersonTeams" +
-		//	"\n\t currProjectTeams=$currProjectTeams\n\t chgProjectTeams=$chgProjectTeams" 
-
 		while (true) {
 			List list
 
@@ -2802,38 +2847,47 @@ class AccountImportExportService {
 			}
 
 			// Next we're going to go through the project team list of changes and add/remove based on the change list
-			// noting that any additions may affect the person list
-			chgProjectTeams.each { chgTeam ->
-				boolean toDelete = isMinus(chgTeam)
-				String team = stripTheMinus(chgTeam)
-				boolean alreadyInList = resultProjectTeams.contains(team)
+			// noting that any additions may affect the person list. Beforehand we're going to check to see if they are
+			// trying to remove the person from the project (-STAFF), if so everything goes.
+			if ( chgProjectTeams.find { isMinus(it) && stripTheMinus(it) == 'STAFF'} ) {
+				map.resultProject = []
+				map.addToProject = []
+				map.deleteFromProject = ['STAFF']
+				map.projectHasChanges = true
+			} else {
+				chgProjectTeams.each { chgTeam ->
+					boolean toDelete = isMinus(chgTeam)
+					String team = stripTheMinus(chgTeam)
+					boolean alreadyInList = resultProjectTeams.contains(team)
 
-				if (toDelete && alreadyInList) {
-					// Delete the team
-					resultProjectTeams.remove(team)
-					map.deleteFromProject << team
-					map.projectHasChanges = true
-				} else if ( !toDelete ) {
-					// Add the team
-					if ( ! alreadyInList) {
-						resultProjectTeams << team
-						map.addToProject << team
+					if (toDelete && alreadyInList) {
+						// Delete the team
+						resultProjectTeams.remove(team)
+						map.deleteFromProject << team
 						map.projectHasChanges = true
-					}
-					// Check the Person personal teams and add if the person doesn't already have the assignment
-					// but keep in mind that the person already has the STAFF assignment.
-					if (team != 'STAFF' && ! resultPersonTeams.contains(team)) {
-						resultPersonTeams << team
-						map.addToPerson << team
-						map.personHasChanges = true
+					} else if ( !toDelete ) {
+						// Add the team
+						if ( ! alreadyInList) {
+							resultProjectTeams << team
+							map.addToProject << team
+							map.projectHasChanges = true
+						}
+						// Check the Person personal teams and add if the person doesn't already have the assignment
+						// but keep in mind that the person already has the STAFF assignment.
+						if (team != 'STAFF' && ! resultPersonTeams.contains(team)) {
+							resultPersonTeams << team
+							map.addToPerson << team
+							map.personHasChanges = true
+						}
 					}
 				}
+				map.resultProject = resultProjectTeams.sort()
+				map.addToProject = map.addToProject.sort()
+				map.deleteFromProject = map.deleteFromProject.sort()
 			}
 
 			map.resultPerson = resultPersonTeams.sort()
-			map.resultProject = resultProjectTeams.sort()
 			map.addToPerson = map.addToPerson.sort()
-			map.addToProject = map.addToProject.sort()
 			map.hasChanges = (map.personHasChanges || map.projectHasChanges)
 
 			break
@@ -3112,7 +3166,7 @@ class AccountImportExportService {
 
 		boolean isNew = ! userLogin.id
 
-		debugLogAccountInfo('In applyUserLoginChanges, about to call apply to Domain', account, 'UserLogin')
+		//debugLogAccountInfo('In applyUserLoginChanges, about to call apply to Domain', account, 'UserLogin')
 		// Update the person with the values passed in
 		applyChangesToDomainObject(userLogin, account, sheetInfoOpts, formOptions.flagToUpdateUserLogin, true)
 		if (isNew) {
@@ -3207,31 +3261,32 @@ class AccountImportExportService {
 			Person person = account.person
 			String personName = account.person.toString()
 
-			log.debug "applyTeamsChanges() account.personTeams isa ${account.personTeams.getClass().getName()} and = ${account.personTeams}"
-			log.debug "applyTeamsChanges() account.projectTeams isa ${account.projectTeams.getClass().getName()} and = ${account.projectTeams}"
-			log.debug "applyTeamsChanges() account=$account"
-
 			Map chgMap = account.teamChangeMap
 			if (chgMap?.hasChanges) {
 				if(chgMap.personHasChanges) {
 					def personTeams = chgMap.resultPerson //@tavo_luna ugly hack to test removing STAFF:    - ["STAFF"]
-					log.debug "partyRelationshipService.updateAssignedTeams($person, $personTeams)"
+					//log.debug "partyRelationshipService.updateAssignedTeams($person, $personTeams)"
 					partyRelationshipService.updateAssignedTeams(person, personTeams)
 					account.changeHistory.put("Person.personTeams".toString(), getOriginalValue(account, 'personTeams') )
 				}
 
 				if(chgMap.projectHasChanges) {
-					def deleteTeamsFromProject = chgMap.deleteFromProject
-					if (deleteTeamsFromProject) {
-						log.debug "projectService.removeTeamMember($project, $person, $deleteTeamsFromProject)"
-						projectService.removeTeamMember(project, person, deleteTeamsFromProject)						
-					}
+					List deleteTeamsFromProject = chgMap.deleteFromProject
+					if (deleteTeamsFromProject.contains('STAFF') ) {
+						// If we're removing STAFF there ain't nothing else going to be happening here...
+						personService.removeFromProject(byWhom, project.id.toString(), person.id.toString())
+					} else {
+						if (deleteTeamsFromProject) {
+							log.debug "projectService.removeTeamMember($project, $person, $deleteTeamsFromProject)"
+							projectService.removeTeamMember(project, person, deleteTeamsFromProject)						
+						}
 
-					def addTeamsToProject = chgMap.addToProject
-					if (addTeamsToProject) {
-						log.debug "projectService.addTeamMember($project, $person, $addTeamsToProject)"
-						projectService.addTeamMember(project, person, addTeamsToProject)	
-						account.changeHistory.put("Person.projectTeams".toString(), getOriginalValue(account, 'projectTeams'))
+						def addTeamsToProject = chgMap.addToProject
+						if (addTeamsToProject) {
+							log.debug "projectService.addTeamMember($project, $person, $addTeamsToProject)"
+							projectService.addTeamMember(project, person, addTeamsToProject)	
+							account.changeHistory.put("Person.projectTeams".toString(), getOriginalValue(account, 'projectTeams'))
+						}
 					}
 				}
 				
@@ -3241,6 +3296,7 @@ class AccountImportExportService {
 
 		return [error, changed]
 	}
+	
 	/**
 	 * This method serves two purposes:
 	 *    1. Applies values from the account map into the domain object passed in when shouldUpdateDomain is true
@@ -3257,7 +3313,7 @@ class AccountImportExportService {
 	 * @param shouldUpdatePerson - a flag if true will record the original values to show changes being made
 	 */
 	private void applyChangesToDomainObject(Object domainObject, Map account, Map sheetInfoOpts, boolean shouldUpdateDomain, boolean setDefaults=false) {
-		log.debug "\n\n*******\napplyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
+		// log.debug "\n\n*******\napplyChangesToDomainObject() called for ${domainObject.getClass().getName()} $domainObject (${domainObject.id})"
 
 		boolean isNew = ! domainObject.id
 		String className = domainObject.getClass().getName()
@@ -3266,7 +3322,7 @@ class AccountImportExportService {
 		boolean identifyUnplannedChanges=shouldIdentifyUnplannedChanges(sheetInfoOpts, className)
 		boolean blockBlankOverwrites = account.flags.blockBlankOverwrites
 
-		log.debug "applyChangesToDomainObject() identifyUnplannedChanges=${identifyUnplannedChanges ? 'TRUE' : 'false'} for domain $className"
+		// log.debug "applyChangesToDomainObject() identifyUnplannedChanges=${identifyUnplannedChanges ? 'TRUE' : 'false'} for domain $className"
 
 		// Used to indicate that user entered data into the spreadsheet when the domain update
 		// option was declined/not selected.
@@ -3279,10 +3335,10 @@ class AccountImportExportService {
 				return // Skip property
 			}
 
-			log.debug "\r\n\r\n****** applyChangesToDomainObject() Processing property $prop"
+			//log.debug "\r\n\r\n****** applyChangesToDomainObject() Processing property $prop"
 
 			if (propertyHasError(account, prop)) {
-				log.debug "applyChangesToDomainObject() SKIPPED property $prop due to it having an error"
+				//log.debug "applyChangesToDomainObject() SKIPPED property $prop due to it having an error"
 				if (accountSpreadsheetColumnMap.containsKey('defaultOnError')) {
 					// Set a default value so that the domain validation will not fail
 					domainObject[prop] = accountSpreadsheetColumnMap.defaultOnError()
@@ -3304,14 +3360,14 @@ class AccountImportExportService {
 			boolean valuesEqual = origValueTransformed == chgValueTransformed
 			boolean origValueIsBlank = StringUtil.isBlank(origValueTransformed)			
 			boolean chgValueIsBlank = StringUtil.isBlank(chgValueTransformed)
-
+			/*
 			log.debug "applyChangesToDomainObject(${account.firstName + ' ' + account.lastName}) prop $prop value"
 			log.debug "existing='${domainObject[prop]==null ? 'null' : domainObject[prop]}' formatted to '${origValueTransformed==null?'null':origValueTransformed}'"
 			log.debug "changed is '${account[prop]==null?'null':account[prop]}' value='${chgValueTransformed ==null?'null': chgValueTransformed}'"
 			log.debug "blockBlankOverwrites=$blockBlankOverwrites, shouldUpdateDomain=$shouldUpdateDomain, isNew=$isNew"
 			log.debug "origValueIsBlank=$origValueIsBlank, chgValueIsBlank=$chgValueIsBlank, valuesEqual=$valuesEqual"
 			log.debug "account.errors=${account.errors.size()>0 ? true : false}"
-
+			*/
 			if (isNew) {
 				//
 				// Working with a NEW Domain object
@@ -3391,6 +3447,5 @@ class AccountImportExportService {
 			account.errors << "Unplanned change(s) for $className"
 		}
 	}
-
 
 }

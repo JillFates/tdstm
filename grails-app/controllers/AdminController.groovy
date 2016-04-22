@@ -1333,8 +1333,16 @@ class AdminController {
 
 					options.fileParamName = fileParamName
 					model = accountImportExportService.processFileUpload(session, request, user, project, options)
+
+					Map forwardParams = [
+						stepAlt:'review', 
+						filename:model.filename, 
+						importOption: params.importOption, 
+						accountsToRemoveFromProject: model.accountsToRemoveFromProject
+					]
+
 					// Redirect the user to the Review step
-					forward( action:formAction, params: [stepAlt:'review', filename:model.filename, importOption: params.importOption] )
+					forward( action:formAction, params: forwardParams )
 					return
 					break
 
@@ -1350,7 +1358,6 @@ class AdminController {
 
 					// This is used by the AJAX request in the form to construct the URL appropriately
 					model.paramsForReviewDataRequest = [filename:model.filename, importOption:params.importOption]
-
 					view = "${formAction}Review"
 					break
 
