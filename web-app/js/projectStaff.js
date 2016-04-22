@@ -483,8 +483,9 @@ function togPrjStaff(source, personId, projectId, teamCode){
 
 	        },
 	        "Cancel" : function() {
-				toggleChangeChckboxState(source);
+	        	$("#overlay").css('display', 'none')
 	          	$(this).dialog("close");
+				toggleChangeChckboxState(source);
 	        }
 	      }
 	    });
