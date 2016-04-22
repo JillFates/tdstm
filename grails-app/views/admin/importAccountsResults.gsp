@@ -46,8 +46,13 @@
 			width: 300px;
 		}
 
-		#grid {
-			min-height: 200px;
+		.k-loading-image {
+			background-image: url('${resource(dir:'dist/css/kendo/Default',file:'loading-image.gif')}');
+		}
+
+		/* we refactored the ui to auto size, the bottom border*/
+		.k-grid-content tr:last-child>td {
+			border-bottom-width: 1px;
 		}
 	</style>
 

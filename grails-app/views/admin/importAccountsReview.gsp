@@ -42,6 +42,14 @@
 		#grid {
 			min-height: 200px;
 		}
+
+		.k-grid-content-locked {
+			min-height: 81px;
+		}
+
+		.k-loading-image {
+			background-image: url('${resource(dir:'dist/css/kendo/Default',file:'loading-image.gif')}');
+		}
 </style>
 </head>
 <body>
