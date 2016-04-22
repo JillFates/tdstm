@@ -10,7 +10,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.material.min.css')}">
 
 	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
-
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
 	<g:javascript src="bootstrap.js" />
 
 	<%--
@@ -110,9 +110,27 @@
 					' that' +  areIs + 'identified with "-STAFF" to be removed from the project. This action will remove the person from all ' +
 					'assigned tasks; event teams; association to the project and for non-client staff unassignment of Application Owner ' +
 					'and/or SME references. These changes can not be undone. Please click OK to proceed otherwise press Cancel.';
-				return confirm(msg);
+
+					$("#confirmDialog").html(msg)
+					$("#overlay").css('display', 'inline')
+					$("#confirmDialog").dialog({
+	      				buttons : {
+	        				"Confirm" : function() {
+								$(this).dialog("close");
+								$("#overlay").css('display', 'none')
+								$("#postForm").submit();
+	        				},
+	        				"Cancel" : function() {
+								$(this).dialog("close");
+	          					$("#overlay").css('display', 'none')
+	        				}
+	      				}
+	    			});
+	    			$("#confirmDialog").dialog("open");
+	    			$("#confirmDialog").parent().find(".ui-dialog-buttonpane").css('width', 'auto')
+
 			} else {
-				return true;
+				$("#postForm").submit();
 			}
 		}
 
@@ -229,7 +247,7 @@
 		</script>
 
 		<div>
-			<g:form action="importAccounts" class="form-inline">
+			<g:form action="importAccounts" class="form-inline" name="postForm">
 				<input type="hidden" name="step" value="post" />
 				<input type="hidden" name="header" value="${header}" />
 				<input type="hidden" name="timezone" value="${timezone}" />
@@ -242,7 +260,7 @@
 						</div>
 					</g:if>
 					<div style="float: right; margin-right: 14px;">
-						<button type="submit" class="btn btn-default btn-post" onclick="validateBeforePost();">
+						<button type="button" class="btn btn-default btn-post" onclick="validateBeforePost();">
 							POST changes to ${importOptionDesc} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 						</button>
 						<button type="button" id="cancelImport" class="btn btn-default" onclick="callCancelImport('${filename}');">Cancel <span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
@@ -256,6 +274,14 @@
 		</div>
 	</div>
 </div>
+<div id="confirmDialog" title="Confirm before proceeding">
+</div>
+
+<div id="overlay">
+	<div id="overlay-wrapper">
+	</div>
+</div>
+
 <g:include view="/layouts/_error.gsp" />
 </body>
 </html>
