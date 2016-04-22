@@ -39,6 +39,7 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link href="/tdstm/css/jqgrid/ui.jqgrid.css" rel="stylesheet" type="text/css" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
 		
 	</head>
 	<body>
@@ -121,7 +122,6 @@
 
 				$("#unselectDialog").dialog({
       				autoOpen: false,
-      				modal: true
     			});
     			
 			})
@@ -154,8 +154,16 @@
 			
 	 	</script>
 
-	 	<div id="unselectDialog" title="Unlock User Login">
+	 	<div id="unselectDialog" title="Confirm before proceeding">
 	
 		</div>
+
+
+		<div id="overlay">
+			<div id="overlay-wrapper">
+			</div>
+		</div>
+
+
 	 </body>
  </html>

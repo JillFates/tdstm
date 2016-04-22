@@ -470,17 +470,21 @@ function togPrjStaff(source, personId, projectId, teamCode){
 	if(sourceChecked){
 		toggleProjectStaff(source, personId, projectId, teamCode, sourceChecked)
 	}else{
-		var confirmMsg = "This action will remove the person from all assigned tasks, SME and/or Application Owner references and any Team and Event associations for the project. These changes can not be undone. Please click OK to proceed otherwise press Cancel."	
+		var confirmMsg = "This action will remove the person from all assigned tasks, SME and/or Application Owner references and any Team and Event associations for the project. These changes can not be undone. Please click Confirm to proceed otherwise press Cancel."	
 		$("#unselectDialog").html(confirmMsg)
+		$("#overlay").css('display', 'inline')
 		$("#unselectDialog").dialog({
 	      buttons : {
 	        "Confirm" : function() {
-	          toggleProjectStaff(source, personId, projectId, teamCode, sourceChecked)
-	          $(this).dialog("close");
+	         	$("#overlay").css('display', 'none')
+				$(this).dialog("close");
+	         	toggleProjectStaff(source, personId, projectId, teamCode, sourceChecked)
+	          	
+
 	        },
 	        "Cancel" : function() {
 				toggleChangeChckboxState(source);
-	          $(this).dialog("close");
+	          	$(this).dialog("close");
 	        }
 	      }
 	    });
