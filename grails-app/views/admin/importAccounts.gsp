@@ -53,11 +53,6 @@
 						</select>
 						<br>
 						<br>
-						<label>
-							<input type="checkbox" name="verifyProject" value="Y"> Import accounts into project ${projectName} <label class="requiredField">*</label>
-						</label>
-						<br />
-						<br />
 						<button type="submit" class="btn btn-default">
 							Upload Spreadsheet
 							<span class="uploadIcon glyphicon glyphicon-upload" aria-hidden="true"></span>

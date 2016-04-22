@@ -1331,11 +1331,6 @@ class AdminController {
 					// and verifying that it has some accounts in it. If successful it will do a forward to 
 					// the review step.
 
-					if (params.verifyProject != 'Y') {
-						flash.message = "You must confirm the project to import into before continuing"
-						return model
-					}
-
 					options.fileParamName = fileParamName
 					model = accountImportExportService.processFileUpload(session, request, user, project, options)
 					// Redirect the user to the Review step
