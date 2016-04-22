@@ -6,9 +6,8 @@ import org.codehaus.groovy.grails.commons.ApplicationHolder
 import groovy.time.TimeDuration
 
 databaseChangeLog = {	
-	changeSet(author: "oluna", id: "20160315 TM-4697-1") {
+	changeSet(author: "oluna", id: "20160315 TM-4697-1-FIX") {
 		comment('Clear orphan task_dependencies')
-		
 		grailsChange {
 			change {
 				def limit = 500000				
@@ -18,8 +17,9 @@ databaseChangeLog = {
 
 				def numBatchs = Math.ceil(totalDeps.total / limit).intValue()
 
-				(1..numBatchs).each{ 
-					log.info(String.format("Cleared %.2f %%", it*100/numBatchs))
+				//using a for statement to save some memory and avoid an extra if 
+				for(int i=1; i<=numBatchs; i++){
+					log.info(String.format("Cleared %.2f %%", i*100/numBatchs))
 					sql.executeUpdate("""
 						DELETE FROM task_dependency WHERE task_dependency_id IN (
 							SELECT id FROM (
