@@ -1,7 +1,5 @@
 package com.tds.asset
 
-//import org.codehaus.groovy.grails.orm.hibernate.cfg.IdentityEnumType
-
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.SizeScale;
 import com.tdsops.tm.enums.domain.ValidationType
@@ -168,11 +166,11 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 	String externalRefId
 	
 	Integer dependencyBundle = 0
-    Integer size
-    SizeScale scale
-    Integer rateOfChange
+	Integer size
+	SizeScale scale
+	Integer rateOfChange
 	Person modifiedBy
-    
+		
 	static hasMany = [
 		// assetEntityVarchars : AssetEntityVarchar,
 		comments : AssetComment
@@ -341,28 +339,26 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		validation( blank:true, nullable:true, size:0..20, inList:ValidationType.getList() )		
 		dependencyBundle( nullable:true )
 		externalRefId( blank:true, nullable:true )
-        
-        size( nullable:true )
-        scale( nullable:true, inList:SizeScale.getKeys() )
-        rateOfChange( nullable:true )
+				
+		size( nullable:true )
+		scale( nullable:true, inList:SizeScale.getKeys() )
+		rateOfChange( nullable:true )
 		modifiedBy( nullable:true )
 	}
 	
 	static mapping  = {	
-		version true
-		autoTimestamp false
+		version           true
+		autoTimestamp     false
 		tablePerHierarchy false
-		id column:'asset_entity_id'
-		os column:'hinfo'
-		appOwner column:'app_owner_id'
-		moveBundle ignoreNotFound:true
-		owner ignoreNotFound: true
-		columns {
-			hasRemoteMgmt sqltype: 'tinyint(1)'
-			retireDate sqltype: 'date'
-			maintExpDate sqltype: 'date'
-		}
-		modifiedBy column:'modified_by'
+		id                column: 'asset_entity_id'
+		os                column: 'hinfo'
+		appOwner          column: 'app_owner_id'
+		modifiedBy        column: 'modified_by'
+		moveBundle        ignoreNotFound: true
+		owner             ignoreNotFound: true
+		retireDate        sqltype: 'date'
+		maintExpDate      sqltype: 'date'
+		rateOfChange      sqltype: 'int(4)'
 	}
 
 	// Need to indicate the getters that would otherwise be mistaken as db properties
