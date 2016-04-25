@@ -2351,7 +2351,7 @@ $(document).ready(function () {
 				scale.zoomTime  = 30 * _MS_PER_MIN;
 			}
 			if(mainGraph) {
-				scale.tick = 3;
+				scale.tick = 2;
 				scale.format = d3.time.format('%b %d - %H:%M');
 			}
 		}
@@ -2360,10 +2360,7 @@ $(document).ready(function () {
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %d');
 			if(differScaleTime) {
-				scale.zoomTime  = 10 * _MS_PER_HOUR;
-			}
-			if(mainGraph) {
-
+				scale.zoomTime  = 7 * _MS_PER_HOUR;
 			}
 		}
 		if( msConversion === _MS_PER_WEEK) {
@@ -2384,9 +2381,6 @@ $(document).ready(function () {
 			if(differScaleTime) {
 				scale.zoomTime  = 1 * _MS_PER_WEEK;
 			}
-			if(mainGraph) {
-
-			}
 		}
 		if( msConversion === _MS_PER_YEAR) {
 			scale.time = d3.time.year;
@@ -2394,9 +2388,6 @@ $(document).ready(function () {
 			scale.format = d3.time.format('%Y');
 			if(differScaleTime) {
 				scale.zoomTime  = 4 * _MS_PER_MONTH;
-			}
-			if(mainGraph) {
-
 			}
 		}
 	}
