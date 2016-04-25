@@ -1,13 +1,19 @@
 /**
  * @author @tavo_luna
  * TM-4697 Fixing orphan records for cookbook tasks by cascade delete using a FK in the Database
+ * 2016-04-25 Fix a problem when there where no orphan records and validate if the FK constraint is already in the DB
  */
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import groovy.time.TimeDuration
 
 databaseChangeLog = {	
 	changeSet(author: "oluna", id: "20160315 TM-4697-1-FIX") {
-		comment('Clear orphan task_dependencies')
+		def constraint_name = "fk_task_dep_asset_comment_id"
+
+		comment('Clear orphan task_dependencies --FIX to ZERO DIV')
+		preConditions(onFail:'MARK_RAN', onFailMessage:"Constraint '$constraint_name' already exists in the Schema") {
+			sqlCheck(expectedResult:"0", """
+	        select count(*) from information_schema.table_constraints where constraint_schema = database() and CONSTRAINT_NAME='$constraint_name';
+	    """)
+		}
 		grailsChange {
 			change {
 				def limit = 500000				
@@ -34,9 +40,13 @@ databaseChangeLog = {
 				log.info("Orphans cleared!")
 
 				log.info("Creating Fk-Constraint")
+				/*
+				2026-04-25 @tavo_luna NOTE: we need to concat the QLTER SQL with the constraint name to execute the code
+				correctly, for weird reasons it won't work if interpolated, YOU'VE BEEN WARNED...
+				*/
 				sql.execute("""
 					ALTER TABLE task_dependency
-					  ADD CONSTRAINT fk_task_dep_asset_comment_id
+					  ADD CONSTRAINT """ + constraint_name + """
 					  FOREIGN KEY (asset_comment_id) REFERENCES asset_comment (asset_comment_id)
 					  ON UPDATE CASCADE
 					  ON DELETE CASCADE
