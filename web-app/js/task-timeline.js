@@ -483,7 +483,7 @@ $(document).ready(function () {
 			.x(x)
 			.on("brush", brushed)
 			.on("brushend", brushedEnd)
-			.extent([parseStartDate(data.startDate), new Date( Math.min( parseStartDate(data.startDate).getTime() + 30 * 60000, x.domain()[1].getTime() ) )])
+			.extent([parseStartDate(data.startDate), new Date( Math.min( parseStartDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime() ) )])
 
 		var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 		zoomScale = extentWidth / width;
@@ -2330,36 +2330,74 @@ $(document).ready(function () {
 		return Math.floor((utc2 - utc1) / _DEF);
 	}
 
-	function applyScaleDefinition(msConversion, scale) {
+	function applyScaleDefinition(msConversion, scale, differScaleTime, mainGraph) {
 		if( msConversion === _MS_PER_MIN) {
 			scale.time = d3.time.minute;
 			scale.tick = 10;
 			scale.format = d3.time.format('%H:%M');
+			if(differScaleTime) {
+				scale.zoomTime  = 10 * _MS_PER_MIN;
+			}
+			if(mainGraph) {
+				scale.tick = 5;
+			}
 		}
 		if( msConversion === _MS_PER_HOUR) {
 			scale.time = d3.time.hour;
 			scale.tick = 5;
-			scale.format = d3.time.format('%b %d - %H:%M');
+			scale.format = d3.time.format('%b %d');
+
+			if(differScaleTime) {
+				scale.zoomTime  = 30 * _MS_PER_MIN;
+			}
+			if(mainGraph) {
+				scale.tick = 3;
+				scale.format = d3.time.format('%b %d - %H:%M');
+			}
 		}
 		if( msConversion === _MS_PER_DAY) {
 			scale.time = d3.time.day;
 			scale.tick = 1;
-			scale.format = d3.time.format('%I %P');
+			scale.format = d3.time.format('%b %d');
+			if(differScaleTime) {
+				scale.zoomTime  = 10 * _MS_PER_HOUR;
+			}
+			if(mainGraph) {
+
+			}
 		}
 		if( msConversion === _MS_PER_WEEK) {
 			scale.time = d3.time.week;
 			scale.tick = 1;
-			scale.format = d3.time.format('%a %d');
+			scale.format = d3.time.format('%b %d');
+			if(differScaleTime) {
+				scale.zoomTime  = 1 * _MS_PER_DAY;
+			}
+			if(mainGraph) {
+				scale.d3TimeFormat = d3.time.format('%b - (week %W)');
+			}
 		}
 		if( msConversion === _MS_PER_MONTH) {
 			scale.time = d3.time.month;
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %Y');
+			if(differScaleTime) {
+				scale.zoomTime  = 1 * _MS_PER_WEEK;
+			}
+			if(mainGraph) {
+
+			}
 		}
 		if( msConversion === _MS_PER_YEAR) {
 			scale.time = d3.time.year;
 			scale.tick = 1;
 			scale.format = d3.time.format('%Y');
+			if(differScaleTime) {
+				scale.zoomTime  = 4 * _MS_PER_MONTH;
+			}
+			if(mainGraph) {
+
+			}
 		}
 	}
 
@@ -2372,16 +2410,19 @@ $(document).ready(function () {
 	function getTimeFormatToDraw(date1, date2) {
 		var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 			difference = 0,
-			scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute},
+			scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute, zoomTime: 30 * _MS_PER_MIN},
 			d3LowerScale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute}; // By Default the min slice is minutes, so copy this as the lower possible scale
 
 		for(var i = 0; i < msConversion.length; i++) {
 			difference = dateDiffByDef(date1, date2, msConversion[i]);
 			if(difference <= _MAX_TICK_PERFORMANCE ) {
-				applyScaleDefinition(msConversion[i], scale)
+				applyScaleDefinition(msConversion[i], scale, true)
 				if(i > 0) {
-					applyScaleDefinition(msConversion[i-1], d3LowerScale);
+					applyScaleDefinition(msConversion[i-1], d3LowerScale, false, true);
+				} else { // Same scale.
+					applyScaleDefinition(msConversion[i], d3LowerScale, false, true);
 				}
+
 
 				// Same days, reduce the tick to 1, just minutes
 				if(difference === 0 && msConversion[i] === _MS_PER_MIN) {
