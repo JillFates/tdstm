@@ -153,6 +153,9 @@ $(document).ready(function () {
 
 		var maxStack = calculateStacks();
 		var miniHeight = ((maxStack+1)*miniRectHeight) + miniRectStroke;
+		if(miniHeight <= 10) {
+			miniHeight = miniRectHeight =100;
+		}
 		var mainHeight = ((maxStack+1)*mainRectHeight*1.5);
 
 		var width = x.range()[1];
@@ -406,12 +409,11 @@ $(document).ready(function () {
 			.tickFormat(d3Linear.format)
 			.tickSize(6, 0, 0);
 
-		// construct the minutes axis for the mini graph
-		var x1MinuteAxis = d3.svg.axis()
+		var x1MainGraphAxis = d3.svg.axis()
 			.scale(x1)
 			.orient('top')
-			.ticks(d3Linear.lowerScale.time, d3Linear.lowerScale.tick)
-			.tickFormat(d3Linear.lowerScale.format)
+			.ticks(d3Linear.time, d3Linear.tick)
+			.tickFormat(d3Linear.format)
 			.tickSize(6, 0, 0);
 
 		// construct the hours axis for the main graph
@@ -422,23 +424,11 @@ $(document).ready(function () {
 			.tickFormat(d3Linear.format)
 			.tickSize(6, 0, 0);
 
-		// construct the hours axis for the mini graph
-		var x1HourAxis = d3.svg.axis()
-			.scale(x1)
-			.orient('bottom')
-			.ticks(d3Linear.time, d3Linear.tick)
-			.tickFormat(d3Linear.format)
-			.tickSize(6, 0, 0);
-
 		var mainMinuteAxis = main.append('g')
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'main axis minute')
-			.call(x1MinuteAxis);
+			.call(x1MainGraphAxis);
 
-		var mainHourAxis = main.append('g')
-			.attr('transform', 'translate(0,' + mainHeight + ')')
-			.attr('class', 'main axis hour')
-			.call(x1HourAxis)
 
 		var miniMinuteAxis = mini.append('g')
 			.attr('transform', 'translate(0,' + miniHeight + ')')
@@ -587,10 +577,6 @@ $(document).ready(function () {
 			itemLabels.attr('transform', 'translate(' + offset + ', 0)');
 			mainNowLine.attr('transform', 'translate(' + offset + ', 0)');
 
-
-			// offset the axis
-			var offsetY = mainHourAxis[0][0].transform.baseVal.getItem(0).matrix.f;
-			mainHourAxis.attr('transform', 'translate(' + offset + ', ' + offsetY + ')');
 			mainMinuteAxis.attr('transform', 'translate(' + offset + ', ' + 0 + ')');
 
 			if ( (! scaled) && (! repainting) )
@@ -602,10 +588,13 @@ $(document).ready(function () {
 				x1.range([0, width / zoomScale]);
 
 				// update the scales for the axis
-				x1MinuteAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
-				x1HourAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
-				mainMinuteAxis.call(x1MinuteAxis);
-				mainHourAxis.call(x1HourAxis);
+
+				var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]));
+				x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
+				x1MainGraphAxis.tickFormat(innerTimeLine.format);
+
+				x1MainGraphAxis.scale(d3.time.scale().domain(x1.domain()).range(x1.range()));
+				mainMinuteAxis.call(x1MainGraphAxis);
 
 				$.each(items, function (i, d) {
 					d.points = getPoints(d);
@@ -850,7 +839,6 @@ $(document).ready(function () {
 			$('clippath rect').height(mainHeight);
 			chart.attr('height', height + margin.top + margin.bottom + 20);
 			background.attr('height', mainHeight);
-			//mainHourAxis.attr('transform', 'translate(0,' + mainHeight + ')');
 			mainNowLine.attr('y2', mainHeight);
 			fullRedraw();
 		}
@@ -2330,65 +2318,42 @@ $(document).ready(function () {
 		return Math.floor((utc2 - utc1) / _DEF);
 	}
 
-	function applyScaleDefinition(msConversion, scale, differScaleTime, mainGraph) {
+	function applyScaleDefinition(msConversion, scale, differScaleTime) {
 		if( msConversion === _MS_PER_MIN) {
 			scale.time = d3.time.minute;
 			scale.tick = 10;
 			scale.format = d3.time.format('%H:%M');
-			if(differScaleTime) {
-				scale.zoomTime  = 10 * _MS_PER_MIN;
-			}
-			if(mainGraph) {
-				scale.tick = 5;
-			}
+			scale.zoomTime  = 10 * _MS_PER_MIN;
 		}
 		if( msConversion === _MS_PER_HOUR) {
 			scale.time = d3.time.hour;
 			scale.tick = 5;
 			scale.format = d3.time.format('%b %d');
-
-			if(differScaleTime) {
-				scale.zoomTime  = 30 * _MS_PER_MIN;
-			}
-			if(mainGraph) {
-				scale.tick = 2;
-				scale.format = d3.time.format('%b %d - %H:%M');
-			}
+			scale.zoomTime  = 30 * _MS_PER_MIN;
 		}
 		if( msConversion === _MS_PER_DAY) {
 			scale.time = d3.time.day;
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %d');
-			if(differScaleTime) {
-				scale.zoomTime  = 7 * _MS_PER_HOUR;
-			}
+			scale.zoomTime  = 7 * _MS_PER_HOUR;
 		}
 		if( msConversion === _MS_PER_WEEK) {
 			scale.time = d3.time.week;
 			scale.tick = 1;
-			scale.format = d3.time.format('%b %d');
-			if(differScaleTime) {
-				scale.zoomTime  = 1 * _MS_PER_DAY;
-			}
-			if(mainGraph) {
-				scale.d3TimeFormat = d3.time.format('%b - (week %W)');
-			}
+			scale.format = d3.time.format('%b %d (week %W)');
+			scale.zoomTime  = 1 * _MS_PER_DAY;
 		}
 		if( msConversion === _MS_PER_MONTH) {
 			scale.time = d3.time.month;
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %Y');
-			if(differScaleTime) {
-				scale.zoomTime  = 1 * _MS_PER_WEEK;
-			}
+			scale.zoomTime  = 1 * _MS_PER_WEEK;
 		}
 		if( msConversion === _MS_PER_YEAR) {
 			scale.time = d3.time.year;
 			scale.tick = 1;
 			scale.format = d3.time.format('%Y');
-			if(differScaleTime) {
-				scale.zoomTime  = 4 * _MS_PER_MONTH;
-			}
+			scale.zoomTime  = 4 * _MS_PER_MONTH;
 		}
 	}
 
@@ -2401,31 +2366,16 @@ $(document).ready(function () {
 	function getTimeFormatToDraw(date1, date2) {
 		var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 			difference = 0,
-			scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute, zoomTime: 30 * _MS_PER_MIN},
-			d3LowerScale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute}; // By Default the min slice is minutes, so copy this as the lower possible scale
+			scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute, zoomTime: 30 * _MS_PER_MIN};
 
 		for(var i = 0; i < msConversion.length; i++) {
 			difference = dateDiffByDef(date1, date2, msConversion[i]);
 			if(difference <= _MAX_TICK_PERFORMANCE ) {
-				applyScaleDefinition(msConversion[i], scale, true)
-				if(i > 0) {
-					applyScaleDefinition(msConversion[i-1], d3LowerScale, false, true);
-				} else { // Same scale.
-					applyScaleDefinition(msConversion[i], d3LowerScale, false, true);
-				}
-
-
-				// Same days, reduce the tick to 1, just minutes
-				if(difference === 0 && msConversion[i] === _MS_PER_MIN) {
-					//scale.tick = 1;
-					//d3LowerScale.tick = 1;
-				}
-
+				applyScaleDefinition(msConversion[i], scale, true);
 				break;
 			}
 		}
 
-		scale.lowerScale = d3LowerScale;
 		// Return the config
 		return scale;
 	}
