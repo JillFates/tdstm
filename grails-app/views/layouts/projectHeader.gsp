@@ -145,10 +145,10 @@
 							<tds:hasPermission permission='UserLoginView'>
 							<li><g:link class="mmlink" controller="userLogin" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Users</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='ImportPerson'>
+							<tds:hasPermission permission='PersonImport'>
 							<li><g:link class="mmlink" controller="admin" action="importAccounts" onclick="hideMegaMenu('adminMegaMenu')">Import Accounts</g:link></li>
 							</tds:hasPermission>
-							<tds:hasPermission permission='ExportPerson'>
+							<tds:hasPermission permission='PersonExport'>
 							<li><g:link class="mmlink" controller="admin" action="exportAccounts" onclick="hideMegaMenu('adminMegaMenu')">Export Accounts</g:link></li>
 							</tds:hasPermission>
 							<tds:hasPermission permission='HelpMenuView'>
