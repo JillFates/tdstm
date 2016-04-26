@@ -41,7 +41,7 @@ databaseChangeLog = {
 
 				log.info("Creating Fk-Constraint")
 				/*
-				2026-04-25 @tavo_luna NOTE: we need to concat the QLTER SQL with the constraint name to execute the code
+				2026-04-25 @tavo_luna NOTE: we need to concat the ALTER SQL with the constraint name to execute the code
 				correctly, for weird reasons it won't work if interpolated, YOU'VE BEEN WARNED...
 				*/
 				sql.execute("""
@@ -58,12 +58,22 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "oluna", id: "20160315 TM-4697-2") {
+		def constraint_name = "fk_comment_note_asset_comment_id"
 		comment('Fix Orphan records for comment_note (tasks)')
+		preConditions(onFail:'MARK_RAN', onFailMessage:"Constraint '$constraint_name' already exists in the Schema") {
+			sqlCheck(expectedResult:"0", """
+	        select count(*) from information_schema.table_constraints where constraint_schema = database() and CONSTRAINT_NAME='$constraint_name';
+	    """)
+		}
 		//delete and set cascade to comment
 		sql("DELETE cn FROM comment_note cn LEFT OUTER JOIN asset_comment ac ON ac.asset_comment_id = cn.asset_comment_id WHERE ac.asset_comment_id IS NULL")
+		/*
+			2026-04-25 @tavo_luna NOTE: we need to concat the ALTER SQL with the constraint name to execute the code
+			correctly, for weird reasons it won't work if interpolated, YOU'VE BEEN WARNED...
+		*/
 		sql("""
 			ALTER TABLE comment_note
-			  ADD CONSTRAINT fk_comment_note_asset_comment_id
+			  ADD CONSTRAINT """ + constraint_name + """
 			  FOREIGN KEY (asset_comment_id) REFERENCES asset_comment (asset_comment_id)
 			  ON UPDATE CASCADE
 			  ON DELETE CASCADE
