@@ -239,10 +239,11 @@ body{
 	}
 
 .teamcol{
-	max-width:160px;
+	width:110px;
+	padding: 2px;
 }
 .teamcountcolumn{
-	max-width:50px;
+	width:30px;
 	text-align:right;
 }
 .teambarcolumn{
@@ -793,7 +794,7 @@ input, select, textarea {
 	margin: 5px;
 }
 .statusTaskEffort {
-	margin-left: 30px; 
+	margin-left: 5px; 
 }
 .statusTaskEffort.toprightcontent {
 	width: 380px;
@@ -804,8 +805,7 @@ input, select, textarea {
 	vertical-align: middle !important;
 }
 .teamBreakdown.toprightcontent {
-	width: 50%; 
-	max-width: 600px;
+	width: 500px;
 }
 .teamBreakdown {
 	margin-top:5px;
