@@ -12,12 +12,31 @@
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'bootstrap.css')}"/>
 		<g:javascript src="bootstrap.js" />
 
 		<jqgrid:resources />
 		<g:javascript src="projectStaff.js" />
 		<g:javascript src="person.js" />
 		<g:javascript src="jqgrid-support.js" />
+
+		<style>
+			*, *:before, *:after {
+				-webkit-box-sizing: initial;
+				-moz-box-sizing: initial;
+				box-sizing: initial;
+			}
+
+			div.main_bottom table {
+				border-collapse: initial;
+				border-spacing: initial;
+			}
+
+			#filterSelect {
+				margin-bottom: 6px;
+			}
+		</style>
+
 		<script type="text/javascript">
 		function onInvokeAction(id) {
 			setExportToLimit(id, '');
