@@ -341,6 +341,19 @@ class TimeUtil {
 	}
 
 	/**
+	 * Used to format a Date into a date string format, based in the format defined in the param
+	 * For dates (without time) is not required to applied a timezone.
+	 * @param dateValue the date to format
+	 * @param formatType the format type to be used, valid values defined in dateTimeFormatTypes
+	 * @param formatterType defines the format to be used
+	 * @return The date formatted
+	 **/
+	public static String formatDate(String formatType, Date dateValue, String formatterType=FORMAT_DATE_TIME) {
+		def formatter = createFormatterForType(formatType, formatterType)
+		return formatDate(dateValue, formatter)
+	}
+
+	/**
 	 * Used to format a Date into a date string format, based in the formatter provided plus the timezone passed
 	 * @param tzId - the timezone to render a date for
 	 * @param dateValue - the date to format

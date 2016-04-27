@@ -2598,7 +2598,7 @@ class AssetEntityService {
 									break
 
 								case ~/Retire|MaintExp/:
-									addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
+									addCell(serverSheet, deviceCount, colNum, TimeUtil.formatDate(userDTFormat, a[attribute], TimeUtil.FORMAT_DATE_TIME_12))
 									break
 
 								case ~/Modified Date/:
@@ -2689,7 +2689,7 @@ class AssetEntityService {
 									//log.info "export() : field class type=$app[assetColName].className()}"
 									break
 								case ~/Retire|MaintExp/:
-									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
+									colVal = app[assetColName] ? TimeUtil.formatDate(userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_12) : ''
 									break
 								case ~/Modified Date/:
 									colVal = app[assetColName] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, app[assetColName], TimeUtil.FORMAT_DATE_TIME_2) : ''
@@ -2746,7 +2746,7 @@ class AssetEntityService {
 									if (attribute == 'lastUpdated') {
 										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									} else {
-										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
+										dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									}
 								} else {
 									dateValue =''
@@ -2799,7 +2799,7 @@ class AssetEntityService {
 									if (attribute == 'lastUpdated') {
 										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									} else {
-										dateValue = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
+										dateValue = TimeUtil.formatDate(userDTFormat, dateValue, TimeUtil.FORMAT_DATE_TIME_12)
 									}
 								} else {
 									dateValue =''
