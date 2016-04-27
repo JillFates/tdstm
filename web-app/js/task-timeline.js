@@ -265,10 +265,9 @@ $(document).ready(function () {
 		function drawEnd () {
 			if (drawing == 1) {
 				var xa = Math.min(tempBrushXInitial, d3.mouse(chart.node())[0] - margin.left);
-				var xb = Math.max(Math.abs(tempBrushXInitial - (d3.mouse(chart.node())[0] - margin.left)), minExtentRange);
-				if (Math.abs(xa - xb) < minExtentRange)
-					xb = xa + minExtentRange;
-				brush.extent([x.invert(xa), x.invert(xa+xb)]);
+				var brushEndInMin = getTimeLinePercent(x.domain()[0], x.domain()[1], 5) / 60000;
+				var xb = Math.floor(x(x.invert(xa).getTime() + brushEndInMin * 60000 ));
+				brush.extent([x.invert(xa), x.invert(xb)]);
 
 				tempBrush.remove();
 				tempBrush = null;
@@ -2367,6 +2366,19 @@ $(document).ready(function () {
 	}
 
 	/**
+	 *  Applies the percent of two specif dates
+	 * @param startDate
+	 * @param endDate
+	 * @param percent
+	 * @returns {number}
+	 */
+	function getTimeLinePercent(startDate, endDate, percent) {
+		// Calculate the 10% between two dates
+		var time10Perc = endDate.getTime() - startDate.getTime();
+		return time10Perc * percent / 100;
+	}
+
+	/**
 	 * @param startDate the init Start Date
 	 * @param endDate the last End Date
 	 * @param increasePer string that represent how we should handle the expo
@@ -2399,9 +2411,8 @@ $(document).ready(function () {
 					}
 				}
 
-				// Calculate the 10% between two dates
-				var time10Perc = endDate.getTime() - startDate.getTime();
-				scale.zoomTime = time10Perc * 5 / 100;
+				scale.zoomTime = getTimeLinePercent(startDate, endDate, 5);
+
 				break;
 			}
 		}
