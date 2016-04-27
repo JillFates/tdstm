@@ -589,7 +589,7 @@ $(document).ready(function () {
 
 				// update the scales for the axis
 
-				var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]));
+				var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]), 'week');
 				x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
 				x1MainGraphAxis.tickFormat(innerTimeLine.format);
 
@@ -2318,60 +2318,90 @@ $(document).ready(function () {
 		return Math.floor((utc2 - utc1) / _DEF);
 	}
 
+	/**
+	 * Utility to calculate the difference in Months between two dates
+	 * this can be upgrade to pass a specific period like hours, weeks and so on.
+	 * @param date1
+	 * @param date2
+	 * @returns {*}
+	 */
+	function monthDiff(date1, date2) {
+		var months;
+		months = (date2.getFullYear() - date1.getFullYear()) * 12;
+		months -= date1.getMonth() + 1;
+		months += date2.getMonth();
+		return months <= 0 ? 0 : months;
+	}
+
 	function applyScaleDefinition(msConversion, scale, differScaleTime) {
 		if( msConversion === _MS_PER_MIN) {
 			scale.time = d3.time.minute;
 			scale.tick = 10;
 			scale.format = d3.time.format('%H:%M');
-			scale.zoomTime  = 10 * _MS_PER_MIN;
 		}
 		if( msConversion === _MS_PER_HOUR) {
 			scale.time = d3.time.hour;
 			scale.tick = 5;
 			scale.format = d3.time.format('%b %d');
-			scale.zoomTime  = 30 * _MS_PER_MIN;
 		}
 		if( msConversion === _MS_PER_DAY) {
 			scale.time = d3.time.day;
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %d');
-			scale.zoomTime  = 7 * _MS_PER_HOUR;
 		}
 		if( msConversion === _MS_PER_WEEK) {
 			scale.time = d3.time.week;
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %d (week %W)');
-			scale.zoomTime  = 1 * _MS_PER_DAY;
 		}
 		if( msConversion === _MS_PER_MONTH) {
 			scale.time = d3.time.month;
 			scale.tick = 1;
 			scale.format = d3.time.format('%b %Y');
-			scale.zoomTime  = 1 * _MS_PER_WEEK;
 		}
 		if( msConversion === _MS_PER_YEAR) {
 			scale.time = d3.time.year;
 			scale.tick = 1;
 			scale.format = d3.time.format('%Y');
-			scale.zoomTime  = 4 * _MS_PER_MONTH;
 		}
 	}
 
 	/**
-	 * @param date1 the init Start Date
-	 * @param date2 the last End Date
+	 * @param startDate the init Start Date
+	 * @param endDate the last End Date
+	 * @param increasePer string that represent how we should handle the expo
 	 * It calculate the tick number based on two dates
 	 * it returns an object that represent the best d3.time.xxx, d3.time.format(xxx) and the tick jump
 	 */
-	function getTimeFormatToDraw(date1, date2) {
+	function getTimeFormatToDraw(startDate, endDate, increasePer) {
+
 		var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 			difference = 0,
+			maxTick = _MAX_TICK_PERFORMANCE,
 			scale = { tick: 10, format: d3.time.format('%H:%M'), time: d3.time.minute, zoomTime: 30 * _MS_PER_MIN};
 
+
 		for(var i = 0; i < msConversion.length; i++) {
-			difference = dateDiffByDef(date1, date2, msConversion[i]);
-			if(difference <= _MAX_TICK_PERFORMANCE ) {
+
+			if(increasePer && increasePer === 'week' && msConversion[i] === _MS_PER_WEEK) {
+				maxTick = 25;
+			}
+
+			difference = dateDiffByDef(startDate, endDate, msConversion[i]);
+			if(difference <= maxTick ) {
 				applyScaleDefinition(msConversion[i], scale, true);
+
+				//We increase the tick number using expo
+				if(increasePer && increasePer === 'week' && msConversion[i] === _MS_PER_WEEK) {
+					var months = monthDiff(startDate, endDate);
+					if(!isNaN(months) && months >=  3 ) {
+						scale.tick = scale.tick + months - 2;
+					}
+				}
+
+				// Calculate the 10% between two dates
+				var time10Perc = endDate.getTime() - startDate.getTime();
+				scale.zoomTime = time10Perc * 5 / 100;
 				break;
 			}
 		}
