@@ -5,7 +5,7 @@
  */
 
 databaseChangeLog = {	
-	changeSet(author: "oluna", id: "20160315 TM-4697-1-FIX") {
+	changeSet(author: "oluna", id: "20160315 TM-4697-1-FIX2") {
 		def constraint_name = "fk_task_dep_asset_comment_id"
 
 		comment('Clear orphan task_dependencies --FIX to ZERO DIV')
@@ -31,7 +31,8 @@ databaseChangeLog = {
 							SELECT id FROM (
 								SELECT DISTINCT task_dependency_id as id FROM task_dependency td
 								LEFT OUTER JOIN asset_comment t1 on t1.asset_comment_id = td.asset_comment_id
-								WHERE t1.asset_comment_id IS NULL
+								LEFT OUTER JOIN asset_comment t2 on t2.asset_comment_id = td.predecessor_id
+								WHERE t1.asset_comment_id IS NULL OR t2.asset_comment_id IS NULL
 								LIMIT ${limit}
 							) t
 						);
