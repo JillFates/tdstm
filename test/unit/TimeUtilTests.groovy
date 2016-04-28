@@ -94,47 +94,26 @@ class TimeUtilTests extends Specification {
 	public void testParseDate() {
 		// ******************************************
 		// Test dates using date format: "MM/DD/YYYY"
-		def sessionDateFormat = "MM/DD/YYYY"
-		def sessionTimeZone = "GMT"
-
+		
 		// Mock session behaviour
-		def session = [
-			"getAttribute": { param ->
-				if ("CURR_DT_FORMAT" == param) {
-					return ["CURR_DT_FORMAT": sessionDateFormat]
-				} else if ("CURR_TZ" == param) {
-					return ["CURR_TZ": sessionTimeZone]
-				}
-			}
-		]
-
+		def mockSession = getMockSession()
+		
 		def testDate = new Date()
 		testDate.clearTime()
 		testDate.set(year: 2014, month: 9, date: 5)
 
 		expect:
-			testDate.equals(TimeUtil.parseDate(session, '10/5/2014'))
+			testDate.equals(TimeUtil.parseDate(mockSession, '10/5/2014'))
 	}
 
 	public void testParseDateTime() {
-		def sessionDateFormat = "MM/DD/YYYY"
-		def sessionTimeZone = "GMT"
-
 		// Mock session behaviour
-		def session = [
-			"getAttribute": { param ->
-				if ("CURR_DT_FORMAT" == param) {
-					return ["CURR_DT_FORMAT": sessionDateFormat]
-				} else if ("CURR_TZ" == param) {
-					return ["CURR_TZ": sessionTimeZone]
-				}
-			}
-		]
+		def mockSession = getMockSession()
 
 		def testDate = new Date(Date.UTC(114, 9, 5, 10, 15, 0))
 
 		expect:
-			testDate.equals(TimeUtil.parseDateTime(session, '10/5/2014 10:15 AM'))
+			testDate.equals(TimeUtil.parseDateTime(mockSession, '10/5/2014 10:15 AM'))
 	}
 
 	def 'Test the createFormatterForType with various options'() {
@@ -187,9 +166,7 @@ class TimeUtilTests extends Specification {
 		// TM-4795
 		setup:
 			// Mock the bullshit format of session attributes ...
-			def mockSession = new GrailsHttpSession(request)
-			mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': TimeUtil.MIDDLE_ENDIAN ] )
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': 'GMT' ] )
+			def mockSession = getMockSession()
 
 			// Timestamp at epoch should be January 1, 1970, 00:00:00 GMT + 1 day
 			long oneDay = 60*60*24*1000
@@ -213,9 +190,7 @@ class TimeUtilTests extends Specification {
 	def 'Test formatDateTime(HttpSession session, dateValue, DateFormat formatter)'() {
 		setup:
 			// Mock the bullshit format of session attributes ...
-			def mockSession = new GrailsHttpSession(request)
-			mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': TimeUtil.MIDDLE_ENDIAN ] )
-			mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': 'GMT' ] )
+			def mockSession = getMockSession()
 		when:
 			TimeUtil.formatDateTime(mockSession, new Date(), null)
 		then: 'Make sure that a null formatter causes an exception'
@@ -262,5 +237,20 @@ class TimeUtilTests extends Specification {
 		expect:
 			blankValueDate == null
 			nullValueDate == null
+	}
+
+// HELPERS ////////////////////////////////////////////////////////////////////
+	// Mock the bullshit format of session attributes ...
+	private getMockSession(){
+		def sessionDateFormat = TimeUtil.MIDDLE_ENDIAN
+		def sessionTimeZone = "GMT"
+
+		// Mock session behaviour
+		
+		def mockSession = new GrailsHttpSession(request)
+		mockSession.setAttribute('CURR_DT_FORMAT', [ 'CURR_DT_FORMAT': sessionDateFormat ] )
+		mockSession.setAttribute('CURR_TZ', [ 'CURR_TZ': sessionTimeZone ] )
+
+		return mockSession
 	}
 }
