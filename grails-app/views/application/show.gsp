@@ -1,4 +1,6 @@
 <%@page import="com.tds.asset.Application"%>
+<%@page defaultCodec="html" %> 
+
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 
 <table style="border: 0">

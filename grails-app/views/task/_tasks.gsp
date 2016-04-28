@@ -2,6 +2,7 @@
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
+
 <g:set var="now" value="${TimeUtil.nowGMT()}" />
 <%--
 /*

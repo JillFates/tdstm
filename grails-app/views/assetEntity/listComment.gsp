@@ -1,4 +1,6 @@
 <%@page import="com.tds.asset.AssetComment"%>
+<%@page defaultCodec="html" %> 
+
 <html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
@@ -61,7 +63,7 @@
 				</jqgrid:grid>
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
-					var value = cellvalue ? cellvalue : ''
+					var value = cellvalue ? _.escape(cellvalue) : ''
 						return '<span class="Arrowcursor" ng-click="comments.showCommentById(\''+options.rowId+'\',\'comment\')">'+value+'</span>'
 				}
 				function myCustomFormatter (cellVal,options,rowObject) {
@@ -72,7 +74,7 @@
 					return editButton
 				}
 				function assetFormatter(cellVal,options,rowObject) {
-					return cellVal ? '<span class="Arrowcursor" onclick="EntityCrud.showAssetDetailView(\''+rowObject[8]+'\', '+rowObject[7]+ ')">' + (cellVal) + '</span>' : "" 
+					return cellVal ? '<span class="Arrowcursor" onclick="EntityCrud.showAssetDetailView(\''+rowObject[8]+'\', '+rowObject[7]+ ')">' + _.escape(cellVal) + '</span>' : "" 
 				} 
 			});
 		</script>

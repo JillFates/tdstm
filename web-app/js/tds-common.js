@@ -310,9 +310,30 @@ var tdsCommon = {
 					result = "";
 				}
 				break;
+
+			case "retireDate":
+			case "maintExpDate":
+				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+				if (momentObj.isValid()) {
+					// Strip off any time 
+					momentObj.tz('GMT');
+					result = momentObj.format(tdsCommon.defaultDateFormat());
+				} else {
+					result = "";
+				}
+				break;
+
+			default:
+				result = _.escape(result);
+
 		}
 		return result;
 	},
+
+	// Used to escape the text cells to prevent XSS 
+	jqgridTextCellFormatter: function(cellvalue, options, rowObject) {
+		return _.escape(cellvalue);
+	}
 
 	parseAndFormatDateTimeFromZulu: function(stringValue, format) {
 		var result;

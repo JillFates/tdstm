@@ -2,6 +2,8 @@
 <%@page import="com.tds.asset.AssetComment"%>
 <%@page import="com.tdssrc.grails.TimeUtil"%>
 <%@page import="com.tdssrc.grails.HtmlUtil"%>
+<%@page defaultCodec="html" %> 
+
 <g:set var="now" value="${TimeUtil.nowGMT()}" />
 <g:set var="tableColCount" value="${project=='All'?5:4}" />
 <div id="assetIssueDiv" class="taskSummaryScrolableTable">

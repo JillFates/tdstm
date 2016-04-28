@@ -28,9 +28,11 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.multipart.*
 import org.springframework.web.multipart.commons.*
 
+import org.apache.commons.lang.StringEscapeUtils as SEU
+
 import java.util.regex.Matcher
 import org.hibernate.criterion.Order
-import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.CriteriaSpecification
 
 import com.tds.asset.Application
 import com.tds.asset.AssetCableMap
@@ -4324,14 +4326,14 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			// This map will drive how the query is constructed for each of the various options
 			def qmap = [
 				'APPLICATION': 		[ assetClass: AssetClass.APPLICATION, domain: Application ],
-				'SERVER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
+				'SERVER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getServerTypes() ],
 				'DATABASE': 		[ assetClass: AssetClass.DATABASE, domain: Database ],
 				'NETWORK-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNetworkDeviceTypes() ],
 				// 'NETWORK-LOGICAL': 	[],
 				'STORAGE-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getStorageTypes() ],
 				'STORAGE-LOGICAL': 	[ assetClass: AssetClass.STORAGE, domain: Files ],
-				'OTHER-DEVICE': 		[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ],
-				'ALL': 			[ domain: AssetEntity ]
+				'OTHER-DEVICE': 	[ assetClass: AssetClass.DEVICE, domain: AssetEntity, assetType: AssetType.getNonOtherTypes(), notIn: true ],
+				'ALL': 				[ domain: AssetEntity ]
 			]
 
 
@@ -4400,7 +4402,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					results = qm.domain.executeQuery(rquery, qparams, [max:max, offset:offset, sort:'assetName' ])
 
 					// Convert the columns into a map that Select2 requires
-					results = results.collect{ r -> [ id:r[0], text:r[1] ]}			
+					results = results.collect{ r -> [ id:r[0], text: SEU.escapeHtml(SEU.escapeJavaScript( r[1] )) ]}			
 				}
 			} else {
 				// TODO - Return an error perhaps by setting total to -1 and adding an extra property for a message
@@ -4680,9 +4682,11 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 					size = it.criticality ? criticalitySizes[it.criticality] : 200
 				
 				graphNodes << [
-					id:it.id, name:it.assetName, 
+					id:it.id, 
+					name: SEU.escapeHtml(SEU.escapeJavaScript( it.assetName )),
 					type:type, assetClass:it.assetClass.toString(),
-					shape:shape, size:size, title:it.assetName, 
+					shape:shape, size:size, 
+					title: SEU.escapeHtml(SEU.escapeJavaScript( it.assetName )),
 					color: ((it == asset)?('red'):('grey')), 
 					parents:[], children:[], checked:false, siblings:[]
 				]

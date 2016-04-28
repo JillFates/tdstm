@@ -227,7 +227,11 @@ class DatabaseController {
 			[ cell: [
 			'',it.assetName, (it[dbPref["1"]] ?: ''), (it[dbPref["2"]] ?: ''), (it[dbPref["3"]] ?: ''), (it[dbPref["4"]] ?: ''), (it[dbPref["5"]] ?: ''),
 					/*it.depNumber, it.depResolve==0?'':it.depResolve, it.depConflicts==0?'':it.depConflicts,*/
-					it.tasksStatus,	it.assetType, it.commentsStatus], id: it.dbId, escapedName:assetEntityService.getEscapedName(it)
+					it.tasksStatus,	
+					it.assetType, 
+					it.commentsStatus], 
+					id: it.dbId, 
+					escapedName:assetEntityService.getEscapedName(it)
 			]}
 
 		def jsonData = [rows: results, page: currentPage, records: totalRows, total: numberOfPages]
