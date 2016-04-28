@@ -2048,7 +2048,10 @@ function getHelpTextAsToolTip(type){
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			alert("An unexpected error occurred while getting asset.")
+			if(jqXHR.getAllResponseHeaders()){
+				alert("An unexpected error occurred while getting asset.")	
+			}
+			
 		}
 	});
 }
