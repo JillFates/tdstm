@@ -19,6 +19,42 @@
 		See http://jsfiddle.net/FcWBQ/
 	--%>
 
+	<script>
+		// watch out, this code detect when the screen has just finished his resize event.
+		var toResize;
+		var heightToTop = 0;
+
+		function applySuperHeader(){
+			var sc = $(window).scrollTop();
+			if(sc > heightToTop) {
+				$(".k-grid-header").addClass("modify-header");
+			} else if(sc < heightToTop) {
+				$(".k-grid-header").removeClass("modify-header");
+			}
+		}
+
+		$(window).resize(function() {
+			$(".k-grid-header").removeClass("modify-header");
+			clearTimeout(toResize);
+			toResize = setTimeout(function() {
+				applySuperHeader();
+			}, 100);
+		});
+
+		function onDataBound() {
+			var contentHeight = $('.k-grid-content-locked').height();
+			if(contentHeight && contentHeight > 81) {
+				$('.k-grid-content-locked').height(contentHeight + 28);
+			}
+			heightToTop = $(".k-grid-header").offset().top;
+		}
+
+		// Apply the fix only after the scroll has reached
+		$(window).scroll(function (event) {
+			applySuperHeader();
+		});
+
+	</script>
 	<style>
 		.k-grid-toolbar {
 			border-color: #5f9fcf;
@@ -50,6 +86,14 @@
 		.k-loading-image {
 			background-image: url('${resource(dir:'dist/css/kendo/Default',file:'loading-image.gif')}');
 		}
+
+		.modify-header {
+			position: fixed;
+			z-index: 9999;
+			top: 0px;
+		}
+
+
 </style>
 </head>
 <body>
@@ -247,7 +291,8 @@
 				resizable: true,
 				filterable: true,
 				columnMenu: true,
-				pageable: false
+				pageable: false,
+				dataBound: onDataBound
 			});
 
 		});
