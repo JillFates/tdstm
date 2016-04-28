@@ -64,16 +64,19 @@ class DeviceService {
 		else
 			asset.roomTarget = room
 
-		// Look for the rack or have created on the fly
-		def rack = rackService.findOrCreateRack(room, rackName)
-		if (! rack) {
-			return "Unable to create rack $location/$roomName/$rackName (${isSource ? 'Source' : 'Target'})"
-		}
+		if(!(asset.isaVM() && (StringUtil.isBlank(rackName)))){
+			// Look for the rack or have created on the fly
+			def rack = rackService.findOrCreateRack(room, rackName)
+			if (! rack) {
+				return "Unable to create rack $location/$roomName/$rackName (${isSource ? 'Source' : 'Target'})"
+			}
 
-		if (isSource)
-			asset.rackSource = rack
-		else
-			asset.rackTarget = rack
+			if (isSource)
+				asset.rackSource = rack
+			else
+				asset.rackTarget = rack
+
+		}
 
 		log.debug "assignDeviceToLocationRoomRack() END $asset ${asset.sourceLocation}/${asset.sourceRoom}/${asset.sourceRack}"
 		return null
