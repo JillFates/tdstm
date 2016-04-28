@@ -300,8 +300,7 @@ var tdsCommon = {
 		var result = cellvalue;
 		switch (options.colModel.name) {
 			case "lastUpdated":
-			case "retireDate":
-			case "maintExpDate":
+			case "dateCreated":
 				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
 				if (momentObj.isValid()) {
 					momentObj.tz(tdsCommon.timeZone());
@@ -310,6 +309,20 @@ var tdsCommon = {
 					result = "";
 				}
 				break;
+
+			case "retireDate":
+			case "maintExpDate":
+				var momentObj = tdsCommon.parseDateTimeFromZulu(cellvalue);
+				if (momentObj.isValid()) {
+					// Strip off any time 
+					//momentObj.endOf('day')
+					momentObj.tz('GMT');
+					result = momentObj.format(tdsCommon.defaultDateFormat());
+				} else {
+					result = "";
+				}
+				break;
+
 		}
 		return result;
 	},
@@ -330,7 +343,8 @@ var tdsCommon = {
 	},
 
 	timeZone: function() {
-		return $("#tzId").val()
+		var tz = $("#tzId").val();
+		return tz;
 	}
 
 }
