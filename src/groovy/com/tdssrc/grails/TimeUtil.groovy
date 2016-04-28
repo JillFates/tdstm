@@ -566,8 +566,8 @@ class TimeUtil {
 		return elapsed
 	}
 
-	private static DateFormat createFormatter(session, String formatterType) {
-		String userDTFormat = getUserDateFormat(session)
+	private static DateFormat createFormatter(HttpSession session, String formatterType) {
+		String userDTFormat = TimeUtil.getUserDateFormat(session)
 		return createFormatterForType(userDTFormat, formatterType)
 	}
 
