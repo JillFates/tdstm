@@ -37,4 +37,15 @@ class ExceptionUtil {
 		return st
 	}
 
+	/**
+	 * Used to generate a stacktrace with a prefixed message
+	 * @param msg - the prefix message to include in the result
+	 * @param e - the exception object
+	 * @param lines - the number of lines to include in the stacktrace (default 40)
+	 * @return the message + the stacktrace
+	 */
+	static String messageWithStacktrace(String msg, Exception e, Integer lines=40) {
+		return stackTraceToString(msg, e, lines)
+	}
+
 }

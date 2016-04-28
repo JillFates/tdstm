@@ -1529,9 +1529,10 @@ class ProjectService {
 		String prQuery = """DELETE from PartyRelationship pr where
 			pr.partyRelationshipType = 'PROJ_STAFF' and
 			pr.roleTypeCodeFrom.id='PROJECT' and
+			pr.roleTypeCodeTo.id in (:teamCodes) and
 			pr.partyIdFrom=:project and
 			pr.partyIdTo=:person"""
-		int count = PartyRelationship.executeUpdate(prQuery, [project:project, person:person]) 
+		int count = PartyRelationship.executeUpdate(prQuery, [project:project, person:person, teamCodes:teamCodes]) 
 
 		return count
 	}

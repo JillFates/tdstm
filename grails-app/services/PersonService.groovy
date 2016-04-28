@@ -1115,7 +1115,8 @@ class PersonService {
 	}
 
 	/** 
-	 * Used to remove a person from a project as staff and also clear out references to MoveEventStaff
+	 * Used to remove a person from a team on a project which will also clear out references to MoveEventStaff
+	 * for the given team.
 	 * @param user - the user performing the action
 	 * @param projectId - the id number of the project to remove the person from
 	 * @param personId - the id of the person to update
@@ -1129,17 +1130,7 @@ class PersonService {
 			throw new InvalidRequestException(map.error)
 		}
 
-		// Remove all of the person's MoveEventStaff relationships for the project
-		deleteFromEvent(map.project, null, map.person, map.teamRoleType)
-
-		// Remove the Project Staff Team relationship for the project
-		partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, map.teamRoleType.id)
-
-		// Remove from project staff if don't have more teams
-		List roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
-		if (roles.size() == 1 && roles[0].id.equals("STAFF")) {
-			partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, "STAFF")
-		}
+		projectService.removeTeamMember(map.project, map.person, teamCode)
 
 		auditService.logMessage("$user unassigned ${map.person} from team $teamCode of project ${map.project.name}")
 	}
