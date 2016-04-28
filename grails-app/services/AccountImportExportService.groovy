@@ -953,6 +953,14 @@ class AccountImportExportService {
 				} else {
 					log.debug "hasUserLoginPropertiesSet() for prop $prop, origKey=$origKey, defKey=$defKey"
 				}
+
+				if (! yup) {
+					if ((account[prop] instanceof String)) {
+						yup = ! StringUtil.isBlank(account[prop])
+					} else {
+						yup = account[prop] != null
+					}
+				}
 			}
 			return yup
 		}
@@ -2331,9 +2339,19 @@ class AccountImportExportService {
 		Boolean ok=true
 		boolean hasUserChanges = hasUserLoginPropertiesSet(account)
 		boolean shouldUpdateUser = shouldUpdateUserLogin(sheetInfoOpts)
+		boolean hasUsername = ! StringUtil.isBlank(account.username)
 
 		log.debug "validateUserLogin() hasUserChanges=$hasUserChanges, shouldUpdateUser=$shouldUpdateUser"
 		debugLogAccountInfo("validateUserLogin", account, 'UserLogin')
+
+		if (hasUserChanges && ! hasUsername) {
+			account.errors << 'User changes but missing Username'
+			return false
+		} 
+
+		if (! hasUserChanges && ! hasUsername) {
+			return true
+		}
 
 		UserLogin.withNewSession { ses ->
 			boolean personExists = !!account.person.id
@@ -2343,7 +2361,7 @@ class AccountImportExportService {
 			if (personExists) {
 				userLogin = account.person.userLogin
 			}
-			if (!userLogin) {
+			if (! userLogin) {
 				account.flags.isNewUserLogin = true
 				userLogin = new UserLogin()
 
@@ -2514,6 +2532,15 @@ class AccountImportExportService {
 		// List roleChanges = StringUtil.splitter(importedRoles, ',', DELIM_OPTIONS)
 		List roleChanges = account[prop].clone()
 
+		// Check to see if there is a username while creating and if not we'll bail out of this
+		if (isNewUser && ! account.username) {
+			if (roleChanges) {
+				account.errors << 'Security change but missing username'
+				return false
+			}
+			return true
+		}
+
 		boolean setDefaulted = false
 
 		// Add the DEFAULT security code if it appears that the user wouldn't otherwise be assigned one
@@ -2535,9 +2562,16 @@ class AccountImportExportService {
 			if (changeMap.hasChanges) {
 				// For roles we are going to want to show the imported values along with the original and the resulting 
 				// changes so we'll use all three underlying properties
-				setOriginalValue(account, prop, currentRoles)
+				if (! setDefaulted) {
+					setOriginalValue(account, prop, currentRoles)
+				}
+
+				// Here's the special case so that we can show original, user input and results in the review
 				if (!setDefaulted && !isNewUser) {
-					setDefaultedValue(account, prop, roleChanges)
+					setDefaultedValue(account, prop, changeMap.results)
+					account[prop] = roleChanges
+					//setDefaultedValue(account, prop, roleChanges)
+					//account[prop] = changeMap.results
 				}
 				
 				// Save the changeMap to be used later on by the update logic
@@ -2549,8 +2583,6 @@ class AccountImportExportService {
 			if (changeMap.hasChanges) {
 				account.errors << 'Unplanned change on security roles'
 			} 
-			// TODO : FIX THIS LOGIC
-			//if (has)
 		}
 
 		return ok
