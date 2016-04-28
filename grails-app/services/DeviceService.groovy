@@ -64,7 +64,7 @@ class DeviceService {
 		else
 			asset.roomTarget = room
 
-		if(!(asset.isaVM() && (StringUtil.isBlank(rackName)))){
+		if(!(asset.isaVM() && StringUtil.isBlank(rackName))){
 			// Look for the rack or have created on the fly
 			def rack = rackService.findOrCreateRack(room, rackName)
 			if (! rack) {
