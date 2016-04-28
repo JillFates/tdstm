@@ -1387,7 +1387,6 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 							TimeUtil.FORMAT_DATE
 						]
 						def dateCreated = WorkbookUtil.getDateCellValue(commentsSheet, cols, r, getSession(), validFormats)
-						//def createdDateInput = WorkbookUtil.getStringCellValue(commentsSheet, cols, r )
 						if (!dateCreated) {
 							dateCreated = new Date()
 						}

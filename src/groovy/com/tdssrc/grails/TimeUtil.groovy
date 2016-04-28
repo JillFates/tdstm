@@ -87,7 +87,7 @@ class TimeUtil {
 	 * @return the timezone id string
 	 */
 	public static String getUserDateFormat(HttpSession session) {
-		return session.getAttribute(DATE_TIME_FORMAT_ATTR)[DATE_TIME_FORMAT_ATTR] ?: MIDDLE_ENDIAN
+		return session.getAttribute(DATE_TIME_FORMAT_ATTR)[DATE_TIME_FORMAT_ATTR] ?: getDefaultFormatType()
 	}	 
 
 	/**
@@ -495,7 +495,7 @@ class TimeUtil {
 				result = formatter.parse(dateValue)
 				result.clearTime()	
 			} catch (Exception e) {
-				log.warn("parseDate() encountered invalid date ($dateValue) format '${formatter?.toPattern()}' : ${e.getMessage()}")
+				log.debug("parseDate() encountered invalid date ($dateValue) format '${formatter?.toPattern()}' : ${e.getMessage()}")
 				log.debug("Exception:",e)
 			}	
 		}
@@ -540,7 +540,7 @@ class TimeUtil {
 		try {
 			result = formatter.parse(dateValue)
 		} catch (Exception e) {
-			log.warn("Invalid date time: $dateValue, $tzId, ${formatter.toPattern()}")
+			log.debug("Invalid date time: $dateValue, $tzId, ${formatter.toPattern()}")
 		}
 		return result
 	}
@@ -567,12 +567,8 @@ class TimeUtil {
 	}
 
 	private static DateFormat createFormatter(session, String formatterType) {
-		def type = getDefaultFormatType()
-		def userDTFormat = session.getAttribute( DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT
-		if (userDTFormat) {
-			type = userDTFormat
-		}
-		return createFormatterForType(type, formatterType)
+		String userDTFormat = getUserDateFormat(session)
+		return createFormatterForType(userDTFormat, formatterType)
 	}
 
 	/**

@@ -103,7 +103,11 @@ class WorkbookUtil {
 					String cellVal = cell.getStringCellValue()
 					for(def formatterType : formatterTypes) {
 						try {
-							result = TimeUtil.parseDate(session, cellVal, formatterType)
+							if(formatterType == TimeUtil.FORMAT_DATE){ //Parse to DATE only
+								result = TimeUtil.parseDate(TimeUtil.getUserDateFormat(session), cellVal, formatterType)	
+							}else{
+								result = TimeUtil.parseDateTime(session, cellVal, formatterType)
+							}
 							if (result) {
 								break
 							}
@@ -112,7 +116,9 @@ class WorkbookUtil {
 						}
 					}
 
-					if(!result) log.warn("Can't Parse '$cellVal' using any of the formatters declared in $formatterTypes")
+					if(!result){						
+						log.warn("Can't Parse '$cellVal' using any of the formatters declared in $formatterTypes")
+					}
 					break
 				default:
 					throw new IllegalArgumentException("Invalid date value in row ${rowIdx+1}/column ${columnIdx+1}")
