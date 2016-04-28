@@ -5,7 +5,7 @@
  */
 
 databaseChangeLog = {	
-	changeSet(author: "oluna", id: "20160315 TM-4697-1-FIX2") {
+	changeSet(author: "oluna", id: "20160315 TM-4697-1-FIX") {
 		def constraint_name = "fk_task_dep_asset_comment_id"
 
 		comment('Clear orphan task_dependencies --FIX to ZERO DIV')
@@ -31,7 +31,6 @@ databaseChangeLog = {
 							SELECT id FROM (
 								SELECT DISTINCT task_dependency_id as id FROM task_dependency td
 								LEFT OUTER JOIN asset_comment t1 on t1.asset_comment_id = td.asset_comment_id
-								LEFT OUTER JOIN asset_comment t2 on t2.asset_comment_id = td.predecessor_id
 								WHERE t1.asset_comment_id IS NULL OR t2.asset_comment_id IS NULL
 								LIMIT ${limit}
 							) t
@@ -54,6 +53,37 @@ databaseChangeLog = {
 				""")
 
 				confirm "task_dependencies: Orphans Cleared and Fk-Constraint Created"
+			}
+		}
+	}
+
+	changeSet(author: "oluna", id: "20160315 TM-4697-1.5-FIX") {
+		comment('Clear orphan task_dependencies for predecessors note relationship')		
+		grailsChange {
+			change {
+				def limit = 500000				
+				
+				def totalDeps = sql.firstRow("select count(*) as total FROM task_dependency td LEFT OUTER JOIN asset_comment t2 ON t2.asset_comment_id = td.predecessor_id WHERE t2.asset_comment_id IS NULL")
+				log.info("1.5 Orphans: ${totalDeps.total} to clear")
+
+				def numBatchs = Math.ceil(totalDeps.total / limit).intValue()
+
+				//using a for statement to save some memory and avoid an extra if 
+				for(int i=1; i<=numBatchs; i++){
+					log.info(String.format("Cleared %.2f %%", i*100/numBatchs))
+					sql.executeUpdate("""
+						DELETE FROM task_dependency WHERE task_dependency_id IN (
+							SELECT id FROM (
+								SELECT DISTINCT task_dependency_id as id FROM task_dependency td
+								LEFT OUTER JOIN asset_comment t2 ON t2.asset_comment_id = td.predecessor_id
+								WHERE t2.asset_comment_id IS NULL
+								LIMIT ${limit}
+							) t
+						);
+		    	""")
+				}
+				log.info("1.5 Orphans cleared!")
+				confirm "task_dependencies: predecessors Orphans Cleared"
 			}
 		}
 	}
