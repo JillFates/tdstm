@@ -264,7 +264,7 @@
 							}
 						}
 					},
-					pageSize: 30
+					pageSize: 0
 				},
 				columns: [
 					{ template: '<img src="#= icon #" />', width:50, locked: true },

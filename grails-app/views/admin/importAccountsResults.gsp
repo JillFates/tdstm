@@ -68,7 +68,7 @@
 
 	<div class="panel panel-default">
 		<div class="panel-body">
-			<h3>Results Summary </h3>
+			<h3>Posting Summary</h3>
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-md-3">
@@ -81,16 +81,6 @@
 								<span class="badge">${results.personUpdated}</span>
 								People Updated:
 							</li>
-<%--
-							<li class="list-group-item">
-								<span class="badge">${results.personSkipped}</span>
-								People Skipped:
-							</li>
-							<li class="list-group-item">
-								<span class="badge">${results.personUnchanged}</span>
-								People Unchanged:
-							</li>
---%>
 							<li class="list-group-item">
 								<span class="badge">${results.personError}</span>
 								People With Errors:
@@ -253,7 +243,7 @@
 							}
 						}
 					},
-					pageSize: 30
+					pageSize: 0
 				},
 				columns: [
 					{ template: '<img src="#= icon #" />', width:30, locked: true },
