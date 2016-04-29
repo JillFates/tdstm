@@ -31,7 +31,7 @@ databaseChangeLog = {
 							SELECT id FROM (
 								SELECT DISTINCT task_dependency_id as id FROM task_dependency td
 								LEFT OUTER JOIN asset_comment t1 on t1.asset_comment_id = td.asset_comment_id
-								WHERE t1.asset_comment_id IS NULL OR t2.asset_comment_id IS NULL
+								WHERE t1.asset_comment_id IS NULL
 								LIMIT ${limit}
 							) t
 						);
