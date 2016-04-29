@@ -588,7 +588,7 @@ $(document).ready(function () {
 
 				// update the scales for the axis
 
-				var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]), 'week');
+				var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]), true);
 				x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
 				x1MainGraphAxis.tickFormat(innerTimeLine.format);
 
@@ -2318,18 +2318,16 @@ $(document).ready(function () {
 	}
 
 	/**
-	 * Utility to calculate the difference in Months between two dates
-	 * this can be upgrade to pass a specific period like hours, weeks and so on.
-	 * @param date1
-	 * @param date2
-	 * @returns {*}
+	 * Calculate the specific period between two dates
+	 * @param startDate
+	 * @param endDate
+	 * @param period 'years', 'months', 'weeks', 'days', 'hours', 'minutes'
+	 * @returns {number}
 	 */
-	function monthDiff(date1, date2) {
-		var months;
-		months = (date2.getFullYear() - date1.getFullYear()) * 12;
-		months -= date1.getMonth() + 1;
-		months += date2.getMonth();
-		return months <= 0 ? 0 : months;
+	function specifTimeDiff(startDate, endDate, period){
+		var start = moment(startDate);
+		var end = moment(endDate);
+		return end.diff(start, period);
 	}
 
 	function applyScaleDefinition(msConversion, scale, differScaleTime) {
@@ -2341,7 +2339,7 @@ $(document).ready(function () {
 		if( msConversion === _MS_PER_HOUR) {
 			scale.time = d3.time.hour;
 			scale.tick = 5;
-			scale.format = d3.time.format('%b %d');
+			scale.format = d3.time.format('%b %d, %I %PM');
 		}
 		if( msConversion === _MS_PER_DAY) {
 			scale.time = d3.time.day;
@@ -2395,7 +2393,11 @@ $(document).ready(function () {
 
 		for(var i = 0; i < msConversion.length; i++) {
 
-			if(increasePer && increasePer === 'week' && msConversion[i] === _MS_PER_WEEK) {
+			if(increasePer && msConversion[i] === _MS_PER_MIN) {
+				maxTick = 25;
+			}
+
+			if(increasePer && msConversion[i] === _MS_PER_WEEK) {
 				maxTick = 25;
 			}
 
@@ -2403,11 +2405,41 @@ $(document).ready(function () {
 			if(difference <= maxTick ) {
 				applyScaleDefinition(msConversion[i], scale, true);
 
-				//We increase the tick number using expo
-				if(increasePer && increasePer === 'week' && msConversion[i] === _MS_PER_WEEK) {
-					var months = monthDiff(startDate, endDate);
-					if(!isNaN(months) && months >=  3 ) {
-						scale.tick = scale.tick + months - 2;
+				if(increasePer && msConversion[i] === _MS_PER_HOUR) {
+					scale.tick = 1;
+					scale.format = d3.time.format('%H:%M');
+
+					var hours = specifTimeDiff(startDate, endDate, 'hours');
+					if(!isNaN(hours) && hours >=  10 ) {
+						scale.tick = 2;
+					}
+
+					if(!isNaN(hours) && hours >=  20 ) {
+						scale.tick = 5;
+						scale.format = d3.time.format('%b %d, %I %PM');
+					}
+
+				}
+
+				if(increasePer && msConversion[i] === _MS_PER_DAY) {
+					var weeks = specifTimeDiff(startDate, endDate, 'weeks');
+					if(!isNaN(weeks) && weeks >=  2 ) {
+						scale.tick = scale.tick + 2;
+					}
+				}
+
+
+				if(increasePer && msConversion[i] === _MS_PER_MIN) {
+					var hours = specifTimeDiff(startDate, endDate, 'hours');
+					if(!isNaN(hours) && hours >=  2 ) {
+						scale.tick = scale.tick + 20;
+					}
+				}
+
+				if(increasePer && msConversion[i] === _MS_PER_WEEK) {
+					var months = specifTimeDiff(startDate, endDate, 'months');
+					if(!isNaN(months) && months >=  1 ) {
+						scale.tick = scale.tick + months;
 					}
 				}
 
