@@ -54,4 +54,15 @@ databaseChangeLog = {
 		""")
 	}
 
+	changeSet(author: "jmartin", id: "20160428 TM-4829-6") {
+		comment('Remove invalid PROJECT/STAFF assignments')		
+		sql("""
+			DELETE pr
+			FROM party_relationship pr 
+			WHERE party_relationship_type_id='STAFF' 
+				AND role_type_code_from_id='PROJECT' 
+				AND role_type_code_to_id='STAFF'
+		""")
+	}
+
 }
