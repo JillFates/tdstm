@@ -2334,7 +2334,7 @@ $(document).ready(function () {
 		if( msConversion === _MS_PER_MIN) {
 			scale.time = d3.time.minute;
 			scale.tick = 10;
-			scale.format = d3.time.format('%H:%M');
+			scale.format = d3.time.format('%I:%M%PM');
 		}
 		if( msConversion === _MS_PER_HOUR) {
 			scale.time = d3.time.hour;
@@ -2407,7 +2407,7 @@ $(document).ready(function () {
 
 				if(increasePer && msConversion[i] === _MS_PER_HOUR) {
 					scale.tick = 1;
-					scale.format = d3.time.format('%H:%M');
+					scale.format = d3.time.format('%I:%M%PM');
 
 					var hours = specifTimeDiff(startDate, endDate, 'hours');
 					if(!isNaN(hours) && hours >=  10 ) {
