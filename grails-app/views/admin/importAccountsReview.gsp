@@ -44,7 +44,7 @@
 		function onDataBound() {
 			var contentHeight = $('.k-grid-content-locked').height();
 			if(contentHeight && contentHeight > 81) {
-				$('.k-grid-content-locked').height(contentHeight + 28);
+				$('.k-grid-content-locked').height($('.k-grid-content').height());
 			}
 			heightToTop = $(".k-grid-header").offset().top;
 		}
