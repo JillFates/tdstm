@@ -2348,8 +2348,8 @@ $(document).ready(function () {
 		}
 		if( msConversion === _MS_PER_WEEK) {
 			scale.time = d3.time.week;
-			scale.tick = 1;
-			scale.format = d3.time.format('%b %d (week %W)');
+			scale.tick = 2;
+			scale.format = d3.time.format('%b %d');
 		}
 		if( msConversion === _MS_PER_MONTH) {
 			scale.time = d3.time.month;
@@ -2419,6 +2419,10 @@ $(document).ready(function () {
 						scale.format = d3.time.format('%b %d, %I %PM');
 					}
 
+				}
+
+				if(increasePer && msConversion[i] === _MS_PER_WEEK) {
+					scale.format = d3.time.format('%b %d (week %W)');
 				}
 
 				if(increasePer && msConversion[i] === _MS_PER_DAY) {
