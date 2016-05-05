@@ -1,3 +1,5 @@
+<%@page defaultCodec="html" %> 
+
 <table>
 	<tbody>
 		<tr>

@@ -1,3 +1,5 @@
+<%@page defaultCodec="html" %> 
+
 <td valign="top">
 			<div>
 				<h1>Supports:</h1>

@@ -1,6 +1,7 @@
 <%--
     This is used by the dependency Console
 --%>
+<%@page defaultCodec="html" %> 
 <%@page import="com.tds.asset.AssetComment" %>
 <%@page import="com.tds.asset.Application" %>
 <g:set var="assetClass" value="${(new Application()).assetClass}" />

@@ -1,4 +1,5 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
+<%@page defaultCodec="html" %> 
 
 <table style="border: 0">
 	<tr>

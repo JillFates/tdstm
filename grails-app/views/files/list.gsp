@@ -92,7 +92,7 @@
 				
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObjcet) {
-					var value = cellvalue ? cellvalue : ''
+					var value = cellvalue ? _.escape(cellvalue) : ''
 					return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+')">'+value+'</a>'
 				}
 				

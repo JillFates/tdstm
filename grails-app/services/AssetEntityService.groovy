@@ -1,6 +1,7 @@
 import grails.converters.JSON
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringEscapeUtils as SEU
+import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -2078,6 +2079,10 @@ class AssetEntityService {
 	 */
 	def getEscapedName(assetEntity, ignoreSingleQuotes = false) {
 		def name = ''
+		if (assetEntity.assetName?.size() > 0 ) {
+			name = SEU.escapeHtml(SEU.escapeJavaScript(assetEntity.assetName))
+		}
+/*			
 		def size = assetEntity.assetName?.size() ?: 0
 		for (int i = 0; i < size; ++i)
 			if (assetEntity.assetName[i] == "'")
@@ -2086,6 +2091,7 @@ class AssetEntityService {
 				name = name + '\\"'
 			else
 				name = name + assetEntity.assetName[i]
+*/
 		return name
 	}
 

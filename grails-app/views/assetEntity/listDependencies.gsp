@@ -59,11 +59,11 @@
 				$.jgrid.formatter.integer.thousandsSeparator='';
 				function myLinkFormatter (cellvalue, options, rowObject) {
 					var value = cellvalue ? cellvalue : ''
-					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[12]+'\',\''+rowObject[10]+'\')">'+value+'</a>'
+					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[12]+'\',\''+rowObject[10]+'\')">'+ _.escape(value) +'</a>'
 				}
 				function dependentFormatter(cellvalue, options, rowObject){
 					var value = cellvalue ? cellvalue : ''
-					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[13]+'\',\''+rowObject[11]+'\')">'+value+'</a>'
+					return '<a href="javascript:EntityCrud.showAssetDetailView(\''+rowObject[13]+'\',\''+rowObject[11]+'\')">'+ _.escape(value) +'</a>'
 				}
 				
 			})

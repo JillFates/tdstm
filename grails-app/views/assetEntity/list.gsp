@@ -85,17 +85,17 @@
 					colNames="'Actions', 'Name', 'Device Type', 'Manufacturer', 'Model', 'Location','${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','Plan Status','Bundle', 'id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false,width:'65', fixed:true},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'250'},
-						{name:'assetType', width:'110'},
-						{name:'manufacturer', width:'120'},
-						{name:'model', width:'150'}, 
-						{name:'sourceLocation'},
+						{name:'assetType', width:'110', formatter:tdsCommon.jqgridTextCellFormatter},
+						{name:'manufacturer', width:'120', formatter:tdsCommon.jqgridTextCellFormatter},
+						{name:'model', width:'150', formatter:tdsCommon.jqgridTextCellFormatter}, 
+						{name:'sourceLocation', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'${assetPref['1']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['2']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['3']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter}, 
 						{name:'${assetPref['4']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${assetPref['5']}', width:'130', formatter: tdsCommon.jqgridPrefCellFormatter},
-						{name:'planStatus'},
-						{name:'moveBundle'},
+						{name:'planStatus', formatter:tdsCommon.jqgridTextCellFormatter},
+						{name:'moveBundle', formatter:tdsCommon.jqgridTextCellFormatter},
 						{name:'id', hidden: true},
 						{name:'commentType', hidden: true} "
 					sortname="'assetName'"
@@ -128,7 +128,7 @@
 			
 				$.jgrid.formatter.integer.thousandsSeparator = '';
 				function myLinkFormatter (cellvalue, options, rowObject) {
-					var value = cellvalue ? cellvalue : '';
+					var value = cellvalue ? _.escape(cellvalue) : '';
 					return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\',' + options.rowId + ');">' + value + '</a>';
 				}
 

@@ -1324,15 +1324,31 @@ digraph runbook {
 		def moveEventList = MoveEvent.findAllByProject(project,[sort:'name'])
 		
 		// Determine the model and view
-		def model = [taskList:issueList, tab:tab, todoSize:todoSize, allSize:allSize, 
-			search:search, sort:params.sort, order:params.order,
-	 		personId:person.id, isCleaner:isCleaner, isMoveTech:isMoveTech,
-			timeToUpdate:timeToRefresh ?: 60, 
-			isOnIE:false, person:person,servers : entities.servers, 
-			applications : entities.applications, dbs : entities.dbs, 
-			files : entities.files,  networks :entities.networks,
-			assetDependency : new AssetDependency(), dependencyType:entities.dependencyType, 
-			dependencyStatus:entities.dependencyStatus,moveBundleList:moveBundleList,moveEventList:moveEventList, moveEvent: moveEvent,
+		def model = [
+			taskList:issueList, 
+			tab:tab, 
+			todoSize:todoSize, 
+			allSize:allSize, 
+			search:search, 
+			sort:params.sort, 
+			order:params.order,
+	 		personId: person.id, 
+	 		isCleaner: isCleaner, 
+	 		isMoveTech:isMoveTech,
+			timeToUpdate: timeToRefresh ?: 60, 
+			isOnIE: false, 
+			person: person,
+			servers: entities.servers, 
+			applications: entities.applications, 
+			dbs: entities.dbs, 
+			files: entities.files,  
+			networks: entities.networks,
+			assetDependency: new AssetDependency(), 
+			dependencyType: entities.dependencyType, 
+			dependencyStatus: entities.dependencyStatus,
+			moveBundleList: moveBundleList,
+			moveEventList: moveEventList, 
+			moveEvent: moveEvent,
 			selectedTaskId: params.id]
 		
 		if(search && taskList.size() > 0){
@@ -1456,7 +1472,8 @@ function goBack() { window.history.back() }
 		def projectStaff = partyRelationshipService.getProjectStaff( project.id )?.staff
 		projectStaff.sort{it.firstName}
 	    
-		def model = [ assetComment:assetComment,
+		def model = [ 
+			assetComment: assetComment,
 			notes:notes, 
 			statusWarn:taskService.canChangeStatus ( assetComment ) ? 0 : 1,
 			permissionForUpdate:permissionForUpdate, 
@@ -1470,7 +1487,7 @@ function goBack() { window.history.back() }
             assetEntity:assetComment.assetEntity,
             cartQty:cartQty,
 			project:project
-            ]
+        ]
 	
 		def view = isCleaner ? '_showCleanerTask' : 'showIssue'
 		if(isCleaner){

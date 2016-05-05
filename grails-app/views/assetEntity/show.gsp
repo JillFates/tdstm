@@ -1,4 +1,6 @@
 <%@page import="com.tdsops.tm.enums.domain.SizeScale"%>
+<%@page defaultCodec="html" %> 
+
 <g:form method="post">
 	<table style="border:0;width:1000px;">
 		<tr>
@@ -124,7 +126,7 @@
 								<label for="truck">Truck/Cart/Shelf</label>
 							</td>
 							<td class="valueNW ${config.truck}">
-								${assetEntity.truck ?: '&nbsp;&nbsp;&nbsp;'} / ${assetEntity.cart ?: '&nbsp;&nbsp;&nbsp;'} / ${assetEntity.shelf ?: '&nbsp;&nbsp;&nbsp;'}
+								${assetEntity.truck ?: '   '} / ${assetEntity.cart ?: '   '} / ${assetEntity.shelf ?: '   '}
 							</td>
 						</g:if>
 						<td class="label ${config.validation}  ${highlightMap.validation?:''}"><label for="validation">Validation</label></td>

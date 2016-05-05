@@ -24,8 +24,6 @@
 
 			$(document).ready(function() {
 
-				
-
 				//$('#assetMenu').show();
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#showEntityView").dialog({ autoOpen: false })
@@ -66,7 +64,7 @@
 					colNames="'Actions','Name', '${modelPref['1']}','${modelPref['2']}', '${modelPref['3']}','${modelPref['4']}','${modelPref['5']}','id', 'commentType'"
 					colModel="{name:'act', index: 'act' , sortable: false, formatter:myCustomFormatter, search:false, width:'50', fixed:false},
 						{name:'assetName',index: 'assetName', formatter: myLinkFormatter, width:'300'},
-						{name:'${dbPref['1']}',width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
+						{name:'${dbPref['1']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${dbPref['2']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
 						{name:'${dbPref['3']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter}, 
 						{name:'${dbPref['4']}', width:'120', formatter: tdsCommon.jqgridPrefCellFormatter},
@@ -89,23 +87,21 @@
 					<jqgrid:refreshButton id="databaseId" />
 				</jqgrid:grid>
 
-
 				jQuery("#databaseId").jqGrid('navButtonAdd','#pcolch',{ caption: "Columns", title: "Reorder Columns", onClickButton : function (){ jQuery("#colch").jqGrid('columnChooser'); } });
 				populateFilter();
 				$("#del_databaseIdGrid").click(function(){
 				$("#databaseId").jqGrid("editGridRow","new",
 					{afterSubmit:deleteMessage});
-
 				
-			 });
+			});
 			<g:each var="key" in="['1','2','3','4','5']">
 				var dbPref= '${dbPref[key]}';
 				$("#databaseIdGrid_"+dbPref).append("<img src=\"${resource(dir:'images',file:'select2Arrow.png')}\" class=\"selectImage customizeSelect editSelectimage_"+${key}+"\" onclick=\"showSelect('"+dbPref+"', 'database','"+${key}+"')\">");
 			</g:each>
 				
 			$.jgrid.formatter.integer.thousandsSeparator='';
-			function myLinkFormatter (cellvalue, options, rowObjcet) {
-				var value = cellvalue ? cellvalue : ''
+			function myLinkFormatter (cellvalue, options, rowObject) {
+				var value = cellvalue ? _.escape(cellvalue) : ''
 				return '<a href="javascript:EntityCrud.showAssetDetailView(\'${assetClass}\','+options.rowId+');">'+value+'</a>'
 			}
 			
