@@ -332,7 +332,7 @@ var tdsCommon = {
 	// Used to escape the text cells to prevent XSS 
 	jqgridTextCellFormatter: function(cellvalue, options, rowObject) {
 		return _.escape(cellvalue);
-	}
+	},
 
 	parseAndFormatDateTimeFromZulu: function(stringValue, format) {
 		var result;
