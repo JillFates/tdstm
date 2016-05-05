@@ -1,4 +1,5 @@
 import org.apache.shiro.SecurityUtils
+import grails.converters.JSON
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -8,6 +9,8 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdsops.common.lang.ExceptionUtil
+
+import java.text.DateFormat
 
 class DashboardController {
 	
@@ -164,6 +167,36 @@ class DashboardController {
 			return [projects:dispProjs, projectInstance:projectInstance, loggedInPerson : securityService.getUserLoginPerson()]
 		}
 	}
+
+	/**
+	 * This action will load the event template for User Dashboard.
+	 * @param : project id of selected project
+	 * @render : events template
+	 *
+	 */
+	def retrieveEventsList() {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if(projectInstance!='All'){
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+
+		def result = new ArrayList()
+		def upComingEvents = userService.getEventDetails(projectInstance)
+		upComingEvents.each{ entry ->
+			result.add(
+					[
+						 eventId: upComingEvents[entry.key].moveEvent.id,
+						 projectName: upComingEvents[entry.key].moveEvent.project.name,
+						 name: upComingEvents[entry.key].moveEvent.name,
+						 startDate: upComingEvents[entry.key].moveEvent.eventTimes.start,
+						 days: upComingEvents[entry.key].daysToGo + ' days',
+						 teams: upComingEvents[entry.key].teams
+					])
+
+		}
+
+		render result as JSON
+	}
 	
 	/**
 	 * This action will load the event template for User Dashboard.
@@ -179,6 +212,35 @@ class DashboardController {
 		render (template :'events', model:[ upcomingEvents:userService.getEventDetails(projectInstance), project:projectInstance,
 			staffRoles:taskService.getTeamRolesForTasks()])
 	}
+
+	/**
+	 * This action will load the event news template for User Dashboard.
+	 * @param : project id of selected project
+	 * @render : events template
+	 *
+	 */
+	def retrieveEventsNewsList() {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if(projectInstance!='All'){
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+
+		def result = new ArrayList()
+		def newsList = userService.getEventNews(projectInstance)
+		newsList.each { news ->
+			result.add(
+					[
+							eventId: news.moveEvent.id,
+							projectName: news.moveEvent.project.name,
+							date: news.dateCreated,
+							event: news.moveEvent.name,
+							news: news.message
+					])
+
+		}
+
+		render result as JSON
+	}
 	
 	/**
 	 * This action will load the event news for User Dashboard.
@@ -189,6 +251,48 @@ class DashboardController {
 	def retrieveEventsNews() {
 		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
 		render (template :'eventNews', model:[ newsList:userService.getEventNews(projectInstance), project:projectInstance])
+	}
+
+	/**
+	 * This action will load the tasks Template for User Dashboard.
+	 * @param : project id of selected project
+	 * @render : tasks template
+	 */
+	def retrieveTaskSummaryList() {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+
+		def result = new ArrayList()
+		def taskSummary = userService.getTaskSummary(projectInstance)
+		def DateFormat formatter = TimeUtil.createFormatter(session, "MM/dd kk:mm")
+
+		taskSummary.taskList.each { task ->
+			if(task.item.estFinish != null) {
+				task.item.estFinish = task.item.estFinish.clearTime()
+			}
+			result.add(
+					[
+							projectName: task.projectName,
+							taskId: task.item.id,
+							task: ((task.item.taskNumber)? task.item.taskNumber + " - " : "" ) + task.item.comment,
+							css: task.css,
+							overDue: (task.item.dueDate && task.item.dueDate < TimeUtil.nowGMT()? 'task_overdue' : ''),
+							assetClass: task.item.assetClass.toString(),
+							assetId: task.item.assetId,
+							related: task.item.assetName,
+							dueEstFinish: TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, (task.item.estFinish != null? task.item.estFinish : new Date()), formatter),
+							status: task.item.status
+					])
+		}
+
+		def timeInMin = taskSummary.timeInMin
+		def dueTaskCount = taskSummary.dueTaskCount
+
+		Map data = [
+				taskList: result,
+				summaryDetail: taskSummary.taskList.size() + ' assigned tasks with ' + timeInMin + ' minutes of effort. (' +  dueTaskCount + '  are over due.)'
+		]
+
+		render data as JSON
 	}
 	
 	/**
@@ -203,6 +307,37 @@ class DashboardController {
 		render (template :'tasks', model:[ taskList:taskSummary.taskList, timeInMin:taskSummary.timeInMin, project:projectInstance,
 			dueTaskCount:taskSummary.dueTaskCount, personId:taskSummary.personId])
 	}
+
+	/**
+	 *  This action will load Application template for User Dashboard.
+	 * @param : project id of selected project
+	 * @render : application template
+	 *
+	 */
+	def retrieveApplicationsList() {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if(projectInstance!='All'){
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+
+		def result = new ArrayList()
+		def appSummary = userService.getApplications(projectInstance)
+		appSummary.appList.each { app ->
+			result.add(
+					[
+							projectName: app.project.name,
+							name: app.assetName,
+							appId: app.id,
+							assetClass: app.assetClass.toString(),
+							planStatus: app.planStatus,
+							moveBundle: app.moveBundle.name,
+							relation: appSummary.relationList[app.id]
+					])
+		}
+
+		render result as JSON
+
+	}
 	
 	/**
 	 * This action will load the apps for User Dashboard.
@@ -215,6 +350,32 @@ class DashboardController {
 		def appSummary = userService.getApplications(projectInstance)
 		render (template :'application', model:[ appList:appSummary.appList, relationList:appSummary.relationList, project:projectInstance ])
 	
+	}
+
+	/**
+	 * This action will load the active people Template for User Dashboard.
+	 * @param : project id of selected project
+	 * @render : activePeople template
+	 *
+	 */
+	def retrieveActivePeopleList() {
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if(projectInstance!='All'){
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+
+		def result = new ArrayList()
+		def recentLogin = userService.getActivePeople(projectInstance)
+		recentLogin.each { login ->
+			result.add(
+					[
+							personId: login.personId,
+							projectName: login.projectName,
+							personName: login.personName
+					])
+		}
+
+		render result as JSON
 	}
 	
 	/**
