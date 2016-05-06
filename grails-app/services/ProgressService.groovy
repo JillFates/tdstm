@@ -66,7 +66,7 @@ class ProgressService {
 		} 
 		ProgressInfo info = this.progressInfo.getIfPresent(key)
 		if (info != null) {
-			log.debug("update() Key was found ${key}")
+			// log.debug("update() Key was found ${key}")
 			synchronized (info) {
 				info.percentComp = percentComp
 				info.status = status
@@ -195,7 +195,7 @@ class ProgressService {
 			log.debug("Key not found ${key}")
 			return [:]
 		} else {
-			log.debug("Key FOUND ${key}")
+			// log.debug("Key FOUND ${key}")
 			return [
 				percentComp: info.percentComp,
 				status: info.status,

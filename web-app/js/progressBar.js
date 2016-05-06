@@ -88,7 +88,6 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 	}
 
 	var showProgressBar = function() {
-		console.log("Show Progress Bar!!!!");
 		//@tavo_luna: prevent dialog to close if clicked outside or after presing [ESC]
 		$('#globalProgressBar').modal({
 			backdrop: 'static',

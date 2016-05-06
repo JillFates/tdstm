@@ -137,9 +137,9 @@ class TimeUtil {
 	 * @return TimeDuration
 	 */
 	public static TimeDuration elapsed(Date start) {
-		def e = 
+		def e = elapsed(start, new Date())
 		start = new Date()
-		return elapsed(start, new Date())
+		return e
 	}
 
 	public static TimeDuration elapsed(List startList) {

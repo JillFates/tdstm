@@ -1,7 +1,7 @@
 import grails.converters.JSON
-
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
+import java.text.SimpleDateFormat
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -2319,8 +2319,6 @@ class AssetEntityService {
 				}
 
 				return hqlQuery.scroll(ScrollMode.FORWARD_ONLY)
-
-
 			}
 
 
@@ -2385,25 +2383,23 @@ class AssetEntityService {
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
-			log.info "export() - Initial loading took ${TimeUtil.elapsed(started)}"
+			log.info "export() Initial loading took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
-			def assetDepBundleList = AssetDependencyBundle.findAllByProject(project)
-			def assetDepBundleMap = [:]
-			assetDepBundleList?.each { dep ->
-				if(dep.asset){
-					assetDepBundleMap[dep.asset.id] = dep?.dependencyBundle?.toString()?:''	
-				}
-			}
-
-			log.info "export() - Create asset dep bundles took ${TimeUtil.elapsed(started)}"
+			String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
+			List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
+			Map assetDepBundleMap = new HashMap(assetDepBundleList.size())
+			assetDepBundleList.each {
+				assetDepBundleMap.put(it[0].toString(), it[1])
+			}			
+			log.info "export() Create asset dep bundles took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
 			//create book and sheet
 			FileInputStream fileInputStream = new FileInputStream( file );
 			book = new HSSFWorkbook(fileInputStream);
 
-			log.info "export() - Creating book took ${TimeUtil.elapsed(started)}"
+			log.info "export() Creating book took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
 			// Helper closure used to retrieve the s
@@ -2495,7 +2491,7 @@ class AssetEntityService {
 				}
 			}
 
-			log.info "export() - Valdating columns took ${TimeUtil.elapsed(started)}"
+			log.info "export() Valdating columns took ${TimeUtil.elapsed(started)}"
 			started = new Date()
 
 			// Helper closure to create a text list from an array for debugging
@@ -2553,7 +2549,7 @@ class AssetEntityService {
 				updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
 				updateColumnHeaders(storageSheet, fileDTAMap, storageSheetColumnNames, project)
 
-				log.info "export() - Updating spreadsheet headers took ${TimeUtil.elapsed(started)}"
+				log.info "export() Updating spreadsheet headers took ${TimeUtil.elapsed(started)}"
 				started = new Date()
 				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
 
@@ -2561,6 +2557,7 @@ class AssetEntityService {
 				// Device Export
 				//
 				if ( doDevice ) {
+					log.info "export() starting export of Devices"
 					exportedEntity += 'S'
 					int deviceCount = 0
 					while(asset.next()){
@@ -2593,7 +2590,7 @@ class AssetEntityService {
 							switch(colName) {
 								case 'DepGroup':
 									// TODO : JPM 9/2014 : Should load the dependency bundle list into memory so we don't do queries for each record
-									addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id])
+									addCell(serverSheet, deviceCount, colNum, assetDepBundleMap[a.id.toString()])
 									break
 								case ~/usize|SourcePos|TargetPos/:
 									def pos = a[attribute] ?: 0
@@ -2629,14 +2626,14 @@ class AssetEntityService {
 						}
 						GormUtil.flushAndClearSession(session, deviceCount)
 					}
-					log.info "export() - processing assets took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Devices took ${TimeUtil.elapsed([started])}"
 				}
 
 				//
 				// Application Export
 				//
 				if ( doApp ) {
+					log.info "export() starting export of Applications"
 					exportedEntity += 'A'
 
 					// This determines which columns are added as Number vs Label
@@ -2685,7 +2682,7 @@ class AssetEntityService {
 									break
 								case 'DepGroup':
 									// Find the Dependency Group that this app is bound to
-									colVal = assetDepBundleMap[app.id]
+									colVal = assetDepBundleMap[app.id.toString()]
 									break
 								case ~/ShutdownBy|StartupBy|TestingBy/:
 									colVal = app[assetColName] ? this.resolveByName(app[assetColName], false)?.toString() : ''
@@ -2719,14 +2716,14 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, applicationCount)
 					}
-					log.info "export() - processing apps took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Applications took ${TimeUtil.elapsed([started])}"
 				}
 
 				//
 				// Database
 				//
 				if ( doDB ) {
+					log.info "export() starting export of Databases"
 					exportedEntity += "D"
 					int databaseCount = 0
 					//for ( int r = 1; r <= dbSize; r++ ) {
@@ -2745,7 +2742,7 @@ class AssetEntityService {
 							//if attributeCode is sourceTeamMt or targetTeamMt export the teamCode
 							def colName = dbColumnNameList.get(coll)
 							if (colName == "DepGroup") {
-								addCell(dbSheet, databaseCount, dbMap[colName], assetDepBundleMap[currentDatabase.id])
+								addCell(dbSheet, databaseCount, dbMap[colName], assetDepBundleMap[currentDatabase.id.toString()])
 							} else if(attribute in ['retireDate', 'maintExpDate', 'lastUpdated']) {
 								def dateValue = currentDatabase.(dbDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
@@ -2771,14 +2768,14 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, databaseCount)
 					}
-					log.info "export() - processing databases took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Databases took ${TimeUtil.elapsed([started])}"
 				}
 
 				//
 				// Storage ( files )
 				//
 				if ( doStorage ) {
+					log.info "export() starting export of Logical Storage"
 					exportedEntity += "F"
 					//for ( int r = 1; r <= fileSize; r++ ) {
 					int filesCount = 0
@@ -2798,7 +2795,7 @@ class AssetEntityService {
 							def attribute = fileDTAMap.eavAttribute.attributeCode[coll]
 							def colName = fileColumnNameList.get(coll)
 							if (colName == "DepGroup") {
-								addCell(storageSheet, filesCount, fileMap[colName], assetDepBundleMap[currentFile.id] )
+								addCell(storageSheet, filesCount, fileMap[colName], assetDepBundleMap[currentFile.id.toString()] )
 							} else if(attribute in ['retireDate', 'maintExpDate', 'lastUpdated']) {
 								def dateValue = currentFile.(fileDTAMap.eavAttribute.attributeCode[coll])
 								if (dateValue) {
@@ -2821,14 +2818,14 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, filesCount)
 					}
-					log.info "export() - processing storage took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Logical Storage took ${TimeUtil.elapsed([started])}"
 				}
 				
 				//
 				// Dependencies
 				//
 				if ( doDependency ) {
+					log.info "export() starting export of Dependencies"
 					exportedEntity += "X"
 					def dependencySheet = getWorksheet('Dependencies')
 
@@ -2869,14 +2866,15 @@ class AssetEntityService {
 							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
 						}
 					}
-					log.info "export() - processing dependencies took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Dependencies took ${TimeUtil.elapsed([started])}"
 				}
 
 				//
 				// Room Export
 				//
 				if( doRoom ) {
+					log.info "export() starting export of Rooms"
+
 					exportedEntity += "R"
 
 					def roomSheet = getWorksheet('Room')
@@ -2911,14 +2909,14 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() - processing rooms took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Rooms took ${TimeUtil.elapsed([started])}"
 				}
 				
 				//
 				// Rack Export
 				//
-				if( doRack ) {
+				if ( doRack ) {
+					log.info "export() starting export of Racks"
 					exportedEntity +="r"
 
 					def rackSheet = getWorksheet('Rack')
@@ -2950,8 +2948,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() - processing racks took ${TimeUtil.elapsed(started)}"
-					started = new Date()
+					log.info "export() processing Racks took ${TimeUtil.elapsed([started])}"
 				}
 				
 			}
@@ -2960,73 +2957,67 @@ class AssetEntityService {
 			// Cabling Export
 			// 
 			if ( doCabling ) {
+				log.info "export() starting export of Cabling"
+
 				exportedEntity += "c"
 
 				def cablingSheet = getWorksheet("Cabling")
 
 				def cablingList = AssetCableMap.findAll( "from AssetCableMap acm where acm.assetFrom.project.id = $project.id " )
 
-				log.debug("Cabling found ${sizeOf(cablingList)} mappings")
+				log.debug("export() Cabling found ${sizeOf(cablingList)} mappings")
 
 				cablingReportData(cablingList, cablingSheet)
+				log.info "export() processing Cabling took ${TimeUtil.elapsed([started])}"
 			}
 
 			//
 			// Comments Export
 			// 
 			if ( doComment ) {
+				log.debug "export() Starting the export of Comments"
 
 				exportedEntity += "M"
 
 				def commentSheet = getWorksheet("Comments")
 
-				def commentIt = new ArrayList()
-				def allAssets
 
-				// TODO : JPM 9/2014 : The way that 
-				if (bundle[0] == "" ) {
-					allAssets = AssetEntity.findAllByProject( project, params )
-				} else {
-					allAssets = AssetEntity.findAll( "from AssetEntity m where m.project = :project and m.moveBundle.id in ( :bundles ) ",
-						[project:project, bundles: bundles])
-				}
-				
-				allAssets.each{
-					commentIt.add(it.id)
+				List commentList = AssetComment.withCriteria {
+					and {
+						eq('project', project)
+						eq('commentType', 'comment')
+						isNotNull('assetEntity')
+					} 
 				}
 
-				def commentList = new StringBuffer()
-				def commentSize = commentIt.size()
-				for ( int k=0; k< commentSize ; k++ ) {
-					if( k != commentSize - 1) {
-						commentList.append( commentIt[k] + "," )
-					} else {
-						commentList.append( commentIt[k] )
-					}
-				}
-				if (commentList) {
-					def assetcomment = AssetComment.findAll("from AssetComment cmt where cmt.assetEntity in ($commentList) and cmt.commentType = 'comment'")
+				if (commentList.size() > 0) {
 					def assetId
 					def createdDate
 					def createdBy
 					def commentId
 					def category
 					def comment
-					for(int cr=1 ; cr<=assetcomment.size() ; cr++){
+					for(int cr=1 ; cr<=commentList.size() ; cr++){
+						def dateCommentCreated = ''
+						if (commentList[cr-1].dateCreated) {
+							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, commentList[cr-1].dateCreated, TimeUtil.FORMAT_DATE)
+						} 
 
-						addCell(commentSheet, cr, 0, String.valueOf(assetcomment[cr-1].id))
+						addCell(commentSheet, cr, 0, String.valueOf(commentList[cr-1].id))
 
-						addCell(commentSheet, cr, 1, assetcomment[cr-1].assetEntity.id, Cell.CELL_TYPE_NUMERIC)
+						addCell(commentSheet, cr, 1, commentList[cr-1].assetEntity.id, Cell.CELL_TYPE_NUMERIC)
 
-						addCell(commentSheet, cr, 2, String.valueOf(assetcomment[cr-1].category))
+						addCell(commentSheet, cr, 2, String.valueOf(commentList[cr-1].category))
 
-						addCell(commentSheet, cr, 3, String.valueOf(assetcomment[cr-1].dateCreated? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, assetcomment[cr-1].dateCreated, TimeUtil.FORMAT_DATE) : "") )
+						addCell(commentSheet, cr, 3, String.valueOf(dateCommentCreated))
 
-						addCell(commentSheet, cr, 4, String.valueOf(assetcomment[cr-1].createdBy))
+						addCell(commentSheet, cr, 4, String.valueOf(commentList[cr-1].createdBy))
 
-						addCell(commentSheet, cr, 5, String.valueOf(assetcomment[cr-1].comment))
+						addCell(commentSheet, cr, 5, String.valueOf(commentList[cr-1].comment))
 					}
 				}
+
+				log.info "export() processing Comments took ${TimeUtil.elapsed([started])}"
 			}
 
 			//
@@ -3042,7 +3033,8 @@ class AssetEntityService {
 			progressService.updateData(key, 'header', "attachment; filename=\""+exportType+'-'+filename+".xls\"")
 			progressService.update(key, 100, 'Completed')
 
-			log.info "export() - Global time ${TimeUtil.elapsed(startedMain)}"
+			log.info "export() streaming spreadsheet to browser took ${TimeUtil.elapsed(started)}"
+			log.info "export() Combined time ${TimeUtil.elapsed(startedMain)}"
 
 		} catch( Exception exportExp ) {
 
