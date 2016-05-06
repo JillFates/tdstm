@@ -53,8 +53,8 @@ class GenerateTasksJob {
 
 			// reschedule the job
 			String triggerName = trigger.getName()
-			// context.getScheduler().rescheduleJob(triggerName, trigger.getGroup(), trigger)
-			context.getScheduler().rescheduleJob(trigger.getKey(), trigger)
+			context.getScheduler().rescheduleJob(triggerName, trigger.getGroup(), trigger)
+			//context.getScheduler().rescheduleJob(trigger.getKey(), trigger)
 			log.info("Rescheduled job ${triggerName} for ${nextFiringDate}, tries=$tries")
 		}
 	}
