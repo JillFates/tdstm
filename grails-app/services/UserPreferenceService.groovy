@@ -226,6 +226,41 @@ class UserPreferenceService {
 		return prefValue
 	}
 	
+	/**
+	 * Get Preference Map by default User by preferenceKeys
+	 * @author @tavo_luna
+	 */
+	def getPreferencesMap(Collection<UserPreferenceEnum> preferenceKeys){
+		def mapPref = [:]
+		def userLogin = securityService.getUserLogin()
+		if (userLogin && preferenceKeys) {
+			def keyNames = preferenceKeys.collect{ it.name() }
+			def userPreferences = UserPreference.findAllByUserLoginAndPreferenceCodeInList(userLogin, keyNames) ?: []
+			
+			userPreferences.each{ preferenceCode ->
+				mapPref[preferenceCode.preferenceCode] = preferenceCode.value
+			}
+		}
+
+		return mapPref
+	}
+
+	/**
+	 * get ImportPreferences
+	 */
+	def getImportPreferences(){
+		def prefKeys = UserPreferenceEnum.getImportPreferenceKeys()
+		return getPreferencesMap(prefKeys)
+	}
+
+	/**
+	 * get ExportPreferences
+	 */
+	def getExportPreferences(){
+		def prefKeys = UserPreferenceEnum.getExportPreferenceKeys()
+		return getPreferencesMap(prefKeys)
+	}
+	
 	/*
 	 * Method will remove the user preference record for selected preferenceCode and loginUser
 	 */

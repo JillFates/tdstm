@@ -214,10 +214,7 @@ class AssetEntityController {
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
 		
-		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportCabling', 'ImportComment'].each{t->
-			prefMap << [(t) : userPreferenceService.getPreference(t)]
-		}
+		def prefMap = userPreferenceService.getImportPreferences()
 		
 		def isMSIE = false
 		def userAgent = request.getHeader("User-Agent")
@@ -280,10 +277,7 @@ class AssetEntityController {
 		}
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(project).size()
 		
-		def prefMap = [:]
-		['ImportApplication','ImportServer','ImportDatabase','ImportStorage','ImportDependency','ImportRoom','ImportRack', 'ImportCabling','ImportComment'].each {t->
-			prefMap << [(t) : userPreferenceService.getPreference(t)]
-		}
+		def prefMap = userPreferenceService.getExportPreferences()
 		
 		render (view:"exportAssets", model : [projectId: projectId,
 			dataTransferBatchs:dataTransferBatchs, prefMap:prefMap,
