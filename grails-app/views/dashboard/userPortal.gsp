@@ -104,6 +104,24 @@
             content: "\e031";
         }
 
+        .custom-action {
+            padding-left: 8px !important;
+        }
+
+        .custom-action .k-icon {
+            background-color: white !important;
+            background-color: transparent;
+            border-radius: 50%;
+        }
+
+        .k-loading-image {
+            background-image: url('${resource(dir:'dist/css/kendo/Default',file:'loading-image.gif')}');
+        }
+
+        .k-grid {
+            margin-top: 24px;
+        }
+
 </style>
 
 </head>
@@ -119,9 +137,9 @@
 
         <script id="taskRowTemplate" type="text/x-kendo-tmpl">
 
-            <tr id="issueTrId_#: taskId #" data-uid="#: uid #" class="#: css # k-master-row">
-                <td class="k-hierarchy-cell">
-                    <a class="k-icon k-plus" href="\\#" tabindex="-1" action-bar-cell config-table="config.table" comment-id="#: taskId #" asset-id="#: assetId #" status="#: status #" id-prefix="issueTrId_" master="true" table-col-span="5"></a>
+            <tr id="issueTrId_#: taskId #" data-uid="#: uid #" class="#: css #">
+                <td class="custom-action">
+                    <a class="k-icon k-plus" href="\\#" tabindex="-1" action-bar-cell config-table="config.table" comment-id="#: taskId #" asset-id="#: assetId #" status="#: status #" id-prefix="issueTrId_" master="true" table-col-span="5" onclick="changeDropSummary(this)"></a>
                 </td>
                 <td #:isAllProjectMode() ? '' : 'style=display:none' # class="taskTd">
                     #: projectName #
@@ -141,8 +159,6 @@
             </tr>
         </script>
 
-        <script id="taskSummaryDetailTemplate" type="text/x-kendo-tmpl" ></script>
-
         <!-- Body Starts here-->
         <div id="bodycontent">
             <h1>User Dashboard for ${loggedInPerson}</h1>
@@ -157,31 +173,21 @@
                         <div class="row">
                             <div class="col-md-6 cell-container">
                                 <div id="gridEvents"></div>
+
+                                <div id="gridTaskSummary"></div>
+                                <div id="taskSummaryDetail"></div>
+
                             </div>
 
                             <div class="col-md-6 cell-container">
                                 <div id="gridEventsNews"></div>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6 cell-container">
-                                <div id="gridTaskSummary"></div>
-                                <div id="taskSummaryDetail"></div>
-                            </div>
-
-                            <div class="col-md-6 cell-container">
                                 <div id="gridApplication"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 cell-container">
-                            </div>
 
-                            <div class="col-md-6 cell-container">
                                 <div id="gridActivePeople"></div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -198,6 +204,14 @@
 
         var image = "<tr><td><div><img src=\"${resource(dir:'images',file:'processing.gif')}\"></div></td></tr>";
         currentMenuId = "#teamMenuId";
+
+        function changeDropSummary(e) {
+            if(e && $(e).hasClass('k-plus')) {
+                $(e).removeClass('k-plus').addClass('k-minus');
+            } else if(e && $(e).hasClass('k-minus')) {
+                $(e).removeClass('k-minus').addClass('k-plus');
+            }
+        }
 
         function issueDetails(id, status) {
             // hideStatus(id,status)
@@ -444,6 +458,8 @@
                 }
             }
 
+            //$('#gridTaskSummary').find('.k-grid-content table').remove();
+
             // do the fact that Task Summary can handle even more information that we expect for Kendo, create on this way
             var dataSource = new kendo.data.DataSource({
                 transport: {
@@ -510,13 +526,14 @@
                     }
                 ],
                 rowTemplate: kendo.template($("#taskRowTemplate").html()),
-                detailTemplate: kendo.template($("#taskSummaryDetailTemplate").html()),
-                detailInit: function() {
-                    $("#gridTaskSummary").find('.k-detail-row').remove();
+                detailInit: function(e) {
+                    var detailRow = e.detailRow;
+                    detailRow.find('td').css('padding', 0);
                 },
-                dataBound: function() {
-                    recompileDOM("gridTaskSummary");
-                }
+                dataBound: function(e) {
+                    recompileDOM("gridTaskSummary  .custom-action a");
+                },
+                height: 400
             });
 
         }
