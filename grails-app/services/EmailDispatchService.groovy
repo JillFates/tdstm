@@ -7,6 +7,7 @@ import org.quartz.SimpleTrigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import grails.converters.JSON
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 
 /**
  * Generic service to send emails using templates
@@ -74,29 +75,34 @@ class EmailDispatchService {
 	def sendEmail(dataMap) {
 		log.info("Send email: Start.")
 
-		def edId = dataMap.getLongValue('edId')
-		def ed = EmailDispatch.findById(edId)
+		try{
+			def edId = dataMap.getLongValue('edId')
+			def ed = EmailDispatch.findById(edId)
 
-		if (!ed) {
-			log.error "Invalid EmailDispatch id: $edId"
-			return
-		}
-		
-		log.info "sendEmail: edId=${edId} to=${ed.toPerson.id}/${ed.toPerson.email}"
-		
-		mailService.sendMail {
-			to ed.toPerson.email
-			subject ed.subject
-			body (
-				view: getTemplateView(ed),
-				model: createModel(ed)
-			)
-		}
+			if (!ed) {
+				log.error "Invalid EmailDispatch id: $edId"
+				return
+			}
+			
+			log.info "sendEmail: edId=${edId} to=${ed.toPerson.id}/${ed.toPerson.email}"
+			
+			mailService.sendMail {
+				to ed.toPerson.email
+				subject ed.subject
+				body (
+					view: getTemplateView(ed),
+					model: createModel(ed)
+				)
+			}
 
-		ed.sentDate = TimeUtil.nowGMT()
+			ed.sentDate = TimeUtil.nowGMT()
 
-		if (!ed.validate() || !ed.save(flush:true)) {
-			log.error "Can't update email dispatch object: " + GormUtil.allErrorsString(ed)
+			if (!ed.validate() || !ed.save(flush:true)) {
+				log.error "Can't update email dispatch object: " + GormUtil.allErrorsString(ed)
+			}
+		} finally {
+			//Just in case of any problem we wrapp it in a try statement
+			DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 		}
 
 	}

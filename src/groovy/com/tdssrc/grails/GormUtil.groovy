@@ -6,6 +6,7 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod 
 import org.hibernate.ScrollableResults
 import org.hibernate.ScrollMode
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 
 public class GormUtil {
 
@@ -179,6 +180,8 @@ public class GormUtil {
 		if (rowsProcessed % flushAfterLimit == 0) {
 			session.flush()
 			session.clear()
+			//Fixing a problem when working with requestless Domain objects (http://burtbeckwith.com/blog/?p=73)
+			DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 			return true
 		}
 		return false

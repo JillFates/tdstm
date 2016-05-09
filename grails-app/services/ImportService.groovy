@@ -592,8 +592,7 @@ class ImportService {
 						}
 					}
 	
-					session.flush()
-					session.clear()
+					GormUtil.flushAndClearSession(session, 1, 1)
 					//tx.commit()
 				}
 			} catch (UnauthorizedException e) {
@@ -611,6 +610,9 @@ class ImportService {
 				}
 				log.error "deviceProcess() failed : ${e.getMessage()} : userLogin ($userLoginId) : batchId $batchId"
 				log.error ExceptionUtil.stackTraceToString(e)
+			} finally {
+				def session = sessionFactory.currentSession
+				GormUtil.flushAndClearSession(session, 1, 1)
 			}
 			break
 		}

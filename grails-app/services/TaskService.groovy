@@ -3059,6 +3059,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				exceptions.append(failure)
 				log.error "$failure\n${ExceptionUtil.stackTraceToString(e)}"
 			}
+		}finally{
+			def session = sessionFactory.currentSession
+			GormUtil.flushAndClearSession(session, 1, 1)
 		}
 		
 		// Check to make sure that all of the deferred tasks have been collected as they should have

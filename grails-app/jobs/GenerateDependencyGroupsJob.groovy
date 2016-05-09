@@ -3,6 +3,7 @@ import org.quartz.SimpleTrigger
 import org.quartz.Trigger
 import org.quartz.JobExecutionException
 import com.tdsops.common.lang.ExceptionUtil
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 
 class GenerateDependencyGroupsJob {
 
@@ -51,6 +52,9 @@ class GenerateDependencyGroupsJob {
 		} catch (e) {
 			log.error "execute() moveBundleService.generateDependencyGroups received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.fail(progressKey, e.getMessage())
+		} finally {
+			//Fixing a problem when working with requestless Domain objects (http://burtbeckwith.com/blog/?p=73)
+		  DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 		}
 	}
 }
