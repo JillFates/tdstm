@@ -1,3 +1,5 @@
+import com.tdssrc.grails.GormUtil
+import com.tdsops.common.lang.ExceptionUtil
 
 class ExportAssetEntityJob {
 
@@ -15,7 +17,14 @@ class ExportAssetEntityJob {
 	 * @return void
 	 */
 	 def execute(context) {
-		def dataMap = context.mergedJobDataMap
-		assetEntityService.export(dataMap)
+	 	try {
+			def dataMap = context.mergedJobDataMap
+			assetEntityService.export(dataMap)
+		} catch (e) {
+			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
+			progressService.fail(progressKey, e.getMessage())
+		} finally {
+			GormUtil.releaseLocalThreadMemory()
+		}
 	}
 }

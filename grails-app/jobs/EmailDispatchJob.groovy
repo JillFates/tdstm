@@ -1,3 +1,6 @@
+import com.tdssrc.grails.GormUtil
+import com.tdsops.common.lang.ExceptionUtil
+
 class EmailDispatchJob {
 
 	// Quartz Properties
@@ -15,7 +18,13 @@ class EmailDispatchJob {
 	 * @return void
 	 */
 	 def execute(context) {
-		def dataMap = context.mergedJobDataMap
-		emailDispatchService.sendEmail(dataMap)
+	 	try {
+			def dataMap = context.mergedJobDataMap
+			emailDispatchService.sendEmail(dataMap)
+		} catch (e) {
+			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
+		} finally {
+			GormUtil.releaseLocalThreadMemory()
+		}
 	}
 }

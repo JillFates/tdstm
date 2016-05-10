@@ -3059,9 +3059,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				exceptions.append(failure)
 				log.error "$failure\n${ExceptionUtil.stackTraceToString(e)}"
 			}
-		}finally{
-			def session = sessionFactory.currentSession
-			GormUtil.flushAndClearSession(session, 1, 1)
 		}
 		
 		// Check to make sure that all of the deferred tasks have been collected as they should have
@@ -3086,6 +3083,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		taskBatch.save(flush:true, failOnError:true)
 
 		// TM-2843 - Fix issue with memory leak due to the usage of metaClass.addProperty
+		// TODO : JPM 5/2016 : generateTasks() review if the 'taskToWipe.metaClass = null' is still necessary for the memory leak
 		taskList.each { id, taskToWipe -> taskToWipe.metaClass = null }
 		
 		if (failure)

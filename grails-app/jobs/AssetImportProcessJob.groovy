@@ -4,6 +4,7 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.quartz.Trigger
 import org.quartz.JobExecutionException
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdssrc.grails.GormUtil
 
 class AssetImportProcessJob {
 
@@ -53,6 +54,8 @@ class AssetImportProcessJob {
 		} catch (e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"			
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage())
+		} finally {
+			GormUtil.releaseLocalThreadMemory()
 		}
  	}
 }

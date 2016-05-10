@@ -24,7 +24,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringUtils
 
 import java.util.regex.Matcher
 import org.hibernate.FlushMode
@@ -592,8 +592,8 @@ class ImportService {
 						}
 					}
 	
+					// TODO : JPM 5/2016 : invokeAssetImportProcess() should probably only call the flushAndClearSession every few hundred or even one thousand rows
 					GormUtil.flushAndClearSession(session, 1, 1)
-					//tx.commit()
 				}
 			} catch (UnauthorizedException e) {
 				errorMsg = e.getMessage()
@@ -610,9 +610,7 @@ class ImportService {
 				}
 				log.error "deviceProcess() failed : ${e.getMessage()} : userLogin ($userLoginId) : batchId $batchId"
 				log.error ExceptionUtil.stackTraceToString(e)
-			} finally {
-				def session = sessionFactory.currentSession
-				GormUtil.flushAndClearSession(session, 1, 1)
+
 			}
 			break
 		}

@@ -180,11 +180,18 @@ public class GormUtil {
 		if (rowsProcessed % flushAfterLimit == 0) {
 			session.flush()
 			session.clear()
-			//Fixing a problem when working with requestless Domain objects (http://burtbeckwith.com/blog/?p=73)
-			DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 			return true
 		}
 		return false
+	}
+
+	/**
+	 * This method is used to free up memory that is allocated in local threads when GORM is used in background processes
+	 * where there is no HTTP Request object in the session. This is a known problem documented in the blog post 
+	 * http://burtbeckwith.com/blog/?p=73.
+	 */
+	static void releaseLocalThreadMemory() {
+		DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 	}
 
 	/**

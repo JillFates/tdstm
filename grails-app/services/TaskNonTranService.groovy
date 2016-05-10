@@ -129,13 +129,10 @@ class TaskNonTranService {
 
 			} // AssetComment.withTransaction {}
 
-		}catch(e){
-			log.error "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id})\n$e"
-		}finally{
-			def session = sessionFactory.currentSession
-			GormUtil.flushAndClearSession(session, 1, 1)
+		} catch(e) {
+			msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id})\n$e"
+			success = false
 		}
-
 
 		if (success) {
 			log.info msg
