@@ -239,6 +239,36 @@ class TimeUtilTests extends Specification {
 			nullValueDate == null
 	}
 
+	def 'Test getUserDateFormat default value when Session is null'(){
+		when:
+			def session = null
+			def timeFormat = TimeUtil.getUserDateFormat(session)
+		then: "timeFormat should be the same than TimeUtil::getDefaultFormatType"
+			timeFormat == TimeUtil.getDefaultFormatType()
+
+		when: "session doesn't have the 'CURR_DT_FORMAT' attribute"
+			session = new GrailsHttpSession(request)
+			timeFormat = TimeUtil.getUserDateFormat(session)
+		then: "timeFormat should be the same than TimeUtil::getDefaultFormatType"
+			timeFormat == TimeUtil.getDefaultFormatType()		
+		
+	}
+
+	def 'Test getUserTimezone  default value when Session is null'(){
+		when:
+			def session = null
+			def timeZone = TimeUtil.getUserTimezone(session)
+		then: "timeZone should be the same than TimeUtil::defaultTimeZone"
+			timeZone == TimeUtil.defaultTimeZone
+
+		when: "session doesn't have the 'CURR_TZ' attribute"
+			session = new GrailsHttpSession(request)
+			timeZone = TimeUtil.getUserTimezone(session)
+
+		then: "timeZone should be the same than TimeUtil::defaultTimeZone"
+			timeZone == TimeUtil.defaultTimeZone		
+	}
+
 // HELPERS ////////////////////////////////////////////////////////////////////
 	// Mock the bullshit format of session attributes ...
 	private getMockSession(){

@@ -69,6 +69,14 @@ class TimeUtil {
 	public static final String GRANULARITY_HOURS = "H"
 	public static final String GRANULARITY_DAYS = "D"
 
+	private static String getFromHttpSession(HttpSession session, String key, String defaultValue = null) {
+		def value = null
+		if(session){
+			def map = session.getAttribute(key) ?: [:]
+			value = map[key]
+		}
+		return value ?: defaultValue
+	}
 
 	/**
 	 * Used to get the user perferred timezone
@@ -76,9 +84,7 @@ class TimeUtil {
 	 * @return the timezone id string
 	 */
 	public static String getUserTimezone(HttpSession session) {
-		String tzId = session.getAttribute(TIMEZONE_ATTR)[TIMEZONE_ATTR] ?: defaultTimeZone
-
-		return tzId
+		return TimeUtil.getFromHttpSession(session, TIMEZONE_ATTR, defaultTimeZone)
 	}	 
 
 	/**
@@ -87,7 +93,7 @@ class TimeUtil {
 	 * @return the timezone id string
 	 */
 	public static String getUserDateFormat(HttpSession session) {
-		return session.getAttribute(DATE_TIME_FORMAT_ATTR)[DATE_TIME_FORMAT_ATTR] ?: getDefaultFormatType()
+		return TimeUtil.getFromHttpSession(session, DATE_TIME_FORMAT_ATTR, getDefaultFormatType())
 	}	 
 
 	/**
