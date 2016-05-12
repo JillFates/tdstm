@@ -9,7 +9,7 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
 
-import java.io.File;
+import java.io.File
 
 import grails.util.GrailsUtil
 
@@ -61,6 +61,7 @@ import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -616,7 +617,7 @@ class AssetEntityController {
 
 			log.debug "processSheet() sheet $sheetName results = $results"
 		} catch (e) {
-			log.debug "import() exception : ${ExceptionUtil.stackTraceToString(e)}"
+			log.debug "processSheet() exception : ${ExceptionUtil.stackTraceToString(e)}"
 			results.errors << "Sheet $sheetName failed to process - ${e.getMessage()}"
 		}
 
@@ -646,7 +647,7 @@ class AssetEntityController {
 		int assetNameColIndex = sheetInfo.nameColumnIndex
 		String assetSheetName = sheetInfo.sheetName
 
-log.debug "importSheetValues() sheetInfo=sheetInfo" 
+		// log.debug "importSheetValues() sheetInfo=sheetInfo" 
 
 		Project project = dataTransferBatch.project
 
@@ -774,6 +775,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			forward (action:forwardAction, params:[error:warnMsg])
 			return
 		}
+
+		def stopwatch = new StopWatch()
+		stopwatch.start()
 
 		// ------
 		// Some variables that are referenced by the following closures
@@ -972,54 +976,65 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 			Map importResults
 			String sheetName, domainClassName
 
+			log.info "upload() Initializtion loading took ${stopwatch.lap()}"
+
 			// ----
 			// Devices Sheet
 			// ----
 			if (params.asset == 'asset') {
+				log.info "upload() beginning Devices"
 				sheetName='Devices'
 				domainClassName = 'AssetEntity'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'assetId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
+				log.info "upload() Devices took ${stopwatch.lap()}"
 			}
 
 			// ----
 			// Applications Sheet
 			// ----
 			if (params.application == 'application') {
+				log.info "upload() beginning Applications"
 				sheetName='Applications'
 				domainClassName = 'Application'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'appId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
+				log.info "upload() Applications took ${stopwatch.lap()}"
 			}
 
 			// ----
 			// Database Sheet
 			// ----
 			if (params.database == 'database') {
+				log.info "upload() beginning Databases"
 				sheetName='Databases'
 				domainClassName = 'Database'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'dbId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
+				log.info "upload() Databases took ${stopwatch.lap()}"
 			}
 
 			// ----
 			// Storage Sheet
 			// ----
 			if (params.storage == 'storage') {
+				log.info "upload() beginning Logical Storage"
 				sheetName='Storage'
 				domainClassName = 'Files'
 				importResults = processSheet(project, userLogin, projectCustomLabels, dataTransferSet, workbook, sheetName, 'filesId', 'Name', 0, domainClassName, exportTime, sheetConf)
 				processResults(sheetName, importResults)
 				saveProcessResultsToBatch(sheetName, uploadResults)
+				log.info "upload() Logical Storage took ${stopwatch.lap()}"
 			}
 
 			// ----
 			// Process Dependencies
 			// ----
 			if (params.dependency=='dependency') {
+				log.info "upload() beginning Dependencies"
 				def dependencySheet = workbook.getSheet( "Dependencies" )
 
 				def dependencySheetRow = dependencySheet.getLastRowNum()
@@ -1241,7 +1256,9 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 							dependencySkipped--
 							continue
 						} else {
-							log.info "Changed fields ${assetDep.dirtyPropertyNames}"
+							if (! isNew && assetDep.dirtyPropertyNames) {
+								log.info "upload() Changed fields ${assetDep.dirtyPropertyNames} of Dependency ${assetDep.id}"
+							}
 						}
 
 						// Attempt to save the record
@@ -1262,13 +1279,15 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 
 				importResults.summary = "$dependencySheetRow Rows read, $dependencyAdded Added, $dependencyUpdated Updated, $dependencyUnchanged Unchanged, $dependencyErrored Errored, $dependencySkipped Skipped"
 				processResults('Dependencies', importResults)
+				log.info "upload() Dependencies took ${stopwatch.lap()}"
 
 			} // Process Dependencies
 			
 			// ----
 			// Process Cabling
 			// ----
-			if (params.cabling=='cable'){
+			if (params.cabling=='cable') {
+				log.info "upload() beginning Cabling"
 				def cablingSheet = workbook.getSheet( "Cabling" )
 				def cablingSheetRow = cablingSheet.getLastRowNum()
 				session.setAttribute("TOTAL_ASSETS",cablingSheetRow)
@@ -1281,12 +1300,14 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				importResults.summary = "${importResults.rowsProcessed } Rows read, $resultMap.cablingUpdated Updated, $resultMap.cablingSkipped Skipped, ${importResults.errors.size()} Errored"
 				processResults('Cabling', importResults)
 
+				log.info "upload() Cabling took ${stopwatch.lap()}"
 			}
 			
 			// ----
 			// Process Comments Imports
 			// ----
 			if (params.comment=='comment') {
+				log.info "upload() beginning Comments"
 				def commentsSheet = workbook.getSheet( "Comments" )
 
 				int commentAdded=0
@@ -1437,6 +1458,7 @@ log.debug "importSheetValues() sheetInfo=sheetInfo"
 				}
 				importResults.summary = "${importResults.rowsProcessed} Rows read, $commentAdded Added, $commentUpdated Updated, $commentUnchanged Unchanged, ${importResults.errors.size()} Errors"
 				processResults('Comments', importResults)
+				log.info "upload() Comments took ${stopwatch.lap()}"
 
 			} // Process Comment Imports
 

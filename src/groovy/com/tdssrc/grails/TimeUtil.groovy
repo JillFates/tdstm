@@ -144,10 +144,16 @@ class TimeUtil {
 	 */
 	public static TimeDuration elapsed(Date start) {
 		def e = elapsed(start, new Date())
-		start = new Date()
+		start = new Date()  //<- this doesn't have any effect in the program since we are not changing the passed object
 		return e
 	}
 
+	/**
+	 * This is Supposed to get the Elapsed Time until now from a given date wrapped in a list for later updating this Date.
+	 * I dont recomend this approach since its Error prone and Mutability es the root of all evil :) rather change it in the caller.
+	 * 
+	 * @deprecated Use {@link com.tdssrc.grails.StopWatch} or {@link org.apache.commons.lang.time.StopWatch}
+	 */
 	public static TimeDuration elapsed(List startList) {
 		def e = elapsed(startList[0], new Date())
 		startList[0] = new Date()

@@ -47,6 +47,7 @@ import com.tdssrc.eav.EavAttributeSet
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
@@ -2213,8 +2214,7 @@ class AssetEntityService {
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
 
 		try {
-			def startedMain = new Date()
-			def started = new Date()
+			def stopwatch = new StopWatch()
 		
 			java.io.File temp = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
 			temp.deleteOnExit();
@@ -2407,7 +2407,8 @@ class AssetEntityService {
 			
 			//get template Excel
 			def book
-			started = new Date()
+			stopwatch.start()
+
 			def filenametoSet = dataTransferSetInstance.templateFilename
 			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
@@ -2425,8 +2426,7 @@ class AssetEntityService {
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
-			log.info "export() Initial loading took ${TimeUtil.elapsed(started)}"
-			started = new Date()
+			log.info "export() Initial loading took ${stopwatch.lap()}"
 
 			String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
 			List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
@@ -2434,15 +2434,13 @@ class AssetEntityService {
 			assetDepBundleList.each {
 				assetDepBundleMap.put(it[0].toString(), it[1])
 			}			
-			log.info "export() Create asset dep bundles took ${TimeUtil.elapsed(started)}"
-			started = new Date()
+			log.info "export() Create asset dep bundles took ${stopwatch.lap()}"
 
 			//create book and sheet
 			FileInputStream fileInputStream = new FileInputStream( file );
 			book = new HSSFWorkbook(fileInputStream);
 
-			log.info "export() Creating book took ${TimeUtil.elapsed(started)}"
-			started = new Date()
+			log.info "export() Creating book took ${stopwatch.lap()}"
 
 			// Helper closure used to retrieve the s
 			def getWorksheet = { sheetName ->
@@ -2533,8 +2531,7 @@ class AssetEntityService {
 				}
 			}
 
-			log.info "export() Valdating columns took ${TimeUtil.elapsed(started)}"
-			started = new Date()
+			log.info "export() Valdating columns took ${stopwatch.lap()}"
 
 			// Helper closure to create a text list from an array for debugging
 			def xportList = { list ->
@@ -2591,8 +2588,7 @@ class AssetEntityService {
 				updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
 				updateColumnHeaders(storageSheet, fileDTAMap, storageSheetColumnNames, project)
 
-				log.info "export() Updating spreadsheet headers took ${TimeUtil.elapsed(started)}"
-				started = new Date()
+				log.info "export() Updating spreadsheet headers took ${stopwatch.lap()}"
 				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
 
 				//
@@ -2668,7 +2664,7 @@ class AssetEntityService {
 						}
 						GormUtil.flushAndClearSession(session, deviceCount)
 					}
-					log.info "export() processing Devices took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Devices took ${stopwatch.lap()}"
 				}
 
 				//
@@ -2758,7 +2754,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, applicationCount)
 					}
-					log.info "export() processing Applications took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Applications took ${stopwatch.lap()}"
 				}
 
 				//
@@ -2810,7 +2806,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, databaseCount)
 					}
-					log.info "export() processing Databases took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Databases took ${stopwatch.lap()}"
 				}
 
 				//
@@ -2860,7 +2856,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, filesCount)
 					}
-					log.info "export() processing Logical Storage took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Logical Storage took ${stopwatch.lap()}"
 				}
 				
 				//
@@ -2910,7 +2906,7 @@ class AssetEntityService {
 							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
 						}
 					}
-					log.info "export() processing Dependencies took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Dependencies took ${stopwatch.lap()}"
 				}
 
 				//
@@ -2954,7 +2950,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() processing Rooms took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Rooms took ${stopwatch.lap()}"
 				}
 				
 				//
@@ -2994,7 +2990,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() processing Racks took ${TimeUtil.elapsed([started])}"
+					log.info "export() processing Racks took ${stopwatch.lap()}"
 				}
 				
 			}
@@ -3015,7 +3011,7 @@ class AssetEntityService {
 
 				cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
 				progressCount += cablingSize
-				log.info "export() processing Cabling took ${TimeUtil.elapsed([started])}"
+				log.info "export() processing Cabling took ${stopwatch.lap()}"
 			}
 
 			//
@@ -3066,7 +3062,7 @@ class AssetEntityService {
 					}
 				}
 
-				log.info "export() processing Comments took ${TimeUtil.elapsed([started])}"
+				log.info "export() processing Comments took ${stopwatch.lap()}"
 			}
 
 			//
@@ -3082,8 +3078,8 @@ class AssetEntityService {
 			progressService.updateData(key, 'header', "attachment; filename=\""+exportType+'-'+filename+".xls\"")
 			progressService.update(key, 100, 'Completed')
 
-			log.info "export() streaming spreadsheet to browser took ${TimeUtil.elapsed(started)}"
-			log.info "export() Combined time ${TimeUtil.elapsed(startedMain)}"
+			log.info "export() streaming spreadsheet to browser took ${stopwatch.lap()}"
+			log.info "export() Combined time ${stopwatch.sinceStart}"
 
 		} catch( Exception exportExp ) {
 
