@@ -2,11 +2,11 @@ package com.tdssrc.grails
 
 import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import com.tdsops.common.grails.ApplicationContextHolder
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod 
 import org.hibernate.ScrollableResults
 import org.hibernate.ScrollMode
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
+import com.tdsops.common.grails.ApplicationContextHolder
 
 public class GormUtil {
 

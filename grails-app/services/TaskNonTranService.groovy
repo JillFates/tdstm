@@ -56,83 +56,76 @@ class TaskNonTranService {
 		def success=true
 		def msg=''
 
-		try{
+		def predCountSQL = 'SELECT COUNT(*) FROM asset_comment ac ' + 
+			'JOIN task_dependency td ON td.predecessor_id=ac.asset_comment_id AND ac.status<>"' + AssetCommentStatus.DONE + '" ' +
+			'WHERE td.asset_comment_id=' 
 
-			def predCountSQL = 'SELECT COUNT(*) FROM asset_comment ac ' + 
-				'JOIN task_dependency td ON td.predecessor_id=ac.asset_comment_id AND ac.status<>"' + AssetCommentStatus.DONE + '" ' +
-				'WHERE td.asset_comment_id=' 
+		AssetComment.withTransaction { trxStatus ->
 
-			AssetComment.withTransaction { trxStatus ->
-
-				// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
-			
-				//
-				// Now mark any successors as Ready if all of the successors' predecessors are DONE
-				//
-				if ( status ==	AssetCommentStatus.DONE ) {
-					def successorDeps = TaskDependency.findAllByPredecessor(task)
-					log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
-					def i = 1
-					successorDeps?.each() { succDepend ->
-						def successorTask = succDepend.assetComment
-						log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) Processing (#${i++}) successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom"
+			// TODO: taskStatusChangeEvent : Add logic to handle READY for the SS predecessor type and correct the current code to not assume SF type
+		
+			//
+			// Now mark any successors as Ready if all of the successors' predecessors are DONE
+			//
+			if ( status ==	AssetCommentStatus.DONE ) {
+				def successorDeps = TaskDependency.findAllByPredecessor(task)
+				log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) found ${successorDeps ? successorDeps.size() : '0'} successors - $whom"
+				def i = 1
+				successorDeps?.each() { succDepend ->
+					def successorTask = succDepend.assetComment
+					log.info "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) Processing (#${i++}) successorTask(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom"
+					
+					// If the Successor Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
+					if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(successorTask.status)) {
 						
-						// If the Successor Task is in the Planned or Pending state, we can check to see if it makes sense to set to READY
-						if ([AssetCommentStatus.PLANNED, AssetCommentStatus.PENDING].contains(successorTask.status)) {
-							
-							// See if there are any predecessor tasks dependencies for the successor that are not DONE
-							def sql = "$predCountSQL ${successorTask.id}"
-							def predCount = jdbcTemplate.queryForInt(sql)
-							//def predCount = jdbcTemplate.queryForInt(predCountSQL, [successorTask.id]) -- this was NOT working...
-							// log.info "updateTaskSuccessors: predCount=$predCount, $sql"
-							if (predCount > 0) {
-								log.info "updateTaskSuccessors: found ${predCount} task(s) not in the DONE state"
-							} else {
+						// See if there are any predecessor tasks dependencies for the successor that are not DONE
+						def sql = "$predCountSQL ${successorTask.id}"
+						def predCount = jdbcTemplate.queryForInt(sql)
+						//def predCount = jdbcTemplate.queryForInt(predCountSQL, [successorTask.id]) -- this was NOT working...
+						// log.info "updateTaskSuccessors: predCount=$predCount, $sql"
+						if (predCount > 0) {
+							log.info "updateTaskSuccessors: found ${predCount} task(s) not in the DONE state"
+						} else {
 
-								def setStatusTo = AssetCommentStatus.READY
-								if (successorTask.role == AssetComment.AUTOMATIC_ROLE) {
-									// If this is an automated task, we'll mark it DONE instead of READY and indicate that it was completed by
-									// the Automated Task person.
-									setStatusTo = AssetCommentStatus.DONE
-									// whom = taskService.getAutomaticPerson()	// don't need this since it is duplicated
-								}
-									
-								log.info "updateTaskSuccessors: pred task(#:${task.taskNumber} Id:${task.id}) triggering successor task (#:${successorTask.taskNumber} Id:${successorTask.id}) to $setStatusTo by $whom"
-								taskService.setTaskStatus(successorTask, setStatusTo, whom, isPM)
-								// log.info "taskStatusChangeEvent: successorTask(${successorTask.id}) Making READY - Successful"
-								if ( ! successorTask.validate() ) {
-									msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed READY of successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom : " + GormUtil.allErrorsString(successorTask)
+							def setStatusTo = AssetCommentStatus.READY
+							if (successorTask.role == AssetComment.AUTOMATIC_ROLE) {
+								// If this is an automated task, we'll mark it DONE instead of READY and indicate that it was completed by
+								// the Automated Task person.
+								setStatusTo = AssetCommentStatus.DONE
+								// whom = taskService.getAutomaticPerson()	// don't need this since it is duplicated
+							}
+								
+							log.info "updateTaskSuccessors: pred task(#:${task.taskNumber} Id:${task.id}) triggering successor task (#:${successorTask.taskNumber} Id:${successorTask.id}) to $setStatusTo by $whom"
+							taskService.setTaskStatus(successorTask, setStatusTo, whom, isPM)
+							// log.info "taskStatusChangeEvent: successorTask(${successorTask.id}) Making READY - Successful"
+							if ( ! successorTask.validate() ) {
+								msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed READY of successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) - $whom : " + GormUtil.allErrorsString(successorTask)
+								log.error msg
+							} else {				
+								if ( successorTask.save(flush:true) ) {
+									msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) Saved - $whom"
+									success = true
+								} else {
+									msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed setting successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY - $whom : " + 
+										GormUtil.allErrorsString(successorTask)
 									log.error msg
-								} else {				
-									if ( successorTask.save(flush:true) ) {
-										msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) Saved - $whom"
-										success = true
-									} else {
-										msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id}) failed setting successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) to READY - $whom : " + 
-											GormUtil.allErrorsString(successorTask)
-										log.error msg
-										success=false
-									}
+									success=false
 								}
 							}
-						} else {
-							log.warn "updateTaskSuccessors: taskId(#:${task.taskNumber} Id:${task.id}) found successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) " + 
-								"in unexpected status (${successorTask.status} by $whom"
-						} 
-					} // succDependencies?.each()
-				} // if ( status ==	AssetCommentStatus.DONE )
+						}
+					} else {
+						log.warn "updateTaskSuccessors: taskId(#:${task.taskNumber} Id:${task.id}) found successor task(#:${successorTask.taskNumber} Id:${successorTask.id}) " + 
+							"in unexpected status (${successorTask.status} by $whom"
+					} 
+				} // succDependencies?.each()
+			} // if ( status ==	AssetCommentStatus.DONE )
 
-				// Rollback the transaction if we ran into any errors
-				if ( ! success ) {
-					trxStatus.setRollbackOnly()
-				}
+			// Rollback the transaction if we ran into any errors
+			if ( ! success ) {
+				trxStatus.setRollbackOnly()
+			}
 
-			} // AssetComment.withTransaction {}
-
-		} catch(e) {
-			msg = "updateTaskSuccessors: task(#:${task.taskNumber} Id:${task.id})\n$e"
-			success = false
-		}
+		} // AssetComment.withTransaction {}
 
 		if (success) {
 			log.info msg
