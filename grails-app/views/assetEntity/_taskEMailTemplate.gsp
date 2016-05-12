@@ -20,7 +20,7 @@
 		</tr>
 		<tr style="margin-top: 10px">
          <td valign="top" class="name" ><label for="dueDate"><b>Due Date:</b></label></td>
-         <td valign="top" class="value" id="dueDatesId" ><tds:convertDate date="${assetComment.dueDate}" /></td>
+         <td valign="top" class="value" id="dueDatesId" ><tds:convertDate date="${assetComment.dueDate}" endian="${dateFormat}" /></td>
         </tr> 
         <tr style="margin-top: 10px">
 			<td valign="top" class="name" ><label for="category"><b> Event/Phase</b></label></td>
@@ -48,7 +48,7 @@
 				<g:each in="${notes}" var="note">
 					<tr>
 						<td>
-							<tds:convertDate date="${note.dateCreated}"  />
+							<tds:convertDate date="${note.dateCreated}" endian="${dateFormat}"/>
 						</td>
 						<td>${note.createdBy }</td>
 						<td>${note.note }</td>

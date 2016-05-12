@@ -527,6 +527,13 @@ class CommentService {
 		
 		log.info "sendTaskEMail: taskId=${taskId} to=${assignedTo.id}/${assignedTo.email}"
 		
+		if(assignedTo?.userLogin){
+			def dateFormat = userPreferenceService.getPreferenceByUserAndCode(assignedTo?.userLogin, "CURR_DT_FORMAT")
+			if(dateFormat){
+				userDTFormat = dateFormat
+			}
+		}
+		
 		mailService.sendMail {
 			to assignedTo.email
 			subject "${sub}"
@@ -535,6 +542,7 @@ class CommentService {
 				model: assetCommentModel(assetComment, tzId, userDTFormat)
 			)
 		}
+
 	}
 	
 	/**
@@ -565,6 +573,7 @@ class CommentService {
 			moveEvent:assetComment.moveEvent,
 			createdBy:createdBy, dtCreated:dtCreated, dtResolved:dtResolved, dueDate:dueDate,
 			resolvedBy:resolvedBy, assignedTo:assetComment.assignedTo,
+			dateFormat: userDTFormat,
 			notes:notes ]
 	}
 	
