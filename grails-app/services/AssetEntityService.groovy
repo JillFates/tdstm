@@ -1791,9 +1791,14 @@ class AssetEntityService {
 	 * export cabling data.
 	 * @param assetCablesList
 	 * @param cablingSheet
+	 * @param progressCount
+	 * @param progressTotal
+	 * @param updateOnPercent
 	 */
-	def cablingReportData( assetCablesList, cablingSheet ){
+	def cablingReportData( assetCablesList, cablingSheet, progressCount, progressTotal, updateOnPercent, key){
 		for ( int r = 2; r <= assetCablesList.size(); r++ ) {
+			progressCount++
+			updateProgress(key, progressCount, progressTotal, 'In progress', 0.01)
 			addCell(cablingSheet, r, 0, String.valueOf(assetCablesList[r-2].assetFromPort?.type ))
 			addCell(cablingSheet, r, 1, assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
 			addCell(cablingSheet, r, 2, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" ))
@@ -2166,9 +2171,10 @@ class AssetEntityService {
 	 * @param progressCount progress count
 	 * @param progressTotal total number of items
 	 * @param description description used on update
+	 * @param updateOnPercent used to determine the step size for updating the progress bar.
 	 **/
-	private void updateProgress(key, progressCount, progressTotal, description) {
-		def stepSize = Math.round(progressTotal * 0.05)
+	private void updateProgress(key, progressCount, progressTotal, description, updateOnPercent = 0.05) {
+		int stepSize = Math.round(progressTotal * updateOnPercent)
 		if ((progressTotal > 0) && (stepSize > 0) && ((progressCount % stepSize) == 0)) {
 			progressService.update(key, ((int)((progressCount / progressTotal) * 100)), description)
 		}
@@ -2306,11 +2312,19 @@ class AssetEntityService {
 				//queryParams.bundles = bundles
 			}
 			
-
+			/*
+				The following size related variables are used to
+				update the progress meter.
+			*/
 			int assetSize = 0
 			int appSize = 0
 			int dbSize = 0
 			int fileSize = 0
+			int roomSize = 0
+			int rackSize = 0
+			int commentSize = 0
+			int cablingSize = 0
+			int dependencySize = 0
 
 			def getScrollableResults = { q, qParams ->
 				def hqlQuery = session.createQuery(q)
@@ -2335,24 +2349,54 @@ class AssetEntityService {
 				String deviceQuery = "FROM AssetEntity d" + query + " AND d.assetClass='${AssetClass.DEVICE}'"
 				asset = getScrollableResults(deviceQuery, queryParams)
 				assetSize = countRows(deviceQuery, queryParams)
+				progressTotal += assetSize
 			}
 			if ( doApp ) {
 				String applicationQuery = "FROM Application d" + query
 				application = getScrollableResults(applicationQuery, queryParams)	
 				appSize = countRows(applicationQuery, queryParams)
-				
+				progressTotal += appSize
 			}
 			if ( doDB ) {
 				String databaseQuery = "FROM Database d" + query
 				database = getScrollableResults(databaseQuery, queryParams)
 				dbSize = countRows(databaseQuery, queryParams)
+				progressTotal += dbSize
 			}
 			if ( doStorage ) {
 				String filesQuery = "FROM Files d" + query
 				files = getScrollableResults(filesQuery, queryParams)
 				fileSize = countRows(filesQuery, queryParams)
-
+				progressTotal += fileSize
 			}
+
+			if(doDependency){
+				dependencySize  = AssetDependency.executeQuery("SELECT COUNT(*) FROM AssetDependency WHERE asset.project = ? ",[project])[0]
+				progressTotal += dependencySize
+			}
+
+			if (doRoom){
+				roomSize = Room.executeQuery("SELECT COUNT(*) FROM Room WHERE project = ?", [project])[0]
+				progressTotal += roomSize
+			}
+
+			if(doRack){
+				rackSize = Rack.executeQuery("SELECT COUNT(*) FROM Rack WHERE project = ?", [project])[0]
+				progressTotal += rackSize
+			}
+
+			if(doCabling){
+				cablingSize = AssetCableMap.executeQuery( "select count(*) from AssetCableMap acm where acm.assetFrom.project = ?", [project])[0]
+				progressTotal += cablingSize
+			}
+
+			if(doComment){
+				commentSize = AssetComment.executeQuery("SELECT COUNT(*) FROM AssetComment WHERE project = ? AND commentType = 'comment' AND assetEntity IS NOT NULL", [project])[0]
+				progressTotal += commentSize
+			}
+
+			// This variable is used to determine when to call the updateProgress
+			float updateOnPercent = 0.01
 
 			// Have to load the maps because we update the column names across the top for all sheets
 			serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Devices" )
@@ -2360,8 +2404,6 @@ class AssetEntityService {
 			dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 			fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
 			
-			// Compute the total assets to be exported, used for progress meter
-			progressTotal = assetSize + appSize + dbSize + fileSize
 			
 			//get template Excel
 			def book
@@ -2565,7 +2607,7 @@ class AssetEntityService {
 						deviceCount++
 					//for ( int r = 1; r <= assetSize; r++ ) {
 						progressCount++
-						updateProgress(key, progressCount, progressTotal, 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						
 						//Add assetId for walkthrough template only.
 						if( serverSheetColumnNames.containsKey("assetId") ) {
@@ -2649,7 +2691,7 @@ class AssetEntityService {
 					while(application.next()){
 						def app = application.get(0)
 						progressCount++
-						updateProgress(key, progressCount, progressTotal, 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						applicationCount++
 
 						// Add the appId column to column 0 if it exists
@@ -2731,7 +2773,7 @@ class AssetEntityService {
 						def currentDatabase = database.get(0)
 						progressCount++
 						databaseCount++
-						updateProgress(key, progressCount, progressTotal, 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						//Add assetId for walkthrough template only.
 						if( dbSheetColumnNames.containsKey("dbId") ) {
 							addCell(dbSheet, databaseCount, 0, (currentDatabase.id), Cell.CELL_TYPE_NUMERIC)
@@ -2783,7 +2825,7 @@ class AssetEntityService {
 						def currentFile = files.get(0)
 						progressCount++
 						filesCount++
-						updateProgress(key, progressCount, progressTotal, 'In progress')
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						
 						// Add assetId for walkthrough template only.
 						if ( storageSheetColumnNames.containsKey("filesId") ) {
@@ -2838,7 +2880,9 @@ class AssetEntityService {
 					for ( int r = 1; r <= dependentSize; r++ ) {
 						//Add assetId for walkthrough template only.
 						addCell(dependencySheet, r, 0, (assetDependent[r-1].id), Cell.CELL_TYPE_NUMERIC)
-
+						progressCount++
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
+					
 						for ( int coll = 0; coll < dependencyColumnNameList.size(); coll++ ) {
 							def addContentToSheet
 							switch(DTAMap[coll]){
@@ -2880,7 +2924,6 @@ class AssetEntityService {
 					def roomSheet = getWorksheet('Room')
 
 					def rooms = Room.findAllByProject(project)
-					def roomSize = rooms.size()
 					def roomMap = ['roomId':'id', 'Name':'roomName', 'Location':'location', 'Depth':'roomDepth', 'Width':'roomWidth',
 									 'Source':'source', 'Address':'address', 'City':'city', 'Country':'country', 'StateProv':'stateProv',
 									 'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
@@ -2894,6 +2937,8 @@ class AssetEntityService {
 					}
 					roomSheetColumns.removeAll('')
 					for ( int r = 1; r <= roomSize; r++ ) {
+						progressCount++
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						roomSheetColumns.eachWithIndex{column, i->
 							def addContentToSheet
 							if(column == 'roomId'){
@@ -2922,7 +2967,6 @@ class AssetEntityService {
 					def rackSheet = getWorksheet('Rack')
 
 					def racks = Rack.findAllByProject(project)
-					def rackSize = racks.size()
 					def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
 									 'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
 									 'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
@@ -2936,6 +2980,8 @@ class AssetEntityService {
 					}
 					rackSheetColumns.removeAll('')
 					for ( int r = 1; r <= rackSize; r++ ) {
+						progressCount++
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						rackSheetColumns.eachWithIndex{column, i->
 							def addContentToSheet
 							if(column == 'rackId'){
@@ -2967,7 +3013,8 @@ class AssetEntityService {
 
 				log.debug("export() Cabling found ${sizeOf(cablingList)} mappings")
 
-				cablingReportData(cablingList, cablingSheet)
+				cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
+				progressCount += cablingSize
 				log.info "export() processing Cabling took ${TimeUtil.elapsed([started])}"
 			}
 
@@ -2998,6 +3045,8 @@ class AssetEntityService {
 					def category
 					def comment
 					for(int cr=1 ; cr<=commentList.size() ; cr++){
+						progressCount++
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						def dateCommentCreated = ''
 						if (commentList[cr-1].dateCreated) {
 							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, commentList[cr-1].dateCreated, TimeUtil.FORMAT_DATE)
