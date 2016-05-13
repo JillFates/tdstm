@@ -2215,9 +2215,10 @@ class AssetEntityService {
 
 		try {
 			def stopwatch = new StopWatch()
-		
+			stopwatch.start()
+	
 			java.io.File temp = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
-			temp.deleteOnExit();
+			temp.deleteOnExit()
 			
 			progressService.updateData(key, 'filename', temp.getAbsolutePath())
 			
@@ -2328,13 +2329,15 @@ class AssetEntityService {
 
 			def getScrollableResults = { q, qParams ->
 				def hqlQuery = session.createQuery(q)
+				hqlQuery.setReadOnly(true)
 				qParams.each{k, v ->
-						hqlQuery.setParameter(k, v)
+					hqlQuery.setParameter(k, v)
 				}
 
 				return hqlQuery.scroll(ScrollMode.FORWARD_ONLY)
 			}
 
+			log.info "export() Initial loading took ${stopwatch.lap()}"
 
 			def countRows = { q, qParams ->
 				def tmpQueryStr = "SELECT COUNT(*) " + q
@@ -2370,30 +2373,32 @@ class AssetEntityService {
 				progressTotal += fileSize
 			}
 
-			if(doDependency){
+			if (doDependency) {
 				dependencySize  = AssetDependency.executeQuery("SELECT COUNT(*) FROM AssetDependency WHERE asset.project = ? ",[project])[0]
 				progressTotal += dependencySize
 			}
 
-			if (doRoom){
+			if (doRoom) {
 				roomSize = Room.executeQuery("SELECT COUNT(*) FROM Room WHERE project = ?", [project])[0]
 				progressTotal += roomSize
 			}
 
-			if(doRack){
+			if (doRack) {
 				rackSize = Rack.executeQuery("SELECT COUNT(*) FROM Rack WHERE project = ?", [project])[0]
 				progressTotal += rackSize
 			}
 
-			if(doCabling){
+			if (doCabling) {
 				cablingSize = AssetCableMap.executeQuery( "select count(*) from AssetCableMap acm where acm.assetFrom.project = ?", [project])[0]
 				progressTotal += cablingSize
 			}
 
-			if(doComment){
+			if (doComment) {
 				commentSize = AssetComment.executeQuery("SELECT COUNT(*) FROM AssetComment WHERE project = ? AND commentType = 'comment' AND assetEntity IS NOT NULL", [project])[0]
 				progressTotal += commentSize
 			}
+
+			log.info "export() Getting row counts took ${stopwatch.lap()}"
 
 			// This variable is used to determine when to call the updateProgress
 			float updateOnPercent = 0.01
@@ -2403,11 +2408,9 @@ class AssetEntityService {
 			appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
 			dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 			fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
-			
-			
+					
 			//get template Excel
 			def book
-			stopwatch.start()
 
 			def filenametoSet = dataTransferSetInstance.templateFilename
 			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
@@ -2426,7 +2429,7 @@ class AssetEntityService {
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
-			log.info "export() Initial loading took ${stopwatch.lap()}"
+			log.info "export() Loading DTAMaps took ${stopwatch.lap()}"
 
 			String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
 			List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
@@ -2664,7 +2667,7 @@ class AssetEntityService {
 						}
 						GormUtil.flushAndClearSession(session, deviceCount)
 					}
-					log.info "export() processing Devices took ${stopwatch.lap()}"
+					log.info "export() processing Devices took ${stopwatch.lap()} for $assetSize rows"
 				}
 
 				//
@@ -2754,7 +2757,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, applicationCount)
 					}
-					log.info "export() processing Applications took ${stopwatch.lap()}"
+					log.info "export() processing Applications took ${stopwatch.lap()} for $appSize rows"
 				}
 
 				//
@@ -2806,7 +2809,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, databaseCount)
 					}
-					log.info "export() processing Databases took ${stopwatch.lap()}"
+					log.info "export() processing Databases took ${stopwatch.lap()} for $dbSize rows"
 				}
 
 				//
@@ -2856,7 +2859,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, filesCount)
 					}
-					log.info "export() processing Logical Storage took ${stopwatch.lap()}"
+					log.info "export() processing Logical Storage took ${stopwatch.lap()} for $fileSize"
 				}
 				
 				//
@@ -2867,7 +2870,7 @@ class AssetEntityService {
 					exportedEntity += "X"
 					def dependencySheet = getWorksheet('Dependencies')
 
-					def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project])
+					def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project], [readOnly:true])
 					def dependencyMap = ['AssetId':1,'AssetName':2,'AssetType':3,'DependentId':4,'DependentName':5,'DependentType':6,'Type':7, 'DataFlowFreq':8, 'DataFlowDirection':9, 'status':10, 'comment':11, 'c1':12, 'c2':13, 'c3':14, 'c4':15]
 					def dependencyColumnNameList = ['AssetId','AssetName','AssetType','DependentId','DependentName','DependentType','Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment', 'c1', 'c2', 'c3', 'c4']
 					def DTAMap = [0:'asset',1:'assetName',2:'assetType',3:'dependent',4:'dependentName',5:'dependentType',6:'type', 7:'dataFlowFreq', 8:'dataFlowDirection', 9:'status', 10:'comment', 11:'c1', 12:'c2', 13:'c3', 14:'c4']
@@ -2906,7 +2909,7 @@ class AssetEntityService {
 							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
 						}
 					}
-					log.info "export() processing Dependencies took ${stopwatch.lap()}"
+					log.info "export() processing Dependencies took ${stopwatch.lap()} for $dependentSize rows"
 				}
 
 				//
@@ -2919,7 +2922,7 @@ class AssetEntityService {
 
 					def roomSheet = getWorksheet('Room')
 
-					def rooms = Room.findAllByProject(project)
+					def rooms = Room.findAllByProject(project, [readOnly:true])
 					def roomMap = ['roomId':'id', 'Name':'roomName', 'Location':'location', 'Depth':'roomDepth', 'Width':'roomWidth',
 									 'Source':'source', 'Address':'address', 'City':'city', 'Country':'country', 'StateProv':'stateProv',
 									 'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
@@ -2950,7 +2953,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() processing Rooms took ${stopwatch.lap()}"
+					log.info "export() processing Rooms took ${stopwatch.lap()} for $roomSize rows"
 				}
 				
 				//
@@ -2962,7 +2965,7 @@ class AssetEntityService {
 
 					def rackSheet = getWorksheet('Rack')
 
-					def racks = Rack.findAllByProject(project)
+					def racks = Rack.findAllByProject(project, [readOnly:true])
 					def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
 									 'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
 									 'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
@@ -2990,7 +2993,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() processing Racks took ${stopwatch.lap()}"
+					log.info "export() processing Racks took ${stopwatch.lap()} for $rackSize rows"
 				}
 				
 			}
@@ -3003,15 +3006,17 @@ class AssetEntityService {
 
 				exportedEntity += "c"
 
-				def cablingSheet = getWorksheet("Cabling")
+				if (cablingSize > 0) {
+					def cablingSheet = getWorksheet("Cabling")
 
-				def cablingList = AssetCableMap.findAll( "from AssetCableMap acm where acm.assetFrom.project.id = $project.id " )
+					def cablingList = AssetCableMap.findAll( "from AssetCableMap acm where acm.assetFrom.project.id=?", [project.id], [readOnly:true] )
 
-				log.debug("export() Cabling found ${sizeOf(cablingList)} mappings")
+					log.debug("export() Cabling found ${sizeOf(cablingList)} mappings")
 
-				cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
-				progressCount += cablingSize
-				log.info "export() processing Cabling took ${stopwatch.lap()}"
+					cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
+					progressCount += cablingSize
+				}
+				log.info "export() processing Cabling took ${stopwatch.lap()} for $cablingSize rows"
 			}
 
 			//
@@ -3022,47 +3027,50 @@ class AssetEntityService {
 
 				exportedEntity += "M"
 
-				def commentSheet = getWorksheet("Comments")
+				if (commentSize > 0) {
+					def commentSheet = getWorksheet("Comments")
 
-
-				List commentList = AssetComment.withCriteria {
-					and {
-						eq('project', project)
-						eq('commentType', 'comment')
-						isNotNull('assetEntity')
-					} 
-				}
-
-				if (commentList.size() > 0) {
-					def assetId
-					def createdDate
-					def createdBy
-					def commentId
-					def category
-					def comment
-					for(int cr=1 ; cr<=commentList.size() ; cr++){
-						progressCount++
-						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-						def dateCommentCreated = ''
-						if (commentList[cr-1].dateCreated) {
-							dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, commentList[cr-1].dateCreated, TimeUtil.FORMAT_DATE)
+					def c = AssetComment.createCriteria()				
+					List commentList = c {
+						and {
+							eq('project', project)
+							eq('commentType', 'comment')
+							isNotNull('assetEntity')
+							setReadOnly true
 						} 
+					}
 
-						addCell(commentSheet, cr, 0, String.valueOf(commentList[cr-1].id))
+					if (commentList.size() > 0) {
+						def assetId
+						def createdDate
+						def createdBy
+						def commentId
+						def category
+						def comment
+						for(int cr=1 ; cr<=commentList.size() ; cr++){
+							progressCount++
+							updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
+							def dateCommentCreated = ''
+							if (commentList[cr-1].dateCreated) {
+								dateCommentCreated = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, commentList[cr-1].dateCreated, TimeUtil.FORMAT_DATE)
+							} 
 
-						addCell(commentSheet, cr, 1, commentList[cr-1].assetEntity.id, Cell.CELL_TYPE_NUMERIC)
+							addCell(commentSheet, cr, 0, String.valueOf(commentList[cr-1].id))
 
-						addCell(commentSheet, cr, 2, String.valueOf(commentList[cr-1].category))
+							addCell(commentSheet, cr, 1, commentList[cr-1].assetEntity.id, Cell.CELL_TYPE_NUMERIC)
 
-						addCell(commentSheet, cr, 3, String.valueOf(dateCommentCreated))
+							addCell(commentSheet, cr, 2, String.valueOf(commentList[cr-1].category))
 
-						addCell(commentSheet, cr, 4, String.valueOf(commentList[cr-1].createdBy))
+							addCell(commentSheet, cr, 3, String.valueOf(dateCommentCreated))
 
-						addCell(commentSheet, cr, 5, String.valueOf(commentList[cr-1].comment))
+							addCell(commentSheet, cr, 4, String.valueOf(commentList[cr-1].createdBy))
+
+							addCell(commentSheet, cr, 5, String.valueOf(commentList[cr-1].comment))
+						}
 					}
 				}
 
-				log.info "export() processing Comments took ${stopwatch.lap()}"
+				log.info "export() processing Comments took ${stopwatch.lap()} for $commentSize rows"
 			}
 
 			//
