@@ -36,7 +36,7 @@ class TimeUtil {
 	def static final FORMAT_DATE         = "MM/dd/yyyy"
 	def static final FORMAT_DATE_TIME    = "MM/dd/yyyy hh:mm a"
 	def static final FORMAT_DATE_TIME_2  = "MM-dd-yyyy hh:mm:ss a"
-	def static final FORMAT_DATE_TIME_3  = "E, d MMM 'at ' HH:mma"
+	def static final FORMAT_DATE_TIME_3  = "E, d MMM 'at ' hh:mm a"
 	def static final FORMAT_DATE_TIME_4  = "MM/dd kk:mm"
 	def static final FORMAT_DATE_TIME_5  = "yyyyMMdd"
 	def static final FORMAT_DATE_TIME_6  = "yyyy-MM-dd"
@@ -629,7 +629,7 @@ class TimeUtil {
 					formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a")
 				break
 			case FORMAT_DATE_TIME_3:
-				formatter = new SimpleDateFormat("E, d MMM 'at ' HH:mma")
+				formatter = new SimpleDateFormat("E, d MMM 'at ' hh:mm a")
 				break
 			case FORMAT_DATE_TIME_4:
 				if (isMiddleEndian)
