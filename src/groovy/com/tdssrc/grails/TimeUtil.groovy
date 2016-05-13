@@ -338,7 +338,7 @@ class TimeUtil {
 	 **/
 	public static String formatDate(HttpSession session, Date dateValue) {
 		def formatter = createFormatter(session, FORMAT_DATE)
-		return formatDateTime(session, dateValue, formatter)
+		return formatDate(dateValue, formatter)
 	}
 
 	/**
