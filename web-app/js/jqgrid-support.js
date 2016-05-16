@@ -113,19 +113,19 @@ function initCheck() {
 }
 
 // handles positioning of the header on non-jqgrid tables
-function handleHeaderPositionGeneral (scrollLimit, header, top, left) {
+function handleHeaderPositionGeneral (scrollLimit, header, top, left, eventType) {
 	var scroll = $(document).scrollTop();
 	
 	if (scroll > scrollLimit) {
-		freezeHeaderGeneral(header, top, left);
+		freezeHeaderGeneral(header, top, left, eventType);
 	} else {
 		unfreezeHeaderGeneral(header);
 	}
 }
 
 // Freezes the header at the top of the window for non-jqgrid tables
-function freezeHeaderGeneral (header, top, left) {
-	if (header.parent().children('.floatingHeader').size() == 0) {
+function freezeHeaderGeneral (header, top, left, eventType) {
+	if (header.parent().children('.floatingHeader').size() == 0 || eventType === 'resize') {
 		var clone = header.clone();
 		clone.attr('class', 'floatingHeader');
 		clone.css('left', Math.floor(left) + 'px');
@@ -138,6 +138,8 @@ function freezeHeaderGeneral (header, top, left) {
 				});
 			}
 		});
+		// Even when the width is calculated per column, due the position:fixed we need to set the width to the table
+		clone.css('width', header.width());
 		header.parent().append(clone);
 	}
 }

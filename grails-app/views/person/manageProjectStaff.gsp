@@ -118,21 +118,31 @@
 				$(window).scroll( function() {
 					handleHeader();
 				});
+
 				handleHeader();
+
+				// watch out, this code detect when the screen has just finished his resize event.
+				var toResize;
+				$(window).resize(function() {
+					clearTimeout(toResize);
+					toResize = setTimeout(function() {
+						handleHeader('resize');
+					}, 100);
+				});
 
 				$("#unselectDialog").dialog({
       				autoOpen: false,
     			});
     			
-			})
+			});
 			
-			function handleHeader () {
+			function handleHeader (eventType) {
 
 				if($('#staffingTable').length > 0) {
 					var scrollLimit = $('#staffingTable').offset().top;
 					var header = $('#headerRowId');
 					var leftOffset = header.offset().left;
-					handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset);
+					handleHeaderPositionGeneral(scrollLimit, header, 0, leftOffset, eventType);
 				}
 			}
 
