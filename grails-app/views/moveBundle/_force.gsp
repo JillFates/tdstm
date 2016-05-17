@@ -41,6 +41,7 @@ line.link.selected {
 if (GraphUtil.force != null) {
 	GraphUtil.force.stop()
 }
+
 GraphUtil.force = d3.layout.force();
 var canvas = d3.select("div#item1")
 	.append("div")
@@ -73,6 +74,7 @@ var zoomBehavior;
 var vis = canvas;
 var background;
 var defaults = ${defaultsJson};
+var depGroup = ${depGroup}; // specify the Group
 var defaultPrefs = ${defaultPrefs};
 var selectedBundle = '${dependencyBundle}';
 var assetTypes = ${assetTypesJson};
@@ -115,7 +117,7 @@ var cancelCut = false;
 
 // Build the layout model
 function buildMap (charge, linkSize, friction, theta, width, height) {
-	
+
 	// Use the new parameters, or the defaults if not specified
 	var charge 	 =	( charge	? charge 	: defaults['force'] 	);
 	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	);
@@ -500,8 +502,6 @@ function toggleNodeSelection (id) {
 	
 	var node = GraphUtil.force.nodes()[id];
 	
-	console.log(node);
-	
 	// check if we are selecting or deselecting
 	if (nodeSelected == id) {
 		// deselecting
@@ -615,11 +615,13 @@ function resizeGraph (width, height) {
 
 // centers the view onto the graph
 function centerGraph () {
+	//debugger;
 	var ranges = getGraphRanges();
 	var visWidth = ranges.maxX - ranges.minX;
 	var visHeight = ranges.maxY - ranges.minY;
 	
 	var dimensions = getDimensionsForOptimizing();
+
 	var graphWidth = dimensions.graphWidth;
 	var graphHeight = dimensions.graphHeight;
 	
@@ -634,10 +636,15 @@ function centerGraph () {
 	var translateAfter = [translateXAfter, translateYAfter];
 	
 	scaleAfter = Math.min(scaleAfter, 2.0);
-	
+
+
 	if (scaleAfter < 2) {
 		zoomBehavior.scale(scaleAfter);
 		zoomBehavior.translate(translateAfter);
+	} if(visWidth > 40000 && visHeight > 40000 && depGroup === 0){
+		// We are dealing with big, huge Graph
+		zoomBehavior.scale(0.37892914162759944);
+		zoomBehavior.translate([527.9102296165405, 185.33142583118914]);
 	} else {
 		zoomBehavior.scale(1);
 		zoomBehavior.translate([0, 0]);
