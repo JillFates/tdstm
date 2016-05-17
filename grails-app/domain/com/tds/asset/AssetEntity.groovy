@@ -505,6 +505,14 @@ class AssetEntity extends com.tdssrc.eav.EavEntity {
 		return ( assetClass==AssetClass.DEVICE && (model?.assetType==AssetType.BLADE.toString() || assetType==AssetType.BLADE.toString() ) )
 	}
 
+	/**
+	 * Determines if the asset is a Chassis.
+	 * @return Boolean true if the asset is a chassis, false otherwise.
+	 */
+	def isaChassis(){
+		return this.assetType in AssetType.getBladeChassisTypes()
+	}
+
 	/*
 	// Used to get the super class of the asset such as Application or Database
 	def getSuperObject(readonly = false) {

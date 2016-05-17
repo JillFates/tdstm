@@ -962,7 +962,10 @@ class AssetEntityService {
 			where assetTo = :asset""", [asset:assetEntity])
 		AssetDependency.executeUpdate("delete AssetDependency where asset = :asset or dependent = :dependent ",[asset:assetEntity, dependent:assetEntity])
 		AssetDependencyBundle.executeUpdate("delete from AssetDependencyBundle ad where ad.asset = :asset",[asset:assetEntity])
+		AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.sourceChassis = NULL WHERE ae.sourceChassis=:asset", [asset:assetEntity])
+		AssetEntity.executeUpdate("UPDATE AssetEntity ae SET ae.targetChassis = NULL WHERE ae.targetChassis=:asset", [asset:assetEntity])
 	}
+
 	
 	/**
 	 * Used to gather all of the assets for a project by asset class with option to return just individual classes

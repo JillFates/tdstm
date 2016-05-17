@@ -3,7 +3,13 @@
 	<span class="button"><input type="button" class="edit" value="Edit" onclick="EntityCrud.showAssetEditView('${assetEntity.assetClass}', ${assetEntity?.id});" /> </span>
 </tds:hasPermission>
 <tds:hasPermission permission='AssetDelete'>
-	<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>
+	<g:if test="${deleteChassisWarning}">
+		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Deleting the chassis will clear the reference to the chassis for these blades. Click OK to continue otherwise click Cancel');" value="Delete" /> </span>
+	</g:if>
+	<g:else>
+		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>	
+	</g:else>
+	
 </tds:hasPermission>
 
 <a href="javascript:createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">

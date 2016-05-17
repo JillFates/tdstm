@@ -91,6 +91,12 @@ class DeviceService {
 		def attributeOptions
 		def options
 		def frontEndLabel
+		boolean deleteChassisWarning = false
+
+		if(assetEntity.isaChassis()){
+			int count = AssetEntity.executeQuery("SELECT COUNT(*) FROM AssetEntity WHERE sourceChassis=:sc OR targetChassis=:tc",[sc: assetEntity, tc: assetEntity])[0]
+			deleteChassisWarning = count > 0
+		}
 
 		entityAttributeInstance.each{
 			attributeOptions = EavAttributeOption.findAllByAttribute( it.attribute,[sort:'value',order:'asc'] )
@@ -109,7 +115,8 @@ class DeviceService {
 		def model = [
 			assetEntity: assetEntity, 
 			label: frontEndLabel,
-			canEdit: RolePermissions.hasPermission("AssetEdit")
+			canEdit: RolePermissions.hasPermission("AssetEdit"),
+			deleteChassisWarning: deleteChassisWarning
 		]
 
 		model.putAll( assetEntityService.getCommonModelForShows('AssetEntity', project, params, assetEntity) )
