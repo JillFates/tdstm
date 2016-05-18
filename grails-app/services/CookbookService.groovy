@@ -6,6 +6,7 @@ import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap.Values;
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.RowMapper
 
@@ -26,7 +27,7 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
  */
 class CookbookService {
 
-    boolean transactional = true
+		boolean transactional = true
 	static allowedCatalogs = ['Event', 'Bundle', 'Application']
 	static searchAllowedCatalogs = ['All', 'Event', 'Bundle', 'Application']
 
@@ -123,8 +124,8 @@ class CookbookService {
 
 		}
 
-	    result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
-			               currentProject, defaultSourceCode, defaultChangelog, clonedReleasedVersion, loginUser.person)
+			result = createRecipeAndRecipeVersion(recipeName, description, recipeContext,
+										 currentProject, defaultSourceCode, defaultChangelog, clonedReleasedVersion, loginUser.person)
 
 		return result.recipe
 	}
@@ -145,7 +146,7 @@ class CookbookService {
 			throw new UnauthorizedException('User doesn\'t have a EditRecipe permission')
 		}
 
-    	if (loginUser == null || recipeVersionid == null || !recipeVersionid.isNumber() || !name || currentProject == null) {
+			if (loginUser == null || recipeVersionid == null || !recipeVersionid.isNumber() || !name || currentProject == null) {
 			throw new EmptyResultException();
 		}
 		
@@ -198,7 +199,7 @@ class CookbookService {
 		newRecipeVersion.changelog = changelog
 		newRecipeVersion.clonedFrom  = recipeVersion
 		newRecipeVersion.recipe = newRecipe
-    	newRecipeVersion.versionNumber = 0
+			newRecipeVersion.versionNumber = 0
 		newRecipeVersion.createdBy = person
 
 		newRecipeVersion.save(failOnError: true)
@@ -224,7 +225,7 @@ class CookbookService {
 		} else if (project == currentProject) {
 			valid = true
 		} else {
-		    valid = projectService.getUserProjects(loginUser).find() {
+				valid = projectService.getUserProjects(loginUser).find() {
 				return (project.id == it.id)
 			}
 		}
@@ -714,7 +715,7 @@ class CookbookService {
 	 * 
 	 * @return a list of Maps with information about the recipes. See {@link RecipeMapper}
 	 */
-    def findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject) {
+		def findRecipes(isArchived, catalogContext, searchText, projectType, loginUser, currentProject) {
 		def projectIds = []
 		
 		if (projectType == null) {
@@ -736,14 +737,14 @@ class CookbookService {
 					break
 					
 				case 'active':
-				    def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.ACTIVE)
+						def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.ACTIVE)
 					projects.each { project ->
 						projectIds << project.id
 					}
 					break
 					
 				case 'completed':
-				    def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.COMPLETED)
+						def projects = projectService.getUserProjects(loginUser, true, ProjectStatus.COMPLETED)
 					projects.each { project ->
 						projectIds << project.id
 					}
@@ -819,7 +820,7 @@ class CookbookService {
 			""", arguments, new RecipeMapper())
 		
 		return recipes
-    }
+		}
 
 	/**
 	 * Finds the recipes versions for a given recipe id.
@@ -926,14 +927,46 @@ class CookbookService {
 		return recipe
 	}
 
-    /**
-     * Used to convert the Recipe source code from syntax into a Map
-     * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
-     * @return The recipe in a Groovy Map containing the various elements of the recipe
-     * @throws InvalidSyntaxException if the sourcecode is invalid
-     */
-    Map parseRecipeSyntax( sourceCode ) {
-    	def recipe
+	/**
+	 * Used to convert the Recipe source code from syntax into a Map
+	 * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
+	 * @return The recipe in a Groovy Map containing the various elements of the recipe
+	 * @throws InvalidSyntaxException if the sourcecode is invalid
+	 */
+	Map parseRecipeSyntax( sourceCode ) {
+		def recipe
+		if (! sourceCode ) {
+			throw new RuntimeException('Recipe contains no source code')
+		} else {
+			Script script
+			try {
+				GroovyShell groovyShell = new GroovyShell();
+				script = groovyShell.parse("[${sourceCode}]")
+				recipe = script.run()
+
+			} catch (e) {
+				//throw new InvalidSyntaxException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
+				throw new RuntimeException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
+			}finally{
+				if(script){
+					log.info('ϕ CookbookService::parseRecipeSyntax: InvokerHelper.removeClass')					
+					InvokerHelper.removeClass(script.getClass())
+					script = null // just in case
+				}
+			}
+		}
+		return recipe
+	}
+
+	/**
+	 * Used to convert the Recipe source code from syntax into a Map
+	 * Old version Using Eval
+	 * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
+	 * @return The recipe in a Groovy Map containing the various elements of the recipe
+	 * @throws InvalidSyntaxException if the sourcecode is invalid
+	 */
+	Map parseRecipeSyntaxUsingEval( sourceCode ) {
+		def recipe
 		if (! sourceCode ) {
 //			throw new InvalidSyntaxException('Recipe contains no source code')
 			throw new RuntimeException('Recipe contains no source code')
@@ -947,7 +980,7 @@ class CookbookService {
 			}
 		}
 		return recipe
-    }
+	}
 
 	List<Map> validateSyntax( sourceCode ) {
 		try {
@@ -1387,7 +1420,7 @@ class CookbookService {
 										} else {
 											errorList << [ error: 4, reason: 'Invalid Reference', 
 												detail: "$taskRef 'predecessor.taskSpec' contains invalid id reference ($tsid). TaskSpec ids must reference a previously defined TaskSpec." ]
-	 									}
+										}
 									} else {
 										errorList << [ error: 1, reason: 'Invalid syntax', 
 											detail: "$taskRef 'predecessor.taskSpec' contains invalid id ($tsid). Ids must be a positive whole number > 0" ]
@@ -1615,7 +1648,7 @@ class CookbookService {
 		}
 
 		return (errorList ? errorList as List : null)
-    }
+		}
 	
 	void validateGroupReferences(taskRef, fieldName, field, existingGroups, errorList) {
 		if (field) {
