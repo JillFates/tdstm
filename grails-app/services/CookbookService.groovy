@@ -939,8 +939,8 @@ class CookbookService {
 	 * @throws InvalidSyntaxException if the sourcecode is invalid
 	 */
 	Map parseRecipeSyntax( sourceCode ) {	
-		//return parseRecipeSyntaxUsingEval(sourceCode)
-		return parseRecipeSyntaxWithCache(sourceCode)
+		return parseRecipeSyntaxUsingEval(sourceCode)
+		//return parseRecipeSyntaxWithCache(sourceCode)
 	}
 
 	Map parseRecipeSyntaxWithCache( sourceCode ) {		
