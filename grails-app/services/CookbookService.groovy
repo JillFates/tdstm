@@ -1012,7 +1012,10 @@ class CookbookService {
 				throw new RuntimeException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
 			}
 		}
-		return recipe
+
+		Map cloned = SerializationUtils.clone(recipe)
+		return cloned
+		//return recipe
 	}
 
 	List<Map> validateSyntax( sourceCode ) {
