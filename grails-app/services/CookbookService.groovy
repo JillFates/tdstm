@@ -948,18 +948,15 @@ class CookbookService {
 		def md5 = DigestUtils.md5Hex(source)
 		def retVal = CookbookService.sourceCache[md5]
 		if(!retVal){
-			log.info "OLB: CookbookService::parseRecipeSyntax: check syntax"
+			log.debug "OLB: CookbookService::parseRecipeSyntax: check syntax"
 			try{
 				retVal = parseRecipeSyntaxUsingEval(source)
 				
 			}catch(Throwable t){
-				log.info "OLB: ERROR"
 				retVal = t 
 			}	
 			CookbookService.sourceCache[md5] = retVal		
 		}
-
-		//log.info "OLB: RETURN VAL $retVal: ${retVal.getClass()}"
 
 		if(retVal instanceof Throwable){
 			throw retVal
