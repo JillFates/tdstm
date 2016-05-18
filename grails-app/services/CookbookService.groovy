@@ -938,9 +938,10 @@ class CookbookService {
 	 * @return The recipe in a Groovy Map containing the various elements of the recipe
 	 * @throws InvalidSyntaxException if the sourcecode is invalid
 	 */
-	Map parseRecipeSyntax( sourceCode ) {		
-		//return parseRecipeSyntaxUsingEval(sourceCode)
-		return parseRecipeSyntaxWithCache(sourceCode)
+	Map parseRecipeSyntax( sourceCode ) {	
+		log.info "OLB: Using Eval"
+		return parseRecipeSyntaxUsingEval(sourceCode)
+		//return parseRecipeSyntaxWithCache(sourceCode)
 	}
 
 	Map parseRecipeSyntaxWithCache( sourceCode ) {		
