@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.concurrent.ConcurrentHashMap.Values;
+import java.io.*;
 
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -19,6 +20,9 @@ import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.lang3.SerializationUtils
 
 /**
  * The cookbook services handles the logic for creating recipes and running the cookbook
@@ -927,13 +931,45 @@ class CookbookService {
 		return recipe
 	}
 
+	private static sourceCache = [:]
 	/**
 	 * Used to convert the Recipe source code from syntax into a Map
 	 * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
 	 * @return The recipe in a Groovy Map containing the various elements of the recipe
 	 * @throws InvalidSyntaxException if the sourcecode is invalid
 	 */
-	Map parseRecipeSyntax( sourceCode ) {
+	Map parseRecipeSyntax( sourceCode ) {		
+		//return parseRecipeSyntaxUsingEval(sourceCode)
+		return parseRecipeSyntaxWithCache(sourceCode)
+	}
+
+	Map parseRecipeSyntaxWithCache( sourceCode ) {		
+		def source = (sourceCode ?: "").trim()
+		def md5 = DigestUtils.md5Hex(source)
+		def retVal = CookbookService.sourceCache[md5]
+		if(!retVal){
+			log.info "OLB: CookbookService::parseRecipeSyntax: check syntax"
+			try{
+				retVal = parseRecipeSyntaxUsingEval(source)
+				
+			}catch(Throwable t){
+				log.info "OLB: ERROR"
+				retVal = t 
+			}	
+			CookbookService.sourceCache[md5] = retVal		
+		}
+
+		//log.info "OLB: RETURN VAL $retVal: ${retVal.getClass()}"
+
+		if(retVal instanceof Throwable){
+			throw retVal
+		}
+
+		Map cloned = SerializationUtils.clone(retVal)
+		return cloned
+	}
+
+	Map parseRecipeSyntaxUsingGroovyShell( sourceCode ) {
 		def recipe
 		if (! sourceCode ) {
 			throw new RuntimeException('Recipe contains no source code')
@@ -949,7 +985,7 @@ class CookbookService {
 				throw new RuntimeException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
 			}finally{
 				if(script){
-					log.info('ϕ CookbookService::parseRecipeSyntax: InvokerHelper.removeClass')					
+					log.info('CookbookService::parseRecipeSyntax: InvokerHelper.removeClass')					
 					InvokerHelper.removeClass(script.getClass())
 					script = null // just in case
 				}
@@ -1065,7 +1101,7 @@ class CookbookService {
 			def i=0
 			if (key == null) {
 				key = ( type=='task' ? "${spec.id ?: 'UNDEF'}" : "${spec.name ?: 'UNDEF'}")
-				log.warn(key)
+				log.debug(key)
 			}
 			def label = ( type=='task' ? "Task id ${key}" : "Group ${key}" )
 			
