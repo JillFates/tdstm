@@ -74,7 +74,7 @@ var zoomBehavior;
 var vis = canvas;
 var background;
 var defaults = ${defaultsJson};
-var depGroup = ${depGroup}; // specify the Group
+var depGroup = '${depGroup}'; // specify the Group
 var defaultPrefs = ${defaultPrefs};
 var selectedBundle = '${dependencyBundle}';
 var assetTypes = ${assetTypesJson};
@@ -641,7 +641,7 @@ function centerGraph () {
 	if (scaleAfter < 2) {
 		zoomBehavior.scale(scaleAfter);
 		zoomBehavior.translate(translateAfter);
-	} if(visWidth > 40000 && visHeight > 40000 && depGroup === 0){
+	} if(visWidth > 40000 && visHeight > 40000 && depGroup == 0){
 		// We are dealing with big, huge Graph
 		zoomBehavior.scale(0.37892914162759944);
 		zoomBehavior.translate([527.9102296165405, 185.33142583118914]);
