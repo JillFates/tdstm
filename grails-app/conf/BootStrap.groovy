@@ -3,18 +3,19 @@ import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
 import com.tdssrc.eav.*
 import com.tdssrc.grails.GormUtil
-
 import groovy.sql.Sql
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 
 import org.apache.shiro.crypto.hash.Sha256Hash
-
+import grails.util.Environment
 import org.grails.refcode.RefCode
+import java.lang.management.ManagementFactory
 
 class BootStrap {
 	def assetEntityAttributeLoaderService
 	def stateEngineService
 	def init = { servletContext ->
+		checkForBlacklistedVMParameters()
 
 		// Initialize various custom metaclass methods used by the application
 		com.tdsops.metaclass.CustomMethods.initialize
@@ -28,7 +29,9 @@ class BootStrap {
 		if ( grails.util.GrailsUtil.environment.equals("production") ) return
 
 		// createInitialData()
-				
+
+		//LOAD TESTS for dev
+		//testMemoryAllocation()
 	}
 		
 	def destroy = {
@@ -657,6 +660,57 @@ class BootStrap {
 		}
 		assetEntityAttributeLoaderService.uploadEavAttribute(stream)
 	}
+
+	private checkForBlacklistedVMParameters(){
+		def blacklist = ["-Xnoclassgc"]
+
+		def inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments()
+		def blackListArgs = inputArguments.grep{arg->
+			def result = blacklist.find{ el ->
+				arg.contains(el)
+			}
+			return result != null
+		}
+
+		if(blackListArgs.size() > 0){
+			log.warn "*** WARNING ***\n BLACK LISTED ARGUMENTS FOUND IN THE CONFIGURATION!\n This can cause unexpected behaviour on the application, please check that you really want to do this: \n\t $blacklist\n***********************************************************"
+		}
+	}
 	
 
+	/** SOME LOAD TEST ***********/
+	/**
+	 * This test is to check the memory allocation and the PermGen, don't use in production
+	 * related to: TM-4157 (https://support.transitionmanager.com/browse/TM-4157)
+	 */
+	private testMemoryAllocation(){
+		//Use only in development mode
+		if (Environment.current != Environment.DEVELOPMENT) return;
+
+	  log.info "THREAD INICIALIZANDO!!!! LETS KILL THIS GUY"
+		Thread.start {
+		  log.info "Generate a very Big MAP groovy String Code"
+		  def strMap = "["
+			for (int i = 0; i < 1000; i++){
+				if(i>0) strMap += ","
+				strMap += "'$i':'value $i'"
+			}
+			strMap += "]"
+
+			log.info "sz: ${strMap.size()}"
+
+		  for (int i = 10; i > 0; i--){
+		    log.info "THREAD will start in T - $i seconds"
+		    Thread.sleep(1000)
+		  }
+
+		  for (int i = 0; i < 100000; i++) {
+		    //new Person(firstName:'Octavio', lastName:'Luna',title:'Dev')
+        def daMap = Eval.me(strMap)        
+		    Thread.sleep(50)
+		  }
+		  
+		  log.info "THREAD TERMINADO!"
+		}
+	}
 }

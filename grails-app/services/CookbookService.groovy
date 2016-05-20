@@ -931,7 +931,6 @@ class CookbookService {
 		return recipe
 	}
 
-	private static sourceCache = [:]
 	/**
 	 * Used to convert the Recipe source code from syntax into a Map
 	 * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
@@ -939,66 +938,6 @@ class CookbookService {
 	 * @throws InvalidSyntaxException if the sourcecode is invalid
 	 */
 	Map parseRecipeSyntax( sourceCode ) {	
-		return parseRecipeSyntaxUsingEval(sourceCode)
-		//return parseRecipeSyntaxWithCache(sourceCode)
-	}
-
-	Map parseRecipeSyntaxWithCache( sourceCode ) {		
-		def source = (sourceCode ?: "").trim()
-		def md5 = DigestUtils.md5Hex(source)
-		def retVal = CookbookService.sourceCache[md5]
-		if(!retVal){
-			log.debug "OLB: CookbookService::parseRecipeSyntax: check syntax"
-			try{
-				retVal = parseRecipeSyntaxUsingEval(source)
-				
-			}catch(Throwable t){
-				retVal = t 
-			}	
-			CookbookService.sourceCache[md5] = retVal		
-		}
-
-		if(retVal instanceof Throwable){
-			throw retVal
-		}
-
-		Map cloned = SerializationUtils.clone(retVal)
-		return cloned
-	}
-
-	Map parseRecipeSyntaxUsingGroovyShell( sourceCode ) {
-		def recipe
-		if (! sourceCode ) {
-			throw new RuntimeException('Recipe contains no source code')
-		} else {
-			Script script
-			try {
-				GroovyShell groovyShell = new GroovyShell();
-				script = groovyShell.parse("[${sourceCode}]")
-				recipe = script.run()
-
-			} catch (e) {
-				//throw new InvalidSyntaxException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
-				throw new RuntimeException( e.getMessage().replaceAll(/[\r]/, '<br/>') )
-			}finally{
-				if(script){
-					log.info('CookbookService::parseRecipeSyntax: InvokerHelper.removeClass')					
-					InvokerHelper.removeClass(script.getClass())
-					script = null // just in case
-				}
-			}
-		}
-		return recipe
-	}
-
-	/**
-	 * Used to convert the Recipe source code from syntax into a Map
-	 * Old version Using Eval
-	 * @param sourceCode the source code that represents the recipe (presently represents a Groovy Map)
-	 * @return The recipe in a Groovy Map containing the various elements of the recipe
-	 * @throws InvalidSyntaxException if the sourcecode is invalid
-	 */
-	Map parseRecipeSyntaxUsingEval( sourceCode ) {
 		def recipe
 		if (! sourceCode ) {
 //			throw new InvalidSyntaxException('Recipe contains no source code')
@@ -1013,9 +952,7 @@ class CookbookService {
 			}
 		}
 
-		Map cloned = SerializationUtils.clone(recipe)
-		return cloned
-		//return recipe
+		return recipe
 	}
 
 	List<Map> validateSyntax( sourceCode ) {
