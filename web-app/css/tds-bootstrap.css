@@ -42,3 +42,7 @@ form label, * label{
 	display: block !important;
 	visibility: visible !important;
 }
+
+button.btn.dropdown-toggle {
+  height: 34px !important;
+}

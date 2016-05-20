@@ -19,8 +19,23 @@
 	</tabset>
 
 	<div class="completionButtons">
-		<a class="btn btn-default" ng-click="tasks.viewGeneratedResults(this)"><span class="glyphicon glyphicon-tasks"></span> View Results</a>
-		<a class="btn btn-default" ng-click="tasks.viewTaskGraph(this)"><span class="glyphicon glyphicon-stats"></span> View Task Graph</a>
-		<a class="btn btn-default" ng-click="tasks.startOver(this)"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</a>
+		<button class="btn btn-default" ng-click="tasks.viewGeneratedResults(this)"><span class="glyphicon glyphicon-tasks"></span> View Results</button>
+		<div class="btn-group dropup">
+			<button type="button" class="btn btn-default" ng-click="tasks.viewTaskGraph(this)">
+				<span class="glyphicon glyphicon-stats"></span> View Task Graph
+			</button>
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<span class="caret"></span>
+				<span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu">
+				<li>
+					<a ng-click="tasks.viewTaskGraph(this, {target:'_blank'})">
+						<span class="glyphicon glyphicon-new-window"></span> View in New Tab
+					</a>
+				</li>				
+			</ul>
+		</div>
+		<button class="btn btn-default" ng-click="tasks.startOver(this)"><span class="glyphicon glyphicon-arrow-left"></span> Start Over</button>
 	</div>
 </div>

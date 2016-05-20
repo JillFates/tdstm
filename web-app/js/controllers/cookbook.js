@@ -1075,7 +1075,12 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 		state.go('recipes.detail.history.detail.actions', { 'taskBatchId' : id});
 	}
 
-	scope.tasks.viewTaskGraph = function(e){
+	/**
+	 * e: event passed from the caller
+	 * conf: configuration object passed 
+	 */
+	scope.tasks.viewTaskGraph = function(e, conf){
+		conf = conf || {}
 		var eventsArray = scope.contexts.eventsArray;
 		var eventName = scope.tasks.generation.contextName;
 		var eventId = null;
@@ -1085,7 +1090,13 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 				break;
 			}
 		}
-		window.location = utils.url.applyRootPath("/task/taskGraph?moveEventId=" + eventId);
+
+		var location = utils.url.applyRootPath("/task/taskGraph?moveEventId=" + eventId);
+		if(conf.target){ //Open in new Target
+			window.open(location, conf.target);
+		}else{
+			window.location = location;
+		}
 	}
 
 	scope.tasks.startOver = function(e){
