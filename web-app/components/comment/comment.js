@@ -1583,10 +1583,12 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 
 			/**
 			 * Initialized the DataSource for dependency
+			 * This function selects Lazy loading as the Datasource if we have a value already, this is since we can have multiple dependencies
+			 * and it will hit the server with multiple calls
 			 * @param dependency
 			 * @returns {*}
 			 */
-			scope.taskOptionsDS = function(dependency, updatedDependencyList) {				
+			scope.taskOptionsDS = function(dependency, updatedDependencyList) {
 				if(dependency.taskId !== '' && !updatedDependencyList) {
 					return createDataSourceForLazyLoad(dependency);
 				} else {
@@ -1656,7 +1658,6 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 						itemHeight: 20,
 						valueMapper: function(options) {
 							if(options.value && options.value !== '' && ds.initializedWidget) {
-
 								if(ds.loadedDataSource){
 									commentService.getIndexValueMapper(dependency.category, scope.commentId, options.value).then(
 										function(data) {
