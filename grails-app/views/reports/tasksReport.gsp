@@ -34,11 +34,14 @@
 					<th>Date Required</th>
 					<th>Comments</th>
 					<th>Duration</th>
+					<th>Duration Scale</th>
 					<th>Estimated Start</th>
 					<th>Actual Time</th>
 					<th>Estimated Finish</th>
 					<th>Actual Finish</th>
 					<th>WorkFlow Step</th>
+					<th>Category</th>
+					<th>Due Date</th>
 					<th>Created on</th>
 					<th>Created by</th>
 					<th>Event</th>
@@ -83,11 +86,18 @@
 						<td>
 							${task.duration}
 						</td>
+						<td>
+							${task.durationScale}
+						</td>
 						<td><tds:convertDate date="${task.estStart}" /></td>
 						<td><tds:convertDate date="${task.actStart}"  /></td>
 						<td><tds:convertDate date="${task.estFinish }" /></td>
 						<td><tds:convertDate date="${task.dateResolved }"/></td>
 						<td>NA</td>
+						<td>
+							${task.category}
+						</td>
+						<td><tds:convertDate date="${task.dueDate }"/></td>
 						<td>
 							<tds:convertDate date="${task.dateCreated }"/>
 						</td>
