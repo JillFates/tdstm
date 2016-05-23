@@ -1583,7 +1583,7 @@ tds.comments.directive.TaskDependencies = function(commentService, alerts, utils
 
 			/**
 			 * Initialized the DataSource for dependency
-			 * This function selects Lazy loading as the Datasource if we have a value already, this is since we can have multiple dependencies
+			 * [TM-4748] This function selects Lazy loading as the Datasource if we have a value already, this is since we can have multiple dependencies
 			 * and it will hit the server with multiple calls
 			 * @param dependency
 			 * @returns {*}
