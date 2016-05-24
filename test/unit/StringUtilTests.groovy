@@ -161,6 +161,7 @@ class StringUtilTests extends Specification {
 			" .\u00850085. "	| '.~0085.'
 			" [\u007f007f] "	| '[~007f]'
 			" [\u008f008f] "	| '[~008f]'
+			" WHITE SPACE "		| "WHITE+SPACE"
 
 			/*
 			" .\ u000A000A. "	| '.~000A.'
