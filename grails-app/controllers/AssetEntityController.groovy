@@ -1066,8 +1066,11 @@ class AssetEntityController {
 					dependencySkipped--
 				}
 
-				def assetDepTypeList = AssetDependencyType.getList()
-				def assetDepStatusList = AssetDependencyStatus.getList()
+				// def assetDepTypeList = AssetDependencyType.getList()
+				// def assetDepStatusList = AssetDependencyStatus.getList()
+				String lookupQuery = 'select value from AssetOptions where type=? order by value'
+				List assetDepTypeList = AssetOptions.executeQuery(lookupQuery, [ AssetOptions.AssetOptionsType.DEPENDENCY_TYPE ])
+				List assetDepStatusList = AssetOptions.executeQuery(lookupQuery, [ AssetOptions.AssetOptionsType.DEPENDENCY_STATUS ])
 
 				def lookupValue = { value, list ->
 					def result = "Unknown"
@@ -1085,6 +1088,7 @@ class AssetEntityController {
 
 					int rowNum = r+1
 
+					// This will clear the session every 50 rows
 					if (GormUtil.flushAndClearSession(hibernateSession, rowNum)) {
 						(project, userLogin) = GormUtil.mergeWithSession(hibernateSession, [project, userLogin])
 					}
@@ -1092,6 +1096,7 @@ class AssetEntityController {
 					def assetId = null
 					def assetIdCell = WorkbookUtil.getStringCellValue(dependencySheet, 1, r )
 					if (assetIdCell) {
+						// TODO : JPM 5/2016 : upload() why is the dependency processing escaping quotes on columns that should be numbers?
 						assetId = NumberUtils.toDouble(assetIdCell.replace("'","\\'"), 0).round()
 					}
 
@@ -1219,17 +1224,30 @@ class AssetEntityController {
 					if (assetDep) {
 						assetDep.asset = asset
 						assetDep.dependent = dependent
+
 						def tmpType = WorkbookUtil.getStringCellValue(dependencySheet, 7, r, "").replace("'","\\'")
-						assetDep.type = lookupValue(tmpType, assetDepTypeList)
+						def luv = lookupValue(tmpType, assetDepTypeList)
+						if (tmpType && tmpType != 'Unknown' && luv == 'Unknown') {
+							dependencyError "Invalid Type specified ($tmpType) for row $rowNum"
+							continue
+						}
+						assetDep.type = luv
+						
+
+						// TODO : JPM 5/2016 : the status should probably have the same default value as the tmpType above
+						def tmpStatus = WorkbookUtil.getStringCellValue(dependencySheet,10, r , "").replace("'","\\'") ?: 
+							(isNew ? "Unknown" : assetDep.status)
+						luv = lookupValue(tmpStatus, assetDepStatusList)
+						if (tmpStatus != 'Unknown' && luv == 'Unknown') {
+							dependencyError "Invalid Status specified ($tmpStatus) for row $rowNum"
+							continue
+						}
+						assetDep.status = luv
 						
 						assetDep.dataFlowFreq = WorkbookUtil.getStringCellValue(dependencySheet, 8, r, "").replace("'","\\'") ?: 
 							(isNew ? "Unknown" : assetDep.dataFlowFreq)
 						assetDep.dataFlowDirection = WorkbookUtil.getStringCellValue(dependencySheet, 9, r, "").replace("'","\\'") ?: 
 							(isNew ? "Unknown" : assetDep.dataFlowDirection)
-						
-						def tmpStatus = WorkbookUtil.getStringCellValue(dependencySheet,10, r , "").replace("'","\\'") ?: 
-							(isNew ? "Unknown" : assetDep.status)
-						assetDep.status = lookupValue(tmpStatus, assetDepStatusList)
 						
 						def depComment = WorkbookUtil.getStringCellValue(dependencySheet, 11, r , "").replace("'","\\'")
 						def length = depComment.length()
