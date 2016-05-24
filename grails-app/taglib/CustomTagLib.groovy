@@ -15,14 +15,14 @@ class CustomTagLib {
 	/**
 	 * Used to adjust a date to a specified timezone and format to the default (yyyy-MM-dd  kk:mm:ss) or one specified
 	 * @param date - the date to be formated
-	 * @param format - the String format to use to format the date into a string
-   * @param endian - the ENDIAN format to use, fallbacks into session then in default
+	 * @param format - the String format to use to format the date into a string (CURRENTLY NOT USED)
+	 * @param endian - the ENDIAN format to use, fallbacks into session then in default
 	 * @param mockSession - used by tests to pass in a mock session
 	 * @return a date formatted appropriately
 	 */
   def convertDate = { attrs ->
     Date dateValue = attrs['date'];
-    def format = attrs['format']
+    def format
     def endian = attrs['endian']
     def sessionObj = (attrs.containsKey('mockSession') ? attrs.mockSession : session)
     String dateParamClassName = dateValue.getClass().getName().toString();
@@ -32,9 +32,8 @@ class CustomTagLib {
       dateValue.clearTime()
       if (dateParamClassName.equals("java.util.Date") || dateParamClassName.equals("java.sql.Timestamp")) {
         if(!endian) endian = TimeUtil.getUserDateFormat(sessionObj)
-        if(!format) format = TimeUtil.FORMAT_DATE
+		format = TimeUtil.FORMAT_DATE
         DateFormat formatter = TimeUtil.createFormatterForType(endian, format)
-        
         out << TimeUtil.formatDateTimeWithTZ(TimeUtil.defaultTimeZone, dateValue, formatter)
       }
     }
