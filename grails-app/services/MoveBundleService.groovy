@@ -14,6 +14,7 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.StringUtil
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -516,10 +517,12 @@ class MoveBundleService {
 						cellValue = attribName.call( exportList[rowIdx] )
 						break
 					case "taskDependencies":
-						if (viewUnpublished)
+						if (viewUnpublished){
 							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".collect({ e -> e.predecessor == null ? '' : e.predecessor.taskNumber + ' ' + e.predecessor.comment?.toString()}))
-						else
+						}else{
 							cellValue = WebUtil.listAsPipeSepratedString(exportList[r-startRow]."${columnList[c]}".findAll{it.predecessor?.isPublished}.collect({ e -> (e.predecessor == null ? '' : e.predecessor.taskNumber) + ' ' + e.predecessor.comment?.toString()}))
+						}
+						cellValue = StringUtil.ellipsis(cellValue, 32767)
 						break
 					case 'taskNumber':
 						cellValue = exportList[rowIdx].taskNumber
