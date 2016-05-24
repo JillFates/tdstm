@@ -1,6 +1,7 @@
 import grails.converters.JSON
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
+import org.apache.commons.codec.net.URLCodec
 import java.text.SimpleDateFormat
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.shiro.SecurityUtils
@@ -3080,6 +3081,10 @@ class AssetEntityService {
 			// Wrap up the process
 			// 
 			filename += "-"+exportedEntity+"-"+exportDate
+			filename = StringUtil.sanitize(filename)
+
+			URLCodec codec = new URLCodec()
+    		String urlEscaped = codec.encode(filename)
 
 			FileOutputStream out =  new FileOutputStream(temp);
 
