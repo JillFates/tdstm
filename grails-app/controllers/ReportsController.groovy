@@ -1212,7 +1212,7 @@ class ReportsController {
 					  break;
 					  
 				default :
-					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId, viewUnpublished:viewUnpublished]) 
+					 render (view :'tasksReport', model:[taskList : taskList, tzId:tzId, viewUnpublished:viewUnpublished, userDTFormat:userDTFormat, tzId:tzId]) 
 					 break;
 			}
 		} else{
@@ -1242,8 +1242,8 @@ class ReportsController {
 
 		def tasksSheet = book.getSheet("tasks")
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
-					'estStart','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'actFinish', 'workflow', 'category',
-					'dueDate', 'dateCreated', 'createdBy', 'moveEvent']
+			'estStart','','', 'notes', 'duration', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
+			'dueDate', 'dateCreated', 'createdBy', 'moveEvent']
 					
 		def viewUnpublished = (RolePermissions.hasPermission("PublishTasks") && userPreferenceService.getPreference("viewUnpublished") == 'true')
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId, userDTFormat, 7, viewUnpublished)
@@ -1270,7 +1270,7 @@ class ReportsController {
 			else
 				visibleDependencies = task.taskDependencies?.findAll{it?.predecessor?.isPublished}
 			
-			reportFields <<[
+			reportFields << [
 				'taskNumber':task.taskNumber?.toString() , 
 				'taskDependencies': WebUtil.listAsMultiValueString(visibleDependencies.predecessor?.comment) ,
 				"assetEntity":task.assetEntity?.assetName,"comment":task.comment,

@@ -36,8 +36,8 @@
 					<th>Duration</th>
 					<th>Duration Scale</th>
 					<th>Estimated Start</th>
-					<th>Actual Time</th>
 					<th>Estimated Finish</th>
+					<th>Actual Start</th>
 					<th>Actual Finish</th>
 					<th>WorkFlow Step</th>
 					<th>Category</th>
@@ -89,17 +89,17 @@
 						<td>
 							${task.durationScale}
 						</td>
-						<td><tds:convertDate date="${task.estStart}" /></td>
-						<td><tds:convertDate date="${task.actStart}"  /></td>
-						<td><tds:convertDate date="${task.estFinish }" /></td>
-						<td><tds:convertDate date="${task.dateResolved }"/></td>
+						<td><tds:convertDateTime date="${task.estStart}" /></td>
+						<td><tds:convertDateTime date="${task.estFinish }" /></td>
+						<td><tds:convertDateTime date="${task.actStart}"  /></td>
+						<td><tds:convertDateTime date="${task.dateResolved }"/></td>
 						<td>NA</td>
 						<td>
 							${task.category}
 						</td>
 						<td><tds:convertDate date="${task.dueDate }"/></td>
 						<td>
-							<tds:convertDate date="${task.dateCreated }"/>
+							<tds:convertDateTime date="${task.dateCreated }"/>
 						</td>
 						<td>${task.createdBy}</td>
 						<td>

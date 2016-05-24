@@ -498,8 +498,9 @@ class MoveBundleService {
 	 * @return void
 	 */
 	def issueExport (def exportList, def columnList, def sheet, def tzId, userDTFormat, def startRow = 0, def viewUnpublished = false) {
+		def dateFormatter = TimeUtil.createFormatterForType(userDTFormat, TimeUtil.FORMAT_DATE)
 
-		def formatDateForExport = { dateValue ->
+		def formatDateTimeForExport = { dateValue ->
 			return (dateValue ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, dateValue) : '')
 		}
 
@@ -539,6 +540,7 @@ class MoveBundleService {
 					case "workflow":
 						cellValue = exportList[rowIdx].workflowTransition ? String.valueOf(exportList[rowIdx].workflowTransition?.name) : ''
 						 break
+					/*	 
 					case "estStart":
 						 cellValue = formatDateForExport(exportList[rowIdx].estStart)
 						 break
@@ -551,8 +553,13 @@ class MoveBundleService {
 					case "actFinish":
 						 cellValue = formatDateForExport(exportList[rowIdx].actFinish)
 						 break
+					*/
+					case ~/actStart|dateResolved|dateCreated|estStart/:
+						cellValue = formatDateTimeForExport( exportList[rowIdx].("$attribName") )
+						break
+
 					case "dueDate":
-						 cellValue = formatDateForExport(exportList[rowIdx].dueDate)
+						 cellValue = exportList[rowIdx].dueDate ? TimeUtil.formatDate(exportList[rowIdx].dueDate, dateFormatter) : ''
 						 break
 					case "duration":
 						 def duration = exportList[rowIdx].duration
