@@ -319,7 +319,7 @@ class StringUtil {
 		if (str != null) {
 			result = str.trim()
 			// NOTE stripping out the \b causes + to be added to beginning and end of string for some strange reason
-			result = result.replaceAll(/\r|\n|\t|\f/, '+')
+			result = result.replaceAll(/\r|\n|\t|\f|\s/, '+')
 			// invisible control characters and unused code points; Line (u2028) and Paragraph (u2029) separators .
 			result = result.replaceAll(/\p{C}|\p{Zl}|\p{Zp}/, '~')
 		}
