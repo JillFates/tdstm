@@ -129,6 +129,11 @@
 						handleHeader('resize');
 					}, 100);
 				});
+				
+				$(window).scroll(function() {
+					var position = 16 - $(this).scrollLeft();
+					$('.floatingHeader').css('left', position + "px");
+				});
 
 				$("#unselectDialog").dialog({
       				autoOpen: false,
