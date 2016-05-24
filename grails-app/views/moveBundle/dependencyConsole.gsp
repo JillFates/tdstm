@@ -58,7 +58,7 @@
 								<legend>Connection Status:</legend>
 								<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 									<input type="checkbox" id="${dependencyStatusInst}"
-										name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatus) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatus) ? '' : 'checked')}/>&nbsp;&nbsp;
+										name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
 										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
 									<br />
 								</g:each>
@@ -69,7 +69,6 @@
 						<div class="buttonR">
 							<input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
 						</div>
-						
 					</g:form>
 				</div> 
 			</div>
