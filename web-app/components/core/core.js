@@ -356,10 +356,13 @@ tds.core.service.AlertsService = function(rootScope, timeout) {
 
 	var closeAlert = function(index) {
 		index = (index) ? index : rootScope.alerts.list.length - 1;
-		rootScope.alerts.list[index].hidden = true;
-		timeout(function() {
-			rootScope.alerts.list.splice(index, 1);
-		}, 500);
+		// After deleting the last one, the list is empty
+		if(rootScope.alerts.list[index]){
+			rootScope.alerts.list[index].hidden = true;
+			timeout(function() {
+				rootScope.alerts.list.splice(index, 1);
+			}, 500);
+		}
 	};
 
 	var removeAlertAfter = function(time) {
