@@ -1,0 +1,17 @@
+div.message-wrapper
+  top: 8%
+  margin: auto
+  position: fixed
+  left: 0
+  right: 0
+  width: 80%
+  z-index: 1035
+  div.message-wrapper-container
+    div.alert
+      &.fadeIn
+        -webkit-transition: all linear 0.25s
+        transition: all linear 0.25s
+      &.fadeIn.ng-hide
+        opacity: 0
+      &.fadeIn.ng-show
+        opacity: 1

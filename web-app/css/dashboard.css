@@ -49,15 +49,6 @@ Css for client dashboard
 @charset "utf-8";
 /* CSS Document */
 
-body{
-	margin:auto;
-	 /*font-family:Arial, Helvetica, sans-serif;*/
-	font-size:12px;
-	width:auto;
-	text-align:center;
-    background-position:top;
-	background-repeat:repeat-x;
-	}
 .body_bg{
 	margin:auto;
 	font-family:Arial, Helvetica, sans-serif;

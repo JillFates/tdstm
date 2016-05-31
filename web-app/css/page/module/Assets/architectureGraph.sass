@@ -1,0 +1,14 @@
+div.content-wrapper
+  div.container
+    div.graphContainer
+      div#svgContainerId
+        svg.chart
+          width: initial !important
+          position: initial
+      &.fullscreen
+        z-index: 1032
+        div#svgContainerId
+        svg.chart
+          position: fixed !important
+      div#controlPanel, div#legendDivId
+        z-index: 1032 !important
