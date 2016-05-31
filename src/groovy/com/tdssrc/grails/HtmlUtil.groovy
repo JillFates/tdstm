@@ -217,4 +217,17 @@ class HtmlUtil {
 		return text.toString()		
 	}
 
+	/**
+	 * Used to construct an application URL to be used in the application
+	 * @param controller - name of the controller to access
+	 * @param action - optional action to add to the
+	 * @param fragment - any addition content to append to the URI
+	 * @param absolute - boolean flag if true will create
+	 * @return The constructed URI or URL if absolute is true
+	 */
+	def public static appUrl(String controller, String action='', String fragment='', Boolean absolute=false) {
+		String url = "/tdstm/app#$controller" + ((action)?: "/$action") + fragment
+		return url
+	}
+
 }

@@ -172,4 +172,12 @@ class CustomTagLibTests extends Specification {
 		applyTemplate('<tds:svgIcon name="${name}" />', [name: ""]).isEmpty()
 	}
 
+	void testAppURL() {
+		expect:
+		// it should generate from the root to the anchor used by the ui routing
+		applyTemplate('<tds:appURL controller="${controller}" fragment="list?status=active" />', [controller: "project", fragment: "list?status=active"]).contains('/tdstm/app#project/list?status=active')
+		// it should generate from the root to the anchor used by the ui routing
+		applyTemplate('<tds:appURL controller="${controller}" fragment="list" />', [controller: "task", fragment: "list"]).contains('/tdstm/app#task/list')
+	}
+
 }

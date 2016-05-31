@@ -418,4 +418,22 @@ class CustomTagLib {
 			out << ', ' + personCo.name
 		}
 	}
+
+	/**
+	 * Used to construct an application URL to be used in the application
+	 * @param controller - name of the controller from the ui routing to be referenced
+	 * @param fragment - each fragment is composed of one or n arguments and is the module being injected in the routing
+	 */
+	def appURL = { attrs ->
+		def controller = attrs['controller']
+		def fragment = attrs['fragment']
+
+		def urlGenerated = ''
+
+		if(controller != '' && fragment != '') {
+			urlGenerated = HtmlUtil.appUrl(controller, '', fragment, false)
+		}
+
+		out << urlGenerated
+	}
 }
