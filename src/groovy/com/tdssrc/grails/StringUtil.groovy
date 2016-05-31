@@ -319,12 +319,20 @@ class StringUtil {
 		if (str != null) {
 			result = str.trim()
 			// NOTE stripping out the \b causes + to be added to beginning and end of string for some strange reason
-			result = result.replaceAll(/\r|\n|\t|\f|\s/, '+')
+			result = result.replaceAll(/\r|\n|\t|\f/, '+')
 			// invisible control characters and unused code points; Line (u2028) and Paragraph (u2029) separators .
 			result = result.replaceAll(/\p{C}|\p{Zl}|\p{Zp}/, '~')
 		}
 		return result
 	}
+
+	/**
+	 * This method will sanitize the String with StringUtil.sanitize
+	 * and then replace all white spaces with a '+'
+	 */
+	 public static String sanitizeAndStripSpaces(String str){
+	 	return StringUtil.sanitize(str).replaceAll(/\s/, "+")
+	 }
 
 	/**
 	 * Used to compare various string values as boolean

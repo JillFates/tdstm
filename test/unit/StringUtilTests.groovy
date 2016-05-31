@@ -161,7 +161,6 @@ class StringUtilTests extends Specification {
 			" .\u00850085. "	| '.~0085.'
 			" [\u007f007f] "	| '[~007f]'
 			" [\u008f008f] "	| '[~008f]'
-			" WHITE SPACE "		| "WHITE+SPACE"
 
 			/*
 			" .\ u000A000A. "	| '.~000A.'
@@ -171,6 +170,23 @@ class StringUtilTests extends Specification {
 			" [\ u00A000A0] "	| '[~00A0]'
 			" [\ u0A400A40] "	| '[~0A40]'
 			*/
+	}
+
+	/**
+	 * This method will test the function that strips
+	 * spaces from strings in addition to the traditional
+	 * sanitize method.
+	 */
+	def "Test sanitize string stripping white spaces too"(){
+		expect:
+			SU.sanitizeAndStripSpaces(value) == result
+		where:
+			value 				| result
+			" NOPQRSTUVWXYZ "	| 'NOPQRSTUVWXYZ'
+			" 01234567890 "		| '01234567890'
+			"!@#\$%^&*()-_=+`~"	| '!@#$%^&*()-_=+`~'
+			"TEXTWITHNOSPACES"	| "TEXTWITHNOSPACES"
+			"TEXT WITH SPACES"	| "TEXT+WITH+SPACES"
 	}
 
 	def "Test the toBoolean method that compares different strings for y/n|1/0|yes/no, etc "() {

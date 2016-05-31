@@ -3081,7 +3081,7 @@ class AssetEntityService {
 			// Wrap up the process
 			// 
 			filename += "-"+exportedEntity+"-"+exportDate
-			filename = StringUtil.sanitize(filename)
+			filename = StringUtil.sanitizeAndStripSpaces(filename)
 
 			URLCodec codec = new URLCodec()
     		String urlEscaped = codec.encode(filename)
