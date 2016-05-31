@@ -2222,7 +2222,6 @@ class AssetEntityService {
 			stopwatch.start()
 	
 			java.io.File tempExportFile = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
-			tempExportFile.deleteOnExit()
 			
 			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
 			
