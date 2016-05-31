@@ -2221,10 +2221,10 @@ class AssetEntityService {
 			def stopwatch = new StopWatch()
 			stopwatch.start()
 	
-			java.io.File temp = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
-			temp.deleteOnExit()
+			java.io.File tempExportFile = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
+			tempExportFile.deleteOnExit()
 			
-			progressService.updateData(key, 'filename', temp.getAbsolutePath())
+			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
 			
 			def progressCount = 0
 			def progressTotal = 0
@@ -2420,7 +2420,7 @@ class AssetEntityService {
 			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
 
-			//set MIME TYPE as Excel
+			// set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
 			def masterIndex = exportType.indexOf("Master_template.xls")
 			if (masterIndex != -1) {
@@ -2431,7 +2431,6 @@ class AssetEntityService {
 			def userDTFormat = params.userDTFormat
 			def currDate = TimeUtil.nowGMT()
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
-			def filename = project?.name?.replace(" ","_")+"-"+bundleNameList.toString()
 
 			log.info "export() Loading DTAMaps took ${stopwatch.lap()}"
 
@@ -3080,18 +3079,23 @@ class AssetEntityService {
 			//
 			// Wrap up the process
 			// 
-			filename += "-"+exportedEntity+"-"+exportDate
-			filename = StringUtil.sanitizeAndStripSpaces(filename)
 
-			URLCodec codec = new URLCodec()
-    		String urlEscaped = codec.encode(filename)
-
-			FileOutputStream out =  new FileOutputStream(temp);
-
+			FileOutputStream out =  new FileOutputStream(tempExportFile)
 			book.write(out)
 			out.close()
 
-			progressService.updateData(key, 'header', "attachment; filename=\""+exportType+'-'+filename+".xls\"")
+			// The filename will consiste of the following:
+			//    - Owner of the Project 
+			//    - Name of the Project or ID 
+			//    - Bundle name(s) selected or ALL
+			//    - Letters symbolizing each of the tabs that were exported 
+			//    - The date that the spreadsheet was exported 
+			String filename = project.getOwner().toString() + '-' + 
+				( project.name ?: project.id ) + 
+				"-${bundleNameList}-${exportedEntity}-${exportDate}.xls"
+			filename = StringUtil.sanitizeAndStripSpaces(filename)
+
+			progressService.updateData(key, 'header', 'attachment; filename="' + filename + '"')
 			progressService.update(key, 100, 'Completed')
 
 			log.info "export() streaming spreadsheet to browser took ${stopwatch.lap()}"
