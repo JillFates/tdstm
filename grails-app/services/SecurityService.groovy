@@ -637,7 +637,7 @@ class SecurityService implements InitializingBean {
 	 */
 	boolean verifyMinPeriodToChangePswd(UserLogin userLogin) {
 		// Check to see if minimum period is a requirement first
-		if ( getUserLocalConfig().minPeriodToChangePswd > 0 ) {
+		if ( getUserLocalConfig().minPeriodToChangePswd > 0 && userLogin.passwordChangedDate ) {
 			int minTimeLimit = getUserLocalConfig().minPeriodToChangePswd * 60 * 60 * 1000
 			if (TimeUtil.nowGMT().time < (userLogin.passwordChangedDate.time + minTimeLimit)) {
 				return false
