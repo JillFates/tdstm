@@ -1,143 +1,133 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
+<!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Login</title>
-	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
-	<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+	<!-- Tell the browser to be responsive to screen width -->
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<!-- Bootstrap 3.3.5 -->
+	<link rel="stylesheet" href="${resource(dir:'dist/js/vendors/bootstrap/dist/css',file:'bootstrap.min.css')}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/fontawesome',file:'font-awesome.min.css')}">
+	<!-- Ionicons -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/ionicons/2.0.1/css',file:'ionicons.min.css')}">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
+	<!-- General Template Style -->
+	<link rel="stylesheet" href="${resource(dir:'css',file:'style.css')}">
+
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-	<meta name="viewport" content="height=device-height,width=device-width" />
-	<g:javascript src="jquery-1.9.1.js"/>
-	<g:javascript library="application" />
+
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+
+	<!-- jQuery -->
+	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
+
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="${resource(dir:'app-js/vendors/html5shiv/dist',file:'html5shiv.min.js')}"></script>
+	<script src="${resource(dir:'app-js/vendors/respond/dest',file:'respond.min.js')}"></script>
+	<![endif]-->
+	<script language="javascript" type="text/javascript">
+		// Let's keep this until migrate the login into angularjs.
+
+		function setFieldFocus() {
+			<g:if test="${loginConfig.authorityPrompt in ['select', 'prompt']}">
+			var field = document.loginForm.authority;
+			</g:if>
+			<g:else>
+			var field = document.loginForm.username;
+			</g:else>
+			field.focus();
+		}
+
+		// break us out of any containing div or iframes
+		if (top != self) { top.location.replace(self.location.href); }
+
+		$(document).ready(function() {
+			$("#submitButton").click(function(){
+				$("#overlay").css('display', 'inline');
+				$("#submitButton").attr('disabled', true);
+				var form = $("form")[0];
+				form.submit();
+			});
+		});
+
+	</script>
 </head>
-<body onload="setFieldFocus()">
-<script language="javascript" type="text/javascript">
+<body class="hold-transition login-page" onload="setFieldFocus()">
+<div class="login-box">
 
-	function setFieldFocus() {
-		<g:if test="${loginConfig.authorityPrompt in ['select', 'prompt']}">
-		var field = document.loginForm.authority;
-		</g:if>
-		<g:else>
-		var field = document.loginForm.username;
-		</g:else>
-		field.focus();
-	}
-
-	/* break us out of any containing div or iframes */
-	if (top != self) { top.location.replace(self.location.href); }
-
-	$(document).ready(function() {
-		$("#submitButton").click(function(){
-			$("#overlay").css('display', 'inline')
-			$("#submitButton").attr('disabled', true)
-			var form = $("form")[0]
-			form.submit()
-		})
-	})
-
-</script>
-
-<div id="spinner" class="spinner" style="display: none;">
-	<img src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-</div>
-<div class="logo">
-	<table style="border: 0; width: 292px;">
-		<tr>
-			<td style="text-align: center;">
-				<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-					<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
-				</a>
-			</td>
-			
-		</tr>
-	</table>
-	<div class="mainbody">
-		<table width="100%" style="border: 0; vertical-align: top;" align="center" cellpadding="0" cellspacing="0">
-			<tr>
-				<td valign="top" style="width:292px">
-				<div class="colum_login">
-				
-				<div class="left_cornerlog"></div>
-				<div class="border_toplog"></div>
-				<div class="right_cornerlog"></div>
-				<div class="w_bodylog">
-				<g:form action="signIn" name="loginForm">
-					<input type="hidden" name="targetUri" value="${targetUri}" />
-					<g:if test="${flash.message}">
-						<div class="message">${flash.message}</div>
+	<div class="login-box-body">
+		<div class="login-logo">
+			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
+				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
+			</a>
+		</div>
+		<p class="login-box-msg">Sign in to start your session</p>
+		<div id="spinner" class="spinner" style="display: none;"><img
+				src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+		</div>
+		<g:form action="signIn" name="loginForm" class="loginPageFormWrapper">
+			<input type="hidden" name="targetUri" value="${targetUri}" />
+			<g:if test="${loginConfig.authorityPrompt == 'hidden'}">
+				<input type="hidden" name="authority" value="${loginConfig.authorityName}">
+			</g:if>
+			<g:if test="${loginConfig.authorityPrompt in ['prompt', 'select']}">
+				<div class="form-group">
+					<span>${loginConfig.authorityLabel}:</span>
+					<g:if test="${loginConfig.authorityPrompt == 'prompt'}">
+						<input type="text"  class="form-control" name="authority" value="${authority}" autocorrect="off" autocapitalize="off">
 					</g:if>
-					<table>
-						<tbody>
-							<g:if test="${loginConfig.authorityPrompt in ['prompt', 'select']}">
-								<tr>
-									<td>${loginConfig.authorityLabel}:</td>
-									<g:if test="${loginConfig.authorityPrompt == 'prompt'}">
-										<td><input type="text" name="authority" value="${authority}" autocorrect="off" autocapitalize="off"></td>
-									</g:if>
-									<g:if test="${loginConfig.authorityPrompt == 'select'}">
-										<td>
-											<g:select name="authority" from="${loginConfig.authorityList}" value="${authority}"
-												noSelection="['':'Please select']"/>
-										</td>
-									</g:if>
-								</tr>
-							</g:if>
-							<g:if test="${loginConfig.authorityPrompt == 'hidden'}">
-								<input type="hidden" name="authority" value="${loginConfig.authorityName}">
-							</g:if>
-							
-							<tr>
-								<td>Username:</td>
-								<td>
-									<input type="text" name="username" id="usernameId" value="${username}" size="25" required
-										autocorrect="off" autocapitalize="off" placeholder="${loginConfig.usernamePlaceholder}"/>
-								</td>
-							</tr>
-							<tr>
-								<td>Password:</td>
-								<td><input type="password" name="password" size="25" value="" required
-									autocorrect="off" autocapitalize="off" placeholder="Enter your password"/></td>
-							</tr>
-							<tr>
-								<td class="buttonR" colspan="2" style="text-align:center;">
-									<input type="submit" value="Sign in" id="submitButton" />
-									<br style="height: 4px;"><br/>
-									<g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link>
-								</td>
-							</tr>
-							<g:if test="${request.getHeader('User-Agent')}">
-								<g:if test="${request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
-									<tr>
-										<td colspan="2">
-											<div class="message">Warning: This site no longer supports versions of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
-										</td>
-									</tr>
-								</g:if>
-							</g:if>
-							<g:else>
-								<div class="message">Warning: Unable to determine your browser type and therefore unable to guarantee the site will work properly.</div>
-							</g:else>
-							
-						</tbody>
-					</table>
-				</g:form>
+					<g:if test="${loginConfig.authorityPrompt == 'select'}">
+						<g:select class="form-control" name="authority" from="${loginConfig.authorityList}" value="${authority}" noSelection="['':'Please select']"/>
+					</g:if>
 				</div>
-				
-				<div class="left_bcornerlog"></div>
-				<div class="border_botlog"></div>
-				<div class="right_bcornerlog"></div>
-				<div id="buildInfoId">
-					<pre style="word-wrap: break-word; white-space: pre-wrap;">${buildInfo}</pre>
+			</g:if>
+			<div class="form-group has-feedback">
+				<input type="text" class="form-control" name="username" id="usernameid" placeholder="Enter your username" value="${username}" autocorrect="off" autocapitalize="off" >
+				<span class="glyphicon glyphicon-user form-control-feedback"></span>
+			</div>
+			<div class="form-group has-feedback">
+				<input type="password" class="form-control" name="password" autocorrect="off" autocapitalize="off" placeholder="Enter your password"/>
+				<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+			</div>
+			<g:if test="${flash.message}">
+				<div class="message">${flash.message}</div>
+			</g:if>
+			<div class="row">
+				<div class="col-xs-8">
 				</div>
-				
+				<!-- /.col -->
+				<div class="col-xs-4">
+					<button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat">Sign In</button>
 				</div>
-				</td>
-			</tr>
-		</table>
+				<!-- /.col -->
+			</div>
+		</g:form>
+
+		<g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link><br/>
+		<div class="loginErrorMsg">
+			<g:if test="${request.getHeader('User-Agent')}">
+				<g:if test="${request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
+					<div class="message" >Warning: This site no longer supports version of Internet Explorer before version 9. We recommend that you use a newer browser for this site.</div>
+				</g:if>
+			</g:if>
+			<g:else>
+				<div class="alert alert-warning"><strong>Warning!</strong> Unable to determine your browser type and therefore unable to guarantee the site will work properly.</div>
+			</g:else>
+		</div>
+		<div class="loginIframe">
+			<pre style="word-wrap: break-word; white-space: pre-wrap;">${buildInfo}</pre>
+		</div>
 	</div>
+	<!-- /.login-box-body -->
 </div>
-<div class="logo"></div>
+<!-- /.login-box -->
+
 
 <div id="overlay">
 	<div id="overlay-wrapper">
@@ -153,6 +143,7 @@
 		</div>
 	</div>
 </div>
+<!-- /.spinenr-box -->
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="projectHeader" />
+    <meta name="layout" content="topNav" />
     <title>Sync Management</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 	<script type="text/javascript">
@@ -51,7 +51,7 @@
       <g:form action="export" method="post" name="exportForm" >
         <input type="hidden" value="${projectId}" name="projectIdExport" />
         <div class="dialog">
-          <table>
+          <table class="model-sync-export-table">
             <tbody>
             <thead>
               <tr><th colspan="5">Export</th></tr>

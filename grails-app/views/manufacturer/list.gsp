@@ -1,9 +1,9 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<title>Manufacturer List</title>
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/manufacturer',file:'manufacturer.js')}"></script>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />

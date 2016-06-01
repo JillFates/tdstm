@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Update Role Permissions</title>
 	<g:javascript src="jqgrid-support.js" />
 </head>

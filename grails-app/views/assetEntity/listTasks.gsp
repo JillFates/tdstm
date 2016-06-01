@@ -7,7 +7,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Task Manager</title>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="asset.comment.js" />
@@ -18,7 +18,7 @@
 	<g:javascript src="jqgrid-support.js" />
 	<g:javascript src="TimerBar.js" />
 
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 
 	<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datetimepicker.css')}" />

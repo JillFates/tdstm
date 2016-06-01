@@ -4,13 +4,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>My Tasks</title>
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="TimerBar.js" />
 </head>

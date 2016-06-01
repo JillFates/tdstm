@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="projectHeader" />
+    <meta name="layout" content="topNav" />
     <title>Edit Bundle</title>
 
 	<link rel="stylesheet" href="${resource(dir:'css',file:'jquery-ui.css')}" type="text/css"/>
@@ -35,11 +35,12 @@
 	</script>
 </head>
 <body>
-  	<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
-			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
-	</div>
+
   <g:form method="post" >
     <div class="body" style="width: 350px;">
+		<div class="nav" style="border: 1px solid #CCCCCC; height: 11px;width: 219px; margin:9px 14px 0px">
+			<span class="menuButton"><g:link class="list" action="list">Bundle List</g:link></span>
+		</div>
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>

@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <g:javascript src="admin.js" />
 <title>TDS TransitionManager&trade; Admin Portal</title>
 <style type="text/css">
@@ -17,12 +17,12 @@ a:hover {
 	<div class="message">${flash.message}</div>
 </g:if>
 <div id="showCleanTypeMsgId" style="display: none" class="message"></div>
-<table style="border: 0">
+<table style="border: 0" class="admin-home">
 	<tr>
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Recent Users</b></h1>
-			<table>
+			<table class="admin-home">
 				<thead>
 					<tr>
 						<th>Person</th>
@@ -47,7 +47,7 @@ a:hover {
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Current and Recent Events</b></h1>
-			<table>
+			<table class="admin-home">
 				<thead>
 					<thead>
 						<tr>
@@ -78,7 +78,7 @@ a:hover {
 			<br/>
 			<div>
 				<h1 style="margin-right: 0px;"><b>Upcoming Events</b></h1>
-				<table>
+				<table class="admin-home">
 					<thead>
 						<tr>
 							<th>Name </th>
@@ -104,7 +104,7 @@ a:hover {
 			</div>
 			<br />
 			<div>
-				<table>
+				<table class="admin-home">
 					<thead>
 						<tr>
 							<th colspan="2">Misc. Admin functions</th>
@@ -149,7 +149,7 @@ a:hover {
 			</div>
 			<br />
 			<div id="reconcileAssetsFormId" style="display: none;">
-				<table>
+				<table class="admin-home">
 					<thead>
 						<tr>
 							<th colspan="2">Reconcile AssetTypes</th>

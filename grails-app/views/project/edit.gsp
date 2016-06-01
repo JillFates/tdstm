@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<link type="text/css" rel="stylesheet"
 		href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 	<title>Edit Project</title>

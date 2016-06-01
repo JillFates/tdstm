@@ -2,9 +2,8 @@
 <html xmlns:ng="http://angularjs.org">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Cookbook</title>
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ng-grid.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'codemirror/codemirror.css')}" />
@@ -15,7 +14,7 @@
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'cookbook.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
 
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="codemirror/codemirror.js" />
 	<g:javascript src="codemirror/ui-codemirror.js" />
 	<g:javascript src="codemirror/addon/dialog.js" />

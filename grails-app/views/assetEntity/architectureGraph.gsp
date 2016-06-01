@@ -1,42 +1,42 @@
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-		<meta name="layout" content="projectHeader" />
-		<title>Architecture Graph</title>
-		<g:javascript src="asset.tranman.js" />
-		<g:javascript src="entity.crud.js" />
-		<g:javascript src="model.manufacturer.js"/>
-		<g:javascript src="projectStaff.js" />
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<meta name="layout" content="topNav" />
+	<title>Architecture Graph</title>
+	<g:javascript src="asset.tranman.js" />
+	<g:javascript src="entity.crud.js" />
+	<g:javascript src="model.manufacturer.js"/>
+	<g:javascript src="projectStaff.js" />
 
-		<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 
-		<g:javascript src="asset.comment.js" />
+	<g:javascript src="asset.comment.js" />
 
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
-		<g:javascript src="d3/d3.js" />
-		<g:javascript src="lodash/lodash.min.js" />
-		<g:javascript src="svg.js"/>
-		<g:javascript src="load.shapes.js"/>
-		<g:javascript src="graph.js" />
-		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
-	</head>
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
+	<g:javascript src="d3/d3.js" />
+	<g:javascript src="lodash/lodash.min.js" />
+	<g:javascript src="svg.js"/>
+	<g:javascript src="load.shapes.js"/>
+	<g:javascript src="graph.js" />
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
+</head>
 <body>
 <div id="body" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<h1 id="pageTitleId">Architecture Graph</h1>
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>
 	</g:if>
-	
+
 	<div id="item1" class="graphContainer">
 		<div id="toolsContainerId">
 			<span id="panelLink" class="noPadding">
 				<div id="mapReferenceId">
 					<div id="controlPanelTabId" class="graphPanelTab activeTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
 					--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
-					--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+				--><div id="fullscreenButtonId" class="showMenu graphButton graphTabButton" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
 				</div>
 			</span>
-		
+
 			<div id="controlPanel" class="graphPanel openPanel">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
@@ -55,24 +55,24 @@
 						<tr title="Sets the max number of links to follow up">
 							<td class="controlPanelControl" colspan="3">
 								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon disabled minus" onclick="modifyParameter('sub', 'levelsUpId')"/><!--
-								--><input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" /><!--
-								--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
-								--><label for="levelsUpId">&nbsp;Tiers Above</label>
+							--><input name="levelsUp" id="levelsUpId" class="controlPanelprop" value="${(graphPrefs.levelsUp) ?: levelsUp}" size="1" disabled="disabled" /><!--
+							--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon disabled plus" onclick="modifyParameter('add', 'levelsUpId')"/><!--
+							--><label for="levelsUpId">&nbsp;Tiers Above</label>
 							</td>
 						</tr>
 						<tr title="Sets the max number of links to follow down">
 							<td class="controlPanelControl" colspan="3">
 								<img src="${resource(dir:'images',file:'minus.gif')}" class="pointer plusMinusIcon minus" onclick="modifyParameter('sub', 'levelsDownId')"/><!--
-								--><input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" /><!--
-								--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
-								--><label for="assetSelectId">&nbsp;Tiers Below</label>
+							--><input name="levelsDown" id="levelsDownId" class="controlPanelprop" value="${(graphPrefs.levelsDown) ?: levelsDown}" disabled="disabled" /><!--
+							--><img src="${resource(dir:'images',file:'plus.gif')}" class="pointer plusMinusIcon plus" onclick="modifyParameter('add', 'levelsDownId')"/><!--
+							--><label for="assetSelectId">&nbsp;Tiers Below</label>
 							</td>
 						</tr>
 						<tr title="Highlights cyclical structures in the dependency tree">
 							<td class="controlPanelControl" colspan="3">
 								<span class="checkboxContainer">
 									<input type="checkbox" id="highlightCyclicalCheckBoxId" name="showCycles" class="pointer" value="true" ${(graphPrefs.showCycles) ? 'checked' : ''} /><!--
-									--><label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical References</label>
+								--><label for="highlightCyclicalCheckBoxId" class="pointer">&nbsp;Show Cyclical References</label>
 								</span>
 							</td>
 						</tr>
@@ -80,7 +80,7 @@
 							<td class="controlPanelControl" colspan="3">
 								<span class="checkboxContainer">
 									<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)"><!--
-									--><label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
+								--><label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
 								</span>
 							</td>
 						</tr>
@@ -89,7 +89,7 @@
 								<br />
 							</td>
 						</tr>
-						
+
 						<!-- Label checkboxes -->
 						<tr id="twistieRowId">
 							<td colspan="3" class="noPadding">
@@ -99,7 +99,7 @@
 								</span>
 							</td>
 						</tr>
-						
+
 					</table>
 					<div id="labelControlContainerId">
 						<table class="labelTree" cellpadding="0" cellspacing="0" style="margin-left: 5px;border: 0;" >
@@ -112,10 +112,10 @@
 											<div style="padding:0px;">
 												<div class="checkboxContainer">
 													<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" /><!--
-													--><label for="${type}CheckboxId" class="pointer">
-														<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
-														${names.labelText ?: names.frontEndName}
-													</label>
+												--><label for="${type}CheckboxId" class="pointer">
+													<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
+													${names.labelText ?: names.frontEndName}
+												</label>
 												</div>
 											</div>
 										</td>
@@ -125,33 +125,33 @@
 						</table>
 					</div>
 					<table class="labelTree" cellpadding="0" cellspacing="0">
-						
+
 						<tr>
 							<td colspan="3" class="noPadding">
 								<br />
 							</td>
 						</tr>
-						
+
 						<tr title="Sets the distance between nodes">
 							<td class="controlPanelControl" colspan="3">
 								<img src="${resource(dir:'icons',file:'arrow_in.png')}" id="spacingDecreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
-								--><img src="${resource(dir:'icons',file:'arrow_out.png')}" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
-								-->Spacing
+							--><img src="${resource(dir:'icons',file:'arrow_out.png')}" id="spacingIncreaseId" height="20" class="pointer plusMinusIcon" style="margin-right:10px;"/><!--
+							-->Spacing
 							</td>
 						</tr>
-						
+
 					</table>
 				</form>
-					
+
 				<!-- Preference controls -->
 				<table class="labelTree" cellpadding="0" cellspacing="0">
-						
+
 					<tr>
 						<td colspan="3" class="noPadding">
 							<br />
 						</td>
 					</tr>
-					
+
 					<tr title="Reloads the graph">
 						<td colspan="3" class="noPadding">
 							<input type="button" name="Submit Button" id="graphSubmitButtonId" class="pointer fullButton" value="Regenerate Graph">
@@ -169,13 +169,13 @@
 					</tr>
 				</table>
 			</div>
-			
+
 			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:true]}" />
 		</div>
 		<div id="svgContainerId"></div>
 		<div id="spinnerDivId" style="display: none"></div>
 	</div>
-	
+
 	<g:render template="../assetEntity/modelDialog"/>
 	<g:render template="../assetEntity/entityCrudDivs" />
 	<g:render template="../assetEntity/dependentAdd" />
@@ -187,7 +187,7 @@
 <g:render template="../assetEntity/initAssetEntityData"/>
 
 <script type="text/javascript">
-	
+
 	// if the user navigated here from an asset crud button, there will be a specific asset to start with
 	var initialAssetId = ${assetId ?: 'null'};
 	var parameterRanges = {'levelsUp':[0, 10], 'levelsDown':[0, 10]};
@@ -196,33 +196,33 @@
 
 	// Used to track ajax requests and abort them when needed
 	var ajaxRequest;
-	
+
 	$(document).ready(function () {
 		// close the labels twistie by default
 		$('#labelControlContainerId').slideUp(0);
 
-		
+
 		// define the select2 for assets
 		if (!isIE7OrLesser) {
 			EntityCrud.assetNameSelect2( $(".scrollSelect") );
 			$("#select2-chosen-1").html('Select an Asset');
 			filterSelect2( $(".filterScrollSelect"), ${assetClassesForSelect2} );
 		}
-		
+
 		// bind the custom submit behavior for the control panel
 		$('#graphSubmitButtonId').on('click', function (event) {
 			generateGraph();
 			event.preventDefault();
 		});
-		
+
 		// bind changing the asset or level to regenerating the graph automatically
 		$('#assetSelectId').on('change', function (event) {
 			generateGraph();
 		});
 		$('#assetClassesId').on('change', function (event) {
 			$('#assetSelectId')
-				.attr('data-asset-type', $(this).val())
-				.data('asset-type', $(this).val());
+					.attr('data-asset-type', $(this).val())
+					.data('asset-type', $(this).val());
 		});
 		$('#levelsUpId').on('change', function (event) {
 			generateGraph();
@@ -230,33 +230,33 @@
 		$('#levelsDownId').on('change', function (event) {
 			generateGraph();
 		});
-		
+
 		// disable any plus/minus icons that should be initially disabled
 		GraphUtil.checkForDisabledButtons(parameterRanges);
-		
+
 		// if the page was loaded with an assetId, show the graph for it
 		if (! isNaN(initialAssetId)){
 			generateGraph();
 			if(initialAssetId != null){
-				$('#s2id_assetSelectId').find("a").removeClass("select2-default");	
+				$('#s2id_assetSelectId').find("a").removeClass("select2-default");
 			}
 		}
-		
+
 		// set the width for the asset select2
 		$('#s2id_assetSelectId').css('width', assetSelectWidth + 'px');
-		
+
 		generateGraph();
 	});
-	
+
 	// makes an ajax call to get the graph data, then loads it into the DOM
 	function generateGraph () {
-		
+
 		$('#graphSubmitButtonId').attr('disabled', 'disabled');
-		
+
 		// abort the last ajax request if it still hasn't completed
 		if (ajaxRequest)
 			ajaxRequest.abort();
-		
+
 		// get the params to use for the request
 		var params = {};
 		if ($('#assetSelectId').val() != '') {
@@ -269,7 +269,7 @@
 		params.levelsUp = $('#levelsUpId').val();
 		params.levelsDown = $('#levelsDownId').val();
 		params.mode = 'assetId';
-		
+
 		// make the ajax request for the graph data
 		ajaxRequest = jQuery.ajax({
 			dataType: 'json',
@@ -278,7 +278,7 @@
 			type:'GET',
 			complete: loadGraph
 		});
-		
+
 		var svgElement = d3.select('#graphSvgId');
 		if (svgElement.size() == 0) {
 			var spinnerDiv = $('#spinnerDivId').clone().css('display','block');
@@ -287,21 +287,21 @@
 			svgElement.attr('class', 'loading');
 		}
 	}
-	
+
 	// loads the graph code into the DOM
 	function loadGraph (response) {
 		ajaxRequest = null;
 		$('#svgContainerId').html(response.responseText);
 	}
-	
+
 	function modifyParameter (action, element) {
 		var input = $('#' + element);
 		var ids = ['levelsUpId', 'levelsDownId'];
 		var oldValue = parseInt($('#' + input.attr('id')).val());
 		var plusButton = input.parent().children('.plus');
 		var minusButton = input.parent().children('.minus');
-		
-		
+
+
 		if (action == 'add') {
 			if (plusButton.hasClass('disabled'))
 				return;
@@ -329,7 +329,7 @@
 		element.select2( {
 			minimumInputLength: 0,
 			width: assetSelectWidth,
-			
+
 			placeholder: "Filter: All Classes",
 			data: data
 		} );

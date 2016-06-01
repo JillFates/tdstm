@@ -1,99 +1,135 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<g:if test="${success}">
-	<title>Forgot Password - Step 2</title>
-</g:if>
-<g:else>
-	<title>Forgot Password</title>
-</g:else>	
-	<link rel="stylesheet" href="${resource(dir:'css',file:'main.css')}" type="text/css"/>
-	<link rel="stylesheet" href="${resource(dir:'css',file:'tds.css')}" type="text/css"/>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<g:if test="${success}">
+		<title>Forgot Password - Step 2</title>
+	</g:if>
+	<g:else>
+		<title>Forgot Password</title>
+	</g:else>
+<!-- Tell the browser to be responsive to screen width -->
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<!-- Bootstrap 3.3.5 -->
+	<link rel="stylesheet" href="${resource(dir:'dist/js/vendors/bootstrap/dist/css',file:'bootstrap.min.css')}">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/fontawesome',file:'font-awesome.min.css')}">
+	<!-- Ionicons -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css/ionicons/2.0.1/css',file:'ionicons.min.css')}">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="${resource(dir:'dist/css',file:'TDSTMLayout.min.css')}">
+	<!-- General Template Style -->
+	<link rel="stylesheet" href="${resource(dir:'css',file:'style.css')}">
+
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
-	<g:javascript src="jquery-1.9.1.js"/>
-	<g:javascript src="jquery-1.9.1-ui.js"/>
-	<g:javascript src="tds-common.js" />
-	<meta name="viewport" content="height=device-height,width=device-width" />
+
+	<script src="${resource(dir:'dist/js/vendors/jquery/dist',file:'jquery.min.js')}"></script>
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="${resource(dir:'app-js/vendors/html5shiv/dist',file:'html5shiv.min.js')}"></script>
+	<script src="${resource(dir:'app-js/vendors/respond/dest',file:'respond.min.js')}"></script>
+	<![endif]-->
+
+	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
+
 </head>
-<body>
+<body class="hold-transition login-page">
+<div class="login-box">
 
-<div id="spinner" class="spinner" style="display: none;"><img
-	src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
-</div>
+	<div class="login-box-body">
+		<div class="login-logo">
+			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
+				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" />
+			</a>
+		</div>
 
-<div class="logo">
-	<table style="border: 0; width: 450px;">
-		<tr>
-			<td>
-				<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-				<img src="${resource(dir:'images',file:'TMLoginLogo.gif')}" border="0" alt="Learn more about TransitionManager" /></a>
-			</td>
-		</tr>
-	</table>
-	<div class="mainbody" style="margin: .8em">
-		<table style="width:466px" width="100%" style="border: 0; vertical-align: top;" cellpadding="0" cellspacing="0">
-			<tr>
-				<td valign="top">
-					<div class="xxcolum_login">
-						<div class="left_cornerlog"></div>
-						<div class="border_toplog"></div>
-						<div class="right_cornerlog"></div>
-						<div class="xxw_bodylog">
-					<g:if test="${success}">
-						<h1 style="padding: 8px 0px; margin: 0em !important;">Password Assistant - Check Your Email</h1>
-						<p>We sent you an email with a link to reset your password. It may take a few minutes to reach your inbox. 
-						If you don’t see the email, be sure to check your spam folder.
-						</p>
-						<br>
-						<div style="text-align: center;"><g:link action="login" class="light">Back to Login</g:link></div>
-					</g:if>
-					<g:else>
-						<h1 style="padding: 8px 0px; margin: 0em !important;">Password Assistant</h1>
-						<g:form action="sendResetPassword" name="forgotPasswordForm">
-							<g:if test="${flash.message}">
-								<div class="message">${flash.message}</div>
-							</g:if>
-								<p>Please enter the e-mail address associated with your TransitionManager account, then click Send. We will send an e-mail to
-								you that contains a link to a page where you can create new password.</p>
-								<br/>
-								<p>
-									<label for="email">Email Address:</label>
-									<input type="email" name="email" id="email" value="${email}" size="35"
-										required autofocus
-										placeholder="Enter your email address" 
-										autocorrect="email" autocapitalize="off" />
-								</p>
-								<br/>
-								<p style="text-align:center;" class="buttonR">
-									<g:link action="login" class="light" style="margin-right: 16px;">Back to Login</g:link>
-									<input type="submit" id="resetPasswordSubmitButton" value="Send" />
-								</p>
+		<g:if test="${success}">
+			<h2 class="emailStatus">Check Your Email</h2>
+			<p class="instructions">We sent you an email with a link to reset your password. It may take a few minutes to reach your inbox.
+			If you don’t see the email, be sure to check your spam folder.
+			</p>
+			<br>
+			<div style="text-align: center;"><g:link action="login" class="light">Back to Login</g:link></div>
+		</g:if>
+		<g:else>
+			<p class="login-box-msg">Password Assistant</p>
 
-						</g:form>
-					</g:else>	
+			<div id="spinner" class="spinner" style="display: none;"><img
+					src="${resource(dir:'images',file:'spinner.gif')}" alt="Spinner" />
+			</div>
+
+			<g:form action="sendResetPassword" name="forgotPasswordForm">
+				<p>We will send an e-mail to you that contains a link to a page where you can create new password.</p>
+				<div class="form-group has-feedback">
+					<input type="email" class="form-control" name="email" id="email" placeholder="Enter your email address" value="${email}" autocorrect="off" autocapitalize="off" required autofocus>
+					<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+				</div>
+				<g:if test="${flash.message}">
+					<div class="message">${flash.message}</div>
+				</g:if>
+				<div class="row">
+					<div class="col-xs-8">
 					</div>
-				</td>
-			</tr>
-		</table>
+					<!-- /.col -->
+					<div class="col-xs-4">
+						<button type="submit"  id="resetPasswordSubmitButton" class="btn btn-primary btn-block btn-flat">Send</button>
+					</div>
+					<!-- /.col -->
+				</div>
+			</g:form>
+			<g:link action="login" class="light" style="margin-right: 16px;">Back to Login</g:link>
+		</g:else>
+
 	</div>
+	<!-- /.login-box-body -->
 </div>
-<div class="logo"></div>
+<!-- /.login-box -->
 <script type="text/javascript">
+
 	$( document ).ready(function() {
+
+		function isValidEmail(email) {
+			var emailExp = /^([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]+\.[a-zA-Z]{2,4})+$/ ;
+			return emailExp.test(email);
+		}
+
 		$("#forgotPasswordForm").on("submit", function(event) {
 			event.preventDefault();
 			var emailField = $("#email");
-			if (!tdsCommon.isValidEmail(emailField.val())) {
+			if (!isValidEmail(emailField.val())) {
 				alert("Please enter a valid email address");
 				emailField.focus();
 				return false;
 			} else {
+
+				$("#overlay").css('display', 'inline');
+
 				$(this).off("submit");
-				$("#resetPasswordSubmitButton").prop('disabled', true)
+				$("#resetPasswordSubmitButton").prop('disabled', true);
 				this.submit();
 			}
 		});
 	});
 </script>
+
+<div id="overlay">
+	<div id="overlay-wrapper">
+		<div id="floatingBarsG">
+			<div class="blockG" id="rotateG_01"></div>
+			<div class="blockG" id="rotateG_02"></div>
+			<div class="blockG" id="rotateG_03"></div>
+			<div class="blockG" id="rotateG_04"></div>
+			<div class="blockG" id="rotateG_05"></div>
+			<div class="blockG" id="rotateG_06"></div>
+			<div class="blockG" id="rotateG_07"></div>
+			<div class="blockG" id="rotateG_08"></div>
+		</div>
+	</div>
+</div>
+<!-- /.spinenr-box -->
+
 </body>
 </html>

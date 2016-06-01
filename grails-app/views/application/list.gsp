@@ -9,14 +9,13 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<title>Application list</title>
-		<g:javascript src="bootstrap.js" />
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="projectStaff.js" />
 
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 
 		<g:javascript src="asset.comment.js" />
 		<jqgrid:resources />

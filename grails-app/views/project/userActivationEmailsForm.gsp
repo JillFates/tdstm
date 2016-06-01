@@ -1,12 +1,11 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>User Activation Emails</title>
 </head>
 <body>
 <div class="body">
-<div>
 	<h1>User Activation Emails</h1>
 	<p>This form is used to initiate the user account activation process for staff of the project whom have new account properly configured in TransitionManager. By selecting the users and submitting the form, an activation email notification will be sent to each individual so that they can login and set their own passwords.</p><br/>
 	<g:if test="${flash.message}">
@@ -21,7 +20,7 @@
 				<input type="radio" name="sendFrom" value="ADMIN">&nbsp;<span>Your Email (${adminEmail})</span><br/><br/>
 				<span>Custom Message:</span><br>
 				<textarea name="customMessage" rows="5" cols="80">Welcome to TransitionManager.</textarea><br/><br/>
-				<table>
+				<table class="user-activation-emails-table">
 					<thead>
 						<tr>
 							<th style="text-align: center;"><input type="checkbox" id="checkAllAccountActivation" /></th>
@@ -109,5 +108,7 @@
 
 
 			</script>
+		</div>
+</div>
 </body>
 </html>

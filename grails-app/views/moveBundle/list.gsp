@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<title>Bundle List</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>

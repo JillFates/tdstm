@@ -1,67 +1,71 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
-<title>Workflows</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="layout" content="topNav"/>
+    <title>Workflows</title>
 </head>
+
 <body>
 <div class="body">
-<g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-            </g:if>
-<div class="steps_table">
-	<span class="span"><b>Workflows</b></span>
-<div class="list" style="border: 1px solid #5F9FCF; margin-left: 10px;margin-right: 10px;">
-<table>
-	<thead>
-		<tr>
-			<g:sortableColumn property="process" title="Workflow" />
+    <g:if test="${flash.message}">
+        <div class="message">${flash.message}</div>
+    </g:if>
+    <div class="steps_table">
+        <span class="span"><b>Workflows</b></span>
 
-			<th class="sortable" style="font-size: 10px;">Used On</th>
-			
-			<g:sortableColumn property="dateCreated" title="Created On" />
+        <div class="list" style="border: 1px solid #5F9FCF; margin-left: 10px;margin-right: 10px;">
+            <table>
+                <thead>
+                <tr>
+                    <g:sortableColumn property="process" title="Workflow"/>
 
-			<g:sortableColumn property="lastUpdated" title="Updatated On" />
-			
-			<g:sortableColumn property="updateBy" title="Updated By" />
-			
-		</tr>
-	</thead>
-	<tbody>
-		<g:each in="${workflowInstanceList}" status="i" var="workflows">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowList('${workflows?.id}')">
+                    <th class="sortable" style="font-size: 10px;">Used On</th>
 
-				<td nowrap="nowrap">${workflows?.process}</td>
-				<td>${Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[","").replace("]","")}</td>
-				<td nowrap="nowrap">
-					<tds:convertDateTime date="${workflows?.dateCreated}" />
-				</td>
-				<td nowrap="nowrap">
-					<tds:convertDateTime date="${workflows?.lastUpdated}" />
-				</td>
+                    <g:sortableColumn property="dateCreated" title="Created On"/>
 
-				<td nowrap="nowrap">${workflows?.updateBy}</td>
-			</tr>
-		</g:each>
-	</tbody>
-</table>
+                    <g:sortableColumn property="lastUpdated" title="Updatated On"/>
+
+                    <g:sortableColumn property="updateBy" title="Updated By"/>
+
+                </tr>
+                </thead>
+                <tbody>
+                <g:each in="${workflowInstanceList}" status="i" var="workflows">
+                    <tr class="${(i % 2) == 0 ? 'odd' : 'even'}" onclick="showWorkflowList('${workflows?.id}')">
+
+                        <td nowrap="nowrap">${workflows?.process}</td>
+                        <td>${Project.findAllByWorkflowCode(workflows?.process)?.name.toString().replace("[", "").replace("]", "")}</td>
+                        <td nowrap="nowrap">
+                            <tds:convertDateTime date="${workflows?.dateCreated}"/>
+                        </td>
+                        <td nowrap="nowrap">
+                            <tds:convertDateTime date="${workflows?.lastUpdated}"/>
+                        </td>
+
+                        <td nowrap="nowrap">${workflows?.updateBy}</td>
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <g:form action="workflowList" name="workflowForm">
+                <input type="hidden" name="workflow" id="workflowId">
+            </g:form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function showWorkflowList(workflowId) {
+            $("#workflowId").val(workflowId);
+            $("form[name=workflowForm]").submit();
+        }
+    </script>
+    <script>
+        currentMenuId = "#adminMenu";
+        $("#adminMenuId a").css('background-color', '#003366')
+    </script>
 </div>
-<div> 
-	<g:form action="workflowList" name="workflowForm">
-			<input type="hidden" name="workflow" id="workflowId">
-	</g:form>
-</div>
-</div>
-<script type="text/javascript">
-function showWorkflowList( workflowId ){
-	$("#workflowId").val( workflowId );
-	$("form[name=workflowForm]").submit();
-}
-</script>
-<script>
-	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
-</script>
 </body>
 </html>
 				

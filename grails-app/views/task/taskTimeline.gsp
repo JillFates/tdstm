@@ -2,13 +2,13 @@
 	<head>
 		<title>Task Timeline</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<g:javascript src="asset.comment.js" />
 		<g:javascript src="asset.tranman.js"/>
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="d3/d3.js"/>
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="lodash/lodash.min.js" />
 		<g:javascript src="TimerBar.js" />
 

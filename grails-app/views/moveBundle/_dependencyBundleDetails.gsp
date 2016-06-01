@@ -4,12 +4,12 @@
 		<div style="margin-left: 0px; margin-bottom: 10px;">
 			<div class="message" id="messageId" style="display:none">${flash.message}</div>
         	<div style="width: 250px; margin-bottom: 3px">
-        		<h3>
+        		<h4>
 				<b>Dependency Groups</b>&nbsp;&nbsp;&nbsp;
 				<tds:hasPermission permission='DepAnalyzerGenerate'>
 				<input  type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
 				</tds:hasPermission>
-				</h3>
+				</h4>
 			</div>
 			<div class="planBundleSel">
 				<g:form name="bundleForm" action="dependencyConsole">	

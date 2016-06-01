@@ -1,10 +1,10 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<title>UserLogin</title>
 		
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminController.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'adminService.js')}"></script>
 		<script type="text/javascript" src="${resource(dir:'components/admin',file:'unlockAccountDirective.js')}"></script>

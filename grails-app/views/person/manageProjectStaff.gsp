@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<g:javascript src="tds-common.js" />
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
@@ -16,7 +16,6 @@
 		<g:javascript src="cabling.js"/>
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />
-		<g:javascript src="bootstrap.js" />
 		<g:javascript src="angular/plugins/ui-bootstrap-tpls-0.10.0.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-2.0.7.min.js" />
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
@@ -29,7 +28,7 @@
 		<g:javascript src="angular/plugins/ngGrid/ng-grid-layout.js" />
 
 
-				<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
+		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'jquery.autocomplete.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.accordion.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.resizable.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.slider.css')}" />
@@ -129,7 +128,7 @@
 						handleHeader('resize');
 					}, 100);
 				});
-				
+
 				$(window).scroll(function() {
 					var position = 16 - $(this).scrollLeft();
 					$('.floatingHeader').css('left', position + "px");

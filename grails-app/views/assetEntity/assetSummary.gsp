@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-<meta name="layout" content="projectHeader"/>
+<meta name="layout" content="topNav"/>
 <title>Asset Summary Table</title>
 </head>
 <body>
@@ -10,7 +10,7 @@
   <div>
   <h1>ASSET SUMMARY TABLE</h1>
   </div>
-  <table style="width:700px;">
+  <table class="asset-summary-table" style="width:700px;">
      <thead>
       <tr>
 	     <th>Bundle</th>

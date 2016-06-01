@@ -4,12 +4,12 @@
 <html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 		<title>Asset Comment</title>
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 
 		<jqgrid:resources />
 		<g:javascript src="jqgrid-support.js" />

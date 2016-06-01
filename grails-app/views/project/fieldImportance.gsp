@@ -3,14 +3,13 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Project Field Settings</title>
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<%--TODO:the following bootstrap contains few extra methods which is usefull for angular bootstrap,once testing entire application with this js I will replace it with bootstrap.js--%>
 	<g:javascript src="controllers/fieldImportance.js" />
 	<jqgrid:resources />
 	<g:javascript src="jqgrid-support.js" />
-	<link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap-tabs.css')}" type="text/css"/>
 </head>
 <body>
 	<h1 class="assetFieldHeader1">Project Field Settings</h1><br>
@@ -32,7 +31,7 @@
 					<img ng-hide="showLegend()" src="${resource(dir:'images',file:'triangle_right.png')}" /> 
 					<img ng-show="showLegend()" src="${resource(dir:'images',file:'triangle_down.png')}" /> 
 				</h1>
-				<table class="legendTable" ng-show="showLegend()">
+				<table class="legendTable field-importance-table" ng-show="showLegend()">
 					<tr ng-repeat="note in notes">
 						<td>{{note.imp}}</td>
 						<td class="{{note.id}}">{{note.field}}</td>
@@ -44,7 +43,7 @@
 			
 				<tabset>
 					 <tab ng-repeat="type in types" ng-click="toggleSection(type.name)" heading="{{type.id}}">
-						<table class="fieldTable">
+						<table class="fieldTable field-importance-table">
 								<tr ng-show="showSection(type.name)" class="crudTable">
 									<td>
 										<div>

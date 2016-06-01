@@ -3,9 +3,8 @@
 <head>
 	<title>Transition Planning Dashboard</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-	<meta name="layout" content="projectHeader" />
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-	<g:javascript src="bootstrap.js" />
+	<meta name="layout" content="topNav" />
+
 <script type="text/javascript">
 $(document).ready(function() {
 	currentMenuId = "#dashboardMenu";
@@ -335,13 +334,13 @@ $(document).ready(function() {
 								<div class="dashboard_bar_graph0">
 									<b>0% Applications Assigned</b>
 								</div>
-							</g:if> 
+							</g:if>
 							<g:elseif test="${assignedAppPerc == 100}">
 								<div class="task_completed" style="z-index: -1; height: 24px; width: 100%"></div>
 								<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
 									<b>100% Applications Assigned</b>
 								</div>
-							</g:elseif> 
+							</g:elseif>
 							<g:else>
 								<div class="dashboard_bar_graph" id="assignmentbar" style="width: 0%;"></div>
 								<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
@@ -360,13 +359,13 @@ $(document).ready(function() {
 								<div class="dashboard_bar_graph0">
 									<b>0% Applications Confirmed</b>
 								</div>
-							</g:if> 
+							</g:if>
 							<g:elseif test="${confirmedAppPerc == 100}">
 								<div class="task_completed" style="z-index: -1; height: 24px; width: 100%"></div>
 									<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
 										<b>100% Applications Confirmed</b>
 									</div>
-							</g:elseif> 
+							</g:elseif>
 							<g:else>
 								<div class="dashboard_bar_graph" id="confirmedbar" style="width: 0%;"></div>
 									<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
@@ -386,13 +385,13 @@ $(document).ready(function() {
 								<div class="dashboard_bar_graph0">
 									<b>0% Applications Moved</b>
 								</div>
-							</g:if> 
+							</g:if>
 							<g:elseif test="${movedAppPerc == 100}">
 								<div class="task_completed" style="z-index: -1; height: 24px; width: 100%"></div>
 								<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
 									<b>100% Applications Moved</b>
 								</div>
-							</g:elseif> 
+							</g:elseif>
 							<g:else>
 								<div class="dashboard_bar_graph" id="appmovedbar" style="width: 0%;"></div>
 								<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">

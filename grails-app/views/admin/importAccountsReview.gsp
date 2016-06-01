@@ -1,17 +1,10 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Import Accounts</title>
 
-	<link type="text/css" rel="stylesheet" href="${resource(dir: 'css', file: 'bootstrap.css')}"/>
-	<!-- Kendo UI Material Theme -->
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.common-material.min.css')}">
-	<link type="text/css" rel="stylesheet" href="${resource(dir:'dist/css/kendo',file:'kendo.material.min.css')}">
-
-	<script src="${resource(dir:'/dist/js/vendors/kendo',file:'kendo.all.min.js')}"></script>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
-	<g:javascript src="bootstrap.js" />
 
 	<%--
 

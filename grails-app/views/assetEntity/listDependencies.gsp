@@ -1,14 +1,14 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="projectHeader" />
+        <meta name="layout" content="topNav" />
         <title>Dependencies List</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css/jqgrid',file:'ui.jqgrid.css')}" />
 		<link type="text/css" rel="stylesheet" href="${g.resource(dir:'css',file:'ui.datepicker.css')}" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="asset.tranman.js" />
 		
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 		
 		<g:javascript src="asset.comment.js" />
 

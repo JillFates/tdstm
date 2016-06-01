@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Create Project</title>
 
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
@@ -131,7 +131,7 @@
 		</g:if> 
 		<g:form action="save" method="post" name="createProjectForm" enctype="multipart/form-data">
 			<div class="dialog">
-				<table>
+				<table class="create-project-table">
 					<tbody>	
 						<tr>
 							<td colspan="4"><div class="required"> Fields marked ( * ) are mandatory </div> </td>

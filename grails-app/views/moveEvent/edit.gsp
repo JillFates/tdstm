@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
+        <meta name="layout" content="topNav" />
         <title>Edit Event</title>
     <script type="text/javascript">
       function initialize(){
@@ -32,7 +32,7 @@
     </script>
         </head>
     <body>
-        <div class="body">
+        <div class="body move-event-edit">
             <h1>Edit Event</h1>
             <div class="nav" style="border: 1px solid #CCCCCC; height: 11px">
 		      <span class="menuButton"><g:link class="list" action="list">Events List</g:link></span>

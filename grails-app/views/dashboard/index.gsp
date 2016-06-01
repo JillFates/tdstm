@@ -1,14 +1,14 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Event Dashboard</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'dashboard.css')}" />
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tabcontent.css')}" />
 	<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 	<g:javascript src="asset.comment.js" />
 	<g:javascript src="yahoo.ui.dashboard.js" />
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="model.manufacturer.js"/>
 	<g:javascript src="TimerBar.js" />
 </head>
