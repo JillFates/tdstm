@@ -102,7 +102,9 @@
         </div>
 <script>
 	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
+    $('.menu-list-companies').addClass('active');
+    $('.menu-parent-admin').addClass('active');
+
 </script>
     </body>
 </html>

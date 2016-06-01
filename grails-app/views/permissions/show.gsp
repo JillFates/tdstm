@@ -58,7 +58,8 @@
 	</tds:hasPermission>
 	<script>
 		currentMenuId = "#adminMenu";
-		$("#adminMenuId a").css('background-color','#003366')
+		$('.menu-admin-role').addClass('active');
+		$('.menu-parent-admin').addClass('active');
 		
 		// handle the scrolling header
 		var headTable;

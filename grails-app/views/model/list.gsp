@@ -106,5 +106,9 @@
 		</div>
 		
 		<div id="fixedTest" style="position:fixed"></div>
+		<script>
+			$('.menu-list-models').addClass('active');
+			$('.menu-parent-admin').addClass('active');
+		</script>
 	</body>
 </html>

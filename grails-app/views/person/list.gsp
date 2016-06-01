@@ -160,5 +160,9 @@
 	<div class="dialog">
 		<div id="showOrMergeId" style="display: none;" title="Compare/Merge Persons"></div>
 	</div>
+	<script>
+		$('.menu-list-staff').addClass('active');
+		$('.menu-parent-admin').addClass('active');
+	</script>
 	</body>
 </html>

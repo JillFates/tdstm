@@ -300,7 +300,8 @@ function updatePage(){
 </div>
 <script>
 	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
+	$('.menu-list-models').addClass('active');
+	$('.menu-parent-admin').addClass('active');
 </script>
 </body>
 </html>

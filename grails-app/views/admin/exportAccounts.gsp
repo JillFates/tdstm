@@ -80,7 +80,8 @@
 	<script type="text/javascript">
 		$(window).load(function() {
 			currentMenuId = "#adminMenu";
-			$("#projectMenuId a").css('background-color','#003366');
+			$('.menu-client-export-accounts').addClass('active');
+			$('.menu-parent-admin').addClass('active');
 		});
 
 		// Used to enable/disable the LoginChoice radio button

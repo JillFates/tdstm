@@ -64,5 +64,9 @@
 
 		</div>
 	</div>
+	<script>
+		$('.menu-client-import-accounts').addClass('active');
+		$('.menu-parent-admin').addClass('active');
+	</script>
 </body>
 </html>

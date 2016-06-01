@@ -63,5 +63,9 @@
 			<div id="createManufacturerView" style="display: none;" ></div>
 			<div id="showManufacturerView" style="display: none;" ></div>
 		</div>
+		<script>
+			$('.menu-list-manufacturers').addClass('active');
+			$('.menu-parent-admin').addClass('active');
+		</script>
 	</body>
 </html>

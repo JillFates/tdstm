@@ -30,7 +30,10 @@
 
 	<script type="text/javascript">
 	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
+
+	$('.menu-admin-asset-options').addClass('active');
+	$('.menu-parent-admin').addClass('active');
+
     function addAssetOptions(value){
         var option = value;
         if(option=='planStatus'){

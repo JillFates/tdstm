@@ -315,7 +315,8 @@
 		})
 //					<input class="cancel" onclick="return confirm('Are you sure?');" value="Delete" />
 	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
+	$('.menu-list-users').addClass('active');
+	$('.menu-parent-admin').addClass('active');
 	
 	function deleteRole(id){
 		var values = $("#"+id).val()

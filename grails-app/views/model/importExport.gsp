@@ -69,7 +69,8 @@
     </div>
 <script>
 	currentMenuId = "#assetMenu";
-	$("#assetMenuId a").css('background-color','#003366')
+    $('.menu-sync-libraries').addClass('active');
+    $('.menu-parent-admin').addClass('active');
 </script>
   </body>
 </html>

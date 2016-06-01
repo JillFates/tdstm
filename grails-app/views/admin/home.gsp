@@ -239,8 +239,9 @@ a:hover {
 </div>
 
 <script>
-	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
+	currentMenuId = '#adminMenu';
+	$('.menu-admin-portal').addClass('active');
+	$('.menu-parent-admin').addClass('active');
 	
 	$(document).ready(function() {
 		$("#flushOldBatchId").dialog({ autoOpen: false })

@@ -329,5 +329,9 @@
 </div>
 
 <g:include view="/layouts/_error.gsp" />
+<script>
+	$('.menu-client-import-accounts').addClass('active');
+	$('.menu-parent-admin').addClass('active');
+</script>
 </body>
 </html>

@@ -111,17 +111,17 @@
                     <g:if test="${currProj}">
                         <ul class="nav navbar-nav">
                             <tds:hasPermission permission='AdminMenuView'>
-                                <li class="dropdown">
+                                <li class="dropdown menu-parent-admin">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Administration</li>
-                                        <li class="menu-child-item"><g:link controller="admin" action="home">Admin Portal</g:link> </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-admin-portal"><g:link controller="admin" action="home">Admin Portal</g:link> </li>
+                                        <li class="menu-child-item menu-admin-role">
                                             <tds:hasPermission permission='RolePermissionView'>
                                                 <g:link controller="permissions" action="show">Role Permissions</g:link>
                                             </tds:hasPermission>
                                         </li>
-                                        <li class="menu-child-item"><g:link controller="assetEntity" action="assetOptions">Asset Options</g:link></li>
+                                        <li class="menu-child-item menu-admin-asset-options"><g:link controller="assetEntity" action="assetOptions">Asset Options</g:link></li>
                                         <li class="menu-child-item">
                                             <tds:hasPermission permission='HelpMenuView'>
                                                 <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMAdminPortal?cover=print','help');" >help</a>
@@ -129,19 +129,19 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Manage Clients</li>
-                                        <li class="menu-child-item"><g:link controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}">List Companies</g:link></li>
-                                        <li class="menu-child-item"><g:link controller="person" id="${partyGroup}">List Staff</g:link></li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-list-companies"><g:link controller="partyGroup" action="list" params="[active:'active',tag_s_2_name:'asc']" id="${partyGroup}">List Companies</g:link></li>
+                                        <li class="menu-child-item menu-list-staff"><g:link controller="person" id="${partyGroup}">List Staff</g:link></li>
+                                        <li class="menu-child-item menu-list-users">
                                             <tds:hasPermission permission='UserLoginView'>
                                                 <g:link controller="userLogin" id="${partyGroup}">List Users</g:link>
                                             </tds:hasPermission>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-client-import-accounts">
                                             <tds:hasPermission permission='PersonImport'>
                                                 <g:link class="mmlink" controller="admin" action="importAccounts" >Import Accounts</g:link>
                                             </tds:hasPermission>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-client-export-accounts">
                                             <tds:hasPermission permission='PersonExport'>
                                                 <g:link controller="admin" action="exportAccounts" >Export Accounts</g:link>
                                             </tds:hasPermission>
@@ -153,7 +153,7 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Manage Workflows</li>
-                                        <li class="menu-child-item"><g:link controller="workflow" action="home">List Workflows </g:link></li>
+                                        <li class="menu-child-item menu-list-workflows"><g:link controller="workflow" action="home">List Workflows </g:link></li>
                                         <li class="menu-child-item">
                                             <tds:hasPermission permission='HelpMenuView'>
                                                 <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');">help</a>
@@ -161,9 +161,9 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Manage Model Library</li>
-                                        <li class="menu-child-item"><g:link controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link></li>
-                                        <li class="menu-child-item"><g:link controller="model" id="${partyGroup}">List Models</g:link></li>
-                                        <li class="menu-child-item"><g:link controller="model" action="importExport">Sync Libraries</g:link></li>
+                                        <li class="menu-child-item menu-list-manufacturers"><g:link controller="manufacturer" id="${partyGroup}">List Manufacturers</g:link></li>
+                                        <li class="menu-child-item menu-list-models"><g:link controller="model" id="${partyGroup}">List Models</g:link></li>
+                                        <li class="menu-child-item menu-sync-libraries"><g:link controller="model" action="importExport">Sync Libraries</g:link></li>
                                         <li class="menu-child-item">
                                             <tds:hasPermission permission='HelpMenuView'>
                                                 <a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMModelLibrary?cover=print','help');">help</a>

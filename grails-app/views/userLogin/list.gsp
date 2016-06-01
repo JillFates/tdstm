@@ -112,6 +112,12 @@
 			<jqgrid:wrapper id="userLoginId" />
 			<div id="personGeneralViewId" style="display: none;" title="Manage Staff "></div>
 		</div>
-		
+
+		<script>
+			var currentMenuId = "#adminMenu";
+
+			$('.menu-list-users').addClass('active');
+			$('.menu-parent-admin').addClass('active');
+		</script>
 	</body>
 </html>
