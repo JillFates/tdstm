@@ -840,9 +840,9 @@ class ProjectController {
 				}else{
 					message = "No Accounts selected for notification."
 				}
-			}catch(Exception e){
+			} catch(Exception e) {
 				message = "There was an error while processing the email notifications. Please contact Support."
-				log.error "An error occurred : ${e}"
+				log.error ExceptionUtil.messageWithStacktrace("sendAccountActivationEmails blew up", e)
 			}
 			
 		}else{
