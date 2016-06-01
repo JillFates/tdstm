@@ -1302,7 +1302,7 @@ class ProjectService {
 		List accounts = []
 
 		// All the staff associated with the current project
-		List persons = getTeamMembers(project)
+		List persons = getAssignedStaff(project)
 		if (! persons) {
 			return accounts
 		}
