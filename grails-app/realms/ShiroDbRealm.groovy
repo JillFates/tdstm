@@ -240,6 +240,7 @@ class ShiroDbRealm {
 		def maxPasswordAgeDays = getSecurityService().getUserLocalConfig().maxPasswordAgeDays
 		if ( state.authenticated &&
 			 (maxPasswordAgeDays > 0) &&
+			 state.user.passwordChangedDate &&
 			 ((state.user.passwordChangedDate.time + (maxPasswordAgeDays * 24 * 60 * 60 * 1000)) < TimeUtil.nowGMT().time)
 			) {
 				// Set the userLogin so that they're forced to change their password

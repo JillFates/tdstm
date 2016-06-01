@@ -124,4 +124,5 @@ databaseChangeLog = {
 	include file: '20160415-add-perms-for-accountImportExprt.groovy'
 	include file: '20160425-change-rate_of_change-in-asset_entity-precision.groovy'
 	include file: '20160428-remove-orphan-staffing-party-references.groovy'
+	include file: '20160601-drop-nonnull-on-UserLogin-passwordChangedDate.groovy'
 }

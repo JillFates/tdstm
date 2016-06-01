@@ -444,7 +444,7 @@ class SecurityService implements InitializingBean {
 				break
 			}
 
-			// Check if the user is changing the password to offen
+			// Check if the user is changing the password to often
 			if (! verifyMinPeriodToChangePswd(userLogin) ) {
 				auditService.logWarning("Forgot My Password for email $email was requested to frequently from $ipAddress")
 				break
@@ -750,9 +750,9 @@ class SecurityService implements InitializingBean {
 			}
 			userLogin.person = person
 
-			if (StringUtil.isBlank(params.password)) {
-				throw new DomainUpdateException("Password should not be empty")
-			}
+			//if (StringUtil.isBlank(params.password)) {
+			//	throw new DomainUpdateException("Password should not be empty")
+			//}
 
 		} else {
 			// Make sure we have a user to edit

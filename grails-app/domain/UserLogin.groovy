@@ -9,13 +9,13 @@ class UserLogin {
 	// def securityService
 
 	String username
-	String password
+	String password = ''
 	Date createdDate = TimeUtil.nowGMT()
 	Date lastLogin
 	String active
 	Date lastPage
 	Date expiryDate
-	Date passwordChangedDate = TimeUtil.nowGMT()
+	Date passwordChangedDate
 	Date lastModified = TimeUtil.nowGMT()
 	/** Used to signal during the login process that the user needs to change their password */
 	String forcePasswordChange = 'N'
@@ -39,13 +39,13 @@ class UserLogin {
 		person( nullable: false )
 		username( blank: false, unique:true, size:2..50 )
 		// TODO : Add a password constraint on size, and other rules
-		password( blank: false, nullable: false, password: true )
+		password( blank: true, nullable: false, password: true )
 		createdDate( nullable: true )
 		lastLogin( nullable: true )
 		active( nullable:false, inList:['Y', 'N'] )
 		lastPage( nullable: true )
 		expiryDate( nullable: false )
-		passwordChangedDate( nullable: false)
+		passwordChangedDate( nullable: true)
 		lastModified( nullable: false )
 		isLocal( nullable:false )
 		externalGuid( nullable:true, blank:true)
@@ -82,8 +82,8 @@ class UserLogin {
 		'disabled', 
 		'lockedOut', 
 		'hasEmail',
-		'passwordWasChanged', 
-		'personDetails', 
+		'passwordWasChanged',
+		'personDetails',
 		'securityRoleCodes',
 		'userActive'
 	]
@@ -231,7 +231,6 @@ class UserLogin {
 	// Insert/Update Events
 	// -------------------------------
 	def beforeInsert = {
-		checkForPasswordChange()
 	}
 	
 	def beforeUpdate = {
