@@ -320,7 +320,8 @@
 	   </script>
 <script>
 	currentMenuId = "#projectMenu";
-	$("#projectMenuId a").css('background-color','#003366')
+	$('.menu-projects-current-project').addClass('active');
+	$('.menu-parent-projects').addClass('active');
 </script>
 </body>
 </html>

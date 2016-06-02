@@ -110,5 +110,9 @@
 			</script>
 		</div>
 </div>
+<script>
+	$('.menu-projects-user-activation').addClass('active');
+	$('.menu-parent-projects').addClass('active');
+</script>
 </body>
 </html>

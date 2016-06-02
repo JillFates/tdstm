@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <title>Orphan records list</title>
 <g:javascript src="orphanData.js" />
 <style type="text/css">
@@ -101,7 +101,8 @@ a:hover {
 </script>
 <script>
 	currentMenuId = "#adminMenu";
-	$("#adminMenuId a").css('background-color','#003366')
+	$('.menu-admin-portal').addClass('active');
+	$('.menu-parent-admin').addClass('active');
 </script>
 </body>
 </html>

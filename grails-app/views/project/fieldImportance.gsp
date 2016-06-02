@@ -63,7 +63,8 @@
 	</div>
 	<script type="text/javascript">
 	currentMenuId = "#projectMenu";
-	$("#projectMenuId a").css('background-color','#003366')
+	$('.menu-projects-field-settings').addClass('active');
+	$('.menu-parent-projects').addClass('active');
 	$(".legend").css('margin-left',$(window).width()-375+"px")
 	
 	// handle the scrolling header

@@ -82,5 +82,9 @@
 		</span>
 	</div>
 </g:form></div>
+<script>
+	$('.menu-projects-active-projects').addClass('active');
+	$('.menu-parent-projects').addClass('active');
+</script>
 </body>
 </html>

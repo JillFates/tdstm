@@ -172,17 +172,17 @@
                                     </ul>
                                 </li>
                             </tds:hasPermission>
-                            <li class="dropdown">
+                            <li class="dropdown menu-parent-projects">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
-                                    <li class="menu-child-item"><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Active Projects</g:link></li>
+                                    <li class="menu-child-item menu-projects-active-projects"><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Active Projects</g:link></li>
                                     <g:if test="${currProjObj}">
-                                        <li class="menu-child-item"><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
-                                        <li class="menu-child-item"><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
+                                        <li class="menu-child-item menu-projects-current-project"><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProjObj.name.size()>20}">${currProjObj.name.substring(0,20)+'...'}</g:if><g:else>${currProjObj.name}</g:else> Details</g:link></li>
+                                        <li class="menu-child-item menu-projects-project-staff"><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
                                         <tds:hasPermission permission='SendUserActivations'>
-                                            <li class="menu-child-item"><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link></li>
+                                            <li class="menu-child-item menu-projects-user-activation"><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link></li>
                                         </tds:hasPermission>
-                                        <li class="menu-child-item"><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Settings</g:link></li>
+                                        <li class="menu-child-item menu-projects-field-settings"><g:link class="mmlink" controller="project" action="fieldImportance" onclick="hideMegaMenu('projectMegaMenu')">Field Settings</g:link></li>
                                     </g:if>
                                     <g:else>
                                         <li class="menu-child-warn">No Project Selected</li>
@@ -384,21 +384,21 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission='ReportMenuView'>
-                                <li class="dropdown">
+                                <li class="dropdown menu-parent-reports">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports<span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <tds:hasPermission permission='ShowDiscovery'>
                                             <li class="menu-parent-item">Discovery</li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" >Cabling Conflict</a> </li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a> </li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/powerReport">Power</a> </li>
+                                            <li class="menu-child-item menu-reports-cabling-conflict"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingConflict" >Cabling Conflict</a> </li>
+                                            <li class="menu-child-item menu-reports-cabling-data"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingData">Cabling Data</a> </li>
+                                            <li class="menu-child-item menu-reports-power"><a href="/tdstm/reports/powerReport">Power</a> </li>
                                             <tds:hasPermission permission='HelpMenuView'>
                                                 <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
                                             </tds:hasPermission>
                                         </tds:hasPermission>
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Planning</li>
-                                        <li class="menu-child-item"><a href="/tdstm/reports/applicationProfiles">Application Profiles</a> </li>
+                                        <li class="menu-child-item menu-reports-application-profiles"><a href="/tdstm/reports/applicationProfiles">Application Profiles</a> </li>
                                         <li class="menu-child-item"><a href="/tdstm/reports/applicationConflicts">Application Conflicts</a> </li>
                                         <li class="menu-child-item"><a href="/tdstm/reports/serverConflicts">Server Conflicts</a> </li>
                                         <li class="menu-child-item"><a href="/tdstm/reports/databaseConflicts" >Database Conflicts</a> </li>

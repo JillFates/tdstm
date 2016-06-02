@@ -328,7 +328,8 @@
 	<g:javascript>
 		$(window).load(function() {
 			currentMenuId = "#projectMenu";
-			$("#projectMenuId a").css('background-color','#003366');
+			$('.menu-projects-active-projects').addClass('active');
+			$('.menu-parent-projects').addClass('active');
 
 			// Disable the Enter Key from submitting the form (issue with the select2)
 			$(window).keydown( function(event) {

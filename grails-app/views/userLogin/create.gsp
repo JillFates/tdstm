@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<title>Create UserLogin</title>
 		
 		<script type="text/javascript">
@@ -346,7 +346,8 @@
 
 
 		currentMenuId = "#adminMenu";
-		$("#adminMenuId a").css('background-color','#003366')
+		$('.menu-list-users').addClass('active');
+		$('.menu-parent-admin').addClass('active');
 
 		function togglePasswordEditFields($me) {
 				var isChecked = $me.is(":checked")

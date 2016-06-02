@@ -178,6 +178,9 @@
 			</div>
 		</div>
 
-
+	 <script>
+		 $('.menu-projects-project-staff').addClass('active');
+		 $('.menu-parent-projects').addClass('active');
+	 </script>
 	 </body>
  </html>

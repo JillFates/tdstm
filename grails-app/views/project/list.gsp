@@ -64,7 +64,8 @@
 		</div>
 		<script>
 			currentMenuId = "#projectMenu";
-			$("#projectMenuId a").css('background-color','#003366')
+			$('.menu-projects-active-projects').addClass('active');
+			$('.menu-parent-projects').addClass('active');
 		</script>
 	</body>
 </html>
