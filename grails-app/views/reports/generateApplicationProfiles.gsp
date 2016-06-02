@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Application Profiles</title>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
 	<g:javascript src="projectStaff.js" />
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="asset.comment.js" />
 	<style type="text/css" media="print">
 	<%--Had given these css property in css file but was not reflecting. so defined in page itself--%>
@@ -35,12 +35,13 @@
 			$("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			currentMenuId = "#reportsMenu";
-			$("#reportsMenuId a").css('background-color','#003366')
+			$('.menu-reports-application-profiles').addClass('active');
+			$('.menu-parent-reports').addClass('active');
 		});
 	</script>
 </head>
 <body>
-	<div class="body" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
+	<div class="body content-generate-application-profiles" ng-app="tdsAssets" ng-controller="tds.assets.controller.MainController as assets" style="width:1000px;">
 		<div style="margin-top: 20px; color: black; font-size: 20px;text-align: center;" >
 			<b>Application Profiles - ${project.name} : ${moveBundle}, SME : ${sme} and App Owner : ${appOwner}</b><br/>
 			This report generated on <tds:convertDateTime date="${new Date()}" format="12hrs" /> for ${session.getAttribute("LOGIN_PERSON").name }.
@@ -48,7 +49,7 @@
 
 		<g:each var="appList" in="${applicationList}" var="application" status="i">
 			<div class='onepage'>
-				<table style="margin-left:80px;" class="tablePerPage">
+				<table style="margin-left:80px;" class="tablePerPage planning-application-profiles-table">
 					<tbody>
 						<tr>
 							<th>

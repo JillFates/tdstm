@@ -6,12 +6,13 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 	    currentMenuId = "#reportsMenu";
-	    $("#reportsMenuId a").css('background-color','#003366')
+		$('.menu-reports-power').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 	});
 </script>
 </head>
 <body>
-	<table>
+	<table class="reports-discovery-table">
 		<thead>
 			<tr>
 				<th>Location</th>

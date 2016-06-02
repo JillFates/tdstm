@@ -1,6 +1,6 @@
 <%@page defaultCodec="html" %> 
 
-<table>
+<table class="planning-application-profiles-table">
 	<tbody>
 		<tr>
 			<td class="label ${config.assetName} ${highlightMap.assetName?:''}" nowrap="nowrap"><label for="assetName">Name</label></td>

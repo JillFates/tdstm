@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
 		<title>Application Profiles</title>
@@ -68,7 +68,10 @@
 
 		<script type="text/javascript">
 			currentMenuId = "#reportsMenu"
-			$("#reportsMenuId a").css('background-color','#003366')
+
+			$('.menu-reports-application-profiles').addClass('active');
+			$('.menu-parent-reports').addClass('active');
+
 			$(document).ready(function() {
 				$("#moveBundleId").prepend("<option value='' disabled >──────────</option>")
 				.prepend("<option value='useForPlanning' id='planningBundlesId'>Planning Bundles</option>");
