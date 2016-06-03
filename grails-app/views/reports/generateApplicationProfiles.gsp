@@ -49,7 +49,7 @@
 
 		<g:each var="appList" in="${applicationList}" var="application" status="i">
 			<div class='onepage'>
-				<table style="margin-left:80px;" class="tablePerPage planning-application-profiles-table">
+				<table style="margin-left:80px;" class="tablePerPage planning-application-table">
 					<tbody>
 						<tr>
 							<th>

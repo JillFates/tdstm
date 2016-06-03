@@ -3,7 +3,7 @@
 <td valign="top">
 			<div>
 				<h1>Supports:</h1>
-				<table style="min-width: 400px;" class="planning-application-profiles-table">
+				<table style="min-width: 400px;" class="planning-application-table">
 					<thead>
 						<tr>
 							<th>Frequency</th>
@@ -57,7 +57,7 @@
 		<td valign="top">
 			<div>
 				<h1>Is dependent on:</h1>
-				<table style="min-width: 400px;" class="planning-application-profiles-table">
+				<table style="min-width: 400px;" class="planning-application-table">
 					<thead>
 						<tr>
 							<th>Frequency</th>

@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'rackLayout.css')}" />
 <title>Application Migration Results</title>
 <g:javascript src="report.js"/>
@@ -16,7 +16,7 @@
 		</g:if>
 		
 		<g:form action="generateApplicationMigration" name="applicationMigration" method="post" onsubmit="return disableGenerateButton(this.name)">
-			<table>
+			<table class="event-day-table">
 				<tbody>
 					<tr>
 						<td><label for="moveBundle">Bundle:</label></td>
@@ -57,7 +57,8 @@
 	</div>
 	<script type="text/javascript">
 		currentMenuId = "#reportsMenu"
-		$("#reportsMenuId a").css('background-color','#003366')
+		$('.menu-reports-application-migration').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 		
 		$(document).ready(function() {
 			$("#moveBundleId").prepend("<option value='' disabled >──────────</option>")

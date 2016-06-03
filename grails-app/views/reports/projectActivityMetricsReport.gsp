@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <title>Activity Metrics Report</title>
 <link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 <link type="text/css" rel="stylesheet" href="${resource(dir:'components/comment',file:'comment.css')}" />
@@ -80,6 +80,8 @@ $(document).ready(function() {
 	$('#startDate').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true});
 	$('#endDate').datepicker({showOn: 'both', buttonImage: '${resource(dir:'images',file:'calendar.gif')}', buttonImageOnly: true});
 })
+$('.menu-reports-activity-metrics').addClass('active');
+$('.menu-parent-reports').addClass('active');
 </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="projectHeader" />
+        <meta name="layout" content="topNav" />
         <title>TransitionManager&trade; Reports Home</title>
     </head>
 <body>
@@ -62,7 +62,7 @@
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Move Day</b></h1>
-			<table>
+			<table class="planning-application-table">
 				<thead>
 					<thead>
 						<tr>
@@ -83,7 +83,7 @@
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Application</b></h1>
-			<table>
+			<table class="planning-application-table">
 				<thead>
 					<thead>
 						<tr>
@@ -104,7 +104,7 @@
 		<td style="vertical-align:top">
 			<div>
 			<h1 style="margin-right: 0px;"><b>Infrastructure</b></h1>
-			<table>
+			<table class="planning-application-table">
 				<thead>
 					<thead>
 						<tr>
@@ -129,7 +129,8 @@
 <script>
 	$(document).ready(function() {
 	    currentMenuId = "#reportsMenu";
-	    $("#reportsMenuId a").css('background-color','#003366')
+		$('.menu-reports-report-summary').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 	});
 </script>
 </body>

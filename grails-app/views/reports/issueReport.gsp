@@ -2,12 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <title>Issue Report</title>
 <script type="text/javascript">
 	$(document).ready(function() {
 	    currentMenuId = "#reportsMenu";
-	    $("#reportsMenuId a").css('background-color','#003366')
+		$('.menu-reports-issue-report').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 	});
     
     function populateSelect( id, value ) {    	
@@ -44,7 +45,7 @@
 	<div class="message">${flash.message}</div>
 </g:if>
 <div class="dialog">
-<table>
+<table class="event-day-table">
 	<tbody>
 		<tr>
 			<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>

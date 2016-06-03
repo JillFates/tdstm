@@ -2,12 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <title>Move Results Report</title>
 <script type="text/javascript">
 	$(document).ready(function() {
 		currentMenuId = "#reportsMenu";
-		$("#reportsMenuId a").css('background-color', '#003366')
+		$('.menu-reports-task-report').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 	});
 </script>
 </head>
@@ -19,7 +20,7 @@
 				${flash.message}
 			</div>
 		</g:if>
-		<table>
+		<table class="planning-application-table">
 			<thead>
 				<tr>
 					<th>Task #</th>

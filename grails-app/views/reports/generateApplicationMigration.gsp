@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="layout" content="projectHeader" />
+<meta name="layout" content="topNav" />
 <title>Application Migration Results</title>
 <g:javascript src="asset.tranman.js" />
 <g:javascript src="entity.crud.js" />
 <g:javascript src="model.manufacturer.js"/>
-<g:render template="../layouts/angularResources" />
+<g:render template="../layouts/responsiveAngularResources" />
 <g:javascript src="asset.comment.js" />
 <jqgrid:resources />
 <g:javascript src="jqgrid-support.js" />
@@ -25,7 +25,8 @@
 		$("#showEntityView").dialog({ autoOpen: false })
 		$("#editEntityView").dialog({ autoOpen: false })
 		currentMenuId = "#reportsMenu";
-		$("#reportsMenuId a").css('background-color','#003366')
+		$('.menu-reports-application-migration').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 	});
 </script>
 </head>
@@ -40,7 +41,7 @@
 		</div>
 		${eventErrorString}
 		<br/>
-		<table style="margin-left:5%;" ng-controller="tds.comments.controller.MainController as comments">
+		<table class="event-day-table" style="margin-left:5%;" ng-controller="tds.comments.controller.MainController as comments">
 			<thead>
 				<tr>
 					<th>Name</th>

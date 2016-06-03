@@ -7,7 +7,8 @@
 <script>
 	$(document).ready(function() {
 	    currentMenuId = "#reportsMenu";
-	    $("#reportsMenuId a").css('background-color','#003366')
+		$('.menu-reports-pre-checklist').addClass('active');
+		$('.menu-parent-reports').addClass('active');
 	});
 </script>
 </head>

@@ -4,7 +4,7 @@
 	</td>
 	<td>
 		<g:each var="appList" in="${appList}" var="assetEntity" status="i">
-			<table class="conflictApp">
+			<table class="conflictApp planning-application-table">
 				<thead>
 					<tr>
 						<th colspan="${columns}">

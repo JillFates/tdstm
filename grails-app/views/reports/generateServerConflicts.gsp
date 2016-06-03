@@ -2,11 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Server Conflicts</title>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="asset.comment.js" />
 	<script>
 		var maxR
@@ -22,7 +22,8 @@
 			$("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			currentMenuId = "#reportsMenu";
-			$("#reportsMenuId a").css('background-color','#003366')
+			$('.menu-reports-server-conflicts').addClass('active');
+			$('.menu-parent-reports').addClass('active');
 
 			maxR = ${maxR}
 			ofst = ${ofst}
@@ -64,7 +65,7 @@
 			${time}
 		</div>
 		${eventErrorString}
-		<table>
+		<table class="planning-application-table">
 			<tbody id="serverConflictTbody">
 				<g:render template="serverConflicts"></g:render>
 			</tbody>

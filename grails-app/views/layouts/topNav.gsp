@@ -399,25 +399,25 @@
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Planning</li>
                                         <li class="menu-child-item menu-reports-application-profiles"><a href="/tdstm/reports/applicationProfiles">Application Profiles</a> </li>
-                                        <li class="menu-child-item"><a href="/tdstm/reports/applicationConflicts">Application Conflicts</a> </li>
-                                        <li class="menu-child-item"><a href="/tdstm/reports/serverConflicts">Server Conflicts</a> </li>
-                                        <li class="menu-child-item"><a href="/tdstm/reports/databaseConflicts" >Database Conflicts</a> </li>
+                                        <li class="menu-child-item menu-reports-application-conflicts"><a href="/tdstm/reports/applicationConflicts">Application Conflicts</a> </li>
+                                        <li class="menu-child-item menu-reports-server-conflicts"><a href="/tdstm/reports/serverConflicts">Server Conflicts</a> </li>
+                                        <li class="menu-child-item menu-reports-database-conflicts"><a href="/tdstm/reports/databaseConflicts" >Database Conflicts</a> </li>
                                         <tds:hasPermission permission='ShowPlanning'>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
+                                            <li class="menu-child-item menu-reports-task-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Task+Report">Task Report</a> </li>
                                         </tds:hasPermission>
-                                        <li class="menu-child-item"><g:link controller="reports" params="[projectId:currProjObj?.id]">Report Summary</g:link></li>
+                                        <li class="menu-child-item menu-reports-report-summary"><g:link controller="reports" params="[projectId:currProjObj?.id]">Report Summary</g:link></li>
                                         <tds:hasPermission permission='ShowProjectDailyMetrics'>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
+                                            <li class="menu-child-item menu-reports-activity-metrics"><a href="/tdstm/reports/projectActivityMetrics">Activity Metrics</a> </li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='ShowMovePrep'>
                                             <li class="divider"></li>
                                             <li class="menu-parent-item">Event Prep</li>
                                             <tds:hasPermission permission="ShowMovePrep">
-                                                <li class="menu-child-item"><a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a> </li>
+                                                <li class="menu-child-item menu-reports-pre-checklist"><a href="/tdstm/reports/preMoveCheckList">Pre-event Checklist</a> </li>
                                             </tds:hasPermission>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges">Login Badges</a> </li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a> </li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a></li>
+                                            <li class="menu-child-item menu-reports-login-badges"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Login+Badges">Login Badges</a> </li>
+                                            <li class="menu-child-item menu-reports-asset-tags"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Asset+Tag">Asset Tags</a> </li>
+                                            <li class="menu-child-item menu-reports-transport-worksheets"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Transportation+Asset+List">Transport Worksheets</a></li>
                                             <tds:hasPermission permission='HelpMenuView'>
                                                 <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>
                                             </tds:hasPermission>
@@ -425,8 +425,8 @@
                                         <tds:hasPermission permission='ShowMoveDay'>
                                             <li class="divider"></li>
                                             <li class="menu-parent-item">Event Day</li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
-                                            <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" >Issue Report</a> </li>
+                                            <li class="menu-child-item menu-reports-application-migration"><a href="/tdstm/reports/applicationMigrationReport" onclick="hideMegaMenu('reportsMegaMenu')">Application Migration Results</a> </li>
+                                            <li class="menu-child-item menu-reports-issue-report"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=Issue+Report" >Issue Report</a> </li>
                                             <li class="menu-child-item"><a href="/tdstm/reports/retrieveBundleListForReportDialog?reportId=CablingQA">Cabling QA</a> </li>
                                             <tds:hasPermission permission='HelpMenuView'>
                                                 <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TranManHelp?cover=print','help');">help</a></li>

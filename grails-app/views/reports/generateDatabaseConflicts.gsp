@@ -2,18 +2,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="projectHeader" />
+	<meta name="layout" content="topNav" />
 	<title>Database Conflicts</title>
 	<g:javascript src="asset.tranman.js" />
 	<g:javascript src="entity.crud.js" />
-	<g:render template="../layouts/angularResources" />
+	<g:render template="../layouts/responsiveAngularResources" />
 	<g:javascript src="asset.comment.js" />
 	<script>
 		$(document).ready(function() {
 			$("#showEntityView").dialog({ autoOpen: false })
 			$("#editEntityView").dialog({ autoOpen: false })
 			currentMenuId = "#reportsMenu";
-			$("#reportsMenuId a").css('background-color','#003366')
+			$('.menu-reports-database-conflicts').addClass('active');
+			$('.menu-parent-reports').addClass('active');
 		});
 	</script>
 </head>
@@ -27,13 +28,13 @@
 			${time}
 		</div>
 		${eventErrorString}
-		<table>
+		<table class="planning-application-table">
 			<tbody id="serverConflictTbody">
 				<tr>
 					<td></td>
 					<td>
 						<g:each var="appList" in="${appList}" var="assetEntity" status="i">
-							<table class="conflictApp">
+							<table class="conflictApp planning-application-table">
 								<thead>
 									<tr>
 										<th colspan="${columns}">
