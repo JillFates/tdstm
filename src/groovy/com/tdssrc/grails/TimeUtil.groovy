@@ -405,6 +405,9 @@ class TimeUtil {
 			throw new RuntimeException('formatDateTime called with missing DateFormat formatter parameter')
 		}
 		def tzId = session.getAttribute( TIMEZONE_ATTR )?.CURR_TZ
+		if(!tzId){
+			tzId = "GMT"
+		}
 		return formatDateTimeWithTZ(tzId, dateValue, formatter)
 	}
 
