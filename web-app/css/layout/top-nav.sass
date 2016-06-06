@@ -79,9 +79,6 @@
   nav
     ul.menu-item-expand
       border: 1px solid #d2d6de
-      li
-        a
-          line-height: 12px
       li.menu-parent-item
         display: block
         padding: 1px 13px
@@ -102,7 +99,10 @@
         li.menu-parent-item
           color: #fff
       li.menu-child-item
-        padding-left: 10px
+        &.active
+          a
+            background-color: $c_menuSelected !important
+            color: $c_black2
       li.menu-child-warn
         color: red
         padding-left: 28px
