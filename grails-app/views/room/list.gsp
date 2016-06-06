@@ -429,8 +429,16 @@
 			}
 		}
 		currentMenuId = "#roomsMenu";
-		$("#roomMenuId a").css('background-color','#003366')
-		</script>
+
+		if(viewType && viewType == 'list') {
+			$(".menu-parent-data-centers-list-rooms").addClass('active');
+		} else {
+			$(".menu-parent-data-centers-selected-center").addClass('active');
+		}
+
+		$(".menu-parent-data-centers").addClass('active');
+
+	</script>
 		<g:render template="../assetEntity/initAssetEntityData"/>
 	</body>
 </html>

@@ -75,5 +75,9 @@
   </table>
 
   </div>
+	<script>
+		$(".menu-parent-assets-summary-table").addClass('active');
+		$(".menu-parent-assets").addClass('active');
+	</script>
 </body>
 </html>

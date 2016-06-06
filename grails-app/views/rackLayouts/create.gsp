@@ -303,7 +303,8 @@
         }
 
         currentMenuId = "#racksMenu";
-        $("#rackMenuId a").css('background-color', '#003366')
+        $(".menu-parent-data-centers-rack-elevation").addClass('active');
+        $(".menu-parent-data-centers").addClass('active');
     </script>
 </div>
 </body>

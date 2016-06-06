@@ -200,7 +200,13 @@
 		<g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
-			$("#assetMenuId a").css('background-color','#003366')
+			var filter = '${filter}';
+			if(filter && filter == 'all') {
+				$(".menu-parent-assets-all-list").addClass('active');
+			} else {
+				$(".menu-parent-assets-server-list").addClass('active');
+			}
+			$(".menu-parent-assets").addClass('active');
 		</script>
 	</body>
 </html>

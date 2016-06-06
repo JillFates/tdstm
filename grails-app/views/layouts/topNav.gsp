@@ -192,16 +192,16 @@
                                     </tds:hasPermission>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown menu-parent-data-centers">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Centers<span class="caret"></span></a>
                                 <ul class="dropdown-menu menu-item-expand" role="menu">
                                     <li class="menu-parent-item">Rooms and Racks</li>
-                                    <li class="menu-child-item"><g:link  params="[viewType:'list']" controller="room" >List Rooms</g:link></li>
+                                    <li class="menu-child-item menu-parent-data-centers-list-rooms" ><g:link  params="[viewType:'list']" controller="room" >List Rooms</g:link></li>
                                     <g:if test="${roomId}">
-                                        <li class="menu-child-item"><g:link params="[roomId:roomId]" controller="room">Room ${room?.location}/${room?.roomName}</g:link></li>
+                                        <li class="menu-child-item menu-parent-data-centers-selected-center"><g:link params="[roomId:roomId]" controller="room">Room ${room?.location}/${room?.roomName}</g:link></li>
                                     </g:if>
                                     <tds:hasPermission permission='AssetEdit'>
-                                        <li class="menu-child-item"><g:link controller="rackLayouts" action="create" >Rack Elevations</g:link></li>
+                                        <li class="menu-child-item menu-parent-data-centers-rack-elevation"><g:link controller="rackLayouts" action="create" >Rack Elevations</g:link></li>
                                     </tds:hasPermission>
                                     <tds:hasPermission permission='HelpMenuView'>
                                         <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMRooms?cover=print','help');">help</a></li>
@@ -209,35 +209,35 @@
                                 </ul>
                             </li>
                             <tds:hasPermission permission='AssetMenuView'>
-                                <li class="dropdown">
+                                <li class="dropdown menu-parent-assets">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets<span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Assets</li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-summary-table">
                                             <g:link class="mmlink" controller="assetEntity" action="assetSummary">
                                                 <g:img uri="/icons/application_view_columns.png" width="16" height="16"/>
                                                 Summary Table
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-application-list">
                                             <g:link class="mmlink" controller="application" action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <tds:svgIcon name="application" width="16" height="16" />
                                                 Applications
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-server-list">
                                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'server']" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <tds:svgIcon name="serverPhysical" width="16" height="16" />
                                                 Servers
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-all-list" >
                                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'all']" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <tds:svgIcon name="other" width="16" height="16" />
                                                 All Devices
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-database-list">
                                             <g:link class="mmlink" controller="database"    action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <tds:svgIcon name="database" width="16" height="16" />
                                                 Databases
