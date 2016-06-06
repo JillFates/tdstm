@@ -657,7 +657,7 @@ class UserService implements InitializingBean {
 					UserLogin userLogin = UserLogin.findByUsername(username)
 					def now = TimeUtil.nowGMT()
 					if (userLogin) {
-						if ((userLogin.lastPage - now) > 500) {
+						if ((now.getTime() - userLogin.lastPage.getTime()) > 500) {
 							userLogin.lastPage = now
 							userLogin.save(flush:true)
 						}
