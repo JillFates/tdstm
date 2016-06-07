@@ -95,5 +95,9 @@
 			<g:render template="../assetEntity/dependentAdd" />
 			<g:render template="initAssetEntityData"/>
 		</div>
+		<script>
+			$(".menu-parent-assets-dependencies-list").addClass('active');
+			$(".menu-parent-assets").addClass('active');
+		</script>
 	</body>
 </html>

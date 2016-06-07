@@ -243,32 +243,32 @@
                                                 Databases
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-storage-list">
                                             <g:link class="mmlink" controller="assetEntity" action="list" params="[filter:'storage']" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <tds:svgIcon name="storagePhysical" width="16" height="16" />
                                                 Storage-Devices
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-storage-logical-list">
                                             <g:link class="mmlink" controller="files"       action="list" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <tds:svgIcon name="storageLogical" width="16" height="16" />
                                                 Storage-Logical
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-comments-list">
                                             <g:link class="mmlink" controller="assetEntity" action="listComment" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <g:img uri="/icons/comments.png" width="16" height="16"/>
                                                 Comments
                                             </g:link>
                                         </li>
-                                        <li class="menu-child-item">
+                                        <li class="menu-child-item menu-parent-assets-dependencies-list">
                                             <g:link class="mmlink" controller="assetEntity" action="listDependencies" onclick="hideMegaMenu('assetMegaMenu')">
                                                 <g:img uri="/icons/bricks.png" width="16" height="16"/>
                                                 Dependencies
                                             </g:link>
                                         </li>
                                         <tds:hasPermission permission='DepAnalyzerView'>
-                                            <li class="menu-child-item">
+                                            <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                                 <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
                                                     <g:img uri="/icons//brick_magnify.png" width="16" height="16"/>
                                                     Dependency Analyzer
@@ -276,7 +276,7 @@
                                             </li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='ArchitectureView'>
-                                            <li class="menu-child-item">
+                                            <li class="menu-child-item menu-parent-assets-architecture-graph">
                                                 <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
                                                     <g:img uri="/icons/chart_organisation.png" width="16" height="16"/>
                                                     Architecture Graph

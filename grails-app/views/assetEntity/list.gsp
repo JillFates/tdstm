@@ -203,6 +203,8 @@
 			var filter = '${filter}';
 			if(filter && filter == 'all') {
 				$(".menu-parent-assets-all-list").addClass('active');
+			} else if(filter && filter == 'storage') {
+				$(".menu-parent-assets-storage-list").addClass('active');
 			} else {
 				$(".menu-parent-assets-server-list").addClass('active');
 			}

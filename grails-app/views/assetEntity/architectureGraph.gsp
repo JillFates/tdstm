@@ -340,6 +340,9 @@
 		$('#graphSVGContainer').append(appSVGShapes.getAll());
 	});
 
+	$(".menu-parent-assets-architecture-graph").addClass('active');
+	$(".menu-parent-assets").addClass('active');
+
 </script>
 <div style="display: none;" id="graphSVGContainer"></div>
 </body>

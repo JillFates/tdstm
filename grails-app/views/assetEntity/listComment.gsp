@@ -34,7 +34,8 @@
 				$("#createEntityView").dialog({ autoOpen: false })
 				$("#cablingDialogId").dialog({ autoOpen:false })
 				currentMenuId = "#assetMenu";
-				$("#assetMenuId a").css('background-color','#003366')
+				$(".menu-parent-assets-comments-list").addClass('active');
+				$(".menu-parent-assets").addClass('active');
 				$(".span_ready").parent().addClass("task_ready")
 				$(".span_hold").parent().addClass("task_hold")
 				$(".span_started").parent().addClass("task_started")

@@ -143,7 +143,9 @@
         <g:render template="../assetEntity/initAssetEntityData"/>
 		<script>
 			currentMenuId = "#assetMenu";
-			$("#assetMenuId a").css('background-color','#003366')
+
+			$(".menu-parent-assets-storage-logical-list").addClass('active');
+			$(".menu-parent-assets").addClass('active');
 		</script>
 	</body>
 </html>
