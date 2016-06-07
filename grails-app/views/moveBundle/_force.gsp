@@ -93,6 +93,7 @@ var gravity = ${multiple ? 0.05 : 0};
 var distanceIntervals = 500;
 var graphPadding = 15;
 var cutLinkSize = 500;
+var graphSizeLimit = 40000;
 var floatMode = false;
 var maxWeight;
 var maxFamilyWeights = [];
@@ -615,7 +616,6 @@ function resizeGraph (width, height) {
 
 // centers the view onto the graph
 function centerGraph () {
-	//debugger;
 	var ranges = getGraphRanges();
 	var visWidth = ranges.maxX - ranges.minX;
 	var visHeight = ranges.maxY - ranges.minY;
@@ -636,20 +636,23 @@ function centerGraph () {
 	var translateAfter = [translateXAfter, translateYAfter];
 	
 	scaleAfter = Math.min(scaleAfter, 2.0);
-
-
-	if (scaleAfter < 2) {
-		zoomBehavior.scale(scaleAfter);
-		zoomBehavior.translate(translateAfter);
-	} if(visWidth > 40000 && visHeight > 40000 && depGroup == 0){
-		// We are dealing with big, huge Graph
+	
+	// set the new scale and translate values
+	if (visWidth > graphSizeLimit && visHeight > graphSizeLimit && depGroup == 0) {
+		// the graph exceeded the max size, so use the max size translate
 		zoomBehavior.scale(0.37892914162759944);
 		zoomBehavior.translate([527.9102296165405, 185.33142583118914]);
+	} else if (scaleAfter < 2) {
+		// use the calculated transform
+		zoomBehavior.scale(scaleAfter);
+		zoomBehavior.translate(translateAfter);
 	} else {
+		// the graph exceeded the min size, so use the default scale
 		zoomBehavior.scale(1);
 		zoomBehavior.translate([0, 0]);
 	}
-		zoomBehavior.event(canvas);
+	
+	zoomBehavior.event(canvas);
 }
 
 // finds the rotation of the graph that requires the least zooming
