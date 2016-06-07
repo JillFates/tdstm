@@ -305,7 +305,6 @@ setFocus();
 </script>
 <script>
 	currentMenuId = "#teamMenuId";
-	$("#teamMenuId a").css('background-color','#003366')
 	var timerBar;
 	
 	$(document).ready(function() {
@@ -324,6 +323,9 @@ setFocus();
 		setTimeout(function(){ issueDetails(${selectedTaskId}); }, 500);
 		</g:if>
 	});
+
+	$(".menu-parent-tasks-my-tasks").addClass('active');
+	$(".menu-parent-tasks").addClass('active');
 </script>
 	<g:render template="../assetEntity/initAssetEntityData"/>
 	<g:render template="../layouts/error"/>

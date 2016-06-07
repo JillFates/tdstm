@@ -304,30 +304,30 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission='EventMenuView'>
-                                <li class="dropdown">
+                                <li class="dropdown menu-parent-planning">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning<span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Events</li>
-                                        <li class="menu-child-item"><g:link controller="moveEvent" action="list" >List Events</g:link> </li>
+                                        <li class="menu-child-item menu-parent-planning-event-list"><g:link controller="moveEvent" action="list" >List Events</g:link> </li>
                                         <g:if test="${currProjObj && moveEvent}">
-                                            <li class="menu-child-item"><g:link controller="moveEvent" action="show" id="${moveEventId}">${moveEventName} Event Details</g:link></li>
+                                            <li class="menu-child-item menu-parent-planning-event-detail-list"><g:link controller="moveEvent" action="show" id="${moveEventId}">${moveEventName} Event Details</g:link></li>
                                         </g:if>
                                         <tds:hasPermission permission='ShowListNews'>
-                                            <li class="menu-child-item"><g:link controller="newsEditor" >List Event News</g:link></li>
+                                            <li class="menu-child-item menu-parent-planning-event-news"><g:link controller="newsEditor" >List Event News</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission="ShowMovePrep">
                                             <li class="menu-child-item"><g:link controller="reports" action="preMoveCheckList" >Pre-event Checklist</g:link></li>
                                         </tds:hasPermission>
-                                        <li class="menu-child-item"><g:link controller="moveEvent" action="exportRunbook">Export Runbook</g:link></li>
+                                        <li class="menu-child-item menu-parent-planning-export-runbook"><g:link controller="moveEvent" action="exportRunbook">Export Runbook</g:link></li>
                                         <tds:hasPermission permission='HelpMenuView'>
                                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMEvents?cover=print','help');" >help</a></li>
                                         </tds:hasPermission>
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Bundles</li>
-                                        <li class="menu-child-item"><g:link controller="moveBundle" action="list">List Bundles</g:link> </li>
+                                        <li class="menu-child-item menu-parent-planning-list-bundles"><g:link controller="moveBundle" action="list">List Bundles</g:link> </li>
                                         <g:if test="${currProjObj && moveBundleId}">
-                                            <li class="menu-child-item"><g:link controller="moveBundle" action="show">${moveBundleName} Bundle Details</g:link></li>
-                                            <li class="menu-child-item"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]">Bundled Assets</g:link> </li>
+                                            <li class="menu-child-item menu-parent-planning-selected-bundle"><g:link controller="moveBundle" action="show">${moveBundleName} Bundle Details</g:link></li>
+                                            <li class="menu-child-item menu-parent-planning-bundled-assets"><g:link controller="moveBundleAsset" action="assignAssetsToBundle" params="[bundleId:moveBundleId]">Bundled Assets</g:link> </li>
                                         </g:if>
                                         <tds:hasPermission permission='HelpMenuView'>
                                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMBundles?cover=print','help');">help</a></li>
@@ -336,22 +336,22 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission='BundleMenuView'>
-                                <li class="dropdown">
+                                <li class="dropdown menu-parent-tasks">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Tasks</li>
-                                        <li class="menu-child-item"><a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a></li>
+                                        <li class="menu-child-item menu-parent-tasks-my-tasks"><a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a></li>
                                         <tds:hasPermission permission='ViewTaskManager'>
-                                            <li class="menu-child-item"><g:link controller="assetEntity" action="listTasks"  params="[initSession:true]">Task Manager</g:link></li>
+                                            <li class="menu-child-item menu-parent-tasks-task-manager"><g:link controller="assetEntity" action="listTasks"  params="[initSession:true]">Task Manager</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='ViewTaskGraph'>
-                                            <li class="menu-child-item"><g:link controller="task" action="taskGraph"  params="[initSession:true]" >Task Graph</g:link></li>
+                                            <li class="menu-child-item menu-parent-tasks-task-graph"><g:link controller="task" action="taskGraph"  params="[initSession:true]" >Task Graph</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='ViewTaskTimeline'>
-                                            <li class="menu-child-item"><g:link controller="task" action="taskTimeline">Task Timeline</g:link></li>
+                                            <li class="menu-child-item menu-parent-tasks-task-timeline"><g:link controller="task" action="taskTimeline">Task Timeline</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission="ViewRecipe">
-                                            <li class="menu-child-item"><g:link controller="cookbook" action="index">Cookbook</g:link></li>
+                                            <li class="menu-child-item menu-parent-tasks-cookbook"><g:link controller="cookbook" action="index">Cookbook</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission="GenerateTasks">
                                             <li class="menu-child-item"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
@@ -363,15 +363,15 @@
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission='DashBoardMenuView'>
-                                <li class="dropdown">
+                                <li class="dropdown menu-parent-dashboard">
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards<span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Live Dashboards</li>
-                                        <li class="menu-child-item"><g:link controller="dashboard" action="userPortal" >User Dashboard</g:link></li>
+                                        <li class="menu-child-item menu-parent-dashboard-user-dashboard"><g:link controller="dashboard" action="userPortal" >User Dashboard</g:link></li>
                                         <tds:hasPermission permission='ShowPlanning'>
-                                            <li class="menu-child-item"><g:link controller="moveBundle" action="planningStats" >Planning Dashboard</g:link></li>
+                                            <li class="menu-child-item menu-parent-dashboard-planning-dashboard"><g:link controller="moveBundle" action="planningStats" >Planning Dashboard</g:link></li>
                                         </tds:hasPermission>
-                                        <li class="menu-child-item"><g:link controller="dashboard">Event Dashboard</g:link></li>
+                                        <li class="menu-child-item menu-parent-dashboard-event-dashboard"><g:link controller="dashboard">Event Dashboard</g:link></li>
                                     <!-- <%-- Removed until this report will be implemented using tasks
                                             <tds:hasPermission permission='ShowCartTracker'>
                                                 <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>

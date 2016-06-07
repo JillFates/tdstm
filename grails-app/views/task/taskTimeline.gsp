@@ -134,6 +134,9 @@
 			function reloadGraph () {
 				submitForm();
 			}
+
+			$(".menu-parent-tasks-task-timeline").addClass('active');
+			$(".menu-parent-tasks").addClass('active');
 		</script>
 	</body>
 </html>

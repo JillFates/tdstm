@@ -335,6 +335,10 @@
 			$('#searchBoxId').val('');
 			performSearch();
 		}
+
+		$(".menu-parent-tasks-task-graph").addClass('active');
+		$(".menu-parent-tasks").addClass('active');
+
 		</script>
 	</head>
 	<body>
@@ -368,5 +372,9 @@
 			<span id="spinnerId" style="display: none"><img alt="" src="${resource(dir:'images',file:'spinner.gif')}"/></span>
 		</div>
 		<g:render template="../layouts/error"/>
+		<script>
+			$(".menu-parent-tasks-task-graph").addClass('active');
+			$(".menu-parent-tasks").addClass('active');
+		</script>
 	</body>
 </html>

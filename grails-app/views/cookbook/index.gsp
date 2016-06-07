@@ -81,7 +81,10 @@
 					el.CodeMirror.focus();
 				}, 10)
 			});
-		})
+		});
+
+		$(".menu-parent-tasks-cookbook").addClass('active');
+		$(".menu-parent-tasks").addClass('active');
 	</script>
 
 </body>

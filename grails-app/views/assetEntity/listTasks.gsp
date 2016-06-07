@@ -44,7 +44,8 @@
 			$("#cablingDialogId").dialog({ autoOpen:false })
 			$("#createStaffDialog").dialog({ autoOpen: false })
 			currentMenuId = "#assetMenu";
-			$("#teamMenuId a").css('background-color','#003366')
+			$(".menu-parent-tasks-task-manager").addClass('active');
+			$(".menu-parent-tasks").addClass('active');
 			$("#viewGraphSpanId").css('margin-left',$(window).width()*3.3/100+'%')
 			
 			var event = ${filterEvent}
@@ -260,24 +261,24 @@
 	</div>
  <g:render template="initAssetEntityData"/>
  <script type="text/javascript">
-function toggleCheckbox (chkbox, field) {
-	$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
-	submitForm()
-}
-function toggleViewUnpublished (e) {
-	var checkedValue = $(e.srcElement).is(':checked');
-	viewUnpublished = checkedValue;
-	setUserPreference('viewUnpublished', checkedValue, function () {
-		reloadGrid();
-	});
-}
-function submitForm () {
-	$('#commentForm').submit()
-}
+	function toggleCheckbox (chkbox, field) {
+		$('input[name='+field+']').val(chkbox.checked ? '1' : '0')
+		submitForm()
+	}
+	function toggleViewUnpublished (e) {
+		var checkedValue = $(e.srcElement).is(':checked');
+		viewUnpublished = checkedValue;
+		setUserPreference('viewUnpublished', checkedValue, function () {
+			reloadGrid();
+		});
+	}
+	function submitForm () {
+		$('#commentForm').submit()
+	}
 
-function loadGrid () {
-	$(".ui-icon-refresh").click()
-}
+	function loadGrid () {
+		$(".ui-icon-refresh").click()
+	}
 </script>
 </body>
 

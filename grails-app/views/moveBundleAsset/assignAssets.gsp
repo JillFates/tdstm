@@ -344,7 +344,8 @@
 <script type="text/javascript">
 initialize()
 	currentMenuId = "#eventMenu";
-	$("#eventMenuId a").css('background-color','#003366')
+	$(".menu-parent-planning-bundled-assets").addClass('active');
+	$(".menu-parent-planning").addClass('active');
 </script>
 </body>
 </html>

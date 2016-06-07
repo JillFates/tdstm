@@ -734,6 +734,9 @@
 
             $("#teamMenuId a").css('background-color', '#003366');
 
+            $(".menu-parent-dashboard-user-dashboard").addClass('active');
+            $(".menu-parent-dashboard").addClass('active');
+
             // Avoid dialog to auto open ( if this is all page, why not a global change?)
             $("#personGeneralViewId").dialog({autoOpen: false});
 

@@ -1144,7 +1144,8 @@
 	</script>
 <script>
 	currentMenuId = "#dashboardMenu";
-	$("#dashboardMenuId a").css('background-color','#003366')
+	$(".menu-parent-dashboard-event-dashboard").addClass('active');
+	$(".menu-parent-dashboard").addClass('active');
 </script>
 	<g:render template="../layouts/error"/>
 </body>

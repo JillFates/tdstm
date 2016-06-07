@@ -37,7 +37,8 @@
 		</g:form>
 		<script type="text/javascript">
 		currentMenuId = "#eventMenu";
-		$("#eventMenuId a").css('background-color','#003366')
+		$(".menu-parent-planning-export-runbook").addClass('active');
+		$(".menu-parent-planning").addClass('active');
 		function generateRunbook () {
 			var moveEvent = $('#eventList').val();
 			var boo = false;

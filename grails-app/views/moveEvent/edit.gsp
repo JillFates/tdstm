@@ -190,7 +190,8 @@
         </div>
 <script>
 	currentMenuId = "#eventMenu";
-	$("#eventMenuId a").css('background-color','#003366')
+    $(".menu-parent-planning-event-detail-list").addClass('active');
+    $(".menu-parent-planning").addClass('active');
 </script>
     </body>
 </html>

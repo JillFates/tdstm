@@ -217,7 +217,8 @@
     </div>
     <script>
     currentMenuId = "#eventMenu";
-	$("#eventMenuId a").css('background-color','#003366')
+    $(".menu-parent-planning-list-bundles").addClass('active');
+    $(".menu-parent-planning").addClass('active');
    </script>
   </body>
 </html>

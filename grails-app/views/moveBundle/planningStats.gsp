@@ -8,7 +8,9 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	currentMenuId = "#dashboardMenu";
-	$("#dashboardMenuId a").css('background-color', '#003366');
+
+	$(".menu-parent-dashboard-planning-dashboard").addClass('active');
+	$(".menu-parent-dashboard").addClass('active');
 
 	var percentageAppToValidate = 100 - ${percentageAppToValidate}
 			$("#discoverybar").animate({width: percentageAppToValidate + "%"}, 1000);

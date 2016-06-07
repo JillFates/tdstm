@@ -426,7 +426,8 @@ function textCounter(fieldId, maxlimit) {
 </script>
 <script>
 	currentMenuId = "#consoleMenu";
-	$("#consoleMenuId a").css('background-color','#003366')
+	$(".menu-parent-planning-event-news").addClass('active');
+	$(".menu-parent-planning").addClass('active');
 </script>
 </body>
 </html>

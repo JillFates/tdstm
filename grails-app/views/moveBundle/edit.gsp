@@ -748,7 +748,8 @@
 	</script>
 	<script>
 		currentMenuId = "#eventMenu";
-		$("#eventMenuId a").css('background-color','#003366')
+		$(".menu-parent-planning-selected-bundle").addClass('active');
+		$(".menu-parent-planning").addClass('active');
     </script>
   </body>
 </html>
