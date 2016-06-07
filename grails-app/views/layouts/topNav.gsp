@@ -289,13 +289,13 @@
                                         <li class="divider"></li>
                                         <li class="menu-parent-item">Manage Data</li>
                                         <tds:hasPermission permission='Import'>
-                                            <li class="menu-child-item"><g:link controller="assetEntity" action="assetImport" >Import Assets</g:link></li>
+                                            <li class="menu-child-item menu-parent-assets-import-assets"><g:link controller="assetEntity" action="assetImport" >Import Assets</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='Import'>
-                                            <li class="menu-child-item"><g:link controller="dataTransferBatch" action="index" >Manage Batches</g:link></li>
+                                            <li class="menu-child-item menu-parent-assets-manage-batches"><g:link controller="dataTransferBatch" action="index" >Manage Batches</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='Export'>
-                                            <li class="menu-child-item"><g:link controller="assetEntity" action="exportAssets" >Export Assets</g:link></li>
+                                            <li class="menu-child-item menu-parent-assets-export-assets"><g:link controller="assetEntity" action="exportAssets" >Export Assets</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='HelpMenuView'>
                                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMImportExport?cover=print','help');">help</a></li>

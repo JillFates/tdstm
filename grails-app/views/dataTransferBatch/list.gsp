@@ -245,9 +245,10 @@
 			}
 
     	currentMenuId = "#assetMenu";
-    	$("#assetMenuId a").css('background-color','#003366');
-			$('#assetMenu').show();
-			$('#reportsMenu').hide();
+        $(".menu-parent-assets-manage-batches").addClass('active');
+        $(".menu-parent-assets").addClass('active');
+        $('#assetMenu').show();
+        $('#reportsMenu').hide();
 
 		</script>
 		

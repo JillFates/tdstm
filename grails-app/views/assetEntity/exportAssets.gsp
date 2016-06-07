@@ -145,7 +145,8 @@
 
 	<script>
 		currentMenuId = "#assetMenu";
-		$("#assetMenuId a").css('background-color','#003366')
+		$(".menu-parent-assets-export-assets").addClass('active');
+		$(".menu-parent-assets").addClass('active');
 	</script>
 
 	</body>
