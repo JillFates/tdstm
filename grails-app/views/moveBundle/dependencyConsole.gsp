@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-		<meta name="layout" content="projectHeader" />
+		<meta name="layout" content="topNav" />
 		<title>Dependency Analyzer</title>
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
@@ -14,7 +14,7 @@
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
 		<g:javascript src="projectStaff.js" />
-		<g:render template="../layouts/angularResources" />
+		<g:render template="../layouts/responsiveAngularResources" />
 		<g:javascript src="progressBar.js" />
 
 		<g:javascript src="asset.comment.js" />
@@ -309,7 +309,8 @@
 				$("#createStaffDialog").dialog({ autoOpen: false })
 
 				currentMenuId = "#assetMenu";
-				$("#assetMenuId a").css('background-color','#003366')
+				$(".menu-parent-assets-dependency-analyzer").addClass('active');
+				$(".menu-parent-assets").addClass('active');
 				setGroupTablePosition();
 				$(window).resize(function() {
 					setGroupTablePosition();
