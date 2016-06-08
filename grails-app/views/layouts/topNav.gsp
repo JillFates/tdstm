@@ -337,7 +337,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission='BundleMenuView'>
                                 <li class="dropdown menu-parent-tasks">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
+                                    <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks<span class="caret"></span></a>
                                     <ul class="dropdown-menu menu-item-expand" role="menu">
                                         <li class="menu-parent-item">Tasks</li>
                                         <li class="menu-child-item menu-parent-tasks-my-tasks"><a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a></li>
@@ -354,7 +354,7 @@
                                             <li class="menu-child-item menu-parent-tasks-cookbook"><g:link controller="cookbook" action="index">Cookbook</g:link></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission="GenerateTasks">
-                                            <li class="menu-child-item"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
+                                            <li class="menu-child-item menu-parent-tasks-generation-history"><a href="/tdstm/cookbook/index#/generationHistory">Generation History</a></li>
                                         </tds:hasPermission>
                                         <tds:hasPermission permission='HelpMenuView'>
                                             <li class="menu-child-item"><a href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMTaskOverview?cover=print','help');">help</a></li>

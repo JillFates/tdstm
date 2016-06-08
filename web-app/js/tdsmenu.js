@@ -216,7 +216,7 @@
 					}
 					break;
 				case "#teamMegaMenu":
-					if($("#teamMegaMenu:visible").length){
+					/*if($("#teamMegaMenu:visible").length){*/
 						jQuery.ajax({
 							url: contextPath+'/task/retrieveUserToDoCount',
 							type:'POST',
@@ -230,8 +230,7 @@
 						$("#teamMenuId a").css('background-color','lightblue');
 						$("#teamMenuId a").css('border-right-color','lightblue');
 						$("#teamMenuId a").css('color','#354E81');
-						$("#teamAnchor").css("display","inline")
-					}
+					/*}*/
 					break;
 				case "#consoleMegaMenu":
 					if($("#consoleMegaMenu:visible").length){

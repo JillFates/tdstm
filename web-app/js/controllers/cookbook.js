@@ -1271,6 +1271,9 @@ tds.cookbook.controller.TaskGenerationCompletedController.$inject = ['$scope', '
  */
 tds.cookbook.controller.TaskBatchHistoryController = function(scope, state, stateParams, log, timeout, utils, cookbookService, alerts) {
 
+	$(".menu-parent-tasks-cookbook").removeClass('active');
+	$(".menu-parent-tasks-generation-history").addClass('active');
+
 	scope.tasks = {};
 
 	scope.tasks.gridData = [{'message': 'No results found', 'context': 'none'}];
