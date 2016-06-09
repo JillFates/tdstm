@@ -946,8 +946,8 @@ class AssetEntityService {
 	}
 	
 	/**
-	 * Delete asset and associated records, User this method when we want to delete an Entity
-	 * @param assetEntityInstance
+	 * Delete asset and associated records - use this method when we want to delete any asset 
+	 * @param assetEntity
 	 * @return
 	 */
 	def deleteAsset(assetEntity){

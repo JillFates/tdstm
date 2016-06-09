@@ -5,7 +5,7 @@
 <tds:hasPermission permission='AssetDelete'>
 	<g:if test="${deleteChassisWarning}">
 		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will ' +
-		  'clear the reference for all associated blades. Click OK to continue otherwise click Cancel');" value="Delete" /> </span>
+		  'clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');" value="Delete" /> </span>
 	</g:if>
 	<g:else>
 		<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /> </span>	
