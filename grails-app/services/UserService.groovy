@@ -657,7 +657,8 @@ class UserService implements InitializingBean {
 					UserLogin userLogin = UserLogin.findByUsername(username)
 					def now = TimeUtil.nowGMT()
 					if (userLogin) {
-						if ((now.getTime() - userLogin.lastPage.getTime()) > 500) {
+						// Only update if the page request is more than 5 seconds to avoid the multi-ajax requests within the same page
+						if ((now.getTime() - userLogin.lastPage.getTime()) > 5000) {
 							userLogin.lastPage = now
 							userLogin.save(flush:true)
 						}
