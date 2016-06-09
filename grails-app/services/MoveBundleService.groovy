@@ -684,12 +684,13 @@ class MoveBundleService {
 	 * @return List of records
 	 */
 	private def searchForAssetDependencies(moveBundleText, connectionTypes, statusTypes) {
+
 		// Query to fetch dependent asset list with dependency type and status and move bundle list with use for planning .
 		def queryForAssets = """SELECT a.asset_entity_id as assetId, ad.asset_id as assetDepFromId, ad.dependent_id as assetDepToId, a.move_bundle_id as moveBundleId, ad.status as status, ad.type as type, a.asset_type as assetType FROM asset_entity a
 			LEFT JOIN asset_dependency ad on a.asset_entity_id = ad.asset_id OR ad.dependent_id = a.asset_entity_id
 			WHERE a.move_bundle_id in (${moveBundleText}) """
-		queryForAssets += connectionTypes == 'null' ? "" : " AND ad.type in (${connectionTypes}) "
-		queryForAssets += statusTypes == 'null' ? "" : " AND ad.status in (${statusTypes}) "
+		queryForAssets += connectionTypes ? " AND ad.type in (${connectionTypes}) " : ""
+		queryForAssets += statusTypes ? " AND ad.status in (${statusTypes}) " : ""
 		queryForAssets += " ORDER BY a.asset_entity_id DESC  "
 
 		log.info "SQL used to find assets: ${queryForAssets}"
