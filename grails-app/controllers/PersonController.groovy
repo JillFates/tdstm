@@ -276,36 +276,25 @@ def test = {
 		def personInstance = Person.get( params.id )
 		def companyId = params.companyId
 		if ( personInstance ) {
-			def partyInstance = Party.findById( personInstance.id )      
-			def partyRelnInst = PartyRelationship.findAll("from PartyRelationship pr where pr.partyIdTo = ${personInstance.id}")         
-			def partyRole = PartyRole.findAll("from PartyRole p where p.party =${partyInstance.id}")      
-			def loginInst = UserLogin.find("from UserLogin ul where ul.person = ${personInstance.id}")
-			if ( loginInst ) {
-				def preferenceInst = UserPreference.findAll("from UserPreference up where up.userLogin = ${loginInst.id}")
-				preferenceInst.each{
-				  it.delete()
-				  }
-				loginInst.delete()
-			}       
-			partyRelnInst.each{
-			it.delete()
+			Map deleteResultMap = personService.deletePerson(personInstance, true, true)
+			if(deleteResultMap["deleted"]){
+				flash.message = "Person ${personInstance} deleted"	
+			}else{
+				StringBuffer message = new StringBuffer("")
+				deleteResultMap["messages"].each{
+					message.append("it\n")
+				}
+				flash.message = message.toString()
 			}
-			partyRole.each{
-			it.delete()
-			}      
-			partyInstance.delete()      
-			personInstance.delete()
-			if( personInstance.lastName == null ) {
-				personInstance.lastName = ""
-			}
-			flash.message = "Person ${personInstance} deleted"
-			redirect( action:"list", params:[ id:companyId ] )
+			
 		}
 		else {
 			flash.message = "Person not found with id ${params.id}"
-			redirect( action:"list", params:[ id:companyId ] )
+			
 		}
+		redirect( action:"list", params:[ id:companyId ] )
 	}
+	
 	/**
 	 * return person details to EDIT form
 	 * Note: No reference found to this method

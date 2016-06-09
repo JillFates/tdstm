@@ -554,6 +554,90 @@ class PersonService {
 	}
 
 	/**
+	 * This method deletes a person and other entities
+	 * related to the instance, such as party and party role.
+	 *
+	 * @param person - Person Instance to be deleted
+	 * @param deleteIfUserLogin - boolean that indicates if a person with existing UserLogin must be deleted.
+	 * @param deleteIfAssocWithAssets - boolean that indicates if a person with relationships with assets must
+	 *									 be deleted (see PERSON_DELETE_EXCEPTIONS_MAP)
+	 * @return Map[
+	 *				String[]	-> messages: errors and other messages.
+	 *				int 		-> cleared: assets cleared
+	 *				Boolean 	-> deleted: the person was deleted.
+	 *			]
+	 */
+	Map deletePerson(Person person, boolean deleteIfUserLogin, boolean deleteIfAssocWithAssets){
+		int cleared = 0
+		boolean deleted = false
+		String messages = []
+		def userLogin = UserLogin.find("from UserLogin ul where ul.person = ${person.id}")
+
+		boolean isDeletable = !haveRelationship(person) && !(!deleteIfUserLogin && userLogin)
+		if(isDeletable){
+
+			Person.withTransaction { trxStatus ->
+
+				try{
+
+					// Sets additional person references to NULL
+					PERSON_DELETE_EXCEPTIONS_MAP.each { table, fields ->
+						fields.each { column, status ->
+							if(isDeletable){
+								def rels = jdbcTemplate.queryForList("SELECT count(*) AS count FROM ${table} WHERE ${column} = '${person.id}'")
+								if(rels[0].count > 0){
+									if(deleteIfAssocWithAssets){
+										// Clear out the person's associate with all assets for the given column
+										log.debug "Disassociated person as $column"
+										cleared += jdbcTemplate.update("UPDATE ${table} SET ${column} = NULL WHERE ${column} = '${person.id}'")
+									}else{
+										log.debug("Ignoring delete of person ${person.id} as it contains $column association with asset(s)")
+										messages << "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due it contains $column association with asset(s)."
+										isDeletable = false
+									}
+								}
+							}
+						}
+					}
+						
+					if(isDeletable){
+						Map map = [person: person]
+						// Deletes Party Roles
+						Person.executeUpdate("Delete PartyRole p where p.party=:person", map)
+						// Deletes Party Relationships
+						Person.executeUpdate("Delete PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
+						def partyInstance = Party.findById(person.id)
+						// Deletes Party
+						partyInstance.delete()
+
+						if(deleteIfUserLogin){
+							if (userLogin) {
+								def preferenceInst = UserPreference.findAll("from UserPreference up where up.userLogin = ${userLogin.id}")
+								preferenceInst.each{
+								  it.delete()
+								}
+								userLogin.delete()
+							}
+						}
+						person.delete()
+						deleted = true
+
+					}
+				
+				}catch(Exception e){
+					status.setRollbackOnly()
+					messages << "There was an error trying to delete staff '${person.firstName}, ${person.lastName}'"
+					log.debug("An error occurred while trying to delete ${person.id}: " + e)
+				}		
+			}		
+		}else{
+			messages << "Staff '${person.firstName}, ${person.lastName}' unable to be deleted due to associations with existing elements in one or more Projects. Please use Person Merge functionality if applicable."
+		}
+
+		return [messages: messages, cleared: cleared, deleted: deleted]
+	}
+
+	/**
 	 * This action is used to merge Person's UserLogin according to criteria
 	 * 1. If neither account has a UserLogin - nothing to do
 	 * 2. If Person being merged into the master has a UserLogin but master doesn't, assign the UserLogin to the master Person record.
@@ -570,7 +654,7 @@ class PersonService {
 			fromUserLogin.save(flush:true)
 		} else if(fromUserLogin && toUserLogin){
 			if(fromUserLogin.lastLogin && toUserLogin.lastLogin){
-				if (fromUserLogin.lastLogin > toUserLogin.lastLogin){
+				if ((fromUserLogin.active == "Y" && toUserLogin.active == "N") ||  (toUserLogin.active == fromUserLogin.active && fromUserLogin.lastLogin > toUserLogin.lastLogin)){
 					fromUserLogin.person = toPerson
 					toUserLogin.delete()
 				} else {
@@ -599,6 +683,12 @@ class PersonService {
 		PERSON_DOMAIN_RELATIONSHIP_MAP.each{key, value ->
 			value.each{ prop ->
 				jdbcTemplate.update("UPDATE ${key} SET ${prop} = '${toPerson.id}' where ${prop}= '${fromPerson.id}'")
+			}
+		}
+
+		PERSON_DELETE_EXCEPTIONS_MAP.each { table, fields ->
+			fields.each { column, status ->
+				jdbcTemplate.update("UPDATE ${table} SET ${column} = '${toPerson.id}' WHERE ${column} = '${fromPerson.id}'")
 			}
 		}
 	}
@@ -719,7 +809,20 @@ class PersonService {
 				if (id.isLong()) {
 					Person person = Person.get(id)
 					if (person) {
-						
+						// Deletes the person and other related entities.
+						Map deleteResultMap = deletePerson(person, true, deleteIfAssocWithAssets)
+
+						// Updates variables that comput different results.
+						cleared += deleteResultMap["cleared"]
+						if(deleteResultMap["deleted"]){
+							deleted++
+						}else{
+							skipped++
+						}
+						messages = messages + deleteResultMap["messages"]
+
+
+						/*
 						// Don't delete if they have a UserLogin
 						def userLogin = UserLogin.findByPerson(person)
 						if (userLogin) {
@@ -781,7 +884,7 @@ class PersonService {
 						Person.executeUpdate("Delete PartyRelationship p where p.partyIdFrom=:person or p.partyIdTo=:person", map)
 						person.delete(flush:true)
 						deleted++
-
+						*/
 					}
 				}
 			}
