@@ -1634,7 +1634,7 @@ function submitCheckBox(){
 		}, function() {
 			location.reload();
 		},
-		"<h1>Generating Dependency Groups</h1>");
+		"Generating Dependency Groups");
 	});
 
 }

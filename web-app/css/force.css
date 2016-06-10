@@ -624,7 +624,7 @@ div.graphPanel.openPanel {
 }
 
 .ui-front {
-	z-index: 120 !important;
+	/*z-index: 120 !important;*/
 }
 #head_crawler {
 	border-left: 0px !important;

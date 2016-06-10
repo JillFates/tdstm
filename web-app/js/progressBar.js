@@ -11,13 +11,13 @@ tds.ui.progressBar = function(taskId, pingTime, onSuccess, onFailure, progressTi
 					'<h4 id="progressTitle" class="modal-title" id="myModalLabel">Modal title</h4>' +
 				'</div>' +
 				'<div class="modal-body" style="max-height:20em; overflow-y:auto">' +
-					'<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>' +
+					'<p id="progressStatus" style="color:#777777; font-size: 12px; font-family: verdana; margin-top: 4px;"></p>' +
 					'<div id="innerGlobalProgressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; font-size: 11px; font-family: verdana;">0%</div>' +
 					'<p id="progressStatus" style="color:#777777; font-size: 11px; font-family: verdana; margin-top: 4px;"></p>' +
 				'</div>' +
 				'<div class="modal-footer">' +
 					'<button id="progressClose" type="button" class="btn btn-default" data-dismiss="modal" style="display:none;">Close</button>' +
-					'<button id="progressCancel" type="button" class="btn btn-primary" style="display:none;">Cancel</button>' +
+					'<button id="progressCancel" type="button" class="btn btn-primary" style="display:none;"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>' +
 				'</div>' +
 			'</div>' + 
 		'</div>' +

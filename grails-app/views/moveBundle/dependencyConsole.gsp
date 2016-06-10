@@ -67,7 +67,7 @@
 									&nbsp;&nbsp; <span>Save as defaults</span>
 						</div>
 						<div class="buttonR">
-							<input type="button" class="submit" style="margin-top: 40px; margin-left: 10px;" value="Generate" onclick="submitCheckBox()" />
+							<button type="button" class="btn btn-default submit" value="Generate" id="generateId" onclick="submitCheckBox()"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Generate</button>
 						</div>
 					</g:form>
 				</div> 
