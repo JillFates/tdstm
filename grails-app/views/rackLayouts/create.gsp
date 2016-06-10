@@ -83,20 +83,14 @@
                             </label><br/>
                         </div>
                     </td>
-
-                    <td class="buttonR">
-                        <br/><br/>
-                        <input type="hidden" id="viewMode" name="viewMode" value=""/>
-                        <input type="submit" class="submit" value="Generate" id="generateId"/>
-                    </td>
-
-                    <td class="buttonR">
-                        <br/><br/>
-                        <input type="submit" class="submit" value="Print View"/>
-                    </td>
                 </tr>
                 </tbody>
             </table>
+            <div class="action-wrapper">
+                <input type="hidden" id="viewMode" name="viewMode" value=""/>
+                <button type="submit" class="btn btn-default submit" value="Generate" id="generateId"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Generate</button>
+                <button type="submit" class="btn btn-default submit" value="Print View"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Print View</button>
+            </div>
         </g:form>
     </div>
 
@@ -274,7 +268,7 @@
             var bundleId = bundleObj.val();
             ${remoteFunction(action:'retrieveRackDetails', params:'\'bundles=\' + bundleId', onComplete:'updateRackDetails(XMLHttpRequest)')};
 
-            $('input.submit').click(function () {
+            $('button.submit').click(function () {
                 $('#viewMode').val($(this).val());
             });
         })(jQuery);
