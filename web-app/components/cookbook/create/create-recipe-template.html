@@ -75,6 +75,6 @@
 	</form>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-default" ng-disabled="(clone.activeTabs.newRecipe && (createRecipeForm.$invalid || isUnchanged(newRecipe))) || (!clone.activeTabs.newRecipe && (!clone.newRecipe.name || !clone.projectsGrid.selectedItems[0]))" ng-click="save()">Save</button>
-	<button class="btn btn-default" ng-click="cancel()">Cancel</button>
+	<button class="btn btn-default" ng-disabled="(clone.activeTabs.newRecipe && (createRecipeForm.$invalid || isUnchanged(newRecipe))) || (!clone.activeTabs.newRecipe && (!clone.newRecipe.name || !clone.projectsGrid.selectedItems[0]))" ng-click="save()"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save</button>
+	<button class="btn btn-default" ng-click="cancel()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 </div>

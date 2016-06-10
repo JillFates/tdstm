@@ -173,10 +173,8 @@
 		</div>
 
 		<div class="buttons" ng-class="form.$invalid?'disabledButton' : ''">
-			<span class="button">
-			<input class="tablesave" type="button" id="saveAndCloseBId" value="Save" ng-click="saveComment(true, form.$invalid)" />
-			</span>
-			<span class="button"><input type="button" class="cancel" value="Cancel" ng-click="close()"/>
+			<button type="button" id="saveAndCloseBId" class="btn btn-default tablesave" ng-click="saveComment(true, form.$invalid)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save</button>
+			<button type="button" class="btn btn-default tablesave cancel" ng-click="close()"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Cancel</button>
 		</div>
 			
 	</form>

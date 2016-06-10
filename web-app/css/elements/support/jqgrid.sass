@@ -1,25 +1,43 @@
 div.content-wrapper
-  div.ui-jqgrid-view
-    span
-      input
-        color: $black
-      input:disabled
-        color: $fontDisabledGray
-  table.ui-jqgrid-htable
-    border-collapse: inherit
-    thead
-      box-sizing: initial !important
-      tr
-        box-sizing: initial !important
-        th
+  div.ui-widget-header
+    background: $material_c_blue1 50% 50% repeat-x !important
+    border-color: $material_c_blue1 !important
+    -webkit-border-radius: 0px
+    -moz-border-radius: 0px
+    border-radius: 0px
+    div.ui-corner-bottom
+      -webkit-border-radius: 0px
+      -moz-border-radius: 0px
+      border-radius: 0px
+    div.ui-jqgrid-view
+      span
+        input
+          color: $black
+        input:disabled
+          color: $fontDisabledGray
+      div.ui-jqgrid-titlebar
+        background: $material_c_blue1 50% 50% repeat-x !important
+        border-color: $material_c_blue1 !important
+        -webkit-border-radius: 0px
+        -moz-border-radius: 0px
+        border-radius: 0px
+      table.ui-jqgrid-htable
+        border-collapse: inherit
+        thead
           box-sizing: initial !important
-  table.ui-jqgrid-btable
-    border-collapse: inherit
-    tbody
-      box-sizing: initial !important
-      tr
-        box-sizing: initial !important
-        td
-          box-sizing: initial !important
-          span
+          tr
             box-sizing: initial !important
+            th.ui-th-column input
+              color: $black
+            th
+              box-sizing: initial !important
+      table.ui-jqgrid-btable
+        border-collapse: inherit
+        tbody
+          box-sizing: initial !important
+          tr
+            box-sizing: initial !important
+            td
+              box-sizing: initial !important
+              span
+                box-sizing: initial !important

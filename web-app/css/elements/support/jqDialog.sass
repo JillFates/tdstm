@@ -1,6 +1,68 @@
 div.ui-dialog
-  z-index: 1030
+  z-index: 1060
+  padding: 0px
+  -webkit-border-radius: 0px
+  -moz-border-radius: 0px
+  border-radius: 0px
+  border: 0px
+  top: 30px
+  div.dialog
+    background-color: $white
+    border: 0px !important
+  div.buttons
+    padding: 15px
+    font-size: 14px
+    text-align: right
+    border: 0px
+    border-top: 1px solid #e5e5e5
+    margin-top: 0px
+    -webkit-border-radius: 0px
+    -moz-border-radius: 0px
+    border-radius: 0px
+    background: white none
+  div.ui-widget-header
+    background: $material_c_blue1 50% 50% repeat-x !important
+    border-color: $material_c_blue1 !important
+    -webkit-border-radius: 0px
+    -moz-border-radius: 0px
+    border-radius: 0px
+    height: 39px
+    padding-top: 7px
+    font-size: 16px
+    button.ui-dialog-titlebar-close
+      display: none !important
   table
-    td.label
-      label
-        color: initial
+    border-spacing: 2px
+    border-collapse: initial
+    div
+      .label
+        display: table-cell
+        text-align: initial
+        vertical-align: inherit
+        label
+          color: $c_black2
+          font-size: 12px
+          font-style: normal
+          font-weight: normal !important
+      .highField
+        label
+          color: $red !important
+          font-weight: 700 !important
+  div#createEntityView
+    background-color: $white
+  table#updateCommentTable, table#updateResolveTable
+    padding: 20px
+    tbody
+      tr
+        td
+          label
+            color: $c_black2
+            font-size: 12px
+            font-style: normal
+            font-weight: normal
+
+div.ui-widget-overlay
+  opacity: 1
+  filter: Alpha(Opacity=100)
+  background: rgba(0,0,0,0.3)
+  z-index: 1050

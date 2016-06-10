@@ -1525,11 +1525,6 @@ div.dialog input#description {
 	content: " ";
 }
 
-/* TODO: Review with Kendo CSS for Dropdown*/
-span.k-dropdown span.k-dropdown-wrap span.k-select {
-	padding-top: 7px;
-}
-
 .k-list-container .k-list .k-item
 {
 	padding-right: 25px;

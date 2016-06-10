@@ -1176,6 +1176,7 @@ var EntityCrud = ( function($) {
 		if (createModal.length) {
 			createModal.html(html);
 			createModal.dialog('option', 'width', 'auto');
+			createModal.dialog('option', 'modal', 'true');
 			createModal.dialog('option', 'position', ['center','top']);
 			createModal.dialog('open');
 			pub.closeEditModal();
