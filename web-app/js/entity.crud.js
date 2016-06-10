@@ -1025,6 +1025,7 @@ var EntityCrud = ( function($) {
 			pub.closeCreateModal();
 			editModal.html(html);
 			editModal.dialog('option', 'width', 'auto');
+			editModal.dialog('option', 'modal', 'true');
 			editModal.dialog('option', 'position', ['center','top']);
 			editModal.dialog('open');
 			
@@ -1092,6 +1093,7 @@ var EntityCrud = ( function($) {
 			pub.closeEditModal();
 			showModal.html(html);
 			showModal.dialog('option', 'width', 'auto');
+			showModal.dialog('option', 'modal', 'true');
 			showModal.dialog('option', 'position', ['center','top']);
 			showModal.dialog('open');
 			if (typeof timerBar !== 'undefined')
@@ -1382,6 +1384,7 @@ var EntityCrud = ( function($) {
 		var title = 'Comment for ' + depAssetText + ' (' + tdsCommon.capitalize(type) + ')';
 
 		modal.dialog('option', 'width', 'auto');
+		modal.dialog('option', 'modal', 'true');
 		modal.dialog('option', 'position', 'absolute');
 		modal.dialog('option', 'title', title);
 		modal.dialog('open'); 
@@ -1983,6 +1986,7 @@ function populateModelSelect(e,rackId){
 
 function showDependencyControlDiv(){
 	$("#checkBoxDiv").dialog('option', 'width', '350px')
+	$("#checkBoxDiv").dialog('option', 'modal', 'true');
 	$("#checkBoxDiv").dialog('option', 'position', ['center','top']);
 	$("#checkBoxDiv").dialog('open')
 	$("#checkBoxDivId").show();
