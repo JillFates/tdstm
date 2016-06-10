@@ -7,6 +7,7 @@ var autoprefixer = require('gulp-autoprefixer'),
     sourcemaps = require('gulp-sourcemaps');
 
 
+var taskPath = "./gulp-tasks";
 
 /**
  * What this task do is to compile the SASS file and generate a map that can be view from moder browser
@@ -31,3 +32,9 @@ gulp.task('sass:watch', function () {
     return gulp.watch('web-app/css/**/*.sass', ['sass-compiler']);
 });
 
+
+/**
+ * Add any Sub Task Process
+ */
+
+require(taskPath + '/es6-compile')();
