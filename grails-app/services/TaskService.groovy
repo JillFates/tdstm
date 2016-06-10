@@ -115,16 +115,26 @@ class TaskService implements InitializingBean {
 
 		// NOTE - This method is only called on startup therefore if code is modified then you will need to restart Grails to see changes
 
-// TODO : Need to solve the fact that staffingRoles can't be static
-
 		// Initialize some class level variables used repeatedly by the application
-		// TODO : Need to get staffingRoles out of static as the list can change during runtime
-		// staffingRoles = partyRelationshipService.getStaffingRoles()*.id
 
-		commonFilterProperties = ['assetName','assetTag','assetType', 'priority', 'planStatus', 'department', 'costCenter', 'environment']
-
+		// commonFilterProperties is a list of property names that can be used in filters of assets in recipes
+		commonFilterProperties = [
+			'assetName',
+			'assetTag',
+			'assetType',
+			'costCenter',
+			'department',
+			'description',
+			'environment',
+			'externalRefId',
+			'planStatus',
+			'priority',
+			'supportType',
+			'validation'
+		]
 		(1..(Project.CUSTOM_FIELD_COUNT)).each() { commonFilterProperties << "custom$it".toString() }	// Add custom1..custom##
 		// log.debug "commonFilterProperties include $commonFilterProperties"
+
 		ctx = AH.application.mainContext
 		sessionFactory = ctx.sessionFactory
 
@@ -4213,7 +4223,27 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						sql = 'from AssetDependency ad where ad.asset.id in (:assetIds)'
 						daProp = 'dependent'					
 					}
-					def depAssets = AssetDependency.findAll(sql, [assetIds:assets*.id])
+
+					Map findDepMap = [assetIds:assets*.id]
+
+					// Iterate over the filterable properties for the AssetDependency table
+					List dependencyPropsToFilterOn = ['c1', 'c2', 'c3', 'c4', 'comment', 'type', 'status']
+					dependencyPropsToFilterOn.each { depPropName ->
+						if (filter.dependency.containsKey(depPropName)) {
+							Map sqlWhereMap = SqlUtil.whereExpression(depPropName, filter.dependency[depPropName], depPropName)
+							if (sqlWhereMap) {
+								sql = SqlUtil.appendToWhere(sql, sqlWhereMap.sql)
+								if (sqlWhereMap.param) {
+									findDepMap[depPropName] = sqlWhereMap.param
+								}								
+							} else {
+								log.error "Unable to resolve filter.dependency.${depPropName} expression [${filter.dependency[depPropName]}]"
+							}
+						}
+					}
+					log.debug "filter.dependency query=$sql, params=$findDepMap"
+
+					def depAssets = AssetDependency.findAll(sql, findDepMap)
 					def daList = []
 					queryOn = filter.dependency.containsKey('class') ? filter.dependency['class'].toLowerCase() : 'device'
 

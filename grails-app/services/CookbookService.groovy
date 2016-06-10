@@ -1033,6 +1033,15 @@ class CookbookService {
 		// TODO: ValidateSyntax - Add a check to make sure that any filters that specify a group, that the group is defined
 
 		// Helper closure that compares the properties of a spec to a defined map
+		/** 
+		 * Used to validate a section of a recipe spec (e.g. group) against a map definition for the section. The closure will
+		 * use recursion to validate maps within the maps.
+		 * @param type - the type or section of the spec (e.g. task, group)
+		 * @param spec - the map containing the values define in the actual recipe spec section
+		 * @param map - the definition map for the section of the spec
+		 * @param key - the primary reference code for the section as specified in the recipe (e.g task spec id or group name)
+		 * @return List of error messages
+		 */
 		def validateAgainstMap
 		validateAgainstMap = { type, spec, map, key ->
 			def i=0
@@ -1056,26 +1065,27 @@ class CookbookService {
 						detail: "$label in element $i must be either true or false" ]
 				}
 				
-
 				if( n=="category" && ! (v in AssetCommentCategory.getList())){
 					errorList << [ error: 1, reason: 'Invalid Category',
 						detail: "$label in element $i contains unknown category '$v'" ]
 				}
+
 				if (map.containsKey(n)) {
 					// can do more here to check the nested definitions later on.
 
 					if ( CU.isaMap(map[n])) {
-						if(!CU.isaMap(spec[n])){
+						if (!CU.isaMap(spec[n])) {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
 								detail: "$label in element $i property '$n' should be a map. Invalid value '$v' was given" ]
-						}else{
+						} else {
 							// Check the sub section of the spec against a sub section of the map
+							// TODO : JPM 6/2016 : TM-4989 the addAll should most likely be removed
 							errorList.addAll( validateAgainstMap(type, spec[n], map[n], key) )	
 						}
 						
 					} else if ( CU.isaList(map[n]) ) {
 
-						if(v in String){
+						if (v in String) {
 							// Check if the value of a property exists in the map defined list
 							// Need to strip out any boolean expressions
 							def cleanedExp = v.replaceAll( /[!=<>]/, '' )
@@ -1083,7 +1093,7 @@ class CookbookService {
 								errorList << [ error: 1, reason: 'Invalid syntax', 
 									detail: "$label in element $i property '$n' contains invalid value '$v'" ]
 							}
-						}else{
+						} else {
 							errorList << [ error: 1, reason: 'Invalid syntax', 
 									detail: "Simple value expected for property '$n' but '$v' was given." ]
 						}
@@ -1108,15 +1118,24 @@ class CookbookService {
 				include:0,
 				exclude:0,
 				taskSpec:0,
-				class:['device','database','application','storage'],
+				class: ['device','database','application','storage'],
 				asset:0,
 				dependency: [
-					mode:['supports', 'requires'],
-					class:['device','database','application','storage'],
+					mode:  ['supports', 'requires'],
+					class: ['device','database','application','storage'],
 					asset: [
 						physical:true,
 						virtual:true
-					]
+					],
+					c1: '',
+					c2: '',
+					c3: '',
+					c4: '',
+					comment: '',
+					dataFlowFreq: '',
+					dataFlowDirection: '',
+					type: 0,
+					status: 0
 				]
 			]
 		]
