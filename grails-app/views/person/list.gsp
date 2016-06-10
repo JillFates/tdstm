@@ -19,11 +19,6 @@
 		<g:javascript src="jqgrid-support.js" />
 
 		<style>
-			*, *:before, *:after {
-				-webkit-box-sizing: initial;
-				-moz-box-sizing: initial;
-				box-sizing: initial;
-			}
 
 			div.main_bottom table {
 				border-collapse: initial;
