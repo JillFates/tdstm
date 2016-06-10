@@ -1,66 +1,29 @@
+import com.tds.asset.*
+import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.sql.SqlUtil
+import com.tdsops.tm.domain.AssetEntityHelper
+import com.tdsops.tm.enums.domain.*
+import com.tdssrc.eav.EavAttribute
+import com.tdssrc.eav.EavAttributeOption
+import com.tdssrc.grails.*
 import grails.converters.JSON
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
-import org.apache.commons.codec.net.URLCodec
-import java.text.SimpleDateFormat
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.shiro.SecurityUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
-import org.codehaus.groovy.runtime.typehandling.GroovyCastException
-import org.springframework.transaction.annotation.Transactional
-import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Cell
-
-import org.hibernate.ScrollableResults
+import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.ScrollMode
+import org.hibernate.ScrollableResults
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.transaction.annotation.Transactional
+import net.transitionmanager.utils.Profiler
 
 import java.util.regex.Matcher
-
 // Used to wire up bindData
 //import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 //import org.codehaus.groovy.grails.commons.metaclass.GroovyDynamicMethodsInterceptor
 //import org.springframework.validation.BindingResult
-
-import com.tds.asset.Application
-import com.tds.asset.ApplicationAssetMap
-import com.tds.asset.AssetCableMap
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetDependency
-import com.tds.asset.AssetDependencyBundle
-import com.tds.asset.AssetEntity
-import com.tds.asset.AssetEntityVarchar
-import com.tds.asset.AssetOptions
-import com.tds.asset.AssetType
-import com.tds.asset.Database
-import com.tds.asset.Files
-import com.tdsops.tm.domain.AssetEntityHelper
-import com.tdsops.tm.enums.domain.AssetCableStatus
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.ValidationType
-import com.tdsops.tm.enums.domain.SizeScale
-import com.tdssrc.grails.ApplicationConstants
-import com.tdssrc.eav.EavAttribute
-import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavAttributeSet
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.StopWatch
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.WebUtil
-import com.tdsops.common.sql.SqlUtil
-import com.tdssrc.eav.EavEntityAttribute
-import com.tdsops.common.lang.ExceptionUtil
-import com.tdssrc.grails.WorkbookUtil
-import com.tdsops.tm.enums.domain.EntityType;
-
-import org.apache.commons.lang.StringEscapeUtils
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-
 @Transactional
 class AssetEntityService {
 
@@ -1984,7 +1947,7 @@ class AssetEntityService {
 					def fromConnector = fromAsset.model?.modelConnectors.find{it.label == fromConnectorLabel}
 					def assetCable = AssetCableMap.findByAssetFromAndAssetFromPort(fromAsset,fromConnector)
 					if (!assetCable) {
-						log.info "Cable not found for $fromAsset and $fromConnector"
+						log.info "Cable not found for $fromAsset and $fromConnector"						
 						warnMsg << "row (${r+1}) with connector $fromConnectorLabel and Asset Name $fromAssetName don't have a cable"
 						cablingSkipped++
 						continue
@@ -2216,6 +2179,9 @@ class AssetEntityService {
 		def key = params.key
 		def projectId = params.projectId
 
+		Profiler profiler = Profiler.create(params[Profiler.KEY_NAME]==Profiler.KEY_NAME, key)
+		profiler.beginInfo("EXPORT")
+
 		// Helper closure that returns the size of an object or zero (0) if it is null
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
 
@@ -2342,7 +2308,8 @@ class AssetEntityService {
 				return hqlQuery.scroll(ScrollMode.FORWARD_ONLY)
 			}
 
-			log.info "export() Initial loading took ${stopwatch.lap()}"
+			//log.info "export() Initial loading took ${stopwatch.lap()}"
+			profiler.lap("export() Initial loading")
 
 			def countRows = { q, qParams ->
 				def tmpQueryStr = "SELECT COUNT(*) " + q
@@ -2403,7 +2370,8 @@ class AssetEntityService {
 				progressTotal += commentSize
 			}
 
-			log.info "export() Getting row counts took ${stopwatch.lap()}"
+			//log.info "export() Getting row counts took ${stopwatch.lap()}"
+			profiler.lap "export() Getting row counts"
 
 			// This variable is used to determine when to call the updateProgress
 			float updateOnPercent = 0.01
@@ -2433,7 +2401,8 @@ class AssetEntityService {
 			def currDate = TimeUtil.nowGMT()
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 
-			log.info "export() Loading DTAMaps took ${stopwatch.lap()}"
+			//log.info "export() Loading DTAMaps took ${stopwatch.lap()}"
+			profiler.lap "export() Loading DTAMaps"
 
 			String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
 			List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
@@ -2441,13 +2410,15 @@ class AssetEntityService {
 			assetDepBundleList.each {
 				assetDepBundleMap.put(it[0].toString(), it[1])
 			}			
-			log.info "export() Create asset dep bundles took ${stopwatch.lap()}"
+			//log.info "export() Create asset dep bundles took ${stopwatch.lap()}"
+			profiler.lap "export() Create asset dep bundles"
 
 			//create book and sheet
 			FileInputStream fileInputStream = new FileInputStream( file );
 			book = new HSSFWorkbook(fileInputStream);
 
-			log.info "export() Creating book took ${stopwatch.lap()}"
+			//log.info "export() Creating book took ${stopwatch.lap()}"
+			profiler.lap "export() Creating book"
 
 			// Helper closure used to retrieve the s
 			def getWorksheet = { sheetName ->
@@ -2538,7 +2509,8 @@ class AssetEntityService {
 				}
 			}
 
-			log.info "export() Valdating columns took ${stopwatch.lap()}"
+			//log.info "export() Valdating columns took ${stopwatch.lap()}"
+			profiler.lap "export() Valdating columns"
 
 			// Helper closure to create a text list from an array for debugging
 			def xportList = { list ->
@@ -2595,14 +2567,16 @@ class AssetEntityService {
 				updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
 				updateColumnHeaders(storageSheet, fileDTAMap, storageSheetColumnNames, project)
 
-				log.info "export() Updating spreadsheet headers took ${stopwatch.lap()}"
-				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
+				//log.info "export() Updating spreadsheet headers took ${stopwatch.lap()}"
+				profiler.lap "export() Updating spreadsheet headers"
+				//log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
+				profiler.lap("Device Export - serverColumnNameList=$serverColumnNameList")
 
 				//
 				// Device Export
 				//
-				if ( doDevice ) {
-					log.info "export() starting export of Devices"
+				if ( doDevice ) {				
+					profiler.beginInfo "Devices"
 					exportedEntity += 'S'
 					int deviceCount = 0
 					while(asset.next()){
@@ -2610,6 +2584,11 @@ class AssetEntityService {
 						deviceCount++
 					//for ( int r = 1; r <= assetSize; r++ ) {
 						progressCount++
+
+						//if(progressCount < 10){
+						//	profiler.lap("Devices", "%d of %d", [progressCount, progressTotal])		  // INFO when enabled
+						//}
+
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						
 						//Add assetId for walkthrough template only.
@@ -2670,15 +2649,18 @@ class AssetEntityService {
 							}
 						}
 						GormUtil.flushAndClearSession(session, deviceCount)
-					}
-					log.info "export() processing Devices took ${stopwatch.lap()} for $assetSize rows"
+					}//end: while(asset.next())
+
+					profiler.endInfo("Devices", "processing for %d rows", [assetSize])
 				}
 
 				//
 				// Application Export
 				//
+				profiler.lapInfo("EXPORT")
 				if ( doApp ) {
-					log.info "export() starting export of Applications"
+					//log.info "export() starting export of Applications"
+					profiler.beginInfo "Applications"
 					exportedEntity += 'A'
 
 					// This determines which columns are added as Number vs Label
@@ -2694,8 +2676,15 @@ class AssetEntityService {
 					while(application.next()){
 						def app = application.get(0)
 						progressCount++
+						/*
+						if(progressCount < 10){
+							profiler.lap("Applications", "applications %d of %d", [progressCount, progressTotal])
+						}
+						*/
+
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						applicationCount++
+
 
 						// Add the appId column to column 0 if it exists
 						if (hasIdCol) {
@@ -2761,14 +2750,23 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, applicationCount)
 					}
-					log.info "export() processing Applications took ${stopwatch.lap()} for $appSize rows"
+					/*
+					if(profiler.getLapDuration("Applications").toMilliseconds() > 10000L){
+						log.warn("Application Export is taking to long!!")
+					}
+					*/
+
+					profiler.endInfo("Applications", "processing for %d rows", [appSize])
+
+
 				}
+				profiler.lapInfo("EXPORT")
 
 				//
 				// Database
 				//
 				if ( doDB ) {
-					log.info "export() starting export of Databases"
+					profiler.beginInfo "Databases"
 					exportedEntity += "D"
 					int databaseCount = 0
 					//for ( int r = 1; r <= dbSize; r++ ) {
@@ -2813,14 +2811,14 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, databaseCount)
 					}
-					log.info "export() processing Databases took ${stopwatch.lap()} for $dbSize rows"
+					profiler.endInfo("Databases", "processing for %d rows", [dbSize])
 				}
 
 				//
 				// Storage ( files )
 				//
 				if ( doStorage ) {
-					log.info "export() starting export of Logical Storage"
+					profiler.beginInfo "Logical Storage"
 					exportedEntity += "F"
 					//for ( int r = 1; r <= fileSize; r++ ) {
 					int filesCount = 0
@@ -2863,14 +2861,14 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, filesCount)
 					}
-					log.info "export() processing Logical Storage took ${stopwatch.lap()} for $fileSize"
+					profiler.endInfo("Logical Storage", "processing for %d", [fileSize])
 				}
 				
 				//
 				// Dependencies
 				//
 				if ( doDependency ) {
-					log.info "export() starting export of Dependencies"
+					profiler.beginInfo "Dependencies"
 					exportedEntity += "X"
 					def dependencySheet = getWorksheet('Dependencies')
 
@@ -2913,14 +2911,14 @@ class AssetEntityService {
 							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
 						}
 					}
-					log.info "export() processing Dependencies took ${stopwatch.lap()} for $dependentSize rows"
+					profiler.endInfo("Dependencies", "processing  for %d rows", [dependentSize])
 				}
 
 				//
 				// Room Export
 				//
 				if( doRoom ) {
-					log.info "export() starting export of Rooms"
+					profiler.beginInfo "Rooms"
 
 					exportedEntity += "R"
 
@@ -2957,14 +2955,14 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() processing Rooms took ${stopwatch.lap()} for $roomSize rows"
+					profiler.endInfo("Rooms", "processing for %d rows", [roomSize])
 				}
 				
 				//
 				// Rack Export
 				//
 				if ( doRack ) {
-					log.info "export() starting export of Racks"
+					profiler.beginInfo "Racks"
 					exportedEntity +="r"
 
 					def rackSheet = getWorksheet('Rack')
@@ -2997,7 +2995,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					log.info "export() processing Racks took ${stopwatch.lap()} for $rackSize rows"
+					profiler.endInfo("Racks", "processing for %d rows", [rackSize])
 				}
 				
 			}
@@ -3006,7 +3004,7 @@ class AssetEntityService {
 			// Cabling Export
 			// 
 			if ( doCabling ) {
-				log.info "export() starting export of Cabling"
+				profiler.beginInfo "Cabling"
 
 				exportedEntity += "c"
 
@@ -3020,14 +3018,14 @@ class AssetEntityService {
 					cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
 					progressCount += cablingSize
 				}
-				log.info "export() processing Cabling took ${stopwatch.lap()} for $cablingSize rows"
+				profiler.endInfo("Cabling","processing for %d rows", [cablingSize])
 			}
 
 			//
 			// Comments Export
 			// 
 			if ( doComment ) {
-				log.debug "export() Starting the export of Comments"
+				profiler.beginInfo "Comments"
 
 				exportedEntity += "M"
 
@@ -3074,7 +3072,7 @@ class AssetEntityService {
 					}
 				}
 
-				log.info "export() processing Comments took ${stopwatch.lap()} for $commentSize rows"
+				profiler.endInfo("Comments", "processing for %d rows", [commentSize])
 			}
 
 			//
@@ -3099,15 +3097,15 @@ class AssetEntityService {
 			progressService.updateData(key, 'header', 'attachment; filename="' + filename + '"')
 			progressService.update(key, 100, 'Completed')
 
-			log.info "export() streaming spreadsheet to browser took ${stopwatch.lap()}"
-			log.info "export() Combined time ${stopwatch.sinceStart}"
-
+			profiler.lap("EXPORT", "export() streaming spreadsheet to browser")
 		} catch( Exception exportExp ) {
 
 			exportExp.printStackTrace()
 			progressService.update(key, 100, 'Cancelled', "An unexpected exception occurred while exporting to Excel")
 
 			return
+		} finally {
+			profiler.endInfo("EXPORT", "Finished!")
 		}
 	}
 

@@ -17,6 +17,7 @@ import com.tdsops.common.sql.SqlUtil
 
 import org.apache.commons.lang.StringEscapeUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import net.transitionmanager.utils.Profiler
 
 class ApplicationController {
 
@@ -485,6 +486,26 @@ class ApplicationController {
 		}
 		def existingCol= "'Actions','Name', 'App Sme','Validation', 'Plan Status','Bundle','Dep # ','Dep to resolve','Dep Conflicts','id', 'commentType', 'Event'"
 		render existingCol as JSON
+	}
+
+	/** Profile Actions */
+	def profileToggle(){
+		def value = session[Profiler.KEY_NAME]
+		if(value){
+			session.removeAttribute(Profiler.KEY_NAME)
+		}else{
+			session[Profiler.KEY_NAME] = Profiler.KEY_NAME
+		}
+
+		render "The Profiler is: " + isProfilerSet()
+	}
+
+	def profileStatus(){
+		render "The Profiler is: " + isProfilerSet()
+	}
+
+	private isProfilerSet(){
+		return (session[Profiler.KEY_NAME] == Profiler.KEY_NAME)?"ENABLED":"DISABLED"
 	}
 
 }

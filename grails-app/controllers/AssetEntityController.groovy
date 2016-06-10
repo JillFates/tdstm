@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import net.transitionmanager.utils.Profiler
 
 import java.text.DateFormat
 
@@ -198,10 +199,12 @@ class AssetEntityController {
 		Project projectInstance
 		UserLogin userLogin
 
-		(projectInstance, userLogin) = controllerService.getProjectAndUserForPage(this, 'import') 
+		def prefMap = userPreferenceService.getImportPreferences()
+
+		(projectInstance, userLogin) = controllerService.getProjectAndUserForPage(this, 'import')
 		if (!projectInstance)
-			return 
-	
+			return
+
 		//get id of selected project from project view
 		def projectId = projectInstance.id
 
@@ -214,9 +217,8 @@ class AssetEntityController {
 		def	dataTransferBatchs = DataTransferBatch.findAllByProject(projectInstance).size()
 		session.setAttribute("BATCH_ID",0)
 		session.setAttribute("TOTAL_ASSETS",0)
-		
-		def prefMap = userPreferenceService.getImportPreferences()
-		
+
+
 		def isMSIE = false
 		def userAgent = request.getHeader("User-Agent")
 		if (userAgent.contains("MSIE") || userAgent.contains("Firefox"))
@@ -1573,6 +1575,7 @@ class AssetEntityController {
 		trigger.jobDataMap.put('projectId', projectId)
 		trigger.jobDataMap.put('tzId', getSession().getAttribute( TimeUtil.TIMEZONE_ATTR )?.CURR_TZ)
 		trigger.jobDataMap.put('userDTFormat', getSession().getAttribute( TimeUtil.DATE_TIME_FORMAT_ATTR )?.CURR_DT_FORMAT)
+		trigger.jobDataMap[Profiler.KEY_NAME] = session[Profiler.KEY_NAME]
 
 		trigger.setJobName('ExportAssetEntityJob')
 		trigger.setJobGroup('tdstm-export-asset')
