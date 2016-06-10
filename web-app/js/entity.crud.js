@@ -1606,6 +1606,10 @@ function reloadDependencyGroupsSection() {
 	});
 }
 function submitCheckBox(){
+	if($("#connectionStatusOptions input:checked").length == 0){
+		alert("One or more status values must be selected.")
+		return
+	}
 	var moveBundleId = $("#planningBundleSelectId").val();
 	var items = $('#checkBoxForm').serialize() + "&bundle="+moveBundleId;
 

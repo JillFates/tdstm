@@ -53,7 +53,7 @@
 							</fieldset>
 						</div>
 						&nbsp;
-						<div style="float: left;margin-left: 10px;">
+						<div style="float: left;margin-left: 10px;" id="connectionStatusOptions">
 							<fieldset>
 								<legend>Connection Status:</legend>
 								<g:each in="${dependencyStatus}" var="dependencyStatusInst">
