@@ -4227,7 +4227,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					Map findDepMap = [assetIds:assets*.id]
 
 					// Iterate over the filterable properties for the AssetDependency table
-					List dependencyPropsToFilterOn = ['c1', 'c2', 'c3', 'c4', 'comment', 'type', 'status']
+					List dependencyPropsToFilterOn = ['c1', 'c2', 'c3', 'c4', 'comment', 'dataFlowFreq', 'dataFlowDirection', 'type', 'status']
 					dependencyPropsToFilterOn.each { depPropName ->
 						if (filter.dependency.containsKey(depPropName)) {
 							Map sqlWhereMap = SqlUtil.whereExpression(depPropName, filter.dependency[depPropName], depPropName)
