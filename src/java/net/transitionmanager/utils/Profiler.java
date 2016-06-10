@@ -467,7 +467,7 @@ public class Profiler  {
 		TimeDuration duration = stopWatch.endDuration(tag);
 		String text = "["+tag+"] (" + duration + ")";
 		if(StringUtils.isNotBlank(msg)) {
-			text += ": " + msg;
+			text += " " + msg;
 		}
 		logPrefix(lType, "END", text, args);
 	}

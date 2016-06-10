@@ -2180,15 +2180,12 @@ class AssetEntityService {
 		def projectId = params.projectId
 
 		Profiler profiler = Profiler.create(params[Profiler.KEY_NAME]==Profiler.KEY_NAME, key)
-		profiler.beginInfo("EXPORT")
+		profiler.beginInfo "EXPORT"
 
 		// Helper closure that returns the size of an object or zero (0) if it is null
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
 
 		try {
-			def stopwatch = new StopWatch()
-			stopwatch.start()
-	
 			java.io.File tempExportFile = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
 			
 			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
@@ -2308,8 +2305,7 @@ class AssetEntityService {
 				return hqlQuery.scroll(ScrollMode.FORWARD_ONLY)
 			}
 
-			//log.info "export() Initial loading took ${stopwatch.lap()}"
-			profiler.lap("export() Initial loading")
+			profiler.lapInfo 'Initial loading'
 
 			def countRows = { q, qParams ->
 				def tmpQueryStr = "SELECT COUNT(*) " + q
@@ -2370,8 +2366,7 @@ class AssetEntityService {
 				progressTotal += commentSize
 			}
 
-			//log.info "export() Getting row counts took ${stopwatch.lap()}"
-			profiler.lap "export() Getting row counts"
+			profiler.lapInfo "Getting row counts"
 
 			// This variable is used to determine when to call the updateProgress
 			float updateOnPercent = 0.01
@@ -2401,8 +2396,7 @@ class AssetEntityService {
 			def currDate = TimeUtil.nowGMT()
 			def exportDate = TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, currDate, TimeUtil.FORMAT_DATE_TIME_5)
 
-			//log.info "export() Loading DTAMaps took ${stopwatch.lap()}"
-			profiler.lap "export() Loading DTAMaps"
+			profiler.lapInfo "Loading DTAMaps"
 
 			String adbSql = 'select adb.asset.id, adb.dependencyBundle from AssetDependencyBundle adb where project=:project'
 			List assetDepBundleList = AssetDependencyBundle.executeQuery(adbSql, [project:project])
@@ -2410,15 +2404,13 @@ class AssetEntityService {
 			assetDepBundleList.each {
 				assetDepBundleMap.put(it[0].toString(), it[1])
 			}			
-			//log.info "export() Create asset dep bundles took ${stopwatch.lap()}"
-			profiler.lap "export() Create asset dep bundles"
+			profiler.lapInfo "Creating asset dep bundles"
 
 			//create book and sheet
 			FileInputStream fileInputStream = new FileInputStream( file );
 			book = new HSSFWorkbook(fileInputStream);
 
-			//log.info "export() Creating book took ${stopwatch.lap()}"
-			profiler.lap "export() Creating book"
+			profiler.lapInfo "Creating workbook"
 
 			// Helper closure used to retrieve the s
 			def getWorksheet = { sheetName ->
@@ -2509,8 +2501,7 @@ class AssetEntityService {
 				}
 			}
 
-			//log.info "export() Valdating columns took ${stopwatch.lap()}"
-			profiler.lap "export() Valdating columns"
+			profiler.lapInfo "Validating columns"
 
 			// Helper closure to create a text list from an array for debugging
 			def xportList = { list ->
@@ -2528,8 +2519,6 @@ class AssetEntityService {
 			// Statement to check Headers if header are not found it will return Error message
 			if ( serverCheckCol == false || appCheckCol == false || dbCheckCol == false || filesCheckCol == false) {
 				missingHeader = missingHeader.replaceFirst(",","")
-				//flash.message = " Column Headers : ${missingHeader} not found, Please check it."
-				//redirect( action:assetImport, params:[message:flash.message] )
 
 				progressService.update(key, 100, 'Cancelled', " Column Headers : ${missingHeader} not found, Please check it.")
 
@@ -2567,10 +2556,9 @@ class AssetEntityService {
 				updateColumnHeaders(dbSheet, dbDTAMap, dbSheetColumnNames, project)
 				updateColumnHeaders(storageSheet, fileDTAMap, storageSheetColumnNames, project)
 
-				//log.info "export() Updating spreadsheet headers took ${stopwatch.lap()}"
-				profiler.lapInfo "export() Updating spreadsheet headers"
+				profiler.lapInfo "Updating spreadsheet headers"
 
-				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
+				// log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
 
 				// We want to limit the number of laps are profiled for any given asset so the value 
 				// in 2x+1 of the flushAfterLimit of 50 rows in GormUtil.flushAndClearSession so that we 
@@ -2612,8 +2600,8 @@ class AssetEntityService {
 							def colNum = serverMap[colName]
 							def a = currentAsset
 
-							if (deviceCount == 1)
-								log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
+							//if (deviceCount == 1)
+							//	log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
 
 							if (deviceCount <= maxProfilerLaps) {
 								profiler.lap 'Devices', 'Set vars for %s', [colName]
