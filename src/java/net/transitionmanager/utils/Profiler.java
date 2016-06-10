@@ -381,7 +381,7 @@ public class Profiler  {
 	
 	public void logSinceStart(String msg){
 		if(doProfile){
-			log(INFO, "Since Start (" + stopWatch.getSinceStart() + "): " + msg);
+			log(INFO, "Since Start (" + stopWatch.getSinceStart() + ") " + msg);
 		}
 	}
 

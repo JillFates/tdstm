@@ -2568,9 +2568,14 @@ class AssetEntityService {
 				updateColumnHeaders(storageSheet, fileDTAMap, storageSheetColumnNames, project)
 
 				//log.info "export() Updating spreadsheet headers took ${stopwatch.lap()}"
-				profiler.lap "export() Updating spreadsheet headers"
-				//log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
-				profiler.lap("Device Export - serverColumnNameList=$serverColumnNameList")
+				profiler.lapInfo "export() Updating spreadsheet headers"
+
+				log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
+
+				// We want to limit the number of laps are profiled for any given asset so the value 
+				// in 2x+1 of the flushAfterLimit of 50 rows in GormUtil.flushAndClearSession so that we 
+				// can profile that as well.
+				int maxProfilerLaps = 101
 
 				//
 				// Device Export
@@ -2579,24 +2584,28 @@ class AssetEntityService {
 					profiler.beginInfo "Devices"
 					exportedEntity += 'S'
 					int deviceCount = 0
-					while(asset.next()){
+					profiler.lap('Devices', 'Entering while loop')
+					while (asset.next()) {
 						def currentAsset = asset.get(0)
 						deviceCount++
-					//for ( int r = 1; r <= assetSize; r++ ) {
 						progressCount++
 
-						//if(progressCount < 10){
-						//	profiler.lap("Devices", "%d of %d", [progressCount, progressTotal])		  // INFO when enabled
-						//}
+						if (deviceCount <= maxProfilerLaps) {
+							profiler.lap('Devices', 'Read device %d of %d, id=%d', [deviceCount, assetSize, currentAsset.id])
+						}
 
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
 						
-						//Add assetId for walkthrough template only.
+						// Add assetId for walkthrough template only.
 						if( serverSheetColumnNames.containsKey("assetId") ) {
 							addCell(serverSheet, deviceCount, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC)
 						}
 
+						if (deviceCount <= maxProfilerLaps) {
+							profiler.begin 'Device Row'
+						}
 						for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
+
 							def addContentToSheet
 							def attribute = serverDTAMap.eavAttribute.attributeCode[coll]
 							def colName = serverColumnNameList.get(coll)
@@ -2605,6 +2614,10 @@ class AssetEntityService {
 
 							if (deviceCount == 1)
 								log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
+
+							if (deviceCount <= maxProfilerLaps) {
+								profiler.lap 'Devices', 'Set vars for %s', [colName]
+							}
 
 							if (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
 								// Skip populating the cell if the value is null
@@ -2647,17 +2660,31 @@ class AssetEntityService {
 									def value = StringUtil.defaultIfEmpty( String.valueOf(a[attribute]), '')
 									addCell(serverSheet, deviceCount, colNum, value)
 							}
+
+							if (deviceCount <= maxProfilerLaps) {
+								profiler.lap 'Devices', 'Set cell %s', [colName]
+							}
+
 						}
+						if (deviceCount <= maxProfilerLaps) {
+							profiler.end 'Device Row'
+						}
+
 						GormUtil.flushAndClearSession(session, deviceCount)
+
+						if (deviceCount <= maxProfilerLaps) {
+							profiler.lap 'Devices', 'Flushed Session'
+						}
+
 					}//end: while(asset.next())
 
-					profiler.endInfo("Devices", "processing for %d rows", [assetSize])
+					profiler.endInfo("Devices", "processed %d rows", [assetSize])
 				}
 
 				//
 				// Application Export
 				//
-				profiler.lapInfo("EXPORT")
+				// profiler.lapInfo("EXPORT")
 				if ( doApp ) {
 					//log.info "export() starting export of Applications"
 					profiler.beginInfo "Applications"
@@ -2756,11 +2783,11 @@ class AssetEntityService {
 					}
 					*/
 
-					profiler.endInfo("Applications", "processing for %d rows", [appSize])
+					profiler.endInfo("Applications", "processed %d rows", [appSize])
 
 
 				}
-				profiler.lapInfo("EXPORT")
+				// profiler.lapInfo("EXPORT")
 
 				//
 				// Database
@@ -2811,7 +2838,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, databaseCount)
 					}
-					profiler.endInfo("Databases", "processing for %d rows", [dbSize])
+					profiler.endInfo("Databases", "processed %d rows", [dbSize])
 				}
 
 				//
@@ -2861,7 +2888,7 @@ class AssetEntityService {
 						
 						GormUtil.flushAndClearSession(session, filesCount)
 					}
-					profiler.endInfo("Logical Storage", "processing for %d", [fileSize])
+					profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
 				}
 				
 				//
@@ -2911,7 +2938,7 @@ class AssetEntityService {
 							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
 						}
 					}
-					profiler.endInfo("Dependencies", "processing  for %d rows", [dependentSize])
+					profiler.endInfo("Dependencies", "processed %d rows", [dependentSize])
 				}
 
 				//
@@ -2955,7 +2982,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					profiler.endInfo("Rooms", "processing for %d rows", [roomSize])
+					profiler.endInfo("Rooms", "processed %d rows", [roomSize])
 				}
 				
 				//
@@ -2995,7 +3022,7 @@ class AssetEntityService {
 							}
 						}
 					}
-					profiler.endInfo("Racks", "processing for %d rows", [rackSize])
+					profiler.endInfo("Racks", "processed %d rows", [rackSize])
 				}
 				
 			}
@@ -3018,7 +3045,7 @@ class AssetEntityService {
 					cablingReportData(cablingList, cablingSheet, progressCount, progressTotal, updateOnPercent, key)
 					progressCount += cablingSize
 				}
-				profiler.endInfo("Cabling","processing for %d rows", [cablingSize])
+				profiler.endInfo("Cabling", "processed %d rows", [cablingSize])
 			}
 
 			//
@@ -3072,12 +3099,13 @@ class AssetEntityService {
 					}
 				}
 
-				profiler.endInfo("Comments", "processing for %d rows", [commentSize])
+				profiler.endInfo("Comments", "processed %d rows", [commentSize])
 			}
 
 			//
 			// Wrap up the process
 			// 
+			profiler.lap("EXPORT", "sheets all populated")
 
 			FileOutputStream out =  new FileOutputStream(tempExportFile)
 			book.write(out)
@@ -3097,7 +3125,7 @@ class AssetEntityService {
 			progressService.updateData(key, 'header', 'attachment; filename="' + filename + '"')
 			progressService.update(key, 100, 'Completed')
 
-			profiler.lap("EXPORT", "export() streaming spreadsheet to browser")
+			profiler.lap("EXPORT", "streamed spreadsheet to browser")
 		} catch( Exception exportExp ) {
 
 			exportExp.printStackTrace()
@@ -3105,7 +3133,7 @@ class AssetEntityService {
 
 			return
 		} finally {
-			profiler.endInfo("EXPORT", "Finished!")
+			profiler.endInfo("EXPORT", "Finished Export")
 		}
 	}
 
