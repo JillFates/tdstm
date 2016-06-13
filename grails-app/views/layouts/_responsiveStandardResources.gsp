@@ -24,8 +24,8 @@
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
-<script src="${resource(dir: 'dist/js/vendors/html5shiv', file: 'html5shiv.min.js')}"></script>
-<script src="${resource(dir: 'dist/js/vendors/respond', file: 'respond.min.js')}"></script>
+<script src="${resource(dir: 'dist/js/vendors/html5shiv/dist', file: 'html5shiv.min.js')}"></script>
+<script src="${resource(dir: 'dist/js/vendors/respond/dest', file: 'respond.min.js')}"></script>
 <![endif]-->
 
 <!-- jQuery -->
