@@ -2418,10 +2418,12 @@ tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $sta
 	};
 
 	$scope.storeCode = function() {
+		$scope.codeEditorOptions.fullScreen = false;
 		$modalInstance.close($scope.modal.sourceCode);
 	};
 
 	$scope.cancel = function () {
+		$scope.codeEditorOptions.fullScreen = false;
 		$modalInstance.dismiss('close');
 	};
 
@@ -2437,7 +2439,7 @@ tds.cookbook.controller.RecipeCodeEditController = function($scope, $state, $sta
 		$("div.code-editor-modal .modal-content").toggleClass("modal-content-fullscreen");
 		$("div.code-editor-modal .modal-body").toggleClass("modal-body-fullscreen");
 		$("div.code-editor-modal .modal-content  .CodeMirror-wrap").toggleClass("CodeMirror-wrap-fullscreen");
-		$scope.codeEditorOptions.fullScreen = !$scope.codeEditorOptions.fullScreen;
+		$scope.codeEditorOptions.fullScreen = true;
 		$("[ui-codemirror='codeEditorOptions']").toggleClass("sourceCode-fullscreen");
 	};
 }
