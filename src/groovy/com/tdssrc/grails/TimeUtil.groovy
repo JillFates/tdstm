@@ -449,16 +449,21 @@ class TimeUtil {
 	 * @return The date formatted
 	 **/
 	public static String formatDateTimeWithTZ(String tzId, dateValue, DateFormat formatter) {
-		if (! formatter) {
+		String result = null
+		if(dateValue){
+			if (! formatter) {
 			// throw new InvalidParamException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
 			throw new RuntimeException('formatDateTimeWithTZ called with missing DateFormat formatter parameter')
-		}
-		if (tzId == null) {
-			throw new RuntimeException('formatDateTimeWithTZ called with null timezone')
-		}
+			}
+			if (tzId == null) {
+				throw new RuntimeException('formatDateTimeWithTZ called with null timezone')
+			}
 
-		formatter.setTimeZone(TimeZone.getTimeZone(tzId))
-		return formatter.format(dateValue)
+			formatter.setTimeZone(TimeZone.getTimeZone(tzId))
+			result = formatter.format(dateValue)	
+		}
+		
+		return result
 	}
 
 	/**
