@@ -29,8 +29,8 @@
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	<script src="${resource(dir:'app-js/vendors/html5shiv/dist',file:'html5shiv.min.js')}"></script>
-	<script src="${resource(dir:'app-js/vendors/respond/dest',file:'respond.min.js')}"></script>
+	<script src="${resource(dir:'dist/vendors/html5shiv/dist',file:'html5shiv.min.js')}"></script>
+	<script src="${resource(dir:'dist/vendors/respond/dest',file:'respond.min.js')}"></script>
 	<![endif]-->
 
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'spinner.css')}" />
