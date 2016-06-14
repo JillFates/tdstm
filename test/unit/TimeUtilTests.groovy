@@ -269,6 +269,15 @@ class TimeUtilTests extends Specification {
 			timeZone == TimeUtil.defaultTimeZone		
 	}
 
+	def "Test sessions without a Time Zone don't brake formatDateTime"(){
+		setup:
+			def mockSession = getMockSession()
+			session.removeAttribute("CURR_TZ")
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDateTime(mockSession, new Date(), formatter) != null
+	}
+
 // HELPERS ////////////////////////////////////////////////////////////////////
 	// Mock the bullshit format of session attributes ...
 	private getMockSession(){
