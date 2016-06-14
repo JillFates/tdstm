@@ -109,7 +109,6 @@
 			</div>
 		</g:form>
 
-		<g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link><br/>
 		<div class="loginErrorMsg">
 			<g:if test="${request.getHeader('User-Agent')}">
 				<g:if test="${request.getHeader('User-Agent').contains('MSIE 6') || request.getHeader('User-Agent').contains('MSIE 7') || request.getHeader('User-Agent').contains('MSIE 8')}">
@@ -121,8 +120,9 @@
 			</g:else>
 		</div>
 		<div class="loginIframe">
-			<pre style="word-wrap: break-word; white-space: pre-wrap;">${buildInfo}</pre>
+			<pre><g:link controller="auth" action="forgotMyPassword" style="font-weight: normal;">Forgot your password?</g:link></pre>
 		</div>
+		<div class="buildInfo">${buildInfo}</div>
 	</div>
 	<!-- /.login-box-body -->
 </div>
