@@ -4,12 +4,13 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 		<meta name="layout" content="topNav" />
 		<title>Dependency Analyzer</title>
+		
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'force.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'ui.datepicker.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-bootstrap.css')}" />
 		<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'tds-progressbar.css')}" />
-
+		
 		<g:javascript src="asset.tranman.js" />
 		<g:javascript src="entity.crud.js" />
 		<g:javascript src="model.manufacturer.js"/>
@@ -23,7 +24,8 @@
 		<g:javascript src="svg.js"/>
 		<g:javascript src="load.shapes.js"/>
 		<g:javascript src="graph.js" />
- 
+		<g:javascript src="generator/runtime.js" />
+		<g:javascript src="generator/generator.js" />
 	</head>
 	<body>
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
@@ -120,7 +122,7 @@
 		</div>
 		<div style="float:left;">
 			<div id="items1" style="display: none"></div>
-			<div id="spinnerDivId" style="display: none"></div>
+			<div id="spinnerDivId" class="containsSpinner" style="display: none"></div>
 			<g:render template="../assetEntity/modelDialog" />
 			<g:render template="../assetEntity/entityCrudDivs" />
 			<div id="createStaffDialog" style="display:none;" class="static-dialog">
@@ -216,7 +218,6 @@
 							topPosition = svgElement.offset().top;
 
 						if (fullscreen) {
-							svgElement = $('#svgContainerId').children('svg');
 							spinnerDiv.css('background-color', '#ffffff');
 							leftPosition = $('#toolsContainerId').offset().left;
 							topPosition = $('#toolsContainerId').offset().top;
@@ -237,7 +238,7 @@
 			}
 			function listUpdate(e){
 				var resp = e.responseText;
-				$('#items1').html(resp)
+				$('#items1').html(resp);
 				$('#items1').css('display','block');
 				ajaxRequest = null;
 			}

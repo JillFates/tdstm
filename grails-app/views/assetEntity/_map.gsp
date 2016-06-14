@@ -204,6 +204,5 @@
 <g:render template="../moveBundle/force" model="${pageScope.variables}"/>
 
 <script type="text/javascript">
-	buildMap(null, null, null, null, -1, -1);
-	GraphUtil.resetGraphSize();
+	buildMap();
 </script>

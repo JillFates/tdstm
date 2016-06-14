@@ -994,6 +994,9 @@ span.checkboxContainer label {
 span.checkboxContainer * {
 	vertical-align: middle;
 }
+span.checkboxContainer input {
+	margin-top: 0px;
+}
 span.checkboxContainer:hover input {
 	filter: brightness(90%);
 	-webkit-filter: brightness(90%);
@@ -1324,3 +1327,7 @@ div.dialog input#description {
 }
 
 /* Modify the right border*/
+
+#dependencyTableId .labelColumn {
+	position: static !important;
+}

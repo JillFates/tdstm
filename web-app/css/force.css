@@ -11,7 +11,13 @@
 svg {
 	border: 1px solid rgb(0, 128, 0);
 }
-
+#svgTranslatorId svg {
+	border: none !important;
+}
+#svgContainerId {
+	border: 1px solid rgb(0, 128, 0);
+	overflow: hidden;
+}
 
 /* Graph Nodes */
 .root {
@@ -328,7 +334,7 @@ img.pointer {
 	left: 0px;
 }
 
-.graphContainer.fullscreen #svgContainerId > svg {
+.graphContainer.fullscreen #svgContainerId {
 	position: fixed;
 	left: 0px;
 	top: 0px;
@@ -362,7 +368,7 @@ img.pointer {
 }
 #controlPanel .labelToggleCol svg {
 	padding-left: 10px;
-	width: 30px;
+	width: 40px;
 	height: 30px;
 	border-width: 0px;
 }
@@ -388,7 +394,7 @@ img.pointer {
 #controlPanel #colorByFormId {
 	padding-left: 2px;
 	padding-bottom: 0px;
-	padding-top: 0px;
+	padding-top: 2px;
 }
 #controlPanel #colorByFormId  span {
 	margin-right: 5px;
@@ -532,6 +538,7 @@ div.graphPanel.openPanel {
 
 .bundleColorExample {
 	padding: 0px;
+	text-align: center;
 }
 #mapReferenceId h4 {
     -webkit-touch-callout: none;
@@ -542,19 +549,22 @@ div.graphPanel.openPanel {
     user-select: none;
 }
 
-#spinnerDivId {
-	width: 800px;
-	height: 300px;
+.containsSpinner {
 	background-image: url(../images/spinner.gif);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 32px 32px;
 	border: 1px solid green;
+}
+.containsSpinner > * {
+	opacity: 0;
+}
+#spinnerDivId {
+	width: 800px;
+	height: 300px;
+	border: 1px solid green;
 	padding: 5px;
 	margin: 5px;
-}
-.fullscreen #spinnerDivId {
-	border: 0px;
 }
 #spinnerDivId.graph {
 	padding: 0px;
@@ -658,4 +668,14 @@ div.graphPanel.openPanel {
 
 defs svg {
 	stroke-width: 2.5px;
+}
+
+#svgTranslatorId {
+	padding: 0px !important;
+	margin: 0px !important;
+	width: 15000px;
+	height: 15000px;
+}
+#svgTranslatorId svg.chart {
+	overflow: visible !important;
 }

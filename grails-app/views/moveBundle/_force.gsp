@@ -1,8 +1,7 @@
 <div id="scriptDivId">
-<style>
+<style type="text/css">
 /* 	these styles must be included here due to a bug in firefox
 	where marker styles don't work when used in external stylesheets. */
-	
 
 line.link {
 	marker-end: url(#arrowhead);
@@ -34,230 +33,158 @@ line.link.bundleConflict {
 line.link.selected {
 	marker-end: url(#arrowheadSelected) !important;
 }
-
 </style>
 <script type="text/javascript">
-// If there is already an instance of force running in memory, it should be stopped before creating this one
-if (GraphUtil.force != null) {
-	GraphUtil.force.stop()
+
+var serverParams = {
+	'maxCutAttempts': ${defaults.maxCutAttempts},
+	'defaults': ${defaultsJson},
+	'depGroup': '${depGroup}',
+	'defaultPrefs': ${defaultPrefs},
+	'selectedBundle': '${dependencyBundle}',
+	'assetTypes': ${assetTypesJson},
+	'links': ${links},
+	'nodes': ${nodes},
+	'depBundles': ${depBundleMap},
+	'moveBundles': ${moveBundleMap},
+	'moveEvents': ${moveEventMap},
+	'gravity': ${multiple ? 0.05 : 0}
 }
 
-GraphUtil.force = d3.layout.force();
-var canvas = d3.select("div#item1")
+// If there is already an instance of force running in memory, it should be stopped before creating this one
+if (GraphUtil.force != null)
+	GraphUtil.force.stop()
+
+GraphUtil.force = d3.layout.force()
+
+var svgContainer = d3.select("div#item1")
 	.append("div")
 	.attr('id','svgContainerId')
+	.style('background-color','#ffffff')
+var svgTranslator = svgContainer
+	.attr('class','containsSpinner')
+	.append("div")
+	.attr('id','svgTranslatorId')
+var canvas = svgTranslator
 	.append("svg:svg")
-	.attr('class','chart');
+	.attr('class','chart')
 
 // define the shapes used for the svg
-var defs = canvas.append("defs");
-defs.html(appSVGShapes.getAll());
-defineShapes(d3.select("defs"));
+var defs = canvas.append("defs")
+defs.html(appSVGShapes.getAll())
+defineShapes(d3.select("defs"))
 
-var outsideWidth = 0;
-var outsideHeight = 0;
+var outsideWidth = 0
+var outsideHeight = 0
 $(window).resize( function(a, b) {
-	GraphUtil.resetGraphSize();
-});
+	GraphUtil.resetGraphSize()
+})
 
-var maxCutAttempts = ${defaults.maxCutAttempts};
-var maxEdgeCount = $('#maxEdgeCountId').val();
+var maxCutAttempts = serverParams.maxCutAttempts
+var maxEdgeCountInput = $('#maxEdgeCountId')
+var maxEdgeCount = maxEdgeCountInput.val()
 if (isNaN(maxEdgeCount))
-	maxEdgeCount = 4;
-$('#maxEdgeCountId').unbind('change').on('change', function (e) {
-	var newVal = parseInt(e.target.value);
+	maxEdgeCount = 4
+maxEdgeCountInput.unbind('change').on('change', function (e) {
+	var newVal = parseInt(e.target.value)
 	if (!isNaN(newVal))
-		maxEdgeCount = newVal;
-});
+		maxEdgeCount = newVal
+})
 
-var zoomBehavior;
-var vis = canvas;
-var background;
-var defaults = ${defaultsJson};
-var depGroup = '${depGroup}'; // specify the Group
-var defaultPrefs = ${defaultPrefs};
-var selectedBundle = '${dependencyBundle}';
-var assetTypes = ${assetTypesJson};
-var links = ${links};
-var nodes = ${nodes};
-var depBundles = ${depBundleMap};
-var moveBundles = ${moveBundleMap};
-var moveEvents = ${moveEventMap};
+var zoomBehavior
+var dragBehavior
+var vis = canvas
+var background
+var defaults = serverParams.defaults
+var depGroup = serverParams.depGroup // specify the Group
+var defaultPrefs = serverParams.defaultPrefs
+var selectedBundle = serverParams.selectedBundle
+var assetTypes = serverParams.assetTypes
+var links = serverParams.links
+var nodes = serverParams.nodes
+var depBundles = serverParams.depBundles
+var moveBundles = serverParams.moveBundles
+var moveEvents = serverParams.moveEvents
 
-var cutLinks = [];
-var cutNodes = [];
-var graphstyle = "z-index:90;";
-var fill = d3.scale.category10();
-var fillMode = 'bundle';
-var gravity = ${multiple ? 0.05 : 0};
-var distanceIntervals = 500;
-var graphPadding = 15;
-var cutLinkSize = 500;
-var graphSizeLimit = 40000;
-var floatMode = false;
-var maxWeight;
-var maxFamilyWeights = [];
-var groupCount = 0;
-var preferenceName = 'depGraph';
+var cutLinks = []
+var cutNodes = []
+var graphstyle = 'z-index:90;'
+var fill = d3.scale.category10()
+var fillMode = 'bundle'
+var gravity = serverParams.gravity
+var distanceIntervals = 500
+var graphPadding = 15
+var canvasSize = 15000
+var cutLinkSize = 500
+var graphSizeLimit = 40000
+var tooBigZoom = {'scale': 0.37892914162759944, 'translate':[527.9102296165405, 185.33142583118914]}
+var initialTickConfig = {
+	'large': {'min': 500, 'ticks': 200, 'theta': 8},
+	'small': {'max': 500, 'ticks': 500, 'theta': 1}
+}
+var floatMode = false
+var maxWeight
+var maxFamilyWeights = []
+var groupCount = 0
+var preferenceName = 'depGraph'
+var isIE = GraphUtil.isIE()
 
-var nodeSelected = -1;
-var defaultColor = '#0000ff';
-var selectedParentColor = '#00ff00';
-var selectedChildColor = '#00cc99';
-var selectedLinkColor = '#00dd00';
-var backgroundColor = GraphUtil.isBlackBackground() ? '#000000' : '#ffffff';
-if (defaults.blackBackground);
-	$('marker#arrowhead').attr('fill', '#ffffff');
+var nodeSelected = -1
+var defaultColor = '#0000ff'
+var selectedParentColor = '#00ff00'
+var selectedChildColor = '#00cc99'
+var selectedLinkColor = '#00dd00'
+var backgroundColor = GraphUtil.isBlackBackground() ? '#000000' : '#ffffff'
+if (defaults.blackBackground)
+	$('marker#arrowhead').attr('fill', '#ffffff')
 
-var widthCurrent;
-var heightCurrent;
+var widthCurrent
+var heightCurrent
+var tx = -canvasSize / 2
+var ty = -canvasSize / 2
 
-var progressBarCancelDisplayed = false;
-var cancelCut = false;
-
+var progressBarCancelDisplayed = false
+var cancelCut = false
 
 // Build the layout model
-function buildMap (charge, linkSize, friction, theta, width, height) {
+function buildMap () {
+	// get the default graph configuration
+	var config = getForceConfig()
+	widthCurrent = config.width
+	heightCurrent = config.height
+	
+	// set the base SVG size
+	setGraphDimensions(config.width, config.height)
+	
+	// initialize the d3 force layout
+	createForceLayout(config)
+	
+	
+	// perform the initial ticks then display the graph
+	var initialTickIterator = initialTickGenerator(config, initialTickConfig, GraphUtil, calmTick)
+	performInitialTicks(initialTickIterator, function(){
+		GraphUtil.force.stop()
+		createGraph(config)
+		
+		if (nodes.size() > 12)
+			setIdealGraphPosition()
+		
+		$('#svgContainerId').removeClass('containsSpinner')
+		GraphUtil.force.on("tick", tick)
+		updateElementPositions()
+	})
+}
 
-	// Use the new parameters, or the defaults if not specified
-	var charge 	 =	( charge	? charge 	: defaults['force'] 	);
-	var linkSize =	( linkSize	? linkSize 	: defaults['linkSize'] 	);
-	var friction =	( friction	? friction 	: defaults['friction'] 	);
-	var theta 	 =	( theta	? theta 	: defaults['theta'] 	);
-	var width 	 = 	( width 	? width 	: defaults['width'] 	);
-	var height 	 = 	( height 	? height 	: defaults['height'] 	);
-	
-	widthCurrent = width;
-	heightCurrent = height;
-	
-	if (width == -1) {
-		widthCurrent = getStandardWidth();
-		width = widthCurrent;
-	}
-	if (height == -1) {
-		heightCurrent = getStandardHeight();
-		height = heightCurrent;
-	}
-	
-	zoomBehavior = d3.behavior.zoom()
-		.on("zoom", zooming);
-	
-	canvas.call(zoomBehavior);
-	
-	vis = canvas
-		.append('svg:g')
-			.on("dblclick.zoom", null)
-			.style('width', 'auto')
-			.style('height', 'auto')
-		.append('svg:g');
-	
-	
-	background = vis
-		.append('svg:rect')
-			.attr('width', width)
-			.attr('height', height)
-			.attr('fill', backgroundColor);
-	
-	
-	// Sets the custom node dragging behavior
-	var dragBehavior = d3.behavior.drag()
-		.on("dragstart", dragstart)
-		.on("drag", dragmove)
-		.on("dragend", dragend);
-	
-	var startAlpha = 0;
-	var dragging = false;
-	var clicked = false;
-	
-	// fires on mousedown on a node
-	function dragstart (d, i) {
-		startAlpha = GraphUtil.force.alpha();
-		dragging = true;		
-		clicked = true;
-		d3.event.sourceEvent.preventDefault();
-		d3.event.sourceEvent.stopPropagation();
-	}
+// creates the d3 force layout and fully initializes it
+function createForceLayout (config) {
 
-	// fires when the user drags a node
-	function dragmove (d, i) {
-		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
-			d.x += d3.event.dx;
-			d.y += d3.event.dy;
-			d.px = d.x;
-			d.py = d.y;
-			
-			if (d.cutShadow)
-				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-
-			d.fix = true;
-			d.fixed = true;
-			clicked = false;
-			
-			startAlpha = Math.min(startAlpha+0.005, 0.1);
-			if (GraphUtil.force.alpha() < startAlpha) {
-				if (!GraphUtil.setAlpha(0.1)) {
-					GraphUtil.updateNodePosition(d);
-					updateElementPositions();
-				}
-			}
-			
-			d3.event.sourceEvent.preventDefault();
-			d3.event.sourceEvent.stopPropagation();
-		}
-	}
-
-	// fires on mouseup on a node. if the user never dragged moved their mouse, treat this like a click
-	function dragend (d, i) {
-		d.fix = false;
-		d.fixed = false;
-		dragging = false;
-		if (clicked)
-			toggleNodeSelection(d.index);
-		d3.event.sourceEvent.preventDefault();
-		d3.event.sourceEvent.stopPropagation();
-	}
-	
-	// Rescales the contents of the svg. Called when the user scrolls.
-	function zooming (e) {
-		if (!dragging) {
-			vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')');
-		}
-	}
-	
-	// Resets the scale and position of the map. Called when the user double clicks on the background
-	function resetView () {
-		if (d3.select(d3.event.target)[0][0].nodeName == 'use')
-			return;
-		centerGraph();
-	}
-	
-	// Handle the panning when the user starts dragging the canvas
-	function mousedown() {
-		return;
-	}
-	
-	// updates the current fillMode
-	fillMode = GraphUtil.getFillMode();
-	
-	// Start each node in the center of the map
+	// Start each node near the center of the map
 	$.each(nodes, function() {
-		this.x = width/2+10*Math.random();
-		this.px = width/2+10*Math.random();
-		this.y = height/2+10*Math.random();
-		this.py = height/2+10*Math.random();
+		this.x = (config.width / 2) + (10 * Math.random())
+		this.px = this.x
+		this.y = (config.height / 2) + (10 * Math.random())
+		this.py = this.py
 	});
-	
-	// Create the SVG element
-	canvas
-		.attr("width", width)
-		.attr("height", height)
-		.attr("class", 'draggable chart')
-		.attr("style", graphstyle)
-		.style('background-color', backgroundColor)
-		.style('cursor', 'default')
-		.on("dblclick", resetView)
-		.on("dblclick.zoom", null);
-	
 	
 	// Create the force layout
 	GraphUtil.force
@@ -267,19 +194,136 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.linkDistance(function (d) {
 			if (d.cut)
 				return 1000;
-			return linkSize;
+			return config.linkSize;
 		})
 		.linkStrength(function (d) {
 			if (d.duplicate)
 				return 0;
 			return 3;
 		})
-		.friction(friction)
-		.charge(charge)
-		.size([width, height])
-		.theta(theta);
+		.friction(config.friction)
+		.charge(config.charge)
+		.size([config.width, config.height])
+		.theta(config.theta);
 	
 	GraphUtil.startForce();
+	GraphUtil.force.stop();
+	
+	// Calculate the maximum weight value, which is used during the tick function
+	var maxWeight = 1
+	_(nodes).forEach(function(o) {
+		maxWeight = Math.max( maxWeight, (o.weight?o.weight:0) )
+		o.fix = false
+	})
+	
+	// set up the node families
+	var nodeFamilies = GraphUtil.setNodeFamilies(nodes);
+	maxFamilyWeights = [];
+	nodeFamilies.each(function (family, i) {
+		var maxWeight = 1;
+		family.each(function (node, i) {
+			maxWeight = Math.max(maxWeight, node.weight);
+		});
+		maxFamilyWeights[i] = maxWeight;
+	});
+	
+	// calculate which nodes should use the gravity
+	GraphUtil.force.gravity(0.05);
+	var gravityNodesFound = 0;
+	if (nodeFamilies.size() < 5)
+		GraphUtil.force.nodes().each(function (o, i) {
+			if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
+				o.noGravity = true;
+			else
+				++gravityNodesFound;
+		});
+	
+	if (gravityNodesFound == 1 || nodeFamilies.size() == nodes.size())
+		GraphUtil.force.gravity(1);
+}
+
+// creates the graph SVG and sets up the bindings and behaviors for it
+function createGraph (config) {
+	
+	// updates the current fillMode
+	fillMode = GraphUtil.getFillMode()
+	
+	// create the zoom and drag behaviors and add their handlers
+	dragBehavior = d3.behavior.drag()
+	zoomBehavior = d3.behavior.zoom()
+	createBehaviorHandler(zoomBehavior, dragBehavior)
+	svgContainer
+		.call(zoomBehavior)
+		.on("dblclick", resetView)
+		.on("dblclick.zoom", null)
+	
+	setGraphDimensions(config.width, config.height)
+	
+	svgContainer.style('background-color', backgroundColor)
+	
+	// Create the SVG element
+	canvas
+		.attr("class", 'draggable chart')
+		.attr("style", graphstyle)
+		.style('cursor', 'default')
+		.on("dblclick.zoom", null)
+	
+	// transform the canvas
+	GraphUtil.transformElement(svgTranslator, -canvasSize/2, -canvasSize/2, 1)
+	GraphUtil.transformElement(canvas, canvasSize/2, canvasSize/2, 1)
+	
+	// create the main group in the SVG
+	vis = canvas
+		.append('svg:g')
+			.on("dblclick.zoom", null)
+			.style('width', 'auto')
+			.style('height', 'auto')
+		.append('svg:g')
+	
+	// create the SVG bindings for the nodes, labels, and edges
+	createSVGBindings(nodes, links)
+	
+	// add pointers to the bound elements
+	GraphUtil.addBindingPointers()
+	
+	// Update the classes for all data bound svg objects
+	GraphUtil.updateAllClasses()
+	
+	// set up dimensional data for the svg bindings
+	if (nodes.length > 1000)
+		GraphUtil.setNodeDimensions(true)
+	else
+		GraphUtil.setNodeDimensions(false)
+	
+	// get the widths of the rasterized labels
+	getLabelWidths()
+	
+	// bind the "color by" radio buttons
+	$('#colorByFormId').children().unbind('change').on('change', function (e) {
+		fillMode = GraphUtil.getFillMode()
+		GraphUtil.nodeBindings.style("fill", function(d) {
+			return GraphUtil.getFillColor(d, fill, fillMode)
+		});
+		if (fillMode == 'group')
+			GraphUtil.updateLegendColorKey(depBundles, fill, fillMode)
+		else if (fillMode == 'bundle')
+			GraphUtil.updateLegendColorKey(moveBundles, fill, fillMode)
+		else
+			GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode)
+	});
+	
+	// bind the show budle conflicts checkbox
+	$('#bundleConflictsId').unbind('change').on('change', function (e) {
+		GraphUtil.updateLinkClasses()
+		GraphUtil.updateNodeClasses()
+	});
+	
+	// Load the move bundles into the legend
+	$('#colorByFormId').children(':checked').trigger('change')
+}
+
+// creates the SVG elements for the nodes, labels, and edges
+function createSVGBindings (nodes, links) {
 	
 	// Add the links the the SVG
 	GraphUtil.linkBindings = vis.selectAll("line.link")
@@ -291,10 +335,11 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 			.attr("x1", function(d) { return d.source.x;})
 			.attr("y1", function(d) { return d.source.y;})
 			.attr("x2", function(d) { return d.target.x;})
-			.attr("y2", function(d) { return d.target.y;});
-
+			.attr("y2", function(d) { return d.target.y;})
+	
+	// line opacity is really slow in firefox so don't use it initially
 	if ($.browser.mozilla)
-		GraphUtil.linkBindings.style('opacity', 1);
+		GraphUtil.linkBindings.style('opacity', 1)
 	
 	// Add the nodes to the SVG
 	GraphUtil.nodeBindings = vis.selectAll("use")
@@ -302,7 +347,7 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 	
 	// Create the nodes
 	GraphUtil.nodeBindings = GraphUtil.nodeBindings
-		.append("use")
+		.append("svg:use")
 			.attr("xlink:href", function (d) {
 				return '#' + appSVGShapes.shape[assetTypes[d.type].internalName].id;
 			})
@@ -320,28 +365,30 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 					return getEntityDetails('planningConsole', 'Database', d.id);
 				return getEntityDetails('planningConsole', 'Server', d.id);
 			})
-			.on("mousedown", mousedown)
 			.attr("id", function(d) { return 'node-'+d.index })
 			.style('cursor', 'default')
+			.style('pointer-events', 'none !important')
 			.style("fill", function(d) {
 				return GraphUtil.getFillColor(d, fill, fillMode);
 			})
 			.attr("cx", 0)
 			.attr("cy", 0)
-			.attr("transform", "translate(0, 0)");
-			
-	GraphUtil.nodeBindings.append("title").text(function(d){ return d.title });
+			.attr("transform", "translate(0, 0)")
 	
-	// Create the labels
+	// Add titles to the nodes
+	GraphUtil.nodeBindings.append("svg:title").text(function(d){ return d.title })
+	
+	// Create the label containers
 	GraphUtil.labelBindings = vis.selectAll("g.node")
 		.data(nodes).enter()
 		.append("svg:g")
 		.attr("cx", 0)
 		.attr("cy", 0)
-		.attr("transform", "translate(0, 0)");
+		.attr("transform", "translate(0, 0)")
 	
-	GraphUtil.labelBindings.attr("class", "label");
+	GraphUtil.labelBindings.attr("class", "label")
 	
+	// Create the label backgrounds
 	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 		.attr("id", function (d) {
 			return "label2-" + d.id;
@@ -351,8 +398,9 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("dy",".35em")
 		.text(function(d) {
 			return d.name;
-		});
+		})
 	
+	// Create the label foregrounds
 	GraphUtil.labelTextBindings = GraphUtil.labelBindings.append("svg:text").attr("style", "font: 11px Tahoma, Arial, san-serif;")
 		.attr("id", function (d) {
 			return "label-" + d.id;
@@ -362,109 +410,37 @@ function buildMap (charge, linkSize, friction, theta, width, height) {
 		.attr("dy",".35em")
 		.text(function(d) {
 			return d.name;
-		});
+		})
 	
-	GraphUtil.setShowLabels(GraphUtil.force.nodes());
-	
-	// add pointers to the bound elements
-	GraphUtil.addBindingPointers();
-	
-	// Update the classes for all data bound svg objects
-	GraphUtil.updateAllClasses();
-	
-	// bind the "color by" radio buttons
-	$('#colorByFormId').children().unbind('change').on('change', function (e) {
-		fillMode = GraphUtil.getFillMode();
-		GraphUtil.nodeBindings.style("fill", function(d) {
-			return GraphUtil.getFillColor(d, fill, fillMode);
-		});
-		if (fillMode == 'group')
-			GraphUtil.updateLegendColorKey(depBundles, fill, fillMode);
-		else if (fillMode == 'bundle')
-			GraphUtil.updateLegendColorKey(moveBundles, fill, fillMode);
-		else
-			GraphUtil.updateLegendColorKey(moveEvents, fill, fillMode);
-	});
-	
-	// set up dimensional data for the svg bindings
-	GraphUtil.setNodeDimensions();
-	getLabelWidths();
-	
-	// bind the show budle conflicts checkbox
-	$('#bundleConflictsId').unbind('change').on('change', function (e) {
-		GraphUtil.updateLinkClasses();
-		GraphUtil.updateNodeClasses();
-	});
-	
-	// Load the move bundles into the legend
-	$('#colorByFormId').children(':checked').trigger('change');
-	
-	
-	// Calculate the maximum weight value, which is used during the tick function
-	var maxWeight = 1
-	_(nodes).forEach(function(o) {
-		maxWeight = Math.max( maxWeight, (o.weight?o.weight:0) );
-		o.fix = false;
-	})
-	
-	// set up the node families
-	var nodeFamilies = GraphUtil.setNodeFamilies(nodes);
-	maxFamilyWeights = [];
-	nodeFamilies.each(function (family, i) {
-		var maxWeight = 1;
-		family.each(function (node, i) {
-			maxWeight = Math.max(maxWeight, node.weight);
-		});
-		maxFamilyWeights[i] = maxWeight;
-	});
-	
-	GraphUtil.force.gravity(0.05);
-	
-	var gravityNodesFound = 0;
-	if (nodeFamilies.size() < 5)
-		GraphUtil.force.nodes().each(function (o, i) {
-			if ( maxFamilyWeights[o.family] > 1 && o.weight < maxFamilyWeights[o.family] )
-				o.noGravity = true;
-			else
-				++gravityNodesFound;
-		});
-	
-	if (gravityNodesFound == 1 || nodeFamilies.size() == nodes.size())
-		GraphUtil.force.gravity(1);
-	
-	// run some initial ticks before displaying the graph
-	if (nodes.size() < 500)
-		calmTick(200);
+	// Filter the visibility of the labels
+	GraphUtil.setShowLabels(GraphUtil.force.nodes())
+}
+
+// asynchronously performs the initial ticks for the graph then executes the callback
+function performInitialTicks (tickItr, callback) {
+	if (tickItr.next().done)
+		callback()
 	else
-		calmTick(20);
-	GraphUtil.force.on("tick", tick);
-	GraphUtil.force.tick();
-	
-	if (nodes.size() > 12)
-		setIdealGraphPosition();
-	
-	// Move the background to the correct place in the DOM
-	background.remove();
+		window.setTimeout(performInitialTicks, 1, tickItr, callback);
 }
 
 // Updates the dynamic attributes of the svg elements every tick of the simulation
 function tick (e) {
-	updateElementPositions();
+	updateElementPositions()
 }
 
 // updates the attributes of all the svg elements
 function updateElementPositions () {
-	
 	var d = null;
 	
 	// set the dynamic attributes for the nodes
 	$(GraphUtil.nodeBindings[0]).each(function (i, o) {
 		d = o.__data__;
 		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
-		if (d.cutShadow){
+		if (d.cutShadow) {
 
 			var yOffset = d.y;
-			if(d && d.type === 'Other') {
+			if (d && d.type === 'Other') {
 				yOffset = d.y - 5;
 			}
 
@@ -492,269 +468,350 @@ function updateElementPositions () {
 	// set the dynamic attributes for the labels
 	$(GraphUtil.labelBindings[0]).each(function (i, o) {
 		d = o.__data__;
-		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
+		o.transform.baseVal.getItem(0).setTranslate(d.x, d.y);
 	});
+	
+	if (isIE)
+		vis.style('line-height', Math.random())
 }
 
 // Toggles selection of a node
 function toggleNodeSelection (id) {
-	if (nodeSelected == -1 && id == -1)
-		return; // No node is selected, so there is nothing to deselect
 	
-	var node = GraphUtil.force.nodes()[id];
+	if (nodeSelected == -1 && id == -1)
+		return // No node is selected, so there is nothing to deselect
+	
+	var node = GraphUtil.force.nodes()[id]
 	
 	// check if we are selecting or deselecting
 	if (nodeSelected == id) {
 		// deselecting
-		nodeSelected = -1;
+		nodeSelected = -1
 		
 		// The funtion is deselecting a node, so remove the selected class from all elements
 		GraphUtil.force.links().each(function (link, i) {
-			link.selected = 0;
+			link.selected = 0
 		});
 		GraphUtil.force.nodes().each(function (node, i) {
-			node.selected = 0;
+			node.selected = 0
 		});
 		
 	} else {
 		// selecting
 		if (nodeSelected != -1)
-			toggleNodeSelection(nodeSelected); // Another node is selected, so deselect that one first
-		nodeSelected = id;
+			toggleNodeSelection(nodeSelected) // Another node is selected, so deselect that one first
+		nodeSelected = id
 	
 		// Style the selected node
-		node.selected = 2;
+		node.selected = 2
 		
 		// Style the dependencies of the selected node
 		function styleDependencies (index, linkIndex, useTarget) {
-			var link = GraphUtil.force.links()[linkIndex];
-			var childNode = (useTarget)?(link.target):(link.source);
-			link.selected = 1;
-			childNode.selected = 1;
+			var link = GraphUtil.force.links()[linkIndex]
+			var childNode = (useTarget)?(link.target):(link.source)
+			link.selected = 1
+			childNode.selected = 1
 		}
-		$.each(node.dependsOn, function (i, o) {styleDependencies(i, o, true)});
-		$.each(node.supports, function (i, o) {styleDependencies(i, o, false)});
+		$.each(node.dependsOn, function (i, o) {styleDependencies(i, o, true)})
+		$.each(node.supports, function (i, o) {styleDependencies(i, o, false)})
 	}
 	
-	GraphUtil.updateAllClasses();
+	GraphUtil.updateAllClasses()
 	
 	// Sort all the svg elements to reorder them in the DOM (SVG has no z-index property)
-	GraphUtil.reorderDOM();
+	GraphUtil.reorderDOM()
 }
 
 // Used to rebuild the layout using the new parameters
 function rebuildMap (layoutChanged, charge, linkSize, friction, theta, width, height) {
-	
 	// handle resizing when not in fullscreen mode
-	if (!GraphUtil.isFullscreen() && (width && height)) {
-		resizeGraph(width, height);
-	}
+	if (!GraphUtil.isFullscreen() && (width && height))
+		resizeGraph(width, height)
 	
 	// handle the background color
-	var blackBackground = GraphUtil.isBlackBackground();
+	var blackBackground = GraphUtil.isBlackBackground()
 	backgroundColor = blackBackground ? '#000000' : '#ffffff'
-	canvas.style('background-color', backgroundColor)
-	background.attr('fill', backgroundColor)
+	svgContainer.style('background-color', backgroundColor)
 	
 	// Create the force layout
 	if (linkSize)
 		GraphUtil.force.linkDistance(function (d) {
 			if (d.cut)
-				return cutLinkSize;
-			return linkSize;
-		});
+				return cutLinkSize
+			return linkSize
+		})
 	if (friction)
-		GraphUtil.force.friction(friction);
+		GraphUtil.force.friction(friction)
 	if (charge)
-		GraphUtil.force.charge(charge);
+		GraphUtil.force.charge(charge)
 	if (theta)
-		GraphUtil.force.theta(theta);
+		GraphUtil.force.theta(theta)
 	
 	// Reset the list of types to show names for
 	var labelsChanged = GraphUtil.setShowLabels(GraphUtil.force.nodes())
 	
 	// Update the classes for all data bound svg objects
-	GraphUtil.updateAllClasses();
+	GraphUtil.updateAllClasses()
 	
 	// Set the new label widths
 	if (labelsChanged)
-		getLabelWidths();
+		getLabelWidths()
 	
 	// updates the current fillMode
-	fillMode = GraphUtil.getFillMode();
+	fillMode = GraphUtil.getFillMode()
 	
 	// if we only changed the labels or background color, only one tick is needed to reflect this change
 	if (layoutChanged)
-		GraphUtil.startForce();
+		GraphUtil.startForce()
 	else
-		GraphUtil.force.tick();
+		GraphUtil.force.tick()
 }
 
 function resizeGraph (width, height) {
-	widthCurrent = width;
-	heightCurrent = height;
+	widthCurrent = width
+	heightCurrent = height
 	
-	canvas
-		.attr("width", width)
-		.attr("height", height);
+	setGraphDimensions(width, height)
 	
-	var oldSize = GraphUtil.force.size();
-	var dx = width - oldSize[0];
-	var dy = height - oldSize[1];
+	var oldSize = GraphUtil.force.size()
+	var dx = width - oldSize[0]
+	var dy = height - oldSize[1]
 	GraphUtil.force.nodes().each(function (o, i) {
-		o.x += dx / 2;
-		o.y += dy / 2;
+		o.x += dx / 2
+		o.y += dy / 2
 	});
 	
-	GraphUtil.force
-		.size([width, height]);
+	GraphUtil.force.size([width, height])
+	GraphUtil.startForce()
 	
-	GraphUtil.startForce();
-	
-	reoptimizeGraph();
+	reoptimizeGraph()
 }
 
 // centers the view onto the graph
 function centerGraph () {
-	var ranges = getGraphRanges();
-	var visWidth = ranges.maxX - ranges.minX;
-	var visHeight = ranges.maxY - ranges.minY;
+	var ranges = getGraphRanges()
+	var visWidth = ranges.maxX - ranges.minX
+	var visHeight = ranges.maxY - ranges.minY
 	
-	var dimensions = getDimensionsForOptimizing();
+	var dimensions = getDimensionsForOptimizing()
 
-	var graphWidth = dimensions.graphWidth;
-	var graphHeight = dimensions.graphHeight;
+	var graphWidth = dimensions.graphWidth
+	var graphHeight = dimensions.graphHeight
 	
-	var ratioX = graphWidth / visWidth;
-	var ratioY = graphHeight / visHeight;
-	var scaleAfter = Math.min(ratioX, ratioY);
+	var ratioX = graphWidth / visWidth
+	var ratioY = graphHeight / visHeight
+	var scaleAfter = Math.min(ratioX, ratioY)
 	
-	var translateXAfter = (graphWidth / 2) - ((visWidth / 2) + ranges.minX) * scaleAfter + graphPadding;
-	var translateYAfter = (graphHeight / 2) - ((visHeight / 2) + ranges.minY) * scaleAfter + graphPadding;
+	var translateXAfter = (graphWidth / 2) - ((visWidth / 2) + ranges.minX) * scaleAfter + graphPadding
+	var translateYAfter = (graphHeight / 2) - ((visHeight / 2) + ranges.minY) * scaleAfter + graphPadding
 	if (GraphUtil.isFullscreen())
-		translateYAfter += $('#dependencyDivId').height();
-	var translateAfter = [translateXAfter, translateYAfter];
+		translateYAfter += $('#dependencyDivId').height()
+	var translateAfter = [translateXAfter, translateYAfter]
 	
-	scaleAfter = Math.min(scaleAfter, 2.0);
+	scaleAfter = Math.min(scaleAfter, 2.0)
+
 	
 	// set the new scale and translate values
-	if (visWidth > graphSizeLimit && visHeight > graphSizeLimit && depGroup == 0) {
+	if (visWidth > graphSizeLimit && visHeight > graphSizeLimit && depGroup == 0)
 		// the graph exceeded the max size, so use the max size translate
-		zoomBehavior.scale(0.37892914162759944);
-		zoomBehavior.translate([527.9102296165405, 185.33142583118914]);
-	} else if (scaleAfter < 2) {
+		zoomBehavior.scale(tooBigZoom.scale).translate(tooBigZoom.translate)
+	else if (scaleAfter < 2)
 		// use the calculated transform
-		zoomBehavior.scale(scaleAfter);
-		zoomBehavior.translate(translateAfter);
-	} else {
+		zoomBehavior.scale(scaleAfter).translate(translateAfter)
+	else
 		// the graph exceeded the min size, so use the default scale
-		zoomBehavior.scale(1);
-		zoomBehavior.translate([0, 0]);
-	}
+		zoomBehavior.scale(1).translate([0, 0])
 	
-	zoomBehavior.event(canvas);
+	zoomBehavior.event(svgContainer)
 }
 
 // finds the rotation of the graph that requires the least zooming
 function findBestRotation () {
-	var dimensions = getDimensionsForOptimizing();
-	var graphWidth = dimensions.graphWidth;
-	var graphHeight = dimensions.graphHeight;
-	var bestAngle = 0;
-	var bestScale = 0;
-	var iterations = 180;
-	var angleChange = 360 / iterations;
+	var dimensions = getDimensionsForOptimizing()
+	var graphWidth = dimensions.graphWidth
+	var graphHeight = dimensions.graphHeight
+	var bestAngle = 0
+	var bestScale = 0
+	var iterations = 180
+	var angleChange = 360 / iterations
 	for (var i = 1; i <= iterations; i++) {
 		if (i == (iterations / 4) + 1) {
-			GraphUtil.rotateGraph(180 - angleChange);
-			i = 3 * (iterations / 4) - 1;
+			GraphUtil.rotateGraph(180 - angleChange)
+			i = 3 * (iterations / 4) - 1
 		} else {
-			GraphUtil.rotateGraph(angleChange);
+			GraphUtil.rotateGraph(angleChange)
 			
-			var ranges = getGraphRanges();
+			var ranges = getGraphRanges()
 			
-			var visWidth = ranges.maxX - ranges.minX;
-			var visHeight = ranges.maxY - ranges.minY;
-			var ratioX = graphWidth / visWidth;
-			var ratioY = graphHeight / visHeight;
-			var scaleAfter = Math.min(ratioX, ratioY);
+			var visWidth = ranges.maxX - ranges.minX
+			var visHeight = ranges.maxY - ranges.minY
+			var ratioX = graphWidth / visWidth
+			var ratioY = graphHeight / visHeight
+			var scaleAfter = Math.min(ratioX, ratioY)
 			if (scaleAfter >= bestScale) {
-				bestScale = scaleAfter;
-				bestAngle = i * angleChange;
+				bestScale = scaleAfter
+				bestAngle = i * angleChange
 			}
 		}
 	}
-	return bestAngle;
+	return bestAngle
 }
 
 function getGraphRanges () {
-	var returnVal = {};
-	returnVal.minX = 9999999999;
-	returnVal.maxX = -9999999999;
-	returnVal.minY = 9999999999;
-	returnVal.maxY = -9999999999;
+	var returnVal = {}
+	returnVal.minX = 9999999999
+	returnVal.maxX = -9999999999
+	returnVal.minY = 9999999999
+	returnVal.maxY = -9999999999
 	
 	GraphUtil.force.nodes().each(function(o, i) {
-		var offsetX = o.dimensions.width / 2;
-		var offsetY = o.dimensions.height / 2;
-		returnVal.minX = Math.min(returnVal.minX, o.x - offsetX);
-		returnVal.maxX = Math.max(returnVal.maxX, o.x + Math.max(o.labelWidth, offsetX));
-		returnVal.minY = Math.min(returnVal.minY, o.y - offsetY);
-		returnVal.maxY = Math.max(returnVal.maxY, o.y + offsetY);
-	});
+		var offsetX = o.dimensions.width / 2
+		var offsetY = o.dimensions.height / 2
+		returnVal.minX = Math.min(returnVal.minX, o.x - offsetX)
+		returnVal.maxX = Math.max(returnVal.maxX, o.x + Math.max(o.labelWidth, offsetX))
+		returnVal.minY = Math.min(returnVal.minY, o.y - offsetY)
+		returnVal.maxY = Math.max(returnVal.maxY, o.y + offsetY)
+	})
 	
-	return returnVal;
+	return returnVal
 }
 
 function setIdealGraphPosition () {
-	var angle = findBestRotation();
-	GraphUtil.rotateGraph(angle);
-	updateElementPositions();
-	centerGraph();
-	updateElementPositions();
+	if (nodes.length < 3000) {
+		var angle = findBestRotation()
+		GraphUtil.rotateGraph(angle)
+		updateElementPositions()
+		centerGraph()
+	}
 }
 
 function reoptimizeGraph () {
 	zoomBehavior
 		.translate([0, 0])
 		.scale(1)
-		.event(canvas);
-	setIdealGraphPosition();
+		.event(svgContainer)
+	setIdealGraphPosition()
 }
 
 function getDimensionsForOptimizing () {
-	var dimensions = GraphUtil.getProperGraphDimensions();
-	var returnVal = {};
-	returnVal.graphWidth = dimensions.width - graphPadding * 2;
-	returnVal.graphHeight = dimensions.height - graphPadding * 2;
+	var dimensions = GraphUtil.getProperGraphDimensions()
+	var returnVal = {}
+	returnVal.graphWidth = dimensions.width - graphPadding * 2
+	returnVal.graphHeight = dimensions.height - graphPadding * 2
 	if (GraphUtil.isFullscreen())
-		returnVal.graphHeight -= $('#dependencyDivId').height();
-	return returnVal;
+		returnVal.graphHeight -= $('#dependencyDivId').height()
+	return returnVal
 }
 
 function getLabelWidths () {
 	GraphUtil.force.nodes().each(function (o, i) {
 		if (o.showLabel) {
-			var labelElement = o.labelElement.select('text:not(.labelBackground)')[0][0];
-			var extent = labelElement.getExtentOfChar(labelElement.getNumberOfChars() - 1);
-			var offset = labelElement.dx.baseVal.getItem(0).value;
-			var labelWidth = extent.x + extent.width + offset;
-			o.labelWidth = labelWidth;
+			var labelElement = o.labelElement.select('text:not(.labelBackground)')[0][0]
+			var extent = labelElement.getExtentOfChar(labelElement.getNumberOfChars() - 1)
+			var offset = labelElement.dx.baseVal.getItem(0).value
+			var labelWidth = extent.x + extent.width + offset
+			o.labelWidth = labelWidth
 		} else {
-			o.labelWidth = 0;
+			o.labelWidth = 0
 		}
 	});
 }
 
 function resetTranslate () {
-	zoomBehavior.translate([0, 0]);
-	zoomBehavior.event(canvas);
+	zoomBehavior
+		.translate([0, 0])
+		.event(svgContainer)
 }
 
-// calls the tick function n times without letting the browser paint in between
+// sets up the handlers to use with the zoom and drag behaviors
+function createBehaviorHandler (zoomBehavior, dragBehavior) {
+	
+	// set the zoom behavior
+	zoomBehavior.on("zoom", zooming)
+	
+	// Sets the custom node dragging behavior
+	dragBehavior
+		.on("dragstart", dragstart)
+		.on("drag", dragmove)
+		.on("dragend", dragend)
+	
+	// local variables used to manage state between handler functions
+	var startAlpha = 0
+	var dragging = false
+	var clicked = false
+	
+	// fires on mousedown on a node
+	function dragstart (d, i) {
+		startAlpha = GraphUtil.force.alpha()
+		dragging = true
+		clicked = true
+		d3.event.sourceEvent.preventDefault()
+		d3.event.sourceEvent.stopPropagation()
+	}
+
+	// fires when the user drags a node
+	function dragmove (d, i) {
+		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
+			var multiplier = zoomBehavior.scale()
+			if (isIE)
+				multiplier = 1 // ie doesn't get mouse position correctly
+			d.x += d3.event.dx / multiplier
+			d.y += d3.event.dy / multiplier
+			d.px = d.x
+			d.py = d.y
+			
+			if (d.cutShadow)
+				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
+
+			d.fix = true
+			d.fixed = true
+			clicked = false
+			
+			startAlpha = Math.min(startAlpha+0.005, 0.1)
+			if (GraphUtil.force.alpha() < startAlpha)
+				if (!GraphUtil.setAlpha(0.1)) {
+					GraphUtil.updateNodePosition(d)
+					updateElementPositions()
+				}
+			
+			d3.event.sourceEvent.preventDefault()
+			d3.event.sourceEvent.stopPropagation()
+		}
+	}
+
+	// fires on mouseup on a node. if the user never dragged moved their mouse, treat this like a click
+	function dragend (d, i) {
+		d.fix = false
+		d.fixed = false
+		dragging = false
+		if (clicked)
+			toggleNodeSelection(d.index)
+		d3.event.sourceEvent.preventDefault()
+		d3.event.sourceEvent.stopPropagation()
+	}
+	
+	// Rescales the contents of the svg. Called when the user scrolls.
+	function zooming (e) {
+		if (!dragging) {
+			if (d3.event.sourceEvent) {
+				d3.event.sourceEvent.stopPropagation()
+				d3.event.sourceEvent.preventDefault()
+			}
+			
+			var offset = canvasSize / 2
+			var x = d3.event.translate[0] - offset
+			var y = d3.event.translate[1] - offset
+			GraphUtil.transformElement(svgTranslator, x, y, d3.event.scale)
+		}
+	}
+}
+
+// calls the tick function once
 function calmTick (n) {
 	for (var i = 0; i < n; ++i) {
-		GraphUtil.force.tick();
+		GraphUtil.force.resume()
+		GraphUtil.force.tick()
+		GraphUtil.force.stop()
 	}
 }
 
@@ -988,21 +1045,21 @@ function stopMap () {
 
 // gets the normal width of this graph
 function getStandardWidth () {
-	var graphOffset = $('#svgContainerId').offset().left;
-	var pageWidth = $(window).width();
+	var graphOffset = $('#svgContainerId').offset().left
+	var pageWidth = $(window).width()
 	if (GraphUtil.isFullscreen())
-		return pageWidth;
-	return pageWidth - graphOffset * 2;
+		return pageWidth
+	return pageWidth - graphOffset * 2
 }
 
 // gets the normal height of this graph
 function getStandardHeight () {
-	var bottomMargin = $('#svgContainerId').offset().left;
-	var graphOffset = $('#svgContainerId').offset().top;
-	var pageHeight = $(window).height();
+	var bottomMargin = $('.main-footer').outerHeight()
+	var graphOffset = $('#svgContainerId').offset().top
+	var pageHeight = $(window).height()
 	if (GraphUtil.isFullscreen())
-		return pageHeight;
-	return pageHeight - graphOffset - bottomMargin;
+		return pageHeight
+	return pageHeight - graphOffset - bottomMargin - graphPadding
 }
 
 function getInitialDimensions () {
@@ -1019,34 +1076,46 @@ function resetMap () {
 
 // gets the list of children for the specified node
 function getChildren (node) {
-	var nodes = [];
+	var nodes = []
 	if (node) 
 		for (var i = 0; i < node.dependsOn.length; ++i)
-			nodes.push(links[node.dependsOn[i]].target);
-	return nodes;
+			nodes.push(links[node.dependsOn[i]].target)
+	return nodes
 }
 
 // gets the list of parents for the specified node
 function getParents (node) {
-	var nodes = [];
-	if (node) 
+	var nodes = []
+	if (node)
 		for (var i = 0; i < node.supports.length; ++i)
-			nodes.push(links[node.supports[i]].source);
-	return nodes;
+			nodes.push(links[node.supports[i]].source)
+	return nodes
+}
+
+// gets the list of nodes with dependencies involving for the specified node
+function getDependencies (node) {
+	var depList = []
+	if (node) {
+		for (var i in node.dependsOn)
+			depList.push(links[node.dependsOn[i]])
+		for (var i in node.supports)
+			depList.push(links[node.supports[i]])
+	}
+	return depList
 }
 
 function getLinkDistance (link) {
-	var width = Math.abs(link.target.x - link.source.x);
-	var height = Math.abs(link.target.y - link.source.y);
-	return Math.sqrt(width*width + height*height);
+	var width = Math.abs(link.target.x - link.source.x)
+	var height = Math.abs(link.target.y - link.source.y)
+	return Math.sqrt(width*width + height*height)
 }
 
 // initializes the progress bar for min cuts
 function displayProgressBar () {
-	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "<h1>Calculating Group Split Suggestion</h1>");
-	progressBarCancelDisplayed = false;
+	var progressBar = tds.ui.progressBar(-1, 999999, function() {}, function() {}, "<h1>Calculating Group Split Suggestion</h1>")
+	progressBarCancelDisplayed = false
 	
-	return progressBar;
+	return progressBar
 }
 
 // sets the value of the progress bar to n %
@@ -1081,5 +1150,51 @@ function setProgress (n) {
 function removeProgressBar () {
 	$('#globalProgressBar').remove();
 }
+
+// Resets the scale and position of the map. Called when the user double clicks on the background
+function resetView () {
+	if (d3.select(d3.event.target)[0][0].nodeName == 'use')
+		return
+	centerGraph()
+}
+
+// gets the config object for the force layout
+function getForceConfig () {
+	// get the default graph configuration
+	var charge = defaults['force']
+	var linkSize = defaults['linkSize']
+	var friction = defaults['friction']
+	var theta = defaults['theta']
+	var width = getStandardWidth()
+	var height = getStandardHeight()
+	
+	return {
+		'charge': charge,
+		'linkSize': linkSize,
+		'friction': friction,
+		'theta': theta,
+		'width': width,
+		'height': height
+	}
+}
+
+function debugTiming (message) {
+	console.log((performance.now() - debugTime) + ' ms');
+	debugTime = performance.now();
+	var fullLine = '##############################################################';
+	var output = ' ' + message + ' done ';
+	output = fullLine.substr(0, Math.floor((fullLine.length - output.length) / 2)) + output + fullLine.substr(0, Math.ceil((fullLine.length - output.length) / 2));
+	console.log(output);
+}
+
+function setGraphDimensions (width, height) {
+	svgContainer
+		.style("width", width + 'px')
+		.style("height", height + 'px')
+	canvas
+		.attr("width", width)
+		.attr("height", height)
+}
+
 </script>
 </div>

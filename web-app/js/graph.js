@@ -15,12 +15,14 @@ var GraphUtil = (function ($) {
 	public.labelTextBindings = null;
 	public.shapeOffset = -20;
 	public.labelShapeOffset = -8
-	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
+	public.GPUNodeThreshold = 500
 	public.labelHeightDefault = 15; // Modify if the size of the text from the rect is different.
+	public.nodeRadius = {'Default': 28, 'Server': 29, 'Database': 27, 'Files': 28, 'Other': 29, 'Application': 26, 'VM': 25};
+	public.defaultDimensions = {'width': 28, 'height': 28};
 
 	// returns true if the graph is loaded
 	public.graphExists = function () {
-		return ($('#svgContainerId').children('svg').size() > 0);
+		return ($('#svgContainerId #svgTranslatorId').children('svg').size() > 0)
 	}
 
 	// returns true if the graph is in fullscreen mode
@@ -110,7 +112,7 @@ var GraphUtil = (function ($) {
 		var panel = $('#' + panelId);
 		panel.css('height', '');
 		panel.css('overflow-y', '');
-		var svgContainer = $('#svgContainerId svg');
+		var svgContainer = $('#svgContainerId');
 		if (panel.size() == 0 || svgContainer.size() == 0)
 			return false;
 
@@ -179,7 +181,7 @@ var GraphUtil = (function ($) {
 
 		}
 	}
-
+	
 	// performs one tick of the
 	public.tickOnce = function () {
 		var oldAlpha = public.force.alpha();
@@ -420,16 +422,20 @@ var GraphUtil = (function ($) {
 
 	// adds references back from the data objects to their bound elements
 	public.addBindingPointers = function () {
-		for (var i = 0; i < public.nodeBindings.size(); i++) {
-			var element = public.nodeBindings.first()[i];
-			element.__data__.nodeElement = d3.select(element);
+		var element;
+		var nodes = public.nodeBindings.first();
+		for (var i = 0; i < nodes.length; i++) {
+			element = nodes[i];
+			element.__data__.nodeElement = element;
 		}
-		for (var i = 0; i < public.labelBindings.size(); i++) {
-			var element = public.labelBindings.first()[i];
+		var labels = public.labelBindings.first();
+		for (var i = 0; i < labels.length; i++) {
+			element = labels[i];
 			element.__data__.labelElement = d3.select(element);
 		}
-		for (var i = 0; i < public.linkBindings.size(); i++) {
-			var element = public.linkBindings.first()[i];
+		var links = public.linkBindings.first();
+		for (var i = 0; i < links.length; i++) {
+			element = links[i];
 			element.__data__.linkElement = d3.select(element);
 		}
 	}
@@ -459,9 +465,9 @@ var GraphUtil = (function ($) {
 	}
 
 	public.updateNodePosition = function (node) {
-		node.nodeElement.attr('transform', 'translate(' + node.x + ' ' + node.y + ')');
-		node.nodeElement.attr('cx', node.x);
-		node.nodeElement.attr('cy', node.y);
+		node.nodeElement.setAttribute('transform', 'translate(' + node.x + ' ' + node.y + ')');
+		node.nodeElement.setAttribute('cx', node.x);
+		node.nodeElement.setAttribute('cy', node.y);
 		var links = public.getAdjacentLinks(node);
 		for (var i = 0; i < links.size(); i++) {
 			var l = links[i];
@@ -593,10 +599,12 @@ var GraphUtil = (function ($) {
 		return changed;
 	}
 
-	public.setNodeDimensions = function () {
+	public.setNodeDimensions = function (fast) {
 		public.force.nodes().each(function (o, i) {
-			var element = o.nodeElement[0][0];
-			o.dimensions = element.getBBox();
+			if (fast)
+				o.dimensions = public.defaultDimensions;
+			else
+				o.dimensions = o.nodeElement.getBBox();
 		});
 	}
 
@@ -647,6 +655,23 @@ var GraphUtil = (function ($) {
 		return { x: x2 - Math.cos(angle) * (nodeRadius), y: y2 - Math.sin(angle) * (nodeRadius) };
 	};
 
+	public.transformElement = function (element, x, y, scale) {
+		if (public.force && public.force.nodes().size() > public.GPUNodeThreshold)
+			element[0][0].style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0px)' + ' scale3d(' + scale + ', ' + scale + ', 1)'
+		else
+			element[0][0].style.transform = 'translate(' + x + 'px, ' + y + 'px)' + ' scale(' + scale + ')'
+		
+	}
+	
+	// returns true if the user is on ie
+	public.isIE = function () {
+		if (navigator.appName == 'Microsoft Internet Explorer')
+			return true
+		if (navigator.appName == 'Netscape' && navigator.userAgent.indexOf('Trident') != -1)
+			return true
+		return false
+	}
+	
 	// return the public object to make the public functions accessable
 	return public;
 
