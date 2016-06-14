@@ -15,9 +15,13 @@ import org.apache.poi.ss.usermodel.Cell
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
+import org.hibernate.criterion.Projections
+import org.hibernate.Criteria
+import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.transaction.annotation.Transactional
 import net.transitionmanager.utils.Profiler
+
 
 import java.util.regex.Matcher
 // Used to wire up bindData
@@ -1766,31 +1770,34 @@ class AssetEntityService {
 	 * @param updateOnPercent
 	 */
 	def cablingReportData( assetCablesList, cablingSheet, progressCount, progressTotal, updateOnPercent, key){
-		for ( int r = 2; r <= assetCablesList.size(); r++ ) {
+
+		assetCablesList.eachWithIndex{ cabling, idx ->
+			def currentCabling = cabling.get(Criteria.ROOT_ALIAS)
 			progressCount++
 			updateProgress(key, progressCount, progressTotal, 'In progress', 0.01)
-			addCell(cablingSheet, r, 0, String.valueOf(assetCablesList[r-2].assetFromPort?.type ))
-			addCell(cablingSheet, r, 1, assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, r, 2, String.valueOf(assetCablesList[r-2].assetFrom ? assetCablesList[r-2].assetFrom.assetName : "" ))
-			addCell(cablingSheet, r, 3, String.valueOf(assetCablesList[r-2].assetFromPort?.label ))
-			addCell(cablingSheet, r, 4, assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
-			addCell(cablingSheet, r, 5, String.valueOf(assetCablesList[r-2].assetTo ? assetCablesList[r-2].assetTo?.assetName :"" ))
-			if(assetCablesList[r-2].assetFromPort && assetCablesList[r-2].assetFromPort.type && assetCablesList[r-2].assetFromPort.type !='Power'){
-				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].assetToPort ? assetCablesList[r-2].assetToPort?.label :"" ))
+			addCell(cablingSheet, idx + 2, 0, String.valueOf(currentCabling.assetFromPort?.type ))
+			addCell(cablingSheet, idx + 2, 1, currentCabling.assetFrom ? currentCabling.assetFrom?.id : "" , Cell.CELL_TYPE_NUMERIC)
+			addCell(cablingSheet, idx + 2, 2, String.valueOf(currentCabling.assetFrom ? currentCabling.assetFrom.assetName : "" ))
+			addCell(cablingSheet, idx + 2, 3, String.valueOf(currentCabling.assetFromPort?.label ))
+			addCell(cablingSheet, idx + 2, 4, currentCabling.assetTo ? currentCabling.assetTo?.id : "" , Cell.CELL_TYPE_NUMERIC)
+			addCell(cablingSheet, idx + 2, 5, String.valueOf(currentCabling.assetTo ? currentCabling.assetTo?.assetName :"" ))
+			if(currentCabling.assetFromPort && currentCabling.assetFromPort.type && currentCabling.assetFromPort.type !='Power'){
+				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.assetToPort ? currentCabling.assetToPort?.label :"" ))
 			}else{
-				addCell(cablingSheet, r, 6, String.valueOf(assetCablesList[r-2].toPower?:"" ))
+				addCell(cablingSheet, idx + 2, 6, String.valueOf(currentCabling.toPower?:"" ))
 			}
-			addCell(cablingSheet, r, 7, String.valueOf(assetCablesList[r-2].cableComment?:"" ))
-			addCell(cablingSheet, r, 8, String.valueOf(assetCablesList[r-2].cableColor?:"" ))
-			if(assetCablesList[r-2].assetFrom?.sourceRoom){
-				addCell(cablingSheet, r, 9, String.valueOf(assetCablesList[r-2].assetFrom?.rackSource?.location+"/"+assetCablesList[r-2].assetFrom?.sourceRoom+"/"+assetCablesList[r-2].assetFrom?.sourceRack ))
-			}else if(assetCablesList[r-2].assetFrom?.targetRoom){
-				addCell(cablingSheet, r, 9, String.valueOf(assetCablesList[r-2].assetFrom?.rackTarget?.location+"/"+assetCablesList[r-2].assetFrom?.targetRoom+"/"+assetCablesList[r-2].assetFrom?.targetRack ))
+			addCell(cablingSheet, idx + 2, 7, String.valueOf(currentCabling.cableComment?:"" ))
+			addCell(cablingSheet, idx + 2, 8, String.valueOf(currentCabling.cableColor?:"" ))
+			if(currentCabling.assetFrom?.sourceRoom){
+				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom?.rackSource?.location+"/"+currentCabling.assetFrom?.sourceRoom+"/"+currentCabling.assetFrom?.sourceRack ))
+			}else if(currentCabling.assetFrom?.targetRoom){
+				addCell(cablingSheet, idx + 2, 9, String.valueOf(currentCabling.assetFrom?.rackTarget?.location+"/"+currentCabling.assetFrom?.targetRoom+"/"+currentCabling.assetFrom?.targetRack ))
 			}else{
-				addCell(cablingSheet, r, 9, '')
+				addCell(cablingSheet, idx + 2, 9, '')
 			}
-			addCell(cablingSheet, r, 10, String.valueOf(assetCablesList[r-2].cableStatus?:"" ))
-			addCell(cablingSheet, r, 11, String.valueOf(assetCablesList[r-2].assetLoc?: "" ))
+			addCell(cablingSheet, idx + 2, 10, String.valueOf(currentCabling.cableStatus?:"" ))
+			addCell(cablingSheet, idx + 2, 11, String.valueOf(currentCabling.assetLoc?: "" ))
+
 		}
 	}
 
@@ -2218,7 +2225,7 @@ class AssetEntityService {
 			def serverDTAMap, appDTAMap, dbDTAMap, fileDTAMap
 
 			// Will hold the list of the assets for each of the classes
-			ScrollableResults asset, application, database, files
+			List asset, application, database, files
 
 			def assetEntityInstance
 
@@ -2265,6 +2272,14 @@ class AssetEntityService {
 			boolean doCabling = params.cabling=='cable'
 			boolean doComment = params.comment=='comment'
 
+			// Queries for main assets
+			String deviceQuery = null
+			String applicationQuery = null
+			String databaseQuery = null
+			String filesQuery = null
+
+
+
 			//
 			// Load the asset lists and property map files based on ALL or selected bundles for the classes selected for export
 			//
@@ -2295,14 +2310,15 @@ class AssetEntityService {
 			int cablingSize = 0
 			int dependencySize = 0
 
-			def getScrollableResults = { q, qParams ->
+			def getAssetList = {q, qParams ->
 				def hqlQuery = session.createQuery(q)
 				hqlQuery.setReadOnly(true)
+				hqlQuery.setFetchSize(1000)
 				qParams.each{k, v ->
 					hqlQuery.setParameter(k, v)
 				}
+				return hqlQuery.list()
 
-				return hqlQuery.scroll(ScrollMode.FORWARD_ONLY)
 			}
 
 			profiler.lapInfo 'Initial loading'
@@ -2317,26 +2333,22 @@ class AssetEntityService {
 			}
 
 			if ( doDevice ) {
-				String deviceQuery = "FROM AssetEntity d" + query + " AND d.assetClass='${AssetClass.DEVICE}'"
-				asset = getScrollableResults(deviceQuery, queryParams)
+				deviceQuery = "FROM AssetEntity d" + query + " AND d.assetClass='${AssetClass.DEVICE}'"
 				assetSize = countRows(deviceQuery, queryParams)
 				progressTotal += assetSize
 			}
 			if ( doApp ) {
-				String applicationQuery = "FROM Application d" + query
-				application = getScrollableResults(applicationQuery, queryParams)	
+				applicationQuery = "FROM Application d" + query
 				appSize = countRows(applicationQuery, queryParams)
 				progressTotal += appSize
 			}
 			if ( doDB ) {
-				String databaseQuery = "FROM Database d" + query
-				database = getScrollableResults(databaseQuery, queryParams)
+				databaseQuery = "FROM Database d" + query
 				dbSize = countRows(databaseQuery, queryParams)
 				progressTotal += dbSize
 			}
 			if ( doStorage ) {
-				String filesQuery = "FROM Files d" + query
-				files = getScrollableResults(filesQuery, queryParams)
+				filesQuery = "FROM Files d" + query
 				fileSize = countRows(filesQuery, queryParams)
 				progressTotal += fileSize
 			}
@@ -2573,8 +2585,8 @@ class AssetEntityService {
 					exportedEntity += 'S'
 					int deviceCount = 0
 					profiler.lap('Devices', 'Entering while loop')
-					while (asset.next()) {
-						def currentAsset = asset.get(0)
+					asset = getAssetList(deviceQuery, queryParams)
+					asset.each{ currentAsset ->
 						deviceCount++
 						progressCount++
 
@@ -2658,8 +2670,6 @@ class AssetEntityService {
 							profiler.end 'Device Row'
 						}
 
-						GormUtil.flushAndClearSession(session, deviceCount)
-
 						if (deviceCount <= maxProfilerLaps) {
 							profiler.lap 'Devices', 'Flushed Session'
 						}
@@ -2678,6 +2688,8 @@ class AssetEntityService {
 					profiler.beginInfo "Applications"
 					exportedEntity += 'A'
 
+					application = getAssetList(applicationQuery, queryParams)
+
 					// This determines which columns are added as Number vs Label
 					def numericCols = []
 
@@ -2688,8 +2700,7 @@ class AssetEntityService {
 					
 					int applicationCount = 0
 					//application.each { app ->
-					while(application.next()){
-						def app = application.get(0)
+					application.each{app ->
 						progressCount++
 						/*
 						if(progressCount < 10){
@@ -2763,7 +2774,6 @@ class AssetEntityService {
 							}
 						}
 						
-						GormUtil.flushAndClearSession(session, applicationCount)
 					}
 					/*
 					if(profiler.getLapDuration("Applications").toMilliseconds() > 10000L){
@@ -2784,9 +2794,9 @@ class AssetEntityService {
 					profiler.beginInfo "Databases"
 					exportedEntity += "D"
 					int databaseCount = 0
+					database = getAssetList(databaseQuery, queryParams)
 					//for ( int r = 1; r <= dbSize; r++ ) {
-					while(database.next()){
-						def currentDatabase = database.get(0)
+					database.each{currentDatabase ->
 						progressCount++
 						databaseCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
@@ -2824,7 +2834,6 @@ class AssetEntityService {
 							}
 						}
 						
-						GormUtil.flushAndClearSession(session, databaseCount)
 					}
 					profiler.endInfo("Databases", "processed %d rows", [dbSize])
 				}
@@ -2835,10 +2844,10 @@ class AssetEntityService {
 				if ( doStorage ) {
 					profiler.beginInfo "Logical Storage"
 					exportedEntity += "F"
+					files = getAssetList(filesQuery, queryParams)
 					//for ( int r = 1; r <= fileSize; r++ ) {
 					int filesCount = 0
-					while(files.next()){
-						def currentFile = files.get(0)
+					files.each{currentFile ->
 						progressCount++
 						filesCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
@@ -2874,7 +2883,6 @@ class AssetEntityService {
 
 						}
 						
-						GormUtil.flushAndClearSession(session, filesCount)
 					}
 					profiler.endInfo("Logical Storage", "processed %d rows", [fileSize])
 				}
@@ -2887,46 +2895,52 @@ class AssetEntityService {
 					exportedEntity += "X"
 					def dependencySheet = getWorksheet('Dependencies')
 
-					def assetDependent = AssetDependency.findAll("from AssetDependency where asset.project = ? ",[project], [readOnly:true])
-					def dependencyMap = ['AssetId':1,'AssetName':2,'AssetType':3,'DependentId':4,'DependentName':5,'DependentType':6,'Type':7, 'DataFlowFreq':8, 'DataFlowDirection':9, 'status':10, 'comment':11, 'c1':12, 'c2':13, 'c3':14, 'c4':15]
-					def dependencyColumnNameList = ['AssetId','AssetName','AssetType','DependentId','DependentName','DependentType','Type', 'DataFlowFreq', 'DataFlowDirection', 'status', 'comment', 'c1', 'c2', 'c3', 'c4']
-					def DTAMap = [0:'asset',1:'assetName',2:'assetType',3:'dependent',4:'dependentName',5:'dependentType',6:'type', 7:'dataFlowFreq', 8:'dataFlowDirection', 9:'status', 10:'comment', 11:'c1', 12:'c2', 13:'c3', 14:'c4']
-					//def newDTA = ['assetName','assetType','dependentName','dependentType']
-					def dependentSize = assetDependent.size()
-					for ( int r = 1; r <= dependentSize; r++ ) {
-						//Add assetId for walkthrough template only.
-						addCell(dependencySheet, r, 0, (assetDependent[r-1].id), Cell.CELL_TYPE_NUMERIC)
+					
+					List projectionFields = [
+							"id",
+							"asset.id",
+							"a.assetName",
+							"a.assetType",
+							"d.id",
+							"d.assetName",
+							"d.assetType",
+							"type",
+							"dataFlowFreq",
+							"dataFlowDirection",
+							"status",
+							"comment",
+							"c1",
+							"c2",
+							"c3",
+							"c4"
+					]
+
+					List results = AssetDependency.createCriteria().list{
+						createAlias("asset", "a")
+						createAlias("dependent", "d")
+						and{
+							eq("a.project", project)
+						}
+						projections{
+							projectionFields.each{
+								property(it)
+							}
+						}
+
+						fetchSize 1000
+						readOnly true
+					}
+
+					results.eachWithIndex{ dependency, r ->
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-					
-						for ( int coll = 0; coll < dependencyColumnNameList.size(); coll++ ) {
-							def addContentToSheet
-							switch(DTAMap[coll]){
-								case "assetName":
-									addContentToSheet = assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetName) :""
-								break;
-								case "assetType":
-									addContentToSheet = assetDependent[r-1].asset ? String.valueOf(assetDependent[r-1].(DTAMap[0])?.assetType) :"" 
-								break;
-								case "dependentName":
-									addContentToSheet = assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetName) : "" 
-								break;
-								case "dependentType":
-									addContentToSheet = assetDependent[r-1].dependent ? String.valueOf(assetDependent[r-1].(DTAMap[3]).assetType) : ""
-								break;
-								case "dependent":
-									addContentToSheet = assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : ""
-								break;
-								case "asset":
-									addContentToSheet = assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll]).id) : ""
-								break;
-								default:
-									addContentToSheet = assetDependent[r-1].(DTAMap[coll]) ? String.valueOf(assetDependent[r-1].(DTAMap[coll])) : ""
-							}
-							addCell(dependencySheet, r, dependencyMap[dependencyColumnNameList.get(coll)], addContentToSheet)
+
+						for(int i = 0; i < projectionFields.size(); i++){
+							addCell(dependencySheet, r + 1, i, dependency[i])
 						}
+					
 					}
-					profiler.endInfo("Dependencies", "processed %d rows", [dependentSize])
+					profiler.endInfo("Dependencies", "processed %d rows", [dependencySize])
 				}
 
 				//
@@ -2939,36 +2953,57 @@ class AssetEntityService {
 
 					def roomSheet = getWorksheet('Room')
 
-					def rooms = Room.findAllByProject(project, [readOnly:true])
-					def roomMap = ['roomId':'id', 'Name':'roomName', 'Location':'location', 'Depth':'roomDepth', 'Width':'roomWidth',
-									 'Source':'source', 'Address':'address', 'City':'city', 'Country':'country', 'StateProv':'stateProv',
-									 'Postal Code':'postalCode', 'Date Created':'dateCreated', 'Last Updated':'lastUpdated'
-									]
-					
-					def roomCol = roomSheet.getRow(0).getLastCellNum()
-					def roomSheetColumns = []
-					for ( int c = 0; c < roomCol; c++ ) {
-						def roomCellContent = roomSheet.getRow(0).getCell(c).getStringCellValue()
-						roomSheetColumns << roomCellContent
-					}
-					roomSheetColumns.removeAll('')
-					for ( int r = 1; r <= roomSize; r++ ) {
-						progressCount++
-						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
-						roomSheetColumns.eachWithIndex{column, i->
-							def addContentToSheet
-							if(column == 'roomId'){
-								addCell(roomSheet, r, 0, (rooms[r-1].id), Cell.CELL_TYPE_NUMERIC)
-							} else {
-								if(column=='Date Created' || column=='Last Updated') {
-									addCell(roomSheet, r, i, rooms[r-1]."${roomMap[column]}" ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, rooms[r-1]."${roomMap[column]}", TimeUtil.FORMAT_DATE) : "")
-								} else if(column =="Source") {
-									addCell(roomSheet, r, i, String.valueOf(rooms[r-1]."${roomMap[column]}" ==1 ? "Source" : "Target" ))
-								} else {
-									addCell(roomSheet, r, i, String.valueOf(rooms[r-1]."${roomMap[column]}"?: "" ))
-								}
+					List projectionFields = [
+							"id",
+							"roomName",
+							"location",
+							"roomDepth",
+							"roomWidth",
+							"source",
+							"address",
+							"city",
+							"country",
+							"stateProv",
+							"postalCode",
+							"dateCreated",
+							"lastUpdated"
+					]
+
+					// These fields can be exported as they are. 5 is intentionally omitted.
+					List regularFields = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10]
+					// These fields are dates and need to be converted to the user's TZ.
+					List dateFields = [11, 12]
+
+
+					List results = Room.createCriteria().list{
+
+						and{
+							eq("project", project)
+						}
+
+						projections{
+							projectionFields.each{
+								property(it)
 							}
 						}
+
+						fetchSize 1000
+						readOnly true
+					}
+
+					results.eachWithIndex{ room, r ->
+						progressCount++
+						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
+						// Export most fields.
+						regularFields.each{ col ->
+							addCell(roomSheet, r + 1, col, String.valueOf(room[col]?:""))
+						}
+						// Export date fields using the user's TZ.
+						dateFields.each{ col->
+							addCell(roomSheet, r, col, room[col] ? TimeUtil.formatDateTimeWithTZ(tzId, userDTFormat, room[col], TimeUtil.FORMAT_DATE) : "")
+						}
+						// Export 'source' or 'target' accordingly.
+						addCell(roomSheet, r, 5, String.valueOf(room[5] == 1 ? "Source" : "Target" ))
 					}
 					profiler.endInfo("Rooms", "processed %d rows", [roomSize])
 				}
@@ -2982,7 +3017,16 @@ class AssetEntityService {
 
 					def rackSheet = getWorksheet('Rack')
 
-					def racks = Rack.findAllByProject(project, [readOnly:true])
+					def racks = Rack.createCriteria().list{
+						and{
+							eq("project", project)	
+						}
+						
+						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+						fetchSize 1000
+						readOnly true
+					}
+			
 					def rackMap = ['rackId':'id', 'Tag':'tag', 'Location':'location', 'Room':'room', 'RoomX':'roomX',
 									 'RoomY':'roomY', 'PowerA':'powerA', 'PowerB':'powerB', 'PowerC':'powerC', 'Type':'rackType',
 									 'Front':'front', 'Model':'model', 'Source':'source', 'Model':'model'
@@ -2990,27 +3034,32 @@ class AssetEntityService {
 
 					def rackCol = rackSheet.getRow(0).getLastCellNum()
 					def rackSheetColumns = []
+					
 					for ( int c = 0; c < rackCol; c++ ) {
 						def rackCellContent = rackSheet.getRow(0).getCell(c).getStringCellValue()
 						rackSheetColumns << rackCellContent
 					}
-					rackSheetColumns.removeAll('')
-					for ( int r = 1; r <= rackSize; r++ ) {
+
+					racks.eachWithIndex{ rack, idx ->
+						def currentRack = rack.get(Criteria.ROOT_ALIAS)
 						progressCount++
 						updateProgress(key, progressCount, progressTotal, 'In progress', updateOnPercent)
+
 						rackSheetColumns.eachWithIndex{column, i->
 							def addContentToSheet
 							if(column == 'rackId'){
-								addCell(rackSheet, r, 0, (racks[r-1].id), Cell.CELL_TYPE_NUMERIC)
+								addCell(rackSheet, idx + 1, 0, (racks[idx].id), Cell.CELL_TYPE_NUMERIC)
 							} else {
 								 if(column =="Source")
-									addCell(rackSheet, r, i, String.valueOf(racks[r-1]."${rackMap[column]}" ==1 ? "Source" : "Target" ))
+									addCell(rackSheet, idx + 1, i, String.valueOf(currentRack."${rackMap[column]}" == 1 ? "Source" : "Target" ))
 								 else
-									addCell(rackSheet, r, i, String.valueOf(racks[r-1]."${rackMap[column]}"?: "" ))
+									addCell(rackSheet, idx + 1, i, String.valueOf(currentRack."${rackMap[column]}"?: "" ))
 							}
 						}
+						
 					}
 					profiler.endInfo("Racks", "processed %d rows", [rackSize])
+
 				}
 				
 			}
@@ -3026,7 +3075,15 @@ class AssetEntityService {
 				if (cablingSize > 0) {
 					def cablingSheet = getWorksheet("Cabling")
 
-					def cablingList = AssetCableMap.findAll( "from AssetCableMap acm where acm.assetFrom.project.id=?", [project.id], [readOnly:true] )
+					//def cablingList = AssetCableMap.findAll( "from AssetCableMap acm where acm.assetFrom.project.id=?", [project.id], [readOnly:true] )
+					def cablingList = AssetCableMap.createCriteria().list{
+						createAlias("assetFrom", "af")
+						and{
+							eq("af.project", project)
+						}
+						resultTransformer(Transformers.ALIAS_TO_ENTITY_MAP)
+						fetchSize 1000
+					}
 
 					log.debug("export() Cabling found ${sizeOf(cablingList)} mappings")
 
@@ -3054,6 +3111,7 @@ class AssetEntityService {
 							eq('commentType', 'comment')
 							isNotNull('assetEntity')
 							setReadOnly true
+							fetchSize 1000
 						} 
 					}
 
