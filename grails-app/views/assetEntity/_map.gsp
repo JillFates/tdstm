@@ -4,6 +4,8 @@
 			<div id="controlPanelTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('control')"><h4>Control Panel</h4></div><!-- This comment prevents the browser from trying to evaluate the whitespace between these divs as a space character
 			--><div id="legendTabId" class="graphPanelTab" onclick="GraphUtil.togglePanel('legend')"><h4>Legend</h4></div><!--
 			--><div id="fullscreenButtonId" class="graphButton graphTabButton" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div><!--
+			--><div id="zoomInButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomIn()" title="Zoom in"></div><!--
+			--><div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div><!--
 			--><div id="refreshButtonId" class="graphButton graphTabButton" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4>Refresh</h4></div>
 		</div>
 	</span>

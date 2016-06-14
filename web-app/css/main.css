@@ -731,23 +731,7 @@ svg {
 	padding: 0px !important;
 	margin: 0px !important;
 }
-#mapResizerId {
-	float:right;
-	vertical-align:bottom;
-}
 
-#mapReferenceId {
-	width: 300px;
-	border-collapse: collapse;
-	border-bottom: 0px;
-}
-#mapReferenceId div:not(.spacer) {
-	border-left: 1px solid green;
-	border-right: 1px solid green;
-	text-align: center;
-	width: auto;
-	cursor: pointer;
-}
 .ynselect{
 	max-width: 50px !important;
 }

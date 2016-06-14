@@ -114,7 +114,7 @@ var fillMode = 'bundle'
 var gravity = serverParams.gravity
 var distanceIntervals = 500
 var graphPadding = 15
-var canvasSize = 15000
+var canvasSize = 0
 var cutLinkSize = 500
 var graphSizeLimit = 40000
 var tooBigZoom = {'scale': 0.37892914162759944, 'translate':[527.9102296165405, 185.33142583118914]}
@@ -416,6 +416,91 @@ function createSVGBindings (nodes, links) {
 	GraphUtil.setShowLabels(GraphUtil.force.nodes())
 }
 
+// sets up the handlers to use with the zoom and drag behaviors
+function createBehaviorHandler (zoomBehavior, dragBehavior) {
+	
+	// set the zoom behavior
+	zoomBehavior.on("zoom", zooming)
+	
+	// Sets the custom node dragging behavior
+	dragBehavior
+		.on("dragstart", dragstart)
+		.on("drag", dragmove)
+		.on("dragend", dragend)
+	
+	// local variables used to manage state between handler functions
+	var startAlpha = 0
+	var dragging = false
+	var clicked = false
+	
+	// fires on mousedown on a node
+	function dragstart (d, i) {
+		startAlpha = GraphUtil.force.alpha()
+		dragging = true
+		clicked = true
+		d3.event.sourceEvent.preventDefault()
+		d3.event.sourceEvent.stopPropagation()
+	}
+
+	// fires when the user drags a node
+	function dragmove (d, i) {
+		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
+			var multiplier = zoomBehavior.scale()
+			if (isIE)
+				multiplier = 1 // ie doesn't get mouse position correctly
+			d.x += d3.event.dx / multiplier
+			d.y += d3.event.dy / multiplier
+			d.px = d.x
+			d.py = d.y
+			
+			if (d.cutShadow)
+				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
+
+			d.fix = true
+			d.fixed = true
+			clicked = false
+			
+			startAlpha = Math.min(startAlpha+0.005, 0.1)
+			if (GraphUtil.force.alpha() < startAlpha)
+				if (!GraphUtil.setAlpha(0.1)) {
+					GraphUtil.updateNodePosition(d)
+					updateElementPositions()
+				}
+			
+			d3.event.sourceEvent.preventDefault()
+			d3.event.sourceEvent.stopPropagation()
+		}
+	}
+
+	// fires on mouseup on a node. if the user never dragged moved their mouse, treat this like a click
+	function dragend (d, i) {
+		d.fix = false
+		d.fixed = false
+		dragging = false
+		if (clicked)
+			toggleNodeSelection(d.index)
+		d3.event.sourceEvent.preventDefault()
+		d3.event.sourceEvent.stopPropagation()
+	}
+	
+	// Rescales the contents of the svg. Called when the user scrolls.
+	function zooming (e) {
+		if (!dragging) {
+			console.log(d3.event)
+			if (d3.event.sourceEvent) {
+				d3.event.sourceEvent.stopPropagation()
+				d3.event.sourceEvent.preventDefault()
+			}
+			
+			var offset = canvasSize / 2
+			var x = d3.event.translate[0] - offset
+			var y = d3.event.translate[1] - offset
+			console.log(x + ', ' + y)
+			GraphUtil.transformElement(svgTranslator, x, y, d3.event.scale)
+		}
+	}
+}
+
 // asynchronously performs the initial ticks for the graph then executes the callback
 function performInitialTicks (tickItr, callback) {
 	if (tickItr.next().done)
@@ -427,6 +512,15 @@ function performInitialTicks (tickItr, callback) {
 // Updates the dynamic attributes of the svg elements every tick of the simulation
 function tick (e) {
 	updateElementPositions()
+}
+
+// calls the tick function once
+function calmTick (n) {
+	for (var i = 0; i < n; ++i) {
+		GraphUtil.force.resume()
+		GraphUtil.force.tick()
+		GraphUtil.force.stop()
+	}
 }
 
 // updates the attributes of all the svg elements
@@ -474,6 +568,7 @@ function updateElementPositions () {
 	if (isIE)
 		vis.style('line-height', Math.random())
 }
+
 
 // Toggles selection of a node
 function toggleNodeSelection (id) {
@@ -589,38 +684,38 @@ function resizeGraph (width, height) {
 
 // centers the view onto the graph
 function centerGraph () {
+	// calculate the ranges of positions for nodes
 	var ranges = getGraphRanges()
 	var visWidth = ranges.maxX - ranges.minX
 	var visHeight = ranges.maxY - ranges.minY
 	
+	// calculate the graph dimensions
 	var dimensions = getDimensionsForOptimizing()
-
 	var graphWidth = dimensions.graphWidth
 	var graphHeight = dimensions.graphHeight
 	
+	// calculate the new scale
 	var ratioX = graphWidth / visWidth
 	var ratioY = graphHeight / visHeight
 	var scaleAfter = Math.min(ratioX, ratioY)
 	
+	// calculate the new translate
 	var translateXAfter = (graphWidth / 2) - ((visWidth / 2) + ranges.minX) * scaleAfter + graphPadding
 	var translateYAfter = (graphHeight / 2) - ((visHeight / 2) + ranges.minY) * scaleAfter + graphPadding
 	if (GraphUtil.isFullscreen())
 		translateYAfter += $('#dependencyDivId').height()
 	var translateAfter = [translateXAfter, translateYAfter]
 	
-	scaleAfter = Math.min(scaleAfter, 2.0)
-
-	
 	// set the new scale and translate values
-	if (visWidth > graphSizeLimit && visHeight > graphSizeLimit && depGroup == 0)
-		// the graph exceeded the max size, so use the max size translate
+	if (scaleAfter < 0.1 )
+		// the graph exceeded the min scale, so use the max size translate
 		zoomBehavior.scale(tooBigZoom.scale).translate(tooBigZoom.translate)
-	else if (scaleAfter < 2)
+	else if (scaleAfter > 2)
+		// the graph exceeded the max scale, so use the default scale
+		zoomBehavior.scale(1).translate([0, 0])
+	else
 		// use the calculated transform
 		zoomBehavior.scale(scaleAfter).translate(translateAfter)
-	else
-		// the graph exceeded the min size, so use the default scale
-		zoomBehavior.scale(1).translate([0, 0])
 	
 	zoomBehavior.event(svgContainer)
 }
@@ -663,14 +758,15 @@ function getGraphRanges () {
 	returnVal.maxX = -9999999999
 	returnVal.minY = 9999999999
 	returnVal.maxY = -9999999999
+	var radius = GraphUtil.nodeRadius.Default
 	
 	GraphUtil.force.nodes().each(function(o, i) {
 		var offsetX = o.dimensions.width / 2
 		var offsetY = o.dimensions.height / 2
-		returnVal.minX = Math.min(returnVal.minX, o.x - offsetX)
-		returnVal.maxX = Math.max(returnVal.maxX, o.x + Math.max(o.labelWidth, offsetX))
-		returnVal.minY = Math.min(returnVal.minY, o.y - offsetY)
-		returnVal.maxY = Math.max(returnVal.maxY, o.y + offsetY)
+		returnVal.minX = Math.min(returnVal.minX, o.x - offsetX - radius)
+		returnVal.maxX = Math.max(returnVal.maxX, o.x + Math.max(o.labelWidth, offsetX) + radius)
+		returnVal.minY = Math.min(returnVal.minY, o.y - offsetY - radius)
+		returnVal.maxY = Math.max(returnVal.maxY, o.y + offsetY + radius)
 	})
 	
 	return returnVal
@@ -703,6 +799,7 @@ function getDimensionsForOptimizing () {
 	return returnVal
 }
 
+// calculates the label widths for every node
 function getLabelWidths () {
 	GraphUtil.force.nodes().each(function (o, i) {
 		if (o.showLabel) {
@@ -717,103 +814,13 @@ function getLabelWidths () {
 	});
 }
 
+// resets the translate to (0,0)
 function resetTranslate () {
 	zoomBehavior
 		.translate([0, 0])
 		.event(svgContainer)
 }
 
-// sets up the handlers to use with the zoom and drag behaviors
-function createBehaviorHandler (zoomBehavior, dragBehavior) {
-	
-	// set the zoom behavior
-	zoomBehavior.on("zoom", zooming)
-	
-	// Sets the custom node dragging behavior
-	dragBehavior
-		.on("dragstart", dragstart)
-		.on("drag", dragmove)
-		.on("dragend", dragend)
-	
-	// local variables used to manage state between handler functions
-	var startAlpha = 0
-	var dragging = false
-	var clicked = false
-	
-	// fires on mousedown on a node
-	function dragstart (d, i) {
-		startAlpha = GraphUtil.force.alpha()
-		dragging = true
-		clicked = true
-		d3.event.sourceEvent.preventDefault()
-		d3.event.sourceEvent.stopPropagation()
-	}
-
-	// fires when the user drags a node
-	function dragmove (d, i) {
-		if ((d3.event.dx != 0 || d3.event.dy != 0) || (!clicked)) {
-			var multiplier = zoomBehavior.scale()
-			if (isIE)
-				multiplier = 1 // ie doesn't get mouse position correctly
-			d.x += d3.event.dx / multiplier
-			d.y += d3.event.dy / multiplier
-			d.px = d.x
-			d.py = d.y
-			
-			if (d.cutShadow)
-				d.cutShadow.transform.baseVal.getItem(0).setTranslate(d.x, d.y)
-
-			d.fix = true
-			d.fixed = true
-			clicked = false
-			
-			startAlpha = Math.min(startAlpha+0.005, 0.1)
-			if (GraphUtil.force.alpha() < startAlpha)
-				if (!GraphUtil.setAlpha(0.1)) {
-					GraphUtil.updateNodePosition(d)
-					updateElementPositions()
-				}
-			
-			d3.event.sourceEvent.preventDefault()
-			d3.event.sourceEvent.stopPropagation()
-		}
-	}
-
-	// fires on mouseup on a node. if the user never dragged moved their mouse, treat this like a click
-	function dragend (d, i) {
-		d.fix = false
-		d.fixed = false
-		dragging = false
-		if (clicked)
-			toggleNodeSelection(d.index)
-		d3.event.sourceEvent.preventDefault()
-		d3.event.sourceEvent.stopPropagation()
-	}
-	
-	// Rescales the contents of the svg. Called when the user scrolls.
-	function zooming (e) {
-		if (!dragging) {
-			if (d3.event.sourceEvent) {
-				d3.event.sourceEvent.stopPropagation()
-				d3.event.sourceEvent.preventDefault()
-			}
-			
-			var offset = canvasSize / 2
-			var x = d3.event.translate[0] - offset
-			var y = d3.event.translate[1] - offset
-			GraphUtil.transformElement(svgTranslator, x, y, d3.event.scale)
-		}
-	}
-}
-
-// calls the tick function once
-function calmTick (n) {
-	for (var i = 0; i < n; ++i) {
-		GraphUtil.force.resume()
-		GraphUtil.force.tick()
-		GraphUtil.force.stop()
-	}
-}
 
 // gets the min cut of the graph defined by the nodes and links
 function getMinCut (nodeList, linkList) {
@@ -1178,6 +1185,7 @@ function getForceConfig () {
 	}
 }
 
+// function for debugging performance
 function debugTiming (message) {
 	console.log((performance.now() - debugTime) + ' ms');
 	debugTime = performance.now();

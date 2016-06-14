@@ -601,10 +601,14 @@ var GraphUtil = (function ($) {
 
 	public.setNodeDimensions = function (fast) {
 		public.force.nodes().each(function (o, i) {
-			if (fast)
+			try {				
+				if (fast)
+					o.dimensions = public.defaultDimensions;
+				else
+					o.dimensions = o.nodeElement.getBBox();
+			} catch (e) {
 				o.dimensions = public.defaultDimensions;
-			else
-				o.dimensions = o.nodeElement.getBBox();
+			}
 		});
 	}
 
@@ -661,6 +665,9 @@ var GraphUtil = (function ($) {
 		else
 			element[0][0].style.transform = 'translate(' + x + 'px, ' + y + 'px)' + ' scale(' + scale + ')'
 		
+		if (public.isIE())
+			vis.style('line-height', Math.random())
+		
 	}
 	
 	// returns true if the user is on ie
@@ -670,6 +677,34 @@ var GraphUtil = (function ($) {
 		if (navigator.appName == 'Netscape' && navigator.userAgent.indexOf('Trident') != -1)
 			return true
 		return false
+	}
+	
+	// zooms in or out depending on direction
+	performZoom = function (direction) {
+		if (zoomBehavior && svgContainer) {
+			var screenModifier = -0.5
+			var modifier = 0.5
+			if (direction == 'in') {
+				screenModifier = 1
+				modifier = 2
+			}
+			
+			var newX = zoomBehavior.translate()[0] * modifier - (widthCurrent / 2) * screenModifier
+			var newY = zoomBehavior.translate()[1] * modifier - (heightCurrent / 2) * screenModifier
+			var newTranslate = [newX, newY]
+			var newScale = zoomBehavior.scale() * modifier
+			
+			zoomBehavior
+				.scale(newScale)
+				.translate(newTranslate)
+				.event(svgContainer)
+		}
+	}
+	public.zoomIn = function () {
+		performZoom('in')
+	}
+	public.zoomOut = function () {
+		performZoom('out')
 	}
 	
 	// return the public object to make the public functions accessable

@@ -286,11 +286,14 @@
 			
 			function setGroupTablePosition () {
 				var windowWidth = $(window).width();
-				var rightOffset = $('#dependencyDivId').parent().offset().left;
-				var leftOffset = $('#dependencyDivId').offset().left;
+				var dependencyDiv = $('#dependencyDivId')
+				var rightOffset = dependencyDiv.parent().offset().left;
+				var leftOffset = dependencyDiv.offset().left;
 				var extraOffset = $('#mapReferenceId').outerWidth() ? $('#mapReferenceId').outerWidth() : 0;
-				$("#dependencyDivId:not(.floating)").css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
-				$("#dependencyDivId.floating").css('max-width', (windowWidth - extraOffset - (rightOffset * 2)) + 'px');
+				if (dependencyDiv.hasClass('floating'))
+					dependencyDiv.css('max-width', (windowWidth - extraOffset - ((leftOffset - extraOffset) * 2)) + 'px');
+				else
+					dependencyDiv.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
 			}
 
 			$(document).ready(function () {

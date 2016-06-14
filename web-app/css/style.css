@@ -415,8 +415,6 @@ div.content-wrapper div.container div.tabInner div.graphContainer div#svgContain
 
 div.content-wrapper div.container div.tabInner div.graphContainer.fullscreen {
   z-index: 1032; }
-  div.content-wrapper div.container div.tabInner div.graphContainer.fullscreen svg.chart {
-    position: fixed !important; }
 
 div.content-wrapper div.container div.tabInner div.graphContainer div#controlPanel, div.content-wrapper div.container div.tabInner div.graphContainer div#legendDivId {
   z-index: 1032 !important; }
@@ -427,8 +425,6 @@ div.content-wrapper div.container div.graphContainer div#svgContainerId svg.char
 
 div.content-wrapper div.container div.graphContainer.fullscreen {
   z-index: 1032; }
-  div.content-wrapper div.container div.graphContainer.fullscreen svg.chart {
-    position: fixed !important; }
 
 div.content-wrapper div.container div.graphContainer div#controlPanel, div.content-wrapper div.container div.graphContainer div#legendDivId {
   z-index: 1032 !important; }
