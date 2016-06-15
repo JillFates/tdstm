@@ -1292,7 +1292,7 @@ class PersonService {
 		UserLogin targetUserLogin = UserLogin.findByPerson(map.person)
 		if(targetUserLogin){
 			UserPreference projectPreference = UserPreference.findByUserLoginAndPreferenceCode( targetUserLogin, "CURR_PROJ")
-			if(projectPreference.preferenceCode == projectId){
+			if(projectPreference?.preferenceCode == projectId){
 				projectPreference.delete()
 				userPreferenceService.removeProjectAssociatedPreferences(targetUserLogin)
 			}
