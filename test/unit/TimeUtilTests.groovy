@@ -278,6 +278,14 @@ class TimeUtilTests extends Specification {
 			TimeUtil.formatDateTime(mockSession, new Date(), formatter) != null
 	}
 
+	def "Test formatDateTimeWithTZ with null date value"(){
+		setup:
+			def formatter = TimeUtil.createFormatterForType(TimeUtil.LITTLE_ENDIAN, TimeUtil.FORMAT_DATE)
+		expect:
+			TimeUtil.formatDateTimeWithTZ("GMT", null, formatter) == null
+	}
+		
+
 // HELPERS ////////////////////////////////////////////////////////////////////
 	// Mock the bullshit format of session attributes ...
 	private getMockSession(){
