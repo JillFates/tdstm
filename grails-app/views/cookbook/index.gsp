@@ -66,6 +66,9 @@
 			<div class="alert-message-icon" ng-if="alert.type == 'success'">
 				<h4><i class="icon fa fa-check"></i> Success:</h4>
 			</div>
+			<div class="alert-message-icon" ng-if="alert.type == 'danger'">
+				<h4><i class="icon fa fa-ban"></i> Error:</h4>
+			</div>
 			<div class="alert-message-text"><span ng-bind="alert.msg"></span></div>
 		</div>
 

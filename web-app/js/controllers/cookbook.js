@@ -322,7 +322,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 					}
 				}, function(){
 					log.warn('Recipe updating error');
-					alerts.addAlert({type: 'danger', msg: 'Error: Could not save the recipe'});                    
+					alerts.addAlert({type: 'danger', msg: 'Could not save the recipe'});
 				});
 			}, 500);
 		}  
@@ -392,7 +392,7 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 				scope.preventSelection = false;
 			}, function(){
 				log.warn('Error on unarchiving Recipe');
-				alerts.addAlert({type: 'danger', msg: 'Error: Unable to UnArchive Recipe'});
+				alerts.addAlert({type: 'danger', msg: 'Unable to UnArchive Recipe'});
 				scope.preventSelection = false;
 			});
 		},
@@ -951,7 +951,7 @@ tds.cookbook.controller.CreateRecipeController = function(scope, log, cookbookSe
 				})
 			}, function(data){
 				log.warn('Error on getting Project list');
-				alerts.addAlert({type: 'danger', msg: 'Error: Could not get the list of Projects'});
+				alerts.addAlert({type: 'danger', msg: 'Could not get the list of Projects'});
 			}
 		);
 	};
@@ -1146,7 +1146,7 @@ tds.cookbook.controller.TaskGenerationController = function(scope, state, stateP
 				state.go("recipes.detail.gentasks.progress", {'jobId': jobId});
 				
 			}, function(data, status, headers, config){
-				alerts.addAlert({type: 'danger', msg: 'Error: Unable to generate tasks. ' + data.headers().errormessage});
+				alerts.addAlert({type: 'danger', msg: 'Unable to generate tasks. ' + data.headers().errormessage});
 				log.info('Error on generating task');
 			});
 		}
@@ -1773,9 +1773,9 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 				}, function(){
 					log.warn('Error on Saving WIP');
 					if(scope.editor.selectedRecipe.hasWIP){
-						alerts.addAlert({type: 'danger', msg: 'Error: Unable to release version'});    
+						alerts.addAlert({type: 'danger', msg: 'Unable to release version'});
 					}else{
-						alerts.addAlert({type: 'danger', msg: 'Error: You can only release recipes'+
+						alerts.addAlert({type: 'danger', msg: 'You can only release recipes'+
 							' saved as WIP'});
 					}
 				});
@@ -1822,7 +1822,7 @@ tds.cookbook.controller.RecipeEditorController = function(scope, rootScope, stat
 			state.go('recipes.detail.code.errors')
 		}, function(data){
 			log.warn('Error on validation');
-			alerts.addAlert({type: 'danger', msg: 'Error: Unable to validate Syntax'});
+			alerts.addAlert({type: 'danger', msg: 'Unable to validate Syntax'});
 		});
 	};
 	
@@ -2150,7 +2150,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 				cookbookService.discardWIP({details:scope.editor.selectedRecipe.recipeId, 
 					moreDetails: versionToDelete}, function(data){
 					if (data.status == 'fail') {
-						alerts.addAlert({type: 'danger', msg: 'Error: ' + data.data});
+						alerts.addAlert({type: 'danger', msg: data.data});
 					} else {
 						log.info('Success on removing Recipe Version');
 						alerts.addAlert({type: 'success', msg: 'Recipe Version Removed', closeIn: 1500});
