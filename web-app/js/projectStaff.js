@@ -265,6 +265,7 @@ function loadPersonDiv(personId,renderPage,redirectTo){
 				$("#personGeneralViewId").html(data)
 				$("#personGeneralViewId").dialog('option', 'width', '420px')
 				$("#personGeneralViewId").dialog('option', 'position', ['center','top']);
+				$("#personGeneralViewId").dialog('option', 'modal', 'true');
 				if(currentTabShow == "generalInfoShowId")
 				{
 					$("#personGeneralViewId").dialog('option', 'title', 'Manage Staff - ' + $('span[id="firstNameId"]').text() + ' ' + $('span[id="middleNameId"]').text() + ' ' + $('span[id="lastNameId"]').text());
@@ -570,6 +571,7 @@ function closePersonDiv(divId){
 function createDialog() {
 	$("#createStaffDialog").show();
 	$("#createStaffDialog").dialog('option', 'width', 500);
+	$("#createStaffDialog").dialog('option', 'modal', 'true');
 	$("#createStaffDialog").dialog("open");
 }
 
@@ -652,9 +654,10 @@ function openPersonDiv(value, fieldName){
 	if(value=="0"){
 		$('#createDialogForm')[0].reset()
 		$("#funcsCreateTbodyId" ).empty();
-		$("#createStaffDialog").show()
-		$("#createStaffDialog").dialog({ title:"Create Person", width: 500})
-		$("#createStaffDialog").dialog("open")
-		$("#fieldName").val( fieldName )
+		$("#createStaffDialog").show();
+		$("#createStaffDialog").dialog({ title:"Create Person", width: 500});
+		$("#createStaffDialog").dialog('option', 'modal', 'true');
+		$("#createStaffDialog").dialog("open");
+		$("#fieldName").val( fieldName );
 	}
 }

@@ -178,6 +178,7 @@ function showAssetDialog (e, action) {
 	if (action == 'edit') {
 		$("#editDialog").dialog('option', 'width', '1000px');
 		$("#editDialog").dialog('option', 'position', ['center','top']);
+		$("#editDialog").dialog('option', 'modal', 'true');
 		$("#editDialog").dialog("open");
 		$("#showDialog").dialog("close");
 		$("#modelShowDialog").dialog("close")
@@ -185,6 +186,7 @@ function showAssetDialog (e, action) {
 	} else if (action == 'show') {
 		$("#showDialog").dialog('option', 'width', '1000px');
 		$("#showDialog").dialog('option', 'position', ['center','top']);
+		$("#showDialog").dialog('option', 'modal', 'true');
 		$("#showDialog").dialog("open");
 		$("#editDialog").dialog("close");
 		$("#modelShowDialog").dialog("close")

@@ -286,11 +286,13 @@ Array.prototype.contains = function (element) {
 	  if(action == 'edit'){
 	      $("#editDialog").dialog('option', 'width', 600);
 	      $("#editDialog").dialog('option', 'position', ['center','top']);
+		  $("#editDialog").dialog('option', 'modal', 'true');
 	      $("#editDialog").dialog("open");
 	      $("#showDialog").dialog("close");
       } else if(action == 'show'){
           $("#showDialog").dialog('option', 'width', 600);
 	      $("#showDialog").dialog('option', 'position', ['center','top']);
+		  $("#showDialog").dialog('option', 'modal', 'true');
 	      $("#showDialog").dialog("open");
 	      $("#editDialog").dialog("close");
       }

@@ -31,6 +31,7 @@ function openFlushDiv () {
 		beforeSend: function(jqXHR) {
 			$("#flushOldBatchId").dialog('option', 'width', '500px')
 			$("#flushOldBatchId").dialog('option', 'position', ['center','top']);
+			$("#flushOldBatchId").dialog('option', 'modal', 'true');
 			$("#flushOldBatchId").dialog('open');
 			$("#getRecordsInfoId").show()
 			$("#respMsgId").hide()
@@ -59,6 +60,7 @@ function openShowTypeDiv () {
 		beforeSend: function(jqXHR) {
 			$("#showOrCleanTypeId").dialog('option', 'width', '500px')
 			$("#showOrCleanTypeId").dialog('option', 'position', ['center','top']);
+			$("#showOrCleanTypeId").dialog('option', 'modal', 'true');
 			$("#showOrCleanTypeId").dialog('open')
 			$("#showCleanTypeMsgId").hide()
 			$("#cleanProcessDivId").show()

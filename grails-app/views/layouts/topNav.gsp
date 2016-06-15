@@ -41,6 +41,8 @@
 
             $.datepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
             $.datetimepicker.setDefaults({dateFormat: tdsCommon.jQueryDateFormat()});
+
+            $('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
         });
 
         function updateEventHeader( e ){
