@@ -63,7 +63,10 @@
 
 		<div class="alert alert-{{alert.type}}" ng-repeat="alert in alerts.list" ng-class="{animateShow: !alert.hidden}">
 			<button type="button" class="close" aria-hidden="true" ng-click="alerts.closeAlert($index)">&times;</button>
-			<span ng-bind="alert.msg"></span>
+			<div class="alert-message-icon" ng-if="alert.type == 'success'">
+				<h4><i class="icon fa fa-check"></i> Success:</h4>
+			</div>
+			<div class="alert-message-text"><span ng-bind="alert.msg"></span></div>
 		</div>
 
 		<div class="container" ng-controller="tds.comments.controller.MainController as comments" ui-view></div>
