@@ -687,6 +687,7 @@ class SecurityService implements InitializingBean {
 	/**
 	 * Used to set the password on a UserLogin object after verifying that the password is legitimate
 	 * and meets the password history requirements otherwise it will thrown an exception
+	 * If the password is set we should set also the expirity date of the password using calculatePasswordExpiration
 	 * @param userLogin - the UserLogin object to set the password on
 	 * @param unencryptedPassword - the unencrypted password to set
 	 * @throws DomainUpdateException
@@ -708,6 +709,11 @@ class SecurityService implements InitializingBean {
 			throw new DomainUpdateException('Please provide a new password that was not previously used')
 		}
 
+		//Set the expirity Date when the password changes (from today)
+		Date expirityDate = calculatePasswordExpiration(userLogin, new Date());
+		if(expirityDate != null){
+			userLogin.setPasswordExpirationDate(expirityDate);
+		}
 	}
 
 	/**
@@ -1347,6 +1353,46 @@ class SecurityService implements InitializingBean {
 
 		log.info "removeRoleCodes() deleted $deleted security roles for person ${person.id} $roleCodes"
 		return deleted
+	}
+
+	/**
+	 * Used to calculate when the user's password should expire based on the following rules
+	 *    - User must have a local account otherwise return null
+	 *    - Previous saved passwordExpirationDate will be used if date is further out than other calculated values
+	 *    - If security config maxPasswordAgeDays is set then calculate expiration of asOfDate param or userLogin.passwordChangedDate
+	 *    - if passwordNeverExpires is true then return null ????
+	 *    - Otherwise use the userLogin.expiryDate
+	 * @param userLogin - the user to determine their password expiration
+	 * @param asOfDate - the date to consider as the first day that the password was set, default: userLogin.passwordChangedDate
+	 * @return the date time that it expires if user has local account. Returns null if passwordNeverExpires.
+	 *
+	 * Collision of Logic:
+	 * 	If We return Null is because is a remote Account??? or the password never expires???
+	 * 	If the password never expires should we return
+	 */
+	 Date calculatePasswordExpiration(UserLogin userLogin, Date asOfDate=null) {
+		Date expires
+		if (userLogin.isLocal) {
+			if (! userLogin.passwordNeverExpires) {
+				def maxPasswordAgeDays = getUserLocalConfig().maxPasswordAgeDays
+				if (maxPasswordAgeDays > 0) {
+					asOfDate = asOfDate ?: userLogin.passwordChangedDate
+					use(TimeCategory) {
+						expires = asOfDate + (maxPasswordAgeDays.intValue()).days
+						log.info("$asOfDate + ${maxPasswordAgeDays}.days = $expires")
+					}
+				} else {
+					// Set the password expiration to the user's expiry date
+					expires = userLogin.expiryDate
+				}
+
+				// If the password expiration was manually set futher out then we should honor that date
+				if (userLogin.passwordExpirationDate && userLogin.passwordExpirationDate > expires) {
+					expires = userLogin.passwordExpirationDate
+				}
+			}
+		}
+		return expires
 	}
 
 }

@@ -182,14 +182,15 @@ class ShiroDbRealm {
 	private def checkPasswordExpirationDate = { state ->
 		log.debug "Rule: Check password expiration date"
 		if ( state.authenticated &&
-			 state.user.passwordExpirationDate &&
-			 state.user.passwordExpirationDate.time <= TimeUtil.nowGMT().time
-			) {
-				// Set the userLogin so that they're forced to change their password
-				log.debug "    Set forcePasswordChange"
-				state.user.forcePasswordChange = 'Y'
-				state.user.save(flush:true, failOnError:true)
-				state.authenticated = true
+				!state.user.passwordNeverExpires && //Check only if the pass can expire
+				state.user.passwordExpirationDate &&
+				state.user.passwordExpirationDate.time <= TimeUtil.nowGMT().time
+		) {
+			// Set the userLogin so that they're forced to change their password
+			log.debug "    Set forcePasswordChange"
+			state.user.forcePasswordChange = 'Y'
+			state.user.save(flush:true, failOnError:true)
+			state.authenticated = true
 		}
 	}
 
