@@ -1379,7 +1379,6 @@ class SecurityService implements InitializingBean {
 					asOfDate = asOfDate ?: userLogin.passwordChangedDate
 					use(TimeCategory) {
 						expires = asOfDate + (maxPasswordAgeDays.intValue()).days
-						log.info("$asOfDate + ${maxPasswordAgeDays}.days = $expires")
 					}
 				} else {
 					// Set the password expiration to the user's expiry date
