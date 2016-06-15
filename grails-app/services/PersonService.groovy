@@ -1287,6 +1287,19 @@ class PersonService {
 		String sql = 'update AssetComment task set  task.assignedTo=null where task.project=:project and task.assignedTo=:person'
 		metrics.tasksUnassigned = AssetComment.executeUpdate(sql, qparams)
 
+
+		// Clears out the CURR_PROJ preference if it matches projectId and other project related preferences.
+		UserLogin targetUserLogin = UserLogin.findByPerson(map.person)
+		if(targetUserLogin){
+			UserPreference projectPreference = UserPreference.findByUserLoginAndPreferenceCode( targetUserLogin, "CURR_PROJ")
+			if(projectPreference.preferenceCode == projectId){
+				projectPreference.delete()
+				userPreferenceService.removeProjectAssociatedPreferences(targetUserLogin)
+			}
+		}
+		
+
+
 		qparams.person = map.person.id.toString()
 		['shutdownBy', 'startupBy', 'testingBy'].each {
 			sql = "update Application a set a.${it}=null where a.project=:project and a.${it}=:person"
