@@ -433,7 +433,7 @@ class RackLayoutsController {
 		def rackId = paramsMap.rackId
 		def forWhom = paramsMap.forWhom
 		boolean printView = paramsMap.printView
-		String disconnectImgUrl = HtmlUtil.createLinkToResource( [dir: "icons", file : "disconnect.png", absolute: true])
+		String disconnectImgUrl = HtmlUtil.resource( [dir: "icons", file : "disconnect.png"])
 		asset.each {
 			def row = new StringBuffer("<tr>")
 			if (it.asset) {
@@ -773,7 +773,7 @@ class RackLayoutsController {
 							assetLocation = assetEntity.targetLocation
 						}
 
-						def rackAdd2ImgUrl = HtmlUtil.createLinkToResource([ dir: "i", file: "rack_add2.png", absolute:true])
+						def rackAdd2ImgUrl = HtmlUtil.resource([ dir: "i", file: "rack_add2.png"])
 						bladeTable.append("""<div ${showIconPref ? '' : 'style="display:none"'} class="rack_menu create_${rackId}"><img src="${rackAdd2ImgUrl}"/>
 							<ul>
 								<li><a href="javascript:${forWhom ? 'createBladeAuditPage' : 'EntityCrud.showAssetCreateView'}('DEVICE','${assetDetails.source}','${assetEntity?.id}','${assetRoom}','${assetLocation}', '${i}', true, '${assetEntity.manufacturer?.id}','Blade','${assetEntity.moveBundle?.id}')">Create asset</a></li>
