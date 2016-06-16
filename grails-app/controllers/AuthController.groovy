@@ -30,7 +30,17 @@ class AuthController {
 	def userPreferenceService
 	def userService
 
-	def index() { redirect(action: 'login', params: params) }
+	/**
+	 * Here whe choose if there's a user logIn we redirect to the preferedPage and to the login otherwise
+	 */
+	def index() {
+		def principal = SecurityUtils.subject?.principal
+		if (principal) {
+			redirectToPrefPage()
+		}else{
+			redirect(action:'login', params:params)
+		}
+	}
 
 	def login() {
 		// Get the various security setup settings
@@ -242,7 +252,6 @@ class AuthController {
 	 *  Action to navigate the admin control home page
 	 */
 	def home() {
-
 		def dateNow = TimeUtil.nowGMT()
 		def timeNow = dateNow.getTime()
 		def dateNowSQL = TimeUtil.nowGMTSQLFormat()

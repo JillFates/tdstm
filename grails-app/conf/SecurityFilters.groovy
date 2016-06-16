@@ -74,7 +74,7 @@ class SecurityFilters {
 				if (subject) {
 					def principal = subject.principal
 					if (principal) {
-						def userLoginInstance = UserLogin.findByUsername( principal + "" )//securityService.getUserLogin()
+						def userLoginInstance = UserLogin.findByUsername("$principal")//securityService.getUserLogin()
 						if ( userLoginInstance?.forcePasswordChange == 'Y' ) {
 							if ( 
 								(controllerName == 'auth' && ['login','signIn','signOut'].contains(actionName) ) ||

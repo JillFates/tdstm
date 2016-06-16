@@ -211,6 +211,11 @@ class UrlMappings {
 			]
 		}
 
+		//ROOT map to the auth/index action
+		"/" {
+			controller = "auth"
+			action = "index"
+		}
 
 		"500"(view:'/error')
 		"401"(view:'/unauthorized')
