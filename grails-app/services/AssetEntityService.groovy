@@ -2577,11 +2577,44 @@ class AssetEntityService {
 				// can profile that as well.
 				int maxProfilerLaps = 101
 
+				def validationSheet = getWorksheet("Validation")
+
+				Map optionsSize = [:]
+
+				def writeValidationColumn = { assetOptions, col, optionKey ->
+					assetOptions.eachWithIndex{ option, idx ->
+			 			WorkbookUtil.addCell(validationSheet, col, idx+1, "${option.value}")
+			 		}
+			 		optionsSize[optionKey] = assetOptions.size()
+				}
+
+				def writeValidationSheet = {
+					profiler.beginInfo "Validations"
+					profiler.lap("Validations", "Starting to export Validation values")
+					int col = 0
+					writeValidationColumn(getAssetEnvironmentOptions(), col++, "Environment")
+					writeValidationColumn(getAssetPriorityOptions(), col++, "Priority")
+					writeValidationColumn(getAssetPlanStatusOptions(), col++, "PlanStatus")
+					writeValidationColumn(getDependencyTypes(), col++, "DepType")
+					writeValidationColumn(getDependencyStatuses(), col, "DepStatus")
+
+					profiler.lap("Validations", "Finished exporting Validation values")
+					profiler.endInfo("Validations", "Finished writing validation values to sheet.")	
+				}
+
+				writeValidationSheet()
+			
+				
 				//
 				// Device Export
 				//
 				if ( doDevice ) {				
 					profiler.beginInfo "Devices"
+					profiler.lap("Devices", "Adding Validations")
+					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,0, 1, optionsSize["Environment"], serverMap["Environment"], 1, assetSize)
+					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,1, 1, optionsSize["Priority"], serverMap["Priority"], 1, assetSize)
+					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"], 1, assetSize)
+					profiler.lap("Devices", "Validations added.")
 					exportedEntity += 'S'
 					int deviceCount = 0
 					profiler.lap('Devices', 'Entering while loop')
@@ -2686,6 +2719,13 @@ class AssetEntityService {
 				if ( doApp ) {
 					//log.info "export() starting export of Applications"
 					profiler.beginInfo "Applications"
+
+					profiler.lap("Applications", "Adding Validations")
+					WorkbookUtil.addRangeCellValidation(book, appSheet, validationSheet,0, 1, optionsSize["Environment"], appSheetColumnNames["Environment"], 1, appSize)
+					//WorkbookUtil.addRangeCellValidation(book, appSheet, validationSheet,1, 1, optionsSize["Priority"], appSheetColumnNames["Priority"], 1, appSize)
+					WorkbookUtil.addRangeCellValidation(book, appSheet, validationSheet,2, 1, optionsSize["PlanStatus"], appSheetColumnNames["PlanStatus"], 1, appSize)
+					profiler.lap("Applications", "Validations added.")
+
 					exportedEntity += 'A'
 
 					application = getAssetList(applicationQuery, queryParams)
@@ -2696,7 +2736,6 @@ class AssetEntityService {
 					// Flag to know if the AppId Column exists
 					def idColName = 'appId'
 					def hasIdCol = appSheetColumnNames.containsKey(idColName)
-
 					
 					int applicationCount = 0
 					//application.each { app ->
@@ -2792,6 +2831,14 @@ class AssetEntityService {
 				//
 				if ( doDB ) {
 					profiler.beginInfo "Databases"
+
+					profiler.lap("Databases", "Adding Validations")
+					WorkbookUtil.addRangeCellValidation(book, dbSheet, validationSheet,0, 1, optionsSize["Environment"], dbMap["Environment"], 1, dbSize)
+					//WorkbookUtil.addRangeCellValidation(book, dbSheet, validationSheet,1, 1, optionsSize["Priority"], dbMap["Priority"], 1, dbSize)
+					WorkbookUtil.addRangeCellValidation(book, dbSheet, validationSheet,2, 1, optionsSize["PlanStatus"], dbMap["PlanStatus"], 1, dbSize)
+					profiler.lap("Databases", "Validations added.")
+
+
 					exportedEntity += "D"
 					int databaseCount = 0
 					database = getAssetList(databaseQuery, queryParams)
@@ -2843,6 +2890,13 @@ class AssetEntityService {
 				//
 				if ( doStorage ) {
 					profiler.beginInfo "Logical Storage"
+
+					profiler.lap("Logical Storage", "Adding Validations")
+					WorkbookUtil.addRangeCellValidation(book, storageSheet, validationSheet,0, 1, optionsSize["Environment"], fileMap["Environment"], 1, fileSize)
+					//WorkbookUtil.addRangeCellValidation(book, storageSheet, validationSheet,1, 1, optionsSize["Priority"], fileMap["Priority"], 1, fileSize)
+					WorkbookUtil.addRangeCellValidation(book, storageSheet, validationSheet,2, 1, optionsSize["PlanStatus"], fileMap["PlanStatus"], 1, fileSize)
+					profiler.lap("Logical Storage", "Validations added.")
+
 					exportedEntity += "F"
 					files = getAssetList(filesQuery, queryParams)
 					//for ( int r = 1; r <= fileSize; r++ ) {
@@ -2914,6 +2968,11 @@ class AssetEntityService {
 							"c3",
 							"c4"
 					]
+
+					profiler.lap("Dependencies", "Adding Validations")
+					WorkbookUtil.addRangeCellValidation(book, dependencySheet, validationSheet,0, 1, optionsSize["DepType"], projectionFields.indexOf("type"), 1, dependencySize)
+					WorkbookUtil.addRangeCellValidation(book, dependencySheet, validationSheet,2, 1, optionsSize["DepStatus"], projectionFields.indexOf("status"), 1, dependencySize)
+					profiler.lap("Dependencies", "Validations added.")
 
 					List results = AssetDependency.createCriteria().list{
 						createAlias("asset", "a")

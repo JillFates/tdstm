@@ -6,6 +6,11 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.hssf.util.CellReference
+import org.apache.poi.hssf.util.CellRangeAddressList
+import org.apache.poi.hssf.usermodel.DVConstraint
+import org.apache.poi.ss.usermodel.DataValidation
+import org.apache.poi.ss.usermodel.Name
+import org.apache.poi.hssf.usermodel.HSSFDataValidation
 import java.text.DateFormat
 import java.util.TimeZone
 import java.util.Collection
@@ -294,4 +299,64 @@ class WorkbookUtil {
 		return CellReference.convertNumToColString(colIdx)
 
 	}
+
+	/**
+	 * This method adds data validation to a given range of cells.
+	 *
+	 * @param sheet
+	 * @param values data validation array.
+	 * @param firstRow
+	 * @param lastRow
+	 * @param firstColumn
+	 * @param lastColumn
+	 */
+	public static void addCellValidation(sheet, values, firstRow, lastRow, firstColumn, lastColumn){
+		if(sheet && values && firstRow >= 0 && firstRow <= lastRow && firstColumn >= 0 && firstColumn <= lastColumn ){
+			CellRangeAddressList addressList = new CellRangeAddressList(firstRow, lastRow, firstColumn, lastColumn);
+	  		DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint(values);
+	  		DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint);
+	  		dataValidation.setSuppressDropDownArrow(false);
+	  		sheet.addValidationData(dataValidation);	
+		}
+		
+	}
+
+	/**
+	 * Adds Range Validation based on a validation sheet.
+	 *
+	 * @param targetSheet - sheet where the validation is to be added.
+	 * @param validationSheet - sheet containing the validation values.
+	 * @param validationColumn - column in validationSheet where the values are listed.
+	 * @param firstValidationRow - first data validation value.
+	 * @param lastValidationRow - last data validation value.
+	 * @param targetColumn - target column, where the validation will be added.
+	 * @param firstTargetRow - first row where validation is to be added.
+	 * @param lastTargetRow - last row where data validation is to be added.
+	 */
+	 public static void addRangeCellValidation(workbook, targetSheet, validationSheet,
+	 				validationColumn,firstValidationRow, lastValidationRow,
+	 				targetColumn, firstTargetRow, lastTargetRow){
+
+
+	 	def createFormulaString = {
+	 		String validationColumnCode = columnCode(validationColumn)
+	 		String sheetName = validationSheet.getSheetName()
+	 		return new StringBuffer("'$sheetName'!")
+	 				.append("\$$validationColumnCode\$$firstValidationRow:")
+	 				.append("\$$validationColumnCode\$$lastValidationRow")
+	 				.toString()
+	 	}
+
+	 	String name = "list$validationColumn"
+	 	
+	 	DVConstraint dvConstraint = DVConstraint.createFormulaListConstraint(name);
+		Name namedRange = workbook.createName()
+  		namedRange.setNameName(name)
+  		namedRange.setRefersToFormula(createFormulaString())
+  		CellRangeAddressList addressList = new CellRangeAddressList(0, 0, 0, 0)
+	  	DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
+	  	dataValidation.setSuppressDropDownArrow(false)
+	  	targetSheet.addValidationData(dataValidation)
+
+	 }
 }
