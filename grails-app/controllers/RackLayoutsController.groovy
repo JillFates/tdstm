@@ -1,20 +1,16 @@
-import grails.converters.JSON
-
-import org.apache.poi.hssf.record.formula.functions.T
-import org.apache.shiro.SecurityUtils
-
 import com.tds.asset.AssetCableMap
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
+import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.AssetCableStatus
+import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
 import org.apache.commons.lang.math.NumberUtils
-import com.tdsops.tm.enums.domain.*
-import com.tdssrc.grails.HtmlUtil
 
 class RackLayoutsController {
 	def assetEntityService

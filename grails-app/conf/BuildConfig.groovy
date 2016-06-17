@@ -39,9 +39,11 @@ grails.project.dependency.resolution = {
 		runtime 'mysql:mysql-connector-java:5.1.27' 		
 		compile 'com.google.guava:guava:16.0.1'
 		compile 'org.apache.commons:commons-lang3:3.1'
-		compile 'org.apache.poi:poi:3.7'
+		compile 'org.apache.poi:poi:3.14'
 		build   'com.lowagie:itext:2.1.7'
-		compile 'net.sf.jasperreports:jasperreports:4.5.1'
+		compile('net.sf.jasperreports:jasperreports:4.5.1'){
+			excludes(group:'org.apache.poi')
+		}
 		compile 'commons-collections:commons-collections:3.2.1'
 		compile 'com.canoo.webtest:webtest:3.0'
 		// TODO : JPM 1/2016 : See TM-3868
