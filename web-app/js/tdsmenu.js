@@ -67,6 +67,7 @@
 				$("#titleId").val(personDetails.person.title);
 				$("#expiryDateId").val(personDetails.expiryDate);
 				$("#personDialog").dialog('option', 'width', 540);
+				$("#personDialog").dialog('option', 'modal', true);
 				$("#personDialog").dialog("open");
 			}
 		}
