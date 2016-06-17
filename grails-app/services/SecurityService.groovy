@@ -814,7 +814,12 @@ class SecurityService implements InitializingBean {
 			active: Y
 			isLocal: true
 		*/
-		
+
+		// Before checking other password flags, Attempt to set the password if it was set
+		if (params.password) {
+			setUserLoginPassword(userLogin, params.password, isNewUser)
+		}
+
 		if (params.isLocal) {
 			userLogin.isLocal = true
 			userLogin.forcePasswordChange = (params.forcePasswordChange ? 'Y' : 'N')
@@ -866,11 +871,6 @@ class SecurityService implements InitializingBean {
 			} else {
 				userLogin.username = params.username
 			}
-		}
-
-		// Attempt to set the password if it was set
-		if (params.password) {
-			setUserLoginPassword(userLogin, params.password, isNewUser)
 		}
 
 		userLogin.active = params.active

@@ -410,7 +410,6 @@ class UserLoginController {
 				//
 				securityService.setUserLoginPassword(userLoginInstance, params.password)
 
-				userLoginInstance.forcePasswordChange = 'N'
 				if (!userLoginInstance.validate() || !userLoginInstance.save()) {
 					log.warn "updatePassword() failed to update user password for $userLoginInstance : " + GormUtil.allErrorsString(userLoginInstance)
 					msg = 'An error occured while trying to save your password'

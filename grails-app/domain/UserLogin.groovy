@@ -157,6 +157,9 @@ class UserLogin {
 		this.password = encryptPassword(unencryptedPassword)
 		this.failedLoginAttempts = 0
 		this.lockedOutUntil = null
+		//We remove the forcePassword Change Flag After the password was set
+		this.forcePasswordChange = 'N'
+
 		return this.password
 	}
 
