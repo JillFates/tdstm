@@ -207,26 +207,27 @@ class AuthController {
 
 	private def redirectToPrefPage() {
 		def startPage = userPreferenceService.getPreference('START_PAGE')
+
 		if (userPreferenceService.getPreference('CURR_PROJ')) {
 			if (startPage =='Project Settings') {
-				redirect(controller:'projectUtil')
+				redirect(uri:'/projectUtil')
 			} else if(startPage=='Current Dashboard') {
 				if (RolePermissions.hasPermission('MoveBundleShowView')) {
-					redirect(controller:'moveBundle',action:'planningStats')
+					redirect(uri:'/moveBundle/planningStats')
 				} else {
-					redirect(controller:'projectUtil')
+					redirect(uri:'/projectUtil')
 				}
 			} else if(startPage=='Admin Portal') {
-				redirect(action:'home')
+				redirect(uri:'/admin/home')
 			} else if(startPage=='User Dashboard' || startPage == null) {
-				redirect(controller:'dashboard', action:'userPortal')
+				redirect(uri:'/dashboard/userPortal')
 			} else {
-				redirect(controller:'projectUtil')
+				redirect(uri:'/projectUtil')
 			}
 		} else if(startPage=='User Dashboard' || startPage == null) {
-			redirect(controller:'dashboard', action:'userPortal')
+			redirect(uri:'/dashboard/userPortal')
 		} else {
-			redirect(controller:'projectUtil')
+			redirect(uri:'/projectUtil')
 		}
 	}
 
