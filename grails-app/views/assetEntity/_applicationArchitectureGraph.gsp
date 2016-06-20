@@ -100,6 +100,7 @@ var maxVerticalSpace = 800;
 var minHorizontalSpace = 15;
 var minVerticalSpace = 30;
 var nodeOffsetIncrements = 2;
+var graphPadding = 30
 var preferenceName = 'depGraph';
 
 // color constants
@@ -683,13 +684,13 @@ function buildMap (width, height) {
 		// Resets the scale and position of the map. Called when the user double clicks on the background
 		function resetView () {
 			if (d3.event && (!d3.event.srcElement || d3.event.srcElement.nodeName != 'use')) {
-				zoomBehavior.scale(1);
-				centerGraph();
+				centerGraph()
+				zoomBehavior.scale(1)
 				if (d3.event.translate && d3.event.scale)
-					vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')');
+					vis.attr('transform','translate(' + d3.event.translate + ')' + ' scale(' + d3.event.scale + ')')
 			} else if (!d3.event) {
-				zoomBehavior.scale(1);
-				centerGraph();
+				centerGraph()
+				zoomBehavior.scale(1)
 			}
 		}
 		
@@ -1563,16 +1564,15 @@ function buildMap (width, height) {
 		var verticalSpace = $("#graphSvgId").height() / 2;
 
 		// Then if everything goes fine, the panel that old the graph itself has the last size
-		if($("#graphPanel")[0]){
-			var horizontalGraphSpace = $("#graphPanel")[0].getBBox().width / 2;
-			var verticalGraphSpace = $("#graphPanel")[0].getBBox().height / 2;
+		if ($("#graphPanel")[0]) {
+			var horizontalGraphSpace = ($("#graphPanel")[0].getBBox().width / 2) / zoomBehavior.scale()
+			var verticalGraphSpace = ($("#graphPanel")[0].getBBox().height / 2) / zoomBehavior.scale()
 
-			var centerX = (horizontalSpace - horizontalGraphSpace);
-			var centerY = (verticalSpace - verticalGraphSpace);
+			var centerX = (horizontalSpace - horizontalGraphSpace) + graphPadding
+			var centerY = (verticalSpace - verticalGraphSpace)
 
-			zoomBehavior.translate([centerX, -centerY]);
-			vis.attr('transform','translate(' + [centerX, -centerY] + ')' + ' scale(' + 1 + ')');
-
+			zoomBehavior.translate([centerX, -centerY])
+			vis.attr('transform','translate(' + [centerX, -centerY] + ')' + ' scale(' + 1 + ')')
 		}
 	}
 	
@@ -2684,7 +2684,12 @@ function getStandardWidth () {
 }
 
 function getStandardHeight () {
-	return $(window).height() - ($('div.body').offset().top * 3);
+	var bottomMargin = $('.main-footer').outerHeight()
+	var graphOffset = $('#svgContainerId').offset().top
+	var pageHeight = $(window).height()
+	if (GraphUtil.isFullscreen())
+		return pageHeight
+	return pageHeight - graphOffset - bottomMargin - graphPadding
 }
 
 function getDependenciesString (node) {

@@ -452,19 +452,11 @@ div.content-wrapper div.container div#DependencyGroupsTableId div#dependencyDivI
 div.content-wrapper div.container div#DependencyGroupsTableId div.floating {
   z-index: 1033 !important; }
 
-div.content-wrapper div.container div.tabInner div.graphContainer div#svgContainerId svg.chart {
-  width: initial !important;
-  position: initial; }
-
 div.content-wrapper div.container div.tabInner div.graphContainer.fullscreen {
   z-index: 1032; }
 
 div.content-wrapper div.container div.tabInner div.graphContainer div#controlPanel, div.content-wrapper div.container div.tabInner div.graphContainer div#legendDivId {
   z-index: 1032 !important; }
-
-div.content-wrapper div.container div.graphContainer div#svgContainerId svg.chart {
-  width: initial !important;
-  position: initial; }
 
 div.content-wrapper div.container div.graphContainer.fullscreen {
   z-index: 1032; }

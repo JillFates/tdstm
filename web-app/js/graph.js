@@ -22,7 +22,7 @@ var GraphUtil = (function ($) {
 
 	// returns true if the graph is loaded
 	public.graphExists = function () {
-		return ($('#svgContainerId #svgTranslatorId').children('svg').size() > 0)
+		return ($('#svgContainerId svg').size() > 0)
 	}
 
 	// returns true if the graph is in fullscreen mode

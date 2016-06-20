@@ -4674,13 +4674,7 @@ table.text-center th {
   filter: alpha(opacity=100);
 }
 .chart {
-  position: relative;
   overflow: hidden;
-  width: 100%;
-}
-.chart svg,
-.chart canvas {
-  width: 100%!important;
 }
 /*
  * Misc: print
