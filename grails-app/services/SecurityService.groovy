@@ -2,6 +2,9 @@
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
 
+
+import org.apache.log4j.Logger
+
 import javax.servlet.http.HttpSession
 import org.apache.shiro.SecurityUtils
 
@@ -909,12 +912,13 @@ class SecurityService implements InitializingBean {
 			throw new DomainUpdateException('Unable to update user security roles')
 		}
 
-		// 
+		//
 		// Set the default project preference for the user
 		//
 		if (! userPreferenceService.addOrUpdatePreferenceToUser(userLogin, "CURR_PROJ", params.projectId)) {
 			throw new DomainUpdateException('Unable to save selected project')
 		}
+
 		if (isNewUser) {
 			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, "START_PAGE", "User Dashboard")
 			// TODO : JPM 3/2016 : Default preferences for user for TZ/Date format should be based on the selected project
@@ -923,6 +927,10 @@ class SecurityService implements InitializingBean {
 			userPreferenceService.addOrUpdatePreferenceToUser(userLogin, TimeUtil.DATE_TIME_FORMAT_ATTR, TimeUtil.getDefaultFormatType())
 
 			auditService.saveUserAudit(UserAuditBuilder.newUserLogin(byWhom, userLogin.username))
+		}
+
+		if(params.projectId) {
+			personService.addToProject(byWhom, "${params.projectId}", "${person.id}")
 		}
 
 		return userLogin
