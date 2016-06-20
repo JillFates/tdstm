@@ -23,7 +23,9 @@
 			<td class="valueNW ${config.appVendor}">${applicationInstance.appVendor}</td>
 			<td class="label ${config.sme} ${highlightMap.sme?:''}" nowrap="nowrap"><label for="sme">SME1</label></td>
 			<td class="valueNW ${config.sme}">
-				<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
+				<span class="clickableText" onClick="loadPersonDiv(${applicationInstance.sme?.id},'generalInfoShow')">
+					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme}" />
+				</span>
 			</td>
 			<td class="label ${config.environment} ${highlightMap.environment?:''}" nowrap="nowrap"><label for="environment">Environment</label></td>
 			<td class="valueNW ${config.environment}">${applicationInstance.environment}</td>
@@ -35,7 +37,9 @@
 			<td class="valueNW ${config.appVersion}">${applicationInstance.appVersion}</td>
 			<td class="label ${config.sme2} ${highlightMap.sme2?:''}" nowrap="nowrap"><label for="sme2">SME2</label></td>
 			<td class="valueNW ${config.sme2}">
-				<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
+				<span class="clickableText" onClick="loadPersonDiv(${applicationInstance.sme2?.id},'generalInfoShow')">
+					<tds:nameAndCompany client="${client}" person="${applicationInstance.sme2}" />
+				</span>
 			</td>
 			<td class="label ${config.criticality} ${highlightMap.criticality?:''}" nowrap="nowrap"><label for="criticality">Criticality</label></td>
 			<td class="valueNW ${config.criticality}">${applicationInstance.criticality}</td>
@@ -47,7 +51,9 @@
 			<td class="valueNW ${config.appTech}">${applicationInstance.appTech}</td>
 			<td class="label ${config.appOwner} ${highlightMap.appOwner?:''}" nowrap="nowrap"><label for="appOwner">App Owner</label></td>
 			<td class="valueNW ${config.appOwner}">
-				<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
+				<span class="clickableText" onClick="loadPersonDiv(${applicationInstance.appOwner?.id},'generalInfoShow')">
+					<tds:nameAndCompany client="${client}" person="${applicationInstance.appOwner}" />
+				</span>
 			</td>
 			<td class="label ${config.moveBundle} ${highlightMap.moveBundle?:''}" nowrap="nowrap"><label for="moveBundle">Bundle : Dep. Group</label></td>
 			<td class="valueNW ${config.moveBundle}">${applicationInstance.moveBundle} : ${dependencyBundleNumber}</td>
@@ -96,7 +102,15 @@
 			<td class="label ${config.externalRefId} ${highlightMap.externalRefId?:''}" nowrap="nowrap"><label for="externalRefId">External Ref Id</label></td>
 			<td class="${config.externalRefId}">${applicationInstance.externalRefId}</td>
 			<td class="label ${config.shutdownBy}  ${highlightMap.shutdownBy?:''}" nowrap="nowrap"><label for="shutdownBy">Shutdown By</label></td>
-			<td class="valueNW ${config.shutdownBy}" nowrap="nowrap">${shutdownBy}
+			<td class="valueNW ${config.shutdownBy}" nowrap="nowrap">
+			<g:if test="${shutdownById == -1}">
+				${shutdownBy}
+			</g:if>
+			<g:else>
+				<span class="clickableText" onClick="loadPersonDiv(${shutdownById},'generalInfoShow')">
+					${shutdownBy}
+				</span>
+			</g:else>
 			<g:if test="${applicationInstance.shutdownFixed ==1 }">
 				<input type="checkbox" id="shutdownFixedShowId" disabled="disabled" name="shutdownFixed" checked="checked"/>
 					<label for="shutdownFixedId" >Fixed</label>
@@ -107,7 +121,15 @@
 		</tr>
 		<tr>
 			<td class="label ${config.startupBy} ${highlightMap.startupBy?:''}" nowrap="nowrap"><label for="startupBy">Startup By</label></td>
-			<td class="valueNW ${config.startupBy}" nowrap="nowrap">${startupBy}
+			<td class="valueNW ${config.startupBy}" nowrap="nowrap">
+			<g:if test="${startupById == -1}">
+				${startupBy}
+			</g:if>
+			<g:else>
+				<span class="clickableText" onClick="loadPersonDiv(${startupById},'generalInfoShow')">
+					${startupBy}
+				</span>
+			</g:else>
 			<g:if test="${applicationInstance.startupFixed ==1 }">
 				<input type="checkbox" id="startupFixedShowId" disabled="disabled" name="startupFixed" value="${applicationInstance.startupFixed}" 
 						checked="checked"/>
@@ -117,7 +139,15 @@
 			<td class="label ${config.shutdownDuration} ${highlightMap.shutdownDuration?:''}" nowrap="nowrap"><label for="shutdownDuration">Startup Duration</label></td>
 			<td class="valueNW ${config.shutdownDuration}" nowrap="nowrap">${applicationInstance.startupDuration ? applicationInstance.startupDuration+'m' :''} </td>
 			<td class="label ${config.testingBy} ${highlightMap.testingBy?:''}" nowrap="nowrap"><label for="testingBy">Testing By</label></td>
-			<td class="valueNW ${config.testingBy}" nowrap="nowrap">${testingBy}
+			<td class="valueNW ${config.testingBy}" nowrap="nowrap">
+			<g:if test="${testingById == -1}">
+				${testingBy}
+			</g:if>
+			<g:else>
+				<span class="clickableText" onClick="loadPersonDiv(${testingById},'generalInfoShow')">
+					${testingBy}
+				</span>
+			</g:else>
 			  <g:if test="${applicationInstance.testingFixed ==1 }">
 				<input type="checkbox" id="testingFixedShowId" disabled="disabled" name="testingFixed" checked="checked" />
 					<label for="testingFixedId" >Fixed</label>

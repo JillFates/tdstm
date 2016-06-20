@@ -92,7 +92,11 @@ class ApplicationService {
 			def shutdownBy = app.shutdownBy  ? assetEntityService.resolveByName(app.shutdownBy) : ''
 			def startupBy = app.startupBy  ? assetEntityService.resolveByName(app.startupBy) : ''
 			def testingBy = app.testingBy  ? assetEntityService.resolveByName(app.testingBy) : ''
-
+			
+			def shutdownById = shutdownBy instanceof Person ? shutdownBy.id : -1
+			def startupById = startupBy instanceof Person ? startupBy.id : -1
+			def testingById = testingBy instanceof Person ? testingBy.id : -1
+			
 			def model = [
 				applicationInstance : app,
 				appMoveEvent:appMoveEvent, 
@@ -100,7 +104,10 @@ class ApplicationService {
 				moveEventList:moveEventList, 
 				shutdownBy:shutdownBy, 
 				startupBy:startupBy, 
-				testingBy:testingBy
+				testingBy:testingBy,
+				shutdownById:shutdownById, 
+				startupById:startupById, 
+				testingById:testingById
 			]
 
 			model.putAll( assetEntityService.getCommonModelForShows('Application', project, params, app) )

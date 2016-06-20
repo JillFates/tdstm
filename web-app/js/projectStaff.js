@@ -282,7 +282,7 @@ function loadPersonDiv(personId,renderPage,redirectTo){
 				
 		},
 		error : function (response) {
-			tdsCommon.displayWsError(response, "Error retriving person information.", false);
+			tdsCommon.displayWsError(response, "Error retrieving person information.", false);
 		}
 	});
 }

@@ -320,6 +320,11 @@ div.loginErrorMsg {
 .login-box-body div.message {
   margin-bottom: 7px; }
 
+.clickableText {
+  color: #1c94c4;
+  font-weight: bold;
+  cursor: pointer; }
+
 div.content-wrapper div.ui-widget-header {
   background: #5f9fcf 50% 50% repeat-x !important;
   border-color: #5f9fcf !important;
