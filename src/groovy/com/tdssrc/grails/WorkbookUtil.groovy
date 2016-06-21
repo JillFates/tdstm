@@ -1,20 +1,13 @@
 package com.tdssrc.grails
 
-import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.DateUtil
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.hssf.util.CellReference
-import org.apache.poi.hssf.util.CellRangeAddressList
 import org.apache.poi.hssf.usermodel.DVConstraint
-import org.apache.poi.ss.usermodel.DataValidation
-import org.apache.poi.ss.usermodel.Name
 import org.apache.poi.hssf.usermodel.HSSFDataValidation
-import java.text.DateFormat
-import java.util.TimeZone
-import java.util.Collection
+import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.util.CellRangeAddressList
+import org.apache.poi.ss.util.CellReference
 
+import java.text.DateFormat
 /**
  * The WorkbookUtil class contains a collection of useful Apache POI manipulation methods
  */
@@ -88,7 +81,7 @@ class WorkbookUtil {
 	 * @param dateFormat - list if formats to use if parsing a string value
 	 * @return The date from the specified cell or null if empty
 	 * @throws IllegalArgumentException - if field does not contain String or Numeric (date) format
-	 * @throws ParseException - if the field contains an invalid formatted String value
+	 * @throws java.text.ParseException - if the field contains an invalid formatted String value
 	 * @deprecated Please use getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, DateFormat dateFormat, failedIndicator=-1) 
 	 */
 	public static getDateCellValue(Sheet sheet, Integer columnIdx, Integer rowIdx, session, Collection formatterTypes=null) {
@@ -338,19 +331,21 @@ class WorkbookUtil {
 	 				targetColumn, firstTargetRow, lastTargetRow){
 
 
-	 	def createFormulaString = {
-	 		String validationColumnCode = columnCode(validationColumn)
-	 		String sheetName = validationSheet.getSheetName()
-	 		return new StringBuffer("'$sheetName'!")
-	 				.append("\$$validationColumnCode\$$firstValidationRow:")
-	 				.append("\$$validationColumnCode\$$lastValidationRow")
-	 				.toString()
-	 	}
+		def createFormulaString = {
+			String validationColumnCode = columnCode(validationColumn)
+			String sheetName = validationSheet.getSheetName()
+			return new StringBuffer("'$sheetName'!")
+					.append("\$$validationColumnCode\$$firstValidationRow:")
+					.append("\$$validationColumnCode\$$lastValidationRow")
+					.toString()
+		}
 
-	 	String name = "list$validationColumn"
+		String sheetName = targetSheet.getSheetName()
+	 	String name = "list_${sheetName}_${validationColumn}"
 	 	
 	 	DVConstraint dvConstraint = DVConstraint.createFormulaListConstraint(name);
 		Name namedRange = workbook.createName()
+
   		namedRange.setNameName(name)
   		namedRange.setRefersToFormula(createFormulaString())
   		CellRangeAddressList addressList = new CellRangeAddressList(0, 0, 0, 0)
