@@ -97,6 +97,33 @@ class MoveBundleController {
 		render jsonData as JSON
 	}
 
+	/**
+	 * Used to generate the List for Bundles using Kendo Grid.
+	 * @return : list of bundles as JSON
+	 */
+	def retrieveBundleList() {
+		def project = securityService.getUserCurrentProject()
+
+		def bundleList = MoveBundle.findAll("from MoveBundle where project =:project ",[project:project])
+
+		def result = new ArrayList()
+
+		bundleList.each{ entry ->
+			result.add([
+					bundleId: entry.id,
+					name: entry.name,
+					description: entry.description,
+					planning: entry.useForPlanning,
+					assetqty: entry.getAssetQty(),
+					startDate: entry.startTime,
+					completion: entry.completionTime
+			])
+
+		}
+
+		render result as JSON
+	}
+
 	def show() {
 		def (project, userLogin) = controllerService.getProjectAndUserForPage(this)
 		if (! project) 

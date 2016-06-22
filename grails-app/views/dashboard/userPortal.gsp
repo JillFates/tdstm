@@ -42,13 +42,6 @@
             margin-top: 20px;
         }
 
-        .k-header.k-grid-toolbar {
-            border-color: #5f9fcf;
-        }
-        .k-header {
-            background-color: #5f9fcf;
-        }
-
         .btn-refresh {
             float: right;
             cursor: pointer;
@@ -69,10 +62,6 @@
         .taskTd {
             font-weight: bold;
             font-size: 12px;
-        }
-
-        .k-grid .k-hierarchy-cell .k-icon {
-            background-color: white !important;
         }
 
         .statusButtonBar {
@@ -109,10 +98,6 @@
             background-color: white !important;
             background-color: transparent;
             border-radius: 50%;
-        }
-
-        .k-loading-image {
-            background-image: url('${resource(dir:'dist/css/kendo/Default',file:'loading-image.gif')}');
         }
 
         .k-grid {
