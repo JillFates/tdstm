@@ -1,11 +1,10 @@
 package com.tdssrc.grails
 
 import org.apache.commons.logging.LogFactory
-import org.apache.poi.hssf.usermodel.DVConstraint
-import org.apache.poi.hssf.usermodel.HSSFDataValidation
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellRangeAddressList
 import org.apache.poi.ss.util.CellReference
+import org.apache.poi.xssf.usermodel.XSSFDataValidation
 
 import java.text.DateFormat
 /**
@@ -293,7 +292,7 @@ class WorkbookUtil {
 
 	}
 
-	/**
+	/* *
 	 * This method adds data validation to a given range of cells.
 	 *
 	 * @param sheet
@@ -302,7 +301,7 @@ class WorkbookUtil {
 	 * @param lastRow
 	 * @param firstColumn
 	 * @param lastColumn
-	 */
+	 * /
 	public static void addCellValidation(sheet, values, firstRow, lastRow, firstColumn, lastColumn){
 		if(sheet && values && firstRow >= 0 && firstRow <= lastRow && firstColumn >= 0 && firstColumn <= lastColumn ){
 			CellRangeAddressList addressList = new CellRangeAddressList(firstRow, lastRow, firstColumn, lastColumn);
@@ -312,7 +311,7 @@ class WorkbookUtil {
 	  		sheet.addValidationData(dataValidation);	
 		}
 		
-	}
+	}*/
 
 	/**
 	 * Adds Range Validation based on a validation sheet.
@@ -326,7 +325,7 @@ class WorkbookUtil {
 	 * @param firstTargetRow - first row where validation is to be added.
 	 * @param lastTargetRow - last row where data validation is to be added.
 	 */
-	 public static void addRangeCellValidation(workbook, targetSheet, validationSheet,
+	 public static void addRangeCellValidation(Workbook workbook, Sheet targetSheet, Sheet validationSheet,
 	 				validationColumn,firstValidationRow, lastValidationRow,
 	 				targetColumn, firstTargetRow, lastTargetRow){
 
@@ -343,14 +342,34 @@ class WorkbookUtil {
 		String sheetName = targetSheet.getSheetName()
 	 	String name = "list_${sheetName}_${validationColumn}"
 	 	
-	 	DVConstraint dvConstraint = DVConstraint.createFormulaListConstraint(name);
-		Name namedRange = workbook.createName()
+	 	//DVConstraint dvConstraint = DVConstraint.createFormulaListConstraint(name);
 
+		Name namedRange = workbook.createName()
   		namedRange.setNameName(name)
   		namedRange.setRefersToFormula(createFormulaString())
-  		CellRangeAddressList addressList = new CellRangeAddressList(0, 0, 0, 0)
-	  	DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
-	  	dataValidation.setSuppressDropDownArrow(false)
+
+		DataValidationHelper dvHelper = targetSheet.getDataValidationHelper()
+		DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint(name)
+		CellRangeAddressList addressList = new CellRangeAddressList(0, 0, 0, 0)
+
+	 	DataValidation dataValidation = dvHelper.createValidation(dvConstraint, addressList)
+
+	 	//DataValidation dataValidation = new HSSFDataValidation(addressList, dvConstraint)
+		// Note the check on the actual type of the DataValidation object.
+		// If it is an instance of the XSSFDataValidation class then the
+		// boolean value 'false' must be passed to the setSuppressDropDownArrow()
+		// method and an explicit call made to the setShowErrorBox() method.
+		if(dataValidation instanceof XSSFDataValidation) {
+		 	dataValidation.setSuppressDropDownArrow(false)
+			dataValidation.setShowErrorBox(true)
+		}
+		else {
+		 	// If the Datavalidation contains an instance of the HSSFDataValidation
+		 	// class then 'true' should be passed to the setSuppressDropDownArrow()
+		 	// method and the call to setShowErrorBox() is not necessary.
+			dataValidation.setSuppressDropDownArrow(true)
+		}
+
 	  	targetSheet.addValidationData(dataValidation)
 
 	 }
