@@ -15,16 +15,32 @@ import java.util.TreeSet;
  * Created by octavio on 6/21/16.
  */
 public class ExcelDocumentConverter {
-	private static Logger log = Logger.getLogger(ExcelDocumentConverter.class);
+	//private static Logger log = Logger.getLogger(ExcelDocumentConverter.class);
 
+	/**
+	 * Creates a copy of the original workbook in HSSFWorkbook instance (XLS)
+	 * @param source workbook to copy
+	 * @return HSSFWorkbook new workbook created
+	 */
 	public static HSSFWorkbook convertWorkbookToHSSF(Workbook source) {
 		return (HSSFWorkbook) ExcelDocumentConverter.copyWorkbook(source, new HSSFWorkbook());
 	}
 
+	/**
+	 * Creates a copy of the original workbook in XSSFWorkbook instance (XLSX)
+	 * @param source workbook to copy
+	 * @return XSSFWorkbook new workbook created
+	 */
 	public static XSSFWorkbook convertWorkbookToXSSF(Workbook source) {
 		return (XSSFWorkbook) ExcelDocumentConverter.copyWorkbook(source, new XSSFWorkbook());
 	}
 
+	/**
+	 * Copy source Workbook to destination Workbook
+	 * @param source
+	 * @param destination
+	 * @return
+	 */
 	public static Workbook copyWorkbook(Workbook source, Workbook destination) {
 		for (int i = 0; i < source.getNumberOfSheets(); i++) {
 			Sheet sourceSheet = source.getSheetAt(i);
@@ -34,6 +50,11 @@ public class ExcelDocumentConverter {
 		return destination;
 	}
 
+	/**
+	 * Copy one sheet to other
+	 * @param source
+	 * @param destination
+	 */
 	public static void copySheets(Sheet source, Sheet destination) {
 		copySheets(source, destination, true);
 	}
@@ -62,16 +83,11 @@ public class ExcelDocumentConverter {
 	}
 
 	/**
-	 * @param srcSheet
-	 *            the sheet to copy.
-	 * @param destSheet
-	 *            the sheet to create.
-	 * @param srcRow
-	 *            the row to copy.
-	 * @param destRow
-	 *            the row to create.
+	 * @param srcSheet the sheet to copy.
+	 * @param destSheet the sheet to create.
+	 * @param srcRow the row to copy.
+	 * @param destRow the row to create.
 	 * @param styleMap
-	 *            -
 	 */
 	public static void copyRow(Sheet srcSheet, Sheet destSheet, Row srcRow, Row destRow,
 														 Map<Integer, CellStyle> styleMap) {
@@ -81,27 +97,21 @@ public class ExcelDocumentConverter {
 		destRow.setHeight(srcRow.getHeight());
 		// pour chaque row
 		for (int j = srcRow.getFirstCellNum(); j >= 0 && j <= srcRow.getLastCellNum(); j++) {
-			Cell oldCell = srcRow.getCell(j); // ancienne cell
-			Cell newCell = destRow.getCell(j); // new cell
+			Cell oldCell = srcRow.getCell(j);
+			Cell newCell = destRow.getCell(j);
 			if (oldCell != null) {
 				if (newCell == null) {
 					newCell = destRow.createCell(j);
 				}
-				// copy chaque cell
+				// copy cell
 				copyCell(oldCell, newCell, styleMap);
-				// copy les informations de fusion entre les cellules
-				// System.out.println("row num: " + srcRow.getRowNum() +
-				// " , col: " + (short)oldCell.getColumnIndex());
+
 				CellRangeAddress mergedRegion = getMergedRegion(srcSheet, srcRow.getRowNum(),
 						(short) oldCell.getColumnIndex());
 
 				if (mergedRegion != null) {
-					// System.out.println("Selected merged region: " +
-					// mergedRegion.toString());
 					CellRangeAddress newMergedRegion = new CellRangeAddress(mergedRegion.getFirstRow(),
 							mergedRegion.getLastRow(), mergedRegion.getFirstColumn(), mergedRegion.getLastColumn());
-					// System.out.println("New merged region: " +
-					// newMergedRegion.toString());
 					CellRangeAddressWrapper wrapper = new CellRangeAddressWrapper(newMergedRegion);
 					if (isNewMergedRegion(wrapper, mergedRegions)) {
 						mergedRegions.add(wrapper);
@@ -114,13 +124,13 @@ public class ExcelDocumentConverter {
 	}
 
 	/**
+	 * Copy one cell and styles fom one type to other
 	 * @param oldCell
 	 * @param newCell
 	 * @param styleMap
 	 */
 	public static void copyCell(Cell oldCell, Cell newCell, Map<Integer, CellStyle> styleMap) {
 		if (styleMap != null) {
-			//newCell.setCellComment(oldCell.getCellComment());
 			Integer hash = oldCell.getCellStyle().hashCode();
 			if (!styleMap.containsKey(hash)) {
 				transform(styleMap, hash, oldCell, newCell);
@@ -155,6 +165,10 @@ public class ExcelDocumentConverter {
 
 	/**
 	 * Copy Cell style from one to another
+	 * @param styleMap
+	 * @param hash    id of the old style
+	 * @param oldCell
+	 * @param newCell
 	 */
 	private static void transform( Map<Integer, CellStyle> styleMap, Integer hash, Cell oldCell, Cell newCell) {
 		CellStyle styleOld = oldCell.getCellStyle();
@@ -177,12 +191,25 @@ public class ExcelDocumentConverter {
 		styleMap.put(hash, styleNew);
 	}
 
+	/**
+	 * Creates/get a DataFormat from one Type to the other
+	 * @param index
+	 * @param oldCell
+	 * @param newCell
+	 * @return DataFormat fot the new Cell
+	 */
 	private static short transform(short index, Cell oldCell, Cell newCell) {
 		DataFormat formatOld = oldCell.getSheet().getWorkbook().createDataFormat();
 		DataFormat formatNew = newCell.getSheet().getWorkbook().createDataFormat();
 		return formatNew.getFormat(formatOld.getFormat(index));
 	}
 
+	/**
+	 * Creates a New Font from one type to the other.
+	 * @param fontOld
+	 * @param newCell
+	 * @return the New Font
+	 */
 	private static Font transform(Font fontOld, Cell newCell) {
 		Font fontNew = newCell.getSheet().getWorkbook().createFont();
 		fontNew.setBoldweight(fontOld.getBoldweight());
@@ -198,18 +225,13 @@ public class ExcelDocumentConverter {
 	}
 
 	/**
-	 * Récupère les informations de fusion des cellules dans la sheet source
-	 * pour les appliquer à la sheet destination... Récupère toutes les zones
-	 * merged dans la sheet source et regarde pour chacune d'elle si elle se
-	 * trouve dans la current row que nous traitons. Si oui, retourne l'objet
-	 * CellRangeAddress.
+	 * Retrieves information from cell fusion in the source sheet to apply to the destination sheet...
+	 * Get all merged areas in the source sheet and look for each of them if she in the current row we handle.
+	 * If so, returns the object CellRangeAddress
 	 *
-	 * @param sheet
-	 *            the sheet containing the data.
-	 * @param rowNum
-	 *            the num of the row to copy.
-	 * @param cellNum
-	 *            the num of the cell to copy.
+	 * @param sheet the sheet containing the data.
+	 * @param rowNum the num of the row to copy.
+	 * @param cellNum the num of the cell to copy.
 	 * @return the CellRangeAddress created.
 	 */
 	public static CellRangeAddress getMergedRegion(Sheet sheet, int rowNum, short cellNum) {
@@ -225,10 +247,8 @@ public class ExcelDocumentConverter {
 	/**
 	 * Check that the merged region has been created in the destination sheet.
 	 *
-	 * @param newMergedRegion
-	 *            the merged region to copy or not in the destination sheet.
-	 * @param mergedRegions
-	 *            the list containing all the merged region.
+	 * @param newMergedRegion the merged region to copy or not in the destination sheet.
+	 * @param mergedRegions the list containing all the merged region.
 	 * @return true if the merged region is already in the list or not.
 	 */
 	private static boolean isNewMergedRegion(CellRangeAddressWrapper newMergedRegion,

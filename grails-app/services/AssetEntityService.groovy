@@ -2393,7 +2393,9 @@ class AssetEntityService {
 			//get template Excel
 			def book
 
-			//def filenametoSet = dataTransferSetInstance.templateFilename
+			def filenametoSet = dataTransferSetInstance.templateFilename
+
+			//TODO: OLB: Please Fix Me this shoudnt be set as a constant ccheck with John for actual use cases of storing the templateFilename
 			def filenametoSet = "/templates/TDSMaster_template.xlsx"
 			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server

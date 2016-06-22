@@ -3,6 +3,7 @@ package net.transitionmanager.utils;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 /**
+ * Wrapper that helps to compare CellRangeAddress to other in cache (dictionary) structures
  * Created by octavio on 6/21/16.
  */
 class CellRangeAddressWrapper implements Comparable<CellRangeAddressWrapper>{
