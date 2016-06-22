@@ -11,17 +11,15 @@ import net.transitionmanager.utils.ExcelDocumentConverter
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.hibernate.ScrollMode
-import org.hibernate.ScrollableResults
-import org.hibernate.criterion.Projections
 import org.hibernate.Criteria
 import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.transaction.annotation.Transactional
 import net.transitionmanager.utils.Profiler
-
 
 import java.util.regex.Matcher
 // Used to wire up bindData
@@ -30,7 +28,10 @@ import java.util.regex.Matcher
 //import org.springframework.validation.BindingResult
 @Transactional
 class AssetEntityService {
-	static final String XLSX_TEMPLATE = "/templates/TDSMaster_template.xlsx"
+	static final TEMPLATES = [
+			xls  : "/templates/TDSMaster_template.xls",
+			xlsx : "/templates/TDSMaster_template.xlsx"
+	]
 
 	def grailsApplication
 	def dataSource
@@ -2195,10 +2196,6 @@ class AssetEntityService {
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
 
 		try {
-			java.io.File tempExportFile = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xlsx");
-			
-			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
-			
 			def progressCount = 0
 			def progressTotal = 0
 			def missingHeader = ""
@@ -2390,17 +2387,16 @@ class AssetEntityService {
 			appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
 			dbDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Databases" )
 			fileDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Files" )
-					
-			//get template Excel
-			def book
 
-			//def filenametoSet = dataTransferSetInstance.templateFilename
-			def filenametoSet = AssetEntityService.XLSX_TEMPLATE
+			def fileExtension = "xlsx"
+			if(params.exportFormat == "xls"){
+				fileExtension = "xls"
+			}
+
+			def filenametoSet = AssetEntityService.TEMPLATES[fileExtension]
 
 			def file =  grailsApplication.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
-
-			log.info "OLB: filenametoSet: $filenametoSet; file: $file"
 
 			def tzId = params.tzId
 			def userDTFormat = params.userDTFormat
@@ -2418,12 +2414,13 @@ class AssetEntityService {
 			profiler.lapInfo "Creating asset dep bundles"
 
 			//create book and sheet
+			//get template Excel
 			FileInputStream fileInputStream = new FileInputStream( file )
-			book = WorkbookFactory.create(fileInputStream)
+			def book = WorkbookFactory.create(fileInputStream)
 
 			profiler.lapInfo "Creating workbook"
 
-			// Helper closure used to retrieve the s
+			// Helper closure used to retrieve the sheet
 			def getWorksheet = { sheetName ->
 				def s = book.getSheet( sheetName )
 				if (s) {
@@ -3211,17 +3208,13 @@ class AssetEntityService {
 			// 
 			profiler.lap("EXPORT", "sheets all populated")
 
+			profiler.begin("RECALCULATE_FORMULAS")
+			book.setForceFormulaRecalculation(true)
+			profiler.end("RECALCULATE_FORMULAS")
+
+			File tempExportFile = File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(), null);
+			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
 			FileOutputStream out =  new FileOutputStream(tempExportFile)
-
-			def fileExtension = "xlsx"
-
-			switch(params.exportFormat){
-				case "xls" :
-					fileExtension = "xls"
-					book = ExcelDocumentConverter.convertWorkbookToHSSF(book)
-					break
-			}
-
 			book.write(out)
 			out.close()
 
@@ -3243,8 +3236,7 @@ class AssetEntityService {
 
 			profiler.lap("EXPORT", "streamed spreadsheet to browser")
 		} catch( Exception exportExp ) {
-
-			exportExp.printStackTrace()
+			log.error("Error: ${exportExp.message}", exportExp)
 			progressService.update(key, 100, 'Cancelled', "An unexpected exception occurred while exporting to Excel")
 
 			return
