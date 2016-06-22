@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
 import org.hibernate.criterion.Projections
@@ -31,7 +30,9 @@ import java.util.regex.Matcher
 //import org.springframework.validation.BindingResult
 @Transactional
 class AssetEntityService {
+	static final String XLSX_TEMPLATE = "/templates/TDSMaster_template.xlsx"
 
+	def grailsApplication
 	def dataSource
 
 	// TODO : JPM 9/2014 : determine if customLabels is used as it does NOT have all of the values it should
@@ -2393,23 +2394,13 @@ class AssetEntityService {
 			//get template Excel
 			def book
 
-			def filenametoSet = dataTransferSetInstance.templateFilename
+			//def filenametoSet = dataTransferSetInstance.templateFilename
+			def filenametoSet = AssetEntityService.XLSX_TEMPLATE
 
-			//TODO: OLB: Please Fix Me this shoudnt be set as a constant ccheck with John for actual use cases of storing the templateFilename
-			filenametoSet = "/templates/TDSMaster_template.xlsx"
-			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
+			def file =  grailsApplication.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
 
 			log.info "OLB: filenametoSet: $filenametoSet; file: $file"
-			/*
-			// set MIME TYPE as Excel
-			def exportType = filenametoSet.split("/")[2]
-			def masterIndex = exportType.indexOf("Master_template.xlsx")
-			if (masterIndex != -1) {
-				exportType = exportType.substring(0, masterIndex)
-				log.info "OLB  exportType: $exportType"
-			}
-			*/
 
 			def tzId = params.tzId
 			def userDTFormat = params.userDTFormat
