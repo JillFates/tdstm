@@ -7,11 +7,12 @@ import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
 import com.tdssrc.grails.*
 import grails.converters.JSON
+import net.transitionmanager.utils.ExcelDocumentConverter
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.codehaus.groovy.grails.commons.ApplicationHolder
 import org.hibernate.ScrollMode
 import org.hibernate.ScrollableResults
@@ -2193,7 +2194,7 @@ class AssetEntityService {
 		def sizeOf = { obj -> (obj ? obj.size : 0)}
 
 		try {
-			java.io.File tempExportFile = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xls");
+			java.io.File tempExportFile = java.io.File.createTempFile("assetEntityExport_" + UUID.randomUUID().toString(),".xlsx");
 			
 			progressService.updateData(key, 'filename', tempExportFile.getAbsolutePath())
 			
@@ -2392,16 +2393,21 @@ class AssetEntityService {
 			//get template Excel
 			def book
 
-			def filenametoSet = dataTransferSetInstance.templateFilename
+			//def filenametoSet = dataTransferSetInstance.templateFilename
+			def filenametoSet = "/templates/TDSMaster_template.xlsx"
 			def file =  ApplicationHolder.application.parentContext.getResource(filenametoSet).getFile()
 			// Going to use temporary file because we were getting out of memory errors constantly on staging server
 
+			log.info "OLB: filenametoSet: $filenametoSet; file: $file"
+			/*
 			// set MIME TYPE as Excel
 			def exportType = filenametoSet.split("/")[2]
-			def masterIndex = exportType.indexOf("Master_template.xls")
+			def masterIndex = exportType.indexOf("Master_template.xlsx")
 			if (masterIndex != -1) {
 				exportType = exportType.substring(0, masterIndex)
+				log.info "OLB  exportType: $exportType"
 			}
+			*/
 
 			def tzId = params.tzId
 			def userDTFormat = params.userDTFormat
@@ -2419,8 +2425,8 @@ class AssetEntityService {
 			profiler.lapInfo "Creating asset dep bundles"
 
 			//create book and sheet
-			FileInputStream fileInputStream = new FileInputStream( file );
-			book = new HSSFWorkbook(fileInputStream);
+			FileInputStream fileInputStream = new FileInputStream( file )
+			book = WorkbookFactory.create(fileInputStream)
 
 			profiler.lapInfo "Creating workbook"
 
@@ -3213,6 +3219,16 @@ class AssetEntityService {
 			profiler.lap("EXPORT", "sheets all populated")
 
 			FileOutputStream out =  new FileOutputStream(tempExportFile)
+
+			def fileExtension = "xlsx"
+
+			switch(params.exportFormat){
+				case "xls" :
+					fileExtension = "xls"
+					book = ExcelDocumentConverter.convertWorkbookToHSSF(book)
+					break
+			}
+
 			book.write(out)
 			out.close()
 
@@ -3221,10 +3237,12 @@ class AssetEntityService {
 			//    - Name of the Project or ID 
 			//    - Bundle name(s) selected or ALL
 			//    - Letters symbolizing each of the tabs that were exported 
-			//    - The date that the spreadsheet was exported 
+			//    - The date that the spreadsheet was exported
+			//	  - The file extension to use
 			String filename = project.getOwner().toString() + '-' + 
 				( project.name ?: project.id ) + 
-				"-${bundleNameList}-${exportedEntity}-${exportDate}.xls"
+				"-${bundleNameList}-${exportedEntity}-${exportDate}.${fileExtension}"
+
 			filename = StringUtil.sanitizeAndStripSpaces(filename)
 
 			progressService.updateData(key, 'header', 'attachment; filename="' + filename + '"')

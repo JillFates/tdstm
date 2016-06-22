@@ -15,8 +15,8 @@ import java.io.File
 import grails.util.GrailsUtil
 
 import org.apache.commons.lang.math.NumberUtils
-import org.apache.poi.hssf.usermodel.HSSFSheet
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Row
 import org.codehaus.groovy.grails.commons.ApplicationHolder
@@ -324,7 +324,7 @@ class AssetEntityController {
 	private String rowToImportValues(
 		Map sheetInfo,
 		StringBuffer sqlStrBuff,
-		HSSFSheet sheetRef, 
+		Sheet sheetRef,
 		Integer rowOffset, 
 		Integer colOffset, 
 		DataTransferAttributeMap dtaMapField, 
@@ -468,7 +468,7 @@ class AssetEntityController {
 	 */
 	private Map getSheetInfo(
 		Project project,
-		HSSFWorkbook spreadsheetWB, 
+		Workbook spreadsheetWB,
 		String sheetName, 
 		String assetIdColLabel, 
 		String columnName, 
@@ -930,7 +930,7 @@ class AssetEntityController {
 		*/
 
 		try {
-			workbook = new HSSFWorkbook( file.inputStream );
+			workbook = WorkbookFactory.create( file.inputStream )
 			def sheetNames = WorkbookUtil.getSheetNames(workbook)
 			def flag = 0
 			def sheetNamesLength = sheetNames.size()
@@ -4256,10 +4256,11 @@ class AssetEntityController {
 		//getting FileInputStream instance for template file
 		FileInputStream fileInputStream = new FileInputStream( file );
 
-		//creating HSSFWorkbook insatnce with using template fileInput stream 
-		HSSFWorkbook workbook = new HSSFWorkbook(fileInputStream);
+		//creating Workbook insatnce with using template fileInput stream
+		Workbook workbook = WorkbookFactory.create(fileInputStream)
+
 		// Get sheet with name 'Server'
-		HSSFSheet sheet = workbook.getSheet("Servers");
+		Sheet sheet = workbook.getSheet("Servers");
 		
 		org.apache.poi.ss.usermodel.Cell cell = null;
 		Row row = null;

@@ -40,6 +40,7 @@ grails.project.dependency.resolution = {
 		compile 'com.google.guava:guava:16.0.1'
 		compile 'org.apache.commons:commons-lang3:3.1'
 		compile 'org.apache.poi:poi:3.14'
+		compile 'org.apache.poi:poi-ooxml:3.14'
 		build   'com.lowagie:itext:2.1.7'
 		compile('net.sf.jasperreports:jasperreports:4.5.1'){
 			excludes(group:'org.apache.poi')

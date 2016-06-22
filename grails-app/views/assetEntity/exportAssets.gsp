@@ -127,12 +127,19 @@
 			<tds:hasPermission permission="Export">
 			<tr>
 				<td class="buttonR" colspan="3">
-					<input class="button" type="submit" value="Export to Excel"/> 
 					<%--
 					<g:link controller="assetEntity" action="exportSpecialReport">
 						<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
 					</g:link>
 					--%>
+					<button type="submit" class="btn btn-default">
+						Export to Excel
+						<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
+					</button>
+					<span style="margin-left: 1em">
+						<input type="checkbox" id="exportFormat" name="exportFormat" value="xls"/>
+						<label for="exportFormat">Excel 97-2004 (.xls)</label>
+					</span>
 				</td>
 			</tr>
 			</tds:hasPermission>
