@@ -51,6 +51,11 @@
         <listener-class>org.codehaus.groovy.grails.web.context.GrailsContextLoaderListener</listener-class>
     </listener>
 
+    <!-- TM-5032 Listener to log JSESSIONID creation/destruction and authentication changes -->
+    <listener>
+        <listener-class>com.tdsops.common.security.SessionListener</listener-class>
+    </listener>
+
     <!-- Grails dispatcher servlet -->
     <servlet>
         <servlet-name>grails</servlet-name>

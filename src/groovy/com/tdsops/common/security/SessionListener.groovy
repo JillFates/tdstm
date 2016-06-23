@@ -1,0 +1,125 @@
+package com.tdsops.common.security
+
+import javax.servlet.http.HttpSession
+import javax.servlet.http.HttpSessionAttributeListener
+import javax.servlet.http.HttpSessionBindingEvent
+import javax.servlet.http.HttpSessionEvent
+import javax.servlet.http.HttpSessionListener
+
+import org.apache.log4j.Logger
+import org.apache.shiro.subject.PrincipalCollection
+import org.apache.shiro.subject.support.DefaultSubjectContext
+
+class SessionListener implements HttpSessionListener, HttpSessionAttributeListener {
+
+	private static final String SHIRO_KEY = DefaultSubjectContext.PRINCIPALS_SESSION_KEY
+	private static final String LOGIN_PERSON = 'LOGIN_PERSON'
+
+	private final Logger log = Logger.getLogger(getClass())
+
+	void sessionCreated(HttpSessionEvent event) {
+		log.effectiveLevel
+		try {
+			if (!log.debugEnabled) return
+
+			HttpSession session = event.session
+			log.debug 'New HttpSession created; id: ' + session.id + ', created at ' +
+				 session.creationTime
+		}
+		catch (ignored) {}
+	}
+
+	void sessionDestroyed(HttpSessionEvent event) {
+		try {
+			if (!log.debugEnabled) return
+
+			HttpSession session = event.session
+
+			StringBuilder sb = new StringBuilder('Session destroyed; ')
+			sb << 'id:' << session.id << ', created at ' << session.creationTime
+			sb << ' (age: ' << (System.currentTimeMillis() - session.creationTime) << '), '
+			sb << 'lastAccessed at ' << session.lastAccessedTime
+			sb << ' (' + (System.currentTimeMillis() - session.lastAccessedTime) + ' ms ago), '
+
+			for (Enumeration<String> names = session.attributeNames; names.hasMoreElements(); ) {
+				String name = names.nextElement()
+				if (name == SHIRO_KEY || name == LOGIN_PERSON) {
+					boolean added = false
+					if (name == SHIRO_KEY) {
+						PrincipalCollection principals = session.getAttribute(name)
+						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal << ', '
+						added = true
+					}
+					if (name == LOGIN_PERSON) {
+						if (added) sb << ', '
+						sb << 'LOGIN_PERSON found in session: ' + session[LOGIN_PERSON]
+					}
+					break
+				}
+			}
+
+			sb << 'Attributes: '
+
+			String delimiter = ''
+			for (Enumeration<String> names = session.attributeNames; names.hasMoreElements(); ) {
+				String name = names.nextElement()
+				def value = session.getAttribute(name)
+				sb << delimiter
+				sb << 'Name: "' << name << '" '
+				sb << 'Value: ' << value
+				delimiter = ', '
+			}
+
+			log.debug sb.toString()
+		}
+		catch (ignored) {}
+	}
+
+	void attributeAdded(HttpSessionBindingEvent event) {
+		try {
+			if (!log.debugEnabled) return
+			findPrincipal event, 'added to'
+		}
+		catch (ignored) {}
+	}
+
+	void attributeRemoved(HttpSessionBindingEvent event) {
+		try {
+			if (!log.debugEnabled) return
+			findPrincipal event, 'removed from'
+		}
+		catch (ignored) {}
+	}
+
+	void attributeReplaced(HttpSessionBindingEvent event) {
+		try {
+			if (!log.debugEnabled) return
+			findPrincipal event, 'replaced in'
+		}
+		catch (ignored) {}
+	}
+
+	private findPrincipal(HttpSessionBindingEvent event, String what) {
+		String name = event.name
+		if (name != SHIRO_KEY && name != LOGIN_PERSON) {
+			return
+		}
+
+		HttpSession session = event.session
+		StringBuilder sb = new StringBuilder('Session destroyed; ')
+
+		boolean added = false
+		if (name == SHIRO_KEY) {
+			PrincipalCollection principals = session.getAttribute(name)
+			sb << 'Shiro principal ' + what + ' session ' << session.id << ': ' << principals.primaryPrincipal
+			added = true
+		}
+
+		if (event.name == LOGIN_PERSON) {
+			if (added) sb << ', '
+			sb << 'LOGIN_PERSON ' + what + ' session ' << session.id << ': ' << session[LOGIN_PERSON]
+		}
+
+		log.debug sb.toString()
+	}
+}
