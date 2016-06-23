@@ -553,7 +553,7 @@ class AssetEntityController {
 		List missingCols = getMissingColumns(domainPropertyList, sheetColumnNameList )
 
 		if (missingCols) {
-			throw new RuntimeException("missing expected columns ${missingCols.join(', ')}")
+			throw new RuntimeException("missing expected columns ${sheetName}:${missingCols.join(', ')}")
 		}
 	}
 
