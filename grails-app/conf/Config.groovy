@@ -224,3 +224,21 @@ tdsops.buildFile = "/build.txt"
 // access: logging will include login, logout and security violations
 // activity:  will also include all user interactions with the application.
 //tdstm.security.auditLogging = "access"
+
+//MIME Types
+grails.mime.types = [
+		html: ['text/html','application/xhtml+xml'],
+		xml: ['text/xml', 'application/xml'],
+		text: 'text/plain',
+		js: 'text/javascript',
+		rss: 'application/rss+xml',
+		atom: 'application/atom+xml',
+		css: 'text/css',
+		csv: 'text/csv',
+		all: '*/*',
+		json: ['application/json','text/json'],
+		form: 'application/x-www-form-urlencoded',
+		multipartForm: 'multipart/form-data',
+		xls : 'application/vnd.ms-excel',
+		xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+]

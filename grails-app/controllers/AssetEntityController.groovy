@@ -1592,12 +1592,13 @@ class AssetEntityController {
 		}
 		def key = params.key
 		def filename = progressService.getData(key, 'filename')
+		def contentType = progressService.getData(key, 'contenttype')
 		def header = progressService.getData(key, 'header')
 		
 		java.io.File file = new java.io.File(filename);
 		FileInputStream io = new FileInputStream(file)
 		
-		response.setContentType( "application/vnd.ms-excel" )
+		response.setContentType(contentType)
 		response.setHeader("Content-Disposition", header)
 		
 		OutputStream out = response.getOutputStream();

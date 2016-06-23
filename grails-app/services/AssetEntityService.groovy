@@ -3231,6 +3231,8 @@ class AssetEntityService {
 
 			filename = StringUtil.sanitizeAndStripSpaces(filename)
 
+			def contenttype = grailsApplication.config.grails.mime.types[fileExtension]
+			progressService.updateData(key, 'contenttype', contenttype)
 			progressService.updateData(key, 'header', 'attachment; filename="' + filename + '"')
 			progressService.update(key, 100, 'Completed')
 
