@@ -592,8 +592,10 @@ class SecurityService implements InitializingBean {
 			throw new ServiceException("The password provided does not meet security policy requirements")
 		}
 
-		// Perform some validation and then attempt to set the user's new password 
+		// Perform some validation and then attempt to set the user's new password, clear the forcePassword change and set their password expiration
 		setUserLoginPassword(pr.userLogin, password)
+		pr.userLogin.forcePasswordChange = 'N'
+		pr.userLogin.passwordExpirationDate = calculatePasswordExpiration(pr.userLogin, new Date())
 			
 		String errMsg = 'An error occurred while attempting to save your new password'
 
@@ -705,7 +707,7 @@ class SecurityService implements InitializingBean {
 		String encryptedPassword = userLogin.applyPassword(unencryptedPassword)
 
 		if (currentPassword.equals(encryptedPassword)) {
-			throw new InvalidParamException('New password must be different from the old password')
+			throw new InvalidParamException('New password must be different from the current password')
 		}
 
 		if (!isNewUser && ! verifyPasswordHistory(userLogin, encryptedPassword)) {
