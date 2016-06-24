@@ -5,6 +5,7 @@
 		<title>Bundle List</title>
 		<script src="${resource(dir:'js',file:'jquery.form.js')}"></script>
 		<style>
+			/*TODO: REMOVE ON COMPLETE MIGRATION */
 			div.content-wrapper {
 				background-color: #ecf0f5 !important;
 			}

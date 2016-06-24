@@ -1044,12 +1044,6 @@ a#taskLinkAllId * {
 	outline-offset: -2px;
 }
 
-.btn:hover,
-.btn:focus {
-	color: #333333;
-	text-decoration: none;
-}
-
 .btn:active,
 .btn.active {
 	background-image: none;
