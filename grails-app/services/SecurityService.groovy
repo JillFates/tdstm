@@ -708,8 +708,6 @@ class SecurityService implements InitializingBean {
 			throw new InvalidParamException('New password must be different from the existing password')
  		}
 
-		}
-
 		if (!isNewUser && ! verifyPasswordHistory(userLogin, encryptedPassword)) {
 			throw new DomainUpdateException('Please provide a new password that was not previously used')
 		}
