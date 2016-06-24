@@ -14,6 +14,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 
 	private static final String SHIRO_KEY = DefaultSubjectContext.PRINCIPALS_SESSION_KEY
 	private static final String LOGIN_PERSON = 'LOGIN_PERSON'
+	private static final String LOGGER_PREFIX = 'SESSION_ACTIVITY: '
 
 	private final Logger log = Logger.getLogger(getClass())
 
@@ -23,8 +24,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 			if (!log.debugEnabled) return
 
 			HttpSession session = event.session
-			log.debug 'New HttpSession created; id: ' + session.id + ', created at ' +
-				 session.creationTime
+			log.debug LOGGER_PREFIX + 'Created; id: ' + session.id + ', at ' + session.creationTime
 		}
 		catch (ignored) {}
 	}
@@ -35,7 +35,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 
 			HttpSession session = event.session
 
-			StringBuilder sb = new StringBuilder('Session destroyed; ')
+			StringBuilder sb = new StringBuilder(LOGGER_PREFIX + 'Destroyed; ')
 			sb << 'id:' << session.id << ', created at ' << session.creationTime
 			sb << ' (age: ' << (System.currentTimeMillis() - session.creationTime) << '), '
 			sb << 'lastAccessed at ' << session.lastAccessedTime
@@ -44,20 +44,23 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 			for (Enumeration<String> names = session.attributeNames; names.hasMoreElements(); ) {
 				String name = names.nextElement()
 				if (name == SHIRO_KEY || name == LOGIN_PERSON) {
-					boolean added = false
+					// boolean added = false
 					if (name == SHIRO_KEY) {
 						PrincipalCollection principals = session.getAttribute(name)
 						sb << 'Shiro principal found in session: ' << principals.primaryPrincipal << ', '
-						added = true
+						// added = true
 					}
+					/*
 					if (name == LOGIN_PERSON) {
 						if (added) sb << ', '
 						sb << 'LOGIN_PERSON found in session: ' + session[LOGIN_PERSON]
 					}
+					*/
 					break
 				}
 			}
 
+			/*
 			sb << 'Attributes: '
 
 			String delimiter = ''
@@ -69,6 +72,7 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 				sb << 'Value: ' << value
 				delimiter = ', '
 			}
+			*/ 
 
 			log.debug sb.toString()
 		}
@@ -106,19 +110,19 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 		}
 
 		HttpSession session = event.session
-		StringBuilder sb = new StringBuilder('Session destroyed; ')
+		StringBuilder sb = new StringBuilder(LOGGER_PREFIX + 'Attrib Change; ')
 
-		boolean added = false
+		//boolean added = false
 		if (name == SHIRO_KEY) {
 			PrincipalCollection principals = session.getAttribute(name)
 			sb << 'Shiro principal ' + what + ' session ' << session.id << ': ' << principals.primaryPrincipal
-			added = true
+			// added = true
 		}
 
-		if (event.name == LOGIN_PERSON) {
-			if (added) sb << ', '
-			sb << 'LOGIN_PERSON ' + what + ' session ' << session.id << ': ' << session[LOGIN_PERSON]
-		}
+		//if (event.name == LOGIN_PERSON) {
+		//	if (added) sb << ', '
+		//	sb << 'LOGIN_PERSON ' + what + ' session ' << session.id << ': ' << session[LOGIN_PERSON]
+		//}
 
 		log.debug sb.toString()
 	}
