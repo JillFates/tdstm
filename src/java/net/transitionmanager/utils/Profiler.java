@@ -58,7 +58,7 @@ import static net.transitionmanager.utils.Profiler.LOG_TYPE.*;
  * @author @tavo_luna
  */
 public class Profiler  {
-	enum LOG_TYPE {INFO, DEBUG, ERROR, FATAL, TRACE, WARN}
+	enum LOG_TYPE {INFO, DEBUG, ERROR, FATAL, TRACE, WARN, SILENT}
 	static public final String KEY_NAME = "ADV_PROFILER";
 	static private final Logger LOG = Logger.getLogger(Profiler.class);
 
@@ -161,6 +161,19 @@ public class Profiler  {
 		begin(TRACE, tag, msg, args);
 	}
 
+	/**
+	 * Used to being a silent block for measuring without logging
+	 */
+	public void beginSilent(String tag){
+		beginSilent(tag, null, null);
+	}
+	public void beginSilent(String tag, String msg){
+		beginSilent(tag, msg, null);
+	}
+	public void beginSilent(String tag, String msg, ArrayList args){
+		begin(SILENT, tag, msg, args);
+	}
+
 	public void end(String tag){
 		end(tag, null, null);
 	}
@@ -237,6 +250,28 @@ public class Profiler  {
 		end(FATAL, tag, msg, args);
 	}
 
+	/**
+	 * Used to terminate a block without any logging
+	 * @param tag - the label/tag to reference the block by
+	 */
+	public void endSilent(String tag){
+		endSilent(tag, null, null);
+	}
+	public void endSilent(String tag, String msg){
+		endSilent(tag, msg, null);
+	}
+	public void endSilent(String tag, String msg, ArrayList args){
+		end(SILENT, tag, msg, args);
+	}
+
+	/**
+	 * Used to reset a named stopwatch
+	 * @param tag - the stopwatch tag name to reset
+	 */
+	public void lapReset(String tag) {
+		stopWatch.begin(tag);
+	}
+
 	private void lap(LOG_TYPE ltype, String tag, String msg, ArrayList args){
 		TimeDuration duration;
 		String text = "[";
@@ -247,13 +282,24 @@ public class Profiler  {
 			text += "ROOT";
 			duration = stopWatch.lap();
 		}
-		text += "] (" + duration + ")";
+
+		// Milliseconds sometimes toString to '0' but we want finer granularity
+		String duraStr = duration.toString();
+		if (duraStr.compareTo("0") == 0) {
+			duraStr += " msec";
+		}
+
+		text += "] (" + duraStr + ")";
 		if(StringUtils.isNotBlank(msg)) {
 			text += ": " + msg;
 		}
 		logPrefix(ltype, "LAP", text, args);
 	}
 
+	/** 
+	 * Used to log lap information at the INFO level if the profiler is enabled otherwise nothing logged
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lap(String tag){
 		lap(tag, null, null);
 	}
@@ -267,6 +313,10 @@ public class Profiler  {
 		}
 	}
 
+	/** 
+	 * Used to log lap information at the INFO level regardless of if the profiler is enabled
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lapInfo(String tag){
 		lapInfo(tag, null, null);
 	}
@@ -277,6 +327,10 @@ public class Profiler  {
 		lap(INFO, tag, msg, args);
 	}
 
+	/** 
+	 * Used to log lap information at the DEBUG level regardless of if the profiler is enabled
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lapDebug(String tag){
 		lapDebug(tag, null, null);
 	}
@@ -287,6 +341,10 @@ public class Profiler  {
 		lap(DEBUG, tag, msg, args);
 	}
 
+	/** 
+	 * Used to log lap information at the TRACE level regardless of if the profiler is enabled
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lapTrace(String tag){
 		lapTrace(tag, null, null);
 	}
@@ -297,6 +355,10 @@ public class Profiler  {
 		logPrefix(TRACE, tag, msg, args);
 	}
 
+	/** 
+	 * Used to log lap information at the WARN level regardless of if the profiler is enabled
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lapWarn(String tag){
 		lapWarn(tag, null, null);
 	}
@@ -307,6 +369,10 @@ public class Profiler  {
 		logPrefix(WARN, tag, msg, args);
 	}
 
+	/** 
+	 * Used to log lap information at the ERROR level regardless of if the profiler is enabled
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lapError(String tag){
 		lapError(tag, null, null);
 	}
@@ -317,6 +383,10 @@ public class Profiler  {
 		logPrefix(ERROR, tag, msg, args);
 	}
 
+	/** 
+	 * Used to log lap information at the FATAL level regardless of if the profiler is enabled
+	 * @param tag - the stopwatch tag name to log info for
+	 */
 	public void lapFatal(String tag){
 		lapFatal(tag, null, null);
 	}
@@ -330,7 +400,6 @@ public class Profiler  {
 	public void lapRoot(String msg){
 		lapRoot(msg, null);
 	}
-
 	public void lapRoot(String msg, ArrayList args){
 		if(doProfile){
 			lapRootInfo(msg, args);
@@ -419,36 +488,52 @@ public class Profiler  {
 		return (tag!=null) ? stopWatch.getLastLap(tag) : stopWatch.getLastLap();
 	}
 
-	// PRIVATE HELPER METHODS ////////////////////////
-	private void log(LOG_TYPE lType, String msg){
+	/**
+	 * Used to log a message directly as part of the Profiler without referencing a lap tag
+	 * @param lType - the logger level
+	 * @param msg - the message to log 
+	 */
+	public void log(LOG_TYPE lType, String msg){
 		log(lType, msg, null);
 	}
 
-	private void log(LOG_TYPE lType, String msg, ArrayList args){
-		String formattedText = (args != null) ? String.format(msg, args.toArray()) : msg;
-		formattedText = name + "= " + formattedText;
-		switch(lType){
-			case DEBUG :
-				LOG.debug(formattedText);
-				break;
-			case WARN :
-				LOG.warn(formattedText);
-				break;
-			case ERROR:
-				LOG.error(formattedText);
-				break;
-			case FATAL:
-				LOG.fatal(formattedText);
-				break;
-			case TRACE:
-				LOG.trace(formattedText);
-				break;
-			case INFO :
-			default:
-				LOG.info(formattedText);
+	/**
+	 * Used to log a message directly as part of the Profiler without referencing a lap tag
+	 * @param lType - the logger level
+	 * @param msg - the message to log 
+	 * @param args - a list of parameters for a parameterized message
+	 */
+	public void log(LOG_TYPE lType, String msg, ArrayList args) {
+		if (lType != SILENT) {
+			// TODO : JPM 6/2016 : the log should be calling the logger to parameterize vs ALWAY formatting the string
+			String formattedText = (args != null) ? String.format(msg, args.toArray()) : msg;
+			formattedText = name + "= " + formattedText;
+			switch(lType){
+				case DEBUG :
+					LOG.debug(formattedText);
+					break;
+				case WARN :
+					LOG.warn(formattedText);
+					break;
+				case ERROR:
+					LOG.error(formattedText);
+					break;
+				case FATAL:
+					LOG.fatal(formattedText);
+					break;
+				case TRACE:
+					LOG.trace(formattedText);
+					break;
+				case INFO :
+				default:
+					LOG.info(formattedText);
+			}
 		}
-
 	}
+
+	// ---------------------------------
+	// PRIVATE HELPER METHODS 
+	// ---------------------------------
 
 	private void logPrefix(LOG_TYPE lType, String prefix, String msg, ArrayList args) {
 		log(lType, prefix + " " + msg, args);

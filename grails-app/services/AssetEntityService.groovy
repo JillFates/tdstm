@@ -20,6 +20,7 @@ import org.hibernate.transform.Transformers
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.transaction.annotation.Transactional
 import net.transitionmanager.utils.Profiler
+import groovy.time.TimeDuration
 
 import java.util.regex.Matcher
 // Used to wire up bindData
@@ -2189,7 +2190,8 @@ class AssetEntityService {
 		def key = params.key
 		def projectId = params.projectId
 
-		Profiler profiler = Profiler.create(params[Profiler.KEY_NAME]==Profiler.KEY_NAME, key)
+		boolean profilerEnabled = params[Profiler.KEY_NAME]==Profiler.KEY_NAME
+		Profiler profiler = Profiler.create(profilerEnabled, key)
 		profiler.beginInfo "EXPORT"
 
 		// Helper closure that returns the size of an object or zero (0) if it is null
@@ -2382,6 +2384,10 @@ class AssetEntityService {
 			// This variable is used to determine when to call the updateProgress
 			float updateOnPercent = 0.01
 
+			// Used by the profile sampling to determine # of rows to profile and how often within the dataset
+			double percentToProfile = 5.0		// Sample 5% of all of data 
+			double frequencyToProfile = 5.0		// Sample the data every 5% of the way
+
 			// Have to load the maps because we update the column names across the top for all sheets
 			serverDTAMap = DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Devices" )
 			appDTAMap =  DataTransferAttributeMap.findAllByDataTransferSetAndSheetName( dataTransferSetInstance,"Applications" )
@@ -2566,13 +2572,6 @@ class AssetEntityService {
 
 				profiler.lapInfo "Updating spreadsheet headers"
 
-				// log.debug "Device Export - serverColumnNameList=$serverColumnNameList"
-
-				// We want to limit the number of laps are profiled for any given asset so the value 
-				// in 2x+1 of the flushAfterLimit of 50 rows in GormUtil.flushAndClearSession so that we 
-				// can profile that as well.
-				int maxProfilerLaps = 101
-
 				def validationSheet = getWorksheet("Validation")
 
 				Map optionsSize = [:]
@@ -2600,26 +2599,99 @@ class AssetEntityService {
 
 				writeValidationSheet()
 			
-				
+				def calcProfilerCriteria = { datasetSize -> 
+					int sampleQty = 1
+					int sampleModulus = 1
+					// int numOfSampleSets = (int)(1/frequencyToProfile)
+					int numOfSampleSets = Math.round(100/frequencyToProfile)
+
+					if (datasetSize > 0) {
+						sampleQty = Math.round( (datasetSize * percentToProfile / 100) / numOfSampleSets)
+						if (sampleQty == 0) {
+							sampleQty = 1
+						}
+
+						// sampleModulus = (int)(datasetSize / numOfSampleSets)
+						sampleModulus = Math.floor(datasetSize / numOfSampleSets)
+						if (sampleModulus == 0) {
+							sampleModulus = datasetSize
+						}
+					}
+
+					return [sampleQty, sampleModulus]
+				}
+
+				// The threshold (milliseconds) to warning on when the processing time is exceeded for a row
+				Map profileRowThresholds = [
+					(AssetClass.DEVICE): 300,
+					(AssetClass.APPLICATION): 80
+				]
+				// The maximum # of violations to log
+				final int profileThresholdLogLimit = 100 	
+				final String thresholdWarnMsg = 'A total of %d row(s) exceeded the duration threshold of %d ms'
+
+				// The following variables are used to control the profiling behavior
+				//
+				// Counter used to count the number of threshold violations
+				int profileThresholdViolations 
+				int profileSampleQty
+				int profileSampleModulus
+				int profileSamplingTics
+				long lapDuration
+				boolean profilingRow
+
 				//
 				// Device Export
 				//
-				if ( doDevice ) {				
+				if ( doDevice ) {
 					profiler.beginInfo "Devices"
-					profiler.lap("Devices", "Adding Validations")
+
+					profiler.lap("Devices", "Devices Started")
+
 					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,0, 1, optionsSize["Environment"], serverMap["Environment"], 1, assetSize)
 					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,1, 1, optionsSize["Priority"], serverMap["Priority"], 1, assetSize)
 					WorkbookUtil.addRangeCellValidation(book, serverSheet, validationSheet,2, 1, optionsSize["PlanStatus"], serverMap["PlanStatus"], 1, assetSize)
-					profiler.lap("Devices", "Validations added.")
+					profiler.lap("Devices", "Validations added")
+
 					exportedEntity += 'S'
 					int deviceCount = 0
+					profileThresholdViolations = 0
+					profilingRow = false
+
+					String silentTag = 'DevRowSilent'
+
+					if (profilerEnabled ) {
+						(profileSampleQty, profileSampleModulus) = calcProfilerCriteria(assetSize)
+						log.debug "Devices Export profileSampleQty=$profileSampleQty, profileSampleModulus=$profileSampleModulus, assetSize=$assetSize"
+					}
+
 					profiler.lap('Devices', 'Entering while loop')
 					asset = getAssetList(deviceQuery, queryParams)
-					asset.each{ currentAsset ->
+					asset.each { currentAsset ->
+
+						profiler.beginSilent(silentTag)
+
+						if (profilerEnabled) {
+							if (deviceCount == 0 || (deviceCount % profileSampleModulus == 0)) {
+								profilingRow = true
+								profileSamplingTics = profileSampleQty
+								profiler.lapReset('Devices')
+							}
+
+							if (profilingRow) {
+								if (profileSamplingTics == 0) {
+									profilingRow = false
+								} else {
+									profileSamplingTics--
+									profiler.begin 'Device Row'
+								}
+							}
+						}
+
 						deviceCount++
 						progressCount++
 
-						if (deviceCount <= maxProfilerLaps) {
+						if (profilingRow) {
 							profiler.lap('Devices', 'Read device %d of %d, id=%d', [deviceCount, assetSize, currentAsset.id])
 						}
 
@@ -2630,9 +2702,6 @@ class AssetEntityService {
 							addCell(serverSheet, deviceCount, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC)
 						}
 
-						if (deviceCount <= maxProfilerLaps) {
-							profiler.begin 'Device Row'
-						}
 						for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
 
 							def addContentToSheet
@@ -2644,8 +2713,14 @@ class AssetEntityService {
 							//if (deviceCount == 1)
 							//	log.debug "Device Export - attribute=$attribute, colName=$colName, colNum=$colNum"
 
-							if (deviceCount <= maxProfilerLaps) {
-								profiler.lap 'Devices', 'Set vars for %s', [colName]
+							if (profilingRow) {
+								// log.debug "SET VAR TIME = " + profiler.getLapDuration('Devices').toMilliseconds()
+								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
+								if (lapDuration > 3) {
+									profiler.log(Profiler.LOG_TYPE.INFO, 'Set var %s (%s msec)', [colName, lapDuration.toString()])
+								} else {
+									profiler.lapReset('Devices')
+								}
 							}
 
 							if (attribute && a.(serverDTAMap.eavAttribute.attributeCode[coll]) == null ) {
@@ -2690,22 +2765,40 @@ class AssetEntityService {
 									addCell(serverSheet, deviceCount, colNum, value)
 							}
 
-							if (deviceCount <= maxProfilerLaps) {
-								profiler.lap 'Devices', 'Set cell %s', [colName]
+							if (profilingRow) {
+								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
+								if (lapDuration > 3) {
+									profiler.log(Profiler.LOG_TYPE.INFO, 'Set CELL %s (%s msec)', [colName, lapDuration.toString()])
+								} else {
+									profiler.lapReset('Devices')
+								}
 							}
 
 						}
-						if (deviceCount <= maxProfilerLaps) {
+						if (profilingRow) {
 							profiler.end 'Device Row'
 						}
 
-						if (deviceCount <= maxProfilerLaps) {
+						if (profilingRow) {
 							profiler.lap 'Devices', 'Flushed Session'
 						}
 
-					}//end: while(asset.next())
+						if (profilerEnabled) {
+							// If the row duration exceeds the threshold we'll report it
+							lapDuration = profiler.getLapDuration(silentTag).toMilliseconds()
+							if (lapDuration > profileRowThresholds[(AssetClass.DEVICE)]) {
+ 								if ( profileThresholdLogLimit > profileThresholdViolations++) {
+									profiler.log(Profiler.LOG_TYPE.WARN, "Processing asset ${currentAsset.id} ($lapDuration msec) exceeded threshold") 
+								}
+							}
+						}
+						profiler.endSilent(silentTag)
+					} // asset.each
 
 					profiler.endInfo("Devices", "processed %d rows", [assetSize])
+					if (profileThresholdViolations > 0) {
+						profiler.log(Profiler.LOG_TYPE.WARN, thresholdWarnMsg, [profileThresholdViolations, profileRowThresholds[(AssetClass.DEVICE)]])
+					}
 				}
 
 				//
