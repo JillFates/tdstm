@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import org.apache.log4j.Logger
 
 /**
  * Stop watch to measure the duration of execution code
@@ -18,6 +19,8 @@ import groovy.time.TimeDuration
  * @author @tavo_luna
  */
 class StopWatch{
+	private static Logger log = Logger.getLogger(StopWatch.class)
+
 	private Date startTime
 	private Date lastLapTime
 	private tags = [:]
@@ -81,6 +84,7 @@ class StopWatch{
 
 	/**
 	 * set a tag mark to Begin
+	 * Every time that this function is called the time mark is reset tho the calltime
 	 */
 	public Date begin(String tag){
 		Date begin = new Date()
@@ -90,15 +94,19 @@ class StopWatch{
 
 	/**
 	 * Get last Time duration of the last lap(TAG) call
+	 * You should call a begin(TAG) to start the profiling block before calling this function
+	 * NOTE: if this is call before invoking begin(TAG) a Warning message will be logged and a profiling block will be created.
 	 */
 	public TimeDuration lap(String tag){
 		Date currentDate = new Date()
 
 		def conf = tags[tag]
-		Date lastLapTime = conf?.lapTime
-		if(lastLapTime == null){
-			lastLapTime = startTime
+		if(conf == null){
+			log.warn("lap('$tag') was called before creating the Profile block, please call begin('$tag') beforehand to avoid this message")
+			begin(tag)
+			conf = tags[tag]
 		}
+		Date lastLapTime = conf.lapTime
 
 		def lap = use (TimeCategory) {
 			return currentDate - lastLapTime

@@ -400,6 +400,11 @@ public class Profiler  {
 	public void lapRoot(String msg){
 		lapRoot(msg, null);
 	}
+	/**
+	 * Lap ROOT is used to log without a TAG (using the global StopWatch)
+	 * @param msg
+	 * @param args
+	 */
 	public void lapRoot(String msg, ArrayList args){
 		if(doProfile){
 			lapRootInfo(msg, args);
