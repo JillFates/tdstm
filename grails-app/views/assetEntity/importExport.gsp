@@ -2,7 +2,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="topNav" />
-    <title>Asset Importas</title>
+    <title>Asset Import</title>
 	<link type="text/css" rel="stylesheet" href="${resource(dir:'css',file:'progressbar.css')}" />
 	<g:javascript src="jquery/ui.progressbar.js"/>
 	<g:javascript src="import.export.js"/>
