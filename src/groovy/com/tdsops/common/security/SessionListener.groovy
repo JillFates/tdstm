@@ -112,18 +112,20 @@ class SessionListener implements HttpSessionListener, HttpSessionAttributeListen
 		HttpSession session = event.session
 		StringBuilder sb = new StringBuilder(LOGGER_PREFIX + 'Attrib Change; ')
 
-		//boolean added = false
+		boolean added = false
 		if (name == SHIRO_KEY) {
 			PrincipalCollection principals = session.getAttribute(name)
 			sb << 'Shiro principal ' + what + ' session ' << session.id << ': ' << principals.primaryPrincipal
-			// added = true
+			added = true
 		}
 
 		//if (event.name == LOGIN_PERSON) {
 		//	if (added) sb << ', '
 		//	sb << 'LOGIN_PERSON ' + what + ' session ' << session.id << ': ' << session[LOGIN_PERSON]
 		//}
-
-		log.debug sb.toString()
+		
+		if (added) {
+			log.debug sb.toString()
+		}
 	}
 }
