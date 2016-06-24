@@ -505,15 +505,17 @@ class UserService implements InitializingBean {
 	}
 	
 	/**
-	 * 
+	 * Used to retgetEventNews
 	 * @param project
 	 * @return
 	 */
-	def getEventNews( project ){
-		def newsList = []
-		def comingEvents = getEvents(getSelectedProject(project), TimeUtil.nowGMT()).keySet().asList()
-		if(comingEvents){
-			newsList = MoveEventNews.findAll("from MoveEventNews where moveEvent.id in (:events) and isArchived =:isArchived  order by dateCreated desc",[events:comingEvents.id, isArchived:0])
+	List getEventNews( projectOrAll ){
+		List newsList = []
+		List comingEvents = getEvents(getSelectedProject(projectOrAll), TimeUtil.nowGMT()).keySet().asList()
+		// log.debug "getEventNews() comingEvents=$comingEvents"
+		if (comingEvents) {
+			String q = 'from MoveEventNews where moveEvent in (:events) and isArchived=:isArchived order by dateCreated desc'	
+			newsList = MoveEventNews.executeQuery(q, [events:comingEvents, isArchived:0])
 		}
 		
 		return newsList

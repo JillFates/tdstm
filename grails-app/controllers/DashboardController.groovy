@@ -4,10 +4,11 @@ import grails.converters.JSON
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
 import com.tdssrc.grails.GormUtil
-import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.ProjectStatus
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.common.lang.ExceptionUtil
 
 import java.text.DateFormat
@@ -220,23 +221,56 @@ class DashboardController {
 	 *
 	 */
 	def retrieveEventsNewsList() {
-		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
-		if(projectInstance!='All'){
-			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		// TODO : JPM 6/2016 : SECURITY : Users should only have the projects that they can access
+		Map map = [ 
+			project: null,
+			newsList: []
+		]
+
+		def projectOrAll
+		List newsList = []
+		Long projectId = NumberUtil.toPositiveLong(params.project, -1)
+		if ( projectId > 0) {
+			projectOrAll = Project.get(projectId)
+			if (projectOrAll) {
+				// TODO : JPM 6/2016 : SECURITY : Should be checking if user has access to project
+				userPreferenceService.setPreference( "CURR_PROJ", "${projectId}" )
+			} else { 
+				projectId = -1
+			}
+		} else if (projectId == 0) {
+			projectOrAll = 'All'
 		}
 
-		def result = new ArrayList()
-		def newsList = userService.getEventNews(projectInstance)
+		if (projectId == -1) {
+			projectOrAll = securityService.getUserCurrentProject()
+		}
+
+		if (projectOrAll) {
+			newsList = userService.getEventNews(projectOrAll)
+		}
+
+		/*
+
+
+
+		def projectInstance = params.project!='0' ? Project.get(params.project) : 'All'
+		if (projectInstance != 'All') {
+			userPreferenceService.setPreference( "CURR_PROJ", "${projectInstance.id}" )
+		}
+		*/
+		List result = new ArrayList()
+		// def newsList = userService.getEventNews(projectInstance)
 		newsList.each { news ->
 			result.add(
-					[
-							eventId: news.moveEvent.id,
-							projectName: news.moveEvent.project.name,
-							date: news.dateCreated,
-							event: news.moveEvent.name,
-							news: news.message
-					])
-
+				[
+					eventId: news.moveEvent.id,
+					projectName: news.moveEvent.project.name,
+					date: news.dateCreated,
+					event: news.moveEvent.name,
+					news: news.message
+				]
+			)
 		}
 
 		render result as JSON
