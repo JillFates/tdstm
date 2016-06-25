@@ -3762,8 +3762,8 @@ class AssetEntityController {
 		def today = TimeUtil.formatDateTime(getSession(), new Date(), TimeUtil.FORMAT_DATE_TIME_5)
 		try{
 			def filePath = "/templates/TDS-Storage-Inventory.xls"
-			def filename = "${project.name}SpecialExport-${today}"
-			def book = ExportUtil.workBookInstance(filename, filePath, response) 
+			def book = ExportUtil.loadSpreadsheetTemplate(filePath)
+
 			def spcExpSheet = book.getSheet("SpecialExport")
 			def storageInventoryList = assetEntityService.getSpecialExportData( project )
 			def spcColumnList = ["server_id", "app_id", "server_name", "server_type", "app_name", "tru", "tru2", "move_bundle", "move_date",
@@ -3775,6 +3775,12 @@ class AssetEntityController {
 					WorkbookUtil.addCell(spcExpSheet, c, r+1, valueForSheet )
 				 }
 			}
+
+			def filename = "${project.name}SpecialExport-${today}"
+			filename += "." + ExportUtil.getWorkbookExtension(book)
+
+			def mimetypes = grailsApplication.config.grails.mime.types
+			ExportUtil.setContentType(response, filename, mimetypes)
 			book.write(response.getOutputStream())
 		}catch( Exception ex ){
 			log.error "Exception occurred while exporting data"+ex.printStackTrace()
