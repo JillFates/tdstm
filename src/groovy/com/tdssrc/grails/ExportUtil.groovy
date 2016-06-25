@@ -1,8 +1,10 @@
 package com.tdssrc.grails
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-// import org.codehaus.groovy.grails.commons.ApplicationHolder
 import com.tdsops.common.grails.ApplicationContextHolder
+import org.apache.commons.io.FilenameUtils
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 class ExportUtil {
 
@@ -11,22 +13,37 @@ class ExportUtil {
 	 * @param templateFilename - the relative path+filename of the spreadsheet template to open
 	 * @return the spreadsheet workbook
 	 */
-	static HSSFWorkbook loadSpreadsheetTemplate(String templateFilename) {
+	static Workbook loadSpreadsheetTemplate(String templateFilename) {
 		
 		// File file =  ApplicationHolder.application.parentContext.getResource( templateFilename ).getFile()
 		File file =  ApplicationContextHolder.getApplicationContext().getResource( templateFilename ).getFile()
 		if (! file.exists()) {
 			throw new RuntimeException("Unable to load template file $templateFilename")
 		}
-		HSSFWorkbook book = new HSSFWorkbook(new FileInputStream( file ))
-
-		return book
+		return WorkbookFactory.create(file)
 	}
 
+	/**
+	 * Set the mimetype of the file, and the Header disposition
+	 * @param response
+	 * @param filename
+	 * @param mimetypes
+	 */
+	static void setContentType(Object response, String filename, Map mimetypes) {
+		String ext = FilenameUtils.getExtension(filename)
+		String mime = mimetypes[ext]
+		response.setContentType(mime)
+		response.setHeader( "Content-Disposition", "attachment; filename=\"${filename}\"" )
+	}
+
+	static String getWorkbookExtension(Workbook wb){
+		return (wb instanceof XSSFWorkbook)? "xlsx" : "xls"
+	}
 	/**
 	 * Used to send the appropriate content-type header to the response 
 	 * @param response - the servlet response object
 	 * @param filename - the name that the file should be saved as when downloaded
+	 * @deprecated use setExcelContentType(response, filename, mimetypes)
 	 */
 	static void setExcelContentType(Object response, String filename) {
 		response.setContentType( "application/vnd.ms-excel" )
@@ -43,12 +60,12 @@ class ExportUtil {
 	 * @param fileName - the name of the spreadsheet as it will appear to the user when generated
 	 * @param templateFilename - the relative path+filename of the spreadsheet template to open
 	 * @return the spreadsheet workbook
+	 * @deprecated
 	 */
 	def static workBookInstance(String fileName, String templateFilename, Object response) {
 		// TODO : JPM 3/2016 : ExportUtil.workBookInstance() method should be swapped out for loadSpreadsheetTemplate and setExcelContentType
-		HSSFWorkbook book =  loadSpreadsheetTemplate(templateFilename)
+		Workbook book =  loadSpreadsheetTemplate(templateFilename)
 		setExcelContentType(response, fileName)
 		return book
 	}
-	
 }

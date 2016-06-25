@@ -1,35 +1,15 @@
-import grails.converters.JSON
-
-import org.codehaus.groovy.grails.web.json.JSONObject
-
-import groovy.time.TimeCategory
-import org.apache.commons.lang.math.NumberUtils
-import org.apache.commons.lang.StringUtils
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-
 import com.tds.asset.AssetEntity
+import com.tdsops.common.os.Shell
+import com.tdsops.common.security.AESCodec
+import com.tdsops.common.security.DESCodec
 import com.tdssrc.eav.EavAttribute
 import com.tdssrc.eav.EavAttributeOption
-import com.tdssrc.eav.EavEntityType
-import com.tdssrc.grails.ExportUtil
-import com.tdssrc.grails.WorkbookUtil
-import com.tdssrc.grails.WebUtil
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
-import com.tdsops.common.security.*
-import com.tdsops.common.os.Shell
+import com.tdssrc.grails.WebUtil
+import grails.converters.JSON
 // import org.codehaus.groovy.grails.commons.ApplicationHolder
-import com.tdsops.common.grails.ApplicationContextHolder
-import com.tdsops.common.security.SecurityUtil
-
-
-
 //import org.springframework.web.multipart.*
 //import org.springframework.web.multipart.commons.*
-
-import java.util.UUID
-
 class AdminController {
 	def jdbcTemplate
 	def sessionFactory
@@ -1174,6 +1154,7 @@ class AdminController {
 		}
 
 		Map formOptions = [
+			exportFormat: params.exportFormat ?: 'xlsx',
 			staffType: params.staffType,				// CLIENT_STAFF | AVAIL_STAFF | PROJ_STAFF
 			includeLogin: params.includeLogin,			// Y)es if checked
 			loginChoice: params.loginChoice				// 0=All, 1=Active, 2=Inactive

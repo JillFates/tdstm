@@ -2,32 +2,27 @@
  * AccountImportExportService - A set of service methods the importing and exporting of project staff and users
  */
 
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
-import com.tdssrc.grails.ExportUtil
-import com.tdssrc.grails.WorkbookUtil
-import com.tdssrc.grails.GormUtil
+
+
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
-import org.apache.commons.lang.StringUtils
+import com.tdssrc.grails.*
+import grails.transaction.Transactional
+import groovy.json.JsonBuilder
 import org.apache.commons.lang.RandomStringUtils as RSU
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.springframework.web.multipart.*
-import org.springframework.web.multipart.commons.*
-import org.apache.commons.lang.StringUtils
-import grails.transaction.*
-import groovy.json.*
-import java.text.SimpleDateFormat
-import javax.servlet.http.HttpSession 
+import org.apache.poi.ss.usermodel.Workbook
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
 
+import javax.servlet.http.HttpSession
 //import org.apache.commons.validator.routines.EmailValidator
 
 class AccountImportExportService {
 
 	static transactional = false
 
+	def grailsApplication
 	def auditService
 	def coreService
 	def partyRelationshipService
@@ -39,7 +34,10 @@ class AccountImportExportService {
 	static final String LOGIN_OPT_ACTIVE = 'Y'
 	static final String LOGIN_OPT_INACTIVE = 'N'
 
-	static final String ACCOUNT_EXPORT_TEMPLATE = '/templates/AccountsImportExport.xls'
+	private static final ACCOUNT_EXPORT_TEMPLATE = [
+			xls:'/templates/AccountsImportExport.xls',
+			xlsx:'/templates/AccountsImportExport.xlsx'
+	]
 	static final String EXPORT_FILENAME_PREFIX = 'AccountExport'
 	static final String IMPORT_FILENAME_PREFIX = 'AccountImport'
 
@@ -320,7 +318,7 @@ class AccountImportExportService {
 			throw new UnauthorizedException('Do not have the required permission for this action')
 		}
 
-		HSSFWorkbook workbook = getAccountExportTemplate()
+		Workbook workbook = getAccountExportTemplate()
 
 		Map sheetOptions = getUserPreferences(session)
 
@@ -398,9 +396,9 @@ class AccountImportExportService {
 			throw new EmptyResultException('The file you uploaded appears to be empty')
 		}
 
-		// Save the spreadsheet file and then read it into a HSSFWorkbook
+		// Save the spreadsheet file and then read it into a Workbook
 		model.filename = saveImportSpreadsheet(request, byWhom, formOptions.fileParamName)
-		HSSFWorkbook workbook = readImportSpreadsheet(model.filename)
+		Workbook workbook = readImportSpreadsheet(model.filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 		sheetInfoOpts.putAll(formOptions)		
@@ -456,7 +454,7 @@ class AccountImportExportService {
 		}
 
 		// Load the spreadsheet
-		HSSFWorkbook workbook = readImportSpreadsheet(filename)
+		Workbook workbook = readImportSpreadsheet(filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 		sheetInfoOpts.putAll(formOptions)
@@ -539,7 +537,7 @@ class AccountImportExportService {
 
 		// Need to load the spreadsheet into the list of accounts so we can determine the accountsToRemoveFromProject param. This param 
 		// will be used to determine if warning message should be show when it is > 0 when user is about to post
-		HSSFWorkbook workbook = readImportSpreadsheet(formOptions.filename)
+		Workbook workbook = readImportSpreadsheet(formOptions.filename)
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
 		model.accountsToRemoveFromProject = countRemoveFromProject(accounts)	
@@ -607,7 +605,7 @@ class AccountImportExportService {
 			throw new UnauthorizedException('Do not have the required permission to import user information')
 		}
 
-		HSSFWorkbook workbook = readImportSpreadsheet(formOptions.filename)
+		Workbook workbook = readImportSpreadsheet(formOptions.filename)
 
 		Map sheetInfoOpts = getSheetInfoAndOptions(session, project, workbook)
 		sheetInfoOpts.putAll(formOptions)
@@ -899,7 +897,7 @@ class AccountImportExportService {
 	 * @param workbook
 	 * @return A map containing the values from the title page plus the userTzId, and userDateFormat and formatters
 	 */
-	private Map getSheetInfoAndOptions(session, Project project, HSSFWorkbook workbook) {
+	private Map getSheetInfoAndOptions(session, Project project, Workbook workbook) {
 
 		// Collect the details off of the title sheet including the project id, exportedOn and the timezone when the data was exported
 		Map sheetInfoOpts = getUserPreferences(session)
@@ -1403,10 +1401,11 @@ class AccountImportExportService {
 	 * Used to retrieve a blank Account Export Spreadsheet
 	 * @return The blank spreadsheet
 	 */
-	private HSSFWorkbook getAccountExportTemplate() {
+	private Workbook getAccountExportTemplate(format = "xlsx") {
 		// Load the spreadsheet template and populate it
-		String templateFilename = ACCOUNT_EXPORT_TEMPLATE
-        HSSFWorkbook spreadsheet = ExportUtil.loadSpreadsheetTemplate(templateFilename)
+		String templateFilename = ACCOUNT_EXPORT_TEMPLATE[format]
+        Workbook spreadsheet = ExportUtil.loadSpreadsheetTemplate(templateFilename)
+		log.info("OLB generating: ${spreadsheet.class}")
         updateSpreadsheetHeader(spreadsheet)
         addRolesToSpreadsheet(spreadsheet)
         addTeamsToSpreadsheet(spreadsheet)
@@ -1470,7 +1469,7 @@ class AccountImportExportService {
 	 * @param project - the project that this export is for
 	 * @param sheet - the spreadsheet to update
 	 */
-	 //HSSFWorkbook
+	 //Workbook
 	private Map readTitleSheetInfo(Project project, workbook, Map sheetOpts) {
 
 		def sheet = workbook.getSheet(TEMPLATE_TAB_TITLE)
@@ -1556,8 +1555,10 @@ class AccountImportExportService {
 	 * @param spreadsheet - the spreadsheet object
 	 * @param filename - the filename that it should be saved as on the client
 	 */ 
-	private void sendSpreadsheetToBrowser(Object response, HSSFWorkbook spreadsheet, String filename) {
-		ExportUtil.setExcelContentType(response, filename)
+	private void sendSpreadsheetToBrowser(Object response, Workbook spreadsheet, String filename) {
+		filename += "." + ExportUtil.getWorkbookExtension(spreadsheet)
+		def mimetypes = grailsApplication.config.grails.mime.types
+		ExportUtil.setContentType(response, filename, mimetypes)
 		spreadsheet.write( response.getOutputStream() )
 		response.outputStream.flush()
 	}
@@ -1607,7 +1608,7 @@ class AccountImportExportService {
 	 * @param formOptions - A map of the form variables submitted by the user
 	 * @permission PersonExport 
 	 */
-	private HSSFWorkbook generateAccountExportSpreadsheet(Object session, UserLogin byWhom, Project project, Map formOptions) {
+	private Workbook generateAccountExportSpreadsheet(Object session, UserLogin byWhom, Project project, Map formOptions) {
 		if (!project) {
 			return
 		}
@@ -1644,7 +1645,8 @@ class AccountImportExportService {
 
 		Map sheetInfoOpts = getUserPreferences(session)
 
-		def workbook = getAccountExportTemplate()
+		//log.info "FORMAT: ${formOptions.exportFormat}"
+		def workbook = getAccountExportTemplate(formOptions.exportFormat)
 
 		populateAccountSpreadsheet(byWhom, project, persons, workbook, formOptions, sheetInfoOpts)
 
@@ -1664,7 +1666,7 @@ class AccountImportExportService {
 		UserLogin byWhom, 
 		Project project, 
 		List persons, 
-		HSSFWorkbook workbook, 
+		Workbook workbook,
 		Map formOptions,
 		Map sheetInfoOpts) {
 
@@ -1915,7 +1917,7 @@ class AccountImportExportService {
 	 * @param formOptions - the user input params from the form
 	 * @return The list of accounts mapped out
 	 */
-	private List<Map> validateSpreadsheetContent(UserLogin byWhom, Project project, HSSFWorkbook workbook, Map sheetInfoOpts, Map formOptions) {
+	private List<Map> validateSpreadsheetContent(UserLogin byWhom, Project project, Workbook workbook, Map sheetInfoOpts, Map formOptions) {
 
 		// Read in the accounts and then validate them
 		List accounts = readAccountsFromSpreadsheet(workbook, sheetInfoOpts)
@@ -1986,11 +1988,11 @@ class AccountImportExportService {
 	}
 
 	/**
-	 * Used to read a spreadsheet from the file system into a HSSFWorkbook which is returned
+	 * Used to read a spreadsheet from the file system into a Workbook which is returned
 	 * @param filename - the filename to spreadsheet (which assumes it is in the app configured tmp directory)
 	 * @return the spreadsheet itself
 	 */
-	private HSSFWorkbook readImportSpreadsheet(String filename) {
+	private Workbook readImportSpreadsheet(String filename) {
 		if (! filename) {
 			throw new InvalidParamException('The import filename parameter was missing')
 		}
@@ -2000,8 +2002,7 @@ class AccountImportExportService {
 		if (! file || ! file.exists()) {
 			throw new EmptyResultException('Unable to read from the uploaded spreadsheet')
 		}
-		HSSFWorkbook xlsWorkbook = new HSSFWorkbook(new FileInputStream(file))
-		return xlsWorkbook
+		return WorkbookFactory.create(file)
 	}
 
 	/**
