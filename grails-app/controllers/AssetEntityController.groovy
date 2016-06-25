@@ -3779,8 +3779,7 @@ class AssetEntityController {
 			def filename = "${project.name}SpecialExport-${today}"
 			filename += "." + ExportUtil.getWorkbookExtension(book)
 
-			def mimetypes = grailsApplication.config.grails.mime.types
-			ExportUtil.setContentType(response, filename, mimetypes)
+			ExportUtil.setContentType(response, filename)
 			book.write(response.getOutputStream())
 		}catch( Exception ex ){
 			log.error "Exception occurred while exporting data"+ex.printStackTrace()

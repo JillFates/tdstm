@@ -1,3 +1,4 @@
+import com.tdssrc.grails.ExportUtil
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 import grails.converters.JSON
@@ -625,15 +626,12 @@ class MoveEventController {
 		def preMoveCheckListError = reportsService.generatePreMoveCheckList(project.id, moveEvent, viewUnpublished).allErrors.size()
 
 		try {
-			File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xls" ).getFile()
-			//set MIME TYPE as Excel
-			response.setContentType( "application/vnd.ms-excel" )
+			def book = ExportUtil.loadSpreadsheetTemplate("/templates/Runbook.xlsx")
+			//File file =  ApplicationHolder.application.parentContext.getResource( "/templates/Runbook.xlsx" ).getFile()
 			def filename = 	"${project.name} - ${moveEvent.name} Runbook v${currentVersion} -${today}"
-			filename = filename.replace(".xls",'')
-			response.setHeader( "Content-Disposition", "attachment; filename = ${filename}" )
-			response.setHeader( "Content-Disposition", "attachment; filename=\""+filename+".xls\"" )
+			filename += "." + ExportUtil.getWorkbookExtension(book)
 
-			def book = new HSSFWorkbook(new FileInputStream( file ));
+			ExportUtil.setContentType(response, filename)
 			
 			def serverSheet = book.getSheet("Servers")
 			def personelSheet = book.getSheet("Staff")

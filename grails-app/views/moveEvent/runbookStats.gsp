@@ -46,9 +46,12 @@
      </td>
  </tr>
  
- <tr><td class="buttonR">
-				<input type="submit" class="submit"  value="Export Runbook (Excel)"  id="generateRunbookId"  onclick=" $('#moveEventForm').submit();"/>
-	</td>
+ <tr><td>
+	 <button type="button" class="btn btn-default" id="generateRunbookId"  onclick=" $('#moveEventForm').submit();">
+		 Export Runbook (Excel)
+		 <span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
+	 </button>
+ </td>
 </tr>
  
  </table>

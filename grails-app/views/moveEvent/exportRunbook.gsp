@@ -25,8 +25,11 @@
 							</tr>
 						</tds:hasPermission>
 						<tr>
-							<td class="buttonR">
-								<input type="button" class="submit" value="Summary" id="generateId" onclick="generateRunbook();"/>
+							<td>
+								<button type="button" class="btn btn-default" id="generateId"  onclick="generateRunbook();">
+									Summary
+									<span class="exportIcon glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+								</button>
 							</td>
 						</tr>
 					</table>

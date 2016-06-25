@@ -22,7 +22,6 @@ class AccountImportExportService {
 
 	static transactional = false
 
-	def grailsApplication
 	def auditService
 	def coreService
 	def partyRelationshipService
@@ -1557,8 +1556,7 @@ class AccountImportExportService {
 	 */ 
 	private void sendSpreadsheetToBrowser(Object response, Workbook spreadsheet, String filename) {
 		filename += "." + ExportUtil.getWorkbookExtension(spreadsheet)
-		def mimetypes = grailsApplication.config.grails.mime.types
-		ExportUtil.setContentType(response, filename, mimetypes)
+		ExportUtil.setContentType(response, filename)
 		spreadsheet.write( response.getOutputStream() )
 		response.outputStream.flush()
 	}
