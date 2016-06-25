@@ -14,8 +14,6 @@ class ExportUtil {
 	 * @return the spreadsheet workbook
 	 */
 	static Workbook loadSpreadsheetTemplate(String templateFilename) {
-		
-		// File file =  ApplicationHolder.application.parentContext.getResource( templateFilename ).getFile()
 		File file =  ApplicationContextHolder.getApplicationContext().getResource( templateFilename ).getFile()
 		if (! file.exists()) {
 			throw new RuntimeException("Unable to load template file $templateFilename")
@@ -27,9 +25,10 @@ class ExportUtil {
 	 * Set the mimetype of the file, and the Header disposition
 	 * @param response
 	 * @param filename
-	 * @param mimetypes
 	 */
-	static void setContentType(Object response, String filename, Map mimetypes) {
+	static void setContentType(Object response, String filename) {
+		def mimetypes = ApplicationContextHolder.config.grails.mime.types
+
 		String ext = FilenameUtils.getExtension(filename)
 		String mime = mimetypes[ext]
 		response.setContentType(mime)
@@ -46,6 +45,7 @@ class ExportUtil {
 	 * @deprecated use setExcelContentType(response, filename, mimetypes)
 	 */
 	static void setExcelContentType(Object response, String filename) {
+
 		response.setContentType( "application/vnd.ms-excel" )
 
 		// TODO : JPM 3/2016 : We shouldn't be mucking with the Excel file extension since might have different types going forward
