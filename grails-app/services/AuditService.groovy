@@ -40,7 +40,6 @@ class AuditService {
 		def auditUri = request.forwardURI - request.contextPath
 		if (auditedUri(auditUri)) {
 			def subject = SecurityUtils.subject
-			log.info("OLB: DMN: $params")
 			params = filterParams(params)
 			String paramsMsg = params.size() ? "$params " : ''
 			String user = (subject && subject.principal) ? subject.principal : 'ANONYMOUS_USER'
