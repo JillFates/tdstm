@@ -171,7 +171,7 @@
 
 				messageDiv.html('').hide();
 
-				var title = '<h1>'+(reviewOrProcess=='r' ? 'Reviewing assets in batch ' : 'Posting assets to inventory for batch ')+batchId;
+				var title = (reviewOrProcess=='r' ? 'Reviewing assets in batch ' : 'Posting assets to inventory for batch ')+batchId;
 				var uri = '/import/invokeAssetImport' + (reviewOrProcess=='r'?'Review':'Process') + '/' + batchId;
 				$.post(
           tdsCommon.createAppURL(uri)
