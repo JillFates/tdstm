@@ -126,20 +126,22 @@
 
 			<tds:hasPermission permission="Export">
 			<tr>
-				<td colspan="3" class="form-inline">
+				<td>Export Format:</td>
+				<td colspan="2" class="form-inline">
+					<select name="exportFormat" class="form-control selectpicker show-tick">
+						<option value="xlsx" selected="selected">Excel Workbook (.xlsx)</option>
+						<option value="xls">Excel 97-2004 (.xls)</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
 					<%--
 					<g:link controller="assetEntity" action="exportSpecialReport">
 						<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
 					</g:link>
 					--%>
-					<div class="form-group col-sm-8">
-						<label>Export Format:</label>
-						<select name="exportFormat" class="form-control selectpicker show-tick">
-							<option value="xlsx" selected="selected">Excel Workbook (.xlsx)</option>
-							<option value="xls">Excel 97-2004 (.xls)</option>
-						</select>
-					</div>
-					<button type="submit" class="btn btn-default col-sm-4">
+					<button type="submit" class="btn btn-default">
 						Export
 						<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
 					</button>
