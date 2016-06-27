@@ -1,5 +1,5 @@
 /* This is a TDS source file.  
- * This javascript file contains fuctions used by all the list views
+ * This javascript file contains function used by all the list views
  */
 
 // Set the defaults for any jqgrid
