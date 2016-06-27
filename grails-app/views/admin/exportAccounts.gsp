@@ -72,15 +72,15 @@
 									<input class="button" type="button" value="Generate Special" onclick="window.location=this.parentNode.href;"/>
 								</g:link>
 								--%>
-								<div class="form-group col-sm-6">
+								<%-- div class="form-group col-sm-6">
 									<label>Export Format:</label>
 									<select name="exportFormat" class="form-control selectpicker show-tick">
 										<option value="xlsx" selected="selected">Excel Workbook (.xlsx)</option>
 										<option value="xls">Excel 97-2004 (.xls)</option>
 									</select>
-								</div>
-								<button type="submit" class="btn btn-default col-sm-2">
-									Export
+								</div --%>
+								<button type="submit" class="btn btn-default">
+									Export Excel (.xlsx)
 									<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span>
 								</button>
 							</div>
