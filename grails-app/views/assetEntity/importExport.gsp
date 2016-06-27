@@ -159,7 +159,7 @@
 
                         <div class="form-group">
                             <label for="checkboxGroup">Choose Items to Import:</label>
-                            <div class="row" id="checkboxGroup">
+                            <div class="row checkboxGroup" id="checkboxGroup">
                                 <div class="col-md-6">
                                     <ul class="list-group sub-set">
                                         <li class="list-group-item">
@@ -225,7 +225,7 @@
                     <tds:hasPermission permission="Import">
                         <div class="box-footer">
                             <button type="submit" id="run"  class="btn btn-primary">Import Spreadsheet&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
-                            <div class="box-footer-url"><g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></div>
+                            <div class="box-footer-url-right"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> <g:link controller="dataTransferBatch" >Manage Batches: ${dataTransferBatchs}</g:link></div>
                         </div>
                     </tds:hasPermission>
                 </g:form>
