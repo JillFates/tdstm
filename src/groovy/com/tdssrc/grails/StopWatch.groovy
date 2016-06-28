@@ -41,7 +41,7 @@ class StopWatch {
 	 * Set a tag mark to Begin
 	 * Every time that this function is called the time mark is reset tho the calltime
 	 */
-	public Date begin(String tag) {
+	public Date begin(String tag='') {
 		Date begin = new Date()
 		tags[tag] = [ begin:begin, lapTime:begin, lastLap:new TimeDuration(0,0,0,0) ]
 		return begin

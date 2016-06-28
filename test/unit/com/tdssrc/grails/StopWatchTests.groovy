@@ -18,8 +18,8 @@ class StopWatchTests extends Specification {
 		then:
 			stopWatch.hasTag() == true
 			stopWatch.hasTag(tag) == true
-			stopWatch.getStartTime() == started
-			stopWatch.getStartTime(tag) == startedTag
+			stopWatch.getStartTime().getTime() == started.getTime()
+			stopWatch.getStartTime(tag).getTime() == startedTag.getTime()
 
 		// Test that the clocks can be terminated
 		when:	

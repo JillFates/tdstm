@@ -2387,7 +2387,7 @@ class AssetEntityService {
 			float updateOnPercent = 0.01
 
 			// Used by the profile sampling to determine # of rows to profile and how often within the dataset
-			double percentToProfile = 5.0		// Sample 5% of all of data 
+			double percentToProfile = 25.0		// Sample 5% of all of data 
 			double frequencyToProfile = 5.0		// Sample the data every 5% of the way
 
 			// Have to load the maps because we update the column names across the top for all sheets
@@ -2628,12 +2628,14 @@ class AssetEntityService {
 
 				// The threshold (milliseconds) to warning on when the processing time is exceeded for a row
 				Map profileRowThresholds = [
-					(AssetClass.DEVICE): 10,
+					(AssetClass.DEVICE): 20,
 					(AssetClass.APPLICATION): 50
 				]
 
 				// The maximum # of violations to log
 				final int profileThresholdLogLimit = 100 	
+				final int profileThresholdSettingField = 5
+
 				final String thresholdWarnMsg = 'A total of %d row(s) exceeded the duration threshold of %d ms'
 
 				// The following variables are used to control the profiling behavior
@@ -2672,7 +2674,7 @@ class AssetEntityService {
 
 					if (profilerEnabled ) {
 						(profileSampleQty, profileSampleModulus) = calcProfilerCriteria(assetSize)
-						log.debug "Devices Export profileSampleQty=$profileSampleQty, profileSampleModulus=$profileSampleModulus, assetSize=$assetSize"
+						// log.debug "Devices Export profileSampleQty=$profileSampleQty, profileSampleModulus=$profileSampleModulus, assetSize=$assetSize"
 					}
 
 					profiler.lap('Devices', 'Entering while loop')
@@ -2713,6 +2715,10 @@ class AssetEntityService {
 							addCell(serverSheet, deviceCount, 0, currentAsset.id, Cell.CELL_TYPE_NUMERIC)
 						}
 
+						if (profilingRow) {
+							profiler.lap('Devices', 'Update Progress')
+						}
+
 						for ( int coll = 0; coll < serverColumnNameListSize; coll++ ) {
 
 							def addContentToSheet
@@ -2727,7 +2733,7 @@ class AssetEntityService {
 							if (profilingRow) {
 								// log.debug "SET VAR TIME = " + profiler.getLapDuration('Devices').toMilliseconds()
 								lapDuration = profiler.getLapDuration('Devices').toMilliseconds()
-								if (lapDuration > 3) {
+								if (lapDuration > profileThresholdSettingField) {
 									profiler.log(Profiler.LOG_TYPE.INFO, 'Set var %s (%s msec)', [colName, lapDuration.toString()])
 								} else {
 									profiler.lapReset('Devices')
