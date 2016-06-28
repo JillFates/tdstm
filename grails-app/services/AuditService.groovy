@@ -2,6 +2,7 @@ import org.apache.shiro.SecurityUtils
 import org.codehaus.groovy.grails.commons.ConfigurationHolder
 import org.springframework.transaction.annotation.Transactional
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import net.transitionmanager.UserAudit
 
 /**
@@ -43,8 +44,8 @@ class AuditService {
 			params = filterParams(params)
 			String paramsMsg = params.size() ? "$params " : ''
 			String user = (subject && subject.principal) ? subject.principal : 'ANONYMOUS_USER'
-
-			log.info "USER_ACTIVITY: $user invoked $request.method $auditUri ${paramsMsg}from ${request.remoteAddr}"
+			String remoteIp = HtmlUtil.getRemoteIp(request).toString()
+			log.info "USER_ACTIVITY: $user invoked $request.method $auditUri ${paramsMsg}from ${remoteIp}"
 		}
 	}
 

@@ -94,13 +94,16 @@ class HtmlUtil {
 	
 	/**
 	 * Access the remote IP address from the web request or the X-Forwarded-For header content
+	 * @param request
 	 * @return String The remote IP address that made the web request
 	 */
- 	public static String getRemoteIp() {
-		def webUtils = WebUtils.retrieveGrailsWebRequest()
-
-		//Getting the Request object
-		def request = webUtils.getCurrentRequest()
+ 	public static String getRemoteIp(request = null) {
+ 		if(!request){
+ 			def webUtils = WebUtils.retrieveGrailsWebRequest()
+ 			//Getting the Request object
+			request = webUtils.getCurrentRequest()	
+ 		}
+		
 		
 		// Now try and figure out the IP 
 		def remoteIp = request.getHeader("X-Forwarded-For")
